@@ -1,0 +1,44 @@
+{
+  "claudeCode": {
+    "useTerminal": false,
+    "selectedModel": "global.anthropic.claude-sonnet-4-5-20250929-v1:0",
+    "initialPermissionMode": "default",
+    "preferredLocation": "sidebar",
+    "autosave": true,
+    "useCtrlEnterToSend": false,
+    "enableNewConversationShortcut": true,
+    "respectGitIgnore": true,
+    "disableLoginPrompt": true,
+    "allowDangerouslySkipPermissions": false,
+    "environmentVariables": [
+      {
+        "name": "CLAUDE_CODE_USE_BEDROCK",
+        "value": "1"
+      },
+      {
+        "name": "AWS_REGION",
+        "value": "us-east-1"
+      },
+      {
+        "name": "CLAUDE_CODE_MAX_OUTPUT_TOKENS",
+        "value": "4096"
+      },
+      {
+        "name": "MAX_THINKING_TOKENS",
+        "value": "1024"
+      },
+      {
+        "name": "ANTHROPIC_MODEL",
+        "value": "global.anthropic.claude-sonnet-4-5-20250929-v1:0"
+      },
+      {
+        "name": "ANTHROPIC_SMALL_FAST_MODEL",
+        "value": "us.anthropic.claude-haiku-4-5-20251001-v1:0"
+      },
+      {
+        "name": "ANTHROPIC_DEFAULT_HAIKU_MODEL",
+        "value": "us.anthropic.claude-haiku-4-5-20251001-v1:0"
+      }
+    ]
+  }
+}

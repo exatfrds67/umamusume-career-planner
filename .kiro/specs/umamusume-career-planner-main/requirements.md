@@ -13,7 +13,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 - **Training_Session**: Individual training activities that improve character stats
 - **Support_Cards**: Cards that provide bonuses and events during training
 - **Legacy_Team**: Veteran Umamusume that provide initial stat boosts and inheritance
-- **Stats**: Five core attributes with numerical values (0-1200) and letter grades (G+ through SS) - Speed (top speed, Priority: ★★★★★), Stamina (duration at top speed, Priority: ★★★★), Power (acceleration rate, Priority: ★★★), Guts (final phase performance, Priority: ★), and Intelligence/Wit (skill activation rate, positioning, Priority: ★★)
+- **Stats**: Five core attributes with numerical values (0-1200) and letter grades (G+ through SS) - Speed (top speed, Priority: ★★★★★), Stamina (duration at top speed, Priority: ★★★★), Power (acceleration rate, Priority: ★★★), Guts (final phase performance, Priority: ★), and Wit (skill activation rate, positioning, Priority: ★★)
 - **Stat_Breakpoints**: Critical thresholds at 901 and 1600 where additional stat points provide diminishing returns (half value after 1200, significant benefits at breakpoints)
 - **Hidden_Race_Boost**: Undocumented +400 boost to all stats during career mode races that affects training priority calculations
 - **Aptitudes**: Fixed talent ratings (G through SS) for distances (Sprint 1000-1400m, Mile 1401-1800m, Medium 1801-2400m, Long 2401m+), surfaces (Turf/Dirt), and running styles (Front Runner/Pace Chaser/Late Surger/End Closer) with no numerical values and cannot be changed through training
@@ -73,7 +73,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player, I want to track my character's current state and goals, so that I can make informed training decisions based on comprehensive character information.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 1
 
 1. WHEN setting up a character, THE System SHALL record trainee name, career stage, class, current stat values (Speed 0-1200 Priority ★★★★★, Stamina 0-1200 Priority ★★★★, Power 0-1200 Priority ★★★, Guts 0-1200 Priority ★, Wit 0-1200 Priority ★★) with corresponding letter grades (G+ through SS), and all aptitude ratings (G through SS) for distance categories (Sprint 1000-1400m, Mile 1401-1800m, Medium 1801-2400m, Long 2401m+), surface types (Turf/Dirt), and running styles (Front Runner/Pace Chaser/Late Surger/End Closer)
 2. WHEN updating character state, THE System SHALL track energy levels (0-100%), mood status (Great +20%, Good +10%, Normal 0%, Bad -10%, Awful -20%), days until next race, current conditions (positive/negative status effects), and inherited growth rate bonuses (+10%, +20%, +30%) for each stat with training facility levels (1-5 providing 1.0x to 2.0x multipliers)
@@ -85,7 +85,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player, I want detailed predictions for each training option, so that I can choose the most effective training based on expected stat gains and scenario-specific mechanics.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 2
 
 1. WHEN viewing training options in URA Finale, THE System SHALL display predicted stat gains for Speed, Stamina, Power, Guts, and Wit based on support card bonuses and friendship training
 2. WHEN viewing training options in Unity Cup, THE System SHALL additionally predict Spirit Burst potential, teammate gauge filling, and team stat distribution effects
@@ -97,7 +97,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player, I want race day predictions and strategy recommendations, so that I can prepare my character optimally for upcoming competitions.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 3
 
 1. WHEN a race is approaching, THE System SHALL display detailed race information including grade (G1/G2/G3), track (Kyoto, Tokyo, etc.), surface (Turf/Dirt), distance (Sprint/Mile/Medium/Long), track characteristics (Right/Left, Inner/Outer), and weather conditions (Good/Soft/Heavy ground)
 2. WHEN analyzing race requirements, THE System SHALL provide stat requirement indicators using symbols (○ adequate, ⦾ borderline, △ insufficient, × inadequate) for Speed, Stamina, Power, Guts, and Wit based on race distance, surface, competition level, and weather effects on performance
@@ -109,7 +109,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player, I want advanced skill management with hint-based cost reduction and strategic SP allocation, so that I can optimize skill acquisition through support card interactions and hint collection strategies.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 4
 
 1. WHEN managing skills, THE System SHALL display all available skills with base SP costs, current hint discounts (20% per duplicate hint, 40% maximum), final acquisition costs, and available skill evolution paths from Normal to Rare counterparts
 2. WHEN skills are acquired, THE System SHALL update skill inventory, adjust available SP points, track hint sources that contributed to cost reductions, and automatically replace Normal skills with their Rare counterparts when evolved (e.g., "Go with the Flow" → "Lane Legerdemain", "Homestretch Haste" → "In Body and Mind")
@@ -121,7 +121,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player, I want to track my career progression and maintain historical records, so that I can analyze patterns and improve my training strategies over time.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 5
 
 1. WHEN completing training sessions, THE System SHALL log actual outcomes against predictions and calculate accuracy metrics
 2. WHEN finishing races, THE System SHALL record results, final stats, and strategy effectiveness
@@ -133,7 +133,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player, I want comprehensive support card management with skill hint tracking and deck optimization, so that I can maximize training effectiveness and skill hint acquisition through optimal card selection and strategic training.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 6
 
 1. WHEN setting up a career, THE System SHALL allow detailed input of support card deck composition with exactly 6 support cards (5 owned cards + 1 borrowed card from available options), including card names, rarities (SSR/SR), limit break levels (0-4 stars), specialization types (Speed/Power/Stamina/Guts/Wit/Pal), and complete effect profiles
 2. WHEN configuring support cards, THE System SHALL track friendship bond levels for all 6 cards, training bonuses, rainbow training availability, and maintain comprehensive skill provision databases showing which specific skills each card provides during training
@@ -153,7 +153,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 - **Integration Approach**: Hybrid approach - use external APIs for base character data validation and factor reference tables, but store all personal legacy data locally for privacy
 - **Implementation Priority**: Core inheritance mechanics (factors, bonuses, compatibility) in Phase 1; advanced features (factor farming recommendations, multi-generation planning) in Phase 2
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 7
 
 1. WHEN selecting legacy characters, THE System SHALL record veteran Umamusume stats, inherited factors with specific bonuses (Blue stat factors: ★☆☆ = +5, ★★☆ = +12, ★★★ = +21; Red aptitude factors: 1★ = 1 grade up, then 3★ per additional grade; Green unique skill factors guaranteed from 3★ characters; White normal skill/race bonus factors), available skills, and factor inheritance stacking rules with affinity compatibility indicators (◎ symbol)
 2. WHEN calculating initial character bonuses, THE System SHALL apply legacy stat bonuses, factor effects to base character attributes with proper stacking calculations, aptitude improvements through red factors, skill inheritance from green/white factors, and growth rate bonuses from blue factors with multiple factor source calculations
@@ -165,7 +165,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player, I want all my data stored locally, so that I can maintain privacy and have full control over my training information.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 8
 
 1. THE System SHALL store all career data, analytics, and configurations in local database files
 2. WHEN backing up data, THE System SHALL provide export functionality for complete data preservation
@@ -177,7 +177,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player, I want turn-by-turn guidance with specific recommendations, so that I can make optimal decisions throughout the entire career progression.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 9
 
 1. WHEN starting each turn, THE System SHALL analyze current state and recommend the single best action with clear reasoning
 2. WHEN multiple viable options exist, THE System SHALL rank them with expected value calculations and trade-off explanations
@@ -189,7 +189,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player, I want comprehensive aptitude and growth rate tracking, so that I can optimize character development based on natural strengths and inherited bonuses.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 10
 
 1. WHEN setting up a character, THE System SHALL record all aptitudes (G through SS ratings) for distance categories (Sprint/Mile/Medium/Long), surface types (Turf/Dirt), and running styles (Front Runner/Pace Chaser/Late Surger/End Closer), with aptitudes being fixed talent ratings without numerical values
 2. WHEN tracking growth rates, THE System SHALL monitor inherited growth bonuses (+10%, +20%, +30%) for each stat (Speed, Stamina, Power, Guts, Wit) and factor these into training predictions and stat gain calculations
@@ -201,7 +201,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player, I want distinct optimization strategies for URA Finale and Unity Cup scenarios, so that I can maximize effectiveness in both individual and team-based career modes.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 11
 
 1. WHEN selecting URA Finale mode, THE System SHALL focus on individual character optimization with traditional training predictions and single-character race preparation
 2. WHEN selecting Unity Cup mode, THE System SHALL incorporate team management, Spirit Burst mechanics, and distance-based team composition into all recommendations
@@ -213,7 +213,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player familiar with Laravel, I want a cutting-edge responsive web application interface with comprehensive accessibility compliance, so that I can use the career planner on any device with optimal performance, accessibility, and user experience.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 12
 
 1. WHEN accessing the application, THE System SHALL provide a fully responsive interface built with Laravel 12's new starter kit architecture using TypeScript, Tailwind CSS, and modern component-based design that works seamlessly on desktop, tablet, and mobile devices with WCAG 2.2 AA accessibility compliance including keyboard navigation, screen reader support (NVDA, JAWS, VoiceOver), proper contrast ratios (4.5:1 for normal text, 3:1 for large text), focus indicators with 3:1 contrast ratio, and semantic HTML structure
 2. WHEN entering training data, THE System SHALL offer intuitive forms with comprehensive validation, auto-completion features, error handling with clear text descriptions (not just color coding), accessibility labels for all form elements, skip links for easy navigation, proper heading hierarchy (H1-H6), and ARIA attributes where HTML semantics are insufficient, ensuring all functionality is operable via keyboard with visible focus states and logical tab order
@@ -225,7 +225,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player, I want an intelligent AI chatbot with multi-model capabilities and advanced game knowledge, so that I can receive personalized advice, strategic guidance, and contextual assistance that adapts to my specific career progression and gameplay patterns.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 13
 
 1. WHEN asking the chatbot for advice, THE System SHALL implement a hybrid AI approach using local Ollama models (Llama 3.3, Mistral, Qwen) as the primary inference engine for privacy and speed (<3 seconds response time), with automatic fallback to AWS Bedrock models (Nova 2 Lite $0.00125/1K tokens, Nova 2 Pro Preview, Claude 4.5 Opus $5/$25/1M tokens, Sonnet $3/$15/1M tokens, Haiku $1/$5/1M tokens) when local processing is slow (>10 seconds) or when advanced reasoning is required, maintaining conversation context and user preferences across model switches
 2. WHEN providing recommendations, THE System SHALL incorporate comprehensive game knowledge including character aptitudes, race requirements, skill synergies, current meta strategies, hidden game mechanics (+400 race stat boost, stat breakpoints at 901/1600), historical player decisions, and real-time community data with confidence scoring and reasoning explanations for all recommendations
@@ -237,7 +237,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player, I want the system to integrate with multiple free public databases and community tools with intelligent fallback mechanisms, so that I have access to current character stats, support card data, and advanced calculation tools with high availability and accuracy while running locally.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 14
 
 1. WHEN initializing the application, THE System SHALL connect to multiple external data sources with priority ordering: umapyoi.net as primary source for character/support card information (verified active), UmamusumeDB.com for training calculations (requires verification), Umalator.com for race simulation data, and umamusumecalculator.com for comprehensive calculations, with automatic failover between sources and Redis-based caching for offline access (Note: SimpleSandman/UmaMusumeAPI deprecated as of October 2024)
 2. WHEN external APIs are unavailable or slow (>5 seconds response time), THE System SHALL implement intelligent fallback mechanisms using Redis-cached data with staleness indicators, alternative API endpoints with retry logic, graceful degradation to manual input modes while maintaining data integrity, and background sync when connectivity is restored using Laravel queues with Redis
@@ -249,7 +249,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player, I want to compare multiple career runs for the same Umamusume, so that I can identify successful patterns and optimize future training strategies.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 15
 
 1. WHEN viewing career history, THE System SHALL display all completed runs for each Umamusume with final grades, stats, and key metrics
 2. WHEN comparing careers, THE System SHALL highlight differences in support card choices, training decisions, and outcome variations
@@ -261,7 +261,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player, I want the system to track official game goals and missions, so that I can ensure my training aligns with required objectives for each Umamusume.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 16
 
 1. WHEN starting a career, THE System SHALL load the official goal structure for the selected Umamusume including debut requirements, target races, and stat thresholds
 2. WHEN tracking progress, THE System SHALL monitor completion status of each goal and highlight upcoming deadlines or requirements
@@ -273,7 +273,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a developer, I want the backend built with cutting-edge Laravel 12 architecture and enterprise-grade best practices, so that the application provides exceptional performance, security, scalability, and maintainability with modern backend development standards leveraging Redis through WSL.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 17
 
 1. THE System SHALL be built using Laravel 12 framework with MySQL database implementing advanced architectural patterns including Repository pattern for data access abstraction, Service layer for business logic separation, Command/Query Responsibility Segregation (CQRS) for complex operations, and Event-driven architecture with Laravel Events and Listeners for decoupled system components, following Domain-Driven Design (DDD) principles where appropriate
 2. THE System SHALL implement comprehensive security measures including Laravel Sanctum for API authentication, proper input validation with custom Form Requests, CSRF protection for all state-changing operations, SQL injection prevention through Eloquent ORM and parameterized queries, XSS protection with output escaping, rate limiting with Laravel's built-in throttling (10 requests per minute for authentication, 60 per minute for API endpoints), and secure session management with httpOnly cookies and proper session timeout handling
@@ -285,7 +285,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player, I want a comprehensive database of all career events with optimal choice outcomes, so that I can make informed decisions during character and support card events.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 18
 
 1. WHEN an event occurs during career mode, THE System SHALL identify the event type and present all available choices with predicted outcomes based on historical data
 2. WHEN managing event databases, THE System SHALL maintain separate collections for character-specific events, support card events, and scenario events with their optimal choice patterns
@@ -297,7 +297,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player, I want to track training facility levels, mood states, and environmental factors, so that I can optimize training effectiveness throughout the career.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 19
 
 1. WHEN tracking training facilities, THE System SHALL monitor facility levels (Lv1-Lv5) and their impact on stat gain multipliers (1.0x to 2.0x)
 2. WHEN managing character mood, THE System SHALL track mood states (Awful -20%, Bad -10%, Normal 0%, Good +10%, Great +20%) and their effects on training outcomes
@@ -309,7 +309,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player, I want optimized friendship training timing and skill hint acquisition strategies, so that I can maximize stat gains and skill development efficiency.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 20
 
 1. WHEN managing friendship bonds, THE System SHALL track friendship gauge levels (80%+ for rainbow training) and prioritize early friendship building for maximum mid-to-late game benefits
 2. WHEN friendship training is available, THE System SHALL calculate enhanced stat bonuses through multiple participant effects (2 participants +2 bonus, 3 participants +3 bonus) and prioritize these high-value training opportunities
@@ -321,7 +321,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player, I want intelligent race strategy selection and running style optimization, so that I can maximize race performance based on character attributes and race conditions.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 21
 
 1. WHEN selecting race strategies, THE System SHALL recommend optimal running styles (Front Runner, Pace Chaser, Late Surger, End Closer) based on character stats, distance, and competition
 2. WHEN analyzing running style effectiveness, THE System SHALL consider stat requirements: Front Runners need Speed/Stamina, Late Surgers need Speed/Power, and adapt recommendations accordingly
@@ -333,7 +333,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player, I want optimal turn usage strategies throughout the 60-70 turn career progression, so that I can maximize efficiency and achieve target goals within time constraints.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 22
 
 1. WHEN managing career progression, THE System SHALL optimize turn allocation across the Junior (turns 1-24), Classic (turns 25-48), and Senior (turns 49-72) periods with phase-specific priorities
 2. WHEN approaching critical deadlines, THE System SHALL prioritize goal completion requirements while maintaining optimal stat development trajectory
@@ -353,7 +353,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 - **Conflict Resolution**: User-prompted conflict resolution with side-by-side comparison view; option to merge, overwrite, or skip conflicting records with detailed change logs
 - **Migration Strategy**: Phase 1 - copy/paste CSV/JSON import and OCR screenshot processing; No Google Sheets API integration needed as users can copy/paste or screenshot their data
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 23
 
 1. WHEN importing Google Docs data, THE System SHALL parse the existing manual form structure and map fields to corresponding database entities
 2. WHEN processing imported careers, THE System SHALL validate data integrity and flag any inconsistencies or missing information for manual review
@@ -365,7 +365,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player, I want a complete race calendar with all Pre-OP, OP, G3, G2, and G1 races across Junior, Classic, and Senior years, so that I can plan optimal race schedules and meet character-specific goal requirements.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 24
 
 1. WHEN viewing the race calendar, THE System SHALL display all available races organized by year (Junior/Classic/Senior), month (Early/Late), grade (Pre-OP/OP/G3/G2/G1), distance (Sprint/Mile/Medium/Long), and surface type (Turf/Dirt)
 2. WHEN planning race schedules, THE System SHALL highlight character-specific goal races, Triple Crown opportunities (Satsuki Sho, Tokyo Yushun/Japanese Derby, Kikuka Sho), and optimal timing for stat development
@@ -377,7 +377,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player, I want detailed race performance analysis and optimization recommendations, so that I can improve race outcomes and identify patterns for future career runs.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 25
 
 1. WHEN completing races, THE System SHALL record detailed performance metrics including final position, margin of victory/defeat, energy consumption, strategy effectiveness, and stat adequacy analysis
 2. WHEN analyzing race failures, THE System SHALL identify specific deficiencies (insufficient stats, poor strategy choice, energy management issues) and provide targeted improvement recommendations
@@ -389,7 +389,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player, I want comprehensive skill hint management with SP cost reduction mechanics, so that I can optimize skill acquisition through strategic hint collection and support card training interactions.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 26
 
 1. WHEN skill hints are obtained, THE System SHALL track hint sources (support card training with red "!" indicators, events, inheritance) and apply 20% SP cost reduction per duplicate hint with a maximum 40% total discount per skill (2 duplicate hints = 40% maximum discount), maintaining detailed logs of hint acquisition and cost reduction calculations
 2. WHEN training with support cards, THE System SHALL predict skill hint availability based on support card specializations and display red "!" indicators for guaranteed hint opportunities during matching stat training (Speed cards provide Speed skill hints during Speed training, Power cards provide Power skill hints during Power training, etc.), with probability calculations for non-guaranteed hints
@@ -401,7 +401,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player, I want comprehensive energy and condition management with mood optimization, so that I can prevent training failures and maintain optimal training effectiveness throughout the career.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 27
 
 1. WHEN tracking energy levels, THE System SHALL monitor energy percentage (0-100%) and recommend rest when energy falls below 50% to prevent training failures, with automatic failure rate calculations based on current energy levels
 2. WHEN negative conditions are present, THE System SHALL identify condition types, track their effects on training and racing performance, and recommend infirmary visits to remove conditions when strategically beneficial
@@ -413,7 +413,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player, I want intelligent support card meta analysis and deck optimization, so that I can build the most effective 6-card support deck based on current meta trends and character requirements.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 28
 
 1. WHEN analyzing support card options, THE System SHALL display available cards with their tier rankings (S+/S/A/B), complete effect profiles, and specialized use case recommendations for different character builds and scenarios
 2. WHEN building support decks, THE System SHALL analyze the 6 selected cards for gaps in stat coverage, skill provision, or strategic alignment, then provide recommendations for optimal card combinations
@@ -425,7 +425,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player, I want detailed support card skill provision tracking and training interaction mechanics, so that I can strategically plan training sessions to maximize skill hint acquisition from my support card deck.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 29
 
 1. WHEN configuring support cards, THE System SHALL maintain comprehensive databases of each card's skill provision capabilities, showing which specific skills each card can provide hints for during training sessions and the probability rates for hint acquisition
 2. WHEN planning training sessions, THE System SHALL analyze the current 6-card support deck (5 owned + 1 friend) and predict which training options will provide skill hints based on card specializations, with red "!" indicators showing guaranteed hint opportunities when support cards match training stats
@@ -437,7 +437,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player, I want to identify and prioritize training sessions with guaranteed skill hint acquisition, so that I can efficiently collect skill hints through strategic training choices when red "!" indicators appear.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 30
 
 1. WHEN red "!" indicators appear on training options, THE System SHALL guarantee that selecting those training sessions will provide skill hints from participating support cards, with 100% certainty of hint acquisition for matching stat specializations
 2. WHEN multiple training options show red "!" indicators, THE System SHALL rank them by skill hint value, considering current character build requirements, SP cost reduction potential, and skill evolution prerequisites to recommend the most beneficial choice
@@ -449,7 +449,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player, I want comprehensive skill evolution tracking and prerequisite management, so that I can strategically acquire Normal skills that evolve into powerful Rare counterparts while optimizing SP costs through hint collection.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 31
 
 1. WHEN managing skill evolution paths, THE System SHALL display complete evolution chains showing Normal skills that can upgrade to Rare counterparts (e.g., "Go with the Flow" → "Lane Legerdemain", "Homestretch Haste" → "In Body and Mind"), with prerequisite requirements and SP cost comparisons
 2. WHEN acquiring evolved skills, THE System SHALL automatically replace the Normal skill with its Rare counterpart, update SP costs, track evolution bonuses, and ensure no duplicate skills exist in the character's skill inventory
@@ -461,7 +461,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player, I want an intelligent SP optimization engine that maximizes skill hint collection and cost reduction strategies, so that I can acquire the most skills possible within SP constraints through strategic hint farming.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 32
 
 1. WHEN calculating SP optimization strategies, THE System SHALL analyze all available skill hints, predict future hint opportunities from support card training, and recommend optimal skill acquisition sequences that maximize SP cost reductions through strategic hint collection timing
 2. WHEN duplicate hints are obtained, THE System SHALL automatically apply 20% SP cost reduction per duplicate (maximum 40% total discount), track hint sources and accumulation progress, and display real-time SP savings calculations for each skill
@@ -473,7 +473,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player, I want comprehensive weather and track condition tracking with performance impact analysis, so that I can optimize race preparation and skill selection based on environmental factors.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 33
 
 1. WHEN analyzing race conditions, THE System SHALL track weather states (Sunny/Cloudy/Rainy/Snowy) and resulting track conditions (Firm for dry, Good/Soft/Heavy for wet conditions) with their impact on character performance based on weather aptitudes, distance-specific stamina requirements (Sprint 350-600, Mile 400-700, Medium 500-900, Long 600-1100), and performance modifiers for each surface type
 2. WHEN planning race strategies, THE System SHALL recommend weather-appropriate skills ("Wet Conditions ○/◎" for Good/Soft/Heavy ground, "Firm Conditions ○" for dry tracks) and adjust running style recommendations based on track conditions, character weather aptitudes, and distance-specific stat priorities (Front Runner needs Speed/Stamina, Late Surger needs Speed/Power)
@@ -485,7 +485,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player, I want intelligent training failure prevention and recovery strategies, so that I can minimize wasted turns and maintain optimal career progression despite energy and condition management challenges.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 34
 
 1. WHEN energy levels drop below safe thresholds (50% recommended rest threshold), THE System SHALL calculate training failure probabilities for each option based on current energy/mood/condition states, recommend optimal rest timing to prevent failures, and suggest energy-efficient training sequences that maintain progress while avoiding high-risk situations (Wit training provides energy recovery)
 2. WHEN training failures occur, THE System SHALL analyze failure causes (low energy <50%, poor mood Bad/Awful, negative conditions like Practice Poor +2% failure rate), provide immediate recovery recommendations (rest for energy, recreation for mood, infirmary for conditions), and adjust future training plans to prevent similar failures through improved risk management
@@ -497,7 +497,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player, I want comprehensive statistical analysis and performance tracking, so that I can measure training efficiency, identify optimization opportunities, and track long-term improvement patterns across multiple careers.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 35
 
 1. WHEN tracking training efficiency, THE System SHALL calculate metrics including stat gains per turn, SP acquisition rates, skill hint collection efficiency, friendship training success rates, and energy utilization optimization with historical trend analysis
 2. WHEN analyzing career performance, THE System SHALL provide detailed statistics on race win rates by distance/surface/weather, goal completion efficiency, turn economy optimization, and comparative analysis against optimal theoretical performance
@@ -517,7 +517,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 - **Integration Approach**: Use external Unity Cup calculators for complex team simulations; focus on individual character preparation and Spirit Burst timing optimization locally
 - **Scope Limitation**: Phase 1 - individual character Unity Cup optimization; Phase 2 - full team management, advanced Spirit Burst coordination, and multi-character strategic planning
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 36
 
 1. WHEN managing Unity Cup teams, THE System SHALL track all three team members' stats, Spirit Burst gauge levels (filled by 4 training sessions with flame icons), distance specializations for 5 teams (Sprint 1000-1400m, Mile 1401-1800m, Medium 1801-2400m, Long 2401m+, Dirt), team stat ranks (D-S determining facility levels 1-5), and coordinate training schedules to optimize team synergy and individual member development
 2. WHEN calculating Spirit Burst mechanics, THE System SHALL predict gauge filling rates based on training choices with teammates, recommend optimal Spirit Burst timing for large stat bonuses + random skill hints, track Spirit Burst cooldowns and availability windows, and calculate additive stacking effects when multiple Spirit Bursts are available simultaneously
@@ -529,7 +529,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player, I want to upload game screenshots for automatic data extraction and AI-powered analysis, so that I can quickly input current game state information without manual data entry through intelligent image recognition and chatbot assistance.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 37
 
 1. WHEN uploading screenshots, THE System SHALL use OCR technology to automatically extract visible game data including character stats, skill lists, support card information, race details, training options, and current game state with accuracy validation and manual correction options
 2. WHEN processing training screen screenshots, THE System SHALL identify available training options, support card participation, friendship levels, energy/mood states, red "!" indicators, and predicted stat gains, then provide immediate optimization recommendations based on extracted data
@@ -541,7 +541,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player, I want real-time updates and synchronization for my local application data, so that I can receive instant updates when external data changes and maintain current game information without manual refreshes.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 39
 
 1. WHEN using the application, THE System SHALL implement background data synchronization for external API updates using Laravel queues with Redis, automatically refresh game data when new support cards or balance changes are detected, provide change notifications for affected calculations, and maintain data freshness without blocking user interactions
 2. WHEN external API data is updated (new support cards, balance changes, meta shifts), THE System SHALL automatically refresh affected calculations in the background, provide change summaries with impact analysis on existing career plans, update cached data with intelligent invalidation, and notify users of significant changes through local notifications
@@ -553,7 +553,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player, I want sophisticated screenshot analysis with AI-powered game state recognition and automated data extraction, so that I can quickly input complex game information through intelligent image processing and receive contextual strategic advice.
 
-#### Future Acceptance Criteria
+#### Future Acceptance Criteria - Requirement F5
 
 1. WHEN uploading screenshots, THE System SHALL use advanced OCR technology (Tesseract with OpenCV preprocessing) combined with computer vision models to automatically extract game data including character stats, skill lists, support card information, race details, training options, energy/mood states, and UI element recognition with confidence scoring and manual correction interfaces
 2. WHEN processing training screen screenshots, THE System SHALL implement template matching and pattern recognition to identify available training options, support card participation, friendship levels, red "!" indicators, predicted stat gains, and environmental factors (weather, facility levels), then provide immediate optimization recommendations through the AI chatbot with visual overlay annotations
@@ -565,7 +565,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a developer, I want the application to handle large datasets and complex calculations efficiently with modern performance optimization techniques, so that users experience fast response times even with extensive career histories and advanced features.
 
-#### Future Acceptance Criteria
+#### Future Acceptance Criteria - Requirement F6
 
 1. WHEN handling large career datasets (1000+ completed careers), THE System SHALL implement database optimization techniques including proper indexing strategies, query optimization with EXPLAIN analysis, database connection pooling, and data archiving policies with compressed storage for historical data while maintaining fast query performance
 2. WHEN performing complex calculations (training predictions, stat optimizations, race simulations), THE System SHALL use asynchronous job processing with Laravel Queues, implement calculation caching with intelligent invalidation, utilize background processing for heavy computations, and provide progress indicators for long-running operations with cancellation capabilities
@@ -577,7 +577,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player using Make a New Track scenario, I want comprehensive Grade Points optimization and Special Shop management, so that I can efficiently achieve 60/300 point objectives, optimize item usage, and maximize Twinkle Star Climax performance through strategic resource allocation.
 
-#### Future Acceptance Criteria
+#### Future Acceptance Criteria - Requirement F7
 
 1. WHEN managing Grade Points system, THE System SHALL track progress toward 60-point and 300-point objectives, analyze point-earning efficiency across different activities, recommend optimal point allocation strategies, and provide timeline management for achieving Grade Point milestones within scenario constraints
 2. WHEN utilizing the Special Shop, THE System SHALL track available items (training boosters +3/+7/+15 variants, energy drinks +20/+40/+65/+100, condition healers, facility upgrades), analyze cost-benefit ratios for different purchases, and recommend optimal item acquisition timing based on career phase and available Grade Points
@@ -589,7 +589,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player, I want intelligent item management and strategic usage recommendations, so that I can optimize training effectiveness, energy management, and facility development through cost-effective consumable utilization and inventory planning.
 
-#### Future Acceptance Criteria
+#### Future Acceptance Criteria - Requirement F8
 
 1. WHEN managing training items, THE System SHALL track inventory of stat boosters (Speed/Stamina/Power/Guts/Wit +3/+7/+15 variants), analyze optimal usage timing for maximum training efficiency, calculate ROI for different item types, and recommend strategic item deployment based on career phase, upcoming races, and training goals
 2. WHEN optimizing energy management, THE System SHALL track energy restoration items (Vital drinks +20/+40/+65/+100, Max Energy boosters), recommend optimal usage timing to prevent training failures, calculate energy efficiency strategies, and integrate item-based energy management with natural recovery and rest scheduling
@@ -601,7 +601,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player, I want intelligent gacha planning and resource optimization, so that I can maximize collection efficiency, manage pity systems effectively, and make strategic pulling decisions based on banner analysis and long-term account goals.
 
-#### Future Acceptance Criteria
+#### Future Acceptance Criteria - Requirement F9
 
 1. WHEN managing pity systems, THE System SHALL track Exchange Points across active banners (200 points for guaranteed SSR), monitor pity progress toward guaranteed pulls, calculate expected value for different spending strategies, and provide pity optimization recommendations including Exchange Point conversion to Clovers when banners end
 2. WHEN analyzing banners, THE System SHALL evaluate rate-up characters and support cards for meta relevance, calculate pull value based on current collection gaps, analyze banner timing relative to account needs, and provide pull/skip recommendations based on resource availability and strategic priorities
@@ -621,7 +621,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 - **Integration Level**: Use external community calendars for reference; maintain local event database for career-relevant events and personal tracking
 - **Implementation Priority**: Phase 1 - core career event database and basic seasonal awareness; Phase 2 - comprehensive event planning, resource optimization, and advanced campaign coordination
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 42
 
 1. WHEN tracking monthly events, THE System SHALL maintain comprehensive event calendars including seasonal celebrations, limited-time banners, special campaigns, and game updates, with advance preparation recommendations and resource allocation strategies for maximum event participation benefits
 2. WHEN managing limited-time content, THE System SHALL monitor time-sensitive opportunities (Legend Races, anniversary events, special missions), provide countdown tracking and preparation checklists, analyze event-specific reward structures, and recommend participation strategies based on account needs and resource availability
@@ -633,7 +633,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a competitive player, I want seamless integration with community tools and real-time data synchronization, so that I can access live meta updates, share strategies with the community, and benefit from collective optimization knowledge through automated API connections.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 43
 
 1. WHEN integrating with community APIs, THE System SHALL establish direct connections to major community platforms (umamusume.run, umapyoi.net, UmamusumeCalculator.com, UmamusumeDB.com), automatically synchronize character data, support card information, and meta tier lists, with real-time updates that ensure current optimization recommendations
 2. WHEN sharing community data, THE System SHALL export career builds and strategies in standardized formats compatible with community tools, enable seamless data exchange with popular calculators and databases, and provide community build import capabilities that allow users to test and adapt successful strategies from other players
@@ -645,7 +645,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a data-driven player, I want sophisticated statistical analysis and predictive modeling capabilities, so that I can optimize strategies through Monte Carlo simulations, regression analysis, and machine learning algorithms that provide statistical confidence in optimization decisions.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 44
 
 1. WHEN performing statistical analysis, THE System SHALL implement Monte Carlo simulations for training outcome predictions with confidence intervals, provide regression analysis for identifying optimal training patterns and factor relationships, and offer Bayesian optimization for probabilistic career planning with uncertainty quantification
 2. WHEN conducting predictive modeling, THE System SHALL use machine learning algorithms that learn from successful career patterns, implement performance correlation analysis to identify statistical relationships between training decisions and outcomes, and provide predictive analytics with statistical significance testing for strategy effectiveness
@@ -657,7 +657,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a competitive player, I want real-time meta tracking and prediction capabilities, so that I can adapt strategies to evolving competitive landscapes, anticipate meta shifts, and maintain competitive advantages through dynamic strategy optimization.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 45
 
 1. WHEN tracking meta evolution, THE System SHALL monitor real-time tier list changes from community sources, detect emerging strategies and counter-strategies in community performance data, analyze competitive trends and meta shifts, and provide meta shift alerts with strategic adaptation recommendations
 2. WHEN predicting meta developments, THE System SHALL implement predictive meta modeling that forecasts future strategy trends based on balance changes, analyze historical meta patterns to identify cyclical trends and emerging strategies, and provide early warning systems for meta shifts that could impact current character builds
@@ -669,7 +669,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a strategic player, I want automatic adaptation to game updates and balance changes, so that my optimization strategies remain current and effective despite frequent game patches, balance adjustments, and meta shifts caused by official updates.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 46
 
 1. WHEN game updates are released, THE System SHALL automatically parse official patch notes and update logs, identify balance changes that affect character stats, skills, or game mechanics, analyze impact on existing strategies and recommendations, and provide update summaries with strategic implications for current and planned careers
 2. WHEN balance changes occur, THE System SHALL automatically recalculate strategy effectiveness based on modified game mechanics, update character tier lists and build recommendations to reflect balance adjustments, provide migration guides for adapting existing careers to new balance conditions, and ensure all optimization algorithms account for current game state
@@ -681,7 +681,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a player, I want seamless integration with the broader Umamusume community ecosystem and tools, so that I can leverage the collective knowledge and resources of the community while contributing to shared databases and strategies.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 47
 
 1. WHEN integrating with community calculators, THE System SHALL provide bidirectional data exchange with UmamusumeDB.com training calculator, Umalator.com race simulator, umamusumecalculator.com suite, and Uma Support Helper, allowing users to export career data to external tools and import optimized builds back into the system
 2. WHEN sharing strategies and builds, THE System SHALL implement standardized data formats for career exports, support card deck sharing, training sequence templates, and strategy guides with version control and community rating systems for shared content
@@ -693,7 +693,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a developer, I want the frontend built with cutting-edge 2025 best practices and performance optimization techniques, so that users experience exceptional speed, accessibility, and modern web capabilities across all devices and network conditions.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 48
 
 1. WHEN building the frontend architecture, THE System SHALL use modern JavaScript (ES2024+ features) with optional TypeScript migration path for future enhancement, implement component-based architecture with proper separation of concerns, utilize CSS-in-JS or modern CSS solutions (CSS Modules, Tailwind CSS) with zero-runtime optimizations, and follow Feature-Sliced Design (FSD) principles for scalable code organization and maintainability
 2. WHEN optimizing for performance, THE System SHALL achieve Core Web Vitals excellence with Largest Contentful Paint (LCP) < 2.5 seconds, Interaction to Next Paint (INP) < 200ms, Cumulative Layout Shift (CLS) < 0.1, implement advanced rendering strategies including partial hydration, progressive hydration, streaming SSR, and islands architecture for optimal loading performance
@@ -705,7 +705,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a developer, I want sophisticated state management and data flow patterns that scale with application complexity, so that the application maintains performance and reliability as features and user data grow over time.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 49
 
 1. WHEN managing application state, THE System SHALL implement a hybrid state management approach using framework-native solutions (React Context API with useReducer, Vue Pinia, or Svelte stores) for local component state and specialized libraries (Zustand, Jotai) for complex global state with proper state normalization and immutable updates
 2. WHEN handling data synchronization, THE System SHALL implement optimistic updates for immediate user feedback, conflict resolution for concurrent edits, real-time synchronization using WebSockets with automatic reconnection, and offline-first data persistence with background sync when connectivity is restored
@@ -717,7 +717,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a user, I want my data and interactions to be secure and private with modern web security practices, so that I can use the application confidently knowing my information is protected and my privacy is respected.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 50
 
 1. WHEN handling user data, THE System SHALL implement client-side encryption for sensitive information before storage, use secure HTTP headers (CSP, HSTS, X-Frame-Options), sanitize all user inputs to prevent XSS attacks, and implement proper CSRF protection with token validation for all state-changing operations
 2. WHEN managing authentication and sessions, THE System SHALL use secure session management with httpOnly cookies, implement proper logout functionality that clears all client-side data, provide session timeout warnings, and ensure all authentication flows are protected against common attacks (session fixation, CSRF, XSS)
@@ -729,7 +729,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a developer, I want sophisticated database architecture with advanced optimization techniques, so that the application handles large datasets efficiently while maintaining data integrity and optimal query performance.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 51
 
 1. WHEN designing database schema, THE System SHALL implement proper normalization (3NF minimum) with strategic denormalization for performance-critical queries, use appropriate data types for optimal storage efficiency, implement database constraints for data integrity (foreign keys, unique constraints, check constraints), and design indexes strategically for all frequently queried columns including composite indexes for multi-column queries
 2. WHEN executing database queries, THE System SHALL use Eloquent ORM with strict mode enabled to prevent N+1 queries, implement eager loading with `with()` for relationship queries, use `select()` to limit returned columns, implement chunking with `chunk()` and `cursor()` for large dataset processing, and utilize database-level aggregations instead of collection operations for better performance
@@ -741,7 +741,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a security-conscious developer, I want comprehensive security measures implemented throughout the backend architecture, so that the application protects against modern security threats and maintains the highest standards of data protection.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 52
 
 1. WHEN implementing authentication and authorization, THE System SHALL use Laravel Sanctum for API token management with proper token scoping and expiration, implement multi-factor authentication (MFA) support with TOTP and WebAuthn, use Laravel Policies for fine-grained authorization control, implement role-based access control (RBAC) with proper permission inheritance, and provide secure password reset functionality with time-limited tokens
 2. WHEN handling user input and data validation, THE System SHALL implement comprehensive input validation using Laravel Form Requests with custom validation rules, sanitize all user inputs to prevent XSS attacks, use parameterized queries through Eloquent ORM to prevent SQL injection, implement CSRF protection for all state-changing operations, and validate file uploads with proper MIME type checking and virus scanning integration
@@ -753,7 +753,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As an API consumer and developer, I want well-designed, performant, and secure APIs that follow modern best practices, so that the application provides excellent developer experience and seamless integration capabilities.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 53
 
 1. WHEN designing REST APIs, THE System SHALL follow RESTful principles with proper HTTP methods (GET, POST, PUT, PATCH, DELETE), implement consistent URL naming conventions with resource-based endpoints, use appropriate HTTP status codes for all responses, implement proper content negotiation with JSON as primary format, and provide comprehensive API documentation using OpenAPI 3.0 specification with interactive documentation
 2. WHEN implementing API responses, THE System SHALL use consistent response formats with standardized error structures, implement proper pagination for list endpoints with cursor-based pagination for large datasets, provide filtering, sorting, and searching capabilities with query parameter validation, implement field selection to reduce payload size, and use proper HTTP caching headers for cacheable responses
@@ -765,7 +765,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a developer, I want sophisticated background processing capabilities with reliable queue management, so that the application handles long-running tasks efficiently without blocking user interactions.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 54
 
 1. WHEN processing background jobs, THE System SHALL use Laravel Queues with Redis as the queue driver for reliability and performance, implement job prioritization with different queue priorities (high, normal, low), use job batching for related tasks with progress tracking, implement proper job retry logic with exponential backoff, and provide job failure handling with dead letter queues for failed jobs
 2. WHEN managing queue workers, THE System SHALL implement worker process management with Laravel Horizon for monitoring and configuration, use multiple queue workers for parallel processing, implement proper memory management with worker restart policies, provide real-time queue monitoring with metrics and alerting, and implement graceful shutdown handling for maintenance operations
@@ -777,7 +777,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a developer and system administrator, I want comprehensive monitoring and observability capabilities, so that I can proactively identify issues, optimize performance, and maintain system reliability.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 55
 
 1. WHEN implementing application logging, THE System SHALL use Laravel's logging system with structured logging (JSON format), implement log levels appropriately (DEBUG, INFO, WARN, ERROR, CRITICAL), use contextual logging with request IDs for tracing, implement log rotation and retention policies, and provide centralized log aggregation with search and filtering capabilities
 2. WHEN monitoring application performance, THE System SHALL implement Application Performance Monitoring (APM) with request/response time tracking, database query performance monitoring with slow query detection, memory usage monitoring with leak detection, CPU usage tracking with bottleneck identification, and custom metrics for business-specific KPIs
@@ -789,7 +789,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a local application user, I want the application optimized for XAMPP development environment with seamless cloud API integration and Redis performance enhancement, so that I can achieve optimal performance and functionality in my local setup while accessing cloud services and external APIs for enhanced capabilities.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 56
 
 1. WHEN setting up local development environment, THE System SHALL be optimized for XAMPP stack (Apache, MySQL, PHP) with Laravel 12 framework, implement local environment configuration with .env files for database, AWS credentials, Redis (WSL), and external API settings, use Composer for PHP dependency management with AWS SDK integration, implement local asset compilation with Laravel Mix or Vite, and provide clear setup documentation for XAMPP + WSL Redis configuration with cloud service integration
 2. WHEN implementing hybrid local-cloud architecture, THE System SHALL use Laravel's HTTP client for external API integration with proper timeout and retry mechanisms, implement AWS SDK for PHP for Bedrock and other AWS service integration, use Redis (via WSL) for high-performance caching of external API responses and session data, implement secure credential management for AWS and external APIs using Laravel's encryption, and provide connection health monitoring for all external services including Redis
@@ -813,7 +813,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a local application user, I want sophisticated AI agent capabilities that leverage AWS Bedrock for cloud processing while running locally, so that I can access powerful agentic AI features for game strategy and analysis from my personal XAMPP environment.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 57
 
 1. WHEN implementing local agentic AI architecture, THE System SHALL create modular agent classes using Laravel services that integrate with AWS Bedrock Agents for complex multi-step reasoning, implement local agent orchestration with cloud AI processing, use local MySQL database for agent memory and conversation history, implement tool integration patterns that connect local game data with cloud AI capabilities, and provide agent lifecycle management with proper initialization and cleanup
 2. WHEN developing hybrid AI agents, THE System SHALL follow agent development patterns with Laravel services that integrate with AWS Bedrock Agents for complex multi-step reasoning, implement local agent orchestration using cloudstudio/ollama-laravel for primary processing with cloud AI integration for complex tasks, use local MySQL database for agent memory and conversation history, implement tool integration patterns that connect local game data with both local Ollama and cloud AI capabilities, and provide agent lifecycle management with proper initialization and cleanup
@@ -825,7 +825,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a local developer, I want comprehensive local development infrastructure with modern practices and clear migration paths to cloud deployment, so that I can develop efficiently in XAMPP while maintaining code that can be easily deployed to cloud platforms in the future.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 58
 
 1. WHEN implementing local development infrastructure, THE System SHALL use Laravel 12 with proper MVC architecture and service layer patterns, implement local environment configuration with .env files for different environments (local, testing, staging), use Composer for dependency management with version locking, implement local asset compilation with Laravel Mix or Vite for modern frontend tooling, and maintain clear separation between local and future cloud configurations
 2. WHEN organizing local code structure, THE System SHALL implement service-oriented architecture with Laravel service classes, use repository pattern for data access abstraction, implement proper dependency injection with Laravel's container, use Laravel's built-in testing framework with feature and unit tests, and maintain modular code structure that facilitates future cloud deployment
@@ -837,7 +837,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a local application user, I want comprehensive resource optimization for my XAMPP environment with intelligent cloud API cost management and Redis performance enhancement, so that I can achieve optimal performance and cost efficiency while using AWS Bedrock and external APIs from my local setup.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 59
 
 1. WHEN implementing local resource monitoring, THE System SHALL use Laravel Debugbar for local performance monitoring and profiling, implement local database query optimization with Laravel's query log and EXPLAIN analysis, use Laravel Telescope for local application monitoring and debugging, monitor local memory usage and execution time for optimization, provide local performance dashboards for development insights, track cloud API usage and costs in real-time, and monitor Redis performance metrics including memory usage, hit rates, and connection statistics
 2. WHEN optimizing local development resources, THE System SHALL implement efficient Redis-based caching strategies for API responses, database queries, and computed results, optimize local database queries with proper indexing and eager loading, use Laravel's built-in optimization features like config caching and route caching, implement local asset optimization with Laravel Mix/Vite, use local development tools for code profiling and optimization, implement intelligent API request batching to minimize cloud costs, and leverage Redis for session storage and real-time data caching
@@ -849,7 +849,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a local developer, I want comprehensive security controls and development best practices implemented for XAMPP environment, so that I can ensure secure local development while maintaining patterns that support future enterprise security requirements.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 60
 
 1. WHEN implementing local authentication and authorization, THE System SHALL use Laravel's built-in authentication system with secure password hashing (bcrypt), implement role-based access control using Laravel's authorization features, use Laravel Sanctum for API authentication in local development, implement session security with proper configuration, use HTTPS in local development with self-signed certificates, and implement secure password reset functionality
 2. WHEN securing local data protection, THE System SHALL implement Laravel's encryption features for sensitive data storage, use proper input validation and sanitization with Laravel's validation rules, implement CSRF protection for all forms and state-changing operations, use Laravel's built-in XSS protection, implement secure file upload handling with proper validation, and ensure proper data handling and privacy controls
@@ -861,7 +861,7 @@ An advanced optimization application for Umamusume Pretty Derby mobile game that
 
 **User Story:** As a local developer, I want comprehensive backup and data protection capabilities for XAMPP environment, so that I can ensure data safety and recovery during development while establishing patterns for future disaster recovery implementation.
 
-#### Acceptance Criteria
+#### Acceptance Criteria - Requirement 61
 
 1. WHEN implementing local backup architecture, THE System SHALL use automated local database backups with MySQL dump utilities, implement local file system backups for application data and user uploads, use Laravel's built-in backup package for comprehensive application backups, implement incremental backup strategies to minimize storage usage, and maintain local backup retention policies with automated cleanup
 2. WHEN ensuring local data recovery, THE System SHALL implement point-in-time recovery capabilities for local databases, use database migration rollback features for schema recovery, implement local file versioning for critical application files, maintain backup integrity verification with checksum validation, implement backup testing procedures to ensure recovery reliability, and provide granular recovery capabilities for individual data elements
@@ -879,7 +879,7 @@ The following requirements represent features planned for future development pha
 
 **User Story:** As a competitive player, I want comprehensive Champions Meeting tournament management and optimization, so that I can build optimal 3v3v3 teams, track monthly cup requirements, and maximize PvP rewards through strategic team composition and meta analysis.
 
-#### Future Acceptance Criteria
+#### Future Acceptance Criteria - Requirement F1
 
 1. WHEN building Champions Meeting teams, THE System SHALL support 3-character team composition with role assignment (Ace runners, debuffers, hybrid strategies), enforce no-duplicate rules including costume variants, and provide team synergy analysis for optimal performance in 3v3v3 tournament format
 2. WHEN tracking monthly cup requirements, THE System SHALL maintain current meta baselines for each cup (Taurus, Gemini, Cancer, Leo, Virgo, Libra, Scorpio, Sagittarius) with specific stat requirements, distance/surface preferences, and recommended character builds
@@ -891,7 +891,7 @@ The following requirements represent features planned for future development pha
 
 **User Story:** As a community member, I want to share strategies and collaborate with other players, so that I can learn from the community and contribute to shared knowledge while maintaining privacy controls.
 
-#### Future Acceptance Criteria
+#### Future Acceptance Criteria - Requirement F2
 
 1. WHEN sharing strategies and builds, THE System SHALL implement standardized data formats for career exports, support card deck sharing, training sequence templates, and strategy guides with version control and community rating systems for shared content
 2. WHEN accessing community databases, THE System SHALL contribute anonymized performance data to community knowledge bases (with explicit user consent), participate in distributed calculation networks for complex optimizations, and provide feedback loops to improve community tool accuracy
@@ -903,7 +903,7 @@ The following requirements represent features planned for future development pha
 
 **User Story:** As a club member, I want comprehensive club management and social optimization tools, so that I can maximize monthly ranking rewards, optimize resource sharing, and coordinate with clubmates for enhanced gameplay benefits.
 
-#### Future Acceptance Criteria
+#### Future Acceptance Criteria - Requirement F3
 
 1. WHEN managing club rankings, THE System SHALL track monthly fan count contributions toward club ranking goals, monitor individual and collective progress, analyze contribution efficiency strategies, and provide recommendations for maximizing club ranking performance through coordinated member activities
 2. WHEN optimizing resource sharing, THE System SHALL manage shoe request and donation systems, track Club Point accumulation and exchange opportunities, analyze trading efficiency for maximum Club Point generation, and recommend strategic resource sharing that benefits both individual players and overall club performance
@@ -915,7 +915,7 @@ The following requirements represent features planned for future development pha
 
 **User Story:** As a collaborative user, I want real-time collaboration capabilities across multiple sessions and devices, so that I can work with others on strategy development and share insights in real-time.
 
-#### Future Acceptance Criteria
+#### Future Acceptance Criteria - Requirement F4
 
 1. WHEN using collaborative features, THE System SHALL implement Laravel Reverb WebSocket server for real-time bidirectional communication, enable live cursor tracking and simultaneous editing capabilities, provide comment systems with instant notifications, and implement shared workspace management with permission controls
 2. WHEN collaborating across devices, THE System SHALL synchronize career state changes, training decisions, and calculation results instantly across all connected sessions with conflict resolution for simultaneous edits, maintain session continuity across device switches, and provide seamless collaboration experience

@@ -1,0 +1,173 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "c:\\XAMPP\\htdocs\\umamusume-career-planner"
+      ],
+      "disabled": false,
+      "autoApprove": [
+        "read_file",
+        "write_file",
+        "create_directory",
+        "list_directory",
+        "move_file",
+        "search_files",
+        "get_file_info",
+        "list_allowed_directories"
+      ]
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ],
+      "disabled": false,
+      "autoApprove": [
+        "sequential_thinking",
+        "sequentialthinking"
+      ]
+    },
+    "git": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-git"
+      ],
+      "disabled": true,
+      "autoApprove": [
+        "git_status",
+        "git_diff",
+        "git_log",
+        "git_show",
+        "git_add",
+        "git_commit",
+        "git_push",
+        "git_pull"
+      ]
+    },
+    "sqlite": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-server-sqlite-npx"
+      ],
+      "disabled": true,
+      "autoApprove": [
+        "read_query",
+        "write_query",
+        "create_table",
+        "list_tables",
+        "describe_table"
+      ]
+    },
+    "memory": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-memory"
+      ],
+      "disabled": false,
+      "autoApprove": [
+        "create_memory",
+        "search_memory",
+        "update_memory",
+        "delete_memory"
+      ]
+    },
+    "brave-search": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-brave-search"
+      ],
+      "env": {
+        "BRAVE_API_KEY": "$env:BRAVE_API_KEY"
+      },
+      "disabled": true,
+      "autoApprove": [
+        "brave_web_search"
+      ]
+    },
+    "github": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "$env:GITHUB_PERSONAL_ACCESS_TOKEN"
+      },
+      "disabled": true,
+      "autoApprove": [
+        "create_or_update_file",
+        "search_repositories",
+        "create_repository",
+        "get_file_contents",
+        "push_files"
+      ]
+    },
+    "postgres": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres"
+      ],
+      "disabled": true,
+      "autoApprove": [
+        "read_query",
+        "write_query",
+        "list_tables",
+        "describe_table"
+      ]
+    },
+    "puppeteer": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-puppeteer"
+      ],
+      "disabled": true,
+      "autoApprove": [
+        "puppeteer_screenshot",
+        "puppeteer_click",
+        "puppeteer_fill",
+        "puppeteer_select",
+        "puppeteer_navigate"
+      ]
+    },
+    "gitkraken": {
+      "command": "gk",
+      "args": [
+        "mcp"
+      ],
+      "disabled": false,
+      "autoApprove": [
+        "get_pull_requests",
+        "create_pull_request",
+        "get_issues",
+        "create_issue",
+        "get_repositories",
+        "get_branches",
+        "get_commits"
+      ]
+    },
+    "everart": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-everart"
+      ],
+      "env": {
+        "EVERART_API_KEY": "$env:EVERART_API_KEY"
+      },
+      "disabled": true,
+      "autoApprove": [
+        "generate_image"
+      ]
+    }
+  }
+}

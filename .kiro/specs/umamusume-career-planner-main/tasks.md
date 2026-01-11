@@ -4,9 +4,11 @@
 
 **Application Name**: UmamusumeCareerPlanner  
 **Description**: Advanced optimization application for Umamusume Pretty Derby mobile game  
-**Architecture**: Local XAMPP + Cloud APIs (Ollama primary, AWS Bedrock fallback)  
+**Architecture**: Local XAMPP + MCP Server Integration + Cloud APIs (Ollama primary, AWS Bedrock via MCP fallback)  
 **Database**: MySQL (`umamusume-career-planner`) with Redis (WSL) caching  
 **Frontend**: Modern JavaScript (ES2024+) with Tailwind CSS v4  
+**Testing**: Pest PHP testing framework (Laravel-optimized)  
+**AI Integration**: Hybrid local/cloud with MCP server orchestration and subagent management  
 
 **Current Status**: No implementation exists - starting from scratch based on comprehensive requirements and design specifications.
 
@@ -27,13 +29,26 @@
 2. **Model Pricing**: Updated AWS Bedrock model references with verified pricing and availability
 3. **Framework Versions**: Confirmed Laravel 12 and Tailwind CSS v4 release dates and features
 4. **Package Compatibility**: Verified cloudstudio/ollama-laravel supports Laravel 12
+5. **MCP Integration**: Added comprehensive MCP server integration for AI services and infrastructure management
+6. **Testing Framework**: Replaced PHPUnit with Pest PHP testing framework for Laravel-optimized testing
+7. **Subagent Architecture**: Implemented MCP-powered subagent system for specialized task automation
+
+**MCP SERVER CONFIGURATION**:
+
+- **strands-agents**: Strands Agent SDK integration for multi-model AI agent creation and management
+- **agentcore-mcp-server**: Amazon Bedrock AgentCore platform for advanced agent orchestration
+- **awspricing**: Real-time AWS pricing data for cost optimization and budget management
+- **awsknowledge**: AWS documentation and best practices for infrastructure optimization
+- **awsapi**: Direct AWS service integration for infrastructure management and monitoring
+- **awslabs.aws-iac-mcp-server**: Infrastructure as Code validation and optimization tools
+- **context7**: Advanced context management for enhanced conversation and workflow continuity
+- **fetch**: Enhanced HTTP client capabilities for external API integration and data retrieval
+- **figma** (optional): UI design consistency and asset management integration
 
 **REMAINING VERIFICATION NEEDED**:
 
 - UmamusumeDB.com API availability and endpoints
 - Specific external API rate limits and authentication requirements
-
----
 
 ## Phase 1: Foundation & Core Setup
 
@@ -44,7 +59,7 @@
 **Dependencies**: None  
 **Requirements**: 1, 17, 55
 
-#### Subtasks
+#### Subtasks - Task 1.1
 
 - [ ] **1.1.1** Create new Laravel 12 project with proper structure
   - ✅ **VERIFIED**: Initialize Laravel 12 project (released February 24, 2025): `composer create-project laravel/laravel umamusume-career-planner`
@@ -73,11 +88,13 @@
   - Set up Redis for cache, sessions, and queue drivers
   - _Requirements: 17.4, 55.2_
 
-- [ ] **1.1.5** Install and configure core dependencies
+- [ ] **1.1.5** Install and configure core dependencies with MCP integration
   - Install Laravel packages: `cloudstudio/ollama-laravel`, `aws/aws-sdk-php`, `laravel/sanctum`, `laravel/horizon`
-  - Install development packages: `laravel/telescope`, `barryvdh/laravel-debugbar`
-  - Configure package service providers and aliases
-  - Verify all packages are compatible with Laravel 12
+  - Install development packages: `laravel/telescope`, `barryvdh/laravel-debugbar`, `pestphp/pest`, `pestphp/pest-plugin-laravel`
+  - **Configure MCP Server Integration**: Set up MCP client configuration for AI and infrastructure services
+  - **Install MCP Servers**: Configure strands-agents, agentcore-mcp-server, awspricing, awsknowledge, awsapi, context7, fetch servers
+  - Configure package service providers and aliases with MCP client initialization
+  - Verify all packages are compatible with Laravel 12 and MCP integration works correctly
   - _Requirements: 17.1, 56.1_
 
 **Acceptance Criteria**:
@@ -88,8 +105,6 @@
 - All core dependencies installed and properly configured
 - Development tools (Telescope, Debugbar) accessible and functional
 
----
-
 ### Task 1.2: Database Schema Implementation
 
 **Priority**: Critical  
@@ -97,7 +112,7 @@
 **Dependencies**: Task 1.1  
 **Requirements**: 1, 2, 4, 6, 7, 50
 
-#### Subtasks
+#### Subtasks - Task 1.2
 
 - [ ] **1.2.1** Create core entity migrations
   - Create `users` table with authentication fields and Laravel Sanctum support
@@ -127,12 +142,15 @@
   - Include meta tier rankings and skill provision mappings for support cards
   - _Requirements: 6.1, 6.2, 14.1, 28.1_
 
-- [ ] **1.2.5** Create AI and utility migrations
-  - Create `ai_conversations` table for hybrid AI system (Ollama + Bedrock) chat history
-  - Create `ocr_extractions` table for screenshot processing and data extraction
-  - Include AI model tracking, processing time, and cost estimation fields
-  - Add confidence scoring and validation error tracking for OCR results
-  - _Requirements: 13.1, 13.4, 56.1, 57.2_
+- [ ] **1.2.5** Create AI, MCP, and utility migrations
+  - Create `ai_conversations` table for hybrid AI system (Ollama + MCP Bedrock + Agents) chat history
+  - Create `mcp_servers` table for MCP server configuration, health monitoring, and connection status
+  - Create `mcp_agents` table for subagent lifecycle management, performance tracking, and workflow history
+  - Create `mcp_tool_usage` table for MCP tool execution logging, cost tracking, and performance analytics
+  - Create `ocr_extractions` table for screenshot processing and data extraction with confidence scoring
+  - Include AI model tracking, MCP server performance, agent orchestration, and cost estimation fields
+  - Add comprehensive indexing for MCP operations, agent queries, and tool usage analytics
+  - _Requirements: 13.1, 13.4, 56.1, 56.4, 57.2_
 
 - [ ] **1.2.6** Implement database optimization
   - Add performance-critical indexes for all frequently queried columns
@@ -156,8 +174,6 @@
 - Database seeders populate essential game data for development and testing
 - Schema supports both URA Finale and Unity Cup scenario requirements
 
----
-
 ### Task 1.3: Core Models and Eloquent Relationships
 
 **Priority**: Critical  
@@ -165,7 +181,7 @@
 **Dependencies**: Task 1.2  
 **Requirements**: 1, 17, 50
 
-#### Subtasks
+#### Subtasks - Task 1.3
 
 - [ ] **1.3.1** Create core entity models with Laravel 12 features
   - Create `User` model with Sanctum authentication and relationship definitions
@@ -188,13 +204,16 @@
   - Include Unity Cup specific methods for Spirit Burst and team mechanics
   - _Requirements: 2.1, 2.2, 11.1, 11.2_
 
-- [ ] **1.3.4** Create support and external data models
+- [ ] **1.3.4** Create support, external data, and MCP integration models
   - Create `SupportCard` model with 6-card deck management and friendship tracking
   - Create `Event` model with decision tracking and outcome analysis
   - Create `ExternalData` model with API caching and data validation
-  - Create `AIConversation` model for hybrid AI system chat history
+  - Create `AIConversation` model for hybrid AI system chat history with MCP integration
+  - Create `MCPServer` model for MCP server configuration, health monitoring, and status tracking
+  - Create `MCPAgent` model for subagent lifecycle management and performance analytics
+  - Create `MCPToolUsage` model for tool execution logging and cost tracking
   - Create `OCRExtraction` model for screenshot processing results
-  - _Requirements: 6.1, 13.1, 14.1_
+  - _Requirements: 6.1, 13.1, 14.1, 56.1, 56.4_
 
 - [ ] **1.3.5** Implement comprehensive Eloquent relationships
   - Define one-to-many relationships (User → Characters, Character → Careers)
@@ -225,8 +244,6 @@
 - Model scopes enable efficient querying for common use cases
 - Strict mode compliance prevents performance issues
 
----
-
 ## Phase 2: Authentication & API Foundation
 
 ### Task 2.1: Laravel Sanctum Authentication System
@@ -236,7 +253,7 @@
 **Dependencies**: Task 1.3  
 **Requirements**: 17, 51
 
-#### Subtasks
+#### Subtasks - Task 2.1
 
 - [ ] **2.1.1** Configure Laravel Sanctum for API authentication
   - Install and configure Sanctum with proper middleware setup
@@ -274,8 +291,6 @@
 - Password reset functionality works securely with time-limited tokens
 - API documentation clearly explains authentication requirements
 
----
-
 ### Task 2.2: Frontend Foundation with Tailwind CSS v4
 
 **Priority**: High  
@@ -283,7 +298,7 @@
 **Dependencies**: Task 2.1  
 **Requirements**: 12, 47
 
-#### Subtasks
+#### Subtasks - Task 2.2
 
 - [ ] **2.2.1** Configure modern build tools and asset compilation
   - ✅ **VERIFIED**: Set up Vite for Laravel 12 with ES2024+ JavaScript compilation
@@ -299,16 +314,18 @@
   - Add footer component with status information and accessibility links
   - _Requirements: 12.1, 12.4, 47.4_
 
-- [ ] **2.2.3** Implement comprehensive design system
+- [ ] **2.2.3** Implement comprehensive design system with existing assets
   - Define color palette with WCAG 2.2 AA compliant contrast ratios (4.5:1 normal, 3:1 large)
   - Create typography system with fluid scaling and proper font loading
   - Build component library (buttons, forms, cards, modals) with accessibility features
   - Implement responsive breakpoints and container queries for modern layouts
+  - **Integrate existing visual assets**: Configure background system using `images/app_bg/` (light/dark themes, desktop/mobile orientations)
+  - **Create character avatar system**: Map character images from `images/trainee_images/` to character names for UI components
   - _Requirements: 12.1, 12.4, 47.1_
 
 - [ ] **2.2.4** Set up Progressive Web App (PWA) foundation
   - Configure service worker registration with proper lifecycle management
-  - Create web app manifest with proper icons and display settings
+  - Create web app manifest using existing logo assets from `images/app_logo/` directory (128px, 256px, 512px, 1024px PNG + ICO files)
   - Implement offline detection and basic offline functionality
   - Set up background sync foundation for future data synchronization
   - _Requirements: 12.4, 47.5_
@@ -321,15 +338,22 @@
   - Add text resizing capability up to 200% without content loss
   - _Requirements: 12.1, 12.4, 47.4_
 
+- [ ] **2.2.6** Asset Integration and Optimization
+  - **Background System**: Implement responsive background switching using existing `images/app_bg/` assets (light/dark themes, desktop/mobile orientations)
+  - **Character Avatar Mapping**: Create character name to image mapping using `images/trainee_images/` for consistent character representation (includes Silence Suzuka, Agnes Tachyon, Gold Ship, Narita Brian, Tokai Teio, Vodka, and others)
+  - **Asset Optimization**: Optimize existing images for web delivery (WebP conversion, responsive sizing, lazy loading)
+  - **Theme Integration**: Implement automatic theme detection and background switching based on user preference
+  - _Requirements: 12.1, 47.3_
+
 **Acceptance Criteria**:
 
-- Build system compiles modern JavaScript and CSS efficiently
+- Build system compiles modern JavaScript and CSS efficiently with asset optimization
 - Responsive layout works seamlessly across desktop, tablet, and mobile devices
-- Design system provides consistent, accessible components throughout application
-- PWA features enable offline functionality and app-like experience
+- Design system provides consistent, accessible components with integrated visual assets
+- Background system automatically switches between light/dark themes and desktop/mobile orientations
+- Character avatars display correctly using existing character images with proper fallbacks
+- PWA features enable offline functionality and app-like experience with proper branding
 - WCAG 2.2 AA compliance verified through automated and manual testing
-
----
 
 ### Task 2.3: Character Management Interface
 
@@ -338,7 +362,7 @@
 **Dependencies**: Task 2.2  
 **Requirements**: 1, 10, 12
 
-#### Subtasks
+#### Subtasks - Task 2.3
 
 - [ ] **2.3.1** Create character list and overview interface
   - Build character list view with filtering by scenario type (URA/Unity Cup)
@@ -355,12 +379,14 @@
   - Include accessibility features (labels, descriptions, keyboard navigation)
   - _Requirements: 1.1, 10.1, 12.1_
 
-- [ ] **2.3.3** Create detailed character overview dashboard
+- [ ] **2.3.3** Create detailed character overview dashboard with visual enhancements
   - Build character detail view with comprehensive stat display and progress indicators
   - Implement aptitude visualization with color-coded grade indicators
   - Create current goals and objectives tracking with progress visualization
   - Add stat progression charts and historical performance metrics
   - Include factor inheritance display with affinity compatibility indicators
+  - **Integrate character avatars**: Use character images from `images/trainee_images/` for visual character identification
+  - **Apply themed backgrounds**: Use appropriate backgrounds from `images/app_bg/` based on user theme preference
   - _Requirements: 1.5, 10.3, 10.5_
 
 - [ ] **2.3.4** Create character editing and management interface
@@ -385,53 +411,56 @@
 - Form validation prevents invalid data entry with clear, accessible error messages
 - Character editing saves properly with optimistic updates and error handling
 
----
-
 ## Phase 3: Core Game Mechanics Implementation
 
-### Task 3.1: Training Prediction Engine
+### Task 3.1: MCP-Enhanced Training Prediction Engine with Agent Orchestration
 
 **Priority**: Critical  
-**Estimated Time**: 15-18 hours  
+**Estimated Time**: 18-22 hours  
 **Dependencies**: Task 2.3  
 **Requirements**: 2, 11, 19, 20
 
-#### Subtasks
+#### Subtasks - Task 3.1
 
-- [ ] **3.1.1** Create comprehensive training calculation service
+- [ ] **3.1.1** Create comprehensive training calculation service with MCP integration
   - Implement base stat gain calculations with support card bonus integration
   - Add friendship training multipliers (2 participants +2 bonus, 3 participants +3 bonus)
   - Create facility level bonus calculations (1.0x to 2.0x multipliers for Unity Cup)
   - Include energy cost calculations and training failure risk assessment
-  - _Requirements: 2.1, 19.1, 20.2_
+  - **Integrate Training Optimization Agent** via strands-agents MCP server for complex calculations
+  - _Requirements: 2.1, 19.1, 20.2, 56.3_
 
-- [ ] **3.1.2** Implement scenario-specific training mechanics
+- [ ] **3.1.2** Implement MCP-powered scenario-specific training mechanics
   - Add URA Finale training predictions with traditional individual optimization
   - Implement Unity Cup Spirit Burst mechanics with 4-session gauge filling
   - Create team member interaction calculations for Unity Cup scenarios
   - Include distance team performance tracking and facility level impacts
-  - _Requirements: 2.2, 11.1, 11.2_
+  - **Deploy Scenario Analysis Agent** for scenario-specific optimization strategies
+  - _Requirements: 2.2, 11.1, 11.2, 56.3_
 
-- [ ] **3.1.3** Create intelligent training recommendation engine
-  - Implement goal-based training optimization with stat priority weighting
-  - Add turn economy calculations for optimal resource allocation
-  - Create energy and mood management recommendations
-  - Include Summer Camp period optimization (4-turn high-efficiency periods)
-  - _Requirements: 2.4, 19.3, 22.1, 22.3_
+- [ ] **3.1.3** Create intelligent MCP agent-based recommendation engine
+  - Implement **Career Strategy Agent** for goal-based training optimization with stat priority weighting
+  - Add **Resource Management Agent** for turn economy calculations and optimal resource allocation
+  - Create **Performance Analytics Agent** for energy and mood management recommendations
+  - Include **Summer Camp Optimization Agent** for 4-turn high-efficiency period planning
+  - Implement **agent orchestration workflows** for multi-agent collaborative recommendations
+  - _Requirements: 2.4, 19.3, 22.1, 22.3, 56.3_
 
-- [ ] **3.1.4** Build training prediction API with caching
-  - Create RESTful endpoints for real-time training predictions
-  - Implement Redis-based caching for expensive calculations
-  - Add prediction accuracy tracking and machine learning improvement
-  - Include batch prediction capabilities for multi-turn planning
-  - _Requirements: 2.5, 17.4, 52.2_
+- [ ] **3.1.4** Build MCP-enhanced training prediction API with intelligent caching
+  - Create RESTful endpoints for real-time training predictions with MCP agent integration
+  - Implement **Redis-based caching** enhanced with MCP server health monitoring
+  - Add **prediction accuracy tracking** using MCP analytics tools and machine learning improvement
+  - Include **batch prediction capabilities** via MCP agents for multi-turn planning and optimization
+  - Create **cost optimization** using awspricing MCP server for agent usage cost management
+  - _Requirements: 2.5, 17.4, 52.2, 56.4_
 
-- [ ] **3.1.5** Create training prediction UI components
-  - Build training option display with predicted stat gains and energy costs
-  - Implement prediction visualization with confidence indicators
-  - Create recommendation rankings with clear reasoning explanations
-  - Add Spirit Burst indicators and team synergy visualization for Unity Cup
-  - _Requirements: 2.1, 11.3, 12.2_
+- [ ] **3.1.5** Create advanced training prediction UI with agent visualization
+  - Build training option display with predicted stat gains, energy costs, and agent recommendations
+  - Implement **agent workflow visualization** showing multi-step prediction processes
+  - Create **recommendation rankings** with clear reasoning explanations from multiple agents
+  - Add **Spirit Burst indicators** and team synergy visualization for Unity Cup scenarios
+  - Include **agent performance metrics** and confidence indicators for prediction quality
+  - _Requirements: 2.1, 11.3, 12.2, 56.4_
 
 **Acceptance Criteria**:
 
@@ -441,51 +470,54 @@
 - UI displays predictions clearly with intuitive ranking and explanations
 - Recommendation engine optimizes for user-defined goals and constraints
 
----
-
-### Task 3.2: Advanced Skill Management System
+### Task 3.2: MCP-Enhanced Advanced Skill Management System with Agent Optimization
 
 **Priority**: High  
-**Estimated Time**: 12-15 hours  
+**Estimated Time**: 15-18 hours  
 **Dependencies**: Task 3.1  
 **Requirements**: 4, 26, 30, 31, 32
 
-#### Subtasks
+#### Subtasks - Task 3.2
 
-- [ ] **3.2.1** Create comprehensive skill database and management
+- [ ] **3.2.1** Create comprehensive skill database and MCP-powered management
   - Seed complete skill database with SP costs by category (Normal 120-180, Rare 180-240, Unique variable)
   - Implement skill categorization (Speed, Passive, Recovery, Debuff) with proper relationships
   - Create skill evolution mapping (Normal → Rare upgrade paths) with prerequisite tracking
   - Include skill effect descriptions and strategic usage recommendations
-  - _Requirements: 4.4, 31.1, 31.4_
+  - **Deploy Skill Analysis Agent** via strands-agents MCP server for skill synergy analysis and optimization
+  - _Requirements: 4.4, 31.1, 31.4, 56.3_
 
-- [ ] **3.2.2** Implement advanced skill hint system with cost reduction
+- [ ] **3.2.2** Implement MCP agent-enhanced skill hint system with cost reduction
   - Create hint tracking system with source identification (support cards, events, inheritance)
   - Implement 20% SP cost reduction per duplicate hint with 40% maximum discount calculation
   - Add red "!" indicator logic for guaranteed hint opportunities during training
   - Include hint probability calculations for non-guaranteed opportunities
-  - _Requirements: 26.1, 26.2, 30.1, 30.2_
+  - **Integrate Hint Optimization Agent** for strategic hint collection and cost minimization planning
+  - _Requirements: 26.1, 26.2, 30.1, 30.2, 56.3_
 
-- [ ] **3.2.3** Create skill evolution and prerequisite management
+- [ ] **3.2.3** Create MCP-powered skill evolution and prerequisite management
   - Implement automatic skill evolution system (Normal → Rare replacement)
   - Add prerequisite checking for skill evolution chains
   - Create skill evolution planning with optimal acquisition timing
   - Include SP efficiency calculations for evolution vs direct acquisition
-  - _Requirements: 31.1, 31.2, 31.3, 31.5_
+  - **Deploy Skill Evolution Agent** for long-term skill development roadmap optimization
+  - _Requirements: 31.1, 31.2, 31.3, 31.5, 56.3_
 
-- [ ] **3.2.4** Build skill optimization engine with hint farming
-  - Create SP budget management with hint collection optimization
-  - Implement hint farming strategies for maximum cost reduction
-  - Add skill build planning with character synergy analysis
-  - Include long-term skill development roadmaps with milestone tracking
-  - _Requirements: 32.1, 32.2, 32.3_
+- [ ] **3.2.4** Build MCP agent-orchestrated skill optimization engine
+  - Create **SP Budget Management Agent** for hint collection optimization and cost tracking
+  - Implement **Hint Farming Strategy Agent** for maximum cost reduction planning
+  - Add **Skill Build Planning Agent** with character synergy analysis and meta optimization
+  - Include **Long-term Development Agent** for skill roadmaps with milestone tracking
+  - Create **agent collaboration workflows** for comprehensive skill optimization strategies
+  - _Requirements: 32.1, 32.2, 32.3, 56.3_
 
-- [ ] **3.2.5** Create comprehensive skill management UI
-  - Build skill inventory display with hint progress and cost calculations
-  - Implement skill acquisition interface with SP cost breakdown
-  - Create skill evolution visualization with prerequisite chains
-  - Add skill build planner with optimization recommendations
-  - _Requirements: 4.1, 26.4, 30.3_
+- [ ] **3.2.5** Create comprehensive MCP-enhanced skill management UI
+  - Build skill inventory display with hint progress, cost calculations, and agent recommendations
+  - Implement skill acquisition interface with SP cost breakdown and optimization suggestions
+  - Create skill evolution visualization with prerequisite chains and agent-guided pathways
+  - Add skill build planner with multi-agent optimization recommendations and workflow visualization
+  - Include **agent performance dashboard** showing skill optimization effectiveness and cost savings
+  - _Requirements: 4.1, 26.4, 30.3, 56.4_
 
 **Acceptance Criteria**:
 
@@ -495,8 +527,6 @@
 - Optimization engine provides valuable SP efficiency recommendations
 - UI clearly displays all skill information with intuitive management interface
 
----
-
 ### Task 3.3: Support Card Management and Deck Optimization
 
 **Priority**: High  
@@ -504,7 +534,7 @@
 **Dependencies**: Task 3.2  
 **Requirements**: 6, 28, 29
 
-#### Subtasks
+#### Subtasks - Task 3.3
 
 - [ ] **3.3.1** Create comprehensive support card database
   - Seed complete support card database with stats, bonuses, and skill provisions
@@ -549,53 +579,56 @@
 - Deck optimization provides valuable recommendations for character builds
 - UI allows intuitive deck management with clear feedback and analysis
 
----
-
 ## Phase 4: AI Integration and External APIs
 
-### Task 4.1: Ollama Local AI Integration
+### Task 4.1: MCP-Enhanced AI Integration with Hybrid Processing
 
 **Priority**: High  
-**Estimated Time**: 8-10 hours  
+**Estimated Time**: 12-15 hours  
 **Dependencies**: Task 1.1  
 **Requirements**: 13, 56, 57
 
-#### Subtasks
+#### Subtasks - Task 4.1
 
-- [ ] **4.1.1** Configure cloudstudio/ollama-laravel package
-  - ✅ **VERIFIED**: Install and configure ollama-laravel package (v2.x supports Laravel 11+, compatible with Laravel 12)
-  - Set up local Ollama connection with model management (Llama 3.3, Mistral, Qwen)
-  - Configure package settings for optimal performance and error handling
-  - Test connection and model availability with fallback mechanisms
+- [ ] **4.1.1** Configure MCP Server Integration for AI Services
+  - ✅ **VERIFIED**: Set up MCP client configuration for AI services integration
+  - Configure **strands-agents** MCP server for Strands Agent SDK integration with Bedrock, Anthropic, OpenAI, Gemini, and Llama models
+  - Configure **agentcore-mcp-server** for Amazon Bedrock AgentCore platform integration
+  - Set up MCP client service with health monitoring and automatic reconnection
+  - Test MCP server connectivity and tool availability with proper error handling
   - _Requirements: 56.1, 56.2_
 
-- [ ] **4.1.2** Create comprehensive AI service layer
-  - Create `OllamaService` class using cloudstudio/ollama-laravel package
-  - Implement request/response handling with proper error management
-  - Add conversation context tracking and session management
-  - Include performance monitoring (response time, token usage, success rates)
+- [ ] **4.1.2** Implement Hybrid AI Service Architecture with MCP Integration
+  - Create `HybridAIService` class integrating local Ollama and MCP Bedrock services
+  - Implement intelligent routing between local Ollama (Llama 3.3, Mistral, Qwen) and MCP Bedrock models
+  - Add MCP agent creation and management via strands-agents server
+  - Include conversation context tracking with MCP session management
+  - Implement performance monitoring across all AI providers (local, MCP, direct)
   - _Requirements: 13.1, 56.2, 57.2_
 
-- [ ] **4.1.3** Implement game-specific AI prompt engineering
-  - Create specialized prompts for Umamusume game mechanics and strategy
-  - Implement few-shot learning with game-specific examples
-  - Add context-aware prompts based on character state and career progression
-  - Include chain-of-thought reasoning for complex strategic decisions
-  - _Requirements: 13.2, 13.3_
+- [ ] **4.1.3** Create MCP-Powered Subagent System
+  - Implement **Training Optimization Agent** via strands-agents MCP server for complex training sequence planning
+  - Create **Career Strategy Agent** for long-term career planning and goal optimization
+  - Add **Race Analysis Agent** for race preparation and performance analysis
+  - Implement **Skill Management Agent** for SP optimization and hint collection strategies
+  - Include agent orchestration system for multi-agent workflows and collaboration
+  - _Requirements: 13.2, 13.3, 56.3_
 
-- [ ] **4.1.4** Create conversation management and persistence
-  - Implement conversation history storage with Redis caching
-  - Add conversation context management across multiple interactions
-  - Create conversation branching for exploring alternative strategies
-  - Include conversation export/import functionality for strategy sharing
-  - _Requirements: 13.4, 56.2_
+- [ ] **4.1.4** Implement Advanced MCP Tool Integration
+  - Integrate **AWS infrastructure tools** via awspricing, awsknowledge, awsapi MCP servers for cost optimization
+  - Add **context management tools** via context7 MCP server for enhanced conversation context
+  - Implement **fetch tools** for external API integration and data retrieval
+  - Create **figma integration** (optional) for UI design consistency and asset management
+  - Include tool chaining and workflow automation for complex multi-step operations
+  - _Requirements: 13.4, 56.2, 14.1_
 
-- [ ] **4.1.5** Add comprehensive performance monitoring
-  - Implement response time tracking and optimization
-  - Add token usage monitoring for cost analysis
-  - Create success/failure rate tracking with error categorization
-  - Include model performance comparison and selection optimization
-  - _Requirements: 56.4, 57.5_
+- [ ] **4.1.5** Build Comprehensive AI Management Dashboard
+  - Create MCP server status monitoring with health checks and reconnection logic
+  - Implement AI provider performance comparison (Ollama vs MCP Bedrock vs Agents)
+  - Add cost tracking and budget management across all AI services
+  - Create agent management interface for subagent creation, monitoring, and termination
+  - Include conversation history with MCP tool usage tracking and analytics
+  - _Requirements: 56.4, 57.5, 13.5_
 
 **Acceptance Criteria**:
 
@@ -605,52 +638,54 @@
 - Performance metrics collected and analyzed for optimization
 - Error handling works gracefully with proper fallback mechanisms
 
----
-
-### Task 4.2: AWS Bedrock Fallback Integration
+### Task 4.2: MCP-Enhanced AWS Bedrock Integration with Agent Orchestration
 
 **Priority**: Medium  
-**Estimated Time**: 8-10 hours  
+**Estimated Time**: 10-12 hours  
 **Dependencies**: Task 4.1  
 **Requirements**: 13, 56, 57
 
-#### Subtasks
+#### Subtasks - Task 4.2
 
-- [ ] **4.2.1** Configure AWS SDK and Bedrock client
-  - ✅ **VERIFIED**: Install and configure AWS SDK for PHP with proper credential management
-  - Set up Bedrock client with region configuration and service endpoints
-  - ✅ **MODELS CONFIRMED**: Claude 4.5 Opus ($5/$25), Sonnet ($3/$15), Haiku ($1/$5), Nova 2 Lite ($0.00125), Nova 2 Pro (Preview)
-  - Implement secure credential storage and rotation for local development
-  - Test connection to verified Bedrock models with cost tracking
+- [ ] **4.2.1** Configure MCP Bedrock Integration via AgentCore
+  - ✅ **VERIFIED**: Set up agentcore-mcp-server for Amazon Bedrock AgentCore platform integration
+  - Configure MCP client for Bedrock model access (Claude 4.5 Opus $5/$25, Sonnet $3/$15, Haiku $1/$5, Nova 2 Lite $0.00125)
+  - Implement secure credential management through MCP server configuration
+  - Add MCP tool integration for enhanced Bedrock capabilities and cost tracking
+  - Test MCP Bedrock connectivity with comprehensive error handling and fallback mechanisms
   - _Requirements: 56.3, 57.3_
 
-- [ ] **4.2.2** Create Bedrock service layer with cost tracking
-  - Create `BedrockService` class with model selection logic
-  - Implement cost tracking and budget management for personal AWS usage
-  - Add model selection optimization based on complexity and cost
-  - Include usage analytics and spending alerts
-  - _Requirements: 56.3, 56.4_
+- [ ] **4.2.2** Create MCP-Powered Agent Orchestration System
+  - Implement **AgentCore integration** via agentcore-mcp-server for advanced agent management
+  - Create **multi-agent workflows** using strands-agents MCP server for complex task coordination
+  - Add **agent communication protocols** for inter-agent collaboration and data sharing
+  - Implement **agent lifecycle management** (creation, monitoring, termination) through MCP tools
+  - Include **agent performance analytics** and optimization recommendations
+  - _Requirements: 56.3, 56.4, 13.2_
 
-- [ ] **4.2.3** Implement intelligent hybrid AI router
-  - Create complexity detection algorithm for request routing
-  - Implement automatic fallback logic (local timeout >15s, complexity threshold)
-  - Add performance threshold monitoring and adaptive routing
-  - Include seamless context transfer between local and cloud models
-  - _Requirements: 56.1, 56.3_
+- [ ] **4.2.3** Implement Intelligent MCP-Based Routing and Cost Management
+  - Create **complexity detection algorithm** for optimal routing between local Ollama, MCP Bedrock, and agents
+  - Implement **automatic fallback logic** with MCP health monitoring and service availability checks
+  - Add **cost optimization engine** using awspricing MCP server for real-time cost analysis
+  - Include **budget management system** with MCP-based usage tracking and spending alerts
+  - Create **performance threshold monitoring** with adaptive routing based on MCP server performance
+  - _Requirements: 56.1, 56.3, 56.4_
 
-- [ ] **4.2.4** Add comprehensive cost management
-  - Implement real-time usage tracking with Redis-based counters
-  - Create budget alerts and spending limit enforcement
-  - Add cost optimization recommendations based on usage patterns
-  - Include detailed cost breakdowns by feature and model usage
-  - _Requirements: 56.4, 59.3_
+- [ ] **4.2.4** Build Advanced MCP Tool Integration for AWS Services
+  - Integrate **awspricing MCP server** for real-time cost analysis and budget optimization
+  - Add **awsknowledge MCP server** for AWS best practices and documentation access
+  - Implement **awsapi MCP server** for direct AWS service integration and management
+  - Create **awslabs.aws-iac-mcp-server** integration for infrastructure validation and optimization
+  - Include **comprehensive logging and monitoring** of all MCP tool usage and performance
+  - _Requirements: 56.4, 59.3, 14.1_
 
-- [ ] **4.2.5** Create fallback UI indicators and transparency
-  - Add model usage indicators showing which AI service was used
-  - Implement cost information display for cloud model usage
-  - Create performance metrics dashboard for hybrid AI system
-  - Include user controls for AI service preferences and budget limits
-  - _Requirements: 13.5, 56.4_
+- [ ] **4.2.5** Create MCP-Enhanced User Interface and Transparency
+  - Add **MCP server status indicators** showing health and availability of all connected servers
+  - Implement **agent activity dashboard** with real-time monitoring of active agents and workflows
+  - Create **cost transparency interface** showing MCP tool usage costs and budget consumption
+  - Include **performance metrics dashboard** comparing local, MCP, and agent processing performance
+  - Add **user controls** for MCP server preferences, agent configurations, and budget limits
+  - _Requirements: 13.5, 56.4, 57.5_
 
 **Acceptance Criteria**:
 
@@ -660,51 +695,54 @@
 - Fallback happens automatically when local processing is insufficient
 - UI clearly indicates which model was used with cost transparency
 
----
-
-### Task 4.3: AI Chat Interface and User Experience
+### Task 4.3: MCP-Enhanced AI Chat Interface with Subagent Integration
 
 **Priority**: Medium  
-**Estimated Time**: 10-12 hours  
+**Estimated Time**: 12-15 hours  
 **Dependencies**: Task 4.2  
 **Requirements**: 13, 56
 
-#### Subtasks
+#### Subtasks - Task 4.3
 
-- [ ] **4.3.1** Create responsive AI chat UI components
-  - Build chat message display with proper message threading and history
-  - Implement real-time input interface with typing indicators
-  - Add model selection display and processing status indicators
-  - Create message formatting with syntax highlighting for game data
-  - _Requirements: 13.1, 12.2_
+- [ ] **4.3.1** Create Advanced AI Chat UI with MCP Integration
+  - Build **multi-provider chat interface** supporting Ollama, MCP Bedrock, and MCP agents
+  - Implement **agent selection interface** for choosing specific subagents (Training, Career, Race, Skill)
+  - Add **MCP server status indicators** showing real-time health and availability
+  - Create **agent workflow visualization** displaying multi-step agent processes and collaboration
+  - Include **tool usage indicators** showing which MCP tools are being utilized in real-time
+  - _Requirements: 13.1, 12.2, 56.4_
 
-- [ ] **4.3.2** Implement real-time chat functionality
-  - Add message streaming for long AI responses with progress indicators
-  - Implement WebSocket integration for real-time updates (optional)
-  - Create proper message state management (sending, processing, delivered)
-  - Include message retry functionality for failed requests
-  - _Requirements: 13.4, 47.2_
+- [ ] **4.3.2** Implement Real-Time MCP Communication and Monitoring
+  - Add **MCP server communication** with real-time status updates and health monitoring
+  - Implement **agent progress tracking** for long-running subagent workflows
+  - Create **tool execution monitoring** showing MCP tool calls and results
+  - Include **performance metrics display** comparing different AI providers and agents
+  - Add **error handling and recovery** for MCP server disconnections and failures
+  - _Requirements: 13.4, 47.2, 56.4_
 
-- [ ] **4.3.3** Add comprehensive context awareness
-  - Integrate current character data into AI conversation context
-  - Include career state awareness (current turn, goals, progress)
-  - Add training history context for informed recommendations
-  - Implement dynamic context management to maintain conversation coherence
-  - _Requirements: 13.2, 13.3_
+- [ ] **4.3.3** Build Context-Aware Agent Orchestration Interface
+  - Integrate **character context awareness** across all MCP agents and tools
+  - Include **career state synchronization** between different subagents
+  - Add **cross-agent communication** for collaborative problem-solving
+  - Implement **workflow templates** for common multi-agent scenarios
+  - Create **agent memory management** for persistent context across sessions
+  - _Requirements: 13.2, 13.3, 56.3_
 
-- [ ] **4.3.4** Create conversation management features
-  - Implement chat history persistence with search functionality
-  - Add conversation export capabilities (text, JSON formats)
-  - Create conversation clearing and context reset functionality
-  - Include conversation sharing and collaboration features
-  - _Requirements: 13.4_
+- [ ] **4.3.4** Create Advanced Conversation Management with MCP Integration
+  - Implement **multi-agent conversation history** with agent attribution and tool usage
+  - Add **conversation branching** for exploring different agent recommendations
+  - Create **agent workflow export** capabilities for sharing complex strategies
+  - Include **conversation analytics** showing agent effectiveness and user satisfaction
+  - Add **agent feedback system** for improving subagent performance over time
+  - _Requirements: 13.4, 56.4_
 
-- [ ] **4.3.5** Implement advanced chat features
-  - Add message reactions and feedback system for AI response quality
-  - Create copy/share functionality for useful AI responses
-  - Implement search within conversation history
-  - Add conversation templates for common strategic questions
-  - _Requirements: 13.5_
+- [ ] **4.3.5** Implement Comprehensive MCP Monitoring and Control Interface
+  - Add **MCP server management panel** for connecting, disconnecting, and configuring servers
+  - Create **agent lifecycle controls** for creating, monitoring, and terminating subagents
+  - Implement **cost tracking dashboard** showing MCP tool usage and associated costs
+  - Include **performance optimization recommendations** based on MCP usage patterns
+  - Add **user preference management** for default agents, MCP servers, and workflow templates
+  - _Requirements: 13.5, 56.4, 57.5_
 
 **Acceptance Criteria**:
 
@@ -714,51 +752,54 @@
 - Real-time features work properly with appropriate loading states
 - User feedback mechanisms help improve AI response quality
 
----
-
-### Task 4.4: External API Integration and Data Synchronization
+### Task 4.4: MCP-Enhanced External API Integration with Intelligent Data Management
 
 **Priority**: Medium  
-**Estimated Time**: 10-12 hours  
+**Estimated Time**: 12-15 hours  
 **Dependencies**: Task 3.3  
 **Requirements**: 14, 55
 
-#### Subtasks
+#### Subtasks - Task 4.4
 
-- [ ] **4.4.1** Create external API client services
+- [ ] **4.4.1** Create MCP-Powered External API Client Services
   - ⚠️ **UPDATE REQUIRED**: Replace deprecated SimpleSandman/UmaMusumeAPI with umapyoi.net API client
-  - Create umapyoi.net client for character, support card, and news information (verified active)
-  - Add UmamusumeDB.com client for training calculations and meta data (requires verification)
-  - Include proper HTTP client configuration with timeouts and retry logic
+  - Implement **fetch MCP server integration** for enhanced HTTP client capabilities and error handling
+  - Create **umapyoi.net client** via MCP fetch tools for character, support card, and news information (verified active)
+  - Add **UmamusumeDB.com client** with MCP-enhanced retry logic for training calculations and meta data
+  - Include **context7 MCP server integration** for intelligent context management across API calls
   - _Requirements: 14.1, 55.3_
 
-- [ ] **4.4.2** Implement comprehensive caching layer with Redis
-  - Create Redis-based API response caching with configurable TTL values
-  - Implement cache warming strategies for frequently accessed data
-  - Add intelligent cache invalidation based on game update cycles
-  - Include cache performance monitoring and hit rate optimization
-  - _Requirements: 14.5, 55.3_
+- [ ] **4.4.2** Implement MCP-Enhanced Caching and Performance Optimization
+  - Create **Redis-based API response caching** with MCP server health monitoring integration
+  - Implement **intelligent cache warming** using MCP agents for predictive data fetching
+  - Add **MCP-powered cache invalidation** based on external data change detection
+  - Include **awspricing MCP integration** for cost-optimized caching strategies
+  - Create **performance monitoring** using MCP tools for cache hit rates and API response times
+  - _Requirements: 14.5, 55.3, 56.4_
 
-- [ ] **4.4.3** Create intelligent fallback mechanisms
-  - Implement API priority ordering with automatic failover
-  - Add graceful degradation to manual input when APIs are unavailable
-  - Create background sync jobs for data reconciliation when connectivity restored
-  - Include data staleness indicators and user notifications
-  - _Requirements: 14.2, 55.3_
+- [ ] **4.4.3** Build MCP-Powered Intelligent Fallback and Recovery System
+  - Implement **MCP agent-based API health monitoring** with automatic failover coordination
+  - Add **graceful degradation agents** that manage manual input modes when APIs are unavailable
+  - Create **background sync agents** using strands-agents MCP server for data reconciliation
+  - Include **awsknowledge MCP integration** for best practices in API failure handling
+  - Add **comprehensive alerting system** via MCP tools for API status and recovery notifications
+  - _Requirements: 14.2, 55.3, 56.3_
 
-- [ ] **4.4.4** Build comprehensive data synchronization system
-  - Create background sync jobs using Laravel queues with Redis driver
-  - Implement data validation and conflict resolution between sources
-  - Add data quality scoring and accuracy verification
-  - Include automated data update detection and synchronization
-  - _Requirements: 14.3, 14.4_
+- [ ] **4.4.4** Create Advanced MCP-Based Data Synchronization and Validation
+  - Build **data synchronization agents** using strands-agents MCP server for multi-source coordination
+  - Implement **data validation workflows** with MCP tool chaining for accuracy verification
+  - Add **conflict resolution agents** for handling discrepancies between data sources
+  - Create **data quality scoring system** using MCP analytics tools
+  - Include **automated update detection** via MCP monitoring agents for game data changes
+  - _Requirements: 14.3, 14.4, 56.3_
 
-- [ ] **4.4.5** Add monitoring and health checking
-  - Implement API health monitoring with uptime tracking
-  - Create response time monitoring and performance alerts
-  - Add failure rate tracking with automatic retry mechanisms
-  - Include comprehensive logging for debugging and optimization
-  - _Requirements: 14.5, 55.4_
+- [ ] **4.4.5** Build Comprehensive MCP Monitoring and Health Management
+  - Implement **MCP server health dashboard** showing status of all external integrations
+  - Create **API performance analytics** using MCP monitoring tools and awsapi integration
+  - Add **failure rate tracking** with MCP-powered automated recovery mechanisms
+  - Include **cost optimization recommendations** via awspricing MCP server for API usage
+  - Create **comprehensive logging system** using MCP tools for debugging and optimization
+  - _Requirements: 14.5, 55.4, 56.4_
 
 **Acceptance Criteria**:
 
@@ -767,8 +808,6 @@
 - Fallback mechanisms work seamlessly when external services are unavailable
 - Data stays synchronized with proper conflict resolution and validation
 - Monitoring provides comprehensive visibility into API health and performance
-
----
 
 ## Phase 5: Advanced Features and Optimization
 
@@ -779,7 +818,7 @@
 **Dependencies**: Task 4.4  
 **Requirements**: 23
 
-#### Subtasks
+#### Subtasks - Task 5.1
 
 - [ ] **5.1.1** Set up OCR infrastructure and image processing
   - Install and configure Tesseract OCR with Japanese language support
@@ -824,8 +863,6 @@
 - Extracted data integrates seamlessly with existing character management
 - UI provides intuitive workflow for screenshot processing and correction
 
----
-
 ### Task 5.2: Career Analytics and Performance Tracking
 
 **Priority**: Medium  
@@ -833,7 +870,7 @@
 **Dependencies**: Task 3.1  
 **Requirements**: 15, 25
 
-#### Subtasks
+#### Subtasks - Task 5.2
 
 - [ ] **5.2.1** Create comprehensive analytics engine
   - Implement career performance metrics calculation (efficiency, success rates)
@@ -878,8 +915,6 @@
 - Reports generate correctly with actionable recommendations
 - Historical tracking enables long-term strategy optimization
 
----
-
 ### Task 5.3: Data Import/Export and Migration System
 
 **Priority**: Low  
@@ -887,7 +922,7 @@
 **Dependencies**: Task 5.1  
 **Requirements**: 23
 
-#### Subtasks
+#### Subtasks - Task 5.3
 
 - [ ] **5.3.1** Create flexible data import interface
   - Implement copy/paste text import with intelligent parsing
@@ -932,8 +967,6 @@
 - Backup system provides reliable data protection and recovery
 - UI guides users through complex import/export processes intuitively
 
----
-
 ## Phase 6: Performance, Testing, and Deployment
 
 ### Task 6.1: Performance Optimization and Monitoring
@@ -943,7 +976,7 @@
 **Dependencies**: All previous tasks  
 **Requirements**: 17, 50, 59
 
-#### Subtasks
+#### Subtasks - Task 6.1
 
 - [ ] **6.1.1** Database query optimization and indexing
   - Analyze and optimize all database queries using Laravel Debugbar
@@ -988,51 +1021,62 @@
 - API responses are fast with proper compression and caching
 - Performance monitoring provides actionable insights for optimization
 
----
-
-### Task 6.2: Comprehensive Testing Suite
+### Task 6.2: Comprehensive Testing Suite with Pest Framework
 
 **Priority**: High  
-**Estimated Time**: 12-15 hours  
+**Estimated Time**: 15-18 hours  
 **Dependencies**: Task 6.1  
 **Requirements**: 17, 51
 
-#### Subtasks
+#### Subtasks - Task 6.2
 
-- [ ] **6.2.1** Unit testing for core business logic
-  - Create comprehensive unit tests for all service classes
-  - Add model tests with relationship validation
-  - Implement utility function tests with edge case coverage
-  - Include test coverage reporting with minimum 80% threshold
+- [ ] **6.2.1** Set up Pest Testing Framework for Laravel 12
+  - ✅ **VERIFIED**: Install and configure Pest PHP testing framework (optimized for Laravel)
+  - Set up Pest configuration with Laravel 12 integration and database testing
+  - Configure Pest plugins for Laravel (pest-plugin-laravel) and parallel testing
+  - Create Pest test structure with proper organization and naming conventions
+  - Add Pest coverage reporting with minimum 80% threshold and HTML reports
   - _Requirements: 17.5_
 
-- [ ] **6.2.2** Feature testing for API endpoints
-  - Create feature tests for all API endpoints with authentication
-  - Add integration tests for complex workflows (career creation, training)
-  - Implement user workflow tests covering complete user journeys
-  - Include API response validation and error handling tests
-  - _Requirements: 17.5, 52.4_
+- [ ] **6.2.2** Create Pest Unit Tests for Core Business Logic
+  - Write **Pest unit tests** for all service classes with descriptive test names and assertions
+  - Add **model tests** using Pest's elegant syntax for relationship validation and data integrity
+  - Implement **utility function tests** with Pest datasets for comprehensive edge case coverage
+  - Create **MCP integration tests** using Pest mocking for MCP server interactions and agent workflows
+  - Include **AI service tests** with Pest fixtures for testing hybrid AI routing and cost management
+  - _Requirements: 17.5, 56.4_
 
-- [ ] **6.2.3** Frontend testing and accessibility validation
-  - Create component tests for all UI components
-  - Add user interaction tests with proper event simulation
-  - Implement automated accessibility testing with WCAG 2.2 AA validation
-  - Include cross-browser compatibility testing
-  - _Requirements: 12.4, 47.4_
+- [ ] **6.2.3** Implement Pest Feature Tests for API Endpoints and User Workflows
+  - Create **API endpoint tests** using Pest's Laravel integration for all REST endpoints with authentication
+  - Add **MCP-enhanced integration tests** for complex workflows involving multiple agents and tools
+  - Implement **user journey tests** covering complete career management workflows with Pest's readable syntax
+  - Include **AI conversation tests** validating MCP agent interactions and response quality
+  - Create **external API integration tests** with Pest mocking for umapyoi.net and other services
+  - _Requirements: 17.5, 52.4, 56.3_
 
-- [ ] **6.2.4** Performance and load testing
-  - Create load testing scenarios for high-traffic situations
-  - Add stress testing for database and Redis performance
-  - Implement memory leak detection and resource usage monitoring
-  - Include API rate limiting and throttling validation
-  - _Requirements: 50.4, 52.4_
+- [ ] **6.2.4** Build Pest Frontend and Accessibility Testing Suite
+  - Create **component tests** using Pest browser testing for all UI components with user interaction simulation
+  - Add **accessibility tests** with Pest and axe-core integration for WCAG 2.2 AA compliance validation
+  - Implement **PWA functionality tests** using Pest browser testing for service worker and offline capabilities
+  - Include **responsive design tests** with Pest's browser testing across multiple viewport sizes
+  - Create **MCP UI tests** for agent management interfaces and real-time status monitoring
+  - _Requirements: 12.4, 47.4, 56.4_
 
-- [ ] **6.2.5** Security and penetration testing
-  - Create comprehensive authentication and authorization tests
-  - Add input validation tests for XSS and injection prevention
-  - Implement security header validation and CSRF protection tests
-  - Include API security testing with automated vulnerability scanning
-  - _Requirements: 51.1, 51.2, 51.4_
+- [ ] **6.2.5** Implement Pest Performance and Security Testing
+  - Create **load testing scenarios** using Pest with parallel execution for high-traffic simulation
+  - Add **MCP server stress tests** for agent creation, tool execution, and concurrent operations
+  - Implement **memory leak detection** using Pest with performance monitoring and resource tracking
+  - Include **security tests** with Pest for authentication, authorization, XSS, and injection prevention
+  - Create **API rate limiting tests** using Pest datasets for various throttling scenarios and edge cases
+  - _Requirements: 50.4, 51.1, 51.2, 51.4, 56.4_
+
+- [ ] **6.2.6** Set up Pest Continuous Integration and Reporting
+  - Configure **Pest CI pipeline** with GitHub Actions for automated testing on code changes
+  - Implement **parallel test execution** using Pest's built-in parallelization for faster CI runs
+  - Add **Pest coverage reporting** with integration to code coverage services and PR comments
+  - Create **Pest test result dashboards** with detailed reporting and trend analysis
+  - Include **MCP integration testing** in CI pipeline with proper mocking and service simulation
+  - _Requirements: 17.5, 58.3_
 
 **Acceptance Criteria**:
 
@@ -1042,8 +1086,6 @@
 - Security tests confirm protection against common vulnerabilities
 - Accessibility compliance verified through automated and manual testing
 
----
-
 ### Task 6.3: Documentation and Deployment Preparation
 
 **Priority**: Medium  
@@ -1051,7 +1093,7 @@
 **Dependencies**: Task 6.2  
 **Requirements**: 58
 
-#### Subtasks
+#### Subtasks - Task 6.3
 
 - [ ] **6.3.1** Create comprehensive user documentation
   - Write detailed user guide covering all application features
@@ -1096,36 +1138,51 @@
 - Application is thoroughly tested and ready for production deployment
 - Launch checklist ensures all requirements are met before go-live
 
----
-
 ## Summary and Next Steps
 
-**Total Estimated Time**: 180-220 hours (22-28 weeks at 8 hours/week)
+**Total Estimated Time**: 220-270 hours (28-34 weeks at 8 hours/week)
 
 **Critical Path**:
 
-1. Foundation Setup (Tasks 1.1-1.3) - 22-28 hours
+1. Foundation Setup with MCP Integration (Tasks 1.1-1.3) - 26-32 hours
 2. Authentication & API Foundation (Tasks 2.1-2.3) - 24-30 hours  
-3. Core Game Mechanics (Tasks 3.1-3.3) - 37-45 hours
-4. AI Integration (Tasks 4.1-4.4) - 36-44 hours
-5. Performance & Testing (Tasks 6.1-6.3) - 28-35 hours
+3. MCP-Enhanced Core Game Mechanics (Tasks 3.1-3.3) - 45-55 hours
+4. Advanced MCP AI Integration & Subagents (Tasks 4.1-4.4) - 46-56 hours
+5. Performance & Pest Testing Suite (Tasks 6.1-6.3) - 35-42 hours
 
 **Key Milestones**:
 
-- **Week 4**: Laravel foundation and authentication complete
-- **Week 8**: Character management and basic UI functional
-- **Week 14**: Core training prediction engine operational
-- **Week 20**: AI integration and external APIs complete
-- **Week 26**: Performance optimized and fully tested
-- **Week 28**: Production ready with comprehensive documentation
+- **Week 4**: Laravel foundation, MCP server integration, and authentication complete
+- **Week 8**: Character management, basic UI, and MCP agent deployment functional
+- **Week 16**: MCP-enhanced training prediction engine and subagent orchestration operational
+- **Week 24**: Advanced AI integration, MCP tool workflows, and external APIs complete
+- **Week 30**: Performance optimized with comprehensive Pest testing suite
+- **Week 34**: Production ready with MCP monitoring and comprehensive documentation
+
+**MCP Integration Benefits**:
+
+- **Enhanced AI Capabilities**: Multi-model agent orchestration with specialized subagents
+- **Cost Optimization**: Real-time AWS pricing integration and budget management
+- **Infrastructure Management**: Automated AWS service integration and optimization
+- **Advanced Context Management**: Persistent conversation and workflow context across sessions
+- **Scalable Architecture**: MCP server-based architecture supporting future expansion
+
+**Pest Testing Advantages**:
+
+- **Laravel-Optimized**: Native Laravel integration with elegant syntax and better performance
+- **Readable Tests**: Descriptive test names and assertions improving maintainability
+- **Parallel Execution**: Built-in parallel testing for faster CI/CD pipelines
+- **Better Coverage**: Enhanced coverage reporting with HTML output and trend analysis
+- **Modern Syntax**: PHP 8+ features and modern testing patterns
 
 **Implementation Notes**:
 
-- Start with solid foundation (Laravel 12, database, authentication)
-- Prioritize core game mechanics before advanced features
-- Implement AI integration early for user feedback
-- Focus on performance and caching throughout development
-- Maintain comprehensive testing from the beginning
-- Document everything for future maintenance and expansion
+- Start with solid foundation including MCP server configuration and health monitoring
+- Prioritize MCP agent deployment for core game mechanics before advanced features
+- Implement comprehensive MCP integration early for user feedback and optimization
+- Focus on performance and caching throughout development with MCP cost monitoring
+- Maintain comprehensive Pest testing from the beginning with MCP integration tests
+- Document MCP workflows and agent configurations for future maintenance and expansion
+- Monitor MCP server health and performance continuously for optimal user experience
 
-This implementation plan transforms the comprehensive requirements and design into actionable development tasks, ensuring all 59 requirements are addressed while maintaining a logical development progression.
+This implementation plan transforms the comprehensive requirements and design into actionable development tasks with modern MCP server integration, subagent orchestration, and Pest testing framework, ensuring all 59 requirements are addressed while maintaining a logical development progression enhanced by AI-powered automation and intelligent infrastructure management.

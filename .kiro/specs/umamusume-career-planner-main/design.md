@@ -11,10 +11,9 @@
 7. [AI Integration Architecture](#ai-integration-architecture)
 8. [Security Architecture](#security-architecture)
 9. [Performance & Scalability](#performance--scalability)
-10. [Development Workflow](#development-workflow)
-11. [Deployment Architecture](#deployment-architecture)
-12. [Monitoring & Observability](#monitoring--observability)
-13. [Future Architecture](#future-architecture)
+10. [Correctness Properties](#correctness-properties)
+11. [Error Handling](#error-handling)
+12. [Testing Strategy](#testing-strategy)
 
 ## Executive Summary
 
@@ -44,7 +43,7 @@ The application serves as a single-user turn-by-turn career progression planner 
 
 ### High-Level Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                 UMAMUSUME CAREER PLANNER                       │
 ├─────────────────────────────────────────────────────────────────┤
@@ -437,18 +436,188 @@ if ('serviceWorker' in navigator) {
   "theme_color": "#3b82f6",
   "icons": [
     {
-      "src": "/icons/icon-192x192.png",
-      "sizes": "192x192",
+      "src": "/images/app_logo/uma_musume_race_planner_logo_128.png",
+      "sizes": "128x128",
       "type": "image/png"
     },
     {
-      "src": "/icons/icon-512x512.png",
+      "src": "/images/app_logo/uma_musume_race_planner_logo_256.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    },
+    {
+      "src": "/images/app_logo/uma_musume_race_planner_logo_512.png",
       "sizes": "512x512",
       "type": "image/png"
+    },
+    {
+      "src": "/images/app_logo/uma_musume_race_planner_logo_1024.png",
+      "sizes": "1024x1024",
+      "type": "image/png"
     }
-  ]
+  ],
+  "favicon": "/images/app_logo/uma_musume_race_planner_logo_32.ico"
 }
 ```
+
+#### Visual Design System and Asset Integration
+
+```css
+/* Theme Configuration with Existing Assets */
+@theme {
+  /* Background Images from images/app_bg/ */
+  --bg-light-desktop: url('/images/app_bg/uma_musume_race_planner_bg_light_1536x1028.png');
+  --bg-light-mobile: url('/images/app_bg/uma_musume_race_planner_bg_light_1028x1536.png');
+  --bg-dark-desktop: url('/images/app_bg/uma_musume_race_planner_bg_dark_1536x1028.png');
+  --bg-dark-mobile: url('/images/app_bg/uma_musume_race_planner_bg_dark_1028x1536.png');
+  
+  /* Character Avatar Placeholders from images/trainee_images/ */
+  --avatar-agnes-tachyon: url('/images/trainee_images/__agnes_tachyon_umamusume_drawn_by_welchino__sample-1db2ca428e2545fcae81fe526d7a8e96.jpg');
+  --avatar-gold-ship: url('/images/trainee_images/__gold_ship_umamusume_drawn_by_advarcher__sample-2713426899554240b99dc00440e97745.jpg');
+  --avatar-narita-brian: url('/images/trainee_images/__narita_brian_umamusume_drawn_by_no_uwazumi__sample-0f3c352063a7077cb5708b8284dd7217.jpg');
+  --avatar-tokai-teio: url('/images/trainee_images/__tokai_teio_umamusume_drawn_by_so_on__305c01834a0c0cf3fe3593c281a0b05b.jpg');
+  --avatar-vodka: url('/images/trainee_images/__vodka_umamusume_drawn_by_mayata__41166bfaeb2670ae37c8785af4566d58.jpg');
+  --avatar-silence-suzuka: url('/images/trainee_images/bb962aabeafaee5cbf7831e4d178ca64.jpg');
+}
+
+/* Responsive Background System */
+.app-background {
+  background-image: var(--bg-light-desktop);
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  
+  @media (max-width: 768px) {
+    background-image: var(--bg-light-mobile);
+  }
+  
+  @media (prefers-color-scheme: dark) {
+    background-image: var(--bg-dark-desktop);
+    
+    @media (max-width: 768px) {
+      background-image: var(--bg-dark-mobile);
+    }
+  }
+}
+
+/* Character Avatar Components */
+.character-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  border: 2px solid var(--color-primary-500);
+  
+  &.avatar-lg {
+    width: 128px;
+    height: 128px;
+  }
+  
+  &.avatar-sm {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+/* Character Selection Grid */
+.character-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  
+  .character-card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    
+    @media (prefers-color-scheme: dark) {
+      background: rgba(0, 0, 0, 0.8);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+}
+```
+
+#### Character Image Integration
+
+```javascript
+// Character Avatar System
+const CharacterAvatars = {
+  'Agnes Tachyon': '/images/trainee_images/__agnes_tachyon_umamusume_drawn_by_welchino__sample-1db2ca428e2545fcae81fe526d7a8e96.jpg',
+  'Daiwa Scarlet': '/images/trainee_images/__daiwa_scarlet_umamusume_drawn_by_kurokawa_heuy__sample-9576ae268cdddfe167c2300d5453f2cf.jpg',
+  'El Condor Pasa': '/images/trainee_images/__el_condor_pasa_umamusume_drawn_by_nekogusa_kinako__85cfefb3697093d2c40c9db031ab46a5.jpg',
+  'Gold Ship': '/images/trainee_images/__gold_ship_umamusume_drawn_by_advarcher__sample-2713426899554240b99dc00440e97745.jpg',
+  'Haru Urara': '/images/trainee_images/__haru_urara_umamusume_drawn_by_advarcher__sample-7d1c3c431ef193e5e061bdda73f97fd5.jpg',
+  'Maruzensky': '/images/trainee_images/__maruzensky_umamusume_drawn_by_kamishima_kanon__sample-297ecca0da3990374954a514f06bea2b.jpg',
+  'Narita Brian': '/images/trainee_images/__narita_brian_umamusume_drawn_by_no_uwazumi__sample-0f3c352063a7077cb5708b8284dd7217.jpg',
+  'Oguri Cap': '/images/trainee_images/__oguri_cap_and_jacques_villeneuve_umamusume_and_1_more_drawn_by_holeecrab__sample-9628095fc1e0ee5bcc8c96c47d5722a1.jpg',
+  'Tokai Teio': '/images/trainee_images/__tokai_teio_umamusume_drawn_by_so_on__305c01834a0c0cf3fe3593c281a0b05b.jpg',
+  'Vodka': '/images/trainee_images/__vodka_umamusume_drawn_by_mayata__41166bfaeb2670ae37c8785af4566d58.jpg',
+  'Silence Suzuka': '/images/trainee_images/bb962aabeafaee5cbf7831e4d178ca64.jpg'
+};
+
+/**
+ * Character Avatar Component
+ * @param {Object} props
+ * @param {string} props.characterName - Name of the character
+ * @param {string} [props.size='md'] - Avatar size (sm, md, lg)
+ * @param {string} [props.className] - Additional CSS classes
+ */
+const CharacterAvatar = ({ characterName, size = 'md', className = '' }) => {
+  const avatarUrl = CharacterAvatars[characterName] || CharacterAvatars['Silence Suzuka']; // Default to Silence Suzuka
+  
+  return (
+    <div 
+      className={`character-avatar avatar-${size} ${className}`}
+      style={{ backgroundImage: `url(${avatarUrl})` }}
+      aria-label={`${characterName} avatar`}
+      role="img"
+    />
+  );
+};
+
+/**
+ * Character Selection Component with Background
+ * @param {Object} props
+ * @param {Array} props.characters - Available characters
+ * @param {Function} props.onSelect - Character selection handler
+ */
+const CharacterSelection = ({ characters, onSelect }) => {
+  return (
+    <div className="app-background min-h-screen">
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold text-center mb-8 text-white drop-shadow-lg">
+          Select Your Umamusume
+        </h1>
+        <div className="character-grid">
+          {characters.map((character) => (
+            <div 
+              key={character.id} 
+              className="character-card cursor-pointer hover:scale-105 transition-transform"
+              onClick={() => onSelect(character)}
+            >
+              <CharacterAvatar 
+                characterName={character.name} 
+                size="lg" 
+                className="mx-auto mb-4"
+              />
+              <h3 className="text-lg font-semibold text-center">{character.name}</h3>
+              <p className="text-sm text-gray-600 text-center mt-2">
+                {character.scenario_type === 'ura_finale' ? 'URA Finale' : 'Unity Cup'}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+```
+
+```text
 
 ### AI Integration Stack
 
@@ -590,7 +759,7 @@ class HybridAIService
 
 ### Entity Relationship Diagram
 
-```
+```text
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
 │    Users        │    │   Characters    │    │   Aptitudes     │
 ├─────────────────┤    ├─────────────────┤    ├─────────────────┤
@@ -1210,7 +1379,7 @@ $skillHints = Skill::select(['skill_name', 'hint_count', 'discount_percentage'])
 
 #### API Structure Overview
 
-```
+```text
 /api/v1/
 ├── auth/
 │   ├── POST /login
