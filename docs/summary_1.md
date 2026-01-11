@@ -56,7 +56,7 @@ Creating a sophisticated local-first web application to optimize Umamusume Prett
 - **Stamina** (0-1200, Priority ★★★★): Duration at top speed, distance-specific requirements
 - **Power** (0-1200, Priority ★★★): Acceleration rate, crucial for positioning
 - **Guts** (0-1200, Priority ★): Final phase performance, endurance in difficult races
-- **Wit** (0-1200, Priority ★★): Skill activation rate, positioning intelligence
+- **Wit** (0-1200, Priority ★★): Skill activation rate, positioning wit
 
 ### Distance-Specific Requirements
 
