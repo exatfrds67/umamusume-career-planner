@@ -1,0 +1,6 @@
+{
+  "aws.cloudformation.diagnostics.cfnLint.customization": {
+    
+    "includeChecks": ["I"]
+  }
+}
