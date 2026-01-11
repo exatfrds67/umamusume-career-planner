@@ -1,0 +1,33 @@
+Filesystem MCP Test - Created via Amazon Q
+Project: Umamusume Career Planner
+Timestamp: 2025
+Status: MCP Working ✓
+
+
+Name:
+
+filesystem
+
+Copy
+Transport:
+
+stdio
+
+Copy
+Command:
+
+npx
+
+Copy
+Arguments:
+
+-y
+@modelcontextprotocol/server-filesystem
+c:\XAMPP\htdocs\umamusume-career-planner
+
+Copy
+Environment variables: (leave empty)
+
+Timeout:
+
+60
