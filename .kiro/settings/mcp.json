@@ -16,7 +16,9 @@
         "move_file",
         "search_files",
         "get_file_info",
-        "list_allowed_directories"
+        "list_allowed_directories",
+        "read_multiple_files",
+        "edit_file"
       ]
     },
     "sequential-thinking": {
@@ -70,12 +72,20 @@
         "-y",
         "@modelcontextprotocol/server-memory"
       ],
+      "env": {
+        "MEMORY_FILE_PATH": "C:\\XAMPP\\htdocs\\umamusume-career-planner\\memory.jsonl"
+      },
       "disabled": false,
       "autoApprove": [
-        "create_memory",
-        "search_memory",
-        "update_memory",
-        "delete_memory"
+        "create_entities",
+        "create_relations",
+        "add_observations",
+        "delete_entities",
+        "delete_relations",
+        "delete_observations",
+        "read_graph",
+        "search_nodes",
+        "open_nodes"
       ]
     },
     "brave-search": {
@@ -167,6 +177,44 @@
       "disabled": true,
       "autoApprove": [
         "generate_image"
+      ]
+    },
+    "laravel-boost": {
+      "command": "php",
+      "args": [
+        "artisan",
+        "boost:mcp"
+      ],
+      "disabled": false,
+      "autoApprove": [
+        "application_info",
+        "browser_logs",
+        "database_connections",
+        "database_query",
+        "database_schema",
+        "get_absolute_url",
+        "get_config",
+        "last_error",
+        "list_artisan_commands",
+        "list_available_config_keys",
+        "list_available_env_vars",
+        "list_routes",
+        "read_log_entries",
+        "search_docs",
+        "tinker",
+        "application-info",
+        "database-connections",
+        "database-schema",
+        "list-routes",
+        "get-config",
+        "list-available-config-keys",
+        "search-docs",
+        "get-absolute-url",
+        "list-artisan-commands",
+        "browser-logs",
+        "last-error",
+        "list-available-env-vars",
+        "database-query"
       ]
     }
   }

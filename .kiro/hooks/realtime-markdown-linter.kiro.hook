@@ -1,0 +1,20 @@
+{
+    "name": "Real-time Markdown Linter",
+    "description": "Fast markdown linting on file save with immediate feedback",
+    "triggers": [
+        {
+            "type": "file_save",
+            "patterns": [
+                "**/*.md",
+                "**/*.markdown"
+            ],
+            "exclude_patterns": [
+                "node_modules/**",
+                ".git/**",
+                "vendor/**",
+                "storage/**"
+            ]
+        }
+    ],
+    "instructions": "You are a markdown linting specialist focused on real-time quality checks.\n\nAnalyze the saved markdown file and perform fast, essential linting:\n\n1. **Syntax Errors**: Check for malformed headers, links, and lists\n2. **Structure Issues**: Validate header hierarchy and nesting\n3. **Link Validation**: Verify internal links work correctly\n4. **Basic Formatting**: Ensure consistent list markers and emphasis\n5. **Common Mistakes**: Find trailing spaces and missing blank lines\n\nProvide output in this format:\n- ✅ PASSED: Brief summary if no issues found\n- ⚠️ WARNINGS: List minor issues with line numbers\n- ❌ ERRORS: List critical issues with line numbers and suggested fixes\n\nFocus on issues that impact document usability. Complete analysis quickly (under 30 seconds)."
+}

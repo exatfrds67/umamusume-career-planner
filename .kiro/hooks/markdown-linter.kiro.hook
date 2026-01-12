@@ -1,0 +1,17 @@
+{
+  "enabled": true,
+  "name": "Markdown Linter",
+  "description": "Automatically lints markdown files when saved, checking for syntax errors, structure issues, broken links, and formatting inconsistencies",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "*.md",
+      "*.markdown"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Analyze the saved markdown file and perform fast linting focused on:\n- Syntax errors like malformed headers, links, and lists\n- Structure issues like improper header hierarchy \n- Broken internal links\n- Basic formatting inconsistencies\n- Common mistakes like trailing spaces\n\nExclude files in node_modules, .git, vendor, and storage folders from analysis.\n\nProvide output in this format:\n✅ PASSED: Brief summary if no issues\n⚠️ WARNINGS: List minor issues with line numbers  \n❌ ERRORS: List critical issues with line numbers and fixes\n\nKeep the analysis fast (under 30 seconds) and focus on issues that impact usability."
+  }
+}

@@ -1,0 +1,217 @@
+# Kiro Hooks Configuration
+# Global configuration for markdown linting hooks
+
+version: "1.0.0"
+config_version: "2024.1"
+
+# Global Settings
+global:
+  # Default timeout for all hooks (can be overridden per hook)
+  default_timeout: 60000 # 60 seconds
+
+  # Maximum parallel agents across all hooks
+  max_global_parallel: 10
+
+  # Resource limits
+  memory_limit: "2GB"
+  cpu_limit: "80%"
+
+  # Logging configuration
+  logging:
+    level: "info"
+    file: ".kiro/logs/hooks.log"
+    rotation: "daily"
+    retention: "30d"
+
+# File Pattern Definitions
+patterns:
+  markdown_files:
+    include:
+      - "**/*.md"
+      - "**/*.markdown"
+      - "**/*.mdown"
+    exclude:
+      - "node_modules/**"
+      - ".git/**"
+      - "vendor/**"
+      - "storage/**"
+      - "tmp/**"
+      - "temp/**"
+      - ".kiro/cache/**"
+
+  documentation_files:
+    include:
+      - "docs/**/*.md"
+      - "documentation/**/*.md"
+      - "README*.md"
+      - "CHANGELOG*.md"
+      - "CONTRIBUTING*.md"
+      - "LICENSE*.md"
+      - "SECURITY*.md"
+    exclude:
+      - "docs/temp/**"
+      - "docs/drafts/**"
+      - "docs/archive/**"
+
+# Agent Configuration Templates
+agent_templates:
+  quick_analysis:
+    timeout: 30000
+    parallel: false
+    priority: "high"
+
+  standard_analysis:
+    timeout: 120000
+    parallel: true
+    max_parallel: 3
+    priority: "medium"
+
+  comprehensive_analysis:
+    timeout: 600000
+    parallel: true
+    max_parallel: 6
+    priority: "low"
+    resource_allocation: "high"
+
+# Notification Settings
+notifications:
+  console:
+    enabled: true
+    level: "info"
+    format: "structured"
+
+  file:
+    enabled: true
+    path: ".kiro/reports/notifications.log"
+    level: "warning"
+
+  email:
+    enabled: false
+    smtp_server: ""
+    recipients: []
+
+# Reporting Configuration
+reporting:
+  default_format: "markdown"
+  save_location: ".kiro/reports/"
+  retention_days: 90
+
+  formats:
+    console:
+      enabled: true
+      colors: true
+      progress_bars: true
+
+    markdown:
+      enabled: true
+      template: "default"
+      include_toc: true
+
+    html:
+      enabled: true
+      template: "bootstrap"
+      interactive: true
+
+    json:
+      enabled: true
+      pretty_print: true
+      include_metadata: true
+
+# Performance Tuning
+performance:
+  # File processing
+  batch_size: 15
+  concurrent_files: 5
+
+  # Memory management
+  gc_frequency: "auto"
+  memory_threshold: "75%"
+
+  # Caching
+  cache_enabled: true
+  cache_location: ".kiro/cache/"
+  cache_ttl: "1h"
+
+  # Rate limiting for external requests
+  rate_limit:
+    requests_per_minute: 60
+    burst_limit: 10
+
+# Error Handling
+error_handling:
+  # Global retry settings
+  default_retry_count: 2
+  retry_delay: "exponential" # linear, exponential, fixed
+
+  # Failure thresholds
+  agent_failure_threshold: 50 # percentage
+  hook_failure_threshold: 75 # percentage
+
+  # Recovery strategies
+  recovery_strategy: "graceful_degradation"
+  fallback_reporting: true
+
+# Security Settings
+security:
+  # External link checking
+  allow_external_requests: true
+  trusted_domains:
+    - "github.com"
+    - "gitlab.com"
+    - "docs.laravel.com"
+    - "laravel.com"
+
+  # Content scanning
+  scan_for_secrets: true
+  secret_patterns:
+    - "password"
+    - "api_key"
+    - "secret"
+    - "token"
+
+  # File access
+  restrict_file_access: true
+  allowed_paths:
+    - "."
+    - "docs/"
+    - "documentation/"
+
+# Integration Settings
+integrations:
+  git:
+    enabled: true
+    auto_commit_reports: false
+    branch_protection: true
+
+  ci_cd:
+    enabled: false
+    export_format: "junit"
+    fail_on_errors: false
+
+  ide:
+    enabled: true
+    problem_matcher: "markdown-lint"
+    quick_fixes: true
+
+# Hook-Specific Overrides
+hook_overrides:
+  realtime-markdown-linter:
+    timeout: 30000
+    priority: "critical"
+    cache_enabled: false
+
+  docs-quality-checker:
+    timeout: 120000
+    max_parallel: 3
+    detailed_reporting: true
+
+  parallel-lint-workflow:
+    timeout: 180000
+    max_parallel: 5
+    resource_allocation: "high"
+
+  manual-markdown-audit:
+    timeout: 600000
+    max_parallel: 6
+    comprehensive_reporting: true
+    historical_comparison: true

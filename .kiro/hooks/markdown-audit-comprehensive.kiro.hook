@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Comprehensive Markdown Audit",
+  "description": "Performs exhaustive markdown audit including file discovery, syntax analysis, content intelligence, accessibility compliance, performance analysis, and security audit with comprehensive reporting",
+  "version": "1",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Execute a comprehensive markdown audit with the following specifications:\n\n**AUDIT SCOPE & PARAMETERS:**\n- Scope: all markdown files in workspace (*.md, *.markdown)\n- Depth: comprehensive analysis\n- Output formats: console summary, detailed HTML report, JSON data export\n\n**EXECUTE COMPREHENSIVE AUDIT:**\n\n1. **FILE DISCOVERY & MAPPING:**\n   - Scan and categorize all markdown files by type (docs/, README, project files)\n   - Map inter-file relationships via links and references\n   - Assess file complexity (word count, heading structure, link density)\n   - Prioritize files by importance and usage patterns\n\n2. **SYNTAX ANALYSIS:**\n   - Validate CommonMark/GFM specification compliance\n   - Check extension syntax (tables, task lists, code blocks, math)\n   - Identify inconsistent formatting patterns\n   - Assess rendering performance impact\n\n3. **CONTENT INTELLIGENCE:**\n   - Calculate readability metrics (Flesch-Kincaid, complexity scores)\n   - Evaluate content completeness and structure quality\n   - Identify content gaps and missing documentation\n   - Assess audience alignment and technical accuracy\n\n4. **ACCESSIBILITY COMPLIANCE:**\n   - WCAG 2.1 AA compliance audit (headings, alt text, color contrast)\n   - Screen reader compatibility analysis\n   - Cognitive accessibility assessment\n   - Navigation and structure evaluation\n\n5. **PERFORMANCE ANALYSIS:**\n   - File size optimization opportunities\n   - Image optimization recommendations\n   - Mobile rendering performance\n   - SEO impact analysis (meta descriptions, heading structure)\n\n6. **SECURITY AUDIT:**\n   - Scan for XSS vectors in HTML/JavaScript content\n   - Evaluate external link safety and HTTPS usage\n   - Check for sensitive information disclosure\n   - Identify potential code injection vulnerabilities\n\n**GENERATE COMPREHENSIVE REPORT:**\n- Executive summary with overall health score (0-100)\n- Audit metrics dashboard with key statistics\n- Critical findings requiring immediate attention\n- Optimization opportunities with impact assessment\n- Quality trends and improvement recommendations\n- Strategic action plan with prioritized tasks\n- Best practices guide for ongoing maintenance\n\nPresent findings in structured format with actionable recommendations and implementation guidance."
+  }
+}
