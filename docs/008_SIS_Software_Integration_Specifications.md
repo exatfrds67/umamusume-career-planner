@@ -801,6 +801,55 @@ capabilities:
   - troubleshoot_deployment
 ```
 
+#### 5.1.3 Data and Context Services
+
+**context7**:
+
+```yaml
+server_name: context7
+description: Advanced context management for enhanced conversation continuity
+capabilities:
+  - context_management
+  - data_processing
+  - workflow_continuity
+```
+
+**fetch**:
+
+```yaml
+server_name: fetch
+description: Enhanced HTTP client capabilities for external API integration
+capabilities:
+  - http_client
+  - external_api_integration
+  - data_retrieval
+```
+
+**memory**:
+
+```yaml
+server_name: memory
+description: Persistent knowledge graph memory for AI agents across sessions
+capabilities:
+  - knowledge_graph_storage
+  - entity_relationship_management
+  - persistent_memory
+  - cross_session_continuity
+```
+
+#### 5.1.4 Optional Services
+
+**figma**:
+
+```yaml
+server_name: figma
+description: UI design consistency and asset management integration (optional)
+capabilities:
+  - design_system_integration
+  - asset_management
+  - ui_consistency_validation
+```
+
 ### 5.2 MCP Integration Implementation
 
 #### 5.2.1 Strands Agent Integration
@@ -956,6 +1005,12 @@ class AWSPricingIntegration
       "args": ["awsknowledge@latest"],
       "disabled": false,
       "autoApprove": ["search_documentation"]
+    },
+    "memory": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"],
+      "disabled": false,
+      "autoApprove": ["create_entities", "add_observations", "search_nodes"]
     }
   }
 }

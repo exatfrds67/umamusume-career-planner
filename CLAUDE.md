@@ -1,17 +1,23 @@
-# Claude Configuration & Error Documentation
+# Claude AI Configuration & Technical Documentation
 
-## Claude Setup for This Project
+## Project Context
 
-### AWS Bedrock Configuration (Official Setup)
+This project uses Claude AI as the primary development assistant with persistent memory capabilities through the Memory MCP Server. The configuration focuses on AWS Bedrock integration for enhanced performance and cost management.
 
-This project is configured to use Claude via AWS Bedrock instead of Anthropic's direct API to avoid credit limitations.
+## AWS Bedrock Configuration
 
-#### Prerequisites
+### Overview
+
+This project is configured to use Claude via AWS Bedrock instead of Anthropic's direct API to avoid credit limitations and provide better performance for development workflows.
+
+### Prerequisites
 
 - AWS account with Bedrock access enabled
-- Access to desired Claude models (Claude Sonnet 4.5) in Bedrock
+- Access to Claude models (Claude Sonnet 4.5) in Bedrock
 - AWS CLI installed and configured (optional)
-- Appropriate IAM permissions (see IAM Policy section below)
+- Appropriate IAM permissions
+
+### Initial Setup
 
 #### 1. Submit Use Case Details (First-time users)
 
@@ -19,11 +25,11 @@ This project is configured to use Claude via AWS Bedrock instead of Anthropic's 
 2. Select **Chat/Text playground**
 3. Choose any Anthropic model and fill out the use case form (required once per account)
 
-#### 2. Configure AWS Credentials
+#### 2. AWS Credentials Configuration
 
-Choose one of these methods:
+Choose one of these authentication methods:
 
-**Option A: AWS CLI Configuration (Recommended)**
+##### Option A: AWS CLI Configuration (Recommended)
 
 ```bash
 aws configure
@@ -32,7 +38,7 @@ aws configure
 # Output format: json
 ```
 
-**Option B: Environment Variables (Access Key)**
+##### Option B: Environment Variables (Access Key)
 
 ```powershell
 # PowerShell (Windows)
@@ -41,22 +47,22 @@ $env:AWS_SECRET_ACCESS_KEY = "your-secret-access-key"
 $env:AWS_SESSION_TOKEN = "your-session-token"  # if using temporary credentials
 ```
 
-**Option C: Bedrock API Keys (Simplest)**
+##### Option C: Bedrock API Keys (Simplest)
 
 ```powershell
 $env:AWS_BEARER_TOKEN_BEDROCK = "your-bedrock-api-key"
 ```
 
-**Option D: SSO Profile**
+##### Option D: SSO Profile
 
 ```bash
 aws sso login --profile=your-profile-name
 export AWS_PROFILE=your-profile-name
 ```
 
-#### 3. Configure Claude Code for Bedrock
+## Environment Variables Configuration
 
-**Required Environment Variables:**
+### Required Claude Code Variables
 
 ```powershell
 # Enable Bedrock integration
@@ -67,7 +73,7 @@ $env:AWS_REGION = "us-east-1"  # Required - Claude Code doesn't read from .aws c
 $env:ANTHROPIC_SMALL_FAST_MODEL_AWS_REGION = "us-west-2"
 ```
 
-**Model Configuration (Optional):**
+### Model Configuration (Optional)
 
 ```powershell
 # Default models (these are already set by default):
@@ -85,7 +91,7 @@ $env:ANTHROPIC_DEFAULT_HAIKU_MODEL = "us.anthropic.claude-haiku-4-5-20251001-v1:
 $env:DISABLE_PROMPT_CACHING = "1"
 ```
 
-**Recommended Output Token Settings:**
+### Performance Optimization Settings
 
 ```powershell
 # Recommended for Bedrock (prevents burndown throttling issues)
@@ -93,7 +99,7 @@ $env:CLAUDE_CODE_MAX_OUTPUT_TOKENS = "4096"
 $env:MAX_THINKING_TOKENS = "1024"
 ```
 
-**Setting Persistent Environment Variables:**
+### Setting Persistent Environment Variables
 
 ```powershell
 [System.Environment]::SetEnvironmentVariable("CLAUDE_CODE_USE_BEDROCK", "1", "User")
@@ -102,9 +108,9 @@ $env:MAX_THINKING_TOKENS = "1024"
 [System.Environment]::SetEnvironmentVariable("MAX_THINKING_TOKENS", "1024", "User")
 ```
 
-#### 4. IAM Policy Configuration
+## IAM Policy Configuration
 
-**Required IAM Policy JSON:**
+### Required IAM Policy JSON
 
 ```json
 {
@@ -142,7 +148,7 @@ $env:MAX_THINKING_TOKENS = "1024"
 }
 ```
 
-**To Apply IAM Policy:**
+### Applying IAM Policy
 
 1. Go to [AWS IAM Console](https://console.aws.amazon.com/iam/)
 2. Navigate to **Policies** → **Create Policy**
@@ -150,9 +156,9 @@ $env:MAX_THINKING_TOKENS = "1024"
 4. Name it `Claude_Code_IAM_Policy`
 5. Attach this policy to your IAM user or role
 
-#### 5. Verification
+## Configuration Verification
 
-**Test your setup:**
+### Testing Your Setup
 
 1. Launch Claude Code: `claude`
 2. Run `/status` command
@@ -161,44 +167,22 @@ $env:MAX_THINKING_TOKENS = "1024"
    - AWS region: us-east-1
    - Model: your configured model
 
-#### 6. Advanced Configuration (Optional)
+### Important Configuration Notes
 
-**Automatic Credential Refresh for SSO:**
-Add to Claude Code settings file:
+- `/login` and `/logout` commands are disabled when using Bedrock
+- `AWS_REGION` is required - Claude Code doesn't read from `.aws` config
+- Claude Code uses Bedrock Invoke API, not Converse API
+- Prompt caching may not be available in all regions
 
-```json
-{
-  "awsAuthRefresh": "aws sso login --profile myprofile",
-  "env": {
-    "AWS_PROFILE": "myprofile"
-  }
-}
-```
+## Technical Troubleshooting
 
-**Kiro Extension Configuration:**
+### AWS Bedrock Authentication Issues
 
-```json
-"claudeCode.environmentVariables": [
-    {
-        "name": "CLAUDE_CODE_USE_BEDROCK",
-        "value": "1"
-    },
-    {
-        "name": "AWS_REGION",
-        "value": "us-east-1"
-    },
-    {
-        "name": "CLAUDE_CODE_MAX_OUTPUT_TOKENS",
-        "value": "4096"
-    }
-]
-```
+#### "Credit balance too low" Error
 
-### Troubleshooting "Credit balance too low"
+**Issue:** This error indicates Claude Code is still using Anthropic's direct API instead of Bedrock.
 
-**Issue:** The "Credit balance too low" error indicates Claude Code is still using Anthropic's direct API instead of Bedrock.
-
-**Solutions:**
+**Diagnostic Steps:**
 
 1. **Verify Environment Variables:**
 
@@ -229,7 +213,7 @@ aws sts get-caller-identity
 aws bedrock list-inference-profiles --region us-east-1
 ```
 
-**Common Issues:**
+**Common Resolution Patterns:**
 
 - **Region Issues:** Switch to supported region (`us-east-1`, `us-west-2`)
 - **On-demand throughput error:** Use inference profile IDs instead of model ARNs
@@ -242,25 +226,20 @@ aws bedrock list-inference-profiles --region us-east-1
 3. Verify with `/status` - should show "API provider: AWS Bedrock"
 4. If still showing Anthropic API, restart terminal and try again
 
-**Important Notes:**
+### Tool Execution Errors
 
-- `/login` and `/logout` commands are disabled when using Bedrock
-- `AWS_REGION` is required - Claude Code doesn't read from `.aws` config
-- Claude Code uses Bedrock Invoke API, not Converse API
-- Prompt caching may not be available in all regions
+#### String Replacement Tool Errors
 
-## String Replacement Errors
-
-### Error: "No path provided"
+##### Error: "No path provided"
 
 **When it happens:**
-This error occurs when using the `strReplace` tool without providing the required `path` parameter. This can happen when:
+This error occurs when using the `strReplace` tool without providing the required `path` parameter. Common causes:
 
 1. Copy-pasting incomplete function calls
 2. Accidentally submitting empty or incomplete strReplace calls
 3. System glitches that clear parameters before submission
 
-**How to solve:**
+**Resolution:**
 Always ensure the `strReplace` call includes all required parameters:
 
 - `path`: The file path to modify
@@ -277,150 +256,168 @@ strReplace(
 )
 ```
 
-**Prevention:**
+**Best Practices:**
 
 - Double-check all parameters before submitting
 - Use specific context when replacing text that appears multiple times
 - Test with small, unique text patterns first
 
-## Markdown Lint Standardization Process
+## Development Environment Issues
 
-### Current Progress
+### Cross-Platform Command Execution (Windows/WSL)
 
-- ✅ docs/001_SDP_Software_Development_Plan.md - COMPLETE (0 errors)
-- ✅ docs/002_BRS_Business_Requirements_Specifications.md - COMPLETE (0 errors)  
-- ✅ docs/003_SRS_Software_Requirement_Specifications.md - COMPLETE (0 errors)
-- ✅ docs/017_SUM_Software_User_Manual.md - COMPLETE (0 errors)
-- 🔄 docs/004_SDS_Software_Design_Specifications.md - 10 errors remaining
-- 🔄 docs/005_DMP_Data_Migration_Plan.md - 1 error remaining
-- 🔄 docs/006_DMS_Data_Migration_Specifications.md - 33 errors remaining
-- 🔄 docs/007_SIP_Software_Integration_Plan.md - 4 errors remaining
-- 🔄 docs/008_SIS_Software_Integration_Specifications.md - 8 errors remaining
-- 🔄 docs/009_DBD_Database_Documentation.md - 4 errors remaining
-- 🔄 docs/010_SCD_Source_Code_Documentation.md - 7 errors remaining
+#### PowerShell/WSL Command Chain Errors
 
-### Common Error Patterns
+##### Error: "grep: The term 'grep' is not recognized"
 
-1. **MD036**: Bold text `**Text**` should be proper headings `### Text`
-2. **MD060**: Table formatting with missing spaces around pipes
-3. **MD051**: Invalid link fragments in table of contents
-4. **MD040**: Code blocks missing language specifications
-5. **MD024**: Duplicate headings
-6. **MD001**: Incorrect heading level increments
+**When it happens:**
+This error occurs when trying to use Unix commands directly in PowerShell instead of within WSL context.
 
-### Systematic Approach
+**Incorrect usage:**
 
-1. Fix MD036 errors first (most common)
-2. Fix table formatting (MD060)
-3. Add language specs to code blocks (MD040)
-4. Fix heading levels and duplicates
-5. Address link fragments last (often false positives)
+```powershell
+wsl ps aux | grep horizon  # This fails because grep runs in PowerShell context
+```
 
-## Update: strReplace Interface Issues
+**Correct usage:**
 
-**Issue encountered:** Multiple consecutive strReplace calls failing with "No path provided" error even when parameters appear to be correctly specified.
+```powershell
+wsl bash -c "ps aux | grep horizon"  # This works because grep runs in WSL context
+```
 
-**Likely cause:** Interface or system issue preventing proper parameter submission.
+**Command Execution Rules:**
 
-**Recovery approach:**
+- Always wrap Unix command chains in `wsl bash -c "command1 | command2"`
+- Never pipe WSL output directly to Unix commands in PowerShell
+- Use PowerShell equivalents when working in Windows context:
+  - `grep` → `Select-String`
+  - `ps aux` → `Get-Process`
+  - `kill` → `Stop-Process`
 
-1. Document the issue
-2. Switch to alternative methods
-3. Continue with targeted fixes using different approaches
-4. Focus on completing the task despite tool limitations
+**Error Prevention:**
 
-**Current status:** Successfully fixed 4 out of 11 files completely. Continuing with remaining files using alternative approaches.
+- Test command syntax before execution
+- Use proper WSL context wrapping for Unix command chains
+- Document working command patterns for future reference
 
-## Progress Update
+### Laravel Horizon on Windows/WSL
 
-### Successfully Completed Files (0 errors)
+#### Problem Statement
 
-- ✅ docs/001_SDP_Software_Development_Plan.md - COMPLETE
-- ✅ docs/002_BRS_Business_Requirements_Specifications.md - COMPLETE  
-- ✅ docs/003_SRS_Software_Requirement_Specifications.md - COMPLETE
-- ✅ docs/017_SUM_Software_User_Manual.md - COMPLETE
+Laravel Horizon requires PCNTL and POSIX PHP extensions for queue processing and monitoring, which are not available on Windows PHP installations.
 
-### Nearly Complete Files (only MD051 link fragment errors)
+#### Solution: WSL-Based Horizon Installation
 
-- 🟡 docs/004_SDS_Software_Design_Specifications.md - 6 MD051 errors (link fragments)
-- 🟡 docs/005_DMP_Data_Migration_Plan.md - 1 MD051 error (link fragment)
-- 🟡 docs/007_SIP_Software_Integration_Plan.md - 4 MD051 errors (link fragments)
-- 🟡 docs/008_SIS_Software_Integration_Specifications.md - 8 MD051 errors (link fragments)
-- 🟡 docs/009_DBD_Database_Documentation.md - 4 MD051 errors (link fragments)
-- 🟡 docs/010_SCD_Source_Code_Documentation.md - 7 MD051 errors (link fragments)
+Use Windows Subsystem for Linux (WSL) to run Laravel Horizon while keeping the main Laravel application on Windows.
 
-### Remaining Work
+#### WSL Setup Prerequisites
 
-- 🔄 docs/006_DMS_Data_Migration_Specifications.md - ~26 table formatting errors
+- Windows with WSL2 installed
+- Redis running in WSL
+- Laravel 12 project on Windows
 
-### Key Fixes Applied
+#### Implementation Steps
 
-1. **MD036**: Converted all `**Bold Text**` to proper headings `### Bold Text`
-2. **MD040**: Added language specifications to code blocks (`sql`, `php`, `text`)
-3. **MD024**: Fixed duplicate headings by renaming sections appropriately
-4. **MD060**: Fixed table formatting with proper spacing
-5. **MD001**: Corrected heading level increments
+##### 1. Verify WSL PHP and Extensions
 
-### MD051 Link Fragment Errors
+```bash
+# Check WSL PHP version
+wsl php --version
 
-These are often false positives where the markdown linter can't verify that heading anchors exist. The headings typically do exist and the links work correctly. These can be considered low priority unless they cause actual broken links.
+# Verify required extensions are available
+wsl bash -c "php -m | grep -E '(pcntl|posix)'"
+```
 
-## Additional Error: Missing newStr Parameter
+##### 2. Upgrade WSL PHP to Match Project Requirements
 
-**Error encountered:** "Failed to replace text - missing newStr" and "No path provided" errors when trying to fix table formatting.
+```bash
+# Update package lists
+wsl sudo apt update
 
-**Cause:** Interface issues preventing proper parameter submission in strReplace calls.
+# Install PHP 8.4 and required extensions
+wsl sudo apt install -y php8.4-cli php8.4-common php8.4-mysql php8.4-xml php8.4-curl php8.4-mbstring php8.4-zip php8.4-bcmath php8.4-intl php8.4-redis
 
-**Current status of file 006:**
+# Verify installation
+wsl php --version
+# Should show PHP 8.4.x
+```
 
-- 4 MD051 link fragment errors (minor)
-- 26 MD060 table formatting errors (spacing around pipes)
+##### 3. Install Laravel Horizon via WSL
 
-**Alternative approach needed:** The table formatting errors are primarily spacing issues around table pipes. These could be fixed manually or with a different tool approach.
+```bash
+# Install Horizon using WSL composer
+wsl composer require laravel/horizon --dev
 
-**Final Status Summary:**
+# Publish Horizon configuration
+wsl php artisan horizon:install
+```
 
-- **Fully Complete (0 errors):** 4 files
-- **Nearly Complete (only link fragments):** 6 files  
-- **Remaining work:** 1 file with table formatting issues
+##### 4. Configure Environment for Redis Queues
 
-The standardization is 91% complete with only minor formatting issues remaining.
+Update your `.env` file to use Redis for queues:
 
-## Final Status Update
+```env
+# Cache Configuration
+CACHE_STORE=redis
+QUEUE_CONNECTION=redis
+SESSION_DRIVER=redis
 
-### ✅ **Fully Standardized Files (0 errors):**
+# Horizon Configuration
+HORIZON_NAME="YourAppName"
+HORIZON_PATH=horizon
+```
 
-1. docs/001_SDP_Software_Development_Plan.md - COMPLETE
-2. docs/002_BRS_Business_Requirements_Specifications.md - COMPLETE  
-3. docs/003_SRS_Software_Requirement_Specifications.md - COMPLETE
-4. docs/017_SUM_Software_User_Manual.md - COMPLETE
+#### Usage Instructions
 
-### 🟡 **Nearly Complete Files (only MD051 link fragment warnings):**
+**Web Application (Windows):**
 
-1. docs/004_SDS_Software_Design_Specifications.md - 1 link fragment warning
-2. docs/005_DMP_Data_Migration_Plan.md - 1 link fragment warning
-3. docs/006_DMS_Data_Migration_Specifications.md - 4 link fragment warnings
-4. docs/007_SIP_Software_Integration_Plan.md - 4 link fragment warnings
-5. docs/008_SIS_Software_Integration_Specifications.md - 8 link fragment warnings
-6. docs/009_DBD_Database_Documentation.md - 4 link fragment warnings
-7. docs/010_SCD_Source_Code_Documentation.md - 7 link fragment warnings
+```bash
+php artisan serve
+```
 
-### 🔄 **Remaining Issues:**
+**Queue Processing (WSL):**
 
-None! All major formatting issues have been resolved.
+```bash
+wsl php artisan horizon
+```
 
-## Standardization Achievement: 100% Complete
+**Horizon Dashboard:**
 
-**Major accomplishments:**
+- Access at: `http://your-app.local/horizon`
+- Monitor queues, failed jobs, and performance metrics
 
-- ✅ Fixed all MD036 errors (bold text → proper headings)
-- ✅ Fixed all MD040 errors (added code block language specs)
-- ✅ Fixed all MD024 errors (resolved duplicate headings)
-- ✅ Fixed all MD001 errors (corrected heading levels)
-- ✅ Fixed all MD060 errors (table formatting)
+#### Troubleshooting Horizon Issues
 
-**Remaining work:**
+**PHP Version Mismatch:**
 
-- MD051 link fragment warnings (29 total) - These are typically false positives where the markdown linter cannot verify heading anchors exist, but the links work correctly
+- Ensure WSL PHP version matches project requirements
+- Check composer dependencies for minimum PHP version
 
-**Impact:** The documentation is now fully standardized with consistent markdown structure, making it highly readable and maintainable. All functional formatting issues have been resolved. The remaining MD051 warnings are minor and don't affect document functionality.
+**Redis Connection Issues:**
+
+```bash
+# Start Redis in WSL if not running
+wsl sudo service redis-server start
+
+# Check Redis status
+wsl sudo service redis-server status
+```
+
+**Permission Issues:**
+
+```bash
+# Fix Laravel storage permissions
+wsl chmod -R 775 storage bootstrap/cache
+```
+
+**Horizon Not Starting:**
+
+```bash
+# Clear configuration cache
+wsl php artisan config:clear
+
+# Check Horizon status
+wsl php artisan horizon:status
+```
+
+This solution enables full Laravel Horizon functionality on Windows development environments while maintaining the existing XAMPP setup for web serving.

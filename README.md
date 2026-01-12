@@ -1,391 +1,59 @@
-# Umamusume Pretty Derby Career Planner
+<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-A comprehensive career planning application for Umamusume Pretty Derby mobile game that helps players make strategic decisions during career mode training to achieve A-grade rankings. The system provides data-driven recommendations for optimal gameplay outcomes in both URA Finale and Unity Cup scenarios.
+<p align="center">
+<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+</p>
 
-## 🎯 Overview
+## About Laravel
 
-The Umamusume Career Planner is a Laravel 12-based web application designed to help players optimize their training strategies, race preparations, and resource management in Umamusume Pretty Derby. It features an AI-powered advisory system, comprehensive data analysis, and intelligent recommendations based on game mechanics and community meta.
+Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-### Key Features
+- [Simple, fast routing engine](https://laravel.com/docs/routing).
+- [Powerful dependency injection container](https://laravel.com/docs/container).
+- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
+- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
+- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
+- [Robust background job processing](https://laravel.com/docs/queues).
+- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
-- **🤖 AI-Powered Advisory Chatbot** - Intelligent recommendations using Ollama (local) with AWS Bedrock fallback
-- **📊 Training Optimization Engine** - Advanced algorithms for optimal training decisions
-- **🏆 Race Strategy Analysis** - Comprehensive race preparation and strategy recommendations  
-- **💎 Skill Management System** - SP optimization with hint-based cost reduction mechanics
-- **📈 Career Progress Tracking** - Historical analysis and performance metrics
-- **🎮 Multi-Scenario Support** - Optimized for both URA Finale and Unity Cup scenarios
-- **📱 Screenshot Analysis** - OCR-powered game state extraction from screenshots
-- **🌐 Community Integration** - Real-time meta data and tier list synchronization
-- **📋 Champions Meeting PvP** - 3v3v3 tournament team optimization
-- **🎁 Resource Management** - Gacha planning, item optimization, and budget tracking
+Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
-## 🏗️ System Architecture
+## Learning Laravel
 
-### Core Components
+Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
 
-1. **Data Collection & Integration** - External API synchronization and community data
-2. **Screenshot Analysis & OCR** - Automated game state extraction
-3. **AI Advisory System** - Ollama-first with AWS Bedrock fallback
-4. **Training Optimization Engine** - Multi-algorithm decision optimization
-5. **Career Management System** - Progress tracking and historical analysis
-6. **PvP & Competition Analysis** - Champions Meeting and meta strategies
-7. **Resource Management** - Items, gacha, and economic optimization
-8. **Analytics & Reporting** - Performance metrics and statistical analysis
+If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
 
-### Technology Stack
+## Laravel Sponsors
 
-- **Backend**: Laravel 12 with MySQL database
-- **Frontend**: Blade templates with responsive design
-- **AI Models**: Ollama (local) + AWS Bedrock (Claude 4.5 Opus/Sonnet/Haiku, Nova 2 Lite/Pro)
-- **External APIs**: UmaMusumeAPI, umapyoi.net, UmamusumeDB.com
-- **Image Processing**: OCR for screenshot analysis
-- **Caching**: Laravel cache system for performance optimization
+We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
 
-## 🚀 Getting Started
+### Premium Partners
 
-### Prerequisites
+- **[Vehikl](https://vehikl.com)**
+- **[Tighten Co.](https://tighten.co)**
+- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
+- **[64 Robots](https://64robots.com)**
+- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
+- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
+- **[Redberry](https://redberry.international/laravel-development)**
+- **[Active Logic](https://activelogic.com)**
 
-- PHP 8.2+
-- MySQL 8.0+
-- Composer
-- Node.js & NPM
-- Ollama (optional, for local AI)
-- AWS Account (optional, for cloud AI fallback)
+## Contributing
 
-### Installation
+Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
-1. **Clone the repository**
+## Code of Conduct
 
-   ```bash
-   git clone https://github.com/your-username/umamusume-career-planner.git
-   cd umamusume-career-planner
-   ```
+In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
 
-2. **Install dependencies**
+## Security Vulnerabilities
 
-   ```bash
-   composer install
-   npm install
-   ```
+If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
-3. **Environment setup**
+## License
 
-   ```bash
-   cp .env.example .env
-   php artisan key:generate
-   ```
-
-4. **Database setup**
-
-   ```bash
-   php artisan migrate
-   php artisan db:seed
-   ```
-
-5. **Build assets**
-
-   ```bash
-   npm run build
-   ```
-
-6. **Start the application**
-
-   ```bash
-   php artisan serve
-   ```
-
-### Configuration
-
-#### AI Models Setup
-
-**Ollama (Local AI)**
-
-```bash
-# Install Ollama
-curl -fsSL https://ollama.ai/install.sh | sh
-
-# Pull recommended models
-ollama pull llama2
-ollama pull codellama
-```
-
-**AWS Bedrock (Cloud Fallback)**
-
-```env
-AWS_ACCESS_KEY_ID=your_access_key
-AWS_SECRET_ACCESS_KEY=your_secret_key
-AWS_DEFAULT_REGION=us-east-1
-BEDROCK_REGION=us-east-1
-```
-
-#### External APIs
-
-```env
-# Updated API Configuration (January 2026)
-# Note: SimpleSandman/UmaMusumeAPI deprecated October 2024
-UMAPYOI_API_URL=https://umapyoi.net/api
-UMAMUSUMEDB_API_URL=https://umamusumedb.com/api
-```
-
-## 📖 Usage Guide
-
-### 1. Character Setup
-
-1. **Create New Career**
-   - Select character and scenario (URA Finale/Unity Cup)
-   - Input base stats, aptitudes, and growth rates
-   - Configure support card deck (5 owned + 1 friend)
-   - Set career goals and target stats
-
-2. **Legacy & Inheritance**
-   - Select parent characters (2 main + 4 grandparents)
-   - Configure factor inheritance (Blue/Red/Green/White factors)
-   - Optimize affinity compatibility for maximum bonuses
-
-### 2. Training Optimization
-
-1. **Turn-by-Turn Guidance**
-   - Upload screenshots or manually input game state
-   - Receive AI-powered training recommendations
-   - View predicted stat gains and skill hint opportunities
-   - Track energy, mood, and condition management
-
-2. **Skill Management**
-   - Monitor skill hints and SP cost reductions (20% per duplicate, 40% max)
-   - Plan skill evolution paths (Normal → Rare upgrades)
-   - Optimize SP allocation strategies
-
-### 3. Race Preparation
-
-1. **Race Analysis**
-   - View upcoming races with stat requirements
-   - Get strategy recommendations based on aptitudes
-   - Analyze weather conditions and track characteristics
-   - Receive performance predictions
-
-2. **Strategy Selection**
-   - Choose optimal running styles (Front Runner/Pace Chaser/Late Surger/End Closer)
-   - Adapt to weather conditions and competition strength
-   - Plan race schedules for goal completion
-
-### 4. AI Chatbot Interaction
-
-1. **Ask Strategic Questions**
-   - Get personalized advice based on current career state
-   - Receive explanations for complex game mechanics
-   - Upload screenshots for instant analysis
-
-2. **Model Selection**
-   - Local Ollama processing for privacy and speed
-   - Automatic fallback to AWS Bedrock for complex queries
-   - Transparent model usage disclosure
-
-### 5. Champions Meeting PvP
-
-1. **Team Building**
-   - Create 3-character teams with role assignments
-   - Optimize for monthly cup requirements
-   - Track meta strategies and counter-compositions
-
-2. **Tournament Management**
-   - Monitor RP costs and reward tiers
-   - Plan entry timing based on team readiness
-   - Analyze performance against different opponents
-
-## 📊 Features Deep Dive
-
-### Training Optimization Engine
-
-The core optimization system uses multiple algorithms to analyze:
-
-- **Stat Prediction**: Expected gains based on support cards and friendship levels
-- **Skill Hint Optimization**: Red "!" detection and SP cost reduction strategies
-- **Energy Management**: Failure prevention and sustainable training progression
-- **Turn Economy**: Optimal resource allocation across 60-70 turn careers
-- **Weather Adaptation**: Strategy adjustments for different track conditions
-
-### AI Advisory System
-
-**Local Processing (Ollama)**
-
-- Privacy-focused local AI processing
-- Instant responses for common queries
-- Conversation history persistence
-
-**Cloud Fallback (AWS Bedrock)**
-
-- Claude 4.5 Opus ($5/$25 per 1M tokens) for complex strategic analysis
-- Claude 4.5 Sonnet ($3/$15 per 1M tokens) for balanced reasoning
-- Claude 4.5 Haiku ($1/$5 per 1M tokens) for fast responses
-- Nova 2 Lite ($0.00125 per 1K tokens) for cost-effective processing
-- Nova 2 Pro (Preview) for advanced multimodal capabilities
-- Automatic quality assessment and fallback triggers
-
-### Data Integration
-
-**External APIs**
-
-- UmaMusumeAPI: Character and race data
-- umapyoi.net: Japanese game data
-- UmamusumeDB.com: Calculator tools and meta information
-
-**Community Sources**
-
-- Real-time tier lists and meta strategies
-- Competitive performance data
-- Strategy sharing and collaboration
-
-## 🎮 Game Mechanics Coverage
-
-### Character Development
-
-- **Stats**: Speed (★★★★★), Stamina (★★★★), Power (★★★), Guts (★), Wit (★★)
-- **Aptitudes**: Distance (Sprint/Mile/Medium/Long), Surface (Turf/Dirt), Running Styles
-- **Growth Rates**: Inherited bonuses (+10%, +20%, +30%) affecting training efficiency
-
-### Training Systems
-
-- **Friendship Training**: Rainbow training at 80% bond levels with multi-participant bonuses
-- **Summer Camps**: High-efficiency 4-turn periods (Early/Late July/August)
-- **Spirit Burst**: Unity Cup team mechanics with gauge filling and stat bonuses
-- **Skill Hints**: Cost reduction system with support card interactions
-
-### Race Management
-
-- **Race Calendar**: Complete Pre-OP through G1 race scheduling
-- **Strategy Selection**: Running style optimization based on stats and conditions
-- **Weather System**: Track condition impacts and weather-specific skills
-- **Performance Analysis**: Detailed race outcome tracking and improvement identification
-
-### Resource Optimization
-
-- **Skill Points**: Strategic SP allocation with hint-based cost reduction
-- **Items**: Training boosters, energy drinks, and facility upgrades
-- **Gacha Planning**: Pity system management and banner analysis
-- **Energy/Mood**: Sustainable training progression with failure prevention
-
-## 📈 Analytics & Reporting
-
-### Performance Metrics
-
-- Training efficiency (stat gains per turn)
-- Prediction accuracy (expected vs actual results)
-- Goal completion rates and trajectory analysis
-- Resource utilization optimization
-
-### Historical Analysis
-
-- Multi-career comparison and pattern recognition
-- Success factor identification and strategy evolution
-- Community benchmarking and meta adaptation
-- Long-term improvement tracking
-
-### Statistical Tools
-
-- Monte Carlo simulations for outcome prediction
-- Regression analysis for training effectiveness
-- Confidence intervals and significance testing
-- Machine learning model updates based on performance data
-
-## 🔧 Development
-
-### Project Structure
-
-```
-├── app/
-│   ├── Http/Controllers/     # Web controllers
-│   ├── Models/              # Eloquent models
-│   ├── Services/            # Business logic services
-│   └── Jobs/                # Background jobs
-├── database/
-│   ├── migrations/          # Database schema
-│   └── seeders/            # Sample data
-├── resources/
-│   ├── views/              # Blade templates
-│   └── js/                 # Frontend assets
-├── docs/                   # Documentation
-└── tests/                  # Test suites
-```
-
-### Key Services
-
-- `TrainingOptimizationService`: Core training recommendation engine
-- `AIAdvisoryService`: Ollama and AWS Bedrock integration
-- `ScreenshotAnalysisService`: OCR and image processing
-- `ExternalDataService`: API synchronization and caching
-- `PerformanceAnalyticsService`: Metrics calculation and reporting
-
-### Database Schema
-
-- **15 major entity groups** covering all game aspects
-- **Comprehensive relationships** between characters, careers, and performance data
-- **Optimized indexing** for query performance
-- **Data integrity constraints** ensuring consistency
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
-
-### Development Setup
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes with tests
-4. Submit a pull request
-
-### Code Standards
-
-- Follow PSR-12 coding standards
-- Write comprehensive tests (PHPUnit)
-- Document new features and APIs
-- Maintain backward compatibility
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- **Cygames** for creating Umamusume Pretty Derby
-- **Community Contributors** for game data and meta analysis
-- **API Providers**: UmaMusumeAPI, umapyoi.net, UmamusumeDB.com
-- **Open Source Libraries** used throughout the project
-
-## 📞 Support
-
-- **Documentation**: [Full documentation](docs/)
-- **Issues**: [GitHub Issues](https://github.com/your-username/umamusume-career-planner/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/your-username/umamusume-career-planner/discussions)
-- **Discord**: [Community Discord Server](https://discord.gg/your-server)
-
-## 🗺️ Roadmap
-
-### Phase 1: Core Features ✅
-
-- Basic training optimization
-- Character state management
-- Simple AI recommendations
-
-### Phase 2: Advanced Features 🚧
-
-- Screenshot analysis and OCR
-- Champions Meeting PvP optimization
-- Advanced statistical analysis
-
-### Phase 3: Community Features 📋
-
-- Strategy sharing platform
-- Real-time meta tracking
-- Collaborative optimization tools
-
-### Phase 4: Mobile & Extensions 🔮
-
-- Mobile-responsive improvements
-- Browser extension for game integration
-- Advanced machine learning models
-
----
-
-**Made with ❤️ for the Umamusume community**
-
-*This project is not affiliated with Cygames or Umamusume Pretty Derby. All game data and mechanics are used for educational and optimization purposes only.*
+The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
