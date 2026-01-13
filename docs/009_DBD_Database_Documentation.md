@@ -2,10 +2,10 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 1.0  
-**Date**: January 11, 2026  
-**Project**: UmamusumeCareerPlanner  
-**Author**: Development Team  
+**Document Version**: 1.0
+**Date**: January 14, 2026
+**Project**: UmamusumeCareerPlanner
+**Author**: Development Team
 **Updated**: Aligned with Laravel 12, modern database practices, and
 performance optimization
 
@@ -110,7 +110,7 @@ operational procedures.
 // config/database.php
 return [
     'default' => env('DB_CONNECTION', 'mysql'),
-    
+
     'connections' => [
         'mysql' => [
             'driver' => 'mysql',
@@ -134,7 +134,7 @@ return [
                 PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
             ]) : [],
         ],
-        
+
         'mysql_read' => [
             'driver' => 'mysql',
             'read' => [
@@ -149,7 +149,7 @@ return [
             'sticky' => true,
             // ... other configuration
         ],
-        
+
         'redis' => [
             'driver' => 'redis',
             'url' => env('REDIS_URL'),
@@ -196,7 +196,7 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP NULL,
-    
+
     INDEX idx_email (email),
     INDEX idx_uuid (uuid),
     INDEX idx_active (is_active),
@@ -212,7 +212,7 @@ CREATE TABLE user_sessions (
     user_agent TEXT NULL,
     payload LONGTEXT NOT NULL,
     last_activity INT NOT NULL,
-    
+
     INDEX idx_user_id (user_id),
     INDEX idx_last_activity (last_activity),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -233,7 +233,7 @@ CREATE TABLE characters (
     scenario_id BIGINT UNSIGNED NULL,
     current_turn SMALLINT UNSIGNED DEFAULT 0,
     max_turns SMALLINT UNSIGNED DEFAULT 78,
-    
+
     -- Current stats (dynamic)
     current_stats JSON NOT NULL DEFAULT '{}',
     -- Base aptitudes (from template)
@@ -246,19 +246,19 @@ CREATE TABLE characters (
     goals JSON NULL,
     -- Current status and conditions
     status JSON NULL,
-    
+
     is_active BOOLEAN DEFAULT TRUE,
     completed_at TIMESTAMP NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     INDEX idx_user_characters (user_id, is_active),
     INDEX idx_character_template (character_template_id),
     INDEX idx_scenario (scenario_id),
     INDEX idx_current_turn (current_turn),
     INDEX idx_uuid (uuid),
     INDEX idx_created_at (created_at),
-    
+
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (character_template_id) REFERENCES character_templates(id),
     FOREIGN KEY (scenario_id) REFERENCES scenarios(id) ON DELETE SET NULL
@@ -272,7 +272,7 @@ CREATE TABLE character_templates (
     name_en VARCHAR(100) NULL,
     name_jp VARCHAR(100) NULL,
     rarity TINYINT UNSIGNED NOT NULL,
-    
+
     -- Base aptitudes
     aptitudes JSON NOT NULL DEFAULT '{}',
     -- Base stats
@@ -283,16 +283,16 @@ CREATE TABLE character_templates (
     available_skills JSON NULL,
     -- Character-specific data
     metadata JSON NULL,
-    
+
     -- Data source tracking
     data_source VARCHAR(50) NOT NULL DEFAULT 'umapyoi',
     data_version VARCHAR(20) NULL,
     last_synced_at TIMESTAMP NULL,
-    
+
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     INDEX idx_external_id (external_id),
     INDEX idx_name (name),
     INDEX idx_rarity (rarity),
@@ -312,40 +312,40 @@ CREATE TABLE training_sessions (
     character_id BIGINT UNSIGNED NOT NULL,
     turn_number SMALLINT UNSIGNED NOT NULL,
     session_type ENUM('training', 'race', 'rest', 'event', 'special') NOT NULL,
-    
+
     -- Pre-session state
     stats_before JSON NOT NULL,
     conditions_before JSON NULL,
-    
+
     -- Actions taken
     primary_action VARCHAR(100) NOT NULL,
     secondary_actions JSON NULL,
     support_cards_used JSON NULL,
-    
+
     -- Results
     stats_gained JSON NOT NULL,
     stats_after JSON NOT NULL,
     conditions_after JSON NULL,
     events_triggered JSON NULL,
     skills_learned JSON NULL,
-    
+
     -- AI recommendations and analysis
     ai_recommendation JSON NULL,
     ai_confidence DECIMAL(3,2) NULL,
     user_followed_ai BOOLEAN NULL,
-    
+
     -- Performance metrics
     success_rate DECIMAL(5,2) NULL,
     efficiency_score DECIMAL(5,2) NULL,
-    
+
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    
+
     INDEX idx_character_sessions (character_id, turn_number),
     INDEX idx_session_type (session_type),
     INDEX idx_turn_number (turn_number),
     INDEX idx_uuid (uuid),
     INDEX idx_created_at (created_at),
-    
+
     FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE,
     UNIQUE KEY uk_character_turn (character_id, turn_number)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -357,35 +357,35 @@ CREATE TABLE race_results (
     character_id BIGINT UNSIGNED NOT NULL,
     race_id BIGINT UNSIGNED NOT NULL,
     turn_number SMALLINT UNSIGNED NOT NULL,
-    
+
     -- Race details
     race_name VARCHAR(200) NOT NULL,
     race_grade ENUM('G1', 'G2', 'G3', 'OP', 'Pre-OP', 'Debut') NOT NULL,
     distance SMALLINT UNSIGNED NOT NULL,
     surface ENUM('turf', 'dirt') NOT NULL,
     track_condition ENUM('good', 'slightly_heavy', 'heavy', 'bad') DEFAULT 'good',
-    
+
     -- Performance
     finish_position TINYINT UNSIGNED NOT NULL,
     total_runners TINYINT UNSIGNED NOT NULL,
     finish_time DECIMAL(6,3) NULL,
-    
+
     -- Stats at race time
     stats_at_race JSON NOT NULL,
     skills_active JSON NULL,
-    
+
     -- Rewards and consequences
     fan_gain INT DEFAULT 0,
     skill_points_gain SMALLINT DEFAULT 0,
     prize_money INT DEFAULT 0,
-    
+
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    
+
     INDEX idx_character_races (character_id, turn_number),
     INDEX idx_race_performance (race_id, finish_position),
     INDEX idx_race_grade (race_grade),
     INDEX idx_uuid (uuid),
-    
+
     FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE,
     FOREIGN KEY (race_id) REFERENCES races(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -401,40 +401,40 @@ CREATE TABLE ai_conversations (
     user_id BIGINT UNSIGNED NOT NULL,
     character_id BIGINT UNSIGNED NULL,
     conversation_type ENUM('recommendation', 'analysis', 'planning', 'general', 'optimization') NOT NULL,
-    
+
     -- AI model information
     model_provider ENUM('ollama', 'bedrock') NOT NULL,
     model_name VARCHAR(100) NOT NULL,
     model_version VARCHAR(50) NULL,
-    
+
     -- Conversation data (encrypted)
     prompt_text TEXT NOT NULL,
     response_text TEXT NOT NULL,
     context_data JSON NULL,
-    
+
     -- Performance metrics
     processing_time_ms INT UNSIGNED NOT NULL,
     token_count_input INT UNSIGNED NULL,
     token_count_output INT UNSIGNED NULL,
     cost_usd DECIMAL(8,6) DEFAULT 0.000000,
-    
+
     -- Quality metrics
     confidence_score DECIMAL(3,2) NULL,
     user_rating TINYINT UNSIGNED NULL,
     user_feedback TEXT NULL,
-    
+
     -- Metadata
     metadata JSON NULL,
-    
+
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    
+
     INDEX idx_user_conversations (user_id, created_at DESC),
     INDEX idx_character_conversations (character_id, created_at DESC),
     INDEX idx_conversation_type (conversation_type),
     INDEX idx_model_provider (model_provider, model_name),
     INDEX idx_uuid (uuid),
     INDEX idx_cost_tracking (created_at, cost_usd),
-    
+
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -444,29 +444,29 @@ CREATE TABLE ai_usage_analytics (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT UNSIGNED NOT NULL,
     date DATE NOT NULL,
-    
+
     -- Usage counts by provider
     ollama_requests INT UNSIGNED DEFAULT 0,
     bedrock_requests INT UNSIGNED DEFAULT 0,
-    
+
     -- Token usage
     total_input_tokens INT UNSIGNED DEFAULT 0,
     total_output_tokens INT UNSIGNED DEFAULT 0,
-    
+
     -- Cost tracking
     daily_cost_usd DECIMAL(8,6) DEFAULT 0.000000,
-    
+
     -- Performance metrics
     avg_response_time_ms INT UNSIGNED NULL,
     success_rate DECIMAL(5,2) NULL,
-    
+
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     INDEX idx_user_date (user_id, date),
     INDEX idx_date_cost (date, daily_cost_usd),
     UNIQUE KEY uk_user_date (user_id, date),
-    
+
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
@@ -487,7 +487,7 @@ CREATE TABLE scenarios (
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     INDEX idx_name (name),
     INDEX idx_active (is_active)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -507,7 +507,7 @@ CREATE TABLE skills (
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     INDEX idx_external_id (external_id),
     INDEX idx_name (name),
     INDEX idx_skill_type (skill_type),
@@ -524,20 +524,20 @@ CREATE TABLE support_cards (
     character_name VARCHAR(100) NULL,
     card_type ENUM('speed', 'stamina', 'power', 'guts', 'wit', 'pal') NOT NULL,
     rarity ENUM('R', 'SR', 'SSR') NOT NULL,
-    
+
     -- Card effects and bonuses
     training_effects JSON NULL,
     race_effects JSON NULL,
     unique_effects JSON NULL,
-    
+
     -- Limit break effects
     limit_break_effects JSON NULL,
-    
+
     data_source VARCHAR(50) NOT NULL DEFAULT 'umapyoi',
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     INDEX idx_external_id (external_id),
     INDEX idx_name (name),
     INDEX idx_card_type (card_type),
@@ -568,7 +568,7 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
-    
+
     protected $fillable = [
         'uuid',
         'name',
@@ -580,13 +580,13 @@ class User extends Authenticatable
         'preferences',
         'email_notifications',
     ];
-    
+
     protected $hidden = [
         'password',
         'remember_token',
         'mfa_settings',
     ];
-    
+
     protected $casts = [
         'email_verified_at' => 'datetime',
         'last_login_at' => 'datetime',
@@ -597,35 +597,35 @@ class User extends Authenticatable
         'login_count' => 'integer',
         'deleted_at' => 'datetime',
     ];
-    
+
     // Relationships
     public function characters(): HasMany
     {
         return $this->hasMany(Character::class);
     }
-    
+
     public function aiConversations(): HasMany
     {
         return $this->hasMany(AIConversation::class);
     }
-    
+
     public function usageAnalytics(): HasMany
     {
         return $this->hasMany(AIUsageAnalytics::class);
     }
-    
+
     // Scopes
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
     }
-    
+
     // Accessors & Mutators
     public function getAvatarUrlAttribute($value): string
     {
         return $value ?: $this->generateGravatarUrl();
     }
-    
+
     private function generateGravatarUrl(): string
     {
         $hash = md5(strtolower(trim($this->email)));
@@ -665,7 +665,7 @@ class Character extends Model
         'is_active',
         'completed_at',
     ];
-    
+
     protected $casts = [
         'current_stats' => 'array',
         'aptitudes' => 'array',
@@ -678,55 +678,55 @@ class Character extends Model
         'current_turn' => 'integer',
         'max_turns' => 'integer',
     ];
-    
+
     // Relationships
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
-    
+
     public function characterTemplate(): BelongsTo
     {
         return $this->belongsTo(CharacterTemplate::class);
     }
-    
+
     public function scenario(): BelongsTo
     {
         return $this->belongsTo(Scenario::class);
     }
-    
+
     public function trainingSessions(): HasMany
     {
         return $this->hasMany(TrainingSession::class);
     }
-    
+
     public function raceResults(): HasMany
     {
         return $this->hasMany(RaceResult::class);
     }
-    
+
     public function aiConversations(): HasMany
     {
         return $this->hasMany(AIConversation::class);
     }
-    
+
     // Scopes
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
     }
-    
+
     public function scopeInProgress($query)
     {
         return $query->where('is_active', true)
                     ->whereNull('completed_at');
     }
-    
+
     // Accessors
     public function getCurrentStatsAttribute($value): array
     {
         $stats = json_decode($value, true) ?: [];
-        
+
         return array_merge([
             'speed' => 0,
             'stamina' => 0,
@@ -737,24 +737,24 @@ class Character extends Model
             'fans' => 0,
         ], $stats);
     }
-    
+
     // Business Logic Methods
     public function getTotalStats(): int
     {
         $stats = $this->current_stats;
-        return $stats['speed'] + $stats['stamina'] + $stats['power'] + 
+        return $stats['speed'] + $stats['stamina'] + $stats['power'] +
                $stats['guts'] + $stats['wit'];
     }
-    
+
     public function getProgressPercentage(): float
     {
         return ($this->current_turn / $this->max_turns) * 100;
     }
-    
+
     public function canTrain(): bool
     {
-        return $this->is_active && 
-               $this->current_turn < $this->max_turns && 
+        return $this->is_active &&
+               $this->current_turn < $this->max_turns &&
                is_null($this->completed_at);
     }
 }
@@ -771,7 +771,7 @@ Users (1) ──────────── (M) Characters
   │                         │
   │                         │
   │                         ├── (M) TrainingSession
-  │                         ├── (M) RaceResults  
+  │                         ├── (M) RaceResults
   │                         └── (M) AIConversations
   │
   └── (M) AIConversations
@@ -887,27 +887,27 @@ class MonitorIndexPerformance extends Command
 {
     protected $signature = 'db:monitor-indexes';
     protected $description = 'Monitor database index performance and usage';
-    
+
     public function handle()
     {
         $this->info('Analyzing index performance...');
-        
+
         // Check index usage statistics
         $indexStats = DB::select("
-            SELECT 
+            SELECT
                 TABLE_NAME,
                 INDEX_NAME,
                 CARDINALITY,
                 NULLABLE,
                 INDEX_TYPE
-            FROM information_schema.STATISTICS 
+            FROM information_schema.STATISTICS
             WHERE TABLE_SCHEMA = DATABASE()
             ORDER BY TABLE_NAME, SEQ_IN_INDEX
         ");
-        
+
         // Check for unused indexes
         $unusedIndexes = DB::select("
-            SELECT 
+            SELECT
                 object_schema,
                 object_name,
                 index_name
@@ -916,24 +916,24 @@ class MonitorIndexPerformance extends Command
             AND count_star = 0
             AND object_schema = DATABASE()
         ");
-        
+
         if (!empty($unusedIndexes)) {
             $this->warn('Found potentially unused indexes:');
             foreach ($unusedIndexes as $index) {
                 $this->line("- {$index->object_name}.{$index->index_name}");
             }
         }
-        
+
         // Check for missing indexes on foreign keys
         $this->checkForeignKeyIndexes();
-        
+
         $this->info('Index analysis complete.');
     }
-    
+
     private function checkForeignKeyIndexes()
     {
         $missingIndexes = DB::select("
-            SELECT 
+            SELECT
                 TABLE_NAME,
                 COLUMN_NAME,
                 CONSTRAINT_NAME,
@@ -948,7 +948,7 @@ class MonitorIndexPerformance extends Command
                 AND COLUMN_NAME = KEY_COLUMN_USAGE.COLUMN_NAME
             )
         ");
-        
+
         if (!empty($missingIndexes)) {
             $this->warn('Foreign keys without indexes found:');
             foreach ($missingIndexes as $fk) {
@@ -977,7 +977,7 @@ class CharacterRepository
     public function getUserCharactersWithStats(User $user): Collection
     {
         return Character::select([
-                'id', 'uuid', 'name', 'nickname', 'current_turn', 
+                'id', 'uuid', 'name', 'nickname', 'current_turn',
                 'max_turns', 'current_stats', 'is_active', 'updated_at'
             ])
             ->where('user_id', $user->id)
@@ -989,7 +989,7 @@ class CharacterRepository
             ->orderBy('updated_at', 'desc')
             ->get();
     }
-    
+
     public function getCharacterTrainingHistory(Character $character, int $limit = 50): Collection
     {
         return TrainingSession::select([
@@ -1001,23 +1001,23 @@ class CharacterRepository
             ->limit($limit)
             ->get();
     }
-    
+
     public function getCharacterAnalytics(Character $character): array
     {
         // Use raw queries for complex analytics
         $statsProgression = DB::select("
-            SELECT 
+            SELECT
                 turn_number,
                 JSON_EXTRACT(stats_after, '$.speed') as speed,
                 JSON_EXTRACT(stats_after, '$.stamina') as stamina,
                 JSON_EXTRACT(stats_after, '$.power') as power,
                 JSON_EXTRACT(stats_after, '$.guts') as guts,
                 JSON_EXTRACT(stats_after, '$.wit') as wit
-            FROM training_sessions 
+            FROM training_sessions
             WHERE character_id = ?
             ORDER BY turn_number ASC
         ", [$character->id]);
-        
+
         return [
             'stats_progression' => $statsProgression,
             'total_sessions' => $character->trainingSessions()->count(),
@@ -1050,14 +1050,14 @@ class DatabaseServiceProvider extends ServiceProvider
                 }
             });
         }
-        
+
         // Configure connection pooling
         $this->configureConnectionPooling();
-        
+
         // Set up read/write splitting
         $this->configureReadWriteSplitting();
     }
-    
+
     private function configureConnectionPooling()
     {
         config([
@@ -1081,7 +1081,7 @@ class DatabaseServiceProvider extends ServiceProvider
 
 ```sql
 -- Partition training_sessions by month for better performance
-ALTER TABLE training_sessions 
+ALTER TABLE training_sessions
 PARTITION BY RANGE (YEAR(created_at) * 100 + MONTH(created_at)) (
     PARTITION p202601 VALUES LESS THAN (202602),
     PARTITION p202602 VALUES LESS THAN (202603),
@@ -1099,7 +1099,7 @@ PARTITION BY RANGE (YEAR(created_at) * 100 + MONTH(created_at)) (
 );
 
 -- Partition ai_conversations by month for cost tracking
-ALTER TABLE ai_conversations 
+ALTER TABLE ai_conversations
 PARTITION BY RANGE (YEAR(created_at) * 100 + MONTH(created_at)) (
     PARTITION p202601 VALUES LESS THAN (202602),
     PARTITION p202602 VALUES LESS THAN (202603),
@@ -1139,7 +1139,7 @@ class GameDataCacheService
         'user_data' => ['user_data'],
         'ai_responses' => ['ai_data', 'temporary']
     ];
-    
+
     private const CACHE_TTL = [
         'character_templates' => 86400, // 24 hours
         'skills' => 86400, // 24 hours
@@ -1148,22 +1148,22 @@ class GameDataCacheService
         'training_history' => 1800, // 30 minutes
         'ai_responses' => 300, // 5 minutes
     ];
-    
+
     public function cacheCharacterTemplates(): void
     {
         $templates = CharacterTemplate::active()
             ->select(['id', 'name', 'name_en', 'rarity', 'aptitudes', 'base_stats'])
             ->get()
             ->keyBy('id');
-        
+
         Cache::tags(self::CACHE_TAGS['characters'])
             ->put('character_templates:all', $templates, self::CACHE_TTL['character_templates']);
     }
-    
+
     public function getUserCharacters(User $user): Collection
     {
         $cacheKey = "user_characters:{$user->id}";
-        
+
         return Cache::tags(self::CACHE_TAGS['user_data'])
             ->remember($cacheKey, self::CACHE_TTL['user_characters'], function () use ($user) {
                 return $user->characters()
@@ -1172,23 +1172,23 @@ class GameDataCacheService
                     ->get();
             });
     }
-    
+
     public function invalidateUserCache(User $user): void
     {
         Cache::tags(self::CACHE_TAGS['user_data'])->flush();
-        
+
         // Also clear specific user caches
         $patterns = [
             "user_characters:{$user->id}",
             "user_analytics:{$user->id}:*",
             "ai_conversations:{$user->id}:*"
         ];
-        
+
         foreach ($patterns as $pattern) {
             $this->clearCachePattern($pattern);
         }
     }
-    
+
     private function clearCachePattern(string $pattern): void
     {
         $keys = Redis::keys($pattern);
@@ -1211,38 +1211,38 @@ trait CacheableQueries
     public function scopeCached($query, string $key = null, int $ttl = 3600)
     {
         $cacheKey = $key ?: $this->generateCacheKey($query);
-        
+
         return Cache::remember($cacheKey, $ttl, function () use ($query) {
             return $query->get();
         });
     }
-    
+
     private function generateCacheKey($query): string
     {
         $sql = $query->toSql();
         $bindings = $query->getBindings();
-        
+
         return 'query:' . md5($sql . serialize($bindings));
     }
-    
+
     public static function bootCacheableQueries()
     {
         // Clear cache on model changes
         static::saved(function ($model) {
             $model->clearModelCache();
         });
-        
+
         static::deleted(function ($model) {
             $model->clearModelCache();
         });
     }
-    
+
     public function clearModelCache(): void
     {
         $tags = $this->getCacheTags();
         Cache::tags($tags)->flush();
     }
-    
+
     protected function getCacheTags(): array
     {
         return [strtolower(class_basename($this))];

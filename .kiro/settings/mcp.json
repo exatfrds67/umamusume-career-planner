@@ -18,7 +18,10 @@
         "get_file_info",
         "list_allowed_directories",
         "read_multiple_files",
-        "edit_file"
+        "edit_file",
+        "read_text_file",
+        "directory_tree",
+        "list_directory_with_sizes"
       ]
     },
     "sequential-thinking": {

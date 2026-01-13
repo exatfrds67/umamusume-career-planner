@@ -101,7 +101,7 @@ interface CharacterRepositoryInterface
 class EloquentCharacterRepository implements CharacterRepositoryInterface
 {
     public function __construct(private Character $model) {}
-    
+
     public function findById(int $id): ?Character
     {
         return $this->model->with(['aptitudes', 'factors', 'skills'])->find($id);
@@ -119,13 +119,13 @@ class TrainingOptimizationService
         private TrainingPredictionEngine $predictionEngine,
         private CacheManager $cache
     ) {}
-    
+
     public function optimizeTrainingSequence(
-        Character $character, 
+        Character $character,
         TrainingGoals $goals
     ): TrainingRecommendation {
         $cacheKey = "training_optimization_{$character->id}_{$goals->hash()}";
-        
+
         return $this->cache->remember($cacheKey, 300, function () use ($character, $goals) {
             return $this->predictionEngine->calculateOptimalSequence($character, $goals);
         });
@@ -153,7 +153,7 @@ class UpdateCharacterStatsHandler
         $character = $this->characterRepo->findById($command->characterId);
         $character->updateStats($command->stats);
         $this->characterRepo->update($character);
-        
+
         event(new CharacterStatsUpdated($character, $command->source));
     }
 }
@@ -190,7 +190,7 @@ class UpdateTrainingRecommendationsListener
     {
         // Invalidate cached training recommendations
         Cache::tags(['training', "character_{$event->character->id}"])->flush();
-        
+
         // Queue background recalculation
         RecalculateTrainingRecommendations::dispatch($event->character);
     }
@@ -203,14 +203,16 @@ class UpdateTrainingRecommendationsListener
 
 #### Laravel 12 Framework
 
-- **Version**: Laravel 12.x (Latest LTS)
-- **PHP Version**: PHP 8.3+
+- **Version**: Laravel 12.x (Latest LTS, released February 2025)
+- **PHP Version**: PHP 8.1 or higher (Laravel Boost compatible; official installer defaults to PHP 8.4)
 - **Key Features**:
-  - New starter kits with TypeScript integration
-  - Asynchronous caching with `asyncRemember()`
-  - Enhanced Eloquent with `nestedWhere()`, `fillAndInsert()`
-  - Improved security with `secureValidate()`
+  - Streamlined file structure (middleware in bootstrap/app.php, no app/Http/Kernel.php)
+  - Laravel Boost integration for AI-assisted development with 15+ specialized tools and 17,000+ pieces of vectorized documentation
+  - Native service provider configuration in bootstrap/providers.php
+  - Console commands auto-discovered from app/Console/Commands/
   - Laravel Sanctum for API authentication
+  - Real-time support with Laravel Reverb for WebSocket communication
+  - Asynchronous caching and improved database features
 
 #### Database Layer
 
@@ -326,10 +328,10 @@ class UpdateTrainingRecommendationsListener
   --color-primary-50: #f0f9ff;
   --color-primary-500: #3b82f6;
   --color-primary-900: #1e3a8a;
-  
+
   --font-family-sans: "Inter", system-ui, sans-serif;
   --font-family-mono: "JetBrains Mono", monospace;
-  
+
   --spacing-xs: 0.5rem;
   --spacing-sm: 0.75rem;
   --spacing-md: 1rem;
@@ -340,11 +342,11 @@ class UpdateTrainingRecommendationsListener
 /* Component-specific styles */
 @layer components {
   .btn-primary {
-    @apply bg-primary-500 text-white px-4 py-2 rounded-lg hover:bg-primary-600 
-           focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 
+    @apply bg-primary-500 text-white px-4 py-2 rounded-lg hover:bg-primary-600
+           focus:ring-2 focus:ring-primary-500 focus:ring-offset-2
            transition-colors duration-200;
   }
-  
+
   .card {
     @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6;
   }
@@ -383,19 +385,19 @@ const Button = ({
   onClick
 }) => {
   const baseClasses = 'inline-flex items-center justify-center font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2';
-  
+
   const variantClasses = {
     primary: 'bg-primary-500 text-white hover:bg-primary-600 focus:ring-primary-500',
     secondary: 'bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-500',
     danger: 'bg-red-500 text-white hover:bg-red-600 focus:ring-red-500'
   };
-  
+
   const sizeClasses = {
     sm: 'px-3 py-1.5 text-sm',
     md: 'px-4 py-2 text-base',
     lg: 'px-6 py-3 text-lg'
   };
-  
+
   return (
     <button
       className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`}
@@ -470,7 +472,7 @@ if ('serviceWorker' in navigator) {
   --bg-light-mobile: url('/images/app_bg/uma_musume_race_planner_bg_light_1028x1536.png');
   --bg-dark-desktop: url('/images/app_bg/uma_musume_race_planner_bg_dark_1536x1028.png');
   --bg-dark-mobile: url('/images/app_bg/uma_musume_race_planner_bg_dark_1028x1536.png');
-  
+
   /* Character Avatar Placeholders from images/trainee_images/ */
   --avatar-agnes-tachyon: url('/images/trainee_images/__agnes_tachyon_umamusume_drawn_by_welchino__sample-1db2ca428e2545fcae81fe526d7a8e96.jpg');
   --avatar-gold-ship: url('/images/trainee_images/__gold_ship_umamusume_drawn_by_advarcher__sample-2713426899554240b99dc00440e97745.jpg');
@@ -486,14 +488,14 @@ if ('serviceWorker' in navigator) {
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
-  
+
   @media (max-width: 768px) {
     background-image: var(--bg-light-mobile);
   }
-  
+
   @media (prefers-color-scheme: dark) {
     background-image: var(--bg-dark-desktop);
-    
+
     @media (max-width: 768px) {
       background-image: var(--bg-dark-mobile);
     }
@@ -508,12 +510,12 @@ if ('serviceWorker' in navigator) {
   background-size: cover;
   background-position: center;
   border: 2px solid var(--color-primary-500);
-  
+
   &.avatar-lg {
     width: 128px;
     height: 128px;
   }
-  
+
   &.avatar-sm {
     width: 32px;
     height: 32px;
@@ -525,14 +527,14 @@ if ('serviceWorker' in navigator) {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 1rem;
-  
+
   .character-card {
     background: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(10px);
     border-radius: 12px;
     padding: 1rem;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    
+
     @media (prefers-color-scheme: dark) {
       background: rgba(0, 0, 0, 0.8);
       border-color: rgba(255, 255, 255, 0.1);
@@ -568,9 +570,9 @@ const CharacterAvatars = {
  */
 const CharacterAvatar = ({ characterName, size = 'md', className = '' }) => {
   const avatarUrl = CharacterAvatars[characterName] || CharacterAvatars['Silence Suzuka']; // Default to Silence Suzuka
-  
+
   return (
-    <div 
+    <div
       className={`character-avatar avatar-${size} ${className}`}
       style={{ backgroundImage: `url(${avatarUrl})` }}
       aria-label={`${characterName} avatar`}
@@ -594,14 +596,14 @@ const CharacterSelection = ({ characters, onSelect }) => {
         </h1>
         <div className="character-grid">
           {characters.map((character) => (
-            <div 
-              key={character.id} 
+            <div
+              key={character.id}
               className="character-card cursor-pointer hover:scale-105 transition-transform"
               onClick={() => onSelect(character)}
             >
-              <CharacterAvatar 
-                characterName={character.name} 
-                size="lg" 
+              <CharacterAvatar
+                characterName={character.name}
+                size="lg"
                 className="mx-auto mb-4"
               />
               <h3 className="text-lg font-semibold text-center">{character.name}</h3>
@@ -640,7 +642,7 @@ class OllamaService
                 'max_tokens' => 2048,
             ])
             ->ask();
-        
+
         return new AIResponse([
             'content' => $response,
             'model' => config('ai.ollama.model', 'llama3.3'),
@@ -648,7 +650,7 @@ class OllamaService
             'token_count' => $response->getTokenCount(),
         ]);
     }
-    
+
     public function streamResponse(string $prompt, callable $callback = null): Generator
     {
         return Ollama::agent('Umamusume Career Advisor')
@@ -668,7 +670,7 @@ use Aws\BedrockRuntime\BedrockRuntimeClient;
 class BedrockService
 {
     private BedrockRuntimeClient $client;
-    
+
     public function __construct()
     {
         $this->client = new BedrockRuntimeClient([
@@ -680,7 +682,7 @@ class BedrockService
             ]
         ]);
     }
-    
+
     public function invokeModel(string $modelId, array $payload): AIResponse
     {
         $response = $this->client->invokeModel([
@@ -689,7 +691,7 @@ class BedrockService
             'accept' => 'application/json',
             'body' => json_encode($payload)
         ]);
-        
+
         return new AIResponse(json_decode($response['body']->getContents(), true));
     }
 }
@@ -705,7 +707,7 @@ class HybridAIService
         private BedrockService $bedrock,
         private CacheManager $cache
     ) {}
-    
+
     public function processRequest(AIRequest $request): AIResponse
     {
         // Check cache first
@@ -713,14 +715,14 @@ class HybridAIService
         if ($cached = $this->cache->get($cacheKey)) {
             return $cached;
         }
-        
+
         // Determine complexity and route accordingly
         if ($this->isComplexRequest($request)) {
             $response = $this->processWithBedrock($request);
         } else {
             try {
                 $response = $this->processWithOllama($request);
-                
+
                 // Fallback to Bedrock if Ollama fails or is too slow
                 if (!$response->isSuccessful() || $response->getProcessingTime() > 15) {
                     Log::info('Ollama processing slow/failed, falling back to Bedrock', [
@@ -737,19 +739,19 @@ class HybridAIService
                 $response = $this->processWithBedrock($request);
             }
         }
-        
+
         // Cache successful responses
         if ($response->isSuccessful()) {
             $this->cache->put($cacheKey, $response, 3600);
         }
-        
+
         return $response;
     }
-    
+
     private function isComplexRequest(AIRequest $request): bool
     {
-        return $request->hasMultiStepReasoning() 
-            || $request->requiresRAG() 
+        return $request->hasMultiStepReasoning()
+            || $request->requiresRAG()
             || $request->getTokenCount() > 4000;
     }
 }
@@ -843,7 +845,7 @@ CREATE TABLE users (
     remember_token VARCHAR(100) NULL,
     created_at TIMESTAMP NULL,
     updated_at TIMESTAMP NULL,
-    
+
     INDEX idx_users_email (email)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -853,27 +855,27 @@ CREATE TABLE characters (
     user_id BIGINT UNSIGNED NOT NULL,
     name VARCHAR(255) NOT NULL,
     scenario_type ENUM('ura_finale', 'unity_cup') NOT NULL,
-    
+
     -- Current Stats (0-1200 range)
     speed_stat SMALLINT UNSIGNED DEFAULT 0,
     stamina_stat SMALLINT UNSIGNED DEFAULT 0,
     power_stat SMALLINT UNSIGNED DEFAULT 0,
     guts_stat SMALLINT UNSIGNED DEFAULT 0,
     wit_stat SMALLINT UNSIGNED DEFAULT 0,
-    
+
     -- Character State
     energy_level TINYINT UNSIGNED DEFAULT 100,
     mood_status ENUM('awful', 'bad', 'normal', 'good', 'great') DEFAULT 'normal',
     career_stage ENUM('junior', 'classic', 'senior') DEFAULT 'junior',
     current_turn TINYINT UNSIGNED DEFAULT 1,
-    
+
     -- Goals and Targets
     target_stats JSON NULL,
     race_objectives JSON NULL,
-    
+
     created_at TIMESTAMP NULL,
     updated_at TIMESTAMP NULL,
-    
+
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     INDEX idx_characters_user_id (user_id),
     INDEX idx_characters_scenario (scenario_type),
@@ -884,26 +886,26 @@ CREATE TABLE characters (
 CREATE TABLE aptitudes (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     character_id BIGINT UNSIGNED NOT NULL,
-    
+
     -- Distance Aptitudes
     sprint_aptitude ENUM('G', 'G+', 'F', 'F+', 'E', 'E+', 'D', 'D+', 'C', 'C+', 'B', 'B+', 'A', 'A+', 'S', 'S+', 'SS') NOT NULL,
     mile_aptitude ENUM('G', 'G+', 'F', 'F+', 'E', 'E+', 'D', 'D+', 'C', 'C+', 'B', 'B+', 'A', 'A+', 'S', 'S+', 'SS') NOT NULL,
     medium_aptitude ENUM('G', 'G+', 'F', 'F+', 'E', 'E+', 'D', 'D+', 'C', 'C+', 'B', 'B+', 'A', 'A+', 'S', 'S+', 'SS') NOT NULL,
     long_aptitude ENUM('G', 'G+', 'F', 'F+', 'E', 'E+', 'D', 'D+', 'C', 'C+', 'B', 'B+', 'A', 'A+', 'S', 'S+', 'SS') NOT NULL,
-    
+
     -- Surface Aptitudes
     turf_aptitude ENUM('G', 'G+', 'F', 'F+', 'E', 'E+', 'D', 'D+', 'C', 'C+', 'B', 'B+', 'A', 'A+', 'S', 'S+', 'SS') NOT NULL,
     dirt_aptitude ENUM('G', 'G+', 'F', 'F+', 'E', 'E+', 'D', 'D+', 'C', 'C+', 'B', 'B+', 'A', 'A+', 'S', 'S+', 'SS') NOT NULL,
-    
+
     -- Running Style Aptitudes
     front_runner_aptitude ENUM('G', 'G+', 'F', 'F+', 'E', 'E+', 'D', 'D+', 'C', 'C+', 'B', 'B+', 'A', 'A+', 'S', 'S+', 'SS') NOT NULL,
     pace_chaser_aptitude ENUM('G', 'G+', 'F', 'F+', 'E', 'E+', 'D', 'D+', 'C', 'C+', 'B', 'B+', 'A', 'A+', 'S', 'S+', 'SS') NOT NULL,
     late_surger_aptitude ENUM('G', 'G+', 'F', 'F+', 'E', 'E+', 'D', 'D+', 'C', 'C+', 'B', 'B+', 'A', 'A+', 'S', 'S+', 'SS') NOT NULL,
     end_closer_aptitude ENUM('G', 'G+', 'F', 'F+', 'E', 'E+', 'D', 'D+', 'C', 'C+', 'B', 'B+', 'A', 'A+', 'S', 'S+', 'SS') NOT NULL,
-    
+
     created_at TIMESTAMP NULL,
     updated_at TIMESTAMP NULL,
-    
+
     FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE,
     UNIQUE KEY unique_character_aptitudes (character_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -915,20 +917,20 @@ CREATE TABLE factors (
     factor_type ENUM('blue_stat', 'red_aptitude', 'green_unique', 'white_normal') NOT NULL,
     factor_category ENUM('speed', 'stamina', 'power', 'guts', 'wit', 'distance', 'surface', 'running_style', 'skill') NOT NULL,
     factor_level ENUM('1_star', '2_star', '3_star') NOT NULL,
-    
+
     -- Bonus Values
     stat_bonus SMALLINT DEFAULT 0, -- For blue factors: +5, +12, +21
     aptitude_bonus TINYINT DEFAULT 0, -- For red factors: grade improvements
     skill_name VARCHAR(255) NULL, -- For green/white factors
-    
+
     -- Source Information
     source_parent VARCHAR(255) NOT NULL, -- Which parent provided this factor
     inheritance_rate DECIMAL(3,2) DEFAULT 1.00, -- Success rate multiplier
     affinity_bonus BOOLEAN DEFAULT FALSE, -- ◎ symbol compatibility
-    
+
     created_at TIMESTAMP NULL,
     updated_at TIMESTAMP NULL,
-    
+
     FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE,
     INDEX idx_factors_character (character_id),
     INDEX idx_factors_type (factor_type),
@@ -942,25 +944,25 @@ CREATE TABLE skills (
     skill_name VARCHAR(255) NOT NULL,
     skill_type ENUM('normal', 'rare', 'unique') NOT NULL,
     skill_category ENUM('speed', 'passive', 'recovery', 'debuff') NOT NULL,
-    
+
     -- SP Cost Management
     base_sp_cost SMALLINT UNSIGNED NOT NULL,
     hint_count TINYINT UNSIGNED DEFAULT 0,
     discount_percentage TINYINT UNSIGNED DEFAULT 0, -- 20% per hint, max 40%
     final_sp_cost SMALLINT UNSIGNED NOT NULL,
-    
+
     -- Acquisition Status
     is_acquired BOOLEAN DEFAULT FALSE,
     acquired_at TIMESTAMP NULL,
     acquisition_source ENUM('training', 'event', 'inheritance', 'evolution') NULL,
-    
+
     -- Evolution Information
     evolves_from VARCHAR(255) NULL, -- Normal skill that evolves to this Rare skill
     evolves_to VARCHAR(255) NULL, -- Rare skill this Normal skill evolves to
-    
+
     created_at TIMESTAMP NULL,
     updated_at TIMESTAMP NULL,
-    
+
     FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE,
     INDEX idx_skills_character (character_id),
     INDEX idx_skills_type (skill_type),
@@ -977,32 +979,32 @@ CREATE TABLE careers (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     character_id BIGINT UNSIGNED NOT NULL,
     scenario_type ENUM('ura_finale', 'unity_cup') NOT NULL,
-    
+
     -- Career Timeline
     start_date TIMESTAMP NOT NULL,
     end_date TIMESTAMP NULL,
     total_turns TINYINT UNSIGNED DEFAULT 0,
     current_turn TINYINT UNSIGNED DEFAULT 1,
-    
+
     -- Final Results
     final_grade ENUM('G', 'G+', 'F', 'F+', 'E', 'E+', 'D', 'D+', 'C', 'C+', 'B', 'B+', 'A', 'A+', 'S', 'S+', 'SS') NULL,
     final_stats JSON NULL, -- Final stat values
     total_sp_earned SMALLINT UNSIGNED DEFAULT 0,
     total_sp_spent SMALLINT UNSIGNED DEFAULT 0,
-    
+
     -- Performance Metrics
     race_results JSON NULL, -- Array of race outcomes
     training_efficiency DECIMAL(5,2) NULL, -- Average stat gains per turn
     goal_completion_rate DECIMAL(5,2) NULL, -- Percentage of goals achieved
-    
+
     -- Strategy Information
     support_card_deck JSON NOT NULL, -- 6-card deck configuration
     training_strategy TEXT NULL,
     race_strategy TEXT NULL,
-    
+
     created_at TIMESTAMP NULL,
     updated_at TIMESTAMP NULL,
-    
+
     FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE,
     INDEX idx_careers_character (character_id),
     INDEX idx_careers_scenario (scenario_type),
@@ -1015,31 +1017,31 @@ CREATE TABLE training_sessions (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     career_id BIGINT UNSIGNED NOT NULL,
     turn_number TINYINT UNSIGNED NOT NULL,
-    
+
     -- Training Details
     training_type ENUM('speed', 'stamina', 'power', 'guts', 'wit', 'rest', 'infirmary', 'recreation') NOT NULL,
     training_location VARCHAR(255) NULL, -- Facility name
     facility_level TINYINT UNSIGNED DEFAULT 1, -- 1-5 for Unity Cup
-    
+
     -- Participants
     support_card_participants JSON NULL, -- Which support cards participated
     teammate_participants JSON NULL, -- Unity Cup teammates
     friendship_training BOOLEAN DEFAULT FALSE,
     participant_count TINYINT UNSIGNED DEFAULT 0,
-    
+
     -- Results
     stat_gains JSON NOT NULL, -- Actual stat increases
     energy_cost TINYINT UNSIGNED DEFAULT 0,
     skill_hints_gained JSON NULL, -- Skills that gained hints
     spirit_burst_used BOOLEAN DEFAULT FALSE,
-    
+
     -- Predictions vs Reality
     predicted_gains JSON NULL, -- What was predicted
     prediction_accuracy DECIMAL(5,2) NULL, -- How accurate the prediction was
-    
+
     created_at TIMESTAMP NULL,
     updated_at TIMESTAMP NULL,
-    
+
     FOREIGN KEY (career_id) REFERENCES careers(id) ON DELETE CASCADE,
     INDEX idx_training_career (career_id),
     INDEX idx_training_turn (turn_number),
@@ -1052,37 +1054,37 @@ CREATE TABLE races (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     career_id BIGINT UNSIGNED NOT NULL,
     turn_number TINYINT UNSIGNED NOT NULL,
-    
+
     -- Race Information
     race_name VARCHAR(255) NOT NULL,
     race_grade ENUM('pre_op', 'op', 'g3', 'g2', 'g1') NOT NULL,
     distance ENUM('sprint', 'mile', 'medium', 'long') NOT NULL,
     surface ENUM('turf', 'dirt') NOT NULL,
     track_name VARCHAR(255) NOT NULL,
-    
+
     -- Conditions
     weather ENUM('sunny', 'cloudy', 'rainy', 'snowy') NOT NULL,
     track_condition ENUM('firm', 'good', 'soft', 'heavy') NOT NULL,
-    
+
     -- Strategy and Results
     running_style ENUM('front_runner', 'pace_chaser', 'late_surger', 'end_closer') NOT NULL,
     final_position TINYINT UNSIGNED NOT NULL,
     total_participants TINYINT UNSIGNED NOT NULL,
-    
+
     -- Performance Analysis
     stat_adequacy JSON NOT NULL, -- ○ ⦾ △ × indicators for each stat
     performance_rating ENUM('excellent', 'good', 'average', 'poor') NOT NULL,
     fan_gain INTEGER DEFAULT 0,
     prize_money INTEGER DEFAULT 0,
-    
+
     -- Goal Tracking
     was_goal_race BOOLEAN DEFAULT FALSE,
     goal_requirement ENUM('debut', 'placement', 'fan_count', 'specific_race') NULL,
     goal_achieved BOOLEAN DEFAULT FALSE,
-    
+
     created_at TIMESTAMP NULL,
     updated_at TIMESTAMP NULL,
-    
+
     FOREIGN KEY (career_id) REFERENCES careers(id) ON DELETE CASCADE,
     INDEX idx_races_career (career_id),
     INDEX idx_races_turn (turn_number),
@@ -1100,30 +1102,30 @@ CREATE TABLE support_cards (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     character_id BIGINT UNSIGNED NOT NULL,
     position_slot TINYINT UNSIGNED NOT NULL, -- 1-6 (5 owned + 1 friend)
-    
+
     -- Card Information
     card_name VARCHAR(255) NOT NULL,
     card_rarity ENUM('SSR', 'SR', 'R') NOT NULL,
     specialization ENUM('speed', 'stamina', 'power', 'guts', 'wit', 'pal') NOT NULL,
     limit_break_level TINYINT UNSIGNED DEFAULT 0, -- 0-4 stars
-    
+
     -- Relationship Status
     friendship_level TINYINT UNSIGNED DEFAULT 0, -- 0-100%
     rainbow_training_available BOOLEAN DEFAULT FALSE, -- 80%+ friendship
-    
+
     -- Card Effects
     training_bonuses JSON NOT NULL, -- Stat bonuses provided
     skill_provisions JSON NOT NULL, -- Skills this card can provide hints for
     event_skills JSON NULL, -- Skills from card events
     unique_effects JSON NULL, -- Special card effects
-    
+
     -- Meta Information
     tier_ranking ENUM('SS', 'S', 'A', 'B') NULL, -- Community tier ranking
     is_friend_card BOOLEAN DEFAULT FALSE, -- Position 6 friend card
-    
+
     created_at TIMESTAMP NULL,
     updated_at TIMESTAMP NULL,
-    
+
     FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE,
     INDEX idx_support_cards_character (character_id),
     INDEX idx_support_cards_specialization (specialization),
@@ -1136,30 +1138,30 @@ CREATE TABLE events (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     career_id BIGINT UNSIGNED NOT NULL,
     turn_number TINYINT UNSIGNED NOT NULL,
-    
+
     -- Event Information
     event_type ENUM('character', 'support_card', 'scenario', 'random') NOT NULL,
     event_name VARCHAR(255) NOT NULL,
     event_description TEXT NULL,
-    
+
     -- Choices and Outcomes
     available_choices JSON NOT NULL, -- Array of choice options
     selected_choice INTEGER NOT NULL, -- Index of selected choice
     choice_reasoning TEXT NULL, -- Why this choice was made
-    
+
     -- Results
     outcome_description TEXT NULL,
     stat_changes JSON NULL, -- Any stat modifications
     skill_hints_gained JSON NULL, -- Skills that gained hints
     other_effects JSON NULL, -- Mood changes, conditions, etc.
-    
+
     -- Optimization Data
     optimal_choice INTEGER NULL, -- Recommended choice based on goals
     choice_effectiveness DECIMAL(5,2) NULL, -- How good the choice was
-    
+
     created_at TIMESTAMP NULL,
     updated_at TIMESTAMP NULL,
-    
+
     FOREIGN KEY (career_id) REFERENCES careers(id) ON DELETE CASCADE,
     INDEX idx_events_career (career_id),
     INDEX idx_events_turn (turn_number),
@@ -1172,24 +1174,24 @@ CREATE TABLE external_data (
     data_type ENUM('character_base', 'support_card', 'race_info', 'skill_data', 'meta_tier', 'community_build') NOT NULL,
     data_key VARCHAR(255) NOT NULL, -- Unique identifier for the data
     source_api VARCHAR(255) NOT NULL, -- Which API provided this data
-    
+
     -- Data Content
     data_content JSON NOT NULL, -- The actual cached data
     data_version VARCHAR(50) NULL, -- Version/hash for change detection
-    
+
     -- Cache Management
     cache_expires TIMESTAMP NOT NULL,
     last_updated TIMESTAMP NOT NULL,
     access_count INTEGER DEFAULT 0,
     is_active BOOLEAN DEFAULT TRUE,
-    
+
     -- Quality Metrics
     data_quality_score DECIMAL(3,2) DEFAULT 1.00, -- 0.00-1.00 quality rating
     validation_errors JSON NULL, -- Any validation issues found
-    
+
     created_at TIMESTAMP NULL,
     updated_at TIMESTAMP NULL,
-    
+
     INDEX idx_external_data_type (data_type),
     INDEX idx_external_data_key (data_key),
     INDEX idx_external_data_expires (cache_expires),
@@ -1203,25 +1205,25 @@ CREATE TABLE ai_conversations (
     user_id BIGINT UNSIGNED NOT NULL,
     character_id BIGINT UNSIGNED NULL, -- NULL for general conversations
     conversation_id VARCHAR(255) NOT NULL, -- Session identifier
-    
+
     -- Message Information
     message_type ENUM('user', 'assistant', 'system') NOT NULL,
     message_content TEXT NOT NULL,
     message_context JSON NULL, -- Additional context data
-    
+
     -- AI Processing Information
     ai_model_used ENUM('ollama_llama3.3', 'ollama_mistral', 'bedrock_nova_pro', 'bedrock_claude_sonnet', 'bedrock_claude_haiku') NOT NULL,
     processing_time DECIMAL(6,3) NOT NULL, -- Seconds
     token_count INTEGER NULL,
     cost_estimate DECIMAL(8,4) NULL, -- USD cost for cloud models
-    
+
     -- Quality Metrics
     confidence_score DECIMAL(3,2) NULL, -- AI confidence in response
     user_feedback ENUM('helpful', 'neutral', 'unhelpful') NULL,
-    
+
     created_at TIMESTAMP NULL,
     updated_at TIMESTAMP NULL,
-    
+
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE SET NULL,
     INDEX idx_ai_conversations_user (user_id),
@@ -1235,31 +1237,31 @@ CREATE TABLE ai_conversations (
 CREATE TABLE ocr_extractions (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT UNSIGNED NOT NULL,
-    
+
     -- Image Information
     image_path VARCHAR(500) NOT NULL, -- Path to uploaded image
     image_hash VARCHAR(64) NOT NULL, -- SHA-256 hash for deduplication
     image_size INTEGER NOT NULL, -- File size in bytes
     image_dimensions VARCHAR(20) NULL, -- "1920x1080" format
-    
+
     -- OCR Processing
     extracted_data JSON NOT NULL, -- Raw OCR results
     processed_data JSON NULL, -- Cleaned and structured data
     confidence_score DECIMAL(5,2) NOT NULL, -- Average confidence
     processing_time DECIMAL(6,3) NOT NULL, -- Seconds
-    
+
     -- Data Classification
     detected_screen_type ENUM('training', 'race', 'character_stats', 'support_cards', 'skills', 'unknown') NOT NULL,
     extraction_success BOOLEAN DEFAULT FALSE,
     validation_errors JSON NULL,
-    
+
     -- Usage Tracking
     used_for_import BOOLEAN DEFAULT FALSE,
     import_character_id BIGINT UNSIGNED NULL,
-    
+
     created_at TIMESTAMP NULL,
     updated_at TIMESTAMP NULL,
-    
+
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (import_character_id) REFERENCES characters(id) ON DELETE SET NULL,
     INDEX idx_ocr_extractions_user (user_id),
@@ -1441,7 +1443,7 @@ class ApiResponse
             'timestamp' => now()->toISOString(),
         ], $code);
     }
-    
+
     public function error(string $message, int $code = 400, $errors = null): JsonResponse
     {
         return response()->json([
@@ -1451,7 +1453,7 @@ class ApiResponse
             'timestamp' => now()->toISOString(),
         ], $code);
     }
-    
+
     public function paginated($data, string $message = 'Success'): JsonResponse
     {
         return response()->json([
@@ -1484,7 +1486,7 @@ class CharacterController extends Controller
         private CharacterService $characterService,
         private ApiResponse $response
     ) {}
-    
+
     /**
      * GET /api/v1/characters
      * List all characters for authenticated user
@@ -1495,10 +1497,10 @@ class CharacterController extends Controller
             $request->user()->id,
             $request->get('scenario_type')
         );
-        
+
         return $this->response->success($characters);
     }
-    
+
     /**
      * POST /api/v1/characters
      * Create new character
@@ -1506,10 +1508,10 @@ class CharacterController extends Controller
     public function store(CreateCharacterRequest $request): JsonResponse
     {
         $character = $this->characterService->createCharacter($request->validated());
-        
+
         return $this->response->success($character, 'Character created successfully', 201);
     }
-    
+
     /**
      * GET /api/v1/characters/{id}
      * Get character details with relationships
@@ -1517,10 +1519,10 @@ class CharacterController extends Controller
     public function show(int $id): JsonResponse
     {
         $character = $this->characterService->getCharacterWithRelations($id);
-        
+
         return $this->response->success($character);
     }
-    
+
     /**
      * PUT /api/v1/characters/{id}
      * Update character information
@@ -1528,7 +1530,7 @@ class CharacterController extends Controller
     public function update(UpdateCharacterRequest $request, int $id): JsonResponse
     {
         $character = $this->characterService->updateCharacter($id, $request->validated());
-        
+
         return $this->response->success($character, 'Character updated successfully');
     }
 }
@@ -1544,7 +1546,7 @@ class TrainingOptimizationController extends Controller
         private TrainingOptimizationService $optimizationService,
         private ApiResponse $response
     ) {}
-    
+
     /**
      * POST /api/v1/characters/{id}/training-predictions
      * Get training predictions for current turn
@@ -1555,10 +1557,10 @@ class TrainingOptimizationController extends Controller
             $characterId,
             $request->validated()
         );
-        
+
         return $this->response->success($predictions);
     }
-    
+
     /**
      * POST /api/v1/characters/{id}/race-strategy
      * Get race strategy recommendations
@@ -1569,10 +1571,10 @@ class TrainingOptimizationController extends Controller
             $characterId,
             $request->validated()
         );
-        
+
         return $this->response->success($strategy);
     }
-    
+
     /**
      * POST /api/v1/characters/{id}/skill-optimization
      * Get skill acquisition recommendations
@@ -1583,7 +1585,7 @@ class TrainingOptimizationController extends Controller
             $characterId,
             $request->validated()
         );
-        
+
         return $this->response->success($optimization);
     }
 }
@@ -1599,7 +1601,7 @@ class AIController extends Controller
         private HybridAIService $aiService,
         private ApiResponse $response
     ) {}
-    
+
     /**
      * POST /api/v1/ai/chat
      * Process AI chat request
@@ -1612,12 +1614,12 @@ class AIController extends Controller
             'character_id' => $request->input('character_id'),
             'conversation_id' => $request->input('conversation_id'),
         ]);
-        
+
         $response = $this->aiService->processRequest($aiRequest);
-        
+
         return $this->response->success($response);
     }
-    
+
     /**
      * GET /api/v1/ai/conversations
      * Get conversation history
@@ -1629,7 +1631,7 @@ class AIController extends Controller
             $request->get('character_id'),
             $request->get('limit', 50)
         );
-        
+
         return $this->response->success($conversations);
     }
 }
@@ -1644,7 +1646,7 @@ class APIRateLimitMiddleware
     public function handle(Request $request, Closure $next, string $maxAttempts = '60', string $decayMinutes = '1')
     {
         $key = $this->resolveRequestSignature($request);
-        
+
         if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {
             return response()->json([
                 'success' => false,
@@ -1652,9 +1654,9 @@ class APIRateLimitMiddleware
                 'retry_after' => RateLimiter::availableIn($key),
             ], 429);
         }
-        
+
         RateLimiter::hit($key, $decayMinutes * 60);
-        
+
         return $next($request);
     }
 }
@@ -1670,7 +1672,7 @@ class APIAuthMiddleware
                 'message' => 'Unauthenticated.',
             ], 401);
         }
-        
+
         return $next($request);
     }
 }
@@ -1740,30 +1742,30 @@ const AppStateContext = createContext();
  */
 const AppStateProvider = ({ children }) => {
   const [state, dispatch] = useReducer(appStateReducer, initialState);
-  
+
   // Character management actions
   const actions = {
     setCurrentCharacter: (character) => {
       dispatch({ type: 'SET_CURRENT_CHARACTER', payload: character });
     },
-    
+
     updateCharacterStats: (stats) => {
       dispatch({ type: 'UPDATE_CHARACTER_STATS', payload: stats });
     },
-    
+
     addTrainingSession: (session) => {
       dispatch({ type: 'ADD_TRAINING_SESSION', payload: session });
     },
-    
+
     updateUI: (uiChanges) => {
       dispatch({ type: 'UPDATE_UI', payload: uiChanges });
     },
-    
+
     cacheAPIResponse: (key, data) => {
       dispatch({ type: 'CACHE_API_RESPONSE', payload: { key, data } });
     }
   };
-  
+
   return (
     <AppStateContext.Provider value={{ state, actions }}>
       {children}
@@ -1795,21 +1797,21 @@ const useAppState = () => {
   --breakpoint-lg: 1024px;
   --breakpoint-xl: 1280px;
   --breakpoint-2xl: 1536px;
-  
+
   /* Container Queries */
   --container-xs: 320px;
   --container-sm: 384px;
   --container-md: 448px;
   --container-lg: 512px;
   --container-xl: 576px;
-  
+
   /* Fluid Typography */
   --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
   --text-sm: clamp(0.875rem, 0.8rem + 0.375vw, 1rem);
   --text-base: clamp(1rem, 0.9rem + 0.5vw, 1.125rem);
   --text-lg: clamp(1.125rem, 1rem + 0.625vw, 1.25rem);
   --text-xl: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);
-  
+
   /* Spacing Scale */
   --space-1: clamp(0.25rem, 0.2rem + 0.25vw, 0.375rem);
   --space-2: clamp(0.5rem, 0.4rem + 0.5vw, 0.75rem);
@@ -1827,18 +1829,18 @@ const useAppState = () => {
 .grid-character-overview {
   display: grid;
   gap: var(--space-4);
-  grid-template-areas: 
+  grid-template-areas:
     "stats"
     "aptitudes"
     "progress";
-    
+
   @container (min-width: 768px) {
-    grid-template-areas: 
+    grid-template-areas:
       "stats aptitudes"
       "progress progress";
     grid-template-columns: 1fr 1fr;
   }
-  
+
   @container (min-width: 1024px) {
     grid-template-areas: "stats aptitudes progress";
     grid-template-columns: 1fr 1fr 1fr;
@@ -1848,11 +1850,11 @@ const useAppState = () => {
 /* Component Responsive Patterns */
 .training-panel {
   @apply flex flex-col gap-4;
-  
+
   @screen md {
     @apply flex-row;
   }
-  
+
   @container (min-width: 640px) {
     .training-option {
       @apply flex-1 min-w-0;
@@ -1872,27 +1874,27 @@ const useAppState = () => {
 const useFocusManagement = (initialFocus = null) => {
   const focusRef = useRef(null);
   const previousFocusRef = useRef(null);
-  
+
   const setFocus = useCallback((element) => {
     if (element) {
       previousFocusRef.current = document.activeElement;
       element.focus();
     }
   }, []);
-  
+
   const restoreFocus = useCallback(() => {
     if (previousFocusRef.current) {
       previousFocusRef.current.focus();
     }
   }, []);
-  
+
   useEffect(() => {
     if (initialFocus && focusRef.current) {
       const element = focusRef.current.querySelector(initialFocus);
       if (element) setFocus(element);
     }
   }, [initialFocus, setFocus]);
-  
+
   return { focusRef, setFocus, restoreFocus };
 };
 
@@ -1903,7 +1905,7 @@ const useFocusManagement = (initialFocus = null) => {
  */
 const useKeyboardNavigation = (items, onSelect) => {
   const [activeIndex, setActiveIndex] = useState(0);
-  
+
   const handleKeyDown = useCallback((event) => {
     switch (event.key) {
       case 'ArrowDown':
@@ -1925,7 +1927,7 @@ const useKeyboardNavigation = (items, onSelect) => {
         break;
     }
   }, [items, activeIndex, onSelect]);
-  
+
   return { activeIndex, handleKeyDown };
 };
 
@@ -1982,34 +1984,34 @@ class AIModelRouter
         'medium' => 4000,    // Token count threshold
         'complex' => 8000,   // Token count threshold
     ];
-    
+
     private const PROCESSING_TIME_LIMITS = [
         'ollama_timeout' => 15,      // Seconds
         'bedrock_fallback' => 30,    // Seconds
     ];
-    
+
     public function selectOptimalModel(AIRequest $request): string
     {
         // Analyze request complexity
         $complexity = $this->analyzeComplexity($request);
         $tokenCount = $request->getTokenCount();
-        
+
         // Route based on complexity and requirements
         if ($this->requiresAdvancedReasoning($request)) {
             return $this->selectBedrockModel($complexity);
         }
-        
+
         if ($tokenCount > self::COMPLEXITY_THRESHOLDS['complex']) {
             return 'bedrock_nova_pro';
         }
-        
+
         if ($this->isOllamaAvailable() && $tokenCount <= self::COMPLEXITY_THRESHOLDS['medium']) {
             return $this->selectOllamaModel($complexity);
         }
-        
+
         return $this->selectBedrockModel($complexity);
     }
-    
+
     private function selectOllamaModel(string $complexity): string
     {
         return match($complexity) {
@@ -2019,7 +2021,7 @@ class AIModelRouter
             default => 'ollama_llama3.3:8b'
         };
     }
-    
+
     private function selectBedrockModel(string $complexity): string
     {
         return match($complexity) {
@@ -2029,11 +2031,11 @@ class AIModelRouter
             default => 'bedrock_nova_pro'
         };
     }
-    
+
     private function requiresAdvancedReasoning(AIRequest $request): bool
     {
-        return $request->hasMultiStepReasoning() 
-            || $request->requiresRAG() 
+        return $request->hasMultiStepReasoning()
+            || $request->requiresRAG()
             || $request->hasComplexGameMechanics()
             || $request->requiresStrategicPlanning();
     }
@@ -2048,27 +2050,27 @@ class UmamusumePromptEngine
 {
     private const SYSTEM_PROMPTS = [
         'career_advisor' => 'You are an expert Umamusume Pretty Derby career advisor with comprehensive knowledge of game mechanics, optimal training strategies, and meta analysis. You provide precise, actionable advice based on character stats, aptitudes, and career goals.',
-        
+
         'training_optimizer' => 'You are a training optimization specialist for Umamusume Pretty Derby. You analyze character state, support card effects, and scenario mechanics to recommend optimal training sequences that maximize stat gains and skill acquisition.',
-        
+
         'race_strategist' => 'You are a race strategy expert for Umamusume Pretty Derby. You evaluate character readiness, race requirements, and optimal running styles to maximize race performance and goal completion.',
-        
+
         'skill_specialist' => 'You are a skill acquisition specialist for Umamusume Pretty Derby. You optimize SP allocation, hint collection strategies, and skill evolution paths to maximize character potential within SP constraints.'
     ];
-    
+
     public function buildPrompt(AIRequest $request): string
     {
         $systemPrompt = $this->getSystemPrompt($request->getType());
         $contextData = $this->buildContextData($request);
         $userQuery = $request->getMessage();
-        
+
         return $this->assemblePrompt($systemPrompt, $contextData, $userQuery);
     }
-    
+
     private function buildContextData(AIRequest $request): array
     {
         $context = [];
-        
+
         if ($request->hasCharacterContext()) {
             $character = $request->getCharacter();
             $context['character'] = [
@@ -2081,7 +2083,7 @@ class UmamusumePromptEngine
                 'turn' => $character->current_turn,
                 'career_stage' => $character->career_stage,
             ];
-            
+
             if ($character->supportCards->isNotEmpty()) {
                 $context['support_cards'] = $character->supportCards->map(function ($card) {
                     return [
@@ -2092,7 +2094,7 @@ class UmamusumePromptEngine
                     ];
                 })->toArray();
             }
-            
+
             if ($character->skills->isNotEmpty()) {
                 $context['skills'] = [
                     'acquired' => $character->skills->where('is_acquired', true)->pluck('skill_name'),
@@ -2106,7 +2108,7 @@ class UmamusumePromptEngine
                 ];
             }
         }
-        
+
         if ($request->hasCareerContext()) {
             $career = $request->getCareer();
             $context['career'] = [
@@ -2120,22 +2122,22 @@ class UmamusumePromptEngine
                     ->toArray(),
             ];
         }
-        
+
         return $context;
     }
-    
+
     private function assemblePrompt(string $systemPrompt, array $context, string $userQuery): string
     {
         $prompt = $systemPrompt . "\n\n";
-        
+
         if (!empty($context)) {
             $prompt .= "Current Context:\n";
             $prompt .= json_encode($context, JSON_PRETTY_PRINT) . "\n\n";
         }
-        
+
         $prompt .= "User Query: " . $userQuery . "\n\n";
         $prompt .= "Please provide a detailed, actionable response based on the current context and game mechanics.";
-        
+
         return $prompt;
     }
 }
@@ -2149,49 +2151,49 @@ class AIConversationManager
 {
     private const MAX_CONTEXT_TOKENS = 8000;
     private const CONTEXT_COMPRESSION_RATIO = 0.7;
-    
+
     public function __construct(
         private ConversationRepository $conversationRepo,
         private CacheManager $cache
     ) {}
-    
+
     public function getConversationContext(string $conversationId, int $maxTokens = null): array
     {
         $maxTokens = $maxTokens ?? self::MAX_CONTEXT_TOKENS;
-        
+
         $cacheKey = "conversation_context_{$conversationId}_{$maxTokens}";
-        
+
         return $this->cache->remember($cacheKey, 300, function () use ($conversationId, $maxTokens) {
             $messages = $this->conversationRepo->getRecentMessages($conversationId, 50);
-            
+
             return $this->compressContext($messages, $maxTokens);
         });
     }
-    
+
     public function addMessage(string $conversationId, AIMessage $message): void
     {
         $this->conversationRepo->storeMessage($conversationId, $message);
-        
+
         // Invalidate context cache
         $this->cache->tags(['conversation', $conversationId])->flush();
-        
+
         // Trigger background context optimization
         OptimizeConversationContext::dispatch($conversationId);
     }
-    
+
     private function compressContext(Collection $messages, int $maxTokens): array
     {
         $totalTokens = $messages->sum('token_count');
-        
+
         if ($totalTokens <= $maxTokens) {
             return $messages->toArray();
         }
-        
+
         // Implement intelligent context compression
         $compressed = [];
         $currentTokens = 0;
         $targetTokens = (int)($maxTokens * self::CONTEXT_COMPRESSION_RATIO);
-        
+
         // Always include the most recent messages
         foreach ($messages->reverse() as $message) {
             if ($currentTokens + $message->token_count <= $targetTokens) {
@@ -2201,7 +2203,7 @@ class AIConversationManager
                 break;
             }
         }
-        
+
         return array_reverse($compressed);
     }
 }
@@ -2222,13 +2224,13 @@ return [
         'localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,::1',
         Sanctum::currentApplicationUrlWithPort()
     ))),
-    
+
     'guard' => ['web'],
-    
+
     'expiration' => null, // Never expire for local app
-    
+
     'token_prefix' => env('SANCTUM_TOKEN_PREFIX', ''),
-    
+
     'middleware' => [
         'authenticate_session' => Laravel\Sanctum\Http\Middleware\AuthenticateSession::class,
         'encrypt_cookies' => App\Http\Middleware\EncryptCookies::class,
@@ -2243,36 +2245,36 @@ class AuthenticationService
         private UserRepository $userRepo,
         private RateLimiter $rateLimiter
     ) {}
-    
+
     public function authenticate(LoginRequest $request): AuthResult
     {
         $this->checkRateLimit($request->ip());
-        
+
         $credentials = $request->only(['email', 'password']);
-        
+
         if (!Auth::attempt($credentials, $request->boolean('remember'))) {
             $this->incrementRateLimit($request->ip());
-            
+
             throw new AuthenticationException('Invalid credentials');
         }
-        
+
         $user = Auth::user();
         $token = $user->createToken('umamusume-career-planner')->plainTextToken;
-        
+
         return new AuthResult([
             'user' => $user,
             'token' => $token,
             'expires_at' => null, // Local app - no expiration
         ]);
     }
-    
+
     private function checkRateLimit(string $ip): void
     {
         $key = "login_attempts:{$ip}";
-        
+
         if ($this->rateLimiter->tooManyAttempts($key, 5)) {
             $seconds = $this->rateLimiter->availableIn($key);
-            
+
             throw new TooManyRequestsException(
                 "Too many login attempts. Try again in {$seconds} seconds."
             );
@@ -2291,7 +2293,7 @@ class CreateCharacterRequest extends FormRequest
     {
         return $this->user()->can('create', Character::class);
     }
-    
+
     public function rules(): array
     {
         return [
@@ -2349,7 +2351,7 @@ class CreateCharacterRequest extends FormRequest
             ],
         ];
     }
-    
+
     public function messages(): array
     {
         return [
@@ -2359,7 +2361,7 @@ class CreateCharacterRequest extends FormRequest
             'aptitudes.*.in' => 'Aptitude values must be valid grades from G to SS.',
         ];
     }
-    
+
     protected function prepareForValidation(): void
     {
         // Sanitize input data
@@ -2374,15 +2376,15 @@ class CreateCharacterRequest extends FormRequest
 class ValidAptitudeGrade implements Rule
 {
     private const VALID_GRADES = [
-        'G', 'G+', 'F', 'F+', 'E', 'E+', 'D', 'D+', 
+        'G', 'G+', 'F', 'F+', 'E', 'E+', 'D', 'D+',
         'C', 'C+', 'B', 'B+', 'A', 'A+', 'S', 'S+', 'SS'
     ];
-    
+
     public function passes($attribute, $value): bool
     {
         return in_array($value, self::VALID_GRADES, true);
     }
-    
+
     public function message(): string
     {
         return 'The :attribute must be a valid aptitude grade (G through SS).';
@@ -2399,24 +2401,24 @@ class DataEncryptionService
     public function __construct(
         private Encrypter $encrypter
     ) {}
-    
+
     public function encryptSensitiveData(array $data): array
     {
         $sensitiveFields = ['email', 'personal_notes', 'external_api_keys'];
-        
+
         foreach ($sensitiveFields as $field) {
             if (isset($data[$field])) {
                 $data[$field] = $this->encrypter->encrypt($data[$field]);
             }
         }
-        
+
         return $data;
     }
-    
+
     public function decryptSensitiveData(array $data): array
     {
         $sensitiveFields = ['email', 'personal_notes', 'external_api_keys'];
-        
+
         foreach ($sensitiveFields as $field) {
             if (isset($data[$field])) {
                 try {
@@ -2427,7 +2429,7 @@ class DataEncryptionService
                 }
             }
         }
-        
+
         return $data;
     }
 }
@@ -2444,22 +2446,22 @@ class PrivacyComplianceMiddleware
                 '_original_data' => $this->filterPersonalData($request->all())
             ]);
         }
-        
+
         $response = $next($request);
-        
+
         // Add privacy headers
         $response->headers->set('X-Content-Type-Options', 'nosniff');
         $response->headers->set('X-Frame-Options', 'DENY');
         $response->headers->set('X-XSS-Protection', '1; mode=block');
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
-        
+
         return $response;
     }
-    
+
     private function containsPersonalData(Request $request): bool
     {
         $personalFields = ['email', 'name', 'password', 'phone', 'address'];
-        
+
         return collect($personalFields)->some(function ($field) use ($request) {
             return $request->has($field);
         });
@@ -2482,7 +2484,7 @@ class AdvancedCacheManager
         'redis' => 'redis',       // Redis for session/application cache
         'database' => 'database', // Database for persistent cache
     ];
-    
+
     private const TTL_STRATEGIES = [
         'training_predictions' => 300,    // 5 minutes
         'character_data' => 3600,         // 1 hour
@@ -2490,37 +2492,37 @@ class AdvancedCacheManager
         'static_game_data' => 86400,      // 24 hours
         'user_preferences' => 604800,     // 1 week
     ];
-    
+
     public function __construct(
         private CacheManager $cache,
         private RedisManager $redis
     ) {}
-    
+
     public function remember(string $key, string $strategy, callable $callback)
     {
         $ttl = self::TTL_STRATEGIES[$strategy] ?? 3600;
-        
+
         // Try memory cache first
         if ($cached = $this->getFromMemory($key)) {
             return $cached;
         }
-        
+
         // Try Redis cache
         if ($cached = $this->getFromRedis($key)) {
             $this->storeInMemory($key, $cached, 60); // 1 minute memory cache
             return $cached;
         }
-        
+
         // Generate fresh data
         $data = $callback();
-        
+
         // Store in all tiers
         $this->storeInRedis($key, $data, $ttl);
         $this->storeInMemory($key, $data, 60);
-        
+
         return $data;
     }
-    
+
     public function invalidatePattern(string $pattern): void
     {
         // Invalidate Redis keys matching pattern
@@ -2528,11 +2530,11 @@ class AdvancedCacheManager
         if (!empty($keys)) {
             $this->redis->del($keys);
         }
-        
+
         // Clear memory cache
         $this->clearMemoryPattern($pattern);
     }
-    
+
     public function warmCache(): void
     {
         // Warm frequently accessed data
@@ -2540,20 +2542,20 @@ class AdvancedCacheManager
         $this->warmUserPreferences();
         $this->warmExternalAPIData();
     }
-    
+
     private function warmStaticGameData(): void
     {
         // Pre-load character base stats, aptitudes, skills
         $gameDataService = app(GameDataService::class);
-        
+
         $this->remember('game_data:characters', 'static_game_data', function () use ($gameDataService) {
             return $gameDataService->getAllCharacterData();
         });
-        
+
         $this->remember('game_data:skills', 'static_game_data', function () use ($gameDataService) {
             return $gameDataService->getAllSkillData();
         });
-        
+
         $this->remember('game_data:support_cards', 'static_game_data', function () use ($gameDataService) {
             return $gameDataService->getAllSupportCardData();
         });
@@ -2575,18 +2577,18 @@ class DatabaseOptimizer
             $table->index(['user_id', 'created_at'], 'idx_user_created');
             $table->index(['scenario_type', 'career_stage'], 'idx_scenario_stage');
         });
-        
+
         Schema::table('training_sessions', function (Blueprint $table) {
             $table->index(['career_id', 'turn_number'], 'idx_career_turn');
             $table->index(['training_type', 'created_at'], 'idx_type_created');
         });
-        
+
         Schema::table('skills', function (Blueprint $table) {
             $table->index(['character_id', 'is_acquired'], 'idx_character_acquired');
             $table->index(['skill_type', 'sp_cost'], 'idx_type_cost');
         });
     }
-    
+
     public function configureConnectionPooling(): void
     {
         // Configure MySQL connection pooling
@@ -2599,18 +2601,18 @@ class DatabaseOptimizer
             ]
         ]);
     }
-    
+
     public function enableQueryOptimization(): void
     {
         // Enable Eloquent strict mode
         Model::shouldBeStrict();
-        
+
         // Prevent lazy loading in production
         Model::preventLazyLoading(!app()->isProduction());
-        
+
         // Prevent silently discarding attributes
         Model::preventSilentlyDiscardingAttributes(!app()->isProduction());
-        
+
         // Prevent accessing missing attributes
         Model::preventAccessingMissingAttributes(!app()->isProduction());
     }
@@ -2623,7 +2625,7 @@ class OptimizedCharacterRepository implements CharacterRepositoryInterface
         private Character $model,
         private CacheManager $cache
     ) {}
-    
+
     public function findWithOptimizedRelations(int $id): ?Character
     {
         return $this->cache->remember("character_full_{$id}", 3600, function () use ($id) {
@@ -2652,20 +2654,20 @@ class OptimizedCharacterRepository implements CharacterRepositoryInterface
                 ->find($id);
         });
     }
-    
+
     public function getUserCharactersOptimized(int $userId, ?string $scenarioType = null): Collection
     {
         $cacheKey = "user_characters_{$userId}" . ($scenarioType ? "_{$scenarioType}" : '');
-        
+
         return $this->cache->remember($cacheKey, 1800, function () use ($userId, $scenarioType) {
             $query = $this->model
                 ->select(['id', 'name', 'scenario_type', 'career_stage', 'current_turn', 'created_at'])
                 ->where('user_id', $userId);
-                
+
             if ($scenarioType) {
                 $query->where('scenario_type', $scenarioType);
             }
-            
+
             return $query->orderBy('created_at', 'desc')->get();
         });
     }
@@ -2681,53 +2683,53 @@ class OptimizedCharacterRepository implements CharacterRepositoryInterface
 class CalculateTrainingPredictionsJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-    
+
     public int $timeout = 120;
     public int $tries = 3;
     public int $maxExceptions = 2;
-    
+
     public function __construct(
         private int $characterId,
         private array $trainingOptions,
         private string $cacheKey
     ) {}
-    
+
     public function handle(TrainingPredictionEngine $engine, CacheManager $cache): void
     {
         try {
             $character = Character::with(['aptitudes', 'supportCards', 'skills'])->find($this->characterId);
-            
+
             if (!$character) {
                 Log::warning("Character not found for training prediction", ['id' => $this->characterId]);
                 return;
             }
-            
+
             $predictions = $engine->calculatePredictions($character, $this->trainingOptions);
-            
+
             // Cache results for 5 minutes
             $cache->put($this->cacheKey, $predictions, 300);
-            
+
             // Broadcast to user via WebSocket
             broadcast(new TrainingPredictionsCalculated($character->user_id, $predictions));
-            
+
         } catch (Exception $e) {
             Log::error("Training prediction calculation failed", [
                 'character_id' => $this->characterId,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             throw $e;
         }
     }
-    
+
     public function failed(Throwable $exception): void
     {
         Log::error("Training prediction job failed permanently", [
             'character_id' => $this->characterId,
             'error' => $exception->getMessage()
         ]);
-        
+
         // Notify user of failure
         broadcast(new TrainingPredictionFailed($this->characterId));
     }
@@ -2737,7 +2739,7 @@ class CalculateTrainingPredictionsJob implements ShouldQueue
 // config/queue.php
 return [
     'default' => env('QUEUE_CONNECTION', 'redis'),
-    
+
     'connections' => [
         'redis' => [
             'driver' => 'redis',
@@ -2748,12 +2750,12 @@ return [
             'after_commit' => false,
         ],
     ],
-    
+
     'batching' => [
         'database' => env('DB_CONNECTION', 'mysql'),
         'table' => 'job_batches',
     ],
-    
+
     'failed' => [
         'driver' => env('QUEUE_FAILED_DRIVER', 'database-uuids'),
         'database' => env('DB_CONNECTION', 'mysql'),
@@ -2777,7 +2779,7 @@ return [
             ],
         ],
     ],
-    
+
     'trim' => [
         'recent' => 60,
         'pending' => 60,
@@ -2906,13 +2908,13 @@ Property-based testing (PBT) validates software correctness by testing universal
 abstract class UmamusumeException extends Exception
 {
     protected array $context = [];
-    
+
     public function __construct(string $message = '', array $context = [], int $code = 0, ?Throwable $previous = null)
     {
         $this->context = $context;
         parent::__construct($message, $code, $previous);
     }
-    
+
     public function getContext(): array
     {
         return $this->context;
@@ -2935,7 +2937,7 @@ class Handler extends ExceptionHandler
         ModelNotFoundException::class,
         ValidationException::class,
     ];
-    
+
     public function register(): void
     {
         $this->reportable(function (UmamusumeException $e) {
@@ -2946,7 +2948,7 @@ class Handler extends ExceptionHandler
                 'trace' => $e->getTraceAsString(),
             ]);
         });
-        
+
         $this->renderable(function (UmamusumeException $e, Request $request) {
             if ($request->expectsJson()) {
                 return response()->json([
@@ -2956,7 +2958,7 @@ class Handler extends ExceptionHandler
                     'context' => $e->getContext(),
                 ], 400);
             }
-            
+
             return back()->withErrors(['error' => $e->getMessage()]);
         });
     }
@@ -2972,16 +2974,16 @@ class CircuitBreaker
     private const FAILURE_THRESHOLD = 5;
     private const RECOVERY_TIMEOUT = 60; // seconds
     private const HALF_OPEN_MAX_CALLS = 3;
-    
+
     public function __construct(
         private CacheManager $cache,
         private string $serviceName
     ) {}
-    
+
     public function call(callable $operation)
     {
         $state = $this->getState();
-        
+
         switch ($state['status']) {
             case 'closed':
                 return $this->callClosed($operation);
@@ -2991,7 +2993,7 @@ class CircuitBreaker
                 return $this->callHalfOpen($operation);
         }
     }
-    
+
     private function callClosed(callable $operation)
     {
         try {
@@ -3003,19 +3005,19 @@ class CircuitBreaker
             throw $e;
         }
     }
-    
+
     private function callOpen(callable $operation)
     {
         $state = $this->getState();
-        
+
         if (time() - $state['last_failure'] > self::RECOVERY_TIMEOUT) {
             $this->setState('half_open');
             return $this->callHalfOpen($operation);
         }
-        
+
         throw new CircuitBreakerOpenException("Circuit breaker is open for {$this->serviceName}");
     }
-    
+
     private function callHalfOpen(callable $operation)
     {
         try {
@@ -3027,22 +3029,22 @@ class CircuitBreaker
             throw $e;
         }
     }
-    
+
     private function onSuccess(): void
     {
         $this->cache->forget("circuit_breaker_{$this->serviceName}");
     }
-    
+
     private function onFailure(): void
     {
         $state = $this->getState();
         $state['failure_count']++;
         $state['last_failure'] = time();
-        
+
         if ($state['failure_count'] >= self::FAILURE_THRESHOLD) {
             $state['status'] = 'open';
         }
-        
+
         $this->cache->put("circuit_breaker_{$this->serviceName}", $state, 3600);
     }
 }
@@ -3080,16 +3082,16 @@ The system employs both unit testing and property-based testing as complementary
 // Property-Based Test Example
 test('character stats remain within valid bounds after any update', function () {
     // Feature: umamusume-career-planner-main, Property 1: Character State Consistency
-    
+
     $this->forAll(
         Generator\choose(0, 1200), // speed
-        Generator\choose(0, 1200), // stamina  
+        Generator\choose(0, 1200), // stamina
         Generator\choose(0, 1200), // power
         Generator\choose(0, 1200), // guts
         Generator\choose(0, 1200)  // wit
     )->then(function ($speed, $stamina, $power, $guts, $wit) {
         $character = Character::factory()->create();
-        
+
         $character->updateStats([
             'speed' => $speed,
             'stamina' => $stamina,
@@ -3097,7 +3099,7 @@ test('character stats remain within valid bounds after any update', function () 
             'guts' => $guts,
             'wit' => $wit,
         ]);
-        
+
         expect($character->speed_stat)->toBeBetween(0, 1200);
         expect($character->stamina_stat)->toBeBetween(0, 1200);
         expect($character->power_stat)->toBeBetween(0, 1200);
@@ -3127,9 +3129,9 @@ test('character creation with valid data succeeds', function () {
             'dirt_aptitude' => 'C+',
         ],
     ];
-    
+
     $character = Character::create($userData);
-    
+
     expect($character->name)->toBe('Test Character');
     expect($character->scenario_type)->toBe('ura_finale');
     expect($character->speed_stat)->toBe(300);

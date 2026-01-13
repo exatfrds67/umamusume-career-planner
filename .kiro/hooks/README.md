@@ -7,7 +7,7 @@ This directory contains automated markdown linting hooks that follow the officia
 The markdown linting system consists of four specialized hooks, each designed for different use cases:
 
 1. **Real-time Markdown Linter** - Fast feedback on file saves
-2. **Documentation Quality Checker** - Comprehensive docs analysis  
+2. **Documentation Quality Checker** - Comprehensive docs analysis
 3. **Parallel Lint Workflow** - Advanced comprehensive linting
 4. **Manual Markdown Audit** - On-demand comprehensive audits
 
@@ -189,7 +189,7 @@ Edit the `instructions` field in each `.kiro.hook` file to customize behavior:
 
 ```
 ✅ PASSED: No issues found in README.md
-⚠️ WARNINGS: 
+⚠️ WARNINGS:
   - Line 23: Consider adding alt text to image
 ❌ ERRORS:
   - Line 45: Broken internal link to ./docs/guide.md
@@ -254,7 +254,7 @@ kiro hook run manual-markdown-audit --scope=docs --depth=quick
   "tasks": [
     {
       "label": "Lint Markdown",
-      "type": "shell", 
+      "type": "shell",
       "command": "kiro hook run parallel-lint-workflow",
       "group": "build"
     }

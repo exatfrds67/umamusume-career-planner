@@ -326,6 +326,7 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - laravel/framework (LARAVEL) - v12
 - laravel/prompts (PROMPTS) - v0
 - laravel/sanctum (SANCTUM) - v4
+- larastan/larastan (LARASTAN) - v3
 - laravel/horizon (HORIZON) - v5
 - laravel/mcp (MCP) - v0
 - laravel/pint (PINT) - v1
@@ -333,6 +334,7 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - laravel/telescope (TELESCOPE) - v5
 - pestphp/pest (PEST) - v3
 - phpunit/phpunit (PHPUNIT) - v11
+- tailwindcss (TAILWINDCSS) - v4
 
 ## Conventions
 
@@ -439,6 +441,13 @@ protected function isAccessible(User $user, ?string $path = null): bool
 ## Enums
 
 - Typically, keys in an Enum should be TitleCase. For example: `FavoritePerson`, `BestLake`, `Monthly`.
+
+=== tests rules ===
+
+## Test Enforcement
+
+- Every change must be programmatically tested. Write a new test or update an existing test, then run the affected tests to make sure they pass.
+- Run the minimum number of tests needed to ensure code quality and speed. Use `php artisan test --compact` with a specific filename or filter.
 
 === laravel/core rules ===
 
@@ -587,4 +596,148 @@ it('has emails', function (string $email) {
     'taylor' => 'taylor@laravel.com',
 ]);
 </code-snippet>
+
+=== tailwindcss/core rules ===
+
+## Tailwind CSS
+
+- Use Tailwind CSS classes to style HTML; check and use existing Tailwind conventions within the project before writing your own.
+- Offer to extract repeated patterns into components that match the project's conventions (i.e. Blade, JSX, Vue, etc.).
+- Think through class placement, order, priority, and defaults. Remove redundant classes, add classes to parent or child carefully to limit repetition, and group elements logically.
+- You can use the `search-docs` tool to get exact examples from the official documentation when needed.
+
+### Spacing
+
+- When listing items, use gap utilities for spacing; don't use margins.
+
+<code-snippet name="Valid Flex Gap Spacing Example" lang="html">
+    <div class="flex gap-8">
+        <div>Superior</div>
+        <div>Michigan</div>
+        <div>Erie</div>
+    </div>
+</code-snippet>
+
+### Dark Mode
+
+- If existing pages and components support dark mode, new pages and components must support dark mode in a similar way, typically using `dark:`.
+
+=== tailwindcss/v4 rules ===
+
+## Tailwind CSS 4
+
+- Always use Tailwind CSS v4; do not use the deprecated utilities.
+- `corePlugins` is not supported in Tailwind v4.
+- In Tailwind v4, configuration is CSS-first using the `@theme` directive — no separate `tailwind.config.js` file is needed.
+
+<code-snippet name="Extending Theme in CSS" lang="css">
+@theme {
+  --color-brand: oklch(0.72 0.11 178);
+}
+</code-snippet>
+
+- In Tailwind v4, you import Tailwind using a regular CSS `@import` statement, not using the `@tailwind` directives used in v3:
+
+<code-snippet name="Tailwind v4 Import Tailwind Diff" lang="diff">
+   - @tailwind base;
+   - @tailwind components;
+   - @tailwind utilities;
+   + @import "tailwindcss";
+</code-snippet>
+
+### Replaced Utilities
+
+- Tailwind v4 removed deprecated utilities. Do not use the deprecated option; use the replacement.
+- Opacity values are still numeric.
+
+| Deprecated | Replacement |
+|------------+--------------|
+| bg-opacity-*| bg-black/* |
+| text-opacity-*| text-black/* |
+| border-opacity-*| border-black/* |
+| divide-opacity-*| divide-black/* |
+| ring-opacity-*| ring-black/* |
+| placeholder-opacity-*| placeholder-black/* |
+| flex-shrink-*| shrink-* |
+| flex-grow-*| grow-* |
+| overflow-ellipsis | text-ellipsis |
+| decoration-slice | box-decoration-slice |
+| decoration-clone | box-decoration-clone |
 </laravel-boost-guidelines>
+
+## Development Environment Issues
+
+### Cross-Platform Command Execution (Windows/WSL)
+
+#### PowerShell/WSL Command Chain Errors
+
+##### Error: "grep: The term 'grep' is not recognized" / "wc: The term 'wc' is not recognized"
+
+**When it happens:**
+This error occurs when trying to use Unix commands (`grep`, `wc`, `awk`, etc.) directly in PowerShell instead of within WSL context.
+
+**Incorrect usage:**
+
+```powershell
+wsl ps aux | grep horizon  # This fails because grep runs in PowerShell context
+wsl cat file.txt | wc -l   # This fails because wc runs in PowerShell context
+```
+
+**Correct usage:**
+
+```powershell
+wsl bash -c "ps aux | grep horizon"  # This works because grep runs in WSL context
+wsl bash -c "cat file.txt | wc -l"   # This works because wc runs in WSL context
+```
+
+**Command Execution Rules:**
+
+- Always wrap Unix command chains in `wsl bash -c "command1 | command2"`
+- Never pipe WSL output directly to Unix commands in PowerShell
+- Use PowerShell equivalents when working in Windows context:
+  - `grep` → `Select-String`
+  - `wc -l` → `Measure-Object -Line`
+  - `ps aux` → `Get-Process`
+  - `kill` → `Stop-Process`
+
+**Error Prevention:**
+
+- Test command syntax before execution
+- Use proper WSL context wrapping for Unix command chains
+- Document working command patterns for future reference
+
+### Tool Execution Errors
+
+#### String Replacement Tool Errors
+
+##### Error: "No path provided"
+
+**When it happens:**
+This error occurs when using the `strReplace` tool without providing the required `path` parameter. Common causes:
+
+1. Copy-pasting incomplete function calls
+2. Accidentally submitting empty or incomplete strReplace calls
+3. System glitches that clear parameters before submission
+
+**Resolution:**
+Always ensure the `strReplace` call includes all required parameters:
+
+- `path`: The file path to modify
+- `oldStr`: The exact text to replace
+- `newStr`: The replacement text
+
+**Example of correct usage:**
+
+```text
+strReplace(
+  path="docs/example.md",
+  oldStr="**Bold Text**",
+  newStr="### Bold Text"
+)
+```
+
+**Best Practices:**
+
+- Double-check all parameters before submitting
+- Use specific context when replacing text that appears multiple times
+- Test with small, unique text patterns first

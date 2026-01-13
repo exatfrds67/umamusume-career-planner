@@ -2,20 +2,24 @@
 
 namespace App\Services\MCP;
 
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
 
 class MCPClientService
 {
+    /** @var array<string, mixed> */
     protected array $servers;
+
     protected bool $enabled;
+
     protected bool $debug;
 
     public function __construct()
     {
-        $this->enabled = Config::get('mcp.enabled', true);
-        $this->debug = Config::get('mcp.debug', false);
-        $this->servers = Config::get('mcp.servers', []);
+        $this->enabled = (bool) Config::get('mcp.enabled', true);
+        $this->debug = (bool) Config::get('mcp.debug', false);
+        $servers = Config::get('mcp.servers', []);
+        $this->servers = is_array($servers) ? $servers : [];
     }
 
     /**
@@ -28,6 +32,8 @@ class MCPClientService
 
     /**
      * Get all configured MCP servers
+     *
+     * @return array<string, mixed>
      */
     public function getServers(): array
     {
@@ -36,10 +42,14 @@ class MCPClientService
 
     /**
      * Get a specific MCP server configuration
+     *
+     * @return array<string, mixed>|null
      */
     public function getServer(string $name): ?array
     {
-        return $this->servers[$name] ?? null;
+        $server = $this->servers[$name] ?? null;
+
+        return is_array($server) ? $server : null;
     }
 
     /**
@@ -48,20 +58,30 @@ class MCPClientService
     public function isServerEnabled(string $name): bool
     {
         $server = $this->getServer($name);
+
         return $server && ($server['enabled'] ?? false);
     }
 
     /**
      * Get server capabilities
+     *
+     * @return array<string, mixed>
      */
     public function getServerCapabilities(string $name): array
     {
         $server = $this->getServer($name);
-        return $server['capabilities'] ?? [];
+        if (! $server) {
+            return [];
+        }
+        $capabilities = $server['capabilities'] ?? [];
+
+        return is_array($capabilities) ? $capabilities : [];
     }
 
     /**
      * Log MCP operations if debug is enabled
+     *
+     * @param  array<string, mixed>  $context
      */
     protected function debugLog(string $message, array $context = []): void
     {
@@ -74,25 +94,32 @@ class MCPClientService
      * Health check for MCP servers
      * Note: This is a placeholder - actual implementation would require
      * MCP protocol implementation or external MCP client library
+     *
+     * @return array<string, array{status: string, message: string, capabilities?: array<string, mixed>}>
      */
     public function healthCheck(): array
     {
         $results = [];
 
         foreach ($this->servers as $name => $config) {
-            if (!($config['enabled'] ?? false)) {
-                $results[$name] = [
-                    'status' => 'disabled',
-                    'message' => 'Server is disabled in configuration'
-                ];
+            if (! is_array($config)) {
                 continue;
             }
 
-            // Placeholder health check
+            if (! ($config['enabled'] ?? false)) {
+                $results[$name] = [
+                    'status' => 'disabled',
+                    'message' => 'Server is disabled in configuration',
+                ];
+
+                continue;
+            }
+
+            $capabilities = $config['capabilities'] ?? [];
             $results[$name] = [
                 'status' => 'unknown',
                 'message' => 'Health check not implemented - requires MCP client library',
-                'capabilities' => $config['capabilities'] ?? []
+                'capabilities' => is_array($capabilities) ? $capabilities : [],
             ];
         }
 

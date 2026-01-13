@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.0  
-**Date**: 2026-01-12  
-**Project**: UmamusumeCareerPlanner  
-**Author**: Development Team  
-**Status**: Final  
+**Document Version**: 3.0
+**Date**: 2026-01-12
+**Project**: UmamusumeCareerPlanner
+**Author**: Development Team
+**Status**: Final - Consolidated Structure
 
 ---
 
@@ -16,6 +16,7 @@
 2. [Document Catalog](#2-document-catalog)
 3. [Document Dependencies](#3-document-dependencies)
 4. [Quick Reference Guide](#4-quick-reference-guide)
+5. [Archive Structure](#5-archive-structure)
 
 ---
 
@@ -23,7 +24,17 @@
 
 This index provides a comprehensive reference to all documentation in the Umamusume Career Planner project, including document relationships, dependencies, and quick access guides.
 
-### 1.1 Documentation Suite Summary
+### 1.1 Documentation Structure
+
+The documentation has been consolidated and organized as follows:
+
+- **Active Documents**: Current, canonical versions of all specification documents
+- **Archive Structure**: Historical versions and completed task summaries organized in `docs/archive/`
+  - `versions/`: Previous versions of documents (e.g., design_document_v0.1.0.md)
+  - `task-summaries/`: Completed task summaries and implementation reports
+  - `superseded/`: Documents replaced by newer consolidated versions
+
+### 1.2 Documentation Suite Summary
 
 | Category | Documents | Purpose |
 | -------- | --------- | ------- |
@@ -108,6 +119,18 @@ This index provides a comprehensive reference to all documentation in the Umamus
   - Hybrid AI processing design
   - Database design and API specifications
   - UI/UX design with accessibility
+
+#### docs/frontend/design_document.md
+
+- **Purpose**: Frontend design specifications and UI/UX guidelines
+- **Audience**: Frontend developers, UI/UX designers
+- **Dependencies**: 004_SDS
+- **Key Content**:
+  - Component design specifications
+  - User interface layouts and interactions
+  - Accessibility requirements
+  - Progressive Web App features
+- **Note**: Previous versions (v0.1.0, v0.1.1, v0.2.2) archived in `docs/archive/versions/`
 
 ### 2.5 Migration Documents
 
@@ -297,12 +320,48 @@ This index provides a comprehensive reference to all documentation in the Umamus
 
 ---
 
+## 5. Archive Structure
+
+### 5.1 Archived Documents
+
+The following documents have been moved to the archive to maintain a clean, focused documentation structure:
+
+#### docs/archive/versions/
+
+- `design_document_v0.1.0.md` - Initial frontend design document
+- `design_document_v0.1.1.md` - First revision of frontend design
+- `design_document_v0.2.2.md` - Second major revision of frontend design
+
+#### docs/archive/task-summaries/
+
+- `TASK_1_3_2_COMPLETION_SUMMARY.md` - MCP Server Integration Documentation Standardization
+- `TASK_1_3_3_COMPLETION_SUMMARY.md` - Database Schema Alignment Verification
+- `TASK_1_3_6_COMPLETION_SUMMARY.md` - Implementation Readiness and Continuation Prompts
+- `TASK_1_3_6_FINAL_COMPLETION_SUMMARY.md` - Final completion summary for Task 1.3.6
+- `TASK_1_3_6_IMPLEMENTATION_READINESS_REPORT.md` - Implementation readiness report
+- `TASK_1_4_IMPLEMENTATION_PROMPTS.md` - Implementation prompts for Task 1.4
+- `PHASE_2_IMPLEMENTATION_READINESS_CHECKLIST.md` - Phase 2 readiness checklist
+- `STANDARDIZATION_SUMMARY.md` - Documentation standardization summary
+- `DESIGN_SYSTEM_IMPLEMENTATION_SUMMARY.md` - Design system implementation summary
+- `PWA_IMPLEMENTATION_SUMMARY.md` - PWA implementation summary
+
+#### docs/archive/superseded/
+
+- `summary_1.md` - Initial project summary (superseded by current documentation)
+
+### 5.2 Archive Access
+
+Archived documents remain accessible for historical reference and can be found in their respective archive subdirectories. These documents provide valuable context for project evolution but are no longer part of the active documentation suite.
+
+---
+
 ## Document Control
 
 | Version | Date | Author | Changes |
 | ------- | ---- | ------ | ------- |
 | 1.0 | 2026-01-12 | Development Team | Initial index creation |
 | 2.0 | 2026-01-12 | Development Team | Updated completion status for 008_SIS and 017_SUM |
+| 3.0 | 2026-01-12 | Development Team | Documentation consolidation and archive structure |
 
 ---
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document presents the Entity Relationship Diagrams for the Umamusume Pretty Derby Career Planner application, showing the data model structure, relationships between entities, and database schema design that supports all **60 comprehensive requirements**. The system is built with **Laravel 12** (released February 24, 2025) with **TypeScript support**, **Tailwind CSS v4**, and integrates with **AWS Bedrock** and **Ollama** for AI capabilities.
+This document presents the Entity Relationship Diagrams for the Umamusume Pretty Derby Career Planner application, showing the data model structure, relationships between entities, and database schema design that supports all **59 requirements**. The system is built with **Laravel 12** (released February 24, 2025) with **TypeScript support**, **Tailwind CSS v4**, and integrates with **AWS Bedrock** and **Ollama** for AI capabilities.
 
 ## High-Level Entity Overview
 
@@ -28,7 +28,7 @@ The database consists of 15 major entity groups:
 
 ### ASCII Entity Overview
 
-```
+```text
 [User] ----< [Career] >---- [Character]
   |            |               |
   |            |               |
@@ -111,7 +111,7 @@ erDiagram
         timestamp created_at
         timestamp updated_at
     }
-    
+
     Career {
         int career_id PK
         int user_id FK
@@ -124,7 +124,7 @@ erDiagram
         timestamp started_at
         timestamp completed_at
     }
-    
+
     Character {
         int character_id PK
         string character_name
@@ -134,7 +134,7 @@ erDiagram
         json growth_rates
         timestamp created_at
     }
-    
+
     Character_Stats {
         int stats_id PK
         int career_id FK
@@ -150,14 +150,14 @@ erDiagram
         json conditions
         timestamp recorded_at
     }
-    
+
     Support_Deck {
         int deck_id PK
         int career_id FK
         string deck_name
         timestamp created_at
     }
-    
+
     Support_Card {
         int card_id PK
         string card_name
@@ -167,7 +167,7 @@ erDiagram
         json skill_provisions
         string tier_ranking
     }
-    
+
     Support_Card_Assignment {
         int assignment_id PK
         int deck_id FK
@@ -177,7 +177,7 @@ erDiagram
         int friendship_level
         boolean is_friend_card
     }
-    
+
     Training_Session {
         int session_id PK
         int career_id FK
@@ -189,7 +189,7 @@ erDiagram
         boolean success
         timestamp session_date
     }
-    
+
     Training_Option {
         int option_id PK
         string option_name
@@ -198,7 +198,7 @@ erDiagram
         json requirements
         json modifiers
     }
-    
+
     Skill {
         int skill_id PK
         string skill_name
@@ -209,7 +209,7 @@ erDiagram
         int evolution_target_id FK
         json prerequisites
     }
-    
+
     Skill_Acquisition {
         int acquisition_id PK
         int career_id FK
@@ -221,7 +221,7 @@ erDiagram
         json hint_sources
         timestamp acquired_at
     }
-    
+
     %% Relationships
     User ||--o{ Career : "has many"
     Career ||--|| Character : "trains"
@@ -229,15 +229,15 @@ erDiagram
     Career ||--o{ Character_Stats : "tracks"
     Career ||--o{ Training_Session : "contains"
     Career ||--o{ Skill_Acquisition : "includes"
-    
+
     Support_Deck ||--o{ Support_Card_Assignment : "contains"
     Support_Card ||--o{ Support_Card_Assignment : "assigned to"
-    
+
     Training_Session }o--|| Training_Option : "uses"
-    
+
     Character ||--o{ Character_Stats : "has stats"
     Character ||--o{ Skill_Acquisition : "acquires skills"
-    
+
     Skill ||--o{ Skill_Acquisition : "acquired as"
     Skill ||--o{ Skill : "evolves to"
 ```
@@ -259,7 +259,7 @@ erDiagram
         json stat_requirements
         timestamp race_date
     }
-    
+
     Race_Entry {
         int entry_id PK
         int career_id FK
@@ -270,7 +270,7 @@ erDiagram
         json skills_equipped
         timestamp entered_at
     }
-    
+
     Race_Result {
         int result_id PK
         int entry_id FK
@@ -281,7 +281,7 @@ erDiagram
         json performance_metrics
         timestamp completed_at
     }
-    
+
     Race_Calendar {
         int calendar_id PK
         int race_id FK
@@ -291,7 +291,7 @@ erDiagram
         boolean is_goal_race
         json eligibility_requirements
     }
-    
+
     Career ||--o{ Race_Entry : "enters"
     Race ||--o{ Race_Entry : "has entries"
     Race ||--|| Race_Calendar : "scheduled in"
@@ -312,7 +312,7 @@ erDiagram
         json available_skills
         timestamp created_at
     }
-    
+
     Factor {
         int factor_id PK
         string factor_type
@@ -321,7 +321,7 @@ erDiagram
         json bonus_values
         string source_type
     }
-    
+
     Legacy_Factor {
         int legacy_factor_id PK
         int legacy_id FK
@@ -329,7 +329,7 @@ erDiagram
         int quantity
         timestamp acquired_at
     }
-    
+
     Inheritance_Plan {
         int plan_id PK
         int career_id FK
@@ -339,7 +339,7 @@ erDiagram
         json target_factors
         json affinity_scores
     }
-    
+
     Career ||--|| Legacy_Character : "creates"
     Legacy_Character ||--o{ Legacy_Factor : "provides"
     Factor ||--o{ Legacy_Factor : "included in"
@@ -359,7 +359,7 @@ erDiagram
         json team_composition
         timestamp created_at
     }
-    
+
     Team_Member {
         int member_id PK
         int team_id FK
@@ -369,7 +369,7 @@ erDiagram
         json member_stats
         json equipped_skills
     }
-    
+
     Tournament_Entry {
         int entry_id PK
         int team_id FK
@@ -378,7 +378,7 @@ erDiagram
         int entry_cost
         timestamp entered_at
     }
-    
+
     Tournament_Result {
         int result_id PK
         int entry_id FK
@@ -387,7 +387,7 @@ erDiagram
         json rewards_earned
         timestamp completed_at
     }
-    
+
     Meta_Analysis {
         int analysis_id PK
         string cup_type
@@ -396,7 +396,7 @@ erDiagram
         json successful_strategies
         timestamp analysis_date
     }
-    
+
     User ||--o{ Champions_Team : "creates"
     Champions_Team ||--o{ Team_Member : "contains"
     Character ||--o{ Team_Member : "participates as"
@@ -417,7 +417,7 @@ erDiagram
         int base_cost
         string rarity
     }
-    
+
     User_Inventory {
         int inventory_id PK
         int user_id FK
@@ -426,7 +426,7 @@ erDiagram
         timestamp acquired_at
         timestamp expires_at
     }
-    
+
     Item_Usage {
         int usage_id PK
         int career_id FK
@@ -436,7 +436,7 @@ erDiagram
         json usage_context
         timestamp used_at
     }
-    
+
     Gacha_Banner {
         int banner_id PK
         string banner_name
@@ -446,7 +446,7 @@ erDiagram
         timestamp start_date
         timestamp end_date
     }
-    
+
     Gacha_Pull {
         int pull_id PK
         int user_id FK
@@ -456,7 +456,7 @@ erDiagram
         int pity_counter
         timestamp pulled_at
     }
-    
+
     Resource_Budget {
         int budget_id PK
         int user_id FK
@@ -466,7 +466,7 @@ erDiagram
         json pull_targets
         timestamp updated_at
     }
-    
+
     User ||--o{ User_Inventory : "owns"
     Item ||--o{ User_Inventory : "stored as"
     Career ||--o{ Item_Usage : "uses items"
@@ -489,7 +489,7 @@ erDiagram
         timestamp end_date
         json rewards
     }
-    
+
     Event_Choice {
         int choice_id PK
         int event_id FK
@@ -498,7 +498,7 @@ erDiagram
         json requirements
         float success_rate
     }
-    
+
     Career_Event {
         int career_event_id PK
         int career_id FK
@@ -508,7 +508,7 @@ erDiagram
         json outcome_received
         timestamp occurred_at
     }
-    
+
     Seasonal_Campaign {
         int campaign_id PK
         string campaign_name
@@ -518,7 +518,7 @@ erDiagram
         timestamp start_date
         timestamp end_date
     }
-    
+
     User_Campaign_Progress {
         int progress_id PK
         int user_id FK
@@ -527,7 +527,7 @@ erDiagram
         json rewards_claimed
         timestamp last_updated
     }
-    
+
     Event ||--o{ Event_Choice : "has choices"
     Career ||--o{ Career_Event : "experiences"
     Event ||--o{ Career_Event : "occurs in"
@@ -549,7 +549,7 @@ erDiagram
         timestamp started_at
         timestamp last_message_at
     }
-    
+
     AI_Message {
         int message_id PK
         int conversation_id FK
@@ -560,7 +560,7 @@ erDiagram
         float confidence_score
         timestamp sent_at
     }
-    
+
     Screenshot_Analysis {
         int analysis_id PK
         int user_id FK
@@ -570,7 +570,7 @@ erDiagram
         json validation_results
         timestamp analyzed_at
     }
-    
+
     Performance_Metric {
         int metric_id PK
         int career_id FK
@@ -580,7 +580,7 @@ erDiagram
         json metric_context
         timestamp recorded_at
     }
-    
+
     Statistical_Analysis {
         int analysis_id PK
         int user_id FK
@@ -590,7 +590,7 @@ erDiagram
         json confidence_intervals
         timestamp generated_at
     }
-    
+
     Community_Data {
         int data_id PK
         string data_type
@@ -599,7 +599,7 @@ erDiagram
         timestamp last_updated
         float reliability_score
     }
-    
+
     User ||--o{ AI_Conversation : "has conversations"
     Career ||--o{ AI_Conversation : "discussed in"
     AI_Conversation ||--o{ AI_Message : "contains"
@@ -637,29 +637,29 @@ CREATE INDEX idx_gacha_pull_banner_date ON Gacha_Pull(banner_id, pulled_at);
 
 ```sql
 -- Referential integrity
-ALTER TABLE Career ADD CONSTRAINT fk_career_user 
+ALTER TABLE Career ADD CONSTRAINT fk_career_user
     FOREIGN KEY (user_id) REFERENCES User(user_id) ON DELETE CASCADE;
 
-ALTER TABLE Character_Stats ADD CONSTRAINT fk_stats_career 
+ALTER TABLE Character_Stats ADD CONSTRAINT fk_stats_career
     FOREIGN KEY (career_id) REFERENCES Career(career_id) ON DELETE CASCADE;
 
 -- Business logic constraints
-ALTER TABLE Support_Card_Assignment ADD CONSTRAINT chk_position_range 
+ALTER TABLE Support_Card_Assignment ADD CONSTRAINT chk_position_range
     CHECK (position BETWEEN 1 AND 6);
 
-ALTER TABLE Character_Stats ADD CONSTRAINT chk_stat_ranges 
-    CHECK (speed BETWEEN 0 AND 1200 AND stamina BETWEEN 0 AND 1200 
-           AND power BETWEEN 0 AND 1200 AND guts BETWEEN 0 AND 1200 
+ALTER TABLE Character_Stats ADD CONSTRAINT chk_stat_ranges
+    CHECK (speed BETWEEN 0 AND 1200 AND stamina BETWEEN 0 AND 1200
+           AND power BETWEEN 0 AND 1200 AND guts BETWEEN 0 AND 1200
            AND wit BETWEEN 0 AND 1200);
 
-ALTER TABLE Training_Session ADD CONSTRAINT chk_turn_positive 
+ALTER TABLE Training_Session ADD CONSTRAINT chk_turn_positive
     CHECK (turn_number > 0);
 
 -- Unique constraints
-ALTER TABLE Support_Card_Assignment ADD CONSTRAINT uk_deck_position 
+ALTER TABLE Support_Card_Assignment ADD CONSTRAINT uk_deck_position
     UNIQUE (deck_id, position);
 
-ALTER TABLE Legacy_Factor ADD CONSTRAINT uk_legacy_factor 
+ALTER TABLE Legacy_Factor ADD CONSTRAINT uk_legacy_factor
     UNIQUE (legacy_id, factor_id);
 ```
 
@@ -704,4 +704,4 @@ CREATE TABLE Performance_Metric (
 - **Caching Layer**: Frequently accessed data cached for performance
 - **API Integration**: External data synchronized with conflict resolution
 
-This comprehensive ERD structure supports all 48 requirements while maintaining data integrity, performance, and scalability for the complete Umamusume optimization system.
+This comprehensive ERD structure supports all 59 requirements while maintaining data integrity, performance, and scalability for the complete Umamusume optimization system.

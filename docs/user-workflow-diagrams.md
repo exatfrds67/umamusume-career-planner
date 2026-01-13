@@ -2,17 +2,17 @@
 
 ## Overview
 
-This document presents the key user workflow flow diagrams for the Umamusume Pretty Derby Career Planner application, showing how users interact with the system to achieve their optimization goals through various pathways and decision points. The system is built with **Laravel 12** (released February 24, 2025) with **TypeScript support**, **Tailwind CSS v4** (released January 22, 2025), and integrates with **AWS Bedrock Claude 4.5** models and **AWS Bedrock Nova 2** for AI capabilities, supporting all **60 comprehensive requirements**.
+This document presents the key user workflow flow diagrams for the Umamusume Pretty Derby Career Planner application, showing how users interact with the system to achieve their optimization goals through various pathways and decision points. The system is built with **Laravel 12** (released February 24, 2025) with **TypeScript support**, **Tailwind CSS v4** (released January 22, 2025), and integrates with **AWS Bedrock Claude 4.5** models and **AWS Bedrock Nova 2** for AI capabilities, supporting all **59 requirements**.
 
 ## 1. Career Setup and Initialization Flow
 
 ### Text Description
 
-The career setup flow guides users through the initial configuration of a new career run, including character selection, support card deck composition, legacy character inheritance, and goal setting. This is the foundation workflow that determines the optimization strategy for the entire career, supporting all **60 comprehensive requirements** including advanced PvP team building, resource management, and multi-scenario planning.
+The career setup flow guides users through the initial configuration of a new career run, including character selection, support card deck composition, legacy character inheritance, and goal setting. This is the foundation workflow that determines the optimization strategy for the entire career, supporting all **59 requirements** including advanced PvP team building, resource management, and multi-scenario planning.
 
 ### ASCII Diagram
 
-```
+```text
 [Start New Career]
         |
         v
@@ -73,7 +73,7 @@ flowchart TD
     GoalEngine --> ReviewSummary[Review Setup Summary]
     ReviewSummary --> ConfirmStart[Confirm and Start Career]
     ConfirmStart --> Dashboard[Career Dashboard]
-    
+
     %% Decision points
     ReviewSummary -->|Need Changes| ConfigDeck
     SelectChar -->|Character Info| CharDB
@@ -89,7 +89,7 @@ The core optimization flow that occurs every turn, analyzing current character s
 
 ### ASCII Diagram
 
-```
+```text
 [Start Turn] -----> [Current Turn: X/72]
      |
      v
@@ -165,22 +165,22 @@ The core optimization flow that occurs every turn, analyzing current character s
 flowchart TD
     StartTurn([Start Turn]) --> TurnCounter[Current Turn: X/72]
     TurnCounter --> AnalyzeState[Analyze Character State]
-    
+
     AnalyzeState --> StatsAnalysis[Stats Analysis]
     AnalyzeState --> EnergyLevel[Energy Level]
     AnalyzeState --> MoodStatus[Mood Status]
     AnalyzeState --> Conditions[Conditions]
-    
+
     StatsAnalysis --> GoalProgress[Goal Progress Check]
     EnergyLevel --> FailureRisk[Failure Risk Assessment]
     MoodStatus --> TrainingEffect[Training Effectiveness]
     Conditions --> ConditionImpact[Condition Impact Analysis]
-    
+
     GoalProgress --> EvaluateOptions[Evaluate Training Options]
     FailureRisk --> EvaluateOptions
     TrainingEffect --> EvaluateOptions
     ConditionImpact --> EvaluateOptions
-    
+
     EvaluateOptions --> SpeedTraining[Speed Training]
     EvaluateOptions --> StaminaTraining[Stamina Training]
     EvaluateOptions --> PowerTraining[Power Training]
@@ -188,7 +188,7 @@ flowchart TD
     EvaluateOptions --> WitTraining[Wit Training]
     EvaluateOptions --> Rest[Rest]
     EvaluateOptions --> Recreation[Recreation]
-    
+
     SpeedTraining --> StatGains[Stat Gain Prediction]
     StaminaTraining --> SupportParticipation[Support Card Participation]
     PowerTraining --> FriendshipBonus[Friendship Training Bonus]
@@ -196,7 +196,7 @@ flowchart TD
     WitTraining --> RedIndicators[Red "!" Indicators]
     Rest --> EnergyRecovery[Energy Recovery]
     Recreation --> MoodImprovement[Mood Improvement]
-    
+
     StatGains --> OptEngine[Optimization Engine Analysis]
     SupportParticipation --> OptEngine
     FriendshipBonus --> OptEngine
@@ -204,32 +204,32 @@ flowchart TD
     RedIndicators --> OptEngine
     EnergyRecovery --> OptEngine
     MoodImprovement --> OptEngine
-    
+
     OptEngine --> GoalPriority[Goal Priority Weighting]
     OptEngine --> TurnEconomy[Turn Economy Calculation]
     OptEngine --> RiskReward[Risk-Reward Analysis]
     OptEngine --> LongTermStrategy[Long-term Strategy Impact]
-    
+
     GoalPriority --> GenRecs[Generate Recommendations]
     TurnEconomy --> GenRecs
     RiskReward --> GenRecs
     LongTermStrategy --> GenRecs
-    
+
     GenRecs --> PrimaryRec[Primary Recommendation]
     GenRecs --> AltOptions[Alternative Options]
     GenRecs --> RiskWarnings[Risk Warnings]
-    
+
     PrimaryRec --> UserDecision{User Decision}
     AltOptions --> UserDecision
     RiskWarnings --> UserDecision
-    
+
     UserDecision -->|Execute| ExecuteTraining[Execute Training]
     UserDecision -->|Ask AI| AIChatbot[AI Advisory System]
-    
+
     ExecuteTraining --> RecordResults[Record Actual Results]
     RecordResults --> UpdateAccuracy[Update Prediction Accuracy]
     UpdateAccuracy --> NextTurn[Next Turn]
-    
+
     AIChatbot --> ContextualAdvice[Contextual Advice]
     ContextualAdvice --> NextTurn
 ```
@@ -242,7 +242,7 @@ The race preparation workflow that activates when races are approaching, analyzi
 
 ### ASCII Diagram
 
-```
+```text
 [Upcoming Race Detected] -----> [Race Calendar Check]
          |
          v
@@ -326,44 +326,44 @@ The race preparation workflow that activates when races are approaching, analyzi
 flowchart TD
     RaceDetected([Upcoming Race Detected]) --> CalendarCheck[Race Calendar Check]
     CalendarCheck --> RaceAnalysis[Race Analysis]
-    
+
     RaceAnalysis --> RaceDetails[Race Details]
     RaceAnalysis --> WeatherForecast[Weather Forecast]
     RaceAnalysis --> CompetitionAnalysis[Competition Analysis]
-    
+
     RaceDetails --> Grade[Grade: G1/G2/G3/OP/Pre-OP]
     RaceDetails --> Distance[Distance: Sprint/Mile/Medium/Long]
     RaceDetails --> Surface[Surface: Turf/Dirt]
     RaceDetails --> Track[Track: Kyoto/Tokyo/etc.]
-    
+
     WeatherForecast --> TrackConditions[Track Conditions<br/>Firm/Good/Soft/Heavy]
     CompetitionAnalysis --> FieldStrength[Expected Field Strength]
-    
+
     Grade --> ReadinessAssessment[Character Readiness Assessment]
     Distance --> ReadinessAssessment
     Surface --> ReadinessAssessment
     Track --> ReadinessAssessment
     TrackConditions --> ReadinessAssessment
     FieldStrength --> ReadinessAssessment
-    
+
     ReadinessAssessment --> StatRequirements[Stat Requirements Check]
     ReadinessAssessment --> AptitudeAnalysis[Aptitude Analysis]
     ReadinessAssessment --> SkillEvaluation[Skill Evaluation]
-    
+
     StatRequirements --> SpeedCheck[Speed: ○/⦾/△/×]
     StatRequirements --> StaminaCheck[Stamina: ○/⦾/△/×]
     StatRequirements --> PowerCheck[Power: ○/⦾/△/×]
     StatRequirements --> GutsCheck[Guts: ○/⦾/△/×]
     StatRequirements --> WitCheck[Wit: ○/⦾/△/×]
-    
+
     AptitudeAnalysis --> DistanceApt[Distance Aptitude: G-SS]
     AptitudeAnalysis --> SurfaceApt[Surface Aptitude: G-SS]
     AptitudeAnalysis --> StyleApt[Running Style Aptitude: G-SS]
-    
+
     SkillEvaluation --> WeatherSkills[Weather Skills Available]
     SkillEvaluation --> DistanceSkills[Distance-Specific Skills]
     SkillEvaluation --> RacingSkills[Racing Skills Equipped]
-    
+
     SpeedCheck --> StrategyOpt[Strategy Optimization]
     StaminaCheck --> StrategyOpt
     PowerCheck --> StrategyOpt
@@ -375,35 +375,35 @@ flowchart TD
     WeatherSkills --> StrategyOpt
     DistanceSkills --> StrategyOpt
     RacingSkills --> StrategyOpt
-    
+
     StrategyOpt --> RunningStyleSelect[Running Style Selection]
     StrategyOpt --> WeatherStrategy[Weather Strategy]
-    
+
     RunningStyleSelect --> FrontRunner[Front Runner<br/>Speed/Stamina Focus]
     RunningStyleSelect --> PaceChaser[Pace Chaser<br/>Balanced Approach]
     RunningStyleSelect --> LateSurger[Late Surger<br/>Speed/Power Focus]
     RunningStyleSelect --> EndCloser[End Closer<br/>Power/Guts Focus]
-    
+
     WeatherStrategy --> FirmConditions[Firm Conditions<br/>Standard Strategy]
     WeatherStrategy --> WetConditions[Wet Conditions<br/>Weather Skill Priority]
-    
+
     FrontRunner --> PrepRecs[Preparation Recommendations]
     PaceChaser --> PrepRecs
     LateSurger --> PrepRecs
     EndCloser --> PrepRecs
     FirmConditions --> PrepRecs
     WetConditions --> PrepRecs
-    
+
     PrepRecs --> TrainingFocus[Training Focus<br/>Stat Gap Priorities]
     PrepRecs --> SkillAcquisition[Skill Acquisition<br/>Weather/Distance Skills]
     PrepRecs --> EnergyMgmt[Energy Management<br/>Pre-Race Rest Strategy]
     PrepRecs --> ConditionOpt[Condition Optimization<br/>Infirmary Timing]
-    
+
     TrainingFocus --> RaceDay[Race Day Execution]
     SkillAcquisition --> RaceDay
     EnergyMgmt --> RaceDay
     ConditionOpt --> RaceDay
-    
+
     RaceDay --> PerfTracking[Performance Tracking]
     PerfTracking --> PostRaceAnalysis[Post-Race Analysis]
     PostRaceAnalysis --> StrategyUpdate[Strategy Effectiveness Update]
@@ -418,7 +418,7 @@ The AI advisory system workflow showing how users interact with the chatbot for 
 
 ### ASCII Diagram
 
-```
+```text
 [User Query Input] -----> [Query Analysis]
         |
         v
@@ -487,58 +487,58 @@ The AI advisory system workflow showing how users interact with the chatbot for 
 flowchart TD
     UserQuery([User Query Input]) --> QueryAnalysis[Query Analysis]
     QueryAnalysis --> QueryClassification[Query Classification]
-    
+
     QueryClassification --> SimpleQuestion[Simple Question]
     QueryClassification --> ComplexStrategy[Complex Strategy]
     QueryClassification --> ScreenshotAnalysis[Screenshot Analysis]
-    
+
     SimpleQuestion --> LocalKB[Local Knowledge Base]
     ComplexStrategy --> AIProcessing[AI Processing Required]
     ScreenshotAnalysis --> OCRAnalysis[OCR + AI Analysis]
-    
+
     LocalKB --> ResponseDelivery[Response Delivery]
     AIProcessing --> ModelSelection[AI Model Selection]
     OCRAnalysis --> ModelSelection
-    
+
     ModelSelection --> TryOllama[Try Ollama Local]
     TryOllama --> ResponseTimeCheck{Response Time Check}
-    
+
     ResponseTimeCheck -->|< 10 seconds| QualityCheck{Quality Check}
     ResponseTimeCheck -->|> 10 seconds| FallbackAWS[Fallback to AWS]
-    
+
     QualityCheck -->|Good Quality| UseOllama[Use Ollama Response]
     QualityCheck -->|Poor Quality| FallbackAWS
-    
+
     ModelSelection --> AWSFallback[AWS Bedrock Fallback]
     FallbackAWS --> AWSFallback
-    
+
     AWSFallback --> NovaModels[Nova Pro/Lite<br/>Complex Analysis]
     AWSFallback --> ClaudeModels[Claude 4.5 Sonnet/Haiku<br/>Strategic Advice]
-    
+
     UseOllama --> ContextIntegration[Context Integration]
     NovaModels --> ContextIntegration
     ClaudeModels --> ContextIntegration
-    
+
     ContextIntegration --> CareerState[Current Career State<br/>Character Stats/Goals]
     ContextIntegration --> HistoricalDecisions[Historical Decisions<br/>Previous Conversations]
     ContextIntegration --> GameKnowledge[Game Knowledge Base<br/>Meta Information]
     ContextIntegration --> CommunityData[Community Data<br/>Tier Lists/Strategies]
-    
+
     CareerState --> ResponseGeneration[Response Generation]
     HistoricalDecisions --> ResponseGeneration
     GameKnowledge --> ResponseGeneration
     CommunityData --> ResponseGeneration
-    
+
     ResponseGeneration --> StrategyRecs[Strategic Recommendations<br/>Reasoning Explanation]
     ResponseGeneration --> AltApproaches[Alternative Approaches<br/>Trade-off Analysis]
     ResponseGeneration --> ConfidenceIndicators[Confidence Indicators<br/>Model Used Disclosure]
     ResponseGeneration --> FollowupSuggestions[Follow-up Suggestions<br/>Related Resources]
-    
+
     StrategyRecs --> ResponseDelivery
     AltApproaches --> ResponseDelivery
     ConfidenceIndicators --> ResponseDelivery
     FollowupSuggestions --> ResponseDelivery
-    
+
     ResponseDelivery --> UserFeedback[User Feedback Collection]
     UserFeedback --> ConversationUpdate[Conversation History Update]
     ConversationUpdate --> LearningIntegration[Learning Integration<br/>Improve Future Responses]
@@ -552,7 +552,7 @@ The screenshot processing workflow that handles image uploads, performs OCR anal
 
 ### ASCII Diagram
 
-```
+```text
 [Screenshot Upload] -----> [Image Validation]
         |                        |
         v                        +-----> [Format Check: PNG/JPG/WebP]
@@ -664,54 +664,54 @@ The screenshot processing workflow that handles image uploads, performs OCR anal
 ```mermaid
 flowchart TD
     ScreenshotUpload([Screenshot Upload]) --> ImageValidation[Image Validation]
-    
+
     ImageValidation --> FormatCheck[Format Check: PNG/JPG/WebP]
     ImageValidation --> SizeValidation[Size Validation: < 10MB]
     ImageValidation --> ResolutionCheck[Resolution Check: Min 800x600]
-    
+
     FormatCheck --> ImageProcessing[Image Processing]
     SizeValidation --> ImageProcessing
     ResolutionCheck --> ImageProcessing
-    
+
     ImageProcessing --> OCRAnalysis[OCR Analysis]
     OCRAnalysis --> ScreenTypeDetection[Screen Type Detection]
-    
+
     ScreenTypeDetection --> TrainingScreen[Training Screen]
     ScreenTypeDetection --> StatsScreen[Character Stats Screen]
     ScreenTypeDetection --> RaceScreen[Race Preparation Screen]
     ScreenTypeDetection --> SkillScreen[Skill Screen]
     ScreenTypeDetection --> SupportScreen[Support Card Screen]
-    
+
     TrainingScreen --> TrainingExtraction[Training Options Extraction]
     TrainingExtraction --> TrainingTypes[Available Training Types]
     TrainingExtraction --> SupportParticipation[Support Card Participation]
     TrainingExtraction --> RedIndicators[Red "!" Indicators]
     TrainingExtraction --> PredictedGains[Predicted Stat Gains]
-    
+
     StatsScreen --> StatsExtraction[Stats Extraction]
     StatsExtraction --> CurrentStats[Current Stat Values]
     StatsExtraction --> EnergyMood[Energy/Mood Status]
     StatsExtraction --> ConditionsPresent[Conditions Present]
     StatsExtraction --> TurnNumber[Turn Number]
-    
+
     RaceScreen --> RaceExtraction[Race Info Extraction]
     RaceExtraction --> RaceDetails[Race Details]
     RaceExtraction --> StrategyOptions[Strategy Options]
     RaceExtraction --> WeatherConditions[Weather Conditions]
     RaceExtraction --> ReadinessIndicators[Readiness Indicators]
-    
+
     SkillScreen --> SkillExtraction[Skill Data Extraction]
     SkillExtraction --> AvailableSkills[Available Skills]
     SkillExtraction --> SPCosts[SP Costs]
     SkillExtraction --> HintDiscounts[Hint Discounts]
     SkillExtraction --> SPBalance[Current SP Balance]
-    
+
     SupportScreen --> DeckAnalysis[Deck Analysis]
     DeckAnalysis --> CardComposition[Card Composition]
     DeckAnalysis --> FriendshipLevels[Friendship Levels]
     DeckAnalysis --> LimitBreakStatus[Limit Break Status]
     DeckAnalysis --> Specializations[Specializations]
-    
+
     TrainingTypes --> DataValidation[Data Validation and Confidence Scoring]
     SupportParticipation --> DataValidation
     RedIndicators --> DataValidation
@@ -732,49 +732,49 @@ flowchart TD
     FriendshipLevels --> DataValidation
     LimitBreakStatus --> DataValidation
     Specializations --> DataValidation
-    
+
     DataValidation --> HighConfidence[High Confidence >90%<br/>Auto-Accept Data]
     DataValidation --> MediumConfidence[Medium Confidence 70-90%<br/>Flag for Review]
     DataValidation --> LowConfidence[Low Confidence <70%<br/>Manual Correction Required]
-    
+
     HighConfidence --> ContextAnalysis[Context Analysis]
     MediumConfidence --> ContextAnalysis
     LowConfidence --> ContextAnalysis
-    
+
     ContextAnalysis --> CareerState[Current Career State<br/>Goal Progress Assessment]
     ContextAnalysis --> HistoricalPatterns[Historical Patterns<br/>Decision Pattern Analysis]
     ContextAnalysis --> MetaKnowledge[Meta Knowledge<br/>Current Strategy Effectiveness]
-    
+
     CareerState --> RecommendationGeneration[Recommendation Generation]
     HistoricalPatterns --> RecommendationGeneration
     MetaKnowledge --> RecommendationGeneration
-    
+
     RecommendationGeneration --> TrainingRecs[Training Screen<br/>Optimal Training Choice]
     RecommendationGeneration --> StatsRecs[Stats Screen<br/>Development Analysis]
     RecommendationGeneration --> RaceRecs[Race Screen<br/>Race Strategy Optimization]
     RecommendationGeneration --> SkillRecs[Skill Screen<br/>Skill Acquisition Strategy]
     RecommendationGeneration --> SupportRecs[Support Screen<br/>Deck Optimization]
-    
+
     TrainingRecs --> PrimaryRec[Primary Recommendation]
     TrainingRecs --> AltOptions[Alternative Options]
     TrainingRecs --> RiskAssessment[Risk Assessment]
-    
+
     StatsRecs --> GoalProgressUpdate[Goal Progress Update]
     StatsRecs --> StatGapAnalysis[Stat Gap Analysis]
     StatsRecs --> NextStepsGuidance[Next Steps Guidance]
-    
+
     RaceRecs --> ReadinessAssessment[Readiness Assessment]
     RaceRecs --> StrategyRecommendations[Strategy Recommendations]
     RaceRecs --> PreparationAdvice[Preparation Advice]
-    
+
     SkillRecs --> PrioritySkills[Priority Skills]
     SkillRecs --> SPOptimization[SP Optimization]
     SkillRecs --> HintCollectionStrategy[Hint Collection Strategy]
-    
+
     SupportRecs --> DeckAnalysisResult[Deck Analysis]
     SupportRecs --> ImprovementSuggestions[Improvement Suggestions]
     SupportRecs --> FriendCardRecs[Friend Card Recommendations]
-    
+
     PrimaryRec --> AIChatbotIntegration[AI Chatbot Integration]
     AltOptions --> AIChatbotIntegration
     RiskAssessment --> AIChatbotIntegration
@@ -790,7 +790,7 @@ flowchart TD
     DeckAnalysisResult --> AIChatbotIntegration
     ImprovementSuggestions --> AIChatbotIntegration
     FriendCardRecs --> AIChatbotIntegration
-    
+
     AIChatbotIntegration --> ContextualConversation[Contextual Conversation]
     ContextualConversation --> ResponseDelivery[Response Delivery]
     ResponseDelivery --> UserInteraction[User Interaction]

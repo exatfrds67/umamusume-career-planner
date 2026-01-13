@@ -9,7 +9,7 @@ This folder contains scripts to configure and test Claude Code with AWS Bedrock.
 - **`setup-claude-bedrock-complete.ps1`** - Complete setup with persistent environment variables
 - **`setup-aws-credentials.ps1`** - Configure AWS credentials for Bedrock access
 
-### Launch Scripts  
+### Launch Scripts
 
 - **`launch-claude-bedrock.ps1`** - Launch Claude Code with Bedrock configuration
 

@@ -2,10 +2,10 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.0  
-**Date**: January 10, 2026  
-**Project**: UmamusumeCareerPlanner  
-**Author**: Development Team  
+**Document Version**: 2.0
+**Date**: January 14, 2026
+**Project**: UmamusumeCareerPlanner
+**Author**: Development Team
 **Updated**: Aligned with Laravel 12, Tailwind CSS v4, and modern architecture specifications
 
 ---
@@ -101,7 +101,7 @@ The migration plan covers all aspects of the modern UmamusumeCareerPlanner syste
 **Key Components**:
 
 - **Database Migrations**: Laravel 12 migration system with proper foreign key constraints
-- **API Integration**: umapyoi.net (verified active), UmamusumeDB.com (requires verification)
+- **API Integration**: umapyoi.net (verified active), UmamusumeDB.com (verification pending)
 - **Caching Layer**: Redis-based caching with TTL management and intelligent invalidation
 - **Data Validation**: Comprehensive validation rules for game data integrity
 
@@ -432,20 +432,20 @@ CREATE TABLE ucp_users (
     email_verified_at TIMESTAMP NULL,
     password VARCHAR(255) NOT NULL,
     remember_token VARCHAR(100) NULL,
-    
+
     -- User preferences
     theme ENUM('light', 'dark', 'auto') DEFAULT 'auto',
     language VARCHAR(10) DEFAULT 'en',
     timezone VARCHAR(50) DEFAULT 'UTC',
-    
+
     -- Privacy settings
     data_sharing_consent BOOLEAN DEFAULT FALSE,
     analytics_consent BOOLEAN DEFAULT FALSE,
-    
+
     -- Timestamps
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     -- Indexes
     INDEX idx_email (email),
     INDEX idx_created_at (created_at)
@@ -458,45 +458,45 @@ CREATE TABLE ucp_users (
 CREATE TABLE ucp_characters (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT UNSIGNED NOT NULL,
-    
+
     -- Character identification
     name VARCHAR(255) NOT NULL,
     scenario_type ENUM('ura_finale', 'unity_cup') NOT NULL,
     career_stage VARCHAR(50) DEFAULT 'junior',
-    
+
     -- Current stats (0-1200 range with validation)
     speed SMALLINT UNSIGNED NOT NULL DEFAULT 0,
     stamina SMALLINT UNSIGNED NOT NULL DEFAULT 0,
     power SMALLINT UNSIGNED NOT NULL DEFAULT 0,
     guts SMALLINT UNSIGNED NOT NULL DEFAULT 0,
     wit SMALLINT UNSIGNED NOT NULL DEFAULT 0,
-    
+
     -- Character state
     energy_level TINYINT UNSIGNED NOT NULL DEFAULT 100,
     mood_status ENUM('awful', 'bad', 'normal', 'good', 'great') NOT NULL DEFAULT 'normal',
-    
+
     -- Goals and targets (JSON casting in Laravel)
     target_stats JSON NULL,
     race_objectives JSON NULL,
-    
+
     -- Metadata
     final_grade VARCHAR(10) NULL,
     completion_date TIMESTAMP NULL,
     notes TEXT,
-    
+
     -- Timestamps
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     -- Indexes for performance
     INDEX idx_user_scenario (user_id, scenario_type),
     INDEX idx_name (name),
     INDEX idx_created_at (created_at),
     INDEX idx_completion (completion_date),
-    
+
     -- Foreign keys with cascade
     FOREIGN KEY (user_id) REFERENCES ucp_users(id) ON DELETE CASCADE,
-    
+
     -- Check constraints for data integrity
     CONSTRAINT chk_speed_range CHECK (speed >= 0 AND speed <= 1200),
     CONSTRAINT chk_stamina_range CHECK (stamina >= 0 AND stamina <= 1200),
@@ -516,32 +516,32 @@ CREATE TABLE ucp_ai_conversations (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT UNSIGNED NOT NULL,
     character_id BIGINT UNSIGNED NULL,
-    
+
     -- Conversation metadata
     conversation_id VARCHAR(255) NOT NULL,
     message_type ENUM('user', 'assistant') NOT NULL,
-    
+
     -- AI system information
     ai_model ENUM('ollama_llama', 'ollama_mistral', 'bedrock_claude', 'bedrock_nova') NOT NULL,
     model_version VARCHAR(50) NULL,
     processing_time_ms INT UNSIGNED NULL,
     token_count INT UNSIGNED NULL,
     cost_usd DECIMAL(10, 6) NULL DEFAULT 0,
-    
+
     -- Message content
     message_content TEXT NOT NULL,
     context_data JSON NULL,
     confidence_score DECIMAL(3, 2) NULL,
-    
+
     -- Timestamps
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    
+
     -- Indexes
     INDEX idx_user_conversation (user_id, conversation_id),
     INDEX idx_character (character_id),
     INDEX idx_ai_model (ai_model),
     INDEX idx_created_at (created_at),
-    
+
     -- Foreign keys
     FOREIGN KEY (user_id) REFERENCES ucp_users(id) ON DELETE CASCADE,
     FOREIGN KEY (character_id) REFERENCES ucp_characters(id) ON DELETE SET NULL
@@ -555,37 +555,37 @@ CREATE TABLE ucp_ocr_extractions (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT UNSIGNED NOT NULL,
     character_id BIGINT UNSIGNED NULL,
-    
+
     -- File information
     original_filename VARCHAR(255) NOT NULL,
     file_hash VARCHAR(64) NOT NULL,
     file_size INT UNSIGNED NOT NULL,
-    
+
     -- OCR processing
     screen_type ENUM('training', 'race', 'character_stats', 'skills', 'support_cards') NULL,
     processing_status ENUM('pending', 'processing', 'completed', 'failed') NOT NULL DEFAULT 'pending',
     confidence_score DECIMAL(3, 2) NULL,
-    
+
     -- Extracted data
     extracted_data JSON NULL,
     validation_errors JSON NULL,
     manual_corrections JSON NULL,
-    
+
     -- Processing metadata
     processing_time_ms INT UNSIGNED NULL,
     ocr_engine VARCHAR(50) DEFAULT 'tesseract',
-    
+
     -- Timestamps
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     -- Indexes
     INDEX idx_user_character (user_id, character_id),
     INDEX idx_file_hash (file_hash),
     INDEX idx_screen_type (screen_type),
     INDEX idx_status (processing_status),
     INDEX idx_created_at (created_at),
-    
+
     -- Foreign keys
     FOREIGN KEY (user_id) REFERENCES ucp_users(id) ON DELETE CASCADE,
     FOREIGN KEY (character_id) REFERENCES ucp_characters(id) ON DELETE SET NULL
@@ -597,31 +597,31 @@ CREATE TABLE ucp_ocr_extractions (
 ```sql
 CREATE TABLE ucp_external_data_cache (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    
+
     -- Cache key information
     cache_key VARCHAR(255) NOT NULL UNIQUE,
     data_source ENUM('umapyoi', 'umamusumedb', 'community') NOT NULL,
     data_type ENUM('characters', 'skills', 'support_cards', 'races', 'meta_tiers') NOT NULL,
-    
+
     -- Cache data
     cached_data JSON NOT NULL,
     data_hash VARCHAR(64) NOT NULL,
-    
+
     -- Cache metadata
     ttl_seconds INT UNSIGNED NOT NULL DEFAULT 86400,
     hit_count INT UNSIGNED DEFAULT 0,
     last_accessed TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     -- Timestamps
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     expires_at TIMESTAMP NOT NULL,
-    
+
     -- Indexes
     INDEX idx_cache_key (cache_key),
     INDEX idx_data_source_type (data_source, data_type),
     INDEX idx_expires_at (expires_at),
     INDEX idx_last_accessed (last_accessed),
-    
+
     -- Check constraint
     CONSTRAINT chk_ttl_positive CHECK (ttl_seconds > 0)
 );
@@ -672,35 +672,35 @@ class ModernETLService
         private CacheManager $cache,
         private EventDispatcher $events
     ) {}
-    
+
     public function migrate(MigrationRequest $request): MigrationResult
     {
         // Dispatch migration started event
         $this->events->dispatch(new MigrationStarted($request));
-        
+
         try {
             // Extract with caching
             $extracted = $this->extractor->extract($request->getSource());
             $this->cache->remember("migration.{$request->getId()}.extracted", $extracted);
-            
+
             // Transform with validation
             $transformed = $this->transformer->transform($extracted);
             $validation = $this->validator->validate($transformed);
-            
+
             if (!$validation->isValid()) {
                 throw new MigrationException('Validation failed', $validation->getErrors());
             }
-            
+
             // Load with transaction safety
             $result = DB::transaction(function () use ($transformed) {
                 return $this->loader->load($transformed);
             });
-            
+
             // Dispatch success event
             $this->events->dispatch(new MigrationCompleted($result));
-            
+
             return $result;
-            
+
         } catch (Exception $e) {
             $this->events->dispatch(new MigrationFailed($request, $e));
             throw $e;
@@ -740,10 +740,10 @@ class ProcessExternalDataChange implements ShouldQueue
                 default => Log::warning("Unknown change type: {$change['type']}")
             };
         }
-        
+
         // Invalidate relevant caches
         Cache::tags(['external-data', $source])->flush();
-        
+
         // Broadcast updates to connected clients
         broadcast(new ExternalDataUpdated($source, $changes));
     }
@@ -770,38 +770,38 @@ class CreateCharactersTableWithModernFeatures extends Migration
         Schema::create('ucp_characters', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('ucp_users')->cascadeOnDelete();
-            
+
             // Character data with JSON casting
             $table->string('name');
             $table->enum('scenario_type', ['ura_finale', 'unity_cup']);
             $table->json('stats')->comment('Speed, Stamina, Power, Guts, Wit');
             $table->json('aptitudes')->comment('Distance, Surface, Style aptitudes');
             $table->json('goals')->nullable()->comment('Target stats and objectives');
-            
+
             // State tracking
             $table->tinyInteger('energy_level')->default(100);
             $table->enum('mood_status', ['awful', 'bad', 'normal', 'good', 'great'])->default('normal');
-            
+
             // Metadata
             $table->string('final_grade', 10)->nullable();
             $table->timestamp('completion_date')->nullable();
             $table->text('notes')->nullable();
-            
+
             $table->timestamps();
-            
+
             // Performance indexes
             $table->index(['user_id', 'scenario_type']);
             $table->index('name');
             $table->index('created_at');
             $table->index('completion_date');
-            
+
             // Check constraints for data integrity
             $table->check('json_valid(stats)');
             $table->check('json_valid(aptitudes)');
             $table->check('energy_level >= 0 AND energy_level <= 100');
         });
     }
-    
+
     public function down(): void
     {
         Schema::dropIfExists('ucp_characters');
@@ -821,19 +821,19 @@ use App\Services\Migration\GameDataMigrationService;
 
 class MigrateGameDataCommand extends Command
 {
-    protected $signature = 'migrate:game-data 
+    protected $signature = 'migrate:game-data
                            {--source=umapyoi : Data source to use}
                            {--force : Force migration even if data exists}
                            {--dry-run : Show what would be migrated without executing}
                            {--chunk=100 : Number of records to process per batch}
                            {--timeout=1800 : Maximum execution time in seconds}';
-    
+
     protected $description = 'Migrate game data from external sources with modern features';
-    
+
     public function handle(GameDataMigrationService $service): int
     {
         $this->info('🚀 Starting game data migration with Laravel 12...');
-        
+
         $options = [
             'source' => $this->option('source'),
             'force' => $this->option('force'),
@@ -841,22 +841,22 @@ class MigrateGameDataCommand extends Command
             'chunk_size' => (int) $this->option('chunk'),
             'timeout' => (int) $this->option('timeout'),
         ];
-        
+
         try {
             // Create progress bar
             $progressBar = $this->output->createProgressBar();
             $progressBar->setFormat('verbose');
-            
+
             // Execute migration with real-time progress
             $result = $service->migrate($options, function ($progress) use ($progressBar) {
                 $progressBar->setProgress($progress['current']);
                 $progressBar->setMaxSteps($progress['total']);
                 $this->line(" Processing: {$progress['current']}/{$progress['total']} - {$progress['message']}");
             });
-            
+
             $progressBar->finish();
             $this->newLine(2);
-            
+
             // Display results
             $this->info('✅ Migration completed successfully!');
             $this->table(
@@ -867,9 +867,9 @@ class MigrateGameDataCommand extends Command
                     ['Support Cards', $result->getSupportCardCount(), '✅ Success', $result->getSupportCardTime()],
                 ]
             );
-            
+
             return Command::SUCCESS;
-            
+
         } catch (Exception $e) {
             $this->error("❌ Migration failed: {$e->getMessage()}");
             $this->line("Stack trace available in logs: storage/logs/laravel.log");
@@ -897,22 +897,22 @@ class UmapyoiApiClient
     private const BASE_URL = 'https://api.umapyoi.net/api/v1/';
     private const RATE_LIMIT = 100; // requests per minute
     private const CACHE_TTL = 3600; // 1 hour
-    
+
     public function __construct(
         private HttpFactory $http,
         private RateLimiter $rateLimiter
     ) {}
-    
+
     public function getCharacters(array $options = []): Collection
     {
         $cacheKey = 'umapyoi.characters.' . md5(serialize($options));
-        
+
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($options) {
             // Check rate limit
             if (!$this->rateLimiter->attempt('umapyoi-api', self::RATE_LIMIT, 60)) {
                 throw new RateLimitExceededException('Rate limit exceeded for umapyoi.net API');
             }
-            
+
             $response = $this->http
                 ->timeout(30)
                 ->retry(3, 1000) // 3 retries with 1 second delay
@@ -921,32 +921,32 @@ class UmapyoiApiClient
                     'Accept' => 'application/json',
                 ])
                 ->get(self::BASE_URL . 'characters', $options);
-            
+
             if (!$response->successful()) {
                 Log::error('umapyoi.net API error', [
                     'status' => $response->status(),
                     'body' => $response->body(),
                     'options' => $options
                 ]);
-                
+
                 throw new ExternalApiException(
                     "API request failed with status {$response->status()}"
                 );
             }
-            
+
             $data = $response->json();
-            
+
             // Validate response structure
             if (!isset($data['data']) || !is_array($data['data'])) {
                 throw new InvalidApiResponseException('Invalid response structure from umapyoi.net');
             }
-            
+
             return collect($data['data'])->map(function ($character) {
                 return $this->transformCharacterData($character);
             });
         });
     }
-    
+
     private function transformCharacterData(array $data): array
     {
         return [
@@ -979,7 +979,7 @@ class ModernFileProcessor
     {
         // Validate file security
         $this->validateFileSecurity($file);
-        
+
         // Determine file type and processor
         $processor = match ($file->getClientOriginalExtension()) {
             'csv' => new CsvProcessor(),
@@ -987,7 +987,7 @@ class ModernFileProcessor
             'json' => new JsonProcessor(),
             default => throw new UnsupportedFileTypeException("Unsupported file type: {$file->getClientOriginalExtension()}")
         };
-        
+
         // Process with progress tracking
         return $processor->process($file, $options, function ($progress) {
             // Broadcast progress to user via WebSocket
@@ -999,14 +999,14 @@ class ModernFileProcessor
             ));
         });
     }
-    
+
     private function validateFileSecurity(UploadedFile $file): void
     {
         // File size validation
         if ($file->getSize() > 50 * 1024 * 1024) { // 50MB
             throw new FileTooLargeException('File size exceeds 50MB limit');
         }
-        
+
         // MIME type validation
         $allowedMimes = [
             'text/csv',
@@ -1014,25 +1014,25 @@ class ModernFileProcessor
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             'application/json'
         ];
-        
+
         if (!in_array($file->getMimeType(), $allowedMimes)) {
             throw new InvalidFileTypeException("Invalid MIME type: {$file->getMimeType()}");
         }
-        
+
         // Scan for malicious content
         $this->scanForMaliciousContent($file);
     }
-    
+
     private function scanForMaliciousContent(UploadedFile $file): void
     {
         $handle = fopen($file->getPathname(), 'rb');
         $header = fread($handle, 1024);
         fclose($handle);
-        
+
         $maliciousPatterns = [
             '<?php', '<script', 'javascript:', 'vbscript:', 'data:text/html'
         ];
-        
+
         foreach ($maliciousPatterns as $pattern) {
             if (stripos($header, $pattern) !== false) {
                 throw new MaliciousFileException("Potentially malicious content detected: {$pattern}");
@@ -1090,7 +1090,7 @@ class IntelligentCacheManager
     // L1: Application cache (fast, small)
     // L2: Redis cache (medium speed, larger)
     // L3: Database (slow, persistent)
-    
+
     public function getCharacterData(int $characterId): array
     {
         return Cache::tags(['characters', "character.{$characterId}"])
@@ -1098,11 +1098,11 @@ class IntelligentCacheManager
                 return Character::with('aptitudes', 'skills')->find($characterId)->toArray();
             });
     }
-    
+
     public function invalidateCharacterCache(int $characterId): void
     {
         Cache::tags(["character.{$characterId}"])->flush();
-        
+
         // Warm cache asynchronously
         Cache::async()->remember("character.{$characterId}", 300, function () use ($characterId) {
             return Character::with('aptitudes', 'skills')->find($characterId)->toArray();
@@ -1141,9 +1141,9 @@ class IntelligentCacheManager
 
 ```sql
 INSERT INTO game_characters (
-  external_id, name, rarity, 
+  external_id, name, rarity,
   turf_aptitude, dirt_aptitude,
-  sprint_aptitude, mile_aptitude, 
+  sprint_aptitude, mile_aptitude,
   medium_aptitude, long_aptitude,
   created_at, updated_at
 ) VALUES (
@@ -1663,20 +1663,20 @@ class OllamaIntegrationService
         'mistral' => ['size' => '7B', 'context' => 32000, 'use_case' => 'fast_responses'],
         'qwen2.5' => ['size' => '14B', 'context' => 32000, 'use_case' => 'multilingual']
     ];
-    
+
     public function migrateConversationHistory(array $conversations): MigrationResult
     {
         $migrated = 0;
         $errors = [];
-        
+
         foreach ($conversations as $conversation) {
             try {
                 // Validate conversation format
                 $this->validateConversationFormat($conversation);
-                
+
                 // Transform legacy format to new structure
                 $transformed = $this->transformConversationData($conversation);
-                
+
                 // Store with proper relationships
                 AIConversation::create([
                     'user_id' => $transformed['user_id'],
@@ -1689,17 +1689,17 @@ class OllamaIntegrationService
                     'processing_time_ms' => $transformed['processing_time'],
                     'created_at' => $transformed['timestamp']
                 ]);
-                
+
                 $migrated++;
-                
+
             } catch (Exception $e) {
                 $errors[] = "Conversation {$conversation['id']}: {$e->getMessage()}";
             }
         }
-        
+
         return new MigrationResult($migrated, count($errors), $errors);
     }
-    
+
     public function setupModelConfiguration(): void
     {
         foreach ($this->supportedModels as $model => $config) {
@@ -1713,14 +1713,14 @@ class OllamaIntegrationService
             }
         }
     }
-    
+
     private function isModelAvailable(string $model): bool
     {
         try {
             $response = OllamaLaravel::agent()
                 ->model($model)
                 ->ask('Test connection');
-            
+
             return !empty($response);
         } catch (Exception $e) {
             return false;
@@ -1748,22 +1748,22 @@ class BedrockIntegrationService
         'amazon.nova-lite-v1:0' => ['input' => 0.00125, 'output' => 0.00125],
         'amazon.nova-pro-v1:0' => ['input' => 0.008, 'output' => 0.032]
     ];
-    
+
     public function __construct(
         private BedrockRuntimeClient $bedrock,
         private CostTrackingService $costTracker
     ) {}
-    
+
     public function migrateCloudConversations(array $conversations): MigrationResult
     {
         $migrated = 0;
         $totalCost = 0;
-        
+
         foreach ($conversations as $conversation) {
             // Calculate historical costs
             $cost = $this->calculateConversationCost($conversation);
             $totalCost += $cost;
-            
+
             // Store with cost tracking
             AIConversation::create([
                 'user_id' => $conversation['user_id'],
@@ -1777,32 +1777,32 @@ class BedrockIntegrationService
                 'processing_time_ms' => $conversation['processing_time'],
                 'created_at' => $conversation['timestamp']
             ]);
-            
+
             $migrated++;
         }
-        
+
         // Update cost tracking
         $this->costTracker->recordMigrationCosts($totalCost);
-        
+
         return new MigrationResult($migrated, 0, [], ['total_cost' => $totalCost]);
     }
-    
+
     private function calculateConversationCost(array $conversation): float
     {
         $model = $conversation['model'];
         $tokenCount = $conversation['token_count'] ?? 0;
-        
+
         if (!isset($this->modelPricing[$model])) {
             return 0.0;
         }
-        
+
         $pricing = $this->modelPricing[$model];
-        
+
         // Estimate input/output split (typically 70/30)
         $inputTokens = $tokenCount * 0.7;
         $outputTokens = $tokenCount * 0.3;
-        
-        return ($inputTokens * $pricing['input'] / 1000) + 
+
+        return ($inputTokens * $pricing['input'] / 1000) +
                ($outputTokens * $pricing['output'] / 1000);
     }
 }
@@ -1827,17 +1827,17 @@ class OCRMigrationService
     {
         $migrated = 0;
         $errors = [];
-        
+
         foreach ($extractions as $extraction) {
             try {
                 // Validate screenshot file
                 if (!$this->validateScreenshotFile($extraction['file_path'])) {
                     throw new InvalidFileException("Invalid screenshot file: {$extraction['file_path']}");
                 }
-                
+
                 // Re-process with current OCR engine for consistency
                 $ocrResult = $this->reprocessScreenshot($extraction['file_path']);
-                
+
                 // Store migration result
                 OCRExtraction::create([
                     'user_id' => $extraction['user_id'],
@@ -1854,21 +1854,21 @@ class OCRMigrationService
                     'ocr_engine' => 'tesseract_5.3',
                     'created_at' => $extraction['original_date']
                 ]);
-                
+
                 $migrated++;
-                
+
             } catch (Exception $e) {
                 $errors[] = "Screenshot {$extraction['file_path']}: {$e->getMessage()}";
             }
         }
-        
+
         return new MigrationResult($migrated, count($errors), $errors);
     }
-    
+
     private function reprocessScreenshot(string $filePath): array
     {
         $startTime = microtime(true);
-        
+
         try {
             // Configure Tesseract for Japanese + English
             $ocr = new TesseractOCR($filePath);
@@ -1876,14 +1876,14 @@ class OCRMigrationService
                 ->psm(6) // Uniform block of text
                 ->oem(3) // Default OCR Engine Mode
                 ->config('tessedit_char_whitelist', '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+-.,()[]{}スペシャルウィークサイレンススズカトウカイテイオー');
-            
+
             $text = $ocr->run();
             $confidence = $ocr->confidence();
-            
+
             // Parse extracted text based on screen type
             $parsedData = $this->parseExtractedText($text);
             $validationErrors = $this->validateExtractedData($parsedData);
-            
+
             return [
                 'text' => $text,
                 'confidence' => $confidence,
@@ -1891,7 +1891,7 @@ class OCRMigrationService
                 'errors' => $validationErrors,
                 'processing_time' => (microtime(true) - $startTime) * 1000
             ];
-            
+
         } catch (Exception $e) {
             return [
                 'text' => '',
@@ -1902,11 +1902,11 @@ class OCRMigrationService
             ];
         }
     }
-    
+
     private function detectScreenType(array $ocrResult): ?string
     {
         $text = strtolower($ocrResult['text']);
-        
+
         return match (true) {
             str_contains($text, 'training') || str_contains($text, 'トレーニング') => 'training',
             str_contains($text, 'race') || str_contains($text, 'レース') => 'race',
@@ -1936,15 +1936,15 @@ class ExternalDataSyncService
     {
         $migrated = 0;
         $errors = [];
-        
+
         foreach ($cacheEntries as $entry) {
             try {
                 // Validate cache entry structure
                 $this->validateCacheEntry($entry);
-                
+
                 // Transform to new cache format
                 $transformed = $this->transformCacheEntry($entry);
-                
+
                 // Store in new external data cache table
                 ExternalDataCache::create([
                     'cache_key' => $transformed['key'],
@@ -1956,20 +1956,20 @@ class ExternalDataSyncService
                     'created_at' => $transformed['cached_at'],
                     'expires_at' => $transformed['expires_at']
                 ]);
-                
+
                 $migrated++;
-                
+
             } catch (Exception $e) {
                 $errors[] = "Cache entry {$entry['key']}: {$e->getMessage()}";
             }
         }
-        
+
         // Set up automated sync jobs
         $this->setupAutomatedSync();
-        
+
         return new MigrationResult($migrated, count($errors), $errors);
     }
-    
+
     private function setupAutomatedSync(): void
     {
         // Schedule daily sync for character data
@@ -1978,7 +1978,7 @@ class ExternalDataSyncService
             ->at('02:00')
             ->withoutOverlapping()
             ->runInBackground();
-        
+
         // Schedule weekly sync for meta tier lists
         Schedule::command('sync:external-data meta-tiers')
             ->weekly()
@@ -1986,7 +1986,7 @@ class ExternalDataSyncService
             ->at('03:00')
             ->withoutOverlapping()
             ->runInBackground();
-        
+
         // Schedule hourly sync for news and events
         Schedule::command('sync:external-data news')
             ->hourly()
@@ -2024,27 +2024,27 @@ class OptimizeDatabasePerformance extends Migration
             $table->index(['scenario_type', 'final_grade'], 'idx_scenario_grade');
             $table->index(['completion_date'], 'idx_completion_date');
         });
-        
+
         Schema::table('ucp_ai_conversations', function (Blueprint $table) {
             $table->index(['user_id', 'conversation_id', 'created_at'], 'idx_user_conversation_date');
             $table->index(['ai_model', 'created_at'], 'idx_model_date');
             $table->index(['character_id', 'created_at'], 'idx_character_date');
         });
-        
+
         Schema::table('ucp_ocr_extractions', function (Blueprint $table) {
             $table->index(['user_id', 'screen_type', 'processing_status'], 'idx_user_screen_status');
             $table->index(['file_hash'], 'idx_file_hash');
             $table->index(['processing_status', 'created_at'], 'idx_status_date');
         });
-        
+
         // Add full-text search indexes
         DB::statement('ALTER TABLE ucp_characters ADD FULLTEXT(name, notes)');
         DB::statement('ALTER TABLE ucp_ai_conversations ADD FULLTEXT(message_content)');
-        
+
         // Optimize table storage
         DB::statement('OPTIMIZE TABLE ucp_characters, ucp_ai_conversations, ucp_ocr_extractions');
     }
-    
+
     public function down(): void
     {
         Schema::table('ucp_characters', function (Blueprint $table) {
@@ -2052,7 +2052,7 @@ class OptimizeDatabasePerformance extends Migration
             $table->dropIndex('idx_scenario_grade');
             $table->dropIndex('idx_completion_date');
         });
-        
+
         // Remove other indexes...
     }
 }
@@ -2073,52 +2073,52 @@ class RedisCacheMigrationService
     {
         // Configure Redis for optimal performance
         $this->configureRedisSettings();
-        
+
         // Migrate existing cache data to new structure
         $this->migrateCacheStructure();
-        
+
         // Set up cache warming strategies
         $this->setupCacheWarming();
-        
+
         // Configure cache monitoring
         $this->setupCacheMonitoring();
     }
-    
+
     private function configureRedisSettings(): void
     {
         // Configure Redis for memory optimization
         Redis::config('set', 'maxmemory-policy', 'allkeys-lru');
         Redis::config('set', 'maxmemory', '2gb');
-        
+
         // Enable compression for large values
         Redis::config('set', 'compression', 'yes');
-        
+
         // Configure persistence for important data
         Redis::config('set', 'save', '900 1 300 10 60 10000');
     }
-    
+
     private function migrateCacheStructure(): void
     {
         // Migrate to hierarchical cache keys
         $oldKeys = Redis::keys('*');
-        
+
         foreach ($oldKeys as $oldKey) {
             $newKey = $this->transformCacheKey($oldKey);
             $value = Redis::get($oldKey);
             $ttl = Redis::ttl($oldKey);
-            
+
             // Set with new key structure
             if ($ttl > 0) {
                 Redis::setex($newKey, $ttl, $value);
             } else {
                 Redis::set($newKey, $value);
             }
-            
+
             // Remove old key
             Redis::del($oldKey);
         }
     }
-    
+
     private function setupCacheWarming(): void
     {
         // Warm frequently accessed data
@@ -2126,19 +2126,19 @@ class RedisCacheMigrationService
         $this->warmUserDataCache();
         $this->warmAIModelCache();
     }
-    
+
     private function warmGameDataCache(): void
     {
         // Pre-load character data
         Cache::remember('game-data:characters:all', 3600, function () {
             return GameCharacter::with('aptitudes')->get();
         });
-        
+
         // Pre-load skill data
         Cache::remember('game-data:skills:all', 3600, function () {
             return GameSkill::with('evolution')->get();
         });
-        
+
         // Pre-load support card data
         Cache::remember('game-data:support-cards:all', 3600, function () {
             return GameSupportCard::with('effects')->get();
@@ -2164,17 +2164,17 @@ class PerformanceMonitoringService
     {
         // Configure Laravel Telescope for development
         $this->configureTelescopeMonitoring();
-        
+
         // Set up custom performance metrics
         $this->setupCustomMetrics();
-        
+
         // Configure alerting thresholds
         $this->configureAlertingThresholds();
-        
+
         // Set up automated reporting
         $this->setupAutomatedReporting();
     }
-    
+
     private function setupCustomMetrics(): void
     {
         // Migration performance metrics
@@ -2182,35 +2182,35 @@ class PerformanceMonitoringService
             'help' => 'Duration of migration operations in seconds',
             'labels' => ['migration_type', 'status']
         ]);
-        
+
         Metrics::register('migration_records_processed_total', 'counter', [
             'help' => 'Total number of records processed during migrations',
             'labels' => ['migration_type', 'source']
         ]);
-        
+
         // AI system metrics
         Metrics::register('ai_request_duration_seconds', 'histogram', [
             'help' => 'Duration of AI requests in seconds',
             'labels' => ['model', 'request_type']
         ]);
-        
+
         Metrics::register('ai_cost_usd_total', 'counter', [
             'help' => 'Total cost of AI requests in USD',
             'labels' => ['model', 'provider']
         ]);
-        
+
         // OCR processing metrics
         Metrics::register('ocr_processing_duration_seconds', 'histogram', [
             'help' => 'Duration of OCR processing in seconds',
             'labels' => ['screen_type', 'status']
         ]);
-        
+
         Metrics::register('ocr_confidence_score', 'histogram', [
             'help' => 'OCR confidence scores',
             'labels' => ['screen_type']
         ]);
     }
-    
+
     private function configureAlertingThresholds(): void
     {
         // Migration performance alerts
@@ -2220,14 +2220,14 @@ class PerformanceMonitoringService
             'severity' => 'warning',
             'notification_channels' => ['email', 'slack']
         ]);
-        
+
         Alert::create([
             'name' => 'Migration Failure Rate High',
             'condition' => 'rate(migration_records_processed_total{status="failed"}[5m]) > 0.1',
             'severity' => 'critical',
             'notification_channels' => ['email', 'slack', 'sms']
         ]);
-        
+
         // AI cost alerts
         Alert::create([
             'name' => 'AI Cost Budget Exceeded',
@@ -2235,7 +2235,7 @@ class PerformanceMonitoringService
             'severity' => 'warning',
             'notification_channels' => ['email']
         ]);
-        
+
         // System resource alerts
         Alert::create([
             'name' => 'High Memory Usage',
@@ -2262,17 +2262,17 @@ class MigrationAuditService
     {
         // Create audit log table
         $this->createAuditLogTable();
-        
+
         // Set up event listeners for audit logging
         $this->setupAuditEventListeners();
-        
+
         // Configure audit data retention
         $this->configureAuditRetention();
-        
+
         // Set up compliance reporting
         $this->setupComplianceReporting();
     }
-    
+
     private function setupAuditEventListeners(): void
     {
         // Migration events
@@ -2291,7 +2291,7 @@ class MigrationAuditService
                 'created_at' => now()
             ]);
         });
-        
+
         Event::listen(MigrationCompleted::class, function ($event) {
             AuditLog::create([
                 'event_type' => 'migration_completed',
@@ -2306,7 +2306,7 @@ class MigrationAuditService
                 'created_at' => now()
             ]);
         });
-        
+
         // Data access events
         Event::listen(DataAccessed::class, function ($event) {
             AuditLog::create([
@@ -2323,7 +2323,7 @@ class MigrationAuditService
             ]);
         });
     }
-    
+
     private function configureAuditRetention(): void
     {
         // Set up automated cleanup of old audit logs
@@ -2332,14 +2332,14 @@ class MigrationAuditService
             ->at('01:00')
             ->description('Clean up audit logs older than retention period');
     }
-    
+
     private function setupComplianceReporting(): void
     {
         // Generate monthly compliance reports
         Schedule::command('audit:generate-compliance-report')
             ->monthly()
             ->description('Generate monthly compliance report');
-        
+
         // Generate data processing reports for GDPR compliance
         Schedule::command('audit:generate-gdpr-report')
             ->monthly()
@@ -2444,7 +2444,7 @@ This updated Data Migration Plan provides a comprehensive framework for successf
 ### Critical Implementation Considerations
 
 #### External Dependencies
-- **API Reliability**: umapyoi.net verified active, UmamusumeDB.com requires verification during Phase 1
+- **API Reliability**: umapyoi.net verified active, UmamusumeDB.com verification pending (Phase 1 priority)
 - **Rate Limiting**: Respect external API limits with exponential backoff and intelligent caching
 - **Data Quality**: Multi-source validation and community consensus for meta information
 - **Fallback Strategies**: Graceful degradation when external services are unavailable

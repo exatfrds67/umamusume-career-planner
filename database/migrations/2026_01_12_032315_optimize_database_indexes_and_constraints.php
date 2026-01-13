@@ -87,18 +87,21 @@ return new class extends Migration
             $table->index(['is_security_event', 'is_audit_event'], 'idx_log_security_audit');
         });
 
-        // Add check constraints for data integrity
+        // Add check constraints for data integrity (MySQL only)
         // Note: Characters table stores stats in JSON format, so we'll skip stat range constraints
-        
-        DB::statement('ALTER TABLE ucp_skills ADD CONSTRAINT chk_sp_cost_positive CHECK (base_sp_cost > 0)');
-        
-        DB::statement('ALTER TABLE ucp_careers ADD CONSTRAINT chk_turn_range CHECK (current_turn >= 1 AND current_turn <= 78)');
-        DB::statement('ALTER TABLE ucp_careers ADD CONSTRAINT chk_win_rate_range CHECK (win_rate >= 0 AND win_rate <= 100)');
+        // SQLite doesn't support ALTER TABLE ADD CONSTRAINT for CHECK constraints
 
-        DB::statement('ALTER TABLE ucp_training_sessions ADD CONSTRAINT chk_energy_range CHECK (energy_before >= 0 AND energy_before <= 100 AND energy_after >= 0 AND energy_after <= 100)');
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement('ALTER TABLE ucp_skills ADD CONSTRAINT chk_sp_cost_positive CHECK (base_sp_cost > 0)');
 
-        DB::statement('ALTER TABLE ucp_races ADD CONSTRAINT chk_finish_position_positive CHECK (finish_position > 0)');
-        DB::statement('ALTER TABLE ucp_races ADD CONSTRAINT chk_field_size_positive CHECK (field_size > 0)');
+            DB::statement('ALTER TABLE ucp_careers ADD CONSTRAINT chk_turn_range CHECK (current_turn >= 1 AND current_turn <= 78)');
+            DB::statement('ALTER TABLE ucp_careers ADD CONSTRAINT chk_win_rate_range CHECK (win_rate >= 0 AND win_rate <= 100)');
+
+            DB::statement('ALTER TABLE ucp_training_sessions ADD CONSTRAINT chk_energy_range CHECK (energy_before >= 0 AND energy_before <= 100 AND energy_after >= 0 AND energy_after <= 100)');
+
+            DB::statement('ALTER TABLE ucp_races ADD CONSTRAINT chk_finish_position_positive CHECK (finish_position > 0)');
+            DB::statement('ALTER TABLE ucp_races ADD CONSTRAINT chk_field_size_positive CHECK (field_size > 0)');
+        }
     }
 
     /**
@@ -106,14 +109,16 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Drop check constraints
+        // Drop check constraints (MySQL only)
         // Note: Characters table constraints were not added
-        DB::statement('ALTER TABLE ucp_skills DROP CONSTRAINT IF EXISTS chk_sp_cost_positive');
-        DB::statement('ALTER TABLE ucp_careers DROP CONSTRAINT IF EXISTS chk_turn_range');
-        DB::statement('ALTER TABLE ucp_careers DROP CONSTRAINT IF EXISTS chk_win_rate_range');
-        DB::statement('ALTER TABLE ucp_training_sessions DROP CONSTRAINT IF EXISTS chk_energy_range');
-        DB::statement('ALTER TABLE ucp_races DROP CONSTRAINT IF EXISTS chk_finish_position_positive');
-        DB::statement('ALTER TABLE ucp_races DROP CONSTRAINT IF EXISTS chk_field_size_positive');
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement('ALTER TABLE ucp_skills DROP CONSTRAINT IF EXISTS chk_sp_cost_positive');
+            DB::statement('ALTER TABLE ucp_careers DROP CONSTRAINT IF EXISTS chk_turn_range');
+            DB::statement('ALTER TABLE ucp_careers DROP CONSTRAINT IF EXISTS chk_win_rate_range');
+            DB::statement('ALTER TABLE ucp_training_sessions DROP CONSTRAINT IF EXISTS chk_energy_range');
+            DB::statement('ALTER TABLE ucp_races DROP CONSTRAINT IF EXISTS chk_finish_position_positive');
+            DB::statement('ALTER TABLE ucp_races DROP CONSTRAINT IF EXISTS chk_field_size_positive');
+        }
 
         // Drop additional indexes
         Schema::table('ucp_characters', function (Blueprint $table) {

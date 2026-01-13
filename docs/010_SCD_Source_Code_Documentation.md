@@ -2,10 +2,10 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 1.0  
-**Date**: January 11, 2026  
-**Project**: UmamusumeCareerPlanner  
-**Author**: Development Team  
+**Document Version**: 1.0
+**Date**: January 14, 2026
+**Project**: UmamusumeCareerPlanner
+**Author**: Development Team
 **Updated**: Aligned with Laravel 12, modern PHP practices, and AI
 integration architecture
 
@@ -214,7 +214,7 @@ umamusume-career-planner/
 
 return [
     'default_provider' => env('AI_DEFAULT_PROVIDER', 'ollama'),
-    
+
     'providers' => [
         'ollama' => [
             'enabled' => env('OLLAMA_ENABLED', true),
@@ -238,7 +238,7 @@ return [
                 ]
             ]
         ],
-        
+
         'bedrock' => [
             'enabled' => env('BEDROCK_ENABLED', false),
             'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
@@ -267,7 +267,7 @@ return [
             ]
         ]
     ],
-    
+
     'routing' => [
         'complexity_thresholds' => [
             'simple' => 3,
@@ -360,11 +360,11 @@ class CharacterRepository implements CharacterRepositoryInterface
         private Character $model,
         private CacheService $cache
     ) {}
-    
+
     public function findByUser(User $user): Collection
     {
         $cacheKey = "user_characters:{$user->id}";
-        
+
         return $this->cache->remember($cacheKey, 3600, function () use ($user) {
             return $this->model
                 ->where('user_id', $user->id)
@@ -373,12 +373,12 @@ class CharacterRepository implements CharacterRepositoryInterface
                 ->get();
         });
     }
-    
+
     public function findActiveByUser(User $user): Collection
     {
         return $this->findByUser($user)->where('is_active', true);
     }
-    
+
     public function create(array $data): Character
     {
         $character = $this->model->create(array_merge($data, [
@@ -386,16 +386,16 @@ class CharacterRepository implements CharacterRepositoryInterface
             'current_stats' => $this->getDefaultStats(),
             'is_active' => true
         ]));
-        
+
         // Clear user cache
         $this->cache->forget("user_characters:{$character->user_id}");
-        
+
         // Dispatch character created event
         event(new CharacterCreated($character));
-        
+
         return $character;
     }
-    
+
     private function getDefaultStats(): array
     {
         return [
@@ -426,43 +426,43 @@ class CharacterTrainingService
         private AIRecommendationService $aiService,
         private EventDispatcher $eventDispatcher
     ) {}
-    
+
     public function executeTraining(
-        Character $character, 
+        Character $character,
         TrainingAction $action
     ): TrainingResult {
-        
+
         // Validate training action
         $this->validateTrainingAction($character, $action);
-        
+
         // Get AI recommendation if requested
         $aiRecommendation = null;
         if ($action->requestAIRecommendation) {
             $aiRecommendation = $this->aiService->getTrainingRecommendation(
-                $character, 
+                $character,
                 $action
             );
         }
-        
+
         // Calculate training results
         $results = $this->calculateTrainingResults($character, $action);
-        
+
         // Update character stats
         $updatedCharacter = $this->updateCharacterStats($character, $results);
-        
+
         // Record training session
         $session = $this->recordTrainingSession(
-            $character, 
-            $action, 
-            $results, 
+            $character,
+            $action,
+            $results,
             $aiRecommendation
         );
-        
+
         // Dispatch training completed event
         $this->eventDispatcher->dispatch(
             new TrainingCompleted($updatedCharacter, $session, $results)
         );
-        
+
         return new TrainingResult(
             character: $updatedCharacter,
             session: $session,
@@ -471,31 +471,31 @@ class CharacterTrainingService
             aiRecommendation: $aiRecommendation
         );
     }
-    
+
     private function validateTrainingAction(Character $character, TrainingAction $action): void
     {
         if (!$character->canTrain()) {
             throw new InvalidTrainingException('Character cannot train at this time');
         }
-        
+
         if ($character->current_turn >= $character->max_turns) {
             throw new InvalidTrainingException('Character has completed maximum turns');
         }
-        
+
         // Additional validation logic...
     }
-    
+
     private function calculateTrainingResults(
-        Character $character, 
+        Character $character,
         TrainingAction $action
     ): TrainingCalculationResult {
-        
+
         $calculator = new TrainingCalculator(
             $character->aptitudes,
             $character->current_stats,
             $action->supportCards
         );
-        
+
         return $calculator->calculate($action);
     }
 }
@@ -511,31 +511,31 @@ namespace App\Services\AI;
 class AIServiceFactory
 {
     private array $providers = [];
-    
+
     public function __construct()
     {
         $this->registerProviders();
     }
-    
+
     public function create(string $provider = null): AIServiceInterface
     {
         $provider = $provider ?: config('ai.default_provider');
-        
+
         if (!isset($this->providers[$provider])) {
             throw new InvalidAIProviderException("Provider {$provider} not found");
         }
-        
+
         return $this->providers[$provider]();
     }
-    
+
     public function createOptimal(AIRequest $request): AIServiceInterface
     {
         $router = app(HybridAIRouter::class);
         $optimalProvider = $router->selectProvider($request);
-        
+
         return $this->create($optimalProvider);
     }
-    
+
     private function registerProviders(): void
     {
         $this->providers['ollama'] = fn() => app(OllamaService::class);
@@ -550,16 +550,16 @@ class AIController extends Controller
         private AIServiceFactory $aiFactory,
         private AIRequestValidator $validator
     ) {}
-    
+
     public function generateRecommendation(AIRecommendationRequest $request): JsonResponse
     {
         $aiRequest = AIRequest::fromRequest($request);
-        
+
         // Get optimal AI service based on request complexity
         $aiService = $this->aiFactory->createOptimal($aiRequest);
-        
+
         $response = $aiService->generateResponse($aiRequest);
-        
+
         return response()->json([
             'success' => true,
             'data' => [
@@ -597,7 +597,7 @@ use App\Models\Concerns\CacheableQueries;
 class Character extends Model
 {
     use HasFactory, HasUuid, CacheableQueries;
-    
+
     protected $fillable = [
         'user_id',
         'character_template_id',
@@ -614,7 +614,7 @@ class Character extends Model
         'status',
         'is_active'
     ];
-    
+
     protected $casts = [
         'current_stats' => 'array',
         'aptitudes' => 'array',
@@ -627,66 +627,66 @@ class Character extends Model
         'max_turns' => 'integer',
         'completed_at' => 'datetime'
     ];
-    
+
     protected $attributes = [
         'current_stats' => '{"speed":0,"stamina":0,"power":0,"guts":0,"wit":0,"skill_points":0,"fans":0}',
         'is_active' => true,
         'current_turn' => 0,
         'max_turns' => 78
     ];
-    
+
     // Relationships
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
-    
+
     public function characterTemplate(): BelongsTo
     {
         return $this->belongsTo(CharacterTemplate::class);
     }
-    
+
     public function scenario(): BelongsTo
     {
         return $this->belongsTo(Scenario::class);
     }
-    
+
     public function trainingSessions(): HasMany
     {
         return $this->hasMany(TrainingSession::class);
     }
-    
+
     public function raceResults(): HasMany
     {
         return $this->hasMany(RaceResult::class);
     }
-    
+
     public function aiConversations(): HasMany
     {
         return $this->hasMany(AIConversation::class);
     }
-    
+
     // Scopes
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
     }
-    
+
     public function scopeInProgress($query)
     {
         return $query->active()->whereNull('completed_at');
     }
-    
+
     public function scopeCompleted($query)
     {
         return $query->whereNotNull('completed_at');
     }
-    
+
     // Accessors & Mutators
     public function getCurrentStatsAttribute($value): array
     {
         $stats = is_string($value) ? json_decode($value, true) : $value;
-        
+
         return array_merge([
             'speed' => 0,
             'stamina' => 0,
@@ -697,38 +697,38 @@ class Character extends Model
             'fans' => 0
         ], $stats ?: []);
     }
-    
+
     public function setCurrentStatsAttribute($value): void
     {
-        $this->attributes['current_stats'] = is_array($value) 
-            ? json_encode($value) 
+        $this->attributes['current_stats'] = is_array($value)
+            ? json_encode($value)
             : $value;
     }
-    
+
     // Business Logic Methods
     public function getTotalStats(): int
     {
         $stats = $this->current_stats;
-        return $stats['speed'] + $stats['stamina'] + $stats['power'] + 
+        return $stats['speed'] + $stats['stamina'] + $stats['power'] +
                $stats['guts'] + $stats['wit'];
     }
-    
+
     public function getProgressPercentage(): float
     {
         return ($this->current_turn / $this->max_turns) * 100;
     }
-    
+
     public function canTrain(): bool
     {
-        return $this->is_active && 
-               $this->current_turn < $this->max_turns && 
+        return $this->is_active &&
+               $this->current_turn < $this->max_turns &&
                is_null($this->completed_at);
     }
-    
+
     public function getStatRank(string $stat): string
     {
         $value = $this->current_stats[$stat] ?? 0;
-        
+
         return match (true) {
             $value >= 1200 => 'SS',
             $value >= 1000 => 'S',
@@ -739,11 +739,11 @@ class Character extends Model
             default => 'G'
         };
     }
-    
+
     public function getOverallRank(): string
     {
         $total = $this->getTotalStats();
-        
+
         return match (true) {
             $total >= 6000 => 'SS',
             $total >= 5000 => 'S',
@@ -754,17 +754,17 @@ class Character extends Model
             default => 'G'
         };
     }
-    
+
     public function completeTraining(): void
     {
         $this->update([
             'is_active' => false,
             'completed_at' => now()
         ]);
-        
+
         event(new CharacterTrainingCompleted($this));
     }
-    
+
     // Cache Management
     protected function getCacheTags(): array
     {
@@ -786,7 +786,7 @@ class TrainingCalculator
     private array $currentStats;
     private array $supportCards;
     private array $baseGainRates;
-    
+
     public function __construct(array $aptitudes, array $currentStats, array $supportCards = [])
     {
         $this->aptitudes = $aptitudes;
@@ -794,24 +794,24 @@ class TrainingCalculator
         $this->supportCards = $supportCards;
         $this->baseGainRates = config('game.training.base_gain_rates');
     }
-    
+
     public function calculate(TrainingAction $action): TrainingCalculationResult
     {
         $baseGains = $this->calculateBaseGains($action);
         $aptitudeModifiers = $this->calculateAptitudeModifiers($action);
         $supportCardBonuses = $this->calculateSupportCardBonuses($action);
         $randomVariation = $this->calculateRandomVariation();
-        
+
         $finalGains = $this->applyAllModifiers(
             $baseGains,
             $aptitudeModifiers,
             $supportCardBonuses,
             $randomVariation
         );
-        
+
         $events = $this->checkForEvents($action, $finalGains);
         $skillsLearned = $this->checkForSkillLearning($action);
-        
+
         return new TrainingCalculationResult(
             statsGained: $finalGains,
             events: $events,
@@ -820,12 +820,12 @@ class TrainingCalculator
             efficiencyScore: $this->calculateEfficiencyScore($finalGains, $action)
         );
     }
-    
+
     private function calculateBaseGains(TrainingAction $action): array
     {
         $trainingType = $action->getTrainingType();
         $baseRates = $this->baseGainRates[$trainingType] ?? [];
-        
+
         return [
             'speed' => $baseRates['speed'] ?? 0,
             'stamina' => $baseRates['stamina'] ?? 0,
@@ -835,21 +835,21 @@ class TrainingCalculator
             'skill_points' => $baseRates['skill_points'] ?? 0
         ];
     }
-    
+
     private function calculateAptitudeModifiers(TrainingAction $action): array
     {
         $modifiers = [];
         $trainingType = $action->getTrainingType();
-        
+
         foreach (['speed', 'stamina', 'power', 'guts', 'wit'] as $stat) {
             $aptitude = $this->aptitudes[$stat] ?? 'G';
             $modifier = $this->getAptitudeModifier($aptitude, $stat, $trainingType);
             $modifiers[$stat] = $modifier;
         }
-        
+
         return $modifiers;
     }
-    
+
     private function getAptitudeModifier(string $aptitude, string $stat, string $trainingType): float
     {
         $aptitudeValues = [
@@ -863,32 +863,32 @@ class TrainingCalculator
             'F' => 0.5,
             'G' => 0.4
         ];
-        
+
         $baseModifier = $aptitudeValues[$aptitude] ?? 1.0;
-        
+
         // Apply additional modifiers based on training type matching stat
         if ($this->isMatchingTraining($stat, $trainingType)) {
             $baseModifier *= 1.1; // 10% bonus for matching training
         }
-        
+
         return $baseModifier;
     }
-    
+
     private function calculateSupportCardBonuses(TrainingAction $action): array
     {
         $bonuses = array_fill_keys(['speed', 'stamina', 'power', 'guts', 'wit', 'skill_points'], 0);
-        
+
         foreach ($this->supportCards as $card) {
             $cardBonuses = $this->calculateSingleCardBonus($card, $action);
-            
+
             foreach ($cardBonuses as $stat => $bonus) {
                 $bonuses[$stat] += $bonus;
             }
         }
-        
+
         return $bonuses;
     }
-    
+
     private function calculateRandomVariation(): array
     {
         // Add 0-20% random variation to make training less predictable
@@ -901,7 +901,7 @@ class TrainingCalculator
             'skill_points' => mt_rand(100, 120) / 100
         ];
     }
-    
+
     private function applyAllModifiers(
         array $baseGains,
         array $aptitudeModifiers,
@@ -909,16 +909,16 @@ class TrainingCalculator
         array $randomVariation
     ): array {
         $finalGains = [];
-        
+
         foreach ($baseGains as $stat => $baseGain) {
             $aptitudeModifier = $aptitudeModifiers[$stat] ?? 1.0;
             $supportBonus = $supportCardBonuses[$stat] ?? 0;
             $randomMod = $randomVariation[$stat] ?? 1.0;
-            
+
             $finalGain = (($baseGain * $aptitudeModifier) + $supportBonus) * $randomMod;
             $finalGains[$stat] = max(0, round($finalGain));
         }
-        
+
         return $finalGains;
     }
 }
@@ -951,7 +951,7 @@ class AIRequest
         private int $complexity = 5,
         private array $options = []
     ) {}
-    
+
     public static function fromRequest(Request $request): self
     {
         return new self(
@@ -961,37 +961,37 @@ class AIRequest
             options: $request->input('options', [])
         );
     }
-    
+
     public function getPrompt(): string
     {
         return $this->prompt;
     }
-    
+
     public function getContext(): array
     {
         return $this->context;
     }
-    
+
     public function getComplexity(): int
     {
         return $this->complexity;
     }
-    
+
     public function getOptions(): array
     {
         return $this->options;
     }
-    
+
     public function requiresMultilingual(): bool
     {
         return $this->options['multilingual'] ?? false;
     }
-    
+
     public function getMaxTokens(): int
     {
         return $this->options['max_tokens'] ?? 2048;
     }
-    
+
     public function getTemperature(): float
     {
         return $this->options['temperature'] ?? 0.7;
@@ -1008,42 +1008,42 @@ class AIResponse
         private float $cost = 0.0,
         private array $metadata = []
     ) {}
-    
+
     public function getContent(): string
     {
         return $this->content;
     }
-    
+
     public function getModel(): string
     {
         return $this->model;
     }
-    
+
     public function getProcessingTime(): float
     {
         return $this->processingTime;
     }
-    
+
     public function getConfidence(): float
     {
         return $this->confidence;
     }
-    
+
     public function getCost(): float
     {
         return $this->cost;
     }
-    
+
     public function getMetadata(): array
     {
         return $this->metadata;
     }
-    
+
     public function isLocalProcessing(): bool
     {
         return $this->metadata['local_processing'] ?? false;
     }
-    
+
     public function toArray(): array
     {
         return [
@@ -1073,7 +1073,7 @@ namespace App\Http\Controllers\API\V1;
 
 /**
  * @group Character Management
- * 
+ *
  * APIs for managing user characters, training sessions, and performance analytics.
  */
 class CharacterController extends Controller
@@ -1082,18 +1082,18 @@ class CharacterController extends Controller
         private CharacterService $characterService,
         private TrainingService $trainingService
     ) {}
-    
+
     /**
      * Get user characters
-     * 
+     *
      * Retrieve all characters belonging to the authenticated user.
-     * 
+     *
      * @authenticated
-     * 
+     *
      * @queryParam active boolean Filter by active status. Example: true
      * @queryParam scenario_id integer Filter by scenario ID. Example: 1
      * @queryParam limit integer Number of characters to return. Example: 10
-     * 
+     *
      * @response 200 {
      *   "success": true,
      *   "data": [
@@ -1143,7 +1143,7 @@ class CharacterController extends Controller
             filters: $request->only(['active', 'scenario_id']),
             limit: $request->input('limit', 50)
         );
-        
+
         return response()->json([
             'success' => true,
             'data' => CharacterResource::collection($characters),
@@ -1154,20 +1154,20 @@ class CharacterController extends Controller
             ]
         ]);
     }
-    
+
     /**
      * Create new character
-     * 
+     *
      * Create a new character instance for the authenticated user.
-     * 
+     *
      * @authenticated
-     * 
+     *
      * @bodyParam character_template_id integer required The character template ID. Example: 1
      * @bodyParam name string required Character name. Example: Special Week
      * @bodyParam nickname string Character nickname. Example: Spechan
      * @bodyParam scenario_id integer Scenario ID. Example: 1
      * @bodyParam goals array Character goals and objectives. Example: ["win_twinkle_series", "reach_1000_fans"]
-     * 
+     *
      * @response 201 {
      *   "success": true,
      *   "data": {
@@ -1198,23 +1198,23 @@ class CharacterController extends Controller
             user: $request->user(),
             data: $request->validated()
         );
-        
+
         return response()->json([
             'success' => true,
             'data' => new CharacterResource($character),
             'message' => 'Character created successfully'
         ], 201);
     }
-    
+
     /**
      * Get character details
-     * 
+     *
      * Retrieve detailed information about a specific character.
-     * 
+     *
      * @authenticated
-     * 
+     *
      * @urlParam character string required Character UUID. Example: 550e8400-e29b-41d4-a716-446655440000
-     * 
+     *
      * @response 200 {
      *   "success": true,
      *   "data": {
@@ -1248,28 +1248,28 @@ class CharacterController extends Controller
     public function show(string $uuid): JsonResponse
     {
         $character = $this->characterService->getCharacterByUuid($uuid);
-        
+
         $this->authorize('view', $character);
-        
+
         return response()->json([
             'success' => true,
             'data' => new DetailedCharacterResource($character)
         ]);
     }
-    
+
     /**
      * Execute training action
-     * 
+     *
      * Execute a training action for the specified character.
-     * 
+     *
      * @authenticated
-     * 
+     *
      * @urlParam character string required Character UUID. Example: 550e8400-e29b-41d4-a716-446655440000
-     * 
+     *
      * @bodyParam action string required Training action type. Example: speed_training
      * @bodyParam support_cards array Support cards to use. Example: [1, 2, 3]
      * @bodyParam request_ai_recommendation boolean Request AI recommendation. Example: true
-     * 
+     *
      * @response 200 {
      *   "success": true,
      *   "data": {
@@ -1301,14 +1301,14 @@ class CharacterController extends Controller
     public function train(string $uuid, TrainingRequest $request): JsonResponse
     {
         $character = $this->characterService->getCharacterByUuid($uuid);
-        
+
         $this->authorize('train', $character);
-        
+
         $result = $this->trainingService->executeTraining(
             character: $character,
             action: TrainingAction::fromRequest($request)
         );
-        
+
         return response()->json([
             'success' => true,
             'data' => [
@@ -1330,7 +1330,7 @@ namespace App\Http\Controllers\API\V1;
 
 /**
  * @group AI Integration
- * 
+ *
  * APIs for AI-powered recommendations, analysis, and optimization.
  */
 class AIController extends Controller
@@ -1339,20 +1339,20 @@ class AIController extends Controller
         private AIServiceFactory $aiFactory,
         private AIUsageTracker $usageTracker
     ) {}
-    
+
     /**
      * Get AI recommendation
-     * 
+     *
      * Generate AI-powered training recommendations for a character.
-     * 
+     *
      * @authenticated
-     * 
+     *
      * @bodyParam character_id integer required Character ID. Example: 1
      * @bodyParam request_type string required Type of recommendation. Example: training_optimization
      * @bodyParam context array Additional context data. Example: {"current_turn": 15, "goals": ["speed_focus"]}
      * @bodyParam complexity integer Request complexity (1-10). Example: 7
      * @bodyParam prefer_local boolean Prefer local AI processing. Example: true
-     * 
+     *
      * @response 200 {
      *   "success": true,
      *   "data": {
@@ -1382,21 +1382,21 @@ class AIController extends Controller
     public function getRecommendation(AIRecommendationRequest $request): JsonResponse
     {
         $aiRequest = AIRequest::fromRequest($request);
-        
+
         // Check usage limits
         $this->usageTracker->checkLimits($request->user());
-        
+
         // Get optimal AI service
         $aiService = $this->aiFactory->createOptimal($aiRequest);
-        
+
         $response = $aiService->generateResponse($aiRequest);
-        
+
         // Track usage
         $this->usageTracker->recordUsage(
             user: $request->user(),
             response: $response
         );
-        
+
         return response()->json([
             'success' => true,
             'data' => [
@@ -1405,16 +1405,16 @@ class AIController extends Controller
             ]
         ]);
     }
-    
+
     /**
      * Analyze character performance
-     * 
+     *
      * Get AI-powered analysis of character training performance and optimization suggestions.
-     * 
+     *
      * @authenticated
-     * 
+     *
      * @urlParam character string required Character UUID. Example: 550e8400-e29b-41d4-a716-446655440000
-     * 
+     *
      * @response 200 {
      *   "success": true,
      *   "data": {
@@ -1439,18 +1439,18 @@ class AIController extends Controller
     public function analyzePerformance(string $uuid): JsonResponse
     {
         $character = Character::where('uuid', $uuid)->firstOrFail();
-        
+
         $this->authorize('view', $character);
-        
+
         $analysisRequest = new AIRequest(
             prompt: $this->buildAnalysisPrompt($character),
             context: $this->gatherAnalysisContext($character),
             complexity: 8
         );
-        
+
         $aiService = $this->aiFactory->createOptimal($analysisRequest);
         $response = $aiService->generateResponse($analysisRequest);
-        
+
         return response()->json([
             'success' => true,
             'data' => [

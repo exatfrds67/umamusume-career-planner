@@ -13,7 +13,7 @@ The highest level view showing the system boundary and external entities.
 The Umamusume Career Planner system sits at the center, receiving inputs from:
 
 - **Player**: Provides manual data entry, screenshots, career goals, and configuration
-- **External APIs**: **umapyoi.net** (active public API), **UmamusumeDB.com**, and community sources provide game data
+- **External APIs**: **umapyoi.net** (active public API), **UmamusumeDB.com** (verification pending), and community sources provide game data
 - **Community Sources**: Real-time meta data, tier lists, and strategy information
 - **Game Client**: Screenshot data and current game state information
 
@@ -25,10 +25,10 @@ The system outputs:
 
 ### ASCII Diagram
 
-```
+```text
                     External APIs
-                   (umapyoi.net,     Community Sources
-                   UmamusumeDB)     (Meta data, Tier lists)
+                   (umapyoi.net,              Community Sources
+                   UmamusumeDB - pending)     (Meta data, Tier lists)
                         |                    |
                         v                    v
     Player ---------> [UMAMUSUME] ---------> Analytics Reports
@@ -52,21 +52,21 @@ The system outputs:
 ```mermaid
 graph TB
     Player[Player<br/>Manual Input, Screenshots, Goals]
-    APIs[External APIs<br/>umapyoi.net, UmamusumeDB]
+    APIs[External APIs<br/>umapyoi.net, UmamusumeDB - pending]
     Community[Community Sources<br/>Meta Data, Tier Lists]
     GameClient[Game Client<br/>Screenshots, Game State]
-    
+
     UmamusumeCareerPlanner[UMAMUSUME<br/>CAREER<br/>PLANNER<br/>SYSTEM]
-    
+
     OptRecommendations[Optimization Recommendations<br/>Training Suggestions, Race Strategies]
     Analytics[Analytics Reports<br/>Performance Analysis, Career Comparisons]
     CommunityData[Community Data<br/>Shared Builds, Strategies]
-    
+
     Player --> UmamusumeCareerPlanner
     APIs --> UmamusumeCareerPlanner
     Community --> UmamusumeCareerPlanner
     GameClient --> UmamusumeCareerPlanner
-    
+
     UmamusumeCareerPlanner --> OptRecommendations
     UmamusumeCareerPlanner --> Analytics
     UmamusumeCareerPlanner --> CommunityData
@@ -76,22 +76,22 @@ graph TB
 
 ### Text Description
 
-The system breaks down into 8 major processes supporting all **60 comprehensive requirements**:
+The system breaks down into 8 major processes supporting all **59 requirements**:
 
 1. **Data Collection & Integration**: Aggregates data from **umapyoi.net** API, community sources, and user inputs
 2. **Screenshot Analysis & OCR**: Processes game screenshots to extract current state information using **AWS Bedrock Claude 4.5**
 3. **AI Advisory System**: Provides intelligent recommendations using **Ollama** (local) and **AWS Bedrock** (cloud) models
 4. **Training Optimization Engine**: Calculates optimal training strategies and predictions with **Laravel 12** backend
-5. **Career Management System**: Tracks career progression and historical data across all 60 requirements
+5. **Career Management System**: Tracks career progression and historical data across all 59 requirements
 6. **PvP & Competition Analysis**: Manages Champions Meeting and competitive strategies
 7. **Resource Management**: Handles items, gacha planning, and resource optimization
 8. **Analytics & Reporting**: Generates performance reports and statistical analysis
 
 ### ASCII Diagram
 
-```
+```text
 External APIs -----> [1. Data Collection] -----> Game Data Store
-Community Data ----> [   & Integration  ] 
+Community Data ----> [   & Integration  ]
 User Input --------> [   (umapyoi.net)  ]
 
 Screenshots -------> [2. Screenshot     ] -----> Extracted Game State
@@ -133,13 +133,13 @@ graph TB
     Screenshots[Screenshots]
     GameState[Game State]
     UserQueries[User Queries]
-    
+
     %% Data Stores
     GameDataStore[(Game Data Store)]
     CareerHistory[(Career History)]
     UserProfiles[(User Profiles)]
     MetaDatabase[(Meta Database)]
-    
+
     %% Processes
     DataCollection[1. Data Collection<br/>& Integration]
     ScreenshotAnalysis[2. Screenshot<br/>Analysis & OCR]
@@ -149,7 +149,7 @@ graph TB
     PvPAnalysis[6. PvP &<br/>Competition Analysis]
     ResourceManagement[7. Resource<br/>Management]
     Analytics[8. Analytics<br/>& Reporting]
-    
+
     %% Outputs
     AIRecommendations[AI Recommendations]
     TrainingRecs[Training Recommendations]
@@ -157,38 +157,38 @@ graph TB
     PvPStrategies[PvP Strategies]
     ResourcePlans[Resource Plans]
     Reports[Performance Reports]
-    
+
     %% Data Flow
     ExtAPIs --> DataCollection
     CommunityData --> DataCollection
     UserInput --> DataCollection
     DataCollection --> GameDataStore
-    
+
     Screenshots --> ScreenshotAnalysis
     GameState --> ScreenshotAnalysis
     ScreenshotAnalysis --> UserProfiles
-    
+
     UserQueries --> AIAdvisory
     GameDataStore --> AIAdvisory
     CareerHistory --> AIAdvisory
     AIAdvisory --> AIRecommendations
-    
+
     GameDataStore --> TrainingOptimization
     UserProfiles --> TrainingOptimization
     TrainingOptimization --> TrainingRecs
-    
+
     CareerHistory --> CareerManagement
     UserProfiles --> CareerManagement
     CareerManagement --> CareerAnalytics
-    
+
     MetaDatabase --> PvPAnalysis
     GameDataStore --> PvPAnalysis
     PvPAnalysis --> PvPStrategies
-    
+
     UserProfiles --> ResourceManagement
     GameDataStore --> ResourceManagement
     ResourceManagement --> ResourcePlans
-    
+
     GameDataStore --> Analytics
     CareerHistory --> Analytics
     UserProfiles --> Analytics
@@ -211,7 +211,7 @@ The Training Optimization Engine is the core of the system, containing several s
 
 ### ASCII Diagram
 
-```
+```text
 Character Stats -----> [4.1 Stat Prediction] -----> Predicted Gains
 Support Cards ------> [    Calculator      ]
 Growth Rates -------> [                    ]
@@ -258,7 +258,7 @@ graph TB
     CareerPhase[Career Phase]
     GoalsTimeline[Goals Timeline]
     RemainingTurns[Remaining Turns]
-    
+
     %% Sub-processes
     StatPrediction[4.1 Stat Prediction<br/>Calculator]
     SkillHintOpt[4.2 Skill Hint<br/>Manager]
@@ -266,7 +266,7 @@ graph TB
     FriendshipAnalyzer[4.4 Friendship<br/>Training Analyzer]
     WeatherProcessor[4.5 Weather &<br/>Environment Processor]
     TurnOptimizer[4.6 Turn Economy<br/>Manager]
-    
+
     %% Outputs
     PredictedGains[Predicted Gains]
     SkillRecs[Skill Recommendations]
@@ -274,31 +274,31 @@ graph TB
     FriendshipStrats[Friendship Strategies]
     WeatherAdapt[Weather Adaptations]
     TurnOpt[Turn Optimization]
-    
+
     %% Data Flow
     CharacterStats --> StatPrediction
     SupportCards --> StatPrediction
     GrowthRates --> StatPrediction
     StatPrediction --> PredictedGains
-    
+
     AvailableSkills --> SkillHintOpt
     HintStatus --> SkillHintOpt
     SPPoints --> SkillHintOpt
     SkillHintOpt --> SkillRecs
-    
+
     EnergyLevel --> EnergyManager
     MoodStatus --> EnergyManager
     Conditions --> EnergyManager
     EnergyManager --> EnergyMgmt
-    
+
     SupportBonds --> FriendshipAnalyzer
     TrainingHistory --> FriendshipAnalyzer
     FriendshipAnalyzer --> FriendshipStrats
-    
+
     WeatherData --> WeatherProcessor
     TrackConditions --> WeatherProcessor
     WeatherProcessor --> WeatherAdapt
-    
+
     CareerPhase --> TurnOptimizer
     GoalsTimeline --> TurnOptimizer
     RemainingTurns --> TurnOptimizer
@@ -319,7 +319,7 @@ The AI Advisory System manages intelligent recommendations through multiple comp
 
 ### ASCII Diagram
 
-```
+```text
 User Questions -----> [3.1 Query          ] -----> Processed Queries
 Chat History -------> [    Processor      ] -----> Response Strategy
                       [                   ]
@@ -358,40 +358,40 @@ graph TB
     AIResponses[AI Responses]
     GameData[Game Data]
     CurrentState[Current State]
-    
+
     %% Sub-processes
     QueryProcessor[3.1 Query<br/>Processor]
     OllamaEngine[3.2 Ollama Local<br/>Engine]
     AWSFallback[3.3 AWS Bedrock<br/>Fallback]
     ContextManager[3.4 Context<br/>Manager]
     ResponseSynth[3.5 Response<br/>Synthesizer]
-    
+
     %% Outputs
     ProcessedQueries[Processed Queries]
     LocalResponses[Local AI Responses]
     CloudResponses[Cloud AI Responses]
     UpdatedContext[Updated Context]
     FinalRecs[Final Recommendations]
-    
+
     %% Data Flow
     UserQuestions --> QueryProcessor
     ChatHistory --> QueryProcessor
     QueryProcessor --> ProcessedQueries
-    
+
     ProcessedQueries --> OllamaEngine
     GameContext --> OllamaEngine
     CareerData --> OllamaEngine
     OllamaEngine --> LocalResponses
-    
+
     ComplexQueries --> AWSFallback
     FallbackTriggers --> AWSFallback
     AWSFallback --> CloudResponses
-    
+
     Conversation --> ContextManager
     CareerProgress --> ContextManager
     UserPrefs --> ContextManager
     ContextManager --> UpdatedContext
-    
+
     AIResponses --> ResponseSynth
     GameData --> ResponseSynth
     CurrentState --> ResponseSynth

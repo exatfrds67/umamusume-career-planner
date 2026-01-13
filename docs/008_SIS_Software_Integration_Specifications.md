@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.0  
-**Date**: 2026-01-12  
-**Project**: UmamusumeCareerPlanner  
-**Author**: Development Team  
-**Status**: Final  
+**Document Version**: 2.0
+**Date**: January 14, 2026
+**Project**: UmamusumeCareerPlanner
+**Author**: Development Team
+**Status**: Final
 **Updated**: Complete specifications aligned with Laravel 12, Tailwind CSS v4, Hybrid AI Processing, and MCP integration
 
 ---
@@ -193,7 +193,7 @@ class UmapyoiAPIClient implements GameDataAPIInterface
     private const BASE_URL = 'https://api.umapyoi.net/api/v1/';
     private const RATE_LIMIT_KEY = 'umapyoi_api_rate_limit';
     private const CACHE_PREFIX = 'umapyoi_cache:';
-    
+
     public function __construct(
         private HttpClient $client,
         private CacheManager $cache,
@@ -204,23 +204,23 @@ class UmapyoiAPIClient implements GameDataAPIInterface
         $this->client->setBaseUrl(self::BASE_URL);
         $this->client->setTimeout(30);
     }
-    
+
     public function getCharacters(array $params = []): APIResponse
     {
         $cacheKey = self::CACHE_PREFIX . 'characters:' . md5(serialize($params));
-        
+
         return $this->cache->remember($cacheKey, 86400, function () use ($params) {
             return $this->makeRequest('GET', 'characters', $params);
         });
     }
-    
+
     private function makeRequest(string $method, string $endpoint, array $params = []): APIResponse
     {
         // Check rate limit
         if (!$this->rateLimiter->attempt(self::RATE_LIMIT_KEY, 100, 60)) {
             throw new RateLimitExceededException('umapyoi.net API rate limit exceeded');
         }
-        
+
         try {
             $response = $this->client->request($method, $endpoint, [
                 'query' => $params,
@@ -229,21 +229,21 @@ class UmapyoiAPIClient implements GameDataAPIInterface
                     'User-Agent' => 'UmamusumeCareerPlanner/1.0'
                 ]
             ]);
-            
+
             $data = $response->json();
-            
+
             // Validate response schema
             if (!$this->validator->validate($data, $this->getSchema($endpoint))) {
                 throw new InvalidResponseException('Response schema validation failed');
             }
-            
+
             return new APIResponse(
                 success: true,
                 data: $data,
                 statusCode: $response->getStatusCode(),
                 headers: $response->getHeaders()
             );
-            
+
         } catch (RequestException $e) {
             $this->logger->error('umapyoi.net API request failed', [
                 'endpoint' => $endpoint,
@@ -251,7 +251,7 @@ class UmapyoiAPIClient implements GameDataAPIInterface
                 'error' => $e->getMessage(),
                 'status_code' => $e->getResponse()?->getStatusCode()
             ]);
-            
+
             throw new APIException("API request failed: {$e->getMessage()}", $e->getCode(), $e);
         }
     }
@@ -284,7 +284,7 @@ class GameDataAPIManager
 {
     private array $providers;
     private CircuitBreaker $circuitBreaker;
-    
+
     public function __construct()
     {
         $this->providers = [
@@ -293,7 +293,7 @@ class GameDataAPIManager
             'fallback' => new LocalDataProvider()
         ];
     }
-    
+
     public function getCharacters(array $params = []): APIResponse
     {
         foreach ($this->providers as $name => $provider) {
@@ -307,7 +307,7 @@ class GameDataAPIManager
                 continue;
             }
         }
-        
+
         throw new AllProvidersFailedException('All API providers are unavailable');
     }
 }
@@ -334,7 +334,7 @@ confidence_threshold: 0.7
 ```yaml
 source: Reddit
 method: api
-endpoints: 
+endpoints:
   - /r/UmaMusume/hot
   - /r/UmaMusume/search
 authentication: oauth2
@@ -361,7 +361,7 @@ ollama_models:
     memory_requirement: 8GB
     performance_target: <3s response time
     priority: ★★★★★
-    
+
   mistral:
     context_length: 32000
     temperature: 0.6
@@ -370,7 +370,7 @@ ollama_models:
     memory_requirement: 4GB
     performance_target: <1s response time
     priority: ★★★★
-    
+
   qwen2.5:
     context_length: 32000
     temperature: 0.8
@@ -397,21 +397,21 @@ class OllamaIntegration
         'mistral' => ['context' => 32000, 'use_case' => 'fast_responses'],
         'qwen2.5' => ['context' => 32000, 'use_case' => 'multilingual']
     ];
-    
+
     public function generateRecommendation(Character $character, array $context): AIRecommendation
     {
         $model = $this->selectOptimalModel($context);
         $prompt = $this->buildGameSpecificPrompt($character, $context);
-        
+
         try {
             $startTime = microtime(true);
-            
+
             $response = OllamaLaravel::agent()
                 ->model($model)
                 ->ask($prompt);
-            
+
             $processingTime = (microtime(true) - $startTime) * 1000;
-            
+
             return new AIRecommendation(
                 content: $response,
                 model: "ollama_{$model}",
@@ -419,28 +419,28 @@ class OllamaIntegration
                 confidence: $this->calculateConfidence($response),
                 cost: 0.0 // Local processing is free
             );
-            
+
         } catch (Exception $e) {
             Log::error('Ollama processing failed', [
                 'model' => $model,
                 'error' => $e->getMessage()
             ]);
-            
+
             throw new AIProcessingException("Local AI processing failed: {$e->getMessage()}");
         }
     }
-    
+
     private function selectOptimalModel(array $context): string
     {
         $complexity = $this->assessComplexity($context);
-        
+
         return match (true) {
             $complexity <= 3 => 'mistral',    // Fast responses
             $complexity <= 7 => 'llama3.3',   // General purpose
             default => 'qwen2.5'              // Complex multilingual
         };
     }
-    
+
     private function assessComplexity(array $context): int
     {
         $factors = [
@@ -449,7 +449,7 @@ class OllamaIntegration
             'requires_reasoning' => ($context['requires_reasoning'] ?? false) ? 3 : 0,
             'multi_turn' => ($context['is_multi_turn'] ?? false) ? 2 : 0
         ];
-        
+
         return array_sum($factors);
     }
 }
@@ -468,7 +468,7 @@ aws_bedrock_models:
     max_tokens: 4096
     use_cases: [complex_reasoning, advanced_analysis, premium_features]
     priority: ★★★★★
-    
+
   claude-4.5-sonnet:
     model_id: anthropic.claude-4-5-sonnet-20250101-v1:0
     input_cost: $3.00 per 1M tokens
@@ -476,7 +476,7 @@ aws_bedrock_models:
     max_tokens: 4096
     use_cases: [standard_analysis, strategy_optimization, balanced_performance]
     priority: ★★★★
-    
+
   claude-4.5-haiku:
     model_id: anthropic.claude-4-5-haiku-20250101-v1:0
     input_cost: $1.00 per 1M tokens
@@ -484,7 +484,7 @@ aws_bedrock_models:
     max_tokens: 4096
     use_cases: [quick_queries, simple_recommendations, cost_optimization]
     priority: ★★★
-    
+
   nova-2-lite:
     model_id: amazon.nova-2-lite-v1:0
     input_cost: $0.00125 per 1K tokens
@@ -492,7 +492,7 @@ aws_bedrock_models:
     max_tokens: 2048
     use_cases: [budget_processing, high_volume, basic_tasks]
     priority: ★★★★★ (cost-effective)
-    
+
   nova-2-pro:
     model_id: amazon.nova-2-pro-v1:0
     input_cost: $0.008 per 1K tokens
@@ -520,28 +520,28 @@ class BedrockIntegration
         'nova-2-lite' => ['input' => 0.00125, 'output' => 0.00125],
         'nova-2-pro' => ['input' => 0.008, 'output' => 0.032]
     ];
-    
+
     public function __construct(
         private BedrockRuntimeClient $client,
         private CostTracker $costTracker,
         private BudgetManager $budgetManager
     ) {}
-    
+
     public function generateRecommendation(
-        Character $character, 
-        array $context, 
+        Character $character,
+        array $context,
         string $preferredModel = 'nova-2-lite'
     ): AIRecommendation {
-        
+
         // Check budget before processing
         if (!$this->budgetManager->canAfford($preferredModel, $context)) {
             throw new BudgetExceededException('Insufficient budget for cloud AI processing');
         }
-        
+
         try {
             $startTime = microtime(true);
             $prompt = $this->buildGameSpecificPrompt($character, $context);
-            
+
             $response = $this->client->invokeModel([
                 'modelId' => $this->getModelId($preferredModel),
                 'body' => json_encode([
@@ -552,14 +552,14 @@ class BedrockIntegration
                     ]
                 ])
             ]);
-            
+
             $result = json_decode($response['body']->getContents(), true);
             $processingTime = (microtime(true) - $startTime) * 1000;
-            
+
             // Calculate and track costs
             $cost = $this->calculateCost($preferredModel, $result['usage']);
             $this->costTracker->recordUsage($preferredModel, $cost);
-            
+
             return new AIRecommendation(
                 content: $result['content'][0]['text'],
                 model: "bedrock_{$preferredModel}",
@@ -567,26 +567,26 @@ class BedrockIntegration
                 confidence: $this->calculateConfidence($result),
                 cost: $cost
             );
-            
+
         } catch (Exception $e) {
             Log::error('Bedrock processing failed', [
                 'model' => $preferredModel,
                 'error' => $e->getMessage()
             ]);
-            
+
             throw new AIProcessingException("Cloud AI processing failed: {$e->getMessage()}");
         }
     }
-    
+
     private function calculateCost(string $model, array $usage): float
     {
         $pricing = $this->modelPricing[$model];
         $inputCost = ($usage['input_tokens'] / 1000000) * $pricing['input'];
         $outputCost = ($usage['output_tokens'] / 1000000) * $pricing['output'];
-        
+
         return $inputCost + $outputCost;
     }
-    
+
     private function getModelId(string $model): string
     {
         return match ($model) {
@@ -611,15 +611,15 @@ routing_strategy:
     local_only: 0-3
     cloud_lite: 4-7
     cloud_advanced: 8-10
-    
+
   budget_thresholds:
     minimum_cloud_lite: $0.01
     minimum_cloud_advanced: $0.10
-    
+
   performance_thresholds:
     local_response_time: 3000ms
     cloud_timeout: 10000ms
-    
+
   fallback_chain:
     - ollama_llama3.3
     - ollama_mistral
@@ -642,15 +642,15 @@ class HybridAIRouter
         private CostTracker $costTracker,
         private PerformanceMonitor $monitor
     ) {}
-    
+
     public function routeRequest(AIRequest $request): AIResponse
     {
         $complexity = $this->assessComplexity($request);
         $budget = $this->costTracker->getRemainingBudget();
         $localPerformance = $this->monitor->getLocalPerformance();
-        
+
         $strategy = $this->selectStrategy($complexity, $budget, $localPerformance);
-        
+
         return match ($strategy) {
             'local' => $this->processLocally($request),
             'cloud_lite' => $this->processWithCloud($request, 'nova-2-lite'),
@@ -658,42 +658,42 @@ class HybridAIRouter
             'hybrid' => $this->processHybrid($request)
         };
     }
-    
+
     private function selectStrategy(int $complexity, float $budget, array $performance): string
     {
         // Local processing preferred for privacy and cost
         if ($complexity <= 5 && $performance['avg_response_time'] < 3000) {
             return 'local';
         }
-        
+
         // Budget-conscious cloud processing
         if ($complexity <= 8 && $budget > 0.01) {
             return 'cloud_lite';
         }
-        
+
         // Advanced cloud processing for complex tasks
         if ($complexity > 8 && $budget > 0.10) {
             return 'cloud_advanced';
         }
-        
+
         // Hybrid approach for balanced processing
         return 'hybrid';
     }
-    
+
     private function processHybrid(AIRequest $request): AIResponse
     {
         // Try local first, fallback to cloud if needed
         try {
             $response = $this->processLocally($request);
-            
+
             // Validate response quality
             if ($response->confidence >= 0.7) {
                 return $response;
             }
-            
+
             // Enhance with cloud processing if quality insufficient
             return $this->processWithCloud($request, 'nova-2-lite');
-            
+
         } catch (AIProcessingException $e) {
             Log::info('Falling back to cloud processing', ['reason' => $e->getMessage()]);
             return $this->processWithCloud($request, 'nova-2-lite');
@@ -862,7 +862,7 @@ namespace App\Integrations\MCP;
 class StrandsAgentIntegration
 {
     public function __construct(private MCPClient $mcpClient) {}
-    
+
     public function createTrainingAgent(Character $character): Agent
     {
         return $this->mcpClient->call('strands-agents', 'create_agent', [
@@ -881,11 +881,11 @@ class StrandsAgentIntegration
             ]
         ]);
     }
-    
+
     public function optimizeCareerPath(Character $character, array $constraints): CareerOptimization
     {
         $agent = $this->createTrainingAgent($character);
-        
+
         return $this->mcpClient->call('strands-agents', 'execute_workflow', [
             'agent_id' => $agent->id,
             'workflow' => 'career_optimization',
@@ -909,7 +909,7 @@ namespace App\Integrations\MCP;
 class AgentCoreIntegration
 {
     public function __construct(private MCPClient $mcpClient) {}
-    
+
     public function deployOptimizationAgent(array $config): DeploymentResult
     {
         return $this->mcpClient->call('agentcore-mcp-server', 'deploy_agent', [
@@ -922,7 +922,7 @@ class AgentCoreIntegration
             ]
         ]);
     }
-    
+
     public function monitorAgentPerformance(string $agentId): PerformanceMetrics
     {
         return $this->mcpClient->call('agentcore-mcp-server', 'get_metrics', [
@@ -943,7 +943,7 @@ namespace App\Integrations\MCP;
 class AWSPricingIntegration
 {
     public function __construct(private MCPClient $mcpClient) {}
-    
+
     public function getBedrockPricing(string $region = 'us-east-1'): array
     {
         return $this->mcpClient->call('awspricing', 'get_pricing', [
@@ -954,11 +954,11 @@ class AWSPricingIntegration
             ]
         ]);
     }
-    
+
     public function calculateMonthlyCosts(array $usage): CostEstimate
     {
         $pricing = $this->getBedrockPricing();
-        
+
         return new CostEstimate(
             current: $this->calculateCurrentCosts($usage, $pricing),
             projected: $this->projectMonthlyCosts($usage, $pricing),
@@ -1026,46 +1026,46 @@ namespace App\Services\MCP;
 class MCPConfigurationManager
 {
     private array $serverConfigs;
-    
+
     public function __construct()
     {
         $this->loadConfigurations();
     }
-    
+
     private function loadConfigurations(): void
     {
         // Load from workspace-level configuration
         $workspaceConfig = $this->loadWorkspaceConfig();
-        
+
         // Load from user-level configuration
         $userConfig = $this->loadUserConfig();
-        
+
         // Merge configurations with workspace taking precedence
         $this->serverConfigs = array_merge($userConfig, $workspaceConfig);
     }
-    
+
     private function loadWorkspaceConfig(): array
     {
         $configPath = base_path('.kiro/settings/mcp.json');
-        
+
         if (file_exists($configPath)) {
             return json_decode(file_get_contents($configPath), true)['mcpServers'] ?? [];
         }
-        
+
         return [];
     }
-    
+
     public function getServerConfig(string $serverName): ?array
     {
         return $this->serverConfigs[$serverName] ?? null;
     }
-    
+
     public function isServerEnabled(string $serverName): bool
     {
         $config = $this->getServerConfig($serverName);
         return $config && !($config['disabled'] ?? false);
     }
-    
+
     public function getAvailableServers(): array
     {
         return array_filter(
@@ -1129,7 +1129,7 @@ class MySQLConnectionManager
         private DatabaseManager $db,
         private ConnectionPoolManager $poolManager
     ) {}
-    
+
     public function getOptimizedConnection(): Connection
     {
         return $this->poolManager->getConnection('mysql', [
@@ -1139,7 +1139,7 @@ class MySQLConnectionManager
             'query_timeout' => 60
         ]);
     }
-    
+
     public function configureForPerformance(): void
     {
         DB::statement('SET SESSION sql_mode = "STRICT_TRANS_TABLES,NO_ZERO_DATE,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO"');
@@ -1159,7 +1159,7 @@ redis_config:
   port: 6379
   database: 0
   prefix: umamusume-career-planner:
-  
+
 cache_strategies:
   characters:
     ttl: 3600
@@ -1190,32 +1190,32 @@ class RedisIntegration
         'predictions' => ['ttl' => 300, 'tags' => ['ai_results']],
         'meta_tiers' => ['ttl' => 7200, 'tags' => ['community_data']]
     ];
-    
+
     public function cacheWithStrategy(string $key, $data, string $strategy = 'default'): void
     {
         $config = $this->cacheStrategies[$strategy] ?? ['ttl' => 3600, 'tags' => []];
-        
+
         Cache::tags($config['tags'])->put($key, $data, $config['ttl']);
     }
-    
+
     public function invalidateByTags(array $tags): void
     {
         Cache::tags($tags)->flush();
     }
-    
+
     public function warmCache(): void
     {
         $this->warmGameData();
         $this->warmUserData();
         $this->warmMetaData();
     }
-    
+
     private function warmGameData(): void
     {
         // Pre-load frequently accessed game data
         $characters = Character::with(['aptitudes', 'skills'])->get();
         $this->cacheWithStrategy('all_characters', $characters, 'game_data');
-        
+
         $skills = Skill::with('evolutions')->get();
         $this->cacheWithStrategy('all_skills', $skills, 'game_data');
     }
@@ -1259,12 +1259,12 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 class CharacterDataUpdated implements ShouldBroadcast
 {
     use InteractsWithSockets;
-    
+
     public function __construct(
         public Character $character,
         public array $changes
     ) {}
-    
+
     public function broadcastOn(): array
     {
         return [
@@ -1272,7 +1272,7 @@ class CharacterDataUpdated implements ShouldBroadcast
             new PrivateChannel("user.{$this->character->user_id}")
         ];
     }
-    
+
     public function broadcastWith(): array
     {
         return [
@@ -1298,7 +1298,7 @@ queue_config:
       queue: default
       retry_after: 90
       block_for: null
-      
+
   queues:
     high: [ai_processing, real_time_sync]
     default: [data_sync, notifications]
@@ -1320,15 +1320,15 @@ use Illuminate\Queue\SerializesModels;
 class SyncExternalGameData implements ShouldQueue
 {
     use InteractsWithQueue, Queueable, SerializesModels;
-    
+
     public $tries = 3;
     public $backoff = [60, 300, 900]; // 1min, 5min, 15min
-    
+
     public function __construct(
         private string $dataType,
         private array $options = []
     ) {}
-    
+
     public function handle(GameDataAPIManager $apiManager): void
     {
         $data = match ($this->dataType) {
@@ -1337,24 +1337,24 @@ class SyncExternalGameData implements ShouldQueue
             'support_cards' => $apiManager->getSupportCards($this->options),
             default => throw new InvalidArgumentException("Unknown data type: {$this->dataType}")
         };
-        
+
         // Process and store data
         $this->processData($data);
-        
+
         // Invalidate related caches
         Cache::tags(['external_api', $this->dataType])->flush();
-        
+
         // Broadcast update event
         event(new ExternalDataUpdated($this->dataType, $data->count()));
     }
-    
+
     public function failed(Throwable $exception): void
     {
         Log::error("External data sync failed", [
             'data_type' => $this->dataType,
             'error' => $exception->getMessage()
         ]);
-        
+
         // Notify administrators
         Notification::send(
             User::administrators()->get(),
@@ -1409,13 +1409,13 @@ self.addEventListener('install', (event) => {
 self.addEventListener('fetch', (event) => {
     const { request } = event;
     const url = new URL(request.url);
-    
+
     // API requests: Network first, cache fallback
     if (url.pathname.startsWith('/api/')) {
         event.respondWith(networkFirst(request));
         return;
     }
-    
+
     // Static assets: Cache first, network fallback
     event.respondWith(cacheFirst(request));
 });
@@ -1435,7 +1435,7 @@ async function networkFirst(request) {
 async function cacheFirst(request) {
     const cached = await caches.match(request);
     if (cached) return cached;
-    
+
     try {
         const response = await fetch(request);
         const cache = await caches.open(CACHE_NAME);
@@ -1561,21 +1561,21 @@ function subscribeToAIUpdates(userId) {
 
 <main id="main-content" role="main" aria-label="Main content">
     <h1>Character Dashboard</h1>
-    
+
     <!-- Accessible form example -->
     <form aria-labelledby="form-title">
         <h2 id="form-title">Character Stats</h2>
-        
+
         <div class="form-group">
             <label for="speed" id="speed-label">
                 Speed (0-1200)
                 <span class="required" aria-hidden="true">*</span>
             </label>
-            <input 
-                type="number" 
-                id="speed" 
+            <input
+                type="number"
+                id="speed"
                 name="speed"
-                min="0" 
+                min="0"
                 max="1200"
                 aria-labelledby="speed-label"
                 aria-describedby="speed-help"
@@ -1676,26 +1676,26 @@ class AuthController extends Controller
     public function login(LoginRequest $request): JsonResponse
     {
         $request->authenticate();
-        
+
         $user = Auth::user();
         $token = $user->createToken('api-token', ['*'])->plainTextToken;
-        
+
         return response()->json([
             'user' => $user,
             'token' => $token,
             'token_type' => 'Bearer'
         ]);
     }
-    
+
     public function logout(): JsonResponse
     {
         Auth::user()->currentAccessToken()->delete();
-        
+
         return response()->json([
             'message' => 'Successfully logged out'
         ]);
     }
-    
+
     public function user(): JsonResponse
     {
         return response()->json([
@@ -1723,22 +1723,22 @@ class CharacterPolicy
     {
         return true; // Users can view their own characters
     }
-    
+
     public function view(User $user, Character $character): bool
     {
         return $user->id === $character->user_id;
     }
-    
+
     public function create(User $user): bool
     {
         return true; // All authenticated users can create characters
     }
-    
+
     public function update(User $user, Character $character): bool
     {
         return $user->id === $character->user_id;
     }
-    
+
     public function delete(User $user, Character $character): bool
     {
         return $user->id === $character->user_id;
@@ -1767,17 +1767,17 @@ class RateLimitServiceProvider extends ServiceProvider
         RateLimiter::for('auth', function ($request) {
             return Limit::perMinute(10)->by($request->ip());
         });
-        
+
         // API endpoints: 60 requests per minute
         RateLimiter::for('api', function ($request) {
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
-        
+
         // AI processing: 20 requests per minute
         RateLimiter::for('ai', function ($request) {
             return Limit::perMinute(20)->by($request->user()?->id ?: $request->ip());
         });
-        
+
         // External API calls: 100 requests per minute
         RateLimiter::for('external_api', function ($request) {
             return Limit::perMinute(100)->by('external_api');
@@ -1794,13 +1794,13 @@ class RateLimitServiceProvider extends ServiceProvider
 encryption_config:
   cipher: AES-256-CBC
   key: ${APP_KEY}
-  
+
 encrypted_fields:
   - user.email
   - user.password
   - api_credentials.secret
   - ai_conversations.content (optional)
-  
+
 hashing:
   driver: bcrypt
   rounds: 12
@@ -1825,10 +1825,10 @@ class DataProtectionService
                 $data[$field] = Crypt::encryptString($data[$field]);
             }
         }
-        
+
         return $data;
     }
-    
+
     public function decryptSensitiveData(array $data, array $sensitiveFields): array
     {
         foreach ($sensitiveFields as $field) {
@@ -1841,19 +1841,19 @@ class DataProtectionService
                 }
             }
         }
-        
+
         return $data;
     }
-    
+
     public function sanitizeUserInput(string $input): string
     {
         // Remove potentially dangerous characters
         $input = strip_tags($input);
         $input = htmlspecialchars($input, ENT_QUOTES, 'UTF-8');
-        
+
         return $input;
     }
-    
+
     public function validateDataIntegrity(array $data, string $checksum): bool
     {
         $calculatedChecksum = hash('sha256', json_encode($data));
@@ -1871,14 +1871,14 @@ privacy_config:
   data_storage: local_only
   cloud_sync: opt_in
   data_sharing: user_controlled
-  
+
 local_data:
   - user_profiles
   - character_data
   - career_history
   - ai_conversations
   - preferences
-  
+
 cloud_data_optional:
   - anonymous_analytics
   - community_strategies (opt-in)
@@ -1904,7 +1904,7 @@ class PrivacyService
             'exported_at' => now()->toISOString()
         ];
     }
-    
+
     public function deleteUserData(User $user): void
     {
         // Delete all user-related data
@@ -1912,20 +1912,20 @@ class PrivacyService
         $user->careers()->delete();
         $user->aiConversations()->delete();
         $user->preferences()->delete();
-        
+
         // Anonymize user record
         $user->update([
             'name' => 'Deleted User',
             'email' => "deleted_{$user->id}@deleted.local",
             'password' => bcrypt(Str::random(32))
         ]);
-        
+
         // Soft delete user
         $user->delete();
-        
+
         Log::info("User data deleted", ['user_id' => $user->id]);
     }
-    
+
     public function getPrivacySettings(User $user): array
     {
         return [
@@ -1957,7 +1957,7 @@ monitoring_config:
     - cache_hit_rate
     - ai_processing_time
     - memory_usage
-    
+
   alerting:
     response_time_threshold: 5000ms
     error_rate_threshold: 5%
@@ -1981,36 +1981,36 @@ class PerformanceMonitor
             'tags' => $tags,
             'timestamp' => now()->toISOString()
         ];
-        
+
         // Store in Redis for real-time access
         Redis::lpush('metrics:' . $name, json_encode($metric));
         Redis::ltrim('metrics:' . $name, 0, 999); // Keep last 1000 entries
-        
+
         // Check thresholds and alert if necessary
         $this->checkThresholds($name, $value);
     }
-    
+
     public function getMetrics(string $name, int $limit = 100): array
     {
         $metrics = Redis::lrange('metrics:' . $name, 0, $limit - 1);
         return array_map(fn($m) => json_decode($m, true), $metrics);
     }
-    
+
     public function getAverageResponseTime(int $minutes = 5): float
     {
         $metrics = $this->getMetrics('response_time', $minutes * 60);
-        
+
         if (empty($metrics)) {
             return 0.0;
         }
-        
+
         return array_sum(array_column($metrics, 'value')) / count($metrics);
     }
-    
+
     private function checkThresholds(string $name, float $value): void
     {
         $thresholds = config('monitoring.thresholds');
-        
+
         if (isset($thresholds[$name]) && $value > $thresholds[$name]) {
             event(new ThresholdExceeded($name, $value, $thresholds[$name]));
         }
@@ -2029,24 +2029,24 @@ logging_config:
     stack:
       driver: stack
       channels: [daily, slack]
-      
+
     daily:
       driver: daily
       path: storage/logs/laravel.log
       level: debug
       days: 14
-      
+
     slack:
       driver: slack
       url: ${SLACK_WEBHOOK_URL}
       level: error
-      
+
     ai_processing:
       driver: daily
       path: storage/logs/ai.log
       level: info
       days: 30
-      
+
     integration:
       driver: daily
       path: storage/logs/integration.log
@@ -2085,50 +2085,50 @@ class HybridAIRouterTest extends TestCase
     public function test_routes_simple_requests_to_local_ollama(): void
     {
         $router = app(HybridAIRouter::class);
-        
+
         $request = new AIRequest(
             prompt: 'Simple training recommendation',
             complexity: 2,
             requiresReasoning: false
         );
-        
+
         $response = $router->routeRequest($request);
-        
+
         expect($response->model)->toStartWith('ollama_');
         expect($response->cost)->toBe(0.0);
     }
-    
+
     public function test_routes_complex_requests_to_cloud_when_budget_available(): void
     {
         $this->mockBudgetManager(['remaining' => 1.00]);
-        
+
         $router = app(HybridAIRouter::class);
-        
+
         $request = new AIRequest(
             prompt: 'Complex multi-turn strategy analysis',
             complexity: 9,
             requiresReasoning: true
         );
-        
+
         $response = $router->routeRequest($request);
-        
+
         expect($response->model)->toStartWith('bedrock_');
         expect($response->cost)->toBeGreaterThan(0);
     }
-    
+
     public function test_falls_back_to_local_when_cloud_unavailable(): void
     {
         $this->mockBedrockUnavailable();
-        
+
         $router = app(HybridAIRouter::class);
-        
+
         $request = new AIRequest(
             prompt: 'Any request',
             complexity: 8
         );
-        
+
         $response = $router->routeRequest($request);
-        
+
         expect($response->model)->toStartWith('ollama_');
     }
 }

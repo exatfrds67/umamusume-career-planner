@@ -2,10 +2,10 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 1.0  
-**Date**: January 11, 2026  
-**Project**: UmamusumeCareerPlanner  
-**Author**: Development Team  
+**Document Version**: 1.0
+**Date**: January 14, 2026
+**Project**: UmamusumeCareerPlanner
+**Author**: Development Team
 
 ---
 
@@ -193,6 +193,7 @@ The Umamusume Career Planner is a standalone local-first web application built w
 - **Database**: MySQL 8.0+ with Redis (WSL) for caching
 - **PHP Version**: PHP 8.3+
 - **Framework**: Laravel 12 (released February 24, 2025)
+- **Development Timeline**: 22-28 weeks across 6 phases (see 001_SDP)
 
 #### Production Environment
 
@@ -204,7 +205,7 @@ The Umamusume Career Planner is a standalone local-first web application built w
 #### External Dependencies
 
 - **AI Services**: Ollama (local) with cloudstudio/ollama-laravel package + AWS Bedrock (cloud fallback) with intelligent routing and cost optimization
-- **External APIs**: umapyoi.net (verified active, replacing deprecated SimpleSandman/UmaMusumeAPI), UmamusumeDB.com (requires verification), community sources with intelligent fallback
+- **External APIs**: umapyoi.net (verified active, replacing deprecated SimpleSandman/UmaMusumeAPI), UmamusumeDB.com (verification pending), community sources with intelligent fallback
 - **Image Processing**: Tesseract OCR with OpenCV preprocessing for Japanese language support and automated screenshot analysis
 - **MCP Servers**: Model Context Protocol integration for AWS services, external API management, and development workflow enhancement
 - **Progressive Web Technologies**: Service workers, background sync, push notifications, and offline functionality standards

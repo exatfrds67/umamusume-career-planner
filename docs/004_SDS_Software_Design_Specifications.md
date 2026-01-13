@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.0  
-**Date**: January 11, 2026  
-**Project**: UmamusumeCareerPlanner  
-**Author**: Development Team  
-**Updated**: Aligned with spec requirements, MCP server integration, and modern architecture  
+**Document Version**: 2.0
+**Date**: January 14, 2026
+**Project**: UmamusumeCareerPlanner
+**Author**: Development Team
+**Updated**: Aligned with spec requirements, MCP server integration, and modern architecture
 
 ---
 
@@ -76,7 +76,7 @@ The design covers all aspects of the system implementation:
 - **Database**: MySQL 8.0+ with Redis 7.0+ (WSL) for caching and queues
 - **External APIs**:
   - **Primary**: umapyoi.net (verified active, replaces deprecated SimpleSandman/UmaMusumeAPI)
-  - **Secondary**: UmamusumeDB.com (requires verification)
+  - **Secondary**: UmamusumeDB.com (verification pending - community tools)
 - **MCP Integration**:
   - **AI Services**: strands-agents, agentcore-mcp-server
   - **AWS Infrastructure**: awspricing, awsknowledge, awsapi, awslabs.aws-iac-mcp-server
@@ -198,20 +198,20 @@ class MCPBedrockService
         private CostTracker $costTracker,
         private Logger $logger
     ) {}
-    
+
     public function generateRecommendation(Character $character, array $context): AIRecommendation
     {
         $prompt = $this->buildGameSpecificPrompt($character, $context);
-        
+
         // Use MCP Bedrock server for processing
         $response = $this->mcpClient->call('bedrock', 'invoke_claude_sonnet', [
             'prompt' => $prompt,
             'maxTokens' => 2048
         ]);
-        
+
         // Track costs for budget management
         $this->costTracker->recordUsage('claude-sonnet', $response['usage']);
-        
+
         return new AIRecommendation(
             content: $response['content'],
             model: 'claude-sonnet-4.5',
@@ -219,7 +219,7 @@ class MCPBedrockService
             cost: $response['cost']
         );
     }
-    
+
     public function analyzeGameScreenshot(UploadedFile $screenshot): ScreenshotAnalysis
     {
         // Use Bedrock for OCR and game state analysis
@@ -227,7 +227,7 @@ class MCPBedrockService
             'image' => base64_encode($screenshot->getContent()),
             'prompt' => 'Extract Umamusume game state data from this screenshot'
         ]);
-        
+
         return new ScreenshotAnalysis(
             extractedData: $response['extracted_data'],
             confidence: $response['confidence'],
@@ -243,7 +243,7 @@ class MCPBedrockService
 class MCPInfrastructureService
 {
     public function __construct(private MCPClient $mcpClient) {}
-    
+
     public function getAWSPricing(string $service, string $region = 'us-east-1'): array
     {
         return $this->mcpClient->call('awspricing', 'get_pricing', [
@@ -251,7 +251,7 @@ class MCPInfrastructureService
             'region' => $region
         ]);
     }
-    
+
     public function validateInfrastructure(array $config): ValidationResult
     {
         return $this->mcpClient->call('awslabs.aws-iac-mcp-server', 'validate_template', [
@@ -267,7 +267,7 @@ class MCPInfrastructureService
 class MCPAgentService
 {
     public function __construct(private MCPClient $mcpClient) {}
-    
+
     public function createTrainingAgent(Character $character): Agent
     {
         return $this->mcpClient->call('strands-agents', 'create_agent', [
@@ -312,12 +312,12 @@ class MCPConfigurationManager
             'capabilities' => ['agent_creation', 'workflow_management', 'multi_model_support']
         ]
     ];
-    
+
     public function getServerConfig(string $service): array
     {
         return $this->serverConfigs[$service] ?? [];
     }
-    
+
     public function isServerAvailable(string $server): bool
     {
         // Check if MCP server is configured and available
@@ -343,30 +343,30 @@ class HybridAIRouter
         private MCPAgentService $agentMCP,
         private CostTracker $costTracker
     ) {}
-    
+
     public function routeRequest(AIRequest $request): AIResponse
     {
         $complexity = $this->assessComplexity($request);
         $budget = $this->costTracker->getRemainingBudget();
-        
+
         return match (true) {
             // Simple requests - use local Ollama
             $complexity <= 3 => $this->ollama->process($request),
-            
+
             // Medium complexity - use cost-effective cloud model
             $complexity <= 7 && $budget > 0.01 => $this->bedrockMCP->processWithModel($request, 'nova-2-lite'),
-            
+
             // High complexity - use advanced model if budget allows
             $complexity > 7 && $budget > 0.10 => $this->bedrockMCP->processWithModel($request, 'claude-sonnet-4.5'),
-            
+
             // Complex agent tasks - use Strands Agent SDK
             $request->requiresAgent() => $this->agentMCP->processWithAgent($request),
-            
+
             // Fallback to local processing
             default => $this->ollama->process($request)
         };
     }
-    
+
     private function assessComplexity(AIRequest $request): int
     {
         $factors = [
@@ -375,7 +375,7 @@ class HybridAIRouter
             'requires_reasoning' => $request->requiresReasoning() ? 3 : 0,
             'multi_turn' => $request->isMultiTurn() ? 2 : 0
         ];
-        
+
         return array_sum($factors);
     }
 }
@@ -410,18 +410,18 @@ class AIServiceCoordinator
         private CostManager $costManager,
         private PerformanceMonitor $performanceMonitor
     ) {}
-    
+
     public function processRequest(AIRequest $request): AIResponse
     {
         // Analyze request complexity and requirements
         $analysis = $this->routingEngine->analyzeRequest($request);
-        
+
         // Select optimal processing strategy
         $strategy = $this->routingEngine->selectStrategy($analysis);
-        
+
         // Execute with performance monitoring
         $startTime = microtime(true);
-        
+
         try {
             $response = match ($strategy->type) {
                 'local' => $this->processLocally($request, $strategy),
@@ -429,7 +429,7 @@ class AIServiceCoordinator
                 'agent' => $this->processWithAgent($request, $strategy),
                 'hybrid' => $this->processHybrid($request, $strategy)
             };
-            
+
             // Record performance metrics
             $this->performanceMonitor->recordExecution([
                 'strategy' => $strategy->type,
@@ -438,15 +438,15 @@ class AIServiceCoordinator
                 'cost' => $response->cost,
                 'success' => true
             ]);
-            
+
             return $response;
-            
+
         } catch (AIProcessingException $e) {
             $this->handleProcessingError($e, $request, $strategy);
             throw $e;
         }
     }
-    
+
     private function processLocally(AIRequest $request, ProcessingStrategy $strategy): AIResponse
     {
         return $this->ollamaService->process($request, [
@@ -455,20 +455,20 @@ class AIServiceCoordinator
             'max_tokens' => $strategy->maxTokens
         ]);
     }
-    
+
     private function processInCloud(AIRequest $request, ProcessingStrategy $strategy): AIResponse
     {
         // Check budget constraints
         if (!$this->costManager->canAfford($strategy->estimatedCost)) {
             throw new InsufficientBudgetException();
         }
-        
+
         return $this->bedrockService->process($request, [
             'model' => $strategy->model,
             'parameters' => $strategy->parameters
         ]);
     }
-    
+
     private function processWithAgent(AIRequest $request, ProcessingStrategy $strategy): AIResponse
     {
         return $this->agentService->processWithAgent($request, [
@@ -492,19 +492,19 @@ class AIRoutingEngine
         // Privacy-sensitive operations - always local
         'user_data_analysis' => ['strategy' => 'local', 'model' => 'llama3.3:70b'],
         'personal_recommendations' => ['strategy' => 'local', 'model' => 'mistral:7b'],
-        
+
         // Complex reasoning - cloud with cost optimization
         'training_optimization' => ['strategy' => 'cloud', 'model' => 'claude-sonnet-4.5'],
         'race_strategy_analysis' => ['strategy' => 'cloud', 'model' => 'claude-haiku-4.5'],
-        
+
         // Multi-step workflows - agent-based
         'career_planning' => ['strategy' => 'agent', 'agent_type' => 'career_planner'],
         'scenario_simulation' => ['strategy' => 'agent', 'agent_type' => 'simulator'],
-        
+
         // Hybrid processing for balanced workloads
         'content_generation' => ['strategy' => 'hybrid']
     ];
-    
+
     public function analyzeRequest(AIRequest $request): RequestAnalysis
     {
         return new RequestAnalysis([
@@ -515,7 +515,7 @@ class AIRoutingEngine
             'required_capabilities' => $this->identifyRequiredCapabilities($request)
         ]);
     }
-    
+
     public function selectStrategy(RequestAnalysis $analysis): ProcessingStrategy
     {
         // Apply routing rules based on request type
@@ -524,11 +524,11 @@ class AIRoutingEngine
         } else {
             $baseStrategy = $this->determineOptimalStrategy($analysis);
         }
-        
+
         // Adjust strategy based on current conditions
         return $this->optimizeStrategy($baseStrategy, $analysis);
     }
-    
+
     private function calculateComplexity(AIRequest $request): int
     {
         $factors = [
@@ -538,10 +538,10 @@ class AIRoutingEngine
             'multi_modal' => $request->hasImages() ? 3 : 0,
             'real_time' => $request->isRealTime() ? 2 : 0
         ];
-        
+
         return array_sum($factors);
     }
-    
+
     private function assessPrivacyRequirements(AIRequest $request): string
     {
         if ($request->containsPersonalData()) return 'high';
@@ -584,20 +584,20 @@ class OllamaService
             'performance' => 'medium'
         ]
     ];
-    
+
     public function __construct(
         private HttpClient $httpClient,
         private ModelManager $modelManager,
         private Logger $logger
     ) {}
-    
+
     public function process(AIRequest $request, array $options = []): AIResponse
     {
         $model = $options['model'] ?? $this->selectOptimalModel($request);
-        
+
         // Ensure model is available
         $this->ensureModelAvailable($model);
-        
+
         $payload = [
             'model' => $model,
             'prompt' => $this->buildPrompt($request),
@@ -608,9 +608,9 @@ class OllamaService
             ],
             'stream' => $request->isStreaming()
         ];
-        
+
         $response = $this->httpClient->post('http://localhost:11434/api/generate', $payload);
-        
+
         return new AIResponse([
             'content' => $response['response'],
             'model' => $model,
@@ -620,12 +620,12 @@ class OllamaService
             'provider' => 'ollama'
         ]);
     }
-    
+
     private function selectOptimalModel(AIRequest $request): string
     {
         $complexity = $this->calculateComplexity($request);
         $memoryAvailable = $this->getAvailableMemory();
-        
+
         return match (true) {
             $complexity > 8 && $memoryAvailable > 35 => 'llama3.3:70b',
             $complexity > 5 && $memoryAvailable > 8 => 'qwen2.5:14b',
@@ -633,7 +633,7 @@ class OllamaService
             default => 'llama3.3:8b'
         };
     }
-    
+
     private function ensureModelAvailable(string $model): void
     {
         if (!$this->modelManager->isModelPulled($model)) {
@@ -677,33 +677,33 @@ class MCPBedrockService
             'cost_tier' => 'budget'
         ]
     ];
-    
+
     public function __construct(
         private MCPClient $mcpClient,
         private CostManager $costManager,
         private Logger $logger
     ) {}
-    
+
     public function process(AIRequest $request, array $options = []): AIResponse
     {
         $model = $options['model'] ?? $this->selectOptimalModel($request);
-        
+
         // Pre-flight cost check
         $estimatedCost = $this->estimateCost($request, $model);
         if (!$this->costManager->canAfford($estimatedCost)) {
             throw new InsufficientBudgetException("Estimated cost: ${estimatedCost}");
         }
-        
+
         // Build MCP request
         $mcpRequest = $this->buildMCPRequest($request, $model, $options);
-        
+
         try {
             $response = $this->mcpClient->call('bedrock', $this->getModelEndpoint($model), $mcpRequest);
-            
+
             // Track actual costs
             $actualCost = $this->calculateActualCost($response, $model);
             $this->costManager->recordUsage($model, $actualCost, $response['usage']);
-            
+
             return new AIResponse([
                 'content' => $response['content'],
                 'model' => $model,
@@ -713,7 +713,7 @@ class MCPBedrockService
                 'provider' => 'aws_bedrock',
                 'confidence' => $response['confidence'] ?? null
             ]);
-            
+
         } catch (MCPException $e) {
             $this->logger->error("Bedrock processing failed", [
                 'model' => $model,
@@ -723,12 +723,12 @@ class MCPBedrockService
             throw new AIProcessingException("Cloud processing failed: " . $e->getMessage());
         }
     }
-    
+
     private function selectOptimalModel(AIRequest $request): string
     {
         $budget = $this->costManager->getRemainingBudget();
         $complexity = $this->calculateComplexity($request);
-        
+
         return match (true) {
             $complexity > 9 && $budget > 1.0 => 'claude-opus-4.5',
             $complexity > 6 && $budget > 0.1 => 'claude-sonnet-4.5',
@@ -737,7 +737,7 @@ class MCPBedrockService
             default => throw new InsufficientBudgetException()
         };
     }
-    
+
     private function getModelEndpoint(string $model): string
     {
         return match ($model) {
@@ -779,15 +779,15 @@ class MCPAgentService
             'model_preference' => 'nova-2-lite'
         ]
     ];
-    
+
     public function processWithAgent(AIRequest $request, array $options = []): AIResponse
     {
         $agentType = $options['agent_type'] ?? $this->determineAgentType($request);
         $agentConfig = $this->agentTypes[$agentType];
-        
+
         // Create or retrieve agent instance
         $agent = $this->getOrCreateAgent($agentType, $agentConfig);
-        
+
         // Execute agent workflow
         $workflow = $this->buildAgentWorkflow($request, $agentConfig);
         $result = $this->mcpClient->call('strands-agents', 'execute_workflow', [
@@ -795,7 +795,7 @@ class MCPAgentService
             'workflow' => $workflow,
             'context' => $request->getContext()
         ]);
-        
+
         return new AIResponse([
             'content' => $result['output'],
             'model' => $agentConfig['model_preference'],
@@ -806,16 +806,16 @@ class MCPAgentService
             'provider' => 'strands_agent'
         ]);
     }
-    
+
     private function getOrCreateAgent(string $type, array $config): Agent
     {
         // Check if agent already exists for this session
         $existingAgent = $this->findExistingAgent($type);
-        
+
         if ($existingAgent && $existingAgent->isActive()) {
             return $existingAgent;
         }
-        
+
         // Create new agent via MCP
         $agentData = $this->mcpClient->call('strands-agents', 'create_agent', [
             'type' => $type,
@@ -827,7 +827,7 @@ class MCPAgentService
                 'memory_enabled' => true
             ]
         ]);
-        
+
         return new Agent($agentData);
     }
 }
@@ -849,23 +849,23 @@ class CostManager
         'weekly' => 50.00,
         'monthly' => 200.00
     ];
-    
+
     private array $modelCosts = [
         'claude-opus-4.5' => ['input' => 0.005, 'output' => 0.025],
         'claude-sonnet-4.5' => ['input' => 0.003, 'output' => 0.015],
         'claude-haiku-4.5' => ['input' => 0.001, 'output' => 0.005],
         'nova-2-lite' => ['input' => 0.00125, 'output' => 0.00125]
     ];
-    
+
     public function canAfford(float $estimatedCost): bool
     {
         $currentUsage = $this->getCurrentUsage();
-        
+
         return ($currentUsage['daily'] + $estimatedCost) <= $this->budgetLimits['daily'] &&
                ($currentUsage['weekly'] + $estimatedCost) <= $this->budgetLimits['weekly'] &&
                ($currentUsage['monthly'] + $estimatedCost) <= $this->budgetLimits['monthly'];
     }
-    
+
     public function recordUsage(string $model, float $cost, array $usage): void
     {
         DB::table('ai_usage_logs')->insert([
@@ -876,21 +876,21 @@ class CostManager
             'total_tokens' => $usage['total_tokens'],
             'created_at' => now()
         ]);
-        
+
         // Update cached usage statistics
         Cache::forget('ai_usage_current');
-        
+
         // Check for budget alerts
         $this->checkBudgetAlerts();
     }
-    
+
     private function checkBudgetAlerts(): void
     {
         $usage = $this->getCurrentUsage();
-        
+
         foreach ($this->budgetLimits as $period => $limit) {
             $percentage = ($usage[$period] / $limit) * 100;
-            
+
             if ($percentage >= 90) {
                 event(new BudgetAlertTriggered($period, $percentage, $usage[$period], $limit));
             }
@@ -911,24 +911,48 @@ The application employs a sophisticated multi-tier database architecture optimiz
 
 ```yaml
 Primary Database:
-  Engine: MySQL 8.0+
-  Storage: InnoDB with optimized configuration
+  Development Default: SQLite (database.sqlite) - zero configuration
+  Production: MySQL 8.0+ with InnoDB
+  Storage: InnoDB with optimized configuration (production)
   Features: JSON columns, full-text search, partitioning
-  
+  Configuration: .env DB_CONNECTION setting (sqlite|mysql)
+
 Caching Layer:
-  Primary: Redis 7.0+ cluster
-  Session Storage: Redis with persistence
+  Development: File-based cache (Laravel default)
+  Production: Redis 7.0+ cluster (WSL-compatible)
+  Session Storage: File-based (development) or Redis (production)
   Query Cache: Multi-level TTL strategy
-  
+
+Queue Processing:
+  Development: Database driver (async via queue:work)
+  Production: Redis driver (WSL-compatible cluster)
+  Configuration: .env QUEUE_CONNECTION setting (database|redis)
+
 ORM Framework:
   Laravel Eloquent: Strict mode enabled
   Connection Pooling: Optimized for high concurrency
   Query Builder: Performance-optimized queries
-  
+
 Search Engine:
-  Primary: MySQL Full-Text Search
+  Primary: MySQL Full-Text Search (production)
+  Development: Database queries with LIKE clauses
   Future: Elasticsearch integration for advanced search
 ```
+
+**Configuration Guide**:
+
+- **Development (XAMPP Default)**:
+  - Database: SQLite (`database.sqlite`)
+  - Cache: File-based
+  - Queue: Database driver
+  - Set via `.env`: `DB_CONNECTION=sqlite`, `CACHE_DRIVER=file`, `QUEUE_CONNECTION=database`
+
+- **Production (MySQL + Redis)**:
+  - Database: MySQL 8.0+ with InnoDB
+  - Cache: Redis cluster
+  - Queue: Redis cluster
+  - Set via `.env`: `DB_CONNECTION=mysql`, `CACHE_DRIVER=redis`, `QUEUE_CONNECTION=redis`
+  - Prefix: Table prefix configured via `DB_PREFIX` (default: empty string)
 
 #### 5.1.2 Database Schema Architecture
 
@@ -955,21 +979,21 @@ class DatabaseSchemaManager
         'races' => RaceSchema::class,
         'skills' => SkillSchema::class
     ];
-    
+
     public function getSchemaVersion(): string
     {
         return '2.1.0'; // Aligned with Laravel 12 and modern practices
     }
-    
+
     public function validateSchemaIntegrity(): SchemaValidationResult
     {
         $results = [];
-        
+
         foreach ($this->coreEntities as $table => $schemaClass) {
             $validator = new $schemaClass();
             $results[$table] = $validator->validate();
         }
-        
+
         return new SchemaValidationResult($results);
     }
 }
@@ -991,33 +1015,33 @@ CREATE TABLE users (
     avatar_url VARCHAR(500) NULL,
     timezone VARCHAR(50) DEFAULT 'UTC',
     locale VARCHAR(10) DEFAULT 'en',
-    
+
     -- User preferences and settings
     preferences JSON NULL COMMENT 'UI preferences, notification settings',
     accessibility_settings JSON NULL COMMENT 'WCAG 2.2 AA compliance settings',
-    
+
     -- Security features
     mfa_settings JSON NULL COMMENT 'Multi-factor authentication configuration',
     security_questions JSON NULL COMMENT 'Encrypted security questions',
-    
+
     -- Activity tracking
     last_login_at TIMESTAMP NULL,
     last_login_ip VARCHAR(45) NULL,
     login_count INT UNSIGNED DEFAULT 0,
-    
+
     -- Account status
     is_active BOOLEAN DEFAULT TRUE,
     is_verified BOOLEAN DEFAULT FALSE,
     subscription_tier ENUM('free', 'premium', 'pro') DEFAULT 'free',
-    
+
     -- Notification preferences
     email_notifications BOOLEAN DEFAULT TRUE,
     push_notifications BOOLEAN DEFAULT TRUE,
-    
+
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP NULL,
-    
+
     -- Optimized indexes
     INDEX idx_email (email),
     INDEX idx_uuid (uuid),
@@ -1036,11 +1060,11 @@ CREATE TABLE user_sessions (
     device_fingerprint VARCHAR(255) NULL,
     payload LONGTEXT NOT NULL,
     last_activity INT NOT NULL,
-    
+
     INDEX idx_user_id (user_id),
     INDEX idx_last_activity (last_activity),
     INDEX idx_device_fingerprint (device_fingerprint),
-    
+
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
@@ -1055,48 +1079,48 @@ CREATE TABLE characters (
     user_id BIGINT UNSIGNED NOT NULL,
     character_template_id BIGINT UNSIGNED NOT NULL,
     scenario_id BIGINT UNSIGNED NULL,
-    
+
     -- Character identification
     name VARCHAR(100) NOT NULL,
     nickname VARCHAR(100) NULL,
-    
+
     -- Career progress
     current_turn SMALLINT UNSIGNED DEFAULT 0,
     max_turns SMALLINT UNSIGNED DEFAULT 78,
     career_phase ENUM('junior', 'classic', 'senior') DEFAULT 'junior',
-    
+
     -- Dynamic stats (current state)
     current_stats JSON NOT NULL DEFAULT '{}' COMMENT 'Speed, Stamina, Power, Guts, Wisdom',
-    
+
     -- Base character data
     aptitudes JSON NOT NULL DEFAULT '{}' COMMENT 'Distance, Surface, Running Style aptitudes',
     base_stats JSON NOT NULL DEFAULT '{}' COMMENT 'Starting stats from template',
-    
+
     -- Growth and training data
     growth_rates JSON NULL COMMENT 'Stat growth rate modifiers',
     training_history JSON NULL COMMENT 'Summarized training performance',
-    
+
     -- Goals and objectives
     goals JSON NULL COMMENT 'User-defined and AI-suggested goals',
     target_races JSON NULL COMMENT 'Planned race schedule',
-    
+
     -- Current status and conditions
     status JSON NULL COMMENT 'Conditions, injuries, motivation',
     support_deck JSON NULL COMMENT 'Currently equipped support cards',
-    
+
     -- AI integration
     ai_personality JSON NULL COMMENT 'AI-generated personality traits',
     ai_recommendations JSON NULL COMMENT 'Latest AI recommendations',
-    
+
     -- Completion tracking
     is_active BOOLEAN DEFAULT TRUE,
     is_completed BOOLEAN DEFAULT FALSE,
     completed_at TIMESTAMP NULL,
     completion_rank ENUM('UG', 'G3', 'G2', 'G1') NULL,
-    
+
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     -- Performance indexes
     INDEX idx_user_characters (user_id, is_active),
     INDEX idx_character_template (character_template_id),
@@ -1104,7 +1128,7 @@ CREATE TABLE characters (
     INDEX idx_career_progress (current_turn, career_phase),
     INDEX idx_completion (is_completed, completion_rank),
     INDEX idx_uuid (uuid),
-    
+
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (character_template_id) REFERENCES character_templates(id),
     FOREIGN KEY (scenario_id) REFERENCES scenarios(id) ON DELETE SET NULL
@@ -1114,40 +1138,40 @@ CREATE TABLE characters (
 CREATE TABLE character_templates (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     external_id VARCHAR(50) NULL,
-    
+
     -- Character names (multilingual support)
     name VARCHAR(100) NOT NULL,
     name_en VARCHAR(100) NULL,
     name_jp VARCHAR(100) NULL,
-    
+
     -- Character properties
     rarity TINYINT UNSIGNED NOT NULL,
     character_type ENUM('speed', 'stamina', 'power', 'guts', 'wisdom') NULL,
-    
+
     -- Base game data
     aptitudes JSON NOT NULL DEFAULT '{}' COMMENT 'Base aptitude ratings A-G',
     base_stats JSON NOT NULL DEFAULT '{}' COMMENT 'Starting stat values',
     growth_modifiers JSON NULL COMMENT 'Stat growth rate modifiers',
-    
+
     -- Available content
     available_skills JSON NULL COMMENT 'Learnable skills and conditions',
     unique_skills JSON NULL COMMENT 'Character-specific unique skills',
-    
+
     -- Visual and metadata
     image_urls JSON NULL COMMENT 'Character artwork URLs',
     metadata JSON NULL COMMENT 'Additional character information',
-    
+
     -- Data source tracking
     data_source VARCHAR(50) NOT NULL DEFAULT 'umapyoi',
     data_version VARCHAR(20) NULL,
     data_quality_score DECIMAL(3,2) DEFAULT 1.00,
     last_synced_at TIMESTAMP NULL,
     sync_status ENUM('pending', 'synced', 'error') DEFAULT 'pending',
-    
+
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     -- Optimized indexes
     INDEX idx_external_id (external_id),
     INDEX idx_name (name),
@@ -1155,7 +1179,7 @@ CREATE TABLE character_templates (
     INDEX idx_data_source (data_source, sync_status),
     INDEX idx_last_synced (last_synced_at),
     INDEX idx_quality_score (data_quality_score),
-    
+
     UNIQUE KEY uk_external_source (external_id, data_source)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
@@ -1169,47 +1193,47 @@ CREATE TABLE training_sessions (
     uuid CHAR(36) NOT NULL UNIQUE,
     character_id BIGINT UNSIGNED NOT NULL,
     turn_number SMALLINT UNSIGNED NOT NULL,
-    
+
     -- Session type and context
     session_type ENUM('training', 'race', 'rest', 'event', 'special') NOT NULL,
     training_facility ENUM('speed', 'stamina', 'power', 'guts', 'wisdom', 'rest') NULL,
-    
+
     -- Pre-session state
     stats_before JSON NOT NULL COMMENT 'Character stats before session',
     conditions_before JSON NULL COMMENT 'Status conditions before session',
     motivation_before TINYINT UNSIGNED NULL,
-    
+
     -- Actions and decisions
     primary_action VARCHAR(100) NOT NULL,
     secondary_actions JSON NULL COMMENT 'Additional actions taken',
     support_cards_used JSON NULL COMMENT 'Support cards that activated',
-    
+
     -- Session results
     stats_gained JSON NOT NULL COMMENT 'Stat points gained',
     stats_after JSON NOT NULL COMMENT 'Character stats after session',
     conditions_after JSON NULL COMMENT 'Status conditions after session',
     motivation_after TINYINT UNSIGNED NULL,
-    
+
     -- Events and outcomes
     events_triggered JSON NULL COMMENT 'Random events that occurred',
     skills_learned JSON NULL COMMENT 'Skills acquired during session',
     items_gained JSON NULL COMMENT 'Items or rewards received',
-    
+
     -- AI integration
     ai_recommendation JSON NULL COMMENT 'AI-suggested action',
     ai_confidence DECIMAL(3,2) NULL COMMENT 'AI confidence in recommendation',
     user_followed_ai BOOLEAN NULL COMMENT 'Whether user followed AI advice',
     ai_model_used VARCHAR(50) NULL COMMENT 'AI model that generated recommendation',
-    
+
     -- Performance metrics
     success_rate DECIMAL(5,2) NULL COMMENT 'Training success percentage',
     efficiency_score DECIMAL(5,2) NULL COMMENT 'Stat gain efficiency rating',
     risk_level TINYINT UNSIGNED NULL COMMENT 'Risk level of chosen action',
-    
+
     -- Timing and metadata
     session_duration_seconds INT UNSIGNED NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    
+
     -- Performance indexes
     INDEX idx_character_sessions (character_id, turn_number),
     INDEX idx_session_type (session_type),
@@ -1217,7 +1241,7 @@ CREATE TABLE training_sessions (
     INDEX idx_ai_usage (ai_model_used, user_followed_ai),
     INDEX idx_performance (efficiency_score, success_rate),
     INDEX idx_uuid (uuid),
-    
+
     FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE,
     UNIQUE KEY uk_character_turn (character_id, turn_number)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -1229,40 +1253,40 @@ CREATE TABLE race_results (
     character_id BIGINT UNSIGNED NOT NULL,
     race_id BIGINT UNSIGNED NOT NULL,
     turn_number SMALLINT UNSIGNED NOT NULL,
-    
+
     -- Race identification
     race_name VARCHAR(200) NOT NULL,
     race_grade ENUM('G1', 'G2', 'G3', 'OP', 'Pre-OP', 'Debut', 'URA') NOT NULL,
-    
+
     -- Race conditions
     distance SMALLINT UNSIGNED NOT NULL,
     surface ENUM('turf', 'dirt') NOT NULL,
     track_condition ENUM('good', 'slightly_heavy', 'heavy', 'bad') DEFAULT 'good',
     weather ENUM('sunny', 'cloudy', 'rainy', 'snowy') DEFAULT 'sunny',
-    
+
     -- Performance results
     finish_position TINYINT UNSIGNED NOT NULL,
     total_runners TINYINT UNSIGNED NOT NULL,
     finish_time DECIMAL(6,3) NULL COMMENT 'Race time in seconds',
     margin VARCHAR(50) NULL COMMENT 'Winning/losing margin',
-    
+
     -- Character state at race
     stats_at_race JSON NOT NULL COMMENT 'Character stats during race',
     skills_active JSON NULL COMMENT 'Skills that activated during race',
     running_style ENUM('escape', 'leading', 'insert', 'chase') NOT NULL,
-    
+
     -- Race rewards and consequences
     fan_gain INT DEFAULT 0,
     skill_points_gain SMALLINT DEFAULT 0,
     prize_money INT DEFAULT 0,
     prestige_gain SMALLINT DEFAULT 0,
-    
+
     -- Performance analysis
     pace_analysis JSON NULL COMMENT 'Race pace breakdown',
     position_changes JSON NULL COMMENT 'Position changes during race',
-    
+
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    
+
     -- Performance indexes
     INDEX idx_character_races (character_id, turn_number),
     INDEX idx_race_performance (race_id, finish_position),
@@ -1270,7 +1294,7 @@ CREATE TABLE race_results (
     INDEX idx_race_conditions (distance, surface, track_condition),
     INDEX idx_performance_metrics (finish_position, total_runners),
     INDEX idx_uuid (uuid),
-    
+
     FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE,
     FOREIGN KEY (race_id) REFERENCES races(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -1285,38 +1309,38 @@ CREATE TABLE ai_conversations (
     uuid CHAR(36) NOT NULL UNIQUE,
     user_id BIGINT UNSIGNED NOT NULL,
     character_id BIGINT UNSIGNED NULL,
-    
+
     -- Conversation metadata
     conversation_type ENUM('recommendation', 'analysis', 'planning', 'general', 'optimization') NOT NULL,
     conversation_title VARCHAR(200) NULL,
-    
+
     -- AI model information
     ai_provider ENUM('ollama', 'bedrock', 'agent') NOT NULL,
     ai_model VARCHAR(100) NOT NULL COMMENT 'Specific model used',
     model_version VARCHAR(50) NULL,
-    
+
     -- Request and response
     user_prompt TEXT NOT NULL,
     ai_response TEXT NOT NULL,
     context_data JSON NULL COMMENT 'Character/game context provided to AI',
-    
+
     -- Quality metrics
     confidence_score DECIMAL(3,2) NULL,
     response_time_ms INT UNSIGNED NULL,
     token_count INT UNSIGNED NULL,
     cost_usd DECIMAL(8,4) NULL DEFAULT 0,
-    
+
     -- User feedback
     user_rating TINYINT UNSIGNED NULL COMMENT '1-5 star rating',
     user_feedback TEXT NULL,
     was_helpful BOOLEAN NULL,
-    
+
     -- Processing metadata
     processing_strategy VARCHAR(50) NULL COMMENT 'local/cloud/hybrid routing decision',
     fallback_used BOOLEAN DEFAULT FALSE,
-    
+
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    
+
     -- Performance indexes
     INDEX idx_user_conversations (user_id, created_at),
     INDEX idx_character_conversations (character_id, conversation_type),
@@ -1325,7 +1349,7 @@ CREATE TABLE ai_conversations (
     INDEX idx_user_rating (user_rating, was_helpful),
     INDEX idx_cost_tracking (cost_usd, created_at),
     INDEX idx_uuid (uuid),
-    
+
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -1335,34 +1359,34 @@ CREATE TABLE ai_usage_logs (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT UNSIGNED NOT NULL,
     conversation_id BIGINT UNSIGNED NULL,
-    
+
     -- Usage details
     ai_provider ENUM('ollama', 'bedrock', 'agent') NOT NULL,
     ai_model VARCHAR(100) NOT NULL,
     operation_type VARCHAR(50) NOT NULL,
-    
+
     -- Token usage
     input_tokens INT UNSIGNED DEFAULT 0,
     output_tokens INT UNSIGNED DEFAULT 0,
     total_tokens INT UNSIGNED DEFAULT 0,
-    
+
     -- Cost tracking
     cost_usd DECIMAL(8,4) NOT NULL DEFAULT 0,
     billing_period DATE NOT NULL,
-    
+
     -- Performance metrics
     processing_time_ms INT UNSIGNED NULL,
     success BOOLEAN DEFAULT TRUE,
     error_message TEXT NULL,
-    
+
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    
+
     -- Cost analysis indexes
     INDEX idx_user_billing (user_id, billing_period),
     INDEX idx_model_costs (ai_model, cost_usd),
     INDEX idx_daily_usage (created_at, ai_provider),
     INDEX idx_conversation_costs (conversation_id, cost_usd),
-    
+
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (conversation_id) REFERENCES ai_conversations(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -1380,29 +1404,29 @@ CREATE TABLE scenarios (
     name VARCHAR(200) NOT NULL,
     name_en VARCHAR(200) NULL,
     name_jp VARCHAR(200) NULL,
-    
+
     -- Scenario properties
     scenario_type ENUM('ura', 'aoharu', 'climax', 'grand_masters') NOT NULL,
     difficulty_level TINYINT UNSIGNED DEFAULT 1,
     max_turns SMALLINT UNSIGNED DEFAULT 78,
-    
+
     -- Scenario-specific data
     special_rules JSON NULL COMMENT 'Scenario-specific mechanics',
     available_facilities JSON NULL COMMENT 'Training facilities available',
     unique_events JSON NULL COMMENT 'Scenario-specific events',
-    
+
     -- Metadata
     description TEXT NULL,
     release_date DATE NULL,
     is_active BOOLEAN DEFAULT TRUE,
-    
+
     -- Data source tracking
     data_source VARCHAR(50) NOT NULL DEFAULT 'umapyoi',
     last_synced_at TIMESTAMP NULL,
-    
+
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     INDEX idx_scenario_type (scenario_type),
     INDEX idx_external_id (external_id),
     INDEX idx_active (is_active),
@@ -1413,39 +1437,39 @@ CREATE TABLE scenarios (
 CREATE TABLE support_cards (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     external_id VARCHAR(50) NULL,
-    
+
     -- Card identification
     name VARCHAR(200) NOT NULL,
     name_en VARCHAR(200) NULL,
     name_jp VARCHAR(200) NULL,
-    
+
     -- Card properties
     rarity TINYINT UNSIGNED NOT NULL,
     support_type ENUM('speed', 'stamina', 'power', 'guts', 'wisdom', 'friend') NOT NULL,
     character_id BIGINT UNSIGNED NULL COMMENT 'Associated character if any',
-    
+
     -- Card effects and abilities
     base_effects JSON NOT NULL DEFAULT '{}' COMMENT 'Base stat bonuses and effects',
     limit_break_effects JSON NULL COMMENT 'Effects at different limit break levels',
     unique_effects JSON NULL COMMENT 'Special card-specific effects',
-    
+
     -- Training bonuses
     training_bonuses JSON NULL COMMENT 'Bonuses to training facilities',
     event_bonuses JSON NULL COMMENT 'Event-related bonuses',
-    
+
     -- Metadata
     description TEXT NULL,
     image_urls JSON NULL,
-    
+
     -- Data source tracking
     data_source VARCHAR(50) NOT NULL DEFAULT 'umapyoi',
     data_quality_score DECIMAL(3,2) DEFAULT 1.00,
     last_synced_at TIMESTAMP NULL,
-    
+
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     INDEX idx_support_type (support_type),
     INDEX idx_rarity (rarity),
     INDEX idx_character_cards (character_id),
@@ -1457,42 +1481,42 @@ CREATE TABLE support_cards (
 CREATE TABLE races (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     external_id VARCHAR(50) NULL,
-    
+
     -- Race identification
     name VARCHAR(200) NOT NULL,
     name_en VARCHAR(200) NULL,
     name_jp VARCHAR(200) NULL,
-    
+
     -- Race properties
     grade ENUM('G1', 'G2', 'G3', 'OP', 'Pre-OP', 'Debut', 'URA') NOT NULL,
     distance SMALLINT UNSIGNED NOT NULL,
     surface ENUM('turf', 'dirt') NOT NULL,
     direction ENUM('right', 'left', 'straight') DEFAULT 'right',
-    
+
     -- Race conditions and requirements
     age_restrictions JSON NULL COMMENT 'Age and career phase restrictions',
     entry_requirements JSON NULL COMMENT 'Stats or achievement requirements',
-    
+
     -- Race rewards
     base_rewards JSON NULL COMMENT 'Fan gain, skill points, prize money',
     victory_conditions JSON NULL COMMENT 'Special victory bonuses',
-    
+
     -- Scheduling
     available_turns JSON NULL COMMENT 'Turns when race is available',
     season ENUM('spring', 'summer', 'autumn', 'winter') NULL,
-    
+
     -- Metadata
     description TEXT NULL,
     track_name VARCHAR(200) NULL,
-    
+
     -- Data source tracking
     data_source VARCHAR(50) NOT NULL DEFAULT 'umapyoi',
     last_synced_at TIMESTAMP NULL,
-    
+
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     INDEX idx_race_grade (grade),
     INDEX idx_race_conditions (distance, surface),
     INDEX idx_external_id (external_id),
@@ -1507,30 +1531,30 @@ CREATE TABLE races (
 
 ```sql
 -- Composite indexes for common query patterns
-ALTER TABLE characters 
+ALTER TABLE characters
 ADD INDEX idx_user_active_scenario (user_id, is_active, scenario_id),
 ADD INDEX idx_completion_stats (is_completed, completion_rank, created_at);
 
-ALTER TABLE training_sessions 
+ALTER TABLE training_sessions
 ADD INDEX idx_character_turn_type (character_id, turn_number, session_type),
 ADD INDEX idx_ai_performance (ai_model_used, efficiency_score, created_at);
 
-ALTER TABLE race_results 
+ALTER TABLE race_results
 ADD INDEX idx_performance_analysis (race_grade, finish_position, distance),
 ADD INDEX idx_character_performance (character_id, finish_position, race_grade);
 
-ALTER TABLE ai_conversations 
+ALTER TABLE ai_conversations
 ADD INDEX idx_user_type_date (user_id, conversation_type, created_at),
 ADD INDEX idx_cost_analysis (ai_provider, cost_usd, created_at);
 
 -- Full-text search indexes
-ALTER TABLE character_templates 
+ALTER TABLE character_templates
 ADD FULLTEXT INDEX ft_character_names (name, name_en, name_jp);
 
-ALTER TABLE races 
+ALTER TABLE races
 ADD FULLTEXT INDEX ft_race_names (name, name_en, name_jp);
 
-ALTER TABLE support_cards 
+ALTER TABLE support_cards
 ADD FULLTEXT INDEX ft_card_names (name, name_en, name_jp);
 ```
 
@@ -1538,7 +1562,7 @@ ADD FULLTEXT INDEX ft_card_names (name, name_en, name_jp);
 
 ```sql
 -- Partition large tables by date for better performance
-ALTER TABLE training_sessions 
+ALTER TABLE training_sessions
 PARTITION BY RANGE (YEAR(created_at)) (
     PARTITION p2024 VALUES LESS THAN (2025),
     PARTITION p2025 VALUES LESS THAN (2026),
@@ -1546,7 +1570,7 @@ PARTITION BY RANGE (YEAR(created_at)) (
     PARTITION p_future VALUES LESS THAN MAXVALUE
 );
 
-ALTER TABLE ai_conversations 
+ALTER TABLE ai_conversations
 PARTITION BY RANGE (YEAR(created_at)) (
     PARTITION p2024 VALUES LESS THAN (2025),
     PARTITION p2025 VALUES LESS THAN (2026),
@@ -1554,7 +1578,7 @@ PARTITION BY RANGE (YEAR(created_at)) (
     PARTITION p_future VALUES LESS THAN MAXVALUE
 );
 
-ALTER TABLE ai_usage_logs 
+ALTER TABLE ai_usage_logs
 PARTITION BY RANGE (YEAR(created_at)) (
     PARTITION p2024 VALUES LESS THAN (2025),
     PARTITION p2025 VALUES LESS THAN (2026),
@@ -1620,7 +1644,7 @@ abstract class AccessibleComponent extends Component
         'aria-controls' => null,
         'tabindex' => null
     ];
-    
+
     protected array $wcagRequirements = [
         'contrast_ratio' => 4.5, // 4.5:1 for normal text
         'large_text_contrast' => 3.0, // 3:1 for large text
@@ -1628,7 +1652,7 @@ abstract class AccessibleComponent extends Component
         'touch_target_size' => 44, // 44px minimum touch target
         'text_spacing' => true // Proper line height and spacing
     ];
-    
+
     public function __construct(
         protected string $id = '',
         protected array $accessibility = [],
@@ -1638,28 +1662,28 @@ abstract class AccessibleComponent extends Component
         $this->id = $id ?: 'component-' . uniqid();
         $this->accessibility = array_merge($this->accessibilityAttributes, $accessibility);
     }
-    
+
     protected function getAccessibilityAttributes(): array
     {
         $attributes = [];
-        
+
         foreach ($this->accessibility as $key => $value) {
             if ($value !== null) {
                 $attributes[$key] = $value;
             }
         }
-        
+
         if ($this->keyboardNavigable && !isset($attributes['tabindex'])) {
             $attributes['tabindex'] = '0';
         }
-        
+
         if ($this->semanticRole) {
             $attributes['role'] = $this->semanticRole;
         }
-        
+
         return $attributes;
     }
-    
+
     protected function validateWCAGCompliance(): array
     {
         return [
@@ -1687,35 +1711,35 @@ abstract class AccessibleComponent extends Component
   --color-primary-500: #3b82f6; /* 4.5:1 contrast ratio */
   --color-primary-600: #2563eb; /* Enhanced contrast */
   --color-primary-700: #1d4ed8; /* High contrast */
-  
+
   --color-success-500: #10b981; /* 4.5:1 contrast ratio */
   --color-warning-500: #f59e0b; /* 4.5:1 contrast ratio */
   --color-error-500: #ef4444; /* 4.5:1 contrast ratio */
-  
+
   /* Focus indicators with 3:1 contrast ratio */
   --color-focus: #2563eb;
   --focus-ring-width: 2px;
   --focus-ring-offset: 2px;
-  
+
   /* Typography scale for accessibility */
   --font-size-xs: 0.75rem; /* 12px */
   --font-size-sm: 0.875rem; /* 14px */
   --font-size-base: 1rem; /* 16px - minimum for body text */
   --font-size-lg: 1.125rem; /* 18px - large text threshold */
   --font-size-xl: 1.25rem; /* 20px */
-  
+
   /* Line height for readability */
   --line-height-tight: 1.25;
   --line-height-normal: 1.5; /* WCAG recommended */
   --line-height-relaxed: 1.625;
-  
+
   /* Spacing scale */
   --spacing-xs: 0.25rem; /* 4px */
   --spacing-sm: 0.5rem; /* 8px */
   --spacing-md: 1rem; /* 16px */
   --spacing-lg: 1.5rem; /* 24px */
   --spacing-xl: 2rem; /* 32px */
-  
+
   /* Touch target sizes (minimum 44px) */
   --touch-target-sm: 2.75rem; /* 44px */
   --touch-target-md: 3rem; /* 48px */
@@ -1740,7 +1764,7 @@ abstract class AccessibleComponent extends Component
 }
 
 .skip-link {
-  @apply sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 
+  @apply sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4
          bg-primary-600 text-white px-4 py-2 rounded-md z-50;
 }
 
@@ -1792,7 +1816,7 @@ abstract class AccessibleComponent extends Component
             <div class="flex justify-between items-center h-16">
                 {{-- Logo and Brand --}}
                 <div class="flex items-center">
-                    <x-ui.logo 
+                    <x-ui.logo
                         class="h-8 w-auto"
                         alt="Umamusume Career Planner"
                         aria-label="Return to homepage"
@@ -1821,7 +1845,7 @@ abstract class AccessibleComponent extends Component
     <main id="main-content" role="main" class="flex-1">
         {{-- Breadcrumb Navigation --}}
         <x-ui.breadcrumb class="bg-gray-50 border-b border-gray-200" />
-        
+
         {{-- Page Content --}}
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             {{ $slot }}
@@ -1850,7 +1874,7 @@ abstract class AccessibleComponent extends Component
         <h2 id="training-title" class="text-lg font-semibold text-gray-900">
             Training Dashboard
         </h2>
-        <x-ui.help-button 
+        <x-ui.help-button
             aria-describedby="training-help"
             content="Manage your character's training schedule and view AI recommendations"
         />
@@ -1858,13 +1882,13 @@ abstract class AccessibleComponent extends Component
 
     {{-- Character Status Panel --}}
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <x-training.character-status 
+        <x-training.character-status
             :character="$character"
             class="lg:col-span-2"
             aria-labelledby="character-status-title"
         />
-        
-        <x-training.quick-actions 
+
+        <x-training.quick-actions
             :character="$character"
             aria-labelledby="quick-actions-title"
         />
@@ -1873,7 +1897,7 @@ abstract class AccessibleComponent extends Component
     {{-- Training Facilities Grid --}}
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
         @foreach($trainingFacilities as $facility)
-            <x-training.facility-card 
+            <x-training.facility-card
                 :facility="$facility"
                 :character="$character"
                 @click="selectFacility"
@@ -1887,7 +1911,7 @@ abstract class AccessibleComponent extends Component
     </div>
 
     {{-- AI Recommendations Panel --}}
-    <x-ai.recommendations-panel 
+    <x-ai.recommendations-panel
         :character="$character"
         :turn="$currentTurn"
         class="mb-6"
@@ -1895,7 +1919,7 @@ abstract class AccessibleComponent extends Component
     />
 
     {{-- Training History --}}
-    <x-training.history-table 
+    <x-training.history-table
         :sessions="$recentSessions"
         aria-labelledby="training-history-title"
         role="region"
@@ -1907,12 +1931,12 @@ abstract class AccessibleComponent extends Component
 
 ```blade
 {{-- AI Assistant Chat Interface --}}
-<div class="ai-chat-container" 
-     role="region" 
+<div class="ai-chat-container"
+     role="region"
      aria-labelledby="ai-chat-title"
      x-data="aiChat()"
      x-init="initializeChat()">
-     
+
     <header class="chat-header bg-primary-50 p-4 border-b">
         <h3 id="ai-chat-title" class="text-lg font-semibold text-primary-900">
             AI Career Assistant
@@ -1933,31 +1957,31 @@ abstract class AccessibleComponent extends Component
          aria-live="polite"
          aria-label="Chat conversation"
          x-ref="messagesContainer">
-         
+
         <template x-for="message in messages" :key="message.id">
             <div class="message"
                  :class="message.sender === 'user' ? 'message-user' : 'message-ai'"
                  role="article"
                  :aria-label="`Message from ${message.sender}`">
-                 
+
                 <div class="message-content bg-white rounded-lg p-3 shadow-sm border">
                     <div class="message-header flex items-center justify-between mb-2">
-                        <span class="font-medium text-sm" 
+                        <span class="font-medium text-sm"
                               :class="message.sender === 'user' ? 'text-primary-600' : 'text-gray-700'">
                             <span x-text="message.sender === 'user' ? 'You' : 'AI Assistant'"></span>
                         </span>
-                        <time class="text-xs text-gray-500" 
+                        <time class="text-xs text-gray-500"
                               :datetime="message.timestamp"
                               x-text="formatTime(message.timestamp)">
                         </time>
                     </div>
-                    
+
                     <div class="message-text prose prose-sm max-w-none"
                          x-html="formatMessage(message.content)">
                     </div>
-                    
+
                     {{-- AI Message Metadata --}}
-                    <div x-show="message.sender === 'ai' && message.metadata" 
+                    <div x-show="message.sender === 'ai' && message.metadata"
                          class="message-metadata mt-3 pt-3 border-t border-gray-100">
                         <div class="flex items-center justify-between text-xs text-gray-500">
                             <span>
@@ -1971,7 +1995,7 @@ abstract class AccessibleComponent extends Component
                             </span>
                         </div>
                     </div>
-                    
+
                     {{-- Message Actions --}}
                     <div class="message-actions mt-3 flex items-center space-x-2">
                         <button type="button"
@@ -2013,7 +2037,7 @@ abstract class AccessibleComponent extends Component
                     Press Enter to send, Shift+Enter for new line
                 </div>
             </div>
-            
+
             <button type="submit"
                     class="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     :disabled="!currentMessage.trim() || isProcessing"
@@ -2026,9 +2050,9 @@ abstract class AccessibleComponent extends Component
                 </template>
             </button>
         </form>
-        
+
         {{-- Processing Indicator --}}
-        <div x-show="isProcessing" 
+        <div x-show="isProcessing"
              class="mt-3 flex items-center space-x-2 text-sm text-gray-600"
              role="status"
              aria-live="polite">
@@ -2083,8 +2107,8 @@ self.addEventListener('activate', event => {
             .then(cacheNames => {
                 return Promise.all(
                     cacheNames
-                        .filter(cacheName => 
-                            cacheName !== STATIC_CACHE && 
+                        .filter(cacheName =>
+                            cacheName !== STATIC_CACHE &&
                             cacheName !== DYNAMIC_CACHE
                         )
                         .map(cacheName => caches.delete(cacheName))
@@ -2097,25 +2121,25 @@ self.addEventListener('activate', event => {
 // Fetch event - implement caching strategies
 self.addEventListener('fetch', event => {
     const { request } = event;
-    
+
     // Handle API requests with network-first strategy
     if (isApiRequest(request)) {
         event.respondWith(networkFirstStrategy(request));
         return;
     }
-    
+
     // Handle static assets with cache-first strategy
     if (isStaticAsset(request)) {
         event.respondWith(cacheFirstStrategy(request));
         return;
     }
-    
+
     // Handle navigation requests with network-first, fallback to offline page
     if (isNavigationRequest(request)) {
         event.respondWith(navigationStrategy(request));
         return;
     }
-    
+
     // Default: network-first strategy
     event.respondWith(networkFirstStrategy(request));
 });
@@ -2124,12 +2148,12 @@ self.addEventListener('fetch', event => {
 async function networkFirstStrategy(request) {
     try {
         const networkResponse = await fetch(request);
-        
+
         if (networkResponse.ok) {
             const cache = await caches.open(DYNAMIC_CACHE);
             cache.put(request, networkResponse.clone());
         }
-        
+
         return networkResponse;
     } catch (error) {
         const cachedResponse = await caches.match(request);
@@ -2140,11 +2164,11 @@ async function networkFirstStrategy(request) {
 // Cache-first strategy for static assets
 async function cacheFirstStrategy(request) {
     const cachedResponse = await caches.match(request);
-    
+
     if (cachedResponse) {
         return cachedResponse;
     }
-    
+
     try {
         const networkResponse = await fetch(request);
         const cache = await caches.open(STATIC_CACHE);
@@ -2171,7 +2195,7 @@ self.addEventListener('sync', event => {
     if (event.tag === 'training-session-sync') {
         event.waitUntil(syncTrainingSessions());
     }
-    
+
     if (event.tag === 'ai-conversation-sync') {
         event.waitUntil(syncAIConversations());
     }
@@ -2200,7 +2224,7 @@ self.addEventListener('push', event => {
             }
         ]
     };
-    
+
     event.waitUntil(
         self.registration.showNotification('Umamusume Career Planner', options)
     );
@@ -2209,7 +2233,7 @@ self.addEventListener('push', event => {
 // Notification click handling
 self.addEventListener('notificationclick', event => {
     event.notification.close();
-    
+
     if (event.action === 'open' || !event.action) {
         event.waitUntil(
             clients.openWindow(event.notification.data.url || '/')
@@ -2223,8 +2247,8 @@ function isApiRequest(request) {
 }
 
 function isStaticAsset(request) {
-    return request.destination === 'style' || 
-           request.destination === 'script' || 
+    return request.destination === 'style' ||
+           request.destination === 'script' ||
            request.destination === 'image';
 }
 
@@ -2235,7 +2259,7 @@ function isNavigationRequest(request) {
 async function syncTrainingSessions() {
     // Sync offline training sessions when back online
     const offlineSessions = await getOfflineTrainingSessions();
-    
+
     for (const session of offlineSessions) {
         try {
             await fetch('/api/training-sessions', {
@@ -2246,7 +2270,7 @@ async function syncTrainingSessions() {
                 },
                 body: JSON.stringify(session)
             });
-            
+
             await removeOfflineSession(session.id);
         } catch (error) {
             console.error('Failed to sync training session:', error);
@@ -2270,7 +2294,7 @@ async function syncTrainingSessions() {
   "scope": "/",
   "lang": "en",
   "dir": "ltr",
-  
+
   "icons": [
     {
       "src": "/images/app-icon-72.png",
@@ -2321,7 +2345,7 @@ async function syncTrainingSessions() {
       "purpose": "any maskable"
     }
   ],
-  
+
   "screenshots": [
     {
       "src": "/images/screenshot-desktop-1.png",
@@ -2338,7 +2362,7 @@ async function syncTrainingSessions() {
       "label": "Mobile Training Interface"
     }
   ],
-  
+
   "categories": ["games", "productivity", "utilities"],
   "shortcuts": [
     {
@@ -2366,10 +2390,10 @@ async function syncTrainingSessions() {
       ]
     }
   ],
-  
+
   "related_applications": [],
   "prefer_related_applications": false,
-  
+
   "protocol_handlers": [
     {
       "protocol": "web+umamusume",
@@ -2402,7 +2426,7 @@ abstract class BaseApiController extends Controller
 {
     protected int $defaultPerPage = 15;
     protected int $maxPerPage = 100;
-    
+
     protected function successResponse($data = null, string $message = 'Success', int $status = 200): JsonResponse
     {
         return response()->json([
@@ -2413,7 +2437,7 @@ abstract class BaseApiController extends Controller
             'version' => 'v1'
         ], $status);
     }
-    
+
     protected function errorResponse(string $message, int $status = 400, array $errors = []): JsonResponse
     {
         return response()->json([
@@ -2424,7 +2448,7 @@ abstract class BaseApiController extends Controller
             'version' => 'v1'
         ], $status);
     }
-    
+
     protected function paginatedResponse($data, string $message = 'Success'): JsonResponse
     {
         return response()->json([
@@ -2467,7 +2491,7 @@ class CharacterController extends BaseApiController
         $this->middleware('auth:sanctum');
         $this->middleware('throttle:60,1');
     }
-    
+
     /**
      * GET /api/v1/characters
      * List user's characters with filtering and pagination
@@ -2482,7 +2506,7 @@ class CharacterController extends BaseApiController
             'sort_by' => 'nullable|in:name,created_at,updated_at,current_turn',
             'sort_direction' => 'nullable|in:asc,desc'
         ]);
-        
+
         $characters = $this->characterService->getUserCharacters(
             user: $request->user(),
             filters: $request->only(['scenario_id', 'is_active', 'is_completed']),
@@ -2490,13 +2514,13 @@ class CharacterController extends BaseApiController
             sortBy: $request->get('sort_by', 'updated_at'),
             sortDirection: $request->get('sort_direction', 'desc')
         );
-        
+
         return $this->paginatedResponse(
             CharacterResource::collection($characters),
             'Characters retrieved successfully'
         );
     }
-    
+
     /**
      * POST /api/v1/characters
      * Create a new character
@@ -2508,21 +2532,21 @@ class CharacterController extends BaseApiController
                 user: $request->user(),
                 data: $request->validated()
             );
-            
+
             // Generate initial AI recommendations
             $recommendations = $this->aiService->generateInitialRecommendations($character);
-            
+
             return $this->successResponse(
                 new CharacterResource($character->load('template', 'scenario')),
                 'Character created successfully',
                 201
             );
-            
+
         } catch (CharacterCreationException $e) {
             return $this->errorResponse($e->getMessage(), 422);
         }
     }
-    
+
     /**
      * GET /api/v1/characters/{character}
      * Get character details with related data
@@ -2530,7 +2554,7 @@ class CharacterController extends BaseApiController
     public function show(Character $character): JsonResponse
     {
         $this->authorize('view', $character);
-        
+
         $character->load([
             'template',
             'scenario',
@@ -2538,13 +2562,13 @@ class CharacterController extends BaseApiController
             'raceResults' => fn($q) => $q->latest()->limit(5),
             'aiConversations' => fn($q) => $q->latest()->limit(3)
         ]);
-        
+
         return $this->successResponse(
             new CharacterDetailResource($character),
             'Character details retrieved successfully'
         );
     }
-    
+
     /**
      * PUT /api/v1/characters/{character}
      * Update character information
@@ -2552,23 +2576,23 @@ class CharacterController extends BaseApiController
     public function update(UpdateCharacterRequest $request, Character $character): JsonResponse
     {
         $this->authorize('update', $character);
-        
+
         try {
             $updatedCharacter = $this->characterService->updateCharacter(
                 character: $character,
                 data: $request->validated()
             );
-            
+
             return $this->successResponse(
                 new CharacterResource($updatedCharacter),
                 'Character updated successfully'
             );
-            
+
         } catch (CharacterUpdateException $e) {
             return $this->errorResponse($e->getMessage(), 422);
         }
     }
-    
+
     /**
      * DELETE /api/v1/characters/{character}
      * Delete character (soft delete)
@@ -2576,15 +2600,15 @@ class CharacterController extends BaseApiController
     public function destroy(Character $character): JsonResponse
     {
         $this->authorize('delete', $character);
-        
+
         $this->characterService->deleteCharacter($character);
-        
+
         return $this->successResponse(
             null,
             'Character deleted successfully'
         );
     }
-    
+
     /**
      * POST /api/v1/characters/{character}/training
      * Process training session
@@ -2592,23 +2616,23 @@ class CharacterController extends BaseApiController
     public function processTraining(ProcessTrainingRequest $request, Character $character): JsonResponse
     {
         $this->authorize('update', $character);
-        
+
         try {
             $result = $this->characterService->processTrainingSession(
                 character: $character,
                 trainingData: $request->validated()
             );
-            
+
             return $this->successResponse(
                 new TrainingResultResource($result),
                 'Training session processed successfully'
             );
-            
+
         } catch (TrainingProcessingException $e) {
             return $this->errorResponse($e->getMessage(), 422);
         }
     }
-    
+
     /**
      * GET /api/v1/characters/{character}/recommendations
      * Get AI recommendations for character
@@ -2616,18 +2640,18 @@ class CharacterController extends BaseApiController
     public function getRecommendations(Character $character): JsonResponse
     {
         $this->authorize('view', $character);
-        
+
         try {
             $recommendations = $this->aiService->generateRecommendations(
                 character: $character,
                 context: ['current_turn', 'goals', 'recent_performance']
             );
-            
+
             return $this->successResponse(
                 AIRecommendationResource::collection($recommendations),
                 'Recommendations generated successfully'
             );
-            
+
         } catch (AIServiceException $e) {
             return $this->errorResponse(
                 'Failed to generate recommendations: ' . $e->getMessage(),
@@ -2658,7 +2682,7 @@ class AIController extends BaseApiController
         $this->middleware('auth:sanctum');
         $this->middleware('throttle:30,1'); // More restrictive for AI endpoints
     }
-    
+
     /**
      * POST /api/v1/ai/chat
      * Send message to AI assistant
@@ -2673,16 +2697,16 @@ class AIController extends BaseApiController
                 'conversation_type' => $request->input('type', 'general'),
                 'user_id' => $request->user()->id
             ]);
-            
+
             $response = $this->aiCoordinator->processRequest($aiRequest);
-            
+
             // Save conversation
             $conversation = $this->conversationService->saveConversation(
                 user: $request->user(),
                 request: $aiRequest,
                 response: $response
             );
-            
+
             return $this->successResponse([
                 'conversation_id' => $conversation->uuid,
                 'message' => $response->content,
@@ -2693,7 +2717,7 @@ class AIController extends BaseApiController
                 'processing_time' => $response->processingTime,
                 'suggestions' => $response->suggestions ?? []
             ], 'AI response generated successfully');
-            
+
         } catch (AIProcessingException $e) {
             return $this->errorResponse(
                 'AI processing failed: ' . $e->getMessage(),
@@ -2706,7 +2730,7 @@ class AIController extends BaseApiController
             );
         }
     }
-    
+
     /**
      * GET /api/v1/ai/conversations
      * Get user's AI conversation history
@@ -2718,19 +2742,19 @@ class AIController extends BaseApiController
             'type' => 'nullable|in:recommendation,analysis,planning,general,optimization',
             'per_page' => 'nullable|integer|min:1|max:50'
         ]);
-        
+
         $conversations = $this->conversationService->getUserConversations(
             user: $request->user(),
             filters: $request->only(['character_id', 'type']),
             perPage: $request->get('per_page', 10)
         );
-        
+
         return $this->paginatedResponse(
             AIConversationResource::collection($conversations),
             'Conversations retrieved successfully'
         );
     }
-    
+
     /**
      * POST /api/v1/ai/analyze-screenshot
      * Analyze game screenshot with AI
@@ -2742,7 +2766,7 @@ class AIController extends BaseApiController
                 screenshot: $request->file('screenshot'),
                 context: $request->input('context', [])
             );
-            
+
             return $this->successResponse([
                 'extracted_data' => $analysis->extractedData,
                 'game_state' => $analysis->gameState,
@@ -2750,7 +2774,7 @@ class AIController extends BaseApiController
                 'suggestions' => $analysis->suggestions,
                 'cost' => $analysis->cost
             ], 'Screenshot analyzed successfully');
-            
+
         } catch (ScreenshotAnalysisException $e) {
             return $this->errorResponse(
                 'Screenshot analysis failed: ' . $e->getMessage(),
@@ -2758,7 +2782,7 @@ class AIController extends BaseApiController
             );
         }
     }
-    
+
     /**
      * GET /api/v1/ai/usage
      * Get AI usage statistics and budget information
@@ -2766,7 +2790,7 @@ class AIController extends BaseApiController
     public function usage(Request $request): JsonResponse
     {
         $usage = $this->conversationService->getUserUsageStats($request->user());
-        
+
         return $this->successResponse([
             'current_period' => [
                 'daily' => $usage['daily'],
@@ -2809,37 +2833,37 @@ class GameDataAPIService
         'primary' => 'umapyoi',
         'fallback' => ['umamusumedb', 'umalator']
     ];
-    
+
     public function __construct(
         private HttpClient $httpClient,
         private CacheManager $cache,
         private Logger $logger
     ) {}
-    
+
     /**
      * Fetch character data from external APIs
      */
     public function fetchCharacterData(string $characterId = null): Collection
     {
         $cacheKey = "characters_data_" . ($characterId ?? 'all');
-        
+
         return $this->cache->remember($cacheKey, 3600, function () use ($characterId) {
             return $this->fetchWithFallback('characters', $characterId);
         });
     }
-    
+
     /**
      * Fetch support card data from external APIs
      */
     public function fetchSupportCardData(string $cardId = null): Collection
     {
         $cacheKey = "support_cards_data_" . ($cardId ?? 'all');
-        
+
         return $this->cache->remember($cacheKey, 3600, function () use ($cardId) {
             return $this->fetchWithFallback('support_cards', $cardId);
         });
     }
-    
+
     /**
      * Fetch race data from external APIs
      */
@@ -2849,17 +2873,17 @@ class GameDataAPIService
             return $this->fetchWithFallback('races');
         });
     }
-    
+
     /**
      * Fetch with intelligent fallback mechanism
      */
     private function fetchWithFallback(string $endpoint, string $id = null): Collection
     {
         $primarySource = $this->apiSources['primary'];
-        
+
         try {
             $data = $this->fetchFromSource($primarySource, $endpoint, $id);
-            
+
             if ($data->isNotEmpty()) {
                 $this->logger->info("Successfully fetched {$endpoint} from primary source: {$primarySource}");
                 return $data;
@@ -2867,12 +2891,12 @@ class GameDataAPIService
         } catch (ExternalAPIException $e) {
             $this->logger->warning("Primary source {$primarySource} failed for {$endpoint}: " . $e->getMessage());
         }
-        
+
         // Try fallback sources
         foreach ($this->apiSources['fallback'] as $fallbackSource) {
             try {
                 $data = $this->fetchFromSource($fallbackSource, $endpoint, $id);
-                
+
                 if ($data->isNotEmpty()) {
                     $this->logger->info("Successfully fetched {$endpoint} from fallback source: {$fallbackSource}");
                     return $data;
@@ -2882,50 +2906,50 @@ class GameDataAPIService
                 continue;
             }
         }
-        
+
         // If all sources fail, return cached data if available
         $staleData = $this->cache->get("stale_{$endpoint}_" . ($id ?? 'all'));
         if ($staleData) {
             $this->logger->warning("All API sources failed, returning stale data for {$endpoint}");
             return collect($staleData);
         }
-        
+
         throw new AllAPISourcesFailedException("All API sources failed for endpoint: {$endpoint}");
     }
-    
+
     /**
      * Fetch data from specific source
      */
     private function fetchFromSource(string $source, string $endpoint, string $id = null): Collection
     {
         $config = config("external_apis.{$source}");
-        
+
         if (!$config || !$config['enabled']) {
             throw new ExternalAPIException("API source {$source} is not configured or disabled");
         }
-        
+
         $url = $this->buildApiUrl($config, $endpoint, $id);
-        
+
         $response = $this->httpClient->timeout(10)->get($url, [
             'headers' => $config['headers'] ?? [],
             'query' => $config['default_params'] ?? []
         ]);
-        
+
         if (!$response->successful()) {
             throw new ExternalAPIException("API request failed with status: " . $response->status());
         }
-        
+
         $data = $response->json();
-        
+
         // Validate and normalize data
         $normalizedData = $this->normalizeApiData($source, $endpoint, $data);
-        
+
         // Cache stale data for fallback
         $this->cache->put("stale_{$endpoint}_" . ($id ?? 'all'), $normalizedData, 86400);
-        
+
         return collect($normalizedData);
     }
-    
+
     /**
      * Build API URL based on source configuration
      */
@@ -2933,14 +2957,14 @@ class GameDataAPIService
     {
         $baseUrl = rtrim($config['base_url'], '/');
         $endpointPath = $config['endpoints'][$endpoint] ?? $endpoint;
-        
+
         if ($id) {
             $endpointPath = str_replace('{id}', $id, $endpointPath);
         }
-        
+
         return "{$baseUrl}/{$endpointPath}";
     }
-    
+
     /**
      * Normalize data from different API sources
      */
@@ -2952,7 +2976,7 @@ class GameDataAPIService
             'umalator' => new UmalatorNormalizer(),
             default => new DefaultNormalizer()
         };
-        
+
         return $normalizer->normalize($endpoint, $data);
     }
 }
@@ -2985,7 +3009,7 @@ return [
             'burst_limit' => 10
         ]
     ],
-    
+
     'umamusumedb' => [
         'enabled' => env('UMAMUSUMEDB_ENABLED', true),
         'base_url' => 'https://umamusumedb.com/api',
@@ -3004,7 +3028,7 @@ return [
             'burst_limit' => 5
         ]
     ],
-    
+
     'umalator' => [
         'enabled' => env('UMALATOR_ENABLED', false), // Requires verification
         'base_url' => 'https://umalator.com/api',
@@ -3039,15 +3063,15 @@ class APIRateLimiter
         'general_endpoints' => ['requests' => 100, 'window' => 60], // 100 requests per minute
         'external_api_proxy' => ['requests' => 20, 'window' => 60] // 20 requests per minute
     ];
-    
+
     public function handle(Request $request, Closure $next, string $category = 'general_endpoints'): Response
     {
         $user = $request->user();
         $limits = $this->rateLimits[$category];
-        
+
         $key = $this->buildRateLimitKey($user, $category, $request);
         $current = Cache::get($key, 0);
-        
+
         if ($current >= $limits['requests']) {
             return response()->json([
                 'success' => false,
@@ -3057,19 +3081,19 @@ class APIRateLimiter
                 'remaining' => 0
             ], 429);
         }
-        
+
         Cache::put($key, $current + 1, $limits['window']);
-        
+
         $response = $next($request);
-        
+
         // Add rate limit headers
         $response->headers->set('X-RateLimit-Limit', $limits['requests']);
         $response->headers->set('X-RateLimit-Remaining', max(0, $limits['requests'] - $current - 1));
         $response->headers->set('X-RateLimit-Reset', now()->addSeconds($limits['window'])->timestamp);
-        
+
         return $response;
     }
-    
+
     private function buildRateLimitKey($user, string $category, Request $request): string
     {
         $identifier = $user ? $user->id : $request->ip();
@@ -3135,7 +3159,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '429':
           $ref: '#/components/responses/RateLimited'
-    
+
     post:
       summary: Create new character
       tags: [Characters]
@@ -3183,7 +3207,7 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-  
+
   schemas:
     Character:
       type: object
@@ -3204,7 +3228,7 @@ components:
         created_at:
           type: string
           format: date-time
-    
+
     CreateCharacterRequest:
       type: object
       required:
@@ -3221,7 +3245,7 @@ components:
           type: integer
         goals:
           type: object
-    
+
     AIChatRequest:
       type: object
       required:
@@ -3238,7 +3262,7 @@ components:
         type:
           type: string
           enum: [recommendation, analysis, planning, general, optimization]
-  
+
   responses:
     Unauthorized:
       description: Authentication required
@@ -3253,7 +3277,7 @@ components:
               message:
                 type: string
                 example: "Unauthenticated"
-    
+
     RateLimited:
       description: Rate limit exceeded
       headers:
@@ -3305,12 +3329,12 @@ namespace App\Repositories;
 class EloquentCharacterRepository implements CharacterRepositoryInterface
 {
     public function __construct(private Character $model) {}
-    
+
     public function findById(int $id): ?Character
     {
         return $this->model->with(['aptitudes', 'factors', 'skills'])->find($id);
     }
-    
+
     public function findByUserId(int $userId): Collection
     {
         return $this->model->where('user_id', $userId)
@@ -3318,13 +3342,13 @@ class EloquentCharacterRepository implements CharacterRepositoryInterface
             ->orderBy('created_at', 'desc')
             ->get();
     }
-    
+
     public function store(Character $character): Character
     {
         $character->save();
         return $character->load(['aptitudes', 'factors']);
     }
-    
+
     public function update(Character $character): Character
     {
         $character->save();
@@ -3349,22 +3373,22 @@ class TrainingOptimizationService
         private CacheManager $cache,
         private EventDispatcher $events
     ) {}
-    
+
     public function optimizeTrainingSequence(
-        Character $character, 
+        Character $character,
         TrainingGoals $goals
     ): TrainingRecommendation {
         $cacheKey = "training_optimization_{$character->id}_{$goals->hash()}";
-        
+
         return $this->cache->remember($cacheKey, 300, function () use ($character, $goals) {
             $recommendation = $this->predictionEngine->calculateOptimalSequence($character, $goals);
-            
+
             $this->events->dispatch(new TrainingRecommendationGenerated($character, $recommendation));
-            
+
             return $recommendation;
         });
     }
-    
+
     public function predictTrainingOutcome(
         Character $character,
         TrainingOption $option,
@@ -3400,20 +3424,20 @@ class UpdateCharacterStatsHandler
         private CharacterRepositoryInterface $characterRepo,
         private EventDispatcher $events
     ) {}
-    
+
     public function handle(UpdateCharacterStatsCommand $command): void
     {
         $character = $this->characterRepo->findById($command->characterId);
-        
+
         if (!$character) {
             throw new CharacterNotFoundException($command->characterId);
         }
-        
+
         $character->updateStats($command->stats, $command->turnNumber);
         $this->characterRepo->update($character);
-        
+
         $this->events->dispatch(new CharacterStatsUpdated(
-            $character, 
+            $character,
             $command->source,
             $command->stats
         ));
@@ -3438,14 +3462,14 @@ class GetCharacterProgressHandler
         private CharacterRepositoryInterface $characterRepo,
         private CareerRepositoryInterface $careerRepo
     ) {}
-    
+
     public function handle(GetCharacterProgressQuery $query): CharacterProgress
     {
         $character = $this->characterRepo->getWithRelations(
-            $query->characterId, 
+            $query->characterId,
             ['careers', 'stats', 'goals']
         );
-        
+
         return new CharacterProgress($character, $query->careerId);
     }
 }
@@ -3472,25 +3496,25 @@ class TrainingOptimizationEngine
         private SkillHintService $skillHintService,
         private ScenarioService $scenarioService
     ) {}
-    
+
     public function calculateOptimalTraining(Character $character): TrainingRecommendation
     {
         $availableOptions = $this->getAvailableTrainingOptions($character);
         $predictions = [];
-        
+
         foreach ($availableOptions as $option) {
             $predictions[] = $this->predictTrainingOutcome($character, $option);
         }
-        
+
         return $this->rankPredictions($predictions);
     }
-    
+
     private function predictTrainingOutcome(Character $character, TrainingOption $option): TrainingPrediction
     {
         $baseStats = $character->getCurrentStats();
         $supportEffects = $this->supportCardService->calculateEffects($character->getSupportCards());
         $scenarioEffects = $this->scenarioService->getActiveEffects($character);
-        
+
         return new TrainingPrediction(
             option: $option,
             predictedStats: $this->statCalculator->calculateGains($baseStats, $option, $supportEffects),
@@ -3499,11 +3523,11 @@ class TrainingOptimizationEngine
             efficiency: $this->calculateEfficiency($option, $supportEffects)
         );
     }
-    
+
     private function rankPredictions(array $predictions): TrainingRecommendation
     {
         usort($predictions, fn($a, $b) => $b->efficiency <=> $a->efficiency);
-        
+
         return new TrainingRecommendation(
             primary: $predictions[0],
             alternatives: array_slice($predictions, 1, 3),
@@ -3524,28 +3548,28 @@ class CharacterManagementComponent
         private AptitudeService $aptitudeService,
         private ValidationService $validator
     ) {}
-    
+
     public function createCharacter(CreateCharacterRequest $request): Character
     {
         $this->validator->validate($request);
-        
+
         $character = new Character([
             'user_id' => $request->userId,
             'name' => $request->name,
             'base_character_id' => $request->baseCharacterId,
             'scenario_id' => $request->scenarioId
         ]);
-        
+
         $character = $this->characterRepo->store($character);
-        
+
         // Initialize character data
         $this->initializeCharacterAptitudes($character, $request->aptitudes);
         $this->initializeCharacterFactors($character, $request->factors);
         $this->initializeCharacterStats($character);
-        
+
         return $character;
     }
-    
+
     private function initializeCharacterAptitudes(Character $character, array $aptitudes): void
     {
         foreach ($aptitudes as $type => $rank) {
@@ -3569,31 +3593,31 @@ class AIIntegrationComponent
         private AIRoutingService $router,
         private CacheManager $cache
     ) {}
-    
+
     public function processTrainingRecommendation(Character $character, array $context): AIRecommendation
     {
         $complexity = $this->assessComplexity($context);
         $service = $this->router->selectService($complexity);
-        
+
         $cacheKey = "ai_recommendation_{$character->id}_" . md5(serialize($context));
-        
+
         return $this->cache->remember($cacheKey, 600, function () use ($service, $character, $context) {
             if ($service === 'bedrock') {
                 // Use MCP Bedrock server for cloud processing
                 return $this->bedrockMCP->generateRecommendation($character, $context);
             }
-            
+
             // Use local Ollama for simple processing
             return $this->ollama->generateRecommendation($character, $context);
         });
     }
-    
+
     public function analyzeScreenshot(UploadedFile $screenshot): ScreenshotAnalysis
     {
         // Always use cloud service for OCR processing via MCP
         return $this->bedrockMCP->analyzeGameScreenshot($screenshot);
     }
-    
+
     private function assessComplexity(array $context): string
     {
         $factors = [
@@ -3602,9 +3626,9 @@ class AIIntegrationComponent
             'support_cards' => count($context['support_cards'] ?? []),
             'goals_count' => count($context['goals'] ?? [])
         ];
-        
+
         $score = array_sum($factors);
-        
+
         return match (true) {
             $score <= 5 => 'local',
             $score <= 15 => 'hybrid',
@@ -3714,40 +3738,40 @@ class MCPClientService
 {
     private array $serverConnections = [];
     private array $serverConfigs;
-    
+
     public function __construct()
     {
         $this->serverConfigs = config('mcp.servers');
         $this->initializeConnections();
     }
-    
+
     public function call(string $server, string $tool, array $arguments = []): mixed
     {
         if (!$this->isServerAvailable($server)) {
             throw new MCPServerUnavailableException("Server {$server} is not available");
         }
-        
+
         $connection = $this->getConnection($server);
-        
+
         try {
             $response = $connection->callTool($tool, $arguments);
-            
+
             $this->logToolCall($server, $tool, $arguments, $response);
-            
+
             return $response;
-            
+
         } catch (Exception $e) {
             $this->handleToolCallError($server, $tool, $e);
             throw new MCPToolCallException("Tool call failed: {$e->getMessage()}", 0, $e);
         }
     }
-    
+
     public function isServerAvailable(string $server): bool
     {
-        return isset($this->serverConnections[$server]) && 
+        return isset($this->serverConnections[$server]) &&
                $this->serverConnections[$server]->isConnected();
     }
-    
+
     private function initializeConnections(): void
     {
         foreach ($this->serverConfigs as $name => $config) {
@@ -3778,7 +3802,7 @@ class MCPAIService
         private MCPClientService $mcpClient,
         private CostTracker $costTracker
     ) {}
-    
+
     public function createTrainingAgent(Character $character): Agent
     {
         return $this->mcpClient->call('strands-agents', 'create_agent', [
@@ -3799,7 +3823,7 @@ class MCPAIService
             ]
         ]);
     }
-    
+
     public function generateRecommendation(Character $character, array $context): AIRecommendation
     {
         // Use AgentCore for advanced processing
@@ -3812,10 +3836,10 @@ class MCPAIService
             ],
             'model' => 'claude-4.5-sonnet'
         ]);
-        
+
         // Track costs
         $this->costTracker->recordUsage('claude-sonnet', $response['usage']);
-        
+
         return new AIRecommendation(
             content: $response['recommendation'],
             reasoning: $response['reasoning'],
@@ -3824,7 +3848,7 @@ class MCPAIService
             cost: $response['cost']
         );
     }
-    
+
     public function optimizeCareerPath(Character $character, int $turnsAhead = 10): CareerOptimization
     {
         return $this->mcpClient->call('strands-agents', 'execute_workflow', [
@@ -3854,7 +3878,7 @@ namespace App\Services\Infrastructure;
 class AWSInfrastructureService
 {
     public function __construct(private MCPClientService $mcpClient) {}
-    
+
     public function getBedrockPricing(string $region = 'us-east-1'): array
     {
         return $this->mcpClient->call('awspricing', 'get_pricing', [
@@ -3865,7 +3889,7 @@ class AWSInfrastructureService
             ]
         ]);
     }
-    
+
     public function validateInfrastructure(array $template): ValidationResult
     {
         return $this->mcpClient->call('awslabs.aws-iac-mcp-server', 'validate_template', [
@@ -3878,7 +3902,7 @@ class AWSInfrastructureService
             ]
         ]);
     }
-    
+
     public function getServiceRecommendations(array $requirements): array
     {
         return $this->mcpClient->call('awsknowledge', 'get_recommendations', [
@@ -3887,12 +3911,12 @@ class AWSInfrastructureService
             'optimization_goals' => ['cost', 'performance', 'security']
         ]);
     }
-    
+
     public function monitorCosts(): CostReport
     {
         $pricing = $this->getBedrockPricing();
         $usage = $this->getCurrentUsage();
-        
+
         return new CostReport(
             current_spend: $usage['total_cost'],
             projected_monthly: $this->projectMonthlyCosts($usage),
@@ -3931,7 +3955,7 @@ return [
             'timeout' => 30,
             'retry_attempts' => 3
         ],
-        
+
         'agentcore-mcp-server' => [
             'enabled' => env('MCP_AGENTCORE_ENABLED', true),
             'command' => 'uvx',
@@ -3944,7 +3968,7 @@ return [
             'timeout' => 60,
             'retry_attempts' => 2
         ],
-        
+
         'awspricing' => [
             'enabled' => env('MCP_AWS_PRICING_ENABLED', true),
             'command' => 'uvx',
@@ -3957,7 +3981,7 @@ return [
             'timeout' => 15,
             'retry_attempts' => 3
         ],
-        
+
         'awsknowledge' => [
             'enabled' => env('MCP_AWS_KNOWLEDGE_ENABLED', true),
             'command' => 'uvx',
@@ -3970,7 +3994,7 @@ return [
             'timeout' => 20,
             'retry_attempts' => 2
         ],
-        
+
         'awslabs.aws-iac-mcp-server' => [
             'enabled' => env('MCP_AWS_IAC_ENABLED', false), // Optional
             'command' => 'uvx',
@@ -3984,7 +4008,7 @@ return [
             'retry_attempts' => 2
         ]
     ],
-    
+
     'fallback_strategy' => 'graceful_degradation',
     'health_check_interval' => 300, // 5 minutes
     'connection_timeout' => 10,
@@ -4005,47 +4029,47 @@ class MCPHealthMonitor
         private MCPClientService $mcpClient,
         private CacheManager $cache
     ) {}
-    
+
     public function checkServerHealth(): array
     {
         $servers = config('mcp.servers');
         $healthStatus = [];
-        
+
         foreach ($servers as $name => $config) {
             if (!($config['enabled'] ?? true)) {
                 $healthStatus[$name] = ['status' => 'disabled'];
                 continue;
             }
-            
+
             $cacheKey = "mcp_health:{$name}";
-            
+
             $status = $this->cache->remember($cacheKey, 300, function () use ($name) {
                 return $this->performHealthCheck($name);
             });
-            
+
             $healthStatus[$name] = $status;
         }
-        
+
         return $healthStatus;
     }
-    
+
     private function performHealthCheck(string $server): array
     {
         try {
             $startTime = microtime(true);
-            
+
             // Attempt a simple ping or health check call
             $response = $this->mcpClient->call($server, 'health_check', []);
-            
+
             $responseTime = (microtime(true) - $startTime) * 1000;
-            
+
             return [
                 'status' => 'healthy',
                 'response_time' => $responseTime,
                 'last_check' => now()->toISOString(),
                 'capabilities' => $response['capabilities'] ?? []
             ];
-            
+
         } catch (Exception $e) {
             return [
                 'status' => 'unhealthy',
@@ -4054,7 +4078,7 @@ class MCPHealthMonitor
             ];
         }
     }
-    
+
     public function getServerMetrics(string $server): array
     {
         return [

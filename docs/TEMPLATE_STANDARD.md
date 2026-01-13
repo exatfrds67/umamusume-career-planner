@@ -2,10 +2,10 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 1.0  
-**Date**: January 11, 2026  
-**Project**: UmamusumeCareerPlanner  
-**Author**: Development Team  
+**Document Version**: 1.0
+**Date**: January 11, 2026
+**Project**: UmamusumeCareerPlanner
+**Author**: Development Team
 
 ---
 

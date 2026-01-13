@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 1.0  
-**Date**: January 12, 2026  
-**Project**: UmamusumeCareerPlanner  
-**Author**: Development Team  
-**Status**: Complete  
+**Document Version**: 1.0
+**Date**: January 12, 2026
+**Project**: UmamusumeCareerPlanner
+**Author**: Development Team
+**Status**: Complete
 
 ---
 
@@ -383,7 +383,7 @@ All MCP servers follow a consistent configuration pattern:
 return [
     'enabled' => env('MCP_ENABLED', true),
     'debug' => env('MCP_DEBUG', false),
-    
+
     'servers' => [
         'server-name' => [
             'enabled' => true,
@@ -394,7 +394,7 @@ return [
             'retry_attempts' => 3,
         ],
     ],
-    
+
     'health_check_interval' => 300,
     'connection_timeout' => 10,
     'max_concurrent_calls' => 5,
@@ -434,16 +434,16 @@ class MCPServiceManager
         private MCPClientService $mcpClient,
         private array $serverConfigs
     ) {}
-    
+
     public function callServer(string $serverName, string $method, array $params = []): mixed
     {
         if (!$this->isServerEnabled($serverName)) {
             throw new MCPServerDisabledException("Server {$serverName} is disabled");
         }
-        
+
         return $this->mcpClient->call($serverName, $method, $params);
     }
-    
+
     public function getServerHealth(string $serverName): array
     {
         return $this->mcpClient->healthCheck($serverName);
@@ -512,12 +512,12 @@ class AgentCoordinator
     {
         // 1. Context preparation
         $enhancedContext = $this->contextAgent->enhanceContext($character, $context);
-        
+
         // 2. Parallel agent consultation
         $trainingAnalysis = $this->trainingAgent->analyzeOptions($character, $enhancedContext);
         $skillAnalysis = $this->skillAgent->analyzeSkillOpportunities($character, $enhancedContext);
         $costAnalysis = $this->costAgent->analyzeCosts($enhancedContext);
-        
+
         // 3. Strategy coordination
         return $this->strategyAgent->coordinateRecommendation([
             'training' => $trainingAnalysis,
@@ -541,12 +541,12 @@ class AgentMemoryCoordinator
     public function shareMemoryBetweenAgents(string $sessionId, array $agentIds): void
     {
         $sharedMemory = $this->memoryServer->getSharedContext($sessionId);
-        
+
         foreach ($agentIds as $agentId) {
             $this->memoryServer->updateAgentContext($agentId, $sharedMemory);
         }
     }
-    
+
     public function consolidateAgentLearnings(array $agentLearnings): void
     {
         $consolidatedKnowledge = $this->consolidateLearnings($agentLearnings);
@@ -602,22 +602,22 @@ class MCPHealthMonitor
     public function performHealthChecks(): array
     {
         $results = [];
-        
+
         foreach ($this->getEnabledServers() as $serverName => $config) {
             $results[$serverName] = $this->checkServerHealth($serverName, $config);
         }
-        
+
         return $results;
     }
-    
+
     private function checkServerHealth(string $serverName, array $config): array
     {
         $startTime = microtime(true);
-        
+
         try {
             $response = $this->mcpClient->ping($serverName);
             $responseTime = (microtime(true) - $startTime) * 1000;
-            
+
             return [
                 'status' => 'healthy',
                 'response_time' => $responseTime,
@@ -625,7 +625,7 @@ class MCPHealthMonitor
                 'last_check' => now(),
                 'error' => null
             ];
-            
+
         } catch (Exception $e) {
             return [
                 'status' => 'unhealthy',
@@ -650,24 +650,24 @@ class MCPHealthCheckCommand extends Command
 {
     protected $signature = 'mcp:health-check {--alert}';
     protected $description = 'Check health of all MCP servers';
-    
+
     public function handle(MCPHealthMonitor $healthMonitor): int
     {
         $results = $healthMonitor->performHealthChecks();
-        
+
         foreach ($results as $serverName => $health) {
             $status = $health['status'] === 'healthy' ? '✅' : '❌';
             $this->line("{$status} {$serverName}: {$health['status']}");
-            
+
             if ($health['error']) {
                 $this->error("   Error: {$health['error']}");
             }
         }
-        
+
         if ($this->option('alert')) {
             $this->sendHealthAlerts($results);
         }
-        
+
         return Command::SUCCESS;
     }
 }
@@ -692,20 +692,20 @@ class MCPPerformanceMonitor
             'success' => $success,
             'timestamp' => now()
         ];
-        
+
         // Store in Redis for real-time monitoring
         Redis::lpush("mcp_performance:{$serverName}", json_encode($metrics));
         Redis::ltrim("mcp_performance:{$serverName}", 0, 999); // Keep last 1000 entries
-        
+
         // Update aggregated metrics
         $this->updateAggregatedMetrics($serverName, $responseTime, $success);
     }
-    
+
     public function getServerMetrics(string $serverName, int $hours = 24): array
     {
         $key = "mcp_metrics:{$serverName}";
         $metrics = Redis::hgetall($key);
-        
+
         return [
             'avg_response_time' => $metrics['avg_response_time'] ?? 0,
             'success_rate' => $metrics['success_rate'] ?? 0,
@@ -729,11 +729,11 @@ class MCPCircuitBreaker
 {
     private const FAILURE_THRESHOLD = 5;
     private const RECOVERY_TIMEOUT = 300; // 5 minutes
-    
+
     public function callWithCircuitBreaker(string $serverName, callable $operation): mixed
     {
         $circuitState = $this->getCircuitState($serverName);
-        
+
         if ($circuitState === 'open') {
             if ($this->shouldAttemptRecovery($serverName)) {
                 $this->setCircuitState($serverName, 'half-open');
@@ -741,24 +741,24 @@ class MCPCircuitBreaker
                 throw new CircuitBreakerOpenException("Circuit breaker open for {$serverName}");
             }
         }
-        
+
         try {
             $result = $operation();
-            
+
             if ($circuitState === 'half-open') {
                 $this->setCircuitState($serverName, 'closed');
                 $this->resetFailureCount($serverName);
             }
-            
+
             return $result;
-            
+
         } catch (Exception $e) {
             $this->recordFailure($serverName);
-            
+
             if ($this->getFailureCount($serverName) >= self::FAILURE_THRESHOLD) {
                 $this->setCircuitState($serverName, 'open');
             }
-            
+
             throw $e;
         }
     }
