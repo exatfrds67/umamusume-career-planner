@@ -41,6 +41,7 @@ The documentation has been consolidated and organized as follows:
 | Reference | 000_GLOSSARY, 000_INDEX | Terminology and navigation |
 | Planning | 001_SDP | Development timeline and methodology |
 | Requirements | 002_BRS, 003_SRS | Business and software requirements |
+| Product Requirements | PRD-001..007 | Module-level product requirements |
 | Design | 004_SDS | Technical architecture and design |
 | Migration | 005_DMP, 006_DMS | Data migration strategy and specs |
 | Integration | 007_SIP, 008_SIS | System integration planning |
@@ -106,7 +107,58 @@ The documentation has been consolidated and organized as follows:
   - Skill management (REQ-3.4.x)
   - Support card management (REQ-3.5.x)
 
-### 2.4 Design Documents
+### 2.4 Product Requirement Documents
+
+#### PRD-001_Character_Management.md
+
+- **Purpose**: Product requirements for character creation, configuration, and lifecycle tracking
+- **Audience**: Product managers, designers, backend/frontend engineers
+- **Dependencies**: 003_SRS, 002_BRS
+- **Key Content**: Run initialization, factors/parents, goals, conditions, snapshots
+
+#### PRD-002_Training_Optimization.md
+
+- **Purpose**: Product requirements for turn-level training predictions and recommendations
+- **Audience**: Product managers, data/ML engineers, backend/frontend engineers
+- **Dependencies**: 003_SRS, 002_BRS, PRD-001
+- **Key Content**: Simulation inputs, gain/risk models, ranking strategies, decision logging
+
+#### PRD-003_Race_Strategy.md
+
+- **Purpose**: Product requirements for race scheduling, readiness scoring, and outcome handling
+- **Audience**: Product managers, backend/frontend engineers, data analysts
+- **Dependencies**: 003_SRS, PRD-001, PRD-002
+- **Key Content**: Race catalog, readiness checks, registration validation, result logging
+
+#### PRD-004_Skill_Management.md
+
+- **Purpose**: Product requirements for skill catalog, validation, purchase, and synergy guidance
+- **Audience**: Product managers, backend/frontend engineers, UX writers
+- **Dependencies**: 003_SRS, PRD-001, PRD-002
+- **Key Content**: Prerequisites/conflicts, point balance, synergy scoring, audit history
+
+#### PRD-005_Support_Card_Management.md
+
+- **Purpose**: Product requirements for support card inventory, upgrades, and deck building
+- **Audience**: Product managers, backend/frontend engineers
+- **Dependencies**: 003_SRS, PRD-001, PRD-002, PRD-004
+- **Key Content**: Deck validation, synergy scoring, upgrade materials, templates
+
+#### PRD-006_AI_Advisory.md
+
+- **Purpose**: Product requirements for AI-driven advice and rationale
+- **Audience**: Product managers, AI/ML engineers, backend/frontend engineers
+- **Dependencies**: 003_SRS, PRD-001, PRD-002, PRD-005
+- **Key Content**: Context building, advice payloads, safety filters, feedback loop
+
+#### PRD-007_External_Integration.md
+
+- **Purpose**: Product requirements for external data ingestion and synchronization
+- **Audience**: Product managers, backend engineers, operations
+- **Dependencies**: 003_SRS, PRD-006
+- **Key Content**: Source connectors, normalization, validation, audit logging, rollback
+
+### 2.5 Design Documents
 
 #### 004_SDS_Software_Design_Specifications.md
 
@@ -132,7 +184,7 @@ The documentation has been consolidated and organized as follows:
   - Progressive Web App features
 - **Note**: Previous versions (v0.1.0, v0.1.1, v0.2.2) archived in `docs/archive/versions/`
 
-### 2.5 Migration Documents
+### 2.6 Migration Documents
 
 #### 005_DMP_Data_Migration_Plan.md
 
@@ -156,7 +208,7 @@ The documentation has been consolidated and organized as follows:
   - Target schema specifications
   - AI and OCR integration specs
 
-### 2.6 Integration Documents
+### 2.7 Integration Documents
 
 #### 007_SIP_Software_Integration_Plan.md
 
@@ -184,7 +236,7 @@ The documentation has been consolidated and organized as follows:
   - Performance monitoring and testing specifications
 - **Status**: ✅ Complete (v2.0)
 
-### 2.7 Technical Documents
+### 2.8 Technical Documents
 
 #### 009_DBD_Database_Documentation.md
 
@@ -208,7 +260,7 @@ The documentation has been consolidated and organized as follows:
   - Core components (Character, Training, AI)
   - API documentation
 
-### 2.8 User Documents
+### 2.9 User Documents
 
 #### 017_SUM_Software_User_Manual.md
 
@@ -242,6 +294,8 @@ The documentation has been consolidated and organized as follows:
     │               │
     │               ├── 001_SDP (Development Plan)
     │               │
+    │               ├── PRD-001..007 (Product Requirements)
+    │               │
     │               └── 004_SDS (Design Specification)
     │                       │
     │                       ├── 005_DMP (Migration Plan)
@@ -267,6 +321,7 @@ The documentation has been consolidated and organized as follows:
 | 001_SDP | 002_BRS, 003_SRS | - |
 | 002_BRS | - | 003_SRS, 001_SDP |
 | 003_SRS | 002_BRS | 004_SDS, 001_SDP |
+| PRD-001..007 | 003_SRS | 004_SDS, Flows, Sequences, Specs |
 | 004_SDS | 003_SRS | 005_DMP, 007_SIP, 009_DBD, 010_SCD |
 | 005_DMP | 004_SDS, 003_SRS | 006_DMS |
 | 006_DMS | 005_DMP | - |
@@ -286,6 +341,7 @@ The documentation has been consolidated and organized as follows:
 | ----- | ---------------- | -------------------- |
 | Project Timeline | 001_SDP | 002_BRS |
 | Requirements | 003_SRS | 002_BRS |
+| Product Requirements | PRD-001..007 | 003_SRS, Flows, Sequences, Specs |
 | Architecture | 004_SDS | 003_SRS |
 | Database Schema | 009_DBD | 004_SDS |
 | AI Integration | 004_SDS, 007_SIP | 008_SIS |
@@ -298,14 +354,14 @@ The documentation has been consolidated and organized as follows:
 
 | Role | Primary Documents |
 | ---- | ----------------- |
-| Project Manager | 001_SDP, 002_BRS |
-| Business Analyst | 002_BRS, 003_SRS |
+| Project Manager | 001_SDP, 002_BRS, PRD-001..007 |
+| Business Analyst | 002_BRS, 003_SRS, PRD-001..007 |
 | Architect | 004_SDS, 007_SIP |
-| Backend Developer | 010_SCD, 009_DBD, 004_SDS |
-| Frontend Developer | 010_SCD, 004_SDS |
+| Backend Developer | 010_SCD, 009_DBD, 004_SDS, PRD-001..007 |
+| Frontend Developer | 010_SCD, 004_SDS, PRD-001..007 |
 | Database Admin | 009_DBD, 005_DMP, 006_DMS |
-| QA Engineer | 003_SRS, 008_SIS |
-| Technical Writer | 017_SUM, 000_GLOSSARY |
+| QA Engineer | 003_SRS, 008_SIS, PRD-001..007 |
+| Technical Writer | 017_SUM, 000_GLOSSARY, PRD-001..007 |
 
 ### 4.3 By Development Phase
 
