@@ -308,6 +308,7 @@ CharacterService    WebSocketService    UserA Connection    UserB Connection    
 
 **Total Sequences**: 7 critical flows  
 **Coverage**:
+
 - Character Management: SD-001
 - Training & Sessions: SD-002, SD-005
 - Race System: SD-003
@@ -316,6 +317,7 @@ CharacterService    WebSocketService    UserA Connection    UserB Connection    
 - Real-time Updates: SD-007
 
 **Key Insights**:
+
 1. Parallel operations reduce latency
 2. Caching critical for responsiveness
 3. Event-driven architecture enables loose coupling
@@ -325,4 +327,3 @@ CharacterService    WebSocketService    UserA Connection    UserB Connection    
 ---
 
 **Related**: [TECH-FLOW Index](../tech-flow/000_TECH_FLOW_INDEX.md), [SPEC Index](../specs/000_SPECS_INDEX.md)
-

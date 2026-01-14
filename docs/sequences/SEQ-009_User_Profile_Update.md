@@ -6,9 +6,20 @@
 **Date**: January 14, 2026  
 **Related Documents**: [PRD-001], [SPEC-009]
 
+**Source Specs**:
+
+- `.kiro/specs/umamusume-career-planner-main/requirements.md` (User Profile Management)
+- `.kiro/specs/umamusume-career-planner-main/design.md` (User Profile System)
+
+**Related Artifacts**:
+
+- PRD: [PRD-001](../prds/PRD-001_Character_Management.md)
+- SPEC: [SPEC-001](../specs/SPEC-001_Character_Management_Technical.md)
+
 ---
 
 ## Sequence Overview
+
 - User updates profile settings; system validates, persists, and refreshes sessions where needed.
 
 ## Sequence Diagram

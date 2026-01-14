@@ -6,9 +6,23 @@
 **Date**: January 14, 2026  
 **Related Documents**: [PRD-001], [SPEC-015], [005_DMP_Data_Migration_Plan.md]
 
+**Source Specs**:
+
+- `.kiro/specs/umamusume-career-planner-main/requirements.md` (Data Migration Requirements)
+- `.kiro/specs/umamusume-career-planner-main/design.md` (Migration Architecture)
+- `docs/005_DMP_Data_Migration_Plan.md`
+
+**Related Artifacts**:
+
+- PRD: [PRD-001](../prds/PRD-001_Character_Management.md)
+- SPEC: [SPEC-001](../specs/SPEC-001_Character_Management_Technical.md)
+- Flow: [FLOW-001](../flows/FLOW-001_Character_Management_System.md)
+- Wireframes: [WF-001](../wireframes/WF-001_Dashboard_Overview.md)
+
 ---
 
 ## Sequence Overview
+
 - Migrates snapshot data into live tables with validation, chunking, and audit logging.
 
 ## Sequence Diagram

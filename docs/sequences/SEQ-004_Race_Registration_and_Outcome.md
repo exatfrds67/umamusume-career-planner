@@ -5,10 +5,24 @@
 **Document Version**: 1.0  
 **Date**: January 14, 2026  
 **Related Documents**: [PRD-001], [SPEC-004], [FLOW-003]
+**Source Specs**:
+
+- `.kiro/specs/umamusume-career-planner-main/requirements.md` (Requirement 3: Race Preparation and Strategy)
+- `.kiro/specs/umamusume-career-planner-main/design.md` (Race Registration Flow)
+
+**Related Artifacts**:
+
+- PRD: [PRD-003](../prds/PRD-003_Race_Strategy.md)
+- SPEC: [SPEC-003](../specs/SPEC-003_Race_Strategy_Technical.md)
+- Flow: [FLOW-003](../flows/FLOW-003_Race_Strategy_System.md)
+- Tech Flow: [TECH-FLOW-003](../tech-flow/TECH-FLOW-003_Race_Strategy_Flow.md)
+- Wireframes: [WF-006](../wireframes/WF-006_Race_Calendar_View.md), [WF-007](../wireframes/WF-007_Race_Preparation_Screen.md)
+- User Flows: [UF-004](../user-flows/UF-004_Race_Day_Flow.md)
 
 ---
 
 ## Sequence Overview
+
 - User registers for a race; system validates schedule/stats, simulates outcome, applies rewards/penalties.
 
 ## Sequence Diagram
