@@ -31,6 +31,12 @@ applyTo: '**'
 - **Solution**: Standardize all dates to "Month DD, YYYY" format, add cross-references between planning documents
 - **Result**: Achieved 10/10 (100%) documentation consistency
 
+## Product Requirement Documents
+
+- **Problem**: PRD folder missing from docs
+- **Solution**: Recreated docs/prds with PRD-001..007 (module-level product requirements) and added to 000_DOCUMENT_INDEX with dependency links
+- **Result**: PRDs visible in docs/prds and referenced in catalog/dependency matrix
+
 ## API Verification Status
 
 - **Problem**: Inconsistent terminology for API verification status
