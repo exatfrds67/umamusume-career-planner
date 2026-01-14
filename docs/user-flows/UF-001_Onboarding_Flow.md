@@ -5,10 +5,21 @@
 **Document Version**: 1.0  
 **Date**: January 14, 2026  
 **Related Documents**: [PRD-001], [SPEC-001]
+**Source Specs**:
+
+- `.kiro/specs/umamusume-career-planner-main/requirements.md` (Onboarding Requirements)
+- `.kiro/specs/umamusume-career-planner-main/design.md` (Onboarding Flow)
+
+**Related Artifacts**:
+
+- PRD: [PRD-001](../prds/PRD-001_Character_Management.md)
+- SPEC: [SPEC-001](../specs/SPEC-001_Character_Management_Technical.md)
+- Wireframes: [WF-001](../wireframes/WF-001_Dashboard_Overview.md)
 
 ---
 
 ## Flow Diagram
+
 ```mermaid
 flowchart TD
     Start([New User Lands]) --> Signup{Has account?}
@@ -29,6 +40,7 @@ flowchart TD
 ```
 
 ## Notes
+
 - SSO optional but recommended; email verification required.  
 - Tour can be skipped; hints appear contextually later.  
 - Goal prompt can be deferred; defaults align to general progression.

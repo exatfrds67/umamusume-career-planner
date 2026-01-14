@@ -590,4 +590,3 @@ START: Race Screen / Calendar
 ---
 
 **Related**: [TECH-FLOW Index](../tech-flow/000_TECH_FLOW_INDEX.md), [Sequence Diagrams](./000_SEQUENCE_DIAGRAMS_INDEX.md), [SPEC Index](../specs/000_SPECS_INDEX.md)
-
