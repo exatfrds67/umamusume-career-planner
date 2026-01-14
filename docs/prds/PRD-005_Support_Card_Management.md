@@ -9,31 +9,58 @@
 **Status**: Draft  
 **Related Documents**: [SRS-3.5], [SDS-4.5], [DBD-009], [SPEC-005], [PRD-001], [PRD-002], [PRD-004]
 
+**Source Specs**:
+
+- `.kiro/specs/umamusume-career-planner-main/requirements.md` (Requirements)
+- `.kiro/specs/umamusume-career-planner-main/design.md` (Design)
+- `.kiro/specs/umamusume-career-planner-main/tasks.md` (Implementation Tasks)
+
+**Related Artifacts**:
+
+- SPEC: [SPEC-005](../specs/SPEC-005_Support_Card_Management_Technical.md)
+- Flow: [FLOW-005](../flows/FLOW-005_Support_Card_Management_System.md)
+- Wireframes: [WF-010](../wireframes/WF-010_Support_Card_Collection.md), [WF-011](../wireframes/WF-011_Support_Deck_Builder.md)
+- Sequences: [SEQ-005](../sequences/SEQ-005_Support_Card_Upgrade.md)
+- User Flows: [UF-006](../user-flows/UF-006_Support_Deck_Building_Flow.md)
+
 ---
 
 ## Table of Contents
-1. [Executive Summary](#1-executive-summary)
-2. [Product Overview](#2-product-overview)
-3. [User Stories](#3-user-stories)
-4. [Functional Requirements](#4-functional-requirements)
-5. [User Interface Requirements](#5-user-interface-requirements)
-6. [Data and Integration](#6-data-and-integration)
-7. [Non-Functional Requirements](#7-non-functional-requirements)
-8. [Success Metrics](#8-success-metrics)
-9. [Release Plan](#9-release-plan)
-10. [Open Questions and Assumptions](#10-open-questions-and-assumptions)
+
+- [PRD-005: Support Card Management](#prd-005-support-card-management)
+  - [Umamusume Pretty Derby Career Planner](#umamusume-pretty-derby-career-planner)
+  - [Table of Contents](#table-of-contents)
+  - [1. Executive Summary](#1-executive-summary)
+    - [1.1 Purpose](#11-purpose)
+    - [1.2 Problem Statement](#12-problem-statement)
+    - [1.3 Solution Overview](#13-solution-overview)
+  - [2. Product Overview](#2-product-overview)
+    - [2.1 Objectives](#21-objectives)
+    - [2.2 Scope (In)](#22-scope-in)
+    - [2.3 Scope (Out)](#23-scope-out)
+  - [3. User Stories](#3-user-stories)
+  - [4. Functional Requirements](#4-functional-requirements)
+  - [5. User Interface Requirements](#5-user-interface-requirements)
+  - [6. Data and Integration](#6-data-and-integration)
+  - [7. Non-Functional Requirements](#7-non-functional-requirements)
+  - [8. Success Metrics](#8-success-metrics)
+  - [9. Release Plan](#9-release-plan)
+  - [10. Open Questions and Assumptions](#10-open-questions-and-assumptions)
 
 ---
 
 ## 1. Executive Summary
 
 ### 1.1 Purpose
+
 Manage support card inventory, decks, and upgrades to maximize training outcomes and bond gains.
 
 ### 1.2 Problem Statement
+
 Players struggle to pick optimal decks and track upgrade materials; suboptimal decks reduce training gains and hint availability.
 
 ### 1.3 Solution Overview
+
 - Deck builder with synergy scores and facility coverage checks.  
 - Inventory management with upgrade/limit-break material tracking.  
 - Validation to prevent illegal decks and highlight gaps.
@@ -43,23 +70,27 @@ Players struggle to pick optimal decks and track upgrade materials; suboptimal d
 ## 2. Product Overview
 
 ### 2.1 Objectives
+
 - Optimize deck composition for target strategy and race plan.  
 - Surface coverage gaps (training types, friend/support effects).  
 - Track upgrade progress and material requirements.
 
 ### 2.2 Scope (In)
+
 - Deck creation/editing (six cards) with validation rules.  
 - Synergy scoring vs training plan and race targets.  
 - Inventory and upgrade flow with material/rarity tracking.  
 - Export/import deck templates.
 
 ### 2.3 Scope (Out)
+
 - Training simulation (PRD-002) except for providing bonuses and events.  
 - Real-money transactions for card acquisition.
 
 ---
 
 ## 3. User Stories
+
 - As a player, I want to build a deck that boosts my target stats.  
 - As a player, I want to know which cards conflict or overlap excessively.  
 - As a player, I want to see material needs to upgrade a card to the next limit break.  
@@ -68,6 +99,7 @@ Players struggle to pick optimal decks and track upgrade materials; suboptimal d
 ---
 
 ## 4. Functional Requirements
+
 - FR1: Manage inventory with rarity, level, bond bonus, hint bonus, event list.  
 - FR2: Validate deck composition (slot count, duplicates, scenario restrictions).  
 - FR3: Compute deck synergy score vs training plan and race goals; flag coverage gaps.  
@@ -79,6 +111,7 @@ Players struggle to pick optimal decks and track upgrade materials; suboptimal d
 ---
 
 ## 5. User Interface Requirements
+
 - Deck builder grid with card slots, synergy score, and gap badges.  
 - Card detail drawer: stats, skills, events, bonuses, upgrade path, material needs.  
 - Validation badges and warnings on deck save.  
@@ -88,6 +121,7 @@ Players struggle to pick optimal decks and track upgrade materials; suboptimal d
 ---
 
 ## 6. Data and Integration
+
 - Data: support cards, events, bonuses, material tables, synergy weights.  
 - Inputs: training plan (PRD-002), race targets (PRD-003), skill plan (PRD-004).  
 - Services: SupportDeckService, SynergyScorer, UpgradeService.  
@@ -96,6 +130,7 @@ Players struggle to pick optimal decks and track upgrade materials; suboptimal d
 ---
 
 ## 7. Non-Functional Requirements
+
 - Performance: deck validation/scoring ≤900ms (p95).  
 - Consistency: atomic deck saves; prevent partial updates.  
 - Observability: deck change audits; upgrade outcome logs.  
@@ -104,6 +139,7 @@ Players struggle to pick optimal decks and track upgrade materials; suboptimal d
 ---
 
 ## 8. Success Metrics
+
 - Deck save success rate ≥98%.  
 - Synergy score improvement ≥12% vs user’s baseline deck.  
 - Upgrade completion tracking accuracy ≥99%.  
@@ -112,6 +148,7 @@ Players struggle to pick optimal decks and track upgrade materials; suboptimal d
 ---
 
 ## 9. Release Plan
+
 - Phase A: Inventory + deck CRUD + validation.  
 - Phase B: Synergy scoring and recommendations; upgrade flow.  
 - Phase C: Template sharing and analytics.
@@ -119,6 +156,7 @@ Players struggle to pick optimal decks and track upgrade materials; suboptimal d
 ---
 
 ## 10. Open Questions and Assumptions
+
 - Assumption: Card event data stays up to date via PRD-007 sync.  
 - Question: Allow duplicate friend cards if game rules change?  
 - Question: Should synergy scoring be scenario-specific or global?

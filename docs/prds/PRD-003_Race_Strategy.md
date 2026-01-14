@@ -10,11 +10,13 @@
 **Related Documents**: [SRS-3.3], [SDS-4.3], [DBD-009], [SPEC-003], [PRD-001], [PRD-002]
 
 **Source Specs**:
+
 - `.kiro/specs/umamusume-career-planner-main/requirements.md` (Requirements)
 - `.kiro/specs/umamusume-career-planner-main/design.md` (Design)
 - `.kiro/specs/umamusume-career-planner-main/tasks.md` (Implementation Tasks)
 
 **Related Artifacts**:
+
 - SPEC: [SPEC-003](../specs/SPEC-003_Race_Strategy_Technical.md)
 - Flow: [FLOW-003](../flows/FLOW-003_Race_Strategy_System.md)
 - Wireframes: [WF-006](../wireframes/WF-006_Race_Calendar_View.md), [WF-007](../wireframes/WF-007_Race_Preparation_Screen.md)
@@ -24,28 +26,41 @@
 ---
 
 ## Table of Contents
-1. [Executive Summary](#1-executive-summary)
-2. [Product Overview](#2-product-overview)
-3. [User Stories](#3-user-stories)
-4. [Functional Requirements](#4-functional-requirements)
-5. [User Interface Requirements](#5-user-interface-requirements)
-6. [Data and Integration](#6-data-and-integration)
-7. [Non-Functional Requirements](#7-non-functional-requirements)
-8. [Success Metrics](#8-success-metrics)
-9. [Release Plan](#9-release-plan)
-10. [Open Questions and Assumptions](#10-open-questions-and-assumptions)
+
+- [PRD-003: Race Strategy System](#prd-003-race-strategy-system)
+  - [Umamusume Pretty Derby Career Planner](#umamusume-pretty-derby-career-planner)
+  - [Table of Contents](#table-of-contents)
+  - [1. Executive Summary](#1-executive-summary)
+    - [1.1 Purpose](#11-purpose)
+    - [1.2 Problem Statement](#12-problem-statement)
+    - [1.3 Solution Overview](#13-solution-overview)
+  - [2. Product Overview](#2-product-overview)
+    - [2.1 Objectives](#21-objectives)
+    - [2.2 Scope (In)](#22-scope-in)
+    - [2.3 Scope (Out)](#23-scope-out)
+  - [3. User Stories](#3-user-stories)
+  - [4. Functional Requirements](#4-functional-requirements)
+  - [5. User Interface Requirements](#5-user-interface-requirements)
+  - [6. Data and Integration](#6-data-and-integration)
+  - [7. Non-Functional Requirements](#7-non-functional-requirements)
+  - [8. Success Metrics](#8-success-metrics)
+  - [9. Release Plan](#9-release-plan)
+  - [10. Open Questions and Assumptions](#10-open-questions-and-assumptions)
 
 ---
 
 ## 1. Executive Summary
 
 ### 1.1 Purpose
+
 Support race selection, preparation, and outcome simulation to maximize placements and rewards.
 
 ### 1.2 Problem Statement
+
 Players over/under-train or choose poor race schedules; missing required stats and skills results in poor placements.
 
 ### 1.3 Solution Overview
+
 - Race calendar with requirements and recommended readiness.  
 - Pre-race readiness checks (stats, skills, condition).  
 - Race outcome simulation and result logging with rewards.
@@ -55,23 +70,27 @@ Players over/under-train or choose poor race schedules; missing required stats a
 ## 2. Product Overview
 
 ### 2.1 Objectives
+
 - Help players pick optimal race schedule aligned to goals and stat growth.  
 - Provide readiness scoring and risk flags before registration.  
 - Deliver post-race analytics to improve future decisions.
 
 ### 2.2 Scope (In)
+
 - Race catalog search with filters (grade, distance, ground, date).  
 - Readiness assessment using stats, aptitudes, skills, condition, support effects.  
 - Outcome simulation (placement, rewards, condition changes).  
 - Logging of rewards, fame, and condition deltas.
 
 ### 2.3 Scope (Out)
+
 - Real-time race replay visualizations.  
 - PvP matches; covered by external game client.
 
 ---
 
 ## 3. User Stories
+
 - As a player, I want to know if my stats meet race requirements before registering.  
 - As a player, I want the tool to suggest the next best race slots.  
 - As a player, I want to see expected rewards and risks before committing.  
@@ -80,6 +99,7 @@ Players over/under-train or choose poor race schedules; missing required stats a
 ---
 
 ## 4. Functional Requirements
+
 - FR1: Provide race catalog with filters and scenario alignment.  
 - FR2: Compute readiness score using stats, aptitudes, skills, condition, deck bonuses.  
 - FR3: Validate registration (date conflicts, fatigue thresholds).  
@@ -91,6 +111,7 @@ Players over/under-train or choose poor race schedules; missing required stats a
 ---
 
 ## 5. User Interface Requirements
+
 - Race finder table with filters and readiness badge.  
 - Pre-race modal showing requirements, readiness score, risk meter, expected rewards.  
 - Post-race summary card with placement, gains, and condition changes.  
@@ -100,6 +121,7 @@ Players over/under-train or choose poor race schedules; missing required stats a
 ---
 
 ## 6. Data and Integration
+
 - Inputs: character state (PRD-001), training outputs (PRD-002), skill set (PRD-004), deck buffs (PRD-005).  
 - Data: race catalog, readiness model coefficients, reward tables.  
 - Services: RaceService, ReadinessScorer, RaceSimulator.  
@@ -108,6 +130,7 @@ Players over/under-train or choose poor race schedules; missing required stats a
 ---
 
 ## 7. Non-Functional Requirements
+
 - Performance: readiness check and registration ≤1.0s (p95).  
 - Reliability: prevent double booking; idempotent registration.  
 - Accuracy: readiness score calibration within ±7% vs benchmark data.  
@@ -116,6 +139,7 @@ Players over/under-train or choose poor race schedules; missing required stats a
 ---
 
 ## 8. Success Metrics
+
 - ≥90% of registered races meet readiness threshold.  
 - Placement improvement ≥8% vs baseline runs without guidance.  
 - Registration error rate <2% (e.g., date conflicts).  
@@ -124,6 +148,7 @@ Players over/under-train or choose poor race schedules; missing required stats a
 ---
 
 ## 9. Release Plan
+
 - Phase A: Race catalog + readiness check + registration validation.  
 - Phase B: Outcome simulation with probability bands and rewards logging.  
 - Phase C: Recommendation engine for schedules and post-race analytics.
@@ -131,6 +156,7 @@ Players over/under-train or choose poor race schedules; missing required stats a
 ---
 
 ## 10. Open Questions and Assumptions
+
 - Assumption: Race catalog kept current via PRD-007 sync.  
 - Question: How to handle event-limited races (cutoff logic)?  
 - Question: Should readiness weights adapt per scenario or remain global?

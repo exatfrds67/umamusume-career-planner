@@ -9,31 +9,58 @@
 **Status**: Draft  
 **Related Documents**: [SRS-3.6], [SDS-4.6], [MCP], [SPEC-006], [PRD-001], [PRD-002]
 
+**Source Specs**:
+
+- `.kiro/specs/umamusume-career-planner-main/requirements.md` (Requirements)
+- `.kiro/specs/umamusume-career-planner-main/design.md` (Design)
+- `.kiro/specs/umamusume-career-planner-main/tasks.md` (Implementation Tasks)
+
+**Related Artifacts**:
+
+- SPEC: [SPEC-006](../specs/SPEC-006_AI_Advisory_Technical.md)
+- Flow: [FLOW-006](../flows/FLOW-006_AI_Advisory_System.md)
+- Wireframes: [WF-012](../wireframes/WF-012_AI_Advisor_Interface.md)
+- Sequences: [SEQ-006](../sequences/SEQ-006_AI_Advice_Generation.md)
+- User Flows: [UF-007](../user-flows/UF-007_AI_Advisor_Journey.md)
+
 ---
 
 ## Table of Contents
-1. [Executive Summary](#1-executive-summary)
-2. [Product Overview](#2-product-overview)
-3. [User Stories](#3-user-stories)
-4. [Functional Requirements](#4-functional-requirements)
-5. [User Interface Requirements](#5-user-interface-requirements)
-6. [Data and Integration](#6-data-and-integration)
-7. [Non-Functional Requirements](#7-non-functional-requirements)
-8. [Success Metrics](#8-success-metrics)
-9. [Release Plan](#9-release-plan)
-10. [Open Questions and Assumptions](#10-open-questions-and-assumptions)
+
+- [PRD-006: AI Advisory System](#prd-006-ai-advisory-system)
+  - [Umamusume Pretty Derby Career Planner](#umamusume-pretty-derby-career-planner)
+  - [Table of Contents](#table-of-contents)
+  - [1. Executive Summary](#1-executive-summary)
+    - [1.1 Purpose](#11-purpose)
+    - [1.2 Problem Statement](#12-problem-statement)
+    - [1.3 Solution Overview](#13-solution-overview)
+  - [2. Product Overview](#2-product-overview)
+    - [2.1 Objectives](#21-objectives)
+    - [2.2 Scope (In)](#22-scope-in)
+    - [2.3 Scope (Out)](#23-scope-out)
+  - [3. User Stories](#3-user-stories)
+  - [4. Functional Requirements](#4-functional-requirements)
+  - [5. User Interface Requirements](#5-user-interface-requirements)
+  - [6. Data and Integration](#6-data-and-integration)
+  - [7. Non-Functional Requirements](#7-non-functional-requirements)
+  - [8. Success Metrics](#8-success-metrics)
+  - [9. Release Plan](#9-release-plan)
+  - [10. Open Questions and Assumptions](#10-open-questions-and-assumptions)
 
 ---
 
 ## 1. Executive Summary
 
 ### 1.1 Purpose
+
 Provide AI-driven recommendations for training, skills, races, and deck tweaks with transparent rationale.
 
 ### 1.2 Problem Statement
+
 Players need guidance tuned to their run state and strategy; generic advice misses context and increases failure risk.
 
 ### 1.3 Solution Overview
+
 - Context builder aggregates run, deck, race plan, and goals.  
 - AI advisor (hybrid local + Bedrock) outputs recommended action and rationale.  
 - Confidence scoring, risk notes, and alternatives.
@@ -43,23 +70,27 @@ Players need guidance tuned to their run state and strategy; generic advice miss
 ## 2. Product Overview
 
 ### 2.1 Objectives
+
 - Deliver actionable, explainable advice in under 1.5s.  
 - Respect safety/guardrails to avoid risky suggestions.  
 - Learn from outcomes to adjust future recommendations.
 
 ### 2.2 Scope (In)
+
 - Advice endpoints for training choice, skill purchase, race registration, deck tweak.  
 - Rationale and risk sections; confidence score.  
 - Feedback loop: user accept/override for model evaluation.  
 - Prompt templates and safety filters.
 
 ### 2.3 Scope (Out)
+
 - Full automation of gameplay; user approval required.  
 - Chat-style long conversations (defer to future UX).
 
 ---
 
 ## 3. User Stories
+
 - As a player, I want the AI to suggest my next action with reasons.  
 - As a player, I want to see alternatives when risk is high.  
 - As a player, I want to rate the advice to improve future suggestions.  
@@ -68,6 +99,7 @@ Players need guidance tuned to their run state and strategy; generic advice miss
 ---
 
 ## 4. Functional Requirements
+
 - FR1: Build context payload from run state, deck, skills, goals, schedule (PRD-001/002/003/004/005).  
 - FR2: Generate advice using hybrid AI pipeline (local + Bedrock) with prompt templates.  
 - FR3: Return action, confidence, rationale, risks, and top alternatives.  
@@ -79,6 +111,7 @@ Players need guidance tuned to their run state and strategy; generic advice miss
 ---
 
 ## 5. User Interface Requirements
+
 - Advice panel with recommended action, confidence bar, rationale, risks, and alternatives.  
 - Quick actions to accept/decline and apply to current turn.  
 - Feedback buttons with reasons (helpful, risky, irrelevant).  
@@ -88,6 +121,7 @@ Players need guidance tuned to their run state and strategy; generic advice miss
 ---
 
 ## 6. Data and Integration
+
 - Inputs: consolidated context from PRD-001..005, race schedule, support events.  
 - Services: ContextBuilder, AdvisoryModel (local + Bedrock), SafetyFilter, FeedbackStore.  
 - Dependencies: MCP server configuration reference, SRS-3.6, SDS-4.6.  
@@ -96,6 +130,7 @@ Players need guidance tuned to their run state and strategy; generic advice miss
 ---
 
 ## 7. Non-Functional Requirements
+
 - Performance: advice response ≤1.5s (p95) with warm model; fallback ≤800ms.  
 - Availability: degrade to heuristics when AI offline; clear UI state.  
 - Safety: apply guardrails to block harmful or nonsensical advice; log filters.  
@@ -104,6 +139,7 @@ Players need guidance tuned to their run state and strategy; generic advice miss
 ---
 
 ## 8. Success Metrics
+
 - Advice acceptance rate ≥60%.  
 - Reduction in risky turns (injury) by ≥15%.  
 - CSAT on advice relevance ≥4.3/5.  
@@ -112,6 +148,7 @@ Players need guidance tuned to their run state and strategy; generic advice miss
 ---
 
 ## 9. Release Plan
+
 - Phase A: Context builder + prompt templates + deterministic fallback.  
 - Phase B: Hybrid AI pipeline with confidence and alternatives; feedback capture.  
 - Phase C: Continuous evaluation dashboard and auto-tuning.
@@ -119,6 +156,7 @@ Players need guidance tuned to their run state and strategy; generic advice miss
 ---
 
 ## 10. Open Questions and Assumptions
+
 - Assumption: Bedrock access keys available and rate limits sufficient.  
 - Question: What offline mode experience is acceptable if both AI providers fail?  
 - Question: Should advice history persist per run or globally?
