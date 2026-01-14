@@ -165,7 +165,9 @@
         "create_issue",
         "get_repositories",
         "get_branches",
-        "get_commits"
+        "get_commits",
+        "git_status",
+        "git_add_or_commit"
       ]
     },
     "everart": {

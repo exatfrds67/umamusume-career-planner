@@ -10,7 +10,7 @@ applyTo: '**'
 - Prefer Pest testing framework over PHPUnit
 - Use Laravel Pint for code formatting
 
-# Project Architecture
+## Project Architecture
 
 - **Framework**: Laravel 12 (Released February 24, 2025)
 - **Frontend**: Tailwind CSS v4 (Released January 22, 2025)
@@ -23,7 +23,7 @@ applyTo: '**'
 - **Timeline**: 22-28 weeks development (6 phases)
 - **Document Numbering**: 000-010, 017 (011-016 reserved/unused)
 
-# Solutions Repository
+## Solutions Repository
 
 ## Documentation Consistency
 
