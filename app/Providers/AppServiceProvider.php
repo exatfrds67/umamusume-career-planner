@@ -35,8 +35,10 @@ class AppServiceProvider extends ServiceProvider
     {
         // Rate limiting for authentication endpoints (10 requests/minute)
         RateLimiter::for('auth', function (Request $request) {
+            $user = $request->user();
+
             return Limit::perMinute(10)->by(
-                $request->user()?->id ?: $request->ip()
+                $user instanceof \App\Models\User ? $user->id : $request->ip()
             )->response(function (Request $request, array $headers) {
                 return response()->json([
                     'success' => false,
@@ -48,8 +50,10 @@ class AppServiceProvider extends ServiceProvider
 
         // Rate limiting for general API endpoints (60 requests/minute)
         RateLimiter::for('api', function (Request $request) {
+            $user = $request->user();
+
             return Limit::perMinute(60)->by(
-                $request->user()?->id ?: $request->ip()
+                $user instanceof \App\Models\User ? $user->id : $request->ip()
             )->response(function (Request $request, array $headers) {
                 return response()->json([
                     'success' => false,
