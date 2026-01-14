@@ -9,8 +9,9 @@ class ExampleTest extends TestCase
     /**
      * A basic test example.
      */
-    public function test_that_true_is_true(): void
+    public function test_example(): void
     {
-        $this->assertTrue(true);
+        $result = 2 + 2;
+        $this->assertEquals(4, $result);
     }
 }
