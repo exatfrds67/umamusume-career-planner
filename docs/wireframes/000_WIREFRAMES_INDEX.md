@@ -45,6 +45,7 @@ Wireframes provide detailed UI/UX specifications for all key screens and compone
 ```
 
 **Components**:
+
 - Search input with autocomplete
 - Filter buttons for rarity
 - Card grid (3 columns, scrollable)
@@ -90,6 +91,7 @@ Wireframes provide detailed UI/UX specifications for all key screens and compone
 ```
 
 **Components**:
+
 - Two-column parent selector
 - Portrait images
 - Affinity indicator (◎ symbol)
@@ -138,6 +140,7 @@ Wireframes provide detailed UI/UX specifications for all key screens and compone
 ```
 
 **Components**:
+
 - Status bar (energy, mood, countdown)
 - Two-column layout (stats + goals)
 - Stat bars with grade indicators
@@ -191,6 +194,7 @@ Wireframes provide detailed UI/UX specifications for all key screens and compone
 ```
 
 **Components**:
+
 - Recommended training (prominent top)
 - AI badge indicator
 - Predicted stat gains visualization
@@ -382,6 +386,7 @@ Wireframes provide detailed UI/UX specifications for all key screens and compone
 ## Wireframe Summary
 
 **Total Screens**: 20+
+
 - Character Management: 5 screens
 - Training & Race: 4 screens
 - Skill Management: 3 screens
@@ -390,6 +395,7 @@ Wireframes provide detailed UI/UX specifications for all key screens and compone
 - Additional: Historical data, reports, settings
 
 **Design Principles**:
+
 - Mobile-first responsive design
 - Dark mode support (WCAG 2.2 AA contrast)
 - Accessibility: Keyboard navigation, screen reader support
@@ -398,6 +404,7 @@ Wireframes provide detailed UI/UX specifications for all key screens and compone
 - Progressive disclosure (expandable sections)
 
 **Component Library**:
+
 - Stat bars (visual + numeric)
 - Progress bars (goals, training)
 - Card layouts (characters, support cards, skills)
@@ -420,4 +427,3 @@ Wireframes provide detailed UI/UX specifications for all key screens and compone
 ---
 
 **Related Documents**: [SPEC Index](../specs/000_SPECS_INDEX.md), [TECH-FLOW Index](../tech-flow/000_TECH_FLOW_INDEX.md)
-

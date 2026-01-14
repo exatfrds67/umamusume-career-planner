@@ -5,10 +5,25 @@
 **Document Version**: 1.0  
 **Date**: January 14, 2026  
 **Related Documents**: [PRD-002], [SPEC-002], [FLOW-002], [SEQ-003]
+**Source Specs**:
+
+- `.kiro/specs/umamusume-career-planner-main/requirements.md` (Requirement 2: Training Prediction Engine)
+- `.kiro/specs/umamusume-career-planner-main/design.md` (Training Results UI)
+
+**Related Artifacts**:
+
+- PRD: [PRD-002](../prds/PRD-002_Training_Optimization.md)
+- SPEC: [SPEC-002](../specs/SPEC-002_Training_Optimization_Technical.md)
+- Flow: [FLOW-002](../flows/FLOW-002_Training_Optimization_System.md)
+- Tech Flow: [TECH-FLOW-002](../tech-flow/TECH-FLOW-002_Training_Optimization_Flow.md)
+- Sequences: [SEQ-002](../sequences/SEQ-002_Training_Block_Resolution.md)
+- User Flows: [UF-003](../user-flows/UF-003_Training_Day_Flow.md)
+- Related WF: [WF-004](WF-004_Training_Selection_Interface.md)
 
 ---
 
 ## Layout (Desktop)
+
 ```
 +----------------------------------------------------------------------------------+
 | Header: Training Result | Turn N                                                 |
@@ -48,11 +63,13 @@
 ```
 
 ## Layout (Mobile)
+
 - Stack cards; result banner full width.  
 - History timeline collapsible.  
 - Footer buttons as bottom sheet.
 
 ## Notes
+
 - Show RNG seed if reproducibility mode on.  
 - If failure, display penalty details and encouragement tip.  
 - AI quick action suggests next safest training or rest.

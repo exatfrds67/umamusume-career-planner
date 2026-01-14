@@ -6,9 +6,25 @@
 **Date**: January 14, 2026  
 **Related Documents**: [PRD-001], [SPEC-001], [FLOW-001], [SEQ-001]
 
+**Source Specs**:
+
+- `.kiro/specs/umamusume-career-planner-main/requirements.md` (Requirement 1: Character State Management)
+- `.kiro/specs/umamusume-career-planner-main/design.md` (Character Detail UI)
+
+**Related Artifacts**:
+
+- PRD: [PRD-001](../prds/PRD-001_Character_Management.md)
+- SPEC: [SPEC-001](../specs/SPEC-001_Character_Management_Technical.md)
+- Flow: [FLOW-001](../flows/FLOW-001_Character_Management_System.md)
+- Tech Flow: [TECH-FLOW-001](../tech-flow/TECH-FLOW-001_Character_Management_Flow.md)
+- Sequences: [SEQ-001](../sequences/SEQ-001_Character_Creation_Sequence.md)
+- User Flows: [UF-002](../user-flows/UF-002_Career_Setup_Flow.md)
+- Related WF: [WF-002](WF-002_Character_Creation_Wizard.md)
+
 ---
 
 ## Layout (Desktop)
+
 ```
 +----------------------------------------------------------------------------------+
 | Header: Run Selector | Character: [Name] | Actions: Export | Duplicate | Delete   |
@@ -43,11 +59,13 @@
 ```
 
 ## Layout (Mobile)
+
 - Stack panels; actions in overflow menu.  
 - Race schedule collapsible accordion.  
 - Deck summary uses horizontal scroll chips.
 
 ## Components
+
 - Stats panel with grade badges and numeric values.  
 - Goals timeline with goal type and due turn.  
 - Race schedule table with readiness badge and entry link.  
@@ -55,6 +73,7 @@
 - Skills summary highlighting rare/evolved skills and SP available.
 
 ## Notes
+
 - Provide edit buttons inline for goals and schedule items.  
 - Dark mode friendly backgrounds; cards use subtle borders.  
 - Keyboard focus indicators for table rows and buttons.
