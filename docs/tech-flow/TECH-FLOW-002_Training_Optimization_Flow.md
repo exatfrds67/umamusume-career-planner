@@ -2,6 +2,21 @@
 
 **Document Version**: 1.0 | **Date**: January 14, 2026 | **Status**: Draft
 
+**Source Specs**:
+
+- `.kiro/specs/umamusume-career-planner-main/requirements.md` (Requirement 2: Training Prediction Engine)
+- `.kiro/specs/umamusume-career-planner-main/design.md` (Training Optimization Architecture)
+- `.kiro/specs/umamusume-career-planner-main/tasks.md` (Task 2.x: Training System)
+
+**Related Artifacts**:
+
+- PRD: [PRD-002](../prds/PRD-002_Training_Optimization.md)
+- SPEC: [SPEC-002](../specs/SPEC-002_Training_Optimization_Technical.md)
+- Flow: [FLOW-002](../flows/FLOW-002_Training_Optimization_System.md)
+- Wireframes: [WF-004](../wireframes/WF-004_Training_Selection_Interface.md), [WF-005](../wireframes/WF-005_Training_Result_Screen.md)
+- Sequences: [SEQ-002](../sequences/SEQ-002_Training_Block_Resolution.md)
+- User Flows: [UF-003](../user-flows/UF-003_Training_Day_Flow.md)
+
 ## System Architecture
 
 ```
@@ -238,4 +253,3 @@ Return ranked predictions [highest score first]
 ---
 
 **Related**: [SPEC-002], [SPEC-005], [SPEC-006]
-

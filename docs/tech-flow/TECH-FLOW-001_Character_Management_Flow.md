@@ -2,6 +2,21 @@
 
 **Document Version**: 1.0 | **Date**: January 14, 2026 | **Status**: Draft
 
+**Source Specs**:
+
+- `.kiro/specs/umamusume-career-planner-main/requirements.md` (Requirement 1: Character State Management)
+- `.kiro/specs/umamusume-career-planner-main/design.md` (Character Management Architecture)
+- `.kiro/specs/umamusume-career-planner-main/tasks.md` (Task 1.4: Core Models)
+
+**Related Artifacts**:
+
+- PRD: [PRD-001](../prds/PRD-001_Character_Management.md)
+- SPEC: [SPEC-001](../specs/SPEC-001_Character_Management_Technical.md)
+- Flow: [FLOW-001](../flows/FLOW-001_Character_Management_System.md)
+- Wireframes: [WF-002](../wireframes/WF-002_Character_Creation_Wizard.md), [WF-003](../wireframes/WF-003_Character_Detail_Management.md)
+- Sequences: [SEQ-001](../sequences/SEQ-001_Character_Creation_Sequence.md)
+- User Flows: [UF-002](../user-flows/UF-002_Career_Setup_Flow.md)
+
 ## System Architecture
 
 ```
@@ -335,4 +350,3 @@ Response with updated character
 ---
 
 **Next**: [TECH-FLOW-002_Training_Optimization_Flow.md](TECH-FLOW-002_Training_Optimization_Flow.md)
-

@@ -1,16 +1,17 @@
 # TECH-FLOW DOCUMENTS: Quick Reference Index
 
-**Status**: 5 of 7 documents created | **Total Planned**: 7 technical flow documents
+**Status**: 7 of 7 documents created | **Total Planned**: 7 technical flow documents | **COMPLETE** ✅
 
 ## Overview
 
-Tech Flow documents (TECH-FLOW-001 through TECH-FLOW-007) provide system architecture diagrams, detailed data flows, component interactions, and implementation task breakdowns for each of the seven core modules.
+Tech Flow documents (TECH-FLOW-001 through TECH-FLOW-007) provide system architecture diagrams, detailed data flows, component interactions, and implementation task breakdowns for each of the seven core modules. All documents now include `.kiro` source references and cross-links to related artifacts (PRDs, SPECs, FLOWs, WFs, SEQs, UFs).
 
 ---
 
 ## Documents Created
 
 ### ✅ TECH-FLOW-001: Character Management
+
 - **Components**: 7 models, 5 repositories, 4 services, 5 controllers
 - **Tables**: characters, character_stats, aptitudes, factors, goals, conditions, snapshots
 - **Endpoints**: 15+ REST endpoints
@@ -19,6 +20,7 @@ Tech Flow documents (TECH-FLOW-001 through TECH-FLOW-007) provide system archite
 - **File**: [TECH-FLOW-001_Character_Management_Flow.md](TECH-FLOW-001_Character_Management_Flow.md)
 
 ### ✅ TECH-FLOW-002: Training Optimization
+
 - **Components**: 4 calculation engines, 5 services, 3 controllers
 - **Engines**: StatGain, BonusMultiplier, SkillHintProbability, Ranking
 - **Endpoints**: 5+ REST endpoints
@@ -26,40 +28,50 @@ Tech Flow documents (TECH-FLOW-001 through TECH-FLOW-007) provide system archite
 - **Tests**: 37+
 - **File**: [TECH-FLOW-002_Training_Optimization_Flow.md](TECH-FLOW-002_Training_Optimization_Flow.md)
 
-### 🔄 TECH-FLOW-003: Race Strategy (To Create)
+### ✅ TECH-FLOW-003: Race Strategy
+
 - **Components**: 3 analysis engines, 2 services, 2 controllers
 - **Engines**: StatRequirement, WeatherImpact, RunningStyleOptimizer
 - **Endpoints**: 6 REST endpoints
 - **Effort**: ~60 hours
 - **Tests**: 25+
+- **File**: [TECH-FLOW-003_Race_Strategy_Flow.md](TECH-FLOW-003_Race_Strategy_Flow.md)
 
-### 🔄 TECH-FLOW-004: Skill Management (To Create)
+### ✅ TECH-FLOW-004: Skill Management
+
 - **Components**: 3 services, 2 controllers
 - **Services**: SkillCatalog, SkillHint, SkillEvolution
-- **Endpoints**: 5 REST endpoints
-- **Effort**: ~40 hours
+- **Endpoints**: 7 REST endpoints
+- **Effort**: ~54 hours
 - **Tests**: 20+
+- **File**: [TECH-FLOW-004_Skill_Management_Flow.md](TECH-FLOW-004_Skill_Management_Flow.md)
 
-### 🔄 TECH-FLOW-005: Support Card Management (To Create)
-- **Components**: 2 services, 3 controllers
-- **Services**: DeckComposition, SupportCardDatabase, SkillProvision
-- **Endpoints**: 5 REST endpoints
-- **Effort**: ~40 hours
-- **Tests**: 20+
+### ✅ TECH-FLOW-005: Support Card Management
 
-### 🔄 TECH-FLOW-006: AI Advisory (To Create)
-- **Components**: 3 services, 2 controllers
-- **Services**: AIAdvisory, OllamaIntegration, BedrockFallback
-- **Endpoints**: 6 REST endpoints
-- **Effort**: ~50 hours
-- **Tests**: 20+
-
-### 🔄 TECH-FLOW-007: External Integration (To Create)
 - **Components**: 4 services, 2 controllers
-- **Services**: ExternalAPI, OCRProcessing, WebSocketUpdates, CommunityIntegration
-- **Endpoints**: 6 REST endpoints
-- **Effort**: ~60 hours
+- **Services**: DeckComposition, SupportCardBonusCalculator, BondLevel, LimitBreak
+- **Endpoints**: 8 REST endpoints
+- **Effort**: ~64 hours
+- **Tests**: 23+
+- **File**: [TECH-FLOW-005_Support_Card_Management_Flow.md](TECH-FLOW-005_Support_Card_Management_Flow.md)
+
+### ✅ TECH-FLOW-006: AI Advisory
+
+- **Components**: 3 services, 2 controllers, health monitoring
+- **Services**: AIAdvisory, Ollama (local), Bedrock (cloud fallback)
+- **Endpoints**: 4 REST endpoints
+- **Effort**: ~74 hours
+- **Tests**: 20+
+- **File**: [TECH-FLOW-006_AI_Advisory_Flow.md](TECH-FLOW-006_AI_Advisory_Flow.md)
+
+### ✅ TECH-FLOW-007: External Integration
+
+- **Components**: 4 services, 2 controllers, WebSocket
+- **Services**: ExternalAPI, OCRProcessing, WebSocketBroadcast, SyncConflictResolver
+- **Endpoints**: 7 REST endpoints + WebSocket
+- **Effort**: ~84 hours
 - **Tests**: 25+
+- **File**: [TECH-FLOW-007_External_Integration_Flow.md](TECH-FLOW-007_External_Integration_Flow.md)
 
 ---
 
@@ -70,6 +82,7 @@ Due to token budget constraints, I'm providing the outline and key information f
 ### TECH-FLOW-003: Race Strategy System
 
 **Architecture**:
+
 ```
 Race Analysis Engine
 ├── StatRequirementAnalyzer
@@ -79,6 +92,7 @@ Race Analysis Engine
 ```
 
 **Key Tasks**:
+
 1. Create RaceRequirementAnalyzer service
 2. Create WeatherImpactCalculator service
 3. Create RunningStyleOptimizer with scoring algorithm
@@ -88,6 +102,7 @@ Race Analysis Engine
 7. Comprehensive testing (race predictions, strategy recommendations)
 
 **Deliverables**:
+
 - races table with detailed race info
 - race_strategies table for recommendations
 - 6 REST endpoints (race details, strategy, forecast, complete)
@@ -98,6 +113,7 @@ Race Analysis Engine
 ### TECH-FLOW-004: Skill Management System
 
 **Architecture**:
+
 ```
 Skill Management
 ├── SkillCatalogService
@@ -107,6 +123,7 @@ Skill Management
 ```
 
 **Key Tasks**:
+
 1. Create Skill and SkillAcquisition models
 2. Implement SkillCatalogService (with evolution paths)
 3. Implement SkillHintService (discount calculation)
@@ -116,6 +133,7 @@ Skill Management
 7. Testing for all mechanics
 
 **Deliverables**:
+
 - skills table with evolution tracking
 - skill_acquisitions table
 - 5 REST endpoints
@@ -126,6 +144,7 @@ Skill Management
 ### TECH-FLOW-005: Support Card Management System
 
 **Architecture**:
+
 ```
 Support Card System
 ├── SupportCardDatabase (200+ cards, meta tiers)
@@ -135,6 +154,7 @@ Support Card System
 ```
 
 **Key Tasks**:
+
 1. Create SupportCard and SupportDeck models
 2. Seed support card database (200+ cards with metadata)
 3. Implement DeckCompositionValidator
@@ -144,6 +164,7 @@ Support Card System
 7. Testing for deck validation and recommendations
 
 **Deliverables**:
+
 - support_card_database table (200+ seed records)
 - character_support_decks table
 - 5 REST endpoints
@@ -154,6 +175,7 @@ Support Card System
 ### TECH-FLOW-006: AI Advisory System
 
 **Architecture**:
+
 ```
 AI Advisory System
 ├── OllamaService (local models)
@@ -163,6 +185,7 @@ AI Advisory System
 ```
 
 **Key Tasks**:
+
 1. Create OllamaService for local AI integration
 2. Create BedrockService for AWS Claude
 3. Implement AIAdvisoryService with fallback logic
@@ -172,6 +195,7 @@ AI Advisory System
 7. Testing for model integration and fallback
 
 **Deliverables**:
+
 - ai_conversations table
 - ai_recommendations table
 - 6 REST endpoints
@@ -183,6 +207,7 @@ AI Advisory System
 ### TECH-FLOW-007: External Integration System
 
 **Architecture**:
+
 ```
 External Integration
 ├── ExternalAPIService (umapyoi.net + fallbacks)
@@ -193,6 +218,7 @@ External Integration
 ```
 
 **Key Tasks**:
+
 1. Create ExternalAPIService with circuit breaker
 2. Implement OCRService (screenshot → data extraction)
 3. Create WebSocketBroadcaster for real-time updates
@@ -202,6 +228,7 @@ External Integration
 7. Testing for resilience and error handling
 
 **Deliverables**:
+
 - external_api_cache table
 - ocr_extractions table
 - community_shares table
@@ -215,6 +242,7 @@ External Integration
 ### Service Layer Pattern
 
 All services follow Laravel 12 conventions:
+
 ```php
 class ServiceName
 {
@@ -260,18 +288,22 @@ Long-term (24 hour): External API data, support card database
 ## Implementation Timeline
 
 **Phase 1** (Weeks 1-4): TECH-FLOW-001 & 002 (Complete)
+
 - Character Management
 - Training Optimization
 
 **Phase 2** (Weeks 5-8): TECH-FLOW-003 & 004
+
 - Race Strategy
 - Skill Management
 
 **Phase 3** (Weeks 9-12): TECH-FLOW-005 & 006
+
 - Support Card Management
 - AI Advisory
 
 **Phase 4** (Weeks 13-16): TECH-FLOW-007
+
 - External Integration
 
 **Total Effort**: ~416 hours (~2.5 developer-months @ 40-hour weeks)
@@ -290,8 +322,8 @@ After TECH-FLOW completion:
 ---
 
 **Quick Links**:
+
 - [SPEC Index](../specs/000_SPECS_INDEX.md)
 - [TECH-FLOW-001](TECH-FLOW-001_Character_Management_Flow.md)
 - [TECH-FLOW-002](TECH-FLOW-002_Training_Optimization_Flow.md)
 - [PRD Index](../000_DOCUMENT_INDEX.md)
-
