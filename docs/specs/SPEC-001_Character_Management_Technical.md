@@ -9,6 +9,20 @@
 **Status**: Draft  
 **Related Documents**: [PRD-001], [SRS-3.1], [SDS-4.1], [DBD-009]
 
+**Source Specs**:
+
+- `.kiro/specs/umamusume-career-planner-main/requirements.md` (Requirement 1: Character State Management)
+- `.kiro/specs/umamusume-career-planner-main/design.md` (Character Management Architecture)
+- `.kiro/specs/umamusume-career-planner-main/tasks.md` (Task 1.4: Core Models)
+
+**Related Artifacts**:
+
+- PRD: [PRD-001](../prds/PRD-001_Character_Management.md)
+- Flow: [FLOW-001](../flows/FLOW-001_Character_Management_System.md)
+- Wireframes: [WF-002](../wireframes/WF-002_Character_Creation_Wizard.md), [WF-003](../wireframes/WF-003_Character_Detail_Management.md)
+- Sequences: [SEQ-001](../sequences/SEQ-001_Character_Creation_Sequence.md)
+- User Flows: [UF-002](../user-flows/UF-002_Career_Setup_Flow.md)
+
 ---
 
 ## Table of Contents
@@ -145,6 +159,7 @@ class Stat
 **Aptitude Ratings**: G, G+, F, F+, E, E+, D, D+, C, C+, B, B+, A, A+, S, S+, SS
 
 **Distance Categories**:
+
 - Sprint: 1000-1400m
 - Mile: 1401-1800m
 - Medium: 1801-2400m
@@ -177,18 +192,21 @@ class Aptitude extends Model
 
 ### 2.4 Factor System
 
-**Factor Types**: 
+**Factor Types**:
+
 - Blue Stat Factors (Inherited stats)
 - Red Aptitude Factors (Inherited aptitudes)
 - Green Unique Skill Factors (Inherited unique skills)
 - White Normal Skill Factors (Inherited normal skills)
 
 **Stat Factor Ratings**:
+
 - ★☆☆ = +5 bonus
 - ★★☆ = +12 bonus
 - ★★★ = +21 bonus
 
 **Aptitude Factor Ratings**:
+
 - 1★ = +1 grade
 - 2★ = +2 grades
 - 3★ = +3 grades
@@ -316,6 +334,7 @@ Authorization: Bearer {token}
 ```
 
 **Response** (201 Created):
+
 ```json
 {
     "id": 1,
@@ -349,6 +368,7 @@ Authorization: Bearer {token}
 ```
 
 **Response** (200 OK):
+
 ```json
 {
     "id": 1,
@@ -504,6 +524,7 @@ Authorization: Bearer {token}
 ```
 
 **Response** (201 Created):
+
 ```json
 {
     "id": 1,
@@ -542,6 +563,7 @@ Authorization: Bearer {token}
 ```
 
 **Response** (200 OK):
+
 ```json
 {
     "data": [
@@ -576,6 +598,7 @@ Authorization: Bearer {token}
 ```
 
 **Response** (200 OK):
+
 ```json
 {
     "distances": [
@@ -605,6 +628,7 @@ Authorization: Bearer {token}
 ```
 
 **Response** (200 OK):
+
 ```json
 {
     "stat_factors": [
@@ -661,6 +685,7 @@ Authorization: Bearer {token}
 ```
 
 **Response** (201 Created):
+
 ```json
 {
     "id": 1,
@@ -687,6 +712,7 @@ Authorization: Bearer {token}
 ```
 
 **Response** (200 OK):
+
 ```json
 {
     "data": [

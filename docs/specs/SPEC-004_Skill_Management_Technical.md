@@ -2,6 +2,20 @@
 
 **Document Version**: 1.0 | **Date**: January 14, 2026 | **Status**: Draft
 
+**Source Specs**:
+
+- `.kiro/specs/umamusume-career-planner-main/requirements.md` (Requirement 4: Comprehensive Skill Management)
+- `.kiro/specs/umamusume-career-planner-main/design.md` (Skill Management Architecture)
+- `.kiro/specs/umamusume-career-planner-main/tasks.md` (Task 4.x: Skill System)
+
+**Related Artifacts**:
+
+- PRD: [PRD-004](../prds/PRD-004_Skill_Management.md)
+- Flow: [FLOW-004](../flows/FLOW-004_Skill_Management_System.md)
+- Wireframes: [WF-008](../wireframes/WF-008_Skill_Shop_Interface.md), [WF-009](../wireframes/WF-009_Skill_Loadout_Manager.md)
+- Sequences: [SEQ-003](../sequences/SEQ-003_Skill_Acquisition_and_Upgrade.md)
+- User Flows: [UF-005](../user-flows/UF-005_Skill_Management_Flow.md)
+
 ## Overview
 
 The Skill Management System handles skill acquisition, cost optimization, hint tracking, and skill evolution mechanics. It integrates with the training optimization system to provide real-time SP cost reduction opportunities.
@@ -110,15 +124,19 @@ class SkillEvolutionService
 ## API Endpoints
 
 ### GET /api/v1/characters/{id}/skills
+
 Get all skills with hint tracking and acquisition costs
 
 ### GET /api/v1/skills
+
 Catalog of all skills with evolution paths
 
 ### POST /api/v1/characters/{id}/skills/{skillId}/acquire
+
 Acquire skill with SP cost (considering hints)
 
 ### GET /api/v1/characters/{id}/skill-recommendations
+
 AI-powered skill building recommendations
 
 ## Database Schema
@@ -163,4 +181,3 @@ CREATE TABLE skill_acquisitions (
 ---
 
 **Related**: [PRD-004], [SPEC-002], [SPEC-006]
-

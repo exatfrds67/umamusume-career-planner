@@ -2,6 +2,20 @@
 
 **Document Version**: 1.0 | **Date**: January 14, 2026 | **Status**: Draft
 
+**Source Specs**:
+
+- `.kiro/specs/umamusume-career-planner-main/requirements.md` (External Integration Requirements)
+- `.kiro/specs/umamusume-career-planner-main/design.md` (External Integration Architecture)
+- `.kiro/specs/umamusume-career-planner-main/tasks.md` (Task 7.x: External Integration)
+
+**Related Artifacts**:
+
+- PRD: [PRD-007](../prds/PRD-007_External_Integration.md)
+- Flow: [FLOW-007](../flows/FLOW-007_External_Integration_System.md)
+- Wireframes: [WF-001](../wireframes/WF-001_Dashboard_Overview.md)
+- Sequences: [SEQ-007](../sequences/SEQ-007_External_Data_Sync.md), [SEQ-015](../sequences/SEQ-015_Data_Migration_Snapshot_to_Live.md)
+- User Flows: [UF-008](../user-flows/UF-008_OCR_and_Data_Import_Flow.md)
+
 ## Overview
 
 External Integration manages synchronization with game APIs, community databases, OCR processing, and WebSocket real-time updates.
@@ -205,21 +219,27 @@ class CommunityIntegrationService
 ## API Endpoints
 
 ### GET /api/v1/external/characters/{traineeId}
+
 Fetch character data from umapyoi.net
 
 ### GET /api/v1/external/support-cards
+
 Fetch support card database
 
 ### POST /api/v1/screenshot/ocr
+
 Process screenshot and extract data
 
 ### POST /api/v1/websocket/subscribe
+
 Subscribe to real-time character updates
 
 ### GET /api/v1/community/tips/{traineeId}
+
 Get community tips for character
 
 ### POST /api/v1/community/share
+
 Share career results to community
 
 ## Database Schema
@@ -305,4 +325,3 @@ CREATE TABLE community_shares (
 ---
 
 **Related**: [PRD-007], [SDS-8], [umapyoi.net API Docs]
-

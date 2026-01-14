@@ -9,6 +9,20 @@
 **Status**: Draft  
 **Related Documents**: [PRD-002], [SRS-3.2], [SDS-4.2], [SPEC-001]
 
+**Source Specs**:
+
+- `.kiro/specs/umamusume-career-planner-main/requirements.md` (Requirement 2: Training Prediction Engine)
+- `.kiro/specs/umamusume-career-planner-main/design.md` (Training Optimization Architecture)
+- `.kiro/specs/umamusume-career-planner-main/tasks.md` (Task 2.x: Training System)
+
+**Related Artifacts**:
+
+- PRD: [PRD-002](../prds/PRD-002_Training_Optimization.md)
+- Flow: [FLOW-002](../flows/FLOW-002_Training_Optimization_System.md)
+- Wireframes: [WF-004](../wireframes/WF-004_Training_Selection_Interface.md), [WF-005](../wireframes/WF-005_Training_Result_Screen.md)
+- Sequences: [SEQ-002](../sequences/SEQ-002_Training_Block_Resolution.md)
+- User Flows: [UF-003](../user-flows/UF-003_Training_Day_Flow.md)
+
 ---
 
 ## Table of Contents
@@ -570,6 +584,7 @@ Authorization: Bearer {token}
 ```
 
 **Response** (200 OK):
+
 ```json
 {
     "character_id": 1,
@@ -658,6 +673,7 @@ Authorization: Bearer {token}
 ```
 
 **Response** (200 OK):
+
 ```json
 {
     "recommended_facility": "Speed",
@@ -714,6 +730,7 @@ Authorization: Bearer {token}
 ```
 
 **Response** (201 Created):
+
 ```json
 {
     "id": 1,
@@ -766,6 +783,7 @@ Authorization: Bearer {token}
 ```
 
 **Response** (200 OK):
+
 ```json
 {
     "data": [
@@ -1068,4 +1086,3 @@ PROMPT;
 ---
 
 **Next Document**: [SPEC-003_Race_Strategy_Technical.md](SPEC-003_Race_Strategy_Technical.md)
-

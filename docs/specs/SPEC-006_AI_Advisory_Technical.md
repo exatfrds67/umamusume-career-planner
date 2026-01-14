@@ -1,6 +1,21 @@
 # SPEC-006: AI Advisory System - Technical Specification
 
-**Document Version**: 1.0 | **Date**: January 14, 2026 | **Status**: Draft
+**Document Version**: 1.0 | **Date**: January 14, 2026 | **Status**: Draft  
+**Related Documents**: [PRD-006], [MCP Server Configuration Reference](../MCP_SERVER_CONFIGURATION_REFERENCE.md)
+
+**Source Specs**:
+
+- `.kiro/specs/umamusume-career-planner-main/requirements.md` (AI Advisory Requirements)
+- `.kiro/specs/umamusume-career-planner-main/design.md` (AI Integration Architecture)
+- `.kiro/specs/umamusume-career-planner-main/tasks.md` (Task 6.x: AI Advisory System)
+
+**Related Artifacts**:
+
+- PRD: [PRD-006](../prds/PRD-006_AI_Advisory.md)
+- Flow: [FLOW-006](../flows/FLOW-006_AI_Advisory_System.md)
+- Wireframes: [WF-012](../wireframes/WF-012_AI_Advisor_Interface.md)
+- Sequences: [SEQ-006](../sequences/SEQ-006_AI_Advice_Generation.md)
+- User Flows: [UF-007](../user-flows/UF-007_AI_Advisor_Journey.md)
 
 ## Overview
 
@@ -106,21 +121,27 @@ class AdvisoryTopics
 ## API Endpoints
 
 ### GET /api/v1/characters/{id}/ai-advice
+
 Get general AI advisory based on character state
 
 ### GET /api/v1/characters/{id}/ai-advice/training
+
 Training-specific AI advice
 
 ### GET /api/v1/characters/{id}/ai-advice/race-prep
+
 Race preparation advisory
 
 ### GET /api/v1/characters/{id}/ai-advice/skill-building
+
 Skill build optimization advice
 
 ### GET /api/v1/characters/{id}/ai-advice/career
+
 Long-term career strategy advice
 
 ### POST /api/v1/characters/{id}/ai-conversation
+
 Interactive AI conversation for guidance
 
 ## Database Schema
@@ -189,4 +210,3 @@ CREATE TABLE ai_recommendations (
 ---
 
 **Related**: [PRD-006], [SDS], [AWS Bedrock Documentation]
-

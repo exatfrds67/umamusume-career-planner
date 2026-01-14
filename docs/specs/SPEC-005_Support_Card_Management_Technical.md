@@ -2,6 +2,20 @@
 
 **Document Version**: 1.0 | **Date**: January 14, 2026 | **Status**: Draft
 
+**Source Specs**:
+
+- `.kiro/specs/umamusume-career-planner-main/requirements.md` (Requirement 6: Support Card Configuration)
+- `.kiro/specs/umamusume-career-planner-main/design.md` (Support Card Architecture)
+- `.kiro/specs/umamusume-career-planner-main/tasks.md` (Task 5.x: Support Card System)
+
+**Related Artifacts**:
+
+- PRD: [PRD-005](../prds/PRD-005_Support_Card_Management.md)
+- Flow: [FLOW-005](../flows/FLOW-005_Support_Card_Management_System.md)
+- Wireframes: [WF-010](../wireframes/WF-010_Support_Card_Collection.md), [WF-011](../wireframes/WF-011_Support_Deck_Builder.md)
+- Sequences: [SEQ-005](../sequences/SEQ-005_Support_Card_Upgrade.md)
+- User Flows: [UF-006](../user-flows/UF-006_Support_Deck_Building_Flow.md)
+
 ## Overview
 
 Support card management handles deck composition, card bonuses, limit break effects, bond level tracking, and skill provision databases for optimal training effectiveness.
@@ -163,15 +177,19 @@ class SkillProvisionDatabase
 ## API Endpoints
 
 ### GET /api/v1/support-cards
+
 Retrieve complete support card database with metadata
 
 ### POST /api/v1/characters/{id}/deck
+
 Configure support deck (6 cards total)
 
 ### PATCH /api/v1/characters/{id}/deck/{cardId}
+
 Update card bond level or limit breaks
 
 ### GET /api/v1/deck-recommendations/{characterId}
+
 AI recommendations for optimal deck composition
 
 ## Database Schema
@@ -218,4 +236,3 @@ CREATE TABLE character_support_decks (
 ---
 
 **Related**: [PRD-005], [SPEC-002], [SPEC-006]
-

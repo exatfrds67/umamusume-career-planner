@@ -22,6 +22,7 @@ The Technical Specifications (SPEC-001 through SPEC-007) provide detailed implem
 **Focus**: Character lifecycle, stat tracking, aptitude management, inheritance optimization
 
 **Key Components**:
+
 - Character entity model with stat system (Speed/Stamina/Power/Guts/Wit)
 - Aptitude ratings (Distance, Surface, Running Style)
 - Factor inheritance system (Stat, Aptitude, Unique Skill, Normal Skill factors)
@@ -31,6 +32,7 @@ The Technical Specifications (SPEC-001 through SPEC-007) provide detailed implem
 - Character snapshots for versioning
 
 **API Endpoints**: 15+
+
 - Create/Read/Update character
 - Stat and condition management
 - Goal CRUD operations
@@ -38,6 +40,7 @@ The Technical Specifications (SPEC-001 through SPEC-007) provide detailed implem
 - Snapshot management
 
 **Database Tables**: 7
+
 - characters, character_stats, aptitudes, factors, goals, conditions, character_snapshots
 
 **Testing**: 30+ unit, integration, and API tests
@@ -50,6 +53,7 @@ The Technical Specifications (SPEC-001 through SPEC-007) provide detailed implem
 **Focus**: Training predictions, support card integration, scenario-specific mechanics
 
 **Key Components**:
+
 - Stat gain calculation engine (with multipliers and bonuses)
 - Support card bonus matrix (specialization, limit breaks, friendship training)
 - Skill hint tracking and SP cost reduction
@@ -59,12 +63,14 @@ The Technical Specifications (SPEC-001 through SPEC-007) provide detailed implem
 - ML-based prediction accuracy improvement
 
 **API Endpoints**: 8+
+
 - Training predictions with ranking
 - Training recommendation (with AI)
 - Training session creation
 - Prediction history and accuracy
 
 **Database Tables**: 4
+
 - training_sessions, support_cards, skill_hints, training_predictions
 
 **Testing**: 35+ tests covering all calculation engines
@@ -77,6 +83,7 @@ The Technical Specifications (SPEC-001 through SPEC-007) provide detailed implem
 **Focus**: Race preparation, strategy optimization, performance prediction
 
 **Key Components**:
+
 - Stat requirement analyzer (with distance-specific benchmarks)
 - Competition level evaluator
 - Weather impact calculator
@@ -86,12 +93,14 @@ The Technical Specifications (SPEC-001 through SPEC-007) provide detailed implem
 - Pre-race preparation planner
 
 **API Endpoints**: 6+
+
 - Race details and requirements
 - Strategy recommendation
 - Performance forecast
 - Complete race with outcome recording
 
 **Database Tables**: 2
+
 - races, race_strategies
 
 **Testing**: 25+ tests
@@ -104,6 +113,7 @@ The Technical Specifications (SPEC-001 through SPEC-007) provide detailed implem
 **Focus**: Skill acquisition, hint tracking, evolution mechanics, SP optimization
 
 **Key Components**:
+
 - Skill catalog with categories (Normal, Rare, Unique)
 - Hint-based SP cost reduction (20% per hint, 40% max)
 - Skill evolution system (Normal → Rare, e.g., "Go with the Flow" → "Lane Legerdemain")
@@ -113,12 +123,14 @@ The Technical Specifications (SPEC-001 through SPEC-007) provide detailed implem
 - AI skill build recommendations
 
 **API Endpoints**: 5+
+
 - Skill catalog retrieval
 - Character skill list
 - Skill acquisition
 - Skill recommendations
 
 **Database Tables**: 2
+
 - skills, skill_acquisitions
 
 **Testing**: 20+ tests
@@ -131,6 +143,7 @@ The Technical Specifications (SPEC-001 through SPEC-007) provide detailed implem
 **Focus**: Deck composition, card bonuses, bond tracking, meta rankings
 
 **Key Components**:
+
 - Support card model (rarity, limit breaks, specialization, bond level)
 - Deck composition validator (6-card deck, 5 owned + 1 borrowed)
 - Limit break multiplier system
@@ -140,12 +153,14 @@ The Technical Specifications (SPEC-001 through SPEC-007) provide detailed implem
 - Optimization recommendations
 
 **API Endpoints**: 5+
+
 - Card database retrieval
 - Deck management
 - Bond level/limit break updates
 - Deck recommendations
 
 **Database Tables**: 2
+
 - support_card_database, character_support_decks
 
 **Testing**: 20+ tests
@@ -158,6 +173,7 @@ The Technical Specifications (SPEC-001 through SPEC-007) provide detailed implem
 **Focus**: Intelligent recommendations using local AI + cloud fallback
 
 **Key Components**:
+
 - Hybrid AI architecture (Ollama local + AWS Bedrock fallback)
 - Local model integration for primary recommendations
 - AWS Bedrock Claude models for complex decisions
@@ -167,16 +183,19 @@ The Technical Specifications (SPEC-001 through SPEC-007) provide detailed implem
 - Advice feedback and outcome tracking
 
 **AI Models**:
+
 - **Primary**: Ollama local neural network models
 - **Fallback**: AWS Bedrock Claude 3.5 Sonnet ($3/$15), Opus ($5/$25), Haiku ($1/$5)
 - **Alternative**: Mistral Large ($0.008/$0.024 per 1K)
 
 **API Endpoints**: 6+
+
 - General AI advice
 - Topic-specific advice (training, race, skill, career)
 - Interactive AI conversation
 
 **Database Tables**: 2
+
 - ai_conversations, ai_recommendations
 
 **Testing**: 20+ tests including model fallback
@@ -189,6 +208,7 @@ The Technical Specifications (SPEC-001 through SPEC-007) provide detailed implem
 **Focus**: API integration, OCR processing, WebSocket updates, community tools
 
 **Key Components**:
+
 - External API integration (primary: umapyoi.net, fallback: UmamusumeDB)
 - Circuit breaker pattern for resilience
 - Intelligent fallback mechanism
@@ -198,11 +218,13 @@ The Technical Specifications (SPEC-001 through SPEC-007) provide detailed implem
 - Rate limiting and caching strategies
 
 **External Data Sources**:
+
 - **Primary**: umapyoi.net API (characters, support cards, news)
 - **Fallback**: UmamusumeDB.com (verification pending)
 - **Community Tools**: Uel, UmamusumeDB wiki
 
 **API Endpoints**: 6+
+
 - Character data from external APIs
 - OCR screenshot processing
 - WebSocket subscriptions
@@ -210,6 +232,7 @@ The Technical Specifications (SPEC-001 through SPEC-007) provide detailed implem
 - Career result sharing
 
 **Database Tables**: 3
+
 - external_api_cache, ocr_extractions, community_shares
 
 **Testing**: 25+ tests including resilience patterns
@@ -221,6 +244,7 @@ The Technical Specifications (SPEC-001 through SPEC-007) provide detailed implem
 ### Performance Optimization
 
 All specs include caching strategies:
+
 - **Character Data**: 5-minute cache
 - **Support Card Bonuses**: 1-hour cache
 - **External API Data**: 24-hour cache
@@ -229,6 +253,7 @@ All specs include caching strategies:
 ### Database Indexes
 
 Comprehensive indexing strategy across all tables:
+
 - User-based filtering (user_id indexes)
 - Time-based queries (created_at, expires_at indexes)
 - Entity relationships (foreign key indexes)
@@ -238,6 +263,7 @@ Comprehensive indexing strategy across all tables:
 ### Error Handling
 
 Standardized error response format:
+
 ```json
 {
     "error": "Error code",
@@ -300,30 +326,35 @@ SPEC-007 (External)
 ## Implementation Roadmap
 
 ### Phase 1: Foundation (Weeks 1-4)
+
 - Implement SPEC-001 (Character Management)
 - Implement SPEC-005 (Support Cards - data layer only)
 - Complete database migrations
 - Write core models and repositories
 
 ### Phase 2: Optimization Engine (Weeks 5-8)
+
 - Implement SPEC-002 (Training Optimization)
 - Integrate SPEC-005 (card bonuses)
 - Build prediction calculation engines
 - ML-based accuracy improvement
 
 ### Phase 3: Race System (Weeks 9-12)
+
 - Implement SPEC-003 (Race Strategy)
 - Race prediction and strategy optimization
 - Complete race workflow
 - Post-race analysis
 
 ### Phase 4: Skills & AI (Weeks 13-16)
+
 - Implement SPEC-004 (Skill Management)
 - Implement SPEC-006 (AI Advisory - basic)
 - Ollama integration
 - Recommendation generation
 
 ### Phase 5: Integration & Polish (Weeks 17-22)
+
 - Implement SPEC-007 (External Integration)
 - AWS Bedrock fallback implementation
 - OCR processing
@@ -332,6 +363,7 @@ SPEC-007 (External)
 - Performance optimization
 
 ### Phase 6: Testing & Release (Weeks 23-28)
+
 - Comprehensive testing (170+ tests)
 - Performance optimization
 - Security audit
@@ -344,6 +376,7 @@ SPEC-007 (External)
 ## Next Steps
 
 After SPEC completion:
+
 1. **TECH-FLOW**: System architecture diagrams, data flow, component interactions
 2. **WIREFRAMES**: UI mockups and component specifications
 3. **SEQUENCES**: Detailed flow diagrams for critical operations
@@ -354,4 +387,3 @@ After SPEC completion:
 
 **Document Index**: [000_DOCUMENT_INDEX.md](../000_DOCUMENT_INDEX.md)  
 **Related**: [001_SDP](../001_SDP_Software_Development_Plan.md), [003_SRS](../003_SRS_Software_Requirement_Specifications.md)
-

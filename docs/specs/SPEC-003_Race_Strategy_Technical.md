@@ -2,7 +2,22 @@
 
 **Document Version**: 1.0 | **Date**: January 14, 2026 | **Status**: Draft
 
+**Source Specs**:
+
+- `.kiro/specs/umamusume-career-planner-main/requirements.md` (Requirement 3: Race Preparation and Strategy)
+- `.kiro/specs/umamusume-career-planner-main/design.md` (Race Strategy Architecture)
+- `.kiro/specs/umamusume-career-planner-main/tasks.md` (Task 3.x: Race System)
+
+**Related Artifacts**:
+
+- PRD: [PRD-003](../prds/PRD-003_Race_Strategy.md)
+- Flow: [FLOW-003](../flows/FLOW-003_Race_Strategy_System.md)
+- Wireframes: [WF-006](../wireframes/WF-006_Race_Calendar_View.md), [WF-007](../wireframes/WF-007_Race_Preparation_Screen.md)
+- Sequences: [SEQ-004](../sequences/SEQ-004_Race_Registration_and_Outcome.md)
+- User Flows: [UF-004](../user-flows/UF-004_Race_Day_Flow.md)
+
 ## Table of Contents
+
 1. [Technical Overview](#1-technical-overview)
 2. [Race Analysis Engine](#2-race-analysis-engine)
 3. [Strategy Recommendation System](#3-strategy-recommendation-system)
@@ -315,6 +330,7 @@ Authorization: Bearer {token}
 ```
 
 **Response**:
+
 ```json
 {
     "race": {
@@ -380,6 +396,7 @@ Authorization: Bearer {token}
 ```
 
 **Response**:
+
 ```json
 {
     "race_id": 42,
@@ -474,6 +491,7 @@ Authorization: Bearer {token}
 ```
 
 **Response**:
+
 ```json
 {
     "race_result": {
@@ -576,4 +594,3 @@ CREATE TABLE race_strategies (
 ---
 
 **Related Documents**: [PRD-003], [SPEC-001], [SPEC-002]
-
