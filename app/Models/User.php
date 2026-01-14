@@ -12,9 +12,19 @@ use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 
 /**
+ * @property int $id
+ * @property string $uuid
+ * @property string $name
+ * @property string $email
+ * @property string $password
+ * @property \ArrayObject<string, mixed> $preferences
+ * @property \ArrayObject<string, mixed> $accessibility_settings
+ * @property \ArrayObject<string, mixed> $ai_settings
+ * @property \ArrayObject<string, mixed> $mcp_settings
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $email_verified_at
+ * @property string|null $remember_token
  */
 class User extends Authenticatable
 {
@@ -87,6 +97,7 @@ class User extends Authenticatable
 
     /**
      * Get the user's characters.
+     * Note: Character model not yet implemented
      *
      * @return HasMany<Character, $this>
      */
@@ -97,90 +108,103 @@ class User extends Authenticatable
 
     /**
      * Get the user's careers.
+     * Note: Career model not yet implemented
      *
-     * @return HasMany<Career, $this>
+     * @return HasMany<\Illuminate\Database\Eloquent\Model, $this>
      */
-    public function careers(): HasMany
-    {
-        return $this->hasMany(Career::class);
-    }
+    // public function careers(): HasMany
+    // {
+    //     return $this->hasMany(Career::class);
+    // }
 
     /**
      * Get the user's AI conversations.
+     * Note: AIConversation model not yet implemented
      *
-     * @return HasMany<AIConversation, $this>
+     * @return HasMany<\Illuminate\Database\Eloquent\Model, $this>
      */
-    public function aiConversations(): HasMany
-    {
-        return $this->hasMany(AIConversation::class);
-    }
+    // public function aiConversations(): HasMany
+    // {
+    //     return $this->hasMany(AIConversation::class);
+    // }
 
     /**
      * Get the user's preferences.
+     * Note: UserPreference model not yet implemented
      *
-     * @return HasMany<UserPreference, $this>
+     * @return HasMany<\Illuminate\Database\Eloquent\Model, $this>
      */
-    public function userPreferences(): HasMany
-    {
-        return $this->hasMany(UserPreference::class);
-    }
+    // public function userPreferences(): HasMany
+    // {
+    //     return $this->hasMany(UserPreference::class);
+    // }
 
     /**
      * Get the user's system logs.
+     * Note: SystemLog model not yet implemented
      *
-     * @return HasMany<SystemLog, $this>
+     * @return HasMany<\Illuminate\Database\Eloquent\Model, $this>
      */
-    public function systemLogs(): HasMany
-    {
-        return $this->hasMany(SystemLog::class);
-    }
+    // public function systemLogs(): HasMany
+    // {
+    //     return $this->hasMany(SystemLog::class);
+    // }
 
     /**
      * Get all events related to this user (polymorphic).
+     * Note: Event model not yet implemented
      *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany<Event, $this>
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Illuminate\Database\Eloquent\Model, $this>
      */
-    public function events(): \Illuminate\Database\Eloquent\Relations\MorphMany
-    {
-        return $this->morphMany(Event::class, 'eventable');
-    }
+    // public function events(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    // {
+    //     return $this->morphMany(Event::class, 'eventable');
+    // }
 
     /**
      * Get all system logs related to this user (polymorphic).
+     * Note: SystemLog model not yet implemented
      *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany<SystemLog, $this>
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Illuminate\Database\Eloquent\Model, $this>
      */
-    public function relatedSystemLogs(): \Illuminate\Database\Eloquent\Relations\MorphMany
-    {
-        return $this->morphMany(SystemLog::class, 'loggable');
-    }
+    // public function relatedSystemLogs(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    // {
+    //     return $this->morphMany(SystemLog::class, 'loggable');
+    // }
 
     /**
      * Get all AI conversations related to this user (polymorphic).
+     * Note: AIConversation model not yet implemented
      *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany<AIConversation, $this>
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany<\Illuminate\Database\Eloquent\Model, $this>
      */
-    public function relatedAiConversations(): \Illuminate\Database\Eloquent\Relations\MorphMany
-    {
-        return $this->morphMany(AIConversation::class, 'conversationable');
-    }
+    // public function relatedAiConversations(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    // {
+    //     return $this->morphMany(AIConversation::class, 'conversationable');
+    // }
 
     /**
      * Check if user can access a specific character.
+     * Note: Character model not yet implemented
      */
-    public function canAccessCharacter(Character $character): bool
-    {
-        return $this->id === $character->user_id;
-    }
+    // public function canAccessCharacter(Character $character): bool
+    // {
+    //     return $this->id === $character->user_id;
+    // }
 
     /**
      * Get the user's subscription tier (for future premium features).
      */
     public function getSubscriptionTier(): string
     {
-        $settings = is_array($this->ai_settings) ? $this->ai_settings : [];
+        if ($this->ai_settings instanceof \ArrayObject) {
+            $settings = $this->ai_settings->getArrayCopy();
+            $tier = $settings['subscription_tier'] ?? null;
 
-        return $settings['subscription_tier'] ?? 'free';
+            return is_string($tier) ? $tier : 'free';
+        }
+
+        return 'free';
     }
 
     /**
@@ -188,9 +212,14 @@ class User extends Authenticatable
      */
     public function getAIBudgetLimit(): float
     {
-        $settings = is_array($this->ai_settings) ? $this->ai_settings : [];
+        if ($this->ai_settings instanceof \ArrayObject) {
+            $settings = $this->ai_settings->getArrayCopy();
+            $limit = $settings['budget_limit'] ?? null;
 
-        return $settings['budget_limit'] ?? 10.0;
+            return is_numeric($limit) ? (float) $limit : 10.0;
+        }
+
+        return 10.0;
     }
 
     /**
@@ -198,9 +227,14 @@ class User extends Authenticatable
      */
     public function getPreferredAIModel(): string
     {
-        $settings = is_array($this->ai_settings) ? $this->ai_settings : [];
+        if ($this->ai_settings instanceof \ArrayObject) {
+            $settings = $this->ai_settings->getArrayCopy();
+            $model = $settings['preferred_model'] ?? null;
 
-        return $settings['preferred_model'] ?? 'ollama';
+            return is_string($model) ? $model : 'ollama';
+        }
+
+        return 'ollama';
     }
 
     /**
@@ -213,9 +247,8 @@ class User extends Authenticatable
 
     /**
      * Get the user's display name with accessibility support.
-     *
-     * @return Attribute<string, never>
      */
+    #[\ReturnTypeWillChange]
     protected function displayName(): Attribute
     {
         return Attribute::make(
@@ -225,9 +258,8 @@ class User extends Authenticatable
 
     /**
      * Get the user's active characters count.
-     *
-     * @return Attribute<int, never>
      */
+    #[\ReturnTypeWillChange]
     protected function activeCharactersCount(): Attribute
     {
         return Attribute::make(
