@@ -46,8 +46,7 @@ class MCPClientService
      * @return array<string, mixed>|null
      */
     public function getServer(string $name): ?array
-    {
-        $server = $this->servers[$name] ?? null;
+    {        /** @var array<string, mixed>|null $server */ $server = $this->servers[$name] ?? null;
 
         return is_array($server) ? $server : null;
     }
