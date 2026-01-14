@@ -1,0 +1,22 @@
+includes:
+  - vendor/larastan/larastan/extension.neon
+
+parameters:
+  level: 9
+  paths:
+    - app
+    - routes
+    - tests
+
+  treatPhpDocTypesAsCertain: false
+  ignoreErrors:
+    - identifier: missingType.generics
+      paths:
+        - tests/TestCase.php
+        - app/Models/User.php
+    - identifier: argument.type
+      path: routes/web.php
+      message: '/view expects view-string/'
+    - identifier: variable.undefined
+      paths:
+        - tests/Pest.php
