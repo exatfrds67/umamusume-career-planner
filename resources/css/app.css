@@ -5,6 +5,9 @@
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
+/* Configure dark mode to use class-based strategy (requires .dark class on html element) */
+@variant dark (&:where(.dark, .dark *));
+
 /* ============================================
    UmamusumeCareerPlanner Design System
    WCAG 2.2 AA Compliant - Tailwind CSS v4
@@ -12,8 +15,9 @@
 
 @theme {
     /* Typography */
-    --font-sans: "Inter", "Instrument Sans", ui-sans-serif, system-ui,
-        sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+    --font-sans:
+        "Inter", "Instrument Sans", ui-sans-serif, system-ui, sans-serif,
+        "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
         "Noto Color Emoji";
     --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
@@ -129,6 +133,179 @@ body {
 
 .skip-link:focus {
     top: 0;
+}
+
+/* ============================================
+   Glassmorphism Card System
+   ============================================ */
+
+/* Main glassmorphism card - used for hero and main content cards */
+.glass-card {
+    background: linear-gradient(
+        to bottom right,
+        rgba(255, 255, 255, 0.9),
+        rgba(239, 246, 255, 0.85),
+        rgba(250, 245, 255, 0.85)
+    );
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.15);
+    /* Light mode text colors - dark for proper contrast */
+    color: #1f2937 !important; /* gray-800 */
+}
+
+.glass-card h1,
+.glass-card h2,
+.glass-card h3,
+.glass-card h4,
+.glass-card h5,
+.glass-card h6 {
+    color: #030712 !important; /* gray-950 - very dark */
+}
+
+.glass-card p,
+.glass-card span,
+.glass-card li,
+.glass-card div {
+    color: #1f2937 !important; /* gray-800 */
+}
+
+.dark .glass-card {
+    background: linear-gradient(
+        to bottom right,
+        rgba(17, 24, 39, 0.85),
+        rgba(31, 41, 55, 0.8),
+        rgba(17, 24, 39, 0.85)
+    );
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.4);
+    /* Dark mode text colors - light for proper contrast */
+    color: #e5e7eb !important; /* gray-200 */
+}
+
+.dark .glass-card h1,
+.dark .glass-card h2,
+.dark .glass-card h3,
+.dark .glass-card h4,
+.dark .glass-card h5,
+.dark .glass-card h6 {
+    color: #ffffff !important; /* white */
+}
+
+.dark .glass-card p,
+.dark .glass-card span,
+.dark .glass-card li,
+.dark .glass-card div {
+    color: #e5e7eb !important; /* gray-200 */
+}
+
+/* Secondary glassmorphism card - horizontal gradient variant */
+.glass-card-alt {
+    background: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0.9),
+        rgba(239, 246, 255, 0.85),
+        rgba(250, 245, 255, 0.85)
+    );
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    /* Light mode text colors - dark for proper contrast */
+    color: #1f2937 !important; /* gray-800 */
+}
+
+.glass-card-alt h1,
+.glass-card-alt h2,
+.glass-card-alt h3,
+.glass-card-alt h4,
+.glass-card-alt h5,
+.glass-card-alt h6 {
+    color: #030712 !important; /* gray-950 - very dark */
+}
+
+.glass-card-alt p,
+.glass-card-alt span,
+.glass-card-alt li,
+.glass-card-alt div {
+    color: #1f2937 !important; /* gray-800 */
+}
+
+.dark .glass-card-alt {
+    background: linear-gradient(
+        to right,
+        rgba(17, 24, 39, 0.85),
+        rgba(31, 41, 55, 0.8),
+        rgba(17, 24, 39, 0.85)
+    );
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3);
+    /* Dark mode text colors - light for proper contrast */
+    color: #e5e7eb !important; /* gray-200 */
+}
+
+.dark .glass-card-alt h1,
+.dark .glass-card-alt h2,
+.dark .glass-card-alt h3,
+.dark .glass-card-alt h4,
+.dark .glass-card-alt h5,
+.dark .glass-card-alt h6 {
+    color: #ffffff !important; /* white */
+}
+
+.dark .glass-card-alt p,
+.dark .glass-card-alt span,
+.dark .glass-card-alt li,
+.dark .glass-card-alt div {
+    color: #e5e7eb !important; /* gray-200 */
+}
+
+/* Inner card for nested content */
+.glass-card-inner {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(229, 231, 235, 0.3);
+    /* Light mode text colors - dark for proper contrast */
+    color: #1f2937 !important; /* gray-800 */
+}
+
+.glass-card-inner h1,
+.glass-card-inner h2,
+.glass-card-inner h3,
+.glass-card-inner h4,
+.glass-card-inner h5,
+.glass-card-inner h6 {
+    color: #030712 !important; /* gray-950 - very dark */
+}
+
+.glass-card-inner p,
+.glass-card-inner span,
+.glass-card-inner li,
+.glass-card-inner div {
+    color: #1f2937 !important; /* gray-800 */
+}
+
+.dark .glass-card-inner {
+    background: rgba(31, 41, 55, 0.9);
+    border: 1px solid rgba(55, 65, 81, 0.4);
+    /* Dark mode text colors - light for proper contrast */
+    color: #e5e7eb !important; /* gray-200 */
+}
+
+.dark .glass-card-inner h1,
+.dark .glass-card-inner h2,
+.dark .glass-card-inner h3,
+.dark .glass-card-inner h4,
+.dark .glass-card-inner h5,
+.dark .glass-card-inner h6 {
+    color: #ffffff !important; /* white */
+}
+
+.dark .glass-card-inner p,
+.dark .glass-card-inner span,
+.dark .glass-card-inner li,
+.dark .glass-card-inner div {
+    color: #e5e7eb !important; /* gray-200 */
 }
 
 /* ============================================
@@ -624,7 +801,9 @@ body {
     background-size: cover;
     background-position: center;
     border: 2px solid var(--color-primary-500);
-    transition: opacity 0.3s ease, transform 0.2s ease;
+    transition:
+        opacity 0.3s ease,
+        transform 0.2s ease;
 }
 
 .character-avatar:not(.image-loaded) {
@@ -705,71 +884,113 @@ body {
    Dark Mode Support
    ============================================ */
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        color-scheme: dark;
-    }
-
-    body {
-        background-color: var(--color-neutral-900);
-        color: var(--color-neutral-100);
-    }
-
-    .card {
-        background-color: var(--color-neutral-800);
-        border-color: var(--color-neutral-700);
-    }
-
-    .card-header,
-    .card-footer {
-        background-color: var(--color-neutral-850);
-        border-color: var(--color-neutral-700);
-    }
-
-    .form-input,
-    .form-select {
-        background-color: var(--color-neutral-800);
-        border-color: var(--color-neutral-600);
-        color: var(--color-neutral-100);
-    }
-
-    .form-label {
-        color: var(--color-neutral-300);
-    }
-
-    .nav-link {
-        color: var(--color-neutral-300);
-    }
-
-    .nav-link:hover {
-        color: var(--color-primary-400);
-        background-color: var(--color-neutral-800);
-    }
-
-    .nav-link-active {
-        color: var(--color-primary-400);
-        background-color: var(--color-neutral-800);
-    }
-
-    /* Asset optimization dark mode */
-    .lazy-background:not(.image-loaded) {
-        background-color: var(--color-neutral-700);
-    }
-
-    .image-placeholder {
-        background: linear-gradient(
-            90deg,
-            var(--color-neutral-700) 25%,
-            var(--color-neutral-600) 50%,
-            var(--color-neutral-700) 75%
-        );
-        background-size: 200% 100%;
-    }
-
-    .character-avatar:not(.image-loaded) {
-        background-color: var(--color-neutral-700);
-    }
+/* Smooth theme transitions */
+html {
+    transition:
+        background-color 0.3s ease,
+        color 0.3s ease;
 }
+
+body {
+    transition:
+        background-color 0.3s ease,
+        color 0.3s ease;
+}
+
+.card,
+.form-input,
+.form-select,
+.nav-link {
+    transition:
+        background-color 0.3s ease,
+        color 0.3s ease,
+        border-color 0.3s ease;
+}
+
+/* Theme toggle button animation */
+#theme-toggle svg {
+    transition:
+        transform 0.3s ease,
+        opacity 0.3s ease;
+}
+
+#theme-toggle:hover svg {
+    transform: scale(1.1);
+}
+
+#theme-toggle:active svg {
+    transform: scale(0.95);
+}
+
+/* Dark mode styles (applied via .dark class) */
+.dark {
+    color-scheme: dark;
+}
+
+.dark body {
+    background-color: var(--color-neutral-900);
+    color: var(--color-neutral-100);
+}
+
+.dark .card {
+    background-color: var(--color-neutral-800);
+    border-color: var(--color-neutral-700);
+}
+
+.dark .card-header,
+.dark .card-footer {
+    background-color: var(--color-neutral-850);
+    border-color: var(--color-neutral-700);
+}
+
+.dark .form-input,
+.dark .form-select {
+    background-color: var(--color-neutral-800);
+    border-color: var(--color-neutral-600);
+    color: var(--color-neutral-100);
+}
+
+.dark .form-label {
+    color: var(--color-neutral-300);
+}
+
+.dark .nav-link {
+    color: var(--color-neutral-300);
+}
+
+.dark .nav-link:hover {
+    color: var(--color-primary-400);
+    background-color: var(--color-neutral-800);
+}
+
+.dark .nav-link-active {
+    color: var(--color-primary-400);
+    background-color: var(--color-neutral-800);
+}
+
+/* Asset optimization dark mode */
+.dark .lazy-background:not(.image-loaded) {
+    background-color: var(--color-neutral-700);
+}
+
+.dark .image-placeholder {
+    background: linear-gradient(
+        90deg,
+        var(--color-neutral-700) 25%,
+        var(--color-neutral-600) 50%,
+        var(--color-neutral-700) 75%
+    );
+    background-size: 200% 100%;
+}
+
+.dark .character-avatar:not(.image-loaded) {
+    background-color: var(--color-neutral-700);
+}
+
+/* Note: Dark mode is controlled via .dark class on <html> element
+   The JavaScript ThemeSystem handles system preference detection
+   and applies the .dark class accordingly. No @media (prefers-color-scheme: dark)
+   fallback is needed here as it would conflict with user-controlled theme toggle. */
 
 /* ============================================
    Accessibility Utilities
@@ -1092,7 +1313,8 @@ body {
     position: relative;
     background: white;
     border-radius: 0.75rem;
-    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1),
+    box-shadow:
+        0 20px 25px -5px rgb(0 0 0 / 0.1),
         0 10px 10px -5px rgb(0 0 0 / 0.04);
     max-width: 32rem;
     width: 100%;
@@ -1358,6 +1580,75 @@ body {
    Responsive & Motion
    ============================================ */
 
+/* Fade-in animations (Requirement 18.1) */
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fade-in 0.5s ease-out forwards;
+}
+
+.animate-fade-in-delay-1 {
+    animation: fade-in 0.5s ease-out 0.1s forwards;
+    opacity: 0;
+}
+
+.animate-fade-in-delay-2 {
+    animation: fade-in 0.5s ease-out 0.2s forwards;
+    opacity: 0;
+}
+
+.animate-fade-in-delay-3 {
+    animation: fade-in 0.5s ease-out 0.3s forwards;
+    opacity: 0;
+}
+
+.animate-fade-in-delay-4 {
+    animation: fade-in 0.5s ease-out 0.4s forwards;
+    opacity: 0;
+}
+
+.animate-fade-in-delay-5 {
+    animation: fade-in 0.5s ease-out 0.5s forwards;
+    opacity: 0;
+}
+
+/* Respect reduced motion preference (Requirement 18.5) */
+@media (prefers-reduced-motion: reduce) {
+    .animate-fade-in,
+    .animate-fade-in-delay-1,
+    .animate-fade-in-delay-2,
+    .animate-fade-in-delay-3,
+    .animate-fade-in-delay-4,
+    .animate-fade-in-delay-5 {
+        animation: none;
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/* Loading spinner animation */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
     *,
@@ -1383,4 +1674,120 @@ body {
     :focus-visible {
         outline-width: 3px;
     }
+}
+
+/* Settings Page Specific Styles */
+.reduce-motion * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+}
+
+.high-contrast {
+    --tw-text-opacity: 1;
+    --tw-bg-opacity: 1;
+}
+
+.high-contrast * {
+    border-width: 2px !important;
+}
+
+.compact-mode .space-y-6 > * + * {
+    margin-top: 1rem !important;
+}
+
+.compact-mode .space-y-4 > * + * {
+    margin-top: 0.5rem !important;
+}
+
+.compact-mode .p-6 {
+    padding: 1rem !important;
+}
+
+.compact-mode .px-4.py-5 {
+    padding: 0.75rem 1rem !important;
+}
+
+/* Toast Animations */
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(1rem);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fade-out {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(1rem);
+    }
+}
+
+.animate-fade-in {
+    animation: fade-in 0.3s ease-out;
+}
+
+.animate-fade-out {
+    animation: fade-out 0.3s ease-in;
+}
+
+/* Smooth transitions for settings changes */
+.settings-transition {
+    transition: all 0.3s ease-in-out;
+}
+
+/* Focus visible for accessibility */
+*:focus-visible {
+    outline: 2px solid rgb(var(--color-primary-500));
+    outline-offset: 2px;
+}
+
+/* Range slider styling */
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 50%;
+    background: rgb(var(--color-primary-600));
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 4px rgba(var(--color-primary-600), 0.2);
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 50%;
+    background: rgb(var(--color-primary-600));
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+}
+
+input[type="range"]::-moz-range-thumb:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 4px rgba(var(--color-primary-600), 0.2);
+}
+
+/* Settings search highlight */
+#settings-search:focus {
+    box-shadow: 0 0 0 3px rgba(var(--color-primary-600), 0.1);
 }
