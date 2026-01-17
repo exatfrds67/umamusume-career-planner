@@ -689,14 +689,14 @@ This standardization work will prevent inconsistencies and ensure smooth develop
 
 #### Subtasks - Task 2.3
 
-- [ ] **2.3.1** Create character list and overview interface
+- [x] **2.3.1** Create character list and overview interface
   - Build character list view with filtering by scenario type (URA/Unity Cup)
   - Implement search functionality with real-time filtering
   - Add sorting options (name, creation date, scenario, progress)
   - Create character cards with key information and progress indicators
   - _Requirements: 1.5, 12.2_
 
-- [ ] **2.3.2** Create comprehensive character creation form
+- [x] **2.3.2** Create comprehensive character creation form
   - Build character creation form with proper validation and error handling
   - Add scenario type selection (URA Finale/Unity Cup) with explanatory tooltips
   - Implement stat input fields (0-1200 range) with validation and visual feedback
@@ -704,7 +704,7 @@ This standardization work will prevent inconsistencies and ensure smooth develop
   - Include accessibility features (labels, descriptions, keyboard navigation)
   - _Requirements: 1.1, 10.1, 12.1_
 
-- [ ] **2.3.3** Create detailed character overview dashboard with visual enhancements
+- [x] **2.3.3** Create detailed character overview dashboard with visual enhancements
   - Build character detail view with comprehensive stat display and progress indicators
   - Implement aptitude visualization with color-coded grade indicators
   - Create current goals and objectives tracking with progress visualization
@@ -714,14 +714,14 @@ This standardization work will prevent inconsistencies and ensure smooth develop
   - **Apply themed backgrounds**: Use appropriate backgrounds from `images/app_bg/` based on user theme preference
   - _Requirements: 1.5, 10.3, 10.5_
 
-- [ ] **2.3.4** Create character editing and management interface
+- [x] **2.3.4** Create character editing and management interface
   - Build stat modification forms with proper validation (0-1200 range)
   - Implement goal setting interface with target stat configuration
   - Add character notes and tracking functionality
   - Create character deletion with proper confirmation and data cleanup
   - _Requirements: 1.3, 10.4_
 
-- [ ] **2.3.5** Implement comprehensive form validation and user feedback
+- [x] **2.3.5** Implement comprehensive form validation and user feedback
   - Add client-side validation for stat ranges (0-1200) and aptitude grades (G-SS)
   - Implement server-side validation with detailed error messages
   - Create real-time validation feedback with accessibility-compliant error display
@@ -747,7 +747,7 @@ This standardization work will prevent inconsistencies and ensure smooth develop
 
 #### Subtasks - Task 3.1
 
-- [ ] **3.1.1** Create comprehensive training calculation service with MCP integration
+- [x] **3.1.1** Create comprehensive training calculation service with MCP integration
   - Implement base stat gain calculations with support card bonus integration
   - Add friendship training multipliers (2 participants +2 bonus, 3 participants +3 bonus)
   - Create facility level bonus calculations (1.0x to 2.0x multipliers for Unity Cup)
@@ -755,7 +755,7 @@ This standardization work will prevent inconsistencies and ensure smooth develop
   - **Integrate Training Optimization Agent** via strands-agents MCP server for complex calculations
   - _Requirements: 2.1, 19.1, 20.2, 56.3_
 
-- [ ] **3.1.2** Implement MCP-powered scenario-specific training mechanics
+- [x] **3.1.2** Implement MCP-powered scenario-specific training mechanics
   - Add URA Finale training predictions with traditional individual optimization
   - Implement Unity Cup Spirit Burst mechanics with 4-session gauge filling
   - Create team member interaction calculations for Unity Cup scenarios
@@ -763,7 +763,7 @@ This standardization work will prevent inconsistencies and ensure smooth develop
   - **Deploy Scenario Analysis Agent** for scenario-specific optimization strategies
   - _Requirements: 2.2, 11.1, 11.2, 56.3_
 
-- [ ] **3.1.3** Create intelligent MCP agent-based recommendation engine
+- [x] **3.1.3** Create intelligent MCP agent-based recommendation engine
   - Implement **Career Strategy Agent** for goal-based training optimization with stat priority weighting
   - Add **Resource Management Agent** for turn economy calculations and optimal resource allocation
   - Create **Performance Analytics Agent** for energy and mood management recommendations
@@ -771,7 +771,7 @@ This standardization work will prevent inconsistencies and ensure smooth develop
   - Implement **agent orchestration workflows** for multi-agent collaborative recommendations
   - _Requirements: 2.4, 19.3, 22.1, 22.3, 56.3_
 
-- [ ] **3.1.4** Build MCP-enhanced training prediction API with intelligent caching
+- [x] **3.1.4** Build MCP-enhanced training prediction API with intelligent caching
   - Create RESTful endpoints for real-time training predictions with MCP agent integration
   - Implement **Redis-based caching** enhanced with MCP server health monitoring
   - Add **prediction accuracy tracking** using MCP analytics tools and machine learning improvement
@@ -779,7 +779,7 @@ This standardization work will prevent inconsistencies and ensure smooth develop
   - Create **cost optimization** using awspricing MCP server for agent usage cost management
   - _Requirements: 2.5, 17.4, 52.2, 56.4_
 
-- [ ] **3.1.5** Create advanced training prediction UI with agent visualization
+- [x] **3.1.5** Create advanced training prediction UI with agent visualization
   - Build training option display with predicted stat gains, energy costs, and agent recommendations
   - Implement **agent workflow visualization** showing multi-step prediction processes
   - Create **recommendation rankings** with clear reasoning explanations from multiple agents
@@ -804,7 +804,7 @@ This standardization work will prevent inconsistencies and ensure smooth develop
 
 #### Subtasks - Task 3.2
 
-- [ ] **3.2.1** Create comprehensive skill database and MCP-powered management
+- [x] **3.2.1** Create comprehensive skill database and MCP-powered management
   - Seed complete skill database with SP costs by category (Normal 120-180, Rare 180-240, Unique variable)
   - Implement skill categorization (Speed, Passive, Recovery, Debuff) with proper relationships
   - Create skill evolution mapping (Normal → Rare upgrade paths) with prerequisite tracking
@@ -812,7 +812,7 @@ This standardization work will prevent inconsistencies and ensure smooth develop
   - **Deploy Skill Analysis Agent** via strands-agents MCP server for skill synergy analysis and optimization
   - _Requirements: 4.4, 31.1, 31.4, 56.3_
 
-- [ ] **3.2.2** Implement MCP agent-enhanced skill hint system with cost reduction
+- [x] **3.2.2** Implement MCP agent-enhanced skill hint system with cost reduction
   - Create hint tracking system with source identification (support cards, events, inheritance)
   - Implement 20% SP cost reduction per duplicate hint with 40% maximum discount calculation
   - Add red "!" indicator logic for guaranteed hint opportunities during training
@@ -820,7 +820,7 @@ This standardization work will prevent inconsistencies and ensure smooth develop
   - **Integrate Hint Optimization Agent** for strategic hint collection and cost minimization planning
   - _Requirements: 26.1, 26.2, 30.1, 30.2, 56.3_
 
-- [ ] **3.2.3** Create MCP-powered skill evolution and prerequisite management
+- [x] **3.2.3** Create MCP-powered skill evolution and prerequisite management
   - Implement automatic skill evolution system (Normal → Rare replacement)
   - Add prerequisite checking for skill evolution chains
   - Create skill evolution planning with optimal acquisition timing
@@ -828,7 +828,7 @@ This standardization work will prevent inconsistencies and ensure smooth develop
   - **Deploy Skill Evolution Agent** for long-term skill development roadmap optimization
   - _Requirements: 31.1, 31.2, 31.3, 31.5, 56.3_
 
-- [ ] **3.2.4** Build MCP agent-orchestrated skill optimization engine
+- [x] **3.2.4** Build MCP agent-orchestrated skill optimization engine
   - Create **SP Budget Management Agent** for hint collection optimization and cost tracking
   - Implement **Hint Farming Strategy Agent** for maximum cost reduction planning
   - Add **Skill Build Planning Agent** with character synergy analysis and meta optimization

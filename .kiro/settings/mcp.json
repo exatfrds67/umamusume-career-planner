@@ -1,72 +1,35 @@
 {
   "mcpServers": {
-    "filesystem": {
-      "command": "npx",
+    "laravel-boost": {
+      "command": "php",
       "args": [
-        "-y",
-        "@modelcontextprotocol/server-filesystem",
-        "c:\\XAMPP\\htdocs\\umamusume-career-planner"
+        "C:\\XAMPP\\htdocs\\umamusume-career-planner\\artisan",
+        "boost:mcp"
       ],
       "disabled": false,
       "autoApprove": [
-        "read_file",
-        "write_file",
-        "create_directory",
-        "list_directory",
-        "move_file",
-        "search_files",
-        "get_file_info",
-        "list_allowed_directories",
-        "read_multiple_files",
-        "edit_file",
-        "read_text_file",
-        "directory_tree",
-        "list_directory_with_sizes"
-      ]
-    },
-    "sequential-thinking": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-sequential-thinking"
-      ],
-      "disabled": false,
-      "autoApprove": [
-        "sequential_thinking",
-        "sequentialthinking"
-      ]
-    },
-    "git": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-git"
-      ],
-      "disabled": true,
-      "autoApprove": [
-        "git_status",
-        "git_diff",
-        "git_log",
-        "git_show",
-        "git_add",
-        "git_commit",
-        "git_push",
-        "git_pull"
-      ]
-    },
-    "sqlite": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-server-sqlite-npx"
-      ],
-      "disabled": true,
-      "autoApprove": [
-        "read_query",
-        "write_query",
-        "create_table",
-        "list_tables",
-        "describe_table"
+        "application_info",
+        "database_schema",
+        "database_query",
+        "list_routes",
+        "search_docs",
+        "tinker",
+        "list_artisan_commands",
+        "get_config",
+        "browser_logs",
+        "last_error",
+        "read_log_entries",
+        "get_absolute_url",
+        "list_available_env_vars",
+        "get-absolute-url",
+        "list-routes",
+        "database-schema",
+        "database-schema",
+        "database-schema",
+        "last-error",
+        "browser-logs",
+        "search-docs",
+        "database-query"
       ]
     },
     "memory": {
@@ -91,135 +54,43 @@
         "open_nodes"
       ]
     },
-    "brave-search": {
+    "filesystem": {
       "command": "npx",
       "args": [
         "-y",
-        "@modelcontextprotocol/server-brave-search"
-      ],
-      "env": {
-        "BRAVE_API_KEY": "$env:BRAVE_API_KEY"
-      },
-      "disabled": true,
-      "autoApprove": [
-        "brave_web_search"
-      ]
-    },
-    "github": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-github"
-      ],
-      "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "$env:GITHUB_PERSONAL_ACCESS_TOKEN"
-      },
-      "disabled": true,
-      "autoApprove": [
-        "create_or_update_file",
-        "search_repositories",
-        "create_repository",
-        "get_file_contents",
-        "push_files"
-      ]
-    },
-    "postgres": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-postgres"
-      ],
-      "disabled": true,
-      "autoApprove": [
-        "read_query",
-        "write_query",
-        "list_tables",
-        "describe_table"
-      ]
-    },
-    "puppeteer": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-puppeteer"
-      ],
-      "disabled": true,
-      "autoApprove": [
-        "puppeteer_screenshot",
-        "puppeteer_click",
-        "puppeteer_fill",
-        "puppeteer_select",
-        "puppeteer_navigate"
-      ]
-    },
-    "gitkraken": {
-      "command": "gk",
-      "args": [
-        "mcp"
+        "@modelcontextprotocol/server-filesystem",
+        "C:\\XAMPP\\htdocs\\umamusume-career-planner"
       ],
       "disabled": false,
       "autoApprove": [
-        "get_pull_requests",
-        "create_pull_request",
-        "get_issues",
-        "create_issue",
-        "get_repositories",
-        "get_branches",
-        "get_commits",
-        "git_status",
-        "git_add_or_commit"
+        "read_file",
+        "read_multiple_files",
+        "list_directory",
+        "list_directory",
+        "list_directory",
+        "search_files",
+        "read_text_file",
+        "read_text_file",
+        "directory_tree",
+        "list_allowed_directories",
+        "get_file_info",
+        "create_directory"
       ]
     },
-    "everart": {
+    "browserstack": {
       "command": "npx",
       "args": [
         "-y",
-        "@modelcontextprotocol/server-everart"
+        "@browserstack/mcp-server"
       ],
       "env": {
-        "EVERART_API_KEY": "$env:EVERART_API_KEY"
+        "BROWSERSTACK_ACCESS_KEY": "$env:BROWSERSTACK_ACCESS_KEY",
+        "BROWSERSTACK_USERNAME": "$env:BROWSERSTACK_USERNAME"
       },
       "disabled": true,
       "autoApprove": [
-        "generate_image"
-      ]
-    },
-    "laravel-boost": {
-      "command": "php",
-      "args": [
-        "artisan",
-        "boost:mcp"
-      ],
-      "disabled": false,
-      "autoApprove": [
-        "application_info",
-        "browser_logs",
-        "database_connections",
-        "database_query",
-        "database_schema",
-        "get_absolute_url",
-        "get_config",
-        "last_error",
-        "list_artisan_commands",
-        "list_available_config_keys",
-        "list_available_env_vars",
-        "list_routes",
-        "read_log_entries",
-        "search_docs",
-        "tinker",
-        "application-info",
-        "database-connections",
-        "database-schema",
-        "list-routes",
-        "get-config",
-        "list-available-config-keys",
-        "search-docs",
-        "get-absolute-url",
-        "list-artisan-commands",
-        "browser-logs",
-        "last-error",
-        "list-available-env-vars",
-        "database-query"
+        "accessibilityExpert",
+        "startAccessibilityScan"
       ]
     }
   }
