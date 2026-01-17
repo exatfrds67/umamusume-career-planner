@@ -12,14 +12,6 @@ export default defineConfig({
     ],
     build: {
         target: "esnext",
-        rollupOptions: {
-            output: {
-                manualChunks: {
-                    vendor: ["chart.js", "alpinejs"],
-                    training: ["resources/js/components/TrainingSystem.js"],
-                },
-            },
-        },
     },
     server: {
         watch: {
