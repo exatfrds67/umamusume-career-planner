@@ -15,29 +15,19 @@ return new class extends Migration
             $table->id();
             $table->foreignId('character_id')->constrained('ucp_characters')->onDelete('cascade');
 
-            // Distance aptitudes (fixed talent ratings G through SS)
-            $table->enum('sprint_aptitude', ['G', 'G+', 'F', 'F+', 'E', 'E+', 'D', 'D+', 'C', 'C+', 'B', 'B+', 'A', 'A+', 'S', 'SS'])->comment('Sprint 1000-1400m aptitude');
-            $table->enum('mile_aptitude', ['G', 'G+', 'F', 'F+', 'E', 'E+', 'D', 'D+', 'C', 'C+', 'B', 'B+', 'A', 'A+', 'S', 'SS'])->comment('Mile 1401-1800m aptitude');
-            $table->enum('medium_aptitude', ['G', 'G+', 'F', 'F+', 'E', 'E+', 'D', 'D+', 'C', 'C+', 'B', 'B+', 'A', 'A+', 'S', 'SS'])->comment('Medium 1801-2400m aptitude');
-            $table->enum('long_aptitude', ['G', 'G+', 'F', 'F+', 'E', 'E+', 'D', 'D+', 'C', 'C+', 'B', 'B+', 'A', 'A+', 'S', 'SS'])->comment('Long 2401m+ aptitude');
+            // Flexible aptitude schema - one row per aptitude type
+            $table->string('distance_type')->nullable()->comment('Distance type: sprint, mile, medium, long');
+            $table->string('surface_type')->nullable()->comment('Surface type: turf, dirt');
+            $table->string('running_style')->nullable()->comment('Running style: front_runner, pace_chaser, late_surger, end_closer');
+            $table->enum('grade', ['G', 'G+', 'F', 'F+', 'E', 'E+', 'D', 'D+', 'C', 'C+', 'B', 'B+', 'A', 'A+', 'S', 'SS'])->comment('Aptitude grade');
 
-            // Surface aptitudes
-            $table->enum('turf_aptitude', ['G', 'G+', 'F', 'F+', 'E', 'E+', 'D', 'D+', 'C', 'C+', 'B', 'B+', 'A', 'A+', 'S', 'SS'])->comment('Turf surface aptitude');
-            $table->enum('dirt_aptitude', ['G', 'G+', 'F', 'F+', 'E', 'E+', 'D', 'D+', 'C', 'C+', 'B', 'B+', 'A', 'A+', 'S', 'SS'])->comment('Dirt surface aptitude');
-
-            // Running style aptitudes
-            $table->enum('front_runner_aptitude', ['G', 'G+', 'F', 'F+', 'E', 'E+', 'D', 'D+', 'C', 'C+', 'B', 'B+', 'A', 'A+', 'S', 'SS'])->comment('Front Runner style aptitude');
-            $table->enum('pace_chaser_aptitude', ['G', 'G+', 'F', 'F+', 'E', 'E+', 'D', 'D+', 'C', 'C+', 'B', 'B+', 'A', 'A+', 'S', 'SS'])->comment('Pace Chaser style aptitude');
-            $table->enum('late_surger_aptitude', ['G', 'G+', 'F', 'F+', 'E', 'E+', 'D', 'D+', 'C', 'C+', 'B', 'B+', 'A', 'A+', 'S', 'SS'])->comment('Late Surger style aptitude');
-            $table->enum('end_closer_aptitude', ['G', 'G+', 'F', 'F+', 'E', 'E+', 'D', 'D+', 'C', 'C+', 'B', 'B+', 'A', 'A+', 'S', 'SS'])->comment('End Closer style aptitude');
-
-            // Metadata
-            $table->json('aptitude_notes')->nullable()->comment('Additional aptitude information and analysis');
             $table->timestamps();
 
-            // Indexes and constraints
-            $table->unique('character_id', 'unique_character_aptitudes');
+            // Indexes
             $table->index('character_id');
+            $table->index(['character_id', 'distance_type']);
+            $table->index(['character_id', 'surface_type']);
+            $table->index(['character_id', 'running_style']);
         });
     }
 

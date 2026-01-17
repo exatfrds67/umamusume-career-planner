@@ -12,26 +12,62 @@ class UcpSkillsSeeder extends Seeder
      */
     public function run(): void
     {
-        $skills = [
-            // Speed Skills
+        // Clear existing skills
+        DB::table('ucp_skills')->truncate();
+
+        // Insert all skills
+        $skills = $this->getAllSkills();
+
+        foreach ($skills as $skill) {
+            DB::table('ucp_skills')->insert($skill);
+        }
+
+        // Set up evolution relationships
+        $this->setupEvolutionRelationships();
+    }
+
+    /**
+     * Get all skills data.
+     */
+    private function getAllSkills(): array
+    {
+        return array_merge(
+            $this->getSpeedSkills(),
+            $this->getPassiveSkills(),
+            $this->getRecoverySkills(),
+            $this->getDebuffSkills(),
+            $this->getUniqueSkills()
+        );
+    }
+
+    /**
+     * Get speed skills (Normal: 120-180 SP, Rare: 180-240 SP).
+     */
+    private function getSpeedSkills(): array
+    {
+        $now = now();
+
+        return [
+            // Normal Speed Skills
             [
                 'name' => 'Go with the Flow',
-                'internal_id' => 'skill_001',
+                'internal_id' => 'speed_001',
                 'skill_type' => 'speed',
                 'rarity' => 'normal',
                 'base_sp_cost' => 120,
+
                 'can_evolve' => true,
                 'is_evolution' => false,
                 'effects' => json_encode([
                     'activation' => 'final_straight',
                     'effect' => 'speed_boost',
                     'duration' => 'short',
-                    'power' => 'medium'
+                    'power' => 'medium',
                 ]),
                 'description' => 'Increases speed in the final straight when in good position',
                 'activation_conditions' => json_encode([
                     'position' => 'top_3',
-                    'phase' => 'final_straight'
+                    'phase' => 'final_straight',
                 ]),
                 'meta_tier' => 'A',
                 'is_active' => true,
@@ -50,12 +86,12 @@ class UcpSkillsSeeder extends Seeder
                     'activation' => 'final_straight',
                     'effect' => 'speed_boost',
                     'duration' => 'medium',
-                    'power' => 'high'
+                    'power' => 'high',
                 ]),
                 'description' => 'Enhanced version - Significantly increases speed in the final straight when in good position',
                 'activation_conditions' => json_encode([
                     'position' => 'top_4',
-                    'phase' => 'final_straight'
+                    'phase' => 'final_straight',
                 ]),
                 'meta_tier' => 'S',
                 'is_active' => true,
@@ -74,7 +110,7 @@ class UcpSkillsSeeder extends Seeder
                 'effects' => json_encode([
                     'activation' => 'passive',
                     'effect' => 'stamina_conservation',
-                    'power' => 'medium'
+                    'power' => 'medium',
                 ]),
                 'description' => 'Reduces stamina consumption during races',
                 'meta_tier' => 'B',
@@ -94,11 +130,11 @@ class UcpSkillsSeeder extends Seeder
                 'effects' => json_encode([
                     'activation' => 'mid_race',
                     'effect' => 'stamina_recovery',
-                    'power' => 'medium'
+                    'power' => 'medium',
                 ]),
                 'description' => 'Recovers stamina during the race',
                 'activation_conditions' => json_encode([
-                    'stamina_threshold' => 'below_50_percent'
+                    'stamina_threshold' => 'below_50_percent',
                 ]),
                 'meta_tier' => 'A',
                 'is_active' => true,
@@ -118,13 +154,13 @@ class UcpSkillsSeeder extends Seeder
                     'activation' => 'final_straight',
                     'effect' => 'massive_speed_boost',
                     'duration' => 'long',
-                    'power' => 'very_high'
+                    'power' => 'very_high',
                 ]),
                 'description' => 'Special Week\'s signature skill - Massive speed boost in final straight',
                 'activation_conditions' => json_encode([
                     'character' => 'Special Week',
                     'phase' => 'final_straight',
-                    'position' => 'any'
+                    'position' => 'any',
                 ]),
                 'meta_tier' => 'S+',
                 'is_active' => true,
@@ -167,7 +203,7 @@ class UcpSkillsSeeder extends Seeder
                 'effects' => json_encode([
                     'activation' => 'passive',
                     'effect' => 'stamina_conservation',
-                    'power' => 'high'
+                    'power' => 'high',
                 ]),
                 'description' => 'Enhanced version - Significantly reduces stamina consumption during races',
                 'meta_tier' => 'A',
