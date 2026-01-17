@@ -1,0 +1,6 @@
+Note: Using configuration file C:\XAMPP\htdocs\umamusume-career-planner\phpstan.neon.
+  0/26 [>---------------------------]   0%[1G[2K 26/26 [============================] 100%
+
+
+ [OK] No errors                                                                                                         
+
