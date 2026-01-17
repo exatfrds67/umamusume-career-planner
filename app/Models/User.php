@@ -247,8 +247,9 @@ class User extends Authenticatable
 
     /**
      * Get the user's display name with accessibility support.
+     *
+     * @return Attribute<string, never>
      */
-    #[\ReturnTypeWillChange]
     protected function displayName(): Attribute
     {
         return Attribute::make(
@@ -258,8 +259,9 @@ class User extends Authenticatable
 
     /**
      * Get the user's active characters count.
+     *
+     * @return Attribute<int, never>
      */
-    #[\ReturnTypeWillChange]
     protected function activeCharactersCount(): Attribute
     {
         return Attribute::make(
