@@ -63,7 +63,23 @@ class TrainingOptimizationAgent
      * Prepare context for MCP agents
      *
      * @param  array<string, mixed>  $context
-     * @return array<string, mixed>
+     * @return array{
+     *     character: array{
+     *         id: int,
+     *         name: string,
+     *         scenario_type: string,
+     *         current_stats: array<string, int>,
+     *         energy_level: int,
+     *         mood_status: string,
+     *         growth_rates: array<string, int>|null,
+     *         facility_levels: array<string, int>|null
+     *     },
+     *     goals: array<string, mixed>,
+     *     support_cards: array<int, array<string, mixed>>,
+     *     training_history: array<int, mixed>,
+     *     upcoming_races: array<int, mixed>,
+     *     team_members: array<int, mixed>
+     * }
      */
     protected function prepareAgentContext(Character $character, array $context): array
     {
@@ -89,7 +105,17 @@ class TrainingOptimizationAgent
     /**
      * Execute multi-agent workflow
      *
-     * @param  array<string, mixed>  $context
+     * @param  array{
+     *     character: array{
+     *         scenario_type: string,
+     *         current_stats: array<string, int>
+     *     },
+     *     goals: array<string, mixed>,
+     *     support_cards: array<int, array<string, mixed>>,
+     *     training_history: array<int, mixed>,
+     *     upcoming_races: array<int, mixed>,
+     *     team_members: array<int, mixed>
+     * }  $context
      * @return array<string, mixed>
      */
     protected function executeAgentWorkflow(array $context): array
@@ -133,8 +159,11 @@ class TrainingOptimizationAgent
     /**
      * Consult Resource Management Agent
      *
-     * @param  array<string, mixed>  $context
-     * @return array<string, mixed>
+     * @param  array{
+     *     character: array{current_stats: array<string, int>},
+     *     goals: array<string, mixed>
+     * }  $context
+     * @return array{priority_stats: array<int, string>, stat_gaps: array<string, int>, resource_efficiency: array<string, mixed>, recommended_focus: string|null}
      */
     protected function consultResourceManagementAgent(array $context): array
     {
@@ -163,8 +192,8 @@ class TrainingOptimizationAgent
     /**
      * Consult Skill Build Planning Agent
      *
-     * @param  array<string, mixed>  $context
-     * @return array<string, mixed>
+     * @param  array{support_cards: array<int, array<string, mixed>>}  $context
+     * @return array{available_skills: array<int, string>, skill_priority: array<int, string>, sp_allocation_strategy: string}
      */
     protected function consultSkillBuildPlanningAgent(array $context): array
     {
@@ -188,7 +217,7 @@ class TrainingOptimizationAgent
     /**
      * Consult Scenario Strategy Agent
      *
-     * @param  array<string, mixed>  $context
+     * @param  array{character: array{scenario_type: string}}  $context
      * @return array<string, mixed>
      */
     protected function consultScenarioStrategyAgent(array $context): array

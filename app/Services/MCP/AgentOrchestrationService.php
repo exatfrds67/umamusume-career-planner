@@ -1,520 +1,556 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services\MCP;
 
-use App\Models\Character;
-use App\Services\MCP\Agents\CareerStrategyAgent;
-use App\Services\MCP\Agents\PerformanceAnalyticsAgent;
-use App\Services\MCP\Agents\ResourceManagementAgent;
-use App\Services\MCP\Agents\SummerCampOptimizationAgent;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 /**
  * Agent Orchestration Service
  *
- * Coordinates multiple MCP agents for collaborative recommendations.
- * Implements agent workflows for comprehensive training optimization
- * by combining insights from specialized agents.
+ * Manages multi-agent workflows, agent lifecycle, and inter-agent communication
+ * using AgentCore MCP server and Strands Agent SDK integration.
  */
 class AgentOrchestrationService
 {
-    protected MCPClientService $mcpClient;
+    /**
+     * Agent orchestration patterns
+     */
+    public const PATTERN_SEQUENTIAL = 'sequential';
 
-    protected CareerStrategyAgent $careerStrategyAgent;
+    public const PATTERN_PARALLEL = 'parallel';
 
-    protected ResourceManagementAgent $resourceManagementAgent;
+    public const PATTERN_HIERARCHICAL = 'hierarchical';
 
-    protected PerformanceAnalyticsAgent $performanceAnalyticsAgent;
+    public const PATTERN_COLLABORATIVE = 'collaborative';
 
-    protected SummerCampOptimizationAgent $summerCampAgent;
+    /**
+     * Agent states
+     */
+    public const STATE_IDLE = 'idle';
+
+    public const STATE_INITIALIZING = 'initializing';
+
+    public const STATE_RUNNING = 'running';
+
+    public const STATE_WAITING = 'waiting';
+
+    public const STATE_COMPLETED = 'completed';
+
+    public const STATE_FAILED = 'failed';
+
+    public const STATE_TERMINATED = 'terminated';
 
     public function __construct(
-        MCPClientService $mcpClient,
-        CareerStrategyAgent $careerStrategyAgent,
-        ResourceManagementAgent $resourceManagementAgent,
-        PerformanceAnalyticsAgent $performanceAnalyticsAgent,
-        SummerCampOptimizationAgent $summerCampAgent
-    ) {
-        $this->mcpClient = $mcpClient;
-        $this->careerStrategyAgent = $careerStrategyAgent;
-        $this->resourceManagementAgent = $resourceManagementAgent;
-        $this->performanceAnalyticsAgent = $performanceAnalyticsAgent;
-        $this->summerCampAgent = $summerCampAgent;
-    }
+        private readonly MCPClientService $mcpClient
+    ) {}
 
     /**
-     * Execute comprehensive multi-agent analysis
-     *
-     * @param  array<string, mixed>  $context
-     * @return array{
-     *     career_strategy: array<string, mixed>,
-     *     resource_management: array<string, mixed>,
-     *     performance_analytics: array<string, mixed>,
-     *     summer_camp: array<string, mixed>,
-     *     integrated_recommendations: array<string, mixed>,
-     *     orchestration_metadata: array<string, mixed>
-     * }
+     * Create a new agent workflow
      */
-    public function executeComprehensiveAnalysis(Character $character, array $context = []): array
-    {
-        $startTime = microtime(true);
-
-        // Execute all agents in parallel (conceptually - actual parallel execution would require async)
-        $results = [
-            'career_strategy' => $this->executeCareerStrategyAgent($character, $context),
-            'resource_management' => $this->executeResourceManagementAgent($character, $context),
-            'performance_analytics' => $this->executePerformanceAnalyticsAgent($character, $context),
-            'summer_camp' => $this->executeSummerCampAgent($character, $context),
-        ];
-
-        // Integrate recommendations from all agents
-        $integratedRecommendations = $this->integrateRecommendations($character, $results, $context);
-
-        // Calculate orchestration metadata
-        $executionTime = microtime(true) - $startTime;
-        $orchestrationMetadata = $this->generateOrchestrationMetadata($results, $executionTime);
-
-        return [
-            ...$results,
-            'integrated_recommendations' => $integratedRecommendations,
-            'orchestration_metadata' => $orchestrationMetadata,
-        ];
-    }
-
-    /**
-     * Execute Career Strategy Agent
-     *
-     * @param  array<string, mixed>  $context
-     * @return array<string, mixed>
-     */
-    protected function executeCareerStrategyAgent(Character $character, array $context = []): array
-    {
-        try {
-            Log::info('Executing Career Strategy Agent', ['character_id' => $character->id]);
-
-            return $this->careerStrategyAgent->analyzeCareerStrategy($character, $context);
-        } catch (\Exception $e) {
-            Log::error('Career Strategy Agent failed', [
-                'error' => $e->getMessage(),
-                'character_id' => $character->id,
-            ]);
-
-            return [
-                'error' => 'Career Strategy Agent execution failed',
-                'message' => $e->getMessage(),
-            ];
-        }
-    }
-
-    /**
-     * Execute Resource Management Agent
-     *
-     * @param  array<string, mixed>  $context
-     * @return array<string, mixed>
-     */
-    protected function executeResourceManagementAgent(Character $character, array $context = []): array
-    {
-        try {
-            Log::info('Executing Resource Management Agent', ['character_id' => $character->id]);
-
-            return $this->resourceManagementAgent->analyzeResourceManagement($character, $context);
-        } catch (\Exception $e) {
-            Log::error('Resource Management Agent failed', [
-                'error' => $e->getMessage(),
-                'character_id' => $character->id,
-            ]);
-
-            return [
-                'error' => 'Resource Management Agent execution failed',
-                'message' => $e->getMessage(),
-            ];
-        }
-    }
-
-    /**
-     * Execute Performance Analytics Agent
-     *
-     * @param  array<string, mixed>  $context
-     * @return array<string, mixed>
-     */
-    protected function executePerformanceAnalyticsAgent(Character $character, array $context = []): array
-    {
-        try {
-            Log::info('Executing Performance Analytics Agent', ['character_id' => $character->id]);
-
-            return $this->performanceAnalyticsAgent->analyzePerformance($character, $context);
-        } catch (\Exception $e) {
-            Log::error('Performance Analytics Agent failed', [
-                'error' => $e->getMessage(),
-                'character_id' => $character->id,
-            ]);
-
-            return [
-                'error' => 'Performance Analytics Agent execution failed',
-                'message' => $e->getMessage(),
-            ];
-        }
-    }
-
-    /**
-     * Execute Summer Camp Optimization Agent
-     *
-     * @param  array<string, mixed>  $context
-     * @return array<string, mixed>
-     */
-    protected function executeSummerCampAgent(Character $character, array $context = []): array
-    {
-        try {
-            Log::info('Executing Summer Camp Optimization Agent', ['character_id' => $character->id]);
-
-            return $this->summerCampAgent->analyzeSummerCampOptimization($character, $context);
-        } catch (\Exception $e) {
-            Log::error('Summer Camp Optimization Agent failed', [
-                'error' => $e->getMessage(),
-                'character_id' => $character->id,
-            ]);
-
-            return [
-                'error' => 'Summer Camp Optimization Agent execution failed',
-                'message' => $e->getMessage(),
-            ];
-        }
-    }
-
-    /**
-     * Integrate recommendations from all agents
-     *
-     * @param  array<string, mixed>  $agentResults
-     * @param  array<string, mixed>  $context
-     * @return array<string, mixed>
-     */
-    protected function integrateRecommendations(
-        Character $character,
-        array $agentResults,
-        array $context = []
+    public function createWorkflow(
+        string $name,
+        string $pattern,
+        array $agents,
+        array $config = []
     ): array {
-        // Extract recommendations from each agent
-        $careerRecs = $agentResults['career_strategy']['recommendations'] ?? [];
-        $resourceRecs = $agentResults['resource_management']['optimization_recommendations'] ?? [];
-        $performanceRecs = $agentResults['performance_analytics']['recommendations'] ?? [];
-        $summerCampRecs = $agentResults['summer_camp']['recommendations'] ?? [];
+        try {
+            $workflowId = $this->generateWorkflowId($name);
 
-        // Determine priority recommendation
-        $priorityRecommendation = $this->determinePriorityRecommendation(
-            $character,
-            $agentResults,
-            $context
-        );
+            $workflow = [
+                'id' => $workflowId,
+                'name' => $name,
+                'pattern' => $pattern,
+                'agents' => $agents,
+                'config' => $config,
+                'state' => self::STATE_IDLE,
+                'created_at' => now()->toIso8601String(),
+                'updated_at' => now()->toIso8601String(),
+            ];
 
-        // Synthesize action plan
-        $actionPlan = $this->synthesizeActionPlan(
-            $character,
-            $agentResults,
-            $priorityRecommendation
-        );
+            // Store workflow in cache
+            Cache::put("workflow:{$workflowId}", $workflow, 3600);
 
-        // Calculate consensus score
-        $consensusScore = $this->calculateConsensusScore($agentResults);
+            Log::info('[AgentOrchestration] Workflow created', [
+                'workflow_id' => $workflowId,
+                'name' => $name,
+                'pattern' => $pattern,
+                'agent_count' => count($agents),
+            ]);
 
-        // Generate integrated summary
-        $summary = $this->generateIntegratedSummary(
-            $character,
-            $agentResults,
-            $priorityRecommendation
-        );
+            return $workflow;
+        } catch (\Exception $e) {
+            Log::error('[AgentOrchestration] Failed to create workflow', [
+                'name' => $name,
+                'error' => $e->getMessage(),
+            ]);
 
-        return [
-            'priority_recommendation' => $priorityRecommendation,
-            'action_plan' => $actionPlan,
-            'consensus_score' => $consensusScore,
-            'summary' => $summary,
-            'all_recommendations' => [
-                'career_strategy' => $careerRecs,
-                'resource_management' => $resourceRecs,
-                'performance_analytics' => $performanceRecs,
-                'summer_camp' => $summerCampRecs,
-            ],
-        ];
+            throw $e;
+        }
     }
 
     /**
-     * Determine priority recommendation from all agents
-     *
-     * @param  array<string, mixed>  $agentResults
-     * @param  array<string, mixed>  $context
-     * @return array<string, mixed>
+     * Execute a workflow
      */
-    protected function determinePriorityRecommendation(
-        Character $character,
-        array $agentResults,
-        array $context = []
-    ): array {
-        // Check for critical situations first
-        $performanceAnalysis = $agentResults['performance_analytics'];
-        $energyAnalysis = $performanceAnalysis['energy_analysis'] ?? [];
-        $summerCampStatus = $agentResults['summer_camp']['summer_camp_status'] ?? [];
-
-        // Critical energy situation
-        if (isset($energyAnalysis['status']) && $energyAnalysis['status'] === 'critical') {
-            return [
-                'priority' => 'critical',
-                'action' => 'rest',
-                'reason' => 'Energy critically low - immediate rest required',
-                'source' => 'performance_analytics',
-            ];
-        }
-
-        // Summer Camp active - highest priority
-        if (isset($summerCampStatus['is_in_camp']) && $summerCampStatus['is_in_camp']) {
-            $careerStrategy = $agentResults['career_strategy'];
-            $priorityStats = $careerStrategy['priority_stats'] ?? [];
-            $topStat = array_key_first($priorityStats);
-
-            return [
-                'priority' => 'critical',
-                'action' => 'training',
-                'focus' => $topStat ?? 'speed',
-                'reason' => 'Summer Camp active - maximize high-priority training',
-                'source' => 'summer_camp',
-            ];
-        }
-
-        // Summer Camp preparation
-        if (isset($summerCampStatus['camp_phase']) && $summerCampStatus['camp_phase'] === 'preparation') {
-            return [
-                'priority' => 'high',
-                'action' => 'prepare_for_summer_camp',
-                'reason' => 'Summer Camp starting soon - optimize energy and mood',
-                'source' => 'summer_camp',
-            ];
-        }
-
-        // Normal priority - follow career strategy
-        $careerStrategy = $agentResults['career_strategy'];
-        $priorityStats = $careerStrategy['priority_stats'] ?? [];
-        $topStat = array_key_first($priorityStats);
-
-        return [
-            'priority' => 'normal',
-            'action' => 'training',
-            'focus' => $topStat ?? 'speed',
-            'reason' => 'Continue goal-based training optimization',
-            'source' => 'career_strategy',
-        ];
-    }
-
-    /**
-     * Synthesize action plan from agent recommendations
-     *
-     * @param  array<string, mixed>  $agentResults
-     * @param  array<string, mixed>  $priorityRecommendation
-     * @return array<string, mixed>
-     */
-    protected function synthesizeActionPlan(
-        Character $character,
-        array $agentResults,
-        array $priorityRecommendation
-    ): array {
-        $plan = [
-            'immediate_action' => $priorityRecommendation,
-            'short_term' => [],
-            'medium_term' => [],
-            'long_term' => [],
-        ];
-
-        // Add short-term actions (next 1-3 turns)
-        $resourceManagement = $agentResults['resource_management'];
-        $turnEconomy = $resourceManagement['turn_economy'] ?? [];
-
-        if (isset($turnEconomy['turns_remaining']) && $turnEconomy['turns_remaining'] < 10) {
-            $plan['short_term'][] = [
-                'action' => 'focus_critical_gaps',
-                'reason' => 'Final turns approaching - prioritize critical stat gaps',
-            ];
-        }
-
-        // Add medium-term actions (next 4-10 turns)
-        $careerStrategy = $agentResults['career_strategy'];
-        $trainingFocus = $careerStrategy['training_focus'] ?? [];
-
-        if (isset($trainingFocus['approach'])) {
-            $plan['medium_term'][] = [
-                'action' => 'follow_training_distribution',
-                'distribution' => $trainingFocus['training_distribution'] ?? [],
-                'reason' => 'Maintain balanced progress toward goals',
-            ];
-        }
-
-        // Add long-term actions (overall career strategy)
-        if (isset($careerStrategy['strategy'])) {
-            $plan['long_term'][] = [
-                'action' => 'execute_career_strategy',
-                'strategy' => $careerStrategy['strategy'],
-                'reason' => 'Long-term career optimization',
-            ];
-        }
-
-        return $plan;
-    }
-
-    /**
-     * Calculate consensus score across agents
-     *
-     * @param  array<string, mixed>  $agentResults
-     */
-    protected function calculateConsensusScore(array $agentResults): float
+    public function executeWorkflow(string $workflowId, array $input = []): array
     {
-        $scores = [];
+        $workflow = $this->getWorkflow($workflowId);
 
-        // Collect confidence/efficiency scores from each agent
-        if (isset($agentResults['career_strategy']['confidence'])) {
-            $scores[] = $agentResults['career_strategy']['confidence'];
+        if (! $workflow) {
+            throw new \RuntimeException("Workflow not found: {$workflowId}");
         }
 
-        if (isset($agentResults['resource_management']['efficiency_score'])) {
-            $scores[] = $agentResults['resource_management']['efficiency_score'];
+        try {
+            $this->updateWorkflowState($workflowId, self::STATE_RUNNING);
+
+            $result = match ($workflow['pattern']) {
+                self::PATTERN_SEQUENTIAL => $this->executeSequential($workflow, $input),
+                self::PATTERN_PARALLEL => $this->executeParallel($workflow, $input),
+                self::PATTERN_HIERARCHICAL => $this->executeHierarchical($workflow, $input),
+                self::PATTERN_COLLABORATIVE => $this->executeCollaborative($workflow, $input),
+                default => throw new \InvalidArgumentException("Unknown pattern: {$workflow['pattern']}"),
+            };
+
+            $this->updateWorkflowState($workflowId, self::STATE_COMPLETED);
+
+            return $result;
+        } catch (\Exception $e) {
+            $this->updateWorkflowState($workflowId, self::STATE_FAILED);
+
+            Log::error('[AgentOrchestration] Workflow execution failed', [
+                'workflow_id' => $workflowId,
+                'error' => $e->getMessage(),
+            ]);
+
+            throw $e;
         }
-
-        if (isset($agentResults['performance_analytics']['optimization_score'])) {
-            $scores[] = $agentResults['performance_analytics']['optimization_score'];
-        }
-
-        if (isset($agentResults['summer_camp']['efficiency_score'])) {
-            $scores[] = $agentResults['summer_camp']['efficiency_score'];
-        }
-
-        if (empty($scores)) {
-            return 0.5;
-        }
-
-        // Calculate average score
-        $averageScore = array_sum($scores) / count($scores);
-
-        // Calculate variance (low variance = high consensus)
-        $mean = $averageScore;
-        $variance = array_sum(array_map(fn ($s) => ($s - $mean) ** 2, $scores)) / count($scores);
-
-        // Consensus score: high average + low variance = high consensus
-        $consensusScore = $averageScore * (1 - min(1.0, $variance * 2));
-
-        return round($consensusScore, 2);
     }
 
     /**
-     * Generate integrated summary
-     *
-     * @param  array<string, mixed>  $agentResults
-     * @param  array<string, mixed>  $priorityRecommendation
+     * Get current workflow for user context
      */
-    protected function generateIntegratedSummary(
-        Character $character,
-        array $agentResults,
-        array $priorityRecommendation
-    ): string {
-        $summaryParts = [];
-
-        // Priority action
-        $action = $priorityRecommendation['action'] ?? 'training';
-        $reason = $priorityRecommendation['reason'] ?? 'Continue development';
-        $summaryParts[] = "Priority: {$action} - {$reason}";
-
-        // Career strategy insight
-        $careerStrategy = $agentResults['career_strategy'];
-        if (isset($careerStrategy['strategy'])) {
-            $summaryParts[] = "Strategy: {$careerStrategy['strategy']}";
-        }
-
-        // Resource management insight
-        $resourceManagement = $agentResults['resource_management'];
-        if (isset($resourceManagement['turn_economy']['turn_efficiency'])) {
-            $efficiency = $resourceManagement['turn_economy']['turn_efficiency'];
-            $efficiencyPercent = round($efficiency * 100, 1);
-            $summaryParts[] = "Turn efficiency: {$efficiencyPercent}%";
-        }
-
-        // Performance insight
-        $performanceAnalytics = $agentResults['performance_analytics'];
-        if (isset($performanceAnalytics['performance_metrics']['performance_rating'])) {
-            $rating = $performanceAnalytics['performance_metrics']['performance_rating'];
-            $summaryParts[] = "Performance: {$rating}";
-        }
-
-        // Summer Camp insight
-        $summerCamp = $agentResults['summer_camp'];
-        if (isset($summerCamp['summer_camp_status']['camp_phase'])) {
-            $phase = $summerCamp['summer_camp_status']['camp_phase'];
-            if ($phase === 'active') {
-                $summaryParts[] = 'Summer Camp ACTIVE - maximize gains!';
-            } elseif ($phase === 'preparation') {
-                $turnsUntil = $summerCamp['summer_camp_status']['turns_until_camp'] ?? 0;
-                $summaryParts[] = "Summer Camp in {$turnsUntil} turns - prepare now";
-            }
-        }
-
-        return implode('. ', $summaryParts).'.';
-    }
-
-    /**
-     * Generate orchestration metadata
-     *
-     * @param  array<string, mixed>  $agentResults
-     */
-    protected function generateOrchestrationMetadata(array $agentResults, float $executionTime): array
+    public function getCurrentWorkflow(?int $userId = null): ?array
     {
-        $agentStatuses = [];
+        return null;
+    }
 
-        foreach ($agentResults as $agentName => $result) {
-            $agentStatuses[$agentName] = [
-                'status' => isset($result['error']) ? 'failed' : 'success',
-                'has_data' => ! isset($result['error']),
-            ];
+    /**
+     * Execute agents sequentially
+     */
+    protected function executeSequential(array $workflow, array $input): array
+    {
+        $results = [];
+        $currentInput = $input;
+
+        foreach ($workflow['agents'] as $agentConfig) {
+            $agentResult = $this->executeAgent($agentConfig, $currentInput);
+            $results[] = $agentResult;
+
+            // Pass output to next agent
+            $currentInput = $agentResult['output'] ?? [];
         }
 
         return [
-            'execution_time_seconds' => round($executionTime, 3),
-            'agents_executed' => count($agentResults),
-            'agent_statuses' => $agentStatuses,
+            'pattern' => self::PATTERN_SEQUENTIAL,
+            'results' => $results,
+            'final_output' => end($results)['output'] ?? [],
+        ];
+    }
+
+    /**
+     * Execute agents in parallel
+     */
+    protected function executeParallel(array $workflow, array $input): array
+    {
+        $results = [];
+
+        foreach ($workflow['agents'] as $agentConfig) {
+            $results[] = $this->executeAgent($agentConfig, $input);
+        }
+
+        return [
+            'pattern' => self::PATTERN_PARALLEL,
+            'results' => $results,
+            'combined_output' => $this->combineOutputs($results),
+        ];
+    }
+
+    /**
+     * Execute agents hierarchically
+     */
+    protected function executeHierarchical(array $workflow, array $input): array
+    {
+        $results = [];
+
+        // Execute coordinator agent first
+        $coordinator = $workflow['agents'][0] ?? null;
+        if (! $coordinator) {
+            throw new \RuntimeException('Hierarchical workflow requires coordinator agent');
+        }
+
+        $coordinatorResult = $this->executeAgent($coordinator, $input);
+        $results['coordinator'] = $coordinatorResult;
+
+        // Execute subordinate agents based on coordinator output
+        $subordinates = array_slice($workflow['agents'], 1);
+        $subordinateResults = [];
+
+        foreach ($subordinates as $agentConfig) {
+            $subordinateResults[] = $this->executeAgent(
+                $agentConfig,
+                $coordinatorResult['output'] ?? []
+            );
+        }
+
+        $results['subordinates'] = $subordinateResults;
+
+        return [
+            'pattern' => self::PATTERN_HIERARCHICAL,
+            'results' => $results,
+            'final_output' => $this->aggregateHierarchicalResults($results),
+        ];
+    }
+
+    /**
+     * Execute agents collaboratively
+     */
+    protected function executeCollaborative(array $workflow, array $input): array
+    {
+        $results = [];
+        $sharedContext = $input;
+
+        foreach ($workflow['agents'] as $agentConfig) {
+            $agentResult = $this->executeAgent($agentConfig, $sharedContext);
+            $results[] = $agentResult;
+
+            // Update shared context with agent output
+            $sharedContext = array_merge($sharedContext, $agentResult['output'] ?? []);
+        }
+
+        return [
+            'pattern' => self::PATTERN_COLLABORATIVE,
+            'results' => $results,
+            'shared_context' => $sharedContext,
+        ];
+    }
+
+    /**
+     * Execute a single agent
+     */
+    protected function executeAgent(array $agentConfig, array $input): array
+    {
+        $agentId = $agentConfig['id'] ?? uniqid('agent_');
+        $agentType = $agentConfig['type'] ?? 'generic';
+
+        try {
+            $startTime = microtime(true);
+
+            // Update agent state
+            $this->updateAgentState($agentId, self::STATE_RUNNING);
+
+            // Execute agent via MCP
+            $output = $this->mcpClient->executeAgent($agentType, $input);
+
+            $executionTime = microtime(true) - $startTime;
+
+            // Update agent state
+            $this->updateAgentState($agentId, self::STATE_COMPLETED);
+
+            // Record performance metrics
+            $this->recordAgentMetrics($agentId, [
+                'execution_time' => $executionTime,
+                'input_size' => strlen(json_encode($input)),
+                'output_size' => strlen(json_encode($output)),
+            ]);
+
+            return [
+                'agent_id' => $agentId,
+                'agent_type' => $agentType,
+                'state' => self::STATE_COMPLETED,
+                'output' => $output,
+                'execution_time' => $executionTime,
+            ];
+        } catch (\Exception $e) {
+            $this->updateAgentState($agentId, self::STATE_FAILED);
+
+            Log::error('[AgentOrchestration] Agent execution failed', [
+                'agent_id' => $agentId,
+                'agent_type' => $agentType,
+                'error' => $e->getMessage(),
+            ]);
+
+            return [
+                'agent_id' => $agentId,
+                'agent_type' => $agentType,
+                'state' => self::STATE_FAILED,
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Create a new agent
+     */
+    public function createAgent(string $type, array $config = []): array
+    {
+        try {
+            $agentId = $this->generateAgentId($type);
+
+            $agent = [
+                'id' => $agentId,
+                'type' => $type,
+                'config' => $config,
+                'state' => self::STATE_IDLE,
+                'created_at' => now()->toIso8601String(),
+                'updated_at' => now()->toIso8601String(),
+            ];
+
+            // Store agent in cache
+            Cache::put("agent:{$agentId}", $agent, 3600);
+
+            Log::info('[AgentOrchestration] Agent created', [
+                'agent_id' => $agentId,
+                'type' => $type,
+            ]);
+
+            return $agent;
+        } catch (\Exception $e) {
+            Log::error('[AgentOrchestration] Failed to create agent', [
+                'type' => $type,
+                'error' => $e->getMessage(),
+            ]);
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Monitor agent performance
+     */
+    public function monitorAgent(string $agentId): array
+    {
+        $agent = $this->getAgent($agentId);
+
+        if (! $agent) {
+            throw new \RuntimeException("Agent not found: {$agentId}");
+        }
+
+        $metrics = $this->getAgentMetrics($agentId);
+
+        return [
+            'agent_id' => $agentId,
+            'type' => $agent['type'],
+            'state' => $agent['state'],
+            'metrics' => $metrics,
+            'health' => $this->calculateAgentHealth($metrics),
+        ];
+    }
+
+    /**
+     * Terminate an agent
+     */
+    public function terminateAgent(string $agentId): bool
+    {
+        try {
+            $this->updateAgentState($agentId, self::STATE_TERMINATED);
+
+            // Clean up agent resources
+            Cache::forget("agent:{$agentId}");
+            Cache::forget("agent_metrics:{$agentId}");
+
+            Log::info('[AgentOrchestration] Agent terminated', [
+                'agent_id' => $agentId,
+            ]);
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error('[AgentOrchestration] Failed to terminate agent', [
+                'agent_id' => $agentId,
+                'error' => $e->getMessage(),
+            ]);
+
+            return false;
+        }
+    }
+
+    /**
+     * Get agent performance analytics
+     */
+    public function getAgentAnalytics(string $agentId): array
+    {
+        $metrics = $this->getAgentMetrics($agentId);
+
+        if (empty($metrics)) {
+            return [
+                'agent_id' => $agentId,
+                'total_executions' => 0,
+                'average_execution_time' => 0,
+                'success_rate' => 0,
+                'recommendations' => [],
+            ];
+        }
+
+        $totalExecutions = count($metrics);
+        $successfulExecutions = count(array_filter($metrics, fn ($m) => $m['success'] ?? false));
+        $executionTimes = array_column($metrics, 'execution_time');
+
+        $analytics = [
+            'agent_id' => $agentId,
+            'total_executions' => $totalExecutions,
+            'successful_executions' => $successfulExecutions,
+            'failed_executions' => $totalExecutions - $successfulExecutions,
+            'success_rate' => $totalExecutions > 0 ? ($successfulExecutions / $totalExecutions) * 100 : 0,
+            'average_execution_time' => ! empty($executionTimes) ? array_sum($executionTimes) / count($executionTimes) : 0,
+            'min_execution_time' => ! empty($executionTimes) ? min($executionTimes) : 0,
+            'max_execution_time' => ! empty($executionTimes) ? max($executionTimes) : 0,
+            'recommendations' => $this->generateOptimizationRecommendations($metrics),
+        ];
+
+        return $analytics;
+    }
+
+    /**
+     * Generate optimization recommendations
+     */
+    protected function generateOptimizationRecommendations(array $metrics): array
+    {
+        $recommendations = [];
+
+        if (empty($metrics)) {
+            return $recommendations;
+        }
+
+        $executionTimes = array_column($metrics, 'execution_time');
+        $avgTime = array_sum($executionTimes) / count($executionTimes);
+
+        // Performance recommendations
+        if ($avgTime > 5.0) {
+            $recommendations[] = [
+                'type' => 'performance',
+                'severity' => 'high',
+                'message' => 'Average execution time is high. Consider optimizing agent logic or using parallel execution.',
+            ];
+        }
+
+        // Success rate recommendations
+        $successRate = count(array_filter($metrics, fn ($m) => $m['success'] ?? false)) / count($metrics);
+        if ($successRate < 0.8) {
+            $recommendations[] = [
+                'type' => 'reliability',
+                'severity' => 'high',
+                'message' => 'Success rate is below 80%. Review error logs and improve error handling.',
+            ];
+        }
+
+        return $recommendations;
+    }
+
+    /**
+     * Helper methods
+     */
+    protected function generateWorkflowId(string $name): string
+    {
+        return 'workflow_'.md5($name.microtime(true));
+    }
+
+    protected function generateAgentId(string $type): string
+    {
+        return 'agent_'.$type.'_'.uniqid();
+    }
+
+    protected function getWorkflow(string $workflowId): ?array
+    {
+        return Cache::get("workflow:{$workflowId}");
+    }
+
+    protected function getAgent(string $agentId): ?array
+    {
+        return Cache::get("agent:{$agentId}");
+    }
+
+    protected function updateWorkflowState(string $workflowId, string $state): void
+    {
+        $workflow = $this->getWorkflow($workflowId);
+        if ($workflow) {
+            $workflow['state'] = $state;
+            $workflow['updated_at'] = now()->toIso8601String();
+            Cache::put("workflow:{$workflowId}", $workflow, 3600);
+        }
+    }
+
+    protected function updateAgentState(string $agentId, string $state): void
+    {
+        $agent = $this->getAgent($agentId);
+        if ($agent) {
+            $agent['state'] = $state;
+            $agent['updated_at'] = now()->toIso8601String();
+            Cache::put("agent:{$agentId}", $agent, 3600);
+        }
+    }
+
+    protected function recordAgentMetrics(string $agentId, array $metrics): void
+    {
+        $allMetrics = Cache::get("agent_metrics:{$agentId}", []);
+        $allMetrics[] = array_merge($metrics, [
             'timestamp' => now()->toIso8601String(),
-        ];
+            'success' => ! isset($metrics['error']),
+        ]);
+
+        // Keep only last 100 metrics
+        if (count($allMetrics) > 100) {
+            $allMetrics = array_slice($allMetrics, -100);
+        }
+
+        Cache::put("agent_metrics:{$agentId}", $allMetrics, 3600);
     }
 
-    /**
-     * Get quick recommendation (cached, lightweight)
-     *
-     * @param  array<string, mixed>  $context
-     * @return array<string, mixed>
-     */
-    public function getQuickRecommendation(Character $character, array $context = []): array
+    protected function getAgentMetrics(string $agentId): array
     {
-        $cacheKey = "quick_recommendation_{$character->id}_".md5(json_encode($context) ?: '');
+        return Cache::get("agent_metrics:{$agentId}", []);
+    }
 
-        return Cache::remember($cacheKey, 60, function () use ($character, $context) {
-            // Execute only priority agents for quick response
-            $careerStrategy = $this->executeCareerStrategyAgent($character, $context);
-            $performanceAnalytics = $this->executePerformanceAnalyticsAgent($character, $context);
+    protected function calculateAgentHealth(array $metrics): string
+    {
+        if (empty($metrics)) {
+            return 'unknown';
+        }
 
-            // Determine quick recommendation
-            $priorityStats = $careerStrategy['priority_stats'] ?? [];
-            $topStat = array_key_first($priorityStats);
+        $recentMetrics = array_slice($metrics, -10);
+        $successRate = count(array_filter($recentMetrics, fn ($m) => $m['success'] ?? false)) / count($recentMetrics);
 
-            $energyAnalysis = $performanceAnalytics['energy_analysis'] ?? [];
-            $energyStatus = $energyAnalysis['status'] ?? 'good';
+        if ($successRate >= 0.9) {
+            return 'healthy';
+        } elseif ($successRate >= 0.7) {
+            return 'degraded';
+        } else {
+            return 'unhealthy';
+        }
+    }
 
-            if ($energyStatus === 'critical' || $energyStatus === 'low') {
-                return [
-                    'action' => 'rest',
-                    'reason' => 'Energy too low for effective training',
-                    'confidence' => 0.9,
-                ];
+    protected function combineOutputs(array $results): array
+    {
+        $combined = [];
+        foreach ($results as $result) {
+            if (isset($result['output']) && is_array($result['output'])) {
+                $combined = array_merge($combined, $result['output']);
             }
+        }
 
-            return [
-                'action' => 'training',
-                'focus' => $topStat ?? 'speed',
-                'reason' => 'Continue goal-based optimization',
-                'confidence' => $careerStrategy['confidence'] ?? 0.7,
-            ];
-        });
+        return $combined;
+    }
+
+    protected function aggregateHierarchicalResults(array $results): array
+    {
+        $aggregated = $results['coordinator']['output'] ?? [];
+
+        foreach ($results['subordinates'] as $subordinateResult) {
+            if (isset($subordinateResult['output']) && is_array($subordinateResult['output'])) {
+                $aggregated = array_merge($aggregated, $subordinateResult['output']);
+            }
+        }
+
+        return $aggregated;
     }
 }
