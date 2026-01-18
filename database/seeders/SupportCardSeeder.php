@@ -46,6 +46,18 @@ class SupportCardSeeder extends Seeder
                 $cardData
             );
         }
+
+        // B-Tier Support Cards (Solid options for specific builds)
+        $bTierCards = $this->getBTierCards();
+        foreach ($bTierCards as $cardData) {
+            SupportCardDefinition::updateOrCreate(
+                ['internal_id' => $cardData['internal_id']],
+                $cardData
+            );
+        }
+
+        $this->command->info('Support card database seeded successfully!');
+        $this->command->info('Total cards: '.(count($ssTierCards) + count($sTierCards) + count($aTierCards) + count($bTierCards)));
     }
 
     /**
@@ -69,6 +81,7 @@ class SupportCardSeeder extends Seeder
                 'training_effect_bonus' => 15, // 10+5% at MLB
                 'friendship_bonus' => 25, // 25% at MLB
                 'meta_tier' => 'S+',
+                'artwork_url' => '/images/support_cards/Kitasan_Black_Fire_at_My_Heels.png',
                 'skill_hints_provided' => [
                     'Professor of Curvature',
                     'Corner Adept ◯',
@@ -95,6 +108,8 @@ class SupportCardSeeder extends Seeder
                     'Can provide Practice Perfect ◯',
                     'Performs best at LB3 or MLB',
                 ],
+                'recommended_scenarios' => ['URA Finale', 'Unity Cup'],
+                'deck_synergies' => ['Fine Motion', 'Super Creek', 'Tazuna Hayakawa'],
                 'usage_rate' => 98.5,
                 'win_rate_contribution' => 96.2,
                 'is_active' => true,
@@ -112,6 +127,7 @@ class SupportCardSeeder extends Seeder
                 'training_effect_bonus' => 10,
                 'friendship_bonus' => 20,
                 'meta_tier' => 'S+',
+                'artwork_url' => '/images/support_cards/Super_Creek_Piece_of_Mind.png',
                 'skill_hints_provided' => [
                     'Swinging Maestro',
                     'Stamina recovery skills',
@@ -144,6 +160,7 @@ class SupportCardSeeder extends Seeder
                 'training_effect_bonus' => 10,
                 'friendship_bonus' => 20,
                 'meta_tier' => 'S+',
+                'artwork_url' => '/images/support_cards/Fine_Motion_Wave_of_Gratitude.jpg',
                 'skill_hints_provided' => [
                     'Speed Star',
                     'Right-Handed ◯',
@@ -187,6 +204,7 @@ class SupportCardSeeder extends Seeder
                 'event_recovery_bonus' => 15,
                 'event_effect_bonus' => 15,
                 'meta_tier' => 'S+',
+                'artwork_url' => '/images/support_cards/Tazuna_Hayakawa_Tracen_Reception.jpg',
                 'skill_hints_provided' => [
                     'Tail Held High',
                     'Concentration',
@@ -379,6 +397,7 @@ class SupportCardSeeder extends Seeder
                 'training_effect_bonus' => 8,
                 'friendship_bonus' => 20,
                 'meta_tier' => 'S',
+                'artwork_url' => '/images/support_cards/Silence_Suzuka_Beyond_This_Shining_Moment.png',
                 'skill_hints_provided' => [
                     'Front Runner Savvy',
                     'Unrestrained',
@@ -432,6 +451,8 @@ class SupportCardSeeder extends Seeder
                     'All-rounder card',
                     'Good for Pace Chasers',
                 ],
+                'recommended_scenarios' => ['URA Finale', 'Unity Cup'],
+                'deck_synergies' => ['Fine Motion', 'Super Creek'],
                 'usage_rate' => 76.8,
                 'win_rate_contribution' => 74.5,
                 'is_active' => true,
@@ -449,17 +470,24 @@ class SupportCardSeeder extends Seeder
                 'training_effect_bonus' => 7,
                 'friendship_bonus' => 18,
                 'meta_tier' => 'A',
+                'artwork_url' => '/images/support_cards/Tokai_Teio_Dream_Big!.png',
                 'skill_hints_provided' => [
                     'Rushing Gale!',
                     'Pace Chaser Straightaways ◯',
+                    'Pace Chaser Corners ◯',
+                    'Pace Chaser Acceleration',
                 ],
                 'unique_effects' => [
                     'Lot of yellow skills for Pace Chasers',
+                    'Good Training Effectiveness',
                 ],
                 'strategic_notes' => [
                     'Good for Pace Chaser style',
                     'Has Rushing Gale!',
+                    'Best for Mile and Medium distances',
                 ],
+                'recommended_scenarios' => ['URA Finale', 'Unity Cup'],
+                'deck_synergies' => ['Fine Motion', 'El Condor Pasa'],
                 'usage_rate' => 75.2,
                 'win_rate_contribution' => 73.1,
                 'is_active' => true,
@@ -480,6 +508,7 @@ class SupportCardSeeder extends Seeder
                 'skill_hints_provided' => [
                     'Killer Tunes',
                     'Hawkeye',
+                    'Pace Chaser skills',
                 ],
                 'unique_effects' => [
                     'Good Training Effectiveness',
@@ -489,6 +518,8 @@ class SupportCardSeeder extends Seeder
                     'Lot of yellow skills for Medium-focused Pace Chasers',
                     'Has navigational skill Hawkeye',
                 ],
+                'recommended_scenarios' => ['URA Finale', 'Unity Cup'],
+                'deck_synergies' => ['Tokai Teio', 'Fine Motion'],
                 'usage_rate' => 74.6,
                 'win_rate_contribution' => 72.8,
                 'is_active' => true,
@@ -505,9 +536,11 @@ class SupportCardSeeder extends Seeder
                 'training_effect_bonus' => 7,
                 'friendship_bonus' => 18,
                 'meta_tier' => 'A',
+                'artwork_url' => '/images/support_cards/Mejiro_McQueen_Your_Team_Ace.png',
                 'skill_hints_provided' => [
                     'Cooldown',
                     'Recovery skills',
+                    'Long distance skills',
                 ],
                 'unique_effects' => [
                     'Good recovery skills for Long-focused Pace Chasers',
@@ -516,7 +549,10 @@ class SupportCardSeeder extends Seeder
                 'strategic_notes' => [
                     'Can give Cooldown',
                     'Good for Long distance races',
+                    'Essential for Long distance builds',
                 ],
+                'recommended_scenarios' => ['URA Finale'],
+                'deck_synergies' => ['Super Creek', 'Special Week'],
                 'usage_rate' => 73.4,
                 'win_rate_contribution' => 71.6,
                 'is_active' => true,
@@ -538,6 +574,7 @@ class SupportCardSeeder extends Seeder
                     'Moxie',
                     'Leader\'s Pride',
                     'Taking the Lead',
+                    'Front Runner skills',
                 ],
                 'unique_effects' => [
                     'Large amount of Front Runner yellow skills',
@@ -546,9 +583,171 @@ class SupportCardSeeder extends Seeder
                 'strategic_notes' => [
                     'Useful event skills for Front Runners',
                     'Has Taking the Lead',
+                    'Best for Sprint and Mile distances',
                 ],
+                'recommended_scenarios' => ['URA Finale', 'Unity Cup'],
+                'deck_synergies' => ['Silence Suzuka', 'Kitasan Black'],
                 'usage_rate' => 72.1,
                 'win_rate_contribution' => 70.3,
+                'is_active' => true,
+            ],
+        ];
+    }
+
+    /**
+     * B-Tier Support Cards
+     * Solid options for specific builds or budget alternatives
+     */
+    private function getBTierCards(): array
+    {
+        return [
+            // Vodka - Power card
+            [
+                'name' => 'Vodka [Vodka Tonic]',
+                'internal_id' => 'GLOBAL_SC_VODKA_TONIC',
+                'card_type' => 'power',
+                'rarity' => 'SSR',
+                'character_name' => 'Vodka',
+                'character_internal_id' => 'CHAR_VODKA',
+                'power_bonus' => 1,
+                'training_effect_bonus' => 6,
+                'friendship_bonus' => 16,
+                'meta_tier' => 'B',
+                'skill_hints_provided' => [
+                    'Power-related skills',
+                ],
+                'unique_effects' => [
+                    'Decent Power training bonuses',
+                ],
+                'strategic_notes' => [
+                    'Budget Power option',
+                    'Good for beginners',
+                ],
+                'recommended_scenarios' => ['URA Finale'],
+                'deck_synergies' => ['El Condor Pasa', 'Rice Shower'],
+                'usage_rate' => 65.3,
+                'win_rate_contribution' => 63.8,
+                'is_active' => true,
+            ],
+
+            // Grass Wonder - Stamina card
+            [
+                'name' => 'Grass Wonder [Endless Curiosity]',
+                'internal_id' => 'GLOBAL_SC_GRASSWONDER_CURIOSITY',
+                'card_type' => 'stamina',
+                'rarity' => 'SSR',
+                'character_name' => 'Grass Wonder',
+                'character_internal_id' => 'CHAR_GRASSWONDER',
+                'stamina_bonus' => 1,
+                'training_effect_bonus' => 6,
+                'friendship_bonus' => 16,
+                'meta_tier' => 'B',
+                'skill_hints_provided' => [
+                    'Stamina recovery skills',
+                ],
+                'unique_effects' => [
+                    'Decent Stamina training bonuses',
+                ],
+                'strategic_notes' => [
+                    'Budget Stamina option',
+                    'Alternative to Super Creek',
+                ],
+                'recommended_scenarios' => ['URA Finale'],
+                'deck_synergies' => ['Super Creek', 'Mejiro McQueen'],
+                'usage_rate' => 64.7,
+                'win_rate_contribution' => 62.9,
+                'is_active' => true,
+            ],
+
+            // Haru Urara - Guts card
+            [
+                'name' => 'Haru Urara [Cheer Up!]',
+                'internal_id' => 'GLOBAL_SC_HARUURA_CHEERUP',
+                'card_type' => 'guts',
+                'rarity' => 'SSR',
+                'character_name' => 'Haru Urara',
+                'character_internal_id' => 'CHAR_HARUURA',
+                'guts_bonus' => 1,
+                'training_effect_bonus' => 6,
+                'friendship_bonus' => 16,
+                'event_recovery_bonus' => 10,
+                'meta_tier' => 'B',
+                'skill_hints_provided' => [
+                    'Guts-related skills',
+                    'Recovery skills',
+                ],
+                'unique_effects' => [
+                    'Good energy recovery events',
+                    'Mood improvement',
+                ],
+                'strategic_notes' => [
+                    'Useful for energy management',
+                    'Good events for consistency',
+                ],
+                'recommended_scenarios' => ['URA Finale', 'Unity Cup'],
+                'deck_synergies' => ['Tazuna Hayakawa', 'Riko Kashimoto'],
+                'usage_rate' => 63.2,
+                'win_rate_contribution' => 61.5,
+                'is_active' => true,
+            ],
+
+            // Symboli Rudolf - Wit card
+            [
+                'name' => 'Symboli Rudolf [Emperor\'s Dignity]',
+                'internal_id' => 'GLOBAL_SC_SYMBOLIRUDOLF_EMPEROR',
+                'card_type' => 'wit',
+                'rarity' => 'SSR',
+                'character_name' => 'Symboli Rudolf',
+                'character_internal_id' => 'CHAR_SYMBOLIRUDOLF',
+                'wit_bonus' => 1,
+                'training_effect_bonus' => 6,
+                'friendship_bonus' => 16,
+                'meta_tier' => 'B',
+                'skill_hints_provided' => [
+                    'Wit-related skills',
+                    'Positioning skills',
+                ],
+                'unique_effects' => [
+                    'Decent Wit training bonuses',
+                ],
+                'strategic_notes' => [
+                    'Budget Wit option',
+                    'Good for skill activation builds',
+                ],
+                'recommended_scenarios' => ['URA Finale', 'Unity Cup'],
+                'deck_synergies' => ['Fine Motion'],
+                'usage_rate' => 62.8,
+                'win_rate_contribution' => 60.9,
+                'is_active' => true,
+            ],
+
+            // Machikane Fukukitaru - Friend card
+            [
+                'name' => 'Machikane Fukukitaru [Lucky Charm]',
+                'internal_id' => 'GLOBAL_SC_MACHIKANEFUKUKITARU_LUCKY',
+                'card_type' => 'friend',
+                'rarity' => 'SSR',
+                'character_name' => 'Machikane Fukukitaru',
+                'character_internal_id' => 'CHAR_MACHIKANEFUKUKITARU',
+                'friendship_bonus' => 16,
+                'event_recovery_bonus' => 12,
+                'event_effect_bonus' => 12,
+                'meta_tier' => 'B',
+                'skill_hints_provided' => [
+                    'Support skills',
+                ],
+                'unique_effects' => [
+                    'Good energy recovery',
+                    'Mood improvement events',
+                ],
+                'strategic_notes' => [
+                    'Budget Friend option',
+                    'Alternative to Tazuna',
+                ],
+                'recommended_scenarios' => ['URA Finale'],
+                'deck_synergies' => ['Tazuna Hayakawa', 'Riko Kashimoto'],
+                'usage_rate' => 61.5,
+                'win_rate_contribution' => 59.7,
                 'is_active' => true,
             ],
         ];
