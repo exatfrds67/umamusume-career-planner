@@ -8,4 +8,12 @@ parameters:
     - routes
     - tests
 
+  stubFiles:
+    - phpstan-stubs/mockery.php
+    - phpstan-stubs/testcase-properties.php
+
+  scanFiles:
+    - phpstan-stubs/mockery.php
+    - phpstan-stubs/testcase-properties.php
+
   treatPhpDocTypesAsCertain: false

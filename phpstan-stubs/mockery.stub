@@ -1,0 +1,23 @@
+<?php
+
+namespace Mockery;
+
+interface ExpectationInterface
+{
+    /**
+     * @param mixed ...$args
+     */
+    public function andReturn(...$args): self;
+
+    public function andReturnSelf(): self;
+}
+
+final class HigherOrderMessage
+{
+    /**
+     * @param mixed ...$args
+     */
+    public function andReturn(...$args): self {}
+
+    public function andReturnSelf(): self {}
+}

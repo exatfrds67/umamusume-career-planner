@@ -1,0 +1,53 @@
+<?php
+
+namespace PHPUnit\Framework;
+
+/**
+ * @method void assertDatabaseHas(string $table, array<string, mixed> $data, string $connection = null)
+ * @method void assertDatabaseMissing(string $table, array<string, mixed> $data, string $connection = null)
+ * @method \Illuminate\Testing\TestResponse<\Illuminate\Http\Response> get(string $uri, array<string, string> $headers = [])
+ * @method \Illuminate\Testing\TestResponse<\Illuminate\Http\JsonResponse> getJson(string $uri, array<string, string> $headers = [])
+ * @method \Illuminate\Testing\TestResponse<\Illuminate\Http\Response> post(string $uri, array<string, mixed> $data = [], array<string, string> $headers = [])
+ * @method \Illuminate\Testing\TestResponse<\Illuminate\Http\JsonResponse> postJson(string $uri, array<string, mixed> $data = [], array<string, string> $headers = [])
+ * @property mixed $user
+ * @property mixed $character
+ * @property mixed $service
+ * @property mixed $mcpClient
+ * @property mixed $costManager
+ * @property mixed $pricingService
+ * @property mixed $knowledgeService
+ * @property mixed $apiService
+ * @property mixed $deckService
+ * @property mixed $optimizationService
+ * @property mixed $friendshipService
+ * @property mixed $supportCards
+ * @property mixed $supportCard
+ * @property mixed $characterSupportCard
+ * @property mixed $hintService
+ * @property mixed $evolutionService
+ * @property mixed $targetSkills
+ * @property mixed $currentSkills
+ * @property mixed $trainingAgent
+ * @property mixed $agent
+ * @property mixed $careerAgent
+ * @property mixed $raceAgent
+ * @property mixed $skillAgent
+ * @property mixed $orchestration
+ * @property mixed $deck
+ * @property mixed $normalSkill
+ * @property mixed $rareSkill
+ * @property mixed $skill
+ * @property mixed $skills
+ */
+class TestCase {}
+
+namespace Pest\PendingCalls;
+
+/**
+ * @property mixed $user
+ * @property mixed $character
+ * @property mixed $service
+ * @property mixed $mcpClient
+ * @property mixed $trainingAgent
+ */
+class TestCall {}
