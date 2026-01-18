@@ -21,10 +21,22 @@ return Application::configure(basePath: dirname(__DIR__))
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
         ]);
 
+        // Web middleware - prevent aggressive HTML caching
+        $middleware->web(append: [
+            \App\Http\Middleware\SetCacheHeaders::class,
+        ]);
+
         // Security headers middleware alias
         $middleware->alias([
             'security.headers' => \App\Http\Middleware\SecurityHeaders::class,
         ]);
+
+        // Configure authentication redirects - redirect to welcome page instead of login
+        $middleware->redirectGuestsTo(
+            fn (Request $request) => $request->expectsJson()
+                ? null
+                : route('welcome')
+        );
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // Handle rate limiting exceptions for API
