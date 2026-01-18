@@ -130,8 +130,7 @@
                                 <div class="space-y-2">
                                     <div class="flex justify-between text-xs font-semibold uppercase tracking-wider">
                                         <span class="text-gray-500 dark:text-gray-400">Goal Progress</span>
-                                        <span
-                                            class="text-primary-500">{{ $character->getProgressPercentage() }}%</span>
+                                        <span class="text-primary-500">{{ $character->getProgressPercentage() }}%</span>
                                     </div>
                                     <x-ui.progress-bar :value="$character->getProgressPercentage()" :max="100" color="bg-primary-500"
                                         size="sm" :show-text="false" />
@@ -180,8 +179,7 @@
                                         @endif
                                     </div>
 
-                                    <div
-                                        class="relative h-3 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                                    <div class="relative h-3 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
                                         <!-- Target Marker -->
                                         @if ($target > 0)
                                             <div class="absolute top-0 bottom-0 w-0.5 bg-gray-400 dark:bg-gray-500 z-10"
@@ -194,13 +192,6 @@
                                     </div>
                                 </div>
                             @endforeach
-                        </div>
-                    </div>
-                    <div class="card-footer">
-                        <div class="text-xs text-blue-600 dark:text-blue-400 flex flex-col sm:flex-row gap-2">
-                            <span>• 901-1200: Optimal Training Range</span>
-                            <span>• 1200+: Diminishing Returns</span>
-                            <span>• Hidden Race Boost: +400</span>
                         </div>
                     </div>
                 </div>
@@ -286,7 +277,9 @@
                     @endif
                 </div>
 
-                <!-- Recent Careers / History -->
+                {{-- Recent Careers / History - Feature not yet implemented --}}
+                {{-- TODO: Implement careers tracking system --}}
+                {{--
                 <div class="card">
                     <div class="card-header">
                         <h3 class="text-lg font-bold text-gray-900 dark:text-white">Training Careers</h3>
@@ -313,6 +306,7 @@
                         </div>
                     @endif
                 </div>
+                --}}
             </div>
 
             <!-- Right Column: Aptitudes & Skills -->
@@ -461,8 +455,7 @@
                                         $parentName = is_array($parent) ? $parent['name'] ?? 'Unknown' : $parent;
                                     @endphp
                                     <div class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-                                        <svg class="w-4 h-4 text-primary-500" fill="currentColor"
-                                            viewBox="0 0 20 20">
+                                        <svg class="w-4 h-4 text-primary-500" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd"
                                                 d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
                                                 clip-rule="evenodd" />

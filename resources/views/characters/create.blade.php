@@ -392,8 +392,8 @@
                                         :class="formData.avatar_url === '{{ $imagePath }}' ?
                                             'border-primary-500 ring-2 ring-primary-500' :
                                             'border-gray-300 dark:border-gray-600'">
-                                        <img src="{{ $imagePath }}" alt="{{ $imageName }}"
-                                            class="w-full h-full object-cover">
+                                        <img src="{{ $imagePath }}" alt="{{ $imageName }}" loading="lazy"
+                                            decoding="async" class="w-full h-full object-cover">
                                         <div
                                             class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                             <span
@@ -564,12 +564,9 @@
                                     clip-rule="evenodd" />
                             </svg>
                             <div class="text-sm text-blue-800 dark:text-blue-200">
-                                <p class="font-semibold mb-1">Training Tips:</p>
-                                <ul class="list-disc list-inside space-y-1 text-xs">
-                                    <li>901-1200: Optimal training range with best gains</li>
-                                    <li>1200+: Diminishing returns, focus on other stats</li>
-                                    <li>Hidden race boost adds +400 to displayed stats</li>
-                                </ul>
+                                <p class="font-semibold mb-1">Stat Information:</p>
+                                <p class="text-xs">Set your character's initial stats. These will grow through training and
+                                    races.</p>
                             </div>
                         </div>
                     </div>

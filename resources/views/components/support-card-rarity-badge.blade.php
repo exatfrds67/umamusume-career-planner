@@ -1,15 +1,25 @@
-@props(['rarity'])
+@props(['rarity', 'size' => 'sm'])
 
 @php
-    $colors = [
-        'SSR' => 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white',
-        'SR' => 'bg-gradient-to-r from-purple-400 to-pink-500 text-white',
-        'R' => 'bg-gradient-to-r from-blue-400 to-cyan-500 text-white',
+    $sizeClasses = [
+        'xs' => 'px-1.5 py-0.5 text-xs',
+        'sm' => 'px-2 py-0.5 text-xs',
+        'md' => 'px-2.5 py-1 text-sm',
     ];
-    $colorClass = $colors[$rarity] ?? 'bg-gray-500 text-white';
+
+    $rarityColors = [
+        'SSR' =>
+            'bg-gradient-to-r from-yellow-100 to-amber-100 text-amber-800 dark:from-yellow-900 dark:to-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-700',
+        'SR' =>
+            'bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 dark:from-purple-900 dark:to-pink-900 dark:text-purple-200 border border-purple-300 dark:border-purple-700',
+        'R' =>
+            'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600',
+    ];
+
+    $colorClass = $rarityColors[$rarity] ?? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
+    $sizeClass = $sizeClasses[$size] ?? $sizeClasses['sm'];
 @endphp
 
-<span
-    {{ $attributes->merge(['class' => "inline-flex items-center rounded px-2 py-1 text-xs font-bold shadow-sm {$colorClass}"]) }}>
+<span class="inline-flex items-center {{ $sizeClass }} rounded font-bold {{ $colorClass }}">
     {{ $rarity }}
 </span>

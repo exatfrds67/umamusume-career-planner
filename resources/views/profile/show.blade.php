@@ -455,22 +455,27 @@
         </div>
     </div>
 
+@endsection
 
-    <script>
-        function profileManager() {
-            return {
-                activeTab: 'account',
-                profile: {
-                    name: 'User',
-                    email: 'user@example.com',
-                    bio: ''
-                },
-                preferences: {
-                    theme: 'auto',
-                    language: 'en',
-                    timezone: 'UTC',
-                    textSize: 'medium'
-                },
+@push('scripts')
+<script>
+    function profileManager() {
+        return {
+            activeTab: 'account',
+            loading: false,
+            profile: {
+                name: '{{ $user->name }}',
+                email: '{{ $user->email }}',
+                bio: ''
+            },
+                preferences: {!! json_encode(
+                    $user->preferences ?? [
+                        'theme' => 'auto',
+                        'language' => 'en',
+                        'timezone' => 'UTC',
+                        'textSize' => 'medium',
+                    ],
+                ) !!},
                 notifications: {
                     email: true,
                     trainingReminders: true,
@@ -489,61 +494,321 @@
                     confirmPassword: ''
                 },
 
-                saveProfile() {
-                    console.log('Saving profile:', this.profile);
-                    alert('Profile saved successfully!');
+                async saveProfile() {
+                    if (this.loading) return;
+                    this.loading = true;
+
+                    try {
+                        const response = await fetch('{{ route('profile.update') }}', {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                name: this.profile.name,
+                                email: this.profile.email
+                            })
+                        });
+
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            this.showSuccess('Profile updated successfully!');
+                        } else {
+                            this.showError(data.message || 'Failed to update profile');
+                        }
+                    } catch (error) {
+                        this.showError('An error occurred while updating your profile');
+                        console.error('Profile update error:', error);
+                    } finally {
+                        this.loading = false;
+                    }
                 },
 
-                savePreferences() {
-                    console.log('Saving preferences:', this.preferences);
-                    alert('Preferences saved successfully!');
+                async savePreferences() {
+                    if (this.loading) return;
+                    this.loading = true;
+
+                    try {
+                        const response = await fetch('{{ route('profile.update') }}', {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                preferences: this.preferences
+                            })
+                        });
+
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            this.showSuccess('Preferences saved successfully!');
+                        } else {
+                            this.showError(data.message || 'Failed to save preferences');
+                        }
+                    } catch (error) {
+                        this.showError('An error occurred while saving preferences');
+                        console.error('Preferences save error:', error);
+                    } finally {
+                        this.loading = false;
+                    }
                 },
 
-                saveNotifications() {
-                    console.log('Saving notifications:', this.notifications);
-                    alert('Notification settings saved successfully!');
+                async saveNotifications() {
+                    if (this.loading) return;
+                    this.loading = true;
+
+                    try {
+                        const response = await fetch('{{ route('profile.update') }}', {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                preferences: {
+                                    notifications: this.notifications
+                                }
+                            })
+                        });
+
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            this.showSuccess('Notification settings saved successfully!');
+                        } else {
+                            this.showError(data.message || 'Failed to save notification settings');
+                        }
+                    } catch (error) {
+                        this.showError('An error occurred while saving notification settings');
+                        console.error('Notifications save error:', error);
+                    } finally {
+                        this.loading = false;
+                    }
                 },
 
-                savePrivacy() {
-                    console.log('Saving privacy settings:', this.privacy);
-                    alert('Privacy settings saved successfully!');
+                async savePrivacy() {
+                    if (this.loading) return;
+                    this.loading = true;
+
+                    try {
+                        const response = await fetch('{{ route('profile.update') }}', {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                preferences: {
+                                    privacy: this.privacy
+                                }
+                            })
+                        });
+
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            this.showSuccess('Privacy settings saved successfully!');
+                        } else {
+                            this.showError(data.message || 'Failed to save privacy settings');
+                        }
+                    } catch (error) {
+                        this.showError('An error occurred while saving privacy settings');
+                        console.error('Privacy save error:', error);
+                    } finally {
+                        this.loading = false;
+                    }
                 },
 
-                changePassword() {
+                async changePassword() {
                     if (this.security.newPassword !== this.security.confirmPassword) {
-                        alert('Passwords do not match!');
+                        this.showError('Passwords do not match!');
                         return;
                     }
-                    console.log('Changing password');
-                    alert('Password changed successfully!');
-                    this.security = {
-                        currentPassword: '',
-                        newPassword: '',
-                        confirmPassword: ''
-                    };
+
+                    if (this.security.newPassword.length < 8) {
+                        this.showError('Password must be at least 8 characters long');
+                        return;
+                    }
+
+                    if (this.loading) return;
+                    this.loading = true;
+
+                    try {
+                        const response = await fetch('{{ route('profile.password.change') }}', {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                current_password: this.security.currentPassword,
+                                password: this.security.newPassword,
+                                password_confirmation: this.security.confirmPassword
+                            })
+                        });
+
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            this.showSuccess('Password changed successfully!');
+                            this.security = {
+                                currentPassword: '',
+                                newPassword: '',
+                                confirmPassword: ''
+                            };
+                        } else {
+                            this.showError(data.message || 'Failed to change password');
+                        }
+                    } catch (error) {
+                        this.showError('An error occurred while changing password');
+                        console.error('Password change error:', error);
+                    } finally {
+                        this.loading = false;
+                    }
                 },
 
                 resetForm() {
-                    console.log('Resetting form');
+                    // Reset to original values
+                    this.profile = {
+                        name: '{{ $user->name }}',
+                        email: '{{ $user->email }}',
+                        bio: ''
+                    };
+                    this.preferences = {!! json_encode(
+                        $user->preferences ?? [
+                            'theme' => 'auto',
+                            'language' => 'en',
+                            'timezone' => 'UTC',
+                            'textSize' => 'medium',
+                        ],
+                    ) !!};
                 },
 
-                exportData() {
-                    console.log('Exporting data');
-                    alert('Data export will be available soon!');
+                async exportData() {
+                    if (this.loading) return;
+                    this.loading = true;
+
+                    try {
+                        const response = await fetch('{{ route('profile.export') }}', {
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            }
+                        });
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            const blob = new Blob([JSON.stringify(data, null, 2)], {
+                                type: 'application/json'
+                            });
+                            const url = window.URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = `profile-export-${new Date().toISOString().split('T')[0]}.json`;
+                            document.body.appendChild(a);
+                            a.click();
+                            window.URL.revokeObjectURL(url);
+                            document.body.removeChild(a);
+                            this.showSuccess('Data exported successfully!');
+                        } else {
+                            this.showError('Failed to export data');
+                        }
+                    } catch (error) {
+                        this.showError('An error occurred while exporting data');
+                        console.error('Export error:', error);
+                    } finally {
+                        this.loading = false;
+                    }
                 },
 
                 importData() {
-                    console.log('Importing data');
-                    alert('Data import will be available soon!');
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = 'application/json';
+                    input.onchange = async (e) => {
+                        const file = e.target.files[0];
+                        if (!file) return;
+
+                        try {
+                            const text = await file.text();
+                            const data = JSON.parse(text);
+                            console.log('Imported data:', data);
+                            this.showSuccess('Data imported successfully! (Feature coming soon)');
+                        } catch (error) {
+                            this.showError('Invalid JSON file');
+                            console.error('Import error:', error);
+                        }
+                    };
+                    input.click();
                 },
 
-                confirmDeleteAccount() {
-                    if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
-                        console.log('Deleting account');
-                        alert('Account deletion will be implemented soon.');
+                async confirmDeleteAccount() {
+                    const confirmation = prompt('To delete your account, type DELETE in all caps:');
+
+                    if (confirmation !== 'DELETE') {
+                        if (confirmation !== null) {
+                            this.showError('Account deletion cancelled. You must type DELETE exactly.');
+                        }
+                        return;
                     }
+
+                    const password = prompt('Enter your password to confirm:');
+                    if (!password) {
+                        this.showError('Password is required to delete your account');
+                        return;
+                    }
+
+                    if (this.loading) return;
+                    this.loading = true;
+
+                    try {
+                        const response = await fetch('{{ route('profile.destroy') }}', {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                password: password,
+                                confirmation: 'DELETE'
+                            })
+                        });
+
+                        if (response.ok) {
+                            window.location.href = '{{ route('welcome') }}';
+                        } else {
+                            const data = await response.json();
+                            this.showError(data.message || 'Failed to delete account');
+                        }
+                    } catch (error) {
+                        this.showError('An error occurred while deleting account');
+                        console.error('Account deletion error:', error);
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                showSuccess(message) {
+                    // You can replace this with a toast notification library
+                    alert(message);
+                },
+
+                showError(message) {
+                    // You can replace this with a toast notification library
+                    alert('Error: ' + message);
                 }
             };
         }
-    </script>
-@endsection
+</script>
+@endpush

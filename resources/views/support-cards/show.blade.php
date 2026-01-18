@@ -21,8 +21,8 @@
                 <div
                     class="md:w-1/3 h-64 md:h-auto bg-gradient-to-br from-{{ $supportCard->card_type === 'speed' ? 'blue' : ($supportCard->card_type === 'stamina' ? 'green' : ($supportCard->card_type === 'power' ? 'red' : ($supportCard->card_type === 'guts' ? 'orange' : ($supportCard->card_type === 'wit' ? 'purple' : 'pink')))) }}-400 to-{{ $supportCard->card_type === 'speed' ? 'blue' : ($supportCard->card_type === 'stamina' ? 'green' : ($supportCard->card_type === 'power' ? 'red' : ($supportCard->card_type === 'guts' ? 'orange' : ($supportCard->card_type === 'wit' ? 'purple' : 'pink')))) }}-600 relative">
                     @if ($supportCard->artwork_url)
-                        <img src="{{ $supportCard->artwork_url }}" alt="{{ $supportCard->name }}"
-                            class="w-full h-full object-cover">
+                        <img src="{{ $supportCard->artwork_url }}" alt="{{ $supportCard->name }}" loading="lazy"
+                            decoding="async" class="w-full h-full object-cover">
                     @else
                         <div class="absolute inset-0 flex items-center justify-center">
                             <svg class="w-32 h-32 text-white opacity-50" fill="none" viewBox="0 0 24 24"

@@ -8,7 +8,8 @@
             <div
                 class="shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-gradient-to-br from-{{ $card->card_type === 'speed' ? 'blue' : ($card->card_type === 'stamina' ? 'green' : ($card->card_type === 'power' ? 'red' : ($card->card_type === 'guts' ? 'orange' : ($card->card_type === 'wit' ? 'purple' : 'pink')))) }}-400 to-{{ $card->card_type === 'speed' ? 'blue' : ($card->card_type === 'stamina' ? 'green' : ($card->card_type === 'power' ? 'red' : ($card->card_type === 'guts' ? 'orange' : ($card->card_type === 'wit' ? 'purple' : 'pink')))) }}-600">
                 @if ($card->artwork_url)
-                    <img src="{{ $card->artwork_url }}" alt="{{ $card->name }}" class="w-full h-full object-cover">
+                    <img src="{{ $card->artwork_url }}" alt="{{ $card->name }}" loading="lazy" decoding="async"
+                        class="w-full h-full object-cover">
                 @endif
             </div>
 

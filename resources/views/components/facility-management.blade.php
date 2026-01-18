@@ -52,7 +52,7 @@
                         <template x-for="level in 5" :key="level">
                             <div class="flex-1 h-3 rounded-full transition-all duration-300"
                                 :class="{
-                                    'bg-gradient-to-r from-primary-400 to-primary-600': level <= team.facilityLevel,
+                                    'bg-linear-to-r from-primary-400 to-primary-600': level <= team.facilityLevel,
                                     'bg-gray-200 dark:bg-gray-700': level > team.facilityLevel
                                 }">
                             </div>

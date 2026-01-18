@@ -1,18 +1,25 @@
-@props(['type'])
+@props(['type', 'size' => 'sm'])
 
 @php
-    $colors = [
-        'speed' => 'bg-blue-100 text-blue-800 ring-blue-600/20 dark:bg-blue-900/30 dark:text-blue-400',
-        'stamina' => 'bg-green-100 text-green-800 ring-green-600/20 dark:bg-green-900/30 dark:text-green-400',
-        'power' => 'bg-red-100 text-red-800 ring-red-600/20 dark:bg-red-900/30 dark:text-red-400',
-        'guts' => 'bg-orange-100 text-orange-800 ring-orange-600/20 dark:bg-orange-900/30 dark:text-orange-400',
-        'wit' => 'bg-purple-100 text-purple-800 ring-purple-600/20 dark:bg-purple-900/30 dark:text-purple-400',
-        'friend' => 'bg-pink-100 text-pink-800 ring-pink-600/20 dark:bg-pink-900/30 dark:text-pink-400',
+    $sizeClasses = [
+        'xs' => 'px-1.5 py-0.5 text-xs',
+        'sm' => 'px-2 py-0.5 text-xs',
+        'md' => 'px-2.5 py-1 text-sm',
     ];
-    $colorClass = $colors[$type] ?? 'bg-gray-100 text-gray-800 ring-gray-600/20';
+
+    $typeColors = [
+        'speed' => 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+        'stamina' => 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+        'power' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+        'guts' => 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
+        'wit' => 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+        'friend' => 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+    ];
+
+    $colorClass = $typeColors[strtolower($type)] ?? 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+    $sizeClass = $sizeClasses[$size] ?? $sizeClasses['sm'];
 @endphp
 
-<span
-    {{ $attributes->merge(['class' => "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset {$colorClass}"]) }}>
+<span class="inline-flex items-center {{ $sizeClass }} rounded font-medium {{ $colorClass }}">
     {{ ucfirst($type) }}
 </span>
