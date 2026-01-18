@@ -1,13 +1,18 @@
 <?php
 
+/**
+ * @property \App\Models\User $user
+ * @property \App\Models\Character $character
+ */
+
 use App\Models\Character;
 use App\Models\User;
 use Illuminate\Support\Facades\Cache;
 
-beforeEach(function () {
-    $this->user = User::factory()->create();
-    $this->character = Character::factory()->create([
-        'user_id' => $this->user->id,
+beforeEach(function (): void {
+    $user = User::factory()->create();
+    $character = Character::factory()->create([
+        'user_id' => $user->id,
         'scenario_type' => 'ura_finale',
         'current_stats' => [
             'speed' => 500,
@@ -19,11 +24,14 @@ beforeEach(function () {
         'energy_level' => 80,
         'mood_status' => 'good',
     ]);
+
+    test()->user = $user;
+    test()->character = $character;
 });
 
-it('returns batch training predictions for all training types', function () {
+it('returns batch training predictions for all training types', function (): void {
     $response = $this->postJson('/api/training-predictions/batch', [
-        'character_id' => $this->character->id,
+        'character_id' => test()->character->id,
         'training_types' => ['speed', 'stamina', 'power', 'guts', 'wit'],
     ]);
 
@@ -46,9 +54,9 @@ it('returns batch training predictions for all training types', function () {
     expect($response->json('data'))->toHaveCount(5);
 });
 
-it('includes recommendations when requested', function () {
+it('includes recommendations when requested', function (): void {
     $response = $this->postJson('/api/training-predictions/batch', [
-        'character_id' => $this->character->id,
+        'character_id' => test()->character->id,
         'training_types' => ['speed', 'stamina', 'power'],
         'include_recommendations' => true,
     ]);
@@ -61,12 +69,12 @@ it('includes recommendations when requested', function () {
     expect($hasRecommendation)->toBeTrue();
 });
 
-it('caches predictions for performance', function () {
+it('caches predictions for performance', function (): void {
     Cache::flush();
 
     // First request - not cached
     $response1 = $this->postJson('/api/training-predictions/batch', [
-        'character_id' => $this->character->id,
+        'character_id' => test()->character->id,
         'training_types' => ['speed'],
     ]);
 
@@ -74,14 +82,14 @@ it('caches predictions for performance', function () {
 
     // Second request - should be cached
     $response2 = $this->postJson('/api/training-predictions/batch', [
-        'character_id' => $this->character->id,
+        'character_id' => test()->character->id,
         'training_types' => ['speed'],
     ]);
 
     expect($response2->json('data.0.cached'))->toBeTrue();
 });
 
-it('validates required character_id', function () {
+it('validates required character_id', function (): void {
     $response = $this->postJson('/api/training-predictions/batch', [
         'training_types' => ['speed'],
     ]);
@@ -90,9 +98,9 @@ it('validates required character_id', function () {
         ->assertJsonValidationErrors(['character_id']);
 });
 
-it('validates training types are valid', function () {
+it('validates training types are valid', function (): void {
     $response = $this->postJson('/api/training-predictions/batch', [
-        'character_id' => $this->character->id,
+        'character_id' => test()->character->id,
         'training_types' => ['invalid_type'],
     ]);
 
@@ -100,9 +108,9 @@ it('validates training types are valid', function () {
         ->assertJsonValidationErrors(['training_types.0']);
 });
 
-it('returns single training prediction', function () {
+it('returns single training prediction', function (): void {
     $response = $this->postJson('/api/training-predictions', [
-        'character_id' => $this->character->id,
+        'character_id' => test()->character->id,
         'training_type' => 'speed',
     ]);
 
@@ -125,9 +133,9 @@ it('returns single training prediction', function () {
         ]);
 });
 
-it('returns training recommendation with reasoning', function () {
+it('returns training recommendation with reasoning', function (): void {
     $response = $this->postJson('/api/training-predictions/recommend', [
-        'character_id' => $this->character->id,
+        'character_id' => test()->character->id,
     ]);
 
     $response->assertSuccessful()
@@ -142,14 +150,14 @@ it('returns training recommendation with reasoning', function () {
         ]);
 });
 
-it('clears cache for character', function () {
+it('clears cache for character', function (): void {
     // Create some cached predictions
     $this->postJson('/api/training-predictions/batch', [
-        'character_id' => $this->character->id,
+        'character_id' => test()->character->id,
         'training_types' => ['speed'],
     ]);
 
-    $response = $this->deleteJson("/api/training-predictions/cache/{$this->character->id}");
+    $response = $this->deleteJson('/api/training-predictions/cache/{test()->character->id}');
 
     $response->assertSuccessful()
         ->assertJson([
@@ -158,8 +166,8 @@ it('clears cache for character', function () {
         ]);
 });
 
-it('returns cache statistics', function () {
-    $response = $this->getJson("/api/training-predictions/cache/{$this->character->id}/stats");
+it('returns cache statistics', function (): void {
+    $response = $this->getJson('/api/training-predictions/cache/{test()->character->id}/stats');
 
     $response->assertSuccessful()
         ->assertJsonStructure([

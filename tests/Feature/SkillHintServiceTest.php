@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * @property \App\Services\SkillHintService $hintService
+ * @property \App\Models\Character $character
+ * @property \App\Models\Skill $normalSkill
+ * @property \App\Models\Skill $rareSkill
+ */
+
 use App\Models\Character;
 use App\Models\Skill;
 use App\Models\SkillHint;

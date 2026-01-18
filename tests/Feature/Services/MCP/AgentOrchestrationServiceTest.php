@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @property \App\Models\User $user
+ * @property \App\Models\Character $character
+ */
+
 use App\Models\Character;
 use App\Models\User;
 use App\Services\MCP\AgentOrchestrationService;

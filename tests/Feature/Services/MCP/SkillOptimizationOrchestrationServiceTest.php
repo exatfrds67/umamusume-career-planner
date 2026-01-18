@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * @property \App\Models\User $user
+ * @property \App\Models\Character $character
+ * @property \Illuminate\Support\Collection<int, \App\Models\Skill> $targetSkills
+ * @property \Illuminate\Support\Collection<int, mixed> $currentSkills
+ * @property \Illuminate\Support\Collection<int, mixed> $supportCards
+ */
+
 use App\Models\Character;
 use App\Models\Skill;
 use App\Models\User;

@@ -1,9 +1,5 @@
 <?php
 
-use App\Models\Character;
-use App\Models\CharacterSupportCard;
-use App\Models\SupportCardDefinition;
-
 /**
  * Training Prediction UI Tests
  *
@@ -14,9 +10,17 @@ use App\Models\SupportCardDefinition;
  * - Spirit Burst indicators
  * - Recommendation rankings
  */
-beforeEach(function () {
+
+use App\Models\Character;
+use App\Models\CharacterSupportCard;
+use App\Models\SupportCardDefinition;
+
+/** @var Character $character */
+$character = null;
+
+beforeEach(function () use (&$character) {
     // Create test character
-    $this->character = Character::factory()->create([
+    $character = Character::factory()->create([
         'name' => 'Test Character',
         'scenario_type' => 'ura_finale',
         'current_stats' => [
@@ -36,7 +40,7 @@ beforeEach(function () {
     // Create character support cards (HasMany relationship)
     foreach ($supportCardDefinitions as $index => $definition) {
         CharacterSupportCard::factory()->create([
-            'character_id' => $this->character->id,
+            'character_id' => $character->id,
             'support_card_id' => $definition->id,
             'limit_break_level' => 2,
             'friendship_level' => 50,
@@ -55,36 +59,36 @@ test('training predictions index page loads successfully', function () {
     $response->assertViewHas('trainingTypes');
 });
 
-test('training predictions index displays character selection', function () {
+test('training predictions index displays character selection', function () use (&$character) {
     $response = $this->get(route('training.predictions'));
 
     $response->assertSuccessful();
     $response->assertSee('Select Character');
-    $response->assertSee($this->character->name);
+    $response->assertSee($character->name);
 });
 
-test('training predictions index with selected character displays character info', function () {
-    $response = $this->get(route('training.predictions', ['character_id' => $this->character->id]));
+test('training predictions index with selected character displays character info', function () use (&$character) {
+    $response = $this->get(route('training.predictions', ['character_id' => $character->id]));
 
     $response->assertSuccessful();
-    $response->assertSee($this->character->name);
+    $response->assertSee($character->name);
     $response->assertSee('Current Stats');
     $response->assertSee('Energy');
     $response->assertSee('Mood');
     $response->assertSee('Support Cards');
 });
 
-test('training predictions index displays training predictions app container', function () {
-    $response = $this->get(route('training.predictions', ['character_id' => $this->character->id]));
+test('training predictions index displays training predictions app container', function () use (&$character) {
+    $response = $this->get(route('training.predictions', ['character_id' => $character->id]));
 
     $response->assertSuccessful();
     $response->assertSee('training-predictions-app', false);
-    $response->assertSee('data-character-id="'.$this->character->id.'"', false);
-    $response->assertSee('data-scenario-type="'.$this->character->scenario_type.'"', false);
+    $response->assertSee('data-character-id="'.$character->id.'"', false);
+    $response->assertSee('data-scenario-type="'.$character->scenario_type.'"', false);
 });
 
-test('training predictions show page loads successfully', function () {
-    $response = $this->get(route('training.predictions.show', $this->character));
+test('training predictions show page loads successfully', function () use (&$character) {
+    $response = $this->get(route('training.predictions.show', $character));
 
     $response->assertSuccessful();
     $response->assertViewIs('training.show');
@@ -92,19 +96,19 @@ test('training predictions show page loads successfully', function () {
     $response->assertViewHas('trainingTypes');
 });
 
-test('training predictions show page displays character details', function () {
-    $response = $this->get(route('training.predictions.show', $this->character));
+test('training predictions show page displays character details', function () use (&$character) {
+    $response = $this->get(route('training.predictions.show', $character));
 
     $response->assertSuccessful();
-    $response->assertSee($this->character->name);
+    $response->assertSee($character->name);
     $response->assertSee('Current Stats');
     $response->assertSee('Status');
     $response->assertSee('Scenario');
     $response->assertSee('Support Cards');
 });
 
-test('training predictions show page displays stat values', function () {
-    $response = $this->get(route('training.predictions.show', $this->character));
+test('training predictions show page displays stat values', function () use (&$character) {
+    $response = $this->get(route('training.predictions.show', $character));
 
     $response->assertSuccessful();
     $response->assertSee('500'); // Speed
@@ -114,36 +118,36 @@ test('training predictions show page displays stat values', function () {
     $response->assertSee('350'); // Wit
 });
 
-test('training predictions show page displays energy level', function () {
-    $response = $this->get(route('training.predictions.show', $this->character));
+test('training predictions show page displays energy level', function () use (&$character) {
+    $response = $this->get(route('training.predictions.show', $character));
 
     $response->assertSuccessful();
     $response->assertSee('80%'); // Energy level
 });
 
-test('training predictions show page displays mood status', function () {
-    $response = $this->get(route('training.predictions.show', $this->character));
+test('training predictions show page displays mood status', function () use (&$character) {
+    $response = $this->get(route('training.predictions.show', $character));
 
     $response->assertSuccessful();
     $response->assertSee('good'); // Mood status
 });
 
-test('training predictions show page displays scenario type', function () {
-    $response = $this->get(route('training.predictions.show', $this->character));
+test('training predictions show page displays scenario type', function () use (&$character) {
+    $response = $this->get(route('training.predictions.show', $character));
 
     $response->assertSuccessful();
     $response->assertSee('ura finale'); // Scenario type
 });
 
-test('training predictions show page displays support card count', function () {
-    $response = $this->get(route('training.predictions.show', $this->character));
+test('training predictions show page displays support card count', function () use (&$character) {
+    $response = $this->get(route('training.predictions.show', $character));
 
     $response->assertSuccessful();
     $response->assertSee('3 / 6 equipped'); // Support card count
 });
 
-test('training predictions show page includes back button', function () {
-    $response = $this->get(route('training.predictions.show', $this->character));
+test('training predictions show page includes back button', function () use (&$character) {
+    $response = $this->get(route('training.predictions.show', $character));
 
     $response->assertSuccessful();
     $response->assertSee('Back to Training Predictions');
@@ -158,16 +162,16 @@ test('training predictions index without character shows empty state', function 
     $response->assertSee('Please select a character to view training predictions');
 });
 
-test('training predictions index displays all training types', function () {
-    $response = $this->get(route('training.predictions', ['character_id' => $this->character->id]));
+test('training predictions index displays all training types', function () use (&$character) {
+    $response = $this->get(route('training.predictions', ['character_id' => $character->id]));
 
     $response->assertSuccessful();
     // Training types are used in JavaScript, so we check for the data attributes
     $response->assertSee('training-predictions-app', false);
 });
 
-test('training predictions show page includes JavaScript module', function () {
-    $response = $this->get(route('training.predictions.show', $this->character));
+test('training predictions show page includes JavaScript module', function () use (&$character) {
+    $response = $this->get(route('training.predictions.show', $character));
 
     $response->assertSuccessful();
     $response->assertSee('training-predictions.js', false);
@@ -210,8 +214,8 @@ test('training predictions index displays character list ordered by name', funct
     $response->assertSeeInOrder(['Alpha Character', 'Test Character', 'Zebra Character']);
 });
 
-test('training predictions show page loads character with relationships', function () {
-    $response = $this->get(route('training.predictions.show', $this->character));
+test('training predictions show page loads character with relationships', function () use (&$character) {
+    $response = $this->get(route('training.predictions.show', $character));
 
     $response->assertSuccessful();
     $response->assertViewHas('character', function ($character) {
@@ -234,15 +238,15 @@ test('training predictions show page returns 404 for non-existent character', fu
     $response->assertNotFound();
 });
 
-test('training predictions index includes CSRF token for API calls', function () {
-    $response = $this->get(route('training.predictions', ['character_id' => $this->character->id]));
+test('training predictions index includes CSRF token for API calls', function () use (&$character) {
+    $response = $this->get(route('training.predictions', ['character_id' => $character->id]));
 
     $response->assertSuccessful();
     $response->assertSee('csrf-token', false);
 });
 
-test('training predictions index includes API URL in data attributes', function () {
-    $response = $this->get(route('training.predictions', ['character_id' => $this->character->id]));
+test('training predictions index includes API URL in data attributes', function () use (&$character) {
+    $response = $this->get(route('training.predictions', ['character_id' => $character->id]));
 
     $response->assertSuccessful();
     $response->assertSee('data-api-url', false);
@@ -258,8 +262,8 @@ test('training predictions page is accessible via keyboard navigation', function
     $response->assertSee('<select', false);
 });
 
-test('training predictions show page displays loading state initially', function () {
-    $response = $this->get(route('training.predictions.show', $this->character));
+test('training predictions show page displays loading state initially', function () use (&$character) {
+    $response = $this->get(route('training.predictions.show', $character));
 
     $response->assertSuccessful();
     $response->assertSee('Loading training predictions...');

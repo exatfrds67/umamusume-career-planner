@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @property \App\Services\SkillAnalysisService $service
+ */
+
 use App\Models\Character;
 use App\Models\Skill;
 use App\Services\SkillAnalysisService;

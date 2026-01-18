@@ -8,12 +8,24 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(Tests\TestCase::class, RefreshDatabase::class);
 
-beforeEach(function () {
-    $this->mcpClient = Mockery::mock(MCPClientService::class);
-    $this->trainingAgent = Mockery::mock(TrainingOptimizationAgent::class);
-    $this->service = new TrainingCalculationService($this->mcpClient, $this->trainingAgent);
+/** @var MCPClientService&Mockery\MockInterface $mcpClient */
+$mcpClient = null;
+/** @var TrainingOptimizationAgent&Mockery\MockInterface $trainingAgent */
+$trainingAgent = null;
+/** @var TrainingCalculationService $service */
+$service = null;
+/** @var Character $character */
+$character = null;
 
-    $this->character = Character::factory()->make([
+beforeEach(function () use (&$mcpClient, &$trainingAgent, &$service, &$character): void {
+    /** @var MCPClientService&Mockery\MockInterface $mcpClient */
+    $mcpClient = Mockery::mock(MCPClientService::class);
+    /** @var TrainingOptimizationAgent&Mockery\MockInterface $trainingAgent */
+    $trainingAgent = Mockery::mock(TrainingOptimizationAgent::class);
+
+    $service = new TrainingCalculationService($mcpClient, $trainingAgent);
+
+    $character = Character::factory()->make([
         'scenario_type' => 'ura_finale',
         'current_stats' => [
             'speed' => 500,
@@ -33,11 +45,13 @@ beforeEach(function () {
         ],
         'facility_levels' => [],
     ]);
+
+    // Store in test context
 });
 
-it('calculates base stat gains correctly', function () {
-    $prediction = $this->service->calculateTrainingPrediction(
-        $this->character,
+it('calculates base stat gains correctly', function () use (&$service, &$character): void {
+    $prediction = $service->calculateTrainingPrediction(
+        $character,
         'speed'
     );
 
@@ -46,9 +60,9 @@ it('calculates base stat gains correctly', function () {
     expect($prediction['stat_gains']['speed'])->toBeGreaterThan(0);
 });
 
-it('applies growth rate bonuses', function () {
-    $prediction = $this->service->calculateTrainingPrediction(
-        $this->character,
+it('applies growth rate bonuses', function () use (&$service, &$character): void {
+    $prediction = $service->calculateTrainingPrediction(
+        $character,
         'speed'
     );
 
@@ -56,19 +70,19 @@ it('applies growth rate bonuses', function () {
     expect($prediction['breakdown']['growth_rate_bonus'])->toBe(0.10);
 });
 
-it('calculates energy cost based on mood', function () {
-    $this->character->mood_status = 'great';
-    $prediction = $this->service->calculateTrainingPrediction(
-        $this->character,
+it('calculates energy cost based on mood', function () use (&$service, &$character): void {
+    $character->mood_status = 'great';
+    $prediction = $service->calculateTrainingPrediction(
+        $character,
         'speed'
     );
 
     // Great mood should reduce energy cost
     expect($prediction['energy_cost'])->toBeLessThan(20);
 
-    $this->character->mood_status = 'awful';
-    $prediction = $this->service->calculateTrainingPrediction(
-        $this->character,
+    $character->mood_status = 'awful';
+    $prediction = $service->calculateTrainingPrediction(
+        $character,
         'speed'
     );
 
@@ -76,18 +90,18 @@ it('calculates energy cost based on mood', function () {
     expect($prediction['energy_cost'])->toBeGreaterThan(20);
 });
 
-it('calculates failure risk based on energy level', function () {
-    $this->character->energy_level = 90;
-    $prediction = $this->service->calculateTrainingPrediction(
-        $this->character,
+it('calculates failure risk based on energy level', function () use (&$service, &$character): void {
+    $character->energy_level = 90;
+    $prediction = $service->calculateTrainingPrediction(
+        $character,
         'speed'
     );
 
     $highEnergyRisk = $prediction['failure_risk'];
 
-    $this->character->energy_level = 20;
-    $prediction = $this->service->calculateTrainingPrediction(
-        $this->character,
+    $character->energy_level = 20;
+    $prediction = $service->calculateTrainingPrediction(
+        $character,
         'speed'
     );
 
@@ -96,15 +110,15 @@ it('calculates failure risk based on energy level', function () {
     expect($lowEnergyRisk)->toBeGreaterThan($highEnergyRisk);
 });
 
-it('applies facility bonuses for Unity Cup', function () {
-    $this->character->scenario_type = 'unity_cup';
-    $this->character->facility_levels = [
+it('applies facility bonuses for Unity Cup', function () use (&$service, &$character): void {
+    $character->scenario_type = 'unity_cup';
+    $character->facility_levels = [
         'speed' => 5,
         'stamina' => 3,
     ];
 
-    $prediction = $this->service->calculateTrainingPrediction(
-        $this->character,
+    $prediction = $service->calculateTrainingPrediction(
+        $character,
         'speed'
     );
 
@@ -112,9 +126,9 @@ it('applies facility bonuses for Unity Cup', function () {
     expect($prediction['breakdown']['facility_bonus'])->toBe(1.0);
 });
 
-it('calculates batch predictions for multiple training types', function () {
-    $predictions = $this->service->calculateBatchPredictions(
-        $this->character,
+it('calculates batch predictions for multiple training types', function () use (&$service, &$character): void {
+    $predictions = $service->calculateBatchPredictions(
+        $character,
         ['speed', 'stamina', 'power']
     );
 
@@ -122,34 +136,34 @@ it('calculates batch predictions for multiple training types', function () {
     expect($predictions)->toHaveKeys(['speed', 'stamina', 'power']);
 });
 
-it('recommends training based on character goals', function () {
-    $this->character->goals = [
+it('recommends training based on character goals', function () use (&$service, &$character): void {
+    $character->goals = [
         'target_stats' => [
             'speed' => 800,
             'stamina' => 600,
         ],
     ];
 
-    $recommendation = $this->service->getRecommendedTraining($this->character);
+    $recommendation = $service->getRecommendedTraining($character);
 
     expect($recommendation)->toHaveKeys(['recommended_training', 'reason', 'prediction', 'alternatives']);
     expect($recommendation['recommended_training'])->toBeIn(['speed', 'stamina', 'power', 'guts', 'wit']);
 });
 
-it('provides reasoning for recommendations', function () {
-    $this->character->goals = [
+it('provides reasoning for recommendations', function () use (&$service, &$character): void {
+    $character->goals = [
         'target_stats' => [
             'speed' => 800,
         ],
     ];
 
-    $recommendation = $this->service->getRecommendedTraining($this->character);
+    $recommendation = $service->getRecommendedTraining($character);
 
     expect($recommendation['reason'])->toBeString();
-    expect($recommendation['reason'])->not->toBeEmpty();
+    expect(strlen($recommendation['reason']))->toBeGreaterThan(0);
 });
 
-it('calculates support card bonuses', function () {
+it('calculates support card bonuses', function () use (&$service, &$character): void {
     $supportCards = [
         [
             'card_type' => 'speed',
@@ -161,8 +175,8 @@ it('calculates support card bonuses', function () {
         ],
     ];
 
-    $prediction = $this->service->calculateTrainingPrediction(
-        $this->character,
+    $prediction = $service->calculateTrainingPrediction(
+        $character,
         'speed',
         ['support_cards' => $supportCards]
     );
@@ -171,9 +185,9 @@ it('calculates support card bonuses', function () {
     expect($prediction['breakdown']['support_card_bonus'])->toBeGreaterThan(0);
 });
 
-it('calculates friendship training multiplier', function () {
-    $prediction = $this->service->calculateTrainingPrediction(
-        $this->character,
+it('calculates friendship training multiplier', function () use (&$service, &$character): void {
+    $prediction = $service->calculateTrainingPrediction(
+        $character,
         'speed',
         ['participants' => 3]
     );

@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @property \App\Models\Character $character
+ * @property \App\Models\Skill $skill
+ */
+
 use App\Models\Character;
 use App\Models\Skill;
 use App\Models\SkillHint;

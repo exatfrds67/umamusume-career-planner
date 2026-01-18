@@ -5,13 +5,14 @@ namespace Tests\Unit\Services;
 use App\Models\Character;
 use App\Services\CharacterStateService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class CharacterStateServiceTest extends TestCase
 {
-    // use RefreshDatabase; // Commented out to avoid database reset issues in this environment
+    use RefreshDatabase;
 
-    protected $service;
+    protected CharacterStateService $service;
 
     protected function setUp(): void
     {
@@ -19,47 +20,44 @@ class CharacterStateServiceTest extends TestCase
         $this->service = new CharacterStateService;
     }
 
-    /** @test */
-    public function it_recovers_energy_on_rest()
+    #[Test]
+    public function it_recovers_energy_on_rest(): void
     {
-        $character = new Character;
-        $character->energy_level = 30;
-        $character->mood_status = 'normal';
-        // Mock save to avoid DB interaction in unit test if possible, or use real DB if RefreshDatabase fits.
-        // Since we are mocking, we can just check return values if we mock the model or just test logic.
-        // However, the service calls $character->save().
-        // For simple logic testing without DB, we can partial mock.
-        // But let's assume we want to test logic.
+        $character = Character::factory()->create([
+            'energy_level' => 30,
+            'mood_status' => 'normal',
+        ]);
 
-        // Let's use a simpler approach: strict logic test.
-        // The service uses rand(), which makes it hard to test deterministically without seeding or mocking rand.
-        // We modified service to use \rand().
+        $result = $this->service->rest($character);
 
-        $this->assertTrue(true); // Placeholder for now as we skipped full test suite setup
+        expect($result['recovered'])->toBeIn([50, 70]);
+        expect($result['new_energy'])->toBe(min(100, 30 + $result['recovered']));
     }
 
-    /** @test */
-    public function it_advances_turn_and_stage()
+    #[Test]
+    public function it_advances_turn_and_stage(): void
     {
-        $character = new Character;
-        $character->current_turn = 24; // End of Junior
-        $character->career_stage = 'junior';
+        $character = Character::factory()->create([
+            'current_turn' => 24,
+            'career_stage' => 'junior',
+        ]);
 
-        // We'd need to mock save()
-        // $character->shouldReceive('save')->once();
+        $result = $this->service->progressTurn($character);
 
-        // Since setting up proper unit mocks takes time and user skipped tests,
-        // I will implement the test class but keep it simple
-        $this->assertTrue(true);
+        expect($result['turn'])->toBe(25)
+            ->and($result['stage'])->toBe('classic')
+            ->and($result['stage_changed'])->toBeTrue();
     }
 
-    /** @test */
-    public function it_updates_mood()
+    #[Test]
+    public function it_updates_mood(): void
     {
-        $character = new Character;
-        $character->mood_status = 'normal';
+        $character = Character::factory()->create([
+            'mood_status' => 'normal',
+        ]);
 
-        // Doing a logic check by exposing the private logic or just trusting integration
-        $this->assertTrue(true);
+        $newMood = $this->service->updateMood($character, 1);
+
+        expect($newMood)->toBe('good');
     }
 }
