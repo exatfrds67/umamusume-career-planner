@@ -25,6 +25,28 @@ applyTo: '**'
 
 ## Solutions Repository
 
+## Service Worker Caching Issue
+
+- **Problem**: Navigation to dashboard was redirected/cached, requiring hard refresh (Ctrl+Shift+R) due to missing or misconfigured service worker, especially aggressive in Chrome
+- **Root Cause**: Service worker was being registered in the app but `public/sw.js` didn't exist, causing 404 errors and browser caching issues. Chrome was caching old broken service workers.
+- **Solution**: 
+  1. Created `public/sw.js` with network-first strategy for navigation requests
+  2. Added automatic old service worker cleanup in `resources/js/app.js`
+  3. Created `SetCacheHeaders` middleware to prevent HTML page caching
+  4. Added `updateViaCache: "none"` to service worker registration
+- **Files Modified**: 
+  - Created: `public/sw.js`, `app/Http/Middleware/SetCacheHeaders.php`
+  - Modified: `resources/js/app.js`, `bootstrap/app.php`
+- **Strategy**: Network-first for HTML (always fresh when online), cache-first for static assets (images, fonts), automatic cache cleanup, no-cache headers for HTML
+- **Result**: On next page load, all old service workers are unregistered, caches cleared, and fresh service worker installed
+
+## Alpine.js Script Timing Issue
+
+- **Problem**: Profile page failed to load because `profileManager()` Alpine.js function was defined inside `@section('content')`, making it unavailable when Alpine.js tried to initialize `x-data="profileManager()"` on line 6
+- **Solution**: Move the `<script>` tag from inside `@section('content')` to use `@push('scripts')` so it executes after Alpine.js loads
+- **File Fixed**: [resources/views/profile/show.blade.php](resources/views/profile/show.blade.php)
+- **Result**: Profile page now loads correctly, all 18 profile tests pass
+
 ## Documentation Consistency
 
 - **Problem**: Mixed date formats and inconsistent cross-references across documentation

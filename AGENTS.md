@@ -500,6 +500,73 @@ protected function isAccessible(User $user, ?string $path = null): bool
 - Faker: Use methods such as `$this->faker->word()` or `fake()->randomDigit()`. Follow existing conventions whether to use `$this->faker` or `fake()`.
 - When creating tests, make use of `php artisan make:test [options] {name}` to create a feature test, and pass `--unit` to create a unit test. Most tests should be feature tests.
 
+### PHPUnit Test Attributes (PHPUnit 11+)
+
+- **Always use PHP attributes for test metadata instead of doc-comment annotations**
+- PHPUnit 11 deprecates doc-comment metadata (like `@test`, `@dataProvider`, `@depends`) in favor of PHP 8 attributes
+- Doc-comment metadata will be removed in PHPUnit 12
+
+**Use attributes (correct):**
+
+```php
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Depends;
+
+#[Test]
+public function it_validates_user_input(): void
+{
+    // Test implementation
+}
+
+#[Test]
+#[DataProvider('emailProvider')]
+public function it_validates_email_formats(string $email): void
+{
+    // Test implementation
+}
+
+public static function emailProvider(): array
+{
+    return [
+        ['valid@example.com'],
+        ['another@test.org'],
+    ];
+}
+```
+
+**Avoid doc-comments (deprecated):**
+
+```php
+/**
+ * @test
+ */
+public function it_validates_user_input(): void
+{
+    // This will trigger deprecation warnings
+}
+
+/**
+ * @test
+ * @dataProvider emailProvider
+ */
+public function it_validates_email_formats(string $email): void
+{
+    // This will trigger deprecation warnings
+}
+```
+
+**Common PHPUnit Attributes:**
+
+- `#[Test]` - Marks a method as a test
+- `#[DataProvider('methodName')]` - Provides test data
+- `#[Depends('testMethodName')]` - Declares test dependencies
+- `#[Group('groupName')]` - Assigns test to a group
+- `#[TestDox('description')]` - Custom test description
+- `#[Before]` and `#[After]` - Setup/teardown methods
+- `#[RequiresPhp('8.4')]` - PHP version requirements
+- `#[CoversClass(ClassName::class)]` - Code coverage annotation
+
 ### Vite Error
 
 - If you receive an "Illuminate\Foundation\ViteException: Unable to locate file in Vite manifest" error, you can run `npm run build` or ask the user to run `npm run dev` or `composer run dev`.
