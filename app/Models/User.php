@@ -46,6 +46,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'avatar_path',
         'preferences',
         'accessibility_settings',
         'ai_settings',

@@ -5,7 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
 
 /**
@@ -114,6 +116,22 @@ class Character extends Model
     public function careers(): HasMany
     {
         return $this->hasMany(Career::class);
+    }
+
+    /**
+     * @return HasOne<Career, $this>
+     */
+    public function currentCareer(): HasOne
+    {
+        return $this->hasOne(Career::class)->latestOfMany('current_turn');
+    }
+
+    /**
+     * @return BelongsToMany<Skill>
+     */
+    public function skills(): BelongsToMany
+    {
+        return $this->belongsToMany(Skill::class, 'ucp_skill_acquisitions', 'character_id', 'skill_id');
     }
 
     /**

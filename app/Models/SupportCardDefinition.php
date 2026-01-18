@@ -9,6 +9,11 @@ use Illuminate\Database\Eloquent\Model;
  * Support Card Definition
  * Reference data for support cards in the game
  *
+ * @property int|null $friendship_level
+ * @property int|null $limit_break_level
+ * @property string|null $specialization
+ * @property array<int, array<string, mixed>>|null $skill_provision
+ *
  * @use HasFactory<\Database\Factories\SupportCardDefinitionFactory>
  */
 class SupportCardDefinition extends Model

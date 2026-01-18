@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -124,7 +125,7 @@ class SkillAcquisition extends Model
     /**
      * Scope a query to only include active acquisitions.
      */
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
     }
@@ -132,7 +133,7 @@ class SkillAcquisition extends Model
     /**
      * Scope a query to only include evolved skills.
      */
-    public function scopeEvolved($query)
+    public function scopeEvolved(Builder $query): Builder
     {
         return $query->where('is_evolution', true);
     }
@@ -140,7 +141,7 @@ class SkillAcquisition extends Model
     /**
      * Scope a query to filter by acquisition method.
      */
-    public function scopeByMethod($query, string $method)
+    public function scopeByMethod(Builder $query, string $method): Builder
     {
         return $query->where('acquisition_method', $method);
     }
@@ -148,7 +149,7 @@ class SkillAcquisition extends Model
     /**
      * Scope a query to filter by priority level.
      */
-    public function scopeByPriority($query, string $priority)
+    public function scopeByPriority(Builder $query, string $priority): Builder
     {
         return $query->where('priority_level', $priority);
     }

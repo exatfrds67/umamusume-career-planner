@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -170,7 +171,7 @@ class Skill extends Model
     /**
      * Scope a query to only include skills of a specific type.
      */
-    public function scopeOfType($query, string $type)
+    public function scopeOfType(Builder $query, string $type): Builder
     {
         return $query->where('skill_type', $type);
     }
@@ -178,7 +179,7 @@ class Skill extends Model
     /**
      * Scope a query to only include skills of a specific rarity.
      */
-    public function scopeOfRarity($query, string $rarity)
+    public function scopeOfRarity(Builder $query, string $rarity): Builder
     {
         return $query->where('rarity', $rarity);
     }
@@ -186,7 +187,7 @@ class Skill extends Model
     /**
      * Scope a query to only include skills that can evolve.
      */
-    public function scopeCanEvolve($query)
+    public function scopeCanEvolve(Builder $query): Builder
     {
         return $query->where('can_evolve', true);
     }
@@ -194,7 +195,7 @@ class Skill extends Model
     /**
      * Scope a query to only include evolved skills.
      */
-    public function scopeEvolved($query)
+    public function scopeEvolved(Builder $query): Builder
     {
         return $query->where('is_evolution', true);
     }
@@ -202,7 +203,7 @@ class Skill extends Model
     /**
      * Scope a query to only include skills of a specific meta tier.
      */
-    public function scopeOfMetaTier($query, string $tier)
+    public function scopeOfMetaTier(Builder $query, string $tier): Builder
     {
         return $query->where('meta_tier', $tier);
     }
@@ -210,7 +211,7 @@ class Skill extends Model
     /**
      * Scope a query to only include active skills.
      */
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
     }
