@@ -25,7 +25,7 @@ class CharacterController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = Character::query()->with(['aptitudes', 'careers']);
+        $query = Character::query()->with(['aptitudes']);
 
         // Search functionality
         if ($request->filled('search')) {
@@ -77,27 +77,28 @@ class CharacterController extends Controller
             $character = Character::create([
                 'user_id' => Auth::id(),
                 'name' => $request->input('name'),
+                'avatar_url' => $request->input('avatar_url'),
                 'scenario_type' => $request->input('scenario_type'),
                 'career_stage' => 'junior',
                 'current_turn' => 1,
                 'current_stats' => $request->input('stats'),
-                'stat_priorities' => json_encode([]),
-                'stat_breakpoints' => json_encode([]),
+                'stat_priorities' => [],
+                'stat_breakpoints' => [],
                 'energy_level' => 100,
                 'mood_status' => 'normal',
-                'conditions' => json_encode([]),
+                'conditions' => [],
                 'days_until_race' => null,
-                'goals' => json_encode([]),
-                'race_schedule' => json_encode([]),
-                'training_plan' => json_encode([]),
-                'growth_rates' => json_encode([]),
-                'inherited_factors' => json_encode([]),
-                'legacy_parents' => json_encode([]),
-                'team_composition' => json_encode([]),
-                'facility_levels' => json_encode([]),
-                'spirit_burst_data' => json_encode([]),
+                'goals' => [],
+                'race_schedule' => [],
+                'training_plan' => [],
+                'growth_rates' => [],
+                'inherited_factors' => [],
+                'legacy_parents' => [],
+                'team_composition' => [],
+                'facility_levels' => [],
+                'spirit_burst_data' => [],
                 'status' => 'active',
-                'completion_data' => json_encode([]),
+                'completion_data' => [],
             ]);
 
             // Create aptitude records
@@ -137,10 +138,6 @@ class CharacterController extends Controller
         $character->load([
             'aptitudes',
             'factors',
-            'skills',
-            'careers' => function ($query) {
-                $query->latest()->limit(5);
-            },
             'supportCards.supportCard',
         ]);
 

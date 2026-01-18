@@ -4,16 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Models\Character;
 use App\Models\SupportCardDefinition;
-use App\Services\SupportDeckService;
-use App\Services\SynergyScorer;
+use App\Services\DeckManagementService;
+use App\Services\DeckOptimizationService;
+use App\Services\FriendshipBondService;
+use App\Services\SupportCardMetaService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class SupportCardController extends Controller
 {
     public function __construct(
-        protected SupportDeckService $deckService,
-        protected SynergyScorer $synergyScorer
+        protected DeckManagementService $deckService,
+        protected DeckOptimizationService $optimizationService,
+        protected FriendshipBondService $friendshipService,
+        protected SupportCardMetaService $metaService
     ) {}
 
     /**
@@ -102,19 +106,30 @@ class SupportCardController extends Controller
             ->orderBy('rarity', 'desc')
             ->get();
 
-        $currentDeck = $character->supportCards;
+        $currentDeck = $this->deckService->getDeck($character->id);
 
-        // Calculate synergy score if deck exists
-        $synergyScore = null;
+        // Get comprehensive deck analysis
+        $deckAnalysis = null;
+        $friendshipOverview = null;
+        $deckStatistics = null;
+
         if ($currentDeck->count() > 0) {
-            $synergyScore = $this->synergyScorer->calculateDeckScore($character);
+            $deckAnalysis = $this->optimizationService->getComprehensiveAnalysis($character->id);
+            $friendshipOverview = $this->friendshipService->getDeckFriendshipOverview($character->id);
+            $deckStatistics = $this->deckService->getDeckStatistics($character->id);
         }
+
+        // Get cards by meta tier for recommendations
+        $cardsByTier = $this->metaService->getCardsByTier();
 
         return view('support-cards.deck-builder', compact(
             'character',
             'availableCards',
             'currentDeck',
-            'synergyScore'
+            'deckAnalysis',
+            'friendshipOverview',
+            'deckStatistics',
+            'cardsByTier'
         ));
     }
 }

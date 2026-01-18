@@ -114,7 +114,16 @@ class DashboardController extends Controller
     private function getMetrics(Character $character): array
     {
         $stats = $character->current_stats ?? [];
+        // Handle case where stats might be a JSON string from old data
+        if (is_string($stats)) {
+            $stats = json_decode($stats, true) ?? [];
+        }
+
         $goals = $character->goals ?? [];
+        // Handle case where goals might be a JSON string from old data
+        if (is_string($goals)) {
+            $goals = json_decode($goals, true) ?? [];
+        }
 
         // Calculate overall grade based on average stats
         $statValues = array_values(array_filter($stats, fn ($v) => is_numeric($v)));
@@ -133,10 +142,19 @@ class DashboardController extends Controller
 
         // Get next race info
         $raceSchedule = $character->race_schedule ?? [];
+        // Handle case where race_schedule might be a JSON string from old data
+        if (is_string($raceSchedule)) {
+            $raceSchedule = json_decode($raceSchedule, true) ?? [];
+        }
+        // Ensure it's an array
+        if (! is_array($raceSchedule)) {
+            $raceSchedule = [];
+        }
+
         $nextRace = null;
         $turnsUntilRace = null;
 
-        if (! empty($raceSchedule)) {
+        if (! empty($raceSchedule) && is_array($raceSchedule)) {
             $upcomingRaces = array_filter($raceSchedule, fn ($race) => ($race['turn'] ?? 0) > $character->current_turn);
             if (! empty($upcomingRaces)) {
                 $nextRaceData = reset($upcomingRaces);
@@ -194,6 +212,10 @@ class DashboardController extends Controller
     private function getGoals(Character $character): array
     {
         $goals = $character->goals ?? [];
+        // Handle case where goals might be a JSON string from old data
+        if (is_string($goals)) {
+            $goals = json_decode($goals, true) ?? [];
+        }
 
         $shortTermGoal = $goals['short_term'] ?? 'No short-term goal set';
         $longTermGoal = $goals['long_term'] ?? 'No long-term goal set';
@@ -220,6 +242,10 @@ class DashboardController extends Controller
     private function calculateGoalProgress(Character $character, string $goalType): float
     {
         $goals = $character->goals ?? [];
+        // Handle case where goals might be a JSON string from old data
+        if (is_string($goals)) {
+            $goals = json_decode($goals, true) ?? [];
+        }
 
         if ($goalType === 'short_term') {
             // Short term could be race-based or stat-based
@@ -245,8 +271,22 @@ class DashboardController extends Controller
     private function getUpcomingRaces(Character $character): array
     {
         $raceSchedule = $character->race_schedule ?? [];
+        // Handle case where race_schedule might be a JSON string from old data
+        if (is_string($raceSchedule)) {
+            $raceSchedule = json_decode($raceSchedule, true) ?? [];
+        }
+
+        // Ensure it's an array
+        if (! is_array($raceSchedule)) {
+            $raceSchedule = [];
+        }
+
         $currentTurn = $character->current_turn ?? 1;
         $stats = $character->current_stats ?? [];
+        // Handle case where stats might be a JSON string from old data
+        if (is_string($stats)) {
+            $stats = json_decode($stats, true) ?? [];
+        }
 
         $upcomingRaces = [];
 
@@ -391,7 +431,17 @@ class DashboardController extends Controller
     private function calculateStatDeficits(Character $character): array
     {
         $stats = $character->current_stats ?? [];
+        // Handle case where stats might be a JSON string from old data
+        if (is_string($stats)) {
+            $stats = json_decode($stats, true) ?? [];
+        }
+
         $goals = $character->goals ?? [];
+        // Handle case where goals might be a JSON string from old data
+        if (is_string($goals)) {
+            $goals = json_decode($goals, true) ?? [];
+        }
+
         $targets = $goals['target_stats'] ?? [
             'speed' => 1000,
             'stamina' => 800,
@@ -415,6 +465,11 @@ class DashboardController extends Controller
     private function calculateTrainingGain(Character $character, string $stat, float $multiplier = 1.0): int
     {
         $growthRates = $character->growth_rates ?? [];
+        // Handle case where growth_rates might be a JSON string from old data
+        if (is_string($growthRates)) {
+            $growthRates = json_decode($growthRates, true) ?? [];
+        }
+
         $baseGain = 12;
         $growthBonus = ($growthRates[$stat] ?? 0) / 100;
 
