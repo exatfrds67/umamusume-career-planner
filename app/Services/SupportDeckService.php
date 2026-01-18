@@ -128,10 +128,17 @@ class SupportDeckService
             $query->where('card_type', $focusStat);
         }
 
-        return $query->orderByRaw("FIELD(meta_tier, 'S+', 'S', 'A')")
-            ->orderBy('usage_rate', 'desc')
+        // Use CASE WHEN for SQLite compatibility instead of FIELD
+        $cards = $query->orderBy('usage_rate', 'desc')
             ->limit(12)
             ->get();
+
+        // Sort by tier manually for SQLite compatibility
+        return $cards->sortBy(function ($card) {
+            $tierOrder = ['S+' => 1, 'S' => 2, 'A' => 3, 'B' => 4, 'C' => 5];
+
+            return $tierOrder[$card->meta_tier] ?? 99;
+        })->values();
     }
 
     /**

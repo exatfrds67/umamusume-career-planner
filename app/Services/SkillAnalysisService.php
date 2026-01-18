@@ -17,6 +17,9 @@ class SkillAnalysisService
 {
     /**
      * Analyze skill synergies for a given set of skills.
+     *
+     * @param  Collection<int, Skill>  $skills
+     * @return array<int, array{skill: Skill, synergies: Collection<int, Skill>, synergy_count: int, synergy_strength: float}>
      */
     public function analyzeSynergies(Collection $skills): array
     {
@@ -42,6 +45,8 @@ class SkillAnalysisService
 
     /**
      * Calculate synergy strength between skills.
+     *
+     * @param  Collection<int, Skill>  $synergisticSkills
      */
     private function calculateSynergyStrength(Skill $skill, Collection $synergisticSkills): float
     {
@@ -67,6 +72,9 @@ class SkillAnalysisService
 
     /**
      * Recommend optimal skill acquisition order.
+     *
+     * @param  Collection<int, Skill>  $targetSkills
+     * @return array<int, array{skill: Skill, priority: int, min_cost: int, max_cost: int, recommended_hints: int, reasoning: string}>
      */
     public function recommendAcquisitionOrder(Collection $targetSkills, int $availableSP): array
     {
@@ -159,6 +167,9 @@ class SkillAnalysisService
 
     /**
      * Analyze skill build for a character.
+     *
+     * @param  Collection<int, Skill>  $skills
+     * @return array<string, mixed>
      */
     public function analyzeSkillBuild(Character $character, Collection $skills): array
     {
@@ -175,6 +186,9 @@ class SkillAnalysisService
 
     /**
      * Analyze skill type distribution.
+     *
+     * @param  Collection<int, Skill>  $skills
+     * @return array<string, int>
      */
     private function analyzeSkillTypes(Collection $skills): array
     {
@@ -189,6 +203,9 @@ class SkillAnalysisService
 
     /**
      * Analyze meta tier distribution.
+     *
+     * @param  Collection<int, Skill>  $skills
+     * @return array<string, int>
      */
     private function analyzeMetaDistribution(Collection $skills): array
     {
@@ -203,6 +220,9 @@ class SkillAnalysisService
 
     /**
      * Analyze evolution potential.
+     *
+     * @param  Collection<int, Skill>  $skills
+     * @return array{evolvable_count: int, evolved_count: int, evolution_rate: float, potential_upgrades: array<int, string>}
      */
     private function analyzeEvolutionPotential(Collection $skills): array
     {
@@ -221,6 +241,9 @@ class SkillAnalysisService
 
     /**
      * Generate build recommendations.
+     *
+     * @param  Collection<int, Skill>  $skills
+     * @return array<int, array{type: string, message: string, priority: string}>
      */
     private function generateBuildRecommendations(Character $character, Collection $skills): array
     {

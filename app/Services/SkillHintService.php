@@ -34,6 +34,8 @@ class SkillHintService
 
     /**
      * Create a new skill hint for a character.
+     *
+     * @param  array<string, mixed>  $additionalData
      */
     public function createHint(
         Character $character,
@@ -74,6 +76,8 @@ class SkillHintService
 
     /**
      * Get all hints for a specific skill and character.
+     *
+     * @return Collection<int, SkillHint>
      */
     public function getHintsForSkill(Character $character, Skill $skill): Collection
     {
@@ -85,6 +89,8 @@ class SkillHintService
 
     /**
      * Get unused hints for a specific skill and character.
+     *
+     * @return Collection<int, SkillHint>
      */
     public function getUnusedHintsForSkill(Character $character, Skill $skill): Collection
     {
@@ -126,6 +132,18 @@ class SkillHintService
 
     /**
      * Get cost breakdown for a skill with current hints.
+     *
+     * @return array{
+     *   skill_id: int,
+     *   skill_name: string,
+     *   base_sp_cost: int,
+     *   hint_count: int,
+     *   discount_percentage: float,
+     *   final_sp_cost: int,
+     *   sp_saved: int,
+     *   max_discount_reached: bool,
+     *   hints: array<int, array{id: int, source_type: string, source_name: string, turn_obtained: int, guaranteed: bool}>
+     * }
      */
     public function getCostBreakdown(Character $character, Skill $skill): array
     {
@@ -178,6 +196,20 @@ class SkillHintService
 
     /**
      * Predict hint opportunities from support cards during training.
+     *
+     * @param  Collection<int, SupportCardDefinition>  $supportCards
+     * @return array<int, array{
+     *   skill_id: int,
+     *   skill_name: string,
+     *   support_card_id: int,
+     *   support_card_name: string,
+     *   guaranteed: bool,
+     *   probability: float,
+     *   current_hints: int,
+     *   potential_discount: float,
+     *   sp_savings: int,
+     *   max_discount_reached: bool
+     * }>
      */
     public function predictHintOpportunities(
         Character $character,
@@ -203,7 +235,7 @@ class SkillHintService
                     'skill_id' => $skill->id,
                     'skill_name' => $skill->name,
                     'support_card_id' => $supportCard->id,
-                    'support_card_name' => $supportCard->card_name,
+                    'support_card_name' => $supportCard->name,
                     'guaranteed' => $isGuaranteed,
                     'probability' => $isGuaranteed ? 100.0 : $this->calculateHintProbability($supportCard, $skill),
                     'current_hints' => $existingHints->count(),
@@ -271,6 +303,8 @@ class SkillHintService
 
     /**
      * Get skills provided by a support card for a specific training type.
+     *
+     * @return array<int, array<string, mixed>>
      */
     private function getSkillsProvidedByCard(SupportCardDefinition $supportCard, string $trainingType): array
     {
@@ -309,6 +343,9 @@ class SkillHintService
 
     /**
      * Get hint collection strategy recommendations.
+     *
+     * @param  Collection<int, Skill>  $targetSkills
+     * @return array<int, array{skill_id: int, skill_name: string, status: string, recommendation: string, priority: string, current_hints: int, final_cost?: int, potential_savings?: int}>
      */
     public function getHintCollectionStrategy(Character $character, Collection $targetSkills): array
     {
@@ -362,6 +399,8 @@ class SkillHintService
 
     /**
      * Get comprehensive hint statistics for a character.
+     *
+     * @return array<string, mixed>
      */
     public function getHintStatistics(Character $character): array
     {

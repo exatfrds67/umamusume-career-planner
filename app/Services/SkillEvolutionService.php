@@ -95,6 +95,8 @@ class SkillEvolutionService
 
     /**
      * Automatically evolve a Normal skill to its Rare counterpart.
+     *
+     * @return array<string, mixed>
      */
     public function evolveSkill(Character $character, Skill $normalSkill): array
     {
@@ -107,6 +109,13 @@ class SkillEvolutionService
         }
 
         $rareSkill = $normalSkill->evolutionTarget;
+        if (! $rareSkill instanceof Skill) {
+            return [
+                'success' => false,
+                'message' => 'Evolution target skill not found',
+                'reason' => 'Evolution target skill not found',
+            ];
+        }
 
         return DB::transaction(function () use ($character, $normalSkill, $rareSkill) {
             // Deactivate the Normal skill acquisition
