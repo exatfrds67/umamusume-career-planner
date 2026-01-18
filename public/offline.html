@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en" class="h-full">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Offline - Umamusume Career Planner</title>
+
+        <!-- Favicons -->
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="128x128"
+            href="/images/app_logo/uma_musume_race_planner_logo_128.png"
+        />
+
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.bunny.net" />
+        <link
+            href="https://fonts.bunny.net/css?family=inter:400,500,600,700"
+            rel="stylesheet"
+        />
+
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            html,
+            body {
+                height: 100%;
+                font-family:
+                    "Inter",
+                    system-ui,
+                    -apple-system,
+                    sans-serif;
+            }
+
+            body {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 1rem;
+                color: #1f2937;
+            }
+
+            /* Dark mode support */
+            @media (prefers-color-scheme: dark) {
+                body {
+                    background: linear-gradient(
+                        135deg,
+                        #1e3a8a 0%,
+                        #581c87 100%
+                    );
+                }
+
+                .card {
+                    background: rgba(31, 41, 55, 0.95);
+                    border-color: rgba(75, 85, 99, 0.5);
+                }
+
+                .card h1,
+                .card p,
+                .status-text {
+                    color: #f9fafb;
+                }
+
+                .status-badge {
+                    background: rgba(239, 68, 68, 0.2);
+                    color: #fca5a5;
+                }
+
+                .retry-button {
+                    background: linear-gradient(
+                        135deg,
+                        #3b82f6 0%,
+                        #8b5cf6 100%
+                    );
+                }
+
+                .retry-button:hover {
+                    background: linear-gradient(
+                        135deg,
+                        #2563eb 0%,
+                        #7c3aed 100%
+                    );
+                }
+            }
+
+            .container {
+                max-width: 42rem;
+                width: 100%;
+            }
+
+            .card {
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(10px);
+                border-radius: 1.5rem;
+                padding: 3rem 2rem;
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                text-align: center;
+            }
+
+            .logo-container {
+                margin-bottom: 2rem;
+                display: flex;
+                justify-content: center;
+            }
+
+            .logo {
+                width: 128px;
+                height: 128px;
+                border-radius: 50%;
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+                animation: pulse 2s ease-in-out infinite;
+            }
+
+            @keyframes pulse {
+                0%,
+                100% {
+                    transform: scale(1);
+                    opacity: 1;
+                }
+                50% {
+                    transform: scale(1.05);
+                    opacity: 0.9;
+                }
+            }
+
+            .status-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 0.5rem 1rem;
+                background: rgba(239, 68, 68, 0.1);
+                color: #dc2626;
+                border-radius: 9999px;
+                font-size: 0.875rem;
+                font-weight: 600;
+                margin-bottom: 1.5rem;
+            }
+
+            .status-dot {
+                width: 8px;
+                height: 8px;
+                background: currentColor;
+                border-radius: 50%;
+                animation: blink 1.5s ease-in-out infinite;
+            }
+
+            @keyframes blink {
+                0%,
+                100% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0.3;
+                }
+            }
+
+            h1 {
+                font-size: 2rem;
+                font-weight: 700;
+                margin-bottom: 1rem;
+                color: #111827;
+            }
+
+            .status-text {
+                font-size: 1.125rem;
+                color: #1f2937;
+                margin-bottom: 2rem;
+                line-height: 1.75;
+                font-weight: 500;
+            }
+
+            .retry-button {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 0.875rem 2rem;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                border: none;
+                border-radius: 0.75rem;
+                font-size: 1rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            }
+
+            .retry-button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+                background: linear-gradient(135deg, #5568d3 0%, #6941a5 100%);
+            }
+
+            .retry-button:active {
+                transform: translateY(0);
+            }
+
+            .icon {
+                width: 20px;
+                height: 20px;
+            }
+
+            .tips {
+                margin-top: 2.5rem;
+                padding-top: 2rem;
+                border-top: 1px solid rgba(0, 0, 0, 0.1);
+            }
+
+            @media (prefers-color-scheme: dark) {
+                .tips {
+                    border-top-color: rgba(255, 255, 255, 0.1);
+                }
+            }
+
+            .tips h2 {
+                font-size: 1rem;
+                font-weight: 600;
+                margin-bottom: 1rem;
+                color: #374151;
+            }
+
+            @media (prefers-color-scheme: dark) {
+                .tips h2 {
+                    color: #9ca3af;
+                }
+            }
+
+            .tips ul {
+                list-style: none;
+                text-align: left;
+            }
+
+            .tips li {
+                padding: 0.75rem 0;
+                color: #374151;
+                font-size: 0.875rem;
+                display: flex;
+                align-items: flex-start;
+                gap: 0.75rem;
+                font-weight: 500;
+            }
+
+            @media (prefers-color-scheme: dark) {
+                .tips li {
+                    color: #9ca3af;
+                }
+            }
+
+            .tips li::before {
+                content: "•";
+                color: #667eea;
+                font-weight: bold;
+                font-size: 1.25rem;
+                line-height: 1;
+            }
+
+            @media (prefers-color-scheme: dark) {
+                .tips li::before {
+                    color: #818cf8;
+                }
+            }
+
+            @media (max-width: 640px) {
+                .card {
+                    padding: 2rem 1.5rem;
+                }
+
+                h1 {
+                    font-size: 1.5rem;
+                }
+
+                .status-text {
+                    font-size: 1rem;
+                }
+
+                .logo {
+                    width: 96px;
+                    height: 96px;
+                }
+            }
+
+            /* Loading animation for retry */
+            .retry-button.loading {
+                pointer-events: none;
+                opacity: 0.7;
+            }
+
+            .retry-button.loading::after {
+                content: "";
+                width: 16px;
+                height: 16px;
+                border: 2px solid rgba(255, 255, 255, 0.3);
+                border-top-color: white;
+                border-radius: 50%;
+                animation: spin 0.6s linear infinite;
+            }
+
+            @keyframes spin {
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="card">
+                <div class="logo-container">
+                    <img
+                        src="/images/app_logo/uma_musume_race_planner_logo_128.png"
+                        alt="Umamusume Career Planner Logo"
+                        class="logo"
+                        onerror="this.style.display = 'none'"
+                    />
+                </div>
+
+                <div class="status-badge">
+                    <span class="status-dot"></span>
+                    <span>Offline</span>
+                </div>
+
+                <h1>You're Offline</h1>
+
+                <p class="status-text">
+                    It looks like you've lost your internet connection. Don't
+                    worry, your data is safe!
+                </p>
+
+                <button
+                    class="retry-button"
+                    onclick="retryConnection()"
+                    id="retryButton"
+                >
+                    <svg
+                        class="icon"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                        />
+                    </svg>
+                    <span>Try Again</span>
+                </button>
+
+                <div class="tips">
+                    <h2>While you're offline:</h2>
+                    <ul>
+                        <li>Check your internet connection</li>
+                        <li>Make sure Wi-Fi or mobile data is enabled</li>
+                        <li>Try moving to an area with better signal</li>
+                        <li>Restart your router if using Wi-Fi</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Check connection status
+            function updateOnlineStatus() {
+                if (navigator.onLine) {
+                    window.location.reload();
+                }
+            }
+
+            // Retry connection
+            function retryConnection() {
+                const button = document.getElementById("retryButton");
+                button.classList.add("loading");
+                button.innerHTML = "<span>Checking...</span>";
+
+                // Check if we're online
+                if (navigator.onLine) {
+                    // Try to fetch a small resource to verify connection
+                    fetch("/", { method: "HEAD", cache: "no-cache" })
+                        .then(() => {
+                            window.location.reload();
+                        })
+                        .catch(() => {
+                            resetButton();
+                        });
+                } else {
+                    setTimeout(resetButton, 1000);
+                }
+            }
+
+            function resetButton() {
+                const button = document.getElementById("retryButton");
+                button.classList.remove("loading");
+                button.innerHTML = `
+                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span>Try Again</span>
+            `;
+            }
+
+            // Listen for online event
+            window.addEventListener("online", updateOnlineStatus);
+
+            // Auto-retry when connection is restored
+            setInterval(() => {
+                if (navigator.onLine) {
+                    fetch("/", { method: "HEAD", cache: "no-cache" })
+                        .then(() => {
+                            window.location.reload();
+                        })
+                        .catch(() => {
+                            // Still offline
+                        });
+                }
+            }, 5000); // Check every 5 seconds
+        </script>
+    </body>
+</html>
