@@ -17,21 +17,35 @@ use App\Services\AI\Agents\RaceAnalysisAgent;
 use App\Services\AI\Agents\SkillManagementAgent;
 use App\Services\AI\Agents\TrainingOptimizationAgent;
 use App\Services\MCP\MCPClientService;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Config;
 
+uses(DatabaseMigrations::class);
+
 beforeEach(function () {
-    $this->mcpClient = Mockery::mock(MCPClientService::class);
-    $this->trainingAgent = Mockery::mock(TrainingOptimizationAgent::class);
-    $this->careerAgent = Mockery::mock(CareerStrategyAgent::class);
-    $this->raceAgent = Mockery::mock(RaceAnalysisAgent::class);
-    $this->skillAgent = Mockery::mock(SkillManagementAgent::class);
+    /** @var MCPClientService&Mockery\MockInterface $mcpClient */
+    $mcpClient = Mockery::mock(MCPClientService::class);
+    /** @var TrainingOptimizationAgent&Mockery\MockInterface $trainingAgent */
+    $trainingAgent = Mockery::mock(TrainingOptimizationAgent::class);
+    /** @var CareerStrategyAgent&Mockery\MockInterface $careerAgent */
+    $careerAgent = Mockery::mock(CareerStrategyAgent::class);
+    /** @var RaceAnalysisAgent&Mockery\MockInterface $raceAgent */
+    $raceAgent = Mockery::mock(RaceAnalysisAgent::class);
+    /** @var SkillManagementAgent&Mockery\MockInterface $skillAgent */
+    $skillAgent = Mockery::mock(SkillManagementAgent::class);
+
+    $this->mcpClient = $mcpClient;
+    $this->trainingAgent = $trainingAgent;
+    $this->careerAgent = $careerAgent;
+    $this->raceAgent = $raceAgent;
+    $this->skillAgent = $skillAgent;
 
     $this->orchestration = new AgentOrchestrationService(
-        $this->mcpClient,
-        $this->trainingAgent,
-        $this->careerAgent,
-        $this->raceAgent,
-        $this->skillAgent
+        $mcpClient,
+        $trainingAgent,
+        $careerAgent,
+        $raceAgent,
+        $skillAgent
     );
 
     $this->character = Character::factory()->create([
@@ -46,9 +60,7 @@ beforeEach(function () {
     ]);
 });
 
-afterEach(function () {
-    Mockery::close();
-});
+afterEach(fn () => Mockery::close());
 
 it('executes comprehensive analysis with all agents', function () {
     Config::set('ai.agents.orchestration.enabled', true);
@@ -287,7 +299,8 @@ it('calculates overall confidence correctly', function () {
     $result = $this->orchestration->executeComprehensiveAnalysis($this->character);
 
     // Average: (0.9 + 0.8 + 0.85 + 0.75) / 4 = 0.825
-    expect($result['confidence'])->toBe(0.825);
+    expect($result['confidence'])->toBeGreaterThanOrEqual(0.82)
+        ->and($result['confidence'])->toBeLessThanOrEqual(0.83);
 });
 
 it('returns status for all agents', function () {

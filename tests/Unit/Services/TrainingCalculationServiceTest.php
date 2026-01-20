@@ -4,9 +4,9 @@ use App\Models\Character;
 use App\Services\MCP\MCPClientService;
 use App\Services\MCP\TrainingOptimizationAgent;
 use App\Services\TrainingCalculationService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 
-uses(Tests\TestCase::class, RefreshDatabase::class);
+uses(DatabaseMigrations::class);
 
 /** @var MCPClientService&Mockery\MockInterface $mcpClient */
 $mcpClient = null;

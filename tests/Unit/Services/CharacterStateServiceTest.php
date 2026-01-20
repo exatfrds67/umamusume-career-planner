@@ -4,13 +4,13 @@ namespace Tests\Unit\Services;
 
 use App\Models\Character;
 use App\Services\CharacterStateService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class CharacterStateServiceTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseMigrations;
 
     protected CharacterStateService $service;
 

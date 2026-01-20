@@ -8,7 +8,6 @@
 use App\Services\AI\BedrockConfigurationService;
 use App\Services\MCP\MCPClientService;
 use Illuminate\Support\Facades\Config;
-use Tests\TestCase;
 
 /**
  * Bedrock Configuration Service Tests
@@ -18,11 +17,11 @@ use Tests\TestCase;
  *
  * Requirements: 56.1, 56.2, 59.1
  */
-uses(TestCase::class);
-
 beforeEach(function () {
     // Mock MCP Client
-    $this->mcpClient = Mockery::mock(MCPClientService::class);
+    /** @var MCPClientService&Mockery\MockInterface $mcpClient */
+    $mcpClient = Mockery::mock(MCPClientService::class);
+    $this->mcpClient = $mcpClient;
 
     // Set up test configuration
     Config::set('aws.credentials', [
@@ -63,7 +62,7 @@ beforeEach(function () {
         'nova-2-lite',
     ]);
 
-    $this->service = new BedrockConfigurationService($this->mcpClient);
+    $this->service = new BedrockConfigurationService($mcpClient);
 });
 
 afterEach(function () {

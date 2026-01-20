@@ -8,22 +8,10 @@ use App\Services\MCP\AWS\AWSKnowledgeService;
 use App\Services\MCP\AWS\AWSPricingService;
 use App\Services\MCP\MCPClientService;
 use Illuminate\Support\Facades\Cache;
-use Tests\TestCase;
 
-uses(TestCase::class);
+// uses() removed - Pest handles this automatically
 
-/** @var MCPClientService&Mockery\MockInterface $mcpClient */
-$mcpClient = null;
-/** @var AWSPricingService&Mockery\MockInterface $pricingService */
-$pricingService = null;
-/** @var AWSKnowledgeService&Mockery\MockInterface $knowledgeService */
-$knowledgeService = null;
-/** @var AWSAPIService&Mockery\MockInterface $apiService */
-$apiService = null;
-/** @var AWSIntegrationService $service */
-$service = null;
-
-beforeEach(function () use (&$mcpClient, &$pricingService, &$knowledgeService, &$apiService, &$service) {
+beforeEach(function () {
     /** @var MCPClientService&Mockery\MockInterface $mcpClient */
     $mcpClient = Mockery::mock(MCPClientService::class);
     /** @var AWSPricingService&Mockery\MockInterface $pricingService */
@@ -33,7 +21,12 @@ beforeEach(function () use (&$mcpClient, &$pricingService, &$knowledgeService, &
     /** @var AWSAPIService&Mockery\MockInterface $apiService */
     $apiService = Mockery::mock(AWSAPIService::class);
 
-    $service = new AWSIntegrationService(
+    $this->mcpClient = $mcpClient;
+    $this->pricingService = $pricingService;
+    $this->knowledgeService = $knowledgeService;
+    $this->apiService = $apiService;
+
+    $this->service = new AWSIntegrationService(
         $mcpClient,
         $pricingService,
         $knowledgeService,
@@ -47,12 +40,12 @@ afterEach(function () {
 });
 
 describe('AWSIntegrationService', function () {
-    it('checks availability of all AWS services', function () use (&$pricingService, &$knowledgeService, &$apiService, &$service) {
-        $pricingService->shouldReceive('isAvailable')->once()->andReturn(true);
-        $knowledgeService->shouldReceive('isAvailable')->once()->andReturn(true);
-        $apiService->shouldReceive('isAvailable')->once()->andReturn(true);
+    it('checks availability of all AWS services', function () {
+        $this->pricingService->shouldReceive('isAvailable')->once()->andReturn(true);
+        $this->knowledgeService->shouldReceive('isAvailable')->once()->andReturn(true);
+        $this->apiService->shouldReceive('isAvailable')->once()->andReturn(true);
 
-        $availability = $service->checkAvailability();
+        $availability = $this->service->checkAvailability();
 
         expect($availability)->toBeArray()
             ->and($availability)->toHaveKeys(['pricing', 'knowledge', 'api', 'overall'])
@@ -62,17 +55,17 @@ describe('AWSIntegrationService', function () {
             ->and($availability['overall'])->toBeTrue();
     });
 
-    it('reports overall availability as true when at least one service is available', function () use (&$pricingService, &$knowledgeService, &$apiService, &$service) {
-        $pricingService->shouldReceive('isAvailable')->once()->andReturn(true);
-        $knowledgeService->shouldReceive('isAvailable')->once()->andReturn(false);
-        $apiService->shouldReceive('isAvailable')->once()->andReturn(false);
+    it('reports overall availability as true when at least one service is available', function () {
+        $this->pricingService->shouldReceive('isAvailable')->once()->andReturn(true);
+        $this->knowledgeService->shouldReceive('isAvailable')->once()->andReturn(false);
+        $this->apiService->shouldReceive('isAvailable')->once()->andReturn(false);
 
-        $availability = $service->checkAvailability();
+        $availability = $this->service->checkAvailability();
 
         expect($availability['overall'])->toBeTrue();
     });
 
-    it('gets comprehensive cost analysis', function () use (&$pricingService, &$service) {
+    it('gets comprehensive cost analysis', function () {
         $usage = [
             'opus' => ['input' => 10000, 'output' => 5000],
         ];
@@ -81,7 +74,7 @@ describe('AWSIntegrationService', function () {
             'daily_costs' => array_fill(0, 30, 5.0),
         ];
 
-        $pricingService->shouldReceive('calculateMonthlyCost')
+        $this->pricingService->shouldReceive('calculateMonthlyCost')
             ->once()
             ->with($usage)
             ->andReturn([
@@ -91,18 +84,18 @@ describe('AWSIntegrationService', function () {
                 'currency' => 'USD',
             ]);
 
-        $pricingService->shouldReceive('getBedrockPricing')
+        $this->pricingService->shouldReceive('getBedrockPricing')
             ->once()
             ->andReturn([
                 'opus' => ['input_cost_per_1k' => 0.005, 'output_cost_per_1k' => 0.025],
             ]);
 
-        $pricingService->shouldReceive('getBudgetOptimizationRecommendations')
+        $this->pricingService->shouldReceive('getBudgetOptimizationRecommendations')
             ->once()
             ->with($usage)
             ->andReturn([]);
 
-        $pricingService->shouldReceive('forecastCosts')
+        $this->pricingService->shouldReceive('forecastCosts')
             ->once()
             ->with($historicalUsage)
             ->andReturn([
@@ -113,7 +106,7 @@ describe('AWSIntegrationService', function () {
                 'recommendations' => [],
             ]);
 
-        $analysis = $service->getCostAnalysis($usage, $historicalUsage);
+        $analysis = $this->service->getCostAnalysis($usage, $historicalUsage);
 
         expect($analysis)->toBeArray()
             ->and($analysis)->toHaveKeys(['current_costs', 'pricing_data', 'optimization_recommendations', 'forecast', 'budget_status'])
@@ -121,49 +114,49 @@ describe('AWSIntegrationService', function () {
             ->and($analysis['budget_status']['current_month'])->toBe(100.0);
     });
 
-    it('gets comprehensive Bedrock guidance', function () use (&$knowledgeService, &$apiService, &$service) {
-        $knowledgeService->shouldReceive('getBedrockBestPractices')
+    it('gets comprehensive Bedrock guidance', function () {
+        $this->knowledgeService->shouldReceive('getBedrockBestPractices')
             ->once()
             ->andReturn([
                 'service' => 'Amazon Bedrock',
                 'best_practices' => [],
             ]);
 
-        $apiService->shouldReceive('getBedrockHealth')
+        $this->apiService->shouldReceive('getBedrockHealth')
             ->once()
             ->andReturn([
                 'service' => 'Amazon Bedrock',
                 'status' => 'operational',
             ]);
 
-        $apiService->shouldReceive('listBedrockModels')
+        $this->apiService->shouldReceive('listBedrockModels')
             ->once()
             ->andReturn([
                 'region' => 'us-east-1',
                 'models' => [],
             ]);
 
-        $knowledgeService->shouldReceive('getArchitectureRecommendations')
+        $this->knowledgeService->shouldReceive('getArchitectureRecommendations')
             ->once()
             ->andReturn([
                 'architecture_type' => 'hybrid_ai_processing',
             ]);
 
-        $guidance = $service->getBedrockGuidance();
+        $guidance = $this->service->getBedrockGuidance();
 
         expect($guidance)->toBeArray()
             ->and($guidance)->toHaveKeys(['best_practices', 'health_status', 'available_models', 'architecture_recommendations']);
     });
 
-    it('gets service health dashboard', function () use (&$apiService, &$service) {
-        $apiService->shouldReceive('getBedrockHealth')
+    it('gets service health dashboard', function () {
+        $this->apiService->shouldReceive('getBedrockHealth')
             ->once()
             ->andReturn([
                 'service' => 'Amazon Bedrock',
                 'status' => 'operational',
             ]);
 
-        $apiService->shouldReceive('checkServiceQuotas')
+        $this->apiService->shouldReceive('checkServiceQuotas')
             ->once()
             ->with('bedrock')
             ->andReturn([
@@ -172,7 +165,7 @@ describe('AWSIntegrationService', function () {
                 'warnings' => [],
             ]);
 
-        $apiService->shouldReceive('getCloudWatchAlarms')
+        $this->apiService->shouldReceive('getCloudWatchAlarms')
             ->once()
             ->with('bedrock')
             ->andReturn([
@@ -181,22 +174,22 @@ describe('AWSIntegrationService', function () {
                 'active_alarms' => 0,
             ]);
 
-        $dashboard = $service->getServiceHealthDashboard();
+        $dashboard = $this->service->getServiceHealthDashboard();
 
         expect($dashboard)->toBeArray()
             ->and($dashboard)->toHaveKeys(['bedrock', 'quotas', 'alarms', 'overall_status', 'recommendations'])
             ->and($dashboard['overall_status'])->toBe('healthy');
     });
 
-    it('detects degraded status when service is not operational', function () use (&$apiService, &$service) {
-        $apiService->shouldReceive('getBedrockHealth')
+    it('detects degraded status when service is not operational', function () {
+        $this->apiService->shouldReceive('getBedrockHealth')
             ->once()
             ->andReturn([
                 'service' => 'Amazon Bedrock',
                 'status' => 'degraded',
             ]);
 
-        $apiService->shouldReceive('checkServiceQuotas')
+        $this->apiService->shouldReceive('checkServiceQuotas')
             ->once()
             ->andReturn([
                 'service' => 'bedrock',
@@ -204,7 +197,7 @@ describe('AWSIntegrationService', function () {
                 'warnings' => [],
             ]);
 
-        $apiService->shouldReceive('getCloudWatchAlarms')
+        $this->apiService->shouldReceive('getCloudWatchAlarms')
             ->once()
             ->andReturn([
                 'alarms' => [],
@@ -212,48 +205,48 @@ describe('AWSIntegrationService', function () {
                 'active_alarms' => 0,
             ]);
 
-        $dashboard = $service->getServiceHealthDashboard();
+        $dashboard = $this->service->getServiceHealthDashboard();
 
         expect($dashboard['overall_status'])->toBe('degraded');
     });
 
-    it('gets optimization recommendations', function () use (&$pricingService, &$knowledgeService, &$service) {
+    it('gets optimization recommendations', function () {
         $currentUsage = [
             'opus' => ['input' => 10000, 'output' => 5000],
         ];
 
-        $pricingService->shouldReceive('getBudgetOptimizationRecommendations')
+        $this->pricingService->shouldReceive('getBudgetOptimizationRecommendations')
             ->once()
             ->with($currentUsage)
             ->andReturn([]);
 
-        $knowledgeService->shouldReceive('getArchitectureRecommendations')
+        $this->knowledgeService->shouldReceive('getArchitectureRecommendations')
             ->once()
             ->andReturn([]);
 
-        $knowledgeService->shouldReceive('getSecurityBestPractices')
+        $this->knowledgeService->shouldReceive('getSecurityBestPractices')
             ->once()
             ->with('ai_services')
             ->andReturn([
                 'practices' => [],
             ]);
 
-        $knowledgeService->shouldReceive('getBedrockBestPractices')
+        $this->knowledgeService->shouldReceive('getBedrockBestPractices')
             ->once()
             ->andReturn([
                 'performance_tips' => ['Tip 1', 'Tip 2'],
             ]);
 
-        $recommendations = $service->getOptimizationRecommendations($currentUsage);
+        $recommendations = $this->service->getOptimizationRecommendations($currentUsage);
 
         expect($recommendations)->toBeArray()
             ->and($recommendations)->toHaveKeys(['cost_optimization', 'architecture_optimization', 'security_recommendations', 'performance_tips', 'priority_actions']);
     });
 
-    it('searches documentation with related content', function () use (&$knowledgeService, &$service) {
+    it('searches documentation with related content', function () {
         $query = 'bedrock error handling';
 
-        $knowledgeService->shouldReceive('searchDocumentation')
+        $this->knowledgeService->shouldReceive('searchDocumentation')
             ->once()
             ->with($query)
             ->andReturn([
@@ -263,13 +256,13 @@ describe('AWSIntegrationService', function () {
                 'search_time' => 0.1,
             ]);
 
-        $knowledgeService->shouldReceive('getBedrockBestPractices')
+        $this->knowledgeService->shouldReceive('getBedrockBestPractices')
             ->once()
             ->andReturn([
                 'service' => 'Amazon Bedrock',
             ]);
 
-        $knowledgeService->shouldReceive('getTroubleshootingGuidance')
+        $this->knowledgeService->shouldReceive('getTroubleshootingGuidance')
             ->once()
             ->with($query, 'bedrock')
             ->andReturn([
@@ -277,17 +270,17 @@ describe('AWSIntegrationService', function () {
                 'solutions' => [],
             ]);
 
-        $results = $service->searchDocumentation($query);
+        $results = $this->service->searchDocumentation($query);
 
         expect($results)->toBeArray()
             ->and($results)->toHaveKeys(['query', 'results', 'related_best_practices', 'troubleshooting_guides'])
             ->and($results['query'])->toBe($query);
     });
 
-    it('gets model comparison', function () use (&$pricingService, &$knowledgeService, &$service) {
+    it('gets model comparison', function () {
         $tokenCounts = ['input' => 1000, 'output' => 1000];
 
-        $pricingService->shouldReceive('comparePricing')
+        $this->pricingService->shouldReceive('comparePricing')
             ->once()
             ->with($tokenCounts)
             ->andReturn([
@@ -296,7 +289,7 @@ describe('AWSIntegrationService', function () {
                 'haiku' => ['estimated_cost' => 0.006],
             ]);
 
-        $knowledgeService->shouldReceive('getBedrockBestPractices')
+        $this->knowledgeService->shouldReceive('getBedrockBestPractices')
             ->once()
             ->andReturn([
                 'model_selection' => [
@@ -306,29 +299,29 @@ describe('AWSIntegrationService', function () {
                 ],
             ]);
 
-        $comparison = $service->getModelComparison($tokenCounts);
+        $comparison = $this->service->getModelComparison($tokenCounts);
 
         expect($comparison)->toBeArray()
             ->and($comparison)->toHaveKeys(['pricing_comparison', 'model_recommendations', 'best_practices', 'cost_savings_potential'])
             ->and($comparison['cost_savings_potential'])->toBe(0.024); // 0.03 - 0.006
     });
 
-    it('clears caches', function () use (&$service) {
+    it('clears caches', function () {
         Cache::put('test_key', 'test_value', 60);
 
-        $service->clearCaches();
+        $this->service->clearCaches();
 
         expect(Cache::has('test_key'))->toBeFalse();
     });
 
-    it('gets integration statistics', function () use (&$pricingService, &$knowledgeService, &$apiService, &$service) {
-        $pricingService->shouldReceive('isAvailable')->once()->andReturn(true);
-        $knowledgeService->shouldReceive('isAvailable')->once()->andReturn(true);
-        $apiService->shouldReceive('isAvailable')->once()->andReturn(true);
+    it('gets integration statistics', function () {
+        $this->pricingService->shouldReceive('isAvailable')->once()->andReturn(true);
+        $this->knowledgeService->shouldReceive('isAvailable')->once()->andReturn(true);
+        $this->apiService->shouldReceive('isAvailable')->once()->andReturn(true);
 
         Cache::put('aws_integration_rate_limit', 10, 60);
 
-        $stats = $service->getStatistics();
+        $stats = $this->service->getStatistics();
 
         expect($stats)->toBeArray()
             ->and($stats)->toHaveKeys(['availability', 'rate_limit_status', 'cache_stats'])

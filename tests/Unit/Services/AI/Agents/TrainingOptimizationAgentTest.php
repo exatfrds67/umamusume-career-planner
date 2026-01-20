@@ -9,12 +9,16 @@
 use App\Models\Character;
 use App\Services\AI\Agents\TrainingOptimizationAgent;
 use App\Services\MCP\MCPClientService;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Config;
 
+uses(DatabaseMigrations::class);
+
 beforeEach(function () {
-    $this->mcpClient = Mockery::mock(MCPClientService::class);
-    $this->agent = new TrainingOptimizationAgent($this->mcpClient);
+    /** @var MCPClientService&Mockery\MockInterface $mcpClient */
+    $mcpClient = Mockery::mock(MCPClientService::class);
+    $this->mcpClient = $mcpClient;
+    $this->agent = new TrainingOptimizationAgent($mcpClient);
     $this->character = Character::factory()->create([
         'scenario_type' => 'ura_finale',
         'current_stats' => [
@@ -29,9 +33,7 @@ beforeEach(function () {
     ]);
 });
 
-afterEach(function () {
-    Mockery::close();
-});
+afterEach(fn () => Mockery::close());
 
 it('analyzes training options successfully', function () {
     Config::set('ai.agents.training_optimization.enabled', true);
@@ -41,8 +43,10 @@ it('analyzes training options successfully', function () {
         ->andReturn(true);
 
     $trainingOptions = [
-        ['type' => 'speed', 'participants' => 2],
-        ['type' => 'stamina', 'participants' => 3],
+        'options' => [
+            ['type' => 'speed', 'participants' => 2],
+            ['type' => 'stamina', 'participants' => 3],
+        ],
     ];
 
     $result = $this->agent->analyzeTrainingOptions(
@@ -65,7 +69,9 @@ it('returns default recommendations when MCP is unavailable', function () {
         ->andReturn(false);
 
     $trainingOptions = [
-        ['type' => 'speed', 'participants' => 2],
+        'options' => [
+            ['type' => 'speed', 'participants' => 2],
+        ],
     ];
 
     $result = $this->agent->analyzeTrainingOptions(

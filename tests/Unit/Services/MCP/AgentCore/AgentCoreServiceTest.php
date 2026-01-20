@@ -9,9 +9,8 @@ use App\Services\MCP\AgentCore\AgentCoreService;
 use App\Services\MCP\MCPClientService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
-use Tests\TestCase;
 
-uses(TestCase::class);
+// uses() removed - Pest handles this automatically
 
 beforeEach(function () {
     Config::set('mcp.agentcore.enabled', true);

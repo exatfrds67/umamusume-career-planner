@@ -13,9 +13,8 @@ use App\Services\MCP\CostManagementService;
 use App\Services\MCP\MCPClientService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
-use Tests\TestCase;
 
-uses(TestCase::class);
+// uses() removed - Pest handles this automatically
 
 beforeEach(function () {
     /** @var MCPClientService&Mockery\MockInterface $mcpClient */

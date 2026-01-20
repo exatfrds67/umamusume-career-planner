@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services\MCP;
 
+use App\Services\MCP\AgentContextService;
+use App\Services\MCP\AgentMemoryService;
 use App\Services\MCP\AgentOrchestrationService;
+use App\Services\MCP\CareerStateSyncService;
 use App\Services\MCP\MCPClientService;
 use Illuminate\Support\Facades\Cache;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -16,12 +19,27 @@ class AgentOrchestrationServiceTest extends TestCase
 
     protected MCPClientService&MockObject $mcpClient;
 
+    protected AgentContextService&MockObject $contextService;
+
+    protected CareerStateSyncService&MockObject $syncService;
+
+    protected AgentMemoryService&MockObject $memoryService;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->mcpClient = $this->createMock(MCPClientService::class);
-        $this->service = new AgentOrchestrationService($this->mcpClient);
+        $this->contextService = $this->createMock(AgentContextService::class);
+        $this->syncService = $this->createMock(CareerStateSyncService::class);
+        $this->memoryService = $this->createMock(AgentMemoryService::class);
+
+        $this->service = new AgentOrchestrationService(
+            $this->mcpClient,
+            $this->contextService,
+            $this->syncService,
+            $this->memoryService
+        );
 
         Cache::flush();
     }

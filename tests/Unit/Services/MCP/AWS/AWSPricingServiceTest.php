@@ -5,19 +5,12 @@ declare(strict_types=1);
 use App\Services\MCP\AWS\AWSPricingService;
 use App\Services\MCP\MCPClientService;
 use Illuminate\Support\Facades\Cache;
-use Tests\TestCase;
 
-uses(TestCase::class);
-
-/** @var MCPClientService&Mockery\MockInterface $mcpClient */
-$mcpClient = null;
-/** @var AWSPricingService $service */
-$service = null;
-
-beforeEach(function () use (&$mcpClient, &$service) {
+beforeEach(function () {
     /** @var MCPClientService&Mockery\MockInterface $mcpClient */
     $mcpClient = Mockery::mock(MCPClientService::class);
-    $service = new AWSPricingService($mcpClient);
+    $this->mcpClient = $mcpClient;
+    $this->service = new AWSPricingService($mcpClient);
 });
 
 afterEach(function () {
@@ -26,34 +19,34 @@ afterEach(function () {
 });
 
 describe('AWSPricingService', function () {
-    it('checks if service is available', function () use (&$mcpClient, &$service) {
-        $mcpClient->shouldReceive('isServerEnabled')
+    it('checks if service is available', function () {
+        $this->mcpClient->shouldReceive('isServerEnabled')
             ->with('awspricing')
             ->once()
             ->andReturn(true);
 
-        $mcpClient->shouldReceive('isServerHealthy')
+        $this->mcpClient->shouldReceive('isServerHealthy')
             ->with('awspricing')
             ->once()
             ->andReturn(true);
 
-        expect($service->isAvailable())->toBeTrue();
+        expect($this->service->isAvailable())->toBeTrue();
     });
 
-    it('returns false when MCP server is disabled', function () use (&$mcpClient, &$service) {
-        $mcpClient->shouldReceive('isServerEnabled')
+    it('returns false when MCP server is disabled', function () {
+        $this->mcpClient->shouldReceive('isServerEnabled')
             ->with('awspricing')
             ->once()
             ->andReturn(false);
 
-        expect($service->isAvailable())->toBeFalse();
+        expect($this->service->isAvailable())->toBeFalse();
     });
 
-    it('gets Bedrock pricing data', function () use (&$mcpClient, &$service) {
-        $mcpClient->shouldReceive('isServerEnabled')->andReturn(true);
-        $mcpClient->shouldReceive('isServerHealthy')->andReturn(true);
+    it('gets Bedrock pricing data', function () {
+        $this->mcpClient->shouldReceive('isServerEnabled')->andReturn(true);
+        $this->mcpClient->shouldReceive('isServerHealthy')->andReturn(true);
 
-        $pricing = $service->getBedrockPricing();
+        $pricing = $this->service->getBedrockPricing();
 
         expect($pricing)->toBeArray()
             ->and($pricing)->toHaveKeys(['opus', 'sonnet', 'haiku', 'nova_lite'])
@@ -62,9 +55,9 @@ describe('AWSPricingService', function () {
             ->and($pricing['opus']['output_cost_per_1k'])->toBe(0.025);
     });
 
-    it('calculates monthly cost correctly', function () use (&$mcpClient, &$service) {
-        $mcpClient->shouldReceive('isServerEnabled')->andReturn(true);
-        $mcpClient->shouldReceive('isServerHealthy')->andReturn(true);
+    it('calculates monthly cost correctly', function () {
+        $this->mcpClient->shouldReceive('isServerEnabled')->andReturn(true);
+        $this->mcpClient->shouldReceive('isServerHealthy')->andReturn(true);
 
         $usage = [
             'opus' => [
@@ -77,7 +70,7 @@ describe('AWSPricingService', function () {
             ],
         ];
 
-        $result = $service->calculateMonthlyCost($usage);
+        $result = $this->service->calculateMonthlyCost($usage);
 
         expect($result)->toBeArray()
             ->and($result)->toHaveKeys(['estimated_cost', 'breakdown', 'recommendations', 'currency'])
@@ -92,16 +85,16 @@ describe('AWSPricingService', function () {
         expect($result['breakdown']['sonnet']['total_cost'])->toBe(0.21);
     });
 
-    it('compares pricing across models', function () use (&$mcpClient, &$service) {
-        $mcpClient->shouldReceive('isServerEnabled')->andReturn(true);
-        $mcpClient->shouldReceive('isServerHealthy')->andReturn(true);
+    it('compares pricing across models', function () {
+        $this->mcpClient->shouldReceive('isServerEnabled')->andReturn(true);
+        $this->mcpClient->shouldReceive('isServerHealthy')->andReturn(true);
 
         $tokenCounts = [
             'input' => 1000,
             'output' => 1000,
         ];
 
-        $comparison = $service->comparePricing($tokenCounts);
+        $comparison = $this->service->comparePricing($tokenCounts);
 
         expect($comparison)->toBeArray()
             ->and($comparison)->toHaveKeys(['opus', 'sonnet', 'haiku', 'nova_lite']);
@@ -110,14 +103,14 @@ describe('AWSPricingService', function () {
         expect($comparison['nova_lite']['relative_cost'])->toBe('cheapest');
 
         // Verify all models have required fields
-        foreach ($comparison as $model => $data) {
+        foreach ($comparison as $data) {
             expect($data)->toHaveKeys(['model', 'estimated_cost', 'cost_per_request', 'relative_cost']);
         }
     });
 
-    it('generates budget optimization recommendations', function () use (&$mcpClient, &$service) {
-        $mcpClient->shouldReceive('isServerEnabled')->andReturn(true);
-        $mcpClient->shouldReceive('isServerHealthy')->andReturn(true);
+    it('generates budget optimization recommendations', function () {
+        $this->mcpClient->shouldReceive('isServerEnabled')->andReturn(true);
+        $this->mcpClient->shouldReceive('isServerHealthy')->andReturn(true);
 
         $currentUsage = [
             'opus' => [
@@ -127,7 +120,7 @@ describe('AWSPricingService', function () {
             ],
         ];
 
-        $recommendations = $service->getBudgetOptimizationRecommendations($currentUsage);
+        $recommendations = $this->service->getBudgetOptimizationRecommendations($currentUsage);
 
         expect($recommendations)->toBeArray()
             ->and($recommendations)->not->toBeEmpty();
@@ -140,15 +133,15 @@ describe('AWSPricingService', function () {
         }
     });
 
-    it('forecasts costs based on historical usage', function () use (&$mcpClient, &$service) {
-        $mcpClient->shouldReceive('isServerEnabled')->andReturn(true);
-        $mcpClient->shouldReceive('isServerHealthy')->andReturn(true);
+    it('forecasts costs based on historical usage', function () {
+        $this->mcpClient->shouldReceive('isServerEnabled')->andReturn(true);
+        $this->mcpClient->shouldReceive('isServerHealthy')->andReturn(true);
 
         $historicalUsage = [
             'daily_costs' => array_fill(0, 30, 5.0), // 30 days of $5/day
         ];
 
-        $forecast = $service->forecastCosts($historicalUsage);
+        $forecast = $this->service->forecastCosts($historicalUsage);
 
         expect($forecast)->toBeArray()
             ->and($forecast)->toHaveKeys(['current_month', 'next_month_forecast', 'trend', 'confidence', 'recommendations'])
@@ -158,46 +151,46 @@ describe('AWSPricingService', function () {
             ->and($forecast['confidence'])->toBeIn(['high', 'medium', 'low']);
     });
 
-    it('handles insufficient data for forecasting', function () use (&$mcpClient, &$service) {
-        $mcpClient->shouldReceive('isServerEnabled')->andReturn(true);
-        $mcpClient->shouldReceive('isServerHealthy')->andReturn(true);
+    it('handles insufficient data for forecasting', function () {
+        $this->mcpClient->shouldReceive('isServerEnabled')->andReturn(true);
+        $this->mcpClient->shouldReceive('isServerHealthy')->andReturn(true);
 
         $historicalUsage = [
             'daily_costs' => [5.0, 6.0], // Only 2 days
         ];
 
-        $forecast = $service->forecastCosts($historicalUsage);
+        $forecast = $this->service->forecastCosts($historicalUsage);
 
         expect($forecast['trend'])->toBe('insufficient_data')
             ->and($forecast['confidence'])->toBe('low')
             ->and($forecast['recommendations'])->toContain('Collect more usage data for accurate forecasting');
     });
 
-    it('caches pricing data', function () use (&$mcpClient, &$service) {
-        $mcpClient->shouldReceive('isServerEnabled')->andReturn(true);
-        $mcpClient->shouldReceive('isServerHealthy')->andReturn(true);
+    it('caches pricing data', function () {
+        $this->mcpClient->shouldReceive('isServerEnabled')->andReturn(true);
+        $this->mcpClient->shouldReceive('isServerHealthy')->andReturn(true);
 
         // First call should cache
-        $pricing1 = $service->getBedrockPricing();
+        $pricing1 = $this->service->getBedrockPricing();
 
         // Second call should use cache
-        $pricing2 = $service->getBedrockPricing();
+        $pricing2 = $this->service->getBedrockPricing();
 
         expect($pricing1)->toBe($pricing2);
     });
 
-    it('uses fallback when MCP server is unavailable', function () use (&$mcpClient, &$service) {
-        $mcpClient->shouldReceive('isServerEnabled')->andReturn(false);
+    it('uses fallback when MCP server is unavailable', function () {
+        $this->mcpClient->shouldReceive('isServerEnabled')->andReturn(false);
 
-        $pricing = $service->getBedrockPricing();
+        $pricing = $this->service->getBedrockPricing();
 
         expect($pricing)->toBeArray()
             ->and($pricing)->toHaveKeys(['opus', 'sonnet', 'haiku', 'nova_lite']);
     });
 
-    it('generates cost recommendations for high usage', function () use (&$mcpClient, &$service) {
-        $mcpClient->shouldReceive('isServerEnabled')->andReturn(true);
-        $mcpClient->shouldReceive('isServerHealthy')->andReturn(true);
+    it('generates cost recommendations for high usage', function () {
+        $this->mcpClient->shouldReceive('isServerEnabled')->andReturn(true);
+        $this->mcpClient->shouldReceive('isServerHealthy')->andReturn(true);
 
         $usage = [
             'opus' => [
@@ -206,7 +199,7 @@ describe('AWSPricingService', function () {
             ],
         ];
 
-        $result = $service->calculateMonthlyCost($usage);
+        $result = $this->service->calculateMonthlyCost($usage);
 
         expect($result['recommendations'])->not->toBeEmpty()
             ->and($result['estimated_cost'])->toBeGreaterThan(50.0);

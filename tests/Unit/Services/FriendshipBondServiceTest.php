@@ -4,10 +4,9 @@ use App\Models\Character;
 use App\Models\CharacterSupportCard;
 use App\Models\SupportCardDefinition;
 use App\Services\FriendshipBondService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 
-uses(TestCase::class, RefreshDatabase::class);
+uses(DatabaseMigrations::class);
 
 /** @var FriendshipBondService $service */
 $service = null;

@@ -4,7 +4,7 @@ namespace Tests\Unit\Services\MCP\Tools;
 
 use App\Services\MCP\MCPClientService;
 use App\Services\MCP\Tools\AWSPricingService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -19,7 +19,7 @@ use Tests\TestCase;
  */
 class AWSPricingServiceTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseMigrations;
 
     protected MCPClientService&MockObject $mcpClient;
 
