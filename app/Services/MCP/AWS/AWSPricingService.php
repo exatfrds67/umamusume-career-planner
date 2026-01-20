@@ -469,11 +469,17 @@ class AWSPricingService
 
     /**
      * Get cache key
-     *
-     * @param  array<string, mixed>  $params
      */
-    protected function getCacheKey(string $type, string ...$params): string
+    protected function getCacheKey(string $type, mixed ...$params): string
     {
-        return sprintf('aws_pricing:%s:%s', $type, implode(':', $params));
+        $normalizedParams = array_map(function (mixed $param): string {
+            if (is_array($param)) {
+                return json_encode($param) ?: '';
+            }
+
+            return (string) $param;
+        }, $params);
+
+        return 'aws_pricing:'.$type.':'.md5(implode(':', $normalizedParams));
     }
 }

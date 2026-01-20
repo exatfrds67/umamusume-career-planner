@@ -288,8 +288,13 @@ class AWSIntegrationService
 
                 // Calculate cost savings potential
                 $costs = array_column($pricingComparison, 'estimated_cost');
-                $minCost = min($costs);
-                $maxCost = max($costs);
+                if (empty($costs)) {
+                    $minCost = 0.0;
+                    $maxCost = 0.0;
+                } else {
+                    $minCost = min($costs);
+                    $maxCost = max($costs);
+                }
                 $costSavingsPotential = $maxCost - $minCost;
 
                 $modelRecommendations = $bestPractices['model_selection'] ?? [];
@@ -361,12 +366,16 @@ class AWSIntegrationService
             }
         }
 
+        if ($lastException === null) {
+            throw new \RuntimeException('Operation failed after retries');
+        }
+
         Log::error('[AWSIntegration] Operation failed after all retries', [
             'attempts' => self::RETRY_ATTEMPTS,
-            'error' => $lastException?->getMessage(),
+            'error' => $lastException->getMessage(),
         ]);
 
-        throw $lastException ?? new \RuntimeException('Operation failed after retries');
+        throw $lastException;
     }
 
     /**

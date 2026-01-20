@@ -185,7 +185,7 @@ class AgentRoutingService
         if ($this->isOllamaAvailable()) {
             return [
                 'provider' => self::PROVIDER_OLLAMA,
-                'model' => config('ai.ollama.model', 'llama3.3'),
+                'model' => (string) config('ai.ollama.model', 'llama3.3'),
                 'reason' => 'Simple request - using local Ollama for speed and cost efficiency',
                 'estimated_cost' => self::OLLAMA_COST,
             ];
@@ -212,7 +212,7 @@ class AgentRoutingService
         if ($this->isOllamaAvailable()) {
             return [
                 'provider' => self::PROVIDER_OLLAMA,
-                'model' => config('ai.ollama.model', 'llama3.3'),
+                'model' => (string) config('ai.ollama.model', 'llama3.3'),
                 'reason' => 'Moderate request - attempting local Ollama first',
                 'estimated_cost' => self::OLLAMA_COST,
             ];
@@ -518,7 +518,9 @@ class AgentRoutingService
 
         // Estimate token usage
         $inputTokens = $this->estimateTokenCount($request['prompt'] ?? '', $request['context'] ?? []);
-        $outputTokens = $this->estimateTokenCount(is_string($response) ? $response : json_encode($response));
+        $outputTokens = $this->estimateTokenCount(
+            is_string($response) ? $response : (json_encode($response) ?: '')
+        );
 
         // Calculate cost based on model
         $costPer1K = $route['estimated_cost'];
@@ -627,21 +629,25 @@ class AgentRoutingService
     /**
      * Record execution metrics
      *
-     * @param  array<string, mixed>  $route
+     * @param  array{provider?: string, model?: string}  $route
      */
     protected function recordExecution(array $route, float $executionTime, bool $success): void
     {
         $metrics = [
-            'provider' => $route['provider'],
-            'model' => $route['model'],
+            'provider' => $route['provider'] ?? 'unknown',
+            'model' => $route['model'] ?? 'unknown',
             'execution_time' => $executionTime,
             'success' => $success,
             'timestamp' => now()->toIso8601String(),
         ];
 
         // Store in cache for analytics
-        $cacheKey = "routing_metrics_{$route['provider']}";
+        $providerKey = $route['provider'] ?? 'unknown';
+        $cacheKey = "routing_metrics_{$providerKey}";
         $allMetrics = Cache::get($cacheKey, []);
+        if (! is_array($allMetrics)) {
+            $allMetrics = [];
+        }
         $allMetrics[] = $metrics;
 
         // Keep only last 100 metrics
@@ -666,10 +672,14 @@ class AgentRoutingService
     public function getRoutingAnalytics(): array
     {
         $providers = [self::PROVIDER_OLLAMA, self::PROVIDER_BEDROCK, self::PROVIDER_AGENT];
+        /** @var array<int, array{provider: string, model: string, execution_time: float, success: bool, timestamp: string}> $allMetrics */
         $allMetrics = [];
 
         foreach ($providers as $provider) {
             $metrics = Cache::get("routing_metrics_{$provider}", []);
+            if (! is_array($metrics)) {
+                $metrics = [];
+            }
             $allMetrics = array_merge($allMetrics, $metrics);
         }
 
@@ -689,7 +699,10 @@ class AgentRoutingService
         $successRate = [];
 
         foreach ($providers as $provider) {
-            $providerMetrics = array_filter($allMetrics, fn ($m) => $m['provider'] === $provider);
+            $providerMetrics = array_filter(
+                $allMetrics,
+                fn ($m) => is_array($m) && ($m['provider'] ?? null) === $provider
+            );
             $count = count($providerMetrics);
 
             if ($count > 0) {
@@ -698,7 +711,10 @@ class AgentRoutingService
                 $executionTimes = array_column($providerMetrics, 'execution_time');
                 $avgExecutionTime[$provider] = array_sum($executionTimes) / $count;
 
-                $successCount = count(array_filter($providerMetrics, fn ($m) => $m['success']));
+                $successCount = count(array_filter(
+                    $providerMetrics,
+                    fn ($m) => is_array($m) && ($m['success'] ?? false)
+                ));
                 $successRate[$provider] = ($successCount / $count) * 100;
             }
         }

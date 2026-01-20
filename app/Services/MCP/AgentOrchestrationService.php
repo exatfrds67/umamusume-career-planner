@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace App\Services\MCP;
 
+use App\Models\Character;
+use App\Services\MCP\Agents\CareerStrategyAgent;
+use App\Services\MCP\Agents\PerformanceAnalyticsAgent;
+use App\Services\MCP\Agents\ResourceManagementAgent;
+use App\Services\MCP\Agents\SummerCampOptimizationAgent;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
@@ -44,7 +49,10 @@ class AgentOrchestrationService
     public const STATE_TERMINATED = 'terminated';
 
     public function __construct(
-        private readonly MCPClientService $mcpClient
+        private readonly MCPClientService $mcpClient,
+        private readonly AgentContextService $contextService,
+        private readonly CareerStateSyncService $syncService,
+        private readonly AgentMemoryService $memoryService
     ) {}
 
     /**
@@ -134,6 +142,272 @@ class AgentOrchestrationService
     public function getCurrentWorkflow(?int $userId = null): ?array
     {
         return null;
+    }
+
+    /**
+     * Create context-aware workflow with character and career state
+     */
+    public function createContextAwareWorkflow(
+        string $name,
+        string $pattern,
+        array $agents,
+        \App\Models\Character $character,
+        ?\App\Models\Career $career = null,
+        array $config = []
+    ): array {
+        try {
+            // Build unified context
+            $context = $this->contextService->buildUnifiedContext($character, $career);
+
+            // Create workflow with context
+            $workflow = $this->createWorkflow($name, $pattern, $agents, array_merge($config, [
+                'context_aware' => true,
+                'character_id' => $character->id,
+                'career_id' => $career?->id,
+            ]));
+
+            // Store context reference
+            Cache::put("workflow_context:{$workflow['id']}", $context, 3600);
+
+            // Synchronize state with agents
+            if ($career) {
+                $this->syncService->synchronizeCareerState($career);
+            }
+
+            Log::info('[AgentOrchestration] Context-aware workflow created', [
+                'workflow_id' => $workflow['id'],
+                'character_id' => $character->id,
+                'career_id' => $career?->id,
+            ]);
+
+            return $workflow;
+        } catch (\Exception $e) {
+            Log::error('[AgentOrchestration] Failed to create context-aware workflow', [
+                'name' => $name,
+                'error' => $e->getMessage(),
+            ]);
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Execute workflow with memory persistence
+     */
+    public function executeWorkflowWithMemory(
+        string $workflowId,
+        string $agentId,
+        array $input = []
+    ): array {
+        try {
+            // Retrieve agent memories
+            $memories = $this->memoryService->getAgentMemories($agentId);
+
+            // Add memories to input context
+            $input['agent_memories'] = $memories;
+
+            // Execute workflow
+            $result = $this->executeWorkflow($workflowId, $input);
+
+            // Store episodic memory of this execution
+            $this->memoryService->storeEpisode($agentId, uniqid('episode_'), [
+                'workflow_id' => $workflowId,
+                'input' => $input,
+                'result' => $result,
+                'timestamp' => now()->toIso8601String(),
+            ]);
+
+            return $result;
+        } catch (\Exception $e) {
+            Log::error('[AgentOrchestration] Failed to execute workflow with memory', [
+                'workflow_id' => $workflowId,
+                'agent_id' => $agentId,
+                'error' => $e->getMessage(),
+            ]);
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Execute a comprehensive analysis across core MCP agents.
+     *
+     * @param  array<string, mixed>  $context
+     * @return array{
+     *     career_strategy: array<string, mixed>,
+     *     resource_management: array<string, mixed>,
+     *     performance_analytics: array<string, mixed>,
+     *     summer_camp: array<string, mixed>,
+     *     integrated_recommendations: array<string, mixed>,
+     *     orchestration_metadata: array<string, mixed>
+     * }
+     */
+    public function executeComprehensiveAnalysis(Character $character, array $context = []): array
+    {
+        $startTime = microtime(true);
+
+        $careerStrategy = app(CareerStrategyAgent::class)->analyzeCareerStrategy($character, $context);
+        $resourceManagement = app(ResourceManagementAgent::class)->analyzeResourceManagement($character, $context);
+        $performanceAnalytics = app(PerformanceAnalyticsAgent::class)->analyzePerformance($character, $context);
+        $summerCamp = app(SummerCampOptimizationAgent::class)->analyzeSummerCampOptimization($character, $context);
+
+        $integratedRecommendations = $this->buildIntegratedRecommendations(
+            $character,
+            $careerStrategy,
+            $resourceManagement,
+            $performanceAnalytics,
+            $summerCamp
+        );
+
+        return [
+            'career_strategy' => $careerStrategy,
+            'resource_management' => $resourceManagement,
+            'performance_analytics' => $performanceAnalytics,
+            'summer_camp' => $summerCamp,
+            'integrated_recommendations' => $integratedRecommendations,
+            'orchestration_metadata' => [
+                'execution_time_seconds' => microtime(true) - $startTime,
+                'agents_executed' => 4,
+                'agent_statuses' => [
+                    'career_strategy' => self::STATE_COMPLETED,
+                    'resource_management' => self::STATE_COMPLETED,
+                    'performance_analytics' => self::STATE_COMPLETED,
+                    'summer_camp' => self::STATE_COMPLETED,
+                ],
+                'timestamp' => now()->toIso8601String(),
+            ],
+        ];
+    }
+
+    /**
+     * Get a fast recommendation based on current character state.
+     *
+     * @return array{action: string, reason: string, confidence: float}
+     */
+    public function getQuickRecommendation(Character $character): array
+    {
+        $cacheKey = "mcp_quick_recommendation:{$character->id}";
+        $cached = Cache::get($cacheKey);
+
+        if (is_array($cached)
+            && isset($cached['action'], $cached['reason'], $cached['confidence'])
+            && is_string($cached['action'])
+            && is_string($cached['reason'])
+        ) {
+            return [
+                'action' => $cached['action'],
+                'reason' => $cached['reason'],
+                'confidence' => (float) $cached['confidence'],
+            ];
+        }
+
+        $performanceAnalytics = app(PerformanceAnalyticsAgent::class)->analyzePerformance($character, []);
+        $energy = (int) ($performanceAnalytics['energy_analysis']['current_energy'] ?? 100);
+
+        $action = $energy <= 25 ? 'rest' : 'training';
+        $reason = $energy <= 25
+            ? 'Energy critically low; prioritize recovery.'
+            : 'Energy stable; proceed with training.';
+
+        $confidence = max(0.0, min(1.0, (float) ($performanceAnalytics['optimization_score'] ?? 0.7)));
+
+        $result = [
+            'action' => $action,
+            'reason' => $reason,
+            'confidence' => $confidence,
+        ];
+
+        Cache::put($cacheKey, $result, 300);
+
+        return $result;
+    }
+
+    /**
+     * @param  array<string, mixed>  $careerStrategy
+     * @param  array<string, mixed>  $resourceManagement
+     * @param  array<string, mixed>  $performanceAnalytics
+     * @param  array<string, mixed>  $summerCamp
+     * @return array<string, mixed>
+     */
+    protected function buildIntegratedRecommendations(
+        Character $character,
+        array $careerStrategy,
+        array $resourceManagement,
+        array $performanceAnalytics,
+        array $summerCamp
+    ): array {
+        $energy = (int) ($performanceAnalytics['energy_analysis']['current_energy'] ?? $character->energy_level ?? 100);
+        $isInCamp = (bool) ($summerCamp['summer_camp_status']['is_in_camp'] ?? false);
+
+        $priorityRecommendation = $this->determinePriorityRecommendation($energy, $isInCamp);
+
+        return [
+            'priority_recommendation' => $priorityRecommendation,
+            'action_plan' => [
+                'primary_action' => $priorityRecommendation['action'],
+                'secondary_actions' => array_values($careerStrategy['recommendations'] ?? []),
+            ],
+            'consensus_score' => $this->calculateConsensusScore([
+                $careerStrategy['confidence'] ?? 0.8,
+                $resourceManagement['efficiency_score'] ?? 0.8,
+                $performanceAnalytics['optimization_score'] ?? 0.8,
+                $summerCamp['efficiency_score'] ?? 0.8,
+            ]),
+            'summary' => 'Integrated recommendations generated from core MCP agents.',
+            'all_recommendations' => [
+                'career_strategy' => $careerStrategy['recommendations'] ?? [],
+                'resource_management' => $resourceManagement['optimization_recommendations'] ?? [],
+                'performance_analytics' => $performanceAnalytics['recommendations'] ?? [],
+                'summer_camp' => $summerCamp['recommendations'] ?? [],
+            ],
+        ];
+    }
+
+    /**
+     * @return array{priority: string, action: string, reason: string, source: string}
+     */
+    protected function determinePriorityRecommendation(int $energy, bool $isInCamp): array
+    {
+        if ($energy <= 25) {
+            return [
+                'priority' => 'critical',
+                'action' => 'rest',
+                'reason' => 'Energy critically low; recovery required.',
+                'source' => 'performance_analytics',
+            ];
+        }
+
+        if ($isInCamp) {
+            return [
+                'priority' => 'critical',
+                'action' => 'training',
+                'reason' => 'Summer Camp active; prioritize training for bonus gains.',
+                'source' => 'summer_camp',
+            ];
+        }
+
+        return [
+            'priority' => 'high',
+            'action' => 'training',
+            'reason' => 'Conditions stable; maintain training progression.',
+            'source' => 'career_strategy',
+        ];
+    }
+
+    /**
+     * @param  array<int, float|int>  $scores
+     */
+    protected function calculateConsensusScore(array $scores): float
+    {
+        $filtered = array_values(array_filter($scores, static fn ($score) => is_numeric($score)));
+
+        if ($filtered === []) {
+            return 0.0;
+        }
+
+        $total = array_sum($filtered);
+
+        return max(0.0, min(1.0, $total / count($filtered)));
     }
 
     /**
@@ -473,7 +747,7 @@ class AgentOrchestrationService
     protected function updateWorkflowState(string $workflowId, string $state): void
     {
         $workflow = $this->getWorkflow($workflowId);
-        if ($workflow) {
+        if (is_array($workflow)) {
             $workflow['state'] = $state;
             $workflow['updated_at'] = now()->toIso8601String();
             Cache::put("workflow:{$workflowId}", $workflow, 3600);
@@ -483,7 +757,7 @@ class AgentOrchestrationService
     protected function updateAgentState(string $agentId, string $state): void
     {
         $agent = $this->getAgent($agentId);
-        if ($agent) {
+        if (is_array($agent)) {
             $agent['state'] = $state;
             $agent['updated_at'] = now()->toIso8601String();
             Cache::put("agent:{$agentId}", $agent, 3600);
@@ -493,6 +767,9 @@ class AgentOrchestrationService
     protected function recordAgentMetrics(string $agentId, array $metrics): void
     {
         $allMetrics = Cache::get("agent_metrics:{$agentId}", []);
+        if (! is_array($allMetrics)) {
+            $allMetrics = [];
+        }
         $allMetrics[] = array_merge($metrics, [
             'timestamp' => now()->toIso8601String(),
             'success' => ! isset($metrics['error']),
@@ -508,7 +785,9 @@ class AgentOrchestrationService
 
     protected function getAgentMetrics(string $agentId): array
     {
-        return Cache::get("agent_metrics:{$agentId}", []);
+        $metrics = Cache::get("agent_metrics:{$agentId}", []);
+
+        return is_array($metrics) ? $metrics : [];
     }
 
     protected function calculateAgentHealth(array $metrics): string

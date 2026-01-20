@@ -387,7 +387,7 @@ class CostManagementService
         $bedrockCost = ($breakdown['bedrock']['total_cost'] ?? 0);
         $ollamaCost = ($breakdown['ollama']['total_cost'] ?? 0);
 
-        if ($bedrockCost > 0 && $ollamaCost === 0.0) {
+        if ($bedrockCost > 0 && $ollamaCost == 0) {
             $recommendations[] = [
                 'type' => 'provider_optimization',
                 'severity' => 'high',
