@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\CareerReportController;
 use App\Http\Controllers\CharacterController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\HistoricalTrackingController;
 use Illuminate\Support\Facades\Route;
 
 // Main welcome route
@@ -68,6 +70,26 @@ Route::middleware('auth')->group(function () {
     Route::get('/support-cards/{supportCard}', [App\Http\Controllers\SupportCardController::class, 'show'])->name('support-cards.show');
     Route::get('/characters/{character}/deck-builder', [App\Http\Controllers\SupportCardController::class, 'deckBuilder'])->name('characters.deck-builder');
 
+    // OCR Screenshot Processing routes
+    Route::get('/ocr/upload', [App\Http\Controllers\OCRUploadController::class, 'showUploadPage'])->name('ocr.upload');
+    Route::get('/ocr/results/{extraction}', [App\Http\Controllers\OCRUploadController::class, 'showResults'])->name('ocr.results');
+    Route::post('/ocr/import/{extraction}', [App\Http\Controllers\OCRUploadController::class, 'import'])->name('ocr.import');
+
+    // Data Import routes (Task 5.3.1)
+    Route::get('/import', [App\Http\Controllers\ImportController::class, 'index'])->name('import.index');
+
+    // Data Export routes (Task 5.3.2)
+    Route::get('/export', [App\Http\Controllers\ExportController::class, 'index'])->name('export.index');
+
+    // Data Migration routes (Task 5.3.3)
+    Route::get('/migration', [App\Http\Controllers\MigrationController::class, 'index'])->name('migration.index');
+
+    // Backup & Restore routes (Task 5.3.4)
+    Route::get('/backup', [App\Http\Controllers\BackupController::class, 'index'])->name('backup.index');
+
+    // Data Management Hub routes (Task 5.3.5)
+    Route::get('/data-management', [App\Http\Controllers\DataManagementController::class, 'index'])->name('data-management.index');
+
     // Profile routes
     Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
     Route::put('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
@@ -75,6 +97,44 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile/avatar', [App\Http\Controllers\ProfileController::class, 'uploadAvatar'])->name('profile.avatar');
     Route::get('/profile/export', [App\Http\Controllers\ProfileController::class, 'exportData'])->name('profile.export');
     Route::delete('/profile', [App\Http\Controllers\ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Career Reports routes
+    Route::prefix('reports')->name('reports.')->group(function () {
+        Route::get('/', [CareerReportController::class, 'index'])->name('index');
+        Route::get('/career/{career}', [CareerReportController::class, 'showCareerReport'])->name('career');
+        Route::get('/character/{character}', [CareerReportController::class, 'showCharacterReport'])->name('character');
+        Route::get('/compare', [CareerReportController::class, 'compareReports'])->name('compare');
+
+        // Export routes
+        Route::get('/career/{career}/export/json', [CareerReportController::class, 'exportJson'])->name('export.json');
+        Route::get('/career/{career}/export/csv', [CareerReportController::class, 'exportCsv'])->name('export.csv');
+        Route::get('/career/{career}/export/pdf', [CareerReportController::class, 'exportPdf'])->name('export.pdf');
+
+        // API routes for AJAX
+        Route::get('/api/career/{career}', [CareerReportController::class, 'getReportData'])->name('api.career');
+        Route::get('/api/character/{character}', [CareerReportController::class, 'getCharacterReportData'])->name('api.character');
+        Route::post('/api/career/{career}/clear-cache', [CareerReportController::class, 'clearCache'])->name('api.clear-cache');
+    });
+
+    // Historical Tracking and Benchmarking routes
+    Route::prefix('historical')->name('historical.')->group(function () {
+        Route::get('/', [HistoricalTrackingController::class, 'index'])->name('index');
+
+        // API routes for AJAX
+        Route::get('/api/trends', [HistoricalTrackingController::class, 'getLongTermTrends'])->name('api.trends');
+        Route::get('/api/success-rates', [HistoricalTrackingController::class, 'getSuccessRates'])->name('api.success-rates');
+        Route::get('/api/ml-recommendations', [HistoricalTrackingController::class, 'getMLRecommendations'])->name('api.ml-recommendations');
+        Route::get('/api/benchmarks', [HistoricalTrackingController::class, 'getCommunityBenchmarks'])->name('api.benchmarks');
+        Route::get('/api/user-comparison', [HistoricalTrackingController::class, 'getUserBenchmarkComparison'])->name('api.user-comparison');
+        Route::get('/api/benchmark-trends', [HistoricalTrackingController::class, 'getBenchmarkTrends'])->name('api.benchmark-trends');
+        Route::post('/api/clear-cache', [HistoricalTrackingController::class, 'clearCache'])->name('api.clear-cache');
+    });
+
+    // Performance Monitoring Dashboard (Task 6.1.5)
+    Route::prefix('performance')->name('performance.')->group(function () {
+        Route::get('/apm/dashboard', [App\Http\Controllers\PerformanceController::class, 'apmDashboardView'])
+            ->name('apm.dashboard');
+    });
 });
 
 // Settings routes (requires authentication)

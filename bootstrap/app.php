@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -29,6 +30,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // Security headers middleware alias
         $middleware->alias([
             'security.headers' => \App\Http\Middleware\SecurityHeaders::class,
+            'api.performance' => \App\Http\Middleware\ApiPerformanceMiddleware::class,
+            'tiered.rate.limit' => \App\Http\Middleware\TieredRateLimiting::class,
         ]);
 
         // Configure authentication redirects - redirect to welcome page instead of login
@@ -37,6 +40,14 @@ return Application::configure(basePath: dirname(__DIR__))
                 ? null
                 : route('welcome')
         );
+    })
+    ->withSchedule(function (Schedule $schedule): void {
+        // OCR file cleanup - runs daily at 2 AM
+        $schedule->command('ocr:cleanup')
+            ->daily()
+            ->at('02:00')
+            ->withoutOverlapping()
+            ->onOneServer();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // Handle rate limiting exceptions for API
