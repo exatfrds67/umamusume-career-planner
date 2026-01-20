@@ -10,6 +10,13 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class CharacterSupportCardFactory extends Factory
 {
     /**
+     * Track used position slots per character to avoid unique constraint violations.
+     *
+     * @var array<int, array<int>>
+     */
+    protected static array $usedPositions = [];
+
+    /**
      * Define the model's default state.
      *
      * @return array<string, mixed>
@@ -24,5 +31,25 @@ class CharacterSupportCardFactory extends Factory
             'position_slot' => fake()->numberBetween(1, 6),
             'is_friend_card' => fake()->boolean(20), // 20% chance of being friend card
         ];
+    }
+
+    /**
+     * Configure the factory to use a specific position slot.
+     */
+    public function position(int $slot): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'position_slot' => $slot,
+        ]);
+    }
+
+    /**
+     * Configure the factory as a friend card.
+     */
+    public function friendCard(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_friend_card' => true,
+        ]);
     }
 }

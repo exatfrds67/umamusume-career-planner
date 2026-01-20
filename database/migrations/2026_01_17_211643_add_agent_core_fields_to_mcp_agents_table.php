@@ -40,6 +40,11 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('ucp_mcp_agents', function (Blueprint $table) {
+            // Drop the unique index first (required for SQLite)
+            $table->dropUnique(['agent_id']);
+        });
+
+        Schema::table('ucp_mcp_agents', function (Blueprint $table) {
             $table->dropColumn([
                 'agent_id',
                 'name',

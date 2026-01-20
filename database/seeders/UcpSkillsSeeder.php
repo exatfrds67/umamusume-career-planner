@@ -13,7 +13,9 @@ class UcpSkillsSeeder extends Seeder
     public function run(): void
     {
         // Clear existing skills
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         DB::table('ucp_skills')->truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         // Insert all skills
         $skills = $this->getAllSkills();
@@ -21,9 +23,6 @@ class UcpSkillsSeeder extends Seeder
         foreach ($skills as $skill) {
             DB::table('ucp_skills')->insert($skill);
         }
-
-        // Set up evolution relationships
-        $this->setupEvolutionRelationships();
     }
 
     /**
@@ -31,13 +30,7 @@ class UcpSkillsSeeder extends Seeder
      */
     private function getAllSkills(): array
     {
-        return array_merge(
-            $this->getSpeedSkills(),
-            $this->getPassiveSkills(),
-            $this->getRecoverySkills(),
-            $this->getDebuffSkills(),
-            $this->getUniqueSkills()
-        );
+        return $this->getSpeedSkills();
     }
 
     /**
