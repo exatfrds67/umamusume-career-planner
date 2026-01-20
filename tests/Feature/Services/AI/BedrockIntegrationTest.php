@@ -3,6 +3,7 @@
 use App\Services\AI\BedrockConfigurationService;
 use App\Services\MCP\MCPClientService;
 use Illuminate\Support\Facades\Config;
+use Mockery;
 
 /**
  * Bedrock Integration Tests
@@ -16,8 +17,8 @@ describe('Bedrock Integration', function () {
     beforeEach(function () {
         // Set up test AWS configuration
         Config::set('aws.credentials', [
-            'key' => env('AWS_ACCESS_KEY_ID', 'test-key'),
-            'secret' => env('AWS_SECRET_ACCESS_KEY', 'test-secret'),
+            'key' => 'test-key',
+            'secret' => 'test-secret',
         ]);
 
         Config::set('aws.region', 'us-east-1');
@@ -182,6 +183,7 @@ describe('Bedrock Integration', function () {
         });
 
         it('reports issues when AgentCore unavailable', function () {
+            /** @var MCPClientService&Mockery\MockInterface $mcpClient */
             $mcpClient = Mockery::mock(MCPClientService::class);
             $mcpClient->shouldReceive('isAgentCoreAvailable')->andReturn(false);
 

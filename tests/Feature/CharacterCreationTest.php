@@ -4,7 +4,9 @@ use App\Models\Character;
 use App\Models\User;
 
 test('character creation page can be accessed', function () {
-    $response = $this->get(route('characters.create'));
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->get(route('characters.create'));
 
     $response->assertSuccessful();
     $response->assertViewIs('characters.create');
@@ -63,6 +65,8 @@ test('character can be created with valid data', function () {
 });
 
 test('character name is required', function () {
+    $user = User::factory()->create();
+
     $userData = [
         'name' => '',
         'scenario_type' => 'ura_finale',
@@ -93,12 +97,14 @@ test('character name is required', function () {
         ],
     ];
 
-    $response = $this->post(route('characters.store'), $userData);
+    $response = $this->actingAs($user)->post(route('characters.store'), $userData);
 
     $response->assertSessionHasErrors('name');
 });
 
 test('scenario type must be valid', function () {
+    $user = User::factory()->create();
+
     $userData = [
         'name' => 'Test Character',
         'scenario_type' => 'invalid_scenario',
@@ -129,12 +135,14 @@ test('scenario type must be valid', function () {
         ],
     ];
 
-    $response = $this->post(route('characters.store'), $userData);
+    $response = $this->actingAs($user)->post(route('characters.store'), $userData);
 
     $response->assertSessionHasErrors('scenario_type');
 });
 
 test('stats must be within valid range', function () {
+    $user = User::factory()->create();
+
     $userData = [
         'name' => 'Test Character',
         'scenario_type' => 'ura_finale',
@@ -165,12 +173,14 @@ test('stats must be within valid range', function () {
         ],
     ];
 
-    $response = $this->post(route('characters.store'), $userData);
+    $response = $this->actingAs($user)->post(route('characters.store'), $userData);
 
     $response->assertSessionHasErrors('stats.speed');
 });
 
 test('aptitude grades must be valid', function () {
+    $user = User::factory()->create();
+
     $userData = [
         'name' => 'Test Character',
         'scenario_type' => 'ura_finale',
@@ -201,12 +211,14 @@ test('aptitude grades must be valid', function () {
         ],
     ];
 
-    $response = $this->post(route('characters.store'), $userData);
+    $response = $this->actingAs($user)->post(route('characters.store'), $userData);
 
     $response->assertSessionHasErrors('aptitudes.distance.sprint');
 });
 
 test('all required aptitudes must be provided', function () {
+    $user = User::factory()->create();
+
     $userData = [
         'name' => 'Test Character',
         'scenario_type' => 'ura_finale',
@@ -236,7 +248,7 @@ test('all required aptitudes must be provided', function () {
         ],
     ];
 
-    $response = $this->post(route('characters.store'), $userData);
+    $response = $this->actingAs($user)->post(route('characters.store'), $userData);
 
     $response->assertSessionHasErrors(['aptitudes.distance.medium', 'aptitudes.distance.long']);
 });

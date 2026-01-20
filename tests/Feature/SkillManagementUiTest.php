@@ -10,9 +10,6 @@ use App\Models\Skill;
 use App\Models\SkillAcquisition;
 use App\Models\SkillHint;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->user = User::factory()->create();
@@ -126,7 +123,7 @@ test('skill acquisition applies hint discounts', function () {
         ->first();
 
     expect($acquisition->hints_used)->toBe(2);
-    expect($acquisition->total_discount_percentage)->toBe(40.0);
+    expect((float) $acquisition->total_discount_percentage)->toBe(40.0);
     expect($acquisition->final_sp_cost)->toBe(72); // 120 - 40% = 72
     expect($acquisition->sp_saved)->toBe(48);
 });
@@ -338,7 +335,7 @@ test('evolution applies hint discounts to rare skill', function () {
         ->first();
 
     expect($rareAcquisition->hints_used)->toBe(2);
-    expect($rareAcquisition->total_discount_percentage)->toBe(40.0);
+    expect((float) $rareAcquisition->total_discount_percentage)->toBe(40.0);
     expect($rareAcquisition->final_sp_cost)->toBe(108); // 180 - 40% = 108
 });
 

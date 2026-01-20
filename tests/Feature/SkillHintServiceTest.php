@@ -13,7 +13,6 @@ use App\Models\SkillHint;
 use App\Services\SkillHintService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->hintService = app(SkillHintService::class);

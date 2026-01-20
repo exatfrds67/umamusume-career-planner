@@ -6,7 +6,6 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
-uses(RefreshDatabase::class);
 
 it('displays the profile page for authenticated users', function () {
     $user = User::factory()->create();
@@ -138,7 +137,7 @@ it('uploads user avatar', function () {
 
     $user->refresh();
     expect($user->avatar_path)->not->toBeNull();
-    Storage::disk('public')->assertExists($user->avatar_path);
+    Storage::disk('public')->assertExists((string) $user->avatar_path);
 });
 
 it('validates avatar file type', function () {

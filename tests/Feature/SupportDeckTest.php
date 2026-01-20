@@ -168,6 +168,7 @@ it('clears existing deck when saving new configuration', function () use (&$deck
     $newCards = SupportCardDefinition::factory()->count(6)->create(['is_active' => true]);
 
     // Save initial deck
+    /** @var array<int, array{support_card_id: int, is_friend_card: bool}> $oldDeck */
     $oldDeck = $oldCards->map(fn ($card, $index) => [
         'support_card_id' => $card->id,
         'is_friend_card' => $index === 5,
@@ -178,6 +179,7 @@ it('clears existing deck when saving new configuration', function () use (&$deck
     expect($character->supportCards)->toHaveCount(6);
 
     // Save new deck
+    /** @var array<int, array{support_card_id: int, is_friend_card: bool}> $newDeck */
     $newDeck = $newCards->map(fn ($card, $index) => [
         'support_card_id' => $card->id,
         'is_friend_card' => $index === 5,

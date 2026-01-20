@@ -3,7 +3,6 @@
 use App\Models\Skill;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class);
 
 beforeEach(function () {
     // Seed skills before each test

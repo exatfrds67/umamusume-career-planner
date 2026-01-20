@@ -10,7 +10,6 @@ use App\Services\MCP\MCPClientService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 
-uses(RefreshDatabase::class);
 
 beforeEach(function () {
     Config::set('ai.agents.training_optimization.enabled', true);
@@ -72,8 +71,10 @@ it('training agent provides fallback recommendations when MCP unavailable', func
     $trainingAgent = new TrainingOptimizationAgent($mcpClient);
 
     $trainingOptions = [
-        ['type' => 'speed', 'participants' => 2],
-        ['type' => 'stamina', 'participants' => 3],
+        'options' => [
+            ['type' => 'speed', 'participants' => 2],
+            ['type' => 'stamina', 'participants' => 3],
+        ],
     ];
 
     $result = $trainingAgent->analyzeTrainingOptions(
@@ -125,8 +126,10 @@ it('skill agent optimizes SP allocation', function () {
     $skillAgent = new SkillManagementAgent($mcpClient);
 
     $availableSkills = [
-        ['name' => 'Speed Star', 'sp_cost' => 120, 'type' => 'normal'],
-        ['name' => 'Stamina Keeper', 'sp_cost' => 140, 'type' => 'normal'],
+        'skills' => [
+            ['name' => 'Speed Star', 'sp_cost' => 120, 'type' => 'normal'],
+            ['name' => 'Stamina Keeper', 'sp_cost' => 140, 'type' => 'normal'],
+        ],
     ];
 
     $result = $skillAgent->optimizeSPAllocation(
@@ -280,7 +283,9 @@ it('agents handle Unity Cup scenario correctly', function () {
     $trainingAgent = new TrainingOptimizationAgent($mcpClient);
 
     $trainingOptions = [
-        ['type' => 'speed', 'participants' => 3, 'spirit_burst_ready' => true],
+        'options' => [
+            ['type' => 'speed', 'participants' => 3, 'spirit_burst_ready' => true],
+        ],
     ];
 
     $result = $trainingAgent->analyzeTrainingOptions(

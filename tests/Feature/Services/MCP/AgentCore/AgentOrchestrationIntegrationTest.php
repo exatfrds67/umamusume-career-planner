@@ -13,7 +13,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 
-uses(RefreshDatabase::class);
 
 beforeEach(function () {
     Config::set('mcp.enabled', true);

@@ -11,7 +11,6 @@ use App\Models\SkillHint;
 use App\Models\SupportCard;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->character = Character::factory()->create();

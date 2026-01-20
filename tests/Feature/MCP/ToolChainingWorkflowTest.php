@@ -9,8 +9,9 @@ use App\Services\MCP\Tools\AWSPricingService;
 use App\Services\MCP\Tools\Context7Service;
 use App\Services\MCP\Tools\FetchService;
 use App\Services\MCP\Tools\ToolChainingService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Cache;
+use Mockery;
 use Tests\TestCase;
 
 /**
@@ -22,7 +23,7 @@ use Tests\TestCase;
  */
 class ToolChainingWorkflowTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseMigrations;
 
     protected ToolChainingService $service;
 
@@ -32,9 +33,11 @@ class ToolChainingWorkflowTest extends TestCase
     {
         parent::setUp();
 
-        $this->mcpClient = $this->createMock(MCPClientService::class);
-        $this->mcpClient->method('isServerEnabled')->willReturn(true);
-        $this->mcpClient->method('isServerHealthy')->willReturn(true);
+        /** @var MCPClientService&Mockery\MockInterface $mcpClient */
+        $mcpClient = Mockery::mock(MCPClientService::class);
+        $mcpClient->shouldReceive('isServerEnabled')->andReturn(true);
+        $mcpClient->shouldReceive('isServerHealthy')->andReturn(true);
+        $this->mcpClient = $mcpClient;
 
         $awsPricing = new AWSPricingService($this->mcpClient);
         $awsKnowledge = new AWSKnowledgeService($this->mcpClient);
@@ -52,6 +55,12 @@ class ToolChainingWorkflowTest extends TestCase
         );
 
         Cache::flush();
+    }
+
+    protected function tearDown(): void
+    {
+        Mockery::close();
+        parent::tearDown();
     }
 
     public function test_execute_simple_chain_workflow(): void
@@ -181,10 +190,12 @@ class ToolChainingWorkflowTest extends TestCase
     public function test_cost_optimization_workflow(): void
     {
         $usageData = [
-            [
-                'model' => 'claude-3-5-sonnet',
-                'tokens' => 100000,
-                'frequency' => 100,
+            'models' => [
+                [
+                    'model' => 'claude-3-5-sonnet',
+                    'tokens' => 100000,
+                    'frequency' => 100,
+                ],
             ],
         ];
 

@@ -8,7 +8,6 @@ use App\Services\DeckManagementService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Validation\ValidationException;
 
-uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->service = new DeckManagementService;

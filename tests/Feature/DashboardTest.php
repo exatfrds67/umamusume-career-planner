@@ -4,7 +4,9 @@ use App\Models\Character;
 use App\Models\User;
 
 it('displays dashboard with empty state when no characters exist', function () {
-    $response = $this->get(route('dashboard'));
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->get(route('dashboard'));
 
     $response->assertSuccessful();
     $response->assertViewIs('dashboard');
@@ -32,7 +34,7 @@ it('displays dashboard with character data when characters exist', function () {
         'status' => 'active',
     ]);
 
-    $response = $this->get(route('dashboard'));
+    $response = $this->actingAs($user)->get(route('dashboard'));
 
     $response->assertSuccessful();
     $response->assertViewIs('dashboard');
@@ -56,10 +58,10 @@ it('allows selecting a specific character via query parameter', function () {
         'status' => 'active',
     ]);
 
-    $response = $this->get(route('dashboard', ['character' => $character2->id]));
+    $response = $this->actingAs($user)->get(route('dashboard', ['character' => $character2->id]));
 
     $response->assertSuccessful();
-    $response->assertViewHas('selectedCharacter', fn ($selected) => $selected->id === $character2->id);
+    $response->assertViewHas('selectedCharacter', fn($selected) => $selected->id === $character2->id);
 });
 
 it('displays correct metrics for selected character', function () {
@@ -82,10 +84,10 @@ it('displays correct metrics for selected character', function () {
         'status' => 'active',
     ]);
 
-    $response = $this->get(route('dashboard'));
+    $response = $this->actingAs($user)->get(route('dashboard'));
 
     $response->assertSuccessful();
-    $response->assertViewHas('metrics', fn ($metrics) => $metrics['currentTurn'] === 35
+    $response->assertViewHas('metrics', fn($metrics) => $metrics['currentTurn'] === 35
         && $metrics['targetGrade'] === 'S'
         && $metrics['targetSkills'] === 15);
 });
@@ -104,10 +106,10 @@ it('displays stats snapshot with correct values', function () {
         'status' => 'active',
     ]);
 
-    $response = $this->get(route('dashboard'));
+    $response = $this->actingAs($user)->get(route('dashboard'));
 
     $response->assertSuccessful();
-    $response->assertViewHas('stats', fn ($stats) => $stats['speed'] === 1000
+    $response->assertViewHas('stats', fn($stats) => $stats['speed'] === 1000
         && $stats['stamina'] === 900
         && $stats['power'] === 800
         && $stats['guts'] === 700
@@ -116,17 +118,17 @@ it('displays stats snapshot with correct values', function () {
 
 it('displays mood and energy correctly', function () {
     $user = User::factory()->create();
-    $character = Character::factory()->create([
+    Character::factory()->create([
         'user_id' => $user->id,
         'energy_level' => 65,
         'mood_status' => 'great',
         'status' => 'active',
     ]);
 
-    $response = $this->get(route('dashboard'));
+    $response = $this->actingAs($user)->get(route('dashboard'));
 
     $response->assertSuccessful();
-    $response->assertViewHas('moodEnergy', fn ($moodEnergy) => $moodEnergy['mood'] === 'great'
+    $response->assertViewHas('moodEnergy', fn($moodEnergy) => $moodEnergy['mood'] === 'great'
         && $moodEnergy['energy'] === 65
         && $moodEnergy['maxEnergy'] === 100);
 });
