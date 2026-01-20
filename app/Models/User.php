@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
@@ -108,37 +110,42 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the user's careers.
-     * Note: Career model not yet implemented
+     * Get the user's careers through characters.
      *
-     * @return HasMany<\Illuminate\Database\Eloquent\Model, $this>
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<Career, Character, $this>
      */
-    // public function careers(): HasMany
-    // {
-    //     return $this->hasMany(Career::class);
-    // }
+    public function careers(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
+    {
+        return $this->hasManyThrough(Career::class, Character::class);
+    }
 
     /**
      * Get the user's AI conversations.
-     * Note: AIConversation model not yet implemented
      *
-     * @return HasMany<\Illuminate\Database\Eloquent\Model, $this>
+     * @return HasMany<AIConversation, $this>
      */
-    // public function aiConversations(): HasMany
-    // {
-    //     return $this->hasMany(AIConversation::class);
-    // }
+    public function aiConversations(): HasMany
+    {
+        return $this->hasMany(AIConversation::class);
+    }
 
     /**
      * Get the user's preferences.
-     * Note: UserPreference model not yet implemented
      *
-     * @return HasMany<\Illuminate\Database\Eloquent\Model, $this>
+     * @return HasMany<UserPreference, $this>
      */
-    // public function userPreferences(): HasMany
-    // {
-    //     return $this->hasMany(UserPreference::class);
-    // }
+    public function userPreferences(): HasMany
+    {
+        return $this->hasMany(UserPreference::class);
+    }
+
+    /**
+     * @return HasMany<UserPreference, $this>
+     */
+    public function preferences(): HasMany
+    {
+        return $this->userPreferences();
+    }
 
     /**
      * Get the user's system logs.
@@ -188,10 +195,13 @@ class User extends Authenticatable
      * Check if user can access a specific character.
      * Note: Character model not yet implemented
      */
-    // public function canAccessCharacter(Character $character): bool
-    // {
-    //     return $this->id === $character->user_id;
-    // }
+    /**
+     * Check if user can access a specific character.
+     */
+    public function canAccessCharacter(Character $character): bool
+    {
+        return $this->id === $character->user_id;
+    }
 
     /**
      * Get the user's subscription tier (for future premium features).

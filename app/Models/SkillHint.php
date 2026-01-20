@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use Database\Factories\SkillHintFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SkillHint extends Model
 {
+    /** @use HasFactory<SkillHintFactory> */
     use HasFactory;
 
     /**
@@ -54,6 +57,8 @@ class SkillHint extends Model
 
     /**
      * Get the character that owns the hint.
+     *
+     * @return BelongsTo<Character, $this>
      */
     public function character(): BelongsTo
     {
@@ -62,6 +67,8 @@ class SkillHint extends Model
 
     /**
      * Get the skill associated with the hint.
+     *
+     * @return BelongsTo<Skill, $this>
      */
     public function skill(): BelongsTo
     {
@@ -81,32 +88,44 @@ class SkillHint extends Model
 
     /**
      * Scope a query to only include unused hints.
+     *
+     * @param  Builder<SkillHint>  $query
+     * @return Builder<SkillHint>
      */
-    public function scopeUnused($query)
+    public function scopeUnused(Builder $query): Builder
     {
         return $query->where('is_used', false);
     }
 
     /**
      * Scope a query to only include used hints.
+     *
+     * @param  Builder<SkillHint>  $query
+     * @return Builder<SkillHint>
      */
-    public function scopeUsed($query)
+    public function scopeUsed(Builder $query): Builder
     {
         return $query->where('is_used', true);
     }
 
     /**
      * Scope a query to only include guaranteed hints.
+     *
+     * @param  Builder<SkillHint>  $query
+     * @return Builder<SkillHint>
      */
-    public function scopeGuaranteed($query)
+    public function scopeGuaranteed(Builder $query): Builder
     {
         return $query->where('guaranteed_hint', true);
     }
 
     /**
      * Scope a query to filter by source type.
+     *
+     * @param  Builder<SkillHint>  $query
+     * @return Builder<SkillHint>
      */
-    public function scopeFromSource($query, string $sourceType)
+    public function scopeFromSource(Builder $query, string $sourceType): Builder
     {
         return $query->where('source_type', $sourceType);
     }

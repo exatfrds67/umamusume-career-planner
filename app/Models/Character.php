@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,6 +13,35 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
 
 /**
+ * @property int $id
+ * @property int $user_id
+ * @property string $uuid
+ * @property string $name
+ * @property string|null $avatar_url
+ * @property string $scenario_type
+ * @property string $career_stage
+ * @property int $current_turn
+ * @property array<string, int> $current_stats
+ * @property array<string, int> $stat_priorities
+ * @property array<string, mixed> $stat_breakpoints
+ * @property int $energy_level
+ * @property string $mood_status
+ * @property array<int, string> $conditions
+ * @property int|null $days_until_race
+ * @property array<string, mixed>|null $goals
+ * @property array<string, mixed>|null $race_schedule
+ * @property array<string, mixed>|null $training_plan
+ * @property array<string, mixed>|null $growth_rates
+ * @property array<string, mixed>|null $inherited_factors
+ * @property array<string, mixed>|null $legacy_parents
+ * @property array<string, mixed>|null $team_composition
+ * @property array<string, mixed>|null $facility_levels
+ * @property array<string, mixed>|null $spirit_burst_data
+ * @property string $status
+ * @property array<string, mixed>|null $completion_data
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ *
  * @use HasFactory<\Database\Factories\CharacterFactory>
  */
 class Character extends Model
@@ -53,6 +84,7 @@ class Character extends Model
             'current_stats' => 'array',
             'stat_priorities' => 'array',
             'stat_breakpoints' => 'array',
+            'energy_level' => 'integer',
             'conditions' => 'array',
             'goals' => 'array',
             'race_schedule' => 'array',
@@ -129,9 +161,24 @@ class Character extends Model
     /**
      * @return BelongsToMany<Skill>
      */
+    /**
+     * @return BelongsToMany<Skill, $this>
+     */
     public function skills(): BelongsToMany
     {
-        return $this->belongsToMany(Skill::class, 'ucp_skill_acquisitions', 'character_id', 'skill_id');
+        return $this->belongsToMany(Skill::class, 'ucp_skill_acquisitions', 'character_id', 'skill_id')
+            ->using(SkillAcquisition::class)
+            ->withPivot([
+                'career_id',
+                'turn_acquired',
+                'career_phase',
+                'acquisition_method',
+                'base_sp_cost',
+                'final_sp_cost',
+                'is_evolution',
+                'is_active',
+            ])
+            ->withTimestamps();
     }
 
     /**
@@ -140,6 +187,22 @@ class Character extends Model
     public function supportCards(): HasMany
     {
         return $this->hasMany(CharacterSupportCard::class);
+    }
+
+    /**
+     * Scope a query to only include active characters.
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'active');
+    }
+
+    /**
+     * Scope a query to filter by scenario type.
+     */
+    public function scopeScenarioType($query, string $type)
+    {
+        return $query->where('scenario_type', $type);
     }
 
     // Helper methods for stat access
@@ -151,20 +214,24 @@ class Character extends Model
     public function getStatGrade(int $statValue): string
     {
         return match (true) {
-            $statValue >= 1200 => 'SS',
-            $statValue >= 1100 => 'S',
-            $statValue >= 1000 => 'A+',
-            $statValue >= 900 => 'A',
-            $statValue >= 800 => 'B+',
-            $statValue >= 700 => 'B',
-            $statValue >= 600 => 'C+',
-            $statValue >= 500 => 'C',
-            $statValue >= 400 => 'D+',
+            $statValue >= 1200 => 'SS+',
+            $statValue >= 1100 => 'SS',
+            $statValue >= 1050 => 'S+',
+            $statValue >= 1000 => 'S',
+            $statValue >= 900 => 'A+',
+            $statValue >= 800 => 'A',
+            $statValue >= 700 => 'B+',
+            $statValue >= 600 => 'B',
+            $statValue >= 500 => 'C+',
+            $statValue >= 400 => 'C',
+            $statValue >= 350 => 'D+',
             $statValue >= 300 => 'D',
-            $statValue >= 200 => 'E+',
-            $statValue >= 100 => 'E',
-            $statValue >= 50 => 'F',
-            default => 'G+',
+            $statValue >= 250 => 'E+',
+            $statValue >= 200 => 'E',
+            $statValue >= 150 => 'F+',
+            $statValue >= 100 => 'F',
+            $statValue >= 50 => 'G+',
+            default => 'G',
         };
     }
 

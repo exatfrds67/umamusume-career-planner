@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\SkillFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Skill extends Model
 {
+    /** @use HasFactory<SkillFactory> */
     use HasFactory;
 
     /**
@@ -19,6 +21,8 @@ class Skill extends Model
 
     /**
      * The attributes that are mass assignable.
+     *
+     * @var list<string>
      */
     protected $fillable = [
         'name',
@@ -65,6 +69,8 @@ class Skill extends Model
 
     /**
      * Get the skill that this skill evolves into.
+     *
+     * @return BelongsTo<Skill, $this>
      */
     public function evolutionTarget(): BelongsTo
     {
@@ -73,6 +79,8 @@ class Skill extends Model
 
     /**
      * Get the skill that evolves into this skill.
+     *
+     * @return BelongsTo<Skill, $this>
      */
     public function evolutionSource(): BelongsTo
     {
@@ -81,6 +89,8 @@ class Skill extends Model
 
     /**
      * Get all hints for this skill.
+     *
+     * @return HasMany<SkillHint, $this>
      */
     public function hints(): HasMany
     {
@@ -89,6 +99,8 @@ class Skill extends Model
 
     /**
      * Get all acquisitions of this skill.
+     *
+     * @return HasMany<SkillAcquisition, $this>
      */
     public function acquisitions(): HasMany
     {
@@ -150,6 +162,8 @@ class Skill extends Model
 
     /**
      * Get the evolution chain (source -> target).
+     *
+     * @return array<int, Skill>
      */
     public function getEvolutionChain(): array
     {
@@ -170,6 +184,9 @@ class Skill extends Model
 
     /**
      * Scope a query to only include skills of a specific type.
+     *
+     * @param  Builder<Skill>  $query
+     * @return Builder<Skill>
      */
     public function scopeOfType(Builder $query, string $type): Builder
     {
@@ -178,6 +195,9 @@ class Skill extends Model
 
     /**
      * Scope a query to only include skills of a specific rarity.
+     *
+     * @param  Builder<Skill>  $query
+     * @return Builder<Skill>
      */
     public function scopeOfRarity(Builder $query, string $rarity): Builder
     {
@@ -186,6 +206,9 @@ class Skill extends Model
 
     /**
      * Scope a query to only include skills that can evolve.
+     *
+     * @param  Builder<Skill>  $query
+     * @return Builder<Skill>
      */
     public function scopeCanEvolve(Builder $query): Builder
     {
@@ -194,6 +217,9 @@ class Skill extends Model
 
     /**
      * Scope a query to only include evolved skills.
+     *
+     * @param  Builder<Skill>  $query
+     * @return Builder<Skill>
      */
     public function scopeEvolved(Builder $query): Builder
     {
@@ -202,6 +228,9 @@ class Skill extends Model
 
     /**
      * Scope a query to only include skills of a specific meta tier.
+     *
+     * @param  Builder<Skill>  $query
+     * @return Builder<Skill>
      */
     public function scopeOfMetaTier(Builder $query, string $tier): Builder
     {
@@ -210,6 +239,9 @@ class Skill extends Model
 
     /**
      * Scope a query to only include active skills.
+     *
+     * @param  Builder<Skill>  $query
+     * @return Builder<Skill>
      */
     public function scopeActive(Builder $query): Builder
     {
@@ -218,10 +250,12 @@ class Skill extends Model
 
     /**
      * Get skills that synergize with this skill.
+     *
+     * @return array<int, array<string, mixed>>
      */
     public function getSynergySkills(): array
     {
-        if (empty($this->synergy_skills)) {
+        if (empty($this->synergy_skills) || ! is_array($this->synergy_skills)) {
             return [];
         }
 
@@ -233,7 +267,7 @@ class Skill extends Model
      */
     public function synergizesWith(Skill $otherSkill): bool
     {
-        if (empty($this->synergy_skills)) {
+        if (empty($this->synergy_skills) || ! is_array($this->synergy_skills)) {
             return false;
         }
 

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\SkillAcquisitionFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -9,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SkillAcquisition extends Model
 {
+    /** @use HasFactory<SkillAcquisitionFactory> */
     use HasFactory;
 
     /**
@@ -18,6 +20,8 @@ class SkillAcquisition extends Model
 
     /**
      * The attributes that are mass assignable.
+     *
+     * @var list<string>
      */
     protected $fillable = [
         'character_id',
@@ -64,6 +68,8 @@ class SkillAcquisition extends Model
 
     /**
      * Get the character that owns the acquisition.
+     *
+     * @return BelongsTo<Character, $this>
      */
     public function character(): BelongsTo
     {
@@ -72,6 +78,8 @@ class SkillAcquisition extends Model
 
     /**
      * Get the skill that was acquired.
+     *
+     * @return BelongsTo<Skill, $this>
      */
     public function skill(): BelongsTo
     {
@@ -80,6 +88,8 @@ class SkillAcquisition extends Model
 
     /**
      * Get the career run when the skill was acquired.
+     *
+     * @return BelongsTo<Career, $this>
      */
     public function career(): BelongsTo
     {
@@ -88,6 +98,8 @@ class SkillAcquisition extends Model
 
     /**
      * Get the skill that evolved into this one.
+     *
+     * @return BelongsTo<Skill, $this>
      */
     public function evolvedFromSkill(): BelongsTo
     {
@@ -124,6 +136,9 @@ class SkillAcquisition extends Model
 
     /**
      * Scope a query to only include active acquisitions.
+     *
+     * @param  Builder<SkillAcquisition>  $query
+     * @return Builder<SkillAcquisition>
      */
     public function scopeActive(Builder $query): Builder
     {
@@ -132,6 +147,9 @@ class SkillAcquisition extends Model
 
     /**
      * Scope a query to only include evolved skills.
+     *
+     * @param  Builder<SkillAcquisition>  $query
+     * @return Builder<SkillAcquisition>
      */
     public function scopeEvolved(Builder $query): Builder
     {
@@ -140,6 +158,9 @@ class SkillAcquisition extends Model
 
     /**
      * Scope a query to filter by acquisition method.
+     *
+     * @param  Builder<SkillAcquisition>  $query
+     * @return Builder<SkillAcquisition>
      */
     public function scopeByMethod(Builder $query, string $method): Builder
     {
@@ -148,6 +169,9 @@ class SkillAcquisition extends Model
 
     /**
      * Scope a query to filter by priority level.
+     *
+     * @param  Builder<SkillAcquisition>  $query
+     * @return Builder<SkillAcquisition>
      */
     public function scopeByPriority(Builder $query, string $priority): Builder
     {

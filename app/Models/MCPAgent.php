@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -125,14 +128,26 @@ class MCPAgent extends Model
 
     /**
      * Get agent uptime in seconds.
+     *
+     * @return Attribute<int, never>
      */
+    protected function uptimeSeconds(): Attribute
+    {
+        return Attribute::make(
+            get: function (mixed $value, array $attributes) {
+                // Access dates from $this if model is hydrated to ensure Carbon casting
+                if ($this->terminated_at) {
+                    return $this->terminated_at->diffInSeconds($this->created_at);
+                }
+
+                return now()->diffInSeconds($this->created_at);
+            }
+        );
+    }
+
     public function getUptimeSeconds(): int
     {
-        if ($this->terminated_at) {
-            return $this->terminated_at->diffInSeconds($this->created_at);
-        }
-
-        return now()->diffInSeconds($this->created_at);
+        return (int) $this->uptime_seconds;
     }
 
     /**
