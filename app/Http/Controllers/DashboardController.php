@@ -154,7 +154,7 @@ class DashboardController extends Controller
         $nextRace = null;
         $turnsUntilRace = null;
 
-        if (! empty($raceSchedule) && is_array($raceSchedule)) {
+        if (! empty($raceSchedule)) {
             $upcomingRaces = array_filter($raceSchedule, fn ($race) => ($race['turn'] ?? 0) > $character->current_turn);
             if (! empty($upcomingRaces)) {
                 $nextRaceData = reset($upcomingRaces);

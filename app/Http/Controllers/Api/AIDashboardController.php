@@ -154,20 +154,51 @@ class AIDashboardController extends Controller
     public function conversations(Request $request): JsonResponse
     {
         try {
-            $filters = [
-                'character_id' => $request->query('character_id'),
-                'conversation_id' => $request->query('conversation_id'),
-                'provider' => $request->query('provider'),
-                'model' => $request->query('model'),
-                'date_from' => $request->query('date_from'),
-                'date_to' => $request->query('date_to'),
-                'search' => $request->query('search'),
-                'limit' => (int) $request->query('limit', 50),
-                'offset' => (int) $request->query('offset', 0),
-            ];
+            $filters = [];
+            $characterId = $request->query('character_id');
+            if (is_string($characterId) && ctype_digit($characterId)) {
+                $filters['character_id'] = (int) $characterId;
+            }
 
-            // Remove null values
-            $filters = array_filter($filters, fn ($value) => $value !== null);
+            $conversationId = $request->query('conversation_id');
+            if (is_string($conversationId) && $conversationId !== '') {
+                $filters['conversation_id'] = $conversationId;
+            }
+
+            $provider = $request->query('provider');
+            if (is_string($provider) && $provider !== '') {
+                $filters['provider'] = $provider;
+            }
+
+            $model = $request->query('model');
+            if (is_string($model) && $model !== '') {
+                $filters['model'] = $model;
+            }
+
+            $dateFrom = $request->query('date_from');
+            if (is_string($dateFrom) && $dateFrom !== '') {
+                $filters['date_from'] = $dateFrom;
+            }
+
+            $dateTo = $request->query('date_to');
+            if (is_string($dateTo) && $dateTo !== '') {
+                $filters['date_to'] = $dateTo;
+            }
+
+            $search = $request->query('search');
+            if (is_string($search) && $search !== '') {
+                $filters['search'] = $search;
+            }
+
+            $limit = $request->query('limit');
+            if (is_string($limit) && ctype_digit($limit)) {
+                $filters['limit'] = (int) $limit;
+            }
+
+            $offset = $request->query('offset');
+            if (is_string($offset) && ctype_digit($offset)) {
+                $filters['offset'] = (int) $offset;
+            }
 
             $conversations = $this->conversationHistory->getConversations($filters);
 

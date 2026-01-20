@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ChangePasswordRequest;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Models\Character;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -19,6 +22,7 @@ class ProfileController extends Controller
      */
     public function show(Request $request): View
     {
+        /** @var User $user */
         $user = $request->user();
 
         // Get user statistics
@@ -39,6 +43,7 @@ class ProfileController extends Controller
      */
     public function update(UpdateProfileRequest $request): RedirectResponse
     {
+        /** @var User $user */
         $user = $request->user();
 
         $user->update($request->validated());
@@ -52,6 +57,7 @@ class ProfileController extends Controller
      */
     public function updateApi(UpdateProfileRequest $request): JsonResponse
     {
+        /** @var User $user */
         $user = $request->user();
 
         $user->update($request->validated());
@@ -67,10 +73,11 @@ class ProfileController extends Controller
      */
     public function changePassword(ChangePasswordRequest $request): RedirectResponse
     {
+        /** @var User $user */
         $user = $request->user();
 
         $user->update([
-            'password' => Hash::make($request->input('password')),
+            'password' => Hash::make((string) $request->input('password')),
         ]);
 
         return redirect()->route('profile.show')
@@ -82,10 +89,11 @@ class ProfileController extends Controller
      */
     public function changePasswordApi(ChangePasswordRequest $request): JsonResponse
     {
+        /** @var User $user */
         $user = $request->user();
 
         $user->update([
-            'password' => Hash::make($request->input('password')),
+            'password' => Hash::make((string) $request->input('password')),
         ]);
 
         return response()->json([
@@ -102,6 +110,7 @@ class ProfileController extends Controller
             'avatar' => ['required', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
         ]);
 
+        /** @var User $user */
         $user = $request->user();
 
         // Delete old avatar if exists
@@ -110,13 +119,14 @@ class ProfileController extends Controller
         }
 
         // Store new avatar
-        $path = $request->file('avatar')->store('avatars', 'public');
+        $file = $request->file('avatar');
+        $path = $file ? $file->store('avatars', 'public') : '';
 
         $user->update(['avatar_path' => $path]);
 
         return response()->json([
             'message' => 'Avatar uploaded successfully.',
-            'avatar_url' => Storage::url($path),
+            'avatar_url' => $path ? Storage::url($path) : null,
         ]);
     }
 
@@ -125,6 +135,7 @@ class ProfileController extends Controller
      */
     public function exportData(Request $request): JsonResponse
     {
+        /** @var User $user */
         $user = $request->user();
 
         $data = [
@@ -132,7 +143,7 @@ class ProfileController extends Controller
                 'uuid' => $user->uuid,
                 'name' => $user->name,
                 'email' => $user->email,
-                'created_at' => $user->created_at->toIso8601String(),
+                'created_at' => $user->created_at?->toIso8601String(),
                 'preferences' => $user->preferences,
                 'accessibility_settings' => $user->accessibility_settings,
                 'ai_settings' => $user->ai_settings,
@@ -160,6 +171,7 @@ class ProfileController extends Controller
             'confirmation.in' => 'Please type DELETE to confirm account deletion.',
         ]);
 
+        /** @var User $user */
         $user = $request->user();
 
         // Delete user's avatar if exists
@@ -189,6 +201,7 @@ class ProfileController extends Controller
             'confirmation.in' => 'Please type DELETE to confirm account deletion.',
         ]);
 
+        /** @var User $user */
         $user = $request->user();
 
         // Delete user's avatar if exists

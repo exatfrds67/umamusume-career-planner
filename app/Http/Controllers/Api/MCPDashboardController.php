@@ -177,9 +177,19 @@ class MCPDashboardController extends Controller
             // Update user preferences
             $user = $request->user();
             if ($user) {
-                $user->preferences()->updateOrCreate(
-                    ['user_id' => $user->id, 'category' => 'mcp'],
-                    ['settings' => json_encode($validated)]
+                $user->userPreferences()->updateOrCreate(
+                    [
+                        'user_id' => $user->id,
+                        'preference_category' => 'mcp',
+                        'preference_key' => 'dashboard_settings',
+                        'scope' => 'global',
+                        'context_id' => null,
+                    ],
+                    [
+                        'preference_value' => $validated,
+                        'value_type' => 'object',
+                        'last_modified_at' => now(),
+                    ]
                 );
             }
 
@@ -187,6 +197,12 @@ class MCPDashboardController extends Controller
                 'success' => true,
                 'message' => 'Settings updated successfully',
             ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors(),
+            ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -201,21 +217,21 @@ class MCPDashboardController extends Controller
      */
     protected function getOverviewMetrics(): array
     {
-        $servers = $this->mcpMonitoring->getAllServersStatus();
-        $healthyServers = collect($servers)->where('status', 'healthy')->count();
+        $healthCheck = $this->mcpMonitoring->performHealthCheck();
+        $healthyServers = collect($healthCheck)->where('status', 'healthy')->count();
 
         $agents = $this->agentLifecycle->getActiveAgents();
-        $activeAgents = collect($agents)->where('status', 'active')->count();
+        $activeAgents = \count($agents);
 
-        $costs = $this->costManagement->getCostSummary('24h');
+        $costs = $this->costManagement->getUsageAnalytics(1);
 
         return [
-            'total_servers' => count($servers),
+            'total_servers' => \count($healthCheck),
             'healthy_servers' => $healthyServers,
             'active_agents' => $activeAgents,
-            'active_workflows' => collect($agents)->where('status', 'active')->sum('workflow_steps'),
-            'cost_24h' => $costs['daily_cost'] ?? 0,
-            'requests_24h' => $costs['daily_requests'] ?? 0,
+            'active_workflows' => collect($agents)->sum('workflow_steps'),
+            'cost_24h' => $costs['total_cost'] ?? 0,
+            'requests_24h' => $costs['total_requests'] ?? 0,
             'avg_response_time' => $this->calculateAverageResponseTime(),
             'p95_response_time' => $this->calculateP95ResponseTime(),
         ];
@@ -226,7 +242,7 @@ class MCPDashboardController extends Controller
      */
     protected function getServerStatus(): array
     {
-        return $this->mcpMonitoring->getAllServersStatus();
+        return $this->mcpMonitoring->performHealthCheck();
     }
 
     /**
@@ -242,14 +258,13 @@ class MCPDashboardController extends Controller
      */
     protected function getCostSummary(): array
     {
-        $dailyCosts = $this->costManagement->getCostSummary('24h');
-        $weeklyCosts = $this->costManagement->getCostSummary('7d');
-        $monthlyCosts = $this->costManagement->getCostSummary('30d');
+        $dailyCosts = $this->costManagement->getUsageAnalytics(1);
+        $weeklyCosts = $this->costManagement->getUsageAnalytics(7);
+        $monthlyCosts = $this->costManagement->getUsageAnalytics(30);
 
-        $budgetStatus = $this->costManagement->getBudgetStatus();
-        $costsByProvider = $this->costManagement->getCostsByProvider('30d');
-        $topTools = $this->costManagement->getTopToolsByCost(10);
-        $recommendations = $this->costManagement->getCostOptimizationRecommendations();
+        $budgetStatus = $this->costManagement->checkBudgetStatus();
+        $costsByProvider = $this->costManagement->getCostBreakdownByProvider(30);
+        $recommendations = $this->costManagement->getOptimizationRecommendations();
 
         return [
             'daily_cost' => $dailyCosts['total_cost'] ?? 0,
@@ -260,7 +275,7 @@ class MCPDashboardController extends Controller
             'monthly_requests' => $monthlyCosts['total_requests'] ?? 0,
             'budget_status' => $budgetStatus,
             'by_provider' => $costsByProvider,
-            'top_tools' => $topTools,
+            'top_tools' => [],
             'recommendations' => $recommendations,
         ];
     }
@@ -270,7 +285,28 @@ class MCPDashboardController extends Controller
      */
     protected function getPerformanceMetrics(string $range = '24h'): array
     {
-        $providers = $this->mcpMonitoring->getProviderPerformanceComparison($range);
+        // Get cost breakdown by provider as a proxy for performance data
+        $days = match ($range) {
+            '1h' => 1,
+            '24h' => 1,
+            '7d' => 7,
+            '30d' => 30,
+            default => 1,
+        };
+
+        $providerBreakdown = $this->costManagement->getCostBreakdownByProvider($days);
+
+        // Transform to performance metrics format
+        $providers = [];
+        foreach ($providerBreakdown as $name => $data) {
+            $providers[$name] = [
+                'name' => $name,
+                'avg_response_time' => 0.0,
+                'success_rate' => 100.0,
+                'cost_per_request' => $data['avg_cost_per_request'] ?? 0.0,
+                'total_requests' => $data['request_count'] ?? 0,
+            ];
+        }
 
         // Find best performers
         $fastest = collect($providers)->sortBy('avg_response_time')->first();
@@ -328,12 +364,12 @@ class MCPDashboardController extends Controller
      */
     protected function getDefaultServerSettings(): array
     {
-        $servers = $this->mcpMonitoring->getAllServersStatus();
+        $servers = $this->mcpMonitoring->performHealthCheck();
         $settings = [];
 
         foreach ($servers as $name => $server) {
             $settings[$name] = [
-                'name' => $server['name'],
+                'name' => $server['server_name'] ?? $name,
                 'description' => $server['description'] ?? '',
                 'enabled' => $server['is_connected'] ?? false,
             ];
@@ -347,16 +383,17 @@ class MCPDashboardController extends Controller
      */
     protected function calculateAverageResponseTime(): float
     {
-        $providers = $this->mcpMonitoring->getProviderPerformanceComparison('24h');
+        // Use monitoring dashboard data for response time
+        $dashboard = $this->mcpMonitoring->getMonitoringDashboard();
+        $servers = $dashboard['servers'] ?? [];
 
-        if (empty($providers)) {
+        if (empty($servers)) {
             return 0.0;
         }
 
-        $totalTime = collect($providers)->sum('avg_response_time');
-        $count = count($providers);
+        $responseTimes = collect($servers)->pluck('response_time')->filter();
 
-        return $count > 0 ? $totalTime / $count : 0.0;
+        return $responseTimes->isNotEmpty() ? $responseTimes->avg() : 0.0;
     }
 
     /**
@@ -364,15 +401,23 @@ class MCPDashboardController extends Controller
      */
     protected function calculateP95ResponseTime(): float
     {
-        $providers = $this->mcpMonitoring->getProviderPerformanceComparison('24h');
+        // Use monitoring dashboard data for response time
+        $dashboard = $this->mcpMonitoring->getMonitoringDashboard();
+        $servers = $dashboard['servers'] ?? [];
 
-        if (empty($providers)) {
+        if (empty($servers)) {
             return 0.0;
         }
 
-        $p95Times = collect($providers)->pluck('p95_response_time')->filter();
+        $responseTimes = collect($servers)->pluck('response_time')->filter()->sort()->values();
 
-        return $p95Times->isNotEmpty() ? $p95Times->avg() : 0.0;
+        if ($responseTimes->isEmpty()) {
+            return 0.0;
+        }
+
+        $p95Index = (int) ceil($responseTimes->count() * 0.95) - 1;
+
+        return $responseTimes->get(max(0, $p95Index), 0.0) ?? 0.0;
     }
 
     /**
@@ -384,26 +429,26 @@ class MCPDashboardController extends Controller
 
         foreach ($providers as $name => $provider) {
             // Check for slow response times
-            if ($provider['avg_response_time'] > 5.0) {
+            if (($provider['avg_response_time'] ?? 0) > 5.0) {
                 $recommendations[] = [
                     'type' => 'warning',
-                    'message' => "{$provider['name']} has slow average response time ({$provider['avg_response_time']}s). Consider using a faster provider for time-sensitive tasks.",
+                    'message' => "{$name} has slow average response time ({$provider['avg_response_time']}s). Consider using a faster provider for time-sensitive tasks.",
                 ];
             }
 
             // Check for low success rates
-            if ($provider['success_rate'] < 90) {
+            if (($provider['success_rate'] ?? 100) < 90) {
                 $recommendations[] = [
                     'type' => 'error',
-                    'message' => "{$provider['name']} has low success rate ({$provider['success_rate']}%). Investigate connection issues or consider disabling this provider.",
+                    'message' => "{$name} has low success rate ({$provider['success_rate']}%). Investigate connection issues or consider disabling this provider.",
                 ];
             }
 
             // Check for high costs
-            if ($provider['cost_per_request'] > 0.01) {
+            if (($provider['cost_per_request'] ?? 0) > 0.01) {
                 $recommendations[] = [
                     'type' => 'info',
-                    'message' => "{$provider['name']} has high cost per request (\${$provider['cost_per_request']}). Consider using a more cost-effective provider for routine tasks.",
+                    'message' => "{$name} has high cost per request (\${$provider['cost_per_request']}). Consider using a more cost-effective provider for routine tasks.",
                 ];
             }
         }

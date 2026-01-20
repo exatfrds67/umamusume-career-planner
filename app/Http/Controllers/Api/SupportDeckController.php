@@ -73,7 +73,7 @@ class SupportDeckController extends Controller
     /**
      * Validate deck composition without saving
      */
-    public function validate(Request $request, Character $character): JsonResponse
+    public function validateDeck(Request $request, Character $character): JsonResponse
     {
         $cards = $request->input('cards', []);
 

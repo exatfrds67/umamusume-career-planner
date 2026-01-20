@@ -86,7 +86,10 @@ class AIChatController extends Controller
 
             $content = match (true) {
                 is_string($responseContent) => $responseContent,
-                is_array($responseContent) => (string) ($responseContent['content'] ?? $encodedResponse),
+                is_array($responseContent) => is_string($responseContent['content'] ?? null)
+                    ? $responseContent['content']
+                    : $encodedResponse,
+                is_scalar($responseContent) => (string) $responseContent,
                 default => $encodedResponse,
             };
 

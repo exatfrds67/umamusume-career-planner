@@ -63,14 +63,14 @@ class SkillManagementController extends Controller
                     'effectiveness_rating' => $acquisition?->effectiveness_rating,
                     'can_evolve' => $skill->can_evolve,
                     'evolution_target_id' => $skill->evolution_target_id,
-                    'available_hints' => $this->hintService->getUnusedHints($character, $skill)->count(),
+                    'available_hints' => $this->hintService->getUnusedHintsForSkill($character, $skill)->count(),
                     'discounted_cost' => $this->hintService->calculateFinalCost(
                         $skill,
-                        $this->hintService->getUnusedHints($character, $skill)->count()
+                        $this->hintService->getUnusedHintsForSkill($character, $skill)->count()
                     ),
                     'sp_savings' => $skill->base_sp_cost - $this->hintService->calculateFinalCost(
                         $skill,
-                        $this->hintService->getUnusedHints($character, $skill)->count()
+                        $this->hintService->getUnusedHintsForSkill($character, $skill)->count()
                     ),
                 ];
             });
@@ -100,7 +100,7 @@ class SkillManagementController extends Controller
             $skill = Skill::findOrFail($request->skill_id);
 
             // Get unused hints
-            $hints = $this->hintService->getUnusedHints($character, $skill);
+            $hints = $this->hintService->getUnusedHintsForSkill($character, $skill);
             $hintCount = $hints->count();
 
             // Calculate final cost

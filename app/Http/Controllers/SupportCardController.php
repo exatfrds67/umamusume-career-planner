@@ -56,8 +56,8 @@ class SupportCardController extends Controller
             $search = $request->input('search');
             if (is_string($search)) {
                 $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', '%'.$search.'%')
-                        ->orWhere('character_name', 'like', '%'.$search.'%');
+                    $q->where('name', 'like', '%' . $search . '%')
+                        ->orWhere('character_name', 'like', '%' . $search . '%');
                 });
             }
         }
@@ -70,7 +70,7 @@ class SupportCardController extends Controller
         if (is_string($sortField) && in_array($sortField, $allowedSorts) && is_string($sortDirection)) {
             // Custom sort for meta tier to maintain S+, S, A, B, C order
             if ($sortField === 'meta_tier') {
-                $query->orderByRaw("FIELD(meta_tier, 'S+', 'S', 'A', 'B', 'C')");
+                $query->orderByRaw("CASE meta_tier WHEN 'S+' THEN 1 WHEN 'S' THEN 2 WHEN 'A' THEN 3 WHEN 'B' THEN 4 WHEN 'C' THEN 5 ELSE 6 END");
             } else {
                 $query->orderBy($sortField, $sortDirection);
             }
@@ -102,7 +102,7 @@ class SupportCardController extends Controller
         $character->load('supportCards.supportCard');
 
         $availableCards = SupportCardDefinition::where('is_active', true)
-            ->orderByRaw("FIELD(meta_tier, 'S+', 'S', 'A', 'B', 'C')")
+            ->orderByRaw("CASE meta_tier WHEN 'S+' THEN 1 WHEN 'S' THEN 2 WHEN 'A' THEN 3 WHEN 'B' THEN 4 WHEN 'C' THEN 5 ELSE 6 END")
             ->orderBy('rarity', 'desc')
             ->get();
 
