@@ -20,7 +20,7 @@ class CharacterStateService
         // 80+ energy: Low recovery (fixed 10)
         // TODO: Implement proper RNG logic like the game (Success/Failure/Great Success)
 
-        $currentEnergy = $character->energy_level;
+        $currentEnergy = (int) $character->energy_level;
         $recovery = 0;
         $resultType = 'success'; // success, failure, great_success
 
@@ -55,7 +55,7 @@ class CharacterStateService
         }
 
         // Apply recovery
-        $character->energy_level = min(100, $character->energy_level + $recovery);
+        $character->energy_level = min(100, (int) $character->energy_level + $recovery);
         $character->save();
 
         return [
@@ -81,7 +81,7 @@ class CharacterStateService
         // In real game, training fails if energy is low.
         // Here we'll just allow it but maybe calculate failure risk later.
 
-        $character->energy_level = max(0, $character->energy_level - $amount);
+        $character->energy_level = max(0, (int) $character->energy_level - $amount);
         $character->save();
 
         return true;
@@ -161,7 +161,10 @@ class CharacterStateService
         $added = [];
         $removed = [];
 
-        $conditions = json_decode($character->conditions ?? '[]', true) ?: [];
+        $conditions = $character->conditions;
+        if (! is_array($conditions)) {
+            $conditions = [];
+        }
 
         // Example: Low energy (<20) might give "Tired" condition (simplified)
         // In real game, conditions like "Overweight" come from events.
@@ -176,7 +179,7 @@ class CharacterStateService
         }
 
         // Save back
-        $character->conditions = json_encode(array_values($conditions));
+        $character->conditions = array_values($conditions);
         $character->save();
 
         return ['added' => $added, 'removed' => $removed];

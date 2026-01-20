@@ -248,7 +248,7 @@ class DeckOptimizationService
     {
         $recommendations = [];
 
-        if ($coverageScore >= 80) {
+        if ($coverageScore >= self::OPTIMAL_STAT_COVERAGE) {
             $recommendations[] = 'Excellent deck composition! Your stat coverage and skill diversity are well-balanced.';
         } elseif ($coverageScore >= 60) {
             $recommendations[] = 'Good deck composition with room for optimization.';
@@ -399,6 +399,10 @@ class DeckOptimizationService
 
         // Focused strategy gets bonus for concentration
         if (str_contains($primaryStrategy, 'Focus')) {
+            if (empty($cardTypes)) {
+                return 0;
+            }
+
             $maxCount = max($cardTypes);
 
             return min(100, ($maxCount / 6) * 100);

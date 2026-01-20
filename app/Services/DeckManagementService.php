@@ -179,6 +179,10 @@ class DeckManagementService
         int $limitBreakLevel = 0
     ): ?CharacterSupportCard {
         try {
+            if ($newSupportCardId < 0) {
+                throw new \InvalidArgumentException('Support card ID must be non-negative.');
+            }
+
             return DB::transaction(function () use ($characterId, $positionSlot, $newSupportCardId, $limitBreakLevel) {
                 $existingCard = CharacterSupportCard::where('character_id', $characterId)
                     ->where('position_slot', $positionSlot)
