@@ -2,7 +2,27 @@
     "aws.cloudformation.diagnostics.cfnLint.customization": {
         "includeChecks": ["I"]
     },
+
+    "better-phpunit.phpunitBinary": "vendor/bin/pest",
+    "better-phpunit.suiteSuffix": null,
+    "phpunit.phpunit": "vendor/bin/pest",
+    "phpunit.args": ["--colors=always"],
+    "phpunit.paths": {
+        "${workspaceFolder}": "${workspaceFolder}"
+    },
+
+    "pestphp.pestPath": "vendor/bin/pest",
+    "pestphp.enable": true,
+
+    "php.validate.executablePath": null,
+
     "intelephense.diagnostics.undefinedMethods": false,
+    "intelephense.diagnostics.undefinedProperties": false,
+    "yaml.customTags": ["!environment scalar"],
+    "yaml.validate": true,
+    "yaml.schemas": {
+        "https://json.schemastore.org/github-workflow.json": ".github/workflows/*.yml"
+    },
     "intelephense.stubs": [
         "apache",
         "bcmath",

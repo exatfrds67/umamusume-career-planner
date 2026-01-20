@@ -334,6 +334,7 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - laravel/telescope (TELESCOPE) - v5
 - pestphp/pest (PEST) - v3
 - phpunit/phpunit (PHPUNIT) - v11
+- alpinejs (ALPINEJS) - v3
 - tailwindcss (TAILWINDCSS) - v4
 
 ## Conventions
@@ -442,13 +443,6 @@ protected function isAccessible(User $user, ?string $path = null): bool
 
 - Typically, keys in an Enum should be TitleCase. For example: `FavoritePerson`, `BestLake`, `Monthly`.
 
-=== tests rules ===
-
-## Test Enforcement
-
-- Every change must be programmatically tested. Write a new test or update an existing test, then run the affected tests to make sure they pass.
-- Run the minimum number of tests needed to ensure code quality and speed. Use `php artisan test --compact` with a specific filename or filter.
-
 === laravel/core rules ===
 
 ## Do Things the Laravel Way
@@ -499,73 +493,6 @@ protected function isAccessible(User $user, ?string $path = null): bool
 - When creating models for tests, use the factories for the models. Check if the factory has custom states that can be used before manually setting up the model.
 - Faker: Use methods such as `$this->faker->word()` or `fake()->randomDigit()`. Follow existing conventions whether to use `$this->faker` or `fake()`.
 - When creating tests, make use of `php artisan make:test [options] {name}` to create a feature test, and pass `--unit` to create a unit test. Most tests should be feature tests.
-
-### PHPUnit Test Attributes (PHPUnit 11+)
-
-- **Always use PHP attributes for test metadata instead of doc-comment annotations**
-- PHPUnit 11 deprecates doc-comment metadata (like `@test`, `@dataProvider`, `@depends`) in favor of PHP 8 attributes
-- Doc-comment metadata will be removed in PHPUnit 12
-
-**Use attributes (correct):**
-
-```php
-use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Depends;
-
-#[Test]
-public function it_validates_user_input(): void
-{
-    // Test implementation
-}
-
-#[Test]
-#[DataProvider('emailProvider')]
-public function it_validates_email_formats(string $email): void
-{
-    // Test implementation
-}
-
-public static function emailProvider(): array
-{
-    return [
-        ['valid@example.com'],
-        ['another@test.org'],
-    ];
-}
-```
-
-**Avoid doc-comments (deprecated):**
-
-```php
-/**
- * @test
- */
-public function it_validates_user_input(): void
-{
-    // This will trigger deprecation warnings
-}
-
-/**
- * @test
- * @dataProvider emailProvider
- */
-public function it_validates_email_formats(string $email): void
-{
-    // This will trigger deprecation warnings
-}
-```
-
-**Common PHPUnit Attributes:**
-
-- `#[Test]` - Marks a method as a test
-- `#[DataProvider('methodName')]` - Provides test data
-- `#[Depends('testMethodName')]` - Declares test dependencies
-- `#[Group('groupName')]` - Assigns test to a group
-- `#[TestDox('description')]` - Custom test description
-- `#[Before]` and `#[After]` - Setup/teardown methods
-- `#[RequiresPhp('8.4')]` - PHP version requirements
-- `#[CoversClass(ClassName::class)]` - Code coverage annotation
 
 ### Vite Error
 

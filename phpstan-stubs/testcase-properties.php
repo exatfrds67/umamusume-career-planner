@@ -57,9 +57,12 @@ namespace PHPUnit\Framework;
  */
 abstract class TestCase extends Assert
 {
-    public function __get(string $name): mixed
+    /**
+     * @return mixed
+     */
+    public function __get(string $name)
     {
-        return null;
+        return $this->$name ?? null;
     }
 }
 
@@ -74,8 +77,11 @@ namespace Pest\PendingCalls;
  */
 class TestCall
 {
-    public function __get(string $name): mixed
+    /**
+     * @return mixed
+     */
+    public function __get(string $name)
     {
-        return null;
+        return $this->$name ?? null;
     }
 }

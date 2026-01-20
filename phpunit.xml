@@ -3,6 +3,17 @@
          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
          bootstrap="vendor/autoload.php"
          colors="true"
+         cacheDirectory=".phpunit.cache"
+         executionOrder="depends,defects"
+         requireCoverageMetadata="false"
+         beStrictAboutCoverageMetadata="false"
+         beStrictAboutOutputDuringTests="true"
+         failOnRisky="true"
+         failOnWarning="true"
+         displayDetailsOnTestsThatTriggerDeprecations="true"
+         displayDetailsOnTestsThatTriggerErrors="true"
+         displayDetailsOnTestsThatTriggerNotices="true"
+         displayDetailsOnTestsThatTriggerWarnings="true"
 >
     <testsuites>
         <testsuite name="Unit">
@@ -11,14 +22,47 @@
         <testsuite name="Feature">
             <directory>tests/Feature</directory>
         </testsuite>
+        <testsuite name="Integration">
+            <directory>tests/Integration</directory>
+        </testsuite>
+        <testsuite name="Architecture">
+            <directory>tests/Architecture</directory>
+        </testsuite>
     </testsuites>
     <source>
         <include>
             <directory>app</directory>
         </include>
+        <exclude>
+            <directory>app/Console/Commands</directory>
+            <file>app/Providers/AppServiceProvider.php</file>
+        </exclude>
     </source>
+    <coverage includeUncoveredFiles="true"
+              pathCoverage="false"
+              ignoreDeprecatedCodeUnits="true"
+              disableCodeCoverageIgnore="false">
+        <report>
+            <clover outputFile="coverage/clover.xml"/>
+            <html outputDirectory="coverage/html" lowUpperBound="50" highLowerBound="80"/>
+            <text outputFile="coverage/coverage.txt" showUncoveredFiles="true" showOnlySummary="false"/>
+        </report>
+    </coverage>
+    <logging>
+        <junit outputFile="coverage/junit.xml"/>
+        <testdoxHtml outputFile="coverage/testdox.html"/>
+        <testdoxText outputFile="coverage/testdox.txt"/>
+    </logging>
+    <groups>
+        <exclude>
+            <group>slow</group>
+            <group>external</group>
+        </exclude>
+    </groups>
     <php>
         <env name="APP_ENV" value="testing"/>
+        <env name="APP_DEBUG" value="true"/>
+        <env name="APP_KEY" value="base64:EbWoff2KGfUSGgPiC7zlnhN4bV0saWa1Vwc22hWh8qQ="/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="BROADCAST_CONNECTION" value="null"/>
@@ -31,5 +75,9 @@
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
+        <env name="LOG_CHANNEL" value="null"/>
+        <env name="LOG_LEVEL" value="debug"/>
+        <env name="MCP_ENABLED" value="false"/>
+        <env name="AI_ENABLED" value="false"/>
     </php>
 </phpunit>

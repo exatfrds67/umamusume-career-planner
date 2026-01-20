@@ -1,0 +1,241 @@
+name: Deploy
+
+# NOTE: Before using this workflow, create the following environments in GitHub repository settings:
+# - staging (with appropriate secrets)
+# - production (with appropriate secrets and protection rules)
+#
+# Required secrets for each environment:
+# - STAGING_SSH_KEY, STAGING_SSH_HOST, STAGING_SSH_USER, STAGING_DEPLOY_PATH
+# - PRODUCTION_SSH_KEY, PRODUCTION_SSH_HOST, PRODUCTION_SSH_USER, PRODUCTION_DEPLOY_PATH
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Deployment environment"
+        required: true
+        default: staging
+        type: choice
+        options:
+          - staging
+          - production
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  PHP_VERSION: "8.4"
+  NODE_VERSION: "20"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build Application
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, pdo_mysql, bcmath, soap, intl, gd, exif, iconv, redis
+          tools: composer:v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install Composer dependencies
+        run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Build frontend assets
+        run: npm run build
+
+      - name: Create deployment artifact
+        run: |
+          tar -czf artifact.tar.gz \
+            --exclude='.git' \
+            --exclude='node_modules' \
+            --exclude='tests' \
+            --exclude='.github' \
+            --exclude='storage/logs/*' \
+            --exclude='storage/framework/cache/*' \
+            --exclude='storage/framework/sessions/*' \
+            --exclude='storage/framework/views/*' \
+            .
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-artifact
+          path: artifact.tar.gz
+          retention-days: 1
+
+  deploy-staging:
+    runs-on: ubuntu-latest
+    name: Deploy to Staging
+    needs: build
+    if: github.event.inputs.environment == 'staging' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+    environment:
+      name: staging
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: deployment-artifact
+
+      - name: Extract artifact
+        run: tar -xzf artifact.tar.gz
+
+      - name: Deploy to staging server
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.STAGING_SSH_KEY }}
+          SSH_HOST: ${{ secrets.STAGING_SSH_HOST }}
+          SSH_USER: ${{ secrets.STAGING_SSH_USER }}
+          DEPLOY_PATH: ${{ secrets.STAGING_DEPLOY_PATH }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
+
+          # Deploy using rsync
+          rsync -avz --delete \
+            --exclude='.env' \
+            --exclude='storage/app/*' \
+            --exclude='storage/logs/*' \
+            ./ $SSH_USER@$SSH_HOST:$DEPLOY_PATH/
+
+          # Run post-deployment commands
+          ssh $SSH_USER@$SSH_HOST << 'EOF'
+            cd $DEPLOY_PATH
+            php artisan migrate --force
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            php artisan queue:restart
+          EOF
+
+      - name: Notify deployment
+        if: always()
+        run: |
+          echo "Staging deployment completed with status: ${{ job.status }}"
+
+  deploy-production:
+    runs-on: ubuntu-latest
+    name: Deploy to Production
+    needs: [build, deploy-staging]
+    if: github.event.inputs.environment == 'production'
+    environment:
+      name: production
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: deployment-artifact
+
+      - name: Extract artifact
+        run: tar -xzf artifact.tar.gz
+
+      - name: Deploy to production server
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.PRODUCTION_SSH_KEY }}
+          SSH_HOST: ${{ secrets.PRODUCTION_SSH_HOST }}
+          SSH_USER: ${{ secrets.PRODUCTION_SSH_USER }}
+          DEPLOY_PATH: ${{ secrets.PRODUCTION_DEPLOY_PATH }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
+
+          # Create backup before deployment
+          ssh $SSH_USER@$SSH_HOST "cd $DEPLOY_PATH && tar -czf ../backup-$(date +%Y%m%d-%H%M%S).tar.gz ."
+
+          # Deploy using rsync
+          rsync -avz --delete \
+            --exclude='.env' \
+            --exclude='storage/app/*' \
+            --exclude='storage/logs/*' \
+            ./ $SSH_USER@$SSH_HOST:$DEPLOY_PATH/
+
+          # Run post-deployment commands
+          ssh $SSH_USER@$SSH_HOST << 'EOF'
+            cd $DEPLOY_PATH
+            php artisan down --retry=60
+            php artisan migrate --force
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            php artisan event:cache
+            php artisan queue:restart
+            php artisan up
+          EOF
+
+      - name: Notify deployment
+        if: always()
+        run: |
+          echo "Production deployment completed with status: ${{ job.status }}"
+
+  rollback:
+    runs-on: ubuntu-latest
+    name: Rollback Production
+    if: failure() && github.event.inputs.environment == 'production'
+    needs: deploy-production
+    environment:
+      name: production
+
+    steps:
+      - name: Rollback to previous version
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.PRODUCTION_SSH_KEY }}
+          SSH_HOST: ${{ secrets.PRODUCTION_SSH_HOST }}
+          SSH_USER: ${{ secrets.PRODUCTION_SSH_USER }}
+          DEPLOY_PATH: ${{ secrets.PRODUCTION_DEPLOY_PATH }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
+
+          ssh $SSH_USER@$SSH_HOST << 'EOF'
+            cd $DEPLOY_PATH/..
+            LATEST_BACKUP=$(ls -t backup-*.tar.gz | head -1)
+            if [ -n "$LATEST_BACKUP" ]; then
+              cd $DEPLOY_PATH
+              php artisan down
+              tar -xzf ../$LATEST_BACKUP
+              php artisan migrate --force
+              php artisan config:cache
+              php artisan route:cache
+              php artisan view:cache
+              php artisan up
+              echo "Rollback completed using $LATEST_BACKUP"
+            else
+              echo "No backup found for rollback"
+              exit 1
+            fi
+          EOF

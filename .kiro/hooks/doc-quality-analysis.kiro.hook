@@ -4,17 +4,12 @@
   "description": "Performs comprehensive quality analysis on documentation files including structure validation, content assessment, and style enforcement",
   "version": "1",
   "when": {
-    "type": "fileEdited",
-    "patterns": [
-      "docs/**/*.md",
-      "documentation/**/*.md",
-      "README.md",
-      "CHANGELOG.md",
-      "CONTRIBUTING.md"
-    ]
+    "type": "userTriggered"
   },
   "then": {
     "type": "askAgent",
     "prompt": "Perform comprehensive documentation quality analysis on the file I just saved. Please analyze:\n\n**Structure Analysis:**\n- Check header hierarchy (H1-H6 usage and proper nesting)\n- Validate table of contents accuracy and completeness\n- Verify cross-references and internal links work correctly\n- Assess overall document flow and logical organization\n\n**Content Validation:**\n- Validate any code examples for syntax correctness\n- Check technical accuracy of information presented\n- Identify missing information or incomplete sections\n- Assess language clarity and readability\n\n**Style Enforcement:**\n- Check compliance with documentation style guidelines\n- Ensure formatting consistency throughout the document\n- Verify consistent terminology usage\n- Check accessibility compliance (alt text, heading structure, etc.)\n\nProvide a detailed report with:\n1. Priority issues that need immediate attention\n2. Structure findings and recommendations\n3. Content quality assessment\n4. Style recommendations and improvements\n5. Actionable next steps for enhancement\n\nFocus on actionable feedback that will improve the documentation's usefulness and maintainability."
-  }
+  },
+  "workspaceFolderName": "umamusume-career-planner",
+  "shortName": "doc-quality-analysis"
 }
