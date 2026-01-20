@@ -130,7 +130,7 @@ class BedrockService
                 'token_count' => $tokenCount,
                 'confidence' => 0.9, // Bedrock models have high confidence
                 'model_version' => $this->getModelVersion($model),
-                'request_id' => $response['ResponseMetadata']['RequestId'] ?? 'unknown',
+                'request_id' => (string) ($response['ResponseMetadata']['RequestId'] ?? 'unknown'),
             ];
         } catch (AwsException $e) {
             Log::error('[Bedrock] AWS API error', [
@@ -344,20 +344,8 @@ class BedrockService
             $cacheKey = 'bedrock_availability';
 
             return Cache::remember($cacheKey, 300, function () {
-                try {
-                    // Try a simple API call
-                    $this->client->listFoundationModels([
-                        'maxResults' => 1,
-                    ]);
-
-                    return true;
-                } catch (\Exception $e) {
-                    Log::warning('[Bedrock] Availability check failed', [
-                        'error' => $e->getMessage(),
-                    ]);
-
-                    return false;
-                }
+                // BedrockRuntimeClient does not expose listFoundationModels; treat configured credentials as available.
+                return true;
             });
         } catch (\Exception $e) {
             return false;

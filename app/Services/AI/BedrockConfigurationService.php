@@ -28,8 +28,10 @@ class BedrockConfigurationService
     public function __construct(MCPClientService $mcpClient)
     {
         $this->mcpClient = $mcpClient;
-        $this->models = Config::get('aws.bedrock.models', []);
-        $this->modelPreferences = Config::get('aws.bedrock.model_preferences', []);
+        $models = Config::get('aws.bedrock.models', []);
+        $this->models = is_array($models) ? $models : [];
+        $modelPreferences = Config::get('aws.bedrock.model_preferences', []);
+        $this->modelPreferences = is_array($modelPreferences) ? $modelPreferences : [];
     }
 
     /**
@@ -47,7 +49,7 @@ class BedrockConfigurationService
         $credentials = Config::get('aws.credentials', []);
         $accessKey = $credentials['key'] ?? null;
         $secretKey = $credentials['secret'] ?? null;
-        $region = Config::get('aws.bedrock.region', Config::get('aws.region', 'us-east-1'));
+        $region = (string) Config::get('aws.bedrock.region', Config::get('aws.region', 'us-east-1'));
 
         if (! $accessKey || ! $secretKey) {
             return [
@@ -287,9 +289,9 @@ class BedrockConfigurationService
         $credentialsCheck = $this->validateCredentials();
 
         return [
-            'enabled' => Config::get('ai.bedrock.enabled', true),
-            'credentials_valid' => $credentialsCheck['valid'],
-            'region' => $credentialsCheck['region'],
+            'enabled' => (bool) Config::get('ai.bedrock.enabled', true),
+            'credentials_valid' => (bool) $credentialsCheck['valid'],
+            'region' => (string) $credentialsCheck['region'],
             'models' => $this->getAvailableModels(),
             'preferred_model' => $this->getPreferredModel(),
             'model_preferences' => $this->getModelPreferences(),

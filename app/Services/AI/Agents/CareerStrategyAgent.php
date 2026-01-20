@@ -76,13 +76,22 @@ class CareerStrategyAgent
             // Process through MCP agent
             $response = $this->processWithMCPAgent($context);
 
+            /** @var array<string, mixed> $planData */
+            $planData = is_array($response['plan'] ?? null) ? $response['plan'] : [];
+            /** @var array<int, array<string, mixed>> $milestones */
+            $milestones = is_array($response['milestones'] ?? null) ? array_values($response['milestones']) : [];
+            /** @var array<int, array<string, mixed>> $raceSchedule */
+            $raceSchedule = is_array($response['race_schedule'] ?? null) ? array_values($response['race_schedule']) : [];
+            /** @var array<string, mixed> $trainingPriorities */
+            $trainingPriorities = is_array($response['training_priorities'] ?? null) ? $response['training_priorities'] : [];
+
             $plan = [
-                'plan' => $response['plan'] ?? [],
-                'milestones' => $response['milestones'] ?? [],
-                'race_schedule' => $response['race_schedule'] ?? [],
-                'training_priorities' => $response['training_priorities'] ?? [],
-                'confidence' => $response['confidence'] ?? 0.85,
-                'reasoning' => $response['reasoning'] ?? 'Career plan created',
+                'plan' => $planData,
+                'milestones' => $milestones,
+                'race_schedule' => $raceSchedule,
+                'training_priorities' => $trainingPriorities,
+                'confidence' => (float) ($response['confidence'] ?? 0.85),
+                'reasoning' => (string) ($response['reasoning'] ?? 'Career plan created'),
                 'metadata' => [
                     'agent_id' => $this->agentId,
                     'processing_time' => microtime(true) - $startTime,
@@ -130,11 +139,16 @@ class CareerStrategyAgent
 
             $response = $this->processWithMCPAgent($context);
 
+            /** @var array<int, array<string, mixed>> $priorities */
+            $priorities = is_array($response['priorities'] ?? null) ? array_values($response['priorities']) : [];
+            /** @var array<int, string> $recommendations */
+            $recommendations = is_array($response['recommendations'] ?? null) ? array_values($response['recommendations']) : [];
+
             return [
-                'priorities' => $response['priorities'] ?? [],
-                'recommendations' => $response['recommendations'] ?? [],
-                'confidence' => $response['confidence'] ?? 0.85,
-                'reasoning' => $response['reasoning'] ?? 'Goals optimized',
+                'priorities' => $priorities,
+                'recommendations' => $recommendations,
+                'confidence' => (float) ($response['confidence'] ?? 0.85),
+                'reasoning' => (string) ($response['reasoning'] ?? 'Goals optimized'),
             ];
         } catch (\Exception $e) {
             Log::error('[CareerStrategyAgent] Goal optimization failed', [
@@ -176,10 +190,13 @@ class CareerStrategyAgent
 
             $response = $this->processWithMCPAgent($context);
 
+            /** @var array<int, array<string, mixed>> $schedule */
+            $schedule = is_array($response['schedule'] ?? null) ? array_values($response['schedule']) : [];
+
             return [
-                'schedule' => $response['schedule'] ?? [],
-                'reasoning' => $response['reasoning'] ?? 'Schedule generated',
-                'confidence' => $response['confidence'] ?? 0.85,
+                'schedule' => $schedule,
+                'reasoning' => (string) ($response['reasoning'] ?? 'Schedule generated'),
+                'confidence' => (float) ($response['confidence'] ?? 0.85),
             ];
         } catch (\Exception $e) {
             Log::error('[CareerStrategyAgent] Race schedule generation failed', [
@@ -221,11 +238,18 @@ class CareerStrategyAgent
 
             $response = $this->processWithMCPAgent($context);
 
+            /** @var array<string, mixed> $progress */
+            $progress = is_array($response['progress'] ?? null) ? $response['progress'] : [];
+            /** @var array<int, string> $nextSteps */
+            $nextSteps = is_array($response['next_steps'] ?? null) ? array_values($response['next_steps']) : [];
+            /** @var array<int, string> $warnings */
+            $warnings = is_array($response['warnings'] ?? null) ? array_values($response['warnings']) : [];
+
             return [
-                'progress' => $response['progress'] ?? [],
-                'next_steps' => $response['next_steps'] ?? [],
-                'warnings' => $response['warnings'] ?? [],
-                'confidence' => $response['confidence'] ?? 0.85,
+                'progress' => $progress,
+                'next_steps' => $nextSteps,
+                'warnings' => $warnings,
+                'confidence' => (float) ($response['confidence'] ?? 0.85),
             ];
         } catch (\Exception $e) {
             Log::error('[CareerStrategyAgent] Milestone tracking failed', [

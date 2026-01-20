@@ -18,17 +18,7 @@ class ConversationHistoryService
     /**
      * Get conversation history with filters
      *
-     * @param  array{
-     *     character_id?: int,
-     *     conversation_id?: string,
-     *     provider?: string,
-     *     model?: string,
-     *     date_from?: string,
-     *     date_to?: string,
-     *     search?: string,
-     *     limit?: int,
-     *     offset?: int
-     * }  $filters
+     * @param  array<string, mixed>  $filters
      * @return array{
      *     conversations: array<int, array<string, mixed>>,
      *     total: int,
@@ -82,6 +72,7 @@ class ConversationHistoryService
         $limit = $filters['limit'] ?? 50;
         $offset = $filters['offset'] ?? 0;
 
+        /** @var array<int, array<string, mixed>> $conversations */
         $conversations = $query->orderBy('created_at', 'desc')
             ->limit($limit)
             ->offset($offset)
@@ -99,14 +90,15 @@ class ConversationHistoryService
                 'cost' => $conv->cost,
                 'created_at' => $conv->created_at?->toIso8601String(),
             ])
+            ->values()
             ->toArray();
 
         return [
             'conversations' => $conversations,
             'total' => $total,
             'filtered' => $filtered,
-            'limit' => $limit,
-            'offset' => $offset,
+            'limit' => (int) $limit,
+            'offset' => (int) $offset,
         ];
     }
 
@@ -117,6 +109,7 @@ class ConversationHistoryService
      */
     public function getConversationById(string $conversationId): array
     {
+        /** @var array<int, array<string, mixed>> $conversations */
         $conversations = AIConversation::with('character')
             ->where('conversation_id', $conversationId)
             ->orderBy('created_at', 'asc')
@@ -134,6 +127,7 @@ class ConversationHistoryService
                 'cost' => $conv->cost,
                 'created_at' => $conv->created_at?->toIso8601String(),
             ])
+            ->values()
             ->toArray();
 
         return $conversations;
@@ -172,10 +166,11 @@ class ConversationHistoryService
         $totalMessages = $conversations->count();
         $avgLength = $totalConversations > 0 ? $totalMessages / $totalConversations : 0;
 
-        $totalTokens = $conversations->sum('token_count') ?? 0;
-        $totalCost = $conversations->sum('cost') ?? 0.0;
+        $totalTokens = (int) ($conversations->sum('token_count') ?? 0);
+        $totalCost = (float) ($conversations->sum('cost') ?? 0.0);
 
         // Group by provider
+        /** @var array<string, int> $byProvider */
         $byProvider = $conversations
             ->filter(fn ($c) => $c->ai_model_used !== null)
             ->groupBy(function ($conv) {
@@ -195,21 +190,23 @@ class ConversationHistoryService
 
                 return 'unknown';
             })
-            ->map(fn ($group) => $group->count())
+            ->map(fn ($group) => (int) $group->count())
             ->toArray();
 
         // Group by model
+        /** @var array<string, int> $byModel */
         $byModel = $conversations
             ->filter(fn ($c) => $c->ai_model_used !== null)
             ->groupBy('ai_model_used')
-            ->map(fn ($group) => $group->count())
+            ->map(fn ($group) => (int) $group->count())
             ->toArray();
 
         // Group by character
+        /** @var array<string, int> $byCharacter */
         $byCharacter = $conversations
             ->filter(fn ($c) => $c->character_id !== null)
             ->groupBy('character_id')
-            ->map(fn ($group) => $group->count())
+            ->map(fn ($group) => (int) $group->count())
             ->toArray();
 
         return [
@@ -256,7 +253,7 @@ class ConversationHistoryService
     {
         $result = $this->getConversations($filters);
 
-        return json_encode($result['conversations'], JSON_PRETTY_PRINT);
+        return json_encode($result['conversations'], JSON_PRETTY_PRINT) ?: '[]';
     }
 
     /**

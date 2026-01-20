@@ -77,11 +77,16 @@ class SkillManagementAgent
             // Process through MCP agent
             $response = $this->processWithMCPAgent($context);
 
+            /** @var array<string, mixed> $allocationData */
+            $allocationData = is_array($response['allocation'] ?? null) ? $response['allocation'] : [];
+            /** @var array<int, array<string, mixed>> $prioritySkills */
+            $prioritySkills = is_array($response['priority_skills'] ?? null) ? array_values($response['priority_skills']) : [];
+
             $allocation = [
-                'allocation' => $response['allocation'] ?? [],
-                'priority_skills' => $response['priority_skills'] ?? [],
-                'reasoning' => $response['reasoning'] ?? 'SP allocation optimized',
-                'confidence' => $response['confidence'] ?? 0.85,
+                'allocation' => $allocationData,
+                'priority_skills' => $prioritySkills,
+                'reasoning' => (string) ($response['reasoning'] ?? 'SP allocation optimized'),
+                'confidence' => (float) ($response['confidence'] ?? 0.85),
                 'metadata' => [
                     'agent_id' => $this->agentId,
                     'processing_time' => microtime(true) - $startTime,
@@ -130,12 +135,17 @@ class SkillManagementAgent
 
             $response = $this->processWithMCPAgent($context);
 
+            /** @var array<string, mixed> $strategy */
+            $strategy = is_array($response['strategy'] ?? null) ? $response['strategy'] : [];
+            /** @var array<int, array<string, mixed>> $hintSources */
+            $hintSources = is_array($response['hint_sources'] ?? null) ? array_values($response['hint_sources']) : [];
+
             return [
-                'strategy' => $response['strategy'] ?? [],
-                'hint_sources' => $response['hint_sources'] ?? [],
-                'expected_savings' => $response['expected_savings'] ?? 0,
-                'confidence' => $response['confidence'] ?? 0.85,
-                'reasoning' => $response['reasoning'] ?? 'Hint collection strategy generated',
+                'strategy' => $strategy,
+                'hint_sources' => $hintSources,
+                'expected_savings' => (int) ($response['expected_savings'] ?? 0),
+                'confidence' => (float) ($response['confidence'] ?? 0.85),
+                'reasoning' => (string) ($response['reasoning'] ?? 'Hint collection strategy generated'),
             ];
         } catch (\Exception $e) {
             Log::error('[SkillManagementAgent] Hint strategy generation failed', [
@@ -180,12 +190,17 @@ class SkillManagementAgent
 
             $response = $this->processWithMCPAgent($context);
 
+            /** @var array<int, array<string, mixed>> $evolutionPlan */
+            $evolutionPlan = is_array($response['evolution_plan'] ?? null) ? array_values($response['evolution_plan']) : [];
+            /** @var array<int, string> $prerequisites */
+            $prerequisites = is_array($response['prerequisites'] ?? null) ? array_values($response['prerequisites']) : [];
+
             return [
-                'evolution_plan' => $response['evolution_plan'] ?? [],
-                'prerequisites' => $response['prerequisites'] ?? [],
-                'total_sp_cost' => $response['total_sp_cost'] ?? 0,
-                'confidence' => $response['confidence'] ?? 0.85,
-                'reasoning' => $response['reasoning'] ?? 'Evolution plan created',
+                'evolution_plan' => $evolutionPlan,
+                'prerequisites' => $prerequisites,
+                'total_sp_cost' => (int) ($response['total_sp_cost'] ?? 0),
+                'confidence' => (float) ($response['confidence'] ?? 0.85),
+                'reasoning' => (string) ($response['reasoning'] ?? 'Evolution plan created'),
             ];
         } catch (\Exception $e) {
             Log::error('[SkillManagementAgent] Skill evolution planning failed', [
@@ -231,13 +246,20 @@ class SkillManagementAgent
 
             $response = $this->processWithMCPAgent($context);
 
+            /** @var array<string, mixed> $build */
+            $build = is_array($response['build'] ?? null) ? $response['build'] : [];
+            /** @var array<int, string> $coreSkills */
+            $coreSkills = is_array($response['core_skills'] ?? null) ? array_values($response['core_skills']) : [];
+            /** @var array<int, string> $optionalSkills */
+            $optionalSkills = is_array($response['optional_skills'] ?? null) ? array_values($response['optional_skills']) : [];
+
             return [
-                'build' => $response['build'] ?? [],
-                'core_skills' => $response['core_skills'] ?? [],
-                'optional_skills' => $response['optional_skills'] ?? [],
-                'total_sp_required' => $response['total_sp_required'] ?? 0,
-                'confidence' => $response['confidence'] ?? 0.85,
-                'reasoning' => $response['reasoning'] ?? 'Skill build recommended',
+                'build' => $build,
+                'core_skills' => $coreSkills,
+                'optional_skills' => $optionalSkills,
+                'total_sp_required' => (int) ($response['total_sp_required'] ?? 0),
+                'confidence' => (float) ($response['confidence'] ?? 0.85),
+                'reasoning' => (string) ($response['reasoning'] ?? 'Skill build recommended'),
             ];
         } catch (\Exception $e) {
             Log::error('[SkillManagementAgent] Skill build recommendation failed', [
@@ -281,10 +303,15 @@ class SkillManagementAgent
 
             $response = $this->processWithMCPAgent($context);
 
+            /** @var array<int, array<string, mixed>> $synergies */
+            $synergies = is_array($response['synergies'] ?? null) ? array_values($response['synergies']) : [];
+            /** @var array<int, string> $recommendations */
+            $recommendations = is_array($response['recommendations'] ?? null) ? array_values($response['recommendations']) : [];
+
             return [
-                'synergies' => $response['synergies'] ?? [],
-                'recommendations' => $response['recommendations'] ?? [],
-                'confidence' => $response['confidence'] ?? 0.85,
+                'synergies' => $synergies,
+                'recommendations' => $recommendations,
+                'confidence' => (float) ($response['confidence'] ?? 0.85),
             ];
         } catch (\Exception $e) {
             Log::error('[SkillManagementAgent] Skill synergy analysis failed', [

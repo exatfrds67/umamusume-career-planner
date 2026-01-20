@@ -59,8 +59,9 @@ class AgentOrchestrationService
      *     training_recommendations: array<string, mixed>,
      *     race_strategy: array<string, mixed>,
      *     skill_plan: array<string, mixed>,
-     *     workflow: array<string, mixed>,
-     *     confidence: float
+     *     workflow: array<int, array{agent: string, status: string}>,
+     *     confidence: float,
+     *     metadata: array{processing_time: float, agents_used: int, character_id: int}
      * }
      */
     public function executeComprehensiveAnalysis(
@@ -108,10 +109,10 @@ class AgentOrchestrationService
 
             // Calculate overall confidence
             $confidence = $this->calculateOverallConfidence([
-                $careerPlan['confidence'] ?? 0.8,
-                $trainingRecommendations['confidence'] ?? 0.8,
-                $raceStrategy['confidence'] ?? 0.8,
-                $skillPlan['confidence'] ?? 0.8,
+                (float) ($careerPlan['confidence'] ?? 0.8),
+                (float) ($trainingRecommendations['confidence'] ?? 0.8),
+                (float) ($raceStrategy['confidence'] ?? 0.8),
+                (float) ($skillPlan['confidence'] ?? 0.8),
             ]);
 
             return [
@@ -144,8 +145,9 @@ class AgentOrchestrationService
      * @param  array<string, array<string, mixed>>  $tasks
      * @return array{
      *     results: array<string, mixed>,
-     *     workflow: array<string, mixed>,
-     *     confidence: float
+     *     workflow: array<int, array{task: string, status: string}>,
+     *     confidence: float,
+     *     metadata?: array{processing_time: float, tasks_executed: int}
      * }
      */
     public function executeParallelWorkflow(
@@ -202,8 +204,9 @@ class AgentOrchestrationService
      * @return array{
      *     results: array<int, mixed>,
      *     shared_context: array<string, mixed>,
-     *     workflow: array<string, mixed>,
-     *     confidence: float
+     *     workflow: array<int, array{step: int, agent: string, status: string}>,
+     *     confidence: float,
+     *     metadata?: array{processing_time: float, steps_executed: int}
      * }
      */
     public function executeSequentialWorkflow(

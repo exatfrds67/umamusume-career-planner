@@ -75,12 +75,19 @@ class RaceAnalysisAgent
             // Process through MCP agent
             $response = $this->processWithMCPAgent($context);
 
+            /** @var array<string, mixed> $readiness */
+            $readiness = is_array($response['readiness'] ?? null) ? $response['readiness'] : [];
+            /** @var array<int, string> $recommendations */
+            $recommendations = is_array($response['recommendations'] ?? null) ? array_values($response['recommendations']) : [];
+            /** @var array<string, mixed> $statRequirements */
+            $statRequirements = is_array($response['stat_requirements'] ?? null) ? $response['stat_requirements'] : [];
+
             $analysis = [
-                'readiness' => $response['readiness'] ?? [],
-                'recommendations' => $response['recommendations'] ?? [],
-                'stat_requirements' => $response['stat_requirements'] ?? [],
-                'confidence' => $response['confidence'] ?? 0.85,
-                'reasoning' => $response['reasoning'] ?? 'Race analysis completed',
+                'readiness' => $readiness,
+                'recommendations' => $recommendations,
+                'stat_requirements' => $statRequirements,
+                'confidence' => (float) ($response['confidence'] ?? 0.85),
+                'reasoning' => (string) ($response['reasoning'] ?? 'Race analysis completed'),
                 'metadata' => [
                     'agent_id' => $this->agentId,
                     'processing_time' => microtime(true) - $startTime,
@@ -132,12 +139,15 @@ class RaceAnalysisAgent
 
             $response = $this->processWithMCPAgent($context);
 
+            /** @var array<string, mixed> $performanceFactors */
+            $performanceFactors = is_array($response['performance_factors'] ?? null) ? $response['performance_factors'] : [];
+
             return [
-                'predicted_position' => $response['predicted_position'] ?? 5,
-                'win_probability' => $response['win_probability'] ?? 0.5,
-                'performance_factors' => $response['performance_factors'] ?? [],
-                'confidence' => $response['confidence'] ?? 0.8,
-                'reasoning' => $response['reasoning'] ?? 'Performance prediction completed',
+                'predicted_position' => (int) ($response['predicted_position'] ?? 5),
+                'win_probability' => (float) ($response['win_probability'] ?? 0.5),
+                'performance_factors' => $performanceFactors,
+                'confidence' => (float) ($response['confidence'] ?? 0.8),
+                'reasoning' => (string) ($response['reasoning'] ?? 'Performance prediction completed'),
             ];
         } catch (\Exception $e) {
             Log::error('[RaceAnalysisAgent] Performance prediction failed', [
@@ -182,12 +192,17 @@ class RaceAnalysisAgent
 
             $response = $this->processWithMCPAgent($context);
 
+            /** @var array<string, mixed> $strategy */
+            $strategy = is_array($response['strategy'] ?? null) ? $response['strategy'] : [];
+            /** @var array<int, string> $skillRecommendations */
+            $skillRecommendations = is_array($response['skill_recommendations'] ?? null) ? array_values($response['skill_recommendations']) : [];
+
             return [
-                'strategy' => $response['strategy'] ?? [],
-                'running_style' => $response['running_style'] ?? 'pace_chaser',
-                'skill_recommendations' => $response['skill_recommendations'] ?? [],
-                'confidence' => $response['confidence'] ?? 0.85,
-                'reasoning' => $response['reasoning'] ?? 'Strategy recommendation completed',
+                'strategy' => $strategy,
+                'running_style' => (string) ($response['running_style'] ?? 'pace_chaser'),
+                'skill_recommendations' => $skillRecommendations,
+                'confidence' => (float) ($response['confidence'] ?? 0.85),
+                'reasoning' => (string) ($response['reasoning'] ?? 'Strategy recommendation completed'),
             ];
         } catch (\Exception $e) {
             Log::error('[RaceAnalysisAgent] Strategy recommendation failed', [
@@ -232,12 +247,21 @@ class RaceAnalysisAgent
 
             $response = $this->processWithMCPAgent($context);
 
+            /** @var array<string, mixed> $analysis */
+            $analysis = is_array($response['analysis'] ?? null) ? $response['analysis'] : [];
+            /** @var array<int, string> $strengths */
+            $strengths = is_array($response['strengths'] ?? null) ? array_values($response['strengths']) : [];
+            /** @var array<int, string> $weaknesses */
+            $weaknesses = is_array($response['weaknesses'] ?? null) ? array_values($response['weaknesses']) : [];
+            /** @var array<int, string> $improvements */
+            $improvements = is_array($response['improvements'] ?? null) ? array_values($response['improvements']) : [];
+
             return [
-                'analysis' => $response['analysis'] ?? [],
-                'strengths' => $response['strengths'] ?? [],
-                'weaknesses' => $response['weaknesses'] ?? [],
-                'improvements' => $response['improvements'] ?? [],
-                'confidence' => $response['confidence'] ?? 0.85,
+                'analysis' => $analysis,
+                'strengths' => $strengths,
+                'weaknesses' => $weaknesses,
+                'improvements' => $improvements,
+                'confidence' => (float) ($response['confidence'] ?? 0.85),
             ];
         } catch (\Exception $e) {
             Log::error('[RaceAnalysisAgent] Post-race analysis failed', [

@@ -93,8 +93,8 @@ class AIDashboardService
     {
         $metrics24h = $this->getMetricsForPeriod('24h');
 
-        $totalRequests = $metrics24h['total_requests'] ?? 0;
-        $successfulRequests = $metrics24h['successful_requests'] ?? 0;
+        $totalRequests = (int) ($metrics24h['total_requests'] ?? 0);
+        $successfulRequests = (int) ($metrics24h['successful_requests'] ?? 0);
         $successRate = $totalRequests > 0 ? ($successfulRequests / $totalRequests) * 100 : 0;
 
         $serverHealth = $this->mcpClient->getAllServerHealth();
@@ -104,8 +104,8 @@ class AIDashboardService
         return [
             'total_requests_24h' => $totalRequests,
             'success_rate' => round($successRate, 2),
-            'avg_response_time' => $metrics24h['avg_response_time'] ?? 0.0,
-            'total_cost_24h' => $metrics24h['total_cost'] ?? 0.0,
+            'avg_response_time' => (float) ($metrics24h['avg_response_time'] ?? 0.0),
+            'total_cost_24h' => (float) ($metrics24h['total_cost'] ?? 0.0),
             'active_agents' => $this->getActiveAgentCount(),
             'healthy_servers' => $healthyServers,
             'total_servers' => $totalServers,
@@ -178,16 +178,16 @@ class AIDashboardService
             $metrics = $this->getProviderMetrics($provider, '24h');
             $providerMetrics[$provider] = [
                 'name' => $provider,
-                'requests_24h' => $metrics['request_count'] ?? 0,
-                'success_rate' => $metrics['success_rate'] ?? 0.0,
-                'avg_response_time' => $metrics['avg_response_time'] ?? 0.0,
-                'min_response_time' => $metrics['min_response_time'] ?? 0.0,
-                'max_response_time' => $metrics['max_response_time'] ?? 0.0,
-                'p95_response_time' => $metrics['p95_response_time'] ?? 0.0,
-                'p99_response_time' => $metrics['p99_response_time'] ?? 0.0,
-                'total_tokens' => $metrics['total_tokens'] ?? 0,
-                'total_cost' => $metrics['total_cost'] ?? 0.0,
-                'avg_confidence' => $metrics['avg_confidence'] ?? 0.0,
+                'requests_24h' => (int) ($metrics['request_count'] ?? 0),
+                'success_rate' => (float) ($metrics['success_rate'] ?? 0.0),
+                'avg_response_time' => (float) ($metrics['avg_response_time'] ?? 0.0),
+                'min_response_time' => (float) ($metrics['min_response_time'] ?? 0.0),
+                'max_response_time' => (float) ($metrics['max_response_time'] ?? 0.0),
+                'p95_response_time' => (float) ($metrics['p95_response_time'] ?? 0.0),
+                'p99_response_time' => (float) ($metrics['p99_response_time'] ?? 0.0),
+                'total_tokens' => (int) ($metrics['total_tokens'] ?? 0),
+                'total_cost' => (float) ($metrics['total_cost'] ?? 0.0),
+                'avg_confidence' => (float) ($metrics['avg_confidence'] ?? 0.0),
             ];
         }
 
@@ -333,6 +333,7 @@ class AIDashboardService
         $avgLength = $totalConversations > 0 ? $totalMessages / $totalConversations : 0;
 
         // Get recent conversations
+        /** @var array<int, array<string, mixed>> $recentConversations */
         $recentConversations = AIConversation::with('character')
             ->orderBy('created_at', 'desc')
             ->limit(10)
@@ -347,9 +348,11 @@ class AIDashboardService
                 'cost' => $conv->cost,
                 'created_at' => $conv->created_at?->toIso8601String(),
             ])
+            ->values()
             ->toArray();
 
         // TODO: Implement tool usage tracking
+        /** @var array<int, array{tool: string, count: int}> $mostUsedTools */
         $mostUsedTools = [];
 
         return [
@@ -636,7 +639,7 @@ class AIDashboardService
         $budgetLimit = 100.0; // $100/month default
 
         $remainingBudget = $budgetLimit - $currentSpend;
-        $budgetUtilization = $budgetLimit > 0 ? ($currentSpend / $budgetLimit) * 100 : 0;
+        $budgetUtilization = ($currentSpend / $budgetLimit) * 100;
 
         $status = match (true) {
             $budgetUtilization >= 100 => 'exceeded',

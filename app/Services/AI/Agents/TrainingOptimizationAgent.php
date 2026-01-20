@@ -133,13 +133,22 @@ class TrainingOptimizationAgent
 
             $response = $this->processWithMCPAgent($context);
 
+            /** @var array<string, int> $statGains */
+            $statGains = is_array($response['stat_gains'] ?? null)
+                ? array_map(fn ($value) => (int) $value, $response['stat_gains'])
+                : [];
+            /** @var array<int, string> $skillHints */
+            $skillHints = is_array($response['skill_hints'] ?? null) ? array_values($response['skill_hints']) : [];
+
             return [
-                'stat_gains' => $response['stat_gains'] ?? [],
-                'energy_cost' => $response['energy_cost'] ?? 0,
-                'failure_risk' => $response['failure_risk'] ?? 0.0,
-                'spirit_burst_potential' => $response['spirit_burst_potential'] ?? null,
-                'skill_hints' => $response['skill_hints'] ?? [],
-                'confidence' => $response['confidence'] ?? 0.8,
+                'stat_gains' => $statGains,
+                'energy_cost' => (int) ($response['energy_cost'] ?? 0),
+                'failure_risk' => (float) ($response['failure_risk'] ?? 0.0),
+                'spirit_burst_potential' => isset($response['spirit_burst_potential'])
+                    ? (float) $response['spirit_burst_potential']
+                    : null,
+                'skill_hints' => $skillHints,
+                'confidence' => (float) ($response['confidence'] ?? 0.8),
             ];
         } catch (\Exception $e) {
             Log::error('[TrainingOptimizationAgent] Stat gain prediction failed', [
@@ -179,11 +188,16 @@ class TrainingOptimizationAgent
 
             $response = $this->processWithMCPAgent($context);
 
+            /** @var array<int, array<string, mixed>> $sequence */
+            $sequence = is_array($response['sequence'] ?? null) ? array_values($response['sequence']) : [];
+            /** @var array<string, mixed> $expectedOutcomes */
+            $expectedOutcomes = is_array($response['expected_outcomes'] ?? null) ? $response['expected_outcomes'] : [];
+
             return [
-                'sequence' => $response['sequence'] ?? [],
-                'expected_outcomes' => $response['expected_outcomes'] ?? [],
-                'confidence' => $response['confidence'] ?? 0.8,
-                'reasoning' => $response['reasoning'] ?? 'Optimized for goal achievement',
+                'sequence' => $sequence,
+                'expected_outcomes' => $expectedOutcomes,
+                'confidence' => (float) ($response['confidence'] ?? 0.8),
+                'reasoning' => (string) ($response['reasoning'] ?? 'Optimized for goal achievement'),
             ];
         } catch (\Exception $e) {
             Log::error('[TrainingOptimizationAgent] Sequence optimization failed', [
@@ -297,9 +311,11 @@ class TrainingOptimizationAgent
     {
         return [
             'recommendations' => array_map(function ($option, $index) {
+                $indexValue = is_numeric($index) ? (int) $index : 0;
+
                 return [
-                    'option_index' => $index,
-                    'priority' => 1.0 / ($index + 1),
+                    'option_index' => $indexValue,
+                    'priority' => 1.0 / ($indexValue + 1),
                     'reasoning' => 'Default recommendation',
                 ];
             }, $trainingOptions, array_keys($trainingOptions)),
