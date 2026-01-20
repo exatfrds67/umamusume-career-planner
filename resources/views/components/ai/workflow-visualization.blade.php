@@ -50,7 +50,7 @@
                             }">
 
                             {{-- Step Icon --}}
-                            <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
                                 :class="{
                                     'bg-blue-100 dark:bg-blue-900': step.status === 'running',
                                     'bg-green-100 dark:bg-green-900': step.status === 'completed',

@@ -39,7 +39,7 @@
     x-transition:leave-start="opacity-100 transform translate-y-0"
     x-transition:leave-end="opacity-0 transform translate-y-2">
     <div class="flex items-start gap-3">
-        <div class="flex-shrink-0">
+        <div class="shrink-0">
             @if ($variant === 'success')
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -68,7 +68,7 @@
         </div>
 
         <button type="button" @click="show = false"
-            class="flex-shrink-0 text-current opacity-70 hover:opacity-100 transition-opacity"
+            class="shrink-0 text-current opacity-70 hover:opacity-100 transition-opacity"
             aria-label="Dismiss notification">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />

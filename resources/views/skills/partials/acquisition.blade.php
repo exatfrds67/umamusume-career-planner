@@ -4,7 +4,7 @@
     <div class="card bg-gradient-to-br from-purple-500 to-purple-600 text-white">
         <div class="card-body">
             <div class="flex items-start gap-4">
-                <div class="flex-shrink-0">
+                <div class="shrink-0">
                     <svg class="w-12 h-12 text-purple-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
@@ -42,7 +42,7 @@
                     <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                         <div class="flex items-start gap-4">
                             {{-- Priority Badge --}}
-                            <div class="flex-shrink-0">
+                            <div class="shrink-0">
                                 <span
                                     class="inline-flex items-center justify-center w-10 h-10 rounded-full text-lg font-bold"
                                     :class="{
@@ -243,7 +243,7 @@
                     {{-- Hint Collection Tip --}}
                     <div class="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                         <div class="flex items-start gap-2">
-                            <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5"
+                            <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5"
                                 fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd"
                                     d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
@@ -277,7 +277,7 @@
                 <template x-for="acquisition in recentAcquisitions" :key="acquisition.id">
                     <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
                         <div class="flex items-center gap-3">
-                            <div class="flex-shrink-0">
+                            <div class="shrink-0">
                                 <svg class="w-8 h-8 text-green-500" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd"
                                         d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"

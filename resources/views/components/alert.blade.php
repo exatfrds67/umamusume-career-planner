@@ -42,7 +42,7 @@
 
         @if ($dismissible)
             <button type="button" @click="show = false"
-                class="flex-shrink-0 text-current opacity-70 hover:opacity-100 transition-opacity"
+                class="shrink-0 text-current opacity-70 hover:opacity-100 transition-opacity"
                 aria-label="Dismiss alert">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />

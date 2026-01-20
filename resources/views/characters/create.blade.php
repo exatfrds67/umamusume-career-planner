@@ -538,7 +538,7 @@
                                     <input type="number" id="stat_{{ $stat }}"
                                         name="stats[{{ $stat }}]"
                                         x-model.number="formData.stats.{{ $stat }}" min="0"
-                                        max="1200" step="10" required
+                                        max="1200" step="10"
                                         class="form-input pr-16 text-lg font-semibold"
                                         @input="validateStat('{{ $stat }}')">
                                     <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
@@ -613,7 +613,7 @@
                                     <div>
                                         <label class="form-label text-xs font-semibold">{{ $label }}</label>
                                         <select name="aptitudes[distance][{{ $key }}]"
-                                            x-model="formData.aptitudes.distance.{{ $key }}" required
+                                            x-model="formData.aptitudes.distance.{{ $key }}"
                                             class="form-select text-sm">
                                             <option value="">Select Grade</option>
                                             @foreach ($grades as $grade)
@@ -641,7 +641,7 @@
                                     <div>
                                         <label class="form-label text-xs font-semibold">{{ $label }}</label>
                                         <select name="aptitudes[surface][{{ $key }}]"
-                                            x-model="formData.aptitudes.surface.{{ $key }}" required
+                                            x-model="formData.aptitudes.surface.{{ $key }}"
                                             class="form-select text-sm">
                                             <option value="">Select Grade</option>
                                             @foreach ($grades as $grade)
@@ -669,7 +669,7 @@
                                     <div>
                                         <label class="form-label text-xs font-semibold">{{ $label }}</label>
                                         <select name="aptitudes[style][{{ $key }}]"
-                                            x-model="formData.aptitudes.style.{{ $key }}" required
+                                            x-model="formData.aptitudes.style.{{ $key }}"
                                             class="form-select text-sm">
                                             <option value="">Select Grade</option>
                                             @foreach ($grades as $grade)
@@ -1043,37 +1043,44 @@
                 },
 
                 getGrade(value) {
-                    if (value >= 1200) return 'SS';
-                    if (value >= 1100) return 'S';
-                    if (value >= 1000) return 'A+';
-                    if (value >= 900) return 'A';
-                    if (value >= 800) return 'B+';
-                    if (value >= 700) return 'B';
-                    if (value >= 600) return 'C+';
-                    if (value >= 500) return 'C';
-                    if (value >= 400) return 'D+';
+                    if (value >= 1200) return 'SS+';
+                    if (value >= 1100) return 'SS';
+                    if (value >= 1050) return 'S+';
+                    if (value >= 1000) return 'S';
+                    if (value >= 900) return 'A+';
+                    if (value >= 800) return 'A';
+                    if (value >= 700) return 'B+';
+                    if (value >= 600) return 'B';
+                    if (value >= 500) return 'C+';
+                    if (value >= 400) return 'C';
+                    if (value >= 350) return 'D+';
                     if (value >= 300) return 'D';
-                    if (value >= 200) return 'E+';
-                    if (value >= 100) return 'E';
-                    if (value >= 50) return 'F';
+                    if (value >= 250) return 'E+';
+                    if (value >= 200) return 'E';
+                    if (value >= 150) return 'F+';
+                    if (value >= 100) return 'F';
+                    if (value >= 50) return 'G+';
                     return 'G';
                 },
 
                 getGradeColor(value) {
-                    if (value >= 1200) return 'bg-linear-to-r from-yellow-400 to-amber-500 text-white';
-                    if (value >= 1100) return 'bg-linear-to-r from-purple-500 to-pink-500 text-white';
-                    if (value >= 1000) return 'bg-red-500 text-white';
-                    if (value >= 900) return 'bg-red-500 text-white';
+                    if (value >= 1200) return 'bg-yellow-500 text-white';
+                    if (value >= 1100) return 'bg-yellow-500 text-white';
+                    if (value >= 1000) return 'bg-yellow-500 text-white';
+                    if (value >= 900) return 'bg-orange-500 text-white';
                     if (value >= 800) return 'bg-orange-500 text-white';
-                    if (value >= 700) return 'bg-orange-500 text-white';
-                    if (value >= 600) return 'bg-yellow-500 text-gray-900';
-                    if (value >= 500) return 'bg-yellow-500 text-gray-900';
+                    if (value >= 700) return 'bg-red-500 text-white';
+                    if (value >= 600) return 'bg-red-500 text-white';
+                    if (value >= 500) return 'bg-green-500 text-white';
                     if (value >= 400) return 'bg-green-500 text-white';
-                    if (value >= 300) return 'bg-green-500 text-white';
-                    if (value >= 200) return 'bg-blue-500 text-white';
-                    if (value >= 100) return 'bg-blue-500 text-white';
+                    if (value >= 350) return 'bg-blue-500 text-white';
+                    if (value >= 300) return 'bg-blue-500 text-white';
+                    if (value >= 250) return 'bg-purple-500 text-white';
+                    if (value >= 200) return 'bg-purple-500 text-white';
+                    if (value >= 150) return 'bg-purple-800 text-white';
+                    if (value >= 100) return 'bg-purple-800 text-white';
                     if (value >= 50) return 'bg-gray-500 text-white';
-                    return 'bg-gray-400 text-white';
+                    return 'bg-gray-500 text-white';
                 },
 
                 isStep3Valid() {

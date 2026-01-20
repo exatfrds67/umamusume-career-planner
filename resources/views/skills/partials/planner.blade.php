@@ -125,7 +125,7 @@
                         <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-lg">
                             <div class="flex items-center gap-3">
                                 <span
-                                    class="flex-shrink-0 w-6 h-6 bg-primary-500 text-white rounded-full flex items-center justify-center text-xs font-bold"
+                                    class="shrink-0 w-6 h-6 bg-primary-500 text-white rounded-full flex items-center justify-center text-xs font-bold"
                                     x-text="index + 1"></span>
                                 <div>
                                     <p class="font-medium text-gray-900 dark:text-white" x-text="skill.name"></p>
@@ -161,7 +161,7 @@
             <div x-show="aiOptimization"
                 class="bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-lg p-6">
                 <div class="flex items-start gap-4 mb-4">
-                    <div class="flex-shrink-0">
+                    <div class="shrink-0">
                         <svg class="w-10 h-10 text-purple-600 dark:text-purple-400" fill="none"
                             stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -207,7 +207,7 @@
                             <ul class="space-y-2">
                                 <template x-for="rec in aiOptimization.recommendations" :key="rec">
                                     <li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300">
-                                        <svg class="w-5 h-5 text-purple-500 flex-shrink-0 mt-0.5" fill="currentColor"
+                                        <svg class="w-5 h-5 text-purple-500 shrink-0 mt-0.5" fill="currentColor"
                                             viewBox="0 0 20 20">
                                             <path fill-rule="evenodd"
                                                 d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
@@ -228,7 +228,7 @@
                                     :key="index">
                                     <div class="flex items-center gap-3 p-2 bg-white dark:bg-gray-800 rounded">
                                         <span
-                                            class="flex-shrink-0 w-6 h-6 bg-purple-500 text-white rounded-full flex items-center justify-center text-xs font-bold"
+                                            class="shrink-0 w-6 h-6 bg-purple-500 text-white rounded-full flex items-center justify-center text-xs font-bold"
                                             x-text="index + 1"></span>
                                         <span class="text-sm text-gray-700 dark:text-gray-300" x-text="step"></span>
                                     </div>

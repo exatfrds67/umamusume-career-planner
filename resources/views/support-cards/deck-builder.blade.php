@@ -24,27 +24,29 @@
         </div>
 
         <!-- Deck Status -->
-        @if ($synergyScore)
-            <div
-                class="card bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 p-4 rounded-lg border border-primary-200 dark:border-primary-700">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h3 class="text-sm font-medium text-primary-900 dark:text-primary-100">Current Deck Synergy</h3>
-                        <p class="mt-1 text-2xl font-bold text-primary-600 dark:text-primary-400">
-                            {{ number_format($synergyScore['total_score'], 1) }}%
-                        </p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-sm text-primary-700 dark:text-primary-300">
-                            Type Coverage: {{ $synergyScore['type_coverage'] ?? 'N/A' }}
-                        </p>
-                        <p class="text-sm text-primary-700 dark:text-primary-300">
-                            Avg Meta Tier: {{ $synergyScore['avg_tier'] ?? 'N/A' }}
-                        </p>
+        @isset($deckAnalysis)
+            @if ($deckAnalysis && isset($deckAnalysis['synergy']))
+                <div
+                    class="card bg-linear-to-r from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 p-4 rounded-lg border border-primary-200 dark:border-primary-700">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-sm font-medium text-primary-900 dark:text-primary-100">Current Deck Synergy</h3>
+                            <p class="mt-1 text-2xl font-bold text-primary-600 dark:text-primary-400">
+                                {{ number_format($deckAnalysis['synergy']['total_score'] ?? 0, 1) }}%
+                            </p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm text-primary-700 dark:text-primary-300">
+                                Type Coverage: {{ $deckAnalysis['synergy']['type_coverage'] ?? 'N/A' }}
+                            </p>
+                            <p class="text-sm text-primary-700 dark:text-primary-300">
+                                Avg Meta Tier: {{ $deckAnalysis['synergy']['avg_tier'] ?? 'N/A' }}
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
-        @endif
+            @endif
+        @endisset
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Deck Slots (Left/Top) -->
@@ -65,7 +67,7 @@
                                 class="deck-slot p-4 rounded-lg border-2 {{ $slotCard ? 'border-primary-300 dark:border-primary-600 bg-primary-50 dark:bg-primary-900/20' : 'border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900/20' }}">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-4 flex-1">
-                                        <div class="flex-shrink-0">
+                                        <div class="shrink-0">
                                             <span
                                                 class="inline-flex items-center justify-center w-8 h-8 rounded-full {{ $isFriendSlot ? 'bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300' }} font-semibold text-sm">
                                                 {{ $i }}
@@ -239,7 +241,7 @@
                                             <x-support-card-tier-badge :tier="$card->meta_tier" size="xs" />
                                         </div>
                                     </div>
-                                    <button class="btn btn-xs btn-primary flex-shrink-0">
+                                    <button class="btn btn-xs btn-primary shrink-0">
                                         Add
                                     </button>
                                 </div>
@@ -271,18 +273,25 @@
         </div>
     </div>
 
+    @php
+        $deckData = $currentDeck
+            ->map(function ($card) {
+                return [
+                    'slot' => $card->position_slot,
+                    'card_id' => $card->support_card_id,
+                    'is_friend' => $card->is_friend_card,
+                    'limit_break' => $card->limit_break_level,
+                    'friendship' => $card->friendship_level,
+                    'card' => $card->supportCard,
+                ];
+            })
+            ->values()
+            ->toArray();
+    @endphp
     <script>
         function deckBuilder() {
             return {
-                deck: @json(
-                    $currentDeck->map(fn($card) => [
-                            'slot' => $card->position_slot,
-                            'card_id' => $card->support_card_id,
-                            'is_friend' => $card->is_friend_card,
-                            'limit_break' => $card->limit_break_level,
-                            'friendship' => $card->friendship_level,
-                            'card' => $card->supportCard,
-                        ])),
+                deck: @json($deckData),
                 selectedSlot: null,
                 isFriendSlot: false,
                 searchQuery: '',
@@ -392,7 +401,7 @@
                     // Warnings
                     if (this.uniqueTypes < 3) {
                         this.validationWarnings.push(
-                        'Consider using at least 3 different card types for balanced training');
+                            'Consider using at least 3 different card types for balanced training');
                     }
                 },
 
@@ -433,7 +442,8 @@
 
                 autoOptimize() {
                     alert(
-                        'Auto-optimize feature coming soon! This will automatically select the best cards based on your character\'s goals.');
+                        'Auto-optimize feature coming soon! This will automatically select the best cards based on your character\'s goals.'
+                    );
                 }
             }
         }

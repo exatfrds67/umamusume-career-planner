@@ -5,7 +5,7 @@
         <div class="card bg-white dark:bg-gray-800">
             <div class="card-body">
                 <div class="flex items-center gap-3">
-                    <div class="flex-shrink-0">
+                    <div class="shrink-0">
                         <div
                             class="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
                             <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor"
@@ -27,7 +27,7 @@
         <div class="card bg-white dark:bg-gray-800">
             <div class="card-body">
                 <div class="flex items-center gap-3">
-                    <div class="flex-shrink-0">
+                    <div class="shrink-0">
                         <div
                             class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900 rounded-lg flex items-center justify-center">
                             <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-400" fill="none"
@@ -49,7 +49,7 @@
         <div class="card bg-white dark:bg-gray-800">
             <div class="card-body">
                 <div class="flex items-center gap-3">
-                    <div class="flex-shrink-0">
+                    <div class="shrink-0">
                         <div
                             class="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center">
                             <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none"
@@ -113,7 +113,7 @@
                             </div>
 
                             {{-- Evolution Arrow --}}
-                            <div class="flex-shrink-0">
+                            <div class="shrink-0">
                                 <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -166,7 +166,7 @@
                         <div x-show="evolution.ai_recommendation"
                             class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-3 mb-4">
                             <div class="flex items-start gap-2">
-                                <svg class="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5"
+                                <svg class="w-5 h-5 text-purple-600 dark:text-purple-400 shrink-0 mt-0.5"
                                     fill="currentColor" viewBox="0 0 20 20">
                                     <path
                                         d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1h4v1a2 2 0 11-4 0zM12 14c.015-.34.208-.646.477-.859a4 4 0 10-4.954 0c.27.213.462.519.476.859h4.002z" />
@@ -242,7 +242,7 @@
                             </div>
 
                             {{-- Evolution Arrow (Disabled) --}}
-                            <div class="flex-shrink-0">
+                            <div class="shrink-0">
                                 <svg class="w-8 h-8 text-gray-300 dark:text-gray-600" fill="none"
                                     stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -270,7 +270,7 @@
                         {{-- Missing Prerequisites --}}
                         <div class="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4 mb-4">
                             <div class="flex items-start gap-2 mb-3">
-                                <svg class="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5"
+                                <svg class="w-5 h-5 text-yellow-600 dark:text-yellow-400 shrink-0 mt-0.5"
                                     fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd"
                                         d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
@@ -303,7 +303,7 @@
                         {{-- Roadmap to Evolution --}}
                         <div x-show="evolution.roadmap" class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
                             <div class="flex items-start gap-2">
-                                <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5"
+                                <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5"
                                     fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
                                     <path fill-rule="evenodd"
@@ -334,7 +334,7 @@
                 <h4 class="text-base font-semibold text-gray-900 dark:text-white mb-3">How Skill Evolution Works</h4>
                 <ul class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
                     <li class="flex items-start gap-2">
-                        <svg class="w-5 h-5 text-primary-500 flex-shrink-0 mt-0.5" fill="currentColor"
+                        <svg class="w-5 h-5 text-primary-500 shrink-0 mt-0.5" fill="currentColor"
                             viewBox="0 0 20 20">
                             <path fill-rule="evenodd"
                                 d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
@@ -344,7 +344,7 @@
                             with enhanced effects</span>
                     </li>
                     <li class="flex items-start gap-2">
-                        <svg class="w-5 h-5 text-primary-500 flex-shrink-0 mt-0.5" fill="currentColor"
+                        <svg class="w-5 h-5 text-primary-500 shrink-0 mt-0.5" fill="currentColor"
                             viewBox="0 0 20 20">
                             <path fill-rule="evenodd"
                                 d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
@@ -354,7 +354,7 @@
                             replaced by the Rare version</span>
                     </li>
                     <li class="flex items-start gap-2">
-                        <svg class="w-5 h-5 text-primary-500 flex-shrink-0 mt-0.5" fill="currentColor"
+                        <svg class="w-5 h-5 text-primary-500 shrink-0 mt-0.5" fill="currentColor"
                             viewBox="0 0 20 20">
                             <path fill-rule="evenodd"
                                 d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
@@ -364,7 +364,7 @@
                             cost by 20% per hint (40% max)</span>
                     </li>
                     <li class="flex items-start gap-2">
-                        <svg class="w-5 h-5 text-primary-500 flex-shrink-0 mt-0.5" fill="currentColor"
+                        <svg class="w-5 h-5 text-primary-500 shrink-0 mt-0.5" fill="currentColor"
                             viewBox="0 0 20 20">
                             <path fill-rule="evenodd"
                                 d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
@@ -374,7 +374,7 @@
                             or prerequisite skills</span>
                     </li>
                     <li class="flex items-start gap-2">
-                        <svg class="w-5 h-5 text-primary-500 flex-shrink-0 mt-0.5" fill="currentColor"
+                        <svg class="w-5 h-5 text-primary-500 shrink-0 mt-0.5" fill="currentColor"
                             viewBox="0 0 20 20">
                             <path fill-rule="evenodd"
                                 d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"

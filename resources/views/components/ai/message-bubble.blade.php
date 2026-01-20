@@ -4,7 +4,7 @@
     :aria-label="`Message from ${message.sender === 'user' ? 'you' : 'AI assistant'}`">
 
     {{-- Avatar --}}
-    <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+    <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
         :class="message.sender === 'user' ? 'bg-gray-300 dark:bg-gray-600' : 'bg-primary-500'">
         <template x-if="message.sender === 'user'">
             <svg class="w-5 h-5 text-gray-700 dark:text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
