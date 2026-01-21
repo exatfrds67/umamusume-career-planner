@@ -89,6 +89,27 @@ return [
             ],
         ],
 
+        // External API Sync Queue Configuration
+        // High priority queue for critical data synchronization
+        'sync-high' => [
+            'driver' => 'redis',
+            'connection' => env('REDIS_QUEUE_CONNECTION', 'default'),
+            'queue' => 'high',
+            'retry_after' => (int) env('REDIS_QUEUE_RETRY_AFTER', 90),
+            'block_for' => null,
+            'after_commit' => false,
+        ],
+
+        // Low priority queue for non-critical data synchronization
+        'sync-low' => [
+            'driver' => 'redis',
+            'connection' => env('REDIS_QUEUE_CONNECTION', 'default'),
+            'queue' => 'low',
+            'retry_after' => (int) env('REDIS_QUEUE_RETRY_AFTER', 90),
+            'block_for' => null,
+            'after_commit' => false,
+        ],
+
     ],
 
     /*

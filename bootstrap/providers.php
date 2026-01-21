@@ -7,4 +7,5 @@ return [
     App\Providers\ExternalAPIServiceProvider::class,
     App\Providers\FallbackRecoveryServiceProvider::class,
     App\Providers\HorizonServiceProvider::class,
+    App\Providers\RedisCacheOptimizationServiceProvider::class,
 ];
