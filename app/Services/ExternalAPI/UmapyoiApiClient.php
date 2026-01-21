@@ -53,7 +53,9 @@ class UmapyoiApiClient
 
     public function __construct(
         protected MCPClientService $mcpClient,
-        protected CacheManagementService $cacheManager
+        protected CacheManagementService $cacheManager,
+        protected ResponseValidator $validator,
+        protected ResponseTransformer $transformer
     ) {
         $this->baseUrl = (string) config('services.umapyoi.url', 'https://api.umapyoi.net');
         $this->timeout = (int) config('services.umapyoi.timeout', 30);
@@ -67,6 +69,11 @@ class UmapyoiApiClient
     public function getCharacters(bool $forceRefresh = false): array
     {
         $cacheKey = self::CACHE_PREFIX.'characters';
+
+        // If force refresh, invalidate cache first
+        if ($forceRefresh) {
+            Cache::forget($cacheKey);
+        }
 
         // Use cache manager for intelligent caching
         return $this->cacheManager->remember(
@@ -85,17 +92,31 @@ class UmapyoiApiClient
                         throw new \RuntimeException($response['error'] ?? 'Unknown error');
                     }
 
-                    $characters = $response['data']['characters'] ?? [];
+                    // Validate response schema
+                    $validation = $this->validator->validate('umapyoi_characters', $response['data']);
+
+                    if (! $validation['valid']) {
+                        Log::error('[UmapyoiApiClient] Response validation failed', [
+                            'errors' => $validation['errors'],
+                        ]);
+
+                        throw new \RuntimeException('Invalid response format: '.implode(', ', $validation['errors']));
+                    }
+
+                    $characters = $validation['data'] ?? [];
+
+                    // Transform to internal format
+                    $transformedCharacters = $this->transformer->transform('characters', $characters);
 
                     Log::info('[UmapyoiApiClient] Characters fetched successfully', [
-                        'count' => count($characters),
+                        'count' => \count($transformedCharacters),
                         'source' => 'api',
                         'response_time_ms' => round($responseTime, 2),
                     ]);
 
                     return [
                         'success' => true,
-                        'data' => $characters,
+                        'data' => $transformedCharacters,
                         'source' => 'api',
                     ];
                 } catch (\Exception $e) {
@@ -139,16 +160,37 @@ class UmapyoiApiClient
                 throw new \RuntimeException($response['error'] ?? 'Unknown error');
             }
 
-            $character = $response['data']['character'] ?? null;
+            // Validate response schema
+            $validation = $this->validator->validate('umapyoi_character', $response['data']);
+
+            if (! $validation['valid']) {
+                Log::error('[UmapyoiApiClient] Character validation failed', [
+                    'character_id' => $characterId,
+                    'errors' => $validation['errors'],
+                ]);
+
+                throw new \RuntimeException('Invalid response format: '.implode(', ', $validation['errors']));
+            }
+
+            $character = $validation['data'] ?? null;
 
             if ($character) {
-                Cache::put($cacheKey, $character, self::CACHE_TTL);
+                // Transform to internal format
+                $transformedCharacter = $this->transformer->transform('character', $character);
+                Cache::put($cacheKey, $transformedCharacter, self::CACHE_TTL);
+
+                return [
+                    'success' => true,
+                    'data' => $transformedCharacter,
+                    'source' => 'api',
+                ];
             }
 
             return [
-                'success' => true,
-                'data' => $character,
+                'success' => false,
+                'data' => null,
                 'source' => 'api',
+                'error' => 'Character not found',
             ];
         } catch (\Exception $e) {
             Log::error('[UmapyoiApiClient] Failed to fetch character', [
@@ -189,19 +231,33 @@ class UmapyoiApiClient
                 throw new \RuntimeException($response['error'] ?? 'Unknown error');
             }
 
-            $cards = $response['data']['support_cards'] ?? [];
+            // Validate response schema
+            $validation = $this->validator->validate('umapyoi_support_cards', $response['data']);
+
+            if (! $validation['valid']) {
+                Log::error('[UmapyoiApiClient] Support cards validation failed', [
+                    'errors' => $validation['errors'],
+                ]);
+
+                throw new \RuntimeException('Invalid response format: '.implode(', ', $validation['errors']));
+            }
+
+            $cards = $validation['data'] ?? [];
+
+            // Transform to internal format
+            $transformedCards = $this->transformer->transform('support_cards', $cards);
 
             // Cache the result
-            Cache::put($cacheKey, $cards, self::CACHE_TTL);
+            Cache::put($cacheKey, $transformedCards, self::CACHE_TTL);
 
             Log::info('[UmapyoiApiClient] Support cards fetched successfully', [
-                'count' => count($cards),
+                'count' => \count($transformedCards),
                 'source' => 'api',
             ]);
 
             return [
                 'success' => true,
-                'data' => $cards,
+                'data' => $transformedCards,
                 'source' => 'api',
             ];
         } catch (\Exception $e) {
@@ -242,20 +298,179 @@ class UmapyoiApiClient
                 throw new \RuntimeException($response['error'] ?? 'Unknown error');
             }
 
-            $card = $response['data']['support_card'] ?? null;
+            // Validate response schema
+            $validation = $this->validator->validate('umapyoi_support_card', $response['data']);
+
+            if (! $validation['valid']) {
+                Log::error('[UmapyoiApiClient] Support card validation failed', [
+                    'card_id' => $cardId,
+                    'errors' => $validation['errors'],
+                ]);
+
+                throw new \RuntimeException('Invalid response format: '.implode(', ', $validation['errors']));
+            }
+
+            $card = $validation['data'] ?? null;
 
             if ($card) {
-                Cache::put($cacheKey, $card, self::CACHE_TTL);
+                // Transform to internal format
+                $transformedCard = $this->transformer->transform('support_card', $card);
+                Cache::put($cacheKey, $transformedCard, self::CACHE_TTL);
+
+                return [
+                    'success' => true,
+                    'data' => $transformedCard,
+                    'source' => 'api',
+                ];
             }
 
             return [
-                'success' => true,
-                'data' => $card,
+                'success' => false,
+                'data' => null,
                 'source' => 'api',
+                'error' => 'Support card not found',
             ];
         } catch (\Exception $e) {
             Log::error('[UmapyoiApiClient] Failed to fetch support card', [
                 'card_id' => $cardId,
+                'error' => $e->getMessage(),
+            ]);
+
+            return [
+                'success' => false,
+                'data' => null,
+                'source' => 'error',
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Fetch all skills from umapyoi.net
+     *
+     * @return array{success: bool, data: array<int, array<string, mixed>>, source: string, error?: string}
+     */
+    public function getSkills(bool $forceRefresh = false): array
+    {
+        $cacheKey = self::CACHE_PREFIX.'skills';
+
+        if (! $forceRefresh && Cache::has($cacheKey)) {
+            return [
+                'success' => true,
+                'data' => Cache::get($cacheKey, []),
+                'source' => 'cache',
+            ];
+        }
+
+        try {
+            $response = $this->makeRequest('GET', '/v1/skills');
+
+            if (! $response['success']) {
+                throw new \RuntimeException($response['error'] ?? 'Unknown error');
+            }
+
+            // Validate response schema
+            $validation = $this->validator->validate('umapyoi_skills', $response['data']);
+
+            if (! $validation['valid']) {
+                Log::error('[UmapyoiApiClient] Skills validation failed', [
+                    'errors' => $validation['errors'],
+                ]);
+
+                throw new \RuntimeException('Invalid response format: '.implode(', ', $validation['errors']));
+            }
+
+            $skills = $validation['data'] ?? [];
+
+            // Transform to internal format
+            $transformedSkills = $this->transformer->transform('skills', $skills);
+
+            // Cache the result
+            Cache::put($cacheKey, $transformedSkills, self::CACHE_TTL);
+
+            Log::info('[UmapyoiApiClient] Skills fetched successfully', [
+                'count' => \count($transformedSkills),
+                'source' => 'api',
+            ]);
+
+            return [
+                'success' => true,
+                'data' => $transformedSkills,
+                'source' => 'api',
+            ];
+        } catch (\Exception $e) {
+            Log::error('[UmapyoiApiClient] Failed to fetch skills', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return [
+                'success' => false,
+                'data' => [],
+                'source' => 'error',
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Fetch a specific skill by ID
+     *
+     * @return array{success: bool, data: array<string, mixed>|null, source: string, error?: string}
+     */
+    public function getSkill(string $skillId, bool $forceRefresh = false): array
+    {
+        $cacheKey = self::CACHE_PREFIX."skill:{$skillId}";
+
+        if (! $forceRefresh && Cache::has($cacheKey)) {
+            return [
+                'success' => true,
+                'data' => Cache::get($cacheKey),
+                'source' => 'cache',
+            ];
+        }
+
+        try {
+            $response = $this->makeRequest('GET', "/v1/skills/{$skillId}");
+
+            if (! $response['success']) {
+                throw new \RuntimeException($response['error'] ?? 'Unknown error');
+            }
+
+            // Validate response schema
+            $validation = $this->validator->validate('umapyoi_skill', $response['data']);
+
+            if (! $validation['valid']) {
+                Log::error('[UmapyoiApiClient] Skill validation failed', [
+                    'skill_id' => $skillId,
+                    'errors' => $validation['errors'],
+                ]);
+
+                throw new \RuntimeException('Invalid response format: '.implode(', ', $validation['errors']));
+            }
+
+            $skill = $validation['data'] ?? null;
+
+            if ($skill) {
+                // Transform to internal format
+                $transformedSkill = $this->transformer->transform('skill', $skill);
+                Cache::put($cacheKey, $transformedSkill, self::CACHE_TTL);
+
+                return [
+                    'success' => true,
+                    'data' => $transformedSkill,
+                    'source' => 'api',
+                ];
+            }
+
+            return [
+                'success' => false,
+                'data' => null,
+                'source' => 'api',
+                'error' => 'Skill not found',
+            ];
+        } catch (\Exception $e) {
+            Log::error('[UmapyoiApiClient] Failed to fetch skill', [
+                'skill_id' => $skillId,
                 'error' => $e->getMessage(),
             ]);
 
@@ -294,19 +509,33 @@ class UmapyoiApiClient
                 throw new \RuntimeException($response['error'] ?? 'Unknown error');
             }
 
-            $news = $response['data']['news'] ?? [];
+            // Validate response schema
+            $validation = $this->validator->validate('umapyoi_news', $response['data']);
+
+            if (! $validation['valid']) {
+                Log::error('[UmapyoiApiClient] News validation failed', [
+                    'errors' => $validation['errors'],
+                ]);
+
+                throw new \RuntimeException('Invalid response format: '.implode(', ', $validation['errors']));
+            }
+
+            $news = $validation['data'] ?? [];
+
+            // Transform to internal format
+            $transformedNews = $this->transformer->transform('news', $news);
 
             // Cache the result for 1 hour (news updates more frequently)
-            Cache::put($cacheKey, $news, 3600);
+            Cache::put($cacheKey, $transformedNews, 3600);
 
             Log::info('[UmapyoiApiClient] News fetched successfully', [
-                'count' => count($news),
+                'count' => \count($transformedNews),
                 'source' => 'api',
             ]);
 
             return [
                 'success' => true,
-                'data' => $news,
+                'data' => $transformedNews,
                 'source' => 'api',
             ];
         } catch (\Exception $e) {
@@ -436,6 +665,7 @@ class UmapyoiApiClient
         $keys = [
             self::CACHE_PREFIX.'characters',
             self::CACHE_PREFIX.'support_cards',
+            self::CACHE_PREFIX.'skills',
         ];
 
         foreach ($keys as $key) {
@@ -448,13 +678,14 @@ class UmapyoiApiClient
     /**
      * Get cache statistics
      *
-     * @return array{characters: bool, support_cards: bool, news: bool}
+     * @return array{characters: bool, support_cards: bool, skills: bool, news: bool}
      */
     public function getCacheStatus(): array
     {
         return [
             'characters' => Cache::has(self::CACHE_PREFIX.'characters'),
             'support_cards' => Cache::has(self::CACHE_PREFIX.'support_cards'),
+            'skills' => Cache::has(self::CACHE_PREFIX.'skills'),
             'news' => Cache::has(self::CACHE_PREFIX.'news:limit:10'),
         ];
     }

@@ -451,4 +451,317 @@ class MCPClientService
         // In production, this would unregister the agent from MCP servers
         return true;
     }
+
+    /**
+     * Call an MCP tool on a specific server
+     *
+     * @param  array<string, mixed>  $arguments
+     * @return array<string, mixed>
+     *
+     * @throws \RuntimeException
+     */
+    public function callTool(string $serverName, string $toolName, array $arguments = []): array
+    {
+        if (! $this->isEnabled()) {
+            throw new \RuntimeException('MCP is not enabled');
+        }
+
+        if (! $this->isServerEnabled($serverName)) {
+            throw new \RuntimeException("MCP server '{$serverName}' is not enabled");
+        }
+
+        if (! $this->isServerHealthy($serverName)) {
+            throw new \RuntimeException("MCP server '{$serverName}' is not healthy");
+        }
+
+        $this->debugLog("Calling MCP tool: {$serverName}.{$toolName}", [
+            'server' => $serverName,
+            'tool' => $toolName,
+            'arguments' => $arguments,
+        ]);
+
+        // In production, this would make actual MCP protocol calls
+        // For now, we simulate the response structure
+        return [
+            'success' => true,
+            'server' => $serverName,
+            'tool' => $toolName,
+            'result' => $arguments,
+        ];
+    }
+
+    /**
+     * Perform HTTP GET request using MCP fetch server
+     *
+     * @param  array<string, string>  $headers
+     * @return array<string, mixed>
+     *
+     * @throws \RuntimeException
+     */
+    public function get(string $url, array $headers = [], int $timeout = 5): array
+    {
+        return $this->fetch($url, 'GET', [], $headers, $timeout);
+    }
+
+    /**
+     * Perform HTTP POST request using MCP fetch server
+     *
+     * @param  array<string, mixed>  $data
+     * @param  array<string, string>  $headers
+     * @return array<string, mixed>
+     *
+     * @throws \RuntimeException
+     */
+    public function post(string $url, array $data = [], array $headers = [], int $timeout = 5): array
+    {
+        return $this->fetch($url, 'POST', $data, $headers, $timeout);
+    }
+
+    /**
+     * Perform HTTP PUT request using MCP fetch server
+     *
+     * @param  array<string, mixed>  $data
+     * @param  array<string, string>  $headers
+     * @return array<string, mixed>
+     *
+     * @throws \RuntimeException
+     */
+    public function put(string $url, array $data = [], array $headers = [], int $timeout = 5): array
+    {
+        return $this->fetch($url, 'PUT', $data, $headers, $timeout);
+    }
+
+    /**
+     * Perform HTTP DELETE request using MCP fetch server
+     *
+     * @param  array<string, string>  $headers
+     * @return array<string, mixed>
+     *
+     * @throws \RuntimeException
+     */
+    public function delete(string $url, array $headers = [], int $timeout = 5): array
+    {
+        return $this->fetch($url, 'DELETE', [], $headers, $timeout);
+    }
+
+    /**
+     * Perform HTTP PATCH request using MCP fetch server
+     *
+     * @param  array<string, mixed>  $data
+     * @param  array<string, string>  $headers
+     * @return array<string, mixed>
+     *
+     * @throws \RuntimeException
+     */
+    public function patch(string $url, array $data = [], array $headers = [], int $timeout = 5): array
+    {
+        return $this->fetch($url, 'PATCH', $data, $headers, $timeout);
+    }
+
+    /**
+     * Perform HTTP request using MCP fetch server with retry logic
+     *
+     * @param  array<string, mixed>  $data
+     * @param  array<string, string>  $headers
+     * @return array<string, mixed>
+     *
+     * @throws \RuntimeException
+     */
+    public function fetch(
+        string $url,
+        string $method = 'GET',
+        array $data = [],
+        array $headers = [],
+        int $timeout = 5,
+        int $maxRetries = 3
+    ): array {
+        if (! $this->isServerEnabled('fetch')) {
+            throw new \RuntimeException('MCP fetch server is not enabled');
+        }
+
+        $startTime = microtime(true);
+        $attempt = 0;
+        $lastException = null;
+
+        // Default headers
+        $defaultHeaders = [
+            'Accept' => 'application/json',
+            'User-Agent' => 'UmamusumeCareerPlanner/1.0',
+        ];
+
+        $headers = array_merge($defaultHeaders, $headers);
+
+        // Add Content-Type for requests with body
+        if (in_array($method, ['POST', 'PUT', 'PATCH']) && ! isset($headers['Content-Type'])) {
+            $headers['Content-Type'] = 'application/json';
+        }
+
+        while ($attempt < $maxRetries) {
+            $attempt++;
+
+            try {
+                $this->debugLog("HTTP {$method} request (attempt {$attempt}/{$maxRetries})", [
+                    'url' => $url,
+                    'method' => $method,
+                    'timeout' => $timeout,
+                    'has_data' => ! empty($data),
+                ]);
+
+                // Simulate MCP fetch call
+                // In production, this would use actual MCP protocol
+                $response = $this->performFetch($url, $method, $data, $headers, $timeout);
+
+                $duration = round((microtime(true) - $startTime) * 1000, 2);
+
+                Log::info('[MCP Fetch] Request successful', [
+                    'url' => $url,
+                    'method' => $method,
+                    'status' => $response['status'] ?? 'unknown',
+                    'duration_ms' => $duration,
+                    'attempt' => $attempt,
+                ]);
+
+                return $response;
+            } catch (\Exception $e) {
+                $lastException = $e;
+                $duration = round((microtime(true) - $startTime) * 1000, 2);
+
+                Log::warning('[MCP Fetch] Request failed', [
+                    'url' => $url,
+                    'method' => $method,
+                    'attempt' => $attempt,
+                    'max_retries' => $maxRetries,
+                    'duration_ms' => $duration,
+                    'error' => $e->getMessage(),
+                ]);
+
+                // Don't retry on client errors (4xx)
+                if ($e instanceof \RuntimeException && str_contains($e->getMessage(), '4')) {
+                    break;
+                }
+
+                // Wait before retry (exponential backoff)
+                if ($attempt < $maxRetries) {
+                    $waitTime = min(1000 * pow(2, $attempt - 1), 5000); // Max 5 seconds
+                    usleep($waitTime * 1000);
+                }
+            }
+        }
+
+        $totalDuration = round((microtime(true) - $startTime) * 1000, 2);
+
+        Log::error('[MCP Fetch] All retry attempts failed', [
+            'url' => $url,
+            'method' => $method,
+            'attempts' => $attempt,
+            'total_duration_ms' => $totalDuration,
+            'last_error' => $lastException?->getMessage(),
+        ]);
+
+        throw new \RuntimeException(
+            "HTTP {$method} request to {$url} failed after {$attempt} attempts: ".$lastException?->getMessage()
+        );
+    }
+
+    /**
+     * Perform the actual fetch operation
+     *
+     * @param  array<string, mixed>  $data
+     * @param  array<string, string>  $headers
+     * @return array<string, mixed>
+     *
+     * @throws \RuntimeException
+     */
+    protected function performFetch(
+        string $url,
+        string $method,
+        array $data,
+        array $headers,
+        int $timeout
+    ): array {
+        // In production, this would make actual MCP protocol calls to the fetch server
+        // For now, we simulate a successful response structure
+
+        // Validate URL
+        if (! filter_var($url, FILTER_VALIDATE_URL)) {
+            throw new \RuntimeException("Invalid URL: {$url}");
+        }
+
+        // Simulate response based on method
+        $statusCode = 200;
+        $responseBody = json_encode([
+            'success' => true,
+            'message' => 'Simulated response',
+            'method' => $method,
+            'url' => $url,
+        ]);
+
+        return [
+            'success' => true,
+            'status' => $statusCode,
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'X-Request-ID' => uniqid('req_'),
+            ],
+            'body' => $responseBody,
+            'url' => $url,
+            'method' => $method,
+        ];
+    }
+
+    /**
+     * Fetch with automatic JSON decoding
+     *
+     * @param  array<string, string>  $headers
+     * @return array<string, mixed>
+     *
+     * @throws \RuntimeException
+     */
+    public function fetchJson(
+        string $url,
+        string $method = 'GET',
+        array $data = [],
+        array $headers = [],
+        int $timeout = 5
+    ): array {
+        $response = $this->fetch($url, $method, $data, $headers, $timeout);
+
+        if (! $response['success']) {
+            $error = $response['error'] ?? 'Unknown error';
+            throw new \RuntimeException("Fetch failed: {$error}");
+        }
+
+        $body = $response['body'] ?? '';
+        $decoded = json_decode($body, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new \RuntimeException('Failed to decode JSON response: '.json_last_error_msg());
+        }
+
+        return [
+            'success' => true,
+            'status' => $response['status'] ?? 200,
+            'headers' => $response['headers'] ?? [],
+            'data' => $decoded,
+            'raw_body' => $body,
+        ];
+    }
+
+    /**
+     * Check if fetch server is available
+     */
+    public function isFetchAvailable(): bool
+    {
+        return $this->isServerEnabled('fetch') && $this->isServerHealthy('fetch');
+    }
+
+    /**
+     * Get fetch server configuration
+     *
+     * @return array<string, mixed>|null
+     */
+    public function getFetchServerConfig(): ?array
+    {
+        return $this->getServer('fetch');
+    }
 }

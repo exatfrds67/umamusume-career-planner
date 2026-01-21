@@ -29,7 +29,9 @@ class ExternalAPIServiceProvider extends ServiceProvider
         $this->app->singleton(UmapyoiApiClient::class, function ($app) {
             return new UmapyoiApiClient(
                 $app->make(MCPClientService::class),
-                $app->make(\App\Services\CacheManagementService::class)
+                $app->make(\App\Services\CacheManagementService::class),
+                $app->make(\App\Services\ExternalAPI\ResponseValidator::class),
+                $app->make(\App\Services\ExternalAPI\ResponseTransformer::class)
             );
         });
 
