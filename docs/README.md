@@ -2,292 +2,267 @@
 
 ## Overview
 
-This directory contains all project documentation organized by category for easy navigation and maintenance.
+This directory contains all project documentation organized by category for easy navigation and maintenance. The structure uses numbered prefixes for logical ordering and clear categorization.
 
 ---
 
-## Core Specification Documents (Root Level)
+## Directory Structure
 
-These documents form the foundation of the project and should remain in the root `docs/` directory:
-
-### Master Index and Reference Documents (000 Series)
-
-- `000_DOCUMENT_INDEX.md` - Master index of all documentation
-- `000_IMPLEMENTATION_VERIFICATION_MATRIX.md` - Implementation verification tracking
-- `000_MASTER_GLOSSARY.md` - Project terminology and definitions
-- `000_REQUIREMENTS_TRACEABILITY_MATRIX.md` - Requirements tracking
-
-### Core Specification Documents (001-017 Series)
-
-- `001_SDP_Software_Development_Plan.md` - Software development plan
-- `002_BRS_Business_Requirements_Specifications.md` - Business requirements
-- `003_SRS_Software_Requirement_Specifications.md` - Software requirements
-- `004_SDS_Software_Design_Specifications.md` - Software design
-- `005_DMP_Data_Migration_Plan.md` - Data migration plan
-- `006_DMS_Data_Migration_Specifications.md` - Data migration specifications
-- `007_SIP_Software_Integration_Plan.md` - Integration plan
-- `008_SIS_Software_Integration_Specifications.md` - Integration specifications
-- `009_DBD_Database_Documentation.md` - Database documentation
-- `010_SCD_Source_Code_Documentation.md` - Source code documentation
-- `017_SUM_Software_User_Manual.md` - Software user manual
-
-### Task 6.3 Deliverables (Root Level)
-
-- `USER_GUIDE.md` - Comprehensive user guide
-- `FAQ.md` - Frequently asked questions
-- `DEVELOPER_GUIDE.md` - Developer documentation
-- `API_REFERENCE.md` - API documentation
-- `DEPLOYMENT_SETUP.md` - Deployment configuration guide
-- `MONITORING_AND_LOGGING.md` - Monitoring and logging guide
-- `LAUNCH_CHECKLIST.md` - Pre-launch verification checklist
-- `PRODUCTION_TESTING_GUIDE.md` - Production testing procedures
+```
+docs/
+├── README.md                    # This file - documentation index
+├── 00-core-docs/               # Core SDLC specification documents
+├── 01-diagrams/                # System diagrams (ERD, data flow, etc.)
+├── 01-flows/                   # System flow documentation
+├── 01-sequences/               # Sequence diagrams
+├── 01-tech-flow/               # Technical flow documentation
+├── 01-user-flows/              # User flow diagrams
+├── 01-wireframes/              # UI wireframes and mockups
+├── 02-prds/                    # Product Requirements Documents
+├── 02-specs/                   # Technical specifications
+├── accessibility/              # Accessibility compliance docs
+├── archive/                    # Archived/deprecated files
+├── audit-reports/              # Project audit reports
+├── database-documentation/     # Database schema and mapping
+├── deployment/                 # Deployment configuration
+├── external-api-integration/   # External API integration docs
+├── feature-documentation/      # Feature implementation docs
+├── future-implements/          # Future feature planning
+├── implementation-summaries/   # Task completion summaries
+├── mcp-integration/            # MCP server integration
+├── neuron/                     # Neuron AI framework docs
+├── redis/                      # Redis setup and configuration
+├── reference/                  # Reference guides (API, User, Developer)
+├── services/                   # Service documentation
+├── setup-guides/               # Installation and setup guides
+├── testing/                    # Testing documentation
+└── verification-reports/       # Verification and status reports
+```
 
 ---
 
-## Organized Subdirectories
+## Core Documentation
 
-### `/accessibility/`
+### `/00-core-docs/` - SDLC Specification Documents
 
-Accessibility compliance documentation and testing guides.
+Master reference and core specification documents:
 
-### `/archive/`
+| Document | Description |
+| -------- | ----------- |
+| `000_DOCUMENT_INDEX.md` | Master index of all documentation |
+| `000_IMPLEMENTATION_VERIFICATION_MATRIX.md` | Implementation verification tracking |
+| `000_MASTER_GLOSSARY.md` | Project terminology and definitions |
+| `000_REQUIREMENTS_TRACEABILITY_MATRIX.md` | Requirements tracking |
+| `001_SDP_Software_Development_Plan.md` | Software development plan |
+| `002_BRS_Business_Requirements_Specifications.md` | Business requirements |
+| `003_SRS_Software_Requirement_Specifications.md` | Software requirements |
+| `004_SDS_Software_Design_Specifications.md` | Software design |
+| `005_DMP_Data_Migration_Plan.md` | Data migration plan |
+| `006_DMS_Data_Migration_Specifications.md` | Data migration specifications |
+| `007_SIP_Software_Integration_Plan.md` | Integration plan |
+| `008_SIS_Software_Integration_Specifications.md` | Integration specifications |
+| `009_DBD_Database_Documentation.md` | Database documentation |
+| `010_SCD_Source_Code_Documentation.md` | Source code documentation |
+| `017_SUM_Software_User_Manual.md` | Software user manual |
 
-Archived or deprecated documentation files.
+---
 
-### `/audit-reports/`
+## Design Documentation
 
-Project audit reports and assessments.
+### `/01-diagrams/` - System Diagrams
 
-- `AUDIT_REPORT_FINAL.md`
-- `AUDIT_REPORT_PHASE_1.md`
+- `data-flow-diagram.md` - Data flow visualization
+- `decision-tree-flow-diagrams.md` - Decision tree flows
+- `entity-relationship-diagram.md` - Database ERD
+- `system-process-flow-diagrams.md` - System process flows
+- `user-workflow-diagrams.md` - User workflow visualization
 
-### `/database-documentation/`
+### `/01-flows/` - System Flows
 
-Database schema, alignment, and mapping documentation.
+Feature-specific system flow documentation (FLOW-001 through FLOW-007).
 
-- `DATABASE_REQUIREMENT_MAPPING_TABLE.md`
-- `DATABASE_SCHEMA_ALIGNMENT_VERIFICATION.md`
-- `UPDATED_ENTITY_RELATIONSHIP_DIAGRAM.md`
+### `/01-sequences/` - Sequence Diagrams
 
-### `/deployment/`
+System interaction sequence diagrams (SEQ-001 through SEQ-015).
 
-Deployment-related documentation and configuration files.
+### `/01-tech-flow/` - Technical Flows
 
-- `openapi.yaml` - OpenAPI specification
+Technical flow documentation for each major feature (TECH-FLOW-001 through TECH-FLOW-007).
 
-### `/diagrams/`
+### `/01-user-flows/` - User Flows
 
-System diagrams including data flow, ERD, and process flows.
+User journey and flow documentation (UF-001 through UF-008).
 
-- `data-flow-diagram.md`
-- `decision-tree-flow-diagrams.md`
-- `entity-relationship-diagram.md`
-- `system-process-flow-diagrams.md`
-- `user-workflow-diagrams.md`
+### `/01-wireframes/` - UI Wireframes
 
-### `/feature-documentation/`
+UI wireframes and mockups (WF-001 through WF-012).
 
-Feature-specific implementation documentation.
+---
 
-- `BEFORE_AFTER_LAZY_LOADING.md`
-- `EXTERNAL_API_INTEGRATION.md`
-- `IMAGE_INTEGRATION_COMPLETE.md`
-- `LAZY_LOADING_IMPLEMENTATION.md`
-- `LAZY_LOADING_SUMMARY.md`
-- `OCR_INSTALLATION_GUIDE.md`
-- `OCR_UPLOAD_SYSTEM.md`
-- `SKILL_SYSTEM_DOCUMENTATION.md`
-- `SUPPORT_CARDS_IMAGE_STATUS.md`
-- `SUPPORT_CARDS_IMPLEMENTATION_SUMMARY.md`
-- `TESTING_LAZY_LOADING.md`
+## Requirements & Specifications
 
-### `/flows/`
+### `/02-prds/` - Product Requirements Documents
 
-System flow documentation for major features.
+- `000_PRDS_INDEX.md` - PRD index
+- `PRD-001` through `PRD-007` - Feature PRDs
 
-- `FLOW-001_Character_Management_System.md`
-- `FLOW-002_Training_Optimization_System.md`
-- `FLOW-003_Race_Strategy_System.md`
-- `FLOW-004_Skill_Management_System.md`
-- `FLOW-005_Support_Card_Management_System.md`
-- `FLOW-006_AI_Advisory_System.md`
-- `FLOW-007_External_Integration_System.md`
+### `/02-specs/` - Technical Specifications
 
-### `/future-implements/`
+- `000_SPECS_INDEX.md` - Specs index
+- `SPEC-001` through `SPEC-007` - Technical specifications
 
-Future feature planning and analysis.
+---
+
+## Reference Documentation
+
+### `/reference/` - Reference Guides
+
+| Document | Description |
+| -------- | ----------- |
+| `USER_GUIDE.md` | Comprehensive user guide |
+| `DEVELOPER_GUIDE.md` | Developer documentation |
+| `API_REFERENCE.md` | API documentation |
+| `FAQ.md` | Frequently asked questions |
+| `MONITORING_AND_LOGGING.md` | Monitoring and logging guide |
+| `ai-coding-assistant-best-practices.md` | AI coding guidelines |
+| `external-api-service.md` | External API service reference |
+
+---
+
+## Setup & Deployment
+
+### `/setup-guides/` - Installation Guides
+
+| Document | Description |
+| -------- | ----------- |
+| `DEPLOYMENT_SETUP.md` | Deployment configuration guide |
+| `INSTALL_CODE_COVERAGE.md` | Code coverage setup |
+| `INSTALL_PHPREDIS_MANUALLY.md` | Manual PHP Redis installation |
+| `INSTALL_PHPREDIS_NOW.md` | Quick PHP Redis setup |
+| `INSTALL_TESSERACT_OCR.md` | Tesseract OCR installation |
+| `TESSERACT_OCR_SETUP_COMPLETE.md` | OCR setup verification |
+
+### `/deployment/` - Deployment Configuration
+
+| Document | Description |
+| -------- | ----------- |
+| `deployment.md` | Deployment procedures |
+| `LAUNCH_CHECKLIST.md` | Pre-launch verification checklist |
+| `openapi.yaml` | OpenAPI specification |
+
+### `/redis/` - Redis Configuration
+
+Comprehensive Redis setup documentation including:
+
+- `START_HERE.md` - Redis quick start guide
+- `REDIS_SETUP_INSTRUCTIONS.md` - Detailed setup instructions
+- `REDIS_WSL_SETUP_GUIDE.md` - WSL-specific setup
+- `REDIS_COMMANDS_REFERENCE.md` - Command reference
+- `REDIS_TESTING_GUIDE.md` - Testing procedures
+- Plus troubleshooting and status documents
+
+---
+
+## Feature Documentation
+
+### `/feature-documentation/` - Feature Implementation
+
+| Document | Description |
+| -------- | ----------- |
+| `EXTERNAL_API_INTEGRATION.md` | External API integration overview |
+| `SKILL_SYSTEM_DOCUMENTATION.md` | Skill system documentation |
+| `OCR_UPLOAD_SYSTEM.md` | OCR upload system |
+| `OCR_INSTALLATION_GUIDE.md` | OCR installation guide |
+| `LAZY_LOADING_IMPLEMENTATION.md` | Lazy loading implementation |
+| `SUPPORT_CARDS_IMPLEMENTATION_SUMMARY.md` | Support cards implementation |
+| `IMAGE_INTEGRATION_COMPLETE.md` | Image integration status |
+
+### `/external-api-integration/` - External API Integration
+
+| Document | Description |
+| -------- | ----------- |
+| `IMPLEMENTATION_SUMMARY.md` | Integration implementation summary |
+| `CACHE_WARMING_IMPLEMENTATION.md` | Cache warming documentation |
+| `mcp-fetch-test-results.md` | MCP fetch test results |
+| `umamusumedb-api-verification.md` | UmamusumeDB API verification |
+| `secondary-apis-verification.md` | Secondary APIs verification |
+| `TASK-1.1.1-SUMMARY.md` | Task 1.1.1 completion summary |
+| `TASK_1.1.2_SUMMARY.md` | Task 1.1.2 completion summary |
+
+### `/mcp-integration/` - MCP Server Integration
+
+| Document | Description |
+| -------- | ----------- |
+| `MCP_SERVER_CONFIGURATION_REFERENCE.md` | MCP configuration reference |
+| `MCP_SERVER_RECOMMENDATIONS.md` | MCP server recommendations |
+| `mcp-memory-test-results.md` | Memory test results |
+
+### `/neuron/` - Neuron AI Framework
+
+AI framework documentation including agents, providers, RAG, streaming, tools, and workflows.
+
+### `/services/` - Service Documentation
+
+- `CacheManagerService.md` - Cache manager service documentation
+
+---
+
+## Testing & Quality
+
+### `/testing/` - Testing Documentation
+
+| Document | Description |
+| -------- | ----------- |
+| `PRODUCTION_TESTING_GUIDE.md` | Production testing procedures |
+| `CODE_COVERAGE_WARNING_RESOLVED.md` | Code coverage resolution |
+| `TEST_ERRORS_RESOLVED.md` | Test error resolutions |
+| `character-creation-flow-test.md` | Character creation flow tests |
+| `offline-page-accessibility.md` | Offline page accessibility |
+| `offline-page-test.md` | Offline page testing |
+
+### `/accessibility/` - Accessibility Compliance
+
+- `focus-management.md` - Focus management documentation
+
+---
+
+## Project Management
+
+### `/audit-reports/` - Audit Reports
+
+- `AUDIT_REPORT_FINAL.md` - Final audit report
+- `AUDIT_REPORT_PHASE_1.md` - Phase 1 audit report
+
+### `/implementation-summaries/` - Task Summaries
+
+Task implementation summaries (TASK_3_x through TASK_6_x series).
+
+### `/verification-reports/` - Verification Reports
+
+Documentation verification, status reports, and standards including:
+
+- `FINAL_STATUS_REPORT.md`
+- `DOCUMENTATION_COMPLETION_SUMMARY.md`
+- `EXECUTIVE_SUMMARY_DOCUMENTATION_COMPLETE.md`
+- Various gap analysis and verification documents
+
+### `/future-implements/` - Future Planning
 
 - `comprehensive_future_features.md`
 - `remaining_5_percent_analysis.md`
 - `umamusume_missing_features_analysis.md`
 
-### `/implementation-summaries/`
+---
 
-Task implementation summaries and completion reports.
+## Database Documentation
 
-- `TASK_3_1_3_IMPLEMENTATION_SUMMARY.md`
-- `TASK_3_1_5_IMPLEMENTATION_SUMMARY.md`
-- `TASK_3_2_1_IMPLEMENTATION_SUMMARY.md`
-- `TASK_3_2_2_IMPLEMENTATION_SUMMARY.md`
-- `TASK_3_2_3_IMPLEMENTATION_SUMMARY.md`
-- `TASK_3_2_5_IMPLEMENTATION_SUMMARY.md`
-- `TASK_4_1_1_MCP_INTEGRATION_SUMMARY.md`
-- `TASK_4_1_2_HYBRID_AI_IMPLEMENTATION_SUMMARY.md`
-- `TASK_4_1_3_MCP_SUBAGENT_SYSTEM_SUMMARY.md`
-- `TASK_4_1_4_MCP_TOOL_INTEGRATION_SUMMARY.md`
-- `TASK_4_1_5_AI_DASHBOARD_SUMMARY.md`
-- `TASK_4_2_1_BEDROCK_AGENTCORE_SUMMARY.md`
-- `TASK_4_2_2_AGENT_ORCHESTRATION_SUMMARY.md`
-- `TASK_4_3_2_IMPLEMENTATION_SUMMARY.md`
-- `TASK_4_3_3_IMPLEMENTATION_SUMMARY.md`
-- `TASK_4_3_4_IMPLEMENTATION_SUMMARY.md`
-- `TASK_4_3_5_IMPLEMENTATION_SUMMARY.md`
-- `TASK_4_4_1_IMPLEMENTATION_SUMMARY.md`
-- `TASK_4_4_2_IMPLEMENTATION_SUMMARY.md`
-- `TASK_4_4_3_IMPLEMENTATION_SUMMARY.md`
-- `TASK_4_4_4_IMPLEMENTATION_SUMMARY.md`
-- `TASK_4_4_5_IMPLEMENTATION_SUMMARY.md`
-- `TASK_5_1_1_COMPLETION_SUMMARY.md`
-- `TASK_6_3_COMPLETION_SUMMARY.md`
+### `/database-documentation/`
 
-### `/mcp-integration/`
-
-MCP (Model Context Protocol) server integration documentation.
-
-- `MCP_SERVER_CONFIGURATION_REFERENCE.md`
-- `MCP_SERVER_RECOMMENDATIONS.md`
-- `mcp-memory-test-results.md`
-
-### `/neuron/`
-
-Neuron AI framework documentation.
-
-- `agents.md`
-- `ai-providers.md`
-- `installation.md`
-- `rag.md`
-- `README.md`
-- `streaming.md`
-- `structured-output.md`
-- `tools.md`
-- `workflows.md`
-
-### `/prds/`
-
-Product Requirements Documents.
-
-- `000_PRDS_INDEX.md`
-- `PRD-001_Character_Management.md`
-- `PRD-002_Training_Optimization.md`
-- `PRD-003_Race_Strategy.md`
-- `PRD-004_Skill_Management.md`
-- `PRD-005_Support_Card_Management.md`
-- `PRD-006_AI_Advisory.md`
-- `PRD-007_External_Integration.md`
-
-### `/sequences/`
-
-Sequence diagrams for system interactions.
-
-- `000_SEQUENCE_DIAGRAMS_INDEX.md`
-- `SEQ-001_Character_Creation_Sequence.md`
-- `SEQ-002_Training_Block_Resolution.md`
-- `SEQ-003_Skill_Acquisition_and_Upgrade.md`
-- `SEQ-004_Race_Registration_and_Outcome.md`
-- `SEQ-005_Support_Card_Upgrade.md`
-- `SEQ-006_AI_Advice_Generation.md`
-- `SEQ-007_External_Data_Sync.md`
-- `SEQ-008_Notification_Delivery.md`
-- `SEQ-009_User_Profile_Update.md`
-- `SEQ-010_Inventory_Transaction.md`
-- `SEQ-011_Telemetry_Event_Capture.md`
-- `SEQ-012_Run_Snapshot_and_Restore.md`
-- `SEQ-013_Achievement_Unlock.md`
-- `SEQ-014_Error_Reporting_and_Retry.md`
-- `SEQ-015_Data_Migration_Snapshot_to_Live.md`
-
-### `/specs/`
-
-Technical specifications for major features.
-
-- `000_SPECS_INDEX.md`
-- `SPEC-001_Character_Management_Technical.md`
-- `SPEC-002_Training_Optimization_Technical.md`
-- `SPEC-003_Race_Strategy_Technical.md`
-- `SPEC-004_Skill_Management_Technical.md`
-- `SPEC-005_Support_Card_Management_Technical.md`
-- `SPEC-006_AI_Advisory_Technical.md`
-- `SPEC-007_External_Integration_Technical.md`
-
-### `/tech-flow/`
-
-Technical flow documentation.
-
-- `000_TECH_FLOW_INDEX.md`
-- `TECH-FLOW-001_Character_Management_Flow.md`
-- `TECH-FLOW-002_Training_Optimization_Flow.md`
-- `TECH-FLOW-003_Race_Strategy_Flow.md`
-- `TECH-FLOW-004_Skill_Management_Flow.md`
-- `TECH-FLOW-005_Support_Card_Management_Flow.md`
-- `TECH-FLOW-006_AI_Advisory_Flow.md`
-- `TECH-FLOW-007_External_Integration_Flow.md`
-
-### `/testing/`
-
-Testing documentation and test results.
-
-- `character-creation-flow-test.md`
-- `offline-page-accessibility.md`
-- `offline-page-test.md`
-
-### `/user-flows/`
-
-User flow diagrams and documentation.
-
-- `000_USER_FLOW_DIAGRAMS_INDEX.md`
-- `UF-001_Onboarding_Flow.md`
-- `UF-002_Career_Setup_Flow.md`
-- `UF-003_Training_Day_Flow.md`
-- `UF-004_Race_Day_Flow.md`
-- `UF-005_Skill_Management_Flow.md`
-- `UF-006_Support_Deck_Building_Flow.md`
-- `UF-007_AI_Advisor_Journey.md`
-- `UF-008_OCR_and_Data_Import_Flow.md`
-
-### `/verification-reports/`
-
-Documentation verification, status reports, and standards.
-
-- `DOCUMENTATION_ARTIFACTS_DIRECTORY_STRUCTURE.md`
-- `DOCUMENTATION_COMPLETION_SUMMARY.md`
-- `DOCUMENTATION_DISCREPANCY_REPORT.md`
-- `DOCUMENTATION_GAP_ANALYSIS.md`
-- `DOCUMENTATION_MANIFEST_AND_DELIVERY_CHECKLIST.md`
-- `EXECUTIVE_SUMMARY_DOCUMENTATION_COMPLETE.md`
-- `FINAL_STATUS_REPORT.md`
-- `OFFICIAL_DOCUMENTATION_UPDATES.md`
-- `requirements.md`
-- `tasks.md`
-- `TECHNOLOGY_VERIFICATION_TABLE.md`
-- `TEMPLATE_STANDARD.md`
-
-### `/wireframes/`
-
-UI wireframes and mockups.
-
-- `000_WIREFRAMES_INDEX.md`
-- `WF-001_Dashboard_Overview.md`
-- `WF-002_Character_Creation_Wizard.md`
-- `WF-003_Character_Detail_Management.md`
-- `WF-004_Training_Selection_Interface.md`
-- `WF-005_Training_Result_Screen.md`
-- `WF-006_Race_Calendar_View.md`
-- `WF-007_Race_Preparation_Screen.md`
-- `WF-008_Skill_Shop_Interface.md`
-- `WF-009_Skill_Loadout_Manager.md`
-- `WF-010_Support_Card_Collection.md`
-- `WF-011_Support_Deck_Builder.md`
-- `WF-012_AI_Advisor_Interface.md`
+| Document | Description |
+| -------- | ----------- |
+| `DATABASE_REQUIREMENT_MAPPING_TABLE.md` | Requirements to database mapping |
+| `DATABASE_SCHEMA_ALIGNMENT_VERIFICATION.md` | Schema alignment verification |
+| `UPDATED_ENTITY_RELATIONSHIP_DIAGRAM.md` | Current ERD |
 
 ---
 
@@ -295,52 +270,63 @@ UI wireframes and mockups.
 
 ### For Users
 
-- Start with: `USER_GUIDE.md`
-- Questions: `FAQ.md`
+- Start with: `/reference/USER_GUIDE.md`
+- Questions: `/reference/FAQ.md`
 
 ### For Developers
 
-- Start with: `DEVELOPER_GUIDE.md`
-- API: `API_REFERENCE.md`
+- Start with: `/reference/DEVELOPER_GUIDE.md`
+- API: `/reference/API_REFERENCE.md`
 - Database: `/database-documentation/`
 - Features: `/feature-documentation/`
 
 ### For DevOps
 
-- Deployment: `DEPLOYMENT_SETUP.md`
-- Monitoring: `MONITORING_AND_LOGGING.md`
-- Testing: `PRODUCTION_TESTING_GUIDE.md`
-- Launch: `LAUNCH_CHECKLIST.md`
+- Deployment: `/setup-guides/DEPLOYMENT_SETUP.md`
+- Launch: `/deployment/LAUNCH_CHECKLIST.md`
+- Monitoring: `/reference/MONITORING_AND_LOGGING.md`
+- Testing: `/testing/PRODUCTION_TESTING_GUIDE.md`
+- Redis: `/redis/START_HERE.md`
 
 ### For Project Management
 
-- Requirements: `003_SRS_Software_Requirement_Specifications.md`
-- Traceability: `000_REQUIREMENTS_TRACEABILITY_MATRIX.md`
+- Requirements: `/00-core-docs/003_SRS_Software_Requirement_Specifications.md`
+- Traceability: `/00-core-docs/000_REQUIREMENTS_TRACEABILITY_MATRIX.md`
 - Status: `/verification-reports/FINAL_STATUS_REPORT.md`
 
 ---
 
 ## Document Naming Conventions
 
-- **000 Series**: Master reference documents
-- **001-017 Series**: Core specification documents
-- **Uppercase with underscores**: General documentation (e.g., `USER_GUIDE.md`)
-- **Prefixed with category**: Organized documents (e.g., `TASK_`, `FLOW-`, `PRD-`)
-- **Lowercase with hyphens**: Subdirectory files (e.g., `data-flow-diagram.md`)
+| Pattern | Usage |
+| ------- | ----- |
+| `000-017` prefix | Core SDLC specification documents |
+| `FLOW-XXX` | System flow documents |
+| `SEQ-XXX` | Sequence diagrams |
+| `TECH-FLOW-XXX` | Technical flow documents |
+| `UF-XXX` | User flow documents |
+| `WF-XXX` | Wireframe documents |
+| `PRD-XXX` | Product requirement documents |
+| `SPEC-XXX` | Technical specifications |
+| `TASK_X_X_X` | Task implementation summaries |
+| `UPPERCASE_WITH_UNDERSCORES` | General documentation |
+| `lowercase-with-hyphens` | Subdirectory files |
 
 ---
 
-## Maintenance
+## Maintenance Guidelines
 
-- Core specification documents (000-017) should not be moved or renamed
-- Task 6.3 deliverables should remain in root for easy access
-- Implementation summaries go to `/implementation-summaries/`
-- Feature-specific docs go to `/feature-documentation/`
-- Verification and status reports go to `/verification-reports/`
+1. **Core documents** (`/00-core-docs/`) should not be moved or renamed
+2. **New task summaries** go to `/implementation-summaries/`
+3. **Feature-specific docs** go to `/feature-documentation/`
+4. **Setup/installation guides** go to `/setup-guides/`
+5. **Reference materials** go to `/reference/`
+6. **Test documentation** goes to `/testing/`
+7. **Verification reports** go to `/verification-reports/`
 
 ---
 
 ## Version
 
-**Last Updated**: January 20, 2026  
-**Organization Version**: 2.0
+**Last Updated**: January 21, 2026  
+**Organization Version**: 3.0
