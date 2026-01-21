@@ -4,6 +4,7 @@ use App\Http\Controllers\CareerReportController;
 use App\Http\Controllers\CharacterController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HistoricalTrackingController;
+use App\Http\Controllers\RaceController;
 use Illuminate\Support\Facades\Route;
 
 // Main welcome route
@@ -49,9 +50,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/training/predictions/{character}', [App\Http\Controllers\TrainingPredictionController::class, 'show'])
         ->name('training.predictions.show');
 
-    // Race routes (placeholders)
-    Route::get('/races', fn () => view('races.index'))->name('races.index');
-    Route::get('/races/results', fn () => view('races.results'))->name('races.results');
+    // Race routes
+    Route::get('/races', [RaceController::class, 'index'])->name('races.index');
+    Route::get('/races/{race}', [RaceController::class, 'show'])->name('races.show');
 
     // Skills routes
     Route::get('/skills', [App\Http\Controllers\SkillController::class, 'index'])->name('skills.index');

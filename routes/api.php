@@ -12,9 +12,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Public routes
-Route::get('/register', fn() => response()->json(['message' => 'Use POST method to register', 'endpoint' => '/api/register'], 405));
+Route::get('/register', fn () => response()->json(['message' => 'Use POST method to register', 'endpoint' => '/api/register'], 405));
 Route::post('/register', [\App\Http\Controllers\Api\Auth\AuthController::class, 'register'])->name('api.register');
-Route::get('/login', fn() => response()->json(['message' => 'Use POST method to login', 'endpoint' => '/api/login'], 405));
+Route::get('/login', fn () => response()->json(['message' => 'Use POST method to login', 'endpoint' => '/api/login'], 405));
 Route::post('/login', [\App\Http\Controllers\Api\Auth\AuthController::class, 'login'])->name('api.login');
 Route::post('/password/email', [\App\Http\Controllers\Api\Auth\AuthController::class, 'sendResetLink'])->name('password.email');
 // Route::post('/password/reset', [NewPasswordController::class, 'store'])->name('password.store');
@@ -47,6 +47,7 @@ Route::middleware('auth:sanctum')->prefix('v1/profile')->name('api.v1.profile.')
 });
 
 // Training Prediction API Routes
+// Training Prediction API Routes
 Route::prefix('training-predictions')->name('api.training-predictions.')->group(function () {
     // Single prediction
     Route::post('/', [TrainingPredictionController::class, 'predict'])
@@ -66,6 +67,120 @@ Route::prefix('training-predictions')->name('api.training-predictions.')->group(
 
     Route::get('/cache/{characterId}/stats', [TrainingPredictionController::class, 'cacheStats'])
         ->name('cache.stats');
+});
+
+// Cache Monitoring API Routes (Task 2.1.2 - External API Cache Warming)
+Route::prefix('external-cache')->name('api.external-cache.')->group(function () {
+    // Cache statistics
+    Route::get('/statistics', [\App\Http\Controllers\Api\CacheMonitoringController::class, 'statistics'])
+        ->name('statistics');
+
+    // Warming statistics
+    Route::get('/warming/statistics', [\App\Http\Controllers\Api\CacheMonitoringController::class, 'warmingStatistics'])
+        ->name('warming.statistics');
+
+    // Trigger cache warming
+    Route::post('/warm', [\App\Http\Controllers\Api\CacheMonitoringController::class, 'warm'])
+        ->name('warm');
+
+    // Comprehensive cache information
+    Route::get('/info', [\App\Http\Controllers\Api\CacheMonitoringController::class, 'info'])
+        ->name('info');
+
+    // Cache size
+    Route::get('/size', [\App\Http\Controllers\Api\CacheMonitoringController::class, 'size'])
+        ->name('size');
+
+    // Cached keys
+    Route::get('/keys', [\App\Http\Controllers\Api\CacheMonitoringController::class, 'keys'])
+        ->name('keys');
+});
+
+// API Monitoring Dashboard Routes (Task 5.1.1 - Monitoring Dashboard)
+Route::prefix('monitoring')->name('api.monitoring.')->group(function () {
+    // Comprehensive dashboard
+    Route::get('/dashboard', [\App\Http\Controllers\Api\APIMonitoringController::class, 'dashboard'])
+        ->name('dashboard');
+
+    // Response time tracking
+    Route::get('/response-times', [\App\Http\Controllers\Api\APIMonitoringController::class, 'responseTimes'])
+        ->name('response-times');
+
+    // Cache performance monitoring
+    Route::get('/cache-performance', [\App\Http\Controllers\Api\APIMonitoringController::class, 'cachePerformance'])
+        ->name('cache-performance');
+
+    // Error rate tracking
+    Route::get('/error-rates', [\App\Http\Controllers\Api\APIMonitoringController::class, 'errorRates'])
+        ->name('error-rates');
+
+    // Health status
+    Route::get('/health', [\App\Http\Controllers\Api\APIMonitoringController::class, 'health'])
+        ->name('health');
+
+    // Alerts management
+    Route::get('/alerts', [\App\Http\Controllers\Api\APIMonitoringController::class, 'alerts'])
+        ->name('alerts');
+
+    Route::post('/alerts/{alertId}/acknowledge', [\App\Http\Controllers\Api\APIMonitoringController::class, 'acknowledgeAlert'])
+        ->name('alerts.acknowledge');
+
+    // Performance recommendations
+    Route::get('/recommendations', [\App\Http\Controllers\Api\APIMonitoringController::class, 'recommendations'])
+        ->name('recommendations');
+
+    // Request volume statistics
+    Route::get('/request-volume', [\App\Http\Controllers\Api\APIMonitoringController::class, 'requestVolume'])
+        ->name('request-volume');
+
+    // Circuit breaker status
+    Route::get('/circuit-breakers', [\App\Http\Controllers\Api\APIMonitoringController::class, 'circuitBreakers'])
+        ->name('circuit-breakers');
+
+    Route::post('/circuit-breakers/reset', [\App\Http\Controllers\Api\APIMonitoringController::class, 'resetCircuitBreaker'])
+        ->name('circuit-breakers.reset');
+
+    // Real-time metrics
+    Route::get('/realtime', [\App\Http\Controllers\Api\APIMonitoringController::class, 'realtime'])
+        ->name('realtime');
+
+    // Historical metrics
+    Route::get('/historical', [\App\Http\Controllers\Api\APIMonitoringController::class, 'historical'])
+        ->name('historical');
+
+    // Reset metrics
+    Route::post('/reset', [\App\Http\Controllers\Api\APIMonitoringController::class, 'resetMetrics'])
+        ->name('reset');
+});
+
+// Cache Invalidation API Routes (Task 2.1.3 - Cache Invalidation Logic)
+Route::prefix('external-cache/invalidate')->name('api.external-cache.invalidate.')->group(function () {
+    // Manual invalidation endpoints
+    Route::post('/pattern', [\App\Http\Controllers\Api\CacheInvalidationController::class, 'invalidateByPattern'])
+        ->name('pattern');
+
+    Route::post('/type', [\App\Http\Controllers\Api\CacheInvalidationController::class, 'invalidateByType'])
+        ->name('type');
+
+    Route::post('/keys', [\App\Http\Controllers\Api\CacheInvalidationController::class, 'invalidateKeys'])
+        ->name('keys');
+
+    Route::post('/stale', [\App\Http\Controllers\Api\CacheInvalidationController::class, 'invalidateStale'])
+        ->name('stale');
+
+    Route::post('/flush', [\App\Http\Controllers\Api\CacheInvalidationController::class, 'flush'])
+        ->name('flush');
+
+    // Version tracking system
+    Route::get('/version', [\App\Http\Controllers\Api\CacheInvalidationController::class, 'getVersion'])
+        ->name('version.get');
+
+    Route::post('/version', [\App\Http\Controllers\Api\CacheInvalidationController::class, 'setVersion'])
+        ->name('version.set');
+
+    // Cache staleness check
+    Route::get('/staleness', [\App\Http\Controllers\Api\CacheInvalidationController::class, 'checkStaleness'])
+        ->name('staleness');
 });
 
 // Skill Management API Routes
@@ -836,4 +951,27 @@ Route::middleware('auth:sanctum')->prefix('performance')->name('api.performance.
         Route::post('/clear', [\App\Http\Controllers\PerformanceController::class, 'regressionsClear'])
             ->name('clear');
     });
+});
+
+// Connectivity Monitoring API Routes (Task 2.2.1 - Offline Detection)
+Route::prefix('connectivity')->name('api.connectivity.')->group(function () {
+    // Get current connectivity status (cached)
+    Route::get('/status', [\App\Http\Controllers\Api\ConnectivityController::class, 'status'])
+        ->name('status');
+
+    // Force connectivity check (bypass cache)
+    Route::post('/check', [\App\Http\Controllers\Api\ConnectivityController::class, 'check'])
+        ->name('check');
+
+    // Get offline mode information
+    Route::get('/offline-info', [\App\Http\Controllers\Api\ConnectivityController::class, 'offlineInfo'])
+        ->name('offline-info');
+
+    // Get connectivity recommendations
+    Route::get('/recommendations', [\App\Http\Controllers\Api\ConnectivityController::class, 'recommendations'])
+        ->name('recommendations');
+
+    // Get comprehensive connectivity report
+    Route::get('/report', [\App\Http\Controllers\Api\ConnectivityController::class, 'report'])
+        ->name('report');
 });
