@@ -38,6 +38,9 @@
             <file>app/Providers/AppServiceProvider.php</file>
         </exclude>
     </source>
+    <!-- Code Coverage Disabled - Install PCOV or Xdebug to enable -->
+    <!-- See INSTALL_CODE_COVERAGE.md for installation instructions -->
+    <!--
     <coverage includeUncoveredFiles="true"
               pathCoverage="false"
               ignoreDeprecatedCodeUnits="true"
@@ -48,6 +51,7 @@
             <text outputFile="coverage/coverage.txt" showUncoveredFiles="true" showOnlySummary="false"/>
         </report>
     </coverage>
+    -->
     <logging>
         <junit outputFile="coverage/junit.xml"/>
         <testdoxHtml outputFile="coverage/testdox.html"/>

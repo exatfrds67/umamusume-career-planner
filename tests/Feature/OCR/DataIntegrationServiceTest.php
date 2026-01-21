@@ -12,6 +12,7 @@ use App\Services\OCR\DataIntegrationService;
 use App\Services\OCR\DataTransformationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->transformer = new DataTransformationService;

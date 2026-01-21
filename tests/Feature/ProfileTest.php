@@ -6,6 +6,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
+uses(RefreshDatabase::class);
 
 it('displays the profile page for authenticated users', function () {
     $user = User::factory()->create();

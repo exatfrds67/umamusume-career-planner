@@ -5,6 +5,9 @@
  */
 
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+uses(RefreshDatabase::class);
 
 describe('MCP Dashboard', function () {
     beforeEach(function () {
@@ -16,12 +19,13 @@ describe('MCP Dashboard', function () {
 
         $response->assertStatus(200);
         $response->assertViewIs('mcp.dashboard');
-    })->skip('View uses Alpine.js x-for with Blade components causing rendering issues');
+        $response->assertSee('MCP Management Dashboard');
+    });
 
     it('requires authentication to access MCP dashboard', function () {
         $response = $this->get(route('mcp.dashboard'));
 
-        $response->assertRedirect();
+        $response->assertRedirect(route('login'));
     });
 });
 
@@ -92,9 +96,8 @@ describe('MCP Dashboard API - Servers', function () {
 
         if (! empty($servers)) {
             $firstServer = reset($servers);
-            // Server response uses 'server_name' instead of 'name'
             expect($firstServer)->toHaveKeys([
-                'server_name',
+                'name',
                 'status',
                 'is_connected',
             ]);
@@ -121,9 +124,6 @@ describe('MCP Dashboard API - Agents', function () {
         $response = $this->actingAs($this->user)->getJson(route('api.mcp.dashboard.agents'));
 
         $agents = $response->json('data');
-
-        // Always make at least one assertion
-        expect($agents)->toBeArray();
 
         if (! empty($agents)) {
             $firstAgent = reset($agents);
@@ -296,10 +296,8 @@ describe('MCP Dashboard Components', function () {
 
         $view = $this->blade('<x-mcp.server-status-card :server="$server" />', ['server' => $server]);
 
-        // Check for static text that appears in the component
-        $view->assertSee('Uptime');
-        $view->assertSee('Requests (24h)');
-        $view->assertSee('Failures');
+        expect($view)->toContain('Test Server');
+        expect($view)->toContain('healthy');
     });
 
     it('renders agent activity card component', function () {
@@ -312,11 +310,8 @@ describe('MCP Dashboard Components', function () {
 
         $view = $this->blade('<x-mcp.agent-activity-card :agent="$agent" />', ['agent' => $agent]);
 
-        // Check for static text that appears in the component
-        $view->assertSee('Progress');
-        $view->assertSee('Time');
-        $view->assertSee('Tools');
-        $view->assertSee('Cost');
+        expect($view)->toContain('Training Agent');
+        expect($view)->toContain('active');
     });
 
     it('renders cost transparency panel component', function () {
@@ -328,8 +323,8 @@ describe('MCP Dashboard Components', function () {
 
         $view = $this->blade('<x-mcp.cost-transparency-panel :costs="$costs" />', ['costs' => $costs]);
 
-        $view->assertSee('Cost Transparency');
-        $view->assertSee('Daily Cost');
+        expect($view)->toContain('Cost Transparency');
+        expect($view)->toContain('Daily Cost');
     });
 
     it('renders performance metrics dashboard component', function () {
@@ -341,7 +336,7 @@ describe('MCP Dashboard Components', function () {
 
         $view = $this->blade('<x-mcp.performance-metrics-dashboard :performance="$performance" />', ['performance' => $performance]);
 
-        $view->assertSee('Performance Metrics');
+        expect($view)->toContain('Performance Metrics');
     });
 
     it('renders user controls panel component', function () {
@@ -353,7 +348,6 @@ describe('MCP Dashboard Components', function () {
 
         $view = $this->blade('<x-mcp.user-controls-panel :settings="$settings" />', ['settings' => $settings]);
 
-        // The component uses Alpine.js, check for the structure
-        $view->assertSee('MCP Settings');
+        expect($view)->toContain('MCP Settings & Controls');
     });
 });

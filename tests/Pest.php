@@ -16,7 +16,8 @@ declare(strict_types=1);
 |
 */
 
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 
 /*
@@ -24,14 +25,13 @@ use Illuminate\Foundation\Testing\WithFaker;
 | Feature Tests Configuration
 |--------------------------------------------------------------------------
 |
-| Feature tests use DatabaseMigrations to ensure a clean database state for each test
-| while avoiding nested transaction issues with SQLite in PHP 8.4.
+| Feature tests use RefreshDatabase to ensure a clean database state for each test.
 | This is essential for testing API endpoints, controllers, and user workflows.
 |
 */
 
 pest()->extend(Tests\TestCase::class)
-    ->use(DatabaseMigrations::class)
+    ->use(RefreshDatabase::class)
     ->use(WithFaker::class)
     ->in('Feature');
 
@@ -53,12 +53,12 @@ pest()->extend(Tests\TestCase::class)
 | Integration Tests Configuration
 |--------------------------------------------------------------------------
 |
-| Integration tests use DatabaseMigrations for better compatibility
+| Integration tests use LazilyRefreshDatabase for better performance
 | when testing complex workflows that span multiple components.
 |
 */
 pest()->extend(Tests\TestCase::class)
-    ->use(DatabaseMigrations::class)
+    ->use(LazilyRefreshDatabase::class)
     ->use(WithFaker::class)
     ->in('Integration');
 
@@ -343,7 +343,7 @@ function randomMoodStatus(): string
 |
 */
 
-dataset('valid_stats', fn() => [
+dataset('valid_stats', fn () => [
     'minimum' => [0],
     'low' => [100],
     'medium' => [500],
@@ -351,13 +351,13 @@ dataset('valid_stats', fn() => [
     'maximum' => [1200],
 ]);
 
-dataset('invalid_stats', fn() => [
+dataset('invalid_stats', fn () => [
     'negative' => [-1],
     'too_high' => [1201],
     'way_too_high' => [9999],
 ]);
 
-dataset('valid_aptitude_grades', fn() => [
+dataset('valid_aptitude_grades', fn () => [
     'G' => ['G'],
     'G+' => ['G+'],
     'F' => ['F'],
@@ -377,12 +377,12 @@ dataset('valid_aptitude_grades', fn() => [
     'SS' => ['SS'],
 ]);
 
-dataset('scenario_types', fn() => [
+dataset('scenario_types', fn () => [
     'ura_finale' => ['ura_finale'],
     'unity_cup' => ['unity_cup'],
 ]);
 
-dataset('mood_statuses', fn() => [
+dataset('mood_statuses', fn () => [
     'awful' => ['awful'],
     'bad' => ['bad'],
     'normal' => ['normal'],
@@ -390,27 +390,27 @@ dataset('mood_statuses', fn() => [
     'great' => ['great'],
 ]);
 
-dataset('skill_types', fn() => [
+dataset('skill_types', fn () => [
     'normal' => ['normal'],
     'rare' => ['rare'],
     'unique' => ['unique'],
     'inherited' => ['inherited'],
 ]);
 
-dataset('card_rarities', fn() => [
+dataset('card_rarities', fn () => [
     'R' => ['R'],
     'SR' => ['SR'],
     'SSR' => ['SSR'],
 ]);
 
-dataset('factor_types', fn() => [
+dataset('factor_types', fn () => [
     'blue_stat' => ['blue_stat'],
     'red_aptitude' => ['red_aptitude'],
     'green_unique' => ['green_unique'],
     'white_normal' => ['white_normal'],
 ]);
 
-dataset('http_methods', fn() => [
+dataset('http_methods', fn () => [
     'GET' => ['GET'],
     'POST' => ['POST'],
     'PUT' => ['PUT'],

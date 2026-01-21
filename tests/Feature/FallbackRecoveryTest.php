@@ -7,22 +7,18 @@ use App\Services\ExternalAPI\APIHealthMonitorService;
 use App\Services\ExternalAPI\BackgroundSyncService;
 use App\Services\ExternalAPI\GracefulDegradationService;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
 
 /**
  * Fallback and Recovery System Tests
  *
  * Tests for MCP-powered intelligent fallback and recovery system.
- * These tests require Redis to be available.
  *
  * Requirements: 14.2, 55.3, 56.3, Task 4.4.3
  */
-
 beforeEach(function () {
-    // Skip if Redis extension is not loaded
-    if (! extension_loaded('redis')) {
-        $this->markTestSkipped('Redis extension is not available');
-    }
-    // Clear cache before each test
+    // Clear Redis cache before each test
+    Redis::flushdb();
     Cache::flush();
 });
 
@@ -144,10 +140,16 @@ describe('Background Sync', function () {
 
         $syncService->queueSync('characters', ['test' => true]);
 
-        // Verify job was queued - this test requires Redis
-        // Skip the Redis check since it's not available in test environment
-        expect(true)->toBeTrue();
-    })->skip('Requires Redis which is not available in test environment');
+        // Verify job was queued (check Redis)
+        $queueKey = 'sync_queue:characters';
+        $jobJson = Redis::lindex($queueKey, 0);
+
+        expect($jobJson)->not->toBeNull();
+
+        $job = json_decode((string) $jobJson, true);
+        expect($job)->toHaveKeys(['id', 'data_type', 'options', 'queued_at', 'attempts', 'status']);
+        expect($job['data_type'])->toBe('characters');
+    });
 
     it('gets sync status for data type', function () {
         $syncService = app(BackgroundSyncService::class);
@@ -265,12 +267,8 @@ describe('API Alerting', function () {
 });
 
 describe('API Endpoints', function () {
-    beforeEach(function () {
-        $this->user = \App\Models\User::factory()->create();
-    });
-
     it('gets health status via API', function () {
-        $response = $this->actingAs($this->user)->getJson('/api/fallback/health/status');
+        $response = $this->getJson('/api/fallback/health/status');
 
         $response->assertStatus(200);
         $response->assertJsonStructure([
@@ -282,10 +280,10 @@ describe('API Endpoints', function () {
                 'timestamp',
             ],
         ]);
-    })->skip('Requires Redis which is not available in test environment');
+    });
 
     it('gets degradation status via API', function () {
-        $response = $this->actingAs($this->user)->getJson('/api/fallback/degradation/status');
+        $response = $this->getJson('/api/fallback/degradation/status');
 
         $response->assertStatus(200);
         $response->assertJsonStructure([
@@ -296,10 +294,10 @@ describe('API Endpoints', function () {
                 'overall_degraded',
             ],
         ]);
-    })->skip('Requires Redis which is not available in test environment');
+    });
 
     it('gets system status via API', function () {
-        $response = $this->actingAs($this->user)->getJson('/api/fallback/system/status');
+        $response = $this->getJson('/api/fallback/system/status');
 
         $response->assertStatus(200);
         $response->assertJsonStructure([
@@ -312,5 +310,5 @@ describe('API Endpoints', function () {
                 'timestamp',
             ],
         ]);
-    })->skip('Requires Redis which is not available in test environment');
+    });
 });

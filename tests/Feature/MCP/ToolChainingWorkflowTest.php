@@ -9,7 +9,7 @@ use App\Services\MCP\Tools\AWSPricingService;
 use App\Services\MCP\Tools\Context7Service;
 use App\Services\MCP\Tools\FetchService;
 use App\Services\MCP\Tools\ToolChainingService;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Mockery;
 use Tests\TestCase;
@@ -23,7 +23,7 @@ use Tests\TestCase;
  */
 class ToolChainingWorkflowTest extends TestCase
 {
-    use DatabaseMigrations;
+    use RefreshDatabase;
 
     protected ToolChainingService $service;
 

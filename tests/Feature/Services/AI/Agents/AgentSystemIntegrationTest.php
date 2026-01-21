@@ -10,6 +10,7 @@ use App\Services\MCP\MCPClientService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     Config::set('ai.agents.training_optimization.enabled', true);
