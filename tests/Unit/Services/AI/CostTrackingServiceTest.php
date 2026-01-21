@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 use App\Services\AI\CostTrackingService;
 use App\Services\MCP\Tools\AWSPricingService;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 
-uses(DatabaseMigrations::class);
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     /** @var AWSPricingService&Mockery\MockInterface $awsPricing */
@@ -17,8 +16,8 @@ beforeEach(function () {
     $this->costService = new CostTrackingService($awsPricing);
 
     // Create the ai_costs table if it doesn't exist
-    if (! Schema::hasTable('ucp_ai_costs')) {
-        Schema::create('ucp_ai_costs', function ($table) {
+    if (! \Schema::hasTable('ucp_ai_costs')) {
+        \Schema::create('ucp_ai_costs', function ($table) {
             $table->id();
             $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedBigInteger('character_id')->nullable();
@@ -39,7 +38,9 @@ beforeEach(function () {
     }
 });
 
-afterEach(fn () => Mockery::close());
+afterEach(function () {
+    Mockery::close();
+});
 
 describe('CostTrackingService', function () {
     describe('trackCost', function () {

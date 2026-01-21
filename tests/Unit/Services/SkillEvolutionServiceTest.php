@@ -7,9 +7,9 @@ use App\Models\Skill;
 use App\Models\SkillAcquisition;
 use App\Services\SkillEvolutionService;
 use App\Services\SkillHintService;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(DatabaseMigrations::class);
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     /** @var SkillHintService&Mockery\MockInterface $hintService */

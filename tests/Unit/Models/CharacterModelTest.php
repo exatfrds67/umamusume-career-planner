@@ -9,9 +9,6 @@ use App\Models\CharacterSupportCard;
 use App\Models\Factor;
 use App\Models\SkillAcquisition;
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
-
-uses(DatabaseMigrations::class);
 
 describe('Character Model', function (): void {
     describe('relationships', function (): void {
@@ -67,16 +64,10 @@ describe('Character Model', function (): void {
             $user = User::factory()->create();
             $character = Character::factory()->create(['user_id' => $user->id]);
 
-            // Create support cards with unique position slots
-            for ($i = 1; $i <= 6; $i++) {
-                CharacterSupportCard::factory()->create([
-                    'character_id' => $character->id,
-                    'position_slot' => $i,
-                ]);
-            }
+            CharacterSupportCard::factory()->count(6)->create(['character_id' => $character->id]);
 
-            expect($character->supportCards)->toHaveCount(6)
-                ->and($character->supportCards->first())->toBeInstanceOf(CharacterSupportCard::class);
+            expect($character->characterSupportCards)->toHaveCount(6)
+                ->and($character->characterSupportCards->first())->toBeInstanceOf(CharacterSupportCard::class);
         });
     });
 
@@ -95,20 +86,18 @@ describe('Character Model', function (): void {
             $user = User::factory()->create();
             $character = Character::factory()->create([
                 'user_id' => $user->id,
-                'current_stats' => [
-                    'speed' => 500,
-                    'stamina' => 400,
-                    'power' => 300,
-                    'guts' => 200,
-                    'wit' => 100,
-                ],
+                'speed_stat' => 500,
+                'stamina_stat' => 400,
+                'power_stat' => 300,
+                'guts_stat' => 200,
+                'wit_stat' => 100,
             ]);
 
-            expect($character->current_stats['speed'])->toBeGreaterThanOrEqual(0)->toBeLessThanOrEqual(1200);
-            expect($character->current_stats['stamina'])->toBeGreaterThanOrEqual(0)->toBeLessThanOrEqual(1200);
-            expect($character->current_stats['power'])->toBeGreaterThanOrEqual(0)->toBeLessThanOrEqual(1200);
-            expect($character->current_stats['guts'])->toBeGreaterThanOrEqual(0)->toBeLessThanOrEqual(1200);
-            expect($character->current_stats['wit'])->toBeGreaterThanOrEqual(0)->toBeLessThanOrEqual(1200);
+            expect($character->speed_stat)->toBeInt()->toBeGreaterThanOrEqual(0)->toBeLessThanOrEqual(1200);
+            expect($character->stamina_stat)->toBeInt()->toBeGreaterThanOrEqual(0)->toBeLessThanOrEqual(1200);
+            expect($character->power_stat)->toBeInt()->toBeGreaterThanOrEqual(0)->toBeLessThanOrEqual(1200);
+            expect($character->guts_stat)->toBeInt()->toBeGreaterThanOrEqual(0)->toBeLessThanOrEqual(1200);
+            expect($character->wit_stat)->toBeInt()->toBeGreaterThanOrEqual(0)->toBeLessThanOrEqual(1200);
         });
 
         it('has valid energy level', function (): void {
@@ -169,39 +158,20 @@ describe('Character Model', function (): void {
             $user = User::factory()->create();
             $character = Character::factory()->create([
                 'user_id' => $user->id,
-                'current_stats' => [
-                    'speed' => 100,
-                    'stamina' => 100,
-                    'power' => 100,
-                    'guts' => 100,
-                    'wit' => 100,
-                ],
+                'speed_stat' => 100,
+                'stamina_stat' => 100,
+                'power_stat' => 100,
+                'guts_stat' => 100,
+                'wit_stat' => 100,
             ]);
 
-            $totalStats = $character->current_stats['speed']
-                + $character->current_stats['stamina']
-                + $character->current_stats['power']
-                + $character->current_stats['guts']
-                + $character->current_stats['wit'];
+            $totalStats = $character->speed_stat
+                + $character->stamina_stat
+                + $character->power_stat
+                + $character->guts_stat
+                + $character->wit_stat;
 
             expect($totalStats)->toBe(500);
-        });
-
-        it('gets individual stat via helper method', function (): void {
-            $user = User::factory()->create();
-            $character = Character::factory()->create([
-                'user_id' => $user->id,
-                'current_stats' => [
-                    'speed' => 800,
-                    'stamina' => 700,
-                    'power' => 600,
-                    'guts' => 500,
-                    'wit' => 400,
-                ],
-            ]);
-
-            expect($character->getStat('speed'))->toBe(800);
-            expect($character->getStat('stamina'))->toBe(700);
         });
     });
 

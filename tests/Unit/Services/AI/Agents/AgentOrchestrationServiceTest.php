@@ -17,10 +17,7 @@ use App\Services\AI\Agents\RaceAnalysisAgent;
 use App\Services\AI\Agents\SkillManagementAgent;
 use App\Services\AI\Agents\TrainingOptimizationAgent;
 use App\Services\MCP\MCPClientService;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Config;
-
-uses(DatabaseMigrations::class);
 
 beforeEach(function () {
     /** @var MCPClientService&Mockery\MockInterface $mcpClient */
@@ -60,7 +57,9 @@ beforeEach(function () {
     ]);
 });
 
-afterEach(fn () => Mockery::close());
+afterEach(function () {
+    Mockery::close();
+});
 
 it('executes comprehensive analysis with all agents', function () {
     Config::set('ai.agents.orchestration.enabled', true);
@@ -299,8 +298,7 @@ it('calculates overall confidence correctly', function () {
     $result = $this->orchestration->executeComprehensiveAnalysis($this->character);
 
     // Average: (0.9 + 0.8 + 0.85 + 0.75) / 4 = 0.825
-    expect($result['confidence'])->toBeGreaterThanOrEqual(0.82)
-        ->and($result['confidence'])->toBeLessThanOrEqual(0.83);
+    expect($result['confidence'])->toBe(0.825);
 });
 
 it('returns status for all agents', function () {

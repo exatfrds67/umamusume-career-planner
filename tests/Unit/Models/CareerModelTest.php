@@ -5,11 +5,9 @@ declare(strict_types=1);
 use App\Models\Career;
 use App\Models\Character;
 use App\Models\Race;
+use App\Models\SkillAcquisition;
 use App\Models\TrainingSession;
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
-
-uses(DatabaseMigrations::class);
 
 describe('Career Model', function (): void {
     describe('relationships', function (): void {
@@ -43,6 +41,17 @@ describe('Career Model', function (): void {
             expect($career->races)->toHaveCount(5)
                 ->and($career->races->first())->toBeInstanceOf(Race::class);
         });
+
+        it('has many skill acquisitions', function (): void {
+            $user = User::factory()->create();
+            $character = Character::factory()->create(['user_id' => $user->id]);
+            $career = Career::factory()->create(['character_id' => $character->id]);
+
+            SkillAcquisition::factory()->count(8)->create(['career_id' => $career->id]);
+
+            expect($career->skillAcquisitions)->toHaveCount(8)
+                ->and($career->skillAcquisitions->first())->toBeInstanceOf(SkillAcquisition::class);
+        });
     });
 
     describe('attributes', function (): void {
@@ -65,7 +74,7 @@ describe('Career Model', function (): void {
                 'status' => 'active',
             ]);
 
-            expect($career->status)->toBeIn(['planning', 'active', 'completed', 'abandoned']);
+            expect($career->status)->toBeIn(['active', 'completed', 'abandoned']);
         });
 
         it('tracks current turn', function (): void {

@@ -29,6 +29,10 @@ describe('TesseractService', function () {
     });
 
     it('validates image before processing', function () {
+        if (! $this->service->isAvailable()) {
+            $this->markTestSkipped('Tesseract is not installed');
+        }
+
         // Create an invalid file (too small)
         $file = UploadedFile::fake()->image('tiny.jpg', 100, 100);
 
@@ -39,6 +43,10 @@ describe('TesseractService', function () {
     });
 
     it('creates OCR extraction record when validation passes', function () {
+        if (! $this->service->isAvailable()) {
+            $this->markTestSkipped('Tesseract is not installed');
+        }
+
         $file = UploadedFile::fake()->image('test.jpg', 800, 600);
 
         // Process screenshot
@@ -54,6 +62,10 @@ describe('TesseractService', function () {
     });
 
     it('detects duplicate images by hash', function () {
+        if (! $this->service->isAvailable()) {
+            $this->markTestSkipped('Tesseract is not installed');
+        }
+
         $file = UploadedFile::fake()->image('test.jpg', 800, 600);
 
         // First upload

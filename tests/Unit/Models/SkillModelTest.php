@@ -5,9 +5,6 @@ declare(strict_types=1);
 use App\Models\Skill;
 use App\Models\SkillAcquisition;
 use App\Models\SkillHint;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
-
-uses(DatabaseMigrations::class);
 
 describe('Skill Model', function (): void {
     describe('relationships', function (): void {
@@ -16,8 +13,8 @@ describe('Skill Model', function (): void {
 
             SkillHint::factory()->count(3)->create(['skill_id' => $skill->id]);
 
-            expect($skill->hints)->toHaveCount(3);
-            expect($skill->hints->first())->toBeInstanceOf(SkillHint::class);
+            expect($skill->skillHints)->toHaveCount(3);
+            expect($skill->skillHints->first())->toBeInstanceOf(SkillHint::class);
         });
 
         it('has many skill acquisitions', function (): void {
@@ -25,16 +22,16 @@ describe('Skill Model', function (): void {
 
             SkillAcquisition::factory()->count(5)->create(['skill_id' => $skill->id]);
 
-            expect($skill->acquisitions)->toHaveCount(5);
-            expect($skill->acquisitions->first())->toBeInstanceOf(SkillAcquisition::class);
+            expect($skill->skillAcquisitions)->toHaveCount(5);
+            expect($skill->skillAcquisitions->first())->toBeInstanceOf(SkillAcquisition::class);
         });
     });
 
     describe('attributes', function (): void {
         it('has valid skill type', function (): void {
-            $skill = Skill::factory()->create(['skill_type' => 'speed']);
+            $skill = Skill::factory()->create(['skill_type' => 'normal']);
 
-            expect($skill->skill_type)->toBeIn(['speed', 'passive', 'recovery', 'debuff', 'unique']);
+            expect($skill->skill_type)->toBeIn(['normal', 'rare', 'unique', 'inherited']);
         });
 
         it('has valid SP cost', function (): void {
@@ -56,15 +53,15 @@ describe('Skill Model', function (): void {
 
     describe('scopes', function (): void {
         it('filters by skill type', function (): void {
-            Skill::factory()->count(3)->create(['skill_type' => 'speed']);
-            Skill::factory()->count(2)->create(['skill_type' => 'passive']);
+            Skill::factory()->count(3)->create(['skill_type' => 'normal']);
+            Skill::factory()->count(2)->create(['skill_type' => 'rare']);
             Skill::factory()->count(1)->create(['skill_type' => 'unique']);
 
-            $speedSkills = Skill::where('skill_type', 'speed')->get();
-            $passiveSkills = Skill::where('skill_type', 'passive')->get();
+            $normalSkills = Skill::where('skill_type', 'normal')->get();
+            $rareSkills = Skill::where('skill_type', 'rare')->get();
 
-            expect($speedSkills)->toHaveCount(3);
-            expect($passiveSkills)->toHaveCount(2);
+            expect($normalSkills)->toHaveCount(3);
+            expect($rareSkills)->toHaveCount(2);
         });
 
         it('filters active skills', function (): void {
@@ -113,7 +110,7 @@ describe('SkillHint Model', function (): void {
                 'discount_percentage' => 30,
             ]);
 
-            expect($hint->discount_percentage)->toEqual(30);
+            expect($hint->discount_percentage)->toBe(30);
             expect($hint->discount_percentage)->toBeGreaterThanOrEqual(0);
             expect($hint->discount_percentage)->toBeLessThanOrEqual(100);
         });
@@ -132,24 +129,24 @@ describe('SkillAcquisition Model', function (): void {
     });
 
     describe('attributes', function (): void {
-        it('tracks final SP cost', function (): void {
+        it('tracks SP spent', function (): void {
             $skill = Skill::factory()->create();
             $acquisition = SkillAcquisition::factory()->create([
                 'skill_id' => $skill->id,
-                'final_sp_cost' => 100,
+                'sp_spent' => 100,
             ]);
 
-            expect($acquisition->final_sp_cost)->toBe(100);
+            expect($acquisition->sp_spent)->toBe(100);
         });
 
         it('tracks acquisition turn', function (): void {
             $skill = Skill::factory()->create();
             $acquisition = SkillAcquisition::factory()->create([
                 'skill_id' => $skill->id,
-                'turn_acquired' => 25,
+                'acquired_at_turn' => 25,
             ]);
 
-            expect($acquisition->turn_acquired)->toBe(25);
+            expect($acquisition->acquired_at_turn)->toBe(25);
         });
     });
 });

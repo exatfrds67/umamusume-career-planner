@@ -9,10 +9,8 @@
 use App\Models\Character;
 use App\Services\AI\Agents\TrainingOptimizationAgent;
 use App\Services\MCP\MCPClientService;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
-
-uses(DatabaseMigrations::class);
 
 beforeEach(function () {
     /** @var MCPClientService&Mockery\MockInterface $mcpClient */
@@ -33,7 +31,9 @@ beforeEach(function () {
     ]);
 });
 
-afterEach(fn () => Mockery::close());
+afterEach(function () {
+    Mockery::close();
+});
 
 it('analyzes training options successfully', function () {
     Config::set('ai.agents.training_optimization.enabled', true);

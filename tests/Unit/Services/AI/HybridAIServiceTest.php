@@ -7,10 +7,10 @@ use App\Services\AI\BedrockService;
 use App\Services\AI\HybridAIService;
 use App\Services\AI\OllamaService;
 use App\Services\MCP\MCPClientService;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 
-uses(DatabaseMigrations::class);
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     /** @var MCPClientService&Mockery\MockInterface $mcpClient */

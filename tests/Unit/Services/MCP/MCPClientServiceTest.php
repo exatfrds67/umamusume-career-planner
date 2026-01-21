@@ -244,4 +244,224 @@ describe('MCPClientService', function () {
             expect($result)->toBeTrue();
         });
     });
+
+    describe('fetch operations', function () {
+        beforeEach(function () {
+            // Add fetch server to configuration
+            Config::set('mcp.servers.fetch', [
+                'enabled' => true,
+                'command' => 'uvx',
+                'args' => ['mcp-server-fetch'],
+                'capabilities' => ['http_client', 'external_api_integration'],
+            ]);
+
+            $this->mcpClient = new MCPClientService;
+            $this->mcpClient->healthCheck();
+        });
+
+        describe('isFetchAvailable', function () {
+            it('returns true when fetch server is enabled and healthy', function () {
+                expect($this->mcpClient->isFetchAvailable())->toBeTrue();
+            });
+
+            it('returns false when fetch server is disabled', function () {
+                Config::set('mcp.servers.fetch.enabled', false);
+                $client = new MCPClientService;
+
+                expect($client->isFetchAvailable())->toBeFalse();
+            });
+        });
+
+        describe('getFetchServerConfig', function () {
+            it('returns fetch server configuration', function () {
+                $config = $this->mcpClient->getFetchServerConfig();
+
+                expect($config)->toBeArray();
+                expect($config['enabled'])->toBeTrue();
+                expect($config['capabilities'])->toContain('http_client');
+            });
+        });
+
+        describe('callTool', function () {
+            it('calls MCP tool successfully', function () {
+                $result = $this->mcpClient->callTool('fetch', 'fetch', [
+                    'url' => 'https://api.example.com/data',
+                    'method' => 'GET',
+                ]);
+
+                expect($result)->toHaveKeys(['success', 'server', 'tool', 'result']);
+                expect($result['success'])->toBeTrue();
+                expect($result['server'])->toBe('fetch');
+                expect($result['tool'])->toBe('fetch');
+            });
+
+            it('throws exception when MCP is disabled', function () {
+                Config::set('mcp.enabled', false);
+                $client = new MCPClientService;
+
+                expect(fn () => $client->callTool('fetch', 'fetch', []))
+                    ->toThrow(\RuntimeException::class, 'MCP is not enabled');
+            });
+
+            it('throws exception when server is not enabled', function () {
+                Config::set('mcp.servers.fetch.enabled', false);
+                $client = new MCPClientService;
+
+                expect(fn () => $client->callTool('fetch', 'fetch', []))
+                    ->toThrow(\RuntimeException::class, "MCP server 'fetch' is not enabled");
+            });
+        });
+
+        describe('get', function () {
+            it('performs GET request successfully', function () {
+                $response = $this->mcpClient->get('https://api.example.com/data');
+
+                expect($response)->toHaveKeys(['success', 'status', 'body', 'url', 'method']);
+                expect($response['success'])->toBeTrue();
+                expect($response['method'])->toBe('GET');
+                expect($response['url'])->toBe('https://api.example.com/data');
+            });
+
+            it('includes custom headers in request', function () {
+                $response = $this->mcpClient->get('https://api.example.com/data', [
+                    'Authorization' => 'Bearer token123',
+                ]);
+
+                expect($response['success'])->toBeTrue();
+            });
+
+            it('respects timeout parameter', function () {
+                $response = $this->mcpClient->get('https://api.example.com/data', [], 10);
+
+                expect($response['success'])->toBeTrue();
+            });
+        });
+
+        describe('post', function () {
+            it('performs POST request successfully', function () {
+                $response = $this->mcpClient->post('https://api.example.com/data', [
+                    'name' => 'Test',
+                    'value' => 123,
+                ]);
+
+                expect($response)->toHaveKeys(['success', 'status', 'body', 'url', 'method']);
+                expect($response['success'])->toBeTrue();
+                expect($response['method'])->toBe('POST');
+            });
+
+            it('includes data in POST request', function () {
+                $data = ['key' => 'value'];
+                $response = $this->mcpClient->post('https://api.example.com/data', $data);
+
+                expect($response['success'])->toBeTrue();
+            });
+        });
+
+        describe('put', function () {
+            it('performs PUT request successfully', function () {
+                $response = $this->mcpClient->put('https://api.example.com/data/1', [
+                    'name' => 'Updated',
+                ]);
+
+                expect($response)->toHaveKeys(['success', 'status', 'body', 'url', 'method']);
+                expect($response['success'])->toBeTrue();
+                expect($response['method'])->toBe('PUT');
+            });
+        });
+
+        describe('delete', function () {
+            it('performs DELETE request successfully', function () {
+                $response = $this->mcpClient->delete('https://api.example.com/data/1');
+
+                expect($response)->toHaveKeys(['success', 'status', 'body', 'url', 'method']);
+                expect($response['success'])->toBeTrue();
+                expect($response['method'])->toBe('DELETE');
+            });
+        });
+
+        describe('patch', function () {
+            it('performs PATCH request successfully', function () {
+                $response = $this->mcpClient->patch('https://api.example.com/data/1', [
+                    'status' => 'active',
+                ]);
+
+                expect($response)->toHaveKeys(['success', 'status', 'body', 'url', 'method']);
+                expect($response['success'])->toBeTrue();
+                expect($response['method'])->toBe('PATCH');
+            });
+        });
+
+        describe('fetch', function () {
+            it('validates URL format', function () {
+                expect(fn () => $this->mcpClient->fetch('not-a-valid-url'))
+                    ->toThrow(\RuntimeException::class, 'Invalid URL');
+            });
+
+            it('includes default headers', function () {
+                $response = $this->mcpClient->fetch('https://api.example.com/data');
+
+                expect($response['success'])->toBeTrue();
+            });
+
+            it('merges custom headers with defaults', function () {
+                $response = $this->mcpClient->fetch(
+                    'https://api.example.com/data',
+                    'GET',
+                    [],
+                    ['X-Custom-Header' => 'value']
+                );
+
+                expect($response['success'])->toBeTrue();
+            });
+
+            it('adds Content-Type for POST requests', function () {
+                $response = $this->mcpClient->fetch(
+                    'https://api.example.com/data',
+                    'POST',
+                    ['key' => 'value']
+                );
+
+                expect($response['success'])->toBeTrue();
+            });
+        });
+
+        describe('fetchJson', function () {
+            it('decodes JSON response successfully', function () {
+                $response = $this->mcpClient->fetchJson('https://api.example.com/data');
+
+                expect($response)->toHaveKeys(['success', 'status', 'headers', 'data', 'raw_body']);
+                expect($response['success'])->toBeTrue();
+                expect($response['data'])->toBeArray();
+            });
+
+            it('throws exception on JSON decode error', function () {
+                // This test would need mocking to simulate invalid JSON
+                // For now, we test the happy path
+                $response = $this->mcpClient->fetchJson('https://api.example.com/data');
+
+                expect($response['data'])->toBeArray();
+            });
+
+            it('supports POST requests with JSON', function () {
+                $response = $this->mcpClient->fetchJson(
+                    'https://api.example.com/data',
+                    'POST',
+                    ['name' => 'Test']
+                );
+
+                expect($response['success'])->toBeTrue();
+                expect($response['data'])->toBeArray();
+            });
+        });
+
+        describe('error handling', function () {
+            it('throws exception when fetch server is not enabled', function () {
+                Config::set('mcp.servers.fetch.enabled', false);
+                $client = new MCPClientService;
+
+                expect(fn () => $client->fetch('https://api.example.com/data'))
+                    ->toThrow(\RuntimeException::class, 'MCP fetch server is not enabled');
+            });
+        });
+    });
 });

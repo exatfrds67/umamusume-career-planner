@@ -8,10 +8,7 @@ use App\Services\DeckManagementService;
 use App\Services\DeckOptimizationService;
 use App\Services\FriendshipBondService;
 use App\Services\SupportCardMetaService;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Collection;
-
-uses(DatabaseMigrations::class);
 
 beforeEach(function (): void {
     /** @var SupportCardMetaService&Mockery\MockInterface $metaService */
@@ -30,43 +27,11 @@ beforeEach(function (): void {
         $deckService,
         $friendshipService
     );
-
-    // Define helper functions as closures on $this
-    $this->createMockDeck = function (array $cards): Collection {
-        return collect(array_map(function ($cardData) {
-            $supportCard = new stdClass;
-            $supportCard->card_type = $cardData['card_type'];
-            $supportCard->skill_hints_provided = $cardData['skill_hints_provided'] ?? [];
-            $supportCard->meta_tier = $cardData['meta_tier'] ?? 'A';
-
-            $card = new stdClass;
-            $card->supportCard = $supportCard;
-            $card->support_card_id = random_int(1, 1000);
-
-            return $card;
-        }, $cards));
-    };
-
-    $this->createMockDeckWithIds = function (array $cards): Collection {
-        return collect(array_map(function ($cardData, $index) {
-            $supportCard = new stdClass;
-            $supportCard->name = $cardData['name'];
-            $supportCard->card_type = $cardData['card_type'];
-            $supportCard->meta_tier = $cardData['meta_tier'] ?? 'A';
-            $supportCard->skill_hints_provided = $cardData['skill_hints_provided'] ?? [];
-            $supportCard->recommended_scenarios = $cardData['recommended_scenarios'] ?? [];
-
-            $card = new stdClass;
-            $card->supportCard = $supportCard;
-            $card->support_card_id = $cardData['id'];
-            $card->position_slot = $index + 1;
-
-            return $card;
-        }, $cards, array_keys($cards)));
-    };
 });
 
-afterEach(fn () => Mockery::close());
+afterEach(function (): void {
+    Mockery::close();
+});
 
 describe('DeckOptimizationService', function (): void {
     describe('analyzeDeckComposition', function (): void {
@@ -86,7 +51,7 @@ describe('DeckOptimizationService', function (): void {
         });
 
         it('calculates stat coverage correctly', function (): void {
-            $deck = ($this->createMockDeck)([
+            $deck = $this->createMockDeck([
                 ['card_type' => 'speed', 'skill_hints_provided' => ['Speed Boost']],
                 ['card_type' => 'speed', 'skill_hints_provided' => ['Acceleration']],
                 ['card_type' => 'stamina', 'skill_hints_provided' => ['Recovery']],
@@ -110,7 +75,7 @@ describe('DeckOptimizationService', function (): void {
         });
 
         it('identifies missing stats as gaps', function (): void {
-            $deck = ($this->createMockDeck)([
+            $deck = $this->createMockDeck([
                 ['card_type' => 'speed', 'skill_hints_provided' => []],
                 ['card_type' => 'speed', 'skill_hints_provided' => []],
                 ['card_type' => 'speed', 'skill_hints_provided' => []],
@@ -141,7 +106,7 @@ describe('DeckOptimizationService', function (): void {
         });
 
         it('identifies synergy pairs correctly', function (): void {
-            $deck = ($this->createMockDeckWithIds)([
+            $deck = $this->createMockDeckWithIds([
                 ['id' => 1, 'name' => 'Card A', 'card_type' => 'speed'],
                 ['id' => 2, 'name' => 'Card B', 'card_type' => 'speed'],
             ]);
@@ -166,7 +131,7 @@ describe('DeckOptimizationService', function (): void {
         });
 
         it('analyzes strategic alignment', function (): void {
-            $deck = ($this->createMockDeckWithIds)([
+            $deck = $this->createMockDeckWithIds([
                 ['id' => 1, 'name' => 'Card A', 'card_type' => 'speed', 'meta_tier' => 'S'],
                 ['id' => 2, 'name' => 'Card B', 'card_type' => 'speed', 'meta_tier' => 'S'],
                 ['id' => 3, 'name' => 'Card C', 'card_type' => 'speed', 'meta_tier' => 'A'],
@@ -182,7 +147,7 @@ describe('DeckOptimizationService', function (): void {
             $result = $this->service->analyzeDeckSynergy(1);
 
             expect($result['strategic_alignment']['primary_strategy'])->toBe('Speed Focus')
-                ->and($result['strategic_alignment'])->toHaveKey('is_well_aligned');
+                ->and($result['strategic_alignment']['is_well_aligned'])->toBeTrue();
         });
     });
 
@@ -195,7 +160,7 @@ describe('DeckOptimizationService', function (): void {
                 'stat_priorities' => ['speed' => 1, 'stamina' => 2],
             ]);
 
-            $deck = ($this->createMockDeckWithIds)([
+            $deck = $this->createMockDeckWithIds([
                 ['id' => 1, 'name' => 'Card A', 'card_type' => 'speed', 'meta_tier' => 'S+'],
                 ['id' => 2, 'name' => 'Card B', 'card_type' => 'speed', 'meta_tier' => 'S'],
                 ['id' => 3, 'name' => 'Card C', 'card_type' => 'stamina', 'meta_tier' => 'A'],
@@ -223,7 +188,7 @@ describe('DeckOptimizationService', function (): void {
                 'scenario_type' => 'ura_finale',
             ]);
 
-            $deck = ($this->createMockDeckWithIds)([
+            $deck = $this->createMockDeckWithIds([
                 ['id' => 1, 'name' => 'Low Tier Card', 'card_type' => 'speed', 'meta_tier' => 'C'],
             ]);
 
@@ -330,3 +295,44 @@ describe('DeckOptimizationService', function (): void {
         });
     });
 });
+
+/**
+ * Helper function to create mock deck collection
+ */
+function createMockDeck(array $cards): Collection
+{
+    return collect(array_map(function ($cardData) {
+        $supportCard = new stdClass;
+        $supportCard->card_type = $cardData['card_type'];
+        $supportCard->skill_hints_provided = $cardData['skill_hints_provided'] ?? [];
+        $supportCard->meta_tier = $cardData['meta_tier'] ?? 'A';
+
+        $card = new stdClass;
+        $card->supportCard = $supportCard;
+        $card->support_card_id = rand(1, 1000);
+
+        return $card;
+    }, $cards));
+}
+
+/**
+ * Helper function to create mock deck with specific IDs
+ */
+function createMockDeckWithIds(array $cards): Collection
+{
+    return collect(array_map(function ($cardData, $index) {
+        $supportCard = new stdClass;
+        $supportCard->name = $cardData['name'];
+        $supportCard->card_type = $cardData['card_type'];
+        $supportCard->meta_tier = $cardData['meta_tier'] ?? 'A';
+        $supportCard->skill_hints_provided = $cardData['skill_hints_provided'] ?? [];
+        $supportCard->recommended_scenarios = $cardData['recommended_scenarios'] ?? [];
+
+        $card = new stdClass;
+        $card->supportCard = $supportCard;
+        $card->support_card_id = $cardData['id'];
+        $card->position_slot = $index + 1;
+
+        return $card;
+    }, $cards, array_keys($cards)));
+}
