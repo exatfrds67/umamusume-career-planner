@@ -1,0 +1,28 @@
+INSTRUCTIONS: Add Redis Extension to php.ini
+
+1. Open this file in a text editor (Notepad, VS Code, etc.):
+   C:\Users\exatf\tools\php-8.4.11\php.ini
+
+2. Find the section with extension lines (search for "extension=")
+   You'll see lines like:
+   extension=curl
+   extension=fileinfo
+   extension=gd
+   etc.
+
+3. Add this line anywhere in that section:
+   extension=redis
+
+4. Save the file
+
+5. Verify by running in PowerShell:
+   php -m | Select-String redis
+
+   You should see: redis
+
+IMPORTANT: 
+- Use "extension=redis" NOT "extension=php_redis.dll"
+- Make sure there's no semicolon (;) at the start of the line
+- Save the file after adding the line
+
+After adding the line, come back and I'll run the verification and tests!

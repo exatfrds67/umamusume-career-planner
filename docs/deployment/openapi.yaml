@@ -1,0 +1,79 @@
+openapi: 3.0.0
+info:
+  title: Umamusume Career Planner API
+  version: 1.0.0
+  description: API for managing training, skills, and strategic planning for Umamusumes.
+servers:
+  - url: https://planner.example.com/api
+paths:
+  /training-predictions:
+    post:
+      summary: Predict training outcome
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                character_id:
+                  type: integer
+                training_type:
+                  type: string
+                  enum: [speed, stamina, power, guts, wit]
+      responses:
+        "200":
+          description: Prediction result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      stat_gains:
+                        type: object
+                      energy_cost:
+                        type: integer
+  /ocr/upload:
+    post:
+      summary: Upload screenshot for OCR
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                screenshot:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: Extracted stats
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  speed:
+                    type: integer
+                  stamina:
+                    type: integer
+  /v1/characters/{character}/export:
+    get:
+      summary: Export career data
+      parameters:
+        - name: character
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: JSON export of character career
+          content:
+            application/json:
+              schema:
+                type: object
