@@ -1,0 +1,19 @@
+# Integration Tests Directory
+
+This directory contains integration tests that verify complex workflows
+spanning multiple components. These tests use LazilyRefreshDatabase
+for better performance.
+
+## Test Organization
+
+- Place tests that involve multiple services here
+- Use for end-to-end workflow testing
+- Tests should verify complete user journeys
+
+## Example Usage
+
+```php
+it('completes a full character creation workflow', function () {
+    // Test complete workflow from start to finish
+});
+```
