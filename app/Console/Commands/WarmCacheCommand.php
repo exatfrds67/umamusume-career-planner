@@ -4,17 +4,20 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use App\Services\CacheManagementService;
-use App\Services\ExternalAPI\ExternalAPIFacade;
+use App\Jobs\WarmCacheJob;
+use App\Services\ExternalAPI\CacheManagerService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Warm Cache Command
  *
- * Intelligently warms application caches with frequently accessed data
- * using MCP agents for predictive data fetching.
+ * Intelligently warms application caches with frequently accessed data.
+ * Supports priority-based warming and can run synchronously or dispatch
+ * background jobs for asynchronous warming.
  *
- * Requirements: 14.5, 55.3, 56.4, Task 4.4.2
+ * Requirements: 14.2 (Intelligent Caching and Offline Functionality)
+ * Task: 2.1.2
  */
 class WarmCacheCommand extends Command
 {
@@ -24,157 +27,168 @@ class WarmCacheCommand extends Command
      * @var string
      */
     protected $signature = 'cache:warm
-                            {--type=all : Type of cache to warm (all, characters, support-cards, meta)}
-                            {--force : Force refresh even if cached}';
+                            {--priority=all : Priority level: high, medium, low, or all}
+                            {--async : Run cache warming in background job}
+                            {--stats : Show warming statistics after completion}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Warm application caches with frequently accessed data using MCP-enhanced predictive fetching';
+    protected $description = 'Warm application caches with frequently accessed external API data';
 
     /**
      * Execute the console command.
      */
-    public function handle(
-        CacheManagementService $cacheManager,
-        ExternalAPIFacade $apiFacade
-    ): int {
-        $type = $this->option('type');
-        $force = $this->option('force');
+    public function handle(CacheManagerService $cacheManager): int
+    {
+        $priority = $this->option('priority');
+        $async = $this->option('async');
+        $showStats = $this->option('stats');
+
+        // Validate priority option
+        if (! in_array($priority, ['high', 'medium', 'low', 'all'])) {
+            $this->error("Invalid priority level: {$priority}");
+            $this->info('Valid options: high, medium, low, all');
+
+            return Command::FAILURE;
+        }
 
         $this->info('Starting cache warming...');
+        $this->info("Priority: {$priority}");
+        $this->info('Mode: '.($async ? 'Asynchronous (background job)' : 'Synchronous'));
         $this->newLine();
 
+        if ($async) {
+            // Dispatch background job
+            WarmCacheJob::dispatch($priority);
+
+            $this->info('✓ Cache warming job dispatched to queue');
+            $this->info('The cache will be warmed in the background.');
+            $this->newLine();
+
+            Log::info('[WarmCacheCommand] Cache warming job dispatched', [
+                'priority' => $priority,
+                'mode' => 'async',
+            ]);
+
+            return Command::SUCCESS;
+        }
+
+        // Run synchronously
         $startTime = microtime(true);
-        $results = [];
 
-        // Determine which caches to warm
-        $cacheTypes = $type === 'all'
-            ? ['characters', 'support-cards', 'meta']
-            : [$type];
+        try {
+            $result = $cacheManager->warmCache($priority);
 
-        foreach ($cacheTypes as $cacheType) {
-            $this->info("Warming {$cacheType} cache...");
+            $duration = (microtime(true) - $startTime) * 1000;
 
-            $result = match ($cacheType) {
-                'characters' => $this->warmCharactersCache($apiFacade, $force),
-                'support-cards' => $this->warmSupportCardsCache($apiFacade, $force),
-                'meta' => $this->warmMetaCache($apiFacade, $force),
-                default => ['success' => false, 'message' => 'Unknown cache type'],
-            };
+            // Display results
+            $this->displayResults($result);
 
-            $results[$cacheType] = $result;
-
-            if ($result['success']) {
-                $this->info("✓ {$cacheType} cache warmed successfully");
-            } else {
-                $message = $result['message'] ?? 'Unknown error';
-                $this->error("✗ Failed to warm {$cacheType} cache: {$message}");
+            // Show statistics if requested
+            if ($showStats) {
+                $this->newLine();
+                $this->displayStatistics($cacheManager);
             }
 
+            Log::info('[WarmCacheCommand] Cache warming completed', [
+                'priority' => $priority,
+                'mode' => 'sync',
+                'result' => $result,
+            ]);
+
+            return $result['success'] ? Command::SUCCESS : Command::FAILURE;
+        } catch (\Exception $e) {
+            $this->error('Cache warming failed: '.$e->getMessage());
+            $this->newLine();
+
+            Log::error('[WarmCacheCommand] Cache warming failed', [
+                'priority' => $priority,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return Command::FAILURE;
+        }
+    }
+
+    /**
+     * Display warming results
+     *
+     * @param  array<string, mixed>  $result
+     */
+    protected function displayResults(array $result): void
+    {
+        if ($result['success']) {
+            $this->info('✓ Cache warming completed successfully');
+        } else {
+            $this->warn('⚠ Cache warming completed with some failures');
+        }
+
+        $this->newLine();
+
+        // Display summary
+        $this->info('Summary:');
+        $this->line("  Warmed Items: {$result['warmed_items']}");
+        $this->line("  Failed Items: {$result['failed_items']}");
+        $this->line('  Duration: '.round($result['duration_ms'], 2).'ms');
+        $this->newLine();
+
+        // Display detailed results
+        if (! empty($result['items'])) {
+            $this->info('Detailed Results:');
+
+            $tableData = [];
+            foreach ($result['items'] as $task => $status) {
+                $statusIcon = match ($status) {
+                    'success' => '✓',
+                    'failed' => '✗',
+                    'error' => '⚠',
+                    default => '?',
+                };
+
+                $tableData[] = [
+                    $task,
+                    "{$statusIcon} {$status}",
+                ];
+            }
+
+            $this->table(['Task', 'Status'], $tableData);
+        }
+    }
+
+    /**
+     * Display cache statistics
+     */
+    protected function displayStatistics(CacheManagerService $cacheManager): void
+    {
+        $this->info('Cache Statistics:');
+
+        // Get general statistics
+        $stats = $cacheManager->getStatistics();
+        $this->line("  Hit Rate: {$stats['hit_rate']}%");
+        $this->line("  Total Hits: {$stats['hits']}");
+        $this->line("  Total Misses: {$stats['misses']}");
+        $this->line("  Total Requests: {$stats['total_requests']}");
+        $this->newLine();
+
+        // Get warming statistics
+        $warmingStats = $cacheManager->getWarmingStatistics();
+        if ($warmingStats) {
+            $this->info('Last Warming Run:');
+            $this->line("  Time: {$warmingStats['last_run']}");
+            $this->line("  Warmed Items: {$warmingStats['warmed_items']}");
+            $this->line("  Failed Items: {$warmingStats['failed_items']}");
+            $this->line('  Duration: '.round($warmingStats['duration_ms'], 2).'ms');
             $this->newLine();
         }
 
-        $duration = (microtime(true) - $startTime) * 1000;
-
-        // Display summary
-        $this->info('Cache Warming Summary:');
-        $this->table(
-            ['Cache Type', 'Status', 'Items'],
-            collect($results)->map(function ($result, $type) {
-                return [
-                    $type,
-                    $result['success'] ? '✓ Success' : '✗ Failed',
-                    $result['count'] ?? 0,
-                ];
-            })->toArray()
-        );
-
-        $this->info('Total duration: '.round($duration, 2).'ms');
-
-        // Display cache statistics
-        $stats = $cacheManager->getHitRateStatistics();
-        $this->newLine();
-        $this->info('Cache Statistics:');
-        $this->line("Hit Rate: {$stats['hit_rate']}%");
-        $this->line("Total Hits: {$stats['total_hits']}");
-        $this->line("Total Misses: {$stats['total_misses']}");
-        $this->line("Avg Response Time: {$stats['avg_response_time_ms']}ms");
-
-        return Command::SUCCESS;
-    }
-
-    /**
-     * Warm characters cache
-     *
-     * @return array{success: bool, count: int, message?: string}
-     */
-    protected function warmCharactersCache(ExternalAPIFacade $apiFacade, bool $force): array
-    {
-        try {
-            $result = $apiFacade->getCharacters($force);
-
-            return [
-                'success' => $result['success'],
-                'count' => count($result['data'] ?? []),
-                'message' => $result['error'] ?? '',
-            ];
-        } catch (\Exception $e) {
-            return [
-                'success' => false,
-                'count' => 0,
-                'message' => $e->getMessage(),
-            ];
-        }
-    }
-
-    /**
-     * Warm support cards cache
-     *
-     * @return array{success: bool, count: int, message?: string}
-     */
-    protected function warmSupportCardsCache(ExternalAPIFacade $apiFacade, bool $force): array
-    {
-        try {
-            $result = $apiFacade->getSupportCards($force);
-
-            return [
-                'success' => $result['success'],
-                'count' => count($result['data'] ?? []),
-                'message' => $result['error'] ?? '',
-            ];
-        } catch (\Exception $e) {
-            return [
-                'success' => false,
-                'count' => 0,
-                'message' => $e->getMessage(),
-            ];
-        }
-    }
-
-    /**
-     * Warm meta data cache
-     *
-     * @return array{success: bool, count: int, message?: string}
-     */
-    protected function warmMetaCache(ExternalAPIFacade $apiFacade, bool $force): array
-    {
-        try {
-            $result = $apiFacade->getMetaTierRankings($force);
-
-            return [
-                'success' => $result['success'],
-                'count' => count($result['data'] ?? []),
-                'message' => $result['error'] ?? '',
-            ];
-        } catch (\Exception $e) {
-            return [
-                'success' => false,
-                'count' => 0,
-                'message' => $e->getMessage(),
-            ];
-        }
+        // Get cache size
+        $sizeInfo = $cacheManager->getCacheSize();
+        $this->info('Cache Size:');
+        $this->line("  Total Keys: {$sizeInfo['total_keys']}");
+        $this->line('  Estimated Size: '.number_format($sizeInfo['estimated_size_bytes']).' bytes');
     }
 }
