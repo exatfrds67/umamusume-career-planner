@@ -29,7 +29,8 @@
         "last-error",
         "browser-logs",
         "search-docs",
-        "database-query"
+        "database-query",
+        "get-config"
       ]
     },
     "memory": {
@@ -74,7 +75,13 @@
         "directory_tree",
         "list_allowed_directories",
         "get_file_info",
-        "create_directory"
+        "create_directory",
+        "move_file",
+        "move_file",
+        "move_file",
+        "move_file",
+        "move_file",
+        "move_file"
       ]
     },
     "browserstack": {
@@ -91,6 +98,21 @@
       "autoApprove": [
         "accessibilityExpert",
         "startAccessibilityScan"
+      ]
+    },
+    "fetch": {
+      "command": "uvx",
+      "args": [
+        "mcp-server-fetch",
+        "--user-agent",
+        "UmamusumeCareerPlanner/1.0"
+      ],
+      "env": {
+        "FASTMCP_LOG_LEVEL": "INFO"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "fetch"
       ]
     }
   }
