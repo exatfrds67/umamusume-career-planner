@@ -22,8 +22,14 @@ import "./core/ThemeSystem.js";
 import "./core/ImageOptimization.js";
 import "./core/PerformanceMonitor.js";
 
+// Import connectivity monitor (Task 2.2.1)
+import connectivityMonitor from "./core/connectivity-monitor.js";
+
 // Register Alpine plugins
 Alpine.plugin(persist);
+
+// Register Alpine components
+Alpine.data("connectivityMonitor", connectivityMonitor);
 
 // Initialize Alpine.js
 window.Alpine = Alpine;

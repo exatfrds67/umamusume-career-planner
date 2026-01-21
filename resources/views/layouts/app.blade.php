@@ -98,6 +98,9 @@
         </main>
     </div>
 
+    <!-- Offline Indicator (Task 2.2.1) -->
+    <x-offline-indicator />
+
     @stack('scripts')
 </body>
 

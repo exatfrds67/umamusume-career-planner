@@ -188,8 +188,8 @@ async function networkFirstStrategy(request) {
     try {
         const networkResponse = await fetch(request);
 
-        // Cache successful responses
-        if (networkResponse.ok) {
+        // Cache successful GET responses only
+        if (networkResponse.ok && request.method === 'GET') {
             const cache = await caches.open(CACHE_NAME);
             cache.put(request, networkResponse.clone());
         }
@@ -229,7 +229,7 @@ async function cacheFirstStrategy(request, cacheName) {
     try {
         const networkResponse = await fetch(request);
 
-        if (networkResponse.ok) {
+        if (networkResponse.ok && request.method === 'GET') {
             const cache = await caches.open(cacheName);
             cache.put(request, networkResponse.clone());
             await trimCache(cacheName, CACHE_LIMITS.runtime);
@@ -252,8 +252,8 @@ async function cacheFirstWithRefresh(request, cacheName) {
     const cache = await caches.open(cacheName);
     const cachedResponse = await cache.match(request);
 
-    // Start network fetch in background
-    const fetchPromise = fetch(request)
+    // Start network fetch in background (only for GET requests)
+    const fetchPromise = request.method === 'GET' ? fetch(request)
         .then((networkResponse) => {
             if (networkResponse.ok) {
                 cache.put(request, networkResponse.clone());
@@ -261,7 +261,7 @@ async function cacheFirstWithRefresh(request, cacheName) {
             }
             return networkResponse;
         })
-        .catch(() => null);
+        .catch(() => null) : Promise.resolve(null);
 
     // Return cached response immediately if available
     if (cachedResponse) {
@@ -287,8 +287,8 @@ async function staleWhileRevalidate(request, cacheName) {
     const cache = await caches.open(cacheName);
     const cachedResponse = await cache.match(request);
 
-    // Start network fetch
-    const fetchPromise = fetch(request)
+    // Start network fetch (only for GET requests)
+    const fetchPromise = request.method === 'GET' ? fetch(request)
         .then((networkResponse) => {
             if (networkResponse.ok) {
                 // Add timestamp for expiration checking
@@ -298,10 +298,10 @@ async function staleWhileRevalidate(request, cacheName) {
             }
             return networkResponse;
         })
-        .catch(() => null);
+        .catch(() => null) : fetch(request).catch(() => null);
 
     // Return cached response if fresh enough
-    if (cachedResponse) {
+    if (cachedResponse && request.method === 'GET') {
         // Check if cache is still valid (within expiration time)
         const cacheDate = cachedResponse.headers.get("date");
         if (cacheDate) {
@@ -319,8 +319,8 @@ async function staleWhileRevalidate(request, cacheName) {
         return networkResponse;
     }
 
-    // Return stale cache if network fails
-    if (cachedResponse) {
+    // Return stale cache if network fails (GET only)
+    if (cachedResponse && request.method === 'GET') {
         return cachedResponse;
     }
 
@@ -338,7 +338,8 @@ async function networkWithCacheFallback(request) {
     try {
         const networkResponse = await fetch(request);
 
-        if (networkResponse.ok) {
+        // Only cache GET requests (HEAD, POST, PUT, DELETE cannot be cached)
+        if (networkResponse.ok && request.method === 'GET') {
             const cache = await caches.open(RUNTIME_CACHE);
             cache.put(request, networkResponse.clone());
         }
