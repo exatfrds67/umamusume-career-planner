@@ -1,0 +1,64 @@
+{
+    "name": "Umamusume Career Planner",
+    "short_name": "Uma Planner",
+    "description": "A comprehensive local-first web application for optimizing gameplay in the Umamusume Pretty Derby mobile game",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#3b82f6",
+    "orientation": "portrait-primary",
+    "scope": "/",
+    "lang": "en",
+    "dir": "ltr",
+    "categories": ["games", "utilities", "productivity"],
+    "icons": [
+        {
+            "src": "/images/app_logo/uma_musume_race_planner_logo_128.png",
+            "sizes": "128x128",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/images/app_logo/uma_musume_race_planner_logo_256.png",
+            "sizes": "256x256",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/images/app_logo/uma_musume_race_planner_logo_512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "screenshots": [],
+    "shortcuts": [
+        {
+            "name": "Dashboard",
+            "short_name": "Dashboard",
+            "description": "View your dashboard",
+            "url": "/dashboard",
+            "icons": [
+                {
+                    "src": "/images/app_logo/uma_musume_race_planner_logo_128.png",
+                    "sizes": "128x128",
+                    "type": "image/png"
+                }
+            ]
+        },
+        {
+            "name": "Characters",
+            "short_name": "Characters",
+            "description": "Manage your characters",
+            "url": "/characters",
+            "icons": [
+                {
+                    "src": "/images/app_logo/uma_musume_race_planner_logo_128.png",
+                    "sizes": "128x128",
+                    "type": "image/png"
+                }
+            ]
+        }
+    ],
+    "prefer_related_applications": false
+}
