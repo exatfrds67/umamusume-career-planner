@@ -16,7 +16,7 @@ class UpdateCharacterRequest extends FormRequest
         $user = $this->user();
         $character = $this->route('character');
 
-        return $user !== null && $character instanceof Character && $user->id === $character->user_id;
+        return $user !== null && $character instanceof Character && $user?->id ?? throw new \Exception('User required') === $character->user_id;
     }
 
     /**

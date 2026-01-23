@@ -152,6 +152,10 @@ class ApiPerformanceMiddleware
 
         // Check content type (only compress text-based responses)
         $contentType = $response->headers->get('Content-Type', '');
+        if (! is_string($contentType)) {
+            return false;
+        }
+
         $compressibleTypes = [
             'application/json',
             'text/html',
@@ -213,7 +217,8 @@ class ApiPerformanceMiddleware
 
         // Fall back to gzip
         if (str_contains($acceptEncoding, 'gzip')) {
-            $level = (int) config('api-performance.compression.level', 6);
+            $compressionLevel = config('api-performance.compression.level', 6);
+            $level = is_int($compressionLevel) ? $compressionLevel : 6;
             $compressed = gzencode($content, $level);
             if ($compressed !== false && strlen($compressed) < $originalSize) {
                 $response->setContent($compressed);
@@ -250,12 +255,13 @@ class ApiPerformanceMiddleware
     {
         $units = ['B', 'KB', 'MB', 'GB'];
         $i = 0;
+        $floatBytes = (float) $bytes;
 
-        while ($bytes >= 1024 && $i < count($units) - 1) {
-            $bytes /= 1024;
-            $i++;
+        while ($floatBytes >= 1024 && $i < count($units) - 1) {
+            $floatBytes /= 1024;
+            $i = ($i ?? 0) + 1;
         }
 
-        return round($bytes, 2).' '.$units[$i];
+        return round($floatBytes, 2).' '.$units[$i];
     }
 }

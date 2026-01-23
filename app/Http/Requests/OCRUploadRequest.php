@@ -32,20 +32,50 @@ class OCRUploadRequest extends FormRequest
      */
     public function rules(): array
     {
-        $maxFileSize = config('services.image_processing.max_file_size', 10485760); // 10MB default
-        $allowedMimes = config('services.image_processing.allowed_mimes', ['image/jpeg', 'image/png', 'image/webp']);
-        $allowedExtensions = config('services.image_processing.allowed_formats', ['jpg', 'jpeg', 'png', 'webp']);
+        $maxFileSize = config('services.image_processing.max_file_size');
+        $maxFileSizeInt = is_int($maxFileSize) ? $maxFileSize : 10485760; // 10MB default
+
+        $allowedMimes = config('services.image_processing.allowed_mimes');
+        $allowedMimesArray = is_array($allowedMimes) ? $allowedMimes : ['image/jpeg', 'image/png', 'image/webp'];
+
+        $allowedExtensions = config('services.image_processing.allowed_formats');
+        $allowedExtensionsArray = is_array($allowedExtensions) ? $allowedExtensions : ['jpg', 'jpeg', 'png', 'webp'];
+
+        // Support both 'screenshot' and 'image' field names
+        $imageField = $this->has('screenshot') ? 'screenshot' : 'image';
+
+        $minWidth = config('services.image_processing.min_width');
+        $minWidthInt = is_int($minWidth) ? $minWidth : 320;
+
+        $minHeight = config('services.image_processing.min_height');
+        $minHeightInt = is_int($minHeight) ? $minHeight : 240;
+
+        $maxWidth = config('services.image_processing.max_width');
+        $maxWidthInt = is_int($maxWidth) ? $maxWidth : 4096;
+
+        $maxHeight = config('services.image_processing.max_height');
+        $maxHeightInt = is_int($maxHeight) ? $maxHeight : 4096;
 
         return [
-            'screenshot' => [
+            $imageField => [
                 'required',
                 'file',
-                'mimes:'.implode(',', array_map(fn ($mime) => str_replace('image/', '', $mime), $allowedMimes)),
-                'max:'.($maxFileSize / 1024), // Convert bytes to KB for validation
-                'dimensions:min_width='.config('services.image_processing.min_width', 320)
-                    .',min_height='.config('services.image_processing.min_height', 240)
-                    .',max_width='.config('services.image_processing.max_width', 4096)
-                    .',max_height='.config('services.image_processing.max_height', 4096),
+                'mimes:'.implode(',', array_map(
+                    /** @param mixed $mime */
+                    function ($mime): string {
+                        if (is_string($mime)) {
+                            return str_replace('image/', '', $mime);
+                        }
+
+                        return '';
+                    },
+                    $allowedMimesArray
+                )),
+                'max:'.(int) ($maxFileSizeInt / 1024), // Convert bytes to KB for validation
+                'dimensions:min_width='.$minWidthInt
+                    .',min_height='.$minHeightInt
+                    .',max_width='.$maxWidthInt
+                    .',max_height='.$maxHeightInt,
             ],
             'character_id' => [
                 'nullable',
@@ -67,7 +97,9 @@ class OCRUploadRequest extends FormRequest
      */
     public function messages(): array
     {
-        $maxSizeMB = config('services.image_processing.max_file_size', 10485760) / 1048576;
+        $maxFileSize = config('services.image_processing.max_file_size');
+        $maxFileSizeInt = is_int($maxFileSize) ? $maxFileSize : 10485760;
+        $maxSizeMB = (int) ($maxFileSizeInt / 1048576);
 
         return [
             'screenshot.required' => 'Please select a screenshot to upload.',

@@ -51,10 +51,14 @@ class StoreSupportDeckRequest extends FormRequest
     /**
      * Configure the validator instance.
      */
-    public function withValidator($validator): void
+    public function withValidator(\Illuminate\Contracts\Validation\Validator $validator): void
     {
-        $validator->after(function ($validator) {
+        $validator->after(function (\Illuminate\Contracts\Validation\Validator $validator): void {
             $cards = $this->input('cards', []);
+
+            if (! is_array($cards)) {
+                return;
+            }
 
             // Check friend card count
             $friendCardCount = collect($cards)->where('is_friend_card', true)->count();

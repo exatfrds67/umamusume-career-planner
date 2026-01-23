@@ -22,6 +22,9 @@ class UpdateProfileRequest extends FormRequest
      */
     public function rules(): array
     {
+        $user = $this->user();
+        $userId = $user instanceof \App\Models\User ? $user?->id ?? throw new \Exception('User required') : null;
+
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => [
@@ -29,7 +32,7 @@ class UpdateProfileRequest extends FormRequest
                 'string',
                 'email',
                 'max:255',
-                Rule::unique('ucp_users')->ignore($this->user()->id),
+                Rule::unique('ucp_users')->ignore($userId),
             ],
             'preferences' => ['nullable', 'array'],
             'preferences.theme' => ['nullable', 'string', 'in:light,dark,auto'],

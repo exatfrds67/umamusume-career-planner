@@ -116,12 +116,40 @@ class TieredRateLimiting
     {
         $tiers = config('api-performance.rate_limiting.tiers', []);
 
-        return $tiers[$tier] ?? $tiers['public'] ?? [
+        $defaultConfig = [
             'requests_per_minute' => 60,
             'requests_per_hour' => 500,
             'requests_per_day' => 5000,
             'burst_limit' => 10,
         ];
+
+        if (! is_array($tiers)) {
+            return $defaultConfig;
+        }
+
+        if (isset($tiers[$tier]) && is_array($tiers[$tier])) {
+            $tierConfig = $tiers[$tier];
+
+            return [
+                'requests_per_minute' => isset($tierConfig['requests_per_minute']) && is_int($tierConfig['requests_per_minute']) ? $tierConfig['requests_per_minute'] : $defaultConfig['requests_per_minute'],
+                'requests_per_hour' => isset($tierConfig['requests_per_hour']) && is_int($tierConfig['requests_per_hour']) ? $tierConfig['requests_per_hour'] : $defaultConfig['requests_per_hour'],
+                'requests_per_day' => isset($tierConfig['requests_per_day']) && is_int($tierConfig['requests_per_day']) ? $tierConfig['requests_per_day'] : $defaultConfig['requests_per_day'],
+                'burst_limit' => isset($tierConfig['burst_limit']) && is_int($tierConfig['burst_limit']) ? $tierConfig['burst_limit'] : $defaultConfig['burst_limit'],
+            ];
+        }
+
+        if (isset($tiers['public']) && is_array($tiers['public'])) {
+            $publicConfig = $tiers['public'];
+
+            return [
+                'requests_per_minute' => isset($publicConfig['requests_per_minute']) && is_int($publicConfig['requests_per_minute']) ? $publicConfig['requests_per_minute'] : $defaultConfig['requests_per_minute'],
+                'requests_per_hour' => isset($publicConfig['requests_per_hour']) && is_int($publicConfig['requests_per_hour']) ? $publicConfig['requests_per_hour'] : $defaultConfig['requests_per_hour'],
+                'requests_per_day' => isset($publicConfig['requests_per_day']) && is_int($publicConfig['requests_per_day']) ? $publicConfig['requests_per_day'] : $defaultConfig['requests_per_day'],
+                'burst_limit' => isset($publicConfig['burst_limit']) && is_int($publicConfig['burst_limit']) ? $publicConfig['burst_limit'] : $defaultConfig['burst_limit'],
+            ];
+        }
+
+        return $defaultConfig;
     }
 
     /**
@@ -134,8 +162,13 @@ class TieredRateLimiting
         $path = $request->path();
         $endpointLimits = config('api-performance.rate_limiting.endpoint_limits', []);
 
+        if (! is_array($endpointLimits)) {
+            return null;
+        }
+
         foreach ($endpointLimits as $pattern => $config) {
-            if (fnmatch($pattern, $path)) {
+            if (is_string($pattern) && is_array($config) && fnmatch($pattern, $path)) {
+                /** @var array<string, int> $config */
                 return $config;
             }
         }
@@ -151,7 +184,7 @@ class TieredRateLimiting
         $user = $request->user();
 
         if ($user !== null) {
-            return 'rate_limit:'.$tier.':user:'.$user->id;
+            return 'rate_limit:'.$tier.':user:'.$user?->id ?? throw new \Exception('User required');
         }
 
         return 'rate_limit:'.$tier.':ip:'.$request->ip();
@@ -256,16 +289,22 @@ class TieredRateLimiting
 
         // Add rate limit headers
         $response->headers->set('Retry-After', (string) $retryAfter);
+
+        $limitHeader = config('api-performance.rate_limiting.headers.limit_header');
         $response->headers->set(
-            config('api-performance.rate_limiting.headers.limit_header', 'X-RateLimit-Limit'),
+            is_string($limitHeader) ? $limitHeader : 'X-RateLimit-Limit',
             (string) $limitResult['limit']
         );
+
+        $remainingHeader = config('api-performance.rate_limiting.headers.remaining_header');
         $response->headers->set(
-            config('api-performance.rate_limiting.headers.remaining_header', 'X-RateLimit-Remaining'),
+            is_string($remainingHeader) ? $remainingHeader : 'X-RateLimit-Remaining',
             '0'
         );
+
+        $resetHeader = config('api-performance.rate_limiting.headers.reset_header');
         $response->headers->set(
-            config('api-performance.rate_limiting.headers.reset_header', 'X-RateLimit-Reset'),
+            is_string($resetHeader) ? $resetHeader : 'X-RateLimit-Reset',
             (string) $limitResult['reset_at']
         );
 
@@ -280,16 +319,21 @@ class TieredRateLimiting
      */
     protected function addRateLimitHeaders(Response $response, array $limitResult, array $config): Response
     {
+        $limitHeader = config('api-performance.rate_limiting.headers.limit_header');
         $response->headers->set(
-            config('api-performance.rate_limiting.headers.limit_header', 'X-RateLimit-Limit'),
+            is_string($limitHeader) ? $limitHeader : 'X-RateLimit-Limit',
             (string) $limitResult['limit']
         );
+
+        $remainingHeader = config('api-performance.rate_limiting.headers.remaining_header');
         $response->headers->set(
-            config('api-performance.rate_limiting.headers.remaining_header', 'X-RateLimit-Remaining'),
+            is_string($remainingHeader) ? $remainingHeader : 'X-RateLimit-Remaining',
             (string) max(0, $limitResult['remaining'])
         );
+
+        $resetHeader = config('api-performance.rate_limiting.headers.reset_header');
         $response->headers->set(
-            config('api-performance.rate_limiting.headers.reset_header', 'X-RateLimit-Reset'),
+            is_string($resetHeader) ? $resetHeader : 'X-RateLimit-Reset',
             (string) $limitResult['reset_at']
         );
 
