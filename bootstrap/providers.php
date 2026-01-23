@@ -8,4 +8,5 @@ return [
     App\Providers\FallbackRecoveryServiceProvider::class,
     App\Providers\HorizonServiceProvider::class,
     App\Providers\RedisCacheOptimizationServiceProvider::class,
+    App\Providers\MemoryGuardServiceProvider::class,
 ];

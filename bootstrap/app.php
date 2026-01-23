@@ -17,9 +17,17 @@ return Application::configure(basePath: dirname(__DIR__))
         apiPrefix: 'api',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Global middleware - apply security headers to all requests
+        $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
+
         // API middleware configuration
         $middleware->api(prepend: [
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+        ]);
+
+        // API middleware - enforce JSON responses
+        $middleware->api(append: [
+            \App\Http\Middleware\ForceJsonResponse::class,
         ]);
 
         // Web middleware - prevent aggressive HTML caching

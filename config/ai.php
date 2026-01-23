@@ -30,29 +30,35 @@ return [
     'ollama' => [
         'enabled' => env('OLLAMA_ENABLED', true),
         'host' => env('OLLAMA_HOST', 'http://localhost:11434'),
-        'default_model' => env('OLLAMA_DEFAULT_MODEL', 'llama3.3'),
+        'default_model' => env('OLLAMA_DEFAULT_MODEL', 'llama3'),
         'timeout' => env('OLLAMA_TIMEOUT', 15), // seconds
         'temperature' => env('OLLAMA_TEMPERATURE', 0.3),
         'max_tokens' => env('OLLAMA_MAX_TOKENS', 2048),
 
         'available_models' => [
-            'llama3.3' => [
-                'name' => 'Llama 3.3',
-                'version' => '70b',
+            'llama3' => [
+                'name' => 'Llama 3',
+                'version' => 'latest',
                 'context_window' => 8192,
-                'description' => 'Meta\'s latest Llama model with excellent reasoning',
+                'description' => 'Meta\'s Llama 3 model - installed locally',
             ],
             'mistral' => [
                 'name' => 'Mistral',
-                'version' => '7b',
+                'version' => 'latest',
                 'context_window' => 8192,
-                'description' => 'Fast and efficient model for general tasks',
+                'description' => 'Mistral - fast and efficient, installed locally',
             ],
-            'qwen' => [
-                'name' => 'Qwen',
-                'version' => '14b',
+            'deepseek-r1' => [
+                'name' => 'DeepSeek R1',
+                'version' => '8b',
                 'context_window' => 8192,
-                'description' => 'Alibaba\'s Qwen model with strong multilingual support',
+                'description' => 'DeepSeek R1 reasoning model - installed locally',
+            ],
+            'gemma3' => [
+                'name' => 'Gemma 3',
+                'version' => '4b',
+                'context_window' => 8192,
+                'description' => 'Google\'s Gemma 3 model - installed locally',
             ],
         ],
     ],

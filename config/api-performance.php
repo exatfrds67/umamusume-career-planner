@@ -14,6 +14,22 @@
  */
 
 return [
+    /*
+    |--------------------------------------------------------------------------
+    | Memory Budget
+    |--------------------------------------------------------------------------
+    |
+    | Centralized configuration for PHP memory limits used by the application
+    | and background workers. Adjust the limit to prevent memory exhaustion.
+    |
+    */
+
+    'memory' => [
+        // Global PHP memory limit (applies via MemoryGuardServiceProvider)
+        'limit' => env('PHP_MEMORY_LIMIT', '512M'),
+        // Higher limit for testing (Pest / PHPUnit) to avoid OOM in parsing
+        'testing_limit' => env('PHP_MEMORY_LIMIT_TESTING', '2048M'),
+    ],
 
     /*
     |--------------------------------------------------------------------------
