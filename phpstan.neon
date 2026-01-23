@@ -11,458 +11,100 @@ parameters:
   excludePaths:
     - phpstan-stubs/
 
-  # Stub files removed - using ignore rules instead for test property access
+  stubFiles:
+    - phpstan-stubs/pest-test-properties.stub
+
+  ignoreErrors:
+    # Pest test properties set in beforeEach() hooks - these are dynamically assigned at runtime
+    # Using wildcard to match all test properties since Pest uses dynamic property assignment
+    - message: '#Access to an undefined property PHPUnit\\Framework\\TestCase::\$\w+\.#'
+      path: tests/*
+    
+    # Laravel testing methods available through traits but not recognized by PHPStan
+    - message: '#Call to an undefined method PHPUnit\\Framework\\TestCase::mock\(\)\.#'
+      path: tests/*
+
+    # Test-specific template type issues - focus on application code quality
+    - message: '#Unable to resolve the template type .* in call to (method|function) .*#'
+      path: tests/*
+    - message: '#Parameter .* of .* expects .*, mixed given\.#'
+      path: tests/*
+    - message: '#Cannot access offset .* on mixed\.#'
+      path: tests/*
+    - message: '#Cannot cast mixed to .*\.#'
+      path: tests/*
+    - message: '#Method .* has parameter .* with no value type specified in iterable type array\.#'
+      path: tests/*
+    - message: '#Method .* return type has no value type specified in iterable type array\.#'
+      path: tests/*
+
+    # HasFactory generic type - Laravel convention, not critical
+    - message: '#Class .+ uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types: TFactory#'
+      path: app/Models/*
+
+    # PHPDoc type covariance for $fillable - Laravel convention
+    - message: '#PHPDoc type array<int, string> of property .+::\$fillable is not covariant with PHPDoc type list<string>#'
+      path: app/Models/*
+
+    # Missing iterableValue types in PHPDoc - non-critical documentation issue
+    - message: '#has no value type specified in iterable type array#'
+
+    # Generic Collection types - complex to fix, non-critical
+    - message: '#with generic class Illuminate\\Support\\Collection but does not specify its types#'
+
+    # Generic BelongsTo/HasMany types - Laravel convention
+    - message: '#return type with generic class Illuminate\\Database\\Eloquent\\Relations\\(BelongsTo|HasMany|BelongsToMany|HasOne) does not specify its types#'
+      path: app/Models/*
+
+    # Scope methods - Laravel convention for query scopes
+    - message: '#Method .+::scope\w+\(\) has no return type specified#'
+      path: app/Models/*
+    - message: '#Method .+::scope\w+\(\) has parameter \$query with no type specified#'
+      path: app/Models/*
+
+    # Attribute casts - Laravel convention
+    - message: '#return type with generic class Illuminate\\Database\\Eloquent\\Casts\\Attribute does not specify its types#'
+      path: app/Models/*
+
+    # Collection map return type issues - complex generic inference
+    - message: '#Return type of call to method Illuminate\\(Database\\Eloquent\\|Support\\)Collection.+::map\(\) contains unresolvable type#'
+
+    # Collection callback unresolvable types
+    - message: '#Parameter .+ of method Illuminate.+Collection.+::map\(\) contains unresolvable type#'
+
+    # Unnecessary collection calls - optimization suggestion, not error
+    - message: "#Called 'pluck' on Laravel collection, but could have been retrieved as a query#"
+
+    # Always true/false conditions - often intentional defensive coding
+    - message: '#Comparison operation .+ is always (true|false)#'
+    - message: '#If condition is always (true|false)#'
+    - message: '#Call to function is_array\(\) with array will always evaluate to true#'
+
+    # Nullsafe operator suggestions - style preference
+    - message: '#Using nullsafe property access .+ on left side of \?\? is unnecessary#'
+
+    # Match arm always true - often intentional for exhaustive matching
+    - message: '#Match arm comparison .+ is always true#'
+
+    # Null coalesce offset suggestions
+    - message: "#Offset .+ on \\*NEVER\\* on left side of \\?\\? always exists#"
+
+    # Empty array foreach - often intentional for empty state handling
+    - message: '#Empty array passed to foreach#'
+
+    # Dead catch blocks - often intentional for future-proofing
+    - message: '#Dead catch - .+ is never thrown in the try block#'
+
+    # No error to ignore - stale ignore comments - exclude the file instead
+    # - message: '#No error to ignore is reported on line#'
+    #   path: app/Http/Controllers/ProfileController.php
+
+    # PHPDoc @var tag issues in tests
+    - message: '#PHPDoc tag @var with type .+ is not subtype of native type null#'
+      path: tests/*
+
+    # Pest describe call issues
+    - message: '#Call to an undefined method Pest\\PendingCalls\\DescribeCall::with\(\)#'
+      path: tests/*
 
   treatPhpDocTypesAsCertain: false
-  
-  ignoreErrors:
-    # Mixed type operations - common in dynamic data from cache/config
-    - '#Cannot cast mixed to (int|string|float)\.#'
-    - '#Cannot access offset .+ on mixed\.#'
-    - '#Binary operation .+ between mixed and .+ results in an error\.#'
-    - '#Binary operation .+ between .+ and mixed results in an error\.#'
-    
-    # Iterator and array type issues from dynamic data
-    - '#Argument of an invalid type (mixed|string) supplied for foreach, only iterables are supported\.#'
-    - '#Parameter .+ of function (array_filter|array_slice|array_merge|array_sum|array_column|count|in_array|array_map|json_decode) expects .+, (mixed|array\<.+\>|string\|false) given\.#'
-    - '#Only iterables can be unpacked, mixed given\.#'
-    
-    # Return type issues from cache/API returns - these methods return data from external sources
-    - '#should return .+ but returns mixed\.#'
-    - '#should return .+ but returns .+\|null\.#'
-    - '#should return .+ but returns (non-empty-)?array<.+>\.#'
-    - '#should return .+ but returns float\|int(\|string)?\.#'
-    - '#should return array\{.+\} but returns array\{.+\}\.#'
-    
-    # String operations with mixed
-    - '#Part .+ of encapsed string cannot be cast to string\.#'
-    - '#Parameter .+ of function (strlen|strtolower|str_contains|sprintf|strcmp|trim|substr|md5|unlink) expects .+, (mixed|string\|null|string\|false) given\.#'
-    
-    # Collection generics - complex to fully type
-    -
-      message: '#with generic class Illuminate\\Support\\Collection but does not specify its types#'
-      reportUnmatched: false
-    
-    # Method parameter type issues
-    - '#Unable to resolve the template type .+ in call to function collect#'
-    - '#contains unresolvable type#'
-    
-    # Possibly invalid array keys from dynamic data
-    - '#Possibly invalid array key type mixed\.#'
-    
-    # Property access on mixed
-    - '#Cannot access property .+ on mixed\.#'
-    - '#Cannot call method .+ on mixed\.#'
-    - '#Cannot use \+\+ on mixed\.#'
-    
-    # Increment on mixed
-    -
-      message: '#Cannot use -- on mixed\.#'
-      reportUnmatched: false
-    
-    # Return type array generics - too many to fix individually
-    - '#return type has no value type specified in iterable type array\.#'
-    
-    # Parameter type array generics
-    - '#has parameter .+ with no value type specified in iterable type array\.#'
-    - '#has parameter .+ with no type specified\.#'
-    
-    # Argument type mismatches from request input and find() returns
-    - '#Parameter .+ expects .+, mixed given\.#'
-    - '#Parameter .+ expects .+, .+\|Illuminate\\Database\\Eloquent\\Collection<.+> given\.#'
-    
-    # Property type assignment from dynamic data
-    - '#Property .+ does not accept (array<.+>|string)\.#'
-    
-    # Property access on Model|Collection (from find() methods that may return collection)
-    - '#Access to an undefined property .+\|Illuminate\\Database\\Eloquent\\Collection<.+>::\$.+\.#'
-    
-    # Call to undefined method on Model|Collection
-    - '#Call to an undefined method .+\|Illuminate\\Database\\Eloquent\\Collection<.+>::.+\(\)\.#'
-    
-    # Property access on potentially null objects - common in optional relationships
-    - '#Cannot access property .+ on .+\|null\.#'
-    - '#Cannot call method .+ on .+\|null\.#'
-    
-    # Undefined methods on services (missing implementation stubs)
-    -
-      message: '#Call to an undefined method#'
-      paths:
-        - app/Http/Controllers/Api/MCPDashboardController.php
-        - app/Http/Controllers/Api/SkillManagementController.php
-      reportUnmatched: false
-    
-    # PHPDoc var tag issues in tests with Mockery
-    - '#PHPDoc tag @var with type .+MockInterface is not subtype of native type null\.#'
-    - '#PHPDoc tag @var with type .+ is not subtype of native type null\.#'
-    
-    # Property only written (unused injected services)
-    - '#Property .+ is never read, only written\.#'
-    
-    # Nullsafe operator recommendations (not errors, just suggestions)
-    - '#Using nullsafe property access .+ on left side of \?\? is unnecessary#'
-    
-    # Generic trait types (HasFactory) - too many models to annotate individually
-    - '#Class .+ uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types: TFactory#'
-    
-    # Missing return type on scopes (Builder return type is complex)
-    -
-      message: '#Method .+::scope.+\(\) has no return type specified\.#'
-      reportUnmatched: false
-    
-    # Relationship generic types (complex to fully type)
-    - '#return type with generic class Illuminate\\Database\\Eloquent\\Relations\\.+ does not specify its types#'
-    
-    # Argument type with int|string from request input
-    - '#Parameter .+ expects int, int\|string(\|null)? given\.#'
-    - '#Parameter .+ expects App\\Models\\.+, App\\Models\\.+\|null given\.#'
-    
-    # View string type (Laravel view() helper)
-    - '#Parameter \#1 \$view of function view expects view-string\|null, string given\.#'
-    
-    # Function alreadyNarrowedType (is_array on arrays, etc.)
-    -
-      message: '#Call to function (is_array|is_string|is_int|is_null) with .+ will always evaluate to (true|false)\.#'
-      reportUnmatched: false
-    
-    # Return type mismatches with numeric types
-    -
-      message: '#should return array<string, int> but returns array<.+>\.#'
-      reportUnmatched: false
-    -
-      message: '#should return array<int, array<string, mixed>> but returns array<mixed>\.#'
-      reportUnmatched: false
-    
-    # Missing return type on controller methods
-    -
-      message: '#Method App\\Http\\Controllers\\.+::.+\(\) has no return type specified\.#'
-      reportUnmatched: false
-    
-    # Missing return type on model methods
-    -
-      message: '#Method App\\Models\\.+::.+\(\) has no return type specified\.#'
-      reportUnmatched: false
-    
-    # Offset access not found (dynamic array structures)
-    - '#Offset .+ does not exist on array\{.+\}\.#'
-    
-    # Undefined properties on models (missing @property PHPDocs)
-    - '#Access to an undefined property App\\Models\\.+::\$#'
-    
-    # Collection type mismatches (Eloquent Collection vs Support Collection)
-    - '#Parameter .+ expects Illuminate\\Support\\Collection<.+>, Illuminate\\Database\\Eloquent\\Collection<.+>\|Illuminate\\Support\\Collection<.+> given\.#'
-    
-    # Response header type mismatch
-    - '#Parameter \#2 \$values of method Illuminate\\Http\\Response::header\(\) expects array\|string, int.+ given\.#'
-    
-    # PHPDoc @property with no value type in iterable (too many to fix individually)
-    - '#Class .+ has PHPDoc tag @property for property \$.+ with no value type specified in iterable type array\.#'
-    
-    # PHPDoc $fillable covariance with Model::$fillable
-    - '#PHPDoc type array<int, string> of property .+::\$fillable is not covariant with PHPDoc type list<string> of overridden property Illuminate\\Database\\Eloquent\\Model::\$fillable\.#'
-    
-    # callable type mismatches from standard PHP functions
-    - "#Parameter \\#1 \\$callback of function array_map expects \\(callable\\(mixed\\): mixed\\)\\|null, 'intval' given\\.#"
-    
-    # Template type resolution issues in Eloquent relationships
-    - '#Unable to resolve the template type .+ in call to method .+::using\(\)#'
-    - '#Parameter .+ of method .+::using\(\) expects class-string<.+>, string given\.#'
-    
-    # Method calls on non-object (Carbon on string, etc.)
-    - '#Cannot call method .+\(\) on string\.#'
-    
-    # Test property access on PHPUnit TestCase
-    - '#Access to an undefined property PHPUnit\\Framework\\TestCase::\$#'
-    
-    # Property type assignment mismatches in tests
-    -
-      message: '#Property .+ does not accept int#'
-      reportUnmatched: false
-    
-    # Property type assignment from mixed
-    -
-      message: '#Property .+::\$.+ \(array\) does not accept mixed\.#'
-      reportUnmatched: false
-    
-    # Return type with generic class Collection does not specify its types
-    -
-      message: '#return type with generic class Illuminate\\Database\\Eloquent\\Collection does not specify its types#'
-      reportUnmatched: false
-    
-    # function.alreadyNarrowedType - is_array on arrays
-    - '#Call to function is_array\(\) with .+ will always evaluate to true\.#'
-    
-    # Argument type with int|string|null from user input
-    -
-      message: '#Parameter .+ expects int(\|null)?, int\|string(\|null)? given\.#'
-      reportUnmatched: false
-    - '#Parameter .+ expects string, string\|null given\.#'
-    - '#Parameter .+ expects float\|int, float\|int\|null given\.#'
-    
-    # Comparison operations always true/false
-    - '#Comparison operation .+ is always (true|false)\.#'
-    
-    # arguments.count - constructor parameter mismatches
-    -
-      message: '#constructor invoked with .+ parameter.?, .+ required\.#'
-      reportUnmatched: false
-    
-    # Array offset might not exist - common in dynamic arrays
-    - "#Offset .+ might not exist on array\\{.+\\}\\.#"
-    
-    # Property assignment type mismatch in tests
-    - '#Property .+::\$.+ \(.+MockObject\) does not accept PHPUnit\\Framework\\MockObject\\MockObject\.#'
-    
-    # Parameter type expects list<>, given array<>
-    - '#Parameter .+ expects array<int, float>, list<mixed> given\.#'
-    
-    # Property assignment type mismatch from config
-    -
-      message: '#Property .+ does not accept mixed#'
-      reportUnmatched: false
-    
-    # Template type resolution issues in Collection methods
-    - '#Unable to resolve the template type .+ in call to method Illuminate\\Support\\Collection<.+>::.+\(\)#'
-    
-    # Return type string but returns string|false (json_encode, file ops)
-    - '#should return string but returns string\|false\.#'
-    
-    # Unknown class (external package not installed)
-    -
-      message: '#on an unknown class CloudStudio#'
-      reportUnmatched: false
-    
-    # Call to undefined method on object (dynamic typing)
-    - '#Call to an undefined method object::.+\(\)\.#'
-    
-    # Undefined properties/methods on base Eloquent Model (should use concrete model)
-    -
-      message: '#Access to an undefined property Illuminate.+Model::#'
-      reportUnmatched: false
-    -
-      message: '#Call to an undefined method Illuminate.+Model::#'
-      reportUnmatched: false
-    
-    # Return type with generic class Support Collection
-    - '#return type with generic class Illuminate\\Support\\Collection does not specify its types#'
-    
-    # Parameter expects array shape but given array<string, mixed>
-    -
-      message: '#Parameter .+ expects array.+, array<string, mixed> given#'
-      reportUnmatched: false
-    
-    # Match arm comparison always true (typically from defensive coding)
-    - '#Match arm comparison between .+ is always true\.#'
-    
-    # larastan performance warnings (not errors)
-    - "#Called '.+' on Laravel collection, but could have been retrieved as a query#"
-    
-    # Undefined method on contracts/interfaces (implementation-specific)
-    -
-      message: '#Call to an undefined method Illuminate.+Cache.+Repository#'
-      reportUnmatched: false
-    
-    # AWS SDK method not found (external SDK)
-    -
-      message: '#Call to an undefined method Aws#'
-      reportUnmatched: false
-    
-    # Filesystem put with string|false
-    -
-      message: '#Parameter .+ of method Illuminate.+FilesystemAdapter::put#'
-      reportUnmatched: false
-    
-    # offsetAccess.nonOffsetAccessible - accessing offset on mixed
-    - '#Cannot access an offset on mixed#'
-    
-    # offsetAccess.notFound - offset might not exist
-    - '#Offset .+ might not exist on#'
-    
-    # offsetAccess.invalidOffset - invalid array key types (float used as index)
-    - '#Possibly invalid array key type float#'
-    - '#Invalid array key type float#'
-    
-    # min/max with possibly empty arrays
-    - '#Parameter .+ of function (min|max) expects non-empty-array#'
-    
-    # Dead catch blocks (defensive coding)
-    -
-      message: '#Dead catch - .+ is never thrown in the try block#'
-      reportUnmatched: false
-    
-    # Strict comparison always true/false
-    - '#Strict comparison using .+ will always evaluate to (true|false)#'
-    
-    # ucfirst with int|string
-    - '#Parameter .+ of function ucfirst expects string, int#'
-    
-    # date with int|false
-    - '#Parameter .+ of function date expects int\|null, int\|false given#'
-    
-    # GdImage vs resource (PHP 8 GD type changes)
-    -
-      message: '#Parameter .+ expects GdImage, resource given#'
-      reportUnmatched: false
-    -
-      message: '#Parameter .+ of function imagecreatetruecolor expects int<1, max>, int given#'
-      reportUnmatched: false
-    -
-      message: '#should return resource but returns#'
-      reportUnmatched: false
-    
-    # Parameter expects array<float>, given array<mixed>
-    - '#Parameter .+ expects array<float(\|int)?>, (array|list)<mixed> given#'
-    
-    # Property access on object
-    - '#Access to an undefined property object::#'
-    
-    # Return type array<string, array>, but returns array
-    - '#should return array<.+> but returns array#'
-    - '#should return array<.+> but returns list<#'
-    
-    # Nullsafe on non-nullable
-    -
-      message: '#Using nullsafe .+ on non-nullable type#'
-      reportUnmatched: false
-    
-    # Null coalesce on non-nullable
-    - '#on left side of .+ always exists and is not (nullable|falsy)#'
-    - '#Expression on left side of .+ is not nullable#'
-    
-    # PHPDoc type incompatible with native type
-    -
-      message: '#PHPDoc tag @param for parameter .+ is incompatible with native type#'
-      reportUnmatched: false
-    
-    # Parameter expects array, given array|null
-    -
-      message: '#Parameter .+ of method .+::getCacheKey\(\) expects string, array#'
-      reportUnmatched: false
-    
-    # array_filter callback type mismatch
-    - '#Parameter .+ of function array_filter expects#'
-    
-    # should return int but returns float
-    - '#should return int but returns float#'
-    
-    # Method not found on Character model (missing relationship)
-    -
-      message: '#Call to an undefined method App.+Character::skillHints#'
-      reportUnmatched: false
-    
-    # Match expression unhandled
-    - '#Match expression does not handle remaining value#'
-    
-    # Parameter expects array, given array|null
-    - '#Parameter .+ expects array, array\|null given#'
-    
-    # Variable in empty() always exists
-    - '#Variable .+ in empty\(\) always exists#'
-    
-    # Parameter expects array<string, mixed>, given list<array>
-    - '#Parameter .+ expects array<string, mixed>, list<array#'
-    
-    # Return type should return array shape but returns array
-    - '#should return array\{.+\} but returns array#'
-    
-    # Parameter expects float|int, float|null given
-    - '#Parameter .+ of function round expects float\|int, float\|null given#'
-    
-    # Various parameter type mismatches
-    - '#Parameter .+ expects string, (array|string\|false) given#'
-    - '#Parameter .+ of function count expects .+, string given#'
-    - '#Parameter .+ of function array_merge expects array, array\|string given#'
-    - '#Parameter .+ of function json_decode expects string, array.+\|string given#'
-    - '#Parameter .+ of function strlen expects string, array.+ given#'
-    
-    # Property type assignment mismatch
-    - '#Property .+ does not accept float\|int#'
-    
-    # Redis scan pattern type
-    - '#Parameter .+ of static method Redis::scan\(\) expects string\|null, array.+ given#'
-    
-    # Redis undefined static method
-    - '#Call to an undefined static method Illuminate.+Redis::#'
-    
-    # Parameter expects array shape, given array<int, array>
-    - '#Parameter .+ expects array<int, array\{.+\}>, array<int, array<string, mixed>> given#'
-    
-    # Parameter expects array<string, int>, given array
-    - '#Parameter .+ expects array<string, int>, array<#'
-    
-    # Parameter expects array<string>, given array<mixed>
-    - '#Parameter .+ expects array<string>, array<mixed> given#'
-    
-    # Test method not found on TestCase/TestCall/DescribeCall
-    - '#Call to an undefined method (PHPUnit.+TestCase|Pest.+TestCall|Pest.+DescribeCall)::#'
-    
-    # Pest Expectation property access (dynamic fluent interface)
-    - '#Access to an undefined property Pest\\(Expectation|Mixins\\Expectation)<.+>::#'
-    
-    # Pest TestCall/HigherOrderTapProxy property access (test fixtures)
-    - '#Access to an undefined property Pest\\PendingCalls\\TestCall\|Pest\\Support\\HigherOrderTapProxy::#'
-    
-    # Mockery methods (union type patterns)
-    - '#Call to an undefined method Mockery.+::#'
-    
-    # Variable in PHPDoc @var doesn't exist (Pest test setup)
-    - '#Variable .+ in PHPDoc tag @var does not exist#'
-    
-    # booleanOr/booleanAnd always true/false (defensive conditions)
-    - '#Result of .+ is always (true|false)#'
-    
-    # GdImage expects resource (PHP 8 type changes)
-    - '#expects resource, GdImage given#'
-    
-    # Mockery\MockInterface given where service expected (test constructor injection)
-    - '#Parameter .+ expects .+, Mockery\\MockInterface given#'
-    
-    # Unable to resolve template type in Pest expect() calls
-    - '#Unable to resolve the template type .+ in call to (function expect|method Pest)#'
-    
-    # Cannot call method on null (Pest test fixtures)
-    -
-      message: '#Cannot call method .+\(\) on null#'
-      paths:
-        - tests/
-
-    # Pest expectation binding uses $this in closures
-    -
-      message: '#Undefined variable: \$this#'
-      paths:
-        - tests/Pest.php
-    
-    # PHPUnit MockObject property assignment in tests
-    - '#Property .+ does not accept PHPUnit\\Framework\\MockObject\\MockObject#'
-    
-    # Stub file errors (excluded but scanFiles may still reference)
-    -
-      message: '#unknown class PHPUnit\\Framework\\Assert#'
-      reportUnmatched: false
-    -
-      message: '#unknown class Illuminate\\#'
-      paths:
-        - phpstan-stubs/
-      reportUnmatched: false
-    -
-      message: '#Class PHPUnit\\Framework\\TestCase extends unknown class PHPUnit\\Framework\\Assert#'
-      paths:
-        - phpstan-stubs/testcase-properties.php
-      reportUnmatched: false
-    -
-      message: '#PHPDoc tag @method for method PHPUnit\\Framework\\TestCase::.+ contains unknown class#'
-      paths:
-        - phpstan-stubs/testcase-properties.php
-      reportUnmatched: false
-    
-    # Eloquent where() method signature - accepts 2-4 arguments
-    - '#Missing argument .+ for where\(\)#'
-    - '#Too many arguments to function update\(\)#'
-    
-    # Pest test property access (dynamic test fixtures)
-    -
-      message: '#Undefined property.*cacheManager#'
-      reportUnmatched: false
-    -
-      message: '#Undefined property.*mcpClient#'
-      reportUnmatched: false

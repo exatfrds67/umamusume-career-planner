@@ -13,6 +13,7 @@
  * - Stable asset loading for minimal CLS
  */
 
+// Build: 2026-01-22-v3-fix-retry
 const CACHE_VERSION = "v3";
 const CACHE_NAME = `umamusume-career-planner-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `umamusume-runtime-${CACHE_VERSION}`;
@@ -189,7 +190,7 @@ async function networkFirstStrategy(request) {
         const networkResponse = await fetch(request);
 
         // Cache successful GET responses only
-        if (networkResponse.ok && request.method === 'GET') {
+        if (networkResponse.ok && request.method === "GET") {
             const cache = await caches.open(CACHE_NAME);
             cache.put(request, networkResponse.clone());
         }
@@ -229,7 +230,7 @@ async function cacheFirstStrategy(request, cacheName) {
     try {
         const networkResponse = await fetch(request);
 
-        if (networkResponse.ok && request.method === 'GET') {
+        if (networkResponse.ok && request.method === "GET") {
             const cache = await caches.open(cacheName);
             cache.put(request, networkResponse.clone());
             await trimCache(cacheName, CACHE_LIMITS.runtime);
@@ -253,15 +254,18 @@ async function cacheFirstWithRefresh(request, cacheName) {
     const cachedResponse = await cache.match(request);
 
     // Start network fetch in background (only for GET requests)
-    const fetchPromise = request.method === 'GET' ? fetch(request)
-        .then((networkResponse) => {
-            if (networkResponse.ok) {
-                cache.put(request, networkResponse.clone());
-                trimCache(cacheName, CACHE_LIMITS.images);
-            }
-            return networkResponse;
-        })
-        .catch(() => null) : Promise.resolve(null);
+    const fetchPromise =
+        request.method === "GET"
+            ? fetch(request)
+                  .then((networkResponse) => {
+                      if (networkResponse.ok) {
+                          cache.put(request, networkResponse.clone());
+                          trimCache(cacheName, CACHE_LIMITS.images);
+                      }
+                      return networkResponse;
+                  })
+                  .catch(() => null)
+            : Promise.resolve(null);
 
     // Return cached response immediately if available
     if (cachedResponse) {
@@ -288,20 +292,23 @@ async function staleWhileRevalidate(request, cacheName) {
     const cachedResponse = await cache.match(request);
 
     // Start network fetch (only for GET requests)
-    const fetchPromise = request.method === 'GET' ? fetch(request)
-        .then((networkResponse) => {
-            if (networkResponse.ok) {
-                // Add timestamp for expiration checking
-                const responseWithTimestamp = networkResponse.clone();
-                cache.put(request, responseWithTimestamp);
-                trimCache(cacheName, CACHE_LIMITS.api);
-            }
-            return networkResponse;
-        })
-        .catch(() => null) : fetch(request).catch(() => null);
+    const fetchPromise =
+        request.method === "GET"
+            ? fetch(request)
+                  .then((networkResponse) => {
+                      if (networkResponse.ok) {
+                          // Add timestamp for expiration checking
+                          const responseWithTimestamp = networkResponse.clone();
+                          cache.put(request, responseWithTimestamp);
+                          trimCache(cacheName, CACHE_LIMITS.api);
+                      }
+                      return networkResponse;
+                  })
+                  .catch(() => null)
+            : fetch(request).catch(() => null);
 
     // Return cached response if fresh enough
-    if (cachedResponse && request.method === 'GET') {
+    if (cachedResponse && request.method === "GET") {
         // Check if cache is still valid (within expiration time)
         const cacheDate = cachedResponse.headers.get("date");
         if (cacheDate) {
@@ -320,7 +327,7 @@ async function staleWhileRevalidate(request, cacheName) {
     }
 
     // Return stale cache if network fails (GET only)
-    if (cachedResponse && request.method === 'GET') {
+    if (cachedResponse && request.method === "GET") {
         return cachedResponse;
     }
 
@@ -339,7 +346,7 @@ async function networkWithCacheFallback(request) {
         const networkResponse = await fetch(request);
 
         // Only cache GET requests (HEAD, POST, PUT, DELETE cannot be cached)
-        if (networkResponse.ok && request.method === 'GET') {
+        if (networkResponse.ok && request.method === "GET") {
             const cache = await caches.open(RUNTIME_CACHE);
             cache.put(request, networkResponse.clone());
         }
@@ -390,7 +397,7 @@ self.addEventListener("message", (event) => {
                 clearAllCaches().then(() => {
                     notifyClients({ type: "CACHE_CLEARED" });
                     event.ports[0]?.postMessage({ success: true });
-                })
+                }),
             );
             break;
 
@@ -399,7 +406,7 @@ self.addEventListener("message", (event) => {
                 caches.delete(API_CACHE).then(() => {
                     notifyClients({ type: "API_CACHE_CLEARED" });
                     event.ports[0]?.postMessage({ success: true });
-                })
+                }),
             );
             break;
 
@@ -408,7 +415,7 @@ self.addEventListener("message", (event) => {
                 event.waitUntil(
                     precacheAssets(payload.urls).then(() => {
                         event.ports[0]?.postMessage({ success: true });
-                    })
+                    }),
                 );
             }
             break;
@@ -420,7 +427,7 @@ self.addEventListener("message", (event) => {
                         type: "CACHE_STATUS",
                         payload: status,
                     });
-                })
+                }),
             );
             break;
     }

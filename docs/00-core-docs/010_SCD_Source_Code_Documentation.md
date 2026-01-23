@@ -2,1482 +2,909 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 1.0
-**Date**: January 14, 2026
+**Document Version**: 2.1.0
+**Date**: January 23, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Updated**: Aligned with Laravel 12, modern PHP practices, and AI
-integration architecture
+**Status**: Current - Aligned with codebase
 
 ---
 
 ## Table of Contents
 
-1. [Introduction](#introduction)
+1. [Introduction](#1-introduction)
 2. [Project Structure](#2-project-structure)
-3. [Architecture Overview](#3-architecture-overview)
-4. [Core Components](#4-core-components)
-5. [API Documentation](#5-api-documentation)
+3. [Key Namespaces & Classes](#3-key-namespaces--classes)
+4. [Service Layer Architecture](#4-service-layer-architecture)
+5. [AI and MCP Integration](#5-ai-and-mcp-integration)
+6. [Frontend Code Structure](#6-frontend-code-structure)
+7. [API Reference](#7-api-reference)
+8. [Coding Standards](#8-coding-standards)
+9. [Testing Strategy](#9-testing-strategy)
 
 ---
 
-## Introduction
+## 1. Introduction
 
-### Purpose
+This document provides a comprehensive map of the source code structure for the Umamusume Pretty Derby Career Planner. It serves as a guide for developers navigating the Laravel 12 codebase, focusing on the Service Layer, Neuron AI agents, MCP integration, and Livewire components.
 
-This Source Code Documentation (SCD) provides comprehensive
-documentation for the Umamusume Career Planner codebase, including
-architecture patterns, component specifications, API documentation, and
-development guidelines.
+### 1.1 Architecture Overview
 
-### Technology Stack
-
-#### Backend Technologies
-
-- **Framework**: Laravel 12 with strict mode enabled
-- **PHP Version**: 8.3+ with modern features
-- **Database**: MySQL 8.0+ with InnoDB engine
-- **Caching**: Redis 7.0+ for application and session caching
-- **Queue System**: Laravel Queues with Redis driver
-- **Authentication**: Laravel Sanctum with multi-factor authentication
-
-#### Frontend Technologies
-
-- **CSS Framework**: Tailwind CSS v4 with zero configuration
-- **JavaScript**: Modern ES2023+ with Vite build system
-- **Progressive Web App**: Service Workers, offline functionality
-- **Real-time**: WebSocket integration with Laravel Broadcasting
-- **Accessibility**: WCAG 2.2 AA compliance throughout
-
-#### AI Integration
-
-- **Local AI**: Ollama with Llama 3.3, Mistral, Qwen 2.5 models
-- **Cloud AI**: AWS Bedrock with Claude 4.5 and Nova 2 series
-- **MCP Servers**: Model Context Protocol for enhanced functionality
-- **Cost Management**: Intelligent routing and budget tracking
-
-### Code Standards
-
-#### PHP Standards
-
-- **PSR-12**: Extended coding style standard
-- **PSR-4**: Autoloading standard
-- **Strict Types**: Enabled in all PHP files
-- **Type Declarations**: Required for all method parameters and return
-  types
-- **Documentation**: PHPDoc blocks for all public methods and classes
-
-#### JavaScript Standards
-
-- **ES2023+**: Modern JavaScript features
-- **ESLint**: Code quality and consistency
-- **Prettier**: Code formatting
-- **JSDoc**: Documentation for complex functions
-
----
+```mermaid
+flowchart TB
+    subgraph Presentation["Presentation Layer"]
+        Blade["Blade Templates"]
+        Livewire["Livewire Components"]
+        Alpine["Alpine.js"]
+    end
+    
+    subgraph Application["Application Layer"]
+        Controllers["Controllers"]
+        Services["Services"]
+        FormRequests["Form Requests"]
+    end
+    
+    subgraph AI["AI & MCP Layer"]
+        Neuron["Neuron Agents"]
+        AIServices["AI Services"]
+        MCPServices["MCP Services"]
+    end
+    
+    subgraph Domain["Domain Layer"]
+        Models["Eloquent Models"]
+        Enums["Enums"]
+        Repositories["Repositories"]
+    end
+    
+    subgraph Infrastructure["Infrastructure Layer"]
+        Database[(MySQL)]
+        Cache["Redis Cache"]
+        Storage["File Storage"]
+        ExternalAPIs["External APIs"]
+    end
+    
+    Blade --> Livewire
+    Livewire --> Alpine
+    Livewire --> Services
+    Controllers --> Services
+    Services --> Models
+    Services --> AIServices
+    AIServices --> Neuron
+    Neuron --> MCPServices
+    Models --> Enums
+    Models --> Database
+    Services --> Cache
+    Services --> ExternalAPIs
+    
+    style Presentation fill:#e3f2fd
+    style Application fill:#f3e5f5
+    style AI fill:#fff3e0
+    style Domain fill:#e8f5e9
+    style Infrastructure fill:#fce4ec
+```
 
 ---
 
 ## 2. Project Structure
 
-### 2.1 Laravel Application Structure
+### 2.1 Top-Level Structure
+
+```mermaid
+flowchart TD
+    Root["/"]
+    
+    Root --> App["app/"]
+    Root --> Config["config/"]
+    Root --> Database["database/"]
+    Root --> Resources["resources/"]
+    Root --> Routes["routes/"]
+    Root --> Tests["tests/"]
+    
+    App --> Models["Models/"]
+    App --> Services["Services/"]
+    App --> Http["Http/"]
+    App --> Livewire["Livewire/"]
+    App --> Neuron["Neuron/"]
+    App --> Repositories["Repositories/"]
+    
+    Services --> AIServices["AI/"]
+    Services --> MCPServices["MCP/"]
+    Services --> ExternalAPI["ExternalAPI/"]
+    Services --> OCRServices["OCR/"]
+    Services --> DataServices["Data/"]
+```
+
+### 2.2 Directory Details
 
 ```text
 umamusume-career-planner/
 ├── app/
-│   ├── Console/
-│   │   ├── Commands/
-│   │   │   ├── AI/
-│   │   │   ├── Cache/
-│   │   │   └── Sync/
-│   │   └── Kernel.php
-│   ├── Events/
-│   │   ├── Character/
-│   │   ├── Training/
-│   │   └── AI/
-│   ├── Exceptions/
-│   │   ├── AI/
-│   │   ├── API/
-│   │   └── Handler.php
+│   ├── Enums/              # PHP 8.1 Enums (Status, Types, Grades)
 │   ├── Http/
-│   │   ├── Controllers/
-│   │   │   ├── API/
-│   │   │   │   ├── V1/
-│   │   │   │   │   ├── CharacterController.php
-│   │   │   │   │   ├── TrainingController.php
-│   │   │   │   │   ├── AIController.php
-│   │   │   │   │   └── AnalyticsController.php
-│   │   │   │   └── V2/ (future)
-│   │   │   ├── Auth/
-│   │   │   └── Web/
-│   │   ├── Middleware/
-│   │   │   ├── API/
-│   │   │   ├── Auth/
-│   │   │   └── Security/
-│   │   ├── Requests/
-│   │   │   ├── Character/
-│   │   │   ├── Training/
-│   │   │   └── AI/
-│   │   └── Resources/
-│   │       ├── Character/
-│   │       ├── Training/
-│   │       └── AI/
-│   ├── Integrations/
-│   │   ├── AI/
-│   │   │   ├── Ollama/
-│   │   │   ├── Bedrock/
-│   │   │   └── Contracts/
-│   │   ├── APIs/
-│   │   │   ├── Umapyoi/
-│   │   │   ├── UmamusumeDB/
-│   │   │   └── Contracts/
-│   │   └── MCP/
-│   ├── Jobs/
-│   │   ├── AI/
-│   │   ├── Sync/
-│   │   └── Analytics/
-│   ├── Listeners/
-│   │   ├── Character/
-│   │   ├── Training/
-│   │   └── AI/
-│   ├── Models/
-│   │   ├── Character/
-│   │   ├── Training/
-│   │   ├── AI/
-│   │   └── User/
-│   ├── Providers/
-│   │   ├── AIServiceProvider.php
-│   │   ├── IntegrationServiceProvider.php
-│   │   └── AppServiceProvider.php
-│   ├── Repositories/
-│   │   ├── Character/
-│   │   ├── Training/
-│   │   └── AI/
-│   └── Services/
-│       ├── AI/
-│       ├── Analytics/
-│       ├── Cache/
-│       └── Security/
-├── bootstrap/
+│   │   ├── Controllers/    # API and Web Controllers
+│   │   ├── Middleware/     # Custom Middleware
+│   │   └── Requests/       # Form Request Validation
+│   ├── Livewire/           # Livewire Components
+│   ├── Models/             # Eloquent Models
+│   ├── Neuron/             # Neuron AI Agents
+│   │   ├── Agents/         # Agent Implementations
+│   │   └── Tools/          # Agent Tools
+│   ├── Repositories/       # Data Access Layer
+│   ├── Services/           # Business Logic Layer
+│   │   ├── AI/             # AI Provider Services
+│   │   ├── Data/           # Data Management Services
+│   │   ├── ExternalAPI/    # External API Clients
+│   │   ├── MCP/            # MCP Server Services
+│   │   └── OCR/            # OCR Processing Services
+│   └── View/               # Blade View Components
 ├── config/
-│   ├── ai.php
-│   ├── integrations.php
-│   └── mcp.php
+│   ├── ai.php              # AI Provider Configuration
+│   ├── mcp.php             # MCP Server Configuration
+│   ├── mcp_tools.php       # MCP Tool Controls
+│   ├── mcp-agents.php      # MCP Agent Settings
+│   ├── neuron.php          # Neuron AI Configuration
+│   └── external-apis.php   # External API Configuration
 ├── database/
-│   ├── factories/
-│   ├── migrations/
-│   ├── seeders/
-│   └── schema/
-├── public/
-│   ├── css/
-│   ├── js/
-│   ├── images/
-│   └── sw.js (Service Worker)
+│   ├── factories/          # Model Factories
+│   ├── migrations/         # Schema Definitions
+│   └── seeders/            # Data Seeders
 ├── resources/
-│   ├── css/
-│   │   └── app.css (Tailwind CSS v4)
-│   ├── js/
-│   │   ├── components/
-│   │   ├── services/
-│   │   └── app.js
-│   ├── views/
-│   │   ├── components/
-│   │   ├── layouts/
-│   │   └── pages/
-│   └── lang/
+│   ├── css/                # Tailwind CSS
+│   ├── js/                 # Alpine.js & App Scripts
+│   └── views/              # Blade Templates
 ├── routes/
-│   ├── api.php
-│   ├── web.php
-│   ├── channels.php
-│   └── console.php
-├── storage/
-├── tests/
-│   ├── Feature/
-│   │   ├── API/
-│   │   ├── Integration/
-│   │   └── AI/
-│   ├── Unit/
-│   │   ├── Models/
-│   │   ├── Services/
-│   │   └── Repositories/
-│   └── TestCase.php
-└── vendor/
+│   ├── api.php             # API Routes
+│   └── web.php             # Web Routes
+└── tests/
+    ├── Feature/            # Feature Tests
+    └── Unit/               # Unit Tests
 ```
 
-### 2.2 Configuration Structure
+---
 
-#### 2.2.1 AI Configuration
+## 3. Key Namespaces & Classes
+
+### 3.1 Core Models
+
+```mermaid
+classDiagram
+    class Character {
+        +int id
+        +int user_id
+        +string name
+        +string scenario_type
+        +json current_stats
+        +int energy_level
+        +string mood_status
+        +json goals
+        +careers() HasMany
+        +aptitudes() HasMany
+        +factors() HasMany
+    }
+    
+    class Career {
+        +int id
+        +int character_id
+        +string career_name
+        +string scenario_type
+        +string status
+        +json final_stats
+        +character() BelongsTo
+        +trainingSessions() HasMany
+        +races() HasMany
+    }
+    
+    class TrainingSession {
+        +int id
+        +int career_id
+        +int turn_number
+        +string training_type
+        +json stat_gains
+        +career() BelongsTo
+    }
+    
+    class Skill {
+        +int id
+        +string name
+        +string skill_type
+        +string rarity
+        +int base_sp_cost
+        +json effects
+        +acquisitions() HasMany
+        +hints() HasMany
+    }
+    
+    class SupportCard {
+        +int id
+        +string name
+        +string card_type
+        +string rarity
+        +int limit_break_level
+        +json bonuses
+    }
+    
+    Character "1" --> "*" Career
+    Career "1" --> "*" TrainingSession
+    Character "*" --> "*" Skill
+    Character "*" --> "*" SupportCard
+```
+
+### 3.2 Enums
+
+```mermaid
+classDiagram
+    class ScenarioType {
+        <<enumeration>>
+        UraFinale
+        UnityCup
+    }
+    
+    class CareerStatus {
+        <<enumeration>>
+        InProgress
+        Completed
+        Abandoned
+    }
+    
+    class TrainingType {
+        <<enumeration>>
+        Speed
+        Stamina
+        Power
+        Guts
+        Wisdom
+        Rest
+    }
+    
+    class SkillRarity {
+        <<enumeration>>
+        Normal
+        Rare
+        Unique
+        Inherited
+    }
+    
+    class AptitudeGrade {
+        <<enumeration>>
+        SS : 120%
+        S : 110%
+        A : 100%
+        B : 90%
+        C : 80%
+        D : 70%
+        E : 60%
+        F : 50%
+        G : 40%
+        +effectiveness() int
+    }
+    
+    class MoodStatus {
+        <<enumeration>>
+        Great : +4%
+        Good : +2%
+        Normal : 0%
+        Bad : -2%
+        Awful : -4%
+        +modifier() int
+    }
+```
+
+---
+
+## 4. Service Layer Architecture
+
+### 4.1 Service Overview
+
+```mermaid
+flowchart TD
+    subgraph CoreServices["Core Domain Services"]
+        CharacterService["CharacterService"]
+        CareerService["CareerService"]
+        TrainingService["TrainingService"]
+        RaceService["RaceService"]
+        SkillService["SkillService"]
+        SupportCardService["SupportCardService"]
+    end
+    
+    subgraph AIServices["AI Services"]
+        HybridAIService["HybridAIService"]
+        OllamaService["OllamaService"]
+        BedrockService["BedrockService"]
+        AIAdvisoryService["AIAdvisoryService"]
+    end
+    
+    subgraph MCPServices["MCP Services"]
+        MCPClientService["MCPClientService"]
+        MCPMonitoringService["MCPMonitoringService"]
+        MCPHealthDashboardService["MCPHealthDashboardService"]
+    end
+    
+    subgraph DataServices["Data Management Services"]
+        DataImportService["DataImportService"]
+        DataExportService["DataExportService"]
+        DataMigrationService["DataMigrationService"]
+        BackupService["BackupService"]
+    end
+    
+    subgraph ExternalServices["External Integration"]
+        UmapyoiApiClient["UmapyoiApiClient"]
+        UmamusumeDBApiClient["UmamusumeDBApiClient"]
+        TesseractService["TesseractService"]
+    end
+    
+    CoreServices --> AIServices
+    AIServices --> MCPServices
+    CoreServices --> DataServices
+    CoreServices --> ExternalServices
+```
+
+### 4.2 Core Service Implementations
+
+#### CharacterService
 
 ```php
-<?php
-// config/ai.php
+namespace App\Services;
 
+class CharacterService
+{
+    public function __construct(
+        private CharacterRepository $repository,
+        private FactorInheritanceService $factorService,
+        private CacheManager $cache
+    ) {}
+    
+    public function create(array $data): Character
+    {
+        $character = $this->repository->create($data);
+        $this->factorService->calculateInheritedStats($character);
+        $this->cache->forget("user.{$data['user_id']}.characters");
+        return $character;
+    }
+    
+    public function updateStats(Character $character, array $stats): Character
+    {
+        $validated = $this->validateStatRanges($stats);
+        $character->update(['current_stats' => $validated]);
+        event(new StatsUpdated($character));
+        return $character->fresh();
+    }
+    
+    private function validateStatRanges(array $stats): array
+    {
+        return collect($stats)->map(fn($value) => 
+            max(0, min(1200, (int) $value))
+        )->toArray();
+    }
+}
+```
+
+#### TrainingPredictionService
+
+```php
+namespace App\Services;
+
+class TrainingPredictionService
+{
+    public function __construct(
+        private SupportCardBonusCalculator $bonusCalculator,
+        private StatGainCalculator $gainCalculator,
+        private CacheManager $cache
+    ) {}
+    
+    public function getPredictions(Character $character): array
+    {
+        $cacheKey = "predictions.{$character->id}";
+        
+        return $this->cache->remember($cacheKey, 300, function () use ($character) {
+            $facilities = TrainingType::cases();
+            $predictions = [];
+            
+            foreach ($facilities as $facility) {
+                $predictions[] = $this->calculatePrediction($character, $facility);
+            }
+            
+            return $this->rankPredictions($predictions);
+        });
+    }
+    
+    private function calculatePrediction(Character $character, TrainingType $type): array
+    {
+        $baseGains = $this->gainCalculator->calculate($character, $type);
+        $bonuses = $this->bonusCalculator->calculate($character->supportDeck, $type);
+        
+        return [
+            'training_type' => $type->value,
+            'stat_gains' => $this->applyBonuses($baseGains, $bonuses),
+            'risk_percentage' => $this->calculateRisk($character),
+            'skill_hints' => $this->getSkillHintChances($character, $type),
+            'recommendation_score' => $this->scoreTraining($character, $type),
+        ];
+    }
+}
+```
+
+---
+
+## 5. AI and MCP Integration
+
+### 5.1 Neuron AI Agents
+
+```mermaid
+flowchart TD
+    subgraph Agents["Neuron Agents"]
+        TrainingAgent["TrainingAdvisorAgent"]
+        RaceAgent["RaceStrategyAgent"]
+        SkillAgent["SkillRecommendationAgent"]
+        CareerAgent["CareerPlanningAgent"]
+    end
+    
+    subgraph Tools["Agent Tools"]
+        StatsTool["GetCharacterStatsTool"]
+        PredictionTool["GetTrainingPredictionsTool"]
+        RaceTool["GetRaceRequirementsTool"]
+        SkillTool["GetSkillCatalogTool"]
+    end
+    
+    subgraph Providers["AI Providers"]
+        Ollama["Ollama (Local)"]
+        Bedrock["AWS Bedrock (Cloud)"]
+    end
+    
+    TrainingAgent --> StatsTool
+    TrainingAgent --> PredictionTool
+    RaceAgent --> RaceTool
+    SkillAgent --> SkillTool
+    
+    Agents --> Providers
+```
+
+#### Agent Implementation
+
+```php
+namespace App\Neuron\Agents;
+
+use NeuronAI\Agent;
+use NeuronAI\SystemPrompt;
+
+class TrainingAdvisorAgent extends Agent
+{
+    protected string $name = 'Training Advisor';
+    
+    public function instructions(): string
+    {
+        return <<<PROMPT
+        You are an expert Umamusume Pretty Derby training advisor.
+        Analyze the character's current state, goals, and available training options.
+        Provide specific, actionable recommendations with reasoning.
+        Consider stat priorities, energy management, and upcoming race requirements.
+        PROMPT;
+    }
+    
+    protected function tools(): array
+    {
+        return [
+            new GetCharacterStatsTool(),
+            new GetTrainingPredictionsTool(),
+            new GetSupportCardBonusTool(),
+            new GetUpcomingRacesTool(),
+        ];
+    }
+    
+    public function provider(): AIProvider
+    {
+        return app(HybridAIService::class)->getProvider();
+    }
+}
+```
+
+### 5.2 MCP Integration
+
+```mermaid
+sequenceDiagram
+    participant Agent as Neuron Agent
+    participant MCP as MCP Client
+    participant Server as MCP Server
+    participant Tool as External Tool
+    
+    Agent->>MCP: Request tool execution
+    MCP->>MCP: Check tool permissions
+    MCP->>Server: Connect to server
+    Server->>Tool: Execute tool
+    Tool-->>Server: Tool result
+    Server-->>MCP: Response
+    MCP->>MCP: Log usage metrics
+    MCP-->>Agent: Processed result
+```
+
+#### MCP Configuration
+
+```php
+// config/mcp.php
 return [
-    'default_provider' => env('AI_DEFAULT_PROVIDER', 'ollama'),
-
-    'providers' => [
-        'ollama' => [
-            'enabled' => env('OLLAMA_ENABLED', true),
-            'base_url' => env('OLLAMA_BASE_URL', 'http://localhost:11434'),
-            'timeout' => env('OLLAMA_TIMEOUT', 30),
-            'models' => [
-                'llama3.3' => [
-                    'context_length' => 128000,
-                    'temperature' => 0.7,
-                    'use_cases' => ['general', 'analysis', 'planning']
-                ],
-                'mistral' => [
-                    'context_length' => 32000,
-                    'temperature' => 0.6,
-                    'use_cases' => ['quick_response', 'simple_calculation']
-                ],
-                'qwen2.5' => [
-                    'context_length' => 32000,
-                    'temperature' => 0.8,
-                    'use_cases' => ['multilingual', 'japanese_processing']
-                ]
-            ]
+    'servers' => [
+        'memory' => [
+            'command' => 'npx',
+            'args' => ['-y', '@modelcontextprotocol/server-memory'],
+            'enabled' => true,
         ],
-
-        'bedrock' => [
-            'enabled' => env('BEDROCK_ENABLED', false),
-            'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
-            'timeout' => env('BEDROCK_TIMEOUT', 60),
-            'budget' => [
-                'daily_limit' => env('BEDROCK_DAILY_BUDGET', 2.00),
-                'monthly_limit' => env('BEDROCK_MONTHLY_BUDGET', 50.00),
-                'alert_threshold' => 0.8
-            ],
-            'models' => [
-                'claude-4.5-opus' => [
-                    'model_id' => 'anthropic.claude-3-5-sonnet-20241022-v2:0',
-                    'input_cost_per_1k' => 5.0,
-                    'output_cost_per_1k' => 25.0
-                ],
-                'claude-4.5-sonnet' => [
-                    'model_id' => 'anthropic.claude-3-5-sonnet-20241022-v2:0',
-                    'input_cost_per_1k' => 3.0,
-                    'output_cost_per_1k' => 15.0
-                ],
-                'nova-2-lite' => [
-                    'model_id' => 'amazon.nova-lite-v1:0',
-                    'input_cost_per_1k' => 0.00125,
-                    'output_cost_per_1k' => 0.00125
-                ]
-            ]
-        ]
+        'filesystem' => [
+            'command' => 'npx',
+            'args' => ['-y', '@anthropic/mcp-server-filesystem', storage_path()],
+            'enabled' => true,
+        ],
+        'fetch' => [
+            'command' => 'npx',
+            'args' => ['-y', '@anthropic/mcp-server-fetch'],
+            'enabled' => true,
+        ],
     ],
-
-    'routing' => [
-        'complexity_thresholds' => [
-            'simple' => 3,
-            'moderate' => 7,
-            'complex' => 10
-        ],
-        'fallback_strategy' => 'local_first',
-        'cache_responses' => true,
-        'cache_ttl' => 300
-    ]
+    
+    'monitoring' => [
+        'enabled' => true,
+        'log_requests' => true,
+        'track_costs' => true,
+    ],
 ];
 ```
 
----
-
-## 3. Architecture Overview
-
-### 3.1 Layered Architecture Pattern
-
-```text
-┌─────────────────────────────────────────────────────────────────┐
-│                    PRESENTATION LAYER                           │
-├─────────────────────────────────────────────────────────────────┤
-│  Controllers, Resources, Requests, Middleware                   │
-│  ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐   │
-│  │   API Routes    │ │   Web Routes    │ │   WebSocket     │   │
-│  │   (RESTful)     │ │   (Blade Views) │ │   (Real-time)   │   │
-│  └─────────────────┘ └─────────────────┘ └─────────────────┘   │
-└─────────────────────────────────────────────────────────────────┘
-                                │
-                                ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    APPLICATION LAYER                            │
-├─────────────────────────────────────────────────────────────────┤
-│  Services, Events, Listeners, Jobs                              │
-│  ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐   │
-│  │   Business      │ │   Event         │ │   Queue         │   │
-│  │   Services      │ │   Handlers      │ │   Jobs          │   │
-│  └─────────────────┘ └─────────────────┘ └─────────────────┘   │
-└─────────────────────────────────────────────────────────────────┘
-                                │
-                                ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    DOMAIN LAYER                                 │
-├─────────────────────────────────────────────────────────────────┤
-│  Models, Repositories, Domain Services                          │
-│  ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐   │
-│  │   Eloquent      │ │   Repository    │ │   Domain        │   │
-│  │   Models        │ │   Pattern       │ │   Logic         │   │
-│  └─────────────────┘ └─────────────────┘ └─────────────────┘   │
-└─────────────────────────────────────────────────────────────────┘
-                                │
-                                ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    INFRASTRUCTURE LAYER                         │
-├─────────────────────────────────────────────────────────────────┤
-│  Database, Cache, External APIs, File System                   │
-│  ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐   │
-│  │   MySQL         │ │   Redis         │ │   External      │   │
-│  │   Database      │ │   Cache         │ │   APIs          │   │
-│  └─────────────────┘ └─────────────────┘ └─────────────────┘   │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-### 3.2 Design Patterns Implementation
-
-#### 3.2.1 Repository Pattern
+### 5.3 Hybrid AI Service
 
 ```php
-<?php
-
-namespace App\Repositories\Contracts;
-
-interface CharacterRepositoryInterface
-{
-    public function findByUser(User $user): Collection;
-    public function findActiveByUser(User $user): Collection;
-    public function create(array $data): Character;
-    public function update(Character $character, array $data): Character;
-    public function delete(Character $character): bool;
-    public function getTrainingHistory(Character $character, int $limit = 50): Collection;
-    public function getPerformanceAnalytics(Character $character): array;
-}
-
-namespace App\Repositories;
-
-class CharacterRepository implements CharacterRepositoryInterface
-{
-    public function __construct(
-        private Character $model,
-        private CacheService $cache
-    ) {}
-
-    public function findByUser(User $user): Collection
-    {
-        $cacheKey = "user_characters:{$user->id}";
-
-        return $this->cache->remember($cacheKey, 3600, function () use ($user) {
-            return $this->model
-                ->where('user_id', $user->id)
-                ->with(['characterTemplate', 'scenario'])
-                ->orderBy('updated_at', 'desc')
-                ->get();
-        });
-    }
-
-    public function findActiveByUser(User $user): Collection
-    {
-        return $this->findByUser($user)->where('is_active', true);
-    }
-
-    public function create(array $data): Character
-    {
-        $character = $this->model->create(array_merge($data, [
-            'uuid' => Str::uuid(),
-            'current_stats' => $this->getDefaultStats(),
-            'is_active' => true
-        ]));
-
-        // Clear user cache
-        $this->cache->forget("user_characters:{$character->user_id}");
-
-        // Dispatch character created event
-        event(new CharacterCreated($character));
-
-        return $character;
-    }
-
-    private function getDefaultStats(): array
-    {
-        return [
-            'speed' => 0,
-            'stamina' => 0,
-            'power' => 0,
-            'guts' => 0,
-            'wit' => 0,
-            'skill_points' => 0,
-            'fans' => 0
-        ];
-    }
-}
-```
-
-#### 3.2.2 Service Layer Pattern
-
-```php
-<?php
-
-namespace App\Services\Character;
-
-class CharacterTrainingService
-{
-    public function __construct(
-        private CharacterRepositoryInterface $characterRepository,
-        private TrainingSessionRepositoryInterface $trainingRepository,
-        private AIRecommendationService $aiService,
-        private EventDispatcher $eventDispatcher
-    ) {}
-
-    public function executeTraining(
-        Character $character,
-        TrainingAction $action
-    ): TrainingResult {
-
-        // Validate training action
-        $this->validateTrainingAction($character, $action);
-
-        // Get AI recommendation if requested
-        $aiRecommendation = null;
-        if ($action->requestAIRecommendation) {
-            $aiRecommendation = $this->aiService->getTrainingRecommendation(
-                $character,
-                $action
-            );
-        }
-
-        // Calculate training results
-        $results = $this->calculateTrainingResults($character, $action);
-
-        // Update character stats
-        $updatedCharacter = $this->updateCharacterStats($character, $results);
-
-        // Record training session
-        $session = $this->recordTrainingSession(
-            $character,
-            $action,
-            $results,
-            $aiRecommendation
-        );
-
-        // Dispatch training completed event
-        $this->eventDispatcher->dispatch(
-            new TrainingCompleted($updatedCharacter, $session, $results)
-        );
-
-        return new TrainingResult(
-            character: $updatedCharacter,
-            session: $session,
-            statsGained: $results->statsGained,
-            eventsTriggered: $results->events,
-            aiRecommendation: $aiRecommendation
-        );
-    }
-
-    private function validateTrainingAction(Character $character, TrainingAction $action): void
-    {
-        if (!$character->canTrain()) {
-            throw new InvalidTrainingException('Character cannot train at this time');
-        }
-
-        if ($character->current_turn >= $character->max_turns) {
-            throw new InvalidTrainingException('Character has completed maximum turns');
-        }
-
-        // Additional validation logic...
-    }
-
-    private function calculateTrainingResults(
-        Character $character,
-        TrainingAction $action
-    ): TrainingCalculationResult {
-
-        $calculator = new TrainingCalculator(
-            $character->aptitudes,
-            $character->current_stats,
-            $action->supportCards
-        );
-
-        return $calculator->calculate($action);
-    }
-}
-```
-
-#### 3.2.3 Factory Pattern for AI Services
-
-```php
-<?php
-
 namespace App\Services\AI;
 
-class AIServiceFactory
-{
-    private array $providers = [];
-
-    public function __construct()
-    {
-        $this->registerProviders();
-    }
-
-    public function create(string $provider = null): AIServiceInterface
-    {
-        $provider = $provider ?: config('ai.default_provider');
-
-        if (!isset($this->providers[$provider])) {
-            throw new InvalidAIProviderException("Provider {$provider} not found");
-        }
-
-        return $this->providers[$provider]();
-    }
-
-    public function createOptimal(AIRequest $request): AIServiceInterface
-    {
-        $router = app(HybridAIRouter::class);
-        $optimalProvider = $router->selectProvider($request);
-
-        return $this->create($optimalProvider);
-    }
-
-    private function registerProviders(): void
-    {
-        $this->providers['ollama'] = fn() => app(OllamaService::class);
-        $this->providers['bedrock'] = fn() => app(BedrockService::class);
-    }
-}
-
-// Usage in controllers
-class AIController extends Controller
+class HybridAIService
 {
     public function __construct(
-        private AIServiceFactory $aiFactory,
-        private AIRequestValidator $validator
+        private OllamaService $ollama,
+        private BedrockService $bedrock,
+        private AICostTracker $costTracker
     ) {}
-
-    public function generateRecommendation(AIRecommendationRequest $request): JsonResponse
+    
+    public function generate(string $prompt, array $options = []): AIResponse
     {
-        $aiRequest = AIRequest::fromRequest($request);
-
-        // Get optimal AI service based on request complexity
-        $aiService = $this->aiFactory->createOptimal($aiRequest);
-
-        $response = $aiService->generateResponse($aiRequest);
-
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'content' => $response->getContent(),
-                'model' => $response->getModel(),
-                'processing_time' => $response->getProcessingTime(),
-                'cost' => $response->getCost(),
-                'confidence' => $response->getConfidence()
-            ]
-        ]);
-    }
-}
-```
-
----
-
-## 4. Core Components
-
-### 4.1 Character Management System
-
-#### 4.1.1 Character Model
-
-```php
-<?php
-
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Models\Concerns\HasUuid;
-use App\Models\Concerns\CacheableQueries;
-
-class Character extends Model
-{
-    use HasFactory, HasUuid, CacheableQueries;
-
-    protected $fillable = [
-        'user_id',
-        'character_template_id',
-        'name',
-        'nickname',
-        'scenario_id',
-        'current_turn',
-        'max_turns',
-        'current_stats',
-        'aptitudes',
-        'growth_rates',
-        'training_summary',
-        'goals',
-        'status',
-        'is_active'
-    ];
-
-    protected $casts = [
-        'current_stats' => 'array',
-        'aptitudes' => 'array',
-        'growth_rates' => 'array',
-        'training_summary' => 'array',
-        'goals' => 'array',
-        'status' => 'array',
-        'is_active' => 'boolean',
-        'current_turn' => 'integer',
-        'max_turns' => 'integer',
-        'completed_at' => 'datetime'
-    ];
-
-    protected $attributes = [
-        'current_stats' => '{"speed":0,"stamina":0,"power":0,"guts":0,"wit":0,"skill_points":0,"fans":0}',
-        'is_active' => true,
-        'current_turn' => 0,
-        'max_turns' => 78
-    ];
-
-    // Relationships
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    public function characterTemplate(): BelongsTo
-    {
-        return $this->belongsTo(CharacterTemplate::class);
-    }
-
-    public function scenario(): BelongsTo
-    {
-        return $this->belongsTo(Scenario::class);
-    }
-
-    public function trainingSessions(): HasMany
-    {
-        return $this->hasMany(TrainingSession::class);
-    }
-
-    public function raceResults(): HasMany
-    {
-        return $this->hasMany(RaceResult::class);
-    }
-
-    public function aiConversations(): HasMany
-    {
-        return $this->hasMany(AIConversation::class);
-    }
-
-    // Scopes
-    public function scopeActive($query)
-    {
-        return $query->where('is_active', true);
-    }
-
-    public function scopeInProgress($query)
-    {
-        return $query->active()->whereNull('completed_at');
-    }
-
-    public function scopeCompleted($query)
-    {
-        return $query->whereNotNull('completed_at');
-    }
-
-    // Accessors & Mutators
-    public function getCurrentStatsAttribute($value): array
-    {
-        $stats = is_string($value) ? json_decode($value, true) : $value;
-
-        return array_merge([
-            'speed' => 0,
-            'stamina' => 0,
-            'power' => 0,
-            'guts' => 0,
-            'wit' => 0,
-            'skill_points' => 0,
-            'fans' => 0
-        ], $stats ?: []);
-    }
-
-    public function setCurrentStatsAttribute($value): void
-    {
-        $this->attributes['current_stats'] = is_array($value)
-            ? json_encode($value)
-            : $value;
-    }
-
-    // Business Logic Methods
-    public function getTotalStats(): int
-    {
-        $stats = $this->current_stats;
-        return $stats['speed'] + $stats['stamina'] + $stats['power'] +
-               $stats['guts'] + $stats['wit'];
-    }
-
-    public function getProgressPercentage(): float
-    {
-        return ($this->current_turn / $this->max_turns) * 100;
-    }
-
-    public function canTrain(): bool
-    {
-        return $this->is_active &&
-               $this->current_turn < $this->max_turns &&
-               is_null($this->completed_at);
-    }
-
-    public function getStatRank(string $stat): string
-    {
-        $value = $this->current_stats[$stat] ?? 0;
-
-        return match (true) {
-            $value >= 1200 => 'SS',
-            $value >= 1000 => 'S',
-            $value >= 800 => 'A',
-            $value >= 600 => 'B',
-            $value >= 400 => 'C',
-            $value >= 200 => 'D',
-            default => 'G'
-        };
-    }
-
-    public function getOverallRank(): string
-    {
-        $total = $this->getTotalStats();
-
-        return match (true) {
-            $total >= 6000 => 'SS',
-            $total >= 5000 => 'S',
-            $total >= 4000 => 'A',
-            $total >= 3000 => 'B',
-            $total >= 2000 => 'C',
-            $total >= 1000 => 'D',
-            default => 'G'
-        };
-    }
-
-    public function completeTraining(): void
-    {
-        $this->update([
-            'is_active' => false,
-            'completed_at' => now()
-        ]);
-
-        event(new CharacterTrainingCompleted($this));
-    }
-
-    // Cache Management
-    protected function getCacheTags(): array
-    {
-        return ['characters', "user:{$this->user_id}", "character:{$this->id}"];
-    }
-}
-```
-
-#### 4.1.2 Training System
-
-```php
-<?php
-
-namespace App\Services\Training;
-
-class TrainingCalculator
-{
-    private array $aptitudes;
-    private array $currentStats;
-    private array $supportCards;
-    private array $baseGainRates;
-
-    public function __construct(array $aptitudes, array $currentStats, array $supportCards = [])
-    {
-        $this->aptitudes = $aptitudes;
-        $this->currentStats = $currentStats;
-        $this->supportCards = $supportCards;
-        $this->baseGainRates = config('game.training.base_gain_rates');
-    }
-
-    public function calculate(TrainingAction $action): TrainingCalculationResult
-    {
-        $baseGains = $this->calculateBaseGains($action);
-        $aptitudeModifiers = $this->calculateAptitudeModifiers($action);
-        $supportCardBonuses = $this->calculateSupportCardBonuses($action);
-        $randomVariation = $this->calculateRandomVariation();
-
-        $finalGains = $this->applyAllModifiers(
-            $baseGains,
-            $aptitudeModifiers,
-            $supportCardBonuses,
-            $randomVariation
-        );
-
-        $events = $this->checkForEvents($action, $finalGains);
-        $skillsLearned = $this->checkForSkillLearning($action);
-
-        return new TrainingCalculationResult(
-            statsGained: $finalGains,
-            events: $events,
-            skillsLearned: $skillsLearned,
-            successRate: $this->calculateSuccessRate($action),
-            efficiencyScore: $this->calculateEfficiencyScore($finalGains, $action)
-        );
-    }
-
-    private function calculateBaseGains(TrainingAction $action): array
-    {
-        $trainingType = $action->getTrainingType();
-        $baseRates = $this->baseGainRates[$trainingType] ?? [];
-
-        return [
-            'speed' => $baseRates['speed'] ?? 0,
-            'stamina' => $baseRates['stamina'] ?? 0,
-            'power' => $baseRates['power'] ?? 0,
-            'guts' => $baseRates['guts'] ?? 0,
-            'wit' => $baseRates['wit'] ?? 0,
-            'skill_points' => $baseRates['skill_points'] ?? 0
-        ];
-    }
-
-    private function calculateAptitudeModifiers(TrainingAction $action): array
-    {
-        $modifiers = [];
-        $trainingType = $action->getTrainingType();
-
-        foreach (['speed', 'stamina', 'power', 'guts', 'wit'] as $stat) {
-            $aptitude = $this->aptitudes[$stat] ?? 'G';
-            $modifier = $this->getAptitudeModifier($aptitude, $stat, $trainingType);
-            $modifiers[$stat] = $modifier;
-        }
-
-        return $modifiers;
-    }
-
-    private function getAptitudeModifier(string $aptitude, string $stat, string $trainingType): float
-    {
-        $aptitudeValues = [
-            'SS' => 1.2,
-            'S' => 1.1,
-            'A' => 1.0,
-            'B' => 0.9,
-            'C' => 0.8,
-            'D' => 0.7,
-            'E' => 0.6,
-            'F' => 0.5,
-            'G' => 0.4
-        ];
-
-        $baseModifier = $aptitudeValues[$aptitude] ?? 1.0;
-
-        // Apply additional modifiers based on training type matching stat
-        if ($this->isMatchingTraining($stat, $trainingType)) {
-            $baseModifier *= 1.1; // 10% bonus for matching training
-        }
-
-        return $baseModifier;
-    }
-
-    private function calculateSupportCardBonuses(TrainingAction $action): array
-    {
-        $bonuses = array_fill_keys(['speed', 'stamina', 'power', 'guts', 'wit', 'skill_points'], 0);
-
-        foreach ($this->supportCards as $card) {
-            $cardBonuses = $this->calculateSingleCardBonus($card, $action);
-
-            foreach ($cardBonuses as $stat => $bonus) {
-                $bonuses[$stat] += $bonus;
+        $complexity = $this->assessComplexity($prompt);
+        
+        if ($this->shouldUseLocal($complexity, $options)) {
+            try {
+                return $this->ollama->generate($prompt, $options);
+            } catch (OllamaUnavailableException $e) {
+                Log::warning('Ollama unavailable, falling back to Bedrock');
             }
         }
-
-        return $bonuses;
+        
+        $response = $this->bedrock->generate($prompt, $options);
+        $this->costTracker->track($response);
+        
+        return $response;
     }
-
-    private function calculateRandomVariation(): array
+    
+    private function shouldUseLocal(int $complexity, array $options): bool
     {
-        // Add 0-20% random variation to make training less predictable
-        return [
-            'speed' => mt_rand(100, 120) / 100,
-            'stamina' => mt_rand(100, 120) / 100,
-            'power' => mt_rand(100, 120) / 100,
-            'guts' => mt_rand(100, 120) / 100,
-            'wit' => mt_rand(100, 120) / 100,
-            'skill_points' => mt_rand(100, 120) / 100
-        ];
-    }
-
-    private function applyAllModifiers(
-        array $baseGains,
-        array $aptitudeModifiers,
-        array $supportCardBonuses,
-        array $randomVariation
-    ): array {
-        $finalGains = [];
-
-        foreach ($baseGains as $stat => $baseGain) {
-            $aptitudeModifier = $aptitudeModifiers[$stat] ?? 1.0;
-            $supportBonus = $supportCardBonuses[$stat] ?? 0;
-            $randomMod = $randomVariation[$stat] ?? 1.0;
-
-            $finalGain = (($baseGain * $aptitudeModifier) + $supportBonus) * $randomMod;
-            $finalGains[$stat] = max(0, round($finalGain));
+        if ($options['force_cloud'] ?? false) {
+            return false;
         }
-
-        return $finalGains;
-    }
-}
-```
-
-### 4.2 AI Integration System
-
-#### 4.2.1 AI Service Interface
-
-```php
-<?php
-
-namespace App\Integrations\AI\Contracts;
-
-interface AIServiceInterface
-{
-    public function generateResponse(AIRequest $request): AIResponse;
-    public function healthCheck(): array;
-    public function getAvailableModels(): array;
-    public function estimateCost(AIRequest $request): float;
-}
-
-namespace App\Integrations\AI;
-
-class AIRequest
-{
-    public function __construct(
-        private string $prompt,
-        private array $context = [],
-        private int $complexity = 5,
-        private array $options = []
-    ) {}
-
-    public static function fromRequest(Request $request): self
-    {
-        return new self(
-            prompt: $request->input('prompt'),
-            context: $request->input('context', []),
-            complexity: $request->input('complexity', 5),
-            options: $request->input('options', [])
-        );
-    }
-
-    public function getPrompt(): string
-    {
-        return $this->prompt;
-    }
-
-    public function getContext(): array
-    {
-        return $this->context;
-    }
-
-    public function getComplexity(): int
-    {
-        return $this->complexity;
-    }
-
-    public function getOptions(): array
-    {
-        return $this->options;
-    }
-
-    public function requiresMultilingual(): bool
-    {
-        return $this->options['multilingual'] ?? false;
-    }
-
-    public function getMaxTokens(): int
-    {
-        return $this->options['max_tokens'] ?? 2048;
-    }
-
-    public function getTemperature(): float
-    {
-        return $this->options['temperature'] ?? 0.7;
-    }
-}
-
-class AIResponse
-{
-    public function __construct(
-        private string $content,
-        private string $model,
-        private float $processingTime,
-        private float $confidence,
-        private float $cost = 0.0,
-        private array $metadata = []
-    ) {}
-
-    public function getContent(): string
-    {
-        return $this->content;
-    }
-
-    public function getModel(): string
-    {
-        return $this->model;
-    }
-
-    public function getProcessingTime(): float
-    {
-        return $this->processingTime;
-    }
-
-    public function getConfidence(): float
-    {
-        return $this->confidence;
-    }
-
-    public function getCost(): float
-    {
-        return $this->cost;
-    }
-
-    public function getMetadata(): array
-    {
-        return $this->metadata;
-    }
-
-    public function isLocalProcessing(): bool
-    {
-        return $this->metadata['local_processing'] ?? false;
-    }
-
-    public function toArray(): array
-    {
-        return [
-            'content' => $this->content,
-            'model' => $this->model,
-            'processing_time' => $this->processingTime,
-            'confidence' => $this->confidence,
-            'cost' => $this->cost,
-            'metadata' => $this->metadata
-        ];
+        
+        if (!$this->ollama->isAvailable()) {
+            return false;
+        }
+        
+        return $complexity <= config('ai.local_complexity_threshold', 70);
     }
 }
 ```
 
 ---
 
-## 5. API Documentation
+## 6. Frontend Code Structure
 
-### 5.1 RESTful API Endpoints
+### 6.1 JavaScript Architecture
 
-#### 5.1.1 Character Management API
-
-```php
-<?php
-
-namespace App\Http\Controllers\API\V1;
-
-/**
- * @group Character Management
- *
- * APIs for managing user characters, training sessions, and performance analytics.
- */
-class CharacterController extends Controller
-{
-    public function __construct(
-        private CharacterService $characterService,
-        private TrainingService $trainingService
-    ) {}
-
-    /**
-     * Get user characters
-     *
-     * Retrieve all characters belonging to the authenticated user.
-     *
-     * @authenticated
-     *
-     * @queryParam active boolean Filter by active status. Example: true
-     * @queryParam scenario_id integer Filter by scenario ID. Example: 1
-     * @queryParam limit integer Number of characters to return. Example: 10
-     *
-     * @response 200 {
-     *   "success": true,
-     *   "data": [
-     *     {
-     *       "id": 1,
-     *       "uuid": "550e8400-e29b-41d4-a716-446655440000",
-     *       "name": "Special Week",
-     *       "nickname": "Spechan",
-     *       "current_turn": 15,
-     *       "max_turns": 78,
-     *       "current_stats": {
-     *         "speed": 450,
-     *         "stamina": 380,
-     *         "power": 420,
-     *         "guts": 350,
-     *         "wit": 400,
-     *         "skill_points": 120,
-     *         "fans": 5000
-     *       },
-     *       "progress_percentage": 19.23,
-     *       "overall_rank": "C",
-     *       "is_active": true,
-     *       "character_template": {
-     *         "id": 1,
-     *         "name": "Special Week",
-     *         "rarity": 3
-     *       },
-     *       "scenario": {
-     *         "id": 1,
-     *         "name": "URA Finals"
-     *       },
-     *       "created_at": "2026-01-11T10:00:00Z",
-     *       "updated_at": "2026-01-11T15:30:00Z"
-     *     }
-     *   ],
-     *   "meta": {
-     *     "total": 5,
-     *     "active": 3,
-     *     "completed": 2
-     *   }
-     * }
-     */
-    public function index(Request $request): JsonResponse
-    {
-        $characters = $this->characterService->getUserCharacters(
-            user: $request->user(),
-            filters: $request->only(['active', 'scenario_id']),
-            limit: $request->input('limit', 50)
-        );
-
-        return response()->json([
-            'success' => true,
-            'data' => CharacterResource::collection($characters),
-            'meta' => [
-                'total' => $characters->count(),
-                'active' => $characters->where('is_active', true)->count(),
-                'completed' => $characters->where('is_active', false)->count()
-            ]
-        ]);
-    }
-
-    /**
-     * Create new character
-     *
-     * Create a new character instance for the authenticated user.
-     *
-     * @authenticated
-     *
-     * @bodyParam character_template_id integer required The character template ID. Example: 1
-     * @bodyParam name string required Character name. Example: Special Week
-     * @bodyParam nickname string Character nickname. Example: Spechan
-     * @bodyParam scenario_id integer Scenario ID. Example: 1
-     * @bodyParam goals array Character goals and objectives. Example: ["win_twinkle_series", "reach_1000_fans"]
-     *
-     * @response 201 {
-     *   "success": true,
-     *   "data": {
-     *     "id": 2,
-     *     "uuid": "550e8400-e29b-41d4-a716-446655440001",
-     *     "name": "Special Week",
-     *     "nickname": "Spechan",
-     *     "current_turn": 0,
-     *     "max_turns": 78,
-     *     "current_stats": {
-     *       "speed": 0,
-     *       "stamina": 0,
-     *       "power": 0,
-     *       "guts": 0,
-     *       "wit": 0,
-     *       "skill_points": 0,
-     *       "fans": 0
-     *     },
-     *     "is_active": true,
-     *     "created_at": "2026-01-11T16:00:00Z"
-     *   },
-     *   "message": "Character created successfully"
-     * }
-     */
-    public function store(CreateCharacterRequest $request): JsonResponse
-    {
-        $character = $this->characterService->createCharacter(
-            user: $request->user(),
-            data: $request->validated()
-        );
-
-        return response()->json([
-            'success' => true,
-            'data' => new CharacterResource($character),
-            'message' => 'Character created successfully'
-        ], 201);
-    }
-
-    /**
-     * Get character details
-     *
-     * Retrieve detailed information about a specific character.
-     *
-     * @authenticated
-     *
-     * @urlParam character string required Character UUID. Example: 550e8400-e29b-41d4-a716-446655440000
-     *
-     * @response 200 {
-     *   "success": true,
-     *   "data": {
-     *     "id": 1,
-     *     "uuid": "550e8400-e29b-41d4-a716-446655440000",
-     *     "name": "Special Week",
-     *     "current_stats": {
-     *       "speed": 450,
-     *       "stamina": 380,
-     *       "power": 420,
-     *       "guts": 350,
-     *       "wit": 400
-     *     },
-     *     "training_history": [
-     *       {
-     *         "turn": 15,
-     *         "action": "speed_training",
-     *         "stats_gained": {"speed": 25, "power": 5},
-     *         "created_at": "2026-01-11T15:30:00Z"
-     *       }
-     *     ],
-     *     "performance_analytics": {
-     *       "total_stats": 2000,
-     *       "avg_gain_per_turn": 28.5,
-     *       "efficiency_score": 85.2,
-     *       "predicted_final_stats": 3200
-     *     }
-     *   }
-     * }
-     */
-    public function show(string $uuid): JsonResponse
-    {
-        $character = $this->characterService->getCharacterByUuid($uuid);
-
-        $this->authorize('view', $character);
-
-        return response()->json([
-            'success' => true,
-            'data' => new DetailedCharacterResource($character)
-        ]);
-    }
-
-    /**
-     * Execute training action
-     *
-     * Execute a training action for the specified character.
-     *
-     * @authenticated
-     *
-     * @urlParam character string required Character UUID. Example: 550e8400-e29b-41d4-a716-446655440000
-     *
-     * @bodyParam action string required Training action type. Example: speed_training
-     * @bodyParam support_cards array Support cards to use. Example: [1, 2, 3]
-     * @bodyParam request_ai_recommendation boolean Request AI recommendation. Example: true
-     *
-     * @response 200 {
-     *   "success": true,
-     *   "data": {
-     *     "character": {
-     *       "current_turn": 16,
-     *       "current_stats": {
-     *         "speed": 475,
-     *         "stamina": 380,
-     *         "power": 425,
-     *         "guts": 350,
-     *         "wit": 400
-     *       }
-     *     },
-     *     "training_result": {
-     *       "stats_gained": {"speed": 25, "power": 5},
-     *       "events_triggered": ["great_success"],
-     *       "skills_learned": [],
-     *       "success_rate": 95.5,
-     *       "efficiency_score": 88.2
-     *     },
-     *     "ai_recommendation": {
-     *       "content": "Excellent choice! Speed training with your current support cards...",
-     *       "confidence": 0.92,
-     *       "model": "ollama_llama3.3"
-     *     }
-     *   }
-     * }
-     */
-    public function train(string $uuid, TrainingRequest $request): JsonResponse
-    {
-        $character = $this->characterService->getCharacterByUuid($uuid);
-
-        $this->authorize('train', $character);
-
-        $result = $this->trainingService->executeTraining(
-            character: $character,
-            action: TrainingAction::fromRequest($request)
-        );
-
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'character' => new CharacterResource($result->character),
-                'training_result' => $result->toArray(),
-                'ai_recommendation' => $result->aiRecommendation?->toArray()
-            ]
-        ]);
-    }
-}
+```mermaid
+flowchart TD
+    subgraph Entry["Entry Point"]
+        AppJS["resources/js/app.js"]
+    end
+    
+    subgraph Alpine["Alpine.js"]
+        Init["Alpine Init"]
+        Stores["Alpine Stores"]
+        Components["Alpine Components"]
+    end
+    
+    subgraph StoresList["Stores"]
+        CharacterStore["$store.characters"]
+        PreferencesStore["$store.preferences"]
+        NotificationsStore["$store.notifications"]
+    end
+    
+    subgraph Events["Global Events"]
+        Toast["toast"]
+        CharacterUpdated["character-updated"]
+        TrainingComplete["training-complete"]
+    end
+    
+    AppJS --> Init
+    Init --> Stores
+    Init --> Components
+    Init --> Events
+    Stores --> StoresList
 ```
 
-#### 5.1.2 AI Integration API
+### 6.2 Livewire Components
 
-```php
-<?php
+```text
+app/Livewire/
+├── Dashboard/
+│   ├── Overview.php              # Main dashboard
+│   ├── CharacterSummary.php      # Character overview cards
+│   └── RecentActivity.php        # Activity feed
+├── Character/
+│   ├── CharacterList.php         # Character roster
+│   ├── CharacterEditor.php       # Character form
+│   └── StatDisplay.php           # Stat visualization
+├── Training/
+│   ├── TrainingSelector.php      # Training options
+│   ├── PredictionDisplay.php     # Training predictions
+│   └── SessionHistory.php        # Training history
+├── Race/
+│   ├── RaceCalendar.php          # Race schedule
+│   ├── RacePreparation.php       # Race prep view
+│   └── RaceResults.php           # Race outcomes
+├── Skills/
+│   ├── SkillCatalog.php          # Skill browser
+│   ├── SkillAcquisition.php      # Skill purchase
+│   └── SkillLoadout.php          # Skill management
+├── SupportCards/
+│   ├── CardCollection.php        # Card inventory
+│   └── DeckBuilder.php           # Deck composition
+├── AI/
+│   ├── AdvisorChat.php           # AI conversation
+│   └── RecommendationPanel.php   # AI suggestions
+└── Settings/
+    ├── UserPreferences.php       # User settings
+    └── AIConfiguration.php       # AI provider settings
+```
 
-namespace App\Http\Controllers\API\V1;
+### 6.3 CSS Architecture
 
-/**
- * @group AI Integration
- *
- * APIs for AI-powered recommendations, analysis, and optimization.
- */
-class AIController extends Controller
-{
-    public function __construct(
-        private AIServiceFactory $aiFactory,
-        private AIUsageTracker $usageTracker
-    ) {}
+```css
+/* resources/css/app.css */
 
-    /**
-     * Get AI recommendation
-     *
-     * Generate AI-powered training recommendations for a character.
-     *
-     * @authenticated
-     *
-     * @bodyParam character_id integer required Character ID. Example: 1
-     * @bodyParam request_type string required Type of recommendation. Example: training_optimization
-     * @bodyParam context array Additional context data. Example: {"current_turn": 15, "goals": ["speed_focus"]}
-     * @bodyParam complexity integer Request complexity (1-10). Example: 7
-     * @bodyParam prefer_local boolean Prefer local AI processing. Example: true
-     *
-     * @response 200 {
-     *   "success": true,
-     *   "data": {
-     *     "recommendation": {
-     *       "content": "Based on your character's current stats and aptitudes, I recommend focusing on speed training for the next 3 turns...",
-     *       "model": "ollama_llama3.3",
-     *       "confidence": 0.89,
-     *       "processing_time": 1250,
-     *       "cost": 0.0,
-     *       "suggestions": [
-     *         {
-     *           "action": "speed_training",
-     *           "priority": "high",
-     *           "expected_gain": {"speed": 28, "power": 6},
-     *           "reasoning": "Your speed aptitude is A-rank and current speed is below optimal..."
-     *         }
-     *       ]
-     *     },
-     *     "usage": {
-     *       "daily_requests": 15,
-     *       "daily_cost": 0.05,
-     *       "remaining_budget": 1.95
-     *     }
-     *   }
-     * }
-     */
-    public function getRecommendation(AIRecommendationRequest $request): JsonResponse
-    {
-        $aiRequest = AIRequest::fromRequest($request);
+/* Stat Colors (Game-accurate) */
+:root {
+  --stat-speed: #3399ff;
+  --stat-stamina: #33cc99;
+  --stat-power: #ff4d4d;
+  --stat-guts: #ffa500;
+  --stat-wisdom: #9933ff;
+}
 
-        // Check usage limits
-        $this->usageTracker->checkLimits($request->user());
+/* Aptitude Grade Colors */
+:root {
+  --grade-ss: #e5e7eb;
+  --grade-s: #ffd700;
+  --grade-a: #ef4444;
+  --grade-b: #f97316;
+  --grade-c: #22c55e;
+  --grade-d: #3b82f6;
+  --grade-e: #a855f7;
+  --grade-f: #6b7280;
+  --grade-g: #9ca3af;
+}
 
-        // Get optimal AI service
-        $aiService = $this->aiFactory->createOptimal($aiRequest);
-
-        $response = $aiService->generateResponse($aiRequest);
-
-        // Track usage
-        $this->usageTracker->recordUsage(
-            user: $request->user(),
-            response: $response
-        );
-
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'recommendation' => $response->toArray(),
-                'usage' => $this->usageTracker->getUserUsage($request->user())
-            ]
-        ]);
-    }
-
-    /**
-     * Analyze character performance
-     *
-     * Get AI-powered analysis of character training performance and optimization suggestions.
-     *
-     * @authenticated
-     *
-     * @urlParam character string required Character UUID. Example: 550e8400-e29b-41d4-a716-446655440000
-     *
-     * @response 200 {
-     *   "success": true,
-     *   "data": {
-     *     "analysis": {
-     *       "overall_performance": "above_average",
-     *       "efficiency_score": 85.2,
-     *       "strengths": ["consistent_speed_training", "good_support_card_usage"],
-     *       "weaknesses": ["neglecting_stamina", "suboptimal_race_timing"],
-     *       "recommendations": [
-     *         "Increase stamina training frequency by 20%",
-     *         "Consider entering G3 races for better fan gain"
-     *       ],
-     *       "predicted_outcomes": {
-     *         "final_stats_estimate": {"speed": 1200, "stamina": 800, "power": 1100},
-     *         "success_probability": 0.78,
-     *         "areas_for_improvement": ["stamina", "race_strategy"]
-     *       }
-     *     }
-     *   }
-     * }
-     */
-    public function analyzePerformance(string $uuid): JsonResponse
-    {
-        $character = Character::where('uuid', $uuid)->firstOrFail();
-
-        $this->authorize('view', $character);
-
-        $analysisRequest = new AIRequest(
-            prompt: $this->buildAnalysisPrompt($character),
-            context: $this->gatherAnalysisContext($character),
-            complexity: 8
-        );
-
-        $aiService = $this->aiFactory->createOptimal($analysisRequest);
-        $response = $aiService->generateResponse($analysisRequest);
-
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'analysis' => json_decode($response->getContent(), true),
-                'metadata' => [
-                    'model_used' => $response->getModel(),
-                    'confidence' => $response->getConfidence(),
-                    'processing_time' => $response->getProcessingTime()
-                ]
-            ]
-        ]);
-    }
+/* Dark Mode Support */
+:root.dark {
+  --bg-primary: #1a1a2e;
+  --bg-secondary: #16213e;
+  --text-primary: #eaeaea;
+  --text-secondary: #a0a0a0;
 }
 ```
 
 ---
 
-This completes the first major section of the Source Code Documentation. The document provides comprehensive coverage of the project structure, architecture patterns, core components, and API documentation with detailed examples and specifications aligned with Laravel 12 and modern development practices.
+## 7. API Reference
+
+### 7.1 Route Structure
+
+```mermaid
+flowchart LR
+    subgraph Web["Web Routes (web.php)"]
+        Home["/"]
+        Characters["/characters"]
+        Careers["/careers"]
+        Training["/training"]
+        AI["/ai-advisor"]
+    end
+    
+    subgraph API["API Routes (api.php)"]
+        APICharacters["/api/characters"]
+        APIPredictions["/api/predictions"]
+        APISkills["/api/skills"]
+        APIOCR["/api/ocr"]
+        APIExport["/api/export"]
+    end
+```
+
+### 7.2 API Endpoints
+
+| Route | Method | Controller | Description |
+|-------|--------|------------|-------------|
+| `/api/characters` | GET | CharacterController | List characters |
+| `/api/characters` | POST | CharacterController | Create character |
+| `/api/characters/{id}` | GET | CharacterController | Get character |
+| `/api/characters/{id}` | PUT | CharacterController | Update character |
+| `/api/characters/{id}/stats` | PATCH | CharacterController | Update stats |
+| `/api/predictions/{characterId}` | GET | PredictionController | Get training predictions |
+| `/api/predictions/batch` | POST | PredictionController | Batch predictions |
+| `/api/skills/search` | GET | SkillController | Search skills |
+| `/api/skills/{id}/acquire` | POST | SkillController | Acquire skill |
+| `/api/ocr/upload` | POST | OCRController | Process screenshot |
+| `/api/export/{type}` | GET | ExportController | Export data |
+| `/api/ai/advice` | POST | AIController | Get AI advice |
+
+### 7.3 Service Method Reference
+
+#### CharacterService
+
+| Method | Parameters | Returns | Description |
+|--------|------------|---------|-------------|
+| `create` | `array $data` | `Character` | Create new character |
+| `update` | `Character $char, array $data` | `Character` | Update character |
+| `updateStats` | `Character $char, array $stats` | `Character` | Update stats |
+| `delete` | `Character $char` | `bool` | Soft delete |
+
+#### TrainingPredictionService
+
+| Method | Parameters | Returns | Description |
+|--------|------------|---------|-------------|
+| `getPredictions` | `Character $char` | `array` | Get all predictions |
+| `getRecommendation` | `Character $char` | `Prediction` | Get best option |
+| `calculateRisk` | `Character $char` | `float` | Calculate failure risk |
+
+---
+
+## 8. Coding Standards
+
+### 8.1 PHP Standards
+
+```mermaid
+mindmap
+  root((Coding Standards))
+    PHP
+      PSR-12 Formatting
+      Strict Types
+      Type Declarations
+      Readonly Properties
+    JavaScript
+      ES6+ Syntax
+      Alpine Best Practices
+      Livewire Conventions
+    CSS
+      Tailwind First
+      CSS Variables
+      Dark Mode Support
+    Testing
+      Pest PHP
+      Feature Tests
+      Unit Tests
+```
+
+### 8.2 Naming Conventions
+
+| Context | Convention | Example |
+|---------|------------|---------|
+| PHP Classes | PascalCase | `CharacterService`, `TrainingAdvisorAgent` |
+| PHP Methods | camelCase | `getPredictions`, `calculateBonus` |
+| PHP Constants | UPPER_SNAKE | `MAX_STAT_VALUE`, `API_TIMEOUT` |
+| Database Tables | snake_case (plural, prefixed) | `ucp_characters`, `ucp_skills` |
+| Database Columns | snake_case | `turn_number`, `skill_type` |
+| Blade Views | kebab-case | `character-editor.blade.php` |
+| Livewire Components | PascalCase | `TrainingSelector.php` |
+| Config Keys | snake_case | `ai.local_model`, `mcp.servers` |
+
+### 8.3 File Organization
+
+| File Type | Location | Naming Pattern |
+|-----------|----------|----------------|
+| Models | `app/Models/` | `{Entity}.php` |
+| Services | `app/Services/` | `{Domain}Service.php` |
+| Controllers | `app/Http/Controllers/` | `{Entity}Controller.php` |
+| Form Requests | `app/Http/Requests/` | `{Action}{Entity}Request.php` |
+| Livewire | `app/Livewire/` | `{Feature}/{Component}.php` |
+| Neuron Agents | `app/Neuron/Agents/` | `{Purpose}Agent.php` |
+| Tests | `tests/{Type}/` | `{Subject}Test.php` |
+
+---
+
+## 9. Testing Strategy
+
+### 9.1 Test Distribution
+
+```mermaid
+pie title Test Coverage Distribution
+    "Unit Tests (Services)" : 40
+    "Feature Tests (HTTP)" : 30
+    "Livewire Tests" : 20
+    "AI Integration Tests" : 10
+```
+
+### 9.2 Test Structure
+
+```text
+tests/
+├── Unit/
+│   ├── Services/
+│   │   ├── CharacterServiceTest.php
+│   │   ├── TrainingPredictionServiceTest.php
+│   │   └── SkillServiceTest.php
+│   ├── Calculators/
+│   │   ├── StatGainCalculatorTest.php
+│   │   └── BonusCalculatorTest.php
+│   └── AI/
+│       ├── HybridAIServiceTest.php
+│       └── CostTrackerTest.php
+├── Feature/
+│   ├── Character/
+│   │   ├── CharacterCrudTest.php
+│   │   └── CharacterStatsTest.php
+│   ├── Training/
+│   │   ├── TrainingPredictionTest.php
+│   │   └── TrainingSessionTest.php
+│   ├── API/
+│   │   ├── CharacterApiTest.php
+│   │   └── PredictionApiTest.php
+│   └── AI/
+│       ├── AIAdvisorTest.php
+│       └── MCPIntegrationTest.php
+└── Livewire/
+    ├── CharacterEditorTest.php
+    ├── TrainingSelectorTest.php
+    └── SkillCatalogTest.php
+```
+
+### 9.3 Test Examples
+
+```php
+// tests/Unit/Services/TrainingPredictionServiceTest.php
+use App\Services\TrainingPredictionService;
+use App\Models\Character;
+
+test('calculates training predictions for all facilities', function () {
+    $character = Character::factory()->create();
+    $service = app(TrainingPredictionService::class);
+    
+    $predictions = $service->getPredictions($character);
+    
+    expect($predictions)->toHaveCount(6)
+        ->and($predictions[0])->toHaveKeys([
+            'training_type',
+            'stat_gains',
+            'risk_percentage',
+            'recommendation_score',
+        ]);
+});
+
+test('ranks predictions by recommendation score', function () {
+    $character = Character::factory()->withGoals(['speed' => 1000])->create();
+    $service = app(TrainingPredictionService::class);
+    
+    $predictions = $service->getPredictions($character);
+    
+    expect($predictions[0]['training_type'])->toBe('speed');
+});
+```
 
 ---
 
 ## Document Control
 
 | Version | Date | Author | Changes |
-| ------- | ---- | ------ | ------- |
-| 1.0 | 2026-01-11 | Development Team | Initial source code documentation |
+|---------|------|--------|---------|
+| 2.1.0 | 2026-01-23 | Development Team | Updated to reflect current codebase structure including AI, MCP, and Neuron integration |
+| 2.0.0 | 2026-01-14 | Development Team | Added service layer and Livewire documentation |
+| 1.0.0 | 2026-01-03 | Development Team | Initial draft |
 
 ---
 
-*This document provides comprehensive source code documentation for the Umamusume Pretty Derby Career Planner system, including project structure, architecture patterns, core components, and API documentation.*
+*This documentation reflects the current implementation of the Umamusume Pretty Derby Career Planner codebase.*

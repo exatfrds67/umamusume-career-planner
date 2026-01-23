@@ -1,838 +1,621 @@
-# Business Requirements Specification (BRS)
+# Business Requirements Specifications (BRS)
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 1.0
-**Date**: January 14, 2026
+**Document Version**: 2.1.0
+**Date**: January 23, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
+**Status**: Current - Aligned with codebase
 
 ---
 
 ## Table of Contents
 
-1. [Executive Summary](#executive-summary)
+1. [Introduction](#1-introduction)
 2. [Business Context](#2-business-context)
-3. [Business Objectives](#3-business-objectives)
-4. [Stakeholder Analysis](#4-stakeholder-analysis)
-5. [Business Requirements](#5-business-requirements)
-6. [Success Criteria](#6-success-criteria)
-7. [Risk Assessment](#7-risk-assessment)
-8. [Implementation Strategy](#8-implementation-strategy)
+3. [Stakeholder Analysis](#3-stakeholder-analysis)
+4. [Business Requirements](#4-business-requirements)
+5. [Business Rules](#5-business-rules)
+6. [Business Process Flows](#6-business-process-flows)
+7. [Success Metrics](#7-success-metrics)
+8. [Constraints and Assumptions](#8-constraints-and-assumptions)
+9. [Dependencies](#9-dependencies)
+10. [Document Control](#10-document-control)
 
 ---
 
-## Executive Summary
+## 1. Introduction
 
-### Business Problem
+### 1.1 Purpose
 
-Umamusume Pretty Derby players currently rely on manual tracking methods
-(Google Docs, spreadsheets) and fragmented community tools to optimize
-their character training strategies across both URA Finale and Unity Cup
-scenarios. This approach leads to:
+This document defines the business objectives and current scope for the Umamusume Pretty Derby Career Planner application. It establishes the business context, stakeholder needs, and high-level requirements that guide the technical implementation.
 
-- **Inefficient Decision Making**: Players spend excessive time
-  calculating optimal training choices manually, particularly for complex
-  scenario-specific mechanics like Spirit Burst timing and friendship
-  training optimization
-- **Inconsistent Results**: Lack of systematic approach results in
-  variable A+ grade achievement rates, with many players struggling to
-  understand the intricate relationships between stats, aptitudes, skills,
-  and scenario requirements
-- **Information Fragmentation**: Critical game data scattered across
-  multiple sources and languages, including deprecated APIs
-  (SimpleSandman/UmaMusumeAPI EOL October 2024), making comprehensive
-  optimization difficult
-- **Accessibility Barriers**: Existing tools lack proper accessibility
-  features for diverse user needs, with no WCAG 2.2 AA compliance or
-  comprehensive keyboard navigation support
-- **Privacy Concerns**: Cloud-based solutions require sharing personal
-  gameplay data, with no local-first alternatives providing AI-powered
-  optimization while maintaining data privacy
-- **Scenario Complexity**: Limited tools supporting both URA Finale
-  individual optimization and Unity Cup team mechanics, Spirit Burst
-  coordination, and facility level management
-- **Advanced Mechanics Gap**: No comprehensive tools handling skill
-  evolution chains, hint-based SP cost reduction (20% per duplicate, 40%
-  max), weather condition optimization, or turn economy management across
-  60-70 turn careers
+### 1.2 Scope
 
-### Proposed Solution
+The Umamusume Career Planner is a comprehensive web application built with **Laravel 12** (released February 24, 2025), **TypeScript support**, **Tailwind CSS v4** (released January 22, 2025), and integrates with **AWS Bedrock Claude 4.5** models and **AWS Bedrock Nova 2** for AI capabilities. The system enables players of Uma Musume: Pretty Derby to track, manage, and optimize their career progression through intelligent recommendations and analytics.
 
-The Umamusume Career Planner addresses these challenges through a
-comprehensive local-first application that provides:
+### 1.3 Definitions and Acronyms
 
-- **Intelligent Automation**: Hybrid AI-powered training predictions
-  using Ollama local models (Llama 3.3, Mistral, Qwen) with AWS Bedrock
-  fallback (Claude 4.5 series, Nova 2) for complex optimization scenarios
-- **Unified Data Management**: Centralized character, skill, and career
-  progression tracking with comprehensive database schema supporting 15+
-  tables for complete game mechanics
-- **Privacy-First Architecture**: Local MySQL database with Redis caching
-  via WSL, ensuring no personal data transmission without explicit user
-  consent
-- **Accessibility Compliance**: WCAG 2.2 AA compliant Progressive Web App
-  interface with keyboard navigation, screen reader support, and proper
-  contrast ratios
-- **Scenario Optimization**: Specialized support for both URA Finale
-  individual optimization and Unity Cup team mechanics, including Spirit
-  Burst coordination and facility level management
-- **Advanced Game Mechanics**: Complete implementation of skill evolution
-  chains, hint-based SP cost reduction, weather condition optimization,
-  and comprehensive turn economy management
-- **External API Integration**: Intelligent integration with umapyoi.net
-  (replacing deprecated SimpleSandman/UmaMusumeAPI) and UmamusumeDB.com
-  with Redis-based caching and fallback mechanisms
-- **OCR Screenshot Processing**: Tesseract OCR with OpenCV preprocessing
-  for automated data extraction from game screenshots with Japanese
-  language support
-- **MCP Server Integration**: Leveraging Model Context Protocol servers
-  for enhanced AWS integration, external API management, and development
-  workflow optimization
-- **Subagent Utilization**: Strategic deployment of context-gatherer and
-  general-task-execution subagents for efficient development and complex
-  feature implementation
-
-### Business Value Proposition
-
-- **Time Savings**: Reduce training decision time from minutes to seconds
-  per turn through AI-powered recommendations and automated calculations
-- **Performance Improvement**: Increase A+ grade achievement rate by 40%
-  through data-driven optimization and scenario-specific mechanics
-  understanding
-- **Enhanced Experience**: Transform manual tracking into intelligent
-  strategic guidance with comprehensive game mechanics support
-- **Privacy Protection**: Maintain complete control over personal gameplay
-  data with local-first architecture and hybrid AI processing
-- **Future-Proof Design**: Scalable architecture supporting community
-  features, multi-user expansion, and integration with emerging game
-  mechanics
-- **Comprehensive Coverage**: Support for all 59 detailed requirements
-  including advanced skill management, weather optimization, and turn
-  economy strategies
-- **Technology Leadership**: Leverage cutting-edge technologies (Laravel
-  12, Tailwind CSS v4, hybrid AI) for superior performance and user
-  experience
-- **Accessibility Excellence**: WCAG 2.2 AA compliance ensuring inclusive
-  access for all players regardless of abilities or assistive technology
-  needs
-
----
+| Term | Definition |
+|------|------------|
+| Plan/Career Run | A career run record tracking an Uma Musume character's training progression |
+| Uma Musume | A horse girl character from the Uma Musume: Pretty Derby game |
+| SP (Skill Points) | Points earned from races and events, spent to purchase skills |
+| Stat Max | Maximum stat value (1200) - hard cap, no values above allowed |
+| URA Finale | The final race series at the end of Senior Year |
+| OCR | Optical Character Recognition for screenshot data extraction |
+| MCP | Model Context Protocol for AI integration |
 
 ---
 
 ## 2. Business Context
 
-### 2.1 Market Analysis
+### 2.1 Business Problem
 
-#### 2.1.1 Target Market
+Players of Uma Musume: Pretty Derby currently lack a comprehensive, unified tool to:
 
-**Primary Market**: Umamusume Pretty Derby Players
+- Track character training progression across multiple career runs
+- Plan skill acquisitions and race strategies with AI-powered recommendations
+- Analyze training effectiveness and outcomes with predictive analytics
+- Export and share training records
+- Access data across devices or offline
+- Receive intelligent advisory for optimal training decisions
 
-- **Size**: 15+ million registered users globally (as of 2024)
-- **Demographics**: Primarily Japanese players (70%), with growing international audience
-- **Engagement**: High-engagement mobile game with daily active user rates exceeding 40%
-- **Spending**: Premium gacha-based monetization with average monthly spending of $50-200 per active player
+### 2.2 Business Opportunity
 
-**Secondary Market**: Gaming Optimization Tool Users
+By providing a modern, AI-enhanced planning platform, we can:
 
-- **Size**: Estimated 2-3 million users across various gaming optimization platforms
-- **Characteristics**: Tech-savvy gamers who use external tools for competitive advantage
-- **Preferences**: Value data-driven insights, automation, and performance tracking
+- Deliver superior user experience with modern web technologies (Laravel 12, Tailwind CSS v4)
+- Enable offline-first usage for players without reliable connectivity
+- Support cross-device access for authenticated users
+- Improve accessibility for users with disabilities (WCAG AA compliance)
+- Provide AI-powered training optimization and race strategy recommendations
+- Integrate external game data sources for accurate planning
 
-#### 2.1.2 Competitive Landscape
+### 2.3 Business Objectives
 
-**Direct Competitors**:
+| Objective | Success Metric |
+|-----------|----------------|
+| User Adoption | Active users tracking plans |
+| Data Migration | Successful import of legacy data |
+| Accessibility | WCAG AA compliance |
+| Performance | Page load < 2 seconds |
+| Reliability | 99% uptime for Account mode |
+| AI Advisory | Response times within configured timeouts |
 
-- **UmamusumeDB.com**: Web-based calculator tools with limited optimization features and no comprehensive career management
-- **Community Spreadsheets**: Manual tracking templates shared via Discord and Reddit with no automation or AI assistance
-- **Japanese Tools**: Native language tools with limited international accessibility and no advanced AI integration
-- **Deprecated Tools**: SimpleSandman/UmaMusumeAPI (EOL October 2024) requiring migration to active alternatives
+### 2.4 Value Proposition
 
-**Competitive Advantages**:
-
-- **Comprehensive Integration**: All-in-one solution vs. fragmented tools, supporting both URA Finale and Unity Cup scenarios with complete game mechanics
-- **Hybrid AI-Powered Optimization**: Advanced local/cloud AI recommendations vs. manual calculations, with cost-optimized intelligent routing
-- **Local-First Privacy**: Complete data control vs. cloud dependency, with optional AI features and transparent privacy policies
-- **Accessibility Compliance**: WCAG 2.2 AA inclusive design vs. limited accessibility, supporting diverse user needs and assistive technologies
-- **Scenario Specialization**: Dedicated URA/Unity Cup optimization with Spirit Burst mechanics vs. generic tools lacking scenario-specific features
-- **Advanced Game Mechanics**: Complete skill evolution, hint optimization, weather systems, and turn economy vs. basic stat tracking
-- **Modern Technology Stack**: Laravel 12, Tailwind CSS v4, Progressive Web App capabilities vs. outdated frameworks and limited mobile support
-- **MCP Integration**: Enhanced development workflow and external service integration vs. manual API management and limited extensibility
-
-### 2.2 Technology Landscape
-
-#### 2.2.1 Current Technology Trends
-
-- **Local-First Applications**: Growing preference for privacy-preserving local data storage
-- **Hybrid AI Processing**: Combination of local and cloud AI for optimal performance and privacy
-- **Progressive Web Apps**: Modern web applications with native app-like capabilities
-- **Accessibility-First Design**: Increasing focus on inclusive design and WCAG compliance
-
-#### 2.2.2 Technical Enablers
-
-- **Laravel 12**: Modern PHP framework with TypeScript support, advanced starter kits, and Tailwind integration (released February 24, 2025)
-- **Tailwind CSS v4**: Next-generation CSS framework with 5x faster builds, zero configuration, and modern CSS features (released January 22, 2025)
-- **Local AI Models**: Ollama with cloudstudio/ollama-laravel package enabling privacy-preserving AI processing with verified Laravel 12 compatibility
-- **Cloud AI Services**: AWS Bedrock providing advanced AI capabilities (Claude 4.5 Opus $5/$25, Sonnet $3/$15, Haiku $1/$5, Nova 2 Lite $0.00125 per 1K tokens)
-- **Progressive Web Apps**: Modern web standards enabling native app-like capabilities with offline functionality and installable experience
-- **Redis via WSL**: High-performance caching and session management for optimal local development and production performance
-- **External APIs**: Active community APIs (umapyoi.net, UmamusumeDB.com) replacing deprecated services with intelligent fallback mechanisms
-- **OCR Technology**: Tesseract with OpenCV preprocessing for automated screenshot data extraction with Japanese language support
-- **MCP Servers**: Model Context Protocol integration for enhanced development workflow, AWS services, and external API management
-- **Subagent Architecture**: Context-gatherer and general-task-execution subagents for efficient development and parallel task processing
-
----
-
-## 3. Business Objectives
-
-### 3.1 Primary Objectives
-
-#### 3.1.1 User Experience Enhancement
-
-**Objective**: Transform manual character management into intelligent, automated optimization with comprehensive game mechanics support
-
-**Key Results**:
-
-- Reduce training decision time by 80% (from 2-3 minutes to 20-30 seconds per turn) through AI-powered recommendations and automated calculations
-- Achieve 95%+ user satisfaction rating for interface usability with WCAG 2.2 AA accessibility compliance verification
-- Maintain sub-2-second response times for core optimization features with Core Web Vitals compliance (LCP <2.5s, INP <200ms, CLS <0.1)
-- Support comprehensive game mechanics including skill evolution chains, hint-based SP optimization, weather systems, and turn economy management
-- Provide Progressive Web App capabilities with offline functionality, installable experience, and native app-like performance
-
-**Business Impact**: Improved user engagement and retention through superior experience and comprehensive feature coverage
-
-#### 3.1.2 Performance Optimization
-
-**Objective**: Increase player success rates through data-driven strategic guidance and comprehensive game mechanics understanding
-
-**Key Results**:
-
-- Improve A+ grade achievement rate by 40% compared to manual methods through advanced optimization algorithms and scenario-specific mechanics
-- Provide 90%+ accuracy in training outcome predictions with machine learning improvements based on historical performance data
-- Enable consistent performance across both URA Finale individual optimization and Unity Cup team mechanics with Spirit Burst coordination
-- Reduce career completion time by 25% through optimized decision making, turn economy management, and strategic resource allocation
-- Support advanced mechanics including skill hint optimization (20% per duplicate, 40% max), weather condition strategies, and friendship training timing
-
-**Business Impact**: Enhanced player satisfaction and game enjoyment leading to increased engagement and community growth
-
-#### 3.1.3 Privacy and Data Control
-
-**Objective**: Provide complete user control over personal gameplay data with hybrid AI processing capabilities
-
-**Key Results**:
-
-- 100% local data storage for personal gameplay information using MySQL database with Redis caching via WSL
-- Zero unauthorized data transmission to external services with transparent privacy policies and user consent mechanisms
-- User-controlled opt-in for cloud AI features (AWS Bedrock) with clear cost tracking and usage transparency
-- Comprehensive data export/import functionality supporting multiple formats (JSON, CSV, PDF) for complete data portability
-- Hybrid AI processing with local Ollama models as primary and cloud fallback only when necessary or explicitly requested
-
-**Business Impact**: Build trust and differentiate from cloud-dependent competitors while providing advanced AI capabilities
-
-### 3.2 Secondary Objectives
-
-#### 3.2.1 Community Integration
-
-**Objective**: Enable optional community features while maintaining privacy with intelligent external data integration
-
-**Key Results**:
-
-- Support for anonymous strategy sharing and meta analysis with privacy-preserving data aggregation
-- Integration with active community databases (umapyoi.net, UmamusumeDB.com) replacing deprecated APIs with intelligent fallback mechanisms
-- Optional leaderboards and achievement tracking with user-controlled participation and data sharing preferences
-- Community-driven content and strategy guides with contribution recognition and quality validation systems
-- OCR screenshot processing for easy data sharing and community collaboration while maintaining personal data privacy
-
-**Business Impact**: Foster community engagement and user-generated content while respecting privacy preferences
-
-#### 3.2.2 Technical Excellence
-
-**Objective**: Establish technical foundation for future expansion and scalability using modern development practices
-
-**Key Results**:
-
-- Modular architecture supporting future multi-user migration with Laravel 12 advanced features and TypeScript integration
-- Comprehensive test coverage (80%+ for critical components) with automated testing pipeline and quality assurance processes
-- Performance benchmarks meeting or exceeding industry standards with Core Web Vitals compliance and database optimization
-- Documentation quality enabling community contributions with comprehensive API documentation and development guides
-- MCP server integration for enhanced development workflow, AWS services management, and external API coordination
-- Subagent utilization for efficient development processes and parallel task execution capabilities
-
-**Business Impact**: Reduce technical debt, enable rapid feature development, and support community-driven enhancements
+```mermaid
+mindmap
+  root((Umamusume Career Planner))
+    Core Platform
+      Laravel 12 Backend
+      TypeScript Support
+      Tailwind CSS v4
+      PWA Capabilities
+    AI Integration
+      Neuron AI Agents
+      Hybrid Ollama/Bedrock
+      Training Optimization
+      Race Strategy
+    Data Management
+      Import/Export Workflows
+      OCR Processing
+      Backup/Restore
+      Migration Support
+    External Integration
+      umapyoi.net API
+      UmamusumeDB API
+      Community Sources
+      Real-time Updates
+```
 
 ---
 
-## 4. Stakeholder Analysis
+## 3. Stakeholder Analysis
 
-### 4.1 Primary Stakeholders
+### 3.1 Primary Stakeholders
 
-#### 4.1.1 End Users (Umamusume Players)
+#### 3.1.1 Players (End Users)
 
-**Profile**: Individual players seeking to optimize their gameplay experience
+**Needs:**
 
-**Needs**:
+- Quick and easy plan creation with AI recommendations
+- Offline access to data via PWA
+- Cross-device synchronization
+- Data export for sharing/backup
+- Accessible interface (WCAG AA compliant)
+- Intelligent training and race strategy guidance
 
-- Efficient training decision support with clear recommendations
-- Comprehensive character and career progression tracking
-- Privacy-preserving data management with local storage
-- Accessible interface supporting diverse user needs and abilities
+**Pain Points:**
 
-**Success Metrics**:
+- Current tools are fragmented
+- No AI-powered optimization
+- Poor mobile experience
+- Data locked in single application
 
-- User adoption rate and retention
-- Feature usage analytics and engagement patterns
-- User satisfaction surveys and feedback scores
-- Performance improvement in gameplay outcomes
+#### 3.1.2 Developers/Maintainers
 
-**Influence**: High - Primary users whose satisfaction determines project success
+**Needs:**
 
-#### 4.1.2 Development Team
+- Single codebase to maintain
+- Modern, well-documented architecture
+- Comprehensive test coverage
+- Clear development standards
+- Monitoring and observability
 
-**Profile**: Technical team responsible for implementation and maintenance
+### 3.2 Stakeholder Map
 
-**Needs**:
-
-- Clear requirements and technical specifications
-- Modern development tools and frameworks
-- Comprehensive testing and quality assurance processes
-- Documentation and knowledge management systems
-
-**Success Metrics**:
-
-- Development velocity and milestone achievement
-- Code quality metrics and technical debt management
-- Bug resolution time and system reliability
-- Team satisfaction and knowledge retention
-
-**Influence**: High - Responsible for technical execution and long-term maintenance
-
-### 4.3 Technology Integration Stakeholders
-
-#### 4.3.1 MCP Server Integration
-
-**Profile**: Model Context Protocol servers providing enhanced development and integration capabilities
-
-**Needs**:
-
-- Streamlined AWS Bedrock integration for cloud AI services
-- Enhanced external API management for community data sources
-- Development workflow optimization and automation
-- Secure credential management and access control
-
-**Success Metrics**:
-
-- Successful AWS integration with cost optimization and monitoring
-- Reliable external API connections with intelligent fallback mechanisms
-- Improved development velocity through enhanced tooling
-- Secure and efficient credential management across services
-
-**Influence**: Medium - Enables enhanced development capabilities and service integration
-
-#### 4.3.2 Subagent Coordination
-
-**Profile**: Specialized AI subagents for efficient development and complex task execution
-
-**Needs**:
-
-- Context-gatherer subagent for codebase analysis and feature investigation
-- General-task-execution subagent for parallel development and testing automation
-- Efficient task delegation and result integration
-- Quality assurance and performance optimization
-
-**Success Metrics**:
-
-- Accelerated development through parallel task execution
-- Improved code quality through systematic analysis
-- Efficient feature implementation and testing coverage
-- Reduced development time and enhanced productivity
-
-**Influence**: Medium - Significantly impacts development efficiency and code quality
-
-### 4.4 Secondary Stakeholders
-
-#### 4.4.1 Umamusume Community
-
-**Profile**: Broader community of players, content creators, and strategy enthusiasts
-
-**Needs**:
-
-- Access to aggregated meta information and strategy insights
-- Tools for content creation and strategy sharing
-- Integration with existing community platforms and resources
-- Contribution opportunities for community-driven improvements
-
-**Success Metrics**:
-
-- Community engagement and content creation
-- Integration adoption with community tools
-- Contribution volume and quality
-- Community feedback and sentiment analysis
-
-**Influence**: Medium - Provides valuable feedback and potential for viral adoption
-
-#### 4.4.2 Game Developers (Cygames)
-
-**Profile**: Original game developers with intellectual property rights
-
-**Needs**:
-
-- Compliance with terms of service and fair use guidelines
-- Respect for intellectual property and game balance
-- Positive impact on player engagement and satisfaction
-- No interference with game monetization or core mechanics
-
-**Success Metrics**:
-
-- Compliance with ToS and legal requirements
-- Positive player sentiment and engagement metrics
-- No negative impact on game balance or economy
-- Constructive relationship with official channels
-
-**Influence**: Medium - Can impact project viability through policy changes
+```mermaid
+quadrantChart
+    title Stakeholder Influence vs Interest
+    x-axis Low Interest --> High Interest
+    y-axis Low Influence --> High Influence
+    quadrant-1 Keep Satisfied
+    quadrant-2 Manage Closely
+    quadrant-3 Monitor
+    quadrant-4 Keep Informed
+    Players: [0.9, 0.7]
+    Developers: [0.8, 0.9]
+    Content Creators: [0.6, 0.3]
+    Community: [0.5, 0.4]
+```
 
 ---
 
-## 5. Business Requirements
+## 4. Business Requirements
 
-### 5.1 Functional Business Requirements
+### 4.1 Character Management [BR-1]
 
-#### 5.1.1 Core Optimization Engine
+**Business Need:** Players need to manage their Uma Musume character roster with complete information.
 
-##### BR-001: Advanced Training Decision Support
+| ID | Requirement | Priority | Status |
+|----|-------------|----------|--------|
+| BR-1.1 | Create, view, update, and delete character records | P0 | Implemented |
+| BR-1.2 | Store character images with visual preview | P1 | Implemented |
+| BR-1.3 | Track aptitude grades for terrain, distance, and style | P0 | Implemented |
+| BR-1.4 | Track growth rate bonuses for all five stats | P0 | Implemented |
+| BR-1.5 | Factor inheritance system with stat/aptitude bonuses | P0 | Implemented |
+| BR-1.6 | Goal management and progress tracking | P1 | Implemented |
 
-- The system SHALL provide real-time training recommendations based on comprehensive character state, scenario-specific mechanics (URA Finale vs Unity Cup), and advanced game mechanics including Spirit Burst timing, friendship training optimization, and turn economy management
-- The system SHALL calculate expected outcomes for all available training options incorporating support card bonuses, facility levels (1-5 providing 1.0x to 2.0x multipliers), energy management, mood effects, and weather condition impacts
-- The system SHALL rank recommendations by effectiveness toward user-defined objectives with clear reasoning explanations and confidence scoring for all predictions
-- The system SHALL provide scenario-specific optimization with URA Finale individual focus and Unity Cup team coordination including Spirit Burst mechanics and distance team management
+**Related Artifacts:**
 
-##### BR-002: Comprehensive Skill Management and SP Optimization
+- PRD: [PRD-001](prds/PRD-001_Character_Management.md)
+- SPEC: [SPEC-001](specs/SPEC-001_Character_Management_Technical.md)
+- Flow: [FLOW-001](flows/FLOW-001_Character_Management_System.md)
+- Wireframes: [WF-002](wireframes/WF-002_Character_Creation_Wizard.md), [WF-003](wireframes/WF-003_Character_Detail_Management.md)
 
-- The system SHALL implement advanced skill management with complete skill evolution chains (Normal → Rare upgrades), hint-based SP cost reduction (20% per duplicate hint, 40% maximum), and strategic skill acquisition timing optimization
-- The system SHALL track skill hint sources from support card training (red "!" indicators), events, and inheritance with comprehensive cost reduction calculations and SP budget management
-- The system SHALL provide skill build optimization recommendations based on character type, racing goals, available hint opportunities, and skill evolution prerequisites
-- The system SHALL maintain comprehensive skill databases categorized by type (Speed, Passive, Recovery, Debuff) and rarity (Normal 120-180 SP, Rare 180-240 SP, Unique variable) with complete evolution mappings
+### 4.2 Training Optimization [BR-2]
 
-##### BR-003: Multi-Scenario Career Management
+**Business Need:** Players need intelligent training recommendations and predictions.
 
-- The system SHALL support distinct optimization strategies for URA Finale individual character development and Unity Cup team-based mechanics with Spirit Burst coordination
-- The system SHALL track comprehensive character progression including stats (0-1200 range), aptitudes (G-SS fixed ratings), factors from 6-character legacy teams, and scenario-specific progress indicators
-- The system SHALL provide historical analysis and pattern recognition across multiple career runs with comparative performance metrics and optimization recommendations
-- The system SHALL implement turn economy management across 60-70 turn careers with phase-specific priorities (Junior/Classic/Senior) and Summer Camp optimization periods
+| ID | Requirement | Priority | Status |
+|----|-------------|----------|--------|
+| BR-2.1 | Training prediction engine with stat gain calculations | P0 | Implemented |
+| BR-2.2 | Support card bonus integration | P0 | Implemented |
+| BR-2.3 | Skill hint tracking and SP cost reduction | P0 | Implemented |
+| BR-2.4 | AI-powered training recommendations | P0 | Implemented |
+| BR-2.5 | Training session history and analytics | P1 | Implemented |
 
-#### 5.1.2 Data Management and Privacy
+**Related Artifacts:**
 
-##### BR-004: Local-First Data Architecture
+- PRD: [PRD-002](prds/PRD-002_Training_Optimization.md)
+- SPEC: [SPEC-002](specs/SPEC-002_Training_Optimization_Technical.md)
+- Flow: [FLOW-002](flows/FLOW-002_Training_Optimization_System.md)
+- Wireframes: [WF-004](wireframes/WF-004_Training_Selection_Interface.md), [WF-005](wireframes/WF-005_Training_Result_Screen.md)
 
-- The system SHALL store all personal gameplay data locally using MySQL database with Redis caching via WSL, ensuring complete user control over personal information
-- The system SHALL provide comprehensive data backup and restore functionality with multiple export formats (JSON, CSV, PDF) for complete data portability
-- The system SHALL implement hybrid AI processing with local Ollama models as primary and AWS Bedrock cloud fallback only when necessary or explicitly requested by users
-- The system SHALL never transmit personal gameplay data to external servers without explicit user consent and transparent privacy policy acknowledgment
+### 4.3 Race Strategy [BR-3]
 
-##### BR-005: Intelligent External Data Integration
+**Business Need:** Players need race preparation guidance and strategy optimization.
 
-- The system SHALL integrate with active community databases (umapyoi.net replacing deprecated SimpleSandman/UmaMusumeAPI, UmamusumeDB.com) with intelligent fallback mechanisms and Redis-based caching
-- The system SHALL provide comprehensive offline functionality with cached game data, ensuring core features remain available without internet connectivity
-- The system SHALL implement data validation and conflict resolution between multiple external sources with accuracy verification and user notification of data quality issues
-- The system SHALL support OCR screenshot processing using Tesseract with OpenCV preprocessing for automated data extraction with Japanese language support
+| ID | Requirement | Priority | Status |
+|----|-------------|----------|--------|
+| BR-3.1 | Race calendar with requirements and readiness scoring | P0 | Implemented |
+| BR-3.2 | Running style optimization (4 styles) | P0 | Implemented |
+| BR-3.3 | Win probability calculation | P1 | Implemented |
+| BR-3.4 | AI-powered race strategy recommendations | P0 | Implemented |
+| BR-3.5 | Race history and performance analytics | P1 | Implemented |
 
-##### BR-006: MCP Server Integration and Development Enhancement
+**Related Artifacts:**
 
-- The system SHALL leverage Model Context Protocol servers for enhanced AWS Bedrock integration, external API management, and development workflow optimization
-- The system SHALL implement secure credential management and access control for MCP servers with proper configuration management at workspace and user levels
-- The system SHALL utilize subagent coordination with context-gatherer for codebase analysis and general-task-execution for parallel development tasks
-- The system SHALL provide automated development assistance through MCP server integration while maintaining security and performance standards
+- PRD: [PRD-003](prds/PRD-003_Race_Strategy.md)
+- SPEC: [SPEC-003](specs/SPEC-003_Race_Strategy_Technical.md)
+- Flow: [FLOW-003](flows/FLOW-003_Race_Strategy_System.md)
+- Wireframes: [WF-006](wireframes/WF-006_Race_Calendar_View.md), [WF-007](wireframes/WF-007_Race_Preparation_Screen.md)
 
-#### 5.1.3 User Experience and Accessibility
+### 4.4 Skill Management [BR-4]
 
-##### BR-007: Progressive Web Application with Accessibility Excellence
+**Business Need:** Players need to plan and track skill acquisitions efficiently.
 
-- The system SHALL provide a fully responsive Progressive Web App interface built with Laravel 12 and Tailwind CSS v4, supporting desktop, tablet, and mobile devices with WCAG 2.2 AA accessibility compliance
-- The system SHALL implement comprehensive accessibility features including keyboard navigation, screen reader support (NVDA, JAWS, VoiceOver), proper contrast ratios (4.5:1 normal, 3:1 large text), focus indicators with 3:1 contrast, and semantic HTML structure
-- The system SHALL provide offline functionality through service workers, background sync capabilities, push notifications, and installable app experience with proper manifest configuration
-- The system SHALL maintain Core Web Vitals compliance (LCP <2.5s, INP <200ms, CLS <0.1) with performance optimization including code splitting, lazy loading, and asset optimization
+| ID | Requirement | Priority | Status |
+|----|-------------|----------|--------|
+| BR-4.1 | Skill catalog with search (English and Japanese) | P0 | Implemented |
+| BR-4.2 | Hint-based SP cost reduction (20% per hint, 40% max) | P0 | Implemented |
+| BR-4.3 | Skill evolution system (Normal → Rare) | P0 | Implemented |
+| BR-4.4 | SP budget optimization | P1 | Implemented |
+| BR-4.5 | AI skill build recommendations | P1 | Implemented |
 
-##### BR-008: Advanced User Interface and Interaction Design
+**Related Artifacts:**
 
-- The system SHALL integrate existing visual assets including character images from trainee_images directory and themed backgrounds from app_bg directory with automatic theme switching
-- The system SHALL provide intuitive forms with comprehensive validation, auto-completion features, error handling with clear text descriptions, and accessibility labels for all form elements
-- The system SHALL implement smooth transitions with proper loading states, consistent user experience across all sections, breadcrumb navigation with ARIA landmarks, and comprehensive error handling with user-friendly recovery options
-- The system SHALL support text resizing capability up to 200% without loss of content or functionality while maintaining responsive design principles and accessibility standards
+- PRD: [PRD-004](prds/PRD-004_Skill_Management.md)
+- SPEC: [SPEC-004](specs/SPEC-004_Skill_Management_Technical.md)
+- Flow: [FLOW-004](flows/FLOW-004_Skill_Management_System.md)
+- Wireframes: [WF-008](wireframes/WF-008_Skill_Shop_Interface.md), [WF-009](wireframes/WF-009_Skill_Loadout_Manager.md)
 
-### 5.2 Non-Functional Business Requirements
+### 4.5 Support Card Management [BR-5]
 
-#### 5.2.1 Performance Requirements
+**Business Need:** Players need to optimize support card decks for training.
 
-##### BR-009: Advanced Performance Standards
+| ID | Requirement | Priority | Status |
+|----|-------------|----------|--------|
+| BR-5.1 | Support card database (200+ cards with meta tiers) | P0 | Implemented |
+| BR-5.2 | Deck composition validator (6-card deck) | P0 | Implemented |
+| BR-5.3 | Bond level and limit break tracking | P0 | Implemented |
+| BR-5.4 | Deck synergy scoring and recommendations | P1 | Implemented |
+| BR-5.5 | Meta tier synchronization from external sources | P1 | Implemented |
 
-- Core optimization features SHALL respond within 2 seconds under normal conditions with database query optimization, proper indexing, and Redis caching strategies
-- Hybrid AI-powered recommendations SHALL complete within 3 seconds for local Ollama processing and 5 seconds for AWS Bedrock fallback with intelligent routing based on complexity detection
-- Database operations SHALL execute within 500ms for standard queries with connection pooling, query result caching, and Eloquent strict mode to prevent N+1 queries
-- Progressive Web App features SHALL provide immediate feedback within 100ms for user interactions with optimistic updates and proper loading state management
+**Related Artifacts:**
 
-##### BR-010: Scalability and Reliability with Modern Architecture
+- PRD: [PRD-005](prds/PRD-005_Support_Card_Management.md)
+- SPEC: [SPEC-005](specs/SPEC-005_Support_Card_Management_Technical.md)
+- Flow: [FLOW-005](flows/FLOW-005_Support_Card_Management_System.md)
+- Wireframes: [WF-010](wireframes/WF-010_Support_Card_Collection.md), [WF-011](wireframes/WF-011_Support_Deck_Builder.md)
 
-- The system SHALL support databases with 1000+ career records without performance degradation using Laravel 12 advanced features and database optimization techniques
-- The system SHALL maintain 99.9% uptime during normal operation with comprehensive error handling, graceful degradation, and automatic recovery mechanisms
-- The system SHALL handle concurrent operations without data corruption using proper database transactions, locking mechanisms, and Redis-based session management
-- The system SHALL provide intelligent fallback when external services are unavailable using cached data, alternative API endpoints, and offline functionality with background sync capabilities
+### 4.6 AI Advisory System [BR-6]
 
-#### 5.2.2 Security and Privacy Requirements
+**Business Need:** Players need intelligent recommendations across all planning aspects.
 
-##### BR-011: Comprehensive Data Security
+| ID | Requirement | Priority | Status |
+|----|-------------|----------|--------|
+| BR-6.1 | Hybrid AI architecture (Ollama local + AWS Bedrock fallback) | P0 | Implemented |
+| BR-6.2 | Training, race, and skill advisory capabilities | P0 | Implemented |
+| BR-6.3 | Conversation history management | P1 | Implemented |
+| BR-6.4 | Cost tracking and budget management for cloud AI | P1 | Implemented |
+| BR-6.5 | Confidence scoring for recommendations | P1 | Implemented |
 
-- The system SHALL encrypt sensitive data using industry-standard encryption methods with secure key management and proper credential storage for MCP servers and external APIs
-- The system SHALL implement Laravel Sanctum for secure API authentication with proper token management, rate limiting (10 requests/min auth, 60/min API), and session security
-- The system SHALL protect against common security vulnerabilities (OWASP Top 10) including SQL injection prevention through Eloquent ORM, XSS protection with output escaping, and CSRF protection for all state-changing operations
-- The system SHALL provide comprehensive audit logging for security-relevant events with proper log management and monitoring capabilities
+**Related Artifacts:**
 
-##### BR-012: Privacy-by-Design Architecture
+- PRD: [PRD-006](prds/PRD-006_AI_Advisory.md)
+- SPEC: [SPEC-006](specs/SPEC-006_AI_Advisory_Technical.md)
+- Flow: [FLOW-006](flows/FLOW-006_AI_Advisory_System.md)
+- Wireframes: [WF-012](wireframes/WF-012_AI_Advisor_Interface.md)
 
-- The system SHALL implement privacy-by-design principles throughout the architecture with local-first data storage, minimal data collection, and transparent privacy policies
-- The system SHALL provide clear privacy policies and data usage transparency with user-controlled opt-in for cloud AI features and external service integration
-- The system SHALL enable complete user control over data sharing with granular privacy settings, data export capabilities, and right-to-be-forgotten compliance
-- The system SHALL support hybrid AI processing with local Ollama models as primary and cloud fallback only when necessary, with clear indication of which AI service is being used and associated costs
+### 4.7 External Integration [BR-7]
+
+**Business Need:** Players need accurate, up-to-date game data from external sources.
+
+| ID | Requirement | Priority | Status |
+|----|-------------|----------|--------|
+| BR-7.1 | External API integration (umapyoi.net, UmamusumeDB) | P0 | Implemented |
+| BR-7.2 | Circuit breaker pattern for resilience | P0 | Implemented |
+| BR-7.3 | OCR screenshot processing | P1 | Implemented |
+| BR-7.4 | WebSocket real-time updates (Laravel Reverb) | P1 | Implemented |
+| BR-7.5 | Community data sharing | P2 | Implemented |
+
+**Related Artifacts:**
+
+- PRD: [PRD-007](prds/PRD-007_External_Integration.md)
+- SPEC: [SPEC-007](specs/SPEC-007_External_Integration_Technical.md)
+- Flow: [FLOW-007](flows/FLOW-007_External_Integration_System.md)
+
+### 4.8 Data Management [BR-8]
+
+**Business Need:** Players need reliable data import, export, and backup capabilities.
+
+| ID | Requirement | Priority | Status |
+|----|-------------|----------|--------|
+| BR-8.1 | JSON import/export with schema versioning | P0 | Implemented |
+| BR-8.2 | Excel export (.xlsx) | P1 | Implemented |
+| BR-8.3 | Backup and restore workflows | P0 | Implemented |
+| BR-8.4 | Data migration between storage modes | P1 | Implemented |
+| BR-8.5 | OCR-based data capture and validation | P1 | Implemented |
+
+### 4.9 Dual Storage Mode [BR-9]
+
+**Business Need:** Players need flexibility in how their data is stored and accessed.
+
+| ID | Requirement | Priority | Status |
+|----|-------------|----------|--------|
+| BR-9.1 | Local storage mode (browser localStorage) | P0 | Implemented |
+| BR-9.2 | Account storage mode (database) | P0 | Implemented |
+| BR-9.3 | Clear visual indication of storage mode | P0 | Implemented |
+| BR-9.4 | Full offline functionality for Local runs | P0 | Implemented |
+| BR-9.5 | Convert Local runs to Account runs | P0 | Implemented |
+| BR-9.6 | Local data management interface | P1 | Implemented |
+
+### 4.10 Performance and Reliability [BR-10]
+
+**Business Need:** System must be performant and reliable for power users.
+
+| ID | Requirement | Priority | Status |
+|----|-------------|----------|--------|
+| BR-10.1 | APM and performance dashboards | P1 | In Progress |
+| BR-10.2 | Cache monitoring and invalidation | P1 | In Progress |
+| BR-10.3 | Fallback and degradation workflows | P1 | In Progress |
+| BR-10.4 | Page load < 2 seconds | P0 | Implemented |
+
+### 4.11 User Experience and Accessibility [BR-11]
+
+**Business Need:** Application must be accessible and provide excellent UX.
+
+| ID | Requirement | Priority | Status |
+|----|-------------|----------|--------|
+| BR-11.1 | PWA offline route coverage | P1 | In Progress |
+| BR-11.2 | Accessibility pages and keyboard shortcuts | P1 | In Progress |
+| BR-11.3 | Dark/Light mode toggle with persistence | P0 | Implemented |
+| BR-11.4 | Responsive design (320px to 2560px) | P0 | Implemented |
+| BR-11.5 | WCAG AA accessibility compliance | P0 | Implemented |
+
+### 4.12 Requirements Priority Matrix
+
+```mermaid
+pie title Requirements by Priority
+    "P0 - Critical" : 32
+    "P1 - High" : 24
+    "P2 - Medium" : 8
+```
 
 ---
 
-## 6. Success Criteria
+## 5. Business Rules
 
-### 6.1 Quantitative Success Metrics
+### 5.1 Data Validation Rules
 
-#### 6.1.1 User Adoption and Engagement
+| Rule ID | Rule Description |
+|---------|------------------|
+| BV-1 | Plan title is required and cannot be empty |
+| BV-2 | Stat values must be between 0 and 1200 (hard max) |
+| BV-3 | Turn numbers must be between 1 and 78 |
+| BV-4 | Skill status "Acquired" requires turn_acquired value |
+| BV-5 | Energy level must be between 0 and 100 |
+| BV-6 | Support deck must contain exactly 6 cards (5 owned + 1 borrowed) |
+| BV-7 | Skill hint levels cap at 3 (40% maximum discount) |
 
-**Primary Metrics**:
+### 5.2 Calculation Rules
 
-- **User Adoption Rate**: 1,000+ active users within 6 months of launch
-- **User Retention**: 70%+ monthly active user retention rate
-- **Feature Utilization**: 80%+ of users actively using core optimization features
-- **Session Duration**: Average session length of 15+ minutes indicating deep engagement
+| Rule ID | Rule Description |
+|---------|------------------|
+| BC-1 | Stat values capped at 1200 (hard max, no overflow) |
+| BC-2 | Acquired SP = sum of sp_cost where status = acquired |
+| BC-3 | Mood modifiers: Great +4%, Good +2%, Normal 0%, Bad -2%, Awful -4% |
+| BC-4 | Aptitude effectiveness: SS=120%, S=110%, A=100%, B=90%, C=80%, D=70%, E=60%, F=50%, G=40% |
+| BC-5 | Skill hint discount: 20% per hint level, max 40% at level 2+ |
+| BC-6 | Factor inheritance: ★☆☆=+5, ★★☆=+12, ★★★=+21 bonus |
 
-**Secondary Metrics**:
+### 5.3 Storage Rules
 
-- **User Growth Rate**: 20%+ month-over-month user growth
-- **Feature Adoption**: 60%+ adoption rate for advanced features (AI advisory, skill optimization)
-- **Community Engagement**: 100+ community contributions (strategies, feedback, bug reports)
-- **Platform Distribution**: Balanced usage across desktop (60%) and mobile (40%) platforms
+| Rule ID | Rule Description |
+|---------|------------------|
+| BS-1 | Local runs use UUID identifiers |
+| BS-2 | Account runs use database integer IDs |
+| BS-3 | Local runs are fully functional offline |
+| BS-4 | Account runs require network connectivity to save |
+| BS-5 | Drafts are always saved to localStorage regardless of storage mode |
+| BS-6 | External API data cached for 24 hours |
+| BS-7 | Training predictions cached for 5 minutes |
 
-#### 6.1.2 Performance and Quality
+### 5.4 AI Advisory Rules
 
-**Primary Metrics**:
-
-- **Response Time**: 95%+ of requests complete within performance targets
-- **System Reliability**: 99.9%+ uptime with minimal service disruptions
-- **Prediction Accuracy**: 90%+ accuracy in training outcome predictions
-- **User Satisfaction**: 4.5+ average rating on user satisfaction surveys
-
-**Secondary Metrics**:
-
-- **Bug Resolution**: 95%+ of reported bugs resolved within 48 hours
-- **Performance Optimization**: 25%+ improvement in A+ grade achievement rates
-- **Accessibility Compliance**: 100% WCAG 2.2 AA compliance verification
-- **Security Posture**: Zero critical security vulnerabilities in production
-
-### 6.2 Qualitative Success Indicators
-
-#### 6.2.1 User Experience Quality
-
-**Positive Indicators**:
-
-- Users report significant time savings in training decision making
-- Community feedback indicates improved gameplay experience and satisfaction
-- Accessibility features receive positive feedback from users with diverse needs
-- Users successfully achieve their gameplay goals with system assistance
-
-**Success Validation Methods**:
-
-- Regular user surveys and feedback collection
-- Community sentiment analysis and social media monitoring
-- Usability testing sessions with diverse user groups
-- Accessibility audits with assistive technology users
-
-#### 6.2.2 Technical Excellence
-
-**Positive Indicators**:
-
-- Clean, maintainable codebase with comprehensive documentation
-- Successful integration with external APIs and services
-- Smooth deployment and update processes with minimal downtime
-- Positive developer experience and efficient development workflows
-
-**Success Validation Methods**:
-
-- Code quality metrics and technical debt assessment
-- Performance monitoring and optimization tracking
-- Developer satisfaction surveys and feedback sessions
-- Community developer engagement and contribution quality
+| Rule ID | Rule Description |
+|---------|------------------|
+| BA-1 | Local Ollama model used as primary for simple queries |
+| BA-2 | AWS Bedrock used as fallback for complex decisions or local unavailability |
+| BA-3 | AI responses include confidence scores |
+| BA-4 | Token usage tracked for cost management |
+| BA-5 | Conversation context maintained per session |
 
 ---
 
-## 7. Risk Assessment
+## 6. Business Process Flows
 
-### 7.1 Business Risks
+### 6.1 Career Planning Flow
 
-#### 7.1.1 Market and Competition Risks
+```mermaid
+flowchart TD
+    Start([User Starts New Career]) --> SelectTrainee[Select Trainee]
+    SelectTrainee --> PickScenario[Pick Scenario]
+    PickScenario --> PickParents[Pick Parents A/B]
+    PickParents --> PreviewFactors[Preview Factor Bonuses]
+    PreviewFactors --> BuildDeck[Build Support Deck]
+    BuildDeck --> ValidateDeck{Deck Valid?}
+    ValidateDeck -->|No| FixDeck[Fix type/rarity issues]
+    FixDeck --> ValidateDeck
+    ValidateDeck -->|Yes| InitializeStats[Initialize Stats/Mood/Energy]
+    InitializeStats --> SaveRun[Persist Run + Seed]
+    SaveRun --> Dashboard[Show Dashboard Day 1]
+    Dashboard --> TrainingLoop{Training Phase}
+    TrainingLoop --> GetPredictions[Get AI Training Predictions]
+    GetPredictions --> SelectTraining[Select Training Option]
+    SelectTraining --> ExecuteTraining[Execute Training]
+    ExecuteTraining --> UpdateStats[Update Stats/Mood/Energy]
+    UpdateStats --> CheckRace{Race Week?}
+    CheckRace -->|Yes| RacePrep[Race Preparation]
+    RacePrep --> ExecuteRace[Execute Race]
+    ExecuteRace --> TrainingLoop
+    CheckRace -->|No| TrainingLoop
+```
 
-**Risk**: Competitive Response from Established Players
+### 6.2 AI Advisory Flow
 
-- **Probability**: Medium
-- **Impact**: High
-- **Description**: Existing tools may rapidly implement similar features
-- **Mitigation**: Focus on unique value propositions (privacy, AI integration, accessibility)
-- **Contingency**: Accelerate development of advanced features and community integration
+```mermaid
+flowchart TD
+    Query([User Submits Query]) --> Analyze[Analyze Intent/Complexity]
+    Analyze --> CheckOllama{Ollama Available?}
+    CheckOllama -->|Yes & Simple| RouteOllama[Route to Local Ollama]
+    CheckOllama -->|No or Complex| RouteCloud[Route to AWS Bedrock]
+    RouteOllama --> BuildPrompt[Build Prompt + Context]
+    RouteCloud --> BuildPrompt
+    BuildPrompt --> CallModel[Call AI Model]
+    CallModel --> Receive[Receive Response]
+    Receive --> ScoreConfidence[Score Confidence]
+    ScoreConfidence --> TrackCost[Track Token Usage/Cost]
+    TrackCost --> ReturnUser[Return to User]
+```
 
-**Risk**: Changes in Game Mechanics or Policies
+### 6.3 External Data Sync Flow
 
-- **Probability**: Medium
-- **Impact**: Medium
-- **Description**: Game updates may invalidate optimization strategies or violate ToS
-- **Mitigation**: Maintain compliance monitoring and flexible architecture for rapid adaptation
-- **Contingency**: Develop alternative optimization approaches and maintain legal compliance
+```mermaid
+flowchart TD
+    Trigger([Sync Triggered]) --> CheckCircuit{Circuit Breaker Status?}
+    CheckCircuit -->|Closed| FetchPrimary[Fetch from umapyoi.net]
+    CheckCircuit -->|Open| UseCached[Use Cached Data]
+    FetchPrimary --> Success{Success?}
+    Success -->|Yes| UpdateCache[Update Cache - 24hr TTL]
+    Success -->|No| IncrementFailure[Increment Failure Count]
+    IncrementFailure --> CheckThreshold{Threshold Exceeded?}
+    CheckThreshold -->|Yes| OpenCircuit[Open Circuit Breaker]
+    CheckThreshold -->|No| TryFallback[Try Fallback API]
+    OpenCircuit --> UseCached
+    TryFallback --> FallbackSuccess{Success?}
+    FallbackSuccess -->|Yes| UpdateCache
+    FallbackSuccess -->|No| UseCached
+    UpdateCache --> NotifyUpdate[Notify Subscribers via WebSocket]
+    UseCached --> Complete([Sync Complete])
+    NotifyUpdate --> Complete
+```
 
-#### 7.1.2 User Adoption Risks
+### 6.4 OCR Data Capture Flow
 
-**Risk**: Limited User Adoption Due to Complexity
-
-- **Probability**: Low
-- **Impact**: High
-- **Description**: Users may find the system too complex compared to simple tools
-- **Mitigation**: Prioritize user experience design and provide comprehensive onboarding
-- **Contingency**: Implement progressive disclosure and simplified interface options
-
-**Risk**: Privacy Concerns Despite Local-First Architecture
-
-- **Probability**: Low
-- **Impact**: Medium
-- **Description**: Users may still have concerns about data handling and AI integration
-- **Mitigation**: Transparent privacy policies and user education about local-first benefits
-- **Contingency**: Provide additional privacy controls and audit capabilities
-
-### 7.2 Technical Risks
-
-#### 7.2.1 Development and Implementation Risks
-
-**Risk**: Technology Stack Compatibility Issues
-
-- **Probability**: Low
-- **Impact**: Medium
-- **Description**: Laravel 12 or Tailwind CSS v4 may have compatibility issues
-- **Mitigation**: Thorough testing and fallback to stable versions if necessary
-- **Contingency**: Maintain compatibility with previous framework versions
-
-**Risk**: AI Integration Complexity and Costs
-
-- **Probability**: Medium
-- **Impact**: Medium
-- **Description**: Hybrid AI system may be more complex or expensive than anticipated
-- **Mitigation**: Implement cost monitoring and optimize local processing capabilities
-- **Contingency**: Reduce AI features or increase local processing emphasis
-
-#### 7.2.2 External Dependencies
-
-**Risk**: External API Availability and Reliability
-
-- **Probability**: Medium
-- **Impact**: Medium
-- **Description**: Community APIs may become unavailable or unreliable
-- **Mitigation**: Implement comprehensive caching and multiple data source fallbacks
-- **Contingency**: Develop manual data entry interfaces and offline functionality
-
-**Risk**: Changes in External Service Terms or Pricing
-
-- **Probability**: Medium
-- **Impact**: Low
-- **Description**: AWS Bedrock or other services may change terms or increase costs
-- **Mitigation**: Monitor service changes and maintain alternative providers
-- **Contingency**: Increase local processing capabilities and reduce cloud dependency
+```mermaid
+flowchart TD
+    Upload([User Uploads Screenshot]) --> Preprocess[Preprocess Image]
+    Preprocess --> OCRExtract[OCR Text Extraction]
+    OCRExtract --> ParseData[Parse Game Data]
+    ParseData --> Validate{Validation Pass?}
+    Validate -->|Yes| AutoPopulate[Auto-populate Form Fields]
+    Validate -->|No| ManualCorrection[Show Manual Correction UI]
+    ManualCorrection --> UserEdit[User Edits Values]
+    UserEdit --> Validate
+    AutoPopulate --> UserReview[User Reviews Data]
+    UserReview --> Confirm{Confirm Import?}
+    Confirm -->|Yes| SaveData[Save to Career Run]
+    Confirm -->|No| Discard[Discard Changes]
+```
 
 ---
 
-## 8. Implementation Strategy
+## 7. Success Metrics
 
-### 8.1 Development Approach
+### 7.1 User Experience Metrics
 
-#### 8.1.1 Agile Development Methodology
+| Metric | Target | Measurement Method |
+|--------|--------|-------------------|
+| Time to create first plan | < 30 seconds | User testing |
+| Task completion rate | > 95% | Analytics |
+| User satisfaction | > 4/5 stars | Surveys |
+| AI recommendation acceptance rate | > 70% | Analytics |
 
-**Sprint Structure**:
+### 7.2 Technical Metrics
 
-- **Sprint Length**: 2-week iterations for rapid feedback and adaptation
-- **Planning Process**: Weekly planning with stakeholder input and priority adjustment
-- **Review Cycle**: Bi-weekly demos with user feedback integration
-- **Retrospective**: Continuous improvement through development analysis
+| Metric | Target | Measurement Method |
+|--------|--------|-------------------|
+| Page load time | < 2 seconds | Performance monitoring |
+| First Contentful Paint | < 1.5 seconds | Lighthouse |
+| Accessibility score | 100% AA | axe-core |
+| Error rate | < 1% | Error logging |
+| AI response time | < 3 seconds | APM monitoring |
+| API fallback success rate | > 95% | Circuit breaker metrics |
 
-**Quality Assurance**:
+### 7.3 Data Quality Metrics
 
-- **Test-Driven Development**: Write tests before implementation for critical features
-- **Continuous Integration**: Automated testing and quality checks on all commits
-- **User Acceptance Testing**: Regular testing with actual Umamusume players
-- **Accessibility Testing**: Ongoing compliance verification with assistive technologies
-
-#### 8.1.2 Phased Delivery Strategy
-
-##### Phase 1: Foundation & Core Setup (Weeks 1-4)
-
-- Core infrastructure with Laravel 12, MySQL database, and Redis integration via WSL
-- Comprehensive database schema with 15+ tables supporting complete game mechanics
-- Authentication system with Laravel Sanctum and security foundation
-- Progressive Web App foundation with Tailwind CSS v4 and accessibility compliance
-- MCP server configuration for development environment enhancement
-
-##### Phase 2: Authentication & API Foundation (Weeks 5-8)
-
-- Character management system with comprehensive stat and aptitude tracking
-- Training prediction engine with scenario-specific mechanics (URA Finale vs Unity Cup)
-- Skill management system with hint tracking and evolution mechanics
-- Visual asset integration using existing character images and themed backgrounds
-- Context-gatherer subagent deployment for codebase analysis and pattern identification
-
-##### Phase 3: Core Game Mechanics Implementation (Weeks 9-14)
-
-- Advanced training mechanics including Spirit Burst, friendship training, and facility levels
-- Support card management with 6-card deck optimization and meta tier rankings
-- Skill evolution system with hint-based SP cost reduction and strategic optimization
-- Race preparation and strategy recommendations with weather condition support
-- AI integration setup with Ollama local models and AWS Bedrock fallback configuration
-
-##### Phase 4: AI Integration and External APIs (Weeks 15-20)
-
-- Hybrid AI system with intelligent routing and cost optimization
-- External API integration with umapyoi.net and UmamusumeDB.com with fallback mechanisms
-- OCR screenshot processing with Tesseract and OpenCV for automated data extraction
-- Advanced analytics and career comparison with performance tracking
-- Community integration features with privacy-preserving data sharing options
-
-##### Phase 5: Advanced Features and Optimization (Weeks 21-26)
-
-- Performance optimization with Core Web Vitals compliance and database tuning
-- Comprehensive testing suite with 80%+ coverage and accessibility validation
-- Advanced monitoring and observability with APM integration
-- Data import/export system with migration tools and backup functionality
-- Security hardening and compliance validation with penetration testing
-
-##### Phase 6: Polish and Launch (Weeks 27-28)
-
-- Final testing and quality assurance with user acceptance testing
-- Production deployment with monitoring and alerting setup
-- Documentation completion with user guides and developer documentation
-- Launch preparation with community engagement and support systems
-
-### 8.2 Go-to-Market Strategy
-
-#### 8.2.1 Launch Strategy
-
-**Soft Launch Phase**:
-
-- Limited beta release to 50-100 experienced Umamusume players
-- Gather feedback and iterate on core features
-- Refine user experience based on real-world usage patterns
-- Build initial community of advocates and contributors
-
-**Public Launch Phase**:
-
-- Announce on major Umamusume community platforms (Reddit, Discord, Twitter)
-- Create demonstration videos and tutorials showcasing key features
-- Engage with community influencers and content creators
-- Provide comprehensive documentation and support resources
-
-#### 8.2.2 Community Engagement
-
-**Content Strategy**:
-
-- Regular development updates and feature previews
-- Educational content about optimization strategies and game mechanics
-- Community challenges and achievement showcases
-- User-generated content promotion and recognition
-
-**Partnership Opportunities**:
-
-- Collaboration with existing community tools and databases
-- Integration with popular streaming and content creation platforms
-- Partnerships with accessibility organizations for inclusive design validation
-- Academic partnerships for AI and optimization research
-
-### 8.3 Success Measurement and Iteration
-
-#### 8.3.1 Metrics Collection and Analysis
-
-**User Analytics**:
-
-- Feature usage patterns and user journey analysis
-- Performance metrics and error tracking
-- User satisfaction surveys and feedback collection
-- Accessibility compliance monitoring and user experience assessment
-
-**Business Metrics**:
-
-- User acquisition and retention tracking
-- Community engagement and contribution measurement
-- Technical performance and reliability monitoring
-- Cost analysis and resource utilization optimization
-
-#### 8.3.2 Continuous Improvement Process
-
-**Feedback Integration**:
-
-- Regular user feedback collection and analysis
-- Community suggestion evaluation and prioritization
-- Performance monitoring and optimization identification
-- Security and privacy assessment and enhancement
-
-**Feature Evolution**:
-
-- Data-driven feature development and enhancement
-- A/B testing for user experience optimization
-- Community-driven feature requests and implementations
-- Long-term roadmap development based on user needs and market trends
+| Metric | Target | Measurement Method |
+|--------|--------|-------------------|
+| Successful data imports | > 90% | Import logs |
+| OCR accuracy rate | > 85% | Validation logs |
+| External API sync success | > 95% | Sync logs |
+| Backup completion rate | 100% | Backup logs |
 
 ---
 
-## Conclusion
+## 8. Constraints and Assumptions
 
-The Umamusume Career Planner represents a significant opportunity to transform the player experience through intelligent automation, privacy-preserving architecture, and accessibility-first design. By focusing on comprehensive game mechanics support, advanced AI integration, and community engagement, the project can establish a strong market position while providing genuine value to the Umamusume community.
+### 8.1 Constraints
 
-The comprehensive business requirements outlined in this document provide a foundation for successful implementation of all 59 detailed requirements, with clear success criteria and risk mitigation strategies. The phased development approach ensures rapid value delivery while maintaining quality and user satisfaction throughout the 28-week development process.
+1. **Browser Storage Limits**: localStorage typically limited to 5-10MB
+2. **Offline Limitations**: Account runs cannot be saved without connectivity
+3. **Browser Support**: Modern browsers only (Chrome, Firefox, Safari, Edge)
+4. **AI Cost**: AWS Bedrock usage incurs per-token costs
+5. **External API Availability**: Dependent on umapyoi.net and UmamusumeDB uptime
 
-**Key Success Factors**:
+### 8.2 Assumptions
 
-- **User-centric design** with accessibility (WCAG 2.2 AA) and privacy as core principles, supporting diverse user needs and assistive technologies
-- **Technical excellence** with modern frameworks (Laravel 12, Tailwind CSS v4) and best practices including MCP server integration and subagent utilization
-- **Comprehensive game mechanics** support including skill evolution, hint optimization, weather systems, and scenario-specific mechanics for both URA Finale and Unity Cup
-- **Hybrid AI integration** with local Ollama models and AWS Bedrock fallback providing intelligent recommendations while maintaining privacy and cost optimization
-- **Community engagement** and feedback integration throughout development with privacy-preserving data sharing and contribution recognition
-- **Advanced features** including OCR screenshot processing, Progressive Web App capabilities, and comprehensive analytics with performance tracking
-
-**Technology Leadership**:
-
-- **Modern Architecture**: Laravel 12 with TypeScript support, Tailwind CSS v4 with 5x faster builds, Progressive Web App capabilities
-- **AI Innovation**: Hybrid local/cloud AI processing with intelligent routing, cost optimization, and context-aware recommendations
-- **Privacy Excellence**: Local-first architecture with MySQL and Redis via WSL, ensuring complete user control over personal data
-- **Accessibility Leadership**: WCAG 2.2 AA compliance with comprehensive keyboard navigation, screen reader support, and inclusive design
-- **Development Efficiency**: MCP server integration and subagent utilization for enhanced development workflow and parallel task execution
-
-The project's success will be measured not only by technical achievements but by the positive impact on the Umamusume community and the enhancement of the overall gaming experience for players worldwide. The comprehensive approach ensures that all aspects of the complex game mechanics are properly supported while maintaining the highest standards of privacy, accessibility, and user experience.
-
-**Expected Outcomes**:
-
-- **40% improvement** in A+ grade achievement rates through data-driven optimization
-- **80% reduction** in training decision time through AI-powered recommendations
-- **95%+ user satisfaction** with interface usability and accessibility compliance
-- **Complete privacy control** with local-first architecture and transparent AI usage
-- **Community growth** through enhanced tools and privacy-preserving collaboration features
-
-The 28-week development timeline with 6 comprehensive phases ensures thorough implementation of all requirements while maintaining flexibility for user feedback integration and continuous improvement throughout the development process.
+1. Users have access to modern web browsers
+2. Users understand basic Uma Musume game mechanics
+3. Users have sufficient browser storage for Local runs
+4. English is the primary interface language (Japanese skill names supported)
+5. External APIs remain available and maintain current data formats
+6. Local Ollama installation available for primary AI recommendations
 
 ---
 
-### Document Control
+## 9. Dependencies
 
-| Version | Date             | Author           | Changes                           |
-|---------|------------------|------------------|-----------------------------------|
-| 1.0     | January 10, 2026 | Development Team | Initial BRS document creation     |
+### 9.1 External Dependencies
 
-### Approval
+| Dependency | Description | Risk Level |
+|------------|-------------|------------|
+| Browser localStorage API | Local run storage | Low |
+| Livewire connection | Account run operations | Medium |
+| Database availability | Account data persistence | Medium |
+| umapyoi.net API | Primary external game data | Medium |
+| UmamusumeDB API | Fallback external game data | Low |
+| AWS Bedrock | Cloud AI fallback | Medium |
+| Ollama | Local AI primary | Low |
 
-| Role                        | Name   | Signature   | Date   |
-|-----------------------------|--------|-------------|--------|
-| Business Analyst            | [Name] | [Signature] | [Date] |
-| Project Manager             | [Name] | [Signature] | [Date] |
-| Stakeholder Representative  | [Name] | [Signature] | [Date] |
+### 9.2 Internal Dependencies
+
+| Dependency | Description |
+|------------|-------------|
+| Character data | Required before creating career runs |
+| Skill reference database | Required for skill autocomplete and management |
+| Support card database | Required for deck building |
+| Authentication (optional) | Required for Account mode |
+| AI services | Required for training/race recommendations |
+
+### 9.3 Dependency Graph
+
+```mermaid
+flowchart BT
+    A[Character Data] --> B[Career Run]
+    C[Skill Database] --> D[Skill Management]
+    D --> B
+    E[Support Card Database] --> F[Deck Management]
+    F --> B
+    G[Authentication] -.->|Optional| H[Account Mode]
+    H --> B
+    I[localStorage] --> J[Local Mode]
+    J --> B
+    K[AI Services] --> L[Training Advisor]
+    K --> M[Race Advisor]
+    L --> B
+    M --> B
+    N[External APIs] --> O[Game Data Sync]
+    O --> A
+    O --> C
+    O --> E
+```
+
+---
+
+## 10. Document Control
+
+### 10.1 Related Documents
+
+- [SDP - Software Development Plan](001_SDP_Software_Development_Plan.md)
+- [SRS - System Requirements Specifications](003_SRS_Software_Requirement_Specifications.md)
+- [SDS - System Design Specifications](004_SDS_System_Design_Specifications.md)
+- [PRD Index](prds/000_PRDS_INDEX.md)
+- [SPEC Index](specs/000_SPECS_INDEX.md)
+- [Data Flow Diagram](diagrams/data-flow-diagram.md)
+
+### 10.2 Revision History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 2.1.0 | 2026-01-23 | Development Team | Updated scope and requirements to match implementation; added AI integration requirements; added external API integration; aligned with v2.0 architecture |
+| 1.0 | 2026-01-14 | Development Team | Initial draft |
+
+---
+
+*This BRS describes the current business scope as implemented in version 2.0.*

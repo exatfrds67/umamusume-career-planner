@@ -64,6 +64,8 @@
         </exclude>
     </groups>
     <php>
+        <ini name="memory_limit" value="512M"/>
+        <env name="XDEBUG_MODE" value="off"/>
         <env name="APP_ENV" value="testing"/>
         <env name="APP_DEBUG" value="true"/>
         <env name="APP_KEY" value="base64:EbWoff2KGfUSGgPiC7zlnhN4bV0saWa1Vwc22hWh8qQ="/>
@@ -83,5 +85,8 @@
         <env name="LOG_LEVEL" value="debug"/>
         <env name="MCP_ENABLED" value="false"/>
         <env name="AI_ENABLED" value="false"/>
+        <env name="REDIS_DB" value="15"/>
+        <env name="REDIS_CACHE_DB" value="15"/>
+        <env name="REDIS_SESSION_DB" value="15"/>
     </php>
 </phpunit>

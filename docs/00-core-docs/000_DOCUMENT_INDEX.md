@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 3.0
-**Date**: 2026-01-12
+**Document Version**: 3.1
+**Date**: January 23, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Final - Consolidated Structure
+**Status**: Current - Aligned to codebase
 
 ---
 
@@ -22,31 +22,28 @@
 
 ## 1. Document Overview
 
-This index provides a comprehensive reference to all documentation in the Umamusume Career Planner project, including document relationships, dependencies, and quick access guides.
+This index provides a current reference to core documentation in `docs/00-core-docs`, aligned with the present codebase implementation.
 
 ### 1.1 Documentation Structure
 
-The documentation has been consolidated and organized as follows:
-
-- **Active Documents**: Current, canonical versions of all specification documents
-- **Archive Structure**: Historical versions and completed task summaries organized in `docs/archive/`
-  - `versions/`: Previous versions of documents (e.g., design_document_v0.1.0.md)
-  - `task-summaries/`: Completed task summaries and implementation reports
-  - `superseded/`: Documents replaced by newer consolidated versions
+- **Core Docs**: Authoritative, implementation-aligned documents in `docs/00-core-docs/`
+- **Product/Specs**: Detailed PRDs and specs in `docs/02-prds/` and `docs/02-specs/`
+- **Flows/Diagrams**: Supporting diagrams in `docs/01-*` folders
+- **Implementation Summaries**: Status and changes in `docs/implementation-summaries/`
 
 ### 1.2 Documentation Suite Summary
 
 | Category | Documents | Purpose |
-| -------- | --------- | ------- |
-| Reference | 000_GLOSSARY, 000_INDEX | Terminology and navigation |
-| Planning | 001_SDP | Development timeline and methodology |
-| Requirements | 002_BRS, 003_SRS | Business and software requirements |
-| Product Requirements | PRD-001..007 | Module-level product requirements |
-| Design | 004_SDS | Technical architecture and design |
-| Migration | 005_DMP, 006_DMS | Data migration strategy and specs |
-| Integration | 007_SIP, 008_SIS | System integration planning |
-| Technical | 009_DBD, 010_SCD | Database and source code docs |
-| User | 017_SUM | End-user documentation |
+| --- | --- | --- |
+| Reference | 000_MASTER_GLOSSARY, 000_DOCUMENT_INDEX | Terminology and navigation |
+| Planning | 001_SDP | Current development plan and milestones |
+| Requirements | 002_BRS, 003_SRS | Business and software requirements (current scope) |
+| Design | 004_SDS | Current technical architecture and design |
+| Migration | 005_DMP, 006_DMS | Data migration plan and technical specs |
+| Integration | 007_SIP, 008_SIS | Integration plan and specifications |
+| Technical | 009_DBD, 010_SCD | Database and source code documentation |
+| Verification | 000_IMPLEMENTATION_VERIFICATION_MATRIX, 000_REQUIREMENTS_TRACEABILITY_MATRIX | Implementation status and traceability |
+| User | 017_SUM | End-user manual |
 
 ---
 
@@ -54,282 +51,69 @@ The documentation has been consolidated and organized as follows:
 
 ### 2.1 Reference Documents
 
-#### 000_MASTER_GLOSSARY.md
-
-- **Purpose**: Standardized terminology for all documentation
-- **Audience**: All team members, reviewers
-- **Dependencies**: None (foundational document)
-- **Key Content**: Technology terms, game mechanics, conventions
-
-#### 000_DOCUMENT_INDEX.md (This Document)
-
-- **Purpose**: Navigation and cross-reference guide
-- **Audience**: All team members, reviewers
-- **Dependencies**: All documents
-- **Key Content**: Document catalog, dependencies, quick reference
+- **000_MASTER_GLOSSARY.md**: Standardized terminology for the system
+- **000_DOCUMENT_INDEX.md**: This index
 
 ### 2.2 Planning Documents
 
-#### 001_SDP_Software_Development_Plan.md
-
-- **Purpose**: Development methodology, timeline, and organization
-- **Audience**: Project managers, developers, stakeholders
-- **Dependencies**: 002_BRS, 003_SRS
-- **Key Content**:
-  - 28-week development timeline (6 phases)
-  - Agile methodology with 2-week sprints
-  - Team structure and MCP integration strategy
-  - Risk management and quality assurance
+- **001_SDP_Software_Development_Plan.md**: Current roadmap, phases, and milestones
 
 ### 2.3 Requirements Documents
 
-#### 002_BRS_Business_Requirements_Specifications.md
+- **002_BRS_Business_Requirements_Specifications.md**: Business goals and current scope
+- **003_SRS_Software_Requirement_Specifications.md**: Functional and non-functional requirements aligned to the implemented system
 
-- **Purpose**: Business context, objectives, and stakeholder analysis
-- **Audience**: Stakeholders, product owners, business analysts
-- **Dependencies**: None (foundational requirements)
-- **Key Content**:
-  - Market analysis (15M+ global users)
-  - Business objectives and success criteria
-  - Stakeholder analysis and requirements
-  - Technology landscape assessment
+### 2.4 Design Documents
 
-#### 003_SRS_Software_Requirement_Specifications.md
+- **004_SDS_Software_Design_Specifications.md**: System architecture and implementation design
 
-- **Purpose**: Detailed functional and non-functional requirements
-- **Audience**: Developers, QA engineers, architects
-- **Dependencies**: 002_BRS
-- **Key Content**:
-  - 59+ functional requirements
-  - Character management (REQ-3.1.x)
-  - Training prediction engine (REQ-3.2.x)
-  - Race strategy (REQ-3.3.x)
-  - Skill management (REQ-3.4.x)
-  - Support card management (REQ-3.5.x)
+### 2.5 Migration Documents
 
-### 2.4 Product Requirement Documents
+- **005_DMP_Data_Migration_Plan.md**: Migration strategy and procedures
+- **006_DMS_Data_Migration_Specifications.md**: Migration technical specifications
 
-#### PRD-001_Character_Management.md
+### 2.6 Integration Documents
 
-- **Purpose**: Product requirements for character creation, configuration, and lifecycle tracking
-- **Audience**: Product managers, designers, backend/frontend engineers
-- **Dependencies**: 003_SRS, 002_BRS
-- **Key Content**: Run initialization, factors/parents, goals, conditions, snapshots
+- **007_SIP_Software_Integration_Plan.md**: Integration plan
+- **008_SIS_Software_Integration_Specifications.md**: Integration technical details
 
-#### PRD-002_Training_Optimization.md
+### 2.7 Technical Documents
 
-- **Purpose**: Product requirements for turn-level training predictions and recommendations
-- **Audience**: Product managers, data/ML engineers, backend/frontend engineers
-- **Dependencies**: 003_SRS, 002_BRS, PRD-001
-- **Key Content**: Simulation inputs, gain/risk models, ranking strategies, decision logging
+- **009_DBD_Database_Documentation.md**: Database schema and relationships
+- **010_SCD_Source_Code_Documentation.md**: Codebase structure and key components
 
-#### PRD-003_Race_Strategy.md
+### 2.8 Verification Documents
 
-- **Purpose**: Product requirements for race scheduling, readiness scoring, and outcome handling
-- **Audience**: Product managers, backend/frontend engineers, data analysts
-- **Dependencies**: 003_SRS, PRD-001, PRD-002
-- **Key Content**: Race catalog, readiness checks, registration validation, result logging
-
-#### PRD-004_Skill_Management.md
-
-- **Purpose**: Product requirements for skill catalog, validation, purchase, and synergy guidance
-- **Audience**: Product managers, backend/frontend engineers, UX writers
-- **Dependencies**: 003_SRS, PRD-001, PRD-002
-- **Key Content**: Prerequisites/conflicts, point balance, synergy scoring, audit history
-
-#### PRD-005_Support_Card_Management.md
-
-- **Purpose**: Product requirements for support card inventory, upgrades, and deck building
-- **Audience**: Product managers, backend/frontend engineers
-- **Dependencies**: 003_SRS, PRD-001, PRD-002, PRD-004
-- **Key Content**: Deck validation, synergy scoring, upgrade materials, templates
-
-#### PRD-006_AI_Advisory.md
-
-- **Purpose**: Product requirements for AI-driven advice and rationale
-- **Audience**: Product managers, AI/ML engineers, backend/frontend engineers
-- **Dependencies**: 003_SRS, PRD-001, PRD-002, PRD-005
-- **Key Content**: Context building, advice payloads, safety filters, feedback loop
-
-#### PRD-007_External_Integration.md
-
-- **Purpose**: Product requirements for external data ingestion and synchronization
-- **Audience**: Product managers, backend engineers, operations
-- **Dependencies**: 003_SRS, PRD-006
-- **Key Content**: Source connectors, normalization, validation, audit logging, rollback
-
-### 2.5 Design Documents
-
-#### 004_SDS_Software_Design_Specifications.md
-
-- **Purpose**: Technical architecture and implementation design
-- **Audience**: Developers, architects, technical leads
-- **Dependencies**: 003_SRS
-- **Key Content**:
-  - System architecture (4-layer design)
-  - MCP server integration architecture
-  - Hybrid AI processing design
-  - Database design and API specifications
-  - UI/UX design with accessibility
-
-#### docs/frontend/design_document.md
-
-- **Purpose**: Frontend design specifications and UI/UX guidelines
-- **Audience**: Frontend developers, UI/UX designers
-- **Dependencies**: 004_SDS
-- **Key Content**:
-  - Component design specifications
-  - User interface layouts and interactions
-  - Accessibility requirements
-  - Progressive Web App features
-- **Note**: Previous versions (v0.1.0, v0.1.1, v0.2.2) archived in `docs/archive/versions/`
-
-### 2.6 Migration Documents
-
-#### 005_DMP_Data_Migration_Plan.md
-
-- **Purpose**: Data migration strategy and procedures
-- **Audience**: Database administrators, developers
-- **Dependencies**: 004_SDS, 003_SRS
-- **Key Content**:
-  - Migration types and timeline
-  - Data sources (umapyoi.net, user imports)
-  - Migration procedures and validation
-  - Rollback procedures
-
-#### 006_DMS_Data_Migration_Specifications.md
-
-- **Purpose**: Detailed migration technical specifications
-- **Audience**: Developers, database administrators
-- **Dependencies**: 005_DMP
-- **Key Content**:
-  - Technical specifications and requirements
-  - Data transformation rules
-  - Target schema specifications
-  - AI and OCR integration specs
-
-### 2.7 Integration Documents
-
-#### 007_SIP_Software_Integration_Plan.md
-
-- **Purpose**: Integration strategy and architecture
-- **Audience**: Developers, architects, integration specialists
-- **Dependencies**: 004_SDS
-- **Key Content**:
-  - Integration architecture overview
-  - External API integration (umapyoi.net)
-  - AI services integration (Ollama, AWS Bedrock)
-  - MCP server integration
-
-#### 008_SIS_Software_Integration_Specifications.md
-
-- **Purpose**: Detailed integration technical specifications
-- **Audience**: Developers, integration specialists
-- **Dependencies**: 007_SIP
-- **Key Content**:
-  - API integration specifications (umapyoi.net, UmamusumeDB.com)
-  - AI services specifications (Ollama, AWS Bedrock, Hybrid AI Processing)
-  - MCP Server integration specifications
-  - Database integration (MySQL 8.0+, Redis 7.0+)
-  - Frontend integration (PWA, WebSocket, Accessibility)
-  - Security integration (Authentication, Authorization, Privacy)
-  - Performance monitoring and testing specifications
-- **Status**: ✅ Complete (v2.0)
-
-### 2.8 Technical Documents
-
-#### 009_DBD_Database_Documentation.md
-
-- **Purpose**: Database schema and optimization documentation
-- **Audience**: Database administrators, developers
-- **Dependencies**: 004_SDS
-- **Key Content**:
-  - Multi-database architecture
-  - Schema design (users, characters, training, AI)
-  - Eloquent model specifications
-  - Indexing and performance optimization
-
-#### 010_SCD_Source_Code_Documentation.md
-
-- **Purpose**: Codebase structure and implementation guide
-- **Audience**: Developers, code reviewers
-- **Dependencies**: 004_SDS
-- **Key Content**:
-  - Project structure
-  - Architecture patterns (Repository, Service, Factory)
-  - Core components (Character, Training, AI)
-  - API documentation
+- **000_IMPLEMENTATION_VERIFICATION_MATRIX.md**: Implementation status snapshot
+- **000_REQUIREMENTS_TRACEABILITY_MATRIX.md**: Requirements to implementation traceability
 
 ### 2.9 User Documents
 
-#### 017_SUM_Software_User_Manual.md
-
-- **Purpose**: End-user documentation and guides
-- **Audience**: End users, support staff
-- **Dependencies**: All technical documents
-- **Key Content**:
-  - Getting started guide (account creation, first login)
-  - Character management (creation, stats, goals)
-  - Training system (basics, advanced, analytics)
-  - AI assistant features (recommendations, chat, privacy)
-  - Analytics and performance tracking
-  - Settings and preferences
-  - Troubleshooting and FAQ
-  - Accessibility features (WCAG 2.2 AA compliance)
-  - Keyboard shortcuts reference
-- **Status**: ✅ Complete (v2.0)
+- **017_SUM_Software_User_Manual.md**: User manual and feature walkthroughs
 
 ---
 
 ## 3. Document Dependencies
 
-### 3.1 Dependency Diagram
-
 ```text
-000_GLOSSARY (Foundation)
-    │
-    ├── 002_BRS (Business Requirements)
-    │       │
-    │       └── 003_SRS (Software Requirements)
-    │               │
-    │               ├── 001_SDP (Development Plan)
-    │               │
-    │               ├── PRD-001..007 (Product Requirements)
-    │               │
-    │               └── 004_SDS (Design Specification)
-    │                       │
-    │                       ├── 005_DMP (Migration Plan)
-    │                       │       │
-    │                       │       └── 006_DMS (Migration Specs)
-    │                       │
-    │                       ├── 007_SIP (Integration Plan)
-    │                       │       │
-    │                       │       └── 008_SIS (Integration Specs)
-    │                       │
-    │                       ├── 009_DBD (Database Docs)
-    │                       │
-    │                       └── 010_SCD (Source Code Docs)
-    │
-    └── 017_SUM (User Manual) ← All Documents
+000_MASTER_GLOSSARY
+    |
+    +-- 002_BRS
+    |     |
+    |     +-- 003_SRS
+    |           |
+    |           +-- 004_SDS
+    |           |     |
+    |           |     +-- 007_SIP --> 008_SIS
+    |           |     +-- 005_DMP --> 006_DMS
+    |           |     +-- 009_DBD
+    |           |     +-- 010_SCD
+    |           |
+    |           +-- 000_REQUIREMENTS_TRACEABILITY_MATRIX
+    |           +-- 000_IMPLEMENTATION_VERIFICATION_MATRIX
+    |
+    +-- 017_SUM
 ```
-
-### 3.2 Cross-Reference Matrix
-
-| Document | References | Referenced By |
-| -------- | ---------- | ------------- |
-| 000_GLOSSARY | - | All documents |
-| 001_SDP | 002_BRS, 003_SRS | - |
-| 002_BRS | - | 003_SRS, 001_SDP |
-| 003_SRS | 002_BRS | 004_SDS, 001_SDP |
-| PRD-001..007 | 003_SRS | 004_SDS, Flows, Sequences, Specs |
-| 004_SDS | 003_SRS | 005_DMP, 007_SIP, 009_DBD, 010_SCD |
-| 005_DMP | 004_SDS, 003_SRS | 006_DMS |
-| 006_DMS | 005_DMP | - |
-| 007_SIP | 004_SDS | 008_SIS |
-| 008_SIS | 007_SIP | - |
-| 009_DBD | 004_SDS | - |
-| 010_SCD | 004_SDS | - |
-| 017_SUM | All | - |
 
 ---
 
@@ -338,87 +122,45 @@ The documentation has been consolidated and organized as follows:
 ### 4.1 By Topic
 
 | Topic | Primary Document | Supporting Documents |
-| ----- | ---------------- | -------------------- |
-| Project Timeline | 001_SDP | 002_BRS |
-| Requirements | 003_SRS | 002_BRS |
-| Product Requirements | PRD-001..007 | 003_SRS, Flows, Sequences, Specs |
-| Architecture | 004_SDS | 003_SRS |
-| Database Schema | 009_DBD | 004_SDS |
-| AI Integration | 004_SDS, 007_SIP | 008_SIS |
-| External APIs | 007_SIP | 008_SIS, 005_DMP |
+| --- | --- | --- |
+| Architecture | 004_SDS | 010_SCD, 009_DBD |
+| Database | 009_DBD | 004_SDS |
+| API & Routes | 010_SCD | 004_SDS |
+| AI & MCP Integration | 007_SIP, 008_SIS | 004_SDS |
 | Data Migration | 005_DMP | 006_DMS |
-| Code Structure | 010_SCD | 004_SDS |
-| User Guide | 017_SUM | All |
+| Implementation Status | 000_IMPLEMENTATION_VERIFICATION_MATRIX | 000_REQUIREMENTS_TRACEABILITY_MATRIX |
+| User Guide | 017_SUM | 000_MASTER_GLOSSARY |
 
 ### 4.2 By Role
 
 | Role | Primary Documents |
-| ---- | ----------------- |
-| Project Manager | 001_SDP, 002_BRS, PRD-001..007 |
-| Business Analyst | 002_BRS, 003_SRS, PRD-001..007 |
+| --- | --- |
+| Project Manager | 001_SDP, 002_BRS |
 | Architect | 004_SDS, 007_SIP |
-| Backend Developer | 010_SCD, 009_DBD, 004_SDS, PRD-001..007 |
-| Frontend Developer | 010_SCD, 004_SDS, PRD-001..007 |
-| Database Admin | 009_DBD, 005_DMP, 006_DMS |
-| QA Engineer | 003_SRS, 008_SIS, PRD-001..007 |
-| Technical Writer | 017_SUM, 000_GLOSSARY, PRD-001..007 |
-
-### 4.3 By Development Phase
-
-| Phase | Documents |
-| ----- | --------- |
-| Phase 1: Foundation | 001_SDP, 004_SDS, 009_DBD |
-| Phase 2: Auth & API | 003_SRS, 007_SIP, 010_SCD |
-| Phase 3: Core Mechanics | 003_SRS, 004_SDS, 010_SCD |
-| Phase 4: AI Integration | 004_SDS, 007_SIP, 008_SIS |
-| Phase 5: Advanced Features | 005_DMP, 006_DMS, 003_SRS |
-| Phase 6: Polish & Deploy | 017_SUM, All |
+| Backend Developer | 010_SCD, 009_DBD, 003_SRS |
+| Frontend Developer | 010_SCD, 017_SUM |
+| QA Engineer | 003_SRS, 000_REQUIREMENTS_TRACEABILITY_MATRIX |
+| Support | 017_SUM |
 
 ---
 
 ## 5. Archive Structure
 
-### 5.1 Archived Documents
+Archived documents live in `docs/archive/`:
 
-The following documents have been moved to the archive to maintain a clean, focused documentation structure:
-
-#### docs/archive/versions/
-
-- `design_document_v0.1.0.md` - Initial frontend design document
-- `design_document_v0.1.1.md` - First revision of frontend design
-- `design_document_v0.2.2.md` - Second major revision of frontend design
-
-#### docs/archive/task-summaries/
-
-- `TASK_1_3_2_COMPLETION_SUMMARY.md` - MCP Server Integration Documentation Standardization
-- `TASK_1_3_3_COMPLETION_SUMMARY.md` - Database Schema Alignment Verification
-- `TASK_1_3_6_COMPLETION_SUMMARY.md` - Implementation Readiness and Continuation Prompts
-- `TASK_1_3_6_FINAL_COMPLETION_SUMMARY.md` - Final completion summary for Task 1.3.6
-- `TASK_1_3_6_IMPLEMENTATION_READINESS_REPORT.md` - Implementation readiness report
-- `TASK_1_4_IMPLEMENTATION_PROMPTS.md` - Implementation prompts for Task 1.4
-- `PHASE_2_IMPLEMENTATION_READINESS_CHECKLIST.md` - Phase 2 readiness checklist
-- `STANDARDIZATION_SUMMARY.md` - Documentation standardization summary
-- `DESIGN_SYSTEM_IMPLEMENTATION_SUMMARY.md` - Design system implementation summary
-- `PWA_IMPLEMENTATION_SUMMARY.md` - PWA implementation summary
-
-#### docs/archive/superseded/
-
-- `summary_1.md` - Initial project summary (superseded by current documentation)
-
-### 5.2 Archive Access
-
-Archived documents remain accessible for historical reference and can be found in their respective archive subdirectories. These documents provide valuable context for project evolution but are no longer part of the active documentation suite.
+- `versions/`: Superseded document versions
+- `task-summaries/`: Completed task summaries
+- `superseded/`: Retired documents
 
 ---
 
 ## Document Control
 
 | Version | Date | Author | Changes |
-| ------- | ---- | ------ | ------- |
-| 1.0 | 2026-01-12 | Development Team | Initial index creation |
-| 2.0 | 2026-01-12 | Development Team | Updated completion status for 008_SIS and 017_SUM |
+| --- | --- | --- | --- |
+| 3.1 | 2026-01-23 | Development Team | Updated catalog and dependency map to match current codebase |
 | 3.0 | 2026-01-12 | Development Team | Documentation consolidation and archive structure |
 
 ---
 
-*This index is the authoritative navigation guide for the Umamusume Career Planner documentation suite.*
+*This index is the authoritative navigation guide for the Umamusume Career Planner core documentation suite.*

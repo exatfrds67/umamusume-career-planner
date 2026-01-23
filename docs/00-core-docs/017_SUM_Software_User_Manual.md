@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.0
-**Date**: January 14, 2026
-**Project**: UmamusumeCareerPlanner
-**Author**: Development Team
-**Status**: Final
+**Document Version**: 2.0.0  
+**Date**: January 23, 2026  
+**Project**: UmamusumeCareerPlanner  
+**Author**: Development Team  
+**Status**: Current - Aligned with codebase v2.0.0
 
 ---
 
@@ -14,1057 +14,1298 @@
 
 1. [Introduction](#1-introduction)
 2. [Getting Started](#2-getting-started)
-3. [User Interface Overview](#3-user-interface-overview)
+3. [Dashboard Overview](#3-dashboard-overview)
 4. [Character Management](#4-character-management)
-5. [Training System](#5-training-system)
-6. [AI Assistant Features](#6-ai-assistant-features)
-7. [Analytics and Performance](#7-analytics-and-performance)
-8. [Settings and Preferences](#8-settings-and-preferences)
-9. [Troubleshooting](#9-troubleshooting)
-10. [Frequently Asked Questions](#10-frequently-asked-questions)
-11. [Accessibility Features](#11-accessibility-features)
-12. [Support and Contact](#12-support-and-contact)
+5. [Career Run Management](#5-career-run-management)
+6. [Training System](#6-training-system)
+7. [Race Strategy](#7-race-strategy)
+8. [Skill Management](#8-skill-management)
+9. [Support Card & Deck Management](#9-support-card--deck-management)
+10. [AI Advisory System](#10-ai-advisory-system)
+11. [Data Import & Export](#11-data-import--export)
+12. [Storage Modes](#12-storage-modes)
+13. [Settings & Preferences](#13-settings--preferences)
+14. [Troubleshooting](#14-troubleshooting)
+15. [Keyboard Shortcuts](#15-keyboard-shortcuts)
+16. [Glossary](#16-glossary)
+17. [Support & Resources](#17-support--resources)
 
 ---
 
 ## 1. Introduction
 
-### 1.1 Welcome to Umamusume Career Planner
+### 1.1 Welcome
 
-Welcome to the Umamusume Pretty Derby Career Planner, your comprehensive companion for optimizing character training in the popular mobile game. This application combines advanced AI technology with deep game knowledge to help you achieve A-grade rankings in both URA Finale and Unity Cup scenarios.
+Welcome to the **Umamusume Pretty Derby Career Planner**, your comprehensive tool for planning, tracking, and optimizing your training runs in *Uma Musume: Pretty Derby*. This application consolidates features from multiple legacy tracking tools into a unified, modern platform.
 
-**Key Benefits**:
+### 1.2 Application Overview
 
-- Intelligent training recommendations powered by Hybrid AI Processing
-- Real-time stat tracking and progress visualization
-- Support card optimization and skill management
-- Privacy-focused local-first data architecture
-- WCAG 2.2 AA compliant accessible interface
+```mermaid
+mindmap
+  root((Uma Musume<br/>Career Planner))
+    Character Management
+      Create Characters
+      Track Stats
+      Manage Aptitudes
+      Factor Inheritance
+    Training Optimization
+      Stat Predictions
+      Risk Assessment
+      Skill Hints
+      Recommendations
+    Race Strategy
+      Race Calendar
+      Readiness Scoring
+      Win Probability
+      Strategy Optimization
+    Skill Management
+      Skill Catalog
+      SP Tracking
+      Evolution Paths
+      Build Planning
+    Support Cards
+      Deck Building
+      Bond Tracking
+      Meta Tiers
+      Synergy Analysis
+    AI Advisory
+      Training Advice
+      Race Strategy
+      Career Planning
+      Intelligent Recommendations
+    Data Features
+      Import/Export
+      Dual Storage
+      OCR Processing
+      External API Sync
+```
 
-### 1.2 What You Can Do
+### 1.3 Key Features
 
 | Feature | Description |
-| ------- | ----------- |
-| Character Management | Track multiple characters with comprehensive stat monitoring |
-| Training Predictions | Get AI-powered recommendations for optimal training choices |
-| Skill Optimization | Manage skills with hint tracking and SP cost reduction |
-| Race Preparation | Analyze race requirements and strategy recommendations |
-| Career Analytics | Review historical performance and improvement trends |
-| AI Chat Assistant | Ask questions and receive personalized advice |
+|---------|-------------|
+| **Character State Management** | Complete tracking of Speed, Stamina, Power, Guts, and Wit stats with aptitude grades and factor inheritance |
+| **Training Prediction Engine** | AI-powered predictions for stat gains, risk assessment, and optimal training recommendations |
+| **Race Preparation & Strategy** | Comprehensive race planning with readiness scores, win probability, and running style optimization |
+| **Skill Management** | Full skill catalog with hint tracking, SP cost reduction, and evolution path planning |
+| **Support Card Configuration** | 6-card deck building with synergy analysis, bond tracking, and meta tier integration |
+| **AI Advisory System** | Hybrid AI using local Ollama and AWS Bedrock Claude models for intelligent recommendations |
+| **Dual Storage Modes** | Flexible storage with Local (browser) or Account (cloud) options |
+| **External Integration** | Real-time data sync with umapyoi.net, OCR screenshot processing, and community tools |
 
-### 1.3 System Requirements
+### 1.4 System Requirements
 
-**Supported Browsers**:
-
-| Browser | Minimum Version | Recommended |
-|---------|-----------------|-------------|
-| Chrome  | 90+             | Latest      |
-| Firefox | 88+             | Latest      |
-| Safari  | 14+             | Latest      |
-| Edge    | 90+             | Latest      |
-
-**Device Requirements**:
-
-- Desktop: 1024x768 minimum resolution
-- Tablet: iOS 14+ or Android 10+
-- Mobile: iOS 14+ or Android 10+
-- Internet: Broadband connection (offline mode available for basic features)
-
-### 1.4 Accessibility Statement
-
-This application is designed to meet WCAG 2.2 AA accessibility standards:
-
-- Full keyboard navigation support
-- Screen reader compatibility (NVDA, JAWS, VoiceOver)
-- Color contrast ratios of 4.5:1 for normal text
-- Text resizing up to 200% without loss of functionality
-- Focus indicators with 3:1 contrast ratio
+| Component | Requirement |
+|-----------|-------------|
+| **Browser** | Chrome, Firefox, Safari, or Edge (last 2 versions) |
+| **Screen Resolution** | Minimum 320px width, optimized up to 2560px |
+| **JavaScript** | Enabled |
+| **localStorage** | 5-10MB available for Local mode |
+| **Internet** | Required for Account mode; optional for Local mode |
 
 ---
 
 ## 2. Getting Started
 
-### 2.1 Account Creation
+### 2.1 First Launch
 
-**Step 1**: Navigate to the application URL and click "Create Account"
+When you first access the application:
 
-**Step 2**: Enter your registration information:
+1. **Welcome Screen** - View introduction and tutorial toggle
+2. **Account Creation** (Optional) - Register for cloud sync features
+3. **Career Configuration** - Set up your first character and goals
+4. **Dashboard Orientation** - Interactive tutorial for key features
 
-- Username (3-20 characters, alphanumeric)
-- Email address (for account recovery)
-- Password (minimum 8 characters, including uppercase, lowercase, and number)
+### 2.2 New Player Onboarding Flow
 
-**Step 3**: Verify your email address by clicking the link sent to your inbox
+```mermaid
+flowchart TD
+    A[Launch App] --> B{First Time?}
+    B -->|No| C[Dashboard]
+    B -->|Yes| D[Welcome Screen]
+    D --> E[Tutorial Toggle]
+    E --> F{Create Account?}
+    F -->|Yes| G[Account Setup]
+    F -->|No| H[Continue as Guest]
+    G --> I[Career Configuration]
+    H --> I
+    I --> J[Select Trainee]
+    J --> K[Choose Scenario]
+    K --> L[Set Goals]
+    L --> M[Dashboard Tour]
+    M --> C
+```
 
-**Step 4**: Complete your profile setup with optional preferences
+### 2.3 Storage Mode Selection
 
-### 2.2 First Login
+Choose how your data is stored:
 
-After logging in for the first time, you'll see the main dashboard with:
+```mermaid
+flowchart TB
+    subgraph Local["🟠 Local Mode"]
+        L1["No login required"]
+        L2["Data in browser only"]
+        L3["Works offline"]
+        L4["Risk: Browser cache clear"]
+    end
+    
+    subgraph Account["🟣 Account Mode"]
+        A1["Login required"]
+        A2["Cloud sync"]
+        A3["Access anywhere"]
+        A4["Secure backup"]
+    end
+    
+    Local -->|"Convert"| Account
+```
 
-1. **Welcome Tour**: A guided introduction to key features (can be skipped)
-2. **Quick Start Panel**: Create your first character or import existing data
-3. **Navigation Menu**: Access all application sections
-4. **Status Bar**: View system status and notifications
+| Mode | Pros | Cons | Best For |
+|------|------|------|----------|
+| **Local** | Instant start, no account needed, works offline | Data stays on this browser/device only | Quick tests, anonymous usage |
+| **Account** | Cross-device sync, secure cloud backup | Requires internet connection | Long-term tracking, multi-device access |
 
-### 2.3 Creating Your First Character
-
-**Character Creation Wizard**:
-
-1. **Select Scenario**: Choose between URA Finale or Unity Cup
-2. **Choose Character**: Select from available Umamusume characters
-3. **Set Initial Stats**: Enter current stat values (Speed, Stamina, Power, Guts, Wit)
-4. **Configure Aptitudes**: Set aptitude ratings (G through SS) for distances, surfaces, and running styles
-5. **Define Goals**: Set target stats and race objectives
-6. **Configure Support Deck**: Select your 6 support cards
-
-### 2.4 Interface Orientation
-
-**Main Navigation Areas**:
-
-| Area         | Location        | Purpose                        |
-|--------------|-----------------|--------------------------------|
-| Header       | Top             | Logo, user menu, notifications |
-| Sidebar      | Left            | Main navigation menu           |
-| Content Area | Center          | Primary content display        |
-| Action Bar   | Bottom (mobile) | Quick actions and shortcuts    |
+> **Tip:** You can start in Local Mode and convert your plans to Account Mode later!
 
 ---
 
-## 3. User Interface Overview
+## 3. Dashboard Overview
 
-### 3.1 Main Dashboard
+### 3.1 Dashboard Layout
 
-The dashboard provides an at-a-glance view of your training progress:
+```
+┌──────────────────────���─────────────────────────────────────────┐
+│  App Header: Logo | Run Selector | Notifications 🔔 | User Menu │
+├────────────────────────────────────────────────────────────────┤
+│ Sidebar              │ Main Content                            │
+│ - Dashboard (active) │ ┌─────────────────┬─────────────────┐   │
+│ - Character          │ │ Current Goals   │ Stat Snapshot   │   │
+│ - Training           │ │ - Short-term    │ Speed  A (980)  │   │
+│ - Races              │ │ - Long-term     │ Stamina B+(820) │   │
+│ - Skills             │ │ Progress bars   │ Power  B (780)  │   │
+│ - Support Cards      │ ├─────────────────┼─────────────────┤   │
+│ - AI Advisor         │ │ Upcoming Races  │ Mood/Energy     │   │
+│ - Settings           │ │ [Date][Race]    │ Good | 72/100   │   │
+│                      │ ├─────────────────┼─────────────────┤   │
+│                      │ │ Training Suggest│ AI Advisor Card │   │
+│                      │ │ [Action][Gains] │ Last tip + CTA  │   │
+│                      │ └─────────────────┴─────────────────┘   │
+└────────────────────────────────────────────────────────────────┘
+```
 
-**Dashboard Widgets**:
+### 3.2 Dashboard Components
 
-- **Active Character**: Current character stats and progress
-- **Training Recommendations**: AI-suggested next actions
-- **Recent Activity**: Latest training sessions and results
-- **Quick Stats**: Key performance metrics
-- **Notifications**: Important alerts and reminders
+| Component | Description |
+|-----------|-------------|
+| **Stats Panel** | Current character stats with grade indicators (Speed, Stamina, Power, Guts, Wit) |
+| **Goals Progress** | Active goals with progress bars and completion status |
+| **Upcoming Races** | Next 3 races with date, grade, and readiness percentage |
+| **Training Suggestions** | Top 3 recommended training options with gains and risk |
+| **Mood/Energy Widget** | Current mood status and energy level |
+| **AI Advisor Card** | Latest AI recommendation with quick action buttons |
 
-### 3.2 Navigation System
+### 3.3 Navigation
 
-**Primary Navigation** (Sidebar):
-
-- Dashboard
-- Characters
-- Training
-- Skills
-- Races
-- Analytics
-- AI Assistant
-- Settings
-
-**Breadcrumb Navigation**: Shows your current location and allows quick navigation to parent sections
-
-**Quick Actions**: Keyboard shortcuts for common tasks (see Appendix A)
-
-### 3.3 Responsive Design
-
-**Desktop View** (1024px+):
-
-- Full sidebar navigation
-- Multi-column layouts
-- Expanded data tables
-
-**Tablet View** (768px-1023px):
-
-- Collapsible sidebar
-- Adaptive layouts
-- Touch-optimized controls
-
-**Mobile View** (<768px):
-
-- Bottom navigation bar
-- Single-column layouts
-- Swipe gestures enabled
-
-### 3.4 Dark/Light Mode
-
-**Theme Options**:
-
-1. **Light Mode**: Default theme with light backgrounds
-2. **Dark Mode**: Reduced eye strain for low-light environments
-3. **System**: Automatically matches your device settings
-
-**To Change Theme**: Settings → Appearance → Theme Selection
+| Navigation Item | Route | Description |
+|-----------------|-------|-------------|
+| Dashboard | `/dashboard` | Main overview and stats |
+| Character | `/characters` | Character management |
+| Training | `/characters/{id}/training` | Training selection and predictions |
+| Races | `/races` | Race calendar and strategy |
+| Skills | `/skills` | Skill catalog and management |
+| Support Cards | `/support-cards` | Card collection and deck building |
+| AI Advisor | `/ai-advisor` | AI-powered recommendations |
+| Settings | `/settings` | User preferences and configuration |
 
 ---
 
 ## 4. Character Management
 
-### 4.1 Character Creation
+### 4.1 Character Creation Wizard
 
-#### 4.1.1 Selecting Character Templates
+Create a new character through the step-by-step wizard:
 
-Each Umamusume character has unique base aptitudes and growth rates:
+```mermaid
+flowchart LR
+    A[Step 1: Select Trainee] --> B[Step 2: Choose Parents]
+    B --> C[Step 3: Build Support Deck]
+    C --> D[Step 4: Review & Confirm]
+    D --> E[Character Created]
+```
 
-**Aptitude Ratings** (G through SS):
+#### Step 1: Select Trainee & Scenario
 
-- **Distance**: Sprint (1000-1400m), Mile (1401-1800m), Medium (1801-2400m), Long (2401m+)
-- **Surface**: Turf, Dirt
-- **Running Style**: Front Runner, Pace Chaser, Late Surger, End Closer
+```
+┌────────────────────────────────────────────────────────────┐
+│  Create New Character - Step 1 of 4                        │
+├──────────────────────────────────────────────��─────────────┤
+│  Select Trainee                                            │
+│  ┌──────────────────────────────────────────────────┐     │
+│  │ 🔍 Search trainees...                             │     │
+│  └──────────────────────────────────────────────────┘     │
+│                                                            │
+│  Rarity Filter: [ ]SSR  [ ]SR  [ ]R                        │
+│                                                            │
+│  ┌─────────────────┬─────────────────┬─────────────────┐  │
+│  │ Mejiro Ardan    │ Kitasan Black   │ Tokai Teio      │  │
+│  │ SSR · Speed     │ SSR · Power     │ SSR · Stamina   │  │
+│  │ [SELECT]        │ [SELECT]        │ [SELECT]        │  │
+│  └─────────────────┴─────────────────┴─────────────────┘  │
+│                                                            │
+│  Scenario: [URA Finals ▼]                                  │
+│                          [← BACK]  [NEXT →]                │
+└────────────────────────────────────────────────────────────┘
+```
 
-**Growth Rate Bonuses**: Inherited from legacy characters (+10%, +20%, +30%)
+#### Step 2: Parent Selection & Factor Inheritance
 
-#### 4.1.2 Scenario Selection
+- Select Parent A and Parent B
+- Preview inherited stat bonuses and factor ratings
+- View growth rate projections
 
-**URA Finale**:
+**Factor Ratings:**
 
-- Individual character optimization
-- Traditional training mechanics
-- Focus on personal stat development
+| Rating | Stat Bonus |
+|--------|------------|
+| ★☆☆ | +5 |
+| ★★☆ | +12 |
+| ★★★ | +21 |
 
-**Unity Cup**:
+#### Step 3: Support Deck Configuration
 
-- Team-based mechanics
-- Spirit Burst system (4-session gauge)
-- Distance team composition
-- Facility level bonuses (1.0x to 2.0x)
+- Build your 6-card support deck
+- Validate type distribution
+- Preview deck synergy score
 
-#### 4.1.3 Goal Setting
+#### Step 4: Review & Confirm
 
-**Setting Objectives**:
+- Review all selections
+- Confirm character creation
+- Initialize starting stats, mood, and energy
 
-1. **Target Stats**: Define minimum stat values for each attribute
-2. **Race Goals**: Specify races to win or place in
-3. **Skill Targets**: List skills to acquire during the career
-4. **Grade Target**: Set overall grade objective (B, A, S, SS)
+### 4.2 Character Dashboard
 
-**Progress Indicators**:
+View and manage your character's current state:
 
-- ○ Adequate (on track)
-- ⦾ Borderline (needs attention)
-- △ Insufficient (behind schedule)
-- × Inadequate (critical)
+```
+┌────────────────────────────────────────────────────────────┐
+│  Mejiro Ardan (Turn 45)                       [Edit] [≡]   │
+├────────────────────────────────────────────────────────────┤
+│  Status Bar                                                │
+│  Energy: ████████░ 78%  | Mood: ◐ Good  | Race in: 15 d   │
+│                                                            │
+│  ┌────────────────────────────────────────────────────────┐│
+│  │ Stats Overview         │  Goals Progress              ││
+│  ├────────────────────────┼──────────────────────────────┤│
+│  │ Speed      520 ★★★★★  │  Speed Goal: 800  ███░░ 65%  ││
+│  │ Stamina    480 ★★★★░  │  Stamina: 600  ███░░░░ 45%   ││
+│  │ Power      440 ★★★░░  │  Race Goal: G1  ◐ Upcoming   ││
+│  │ Guts       460 ★★★★░  │                              ││
+│  │ Wit        450 ★★★░░  │  [+ Add Goal]                ││
+│  │                        │                              ││
+│  │ Aptitudes              │  Recent Turns                ││
+│  │ • Mile:  A+  ◎         │  Turn 44: Speed +48          ││
+│  │ • Turf:  A             │  Turn 43: Stamina +42        ││
+│  │ • Late Surger: S       │  Turn 42: Power +35          ││
+│  └────────────────────────┴──────────────────────────────┘│
+└────────────────────────────────────────────────────────────┘
+```
 
-### 4.2 Character Overview
+### 4.3 Stat System
 
-#### 4.2.1 Stats Display
+**Stat Types and Ranges:**
 
-**Core Stats** (0-1200 range):
+| Stat | Description | Range | Priority |
+|------|-------------|-------|----------|
+| Speed | Maximum running speed | 0-1200 | ★★★★★ |
+| Stamina | HP and effective stamina | 0-1200 | ★★★★ |
+| Power | Acceleration and lane-changing | 0-1200 | ★★★ |
+| Guts | Last spurt and stamina consumption | 0-1200 | ★ |
+| Wit | Skill activation rate | 0-1200 | ★★ |
 
-| Stat    | Priority | Description                   |
-|---------|----------|-------------------------------|
-| Speed   | ★★★★★    | Top speed during races        |
-| Stamina | ★★★★     | Duration at top speed         |
-| Power   | ★★★      | Acceleration rate             |
-| Guts    | ★        | Final phase performance       |
-| Wit     | ★★       | Skill activation, positioning |
+**Grade Scale:**
 
-**Letter Grades**: G+ through SS (based on numerical value)
+| Grade | Value Range |
+|-------|-------------|
+| SS | 1100+ |
+| S | 950-1099 |
+| A | 850-949 |
+| B+ | 750-849 |
+| B | 650-749 |
+| C+ | 550-649 |
+| C | 450-549 |
+| D+ | 350-449 |
+| D | 250-349 |
+| E | 150-249 |
+| F | 0-149 |
 
-#### 4.2.2 Progress Tracking
+### 4.4 Aptitude System
 
-**Turn Counter**: Shows current turn and remaining turns
+**Aptitude Categories:**
 
-**Completion Percentage**: Overall career progress
+| Category | Types |
+|----------|-------|
+| Distance | Sprint (1000-1400m), Mile (1401-1800m), Medium (1801-2400m), Long (2401m+) |
+| Surface | Turf, Dirt |
+| Running Style | Front Runner (Nige), Pace Chaser (Senkou), Late Surger (Sashi), End Closer (Oikomi) |
 
-**Milestone Tracking**: Key achievements and upcoming goals
+**Aptitude Ratings & Effectiveness:**
 
-#### 4.2.3 Character History
-
-**Training Log**: Complete record of all training sessions
-
-**Race Results**: Performance in completed races
-
-**Achievement History**: Unlocked achievements and milestones
-
-### 4.3 Multiple Character Management
-
-**Character List Features**:
-
-- Filter by scenario type (URA/Unity Cup)
-- Sort by name, creation date, or progress
-- Search by character name
-- Bulk actions (archive, delete)
-
-**Character Comparison**: Side-by-side stat comparison tool
+| Rating | Effectiveness |
+|--------|---------------|
+| SS | 120% |
+| S | 110% |
+| A | 100% |
+| B | 90% |
+| C | 80% |
+| D | 70% |
+| E | 60% |
+| F | 50% |
+| G | 40% |
 
 ---
 
-## 5. Training System
+## 5. Career Run Management
 
-### 5.1 Training Basics
+### 5.1 Career Stages
 
-#### 5.1.1 Understanding Training Types
+```mermaid
+flowchart LR
+    A[Junior Year<br/>Turns 1-24] --> B[Classic Year<br/>Turns 25-48]
+    B --> C[Senior Year<br/>Turns 49-72]
+    C --> D[URA Finals<br/>Turns 73-78]
+```
 
-**Training Options**:
+| Stage | Turn Range | Description |
+|-------|------------|-------------|
+| Junior | 1-24 | Early training and foundation building |
+| Classic | 25-48 | Competitive racing and skill development |
+| Senior | 49-72 | Peak performance and championship preparation |
+| URA Finals | 73-78 | Final championship races |
 
-| Training | Primary Stat | Secondary Stats | Notes                        |
-|----------|--------------|-----------------|------------------------------|
-| Speed    | Speed        | Power           | Priority for most builds     |
-| Stamina  | Stamina      | Guts            | Essential for long distances |
-| Power    | Power        | Stamina         | Acceleration focus           |
-| Guts     | Guts         | Speed, Power    | Final stretch performance    |
-| Wit      | Wit          | Speed           | Skill activation             |
-| Rest     | -            | -               | Recover energy               |
+### 5.2 Turn Progression
 
-**Training Modifiers**:
+Each turn follows this flow:
 
-- Support card bonuses
-- Friendship training multipliers
-- Facility levels (Unity Cup)
-- Energy level effects
+```mermaid
+flowchart TD
+    A[Begin Turn] --> B{Phase?}
+    B -->|Training| C[Training Actions]
+    B -->|Race Week| D[Race Preparation]
+    C --> E[Process Events]
+    D --> F[Execute Race]
+    E --> G[Update Stats/Mood/Condition]
+    F --> G
+    G --> H[Advance Turn]
+    H --> I[Next Turn]
+```
 
-#### 5.1.2 Support Card System
+### 5.3 Goal Management
 
-**Deck Configuration**: 6 cards total (5 owned + 1 borrowed)
+Set and track training objectives:
 
-**Card Types**:
+| Goal Type | Description | Example |
+|-----------|-------------|---------|
+| Stat Target | Reach specific stat value | Speed ≥ 800 |
+| Race Win | Achieve placement in race | Win G1 Race |
+| Skill Acquisition | Obtain specific skills | Acquire 9 skills |
 
-- Speed cards
-- Stamina cards
-- Power cards
-- Guts cards
-- Wit cards
-- Pal (Friend) cards
+**Goal Status:**
 
-**Friendship Levels**:
-
-- 0-79%: Standard bonuses
-- 80%+: Friendship Training unlocked
-- 100%: Rainbow Training (maximum bonuses)
-
-**Skill Hints**: Red "!" indicator shows guaranteed skill hint acquisition
-
-#### 5.1.3 Training Results
-
-**Stat Gains**: Calculated based on:
-
-- Base training value
-- Support card bonuses
-- Friendship multipliers
-- Facility levels
-- Energy level
-- Mood status
-
-**Events**: Random events during training that affect outcomes
-
-**Skill Learning**: Opportunities to learn new skills from support cards
-
-### 5.2 Advanced Training
-
-#### 5.2.1 Training Optimization
-
-**Efficiency Strategies**:
-
-1. **Prioritize Friendship Training**: Focus on building friendship levels early
-2. **Stack Support Cards**: Multiple cards on same training for bonus multipliers
-3. **Energy Management**: Maintain 50%+ energy for optimal results
-4. **Mood Optimization**: Keep mood at "Good" or "Great" for bonuses
-
-**Stat Breakpoints**:
-
-- 901: First efficiency threshold
-- 1200: Half value for additional points
-- 1600: Significant benefits at this breakpoint
-
-#### 5.2.2 Event Management
-
-**Event Types**:
-
-- Training events (support card interactions)
-- Random events (mood changes, conditions)
-- Story events (character development)
-- Race events (pre/post race)
-
-**Decision Making**: Events often present choices that affect:
-
-- Stat gains
-- Skill acquisition
-- Mood changes
-- Condition effects
-
-#### 5.2.3 Race Participation
-
-**Race Selection Criteria**:
-
-- Aptitude compatibility
-- Stat requirements
-- Fan acquisition goals
-- Story progression
-
-**Race Preparation**:
-
-1. Check stat requirements (○/⦾/△/× indicators)
-2. Select appropriate running style
-3. Equip relevant skills
-4. Consider weather conditions
-
-### 5.3 Training Analytics
-
-**Performance Metrics**:
-
-- Training efficiency score
-- Stat gain per turn average
-- Friendship progression rate
-- Skill acquisition rate
-
-**Improvement Suggestions**: AI-generated recommendations based on your training patterns
+- ✅ **Completed** - Goal achieved
+- 🟡 **On Track** - Progress within expected range
+- 🔴 **At Risk** - Behind schedule, intervention needed
 
 ---
 
-## 6. AI Assistant Features
+## 6. Training System
 
-### 6.1 AI Recommendations
+### 6.1 Training Selection Interface
 
-#### 6.1.1 Training Suggestions
+```
+┌────────────────────────────────────────────────────────────┐
+│  Select Training (Turn 46)                            [≡]   │
+├────────────────────────────────────────────────────────────┤
+│  🚨 Status: Good | Energy: 78% | Mood: Good (+0%)          │
+│                                                            │
+│  ┌─────────────────────────────────────────────────────────┐
+│  │ RECOMMENDED: Speed Training                  Rank: 1    │
+│  │ Alignment: High | Score: 92.5/100           [AI] (new)  │
+│  │                                                         │
+│  │ Predicted Gains:                                        │
+│  │ Speed: +45  Stamina: +5  Power: +3  Guts: +2  Wit: +1  │
+│  │ Efficiency: ★★★★★ Excellent                            │
+│  │                                                         │
+│  │ Skill Hints:                                            │
+│  │ • Lane Guidance (Guaranteed ✓ - Mejiro Dober red !)    │
+│  │ • Going Strong (25% chance)                            │
+│  │                                                         │
+│  │ Support Cards Active:                                   │
+│  │ • Mejiro Dober (Power Spec, +12) ← Red Exclamation     │
+│  │ • Tokai Teio (Speed Spec, +8)                          │
+│  │                                                         │
+│  │ Mood Prediction: Good → Normal (-1) ⚠️                  │
+│  │                                                         │
+│  │                          [SELECT THIS] [SHOW MORE]      │
+│  └─────────────────────────────────────────────────────────┘
+│                                                            │
+│  Other Training Options:                                   │
+│  ┌──────────────────┬──────────────────┬──────────────────┐
+│  │ 2. Stamina       │ 3. Power         │ 4. Guts          │
+│  │ Rank: 2 (88.3)   │ Rank: 3 (82.1)   │ Rank: 4 (71.5)   │
+│  │ Gains: +42       │ Gains: +38       │ Gains: +35       │
+│  │ [SELECT]         │ [SELECT]         │ [SELECT]         │
+│  └──────────────────┴──────────────────┴──────────────────┘
+└────────────────────────────────────────────────────────────┘
+```
 
-The AI analyzes your current situation and recommends optimal training choices:
+### 6.2 Training Types
 
-**Recommendation Display**:
+| Training | Primary Stat | Secondary Stats | Energy Cost |
+|----------|--------------|-----------------|-------------|
+| Speed | Speed | Stamina | 20-30% |
+| Stamina | Stamina | Guts | 20-30% |
+| Power | Power | Stamina | 20-30% |
+| Guts | Guts | Power | 20-30% |
+| Wisdom | Wit | Skill Points | 15-25% |
+| Rest | - | Energy Recovery | -50% |
 
-- Ranked list of training options
-- Expected stat gains
-- Confidence level (percentage)
-- Reasoning explanation
+### 6.3 Training Predictions
 
-**Factors Considered**:
+The Training Prediction Engine calculates:
 
-- Current stats vs. goals
-- Support card positions
-- Energy and mood levels
-- Upcoming race requirements
-- Skill hint opportunities
+```mermaid
+flowchart TD
+    A[Load Run Context] --> B[Calculate Base Gains]
+    B --> C[Apply Support Card Bonuses]
+    C --> D[Calculate Failure Risk]
+    D --> E[Determine Hint Chance]
+    E --> F[Build Prediction]
+    F --> G[Rank Options]
+    G --> H[Return to UI]
+```
 
-#### 6.1.2 Strategy Planning
+**Prediction Components:**
 
-**Long-term Planning**:
+| Component | Description |
+|-----------|-------------|
+| Base Gains | Raw stat increases from training type |
+| Support Bonuses | Multipliers from active support cards |
+| Failure Risk | Chance of training failure (0-90%) |
+| Hint Chance | Probability of receiving skill hints |
+| Bond Gains | Friendship points with support cards |
 
-- Multi-turn optimization
-- Race schedule planning
-- Skill acquisition roadmap
-- Resource allocation
+### 6.4 Risk Assessment
 
-**Scenario-Specific Advice**:
+Risk levels are color-coded:
 
-- URA Finale: Individual optimization strategies
-- Unity Cup: Team synergy and Spirit Burst timing
+| Risk Level | Percentage | Indicator |
+|------------|------------|-----------|
+| Low | <15% | 🟢 Green |
+| Moderate | 15-40% | 🟡 Amber |
+| High | >40% | 🔴 Red |
 
-#### 6.1.3 Performance Analysis
+**Risk Factors:**
 
-**AI Analysis Includes**:
+- Low energy level
+- Bad/Awful mood
+- Active condition debuffs
+- High training difficulty
 
-- Training efficiency evaluation
-- Comparison to optimal paths
-- Improvement recommendations
-- Pattern recognition from historical data
+### 6.5 Friendship Training
 
-### 6.2 AI Interaction
+When bond level reaches 80%+, Friendship Training activates:
 
-#### 6.2.1 Chat Interface
-
-**How to Use**:
-
-1. Click the AI Assistant icon or press `Ctrl+/`
-2. Type your question in natural language
-3. Receive contextual response based on your current character
-
-**Example Questions**:
-
-- "What should I train this turn?"
-- "How can I improve my stamina efficiently?"
-- "Which skills should I prioritize?"
-- "Am I ready for the upcoming race?"
-
-#### 6.2.2 Recommendation Acceptance
-
-**Following Suggestions**:
-
-- Click "Apply" to accept AI recommendation
-- Click "Explain" for detailed reasoning
-- Click "Alternative" for other options
-
-**Manual Override**: You can always choose differently from AI suggestions
-
-#### 6.2.3 AI Model Selection
-
-**Processing Options**:
-
-| Model          | Speed         | Cost          | Best For                 |
-|----------------|---------------|---------------|--------------------------|
-| Ollama (Local) | Fast (<3s)    | Free          | Privacy, quick queries   |
-| Nova 2 Lite    | Medium        | $0.00125/1K   | Budget cloud processing  |
-| Claude Haiku   | Medium        | $1/$5 per 1M  | Balanced performance     |
-| Claude Sonnet  | Slower        | $3/$15 per 1M | Complex analysis         |
-
-**Selection**: Settings → AI → Model Preferences
-
-### 6.3 AI Privacy and Settings
-
-**Privacy Features**:
-
-- Local-first processing with Ollama
-- No personal data transmitted without consent
-- Conversation history stored locally
-- Optional cloud processing (user-controlled)
-
-**Budget Management**:
-
-- Set monthly spending limits
-- Track usage and costs
-- Automatic fallback to local when budget exceeded
-
----
-
-## 7. Analytics and Performance
-
-### 7.1 Performance Dashboard
-
-**Key Metrics Display**:
-
-| Metric              | Description            | Target |
-|---------------------|------------------------|--------|
-| Training Efficiency | Stat gains vs. optimal | >80%   |
-| Goal Progress       | Completion percentage  | 100%   |
-| AI Accuracy         | Prediction vs. actual  | >85%   |
-| Career Grade        | Current grade estimate | A+     |
-
-**Trend Indicators**:
-
-- ↑ Improving
-- → Stable
-- ↓ Declining
-
-### 7.2 Training Analytics
-
-#### 7.2.1 Efficiency Metrics
-
-**Efficiency Score Calculation**:
-
-- Actual stat gains ÷ Optimal stat gains × 100
-
-**Benchmarks**:
-
-- 90%+: Excellent
-- 80-89%: Good
-- 70-79%: Average
-- <70%: Needs improvement
-
-#### 7.2.2 Progress Visualization
-
-**Available Charts**:
-
-- Stat progression over time (line chart)
-- Training distribution (pie chart)
-- Goal completion (progress bars)
-- Comparison to targets (radar chart)
-
-**Time Ranges**: View data by turn, session, or career
-
-#### 7.2.3 Comparative Analysis
-
-**Comparison Tools**:
-
-- Character vs. character
-- Career vs. career
-- Your performance vs. community average
-- Current vs. historical performance
-
-### 7.3 Export and Sharing
-
-**Export Options**:
-
-- CSV: Raw data export
-- PDF: Formatted reports
-- JSON: Full data backup
-
-**Sharing Features**:
-
-- Share career summaries (anonymized)
-- Export strategy guides
-- Community leaderboards (opt-in)
+```mermaid
+flowchart TD
+    A[Bond Check] --> B{Bond >= 80%?}
+    B -->|No| C[Normal Training]
+    B -->|Yes| D[Apply Friendship Bonus]
+    D --> E[+2 to +5 per stat]
+    E --> F[Update Gains]
+    C --> F
+```
 
 ---
 
-## 8. Settings and Preferences
+## 7. Race Strategy
 
-### 8.1 Account Settings
+### 7.1 Race Calendar
 
-#### 8.1.1 Profile Management
+```
+┌────────────────────────────────────────────────────────────┐
+│  Race Calendar | Filter: [All Grades ▼] [All Distances ▼]  │
+├────────────────────────────────────────────────────────────┤
+│  January 2026                                              │
+│  ┌─────┬─────┬─────┬─────┬─────┬─────┬─────┐              │
+│  │ Sun │ Mon │ Tue │ Wed │ Thu │ Fri │ Sat │              │
+│  ├─────┼─────┼─────┼─────┼─────┼─────┼─────┤              │
+│  │  5  │  6  │  7  │  8  │  9  │ 10  │ 11  │              │
+│  │     │     │     │     │     │G1🟢 │     │              │
+│  │     │     │     │     │     │85%  │     │              │
+│  └─────┴─────┴─────┴─────┴─────┴─────┴─────┘              │
+│                                                            │
+│  Selected: Kanto Okami Cup (G1)                           │
+│  Distance: Medium (2400m) | Surface: Turf                 │
+│  Readiness: 85% | Win Probability: 35%                    │
+│                                                            │
+│  [VIEW DETAILS] [ENTER RACE]                              │
+└────────────────────────────────────────────────────────────┘
+```
 
-**Editable Fields**:
+### 7.2 Race Preparation
 
-- Display name
-- Avatar selection
-- Language preference
-- Timezone
+```
+┌────────────────────────────────────────────────────────────┐
+│  Upcoming Race: Kanto Okami Cup                       [≡]   │
+├────────────────────────────────────────────────────────────┤
+│  Grade: G1 | Track: Tokyo | Distance: Medium (2400m)      │
+│  Surface: Turf | Weather: Sunny | Turn: 85 | Days: 8      │
+│                                                            │
+│  Stat Requirements                 Running Style           │
+│  ┌─────────────────────────┐       ┌──────────────────────┐│
+│  │ Speed      520 ○ ADEQUATE│      │ RECOMMENDED:         ││
+│  │ Stamina    480 × INADEQUATE     │ Late Surger          ││
+│  │ Power      440 ⦾ BORDERLINE│    │ Score: 85.3/100      ││
+│  │ Guts       460 ○ ADEQUATE│      │                      ││
+│  │ Wit        450 ⦾ BORDERLINE│    │ Reasoning:           ││
+│  │                         │       │ • High Power aptitude││
+│  │ Readiness: ⦾ BORDERLINE │       │ • Strong in Guts     ││
+│  └─────────────────────────┘       └──────────────────────┘│
+│                                                            │
+│  Performance Forecast                                      │
+│  1st Place: 35% | 2nd: 40% | 3rd: 20% | 4th+: 5%          │
+│                                                            │
+│  [PREPARE] [RUN SIMULATION] [AI DETAILED ANALYSIS]        │
+└────────────────────────────────────────────────────────────┘
+```
 
-#### 8.1.2 Security Settings
+### 7.3 Readiness Calculation
 
-**Security Options**:
+```mermaid
+flowchart TD
+    A[Compute Readiness] --> B[Gather Inputs]
+    B --> C[Score Stat Fit vs Race]
+    C --> D[Score Aptitudes]
+    D --> E[Score Active Skills]
+    E --> F[Score Mood/Condition]
+    F --> G[Aggregate Score]
+    G --> H{Classify Tier}
+    H -->|>=85| I[Excellent]
+    H -->|70-84| J[Good]
+    H -->|55-69| K[Fair]
+    H -->|<55| L[Poor]
+```
 
-- Change password
-- Enable two-factor authentication
-- View active sessions
-- Revoke access tokens
+### 7.4 Running Styles
 
-#### 8.1.3 Privacy Controls
+| Style | Japanese | Best For |
+|-------|----------|----------|
+| Front Runner | 逃げ (Nige) | Early lead, consistent pace |
+| Pace Chaser | 先行 (Senkou) | Close pursuit, mid-race positioning |
+| Late Surger | 差し (Sashi) | Final stretch acceleration |
+| End Closer | 追込 (Oikomi) | Maximum end-game burst |
 
-**Privacy Options**:
+### 7.5 Win Probability Factors
 
-| Setting             | Default | Description                   |
-|---------------------|---------|-------------------------------|
-| Data Sharing        | Off     | Share anonymous analytics     |
-| Cloud Backup        | Off     | Backup data to cloud          |
-| Community Sharing   | Off     | Share strategies publicly     |
-| AI Cloud Processing | Off     | Allow cloud AI when needed    |
-
-### 8.2 Application Preferences
-
-#### 8.2.1 Interface Customization
-
-**Customization Options**:
-
-- Theme (Light/Dark/System)
-- Sidebar position (Left/Right)
-- Compact mode (reduced spacing)
-- Animation preferences
-
-#### 8.2.2 AI Configuration
-
-**AI Settings**:
-
-- Preferred model (Local/Cloud)
-- Monthly budget limit
-- Recommendation frequency
-- Explanation detail level
-
-#### 8.2.3 Accessibility Options
-
-**Accessibility Settings**:
-
-- High contrast mode
-- Large text mode
-- Reduced motion
-- Screen reader optimizations
-- Keyboard shortcut customization
-
-### 8.3 Data Management
-
-**Data Options**:
-
-- Export all data (JSON/CSV)
-- Import data from backup
-- Clear cache
-- Delete account and all data
-
----
-
-## 9. Troubleshooting
-
-### 9.1 Common Issues
-
-#### 9.1.1 Login Problems
-
-**Issue**: Cannot log in
-
-**Solutions**:
-
-1. Verify email and password are correct
-2. Check Caps Lock is off
-3. Clear browser cache and cookies
-4. Try password reset if forgotten
-5. Contact support if account is locked
-
-#### 9.1.2 Performance Issues
-
-**Issue**: Application is slow
-
-**Solutions**:
-
-1. Clear browser cache
-2. Disable browser extensions
-3. Check internet connection
-4. Try a different browser
-5. Reduce animation settings
-
-#### 9.1.3 AI Service Issues
-
-**Issue**: AI not responding
-
-**Solutions**:
-
-1. Check if Ollama is running (for local processing)
-2. Verify internet connection (for cloud processing)
-3. Check budget limits haven't been exceeded
-4. Try switching AI model
-5. Restart the application
-
-### 9.2 Technical Support
-
-#### 9.2.1 Browser Requirements
-
-**Required Features**:
-
-- JavaScript enabled
-- Cookies enabled
-- LocalStorage enabled
-- WebSocket support
-
-**Troubleshooting Steps**:
-
-1. Update browser to latest version
-2. Enable required features in settings
-3. Disable conflicting extensions
-4. Try incognito/private mode
-
-#### 9.2.2 Network Issues
-
-**Connectivity Requirements**:
-
-- Stable internet for cloud features
-- Offline mode available for basic features
-- WebSocket connection for real-time updates
-
-#### 9.2.3 Data Synchronization
-
-**Sync Issues**:
-
-1. Check internet connection
-2. Force sync from Settings → Data → Sync Now
-3. Clear local cache and re-sync
-4. Export data and re-import if needed
-
-### 9.3 Error Messages
-
-| Error Code | Meaning                 | Resolution                    |
-|------------|-------------------------|-------------------------------|
-| AUTH_001   | Invalid credentials     | Check email/password          |
-| AUTH_002   | Session expired         | Log in again                  |
-| AI_001     | AI service unavailable  | Try local processing          |
-| AI_002     | Budget exceeded         | Increase budget or use local  |
-| SYNC_001   | Sync failed             | Check connection, retry       |
-| DATA_001   | Data validation error   | Check input values            |
+| Factor | Impact |
+|--------|--------|
+| Race Grade | Higher grades reduce probability |
+| Aptitude Match | Better aptitude = higher probability |
+| Stat Comparison | Stat advantage increases probability |
+| Skill Synergy | Matching skills boost probability |
+| Competitor Strength | Stronger field reduces probability |
 
 ---
 
-## 10. Frequently Asked Questions
+## 8. Skill Management
 
-### 10.1 General Questions
+### 8.1 Skill Shop Interface
 
-**Q: Is my data stored locally or in the cloud?**
-A: By default, all your data is stored locally on your device. Cloud backup is optional and requires explicit opt-in.
+```
+┌────────────────────────────────────────────────────────────┐
+│  Skill Management                                     [≡]   │
+├────────────────────────────────────────────────────────────┤
+│  Current SP: 450 | Total SP Earned: 2400 | Used: 1950      │
+│                                                            │
+│  Filter: [Owned] [Available] [All]  |  Sort: [Cost] [Name] │
+│                                                            │
+│  ┌────────────────────────────────────────────────────────┐│
+│  │ OWNED SKILLS (22)                                      ││
+│  ├────────────────────────────────────────────────────────┤│
+│  │ ✓ Predator's Instinct     [Unique] SP: 180             ││
+│  │   Late Surger enhancement, inherited from legacy       ││
+│  │                                                        ││
+│  │ ✓ Go with the Flow → Lane Legerdemain [EVOLVED]       ││
+│  │   Base: 120 SP | Evolved to: 180 SP | Hint: 1 (-20%)  ││
+│  └────────────────────────────────────────────────────────┘│
+│                                                            │
+│  ┌────────────────────────────────────────────────────────┐│
+│  │ AVAILABLE SKILLS (128)                                 ││
+│  ├────────────────────────────────────────────────────────┤│
+│  │ ⚡ Going Strong [Normal] 120 SP (10 hints available)   ││
+│  │   Recommended for build | Cost with hints: 96 SP      ││
+│  │   [ACQUIRE] [MORE INFO]                               ││
+│  └────────────────────────────────────────────────────────┘│
+└────────────────────────────────────────────────────────────┘
+```
 
-**Q: Can I use the application offline?**
-A: Yes, basic features work offline. AI recommendations require either local Ollama or internet connection for cloud processing.
+### 8.2 Skill Categories
 
-**Q: Is the application free to use?**
-A: The core application is free. Cloud AI processing has associated costs, but local processing with Ollama is free.
+| Category | Description |
+|----------|-------------|
+| Normal | Standard skills, can evolve to Rare |
+| Rare | Enhanced skills with stronger effects |
+| Unique | Character-specific inherited skills |
 
-**Q: Can I use this on mobile devices?**
-A: Yes, the application is fully responsive and works on smartphones and tablets.
+### 8.3 Skill Hint System
 
-### 10.2 Training and Strategy
+Hints reduce SP cost:
 
-**Q: How accurate are the AI recommendations?**
-A: AI recommendations typically achieve 85%+ accuracy. Accuracy improves as the system learns from your choices.
+| Hint Level | Discount |
+|------------|----------|
+| 0 Hints | 0% (Base cost) |
+| 1 Hint | 20% discount |
+| 2 Hints | 40% discount (maximum) |
 
-**Q: Should I always follow AI suggestions?**
-A: AI suggestions are recommendations, not requirements. Your game knowledge combined with AI analysis produces the best results.
+**Hint Sources:**
 
-**Q: How do I optimize for specific races?**
-A: Set race goals in your character profile, and the AI will factor race requirements into training recommendations.
+- Training sessions
+- Race rewards
+- Support card events
 
-**Q: What's the difference between URA Finale and Unity Cup optimization?**
-A: URA Finale focuses on individual stat optimization, while Unity Cup includes team mechanics, Spirit Burst timing, and facility bonuses.
+### 8.4 Skill Evolution
 
-### 10.3 AI Features
+Some Normal skills can evolve to Rare versions:
 
-**Q: What's the difference between local and cloud AI?**
-A: Local AI (Ollama) runs on your device for free with complete privacy. Cloud AI (AWS Bedrock) offers more powerful models but has usage costs.
+```mermaid
+flowchart LR
+    A[Normal Skill] --> B{Requirements Met?}
+    B -->|Yes| C[Evolve to Rare]
+    B -->|No| D[Show Requirements]
+    C --> E[Replace Skill]
+    E --> F[Log History]
+```
 
-**Q: How do I set up local AI processing?**
-A: Install Ollama on your system, download the recommended models (Llama 3.3, Mistral), and enable local processing in Settings.
+**Example Evolution:**
 
-**Q: How much does cloud AI cost?**
-A: Costs vary by model. Nova 2 Lite is most economical at $0.00125/1K tokens. Claude models range from $1-$25 per million tokens.
+| Normal Skill | Rare Evolution |
+|--------------|----------------|
+| Go with the Flow | Lane Legerdemain |
+| Stamina Boost | Endurance Master |
 
-**Q: Is my conversation data private?**
-A: Yes. Local processing keeps all data on your device. Cloud processing only sends the current query, not your personal data.
+### 8.5 Skill Status Types
 
-### 10.4 Technical Questions
-
-**Q: Which browsers are supported?**
-A: Chrome 90+, Firefox 88+, Safari 14+, and Edge 90+. We recommend using the latest version.
-
-**Q: Why is the application slow?**
-A: Try clearing cache, disabling extensions, or switching to a different browser. Check Settings → Performance for optimization options.
-
-**Q: Can I export my data?**
-A: Yes. Go to Settings → Data Management → Export to download your data in JSON or CSV format.
-
-**Q: How do I delete my account?**
-A: Go to Settings → Account → Delete Account. This permanently removes all your data.
-
----
-
-## 11. Accessibility Features
-
-### 11.1 Screen Reader Support
-
-**Supported Screen Readers**:
-
-- NVDA (Windows)
-- JAWS (Windows)
-- VoiceOver (macOS/iOS)
-- TalkBack (Android)
-
-**Navigation Tips**:
-
-- Use heading navigation (H key) to jump between sections
-- Use landmark navigation to find main content areas
-- Tables include proper headers for row/column identification
-- Form fields have descriptive labels
-
-### 11.2 Keyboard Navigation
-
-**Global Shortcuts**:
-
-| Shortcut    | Action                           |
-|-------------|----------------------------------|
-| `Tab`       | Move to next interactive element |
-| `Shift+Tab` | Move to previous element         |
-| `Enter`     | Activate button/link             |
-| `Escape`    | Close modal/menu                 |
-| `Ctrl+/`    | Open AI Assistant                |
-| `?`         | Show keyboard shortcuts          |
-
-**Navigation Shortcuts**:
-
-| Shortcut | Action           |
-|----------|------------------|
-| `g d`    | Go to Dashboard  |
-| `g c`    | Go to Characters |
-| `g t`    | Go to Training   |
-| `g s`    | Go to Settings   |
-
-### 11.3 Visual Accessibility
-
-**High Contrast Mode**:
-
-- Enable in Settings → Accessibility → High Contrast
-- Increases contrast ratios for better visibility
-- Works with system high contrast settings
-
-**Text Resizing**:
-
-- Use browser zoom (Ctrl/Cmd + +/-) up to 200%
-- Application layout adapts to larger text
-- No horizontal scrolling required
-
-**Color Independence**:
-
-- Information is not conveyed by color alone
-- Icons and text labels accompany color indicators
-- Pattern differentiation in charts
-
-### 11.4 Motor Accessibility
-
-**Large Click Targets**:
-
-- Minimum 44x44 pixel touch targets
-- Adequate spacing between interactive elements
-
-**Timing Adjustments**:
-
-- No time limits on form completion
-- Session timeout warnings with extension option
-- Pause/stop controls for animations
-
-**Alternative Input**:
-
-- Full keyboard accessibility
-- Voice control compatible
-- Switch device support
+| Status | Icon | Description |
+|--------|------|-------------|
+| Acquired | ✅ | Skill purchased and owned |
+| Skipped | ❌ | Decided not to acquire |
+| Suggested | 💭 | Recommended by AI or planning |
 
 ---
 
-## 12. Support and Contact
+## 9. Support Card & Deck Management
 
-### 12.1 Getting Help
+### 9.1 Support Card Collection
 
-**Support Channels**:
+```
+┌────────────────────────────────────────────────────────────┐
+│  Support Card Collection                              [≡]   │
+├────────────────────────────────────────────────────────────┤
+│  Total: 156 Cards | SSR: 24 | SR: 48 | R: 84              │
+│                                                            │
+│  Filter: [All Types ▼] [All Rarity ▼] | Sort: [Meta Tier] │
+│                                                            │
+│  ┌─────────────────┬─────────────────┬─────────────────┐  │
+│  │ Mejiro Dober    │ Tokai Teio      │ Kitasan Black   │  │
+│  │ SSR · Power     │ SSR · Speed     │ SSR · Stamina   │  │
+│  │ Meta: S Tier    │ Meta: SS Tier   │ Meta: S Tier    │  │
+│  │ LB: 4/4 ★★★★   │ LB: 2/4 ★★☆☆   │ LB: 4/4 ★★★★   │  │
+│  │ [VIEW] [DECK]   │ [VIEW] [DECK]   │ [VIEW] [DECK]   │  │
+│  └─────────────────┴─────────────────┴─────────────────┘  │
+└────────────────────────────────────────────────────────────┘
+```
 
-| Channel          | Response Time | Best For             |
-|------------------|---------------|----------------------|
-| In-app Help      | Immediate     | Quick questions      |
-| Documentation    | Immediate     | Detailed guides      |
-| Email Support    | 24-48 hours   | Account issues       |
-| Community Forum  | Variable      | Strategy discussions |
+### 9.2 Deck Building
 
-### 12.2 Feature Requests
+Build your 6-card support deck:
 
-**Submitting Requests**:
+```
+┌────────────────────────────────────────────────────────────┐
+│  Configure Support Deck (6 Cards)                     [≡]   │
+├─────────────────────────────────────────────��──────────────┤
+│  Current Deck Power: S Tier | Meta Score: 92/100           │
+│                                                            │
+│  DECK COMPOSITION (6 of 6)                                 │
+│  ┌─────────────────┬─────────────────┬─────────────────┐  │
+│  │ 1. Mejiro Dober │ 2. Tokai Teio   │ 3. Kitasan Black│  │
+│  │ SSR · Power     │ SSR · Speed     │ SSR · Stamina   │  │
+│  │ LB: 4★★★★★     │ LB: 2★★☆☆☆     │ LB: 4★★★★★     │  │
+│  │ Bond: 90%       │ Bond: 75%       │ Bond: 85%       │  │
+│  └─────────────────┴─────────────────┴─────────────────┘  │
+│  ┌─────────────────┬─────────────────┬─────────────────┐  │
+│  │ 4. Narita Brian │ 5. Symboli Rudolf│ 6. [BORROWED]  │  │
+│  │ SSR · Wit       │ SSR · Guts      │ SR · Friend     │  │
+│  │ LB: 3★★★☆☆     │ LB: 2���★☆☆☆     │ LB: 1★☆☆☆☆     │  │
+│  │ Bond: 80%       │ Bond: 70%       │ Bond: 60%       │  │
+│  └─────────────────┴─────────────────┴─────────────────┘  │
+│                                                            │
+│  Deck Analysis:                                            │
+│  • Speed: 2 cards ✓                                        │
+│  • Power: 1 card ✓                                         │
+│  • Stamina: 1 card ✓                                       │
+│  • Good diversity ✓                                        │
+│                                                            │
+│                          [SAVE DECK] [RECOMMEND OPTIMAL]   │
+└────────────────────────────────────────────────────────────┘
+```
 
-1. Go to Settings → Feedback → Feature Request
-2. Describe the feature you'd like
-3. Explain the use case
-4. Submit for review
+### 9.3 Deck Rules
 
-**Request Status**: Track your requests in the feedback section
+| Rule | Description |
+|------|-------------|
+| Deck Size | Exactly 6 cards |
+| Ownership | 5 owned + 1 borrowed allowed |
+| Type Balance | Recommended mix of stat types |
+| Synergy | Cards should complement training goals |
 
-### 12.3 Bug Reports
+### 9.4 Meta Tiers
 
-**Reporting Bugs**:
+Cards are rated by the community:
 
-1. Go to Settings → Feedback → Report Bug
-2. Describe the issue
-3. Include steps to reproduce
-4. Attach screenshots if helpful
-5. Submit report
+| Tier | Description |
+|------|-------------|
+| SS | Top-tier, essential for meta builds |
+| S | Excellent choice, highly recommended |
+| A | Good card, situationally valuable |
+| B | Average card, viable in specific builds |
 
-**Required Information**:
+### 9.5 Bond Progression
 
-- Browser and version
-- Operating system
-- Steps to reproduce
-- Expected vs. actual behavior
+```mermaid
+flowchart TD
+    A[Training Session] --> B[Identify Participating Cards]
+    B --> C[Add Bond +3 base]
+    C --> D{Reached Milestone?}
+    D -->|Yes| E[Grant Reward]
+    D -->|No| F[Continue]
+    E --> G[Hints/Stats/Event]
+    G --> F
+```
 
-### 12.4 Community Resources
+**Bond Milestones:**
 
-**Community Platforms**:
-
-- Official Discord server
-- Reddit community (r/UmaMusume)
-- GitHub discussions (for technical users)
-
-**Community Guidelines**:
-
-- Be respectful and helpful
-- Share strategies and tips
-- Report issues through proper channels
-- No sharing of personal data
+| Level | Reward |
+|-------|--------|
+| 20% | Small stat bonus |
+| 40% | Skill hint |
+| 60% | Special event |
+| 80% | Friendship Training unlocked |
 
 ---
 
-## Appendices
+## 10. AI Advisory System
 
-### Appendix A: Keyboard Shortcuts
+### 10.1 AI Advisor Interface
 
-**Global Shortcuts**:
+```
+┌────────────────────────────────────────────────────────────┐
+│  AI Advisor                                           [≡]   │
+├────────────────────────────────────────────────────────────┤
+│  ┌────────────────────────────────────────────────────────┐│
+│  │ 💡 Current Recommendation                              ││
+│  │                                                        ││
+│  │ Based on your current stats and upcoming G1 race,      ││
+│  │ I recommend focusing on Speed training for the next    ││
+│  │ 3 turns. Your stamina is adequate for the race         ││
+│  │ distance, but speed needs +150 to reach competitive    ││
+│  │ levels.                                                ││
+│  │                                                        ││
+│  │ Confidence: 85%                                        ││
+│  │ Risk Assessment: Low                                   ││
+│  │                                                        ││
+│  │ [APPLY SUGGESTION] [ASK FOLLOW-UP] [DISMISS]          ││
+│  └────────────────────────────────────────────────────────┘│
+│                                                            │
+│  Quick Topics:                                             │
+│  [Training Advice] [Race Strategy] [Skill Build] [Career] │
+│                                                            │
+│  ┌────────────────────────────────────────────────────────┐│
+│  │ Ask AI Advisor...                                      ││
+│  │ ┌──────────────────────────────────────────────────┐  ││
+│  │ │ Type your question here...                       │  ││
+│  │ └──────────────────────────────────────────────────┘  ││
+│  │                                         [Send] 📤     ││
+│  └────────────────────────────────────────────────────────┘│
+└────────────────────────────────────────────────────────────┘
+```
 
-| Shortcut            | Action                |
-|---------------------|-----------------------|
-| `Ctrl+/` or `Cmd+/` | Open AI Assistant     |
-| `Ctrl+S` or `Cmd+S` | Save current changes  |
-| `Ctrl+Z` or `Cmd+Z` | Undo last action      |
-| `Escape`            | Close modal/dialog    |
-| `?`                 | Show all shortcuts    |
+### 10.2 AI System Architecture
 
-**Navigation Shortcuts**:
+```mermaid
+flowchart TD
+    A[User Query] --> B[Analyze Intent]
+    B --> C{Complexity?}
+    C -->|Simple| D[Ollama Local]
+    C -->|Complex| E[AWS Bedrock Cloud]
+    D --> F[Build Prompt + Context]
+    E --> F
+    F --> G[Generate Advice]
+    G --> H[Return Recommendation]
+```
 
-| Shortcut   | Action                       |
-|------------|------------------------------|
-| `g then d` | Go to Dashboard              |
-| `g then c` | Go to Characters             |
-| `g then t` | Go to Training               |
-| `g then s` | Go to Skills                 |
-| `g then r` | Go to Races                  |
-| `g then a` | Go to Analytics              |
-| `g then p` | Go to Settings (Preferences) |
+### 10.3 Advisory Topics
 
-**Character Management**:
+| Topic | Description | Example Questions |
+|-------|-------------|-------------------|
+| Training | Optimal training selection | "What should I train next?" |
+| Race Strategy | Pre-race preparation | "Am I ready for the upcoming G1?" |
+| Skill Build | Skill acquisition planning | "Which skills should I prioritize?" |
+| Career Planning | Long-term strategy | "How can I reach A+ grade by turn 60?" |
 
-| Shortcut  | Action                               |
-|-----------|--------------------------------------|
-| `n`       | New character                        |
-| `e`       | Edit current character               |
-| `d`       | Delete character (with confirmation) |
-| `←` / `→` | Previous/Next character              |
+### 10.4 AI Response Components
 
-**Training Shortcuts**:
+| Component | Description |
+|-----------|-------------|
+| Recommendation | Clear action to take |
+| Reasoning | Explanation of why |
+| Confidence | AI's certainty level (0-100%) |
+| Risks | Potential downsides |
+| Alternatives | Other options to consider |
 
-| Shortcut | Action                      |
-|----------|-----------------------------|
-| `1-6`    | Select training option 1-6  |
-| `r`      | Rest                        |
-| `Enter`  | Confirm selection           |
-| `a`      | Accept AI recommendation    |
+### 10.5 AI Providers
 
-### Appendix B: Glossary Quick Reference
+| Provider | Usage | Best For |
+|----------|-------|----------|
+| Ollama (Local) | Primary | Quick responses, privacy |
+| AWS Bedrock Claude | Fallback | Complex analysis, detailed planning |
 
-**Game Terms**:
+---
+
+## 11. Data Import & Export
+
+### 11.1 Export Formats
+
+| Format | Extension | Use Case |
+|--------|-----------|----------|
+| JSON | .json | Full data backup, import/export |
+| Excel | .xlsx | Spreadsheet analysis |
+| Markdown | .md | Documentation, sharing |
+| CSV | .csv | Data processing |
+
+### 11.2 Export Process
+
+```mermaid
+flowchart LR
+    A[Click Export] --> B[Select Format]
+    B --> C{Format}
+    C -->|JSON| D[Generate JSON]
+    C -->|Excel| E[Generate XLSX]
+    C -->|Markdown| F[Generate MD]
+    D --> G[Preview]
+    E --> G
+    F --> G
+    G --> H{Action}
+    H -->|Download| I[Download File]
+    H -->|Copy| J[Copy to Clipboard]
+```
+
+### 11.3 Import Wizard
+
+```
+┌────────────────────────────────────────────────────────────┐
+│  Import Data - Step 2 of 4: Preview                   [≡]   │
+├────────────────────────────────────────────────────────────┤
+│  File: my_career_data.json                                 │
+│  Format: JSON (Version 1.0)                                │
+│  Plans Found: 5                                            │
+│                                                            │
+│  ┌────────────────────────────────────────────────────────┐│
+│  │ ☑ Speed Build Attempt          Status: In Progress    ││
+│  │   Character: Special Week | Turn: 45 | Stats: 2850    ││
+│  │                                                        ││
+│  │ ☑ Stamina Focus Run            Status: Completed      ││
+│  │   Character: Silence Suzuka | Turn: 72 | Stats: 3200  ││
+│  │                                                        ││
+│  │ ☐ Test Run (skip)              Status: Archived       ││
+│  │   Character: Tokai Teio | Turn: 12 | Stats: 450       ││
+│  └────────────────────────────────────────────────────────┘│
+│                                                            │
+│  Import Target: [Local Storage ▼]                         │
+│                                                            │
+│  Conflict Resolution:                                      │
+│  ○ Skip duplicates                                         │
+│  ○ Overwrite existing                                      │
+│  ● Import as copy                                          │
+│                                                            │
+│                          [← Back] [Import Selected →]      │
+└────────────────────────────────────────────────────────────┘
+```
+
+### 11.4 Import Conflict Resolution
+
+| Option | Description |
+|--------|-------------|
+| Skip | Don't import if duplicate exists |
+| Overwrite | Replace existing with imported data |
+| Import as Copy | Create new entry with modified title |
+| Merge | Combine data (future feature) |
+
+### 11.5 OCR Screenshot Import
+
+Upload game screenshots for automatic data extraction:
+
+```mermaid
+flowchart TD
+    A[Upload Screenshot] --> B[Image Preprocessing]
+    B --> C[OCR Processing]
+    C --> D[Text Extraction]
+    D --> E[Parse Game Data]
+    E --> F[Validate Results]
+    F --> G{Accurate?}
+    G -->|Yes| H[Apply to Character]
+    G -->|No| I[Manual Correction]
+    I --> H
+```
+
+**Supported Data:**
+
+- Current stats
+- Skill inventory
+- Aptitude grades
+- Support card bonds
+
+---
+
+## 12. Storage Modes
+
+### 12.1 Local Mode
+
+**Features:**
+
+- No login required
+- Data stored in browser localStorage
+- Works completely offline
+- UUID-based identification
+
+**Routes:**
+
+- View: `/plans/local/{uuid}`
+- Edit: `/plans/local/{uuid}/edit`
+
+**Limitations:**
+
+- Data tied to single browser/device
+- Risk of data loss if browser cache cleared
+- Limited storage (5-10MB typical)
+
+### 12.2 Account Mode
+
+**Features:**
+
+- Cloud-synced data
+- Access from any device
+- Secure backup
+- Integer ID identification
+
+**Routes:**
+
+- View: `/plans/{id}`
+- Edit: `/plans/{id}/edit`
+
+**Requirements:**
+
+- User account
+- Internet connection for sync
+
+### 12.3 Converting Local to Account
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant LocalData as Local Data Page
+    participant Server
+    participant Database
+    participant LocalStorage
+    
+    User->>User: Log in
+    User->>LocalData: Find local plan
+    User->>LocalData: Click "Convert to Account"
+    LocalData->>Server: Upload plan data
+    Server->>Database: Save to database
+    Database-->>Server: New ID assigned
+    Server-->>LocalData: Success
+    LocalData->>LocalStorage: Remove local copy
+    LocalData-->>User: Redirect to /plans/{id}
+```
+
+**Steps:**
+
+1. Log in to your account
+2. Go to **Local Data** management
+3. Select plans to convert
+4. Click **"Convert to Account"**
+5. Choose whether to keep local copy
+6. Confirm conversion
+
+### 12.4 Draft Auto-Save
+
+Unsaved work is automatically preserved:
+
+| Feature | Behavior |
+|---------|----------|
+| Auto-save interval | Every 30 seconds |
+| Draft versions | Last 3 versions kept |
+| Draft expiration | Prompt after 7 days |
+| Clear on save | Drafts removed after successful save |
+
+---
+
+## 13. Settings & Preferences
+
+### 13.1 Display Settings
+
+| Setting | Options | Default |
+|---------|---------|---------|
+| Theme | Light / Dark / System | System |
+| Language | English / Japanese | English |
+| Stat Display | Numeric / Circular / Bars | Circular |
+| Compact View | On / Off | Off |
+
+### 13.2 Accessibility Settings
+
+| Setting | Description |
+|---------|-------------|
+| Reduced Motion | Minimize animations |
+| High Contrast | Enhanced visibility |
+| Screen Reader | ARIA optimizations |
+| Keyboard Navigation | Tab order and shortcuts |
+
+### 13.3 AI Settings
+
+| Setting | Options | Default |
+|---------|---------|---------|
+| AI Provider | Local Only / Cloud / Hybrid | Hybrid |
+| Auto-suggest | On / Off | On |
+| Suggestion Frequency | Always / Important / Never | Important |
+
+### 13.4 Notification Settings
+
+| Setting | Options | Default |
+|---------|---------|---------|
+| Race Reminders | On / Off | On |
+| Training Suggestions | On / Off | On |
+| Goal Alerts | On / Off | On |
+
+---
+
+## 14. Troubleshooting
+
+### 14.1 Common Issues
+
+```mermaid
+flowchart TD
+    Issue[Issue Encountered]
+    
+    Issue --> Type{What type?}
+    
+    Type -->|Connection| Conn[Connection Lost]
+    Type -->|Data| Data[Missing Data]
+    Type -->|Search| Search[Skill Not Found]
+    Type -->|Performance| Perf[Slow Loading]
+    
+    Conn --> ConnFix[Wait for reconnect<br/>Draft auto-saved]
+    Data --> DataFix[Check browser<br/>Same browser?<br/>Incognito?]
+    Search --> SearchFix[Try Japanese name<br/>Check spelling]
+    Perf --> PerfFix[Clear cache<br/>Archive old plans]
+```
+
+### 14.2 Issue Solutions
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| **Connection Lost** | Internet dropped | App enters Offline Mode. Changes saved as draft. Reconnect to sync. |
+| **Missing Local Data** | Different browser or cleared cache | Ensure same browser. Incognito mode deletes data when closed. |
+| **Skill Not Found** | Name mismatch | Try Japanese name. Check spelling. |
+| **Stats Not Saving** | Form not submitted | Click "Save" after changes. Check for validation errors. |
+| **Slow Performance** | Too many plans | Archive old completed plans. Clear browser cache. |
+| **AI Not Responding** | Local AI unavailable | System falls back to cloud AI. Check Ollama installation. |
+| **Export Failed** | Large data set | Try exporting fewer plans. Check browser memory. |
+
+### 14.3 Connection State Management
+
+```mermaid
+stateDiagram-v2
+    [*] --> Online: Normal operation
+    Online --> Offline: Connection lost
+    Offline --> DraftSaved: Auto-save draft
+    DraftSaved --> Offline: Continue editing
+    Offline --> Online: Connection restored
+    Online --> SyncPrompt: Draft detected
+    SyncPrompt --> Online: Save draft
+    SyncPrompt --> Online: Discard draft
+```
+
+### 14.4 Error Messages
+
+| Error Code | Message | Action |
+|------------|---------|--------|
+| E001 | Validation failed | Check required fields |
+| E002 | Stat out of range | Values must be 0-1200 |
+| E003 | Network timeout | Check internet connection |
+| E004 | Storage quota exceeded | Clear old data or use Account mode |
+| E005 | Import format invalid | Check file format and version |
+
+---
+
+## 15. Keyboard Shortcuts
+
+### 15.1 Global Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| `Ctrl + S` | Save current plan |
+| `Ctrl + N` | Create new plan |
+| `Ctrl + D` | Toggle dark mode |
+| `Esc` | Close modal/dialog |
+| `/` | Focus search |
+| `?` | Show keyboard shortcuts |
+
+### 15.2 Navigation Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| `G then D` | Go to Dashboard |
+| `G then C` | Go to Characters |
+| `G then T` | Go to Training |
+| `G then R` | Go to Races |
+| `G then S` | Go to Skills |
+| `G then A` | Go to AI Advisor |
+
+### 15.3 Editor Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| `Tab` | Next field |
+| `Shift + Tab` | Previous field |
+| `Enter` | Confirm selection |
+| `↑ / ↓` | Navigate dropdown options |
+| `Ctrl + Z` | Undo last change |
+
+---
+
+## 16. Glossary
+
+### 16.1 Game Terms
+
+| Term | Japanese | Definition |
+|------|----------|------------|
+| Speed | スピード | Determines maximum running speed |
+| Stamina | スタミナ | Determines HP/effective stamina |
+| Power | パワー | Affects acceleration and lane-changing |
+| Guts | 根性 | Affects last spurt and stamina consumption |
+| Wit | 賢さ | Affects skill activation rate |
+| Nige | 逃げ | Front Runner running style |
+| Senkou | 先行 | Pace Chaser running style |
+| Sashi | 差し | Late Surger running style |
+| Oikomi | 追込 | End Closer running style |
+| SP | スキルポイント | Skill Points for purchasing skills |
+| URA | URAファイナルズ | Final race series |
+
+### 16.2 Application Terms
 
 | Term | Definition |
-| ---- | ---------- |
-| URA Finale | Individual character optimization scenario |
-| Unity Cup | Team-based scenario with Spirit Burst |
-| Spirit Burst | 4-session gauge mechanic in Unity Cup |
-| Skill Hint | Training indicator (red "!") for skill acquisition |
-| SP Cost Reduction | 20% per duplicate hint, 40% maximum |
-| Meta Tier Rankings | SS/S/A/B community rankings |
-| Friendship Training | Bonus training at 80%+ friendship |
-| Rainbow Training | Maximum friendship bonus training |
+|------|------------|
+| Career Run | A complete training progression from Junior to URA Finals |
+| Turn | A single training/action period in the game |
+| Factor | Inherited stat bonus from parent characters |
+| Hint | Discount on skill SP cost from training/events |
+| Bond | Friendship level with support card characters |
+| Meta Tier | Community ranking of support card effectiveness |
+| Draft | Auto-saved unsaved work |
 
-**Technical Terms**:
+### 16.3 Status Icons
 
-| Term                 | Definition                |
-|----------------------|---------------------------|
-| Ollama               | Local AI inference engine |
-| AWS Bedrock          | Cloud AI service          |
-| Hybrid AI Processing | Combined local + cloud AI |
-| MCP                  | Model Context Protocol    |
-| PWA                  | Progressive Web App       |
-
-### Appendix C: Privacy Policy Summary
-
-**Data Collection**:
-
-- Account information (email, username)
-- Character and career data
-- Usage analytics (optional)
-
-**Data Storage**:
-
-- Local storage by default
-- Cloud backup optional
-- Encrypted transmission
-
-**Data Sharing**:
-
-- No personal data sold
-- Anonymous analytics (opt-in)
-- Community features (opt-in)
-
-**User Rights**:
-
-- Access your data anytime
-- Export all data
-- Delete account and data
-- Opt-out of analytics
-
-### Appendix D: Version History
-
-| Version | Date       | Changes                      |
-|---------|------------|------------------------------|
-| 1.0     | 2026-01-11 | Initial skeleton structure   |
-| 2.0     | 2026-01-12 | Complete content development |
+| Icon | Meaning |
+|------|---------|
+| 🟠 | Local Mode |
+| 🟣 | Account Mode |
+| 🟢 | In Progress / Good |
+| ✅ | Completed / Acquired |
+| 📦 | Archived |
+| ⚠️ | Warning / Unsaved Changes |
+| 🔴 | At Risk / High Risk |
+| 💭 | Suggested |
+| ❌ | Skipped |
 
 ---
 
-## Document Control
+## 17. Support & Resources
 
-| Version | Date       | Author           | Changes                       |
-|---------|------------|------------------|-------------------------------|
-| 1.0     | 2026-01-11 | Development Team | Initial skeleton structure    |
-| 2.0     | 2026-01-12 | Development Team | Complete user manual content  |
+### 17.1 Getting Help
+
+```mermaid
+flowchart LR
+    Help[Need Help?]
+    
+    Help --> Docs[📚 Documentation<br/>Read the docs]
+    Help --> FAQ[❓ FAQ<br/>Common questions]
+    Help --> GitHub[🐙 GitHub<br/>Report bugs]
+    Help --> Contact[📧 Contact<br/>Email support]
+```
+
+### 17.2 Resources
+
+| Resource | Description | Location |
+|----------|-------------|----------|
+| **Documentation** | Full system documentation | `/docs` folder |
+| **FAQ** | Frequently asked questions | Help page |
+| **GitHub** | Bug reports and feature requests | Repository Issues |
+| **Community** | User discussions and tips | Community forums |
+
+### 17.3 Reporting Bugs
+
+When reporting a bug, please include:
+
+1. What you were trying to do
+2. What happened instead
+3. Steps to reproduce
+4. Your browser and device
+5. Screenshots if possible
+6. Console errors (if technical user)
+
+### 17.4 External Data Sources
+
+| Source | Data Provided | Status |
+|--------|---------------|--------|
+| umapyoi.net | Characters, support cards, news | Active |
+| UmamusumeDB.com | Skill data, race info | Verification pending |
+| Community Tools | Meta rankings, strategies | Active |
 
 ---
 
-## Cross-References
+## Document History
 
-| Document            | Relationship                |
-|---------------------|-----------------------------|
-| 000_MASTER_GLOSSARY | Terminology definitions     |
-| 003_SRS             | Feature requirements        |
-| 004_SDS             | Technical architecture      |
-| 008_SIS             | Integration specifications  |
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 2.1.0 | 2026-01-23 | Development Team | Comprehensive update aligned with v2.0.0 codebase, integrated PRD/SPEC/Flow documentation, added AI Advisory, OCR, and detailed feature documentation |
+| 2.0.0 | 2026-01-03 | Development Team | Added Mermaid diagrams, expanded content |
+| 1.0.0 | 2026-01-03 | Development Team | Initial draft |
 
 ---
 
-*This user manual provides comprehensive guidance for using the Umamusume Career Planner application. For technical documentation, refer to the Software Design Specification (004_SDS) and Source Code Documentation (010_SCD).*
+## Related Documents
+
+- [PRD-001: Character Management](../prds/PRD-001_Character_Management.md)
+- [PRD-002: Training Optimization](../prds/PRD-002_Training_Optimization.md)
+- [PRD-003: Race Strategy](../prds/PRD-003_Race_Strategy.md)
+- [PRD-004: Skill Management](../prds/PRD-004_Skill_Management.md)
+- [PRD-005: Support Card Management](../prds/PRD-005_Support_Card_Management.md)
+- [PRD-006: AI Advisory](../prds/PRD-006_AI_Advisory.md)
+- [PRD-007: External Integration](../prds/PRD-007_External_Integration.md)
+- [SPEC Index](../specs/000_SPECS_INDEX.md)
+- [User Flow Diagrams](../user-flows/000_USER_FLOW_DIAGRAMS_INDEX.md)
+- [Wireframes](../wireframes/000_WIREFRAMES_INDEX.md)
+
+---
+
+*This manual reflects the current implementation of Umamusume Career Planner v2.0.0. For the latest updates, please refer to the online documentation.*
