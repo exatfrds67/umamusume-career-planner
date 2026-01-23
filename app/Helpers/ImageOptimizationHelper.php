@@ -127,7 +127,7 @@ class ImageOptimizationHelper
         ?string $placeholder = null,
         array $attributes = []
     ): string {
-        $class = $attributes['class'] ?? '';
+        $class = is_string($attributes['class'] ?? null) ? $attributes['class'] : '';
         $attributes['class'] = trim("lazy-image {$class}");
         $attributes['data-src'] = $src;
 
@@ -152,7 +152,7 @@ class ImageOptimizationHelper
      */
     public static function lazyBackground(string $src, array $attributes = []): string
     {
-        $class = $attributes['class'] ?? '';
+        $class = is_string($attributes['class'] ?? null) ? $attributes['class'] : '';
         $attributes['class'] = trim("lazy-background {$class}");
         $attributes['data-bg-src'] = $src;
 
@@ -301,10 +301,15 @@ class ImageOptimizationHelper
         $parts = [];
 
         foreach ($attributes as $key => $value) {
+            if (! is_string($key)) {
+                continue;
+            }
+
             if ($value === true) {
                 $parts[] = $key;
             } elseif ($value !== false && $value !== null) {
-                $parts[] = sprintf('%s="%s"', $key, htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8'));
+                $stringValue = is_scalar($value) ? (string) $value : '';
+                $parts[] = sprintf('%s="%s"', $key, htmlspecialchars($stringValue, ENT_QUOTES, 'UTF-8'));
             }
         }
 

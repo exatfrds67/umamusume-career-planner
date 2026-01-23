@@ -82,6 +82,8 @@ class RedisHealthCheck extends Command
 
     /**
      * Check for warnings based on statistics
+     *
+     * @param  array<string, mixed>  $stats
      */
     protected function checkWarnings(array $stats): void
     {
@@ -92,17 +94,24 @@ class RedisHealthCheck extends Command
 
         // Check hit rate
         if (isset($stats['hit_rate']) && $stats['hit_rate'] !== 'N/A') {
-            $hitRate = (float) str_replace('%', '', $stats['hit_rate']);
-            if ($hitRate < 80) {
-                $warnings[] = "Low cache hit rate ({$stats['hit_rate']}). Consider cache warming.";
+            $hitRateValue = $stats['hit_rate'];
+            if (is_string($hitRateValue)) {
+                $hitRate = (float) str_replace('%', '', $hitRateValue);
+                if ($hitRate < 80) {
+                    $warnings[] = "Low cache hit rate ({$hitRateValue}). Consider cache warming.";
+                }
             }
         }
 
         // Check fragmentation ratio
         if (isset($stats['fragmentation_ratio']) && $stats['fragmentation_ratio'] !== 'N/A') {
-            $fragmentation = (float) $stats['fragmentation_ratio'];
-            if ($fragmentation > 1.5) {
-                $warnings[] = "High memory fragmentation ({$stats['fragmentation_ratio']}). Consider Redis restart.";
+            $fragmentationValue = $stats['fragmentation_ratio'];
+            if (is_numeric($fragmentationValue)) {
+                $fragmentation = (float) $fragmentationValue;
+                if ($fragmentation > 1.5) {
+                    $fragmentationStr = is_string($fragmentationValue) ? $fragmentationValue : (string) $fragmentation;
+                    $warnings[] = "High memory fragmentation ({$fragmentationStr}). Consider Redis restart.";
+                }
             }
         }
 

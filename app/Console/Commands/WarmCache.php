@@ -39,8 +39,12 @@ class WarmCache extends Command
 
             $this->info('Redis connection successful.');
 
-            // Warm cache
-            $cacheService->warmCache();
+            // Warm cache with empty providers array
+            // Note: This command uses the old RedisCacheOptimizationService
+            // For actual cache warming, use WarmCacheCommand instead
+            $result = $cacheService->warmCache([]);
+
+            $this->info("Warmed: {$result['warmed']}, Failed: {$result['failed']}, Skipped: {$result['skipped']}");
 
             // Get cache statistics
             $stats = $cacheService->getStatistics();

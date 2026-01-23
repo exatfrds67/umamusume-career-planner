@@ -63,10 +63,19 @@ class CleanupOCRFiles extends Command
 
         foreach ($oldExtractions as $extraction) {
             try {
+                // Skip if image_path is null
+                if ($extraction->image_path === null) {
+                    if (! $dryRun) {
+                        $extraction->delete();
+                    }
+
+                    continue;
+                }
+
                 // Get file size before deletion
                 if (Storage::disk('local')->exists($extraction->image_path)) {
                     $fileSize = Storage::disk('local')->size($extraction->image_path);
-                    $totalSize += $fileSize;
+                    $totalSize = ($totalSize ?? 0) + $fileSize;
 
                     if (! $dryRun) {
                         // Delete the file
@@ -82,16 +91,16 @@ class CleanupOCRFiles extends Command
                         $extraction->delete();
                     }
 
-                    $deletedCount++;
+                    $deletedCount = ($deletedCount ?? 0) + 1;
                 } else {
                     // File doesn't exist, just delete the record
                     if (! $dryRun) {
                         $extraction->delete();
                     }
-                    $deletedCount++;
+                    $deletedCount = ($deletedCount ?? 0) + 1;
                 }
             } catch (\Exception $e) {
-                $errorCount++;
+                $errorCount = ($errorCount ?? 0) + 1;
                 Log::error('[CleanupOCRFiles] Failed to delete extraction', [
                     'extraction_id' => $extraction->id,
                     'error' => $e->getMessage(),
@@ -149,7 +158,7 @@ class CleanupOCRFiles extends Command
                     if (! $dryRun) {
                         Storage::disk('local')->delete($file);
                     }
-                    $orphanedCount++;
+                    $orphanedCount = ($orphanedCount ?? 0) + 1;
                 }
             }
         } catch (\Exception $e) {
@@ -185,7 +194,7 @@ class CleanupOCRFiles extends Command
 
         while ($bytes >= 1024 && $i < count($units) - 1) {
             $bytes /= 1024;
-            $i++;
+            $i = ($i ?? 0) + 1;
         }
 
         return round($bytes, 2).' '.$units[$i];

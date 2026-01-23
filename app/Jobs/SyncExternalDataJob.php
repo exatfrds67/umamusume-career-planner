@@ -104,6 +104,7 @@ class SyncExternalDataJob implements ShouldQueue
 
         // Initialize progress tracking
         $this->initializeProgress();
+        $this->registerActiveSync();
 
         $successCount = 0;
         $failureCount = 0;
@@ -119,10 +120,10 @@ class SyncExternalDataJob implements ShouldQueue
                 $result = $this->syncData($identifier, $cacheManager);
 
                 if ($result['success']) {
-                    $successCount++;
+                    $successCount = ($successCount ?? 0) + 1;
 
                     if ($result['had_conflict'] ?? false) {
-                        $conflictCount++;
+                        $conflictCount = ($conflictCount ?? 0) + 1;
                     }
 
                     Log::debug('[SyncExternalDataJob] Data synced successfully', [
@@ -133,7 +134,7 @@ class SyncExternalDataJob implements ShouldQueue
                         'resolution_strategy' => $result['resolution_strategy'] ?? null,
                     ]);
                 } else {
-                    $failureCount++;
+                    $failureCount = ($failureCount ?? 0) + 1;
                     $errors[$identifier] = $result['error'] ?? 'Unknown error';
 
                     Log::warning('[SyncExternalDataJob] Data sync failed', [
@@ -144,7 +145,7 @@ class SyncExternalDataJob implements ShouldQueue
                     ]);
                 }
             } catch (\Exception $e) {
-                $failureCount++;
+                $failureCount = ($failureCount ?? 0) + 1;
                 $errors[$identifier] = $e->getMessage();
 
                 Log::error('[SyncExternalDataJob] Exception during data sync', [
@@ -159,6 +160,7 @@ class SyncExternalDataJob implements ShouldQueue
 
         // Complete progress tracking
         $this->completeProgress($successCount, $failureCount, $conflictCount);
+        $this->unregisterActiveSync();
 
         // Log final results
         Log::info('[SyncExternalDataJob] Data synchronization completed', [
@@ -244,30 +246,61 @@ class SyncExternalDataJob implements ShouldQueue
     /**
      * Fetch fresh data from external API
      *
+     * Uses the ExternalDataService to fetch data based on data type.
+     * Each data type maps to a specific API endpoint and transformation.
+     *
      * @return array<string, mixed>|null
      */
     protected function fetchFreshData(string $identifier): ?array
     {
-        // This is a placeholder - actual implementation would use the appropriate
-        // ExternalAPIService subclass based on data type
-        // For now, we'll return null to indicate API fetch should be implemented
-
         Log::debug('[SyncExternalDataJob] Fetching fresh data', [
             'sync_id' => $this->syncId,
             'data_type' => $this->dataType,
             'identifier' => $identifier,
         ]);
 
-        // TODO: Implement actual API fetching based on data type
-        // Example:
-        // match($this->dataType) {
-        //     'character' => $this->characterService->fetchCharacterData($identifier),
-        //     'support_card' => $this->supportCardService->fetchSupportCardData($identifier),
-        //     'race' => $this->raceService->fetchRaceData($identifier),
-        //     default => null
-        // };
+        try {
+            /** @var \App\Services\ExternalDataService $externalDataService */
+            $externalDataService = app(\App\Services\ExternalDataService::class);
 
-        return null;
+            // Fetch data based on data type using ExternalDataService
+            $data = match ($this->dataType) {
+                'character' => $externalDataService->fetchCharacterData($identifier),
+                'support_card' => $externalDataService->fetchSupportCardData($identifier),
+                'race' => $externalDataService->fetchRaceData($identifier),
+                'skill' => $externalDataService->fetchSkillData($identifier),
+                'news' => $externalDataService->fetchNewsData($identifier),
+                'meta_ranking' => $externalDataService->fetchMetaRankingData($identifier),
+                'game_mechanics' => $externalDataService->fetchGameMechanicsData($identifier),
+                default => null,
+            };
+
+            if ($data === null) {
+                Log::warning('[SyncExternalDataJob] No data returned from API', [
+                    'sync_id' => $this->syncId,
+                    'data_type' => $this->dataType,
+                    'identifier' => $identifier,
+                ]);
+
+                return null;
+            }
+
+            // Add metadata for tracking
+            $data['_fetched_at'] = now()->toIso8601String();
+            $data['_source'] = 'external_api';
+            $data['_data_type'] = $this->dataType;
+
+            return $data;
+        } catch (\Exception $e) {
+            Log::error('[SyncExternalDataJob] Failed to fetch data from API', [
+                'sync_id' => $this->syncId,
+                'data_type' => $this->dataType,
+                'identifier' => $identifier,
+                'error' => $e->getMessage(),
+            ]);
+
+            return null;
+        }
     }
 
     /**
@@ -490,13 +523,55 @@ class SyncExternalDataJob implements ShouldQueue
     /**
      * Get all active sync operations
      *
+     * Retrieves all sync operations that are currently in progress or pending.
+     * Uses cache pattern matching to find all sync progress entries.
+     *
      * @return array<string, array<string, mixed>>
      */
     public static function getActiveSyncs(): array
     {
-        // This would require tracking all sync IDs
-        // For now, return empty array
-        // TODO: Implement tracking of active sync operations
-        return [];
+        $activeSyncs = [];
+
+        // Get all sync progress keys from cache
+        // Note: This requires Redis or a cache driver that supports key scanning
+        // For array/file cache, we track active syncs in a separate key
+        $activeSyncIds = Cache::get('active_sync_ids', []);
+
+        foreach ($activeSyncIds as $syncId) {
+            $progress = self::getSyncProgress($syncId);
+
+            if ($progress !== null && \in_array($progress['status'] ?? '', [self::SYNC_PENDING, self::SYNC_IN_PROGRESS], true)) {
+                $activeSyncs[$syncId] = $progress;
+            }
+        }
+
+        return $activeSyncs;
+    }
+
+    /**
+     * Register a sync operation as active
+     */
+    protected function registerActiveSync(): void
+    {
+        $activeSyncIds = Cache::get('active_sync_ids', []);
+        $activeSyncIds[] = $this->syncId;
+
+        // Keep only unique IDs and limit to last 100
+        $activeSyncIds = \array_unique($activeSyncIds);
+        if (\count($activeSyncIds) > 100) {
+            $activeSyncIds = \array_slice($activeSyncIds, -100);
+        }
+
+        Cache::put('active_sync_ids', $activeSyncIds, 3600);
+    }
+
+    /**
+     * Unregister a sync operation from active list
+     */
+    protected function unregisterActiveSync(): void
+    {
+        $activeSyncIds = Cache::get('active_sync_ids', []);
+        $activeSyncIds = \array_filter($activeSyncIds, fn ($id) => $id !== $this->syncId);
+        Cache::put('active_sync_ids', \array_values($activeSyncIds), 3600);
     }
 }

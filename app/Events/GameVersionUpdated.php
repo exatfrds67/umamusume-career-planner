@@ -22,6 +22,8 @@ class GameVersionUpdated
 
     /**
      * Create a new event instance.
+     *
+     * @param  array<int, string>  $invalidatedTypes
      */
     public function __construct(
         public readonly ?string $previousVersion,
