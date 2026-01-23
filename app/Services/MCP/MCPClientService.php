@@ -82,7 +82,6 @@ class MCPClientService
      * @return array<string, mixed>
      */
     public function getServers(): array
-    {
         return $this->servers;
     }
 
@@ -114,8 +113,7 @@ class MCPClientService
      *
      * @return array<string, mixed>
      */
-    public function getServerCapabilities(string $name): array
-    {
+    public function getServerCapabilities(): array
         $server = $this->getServer($name);
         if (! $server) {
             return [];
@@ -183,7 +181,6 @@ class MCPClientService
      * @return array<string, array{status: string, message: string, capabilities?: array<string, mixed>, health?: array<string, mixed>}>
      */
     public function healthCheck(): array
-    {
         $results = [];
 
         foreach ($this->servers as $name => $config) {
@@ -242,8 +239,7 @@ class MCPClientService
      * @param  array<string, mixed>  $config
      * @return array{status: string, message: string, capabilities: array<string, mixed>, health: array<string, mixed>}
      */
-    protected function performHealthCheck(string $name, array $config): array
-    {
+    protected function performHealthCheck(): array
         $capabilities = $config['capabilities'] ?? [];
         $health = $this->getServerHealth($name) ?? [
             'status' => 'unknown',
@@ -332,7 +328,6 @@ class MCPClientService
      * @return array<string, array{status: string, last_check: int, consecutive_failures: int}>
      */
     public function getAllServerHealth(): array
-    {
         return $this->serverHealth;
     }
 
@@ -394,7 +389,6 @@ class MCPClientService
      * @return array{strands_agents: bool, agentcore: bool}
      */
     public function getAIServicesStatus(): array
-    {
         return [
             'strands_agents' => $this->isStrandsAgentsAvailable(),
             'agentcore' => $this->isAgentCoreAvailable(),
@@ -407,13 +401,12 @@ class MCPClientService
      * @param  array<string, mixed>  $input
      * @return array<string, mixed>
      */
-    public function executeAgent(string $agentType, array $input): array
-    {
+    public function executeAgent(): array
         // Simulate agent execution via MCP
         // In production, this would make actual MCP protocol calls
         $this->debugLog('Executing agent via MCP', [
             'agent_type' => $agentType,
-            'input_size' => strlen(json_encode($input)),
+            'input_size' => strlen(json_encode($input) ?: '{}'),
         ]);
 
         return [
@@ -460,8 +453,7 @@ class MCPClientService
      *
      * @throws \RuntimeException
      */
-    public function callTool(string $serverName, string $toolName, array $arguments = []): array
-    {
+    public function callTool(): array
         if (! $this->isEnabled()) {
             throw new \RuntimeException('MCP is not enabled');
         }
@@ -498,8 +490,7 @@ class MCPClientService
      *
      * @throws \RuntimeException
      */
-    public function get(string $url, array $headers = [], int $timeout = 5): array
-    {
+    public function get(): array
         return $this->fetch($url, 'GET', [], $headers, $timeout);
     }
 
@@ -512,8 +503,7 @@ class MCPClientService
      *
      * @throws \RuntimeException
      */
-    public function post(string $url, array $data = [], array $headers = [], int $timeout = 5): array
-    {
+    public function post(): array
         return $this->fetch($url, 'POST', $data, $headers, $timeout);
     }
 
@@ -526,8 +516,7 @@ class MCPClientService
      *
      * @throws \RuntimeException
      */
-    public function put(string $url, array $data = [], array $headers = [], int $timeout = 5): array
-    {
+    public function put(): array
         return $this->fetch($url, 'PUT', $data, $headers, $timeout);
     }
 
@@ -539,8 +528,7 @@ class MCPClientService
      *
      * @throws \RuntimeException
      */
-    public function delete(string $url, array $headers = [], int $timeout = 5): array
-    {
+    public function delete(): array
         return $this->fetch($url, 'DELETE', [], $headers, $timeout);
     }
 
@@ -553,8 +541,7 @@ class MCPClientService
      *
      * @throws \RuntimeException
      */
-    public function patch(string $url, array $data = [], array $headers = [], int $timeout = 5): array
-    {
+    public function patch(): array
         return $this->fetch($url, 'PATCH', $data, $headers, $timeout);
     }
 
@@ -567,14 +554,7 @@ class MCPClientService
      *
      * @throws \RuntimeException
      */
-    public function fetch(
-        string $url,
-        string $method = 'GET',
-        array $data = [],
-        array $headers = [],
-        int $timeout = 5,
-        int $maxRetries = 3
-    ): array {
+    public function fetch(): array
         if (! $this->isServerEnabled('fetch')) {
             throw new \RuntimeException('MCP fetch server is not enabled');
         }
@@ -597,7 +577,7 @@ class MCPClientService
         }
 
         while ($attempt < $maxRetries) {
-            $attempt++;
+            $attempt = ($attempt ?? 0) + 1;
 
             try {
                 $this->debugLog("HTTP {$method} request (attempt {$attempt}/{$maxRetries})", [
@@ -672,13 +652,7 @@ class MCPClientService
      *
      * @throws \RuntimeException
      */
-    protected function performFetch(
-        string $url,
-        string $method,
-        array $data,
-        array $headers,
-        int $timeout
-    ): array {
+    protected function performFetch(): array
         // In production, this would make actual MCP protocol calls to the fetch server
         // For now, we simulate a successful response structure
 
@@ -712,18 +686,13 @@ class MCPClientService
     /**
      * Fetch with automatic JSON decoding
      *
+     * @param  array<string, mixed>  $data
      * @param  array<string, string>  $headers
      * @return array<string, mixed>
      *
      * @throws \RuntimeException
      */
-    public function fetchJson(
-        string $url,
-        string $method = 'GET',
-        array $data = [],
-        array $headers = [],
-        int $timeout = 5
-    ): array {
+    public function fetchJson(): array
         $response = $this->fetch($url, $method, $data, $headers, $timeout);
 
         if (! $response['success']) {

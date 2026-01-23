@@ -65,12 +65,7 @@ class SkillBuildPlanningAgent
      *     confidence: float
      * }
      */
-    public function analyzeSkillBuild(
-        Character $character,
-        Collection $availableSkills,
-        Collection $currentSkills,
-        array $context = []
-    ): array {
+    public function analyzeSkillBuild(): array
         // Analyze character strengths and weaknesses
         $characterAnalysis = $this->analyzeCharacter($character);
 
@@ -113,8 +108,7 @@ class SkillBuildPlanningAgent
      *
      * @return array<string, mixed>
      */
-    protected function analyzeCharacter(Character $character): array
-    {
+    protected function analyzeCharacter(): array
         // Analyze aptitudes
         $aptitudes = $character->aptitudes;
         $aptitudeAnalysis = $this->analyzeAptitudes($aptitudes);
@@ -145,8 +139,7 @@ class SkillBuildPlanningAgent
      *
      * @return array<string, mixed>
      */
-    protected function analyzeAptitudes($aptitudes): array
-    {
+    protected function analyzeAptitudes(): array
         $distanceAptitudes = [];
         $surfaceAptitudes = [];
         $styleAptitudes = [];
@@ -207,8 +200,8 @@ class SkillBuildPlanningAgent
         $bestScore = 0;
 
         foreach ($aptitudes as $type => $data) {
-            if ($data['numeric'] > $bestScore) {
-                $bestScore = $data['numeric'];
+            if ((is_array($data) && isset($data['numeric']) ? $data['numeric'] : null) > $bestScore) {
+                $bestScore = (is_array($data) && isset($data['numeric']) ? $data['numeric'] : null);
                 $best = $type;
             }
         }
@@ -241,8 +234,7 @@ class SkillBuildPlanningAgent
      * @param  array<string, int>  $stats
      * @return array<string, mixed>
      */
-    protected function analyzeStats(array $stats): array
-    {
+    protected function analyzeStats(): array
         $statRatings = [];
 
         foreach ($stats as $stat => $value) {
@@ -349,8 +341,7 @@ class SkillBuildPlanningAgent
      * @param  array<string, mixed>  $statAnalysis
      * @return array<string, string>
      */
-    protected function identifyStrengths(array $aptitudeAnalysis, array $statAnalysis): array
-    {
+    protected function identifyStrengths(): array
         $strengths = [];
 
         // Aptitude strengths
@@ -384,8 +375,7 @@ class SkillBuildPlanningAgent
      * @param  array<string, mixed>  $statAnalysis
      * @return array<string, string>
      */
-    protected function identifyWeaknesses(array $aptitudeAnalysis, array $statAnalysis): array
-    {
+    protected function identifyWeaknesses(): array
         $weaknesses = [];
 
         // Stat weaknesses
@@ -418,11 +408,7 @@ class SkillBuildPlanningAgent
      *
      * @return array<string, mixed>
      */
-    protected function identifySkillSynergies(
-        Character $character,
-        Collection $availableSkills,
-        Collection $currentSkills
-    ): array {
+    protected function identifySkillSynergies(): array
         // Analyze current skill synergies
         $currentSynergies = $this->analyzeCurrentSynergies($currentSkills);
 
@@ -448,8 +434,7 @@ class SkillBuildPlanningAgent
      *
      * @return array<string, mixed>
      */
-    protected function analyzeCurrentSynergies(Collection $currentSkills): array
-    {
+    protected function analyzeCurrentSynergies(): array
         $categoryCounts = [];
 
         foreach ($currentSkills as $skill) {
@@ -494,11 +479,7 @@ class SkillBuildPlanningAgent
      *
      * @return array<string, mixed>
      */
-    protected function findComplementarySkills(
-        Character $character,
-        Collection $availableSkills,
-        Collection $currentSkills
-    ): array {
+    protected function findComplementarySkills(): array
         $currentCategories = $currentSkills->pluck('category')->unique()->toArray();
         $complementary = [];
 
@@ -578,8 +559,7 @@ class SkillBuildPlanningAgent
      *
      * @return array<string, mixed>
      */
-    protected function identifySkillGaps(Character $character, Collection $currentSkills): array
-    {
+    protected function identifySkillGaps(): array
         $gaps = [];
 
         // Check for missing essential categories
@@ -626,11 +606,7 @@ class SkillBuildPlanningAgent
      * @param  array<string, mixed>  $characterAnalysis
      * @return array<string, mixed>
      */
-    protected function optimizeForMeta(
-        Character $character,
-        Collection $availableSkills,
-        array $characterAnalysis
-    ): array {
+    protected function optimizeForMeta(): array
         // Identify meta skills
         $metaSkills = $this->identifyMetaSkills($availableSkills);
 
@@ -652,8 +628,7 @@ class SkillBuildPlanningAgent
      *
      * @return array<string, mixed>
      */
-    protected function identifyMetaSkills(Collection $availableSkills): array
-    {
+    protected function identifyMetaSkills(): array
         $metaSkills = [];
 
         foreach ($availableSkills as $skill) {
@@ -682,8 +657,7 @@ class SkillBuildPlanningAgent
      * @param  array<string, mixed>  $characterAnalysis
      * @return array<string, mixed>
      */
-    protected function matchMetaSkillsToCharacter(array $metaSkills, array $characterAnalysis): array
-    {
+    protected function matchMetaSkillsToCharacter(): array
         $matched = [];
 
         $specialization = $characterAnalysis['specialization'];
@@ -713,7 +687,7 @@ class SkillBuildPlanningAgent
 
         $totalScore = 0;
         foreach ($matchedMetaSkills as $skill) {
-            $totalScore += $skill['tier_score'];
+            $totalScore = ($totalScore ?? 0) + $skill['tier_score'];
         }
 
         return (int) ($totalScore / count($matchedMetaSkills));
@@ -727,12 +701,7 @@ class SkillBuildPlanningAgent
      * @param  array<string, mixed>  $metaOptimization
      * @return array<string, mixed>
      */
-    protected function generateBuildRecommendations(
-        Character $character,
-        array $characterAnalysis,
-        array $skillSynergies,
-        array $metaOptimization
-    ): array {
+    protected function generateBuildRecommendations(): array
         $recommendations = [];
 
         // Priority 1: Meta skills that match character
@@ -776,11 +745,7 @@ class SkillBuildPlanningAgent
      * @param  array<string, mixed>  $metaOptimization
      * @return array<string, string>
      */
-    protected function generateRecommendations(
-        array $characterAnalysis,
-        array $skillSynergies,
-        array $metaOptimization
-    ): array {
+    protected function generateRecommendations(): array
         $recommendations = [];
 
         // Character-specific recommendations

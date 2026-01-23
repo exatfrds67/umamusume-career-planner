@@ -61,7 +61,6 @@ class RealTimeMonitoringService
      * }
      */
     public function getRealTimeServerStatus(): array
-    {
         $cacheKey = 'realtime:server_status';
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () {
@@ -121,11 +120,10 @@ class RealTimeMonitoringService
      *     started_at: string|null
      * }
      */
-    public function getAgentProgressTracking(?int $userId = null): array
-    {
+    public function getAgentProgressTracking(): array
         $cacheKey = $userId ? "realtime:agent_progress:{$userId}" : 'realtime:agent_progress:global';
 
-        return Cache::get($cacheKey, [
+        $data = Cache::get($cacheKey, [
             'workflow_id' => null,
             'workflow_name' => null,
             'status' => 'idle',
@@ -137,6 +135,22 @@ class RealTimeMonitoringService
             'estimated_completion' => null,
             'started_at' => null,
         ]);
+
+        // Ensure progress_percentage is always a float
+        if (isset((is_array($data) && isset($data['progress_percentage']) ? $data['progress_percentage'] : null))) {
+            (is_array($data) && isset($data['progress_percentage']) ? $data['progress_percentage'] : null) = (float) (is_array($data) && isset($data['progress_percentage']) ? $data['progress_percentage'] : null);
+        }
+
+        // Ensure agent progress values are always floats
+        if (isset((is_array($data) && isset($data['agents']) ? $data['agents'] : null)) && is_array((is_array($data) && isset($data['agents']) ? $data['agents'] : null))) {
+            foreach ((is_array($data) && isset($data['agents']) ? $data['agents'] : null) as &$agent) {
+                if (isset($agent['progress'])) {
+                    $agent['progress'] = (float) $agent['progress'];
+                }
+            }
+        }
+
+        return $data;
     }
 
     /**
@@ -158,7 +172,7 @@ class RealTimeMonitoringService
         foreach ($currentProgress['agents'] as &$agent) {
             if ($agent['agent_id'] === $agentId) {
                 $agent['status'] = $status;
-                $agent['progress'] = $progress;
+                $agent['progress'] = (float) $progress;
 
                 if ($status === AgentOrchestrationService::STATE_COMPLETED) {
                     $agent['completed_at'] = now()->toIso8601String();
@@ -178,7 +192,7 @@ class RealTimeMonitoringService
                 'agent_id' => $agentId,
                 'agent_type' => 'unknown',
                 'status' => $status,
-                'progress' => $progress,
+                'progress' => (float) $progress,
                 'started_at' => now()->toIso8601String(),
                 'completed_at' => null,
                 'execution_time' => null,
@@ -196,7 +210,7 @@ class RealTimeMonitoringService
         $currentProgress['completed_steps'] = $completedAgents;
         $currentProgress['total_steps'] = $totalAgents;
         $currentProgress['progress_percentage'] = $totalAgents > 0
-            ? ($completedAgents / $totalAgents) * 100
+            ? (float) (($completedAgents / $totalAgents) * 100)
             : 0.0;
 
         // Update workflow status
@@ -251,8 +265,7 @@ class RealTimeMonitoringService
      *     }>
      * }
      */
-    public function getToolExecutionMonitoring(?int $userId = null): array
-    {
+    public function getToolExecutionMonitoring(): array
         $cacheKey = $userId ? "realtime:tool_execution:{$userId}" : 'realtime:tool_execution:global';
 
         return Cache::get($cacheKey, [
@@ -369,8 +382,7 @@ class RealTimeMonitoringService
      *     }
      * }
      */
-    public function getPerformanceMetrics(?int $userId = null): array
-    {
+    public function getPerformanceMetrics(): array
         $cacheKey = $userId ? "realtime:performance_metrics:{$userId}" : 'realtime:performance_metrics:global';
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($userId) {
@@ -390,8 +402,7 @@ class RealTimeMonitoringService
     /**
      * Handle MCP server disconnection with recovery
      */
-    public function handleServerDisconnection(string $serverName, string $error): array
-    {
+    public function handleServerDisconnection(): array
         Log::warning('[RealTimeMonitoring] Server disconnection detected', [
             'server' => $serverName,
             'error' => $error,
@@ -420,8 +431,7 @@ class RealTimeMonitoringService
     /**
      * Attempt server reconnection with exponential backoff
      */
-    protected function attemptServerReconnection(string $serverName, int $attempt = 1): array
-    {
+    protected function attemptServerReconnection(): array
         $maxAttempts = 3;
         $baseDelay = 2; // seconds
 
@@ -505,8 +515,7 @@ class RealTimeMonitoringService
     /**
      * Get provider metrics from database
      */
-    protected function getProviderMetrics(?int $userId): array
-    {
+    protected function getProviderMetrics(): array
         $query = DB::table('ucp_ai_conversations')
             ->select(
                 DB::raw('JSON_EXTRACT(metadata, "$.provider") as provider'),
@@ -538,7 +547,7 @@ class RealTimeMonitoringService
                 'average_response_time' => round($result->average_response_time ?? 0.0, 3),
                 'average_cost' => round($result->average_cost ?? 0.0, 6),
                 'success_rate' => $totalRequests > 0 ? ($successfulRequests / $totalRequests) * 100 : 0,
-                'uptime_percentage' => 100.0, // TODO: Calculate from health checks
+                'uptime_percentage' => $this->calculateUptimePercentage($providerName),
             ];
         }
 
@@ -547,18 +556,83 @@ class RealTimeMonitoringService
 
     /**
      * Get agent metrics from database
+     *
+     * Retrieves agent execution metrics from the MCP agents and tool usage tables.
      */
-    protected function getAgentMetrics(?int $userId): array
+    protected function getAgentMetrics(): array
+        $query = DB::table('ucp_mcp_agents')
+            ->select(
+                'agent_type as type',
+                DB::raw('COUNT(*) as total_executions'),
+                DB::raw('SUM(CASE WHEN status = "completed" THEN 1 ELSE 0 END) as successful_executions'),
+                DB::raw('SUM(CASE WHEN status = "failed" THEN 1 ELSE 0 END) as failed_executions'),
+                DB::raw('AVG(execution_time) as average_execution_time')
+            )
+            ->where('created_at', '>=', now()->subHours(24))
+            ->groupBy('agent_type');
+
+        $results = $query->get();
+
+        $agents = [];
+        foreach ($results as $result) {
+            $totalExecutions = $result->total_executions ?? 0;
+            $successfulExecutions = $result->successful_executions ?? 0;
+
+            $agents[$result->type] = [
+                'type' => $result->type,
+                'total_executions' => $totalExecutions,
+                'successful_executions' => $successfulExecutions,
+                'failed_executions' => $result->failed_executions ?? 0,
+                'average_execution_time' => round($result->average_execution_time ?? 0.0, 3),
+                'success_rate' => $totalExecutions > 0 ? ($successfulExecutions / $totalExecutions) * 100 : 0,
+                'health_status' => $this->determineAgentHealthStatus($successfulExecutions, $totalExecutions),
+            ];
+        }
+
+        return $agents;
+    }
+
+    /**
+     * Determine agent health status based on success rate
+     */
+    protected function determineAgentHealthStatus(int $successful, int $total): string
     {
-        // TODO: Implement agent metrics from database
-        return [];
+        if ($total === 0) {
+            return 'unknown';
+        }
+
+        $successRate = ($successful / $total) * 100;
+
+        return match (true) {
+            $successRate >= 95 => 'healthy',
+            $successRate >= 80 => 'degraded',
+            default => 'unhealthy',
+        };
+    }
+
+    /**
+     * Calculate uptime percentage for a provider
+     */
+    protected function calculateUptimePercentage(string $providerName): float
+    {
+        // Map provider names to server names
+        $serverName = match ($providerName) {
+            'ollama' => 'ollama',
+            'bedrock' => 'bedrock',
+            'mcp-strands' => 'strands-agents',
+            'mcp-agentcore' => 'agentcore-mcp-server',
+            default => $providerName,
+        };
+
+        $stats = $this->monitoringService->getServerUptimeStats($serverName, 24);
+
+        return $stats['uptime_percentage'] ?? 100.0;
     }
 
     /**
      * Generate performance comparison
      */
-    protected function generateComparison(array $providers, array $agents): array
-    {
+    protected function generateComparison(): array
         $fastestProvider = null;
         $fastestTime = PHP_FLOAT_MAX;
 
@@ -630,8 +704,7 @@ class RealTimeMonitoringService
     /**
      * Format alerts for frontend display
      */
-    protected function formatAlerts(array $alerts): array
-    {
+    protected function formatAlerts(): array
         return array_map(function ($alert) {
             return [
                 'level' => $alert['level'],

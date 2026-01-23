@@ -53,12 +53,7 @@ class HintFarmingStrategyAgent
      *     confidence: float
      * }
      */
-    public function analyzeHintFarmingStrategy(
-        Character $character,
-        Collection $targetSkills,
-        Collection $supportCards,
-        array $context = []
-    ): array {
+    public function analyzeHintFarmingStrategy(): array
         // Determine optimal farming strategy
         $farmingStrategy = $this->determineFarmingStrategy($character, $targetSkills, $supportCards);
 
@@ -101,11 +96,7 @@ class HintFarmingStrategyAgent
      *
      * @return array<string, mixed>
      */
-    protected function determineFarmingStrategy(
-        Character $character,
-        Collection $targetSkills,
-        Collection $supportCards
-    ): array {
+    protected function determineFarmingStrategy(): array
         // Analyze current hint status
         $hintStats = $this->hintService->getHintStatistics($character);
 
@@ -135,8 +126,7 @@ class HintFarmingStrategyAgent
      *
      * @return array<string, array>
      */
-    protected function categorizeSkillsByHintStatus(Character $character, Collection $targetSkills): array
-    {
+    protected function categorizeSkillsByHintStatus(): array
         $categories = [
             'max_discount' => [],
             'one_hint_away' => [],
@@ -232,8 +222,8 @@ class HintFarmingStrategyAgent
     {
         // Calculate total hints needed
         $hintsNeeded = 0;
-        $hintsNeeded += count($skillsByHintStatus['one_hint_away']); // 1 hint each
-        $hintsNeeded += count($skillsByHintStatus['no_hints']) * 2; // 2 hints each
+        $hintsNeeded = ($hintsNeeded ?? 0) + count($skillsByHintStatus['one_hint_away']); // 1 hint each
+        $hintsNeeded = ($hintsNeeded ?? 0) + count($skillsByHintStatus['no_hints']) * 2; // 2 hints each
 
         if ($hintsNeeded === 0) {
             return 0;
@@ -297,8 +287,7 @@ class HintFarmingStrategyAgent
      *
      * @return array<string, mixed>
      */
-    protected function calculateTrainingPriorities(Collection $targetSkills, Collection $supportCards): array
-    {
+    protected function calculateTrainingPriorities(): array
         // Map skills to training types
         $skillsByTrainingType = $this->mapSkillsToTrainingTypes($targetSkills);
 
@@ -317,7 +306,7 @@ class HintFarmingStrategyAgent
         $rank = 1;
         foreach ($trainingScores as $trainingType => $score) {
             $priorities[] = [
-                'rank' => $rank++,
+                'rank' => $rank = ($rank ?? 0) + 1,
                 'training_type' => $trainingType,
                 'score' => $score,
                 'skill_count' => count($skillsByTrainingType[$trainingType]),
@@ -337,8 +326,7 @@ class HintFarmingStrategyAgent
      *
      * @return array<string, array>
      */
-    protected function mapSkillsToTrainingTypes(Collection $targetSkills): array
-    {
+    protected function mapSkillsToTrainingTypes(): array
         $mapping = [];
 
         foreach ($targetSkills as $skill) {
@@ -393,12 +381,12 @@ class HintFarmingStrategyAgent
         $score = 0.0;
 
         // Base score from number of skills
-        $score += count($skills) * 10;
+        $score = ($score ?? 0) + count($skills) * 10;
 
         // Bonus from high-cost skills
         foreach ($skills as $skill) {
             if ($skill['base_cost'] >= 180) {
-                $score += 5;
+                $score = ($score ?? 0) + 5;
             }
         }
 
@@ -406,12 +394,12 @@ class HintFarmingStrategyAgent
         $matchingCards = $supportCards->filter(
             fn ($card) => strtolower($card->specialization) === $trainingType
         );
-        $score += $matchingCards->count() * 15;
+        $score = ($score ?? 0) + $matchingCards->count() * 15;
 
         // Bonus from high friendship matching cards
         foreach ($matchingCards as $card) {
             if ($card->friendship_level >= 80) {
-                $score += 10;
+                $score = ($score ?? 0) + 10;
             }
         }
 
@@ -439,8 +427,7 @@ class HintFarmingStrategyAgent
      *
      * @return array<string, mixed>
      */
-    protected function optimizeSupportCards(Collection $targetSkills, Collection $supportCards): array
-    {
+    protected function optimizeSupportCards(): array
         // Analyze current deck
         $deckAnalysis = $this->analyzeDeck($supportCards);
 
@@ -466,8 +453,7 @@ class HintFarmingStrategyAgent
      *
      * @return array<string, mixed>
      */
-    protected function analyzeDeck(Collection $supportCards): array
-    {
+    protected function analyzeDeck(): array
         $specializationCounts = [];
         $avgFriendship = $supportCards->avg('friendship_level') ?? 0;
         $avgLimitBreak = $supportCards->avg('limit_break_level') ?? 0;
@@ -491,8 +477,7 @@ class HintFarmingStrategyAgent
      *
      * @return array<string, mixed>
      */
-    protected function identifyHintCoverageGaps(Collection $targetSkills, Collection $supportCards): array
-    {
+    protected function identifyHintCoverageGaps(): array
         $gaps = [];
 
         // Check coverage for each training type
@@ -530,8 +515,7 @@ class HintFarmingStrategyAgent
      * @param  array<string, mixed>  $hintCoverageGaps
      * @return array<string, string>
      */
-    protected function generateOptimizationSuggestions(array $deckAnalysis, array $hintCoverageGaps): array
-    {
+    protected function generateOptimizationSuggestions(): array
         $suggestions = [];
 
         // Friendship level suggestions
@@ -590,12 +574,7 @@ class HintFarmingStrategyAgent
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    protected function createHintCollectionPlan(
-        Character $character,
-        Collection $targetSkills,
-        Collection $supportCards,
-        array $context = []
-    ): array {
+    protected function createHintCollectionPlan(): array
         $turnsAvailable = $context['turns_available'] ?? 20;
 
         // Categorize skills by hint status
@@ -613,7 +592,7 @@ class HintFarmingStrategyAgent
 
             $trainingType = $this->inferTrainingType((object) $skill);
             $plan[] = [
-                'turn' => $currentTurn++,
+                'turn' => $currentTurn = ($currentTurn ?? 0) + 1,
                 'action' => 'collect_hint',
                 'skill_name' => $skill['skill_name'],
                 'training_type' => $trainingType,
@@ -635,7 +614,7 @@ class HintFarmingStrategyAgent
 
             $trainingType = $this->inferTrainingType((object) $skill);
             $plan[] = [
-                'turn' => $currentTurn++,
+                'turn' => $currentTurn = ($currentTurn ?? 0) + 1,
                 'action' => 'collect_hint',
                 'skill_name' => $skill['skill_name'],
                 'training_type' => $trainingType,
@@ -664,7 +643,7 @@ class HintFarmingStrategyAgent
 
         // Savings from completing one-hint-away skills
         foreach ($skillsByStatus['one_hint_away'] as $skill) {
-            $savings += (int) ($skill['base_cost'] * 0.2);
+            $savings = ($savings ?? 0) + (int) ($skill['base_cost'] * 0.2);
         }
 
         return $savings;
@@ -678,11 +657,7 @@ class HintFarmingStrategyAgent
      * @param  array<string, mixed>  $supportCardOptimization
      * @return array<string, string>
      */
-    protected function generateRecommendations(
-        array $farmingStrategy,
-        array $trainingPriorities,
-        array $supportCardOptimization
-    ): array {
+    protected function generateRecommendations(): array
         $recommendations = [];
 
         // Strategy recommendations

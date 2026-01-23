@@ -60,8 +60,7 @@ class MCPHealthDashboardService
      *     last_updated: string
      * }
      */
-    public function getDashboardData(int $userId, bool $forceRefresh = false): array
-    {
+    public function getDashboardData(): array
         $cacheKey = self::DASHBOARD_CACHE_KEY.":{$userId}";
 
         if (! $forceRefresh && Cache::has($cacheKey)) {
@@ -120,15 +119,14 @@ class MCPHealthDashboardService
      *     uptime_percentage: float
      * }
      */
-    protected function getOverviewMetrics(int $userId): array
-    {
+    protected function getOverviewMetrics(): array
         // Get MCP server status
         $mcpServers = MCPServer::all();
         $healthyServers = $mcpServers->filter(fn ($server) => $server->isHealthy())->count();
 
         // Get agent status
         $agents = MCPAgent::where('user_id', $userId)->get();
-        $activeAgents = $agents->where('status', 'active')->count();
+        $activeAgents = $agents->where('status', '=', 'active')->count();
 
         // Get external API status
         $apiHealth = $this->apiHealthMonitor->getCachedAllHealth() ?? $this->apiHealthMonitor->checkAllAPIs();
@@ -181,7 +179,6 @@ class MCPHealthDashboardService
      * }
      */
     protected function getMCPServerHealth(): array
-    {
         $servers = MCPServer::all();
 
         $serverData = $servers->map(function ($server) {
@@ -209,10 +206,10 @@ class MCPHealthDashboardService
         // Calculate summary
         $summary = [
             'total' => $servers->count(),
-            'healthy' => collect($serverData)->where('status', 'healthy')->count(),
-            'degraded' => collect($serverData)->where('status', 'degraded')->count(),
-            'unhealthy' => collect($serverData)->where('status', 'unhealthy')->count(),
-            'offline' => collect($serverData)->where('status', 'offline')->count(),
+            'healthy' => collect($serverData)->where('status', '=', 'healthy')->count(),
+            'degraded' => collect($serverData)->where('status', '=', 'degraded')->count(),
+            'unhealthy' => collect($serverData)->where('status', '=', 'unhealthy')->count(),
+            'offline' => collect($serverData)->where('status', '=', 'offline')->count(),
         ];
 
         return [
@@ -231,7 +228,6 @@ class MCPHealthDashboardService
      * }
      */
     protected function getExternalAPIHealth(): array
-    {
         $apiHealth = $this->apiHealthMonitor->getCachedAllHealth() ?? $this->apiHealthMonitor->checkAllAPIs();
 
         $apis = [
@@ -261,9 +257,9 @@ class MCPHealthDashboardService
 
         $summary = [
             'total' => 2,
-            'healthy' => collect($apis)->where('status', 'healthy')->count(),
-            'degraded' => collect($apis)->where('status', 'degraded')->count(),
-            'unhealthy' => collect($apis)->where('status', 'unhealthy')->count(),
+            'healthy' => collect($apis)->where('status', '=', 'healthy')->count(),
+            'degraded' => collect($apis)->where('status', '=', 'degraded')->count(),
+            'unhealthy' => collect($apis)->where('status', '=', 'unhealthy')->count(),
             'circuit_open' => collect($apis)->where('circuit_breaker_open', true)->count(),
         ];
 
@@ -282,8 +278,7 @@ class MCPHealthDashboardService
      *     summary: array{total: int, active: int, terminated: int, healthy: int, unhealthy: int}
      * }
      */
-    protected function getAgentHealth(int $userId): array
-    {
+    protected function getAgentHealth(): array
         $agents = MCPAgent::where('user_id', $userId)->get();
 
         $agentData = $agents->map(function ($agent) {
@@ -305,10 +300,10 @@ class MCPHealthDashboardService
 
         $summary = [
             'total' => $agents->count(),
-            'active' => $agents->where('status', 'active')->count(),
-            'terminated' => $agents->where('status', 'terminated')->count(),
-            'healthy' => $agents->where('health_status', 'healthy')->count(),
-            'unhealthy' => $agents->where('health_status', 'unhealthy')->count(),
+            'active' => $agents->where('status', '=', 'active')->count(),
+            'terminated' => $agents->where('status', '=', 'terminated')->count(),
+            'healthy' => $agents->where('health_status', '=', 'healthy')->count(),
+            'unhealthy' => $agents->where('health_status', '=', 'unhealthy')->count(),
         ];
 
         return [
@@ -327,8 +322,7 @@ class MCPHealthDashboardService
      *     system_health: array<string, mixed>
      * }
      */
-    protected function getPerformanceMetrics(int $userId): array
-    {
+    protected function getPerformanceMetrics(): array
         // Cache performance
         $cacheStats = $this->cacheManagement->getHitRateStatistics();
 
@@ -363,8 +357,7 @@ class MCPHealthDashboardService
      *     budget_status: array<string, mixed>
      * }
      */
-    protected function getCostAnalytics(int $userId): array
-    {
+    protected function getCostAnalytics(): array
         $costData = $this->mcpMonitoring->getCostAnalytics($userId, 'month');
 
         // Get budget information
@@ -389,8 +382,7 @@ class MCPHealthDashboardService
      *
      * @return array<array{type: string, severity: string, title: string, description: string, action: string, metadata: array<string, mixed>}>
      */
-    protected function getRecommendations(int $userId): array
-    {
+    protected function getRecommendations(): array
         $recommendations = [];
 
         // Get MCP monitoring recommendations
@@ -477,21 +469,21 @@ class MCPHealthDashboardService
 
         // Check for unhealthy servers
         $unhealthyServers = MCPServer::all()->filter(fn ($server) => ! $server->isHealthy())->count();
-        $alertCount += $unhealthyServers;
+        $alertCount = ($alertCount ?? 0) + $unhealthyServers;
 
         // Check for circuit breakers
         if ($this->apiHealthMonitor->isCircuitBreakerOpen('umapyoi')) {
-            $alertCount++;
+            $alertCount = ($alertCount ?? 0) + 1;
         }
         if ($this->apiHealthMonitor->isCircuitBreakerOpen('umamusumedb')) {
-            $alertCount++;
+            $alertCount = ($alertCount ?? 0) + 1;
         }
 
         // Check for unhealthy agents
         $unhealthyAgents = MCPAgent::where('user_id', $userId)
-            ->where('health_status', 'unhealthy')
+            ->where('health_status', '=', 'unhealthy')
             ->count();
-        $alertCount += $unhealthyAgents;
+        $alertCount = ($alertCount ?? 0) + $unhealthyAgents;
 
         return $alertCount;
     }
@@ -519,15 +511,14 @@ class MCPHealthDashboardService
      *
      * @return array{total_executions: int, successful_executions: int, failed_executions: int, success_rate: float, average_execution_time: float}
      */
-    protected function getToolUsageStatistics(int $userId): array
-    {
+    protected function getToolUsageStatistics(): array
         $toolUsage = MCPToolUsage::forUser($userId)
             ->betweenDates(now()->startOfDay(), now())
             ->get();
 
         $totalExecutions = $toolUsage->count();
-        $successfulExecutions = $toolUsage->where('execution_status', 'success')->count();
-        $failedExecutions = $toolUsage->where('execution_status', 'failure')->count();
+        $successfulExecutions = $toolUsage->where('execution_status', '=', 'success')->count();
+        $failedExecutions = $toolUsage->where('execution_status', '=', 'failure')->count();
         $successRate = $totalExecutions > 0 ? ($successfulExecutions / $totalExecutions) * 100 : 0;
         $avgExecutionTime = $toolUsage->avg('execution_time') ?? 0;
 
@@ -546,7 +537,6 @@ class MCPHealthDashboardService
      * @return array{redis_status: string, database_status: string, queue_status: string}
      */
     protected function getSystemHealthMetrics(): array
-    {
         // Check Redis status
         $redisStatus = 'healthy';
         try {
@@ -584,8 +574,7 @@ class MCPHealthDashboardService
      *
      * @return array{budget_limit: float, current_spend: float, remaining_budget: float, percentage_used: float, status: string}
      */
-    protected function getBudgetStatus(int $userId, float $currentSpend): array
-    {
+    protected function getBudgetStatus(): array
         // Get user's budget limit from preferences
         $budgetLimit = 10.0; // Default $10/month
 
@@ -614,7 +603,6 @@ class MCPHealthDashboardService
      * @return array<array{type: string, severity: string, title: string, description: string, action: string}>
      */
     protected function getCacheOptimizationRecommendations(): array
-    {
         $recommendations = [];
         $cacheStats = $this->cacheManagement->getHitRateStatistics();
 
@@ -639,8 +627,7 @@ class MCPHealthDashboardService
      *
      * @return array<array{type: string, severity: string, title: string, description: string, action: string}>
      */
-    protected function getCostOptimizationRecommendations(int $userId): array
-    {
+    protected function getCostOptimizationRecommendations(): array
         $recommendations = [];
         $costData = $this->mcpMonitoring->getCostAnalytics($userId, 'month');
 
@@ -669,8 +656,7 @@ class MCPHealthDashboardService
     /**
      * Force refresh dashboard data
      */
-    public function refreshDashboard(int $userId): array
-    {
+    public function refreshDashboard(): array
         // Clear cached dashboard data
         $cacheKey = self::DASHBOARD_CACHE_KEY.":{$userId}";
         Cache::forget($cacheKey);
@@ -688,8 +674,7 @@ class MCPHealthDashboardService
      * @param  string  $period  'hour', 'day', 'week', 'month'
      * @return array<array{timestamp: string, health_score: float, alerts_count: int}>
      */
-    public function getHealthHistory(int $userId, string $period = 'day'): array
-    {
+    public function getHealthHistory(): array
         // In production, this would query historical health data from database
         // For now, we'll return a simplified response
 

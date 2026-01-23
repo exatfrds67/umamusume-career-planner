@@ -35,8 +35,7 @@ class CareerStateSyncService
     /**
      * Synchronize career state across all agents
      */
-    public function synchronizeCareerState(Career $career): array
-    {
+    public function synchronizeCareerState(): array
         try {
             $syncId = $this->generateSyncId();
 
@@ -61,7 +60,7 @@ class CareerStateSyncService
             Log::info('[CareerStateSync] Career state synchronization completed', [
                 'sync_id' => $syncId,
                 'career_id' => $career->id,
-                'agents_synced' => count($broadcastResult['agents']),
+                'agents_synced' => \count($broadcastResult['agents']),
             ]);
 
             return [
@@ -90,8 +89,7 @@ class CareerStateSyncService
     /**
      * Synchronize character state across agents
      */
-    public function synchronizeCharacterState(Character $character): array
-    {
+    public function synchronizeCharacterState(): array
         try {
             $syncId = $this->generateSyncId();
 
@@ -116,7 +114,7 @@ class CareerStateSyncService
             Log::info('[CareerStateSync] Character state synchronization completed', [
                 'sync_id' => $syncId,
                 'character_id' => $character->id,
-                'agents_synced' => count($broadcastResult['agents']),
+                'agents_synced' => \count($broadcastResult['agents']),
             ]);
 
             return [
@@ -211,15 +209,14 @@ class CareerStateSyncService
     /**
      * Notify agents of state change
      */
-    public function notifyStateChange(string $stateType, array $stateData): array
-    {
+    public function notifyStateChange(): array
         try {
             $subscriptions = Cache::get('agent_subscriptions', []);
             $notifiedAgents = [];
 
             foreach ($subscriptions as $agentId => $subscription) {
                 // Check if agent is subscribed to this state type
-                if (empty($subscription['state_types']) || in_array($stateType, $subscription['state_types'])) {
+                if (empty($subscription['state_types']) || \in_array($stateType, $subscription['state_types'])) {
                     $this->sendStateUpdate($agentId, $stateType, $stateData);
                     $notifiedAgents[] = $agentId;
                 }
@@ -227,13 +224,13 @@ class CareerStateSyncService
 
             Log::info('[CareerStateSync] State change notified', [
                 'state_type' => $stateType,
-                'agents_notified' => count($notifiedAgents),
+                'agents_notified' => \count($notifiedAgents),
             ]);
 
             return [
                 'state_type' => $stateType,
                 'agents_notified' => $notifiedAgents,
-                'notification_count' => count($notifiedAgents),
+                'notification_count' => \count($notifiedAgents),
                 'notified_at' => now()->toIso8601String(),
             ];
         } catch (\Exception $e) {
@@ -249,8 +246,7 @@ class CareerStateSyncService
     /**
      * Build career state snapshot
      */
-    protected function buildCareerState(Career $career): array
-    {
+    protected function buildCareerState(): array
         return [
             'career_id' => $career->id,
             'character_id' => $career->character_id,
@@ -273,8 +269,7 @@ class CareerStateSyncService
     /**
      * Build character state snapshot
      */
-    protected function buildCharacterState(Character $character): array
-    {
+    protected function buildCharacterState(): array
         return [
             'character_id' => $character->id,
             'name' => $character->name,
@@ -300,8 +295,7 @@ class CareerStateSyncService
     /**
      * Broadcast state to all active agents
      */
-    protected function broadcastStateToAgents(string $syncId, array $state): array
-    {
+    protected function broadcastStateToAgents(): array
         $subscriptions = Cache::get('agent_subscriptions', []);
         $broadcastResults = [];
 
@@ -330,8 +324,8 @@ class CareerStateSyncService
             'sync_id' => $syncId,
             'agents' => array_keys($broadcastResults),
             'results' => $broadcastResults,
-            'success_count' => count(array_filter($broadcastResults, fn ($r) => $r['status'] === 'success')),
-            'failure_count' => count(array_filter($broadcastResults, fn ($r) => $r['status'] === 'failed')),
+            'success_count' => \count(\array_filter($broadcastResults, fn ($r) => $r['status'] === 'success')),
+            'failure_count' => \count(\array_filter($broadcastResults, fn ($r) => $r['status'] === 'failed')),
         ];
     }
 
@@ -350,8 +344,8 @@ class CareerStateSyncService
         ];
 
         // Keep only last 50 updates
-        if (count($updates) > 50) {
-            $updates = array_slice($updates, -50);
+        if (\count($updates) > 50) {
+            $updates = \array_slice($updates, -50);
         }
 
         Cache::put($updateKey, $updates, 3600);
@@ -360,8 +354,7 @@ class CareerStateSyncService
     /**
      * Verify synchronization success
      */
-    protected function verifySynchronization(string $syncId, array $state): array
-    {
+    protected function verifySynchronization(): array
         $subscriptions = Cache::get('agent_subscriptions', []);
         $verificationResults = [];
 
@@ -384,8 +377,8 @@ class CareerStateSyncService
             ];
         }
 
-        $successCount = count(array_filter($verificationResults, fn ($r) => $r['received']));
-        $totalCount = count($verificationResults);
+        $successCount = \count(\array_filter($verificationResults, fn ($r) => $r['received']));
+        $totalCount = \count($verificationResults);
 
         return [
             'sync_id' => $syncId,
@@ -401,7 +394,7 @@ class CareerStateSyncService
      */
     protected function generateSyncId(): string
     {
-        return 'sync_'.uniqid().'_'.bin2hex(random_bytes(4));
+        return 'sync_'.uniqid().'_'.bin2hex(\random_bytes(4));
     }
 
     protected function updateSyncStatus(string $syncId, string $status): void

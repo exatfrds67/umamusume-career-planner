@@ -64,8 +64,7 @@ class FailureRateTrackingService
      *     alerts: array<array<string, mixed>>
      * }
      */
-    public function getFailureRateAnalytics(int $userId, string $period = 'day'): array
-    {
+    public function getFailureRateAnalytics(): array
         Log::info('[FailureRateTracking] Generating failure rate analytics', [
             'user_id' => $userId,
             'period' => $period,
@@ -98,14 +97,13 @@ class FailureRateTrackingService
      *     recovery_success_rate: float
      * }
      */
-    protected function getFailureSummary(int $userId, array $dateRange): array
-    {
+    protected function getFailureSummary(): array
         // Get MCP tool failures
         $toolUsage = MCPToolUsage::forUser($userId)
             ->betweenDates($dateRange['start'], $dateRange['end'])
             ->get();
 
-        $mcpFailures = $toolUsage->where('execution_status', 'failure')->count();
+        $mcpFailures = $toolUsage->where('execution_status', '=', 'failure')->count();
         $totalRequests = $toolUsage->count();
 
         // Get API failures
@@ -143,7 +141,6 @@ class FailureRateTrackingService
      * }>
      */
     protected function getMCPServerFailureRates(): array
-    {
         $servers = MCPServer::all();
 
         return $servers->mapWithKeys(function ($server) {
@@ -174,7 +171,6 @@ class FailureRateTrackingService
      * }>
      */
     protected function getExternalAPIFailureRates(): array
-    {
         $apis = ['umapyoi', 'umamusumedb'];
         $failureRates = [];
 
@@ -187,7 +183,7 @@ class FailureRateTrackingService
                 'api_name' => $apiName,
                 'failure_count' => $failureCount,
                 'circuit_breaker_open' => $circuitBreakerOpen,
-                'last_failure' => $health['last_check'] ?? null,
+                'last_failure' => (is_array($health) && isset($health['last_check']) ? $health['last_check'] : null),
                 'status' => $health['status'] ?? 'unknown',
                 'recovery_needed' => $circuitBreakerOpen || $failureCount > 0,
             ];
@@ -205,8 +201,7 @@ class FailureRateTrackingService
      *     failure_by_component: array<array{component: string, failure_count: int, failure_rate: float}>
      * }
      */
-    protected function getFailureTrends(int $userId, array $dateRange): array
-    {
+    protected function getFailureTrends(): array
         $toolUsage = MCPToolUsage::forUser($userId)
             ->betweenDates($dateRange['start'], $dateRange['end'])
             ->get();
@@ -215,7 +210,7 @@ class FailureRateTrackingService
         $hourlyFailures = $toolUsage->groupBy(function ($item) {
             return $item->executed_at->format('Y-m-d H:00:00');
         })->map(function ($items, $timestamp) {
-            $failures = $items->where('execution_status', 'failure')->count();
+            $failures = $items->where('execution_status', '=', 'failure')->count();
             $total = $items->count();
 
             return [
@@ -227,7 +222,7 @@ class FailureRateTrackingService
 
         // Failure by component
         $failureByComponent = $toolUsage->groupBy('server_name')->map(function ($items, $serverName) {
-            $failures = $items->where('execution_status', 'failure')->count();
+            $failures = $items->where('execution_status', '=', 'failure')->count();
             $total = $items->count();
 
             return [
@@ -253,7 +248,6 @@ class FailureRateTrackingService
      * }
      */
     protected function getRecoveryStatus(): array
-    {
         // Get active recovery attempts from Redis
         $activeRecoveries = $this->getActiveRecoveries();
 
@@ -284,8 +278,7 @@ class FailureRateTrackingService
      *     recovery_action: string
      * }>
      */
-    protected function getFailureAlerts(int $userId): array
-    {
+    protected function getFailureAlerts(): array
         $alerts = [];
 
         // Check MCP server failure rates
@@ -347,7 +340,6 @@ class FailureRateTrackingService
      * }
      */
     public function attemptAutomatedRecovery(): array
-    {
         Log::info('[FailureRateTracking] Starting automated recovery');
 
         $attempted = [];
@@ -414,8 +406,7 @@ class FailureRateTrackingService
      *
      * @return array{success: bool, message: string, recovery_time: float, attempts: int}
      */
-    protected function recoverMCPServer(MCPServer $server): array
-    {
+    protected function recoverMCPServer(): array
         $startTime = microtime(true);
         $attempts = $this->getRecoveryAttempts($server->server_name);
 
@@ -473,8 +464,7 @@ class FailureRateTrackingService
      *
      * @return array{success: bool, message: string, recovery_time: float, attempts: int}
      */
-    protected function recoverAPI(string $apiName): array
-    {
+    protected function recoverAPI(): array
         $startTime = microtime(true);
         $attempts = $this->getRecoveryAttempts($apiName);
 
@@ -628,7 +618,6 @@ class FailureRateTrackingService
      * @return array<array<string, mixed>>
      */
     protected function getActiveRecoveries(): array
-    {
         // In production, this would query active recovery processes
         return [];
     }
@@ -639,7 +628,6 @@ class FailureRateTrackingService
      * @return array<array<string, mixed>>
      */
     protected function getRecentRecoveries(): array
-    {
         $recentRecoveries = [];
 
         // Get recovery history for all components
@@ -672,7 +660,6 @@ class FailureRateTrackingService
      * @return array<array<string, mixed>>
      */
     protected function getRecoveryQueue(): array
-    {
         // In production, this would query queued recovery jobs
         return [];
     }
@@ -694,7 +681,6 @@ class FailureRateTrackingService
      * @return array{attempts: int, successful: int, failed: int, success_rate: float}
      */
     protected function getRecoveryStatistics(): array
-    {
         $components = array_merge(
             MCPServer::pluck('server_name')->all(),
             ['umapyoi', 'umamusumedb']
@@ -709,10 +695,10 @@ class FailureRateTrackingService
 
             foreach ($history as $entry) {
                 $data = json_decode($entry, true);
-                $totalAttempts++;
+                $totalAttempts = ($totalAttempts ?? 0) + 1;
 
-                if ($data['success']) {
-                    $totalSuccessful++;
+                if ((is_array($data) && isset($data['success']) ? $data['success'] : null)) {
+                    $totalSuccessful = ($totalSuccessful ?? 0) + 1;
                 }
             }
         }
@@ -732,8 +718,7 @@ class FailureRateTrackingService
      *
      * @return array{start: \Carbon\Carbon, end: \Carbon\Carbon}
      */
-    protected function getDateRange(string $period): array
-    {
+    protected function getDateRange(): array
         return match ($period) {
             'hour' => ['start' => now()->subHour(), 'end' => now()],
             'day' => ['start' => now()->startOfDay(), 'end' => now()],

@@ -56,8 +56,7 @@ class ResourceManagementAgent
      *     efficiency_score: float
      * }
      */
-    public function analyzeResourceManagement(Character $character, array $context = []): array
-    {
+    public function analyzeResourceManagement(): array
         // Analyze turn economy
         $turnEconomy = $this->analyzeTurnEconomy($character, $context);
 
@@ -97,8 +96,7 @@ class ResourceManagementAgent
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    protected function analyzeTurnEconomy(Character $character, array $context = []): array
-    {
+    protected function analyzeTurnEconomy(): array
         $currentTurn = $context['current_turn'] ?? 1;
         $totalTurns = $context['total_turns'] ?? 65;
         $careerStage = $character->career_stage ?? 'junior';
@@ -163,8 +161,8 @@ class ResourceManagementAgent
             $current = $currentStats[$stat] ?? 0;
             if ($target > 0) {
                 $progress = min(1.0, $current / $target);
-                $totalProgress += $progress;
-                $statCount++;
+                $totalProgress = ($totalProgress ?? 0) + $progress;
+                $statCount = ($statCount ?? 0) + 1;
             }
         }
 
@@ -184,8 +182,7 @@ class ResourceManagementAgent
      *
      * @return array<string, array{start: int, end: int, turns: int, priority: string}>
      */
-    protected function calculatePhaseBreakdown(int $currentTurn, int $totalTurns): array
-    {
+    protected function calculatePhaseBreakdown(): array
         return [
             'junior' => [
                 'start' => 1,
@@ -216,8 +213,7 @@ class ResourceManagementAgent
      *
      * @return array<string, mixed>
      */
-    protected function analyzeEnergyManagement(Character $character): array
-    {
+    protected function analyzeEnergyManagement(): array
         $energyLevel = $character->energy_level ?? 100;
         $moodStatus = $character->mood_status ?? 'normal';
 
@@ -274,8 +270,7 @@ class ResourceManagementAgent
      *
      * @return array<string, mixed>
      */
-    protected function analyzeMoodImpact(string $moodStatus): array
-    {
+    protected function analyzeMoodImpact(): array
         $impacts = [
             'great' => ['multiplier' => 1.20, 'description' => '+20% training effectiveness'],
             'good' => ['multiplier' => 1.10, 'description' => '+10% training effectiveness'],
@@ -322,8 +317,7 @@ class ResourceManagementAgent
      * @param  array<string, mixed>  $turnEconomy
      * @return array<string, mixed>
      */
-    protected function calculateResourceAllocation(Character $character, array $turnEconomy): array
-    {
+    protected function calculateResourceAllocation(): array
         $turnsRemaining = $turnEconomy['turns_remaining'];
         $currentPhase = $turnEconomy['current_phase'];
 
@@ -382,8 +376,7 @@ class ResourceManagementAgent
      *
      * @return array<string>
      */
-    protected function getPriorityActivities(string $phase): array
-    {
+    protected function getPriorityActivities(): array
         return match ($phase) {
             'junior' => ['training', 'foundation_building'],
             'classic' => ['training', 'racing', 'skill_acquisition'],
@@ -400,12 +393,7 @@ class ResourceManagementAgent
      * @param  array<string, mixed>  $resourceAllocation
      * @return array<string, string>
      */
-    protected function generateOptimizationRecommendations(
-        Character $character,
-        array $turnEconomy,
-        array $energyManagement,
-        array $resourceAllocation
-    ): array {
+    protected function generateOptimizationRecommendations(): array
         $recommendations = [];
 
         // Turn economy recommendations
@@ -459,22 +447,22 @@ class ResourceManagementAgent
 
         // Turn efficiency component (40%)
         $turnEfficiency = $turnEconomy['turn_efficiency'];
-        $score += $turnEfficiency * 0.4;
+        $score = ($score ?? 0) + $turnEfficiency * 0.4;
 
         // Energy management component (30%)
         $energyLevel = $energyManagement['current_energy'];
         $energyScore = $energyLevel / 100;
-        $score += $energyScore * 0.3;
+        $score = ($score ?? 0) + $energyScore * 0.3;
 
         // Mood component (20%)
         $moodImpact = $energyManagement['mood_impact'];
         $moodScore = ($moodImpact['multiplier'] - 0.8) / 0.4; // Normalize 0.8-1.2 to 0-1
-        $score += $moodScore * 0.2;
+        $score = ($score ?? 0) + $moodScore * 0.2;
 
         // Progress component (10%)
         $progressPercent = $turnEconomy['progress_percent'];
         $progressScore = min(1.0, $progressPercent / 100);
-        $score += $progressScore * 0.1;
+        $score = ($score ?? 0) + $progressScore * 0.1;
 
         return round(min(1.0, $score), 2);
     }

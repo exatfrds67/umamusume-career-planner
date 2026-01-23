@@ -48,6 +48,10 @@ class SkillOptimizationOrchestrationService
     /**
      * Execute comprehensive skill optimization analysis
      *
+     * @param  Collection<int, \App\Models\Skill>  $targetSkills
+     * @param  Collection<int, \App\Models\SupportCard>  $supportCards
+     * @param  Collection<int, \App\Models\Skill>  $currentSkills
+     * @param  array<string, mixed>  $goals
      * @param  array<string, mixed>  $context
      * @return array{
      *     sp_budget: array<string, mixed>,
@@ -58,14 +62,7 @@ class SkillOptimizationOrchestrationService
      *     orchestration_metadata: array<string, mixed>
      * }
      */
-    public function executeComprehensiveOptimization(
-        Character $character,
-        Collection $targetSkills,
-        Collection $supportCards,
-        Collection $currentSkills,
-        array $goals = [],
-        array $context = []
-    ): array {
+    public function executeComprehensiveOptimization(): array
         $startTime = microtime(true);
 
         Log::info('Starting comprehensive skill optimization', [
@@ -105,11 +102,11 @@ class SkillOptimizationOrchestrationService
     /**
      * Execute SP Budget Management Agent
      *
+     * @param  Collection<int, \App\Models\Skill>  $targetSkills
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    protected function executeSPBudgetAgent(Character $character, Collection $targetSkills, array $context = []): array
-    {
+    protected function executeSPBudgetAgent(): array
         try {
             Log::info('Executing SP Budget Management Agent', ['character_id' => $character->id]);
 
@@ -130,15 +127,12 @@ class SkillOptimizationOrchestrationService
     /**
      * Execute Hint Farming Strategy Agent
      *
+     * @param  Collection<int, \App\Models\Skill>  $targetSkills
+     * @param  Collection<int, \App\Models\SupportCard>  $supportCards
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    protected function executeHintFarmingAgent(
-        Character $character,
-        Collection $targetSkills,
-        Collection $supportCards,
-        array $context = []
-    ): array {
+    protected function executeHintFarmingAgent(): array
         try {
             Log::info('Executing Hint Farming Strategy Agent', ['character_id' => $character->id]);
 
@@ -164,15 +158,12 @@ class SkillOptimizationOrchestrationService
     /**
      * Execute Skill Build Planning Agent
      *
+     * @param  Collection<int, \App\Models\Skill>  $targetSkills
+     * @param  Collection<int, \App\Models\Skill>  $currentSkills
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    protected function executeSkillBuildAgent(
-        Character $character,
-        Collection $targetSkills,
-        Collection $currentSkills,
-        array $context = []
-    ): array {
+    protected function executeSkillBuildAgent(): array
         try {
             Log::info('Executing Skill Build Planning Agent', ['character_id' => $character->id]);
 
@@ -198,16 +189,12 @@ class SkillOptimizationOrchestrationService
     /**
      * Execute Long-term Development Agent
      *
+     * @param  Collection<int, \App\Models\Skill>  $targetSkills
      * @param  array<string, mixed>  $goals
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    protected function executeLongTermAgent(
-        Character $character,
-        Collection $targetSkills,
-        array $goals = [],
-        array $context = []
-    ): array {
+    protected function executeLongTermAgent(): array
         try {
             Log::info('Executing Long-term Development Agent', ['character_id' => $character->id]);
 
@@ -237,11 +224,7 @@ class SkillOptimizationOrchestrationService
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    protected function integrateSkillOptimizationStrategy(
-        Character $character,
-        array $agentResults,
-        array $context = []
-    ): array {
+    protected function integrateSkillOptimizationStrategy(): array
         // Extract key insights from each agent
         $spBudget = $agentResults['sp_budget'];
         $hintFarming = $agentResults['hint_farming'];
@@ -281,8 +264,7 @@ class SkillOptimizationOrchestrationService
      * @param  array<string, mixed>  $longTerm
      * @return array<string, mixed>
      */
-    protected function determinePriorityStrategy(array $spBudget, array $hintFarming, array $longTerm): array
-    {
+    protected function determinePriorityStrategy(): array
         // Check SP budget status
         $budgetStatus = $spBudget['budget_status']['status'] ?? 'adequate';
 
@@ -337,12 +319,7 @@ class SkillOptimizationOrchestrationService
      * @param  array<string, mixed>  $longTerm
      * @return array<string, mixed>
      */
-    protected function createIntegratedActionPlan(
-        array $spBudget,
-        array $hintFarming,
-        array $skillBuild,
-        array $longTerm
-    ): array {
+    protected function createIntegratedActionPlan(): array
         $plan = [
             'immediate_actions' => [],
             'short_term_actions' => [],
@@ -429,8 +406,7 @@ class SkillOptimizationOrchestrationService
      * @param  array<string, mixed>  $priorityStrategy
      * @return array<string, string>
      */
-    protected function generateIntegratedRecommendations(array $agentResults, array $priorityStrategy): array
-    {
+    protected function generateIntegratedRecommendations(): array
         $recommendations = [];
 
         // Priority strategy recommendation
@@ -485,7 +461,8 @@ class SkillOptimizationOrchestrationService
         $summaryParts = [];
 
         // Priority strategy
-        $summaryParts[] = "Strategy: {$priorityStrategy['strategy']}";
+        $strategyName = is_string((is_array($priorityStrategy) && isset($priorityStrategy['strategy']) ? $priorityStrategy['strategy'] : null)) ? $priorityStrategy['strategy'] : 'unknown';
+        $summaryParts[] = "Strategy: {$strategyName}";
 
         // Optimization score
         $scoreGrade = match (true) {
@@ -565,9 +542,15 @@ class SkillOptimizationOrchestrationService
      * Generate orchestration metadata
      *
      * @param  array<string, mixed>  $agentResults
+     * @return array{
+     *     execution_time_seconds: float,
+     *     agents_executed: int,
+     *     agent_statuses: array<string, array{status: string, has_data: bool}>,
+     *     timestamp: string,
+     *     orchestration_type: string
+     * }
      */
-    protected function generateOrchestrationMetadata(array $agentResults, float $executionTime): array
-    {
+    protected function generateOrchestrationMetadata(): array
         $agentStatuses = [];
 
         foreach ($agentResults as $agentName => $result) {
@@ -587,16 +570,44 @@ class SkillOptimizationOrchestrationService
     }
 
     /**
-     * Get quick skill optimization recommendation (cached, lightweight)
+     * Optimize skill acquisition for a character (alias for comprehensive optimization)
      *
+     * This method provides a simplified interface for skill acquisition optimization,
+     * calling the comprehensive optimization workflow internally.
+     *
+     * @param  Collection<int, \App\Models\Skill>  $targetSkills
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    public function getQuickOptimizationRecommendation(
-        Character $character,
-        Collection $targetSkills,
-        array $context = []
-    ): array {
+    public function optimizeSkillAcquisition(): array
+        // Get support cards from character
+        $supportCards = $character->supportCards ?? collect();
+
+        // Get current skills
+        $currentSkills = $character->skills ?? collect();
+
+        // Extract goals from context if provided
+        $goals = $context['goals'] ?? [];
+
+        // Execute comprehensive optimization
+        return $this->executeComprehensiveOptimization(
+            character: $character,
+            targetSkills: $targetSkills,
+            supportCards: $supportCards,
+            currentSkills: $currentSkills,
+            goals: $goals,
+            context: $context
+        );
+    }
+
+    /**
+     * Get quick skill optimization recommendation (cached, lightweight)
+     *
+     * @param  Collection<int, \App\Models\Skill>  $targetSkills
+     * @param  array<string, mixed>  $context
+     * @return array<string, mixed>
+     */
+    public function getQuickOptimizationRecommendation(): array
         $cacheKey = "quick_skill_optimization_{$character->id}_".md5(json_encode($context) ?: '');
 
         return Cache::remember($cacheKey, 60, function () use ($character, $targetSkills, $context) {
@@ -604,15 +615,17 @@ class SkillOptimizationOrchestrationService
             $spBudget = $this->executeSPBudgetAgent($character, $targetSkills, $context);
 
             // Extract key recommendation
-            $budgetStatus = $spBudget['budget_status']['status'] ?? 'adequate';
-            $maxDiscountSkills = $spBudget['hint_optimization']['max_discount_skills'] ?? [];
+            $budgetStatus = is_array((is_array($spBudget) && isset($spBudget['budget_status']) ? $spBudget['budget_status'] : null)) ? ($spBudget['budget_status']['status'] ?? 'adequate') : 'adequate';
+            $maxDiscountSkills = is_array((is_array($spBudget) && isset($spBudget['hint_optimization']) ? $spBudget['hint_optimization'] : null)) && is_array($spBudget['hint_optimization']['max_discount_skills'] ?? null)
+                ? $spBudget['hint_optimization']['max_discount_skills']
+                : [];
 
             if (! empty($maxDiscountSkills)) {
                 return [
                     'action' => 'acquire_skills',
                     'skills' => array_column($maxDiscountSkills, 'skill_name'),
                     'reason' => 'Skills with maximum discount ready for acquisition',
-                    'confidence' => $spBudget['confidence'] ?? 0.8,
+                    'confidence' => is_float((is_array($spBudget) && isset($spBudget['confidence']) ? $spBudget['confidence'] : null)) ? $spBudget['confidence'] : 0.8,
                 ];
             }
 
@@ -620,14 +633,14 @@ class SkillOptimizationOrchestrationService
                 return [
                     'action' => 'collect_hints',
                     'reason' => 'SP budget is tight - focus on hint collection',
-                    'confidence' => $spBudget['confidence'] ?? 0.7,
+                    'confidence' => is_float((is_array($spBudget) && isset($spBudget['confidence']) ? $spBudget['confidence'] : null)) ? $spBudget['confidence'] : 0.7,
                 ];
             }
 
             return [
                 'action' => 'balanced_development',
                 'reason' => 'Continue balanced skill development',
-                'confidence' => $spBudget['confidence'] ?? 0.7,
+                'confidence' => is_float((is_array($spBudget) && isset($spBudget['confidence']) ? $spBudget['confidence'] : null)) ? $spBudget['confidence'] : 0.7,
             ];
         });
     }

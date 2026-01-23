@@ -43,7 +43,6 @@ class WorkflowTemplateService
      * Get all available workflow templates
      */
     public function getAvailableTemplates(): array
-    {
         return [
             self::TEMPLATE_TRAINING_OPTIMIZATION => [
                 'name' => 'Training Optimization',
@@ -100,12 +99,7 @@ class WorkflowTemplateService
     /**
      * Execute a workflow template
      */
-    public function executeTemplate(
-        string $templateType,
-        Character $character,
-        ?Career $career = null,
-        array $additionalContext = []
-    ): array {
+    public function executeTemplate(): array
         try {
             $template = $this->getTemplate($templateType);
 
@@ -169,11 +163,7 @@ class WorkflowTemplateService
     /**
      * Execute training optimization template
      */
-    public function executeTrainingOptimization(
-        Character $character,
-        Career $career,
-        array $trainingOptions = []
-    ): array {
+    public function executeTrainingOptimization(): array
         return $this->executeTemplate(
             self::TEMPLATE_TRAINING_OPTIMIZATION,
             $character,
@@ -185,11 +175,7 @@ class WorkflowTemplateService
     /**
      * Execute race preparation template
      */
-    public function executeRacePreparation(
-        Character $character,
-        Career $career,
-        array $upcomingRace
-    ): array {
+    public function executeRacePreparation(): array
         return $this->executeTemplate(
             self::TEMPLATE_RACE_PREPARATION,
             $character,
@@ -201,10 +187,7 @@ class WorkflowTemplateService
     /**
      * Execute skill planning template
      */
-    public function executeSkillPlanning(
-        Character $character,
-        array $availableSkills = []
-    ): array {
+    public function executeSkillPlanning(): array
         return $this->executeTemplate(
             self::TEMPLATE_SKILL_PLANNING,
             $character,
@@ -216,10 +199,7 @@ class WorkflowTemplateService
     /**
      * Execute career strategy template
      */
-    public function executeCareerStrategy(
-        Character $character,
-        array $goals = []
-    ): array {
+    public function executeCareerStrategy(): array
         return $this->executeTemplate(
             self::TEMPLATE_CAREER_STRATEGY,
             $character,
@@ -231,11 +211,7 @@ class WorkflowTemplateService
     /**
      * Execute turn decision template
      */
-    public function executeTurnDecision(
-        Character $character,
-        Career $career,
-        array $availableActions = []
-    ): array {
+    public function executeTurnDecision(): array
         return $this->executeTemplate(
             self::TEMPLATE_TURN_DECISION,
             $character,
@@ -247,13 +223,7 @@ class WorkflowTemplateService
     /**
      * Create custom workflow template
      */
-    public function createCustomTemplate(
-        string $name,
-        string $description,
-        array $agents,
-        string $pattern,
-        array $config = []
-    ): array {
+    public function createCustomTemplate(): array
         try {
             $templateId = $this->generateTemplateId($name);
 
@@ -300,8 +270,7 @@ class WorkflowTemplateService
     /**
      * Build agent configurations from agent names
      */
-    protected function buildAgentConfigs(array $agentNames): array
-    {
+    protected function buildAgentConfigs(): array
         $configs = [];
 
         foreach ($agentNames as $agentName) {
@@ -318,8 +287,7 @@ class WorkflowTemplateService
     /**
      * Post-process template results
      */
-    protected function postProcessTemplateResult(string $templateType, array $result): array
-    {
+    protected function postProcessTemplateResult(): array
         // Add template-specific formatting and insights
         $processed = $result;
 
@@ -351,8 +319,7 @@ class WorkflowTemplateService
     /**
      * Extract recommendations from results
      */
-    protected function extractRecommendations(array $result): array
-    {
+    protected function extractRecommendations(): array
         $recommendations = [];
 
         if (isset($result['results']) && is_array($result['results'])) {

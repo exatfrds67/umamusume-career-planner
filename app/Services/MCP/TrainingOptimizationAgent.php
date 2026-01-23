@@ -81,8 +81,7 @@ class TrainingOptimizationAgent
      *     team_members: array<int, mixed>
      * }
      */
-    protected function prepareAgentContext(Character $character, array $context): array
-    {
+    protected function prepareAgentContext(): array
         return [
             'character' => [
                 'id' => $character->id,
@@ -118,8 +117,7 @@ class TrainingOptimizationAgent
      * }  $context
      * @return array<string, mixed>
      */
-    protected function executeAgentWorkflow(array $context): array
-    {
+    protected function executeAgentWorkflow(): array
         $startTime = microtime(true);
         $agentsConsulted = [];
         $recommendations = [];
@@ -165,8 +163,7 @@ class TrainingOptimizationAgent
      * }  $context
      * @return array{priority_stats: array<int, string>, stat_gaps: array<string, int>, resource_efficiency: array<string, mixed>, recommended_focus: string|null}
      */
-    protected function consultResourceManagementAgent(array $context): array
-    {
+    protected function consultResourceManagementAgent(): array
         $character = $context['character'];
         $goals = $context['goals'];
 
@@ -195,8 +192,7 @@ class TrainingOptimizationAgent
      * @param  array{support_cards: array<int, array<string, mixed>>}  $context
      * @return array{available_skills: array<int, string>, skill_priority: array<int, string>, sp_allocation_strategy: string}
      */
-    protected function consultSkillBuildPlanningAgent(array $context): array
-    {
+    protected function consultSkillBuildPlanningAgent(): array
         $supportCards = $context['support_cards'];
 
         // Analyze available skill hints
@@ -220,8 +216,7 @@ class TrainingOptimizationAgent
      * @param  array{character: array{scenario_type: string}}  $context
      * @return array<string, mixed>
      */
-    protected function consultScenarioStrategyAgent(array $context): array
-    {
+    protected function consultScenarioStrategyAgent(): array
         $scenarioType = $context['character']['scenario_type'];
 
         return match ($scenarioType) {
@@ -237,8 +232,7 @@ class TrainingOptimizationAgent
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    protected function getUnityCupStrategy(array $context): array
-    {
+    protected function getUnityCupStrategy(): array
         return [
             'strategy' => 'team_coordination',
             'focus' => 'spirit_burst_optimization',
@@ -256,8 +250,7 @@ class TrainingOptimizationAgent
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    protected function getUraFinaleStrategy(array $context): array
-    {
+    protected function getUraFinaleStrategy(): array
         return [
             'strategy' => 'individual_optimization',
             'focus' => 'race_preparation',
@@ -276,8 +269,7 @@ class TrainingOptimizationAgent
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    protected function synthesizeRecommendations(array $recommendations, array $context): array
-    {
+    protected function synthesizeRecommendations(): array
         $resourceRec = $recommendations['resource_allocation'];
         $skillRec = $recommendations['skill_priorities'];
         $scenarioRec = $recommendations['scenario_strategy'];
@@ -324,7 +316,7 @@ class TrainingOptimizationAgent
 
         // Increase confidence if multiple agents agree
         $agentCount = count($workflow['agents_consulted']);
-        $confidence += ($agentCount - 1) * 0.1;
+        $confidence = ($confidence ?? 0) + ($agentCount - 1) * 0.1;
 
         // Cap at 0.95
         return min(0.95, $confidence);
@@ -335,8 +327,7 @@ class TrainingOptimizationAgent
      *
      * @return array<int, array<string, mixed>>
      */
-    protected function getSupportCardContext(Character $character): array
-    {
+    protected function getSupportCardContext(): array
         return $character->supportCards->map(function ($characterCard) {
             return [
                 'card_id' => $characterCard->support_card_id,
@@ -369,8 +360,7 @@ class TrainingOptimizationAgent
      * @param  array<string, mixed>  $context
      * @return array<string>
      */
-    protected function prioritizeSkills(array $skills, array $context): array
-    {
+    protected function prioritizeSkills(): array
         // Simple prioritization - can be enhanced with ML
         return array_slice($skills, 0, 5);
     }
@@ -392,8 +382,7 @@ class TrainingOptimizationAgent
      * @param  array<string, mixed>  $context
      * @return array<string>
      */
-    protected function generateActionPlan(array $recommendations, array $context): array
-    {
+    protected function generateActionPlan(): array
         $plan = [];
 
         $resourceRec = $recommendations['resource_allocation'];

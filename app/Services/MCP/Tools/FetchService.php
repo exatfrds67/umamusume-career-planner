@@ -66,11 +66,7 @@ class FetchService
      *     response_time: float
      * }
      */
-    public function fetch(
-        string $url,
-        string $method = 'GET',
-        array $options = []
-    ): array {
+    public function fetch(): array
         $startTime = microtime(true);
         $cacheKey = $this->generateCacheKey($url, $method, $options);
 
@@ -91,7 +87,7 @@ class FetchService
         $lastError = null;
 
         while ($attempts < $this->maxRetries) {
-            $attempts++;
+            $attempts = ($attempts ?? 0) + 1;
 
             try {
                 $response = $this->performFetch($url, $method, $options);
@@ -147,8 +143,7 @@ class FetchService
      *     cached: bool
      * }
      */
-    public function fetchUmapyoiData(string $endpoint, array $params = []): array
-    {
+    public function fetchUmapyoiData(): array
         $baseUrl = Config::get('external_apis.umapyoi.base_url', 'https://api.umapyoi.net');
         $url = "{$baseUrl}/{$endpoint}";
 
@@ -183,8 +178,7 @@ class FetchService
      *     cached: bool
      * }>
      */
-    public function batchFetch(array $requests): array
-    {
+    public function batchFetch(): array
         $results = [];
 
         foreach ($requests as $index => $request) {
@@ -204,11 +198,7 @@ class FetchService
      * @param  array<string, mixed>  $options
      * @return array<string, mixed>
      */
-    public function fetchWithCircuitBreaker(
-        string $url,
-        string $method = 'GET',
-        array $options = []
-    ): array {
+    public function fetchWithCircuitBreaker(): array
         $circuitKey = "fetch_circuit_{$url}";
         $circuitState = Cache::get($circuitKey, ['state' => 'closed', 'failures' => 0]);
 
@@ -263,10 +253,9 @@ class FetchService
      * @param  array<string, mixed>  $options
      * @return array<string, mixed>
      */
-    protected function performFetch(string $url, string $method, array $options): array
-    {
+    protected function performFetch(): array
         $headers = $options['headers'] ?? [];
-        $body = $options['body'] ?? null;
+        $body = (is_array($options) && isset($options['body']) ? $options['body'] : null);
         $timeout = $options['timeout'] ?? $this->timeout;
 
         // Build HTTP request
@@ -345,7 +334,6 @@ class FetchService
      * }
      */
     public function getStatistics(): array
-    {
         // TODO: Implement actual statistics tracking
         return [
             'total_requests' => 0,
@@ -369,7 +357,6 @@ class FetchService
      * }
      */
     public function getStatus(): array
-    {
         return [
             'enabled' => $this->enabled,
             'available' => $this->isAvailable(),

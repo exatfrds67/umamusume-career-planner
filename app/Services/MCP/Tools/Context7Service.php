@@ -59,11 +59,7 @@ class Context7Service
      *     expires_at: int
      * }
      */
-    public function storeContext(
-        string $conversationId,
-        array $context,
-        ?int $ttl = null
-    ): array {
+    public function storeContext(): array
         $ttl = $ttl ?? ($this->contextRetentionDays * 86400);
 
         try {
@@ -112,8 +108,7 @@ class Context7Service
      *     source: string
      * }
      */
-    public function retrieveContext(string $conversationId): array
-    {
+    public function retrieveContext(): array
         try {
             $contextId = $this->generateContextId($conversationId);
 
@@ -169,11 +164,7 @@ class Context7Service
      *     size: int
      * }
      */
-    public function updateContext(
-        string $conversationId,
-        array $updates,
-        bool $merge = true
-    ): array {
+    public function updateContext(): array
         try {
             $contextId = $this->generateContextId($conversationId);
 
@@ -217,10 +208,7 @@ class Context7Service
      *     context_id: string
      * }
      */
-    public function shareContextAcrossAgents(
-        string $conversationId,
-        array $agentIds
-    ): array {
+    public function shareContextAcrossAgents(): array
         try {
             $context = $this->retrieveContext($conversationId);
 
@@ -237,7 +225,7 @@ class Context7Service
             foreach ($agentIds as $agentId) {
                 $agentContextId = $this->generateContextId("{$conversationId}_agent_{$agentId}");
                 Cache::put($agentContextId, $context['context'], $this->cacheTTL);
-                $sharedCount++;
+                $sharedCount = ($sharedCount ?? 0) + 1;
             }
 
             if ($this->isAvailable()) {
@@ -279,8 +267,7 @@ class Context7Service
      *     estimated_savings: int
      * }
      */
-    public function analyzeContext(string $conversationId): array
-    {
+    public function analyzeContext(): array
         try {
             $context = $this->retrieveContext($conversationId);
 
@@ -313,14 +300,14 @@ class Context7Service
             if ($this->hasRedundantData($context['context'])) {
                 $suggestions[] = 'Detected redundant data, consider deduplication';
                 $canCompress = true;
-                $estimatedSavings += (int) ($size * 0.2);
+                $estimatedSavings = ($estimatedSavings ?? 0) + (int) ($size * 0.2);
             }
 
             // Check for old data
             if ($this->hasOldData($context['context'])) {
                 $suggestions[] = 'Context contains old data, consider archiving';
                 $canCompress = true;
-                $estimatedSavings += (int) ($size * 0.3);
+                $estimatedSavings = ($estimatedSavings ?? 0) + (int) ($size * 0.3);
             }
 
             return [
@@ -356,8 +343,7 @@ class Context7Service
      *     savings: int
      * }
      */
-    public function compressContext(string $conversationId): array
-    {
+    public function compressContext(): array
         try {
             $context = $this->retrieveContext($conversationId);
 
@@ -444,8 +430,7 @@ class Context7Service
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    protected function prepareContextData(array $context): array
-    {
+    protected function prepareContextData(): array
         return [
             'data' => $context,
             'timestamp' => time(),
@@ -488,8 +473,7 @@ class Context7Service
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    protected function performCompression(array $context): array
-    {
+    protected function performCompression(): array
         // Remove old messages (keep last 50)
         if (isset($context['messages']) && \is_array($context['messages'])) {
             $context['messages'] = \array_slice($context['messages'], -50);
@@ -526,7 +510,6 @@ class Context7Service
      * }
      */
     public function getStatus(): array
-    {
         return [
             'enabled' => $this->enabled,
             'available' => $this->isAvailable(),

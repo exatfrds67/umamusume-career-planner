@@ -60,8 +60,7 @@ class APIPerformanceAnalyticsService
      *     recommendations: array<string>
      * }
      */
-    public function getPerformanceAnalytics(int $userId, string $period = 'day'): array
-    {
+    public function getPerformanceAnalytics(): array
         $cacheKey = self::ANALYTICS_CACHE_PREFIX."{$userId}:{$period}";
 
         if (Cache::has($cacheKey)) {
@@ -121,8 +120,7 @@ class APIPerformanceAnalyticsService
      *     very_slow_requests: int
      * }
      */
-    protected function getPerformanceSummary(int $userId, array $dateRange): array
-    {
+    protected function getPerformanceSummary(): array
         // Get API response times
         $apiStats = [
             'umapyoi' => $this->cacheManagement->getApiResponseTimeStats('umapyoi'),
@@ -135,8 +133,8 @@ class APIPerformanceAnalyticsService
             ->get();
 
         $totalRequests = $apiStats['umapyoi']['count'] + $apiStats['umamusumedb']['count'] + $toolUsage->count();
-        $successfulRequests = $toolUsage->where('execution_status', 'success')->count();
-        $failedRequests = $toolUsage->where('execution_status', 'failure')->count();
+        $successfulRequests = $toolUsage->where('execution_status', '=', 'success')->count();
+        $failedRequests = $toolUsage->where('execution_status', '=', 'failure')->count();
 
         // Calculate combined metrics
         $allResponseTimes = array_merge(
@@ -188,8 +186,7 @@ class APIPerformanceAnalyticsService
      *     availability: float
      * }>
      */
-    protected function getAPIPerformanceMetrics(array $dateRange): array
-    {
+    protected function getAPIPerformanceMetrics(): array
         $apis = ['umapyoi', 'umamusumedb'];
         $metrics = [];
 
@@ -224,15 +221,14 @@ class APIPerformanceAnalyticsService
      *     slowest_tools: array<array<string, mixed>>
      * }
      */
-    protected function getMCPToolPerformanceMetrics(int $userId, array $dateRange): array
-    {
+    protected function getMCPToolPerformanceMetrics(): array
         $toolUsage = MCPToolUsage::forUser($userId)
             ->betweenDates($dateRange['start'], $dateRange['end'])
             ->get();
 
         // Performance by server
         $byServer = $toolUsage->groupBy('server_name')->map(function ($items, $serverName) {
-            $successful = $items->where('execution_status', 'success')->count();
+            $successful = $items->where('execution_status', '=', 'success')->count();
             $total = $items->count();
 
             return [
@@ -248,7 +244,7 @@ class APIPerformanceAnalyticsService
 
         // Performance by tool
         $byTool = $toolUsage->groupBy('tool_name')->map(function ($items, $toolName) {
-            $successful = $items->where('execution_status', 'success')->count();
+            $successful = $items->where('execution_status', '=', 'success')->count();
             $total = $items->count();
 
             return [
@@ -290,8 +286,7 @@ class APIPerformanceAnalyticsService
      *     request_volume_trend: array<array{timestamp: string, request_count: int}>
      * }
      */
-    protected function getPerformanceTrends(int $userId, array $dateRange): array
-    {
+    protected function getPerformanceTrends(): array
         $toolUsage = MCPToolUsage::forUser($userId)
             ->betweenDates($dateRange['start'], $dateRange['end'])
             ->get();
@@ -309,7 +304,7 @@ class APIPerformanceAnalyticsService
         $successRateTrend = $toolUsage->groupBy(function ($item) {
             return $item->executed_at->format('Y-m-d H:00:00');
         })->map(function ($items, $timestamp) {
-            $successful = $items->where('execution_status', 'success')->count();
+            $successful = $items->where('execution_status', '=', 'success')->count();
             $total = $items->count();
 
             return [
@@ -348,8 +343,7 @@ class APIPerformanceAnalyticsService
      *     threshold: float
      * }>
      */
-    protected function detectPerformanceAnomalies(int $userId, array $dateRange): array
-    {
+    protected function detectPerformanceAnomalies(): array
         $anomalies = [];
 
         // Check for response time anomalies
@@ -380,7 +374,7 @@ class APIPerformanceAnalyticsService
         $byServer = $toolUsage->groupBy('server_name');
 
         foreach ($byServer as $serverName => $items) {
-            $successful = $items->where('execution_status', 'success')->count();
+            $successful = $items->where('execution_status', '=', 'success')->count();
             $total = $items->count();
             $successRate = $total > 0 ? ($successful / $total) * 100 : 0;
 
@@ -431,8 +425,7 @@ class APIPerformanceAnalyticsService
      * @param  array{start: \Carbon\Carbon, end: \Carbon\Carbon}  $dateRange
      * @return array<string>
      */
-    protected function generatePerformanceRecommendations(int $userId, array $dateRange): array
-    {
+    protected function generatePerformanceRecommendations(): array
         $recommendations = [];
 
         // Check API response times
@@ -485,8 +478,7 @@ class APIPerformanceAnalyticsService
      *
      * @return array{start: \Carbon\Carbon, end: \Carbon\Carbon}
      */
-    protected function getDateRange(string $period): array
-    {
+    protected function getDateRange(): array
         return match ($period) {
             'hour' => ['start' => now()->subHour(), 'end' => now()],
             'day' => ['start' => now()->startOfDay(), 'end' => now()],
@@ -501,8 +493,7 @@ class APIPerformanceAnalyticsService
      *
      * @return array<float>
      */
-    protected function getApiResponseTimes(string $apiName): array
-    {
+    protected function getApiResponseTimes(): array
         $key = "api_response_time:{$apiName}";
 
         try {

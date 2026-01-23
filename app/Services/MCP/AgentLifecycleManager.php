@@ -38,11 +38,7 @@ class AgentLifecycleManager
     /**
      * Create and initialize a new agent
      */
-    public function createAgent(
-        string $type,
-        string $name,
-        array $config = []
-    ): array {
+    public function createAgent(): array
         try {
             $agentId = $this->generateAgentId($type);
 
@@ -117,8 +113,7 @@ class AgentLifecycleManager
     /**
      * Monitor agent health and performance
      */
-    public function monitorAgent(string $agentId): array
-    {
+    public function monitorAgent(): array
         $agent = $this->getAgent($agentId);
 
         if (! $agent) {
@@ -223,7 +218,6 @@ class AgentLifecycleManager
      * Get all active agents
      */
     public function getActiveAgents(): array
-    {
         return DB::table('ucp_mcp_agents')
             ->where('stage', self::STAGE_ACTIVE)
             ->get()
@@ -234,8 +228,7 @@ class AgentLifecycleManager
     /**
      * Get agent lifecycle history
      */
-    public function getAgentHistory(string $agentId): array
-    {
+    public function getAgentHistory(): array
         return Cache::get("agent_history:{$agentId}", []);
     }
 
@@ -316,8 +309,7 @@ class AgentLifecycleManager
         ], 3600);
     }
 
-    protected function collectAgentMetrics(string $agentId): array
-    {
+    protected function collectAgentMetrics(): array
         return Cache::get("agent_metrics:{$agentId}", [
             'execution_count' => 0,
             'average_execution_time' => 0,
@@ -339,8 +331,7 @@ class AgentLifecycleManager
         }
     }
 
-    protected function generateMaintenanceRecommendations(array $metrics, string $health): array
-    {
+    protected function generateMaintenanceRecommendations(): array
         $recommendations = [];
 
         if ($health === 'unhealthy') {

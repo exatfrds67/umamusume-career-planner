@@ -51,8 +51,7 @@ class AWSKnowledgeService
      *     last_updated: string
      * }
      */
-    public function getBestPractices(string $service): array
-    {
+    public function getBestPractices(): array
         $cacheKey = $this->getCacheKey('best_practices', $service);
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($service) {
@@ -90,8 +89,7 @@ class AWSKnowledgeService
      *     reliability: string
      * }
      */
-    public function getArchitectureRecommendations(array $requirements): array
-    {
+    public function getArchitectureRecommendations(): array
         $cacheKey = $this->getCacheKey('architecture', md5(json_encode($requirements)));
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($requirements) {
@@ -127,8 +125,7 @@ class AWSKnowledgeService
      *     related_documentation: array<int, string>
      * }
      */
-    public function getTroubleshootingGuidance(string $issue, string $service): array
-    {
+    public function getTroubleshootingGuidance(): array
         $cacheKey = $this->getCacheKey('troubleshooting', $service, $issue);
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($issue, $service) {
@@ -168,7 +165,6 @@ class AWSKnowledgeService
      * }
      */
     public function getBedrockBestPractices(): array
-    {
         $cacheKey = $this->getCacheKey('bedrock_best_practices');
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () {
@@ -204,8 +200,7 @@ class AWSKnowledgeService
      *     compliance_frameworks: array<int, string>
      * }
      */
-    public function getSecurityBestPractices(string $category = 'general'): array
-    {
+    public function getSecurityBestPractices(): array
         $cacheKey = $this->getCacheKey('security', $category);
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($category) {
@@ -242,8 +237,7 @@ class AWSKnowledgeService
      *     search_time: float
      * }
      */
-    public function searchDocumentation(string $query, int $limit = 10): array
-    {
+    public function searchDocumentation(): array
         $cacheKey = $this->getCacheKey('search', $query, (string) $limit);
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query, $limit) {
@@ -280,8 +274,7 @@ class AWSKnowledgeService
      *     documentation: array<int, string>
      * }
      */
-    public function getWellArchitectedRecommendations(array $workload): array
-    {
+    public function getWellArchitectedRecommendations(): array
         $cacheKey = $this->getCacheKey('well_architected', md5(json_encode($workload)));
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($workload) {
@@ -306,8 +299,7 @@ class AWSKnowledgeService
      *
      * @return array<string, mixed>
      */
-    protected function fetchBestPracticesFromMCP(string $service): array
-    {
+    protected function fetchBestPracticesFromMCP(): array
         // In production, this would make actual MCP calls
         return $this->getFallbackBestPractices($service);
     }
@@ -318,8 +310,7 @@ class AWSKnowledgeService
      * @param  array<string, mixed>  $requirements
      * @return array<string, mixed>
      */
-    protected function fetchArchitectureFromMCP(array $requirements): array
-    {
+    protected function fetchArchitectureFromMCP(): array
         // In production, this would make actual MCP calls
         return $this->getFallbackArchitecture($requirements);
     }
@@ -329,8 +320,7 @@ class AWSKnowledgeService
      *
      * @return array<string, mixed>
      */
-    protected function fetchTroubleshootingFromMCP(string $issue, string $service): array
-    {
+    protected function fetchTroubleshootingFromMCP(): array
         // In production, this would make actual MCP calls
         return $this->getFallbackTroubleshooting($issue, $service);
     }
@@ -341,7 +331,6 @@ class AWSKnowledgeService
      * @return array<string, mixed>
      */
     protected function fetchBedrockBestPracticesFromMCP(): array
-    {
         // In production, this would make actual MCP calls
         return $this->getFallbackBedrockBestPractices();
     }
@@ -351,8 +340,7 @@ class AWSKnowledgeService
      *
      * @return array<string, mixed>
      */
-    protected function fetchSecurityPracticesFromMCP(string $category): array
-    {
+    protected function fetchSecurityPracticesFromMCP(): array
         // In production, this would make actual MCP calls
         return $this->getFallbackSecurityPractices($category);
     }
@@ -362,8 +350,7 @@ class AWSKnowledgeService
      *
      * @return array<string, mixed>
      */
-    protected function fetchSearchResultsFromMCP(string $query, int $limit): array
-    {
+    protected function fetchSearchResultsFromMCP(): array
         // In production, this would make actual MCP calls
         return $this->getFallbackSearchResults($query, $limit);
     }
@@ -374,8 +361,7 @@ class AWSKnowledgeService
      * @param  array<string, mixed>  $workload
      * @return array<string, mixed>
      */
-    protected function fetchWellArchitectedFromMCP(array $workload): array
-    {
+    protected function fetchWellArchitectedFromMCP(): array
         // In production, this would make actual MCP calls
         return $this->getFallbackWellArchitected($workload);
     }
@@ -385,8 +371,7 @@ class AWSKnowledgeService
      *
      * @return array<string, mixed>
      */
-    protected function getFallbackBestPractices(string $service): array
-    {
+    protected function getFallbackBestPractices(): array
         return [
             'service' => $service,
             'best_practices' => [
@@ -425,8 +410,7 @@ class AWSKnowledgeService
      * @param  array<string, mixed>  $requirements
      * @return array<string, mixed>
      */
-    protected function getFallbackArchitecture(array $requirements): array
-    {
+    protected function getFallbackArchitecture(): array
         return [
             'architecture_type' => 'hybrid_ai_processing',
             'recommendations' => [
@@ -467,8 +451,7 @@ class AWSKnowledgeService
      *
      * @return array<string, mixed>
      */
-    protected function getFallbackTroubleshooting(string $issue, string $service): array
-    {
+    protected function getFallbackTroubleshooting(): array
         return [
             'issue' => $issue,
             'category' => 'general',
@@ -509,7 +492,6 @@ class AWSKnowledgeService
      * @return array<string, mixed>
      */
     protected function getFallbackBedrockBestPractices(): array
-    {
         return [
             'service' => 'Amazon Bedrock',
             'best_practices' => [
@@ -561,8 +543,7 @@ class AWSKnowledgeService
      *
      * @return array<string, mixed>
      */
-    protected function getFallbackSecurityPractices(string $category): array
-    {
+    protected function getFallbackSecurityPractices(): array
         return [
             'category' => $category,
             'practices' => [
@@ -601,8 +582,7 @@ class AWSKnowledgeService
      *
      * @return array<string, mixed>
      */
-    protected function getFallbackSearchResults(string $query, int $limit): array
-    {
+    protected function getFallbackSearchResults(): array
         return [
             'query' => $query,
             'results' => [],
@@ -617,8 +597,7 @@ class AWSKnowledgeService
      * @param  array<string, mixed>  $workload
      * @return array<string, mixed>
      */
-    protected function getFallbackWellArchitected(array $workload): array
-    {
+    protected function getFallbackWellArchitected(): array
         return [
             'pillars' => [
                 'operational_excellence' => [

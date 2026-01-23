@@ -62,8 +62,7 @@ class CostOptimizationService
      *     projected_costs: array<string, mixed>
      * }
      */
-    public function getCostOptimizationRecommendations(int $userId): array
-    {
+    public function getCostOptimizationRecommendations(): array
         $cacheKey = self::COST_CACHE_PREFIX."recommendations:{$userId}";
 
         if (Cache::has($cacheKey)) {
@@ -119,8 +118,7 @@ class CostOptimizationService
      *     cost_efficiency_score: float
      * }
      */
-    protected function getCostSummary(int $userId, array $costAnalytics): array
-    {
+    protected function getCostSummary(): array
         $currentMonthCost = $costAnalytics['total_cost'];
         $daysInMonth = now()->daysInMonth;
         $currentDay = now()->day;
@@ -163,8 +161,7 @@ class CostOptimizationService
      *     alert_level: string
      * }
      */
-    protected function getBudgetStatus(int $userId, float $currentSpend): array
-    {
+    protected function getBudgetStatus(): array
         // Get user's budget limit from preferences
         $budgetLimit = $this->getUserBudgetLimit($userId);
 
@@ -214,8 +211,7 @@ class CostOptimizationService
      *     by_category: array<array<string, mixed>>
      * }
      */
-    protected function getCostBreakdown(array $costAnalytics): array
-    {
+    protected function getCostBreakdown(): array
         // Cost by server with percentages
         $totalCost = $costAnalytics['total_cost'];
         $byServer = collect($costAnalytics['cost_by_server'])->map(function ($item) use ($totalCost) {
@@ -260,8 +256,7 @@ class CostOptimizationService
      *     action: string
      * }>
      */
-    protected function identifyOptimizationOpportunities(int $userId, array $costAnalytics): array
-    {
+    protected function identifyOptimizationOpportunities(): array
         $opportunities = [];
 
         // Check for expensive tools
@@ -347,8 +342,7 @@ class CostOptimizationService
      * @param  array<string, mixed>  $costAnalytics
      * @return array<string>
      */
-    protected function generateCostRecommendations(int $userId, array $costAnalytics): array
-    {
+    protected function generateCostRecommendations(): array
         $recommendations = [];
 
         $budgetStatus = $this->getBudgetStatus($userId, $costAnalytics['total_cost']);
@@ -408,8 +402,7 @@ class CostOptimizationService
      *     factors: array<string>
      * }
      */
-    protected function projectFutureCosts(int $userId, array $costAnalytics): array
-    {
+    protected function projectFutureCosts(): array
         $currentDay = now()->day;
         $daysInMonth = now()->daysInMonth;
         $currentCost = $costAnalytics['total_cost'];
@@ -563,8 +556,7 @@ class CostOptimizationService
      * @param  array<string, mixed>  $costAnalytics
      * @return array<array{category: string, cost: float, percentage: float}>
      */
-    protected function categorizeCosts(array $costAnalytics): array
-    {
+    protected function categorizeCosts(): array
         $categories = [
             'ai' => 0.0,
             'infrastructure' => 0.0,

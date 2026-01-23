@@ -53,8 +53,7 @@ class AgentLifecycleManager
      *     error?: string
      * }
      */
-    public function createAgent(array $config): array
-    {
+    public function createAgent(): array
         $startTime = microtime(true);
 
         try {
@@ -131,8 +130,7 @@ class AgentLifecycleManager
      *     recommendations: array<int, string>
      * }
      */
-    public function monitorAgent(string $agentId): array
-    {
+    public function monitorAgent(): array
         try {
             Log::info('[AgentLifecycle] Monitoring agent', ['agent_id' => $agentId]);
 
@@ -195,8 +193,7 @@ class AgentLifecycleManager
      *     error?: string
      * }
      */
-    public function terminateAgent(string $agentId): array
-    {
+    public function terminateAgent(): array
         $startTime = microtime(true);
         $resourcesCleaned = [
             'agentcore' => false,
@@ -281,8 +278,7 @@ class AgentLifecycleManager
      *     error?: string
      * }
      */
-    public function restartAgent(string $agentId): array
-    {
+    public function restartAgent(): array
         $startTime = microtime(true);
 
         try {
@@ -358,7 +354,6 @@ class AgentLifecycleManager
      * }>
      */
     public function listActiveAgents(): array
-    {
         try {
             $agents = MCPAgent::where('status', 'active')->get();
 
@@ -391,8 +386,7 @@ class AgentLifecycleManager
      *     last_activity: string
      * }
      */
-    protected function checkAgentHealth(string $agentId): array
-    {
+    protected function checkAgentHealth(): array
         $status = $this->agentCore->getAgentStatus($agentId);
 
         return [
@@ -410,8 +404,7 @@ class AgentLifecycleManager
      * @param  array<string, mixed>  $performanceMetrics
      * @return array<int, string>
      */
-    protected function identifyIssues(array $healthStatus, array $performanceMetrics): array
-    {
+    protected function identifyIssues(): array
         $issues = [];
 
         // Check health status
@@ -444,8 +437,7 @@ class AgentLifecycleManager
      * @param  array<string, mixed>  $performanceMetrics
      * @return array<int, string>
      */
-    protected function generateRecommendations(array $issues, array $performanceMetrics): array
-    {
+    protected function generateRecommendations(): array
         $recommendations = [];
 
         foreach ($issues as $issue) {
@@ -484,7 +476,6 @@ class AgentLifecycleManager
      * }
      */
     public function getStatistics(): array
-    {
         try {
             $totalAgents = MCPAgent::count();
             $activeAgents = MCPAgent::where('status', 'active')->count();

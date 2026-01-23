@@ -76,6 +76,12 @@ class CostManagementService
         // Calculate cost
         $cost = $this->calculateCost($provider, $model, $inputTokens, $outputTokens);
 
+        // Calculate input and output costs separately
+        $costKey = $this->mapModelToCostKey($provider, $model);
+        $costs = self::COSTS[$costKey] ?? self::COSTS['bedrock_sonnet'];
+        $inputCost = ($inputTokens / 1000) * $costs['input'];
+        $outputCost = ($outputTokens / 1000) * $costs['output'];
+
         // Store cost record
         try {
             DB::table('ucp_ai_costs')->insert([
@@ -84,14 +90,14 @@ class CostManagementService
                 'input_tokens' => $inputTokens,
                 'output_tokens' => $outputTokens,
                 'total_tokens' => $inputTokens + $outputTokens,
-                'input_cost' => 0.0, // TODO: Calculate separately
-                'output_cost' => 0.0, // TODO: Calculate separately
+                'input_cost' => round($inputCost, 6),
+                'output_cost' => round($outputCost, 6),
                 'total_cost' => $cost,
                 'response_time' => $executionTime,
                 'request_type' => $operation['type'] ?? 'unknown',
-                'user_id' => $operation['user_id'] ?? null,
-                'character_id' => $operation['character_id'] ?? null,
-                'request_summary' => $operation['summary'] ?? null,
+                'user_id' => (is_array($operation) && isset($operation['user_id']) ? $operation['user_id'] : null),
+                'character_id' => (is_array($operation) && isset($operation['character_id']) ? $operation['character_id'] : null),
+                'request_summary' => (is_array($operation) && isset($operation['summary']) ? $operation['summary'] : null),
                 'cached' => $operation['cached'] ?? false,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -195,7 +201,6 @@ class CostManagementService
      * }
      */
     public function checkBudgetStatus(): array
-    {
         $budgetLimit = $this->getBudgetLimit();
         $currentSpending = $this->getCurrentSpending();
         $remainingBudget = max(0, $budgetLimit - $currentSpending);
@@ -281,8 +286,7 @@ class CostManagementService
      *     avg_cost_per_request: float
      * }>
      */
-    public function getCostBreakdownByProvider(int $days = 30): array
-    {
+    public function getCostBreakdownByProvider(): array
         $since = now()->subDays($days);
 
         $breakdown = DB::table('ucp_ai_costs')
@@ -296,10 +300,10 @@ class CostManagementService
             ->get()
             ->mapWithKeys(fn ($row) => [
                 $row->provider => [
-                    'total_cost' => round((float) $row->total_cost, 4),
-                    'total_tokens' => (int) $row->total_tokens,
-                    'request_count' => (int) $row->request_count,
-                    'avg_cost_per_request' => round((float) $row->avg_cost_per_request, 6),
+                    'total_cost' => round((is_numeric($$$row->total_cost) ? (float) $$$row->total_cost : 0.0), 4),
+                    'total_tokens' => (is_numeric($$$row->total_tokens) ? (int) $$$row->total_tokens : 0),
+                    'request_count' => (is_numeric($$$row->request_count) ? (int) $$$row->request_count : 0),
+                    'avg_cost_per_request' => round((is_numeric($$$row->avg_cost_per_request) ? (float) $$$row->avg_cost_per_request : 0.0), 6),
                 ],
             ])
             ->toArray();
@@ -317,8 +321,7 @@ class CostManagementService
      *     avg_cost_per_request: float
      * }>
      */
-    public function getCostBreakdownByModel(int $days = 30): array
-    {
+    public function getCostBreakdownByModel(): array
         $since = now()->subDays($days);
 
         $breakdown = DB::table('ucp_ai_costs')
@@ -332,10 +335,10 @@ class CostManagementService
             ->get()
             ->mapWithKeys(fn ($row) => [
                 $row->model => [
-                    'total_cost' => round((float) $row->total_cost, 4),
-                    'total_tokens' => (int) $row->total_tokens,
-                    'request_count' => (int) $row->request_count,
-                    'avg_cost_per_request' => round((float) $row->avg_cost_per_request, 6),
+                    'total_cost' => round((is_numeric($$$row->total_cost) ? (float) $$$row->total_cost : 0.0), 4),
+                    'total_tokens' => (is_numeric($$$row->total_tokens) ? (int) $$$row->total_tokens : 0),
+                    'request_count' => (is_numeric($$$row->request_count) ? (int) $$$row->request_count : 0),
+                    'avg_cost_per_request' => round((is_numeric($$$row->avg_cost_per_request) ? (float) $$$row->avg_cost_per_request : 0.0), 6),
                 ],
             ])
             ->toArray();
@@ -348,8 +351,7 @@ class CostManagementService
      *
      * @return array<string, float>
      */
-    public function getDailyCostTrend(int $days = 30): array
-    {
+    public function getDailyCostTrend(): array
         $since = now()->subDays($days);
 
         $trend = DB::table('ucp_ai_costs')
@@ -360,7 +362,7 @@ class CostManagementService
             ->orderBy('date')
             ->get()
             ->mapWithKeys(fn ($row) => [
-                $row->date => round((float) $row->daily_cost, 4),
+                $row->date => round((is_numeric($$$row->daily_cost) ? (float) $$$row->daily_cost : 0.0), 4),
             ])
             ->toArray();
 
@@ -379,7 +381,6 @@ class CostManagementService
      * }>
      */
     public function getOptimizationRecommendations(): array
-    {
         $recommendations = [];
         $breakdown = $this->getCostBreakdownByProvider(30);
 
@@ -403,7 +404,7 @@ class CostManagementService
 
         foreach ($modelBreakdown as $model => $data) {
             if (str_contains($model, 'opus')) {
-                $opusCost += $data['total_cost'];
+                $opusCost = ($opusCost ?? 0) + (is_array($data) && isset($data['total_cost']) ? $data['total_cost'] : null);
             }
         }
 
@@ -449,8 +450,7 @@ class CostManagementService
      *     recommendations: array<int, mixed>
      * }
      */
-    public function getUsageAnalytics(int $days = 30): array
-    {
+    public function getUsageAnalytics(): array
         $since = now()->subDays($days);
 
         $totals = DB::table('ucp_ai_costs')
@@ -482,7 +482,7 @@ class CostManagementService
     public function setBudgetLimit(float $limit): void
     {
         // Store in configuration or database
-        config(['ai.budget.monthly_limit' => $limit]);
+        config(['ai.budget.monthly_limit' => $limit], '');
 
         Log::info('[CostManagement] Budget limit updated', [
             'new_limit' => $limit,

@@ -38,8 +38,7 @@ class AgentContextService
     /**
      * Build comprehensive character context for MCP agents
      */
-    public function buildCharacterContext(Character $character): array
-    {
+    public function buildCharacterContext(): array
         try {
             $cacheKey = "agent_context:character:{$character->id}";
 
@@ -160,8 +159,7 @@ class AgentContextService
     /**
      * Build career context for MCP agents
      */
-    public function buildCareerContext(?Career $career = null): array
-    {
+    public function buildCareerContext(): array
         if (! $career) {
             return [
                 'active' => false,
@@ -254,14 +252,13 @@ class AgentContextService
     /**
      * Build user context for MCP agents
      */
-    public function buildUserContext(User $user): array
-    {
+    public function buildUserContext(): array
         try {
-            $cacheKey = "agent_context:user:{$user->id}";
+            $cacheKey = "agent_context:user:{$user?->id ?? throw new \Exception('User required')}";
 
             return Cache::remember($cacheKey, 600, function () use ($user) {
                 return [
-                    'id' => $user->id,
+                    'id' => $user?->id ?? throw new \Exception('User required'),
                     'name' => $user->name,
                     'preferences' => $this->getUserPreferences($user),
                     'ai_settings' => $this->getUserAISettings($user),
@@ -271,7 +268,7 @@ class AgentContextService
             });
         } catch (\Exception $e) {
             Log::error('[AgentContext] Failed to build user context', [
-                'user_id' => $user->id,
+                'user_id' => $user?->id ?? throw new \Exception('User required'),
                 'error' => $e->getMessage(),
             ]);
 
@@ -282,8 +279,7 @@ class AgentContextService
     /**
      * Build session context for MCP agents
      */
-    public function buildSessionContext(string $sessionId, array $additionalData = []): array
-    {
+    public function buildSessionContext(): array
         try {
             $cacheKey = "agent_context:session:{$sessionId}";
 
@@ -315,13 +311,7 @@ class AgentContextService
     /**
      * Build unified context for multi-agent workflows
      */
-    public function buildUnifiedContext(
-        Character $character,
-        ?Career $career = null,
-        ?User $user = null,
-        ?string $sessionId = null,
-        array $additionalContext = []
-    ): array {
+    public function buildUnifiedContext(): array
         try {
             $context = [
                 'character' => $this->buildCharacterContext($character),
@@ -395,8 +385,7 @@ class AgentContextService
     /**
      * Get user preferences
      */
-    protected function getUserPreferences(User $user): array
-    {
+    protected function getUserPreferences(): array
         return [
             'ai_provider_preference' => 'ollama', // Default to local
             'agent_verbosity' => 'normal',
@@ -408,8 +397,7 @@ class AgentContextService
     /**
      * Get user AI settings
      */
-    protected function getUserAISettings(User $user): array
-    {
+    protected function getUserAISettings(): array
         return [
             'enable_ollama' => true,
             'enable_bedrock' => false,
@@ -425,12 +413,11 @@ class AgentContextService
     /**
      * Get user statistics
      */
-    protected function getUserStatistics(User $user): array
-    {
+    protected function getUserStatistics(): array
         return [
             'total_characters' => $user->characters()->count(),
             'total_careers' => Career::whereHas('character', function ($query) use ($user) {
-                $query->where('user_id', $user->id);
+                $query->where('user_id', $user?->id ?? throw new \Exception('User required'));
             })->count(),
             'total_ai_conversations' => $user->aiConversations()->count(),
             'member_since' => $user->created_at->toIso8601String(),

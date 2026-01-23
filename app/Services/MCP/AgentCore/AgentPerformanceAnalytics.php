@@ -115,8 +115,7 @@ class AgentPerformanceAnalytics
      *     last_updated: string
      * }
      */
-    public function getAgentMetrics(string $agentId): array
-    {
+    public function getAgentMetrics(): array
         /** @var array<string, mixed>|null $metrics */
         $metrics = Cache::get("agent_metrics_{$agentId}");
 
@@ -144,8 +143,7 @@ class AgentPerformanceAnalytics
      *     analysis: array<string, mixed>
      * }
      */
-    public function getPerformanceTrends(string $agentId, int $days = 7): array
-    {
+    public function getPerformanceTrends(): array
         $invocations = $this->getInvocationHistory($agentId, $days);
 
         $trends = [
@@ -205,8 +203,7 @@ class AgentPerformanceAnalytics
      *     overall_score: float
      * }
      */
-    public function getOptimizationRecommendations(string $agentId): array
-    {
+    public function getOptimizationRecommendations(): array
         $metrics = $this->getAgentMetrics($agentId);
         $trends = $this->getPerformanceTrends($agentId, 7);
 
@@ -304,8 +301,7 @@ class AgentPerformanceAnalytics
      *     insights: array<int, string>
      * }
      */
-    public function compareAgents(array $agentIds): array
-    {
+    public function compareAgents(): array
         $comparison = [];
         $scores = [];
 
@@ -378,7 +374,7 @@ class AgentPerformanceAnalytics
             'tokens_used' => $invocationData['tokens_used'] ?? 0,
             'cost' => $invocationData['cost'] ?? 0.0,
             'success' => $invocationData['success'],
-            'error' => $invocationData['error'] ?? null,
+            'error' => (is_array($invocationData) && isset($invocationData['error']) ? $invocationData['error'] : null),
             'timestamp' => now()->toIso8601String(),
         ];
 
@@ -404,8 +400,7 @@ class AgentPerformanceAnalytics
      *
      * @return array<int, array<string, mixed>>
      */
-    protected function getInvocationHistory(string $agentId, int $days): array
-    {
+    protected function getInvocationHistory(): array
         /** @var array<int, array<string, mixed>>|null $records */
         $records = Cache::get("agent_invocations_{$agentId}", []);
         if (! is_array($records)) {
@@ -424,8 +419,7 @@ class AgentPerformanceAnalytics
      * @param  array<string, array<string, mixed>>  $trends
      * @return array<string, mixed>
      */
-    protected function analyzeTrends(array $trends): array
-    {
+    protected function analyzeTrends(): array
         $analysis = [];
 
         // Analyze success rate trend
@@ -479,15 +473,14 @@ class AgentPerformanceAnalytics
      * @param  array<string, array<string, mixed>>  $comparison
      * @return array<int, string>
      */
-    protected function generateComparisonInsights(array $comparison): array
-    {
+    protected function generateComparisonInsights(): array
         $insights = [];
 
         // Find agent with best success rate
         $bestSuccessRate = 0.0;
         $bestSuccessAgent = '';
         foreach ($comparison as $agentId => $data) {
-            $successRate = $data['metrics']['success_rate'] ?? 0.0;
+            $successRate = (is_array($data) && isset($data['metrics']) ? $data['metrics'] : null)['success_rate'] ?? 0.0;
             if ($successRate > $bestSuccessRate) {
                 $bestSuccessRate = $successRate;
                 $bestSuccessAgent = $agentId;
@@ -502,7 +495,7 @@ class AgentPerformanceAnalytics
         $lowestCost = PHP_FLOAT_MAX;
         $cheapestAgent = '';
         foreach ($comparison as $agentId => $data) {
-            $cost = $data['metrics']['cost_per_invocation'] ?? PHP_FLOAT_MAX;
+            $cost = (is_array($data) && isset($data['metrics']) ? $data['metrics'] : null)['cost_per_invocation'] ?? PHP_FLOAT_MAX;
             if ($cost < $lowestCost) {
                 $lowestCost = $cost;
                 $cheapestAgent = $agentId;
@@ -521,8 +514,7 @@ class AgentPerformanceAnalytics
      *
      * @return array<string, mixed>
      */
-    protected function getDefaultMetrics(string $agentId): array
-    {
+    protected function getDefaultMetrics(): array
         return [
             'agent_id' => $agentId,
             'total_invocations' => 0,

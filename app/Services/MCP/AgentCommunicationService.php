@@ -38,13 +38,7 @@ class AgentCommunicationService
     /**
      * Send a message from one agent to another
      */
-    public function sendMessage(
-        string $fromAgentId,
-        string $toAgentId,
-        string $type,
-        array $payload,
-        int $priority = self::PRIORITY_NORMAL
-    ): array {
+    public function sendMessage(): array
         try {
             $messageId = $this->generateMessageId();
 
@@ -84,11 +78,7 @@ class AgentCommunicationService
     /**
      * Broadcast a message to multiple agents
      */
-    public function broadcastMessage(
-        string $fromAgentId,
-        array $toAgentIds,
-        array $payload
-    ): array {
+    public function broadcastMessage(): array
         $messages = [];
 
         foreach ($toAgentIds as $toAgentId) {
@@ -112,8 +102,7 @@ class AgentCommunicationService
     /**
      * Receive messages for an agent
      */
-    public function receiveMessages(string $agentId, int $limit = 10): array
-    {
+    public function receiveMessages(): array
         $inbox = $this->getInbox($agentId);
 
         // Sort by priority (high to low) and timestamp
@@ -207,14 +196,13 @@ class AgentCommunicationService
         $sharedDataKey = "shared_data:{$fromAgentId}:{$toAgentId}:{$dataKey}";
         $data = Cache::get($sharedDataKey);
 
-        return $data['value'] ?? null;
+        return is_array($data) && isset((is_array($data) && isset($data['value']) ? $data['value'] : null)) ? (is_array($data) && isset($data['value']) ? $data['value'] : null) : null;
     }
 
     /**
      * Create a shared context for collaborative agents
      */
-    public function createSharedContext(string $contextId, array $initialData = []): array
-    {
+    public function createSharedContext(): array
         $context = [
             'id' => $contextId,
             'data' => $initialData,
@@ -326,8 +314,7 @@ class AgentCommunicationService
         return 'msg_'.uniqid().'_'.bin2hex(random_bytes(4));
     }
 
-    protected function getInbox(string $agentId): array
-    {
+    protected function getInbox(): array
         return Cache::get("agent_inbox:{$agentId}", []);
     }
 

@@ -63,8 +63,7 @@ class PerformanceAnalyticsAgent
      *     optimization_score: float
      * }
      */
-    public function analyzePerformance(Character $character, array $context = []): array
-    {
+    public function analyzePerformance(): array
         // Analyze energy state
         $energyAnalysis = $this->analyzeEnergyState($character);
 
@@ -113,8 +112,7 @@ class PerformanceAnalyticsAgent
      *
      * @return array<string, mixed>
      */
-    protected function analyzeEnergyState(Character $character): array
-    {
+    protected function analyzeEnergyState(): array
         $energyLevel = $character->energy_level ?? 100;
 
         // Determine energy status
@@ -162,8 +160,7 @@ class PerformanceAnalyticsAgent
      *
      * @return array{trainings_available: int, max_intensity: string}
      */
-    protected function calculateTrainingCapacity(int $energyLevel): array
-    {
+    protected function calculateTrainingCapacity(): array
         // Each training costs ~20 energy
         $trainingsAvailable = (int) floor($energyLevel / 20);
 
@@ -200,8 +197,7 @@ class PerformanceAnalyticsAgent
      *
      * @return array{action: string, turns_needed: int, priority: string}
      */
-    protected function determineRecoveryStrategy(int $energyLevel): array
-    {
+    protected function determineRecoveryStrategy(): array
         return match (true) {
             $energyLevel < 20 => [
                 'action' => 'immediate_rest',
@@ -232,7 +228,6 @@ class PerformanceAnalyticsAgent
      * @return array{min: int, max: int}
      */
     protected function getOptimalEnergyRange(): array
-    {
         return ['min' => 60, 'max' => 100];
     }
 
@@ -241,8 +236,7 @@ class PerformanceAnalyticsAgent
      *
      * @return array<string, mixed>
      */
-    protected function analyzeMoodState(Character $character): array
-    {
+    protected function analyzeMoodState(): array
         $moodStatus = $character->mood_status ?? 'normal';
 
         // Get mood effects
@@ -273,8 +267,7 @@ class PerformanceAnalyticsAgent
      * @param  array{multiplier: float, energy_cost_modifier: float, failure_risk_modifier: float}  $effects
      * @return array<string, mixed>
      */
-    protected function calculateMoodTrainingImpact(array $effects): array
-    {
+    protected function calculateMoodTrainingImpact(): array
         $multiplier = $effects['multiplier'];
         $impactPercent = ($multiplier - 1.0) * 100;
 
@@ -306,8 +299,7 @@ class PerformanceAnalyticsAgent
      *
      * @return array{action: string, priority: string, methods: array<string>}
      */
-    protected function determineMoodImprovementStrategy(string $moodStatus): array
-    {
+    protected function determineMoodImprovementStrategy(): array
         return match ($moodStatus) {
             'awful' => [
                 'action' => 'urgent_improvement',
@@ -358,8 +350,7 @@ class PerformanceAnalyticsAgent
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    protected function analyzeConditions(Character $character, array $context = []): array
-    {
+    protected function analyzeConditions(): array
         $activeConditions = $context['active_conditions'] ?? [];
 
         $positiveConditions = [];
@@ -384,7 +375,7 @@ class PerformanceAnalyticsAgent
                     ];
                 }
 
-                $totalImpact += $conditionData['impact'];
+                $totalImpact = ($totalImpact ?? 0) + $conditionData['impact'];
             }
         }
 
@@ -419,12 +410,7 @@ class PerformanceAnalyticsAgent
      * @param  array<string, mixed>  $conditionAnalysis
      * @return array<string, mixed>
      */
-    protected function calculatePerformanceMetrics(
-        Character $character,
-        array $energyAnalysis,
-        array $moodAnalysis,
-        array $conditionAnalysis
-    ): array {
+    protected function calculatePerformanceMetrics(): array
         // Calculate overall training effectiveness
         $baseEffectiveness = 1.0;
         $moodMultiplier = $moodAnalysis['effects']['multiplier'];
@@ -474,11 +460,7 @@ class PerformanceAnalyticsAgent
      * @param  array<string, mixed>  $conditionAnalysis
      * @return array<string, mixed>
      */
-    protected function calculateRiskFactors(
-        array $energyAnalysis,
-        array $moodAnalysis,
-        array $conditionAnalysis
-    ): array {
+    protected function calculateRiskFactors(): array
         $risks = [];
 
         // Energy risk
@@ -536,11 +518,7 @@ class PerformanceAnalyticsAgent
      * @param  array<string, mixed>  $conditionAnalysis
      * @return array<string, mixed>
      */
-    protected function calculateOptimizationPotential(
-        array $energyAnalysis,
-        array $moodAnalysis,
-        array $conditionAnalysis
-    ): array {
+    protected function calculateOptimizationPotential(): array
         $improvements = [];
 
         // Energy optimization
@@ -614,13 +592,7 @@ class PerformanceAnalyticsAgent
      * @param  array<string, mixed>  $performanceMetrics
      * @return array<string, string>
      */
-    protected function generatePerformanceRecommendations(
-        Character $character,
-        array $energyAnalysis,
-        array $moodAnalysis,
-        array $conditionAnalysis,
-        array $performanceMetrics
-    ): array {
+    protected function generatePerformanceRecommendations(): array
         $recommendations = [];
 
         // Energy recommendations
@@ -681,17 +653,17 @@ class PerformanceAnalyticsAgent
 
         // Energy component (40%)
         $energyScore = $energyAnalysis['current_energy'] / 100;
-        $score += $energyScore * 0.4;
+        $score = ($score ?? 0) + $energyScore * 0.4;
 
         // Mood component (30%)
         $moodMultiplier = $moodAnalysis['effects']['multiplier'];
         $moodScore = ($moodMultiplier - 0.8) / 0.4; // Normalize 0.8-1.2 to 0-1
-        $score += $moodScore * 0.3;
+        $score = ($score ?? 0) + $moodScore * 0.3;
 
         // Performance component (30%)
         $effectiveness = $performanceMetrics['overall_effectiveness'];
         $performanceScore = min(1.0, $effectiveness / 1.2); // Normalize with 1.2 as max
-        $score += $performanceScore * 0.3;
+        $score = ($score ?? 0) + $performanceScore * 0.3;
 
         return round(min(1.0, $score), 2);
     }

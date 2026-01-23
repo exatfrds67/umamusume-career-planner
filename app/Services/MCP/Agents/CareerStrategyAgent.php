@@ -59,8 +59,7 @@ class CareerStrategyAgent
      *     confidence: float
      * }
      */
-    public function analyzeCareerStrategy(Character $character, array $context = []): array
-    {
+    public function analyzeCareerStrategy(): array
         // Determine primary strategy based on scenario and goals
         $strategy = $this->determineStrategy($character);
 
@@ -135,8 +134,7 @@ class CareerStrategyAgent
      *
      * @return array<string, array{current: int, target: int, gap: int, priority: int, weight: float}>
      */
-    protected function calculatePriorityStats(Character $character): array
-    {
+    protected function calculatePriorityStats(): array
         $currentStats = $character->current_stats ?? [];
         $goals = $character->goals ?? [];
         $targetStats = $goals['target_stats'] ?? [];
@@ -158,15 +156,15 @@ class CareerStrategyAgent
                 'weight' => 0.0, // Will be calculated after total gap is known
             ];
 
-            $totalGap += $gap * $basePriority;
+            $totalGap = ($totalGap ?? 0) + $gap * $basePriority;
         }
 
         // Calculate weights based on gap and priority
         foreach ($priorityStats as $stat => &$data) {
             if ($totalGap > 0) {
-                $data['weight'] = ($data['gap'] * $data['priority']) / $totalGap;
+                (is_array($data) && isset($data['weight']) ? $data['weight'] : null) = ((is_array($data) && isset($data['gap']) ? $data['gap'] : null) * (is_array($data) && isset($data['priority']) ? $data['priority'] : null)) / $totalGap;
             } else {
-                $data['weight'] = 1.0 / count($priorityStats);
+                (is_array($data) && isset($data['weight']) ? $data['weight'] : null) = 1.0 / count($priorityStats);
             }
         }
 
@@ -209,8 +207,7 @@ class CareerStrategyAgent
      * @param  array<string, array{current: int, target: int, gap: int, priority: int, weight: float}>  $priorityStats
      * @return array<string, mixed>
      */
-    protected function determineTrainingFocus(Character $character, array $priorityStats): array
-    {
+    protected function determineTrainingFocus(): array
         // Get top 3 priority stats
         $topStats = array_slice(array_keys($priorityStats), 0, 3);
 
@@ -254,12 +251,11 @@ class CareerStrategyAgent
      * @param  array<string, array{current: int, target: int, gap: int, priority: int, weight: float}>  $priorityStats
      * @return array<string, float>
      */
-    protected function calculateTrainingDistribution(array $priorityStats): array
-    {
+    protected function calculateTrainingDistribution(): array
         $distribution = [];
 
         foreach ($priorityStats as $stat => $data) {
-            $distribution[$stat] = round($data['weight'] * 100, 1);
+            $distribution[$stat] = round((is_array($data) && isset($data['weight']) ? $data['weight'] : null) * 100, 1);
         }
 
         return $distribution;
@@ -271,14 +267,13 @@ class CareerStrategyAgent
      * @param  array<string, array{current: int, target: int, gap: int, priority: int, weight: float}>  $priorityStats
      * @return array<string, mixed>
      */
-    protected function trackMilestones(Character $character, array $priorityStats): array
-    {
+    protected function trackMilestones(): array
         $milestones = [];
 
         // Check stat breakpoints (901 and 1200)
         foreach ($priorityStats as $stat => $data) {
-            $current = $data['current'];
-            $target = $data['target'];
+            $current = (is_array($data) && isset($data['current']) ? $data['current'] : null);
+            $target = (is_array($data) && isset($data['target']) ? $data['target'] : null);
 
             $milestones[$stat] = [
                 'current' => $current,
@@ -300,7 +295,7 @@ class CareerStrategyAgent
         // Calculate overall progress
         $totalProgress = 0;
         foreach ($milestones as $milestone) {
-            $totalProgress += $milestone['progress_percent'];
+            $totalProgress = ($totalProgress ?? 0) + $milestone['progress_percent'];
         }
         $overallProgress = count($milestones) > 0 ? $totalProgress / count($milestones) : 0;
 
@@ -333,12 +328,7 @@ class CareerStrategyAgent
      * @param  array<string, mixed>  $trainingFocus
      * @return array<string, string>
      */
-    protected function generateRecommendations(
-        Character $character,
-        string $strategy,
-        array $priorityStats,
-        array $trainingFocus
-    ): array {
+    protected function generateRecommendations(): array
         $recommendations = [];
 
         // Strategy-specific recommendations

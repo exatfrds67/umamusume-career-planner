@@ -50,8 +50,7 @@ class SPBudgetManagementAgent
      *     confidence: float
      * }
      */
-    public function analyzeSPBudget(Character $character, Collection $targetSkills, array $context = []): array
-    {
+    public function analyzeSPBudget(): array
         // Calculate current budget status
         $budgetStatus = $this->calculateBudgetStatus($character, $targetSkills);
 
@@ -90,8 +89,7 @@ class SPBudgetManagementAgent
      *
      * @return array<string, mixed>
      */
-    protected function calculateBudgetStatus(Character $character, Collection $targetSkills): array
-    {
+    protected function calculateBudgetStatus(): array
         // Get current SP from character
         $currentSP = $character->current_sp ?? 0;
 
@@ -104,7 +102,7 @@ class SPBudgetManagementAgent
             $hints = $this->hintService->getHintsForSkill($character, $skill);
             $hintCount = $hints->count();
             $discount = min(0.40, $hintCount * 0.20);
-            $potentialSavings += $skill->base_sp_cost * $discount;
+            $potentialSavings = ($potentialSavings ?? 0) + $skill->base_sp_cost * $discount;
         }
 
         // Calculate estimated final cost
@@ -139,11 +137,7 @@ class SPBudgetManagementAgent
      * @param  array<string, mixed>  $budgetStatus
      * @return array<string, mixed>
      */
-    protected function createAllocationPlan(
-        Character $character,
-        Collection $targetSkills,
-        array $budgetStatus
-    ): array {
+    protected function createAllocationPlan(): array
         $currentSP = $budgetStatus['current_sp'];
         $allocations = [];
         $remainingSP = $currentSP;
@@ -157,12 +151,12 @@ class SPBudgetManagementAgent
             $priorityScore = 0;
 
             if ($hintCount >= 2) {
-                $priorityScore += 1000; // Max discount reached
+                $priorityScore = ($priorityScore ?? 0) + 1000; // Max discount reached
             } elseif ($hintCount === 1) {
-                $priorityScore += 500; // One hint away from max
+                $priorityScore = ($priorityScore ?? 0) + 500; // One hint away from max
             }
 
-            $priorityScore += $skill->base_sp_cost;
+            $priorityScore = ($priorityScore ?? 0) + $skill->base_sp_cost;
 
             return $priorityScore;
         });
@@ -233,8 +227,7 @@ class SPBudgetManagementAgent
      *
      * @return array<string, mixed>
      */
-    protected function analyzeHintOptimization(Character $character, Collection $targetSkills): array
-    {
+    protected function analyzeHintOptimization(): array
         $hintStats = $this->hintService->getHintStatistics($character);
 
         $optimizationOpportunities = [];
@@ -285,16 +278,16 @@ class SPBudgetManagementAgent
         // Score based on skills with max discount
         $maxDiscountSkills = $hintStats['skills_with_max_discount'];
         if ($totalSkills > 0) {
-            $score += (int) (($maxDiscountSkills / $totalSkills) * 40);
+            $score = ($score ?? 0) + (int) (($maxDiscountSkills / $totalSkills) * 40);
         }
 
         // Score based on total SP saved
         $totalSpSaved = $hintStats['total_sp_saved'];
-        $score += min(30, (int) ($totalSpSaved / 10));
+        $score = ($score ?? 0) + min(30, (int) ($totalSpSaved / 10));
 
         // Score based on hint collection rate
         $totalHints = $hintStats['total_hints'];
-        $score += min(30, (int) ($totalHints / 2));
+        $score = ($score ?? 0) + min(30, (int) ($totalHints / 2));
 
         return min(100, $score);
     }
@@ -305,11 +298,7 @@ class SPBudgetManagementAgent
      * @param  array<string, mixed>  $hintOptimization
      * @return array<string, mixed>
      */
-    protected function trackCosts(
-        Character $character,
-        Collection $targetSkills,
-        array $hintOptimization
-    ): array {
+    protected function trackCosts(): array
         $totalBaseCost = $targetSkills->sum('base_sp_cost');
         $totalFinalCost = 0;
         $totalSavings = 0;
@@ -319,8 +308,8 @@ class SPBudgetManagementAgent
             $hintCount = $hints->count();
             $finalCost = $this->hintService->calculateFinalCost($skill, $hintCount);
 
-            $totalFinalCost += $finalCost;
-            $totalSavings += $skill->base_sp_cost - $finalCost;
+            $totalFinalCost = ($totalFinalCost ?? 0) + $finalCost;
+            $totalSavings = ($totalSavings ?? 0) + $skill->base_sp_cost - $finalCost;
         }
 
         $savingsPercentage = $totalBaseCost > 0 ? ($totalSavings / $totalBaseCost) * 100 : 0;
@@ -328,7 +317,7 @@ class SPBudgetManagementAgent
         // Calculate potential additional savings
         $potentialAdditionalSavings = 0;
         foreach ($hintOptimization['one_hint_away_skills'] as $skill) {
-            $potentialAdditionalSavings += $skill['potential_savings'];
+            $potentialAdditionalSavings = ($potentialAdditionalSavings ?? 0) + $skill['potential_savings'];
         }
 
         return [
@@ -349,8 +338,7 @@ class SPBudgetManagementAgent
     /**
      * Get cost breakdown by skill category
      */
-    protected function getCostByCategory(Collection $skills, string $category): array
-    {
+    protected function getCostByCategory(): array
         $categorySkills = $skills->filter(function ($skill) use ($category) {
             $cost = $skill->base_sp_cost;
             $range = $this->spCostCategories[$category] ?? null;
@@ -390,12 +378,7 @@ class SPBudgetManagementAgent
      * @param  array<string, mixed>  $hintOptimization
      * @return array<string, string>
      */
-    protected function generateRecommendations(
-        Character $character,
-        array $budgetStatus,
-        array $allocationPlan,
-        array $hintOptimization
-    ): array {
+    protected function generateRecommendations(): array
         $recommendations = [];
 
         // Budget status recommendations
@@ -476,8 +459,7 @@ class SPBudgetManagementAgent
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    public function calculateSPProjections(Character $character, array $context = []): array
-    {
+    public function calculateSPProjections(): array
         // Get current SP
         $currentSP = $character->current_sp ?? 0;
 

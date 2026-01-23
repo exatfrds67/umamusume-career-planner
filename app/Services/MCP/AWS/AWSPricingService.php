@@ -47,8 +47,7 @@ class AWSPricingService
      *     effective_date: string
      * }
      */
-    public function getServicePricing(string $service, string $region = 'us-east-1', array $filters = []): array
-    {
+    public function getServicePricing(): array
         $cacheKey = $this->getCacheKey('pricing', $service, $region, $filters);
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($service, $region, $filters) {
@@ -83,8 +82,7 @@ class AWSPricingService
      *     region: string
      * }>
      */
-    public function getBedrockPricing(string $region = 'us-east-1'): array
-    {
+    public function getBedrockPricing(): array
         $cacheKey = $this->getCacheKey('bedrock_pricing', $region);
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($region) {
@@ -116,8 +114,7 @@ class AWSPricingService
      *     currency: string
      * }
      */
-    public function calculateMonthlyCost(array $usage): array
-    {
+    public function calculateMonthlyCost(): array
         $bedrockPricing = $this->getBedrockPricing();
         $breakdown = [];
         $totalCost = 0.0;
@@ -143,7 +140,7 @@ class AWSPricingService
                 'total_cost' => round($modelCost, 4),
             ];
 
-            $totalCost += $modelCost;
+            $totalCost = ($totalCost ?? 0) + $modelCost;
         }
 
         $recommendations = $this->generateCostRecommendations($breakdown, $totalCost);
@@ -167,8 +164,7 @@ class AWSPricingService
      *     relative_cost: string
      * }>
      */
-    public function comparePricing(array $tokenCounts): array
-    {
+    public function comparePricing(): array
         $bedrockPricing = $this->getBedrockPricing();
         $comparisons = [];
         $minCost = PHP_FLOAT_MAX;
@@ -212,8 +208,7 @@ class AWSPricingService
      *     implementation: string
      * }>
      */
-    public function getBudgetOptimizationRecommendations(array $currentUsage): array
-    {
+    public function getBudgetOptimizationRecommendations(): array
         $recommendations = [];
         $bedrockPricing = $this->getBedrockPricing();
 
@@ -236,7 +231,7 @@ class AWSPricingService
                 'tokens' => $usage['input'] + $usage['output'],
             ];
 
-            $totalCost += $cost;
+            $totalCost = ($totalCost ?? 0) + $cost;
         }
 
         // Recommendation 1: Use cheaper models for simple tasks
@@ -299,8 +294,7 @@ class AWSPricingService
      *     recommendations: array<int, string>
      * }
      */
-    public function forecastCosts(array $historicalUsage): array
-    {
+    public function forecastCosts(): array
         // Simple linear forecast based on recent trends
         $dailyCosts = $historicalUsage['daily_costs'] ?? [];
 
@@ -346,8 +340,7 @@ class AWSPricingService
      * @param  array<string, mixed>  $filters
      * @return array<string, mixed>
      */
-    protected function fetchPricingFromMCP(string $service, string $region, array $filters): array
-    {
+    protected function fetchPricingFromMCP(): array
         // In production, this would make actual MCP calls
         // For now, return structured fallback data
         return $this->getFallbackPricing($service, $region);
@@ -364,8 +357,7 @@ class AWSPricingService
      *     region: string
      * }>
      */
-    protected function fetchBedrockPricingFromMCP(string $region): array
-    {
+    protected function fetchBedrockPricingFromMCP(): array
         // In production, this would make actual MCP calls
         return $this->getFallbackBedrockPricing();
     }
@@ -375,8 +367,7 @@ class AWSPricingService
      *
      * @return array<string, mixed>
      */
-    protected function getFallbackPricing(string $service, string $region): array
-    {
+    protected function getFallbackPricing(): array
         return [
             'service' => $service,
             'region' => $region,
@@ -398,7 +389,6 @@ class AWSPricingService
      * }>
      */
     protected function getFallbackBedrockPricing(): array
-    {
         return [
             'opus' => [
                 'model' => 'claude-opus-4.5',
@@ -437,8 +427,7 @@ class AWSPricingService
      * @param  array<string, mixed>  $breakdown
      * @return array<int, string>
      */
-    protected function generateCostRecommendations(array $breakdown, float $totalCost): array
-    {
+    protected function generateCostRecommendations(): array
         $recommendations = [];
 
         if ($totalCost > 50.0) {
@@ -450,8 +439,8 @@ class AWSPricingService
         $maxModel = '';
 
         foreach ($breakdown as $model => $data) {
-            if ($data['total_cost'] > $maxCost) {
-                $maxCost = $data['total_cost'];
+            if ((is_array($data) && isset($data['total_cost']) ? $data['total_cost'] : null) > $maxCost) {
+                $maxCost = (is_array($data) && isset($data['total_cost']) ? $data['total_cost'] : null);
                 $maxModel = $model;
             }
         }
@@ -477,7 +466,7 @@ class AWSPricingService
                 return json_encode($param) ?: '';
             }
 
-            return (string) $param;
+            return is_string($param) ? (string) $param : '';
         }, $params);
 
         return 'aws_pricing:'.$type.':'.md5(implode(':', $normalizedParams));

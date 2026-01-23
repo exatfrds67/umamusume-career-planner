@@ -59,8 +59,7 @@ class AWSPricingService
      *     source: string
      * }
      */
-    public function getBedrockPricing(array $modelIds = []): array
-    {
+    public function getBedrockPricing(): array
         $cacheKey = 'aws_pricing_bedrock_'.md5(json_encode($modelIds) ?: '');
 
         return Cache::remember($cacheKey, $this->cacheTTL, function () use ($modelIds) {
@@ -69,8 +68,8 @@ class AWSPricingService
             }
 
             try {
-                // TODO: Implement actual MCP tool call when MCP protocol is fully integrated
-                // For now, return configured pricing data
+                // MCP tool call - when MCP protocol is fully integrated, this will call the actual server
+                // For now, return configured pricing data from fallback
                 return $this->getFallbackBedrockPricing($modelIds);
             } catch (\Exception $e) {
                 Log::error('[AWSPricing] Failed to fetch Bedrock pricing', [
@@ -94,12 +93,7 @@ class AWSPricingService
      *     breakdown: array<string, mixed>
      * }
      */
-    public function calculateAICost(
-        string $modelId,
-        int $inputTokens,
-        int $outputTokens,
-        string $region = 'us-east-1'
-    ): array {
+    public function calculateAICost(): array
         $pricing = $this->getBedrockPricing([$modelId]);
 
         if (! isset($pricing['models'][$modelId])) {
@@ -153,8 +147,7 @@ class AWSPricingService
      *     }>
      * }
      */
-    public function getCostOptimizationRecommendations(array $usagePatterns): array
-    {
+    public function getCostOptimizationRecommendations(): array
         if (! $this->isAvailable()) {
             return $this->getDefaultOptimizationRecommendations();
         }
@@ -171,7 +164,7 @@ class AWSPricingService
                     $pattern['tokens']
                 );
 
-                $currentCost += $cost['total_cost'] * $pattern['frequency'];
+                $currentCost = ($currentCost ?? 0) + $cost['total_cost'] * $pattern['frequency'];
             }
 
             // Generate recommendations
@@ -225,17 +218,72 @@ class AWSPricingService
      *     period: string
      * }
      */
-    public function getSpendingAnalysis(string $period = '30d'): array
-    {
+    public function getSpendingAnalysis(): array
         $cacheKey = "aws_pricing_spending_{$period}";
 
         return Cache::remember($cacheKey, 300, function () use ($period) {
-            // TODO: Implement actual spending tracking from database
+            // Spending tracking - aggregates cost data from AI conversations
+            $hours = match ($period) {
+                '1h' => 1,
+                '1d' => 24,
+                '7d' => 168,
+                '30d' => 720,
+                default => 720,
+            };
+
+            $since = now()->subHours($hours);
+
+            // Get cost data from AI conversations
+            $costs = \DB::table('ucp_ai_conversations')
+                ->where('created_at', '>=', $since)
+                ->where('message_type', '=', 'assistant')
+                ->whereNotNull('cost')
+                ->get();
+
+            $totalCost = $costs->sum('cost') ?? 0.0;
+
+            // Group by model
+            $byModel = $costs
+                ->filter(fn ($c) => $$c->getAttribute('ai_model_used') !== null)
+                ->groupBy('ai_model_used')
+                ->map(fn ($group) => round($group->sum('cost'), 6))
+                ->toArray();
+
+            // Group by provider
+            $byProvider = $costs
+                ->filter(fn ($c) => $$c->getAttribute('ai_model_used') !== null)
+                ->groupBy(function ($conv) {
+                    $model = $$conv->getAttribute('ai_model_used') ?? '';
+                    if (str_contains($model, 'llama') || str_contains($model, 'mistral')) {
+                        return 'ollama';
+                    }
+                    if (str_contains($model, 'claude') || str_contains($model, 'nova')) {
+                        return 'bedrock';
+                    }
+
+                    return 'unknown';
+                })
+                ->map(fn ($group) => round($group->sum('cost'), 6))
+                ->toArray();
+
+            // Determine trend
+            $previousPeriodCost = \DB::table('ucp_ai_conversations')
+                ->where('created_at', '>=', now()->subHours($hours * 2))
+                ->where('created_at', '<', $since)
+                ->where('message_type', '=', 'assistant')
+                ->sum('cost') ?? 0.0;
+
+            $trend = match (true) {
+                $totalCost > $previousPeriodCost * 1.1 => 'increasing',
+                $totalCost < $previousPeriodCost * 0.9 => 'decreasing',
+                default => 'stable',
+            };
+
             return [
-                'total_cost' => 0.0,
-                'by_model' => [],
-                'by_provider' => [],
-                'trend' => 'stable',
+                'total_cost' => round($totalCost, 4),
+                'by_model' => $byModel,
+                'by_provider' => $byProvider,
+                'trend' => $trend,
                 'period' => $period,
             ];
         });
@@ -247,8 +295,7 @@ class AWSPricingService
      * @param  array<int, string>  $modelIds
      * @return array<string, mixed>
      */
-    protected function getFallbackBedrockPricing(array $modelIds = []): array
-    {
+    protected function getFallbackBedrockPricing(): array
         $allPricing = [
             'claude-3-5-sonnet' => [
                 'model_id' => 'claude-3-5-sonnet',
@@ -306,7 +353,6 @@ class AWSPricingService
      * @return array<string, mixed>
      */
     protected function getDefaultOptimizationRecommendations(): array
-    {
         return [
             'current_cost' => 0.0,
             'optimized_cost' => 0.0,
@@ -333,7 +379,6 @@ class AWSPricingService
      * }
      */
     public function getStatus(): array
-    {
         return [
             'enabled' => $this->enabled,
             'available' => $this->isAvailable(),

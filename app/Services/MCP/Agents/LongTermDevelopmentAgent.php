@@ -75,12 +75,7 @@ class LongTermDevelopmentAgent
      *     confidence: float
      * }
      */
-    public function analyzeLongTermDevelopment(
-        Character $character,
-        Collection $targetSkills,
-        array $goals,
-        array $context = []
-    ): array {
+    public function analyzeLongTermDevelopment(): array
         // Create development roadmap
         $developmentRoadmap = $this->createDevelopmentRoadmap($character, $targetSkills, $goals);
 
@@ -119,11 +114,7 @@ class LongTermDevelopmentAgent
      * @param  array<string, mixed>  $goals
      * @return array<string, mixed>
      */
-    protected function createDevelopmentRoadmap(
-        Character $character,
-        Collection $targetSkills,
-        array $goals
-    ): array {
+    protected function createDevelopmentRoadmap(): array
         // Determine current career stage
         $currentStage = $character->career_stage ?? 'junior';
         $stageInfo = $this->careerStages[$currentStage] ?? $this->careerStages['junior'];
@@ -169,11 +160,7 @@ class LongTermDevelopmentAgent
      *
      * @return array<string, mixed>
      */
-    protected function createSkillTimeline(
-        Character $character,
-        Collection $targetSkills,
-        int $turnsRemaining
-    ): array {
+    protected function createSkillTimeline(): array
         $timeline = [];
         $currentTurn = 1;
 
@@ -197,7 +184,7 @@ class LongTermDevelopmentAgent
                 'hints_needed' => $hintsNeeded,
             ];
 
-            $currentTurn += $hintCollectionTurns;
+            $currentTurn = ($currentTurn ?? 0) + $hintCollectionTurns;
 
             // Add acquisition turn
             $timeline[] = [
@@ -207,7 +194,7 @@ class LongTermDevelopmentAgent
                 'estimated_cost' => $this->estimateSkillCost($character, $skill),
             ];
 
-            $currentTurn++;
+            $currentTurn = ($currentTurn ?? 0) + 1;
         }
 
         return [
@@ -227,14 +214,14 @@ class LongTermDevelopmentAgent
 
             // Priority for skills with hints
             $hints = $character->skillHints()->where('skill_id', $skill->id)->count();
-            $score += $hints * 50;
+            $score = ($score ?? 0) + $hints * 50;
 
             // Priority for high-cost skills
-            $score += $skill->base_sp_cost / 10;
+            $score = ($score ?? 0) + $skill->base_sp_cost / 10;
 
             // Priority for meta-tier skills
             $metaTier = $skill->meta_tier ?? 'C';
-            $score += match ($metaTier) {
+            $score = ($score ?? 0) + match ($metaTier) {
                 'SS' => 100,
                 'S' => 80,
                 'A' => 60,
@@ -274,8 +261,7 @@ class LongTermDevelopmentAgent
      * @param  array<string, mixed>  $goals
      * @return array<string, mixed>
      */
-    protected function createStatTimeline(Character $character, array $goals, int $turnsRemaining): array
-    {
+    protected function createStatTimeline(): array
         $currentStats = $character->current_stats ?? [];
         $targetStats = $goals['target_stats'] ?? [];
 
@@ -325,8 +311,7 @@ class LongTermDevelopmentAgent
      * @param  array<string, mixed>  $statTimeline
      * @return array<string, mixed>
      */
-    protected function identifyCriticalDecisionPoints(array $skillTimeline, array $statTimeline): array
-    {
+    protected function identifyCriticalDecisionPoints(): array
         $decisionPoints = [];
 
         // Add stat breakpoint decisions
@@ -379,8 +364,7 @@ class LongTermDevelopmentAgent
      * @param  array<string, mixed>  $goals
      * @return array<string, mixed>
      */
-    protected function trackMilestones(Character $character, Collection $targetSkills, array $goals): array
-    {
+    protected function trackMilestones(): array
         $milestones = [];
 
         // Stat milestones
@@ -408,8 +392,7 @@ class LongTermDevelopmentAgent
      * @param  array<string, mixed>  $goals
      * @return array<string, mixed>
      */
-    protected function trackStatMilestones(Character $character, array $goals): array
-    {
+    protected function trackStatMilestones(): array
         $milestones = [];
         $currentStats = $character->current_stats ?? [];
         $targetStats = $goals['target_stats'] ?? [];
@@ -457,8 +440,7 @@ class LongTermDevelopmentAgent
      *
      * @return array<string, mixed>
      */
-    protected function trackSkillMilestones(Character $character, Collection $targetSkills): array
-    {
+    protected function trackSkillMilestones(): array
         $milestones = [];
 
         foreach ($targetSkills as $skill) {
@@ -500,7 +482,7 @@ class LongTermDevelopmentAgent
 
         $totalProgress = 0;
         foreach ($milestones as $milestone) {
-            $totalProgress += $milestone['progress'];
+            $totalProgress = ($totalProgress ?? 0) + $milestone['progress'];
         }
 
         return round($totalProgress / count($milestones), 1);
@@ -513,11 +495,7 @@ class LongTermDevelopmentAgent
      * @param  array<string, mixed>  $milestoneTracking
      * @return array<string, mixed>
      */
-    protected function planDevelopmentPhases(
-        Character $character,
-        array $developmentRoadmap,
-        array $milestoneTracking
-    ): array {
+    protected function planDevelopmentPhases(): array
         $currentStage = $developmentRoadmap['current_stage'];
         $turnsRemaining = $developmentRoadmap['turns_remaining'];
 
@@ -538,8 +516,7 @@ class LongTermDevelopmentAgent
      *
      * @return array<string, array{start: int, end: int, focus: string}>
      */
-    protected function divideTurnsIntoPhases(int $turnsRemaining): array
-    {
+    protected function divideTurnsIntoPhases(): array
         $phaseLength = ceil($turnsRemaining / 3);
 
         return [
@@ -568,8 +545,7 @@ class LongTermDevelopmentAgent
      * @param  array<string, mixed>  $milestoneTracking
      * @return array<string, mixed>
      */
-    protected function assignMilestonesToPhases(array $phases, array $milestoneTracking): array
-    {
+    protected function assignMilestonesToPhases(): array
         $phasePlans = [];
 
         foreach ($phases as $phaseName => $phaseInfo) {
@@ -625,8 +601,7 @@ class LongTermDevelopmentAgent
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    protected function assessRisks(Character $character, array $developmentRoadmap, array $context): array
-    {
+    protected function assessRisks(): array
         $risks = [];
 
         // Time constraint risk
@@ -684,7 +659,7 @@ class LongTermDevelopmentAgent
 
         foreach ($developmentRoadmap['skill_timeline']['timeline'] as $event) {
             if ($event['action'] === 'skill_acquisition') {
-                $totalCost += $event['estimated_cost'];
+                $totalCost = ($totalCost ?? 0) + $event['estimated_cost'];
             }
         }
 
@@ -723,11 +698,7 @@ class LongTermDevelopmentAgent
      * @param  array<string, mixed>  $riskAssessment
      * @return array<string, string>
      */
-    protected function generateRecommendations(
-        array $developmentRoadmap,
-        array $milestoneTracking,
-        array $riskAssessment
-    ): array {
+    protected function generateRecommendations(): array
         $recommendations = [];
 
         // Progress recommendations

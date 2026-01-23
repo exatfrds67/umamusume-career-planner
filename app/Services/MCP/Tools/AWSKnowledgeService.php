@@ -58,8 +58,7 @@ class AWSKnowledgeService
      *     source: string
      * }
      */
-    public function getBestPractices(string $service): array
-    {
+    public function getBestPractices(): array
         $cacheKey = "aws_knowledge_best_practices_{$service}";
 
         return Cache::remember($cacheKey, $this->cacheTTL, function () use ($service) {
@@ -68,7 +67,8 @@ class AWSKnowledgeService
             }
 
             try {
-                // TODO: Implement actual MCP tool call when MCP protocol is fully integrated
+                // MCP tool call - when MCP protocol is fully integrated, this will call the actual server
+                // For now, use fallback data which provides reasonable defaults
                 return $this->getFallbackBestPractices($service);
             } catch (\Exception $e) {
                 Log::error('[AWSKnowledge] Failed to fetch best practices', [
@@ -96,7 +96,6 @@ class AWSKnowledgeService
      * }
      */
     public function getBedrockOptimizations(): array
-    {
         $cacheKey = 'aws_knowledge_bedrock_optimizations';
 
         return Cache::remember($cacheKey, $this->cacheTTL, function () {
@@ -105,7 +104,7 @@ class AWSKnowledgeService
             }
 
             try {
-                // TODO: Implement actual MCP tool call
+                // MCP tool call - uses fallback until MCP protocol integration is complete
                 return $this->getFallbackBedrockOptimizations();
             } catch (\Exception $e) {
                 Log::error('[AWSKnowledge] Failed to fetch Bedrock optimizations', [
@@ -132,8 +131,7 @@ class AWSKnowledgeService
      *     total_results: int
      * }
      */
-    public function searchDocumentation(string $query, int $limit = 10): array
-    {
+    public function searchDocumentation(): array
         $cacheKey = 'aws_knowledge_search_'.md5($query)."_{$limit}";
 
         return Cache::remember($cacheKey, $this->cacheTTL, function () use ($query) {
@@ -146,7 +144,7 @@ class AWSKnowledgeService
             }
 
             try {
-                // TODO: Implement actual MCP tool call
+                // MCP tool call - uses fallback until MCP protocol integration is complete
                 return [
                     'results' => [],
                     'query' => $query,
@@ -182,8 +180,7 @@ class AWSKnowledgeService
      *     architecture_diagram_url: string|null
      * }
      */
-    public function getInfrastructureRecommendations(array $requirements): array
-    {
+    public function getInfrastructureRecommendations(): array
         $cacheKey = 'aws_knowledge_infra_'.md5(json_encode($requirements) ?: '');
 
         return Cache::remember($cacheKey, $this->cacheTTL, function () use ($requirements) {
@@ -192,7 +189,7 @@ class AWSKnowledgeService
             }
 
             try {
-                // TODO: Implement actual MCP tool call
+                // MCP tool call - uses fallback until MCP protocol integration is complete
                 return $this->getFallbackInfrastructureRecommendations($requirements);
             } catch (\Exception $e) {
                 Log::error('[AWSKnowledge] Failed to get infrastructure recommendations', [
@@ -220,7 +217,6 @@ class AWSKnowledgeService
      * }
      */
     public function getSecurityBestPractices(): array
-    {
         $cacheKey = 'aws_knowledge_security_best_practices';
 
         return Cache::remember($cacheKey, $this->cacheTTL, function () {
@@ -270,8 +266,7 @@ class AWSKnowledgeService
      *
      * @return array<string, mixed>
      */
-    protected function getFallbackBestPractices(string $service): array
-    {
+    protected function getFallbackBestPractices(): array
         $practices = [
             'bedrock' => [
                 [
@@ -312,7 +307,6 @@ class AWSKnowledgeService
      * @return array<string, mixed>
      */
     protected function getFallbackBedrockOptimizations(): array
-    {
         return [
             'recommendations' => [
                 [
@@ -354,8 +348,7 @@ class AWSKnowledgeService
      * @param  array<string, mixed>  $requirements
      * @return array<string, mixed>
      */
-    protected function getFallbackInfrastructureRecommendations(array $requirements): array
-    {
+    protected function getFallbackInfrastructureRecommendations(): array
         return [
             'recommendations' => [
                 [
@@ -393,7 +386,6 @@ class AWSKnowledgeService
      * }
      */
     public function getStatus(): array
-    {
         return [
             'enabled' => $this->enabled,
             'available' => $this->isAvailable(),

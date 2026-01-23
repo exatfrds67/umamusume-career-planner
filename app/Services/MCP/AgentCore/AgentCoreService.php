@@ -62,8 +62,7 @@ class AgentCoreService
      *     error?: string
      * }
      */
-    public function deployAgent(array $agentConfig): array
-    {
+    public function deployAgent(): array
         if (! $this->isAvailable()) {
             return [
                 'agent_id' => '',
@@ -134,8 +133,7 @@ class AgentCoreService
      *     error?: string
      * }
      */
-    public function invokeAgent(string $agentId, array $input): array
-    {
+    public function invokeAgent(): array
         if (! $this->isAvailable()) {
             return [
                 'output' => null,
@@ -202,8 +200,7 @@ class AgentCoreService
      *     error?: string
      * }
      */
-    public function getAgentStatus(string $agentId): array
-    {
+    public function getAgentStatus(): array
         try {
             $agentConfig = $this->getAgentConfig($agentId);
             if (! $agentConfig) {
@@ -251,8 +248,7 @@ class AgentCoreService
      *     error?: string
      * }
      */
-    public function terminateAgent(string $agentId): array
-    {
+    public function terminateAgent(): array
         $startTime = microtime(true);
 
         try {
@@ -303,7 +299,6 @@ class AgentCoreService
      * }>
      */
     public function listAgents(): array
-    {
         try {
             $agentIds = Cache::get('agentcore_agent_list', []);
             $agents = [];
@@ -353,8 +348,7 @@ class AgentCoreService
      * @param  array<string, mixed>  $config
      * @return array<string, mixed>
      */
-    protected function prepareDeploymentPayload(array $config): array
-    {
+    protected function prepareDeploymentPayload(): array
         return [
             'agent_config' => [
                 'name' => $config['name'],
@@ -437,9 +431,39 @@ class AgentCoreService
      * @param  array<string, mixed>  $input
      * @return array<string, mixed>
      */
-    protected function simulateAgentExecution(array $config, array $input): array
-    {
+    protected function simulateAgentExecution(): array
         // In production, this would call the actual AgentCore MCP server
+
+        // Handle coordinator decompose task
+        if (isset($input['task']) && $input['task'] === 'decompose') {
+            $workerCount = count($input['worker_agents'] ?? []);
+            $subtasks = [];
+
+            for ($i = 0; $i < $workerCount; $i = ($i ?? 0) + 1) {
+                $subtasks[] = [
+                    'subtask_id' => "subtask_{$i}",
+                    'description' => "Worker subtask {$i}",
+                    'input' => $input['input'] ?? [],
+                ];
+            }
+
+            return [
+                'result' => 'Task decomposed',
+                'subtasks' => $subtasks,
+                'confidence' => 0.85,
+            ];
+        }
+
+        // Handle coordinator synthesize task
+        if (isset($input['task']) && $input['task'] === 'synthesize') {
+            return [
+                'result' => 'Results synthesized',
+                'synthesis' => 'Combined worker results',
+                'confidence' => 0.90,
+            ];
+        }
+
+        // Default agent execution
         return [
             'result' => 'Agent execution simulated',
             'agent_type' => $config['type'] ?? 'unknown',
@@ -449,6 +473,7 @@ class AgentCoreService
                 'focus' => 'speed',
                 'confidence' => 0.85,
             ],
+            'confidence' => 0.85,
         ];
     }
 
@@ -457,8 +482,7 @@ class AgentCoreService
      *
      * @return array<string, mixed>
      */
-    protected function getAgentMetrics(string $agentId): array
-    {
+    protected function getAgentMetrics(): array
         /** @var array<string, mixed>|null $metrics */
         $metrics = Cache::get("agentcore_metrics_{$agentId}");
 
@@ -485,8 +509,7 @@ class AgentCoreService
      *
      * @return array<string, mixed>
      */
-    protected function checkAgentHealth(string $agentId): array
-    {
+    protected function checkAgentHealth(): array
         return [
             'status' => 'healthy',
             'last_check' => now()->toIso8601String(),
@@ -544,7 +567,6 @@ class AgentCoreService
      * }
      */
     public function getStatus(): array
-    {
         $agentIds = Cache::get('agentcore_agent_list', []);
 
         return [

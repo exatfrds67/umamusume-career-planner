@@ -47,8 +47,7 @@ class AWSAPIService
      *     issues: array<int, string>
      * }
      */
-    public function getBedrockHealth(string $region = 'us-east-1'): array
-    {
+    public function getBedrockHealth(): array
         $cacheKey = $this->getCacheKey('bedrock_health', $region);
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($region) {
@@ -86,8 +85,7 @@ class AWSAPIService
      *     last_updated: string
      * }
      */
-    public function listBedrockModels(string $region = 'us-east-1'): array
-    {
+    public function listBedrockModels(): array
         $cacheKey = $this->getCacheKey('bedrock_models', $region);
 
         return Cache::remember($cacheKey, self::CACHE_TTL * 2, function () use ($region) {
@@ -124,8 +122,7 @@ class AWSAPIService
      *     timestamp: string
      * }
      */
-    public function getModelMetrics(string $modelId, string $period = '1h'): array
-    {
+    public function getModelMetrics(): array
         $cacheKey = $this->getCacheKey('model_metrics', $modelId, $period);
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($modelId, $period) {
@@ -163,8 +160,7 @@ class AWSAPIService
      *     warnings: array<int, string>
      * }
      */
-    public function checkServiceQuotas(string $service, string $region = 'us-east-1'): array
-    {
+    public function checkServiceQuotas(): array
         $cacheKey = $this->getCacheKey('quotas', $service, $region);
 
         return Cache::remember($cacheKey, self::CACHE_TTL * 4, function () use ($service, $region) {
@@ -202,8 +198,7 @@ class AWSAPIService
      *     active_alarms: int
      * }
      */
-    public function getCloudWatchAlarms(string $service): array
-    {
+    public function getCloudWatchAlarms(): array
         $cacheKey = $this->getCacheKey('alarms', $service);
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($service) {
@@ -238,8 +233,7 @@ class AWSAPIService
      *     timestamp: string
      * }
      */
-    public function invokeBedrockModel(string $modelId, string $prompt, array $parameters = []): array
-    {
+    public function invokeBedrockModel(): array
         // Don't cache model invocations
         if (! $this->isAvailable()) {
             return $this->getFallbackModelInvocation($modelId, $prompt);
@@ -266,8 +260,7 @@ class AWSAPIService
      *     cost_allocation_tags: array<string, string>
      * }
      */
-    public function getResourceTags(string $resourceArn): array
-    {
+    public function getResourceTags(): array
         $cacheKey = $this->getCacheKey('tags', md5($resourceArn));
 
         return Cache::remember($cacheKey, self::CACHE_TTL * 2, function () use ($resourceArn) {
@@ -299,8 +292,7 @@ class AWSAPIService
      *     message: string
      * }
      */
-    public function createBudgetAlarm(array $config): array
-    {
+    public function createBudgetAlarm(): array
         if (! $this->isAvailable()) {
             return [
                 'alarm_arn' => '',
@@ -341,8 +333,7 @@ class AWSAPIService
      *     overall_status: string
      * }
      */
-    public function getServiceHealthStatus(array $services, string $region = 'us-east-1'): array
-    {
+    public function getServiceHealthStatus(): array
         $cacheKey = $this->getCacheKey('health', implode(',', $services), $region);
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($services, $region) {
@@ -369,8 +360,7 @@ class AWSAPIService
      *
      * @return array<string, mixed>
      */
-    protected function fetchBedrockHealthFromMCP(string $region): array
-    {
+    protected function fetchBedrockHealthFromMCP(): array
         // In production, this would make actual MCP calls
         return $this->getFallbackBedrockHealth($region);
     }
@@ -380,8 +370,7 @@ class AWSAPIService
      *
      * @return array<string, mixed>
      */
-    protected function fetchBedrockModelsFromMCP(string $region): array
-    {
+    protected function fetchBedrockModelsFromMCP(): array
         // In production, this would make actual MCP calls
         return $this->getFallbackBedrockModels($region);
     }
@@ -391,8 +380,7 @@ class AWSAPIService
      *
      * @return array<string, mixed>
      */
-    protected function fetchModelMetricsFromMCP(string $modelId, string $period): array
-    {
+    protected function fetchModelMetricsFromMCP(): array
         // In production, this would make actual MCP calls
         return $this->getFallbackModelMetrics($modelId, $period);
     }
@@ -402,8 +390,7 @@ class AWSAPIService
      *
      * @return array<string, mixed>
      */
-    protected function fetchQuotasFromMCP(string $service, string $region): array
-    {
+    protected function fetchQuotasFromMCP(): array
         // In production, this would make actual MCP calls
         return $this->getFallbackQuotas($service, $region);
     }
@@ -413,8 +400,7 @@ class AWSAPIService
      *
      * @return array<string, mixed>
      */
-    protected function fetchAlarmsFromMCP(string $service): array
-    {
+    protected function fetchAlarmsFromMCP(): array
         // In production, this would make actual MCP calls
         return $this->getFallbackAlarms($service);
     }
@@ -425,8 +411,7 @@ class AWSAPIService
      * @param  array<string, mixed>  $parameters
      * @return array<string, mixed>
      */
-    protected function invokeModelViaMCP(string $modelId, string $prompt, array $parameters): array
-    {
+    protected function invokeModelViaMCP(): array
         // In production, this would make actual MCP calls
         return $this->getFallbackModelInvocation($modelId, $prompt);
     }
@@ -436,8 +421,7 @@ class AWSAPIService
      *
      * @return array<string, mixed>
      */
-    protected function fetchResourceTagsFromMCP(string $resourceArn): array
-    {
+    protected function fetchResourceTagsFromMCP(): array
         // In production, this would make actual MCP calls
         return $this->getFallbackResourceTags($resourceArn);
     }
@@ -448,8 +432,7 @@ class AWSAPIService
      * @param  array<string, mixed>  $config
      * @return array<string, mixed>
      */
-    protected function createAlarmViaMCP(array $config): array
-    {
+    protected function createAlarmViaMCP(): array
         // In production, this would make actual MCP calls
         return [
             'alarm_arn' => 'arn:aws:cloudwatch:us-east-1:123456789012:alarm:'.($config['name'] ?? 'budget-alarm'),
@@ -465,8 +448,7 @@ class AWSAPIService
      * @param  array<int, string>  $services
      * @return array<string, mixed>
      */
-    protected function fetchServiceHealthFromMCP(array $services, string $region): array
-    {
+    protected function fetchServiceHealthFromMCP(): array
         // In production, this would make actual MCP calls
         return $this->getFallbackServiceHealth($services, $region);
     }
@@ -476,8 +458,7 @@ class AWSAPIService
      *
      * @return array<string, mixed>
      */
-    protected function getFallbackBedrockHealth(string $region): array
-    {
+    protected function getFallbackBedrockHealth(): array
         return [
             'service' => 'Amazon Bedrock',
             'status' => 'operational',
@@ -498,8 +479,7 @@ class AWSAPIService
      *
      * @return array<string, mixed>
      */
-    protected function getFallbackBedrockModels(string $region): array
-    {
+    protected function getFallbackBedrockModels(): array
         return [
             'region' => $region,
             'models' => [
@@ -546,8 +526,7 @@ class AWSAPIService
      *
      * @return array<string, mixed>
      */
-    protected function getFallbackModelMetrics(string $modelId, string $period): array
-    {
+    protected function getFallbackModelMetrics(): array
         return [
             'model_id' => $modelId,
             'period' => $period,
@@ -567,8 +546,7 @@ class AWSAPIService
      *
      * @return array<string, mixed>
      */
-    protected function getFallbackQuotas(string $service, string $region): array
-    {
+    protected function getFallbackQuotas(): array
         return [
             'service' => $service,
             'region' => $region,
@@ -590,8 +568,7 @@ class AWSAPIService
      *
      * @return array<string, mixed>
      */
-    protected function getFallbackAlarms(string $service): array
-    {
+    protected function getFallbackAlarms(): array
         return [
             'alarms' => [],
             'total_count' => 0,
@@ -604,8 +581,7 @@ class AWSAPIService
      *
      * @return array<string, mixed>
      */
-    protected function getFallbackModelInvocation(string $modelId, string $prompt): array
-    {
+    protected function getFallbackModelInvocation(): array
         return [
             'model_id' => $modelId,
             'response' => 'MCP server unavailable - using fallback response',
@@ -622,8 +598,7 @@ class AWSAPIService
      *
      * @return array<string, mixed>
      */
-    protected function getFallbackResourceTags(string $resourceArn): array
-    {
+    protected function getFallbackResourceTags(): array
         return [
             'resource_arn' => $resourceArn,
             'tags' => [],
@@ -637,8 +612,7 @@ class AWSAPIService
      * @param  array<int, string>  $services
      * @return array<string, mixed>
      */
-    protected function getFallbackServiceHealth(array $services, string $region): array
-    {
+    protected function getFallbackServiceHealth(): array
         $serviceStatus = [];
 
         foreach ($services as $service) {

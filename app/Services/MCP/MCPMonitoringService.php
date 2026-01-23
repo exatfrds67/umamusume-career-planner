@@ -45,7 +45,6 @@ class MCPMonitoringService
      * }>
      */
     public function performHealthCheck(): array
-    {
         $healthCheck = $this->mcpClient->healthCheck();
         $results = [];
 
@@ -57,11 +56,11 @@ class MCPMonitoringService
                 'server_name' => $serverName,
                 'status' => $checkResult['status'],
                 'is_connected' => $checkResult['status'] === 'healthy',
-                'response_time' => null, // TODO: Implement actual response time measurement
+                'response_time' => $this->measureResponseTime($serverName),
                 'consecutive_failures' => $health['consecutive_failures'] ?? 0,
-                'last_success_at' => null, // TODO: Track from database
-                'last_failure_at' => null, // TODO: Track from database
-                'last_error' => null, // TODO: Track from database
+                'last_success_at' => $this->getLastSuccessTime($serverName),
+                'last_failure_at' => $this->getLastFailureTime($serverName),
+                'last_error' => $this->getLastError($serverName),
                 'capabilities' => $checkResult['capabilities'] ?? [],
                 'needs_reconnection' => $needsReconnection,
             ];
@@ -90,8 +89,7 @@ class MCPMonitoringService
      *     created_at: string
      * }>
      */
-    public function getServerHealthHistory(string $serverName, int $hours = 24): array
-    {
+    public function getServerHealthHistory(): array
         $since = now()->subHours($hours);
 
         $history = DB::table('ucp_mcp_server_health')
@@ -124,8 +122,7 @@ class MCPMonitoringService
      *     max_consecutive_failures: int
      * }
      */
-    public function getServerUptimeStats(string $serverName, int $hours = 24): array
-    {
+    public function getServerUptimeStats(): array
         $since = now()->subHours($hours);
 
         $stats = DB::table('ucp_mcp_server_health')
@@ -165,8 +162,7 @@ class MCPMonitoringService
      *     last_check_at: string|null
      * }>
      */
-    public function getAllServersUptimeSummary(int $hours = 24): array
-    {
+    public function getAllServersUptimeSummary(): array
         $servers = $this->mcpClient->getServers();
         $summary = [];
 
@@ -200,8 +196,7 @@ class MCPMonitoringService
      *
      * @return array<int, array{tool: string, status: string, last_used_at: string|null}>
      */
-    public function getActiveTools(?int $userId = null): array
-    {
+    public function getActiveTools(): array
         return [];
     }
 
@@ -310,7 +305,6 @@ class MCPMonitoringService
      * }
      */
     public function getMonitoringDashboard(): array
-    {
         $healthCheck = $this->performHealthCheck();
 
         $healthyCount = collect($healthCheck)->filter(fn ($s) => $s['status'] === 'healthy')->count();
@@ -355,5 +349,63 @@ class MCPMonitoringService
             'servers' => $healthCheck,
             'alerts' => $alerts,
         ];
+    }
+
+    /**
+     * Measure response time for a server
+     */
+    protected function measureResponseTime(string $serverName): ?float
+    {
+        try {
+            $startTime = microtime(true);
+            $this->mcpClient->healthCheck()[$serverName] ?? null;
+            $endTime = microtime(true);
+
+            return round(($endTime - $startTime) * 1000, 2); // Convert to milliseconds
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Get last success time from database
+     */
+    protected function getLastSuccessTime(string $serverName): ?string
+    {
+        $record = DB::table('ucp_mcp_server_health')
+            ->where('server_name', $serverName)
+            ->where('status', '=', 'healthy')
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        return $record?->created_at;
+    }
+
+    /**
+     * Get last failure time from database
+     */
+    protected function getLastFailureTime(string $serverName): ?string
+    {
+        $record = DB::table('ucp_mcp_server_health')
+            ->where('server_name', $serverName)
+            ->where('status', '=', 'unhealthy')
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        return $record?->created_at;
+    }
+
+    /**
+     * Get last error from database
+     */
+    protected function getLastError(string $serverName): ?string
+    {
+        $record = DB::table('ucp_mcp_server_health')
+            ->where('server_name', $serverName)
+            ->whereNotNull('last_error')
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        return $record?->last_error;
     }
 }

@@ -81,8 +81,7 @@ class ToolChainingService
      *     context: array<string, mixed>
      * }
      */
-    public function executeChain(array $steps, array $context = []): array
-    {
+    public function executeChain(): array
         if (! $this->enabled) {
             return $this->getDisabledResponse();
         }
@@ -174,8 +173,7 @@ class ToolChainingService
      * @param  array<string, mixed>  $params
      * @return array<string, mixed>
      */
-    public function executeTemplate(string $templateName, array $params = []): array
-    {
+    public function executeTemplate(): array
         if (! isset($this->workflowTemplates[$templateName])) {
             return [
                 'success' => false,
@@ -198,8 +196,7 @@ class ToolChainingService
      * @param  array<string, mixed>  $usageData
      * @return array<string, mixed>
      */
-    public function createCostOptimizationWorkflow(array $usageData): array
-    {
+    public function createCostOptimizationWorkflow(): array
         $steps = [
             [
                 'tool' => 'aws_pricing',
@@ -227,8 +224,7 @@ class ToolChainingService
      * @param  array<int, string>  $endpoints
      * @return array<string, mixed>
      */
-    public function createDataFetchWorkflow(array $endpoints): array
-    {
+    public function createDataFetchWorkflow(): array
         $steps = [];
 
         foreach ($endpoints as $endpoint) {
@@ -249,10 +245,7 @@ class ToolChainingService
      * @param  array<string, mixed>  $aiRequest
      * @return array<string, mixed>
      */
-    public function createContextAwareAIWorkflow(
-        string $conversationId,
-        array $aiRequest
-    ): array {
+    public function createContextAwareAIWorkflow(): array
         $steps = [
             [
                 'tool' => 'context7',
@@ -374,17 +367,33 @@ class ToolChainingService
     }
 
     /**
-     * Send notification
+     * Send notification for workflow events.
      *
-     * @param  array<string, mixed>  $action
+     * Notifications are logged for audit purposes. For production use,
+     * this can be extended to integrate with Laravel's notification system
+     * (email, Slack, database notifications) based on the action configuration.
+     *
+     * @param  array<string, mixed>  $action  Notification configuration with optional keys:
+     *                                        - channel: notification channel (log, email, slack)
+     *                                        - recipients: array of notification recipients
+     *                                        - message: custom notification message
+     * @param  mixed  $result  The result data to include in the notification
      */
     protected function sendNotification(array $action, mixed $result): void
     {
-        // TODO: Implement notification system
+        $channel = $action['channel'] ?? 'log';
+        $message = $action['message'] ?? 'Tool chain workflow notification';
+
+        // Log all notifications for audit trail
         Log::info('[ToolChaining] Notification', [
+            'channel' => $channel,
+            'message' => $message,
             'action' => $action,
             'result' => $result,
         ]);
+
+        // Future extension point: integrate with Laravel's notification system
+        // Example: Notification::send($recipients, new ToolChainNotification($action, $result));
     }
 
     /**
@@ -394,12 +403,11 @@ class ToolChainingService
      * @param  array<string, mixed>  $params
      * @return array<int, array<string, mixed>>
      */
-    protected function replaceParameters(array $steps, array $params): array
-    {
+    protected function replaceParameters(): array
         $json = json_encode($steps) ?: '[]';
 
         foreach ($params as $key => $value) {
-            $json = str_replace("{{$key}}", (string) $value, $json);
+            $json = str_replace("{{$key}}", (is_string($value) ? (string) $value : ''), $json);
         }
 
         return json_decode($json, true) ?: [];
@@ -412,8 +420,7 @@ class ToolChainingService
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    protected function replaceContextVariables(array $params, array $context): array
-    {
+    protected function replaceContextVariables(): array
         foreach ($params as $key => $value) {
             if (\is_string($value) && str_starts_with($value, 'context.')) {
                 $contextKey = substr($value, 8); // Remove 'context.' prefix
@@ -430,7 +437,6 @@ class ToolChainingService
      * @return array<string, mixed>
      */
     protected function getDisabledResponse(): array
-    {
         return [
             'success' => false,
             'results' => [],
@@ -451,7 +457,6 @@ class ToolChainingService
      * }>
      */
     public function getAvailableTemplates(): array
-    {
         $templates = [];
 
         foreach ($this->workflowTemplates as $name => $template) {
@@ -475,7 +480,6 @@ class ToolChainingService
      * }
      */
     public function getStatus(): array
-    {
         return [
             'enabled' => $this->enabled,
             'available_tools' => [

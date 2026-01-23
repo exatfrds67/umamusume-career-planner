@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\MCP;
 
-use CloudStudio\Ollama\Facades\Ollama;
+use Cloudstudio\Ollama\Facades\Ollama;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
@@ -78,8 +78,29 @@ class AgentRoutingService
      * @param  array<string, mixed>  $request
      * @return array{provider: string, model: string, reason: string, estimated_cost: float}
      */
-    public function routeRequest(array $request): array
-    {
+    public function routeRequest(): array
+        // Check if specific provider/model is requested
+        if (! empty($request['preferred_provider'])) {
+            $provider = $request['preferred_provider'];
+            $model = (is_array($request) && isset($request['preferred_model']) ? $request['preferred_model'] : null);
+
+            // Resolve default model for provider if not specified
+            if (! $model) {
+                $model = match ($provider) {
+                    self::PROVIDER_OLLAMA => config('ai.ollama.default_model', 'llama3'),
+                    self::PROVIDER_BEDROCK => config('ai.bedrock.default_model', 'anthropic.claude-3-5-sonnet-20241022-v2:0'),
+                    default => 'default'
+                };
+            }
+
+            return [
+                'provider' => $provider,
+                'model' => $model,
+                'reason' => 'User preference',
+                'estimated_cost' => $this->estimateCostForModel($model),
+            ];
+        }
+
         // Check cache for similar requests
         $cacheKey = $this->generateRouteCacheKey($request);
         $cachedRoute = Cache::get($cacheKey);
@@ -156,8 +177,7 @@ class AgentRoutingService
      * @param  array<string, mixed>  $request
      * @return array{provider: string, model: string, reason: string, estimated_cost: float}
      */
-    protected function selectProvider(string $complexity, array $budgetStatus, array $request): array
-    {
+    protected function selectProvider(): array
         // Check if budget is exceeded
         if ($budgetStatus['is_exceeded']) {
             return $this->selectFallbackProvider($complexity, 'budget_exceeded');
@@ -179,13 +199,12 @@ class AgentRoutingService
      * @param  array<string, mixed>  $request
      * @return array{provider: string, model: string, reason: string, estimated_cost: float}
      */
-    protected function selectSimpleProvider(array $request): array
-    {
+    protected function selectSimpleProvider(): array
         // Try Ollama first (free, fast)
         if ($this->isOllamaAvailable()) {
             return [
                 'provider' => self::PROVIDER_OLLAMA,
-                'model' => (string) config('ai.ollama.model', 'llama3.3'),
+                'model' => (string) config('ai.ollama.default_model', 'llama3'),
                 'reason' => 'Simple request - using local Ollama for speed and cost efficiency',
                 'estimated_cost' => self::OLLAMA_COST,
             ];
@@ -206,13 +225,12 @@ class AgentRoutingService
      * @param  array<string, mixed>  $request
      * @return array{provider: string, model: string, reason: string, estimated_cost: float}
      */
-    protected function selectModerateProvider(array $request): array
-    {
+    protected function selectModerateProvider(): array
         // Try Ollama first
         if ($this->isOllamaAvailable()) {
             return [
                 'provider' => self::PROVIDER_OLLAMA,
-                'model' => (string) config('ai.ollama.model', 'llama3.3'),
+                'model' => (string) config('ai.ollama.default_model', 'llama3'),
                 'reason' => 'Moderate request - attempting local Ollama first',
                 'estimated_cost' => self::OLLAMA_COST,
             ];
@@ -233,8 +251,7 @@ class AgentRoutingService
      * @param  array<string, mixed>  $request
      * @return array{provider: string, model: string, reason: string, estimated_cost: float}
      */
-    protected function selectComplexProvider(array $request): array
-    {
+    protected function selectComplexProvider(): array
         // Complex requests go directly to Bedrock
         return [
             'provider' => self::PROVIDER_BEDROCK,
@@ -250,8 +267,7 @@ class AgentRoutingService
      * @param  array<string, mixed>  $request
      * @return array{provider: string, model: string, reason: string, estimated_cost: float}
      */
-    protected function selectSpecializedProvider(array $request): array
-    {
+    protected function selectSpecializedProvider(): array
         $agentType = $request['agent_type'] ?? 'generic';
 
         return [
@@ -268,10 +284,9 @@ class AgentRoutingService
      * @return array{provider: string, model: string, reason: string, estimated_cost: float}
      */
     protected function selectDefaultProvider(): array
-    {
         return [
             'provider' => self::PROVIDER_OLLAMA,
-            'model' => config('ai.ollama.model', 'llama3.3'),
+            'model' => config('ai.ollama.default_model', 'llama3'),
             'reason' => 'Default routing to local Ollama',
             'estimated_cost' => self::OLLAMA_COST,
         ];
@@ -282,13 +297,12 @@ class AgentRoutingService
      *
      * @return array{provider: string, model: string, reason: string, estimated_cost: float}
      */
-    protected function selectFallbackProvider(string $complexity, string $reason): array
-    {
+    protected function selectFallbackProvider(): array
         // If budget exceeded, use Ollama if available
         if ($reason === 'budget_exceeded' && $this->isOllamaAvailable()) {
             return [
                 'provider' => self::PROVIDER_OLLAMA,
-                'model' => config('ai.ollama.model', 'llama3.3'),
+                'model' => config('ai.ollama.default_model', 'llama3'),
                 'reason' => 'Budget exceeded - falling back to free local Ollama',
                 'estimated_cost' => self::OLLAMA_COST,
             ];
@@ -309,8 +323,7 @@ class AgentRoutingService
      * @param  array<string, mixed>  $request
      * @return array{success: bool, response: mixed, provider: string, model: string, execution_time: float, cost: float, fallback_used: bool}
      */
-    public function executeWithFallback(array $request): array
-    {
+    public function executeWithFallback(): array
         $route = $this->routeRequest($request);
         $startTime = microtime(true);
 
@@ -362,8 +375,7 @@ class AgentRoutingService
      * @param  array<string, mixed>  $primaryRoute
      * @return array{success: bool, response: mixed, provider: string, model: string, execution_time: float, cost: float, fallback_used: bool}
      */
-    protected function executeFallback(array $request, array $primaryRoute, string $reason): array
-    {
+    protected function executeFallback(): array
         $complexity = $this->detectComplexity($request);
         $fallbackRoute = $this->selectFallbackProvider($complexity, $reason);
 
@@ -407,7 +419,7 @@ class AgentRoutingService
     protected function executeRequest(array $route, array $request): mixed
     {
         return match ($route['provider']) {
-            self::PROVIDER_OLLAMA => $this->executeOllama($request),
+            self::PROVIDER_OLLAMA => $this->executeOllama($route['model'], $request),
             self::PROVIDER_BEDROCK => $this->executeBedrock($route['model'], $request),
             self::PROVIDER_AGENT => $this->executeAgent($route['model'], $request),
             default => throw new \InvalidArgumentException("Unknown provider: {$route['provider']}"),
@@ -419,13 +431,19 @@ class AgentRoutingService
      *
      * @param  array<string, mixed>  $request
      */
-    protected function executeOllama(array $request): string
+    protected function executeOllama(string $model, array $request): string
     {
         $prompt = $request['prompt'] ?? '';
         $context = $request['context'] ?? [];
 
+        // Enrich prompt with context if available
+        if (! empty($context)) {
+            $systemContext = $this->buildSystemContext($context);
+            $prompt = $systemContext."\n\nUser Query: ".$prompt;
+        }
+
         $response = Ollama::agent('Umamusume Career Advisor')
-            ->model(config('ai.ollama.model', 'llama3.3'))
+            ->model($model)
             ->prompt($prompt)
             ->options([
                 'temperature' => $request['temperature'] ?? 0.3,
@@ -434,7 +452,44 @@ class AgentRoutingService
             ])
             ->ask();
 
-        return (string) $response;
+        if (is_array($response)) {
+            return $response['response'] ?? $response['content'] ?? json_encode($response);
+        }
+
+        return is_string($response) ? (string) $response : '';
+    }
+
+    /**
+     * Build system context string from context array
+     */
+    protected function buildSystemContext(array $context): string
+    {
+        $lines = ['You are an expert Umamusume Career Advisor. Analyze the following character data to provide specific, strategic advice.'];
+
+        if (isset($context['character'])) {
+            $c = $context['character'];
+            $lines[] = "\n[CHARACTER PROFILE]";
+            $lines[] = 'Name: '.($c['name'] ?? 'Unknown');
+            $lines[] = 'Stage: '.($c['career_stage'] ?? 'Unknown');
+            $lines[] = 'Scenario: '.ucfirst($c['scenario_type'] ?? 'Unknown');
+
+            if (isset($c['stats'])) {
+                $stats = $c['stats'];
+                $lines[] = "Stats: Speed {$stats['speed']}, Stamina {$stats['stamina']}, Power {$stats['power']}, Guts {$stats['guts']}, Wisdom {$stats['wisdom']}";
+            }
+
+            if (isset($c['energy_level'])) {
+                $lines[] = 'Energy: '.$c['energy_level'].'/100';
+            }
+        }
+
+        if (isset($context['career'])) {
+            $cr = $context['career'];
+            $lines[] = "\n[CAREER STATUS]";
+            $lines[] = 'Current Turn: '.($cr['current_turn'] ?? 0);
+        }
+
+        return implode("\n", $lines);
     }
 
     /**
@@ -442,11 +497,107 @@ class AgentRoutingService
      *
      * @param  array<string, mixed>  $request
      */
-    protected function executeBedrock(string $model, array $request): string
+    /**
+     * Execute request with Bedrock
+     *
+     * @param  array<string, mixed>  $request
+     */
+    protected function executeBedrock(string $modelKey, array $request): string
     {
-        // TODO: Implement actual Bedrock API call via MCP
-        // For now, return a placeholder
-        return "Bedrock response from {$model}";
+        $client = new \Aws\BedrockRuntime\BedrockRuntimeClient([
+            'region' => config('services.aws.region', 'us-east-1'),
+            'version' => 'latest',
+            'credentials' => array_filter([
+                'key' => config('services.aws.key'),
+                'secret' => config('services.aws.secret'),
+                'token' => config('services.aws.token'),
+            ]),
+        ]);
+
+        $modelId = $this->mapBedrockModelId($modelKey);
+        $prompt = $request['prompt'] ?? '';
+        $context = $request['context'] ?? [];
+
+        // Build system prompt if context exists
+        $systemPrompt = 'You are an expert Umamusume Career Advisor.';
+        if (! empty($context)) {
+            $systemPrompt = $this->buildSystemContext($context);
+        }
+
+        // Prepare body based on model family
+        if (str_contains($modelId, 'anthropic.claude')) {
+            $body = [
+                'anthropic_version' => 'bedrock-2023-05-31',
+                'max_tokens' => (int) ($request['max_tokens'] ?? 4096),
+                'messages' => [
+                    [
+                        'role' => 'user',
+                        'content' => [
+                            ['type' => 'text', 'text' => $prompt],
+                        ],
+                    ],
+                ],
+                'system' => [
+                    ['type' => 'text', 'text' => $systemPrompt],
+                ],
+            ];
+        } else {
+            // Nova / Titan / Generic (using Converse style or text)
+            // For simplicity, fallback to generic "inputText" or "messages" if supported
+            $body = [
+                'inferenceConfig' => [
+                    'max_new_tokens' => (int) ($request['max_tokens'] ?? 4096),
+                ],
+                'messages' => [
+                    [
+                        'role' => 'user',
+                        'content' => [
+                            ['text' => $systemPrompt."\n\n".$prompt],
+                        ],
+                    ],
+                ],
+            ];
+        }
+
+        try {
+            $result = $client->invokeModel([
+                'modelId' => $modelId,
+                'contentType' => 'application/json',
+                'accept' => 'application/json',
+                'body' => json_encode($body),
+            ]);
+
+            $responseBody = json_decode($result['body']->getContents(), true);
+
+            // Parse response based on model
+            if (str_contains($modelId, 'anthropic.claude')) {
+                return $responseBody['content'][0]['text'] ?? '';
+            } elseif (isset($responseBody['output']['message']['content'][0]['text'])) {
+                // Nova structure
+                return $responseBody['output']['message']['content'][0]['text'];
+            }
+
+            return json_encode($responseBody); // Fallback debug
+
+        } catch (\Aws\Exception\AwsException $e) {
+            Log::error('[Bedrock] AWS Error: '.$e->getMessage());
+            throw new \RuntimeException('Bedrock invocation failed: '.$e->getAwsErrorMessage());
+        } catch (\Exception $e) {
+            Log::error('[Bedrock] General Error: '.$e->getMessage());
+            throw $e;
+        }
+    }
+
+    protected function mapBedrockModelId(string $key): string
+    {
+        return match ($key) {
+            'claude-3-5-sonnet' => 'anthropic.claude-3-5-sonnet-20240620-v1:0',
+            'claude-3-5-haiku' => 'anthropic.claude-3-5-haiku-20241022-v1:0',
+            'claude-opus-4-5' => 'anthropic.claude-3-opus-20240229-v1:0', // Fallback to 3 Opus if 4.5 not out
+            'nova-2-lite' => 'amazon.nova-lite-v1:0',
+            'nova-2-pro' => 'amazon.nova-pro-v1:0',
+            default => 'anthropic.claude-3-5-sonnet-20240620-v1:0',
+        };
     }
 
     /**
@@ -455,8 +606,7 @@ class AgentRoutingService
      * @param  array<string, mixed>  $request
      * @return array<string, mixed>
      */
-    protected function executeAgent(string $agentType, array $request): array
-    {
+    protected function executeAgent(): array
         return $this->mcpClient->executeAgent($agentType, $request);
     }
 
@@ -468,14 +618,15 @@ class AgentRoutingService
         try {
             // Check if Ollama service is running
             $cacheKey = 'ollama_availability';
-            $cached = Cache::get($cacheKey);
-
-            if ($cached !== null) {
-                return (bool) $cached;
+            if (Cache::has($cacheKey)) {
+                return (bool) Cache::get($cacheKey);
             }
 
-            // TODO: Implement actual Ollama health check
-            $available = true;
+            $host = config('ai.ollama.host', 'http://localhost:11434');
+            /** @var \Illuminate\Http\Client\Response $response */
+            $response = \Illuminate\Support\Facades\Http::timeout(2)->get("$host/api/tags");
+
+            $available = $response->successful();
 
             Cache::put($cacheKey, $available, 60); // Cache for 1 minute
 
@@ -670,7 +821,6 @@ class AgentRoutingService
      * }
      */
     public function getRoutingAnalytics(): array
-    {
         $providers = [self::PROVIDER_OLLAMA, self::PROVIDER_BEDROCK, self::PROVIDER_AGENT];
         /** @var array<int, array{provider: string, model: string, execution_time: float, success: bool, timestamp: string}> $allMetrics */
         $allMetrics = [];
@@ -701,7 +851,7 @@ class AgentRoutingService
         foreach ($providers as $provider) {
             $providerMetrics = array_filter(
                 $allMetrics,
-                fn ($m) => is_array($m) && ($m['provider'] ?? null) === $provider
+                fn ($m) => is_array($m) && ((is_array($m) && isset($m['provider']) ? $m['provider'] : null)) === $provider
             );
             $count = count($providerMetrics);
 
@@ -724,7 +874,56 @@ class AgentRoutingService
             'by_provider' => $byProvider,
             'avg_execution_time' => $avgExecutionTime,
             'success_rate' => $successRate,
-            'fallback_rate' => 0.0, // TODO: Calculate from actual fallback tracking
+            'fallback_rate' => $this->calculateFallbackRate($allMetrics),
         ];
+    }
+
+    /**
+     * Calculate fallback rate from metrics
+     *
+     * @param  array<int, array{provider: string, model: string, execution_time: float, success: bool, timestamp: string}>  $metrics
+     */
+    protected function calculateFallbackRate(array $metrics): float
+    {
+        if (empty($metrics)) {
+            return 0.0;
+        }
+
+        // Count metrics that indicate fallback usage
+        // Fallback is indicated by failed primary attempts followed by successful secondary attempts
+        $fallbackCount = 0;
+        $totalAttempts = count($metrics);
+
+        // Simple heuristic: failed requests that were retried
+        $failedMetrics = array_filter($metrics, fn ($m) => ! ($m['success'] ?? true));
+        $fallbackCount = count($failedMetrics);
+
+        return $totalAttempts > 0 ? ($fallbackCount / $totalAttempts) * 100 : 0.0;
+    }
+
+    /**
+     * Estimate cost for a specific model
+     */
+    protected function estimateCostForModel(string $model): float
+    {
+        // Map model to cost per 1K tokens
+        if (str_contains($model, 'llama') || str_contains($model, 'mistral') || str_contains($model, 'qwen')) {
+            return self::OLLAMA_COST;
+        }
+
+        if (str_contains($model, 'nova-lite')) {
+            return self::BEDROCK_NOVA_COST;
+        }
+
+        if (str_contains($model, 'sonnet')) {
+            return self::BEDROCK_SONNET_COST;
+        }
+
+        if (str_contains($model, 'opus')) {
+            return self::BEDROCK_OPUS_COST;
+        }
+
+        // Default to Sonnet pricing
+        return self::BEDROCK_SONNET_COST;
     }
 }

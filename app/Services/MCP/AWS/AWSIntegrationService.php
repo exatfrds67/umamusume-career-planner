@@ -47,7 +47,6 @@ class AWSIntegrationService
      * }
      */
     public function checkAvailability(): array
-    {
         $availability = [
             'pricing' => $this->pricingService->isAvailable(),
             'knowledge' => $this->knowledgeService->isAvailable(),
@@ -73,8 +72,7 @@ class AWSIntegrationService
      *     budget_status: array<string, mixed>
      * }
      */
-    public function getCostAnalysis(array $usage, array $historicalUsage = []): array
-    {
+    public function getCostAnalysis(): array
         return $this->executeWithRateLimit(function () use ($usage, $historicalUsage) {
             return $this->executeWithRetry(function () use ($usage, $historicalUsage) {
                 $currentCosts = $this->pricingService->calculateMonthlyCost($usage);
@@ -108,7 +106,6 @@ class AWSIntegrationService
      * }
      */
     public function getBedrockGuidance(): array
-    {
         return $this->executeWithRateLimit(function () {
             return $this->executeWithRetry(function () {
                 $bestPractices = $this->knowledgeService->getBedrockBestPractices();
@@ -143,7 +140,6 @@ class AWSIntegrationService
      * }
      */
     public function getServiceHealthDashboard(): array
-    {
         return $this->executeWithRateLimit(function () {
             return $this->executeWithRetry(function () {
                 $bedrockHealth = $this->apiService->getBedrockHealth();
@@ -185,8 +181,7 @@ class AWSIntegrationService
      *     priority_actions: array<int, string>
      * }
      */
-    public function getOptimizationRecommendations(array $currentUsage, array $requirements = []): array
-    {
+    public function getOptimizationRecommendations(): array
         return $this->executeWithRateLimit(function () use ($currentUsage, $requirements) {
             return $this->executeWithRetry(function () use ($currentUsage, $requirements) {
                 $costOptimization = $this->pricingService->getBudgetOptimizationRecommendations($currentUsage);
@@ -236,8 +231,7 @@ class AWSIntegrationService
      *     troubleshooting_guides: array<int, mixed>
      * }
      */
-    public function searchDocumentation(string $query): array
-    {
+    public function searchDocumentation(): array
         return $this->executeWithRateLimit(function () use ($query) {
             return $this->executeWithRetry(function () use ($query) {
                 $searchResults = $this->knowledgeService->searchDocumentation($query);
@@ -279,8 +273,7 @@ class AWSIntegrationService
      *     cost_savings_potential: float
      * }
      */
-    public function getModelComparison(array $tokenCounts): array
-    {
+    public function getModelComparison(): array
         return $this->executeWithRateLimit(function () use ($tokenCounts) {
             return $this->executeWithRetry(function () use ($tokenCounts) {
                 $pricingComparison = $this->pricingService->comparePricing($tokenCounts);
@@ -348,7 +341,7 @@ class AWSIntegrationService
     {
         $lastException = null;
 
-        for ($attempt = 1; $attempt <= self::RETRY_ATTEMPTS; $attempt++) {
+        for ($attempt = 1; $attempt <= self::RETRY_ATTEMPTS; $attempt = ($attempt ?? 0) + 1) {
             try {
                 return $operation();
             } catch (\Exception $e) {
@@ -410,7 +403,6 @@ class AWSIntegrationService
      * }
      */
     public function getStatistics(): array
-    {
         $availability = $this->checkAvailability();
 
         $rateLimitCount = (int) Cache::get(self::RATE_LIMIT_KEY, 0);

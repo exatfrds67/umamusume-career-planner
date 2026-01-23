@@ -58,12 +58,7 @@ class AgentOrchestrationService
     /**
      * Create a new agent workflow
      */
-    public function createWorkflow(
-        string $name,
-        string $pattern,
-        array $agents,
-        array $config = []
-    ): array {
+    public function createWorkflow(): array
         try {
             $workflowId = $this->generateWorkflowId($name);
 
@@ -102,8 +97,7 @@ class AgentOrchestrationService
     /**
      * Execute a workflow
      */
-    public function executeWorkflow(string $workflowId, array $input = []): array
-    {
+    public function executeWorkflow(): array
         $workflow = $this->getWorkflow($workflowId);
 
         if (! $workflow) {
@@ -147,14 +141,7 @@ class AgentOrchestrationService
     /**
      * Create context-aware workflow with character and career state
      */
-    public function createContextAwareWorkflow(
-        string $name,
-        string $pattern,
-        array $agents,
-        \App\Models\Character $character,
-        ?\App\Models\Career $career = null,
-        array $config = []
-    ): array {
+    public function createContextAwareWorkflow(): array
         try {
             // Build unified context
             $context = $this->contextService->buildUnifiedContext($character, $career);
@@ -194,11 +181,7 @@ class AgentOrchestrationService
     /**
      * Execute workflow with memory persistence
      */
-    public function executeWorkflowWithMemory(
-        string $workflowId,
-        string $agentId,
-        array $input = []
-    ): array {
+    public function executeWorkflowWithMemory(): array
         try {
             // Retrieve agent memories
             $memories = $this->memoryService->getAgentMemories($agentId);
@@ -242,8 +225,7 @@ class AgentOrchestrationService
      *     orchestration_metadata: array<string, mixed>
      * }
      */
-    public function executeComprehensiveAnalysis(Character $character, array $context = []): array
-    {
+    public function executeComprehensiveAnalysis(): array
         $startTime = microtime(true);
 
         $careerStrategy = app(CareerStrategyAgent::class)->analyzeCareerStrategy($character, $context);
@@ -284,8 +266,7 @@ class AgentOrchestrationService
      *
      * @return array{action: string, reason: string, confidence: float}
      */
-    public function getQuickRecommendation(Character $character): array
-    {
+    public function getQuickRecommendation(): array
         $cacheKey = "mcp_quick_recommendation:{$character->id}";
         $cached = Cache::get($cacheKey);
 
@@ -329,13 +310,7 @@ class AgentOrchestrationService
      * @param  array<string, mixed>  $summerCamp
      * @return array<string, mixed>
      */
-    protected function buildIntegratedRecommendations(
-        Character $character,
-        array $careerStrategy,
-        array $resourceManagement,
-        array $performanceAnalytics,
-        array $summerCamp
-    ): array {
+    protected function buildIntegratedRecommendations(): array
         $energy = (int) ($performanceAnalytics['energy_analysis']['current_energy'] ?? $character->energy_level ?? 100);
         $isInCamp = (bool) ($summerCamp['summer_camp_status']['is_in_camp'] ?? false);
 
@@ -366,8 +341,7 @@ class AgentOrchestrationService
     /**
      * @return array{priority: string, action: string, reason: string, source: string}
      */
-    protected function determinePriorityRecommendation(int $energy, bool $isInCamp): array
-    {
+    protected function determinePriorityRecommendation(): array
         if ($energy <= 25) {
             return [
                 'priority' => 'critical',
@@ -413,8 +387,7 @@ class AgentOrchestrationService
     /**
      * Execute agents sequentially
      */
-    protected function executeSequential(array $workflow, array $input): array
-    {
+    protected function executeSequential(): array
         $results = [];
         $currentInput = $input;
 
@@ -436,8 +409,7 @@ class AgentOrchestrationService
     /**
      * Execute agents in parallel
      */
-    protected function executeParallel(array $workflow, array $input): array
-    {
+    protected function executeParallel(): array
         $results = [];
 
         foreach ($workflow['agents'] as $agentConfig) {
@@ -454,8 +426,7 @@ class AgentOrchestrationService
     /**
      * Execute agents hierarchically
      */
-    protected function executeHierarchical(array $workflow, array $input): array
-    {
+    protected function executeHierarchical(): array
         $results = [];
 
         // Execute coordinator agent first
@@ -490,8 +461,7 @@ class AgentOrchestrationService
     /**
      * Execute agents collaboratively
      */
-    protected function executeCollaborative(array $workflow, array $input): array
-    {
+    protected function executeCollaborative(): array
         $results = [];
         $sharedContext = $input;
 
@@ -513,8 +483,7 @@ class AgentOrchestrationService
     /**
      * Execute a single agent
      */
-    protected function executeAgent(array $agentConfig, array $input): array
-    {
+    protected function executeAgent(): array
         $agentId = $agentConfig['id'] ?? uniqid('agent_');
         $agentType = $agentConfig['type'] ?? 'generic';
 
@@ -567,8 +536,7 @@ class AgentOrchestrationService
     /**
      * Create a new agent
      */
-    public function createAgent(string $type, array $config = []): array
-    {
+    public function createAgent(): array
         try {
             $agentId = $this->generateAgentId($type);
 
@@ -603,8 +571,7 @@ class AgentOrchestrationService
     /**
      * Monitor agent performance
      */
-    public function monitorAgent(string $agentId): array
-    {
+    public function monitorAgent(): array
         $agent = $this->getAgent($agentId);
 
         if (! $agent) {
@@ -652,8 +619,7 @@ class AgentOrchestrationService
     /**
      * Get agent performance analytics
      */
-    public function getAgentAnalytics(string $agentId): array
-    {
+    public function getAgentAnalytics(): array
         $metrics = $this->getAgentMetrics($agentId);
 
         if (empty($metrics)) {
@@ -688,8 +654,7 @@ class AgentOrchestrationService
     /**
      * Generate optimization recommendations
      */
-    protected function generateOptimizationRecommendations(array $metrics): array
-    {
+    protected function generateOptimizationRecommendations(): array
         $recommendations = [];
 
         if (empty($metrics)) {
@@ -783,8 +748,7 @@ class AgentOrchestrationService
         Cache::put("agent_metrics:{$agentId}", $allMetrics, 3600);
     }
 
-    protected function getAgentMetrics(string $agentId): array
-    {
+    protected function getAgentMetrics(): array
         $metrics = Cache::get("agent_metrics:{$agentId}", []);
 
         return is_array($metrics) ? $metrics : [];
@@ -808,8 +772,7 @@ class AgentOrchestrationService
         }
     }
 
-    protected function combineOutputs(array $results): array
-    {
+    protected function combineOutputs(): array
         $combined = [];
         foreach ($results as $result) {
             if (isset($result['output']) && is_array($result['output'])) {
@@ -820,8 +783,7 @@ class AgentOrchestrationService
         return $combined;
     }
 
-    protected function aggregateHierarchicalResults(array $results): array
-    {
+    protected function aggregateHierarchicalResults(): array
         $aggregated = $results['coordinator']['output'] ?? [];
 
         foreach ($results['subordinates'] as $subordinateResult) {

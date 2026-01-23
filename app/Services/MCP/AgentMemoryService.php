@@ -127,10 +127,7 @@ class AgentMemoryService
     /**
      * Get all memories for an agent
      */
-    public function getAgentMemories(
-        string $agentId,
-        ?string $memoryType = null
-    ): array {
+    public function getAgentMemories(): array
         try {
             $index = $this->getMemoryIndex($agentId);
             $memories = [];
@@ -189,10 +186,7 @@ class AgentMemoryService
     /**
      * Retrieve episodic memories
      */
-    public function getEpisodes(
-        string $agentId,
-        ?int $limit = null
-    ): array {
+    public function getEpisodes(): array
         $memories = $this->getAgentMemories($agentId, self::MEMORY_EPISODIC);
 
         // Sort by timestamp (most recent first)
@@ -291,8 +285,7 @@ class AgentMemoryService
     /**
      * Retrieve agent learnings
      */
-    public function getLearnings(string $agentId): array
-    {
+    public function getLearnings(): array
         $memories = $this->getAgentMemories($agentId, self::MEMORY_LONG_TERM);
 
         return array_filter($memories, function ($memory) {
@@ -379,8 +372,7 @@ class AgentMemoryService
     /**
      * Get memory statistics for an agent
      */
-    public function getMemoryStatistics(string $agentId): array
-    {
+    public function getMemoryStatistics(): array
         $index = $this->getMemoryIndex($agentId);
         $stats = [
             'agent_id' => $agentId,
@@ -400,8 +392,7 @@ class AgentMemoryService
     /**
      * Consolidate short-term memories to long-term
      */
-    public function consolidateMemories(string $agentId): array
-    {
+    public function consolidateMemories(): array
         try {
             $shortTermMemories = $this->getAgentMemories($agentId, self::MEMORY_SHORT_TERM);
             $consolidated = [];
@@ -464,8 +455,7 @@ class AgentMemoryService
         };
     }
 
-    protected function getMemoryIndex(string $agentId): array
-    {
+    protected function getMemoryIndex(): array
         return Cache::get("agent_memory_index:{$agentId}", []);
     }
 
