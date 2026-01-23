@@ -61,6 +61,7 @@ class TrainingSession extends Model
         'motivation',
         'had_failure_rate',
         'failure_rate_percentage',
+        'success_rate',
         'friendship_training',
         'friendship_level_bonus',
         'energy_cost',
@@ -79,6 +80,15 @@ class TrainingSession extends Model
     protected function casts(): array
     {
         return [
+            'career_id' => 'integer',
+            'character_id' => 'integer',
+            'turn_number' => 'integer',
+            'speed_gain' => 'integer',
+            'stamina_gain' => 'integer',
+            'power_gain' => 'integer',
+            'guts_gain' => 'integer',
+            'wit_gain' => 'integer',
+            'sp_gain' => 'integer',
             'support_cards_present' => 'array',
             'participating_support_cards' => 'array',
             'skill_hints_obtained' => 'array',
@@ -87,6 +97,8 @@ class TrainingSession extends Model
             'training_penalties' => 'array',
             'decision_factors' => 'array',
             'training_metadata' => 'array',
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
         ];
     }
 

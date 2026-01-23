@@ -8,6 +8,28 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id
+ * @property int $character_id
+ * @property int $skill_id
+ * @property string $source_type
+ * @property string|null $source_name
+ * @property int|null $source_id
+ * @property int|null $turn_obtained
+ * @property string|null $career_phase
+ * @property bool $guaranteed_hint
+ * @property string|null $training_type
+ * @property array<string, mixed>|null $training_participants
+ * @property bool $friendship_training
+ * @property float|null $discount_percentage
+ * @property bool $is_used
+ * @property \Illuminate\Support\Carbon|null $used_at
+ * @property array<string, mixed>|null $hint_metadata
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ *
+ * @use HasFactory<SkillHintFactory>
+ */
 class SkillHint extends Model
 {
     /** @use HasFactory<SkillHintFactory> */
@@ -41,10 +63,16 @@ class SkillHint extends Model
 
     /**
      * The attributes that should be cast.
+     *
+     * @return array<string, string>
      */
     protected function casts(): array
     {
         return [
+            'character_id' => 'integer',
+            'skill_id' => 'integer',
+            'source_id' => 'integer',
+            'turn_obtained' => 'integer',
             'training_participants' => 'array',
             'hint_metadata' => 'array',
             'guaranteed_hint' => 'boolean',
@@ -52,6 +80,8 @@ class SkillHint extends Model
             'is_used' => 'boolean',
             'used_at' => 'datetime',
             'discount_percentage' => 'float',
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
         ];
     }
 

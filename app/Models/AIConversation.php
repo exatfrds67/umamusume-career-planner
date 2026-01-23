@@ -9,6 +9,54 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id
+ * @property int $user_id
+ * @property int|null $character_id
+ * @property string $conversation_id
+ * @property string $conversation_type
+ * @property string|null $conversation_title
+ * @property array<string, mixed>|null $context_entities
+ * @property string $status
+ * @property int $message_count
+ * @property \Illuminate\Support\Carbon|null $last_activity_at
+ * @property \Illuminate\Support\Carbon|null $started_at
+ * @property \Illuminate\Support\Carbon|null $ended_at
+ * @property string|null $ai_model
+ * @property string|null $ai_version
+ * @property array<string, mixed>|null $ai_configuration
+ * @property array<string, mixed>|null $system_prompt
+ * @property array<string, mixed>|null $conversation_summary
+ * @property array<string, mixed>|null $key_topics
+ * @property array<string, mixed>|null $recommendations_made
+ * @property array<string, mixed>|null $user_feedback
+ * @property float|null $user_satisfaction_rating
+ * @property int|null $helpful_responses
+ * @property int|null $unhelpful_responses
+ * @property array<string, mixed>|null $quality_metrics
+ * @property bool $contains_sensitive_data
+ * @property array<string, mixed>|null $data_retention_policy
+ * @property bool $user_consented_storage
+ * @property \Illuminate\Support\Carbon|null $scheduled_deletion_at
+ * @property array<string, mixed>|null $workflow_state
+ * @property array<string, mixed>|null $action_items
+ * @property array<string, mixed>|null $follow_up_tasks
+ * @property bool $requires_human_review
+ * @property array<string, mixed>|null $tags
+ * @property array<string, mixed>|null $custom_metadata
+ * @property string|null $notes
+ * @property string|null $message_type
+ * @property float|null $cost_estimate
+ * @property string|null $ai_model_used
+ * @property float|null $processing_time
+ * @property float|null $cost
+ * @property int|null $token_count
+ * @property array<string, mixed>|null $metadata
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ *
+ * @use HasFactory<\Database\Factories\AIConversationFactory>
+ */
 class AIConversation extends Model
 {
     use HasFactory;
@@ -60,10 +108,14 @@ class AIConversation extends Model
 
     /**
      * The attributes that should be cast.
+     *
+     * @return array<string, string>
      */
     protected function casts(): array
     {
         return [
+            'user_id' => 'integer',
+            'character_id' => 'integer',
             'context_entities' => 'array',
             'message_count' => 'integer',
             'last_activity_at' => 'datetime',
@@ -89,6 +141,7 @@ class AIConversation extends Model
             'requires_human_review' => 'boolean',
             'tags' => 'array',
             'custom_metadata' => 'array',
+            'cost_estimate' => 'float',
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
         ];
@@ -96,6 +149,8 @@ class AIConversation extends Model
 
     /**
      * Get the user that owns the conversation.
+     *
+     * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {
@@ -104,6 +159,8 @@ class AIConversation extends Model
 
     /**
      * Get the character associated with the conversation.
+     *
+     * @return BelongsTo<Character, $this>
      */
     public function character(): BelongsTo
     {
@@ -112,6 +169,8 @@ class AIConversation extends Model
 
     /**
      * Get the messages for this conversation.
+     *
+     * @return HasMany<ConversationMessage, $this>
      */
     public function messages(): HasMany
     {
@@ -121,7 +180,7 @@ class AIConversation extends Model
     /**
      * Scope a query to only include user messages.
      */
-    public function scopeUserMessages($query)
+    public function scopeUserMessages(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('message_type', 'user');
     }
@@ -129,7 +188,7 @@ class AIConversation extends Model
     /**
      * Scope a query to only include AI messages.
      */
-    public function scopeAiMessages($query)
+    public function scopeAiMessages(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('message_type', 'ai');
     }

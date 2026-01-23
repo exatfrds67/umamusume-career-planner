@@ -76,16 +76,23 @@ class Character extends Model
         'spirit_burst_data',
         'status',
         'completion_data',
+        'available_sp',
     ];
 
+    /**
+     * @return array<string, string>
+     */
     protected function casts(): array
     {
         return [
+            'user_id' => 'integer',
+            'current_turn' => 'integer',
             'current_stats' => 'array',
             'stat_priorities' => 'array',
             'stat_breakpoints' => 'array',
             'energy_level' => 'integer',
             'conditions' => 'array',
+            'days_until_race' => 'integer',
             'goals' => 'array',
             'race_schedule' => 'array',
             'training_plan' => 'array',
@@ -96,6 +103,8 @@ class Character extends Model
             'facility_levels' => 'array',
             'spirit_burst_data' => 'array',
             'completion_data' => 'array',
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
         ];
     }
 
@@ -192,7 +201,7 @@ class Character extends Model
     /**
      * Scope a query to only include active characters.
      */
-    public function scopeActive($query)
+    public function scopeActive(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('status', 'active');
     }
@@ -250,8 +259,8 @@ class Character extends Model
                 $current = $this->getStat($stat);
                 $target = $this->goals['target_stats'][$stat];
                 $progress = min(100, ($current / $target) * 100);
-                $totalProgress += $progress;
-                $statCount++;
+                $totalProgress = ($totalProgress ?? 0) + $progress;
+                $statCount = ($statCount ?? 0) + 1;
             }
         }
 

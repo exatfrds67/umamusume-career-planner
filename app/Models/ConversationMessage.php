@@ -9,6 +9,45 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id
+ * @property int $conversation_id
+ * @property int|null $user_id
+ * @property string $message_type
+ * @property string|null $message_content
+ * @property array<string, mixed>|null $message_metadata
+ * @property string|null $agent_id
+ * @property string|null $agent_type
+ * @property string|null $agent_name
+ * @property array<string, mixed>|null $agent_context
+ * @property array<string, mixed>|null $tools_used
+ * @property array<string, mixed>|null $tool_results
+ * @property int|null $tool_call_count
+ * @property int|null $parent_message_id
+ * @property string|null $branch_id
+ * @property int|null $branch_depth
+ * @property bool $is_branch_point
+ * @property array<string, mixed>|null $branch_metadata
+ * @property string|null $ai_model_used
+ * @property float|null $processing_time
+ * @property int|null $tokens_used
+ * @property float|null $cost_estimate
+ * @property array<string, mixed>|null $model_parameters
+ * @property int|null $quality_rating
+ * @property bool|null $is_helpful
+ * @property string|null $user_feedback
+ * @property array<string, mixed>|null $quality_metrics
+ * @property string|null $status
+ * @property bool $is_visible
+ * @property bool $is_pinned
+ * @property bool $is_bookmarked
+ * @property \Illuminate\Support\Carbon|null $sent_at
+ * @property \Illuminate\Support\Carbon|null $edited_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ *
+ * @use HasFactory<\Database\Factories\ConversationMessageFactory>
+ */
 class ConversationMessage extends Model
 {
     use HasFactory;
@@ -58,15 +97,20 @@ class ConversationMessage extends Model
 
     /**
      * The attributes that should be cast.
+     *
+     * @return array<string, string>
      */
     protected function casts(): array
     {
         return [
+            'conversation_id' => 'integer',
+            'user_id' => 'integer',
             'message_metadata' => 'array',
             'agent_context' => 'array',
             'tools_used' => 'array',
             'tool_results' => 'array',
             'tool_call_count' => 'integer',
+            'parent_message_id' => 'integer',
             'branch_depth' => 'integer',
             'is_branch_point' => 'boolean',
             'branch_metadata' => 'array',
@@ -89,6 +133,8 @@ class ConversationMessage extends Model
 
     /**
      * Get the conversation that owns the message.
+     *
+     * @return BelongsTo<AIConversation, $this>
      */
     public function conversation(): BelongsTo
     {
@@ -97,6 +143,8 @@ class ConversationMessage extends Model
 
     /**
      * Get the user that owns the message.
+     *
+     * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {
@@ -105,6 +153,8 @@ class ConversationMessage extends Model
 
     /**
      * Get the parent message for branching.
+     *
+     * @return BelongsTo<ConversationMessage, $this>
      */
     public function parentMessage(): BelongsTo
     {
@@ -113,6 +163,8 @@ class ConversationMessage extends Model
 
     /**
      * Get the child messages (branches).
+     *
+     * @return HasMany<ConversationMessage, $this>
      */
     public function childMessages(): HasMany
     {
@@ -122,7 +174,7 @@ class ConversationMessage extends Model
     /**
      * Scope a query to only include user messages.
      */
-    public function scopeUserMessages($query)
+    public function scopeUserMessages(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('message_type', 'user');
     }
@@ -130,7 +182,7 @@ class ConversationMessage extends Model
     /**
      * Scope a query to only include AI messages.
      */
-    public function scopeAiMessages($query)
+    public function scopeAiMessages(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('message_type', 'ai');
     }
@@ -146,7 +198,7 @@ class ConversationMessage extends Model
     /**
      * Scope a query to only include branch points.
      */
-    public function scopeBranchPoints($query)
+    public function scopeBranchPoints(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('is_branch_point', true);
     }
@@ -162,7 +214,7 @@ class ConversationMessage extends Model
     /**
      * Scope a query to only include visible messages.
      */
-    public function scopeVisible($query)
+    public function scopeVisible(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('is_visible', true);
     }
@@ -193,8 +245,10 @@ class ConversationMessage extends Model
 
     /**
      * Get all branches from this message.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<int, ConversationMessage>
      */
-    public function getBranches()
+    public function getBranches(): \Illuminate\Database\Eloquent\Collection
     {
         return $this->childMessages()->where('is_branch_point', false)->get();
     }

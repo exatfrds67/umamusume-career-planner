@@ -8,6 +8,30 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id
+ * @property int $career_id
+ * @property int $character_id
+ * @property int|null $source_support_card_id
+ * @property array<string, mixed>|null $available_choices
+ * @property array<string, mixed>|null $choice_effects
+ * @property array<string, mixed>|null $skill_hints_gained
+ * @property array<string, mixed>|null $skills_learned
+ * @property array<string, mixed>|null $items_gained
+ * @property array<string, mixed>|null $special_effects
+ * @property array<string, mixed>|null $friendship_changes
+ * @property array<string, mixed>|null $bond_changes
+ * @property array<string, mixed>|null $relationship_effects
+ * @property array<string, mixed>|null $activation_conditions
+ * @property array<string, mixed>|null $character_state_before
+ * @property array<string, mixed>|null $character_state_after
+ * @property array<string, mixed>|null $lessons_learned
+ * @property array<string, mixed>|null $event_metadata
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ *
+ * @use HasFactory<\Database\Factories\EventFactory>
+ */
 class Event extends Model
 {
     use HasFactory;
@@ -27,6 +51,9 @@ class Event extends Model
     protected function casts(): array
     {
         return [
+            'career_id' => 'integer',
+            'character_id' => 'integer',
+            'source_support_card_id' => 'integer',
             'available_choices' => 'array',
             'choice_effects' => 'array',
             'skill_hints_gained' => 'array',
@@ -41,6 +68,8 @@ class Event extends Model
             'character_state_after' => 'array',
             'lessons_learned' => 'array',
             'event_metadata' => 'array',
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
         ];
     }
 

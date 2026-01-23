@@ -9,6 +9,34 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property string|null $internal_id
+ * @property string $skill_type
+ * @property string $rarity
+ * @property int $base_sp_cost
+ * @property int|null $evolution_target_id
+ * @property int|null $evolution_source_id
+ * @property bool $can_evolve
+ * @property bool $is_evolution
+ * @property array<string, mixed>|null $effects
+ * @property string|null $description
+ * @property array<string, mixed>|null $activation_conditions
+ * @property array<string, mixed>|null $stat_requirements
+ * @property array<string, mixed>|null $support_card_sources
+ * @property array<string, mixed>|null $event_sources
+ * @property array<string, mixed>|null $inheritance_sources
+ * @property string|null $meta_tier
+ * @property array<string, mixed>|null $strategic_notes
+ * @property array<int, string>|null $synergy_skills
+ * @property bool $is_active
+ * @property string|null $status
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ *
+ * @use HasFactory<SkillFactory>
+ */
 class Skill extends Model
 {
     /** @use HasFactory<SkillFactory> */
@@ -45,14 +73,20 @@ class Skill extends Model
         'strategic_notes',
         'synergy_skills',
         'is_active',
+        'status',
     ];
 
     /**
      * The attributes that should be cast.
+     *
+     * @return array<string, string>
      */
     protected function casts(): array
     {
         return [
+            'base_sp_cost' => 'integer',
+            'evolution_target_id' => 'integer',
+            'evolution_source_id' => 'integer',
             'effects' => 'array',
             'activation_conditions' => 'array',
             'stat_requirements' => 'array',
@@ -64,6 +98,8 @@ class Skill extends Model
             'can_evolve' => 'boolean',
             'is_evolution' => 'boolean',
             'is_active' => 'boolean',
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
         ];
     }
 

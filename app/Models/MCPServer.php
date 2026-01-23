@@ -18,46 +18,51 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $server_name
  * @property string $server_type
  * @property string $server_version
- * @property array $server_config
- * @property array|null $connection_params
+ * @property array<string, mixed> $server_config
+ * @property array<string, mixed>|null $connection_params
  * @property string|null $endpoint_url
- * @property array|null $authentication_config
+ * @property array<string, mixed>|null $authentication_config
  * @property string $status
  * @property \Illuminate\Support\Carbon|null $last_health_check
- * @property array|null $health_status
+ * @property array<string, mixed>|null $health_status
  * @property int $consecutive_failures
- * @property array|null $supported_tools
- * @property array|null $supported_resources
- * @property array|null $server_capabilities
- * @property array|null $api_schema
+ * @property array<string, mixed>|null $supported_tools
+ * @property array<string, mixed>|null $supported_resources
+ * @property array<string, mixed>|null $server_capabilities
+ * @property array<string, mixed>|null $api_schema
  * @property int $total_requests
  * @property int $successful_requests
  * @property int $failed_requests
  * @property float|null $average_response_time
  * @property \Illuminate\Support\Carbon|null $last_used_at
- * @property array|null $recent_errors
+ * @property array<string, mixed>|null $recent_errors
  * @property string|null $last_error_message
  * @property \Illuminate\Support\Carbon|null $last_error_at
- * @property array|null $debug_information
+ * @property array<string, mixed>|null $debug_information
  * @property bool $auto_start
  * @property bool $auto_restart
  * @property int $max_restart_attempts
  * @property int $restart_count
- * @property array|null $data_sources
- * @property array|null $resource_usage
+ * @property array<string, mixed>|null $data_sources
+ * @property array<string, mixed>|null $resource_usage
  * @property int|null $memory_usage_mb
  * @property float|null $cpu_usage_percent
- * @property array|null $dependent_servers
- * @property array|null $dependent_services
- * @property array|null $integration_points
- * @property array|null $access_permissions
- * @property array|null $security_settings
+ * @property array<string, mixed>|null $dependent_servers
+ * @property array<string, mixed>|null $dependent_services
+ * @property array<string, mixed>|null $integration_points
+ * @property array<string, mixed>|null $access_permissions
+ * @property array<string, mixed>|null $security_settings
  * @property bool $requires_authentication
- * @property array|null $allowed_users
+ * @property array<string, mixed>|null $allowed_users
  * @property string|null $description
- * @property array|null $tags
- * @property array|null $custom_metadata
+ * @property array<string, mixed>|null $tags
+ * @property array<string, mixed>|null $custom_metadata
  * @property string|null $notes
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ */
+/**
+ * @property int $id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  */
@@ -392,7 +397,7 @@ class MCPServer extends Model
     /**
      * Scope a query to only include active servers.
      */
-    public function scopeActive($query)
+    public function scopeActive(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('status', 'active');
     }
@@ -400,7 +405,7 @@ class MCPServer extends Model
     /**
      * Scope a query to only include inactive servers.
      */
-    public function scopeInactive($query)
+    public function scopeInactive(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('status', 'inactive');
     }
@@ -408,7 +413,7 @@ class MCPServer extends Model
     /**
      * Scope a query to only include servers with errors.
      */
-    public function scopeWithErrors($query)
+    public function scopeWithErrors(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('status', 'error');
     }
@@ -424,7 +429,7 @@ class MCPServer extends Model
     /**
      * Scope a query to only include servers that auto-start.
      */
-    public function scopeAutoStart($query)
+    public function scopeAutoStart(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('auto_start', true);
     }

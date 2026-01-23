@@ -22,16 +22,21 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $type
  * @property string $model
  * @property string $instructions
- * @property array $tools
- * @property array $memory_config
- * @property array $guardrails
- * @property array $metadata
+ * @property array<string, mixed> $tools
+ * @property array<string, mixed> $memory_config
+ * @property array<string, mixed> $guardrails
+ * @property array<string, mixed> $metadata
  * @property string $status
  * @property string $health_status
  * @property float $deployment_time
- * @property array|null $performance_metrics
+ * @property array<string, mixed>|null $performance_metrics
  * @property \Illuminate\Support\Carbon|null $last_health_check
  * @property \Illuminate\Support\Carbon|null $terminated_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ */
+/**
+ * @property int $id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  */
@@ -153,7 +158,7 @@ class MCPAgent extends Model
     /**
      * Scope a query to only include active agents.
      */
-    public function scopeActive($query)
+    public function scopeActive(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('status', 'active');
     }
@@ -161,7 +166,7 @@ class MCPAgent extends Model
     /**
      * Scope a query to only include terminated agents.
      */
-    public function scopeTerminated($query)
+    public function scopeTerminated(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('status', 'terminated');
     }
@@ -169,7 +174,7 @@ class MCPAgent extends Model
     /**
      * Scope a query to only include healthy agents.
      */
-    public function scopeHealthy($query)
+    public function scopeHealthy(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('health_status', 'healthy');
     }

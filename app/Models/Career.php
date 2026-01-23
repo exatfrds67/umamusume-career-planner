@@ -43,6 +43,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  */
+/**
+ * @property int $id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ */
 class Career extends Model
 {
     use HasFactory;
@@ -95,6 +100,15 @@ class Career extends Model
     protected function casts(): array
     {
         return [
+            'character_id' => 'integer',
+            'user_id' => 'integer',
+            'current_turn' => 'integer',
+            'final_speed' => 'integer',
+            'final_stamina' => 'integer',
+            'final_power' => 'integer',
+            'final_guts' => 'integer',
+            'final_wit' => 'integer',
+            'final_sp' => 'integer',
             'started_at' => 'datetime',
             'completed_at' => 'datetime',
             'support_deck' => 'array',
@@ -107,6 +121,8 @@ class Career extends Model
             'career_metadata' => 'array',
             'performance_analysis' => 'array',
             'improvement_suggestions' => 'array',
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
         ];
     }
 
@@ -158,5 +174,15 @@ class Career extends Model
     public function events(): HasMany
     {
         return $this->hasMany(Event::class);
+    }
+
+    /**
+     * Get the skill acquisitions for this career.
+     *
+     * @return HasMany<SkillAcquisition, $this>
+     */
+    public function skillAcquisitions(): HasMany
+    {
+        return $this->hasMany(SkillAcquisition::class);
     }
 }

@@ -44,6 +44,8 @@ class Race extends Model
         'race_grade',
         'distance_category',
         'distance_meters',
+        'distance',
+        'track_type',
         'surface',
         'running_style',
         'weather',
@@ -93,6 +95,20 @@ class Race extends Model
     protected function casts(): array
     {
         return [
+            'career_id' => 'integer',
+            'character_id' => 'integer',
+            'turn_number' => 'integer',
+            'distance_meters' => 'integer',
+            'field_size' => 'integer',
+            'speed_at_race' => 'integer',
+            'stamina_at_race' => 'integer',
+            'power_at_race' => 'integer',
+            'guts_at_race' => 'integer',
+            'wit_at_race' => 'integer',
+            'finish_position' => 'integer',
+            'fans_gained' => 'integer',
+            'sp_reward' => 'integer',
+            'unity_cup_points_earned' => 'integer',
             'race_conditions' => 'array',
             'skills_activated' => 'array',
             'race_segments' => 'array',
@@ -103,6 +119,8 @@ class Race extends Model
             'preparation_strategy' => 'array',
             'lessons_learned' => 'array',
             'race_metadata' => 'array',
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
         ];
     }
 

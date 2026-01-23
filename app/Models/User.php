@@ -19,6 +19,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @property string $name
  * @property string $email
  * @property string $password
+ * @property string|null $avatar_path
  * @property \ArrayObject<string, mixed> $preferences
  * @property \ArrayObject<string, mixed> $accessibility_settings
  * @property \ArrayObject<string, mixed> $ai_settings
@@ -117,6 +118,26 @@ class User extends Authenticatable
     public function careers(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
     {
         return $this->hasManyThrough(Career::class, Character::class);
+    }
+
+    /**
+     * Get the user's training sessions through characters.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<TrainingSession, Character, $this>
+     */
+    public function trainingSessions(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
+    {
+        return $this->hasManyThrough(TrainingSession::class, Character::class);
+    }
+
+    /**
+     * Get the user's races through characters.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<Race, Character, $this>
+     */
+    public function races(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
+    {
+        return $this->hasManyThrough(Race::class, Character::class);
     }
 
     /**

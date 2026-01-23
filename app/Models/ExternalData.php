@@ -7,6 +7,32 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * External Data Model
+ *
+ * Caches data from external APIs (umapyoi.net, etc.).
+ *
+ * @property int $id
+ * @property string $source
+ * @property string|null $external_id
+ * @property string $data_type
+ * @property array<string, mixed> $data
+ * @property \Illuminate\Support\Carbon|null $cached_at
+ * @property \Illuminate\Support\Carbon|null $expires_at
+ * @property bool $is_valid
+ * @property array<string, mixed>|null $validation_errors
+ * @property \Illuminate\Support\Carbon|null $last_checked_at
+ * @property array<string, mixed>|null $metadata
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ *
+ * @use HasFactory<\Database\Factories\ExternalDataFactory>
+ */
+/**
+ * @property int $id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ */
 class ExternalData extends Model
 {
     use HasFactory;
@@ -44,7 +70,7 @@ class ExternalData extends Model
         return $this->is_valid && ($this->expires_at === null || $this->expires_at->isFuture());
     }
 
-    public function scopeValid($query)
+    public function scopeValid(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('is_valid', true)
             ->where(function ($q) {

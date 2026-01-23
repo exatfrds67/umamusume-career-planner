@@ -10,7 +10,22 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * Character Support Card Instance
  * Represents a support card equipped to a specific character
  *
+ * @property int $id
+ * @property int $character_id
+ * @property int $support_card_id
+ * @property int|null $limit_break_level
+ * @property int|null $friendship_level
+ * @property int|null $position_slot
+ * @property bool $is_friend_card
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ *
  * @use HasFactory<\Database\Factories\CharacterSupportCardFactory>
+ */
+/**
+ * @property int $id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
  */
 class CharacterSupportCard extends Model
 {
@@ -27,10 +42,20 @@ class CharacterSupportCard extends Model
         'is_friend_card',
     ];
 
+    /**
+     * @return array<string, string>
+     */
     protected function casts(): array
     {
         return [
+            'character_id' => 'integer',
+            'support_card_id' => 'integer',
+            'limit_break_level' => 'integer',
+            'friendship_level' => 'integer',
+            'position_slot' => 'integer',
             'is_friend_card' => 'boolean',
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
         ];
     }
 

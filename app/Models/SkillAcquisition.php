@@ -4,10 +4,41 @@ namespace App\Models;
 
 use Database\Factories\SkillAcquisitionFactory;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id
+ * @property int $character_id
+ * @property int $skill_id
+ * @property int|null $career_id
+ * @property int|null $turn_acquired
+ * @property string|null $career_phase
+ * @property string|null $acquisition_method
+ * @property int|null $base_sp_cost
+ * @property int|null $hints_used
+ * @property float|null $total_discount_percentage
+ * @property int|null $final_sp_cost
+ * @property int|null $sp_saved
+ * @property bool $is_evolution
+ * @property int|null $evolved_from_skill_id
+ * @property bool $replaced_skill
+ * @property array<string, mixed>|null $acquisition_context
+ * @property array<string, mixed>|null $hint_sources
+ * @property string|null $priority_level
+ * @property int|null $races_used
+ * @property array<string, mixed>|null $performance_data
+ * @property float|null $effectiveness_rating
+ * @property bool $is_active
+ * @property array<string, mixed>|null $acquisition_metadata
+ * @property bool $is_equipped
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ *
+ * @use HasFactory<SkillAcquisitionFactory>
+ */
 class SkillAcquisition extends Model
 {
     /** @use HasFactory<SkillAcquisitionFactory> */
@@ -46,14 +77,27 @@ class SkillAcquisition extends Model
         'effectiveness_rating',
         'is_active',
         'acquisition_metadata',
+        'is_equipped',
     ];
 
     /**
      * The attributes that should be cast.
+     *
+     * @return array<string, string>
      */
     protected function casts(): array
     {
         return [
+            'character_id' => 'integer',
+            'skill_id' => 'integer',
+            'career_id' => 'integer',
+            'turn_acquired' => 'integer',
+            'base_sp_cost' => 'integer',
+            'hints_used' => 'integer',
+            'final_sp_cost' => 'integer',
+            'sp_saved' => 'integer',
+            'evolved_from_skill_id' => 'integer',
+            'races_used' => 'integer',
             'acquisition_context' => 'array',
             'hint_sources' => 'array',
             'performance_data' => 'array',
@@ -63,7 +107,18 @@ class SkillAcquisition extends Model
             'is_active' => 'boolean',
             'total_discount_percentage' => 'decimal:2',
             'effectiveness_rating' => 'decimal:2',
+            'is_equipped' => 'boolean',
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
         ];
+    }
+
+    /**
+     * Whether the skill is currently equipped. Defaults to false when absent.
+     */
+    protected function isEquipped(): Attribute
+    {
+        return Attribute::get(fn ($value) => (bool) ($value ?? false));
     }
 
     /**

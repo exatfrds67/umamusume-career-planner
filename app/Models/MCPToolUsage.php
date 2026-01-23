@@ -41,6 +41,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  */
+/**
+ * @property int $id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ */
 class MCPToolUsage extends Model
 {
     use HasFactory;
@@ -175,7 +180,7 @@ class MCPToolUsage extends Model
     /**
      * Scope a query to only include successful executions.
      */
-    public function scopeSuccessful($query)
+    public function scopeSuccessful(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('execution_status', 'success');
     }
@@ -183,7 +188,7 @@ class MCPToolUsage extends Model
     /**
      * Scope a query to only include failed executions.
      */
-    public function scopeFailed($query)
+    public function scopeFailed(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('execution_status', 'failure');
     }

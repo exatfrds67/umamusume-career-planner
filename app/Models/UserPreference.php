@@ -61,6 +61,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  */
+/**
+ * @property int $id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ */
 class UserPreference extends Model
 {
     use HasFactory;
@@ -150,6 +155,7 @@ class UserPreference extends Model
     protected function casts(): array
     {
         return [
+            'user_id' => 'integer',
             'preference_value' => 'array',
             'allowed_values' => 'array',
             'default_value' => 'array',
@@ -181,11 +187,15 @@ class UserPreference extends Model
             'usage_analytics' => 'array',
             'tags' => 'array',
             'custom_metadata' => 'array',
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
         ];
     }
 
     /**
      * Get the user that owns the preference.
+     *
+     * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {
@@ -207,7 +217,7 @@ class UserPreference extends Model
     {
         $this->preference_value = is_array($value) ? $value : (array) $value;
         $this->last_modified_at = now();
-        $this->increment('modification_count');
+        $this->increment('modification_count', 1);
 
         // Add to modification history
         $history = $this->modification_history ?? [];
@@ -226,7 +236,7 @@ class UserPreference extends Model
      */
     public function recordAccess(): void
     {
-        $this->increment('access_count');
+        $this->increment('access_count', 1);
         $this->last_accessed_at = now();
         $this->save();
     }
@@ -298,7 +308,7 @@ class UserPreference extends Model
     /**
      * Scope a query to only include system-managed preferences.
      */
-    public function scopeSystemManaged($query)
+    public function scopeSystemManaged(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('is_system_managed', true);
     }
@@ -306,7 +316,7 @@ class UserPreference extends Model
     /**
      * Scope a query to only include user-managed preferences.
      */
-    public function scopeUserManaged($query)
+    public function scopeUserManaged(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('is_system_managed', false);
     }
@@ -314,7 +324,7 @@ class UserPreference extends Model
     /**
      * Scope a query to only include sensitive preferences.
      */
-    public function scopeSensitive($query)
+    public function scopeSensitive(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('is_sensitive', true);
     }
