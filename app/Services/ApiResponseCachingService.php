@@ -148,8 +148,7 @@ class ApiResponseCachingService
      * @param  array<string>  $tags
      * @return array{invalidated: bool, tags: array<string>}
      */
-    public function invalidateByTags(array $tags): array
-    {
+    public function invalidateByTags(): array
         try {
             Cache::tags($tags)->flush();
 
@@ -183,8 +182,7 @@ class ApiResponseCachingService
      *
      * @return array{invalidated: int, pattern: string}
      */
-    public function invalidateByEndpoint(string $endpointPattern): array
-    {
+    public function invalidateByEndpoint(): array
         $invalidated = 0;
 
         try {
@@ -199,7 +197,7 @@ class ApiResponseCachingService
                     }
                     if (is_array($keys) && ! empty($keys)) {
                         Redis::del(...$keys);
-                        $invalidated += count($keys);
+                        $invalidated = ($invalidated ?? 0) + count($keys);
                     }
                 } while ($cursor !== 0);
             }
@@ -235,8 +233,7 @@ class ApiResponseCachingService
      *
      * @return array{invalidated: int, cascaded: array<string>}
      */
-    public function invalidateWithCascade(string $dataType): array
-    {
+    public function invalidateWithCascade(): array
         $invalidated = 0;
         $cascaded = [];
 
@@ -247,7 +244,7 @@ class ApiResponseCachingService
         $primaryTags = $this->getTagsForDataType($dataType);
         if (! empty($primaryTags)) {
             $this->invalidateByTags($primaryTags);
-            $invalidated++;
+            $invalidated = ($invalidated ?? 0) + 1;
         }
 
         // Apply cascade rules
@@ -257,7 +254,7 @@ class ApiResponseCachingService
                 if (! empty($cascadeTags)) {
                     $this->invalidateByTags($cascadeTags);
                     $cascaded[] = $cascadeType;
-                    $invalidated++;
+                    $invalidated = ($invalidated ?? 0) + 1;
                 }
             }
         }
@@ -274,8 +271,7 @@ class ApiResponseCachingService
      * @param  array<array{method: string, path: string, params?: array<string, mixed>}>  $endpoints
      * @return array{warmed: int, failed: int, details: array<string, array{status: string, ttl?: int, error?: string}>}
      */
-    public function warmCache(array $endpoints): array
-    {
+    public function warmCache(): array
         $warmed = 0;
         $failed = 0;
         $details = [];
@@ -307,13 +303,13 @@ class ApiResponseCachingService
                 $warmingKey = 'api_cache_warming:'.$cacheKey;
                 Cache::put($warmingKey, true, 3600);
 
-                $warmed++;
+                $warmed = ($warmed ?? 0) + 1;
                 $details[$key] = [
                     'status' => 'queued',
                     'cache_key' => $cacheKey,
                 ];
             } catch (\Exception $e) {
-                $failed++;
+                $failed = ($failed ?? 0) + 1;
                 $details[$key] = [
                     'status' => 'failed',
                     'error' => $e->getMessage(),
@@ -334,7 +330,6 @@ class ApiResponseCachingService
      * @return array{hit_rate: float, hits: int, misses: int, stores: int, total_size_bytes: int, by_endpoint: array<string, array{hits: int, misses: int, avg_ttl: float}>}
      */
     public function getStatistics(): array
-    {
         $stats = [
             'hit_rate' => 0.0,
             'hits' => 0,
@@ -426,8 +421,7 @@ class ApiResponseCachingService
      *
      * @return array<string>
      */
-    protected function getEndpointTags(Request $request): array
-    {
+    protected function getEndpointTags(): array
         $path = $request->path();
         $tags = ['api_response'];
 
@@ -466,8 +460,7 @@ class ApiResponseCachingService
      *
      * @return array<string>
      */
-    protected function getTagsForDataType(string $dataType): array
-    {
+    protected function getTagsForDataType(): array
         $tagMap = config('api-performance.cache.data_type_tags', [
             'characters' => ['api_response', 'characters'],
             'skills' => ['api_response', 'skills'],
@@ -608,6 +601,6 @@ class ApiResponseCachingService
      */
     protected function isRedisAvailable(): bool
     {
-        return extension_loaded('redis') && config('cache.default') === 'redis';
+        return extension_loaded('redis') && config('cache.default', '') === 'redis';
     }
 }

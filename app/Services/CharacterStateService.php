@@ -10,15 +10,15 @@ class CharacterStateService
     /**
      * Recover energy through resting.
      *
-     * @return array Result of the rest action (recovered amount, success/fail/great success)
+     * @return array{recovered: int, result: string, new_energy: int, new_mood: string} Result of the rest action (recovered amount, success/fail/great success)
      */
-    public function rest(Character $character): array
-    {
-        // Simple logic for now:
-        // 0-60 energy: High chance of success (fixed 50 recovery)
-        // 60-80 energy: Moderate chance (fixed 30 recovery)
-        // 80+ energy: Low recovery (fixed 10)
-        // TODO: Implement proper RNG logic like the game (Success/Failure/Great Success)
+    public function rest(): array
+        // Implement proper RNG logic with Success/Failure/Great Success outcomes
+        // 0-60 energy: High chance of success (50 recovery base)
+        // 60-80 energy: Moderate chance (30 recovery base)
+        // 80+ energy: Low recovery (10 recovery base)
+        // Great Success: 1.4x recovery multiplier
+        // Failure: 0.2x recovery multiplier
 
         $currentEnergy = (int) $character->energy_level;
         $recovery = 0;
@@ -113,10 +113,9 @@ class CharacterStateService
     /**
      * Advance the turn counter and handle career stage progression.
      *
-     * @return array Information about the turn progression
+     * @return array{turn: int, stage: string, stage_changed: bool} Information about the turn progression
      */
-    public function progressTurn(Character $character): array
-    {
+    public function progressTurn(): array
         $character->current_turn++;
 
         // Scenario lasts 3 years (Junior, Classic, Senior) + URA
@@ -154,17 +153,17 @@ class CharacterStateService
     /**
      * Check and apply conditions based on state.
      *
-     * @return array Added/Removed conditions
+     * @return array{added: array<int, string>, removed: array<int, string>} Added/Removed conditions
      */
-    public function checkCondition(Character $character): array
-    {
+    public function checkCondition(): array
+        /** @var array<int, string> $added */
         $added = [];
+        /** @var array<int, string> $removed */
         $removed = [];
 
-        $conditions = $character->conditions;
-        if (! is_array($conditions)) {
-            $conditions = [];
-        }
+        $conditionsRaw = $character->conditions;
+        /** @var array<int, string> $conditions */
+        $conditions = is_array($conditionsRaw) ? $conditionsRaw : [];
 
         // Example: Low energy (<20) might give "Tired" condition (simplified)
         // In real game, conditions like "Overweight" come from events.

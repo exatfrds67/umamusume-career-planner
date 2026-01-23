@@ -145,8 +145,7 @@ class SkillHintService
      *   hints: array<int, array{id: int, source_type: string, source_name: string, turn_obtained: int, guaranteed: bool}>
      * }
      */
-    public function getCostBreakdown(Character $character, Skill $skill): array
-    {
+    public function getCostBreakdown(): array
         $hints = $this->getUnusedHintsForSkill($character, $skill);
         $hintCount = $hints->count();
         $discountPercentage = $this->calculateDiscountPercentage($hintCount);
@@ -211,11 +210,7 @@ class SkillHintService
      *   max_discount_reached: bool
      * }>
      */
-    public function predictHintOpportunities(
-        Character $character,
-        string $trainingType,
-        Collection $supportCards
-    ): array {
+    public function predictHintOpportunities(): array
         $opportunities = [];
 
         foreach ($supportCards as $supportCard) {
@@ -306,8 +301,7 @@ class SkillHintService
      *
      * @return array<int, array<string, mixed>>
      */
-    private function getSkillsProvidedByCard(SupportCardDefinition $supportCard, string $trainingType): array
-    {
+    private function getSkillsProvidedByCard(): array
         $supportCardSources = $supportCard->skill_provision ?? [];
 
         if (empty($supportCardSources)) {
@@ -347,8 +341,7 @@ class SkillHintService
      * @param  Collection<int, Skill>  $targetSkills
      * @return array<int, array{skill_id: int, skill_name: string, status: string, recommendation: string, priority: string, current_hints: int, final_cost?: int, potential_savings?: int}>
      */
-    public function getHintCollectionStrategy(Character $character, Collection $targetSkills): array
-    {
+    public function getHintCollectionStrategy(): array
         $strategies = [];
 
         foreach ($targetSkills as $skill) {
@@ -402,8 +395,7 @@ class SkillHintService
      *
      * @return array<string, mixed>
      */
-    public function getHintStatistics(Character $character): array
-    {
+    public function getHintStatistics(): array
         $allHints = SkillHint::where('character_id', $character->id)->with('skill')->get();
         $unusedHints = $allHints->where('is_used', false);
         $usedHints = $allHints->where('is_used', true);

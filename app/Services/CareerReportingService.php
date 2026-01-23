@@ -91,8 +91,7 @@ class CareerReportingService
      *     statistical_summary: array
      * }
      */
-    public function generateCareerSummaryReport(Career $career): array
-    {
+    public function generateCareerSummaryReport(): array
         $cacheKey = "report:career_summary:{$career->id}";
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($career) {
@@ -141,10 +140,9 @@ class CareerReportingService
      *     report_version: string
      * }
      */
-    protected function buildReportMetadata(Career $career): array
-    {
+    protected function buildReportMetadata(): array
         return [
-            'report_id' => 'RPT-'.strtoupper(substr(md5((string) $career->id.now()->timestamp), 0, 8)),
+            'report_id' => 'RPT-'.strtoupper(substr(md5((is_string($career) ? (string) $career : '')->id.now()->timestamp), 0, 8)),
             'generated_at' => now()->toIso8601String(),
             'career_id' => $career->id,
             'character_name' => $career->character?->name ?? 'Unknown',
@@ -165,8 +163,7 @@ class CareerReportingService
      *     key_achievements: array<string>
      * }
      */
-    protected function buildExecutiveSummary(Career $career, Collection $sessions, Collection $races): array
-    {
+    protected function buildExecutiveSummary(): array
         $totalTurns = $career->current_turn ?? $sessions->max('turn_number') ?? 0;
         $maxTurns = $career->scenario_type === 'unity_cup' ? 72 : 72;
         $completionPercentage = $maxTurns > 0 ? round(($totalTurns / $maxTurns) * 100, 1) : 0.0;
@@ -197,7 +194,7 @@ class CareerReportingService
     {
         $totalStatGains = 0;
         foreach ($sessions as $session) {
-            $totalStatGains += ($session->speed_gain ?? 0)
+            $totalStatGains = ($totalStatGains ?? 0) + ($session->speed_gain ?? 0)
                 + ($session->stamina_gain ?? 0)
                 + ($session->power_gain ?? 0)
                 + ($session->guts_gain ?? 0)
@@ -235,8 +232,7 @@ class CareerReportingService
      *
      * @return array{best_stat: string, best_value: int, total_gains: int, avg_per_turn: float}
      */
-    protected function getHighlightStats(Collection $sessions): array
-    {
+    protected function getHighlightStats(): array
         $statTotals = array_fill_keys(self::STAT_TYPES, 0);
 
         foreach ($sessions as $session) {
@@ -263,8 +259,7 @@ class CareerReportingService
      *
      * @return array<string>
      */
-    protected function getKeyAchievements(Career $career, Collection $sessions, Collection $races): array
-    {
+    protected function getKeyAchievements(): array
         $achievements = [];
 
         // Check for race wins
@@ -274,7 +269,7 @@ class CareerReportingService
         }
 
         // Check for G1 wins
-        $g1Wins = $races->where('race_grade', 'G1')->where('won_race', true)->count();
+        $g1Wins = $races->where('race_grade', '=', 'G1')->where('won_race', true)->count();
         if ($g1Wins > 0) {
             $achievements[] = "Won {$g1Wins} G1 race(s)";
         }
@@ -282,7 +277,7 @@ class CareerReportingService
         // Check for high efficiency
         $totalGains = 0;
         foreach ($sessions as $session) {
-            $totalGains += ($session->speed_gain ?? 0) + ($session->stamina_gain ?? 0)
+            $totalGains = ($totalGains ?? 0) + ($session->speed_gain ?? 0) + ($session->stamina_gain ?? 0)
                 + ($session->power_gain ?? 0) + ($session->guts_gain ?? 0) + ($session->wit_gain ?? 0);
         }
         $avgGain = $sessions->count() > 0 ? $totalGains / $sessions->count() : 0;
@@ -317,13 +312,12 @@ class CareerReportingService
      *     phase_performance: array<string, array>
      * }
      */
-    protected function buildPerformanceOverview(Career $career, Collection $sessions, Collection $races): array
-    {
+    protected function buildPerformanceOverview(): array
         // Calculate efficiency
         $totalGains = 0;
         $turnCount = $sessions->count();
         foreach ($sessions as $session) {
-            $totalGains += ($session->speed_gain ?? 0) + ($session->stamina_gain ?? 0)
+            $totalGains = ($totalGains ?? 0) + ($session->speed_gain ?? 0) + ($session->stamina_gain ?? 0)
                 + ($session->power_gain ?? 0) + ($session->guts_gain ?? 0) + ($session->wit_gain ?? 0);
         }
         $idealTotal = $turnCount * 30;
@@ -367,8 +361,7 @@ class CareerReportingService
      *
      * @return array<string, array{turns: int, efficiency: float, avg_gains: array}>
      */
-    protected function calculatePhasePerformance(Collection $sessions): array
-    {
+    protected function calculatePhasePerformance(): array
         $phasePerformance = [];
 
         foreach (self::CAREER_PHASES as $phase => $range) {
@@ -386,7 +379,7 @@ class CareerReportingService
                 foreach (self::STAT_TYPES as $stat) {
                     $gain = $session->{"{$stat}_gain"} ?? 0;
                     $statGains[$stat] += $gain;
-                    $totalGains += $gain;
+                    $totalGains = ($totalGains ?? 0) + $gain;
                 }
             }
 
@@ -420,8 +413,7 @@ class CareerReportingService
      *     failure_analysis: array
      * }
      */
-    protected function buildTrainingAnalysis(Collection $sessions): array
-    {
+    protected function buildTrainingAnalysis(): array
         $totalSessions = $sessions->count();
 
         // Training type breakdown
@@ -430,8 +422,8 @@ class CareerReportingService
         // Find best and worst training types
         $typeEfficiencies = [];
         foreach ($typeBreakdown as $type => $data) {
-            if ($data['count'] > 0) {
-                $typeEfficiencies[$type] = $data['avg_total_gain'];
+            if ((is_array($data) && isset($data['count']) ? $data['count'] : null) > 0) {
+                $typeEfficiencies[$type] = (is_array($data) && isset($data['avg_total_gain']) ? $data['avg_total_gain'] : null);
             }
         }
 
@@ -461,8 +453,7 @@ class CareerReportingService
      *
      * @return array<string, array{count: int, percentage: float, avg_total_gain: float, total_gains: array}>
      */
-    protected function calculateTrainingTypeBreakdown(Collection $sessions): array
-    {
+    protected function calculateTrainingTypeBreakdown(): array
         $types = ['speed', 'stamina', 'power', 'guts', 'wit', 'rest'];
         $breakdown = [];
         $totalSessions = $sessions->count();
@@ -478,7 +469,7 @@ class CareerReportingService
                 foreach (self::STAT_TYPES as $stat) {
                     $gain = $session->{"{$stat}_gain"} ?? 0;
                     $totalGains[$stat] += $gain;
-                    $totalAllGains += $gain;
+                    $totalAllGains = ($totalAllGains ?? 0) + $gain;
                 }
             }
 
@@ -498,15 +489,14 @@ class CareerReportingService
      *
      * @return array{count: int, percentage: float, avg_bonus: float, total_bonus_gains: int}
      */
-    protected function calculateFriendshipTrainingStats(Collection $sessions): array
-    {
+    protected function calculateFriendshipTrainingStats(): array
         $friendshipSessions = $sessions->where('friendship_training', true);
         $count = $friendshipSessions->count();
         $totalSessions = $sessions->count();
 
         $totalBonusGains = 0;
         foreach ($friendshipSessions as $session) {
-            $totalBonusGains += ($session->speed_gain ?? 0) + ($session->stamina_gain ?? 0)
+            $totalBonusGains = ($totalBonusGains ?? 0) + ($session->speed_gain ?? 0) + ($session->stamina_gain ?? 0)
                 + ($session->power_gain ?? 0) + ($session->guts_gain ?? 0) + ($session->wit_gain ?? 0);
         }
 
@@ -523,8 +513,7 @@ class CareerReportingService
      *
      * @return array{total_failures: int, failure_rate: float, failures_by_type: array<string, int>, failure_turns: array<int>}
      */
-    protected function analyzeTrainingFailures(Collection $sessions): array
-    {
+    protected function analyzeTrainingFailures(): array
         $failures = $sessions->where('training_failed', true);
         $totalFailures = $failures->count();
         $totalSessions = $sessions->count();
@@ -560,8 +549,7 @@ class CareerReportingService
      *     worst_race: array|null
      * }
      */
-    protected function buildRaceAnalysis(Collection $races): array
-    {
+    protected function buildRaceAnalysis(): array
         $totalRaces = $races->count();
         $wins = $races->where('won_race', true)->count();
         $winRate = $totalRaces > 0 ? round(($wins / $totalRaces) * 100, 1) : 0.0;
@@ -594,8 +582,7 @@ class CareerReportingService
      *
      * @return array<string, array{count: int, wins: int, win_rate: float, avg_position: float}>
      */
-    protected function calculateRacePerformanceByGrade(Collection $races): array
-    {
+    protected function calculateRacePerformanceByGrade(): array
         $grades = ['G1', 'G2', 'G3', 'OP', 'Pre-OP'];
         $performance = [];
 
@@ -620,8 +607,7 @@ class CareerReportingService
      *
      * @return array<string, array{count: int, wins: int, win_rate: float, avg_position: float}>
      */
-    protected function calculateRacePerformanceByDistance(Collection $races): array
-    {
+    protected function calculateRacePerformanceByDistance(): array
         $distanceCategories = [
             'short' => ['min' => 1000, 'max' => 1400],
             'mile' => ['min' => 1401, 'max' => 1800],
@@ -714,15 +700,14 @@ class CareerReportingService
      *     skill_sources: array<string, int>
      * }
      */
-    protected function buildSkillAnalysis(Collection $sessions, ?Character $character): array
-    {
+    protected function buildSkillAnalysis(): array
         $skillsAcquired = 0;
         $totalSpSpent = 0;
         $skillSources = [];
 
         foreach ($sessions as $session) {
             $hints = $session->skill_hints_obtained ?? [];
-            $skillsAcquired += count($hints);
+            $skillsAcquired = ($skillsAcquired ?? 0) + count($hints);
 
             foreach ($hints as $hint) {
                 $source = $hint['source'] ?? 'training';
@@ -759,8 +744,7 @@ class CareerReportingService
      *     correlation_analysis: array
      * }
      */
-    protected function buildStatisticalSummary(Collection $sessions, Collection $races): array
-    {
+    protected function buildStatisticalSummary(): array
         return [
             'stat_statistics' => $this->calculateStatStatistics($sessions),
             'training_statistics' => $this->calculateTrainingStatistics($sessions),
@@ -774,8 +758,7 @@ class CareerReportingService
      *
      * @return array<string, array{mean: float, median: float, std_dev: float, min: int, max: int, total: int}>
      */
-    protected function calculateStatStatistics(Collection $sessions): array
-    {
+    protected function calculateStatStatistics(): array
         $statistics = [];
 
         foreach (self::STAT_TYPES as $stat) {
@@ -830,8 +813,7 @@ class CareerReportingService
      *     peak_performance_turn: int
      * }
      */
-    protected function calculateTrainingStatistics(Collection $sessions): array
-    {
+    protected function calculateTrainingStatistics(): array
         // Sessions per phase
         $sessionsPerPhase = [];
         foreach (self::CAREER_PHASES as $phase => $range) {
@@ -844,7 +826,7 @@ class CareerReportingService
 
         // Average gains trend (by 10-turn blocks)
         $avgGainsTrend = [];
-        for ($block = 0; $block < 8; $block++) {
+        for ($block = 0; $block < 8; $block = ($block ?? 0) + 1) {
             $startTurn = $block * 10 + 1;
             $endTurn = ($block + 1) * 10;
 
@@ -856,7 +838,7 @@ class CareerReportingService
 
             $totalGains = 0;
             foreach ($blockSessions as $session) {
-                $totalGains += ($session->speed_gain ?? 0) + ($session->stamina_gain ?? 0)
+                $totalGains = ($totalGains ?? 0) + ($session->speed_gain ?? 0) + ($session->stamina_gain ?? 0)
                     + ($session->power_gain ?? 0) + ($session->guts_gain ?? 0) + ($session->wit_gain ?? 0);
             }
 
@@ -911,8 +893,7 @@ class CareerReportingService
      *     avg_position_trend: array<int, float>
      * }
      */
-    protected function calculateRaceStatistics(Collection $races): array
-    {
+    protected function calculateRaceStatistics(): array
         // Position distribution
         $positionDistribution = [];
         foreach ($races as $race) {
@@ -927,7 +908,7 @@ class CareerReportingService
         $sortedRaces = $races->sortBy('turn_number');
         foreach ($sortedRaces as $race) {
             if ($race->won_race) {
-                $currentStreak++;
+                $currentStreak = ($currentStreak ?? 0) + 1;
                 $winStreak = max($winStreak, $currentStreak);
             } else {
                 $currentStreak = 0;
@@ -947,7 +928,7 @@ class CareerReportingService
             $avgPositionTrend[$phaseIndex] = $phaseRaces->count() > 0
                 ? round($phaseRaces->avg('finish_position'), 2)
                 : 0.0;
-            $phaseIndex++;
+            $phaseIndex = ($phaseIndex ?? 0) + 1;
         }
 
         return [
@@ -966,8 +947,7 @@ class CareerReportingService
      *     efficiency_win_correlation: float
      * }
      */
-    protected function performCorrelationAnalysis(Collection $sessions, Collection $races): array
-    {
+    protected function performCorrelationAnalysis(): array
         if ($sessions->isEmpty() || $races->isEmpty()) {
             return [
                 'training_race_correlation' => 0.0,
@@ -990,7 +970,7 @@ class CareerReportingService
 
             $totalGains = 0;
             foreach ($priorSessions as $session) {
-                $totalGains += ($session->speed_gain ?? 0) + ($session->stamina_gain ?? 0)
+                $totalGains = ($totalGains ?? 0) + ($session->speed_gain ?? 0) + ($session->stamina_gain ?? 0)
                     + ($session->power_gain ?? 0) + ($session->guts_gain ?? 0) + ($session->wit_gain ?? 0);
             }
 
@@ -1050,12 +1030,12 @@ class CareerReportingService
         $sumSqX = 0;
         $sumSqY = 0;
 
-        for ($i = 0; $i < $n; $i++) {
+        for ($i = 0; $i < $n; $i = ($i ?? 0) + 1) {
             $diffX = $x[$i] - $meanX;
             $diffY = $y[$i] - $meanY;
-            $numerator += $diffX * $diffY;
-            $sumSqX += $diffX * $diffX;
-            $sumSqY += $diffY * $diffY;
+            $numerator = ($numerator ?? 0) + $diffX * $diffY;
+            $sumSqX = ($sumSqX ?? 0) + $diffX * $diffX;
+            $sumSqY = ($sumSqY ?? 0) + $diffY * $diffY;
         }
 
         $denominator = sqrt($sumSqX * $sumSqY);
@@ -1072,8 +1052,7 @@ class CareerReportingService
      *
      * @return array<string>
      */
-    protected function generateKeyInsights(array $performanceOverview, array $trainingAnalysis, array $raceAnalysis): array
-    {
+    protected function generateKeyInsights(): array
         $insights = [];
 
         // Efficiency insights
@@ -1177,8 +1156,7 @@ class CareerReportingService
      *
      * @return array<string>
      */
-    protected function generateImprovementRecommendations(Career $career, array $performanceOverview, array $trainingAnalysis): array
-    {
+    protected function generateImprovementRecommendations(): array
         $recommendations = [];
 
         // Efficiency-based recommendations
@@ -1188,6 +1166,9 @@ class CareerReportingService
         }
         if ($efficiency < 50) {
             $recommendations[] = 'Consider adjusting support card deck composition to improve training synergies.';
+        }
+        if ($efficiency >= 60 && $efficiency < 90) {
+            $recommendations[] = 'Good efficiency, but there is room for improvement - focus on high-value training opportunities.';
         }
 
         // Stat balance recommendations
@@ -1246,6 +1227,11 @@ class CareerReportingService
             $recommendations[] = 'For Unity Cup, prioritize Spirit Burst opportunities and team synergy training.';
         }
 
+        // Ensure at least one recommendation if efficiency is below 95%
+        if (empty($recommendations) && $efficiency < 95) {
+            $recommendations[] = 'Continue optimizing training choices to maximize stat gains per turn.';
+        }
+
         return array_slice($recommendations, 0, 6);
     }
 
@@ -1268,8 +1254,7 @@ class CareerReportingService
      *
      * @return array{headers: array<string>, rows: array<array>}
      */
-    public function exportToCsv(Career $career): array
-    {
+    public function exportToCsv(): array
         $report = $this->generateCareerSummaryReport($career);
 
         $headers = [
@@ -1289,30 +1274,30 @@ class CareerReportingService
         // Executive Summary
         $rows[] = ['Career Status', $report['executive_summary']['career_status'], 'Summary'];
         $rows[] = ['Overall Grade', $report['executive_summary']['overall_grade'], 'Summary'];
-        $rows[] = ['Total Turns', (string) $report['executive_summary']['total_turns'], 'Summary'];
-        $rows[] = ['Completion %', (string) $report['executive_summary']['completion_percentage'], 'Summary'];
+        $rows[] = ['Total Turns', (is_string($report) ? (string) $report : '')['executive_summary']['total_turns'], 'Summary'];
+        $rows[] = ['Completion %', (is_string($report) ? (string) $report : '')['executive_summary']['completion_percentage'], 'Summary'];
 
         // Performance Overview
-        $rows[] = ['Efficiency Rating', (string) $report['performance_overview']['efficiency_rating'], 'Performance'];
-        $rows[] = ['Training Success Rate', (string) $report['performance_overview']['training_success_rate'], 'Performance'];
-        $rows[] = ['Race Win Rate', (string) $report['performance_overview']['race_win_rate'], 'Performance'];
-        $rows[] = ['SP Earned', (string) $report['performance_overview']['sp_earned'], 'Performance'];
+        $rows[] = ['Efficiency Rating', (is_string($report) ? (string) $report : '')['performance_overview']['efficiency_rating'], 'Performance'];
+        $rows[] = ['Training Success Rate', (is_string($report) ? (string) $report : '')['performance_overview']['training_success_rate'], 'Performance'];
+        $rows[] = ['Race Win Rate', (is_string($report) ? (string) $report : '')['performance_overview']['race_win_rate'], 'Performance'];
+        $rows[] = ['SP Earned', (is_string($report) ? (string) $report : '')['performance_overview']['sp_earned'], 'Performance'];
 
         // Stat Distribution
         foreach ($report['performance_overview']['stat_distribution'] as $stat => $value) {
-            $rows[] = [ucfirst($stat).' Gains', (string) $value, 'Stats'];
+            $rows[] = [ucfirst($stat).' Gains', (is_string($value) ? (string) $value : ''), 'Stats'];
         }
 
         // Training Analysis
-        $rows[] = ['Total Training Sessions', (string) $report['training_analysis']['total_sessions'], 'Training'];
+        $rows[] = ['Total Training Sessions', (is_string($report) ? (string) $report : '')['training_analysis']['total_sessions'], 'Training'];
         $rows[] = ['Best Training Type', $report['training_analysis']['best_training_type'], 'Training'];
-        $rows[] = ['Friendship Training Count', (string) $report['training_analysis']['friendship_training_stats']['count'], 'Training'];
-        $rows[] = ['Training Failures', (string) $report['training_analysis']['failure_analysis']['total_failures'], 'Training'];
+        $rows[] = ['Friendship Training Count', (is_string($report) ? (string) $report : '')['training_analysis']['friendship_training_stats']['count'], 'Training'];
+        $rows[] = ['Training Failures', (is_string($report) ? (string) $report : '')['training_analysis']['failure_analysis']['total_failures'], 'Training'];
 
         // Race Analysis
-        $rows[] = ['Total Races', (string) $report['race_analysis']['total_races'], 'Races'];
-        $rows[] = ['Race Wins', (string) $report['race_analysis']['wins'], 'Races'];
-        $rows[] = ['Average Position', (string) $report['race_analysis']['avg_position'], 'Races'];
+        $rows[] = ['Total Races', (is_string($report) ? (string) $report : '')['race_analysis']['total_races'], 'Races'];
+        $rows[] = ['Race Wins', (is_string($report) ? (string) $report : '')['race_analysis']['wins'], 'Races'];
+        $rows[] = ['Average Position', (is_string($report) ? (string) $report : '')['race_analysis']['avg_position'], 'Races'];
 
         // Insights
         foreach ($report['key_insights'] as $index => $insight) {
@@ -1339,8 +1324,7 @@ class CareerReportingService
      *     sections: array<array{title: string, content: array}>
      * }
      */
-    public function exportToPdfFormat(Career $career): array
-    {
+    public function exportToPdfFormat(): array
         $report = $this->generateCareerSummaryReport($career);
 
         return [
@@ -1424,8 +1408,7 @@ class CareerReportingService
      *     strengths: array<string>
      * }
      */
-    public function generateCharacterReport(Character $character): array
-    {
+    public function generateCharacterReport(): array
         $cacheKey = "report:character:{$character->id}";
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($character) {
@@ -1473,8 +1456,7 @@ class CareerReportingService
      *
      * @return array<array{career_id: int, name: string, status: string, grade: string, efficiency: float, win_rate: float}>
      */
-    protected function buildCareerHistory(Collection $careers): array
-    {
+    protected function buildCareerHistory(): array
         $history = [];
 
         foreach ($careers as $career) {
@@ -1484,7 +1466,7 @@ class CareerReportingService
             // Calculate efficiency
             $totalGains = 0;
             foreach ($sessions as $session) {
-                $totalGains += ($session->speed_gain ?? 0) + ($session->stamina_gain ?? 0)
+                $totalGains = ($totalGains ?? 0) + ($session->speed_gain ?? 0) + ($session->stamina_gain ?? 0)
                     + ($session->power_gain ?? 0) + ($session->guts_gain ?? 0) + ($session->wit_gain ?? 0);
             }
             $idealTotal = $sessions->count() * 30;
@@ -1523,8 +1505,7 @@ class CareerReportingService
      *     avg_stat_gains_per_career: array<string, float>
      * }
      */
-    protected function buildAggregateStatistics(Collection $careers): array
-    {
+    protected function buildAggregateStatistics(): array
         $totalSessions = 0;
         $totalRaces = 0;
         $totalWins = 0;
@@ -1535,9 +1516,9 @@ class CareerReportingService
             $sessions = $career->trainingSessions;
             $races = $career->races;
 
-            $totalSessions += $sessions->count();
-            $totalRaces += $races->count();
-            $totalWins += $races->where('won_race', true)->count();
+            $totalSessions = ($totalSessions ?? 0) + $sessions->count();
+            $totalRaces = ($totalRaces ?? 0) + $races->count();
+            $totalWins = ($totalWins ?? 0) + $races->where('won_race', true)->count();
 
             // Calculate efficiency
             $careerGains = 0;
@@ -1545,7 +1526,7 @@ class CareerReportingService
                 foreach (self::STAT_TYPES as $stat) {
                     $gain = $session->{"{$stat}_gain"} ?? 0;
                     $statGains[$stat] += $gain;
-                    $careerGains += $gain;
+                    $careerGains = ($careerGains ?? 0) + $gain;
                 }
             }
 
@@ -1581,8 +1562,7 @@ class CareerReportingService
      *     improvement_rate: float
      * }
      */
-    protected function buildPerformanceTrends(Collection $careers): array
-    {
+    protected function buildPerformanceTrends(): array
         $efficiencyTrend = [];
         $winRateTrend = [];
 
@@ -1595,7 +1575,7 @@ class CareerReportingService
             // Calculate efficiency
             $totalGains = 0;
             foreach ($sessions as $session) {
-                $totalGains += ($session->speed_gain ?? 0) + ($session->stamina_gain ?? 0)
+                $totalGains = ($totalGains ?? 0) + ($session->speed_gain ?? 0) + ($session->stamina_gain ?? 0)
                     + ($session->power_gain ?? 0) + ($session->guts_gain ?? 0) + ($session->wit_gain ?? 0);
             }
             $idealTotal = $sessions->count() * 30;
@@ -1641,8 +1621,7 @@ class CareerReportingService
      *
      * @return array<string>
      */
-    protected function identifyImprovementAreas(array $aggregateStatistics, array $performanceTrends): array
-    {
+    protected function identifyImprovementAreas(): array
         $areas = [];
 
         // Check overall efficiency
@@ -1681,8 +1660,7 @@ class CareerReportingService
      *
      * @return array<string>
      */
-    protected function identifyStrengths(array $aggregateStatistics, array $performanceTrends): array
-    {
+    protected function identifyStrengths(): array
         $strengths = [];
 
         // Check overall efficiency

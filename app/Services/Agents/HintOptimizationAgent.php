@@ -26,13 +26,11 @@ class HintOptimizationAgent
 
     /**
      * Analyze hint collection opportunities and provide strategic recommendations.
+     *
+     * @param  array<string, mixed>  $context
+     * @return array<string, mixed>
      */
-    public function analyzeHintOpportunities(
-        Character $character,
-        Collection $targetSkills,
-        Collection $supportCards,
-        array $context = []
-    ): array {
+    public function analyzeHintOpportunities(): array
         $startTime = microtime(true);
 
         try {
@@ -81,11 +79,7 @@ class HintOptimizationAgent
     /**
      * Gather comprehensive hint data for analysis.
      */
-    private function gatherHintData(
-        Character $character,
-        Collection $targetSkills,
-        Collection $supportCards
-    ): array {
+    private function gatherHintData(): array
         $skillHintData = [];
 
         foreach ($targetSkills as $skill) {
@@ -115,9 +109,12 @@ class HintOptimizationAgent
 
     /**
      * Perform MCP-powered analysis for advanced insights.
+     *
+     * @param  array<string, mixed>  $hintData
+     * @param  array<string, mixed>  $context
+     * @return array<string, mixed>
      */
-    private function performMCPAnalysis(array $hintData, array $context): array
-    {
+    private function performMCPAnalysis(): array
         // Check if MCP is enabled
         if (! $this->mcpClient->isEnabled()) {
             Log::info('MCP is disabled, using local analysis only');
@@ -152,9 +149,11 @@ class HintOptimizationAgent
 
     /**
      * Get local analysis when MCP is unavailable.
+     *
+     * @param  array<string, mixed>  $hintData
+     * @return array<string, mixed>
      */
-    private function getLocalAnalysis(array $hintData): array
-    {
+    private function getLocalAnalysis(): array
         $insights = [];
         $prioritySkills = [];
         $trainingRecommendations = [];
@@ -204,6 +203,8 @@ class HintOptimizationAgent
 
     /**
      * Calculate optimization score based on hint data.
+     *
+     * @param  array<string, mixed>  $hintData
      */
     private function calculateOptimizationScore(array $hintData): int
     {
@@ -215,19 +216,19 @@ class HintOptimizationAgent
         $totalSkills = count($hintData['skill_hint_data']);
 
         if ($totalSkills > 0) {
-            $score += (int) (($skillsWithMaxDiscount / $totalSkills) * 40);
+            $score = ($score ?? 0) + (int) (($skillsWithMaxDiscount / $totalSkills) * 40);
         }
 
         // Score based on total SP saved
         $totalSpSaved = $hintData['hint_statistics']['total_sp_saved'];
         if ($totalSpSaved > 0) {
-            $score += min(30, (int) ($totalSpSaved / 10));
+            $score = ($score ?? 0) + min(30, (int) ($totalSpSaved / 10));
         }
 
         // Score based on hint collection rate
         $totalHints = $hintData['hint_statistics']['total_hints'];
         if ($totalHints > 0) {
-            $score += min(30, (int) ($totalHints / 2));
+            $score = ($score ?? 0) + min(30, (int) ($totalHints / 2));
         }
 
         return min($maxScore, $score);
@@ -235,6 +236,9 @@ class HintOptimizationAgent
 
     /**
      * Build analysis prompt for MCP agent.
+     *
+     * @param  array<string, mixed>  $hintData
+     * @param  array<string, mixed>  $context
      */
     private function buildAnalysisPrompt(array $hintData, array $context): string
     {
@@ -277,9 +281,12 @@ class HintOptimizationAgent
 
     /**
      * Generate comprehensive recommendations combining local and MCP analysis.
+     *
+     * @param  array<string, mixed>  $hintData
+     * @param  array<string, mixed>  $mcpAnalysis
+     * @return array<int, array<string, mixed>>
      */
-    private function generateRecommendations(array $hintData, array $mcpAnalysis): array
-    {
+    private function generateRecommendations(): array
         $recommendations = [];
 
         // High priority: Skills with 1 hint (one more for max discount)
@@ -357,8 +364,7 @@ class HintOptimizationAgent
     /**
      * Get fallback recommendations when MCP is unavailable.
      */
-    private function getFallbackRecommendations(Character $character, Collection $targetSkills): array
-    {
+    private function getFallbackRecommendations(): array
         $strategies = $this->hintService->getHintCollectionStrategy($character, $targetSkills);
 
         return array_map(fn ($strategy) => [
@@ -371,11 +377,7 @@ class HintOptimizationAgent
     /**
      * Calculate optimal hint collection sequence.
      */
-    public function calculateOptimalSequence(
-        Character $character,
-        Collection $targetSkills,
-        int $availableTurns
-    ): array {
+    public function calculateOptimalSequence(): array
         $sequence = [];
         $currentTurn = 1;
 
@@ -418,7 +420,7 @@ class HintOptimizationAgent
                     'priority' => $hintCount === 1 ? 'high' : 'medium',
                 ];
 
-                $currentTurn += $hintsNeeded;
+                $currentTurn = ($currentTurn ?? 0) + $hintsNeeded;
             }
         }
 
@@ -433,8 +435,7 @@ class HintOptimizationAgent
     /**
      * Evaluate hint collection efficiency.
      */
-    public function evaluateEfficiency(Character $character, Collection $acquiredSkills): array
-    {
+    public function evaluateEfficiency(): array
         $totalBaseCost = 0;
         $totalFinalCost = 0;
         $totalSpSaved = 0;
@@ -446,17 +447,17 @@ class HintOptimizationAgent
             $hints = $this->hintService->getHintsForSkill($character, $skill);
             $hintCount = $hints->count();
 
-            $totalBaseCost += $skill->base_sp_cost;
+            $totalBaseCost = ($totalBaseCost ?? 0) + $skill->base_sp_cost;
             $finalCost = $this->hintService->calculateFinalCost($skill, $hintCount);
-            $totalFinalCost += $finalCost;
-            $totalSpSaved += $skill->base_sp_cost - $finalCost;
+            $totalFinalCost = ($totalFinalCost ?? 0) + $finalCost;
+            $totalSpSaved = ($totalSpSaved ?? 0) + $skill->base_sp_cost - $finalCost;
 
             if ($hintCount >= 2) {
-                $skillsWithMaxDiscount++;
+                $skillsWithMaxDiscount = ($skillsWithMaxDiscount ?? 0) + 1;
             } elseif ($hintCount > 0) {
-                $skillsWithPartialDiscount++;
+                $skillsWithPartialDiscount = ($skillsWithPartialDiscount ?? 0) + 1;
             } else {
-                $skillsWithNoDiscount++;
+                $skillsWithNoDiscount = ($skillsWithNoDiscount ?? 0) + 1;
             }
         }
 

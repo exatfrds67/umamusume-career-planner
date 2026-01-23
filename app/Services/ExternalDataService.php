@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Models\Character;
 use App\Models\ExternalData;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -42,8 +41,13 @@ class ExternalDataService
 
     public function __construct()
     {
-        $this->baseUrl = (string) config('services.umapyoi.url', 'https://api.umapyoi.net');
-        $this->timeout = (int) config('services.umapyoi.timeout', 30);
+        /** @var string $baseUrl */
+        $baseUrl = config('services.umapyoi.url', 'https://api.umapyoi.net');
+        $this->baseUrl = \is_string($baseUrl) ? $baseUrl : 'https://api.umapyoi.net';
+
+        /** @var int $timeout */
+        $timeout = config('services.umapyoi.timeout', 30);
+        $this->timeout = \is_int($timeout) ? $timeout : 30;
     }
 
     /**
@@ -52,8 +56,7 @@ class ExternalDataService
      * @param  bool  $forceRefresh  Force cache refresh
      * @return array{success: bool, synced_count: int, errors: array<string>}
      */
-    public function syncCharacterData(bool $forceRefresh = false): array
-    {
+    public function syncCharacterData(): array
         $cacheKey = self::CACHE_PREFIX.'characters';
 
         if (! $forceRefresh && Cache::has($cacheKey)) {
@@ -75,15 +78,27 @@ class ExternalDataService
             }
 
             $characters = $response->json('data', []);
+            if (! \is_array($characters)) {
+                throw new \RuntimeException('Invalid response format: expected array');
+            }
             $syncedCount = 0;
             $errors = [];
 
             foreach ($characters as $charData) {
+                if (! \is_array($charData)) {
+                    continue;
+                }
                 try {
+                    /** @var array<string, mixed> $charData */
                     $this->upsertCharacterData($charData);
-                    $syncedCount++;
+                    $syncedCount = ($syncedCount ?? 0) + 1;
                 } catch (\Exception $e) {
-                    $charId = $charData['id'] ?? 'unknown';
+                    $charId = 'unknown';
+                    if (isset($charData['id'])) {
+                        $charId = \is_string($charData['id']) || \is_int($charData['id'])
+                            ? (is_string($charData) ? (string) $charData : '')['id']
+                            : 'unknown';
+                    }
                     $errors[] = "Character {$charId}: {$e->getMessage()}";
                 }
             }
@@ -103,7 +118,6 @@ class ExternalDataService
                 'errors' => $errors,
                 'source' => 'api',
             ];
-
         } catch (\Exception $e) {
             Log::error('[ExternalDataService] Character sync failed', [
                 'error' => $e->getMessage(),
@@ -124,8 +138,7 @@ class ExternalDataService
      * @param  bool  $forceRefresh  Force cache refresh
      * @return array{success: bool, synced_count: int, errors: array<string>}
      */
-    public function syncSupportCardData(bool $forceRefresh = false): array
-    {
+    public function syncSupportCardData(): array
         $cacheKey = self::CACHE_PREFIX.'support_cards';
 
         if (! $forceRefresh && Cache::has($cacheKey)) {
@@ -147,15 +160,27 @@ class ExternalDataService
             }
 
             $cards = $response->json('data', []);
+            if (! \is_array($cards)) {
+                throw new \RuntimeException('Invalid response format: expected array');
+            }
             $syncedCount = 0;
             $errors = [];
 
             foreach ($cards as $cardData) {
+                if (! \is_array($cardData)) {
+                    continue;
+                }
                 try {
+                    /** @var array<string, mixed> $cardData */
                     $this->upsertSupportCardData($cardData);
-                    $syncedCount++;
+                    $syncedCount = ($syncedCount ?? 0) + 1;
                 } catch (\Exception $e) {
-                    $cardId = $cardData['id'] ?? 'unknown';
+                    $cardId = 'unknown';
+                    if (isset($cardData['id'])) {
+                        $cardId = \is_string($cardData['id']) || \is_int($cardData['id'])
+                            ? (is_string($cardData) ? (string) $cardData : '')['id']
+                            : 'unknown';
+                    }
                     $errors[] = "Card {$cardId}: {$e->getMessage()}";
                 }
             }
@@ -175,7 +200,6 @@ class ExternalDataService
                 'errors' => $errors,
                 'source' => 'api',
             ];
-
         } catch (\Exception $e) {
             Log::error('[ExternalDataService] Support card sync failed', [
                 'error' => $e->getMessage(),
@@ -199,14 +223,17 @@ class ExternalDataService
     {
         $cacheKey = self::CACHE_PREFIX."skill:{$skillId}";
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($skillId) {
+        /** @var array<string, mixed>|null $result */
+        $result = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($skillId) {
             try {
                 /** @var \Illuminate\Http\Client\Response $response */
                 $response = Http::timeout($this->timeout)
                     ->get("{$this->baseUrl}/v1/skills/{$skillId}");
 
                 if ($response->successful()) {
-                    return $response->json('data');
+                    $data = $response->json('data');
+
+                    return \is_array($data) ? $data : null;
                 }
             } catch (\Exception $e) {
                 Log::warning('[ExternalDataService] Skill fetch failed', [
@@ -217,6 +244,8 @@ class ExternalDataService
 
             return null;
         });
+
+        return $result;
     }
 
     /**
@@ -225,33 +254,36 @@ class ExternalDataService
      * @return array<string, array{synced_at: string|null, count: int}>
      */
     public function getSyncStatus(): array
-    {
+        /** @var array<string, mixed>|null $characters */
         $characters = Cache::get(self::CACHE_PREFIX.'characters', [
             'synced_at' => null,
             'count' => 0,
         ]);
+        /** @var array<string, mixed>|null $supportCards */
         $supportCards = Cache::get(self::CACHE_PREFIX.'support_cards', [
             'synced_at' => null,
             'count' => 0,
         ]);
 
-        $characterStatus = is_array($characters) ? $characters : [];
-        $supportCardStatus = is_array($supportCards) ? $supportCards : [];
+        $characterStatus = \is_array($characters) ? $characters : [];
+        $supportCardStatus = \is_array($supportCards) ? $supportCards : [];
 
         return [
             'characters' => [
-                'synced_at' => isset($characterStatus['synced_at']) ? (string) $characterStatus['synced_at'] : null,
-                'count' => (int) ($characterStatus['count'] ?? 0),
+                'synced_at' => isset($characterStatus['synced_at']) && \is_string($characterStatus['synced_at']) ? $characterStatus['synced_at'] : null,
+                'count' => isset($characterStatus['count']) && \is_int($characterStatus['count']) ? $characterStatus['count'] : 0,
             ],
             'support_cards' => [
-                'synced_at' => isset($supportCardStatus['synced_at']) ? (string) $supportCardStatus['synced_at'] : null,
-                'count' => (int) ($supportCardStatus['count'] ?? 0),
+                'synced_at' => isset($supportCardStatus['synced_at']) && \is_string($supportCardStatus['synced_at']) ? $supportCardStatus['synced_at'] : null,
+                'count' => isset($supportCardStatus['count']) && \is_int($supportCardStatus['count']) ? $supportCardStatus['count'] : 0,
             ],
         ];
     }
 
     /**
      * Upsert character data from external source
+     *
+     * @param  array<string, mixed>  $data
      */
     protected function upsertCharacterData(array $data): void
     {
@@ -259,7 +291,7 @@ class ExternalDataService
             [
                 'source' => 'umapyoi',
                 'data_type' => 'character',
-                'external_id' => $data['id'] ?? null,
+                'external_id' => (is_array($data) && isset((is_array($data) && isset($data['id']) ? $data['id'] : null)) ? (is_array($data) && isset($data['id']) ? $data['id'] : null) : null),
             ],
             [
                 'name' => $data['name'] ?? 'Unknown',
@@ -271,6 +303,8 @@ class ExternalDataService
 
     /**
      * Upsert support card data from external source
+     *
+     * @param  array<string, mixed>  $data
      */
     protected function upsertSupportCardData(array $data): void
     {
@@ -278,7 +312,7 @@ class ExternalDataService
             [
                 'source' => 'umapyoi',
                 'data_type' => 'support_card',
-                'external_id' => $data['id'] ?? null,
+                'external_id' => (is_array($data) && isset((is_array($data) && isset($data['id']) ? $data['id'] : null)) ? (is_array($data) && isset($data['id']) ? $data['id'] : null) : null),
             ],
             [
                 'name' => $data['name'] ?? 'Unknown',
@@ -290,13 +324,15 @@ class ExternalDataService
 
     /**
      * Log sync operation
+     *
+     * @param  array<int, string>  $errors
      */
     protected function logSync(string $dataType, int $count, array $errors): void
     {
         Log::info('[ExternalDataService] Sync completed', [
             'data_type' => $dataType,
             'synced_count' => $count,
-            'error_count' => count($errors),
+            'error_count' => \count($errors),
         ]);
     }
 

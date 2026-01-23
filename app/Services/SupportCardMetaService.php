@@ -24,7 +24,6 @@ class SupportCardMetaService
      * @return array<string, Collection>
      */
     public function getCardsByTier(): array
-    {
         return Cache::remember('support_cards_by_tier', self::CACHE_DURATION, function () {
             return [
                 'S+' => SupportCardDefinition::where('meta_tier', 'S+')
@@ -117,8 +116,7 @@ class SupportCardMetaService
     /**
      * Get skill provision mapping for a card
      */
-    public function getSkillProvisionMapping(int $cardId): array
-    {
+    public function getSkillProvisionMapping(): array
         $card = SupportCardDefinition::findOrFail($cardId);
 
         return [
@@ -178,8 +176,7 @@ class SupportCardMetaService
     /**
      * Get card synergies
      */
-    public function getCardSynergies(int $cardId): array
-    {
+    public function getCardSynergies(): array
         $card = SupportCardDefinition::findOrFail($cardId);
 
         $synergyCardNames = $card->deck_synergies ?? [];
@@ -205,8 +202,7 @@ class SupportCardMetaService
     /**
      * Bulk update meta tiers from external source
      */
-    public function bulkUpdateMetaTiers(array $updates): array
-    {
+    public function bulkUpdateMetaTiers(): array
         $results = [
             'success' => 0,
             'failed' => 0,

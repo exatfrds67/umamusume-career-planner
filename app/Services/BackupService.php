@@ -92,18 +92,18 @@ class BackupService
      * Create a manual backup with optional compression and encryption
      *
      * @param  int  $userId  User ID
-     * @param  array  $options  Backup options
-     * @return array{success: bool, backup_id: string, file_path: string, file_size: int, checksum: string, errors: array}
+     * @param  array<string, mixed>  $options  Backup options
+     * @return array{success: bool, backup_id: string, file_path: string, file_size: int, checksum: string, errors: array<int, string>}
      */
-    public function createBackup(int $userId, array $options = []): array
-    {
+    public function createBackup(): array
         $backupId = Str::uuid()->toString();
-        $compress = $options['compress'] ?? true;
-        $encrypt = $options['encrypt'] ?? false;
-        $encryptionKey = $options['encryption_key'] ?? null;
-        $backupType = $options['type'] ?? self::TYPE_FULL;
-        $includeTypes = $options['include_types'] ?? ['character', 'career', 'skill', 'support_card'];
-        $description = $options['description'] ?? 'Manual backup';
+        $compress = (bool) ($options['compress'] ?? true);
+        $encrypt = (bool) ($options['encrypt'] ?? false);
+        $encryptionKey = isset($options['encryption_key']) && \is_string($options['encryption_key']) ? $options['encryption_key'] : null;
+        $backupType = isset($options['type']) && \is_string($options['type']) ? $options['type'] : self::TYPE_FULL;
+        /** @var array<int, string> $includeTypes */
+        $includeTypes = isset($options['include_types']) && \is_array($options['include_types']) ? array_values($options['include_types']) : ['character', 'career', 'skill', 'support_card'];
+        $description = isset($options['description']) && \is_string($options['description']) ? $options['description'] : 'Manual backup';
 
         Log::info('[BackupService] Starting backup creation', [
             'backup_id' => $backupId,
@@ -193,9 +193,10 @@ class BackupService
 
             // Calculate checksum
             $fileContent = Storage::disk(self::BACKUP_DISK)->get($filePath);
-            if ($fileContent === false) {
+            if ($fileContent === false || $fileContent === null) {
                 throw new \RuntimeException('Failed to read backup file contents');
             }
+            \assert(\is_string($fileContent));
             $checksum = hash('sha256', $fileContent);
             $fileSize = strlen($fileContent);
 
@@ -241,9 +242,11 @@ class BackupService
 
     /**
      * Generate backup data based on type and included types
+     *
+     * @param  array<int, string>  $includeTypes
+     * @return array{success: bool, data: array<string, mixed>, counts: array<string, int>, errors: array<int, string>}
      */
-    private function generateBackupData(int $userId, string $backupType, array $includeTypes): array
-    {
+    private function generateBackupData(): array
         $data = [];
         $counts = [];
         $errors = [];
@@ -278,9 +281,10 @@ class BackupService
 
     /**
      * Compress content and save to file
+     *
+     * @return array{success: bool, file_path?: string, error?: string}
      */
-    private function compressAndSave(string $content, string $filePath, bool $encrypted): array
-    {
+    private function compressAndSave(): array
         $tempFile = tempnam(sys_get_temp_dir(), 'backup_');
         $zipPath = $tempFile.'.zip';
 
@@ -296,6 +300,9 @@ class BackupService
 
             // Move to storage
             $zipContent = file_get_contents($zipPath);
+            if ($zipContent === false) {
+                throw new \RuntimeException('Failed to read zip file');
+            }
             Storage::disk(self::BACKUP_DISK)->put($filePath, $zipContent);
 
             // Cleanup temp files
@@ -318,7 +325,12 @@ class BackupService
     {
         if ($customKey) {
             // Use custom key for encryption
-            return openssl_encrypt($content, 'AES-256-CBC', $customKey, 0, substr(hash('sha256', $customKey), 0, 16));
+            $encrypted = openssl_encrypt($content, 'AES-256-CBC', $customKey, 0, substr(hash('sha256', $customKey), 0, 16));
+            if ($encrypted === false) {
+                throw new \RuntimeException('Encryption failed');
+            }
+
+            return $encrypted;
         }
 
         return Crypt::encryptString($content);
@@ -330,7 +342,12 @@ class BackupService
     private function decryptContent(string $content, ?string $customKey = null): string
     {
         if ($customKey) {
-            return openssl_decrypt($content, 'AES-256-CBC', $customKey, 0, substr(hash('sha256', $customKey), 0, 16));
+            $decrypted = openssl_decrypt($content, 'AES-256-CBC', $customKey, 0, substr(hash('sha256', $customKey), 0, 16));
+            if ($decrypted === false) {
+                throw new \RuntimeException('Decryption failed');
+            }
+
+            return $decrypted;
         }
 
         return Crypt::decryptString($content);
@@ -341,15 +358,14 @@ class BackupService
      *
      * @param  string  $backupId  Backup ID
      * @param  int  $userId  User ID
-     * @param  array  $options  Restore options
-     * @return array{success: bool, restored_counts: array, errors: array, warnings: array, dry_run?: bool}
+     * @param  array<string, mixed>  $options  Restore options
+     * @return array{success: bool, restored_counts: array<string, int>, errors: array<int, string>, warnings: array<int, string>, dry_run?: bool}
      */
-    public function restoreFromBackup(string $backupId, int $userId, array $options = []): array
-    {
-        $decryptionKey = $options['decryption_key'] ?? null;
-        $overwriteExisting = $options['overwrite_existing'] ?? false;
-        $restoreTypes = $options['restore_types'] ?? null; // null = restore all
-        $dryRun = $options['dry_run'] ?? false;
+    public function restoreFromBackup(): array
+        $decryptionKey = isset($options['decryption_key']) && \is_string($options['decryption_key']) ? $options['decryption_key'] : null;
+        $overwriteExisting = (bool) ($options['overwrite_existing'] ?? false);
+        $restoreTypes = isset($options['restore_types']) && \is_array($options['restore_types']) ? $options['restore_types'] : null; // null = restore all
+        $dryRun = (bool) ($options['dry_run'] ?? false);
 
         Log::info('[BackupService] Starting backup restoration', [
             'backup_id' => $backupId,
@@ -361,7 +377,7 @@ class BackupService
             // Get backup record
             $backupRecord = $this->getBackupRecord($backupId);
 
-            if (! $backupRecord) {
+            if (! \is_array($backupRecord)) {
                 return [
                     'success' => false,
                     'restored_counts' => [],
@@ -371,7 +387,7 @@ class BackupService
             }
 
             // Verify ownership
-            if ($backupRecord['user_id'] !== $userId) {
+            if (((is_array($backupRecord) && isset($backupRecord['user_id']) ? $backupRecord['user_id'] : null)) !== $userId) {
                 return [
                     'success' => false,
                     'restored_counts' => [],
@@ -381,7 +397,11 @@ class BackupService
             }
 
             // Read and decompress backup file
-            $backupData = $this->readBackupFile($backupRecord['file_path'], $backupRecord['encrypted'], $decryptionKey);
+            $filePath = \is_string((is_array($backupRecord) && isset($backupRecord['file_path']) ? $backupRecord['file_path'] : null)) ? $backupRecord['file_path'] : '';
+            $encrypted = (bool) ($backupRecord['encrypted'] ?? false);
+            $checksum = \is_string((is_array($backupRecord) && isset($backupRecord['checksum']) ? $backupRecord['checksum'] : null)) ? $backupRecord['checksum'] : '';
+
+            $backupData = $this->readBackupFile($filePath, $encrypted, $decryptionKey);
 
             if (! $backupData['success']) {
                 return [
@@ -393,7 +413,17 @@ class BackupService
             }
 
             // Verify data integrity
-            $integrityCheck = $this->verifyDataIntegrity($backupData['data'], $backupRecord['checksum'], $backupRecord['file_path']);
+            $data = $backupData['data'];
+            if (! \is_array($data)) {
+                return [
+                    'success' => false,
+                    'restored_counts' => [],
+                    'errors' => ['Invalid backup data structure'],
+                    'warnings' => [],
+                ];
+            }
+
+            $integrityCheck = $this->verifyDataIntegrity($data, $checksum, $filePath);
 
             if (! $integrityCheck['valid']) {
                 return [
@@ -405,7 +435,9 @@ class BackupService
             }
 
             // Validate backup version compatibility
-            $versionCheck = $this->checkVersionCompatibility($backupData['data']['metadata']['version'] ?? '0.0');
+            $metadata = $data['metadata'] ?? [];
+            $version = \is_array($metadata) && isset($metadata['version']) && \is_string($metadata['version']) ? $metadata['version'] : '0.0';
+            $versionCheck = $this->checkVersionCompatibility($version);
 
             if (! $versionCheck['compatible']) {
                 return [
@@ -417,11 +449,11 @@ class BackupService
             }
 
             if ($dryRun) {
-                return $this->simulateRestore($backupData['data'], $restoreTypes);
+                return $this->simulateRestore($data, $restoreTypes);
             }
 
             // Perform actual restore
-            return $this->executeRestore($backupData['data'], $userId, $restoreTypes, $overwriteExisting);
+            return $this->executeRestore($data, $userId, $restoreTypes, $overwriteExisting);
         } catch (\Exception $e) {
             Log::error('[BackupService] Restore failed', [
                 'backup_id' => $backupId,
@@ -440,9 +472,10 @@ class BackupService
 
     /**
      * Read and decompress backup file
+     *
+     * @return array{success: bool, data: mixed, errors: array<int, string>}
      */
-    private function readBackupFile(string $filePath, bool $encrypted, ?string $decryptionKey): array
-    {
+    private function readBackupFile(): array
         try {
             if (! Storage::disk(self::BACKUP_DISK)->exists($filePath)) {
                 return [
@@ -453,6 +486,14 @@ class BackupService
             }
 
             $fileContent = Storage::disk(self::BACKUP_DISK)->get($filePath);
+            if ($fileContent === false || $fileContent === null) {
+                return [
+                    'success' => false,
+                    'data' => null,
+                    'errors' => ['Failed to read backup file'],
+                ];
+            }
+            \assert(\is_string($fileContent));
 
             // Check if it's a zip file
             if (str_ends_with($filePath, '.zip')) {
@@ -516,11 +557,19 @@ class BackupService
 
     /**
      * Verify data integrity using checksum
+     *
+     * @return array{valid: bool, error: string|null}
      */
-    private function verifyDataIntegrity(array $data, string $storedChecksum, string $filePath): array
-    {
+    private function verifyDataIntegrity(): array
         try {
             $fileContent = Storage::disk(self::BACKUP_DISK)->get($filePath);
+            if ($fileContent === false || $fileContent === null) {
+                return [
+                    'valid' => false,
+                    'error' => 'Failed to read backup file for integrity check',
+                ];
+            }
+            \assert(\is_string($fileContent));
             $calculatedChecksum = hash('sha256', $fileContent);
 
             if ($calculatedChecksum !== $storedChecksum) {
@@ -531,7 +580,7 @@ class BackupService
             }
 
             // Validate data structure
-            if (! isset($data['metadata']) || ! isset($data['data'])) {
+            if (! \is_array($data) || ! isset((is_array($data) && isset($data['metadata']) ? $data['metadata'] : null)) || ! isset((is_array($data) && isset($data['data']) ? $data['data'] : null))) {
                 return [
                     'valid' => false,
                     'error' => 'Invalid backup structure',
@@ -549,9 +598,10 @@ class BackupService
 
     /**
      * Check backup version compatibility
+     *
+     * @return array{compatible: bool, error: string|null}
      */
-    private function checkVersionCompatibility(string $backupVersion): array
-    {
+    private function checkVersionCompatibility(): array
         $currentVersion = self::BACKUP_VERSION;
         $backupParts = explode('.', $backupVersion);
         $currentParts = explode('.', $currentVersion);
@@ -569,20 +619,29 @@ class BackupService
 
     /**
      * Simulate restore operation (dry run)
+     *
+     * @param  array<string, mixed>  $backupData
+     * @param  array<mixed, mixed>|null  $restoreTypes
+     * @return array{success: bool, restored_counts: array<string, int>, errors: array<int, string>, warnings: array<int, string>, dry_run: bool}
      */
-    /**
-     * @return array{success: bool, restored_counts: array, errors: array, warnings: array, dry_run: bool}
-     */
-    private function simulateRestore(array $backupData, ?array $restoreTypes): array
-    {
+    private function simulateRestore(): array
+        /** @var array<string, int> $counts */
         $counts = [];
+        /** @var array<int, string> $warnings */
         $warnings = [];
 
         $data = $backupData['data'] ?? [];
+        if (! \is_array($data)) {
+            $data = [];
+        }
+        /** @var array<int, string> $typesToRestore */
         $typesToRestore = $restoreTypes ?? array_keys($data);
 
         foreach ($typesToRestore as $type) {
-            if (isset($data[$type])) {
+            if (! \is_string($type)) {
+                continue;
+            }
+            if (isset($data[$type]) && \is_array($data[$type])) {
                 $counts[$type] = count($data[$type]);
             } else {
                 $warnings[] = "Type '{$type}' not found in backup";
@@ -600,34 +659,47 @@ class BackupService
 
     /**
      * Execute the actual restore operation
+     *
+     * @param  array<string, mixed>  $backupData
+     * @param  array<mixed, mixed>|null  $restoreTypes
+     * @return array{success: bool, restored_counts: array<string, int>, errors: array<int, string>, warnings: array<int, string>}
      */
-    /**
-     * @return array{success: bool, restored_counts: array, errors: array, warnings: array}
-     */
-    private function executeRestore(array $backupData, int $userId, ?array $restoreTypes, bool $overwriteExisting): array
-    {
+    private function executeRestore(): array
+        /** @var array<string, int> $restoredCounts */
         $restoredCounts = [];
+        /** @var array<int, string> $errors */
         $errors = [];
+        /** @var array<int, string> $warnings */
         $warnings = [];
 
         $data = $backupData['data'] ?? [];
+        if (! \is_array($data)) {
+            $data = [];
+        }
+        /** @var array<int, string> $typesToRestore */
         $typesToRestore = $restoreTypes ?? array_keys($data);
 
         DB::beginTransaction();
 
         try {
             foreach ($typesToRestore as $type) {
-                if (! isset($data[$type])) {
+                if (! \is_string($type)) {
+                    continue;
+                }
+                if (! isset($data[$type]) || ! \is_array($data[$type])) {
                     $warnings[] = "Type '{$type}' not found in backup";
 
                     continue;
                 }
 
+                /** @var array<int, array<string, mixed>> $typeData */
+                $typeData = array_values($data[$type]);
+
                 $result = match ($type) {
-                    'characters' => $this->restoreCharacters($data[$type], $userId, $overwriteExisting),
-                    'careers' => $this->restoreCareers($data[$type], $userId, $overwriteExisting),
-                    'skills' => $this->restoreSkills($data[$type], $overwriteExisting),
-                    'support_cards' => $this->restoreSupportCards($data[$type], $overwriteExisting),
+                    'characters' => $this->restoreCharacters($typeData, $userId, $overwriteExisting),
+                    'careers' => $this->restoreCareers($typeData, $userId, $overwriteExisting),
+                    'skills' => $this->restoreSkills($typeData, $overwriteExisting),
+                    'support_cards' => $this->restoreSupportCards($typeData, $overwriteExisting),
                     default => ['restored' => 0, 'errors' => ["Unknown type: {$type}"]],
                 };
 
@@ -678,22 +750,29 @@ class BackupService
 
     /**
      * Restore characters from backup
+     *
+     * @param  array<int, array<string, mixed>>  $characters
+     * @return array{restored: int, errors: array<int, string>, warnings: array<int, string>}
      */
-    private function restoreCharacters(array $characters, int $userId, bool $overwrite): array
-    {
+    private function restoreCharacters(): array
         $restored = 0;
         $errors = [];
         $warnings = [];
 
         foreach ($characters as $charData) {
+            if (! \is_array($charData)) {
+                continue;
+            }
             try {
+                $charName = \is_string((is_array($charData) && isset($charData['name']) ? $charData['name'] : null)) ? $charData['name'] : 'Unknown';
+
                 /** @var Character|null $existingChar */
                 $existingChar = Character::where('user_id', $userId)
-                    ->where('name', $charData['name'])
+                    ->where('name', $charName)
                     ->first();
 
                 if ($existingChar && ! $overwrite) {
-                    $warnings[] = "Character '{$charData['name']}' already exists, skipped";
+                    $warnings[] = "Character '{$charName}' already exists, skipped";
 
                     continue;
                 }
@@ -708,7 +787,7 @@ class BackupService
                 } else {
                     Character::create([
                         'user_id' => $userId,
-                        'name' => $charData['name'],
+                        'name' => $charName,
                         'scenario_type' => $charData['scenario_type'] ?? 'ura_finale',
                         'current_stats' => $charData['current_stats'] ?? [],
                         'energy_level' => $charData['energy_level'] ?? 100,
@@ -716,9 +795,10 @@ class BackupService
                     ]);
                 }
 
-                $restored++;
+                $restored = ($restored ?? 0) + 1;
             } catch (\Exception $e) {
-                $errors[] = "Failed to restore character '{$charData['name']}': ".$e->getMessage();
+                $charName = \is_string((is_array($charData) && isset($charData['name']) ? $charData['name'] : null)) ? $charData['name'] : 'Unknown';
+                $errors[] = "Failed to restore character '{$charName}': ".$e->getMessage();
             }
         }
 
@@ -727,29 +807,36 @@ class BackupService
 
     /**
      * Restore careers from backup
+     *
+     * @param  array<int, array<string, mixed>>  $careers
+     * @return array{restored: int, errors: array<int, string>, warnings: array<int, string>}
      */
-    private function restoreCareers(array $careers, int $userId, bool $overwrite): array
-    {
+    private function restoreCareers(): array
         $restored = 0;
         $errors = [];
         $warnings = [];
 
         foreach ($careers as $careerData) {
+            if (! \is_array($careerData)) {
+                continue;
+            }
             try {
+                $careerName = \is_string((is_array($careerData) && isset($careerData['career_name']) ? $careerData['career_name'] : null)) ? $careerData['career_name'] : 'Unknown';
+
                 /** @var Career|null $existingCareer */
                 $existingCareer = Career::where('user_id', $userId)
-                    ->where('career_name', $careerData['career_name'])
+                    ->where('career_name', $careerName)
                     ->first();
 
                 if ($existingCareer && ! $overwrite) {
-                    $warnings[] = "Career '{$careerData['career_name']}' already exists, skipped";
+                    $warnings[] = "Career '{$careerName}' already exists, skipped";
 
                     continue;
                 }
 
                 $careerAttributes = [
                     'user_id' => $userId,
-                    'career_name' => $careerData['career_name'],
+                    'career_name' => $careerName,
                     'scenario_type' => $careerData['scenario_type'] ?? 'ura_finale',
                     'status' => $careerData['status'] ?? 'active',
                     'current_turn' => $careerData['current_turn'] ?? 1,
@@ -761,9 +848,10 @@ class BackupService
                     Career::create($careerAttributes);
                 }
 
-                $restored++;
+                $restored = ($restored ?? 0) + 1;
             } catch (\Exception $e) {
-                $errors[] = "Failed to restore career '{$careerData['career_name']}': ".$e->getMessage();
+                $careerName = \is_string((is_array($careerData) && isset($careerData['career_name']) ? $careerData['career_name'] : null)) ? $careerData['career_name'] : 'Unknown';
+                $errors[] = "Failed to restore career '{$careerName}': ".$e->getMessage();
             }
         }
 
@@ -772,26 +860,33 @@ class BackupService
 
     /**
      * Restore skills from backup (reference data)
+     *
+     * @param  array<int, array<string, mixed>>  $skills
+     * @return array{restored: int, errors: array<int, string>, warnings: array<int, string>}
      */
-    private function restoreSkills(array $skills, bool $overwrite): array
-    {
+    private function restoreSkills(): array
         $restored = 0;
         $errors = [];
         $warnings = [];
 
         foreach ($skills as $skillData) {
+            if (! \is_array($skillData)) {
+                continue;
+            }
             try {
+                $skillName = \is_string((is_array($skillData) && isset($skillData['name']) ? $skillData['name'] : null)) ? $skillData['name'] : 'Unknown';
+
                 /** @var Skill|null $existingSkill */
-                $existingSkill = Skill::where('name', $skillData['name'])->first();
+                $existingSkill = Skill::where('name', $skillName)->first();
 
                 if ($existingSkill && ! $overwrite) {
-                    $warnings[] = "Skill '{$skillData['name']}' already exists, skipped";
+                    $warnings[] = "Skill '{$skillName}' already exists, skipped";
 
                     continue;
                 }
 
                 $skillAttributes = [
-                    'name' => $skillData['name'],
+                    'name' => $skillName,
                     'skill_type' => $skillData['skill_type'] ?? 'passive',
                     'rarity' => $skillData['rarity'] ?? 'normal',
                     'base_sp_cost' => $skillData['base_sp_cost'] ?? 120,
@@ -804,9 +899,10 @@ class BackupService
                     Skill::create($skillAttributes);
                 }
 
-                $restored++;
+                $restored = ($restored ?? 0) + 1;
             } catch (\Exception $e) {
-                $errors[] = "Failed to restore skill '{$skillData['name']}': ".$e->getMessage();
+                $skillName = \is_string((is_array($skillData) && isset($skillData['name']) ? $skillData['name'] : null)) ? $skillData['name'] : 'Unknown';
+                $errors[] = "Failed to restore skill '{$skillName}': ".$e->getMessage();
             }
         }
 
@@ -815,26 +911,33 @@ class BackupService
 
     /**
      * Restore support cards from backup (reference data)
+     *
+     * @param  array<int, array<string, mixed>>  $cards
+     * @return array{restored: int, errors: array<int, string>, warnings: array<int, string>}
      */
-    private function restoreSupportCards(array $cards, bool $overwrite): array
-    {
+    private function restoreSupportCards(): array
         $restored = 0;
         $errors = [];
         $warnings = [];
 
         foreach ($cards as $cardData) {
+            if (! \is_array($cardData)) {
+                continue;
+            }
             try {
+                $cardName = \is_string((is_array($cardData) && isset($cardData['name']) ? $cardData['name'] : null)) ? $cardData['name'] : 'Unknown';
+
                 /** @var SupportCard|null $existingCard */
-                $existingCard = SupportCard::where('name', $cardData['name'])->first();
+                $existingCard = SupportCard::where('name', $cardName)->first();
 
                 if ($existingCard && ! $overwrite) {
-                    $warnings[] = "Support card '{$cardData['name']}' already exists, skipped";
+                    $warnings[] = "Support card '{$cardName}' already exists, skipped";
 
                     continue;
                 }
 
                 $cardAttributes = [
-                    'name' => $cardData['name'],
+                    'name' => $cardName,
                     'rarity' => $cardData['rarity'] ?? 'SSR',
                     'card_type' => $cardData['specialization'] ?? 'speed',
                 ];
@@ -845,9 +948,10 @@ class BackupService
                     SupportCard::create($cardAttributes);
                 }
 
-                $restored++;
+                $restored = ($restored ?? 0) + 1;
             } catch (\Exception $e) {
-                $errors[] = "Failed to restore support card '{$cardData['name']}': ".$e->getMessage();
+                $cardName = \is_string((is_array($cardData) && isset($cardData['name']) ? $cardData['name'] : null)) ? $cardData['name'] : 'Unknown';
+                $errors[] = "Failed to restore support card '{$cardName}': ".$e->getMessage();
             }
         }
 
@@ -858,14 +962,13 @@ class BackupService
      * Schedule automated backup
      *
      * @param  int  $userId  User ID
-     * @param  array  $scheduleConfig  Schedule configuration
-     * @return array{success: bool, schedule_id: string, errors: array}
+     * @param  array<string, mixed>  $scheduleConfig  Schedule configuration
+     * @return array{success: bool, schedule_id: string, errors: array<int, string>}
      */
-    public function scheduleBackup(int $userId, array $scheduleConfig): array
-    {
+    public function scheduleBackup(): array
         $scheduleId = Str::uuid()->toString();
-        $frequency = $scheduleConfig['frequency'] ?? self::SCHEDULE_DAILY;
-        $time = $scheduleConfig['time'] ?? '02:00';
+        $frequency = \is_string((is_array($scheduleConfig) && isset($scheduleConfig['frequency']) ? $scheduleConfig['frequency'] : null)) ? $scheduleConfig['frequency'] : self::SCHEDULE_DAILY;
+        $time = \is_string((is_array($scheduleConfig) && isset($scheduleConfig['time']) ? $scheduleConfig['time'] : null)) ? $scheduleConfig['time'] : '02:00';
         $backupType = $scheduleConfig['type'] ?? self::TYPE_FULL;
         $compress = $scheduleConfig['compress'] ?? true;
         $encrypt = $scheduleConfig['encrypt'] ?? false;
@@ -907,7 +1010,11 @@ class BackupService
             Cache::put(self::CACHE_PREFIX."schedule_{$scheduleId}", $schedule, now()->addDays(365));
 
             // Add to user's schedule list
+            /** @var array<string, array<string, mixed>> $userSchedules */
             $userSchedules = Cache::get(self::CACHE_PREFIX."user_schedules_{$userId}", []);
+            if (! \is_array($userSchedules)) {
+                $userSchedules = [];
+            }
             $userSchedules[$scheduleId] = $schedule;
             Cache::put(self::CACHE_PREFIX."user_schedules_{$userId}", $userSchedules, now()->addDays(365));
 
@@ -962,10 +1069,15 @@ class BackupService
 
     /**
      * Get backup schedule for user
+     *
+     * @return array{success: bool, schedules: array<int, array<string, mixed>>}
      */
-    public function getBackupSchedule(int $userId): array
-    {
+    public function getBackupSchedule(): array
+        /** @var array<string, array<string, mixed>> $schedules */
         $schedules = Cache::get(self::CACHE_PREFIX."user_schedules_{$userId}", []);
+        if (! \is_array($schedules)) {
+            $schedules = [];
+        }
 
         return [
             'success' => true,
@@ -975,12 +1087,15 @@ class BackupService
 
     /**
      * Update backup schedule
+     *
+     * @param  array<string, mixed>  $updates
+     * @return array{success: bool, schedule?: array<string, mixed>, errors: array<int, string>}
      */
-    public function updateBackupSchedule(string $scheduleId, int $userId, array $updates): array
-    {
+    public function updateBackupSchedule(): array
+        /** @var array<string, mixed>|null $schedule */
         $schedule = Cache::get(self::CACHE_PREFIX."schedule_{$scheduleId}");
 
-        if (! $schedule || $schedule['user_id'] !== $userId) {
+        if (! \is_array($schedule) || ((is_array($schedule) && isset($schedule['user_id']) ? $schedule['user_id'] : null)) !== $userId) {
             return [
                 'success' => false,
                 'errors' => ['Schedule not found or unauthorized'],
@@ -996,12 +1111,18 @@ class BackupService
         }
 
         $schedule['updated_at'] = now()->toIso8601String();
-        $schedule['next_run'] = $this->calculateNextRun($schedule['frequency'], $schedule['time']);
+        $frequency = \is_string((is_array($schedule) && isset($schedule['frequency']) ? $schedule['frequency'] : null)) ? $schedule['frequency'] : self::SCHEDULE_DAILY;
+        $time = \is_string((is_array($schedule) && isset($schedule['time']) ? $schedule['time'] : null)) ? $schedule['time'] : '02:00';
+        $schedule['next_run'] = $this->calculateNextRun($frequency, $time);
 
         Cache::put(self::CACHE_PREFIX."schedule_{$scheduleId}", $schedule, now()->addDays(365));
 
         // Update user's schedule list
+        /** @var array<string, array<string, mixed>> $userSchedules */
         $userSchedules = Cache::get(self::CACHE_PREFIX."user_schedules_{$userId}", []);
+        if (! \is_array($userSchedules)) {
+            $userSchedules = [];
+        }
         $userSchedules[$scheduleId] = $schedule;
         Cache::put(self::CACHE_PREFIX."user_schedules_{$userId}", $userSchedules, now()->addDays(365));
 
@@ -1014,12 +1135,14 @@ class BackupService
 
     /**
      * Delete backup schedule
+     *
+     * @return array{success: bool, errors: array<int, string>}
      */
-    public function deleteBackupSchedule(string $scheduleId, int $userId): array
-    {
+    public function deleteBackupSchedule(): array
+        /** @var array<string, mixed>|null $schedule */
         $schedule = Cache::get(self::CACHE_PREFIX."schedule_{$scheduleId}");
 
-        if (! $schedule || $schedule['user_id'] !== $userId) {
+        if (! \is_array($schedule) || ((is_array($schedule) && isset($schedule['user_id']) ? $schedule['user_id'] : null)) !== $userId) {
             return [
                 'success' => false,
                 'errors' => ['Schedule not found or unauthorized'],
@@ -1028,7 +1151,11 @@ class BackupService
 
         Cache::forget(self::CACHE_PREFIX."schedule_{$scheduleId}");
 
+        /** @var array<string, array<string, mixed>> $userSchedules */
         $userSchedules = Cache::get(self::CACHE_PREFIX."user_schedules_{$userId}", []);
+        if (! \is_array($userSchedules)) {
+            $userSchedules = [];
+        }
         unset($userSchedules[$scheduleId]);
         Cache::put(self::CACHE_PREFIX."user_schedules_{$userId}", $userSchedules, now()->addDays(365));
 
@@ -1042,37 +1169,49 @@ class BackupService
      * List all backups for a user
      *
      * @param  int  $userId  User ID
-     * @param  array  $filters  Optional filters
-     * @return array{success: bool, backups: array, total: int}
+     * @param  array<string, mixed>  $filters  Optional filters
+     * @return array{success: bool, backups: array<int, array<string, mixed>>, total: int, page?: int, per_page?: int, errors?: array<int, string>}
      */
-    public function listBackups(int $userId, array $filters = []): array
-    {
+    public function listBackups(): array
         try {
+            /** @var array<string, array<string, mixed>> $backups */
             $backups = Cache::get(self::CACHE_PREFIX."user_backups_{$userId}", []);
+            if (! \is_array($backups)) {
+                $backups = [];
+            }
 
             // Apply filters
-            if (! empty($filters['type'])) {
-                $backups = array_filter($backups, fn ($b) => $b['type'] === $filters['type']);
+            if (! empty($filters['type']) && \is_string($filters['type'])) {
+                $filterType = $filters['type'];
+                $backups = array_filter($backups, fn ($b) => ((is_array($b) && isset($b['type']) ? $b['type'] : null)) === $filterType);
             }
 
-            if (! empty($filters['status'])) {
-                $backups = array_filter($backups, fn ($b) => $b['status'] === $filters['status']);
+            if (! empty($filters['status']) && \is_string($filters['status'])) {
+                $filterStatus = $filters['status'];
+                $backups = array_filter($backups, fn ($b) => ((is_array($b) && isset($b['status']) ? $b['status'] : null)) === $filterStatus);
             }
 
-            if (! empty($filters['date_from'])) {
-                $backups = array_filter($backups, fn ($b) => $b['created_at'] >= $filters['date_from']);
+            if (! empty($filters['date_from']) && \is_string($filters['date_from'])) {
+                $filterDateFrom = $filters['date_from'];
+                $backups = array_filter($backups, fn ($b) => ($b['created_at'] ?? '') >= $filterDateFrom);
             }
 
-            if (! empty($filters['date_to'])) {
-                $backups = array_filter($backups, fn ($b) => $b['created_at'] <= $filters['date_to']);
+            if (! empty($filters['date_to']) && \is_string($filters['date_to'])) {
+                $filterDateTo = $filters['date_to'];
+                $backups = array_filter($backups, fn ($b) => ($b['created_at'] ?? '') <= $filterDateTo);
             }
 
             // Sort by created_at descending
-            usort($backups, fn ($a, $b) => strcmp($b['created_at'], $a['created_at']));
+            usort($backups, function ($a, $b) {
+                $aTime = \is_string((is_array($a) && isset($a['created_at']) ? $a['created_at'] : null)) ? $a['created_at'] : '';
+                $bTime = \is_string((is_array($b) && isset($b['created_at']) ? $b['created_at'] : null)) ? $b['created_at'] : '';
+
+                return strcmp($bTime, $aTime);
+            });
 
             // Apply pagination
-            $page = $filters['page'] ?? 1;
-            $perPage = $filters['per_page'] ?? 20;
+            $page = \is_int((is_array($filters) && isset($filters['page']) ? $filters['page'] : null)) ? $filters['page'] : 1;
+            $perPage = \is_int((is_array($filters) && isset($filters['per_page']) ? $filters['per_page'] : null)) ? $filters['per_page'] : 20;
             $offset = ($page - 1) * $perPage;
             $total = count($backups);
             $backups = array_slice($backups, $offset, $perPage);
@@ -1101,12 +1240,14 @@ class BackupService
 
     /**
      * Get backup details
+     *
+     * @return array<string, mixed>|null
      */
     public function getBackupDetails(string $backupId, int $userId): ?array
     {
         $backup = $this->getBackupRecord($backupId);
 
-        if (! $backup || $backup['user_id'] !== $userId) {
+        if (! \is_array($backup) || ((is_array($backup) && isset($backup['user_id']) ? $backup['user_id'] : null)) !== $userId) {
             return null;
         }
 
@@ -1115,20 +1256,21 @@ class BackupService
 
     /**
      * Delete a backup
+     *
+     * @return array{success: bool, errors: array<int, string>}
      */
-    public function deleteBackup(string $backupId, int $userId): array
-    {
+    public function deleteBackup(): array
         try {
             $backup = $this->getBackupRecord($backupId);
 
-            if (! $backup) {
+            if (! \is_array($backup)) {
                 return [
                     'success' => false,
                     'errors' => ['Backup not found'],
                 ];
             }
 
-            if ($backup['user_id'] !== $userId) {
+            if (((is_array($backup) && isset($backup['user_id']) ? $backup['user_id'] : null)) !== $userId) {
                 return [
                     'success' => false,
                     'errors' => ['Unauthorized: Backup belongs to another user'],
@@ -1136,14 +1278,19 @@ class BackupService
             }
 
             // Delete file
-            if (Storage::disk(self::BACKUP_DISK)->exists($backup['file_path'])) {
-                Storage::disk(self::BACKUP_DISK)->delete($backup['file_path']);
+            $filePath = \is_string((is_array($backup) && isset($backup['file_path']) ? $backup['file_path'] : null)) ? $backup['file_path'] : '';
+            if ($filePath && Storage::disk(self::BACKUP_DISK)->exists($filePath)) {
+                Storage::disk(self::BACKUP_DISK)->delete($filePath);
             }
 
             // Remove from cache
             Cache::forget(self::CACHE_PREFIX."backup_{$backupId}");
 
+            /** @var array<string, array<string, mixed>> $userBackups */
             $userBackups = Cache::get(self::CACHE_PREFIX."user_backups_{$userId}", []);
+            if (! \is_array($userBackups)) {
+                $userBackups = [];
+            }
             unset($userBackups[$backupId]);
             Cache::put(self::CACHE_PREFIX."user_backups_{$userId}", $userBackups, now()->addDays(365));
 
@@ -1172,6 +1319,8 @@ class BackupService
 
     /**
      * Store backup record
+     *
+     * @param  array<string, mixed>  $metadata
      */
     private function storeBackupRecord(string $backupId, int $userId, array $metadata, string $filePath, int $fileSize, string $checksum): void
     {
@@ -1194,7 +1343,11 @@ class BackupService
         Cache::put(self::CACHE_PREFIX."backup_{$backupId}", $record, now()->addDays(self::MAX_RETENTION_DAYS));
 
         // Add to user's backup list
+        /** @var array<string, array<string, mixed>> $userBackups */
         $userBackups = Cache::get(self::CACHE_PREFIX."user_backups_{$userId}", []);
+        if (! \is_array($userBackups)) {
+            $userBackups = [];
+        }
         $userBackups[$backupId] = $record;
         Cache::put(self::CACHE_PREFIX."user_backups_{$userId}", $userBackups, now()->addDays(self::MAX_RETENTION_DAYS));
 
@@ -1214,10 +1367,15 @@ class BackupService
 
     /**
      * Get backup record
+     *
+     * @return array<string, mixed>|null
      */
     private function getBackupRecord(string $backupId): ?array
     {
-        return Cache::get(self::CACHE_PREFIX."backup_{$backupId}");
+        /** @var array<string, mixed>|null $record */
+        $record = Cache::get(self::CACHE_PREFIX."backup_{$backupId}");
+
+        return \is_array($record) ? $record : null;
     }
 
     /**
@@ -1225,7 +1383,11 @@ class BackupService
      */
     private function updateBackupStatus(string $backupId, string $status): void
     {
+        /** @var array<string, mixed> $record */
         $record = Cache::get(self::CACHE_PREFIX."backup_{$backupId}", []);
+        if (! \is_array($record)) {
+            $record = [];
+        }
         $record['status'] = $status;
         $record['updated_at'] = now()->toIso8601String();
         Cache::put(self::CACHE_PREFIX."backup_{$backupId}", $record, now()->addDays(self::MAX_RETENTION_DAYS));
@@ -1233,21 +1395,29 @@ class BackupService
 
     /**
      * Clean up old backups based on retention policy
+     *
+     * @return array{success: bool, deleted: int, errors: array<int, string>}
      */
-    public function cleanupOldBackups(int $userId, int $retentionDays = 30): array
-    {
+    public function cleanupOldBackups(): array
         $deleted = 0;
         $errors = [];
 
         try {
+            /** @var array<string, array<string, mixed>> $userBackups */
             $userBackups = Cache::get(self::CACHE_PREFIX."user_backups_{$userId}", []);
+            if (! \is_array($userBackups)) {
+                $userBackups = [];
+            }
             $cutoffDate = now()->subDays($retentionDays)->toIso8601String();
 
             foreach ($userBackups as $backupId => $backup) {
-                if ($backup['created_at'] < $cutoffDate) {
-                    $result = $this->deleteBackup($backupId, $userId);
+                if (! \is_array($backup)) {
+                    continue;
+                }
+                if (($backup['created_at'] ?? '') < $cutoffDate) {
+                    $result = $this->deleteBackup((is_string($backupId) ? (string) $backupId : ''), $userId);
                     if ($result['success']) {
-                        $deleted++;
+                        $deleted = ($deleted ?? 0) + 1;
                     } else {
                         $errors = array_merge($errors, $result['errors']);
                     }
@@ -1270,22 +1440,43 @@ class BackupService
 
     /**
      * Get backup statistics for user
+     *
+     * @return array{total_backups: int, total_size: int, total_size_formatted: string, by_type: array<string, int>, by_status: array<string, int>, schedules: int}
      */
-    public function getBackupStatistics(int $userId): array
-    {
+    public function getBackupStatistics(): array
+        /** @var array<string, array<string, mixed>> $userBackups */
         $userBackups = Cache::get(self::CACHE_PREFIX."user_backups_{$userId}", []);
+        if (! \is_array($userBackups)) {
+            $userBackups = [];
+        }
 
         $totalSize = 0;
+        /** @var array<string, int> $byType */
         $byType = [];
+        /** @var array<string, int> $byStatus */
         $byStatus = [];
 
         foreach ($userBackups as $backup) {
-            $totalSize += $backup['file_size'] ?? 0;
-            $type = $backup['type'] ?? 'unknown';
-            $status = $backup['status'] ?? 'unknown';
+            if (! \is_array($backup)) {
+                continue;
+            }
+            $fileSize = $backup['file_size'] ?? 0;
+            $totalSize = ($totalSize ?? 0) + \is_int($fileSize) ? $fileSize : 0;
 
-            $byType[$type] = ($byType[$type] ?? 0) + 1;
-            $byStatus[$status] = ($byStatus[$status] ?? 0) + 1;
+            $type = $backup['type'] ?? 'unknown';
+            $typeStr = \is_string($type) ? $type : 'unknown';
+
+            $status = $backup['status'] ?? 'unknown';
+            $statusStr = \is_string($status) ? $status : 'unknown';
+
+            $byType[$typeStr] = ($byType[$typeStr] ?? 0) + 1;
+            $byStatus[$statusStr] = ($byStatus[$statusStr] ?? 0) + 1;
+        }
+
+        /** @var array<string, array<string, mixed>> $userSchedules */
+        $userSchedules = Cache::get(self::CACHE_PREFIX."user_schedules_{$userId}", []);
+        if (! \is_array($userSchedules)) {
+            $userSchedules = [];
         }
 
         return [
@@ -1294,7 +1485,7 @@ class BackupService
             'total_size_formatted' => $this->formatBytes($totalSize),
             'by_type' => $byType,
             'by_status' => $byStatus,
-            'schedules' => count(Cache::get(self::CACHE_PREFIX."user_schedules_{$userId}", [])),
+            'schedules' => count($userSchedules),
         ];
     }
 
@@ -1307,7 +1498,7 @@ class BackupService
         $i = 0;
         while ($bytes >= 1024 && $i < count($units) - 1) {
             $bytes /= 1024;
-            $i++;
+            $i = ($i ?? 0) + 1;
         }
 
         return round($bytes, 2).' '.$units[$i];

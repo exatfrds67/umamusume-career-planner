@@ -83,10 +83,22 @@ class TesseractService
         $this->imageProcessor = $imageProcessor;
         $this->screenDetector = new ScreenTypeDetector;
         $this->parserFactory = new ParserFactory;
-        $this->tesseractPath = config('services.tesseract.path', 'tesseract');
-        $this->language = config('services.tesseract.language', 'jpn+eng');
-        $this->psm = config('services.tesseract.psm', '6');
-        $this->oem = config('services.tesseract.oem', '3');
+
+        /** @var string $tesseractPath */
+        $tesseractPath = config('services.tesseract.path', 'tesseract');
+        $this->tesseractPath = \is_string($tesseractPath) ? $tesseractPath : 'tesseract';
+
+        /** @var string $language */
+        $language = config('services.tesseract.language', 'jpn+eng');
+        $this->language = \is_string($language) ? $language : 'jpn+eng';
+
+        /** @var string $psm */
+        $psm = config('services.tesseract.psm', '6');
+        $this->psm = \is_string($psm) ? $psm : '6';
+
+        /** @var string $oem */
+        $oem = config('services.tesseract.oem', '3');
+        $this->oem = \is_string($oem) ? $oem : '3';
     }
 
     /**
@@ -101,7 +113,7 @@ class TesseractService
      *     error: string|null
      * }
      */
-    public function processScreenshot(UploadedFile $file, int $userId): array
+    public function processScreenshot(): array
     {
         try {
             // Validate image first
@@ -119,14 +131,20 @@ class TesseractService
 
             // Store the uploaded file
             $path = $file->store('ocr-uploads', 'local');
+            if ($path === false) {
+                throw new \RuntimeException('Failed to store uploaded file');
+            }
             $fullPath = Storage::disk('local')->path($path);
+            if ($fullPath === false) {
+                throw new \RuntimeException('Failed to get file path');
+            }
 
             // Calculate image hash for deduplication
             $imageHash = $this->imageProcessor->calculateImageHash($fullPath);
 
             // Check for existing extraction with same hash
             $existing = OCRExtraction::where('image_hash', $imageHash)
-                ->where('status', 'processed')
+                ->where('status', '=', 'processed')
                 ->first();
 
             if ($existing) {
@@ -135,7 +153,7 @@ class TesseractService
                     'extraction_id' => $existing->id,
                     'stats' => $existing->parsed_data['stats'] ?? null,
                     'raw_text' => $existing->extracted_text,
-                    'confidence' => (float) $existing->confidence_score,
+                    'confidence' => (is_numeric($existing->confidence_score) ? (float) $existing->confidence_score : 0.0),
                     'error' => null,
                 ];
             }
@@ -151,13 +169,15 @@ class TesseractService
 
             // Preprocess image for better OCR results
             $preprocessResult = $this->imageProcessor->preprocessForOCR($fullPath);
-            $ocrImagePath = $preprocessResult['success'] ? $preprocessResult['processed_path'] : $fullPath;
+            $ocrImagePath = $preprocessResult['success'] && $preprocessResult['processed_path'] !== null
+                ? $preprocessResult['processed_path']
+                : $fullPath;
 
             // Perform OCR
             $rawText = $this->performOCR($ocrImagePath);
 
             // Clean up processed image if it was created
-            if ($preprocessResult['success'] && $preprocessResult['processed_path'] !== $fullPath) {
+            if ($preprocessResult['success'] && $preprocessResult['processed_path'] !== null && $preprocessResult['processed_path'] !== $fullPath) {
                 @unlink($preprocessResult['processed_path']);
             }
 
@@ -237,7 +257,7 @@ class TesseractService
     protected function performOCR(string $imagePath): string
     {
         // Build Tesseract command with PSM and OEM options
-        $command = sprintf(
+        $command = \sprintf(
             '%s %s stdout -l %s --psm %s --oem %s',
             escapeshellcmd($this->tesseractPath),
             escapeshellarg($imagePath),
@@ -249,7 +269,7 @@ class TesseractService
         // Execute OCR
         $output = shell_exec($command);
 
-        if ($output === null) {
+        if (! \is_string($output)) {
             throw new \RuntimeException('Tesseract execution failed');
         }
 
@@ -259,17 +279,10 @@ class TesseractService
     /**
      * Extract stats from OCR text using regex patterns
      *
-     * @return array<string, int|null>
+     * @return array<string, int>
      */
-    protected function extractStats(string $text): array
-    {
-        $stats = [
-            'speed' => null,
-            'stamina' => null,
-            'power' => null,
-            'guts' => null,
-            'wit' => null,
-        ];
+    protected function extractStats(): array
+        $stats = [];
 
         foreach (self::STAT_PATTERNS as $stat => $pattern) {
             if (preg_match($pattern, $text, $matches)) {
@@ -289,15 +302,14 @@ class TesseractService
      *
      * @return array<string, mixed>
      */
-    protected function extractAdditionalData(string $text): array
-    {
+    protected function extractAdditionalData(): array
         $data = [];
 
         // Extract turn
         if (preg_match(self::ADDITIONAL_PATTERNS['turn'], $text, $matches)) {
-            $data['current_turn'] = (int) $matches[1];
+            (is_array($data) && isset($data['current_turn']) ? $data['current_turn'] : null) = (int) $matches[1];
             if (isset($matches[2])) {
-                $data['total_turns'] = (int) $matches[2];
+                (is_array($data) && isset($data['total_turns']) ? $data['total_turns'] : null) = (int) $matches[2];
             }
         }
 
@@ -305,13 +317,13 @@ class TesseractService
         if (preg_match(self::ADDITIONAL_PATTERNS['energy'], $text, $matches)) {
             $energy = (int) $matches[1];
             if ($energy >= 0 && $energy <= 100) {
-                $data['energy_level'] = $energy;
+                (is_array($data) && isset($data['energy_level']) ? $data['energy_level'] : null) = $energy;
             }
         }
 
         // Extract mood
         if (preg_match(self::ADDITIONAL_PATTERNS['mood'], $text, $matches)) {
-            $data['mood_status'] = $this->normalizeMood($matches[1]);
+            (is_array($data) && isset($data['mood_status']) ? $data['mood_status'] : null) = $this->normalizeMood($matches[1]);
         }
 
         return $data;
@@ -339,7 +351,7 @@ class TesseractService
 
         // Check English mood
         $englishMoods = ['great', 'good', 'normal', 'bad', 'awful'];
-        if (in_array($lower, $englishMoods)) {
+        if (\in_array($lower, $englishMoods, true)) {
             return $lower;
         }
 
@@ -349,12 +361,12 @@ class TesseractService
     /**
      * Calculate confidence score based on extracted stats
      *
-     * @param  array<string, int|null>  $stats
+     * @param  array<string, int>  $stats
      * @return float Score 0.0 to 1.0
      */
     protected function calculateConfidence(array $stats): float
     {
-        $foundCount = count(array_filter($stats, fn ($v) => $v !== null));
+        $foundCount = \count($stats);
         $totalStats = 5;
 
         return round($foundCount / $totalStats, 2);
@@ -367,6 +379,6 @@ class TesseractService
     {
         $output = shell_exec("{$this->tesseractPath} --version 2>&1");
 
-        return $output !== null && str_contains($output, 'tesseract');
+        return \is_string($output) && str_contains($output, 'tesseract');
     }
 }

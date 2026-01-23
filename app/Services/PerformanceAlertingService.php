@@ -54,7 +54,6 @@ class PerformanceAlertingService
      * @return array{checked: int, triggered: int, alerts: array<int, array<string, mixed>>}
      */
     public function checkAlerts(): array
-    {
         if (! config('apm.alerting.enabled', true)) {
             return ['checked' => 0, 'triggered' => 0, 'alerts' => []];
         }
@@ -64,50 +63,50 @@ class PerformanceAlertingService
         $alerts = [];
 
         // Check response time
-        $checked++;
+        $checked = ($checked ?? 0) + 1;
         $responseTimeAlert = $this->checkResponseTimeAlert();
         if ($responseTimeAlert !== null) {
-            $triggered++;
+            $triggered = ($triggered ?? 0) + 1;
             $alerts[] = $responseTimeAlert;
         }
 
         // Check error rate
-        $checked++;
+        $checked = ($checked ?? 0) + 1;
         $errorRateAlert = $this->checkErrorRateAlert();
         if ($errorRateAlert !== null) {
-            $triggered++;
+            $triggered = ($triggered ?? 0) + 1;
             $alerts[] = $errorRateAlert;
         }
 
         // Check memory usage
-        $checked++;
+        $checked = ($checked ?? 0) + 1;
         $memoryAlert = $this->checkMemoryAlert();
         if ($memoryAlert !== null) {
-            $triggered++;
+            $triggered = ($triggered ?? 0) + 1;
             $alerts[] = $memoryAlert;
         }
 
         // Check cache hit rate
-        $checked++;
+        $checked = ($checked ?? 0) + 1;
         $cacheAlert = $this->checkCacheHitRateAlert();
         if ($cacheAlert !== null) {
-            $triggered++;
+            $triggered = ($triggered ?? 0) + 1;
             $alerts[] = $cacheAlert;
         }
 
         // Check slow queries
-        $checked++;
+        $checked = ($checked ?? 0) + 1;
         $slowQueryAlert = $this->checkSlowQueryAlert();
         if ($slowQueryAlert !== null) {
-            $triggered++;
+            $triggered = ($triggered ?? 0) + 1;
             $alerts[] = $slowQueryAlert;
         }
 
         // Check database connections
-        $checked++;
+        $checked = ($checked ?? 0) + 1;
         $dbConnAlert = $this->checkDatabaseConnectionAlert();
         if ($dbConnAlert !== null) {
-            $triggered++;
+            $triggered = ($triggered ?? 0) + 1;
             $alerts[] = $dbConnAlert;
         }
 
@@ -192,8 +191,7 @@ class PerformanceAlertingService
      *
      * @return array<int, array<string, mixed>>
      */
-    public function getAlerts(int $limit = 100): array
-    {
+    public function getAlerts(): array
         $alerts = Cache::get(self::ALERT_PREFIX.'list', []);
 
         // Sort by timestamp descending
@@ -208,7 +206,6 @@ class PerformanceAlertingService
      * @return array<int, array<string, mixed>>
      */
     public function getUnacknowledgedAlerts(): array
-    {
         $alerts = $this->getAlerts();
 
         return array_values(array_filter($alerts, fn ($alert) => ! $alert['acknowledged']));
@@ -219,8 +216,7 @@ class PerformanceAlertingService
      *
      * @return array<int, array<string, mixed>>
      */
-    public function getAlertsBySeverity(string $severity): array
-    {
+    public function getAlertsBySeverity(): array
         $alerts = $this->getAlerts();
 
         return array_values(array_filter($alerts, fn ($alert) => $alert['severity'] === $severity));
@@ -232,7 +228,6 @@ class PerformanceAlertingService
      * @return array{total: int, unacknowledged: int, by_severity: array<string, int>, by_type: array<string, int>}
      */
     public function getAlertStatistics(): array
-    {
         $alerts = $this->getAlerts();
 
         $bySeverity = [
@@ -249,7 +244,7 @@ class PerformanceAlertingService
             $byType[$alert['type']] = ($byType[$alert['type']] ?? 0) + 1;
 
             if (! $alert['acknowledged']) {
-                $unacknowledged++;
+                $unacknowledged = ($unacknowledged ?? 0) + 1;
             }
         }
 
@@ -477,7 +472,7 @@ class PerformanceAlertingService
     {
         try {
             $result = DB::select("SHOW STATUS LIKE 'Threads_connected'");
-            $current = isset($result[0]) ? (int) $result[0]->Value : 0;
+            $current = isset($result[0]) ? (isset($result[0]) && is_numeric($result[0]->Value) ? (int) $result[0]->Value : 0) : 0;
 
             $maxResult = DB::select("SHOW VARIABLES LIKE 'max_connections'");
             $max = isset($maxResult[0]) ? (int) $maxResult[0]->Value : 100;

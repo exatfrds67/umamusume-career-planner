@@ -93,10 +93,9 @@ class DataMigrationService
      * Detect legacy format from data
      *
      * @param  string  $content  Raw content to analyze
-     * @return array{format: string, confidence: float, details: array}
+     * @return array{format: string, confidence: float, details: array<string, mixed>}
      */
-    public function detectLegacyFormat(string $content): array
-    {
+    public function detectLegacyFormat(): array
         $content = trim($content);
 
         if (empty($content)) {
@@ -110,7 +109,7 @@ class DataMigrationService
         // Try JSON detection
         if (str_starts_with($content, '{') || str_starts_with($content, '[')) {
             $decoded = json_decode($content, true);
-            if (json_last_error() === JSON_ERROR_NONE) {
+            if (json_last_error() === JSON_ERROR_NONE && \is_array($decoded)) {
                 return $this->detectJsonVersion($decoded);
             }
         }
@@ -157,10 +156,10 @@ class DataMigrationService
     /**
      * Detect JSON format version
      *
-     * @return array{format: string, confidence: float, details: array}
+     * @param  array<int|string, mixed>  $data
+     * @return array{format: string, confidence: float, details: array<string, mixed>}
      */
-    private function detectJsonVersion(array $data): array
-    {
+    private function detectJsonVersion(): array
         // Check for v1 format markers
         $hasV1Markers = false;
         $hasCurrentMarkers = false;
@@ -206,12 +205,13 @@ class DataMigrationService
     /**
      * Detect CSV format version
      *
-     * @return array{format: string, confidence: float, details: array}
+     * @param  array<int, string>  $lines
+     * @return array{format: string, confidence: float, details: array<string, mixed>}
      */
-    private function detectCsvVersion(array $lines): array
-    {
-        $headers = str_getcsv($lines[0]);
-        $normalizedHeaders = array_map(fn ($h) => strtolower(trim($h)), $headers);
+    private function detectCsvVersion(): array
+        $firstLine = $lines[0] ?? '';
+        $headers = str_getcsv($firstLine);
+        $normalizedHeaders = array_map(fn ($h) => strtolower(trim(\is_string($h) ? $h : '')), $headers);
 
         // V1 CSV format markers
         $v1Headers = ['trainee_name', 'stat_speed', 'stat_stamina', 'career_run', 'run_number'];
@@ -251,10 +251,9 @@ class DataMigrationService
      * @param  string  $content  Raw legacy content
      * @param  string  $sourceFormat  Source format identifier
      * @param  string  $targetType  Target data type (character, career, etc.)
-     * @return array{success: bool, data: array, errors: array, warnings: array}
+     * @return array{success: bool, data: array<int, array<string, mixed>>, errors: array<int, string>, warnings: array<int, string>}
      */
-    public function convertLegacyFormat(string $content, string $sourceFormat, string $targetType): array
-    {
+    public function convertLegacyFormat(): array
         $errors = [];
         $warnings = [];
         $convertedData = [];
@@ -324,12 +323,13 @@ class DataMigrationService
 
     /**
      * Parse V1 JSON format
+     *
+     * @return array{success: bool, data: array<int, array<string, mixed>>, errors: array<int, string>}
      */
-    private function parseV1Json(string $content): array
-    {
+    private function parseV1Json(): array
         $data = json_decode($content, true);
 
-        if (json_last_error() !== JSON_ERROR_NONE) {
+        if (json_last_error() !== JSON_ERROR_NONE || ! \is_array($data)) {
             return [
                 'success' => false,
                 'data' => [],
@@ -342,6 +342,7 @@ class DataMigrationService
             $data = [$data];
         }
 
+        /** @var array<int, array<string, mixed>> $data */
         return [
             'success' => true,
             'data' => $data,
@@ -351,9 +352,10 @@ class DataMigrationService
 
     /**
      * Parse V1 CSV format
+     *
+     * @return array{success: bool, data: array<int, array<string, mixed>>, errors: array<int, string>}
      */
-    private function parseV1Csv(string $content): array
-    {
+    private function parseV1Csv(): array
         $lines = array_filter(explode("\n", $content), fn ($line) => trim($line) !== '');
 
         if (count($lines) < 2) {
@@ -364,14 +366,18 @@ class DataMigrationService
             ];
         }
 
-        $headers = str_getcsv(array_shift($lines));
-        $headers = array_map(fn ($h) => strtolower(trim($h)), $headers);
+        $firstLine = array_shift($lines);
+        $headers = str_getcsv(\is_string($firstLine) ? $firstLine : '');
+        $headers = array_map(fn ($h) => strtolower(trim(\is_string($h) ? $h : '')), $headers);
 
         $data = [];
         foreach ($lines as $line) {
             $values = str_getcsv($line);
             if (count($values) === count($headers)) {
-                $data[] = array_combine($headers, $values);
+                $combined = array_combine($headers, $values);
+                if (\is_array($combined)) {
+                    $data[] = $combined;
+                }
             }
         }
 
@@ -384,9 +390,10 @@ class DataMigrationService
 
     /**
      * Parse Google Sheets export (TSV format)
+     *
+     * @return array{success: bool, data: array<int, array<string, mixed>>, errors: array<int, string>}
      */
-    private function parseGoogleSheets(string $content): array
-    {
+    private function parseGoogleSheets(): array
         // Convert tabs to commas and use CSV parser
         $csvContent = str_replace("\t", ',', $content);
 
@@ -395,18 +402,20 @@ class DataMigrationService
 
     /**
      * Parse Excel export
+     *
+     * @return array{success: bool, data: array<int, array<string, mixed>>, errors: array<int, string>}
      */
-    private function parseExcel(string $content): array
-    {
+    private function parseExcel(): array
         // Excel exports are typically tab-separated
         return $this->parseGoogleSheets($content);
     }
 
     /**
      * Parse custom format with intelligent field detection
+     *
+     * @return array{success: bool, data: array<int, array<string, mixed>>, errors: array<int, string>}
      */
-    private function parseCustomFormat(string $content, string $targetType): array
-    {
+    private function parseCustomFormat(): array
         // Use the import service's intelligent parsing
         $result = $this->importService->parseText($content, $targetType);
 
@@ -419,9 +428,11 @@ class DataMigrationService
 
     /**
      * Transform a record from legacy format to current format
+     *
+     * @param  array<string, mixed>  $record
+     * @return array{success: bool, data: array<string, mixed>, errors: array<int, string>, warnings: array<int, string>}
      */
-    private function transformRecord(array $record, string $sourceFormat, string $targetType): array
-    {
+    private function transformRecord(): array
         $transformed = [];
         $warnings = [];
         $errors = [];
@@ -477,9 +488,10 @@ class DataMigrationService
 
     /**
      * Get field mappings for legacy format conversion
+     *
+     * @return array<string, string>
      */
-    private function getFieldMappings(string $sourceFormat, string $targetType): array
-    {
+    private function getFieldMappings(): array
         $baseMappings = [
             // V1 character field mappings
             'trainee_name' => 'name',
@@ -535,16 +547,20 @@ class DataMigrationService
 
     /**
      * Transform a field value during conversion
+     *
+     * @return array{success: bool, value: mixed, warning: string|null, error?: string}
      */
-    private function transformFieldValue(string $oldField, string $newField, mixed $value, string $targetType): array
-    {
+    private function transformFieldValue(): array
         // Handle stat values
         if (in_array($newField, ['speed', 'stamina', 'power', 'guts', 'wit', 'energy_level'])) {
             if (! is_numeric($value)) {
+                $valueStr = \is_string($value) ? $value : 'non-numeric';
+
                 return [
                     'success' => false,
                     'value' => null,
-                    'error' => "Invalid numeric value for {$newField}: {$value}",
+                    'warning' => null,
+                    'error' => "Invalid numeric value for {$newField}: {$valueStr}",
                 ];
             }
 
@@ -581,10 +597,13 @@ class DataMigrationService
         if ($newField === 'scenario_type') {
             $normalized = $this->normalizeScenarioType($value);
             if ($normalized === null) {
+                $valueStr = \is_string($value) ? $value : 'invalid';
+
                 return [
                     'success' => false,
                     'value' => null,
-                    'error' => "Invalid scenario type: {$value}",
+                    'warning' => null,
+                    'error' => "Invalid scenario type: {$valueStr}",
                 ];
             }
 
@@ -600,12 +619,14 @@ class DataMigrationService
 
         // Handle rarity normalization
         if ($newField === 'rarity' && $targetType === 'support_card') {
-            $normalized = strtoupper(trim((string) $value));
+            $valueStr = \is_string($value) ? $value : '';
+            $normalized = strtoupper(trim($valueStr));
             if (! in_array($normalized, ['SSR', 'SR', 'R'])) {
                 return [
                     'success' => false,
                     'value' => null,
-                    'error' => "Invalid rarity: {$value}",
+                    'warning' => null,
+                    'error' => "Invalid rarity: {$valueStr}",
                 ];
             }
 
@@ -667,6 +688,9 @@ class DataMigrationService
     {
         $name = trim($name);
         $name = preg_replace('/[^a-zA-Z0-9\s_]/', '', $name);
+        if ($name === null) {
+            $name = '';
+        }
 
         return Str::snake($name);
     }
@@ -674,14 +698,13 @@ class DataMigrationService
     /**
      * Start a batch import process
      *
-     * @param  array  $data  Data to import
+     * @param  array<int, array<string, mixed>>  $data  Data to import
      * @param  string  $importType  Type of data being imported
      * @param  int  $userId  User ID
-     * @param  array  $options  Batch options
+     * @param  array<string, mixed>  $options  Batch options
      * @return array{batch_id: string, status: string, total_records: int}
      */
-    public function startBatchImport(array $data, string $importType, int $userId, array $options = []): array
-    {
+    public function startBatchImport(): array
         $batchId = Str::uuid()->toString();
         $batchSize = $options['batch_size'] ?? self::DEFAULT_BATCH_SIZE;
         $conflictStrategy = $options['conflict_strategy'] ?? self::CONFLICT_STRATEGY_SKIP;
@@ -728,10 +751,10 @@ class DataMigrationService
      * Process a batch import
      *
      * @param  string  $batchId  Batch ID
-     * @return array{success: bool, status: string, progress: array}
+     * @return array{success: bool, status: string, progress: array<string, mixed>, error?: string}
      */
-    public function processBatch(string $batchId): array
-    {
+    public function processBatch(): array
+        /** @var array<string, mixed>|null $batchData */
         $batchData = Cache::get(self::BATCH_CACHE_PREFIX.$batchId);
 
         if (! is_array($batchData)) {
@@ -766,7 +789,7 @@ class DataMigrationService
 
         try {
             $result = $this->processNextBatch($batchData);
-            $batchDataResult = $result['batch_data'] ?? null;
+            $batchDataResult = (is_array($result) && isset($result['batch_data']) ? $result['batch_data'] : null);
             if (! is_array($batchDataResult)) {
                 $batchDataResult = $batchData;
             }
@@ -800,9 +823,11 @@ class DataMigrationService
 
     /**
      * Process the next batch of records
+     *
+     * @param  array<string, mixed>  $batchData
+     * @return array<string, mixed>
      */
-    private function processNextBatch(array $batchData): array
-    {
+    private function processNextBatch(): array
         $startIndex = $batchData['processed_records'];
         $endIndex = min($startIndex + $batchData['batch_size'], $batchData['total_records']);
         $recordsToProcess = array_slice($batchData['data'], $startIndex, $endIndex - $startIndex);
@@ -886,23 +911,25 @@ class DataMigrationService
      * Get batch import status
      *
      * @param  string  $batchId  Batch ID
+     * @return array<string, mixed>|null
      */
     public function getBatchStatus(string $batchId): ?array
     {
+        /** @var array<string, mixed>|null $batchData */
         $batchData = Cache::get(self::BATCH_CACHE_PREFIX.$batchId);
 
-        if (! $batchData) {
+        if (! \is_array($batchData)) {
             return null;
         }
 
         return [
-            'batch_id' => $batchData['batch_id'],
-            'status' => $batchData['status'],
-            'import_type' => $batchData['import_type'],
+            'batch_id' => $batchData['batch_id'] ?? '',
+            'status' => $batchData['status'] ?? '',
+            'import_type' => $batchData['import_type'] ?? '',
             'progress' => $this->getProgressData($batchData),
-            'errors' => array_slice($batchData['errors'], -10), // Last 10 errors
-            'conflicts' => array_slice($batchData['conflicts'], -10), // Last 10 conflicts
-            'started_at' => $batchData['started_at'],
+            'errors' => array_slice($batchData['errors'] ?? [], -10), // Last 10 errors
+            'conflicts' => array_slice($batchData['conflicts'] ?? [], -10), // Last 10 conflicts
+            'started_at' => $batchData['started_at'] ?? '',
             'updated_at' => $batchData['updated_at'],
             'completed_at' => $batchData['completed_at'],
         ];
@@ -911,8 +938,7 @@ class DataMigrationService
     /**
      * Get progress data from batch
      */
-    private function getProgressData(array $batchData): array
-    {
+    private function getProgressData(): array
         $total = $batchData['total_records'];
         $processed = $batchData['processed_records'];
 
@@ -964,15 +990,14 @@ class DataMigrationService
      * @param  int  $userId  User ID
      * @return array{has_conflict: bool, existing_record: array|null, conflict_type: string|null}
      */
-    public function detectConflict(array $record, string $importType, int $userId): array
-    {
+    public function detectConflict(): array
         $existingRecord = null;
         $conflictType = null;
 
         switch ($importType) {
             case 'character':
                 if (isset($record['name'])) {
-                    $existing = Character::where('user_id', $userId)
+                    $existing = Character::query()->where('user_id', $userId)
                         ->where('name', $record['name'])
                         ->first();
 
@@ -985,7 +1010,7 @@ class DataMigrationService
 
             case 'career':
                 if (isset($record['career_name'])) {
-                    $existing = Career::where('user_id', $userId)
+                    $existing = Career::query()->where('user_id', $userId)
                         ->where('career_name', $record['career_name'])
                         ->first();
 
@@ -998,7 +1023,7 @@ class DataMigrationService
 
             case 'skill':
                 if (isset($record['name'])) {
-                    $existing = Skill::where('name', $record['name'])->first();
+                    $existing = Skill::query()->where('name', $record['name'])->first();
 
                     if ($existing) {
                         $existingRecord = $existing->toArray();
@@ -1009,7 +1034,7 @@ class DataMigrationService
 
             case 'support_card':
                 if (isset($record['name'])) {
-                    $existing = SupportCard::where('name', $record['name'])->first();
+                    $existing = SupportCard::query()->where('name', $record['name'])->first();
 
                     if ($existing) {
                         $existingRecord = $existing->toArray();
@@ -1036,13 +1061,7 @@ class DataMigrationService
      * @param  int  $userId  User ID
      * @return array{success: bool, action: string, id: int|null, error: string|null}
      */
-    public function resolveConflict(
-        array $record,
-        array $conflict,
-        string $strategy,
-        string $importType,
-        int $userId
-    ): array {
+    public function resolveConflict(): array
         switch ($strategy) {
             case self::CONFLICT_STRATEGY_SKIP:
                 return [
@@ -1077,14 +1096,13 @@ class DataMigrationService
     /**
      * @return array{success: bool, action: string, id: int|null, error: string|null}
      */
-    private function overwriteRecord(array $record, array $existing, string $importType, int $userId): array
-    {
+    private function overwriteRecord(): array
         try {
             $model = match ($importType) {
-                'character' => Character::find($existing['id']),
-                'career' => Career::find($existing['id']),
-                'skill' => Skill::find($existing['id']),
-                'support_card' => SupportCard::find($existing['id']),
+                'character' => Character::query()->find($existing['id']),
+                'career' => Career::query()->find($existing['id']),
+                'skill' => Skill::query()->find($existing['id']),
+                'support_card' => SupportCard::query()->find($existing['id']),
                 default => null,
             };
 
@@ -1123,14 +1141,13 @@ class DataMigrationService
     /**
      * @return array{success: bool, action: string, id: int|null, error: string|null}
      */
-    private function mergeRecords(array $record, array $existing, string $importType, int $userId): array
-    {
+    private function mergeRecords(): array
         try {
             $model = match ($importType) {
-                'character' => Character::find($existing['id']),
-                'career' => Career::find($existing['id']),
-                'skill' => Skill::find($existing['id']),
-                'support_card' => SupportCard::find($existing['id']),
+                'character' => Character::query()->find($existing['id']),
+                'career' => Career::query()->find($existing['id']),
+                'skill' => Skill::query()->find($existing['id']),
+                'support_card' => SupportCard::query()->find($existing['id']),
                 default => null,
             };
 
@@ -1181,8 +1198,7 @@ class DataMigrationService
     /**
      * @return array{success: bool, action: string, id: int|null, error: string|null}
      */
-    private function renameAndImport(array $record, string $importType, int $userId): array
-    {
+    private function renameAndImport(): array
         // Add suffix to name to make it unique
         $nameField = match ($importType) {
             'character', 'skill', 'support_card' => 'name',
@@ -1197,7 +1213,7 @@ class DataMigrationService
             do {
                 $record[$nameField] = "{$originalName} ({$counter})";
                 $conflict = $this->detectConflict($record, $importType, $userId);
-                $counter++;
+                $counter = ($counter ?? 0) + 1;
             } while ($conflict['has_conflict'] && $counter < 100);
 
             if ($counter >= 100) {
@@ -1226,8 +1242,7 @@ class DataMigrationService
      *
      * @param  string  $batchId  Batch ID
      */
-    public function getPendingConflicts(string $batchId): array
-    {
+    public function getPendingConflicts(): array
         $batchData = Cache::get(self::BATCH_CACHE_PREFIX.$batchId);
 
         if (! is_array($batchData)) {
@@ -1250,8 +1265,7 @@ class DataMigrationService
      * @param  string  $resolution  Resolution action (skip, overwrite, merge, rename)
      * @return array{success: bool, message: string}
      */
-    public function resolveConflictManually(string $batchId, int $conflictIndex, string $resolution): array
-    {
+    public function resolveConflictManually(): array
         $batchData = Cache::get(self::BATCH_CACHE_PREFIX.$batchId);
 
         if (! is_array($batchData)) {
@@ -1301,18 +1315,19 @@ class DataMigrationService
      * @param  string  $importType  Type of data
      * @return array{valid: bool, records: array, summary: array}
      */
-    public function validateData(array $data, string $importType): array
-    {
+    public function validateData(): array
         $validRecords = [];
         $invalidRecords = [];
         $warnings = [];
 
         foreach ($data as $index => $record) {
-            $validation = $this->importService->validateRecord($record, $importType);
+            // Clean the record first to normalize values
+            $cleaned = $this->cleanRecord($record, $importType);
+
+            // Then validate the cleaned record
+            $validation = $this->importService->validateRecord($cleaned['data'], $importType);
 
             if ($validation['valid']) {
-                // Additional cleaning
-                $cleaned = $this->cleanRecord($record, $importType);
                 $validRecords[] = [
                     'index' => $index,
                     'original' => $record,
@@ -1358,8 +1373,7 @@ class DataMigrationService
      * @param  string  $importType  Type of data
      * @return array{data: array, warnings: array}
      */
-    public function cleanRecord(array $record, string $importType): array
-    {
+    public function cleanRecord(): array
         $cleaned = [];
         $warnings = [];
 
@@ -1432,8 +1446,7 @@ class DataMigrationService
      *
      * @param  string  $importType  Type of data
      */
-    public function getTransformationRules(string $importType): array
-    {
+    public function getTransformationRules(): array
         $baseRules = [
             'field_mappings' => $this->getFieldMappings('v1_json', $importType),
             'stat_range' => [
@@ -1485,8 +1498,7 @@ class DataMigrationService
      *
      * @param  string  $batchId  Batch ID
      */
-    public function generateMigrationReport(string $batchId): array
-    {
+    public function generateMigrationReport(): array
         $batchData = Cache::get(self::BATCH_CACHE_PREFIX.$batchId);
 
         if (! $batchData) {

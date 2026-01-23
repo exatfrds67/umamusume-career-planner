@@ -79,12 +79,11 @@ class HistoricalTrackingService
      *     improvement_velocity: array
      * }
      */
-    public function analyzeLongTermTrends(User $user): array
-    {
-        $cacheKey = "historical:long_term_trends:{$user->id}";
+    public function analyzeLongTermTrends(): array
+        $cacheKey = "historical:long_term_trends:{$user?->id ?? throw new \Exception('User required')}";
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($user) {
-            $careers = Career::where('user_id', $user->id)
+            $careers = Career::where('user_id', $user?->id ?? throw new \Exception('User required'))
                 ->whereNotNull('completed_at')
                 ->with(['trainingSessions', 'races'])
                 ->orderBy('completed_at', 'asc')
@@ -118,8 +117,7 @@ class HistoricalTrackingService
      *     peak_performance_career: int|null
      * }
      */
-    protected function calculateTrendSummary(Collection $careers): array
-    {
+    protected function calculateTrendSummary(): array
         $totalCareers = $careers->count();
         $firstCareer = $careers->first();
         $lastCareer = $careers->last();
@@ -175,8 +173,7 @@ class HistoricalTrackingService
      *     score: float
      * }>
      */
-    protected function calculatePerformanceEvolution(Collection $careers): array
-    {
+    protected function calculatePerformanceEvolution(): array
         $evolution = [];
 
         foreach ($careers as $career) {
@@ -212,8 +209,7 @@ class HistoricalTrackingService
      *     values: array<int, int>
      * }>
      */
-    protected function calculateStatTrends(Collection $careers): array
-    {
+    protected function calculateStatTrends(): array
         $statTrends = [];
 
         foreach (self::STAT_TYPES as $stat) {
@@ -273,8 +269,7 @@ class HistoricalTrackingService
      *     moving_average: array<int, float>
      * }
      */
-    protected function calculateEfficiencyTrends(Collection $careers): array
-    {
+    protected function calculateEfficiencyTrends(): array
         $efficiencies = [];
 
         foreach ($careers as $career) {
@@ -324,8 +319,7 @@ class HistoricalTrackingService
      *     position_improvement: float
      * }
      */
-    protected function calculateRacePerformanceTrends(Collection $careers): array
-    {
+    protected function calculateRacePerformanceTrends(): array
         $winRates = [];
         $g1Performances = [];
         $avgPositions = [];
@@ -335,7 +329,7 @@ class HistoricalTrackingService
             $winRates[$career->id] = $this->calculateWinRate($races);
 
             // G1 performance
-            $g1Races = $races->where('race_grade', 'G1');
+            $g1Races = $races->where('race_grade', '=', 'G1');
             $g1Performances[$career->id] = $g1Races->count() > 0
                 ? round(($g1Races->where('won_race', true)->count() / $g1Races->count()) * 100, 1)
                 : 0.0;
@@ -393,8 +387,7 @@ class HistoricalTrackingService
      *     pattern_description: string
      * }
      */
-    protected function identifySeasonalPatterns(Collection $careers): array
-    {
+    protected function identifySeasonalPatterns(): array
         $monthlyData = [];
 
         foreach ($careers as $career) {
@@ -411,8 +404,8 @@ class HistoricalTrackingService
         $monthlyPerformance = [];
         foreach ($monthlyData as $month => $data) {
             $monthlyPerformance[$month] = [
-                'average_score' => count($data['scores']) > 0 ? round(array_sum($data['scores']) / count($data['scores']), 1) : 0.0,
-                'career_count' => $data['count'],
+                'average_score' => count((is_array($data) && isset($data['scores']) ? $data['scores'] : null)) > 0 ? round(array_sum((is_array($data) && isset($data['scores']) ? $data['scores'] : null)) / count((is_array($data) && isset($data['scores']) ? $data['scores'] : null)), 1) : 0.0,
+                'career_count' => (is_array($data) && isset($data['count']) ? $data['count'] : null),
             ];
         }
 
@@ -423,13 +416,13 @@ class HistoricalTrackingService
         $worstScore = PHP_INT_MAX;
 
         foreach ($monthlyPerformance as $month => $data) {
-            if ($data['career_count'] >= 2) { // Only consider months with enough data
-                if ($data['average_score'] > $bestScore) {
-                    $bestScore = $data['average_score'];
+            if ((is_array($data) && isset($data['career_count']) ? $data['career_count'] : null) >= 2) { // Only consider months with enough data
+                if ((is_array($data) && isset($data['average_score']) ? $data['average_score'] : null) > $bestScore) {
+                    $bestScore = (is_array($data) && isset($data['average_score']) ? $data['average_score'] : null);
                     $bestMonth = $month;
                 }
-                if ($data['average_score'] < $worstScore) {
-                    $worstScore = $data['average_score'];
+                if ((is_array($data) && isset($data['average_score']) ? $data['average_score'] : null) < $worstScore) {
+                    $worstScore = (is_array($data) && isset($data['average_score']) ? $data['average_score'] : null);
                     $worstMonth = $month;
                 }
             }
@@ -461,8 +454,7 @@ class HistoricalTrackingService
      *     velocity_trend: string
      * }
      */
-    protected function calculateImprovementVelocity(Collection $careers): array
-    {
+    protected function calculateImprovementVelocity(): array
         $scores = [];
         foreach ($careers as $index => $career) {
             $scores[$index] = $this->calculateCareerScore($career);
@@ -481,7 +473,7 @@ class HistoricalTrackingService
         // Calculate velocity (change per career)
         $velocities = [];
         $scoreValues = array_values($scores);
-        for ($i = 1; $i < count($scoreValues); $i++) {
+        for ($i = 1; $i < count($scoreValues); $i = ($i ?? 0) + 1) {
             $velocities[] = $scoreValues[$i] - $scoreValues[$i - 1];
         }
 
@@ -489,7 +481,7 @@ class HistoricalTrackingService
 
         // Calculate acceleration (change in velocity)
         $accelerations = [];
-        for ($i = 1; $i < count($velocities); $i++) {
+        for ($i = 1; $i < count($velocities); $i = ($i ?? 0) + 1) {
             $accelerations[] = $velocities[$i] - $velocities[$i - 1];
         }
 
@@ -538,12 +530,11 @@ class HistoricalTrackingService
      *     confidence_analysis: array
      * }
      */
-    public function calculateSuccessRatesWithConfidence(User $user): array
-    {
-        $cacheKey = "historical:success_rates:{$user->id}";
+    public function calculateSuccessRatesWithConfidence(): array
+        $cacheKey = "historical:success_rates:{$user?->id ?? throw new \Exception('User required')}";
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($user) {
-            $careers = Career::where('user_id', $user->id)
+            $careers = Career::where('user_id', $user?->id ?? throw new \Exception('User required'))
                 ->whereNotNull('completed_at')
                 ->with(['character', 'trainingSessions', 'races'])
                 ->get();
@@ -573,8 +564,7 @@ class HistoricalTrackingService
      *     margin_of_error: float
      * }
      */
-    protected function calculateOverallSuccessRate(Collection $careers): array
-    {
+    protected function calculateOverallSuccessRate(): array
         $totalCareers = $careers->count();
         $successfulCareers = $careers->filter(fn ($c) => $this->isCareerSuccessful($c))->count();
 
@@ -601,8 +591,7 @@ class HistoricalTrackingService
      *
      * @return array{lower: float, upper: float}
      */
-    protected function calculateWilsonConfidenceInterval(int $successes, int $total, float $zScore): array
-    {
+    protected function calculateWilsonConfidenceInterval(): array
         if ($total === 0) {
             return ['lower' => 0.0, 'upper' => 0.0];
         }
@@ -633,8 +622,7 @@ class HistoricalTrackingService
      *     confidence_interval_95: array{lower: float, upper: float}
      * }>
      */
-    protected function calculateSuccessByScenario(Collection $careers): array
-    {
+    protected function calculateSuccessByScenario(): array
         $scenarios = ['ura_finale', 'unity_cup'];
         $result = [];
 
@@ -665,8 +653,7 @@ class HistoricalTrackingService
      *     confidence_interval_95: array{lower: float, upper: float}
      * }>
      */
-    protected function calculateSuccessByCharacterType(Collection $careers): array
-    {
+    protected function calculateSuccessByCharacterType(): array
         $characterTypes = [];
 
         foreach ($careers as $career) {
@@ -690,12 +677,12 @@ class HistoricalTrackingService
 
         $result = [];
         foreach ($characterTypes as $type => $data) {
-            $successRate = $data['total'] > 0 ? ($data['successes'] / $data['total']) * 100 : 0;
-            $ci95 = $this->calculateWilsonConfidenceInterval($data['successes'], $data['total'], self::Z_SCORE_95);
+            $successRate = (is_array($data) && isset($data['total']) ? $data['total'] : null) > 0 ? ((is_array($data) && isset($data['successes']) ? $data['successes'] : null) / (is_array($data) && isset($data['total']) ? $data['total'] : null)) * 100 : 0;
+            $ci95 = $this->calculateWilsonConfidenceInterval((is_array($data) && isset($data['successes']) ? $data['successes'] : null), (is_array($data) && isset($data['total']) ? $data['total'] : null), self::Z_SCORE_95);
 
             $result[$type] = [
                 'success_rate' => round($successRate, 1),
-                'sample_size' => $data['total'],
+                'sample_size' => (is_array($data) && isset($data['total']) ? $data['total'] : null),
                 'confidence_interval_95' => $ci95,
             ];
         }
@@ -713,8 +700,7 @@ class HistoricalTrackingService
      *     recommendations: array<string>
      * }
      */
-    protected function identifySuccessFactors(Collection $careers): array
-    {
+    protected function identifySuccessFactors(): array
         $successfulCareers = $careers->filter(fn ($c) => $this->isCareerSuccessful($c));
         $unsuccessfulCareers = $careers->filter(fn ($c) => ! $this->isCareerSuccessful($c));
 
@@ -769,8 +755,7 @@ class HistoricalTrackingService
      *     recommendations_for_improvement: array<string>
      * }
      */
-    protected function performConfidenceAnalysis(Collection $careers): array
-    {
+    protected function performConfidenceAnalysis(): array
         $sampleSize = $careers->count();
 
         // Determine sample adequacy
@@ -832,12 +817,11 @@ class HistoricalTrackingService
      *     retraining_priority: string
      * }
      */
-    public function generateMLModelUpdateRecommendations(User $user): array
-    {
-        $cacheKey = "historical:ml_recommendations:{$user->id}";
+    public function generateMLModelUpdateRecommendations(): array
+        $cacheKey = "historical:ml_recommendations:{$user?->id ?? throw new \Exception('User required')}";
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($user) {
-            $careers = Career::where('user_id', $user->id)
+            $careers = Career::where('user_id', $user?->id ?? throw new \Exception('User required'))
                 ->whereNotNull('completed_at')
                 ->with(['trainingSessions', 'races'])
                 ->orderBy('completed_at', 'desc')
@@ -868,8 +852,7 @@ class HistoricalTrackingService
      *     degradation_detected: bool
      * }
      */
-    protected function assessModelPerformance(Collection $careers): array
-    {
+    protected function assessModelPerformance(): array
         $statAccuracies = array_fill_keys(self::STAT_TYPES, []);
         $raceAccuracies = [];
 
@@ -948,8 +931,7 @@ class HistoricalTrackingService
      *
      * @return array<string>
      */
-    protected function generateUpdateRecommendations(Collection $careers): array
-    {
+    protected function generateUpdateRecommendations(): array
         $recommendations = [];
 
         $modelPerformance = $this->assessModelPerformance($careers);
@@ -999,8 +981,7 @@ class HistoricalTrackingService
      *
      * @return array<string, float>
      */
-    protected function calculateFeatureImportance(Collection $careers): array
-    {
+    protected function calculateFeatureImportance(): array
         $features = [
             'training_efficiency' => [],
             'friendship_training_rate' => [],
@@ -1062,8 +1043,7 @@ class HistoricalTrackingService
      *     issues: array<string>
      * }
      */
-    protected function assessDataQuality(Collection $careers): array
-    {
+    protected function assessDataQuality(): array
         $issues = [];
 
         // Completeness: Check for missing data
@@ -1071,28 +1051,28 @@ class HistoricalTrackingService
         $missingFields = 0;
 
         foreach ($careers as $career) {
-            $totalFields += 10; // Expected fields per career
+            $totalFields = ($totalFields ?? 0) + 10; // Expected fields per career
 
             if (! $career->final_speed) {
-                $missingFields++;
+                $missingFields = ($missingFields ?? 0) + 1;
             }
             if (! $career->final_stamina) {
-                $missingFields++;
+                $missingFields = ($missingFields ?? 0) + 1;
             }
             if (! $career->final_power) {
-                $missingFields++;
+                $missingFields = ($missingFields ?? 0) + 1;
             }
             if (! $career->final_guts) {
-                $missingFields++;
+                $missingFields = ($missingFields ?? 0) + 1;
             }
             if (! $career->final_wit) {
-                $missingFields++;
+                $missingFields = ($missingFields ?? 0) + 1;
             }
             if ($career->trainingSessions->isEmpty()) {
-                $missingFields += 3;
+                $missingFields = ($missingFields ?? 0) + 3;
             }
             if ($career->races->isEmpty()) {
-                $missingFields += 2;
+                $missingFields = ($missingFields ?? 0) + 2;
             }
         }
 
@@ -1114,7 +1094,7 @@ class HistoricalTrackingService
 
         foreach ($scores as $score) {
             if (abs($score - $mean) > 2 * $stdDev) {
-                $outliers++;
+                $outliers = ($outliers ?? 0) + 1;
             }
         }
 
@@ -1165,25 +1145,25 @@ class HistoricalTrackingService
 
         // Model performance factors
         if ($modelPerformance['degradation_detected']) {
-            $urgencyScore += 30;
+            $urgencyScore = ($urgencyScore ?? 0) + 30;
         }
         if ($modelPerformance['overall_accuracy'] < 60) {
-            $urgencyScore += 25;
+            $urgencyScore = ($urgencyScore ?? 0) + 25;
         } elseif ($modelPerformance['overall_accuracy'] < 70) {
-            $urgencyScore += 15;
+            $urgencyScore = ($urgencyScore ?? 0) + 15;
         }
 
         // Data quality factors
         if ($dataQuality['completeness'] < 70) {
-            $urgencyScore += 10;
+            $urgencyScore = ($urgencyScore ?? 0) + 10;
         }
         if ($dataQuality['recency'] < 30) {
-            $urgencyScore += 15;
+            $urgencyScore = ($urgencyScore ?? 0) + 15;
         }
 
         // Volume factor
         if ($careers->count() >= 30 && $dataQuality['recency'] > 50) {
-            $urgencyScore += 10; // Good opportunity to retrain
+            $urgencyScore = ($urgencyScore ?? 0) + 10; // Good opportunity to retrain
         }
 
         return match (true) {
@@ -1213,8 +1193,8 @@ class HistoricalTrackingService
         foreach ($careers as $career) {
             $sessions = $career->trainingSessions;
             if ($sessions->isNotEmpty()) {
-                $totalEfficiency += $this->calculateCareerEfficiencyFromSessions($sessions);
-                $count++;
+                $totalEfficiency = ($totalEfficiency ?? 0) + $this->calculateCareerEfficiencyFromSessions($sessions);
+                $count = ($count ?? 0) + 1;
             }
         }
 
@@ -1232,7 +1212,7 @@ class HistoricalTrackingService
 
         $totalGains = 0;
         foreach ($sessions as $session) {
-            $totalGains += ($session->speed_gain ?? 0)
+            $totalGains = ($totalGains ?? 0) + ($session->speed_gain ?? 0)
                 + ($session->stamina_gain ?? 0)
                 + ($session->power_gain ?? 0)
                 + ($session->guts_gain ?? 0)
@@ -1331,13 +1311,12 @@ class HistoricalTrackingService
      * @param  array<int, float>  $values
      * @return array<int, float>
      */
-    protected function calculateMovingAverage(array $values, int $window): array
-    {
+    protected function calculateMovingAverage(): array
         $result = [];
         $keys = array_keys($values);
         $numericValues = array_values($values);
 
-        for ($i = 0; $i < count($numericValues); $i++) {
+        for ($i = 0; $i < count($numericValues); $i = ($i ?? 0) + 1) {
             $start = max(0, $i - $window + 1);
             $windowValues = array_slice($numericValues, $start, $i - $start + 1);
             $result[$keys[$i]] = round(array_sum($windowValues) / count($windowValues), 1);
@@ -1369,12 +1348,12 @@ class HistoricalTrackingService
         $denomX = 0;
         $denomY = 0;
 
-        for ($i = 0; $i < $n; $i++) {
+        for ($i = 0; $i < $n; $i = ($i ?? 0) + 1) {
             $diffX = $x[$i] - $meanX;
             $diffY = $y[$i] - $meanY;
-            $numerator += $diffX * $diffY;
-            $denomX += $diffX * $diffX;
-            $denomY += $diffY * $diffY;
+            $numerator = ($numerator ?? 0) + $diffX * $diffY;
+            $denomX = ($denomX ?? 0) + $diffX * $diffX;
+            $denomY = ($denomY ?? 0) + $diffY * $diffY;
         }
 
         $denominator = sqrt($denomX * $denomY);
@@ -1424,8 +1403,7 @@ class HistoricalTrackingService
      *
      * @return array{efficiency: float, training_distribution: array<string, float>, win_rate: float}
      */
-    protected function calculateAverageMetrics(Collection $careers): array
-    {
+    protected function calculateAverageMetrics(): array
         if ($careers->isEmpty()) {
             return [
                 'efficiency' => 0.0,
@@ -1474,8 +1452,7 @@ class HistoricalTrackingService
      * @param  array<string, float>  $trainingCorrelations
      * @return array<string>
      */
-    protected function generateSuccessRecommendations(array $highImpactFactors, array $trainingCorrelations): array
-    {
+    protected function generateSuccessRecommendations(): array
         $recommendations = [];
 
         if (isset($highImpactFactors['training_efficiency']) && $highImpactFactors['training_efficiency'] > 0) {
@@ -1528,8 +1505,7 @@ class HistoricalTrackingService
      *
      * @return array{error: string, message: string, current_sample_size: int, required_sample_size: int}
      */
-    protected function getInsufficientDataResult(string $analysisType, int $currentSize): array
-    {
+    protected function getInsufficientDataResult(): array
         return [
             'error' => 'insufficient_data',
             'message' => 'At least '.self::MIN_SAMPLE_SIZE." completed careers are required for {$analysisType} analysis.",
@@ -1543,8 +1519,8 @@ class HistoricalTrackingService
      */
     public function clearCache(User $user): void
     {
-        Cache::forget("historical:long_term_trends:{$user->id}");
-        Cache::forget("historical:success_rates:{$user->id}");
-        Cache::forget("historical:ml_recommendations:{$user->id}");
+        Cache::forget("historical:long_term_trends:{$user?->id ?? throw new \Exception('User required')}");
+        Cache::forget("historical:success_rates:{$user?->id ?? throw new \Exception('User required')}");
+        Cache::forget("historical:ml_recommendations:{$user?->id ?? throw new \Exception('User required')}");
     }
 }

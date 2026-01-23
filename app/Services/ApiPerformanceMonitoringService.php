@@ -109,7 +109,6 @@ class ApiPerformanceMonitoringService
      * @return array{overview: array<string, mixed>, endpoints: array<string, mixed>, bottlenecks: array<int, array<string, mixed>>, trends: array<string, mixed>}
      */
     public function getDashboard(): array
-    {
         return [
             'overview' => $this->getOverviewMetrics(),
             'endpoints' => $this->getEndpointMetrics(),
@@ -124,7 +123,6 @@ class ApiPerformanceMonitoringService
      * @return array{total_requests: int, avg_response_time_ms: float, p95_response_time_ms: float, p99_response_time_ms: float, error_rate: float, slow_request_rate: float, requests_per_minute: float}
      */
     public function getOverviewMetrics(): array
-    {
         $metricsKey = self::METRICS_PREFIX.'overview';
         $cached = Cache::get($metricsKey);
 
@@ -208,7 +206,6 @@ class ApiPerformanceMonitoringService
      * @return array<string, array{total_requests: int, avg_response_time_ms: float, max_response_time_ms: float, min_response_time_ms: float, error_rate: float, last_request: string|null}>
      */
     public function getEndpointMetrics(): array
-    {
         $metricsKey = self::METRICS_PREFIX.'endpoints';
 
         return Cache::get($metricsKey, []);
@@ -220,7 +217,6 @@ class ApiPerformanceMonitoringService
      * @return array<int, array{type: string, severity: string, endpoint: string, description: string, recommendation: string, metrics: array<string, mixed>}>
      */
     public function identifyBottlenecks(): array
-    {
         $bottlenecks = [];
         $endpoints = $this->getEndpointMetrics();
 
@@ -300,7 +296,6 @@ class ApiPerformanceMonitoringService
      * @return array{hourly: array<string, array{requests: int, avg_response_time_ms: float, error_rate: float}>, daily: array<string, array{requests: int, avg_response_time_ms: float, error_rate: float}>}
      */
     public function getPerformanceTrends(): array
-    {
         return [
             'hourly' => $this->getHourlyTrends(),
             'daily' => $this->getDailyTrends(),
@@ -312,8 +307,7 @@ class ApiPerformanceMonitoringService
      *
      * @return array<int, array{request_id: string, endpoint: string, duration_ms: float, timestamp: string, metadata: array<string, mixed>}>
      */
-    public function getSlowRequests(int $limit = 50): array
-    {
+    public function getSlowRequests(): array
         $slowRequestsKey = self::METRICS_PREFIX.'slow_requests';
         $slowRequests = Cache::get($slowRequestsKey, []);
 
@@ -329,7 +323,6 @@ class ApiPerformanceMonitoringService
      * @return array<int, array{endpoints: array<string>, reason: string, potential_savings_ms: float}>
      */
     public function getBatchingRecommendations(): array
-    {
         $recommendations = [];
         $endpoints = $this->getEndpointMetrics();
 
@@ -371,7 +364,6 @@ class ApiPerformanceMonitoringService
      * @return array{memory: array{current_mb: float, peak_mb: float, limit_mb: float|null}, cpu: array{load_average: array<float>|null}, database: array{active_connections: int|null, slow_queries: int}}
      */
     public function getResourceUtilization(): array
-    {
         return [
             'memory' => [
                 'current_mb' => round(memory_get_usage(true) / 1024 / 1024, 2),
@@ -495,8 +487,8 @@ class ApiPerformanceMonitoringService
                 'response_size' => (int) ($metrics['response_size'] ?? 0),
                 'timestamp' => now()->toIso8601String(),
                 'metadata' => [
-                    'user_id' => $metadata['user_id'] ?? null,
-                    'ip' => $metadata['ip'] ?? null,
+                    'user_id' => (is_array($metadata) && isset($metadata['user_id']) ? $metadata['user_id'] : null),
+                    'ip' => (is_array($metadata) && isset($metadata['ip']) ? $metadata['ip'] : null),
                 ],
             ];
 
@@ -571,7 +563,6 @@ class ApiPerformanceMonitoringService
      * @return array<string, array{requests: int, avg_response_time_ms: float, error_rate: float}>
      */
     protected function getHourlyTrends(): array
-    {
         $trends = [];
 
         for ($i = 23; $i >= 0; $i--) {
@@ -603,7 +594,6 @@ class ApiPerformanceMonitoringService
      * @return array<string, array{requests: int, avg_response_time_ms: float, error_rate: float}>
      */
     protected function getDailyTrends(): array
-    {
         $trends = [];
 
         for ($i = 6; $i >= 0; $i--) {
@@ -640,7 +630,7 @@ class ApiPerformanceMonitoringService
             return null;
         }
 
-        $value = (int) $limit;
+        $value = (is_numeric($limit) ? (int) $limit : 0);
         $unit = strtoupper(substr($limit, -1));
 
         return match ($unit) {
@@ -659,7 +649,7 @@ class ApiPerformanceMonitoringService
         try {
             $result = DB::select("SHOW STATUS LIKE 'Threads_connected'");
 
-            return isset($result[0]) ? (int) $result[0]->Value : null;
+            return isset($result[0]) ? (isset($result[0]) && is_numeric($result[0]->Value) ? (int) $result[0]->Value : 0) : null;
         } catch (\Exception $e) {
             return null;
         }
@@ -673,7 +663,7 @@ class ApiPerformanceMonitoringService
         try {
             $result = DB::select("SHOW STATUS LIKE 'Slow_queries'");
 
-            return isset($result[0]) ? (int) $result[0]->Value : 0;
+            return isset($result[0]) ? (isset($result[0]) && is_numeric($result[0]->Value) ? (int) $result[0]->Value : 0) : 0;
         } catch (\Exception $e) {
             return 0;
         }
@@ -684,6 +674,6 @@ class ApiPerformanceMonitoringService
      */
     protected function isRedisAvailable(): bool
     {
-        return extension_loaded('redis') && config('cache.default') === 'redis';
+        return extension_loaded('redis') && config('cache.default', '') === 'redis';
     }
 }

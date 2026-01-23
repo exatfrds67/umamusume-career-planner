@@ -9,10 +9,9 @@ class SynergyScorer
     /**
      * Calculate overall deck synergy score
      *
-     * @return array{score: float, breakdown: array<string, mixed>, recommendations: array<string>}
+     * @return array{score: float, breakdown: array<string, mixed>, recommendations: array<int, string>}
      */
-    public function calculateDeckScore(Character $character): array
-    {
+    public function calculateDeckScore(): array
         $deck = $character->supportCards()->with('supportCard')->get();
 
         if ($deck->isEmpty()) {
@@ -42,7 +41,7 @@ class SynergyScorer
 
         $totalScore = 0;
         foreach ($scores as $key => $score) {
-            $totalScore += $score * $weights[$key];
+            $totalScore = ($totalScore ?? 0) + $score * $weights[$key];
         }
 
         $recommendations = $this->generateRecommendations($scores, $deck);
@@ -73,8 +72,8 @@ class SynergyScorer
         foreach ($deck as $characterCard) {
             if ($characterCard->supportCard) {
                 $tier = $characterCard->supportCard->meta_tier;
-                $totalScore += $tierScores[$tier] ?? 0;
-                $count++;
+                $totalScore = ($totalScore ?? 0) + $tierScores[$tier] ?? 0;
+                $count = ($count ?? 0) + 1;
             }
         }
 
@@ -108,10 +107,13 @@ class SynergyScorer
 
     /**
      * Score based on alignment with character stats
+     *
+     * @param  \Illuminate\Support\Collection<int, \App\Models\CharacterSupportCard>  $deck
      */
     private function scoreStatAlignment(Character $character, $deck): float
     {
         // Get character's current stat priorities
+        /** @var array<string, int> $stats */
         $stats = $character->current_stats ?? [];
         if (empty($stats)) {
             return 75; // Neutral score if no stats defined
@@ -127,6 +129,7 @@ class SynergyScorer
         ];
 
         arsort($statValues);
+        /** @var array<int, string> $weakestStats */
         $weakestStats = array_slice(array_keys($statValues), -3, 3, true);
 
         // Check if deck covers weak stats
@@ -135,7 +138,7 @@ class SynergyScorer
             if ($characterCard->supportCard) {
                 $cardType = $characterCard->supportCard->card_type;
                 if (in_array($cardType, $weakestStats)) {
-                    $coverage++;
+                    $coverage = ($coverage ?? 0) + 1;
                 }
             }
         }
@@ -152,7 +155,7 @@ class SynergyScorer
         $maxPossible = $deck->count() * 4; // Max 4 LB per card
 
         foreach ($deck as $characterCard) {
-            $totalLB += $characterCard->limit_break_level ?? 0;
+            $totalLB = ($totalLB ?? 0) + $characterCard->limit_break_level ?? 0;
         }
 
         return $maxPossible > 0 ? ($totalLB / $maxPossible) * 100 : 0;
@@ -167,7 +170,7 @@ class SynergyScorer
         $maxPossible = $deck->count() * 100; // Max 100 per card
 
         foreach ($deck as $characterCard) {
-            $totalFriendship += $characterCard->friendship_level ?? 0;
+            $totalFriendship = ($totalFriendship ?? 0) + $characterCard->friendship_level ?? 0;
         }
 
         return $maxPossible > 0 ? ($totalFriendship / $maxPossible) * 100 : 0;
@@ -176,10 +179,12 @@ class SynergyScorer
     /**
      * Generate recommendations based on scores
      *
-     * @return array<string>
+     * @param  array<string, float>  $scores
+     * @param  \Illuminate\Support\Collection<int, \App\Models\CharacterSupportCard>  $deck
+     * @return array<int, string>
      */
-    private function generateRecommendations(array $scores, $deck): array
-    {
+    private function generateRecommendations(): array
+        /** @var array<int, string> $recommendations */
         $recommendations = [];
 
         if ($scores['meta_quality'] < 70) {

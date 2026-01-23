@@ -80,7 +80,7 @@ class TesseractServiceEnhanced
      *     error: string|null
      * }
      */
-    public function processScreenshot(UploadedFile $file, int $userId): array
+    public function processScreenshot(): array
     {
         try {
             // Validate image first
@@ -161,8 +161,7 @@ class TesseractServiceEnhanced
      *     errors: array<string>
      * }
      */
-    public function processWithIntelligentParsing(string $text): array
-    {
+    public function processWithIntelligentParsing(): array
         // Detect screen type
         $detection = $this->screenDetector->detectScreenType($text);
 
@@ -240,7 +239,7 @@ class TesseractServiceEnhanced
     protected function checkExistingExtraction(string $imageHash): ?array
     {
         $existing = OCRExtraction::where('image_hash', $imageHash)
-            ->where('status', 'processed')
+            ->where('status', '=', 'processed')
             ->first();
 
         if (! $existing) {
@@ -253,7 +252,7 @@ class TesseractServiceEnhanced
             'screen_type' => $existing->data_type,
             'data' => $existing->parsed_data,
             'raw_text' => $existing->extracted_text,
-            'confidence' => (float) $existing->confidence_score,
+            'confidence' => (is_numeric($existing->confidence_score) ? (float) $existing->confidence_score : 0.0),
             'error' => null,
         ];
     }
@@ -287,8 +286,7 @@ class TesseractServiceEnhanced
      *
      * @return array<string, mixed>
      */
-    protected function fallbackParsing(string $text, ?string $detectedType, float $detectionConfidence): array
-    {
+    protected function fallbackParsing(): array
         // Basic stats extraction as fallback
         $stats = $this->extractBasicStats($text);
         $confidence = $this->calculateBasicConfidence($stats);
@@ -316,8 +314,7 @@ class TesseractServiceEnhanced
      *
      * @return array<string, int|null>
      */
-    protected function extractBasicStats(string $text): array
-    {
+    protected function extractBasicStats(): array
         $patterns = [
             'speed' => '/(?:スピード|Speed|SPD)\s*[:：]?\s*(\d{2,4})/iu',
             'stamina' => '/(?:スタミナ|Stamina|STA)\s*[:：]?\s*(\d{2,4})/iu',
@@ -358,8 +355,7 @@ class TesseractServiceEnhanced
      *
      * @return array<string, mixed>
      */
-    protected function errorResponse(string $error, ?int $extractionId = null): array
-    {
+    protected function errorResponse(): array
         return [
             'success' => false,
             'extraction_id' => $extractionId,

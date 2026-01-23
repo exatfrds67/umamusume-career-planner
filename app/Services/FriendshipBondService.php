@@ -45,8 +45,7 @@ class FriendshipBondService
     /**
      * Update friendship level after training session
      */
-    public function updateFriendshipLevel(int $characterSupportCardId, int $pointsGained = self::FRIENDSHIP_POINTS_PER_TRAINING): array
-    {
+    public function updateFriendshipLevel(): array
         try {
             $characterSupportCard = CharacterSupportCard::findOrFail($characterSupportCardId);
             $oldLevel = $characterSupportCard->friendship_level;
@@ -100,8 +99,7 @@ class FriendshipBondService
     /**
      * Get all cards with rainbow training available for a character
      */
-    public function getRainbowTrainingCards(int $characterId): array
-    {
+    public function getRainbowTrainingCards(): array
         $cards = CharacterSupportCard::where('character_id', $characterId)
             ->where('friendship_level', '>=', self::RAINBOW_TRAINING_THRESHOLD)
             ->with('supportCard')
@@ -136,8 +134,7 @@ class FriendshipBondService
      *
      * @param  array  $participants  Array of character_support_card_ids
      */
-    public function calculateTrainingBonusWithFriendship(array $participants, int $baseBonus): array
-    {
+    public function calculateTrainingBonusWithFriendship(): array
         $rainbowParticipants = [];
         $totalFriendshipBonus = 0;
 
@@ -184,8 +181,7 @@ class FriendshipBondService
     /**
      * Get skill hint provision rate for a specific card
      */
-    public function getSkillHintProvisionRate(int $characterSupportCardId): array
-    {
+    public function getSkillHintProvisionRate(): array
         $characterSupportCard = CharacterSupportCard::findOrFail($characterSupportCardId);
 
         $baseRate = 0.10; // 10% base rate
@@ -204,8 +200,7 @@ class FriendshipBondService
     /**
      * Get friendship progression for a card
      */
-    public function getFriendshipProgression(int $characterSupportCardId): array
-    {
+    public function getFriendshipProgression(): array
         $characterSupportCard = CharacterSupportCard::findOrFail($characterSupportCardId);
 
         $currentLevel = $characterSupportCard->friendship_level;
@@ -228,8 +223,7 @@ class FriendshipBondService
     /**
      * Get friendship overview for all cards in a character's deck
      */
-    public function getDeckFriendshipOverview(int $characterId): array
-    {
+    public function getDeckFriendshipOverview(): array
         $cards = CharacterSupportCard::where('character_id', $characterId)
             ->with('supportCard')
             ->orderBy('position_slot')
@@ -251,10 +245,10 @@ class FriendshipBondService
         $rainbowCount = 0;
 
         foreach ($cards as $card) {
-            $totalFriendship += $card->friendship_level;
+            $totalFriendship = ($totalFriendship ?? 0) + $card->friendship_level;
 
             if ($card->friendship_level >= self::RAINBOW_TRAINING_THRESHOLD) {
-                $rainbowCount++;
+                $rainbowCount = ($rainbowCount ?? 0) + 1;
             }
 
             $overview['cards'][] = [
@@ -280,8 +274,7 @@ class FriendshipBondService
      *
      * @param  array  $updates  Array of ['character_support_card_id' => points_gained]
      */
-    public function bulkUpdateFriendshipLevels(array $updates): array
-    {
+    public function bulkUpdateFriendshipLevels(): array
         $results = [
             'success' => 0,
             'failed' => 0,

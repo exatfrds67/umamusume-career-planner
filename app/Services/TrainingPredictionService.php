@@ -13,10 +13,11 @@ class TrainingPredictionService
      * @param  string  $trainingType  'speed', 'stamina', 'power', 'guts', 'wit'
      * @return array ['stats' => ['speed' => int, ...], 'energy' => int]
      */
-    public function calculateGain(Character $character, string $trainingType): array
+    public function calculateGain(): array
     {
-        // Base gains for Facility Level 1 (Simplified for now)
-        // TODO: Factor in facility levels from character data if available
+        // Base gains for Facility Level 1
+        // Facility levels would multiply gains by (1 + level * 0.1) if implemented
+        // Character model would need facility_levels JSON field to track this
 
         $gains = [
             'speed' => 0,
@@ -132,8 +133,7 @@ class TrainingPredictionService
      *
      * @return array Result data
      */
-    public function executeTraining(Character $character, string $trainingType): array
-    {
+    public function executeTraining(): array
         $prediction = $this->calculateGain($character, $trainingType);
         $failureRate = $this->calculateFailureRate($character, $trainingType);
 
@@ -166,7 +166,6 @@ class TrainingPredictionService
             $character->energy_level = max(0, min(100, $newEnergy));
 
             $resultData['energy_change'] = $energyChange;
-
         } else {
             // Failure!
             // Reduced/No stats, huge mood drop, maybe condition gained.

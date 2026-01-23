@@ -167,6 +167,8 @@ class SkillService
 
     /**
      * Determine skill priority based on character priorities
+     *
+     * @param  array<string, mixed>  $priorities
      */
     protected function determinePriority(Skill $skill, array $priorities): string
     {
@@ -186,6 +188,8 @@ class SkillService
 
     /**
      * Generate recommendation reason
+     *
+     * @param  array<string, mixed>  $priorities
      */
     protected function generateRecommendationReason(Skill $skill, array $priorities): string
     {

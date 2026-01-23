@@ -73,11 +73,8 @@ class TrainingCalculationService
      *     scenario_specific: array<string, mixed>
      * }
      */
-    public function calculateTrainingPrediction(
-        Character $character,
-        string $trainingType,
-        array $trainingData = []
-    ): array {
+    public function calculateTrainingPrediction(): array
+    {
         // Get base stat gains
         $baseGains = $this->baseStatGains[$trainingType] ?? [];
 
@@ -157,6 +154,8 @@ class TrainingCalculationService
 
     /**
      * Calculate support card bonus
+     *
+     * @param  array<int, mixed>  $supportCards
      */
     protected function calculateSupportCardBonus(
         Character $character,
@@ -183,13 +182,13 @@ class TrainingCalculationService
 
             if ($cardType && strtolower($cardType) === strtolower($trainingType)) {
                 // Base bonus: 10% per matching card
-                $bonus += 0.10;
+                $bonus = ($bonus ?? 0) + 0.10;
 
                 // Additional bonus based on limit break level (if available)
                 if (is_object($characterCard) && isset($characterCard->limit_break_level)) {
-                    $bonus += $characterCard->limit_break_level * 0.02;
+                    $bonus = ($bonus ?? 0) + $characterCard->limit_break_level * 0.02;
                 } elseif (is_array($characterCard) && isset($characterCard['limit_break_level'])) {
-                    $bonus += $characterCard['limit_break_level'] * 0.02;
+                    $bonus = ($bonus ?? 0) + $characterCard['limit_break_level'] * 0.02;
                 }
             }
         }
@@ -246,6 +245,8 @@ class TrainingCalculationService
 
     /**
      * Calculate energy cost for training
+     *
+     * @param  array<string, mixed>  $trainingData
      */
     protected function calculateEnergyCost(
         Character $character,
@@ -300,11 +301,7 @@ class TrainingCalculationService
      *     breakdown: array<string, mixed>
      * }>
      */
-    public function calculateBatchPredictions(
-        Character $character,
-        array $trainingTypes,
-        array $trainingData = []
-    ): array {
+    public function calculateBatchPredictions(): array
         $predictions = [];
 
         foreach ($trainingTypes as $trainingType) {
@@ -391,10 +388,7 @@ class TrainingCalculationService
      *     alternatives: array<string, array<string, mixed>>
      * }
      */
-    public function getRecommendedTraining(
-        Character $character,
-        array $trainingData = []
-    ): array {
+    public function getRecommendedTraining(): array
         // Get all available training types
         $trainingTypes = ['speed', 'stamina', 'power', 'guts', 'wit'];
 
@@ -454,8 +448,7 @@ class TrainingCalculationService
      *
      * @return array<string, int>
      */
-    protected function getPriorityStats(Character $character): array
-    {
+    protected function getPriorityStats(): array
         $priorities = [];
         $goals = $character->goals ?? [];
         $targetStats = $goals['target_stats'] ?? [];
@@ -475,6 +468,9 @@ class TrainingCalculationService
 
     /**
      * Score a training option based on priority stats and character state
+     *
+     * @param  array<string, mixed>  $prediction
+     * @param  array<string, int>  $priorityStats
      */
     protected function scoreTrainingOption(
         array $prediction,
@@ -489,7 +485,7 @@ class TrainingCalculationService
             if ($priority > 0) {
                 // Higher priority stats get more weight
                 $weight = $priority / max(1, array_sum($priorityStats));
-                $score += $gain * $weight * 10;
+                $score = ($score ?? 0) + $gain * $weight * 10;
             }
         }
 
@@ -503,13 +499,16 @@ class TrainingCalculationService
         }
 
         // Bonus for high total bonus multiplier
-        $score += $prediction['total_bonus'] * 20;
+        $score = ($score ?? 0) + $prediction['total_bonus'] * 20;
 
         return $score;
     }
 
     /**
      * Generate human-readable recommendation reason
+     *
+     * @param  array<string, mixed>  $prediction
+     * @param  array<string, int>  $priorityStats
      */
     protected function generateRecommendationReason(
         string $trainingType,
@@ -562,11 +561,7 @@ class TrainingCalculationService
      * @param  array<string, mixed>  $trainingData
      * @return array<string, mixed>
      */
-    protected function calculateScenarioSpecificMechanics(
-        Character $character,
-        string $trainingType,
-        array $trainingData = []
-    ): array {
+    protected function calculateScenarioSpecificMechanics(): array
         return match ($character->scenario_type) {
             'unity_cup' => $this->calculateUnityCupMechanics(
                 $character,
@@ -592,11 +587,7 @@ class TrainingCalculationService
      * @param  array<string, mixed>  $trainingData
      * @return array<string, mixed>
      */
-    protected function calculateUraFinaleMechanics(
-        Character $character,
-        string $trainingType,
-        array $trainingData = []
-    ): array {
+    protected function calculateUraFinaleMechanics(): array
         return [
             'scenario' => 'ura_finale',
             'optimization_focus' => 'individual',
@@ -620,11 +611,7 @@ class TrainingCalculationService
      * @param  array<string, mixed>  $trainingData
      * @return array<string, mixed>
      */
-    protected function calculateUnityCupMechanics(
-        Character $character,
-        string $trainingType,
-        array $trainingData = []
-    ): array {
+    protected function calculateUnityCupMechanics(): array
         // Calculate Spirit Burst mechanics
         $spiritBurst = $this->calculateSpiritBurstMechanics(
             $character,
@@ -668,11 +655,7 @@ class TrainingCalculationService
      * @param  array<string, mixed>  $trainingData
      * @return array<string, mixed>
      */
-    protected function calculateSpiritBurstMechanics(
-        Character $character,
-        string $trainingType,
-        array $trainingData = []
-    ): array {
+    protected function calculateSpiritBurstMechanics(): array
         // Get current Spirit Burst gauge (0-4 sessions)
         $currentGauge = $trainingData['spirit_burst_gauge'] ?? 0;
         $teammatesPresent = $trainingData['teammates_present'] ?? [];
@@ -720,11 +703,7 @@ class TrainingCalculationService
      * @param  array<string, mixed>  $trainingData
      * @return array<string, mixed>
      */
-    protected function calculateTeamMemberInteractions(
-        Character $character,
-        string $trainingType,
-        array $trainingData = []
-    ): array {
+    protected function calculateTeamMemberInteractions(): array
         $teammatesPresent = $trainingData['teammates_present'] ?? [];
         $teammateCount = count($teammatesPresent);
 
@@ -758,10 +737,7 @@ class TrainingCalculationService
      * @param  array<string, mixed>  $trainingData
      * @return array<string, mixed>
      */
-    protected function calculateDistanceTeamPerformance(
-        Character $character,
-        array $trainingData = []
-    ): array {
+    protected function calculateDistanceTeamPerformance(): array
         $distanceTeams = [
             'sprint' => ['distance_range' => '1000-1400m', 'members' => []],
             'mile' => ['distance_range' => '1401-1800m', 'members' => []],
@@ -803,8 +779,7 @@ class TrainingCalculationService
      *
      * @return array<string, mixed>
      */
-    protected function getUraFinaleRaceFocus(Character $character): array
-    {
+    protected function getUraFinaleRaceFocus(): array
         // Load aptitudes relationship
         $aptitudesCollection = $character->aptitudes;
 
@@ -812,10 +787,10 @@ class TrainingCalculationService
         $aptitudes = [];
         foreach ($aptitudesCollection as $aptitude) {
             if ($aptitude->distance_type) {
-                $aptitudes[$aptitude->distance_type] = $aptitude->grade;
+                $aptitudes[$aptitude->distance_type] = (is_string($aptitude) ? (string) $aptitude : '')->grade;
             }
             if ($aptitude->surface_type) {
-                $aptitudes[$aptitude->surface_type] = $aptitude->grade;
+                $aptitudes[$aptitude->surface_type] = (is_string($aptitude) ? (string) $aptitude : '')->grade;
             }
         }
 
@@ -832,7 +807,7 @@ class TrainingCalculationService
         ];
 
         arsort($distanceAptitudes);
-        $bestDistance = array_key_first($distanceAptitudes);
+        $bestDistance = (string) (array_key_first($distanceAptitudes) ?? 'mile');
 
         // Find best surface aptitude
         $surfaceAptitudes = [
@@ -841,7 +816,7 @@ class TrainingCalculationService
         ];
 
         arsort($surfaceAptitudes);
-        $bestSurface = array_key_first($surfaceAptitudes);
+        $bestSurface = (string) (array_key_first($surfaceAptitudes) ?? 'turf');
 
         return [
             'best_distance' => $bestDistance,
@@ -856,8 +831,7 @@ class TrainingCalculationService
      *
      * @return array<string, int>
      */
-    protected function getUraFinaleStatPriority(Character $character): array
-    {
+    protected function getUraFinaleStatPriority(): array
         $goals = $character->goals ?? [];
         $targetStats = $goals['target_stats'] ?? [];
         $currentStats = $character->current_stats ?? [];
@@ -881,11 +855,7 @@ class TrainingCalculationService
      * @param  array<string, mixed>  $teammatesPresent
      * @return array<string, mixed>
      */
-    protected function calculateTeamSynergy(
-        Character $character,
-        array $teammatesPresent,
-        string $trainingType
-    ): array {
+    protected function calculateTeamSynergy(): array
         if (empty($teammatesPresent)) {
             return [
                 'level' => 'none',
@@ -929,7 +899,7 @@ class TrainingCalculationService
         $aptitudes = [];
         foreach ($aptitudesCollection as $aptitude) {
             if ($aptitude->distance_type) {
-                $aptitudes[$aptitude->distance_type] = $aptitude->grade;
+                $aptitudes[$aptitude->distance_type] = (is_string($aptitude) ? (string) $aptitude : '')->grade;
             }
         }
 
@@ -942,7 +912,7 @@ class TrainingCalculationService
 
         arsort($distanceAptitudes);
 
-        return array_key_first($distanceAptitudes) ?? 'mile';
+        return (string) (array_key_first($distanceAptitudes) ?? 'mile');
     }
 
     /**

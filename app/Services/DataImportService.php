@@ -60,8 +60,7 @@ class DataImportService
      * @param  string  $importType  Type of data being imported
      * @return array{success: bool, data: array, format: string, errors: array}
      */
-    public function parseText(string $text, string $importType): array
-    {
+    public function parseText(): array
         $text = trim($text);
 
         if (empty($text)) {
@@ -86,9 +85,9 @@ class DataImportService
 
         return [
             'success' => (bool) ($result['success'] ?? false),
-            'data' => is_array($result['data'] ?? null) ? $result['data'] : [],
+            'data' => is_array((is_array($result) && isset($result['data']) ? $result['data'] : null)) ? $result['data'] : [],
             'format' => (string) ($result['format'] ?? $format),
-            'errors' => is_array($result['errors'] ?? null) ? $result['errors'] : [],
+            'errors' => is_array((is_array($result) && isset($result['errors']) ? $result['errors'] : null)) ? $result['errors'] : [],
         ];
     }
 
@@ -139,8 +138,7 @@ class DataImportService
     /**
      * Parse JSON input
      */
-    public function parseJson(string $text, string $importType): array
-    {
+    public function parseJson(): array
         $errors = [];
         $data = json_decode($text, true);
 
@@ -181,8 +179,7 @@ class DataImportService
     /**
      * Parse CSV input
      */
-    public function parseCsv(string $text, string $importType): array
-    {
+    public function parseCsv(): array
         $errors = [];
         $lines = array_filter(explode("\n", $text), fn ($line) => trim($line) !== '');
 
@@ -233,8 +230,7 @@ class DataImportService
     /**
      * Parse TSV (tab-separated values) input
      */
-    public function parseTsv(string $text, string $importType): array
-    {
+    public function parseTsv(): array
         // Convert TSV to CSV format and use CSV parser
         $csvText = str_replace("\t", ',', $text);
         $result = $this->parseCsv($csvText, $importType);
@@ -246,8 +242,7 @@ class DataImportService
     /**
      * Parse key-value pair format
      */
-    public function parseKeyValue(string $text, string $importType): array
-    {
+    public function parseKeyValue(): array
         $errors = [];
         $record = [];
 
@@ -293,8 +288,7 @@ class DataImportService
     /**
      * Parse structured text with intelligent field detection
      */
-    public function parseStructuredText(string $text, string $importType): array
-    {
+    public function parseStructuredText(): array
         $errors = [];
         $record = [];
 
@@ -335,13 +329,12 @@ class DataImportService
     /**
      * Extract character data from structured text
      */
-    private function extractCharacterData(string $text): array
-    {
+    private function extractCharacterData(): array
         $data = [];
 
         // Extract name
         if (preg_match('/(?:name|character|trainee)[:=\s]+([^\n,]+)/i', $text, $matches)) {
-            $data['name'] = trim($matches[1]);
+            (is_array($data) && isset($data['name']) ? $data['name'] : null) = trim($matches[1]);
         }
 
         // Extract stats (Speed, Stamina, Power, Guts, Wit)
@@ -354,17 +347,17 @@ class DataImportService
 
         // Extract scenario type
         if (preg_match('/(?:scenario|mode)[:=\s]+(ura[_\s]?finale|unity[_\s]?cup)/i', $text, $matches)) {
-            $data['scenario_type'] = Str::snake(strtolower($matches[1]));
+            (is_array($data) && isset($data['scenario_type']) ? $data['scenario_type'] : null) = Str::snake(strtolower($matches[1]));
         }
 
         // Extract energy level
         if (preg_match('/(?:energy|stamina[_\s]?level)[:=\s]+(\d+)/i', $text, $matches)) {
-            $data['energy_level'] = (int) $matches[1];
+            (is_array($data) && isset($data['energy_level']) ? $data['energy_level'] : null) = (int) $matches[1];
         }
 
         // Extract mood
         if (preg_match('/(?:mood|condition)[:=\s]+(great|good|normal|bad|awful)/i', $text, $matches)) {
-            $data['mood_status'] = strtolower($matches[1]);
+            (is_array($data) && isset($data['mood_status']) ? $data['mood_status'] : null) = strtolower($matches[1]);
         }
 
         return $data;
@@ -373,23 +366,22 @@ class DataImportService
     /**
      * Extract career data from structured text
      */
-    private function extractCareerData(string $text): array
-    {
+    private function extractCareerData(): array
         $data = [];
 
         // Extract career name
         if (preg_match('/(?:career[_\s]?name|run[_\s]?name)[:=\s]+([^\n,]+)/i', $text, $matches)) {
-            $data['career_name'] = trim($matches[1]);
+            (is_array($data) && isset($data['career_name']) ? $data['career_name'] : null) = trim($matches[1]);
         }
 
         // Extract scenario type
         if (preg_match('/(?:scenario|mode)[:=\s]+(ura[_\s]?finale|unity[_\s]?cup)/i', $text, $matches)) {
-            $data['scenario_type'] = Str::snake(strtolower($matches[1]));
+            (is_array($data) && isset($data['scenario_type']) ? $data['scenario_type'] : null) = Str::snake(strtolower($matches[1]));
         }
 
         // Extract turn number
         if (preg_match('/(?:turn|current[_\s]?turn)[:=\s]+(\d+)/i', $text, $matches)) {
-            $data['current_turn'] = (int) $matches[1];
+            (is_array($data) && isset($data['current_turn']) ? $data['current_turn'] : null) = (int) $matches[1];
         }
 
         // Extract final stats
@@ -402,7 +394,7 @@ class DataImportService
 
         // Extract status
         if (preg_match('/(?:status)[:=\s]+(active|completed|abandoned)/i', $text, $matches)) {
-            $data['status'] = strtolower($matches[1]);
+            (is_array($data) && isset($data['status']) ? $data['status'] : null) = strtolower($matches[1]);
         }
 
         return $data;
@@ -411,18 +403,17 @@ class DataImportService
     /**
      * Extract training session data from structured text
      */
-    private function extractTrainingData(string $text): array
-    {
+    private function extractTrainingData(): array
         $data = [];
 
         // Extract turn number
         if (preg_match('/(?:turn)[:=\s]+(\d+)/i', $text, $matches)) {
-            $data['turn_number'] = (int) $matches[1];
+            (is_array($data) && isset($data['turn_number']) ? $data['turn_number'] : null) = (int) $matches[1];
         }
 
         // Extract training type
         if (preg_match('/(?:training[_\s]?type|type)[:=\s]+(speed|stamina|power|guts|wit|rest)/i', $text, $matches)) {
-            $data['training_type'] = strtolower($matches[1]);
+            (is_array($data) && isset($data['training_type']) ? $data['training_type'] : null) = strtolower($matches[1]);
         }
 
         // Extract stat gains
@@ -435,7 +426,7 @@ class DataImportService
 
         // Extract energy cost
         if (preg_match('/(?:energy[_\s]?cost|energy)[:=\s]+([+-]?\d+)/i', $text, $matches)) {
-            $data['energy_cost'] = (int) $matches[1];
+            (is_array($data) && isset($data['energy_cost']) ? $data['energy_cost'] : null) = (int) $matches[1];
         }
 
         return $data;
@@ -444,28 +435,27 @@ class DataImportService
     /**
      * Extract skill data from structured text
      */
-    private function extractSkillData(string $text): array
-    {
+    private function extractSkillData(): array
         $data = [];
 
         // Extract skill name
         if (preg_match('/(?:skill[_\s]?name|name)[:=\s]+([^\n,]+)/i', $text, $matches)) {
-            $data['name'] = trim($matches[1]);
+            (is_array($data) && isset($data['name']) ? $data['name'] : null) = trim($matches[1]);
         }
 
         // Extract skill type
         if (preg_match('/(?:skill[_\s]?type|type)[:=\s]+(speed|stamina|power|guts|wit|recovery|debuff|passive)/i', $text, $matches)) {
-            $data['skill_type'] = strtolower($matches[1]);
+            (is_array($data) && isset($data['skill_type']) ? $data['skill_type'] : null) = strtolower($matches[1]);
         }
 
         // Extract rarity
         if (preg_match('/(?:rarity)[:=\s]+(normal|rare|unique)/i', $text, $matches)) {
-            $data['rarity'] = strtolower($matches[1]);
+            (is_array($data) && isset($data['rarity']) ? $data['rarity'] : null) = strtolower($matches[1]);
         }
 
         // Extract SP cost
         if (preg_match('/(?:sp[_\s]?cost|cost)[:=\s]+(\d+)/i', $text, $matches)) {
-            $data['base_sp_cost'] = (int) $matches[1];
+            (is_array($data) && isset($data['base_sp_cost']) ? $data['base_sp_cost'] : null) = (int) $matches[1];
         }
 
         return $data;
@@ -474,28 +464,27 @@ class DataImportService
     /**
      * Extract support card data from structured text
      */
-    private function extractSupportCardData(string $text): array
-    {
+    private function extractSupportCardData(): array
         $data = [];
 
         // Extract card name
         if (preg_match('/(?:card[_\s]?name|name)[:=\s]+([^\n,]+)/i', $text, $matches)) {
-            $data['name'] = trim($matches[1]);
+            (is_array($data) && isset($data['name']) ? $data['name'] : null) = trim($matches[1]);
         }
 
         // Extract rarity
         if (preg_match('/(?:rarity)[:=\s]+(ssr|sr|r)/i', $text, $matches)) {
-            $data['rarity'] = strtoupper($matches[1]);
+            (is_array($data) && isset($data['rarity']) ? $data['rarity'] : null) = strtoupper($matches[1]);
         }
 
         // Extract specialization
         if (preg_match('/(?:specialization|type)[:=\s]+(speed|stamina|power|guts|wit|pal)/i', $text, $matches)) {
-            $data['specialization'] = strtolower($matches[1]);
+            (is_array($data) && isset($data['specialization']) ? $data['specialization'] : null) = strtolower($matches[1]);
         }
 
         // Extract limit break level
         if (preg_match('/(?:limit[_\s]?break|lb)[:=\s]+(\d)/i', $text, $matches)) {
-            $data['limit_break_level'] = (int) $matches[1];
+            (is_array($data) && isset($data['limit_break_level']) ? $data['limit_break_level'] : null) = (int) $matches[1];
         }
 
         return $data;
@@ -504,8 +493,7 @@ class DataImportService
     /**
      * Validate a record based on import type
      */
-    public function validateRecord(array $record, string $importType): array
-    {
+    public function validateRecord(): array
         $rules = $this->getValidationRules($importType);
         $validator = Validator::make($record, $rules);
 
@@ -531,8 +519,7 @@ class DataImportService
     /**
      * Get validation rules for import type
      */
-    private function getValidationRules(string $importType): array
-    {
+    private function getValidationRules(): array
         return match ($importType) {
             'character' => [
                 'name' => 'required|string|max:255',
@@ -586,8 +573,7 @@ class DataImportService
     /**
      * Custom validation logic
      */
-    private function customValidation(array $record, string $importType): array
-    {
+    private function customValidation(): array
         $errors = [];
 
         if ($importType === 'character') {
@@ -623,8 +609,7 @@ class DataImportService
     /**
      * Normalize record data
      */
-    private function normalizeRecord(array $record, string $importType): array
-    {
+    private function normalizeRecord(): array
         $normalized = [];
 
         foreach ($record as $key => $value) {
@@ -648,8 +633,7 @@ class DataImportService
     /**
      * Generate import preview with validation results
      */
-    public function generatePreview(array $data, string $importType): array
-    {
+    public function generatePreview(): array
         $preview = [
             'import_type' => $importType,
             'import_type_label' => self::IMPORT_TYPES[$importType] ?? $importType,
@@ -690,8 +674,7 @@ class DataImportService
     /**
      * Get field mapping for import type
      */
-    public function getFieldMapping(string $importType): array
-    {
+    public function getFieldMapping(): array
         return match ($importType) {
             'character' => [
                 'name' => ['label' => 'Character Name', 'required' => true, 'type' => 'string'],
@@ -745,8 +728,7 @@ class DataImportService
     /**
      * Execute import of validated data
      */
-    public function executeImport(array $data, string $importType, int $userId): array
-    {
+    public function executeImport(): array
         $results = [
             'success' => true,
             'imported' => 0,
@@ -846,7 +828,7 @@ class DataImportService
     private function importCareer(array $record, int $userId): int
     {
         // Find or create character for this career
-        $characterId = $record['character_id'] ?? null;
+        $characterId = (is_array($record) && isset($record['character_id']) ? $record['character_id'] : null);
 
         if (! $characterId) {
             // Create a placeholder character if none specified
@@ -869,15 +851,15 @@ class DataImportService
         $career = Career::create([
             'character_id' => $characterId,
             'user_id' => $userId,
-            'career_name' => $record['career_name'] ?? null,
+            'career_name' => (is_array($record) && isset($record['career_name']) ? $record['career_name'] : null),
             'scenario_type' => $record['scenario_type'] ?? 'ura_finale',
             'status' => $record['status'] ?? 'active',
             'current_turn' => $record['current_turn'] ?? 1,
-            'final_speed' => $record['final_speed'] ?? null,
-            'final_stamina' => $record['final_stamina'] ?? null,
-            'final_power' => $record['final_power'] ?? null,
-            'final_guts' => $record['final_guts'] ?? null,
-            'final_wit' => $record['final_wit'] ?? null,
+            'final_speed' => (is_array($record) && isset($record['final_speed']) ? $record['final_speed'] : null),
+            'final_stamina' => (is_array($record) && isset($record['final_stamina']) ? $record['final_stamina'] : null),
+            'final_power' => (is_array($record) && isset($record['final_power']) ? $record['final_power'] : null),
+            'final_guts' => (is_array($record) && isset($record['final_guts']) ? $record['final_guts'] : null),
+            'final_wit' => (is_array($record) && isset($record['final_wit']) ? $record['final_wit'] : null),
         ]);
 
         return $career->id;
@@ -888,7 +870,7 @@ class DataImportService
      */
     private function importTrainingSession(array $record, int $userId): int
     {
-        $careerId = $record['career_id'] ?? null;
+        $careerId = (is_array($record) && isset($record['career_id']) ? $record['career_id'] : null);
 
         if (! $careerId) {
             throw new \InvalidArgumentException('Training session requires a career_id');
@@ -976,7 +958,6 @@ class DataImportService
      * Get import templates for different formats
      */
     public function getTemplates(): array
-    {
         return [
             'character' => [
                 'csv' => "name,speed,stamina,power,guts,wit,scenario_type,energy_level,mood_status\nSilence Suzuka,800,600,700,500,650,ura_finale,100,good",

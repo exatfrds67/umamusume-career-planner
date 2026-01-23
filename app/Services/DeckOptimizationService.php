@@ -48,9 +48,10 @@ class DeckOptimizationService
 
     /**
      * Analyze deck composition for stat coverage and skill provision gaps
+     *
+     * @return array<string, mixed>
      */
-    public function analyzeDeckComposition(int $characterId): array
-    {
+    public function analyzeDeckComposition(): array
         $deck = $this->deckService->getDeck($characterId);
 
         if ($deck->isEmpty()) {
@@ -82,9 +83,12 @@ class DeckOptimizationService
 
     /**
      * Calculate stat coverage from deck
+     *
+     * @param  \Illuminate\Support\Collection<int, \App\Models\CharacterSupportCard>  $deck
+     * @return array<string, mixed>
      */
-    private function calculateStatCoverage(Collection $deck): array
-    {
+    private function calculateStatCoverage(): array
+        /** @var array<string, int> $coverage */
         $coverage = [
             'speed' => 0,
             'stamina' => 0,
@@ -125,8 +129,7 @@ class DeckOptimizationService
     /**
      * Calculate skill provision coverage
      */
-    private function calculateSkillProvisionCoverage(Collection $deck): array
-    {
+    private function calculateSkillProvisionCoverage(): array
         $allSkills = [];
         $skillsByType = [
             'speed' => [],
@@ -195,8 +198,7 @@ class DeckOptimizationService
     /**
      * Identify gaps in deck composition
      */
-    private function identifyGaps(array $statCoverage, array $skillProvisionCoverage): array
-    {
+    private function identifyGaps(): array
         $missingStats = [];
         $weakStats = [];
 
@@ -244,8 +246,7 @@ class DeckOptimizationService
     /**
      * Generate composition recommendations
      */
-    private function generateCompositionRecommendations(array $gaps, float $coverageScore): array
-    {
+    private function generateCompositionRecommendations(): array
         $recommendations = [];
 
         if ($coverageScore >= self::OPTIMAL_STAT_COVERAGE) {
@@ -274,8 +275,7 @@ class DeckOptimizationService
     /**
      * Analyze synergy between cards in the deck
      */
-    public function analyzeDeckSynergy(int $characterId): array
-    {
+    public function analyzeDeckSynergy(): array
         $deck = $this->deckService->getDeck($characterId);
 
         if ($deck->isEmpty()) {
@@ -302,8 +302,7 @@ class DeckOptimizationService
     /**
      * Identify synergy pairs in the deck
      */
-    private function identifySynergyPairs(Collection $deck): array
-    {
+    private function identifySynergyPairs(): array
         $pairs = [];
 
         foreach ($deck as $card1) {
@@ -337,8 +336,7 @@ class DeckOptimizationService
     /**
      * Analyze strategic alignment of the deck
      */
-    private function analyzeStrategicAlignment(Collection $deck): array
-    {
+    private function analyzeStrategicAlignment(): array
         $cardTypes = $deck->pluck('supportCard.card_type')->countBy()->toArray();
         $metaTiers = $deck->pluck('supportCard.meta_tier')->countBy()->toArray();
 
@@ -429,8 +427,7 @@ class DeckOptimizationService
     /**
      * Generate synergy recommendations
      */
-    private function generateSynergyRecommendations(array $synergyPairs, array $strategicAlignment): array
-    {
+    private function generateSynergyRecommendations(): array
         $recommendations = [];
 
         if (count($synergyPairs) === 0) {
@@ -451,8 +448,7 @@ class DeckOptimizationService
     /**
      * Optimize deck for meta tier and character build compatibility
      */
-    public function optimizeForMetaTier(int $characterId): array
-    {
+    public function optimizeForMetaTier(): array
         $character = Character::findOrFail($characterId);
         $deck = $this->deckService->getDeck($characterId);
 
@@ -471,8 +467,7 @@ class DeckOptimizationService
     /**
      * Calculate meta score for the deck
      */
-    private function calculateMetaScore(Collection $deck): array
-    {
+    private function calculateMetaScore(): array
         if ($deck->isEmpty()) {
             return [
                 'total_score' => 0,
@@ -487,7 +482,7 @@ class DeckOptimizationService
         foreach ($deck as $card) {
             $tier = $card->supportCard->meta_tier ?? 'C';
             $weight = self::META_TIER_WEIGHTS[$tier] ?? 1.0;
-            $totalWeight += $weight;
+            $totalWeight = ($totalWeight ?? 0) + $weight;
 
             if (! isset($tierBreakdown[$tier])) {
                 $tierBreakdown[$tier] = 0;
@@ -508,8 +503,7 @@ class DeckOptimizationService
     /**
      * Analyze build compatibility between character and deck
      */
-    private function analyzeBuildCompatibility(Character $character, Collection $deck): array
-    {
+    private function analyzeBuildCompatibility(): array
         $statPriorities = $character->stat_priorities ?? [];
         $scenario = $character->scenario_type;
 
@@ -522,7 +516,7 @@ class DeckOptimizationService
 
             // Check if card type matches stat priorities
             if (in_array($cardType, array_map('strtolower', array_keys($statPriorities)))) {
-                $compatibilityScore += 20;
+                $compatibilityScore = ($compatibilityScore ?? 0) + 20;
                 $matches[] = $card->supportCard->name.' ('.$cardType.')';
             } else {
                 $mismatches[] = $card->supportCard->name.' ('.$cardType.')';
@@ -531,7 +525,7 @@ class DeckOptimizationService
             // Check scenario compatibility
             $recommendedScenarios = $card->supportCard->recommended_scenarios ?? [];
             if (in_array($scenario, $recommendedScenarios)) {
-                $compatibilityScore += 10;
+                $compatibilityScore = ($compatibilityScore ?? 0) + 10;
             }
         }
 
@@ -546,12 +540,7 @@ class DeckOptimizationService
     /**
      * Generate optimization suggestions
      */
-    private function generateOptimizationSuggestions(
-        Character $character,
-        Collection $deck,
-        array $metaScore,
-        array $buildCompatibility
-    ): array {
+    private function generateOptimizationSuggestions(): array
         $suggestions = [];
 
         // Meta tier suggestions
@@ -587,8 +576,7 @@ class DeckOptimizationService
     /**
      * Suggest card replacements for optimization
      */
-    private function suggestReplacements(Character $character, Collection $deck): array
-    {
+    private function suggestReplacements(): array
         $replacements = [];
         $statPriorities = array_keys($character->stat_priorities ?? []);
 
@@ -624,8 +612,7 @@ class DeckOptimizationService
     /**
      * Generate deck recommendations based on character goals and scenario
      */
-    public function recommendDeck(int $characterId, array $options = []): array
-    {
+    public function recommendDeck(): array
         $character = Character::findOrFail($characterId);
         $scenario = $character->scenario_type;
         $statPriorities = $character->stat_priorities ?? [];
@@ -650,8 +637,7 @@ class DeckOptimizationService
     /**
      * Select optimal cards for the character
      */
-    private function selectOptimalCards(Character $character, array $statPriorities, string $scenario, array $options): array
-    {
+    private function selectOptimalCards(): array
         $selectedCards = [];
         $cardsByType = [];
 
@@ -770,14 +756,13 @@ class DeckOptimizationService
     /**
      * Estimate performance of recommended deck
      */
-    private function estimatePerformance(array $recommendedCards): array
-    {
+    private function estimatePerformance(): array
         $metaTierScore = 0;
         $tierCounts = [];
 
         foreach ($recommendedCards as $card) {
             $tier = $card['meta_tier'] ?? 'C';
-            $metaTierScore += self::META_TIER_WEIGHTS[$tier] ?? 1.0;
+            $metaTierScore = ($metaTierScore ?? 0) + self::META_TIER_WEIGHTS[$tier] ?? 1.0;
 
             if (! isset($tierCounts[$tier])) {
                 $tierCounts[$tier] = 0;
@@ -811,8 +796,7 @@ class DeckOptimizationService
     /**
      * Generate reasoning for recommendations
      */
-    private function generateRecommendationReasoning(Character $character, array $recommendedCards): array
-    {
+    private function generateRecommendationReasoning(): array
         $reasoning = [];
 
         $reasoning[] = "Deck optimized for {$character->scenario_type} scenario";
@@ -843,11 +827,11 @@ class DeckOptimizationService
     /**
      * Get comprehensive deck analysis
      */
-    public function getComprehensiveAnalysis(int $characterId): array
-    {
+    public function getComprehensiveAnalysis(): array
         return [
             'composition' => $this->analyzeDeckComposition($characterId),
             'synergy' => $this->analyzeDeckSynergy($characterId),
+            'recommendations' => $this->recommendDeck($characterId),
             'meta_optimization' => $this->optimizeForMetaTier($characterId),
             'friendship_overview' => $this->friendshipService->getDeckFriendshipOverview($characterId),
             'deck_statistics' => $this->deckService->getDeckStatistics($characterId),

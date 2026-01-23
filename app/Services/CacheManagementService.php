@@ -57,7 +57,7 @@ class CacheManagementService
     {
         $startTime = microtime(true);
         $fullKey = self::CACHE_PREFIX.$key;
-        $ttl = $ttl ?? self::DEFAULT_TTL;
+        $ttl ??= self::DEFAULT_TTL;
 
         // Check MCP server health before cache operations
         $mcpHealthy = $this->mcpClient->isServerHealthy('awspricing');
@@ -90,18 +90,17 @@ class CacheManagementService
     /**
      * Warm cache with predictive data fetching using MCP agents
      *
-     * @param  array<string>  $keys
+     * @param  array<int, string>  $keys
      * @param  array<string, callable>  $callbacks
      * @return array{warmed: int, failed: int, duration_ms: float}
      */
-    public function warmCache(array $keys, array $callbacks): array
-    {
+    public function warmCache(): array
         $startTime = microtime(true);
         $warmed = 0;
         $failed = 0;
 
         Log::info('[CacheManagementService] Starting cache warming', [
-            'keys_count' => count($keys),
+            'keys_count' => \count($keys),
             'mcp_available' => $this->mcpClient->isServerEnabled('awspricing'),
         ]);
 
@@ -113,7 +112,7 @@ class CacheManagementService
                 try {
                     if (! isset($callbacks[$key])) {
                         Log::warning('[CacheManagementService] No callback for key', ['key' => $key]);
-                        $failed++;
+                        $failed = ($failed ?? 0) + 1;
 
                         continue;
                     }
@@ -129,13 +128,13 @@ class CacheManagementService
                     $value = $callbacks[$key]();
                     Cache::put($fullKey, $value, self::DEFAULT_TTL);
 
-                    $warmed++;
+                    $warmed = ($warmed ?? 0) + 1;
                 } catch (\Exception $e) {
                     Log::error('[CacheManagementService] Cache warming failed', [
                         'key' => $key,
                         'error' => $e->getMessage(),
                     ]);
-                    $failed++;
+                    $failed = ($failed ?? 0) + 1;
                 }
             }
         }
@@ -158,11 +157,11 @@ class CacheManagementService
     /**
      * Invalidate cache based on external data change detection
      *
-     * @param  string|array<string>  $keys
+     * @param  string|array<int, string>  $keys
      */
     public function invalidate(string|array $keys, string $reason = 'manual'): void
     {
-        $keys = is_array($keys) ? $keys : [$keys];
+        $keys = \is_array($keys) ? $keys : [$keys];
         $invalidated = 0;
 
         foreach ($keys as $key) {
@@ -170,12 +169,12 @@ class CacheManagementService
 
             if (Cache::has($fullKey)) {
                 Cache::forget($fullKey);
-                $invalidated++;
+                $invalidated = ($invalidated ?? 0) + 1;
             }
         }
 
         Log::info('[CacheManagementService] Cache invalidated', [
-            'keys_count' => count($keys),
+            'keys_count' => \count($keys),
             'invalidated' => $invalidated,
             'reason' => $reason,
             'mcp_triggered' => $reason === 'external_data_change',
@@ -198,7 +197,7 @@ class CacheManagementService
                 // Remove prefix from Redis key
                 $cacheKey = str_replace(self::CACHE_PREFIX, '', $key);
                 Cache::forget($cacheKey);
-                $invalidated++;
+                $invalidated = ($invalidated ?? 0) + 1;
             }
 
             Log::info('[CacheManagementService] Pattern invalidation completed', [
@@ -221,15 +220,14 @@ class CacheManagementService
      * @return array{hit_rate: float, total_hits: int, total_misses: int, total_requests: int, avg_response_time_ms: float}
      */
     public function getHitRateStatistics(): array
-    {
         $totalHits = 0;
         $totalMisses = 0;
         $totalTime = 0.0;
 
         foreach ($this->metrics as $metric) {
-            $totalHits += $metric['hits'];
-            $totalMisses += $metric['misses'];
-            $totalTime += $metric['total_time_ms'];
+            $totalHits = ($totalHits ?? 0) + $metric['hits'];
+            $totalMisses = ($totalMisses ?? 0) + $metric['misses'];
+            $totalTime = ($totalTime ?? 0) + $metric['total_time_ms'];
         }
 
         $totalRequests = $totalHits + $totalMisses;
@@ -251,7 +249,6 @@ class CacheManagementService
      * @return array<string, array{hits: int, misses: int, hit_rate: float, avg_time_ms: float}>
      */
     public function getDetailedMetrics(): array
-    {
         $detailed = [];
 
         foreach ($this->metrics as $key => $metric) {
@@ -275,8 +272,7 @@ class CacheManagementService
      *
      * @return array{recommended_ttl: int, estimated_cost: float, strategy: string}
      */
-    public function getCostOptimizedStrategy(string $dataType, int $estimatedSize): array
-    {
+    public function getCostOptimizedStrategy(): array
         // Check if awspricing MCP server is available
         if (! $this->mcpClient->isServerEnabled('awspricing')) {
             return $this->getDefaultStrategy($dataType);
@@ -323,8 +319,7 @@ class CacheManagementService
      *
      * @return array{avg: float, min: float, max: float, p50: float, p95: float, p99: float, count: int}
      */
-    public function getApiResponseTimeStats(string $apiName): array
-    {
+    public function getApiResponseTimeStats(): array
         $key = "api_response_time:{$apiName}";
 
         try {
@@ -345,7 +340,7 @@ class CacheManagementService
             $times = array_map('floatval', $times);
             sort($times);
 
-            $count = count($times);
+            $count = \count($times);
             $avg = array_sum($times) / $count;
             $min = min($times);
             $max = max($times);
@@ -385,7 +380,7 @@ class CacheManagementService
         try {
             $pattern = self::CACHE_PREFIX.'*';
             $keys = Redis::keys($pattern);
-            if (! is_array($keys)) {
+            if (! \is_array($keys)) {
                 $keys = [];
             }
 
@@ -395,7 +390,7 @@ class CacheManagementService
             }
 
             Log::info('[CacheManagementService] All caches cleared', [
-                'keys_cleared' => count($keys),
+                'keys_cleared' => \count($keys),
             ]);
         } catch (\Exception $e) {
             Log::error('[CacheManagementService] Failed to clear all caches', [
@@ -431,8 +426,7 @@ class CacheManagementService
      *
      * @return array{recommended_ttl: int, estimated_cost: float, strategy: string}
      */
-    protected function calculateOptimalStrategy(string $dataType, int $estimatedSize): array
-    {
+    protected function calculateOptimalStrategy(): array
         // Strategy based on data type and size
         $strategies = [
             'characters' => ['ttl' => 86400, 'cost' => 0.001, 'strategy' => 'long_term'],
@@ -461,8 +455,7 @@ class CacheManagementService
      *
      * @return array{recommended_ttl: int, estimated_cost: float, strategy: string}
      */
-    protected function getDefaultStrategy(string $dataType): array
-    {
+    protected function getDefaultStrategy(): array
         return [
             'recommended_ttl' => self::DEFAULT_TTL,
             'estimated_cost' => 0.001,
@@ -473,11 +466,11 @@ class CacheManagementService
     /**
      * Calculate percentile from sorted array
      *
-     * @param  array<float>  $values
+     * @param  array<int, float>  $values
      */
     protected function percentile(array $values, int $percentile): float
     {
-        $count = count($values);
+        $count = \count($values);
         $index = ($percentile / 100) * ($count - 1);
         $lower = floor($index);
         $upper = ceil($index);

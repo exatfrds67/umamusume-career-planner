@@ -70,7 +70,6 @@ class BenchmarkingService
      * }
      */
     public function getCommunityBenchmarks(): array
-    {
         $cacheKey = 'benchmarks:community';
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () {
@@ -102,8 +101,7 @@ class BenchmarkingService
      *     stat_averages: array<string, array>
      * }
      */
-    protected function calculateOverallBenchmarks(Collection $careers): array
-    {
+    protected function calculateOverallBenchmarks(): array
         $efficiencies = [];
         $winRates = [];
         $totalStats = [];
@@ -160,8 +158,7 @@ class BenchmarkingService
      *     total_stats: array
      * }>
      */
-    protected function calculateScenarioBenchmarks(Collection $careers): array
-    {
+    protected function calculateScenarioBenchmarks(): array
         $scenarios = ['ura_finale', 'unity_cup'];
         $result = [];
 
@@ -220,8 +217,7 @@ class BenchmarkingService
      *     total_stats: array<int, float>
      * }
      */
-    protected function calculatePercentileThresholds(Collection $careers): array
-    {
+    protected function calculatePercentileThresholds(): array
         $efficiencies = [];
         $winRates = [];
         $totalStats = [];
@@ -267,12 +263,11 @@ class BenchmarkingService
      *     improvement_areas: array<string>
      * }
      */
-    public function compareUserPerformance(User $user): array
-    {
-        $cacheKey = "benchmarks:user_comparison:{$user->id}";
+    public function compareUserPerformance(): array
+        $cacheKey = "benchmarks:user_comparison:{$user?->id ?? throw new \Exception('User required')}";
 
         return Cache::remember($cacheKey, self::CACHE_TTL / 2, function () use ($user) {
-            $userCareers = Career::where('user_id', $user->id)
+            $userCareers = Career::where('user_id', $user?->id ?? throw new \Exception('User required'))
                 ->whereNotNull('completed_at')
                 ->with(['trainingSessions', 'races'])
                 ->get();
@@ -322,8 +317,7 @@ class BenchmarkingService
      *     recent_trend: string
      * }
      */
-    protected function calculateUserMetrics(Collection $careers): array
-    {
+    protected function calculateUserMetrics(): array
         $efficiencies = [];
         $winRates = [];
         $totalStats = [];
@@ -400,8 +394,7 @@ class BenchmarkingService
      *     stat_comparison: array<string, array>
      * }
      */
-    protected function compareToBenchmarks(array $userMetrics, array $benchmarks): array
-    {
+    protected function compareToBenchmarks(): array
         $efficiencyDiff = $userMetrics['average_efficiency'] - ($benchmarks['efficiency']['mean'] ?? 0);
         $winRateDiff = $userMetrics['average_win_rate'] - ($benchmarks['win_rate']['mean'] ?? 0);
         $totalStatsDiff = $userMetrics['average_total_stats'] - ($benchmarks['total_stats']['mean'] ?? 0);
@@ -460,8 +453,7 @@ class BenchmarkingService
      *     ranking_tier: string
      * }
      */
-    protected function calculateUserPercentiles(array $userMetrics, array $thresholds): array
-    {
+    protected function calculateUserPercentiles(): array
         $efficiencyPercentile = $this->findPercentile(
             $userMetrics['average_efficiency'],
             $thresholds['efficiency'] ?? []
@@ -543,8 +535,7 @@ class BenchmarkingService
      *     notable_achievements: array<string>
      * }
      */
-    protected function generatePerformanceSummary(array $comparison, array $percentiles): array
-    {
+    protected function generatePerformanceSummary(): array
         $strengths = [];
         $weaknesses = [];
         $achievements = [];
@@ -607,8 +598,7 @@ class BenchmarkingService
      * @param  array<string, mixed>  $percentiles
      * @return array<string>
      */
-    protected function identifyImprovementAreas(array $comparison, array $percentiles): array
-    {
+    protected function identifyImprovementAreas(): array
         $improvements = [];
 
         // Check efficiency
@@ -625,8 +615,8 @@ class BenchmarkingService
 
         // Check individual stats
         foreach ($comparison['stat_comparison'] as $stat => $data) {
-            if ($data['status'] === 'below_average' && abs($data['difference']) > 100) {
-                $improvements[] = "Focus on {$stat} training - currently ".abs($data['difference']).' points below average.';
+            if ((is_array($data) && isset($data['status']) ? $data['status'] : null) === 'below_average' && abs((is_array($data) && isset($data['difference']) ? $data['difference'] : null)) > 100) {
+                $improvements[] = "Focus on {$stat} training - currently ".abs((is_array($data) && isset($data['difference']) ? $data['difference'] : null)).' points below average.';
             }
         }
 
@@ -654,7 +644,6 @@ class BenchmarkingService
      * }
      */
     public function analyzeBenchmarkTrends(): array
-    {
         $cacheKey = 'benchmarks:trends';
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () {
@@ -698,8 +687,7 @@ class BenchmarkingService
      *
      * @return array<string, Collection>
      */
-    protected function groupCareersByMonth(Collection $careers): array
-    {
+    protected function groupCareersByMonth(): array
         $grouped = [];
 
         foreach ($careers as $career) {
@@ -719,8 +707,7 @@ class BenchmarkingService
      * @param  array<string, Collection>  $monthlyData
      * @return array<string, float>
      */
-    protected function calculateMonthlyTrend(array $monthlyData, string $metric): array
-    {
+    protected function calculateMonthlyTrend(): array
         $trend = [];
 
         foreach ($monthlyData as $month => $careers) {
@@ -776,8 +763,7 @@ class BenchmarkingService
      * @param  array<string, Collection>  $monthlyData
      * @return array<string>
      */
-    protected function identifyMetaShifts(array $monthlyData): array
-    {
+    protected function identifyMetaShifts(): array
         $shifts = [];
 
         // Analyze training type preferences over time
@@ -855,7 +841,7 @@ class BenchmarkingService
 
         $totalGains = 0;
         foreach ($sessions as $session) {
-            $totalGains += ($session->speed_gain ?? 0)
+            $totalGains = ($totalGains ?? 0) + ($session->speed_gain ?? 0)
                 + ($session->stamina_gain ?? 0)
                 + ($session->power_gain ?? 0)
                 + ($session->guts_gain ?? 0)
@@ -873,8 +859,7 @@ class BenchmarkingService
      * @param  array<float|int>  $values
      * @return array{mean: float, median: float, std_dev: float, min: float|int, max: float|int}
      */
-    protected function calculateStatistics(array $values): array
-    {
+    protected function calculateStatistics(): array
         if (empty($values)) {
             return ['mean' => 0.0, 'median' => 0.0, 'std_dev' => 0.0, 'min' => 0, 'max' => 0];
         }
@@ -909,8 +894,7 @@ class BenchmarkingService
      * @param  array<int>  $percentiles
      * @return array<int, float>
      */
-    protected function calculatePercentiles(array $values, array $percentiles): array
-    {
+    protected function calculatePercentiles(): array
         if (empty($values)) {
             return array_fill_keys($percentiles, 0.0);
         }
@@ -982,8 +966,7 @@ class BenchmarkingService
      *
      * @return array{error: string, message: string, current_sample_size: int, required_sample_size: int}
      */
-    protected function getInsufficientBenchmarkData(int $currentSize): array
-    {
+    protected function getInsufficientBenchmarkData(): array
         return [
             'error' => 'insufficient_data',
             'message' => 'At least '.self::MIN_BENCHMARK_SAMPLE.' completed careers are required for benchmarking.',
@@ -998,7 +981,6 @@ class BenchmarkingService
      * @return array{error: string, message: string}
      */
     protected function getNoUserDataResult(): array
-    {
         return [
             'error' => 'no_user_data',
             'message' => 'No completed careers found for this user.',
@@ -1019,7 +1001,7 @@ class BenchmarkingService
         Cache::forget('benchmarks:trends');
 
         if ($user) {
-            Cache::forget("benchmarks:user_comparison:{$user->id}");
+            Cache::forget("benchmarks:user_comparison:{$user?->id ?? throw new \Exception('User required')}");
         }
     }
 }

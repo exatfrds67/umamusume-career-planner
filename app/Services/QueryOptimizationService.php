@@ -210,7 +210,6 @@ class QueryOptimizationService
      * @return array<string, array{table: string, columns: array<string>, reason: string, priority: string, estimated_improvement: string}>
      */
     public function analyzeAndRecommendIndexes(): array
-    {
         $this->indexRecommendations = [];
 
         foreach ($this->queryStats as $hash => $stats) {
@@ -306,8 +305,7 @@ class QueryOptimizationService
      *
      * @return array<string>
      */
-    private function extractIndexableColumns(string $sql): array
-    {
+    private function extractIndexableColumns(): array
         $columns = [];
 
         // Extract columns from WHERE clause
@@ -413,7 +411,7 @@ class QueryOptimizationService
         $prefix = config('query-optimization.cache.prefix', 'query_cache:');
 
         // For Redis, use pattern-based deletion
-        if (config('cache.default') === 'redis' && config('query-optimization.cache.driver') === 'redis') {
+        if (config('cache.default', '') === 'redis' && config('query-optimization.cache.driver', '') === 'redis') {
             try {
                 $pattern = $prefix.$table.':*';
                 $store = Cache::store('redis')->getStore();
@@ -454,7 +452,6 @@ class QueryOptimizationService
      * @return array<int, array{sql: string, bindings: array<mixed>, time: float, connection: string, timestamp: int}>
      */
     public function getSlowQueries(): array
-    {
         return $this->slowQueries;
     }
 
@@ -464,7 +461,6 @@ class QueryOptimizationService
      * @return array<string, array{sql: string, count: int, total_time: float, avg_time: float, max_time: float, min_time: float}>
      */
     public function getQueryStats(): array
-    {
         return $this->queryStats;
     }
 
@@ -474,7 +470,6 @@ class QueryOptimizationService
      * @return array{hits: int, misses: int, total: int, hit_rate: float}
      */
     public function getCacheStats(): array
-    {
         $hitRate = $this->cacheStats['total'] > 0
             ? ($this->cacheStats['hits'] / $this->cacheStats['total']) * 100
             : 0.0;
@@ -491,7 +486,6 @@ class QueryOptimizationService
      * @return array{total_queries: int, slow_queries: int, avg_query_time: float, cache_hit_rate: float, recommendations_count: int}
      */
     public function getPerformanceMetrics(): array
-    {
         $totalQueries = count($this->executedQueries);
         $slowQueries = count($this->slowQueries);
 
@@ -514,8 +508,7 @@ class QueryOptimizationService
      *
      * @return array<int, array<string, mixed>>
      */
-    public function explainQuery(string $sql): array
-    {
+    public function explainQuery(): array
         try {
             $results = DB::select('EXPLAIN '.$sql);
 
@@ -535,8 +528,7 @@ class QueryOptimizationService
      *
      * @return array{table: string, existing_indexes: array<string>, missing_indexes: array<string>, recommendations: array<string>}
      */
-    public function analyzeTableIndexes(string $table): array
-    {
+    public function analyzeTableIndexes(): array
         $existingIndexes = [];
         $missingIndexes = [];
         $recommendations = [];
@@ -594,7 +586,6 @@ class QueryOptimizationService
      * @return array<string>
      */
     public function generateIndexSQL(): array
-    {
         $sqlStatements = [];
 
         foreach ($this->indexRecommendations as $recommendation) {
@@ -620,7 +611,6 @@ class QueryOptimizationService
      * @return array<string, array{query: string, count: int, potential_n_plus_1: bool}>
      */
     public function detectNPlusOneQueries(): array
-    {
         $potentialIssues = [];
 
         // Group queries by normalized pattern

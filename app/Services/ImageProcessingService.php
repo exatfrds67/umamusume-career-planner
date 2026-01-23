@@ -51,38 +51,44 @@ class ImageProcessingService
      *
      * @return array{valid: bool, error: string|null}
      */
-    public function validateImage(UploadedFile $file): array
-    {
+    public function validateImage(): array
         // Check file size
+        /** @var int $maxSize */
         $maxSize = config('services.image_processing.max_file_size', 10485760);
+        $maxSize = \is_int($maxSize) ? $maxSize : 10485760;
         if ($file->getSize() > $maxSize) {
             return [
                 'valid' => false,
-                'error' => sprintf('File size exceeds maximum allowed size of %s MB', $maxSize / 1048576),
+                'error' => \sprintf('File size exceeds maximum allowed size of %s MB', $maxSize / 1048576),
             ];
         }
 
         // Check MIME type
         $mimeType = $file->getMimeType();
-        if (! in_array($mimeType, self::ALLOWED_MIME_TYPES)) {
+        if (! \in_array($mimeType, self::ALLOWED_MIME_TYPES, true)) {
             return [
                 'valid' => false,
-                'error' => sprintf('Invalid file type: %s. Allowed types: %s', $mimeType, implode(', ', self::ALLOWED_MIME_TYPES)),
+                'error' => \sprintf('Invalid file type: %s. Allowed types: %s', $mimeType, implode(', ', self::ALLOWED_MIME_TYPES)),
             ];
         }
 
         // Check file extension
+        /** @var array<int, string> $allowedExtensions */
         $allowedExtensions = config('services.image_processing.allowed_formats', ['jpg', 'jpeg', 'png', 'webp']);
+        $allowedExtensions = \is_array($allowedExtensions) ? $allowedExtensions : ['jpg', 'jpeg', 'png', 'webp'];
         $extension = strtolower($file->getClientOriginalExtension());
-        if (! in_array($extension, $allowedExtensions)) {
+        if (! \in_array($extension, $allowedExtensions, true)) {
             return [
                 'valid' => false,
-                'error' => sprintf('Invalid file extension: %s. Allowed extensions: %s', $extension, implode(', ', $allowedExtensions)),
+                'error' => \sprintf('Invalid file extension: %s. Allowed extensions: %s', $extension, implode(', ', $allowedExtensions)),
             ];
         }
 
         // Security scan if enabled
-        if (config('services.image_processing.security_scan_enabled', true)) {
+        /** @var bool $securityScanEnabled */
+        $securityScanEnabled = config('services.image_processing.security_scan_enabled', true);
+        $securityScanEnabled = \is_bool($securityScanEnabled) ? $securityScanEnabled : true;
+        if ($securityScanEnabled) {
             $securityCheck = $this->performSecurityScan($file);
             if (! $securityCheck['safe']) {
                 return [
@@ -104,22 +110,30 @@ class ImageProcessingService
 
             [$width, $height] = $imageInfo;
 
+            /** @var int $minWidth */
             $minWidth = config('services.image_processing.min_width', 320);
+            $minWidth = \is_int($minWidth) ? $minWidth : 320;
+            /** @var int $minHeight */
             $minHeight = config('services.image_processing.min_height', 240);
+            $minHeight = \is_int($minHeight) ? $minHeight : 240;
+            /** @var int $maxWidth */
             $maxWidth = config('services.image_processing.max_width', 4096);
+            $maxWidth = \is_int($maxWidth) ? $maxWidth : 4096;
+            /** @var int $maxHeight */
             $maxHeight = config('services.image_processing.max_height', 4096);
+            $maxHeight = \is_int($maxHeight) ? $maxHeight : 4096;
 
             if ($width < $minWidth || $height < $minHeight) {
                 return [
                     'valid' => false,
-                    'error' => sprintf('Image dimensions too small. Minimum: %dx%d, Got: %dx%d', $minWidth, $minHeight, $width, $height),
+                    'error' => \sprintf('Image dimensions too small. Minimum: %dx%d, Got: %dx%d', $minWidth, $minHeight, $width, $height),
                 ];
             }
 
             if ($width > $maxWidth || $height > $maxHeight) {
                 return [
                     'valid' => false,
-                    'error' => sprintf('Image dimensions too large. Maximum: %dx%d, Got: %dx%d', $maxWidth, $maxHeight, $width, $height),
+                    'error' => \sprintf('Image dimensions too large. Maximum: %dx%d, Got: %dx%d', $maxWidth, $maxHeight, $width, $height),
                 ];
             }
         } catch (\Exception $e) {
@@ -142,8 +156,7 @@ class ImageProcessingService
      *
      * @return array{safe: bool, reason: string|null}
      */
-    protected function performSecurityScan(UploadedFile $file): array
-    {
+    protected function performSecurityScan(): array
         try {
             // Read first 1KB of file for signature detection
             $handle = fopen($file->getRealPath(), 'rb');
@@ -153,6 +166,10 @@ class ImageProcessingService
 
             $header = fread($handle, 1024);
             fclose($handle);
+
+            if ($header === false) {
+                return ['safe' => false, 'reason' => 'Unable to read file header'];
+            }
 
             // Check for suspicious signatures
             foreach (self::SUSPICIOUS_SIGNATURES as $signature) {
@@ -189,8 +206,7 @@ class ImageProcessingService
      * @param  string  $imagePath  Path to image file
      * @return array{success: bool, processed_path: string|null, error: string|null}
      */
-    public function preprocessForOCR(string $imagePath): array
-    {
+    public function preprocessForOCR(): array
         try {
             // Load image
             $image = $this->loadImage($imagePath);
@@ -209,8 +225,12 @@ class ImageProcessingService
             $height = imagesy($image);
 
             // Resize if needed
+            /** @var int $maxWidth */
             $maxWidth = config('services.opencv.preprocessing.resize_max_width', 1920);
+            $maxWidth = \is_int($maxWidth) ? $maxWidth : 1920;
+            /** @var int $maxHeight */
             $maxHeight = config('services.opencv.preprocessing.resize_max_height', 1080);
+            $maxHeight = \is_int($maxHeight) ? $maxHeight : 1080;
 
             if ($width > $maxWidth || $height > $maxHeight) {
                 $image = $this->resizeImage($image, $maxWidth, $maxHeight);
@@ -220,12 +240,18 @@ class ImageProcessingService
             imagefilter($image, IMG_FILTER_GRAYSCALE);
 
             // Enhance contrast if enabled
-            if (config('services.opencv.preprocessing.contrast_enhancement', true)) {
+            /** @var bool $contrastEnhancement */
+            $contrastEnhancement = config('services.opencv.preprocessing.contrast_enhancement', true);
+            $contrastEnhancement = \is_bool($contrastEnhancement) ? $contrastEnhancement : true;
+            if ($contrastEnhancement) {
                 imagefilter($image, IMG_FILTER_CONTRAST, -20);
             }
 
             // Sharpen if enabled
-            if (config('services.opencv.preprocessing.sharpen_enabled', true)) {
+            /** @var bool $sharpenEnabled */
+            $sharpenEnabled = config('services.opencv.preprocessing.sharpen_enabled', true);
+            $sharpenEnabled = \is_bool($sharpenEnabled) ? $sharpenEnabled : true;
+            if ($sharpenEnabled) {
                 $this->sharpenImage($image);
             }
 
@@ -293,14 +319,14 @@ class ImageProcessingService
         $width = imagesx($image);
         $height = imagesy($image);
 
-        if ($width <= 0 || $height <= 0) {
-            return $image;
-        }
-
         // Calculate new dimensions maintaining aspect ratio
         $ratio = min($maxWidth / $width, $maxHeight / $height);
-        $newWidth = max(1, (int) ($width * $ratio));
-        $newHeight = max(1, (int) ($height * $ratio));
+        $newWidth = (int) ($width * $ratio);
+        $newHeight = (int) ($height * $ratio);
+
+        // Ensure dimensions are at least 1
+        $newWidth = max(1, $newWidth);
+        $newHeight = max(1, $newHeight);
 
         // Create new image
         $resized = imagecreatetruecolor($newWidth, $newHeight);
@@ -354,7 +380,9 @@ class ImageProcessingService
     protected function reduceNoise(\GdImage $image): void
     {
         // Apply Gaussian blur for noise reduction
+        /** @var int $strength */
         $strength = config('services.opencv.preprocessing.denoise_strength', 10);
+        $strength = \is_int($strength) ? $strength : 10;
 
         // Light smoothing
         if ($strength > 0) {
@@ -365,19 +393,21 @@ class ImageProcessingService
     /**
      * Save processed image
      *
-     * @param  resource  $image  GD image resource
+     * @param  \GdImage  $image  GD image resource
      * @return string|null Path to saved image
      */
-    protected function saveProcessedImage($image, string $originalPath): ?string
+    protected function saveProcessedImage(\GdImage $image, string $originalPath): ?string
     {
         try {
             // Generate processed filename
             $pathInfo = pathinfo($originalPath);
-            $processedFilename = $pathInfo['filename'].'_processed.'.$pathInfo['extension'];
-            $processedPath = $pathInfo['dirname'].'/'.$processedFilename;
+            $extension = $pathInfo['extension'] ?? 'jpg';
+            $dirname = $pathInfo['dirname'] ?? dirname($originalPath);
+            $processedFilename = $pathInfo['filename'].'_processed.'.$extension;
+            $processedPath = $dirname.'/'.$processedFilename;
 
             // Save based on extension
-            $success = match (strtolower($pathInfo['extension'])) {
+            $success = match (strtolower($extension)) {
                 'jpg', 'jpeg' => imagejpeg($image, $processedPath, 95),
                 'png' => imagepng($image, $processedPath, 9),
                 'webp' => imagewebp($image, $processedPath, 95),
@@ -400,7 +430,12 @@ class ImageProcessingService
      */
     public function calculateImageHash(string $imagePath): string
     {
-        return hash_file('sha256', $imagePath);
+        $hash = hash_file('sha256', $imagePath);
+        if ($hash === false) {
+            throw new \RuntimeException('Failed to calculate image hash');
+        }
+
+        return $hash;
     }
 
     /**

@@ -6,7 +6,6 @@ use App\Models\Character;
 use App\Models\Skill;
 use App\Models\SkillAcquisition;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -75,7 +74,7 @@ class SkillEvolutionService
         // Check prerequisite skills (if any)
         if (! empty($evolutionTarget->synergy_skills)) {
             $prerequisiteSkills = Skill::whereIn('internal_id', $evolutionTarget->synergy_skills)
-                ->where('rarity', 'normal')
+                ->where('rarity', '=', 'normal')
                 ->pluck('id');
 
             if ($prerequisiteSkills->isNotEmpty()) {
@@ -98,8 +97,7 @@ class SkillEvolutionService
      *
      * @return array<string, mixed>
      */
-    public function evolveSkill(Character $character, Skill $normalSkill): array
-    {
+    public function evolveSkill(): array
         if (! $this->canEvolve($character, $normalSkill)) {
             return [
                 'success' => false,
@@ -117,74 +115,72 @@ class SkillEvolutionService
             ];
         }
 
-        return DB::transaction(function () use ($character, $normalSkill, $rareSkill) {
-            // Deactivate the Normal skill acquisition
-            $normalAcquisition = SkillAcquisition::where('character_id', $character->id)
-                ->where('skill_id', $normalSkill->id)
-                ->where('is_active', true)
-                ->first();
+        // Deactivate the Normal skill acquisition
+        $normalAcquisition = SkillAcquisition::where('character_id', $character->id)
+            ->where('skill_id', $normalSkill->id)
+            ->where('is_active', true)
+            ->first();
 
-            if ($normalAcquisition) {
-                $normalAcquisition->update(['is_active' => false]);
-            }
+        if ($normalAcquisition) {
+            $normalAcquisition->update(['is_active' => false]);
+        }
 
-            // Get hints for the Rare skill
-            $rareHints = $this->hintService->getUnusedHintsForSkill($character, $rareSkill);
-            $hintCount = $rareHints->count();
-            $discountPercentage = $this->hintService->calculateDiscountPercentage($hintCount);
-            $finalCost = $this->hintService->calculateFinalCost($rareSkill, $hintCount);
-            $spSaved = $this->hintService->calculateSpSaved($rareSkill, $hintCount);
+        // Get hints for the Rare skill
+        $rareHints = $this->hintService->getUnusedHintsForSkill($character, $rareSkill);
+        $hintCount = $rareHints->count();
+        $discountPercentage = $this->hintService->calculateDiscountPercentage($hintCount);
+        $finalCost = $this->hintService->calculateFinalCost($rareSkill, $hintCount);
+        $spSaved = $this->hintService->calculateSpSaved($rareSkill, $hintCount);
 
-            // Create new acquisition for the Rare skill
-            $rareAcquisition = SkillAcquisition::create([
-                'character_id' => $character->id,
-                'skill_id' => $rareSkill->id,
-                'career_id' => $normalAcquisition?->career_id,
-                'turn_acquired' => $normalAcquisition?->turn_acquired,
-                'career_phase' => $normalAcquisition?->career_phase ?? 'evolution',
-                'acquisition_method' => 'evolution',
-                'base_sp_cost' => $rareSkill->base_sp_cost,
-                'hints_used' => $hintCount,
-                'total_discount_percentage' => $discountPercentage,
-                'final_sp_cost' => $finalCost,
-                'sp_saved' => $spSaved,
-                'is_evolution' => true,
-                'evolved_from_skill_id' => $normalSkill->id,
-                'replaced_skill' => true,
-                'acquisition_context' => [
-                    'evolution_type' => 'automatic',
-                    'normal_skill_id' => $normalSkill->id,
-                    'normal_skill_name' => $normalSkill->name,
-                    'rare_skill_id' => $rareSkill->id,
-                    'rare_skill_name' => $rareSkill->name,
-                ],
-                'hint_sources' => $rareHints->pluck('source_name')->toArray(),
-                'priority_level' => 'high',
-                'is_active' => true,
-            ]);
+        // Create new acquisition for the Rare skill
+        $rareAcquisition = SkillAcquisition::create([
+            'character_id' => $character->id,
+            'skill_id' => $rareSkill->id,
+            'career_id' => $normalAcquisition?->career_id,
+            'turn_acquired' => $normalAcquisition?->turn_acquired,
+            'career_phase' => $normalAcquisition?->career_phase ?? $character->career_stage,
+            'acquisition_method' => 'evolution',
+            'base_sp_cost' => $rareSkill->base_sp_cost,
+            'hints_used' => $hintCount,
+            'total_discount_percentage' => $discountPercentage,
+            'final_sp_cost' => $finalCost,
+            'sp_saved' => $spSaved,
+            'is_evolution' => true,
+            'evolved_from_skill_id' => $normalSkill->id,
+            'replaced_skill' => true,
+            'acquisition_context' => [
+                'evolution_type' => 'automatic',
+                'normal_skill_id' => $normalSkill->id,
+                'normal_skill_name' => $normalSkill->name,
+                'rare_skill_id' => $rareSkill->id,
+                'rare_skill_name' => $rareSkill->name,
+            ],
+            'hint_sources' => $rareHints->pluck('source_name')->toArray(),
+            'priority_level' => 'high',
+            'is_active' => true,
+        ]);
 
-            // Mark hints as used
-            $this->hintService->markHintsAsUsed($character, $rareSkill);
+        // Mark hints as used
+        $this->hintService->markHintsAsUsed($character, $rareSkill);
 
-            Log::info('Skill evolved successfully', [
-                'character_id' => $character->id,
-                'normal_skill' => $normalSkill->name,
-                'rare_skill' => $rareSkill->name,
-                'sp_cost' => $finalCost,
-                'sp_saved' => $spSaved,
-            ]);
+        Log::info('Skill evolved successfully', [
+            'character_id' => $character->id,
+            'normal_skill' => $normalSkill->name,
+            'rare_skill' => $rareSkill->name,
+            'sp_cost' => $finalCost,
+            'sp_saved' => $spSaved,
+        ]);
 
-            return [
-                'success' => true,
-                'message' => "Successfully evolved {$normalSkill->name} to {$rareSkill->name}",
-                'normal_skill' => $normalSkill,
-                'rare_skill' => $rareSkill,
-                'acquisition' => $rareAcquisition,
-                'sp_cost' => $finalCost,
-                'sp_saved' => $spSaved,
-                'hints_used' => $hintCount,
-            ];
-        });
+        return [
+            'success' => true,
+            'message' => "Successfully evolved {$normalSkill->name} to {$rareSkill->name}",
+            'normal_skill' => $normalSkill,
+            'rare_skill' => $rareSkill,
+            'acquisition' => $rareAcquisition,
+            'sp_cost' => $finalCost,
+            'sp_saved' => $spSaved,
+            'hints_used' => $hintCount,
+        ];
     }
 
     /**
@@ -224,7 +220,7 @@ class SkillEvolutionService
         // Check prerequisite skills
         if (! empty($evolutionTarget->synergy_skills)) {
             $prerequisiteSkills = Skill::whereIn('internal_id', $evolutionTarget->synergy_skills)
-                ->where('rarity', 'normal')
+                ->where('rarity', '=', 'normal')
                 ->get();
 
             if ($prerequisiteSkills->isNotEmpty()) {
@@ -251,11 +247,10 @@ class SkillEvolutionService
 
     /**
      * Calculate SP efficiency: evolution vs direct acquisition.
+     *
+     * @return array<string, mixed>
      */
-    public function calculateEvolutionEfficiency(
-        Character $character,
-        Skill $normalSkill
-    ): array {
+    public function calculateEvolutionEfficiency(): array
         $rareSkill = $normalSkill->evolutionTarget;
 
         if (! $rareSkill) {
@@ -320,12 +315,13 @@ class SkillEvolutionService
 
     /**
      * Get all available evolution opportunities for a character.
+     *
+     * @return array<int, array<string, mixed>>
      */
-    public function getEvolutionOpportunities(Character $character): array
-    {
+    public function getEvolutionOpportunities(): array
         // Get all Normal skills that can evolve
         $evolvableSkills = Skill::where('can_evolve', true)
-            ->where('rarity', 'normal')
+            ->where('rarity', '=', 'normal')
             ->with('evolutionTarget')
             ->get();
 
@@ -352,6 +348,8 @@ class SkillEvolutionService
 
     /**
      * Calculate evolution priority score.
+     *
+     * @param  array<string, mixed>  $efficiency
      */
     private function calculateEvolutionPriority(Skill $skill, array $efficiency, bool $canEvolve): int
     {
@@ -359,26 +357,27 @@ class SkillEvolutionService
 
         // Can evolve now gets highest priority
         if ($canEvolve) {
-            $priority += 100;
+            $priority = ($priority ?? 0) + 100;
         }
 
         // SP savings bonus
         if (isset($efficiency['comparison']['sp_savings']) && $efficiency['comparison']['sp_savings'] > 0) {
-            $priority += min(50, $efficiency['comparison']['sp_savings']);
+            $priority = ($priority ?? 0) + min(50, $efficiency['comparison']['sp_savings']);
         }
 
         // Meta tier bonus
         $metaTierBonus = ['S+' => 30, 'S' => 25, 'A' => 20, 'B' => 10, 'C' => 5];
-        $priority += $metaTierBonus[$skill->meta_tier] ?? 0;
+        $priority = ($priority ?? 0) + $metaTierBonus[$skill->meta_tier] ?? 0;
 
         return $priority;
     }
 
     /**
      * Get evolution chain for a skill (all related skills in evolution path).
+     *
+     * @return array<int, array<string, mixed>>
      */
-    public function getEvolutionChain(Skill $skill): array
-    {
+    public function getEvolutionChain(): array
         $chain = [];
 
         // Get the source (Normal) skill
@@ -419,9 +418,11 @@ class SkillEvolutionService
 
     /**
      * Plan optimal skill evolution timing for a character.
+     *
+     * @param  Collection<int, Skill>  $targetSkills
+     * @return array<int, array<string, mixed>>
      */
-    public function planEvolutionTiming(Character $character, Collection $targetSkills): array
-    {
+    public function planEvolutionTiming(): array
         $plan = [];
 
         foreach ($targetSkills as $skill) {
@@ -465,9 +466,10 @@ class SkillEvolutionService
 
     /**
      * Get comprehensive evolution roadmap for a character.
+     *
+     * @return array<string, mixed>
      */
-    public function getEvolutionRoadmap(Character $character): array
-    {
+    public function getEvolutionRoadmap(): array
         $opportunities = $this->getEvolutionOpportunities($character);
 
         // Separate into categories
@@ -497,9 +499,12 @@ class SkillEvolutionService
 
     /**
      * Generate recommendations for evolution roadmap.
+     *
+     * @param  array<int, array<string, mixed>>  $readyToEvolve
+     * @param  array<int, array<string, mixed>>  $pendingPrerequisites
+     * @return array<int, array<string, mixed>>
      */
-    private function generateRoadmapRecommendations(array $readyToEvolve, array $pendingPrerequisites): array
-    {
+    private function generateRoadmapRecommendations(): array
         $recommendations = [];
 
         if (! empty($readyToEvolve)) {

@@ -55,7 +55,6 @@ class PerformanceRegressionService
      * @return array{checked: int, detected: int, regressions: array<int, array<string, mixed>>}
      */
     public function checkRegressions(): array
-    {
         if (! config('apm.regression.enabled', true)) {
             return ['checked' => 0, 'detected' => 0, 'regressions' => []];
         }
@@ -65,34 +64,34 @@ class PerformanceRegressionService
         $regressions = [];
 
         // Check response time regression
-        $checked++;
+        $checked = ($checked ?? 0) + 1;
         $responseTimeRegression = $this->checkMetricRegression('response_time');
         if ($responseTimeRegression !== null) {
-            $detected++;
+            $detected = ($detected ?? 0) + 1;
             $regressions[] = $responseTimeRegression;
         }
 
         // Check error rate regression
-        $checked++;
+        $checked = ($checked ?? 0) + 1;
         $errorRateRegression = $this->checkMetricRegression('error_rate');
         if ($errorRateRegression !== null) {
-            $detected++;
+            $detected = ($detected ?? 0) + 1;
             $regressions[] = $errorRateRegression;
         }
 
         // Check throughput regression
-        $checked++;
+        $checked = ($checked ?? 0) + 1;
         $throughputRegression = $this->checkMetricRegression('throughput');
         if ($throughputRegression !== null) {
-            $detected++;
+            $detected = ($detected ?? 0) + 1;
             $regressions[] = $throughputRegression;
         }
 
         // Check memory usage regression
-        $checked++;
+        $checked = ($checked ?? 0) + 1;
         $memoryRegression = $this->checkMetricRegression('memory_usage');
         if ($memoryRegression !== null) {
-            $detected++;
+            $detected = ($detected ?? 0) + 1;
             $regressions[] = $memoryRegression;
         }
 
@@ -169,8 +168,7 @@ class PerformanceRegressionService
      *
      * @return array<int, array<string, mixed>>
      */
-    public function getRegressions(int $limit = 100): array
-    {
+    public function getRegressions(): array
         $regressions = Cache::get(self::REGRESSION_PREFIX.'list', []);
 
         // Sort by detected_at descending
@@ -185,7 +183,6 @@ class PerformanceRegressionService
      * @return array<int, array<string, mixed>>
      */
     public function getActiveRegressions(): array
-    {
         $regressions = $this->getRegressions();
 
         return array_values(array_filter(
@@ -229,7 +226,6 @@ class PerformanceRegressionService
      * @return array{total: int, active: int, resolved: int, by_metric: array<string, int>, avg_deviation: float}
      */
     public function getRegressionStatistics(): array
-    {
         $regressions = $this->getRegressions();
 
         $active = 0;
@@ -239,13 +235,13 @@ class PerformanceRegressionService
 
         foreach ($regressions as $regression) {
             if ($regression['status'] === self::STATUS_DETECTED || $regression['status'] === self::STATUS_INVESTIGATING) {
-                $active++;
+                $active = ($active ?? 0) + 1;
             } elseif ($regression['status'] === self::STATUS_RESOLVED) {
-                $resolved++;
+                $resolved = ($resolved ?? 0) + 1;
             }
 
             $byMetric[$regression['metric']] = ($byMetric[$regression['metric']] ?? 0) + 1;
-            $totalDeviation += abs($regression['deviation_percent']);
+            $totalDeviation = ($totalDeviation ?? 0) + abs($regression['deviation_percent']);
         }
 
         return [
@@ -270,7 +266,6 @@ class PerformanceRegressionService
      * }
      */
     public function generateReport(): array
-    {
         $activeRegressions = $this->getActiveRegressions();
         $statistics = $this->getRegressionStatistics();
 
@@ -351,8 +346,7 @@ class PerformanceRegressionService
      *
      * @return array<string, mixed>
      */
-    protected function createRegression(string $metric, float $baseline, float $current, float $deviation): array
-    {
+    protected function createRegression(): array
         $regression = [
             'id' => uniqid('reg_', true),
             'metric' => $metric,
@@ -459,7 +453,7 @@ class PerformanceRegressionService
 
         $sumSquaredDiff = 0.0;
         foreach ($values as $value) {
-            $sumSquaredDiff += ($value - $mean) ** 2;
+            $sumSquaredDiff = ($sumSquaredDiff ?? 0) + ($value - $mean) ** 2;
         }
 
         return sqrt($sumSquaredDiff / ($count - 1));
@@ -470,8 +464,7 @@ class PerformanceRegressionService
      *
      * @return array<int, array{value: float, recorded_at: string}>
      */
-    protected function getHistoricalData(string $metric, int $hours): array
-    {
+    protected function getHistoricalData(): array
         $data = [];
 
         for ($i = $hours - 1; $i >= 0; $i--) {
@@ -489,8 +482,7 @@ class PerformanceRegressionService
      * @param  array<int, array<string, mixed>>  $regressions
      * @return array<int, string>
      */
-    protected function generateRecommendations(array $regressions): array
-    {
+    protected function generateRecommendations(): array
         $recommendations = [];
 
         foreach ($regressions as $regression) {

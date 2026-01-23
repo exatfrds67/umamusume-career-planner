@@ -320,8 +320,7 @@ class DeckManagementService
     /**
      * Get deck statistics
      */
-    public function getDeckStatistics(int $characterId): array
-    {
+    public function getDeckStatistics(): array
         $deck = $this->getDeck($characterId);
 
         $stats = [
@@ -360,8 +359,7 @@ class DeckManagementService
     /**
      * Check if deck is valid (has exactly 6 cards with proper constraints)
      */
-    public function validateDeck(int $characterId): array
-    {
+    public function validateDeck(): array
         $deck = $this->getDeck($characterId);
 
         $validation = [

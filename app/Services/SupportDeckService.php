@@ -18,11 +18,12 @@ class SupportDeckService
      * Validate deck composition
      *
      * @param  array<int, array{support_card_id: int, is_friend_card: bool}>  $cards
-     * @return array{valid: bool, errors: array<string>, warnings: array<string>}
+     * @return array{valid: bool, errors: array<int, string>, warnings: array<int, string>}
      */
-    public function validateDeck(array $cards): array
-    {
+    public function validateDeck(): array
+        /** @var array<int, string> $errors */
         $errors = [];
+        /** @var array<int, string> $warnings */
         $warnings = [];
 
         // Validate count
@@ -47,9 +48,11 @@ class SupportDeckService
         }
 
         // Load cards to check specialization diversity
+        /** @var array<int> $cardIds */
         $cardIds = collect($cards)->pluck('support_card_id')->unique()->toArray();
         $supportCards = SupportCardDefinition::whereIn('id', $cardIds)->get();
 
+        /** @var array<int, string> $specializations */
         $specializations = $supportCards->pluck('card_type')->toArray();
         $uniqueSpecs = count(array_unique($specializations));
 
@@ -58,6 +61,7 @@ class SupportDeckService
         }
 
         // Check for excessive same-type cards
+        /** @var array<string, int> $typeCounts */
         $typeCounts = array_count_values($specializations);
         foreach ($typeCounts as $type => $count) {
             if ($count > 2 && $type !== 'friend') {
@@ -166,8 +170,8 @@ class SupportDeckService
         foreach ($deck as $characterCard) {
             if ($characterCard->supportCard) {
                 $tier = $characterCard->supportCard->meta_tier;
-                $totalScore += $tierScores[$tier] ?? 0;
-                $cardCount++;
+                $totalScore = ($totalScore ?? 0) + $tierScores[$tier] ?? 0;
+                $cardCount = ($cardCount ?? 0) + 1;
             }
         }
 

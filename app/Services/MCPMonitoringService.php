@@ -15,8 +15,7 @@ class MCPMonitoringService
     /**
      * Get comprehensive MCP dashboard data.
      */
-    public function getDashboardData(int $userId): array
-    {
+    public function getDashboardData(): array
         return [
             'servers' => $this->getServerStatus(),
             'agents' => $this->getAgentStatus($userId),
@@ -30,14 +29,13 @@ class MCPMonitoringService
      * Get server status information.
      */
     public function getServerStatus(): array
-    {
         $servers = MCPServer::all();
 
         return [
             'total' => $servers->count(),
-            'active' => $servers->where('status', 'active')->count(),
-            'inactive' => $servers->where('status', 'inactive')->count(),
-            'error' => $servers->where('status', 'error')->count(),
+            'active' => $servers->where('status', '=', 'active')->count(),
+            'inactive' => $servers->where('status', '=', 'inactive')->count(),
+            'error' => $servers->where('status', '=', 'error')->count(),
             'servers' => $servers->map(function ($server) {
                 return [
                     'id' => $server->id,
@@ -58,8 +56,7 @@ class MCPMonitoringService
     /**
      * Get agent status information.
      */
-    public function getAgentStatus(?int $userId = null): array
-    {
+    public function getAgentStatus(): array
         $query = MCPAgent::query();
 
         if ($userId) {
@@ -70,9 +67,9 @@ class MCPMonitoringService
 
         return [
             'total' => $agents->count(),
-            'active' => $agents->where('status', 'active')->count(),
-            'terminated' => $agents->where('status', 'terminated')->count(),
-            'healthy' => $agents->where('health_status', 'healthy')->count(),
+            'active' => $agents->where('status', '=', 'active')->count(),
+            'terminated' => $agents->where('status', '=', 'terminated')->count(),
+            'healthy' => $agents->where('health_status', '=', 'healthy')->count(),
             'agents' => $agents->map(function ($agent) {
                 return [
                     'id' => $agent->id,
@@ -94,8 +91,7 @@ class MCPMonitoringService
     /**
      * Get cost analytics.
      */
-    public function getCostAnalytics(int $userId, ?string $period = 'month'): array
-    {
+    public function getCostAnalytics(): array
         $startDate = match ($period) {
             'day' => now()->startOfDay(),
             'week' => now()->startOfWeek(),
@@ -157,8 +153,7 @@ class MCPMonitoringService
     /**
      * Get performance metrics.
      */
-    public function getPerformanceMetrics(int $userId, ?string $period = 'day'): array
-    {
+    public function getPerformanceMetrics(): array
         $startDate = match ($period) {
             'hour' => now()->subHour(),
             'day' => now()->startOfDay(),
@@ -170,13 +165,13 @@ class MCPMonitoringService
             ->betweenDates($startDate, now())
             ->get();
 
-        $successfulRequests = $toolUsage->where('execution_status', 'success')->count();
-        $failedRequests = $toolUsage->where('execution_status', 'failure')->count();
+        $successfulRequests = $toolUsage->where('execution_status', '=', 'success')->count();
+        $failedRequests = $toolUsage->where('execution_status', '=', 'failure')->count();
         $totalRequests = $toolUsage->count();
 
         // Performance by server
         $performanceByServer = $toolUsage->groupBy('server_name')->map(function ($items, $serverName) {
-            $successful = $items->where('execution_status', 'success')->count();
+            $successful = $items->where('execution_status', '=', 'success')->count();
             $total = $items->count();
 
             return [
@@ -212,8 +207,7 @@ class MCPMonitoringService
     /**
      * Get optimization recommendations.
      */
-    public function getOptimizationRecommendations(int $userId): array
-    {
+    public function getOptimizationRecommendations(): array
         $recommendations = [];
 
         // Check for underperforming servers
@@ -257,7 +251,7 @@ class MCPMonitoringService
 
         // Check for inactive agents
         $inactiveAgents = MCPAgent::where('user_id', $userId)
-            ->where('status', 'active')
+            ->where('status', '=', 'active')
             ->where('last_health_check', '<', now()->subHours(24)->toDateTimeString())
             ->count();
 
@@ -277,8 +271,7 @@ class MCPMonitoringService
     /**
      * Connect to an MCP server.
      */
-    public function connectServer(int $serverId): array
-    {
+    public function connectServer(): array
         $server = MCPServer::findOrFail($serverId);
 
         try {
@@ -307,8 +300,7 @@ class MCPMonitoringService
     /**
      * Disconnect from an MCP server.
      */
-    public function disconnectServer(int $serverId): array
-    {
+    public function disconnectServer(): array
         $server = MCPServer::findOrFail($serverId);
 
         $server->status = 'inactive';
@@ -324,8 +316,7 @@ class MCPMonitoringService
     /**
      * Update server configuration.
      */
-    public function updateServerConfig(int $serverId, array $config): array
-    {
+    public function updateServerConfig(): array
         $server = MCPServer::findOrFail($serverId);
 
         $server->server_config = array_merge($server->server_config ?? [], $config);
@@ -363,8 +354,7 @@ class MCPMonitoringService
     /**
      * Terminate an agent.
      */
-    public function terminateAgent(int $agentId): array
-    {
+    public function terminateAgent(): array
         $agent = MCPAgent::findOrFail($agentId);
 
         $agent->status = 'terminated';
