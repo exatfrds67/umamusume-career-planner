@@ -78,7 +78,6 @@ abstract class ExternalAPIService
      * @return array<string, array{priority: int, base_url: string, timeout: int, rate_limit: int, enabled: bool}>
      */
     protected function getSortedApiSources(): array
-    {
         $sources = array_filter($this->apiSources, fn ($source) => $source['enabled'] ?? true);
 
         uasort($sources, fn ($a, $b) => ($a['priority'] ?? 999) <=> ($b['priority'] ?? 999));
@@ -92,12 +91,7 @@ abstract class ExternalAPIService
      * @param  array<string, mixed>  $params
      * @return array{success: bool, data: mixed, source: string, error?: string, metadata: array<string, mixed>}
      */
-    protected function fetchWithFallback(
-        string $endpoint,
-        string $method = 'GET',
-        array $params = [],
-        ?string $preferredSource = null
-    ): array {
+    protected function fetchWithFallback(): array
         $sources = $this->getSortedApiSources();
 
         // Try preferred source first if specified
@@ -165,12 +159,7 @@ abstract class ExternalAPIService
      * @param  array<string, mixed>  $params
      * @return array{success: bool, data: mixed, source: string, error?: string, metadata: array<string, mixed>}
      */
-    protected function fetchFromSource(
-        string $sourceName,
-        string $endpoint,
-        string $method = 'GET',
-        array $params = []
-    ): array {
+    protected function fetchFromSource(): array
         $sourceConfig = $this->apiSources[$sourceName] ?? null;
 
         if (! $sourceConfig) {
@@ -223,7 +212,7 @@ abstract class ExternalAPIService
 
             return [
                 'success' => true,
-                'data' => $response['data'] ?? $response['body'] ?? null,
+                'data' => $response['data'] ?? (is_array($response) && isset($response['body']) ? $response['body'] : null),
                 'source' => $sourceName,
                 'metadata' => [
                     'response_time_ms' => round($duration, 2),
@@ -263,12 +252,7 @@ abstract class ExternalAPIService
      * @param  array<string, mixed>  $params
      * @return array{success: bool, status: int, headers: array<string, string>, body: string, data?: mixed}
      */
-    protected function makeRequest(
-        string $url,
-        string $method = 'GET',
-        array $params = [],
-        int $timeout = self::DEFAULT_TIMEOUT
-    ): array {
+    protected function makeRequest(): array
         $headers = [
             'Accept' => 'application/json',
             'User-Agent' => 'UmamusumeCareerPlanner/1.0',
@@ -396,7 +380,7 @@ abstract class ExternalAPIService
     {
         $key = "circuit_breaker:{$sourceName}";
         $failures = Cache::get($key, 0);
-        $failures++;
+        $failures = ($failures ?? 0) + 1;
 
         Cache::put($key, $failures, self::CIRCUIT_BREAKER_RESET_TIME);
 
@@ -424,7 +408,6 @@ abstract class ExternalAPIService
      * @return array<string, array{failures: int, is_open: bool}>
      */
     public function getCircuitBreakerStatus(): array
-    {
         $status = [];
 
         foreach (array_keys($this->apiSources) as $sourceName) {
@@ -446,7 +429,6 @@ abstract class ExternalAPIService
      * @return array<string, array{priority: int, base_url: string, timeout: int, rate_limit: int, enabled: bool}>
      */
     public function getApiSources(): array
-    {
         return $this->apiSources;
     }
 
@@ -492,7 +474,6 @@ abstract class ExternalAPIService
      * @return array<string, array{enabled: bool, circuit_breaker_open: bool, priority: int}>
      */
     public function getHealthStatus(): array
-    {
         $status = [];
 
         foreach ($this->apiSources as $sourceName => $config) {

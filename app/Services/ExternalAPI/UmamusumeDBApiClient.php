@@ -67,8 +67,7 @@ class UmamusumeDBApiClient
      * @param  array<string, mixed>  $params
      * @return array{success: bool, data: array<string, mixed>|null, source: string, error?: string}
      */
-    public function getTrainingCalculation(array $params, bool $forceRefresh = false): array
-    {
+    public function getTrainingCalculation(): array
         $cacheKey = self::CACHE_PREFIX.'training:'.md5(json_encode($params) ?: '');
 
         if (! $forceRefresh && Cache::has($cacheKey)) {
@@ -118,8 +117,7 @@ class UmamusumeDBApiClient
      *
      * @return array{success: bool, data: array<int, array<string, mixed>>, source: string, error?: string}
      */
-    public function getMetaTierRankings(bool $forceRefresh = false): array
-    {
+    public function getMetaTierRankings(): array
         $cacheKey = self::CACHE_PREFIX.'meta:tier_rankings';
 
         if (! $forceRefresh && Cache::has($cacheKey)) {
@@ -171,8 +169,7 @@ class UmamusumeDBApiClient
      *
      * @return array{success: bool, data: array<int, array<string, mixed>>, source: string, error?: string}
      */
-    public function getCommunityBuilds(string $characterId, bool $forceRefresh = false): array
-    {
+    public function getCommunityBuilds(): array
         $cacheKey = self::CACHE_PREFIX."builds:{$characterId}";
 
         if (! $forceRefresh && Cache::has($cacheKey)) {
@@ -226,8 +223,7 @@ class UmamusumeDBApiClient
      *
      * @return array{success: bool, data: array<int, array<string, mixed>>, source: string, error?: string}
      */
-    public function getSkillEffectiveness(bool $forceRefresh = false): array
-    {
+    public function getSkillEffectiveness(): array
         $cacheKey = self::CACHE_PREFIX.'skills:effectiveness';
 
         if (! $forceRefresh && Cache::has($cacheKey)) {
@@ -280,8 +276,7 @@ class UmamusumeDBApiClient
      * @param  array<string, mixed>  $params
      * @return array{success: bool, data: array<string, mixed>|null, source: string, error?: string}
      */
-    public function getRaceStrategy(array $params, bool $forceRefresh = false): array
-    {
+    public function getRaceStrategy(): array
         $cacheKey = self::CACHE_PREFIX.'race_strategy:'.md5(json_encode($params));
 
         if (! $forceRefresh && Cache::has($cacheKey)) {
@@ -332,14 +327,13 @@ class UmamusumeDBApiClient
      * @param  array<string, mixed>  $params
      * @return array{success: bool, data: array<string, mixed>, error?: string}
      */
-    protected function makeRequestWithRetry(string $method, string $endpoint, array $params = []): array
-    {
+    protected function makeRequestWithRetry(): array
         $url = $this->baseUrl.$endpoint;
         $attempt = 0;
         $delay = self::INITIAL_RETRY_DELAY;
 
         while ($attempt < self::MAX_RETRIES) {
-            $attempt++;
+            $attempt = ($attempt ?? 0) + 1;
 
             try {
                 // Check if MCP fetch server is available for enhanced capabilities
@@ -392,8 +386,7 @@ class UmamusumeDBApiClient
      * @param  array<string, mixed>  $params
      * @return array{success: bool, data: array<string, mixed>, error?: string}
      */
-    protected function makeRequestViaMCP(string $method, string $url, array $params): array
-    {
+    protected function makeRequestViaMCP(): array
         // In production, this would use actual MCP fetch server
         // For now, we'll use the standard HTTP client as fallback
         Log::debug('[UmamusumeDBApiClient] MCP fetch server not yet implemented, using HTTP fallback');
@@ -407,8 +400,7 @@ class UmamusumeDBApiClient
      * @param  array<string, mixed>  $params
      * @return array{success: bool, data: array<string, mixed>, error?: string}
      */
-    protected function makeRequestViaHttp(string $method, string $url, array $params): array
-    {
+    protected function makeRequestViaHttp(): array
         $httpClient = Http::timeout($this->timeout)
             ->withHeaders([
                 'Accept' => 'application/json',
@@ -479,7 +471,6 @@ class UmamusumeDBApiClient
      * @return array{meta_tier_rankings: bool, skill_effectiveness: bool}
      */
     public function getCacheStatus(): array
-    {
         return [
             'meta_tier_rankings' => Cache::has(self::CACHE_PREFIX.'meta:tier_rankings'),
             'skill_effectiveness' => Cache::has(self::CACHE_PREFIX.'skills:effectiveness'),

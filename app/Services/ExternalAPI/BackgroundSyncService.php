@@ -84,8 +84,7 @@ class BackgroundSyncService
      *
      * @return array{processed: int, succeeded: int, failed: int, skipped: int}
      */
-    public function processSyncQueue(string $dataType): array
-    {
+    public function processSyncQueue(): array
         $queueKey = self::SYNC_QUEUE_KEY.$dataType;
         $processed = 0;
         $succeeded = 0;
@@ -99,11 +98,11 @@ class BackgroundSyncService
         // Process all jobs in queue
         while ($jobJson = Redis::lpop($queueKey)) {
             $job = json_decode($jobJson, true);
-            $processed++;
+            $processed = ($processed ?? 0) + 1;
 
             // Check if max retry attempts exceeded
             if ($job['attempts'] >= self::MAX_RETRY_ATTEMPTS) {
-                $skipped++;
+                $skipped = ($skipped ?? 0) + 1;
                 $this->recordSyncHistory($job, 'skipped', 'Max retry attempts exceeded');
 
                 continue;
@@ -113,10 +112,10 @@ class BackgroundSyncService
             $result = $this->syncData($job['data_type'], $job['options']);
 
             if ($result['success']) {
-                $succeeded++;
+                $succeeded = ($succeeded ?? 0) + 1;
                 $this->recordSyncHistory($job, 'succeeded', $result['message']);
             } else {
-                $failed++;
+                $failed = ($failed ?? 0) + 1;
                 $job['attempts']++;
 
                 // Re-queue if not max attempts
@@ -150,8 +149,7 @@ class BackgroundSyncService
      * @param  array<string, mixed>  $options
      * @return array{success: bool, message: string, data_count: int}
      */
-    public function syncData(string $dataType, array $options = []): array
-    {
+    public function syncData(): array
         Log::info('[BackgroundSync] Starting data sync', [
             'data_type' => $dataType,
             'options' => $options,
@@ -199,8 +197,7 @@ class BackgroundSyncService
      * @param  array<string, mixed>  $options
      * @return array{success: bool, message: string, data_count: int}
      */
-    protected function syncCharacters(array $options): array
-    {
+    protected function syncCharacters(): array
         $result = $this->apiFacade->getCharacters(true);
 
         if (! $result['success']) {
@@ -233,8 +230,7 @@ class BackgroundSyncService
      * @param  array<string, mixed>  $options
      * @return array{success: bool, message: string, data_count: int}
      */
-    protected function syncSupportCards(array $options): array
-    {
+    protected function syncSupportCards(): array
         $result = $this->apiFacade->getSupportCards(true);
 
         if (! $result['success']) {
@@ -267,8 +263,7 @@ class BackgroundSyncService
      * @param  array<string, mixed>  $options
      * @return array{success: bool, message: string, data_count: int}
      */
-    protected function syncMetaRankings(array $options): array
-    {
+    protected function syncMetaRankings(): array
         $result = $this->apiFacade->getMetaTierRankings(true);
 
         if (! $result['success']) {
@@ -301,8 +296,7 @@ class BackgroundSyncService
      * @param  array<string, mixed>  $options
      * @return array{success: bool, message: string, data_count: int}
      */
-    protected function syncSkillEffectiveness(array $options): array
-    {
+    protected function syncSkillEffectiveness(): array
         $result = $this->apiFacade->getSkillEffectiveness(true);
 
         if (! $result['success']) {
@@ -364,7 +358,6 @@ class BackgroundSyncService
      * @return array<string, array<string, mixed>>
      */
     public function getAllSyncStatus(): array
-    {
         return [
             'characters' => $this->getSyncStatus('characters'),
             'support_cards' => $this->getSyncStatus('support_cards'),
@@ -403,8 +396,7 @@ class BackgroundSyncService
      *
      * @return array<int, array<string, mixed>>
      */
-    public function getSyncHistory(string $dataType, int $limit = 10): array
-    {
+    public function getSyncHistory(): array
         $historyKey = self::SYNC_HISTORY_KEY.$dataType;
         $entries = Redis::lrange($historyKey, 0, $limit - 1);
 
@@ -416,8 +408,7 @@ class BackgroundSyncService
      *
      * @return array{reconciled: bool, differences: array<string, mixed>, actions_taken: array<string>}
      */
-    public function reconcileData(string $dataType): array
-    {
+    public function reconcileData(): array
         Log::info('[BackgroundSync] Starting data reconciliation', [
             'data_type' => $dataType,
         ]);
@@ -506,8 +497,7 @@ class BackgroundSyncService
      *
      * @return array{success: bool, data: mixed, error?: string}
      */
-    protected function fetchFreshData(string $dataType): array
-    {
+    protected function fetchFreshData(): array
         return match ($dataType) {
             'characters' => $this->apiFacade->getCharacters(true),
             'support_cards' => $this->apiFacade->getSupportCards(true),
@@ -524,8 +514,7 @@ class BackgroundSyncService
      * @param  mixed  $freshData
      * @return array<string, mixed>
      */
-    protected function compareData($cachedData, $freshData): array
-    {
+    protected function compareData(): array
         // Simple comparison - in production, this would be more sophisticated
         if (json_encode($cachedData) === json_encode($freshData)) {
             return [];
@@ -558,7 +547,6 @@ class BackgroundSyncService
      * @return array<string, array{processed: int, succeeded: int, failed: int, skipped: int}>
      */
     public function processAllQueues(): array
-    {
         $results = [];
 
         $dataTypes = ['characters', 'support_cards', 'meta_rankings', 'skill_effectiveness'];

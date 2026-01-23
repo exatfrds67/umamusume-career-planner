@@ -87,8 +87,7 @@ class GracefulDegradationService
      * @param  array<string, mixed>  $fallbackOptions
      * @return array{success: bool, data: mixed, source: string, degraded: bool, stale: bool, message: string}
      */
-    public function getDataWithFallback(string $apiName, array $apiResult, array $fallbackOptions = []): array
-    {
+    public function getDataWithFallback(): array
         // If API call was successful, return the data
         if ($apiResult['success']) {
             return [
@@ -105,7 +104,7 @@ class GracefulDegradationService
         $this->enableDegradationMode($apiName, $apiResult['error'] ?? 'Unknown error');
 
         // Try to get cached data
-        $cacheKey = $fallbackOptions['cache_key'] ?? null;
+        $cacheKey = (is_array($fallbackOptions) && isset($fallbackOptions['cache_key']) ? $fallbackOptions['cache_key'] : null);
 
         if ($cacheKey && Cache::has($cacheKey)) {
             $cachedData = Cache::get($cacheKey);
@@ -146,7 +145,7 @@ class GracefulDegradationService
         // Return empty data with degradation notice
         return [
             'success' => false,
-            'data' => $fallbackOptions['default_data'] ?? null,
+            'data' => (is_array($fallbackOptions) && isset($fallbackOptions['default_data']) ? $fallbackOptions['default_data'] : null),
             'source' => 'degraded',
             'degraded' => true,
             'stale' => false,
@@ -224,7 +223,6 @@ class GracefulDegradationService
      * @return array{umapyoi: array<string, mixed>, umamusumedb: array<string, mixed>, overall_degraded: bool}
      */
     public function getDegradationStatus(): array
-    {
         $umapyoiDegraded = $this->isDegradationModeActive('umapyoi');
         $umamusumeDBDegraded = $this->isDegradationModeActive('umamusumedb');
 
@@ -248,8 +246,7 @@ class GracefulDegradationService
      *
      * @return array{title: string, message: string, actions: array<string>, severity: string}
      */
-    public function getDegradationMessage(string $apiName): array
-    {
+    public function getDegradationMessage(): array
         $isDegraded = $this->isDegradationModeActive($apiName);
         $manualInputEnabled = $this->isManualInputEnabled($apiName);
         $healthStatus = $this->healthMonitor->getCachedHealth($apiName);
@@ -337,8 +334,7 @@ class GracefulDegradationService
      *
      * @return array{recovered: bool, api: string, message: string}
      */
-    public function attemptRecovery(string $apiName): array
-    {
+    public function attemptRecovery(): array
         Log::info('[GracefulDegradation] Attempting recovery', [
             'api' => $apiName,
         ]);
@@ -405,7 +401,6 @@ class GracefulDegradationService
      * @return array<string, array{recovered: bool, api: string, message: string}>
      */
     public function attemptAllRecovery(): array
-    {
         return [
             'umapyoi' => $this->attemptRecovery('umapyoi'),
             'umamusumedb' => $this->attemptRecovery('umamusumedb'),
@@ -418,7 +413,6 @@ class GracefulDegradationService
      * @return array{status: array<string, mixed>, cache_availability: array<string, bool>, manual_input_status: array<string, bool>, recovery_recommendations: array<string>}
      */
     public function getDegradationMetrics(): array
-    {
         $status = $this->getDegradationStatus();
 
         $cacheAvailability = [
@@ -450,8 +444,7 @@ class GracefulDegradationService
      * @param  array<string, bool>  $cacheAvailability
      * @return array<string>
      */
-    protected function generateRecoveryRecommendations(array $status, array $cacheAvailability): array
-    {
+    protected function generateRecoveryRecommendations(): array
         $recommendations = [];
 
         if ($status['overall_degraded']) {

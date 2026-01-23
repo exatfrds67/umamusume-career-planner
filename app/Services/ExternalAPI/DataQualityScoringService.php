@@ -64,8 +64,7 @@ class DataQualityScoringService
      * @param  array<string, mixed>  $metadata
      * @return array{overall_score: float, dimensions: array<string, float>, grade: string, recommendations: array<string>, details: array<string, mixed>}
      */
-    public function calculateQualityScore(string $dataType, mixed $data, array $metadata = []): array
-    {
+    public function calculateQualityScore(): array
         Log::info('[DataQualityScoring] Calculating quality score', [
             'data_type' => $dataType,
             'data_size' => is_array($data) ? count($data) : 0,
@@ -179,7 +178,7 @@ class DataQualityScoringService
 
             foreach ($requiredFields as $field) {
                 if (isset($item[$field]) && $item[$field] !== '') {
-                    $filledFields++;
+                    $filledFields = ($filledFields ?? 0) + 1;
                 }
             }
         }
@@ -266,11 +265,11 @@ class DataQualityScoringService
             }
 
             foreach ($item as $field => $value) {
-                $totalChecks++;
+                $totalChecks = ($totalChecks ?? 0) + 1;
 
                 // Check for obviously invalid values
                 if ($this->isInvalidValue($value)) {
-                    $invalidCount++;
+                    $invalidCount = ($invalidCount ?? 0) + 1;
                 }
             }
         }
@@ -300,7 +299,7 @@ class DataQualityScoringService
 
         foreach ($dimensionScores as $dimension => $score) {
             $weight = $this->dimensionWeights[$dimension] ?? 0.0;
-            $weightedSum += $score * $weight;
+            $weightedSum = ($weightedSum ?? 0) + $score * $weight;
         }
 
         return round($weightedSum, 2);
@@ -326,8 +325,7 @@ class DataQualityScoringService
      * @param  array<string, float>  $dimensionScores
      * @return array<string>
      */
-    protected function generateRecommendations(array $dimensionScores, float $overallScore): array
-    {
+    protected function generateRecommendations(): array
         $recommendations = [];
 
         // Overall score recommendations
@@ -401,7 +399,7 @@ class DataQualityScoringService
                     $numericValue = (float) $value;
                     // Check for unreasonably large or small values
                     if (abs($numericValue) > 1000000 || ($numericValue < 0 && $field !== 'id')) {
-                        $anomalyCount++;
+                        $anomalyCount = ($anomalyCount ?? 0) + 1;
                     }
                 }
             }
@@ -431,7 +429,7 @@ class DataQualityScoringService
                 if (! isset($fieldTypes[$field])) {
                     $fieldTypes[$field] = $type;
                 } elseif ($fieldTypes[$field] !== $type && $value !== null) {
-                    $inconsistencies++;
+                    $inconsistencies = ($inconsistencies ?? 0) + 1;
                 }
             }
         }
@@ -462,7 +460,7 @@ class DataQualityScoringService
                     if (! isset($dateFormats[$field])) {
                         $dateFormats[$field] = $format;
                     } elseif ($dateFormats[$field] !== $format) {
-                        $inconsistencies++;
+                        $inconsistencies = ($inconsistencies ?? 0) + 1;
                     }
                 }
             }
@@ -488,7 +486,7 @@ class DataQualityScoringService
 
             // Example: Check for negative IDs
             if (isset($item['id']) && is_numeric($item['id']) && $item['id'] < 0) {
-                $inconsistencies++;
+                $inconsistencies = ($inconsistencies ?? 0) + 1;
             }
         }
 
@@ -631,8 +629,7 @@ class DataQualityScoringService
      *
      * @return array<int, array<string, mixed>>
      */
-    public function getQualityHistory(string $dataType, int $limit = 10): array
-    {
+    public function getQualityHistory(): array
         $historyKey = self::QUALITY_HISTORY_KEY.$dataType;
         $history = Cache::get($historyKey, []);
 
@@ -644,8 +641,7 @@ class DataQualityScoringService
      *
      * @return array{trend: string, avg_score: float, score_change: float, grade_distribution: array<string, int>}
      */
-    public function getQualityTrend(string $dataType): array
-    {
+    public function getQualityTrend(): array
         $history = $this->getQualityHistory($dataType, 20);
 
         if (empty($history)) {

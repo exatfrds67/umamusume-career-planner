@@ -49,8 +49,7 @@ class ConflictResolutionService
      * @param  array<string, array{data: mixed, priority: int, quality_score: float}>  $validSources
      * @return array{resolved_data: array<string, mixed>, conflicts: array<string, mixed>, resolution_strategy: string}
      */
-    public function resolveConflicts(array $validSources): array
-    {
+    public function resolveConflicts(): array
         Log::info('[ConflictResolution] Starting conflict resolution', [
             'sources_count' => count($validSources),
         ]);
@@ -104,8 +103,7 @@ class ConflictResolutionService
      * @param  array<string, array{data: mixed, priority: int, quality_score: float}>  $validSources
      * @return array<string, array<string, mixed>>
      */
-    protected function detectConflicts(array $validSources): array
-    {
+    protected function detectConflicts(): array
         $conflicts = [];
 
         // Convert all sources to comparable format
@@ -118,8 +116,8 @@ class ConflictResolutionService
         // Compare each pair of sources
         $sourceNames = array_keys($normalizedSources);
 
-        for ($i = 0; $i < count($sourceNames); $i++) {
-            for ($j = $i + 1; $j < count($sourceNames); $j++) {
+        for ($i = 0; $i < count($sourceNames); $i = ($i ?? 0) + 1) {
+            for ($j = $i + 1; $j < count($sourceNames); $j = ($j ?? 0) + 1) {
                 $source1 = $sourceNames[$i];
                 $source2 = $sourceNames[$j];
 
@@ -144,8 +142,7 @@ class ConflictResolutionService
      *
      * @return array<string, mixed>
      */
-    protected function normalizeData(mixed $data): array
-    {
+    protected function normalizeData(): array
         if (! is_array($data)) {
             return [];
         }
@@ -173,8 +170,7 @@ class ConflictResolutionService
      * @param  array<string, mixed>  $data2
      * @return array<string, array<string, mixed>>
      */
-    protected function compareDataSources(array $data1, array $data2, string $source1, string $source2): array
-    {
+    protected function compareDataSources(): array
         $conflicts = [];
 
         // Find items present in both sources
@@ -227,8 +223,7 @@ class ConflictResolutionService
      *
      * @return array<string, array<string, mixed>>
      */
-    protected function compareItems(mixed $item1, mixed $item2, string $key): array
-    {
+    protected function compareItems(): array
         $differences = [];
 
         // If both are arrays, compare fields
@@ -309,8 +304,7 @@ class ConflictResolutionService
      * @param  array<string, array<string, mixed>>  $conflicts
      * @return array<string, mixed>
      */
-    protected function applyResolutionStrategy(array $validSources, array $conflicts, string $strategy): array
-    {
+    protected function applyResolutionStrategy(): array
         return match ($strategy) {
             self::STRATEGY_PRIORITY => $this->resolvePriorityBased($validSources),
             self::STRATEGY_CONSENSUS => $this->resolveConsensus($validSources),
@@ -326,8 +320,7 @@ class ConflictResolutionService
      * @param  array<string, array{data: mixed, priority: int, quality_score: float}>  $validSources
      * @return array<string, mixed>
      */
-    protected function resolvePriorityBased(array $validSources): array
-    {
+    protected function resolvePriorityBased(): array
         // Sort sources by priority (highest first)
         uasort($validSources, fn ($a, $b) => $b['priority'] <=> $a['priority']);
 
@@ -343,8 +336,7 @@ class ConflictResolutionService
      * @param  array<string, array{data: mixed, priority: int, quality_score: float}>  $validSources
      * @return array<string, mixed>
      */
-    protected function resolveConsensus(array $validSources): array
-    {
+    protected function resolveConsensus(): array
         // Normalize all sources
         $normalizedSources = [];
 
@@ -384,8 +376,7 @@ class ConflictResolutionService
      * @param  array<string, array{data: mixed, priority: int, quality_score: float}>  $validSources
      * @return array<string, mixed>
      */
-    protected function resolveWeightedAverage(array $validSources): array
-    {
+    protected function resolveWeightedAverage(): array
         // Calculate weights based on quality scores
         $totalQuality = array_sum(array_column($validSources, 'quality_score'));
 
@@ -438,8 +429,7 @@ class ConflictResolutionService
      * @param  array<string, array{data: mixed, priority: int, quality_score: float}>  $validSources
      * @return array<string, mixed>
      */
-    protected function resolveLatestTimestamp(array $validSources): array
-    {
+    protected function resolveLatestTimestamp(): array
         // Find source with latest timestamp
         $latestSource = null;
         $latestTimestamp = null;
@@ -447,8 +437,8 @@ class ConflictResolutionService
         foreach ($validSources as $sourceName => $sourceData) {
             $data = $sourceData['data'];
 
-            if (is_array($data) && isset($data['timestamp'])) {
-                $timestamp = \Carbon\Carbon::parse($data['timestamp']);
+            if (is_array($data) && isset((is_array($data) && isset($data['timestamp']) ? $data['timestamp'] : null))) {
+                $timestamp = \Carbon\Carbon::parse((is_array($data) && isset($data['timestamp']) ? $data['timestamp'] : null));
 
                 if ($latestTimestamp === null || $timestamp->gt($latestTimestamp)) {
                     $latestTimestamp = $timestamp;
@@ -574,7 +564,6 @@ class ConflictResolutionService
      * @return array{total_resolutions: int, strategies_used: array<string, int>, avg_conflicts_per_resolution: float}
      */
     public function getResolutionStatistics(): array
-    {
         // In production, this would query resolution history from database
         return [
             'total_resolutions' => 0,

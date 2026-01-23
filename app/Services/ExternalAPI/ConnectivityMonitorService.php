@@ -66,7 +66,6 @@ class ConnectivityMonitorService
      * @return array{is_online: bool, api_status: array<string, mixed>, last_check: string, offline_since: string|null, consecutive_failures: int}
      */
     public function checkConnectivity(): array
-    {
         Log::debug('[ConnectivityMonitor] Checking connectivity status');
 
         $startTime = microtime(true);
@@ -144,7 +143,6 @@ class ConnectivityMonitorService
      * @return array{is_online: bool, api_status: array<string, mixed>, last_check: string, offline_since: string|null, consecutive_failures: int, cached: bool}
      */
     public function getStatus(): array
-    {
         $cached = $this->getCachedStatus();
 
         if ($cached) {
@@ -183,7 +181,6 @@ class ConnectivityMonitorService
      * @return array{is_offline: bool, offline_since: string|null, duration_seconds: int|null, cached_data_available: bool, cache_statistics: array<string, mixed>}
      */
     public function getOfflineModeInfo(): array
-    {
         $status = $this->getStatus();
         $offlineSince = $status['offline_since'];
 
@@ -211,7 +208,6 @@ class ConnectivityMonitorService
      * @return array{is_online: bool, api_status: array<string, mixed>, last_check: string, offline_since: string|null, consecutive_failures: int}
      */
     public function forceCheck(): array
-    {
         // Clear cached status
         Cache::forget(self::CONNECTIVITY_STATUS_KEY);
 
@@ -265,8 +261,19 @@ class ConnectivityMonitorService
         $umamusumeDBStatus = $apiHealth['umamusumedb']['status'] ?? 'error';
 
         // Online if at least one API is available
-        return in_array($umapyoiStatus, ['healthy', 'degraded']) ||
-            in_array($umamusumeDBStatus, ['healthy', 'degraded']);
+        if (in_array($umapyoiStatus, ['healthy', 'degraded']) ||
+            in_array($umamusumeDBStatus, ['healthy', 'degraded'])) {
+            return true;
+        }
+
+        // In local environment, we don't want to show offline banner just because external APIs are unreachable
+        if (app()->environment('local')) {
+            Log::info('[ConnectivityMonitor] Local environment detected, forcing online status despite API failures');
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -318,7 +325,6 @@ class ConnectivityMonitorService
      * @return array<string>
      */
     public function getRecommendations(): array
-    {
         $status = $this->getStatus();
         $recommendations = [];
 
@@ -362,7 +368,6 @@ class ConnectivityMonitorService
      * @return array{status: array<string, mixed>, offline_info: array<string, mixed>, recommendations: array<string>, cache_info: array<string, mixed>}
      */
     public function getConnectivityReport(): array
-    {
         return [
             'status' => $this->getStatus(),
             'offline_info' => $this->getOfflineModeInfo(),

@@ -55,8 +55,7 @@ class DataSynchronizationAgentService
      * @param  array<string, mixed>  $options
      * @return array{success: bool, synchronized: array<string, mixed>, conflicts: array<string, mixed>, quality_score: float, duration_ms: float}
      */
-    public function coordinateMultiSourceSync(array $dataSources, array $options = []): array
-    {
+    public function coordinateMultiSourceSync(): array
         $startTime = microtime(true);
         $syncId = uniqid('sync_', true);
 
@@ -133,8 +132,7 @@ class DataSynchronizationAgentService
      * @param  array<string, mixed>  $options
      * @return array{workflow_id: string, agents: array<string, array<string, mixed>>, coordination_strategy: string}
      */
-    protected function createSyncWorkflow(string $syncId, array $dataSources, array $options): array
-    {
+    protected function createSyncWorkflow(): array
         $workflowId = "sync_workflow_{$syncId}";
 
         // Define agents for each data source
@@ -172,8 +170,7 @@ class DataSynchronizationAgentService
      * @param  array{workflow_id: string, agents: array<string, array<string, mixed>>, coordination_strategy: string}  $workflow
      * @return array<string, array{success: bool, data: mixed, source: string, timestamp: string, metadata: array<string, mixed>}>
      */
-    protected function executeParallelFetch(array $workflow): array
-    {
+    protected function executeParallelFetch(): array
         $fetchedData = [];
 
         Log::info('[DataSyncAgent] Executing parallel fetch', [
@@ -254,8 +251,7 @@ class DataSynchronizationAgentService
      * @param  array<string, array{success: bool, data: mixed, source: string, timestamp: string, metadata: array<string, mixed>}>  $fetchedData
      * @return array<string, array{valid: bool, errors: array<string>, warnings: array<string>, score: float}>
      */
-    protected function validateFetchedData(array $fetchedData): array
-    {
+    protected function validateFetchedData(): array
         $validationResults = [];
 
         foreach ($fetchedData as $source => $result) {
@@ -286,8 +282,7 @@ class DataSynchronizationAgentService
      * @param  array<string, array{valid: bool, errors: array<string>, warnings: array<string>, score: float}>  $validationResults
      * @return array{resolved_data: array<string, mixed>, conflicts: array<string, mixed>, resolution_strategy: string}
      */
-    protected function resolveDataConflicts(array $fetchedData, array $validationResults): array
-    {
+    protected function resolveDataConflicts(): array
         // Collect valid data sources
         $validSources = [];
 
@@ -352,8 +347,7 @@ class DataSynchronizationAgentService
      * @param  array<string, mixed>  $resolvedData
      * @return array<string, mixed>
      */
-    protected function storeSynchronizedData(array $resolvedData): array
-    {
+    protected function storeSynchronizedData(): array
         $stored = [];
 
         foreach ($resolvedData as $key => $value) {
@@ -392,8 +386,7 @@ class DataSynchronizationAgentService
      * @param  array<string, mixed>  $options
      * @return array{success: bool, synchronized: array<string, mixed>, conflicts: array<string, mixed>, quality_score: float, duration_ms: float}
      */
-    protected function fallbackSync(array $dataSources, array $options): array
-    {
+    protected function fallbackSync(): array
         $startTime = microtime(true);
         $synchronized = [];
 
@@ -424,7 +417,6 @@ class DataSynchronizationAgentService
      * @return array{active_syncs: int, completed_syncs: int, failed_syncs: int, avg_quality_score: float}
      */
     public function getSyncStatus(): array
-    {
         // In production, this would query sync history from database
         return [
             'active_syncs' => 0,

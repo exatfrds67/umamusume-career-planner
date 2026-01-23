@@ -81,8 +81,7 @@ class Context7Service
      *
      * @return array<int, array<string, mixed>>
      */
-    public function getApiCallContext(string $apiName, string $endpoint): array
-    {
+    public function getApiCallContext(): array
         $contextKey = $this->generateContextKey($apiName, $endpoint);
         $cacheKey = self::CACHE_PREFIX."api_call:{$contextKey}";
 
@@ -116,8 +115,7 @@ class Context7Service
      *
      * @return array<string, mixed>
      */
-    public function getCharacterContext(int $characterId): array
-    {
+    public function getCharacterContext(): array
         $cacheKey = self::CACHE_PREFIX."character:{$characterId}";
 
         return Cache::get($cacheKey, []);
@@ -148,8 +146,7 @@ class Context7Service
      *
      * @return array<string, mixed>
      */
-    public function getCareerContext(int $careerId): array
-    {
+    public function getCareerContext(): array
         $cacheKey = self::CACHE_PREFIX."career:{$careerId}";
 
         return Cache::get($cacheKey, []);
@@ -194,8 +191,7 @@ class Context7Service
      *
      * @return array<int, array<string, mixed>>
      */
-    public function getConversationContext(string $conversationId): array
-    {
+    public function getConversationContext(): array
         $cacheKey = self::CACHE_PREFIX."conversation:{$conversationId}";
 
         return Cache::get($cacheKey, []);
@@ -206,8 +202,7 @@ class Context7Service
      *
      * @return array{frequent_endpoints: array<string, int>, cache_hit_rate: float, recommendations: array<string>}
      */
-    public function analyzeContextPatterns(string $apiName): array
-    {
+    public function analyzeContextPatterns(): array
         $pattern = self::CACHE_PREFIX."api_call:{$apiName}:*";
 
         // In production, this would analyze actual cache patterns
@@ -233,7 +228,6 @@ class Context7Service
      * @return array{total_contexts: int, character_contexts: int, career_contexts: int, api_contexts: int}
      */
     public function getContextSummary(): array
-    {
         // In production, this would count actual cached contexts
         // For now, return mock summary
         return [
@@ -290,7 +284,6 @@ class Context7Service
      * @return array{enabled: bool, healthy: bool, capabilities: array<string, mixed>}
      */
     public function getServerStatus(): array
-    {
         return [
             'enabled' => $this->mcpClient->isServerEnabled('context7'),
             'healthy' => $this->mcpClient->isServerHealthy('context7'),

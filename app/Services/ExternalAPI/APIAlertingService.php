@@ -264,8 +264,7 @@ class APIAlertingService
      *
      * @return array<int, array<string, mixed>>
      */
-    public function getAlertHistory(int $limit = 50, ?string $type = null): array
-    {
+    public function getAlertHistory(): array
         $historyKey = $type
             ? self::ALERT_HISTORY_KEY.$type
             : self::ALERT_HISTORY_KEY.'all';
@@ -281,7 +280,6 @@ class APIAlertingService
      * @return array<int, array<string, mixed>>
      */
     public function getUnacknowledgedAlerts(): array
-    {
         $allAlerts = $this->getAlertHistory(100);
 
         return array_filter($allAlerts, fn ($alert) => ! $alert['acknowledged']);
@@ -320,7 +318,6 @@ class APIAlertingService
      * @return array{total: int, by_type: array<string, int>, by_severity: array<string, int>, unacknowledged: int, recent_24h: int}
      */
     public function getAlertStatistics(): array
-    {
         $allAlerts = $this->getAlertHistory(self::MAX_HISTORY_ENTRIES);
 
         $byType = [];
@@ -341,13 +338,13 @@ class APIAlertingService
 
             // Count unacknowledged
             if (! $alert['acknowledged']) {
-                $unacknowledged++;
+                $unacknowledged = ($unacknowledged ?? 0) + 1;
             }
 
             // Count recent (last 24 hours)
             $timestamp = strtotime($alert['timestamp']);
             if ($timestamp >= $cutoff) {
-                $recent24h++;
+                $recent24h = ($recent24h ?? 0) + 1;
             }
         }
 
@@ -398,7 +395,6 @@ class APIAlertingService
      * @return array<string, mixed>
      */
     public function getAlertConfiguration(): array
-    {
         return Cache::get(self::ALERT_CONFIG_KEY, [
             'enabled' => true,
             'cooldown_seconds' => self::ALERT_COOLDOWN,

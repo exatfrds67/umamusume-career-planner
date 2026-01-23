@@ -203,7 +203,6 @@ class CacheManagerService
      * @return array<string, int>
      */
     public function getTTLConfig(): array
-    {
         return self::TTL_CONFIG;
     }
 
@@ -213,7 +212,6 @@ class CacheManagerService
      * @return array{hits: int, misses: int, hit_rate: float, total_requests: int, last_reset: string}
      */
     public function getStatistics(): array
-    {
         $stats = Cache::get(self::STATS_KEY, [
             'hits' => 0,
             'misses' => 0,
@@ -252,7 +250,6 @@ class CacheManagerService
      * @return array<string, mixed>
      */
     public function getCacheInfo(): array
-    {
         $stats = $this->getStatistics();
 
         // Get Redis info if available
@@ -276,7 +273,7 @@ class CacheManagerService
             $pattern = self::CACHE_PREFIX.':*';
 
             // Use Redis to find and delete keys
-            if (config('cache.default') === 'redis') {
+            if (config('cache.default', '') === 'redis') {
                 $redis = Redis::connection();
                 $keys = $redis->keys($pattern);
 
@@ -312,9 +309,8 @@ class CacheManagerService
      * @return array<string>
      */
     public function getCachedKeys(): array
-    {
         try {
-            if (config('cache.default') === 'redis') {
+            if (config('cache.default', '') === 'redis') {
                 $redis = Redis::connection();
                 $pattern = self::CACHE_PREFIX.':*';
                 $keys = $redis->keys($pattern);
@@ -342,9 +338,8 @@ class CacheManagerService
      * @return array{total_keys: int, estimated_size_bytes: int}
      */
     public function getCacheSize(): array
-    {
         try {
-            if (config('cache.default') === 'redis') {
+            if (config('cache.default', '') === 'redis') {
                 $redis = Redis::connection();
                 $pattern = self::CACHE_PREFIX.':*';
                 $keys = $redis->keys($pattern);
@@ -353,7 +348,7 @@ class CacheManagerService
                 foreach ($keys as $key) {
                     $value = $redis->get($key);
                     if ($value) {
-                        $totalSize += strlen($value);
+                        $totalSize = ($totalSize ?? 0) + strlen($value);
                     }
                 }
 
@@ -393,8 +388,7 @@ class CacheManagerService
      * @param  string  $priority  Priority level: 'high', 'medium', 'low', or 'all'
      * @return array{success: bool, warmed_items: int, failed_items: int, duration_ms: float, items: array<string, string>}
      */
-    public function warmCache(string $priority = 'all'): array
-    {
+    public function warmCache(): array
         $startTime = microtime(true);
         $warmedItems = 0;
         $failedItems = 0;
@@ -418,7 +412,7 @@ class CacheManagerService
                 $taskDuration = (microtime(true) - $taskStartTime) * 1000;
 
                 if ($result['success']) {
-                    $warmedItems += $result['count'];
+                    $warmedItems = ($warmedItems ?? 0) + $result['count'];
                     $items[$taskName] = 'success';
 
                     Log::info('[CacheManagerService] Cache warming task completed', [
@@ -428,7 +422,7 @@ class CacheManagerService
                         'duration_ms' => round($taskDuration, 2),
                     ]);
                 } else {
-                    $failedItems++;
+                    $failedItems = ($failedItems ?? 0) + 1;
                     $items[$taskName] = 'failed';
 
                     Log::warning('[CacheManagerService] Cache warming task failed', [
@@ -439,7 +433,7 @@ class CacheManagerService
                     ]);
                 }
             } catch (\Exception $e) {
-                $failedItems++;
+                $failedItems = ($failedItems ?? 0) + 1;
                 $items[$taskName] = 'error';
 
                 Log::error('[CacheManagerService] Cache warming task exception', [
@@ -473,8 +467,7 @@ class CacheManagerService
      *
      * @return array<string, array{priority: string, callback: callable}>
      */
-    protected function getWarmingTasks(string $priority): array
-    {
+    protected function getWarmingTasks(): array
         $allTasks = [
             'top_characters' => [
                 'priority' => 'high',
@@ -522,7 +515,6 @@ class CacheManagerService
      * @return array{success: bool, count: int, error?: string}
      */
     protected function warmTopCharacters(): array
-    {
         // Top 50 most popular characters based on usage data
         $topCharacters = [
             'Silence Suzuka',
@@ -584,7 +576,7 @@ class CacheManagerService
 
             // Check if already cached
             if ($this->has($cacheKey)) {
-                $warmedCount++;
+                $warmedCount = ($warmedCount ?? 0) + 1;
 
                 continue;
             }
@@ -599,7 +591,7 @@ class CacheManagerService
             ];
 
             $this->put($cacheKey, $placeholderData, 300); // 5 minutes TTL for placeholder
-            $warmedCount++;
+            $warmedCount = ($warmedCount ?? 0) + 1;
         }
 
         return [
@@ -614,7 +606,6 @@ class CacheManagerService
      * @return array{success: bool, count: int, error?: string}
      */
     protected function warmTopSupportCards(): array
-    {
         // Top 100 support card IDs (placeholder - would come from configuration or database)
         $topCardIds = range(1, 100);
 
@@ -624,7 +615,7 @@ class CacheManagerService
             $cacheKey = "support_cards:{$cardId}";
 
             if ($this->has($cacheKey)) {
-                $warmedCount++;
+                $warmedCount = ($warmedCount ?? 0) + 1;
 
                 continue;
             }
@@ -636,7 +627,7 @@ class CacheManagerService
             ];
 
             $this->put($cacheKey, $placeholderData, 300);
-            $warmedCount++;
+            $warmedCount = ($warmedCount ?? 0) + 1;
         }
 
         return [
@@ -651,7 +642,6 @@ class CacheManagerService
      * @return array{success: bool, count: int, error?: string}
      */
     protected function warmRaceDefinitions(): array
-    {
         // Common race types and distances
         $raceDefinitions = [
             'sprint_dirt',
@@ -671,7 +661,7 @@ class CacheManagerService
             $cacheKey = "race_data:{$raceType}";
 
             if ($this->has($cacheKey)) {
-                $warmedCount++;
+                $warmedCount = ($warmedCount ?? 0) + 1;
 
                 continue;
             }
@@ -683,7 +673,7 @@ class CacheManagerService
             ];
 
             $this->put($cacheKey, $placeholderData, 300);
-            $warmedCount++;
+            $warmedCount = ($warmedCount ?? 0) + 1;
         }
 
         return [
@@ -698,7 +688,6 @@ class CacheManagerService
      * @return array{success: bool, count: int, error?: string}
      */
     protected function warmPopularSkills(): array
-    {
         // Popular skill IDs (placeholder)
         $popularSkills = range(1, 50);
 
@@ -708,7 +697,7 @@ class CacheManagerService
             $cacheKey = "skills:{$skillId}";
 
             if ($this->has($cacheKey)) {
-                $warmedCount++;
+                $warmedCount = ($warmedCount ?? 0) + 1;
 
                 continue;
             }
@@ -720,7 +709,7 @@ class CacheManagerService
             ];
 
             $this->put($cacheKey, $placeholderData, 300);
-            $warmedCount++;
+            $warmedCount = ($warmedCount ?? 0) + 1;
         }
 
         return [
@@ -735,7 +724,6 @@ class CacheManagerService
      * @return array{success: bool, count: int, error?: string}
      */
     protected function warmMetaRankings(): array
-    {
         $rankingTypes = [
             'speed',
             'stamina',
@@ -751,7 +739,7 @@ class CacheManagerService
             $cacheKey = "meta_rankings:{$type}";
 
             if ($this->has($cacheKey)) {
-                $warmedCount++;
+                $warmedCount = ($warmedCount ?? 0) + 1;
 
                 continue;
             }
@@ -763,7 +751,7 @@ class CacheManagerService
             ];
 
             $this->put($cacheKey, $placeholderData, 300);
-            $warmedCount++;
+            $warmedCount = ($warmedCount ?? 0) + 1;
         }
 
         return [
@@ -778,7 +766,6 @@ class CacheManagerService
      * @return array{success: bool, count: int, error?: string}
      */
     protected function warmGameMechanics(): array
-    {
         $mechanicsTypes = [
             'stat_breakpoints',
             'growth_rates',
@@ -792,7 +779,7 @@ class CacheManagerService
             $cacheKey = "game_mechanics:{$type}";
 
             if ($this->has($cacheKey)) {
-                $warmedCount++;
+                $warmedCount = ($warmedCount ?? 0) + 1;
 
                 continue;
             }
@@ -804,7 +791,7 @@ class CacheManagerService
             ];
 
             $this->put($cacheKey, $placeholderData, 300);
-            $warmedCount++;
+            $warmedCount = ($warmedCount ?? 0) + 1;
         }
 
         return [
@@ -937,13 +924,12 @@ class CacheManagerService
      *
      * @return array{success: bool, invalidated_count: int, error?: string}
      */
-    public function invalidateByPattern(string $pattern): array
-    {
+    public function invalidateByPattern(): array
         try {
             $fullPattern = self::CACHE_PREFIX.':'.$pattern;
             $invalidatedCount = 0;
 
-            if (config('cache.default') === 'redis') {
+            if (config('cache.default', '') === 'redis') {
                 $redis = Redis::connection();
                 $keys = $redis->keys($fullPattern);
 
@@ -1001,8 +987,7 @@ class CacheManagerService
      * @param  string  $dataType  One of: character_data, support_cards, meta_rankings, race_data, skills, news, game_mechanics
      * @return array{success: bool, invalidated_count: int, error?: string}
      */
-    public function invalidateByType(string $dataType): array
-    {
+    public function invalidateByType(): array
         if (! array_key_exists($dataType, self::TTL_CONFIG)) {
             return [
                 'success' => false,
@@ -1020,15 +1005,14 @@ class CacheManagerService
      * @param  array<string>  $keys
      * @return array{success: bool, invalidated_count: int, failed_keys: array<string>}
      */
-    public function invalidateKeys(array $keys): array
-    {
+    public function invalidateKeys(): array
         $invalidatedCount = 0;
         $failedKeys = [];
 
         foreach ($keys as $key) {
             try {
                 if ($this->delete($key)) {
-                    $invalidatedCount++;
+                    $invalidatedCount = ($invalidatedCount ?? 0) + 1;
                 } else {
                     $failedKeys[] = $key;
                 }
@@ -1067,8 +1051,7 @@ class CacheManagerService
      *
      * @return array{success: bool, version_changed: bool, previous_version: ?string, new_version: string, invalidated_types: array<string>}
      */
-    public function setGameVersion(string $version): array
-    {
+    public function setGameVersion(): array
         $previousVersion = $this->getGameVersion();
         $versionChanged = $previousVersion !== $version;
 
@@ -1153,7 +1136,6 @@ class CacheManagerService
      * @return array<array{previous_version: ?string, new_version: string, changed_at: string}>
      */
     public function getVersionHistory(): array
-    {
         $historyKey = self::CACHE_PREFIX.':version_history';
 
         return Cache::get($historyKey, []);
@@ -1165,7 +1147,6 @@ class CacheManagerService
      * @return array{needs_invalidation: bool, stale_types: array<string>, recommendations: array<string>}
      */
     public function checkCacheStaleness(): array
-    {
         $staleTypes = [];
         $recommendations = [];
 
@@ -1174,7 +1155,7 @@ class CacheManagerService
             $fullPattern = self::CACHE_PREFIX.':'.$pattern;
 
             try {
-                if (config('cache.default') === 'redis') {
+                if (config('cache.default', '') === 'redis') {
                     $redis = Redis::connection();
                     $keys = $redis->keys($fullPattern);
 
@@ -1188,7 +1169,7 @@ class CacheManagerService
                         if ($metadata && isset($metadata['cached_at'])) {
                             $age = now()->diffInSeconds($metadata['cached_at']);
                             if ($age > ($ttl * self::STALENESS_THRESHOLD)) {
-                                $staleCount++;
+                                $staleCount = ($staleCount ?? 0) + 1;
                             }
                         }
                     }
@@ -1219,7 +1200,6 @@ class CacheManagerService
      * @return array{success: bool, invalidated_types: array<string>, total_invalidated: int}
      */
     public function invalidateStaleCache(): array
-    {
         $stalenessCheck = $this->checkCacheStaleness();
         $invalidatedTypes = [];
         $totalInvalidated = 0;
@@ -1228,7 +1208,7 @@ class CacheManagerService
             $result = $this->invalidateByType($dataType);
             if ($result['success']) {
                 $invalidatedTypes[] = $dataType;
-                $totalInvalidated += $result['invalidated_count'];
+                $totalInvalidated = ($totalInvalidated ?? 0) + $result['invalidated_count'];
             }
         }
 
@@ -1250,9 +1230,8 @@ class CacheManagerService
      * @return array<string, mixed>
      */
     private function getRedisInfo(): array
-    {
         try {
-            if (config('cache.default') !== 'redis') {
+            if (config('cache.default', '') !== 'redis') {
                 return [
                     'available' => false,
                     'driver' => config('cache.default'),

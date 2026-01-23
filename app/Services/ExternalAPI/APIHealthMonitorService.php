@@ -71,7 +71,6 @@ class APIHealthMonitorService
      * @return array{umapyoi: array<string, mixed>, umamusumedb: array<string, mixed>, overall_status: string, timestamp: string}
      */
     public function checkAllAPIs(): array
-    {
         Log::info('[APIHealthMonitor] Starting comprehensive health check');
 
         $umapyoiHealth = $this->checkAPIHealth('umapyoi', function () {
@@ -121,8 +120,7 @@ class APIHealthMonitorService
      *
      * @return array{status: string, available: bool, response_time_ms: float|null, failure_count: int, circuit_breaker_open: bool, last_check: string, message: string}
      */
-    public function checkAPIHealth(string $apiName, callable $healthCheck): array
-    {
+    public function checkAPIHealth(): array
         $startTime = microtime(true);
         $circuitBreakerKey = self::CIRCUIT_BREAKER_KEY.$apiName;
         $failureCountKey = self::FAILURE_COUNT_KEY.$apiName;
@@ -377,7 +375,6 @@ class APIHealthMonitorService
      * @return array{current_status: array<string, mixed>, failure_counts: array<string, int>, circuit_breakers: array<string, bool>, response_times: array<string, array<string, float>>, recommendations: array<string>}
      */
     public function getHealthMetrics(): array
-    {
         $currentStatus = $this->getCachedAllHealth() ?? $this->checkAllAPIs();
 
         $failureCounts = [
@@ -420,8 +417,7 @@ class APIHealthMonitorService
      * @param  array<string, bool>  $circuitBreakers
      * @return array<string>
      */
-    protected function generateRecommendations(array $currentStatus, array $failureCounts, array $circuitBreakers): array
-    {
+    protected function generateRecommendations(): array
         $recommendations = [];
 
         foreach (['umapyoi', 'umamusumedb'] as $apiName) {

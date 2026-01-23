@@ -85,8 +85,7 @@ class ConflictDetectionService
      * @param  array<string, array{data: mixed, source: string, timestamp?: string, metadata?: array<string, mixed>}>  $sources
      * @return array{has_conflicts: bool, conflicts: array<string, array<string, mixed>>, summary: array<string, mixed>}
      */
-    public function detectConflicts(array $sources): array
-    {
+    public function detectConflicts(): array
         $startTime = microtime(true);
 
         Log::info('[ConflictDetection] Starting conflict detection', [
@@ -110,8 +109,8 @@ class ConflictDetectionService
         $sourceNames = array_keys($sources);
 
         // Compare each pair of sources
-        for ($i = 0; $i < \count($sourceNames); $i++) {
-            for ($j = $i + 1; $j < \count($sourceNames); $j++) {
+        for ($i = 0; $i < \count($sourceNames); $i = ($i ?? 0) + 1) {
+            for ($j = $i + 1; $j < \count($sourceNames); $j = ($j ?? 0) + 1) {
                 $source1Name = $sourceNames[$i];
                 $source2Name = $sourceNames[$j];
 
@@ -158,12 +157,7 @@ class ConflictDetectionService
      * @param  array{data: mixed, source: string, timestamp?: string, metadata?: array<string, mixed>}  $source2Data
      * @return array<string, array<string, mixed>>
      */
-    protected function compareSourcePair(
-        string $source1Name,
-        array $source1Data,
-        string $source2Name,
-        array $source2Data
-    ): array {
+    protected function compareSourcePair(): array
         $conflicts = [];
 
         $data1 = $this->normalizeData($source1Data['data'] ?? []);
@@ -195,12 +189,7 @@ class ConflictDetectionService
      * @param  array<int|string, mixed>  $data2
      * @return array<string, array<string, mixed>>
      */
-    protected function compareListData(
-        string $source1Name,
-        array $data1,
-        string $source2Name,
-        array $data2
-    ): array {
+    protected function compareListData(): array
         $conflicts = [];
 
         // Index data by ID for comparison
@@ -261,12 +250,7 @@ class ConflictDetectionService
      * @param  array<string, mixed>  $data2
      * @return array<string, array<string, mixed>>
      */
-    protected function compareSingleRecord(
-        string $source1Name,
-        array $data1,
-        string $source2Name,
-        array $data2
-    ): array {
+    protected function compareSingleRecord(): array
         $conflicts = [];
         $fieldConflicts = $this->compareFields($data1, $data2);
 
@@ -291,8 +275,7 @@ class ConflictDetectionService
      * @param  array<string, mixed>  $item2
      * @return array<string, array{value1: mixed, value2: mixed, type: string}>
      */
-    protected function compareFields(array $item1, array $item2): array
-    {
+    protected function compareFields(): array
         $conflicts = [];
         $allFields = array_unique(array_merge(array_keys($item1), array_keys($item2)));
 
@@ -533,11 +516,7 @@ class ConflictDetectionService
      * @param  array<string, array{data: mixed, source: string, timestamp?: string, metadata?: array<string, mixed>}>  $sources
      * @return array{resolved_data: mixed, resolution_log: array<string, mixed>}
      */
-    public function resolveConflicts(
-        array $conflicts,
-        array $sources,
-        string $strategy = self::STRATEGY_HIGHEST_CONFIDENCE
-    ): array {
+    public function resolveConflicts(): array
         Log::info('[ConflictDetection] Resolving conflicts', [
             'conflict_count' => \count($conflicts),
             'strategy' => $strategy,
@@ -616,8 +595,8 @@ class ConflictDetectionService
         $newestTime = null;
 
         foreach ($sources as $name => $data) {
-            if (isset($data['timestamp'])) {
-                $time = \Carbon\Carbon::parse($data['timestamp']);
+            if (isset((is_array($data) && isset($data['timestamp']) ? $data['timestamp'] : null))) {
+                $time = \Carbon\Carbon::parse((is_array($data) && isset($data['timestamp']) ? $data['timestamp'] : null));
                 if ($newestTime === null || $time->gt($newestTime)) {
                     $newestTime = $time;
                     $newest = $name;
@@ -653,8 +632,7 @@ class ConflictDetectionService
      * @param  array<string, array{data: mixed, source: string, timestamp?: string, metadata?: array<string, mixed>}>  $sources
      * @return array<string, mixed>
      */
-    protected function resolveConflict(array $conflict, array $sources, string $strategy): array
-    {
+    protected function resolveConflict(): array
         $conflictType = $conflict['type'] ?? 'unknown';
 
         $resolution = [
@@ -730,9 +708,9 @@ class ConflictDetectionService
             $logEntry['conflicts'][$key] = [
                 'type' => $conflict['type'] ?? 'unknown',
                 'severity' => $conflict['severity'] ?? self::SEVERITY_LOW,
-                'source1_confidence' => $conflict['source1_confidence'] ?? null,
-                'source2_confidence' => $conflict['source2_confidence'] ?? null,
-                'recommended_resolution' => $conflict['recommended_resolution'] ?? null,
+                'source1_confidence' => (is_array($conflict) && isset($conflict['source1_confidence']) ? $conflict['source1_confidence'] : null),
+                'source2_confidence' => (is_array($conflict) && isset($conflict['source2_confidence']) ? $conflict['source2_confidence'] : null),
+                'recommended_resolution' => (is_array($conflict) && isset($conflict['recommended_resolution']) ? $conflict['recommended_resolution'] : null),
             ];
 
             // Add field details for field mismatches
@@ -773,8 +751,7 @@ class ConflictDetectionService
      * @param  array<string, array{data: mixed, source: string, timestamp?: string, metadata?: array<string, mixed>}>  $sources
      * @return array<string, mixed>
      */
-    protected function generateConflictSummary(array $conflicts, array $sources, float $durationMs): array
-    {
+    protected function generateConflictSummary(): array
         $severityCounts = [
             self::SEVERITY_CRITICAL => 0,
             self::SEVERITY_HIGH => 0,
@@ -813,8 +790,7 @@ class ConflictDetectionService
      *
      * @return array<int, array<string, mixed>>
      */
-    public function getConflictHistory(int $limit = 50): array
-    {
+    public function getConflictHistory(): array
         return \array_slice($this->conflictHistory, -$limit);
     }
 
@@ -823,8 +799,7 @@ class ConflictDetectionService
      *
      * @return array<int, array<string, mixed>>
      */
-    public function getConflictLogs(?string $date = null): array
-    {
+    public function getConflictLogs(): array
         $date = $date ?? now()->format('Y-m-d');
         $cacheKey = self::CONFLICT_LOG_KEY.$date;
 
@@ -837,7 +812,6 @@ class ConflictDetectionService
      * @return array{total: int, by_severity: array<string, int>, by_type: array<string, int>, avg_per_detection: float}
      */
     public function getConflictStatistics(): array
-    {
         $total = 0;
         $bySeverity = [
             self::SEVERITY_CRITICAL => 0,
@@ -849,7 +823,7 @@ class ConflictDetectionService
 
         foreach ($this->conflictHistory as $entry) {
             $conflictCount = $entry['conflict_count'] ?? 0;
-            $total += $conflictCount;
+            $total = ($total ?? 0) + $conflictCount;
 
             foreach ($entry['conflicts'] ?? [] as $conflict) {
                 $severity = $conflict['severity'] ?? self::SEVERITY_LOW;
@@ -885,8 +859,7 @@ class ConflictDetectionService
      *
      * @return array<string, mixed>
      */
-    protected function normalizeData(mixed $data): array
-    {
+    protected function normalizeData(): array
         if (! \is_array($data)) {
             return [];
         }
@@ -920,8 +893,7 @@ class ConflictDetectionService
      * @param  array<int, array<string, mixed>>  $data
      * @return array<string|int, array<string, mixed>>
      */
-    protected function indexById(array $data): array
-    {
+    protected function indexById(): array
         $indexed = [];
 
         foreach ($data as $item) {
@@ -947,7 +919,6 @@ class ConflictDetectionService
      * @return array<string, float>
      */
     public function getAllSourceConfidences(): array
-    {
         return self::SOURCE_CONFIDENCE;
     }
 
@@ -959,10 +930,7 @@ class ConflictDetectionService
      * @param  array<string, array{data: mixed, source: string, timestamp?: string, metadata?: array<string, mixed>}>  $sources
      * @return array{data: mixed, has_conflicts: bool, conflicts: array<string, mixed>, resolution: array<string, mixed>}
      */
-    public function validateAndResolve(
-        array $sources,
-        string $strategy = self::STRATEGY_HIGHEST_CONFIDENCE
-    ): array {
+    public function validateAndResolve(): array
         $detection = $this->detectConflicts($sources);
 
         if (! $detection['has_conflicts']) {

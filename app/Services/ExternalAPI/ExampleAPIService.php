@@ -64,8 +64,7 @@ class ExampleAPIService extends ExternalAPIService
      *
      * @return array{success: bool, data: mixed, source: string, error?: string, metadata: array<string, mixed>}
      */
-    public function fetchCharacter(string $characterId): array
-    {
+    public function fetchCharacter(): array
         return $this->fetchWithFallback("/characters/{$characterId}");
     }
 
@@ -74,8 +73,7 @@ class ExampleAPIService extends ExternalAPIService
      *
      * @return array{success: bool, data: mixed, source: string, error?: string, metadata: array<string, mixed>}
      */
-    public function fetchSupportCard(string $cardId): array
-    {
+    public function fetchSupportCard(): array
         return $this->fetchWithFallback("/support-cards/{$cardId}");
     }
 
@@ -84,8 +82,7 @@ class ExampleAPIService extends ExternalAPIService
      *
      * @return array{success: bool, data: mixed, source: string, error?: string, metadata: array<string, mixed>}
      */
-    public function fetchFromSpecificSource(string $sourceName, string $endpoint): array
-    {
+    public function fetchFromSpecificSource(): array
         return $this->fetchFromSource($sourceName, $endpoint);
     }
 
@@ -94,8 +91,7 @@ class ExampleAPIService extends ExternalAPIService
      *
      * @return array{success: bool, data: mixed, source: string, error?: string, metadata: array<string, mixed>}
      */
-    public function fetchWithPreferredSource(string $endpoint, string $preferredSource): array
-    {
+    public function fetchWithPreferredSource(): array
         return $this->fetchWithFallback($endpoint, 'GET', [], $preferredSource);
     }
 }

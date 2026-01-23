@@ -42,8 +42,7 @@ class DataValidationService
      *
      * @return array{valid: bool, errors: array<string>, warnings: array<string>, score: float, details: array<string, mixed>}
      */
-    public function validateData(string $dataType, mixed $data): array
-    {
+    public function validateData(): array
         Log::info('[DataValidation] Starting validation', [
             'data_type' => $dataType,
             'data_size' => is_array($data) ? count($data) : 0,
@@ -103,8 +102,7 @@ class DataValidationService
      * @param  array<string, mixed>  $rules
      * @return array{valid: bool, errors: array<string>, warnings: array<string>, details: array<string, mixed>}
      */
-    protected function executeValidationWorkflow(mixed $data, array $rules): array
-    {
+    protected function executeValidationWorkflow(): array
         $errors = [];
         $warnings = [];
         $details = [];
@@ -159,8 +157,7 @@ class DataValidationService
      * @param  array<string, mixed>  $schemaRules
      * @return array{valid: bool, errors: array<string>, warnings: array<string>}
      */
-    protected function validateSchema(mixed $data, array $schemaRules): array
-    {
+    protected function validateSchema(): array
         $errors = [];
         $warnings = [];
 
@@ -175,32 +172,67 @@ class DataValidationService
             return ['valid' => false, 'errors' => $errors, 'warnings' => $warnings];
         }
 
-        // Validate required fields
-        if (isset($schemaRules['required_fields'])) {
-            foreach ($schemaRules['required_fields'] as $field) {
-                if (! isset($data[$field]) && ! array_key_exists($field, $data)) {
-                    $errors[] = "Required field missing: {$field}";
-                }
+        // Check if this is list data
+        $isList = isset($schemaRules['is_list']) && $schemaRules['is_list'];
+
+        if ($isList) {
+            // Validate array structure for list data
+            if (! $this->isSequentialArray($data)) {
+                $warnings[] = 'Data should be a sequential array (list)';
             }
-        }
 
-        // Validate field types
-        if (isset($schemaRules['field_types'])) {
-            foreach ($schemaRules['field_types'] as $field => $expectedType) {
-                if (isset($data[$field])) {
-                    $actualType = gettype($data[$field]);
+            // Validate each item in the list
+            foreach ($data as $index => $item) {
+                if (! is_array($item)) {
+                    $errors[] = "Item at index {$index} is not an array";
 
-                    if ($actualType !== $expectedType) {
-                        $errors[] = "Field '{$field}' has incorrect type. Expected: {$expectedType}, Got: {$actualType}";
+                    continue;
+                }
+
+                // Validate required fields for each item
+                if (isset($schemaRules['required_fields'])) {
+                    foreach ($schemaRules['required_fields'] as $field) {
+                        if (! isset($item[$field]) && ! array_key_exists($field, $item)) {
+                            $errors[] = "Required field missing: {$field} at index {$index}";
+                        }
+                    }
+                }
+
+                // Validate field types for each item
+                if (isset($schemaRules['field_types'])) {
+                    foreach ($schemaRules['field_types'] as $field => $expectedType) {
+                        if (isset($item[$field])) {
+                            $actualType = gettype($item[$field]);
+
+                            if ($actualType !== $expectedType) {
+                                $errors[] = "Field '{$field}' has incorrect type. Expected: {$expectedType}, Got: {$actualType} at index {$index}";
+                            }
+                        }
                     }
                 }
             }
-        }
+        } else {
+            // Validate single record
+            // Validate required fields
+            if (isset($schemaRules['required_fields'])) {
+                foreach ($schemaRules['required_fields'] as $field) {
+                    if (! isset($data[$field]) && ! array_key_exists($field, $data)) {
+                        $errors[] = "Required field missing: {$field}";
+                    }
+                }
+            }
 
-        // Validate array structure for list data
-        if (isset($schemaRules['is_list']) && $schemaRules['is_list']) {
-            if (! $this->isSequentialArray($data)) {
-                $warnings[] = 'Data should be a sequential array (list)';
+            // Validate field types
+            if (isset($schemaRules['field_types'])) {
+                foreach ($schemaRules['field_types'] as $field => $expectedType) {
+                    if (isset($data[$field])) {
+                        $actualType = gettype($data[$field]);
+
+                        if ($actualType !== $expectedType) {
+                            $errors[] = "Field '{$field}' has incorrect type. Expected: {$expectedType}, Got: {$actualType}";
+                        }
+                    }
+                }
             }
         }
 
@@ -217,8 +249,7 @@ class DataValidationService
      * @param  array<string, mixed>  $integrityRules
      * @return array{valid: bool, errors: array<string>, warnings: array<string>}
      */
-    protected function validateDataIntegrity(mixed $data, array $integrityRules): array
-    {
+    protected function validateDataIntegrity(): array
         $errors = [];
         $warnings = [];
 
@@ -268,8 +299,7 @@ class DataValidationService
      * @param  array<string, mixed>  $businessRules
      * @return array{valid: bool, errors: array<string>, warnings: array<string>}
      */
-    protected function validateBusinessRules(mixed $data, array $businessRules): array
-    {
+    protected function validateBusinessRules(): array
         $errors = [];
         $warnings = [];
 
@@ -322,8 +352,7 @@ class DataValidationService
      * @param  array<string, mixed>  $qualityRules
      * @return array{valid: bool, warnings: array<string>, metrics: array<string, mixed>}
      */
-    protected function validateDataQuality(mixed $data, array $qualityRules): array
-    {
+    protected function validateDataQuality(): array
         $warnings = [];
         $metrics = [];
 
@@ -392,7 +421,7 @@ class DataValidationService
 
             foreach ($requiredFields as $field) {
                 if (isset($item[$field]) && $item[$field] !== '') {
-                    $filledFields++;
+                    $filledFields = ($filledFields ?? 0) + 1;
                 }
             }
         }
@@ -428,10 +457,10 @@ class DataValidationService
                 if (! isset($fieldTypes[$field])) {
                     $fieldTypes[$field] = $type;
                 } elseif ($fieldTypes[$field] !== $type) {
-                    $inconsistencies++;
+                    $inconsistencies = ($inconsistencies ?? 0) + 1;
                 }
 
-                $totalChecks++;
+                $totalChecks = ($totalChecks ?? 0) + 1;
             }
         }
 
@@ -464,8 +493,8 @@ class DataValidationService
 
                 // Freshness decreases with age (100% at 0 days, 0% at 30+ days)
                 $freshness = max(0, 100 - ($ageInDays * 3.33));
-                $totalAge += $freshness;
-                $count++;
+                $totalAge = ($totalAge ?? 0) + $freshness;
+                $count = ($count ?? 0) + 1;
             } catch (\Exception $e) {
                 // Invalid timestamp, skip
                 continue;
@@ -539,8 +568,7 @@ class DataValidationService
      *
      * @return array<string, mixed>
      */
-    protected function getValidationRules(string $dataType): array
-    {
+    protected function getValidationRules(): array
         return $this->validationRules[$dataType] ?? [];
     }
 
@@ -637,8 +665,7 @@ class DataValidationService
      *
      * @return array<int, array<string, mixed>>
      */
-    public function getValidationHistory(int $limit = 10): array
-    {
+    public function getValidationHistory(): array
         return array_slice($this->validationHistory, -$limit);
     }
 
@@ -648,17 +675,16 @@ class DataValidationService
      * @return array{total_validations: int, successful: int, failed: int, avg_score: float}
      */
     public function getValidationStatistics(): array
-    {
         $total = count($this->validationHistory);
         $successful = 0;
         $totalScore = 0.0;
 
         foreach ($this->validationHistory as $entry) {
             if ($entry['valid']) {
-                $successful++;
+                $successful = ($successful ?? 0) + 1;
             }
 
-            $totalScore += $entry['score'];
+            $totalScore = ($totalScore ?? 0) + $entry['score'];
         }
 
         return [

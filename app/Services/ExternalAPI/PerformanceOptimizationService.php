@@ -70,12 +70,7 @@ class PerformanceOptimizationService
      * @param  array<string, mixed>  $params
      * @return array{success: bool, queued: bool, batch_id: string, position: int}
      */
-    public function addToBatch(
-        string $endpoint,
-        string $method = 'GET',
-        array $params = [],
-        ?callable $callback = null
-    ): array {
+    public function addToBatch(): array
         $batchId = $this->getBatchId($endpoint, $method);
 
         // Initialize batch if it doesn't exist
@@ -122,8 +117,7 @@ class PerformanceOptimizationService
      *
      * @return array{success: bool, batch_id: string, executed_count: int, results: array<array<string, mixed>>, duration_ms: float}
      */
-    public function executeBatch(string $batchId): array
-    {
+    public function executeBatch(): array
         if (! isset($this->batchQueue[$batchId])) {
             return [
                 'success' => false,
@@ -219,7 +213,6 @@ class PerformanceOptimizationService
      * @return array{success: bool, executed_batches: int, total_requests: int, duration_ms: float}
      */
     public function executeAllBatches(): array
-    {
         $startTime = microtime(true);
         $executedBatches = 0;
         $totalRequests = 0;
@@ -229,8 +222,8 @@ class PerformanceOptimizationService
         foreach ($batchIds as $batchId) {
             $result = $this->executeBatch($batchId);
             if ($result['success']) {
-                $executedBatches++;
-                $totalRequests += $result['executed_count'];
+                $executedBatches = ($executedBatches ?? 0) + 1;
+                $totalRequests = ($totalRequests ?? 0) + $result['executed_count'];
             }
         }
 
@@ -256,13 +249,12 @@ class PerformanceOptimizationService
      * @return array{total_batches: int, total_requests: int, batches: array<string, array{request_count: int, age_seconds: int}>}
      */
     public function getBatchQueueStatus(): array
-    {
         $totalRequests = 0;
         $batches = [];
 
         foreach ($this->batchQueue as $batchId => $batch) {
             $requestCount = count($batch['requests']);
-            $totalRequests += $requestCount;
+            $totalRequests = ($totalRequests ?? 0) + $requestCount;
 
             $batches[$batchId] = [
                 'request_count' => $requestCount,
@@ -285,8 +277,7 @@ class PerformanceOptimizationService
      * @param  array<array{url: string, method?: string, params?: array<string, mixed>, headers?: array<string, string>}>  $requests
      * @return array{success: bool, results: array<array<string, mixed>>, duration_ms: float, parallel_count: int}
      */
-    public function fetchParallel(array $requests): array
-    {
+    public function fetchParallel(): array
         $startTime = microtime(true);
 
         // Limit parallel requests
@@ -326,8 +317,7 @@ class PerformanceOptimizationService
      * @param  array<array{url: string, method?: string, params?: array<string, mixed>, headers?: array<string, string>}>  $requests
      * @return array<array<string, mixed>>
      */
-    protected function executeParallelChunk(array $requests): array
-    {
+    protected function executeParallelChunk(): array
         $results = [];
 
         // In a real implementation, this would use async/parallel execution
@@ -378,8 +368,7 @@ class PerformanceOptimizationService
      *
      * @return array{id: string, url: string, last_used: int, in_use: bool}
      */
-    protected function getConnection(string $url): array
-    {
+    protected function getConnection(): array
         $baseUrl = parse_url($url, PHP_URL_SCHEME).'://'.parse_url($url, PHP_URL_HOST);
 
         // Look for available connection in pool
@@ -477,13 +466,12 @@ class PerformanceOptimizationService
      * @return array{pool_size: int, max_size: int, in_use: int, available: int, connections: array<string, array{url: string, last_used: int, in_use: bool, age_seconds: int}>}
      */
     public function getConnectionPoolStatus(): array
-    {
         $inUse = 0;
         $connections = [];
 
         foreach ($this->connectionPool as $id => $connection) {
             if ($connection['in_use']) {
-                $inUse++;
+                $inUse = ($inUse ?? 0) + 1;
             }
 
             $connections[$id] = [
@@ -511,8 +499,7 @@ class PerformanceOptimizationService
      * @param  array<string, mixed>  $data
      * @return array{compressed: bool, original_size: int, compressed_size: int, compression_ratio: float, data: string}
      */
-    public function compressResponse(array $data): array
-    {
+    public function compressResponse(): array
         $jsonData = json_encode($data);
         $originalSize = strlen($jsonData);
 
@@ -572,8 +559,7 @@ class PerformanceOptimizationService
      *
      * @return array<string, mixed>
      */
-    public function decompressResponse(string $compressedData): array
-    {
+    public function decompressResponse(): array
         try {
             // Decode base64
             $decoded = base64_decode($compressedData, true);
@@ -612,8 +598,7 @@ class PerformanceOptimizationService
      * @param  array<string, mixed>  $params
      * @return array<string, mixed>
      */
-    protected function executeRequest(string $endpoint, string $method, array $params): array
-    {
+    protected function executeRequest(): array
         // This would call the actual API service
         // For now, return a simulated response
         return [
@@ -664,7 +649,6 @@ class PerformanceOptimizationService
      * @return array<string, mixed>
      */
     public function getStatistics(): array
-    {
         return [
             'batch_queue' => $this->getBatchQueueStatus(),
             'connection_pool' => $this->getConnectionPoolStatus(),

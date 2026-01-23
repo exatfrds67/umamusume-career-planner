@@ -34,8 +34,7 @@ class ResponseValidator
      * @param  array<string, mixed>  $response
      * @return array{valid: bool, errors: array<string>, data: mixed}
      */
-    public function validate(string $responseType, array $response): array
-    {
+    public function validate(): array
         $schema = $this->schemas[$responseType] ?? null;
 
         if (! $schema) {
@@ -117,8 +116,7 @@ class ResponseValidator
      * @param  array<string, mixed>  $schema
      * @return array<string>
      */
-    protected function validateItem($item, array $schema): array
-    {
+    protected function validateItem(): array
         $errors = [];
 
         if (! is_array($item)) {
@@ -313,7 +311,6 @@ class ResponseValidator
      * @return array<string, array<string, mixed>>
      */
     public function getSchemas(): array
-    {
         return $this->schemas;
     }
 }

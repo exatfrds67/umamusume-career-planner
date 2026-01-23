@@ -80,8 +80,7 @@ class DataFetchingAgent
      * @param  array{strategy?: string, max_parallel?: int, timeout?: int}  $options
      * @return array{success: bool, results: array<string, array{success: bool, data: mixed, source: string, error?: string, metadata: array<string, mixed>}>, metadata: array<string, mixed>, aggregated?: array<string, mixed>}
      */
-    public function fetchMultipleResources(array $resources, array $options = []): array
-    {
+    public function fetchMultipleResources(): array
         $startTime = microtime(true);
 
         // Extract options
@@ -129,9 +128,9 @@ class DataFetchingAgent
                 $allResults[$resourceName] = $result;
 
                 if ($result['success']) {
-                    $successCount++;
+                    $successCount = ($successCount ?? 0) + 1;
                 } else {
-                    $failureCount++;
+                    $failureCount = ($failureCount ?? 0) + 1;
                 }
             }
         }
@@ -171,8 +170,7 @@ class DataFetchingAgent
      * @param  array<array{name: string, type: string, endpoint: string, source?: string, params?: array<string, mixed>}>  $batch
      * @return array<string, array{success: bool, data: mixed, source: string, error?: string, metadata: array<string, mixed>}>
      */
-    protected function processBatch(array $batch): array
-    {
+    protected function processBatch(): array
         $results = [];
 
         // Process each resource in the batch
@@ -192,12 +190,11 @@ class DataFetchingAgent
      * @param  array{name: string, type: string, endpoint: string, source?: string, params?: array<string, mixed>}  $resource
      * @return array{success: bool, data: mixed, source: string, type: string, error?: string, metadata: array<string, mixed>}
      */
-    protected function fetchResource(array $resource): array
-    {
+    protected function fetchResource(): array
         $resourceName = $resource['name'];
         $resourceType = $resource['type'];
         $endpoint = $resource['endpoint'];
-        $preferredSource = $resource['source'] ?? null;
+        $preferredSource = (is_array($resource) && isset($resource['source']) ? $resource['source'] : null);
         $params = $resource['params'] ?? [];
 
         $startTime = microtime(true);
@@ -232,7 +229,7 @@ class DataFetchingAgent
 
         // Attempt to fetch from API with retries
         while ($attempts < self::MAX_RETRIES) {
-            $attempts++;
+            $attempts = ($attempts ?? 0) + 1;
 
             try {
                 Log::debug('[DataFetchingAgent] Fetching resource from API', [
@@ -359,11 +356,7 @@ class DataFetchingAgent
      * @param  array<string, mixed>  $params
      * @return array{success: bool, data: mixed, source: string, error?: string, metadata: array<string, mixed>}
      */
-    protected function performFetch(
-        string $endpoint,
-        array $params = [],
-        ?string $preferredSource = null
-    ): array {
+    protected function performFetch(): array
         // Check if MCP fetch server is available
         if (! $this->mcpClient->isFetchAvailable()) {
             return [
@@ -443,8 +436,7 @@ class DataFetchingAgent
      * @param  array<array{name?: string, type?: string, endpoint?: string, source?: string, params?: array<string, mixed>, priority?: int}>  $resources
      * @return array<array{name: string, type: string, endpoint: string, source?: string, params?: array<string, mixed>, priority?: int}>
      */
-    protected function validateResources(array $resources): array
-    {
+    protected function validateResources(): array
         $validated = [];
 
         foreach ($resources as $index => $resource) {
@@ -481,7 +473,7 @@ class DataFetchingAgent
                 'name' => $resource['name'],
                 'type' => $resource['type'],
                 'endpoint' => $resource['endpoint'],
-                'source' => $resource['source'] ?? null,
+                'source' => (is_array($resource) && isset($resource['source']) ? $resource['source'] : null),
                 'params' => $resource['params'] ?? [],
                 'priority' => $resource['priority'] ?? self::PRIORITY_NORMAL,
             ];
@@ -504,8 +496,7 @@ class DataFetchingAgent
      * @param  array<array{name: string, type: string, endpoint: string, source?: string, params?: array<string, mixed>, priority?: int}>  $resources
      * @return array<array<array{name: string, type: string, endpoint: string, source?: string, params?: array<string, mixed>, priority?: int}>>
      */
-    protected function createBatches(array $resources, string $strategy, int $maxParallel): array
-    {
+    protected function createBatches(): array
         return match ($strategy) {
             self::BATCH_STRATEGY_PRIORITY => $this->createPriorityBatches($resources, $maxParallel),
             self::BATCH_STRATEGY_TYPE => $this->createTypeBatches($resources, $maxParallel),
@@ -520,8 +511,7 @@ class DataFetchingAgent
      * @param  array<array{name: string, type: string, endpoint: string, source?: string, params?: array<string, mixed>, priority?: int}>  $resources
      * @return array<array<array{name: string, type: string, endpoint: string, source?: string, params?: array<string, mixed>, priority?: int}>>
      */
-    protected function createPriorityBatches(array $resources, int $maxParallel): array
-    {
+    protected function createPriorityBatches(): array
         // Sort resources by priority (lower number = higher priority)
         usort($resources, function ($a, $b) {
             $priorityA = $a['priority'] ?? self::PRIORITY_NORMAL;
@@ -540,8 +530,7 @@ class DataFetchingAgent
      * @param  array<array{name: string, type: string, endpoint: string, source?: string, params?: array<string, mixed>, priority?: int}>  $resources
      * @return array<array<array{name: string, type: string, endpoint: string, source?: string, params?: array<string, mixed>, priority?: int}>>
      */
-    protected function createTypeBatches(array $resources, int $maxParallel): array
-    {
+    protected function createTypeBatches(): array
         // Group resources by type
         $grouped = [];
         foreach ($resources as $resource) {
@@ -568,8 +557,7 @@ class DataFetchingAgent
      * @param  array<array{name: string, type: string, endpoint: string, source?: string, params?: array<string, mixed>, priority?: int}>  $resources
      * @return array<array<array{name: string, type: string, endpoint: string, source?: string, params?: array<string, mixed>, priority?: int}>>
      */
-    protected function createSourceBatches(array $resources, int $maxParallel): array
-    {
+    protected function createSourceBatches(): array
         // Group resources by source
         $grouped = [];
         foreach ($resources as $resource) {
@@ -596,8 +584,7 @@ class DataFetchingAgent
      * @param  array<array{name: string, type: string, endpoint: string, source?: string, params?: array<string, mixed>, priority?: int}>  $resources
      * @return array<array<array{name: string, type: string, endpoint: string, source?: string, params?: array<string, mixed>, priority?: int}>>
      */
-    protected function createSequentialBatches(array $resources, int $maxParallel): array
-    {
+    protected function createSequentialBatches(): array
         return array_chunk($resources, $maxParallel);
     }
 
@@ -607,8 +594,7 @@ class DataFetchingAgent
      * @param  array<string, array{success: bool, data: mixed, source: string, type: string, error?: string, metadata: array<string, mixed>}>  $results
      * @return array{by_type: array<string, array<string, mixed>>, by_source: array<string, array<string, mixed>>, by_status: array<string, array<string, mixed>>, summary: array<string, mixed>}
      */
-    protected function aggregateResults(array $results): array
-    {
+    protected function aggregateResults(): array
         $byType = [];
         $bySource = [];
         $byStatus = [
@@ -720,7 +706,7 @@ class DataFetchingAgent
                 $result['source'] === 'cache' ||
                 $result['source'] === 'cache_fallback'
             ) {
-                $cacheHits++;
+                $cacheHits = ($cacheHits ?? 0) + 1;
             }
         }
 
@@ -742,8 +728,8 @@ class DataFetchingAgent
         $mostCommon = null;
 
         foreach ($bySource as $source => $data) {
-            if ($data['count'] > $maxCount) {
-                $maxCount = $data['count'];
+            if ((is_array($data) && isset($data['count']) ? $data['count'] : null) > $maxCount) {
+                $maxCount = (is_array($data) && isset($data['count']) ? $data['count'] : null);
                 $mostCommon = $source;
             }
         }
@@ -766,8 +752,8 @@ class DataFetchingAgent
         $mostCommon = null;
 
         foreach ($byType as $type => $data) {
-            if ($data['count'] > $maxCount) {
-                $maxCount = $data['count'];
+            if ((is_array($data) && isset($data['count']) ? $data['count'] : null) > $maxCount) {
+                $maxCount = (is_array($data) && isset($data['count']) ? $data['count'] : null);
                 $mostCommon = $type;
             }
         }
@@ -781,8 +767,7 @@ class DataFetchingAgent
      * @param  array<array{name: string, type: string, endpoint: string, source?: string, params?: array<string, mixed>, priority?: int}>  $resources
      * @return array{success: bool, results: array<string, array{success: bool, data: mixed, source: string, error?: string, metadata: array<string, mixed>}>, metadata: array<string, mixed>, aggregated?: array<string, mixed>}
      */
-    public function fetchByPriority(array $resources, int $maxParallel = self::MAX_PARALLEL_REQUESTS): array
-    {
+    public function fetchByPriority(): array
         return $this->fetchMultipleResources($resources, [
             'strategy' => self::BATCH_STRATEGY_PRIORITY,
             'max_parallel' => $maxParallel,
@@ -795,8 +780,7 @@ class DataFetchingAgent
      * @param  array<array{name: string, type: string, endpoint: string, source?: string, params?: array<string, mixed>, priority?: int}>  $resources
      * @return array{success: bool, results: array<string, array{success: bool, data: mixed, source: string, error?: string, metadata: array<string, mixed>}>, metadata: array<string, mixed>, aggregated?: array<string, mixed>}
      */
-    public function fetchByType(array $resources, int $maxParallel = self::MAX_PARALLEL_REQUESTS): array
-    {
+    public function fetchByType(): array
         return $this->fetchMultipleResources($resources, [
             'strategy' => self::BATCH_STRATEGY_TYPE,
             'max_parallel' => $maxParallel,
@@ -809,8 +793,7 @@ class DataFetchingAgent
      * @param  array<array{name: string, type: string, endpoint: string, source?: string, params?: array<string, mixed>, priority?: int}>  $resources
      * @return array{success: bool, results: array<string, array{success: bool, data: mixed, source: string, error?: string, metadata: array<string, mixed>}>, metadata: array<string, mixed>, aggregated?: array<string, mixed>}
      */
-    public function fetchBySource(array $resources, int $maxParallel = self::MAX_PARALLEL_REQUESTS): array
-    {
+    public function fetchBySource(): array
         return $this->fetchMultipleResources($resources, [
             'strategy' => self::BATCH_STRATEGY_SOURCE,
             'max_parallel' => $maxParallel,
@@ -823,7 +806,6 @@ class DataFetchingAgent
      * @return array{total_fetches: int, successful_fetches: int, failed_fetches: int, cache_hits: int, average_duration_ms: float}
      */
     public function getPerformanceMetrics(): array
-    {
         // In a real implementation, these would be tracked in Redis or a database
         // For now, we return placeholder metrics
         return [
@@ -868,7 +850,6 @@ class DataFetchingAgent
      * @return array{healthy: bool, mcp_enabled: bool, fetch_available: bool, cache_available: bool}
      */
     public function getStatus(): array
-    {
         return [
             'healthy' => $this->isHealthy(),
             'mcp_enabled' => $this->mcpClient->isEnabled(),

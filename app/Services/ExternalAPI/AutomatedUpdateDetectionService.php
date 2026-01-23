@@ -58,8 +58,7 @@ class AutomatedUpdateDetectionService
      * @param  array<string, mixed>  $options
      * @return array{updates_detected: bool, changes: array<string, mixed>, last_check: string, next_check: string}
      */
-    public function monitorDataSource(string $dataSource, array $options = []): array
-    {
+    public function monitorDataSource(): array
         Log::info('[UpdateDetection] Monitoring data source', [
             'data_source' => $dataSource,
             'options' => $options,
@@ -127,7 +126,6 @@ class AutomatedUpdateDetectionService
      * @return array<string, array{updates_detected: bool, changes: array<string, mixed>, last_check: string, next_check: string}>
      */
     public function monitorAllSources(): array
-    {
         $dataSources = [
             'umapyoi_characters',
             'umapyoi_support_cards',
@@ -217,8 +215,7 @@ class AutomatedUpdateDetectionService
      * @param  array<string, mixed>  $currentState
      * @return array<string, mixed>
      */
-    protected function detectChanges(?array $lastState, array $currentState, string $dataSource): array
-    {
+    protected function detectChanges(): array
         if ($lastState === null) {
             return [
                 'type' => 'initial_state',
@@ -279,8 +276,7 @@ class AutomatedUpdateDetectionService
      *
      * @return array<string, mixed>
      */
-    protected function analyzeDetailedChanges(mixed $lastData, mixed $currentData): array
-    {
+    protected function analyzeDetailedChanges(): array
         if (! is_array($lastData) || ! is_array($currentData)) {
             return [];
         }
@@ -341,8 +337,7 @@ class AutomatedUpdateDetectionService
      * @param  array<mixed>  $data
      * @return array<string|int, mixed>
      */
-    protected function normalizeDataById(array $data): array
-    {
+    protected function normalizeDataById(): array
         $normalized = [];
 
         foreach ($data as $item) {
@@ -361,8 +356,7 @@ class AutomatedUpdateDetectionService
      * @param  array<string, mixed>  $currentItem
      * @return array<string>
      */
-    protected function findChangedFields(array $lastItem, array $currentItem): array
-    {
+    protected function findChangedFields(): array
         $changedFields = [];
 
         $allFields = array_unique(array_merge(array_keys($lastItem), array_keys($currentItem)));
@@ -452,8 +446,7 @@ class AutomatedUpdateDetectionService
      *
      * @return array<int, array<string, mixed>>
      */
-    public function getChangeLog(string $dataSource, int $limit = 10): array
-    {
+    public function getChangeLog(): array
         $changeLogKey = self::CHANGE_LOG_KEY.$dataSource;
 
         $entries = Redis::lrange($changeLogKey, 0, $limit - 1);
@@ -467,7 +460,6 @@ class AutomatedUpdateDetectionService
      * @return array<string, array{last_check: string|null, updates_detected: int, last_change: string|null}>
      */
     public function getMonitoringStatus(): array
-    {
         $dataSources = [
             'umapyoi_characters',
             'umapyoi_support_cards',
@@ -483,7 +475,7 @@ class AutomatedUpdateDetectionService
             $changeLog = $this->getChangeLog($source, 1);
 
             $status[$source] = [
-                'last_check' => $lastState['timestamp'] ?? null,
+                'last_check' => (is_array($lastState) && isset($lastState['timestamp']) ? $lastState['timestamp'] : null),
                 'updates_detected' => count($changeLog),
                 'last_change' => ! empty($changeLog) ? $changeLog[0]['timestamp'] : null,
             ];
@@ -498,7 +490,6 @@ class AutomatedUpdateDetectionService
      * @return array{total_checks: int, updates_detected: int, avg_changes_per_update: float, most_active_source: string}
      */
     public function getUpdateStatistics(): array
-    {
         $dataSources = [
             'umapyoi_characters',
             'umapyoi_support_cards',
@@ -516,11 +507,11 @@ class AutomatedUpdateDetectionService
             $changeLog = $this->getChangeLog($source, 100);
             $updateCount = count($changeLog);
 
-            $totalChecks += $updateCount;
-            $totalUpdates += $updateCount;
+            $totalChecks = ($totalChecks ?? 0) + $updateCount;
+            $totalUpdates = ($totalUpdates ?? 0) + $updateCount;
 
             foreach ($changeLog as $entry) {
-                $totalChanges += count($entry['changes']);
+                $totalChanges = ($totalChanges ?? 0) + count($entry['changes']);
             }
 
             $sourceActivity[$source] = $updateCount;
