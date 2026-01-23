@@ -10,6 +10,31 @@ use Illuminate\Support\Facades\Route;
 // Main welcome route
 Route::get('/', fn () => view('welcome'))->name('welcome');
 
+// PWA routes - Service Worker and Offline Page
+Route::get('/sw.js', function () {
+    $content = file_get_contents(public_path('sw.js'));
+
+    return response($content, 200, [
+        'Content-Type' => 'application/javascript; charset=utf-8',
+    ]);
+})->name('sw');
+
+Route::get('/manifest.json', function () {
+    $content = file_get_contents(public_path('manifest.json'));
+
+    return response($content, 200, [
+        'Content-Type' => 'application/json',
+    ]);
+})->name('manifest');
+
+Route::get('/offline.html', function () {
+    $content = file_get_contents(public_path('offline.html'));
+
+    return response($content, 200, [
+        'Content-Type' => 'text/html',
+    ]);
+})->name('offline');
+
 // Authentication routes
 Route::middleware('guest')->group(function () {
     Route::get('/login', [App\Http\Controllers\Auth\LoginController::class, 'create'])->name('login');

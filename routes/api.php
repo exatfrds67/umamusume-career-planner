@@ -34,6 +34,14 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
         'update' => 'api.characters.update',
         'destroy' => 'api.characters.destroy',
     ]);
+    // Connectivity Monitoring (Task 2.2.1)
+    Route::prefix('connectivity')->name('connectivity.')->group(function () {
+        Route::get('/status', [\App\Http\Controllers\Api\ConnectivityController::class, 'status'])->name('status');
+        Route::post('/check', [\App\Http\Controllers\Api\ConnectivityController::class, 'check'])->name('check');
+        Route::get('/offline-info', [\App\Http\Controllers\Api\ConnectivityController::class, 'offlineInfo'])->name('offline-info');
+        Route::get('/recommendations', [\App\Http\Controllers\Api\ConnectivityController::class, 'recommendations'])->name('recommendations');
+        Route::get('/report', [\App\Http\Controllers\Api\ConnectivityController::class, 'report'])->name('report');
+    });
 });
 
 // Profile API Routes
@@ -209,20 +217,14 @@ Route::prefix('characters/{characterId}')->name('api.characters.')->group(functi
 
 // Skill Hint API Routes
 Route::prefix('characters/{characterId}/skill-hints')->name('api.skill-hints.')->group(function () {
-    // CRUD operations
+    // CRUD operations - index and store first
     Route::get('/', [SkillHintController::class, 'index'])
         ->name('index');
 
     Route::post('/', [SkillHintController::class, 'store'])
         ->name('store');
 
-    Route::get('/{id}', [SkillHintController::class, 'show'])
-        ->name('show');
-
-    Route::delete('/{id}', [SkillHintController::class, 'destroy'])
-        ->name('destroy');
-
-    // Cost and statistics
+    // Cost and statistics - MUST be before /{id} routes to avoid matching "statistics" as an id
     Route::get('/skills/{skillId}/cost-breakdown', [SkillHintController::class, 'costBreakdown'])
         ->name('cost-breakdown');
 
@@ -249,6 +251,24 @@ Route::prefix('characters/{characterId}/skill-hints')->name('api.skill-hints.')-
     // Mark hints as used
     Route::post('/skills/{skillId}/mark-used', [SkillHintController::class, 'markAsUsed'])
         ->name('mark-used');
+
+    // CRUD operations - show and destroy MUST be last (wildcard routes)
+    Route::get('/{id}', [SkillHintController::class, 'show'])
+        ->name('show');
+
+    Route::delete('/{id}', [SkillHintController::class, 'destroy'])
+        ->name('destroy');
+});
+
+// V1 Character Deck Management API Routes (must be before other deck routes to take precedence)
+Route::middleware('auth:sanctum')->prefix('v1/characters')->name('api.v1.characters.')->group(function () {
+    Route::get('/{id}/deck', [\App\Http\Controllers\Api\V1\DeckManagementController::class, 'getDeck'])
+        ->name('deck.get');
+    Route::post('/{id}/deck', [\App\Http\Controllers\Api\V1\DeckManagementController::class, 'addCard'])
+        ->name('deck.add-card');
+    Route::delete('/{id}/deck/{slot}', [\App\Http\Controllers\Api\V1\DeckManagementController::class, 'removeCardBySlot'])
+        ->where('slot', '[0-9]+')
+        ->name('deck.remove-slot');
 });
 
 // Support Card Deck API Routes
@@ -415,6 +435,10 @@ Route::middleware('auth:sanctum')->prefix('ai/chat')->name('api.ai.chat.')->grou
     Route::post('/server-disconnection', [\App\Http\Controllers\AIChatController::class, 'handleServerDisconnection'])
         ->name('server-disconnection');
 
+    // Get available models
+    Route::get('/models', [\App\Http\Controllers\AIChatController::class, 'getModels'])
+        ->name('models');
+
     // User preferences
     Route::get('/preferences', [\App\Http\Controllers\AIChatController::class, 'preferences'])
         ->name('preferences.get');
@@ -478,6 +502,14 @@ Route::middleware('auth:sanctum')->prefix('mcp/monitoring')->name('api.mcp.monit
 
 // OCR API Routes (Task 5.1)
 Route::middleware('auth:sanctum')->prefix('ocr')->name('api.ocr.')->group(function () {
+    Route::post('/upload', [\App\Http\Controllers\OCRUploadController::class, 'upload'])
+        ->name('upload');
+    Route::get('/status', [\App\Http\Controllers\OCRUploadController::class, 'status'])
+        ->name('status');
+});
+
+// V1 OCR API Routes
+Route::middleware('auth:sanctum')->prefix('v1/ocr')->name('api.v1.ocr.')->group(function () {
     Route::post('/upload', [\App\Http\Controllers\OCRUploadController::class, 'upload'])
         ->name('upload');
     Route::get('/status', [\App\Http\Controllers\OCRUploadController::class, 'status'])
@@ -591,6 +623,133 @@ Route::middleware('auth:sanctum')->prefix('data-management')->name('api.data-man
         ->name('status');
     Route::get('/statistics', [\App\Http\Controllers\DataManagementController::class, 'statistics'])
         ->name('statistics');
+});
+
+// Neuron AI Agent API Routes (Task 14 - Neuron AI Integration)
+Route::middleware(['auth:sanctum', 'throttle:60,1'])->prefix('neuron')->name('api.neuron.')->group(function () {
+    // Training Advisor Agent
+    Route::prefix('training-advisor')->name('training-advisor.')->group(function () {
+        Route::post('/advice', [\App\Http\Controllers\Api\TrainingAdvisorController::class, 'getAdvice'])
+            ->name('advice');
+        Route::post('/advice/stream', [\App\Http\Controllers\Api\TrainingAdvisorController::class, 'getAdviceStreaming'])
+            ->name('advice.stream');
+        Route::get('/history/{characterId}', [\App\Http\Controllers\Api\TrainingAdvisorController::class, 'getHistory'])
+            ->name('history');
+    });
+
+    // Race Strategy Agent
+    Route::prefix('race-strategy')->name('race-strategy.')->group(function () {
+        Route::post('/strategy', [\App\Http\Controllers\Api\RaceStrategyController::class, 'getStrategy'])
+            ->name('strategy');
+        Route::post('/strategy/stream', [\App\Http\Controllers\Api\RaceStrategyController::class, 'getStrategyStreaming'])
+            ->name('strategy.stream');
+        Route::get('/history/{characterId}', [\App\Http\Controllers\Api\RaceStrategyController::class, 'getHistory'])
+            ->name('history');
+        Route::post('/recommended-skills', [\App\Http\Controllers\Api\RaceStrategyController::class, 'getRecommendedSkills'])
+            ->name('recommended-skills');
+    });
+
+    // Skill Recommendation Agent
+    Route::prefix('skill-recommendation')->name('skill-recommendation.')->group(function () {
+        Route::post('/recommendations', [\App\Http\Controllers\Api\SkillRecommendationController::class, 'getRecommendations'])
+            ->name('recommendations');
+        Route::post('/recommendations/stream', [\App\Http\Controllers\Api\SkillRecommendationController::class, 'getRecommendationsStreaming'])
+            ->name('recommendations.stream');
+        Route::get('/history/{characterId}', [\App\Http\Controllers\Api\SkillRecommendationController::class, 'getHistory'])
+            ->name('history');
+        Route::get('/synergies/{characterId}', [\App\Http\Controllers\Api\SkillRecommendationController::class, 'getSynergies'])
+            ->name('synergies');
+    });
+});
+
+// V1 API Routes for Characters
+Route::middleware('auth:sanctum')->prefix('v1')->name('api.v1.')->group(function () {
+    // User endpoint
+    Route::get('/user', function (Request $request) {
+        return response()->json($request->user()->only(['id', 'name', 'email', 'created_at', 'updated_at']));
+    });
+
+    // Character routes
+    Route::get('/characters', [\App\Http\Controllers\Api\V1\CharacterController::class, 'index'])
+        ->name('characters.index');
+    Route::post('/characters', [\App\Http\Controllers\Api\V1\CharacterController::class, 'store'])
+        ->name('characters.store');
+    Route::get('/characters/{id}', [\App\Http\Controllers\Api\V1\CharacterController::class, 'show'])
+        ->name('characters.show');
+    Route::put('/characters/{id}', [\App\Http\Controllers\Api\V1\CharacterController::class, 'update'])
+        ->name('characters.update');
+    Route::delete('/characters/{id}', [\App\Http\Controllers\Api\V1\CharacterController::class, 'destroy'])
+        ->name('characters.destroy');
+    Route::post('/characters/{id}/skills', [\App\Http\Controllers\Api\V1\CharacterController::class, 'acquireSkill'])
+        ->name('characters.skills.acquire');
+    Route::get('/characters/{id}/skills', [\App\Http\Controllers\Api\V1\CharacterController::class, 'skills'])
+        ->name('characters.skills.index');
+    Route::delete('/characters/{id}/skills/{skillId}', [\App\Http\Controllers\Api\V1\CharacterController::class, 'removeSkill'])
+        ->name('characters.skills.remove');
+
+    // Career routes
+    Route::get('/careers', [\App\Http\Controllers\Api\V1\CareerController::class, 'index'])
+        ->name('careers.index');
+    Route::post('/careers', [\App\Http\Controllers\Api\V1\CareerController::class, 'store'])
+        ->name('careers.store');
+    Route::get('/careers/{id}', [\App\Http\Controllers\Api\V1\CareerController::class, 'show'])
+        ->name('careers.show');
+    Route::put('/careers/{id}', [\App\Http\Controllers\Api\V1\CareerController::class, 'update'])
+        ->name('careers.update');
+    Route::delete('/careers/{id}', [\App\Http\Controllers\Api\V1\CareerController::class, 'destroy'])
+        ->name('careers.destroy');
+    Route::get('/careers/{id}/available-races', [\App\Http\Controllers\Api\V1\CareerController::class, 'availableRaces'])
+        ->name('careers.available-races');
+    Route::get('/careers/{id}/training-predictions', [\App\Http\Controllers\Api\V1\CareerController::class, 'trainingPredictions'])
+        ->name('careers.training-predictions');
+    Route::get('/careers/{id}/training-sessions', [\App\Http\Controllers\Api\V1\CareerController::class, 'trainingSessions'])
+        ->name('careers.training-sessions.index');
+    Route::post('/careers/{id}/training-sessions', [\App\Http\Controllers\Api\V1\CareerController::class, 'storeTrainingSession'])
+        ->name('careers.training-sessions.store');
+    Route::post('/careers/{id}/training-sessions/bulk', [\App\Http\Controllers\Api\V1\CareerController::class, 'bulkStoreTrainingSessions'])
+        ->name('careers.training-sessions.bulk');
+    Route::post('/careers/{id}/races', [\App\Http\Controllers\Api\V1\CareerController::class, 'storeRace'])
+        ->name('careers.races.store');
+    Route::put('/careers/{careerId}/races/{raceId}', [\App\Http\Controllers\Api\V1\CareerController::class, 'updateRace'])
+        ->name('careers.races.update');
+    Route::get('/careers/{id}/races', [\App\Http\Controllers\Api\V1\CareerController::class, 'races'])
+        ->name('careers.races.index');
+    Route::get('/careers/{id}/report', [\App\Http\Controllers\Api\V1\CareerController::class, 'report'])
+        ->name('careers.report');
+    Route::get('/careers/{id}/statistics', [\App\Http\Controllers\Api\V1\CareerController::class, 'statistics'])
+        ->name('careers.statistics');
+    Route::post('/careers/compare', [\App\Http\Controllers\Api\V1\CareerController::class, 'compare'])
+        ->name('careers.compare');
+    Route::post('/careers/patterns', [\App\Http\Controllers\Api\V1\CareerController::class, 'patterns'])
+        ->name('careers.patterns');
+    Route::post('/careers/recommendations', [\App\Http\Controllers\Api\V1\CareerController::class, 'recommendations'])
+        ->name('careers.recommendations');
+
+    // Skill routes
+    Route::get('/skills', [\App\Http\Controllers\Api\V1\SkillController::class, 'index'])
+        ->name('skills.index');
+    Route::get('/skills/{id}', [\App\Http\Controllers\Api\V1\SkillController::class, 'show'])
+        ->name('skills.show');
+    Route::get('/skills/{id}/hints', [\App\Http\Controllers\Api\V1\SkillController::class, 'hints'])
+        ->name('skills.hints');
+    Route::get('/skills/analysis/recommendations', [\App\Http\Controllers\Api\V1\SkillController::class, 'recommendations'])
+        ->name('skills.recommendations');
+    Route::get('/skills/analysis/evolution', [\App\Http\Controllers\Api\V1\SkillController::class, 'evolution'])
+        ->name('skills.evolution');
+
+    // Support Card routes
+    Route::get('/support-cards', [\App\Http\Controllers\Api\V1\SupportCardController::class, 'index'])
+        ->name('support-cards.index');
+    Route::get('/support-cards/meta-ranking', [\App\Http\Controllers\Api\V1\SupportCardController::class, 'metaRanking'])
+        ->name('support-cards.meta-ranking');
+    Route::get('/support-cards/{id}', [\App\Http\Controllers\Api\V1\SupportCardController::class, 'show'])
+        ->name('support-cards.show');
+    Route::get('/support-cards/{id}/synergies', [\App\Http\Controllers\Api\V1\SupportCardController::class, 'synergies'])
+        ->name('support-cards.synergies');
+
+    // Deck optimization route
+    Route::get('/characters/{character}/deck/optimization', [\App\Http\Controllers\Api\V1\DeckManagementController::class, 'getRecommendations'])
+        ->name('characters.deck.optimization');
 });
 
 // Career Export/Import API Routes (Task 5.3)
@@ -974,4 +1133,57 @@ Route::prefix('connectivity')->name('api.connectivity.')->group(function () {
     // Get comprehensive connectivity report
     Route::get('/report', [\App\Http\Controllers\Api\ConnectivityController::class, 'report'])
         ->name('report');
+});
+
+// Training Advisor API Routes (Neuron AI Integration - Task 12.1)
+Route::middleware('auth:sanctum')->prefix('training-advisor')->name('api.training-advisor.')->group(function () {
+    // Get training advice
+    Route::post('/advice', [\App\Http\Controllers\Api\TrainingAdvisorController::class, 'getAdvice'])
+        ->name('advice');
+
+    // Get streaming training advice (SSE)
+    Route::post('/advice/stream', [\App\Http\Controllers\Api\TrainingAdvisorController::class, 'getAdviceStreaming'])
+        ->name('advice.stream');
+
+    // Get training advice history
+    Route::get('/history/{characterId}', [\App\Http\Controllers\Api\TrainingAdvisorController::class, 'getHistory'])
+        ->name('history');
+});
+
+// Race Strategy API Routes (Neuron AI Integration - Task 12.2)
+Route::middleware('auth:sanctum')->prefix('race-strategy')->name('api.race-strategy.')->group(function () {
+    // Get race strategy
+    Route::post('/strategy', [\App\Http\Controllers\Api\RaceStrategyController::class, 'getStrategy'])
+        ->name('strategy');
+
+    // Get streaming race strategy (SSE)
+    Route::post('/streaming', [\App\Http\Controllers\Api\RaceStrategyController::class, 'getStrategyStreaming'])
+        ->name('streaming');
+
+    // Get race strategy history
+    Route::get('/history/{characterId}', [\App\Http\Controllers\Api\RaceStrategyController::class, 'getHistory'])
+        ->name('history');
+
+    // Get recommended skills for a race
+    Route::post('/recommended-skills', [\App\Http\Controllers\Api\RaceStrategyController::class, 'getRecommendedSkills'])
+        ->name('recommended-skills');
+});
+
+// Skill Recommendation API Routes (Neuron AI Integration - Task 12.3)
+Route::middleware('auth:sanctum')->prefix('skill-recommendations')->name('api.skill-recommendations.')->group(function () {
+    // Get skill recommendations
+    Route::post('/recommendations', [\App\Http\Controllers\Api\SkillRecommendationController::class, 'getRecommendations'])
+        ->name('recommendations');
+
+    // Get streaming skill recommendations (SSE)
+    Route::post('/streaming', [\App\Http\Controllers\Api\SkillRecommendationController::class, 'getRecommendationsStreaming'])
+        ->name('streaming');
+
+    // Get skill acquisition history
+    Route::get('/history/{characterId}', [\App\Http\Controllers\Api\SkillRecommendationController::class, 'getHistory'])
+        ->name('history');
+
+    // Get skill synergies
+    Route::get('/synergies/{characterId}', [\App\Http\Controllers\Api\SkillRecommendationController::class, 'getSynergies'])
+        ->name('synergies');
 });
