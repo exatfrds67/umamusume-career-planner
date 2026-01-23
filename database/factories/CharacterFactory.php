@@ -49,6 +49,7 @@ class CharacterFactory extends Factory
             'spirit_burst_data' => [],
             'status' => 'active',
             'completion_data' => [],
+            'available_sp' => 0,
         ];
     }
 

@@ -60,6 +60,7 @@ class SkillFactory extends Factory
             ],
             'synergy_skills' => [],
             'is_active' => true,
+            'status' => 'active',
         ];
     }
 

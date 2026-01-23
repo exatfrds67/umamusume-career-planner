@@ -35,12 +35,12 @@ class UcpSupportCardsSeeder extends Seeder
                 'unique_effects' => json_encode([
                     'speed_training_boost' => 'high',
                     'race_bonus' => 'speed_races',
-                    'special_events' => ['daiwa_scarlet_events']
+                    'special_events' => ['daiwa_scarlet_events'],
                 ]),
                 'skill_hints_provided' => json_encode([
                     'Go with the Flow',
                     'Speed Star',
-                    'Acceleration'
+                    'Acceleration',
                 ]),
                 'meta_tier' => 'S',
                 'is_limited' => false,
@@ -68,11 +68,11 @@ class UcpSupportCardsSeeder extends Seeder
                 'training_effect_bonus' => 10,
                 'unique_effects' => json_encode([
                     'dirt_race_bonus' => 'high',
-                    'overseas_training' => true
+                    'overseas_training' => true,
                 ]),
                 'skill_hints_provided' => json_encode([
                     'Dirt Adaptation',
-                    'Overseas Expedition'
+                    'Overseas Expedition',
                 ]),
                 'meta_tier' => 'A',
                 'is_limited' => false,
@@ -102,12 +102,12 @@ class UcpSupportCardsSeeder extends Seeder
                 'unique_effects' => json_encode([
                     'stamina_training_boost' => 'very_high',
                     'long_distance_bonus' => true,
-                    'unpredictable_events' => true
+                    'unpredictable_events' => true,
                 ]),
                 'skill_hints_provided' => json_encode([
                     'Stamina Keeper',
                     'Long Distance',
-                    'Recovery'
+                    'Recovery',
                 ]),
                 'meta_tier' => 'S+',
                 'is_limited' => false,
@@ -137,12 +137,12 @@ class UcpSupportCardsSeeder extends Seeder
                 'unique_effects' => json_encode([
                     'power_training_boost' => 'very_high',
                     'comeback_specialist' => true,
-                    'fighting_spirit' => 'high'
+                    'fighting_spirit' => 'high',
                 ]),
                 'skill_hints_provided' => json_encode([
                     'Power Surge',
                     'Fighting Spirit',
-                    'Comeback'
+                    'Comeback',
                 ]),
                 'meta_tier' => 'S',
                 'is_limited' => false,
@@ -172,12 +172,12 @@ class UcpSupportCardsSeeder extends Seeder
                 'unique_effects' => json_encode([
                     'motivation_boost' => 'high',
                     'energy_recovery' => 'high',
-                    'special_training_events' => true
+                    'special_training_events' => true,
                 ]),
                 'skill_hints_provided' => json_encode([
                     'Motivation Up',
                     'Energy Recovery',
-                    'Training Efficiency'
+                    'Training Efficiency',
                 ]),
                 'meta_tier' => 'A',
                 'is_limited' => false,

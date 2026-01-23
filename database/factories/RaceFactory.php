@@ -54,6 +54,7 @@ class RaceFactory extends Factory
             'distance_category' => $distanceCategory,
             'distance_meters' => $distanceMeters,
             'surface' => fake()->randomElement(['turf', 'dirt']),
+            'track_type' => fake()->randomElement(['right', 'left', 'straight']),
             'running_style' => fake()->randomElement(['escape', 'leading', 'insert', 'tracking']),
             'weather' => fake()->randomElement(['sunny', 'cloudy', 'rainy']),
             'track_condition' => fake()->randomElement(['firm', 'good', 'yielding', 'soft']),

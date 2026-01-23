@@ -51,6 +51,7 @@ class SkillAcquisitionFactory extends Factory
             'effectiveness_rating' => null,
             'is_active' => true,
             'acquisition_metadata' => [],
+            'is_equipped' => false,
         ];
     }
 
