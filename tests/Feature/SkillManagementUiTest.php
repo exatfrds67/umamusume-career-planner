@@ -31,7 +31,7 @@ test('skill management page loads successfully', function () {
 test('skill management page requires authentication', function () {
     $response = $this->get(route('skills.index'));
 
-    $response->assertRedirect(route('login'));
+    $response->assertRedirect(route('welcome'));
 });
 
 test('can fetch all skills with acquisition status', function () {
@@ -202,6 +202,16 @@ test('can evolve a skill', function () {
 
 test('can get AI recommendations', function () {
     Skill::factory()->count(5)->create();
+
+    // Mock the orchestration service to avoid MCP dependencies
+    $this->mock(\App\Services\MCP\SkillOptimizationOrchestrationService::class, function ($mock) {
+        $mock->shouldReceive('optimizeSkillAcquisition')
+            ->once()
+            ->andReturn([
+                'recommendations' => [],
+                'analysis' => 'Test analysis',
+            ]);
+    });
 
     $response = $this->actingAs($this->user)
         ->getJson(route('api.skills.recommendations', ['character_id' => $this->character->id]));

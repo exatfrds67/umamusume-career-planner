@@ -267,8 +267,12 @@ describe('API Alerting', function () {
 });
 
 describe('API Endpoints', function () {
+    beforeEach(function () {
+        $this->user = \App\Models\User::factory()->create();
+    });
+
     it('gets health status via API', function () {
-        $response = $this->getJson('/api/fallback/health/status');
+        $response = $this->actingAs($this->user)->getJson('/api/fallback/health/status');
 
         $response->assertStatus(200);
         $response->assertJsonStructure([
@@ -283,7 +287,7 @@ describe('API Endpoints', function () {
     });
 
     it('gets degradation status via API', function () {
-        $response = $this->getJson('/api/fallback/degradation/status');
+        $response = $this->actingAs($this->user)->getJson('/api/fallback/degradation/status');
 
         $response->assertStatus(200);
         $response->assertJsonStructure([
@@ -297,7 +301,7 @@ describe('API Endpoints', function () {
     });
 
     it('gets system status via API', function () {
-        $response = $this->getJson('/api/fallback/system/status');
+        $response = $this->actingAs($this->user)->getJson('/api/fallback/system/status');
 
         $response->assertStatus(200);
         $response->assertJsonStructure([

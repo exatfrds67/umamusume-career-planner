@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 use App\Models\User;
 use App\Services\QueryOptimizationService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-
 
 beforeEach(function (): void {
     $this->service = new QueryOptimizationService;

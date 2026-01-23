@@ -7,10 +7,7 @@ use App\Models\CharacterSupportCard;
 use App\Models\SupportCardDefinition;
 use App\Models\User;
 use App\Services\SupportDeckService;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Cache;
-
-uses(DatabaseMigrations::class);
 
 beforeEach(function (): void {
     $this->service = new SupportDeckService;

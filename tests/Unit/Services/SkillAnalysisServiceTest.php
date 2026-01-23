@@ -5,9 +5,6 @@ declare(strict_types=1);
 use App\Models\Character;
 use App\Models\Skill;
 use App\Services\SkillAnalysisService;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
-
-uses(DatabaseMigrations::class);
 
 beforeEach(function () {
     $this->analysisService = new SkillAnalysisService;

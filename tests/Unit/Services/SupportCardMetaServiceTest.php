@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 use App\Models\SupportCardDefinition;
 use App\Services\SupportCardMetaService;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Cache;
-
-uses(DatabaseMigrations::class);
 
 beforeEach(function (): void {
     $this->service = new SupportCardMetaService;

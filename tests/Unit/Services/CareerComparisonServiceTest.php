@@ -8,10 +8,7 @@ use App\Models\Race;
 use App\Models\TrainingSession;
 use App\Models\User;
 use App\Services\CareerComparisonService;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Cache;
-
-uses(DatabaseMigrations::class);
 
 beforeEach(function (): void {
     $this->service = new CareerComparisonService;

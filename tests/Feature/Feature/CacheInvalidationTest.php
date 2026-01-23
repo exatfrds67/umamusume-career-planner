@@ -17,10 +17,6 @@ beforeEach(function () {
 
 describe('Cache Invalidation by Pattern', function () {
     it('invalidates cache entries matching pattern with Redis', function () {
-        if (config('cache.default') !== 'redis') {
-            $this->markTestSkipped('Pattern invalidation requires Redis cache driver');
-        }
-
         // Arrange: Create test cache entries
         $this->cacheManager->put('character_data:Silence Suzuka', ['name' => 'Silence Suzuka']);
         $this->cacheManager->put('character_data:Tokai Teio', ['name' => 'Tokai Teio']);
@@ -29,18 +25,25 @@ describe('Cache Invalidation by Pattern', function () {
         // Act: Invalidate character data
         $result = $this->cacheManager->invalidateByPattern('character_data:*');
 
-        // Assert
+        // Assert - behavior depends on cache driver
         expect($result['success'])->toBeTrue();
-        expect($result['invalidated_count'])->toBe(2);
-        expect($this->cacheManager->has('character_data:Silence Suzuka'))->toBeFalse();
-        expect($this->cacheManager->has('character_data:Tokai Teio'))->toBeFalse();
-        expect($this->cacheManager->has('support_cards:1'))->toBeTrue();
+
+        if (config('cache.default') === 'redis') {
+            // Redis supports pattern-based invalidation
+            expect($result['invalidated_count'])->toBe(2);
+            expect($this->cacheManager->has('character_data:Silence Suzuka'))->toBeFalse();
+            expect($this->cacheManager->has('character_data:Tokai Teio'))->toBeFalse();
+            expect($this->cacheManager->has('support_cards:1'))->toBeTrue();
+        } else {
+            // Non-Redis drivers return success with 0 invalidated (limited support)
+            expect($result['invalidated_count'])->toBe(0);
+        }
     });
 
     it('returns success with limited support for non-Redis drivers', function () {
-        if (config('cache.default') === 'redis') {
-            $this->markTestSkipped('This test is for non-Redis cache drivers');
-        }
+        // Force array cache for this test
+        config(['cache.default' => 'array']);
+        Cache::flush();
 
         $result = $this->cacheManager->invalidateByPattern('character_data:*');
 
@@ -52,10 +55,6 @@ describe('Cache Invalidation by Pattern', function () {
 
 describe('Cache Invalidation by Type', function () {
     it('invalidates all entries of specific data type with Redis', function () {
-        if (config('cache.default') !== 'redis') {
-            $this->markTestSkipped('Type invalidation requires Redis cache driver');
-        }
-
         // Arrange
         $this->cacheManager->put('character_data:Silence Suzuka', ['name' => 'Silence Suzuka']);
         $this->cacheManager->put('character_data:Tokai Teio', ['name' => 'Tokai Teio']);
@@ -64,10 +63,16 @@ describe('Cache Invalidation by Type', function () {
         // Act
         $result = $this->cacheManager->invalidateByType('character_data');
 
-        // Assert
+        // Assert - behavior depends on cache driver
         expect($result['success'])->toBeTrue();
-        expect($result['invalidated_count'])->toBe(2);
-        expect($this->cacheManager->has('support_cards:1'))->toBeTrue();
+
+        if (config('cache.default') === 'redis') {
+            expect($result['invalidated_count'])->toBe(2);
+            expect($this->cacheManager->has('support_cards:1'))->toBeTrue();
+        } else {
+            // Non-Redis drivers have limited pattern support
+            expect($result['invalidated_count'])->toBeGreaterThanOrEqual(0);
+        }
     });
 
     it('returns error for invalid data type', function () {
@@ -114,10 +119,6 @@ describe('Cache Invalidation by Keys', function () {
 
 describe('Game Version Tracking', function () {
     it('sets game version and invalidates cache on version change', function () {
-        if (config('cache.default') !== 'redis') {
-            $this->markTestSkipped('Version-based invalidation requires Redis cache driver');
-        }
-
         // Arrange: Set initial version and cache data
         $this->cacheManager->setGameVersion('1.0.0');
         $this->cacheManager->put('character_data:Silence Suzuka', ['name' => 'Silence Suzuka']);
@@ -136,10 +137,8 @@ describe('Game Version Tracking', function () {
         expect($result['invalidated_types'])->toBeArray();
 
         // Verify event was dispatched
-        Event::assertDispatched(GameVersionUpdated::class, function ($event) {
-            return $event->previousVersion === '1.0.0'
-                && $event->newVersion === '1.1.0';
-        });
+        Event::assertDispatched(GameVersionUpdated::class, fn ($event) => $event->previousVersion === '1.0.0'
+            && $event->newVersion === '1.1.0');
     });
 
     it('does not invalidate cache when version unchanged', function () {

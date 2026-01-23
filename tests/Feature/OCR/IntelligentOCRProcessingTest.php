@@ -2,13 +2,12 @@
 
 declare(strict_types=1);
 
+use App\Models\OCRExtraction;
 use App\Models\User;
 use App\Services\ImageProcessingService;
 use App\Services\TesseractServiceEnhanced;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-
 
 describe('Intelligent OCR Processing', function () {
     beforeEach(function () {
@@ -109,14 +108,50 @@ describe('Intelligent OCR Processing', function () {
     });
 
     it('stores extraction results in database', function () {
-        // Skip database test - core functionality tested in other tests
-        expect(true)->toBeTrue();
-    })->skip('Database persistence tested in other test suites');
+        // Create a mock extraction result
+        $mockText = 'Speed: 850 Stamina: 720';
+        $result = $this->tesseractService->processWithIntelligentParsing($mockText);
+
+        // Store in database using OCRExtraction model
+        $extraction = OCRExtraction::create([
+            'user_id' => $this->user->id,
+            'image_path' => 'ocr/test_image_'.uniqid().'.png',
+            'image_hash' => 'test_hash_'.uniqid(),
+            'extracted_text' => $mockText,
+            'parsed_data' => $result['data'],
+            'confidence_score' => $result['confidence'],
+            'data_type' => $result['screen_type'] ?? 'character_stats',
+            'status' => 'processed',
+        ]);
+
+        expect($extraction)->toBeInstanceOf(OCRExtraction::class)
+            ->and($extraction->id)->toBeInt()
+            ->and($extraction->extracted_text)->toBe($mockText)
+            ->and($extraction->user_id)->toBe($this->user->id);
+    });
 
     it('handles duplicate image uploads efficiently', function () {
-        // Skip database test - core functionality tested in other tests
-        expect(true)->toBeTrue();
-    })->skip('Database persistence tested in other test suites');
+        $imageHash = 'duplicate_test_hash_'.uniqid();
+
+        // Create first extraction
+        $first = OCRExtraction::create([
+            'user_id' => $this->user->id,
+            'image_path' => 'ocr/duplicate_test_image.png',
+            'image_hash' => $imageHash,
+            'extracted_text' => 'Test text',
+            'parsed_data' => ['stats' => ['speed' => 850]],
+            'confidence_score' => 0.9,
+            'data_type' => 'character_stats',
+            'status' => 'processed',
+        ]);
+
+        // Check if duplicate exists by image hash
+        $duplicate = OCRExtraction::where('image_hash', $imageHash)->first();
+
+        expect($duplicate)->not->toBeNull()
+            ->and($duplicate->id)->toBe($first->id)
+            ->and($duplicate->image_hash)->toBe($imageHash);
+    });
 
     it('validates confidence scores correctly', function () {
         // High confidence - all stats found

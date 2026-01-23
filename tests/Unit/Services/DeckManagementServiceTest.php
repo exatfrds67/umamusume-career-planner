@@ -6,10 +6,7 @@ use App\Models\Character;
 use App\Models\CharacterSupportCard;
 use App\Models\SupportCardDefinition;
 use App\Services\DeckManagementService;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Validation\ValidationException;
-
-uses(DatabaseMigrations::class);
 
 beforeEach(function () {
     $this->deckService = new DeckManagementService;

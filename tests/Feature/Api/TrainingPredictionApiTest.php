@@ -7,9 +7,7 @@
 
 use App\Models\Character;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
-
 
 beforeEach(function (): void {
     $user = User::factory()->create();
@@ -66,7 +64,7 @@ it('includes recommendations when requested', function (): void {
     $response->assertSuccessful();
 
     $data = $response->json('data');
-    $hasRecommendation = collect($data)->contains(fn($item) => isset($item['recommendation']['is_recommended']) && $item['recommendation']['is_recommended']);
+    $hasRecommendation = collect($data)->contains(fn ($item) => isset($item['recommendation']['is_recommended']) && $item['recommendation']['is_recommended']);
 
     expect($hasRecommendation)->toBeTrue();
 });
@@ -159,7 +157,7 @@ it('clears cache for character', function (): void {
         'training_types' => ['speed'],
     ]);
 
-    $response = $this->deleteJson('/api/training-predictions/cache/' . test()->character->id);
+    $response = $this->deleteJson('/api/training-predictions/cache/'.test()->character->id);
 
     $response->assertSuccessful()
         ->assertJson([
@@ -169,7 +167,7 @@ it('clears cache for character', function (): void {
 });
 
 it('returns cache statistics', function (): void {
-    $response = $this->getJson('/api/training-predictions/cache/' . test()->character->id . '/stats');
+    $response = $this->getJson('/api/training-predictions/cache/'.test()->character->id.'/stats');
 
     $response->assertSuccessful()
         ->assertJsonStructure([

@@ -2,9 +2,7 @@
 
 use App\Models\User;
 use App\Services\MCP\RealTimeMonitoringService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
-
 
 beforeEach(function () {
     $this->user = User::factory()->create();
@@ -341,7 +339,8 @@ describe('Real-Time Updates', function () {
 
 describe('Authorization', function () {
     it('requires authentication for all endpoints', function () {
-        auth()->logout();
+        // Reset authentication by creating a fresh application instance
+        $this->app['auth']->forgetGuards();
 
         $endpoints = [
             '/api/ai/chat/server-status',
@@ -351,7 +350,7 @@ describe('Authorization', function () {
         ];
 
         foreach ($endpoints as $endpoint) {
-            $response = $this->getJson($endpoint);
+            $response = $this->withHeaders(['Authorization' => ''])->getJson($endpoint);
             $response->assertUnauthorized();
         }
     });

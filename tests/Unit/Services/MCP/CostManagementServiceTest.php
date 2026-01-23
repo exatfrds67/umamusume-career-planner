@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 use App\Services\MCP\CostManagementService;
 use App\Services\MCP\MCPClientService;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-
-uses(DatabaseMigrations::class);
 
 beforeEach(function () {
     /** @var MCPClientService&Mockery\MockInterface $mcpClient */

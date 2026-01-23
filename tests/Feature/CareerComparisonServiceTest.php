@@ -8,8 +8,6 @@ use App\Models\Race;
 use App\Models\TrainingSession;
 use App\Models\User;
 use App\Services\CareerComparisonService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
 
 beforeEach(function () {
     $this->service = new CareerComparisonService;
@@ -271,29 +269,67 @@ describe('Career Comparison Service', function () {
         });
 
         it('calculates effect sizes correctly', function () {
-            $careers = Career::factory()->count(6)->create([
+            // Create successful careers (goals_achieved = true)
+            $successfulCareers = Career::factory()->count(3)->create([
                 'character_id' => $this->character->id,
                 'user_id' => $this->user->id,
                 'completed_at' => now(),
+                'performance_analysis' => ['goals_achieved' => true],
             ]);
 
-            foreach ($careers as $career) {
+            // Create unsuccessful careers (goals_achieved = false)
+            $unsuccessfulCareers = Career::factory()->count(3)->create([
+                'character_id' => $this->character->id,
+                'user_id' => $this->user->id,
+                'completed_at' => now(),
+                'performance_analysis' => ['goals_achieved' => false],
+            ]);
+
+            // Add high-performing training to successful careers
+            foreach ($successfulCareers as $career) {
                 TrainingSession::factory()->count(10)->create([
                     'career_id' => $career->id,
                     'character_id' => $this->character->id,
+                    'speed_gain' => 20,
+                    'stamina_gain' => 18,
+                    'power_gain' => 15,
+                    'guts_gain' => 12,
+                    'wit_gain' => 10,
                 ]);
             }
 
-            $careerIds = $careers->pluck('id')->toArray();
-            $result = $this->service->performStatisticalTests($careerIds);
+            // Add low-performing training to unsuccessful careers
+            foreach ($unsuccessfulCareers as $career) {
+                TrainingSession::factory()->count(10)->create([
+                    'career_id' => $career->id,
+                    'character_id' => $this->character->id,
+                    'speed_gain' => 5,
+                    'stamina_gain' => 4,
+                    'power_gain' => 3,
+                    'guts_gain' => 2,
+                    'wit_gain' => 1,
+                ]);
+            }
 
-            if (! empty($result['effect_sizes'])) {
-                foreach ($result['effect_sizes'] as $factor => $data) {
-                    expect($data)->toHaveKey('cohens_d')
-                        ->and($data)->toHaveKey('effect_size')
-                        ->and($data)->toHaveKey('interpretation')
-                        ->and($data['effect_size'])->toBeIn(['negligible', 'small', 'medium', 'large']);
-                }
+            $allCareerIds = $successfulCareers->pluck('id')
+                ->merge($unsuccessfulCareers->pluck('id'))
+                ->toArray();
+
+            $result = $this->service->performStatisticalTests($allCareerIds);
+
+            // Verify the result structure
+            expect($result)->toHaveKey('effect_sizes')
+                ->and($result['overall_significance']['sufficient_data'])->toBeTrue();
+
+            // With distinct successful/unsuccessful careers, effect_sizes should not be empty
+            expect($result['effect_sizes'])->not->toBeEmpty();
+
+            // Verify each effect size entry has the correct structure
+            foreach ($result['effect_sizes'] as $factor => $data) {
+                expect($data)->toHaveKey('cohens_d')
+                    ->and($data)->toHaveKey('effect_size')
+                    ->and($data)->toHaveKey('interpretation')
+                    ->and($data['effect_size'])->toBeIn(['negligible', 'small', 'medium', 'large']);
             }
         });
     });

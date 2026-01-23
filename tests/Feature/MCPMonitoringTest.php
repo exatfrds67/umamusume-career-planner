@@ -6,8 +6,6 @@ use App\Models\MCPToolUsage;
 use App\Models\User;
 use App\Models\UserPreference;
 use App\Services\MCPMonitoringService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
 
 beforeEach(function () {
     $this->user = User::factory()->create();
@@ -388,7 +386,7 @@ describe('User Preferences', function () {
             ->get();
 
         expect($preferences)->toHaveCount(1);
-        expect($preferences->first()->preference_value)->toBe('new-model');
+        expect($preferences->first()->preference_value)->toBe(['new-model']);
     });
 });
 

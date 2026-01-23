@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 use App\Models\Character;
 use App\Services\TrainingPredictionService;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
-
-uses(DatabaseMigrations::class);
 
 beforeEach(function () {
     $this->predictionService = new TrainingPredictionService;

@@ -2,11 +2,14 @@
 
 declare(strict_types=1);
 
+namespace Tests\Unit\Services\ExternalAPI;
+
 use App\Services\ExternalAPI\ExternalAPIService;
 use App\Services\MCP\MCPClientService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
+use Mockery;
 
 /**
  * Test implementation of ExternalAPIService for testing
@@ -88,7 +91,13 @@ beforeEach(function () {
 
     // Mock MCP client
     $this->mcpClient = Mockery::mock(MCPClientService::class);
-    $this->service = new TestExternalAPIService($this->mcpClient);
+
+    // Mock API Performance Metrics Service
+    $this->metricsService = Mockery::mock(\App\Services\ExternalAPI\APIPerformanceMetricsService::class);
+    $this->metricsService->shouldReceive('recordResponseTime')->byDefault();
+    $this->metricsService->shouldReceive('recordError')->byDefault();
+
+    $this->service = new TestExternalAPIService($this->mcpClient, $this->metricsService);
 });
 
 afterEach(function () {

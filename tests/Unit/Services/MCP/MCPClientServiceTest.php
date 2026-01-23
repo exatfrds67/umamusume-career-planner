@@ -3,10 +3,7 @@
 declare(strict_types=1);
 
 use App\Services\MCP\MCPClientService;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Config;
-
-uses(DatabaseMigrations::class);
 
 beforeEach(function () {
     // Set up MCP configuration

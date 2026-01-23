@@ -6,10 +6,7 @@ use App\Models\Career;
 use App\Models\Character;
 use App\Models\TrainingSession;
 use App\Services\CareerAnalyticsService;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Cache;
-
-uses(DatabaseMigrations::class);
 
 beforeEach(function () {
     $this->analyticsService = new CareerAnalyticsService;

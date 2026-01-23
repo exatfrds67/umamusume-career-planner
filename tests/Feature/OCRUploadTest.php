@@ -33,7 +33,7 @@ it('validates screenshot file is required', function () {
 
     postJson('/api/ocr/upload', [])
         ->assertUnprocessable()
-        ->assertJsonValidationErrors(['screenshot']);
+        ->assertJsonValidationErrors(['image']);
 });
 
 it('validates screenshot file type', function () {
@@ -136,60 +136,103 @@ it('successfully uploads and processes screenshot', function () {
 it('detects duplicate screenshots using image hash', function () {
     actingAs($this->user);
 
-    // Create a real image file for consistent hashing
-    $imagePath = storage_path('app/test-screenshot.jpg');
-    $image = imagecreatetruecolor(800, 600);
-    imagejpeg($image, $imagePath);
-    imagedestroy($image);
-
-    $file1 = new UploadedFile($imagePath, 'screenshot1.jpg', 'image/jpeg', null, true);
-
-    // First upload
-    $response1 = postJson('/api/ocr/upload', [
-        'screenshot' => $file1,
+    // Create an existing OCRExtraction record with a known hash
+    $existingHash = 'abc123duplicatehash';
+    $existingExtraction = OCRExtraction::factory()->create([
+        'user_id' => $this->user->id,
+        'image_hash' => $existingHash,
+        'status' => 'processed',
+        'extracted_text' => 'Speed: 850 Stamina: 720',
+        'parsed_data' => [
+            'stats' => ['speed' => 850, 'stamina' => 720],
+        ],
+        'confidence_score' => 0.95,
     ]);
 
-    // If first upload succeeded, mark as processed
-    if ($response1->status() === 200 && $response1->json('data.extraction_id')) {
-        OCRExtraction::find($response1->json('data.extraction_id'))
-            ->update(['status' => 'processed']);
-    }
-
-    // Second upload with same image
-    $file2 = new UploadedFile($imagePath, 'screenshot2.jpg', 'image/jpeg', null, true);
-
-    $response2 = postJson('/api/ocr/upload', [
-        'screenshot' => $file2,
-    ]);
-
-    // Clean up
-    @unlink($imagePath);
-
-    // Both uploads should succeed (duplicate detection returns cached result)
-    if ($response1->status() === 200 && $response2->status() === 200) {
-        expect($response1->json('data.extraction_id'))
-            ->toBe($response2->json('data.extraction_id'));
-    }
-});
-
-it('stores extraction record with correct data', function () {
-    actingAs($this->user);
+    // Mock ImageProcessingService to return valid validation and the same hash
+    $this->mock(ImageProcessingService::class, function ($mock) use ($existingHash) {
+        $mock->shouldReceive('validateImage')
+            ->andReturn(['valid' => true, 'error' => null]);
+        $mock->shouldReceive('calculateImageHash')
+            ->andReturn($existingHash);
+    });
 
     $file = UploadedFile::fake()->image('screenshot.jpg', 800, 600);
 
     $response = postJson('/api/ocr/upload', [
         'screenshot' => $file,
-        'data_type' => 'character_stats',
     ]);
 
-    if ($response->status() === 200) {
-        $extraction = OCRExtraction::latest()->first();
+    $response->assertSuccessful()
+        ->assertJson([
+            'success' => true,
+        ]);
 
-        expect($extraction)->not->toBeNull()
-            ->and($extraction->user_id)->toBe($this->user->id)
-            ->and($extraction->data_type)->toBe('character_stats')
-            ->and($extraction->image_hash)->not->toBeNull();
-    }
+    // Verify the existing extraction was returned (duplicate detected)
+    $responseData = $response->json('data');
+    expect($responseData['extraction_id'])->toBe($existingExtraction->id);
+
+    // Verify no new extraction was created
+    expect(OCRExtraction::count())->toBe(1);
+});
+
+it('stores extraction record with correct data', function () {
+    actingAs($this->user);
+
+    $expectedStats = [
+        'speed' => 850,
+        'stamina' => 720,
+        'power' => 600,
+        'guts' => 550,
+        'wit' => 700,
+    ];
+    $expectedRawText = 'Speed: 850 Stamina: 720 Power: 600 Guts: 550 Wit: 700';
+    $expectedHash = 'unique123hash';
+
+    // Mock ImageProcessingService
+    $this->mock(ImageProcessingService::class, function ($mock) use ($expectedHash) {
+        $mock->shouldReceive('validateImage')
+            ->andReturn(['valid' => true, 'error' => null]);
+        $mock->shouldReceive('calculateImageHash')
+            ->andReturn($expectedHash);
+        $mock->shouldReceive('preprocessForOCR')
+            ->andReturn([
+                'success' => true,
+                'processed_path' => '/tmp/processed.jpg',
+                'error' => null,
+            ]);
+    });
+
+    // Mock TesseractService to return specific stats
+    $this->mock(TesseractService::class, function ($mock) use ($expectedStats, $expectedRawText) {
+        $mock->shouldReceive('processScreenshot')
+            ->andReturn([
+                'success' => true,
+                'extraction_id' => 1,
+                'stats' => $expectedStats,
+                'raw_text' => $expectedRawText,
+                'confidence' => 1.0,
+                'error' => null,
+            ]);
+    });
+
+    $file = UploadedFile::fake()->image('screenshot.jpg', 800, 600);
+
+    $response = postJson('/api/ocr/upload', [
+        'screenshot' => $file,
+    ]);
+
+    $response->assertSuccessful()
+        ->assertJson([
+            'success' => true,
+            'message' => 'Screenshot processed successfully',
+        ]);
+
+    // Verify the response contains expected data
+    $responseData = $response->json('data');
+    expect($responseData['stats'])->toBe($expectedStats)
+        ->and($responseData['raw_text'])->toBe($expectedRawText)
+        ->and((float) $responseData['confidence'])->toBe(1.0);
 });
 
 /**
@@ -318,21 +361,55 @@ it('handles image validation errors gracefully', function () {
 it('processes screenshot and extracts stats successfully', function () {
     actingAs($this->user);
 
+    $expectedStats = [
+        'speed' => 950,
+        'stamina' => 800,
+        'power' => 750,
+        'guts' => 680,
+        'wit' => 820,
+    ];
+    $expectedRawText = 'スピード: 950 スタミナ: 800 パワー: 750 根性: 680 賢さ: 820';
+
+    // Mock TesseractService to return specific stats
+    $this->mock(TesseractService::class, function ($mock) use ($expectedStats, $expectedRawText) {
+        $mock->shouldReceive('processScreenshot')
+            ->andReturn([
+                'success' => true,
+                'extraction_id' => 1,
+                'stats' => $expectedStats,
+                'raw_text' => $expectedRawText,
+                'confidence' => 1.0,
+                'error' => null,
+            ]);
+    });
+
     $file = UploadedFile::fake()->image('screenshot.jpg', 800, 600);
 
     $response = postJson('/api/ocr/upload', [
         'screenshot' => $file,
-        'data_type' => 'character_stats',
     ]);
 
-    // If OCR is available and processing succeeds
-    if ($response->status() === 200) {
-        $data = $response->json('data');
+    $response->assertSuccessful()
+        ->assertJson([
+            'success' => true,
+            'message' => 'Screenshot processed successfully',
+        ])
+        ->assertJsonStructure([
+            'success',
+            'message',
+            'data' => [
+                'extraction_id',
+                'stats',
+                'confidence',
+                'raw_text',
+            ],
+        ]);
 
-        expect($data)->toHaveKeys(['extraction_id', 'stats', 'confidence', 'raw_text'])
-            ->and($data['stats'])->toBeArray()
-            ->and($data['confidence'])->toBeFloat();
-    }
+    // Verify the response contains the expected stats
+    $responseData = $response->json('data');
+    expect($responseData['stats'])->toBe($expectedStats)
+        ->and($responseData['raw_text'])->toBe($expectedRawText)
+        ->and((float) $responseData['confidence'])->toBe(1.0);
 });
 
 it('cleans up temporary files after processing', function () {

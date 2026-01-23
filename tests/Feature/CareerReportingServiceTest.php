@@ -7,9 +7,7 @@ use App\Models\TrainingSession;
 use App\Models\User;
 use App\Services\CareerAnalyticsService;
 use App\Services\CareerReportingService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
-
 
 beforeEach(function () {
     $this->analyticsService = new CareerAnalyticsService;
@@ -85,12 +83,9 @@ describe('Career Summary Report Generation', function () {
         $report = $this->service->generateCareerSummaryReport($career);
 
         expect($report['executive_summary'])
+            ->toHaveKeys(['career_status', 'total_turns', 'overall_grade', 'completion_percentage', 'highlight_stats', 'key_achievements'])
             ->career_status->toBe('in_progress')
-            ->total_turns->toBe(36)
-            ->toHaveKey('overall_grade')
-            ->toHaveKey('completion_percentage')
-            ->toHaveKey('highlight_stats')
-            ->toHaveKey('key_achievements');
+            ->total_turns->toBe(36);
     });
 
     it('builds performance overview with stat distribution', function () {
@@ -161,12 +156,8 @@ describe('Training Analysis', function () {
         $report = $this->service->generateCareerSummaryReport($career);
 
         expect($report['training_analysis'])
-            ->total_sessions->toBe(10)
-            ->toHaveKey('training_type_breakdown')
-            ->toHaveKey('best_training_type')
-            ->toHaveKey('worst_training_type')
-            ->toHaveKey('friendship_training_stats')
-            ->toHaveKey('failure_analysis');
+            ->toHaveKeys(['total_sessions', 'training_type_breakdown', 'best_training_type', 'worst_training_type', 'friendship_training_stats', 'failure_analysis'])
+            ->total_sessions->toBe(10);
 
         expect($report['training_analysis']['training_type_breakdown']['speed']['count'])->toBe(5);
         expect($report['training_analysis']['training_type_breakdown']['stamina']['count'])->toBe(3);
@@ -243,12 +234,10 @@ describe('Race Analysis', function () {
         $report = $this->service->generateCareerSummaryReport($career);
 
         expect($report['race_analysis'])
+            ->toHaveKeys(['total_races', 'wins', 'win_rate', 'avg_position', 'performance_by_grade', 'performance_by_distance'])
             ->total_races->toBe(5)
             ->wins->toBe(3)
-            ->win_rate->toBe(60.0)
-            ->toHaveKey('avg_position')
-            ->toHaveKey('performance_by_grade')
-            ->toHaveKey('performance_by_distance');
+            ->win_rate->toBe(60.0);
     });
 
     it('analyzes performance by race grade', function () {

@@ -109,12 +109,12 @@ describe('Provider Selection', function () {
                 'usage_percentage' => 50.0,
             ]);
 
-        Config::set('ai.ollama.model', 'llama3.3');
+        Config::set('ai.ollama.model', 'llama3');
 
         $route = $this->service->routeRequest($request);
 
         expect($route['provider'])->toBe(AgentRoutingService::PROVIDER_OLLAMA)
-            ->and($route['model'])->toBe('llama3.3')
+            ->and($route['model'])->toBe('llama3')
             ->and($route['estimated_cost'])->toBe(0.0);
     });
 
@@ -166,7 +166,7 @@ describe('Provider Selection', function () {
                 'usage_percentage' => 105.0,
             ]);
 
-        Config::set('ai.ollama.model', 'llama3.3');
+        Config::set('ai.ollama.model', 'llama3');
 
         $route = $this->service->routeRequest($request);
 
@@ -186,7 +186,7 @@ describe('Route Caching', function () {
                 'usage_percentage' => 50.0,
             ]);
 
-        Config::set('ai.ollama.model', 'llama3.3');
+        Config::set('ai.ollama.model', 'llama3');
 
         // First call
         $route1 = $this->service->routeRequest($request);
@@ -209,7 +209,7 @@ describe('Execution with Fallback', function () {
                 'usage_percentage' => 50.0,
             ]);
 
-        Config::set('ai.ollama.model', 'llama3.3');
+        Config::set('ai.ollama.model', 'llama3');
 
         // Mock Ollama facade
         $ollamaMock = Mockery::mock('alias:CloudStudio\Ollama\Facades\Ollama');

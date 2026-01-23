@@ -8,8 +8,6 @@ use App\Services\AI\AgentFeedbackService;
 use App\Services\AI\ConversationAnalyticsService;
 use App\Services\AI\ConversationManagementService;
 use App\Services\AI\WorkflowExportService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
 
 beforeEach(function () {
     $this->user = User::factory()->create();

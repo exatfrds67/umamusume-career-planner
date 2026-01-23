@@ -5,7 +5,6 @@ declare(strict_types=1);
 use App\Models\Character;
 use App\Models\User;
 
-
 /**
  * Visualization Components Tests
  *

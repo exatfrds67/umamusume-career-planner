@@ -7,8 +7,6 @@
 use App\Models\Character;
 use App\Models\Skill;
 use App\Services\SkillAnalysisService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
 
 beforeEach(function () {
     $this->artisan('db:seed', ['--class' => 'ComprehensiveSkillSeeder']);

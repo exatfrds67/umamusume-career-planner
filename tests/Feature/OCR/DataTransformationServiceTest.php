@@ -80,8 +80,9 @@ describe('Character Stats Transformation', function () {
             ->and($result['energy_level'])->toBe(75)
             ->and($result['mood_status'])->toBe('good');
 
-        $stats = json_decode($result['current_stats'], true);
-        expect($stats['speed'])->toBe(850);
+        // current_stats should be an array (model handles JSON encoding)
+        expect($result['current_stats'])->toBeArray()
+            ->and($result['current_stats']['speed'])->toBe(850);
     });
 });
 
@@ -135,11 +136,10 @@ describe('Training Session Transformation', function () {
         expect($result['career_id'])->toBe(1)
             ->and($result['training_type'])->toBe('speed')
             ->and($result['energy_cost'])->toBe(25)
-            ->and($result['spirit_burst'])->toBeFalse()
+            ->and($result['training_metadata']['spirit_burst'])->toBeFalse()
             ->and($result['turn_number'])->toBe(24);
 
-        $statGains = json_decode($result['stat_gains'], true);
-        expect($statGains['speed'])->toBe(45);
+        expect($result['speed_gain'])->toBe(45);
     });
 });
 
@@ -188,13 +188,12 @@ describe('Race Result Transformation', function () {
         expect($result['career_id'])->toBe(1)
             ->and($result['race_name'])->toBe('日本ダービー')
             ->and($result['race_grade'])->toBe('G1')
-            ->and($result['distance'])->toBe(2400)
+            ->and($result['distance_meters'])->toBe(2400)
             ->and($result['surface'])->toBe('turf')
-            ->and($result['final_position'])->toBe(1);
+            ->and($result['finish_position'])->toBe(1);
 
-        $performance = json_decode($result['performance'], true);
-        expect($performance['outcome'])->toBe('victory')
-            ->and($performance['fans_gained'])->toBe(15000);
+        expect($result['race_metadata']['outcome'])->toBe('victory')
+            ->and($result['race_metadata']['fans_gained'])->toBe(15000);
     });
 });
 
@@ -250,6 +249,6 @@ describe('Skill List Transformation', function () {
 
         expect($result['skills'][0]['hint_level'])->toBe(0)
             ->and($result['skills'][0]['is_acquired'])->toBeFalse()
-            ->and($result['skills'][0]['skill_type'])->toBe('unknown');
+            ->and($result['skills'][0]['skill_type'])->toBe('passive');
     });
 });

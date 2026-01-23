@@ -1,8 +1,6 @@
 <?php
 
 use App\Models\Skill;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
 
 beforeEach(function () {
     // Seed skills before each test

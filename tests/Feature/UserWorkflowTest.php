@@ -34,13 +34,15 @@ describe('Complete User Workflows', function (): void {
             $characterResponse->assertCreated();
             $characterId = $characterResponse->json('data.id');
 
-            // Step 2: Set up support deck
+            // Step 2: Set up support deck (5 owned cards + 1 friend card = 6 total)
             $supportCards = SupportCardDefinition::factory()->count(6)->create(['is_active' => true]);
 
             foreach ($supportCards as $index => $card) {
+                $isFriendCard = $index === 5; // Last card is friend card
                 $deckResponse = $this->postJson("/api/v1/characters/{$characterId}/deck", [
                     'support_card_id' => $card->id,
                     'position_slot' => $index + 1,
+                    'is_friend_card' => $isFriendCard,
                 ]);
 
                 $deckResponse->assertCreated();

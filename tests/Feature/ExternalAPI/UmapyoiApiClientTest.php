@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use App\Services\CacheManagementService;
+use App\Services\ExternalAPI\ResponseTransformer;
+use App\Services\ExternalAPI\ResponseValidator;
 use App\Services\ExternalAPI\UmapyoiApiClient;
 use App\Services\MCP\MCPClientService;
 use Illuminate\Support\Facades\Cache;
@@ -9,11 +12,70 @@ use Illuminate\Support\Facades\Http;
 
 beforeEach(function () {
     Cache::flush();
+
     /** @var MCPClientService&Mockery\MockInterface $mcpClient */
     $mcpClient = Mockery::mock(MCPClientService::class);
     $mcpClient->shouldReceive('isServerEnabled')->withArgs(['fetch'])->andReturn(false);
+    $mcpClient->shouldReceive('isServerHealthy')->andReturn(true);
+
+    /** @var CacheManagementService&Mockery\MockInterface $cacheManager */
+    $cacheManager = Mockery::mock(CacheManagementService::class);
+    $cacheManager->shouldReceive('remember')->andReturnUsing(function ($key, $callback, $ttl) {
+        // The key already includes the prefix from UmapyoiApiClient
+        if (Cache::has($key)) {
+            return [
+                'success' => true,
+                'data' => Cache::get($key),
+                'source' => 'cache',
+            ];
+        }
+
+        $result = $callback();
+
+        if ($result['success'] ?? false) {
+            Cache::put($key, $result['data'], $ttl);
+        }
+
+        return $result;
+    });
+    $cacheManager->shouldReceive('recordApiResponseTime')->andReturn(null);
+
+    /** @var ResponseValidator&Mockery\MockInterface $validator */
+    $validator = Mockery::mock(ResponseValidator::class);
+    $validator->shouldReceive('validate')->andReturnUsing(function ($type, $data) {
+        // Extract data from wrapper keys like the real validator does
+        $wrapperKeys = [
+            'umapyoi_characters' => 'characters',
+            'umapyoi_character' => 'character',
+            'umapyoi_support_cards' => 'support_cards',
+            'umapyoi_support_card' => 'support_card',
+            'umapyoi_skills' => 'skills',
+            'umapyoi_skill' => 'skill',
+            'umapyoi_news' => 'news',
+        ];
+
+        $wrapperKey = $wrapperKeys[$type] ?? null;
+        $extractedData = $wrapperKey && isset($data[$wrapperKey]) ? $data[$wrapperKey] : $data;
+
+        return [
+            'valid' => true,
+            'errors' => [],
+            'data' => $extractedData,
+        ];
+    });
+
+    /** @var ResponseTransformer&Mockery\MockInterface $transformer */
+    $transformer = Mockery::mock(ResponseTransformer::class);
+    $transformer->shouldReceive('transform')->andReturnUsing(function ($type, $data) {
+        // Simple pass-through transformation for tests
+        return $data;
+    });
+
     $this->mcpClient = $mcpClient;
-    $this->client = new UmapyoiApiClient($mcpClient);
+    $this->cacheManager = $cacheManager;
+    $this->validator = $validator;
+    $this->transformer = $transformer;
+    $this->client = new UmapyoiApiClient($mcpClient, $cacheManager, $validator, $transformer);
 });
 
 afterEach(function () {

@@ -6,9 +6,6 @@ use App\Models\Character;
 use App\Models\CharacterSupportCard;
 use App\Models\SupportCardDefinition;
 use App\Services\SynergyScorer;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
-
-uses(DatabaseMigrations::class);
 
 beforeEach(function () {
     $this->synergyScorer = new SynergyScorer;

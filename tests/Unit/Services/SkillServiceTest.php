@@ -3,9 +3,6 @@
 declare(strict_types=1);
 
 use App\Services\SkillService;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
-
-uses(DatabaseMigrations::class);
 
 beforeEach(function () {
     $this->skillService = new SkillService;

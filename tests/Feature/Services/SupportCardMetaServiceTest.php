@@ -2,9 +2,7 @@
 
 use App\Models\SupportCardDefinition;
 use App\Services\SupportCardMetaService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
-
 
 beforeEach(function () {
     $this->service = new SupportCardMetaService;

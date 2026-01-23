@@ -7,10 +7,7 @@ use App\Services\AI\Agents\RaceAnalysisAgent;
 use App\Services\AI\Agents\SkillManagementAgent;
 use App\Services\AI\Agents\TrainingOptimizationAgent;
 use App\Services\MCP\MCPClientService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function () {
     Config::set('ai.agents.training_optimization.enabled', true);
@@ -31,7 +28,7 @@ beforeEach(function () {
         'energy_level' => 80,
         'mood_status' => 'good',
         'career_stage' => 'junior',
-        'turn_number' => 10,
+        'current_turn' => 10,
     ]);
 });
 

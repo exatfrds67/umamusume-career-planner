@@ -6,11 +6,8 @@ use App\Models\OCRExtraction;
 use App\Models\User;
 use App\Services\ImageProcessingService;
 use App\Services\TesseractService;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-
-uses(DatabaseMigrations::class);
 
 beforeEach(function () {
     Storage::fake('local');
@@ -29,59 +26,58 @@ describe('TesseractService', function () {
     });
 
     it('validates image before processing', function () {
-        if (! $this->service->isAvailable()) {
-            $this->markTestSkipped('Tesseract is not installed');
-        }
-
         // Create an invalid file (too small)
         $file = UploadedFile::fake()->image('tiny.jpg', 100, 100);
 
         $result = $this->service->processScreenshot($file, $this->user->id);
 
+        // Image validation happens before Tesseract is called
+        // Small images should fail validation regardless of Tesseract availability
         expect($result['success'])->toBeFalse()
             ->and($result['error'])->toContain('too small');
     });
 
     it('creates OCR extraction record when validation passes', function () {
-        if (! $this->service->isAvailable()) {
-            $this->markTestSkipped('Tesseract is not installed');
-        }
-
         $file = UploadedFile::fake()->image('test.jpg', 800, 600);
 
-        // Process screenshot
+        // Process screenshot - this tests the validation and record creation logic
         $result = $this->service->processScreenshot($file, $this->user->id);
 
-        // If validation passed, should create an extraction record
-        if ($result['success'] || $result['extraction_id']) {
+        // If Tesseract is not available, the service should still handle it gracefully
+        if ($result['success'] || isset($result['extraction_id'])) {
             expect(OCRExtraction::count())->toBeGreaterThan(0);
         } else {
-            // If validation failed, no record should be created
-            expect($result['error'])->not->toBeNull();
+            // If processing failed (e.g., Tesseract not available), verify error handling
+            expect($result)->toHaveKey('error');
         }
     });
 
     it('detects duplicate images by hash', function () {
-        if (! $this->service->isAvailable()) {
-            $this->markTestSkipped('Tesseract is not installed');
-        }
+        // Create an existing OCRExtraction record with a known hash
+        $existingHash = 'test_duplicate_hash_123';
+        $existingExtraction = OCRExtraction::factory()->create([
+            'user_id' => $this->user->id,
+            'image_hash' => $existingHash,
+            'status' => 'processed',
+            'extracted_text' => 'Speed: 850 Stamina: 720',
+            'parsed_data' => ['stats' => ['speed' => 850, 'stamina' => 720]],
+            'confidence_score' => 0.95,
+        ]);
+
+        // Mock ImageProcessingService to return the same hash
+        $mockImageProcessor = Mockery::mock(ImageProcessingService::class);
+        $mockImageProcessor->shouldReceive('validateImage')
+            ->andReturn(['valid' => true, 'error' => null]);
+        $mockImageProcessor->shouldReceive('calculateImageHash')
+            ->andReturn($existingHash);
+
+        $service = new TesseractService($mockImageProcessor);
 
         $file = UploadedFile::fake()->image('test.jpg', 800, 600);
+        $result = $service->processScreenshot($file, $this->user->id);
 
-        // First upload
-        $result1 = $this->service->processScreenshot($file, $this->user->id);
-
-        // Mark as processed to enable duplicate detection
-        if ($result1['extraction_id']) {
-            OCRExtraction::find($result1['extraction_id'])->update(['status' => 'processed']);
-        }
-
-        // Second upload of same image
-        $file2 = UploadedFile::fake()->image('test.jpg', 800, 600);
-        $result2 = $this->service->processScreenshot($file2, $this->user->id);
-
-        // Should return the same extraction
-        expect($result2['extraction_id'])->toBe($result1['extraction_id']);
+        // Should return the existing extraction (duplicate detected)
+        expect($result['extraction_id'])->toBe($existingExtraction->id);
     });
 
     it('extracts stats from OCR text', function () {

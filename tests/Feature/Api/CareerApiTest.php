@@ -28,15 +28,16 @@ describe('Career API Endpoints', function (): void {
                         '*' => ['id', 'character_id', 'scenario_type', 'status'],
                     ],
                 ]);
-        })->skip('API v1 career routes not yet implemented');
+        });
 
         it('returns 401 for unauthenticated request', function (): void {
-            Sanctum::actingAs(User::factory()->create(), [], 'invalid');
+            // Clear any existing authentication set by beforeEach
+            $this->app['auth']->forgetGuards();
 
             $response = $this->getJson('/api/v1/careers');
 
             $response->assertUnauthorized();
-        })->skip('Sanctum guard configuration varies');
+        });
 
         it('paginates results', function (): void {
             $character = Character::factory()->create(['user_id' => $this->user->id]);
@@ -46,7 +47,7 @@ describe('Career API Endpoints', function (): void {
 
             $response->assertSuccessful()
                 ->assertJsonCount(10, 'data');
-        })->skip('API v1 career routes not yet implemented');
+        });
 
         it('filters by status', function (): void {
             $character = Character::factory()->create(['user_id' => $this->user->id]);
@@ -63,7 +64,7 @@ describe('Career API Endpoints', function (): void {
 
             $response->assertSuccessful()
                 ->assertJsonCount(3, 'data');
-        })->skip('API v1 career routes not yet implemented');
+        });
     });
 
     describe('POST /api/v1/careers', function (): void {
@@ -79,14 +80,14 @@ describe('Career API Endpoints', function (): void {
                 ->assertJsonStructure([
                     'data' => ['id', 'character_id', 'scenario_type', 'status'],
                 ]);
-        })->skip('API v1 career routes not yet implemented');
+        });
 
         it('validates required fields', function (): void {
             $response = $this->postJson('/api/v1/careers', []);
 
             $response->assertUnprocessable()
                 ->assertJsonValidationErrors(['character_id', 'scenario_type']);
-        })->skip('API v1 career routes not yet implemented');
+        });
 
         it('validates scenario type', function (): void {
             $character = Character::factory()->create(['user_id' => $this->user->id]);
@@ -98,7 +99,7 @@ describe('Career API Endpoints', function (): void {
 
             $response->assertUnprocessable()
                 ->assertJsonValidationErrors(['scenario_type']);
-        })->skip('API v1 career routes not yet implemented');
+        });
     });
 
     describe('GET /api/v1/careers/{id}', function (): void {
@@ -112,13 +113,13 @@ describe('Career API Endpoints', function (): void {
                 ->assertJsonStructure([
                     'data' => ['id', 'character_id', 'scenario_type', 'status', 'current_turn'],
                 ]);
-        })->skip('API v1 career routes not yet implemented');
+        });
 
         it('returns 404 for non-existent career', function (): void {
             $response = $this->getJson('/api/v1/careers/99999');
 
             $response->assertNotFound();
-        })->skip('API v1 career routes not yet implemented');
+        });
 
         it('returns 403 for career belonging to another user', function (): void {
             $otherUser = User::factory()->create();
@@ -128,7 +129,7 @@ describe('Career API Endpoints', function (): void {
             $response = $this->getJson("/api/v1/careers/{$career->id}");
 
             $response->assertForbidden();
-        })->skip('API v1 career routes not yet implemented');
+        });
     });
 
     describe('PUT /api/v1/careers/{id}', function (): void {
@@ -147,7 +148,7 @@ describe('Career API Endpoints', function (): void {
 
             $career->refresh();
             expect($career->status)->toBe('completed');
-        })->skip('API v1 career routes not yet implemented');
+        });
     });
 
     describe('DELETE /api/v1/careers/{id}', function (): void {
@@ -160,7 +161,7 @@ describe('Career API Endpoints', function (): void {
             $response->assertSuccessful();
 
             expect(Career::find($career->id))->toBeNull();
-        })->skip('API v1 career routes not yet implemented');
+        });
     });
 
     describe('GET /api/v1/careers/{id}/training-sessions', function (): void {
@@ -173,7 +174,7 @@ describe('Career API Endpoints', function (): void {
 
             $response->assertSuccessful()
                 ->assertJsonCount(10, 'data');
-        })->skip('API v1 career routes not yet implemented');
+        });
     });
 
     describe('GET /api/v1/careers/{id}/races', function (): void {
@@ -186,7 +187,7 @@ describe('Career API Endpoints', function (): void {
 
             $response->assertSuccessful()
                 ->assertJsonCount(5, 'data');
-        })->skip('API v1 career routes not yet implemented');
+        });
     });
 
     describe('GET /api/v1/careers/{id}/statistics', function (): void {
@@ -209,6 +210,6 @@ describe('Career API Endpoints', function (): void {
                         'efficiency_rating',
                     ],
                 ]);
-        })->skip('API v1 career routes not yet implemented');
+        });
     });
 });

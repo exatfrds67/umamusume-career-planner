@@ -1,8 +1,5 @@
 <?php
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-
 describe('Focus Management System', function () {
     it('renders skip links in the main layout', function () {
         $response = $this->get('/');

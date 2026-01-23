@@ -2,6 +2,12 @@
 
 declare(strict_types=1);
 
+// Ensure sufficient memory for large test suites and disable Xdebug overhead
+@ini_set('memory_limit', '2048M');
+@putenv('XDEBUG_MODE=off');
+// Provide dummy API keys for providers used in tests to avoid constructor errors
+@putenv('ANTHROPIC_KEY=test');
+
 /*
 |--------------------------------------------------------------------------
 | Test Case Configuration
@@ -40,11 +46,12 @@ pest()->extend(Tests\TestCase::class)
 | Unit Tests Configuration
 |--------------------------------------------------------------------------
 |
-| Unit tests extend the base TestCase but don't require database refresh
-| for most cases. They focus on testing isolated business logic.
+| Unit tests extend the base TestCase. Model tests require database refresh
+| to test relationships and attributes. Service tests may not need database.
 |
 */
 pest()->extend(Tests\TestCase::class)
+    ->use(RefreshDatabase::class)
     ->use(WithFaker::class)
     ->in('Unit');
 
@@ -73,6 +80,21 @@ pest()->extend(Tests\TestCase::class)
 */
 pest()->extend(Tests\TestCase::class)
     ->in('Architecture');
+
+/*
+|--------------------------------------------------------------------------
+| Property Tests Configuration
+|--------------------------------------------------------------------------
+|
+| Property-based tests verify universal properties that should hold true
+| across all valid inputs. These tests use repetition to validate
+| correctness properties with randomly generated data.
+|
+*/
+pest()->extend(Tests\TestCase::class)
+    ->use(RefreshDatabase::class)
+    ->use(WithFaker::class)
+    ->in('Property');
 
 /*
 |--------------------------------------------------------------------------

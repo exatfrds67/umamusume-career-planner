@@ -3,7 +3,6 @@
 use App\Services\AI\BedrockConfigurationService;
 use App\Services\MCP\MCPClientService;
 use Illuminate\Support\Facades\Config;
-use Mockery;
 
 /**
  * Bedrock Integration Tests

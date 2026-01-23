@@ -9,8 +9,6 @@ use App\Models\Character;
 use App\Models\Skill;
 use App\Models\SkillHint;
 use App\Models\SupportCard;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
 
 beforeEach(function () {
     $this->character = Character::factory()->create();
@@ -179,21 +177,31 @@ describe('Cost Breakdown and Statistics', function () {
 
         $response = $this->getJson("/api/characters/{$this->character->id}/skill-hints/statistics");
 
-        $response->assertSuccessful()
-            ->assertJsonStructure([
-                'success',
-                'data' => [
-                    'total_hints',
-                    'unused_hints',
-                    'used_hints',
-                    'guaranteed_hints',
-                    'source_distribution',
-                    'total_sp_saved',
-                    'skills_with_max_discount',
-                    'average_hints_per_skill',
-                ],
-            ])
-            ->assertJsonPath('data.total_hints', 5);
+        $response->assertSuccessful();
+
+        // Get the actual response to see its structure
+        $json = $response->json();
+
+        // Debug output
+        // dump('Response JSON:', $json);
+
+        // The response should have success and data keys
+        expect($json)->toHaveKey('success')
+            ->and($json['success'])->toBeTrue()
+            ->and($json)->toHaveKey('data');
+
+        $data = $json['data'];
+
+        // Verify the expected keys exist in data
+        expect($data)->toHaveKey('total_hints')
+            ->and($data)->toHaveKey('unused_hints')
+            ->and($data)->toHaveKey('used_hints')
+            ->and($data)->toHaveKey('guaranteed_hints')
+            ->and($data)->toHaveKey('source_distribution')
+            ->and($data)->toHaveKey('total_sp_saved')
+            ->and($data)->toHaveKey('skills_with_max_discount')
+            ->and($data)->toHaveKey('average_hints_per_skill')
+            ->and($data['total_hints'])->toBe(5);
     });
 });
 

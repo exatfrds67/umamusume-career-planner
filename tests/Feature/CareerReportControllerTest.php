@@ -5,9 +5,7 @@ use App\Models\Character;
 use App\Models\Race;
 use App\Models\TrainingSession;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
-
 
 beforeEach(function () {
     $this->user = User::factory()->create();
@@ -31,16 +29,16 @@ describe('Reports Index', function () {
         $response->assertViewHas('recentCareers');
     });
 
-    it('redirects unauthenticated users to login', function () {
+    it('redirects unauthenticated users to welcome', function () {
         $response = $this->get(route('reports.index'));
 
-        $response->assertRedirect(route('login'));
+        $response->assertRedirect(route('welcome'));
     });
 
     it('shows only user own characters', function () {
         $otherUser = User::factory()->create();
-        $ownCharacter = Character::factory()->for($this->user)->create(['name' => 'Own Character']);
-        $otherCharacter = Character::factory()->for($otherUser)->create(['name' => 'Other Character']);
+        Character::factory()->for($this->user)->create(['name' => 'Own Character']);
+        Character::factory()->for($otherUser)->create(['name' => 'Other Character']);
 
         $response = $this->actingAs($this->user)->get(route('reports.index'));
 
@@ -167,7 +165,7 @@ describe('Export Functionality', function () {
         $response = $this->actingAs($this->user)->get(route('reports.export.csv', $career));
 
         $response->assertStatus(200);
-        $response->assertHeader('Content-Type', 'text/csv; charset=UTF-8');
+        $response->assertHeader('Content-Type', 'text/csv; charset=utf-8');
     });
 
     it('exports career report as PDF view', function () {

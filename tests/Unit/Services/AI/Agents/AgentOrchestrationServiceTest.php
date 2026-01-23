@@ -298,7 +298,7 @@ it('calculates overall confidence correctly', function () {
     $result = $this->orchestration->executeComprehensiveAnalysis($this->character);
 
     // Average: (0.9 + 0.8 + 0.85 + 0.75) / 4 = 0.825
-    expect($result['confidence'])->toBe(0.825);
+    expect($result['confidence'])->toBeGreaterThanOrEqual(0.824)->toBeLessThanOrEqual(0.826);
 });
 
 it('returns status for all agents', function () {

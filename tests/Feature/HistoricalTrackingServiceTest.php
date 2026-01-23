@@ -6,9 +6,7 @@ use App\Models\Race;
 use App\Models\TrainingSession;
 use App\Models\User;
 use App\Services\HistoricalTrackingService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
-
 
 beforeEach(function () {
     $this->service = new HistoricalTrackingService;

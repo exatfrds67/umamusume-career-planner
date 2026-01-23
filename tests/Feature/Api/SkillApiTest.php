@@ -27,7 +27,7 @@ describe('Skill API Endpoints', function (): void {
                         '*' => ['id', 'name', 'skill_type', 'base_sp_cost'],
                     ],
                 ]);
-        })->skip('API v1 skill routes not yet implemented');
+        });
 
         it('filters by skill type', function (): void {
             // Use valid skill_type enum values: speed, passive, recovery, debuff, unique
@@ -44,7 +44,7 @@ describe('Skill API Endpoints', function (): void {
 
             $response->assertSuccessful()
                 ->assertJsonCount(5, 'data');
-        })->skip('API v1 skill routes not yet implemented');
+        });
 
         it('searches by name', function (): void {
             Skill::factory()->create([
@@ -60,7 +60,7 @@ describe('Skill API Endpoints', function (): void {
 
             $response->assertSuccessful()
                 ->assertJsonCount(1, 'data');
-        })->skip('API v1 skill routes not yet implemented');
+        });
 
         it('filters by SP cost range', function (): void {
             Skill::factory()->count(3)->create([
@@ -76,7 +76,7 @@ describe('Skill API Endpoints', function (): void {
 
             $response->assertSuccessful()
                 ->assertJsonCount(2, 'data');
-        })->skip('API v1 skill routes not yet implemented');
+        });
     });
 
     describe('GET /api/v1/skills/{id}', function (): void {
@@ -95,13 +95,13 @@ describe('Skill API Endpoints', function (): void {
                         'base_sp_cost',
                     ],
                 ]);
-        })->skip('API v1 skill routes not yet implemented');
+        });
 
         it('returns 404 for non-existent skill', function (): void {
             $response = $this->getJson('/api/v1/skills/99999');
 
             $response->assertNotFound();
-        })->skip('API v1 skill routes not yet implemented');
+        });
     });
 
     describe('GET /api/v1/skills/{id}/hints', function (): void {
@@ -113,7 +113,7 @@ describe('Skill API Endpoints', function (): void {
 
             $response->assertSuccessful()
                 ->assertJsonCount(3, 'data');
-        })->skip('API v1 skill routes not yet implemented');
+        });
     });
 
     describe('Character Skill Acquisitions', function (): void {
@@ -137,7 +137,7 @@ describe('Skill API Endpoints', function (): void {
 
                 $response->assertSuccessful()
                     ->assertJsonCount(2, 'data');
-            })->skip('API v1 character skill routes not yet implemented');
+            });
         });
 
         describe('POST /api/v1/characters/{id}/skills', function (): void {
@@ -158,7 +158,7 @@ describe('Skill API Endpoints', function (): void {
                     'character_id' => $character->id,
                     'skill_id' => $skill->id,
                 ])->exists())->toBeTrue();
-            })->skip('API v1 character skill routes not yet implemented');
+            });
 
             it('validates sufficient SP', function (): void {
                 $character = Character::factory()->create([
@@ -172,7 +172,7 @@ describe('Skill API Endpoints', function (): void {
                 ]);
 
                 $response->assertUnprocessable();
-            })->skip('API v1 character skill routes not yet implemented');
+            });
 
             it('prevents duplicate skill acquisition', function (): void {
                 $character = Character::factory()->create([
@@ -191,7 +191,7 @@ describe('Skill API Endpoints', function (): void {
                 ]);
 
                 $response->assertUnprocessable();
-            })->skip('API v1 character skill routes not yet implemented');
+            });
         });
 
         describe('DELETE /api/v1/characters/{id}/skills/{skillId}', function (): void {
@@ -212,7 +212,7 @@ describe('Skill API Endpoints', function (): void {
                     'character_id' => $character->id,
                     'skill_id' => $skill->id,
                 ])->exists())->toBeFalse();
-            })->skip('API v1 character skill routes not yet implemented');
+            });
         });
     });
 
@@ -231,7 +231,7 @@ describe('Skill API Endpoints', function (): void {
                             'reasoning',
                         ],
                     ]);
-            })->skip('API v1 skill analysis routes not yet implemented');
+            });
         });
 
         describe('GET /api/v1/skills/analysis/evolution', function (): void {
@@ -247,7 +247,7 @@ describe('Skill API Endpoints', function (): void {
                             'prerequisites',
                         ],
                     ]);
-            })->skip('API v1 skill analysis routes not yet implemented');
+            });
         });
     });
 });

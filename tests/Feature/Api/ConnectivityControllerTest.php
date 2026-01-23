@@ -62,10 +62,10 @@ it('returns connectivity recommendations via API', function () {
     $response->assertSuccessful()
         ->assertJsonStructure([
             'recommendations',
-        ])
-        ->assertJson([
-            'recommendations' => expect()->toBeArray(),
         ]);
+
+    $data = $response->json();
+    expect($data['recommendations'])->toBeArray();
 });
 
 it('returns comprehensive connectivity report via API', function () {

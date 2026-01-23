@@ -411,8 +411,8 @@ describe('MigrationController API', function () {
     });
 
     it('requires authentication for migration endpoints', function () {
-        // Logout
-        auth()->logout();
+        // Create a fresh test instance without authentication
+        $this->app['auth']->forgetGuards();
 
         $response = $this->postJson('/api/migration/convert', [
             'content' => '{}',

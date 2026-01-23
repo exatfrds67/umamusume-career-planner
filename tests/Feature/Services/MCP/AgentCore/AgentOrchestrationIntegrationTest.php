@@ -9,10 +9,8 @@ use App\Services\MCP\AgentCore\AgentLifecycleManager;
 use App\Services\MCP\AgentCore\AgentPerformanceAnalytics;
 use App\Services\MCP\AgentCore\MultiAgentWorkflowManager;
 use App\Services\MCP\MCPClientService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
-
 
 beforeEach(function () {
     Config::set('mcp.enabled', true);

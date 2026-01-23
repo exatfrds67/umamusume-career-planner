@@ -11,8 +11,6 @@ use App\Models\Character;
 use App\Models\Skill;
 use App\Models\SkillHint;
 use App\Services\SkillHintService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
 
 beforeEach(function () {
     $this->hintService = app(SkillHintService::class);

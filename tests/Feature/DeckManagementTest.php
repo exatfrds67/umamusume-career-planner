@@ -15,8 +15,6 @@ use App\Models\User;
 use App\Services\DeckManagementService;
 use App\Services\DeckOptimizationService;
 use App\Services\FriendshipBondService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
 
 beforeEach(function () {
     $this->user = User::factory()->create();
@@ -81,7 +79,7 @@ describe('Deck Operations API', function () {
                 'limit_break_level' => 2,
             ]);
 
-        $response->assertOk();
+        $response->assertSuccessful();
         $response->assertJson([
             'success' => true,
             'message' => 'Card added to deck successfully',
@@ -104,7 +102,7 @@ describe('Deck Operations API', function () {
                 'position_slot' => 1,
             ]);
 
-        $response->assertOk();
+        $response->assertSuccessful();
         $response->assertJson([
             'success' => true,
             'message' => 'Card removed from deck successfully',
@@ -343,6 +341,6 @@ describe('Deck Validation', function () {
 
         // The API should allow adding the same card to a different slot
         // (duplicate card validation may be handled differently)
-        $response->assertOk();
+        $response->assertSuccessful();
     });
 });

@@ -9,10 +9,7 @@ use App\Models\TrainingSession;
 use App\Models\User;
 use App\Services\CareerAnalyticsService;
 use App\Services\CareerReportingService;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Cache;
-
-uses(DatabaseMigrations::class);
 
 beforeEach(function (): void {
     $analyticsService = app(CareerAnalyticsService::class);

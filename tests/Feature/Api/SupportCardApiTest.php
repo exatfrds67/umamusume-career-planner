@@ -26,7 +26,7 @@ describe('Support Card API Endpoints', function (): void {
                         '*' => ['id', 'name', 'card_type', 'rarity'],
                     ],
                 ]);
-        })->skip('API v1 support card routes not yet implemented');
+        });
 
         it('filters by card type', function (): void {
             SupportCardDefinition::factory()->count(5)->create([
@@ -42,7 +42,7 @@ describe('Support Card API Endpoints', function (): void {
 
             $response->assertSuccessful()
                 ->assertJsonCount(5, 'data');
-        })->skip('API v1 support card routes not yet implemented');
+        });
 
         it('filters by rarity', function (): void {
             SupportCardDefinition::factory()->count(4)->create([
@@ -58,7 +58,7 @@ describe('Support Card API Endpoints', function (): void {
 
             $response->assertSuccessful()
                 ->assertJsonCount(4, 'data');
-        })->skip('API v1 support card routes not yet implemented');
+        });
 
         it('filters by meta tier', function (): void {
             SupportCardDefinition::factory()->count(3)->create([
@@ -70,11 +70,11 @@ describe('Support Card API Endpoints', function (): void {
                 'is_active' => true,
             ]);
 
-            $response = $this->getJson('/api/v1/support-cards?meta_tier=S+');
+            $response = $this->getJson('/api/v1/support-cards?meta_tier='.urlencode('S+'));
 
             $response->assertSuccessful()
                 ->assertJsonCount(3, 'data');
-        })->skip('API v1 support card routes not yet implemented');
+        });
 
         it('searches by name', function (): void {
             SupportCardDefinition::factory()->create([
@@ -90,7 +90,7 @@ describe('Support Card API Endpoints', function (): void {
 
             $response->assertSuccessful()
                 ->assertJsonCount(1, 'data');
-        })->skip('API v1 support card routes not yet implemented');
+        });
     });
 
     describe('GET /api/v1/support-cards/{id}', function (): void {
@@ -110,13 +110,13 @@ describe('Support Card API Endpoints', function (): void {
                         'skill_hints_provided',
                     ],
                 ]);
-        })->skip('API v1 support card routes not yet implemented');
+        });
 
         it('returns 404 for non-existent card', function (): void {
             $response = $this->getJson('/api/v1/support-cards/99999');
 
             $response->assertNotFound();
-        })->skip('API v1 support card routes not yet implemented');
+        });
     });
 
     describe('GET /api/v1/support-cards/meta-ranking', function (): void {
@@ -139,7 +139,7 @@ describe('Support Card API Endpoints', function (): void {
                         'S',
                     ],
                 ]);
-        })->skip('API v1 support card routes not yet implemented');
+        });
     });
 
     describe('GET /api/v1/support-cards/{id}/synergies', function (): void {
@@ -155,7 +155,7 @@ describe('Support Card API Endpoints', function (): void {
                         'synergy_score',
                     ],
                 ]);
-        })->skip('API v1 support card routes not yet implemented');
+        });
     });
 
     describe('Character Support Card Deck', function (): void {
@@ -176,7 +176,7 @@ describe('Support Card API Endpoints', function (): void {
 
                 $response->assertSuccessful()
                     ->assertJsonCount(6, 'data');
-            })->skip('API v1 character deck routes not yet implemented');
+            });
         });
 
         describe('POST /api/v1/characters/{id}/deck', function (): void {
@@ -191,11 +191,10 @@ describe('Support Card API Endpoints', function (): void {
 
                 $response->assertCreated();
 
-                expect(CharacterSupportCard::where([
-                    'character_id' => $character->id,
-                    'support_card_id' => $card->id,
-                ])->exists())->toBeTrue();
-            })->skip('API v1 character deck routes not yet implemented');
+                expect(CharacterSupportCard::where('character_id', $character->id)
+                    ->where('support_card_id', $card->id)
+                    ->exists())->toBeTrue();
+            });
 
             it('validates position slot range', function (): void {
                 $character = Character::factory()->create(['user_id' => $this->user->id]);
@@ -208,7 +207,7 @@ describe('Support Card API Endpoints', function (): void {
 
                 $response->assertUnprocessable()
                     ->assertJsonValidationErrors(['position_slot']);
-            })->skip('API v1 character deck routes not yet implemented');
+            });
         });
 
         describe('DELETE /api/v1/characters/{id}/deck/{slot}', function (): void {
@@ -226,11 +225,10 @@ describe('Support Card API Endpoints', function (): void {
 
                 $response->assertSuccessful();
 
-                expect(CharacterSupportCard::where([
-                    'character_id' => $character->id,
-                    'position_slot' => 1,
-                ])->exists())->toBeFalse();
-            })->skip('API v1 character deck routes not yet implemented');
+                expect(CharacterSupportCard::where('character_id', $character->id)
+                    ->where('position_slot', 1)
+                    ->exists())->toBeFalse();
+            });
         });
     });
 });

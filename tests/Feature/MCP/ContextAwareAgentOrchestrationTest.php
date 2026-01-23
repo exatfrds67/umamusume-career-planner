@@ -10,9 +10,7 @@ use App\Services\MCP\AgentMemoryService;
 use App\Services\MCP\AgentOrchestrationService;
 use App\Services\MCP\CareerStateSyncService;
 use App\Services\MCP\WorkflowTemplateService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
-
 
 beforeEach(function () {
     $this->user = User::factory()->create();
