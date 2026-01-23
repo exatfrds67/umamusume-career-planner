@@ -56,8 +56,7 @@ class ScreenTypeDetector
      *     scores: array<string, float>
      * }
      */
-    public function detectScreenType(string $text): array
-    {
+    public function detectScreenType(): array
         $scores = [];
 
         foreach (self::DETECTION_PATTERNS as $type => $config) {
@@ -65,7 +64,7 @@ class ScreenTypeDetector
 
             foreach ($config['keywords'] as $keyword) {
                 if (mb_stripos($text, $keyword) !== false) {
-                    $matchCount++;
+                    $matchCount = ($matchCount ?? 0) + 1;
                 }
             }
 
@@ -111,7 +110,6 @@ class ScreenTypeDetector
      * @return array<string>
      */
     public function getSupportedTypes(): array
-    {
         return array_keys(self::DETECTION_PATTERNS);
     }
 }

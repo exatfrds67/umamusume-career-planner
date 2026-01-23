@@ -59,7 +59,6 @@ class ParserFactory
      * @return array<string, ScreenParserInterface>
      */
     public function getAllParsers(): array
-    {
         $types = ['character_stats', 'training_session', 'race_result', 'skill_list'];
 
         foreach ($types as $type) {
@@ -77,7 +76,6 @@ class ParserFactory
      * @return array<string>
      */
     public function getSupportedTypes(): array
-    {
         return ['character_stats', 'training_session', 'race_result', 'skill_list'];
     }
 }

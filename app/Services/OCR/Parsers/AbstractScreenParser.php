@@ -28,7 +28,7 @@ abstract class AbstractScreenParser implements ScreenParserInterface
 
         foreach ($requiredFields as $field) {
             if (isset($data[$field]) && $data[$field] !== null) {
-                $foundCount++;
+                $foundCount = ($foundCount ?? 0) + 1;
             }
         }
 

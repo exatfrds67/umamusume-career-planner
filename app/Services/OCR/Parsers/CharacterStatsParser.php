@@ -51,14 +51,13 @@ class CharacterStatsParser extends AbstractScreenParser
         return 'character_stats';
     }
 
-    public function parse(string $text): array
-    {
+    public function parse(): array
         $data = [];
         $errors = [];
 
         // Extract stats
         $stats = $this->extractStats($text);
-        $data['stats'] = $stats;
+        (is_array($data) && isset($data['stats']) ? $data['stats'] : null) = $stats;
 
         // Extract additional data
         $additionalData = $this->extractAdditionalData($text);
@@ -86,27 +85,26 @@ class CharacterStatsParser extends AbstractScreenParser
         return $result;
     }
 
-    public function validate(array $data): array
-    {
+    public function validate(): array
         $errors = [];
 
         // Validate stats exist
-        if (! isset($data['stats']) || ! is_array($data['stats'])) {
+        if (! isset((is_array($data) && isset($data['stats']) ? $data['stats'] : null)) || ! is_array((is_array($data) && isset($data['stats']) ? $data['stats'] : null))) {
             $errors[] = 'Stats data is missing or invalid';
 
             return ['valid' => false, 'errors' => $errors];
         }
 
         // Validate each stat value
-        foreach ($data['stats'] as $stat => $value) {
+        foreach ((is_array($data) && isset($data['stats']) ? $data['stats'] : null) as $stat => $value) {
             if ($value !== null && ! $this->validateStatValue($value)) {
                 $errors[] = "Invalid {$stat} value: {$value} (must be 0-1200)";
             }
         }
 
         // Validate energy if present
-        if (isset($data['energy_level']) && ! $this->validatePercentage($data['energy_level'])) {
-            $errors[] = "Invalid energy level: {$data['energy_level']} (must be 0-100)";
+        if (isset((is_array($data) && isset($data['energy_level']) ? $data['energy_level'] : null)) && ! $this->validatePercentage((is_array($data) && isset($data['energy_level']) ? $data['energy_level'] : null))) {
+            $errors[] = "Invalid energy level: {(is_array($data) && isset($data['energy_level']) ? $data['energy_level'] : null)} (must be 0-100)";
         }
 
         return [
@@ -120,8 +118,7 @@ class CharacterStatsParser extends AbstractScreenParser
      *
      * @return array<string, int|null>
      */
-    protected function extractStats(string $text): array
-    {
+    protected function extractStats(): array
         $stats = [
             'speed' => null,
             'stamina' => null,
@@ -145,34 +142,33 @@ class CharacterStatsParser extends AbstractScreenParser
      *
      * @return array<string, mixed>
      */
-    protected function extractAdditionalData(string $text): array
-    {
+    protected function extractAdditionalData(): array
         $data = [];
 
         // Extract character name
         $characterName = $this->extractText($text, self::ADDITIONAL_PATTERNS['character_name']);
         if ($characterName) {
-            $data['character_name'] = $characterName;
+            (is_array($data) && isset($data['character_name']) ? $data['character_name'] : null) = $characterName;
         }
 
         // Extract turn
         if (preg_match(self::ADDITIONAL_PATTERNS['turn'], $text, $matches)) {
-            $data['current_turn'] = (int) $matches[1];
+            (is_array($data) && isset($data['current_turn']) ? $data['current_turn'] : null) = (int) $matches[1];
             if (isset($matches[2])) {
-                $data['total_turns'] = (int) $matches[2];
+                (is_array($data) && isset($data['total_turns']) ? $data['total_turns'] : null) = (int) $matches[2];
             }
         }
 
         // Extract energy
         $energy = $this->extractNumeric($text, self::ADDITIONAL_PATTERNS['energy']);
         if ($energy !== null && $this->validatePercentage($energy)) {
-            $data['energy_level'] = $energy;
+            (is_array($data) && isset($data['energy_level']) ? $data['energy_level'] : null) = $energy;
         }
 
         // Extract mood
         $mood = $this->extractText($text, self::ADDITIONAL_PATTERNS['mood']);
         if ($mood) {
-            $data['mood_status'] = $this->normalizeMood($mood);
+            (is_array($data) && isset($data['mood_status']) ? $data['mood_status'] : null) = $this->normalizeMood($mood);
         }
 
         return $data;

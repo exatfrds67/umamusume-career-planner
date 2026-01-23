@@ -8,6 +8,7 @@ use App\Models\Career;
 use App\Models\Character;
 use App\Models\Race;
 use App\Models\Skill;
+use App\Models\SkillAcquisition;
 use App\Models\TrainingSession;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -32,8 +33,7 @@ class DataIntegrationService
      * @param  array<string, mixed>  $extractedData
      * @return array{success: bool, character_id: int|null, updated_fields: array<string>, message: string}
      */
-    public function importCharacterStats(int $characterId, array $extractedData): array
-    {
+    public function importCharacterStats(): array
         try {
             DB::beginTransaction();
 
@@ -45,7 +45,8 @@ class DataIntegrationService
             // Prepare update data
             $updateData = $this->transformer->prepareCharacterUpdate($transformedData);
 
-            if (empty($updateData)) {
+            // Check if there's any valid data to update
+            if (empty($updateData) || (empty($extractedData['data']) && ($extractedData['confidence'] ?? 0.0) === 0.0)) {
                 DB::rollBack();
 
                 return [
@@ -57,7 +58,8 @@ class DataIntegrationService
             }
 
             // Update character
-            $character->update($updateData);
+            $character->fill($updateData);
+            $character->save();
 
             DB::commit();
 
@@ -96,8 +98,7 @@ class DataIntegrationService
      * @param  array<string, mixed>  $extractedData
      * @return array{success: bool, training_session_id: int|null, message: string}
      */
-    public function importTrainingSession(int $careerId, array $extractedData): array
-    {
+    public function importTrainingSession(): array
         try {
             DB::beginTransaction();
 
@@ -108,6 +109,9 @@ class DataIntegrationService
 
             // Prepare creation data
             $createData = $this->transformer->prepareTrainingSessionCreate($careerId, $transformedData);
+
+            // Set character_id from career
+            $createData['character_id'] = $career->character_id;
 
             // Create training session
             $trainingSession = TrainingSession::create($createData);
@@ -148,8 +152,7 @@ class DataIntegrationService
      * @param  array<string, mixed>  $extractedData
      * @return array{success: bool, race_id: int|null, message: string}
      */
-    public function importRaceResult(int $careerId, array $extractedData): array
-    {
+    public function importRaceResult(): array
         try {
             DB::beginTransaction();
 
@@ -160,6 +163,9 @@ class DataIntegrationService
 
             // Prepare creation data
             $createData = $this->transformer->prepareRaceCreate($careerId, $transformedData);
+
+            // Set character_id from career
+            $createData['character_id'] = $career->character_id;
 
             // Create race record
             $race = Race::create($createData);
@@ -208,8 +214,7 @@ class DataIntegrationService
      * @param  array<string, mixed>  $extractedData
      * @return array{success: bool, skills_processed: int, message: string}
      */
-    public function importSkillList(int $characterId, array $extractedData): array
-    {
+    public function importSkillList(): array
         try {
             DB::beginTransaction();
 
@@ -226,30 +231,51 @@ class DataIntegrationService
                     continue;
                 }
 
-                // Find or create skill
+                // Find or create the global skill first
                 $skill = Skill::firstOrCreate(
                     [
-                        'character_id' => $characterId,
-                        'skill_name' => $skillData['name'],
+                        'name' => $skillData['name'],
                     ],
                     [
-                        'skill_type' => $skillData['skill_type'] ?? 'unknown',
-                        'sp_cost' => $skillData['sp_cost'] ?? 0,
-                        'hint_count' => $skillData['hint_level'] ?? 0,
-                        'is_acquired' => $skillData['is_acquired'] ?? false,
+                        'internal_id' => 'ocr_'.strtolower(str_replace(' ', '_', $skillData['name'])),
+                        'skill_type' => in_array($skillData['skill_type'] ?? '', ['speed', 'passive', 'recovery', 'debuff', 'unique'])
+                            ? $skillData['skill_type']
+                            : 'passive',
+                        'rarity' => 'normal',
+                        'base_sp_cost' => $skillData['sp_cost'] ?? 0,
+                        'effects' => [],
+                        'description' => 'Imported from OCR',
+                    ]
+                );
+
+                // Find or create skill acquisition for this character
+                $acquisition = SkillAcquisition::firstOrCreate(
+                    [
+                        'character_id' => $characterId,
+                        'skill_id' => $skill->id,
+                    ],
+                    [
+                        'turn_acquired' => 1, // Default value
+                        'career_phase' => 'junior', // Default value
+                        'acquisition_method' => 'ocr_import',
+                        'base_sp_cost' => $skillData['sp_cost'] ?? 0,
+                        'hints_used' => $skillData['hint_level'] ?? 0,
+                        'final_sp_cost' => $skillData['sp_cost'] ?? 0,
+                        'is_active' => $skillData['is_acquired'] ?? false,
                     ]
                 );
 
                 // Update if already exists
-                if (! $skill->wasRecentlyCreated) {
-                    $skill->update([
-                        'sp_cost' => $skillData['sp_cost'] ?? $skill->sp_cost,
-                        'hint_count' => $skillData['hint_level'] ?? $skill->hint_count,
-                        'is_acquired' => $skillData['is_acquired'] ?? $skill->is_acquired,
+                if (! $acquisition->wasRecentlyCreated) {
+                    $acquisition->fill([
+                        'base_sp_cost' => $skillData['sp_cost'] ?? $acquisition->base_sp_cost,
+                        'hints_used' => $skillData['hint_level'] ?? $acquisition->hints_used,
+                        'is_active' => $skillData['is_acquired'] ?? $acquisition->is_active,
                     ]);
+                    $acquisition->save();
                 }
 
-                $skillsProcessed++;
+                $skillsProcessed = ($skillsProcessed ?? 0) + 1;
             }
 
             DB::commit();
@@ -288,8 +314,7 @@ class DataIntegrationService
      * @param  array<int, array{screen_type: string, extracted_data: array<string, mixed>, target_id: int}>  $imports
      * @return array{success: bool, processed: int, failed: int, results: array<int, array<string, mixed>>}
      */
-    public function batchImport(array $imports): array
-    {
+    public function batchImport(): array
         $results = [];
         $processed = 0;
         $failed = 0;
@@ -309,9 +334,9 @@ class DataIntegrationService
             $results[$index] = $result;
 
             if ($result['success']) {
-                $processed++;
+                $processed = ($processed ?? 0) + 1;
             } else {
-                $failed++;
+                $failed = ($failed ?? 0) + 1;
             }
         }
 

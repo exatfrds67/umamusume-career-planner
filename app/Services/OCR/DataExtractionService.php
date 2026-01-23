@@ -34,8 +34,7 @@ class DataExtractionService
      * @param  array<string, mixed>  $options
      * @return array<string, mixed>
      */
-    public function extractData(string $screenType, string $ocrText, array $options = []): array
-    {
+    public function extractData(): array
         Log::info('[DataExtractionService] Starting data extraction', [
             'screen_type' => $screenType,
             'text_length' => \strlen($ocrText),
@@ -103,8 +102,7 @@ class DataExtractionService
      *
      * @return array<string, mixed>
      */
-    public function extractCharacterStats(string $ocrText): array
-    {
+    public function extractCharacterStats(): array
         return $this->extractData('character_stats', $ocrText);
     }
 
@@ -113,8 +111,7 @@ class DataExtractionService
      *
      * @return array<string, mixed>
      */
-    public function extractTrainingSession(string $ocrText): array
-    {
+    public function extractTrainingSession(): array
         return $this->extractData('training_session', $ocrText);
     }
 
@@ -123,8 +120,7 @@ class DataExtractionService
      *
      * @return array<string, mixed>
      */
-    public function extractRaceResult(string $ocrText): array
-    {
+    public function extractRaceResult(): array
         return $this->extractData('race_result', $ocrText);
     }
 
@@ -133,8 +129,7 @@ class DataExtractionService
      *
      * @return array<string, mixed>
      */
-    public function extractSkillList(string $ocrText): array
-    {
+    public function extractSkillList(): array
         return $this->extractData('skill_list', $ocrText);
     }
 
@@ -144,8 +139,7 @@ class DataExtractionService
      * @param  array<int, array{screen_type: string, ocr_text: string}>  $screenshots
      * @return array<int, array<string, mixed>>
      */
-    public function batchExtract(array $screenshots): array
-    {
+    public function batchExtract(): array
         $results = [];
 
         foreach ($screenshots as $index => $screenshot) {
