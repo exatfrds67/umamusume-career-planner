@@ -64,7 +64,7 @@ class MCPMonitoringController extends Controller
         $userId = (int) Auth::id();
         $period = $request->input('period', 'month');
 
-        $data = $this->monitoringService->getCostAnalytics($userId, $period);
+        $data = $this->monitoringService->getCostAnalytics($userId, is_string($period) ? $period : null);
 
         return response()->json([
             'success' => true,
@@ -80,7 +80,7 @@ class MCPMonitoringController extends Controller
         $userId = (int) Auth::id();
         $period = $request->input('period', 'day');
 
-        $data = $this->monitoringService->getPerformanceMetrics($userId, $period);
+        $data = $this->monitoringService->getPerformanceMetrics($userId, is_string($period) ? $period : null);
 
         return response()->json([
             'success' => true,
@@ -153,7 +153,7 @@ class MCPMonitoringController extends Controller
         ]);
 
         $userId = Auth::id();
-        $agent = $this->monitoringService->createAgent($userId, $validated);
+        $agent = $this->monitoringService->createAgent($userId !== null ? (int) $userId : 0, $validated);
 
         return response()->json([
             'success' => true,
@@ -180,7 +180,10 @@ class MCPMonitoringController extends Controller
         $userId = Auth::id();
         $category = $request->input('category', 'mcp');
 
-        $preferences = $this->monitoringService->getUserPreferences($userId, $category);
+        $preferences = $this->monitoringService->getUserPreferences(
+            $userId !== null ? (int) $userId : 0,
+            is_string($category) ? $category : 'mcp'
+        );
 
         return response()->json([
             'success' => true,
@@ -201,7 +204,7 @@ class MCPMonitoringController extends Controller
 
         $userId = Auth::id();
         $preference = $this->monitoringService->updateUserPreference(
-            $userId,
+            $userId !== null ? (int) $userId : 0,
             $validated['key'],
             $validated['value'],
             $validated['category'] ?? 'mcp'
@@ -220,9 +223,13 @@ class MCPMonitoringController extends Controller
     public function toolUsageHistory(Request $request): JsonResponse
     {
         $userId = Auth::id();
-        $limit = (int) $request->input('limit', 100);
+        $limitInput = $request->input('limit', 100);
+        $limit = is_numeric($limitInput) ? (is_numeric($limit) ? (int) $limit : 0)Input : 100;
 
-        $history = $this->monitoringService->getToolUsageHistory($userId, $limit);
+        $history = $this->monitoringService->getToolUsageHistory(
+            $userId !== null ? (int) $userId : 0,
+            $limit
+        );
 
         return response()->json([
             'success' => true,

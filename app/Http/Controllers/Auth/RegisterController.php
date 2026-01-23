@@ -27,11 +27,19 @@ class RegisterController extends Controller
      */
     public function store(RegisterRequest $request): RedirectResponse
     {
+        $validated = $request->validated();
+
+        // Ensure password is a string
+        $password = $validated['password'];
+        if (! is_string($password)) {
+            throw new \InvalidArgumentException('Password must be a string');
+        }
+
         $user = User::create([
             'uuid' => Str::uuid()->toString(),
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($password),
             'preferences' => [],
             'accessibility_settings' => [],
             'ai_settings' => ['subscription_tier' => 'free', 'budget_limit' => 10.0],

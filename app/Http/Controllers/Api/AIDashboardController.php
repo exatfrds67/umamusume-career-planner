@@ -192,12 +192,12 @@ class AIDashboardController extends Controller
 
             $limit = $request->query('limit');
             if (is_string($limit) && ctype_digit($limit)) {
-                $filters['limit'] = (int) $limit;
+                $filters['limit'] = (is_numeric($limit) ? (int) $limit : 0);
             }
 
             $offset = $request->query('offset');
             if (is_string($offset) && ctype_digit($offset)) {
-                $filters['offset'] = (int) $offset;
+                $filters['offset'] = (is_numeric($offset) ? (int) $offset : 0);
             }
 
             $conversations = $this->conversationHistory->getConversations($filters);

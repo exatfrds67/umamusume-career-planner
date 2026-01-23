@@ -179,7 +179,7 @@ class MCPDashboardController extends Controller
             if ($user) {
                 $user->userPreferences()->updateOrCreate(
                     [
-                        'user_id' => $user->id,
+                        'user_id' => $user?->id ?? throw new \Exception('User required'),
                         'preference_category' => 'mcp',
                         'preference_key' => 'dashboard_settings',
                         'scope' => 'global',
@@ -214,6 +214,8 @@ class MCPDashboardController extends Controller
 
     /**
      * Get overview metrics
+     *
+     * @return array<string, mixed>
      */
     protected function getOverviewMetrics(): array
     {
@@ -239,6 +241,8 @@ class MCPDashboardController extends Controller
 
     /**
      * Get server status for all MCP servers
+     *
+     * @return array<string, mixed>
      */
     protected function getServerStatus(): array
     {
@@ -247,6 +251,8 @@ class MCPDashboardController extends Controller
 
     /**
      * Get active agents with their current status
+     *
+     * @return array<int, mixed>
      */
     protected function getActiveAgents(): array
     {
@@ -255,6 +261,8 @@ class MCPDashboardController extends Controller
 
     /**
      * Get cost summary with transparency data
+     *
+     * @return array<string, mixed>
      */
     protected function getCostSummary(): array
     {
@@ -282,6 +290,8 @@ class MCPDashboardController extends Controller
 
     /**
      * Get performance metrics for all providers
+     *
+     * @return array<string, mixed>
      */
     protected function getPerformanceMetrics(string $range = '24h'): array
     {
@@ -326,6 +336,8 @@ class MCPDashboardController extends Controller
 
     /**
      * Get user settings
+     *
+     * @return array<string, mixed>
      */
     protected function getUserSettings(): array
     {
@@ -352,8 +364,11 @@ class MCPDashboardController extends Controller
             ],
         ];
 
-        if ($preferences && $preferences->settings) {
-            return array_merge($defaultSettings, json_decode($preferences->settings, true));
+        if ($preferences && isset($preferences->settings) && is_string($preferences->settings)) {
+            $decoded = json_decode($preferences->settings, true);
+            if (is_array($decoded)) {
+                return array_merge($defaultSettings, $decoded);
+            }
         }
 
         return $defaultSettings;
@@ -361,6 +376,8 @@ class MCPDashboardController extends Controller
 
     /**
      * Get default server settings
+     *
+     * @return array<string, mixed>
      */
     protected function getDefaultServerSettings(): array
     {
@@ -393,7 +410,13 @@ class MCPDashboardController extends Controller
 
         $responseTimes = collect($servers)->pluck('response_time')->filter();
 
-        return $responseTimes->isNotEmpty() ? $responseTimes->avg() : 0.0;
+        if ($responseTimes->isEmpty()) {
+            return 0.0;
+        }
+
+        $average = $responseTimes->avg();
+
+        return is_numeric($average) ? (float) $average : 0.0;
     }
 
     /**
@@ -416,39 +439,50 @@ class MCPDashboardController extends Controller
         }
 
         $p95Index = (int) ceil($responseTimes->count() * 0.95) - 1;
+        $value = $responseTimes->get(max(0, $p95Index), 0.0);
 
-        return $responseTimes->get(max(0, $p95Index), 0.0) ?? 0.0;
+        return is_numeric($value) ? (float) $value : 0.0;
     }
 
     /**
      * Generate performance recommendations
+     *
+     * @param  array<string, mixed>  $providers
+     * @return array<int, array<string, string>>
      */
     protected function generatePerformanceRecommendations(array $providers): array
     {
         $recommendations = [];
 
         foreach ($providers as $name => $provider) {
+            if (! is_array($provider)) {
+                continue;
+            }
+
             // Check for slow response times
-            if (($provider['avg_response_time'] ?? 0) > 5.0) {
+            $avgResponseTime = $provider['avg_response_time'] ?? 0;
+            if (is_numeric($avgResponseTime) && $avgResponseTime > 5.0) {
                 $recommendations[] = [
                     'type' => 'warning',
-                    'message' => "{$name} has slow average response time ({$provider['avg_response_time']}s). Consider using a faster provider for time-sensitive tasks.",
+                    'message' => "{$name} has slow average response time ({$avgResponseTime}s). Consider using a faster provider for time-sensitive tasks.",
                 ];
             }
 
             // Check for low success rates
-            if (($provider['success_rate'] ?? 100) < 90) {
+            $successRate = $provider['success_rate'] ?? 100;
+            if (is_numeric($successRate) && $successRate < 90) {
                 $recommendations[] = [
                     'type' => 'error',
-                    'message' => "{$name} has low success rate ({$provider['success_rate']}%). Investigate connection issues or consider disabling this provider.",
+                    'message' => "{$name} has low success rate ({$successRate}%). Investigate connection issues or consider disabling this provider.",
                 ];
             }
 
             // Check for high costs
-            if (($provider['cost_per_request'] ?? 0) > 0.01) {
+            $costPerRequest = $provider['cost_per_request'] ?? 0;
+            if (is_numeric($costPerRequest) && $costPerRequest > 0.01) {
                 $recommendations[] = [
                     'type' => 'info',
-                    'message' => "{$name} has high cost per request (\${$provider['cost_per_request']}). Consider using a more cost-effective provider for routine tasks.",
+                    'message' => "{$name} has high cost per request (\${$costPerRequest}). Consider using a more cost-effective provider for routine tasks.",
                 ];
             }
         }

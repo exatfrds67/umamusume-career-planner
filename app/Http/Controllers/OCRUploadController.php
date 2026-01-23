@@ -31,8 +31,11 @@ class OCRUploadController extends Controller
     public function upload(OCRUploadRequest $request): JsonResponse
     {
         try {
-            $file = $request->file('screenshot');
-            $userId = $request->user()->id;
+            $user = $request->user();
+            /** @var \App\Models\User $user */
+            // Support both 'screenshot' and 'image' field names
+            $file = $request->file('screenshot') ?? $request->file('image');
+            $userId = $user?->id ?? throw new \Exception('User required');
             $characterId = $request->input('character_id');
             $dataType = $request->input('data_type', 'character_stats');
 
@@ -71,7 +74,7 @@ class OCRUploadController extends Controller
         } catch (\Exception $e) {
             Log::error('[OCRUploadController] Upload failed', [
                 'error' => $e->getMessage(),
-                'user_id' => $request->user()->id,
+                'user_id' => $request->user()?->id,
             ]);
 
             return response()->json([
@@ -91,21 +94,36 @@ class OCRUploadController extends Controller
             $tesseractAvailable = $this->tesseractService->isAvailable();
             $imageProcessingAvailable = $this->imageProcessor->isAvailable();
 
+            $maxFileSize = config('services.image_processing.max_file_size', 10485760);
+            $maxFileSizeInt = is_numeric($maxFileSize) ? (int) $maxFileSize : 10485760;
+
+            $minWidth = config('services.image_processing.min_width', 320);
+            $minWidthInt = is_numeric($minWidth) ? (int) $minWidth : 320;
+
+            $minHeight = config('services.image_processing.min_height', 240);
+            $minHeightInt = is_numeric($minHeight) ? (int) $minHeight : 240;
+
+            $maxWidth = config('services.image_processing.max_width', 4096);
+            $maxWidthInt = is_numeric($maxWidth) ? (int) $maxWidth : 4096;
+
+            $maxHeight = config('services.image_processing.max_height', 4096);
+            $maxHeightInt = is_numeric($maxHeight) ? (int) $maxHeight : 4096;
+
             return response()->json([
                 'success' => true,
                 'data' => [
                     'ocr_available' => $tesseractAvailable,
                     'image_processing_available' => $imageProcessingAvailable,
-                    'max_file_size' => config('services.image_processing.max_file_size', 10485760),
-                    'max_file_size_mb' => config('services.image_processing.max_file_size', 10485760) / 1048576,
+                    'max_file_size' => $maxFileSizeInt,
+                    'max_file_size_mb' => $maxFileSizeInt / 1048576,
                     'allowed_formats' => config('services.image_processing.allowed_formats', ['jpg', 'jpeg', 'png', 'webp']),
                     'min_dimensions' => [
-                        'width' => config('services.image_processing.min_width', 320),
-                        'height' => config('services.image_processing.min_height', 240),
+                        'width' => $minWidthInt,
+                        'height' => $minHeightInt,
                     ],
                     'max_dimensions' => [
-                        'width' => config('services.image_processing.max_width', 4096),
-                        'height' => config('services.image_processing.max_height', 4096),
+                        'width' => $maxWidthInt,
+                        'height' => $maxHeightInt,
                     ],
                 ],
             ], 200);
@@ -180,19 +198,19 @@ class OCRUploadController extends Controller
 
             $result = match ($extraction->data_type) {
                 'character_stats' => $integrationService->importCharacterStats(
-                    (int) $request->input('character_id'),
+                    is_numeric($request->input('character_id', 0)) ? (int) $request->input('character_id', 0) : 0,
                     ['data' => $request->except(['_token', 'action']), 'confidence' => $extraction->confidence_score]
                 ),
                 'training_session' => $integrationService->importTrainingSession(
-                    (int) $request->input('career_id'),
+                    is_numeric($request->input('career_id', 0)) ? (int) $request->input('career_id', 0) : 0,
                     ['data' => $request->except(['_token', 'action']), 'confidence' => $extraction->confidence_score]
                 ),
                 'race_result' => $integrationService->importRaceResult(
-                    (int) $request->input('career_id'),
+                    is_numeric($request->input('career_id', 0)) ? (int) $request->input('career_id', 0) : 0,
                     ['data' => $request->except(['_token', 'action']), 'confidence' => $extraction->confidence_score]
                 ),
                 'skill_list' => $integrationService->importSkillList(
-                    (int) $request->input('character_id'),
+                    is_numeric($request->input('character_id', 0)) ? (int) $request->input('character_id', 0) : 0,
                     ['data' => $request->except(['_token', 'action']), 'confidence' => $extraction->confidence_score]
                 ),
                 default => ['success' => false, 'message' => 'Unknown screen type'],

@@ -24,7 +24,9 @@ class SupportDeckController extends Controller
      */
     public function save(StoreSupportDeckRequest $request, Character $character): JsonResponse
     {
-        $cards = $request->validated()['cards'];
+        $validated = $request->validated();
+        /** @var array<int, array{support_card_id: int, is_friend_card: bool, limit_break_level?: int, friendship_level?: int}> $cards */
+        $cards = $validated['cards'];
 
         $success = $this->deckService->saveDeck($character, $cards);
 
@@ -75,7 +77,14 @@ class SupportDeckController extends Controller
      */
     public function validateDeck(Request $request, Character $character): JsonResponse
     {
-        $cards = $request->input('cards', []);
+        $validated = $request->validate([
+            'cards' => ['required', 'array'],
+            'cards.*.support_card_id' => ['required', 'integer'],
+            'cards.*.is_friend_card' => ['required', 'boolean'],
+        ]);
+
+        /** @var array<int, array{support_card_id: int, is_friend_card: bool}> $cards */
+        $cards = $validated['cards'];
 
         $validation = $this->deckService->validateDeck($cards);
 
@@ -106,7 +115,12 @@ class SupportDeckController extends Controller
      */
     public function recommendations(Request $request, Character $character): JsonResponse
     {
-        $focusStat = $request->input('focus_stat');
+        $validated = $request->validate([
+            'focus_stat' => ['nullable', 'string', 'in:speed,stamina,power,guts,wit'],
+        ]);
+
+        /** @var string|null $focusStat */
+        $focusStat = $validated['focus_stat'] ?? null;
 
         $recommendations = $this->deckService->getRecommendations($character, $focusStat);
 

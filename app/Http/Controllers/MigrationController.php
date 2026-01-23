@@ -65,7 +65,7 @@ class MigrationController extends Controller
 
             // Auto-detect format if not specified
             if ($sourceFormat === 'auto') {
-                $detection = $this->migrationService->detectLegacyFormat($content);
+                $detection = $this->migrationService->detectLegacyFormat(is_string($content) ? $content : '');
                 $sourceFormat = $detection['format'];
 
                 if ($detection['confidence'] < 0.5) {
@@ -79,7 +79,14 @@ class MigrationController extends Controller
             }
 
             // Convert the data
-            $result = $this->migrationService->convertLegacyFormat($content, $sourceFormat, $targetType);
+            $contentStr = is_string($content) ? $content : '';
+            $sourceFormatStr = is_string($sourceFormat) ? $sourceFormat : 'auto';
+            $targetTypeStr = is_string($targetType) ? $targetType : 'character';
+            $result = $this->migrationService->convertLegacyFormat(
+                $contentStr,
+                $sourceFormatStr,
+                $targetTypeStr
+            );
 
             if (! $result['success']) {
                 return response()->json([
@@ -123,16 +130,25 @@ class MigrationController extends Controller
     public function startBatch(MigrationBatchRequest $request): JsonResponse
     {
         try {
+            $user = $request->user();
+            /** @var \App\Models\User $user */
             $data = $request->input('data');
             $importType = $request->input('import_type');
-            $userId = $request->user()->id;
+            $userId = $user?->id ?? throw new \Exception('User required');
 
+            $conflictStrategyInput = $request->input('conflict_strategy', DataMigrationService::CONFLICT_STRATEGY_SKIP);
+            $batchSizeInput = $request->input('batch_size', 50);
             $options = [
-                'conflict_strategy' => $request->input('conflict_strategy', DataMigrationService::CONFLICT_STRATEGY_SKIP),
-                'batch_size' => $request->input('batch_size', 50),
+                'conflict_strategy' => is_string($conflictStrategyInput) ? $conflictStrategyInput : DataMigrationService::CONFLICT_STRATEGY_SKIP,
+                'batch_size' => is_numeric($batchSizeInput) ? (int) $batchSizeInput : 50,
             ];
 
-            $result = $this->migrationService->startBatchImport($data, $importType, $userId, $options);
+            $result = $this->migrationService->startBatchImport(
+                is_array($data) ? $data : [],
+                is_string($importType) ? $importType : 'character',
+                $userId,
+                $options
+            );
 
             return response()->json([
                 'success' => true,
@@ -273,7 +289,10 @@ class MigrationController extends Controller
             $data = $request->input('data');
             $importType = $request->input('import_type');
 
-            $result = $this->migrationService->validateData($data, $importType);
+            $result = $this->migrationService->validateData(
+                is_array($data) ? $data : [],
+                is_string($importType) ? $importType : 'character'
+            );
 
             return response()->json([
                 'success' => true,
@@ -282,7 +301,7 @@ class MigrationController extends Controller
                     'summary' => $result['summary'],
                     'valid_records' => $result['records']['valid'],
                     'invalid_records' => $result['records']['invalid'],
-                    'warnings' => $result['warnings'],
+                    'warnings' => $result['warnings'] ?? [],
                 ],
             ]);
         } catch (\Exception $e) {
@@ -311,7 +330,15 @@ class MigrationController extends Controller
             $conflictIndex = $request->input('conflict_index');
             $resolution = $request->input('resolution');
 
-            $result = $this->migrationService->resolveConflictManually($batchId, $conflictIndex, $resolution);
+            $batchIdStr = is_string($batchId) ? $batchId : '';
+            $conflictIndexInt = is_numeric($conflictIndex) ? (int) $conflictIndex : 0;
+            $resolutionStr = is_string($resolution) ? $resolution : '';
+
+            $result = $this->migrationService->resolveConflictManually(
+                $batchIdStr,
+                $conflictIndexInt,
+                $resolutionStr
+            );
 
             return response()->json([
                 'success' => $result['success'],
@@ -411,7 +438,7 @@ class MigrationController extends Controller
 
         try {
             $content = $request->input('content');
-            $detection = $this->migrationService->detectLegacyFormat($content);
+            $detection = $this->migrationService->detectLegacyFormat(is_string($content) ? $content : '');
 
             return response()->json([
                 'success' => true,

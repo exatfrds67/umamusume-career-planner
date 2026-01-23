@@ -71,10 +71,13 @@ class ImportController extends Controller
             }
 
             // Parse the content
-            $parseResult = match ($format) {
-                'json' => $this->importService->parseJson($content, $importType),
-                'csv' => $this->importService->parseCsv($content, $importType),
-                default => $this->importService->parseText($content, $importType),
+            $contentStr = is_string($content) ? $content : '';
+            $formatStr = is_string($format) ? $format : 'auto';
+            $importTypeStr = is_string($importType) ? $importType : 'character';
+            $parseResult = match ($formatStr) {
+                'json' => $this->importService->parseJson($contentStr, $importTypeStr),
+                'csv' => $this->importService->parseCsv($contentStr, $importTypeStr),
+                default => $this->importService->parseText($contentStr, $importTypeStr),
             };
 
             if (! $parseResult['success'] && empty($parseResult['data'])) {
@@ -87,7 +90,7 @@ class ImportController extends Controller
             }
 
             // Generate preview
-            $preview = $this->importService->generatePreview($parseResult['data'], $importType);
+            $preview = $this->importService->generatePreview($parseResult['data'], $importTypeStr);
 
             return response()->json([
                 'success' => true,
@@ -120,9 +123,11 @@ class ImportController extends Controller
     public function execute(ImportExecuteRequest $request): JsonResponse
     {
         try {
+            $user = $request->user();
+            /** @var \App\Models\User $user */
             $importType = $request->input('import_type');
             $data = $request->input('data');
-            $userId = $request->user()->id;
+            $userId = $user?->id ?? throw new \Exception('User required');
 
             if (empty($data)) {
                 return response()->json([
@@ -133,7 +138,12 @@ class ImportController extends Controller
             }
 
             // Execute the import
-            $result = $this->importService->executeImport($data, $importType, $userId);
+            $importTypeStr = is_string($importType) ? $importType : 'character';
+            $result = $this->importService->executeImport(
+                is_array($data) ? $data : [],
+                $importTypeStr,
+                $userId
+            );
 
             if (! $result['success']) {
                 return response()->json([
@@ -219,10 +229,13 @@ class ImportController extends Controller
     public function history(Request $request): JsonResponse
     {
         try {
-            $userId = $request->user()->id;
-            $limit = $request->query('limit', 20);
+            $user = $request->user();
+            /** @var \App\Models\User $user */
+            $userId = $user?->id ?? throw new \Exception('User required');
+            $limitInput = $request->query('limit', 20);
+            $limit = is_numeric($limitInput) ? (is_numeric($limit) ? (int) $limit : 0)Input : 20;
 
-            $history = $this->importService->getImportHistory($userId, (int) $limit);
+            $history = $this->importService->getImportHistory($userId, $limit);
 
             return response()->json([
                 'success' => true,

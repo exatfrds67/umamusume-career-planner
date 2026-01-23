@@ -41,6 +41,25 @@ class TrainingPredictionController extends Controller
     ) {}
 
     /**
+     * Get logic to support tagging if available, otherwise fallback to standard cache
+     *
+     * @param  array<string>  $tags
+     */
+    private function getCache(array $tags = []): \Illuminate\Contracts\Cache\Repository|\Illuminate\Cache\TaggedCache
+    {
+        $store = Cache::getStore();
+
+        // Check if the store supports tags
+        if (method_exists($store, 'tags')) {
+            return Cache::tags($tags);
+        }
+
+        // Fallback for file/database drivers that don't support tags
+        // We just return the standard cache facade/repository
+        return Cache::store();
+    }
+
+    /**
      * Get single training prediction
      */
     public function predict(TrainingPredictionRequest $request): TrainingPredictionResource
@@ -48,42 +67,55 @@ class TrainingPredictionController extends Controller
         $startTime = microtime(true);
 
         // Load character with relationships
-        $character = Character::with(['aptitudes', 'supportCards.supportCard', 'factors'])
+        /** @var Character $character */
+        $character = Character::query()
+            ->with(['aptitudes', 'supportCards.supportCard', 'factors'])
             ->findOrFail($request->input('character_id'));
+
+        // Get validated data
+        $validated = $request->validated();
+        /** @var string $trainingType */
+        $trainingType = $validated['training_type'];
 
         // Generate cache key
         $cacheKey = $this->generateCacheKey(
             $character->id,
-            $request->input('training_type'),
+            $trainingType,
             $request->except(['character_id', 'training_type'])
         );
 
-        // Try to get from cache
-        $cacheHit = Cache::tags(['training_predictions', "character_{$character->id}"])->has($cacheKey);
+        $tags = ['training_predictions', "character_{$character->id}"];
 
-        $prediction = Cache::tags(['training_predictions', "character_{$character->id}"])
-            ->remember($cacheKey, self::CACHE_TTL, function () use ($character, $request, $startTime) {
+        // Try to get from cache
+        $cacheHit = $this->getCache($tags)->has($cacheKey);
+
+        $prediction = $this->getCache($tags)
+            ->remember($cacheKey, self::CACHE_TTL, function () use ($character, $request, $startTime, $trainingType, $validated) {
                 // Calculate prediction
                 $prediction = $this->trainingService->calculateTrainingPrediction(
                     $character,
-                    $request->input('training_type'),
+                    $trainingType,
                     $request->except(['character_id', 'training_type'])
                 );
 
                 // Add MCP optimization if requested
                 if ($request->input('use_mcp', false)) {
-                    $mcpOptimization = $this->trainingService->getMCPOptimization(
-                        $character,
-                        $request->input('mcp_context', [])
-                    );
+                    /** @var array<string, mixed> $mcpContext */
+                    $mcpContext = $validated['mcp_context'] ?? [];
+                    if (! empty($mcpContext)) {
+                        $mcpOptimization = $this->trainingService->getMCPOptimization(
+                            $character,
+                            $mcpContext
+                        );
 
-                    if ($mcpOptimization) {
-                        $prediction['mcp_optimization'] = $mcpOptimization;
+                        if ($mcpOptimization) {
+                            $prediction['mcp_optimization'] = $mcpOptimization;
+                        }
                     }
                 }
 
                 // Add metadata
-                $prediction['training_type'] = $request->input('training_type');
+                $prediction['training_type'] = $trainingType;
                 $prediction['cached'] = false;
                 $prediction['cache_ttl'] = self::CACHE_TTL;
                 $prediction['processing_time_ms'] = round((microtime(true) - $startTime) * 1000, 2);
@@ -101,7 +133,7 @@ class TrainingPredictionController extends Controller
         // Log prediction request
         Log::info('Training prediction generated', [
             'character_id' => $character->id,
-            'training_type' => $request->input('training_type'),
+            'training_type' => $trainingType,
             'cached' => $prediction['cached'],
             'processing_time_ms' => $prediction['processing_time_ms'],
         ]);
@@ -117,23 +149,30 @@ class TrainingPredictionController extends Controller
         $startTime = microtime(true);
 
         // Load character with relationships
-        $character = Character::with(['aptitudes', 'supportCards.supportCard', 'factors'])
+        /** @var Character $character */
+        $character = Character::query()
+            ->with(['aptitudes', 'supportCards.supportCard', 'factors'])
             ->findOrFail($request->input('character_id'));
 
-        $trainingTypes = $request->input('training_types');
+        // Get validated data
+        $validated = $request->validated();
+        /** @var array<string> $trainingTypes */
+        $trainingTypes = $validated['training_types'];
         $trainingData = $request->except(['character_id', 'training_types', 'include_recommendations']);
 
         // Generate cache key for batch prediction
         $cacheKey = $this->generateCacheKey(
             $character->id,
-            'batch_'.implode('_', $trainingTypes),
+            'batch_'.\implode('_', $trainingTypes),
             $trainingData
         );
 
-        // Try to get from cache
-        $cacheHit = Cache::tags(['training_predictions', "character_{$character->id}"])->has($cacheKey);
+        $tags = ['training_predictions', "character_{$character->id}"];
 
-        $predictions = Cache::tags(['training_predictions', "character_{$character->id}"])
+        // Try to get from cache
+        $cacheHit = $this->getCache($tags)->has($cacheKey);
+
+        $predictions = $this->getCache($tags)
             ->remember($cacheKey, self::CACHE_TTL, function () use ($character, $trainingTypes, $trainingData) {
                 // Calculate batch predictions
                 $batchPredictions = $this->trainingService->calculateBatchPredictions(
@@ -192,7 +231,7 @@ class TrainingPredictionController extends Controller
         Log::info('Batch training predictions generated', [
             'character_id' => $character->id,
             'training_types' => $trainingTypes,
-            'count' => count($predictions),
+            'count' => \count($predictions),
             'cached' => $cacheHit,
             'processing_time_ms' => $processingTime,
         ]);
@@ -208,7 +247,9 @@ class TrainingPredictionController extends Controller
         $startTime = microtime(true);
 
         // Load character with relationships
-        $character = Character::with(['aptitudes', 'supportCards.supportCard', 'factors'])
+        /** @var Character $character */
+        $character = Character::query()
+            ->with(['aptitudes', 'supportCards.supportCard', 'factors'])
             ->findOrFail($request->input('character_id'));
 
         $trainingData = $request->except(['character_id']);
@@ -220,16 +261,16 @@ class TrainingPredictionController extends Controller
             $trainingData
         );
 
-        // Try to get from cache
-        $cacheHit = Cache::tags(['training_predictions', "character_{$character->id}"])->has($cacheKey);
+        $tags = ['training_predictions', "character_{$character->id}"];
 
-        $recommendation = Cache::tags(['training_predictions', "character_{$character->id}"])
-            ->remember($cacheKey, self::CACHE_TTL, function () use ($character, $trainingData) {
-                return $this->trainingService->getRecommendedTraining(
-                    $character,
-                    $trainingData
-                );
-            });
+        // Try to get from cache
+        $cacheHit = $this->getCache($tags)->has($cacheKey);
+
+        $recommendation = $this->getCache($tags)
+            ->remember($cacheKey, self::CACHE_TTL, fn () => $this->trainingService->getRecommendedTraining(
+                $character,
+                $trainingData
+            ));
 
         // Add metadata
         $recommendation['cached'] = $cacheHit;
@@ -257,10 +298,18 @@ class TrainingPredictionController extends Controller
     public function clearCache(int $characterId): JsonResponse
     {
         // Verify character exists
-        $character = Character::findOrFail($characterId);
+        /** @var Character $character */
+        $character = Character::query()->findOrFail($characterId);
 
         // Clear cache tags
-        Cache::tags(['training_predictions', "character_{$character->id}"])->flush();
+        if (method_exists(Cache::getStore(), 'tags')) {
+            Cache::tags(['training_predictions', "character_{$character->id}"])->flush();
+        } else {
+            // For file/database cache, we can't easily clear by tag, so we might skip or use forget() if keys were predictable.
+            // But keys involve hashes. So for now, we just skip explicit clearing or would need to clear all (which is bad).
+            // We'll just log that specific clearing isn't supported on this driver.
+            Log::warning('Cache clearing by tag not supported on this driver', ['driver' => config('cache.default')]);
+        }
 
         Log::info('Training prediction cache cleared', [
             'character_id' => $character->id,
@@ -282,7 +331,8 @@ class TrainingPredictionController extends Controller
     public function cacheStats(int $characterId): JsonResponse
     {
         // Verify character exists
-        $character = Character::findOrFail($characterId);
+        /** @var Character $character */
+        $character = Character::query()->findOrFail($characterId);
 
         // Get cache statistics (simplified version)
         $stats = [

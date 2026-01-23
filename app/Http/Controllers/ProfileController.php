@@ -27,9 +27,10 @@ class ProfileController extends Controller
 
         // Get user statistics
         $stats = [
-            'characters_created' => Character::where('user_id', $user->id)->count(),
-            'training_sessions' => 0, // TODO: Implement when training sessions are tracked
-            'races_completed' => 0, // TODO: Implement when races are tracked
+            'characters_created' => Character::where('user_id', '=', $user?->id ?? throw new \Exception('User required'))->count(),
+            'training_sessions' => $user->trainingSessions()->count(),
+            // Count races where finish_position is not null (completed races)
+            'races_completed' => $user->races()->whereNotNull('finish_position')->count(),
         ];
 
         return view('profile.show', [
@@ -46,6 +47,7 @@ class ProfileController extends Controller
         /** @var User $user */
         $user = $request->user();
 
+        // Update user with validated data
         $user->update($request->validated());
 
         return redirect()->route('profile.show')
@@ -60,6 +62,7 @@ class ProfileController extends Controller
         /** @var User $user */
         $user = $request->user();
 
+        // Update user with validated data
         $user->update($request->validated());
 
         return response()->json([
@@ -76,8 +79,9 @@ class ProfileController extends Controller
         /** @var User $user */
         $user = $request->user();
 
+        // Update password with hashed value
         $user->update([
-            'password' => Hash::make((string) $request->input('password')),
+            'password' => Hash::make((string) $request->validated()['password']),
         ]);
 
         return redirect()->route('profile.show')
@@ -92,8 +96,9 @@ class ProfileController extends Controller
         /** @var User $user */
         $user = $request->user();
 
+        // Update password with hashed value
         $user->update([
-            'password' => Hash::make((string) $request->input('password')),
+            'password' => Hash::make((string) $request->validated()['password']),
         ]);
 
         return response()->json([
@@ -122,6 +127,7 @@ class ProfileController extends Controller
         $file = $request->file('avatar');
         $path = $file ? $file->store('avatars', 'public') : '';
 
+        // Update user avatar path
         $user->update(['avatar_path' => $path]);
 
         return response()->json([
@@ -149,7 +155,8 @@ class ProfileController extends Controller
                 'ai_settings' => $user->ai_settings,
                 'mcp_settings' => $user->mcp_settings,
             ],
-            'characters' => Character::where('user_id', $user->id)
+            // Export all characters with relationships
+            'characters' => Character::where('user_id', '=', $user?->id ?? throw new \Exception('User required'))
                 ->with(['aptitudes', 'supportCards', 'skillAcquisitions'])
                 ->get()
                 ->toArray(),

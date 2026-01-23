@@ -128,15 +128,42 @@ class CareerExportController extends Controller
                     $charData = $importData['character'];
 
                     if (isset($charData['current_stats']) && is_array($charData['current_stats'])) {
-                        $character->current_stats = $charData['current_stats'];
+                        // Validate and cast current_stats to array<string, int>
+                        $currentStats = [];
+                        foreach ($charData['current_stats'] as $key => $value) {
+                            if (is_string($key) && is_numeric($value)) {
+                                $currentStats[$key] = (int) $value;
+                            }
+                        }
+                        if (! empty($currentStats)) {
+                            $character->current_stats = $currentStats;
+                        }
                     }
 
                     if (isset($charData['stat_priorities']) && is_array($charData['stat_priorities'])) {
-                        $character->stat_priorities = $charData['stat_priorities'];
+                        // Validate and cast stat_priorities to array<string, int>
+                        $statPriorities = [];
+                        foreach ($charData['stat_priorities'] as $key => $value) {
+                            if (is_string($key) && is_numeric($value)) {
+                                $statPriorities[$key] = (int) $value;
+                            }
+                        }
+                        if (! empty($statPriorities)) {
+                            $character->stat_priorities = $statPriorities;
+                        }
                     }
 
                     if (isset($charData['goals']) && is_array($charData['goals'])) {
-                        $character->goals = $charData['goals'];
+                        // Validate goals array (array<string, mixed>)
+                        $goals = [];
+                        foreach ($charData['goals'] as $key => $value) {
+                            if (is_string($key)) {
+                                $goals[$key] = $value;
+                            }
+                        }
+                        if (! empty($goals)) {
+                            $character->goals = $goals;
+                        }
                     }
 
                     $character->save();
@@ -157,19 +184,19 @@ class CareerExportController extends Controller
                         $career = Career::create([
                             'character_id' => $character->id,
                             'user_id' => $character->user_id,
-                            'career_name' => $careerData['career_name'] ?? $character->name,
-                            'scenario_type' => $careerData['scenario_type'] ?? $character->scenario_type,
-                            'status' => $careerData['status'] ?? 'completed',
-                            'current_turn' => isset($careerData['current_turn']) ? (int) $careerData['current_turn'] : 1,
-                            'current_phase' => $careerData['current_phase'] ?? 'junior',
-                            'started_at' => $careerData['started_at'] ?? null,
-                            'completed_at' => $careerData['completed_at'] ?? null,
-                            'final_speed' => isset($finalStats['speed']) ? (int) $finalStats['speed'] : null,
-                            'final_stamina' => isset($finalStats['stamina']) ? (int) $finalStats['stamina'] : null,
-                            'final_power' => isset($finalStats['power']) ? (int) $finalStats['power'] : null,
-                            'final_guts' => isset($finalStats['guts']) ? (int) $finalStats['guts'] : null,
-                            'final_wit' => isset($finalStats['wit']) ? (int) $finalStats['wit'] : null,
-                            'final_sp' => isset($finalStats['sp']) ? (int) $finalStats['sp'] : null,
+                            'career_name' => is_string($careerData['career_name'] ?? null) ? $careerData['career_name'] : $character->name,
+                            'scenario_type' => is_string($careerData['scenario_type'] ?? null) ? $careerData['scenario_type'] : $character->scenario_type,
+                            'status' => is_string($careerData['status'] ?? null) ? $careerData['status'] : 'completed',
+                            'current_turn' => isset($careerData['current_turn']) && is_numeric($careerData['current_turn']) ? (int) $careerData['current_turn'] : 1,
+                            'current_phase' => is_string($careerData['current_phase'] ?? null) ? $careerData['current_phase'] : 'junior',
+                            'started_at' => is_string($careerData['started_at'] ?? null) ? $careerData['started_at'] : null,
+                            'completed_at' => is_string($careerData['completed_at'] ?? null) ? $careerData['completed_at'] : null,
+                            'final_speed' => isset($finalStats['speed']) && is_numeric($finalStats['speed']) ? (int) $finalStats['speed'] : null,
+                            'final_stamina' => isset($finalStats['stamina']) && is_numeric($finalStats['stamina']) ? (int) $finalStats['stamina'] : null,
+                            'final_power' => isset($finalStats['power']) && is_numeric($finalStats['power']) ? (int) $finalStats['power'] : null,
+                            'final_guts' => isset($finalStats['guts']) && is_numeric($finalStats['guts']) ? (int) $finalStats['guts'] : null,
+                            'final_wit' => isset($finalStats['wit']) && is_numeric($finalStats['wit']) ? (int) $finalStats['wit'] : null,
+                            'final_sp' => isset($finalStats['sp']) && is_numeric($finalStats['sp']) ? (int) $finalStats['sp'] : null,
                         ]);
 
                         // Import training sessions
@@ -186,15 +213,15 @@ class CareerExportController extends Controller
 
                                 $career->trainingSessions()->create([
                                     'character_id' => $character->id,
-                                    'training_type' => $sessionData['training_type'] ?? 'speed',
-                                    'speed_gain' => isset($statGains['speed']) ? (int) $statGains['speed'] : 0,
-                                    'stamina_gain' => isset($statGains['stamina']) ? (int) $statGains['stamina'] : 0,
-                                    'power_gain' => isset($statGains['power']) ? (int) $statGains['power'] : 0,
-                                    'guts_gain' => isset($statGains['guts']) ? (int) $statGains['guts'] : 0,
-                                    'wit_gain' => isset($statGains['wit']) ? (int) $statGains['wit'] : 0,
-                                    'sp_gain' => isset($statGains['sp']) ? (int) $statGains['sp'] : 0,
-                                    'turn_number' => isset($sessionData['turn_number']) ? (int) $sessionData['turn_number'] : 1,
-                                    'career_phase' => $sessionData['career_phase'] ?? 'junior',
+                                    'training_type' => is_string($sessionData['training_type'] ?? null) ? $sessionData['training_type'] : 'speed',
+                                    'speed_gain' => isset($statGains['speed']) && is_numeric($statGains['speed']) ? (int) $statGains['speed'] : 0,
+                                    'stamina_gain' => isset($statGains['stamina']) && is_numeric($statGains['stamina']) ? (int) $statGains['stamina'] : 0,
+                                    'power_gain' => isset($statGains['power']) && is_numeric($statGains['power']) ? (int) $statGains['power'] : 0,
+                                    'guts_gain' => isset($statGains['guts']) && is_numeric($statGains['guts']) ? (int) $statGains['guts'] : 0,
+                                    'wit_gain' => isset($statGains['wit']) && is_numeric($statGains['wit']) ? (int) $statGains['wit'] : 0,
+                                    'sp_gain' => isset($statGains['sp']) && is_numeric($statGains['sp']) ? (int) $statGains['sp'] : 0,
+                                    'turn_number' => isset($sessionData['turn_number']) && is_numeric($sessionData['turn_number']) ? (int) $sessionData['turn_number'] : 1,
+                                    'career_phase' => is_string($sessionData['career_phase'] ?? null) ? $sessionData['career_phase'] : 'junior',
                                 ]);
                             }
                         }
@@ -206,7 +233,6 @@ class CareerExportController extends Controller
                 'success' => true,
                 'message' => 'Career data imported successfully',
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -236,7 +262,8 @@ class CareerExportController extends Controller
         );
 
         return response()->streamDownload(function () use ($exportData) {
-            echo json_encode($exportData['data'] ?? $exportData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            $data = is_array($exportData) && isset($exportData['data']) ? $exportData['data'] : $exportData;
+            echo json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         }, $filename, [
             'Content-Type' => 'application/json',
         ]);

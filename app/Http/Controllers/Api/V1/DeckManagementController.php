@@ -23,22 +23,18 @@ class DeckManagementController extends Controller
     /**
      * Get deck for a character
      */
-    public function getDeck(Character $character): JsonResponse
+    public function getDeck(int $id): JsonResponse
     {
         try {
-            $deck = $this->deckService->getDeck($character->id);
+            $deck = $this->deckService->getDeck($id);
 
             return response()->json([
                 'success' => true,
-                'data' => [
-                    'deck' => $deck,
-                    'statistics' => $this->deckService->getDeckStatistics($character->id),
-                    'validation' => $this->deckService->validateDeck($character->id),
-                ],
+                'data' => $deck,
             ]);
         } catch (\Exception $e) {
             Log::error('Failed to get deck', [
-                'character_id' => $character->id,
+                'character_id' => $id,
                 'error' => $e->getMessage(),
             ]);
 
@@ -52,7 +48,7 @@ class DeckManagementController extends Controller
     /**
      * Add card to deck
      */
-    public function addCard(Request $request, Character $character): JsonResponse
+    public function addCard(Request $request, int $id): JsonResponse
     {
         $validated = $request->validate([
             'support_card_id' => 'required|integer|exists:ucp_support_cards,id',
@@ -63,7 +59,7 @@ class DeckManagementController extends Controller
 
         try {
             $card = $this->deckService->addCardToDeck(
-                $character->id,
+                $id,
                 $validated['support_card_id'],
                 $validated['position_slot'],
                 $validated['is_friend_card'] ?? false,
@@ -75,10 +71,10 @@ class DeckManagementController extends Controller
                 'message' => 'Card added to deck successfully',
                 'data' => [
                     'card' => $card->load('supportCard'),
-                    'deck' => $this->deckService->getDeck($character->id),
-                    'statistics' => $this->deckService->getDeckStatistics($character->id),
+                    'deck' => $this->deckService->getDeck($id),
+                    'statistics' => $this->deckService->getDeckStatistics($id),
                 ],
-            ]);
+            ], 201);
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
@@ -87,7 +83,7 @@ class DeckManagementController extends Controller
             ], 422);
         } catch (\Exception $e) {
             Log::error('Failed to add card to deck', [
-                'character_id' => $character->id,
+                'character_id' => $id,
                 'support_card_id' => $validated['support_card_id'],
                 'error' => $e->getMessage(),
             ]);
@@ -133,6 +129,43 @@ class DeckManagementController extends Controller
             Log::error('Failed to remove card from deck', [
                 'character_id' => $character->id,
                 'position_slot' => $validated['position_slot'],
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to remove card from deck',
+            ], 500);
+        }
+    }
+
+    /**
+     * Remove card from deck by slot (URL parameter)
+     */
+    public function removeCardBySlot(int $id, int $slot): JsonResponse
+    {
+        try {
+            $success = $this->deckService->removeCardFromDeck($id, $slot);
+
+            if ($success) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Card removed from deck successfully',
+                    'data' => [
+                        'deck' => $this->deckService->getDeck($id),
+                        'statistics' => $this->deckService->getDeckStatistics($id),
+                    ],
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Card not found at specified position',
+            ], 404);
+        } catch (\Exception $e) {
+            Log::error('Failed to remove card from deck', [
+                'character_id' => $id,
+                'position_slot' => $slot,
                 'error' => $e->getMessage(),
             ]);
 
@@ -302,6 +335,10 @@ class DeckManagementController extends Controller
     {
         try {
             $options = $request->input('options', []);
+            $options = is_array($options) ? $options : [];
+            if (! is_array($options)) {
+                $options = [];
+            }
             $recommendations = $this->optimizationService->recommendDeck($character->id, $options);
 
             return response()->json([

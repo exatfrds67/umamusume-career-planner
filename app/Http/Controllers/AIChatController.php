@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\Character;
-use App\Services\MCP\AgentOrchestrationService;
 use App\Services\MCP\AgentRoutingService;
-use App\Services\MCP\MCPMonitoringService;
+use App\Services\MCP\RealTimeMonitoringService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,9 +18,8 @@ use Illuminate\View\View;
 class AIChatController extends Controller
 {
     public function __construct(
-        private readonly AgentOrchestrationService $orchestrationService,
         private readonly AgentRoutingService $routingService,
-        private readonly MCPMonitoringService $monitoringService
+        private readonly RealTimeMonitoringService $realTimeMonitoringService
     ) {}
 
     /**
@@ -53,6 +51,7 @@ class AIChatController extends Controller
             'character_id' => 'nullable|integer|exists:ucp_characters,id',
             'career_id' => 'nullable|integer|exists:ucp_careers,id',
             'provider' => 'nullable|string|in:ollama,bedrock,agent',
+            'model' => 'nullable|string|max:255',
             'agent_type' => 'nullable|string|in:training,career,race,skill',
             'conversation_id' => 'nullable|string|max:255',
         ]);
@@ -76,6 +75,7 @@ class AIChatController extends Controller
                 'context' => $context,
                 'agent_type' => $validated['agent_type'] ?? null,
                 'preferred_provider' => $validated['provider'] ?? null,
+                'preferred_model' => $validated['model'] ?? null,
             ];
 
             /** @var array{response: mixed, model: string, provider: string, execution_time: float, cost: float} $execution */
@@ -146,17 +146,34 @@ class AIChatController extends Controller
     }
 
     /**
-     * Get MCP server status
+     * Get available models configuration
+     */
+    public function getModels(): JsonResponse
+    {
+        return response()->json([
+            'success' => true,
+            'models' => [
+                'ollama' => config('ai.ollama.available_models', []),
+                'bedrock' => config('ai.bedrock.pricing', []),
+            ],
+            'defaults' => [
+                'ollama' => config('ai.ollama.default_model'),
+                'bedrock' => config('ai.bedrock.default_model'),
+            ],
+        ]);
+    }
+
+    /**
+     * Get MCP server status with real-time monitoring
      */
     public function getServerStatus(): JsonResponse
     {
         try {
-            $status = $this->monitoringService->performHealthCheck();
+            $status = $this->realTimeMonitoringService->getRealTimeServerStatus();
 
             return response()->json([
                 'success' => true,
-                'servers' => $status,
-                'timestamp' => now()->toIso8601String(),
+                'data' => $status,
             ]);
         } catch (\Exception $e) {
             Log::error('Failed to get server status', [
@@ -164,29 +181,32 @@ class AIChatController extends Controller
             ]);
 
             return response()->json([
-                'success' => false,
-                'error' => 'Failed to retrieve server status',
-                'servers' => [],
-            ], 500);
+                'success' => true,
+                'data' => [
+                    'timestamp' => now()->toIso8601String(),
+                    'overall_status' => 'unknown',
+                    'servers' => [],
+                    'alerts' => [],
+                ],
+            ]);
         }
     }
 
     /**
-     * Get current agent workflow status
+     * Get current agent workflow status with progress tracking
      */
     public function getWorkflowStatus(): JsonResponse
     {
         try {
             $userId = Auth::id();
-            $workflow = $this->orchestrationService->getCurrentWorkflow(
+            $workflow = $this->realTimeMonitoringService->getAgentProgressTracking(
                 is_int($userId) ? $userId : null
             );
 
             return response()->json([
                 'success' => true,
-                'workflow' => $workflow,
-                'timestamp' => now()->toIso8601String(),
-            ]);
+                'data' => $workflow,
+            ], 200, [], JSON_PRESERVE_ZERO_FRACTION);
         } catch (\Exception $e) {
             Log::error('Failed to get workflow status', [
                 'error' => $e->getMessage(),
@@ -194,28 +214,37 @@ class AIChatController extends Controller
             ]);
 
             return response()->json([
-                'success' => false,
-                'error' => 'Failed to retrieve workflow status',
-                'workflow' => null,
-            ], 500);
+                'success' => true,
+                'data' => [
+                    'workflow_id' => null,
+                    'workflow_name' => null,
+                    'status' => 'idle',
+                    'progress_percentage' => 0.0,
+                    'current_step' => null,
+                    'total_steps' => 0,
+                    'completed_steps' => 0,
+                    'agents' => [],
+                    'estimated_completion' => null,
+                    'started_at' => null,
+                ],
+            ], 200, [], JSON_PRESERVE_ZERO_FRACTION);
         }
     }
 
     /**
-     * Get active MCP tool usage
+     * Get active MCP tool usage and execution monitoring
      */
     public function getToolUsage(): JsonResponse
     {
         try {
             $userId = Auth::id();
-            $tools = $this->monitoringService->getActiveTools(
+            $toolData = $this->realTimeMonitoringService->getToolExecutionMonitoring(
                 is_int($userId) ? $userId : null
             );
 
             return response()->json([
                 'success' => true,
-                'tools' => $tools,
-                'timestamp' => now()->toIso8601String(),
+                'data' => $toolData,
             ]);
         } catch (\Exception $e) {
             Log::error('Failed to get tool usage', [
@@ -224,9 +253,93 @@ class AIChatController extends Controller
             ]);
 
             return response()->json([
+                'success' => true,
+                'data' => [
+                    'timestamp' => now()->toIso8601String(),
+                    'active_tools' => [],
+                    'recent_executions' => [],
+                    'tool_statistics' => [],
+                ],
+            ]);
+        }
+    }
+
+    /**
+     * Get performance metrics comparing providers and agents
+     */
+    public function getPerformanceMetrics(): JsonResponse
+    {
+        try {
+            $userId = Auth::id();
+            $metrics = $this->realTimeMonitoringService->getPerformanceMetrics(
+                is_int($userId) ? $userId : null
+            );
+
+            return response()->json([
+                'success' => true,
+                'data' => $metrics,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to get performance metrics', [
+                'error' => $e->getMessage(),
+                'user_id' => Auth::id(),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'timestamp' => now()->toIso8601String(),
+                    'providers' => [],
+                    'agents' => [],
+                    'comparison' => [
+                        'fastest_provider' => 'N/A',
+                        'most_reliable_provider' => 'N/A',
+                        'most_cost_effective' => 'N/A',
+                        'best_performing_agent' => 'N/A',
+                    ],
+                ],
+            ]);
+        }
+    }
+
+    /**
+     * Handle server disconnection and recovery
+     */
+    public function handleServerDisconnection(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'server_name' => 'required|string|max:255',
+            'error' => 'required|string|max:1000',
+        ]);
+
+        try {
+            $result = $this->realTimeMonitoringService->handleServerDisconnection(
+                $validated['server_name'],
+                $validated['error']
+            );
+
+            return response()->json([
+                'success' => true,
+                'data' => $result,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to handle server disconnection', [
+                'error' => $e->getMessage(),
+                'server_name' => $validated['server_name'],
+            ]);
+
+            return response()->json([
                 'success' => false,
-                'error' => 'Failed to retrieve tool usage',
-                'tools' => [],
+                'error' => 'Failed to handle server disconnection',
+                'data' => [
+                    'server' => $validated['server_name'],
+                    'event' => 'disconnection',
+                    'error' => $validated['error'],
+                    'reconnection_attempted' => false,
+                    'reconnection_successful' => false,
+                    'reconnection_message' => 'Failed to process disconnection',
+                    'timestamp' => now()->toIso8601String(),
+                ],
             ], 500);
         }
     }

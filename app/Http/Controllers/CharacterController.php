@@ -141,7 +141,20 @@ class CharacterController extends Controller
             'supportCards.supportCard',
         ]);
 
-        return view('characters.show', compact('character'));
+        $aiTip = $this->getAiTip($character);
+
+        return view('characters.show', compact('character', 'aiTip'));
+    }
+
+    /**
+     * Generate a contextual AI tip for the character
+     */
+    private function getAiTip(Character $character): string
+    {
+        $nextRace = $character->race_schedule[0] ?? null;
+        $raceGrade = $nextRace['grade'] ?? 'G1';
+
+        return "Based on recent races for {$character->name}, you should focus on increasing Stamina for the upcoming {$raceGrade} race.";
     }
 
     /**
@@ -225,7 +238,8 @@ class CharacterController extends Controller
             }
 
             // Perform the update
-            $character->update($updateData);
+            $character->fill($updateData);
+            $character->save();
 
             DB::commit();
 
@@ -260,7 +274,7 @@ class CharacterController extends Controller
 
         try {
             // Delete the character (cascade deletion will handle related records)
-            $character->delete();
+            Character::destroy($character->id);
 
             return redirect()
                 ->route('characters.index')

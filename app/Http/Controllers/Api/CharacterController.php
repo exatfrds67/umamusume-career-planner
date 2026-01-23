@@ -27,7 +27,7 @@ class CharacterController extends Controller
             ], 401);
         }
 
-        $userId = $user->id;
+        $userId = $user?->id ?? throw new \Exception('User required');
         $characters = $this->repository->findByUserId($userId);
 
         return response()->json($characters);
@@ -43,7 +43,7 @@ class CharacterController extends Controller
             ], 401);
         }
 
-        $data['user_id'] = $user->id;
+        $data['user_id'] = $user?->id ?? throw new \Exception('User required');
 
         $character = $this->repository->store($data);
 

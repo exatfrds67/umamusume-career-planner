@@ -21,10 +21,17 @@ class AuthController extends Controller
      */
     public function register(RegisterRequest $request): JsonResponse
     {
+        $password = $request->password;
+        if (! is_string($password)) {
+            return response()->json([
+                'message' => 'Invalid password format.',
+            ], 422);
+        }
+
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make((string) $request->password),
+            'password' => Hash::make($password),
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;

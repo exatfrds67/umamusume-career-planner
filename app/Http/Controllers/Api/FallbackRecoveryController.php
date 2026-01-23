@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Services\ExternalAPI\APIAlertingService;
@@ -252,7 +252,7 @@ class FallbackRecoveryController extends Controller
             ], 400);
         }
 
-        $limitValue = is_numeric($limit) ? (int) $limit : 10;
+        $limitValue = is_numeric($limit) ? (is_numeric($limit) ? (int) $limit : 0) : 10;
         $history = $this->syncService->getSyncHistory($dataType, $limitValue);
 
         return response()->json([
@@ -268,7 +268,7 @@ class FallbackRecoveryController extends Controller
     {
         $dataType = $request->input('data_type');
 
-        if (! $dataType) {
+        if (! is_string($dataType) || $dataType === '') {
             return response()->json([
                 'success' => false,
                 'message' => 'Data type is required',
@@ -291,7 +291,10 @@ class FallbackRecoveryController extends Controller
         $limit = $request->input('limit', 50);
         $type = $request->input('type');
 
-        $history = $this->alertingService->getAlertHistory($limit, $type);
+        $limitValue = is_numeric($limit) ? (is_numeric($limit) ? (int) $limit : 0) : 50;
+        $typeValue = is_string($type) ? $type : null;
+
+        $history = $this->alertingService->getAlertHistory($limitValue, $typeValue);
 
         return response()->json([
             'success' => true,
@@ -319,10 +322,10 @@ class FallbackRecoveryController extends Controller
     {
         $alertId = $request->input('alert_id');
 
-        if (! $alertId) {
+        if (! is_string($alertId)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Alert ID is required',
+                'message' => 'Alert ID must be a string',
             ], 400);
         }
 

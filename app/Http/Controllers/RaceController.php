@@ -35,7 +35,7 @@ class RaceController extends Controller
             $query->where('character_id', $request->input('character_id'));
         }
 
-        $races = $query->latest('turn_number')->paginate(20)->withQueryString();
+        $races = $query->with(['character'])->latest('turn_number')->paginate(20)->withQueryString();
 
         return view('races.index', compact('races'));
     }

@@ -36,7 +36,10 @@ class SkillHintController extends Controller
         $query = SkillHint::where('character_id', $characterId);
 
         if ($request->filled('skill_id')) {
-            $query->where('skill_id', $request->skill_id);
+            $skillId = $request->input('skill_id');
+            if (is_numeric($skillId)) {
+                $query->where('skill_id', (int) $skillId);
+            }
         }
 
         if ($request->boolean('unused_only')) {
@@ -44,7 +47,10 @@ class SkillHintController extends Controller
         }
 
         if ($request->filled('source_type')) {
-            $query->fromSource($request->source_type);
+            $sourceType = $request->input('source_type');
+            if (is_string($sourceType)) {
+                $query->fromSource($sourceType);
+            }
         }
 
         $hints = $query->with(['skill', 'character'])
@@ -68,23 +74,42 @@ class SkillHintController extends Controller
     public function store(StoreSkillHintRequest $request): JsonResponse
     {
         try {
-            $character = Character::findOrFail($request->character_id);
-            $skill = Skill::findOrFail($request->skill_id);
+            $characterId = $request->input('character_id');
+            $skillId = $request->input('skill_id');
+
+            if (! is_numeric($characterId) || ! is_numeric($skillId)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid character_id or skill_id',
+                ], 422);
+            }
+
+            $character = Character::findOrFail((int) $characterId);
+            $skill = Skill::findOrFail((int) $skillId);
+
+            $sourceType = $request->input('source_type');
+            $sourceName = $request->input('source_name');
+            $sourceId = $request->input('source_id');
+            $turnObtained = $request->input('turn_obtained');
+            $careerPhase = $request->input('career_phase');
+            $trainingType = $request->input('training_type');
+            $trainingParticipants = $request->input('training_participants');
+            $hintMetadata = $request->input('hint_metadata');
 
             $hint = $this->hintService->createHint(
                 character: $character,
                 skill: $skill,
-                sourceType: $request->source_type,
-                sourceName: $request->source_name,
-                sourceId: $request->source_id,
+                sourceType: is_string($sourceType) ? $sourceType : '',
+                sourceName: is_string($sourceName) ? $sourceName : '',
+                sourceId: is_numeric($sourceId) ? (int) $sourceId : null,
                 additionalData: [
-                    'turn_obtained' => $request->turn_obtained,
-                    'career_phase' => $request->career_phase,
+                    'turn_obtained' => is_numeric($turnObtained) ? (int) $turnObtained : null,
+                    'career_phase' => is_string($careerPhase) ? $careerPhase : null,
                     'guaranteed_hint' => $request->boolean('guaranteed_hint'),
-                    'training_type' => $request->training_type,
-                    'training_participants' => $request->training_participants,
+                    'training_type' => is_string($trainingType) ? $trainingType : null,
+                    'training_participants' => is_array($trainingParticipants) ? $trainingParticipants : null,
                     'friendship_training' => $request->boolean('friendship_training'),
-                    'hint_metadata' => $request->hint_metadata,
+                    'hint_metadata' => is_array($hintMetadata) ? $hintMetadata : null,
                 ]
             );
 
@@ -186,17 +211,35 @@ class SkillHintController extends Controller
         // Transform to support card instances with friendship/limit break data
         $supportCards = $characterSupportCards->map(function ($csc) {
             $card = $csc->supportCard;
+            if ($card === null) {
+                return null;
+            }
+
             $card->friendship_level = $csc->friendship_level;
             $card->limit_break_level = $csc->limit_break_level;
-            $card->specialization = $card->card_type; // Map card_type to specialization
-            $card->skill_provision = []; // TODO: Map skill_hints_provided to skill_provision format
+            $card->specialization = $card->card_type;
+
+            // Map skill_hints_provided JSON to skill_provision format
+            // skill_hints_provided contains skill IDs that this card can provide hints for
+            $hintsProvided = $card->skill_hints_provided ?? [];
+            if (! is_array($hintsProvided)) {
+                $hintsProvided = [];
+            }
+
+            /** @var array<int, array<string, mixed>> $skillProvision */
+            $skillProvision = collect($hintsProvided)->map(fn ($skillId) => [
+                'skill_id' => $skillId,
+                'probability' => $this->calculateHintProbability($card, $csc->friendship_level ?? 0),
+            ])->toArray();
+
+            $card->skill_provision = $skillProvision;
 
             return $card;
-        });
+        })->filter();
 
         $opportunities = $this->hintService->predictHintOpportunities(
             character: $character,
-            trainingType: $request->training_type,
+            trainingType: is_string($request->input('training_type')) ? $request->input('training_type') : 'speed',
             supportCards: $supportCards
         );
 
@@ -222,7 +265,15 @@ class SkillHintController extends Controller
         ]);
 
         $character = Character::findOrFail($characterId);
-        $targetSkills = Skill::whereIn('id', $request->skill_ids)->get();
+        $skillIds = $request->input('skill_ids');
+        if (! is_array($skillIds)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid skill_ids format.',
+            ], 422);
+        }
+
+        $targetSkills = Skill::whereIn('id', $skillIds)->get();
 
         $strategies = $this->hintService->getHintCollectionStrategy($character, $targetSkills);
 
@@ -246,28 +297,44 @@ class SkillHintController extends Controller
         ]);
 
         $character = Character::findOrFail($characterId);
-        $targetSkills = Skill::whereIn('id', $request->skill_ids)->get();
+        $skillIds = $request->input('skill_ids');
+        $supportCardIds = $request->input('support_card_ids');
+        $context = $request->input('context');
+
+        if (! is_array($skillIds) || ! is_array($supportCardIds)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid skill_ids or support_card_ids format.',
+            ], 422);
+        }
+
+        $targetSkills = Skill::whereIn('id', $skillIds)->get();
 
         // Get character support cards with their definitions
         $characterSupportCards = $character->supportCards()
-            ->whereIn('id', $request->support_card_ids)
+            ->whereIn('id', $supportCardIds)
             ->with('supportCard')
             ->get();
 
         // Transform to support card instances with friendship/limit break data
         $supportCards = $characterSupportCards->map(function ($csc) {
             $card = $csc->supportCard;
-            $card->friendship_level = $csc->friendship_level;
+            if ($card === null) {
+                return null;
+            }
+
+            $friendshipLevel = is_numeric($csc->friendship_level) ? (int) $csc->friendship_level : 0;
+            $card->friendship_level = $friendshipLevel;
             $card->limit_break_level = $csc->limit_break_level;
 
             return $card;
-        });
+        })->filter();
 
         $analysis = $this->hintAgent->analyzeHintOpportunities(
             character: $character,
             targetSkills: $targetSkills,
             supportCards: $supportCards,
-            context: $request->context ?? []
+            context: is_array($context) ? $context : []
         );
 
         return response()->json([
@@ -288,12 +355,22 @@ class SkillHintController extends Controller
         ]);
 
         $character = Character::findOrFail($characterId);
-        $targetSkills = Skill::whereIn('id', $request->skill_ids)->get();
+        $skillIds = $request->input('skill_ids');
+        $availableTurns = $request->input('available_turns');
+
+        if (! is_array($skillIds) || ! is_numeric($availableTurns)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid skill_ids or available_turns format.',
+            ], 422);
+        }
+
+        $targetSkills = Skill::whereIn('id', $skillIds)->get();
 
         $sequence = $this->hintAgent->calculateOptimalSequence(
             character: $character,
             targetSkills: $targetSkills,
-            availableTurns: $request->available_turns
+            availableTurns: (int) $availableTurns
         );
 
         return response()->json([
@@ -313,7 +390,16 @@ class SkillHintController extends Controller
         ]);
 
         $character = Character::findOrFail($characterId);
-        $acquiredSkills = Skill::whereIn('id', $request->skill_ids)->get();
+        $skillIds = $request->input('skill_ids');
+
+        if (! is_array($skillIds)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid skill_ids format.',
+            ], 422);
+        }
+
+        $acquiredSkills = Skill::whereIn('id', $skillIds)->get();
 
         $efficiency = $this->hintAgent->evaluateEfficiency($character, $acquiredSkills);
 
@@ -346,5 +432,30 @@ class SkillHintController extends Controller
                 'character_id' => $characterId,
             ],
         ]);
+    }
+
+    /**
+     * Calculate hint probability based on support card and friendship level.
+     *
+     * Higher friendship levels increase the probability of receiving skill hints.
+     * Base probability is 10%, with up to 40% bonus at max friendship (100).
+     *
+     * @param  object  $card  The support card definition
+     * @param  int  $friendshipLevel  Current friendship level (0-100)
+     * @return float Probability as decimal (0.0 - 1.0)
+     */
+    private function calculateHintProbability(object $card, int $friendshipLevel): float
+    {
+        $baseProbability = 0.10; // 10% base chance
+        $friendshipBonus = ($friendshipLevel / 100) * 0.40; // Up to 40% bonus at max friendship
+
+        // Rare cards have slightly higher hint rates
+        $rarityMultiplier = match ($card->rarity ?? 'R') {
+            'SSR' => 1.3,
+            'SR' => 1.15,
+            default => 1.0,
+        };
+
+        return min(1.0, ($baseProbability + $friendshipBonus) * $rarityMultiplier);
     }
 }

@@ -57,7 +57,8 @@ class TrainingController extends Controller
             'training_type' => 'required|in:speed,stamina,power,guts,wit',
         ]);
 
-        $type = $request->input('training_type');
+        $trainingType = $request->input('training_type');
+        $type = is_string($trainingType) ? $trainingType : 'speed';
 
         // Execute training
         $result = $this->trainingService->executeTraining($character, $type);

@@ -34,7 +34,7 @@ class HistoricalTrackingController extends Controller
     public function index(): View
     {
         $user = Auth::user();
-
+        /** @var \App\Models\User $user */
         $longTermTrends = $this->historicalService->analyzeLongTermTrends($user);
         $successRates = $this->historicalService->calculateSuccessRatesWithConfidence($user);
         $benchmarkComparison = $this->benchmarkingService->compareUserPerformance($user);
@@ -52,6 +52,7 @@ class HistoricalTrackingController extends Controller
     public function getLongTermTrends(): JsonResponse
     {
         $user = Auth::user();
+        /** @var \App\Models\User $user */
         $trends = $this->historicalService->analyzeLongTermTrends($user);
 
         return response()->json([
@@ -66,6 +67,7 @@ class HistoricalTrackingController extends Controller
     public function getSuccessRates(): JsonResponse
     {
         $user = Auth::user();
+        /** @var \App\Models\User $user */
         $successRates = $this->historicalService->calculateSuccessRatesWithConfidence($user);
 
         return response()->json([
@@ -80,6 +82,7 @@ class HistoricalTrackingController extends Controller
     public function getMLRecommendations(): JsonResponse
     {
         $user = Auth::user();
+        /** @var \App\Models\User $user */
         $recommendations = $this->historicalService->generateMLModelUpdateRecommendations($user);
 
         return response()->json([
@@ -107,6 +110,7 @@ class HistoricalTrackingController extends Controller
     public function getUserBenchmarkComparison(): JsonResponse
     {
         $user = Auth::user();
+        /** @var \App\Models\User $user */
         $comparison = $this->benchmarkingService->compareUserPerformance($user);
 
         return response()->json([
@@ -134,7 +138,7 @@ class HistoricalTrackingController extends Controller
     public function clearCache(): JsonResponse
     {
         $user = Auth::user();
-
+        /** @var \App\Models\User $user */
         $this->historicalService->clearCache($user);
         $this->benchmarkingService->clearCache($user);
 

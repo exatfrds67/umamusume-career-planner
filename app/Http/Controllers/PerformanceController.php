@@ -332,8 +332,13 @@ class PerformanceController extends Controller
         $redisInfo = null;
         try {
             if (config('cache.default') === 'redis') {
-                $redis = Cache::store('redis')->getRedis();
-                $info = $redis->info();
+                $store = Cache::store('redis');
+                if ($store instanceof \Illuminate\Cache\RedisStore) {
+                    $redis = $store->getRedis();
+                    $info = $redis->info();
+                } else {
+                    throw new \RuntimeException('Cache store is not RedisStore');
+                }
                 $redisInfo = [
                     'used_memory' => $info['used_memory_human'] ?? 'N/A',
                     'connected_clients' => $info['connected_clients'] ?? 'N/A',
@@ -446,8 +451,9 @@ class PerformanceController extends Controller
             if ($cascade) {
                 $result = $this->redisCacheService->invalidateWithCascade($validated['data_type']);
             } else {
+                $tags = config("cache-management.invalidation.default_tags.{$validated['data_type']}", []);
                 $result = $this->redisCacheService->invalidateByTags(
-                    config("cache-management.invalidation.default_tags.{$validated['data_type']}", [])
+                    is_array($tags) ? $tags : []
                 );
             }
         } elseif (isset($validated['tags'])) {
@@ -621,9 +627,9 @@ class PerformanceController extends Controller
         $config = $connection->getConfig();
 
         return [
-            'driver' => (string) ($config['driver'] ?? 'unknown'),
-            'database' => (string) ($config['database'] ?? 'unknown'),
-            'host' => isset($config['host']) ? (string) $config['host'] : null,
+            'driver' => isset($config['driver']) ? (is_array($config) && isset($config['driver']) && is_string($config['driver']) ? $config['driver'] : 'unknown') : 'unknown',
+            'database' => isset($config['database']) ? (is_array($config) && isset($config['database']) && is_string($config['database']) ? $config['database'] : 'unknown') : 'unknown',
+            'host' => isset($config['host']) ? (is_array($config) && isset($config['host']) && is_string($config['host']) ? $config['host'] : 'localhost') : null,
             'connection_count' => null, // Would need specific driver support
         ];
     }
@@ -899,8 +905,9 @@ class PerformanceController extends Controller
             if ($cascade) {
                 $result = $this->apiCachingService->invalidateWithCascade($validated['data_type']);
             } else {
+                $tags = config("api-performance.cache.data_type_tags.{$validated['data_type']}", ['api_response']);
                 $result = $this->apiCachingService->invalidateByTags(
-                    config("api-performance.cache.data_type_tags.{$validated['data_type']}", ['api_response'])
+                    is_array($tags) ? $tags : ['api_response']
                 );
             }
         } elseif (isset($validated['tags'])) {
@@ -994,25 +1001,25 @@ class PerformanceController extends Controller
             'success' => true,
             'data' => [
                 'compression' => [
-                    'enabled' => config('api-performance.compression.enabled', true),
-                    'level' => config('api-performance.compression.level', 6),
-                    'min_size' => config('api-performance.compression.min_size', 1024),
+                    'enabled' => (bool) config('api-performance.compression.enabled', true),
+                    'level' => (int) config('api-performance.compression.level', 6),
+                    'min_size' => (int) config('api-performance.compression.min_size', 1024),
                 ],
                 'rate_limiting' => [
-                    'enabled' => config('api-performance.rate_limiting.enabled', true),
-                    'tiers' => array_keys(config('api-performance.rate_limiting.tiers', [])),
+                    'enabled' => (bool) config('api-performance.rate_limiting.enabled', true),
+                    'tiers' => array_keys((array) config('api-performance.rate_limiting.tiers', [])),
                 ],
                 'caching' => [
-                    'enabled' => config('api-performance.cache.enabled', true),
-                    'default_ttl' => config('api-performance.cache.default_ttl', 300),
+                    'enabled' => (bool) config('api-performance.cache.enabled', true),
+                    'default_ttl' => (int) config('api-performance.cache.default_ttl', 300),
                 ],
                 'monitoring' => [
-                    'enabled' => config('api-performance.monitoring.enabled', true),
-                    'slow_request_threshold_ms' => config('api-performance.monitoring.slow_request_threshold_ms', 1000),
+                    'enabled' => (bool) config('api-performance.monitoring.enabled', true),
+                    'slow_request_threshold_ms' => (int) config('api-performance.monitoring.slow_request_threshold_ms', 1000),
                 ],
                 'batching' => [
-                    'enabled' => config('api-performance.batching.enabled', true),
-                    'max_batch_size' => config('api-performance.batching.max_batch_size', 10),
+                    'enabled' => (bool) config('api-performance.batching.enabled', true),
+                    'max_batch_size' => (int) config('api-performance.batching.max_batch_size', 10),
                 ],
             ],
             'timestamp' => now()->toIso8601String(),

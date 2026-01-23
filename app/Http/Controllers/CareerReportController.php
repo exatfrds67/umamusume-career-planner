@@ -34,9 +34,10 @@ class CareerReportController extends Controller
     public function index(Request $request): View
     {
         $user = Auth::user();
+        /** @var \App\Models\User $user */
 
         // Get all characters with their careers for the current user
-        $characters = Character::where('user_id', $user->id)
+        $characters = Character::query()->where('user_id', $user?->id ?? throw new \Exception('User required'))
             ->with(['careers' => function ($query) {
                 $query->orderBy('created_at', 'desc');
             }])
@@ -45,14 +46,14 @@ class CareerReportController extends Controller
 
         // Get recent careers for quick access
         $recentCareers = Career::whereHas('character', function ($query) use ($user) {
-            $query->where('user_id', $user->id);
+            $query->where('user_id', $user?->id ?? throw new \Exception('User required'));
         })
             ->with('character')
             ->orderBy('updated_at', 'desc')
             ->limit(5)
             ->get();
 
-        return view('reports.index', compact('characters', 'recentCareers'));
+        return view(/** @var view-string */ 'reports.index', compact('characters', 'recentCareers'));
     }
 
     /**
@@ -67,7 +68,7 @@ class CareerReportController extends Controller
 
         $report = $this->reportingService->generateCareerSummaryReport($career);
 
-        return view('reports.career', compact('career', 'report'));
+        return view(/** @var view-string */ 'reports.career', compact('career', 'report'));
     }
 
     /**
@@ -82,7 +83,7 @@ class CareerReportController extends Controller
 
         $report = $this->reportingService->generateCharacterReport($character);
 
-        return view('reports.character', compact('character', 'report'));
+        return view(/** @var view-string */ 'reports.character', compact('character', 'report'));
     }
 
     /**
@@ -153,7 +154,7 @@ class CareerReportController extends Controller
 
         $pdfData = $this->reportingService->exportToPdfFormat($career);
 
-        return view('reports.pdf', compact('career', 'pdfData'));
+        return view(/** @var view-string */ 'reports.pdf', compact('career', 'pdfData'));
     }
 
     /**
@@ -224,7 +225,7 @@ class CareerReportController extends Controller
         }
 
         // Validate all careers belong to the current user
-        $careers = Career::whereIn('id', $careerIds)
+        $careers = Career::query()->whereIn('id', $careerIds)
             ->with('character')
             ->get();
 
@@ -243,6 +244,6 @@ class CareerReportController extends Controller
             ];
         }
 
-        return view('reports.compare', compact('reports'));
+        return view(/** @var view-string */ 'reports.compare', compact('reports'));
     }
 }

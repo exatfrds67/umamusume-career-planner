@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Services\BackupService;
 use App\Services\DataExportService;
 use App\Services\DataImportService;
 use App\Services\DataMigrationService;
@@ -26,10 +25,6 @@ use Illuminate\View\View;
 class DataManagementController extends Controller
 {
     public function __construct(
-        private readonly DataImportService $importService,
-        private readonly DataExportService $exportService,
-        private readonly DataMigrationService $migrationService,
-        private readonly BackupService $backupService,
         private readonly DataOperationHistoryService $historyService
     ) {}
 
@@ -61,7 +56,12 @@ class DataManagementController extends Controller
     public function dashboard(Request $request): JsonResponse
     {
         try {
-            $userId = $request->user()->id;
+            $user = $request->user();
+            if ($user === null) {
+                return response()->json(['error' => 'Unauthenticated'], 401);
+            }
+            /** @var \App\Models\User $user */
+            $userId = $user?->id ?? throw new \Exception('User required');
 
             // Get statistics
             $statistics = $this->historyService->getStatistics($userId, 'month');
@@ -111,7 +111,9 @@ class DataManagementController extends Controller
     public function history(Request $request): JsonResponse
     {
         try {
-            $userId = $request->user()->id;
+            $user = $request->user();
+            /** @var \App\Models\User $user */
+            $userId = $user?->id ?? throw new \Exception('User required');
             $page = (int) $request->query('page', 1);
             $perPage = (int) $request->query('per_page', 20);
 
@@ -154,7 +156,9 @@ class DataManagementController extends Controller
     public function status(Request $request): JsonResponse
     {
         try {
-            $userId = $request->user()->id;
+            $user = $request->user();
+            /** @var \App\Models\User $user */
+            $userId = $user?->id ?? throw new \Exception('User required');
             $operationId = $request->query('operation_id');
 
             if ($operationId) {
@@ -199,7 +203,9 @@ class DataManagementController extends Controller
     public function statistics(Request $request): JsonResponse
     {
         try {
-            $userId = $request->user()->id;
+            $user = $request->user();
+            /** @var \App\Models\User $user */
+            $userId = $user?->id ?? throw new \Exception('User required');
             $period = $request->query('period', 'month');
 
             $statistics = $this->historyService->getStatistics($userId, $period);
@@ -262,6 +268,9 @@ class DataManagementController extends Controller
     /**
      * Get specific operation status
      */
+    /**
+     * @return array<string, mixed>
+     */
     private function getOperationStatus(string $operationId, int $userId): array
     {
         try {
@@ -280,13 +289,19 @@ class DataManagementController extends Controller
             }
 
             $latestLog = $logs->first();
-            $contextData = json_decode($latestLog->context_data, true) ?? [];
+            $contextData = json_decode($latestLog->context_data, true);
+            if (! is_array($contextData)) {
+                $contextData = [];
+            }
 
             // Get progress logs
             $progressLogs = $logs->filter(function ($log) {
                 return $log->event_type === 'operation_progress';
             })->map(function ($log) {
-                $data = json_decode($log->context_data, true) ?? [];
+                $data = json_decode($log->context_data, true);
+                if (! is_array($data)) {
+                    $data = [];
+                }
 
                 return [
                     'progress' => $data['progress'] ?? 0,

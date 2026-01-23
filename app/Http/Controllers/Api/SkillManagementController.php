@@ -7,18 +7,15 @@ use App\Models\Character;
 use App\Models\Skill;
 use App\Models\SkillAcquisition;
 use App\Services\MCP\SkillOptimizationOrchestrationService;
-use App\Services\SkillAnalysisService;
 use App\Services\SkillEvolutionService;
 use App\Services\SkillHintService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class SkillManagementController extends Controller
 {
     public function __construct(
-        private SkillAnalysisService $analysisService,
         private SkillEvolutionService $evolutionService,
         private SkillHintService $hintService,
         private SkillOptimizationOrchestrationService $orchestrationService
@@ -29,11 +26,12 @@ class SkillManagementController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $request->validate([
+        $validated = $request->validate([
             'character_id' => 'required|integer|exists:ucp_characters,id',
         ]);
 
-        $character = Character::findOrFail($request->character_id);
+        /** @var Character $character */
+        $character = Character::query()->findOrFail($validated['character_id']);
 
         // Get all skills with acquisition status
         $skills = Skill::with(['acquisitions' => function ($query) use ($character) {
@@ -55,12 +53,12 @@ class SkillManagementController extends Controller
                     'effects' => $skill->effects,
                     'meta_tier' => $skill->meta_tier,
                     'is_acquired' => $acquisition !== null,
-                    'is_evolution' => $acquisition?->is_evolution ?? false,
-                    'final_sp_cost' => $acquisition?->final_sp_cost,
-                    'sp_saved' => $acquisition?->sp_saved ?? 0,
-                    'hint_count' => $acquisition?->hints_used ?? 0,
-                    'races_used' => $acquisition?->races_used ?? 0,
-                    'effectiveness_rating' => $acquisition?->effectiveness_rating,
+                    'is_evolution' => $acquisition !== null ? $acquisition->is_evolution : false,
+                    'final_sp_cost' => $acquisition !== null ? $acquisition->final_sp_cost : null,
+                    'sp_saved' => $acquisition !== null ? $acquisition->sp_saved : 0,
+                    'hint_count' => $acquisition !== null ? $acquisition->hints_used : 0,
+                    'races_used' => $acquisition !== null ? $acquisition->races_used : 0,
+                    'effectiveness_rating' => $acquisition !== null ? $acquisition->effectiveness_rating : null,
                     'can_evolve' => $skill->can_evolve,
                     'evolution_target_id' => $skill->evolution_target_id,
                     'available_hints' => $this->hintService->getUnusedHintsForSkill($character, $skill)->count(),
@@ -86,7 +84,7 @@ class SkillManagementController extends Controller
      */
     public function acquire(Request $request): JsonResponse
     {
-        $request->validate([
+        $validated = $request->validate([
             'character_id' => 'required|integer|exists:ucp_characters,id',
             'skill_id' => 'required|integer|exists:ucp_skills,id',
             'turn_acquired' => 'nullable|integer|min:1|max:72',
@@ -94,10 +92,19 @@ class SkillManagementController extends Controller
         ]);
 
         try {
-            DB::beginTransaction();
+            /** @var Character $character */
+            $character = Character::query()->findOrFail($validated['character_id']);
 
-            $character = Character::findOrFail($request->character_id);
-            $skill = Skill::findOrFail($request->skill_id);
+            // Verify character ownership
+            if ($character->user_id !== auth()->id()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Character not found',
+                ], 404);
+            }
+
+            /** @var Skill $skill */
+            $skill = Skill::query()->findOrFail($validated['skill_id']);
 
             // Get unused hints
             $hints = $this->hintService->getUnusedHintsForSkill($character, $skill);
@@ -120,8 +127,8 @@ class SkillManagementController extends Controller
             $acquisition = SkillAcquisition::create([
                 'character_id' => $character->id,
                 'skill_id' => $skill->id,
-                'turn_acquired' => $request->turn_acquired ?? $character->current_turn,
-                'career_phase' => $request->career_phase ?? $character->career_phase,
+                'turn_acquired' => $validated['turn_acquired'] ?? $character->current_turn,
+                'career_phase' => $validated['career_phase'] ?? $character->career_stage,
                 'acquisition_method' => 'manual',
                 'base_sp_cost' => $skill->base_sp_cost,
                 'hints_used' => $hintCount,
@@ -137,22 +144,22 @@ class SkillManagementController extends Controller
             // Mark hints as used
             $this->hintService->markHintsAsUsed($character, $skill);
 
-            DB::commit();
+            /** @var Character $freshCharacter */
+            $freshCharacter = $character->fresh();
 
             return response()->json([
                 'success' => true,
                 'message' => 'Skill acquired successfully',
                 'data' => [
                     'acquisition' => $acquisition,
-                    'remaining_sp' => $character->fresh()->available_sp,
+                    'remaining_sp' => $freshCharacter->available_sp,
                 ],
             ], 201);
         } catch (\Exception $e) {
-            DB::rollBack();
             Log::error('Failed to acquire skill', [
                 'error' => $e->getMessage(),
-                'character_id' => $request->character_id,
-                'skill_id' => $request->skill_id,
+                'character_id' => $validated['character_id'],
+                'skill_id' => $validated['skill_id'],
             ]);
 
             return response()->json([
@@ -168,12 +175,46 @@ class SkillManagementController extends Controller
      */
     public function evolutionOpportunities(int $characterId): JsonResponse
     {
-        $character = Character::findOrFail($characterId);
+        /** @var Character $character */
+        $character = Character::query()->findOrFail($characterId);
         $opportunities = $this->evolutionService->getEvolutionOpportunities($character);
+
+        // Transform the response to match expected structure
+        $transformedOpportunities = array_map(function ($opportunity) {
+            $skill = $opportunity['skill'] ?? null;
+            if (! ($skill instanceof Skill)) {
+                return null;
+            }
+
+            $evolutionTarget = (is_object($skill) && property_exists($skill, 'evolutionTarget') ? $skill->evolutionTarget : null);
+            if (! ($evolutionTarget instanceof Skill)) {
+                return null;
+            }
+
+            $efficiency = $opportunity['efficiency'] ?? [];
+            $finalCost = 0;
+
+            if (is_array($efficiency) && isset($efficiency['rare_skill']) && is_array($efficiency['rare_skill'])) {
+                $finalCost = $efficiency['rare_skill']['final_cost'] ?? 0;
+            }
+
+            return [
+                'normal_skill' => $skill,
+                'rare_skill' => $evolutionTarget,
+                'can_evolve' => $opportunity['can_evolve_now'] ?? false,
+                'evolution_cost' => $finalCost,
+                'block_reason' => $opportunity['block_reason'] ?? null,
+                'efficiency' => $efficiency,
+                'priority' => $opportunity['priority'] ?? 0,
+            ];
+        }, $opportunities);
+
+        // Filter out null values
+        $transformedOpportunities = array_filter($transformedOpportunities);
 
         return response()->json([
             'success' => true,
-            'data' => $opportunities,
+            'data' => $transformedOpportunities,
         ]);
     }
 
@@ -182,14 +223,25 @@ class SkillManagementController extends Controller
      */
     public function evolve(Request $request): JsonResponse
     {
-        $request->validate([
+        $validated = $request->validate([
             'character_id' => 'required|integer|exists:ucp_characters,id',
             'skill_id' => 'required|integer|exists:ucp_skills,id',
         ]);
 
         try {
-            $character = Character::findOrFail($request->character_id);
-            $skill = Skill::findOrFail($request->skill_id);
+            /** @var Character $character */
+            $character = Character::query()->findOrFail($validated['character_id']);
+
+            // Verify character ownership
+            if ($character->user_id !== auth()->id()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Character not found',
+                ], 404);
+            }
+
+            /** @var Skill $skill */
+            $skill = Skill::query()->findOrFail($validated['skill_id']);
 
             $result = $this->evolutionService->evolveSkill($character, $skill);
 
@@ -208,8 +260,8 @@ class SkillManagementController extends Controller
         } catch (\Exception $e) {
             Log::error('Failed to evolve skill', [
                 'error' => $e->getMessage(),
-                'character_id' => $request->character_id,
-                'skill_id' => $request->skill_id,
+                'character_id' => $validated['character_id'],
+                'skill_id' => $validated['skill_id'],
             ]);
 
             return response()->json([
@@ -225,17 +277,18 @@ class SkillManagementController extends Controller
      */
     public function recommendations(Request $request): JsonResponse
     {
-        $request->validate([
+        $validated = $request->validate([
             'character_id' => 'required|integer|exists:ucp_characters,id',
             'target_skills' => 'nullable|array',
             'target_skills.*' => 'integer|exists:ucp_skills,id',
         ]);
 
         try {
-            $character = Character::with(['supportCards.supportCard'])->findOrFail($request->character_id);
+            /** @var Character $character */
+            $character = Character::query()->with(['supportCards.supportCard'])->findOrFail($validated['character_id']);
 
-            $targetSkills = $request->has('target_skills')
-                ? Skill::whereIn('id', $request->target_skills)->get()
+            $targetSkills = isset($validated['target_skills'])
+                ? Skill::whereIn('id', $validated['target_skills'])->get()
                 : Skill::where('is_active', true)->get();
 
             // Get AI recommendations through MCP orchestration
@@ -245,7 +298,7 @@ class SkillManagementController extends Controller
                 context: [
                     'available_sp' => $character->available_sp,
                     'current_turn' => $character->current_turn,
-                    'career_phase' => $character->career_phase,
+                    'career_phase' => $character->career_stage,
                 ]
             );
 
@@ -256,7 +309,7 @@ class SkillManagementController extends Controller
         } catch (\Exception $e) {
             Log::error('Failed to get skill recommendations', [
                 'error' => $e->getMessage(),
-                'character_id' => $request->character_id,
+                'character_id' => $validated['character_id'],
             ]);
 
             return response()->json([
@@ -272,7 +325,8 @@ class SkillManagementController extends Controller
      */
     public function agentPerformance(int $characterId): JsonResponse
     {
-        $character = Character::findOrFail($characterId);
+        /** @var Character $character */
+        $character = Character::query()->findOrFail($characterId);
 
         // Get performance metrics from acquisitions
         $acquisitions = SkillAcquisition::where('character_id', $characterId)->get();
@@ -323,8 +377,10 @@ class SkillManagementController extends Controller
 
     /**
      * Calculate success rate of AI recommendations.
+     *
+     * @param  \Illuminate\Database\Eloquent\Collection<int, SkillAcquisition>  $acquisitions
      */
-    private function calculateSuccessRate($acquisitions): float
+    private function calculateSuccessRate(\Illuminate\Database\Eloquent\Collection $acquisitions): float
     {
         $total = $acquisitions->where('acquisition_method', 'ai_recommended')->count();
         if ($total === 0) {
@@ -340,6 +396,8 @@ class SkillManagementController extends Controller
 
     /**
      * Get recent agent activities.
+     *
+     * @return array<int, array<string, mixed>>
      */
     private function getRecentActivities(Character $character): array
     {
@@ -349,17 +407,22 @@ class SkillManagementController extends Controller
             ->limit(10)
             ->get();
 
-        return $acquisitions->map(function ($acquisition) {
+        /** @var array<int, array<string, mixed>> $activities */
+        $activities = $acquisitions->map(function ($acquisition) {
+            $skill = $acquisition->skill;
+            $skillName = $skill !== null ? $skill->name : 'Unknown Skill';
+            $createdAt = $acquisition->created_at;
+
             return [
                 'id' => $acquisition->id,
                 'type' => $acquisition->is_evolution ? 'optimization' : 'success',
                 'title' => $acquisition->is_evolution
-                    ? "Skill Evolved: {$acquisition->skill->name}"
-                    : "Skill Acquired: {$acquisition->skill->name}",
+                    ? "Skill Evolved: {$skillName}"
+                    : "Skill Acquired: {$skillName}",
                 'description' => $acquisition->is_evolution
                     ? "Successfully evolved skill with {$acquisition->hints_used} hints applied"
                     : "Acquired skill for {$acquisition->final_sp_cost} SP (saved {$acquisition->sp_saved} SP)",
-                'timestamp' => $acquisition->created_at->diffForHumans(),
+                'timestamp' => $createdAt !== null ? $createdAt->diffForHumans() : 'Unknown',
                 'agent_name' => $acquisition->is_evolution ? 'Evolution Agent' : 'Acquisition Agent',
                 'metrics' => [
                     'sp_saved' => $acquisition->sp_saved,
@@ -368,5 +431,7 @@ class SkillManagementController extends Controller
                 ],
             ];
         })->toArray();
+
+        return $activities;
     }
 }

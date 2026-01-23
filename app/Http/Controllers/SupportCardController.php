@@ -56,8 +56,8 @@ class SupportCardController extends Controller
             $search = $request->input('search');
             if (is_string($search)) {
                 $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', '%' . $search . '%')
-                        ->orWhere('character_name', 'like', '%' . $search . '%');
+                    $q->where('name', 'like', '%'.$search.'%')
+                        ->orWhere('character_name', 'like', '%'.$search.'%');
                 });
             }
         }

@@ -116,13 +116,21 @@ class DashboardController extends Controller
         $stats = $character->current_stats ?? [];
         // Handle case where stats might be a JSON string from old data
         if (is_string($stats)) {
-            $stats = json_decode($stats, true) ?? [];
+            $decodedStats = json_decode($stats, true);
+            $stats = is_array($decodedStats) ? $decodedStats : [];
+        }
+        if (! is_array($stats)) {
+            $stats = [];
         }
 
         $goals = $character->goals ?? [];
         // Handle case where goals might be a JSON string from old data
         if (is_string($goals)) {
-            $goals = json_decode($goals, true) ?? [];
+            $decodedGoals = json_decode($goals, true);
+            $goals = is_array($decodedGoals) ? $decodedGoals : [];
+        }
+        if (! is_array($goals)) {
+            $goals = [];
         }
 
         // Calculate overall grade based on average stats
@@ -131,11 +139,15 @@ class DashboardController extends Controller
         $overallGrade = $character->getStatGrade((int) $avgStat);
 
         // Get target grade from goals
-        $targetGrade = $goals['target_grade'] ?? 'A+';
+        $targetGrade = isset($goals['target_grade']) && is_string($goals['target_grade'])
+            ? $goals['target_grade']
+            : 'A+';
 
         // Get skills count
         $skillsAcquired = $character->skillAcquisitions()->count();
-        $targetSkills = $goals['target_skills'] ?? 12;
+        $targetSkills = isset($goals['target_skills']) && is_numeric($goals['target_skills'])
+            ? (int) $goals['target_skills']
+            : 12;
 
         // Calculate skill points (sum of all skill costs or from character data)
         $skillPoints = $character->skillAcquisitions()->sum('final_sp_cost') ?? 0;
@@ -144,7 +156,8 @@ class DashboardController extends Controller
         $raceSchedule = $character->race_schedule ?? [];
         // Handle case where race_schedule might be a JSON string from old data
         if (is_string($raceSchedule)) {
-            $raceSchedule = json_decode($raceSchedule, true) ?? [];
+            $decodedSchedule = json_decode($raceSchedule, true);
+            $raceSchedule = is_array($decodedSchedule) ? $decodedSchedule : [];
         }
         // Ensure it's an array
         if (! is_array($raceSchedule)) {
@@ -155,11 +168,20 @@ class DashboardController extends Controller
         $turnsUntilRace = null;
 
         if (! empty($raceSchedule)) {
-            $upcomingRaces = array_filter($raceSchedule, fn ($race) => ($race['turn'] ?? 0) > $character->current_turn);
+            $upcomingRaces = array_filter($raceSchedule, function ($race) use ($character) {
+                return is_array($race) && isset($race['turn']) && is_numeric($race['turn']) && $race['turn'] > $character->current_turn;
+            });
             if (! empty($upcomingRaces)) {
                 $nextRaceData = reset($upcomingRaces);
-                $nextRace = $nextRaceData['name'] ?? 'Unknown Race';
-                $turnsUntilRace = ($nextRaceData['turn'] ?? $character->current_turn) - $character->current_turn;
+                if (is_array($nextRaceData)) {
+                    $nextRace = isset($nextRaceData['name']) && is_string($nextRaceData['name'])
+                        ? $nextRaceData['name']
+                        : 'Unknown Race';
+                    $raceTurn = isset($nextRaceData['turn']) && is_numeric($nextRaceData['turn'])
+                        ? (int) $nextRaceData['turn']
+                        : $character->current_turn;
+                    $turnsUntilRace = $raceTurn - $character->current_turn;
+                }
             }
         }
 
@@ -214,11 +236,19 @@ class DashboardController extends Controller
         $goals = $character->goals ?? [];
         // Handle case where goals might be a JSON string from old data
         if (is_string($goals)) {
-            $goals = json_decode($goals, true) ?? [];
+            $decodedGoals = json_decode($goals, true);
+            $goals = is_array($decodedGoals) ? $decodedGoals : [];
+        }
+        if (! is_array($goals)) {
+            $goals = [];
         }
 
-        $shortTermGoal = $goals['short_term'] ?? 'No short-term goal set';
-        $longTermGoal = $goals['long_term'] ?? 'No long-term goal set';
+        $shortTermGoal = isset($goals['short_term']) && is_string($goals['short_term'])
+            ? $goals['short_term']
+            : 'No short-term goal set';
+        $longTermGoal = isset($goals['long_term']) && is_string($goals['long_term'])
+            ? $goals['long_term']
+            : 'No long-term goal set';
 
         // Calculate progress based on target stats
         $shortTermProgress = $this->calculateGoalProgress($character, 'short_term');
@@ -244,14 +274,20 @@ class DashboardController extends Controller
         $goals = $character->goals ?? [];
         // Handle case where goals might be a JSON string from old data
         if (is_string($goals)) {
-            $goals = json_decode($goals, true) ?? [];
+            $decodedGoals = json_decode($goals, true);
+            $goals = is_array($decodedGoals) ? $decodedGoals : [];
+        }
+        if (! is_array($goals)) {
+            $goals = [];
         }
 
         if ($goalType === 'short_term') {
             // Short term could be race-based or stat-based
-            if (isset($goals['short_term_target'])) {
-                $target = $goals['short_term_target'];
-                $current = $goals['short_term_current'] ?? 0;
+            if (isset($goals['short_term_target']) && is_numeric($goals['short_term_target'])) {
+                $target = (float) $goals['short_term_target'];
+                $current = isset($goals['short_term_current']) && is_numeric($goals['short_term_current'])
+                    ? (float) $goals['short_term_current']
+                    : 0;
 
                 return $target > 0 ? min(100, ($current / $target) * 100) : 0;
             }
@@ -285,21 +321,31 @@ class DashboardController extends Controller
         $stats = $character->current_stats ?? [];
         // Handle case where stats might be a JSON string from old data
         if (is_string($stats)) {
-            $stats = json_decode($stats, true) ?? [];
+            $decodedStats = json_decode($stats, true);
+            $stats = is_array($decodedStats) ? $decodedStats : [];
+        }
+        if (! is_array($stats)) {
+            $stats = [];
         }
 
         $upcomingRaces = [];
 
         foreach ($raceSchedule as $race) {
-            $raceTurn = $race['turn'] ?? 0;
+            if (! is_array($race)) {
+                continue;
+            }
+
+            $raceTurn = isset($race['turn']) && is_numeric($race['turn']) ? (int) $race['turn'] : 0;
             if ($raceTurn > $currentTurn) {
                 // Calculate readiness based on stats vs race requirements
                 $readiness = $this->calculateRaceReadiness($stats, $race);
 
                 $upcomingRaces[] = [
-                    'name' => $race['name'] ?? 'Unknown Race',
-                    'grade' => $race['grade'] ?? 'G3',
-                    'date' => $race['date'] ?? now()->addDays($raceTurn - $currentTurn)->format('Y-m-d'),
+                    'name' => isset($race['name']) && is_string($race['name']) ? $race['name'] : 'Unknown Race',
+                    'grade' => isset($race['grade']) && is_string($race['grade']) ? $race['grade'] : 'G3',
+                    'date' => isset($race['date']) && is_string($race['date'])
+                        ? $race['date']
+                        : now()->addDays($raceTurn - $currentTurn)->format('Y-m-d'),
                     'turn' => $raceTurn,
                     'turnsAway' => $raceTurn - $currentTurn,
                     'readiness' => $readiness,
@@ -321,11 +367,16 @@ class DashboardController extends Controller
      */
     private function calculateRaceReadiness(array $stats, array $race): int
     {
-        $requirements = $race['requirements'] ?? [];
+        $requirements = isset($race['requirements']) && is_array($race['requirements'])
+            ? $race['requirements']
+            : [];
 
         if (empty($requirements)) {
             // Default calculation based on average stats
-            $avgStat = array_sum(array_filter($stats, fn ($v) => is_numeric($v))) / max(1, count($stats));
+            $numericStats = array_filter($stats, fn ($v) => is_numeric($v));
+            $avgStat = count($numericStats) > 0
+                ? array_sum($numericStats) / count($numericStats)
+                : 0;
 
             return min(100, (int) ($avgStat / 10));
         }
@@ -334,10 +385,15 @@ class DashboardController extends Controller
         $count = 0;
 
         foreach ($requirements as $stat => $required) {
-            $current = $stats[$stat] ?? 0;
-            $readiness = $required > 0 ? min(100, ($current / $required) * 100) : 100;
-            $totalReadiness += $readiness;
-            $count++;
+            if (! is_string($stat) || ! is_numeric($required)) {
+                continue;
+            }
+
+            $current = isset($stats[$stat]) && is_numeric($stats[$stat]) ? (float) $stats[$stat] : 0;
+            $requiredValue = (float) $required;
+            $readiness = $requiredValue > 0 ? min(100, ($current / $requiredValue) * 100) : 100;
+            $totalReadiness = ($totalReadiness ?? 0) + $readiness;
+            $count = ($count ?? 0) + 1;
         }
 
         return $count > 0 ? (int) ($totalReadiness / $count) : 50;
@@ -400,7 +456,7 @@ class DashboardController extends Controller
                 'recommended' => $index === 0,
             ];
 
-            $index++;
+            $index = ($index ?? 0) + 1;
         }
 
         // Always suggest rest if energy is low
@@ -433,27 +489,42 @@ class DashboardController extends Controller
         $stats = $character->current_stats ?? [];
         // Handle case where stats might be a JSON string from old data
         if (is_string($stats)) {
-            $stats = json_decode($stats, true) ?? [];
+            $decodedStats = json_decode($stats, true);
+            $stats = is_array($decodedStats) ? $decodedStats : [];
+        }
+        if (! is_array($stats)) {
+            $stats = [];
         }
 
         $goals = $character->goals ?? [];
         // Handle case where goals might be a JSON string from old data
         if (is_string($goals)) {
-            $goals = json_decode($goals, true) ?? [];
+            $decodedGoals = json_decode($goals, true);
+            $goals = is_array($decodedGoals) ? $decodedGoals : [];
+        }
+        if (! is_array($goals)) {
+            $goals = [];
         }
 
-        $targets = $goals['target_stats'] ?? [
-            'speed' => 1000,
-            'stamina' => 800,
-            'power' => 800,
-            'guts' => 600,
-            'wit' => 600,
-        ];
+        $targets = isset($goals['target_stats']) && is_array($goals['target_stats'])
+            ? $goals['target_stats']
+            : [
+                'speed' => 1000,
+                'stamina' => 800,
+                'power' => 800,
+                'guts' => 600,
+                'wit' => 600,
+            ];
 
         $deficits = [];
         foreach ($targets as $stat => $target) {
-            $current = $stats[$stat] ?? 0;
-            $deficits[$stat] = max(0, $target - $current);
+            if (! is_string($stat) || ! is_numeric($target)) {
+                continue;
+            }
+
+            $current = isset($stats[$stat]) && is_numeric($stats[$stat]) ? (int) $stats[$stat] : 0;
+            $targetValue = (int) $target;
+            $deficits[$stat] = max(0, $targetValue - $current);
         }
 
         return $deficits;
@@ -467,11 +538,17 @@ class DashboardController extends Controller
         $growthRates = $character->growth_rates ?? [];
         // Handle case where growth_rates might be a JSON string from old data
         if (is_string($growthRates)) {
-            $growthRates = json_decode($growthRates, true) ?? [];
+            $decodedRates = json_decode($growthRates, true);
+            $growthRates = is_array($decodedRates) ? $decodedRates : [];
+        }
+        if (! is_array($growthRates)) {
+            $growthRates = [];
         }
 
         $baseGain = 12;
-        $growthBonus = ($growthRates[$stat] ?? 0) / 100;
+        $growthBonus = isset($growthRates[$stat]) && is_numeric($growthRates[$stat])
+            ? (float) $growthRates[$stat] / 100
+            : 0;
 
         return (int) (($baseGain + ($baseGain * $growthBonus)) * $multiplier);
     }
@@ -511,7 +588,7 @@ class DashboardController extends Controller
             ->get();
 
         foreach ($recentAcquisitions as $acquisition) {
-            $skillName = $acquisition->skill?->name ?? 'Unknown Skill';
+            $skillName = $acquisition->skill->name ?? 'Unknown Skill';
             $results[] = [
                 'type' => 'skill',
                 'description' => "Skill acquired: {$skillName}",
@@ -523,17 +600,9 @@ class DashboardController extends Controller
         }
 
         // If no real data, show placeholder
+        // Placeholder handling moved to view
         if (empty($results)) {
-            $results = [
-                [
-                    'type' => 'info',
-                    'description' => 'Start training to see your progress here',
-                    'highlight' => null,
-                    'timestamp' => now(),
-                    'icon' => 'info',
-                    'color' => 'gray',
-                ],
-            ];
+            $results = [];
         }
 
         return array_slice($results, 0, 3);

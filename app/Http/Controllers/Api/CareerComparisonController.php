@@ -205,6 +205,6 @@ class CareerComparisonController extends Controller
             return [];
         }
 
-        return array_values(array_map('intval', $careerIds));
+        return array_values(array_map(fn (mixed $id): int => is_numeric($id) ? (int) $id : 0, $careerIds));
     }
 }

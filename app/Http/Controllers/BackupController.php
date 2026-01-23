@@ -28,11 +28,26 @@ class BackupController extends Controller
     ) {}
 
     /**
+     * Get the authenticated user ID.
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     */
+    private function getUserId(Request $request): int
+    {
+        $user = $request->user();
+        if ($user === null) {
+            abort(401, 'Unauthenticated');
+        }
+
+        return $user?->id ?? throw new \Exception('User required');
+    }
+
+    /**
      * Show the backup management interface
      */
     public function index(): View
     {
-        $userId = auth()->id();
+        $userId = (int) auth()->id();
         $backups = $this->backupService->listBackups($userId);
         $schedules = $this->backupService->getBackupSchedule($userId);
         $statistics = $this->backupService->getBackupStatistics($userId);
@@ -48,7 +63,7 @@ class BackupController extends Controller
     public function create(BackupCreateRequest $request): JsonResponse
     {
         try {
-            $userId = $request->user()->id;
+            $userId = $this->getUserId($request);
 
             $options = [
                 'type' => $request->input('type', BackupService::TYPE_FULL),
@@ -82,7 +97,7 @@ class BackupController extends Controller
         } catch (\Exception $e) {
             Log::error('[BackupController] Create backup failed', [
                 'error' => $e->getMessage(),
-                'user_id' => $request->user()?->id,
+                'user_id' => $this->getUserId($request),
             ]);
 
             return response()->json([
@@ -101,7 +116,7 @@ class BackupController extends Controller
     public function list(Request $request): JsonResponse
     {
         try {
-            $userId = $request->user()->id;
+            $userId = $this->getUserId($request);
 
             $filters = [
                 'type' => $request->query('type'),
@@ -121,7 +136,7 @@ class BackupController extends Controller
         } catch (\Exception $e) {
             Log::error('[BackupController] List backups failed', [
                 'error' => $e->getMessage(),
-                'user_id' => $request->user()?->id,
+                'user_id' => $this->getUserId($request),
             ]);
 
             return response()->json([
@@ -140,7 +155,7 @@ class BackupController extends Controller
     public function show(Request $request, string $id): JsonResponse
     {
         try {
-            $userId = $request->user()->id;
+            $userId = $this->getUserId($request);
             $backup = $this->backupService->getBackupDetails($id, $userId);
 
             if (! $backup) {
@@ -158,7 +173,7 @@ class BackupController extends Controller
             Log::error('[BackupController] Get backup details failed', [
                 'backup_id' => $id,
                 'error' => $e->getMessage(),
-                'user_id' => $request->user()?->id,
+                'user_id' => $this->getUserId($request),
             ]);
 
             return response()->json([
@@ -177,7 +192,7 @@ class BackupController extends Controller
     public function restore(BackupRestoreRequest $request, string $id): JsonResponse
     {
         try {
-            $userId = $request->user()->id;
+            $userId = $this->getUserId($request);
 
             $options = [
                 'decryption_key' => $request->input('decryption_key'),
@@ -214,7 +229,7 @@ class BackupController extends Controller
             Log::error('[BackupController] Restore failed', [
                 'backup_id' => $id,
                 'error' => $e->getMessage(),
-                'user_id' => $request->user()?->id,
+                'user_id' => $this->getUserId($request),
             ]);
 
             return response()->json([
@@ -233,7 +248,7 @@ class BackupController extends Controller
     public function destroy(Request $request, string $id): JsonResponse
     {
         try {
-            $userId = $request->user()->id;
+            $userId = $this->getUserId($request);
             $result = $this->backupService->deleteBackup($id, $userId);
 
             if (! $result['success']) {
@@ -252,7 +267,7 @@ class BackupController extends Controller
             Log::error('[BackupController] Delete backup failed', [
                 'backup_id' => $id,
                 'error' => $e->getMessage(),
-                'user_id' => $request->user()?->id,
+                'user_id' => $this->getUserId($request),
             ]);
 
             return response()->json([
@@ -271,7 +286,7 @@ class BackupController extends Controller
     public function schedule(BackupScheduleRequest $request): JsonResponse
     {
         try {
-            $userId = $request->user()->id;
+            $userId = $this->getUserId($request);
 
             $scheduleConfig = [
                 'frequency' => $request->input('frequency', BackupService::SCHEDULE_DAILY),
@@ -279,8 +294,12 @@ class BackupController extends Controller
                 'type' => $request->input('type', BackupService::TYPE_FULL),
                 'compress' => $request->boolean('compress', true),
                 'encrypt' => $request->boolean('encrypt', false),
-                'retention_days' => (int) $request->input('retention_days', 30),
-                'include_types' => $request->input('include_types', ['character', 'career', 'skill', 'support_card']),
+                'retention_days' => is_numeric($request->input('retention_days', 30))
+                    ? (int) $request->input('retention_days', 30)
+                    : 30,
+                'include_types' => is_array($request->input('include_types'))
+                    ? $request->input('include_types')
+                    : ['character', 'career', 'skill', 'support_card'],
             ];
 
             $result = $this->backupService->scheduleBackup($userId, $scheduleConfig);
@@ -297,14 +316,14 @@ class BackupController extends Controller
                 'success' => true,
                 'message' => 'Backup schedule created successfully',
                 'data' => [
-                    'schedule_id' => $result['schedule_id'],
-                    'schedule' => $result['schedule'],
+                    'schedule_id' => isset($result['schedule_id']) ? $result['schedule_id'] : null,
+                    'schedule' => isset((isset($result['schedule']) ? $result['schedule'] : [])) ? (isset($result['schedule']) ? $result['schedule'] : []) : null,
                 ],
             ]);
         } catch (\Exception $e) {
             Log::error('[BackupController] Schedule backup failed', [
                 'error' => $e->getMessage(),
-                'user_id' => $request->user()?->id,
+                'user_id' => $this->getUserId($request),
             ]);
 
             return response()->json([
@@ -323,7 +342,7 @@ class BackupController extends Controller
     public function getSchedules(Request $request): JsonResponse
     {
         try {
-            $userId = $request->user()->id;
+            $userId = $this->getUserId($request);
             $result = $this->backupService->getBackupSchedule($userId);
 
             return response()->json([
@@ -333,7 +352,7 @@ class BackupController extends Controller
         } catch (\Exception $e) {
             Log::error('[BackupController] Get schedules failed', [
                 'error' => $e->getMessage(),
-                'user_id' => $request->user()?->id,
+                'user_id' => $this->getUserId($request),
             ]);
 
             return response()->json([
@@ -352,7 +371,7 @@ class BackupController extends Controller
     public function updateSchedule(Request $request, string $id): JsonResponse
     {
         try {
-            $userId = $request->user()->id;
+            $userId = $this->getUserId($request);
 
             $updates = $request->only([
                 'frequency',
@@ -378,13 +397,13 @@ class BackupController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Schedule updated successfully',
-                'data' => $result['schedule'],
+                'data' => (isset($result['schedule']) ? $result['schedule'] : []) ?? null,
             ]);
         } catch (\Exception $e) {
             Log::error('[BackupController] Update schedule failed', [
                 'schedule_id' => $id,
                 'error' => $e->getMessage(),
-                'user_id' => $request->user()?->id,
+                'user_id' => $this->getUserId($request),
             ]);
 
             return response()->json([
@@ -403,7 +422,7 @@ class BackupController extends Controller
     public function deleteSchedule(Request $request, string $id): JsonResponse
     {
         try {
-            $userId = $request->user()->id;
+            $userId = $this->getUserId($request);
             $result = $this->backupService->deleteBackupSchedule($id, $userId);
 
             if (! $result['success']) {
@@ -422,7 +441,7 @@ class BackupController extends Controller
             Log::error('[BackupController] Delete schedule failed', [
                 'schedule_id' => $id,
                 'error' => $e->getMessage(),
-                'user_id' => $request->user()?->id,
+                'user_id' => $this->getUserId($request),
             ]);
 
             return response()->json([
@@ -441,7 +460,7 @@ class BackupController extends Controller
     public function statistics(Request $request): JsonResponse
     {
         try {
-            $userId = $request->user()->id;
+            $userId = $this->getUserId($request);
             $statistics = $this->backupService->getBackupStatistics($userId);
 
             return response()->json([
@@ -451,7 +470,7 @@ class BackupController extends Controller
         } catch (\Exception $e) {
             Log::error('[BackupController] Get statistics failed', [
                 'error' => $e->getMessage(),
-                'user_id' => $request->user()?->id,
+                'user_id' => $this->getUserId($request),
             ]);
 
             return response()->json([
@@ -470,8 +489,9 @@ class BackupController extends Controller
     public function cleanup(Request $request): JsonResponse
     {
         try {
-            $userId = $request->user()->id;
-            $retentionDays = (int) $request->input('retention_days', 30);
+            $userId = $this->getUserId($request);
+            $retentionDaysInput = $request->input('retention_days', 30);
+            $retentionDays = is_numeric($retentionDaysInput) ? (int) $retentionDaysInput : 30;
 
             $result = $this->backupService->cleanupOldBackups($userId, $retentionDays);
 
@@ -486,7 +506,7 @@ class BackupController extends Controller
         } catch (\Exception $e) {
             Log::error('[BackupController] Cleanup failed', [
                 'error' => $e->getMessage(),
-                'user_id' => $request->user()?->id,
+                'user_id' => $this->getUserId($request),
             ]);
 
             return response()->json([
