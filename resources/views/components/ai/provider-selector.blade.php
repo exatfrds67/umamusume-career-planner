@@ -2,151 +2,94 @@
 
 <div class="provider-selector flex items-center gap-2" x-data="providerSelector()" x-init="initialize()">
 
-    {{-- Provider Badge --}}
-    <div class="flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium"
-        :class="{
-            'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300': provider === 'ollama' &&
-                status === 'online',
-            'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300': provider === 'bedrock' &&
-                status === 'online',
-            'bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300': provider === 'agent' &&
-                status === 'online',
-            'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300': status === 'offline',
-            'bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300': status === 'connecting'
-        }">
-
-        {{-- Status Indicator --}}
-        <span class="relative flex h-2 w-2">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
+    <div class="relative" @click.away="open = false">
+        <button
+            @click="open = !open"
+            class="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+        >
+            <div class="w-2 h-2 rounded-full"
                 :class="{
-                    'bg-green-400': status === 'online',
-                    'bg-yellow-400': status === 'connecting',
-                    'bg-gray-400': status === 'offline'
+                    'bg-green-500': provider === 'ollama',
+                    'bg-blue-500': provider === 'bedrock',
+                    'bg-purple-500': provider === 'agent'
                 }"
-                x-show="status !== 'offline'"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2"
-                :class="{
-                    'bg-green-500': status === 'online',
-                    'bg-yellow-500': status === 'connecting',
-                    'bg-gray-500': status === 'offline'
-                }"></span>
-        </span>
-
-        {{-- Provider Name --}}
-        <span x-text="getProviderLabel()"></span>
-
-        {{-- Model Name --}}
-        <span class="opacity-75" x-text="model"></span>
-    </div>
-
-    {{-- Provider Selector Dropdown --}}
-    <div class="relative" x-data="{ open: false }">
-        <button @click="open = !open" class="p-1 hover:bg-white/50 dark:hover:bg-gray-600 rounded transition-colors"
-            aria-label="Change AI provider" aria-expanded="false" :aria-expanded="open.toString()">
-            <svg class="w-4 h-4 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor"
-                viewBox="0 0 24 24">
+            ></div>
+            <span x-text="model || provider || 'Select Model'"></span>
+            <svg class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
         </button>
 
-        {{-- Dropdown Menu --}}
-        <div x-show="open" @click.away="open = false" x-transition:enter="transition ease-out duration-100"
-            x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
-            x-transition:leave="transition ease-in duration-75" x-transition:leave-start="opacity-100 scale-100"
-            x-transition:leave-end="opacity-0 scale-95"
-            class="absolute right-0 mt-2 w-72 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50"
-            role="menu">
+        <div
+            x-show="open"
+            x-transition:enter="transition ease-out duration-100"
+            x-transition:enter-start="transform opacity-0 scale-95"
+            x-transition:enter-end="transform opacity-100 scale-100"
+            x-transition:leave="transition ease-in duration-75"
+            x-transition:leave-start="transform opacity-100 scale-100"
+            x-transition:leave-end="transform opacity-0 scale-95"
+            class="absolute top-full left-0 mt-2 w-64 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 z-50 overflow-hidden"
+            style="display: none;"
+        >
+            <!-- Provider Tabs -->
+            <div class="flex border-b border-slate-200 dark:border-slate-700">
+                <button
+                    @click="provider = 'ollama'; model = models.ollama[0] || ''"
+                    class="flex-1 px-4 py-2 text-xs font-medium text-center transition-colors"
+                    :class="provider === 'ollama' ? 'bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white border-b-2 border-green-500' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'"
+                >
+                    Ollama
+                </button>
+                <button
+                    @click="provider = 'bedrock'; model = Object.keys(models.bedrock)[0] || ''"
+                    class="flex-1 px-4 py-2 text-xs font-medium text-center transition-colors"
+                    :class="provider === 'bedrock' ? 'bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-white border-b-2 border-blue-500' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'"
+                >
+                    Bedrock
+                </button>
+            </div>
 
-            <div class="p-2">
-                <div class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase px-3 py-2">
-                    AI Provider
-                </div>
-
-                {{-- Ollama (Local) --}}
-                <button @click="selectProvider('ollama', 'llama3.3'); open = false"
-                    class="w-full flex items-center justify-between px-3 py-2 text-sm rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                    :class="provider === 'ollama' ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300' :
-                        'text-gray-700 dark:text-gray-300'"
-                    role="menuitem">
-                    <div class="flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
-                        </svg>
-                        <div class="text-left">
-                            <div class="font-medium">Ollama (Local)</div>
-                            <div class="text-xs opacity-75">Fast, private, free</div>
+            <!-- Model List -->
+            <div class="max-h-64 overflow-y-auto p-1">
+                <template x-if="provider === 'ollama'">
+                    <div class="space-y-0.5">
+                        <template x-for="(details, id) in models.ollama" :key="id">
+                            <button
+                                @click="selectProvider('ollama', id)"
+                                class="w-full text-left px-3 py-2 text-sm rounded-md transition-colors flex items-center justify-between group"
+                                :class="model === id ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'"
+                            >
+                                <span x-text="details.name || id"></span>
+                                <svg x-show="model === id" class="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                            </button>
+                        </template>
+                        <div x-show="Object.keys(models.ollama).length === 0" class="px-3 py-4 text-center text-sm text-slate-500">
+                            No Ollama models found
                         </div>
                     </div>
-                    <template x-if="provider === 'ollama'">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                clip-rule="evenodd" />
-                        </svg>
-                    </template>
-                </button>
+                </template>
 
-                {{-- AWS Bedrock --}}
-                <button @click="selectProvider('bedrock', 'claude-3.5-sonnet'); open = false"
-                    class="w-full flex items-center justify-between px-3 py-2 text-sm rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                    :class="provider === 'bedrock' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300' :
-                        'text-gray-700 dark:text-gray-300'"
-                    role="menuitem">
-                    <div class="flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
-                        </svg>
-                        <div class="text-left">
-                            <div class="font-medium">AWS Bedrock</div>
-                            <div class="text-xs opacity-75">Advanced reasoning</div>
+                <template x-if="provider === 'bedrock'">
+                    <div class="space-y-0.5">
+                        <template x-for="(price, m) in models.bedrock" :key="m">
+                            <button
+                                @click="selectProvider('bedrock', m)"
+                                class="w-full text-left px-3 py-2 text-sm rounded-md transition-colors flex items-center justify-between group"
+                                :class="model === m ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'"
+                            >
+                                <span x-text="m.split('.')[1] || m"></span>
+                                <svg x-show="model === m" class="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                            </button>
+                        </template>
+                         <div x-show="Object.keys(models.bedrock).length === 0" class="px-3 py-4 text-center text-sm text-slate-500">
+                            No Bedrock models found
                         </div>
                     </div>
-                    <template x-if="provider === 'bedrock'">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                clip-rule="evenodd" />
-                        </svg>
-                    </template>
-                </button>
-
-                {{-- MCP Agents --}}
-                <button @click="selectProvider('agent', 'training-agent'); open = false"
-                    class="w-full flex items-center justify-between px-3 py-2 text-sm rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                    :class="provider === 'agent' ?
-                        'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300' :
-                        'text-gray-700 dark:text-gray-300'"
-                    role="menuitem">
-                    <div class="flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
-                        <div class="text-left">
-                            <div class="font-medium">MCP Agents</div>
-                            <div class="text-xs opacity-75">Specialized subagents</div>
-                        </div>
-                    </div>
-                    <template x-if="provider === 'agent'">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                clip-rule="evenodd" />
-                        </svg>
-                    </template>
-                </button>
-
-                <div class="border-t border-gray-200 dark:border-gray-700 my-2"></div>
-
-                {{-- Auto-Fallback Toggle --}}
-                <label
-                    class="flex items-center justify-between px-3 py-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors">
-                    <span>Auto-fallback to Bedrock</span>
-                    <input type="checkbox" x-model="autoFallback" @change="updateAutoFallback()"
-                        class="rounded border-gray-300 text-primary-600 focus:ring-primary-500">
-                </label>
+                </template>
             </div>
         </div>
     </div>
@@ -159,11 +102,29 @@
             model: '{{ $currentModel }}',
             status: 'connecting',
             autoFallback: true,
+            models: { ollama: [], bedrock: [] },
+            open: false,
 
             initialize() {
                 this.checkStatus();
+                this.fetchModels();
                 // Poll status every 5 seconds
                 setInterval(() => this.checkStatus(), 5000);
+            },
+
+            async fetchModels() {
+                try {
+                    const response = await fetch('/api/ai/chat/models');
+                    const data = await response.json();
+                    if(data.success) {
+                        this.models = data.models;
+                        if(this.models.ollama.length > 0 && !this.models.ollama.includes(this.model) && this.provider === 'ollama') {
+                             this.model = data.defaults.ollama; // Reset to default if current invalid
+                        }
+                    }
+                } catch (e) {
+                    console.error('Failed to fetch models', e);
+                }
             },
 
             async checkStatus() {
@@ -183,6 +144,12 @@
             async selectProvider(provider, model) {
                 this.provider = provider;
                 this.model = model;
+                this.open = false;
+
+                // Dispatch event for other components
+                window.dispatchEvent(new CustomEvent('ai-provider-changed', {
+                    detail: { provider: this.provider, model: this.model }
+                }));
 
                 // Save preference
                 try {

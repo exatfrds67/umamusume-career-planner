@@ -3,6 +3,7 @@
     'shortTermProgress' => 0,
     'longTermGoal' => 'No long-term goal set',
     'longTermProgress' => 0,
+    'characterId' => null,
 ])
 
 <div {{ $attributes->merge(['class' => 'card bg-white dark:bg-gray-800 overflow-hidden rounded-lg shadow']) }}>
@@ -11,7 +12,7 @@
             <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white">
                 Current Goals
             </h3>
-            <a href="{{ route('characters.index') }}"
+            <a href="{{ $characterId ? route('characters.edit', $characterId) : route('characters.index') }}"
                 class="text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300">
                 Edit Goals
             </a>

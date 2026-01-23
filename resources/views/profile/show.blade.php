@@ -99,7 +99,7 @@
                         <div class="flex items-center gap-4">
                             <img class="h-20 w-20 rounded-full bg-gray-50 ring-2 ring-gray-200 dark:ring-gray-700"
                                 src="https://ui-avatars.com/api/?name=User&background=3b82f6&color=fff&size=128"
-                                alt="User avatar">
+                                loading="eager" decoding="async" alt="User avatar">
                             <div>
                                 <button type="button"
                                     class="px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors duration-200">

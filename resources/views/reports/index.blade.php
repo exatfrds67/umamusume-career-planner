@@ -59,6 +59,7 @@
                                     class="w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center">
                                     @if ($character->avatar_url)
                                         <img src="{{ $character->avatar_url }}" alt="{{ $character->name }}"
+                                            loading="lazy" decoding="async"
                                             class="w-12 h-12 rounded-full object-cover">
                                     @else
                                         <span class="text-xl font-bold text-primary-600 dark:text-primary-400">

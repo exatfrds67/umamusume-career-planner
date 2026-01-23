@@ -33,6 +33,23 @@ window.aiChatInterface = function (config) {
             this.loadConversationHistory();
             this.setupEventListeners();
 
+            // Check for initial message in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const initialMessage = urlParams.get("initial_message");
+
+            if (initialMessage) {
+                this.currentMessage = initialMessage;
+                // Clean URL
+                const url = new URL(window.location);
+                url.searchParams.delete("initial_message");
+                window.history.replaceState({}, "", url);
+
+                // Auto-send after short delay to ensure init
+                setTimeout(() => {
+                    this.sendMessage();
+                }, 500);
+            }
+
             // Auto-scroll to bottom on new messages
             this.$watch("messages", () => {
                 this.$nextTick(() => this.scrollToBottom());
@@ -77,6 +94,8 @@ window.aiChatInterface = function (config) {
                         career_id: this.careerId,
                         provider: this.provider,
                         conversation_id: this.conversationId,
+                        model: this.model,
+                        agent_type: this.selectedAgent,
                     }),
                 });
 
@@ -87,7 +106,7 @@ window.aiChatInterface = function (config) {
                     this.addMessage({
                         id: Date.now() + 1,
                         sender: "ai",
-                        content: data.message,
+                        content: data.message, // This is the success message content
                         timestamp: new Date().toISOString(),
                         metadata: data.metadata,
                     });
@@ -97,7 +116,12 @@ window.aiChatInterface = function (config) {
                         this.conversationId = data.conversation_id;
                     }
                 } else {
-                    this.showError(data.error || "Failed to get AI response");
+                    // Handle Laravel standard error format (message) or custom error field
+                    this.showError(
+                        data.error ||
+                            data.message ||
+                            "Failed to get AI response",
+                    );
                 }
             } catch (error) {
                 console.error("Failed to send message:", error);
@@ -136,22 +160,44 @@ window.aiChatInterface = function (config) {
          * Format message content (markdown-like)
          */
         formatMessage(content) {
+            if (!content) return "";
+
             // Basic markdown formatting
             let formatted = content
-                // Bold
+                // Headers (## Header)
+                .replace(
+                    /^## (.*$)/gm,
+                    '<h3 class="text-lg font-bold mt-3 mb-1 text-gray-800 dark:text-gray-100">$1</h3>',
+                )
+                .replace(
+                    /^### (.*$)/gm,
+                    '<h4 class="text-md font-bold mt-2 mb-1 text-gray-800 dark:text-gray-100">$1</h4>',
+                )
+                // Bold (**text**)
                 .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-                // Italic
+                // Italic (*text*)
                 .replace(/\*(.*?)\*/g, "<em>$1</em>")
-                // Code blocks
+                // Code blocks (```code```)
                 .replace(
-                    /```(.*?)```/gs,
-                    '<pre class="bg-gray-100 dark:bg-gray-800 p-2 rounded my-2 overflow-x-auto"><code>$1</code></pre>',
+                    /```([\s\S]*?)```/g,
+                    '<pre class="bg-gray-100 dark:bg-gray-800 p-2 rounded my-2 overflow-x-auto text-sm font-mono"><code>$1</code></pre>',
                 )
-                // Inline code
+                // Inline code (`code`)
                 .replace(
-                    /`(.*?)`/g,
-                    '<code class="bg-gray-100 dark:bg-gray-800 px-1 rounded">$1</code>',
+                    /`([^`]+)`/g,
+                    '<code class="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-sm font-mono text-primary-600 dark:text-primary-400">$1</code>',
                 )
+                // Unordered Lists (- item)
+                .replace(
+                    /^\s*-\s+(.*$)/gm,
+                    '<li class="ml-4 list-disc">$1</li>',
+                )
+                // Numbered Lists (1. item)
+                .replace(
+                    /^\s*\d+\.\s+(.*$)/gm,
+                    '<li class="ml-4 list-decimal">$1</li>',
+                )
+                // Wrap lists in ul/ol (simplified approach: just treating them as lines for now, but CSS classes help)
                 // Line breaks
                 .replace(/\n/g, "<br>");
 
@@ -308,6 +354,15 @@ window.aiChatInterface = function (config) {
             // Listen for agent change events
             window.addEventListener("agent-changed", (event) => {
                 console.log("Agent changed to:", event.detail.agent);
+                this.selectedAgent = event.detail.agent;
+            });
+
+            // Listen for provider/model change events from provider-selector
+            window.addEventListener("ai-provider-changed", (event) => {
+                console.log("Provider/Model changed:", event.detail);
+                if (event.detail.provider)
+                    this.provider = event.detail.provider;
+                if (event.detail.model) this.model = event.detail.model;
             });
         },
     };

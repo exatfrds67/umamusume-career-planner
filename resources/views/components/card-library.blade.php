@@ -61,7 +61,7 @@
     </div>
 
     <!-- Card List -->
-    <div class="space-y-2 max-h-[600px] overflow-y-auto" role="list">
+    <div class="space-y-2 max-h-[600px] overflow-y-auto">
         @foreach ($availableCards as $card)
             <div class="p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/10 transition-colors cursor-pointer"
                 x-show="filterCard({{ json_encode([

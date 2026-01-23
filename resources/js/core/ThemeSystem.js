@@ -6,13 +6,18 @@
 
 class ThemeSystem {
     constructor() {
-        this.theme = this.getStoredTheme() || this.getSystemTheme();
+        // Get theme from localStorage or system preference
+        const stored = localStorage.getItem("theme");
+        this.theme = stored || this.getSystemTheme();
+        
+        // Always store in localStorage for consistency
+        localStorage.setItem("theme", this.theme);
         this.init();
     }
 
     init() {
-        // Apply initial theme
-        this.applyTheme(this.theme);
+        // Apply theme immediately (DOM already has dark class from inline script)
+        this.applyTheme(this.theme, true);
 
         // Listen for system theme changes
         this.watchSystemTheme();
@@ -33,20 +38,6 @@ class ThemeSystem {
             if (e.altKey && e.key.toLowerCase() === "t") {
                 e.preventDefault();
                 this.toggleTheme();
-
-                // Update toggle button state if it exists
-                const toggleButton = document.getElementById("theme-toggle");
-                if (toggleButton) {
-                    toggleButton.setAttribute(
-                        "aria-pressed",
-                        this.theme === "dark" ? "true" : "false",
-                    );
-                }
-
-                // Update settings page theme selection
-                this.updateSettingsPageTheme();
-
-                // Show toast notification
                 this.showThemeChangeToast();
             }
         });
@@ -75,17 +66,16 @@ class ThemeSystem {
             : "light";
     }
 
-    getStoredTheme() {
-        return localStorage.getItem("theme");
-    }
-
-    applyTheme(theme) {
+    applyTheme(theme, isInitial = false) {
         this.theme = theme;
 
-        // Update HTML class
-        if (theme === "dark") {
+        // Update HTML class (only if different from current state)
+        const htmlHasDark = document.documentElement.classList.contains("dark");
+        const shouldBeDark = theme === "dark";
+        
+        if (shouldBeDark && !htmlHasDark) {
             document.documentElement.classList.add("dark");
-        } else {
+        } else if (!shouldBeDark && htmlHasDark) {
             document.documentElement.classList.remove("dark");
         }
 
@@ -97,8 +87,13 @@ class ThemeSystem {
             window.backgroundSystem.updateBackground();
         }
 
-        // Announce to screen readers
-        this.announceThemeChange(theme);
+        // Update toggle button state
+        this.updateToggleButtonState();
+
+        // Announce to screen readers (unless this is initial load)
+        if (!isInitial) {
+            this.announceThemeChange(theme);
+        }
     }
 
     toggleTheme() {
@@ -123,18 +118,16 @@ class ThemeSystem {
         if (toggleButton) {
             toggleButton.addEventListener("click", () => {
                 this.toggleTheme();
-
-                // Update aria-pressed state
-                toggleButton.setAttribute(
-                    "aria-pressed",
-                    this.theme === "dark" ? "true" : "false",
-                );
-
-                // Update settings page theme selection if it exists
-                this.updateSettingsPageTheme();
             });
 
             // Set initial aria-pressed state
+            this.updateToggleButtonState();
+        }
+    }
+
+    updateToggleButtonState() {
+        const toggleButton = document.getElementById("theme-toggle");
+        if (toggleButton) {
             toggleButton.setAttribute(
                 "aria-pressed",
                 this.theme === "dark" ? "true" : "false",
@@ -143,7 +136,8 @@ class ThemeSystem {
     }
 
     updateSettingsPageTheme() {
-        // Update theme selection buttons in settings page
+        // This will be called by settings.js to sync the theme buttons
+        // when running on the settings page
         const themeContainer = document.querySelector(
             ".grid.grid-cols-3.gap-3",
         );
@@ -151,34 +145,31 @@ class ThemeSystem {
 
         const buttons = themeContainer.querySelectorAll("button");
         const themes = ["light", "dark", "system"];
-        const currentThemeIndex = themes.indexOf(this.theme);
+        
+        // Find the button for current theme
+        let activeIndex = themes.indexOf(this.theme);
+        if (activeIndex === -1) activeIndex = 2; // Default to system
 
-        if (currentThemeIndex !== -1 && buttons[currentThemeIndex]) {
-            // Remove active state from all buttons
-            buttons.forEach((btn) => {
+        buttons.forEach((btn, idx) => {
+            if (idx === activeIndex) {
+                btn.classList.remove("border-gray-300", "dark:border-gray-600");
+                btn.classList.add("border-primary-500");
+                
+                // Add visual indicator if not present
+                if (!btn.querySelector(".border-primary-500")) {
+                    const indicator = document.createElement("span");
+                    indicator.className =
+                        "pointer-events-none absolute -inset-px rounded-lg border-2 border-primary-500";
+                    indicator.setAttribute("aria-hidden", "true");
+                    btn.appendChild(indicator);
+                }
+            } else {
                 btn.classList.remove("border-primary-500");
                 btn.classList.add("border-gray-300", "dark:border-gray-600");
                 const indicator = btn.querySelector(".border-primary-500");
                 if (indicator) indicator.remove();
-            });
-
-            // Add active state to current theme button
-            const activeButton = buttons[currentThemeIndex];
-            activeButton.classList.remove(
-                "border-gray-300",
-                "dark:border-gray-600",
-            );
-            activeButton.classList.add("border-primary-500");
-
-            // Add visual indicator
-            if (!activeButton.querySelector(".border-primary-500")) {
-                const indicator = document.createElement("span");
-                indicator.className =
-                    "pointer-events-none absolute -inset-px rounded-lg border-2 border-primary-500";
-                indicator.setAttribute("aria-hidden", "true");
-                activeButton.appendChild(indicator);
             }
-        }
+        });
     }
 
     setupBackgroundSystem() {

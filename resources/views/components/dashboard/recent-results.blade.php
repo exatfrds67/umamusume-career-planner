@@ -36,19 +36,32 @@
     ];
 @endphp
 
-<div {{ $attributes->merge(['class' => 'card bg-white dark:bg-gray-800 overflow-hidden rounded-lg shadow']) }}>
-    <div class="px-4 py-5 sm:p-6">
-        <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white mb-4">
+<div {{ $attributes->merge(['class' => 'glass-card rounded-xl overflow-hidden']) }}>
+    <div class="px-6 py-5">
+        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">
             Recent Results
         </h3>
 
         @if (empty($results))
-            <p class="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
-                No recent activity. Start training to see your progress here.
-            </p>
+            <div class="text-center py-8">
+                <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-700 mb-3">
+                    <svg class="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                    </svg>
+                </div>
+                <p class="text-sm font-medium text-gray-900 dark:text-gray-200 mb-1">
+                    No recent activity
+                </p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mb-4 max-w-xs mx-auto">
+                    Complete training sessions or races to see your character's progress log here.
+                </p>
+                <a href="{{ route('training.predictions') }}" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+                    Start Training
+                </a>
+            </div>
         @else
             <div class="flow-root">
-                <ul role="list" class="-mb-8">
+                <ul class="-mb-8">
                     @foreach ($results as $index => $result)
                         @php
                             $type = $result['type'] ?? 'info';
@@ -65,13 +78,13 @@
                                 <div class="relative flex space-x-3">
                                     <div>
                                         <span
-                                            class="h-8 w-8 rounded-full {{ $color }} flex items-center justify-center ring-8 ring-white dark:ring-gray-800">
+                                            class="h-8 w-8 rounded-full {{ $color }} flex items-center justify-center ring-8 ring-white dark:ring-gray-800/20">
                                             <svg class="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
                                                 {!! $icon['icon'] !!}
                                             </svg>
                                         </span>
                                     </div>
-                                    <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
+                                    <div class="glass-card-inner rounded-lg p-3 flex min-w-0 flex-1 justify-between space-x-4">
                                         <div>
                                             <p class="text-sm text-gray-900 dark:text-white">
                                                 {{ $result['description'] }}

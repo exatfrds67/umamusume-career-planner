@@ -94,9 +94,6 @@ function initializeFontSizeSlider() {
  * Initialize theme selection buttons
  */
 function initializeThemeSelection() {
-    const themeButtons = document.querySelectorAll('[class*="theme-"]');
-
-    // Get all buttons in the theme grid
     const themeContainer = document.querySelector(".grid.grid-cols-3.gap-3");
     if (!themeContainer) return;
 
@@ -104,43 +101,66 @@ function initializeThemeSelection() {
 
     buttons.forEach((button, index) => {
         button.addEventListener("click", function () {
-            // Remove active state from all buttons
-            buttons.forEach((btn) => {
-                btn.classList.remove("border-primary-500");
-                btn.classList.add("border-gray-300", "dark:border-gray-600");
-                const indicator = btn.querySelector(".border-primary-500");
-                if (indicator) indicator.remove();
-            });
-
-            // Add active state to clicked button
-            this.classList.remove("border-gray-300", "dark:border-gray-600");
-            this.classList.add("border-primary-500");
-
-            // Add visual indicator
-            if (!this.querySelector(".border-primary-500")) {
-                const indicator = document.createElement("span");
-                indicator.className =
-                    "pointer-events-none absolute -inset-px rounded-lg border-2 border-primary-500";
-                indicator.setAttribute("aria-hidden", "true");
-                this.appendChild(indicator);
-            }
-
             // Determine theme based on button index
             const themes = ["light", "dark", "system"];
             const selectedTheme = themes[index];
 
-            // Apply theme
-            applyTheme(selectedTheme);
+            // Delegate to ThemeSystem if available
+            if (window.themeSystem) {
+                window.themeSystem.applyTheme(selectedTheme);
+                // Sync the button UI
+                updateThemeButtonUI(buttons, index);
+            } else {
+                // Fallback if ThemeSystem isn't loaded
+                applyTheme(selectedTheme);
+                updateThemeButtonUI(buttons, index);
+            }
 
             // Save to localStorage
             saveSettingToStorage("theme", selectedTheme);
             showSaveIndicator();
         });
     });
+
+    // Initial sync with current theme
+    if (window.themeSystem) {
+        setTimeout(() => {
+            const themes = ["light", "dark", "system"];
+            const currentIndex = themes.indexOf(window.themeSystem.theme);
+            if (currentIndex !== -1) {
+                updateThemeButtonUI(buttons, currentIndex);
+            }
+        }, 100);
+    }
 }
 
 /**
- * Apply theme to the document
+ * Update theme button UI (extracted for reusability)
+ */
+function updateThemeButtonUI(buttons, activeIndex) {
+    buttons.forEach((btn, idx) => {
+        if (idx === activeIndex) {
+            btn.classList.remove("border-gray-300", "dark:border-gray-600");
+            btn.classList.add("border-primary-500");
+            
+            if (!btn.querySelector(".border-primary-500")) {
+                const indicator = document.createElement("span");
+                indicator.className =
+                    "pointer-events-none absolute -inset-px rounded-lg border-2 border-primary-500";
+                indicator.setAttribute("aria-hidden", "true");
+                btn.appendChild(indicator);
+            }
+        } else {
+            btn.classList.remove("border-primary-500");
+            btn.classList.add("border-gray-300", "dark:border-gray-600");
+            const indicator = btn.querySelector(".border-primary-500");
+            if (indicator) indicator.remove();
+        }
+    });
+}
+
+/**
+ * Apply theme to the document (fallback if ThemeSystem not available)
  */
 function applyTheme(theme) {
     const html = document.documentElement;
@@ -170,6 +190,9 @@ function applyTheme(theme) {
 
     // Announce theme change to screen readers
     announceThemeChange(theme);
+    
+    // Store preference
+    localStorage.setItem("theme", theme);
 }
 
 /**

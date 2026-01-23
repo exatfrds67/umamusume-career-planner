@@ -1,6 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
+    @php
+        /** @var \App\Models\Character $character */
+    @endphp
     <div class="max-w-7xl mx-auto space-y-6">
         <!-- Header -->
         <div class="flex items-center justify-between">
@@ -59,8 +62,8 @@
             <!-- Row 1: Basic Info (Left) + Stats (Right) -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Basic Information & Status -->
-                <div class="card bg-white dark:bg-gray-800">
-                    <div class="card-header">
+                <div class="glass-card rounded-lg">
+                    <div class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50">
                         <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white">Basic Information &
                             Status</h3>
                     </div>
@@ -128,8 +131,8 @@
                 </div>
 
                 <!-- Current Stats -->
-                <div class="card bg-white dark:bg-gray-800">
-                    <div class="card-header">
+                <div class="glass-card rounded-lg">
+                    <div class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50">
                         <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white">Current Stats</h3>
                         <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Values between 0-1200</p>
                     </div>
@@ -158,8 +161,8 @@
             </div>
 
             <!-- Row 2: Goals (Full Width) -->
-            <div class="card bg-white dark:bg-gray-800">
-                <div class="card-header">
+            <div class="glass-card-alt rounded-lg">
+                <div class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50">
                     <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white">Training Goals</h3>
                 </div>
                 <div class="card-body space-y-6">
@@ -183,7 +186,7 @@
                             placeholder="Training strategy notes...">{{ old('goals.notes', $character->goals['notes'] ?? '') }}</textarea>
                     </div>
                 </div>
-                <div class="card-footer bg-gray-50 dark:bg-gray-800/50 flex items-center justify-between">
+                <div class="card-footer bg-transparent border-t border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between">
                     <button type="button"
                         onclick="if(confirm('Delete character? This cannot be undone.')) document.getElementById('delete-form').submit()"
                         class="text-red-600 hover:text-red-800 text-sm font-medium focus:outline-none">

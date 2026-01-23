@@ -63,6 +63,7 @@
                     <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Screenshot Preview</h2>
                     <div class="flex justify-center">
                         <img src="{{ Storage::url($extraction->image_path) }}" alt="Uploaded screenshot"
+                            loading="lazy" decoding="async"
                             class="max-w-full h-auto rounded-lg border border-gray-300 dark:border-gray-600"
                             style="max-height: 500px;">
                     </div>

@@ -9,7 +9,7 @@
                 <div class="text-center">
                     <a href="{{ route('welcome') }}">
                         <img src="/images/app_logo/uma_musume_race_planner_logo_256.png" alt="{{ config('app.name') }} logo"
-                            class="h-20 w-20 mx-auto mb-4" width="80" height="80">
+                            loading="eager" decoding="async" class="h-20 w-20 mx-auto mb-4" width="80" height="80">
                     </a>
                     <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
                         Create your account

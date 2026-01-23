@@ -30,7 +30,7 @@
         <!-- Race Info Card -->
         <div class="card bg-white dark:bg-gray-800 overflow-hidden">
             <div class="md:flex">
-                <div class="p-8 md:w-1/2 bg-gradient-to-br from-primary-600 to-primary-800 text-white flex flex-col justify-center">
+                <div class="p-8 md:w-1/2 bg-linear-to-br from-primary-600 to-primary-800 text-white flex flex-col justify-center">
                     <div class="uppercase tracking-wide text-sm font-semibold text-primary-200">Course Details</div>
                     <div class="mt-2 text-3xl font-extrabold">{{ $race->distance_meters }}m</div>
                     <div class="mt-1 text-xl text-primary-100 flex items-center gap-2">
@@ -61,9 +61,17 @@
                     <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Character Snapshot</h3>
                     
                     @if($race->character)
+                        @php
+                            $avatarPath = null;
+
+                            if ($race->character) {
+                                $attributes = $race->character->getAttributes();
+                                $avatarPath = $attributes['avatar_path'] ?? null;
+                            }
+                        @endphp
                         <div class="flex items-center gap-4 mb-6">
-                            @if($race->character->avatar_path)
-                                <img src="{{ $race->character->avatar_path }}" alt="{{ $race->character->name }}" class="w-16 h-16 rounded-full object-cover">
+                            @if($avatarPath)
+                                <img src="{{ $avatarPath }}" alt="{{ $race->character->name }}" loading="lazy" decoding="async" class="w-16 h-16 rounded-full object-cover">
                             @else
                                 <div class="w-16 h-16 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-400">
                                     <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -100,7 +108,7 @@
                                     {{ $race->finish_position }}
                                 </span>
                                 <span class="text-gray-500 font-medium text-lg">
-                                    {{ \Illuminate\Support\Str::ordinal($race->finish_position) }} Place
+                                    {{ \Illuminate\Support\Number::ordinal($race->finish_position) }} Place
                                 </span>
                             </div>
                             @if($race->finish_time)

@@ -32,9 +32,9 @@
                                 <span>{{ ucfirst($character->scenario_type) }}</span>
                                 <span>•</span>
                                 <span>{{ $character->career_stage }}</span>
-                                @if ($character->current_career)
+                                @if ($character->relationLoaded('currentCareer') && $character->currentCareer)
                                     <span>•</span>
-                                    <span>Turn {{ $character->current_career->current_turn ?? 0 }}</span>
+                                    <span>Turn {{ $character->currentCareer->current_turn ?? 0 }}</span>
                                 @endif
                             </div>
                         </div>
@@ -49,7 +49,9 @@
             {{-- Main Chat Interface --}}
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden"
                 style="height: calc(100vh - 300px); min-height: 600px;">
-                <x-ai.chat-interface :character-id="$character->id ?? null" :career-id="$character->current_career->id ?? null" />
+                <x-ai.chat-interface :character-id="$character->id ?? null" :career-id="isset($character) && $character->relationLoaded('currentCareer') && $character->currentCareer
+                    ? $character->currentCareer->id
+                    : null" />
             </div>
 
             {{-- Quick Actions --}}

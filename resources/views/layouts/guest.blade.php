@@ -27,6 +27,20 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700" rel="stylesheet" />
 
+    <!-- Synchronous Theme Initialization (prevents flash/mismatch on page load) -->
+    <script>
+        (function() {
+            const theme = localStorage.getItem('theme') || 
+                (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
+
     <!-- Scripts & Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -34,7 +48,7 @@
 <body class="h-full font-sans antialiased text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-gray-900">
     <!-- Fixed Background with Theme-Aware Images -->
     <div id="app-background" class="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat transition-opacity duration-500"
-        role="presentation" data-bg-light-desktop="/images/app_bg/uma_musume_race_planner_bg_light_1536x1028.png"
+        data-bg-light-desktop="/images/app_bg/uma_musume_race_planner_bg_light_1536x1028.png"
         data-bg-light-mobile="/images/app_bg/uma_musume_race_planner_bg_light_1028x1536.png"
         data-bg-dark-desktop="/images/app_bg/uma_musume_race_planner_bg_dark_1536x1028.png"
         data-bg-dark-mobile="/images/app_bg/uma_musume_race_planner_bg_dark_1028x1536.png" aria-hidden="true">

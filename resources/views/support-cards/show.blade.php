@@ -19,7 +19,7 @@
             <div class="md:flex">
                 <!-- Card Image -->
                 <div
-                    class="md:w-1/3 h-64 md:h-auto bg-gradient-to-br from-{{ $supportCard->card_type === 'speed' ? 'blue' : ($supportCard->card_type === 'stamina' ? 'green' : ($supportCard->card_type === 'power' ? 'red' : ($supportCard->card_type === 'guts' ? 'orange' : ($supportCard->card_type === 'wit' ? 'purple' : 'pink')))) }}-400 to-{{ $supportCard->card_type === 'speed' ? 'blue' : ($supportCard->card_type === 'stamina' ? 'green' : ($supportCard->card_type === 'power' ? 'red' : ($supportCard->card_type === 'guts' ? 'orange' : ($supportCard->card_type === 'wit' ? 'purple' : 'pink')))) }}-600 relative">
+                    class="md:w-1/3 h-64 md:h-auto bg-linear-to-br from-{{ $supportCard->card_type ? ($supportCard->card_type === 'speed' ? 'blue' : ($supportCard->card_type === 'stamina' ? 'green' : ($supportCard->card_type === 'power' ? 'red' : ($supportCard->card_type === 'guts' ? 'orange' : ($supportCard->card_type === 'wit' ? 'purple' : 'pink'))))) : 'gray' }}-400 to-{{ $supportCard->card_type ? ($supportCard->card_type === 'speed' ? 'blue' : ($supportCard->card_type === 'stamina' ? 'green' : ($supportCard->card_type === 'power' ? 'red' : ($supportCard->card_type === 'guts' ? 'orange' : ($supportCard->card_type === 'wit' ? 'purple' : 'pink'))))) : 'gray' }}-600 relative">
                     @if ($supportCard->artwork_url)
                         <img src="{{ $supportCard->artwork_url }}" alt="{{ $supportCard->name }}" loading="lazy"
                             decoding="async" class="w-full h-full object-cover">

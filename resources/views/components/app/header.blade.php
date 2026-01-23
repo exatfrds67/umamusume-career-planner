@@ -49,12 +49,13 @@
         <div class="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-200 dark:lg:bg-gray-700" aria-hidden="true"></div>
 
         <!-- Profile dropdown -->
-        <div x-data="{ open: false }" class="relative">
+        <div x-data="{ open: false }" class="relative z-20" @keydown.escape.window="open = false">
             <button type="button" class="-m-1.5 flex items-center p-1.5" @click="open = !open"
                 @click.away="open = false">
                 <span class="sr-only">Open user menu</span>
                 <img class="h-8 w-8 rounded-full bg-gray-50"
-                    src="https://ui-avatars.com/api/?name=User&background=3b82f6&color=fff" alt="">
+                    src="https://ui-avatars.com/api/?name=User&background=3b82f6&color=fff"
+                    loading="lazy" decoding="async" alt="">
                 <span class="hidden lg:flex lg:items-center">
                     <span class="ml-4 text-sm font-semibold leading-6 text-gray-900 dark:text-white"
                         aria-hidden="true">User</span>

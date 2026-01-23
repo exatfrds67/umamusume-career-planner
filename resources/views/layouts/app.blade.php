@@ -27,11 +27,26 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700|jetbrains-mono:400,500" rel="stylesheet" />
 
+    <!-- Synchronous Theme Initialization (prevents flash/mismatch on page load) -->
+    <script>
+        (function() {
+            const theme = localStorage.getItem('theme') || 
+                (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
+
     <!-- Scripts & Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="h-full font-sans antialiased text-gray-900 dark:text-gray-100" x-data="{ sidebarOpen: false }">
+<body class="h-full font-sans antialiased text-gray-900 dark:text-gray-100" x-data="{ sidebarOpen: false }"
+    @keydown.escape.window="sidebarOpen = false">
 
     <!-- Skip to Content (Accessibility) -->
     <a href="#main-content"
@@ -41,7 +56,7 @@
 
     <!-- Fixed Background with Theme-Aware Images -->
     <div id="app-background" class="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat transition-opacity duration-500"
-        role="presentation" data-bg-light-desktop="/images/app_bg/uma_musume_race_planner_bg_light_1536x1028.png"
+        data-bg-light-desktop="/images/app_bg/uma_musume_race_planner_bg_light_1536x1028.png"
         data-bg-light-mobile="/images/app_bg/uma_musume_race_planner_bg_light_1028x1536.png"
         data-bg-dark-desktop="/images/app_bg/uma_musume_race_planner_bg_dark_1536x1028.png"
         data-bg-dark-mobile="/images/app_bg/uma_musume_race_planner_bg_dark_1028x1536.png" aria-hidden="true">
@@ -65,7 +80,7 @@
 
     <!-- Desktop Sidebar (always visible on lg screens) -->
     <div
-        class="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:flex lg:w-72 lg:flex-col lg:border-r lg:border-gray-200 dark:lg:border-gray-700 lg:bg-white dark:lg:bg-gray-800">
+        class="hidden sm:hidden md:hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:flex lg:w-72 lg:flex-col lg:border-r lg:border-gray-200 dark:lg:border-gray-700 lg:bg-white dark:lg:bg-gray-800">
         <x-app.sidebar />
     </div>
 
@@ -90,10 +105,20 @@
             </div>
         </header>
 
+        <!-- Page Header (if provided via slot) -->
+        @isset($header)
+            <header class="bg-white dark:bg-gray-800 shadow">
+                <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                    {{ $header }}
+                </div>
+            </header>
+        @endisset
+
         <!-- Main Content -->
         <main class="py-10" id="main-content">
             <div class="px-4 sm:px-6 lg:px-8">
                 @yield('content')
+                {{ $slot ?? '' }}
             </div>
         </main>
     </div>

@@ -27,7 +27,8 @@
                         <select id="character-selector"
                             class="form-select rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm pr-10 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                             aria-label="Select character"
-                            onchange="window.location.href='{{ route('dashboard') }}?character=' + this.value">
+                            data-url="{{ route('dashboard') }}"
+                            onchange="window.location.href = this.dataset.url + '?character=' + this.value;">
                             @foreach ($characters as $character)
                                 <option value="{{ $character->id }}"
                                     {{ $selectedCharacter && $selectedCharacter->id === $character->id ? 'selected' : '' }}>
@@ -181,20 +182,20 @@
                 <!-- Left Column: Progress & Schedule (2/3 width) -->
                 <div class="lg:col-span-2 space-y-6">
                     <!-- Goals Widget -->
-                    <x-dashboard.goals-widget :shortTermGoal="$goals['shortTerm']['goal']" :shortTermProgress="$goals['shortTerm']['progress']" :longTermGoal="$goals['longTerm']['goal']" :longTermProgress="$goals['longTerm']['progress']" />
-
-                    <!-- Upcoming Races -->
-                    <x-dashboard.upcoming-races :races="$races" />
+                    <x-dashboard.goals-widget :shortTermGoal="$goals['shortTerm']['goal']" :shortTermProgress="$goals['shortTerm']['progress']" :longTermGoal="$goals['longTerm']['goal']" :longTermProgress="$goals['longTerm']['progress']" :characterId="$selectedCharacter?->id" />
 
                     <!-- Training Suggestions -->
                     <x-dashboard.training-suggestions :suggestions="$trainingSuggestions" />
+
+                    <!-- Upcoming Races -->
+                    <x-dashboard.upcoming-races :races="$races" />
 
                     <!-- Recent Results Timeline -->
                     <x-dashboard.recent-results :results="$recentResults" />
                 </div>
 
                 <!-- Right Column: Stats & Advisories (1/3 width) -->
-                <div class="space-y-6">
+                <div class="flex flex-col gap-6 h-full">
                     <!-- Character Stats Card -->
                     <x-dashboard.stats-snapshot :stats="$stats" :character="$selectedCharacter" />
 
@@ -202,7 +203,7 @@
                     <x-dashboard.mood-energy-widget :mood="$moodEnergy['mood']" :energy="$moodEnergy['energy']" :maxEnergy="$moodEnergy['maxEnergy']" />
 
                     <!-- AI Advisor Card -->
-                    <x-dashboard.ai-advisor-card />
+                    <x-dashboard.ai-advisor-card class="flex-1" />
                 </div>
             </div>
 

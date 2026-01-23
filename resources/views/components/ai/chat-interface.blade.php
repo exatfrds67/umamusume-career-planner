@@ -95,8 +95,93 @@
                     </div>
                 </template>
 
-                <template x-for="message in messages" :key="message.id">
-                    <x-ai.message-bubble :message="message" />
+                <template x-for="msg in messages" :key="msg.id">
+                    <div class="flex items-start gap-3"
+                        :class="msg.sender === 'user' ? 'flex-row-reverse' : 'flex-row'" role="article"
+                        :aria-label="`Message from ${msg.sender === 'user' ? 'you' : 'AI assistant'}`">
+
+                        {{-- Avatar --}}
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+                            :class="msg.sender === 'user' ? 'bg-gray-300 dark:bg-gray-600' : 'bg-primary-500'">
+                            <template x-if="msg.sender === 'user'">
+                                <svg class="w-5 h-5 text-gray-700 dark:text-gray-200" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                            </template>
+                            <template x-if="msg.sender === 'ai'">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                            </template>
+                        </div>
+
+                        {{-- Message Content --}}
+                        <div class="flex-1 max-w-3xl">
+                            <div class="rounded-lg p-4 shadow-sm"
+                                :class="msg.sender === 'user' ?
+                                    'bg-primary-600 text-white' :
+                                    'bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-600'">
+
+                                {{-- Message Header --}}
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-semibold text-sm"
+                                            x-text="msg.sender === 'user' ? 'You' : 'AI Assistant'"></span>
+                                        <template x-if="msg.sender === 'ai' && msg.metadata?.model">
+                                            <span
+                                                class="text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300"
+                                                x-text="msg.metadata.model"></span>
+                                        </template>
+                                    </div>
+                                    <time class="text-xs opacity-75" :datetime="msg.timestamp"
+                                        x-text="formatTime(msg.timestamp)"></time>
+                                </div>
+
+                                {{-- Message Text --}}
+                                <div class="prose prose-sm max-w-none"
+                                    :class="msg.sender === 'user' ? 'prose-invert' : 'dark:prose-invert'"
+                                    x-html="formatMessage(msg.content)"></div>
+
+                                {{-- AI Message Metadata --}}
+                                <template x-if="msg.sender === 'ai' && msg.metadata">
+                                    <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+                                        <template x-if="msg.metadata.processing_time">
+                                            <div class="flex items-center gap-3 text-xs opacity-75">
+                                                <span>
+                                                    <svg class="w-3 h-3 inline mr-1" fill="none"
+                                                        stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                    <span x-text="`${msg.metadata.processing_time}s`"></span>
+                                                </span>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+
+                                {{-- Message Actions --}}
+                                <div class="mt-3 flex items-center gap-3 text-xs">
+                                    <button @click="copyMessage(msg.content)"
+                                        class="flex items-center gap-1 opacity-75 hover:opacity-100 transition-opacity"
+                                        :class="msg.sender === 'user' ? 'text-white' : 'text-gray-600 dark:text-gray-400'"
+                                        aria-label="Copy message">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                        </svg>
+                                        <span>Copy</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </template>
 
                 {{-- Typing Indicator --}}
@@ -163,7 +248,7 @@
         </div>
 
         {{-- Sidebar Panels --}}
-        <div class="w-80 border-l border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 overflow-y-auto"
+        <div class="fixed inset-y-0 right-0 w-80 bg-gray-50 dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 shadow-xl transform transition-transform duration-300 md:relative md:shadow-none z-50 md:z-auto"
             x-show="showServerStatus || showWorkflow || showSettings"
             x-transition:enter="transition ease-out duration-200"
             x-transition:enter-start="opacity-0 transform translate-x-4"

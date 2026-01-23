@@ -11,6 +11,9 @@ import "./training-predictions.js";
 // Import settings module
 import "./settings.js";
 
+// Import AI Chat module
+import "./ai-chat.js";
+
 // Import core modules
 import "./core/EventBus.js";
 import "./core/ResponsiveSystem.js";

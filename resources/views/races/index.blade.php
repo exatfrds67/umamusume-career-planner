@@ -103,7 +103,7 @@
                                         <div class="text-right">
                                             @if($race->finish_position)
                                                 <div class="text-lg font-bold {{ $race->finish_position == 1 ? 'text-yellow-600' : 'text-gray-700 dark:text-gray-300' }}">
-                                                    {{ $race->finish_position }}{{ \Illuminate\Support\Str::ordinal($race->finish_position) }}
+                                                    {{ $race->finish_position }}<sup>{{ match($race->finish_position % 10) { 1 => 'st', 2 => 'nd', 3 => 'rd', default => 'th' } }}</sup>
                                                 </div>
                                                 <div class="text-xs text-gray-500">Result</div>
                                             @else

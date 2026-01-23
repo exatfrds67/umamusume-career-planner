@@ -15,7 +15,7 @@
         aria-labelledby="hero-heading">
         {{-- Background Image with responsive sources - covers full viewport --}}
         <div id="hero-background" class="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat transition-opacity duration-500"
-            role="presentation" data-bg-light-desktop="/images/app_bg/uma_musume_race_planner_bg_light_1536x1028.png"
+            data-bg-light-desktop="/images/app_bg/uma_musume_race_planner_bg_light_1536x1028.png"
             data-bg-light-mobile="/images/app_bg/uma_musume_race_planner_bg_light_1028x1536.png"
             data-bg-dark-desktop="/images/app_bg/uma_musume_race_planner_bg_dark_1536x1028.png"
             data-bg-dark-mobile="/images/app_bg/uma_musume_race_planner_bg_dark_1028x1536.png" aria-hidden="true">
@@ -55,7 +55,7 @@
                             {{-- Primary CTA Button --}}
                             @auth
                                 <a href="{{ route('dashboard') }}"
-                                    class="inline-flex items-center justify-center min-h-[44px] min-w-[44px] px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg font-semibold text-white bg-primary-600 hover:bg-primary-700 active:bg-primary-800 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transform hover:scale-105 active:scale-100 animate-fade-in-delay-3"
+                                    class="inline-flex items-center justify-center min-h-11 min-w-11 px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg font-semibold text-white bg-primary-600 hover:bg-primary-700 active:bg-primary-800 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transform hover:scale-105 active:scale-100 animate-fade-in-delay-3"
                                     role="button" aria-label="Go to your dashboard">
                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                         aria-hidden="true">
@@ -67,7 +67,7 @@
                             @else
                                 <div class="flex flex-col sm:flex-row gap-3 justify-center">
                                     <a href="{{ route('login') }}"
-                                        class="inline-flex items-center justify-center min-h-[44px] min-w-[44px] px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg font-semibold text-white bg-primary-600 hover:bg-primary-700 active:bg-primary-800 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transform hover:scale-105 active:scale-100 animate-fade-in-delay-3"
+                                        class="inline-flex items-center justify-center min-h-11 min-w-11 px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg font-semibold text-white bg-primary-600 hover:bg-primary-700 active:bg-primary-800 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transform hover:scale-105 active:scale-100 animate-fade-in-delay-3"
                                         role="button" aria-label="Sign in to your account">
                                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                             aria-hidden="true">
@@ -77,7 +77,7 @@
                                         Sign In
                                     </a>
                                     <a href="{{ route('register') }}"
-                                        class="inline-flex items-center justify-center min-h-[44px] min-w-[44px] px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg font-semibold text-primary-700 bg-white hover:bg-gray-50 active:bg-gray-100 dark:bg-gray-800 dark:text-primary-300 dark:hover:bg-gray-700 dark:active:bg-gray-600 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transform hover:scale-105 active:scale-100 animate-fade-in-delay-3"
+                                        class="inline-flex items-center justify-center min-h-11 min-w-11 px-8 sm:px-10 py-3 sm:py-4 text-base sm:text-lg font-semibold text-primary-700 bg-white hover:bg-gray-50 active:bg-gray-100 dark:bg-gray-800 dark:text-primary-300 dark:hover:bg-gray-700 dark:active:bg-gray-600 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transform hover:scale-105 active:scale-100 animate-fade-in-delay-3"
                                         role="button" aria-label="Create a new account">
                                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                             aria-hidden="true">
@@ -194,7 +194,7 @@
                         <div
                             class="flex flex-col sm:flex-row items-center justify-center gap-4 text-center animate-fade-in-delay-4">
                             <a href="{{ route('about') }}"
-                                class="inline-flex items-center min-h-[44px] text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 rounded px-2"
+                                class="inline-flex items-center min-h-11 text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 rounded px-2"
                                 aria-label="Learn more about Umamusume Career Planner">
                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                     aria-hidden="true">
@@ -205,7 +205,7 @@
                             </a>
                             <a href="https://github.com/exatfrds67/umamusume-career-planner" target="_blank"
                                 rel="noopener noreferrer"
-                                class="inline-flex items-center min-h-[44px] text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 rounded px-2"
+                                class="inline-flex items-center min-h-11 text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 rounded px-2"
                                 aria-label="View on GitHub (opens in new tab)">
                                 <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     <path fill-rule="evenodd"
@@ -362,7 +362,7 @@
     {{-- Theme toggle button (Requirements 13.1, 13.2) --}}
     <div class="fixed bottom-4 right-4 z-40">
         <button type="button" id="theme-toggle"
-            class="inline-flex items-center justify-center min-h-[44px] min-w-[44px] p-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+            class="inline-flex items-center justify-center min-h-11 min-w-11 p-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
             aria-label="Toggle theme" aria-pressed="false">
             <svg class="w-6 h-6 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                 aria-hidden="true">

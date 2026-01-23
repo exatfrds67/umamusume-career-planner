@@ -257,7 +257,36 @@
             <div x-show="activeTab === 'servers'" class="space-y-4">
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <template x-for="(server, name) in servers" :key="name">
-                        <x-mcp.server-status-card :server="server" />
+                        <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+                            <div class="p-6">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white"
+                                        x-text="server.server_name || name"></h3>
+                                    <span class="rounded-full px-3 py-1 text-xs font-medium"
+                                        :class="{
+                                            'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200': server
+                                                .status === 'healthy',
+                                            'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200': server
+                                                .status === 'degraded',
+                                            'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200': server
+                                                .status === 'unhealthy',
+                                            'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200': server
+                                                .status === 'disabled'
+                                        }"
+                                        x-text="server.status"></span>
+                                </div>
+                                <div class="mt-4 space-y-2">
+                                    <div class="flex justify-between text-sm">
+                                        <span class="text-gray-600 dark:text-gray-400">Connected:</span>
+                                        <span class="font-medium" x-text="server.is_connected ? 'Yes' : 'No'"></span>
+                                    </div>
+                                    <div class="flex justify-between text-sm" x-show="server.uptime_percentage">
+                                        <span class="text-gray-600 dark:text-gray-400">Uptime:</span>
+                                        <span class="font-medium" x-text="server.uptime_percentage + '%'"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </template>
                 </div>
             </div>
@@ -266,7 +295,36 @@
             <div x-show="activeTab === 'agents'" class="space-y-4">
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <template x-for="(agent, id) in agents" :key="id">
-                        <x-mcp.agent-activity-card :agent="agent" />
+                        <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+                            <div class="p-6">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white"
+                                        x-text="agent.name"></h3>
+                                    <span class="rounded-full px-3 py-1 text-xs font-medium"
+                                        :class="{
+                                            'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200': agent
+                                                .status === 'active',
+                                            'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200': agent
+                                                .status === 'completed',
+                                            'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200': agent
+                                                .status === 'waiting',
+                                            'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200': agent
+                                                .status === 'failed'
+                                        }"
+                                        x-text="agent.status"></span>
+                                </div>
+                                <div class="mt-4 space-y-2">
+                                    <div class="flex justify-between text-sm" x-show="agent.type">
+                                        <span class="text-gray-600 dark:text-gray-400">Type:</span>
+                                        <span class="font-medium capitalize" x-text="agent.type"></span>
+                                    </div>
+                                    <div class="flex justify-between text-sm" x-show="agent.progress !== undefined">
+                                        <span class="text-gray-600 dark:text-gray-400">Progress:</span>
+                                        <span class="font-medium" x-text="agent.progress + '%'"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </template>
                 </div>
                 <div x-show="Object.keys(agents).length === 0"
@@ -285,17 +343,84 @@
 
             <!-- Cost Transparency Tab -->
             <div x-show="activeTab === 'costs'">
-                <x-mcp.cost-transparency-panel :costs="costs" />
+                <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+                    <div class="p-6">
+                        <h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Cost Transparency</h3>
+                        <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+                            <div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Daily Cost</p>
+                                <p class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white"
+                                    x-text="'$' + (costs.daily_cost || 0).toFixed(4)"></p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Weekly Cost</p>
+                                <p class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white"
+                                    x-text="'$' + (costs.weekly_cost || 0).toFixed(4)"></p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Monthly Cost</p>
+                                <p class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white"
+                                    x-text="'$' + (costs.monthly_cost || 0).toFixed(2)"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Performance Tab -->
             <div x-show="activeTab === 'performance'">
-                <x-mcp.performance-metrics-dashboard :performance="performance" />
+                <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+                    <div class="p-6">
+                        <h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Performance Metrics</h3>
+                        <div class="space-y-4">
+                            <template x-for="(provider, name) in performance.providers" :key="name">
+                                <div class="rounded-lg border border-gray-200 p-4 dark:border-gray-700">
+                                    <h4 class="font-medium text-gray-900 dark:text-white"
+                                        x-text="provider.name || name"></h4>
+                                    <div class="mt-2 grid grid-cols-2 gap-4 text-sm">
+                                        <div>
+                                            <span class="text-gray-600 dark:text-gray-400">Avg Response:</span>
+                                            <span class="ml-2 font-medium"
+                                                x-text="(provider.avg_response_time || 0).toFixed(2) + 's'"></span>
+                                        </div>
+                                        <div>
+                                            <span class="text-gray-600 dark:text-gray-400">Success Rate:</span>
+                                            <span class="ml-2 font-medium"
+                                                x-text="(provider.success_rate || 0).toFixed(1) + '%'"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Settings Tab -->
             <div x-show="activeTab === 'settings'">
-                <x-mcp.user-controls-panel :settings="settings" />
+                <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+                    <div class="p-6">
+                        <h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">MCP Settings & Controls
+                        </h3>
+                        <div class="space-y-4">
+                            <div>
+                                <h4 class="font-medium text-gray-900 dark:text-white">Budget Settings</h4>
+                                <div class="mt-2 space-y-2 text-sm">
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600 dark:text-gray-400">Daily Budget:</span>
+                                        <span class="font-medium"
+                                            x-text="'$' + (settings.budget?.daily || 0).toFixed(2)"></span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600 dark:text-gray-400">Monthly Budget:</span>
+                                        <span class="font-medium"
+                                            x-text="'$' + (settings.budget?.monthly || 0).toFixed(2)"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

@@ -33,6 +33,7 @@
                 <div class="w-20 h-20 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center">
                     @if ($character?->avatar_url)
                         <img src="{{ $character->avatar_url }}" alt="{{ $character->name }}"
+                            loading="lazy" decoding="async"
                             class="w-20 h-20 rounded-full object-cover">
                     @else
                         <span class="text-3xl font-bold text-primary-600 dark:text-primary-400">

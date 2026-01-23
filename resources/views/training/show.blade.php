@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Training Predictions - ' . $character->name)
+@section('title', 'Training Predictions - ' . ($character?->name ?? 'Character'))
 
 @section('content')
     <div class="container mx-auto px-4 py-8">
@@ -18,7 +18,7 @@
         <!-- Character Header -->
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                {{ $character->name }}
+                {{ $character?->name ?? 'Unknown Character' }}
             </h1>
 
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -30,7 +30,7 @@
                             <div class="flex justify-between items-center">
                                 <span class="text-sm text-gray-600 dark:text-gray-400 capitalize">{{ $stat }}</span>
                                 <span class="text-sm font-bold text-gray-900 dark:text-white">
-                                    {{ $character->current_stats[$stat] ?? 0 }}
+                                    {{ $character?->current_stats[$stat] ?? 0 }}
                                 </span>
                             </div>
                         @endforeach
@@ -46,16 +46,16 @@
                             <div class="mt-1">
                                 <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                                     <div class="bg-green-500 h-2 rounded-full"
-                                        style="width: {{ $character->energy_level }}%"></div>
+                                        style="width: {{ $character?->energy_level ?? 0 }}%"></div>
                                 </div>
                                 <span
-                                    class="text-xs font-medium text-gray-900 dark:text-white">{{ $character->energy_level }}%</span>
+                                    class="text-xs font-medium text-gray-900 dark:text-white">{{ $character?->energy_level ?? 0 }}%</span>
                             </div>
                         </div>
                         <div>
                             <span class="text-xs text-gray-600 dark:text-gray-400">Mood</span>
                             <div class="text-sm font-semibold text-gray-900 dark:text-white capitalize">
-                                {{ $character->mood_status }}
+                                {{ $character?->mood_status ?? 'normal' }}
                             </div>
                         </div>
                     </div>
@@ -65,7 +65,7 @@
                 <div>
                     <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Scenario</h3>
                     <div class="text-sm text-gray-900 dark:text-white capitalize">
-                        {{ str_replace('_', ' ', $character->scenario_type) }}
+                        {{ str_replace('_', ' ', $character?->scenario_type ?? 'ura finale') }}
                     </div>
                 </div>
 
@@ -73,15 +73,15 @@
                 <div>
                     <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Support Cards</h3>
                     <div class="text-sm text-gray-900 dark:text-white">
-                        {{ $character->supportCards->count() }} / 6 equipped
+                        {{ $character?->supportCards?->count() ?? 0 }} / 6 equipped
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Training Predictions -->
-        <div id="training-predictions-app" data-character-id="{{ $character->id }}"
-            data-scenario-type="{{ $character->scenario_type }}"
+        <div id="training-predictions-app" data-character-id="{{ $character?->id ?? '' }}"
+            data-scenario-type="{{ $character?->scenario_type ?? 'ura_finale' }}"
             data-api-url="{{ route('api.training-predictions.batch') }}">
             <div class="text-center py-12">
                 <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>

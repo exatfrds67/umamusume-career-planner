@@ -597,6 +597,32 @@ function renderMetrics(predictions) {
 }
 
 /**
+ * Update performance metrics display
+ */
+function updatePerformanceMetrics(predictions) {
+    // Calculate metrics
+    const totalTime = predictions.reduce(
+        (sum, p) => sum + (p.processing_time_ms || 0),
+        0,
+    );
+    const avgTime = predictions.length > 0 ? totalTime / predictions.length : 0;
+    const cachedCount = predictions.filter((p) => p.cached).length;
+
+    // Update global object
+    performanceMetrics = {
+        apiCalls: 1, // Count this batch as 1 call
+        cacheHits: cachedCount,
+        totalProcessingTime: totalTime,
+        averageProcessingTime: avgTime,
+    };
+
+    // Note: The renderMetrics function uses the predictions array directly,
+    // so this function might just be for internal state or future sidebar updates.
+    // We'll keep it simple to satisfy the reference.
+    console.debug("Performance Metrics Updated:", performanceMetrics);
+}
+
+/**
  * Render error message
  */
 function renderError(container, message) {
@@ -615,6 +641,17 @@ function renderError(container, message) {
             </p>
         </div>
     `;
+}
+
+/**
+ * Initialize event listeners
+ */
+function initializeEventListeners(characterId, apiUrl) {
+    // Add logic for filtering, sorting, or re-fetching if needed
+    console.log(
+        "Training event listeners initialized for character:",
+        characterId,
+    );
 }
 
 // Auto-initialize if app element exists

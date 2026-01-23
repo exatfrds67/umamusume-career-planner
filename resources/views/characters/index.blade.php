@@ -144,12 +144,12 @@
             <div x-show="viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 @foreach ($characters as $character)
                     <a href="{{ route('characters.show', $character) }}"
-                        class="card bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-all border border-gray-200 dark:border-gray-700 overflow-hidden group">
+                        class="glass-card-alt rounded-lg shadow-sm hover:shadow-md transition-all overflow-hidden group">
                         <div class="p-5">
                             <div class="flex items-start justify-between mb-4">
                                 <div class="flex items-center gap-3">
                                     <div
-                                        class="h-12 w-12 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white text-lg font-bold shadow-sm ring-2 ring-white dark:ring-gray-800">
+                                        class="h-12 w-12 rounded-full bg-linear-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white text-lg font-bold shadow-sm ring-2 ring-white dark:ring-gray-800">
                                         {{ strtoupper(substr($character->name, 0, 2)) }}
                                     </div>
                                     <div>
@@ -219,7 +219,7 @@
                                 <!-- Avatar -->
                                 <div class="shrink-0">
                                     <div
-                                        class="h-16 w-16 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white text-xl font-bold shadow-sm ring-2 ring-white dark:ring-gray-800">
+                                        class="h-16 w-16 rounded-full bg-linear-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white text-xl font-bold shadow-sm ring-2 ring-white dark:ring-gray-800">
                                         {{ strtoupper(substr($character->name, 0, 2)) }}
                                     </div>
                                 </div>

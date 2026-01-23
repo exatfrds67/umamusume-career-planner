@@ -147,8 +147,11 @@
                 </div>
             </div>
 
-            <!-- AI Not Implemented Empty State -->
-            <div class="glass-card rounded-xl p-12 text-center animate-fade-in-delay-3">
+            <!-- Training Predictions App Container -->
+            <div id="training-predictions-app" data-character-id="{{ $selectedCharacter->id }}"
+                data-scenario-type="{{ $selectedCharacter->scenario_type }}"
+                data-api-url="{{ route('api.training-predictions.batch') }}"
+                class="glass-card rounded-xl p-12 text-center animate-fade-in-delay-3">
                 <div class="text-gray-400 dark:text-gray-500 mb-4 transition-colors duration-300">
                     <svg class="mx-auto h-20 w-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                         aria-hidden="true">

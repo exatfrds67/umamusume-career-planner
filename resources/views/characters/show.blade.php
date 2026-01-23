@@ -1,6 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
+    @php
+        /** @var \App\Models\Character $character */
+    @endphp
     <div class="max-w-7xl mx-auto space-y-6">
         <!-- Header / Back Navigation -->
         <div class="flex items-center justify-between">
@@ -45,7 +48,7 @@
         </div>
 
         <!-- Character Overview Card -->
-        <div class="card overflow-visible">
+        <div class="glass-card overflow-visible rounded-xl">
             <div class="p-6 md:p-8 relative overflow-hidden">
                 <!-- Background Decoration -->
                 <div
@@ -85,37 +88,44 @@
                     </div>
 
                     <!-- Details -->
-                    <div class="flex-1 space-y-4">
-                        <div>
-                            <div class="flex items-center gap-3 mb-1">
-                                <h1 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
-                                    {{ $character->name }}</h1>
-                                <x-ui.grade-badge :grade="$character->getStatGrade($character->current_stats['speed'] ?? 0)" size="sm" />
+                    <div class="flex-1 space-y-4 w-full">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="flex items-center gap-3 mb-1">
+                                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
+                                        {{ $character->name }}</h1>
+                                    <x-ui.grade-badge :grade="$character->getStatGrade($character->current_stats['speed'] ?? 0)" size="sm" />
+                                </div>
+                                <div
+                                    class="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-gray-600 dark:text-gray-400 font-medium">
+                                    <span class="flex items-center">
+                                        <svg class="w-4 h-4 mr-1.5 text-primary-500" fill="none" viewBox="0 0 24 24"
+                                            stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                        </svg>
+                                        {{ $character->scenario_type === 'ura_finale' ? 'URA Finale' : 'Unity Cup' }}
+                                    </span>
+                                    <span class="flex items-center">
+                                        <svg class="w-4 h-4 mr-1.5 text-secondary-500" fill="none" viewBox="0 0 24 24"
+                                            stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Turn {{ $character->current_turn }} ({{ ucfirst($character->career_stage) }})
+                                    </span>
+                                </div>
                             </div>
-                            <div
-                                class="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-gray-600 dark:text-gray-400 font-medium">
-                                <span class="flex items-center">
-                                    <svg class="w-4 h-4 mr-1.5 text-primary-500" fill="none" viewBox="0 0 24 24"
-                                        stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                                    </svg>
-                                    {{ $character->scenario_type === 'ura_finale' ? 'URA Finale' : 'Unity Cup' }}
-                                </span>
-                                <span class="flex items-center">
-                                    <svg class="w-4 h-4 mr-1.5 text-secondary-500" fill="none" viewBox="0 0 24 24"
-                                        stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    Turn {{ $character->current_turn }} ({{ ucfirst($character->career_stage) }})
-                                </span>
+
+                            <!-- AI Advisor (Desktop Position) -->
+                            <div class="hidden lg:block w-80">
+                                <x-dashboard.ai-advisor-card class="shadow-sm border-0" :lastTip="$aiTip" />
                             </div>
                         </div>
 
                         <!-- Quick Progress Bars -->
                         <div
-                            class="max-w-2xl bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 border border-gray-100 dark:border-gray-700/50">
+                            class="max-w-2xl bg-white/50 dark:bg-gray-800/50 rounded-xl p-4 border border-gray-100 dark:border-gray-700/50 backdrop-blur-sm">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <div class="space-y-2">
                                     <div class="flex justify-between text-xs font-semibold uppercase tracking-wider">
@@ -137,6 +147,11 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- AI Advisor (Mobile Position) -->
+                        <div class="lg:hidden mt-4">
+                            <x-dashboard.ai-advisor-card :lastTip="$aiTip" />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -146,8 +161,9 @@
             <!-- Left Column: Stats -->
             <div class="lg:col-span-2 space-y-6">
                 <!-- Detailed Stats Card -->
-                <div class="card">
-                    <div class="card-header flex items-center justify-between">
+                <div class="glass-card-alt rounded-lg">
+                    <div
+                        class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between">
                         <h3 class="text-lg font-bold text-gray-900 dark:text-white">Current Statistics</h3>
                         <span
                             class="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">Updated
@@ -183,12 +199,12 @@
                                         <!-- Target Marker -->
                                         @if ($target > 0)
                                             <div class="absolute top-0 bottom-0 w-0.5 bg-gray-400 dark:bg-gray-500 z-10"
-                                                style="left: {{ $targetPercentage }}%;"></div>
+                                                @style(['left' => $targetPercentage . '%'])></div>
                                         @endif
 
                                         <!-- Fill -->
                                         <div class="absolute top-0 left-0 bottom-0 rounded-full transition-all duration-500 ease-out stat-bar-{{ $stat }}"
-                                            style="width: {{ $percentage }}%"></div>
+                                            @style(['width' => $percentage . '%'])></div>
                                     </div>
                                 </div>
                             @endforeach
@@ -197,8 +213,9 @@
                 </div>
 
                 <!-- Race Schedule -->
-                <div class="card">
-                    <div class="card-header flex items-center justify-between">
+                <div class="glass-card-alt rounded-lg">
+                    <div
+                        class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between">
                         <h3 class="text-lg font-bold text-gray-900 dark:text-white">Race Schedule</h3>
                         <span class="text-xs text-gray-500 dark:text-gray-400">Upcoming Races</span>
                     </div>
@@ -277,8 +294,18 @@
                     @endif
                 </div>
 
-                {{-- Recent Careers / History - Feature not yet implemented --}}
-                {{-- TODO: Implement careers tracking system --}}
+                {{-- 
+                    Recent Careers / History Section
+                    
+                    This section is intentionally commented out as the careers tracking system
+                    is planned for a future release. The Career model and relationships exist,
+                    but the full career history UI requires additional work:
+                    - Career completion workflow
+                    - Final grade calculation
+                    - Historical statistics aggregation
+                    
+                    See: docs/future-implements/comprehensive_future_features.md
+                --}}
                 {{--
                 <div class="card">
                     <div class="card-header">
@@ -312,8 +339,8 @@
             <!-- Right Column: Aptitudes & Skills -->
             <div class="space-y-6">
                 <!-- Aptitudes -->
-                <div class="card">
-                    <div class="card-header">
+                <div class="glass-card-alt rounded-lg">
+                    <div class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50">
                         <h3 class="text-lg font-bold text-gray-900 dark:text-white">Aptitudes</h3>
                     </div>
                     <div class="card-body space-y-6">
@@ -357,8 +384,8 @@
                 </div>
 
                 <!-- Skills -->
-                <div class="card">
-                    <div class="card-header">
+                <div class="glass-card-alt rounded-lg">
+                    <div class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50">
                         <h3 class="text-lg font-bold text-gray-900 dark:text-white">Skills</h3>
                     </div>
                     <div class="p-2">
@@ -388,8 +415,8 @@
                 </div>
 
                 <!-- Support Deck -->
-                <div class="card">
-                    <div class="card-header">
+                <div class="glass-card-alt rounded-lg">
+                    <div class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50">
                         <h3 class="text-lg font-bold text-gray-900 dark:text-white">Support Deck</h3>
                     </div>
                     <div class="card-body">
@@ -405,7 +432,7 @@
                                     <div
                                         class="flex items-center gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700">
                                         <div
-                                            class="shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-sm">
+                                            class="shrink-0 w-10 h-10 rounded-full bg-linear-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-sm">
                                             {{ strtoupper(substr($card->card_type ?? 'S', 0, 1)) }}
                                         </div>
                                         <div class="flex-1 min-w-0">
@@ -415,7 +442,7 @@
                                                 <div
                                                     class="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                                                     <div class="h-full bg-primary-500 rounded-full transition-all"
-                                                        style="width: {{ $bondPercentage }}%"></div>
+                                                        @style(['width' => $bondPercentage . '%'])></div>
                                                 </div>
                                                 <span
                                                     class="text-xs text-gray-500 dark:text-gray-400 tabular-nums">{{ $bondLevel }}</span>
@@ -438,8 +465,8 @@
                 </div>
 
                 <!-- Inherited Factors -->
-                <div class="card">
-                    <div class="card-header">
+                <div class="glass-card-alt rounded-lg">
+                    <div class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50">
                         <h3 class="text-lg font-bold text-gray-900 dark:text-white">Inherited Factors</h3>
                     </div>
                     <div class="card-body">
