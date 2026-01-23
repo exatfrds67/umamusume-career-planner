@@ -1,261 +1,231 @@
-# Skills Required for Uma Musume Career Planner
+# Skills Required for Uma Musume Career Planner (v2.0.0)
 
-This document outlines the technical skills and knowledge areas required to effectively contribute to and maintain the Uma Musume Career Planner application.
+**Document Version**: 2.0.0  
+**Date**: 2026-01-23  
+**Project**: UmamusumeCareerPlanner  
+**Audience**: Contributors, Maintainers, and AI Coding Assistants  
+**Status**: Current (Aligned with v2.0.0 scope and architecture)
 
-## Core Technical Skills
+---
 
-### Backend Development
+## 1. Purpose
 
-#### PHP & Laravel Framework
+This document defines the technical and domain skills required to effectively contribute to and maintain the **Umamusume Career Planner** v2.0.0.
 
-- **PHP 8.2+**: Modern PHP features including attributes, enums, typed properties, and union types
-- **Laravel 12**: Latest Laravel framework features and conventions
-  - Eloquent ORM and advanced query building
-  - Service container and dependency injection
-  - Middleware and request lifecycle
-  - Route model binding and resource controllers
-  - Database migrations and schema design
-  - Queue management with Laravel Horizon
-  - Real-time debugging with Laravel Telescope
-  - API development with Laravel Sanctum
+It reflects the current architecture and documentation set, including:
 
-#### Database & Data Management
+- PRDs (PRD-001..007), SPECS (SPEC-001..007)
+- Sequence diagrams (SEQ-001..015)
+- Tech-flow documents (TECH-FLOW-001..007)
+- User flows and wireframes
+- Core system docs (SDP/BRS/SRS/SDS/DMP/DMS/SIP/SIS/DBD/SCD/SUM)
 
-- **MySQL/PostgreSQL**: Relational database design and optimization
-- **Database Migrations**: Schema versioning and rollback strategies
-- **Eloquent Relationships**: Complex model relationships (hasMany, belongsTo, morphMany, etc.)
-- **Query Optimization**: Indexes, foreign keys, and performance tuning
-- **Data Modeling**: Understanding of Uma Musume game mechanics and data structures
+---
 
-### Frontend Development
+## 2. Product & Architecture Context (v2.0.0)
 
-#### JavaScript & Modern Web
+### 2.1 Application Goal (Functional Scope)
 
-- **Vanilla JavaScript ES6+**: Modern JavaScript features and syntax
-- **Vite**: Build tool configuration and optimization
-- **Axios**: HTTP client for API requests
-- **Tailwind CSS v4**: Utility-first CSS framework
+The application supports end-to-end planning and tracking for Uma Musume career runs, including:
 
-#### UI/UX Development
+- Character/run lifecycle (creation, state, goals, snapshots)
+- Training prediction and resolution
+- Race registration, simulation, and outcome recording
+- Skill acquisition, hint tracking, and evolution
+- Support card inventory, deck building, and upgrades
+- AI advisory (local-first with cloud fallback)
+- External integrations (API sync, OCR data intake, real-time updates where applicable)
 
-- **Responsive Design**: Mobile-first approach using Tailwind CSS
-- **Component Architecture**: Modular and reusable UI components
-- **Form Handling**: Validation and user input management
-- **Performance Optimization**: Asset optimization and lazy loading
+### 2.2 Core Architectural Patterns
 
-### Testing & Quality Assurance
+Contributors should be comfortable with:
 
-#### Testing Frameworks
+- Layered architecture: **UI → Controllers → Services → Repositories → Database**
+- Event-driven patterns: domain events and listeners
+- Caching strategies: short/medium/long TTL tiers
+- Resilience patterns: circuit breaker + fallback for external APIs
+- Real-time updates: WebSocket broadcasting (per docs, e.g., SD-007 / SPEC-007)
+- Testing as a first-class deliverable
 
-- **Pest v3**: Modern PHP testing framework
-- **PHPUnit v11**: Traditional PHP unit testing
-- **Feature Testing**: End-to-end application testing
-- **Unit Testing**: Isolated component testing
+> Note: Some “tracker” variants also reference dual-storage (local vs account). Contributors should be able to work with local-first storage and synchronization patterns where present in the codebase.
 
-#### Code Quality Tools
+---
 
-- **Laravel Pint**: PHP code style fixer and formatter
-- **Static Analysis**: Code quality and bug detection
-- **Test-Driven Development**: Writing tests before implementation
+## 3. Required Skills (Engineering)
 
-### DevOps & Infrastructure
+### 3.1 Backend Engineering (PHP + Laravel 12)
 
-#### Development Environment
+**Required**
 
-- **Composer**: PHP dependency management
-- **NPM**: JavaScript package management
-- **Laravel Sail**: Docker-based development environment
-- **Git**: Version control and workflow
+- **PHP 8.2+**: typed properties, enums, attributes, union types, strict typing
+- **Laravel 12** fundamentals:
+  - Routing (web + API), middleware, validation (Form Requests)
+  - Eloquent ORM (relationships, eager loading, query optimization)
+  - Database migrations and seeding
+  - Events/listeners, queues/jobs (where used), scheduled tasks
+  - Service container & dependency injection
+  - Policy/authorization patterns (user-owned resources)
 
-#### Deployment & Monitoring
+**Highly Recommended**
 
-- **Queue Workers**: Background job processing with Laravel Horizon
-- **Application Monitoring**: Laravel Telescope for debugging
-- **Log Management**: Laravel Pail for real-time log monitoring
-- **Environment Configuration**: Managing .env files and configurations
+- API design: consistent REST contracts, status codes, and error shapes
+- Performance tuning: N+1 avoidance, indexes, caching, pagination
+- Observability: structured logs, traces, metrics hooks
 
-## Domain-Specific Knowledge
+### 3.2 Domain Modeling & Business Logic Implementation
 
-### Uma Musume Game Mechanics
+Contributors must understand how to translate specs/flows into robust implementations:
 
-#### Character Management
+- Character state modeling: stats, mood, energy, conditions, goals, snapshots
+- Training computation engines and ranking logic (SPEC-002, TECH-FLOW-002)
+- Race readiness scoring and simulation workflow (SPEC-003, SEQ-004)
+- Skill rules:
+  - SP validation
+  - hint-based discount (20% per hint, max 40%)
+  - evolution paths (Normal → Rare)
+- Support card systems: deck rules, bond/limit break effects, bonuses
 
-- **Character Templates**: Base character data and templates
-- **Character Stats**: Speed, Stamina, Power, Guts, Wit (0-1200 range)
-- **Stat Priorities**: Priority ratings (★ to ★★★★★)
-- **Stat Breakpoints**: Understanding breakpoints at 901 and 1600
-- **Character State**: Energy levels, mood status, and conditions
+### 3.3 Data Layer & Persistence (MySQL + Redis)
 
-#### Skills System
+**Required**
 
-- **Skill Types**: Speed skills, passive skills, recovery skills, debuff skills, unique skills
-- **Skill Rarity**: Normal (120-180 SP), Rare (180-240 SP), Unique (variable SP)
-- **Skill Evolution**: Normal to Rare skill evolution mechanics
-- **Skill Acquisition**: Support cards, events, and inheritance sources
-- **Skill Synergies**: Understanding skill combinations and meta strategies
-- **Meta Tier Rankings**: S+, S, A, B, C tier skill classifications
+- MySQL schema design: normalization, constraints, and migrations
+- Indexing strategy and query profiling
+- Transactionality (atomic operations for inventory/awards/migrations)
+- Redis usage patterns:
+  - caching
+  - rate limiting (if enabled)
+  - queues (if enabled)
 
-#### Career Management
+### 3.4 Frontend (Laravel UI stack)
 
-- **Scenario Types**: URA Finale and Unity Cup scenarios
-- **Career Phases**: Junior, Classic, and Senior stages
-- **Turn Management**: 72-78 turn system (varies by scenario)
-- **Training Sessions**: Training type selection and optimization
-- **Race Schedule**: Race planning and calendar management
-- **Performance Metrics**: Win rates, fan counts, and race results
+Contributors should be comfortable with the UI approach used in v2.0.0 documentation:
 
-#### Support Cards & Events
+- Blade templating and component design
+- TailwindCSS v4 (responsive and accessible layouts)
+- Lightweight interactivity (Alpine.js or equivalent)
+- If the codebase includes Livewire: stateful components, hydration/dehydration, validation UX
 
-- **Support Card Types**: Speed, Stamina, Power, Guts, Wit, Friend cards
-- **Event System**: Triggered events and outcomes
-- **Skill Hints**: Acquiring skill hints from support cards and events
+---
 
-### Strategic Planning
+## 4. Required Skills (Integrations)
 
-#### Career Optimization
+### 4.1 AI Advisory & Agent Systems
 
-- **Goal Setting**: Target stats and race objectives
-- **Resource Management**: SP (Skill Points) budgeting and allocation
-- **Turn Planning**: Optimal training and race schedules
-- **Risk Assessment**: Managing conditions and energy levels
-- **Meta Strategy**: Understanding current meta and tier lists
+Contributors working on AI features should understand:
 
-#### Data Analysis
+- **Local-first AI** integration via **Ollama**
+- Cloud fallback via **AWS Bedrock (Claude models)** as documented in SPEC-006
+- Prompt/context building from current run state (SEQ-006)
+- Latency and timeout handling; graceful degradation modes
+- Cost and usage tracking strategies (token-based accounting)
 
-- **Performance Tracking**: Analyzing career outcomes and patterns
-- **Stat Optimization**: Reaching optimal stat distributions
-- **Skill Portfolio**: Building effective skill sets
-- **Comparative Analysis**: Evaluating different strategies and builds
+### 4.2 External Data Integration & Resilience
 
-## Advanced Technical Skills
+- HTTP client usage in Laravel (timeouts, retries)
+- Circuit breaker concepts (open/half-open/closed state)
+- Data normalization/mapping from third-party schemas (SEQ-007)
+- Caching external data with TTL
+- Rate limiting and backoff
 
-### API Integration
+### 4.3 OCR / Image Pipelines
 
-#### MCP (Model Context Protocol)
+- Image preprocessing basics (cropping, thresholding, normalization)
+- OCR engines (e.g., Tesseract) integration considerations
+- Post-OCR parsing, validation, and manual correction workflows
+- Handling low-confidence extraction results safely
 
-- **MCP Client Service**: Understanding MCP server configuration
-- **Server Capabilities**: Working with MCP server features
-- **Health Checks**: Monitoring MCP server status
-- **Debug Logging**: Troubleshooting MCP operations
+### 4.4 Real-time / WebSocket Messaging (if applicable)
 
-#### External Data Sources
+- Publish/subscribe model (channels like `character.{id}`)
+- Event serialization and payload schemas
+- Connection scaling and fan-out considerations
 
-- **AWS SDK**: Integration with AWS services
-- **Third-party APIs**: Consuming external game data APIs
-- **Data Synchronization**: Keeping game data up-to-date
+---
 
-### AI & Machine Learning (Future Considerations)
+## 5. Quality, Security, and Compliance Skills
 
-#### AI Integration
+### 5.1 Testing & QA
 
-- **Ollama Laravel**: Local LLM integration for AI assistance
-- **AI Conversations**: Managing AI-powered career planning suggestions
-- **Pattern Recognition**: Identifying optimal strategies from data
+**Required**
 
-### Performance & Scalability
+- Unit tests for engines/services and domain models
+- Integration tests for critical flows (create run, training turn, skill purchase, race complete)
+- API contract tests (validation errors, auth, response schema)
+- Performance tests for hotspots (prediction, ranking, caching)
 
-#### Optimization Techniques
+**Recommended**
 
-- **Database Indexing**: Strategic index creation for query performance
-- **Caching Strategies**: Redis/Memcached for performance
-- **Query Optimization**: N+1 query prevention and eager loading
-- **Asset Optimization**: Vite build optimization and code splitting
+- Test data management: factories, seeders, fixtures
+- Regression discipline around calculations and stat caps
 
-#### Monitoring & Debugging
+### 5.2 Security Practices
 
-- **Laravel Telescope**: Request/response inspection and debugging
-- **Laravel Horizon**: Queue monitoring and job management
-- **Laravel Pail**: Real-time log streaming and analysis
-- **Performance Profiling**: Identifying and resolving bottlenecks
+- Input validation, request authorization, and user ownership checks
+- File upload security (type/size validation; safe storage)
+- Secrets management (env/config discipline)
+- Safe error reporting (no sensitive data leakage)
 
-## Soft Skills & Best Practices
+### 5.3 Accessibility & UX Quality
 
-### Development Practices
+- WCAG 2.2 AA basics:
+  - keyboard navigation
+  - focus management
+  - contrast and semantic structure
+- Mobile-first responsive design implementation
 
-#### Code Standards
+---
 
-- **PSR Standards**: PSR-12 coding style guidelines
-- **Laravel Conventions**: Following Laravel best practices
-- **Documentation**: Clear and concise code documentation
-- **Type Safety**: Using PHP type hints and return types
+## 6. Operational & Documentation Skills
 
-#### Collaboration
+### 6.1 Documentation-Driven Development
 
-- **Git Workflow**: Branch management and pull requests
-- **Code Review**: Reviewing and providing constructive feedback
-- **Issue Tracking**: Managing tasks and bug reports
-- **Communication**: Clear technical communication
+Contributors must be able to:
 
-### Problem Solving
+- Implement features directly from PRDs/SPECS/TECH-FLOW/SEQ documents
+- Keep docs updated when behavior/architecture changes
+- Maintain cross-links and traceability between artifacts
 
-#### Analytical Thinking
+### 6.2 DevOps Basics (Local & CI)
 
-- **Debugging**: Systematic problem identification and resolution
-- **Performance Analysis**: Identifying and fixing performance issues
-- **Architecture Design**: Planning scalable and maintainable solutions
-- **Trade-off Analysis**: Evaluating technical decisions
+- Composer/NPM workflows; Vite bundling
+- Running migrations and seeders safely
+- Understanding environment configuration differences (dev/staging/prod)
+- CI pipeline discipline: tests + formatting gates
 
-#### Learning & Adaptation
+---
 
-- **Framework Updates**: Staying current with Laravel updates
-- **Game Mechanics**: Keeping up with Uma Musume game changes
-- **Technology Trends**: Adopting new tools and practices appropriately
-- **Documentation**: Reading and understanding technical documentation
+## 7. Suggested Skill Levels by Contribution Area
 
-## Getting Started
+| Area | Minimum | Recommended |
+|---|---:|---:|
+| Core Laravel development | Intermediate | Advanced |
+| Calculation engines (training/race/skills) | Intermediate | Advanced (math + testing) |
+| Database design & migrations | Intermediate | Advanced |
+| Caching & performance | Intermediate | Advanced |
+| AI integrations (Ollama/Bedrock) | Intermediate | Advanced |
+| External integrations & resilience | Intermediate | Advanced |
+| OCR pipeline | Beginner-Intermediate | Intermediate |
+| WebSocket realtime | Beginner-Intermediate | Intermediate |
+| Accessibility | Beginner-Intermediate | Intermediate |
 
-### Minimum Requirements
+---
 
-To begin contributing to this project, you should have:
+## 8. Reference Pointers (Primary Docs)
 
-1. **Core PHP & Laravel Knowledge**: Understanding of PHP 8.2+ and Laravel 12 fundamentals
-2. **Database Skills**: Basic SQL and migration experience
-3. **Frontend Basics**: HTML, CSS, JavaScript fundamentals
-4. **Version Control**: Git workflow and GitHub usage
-5. **Testing Mindset**: Understanding of test-driven development
+- **Character Management**: PRD-001, SPEC-001, TECH-FLOW-001, SEQ-001  
+- **Training Optimization**: PRD-002, SPEC-002, TECH-FLOW-002, SEQ-002  
+- **Race Strategy**: PRD-003, SPEC-003, TECH-FLOW-003, SEQ-004  
+- **Skill Management**: PRD-004, SPEC-004, TECH-FLOW-004, SEQ-003  
+- **Support Cards**: PRD-005, SPEC-005, TECH-FLOW-005, SEQ-005  
+- **AI Advisory**: PRD-006, SPEC-006, TECH-FLOW-006, SEQ-006  
+- **External Integration**: PRD-007, SPEC-007, TECH-FLOW-007, SEQ-007 / SD-006  
+- **Cross-cutting**: Telemetry (SEQ-011), Error handling (SEQ-014), Snapshot/Restore (SEQ-012), Migration (SEQ-015)
 
-### Recommended Learning Path
+---
 
-1. **Set up Development Environment**: Install PHP, Composer, Node.js, and configure Laravel Sail
-2. **Explore the Codebase**: Review migrations, models, and existing features
-3. **Run Tests**: Execute `composer run test` to understand test structure
-4. **Study Game Mechanics**: Learn Uma Musume character progression and skill systems
-5. **Start Small**: Begin with bug fixes or documentation improvements
-6. **Build Features**: Progress to implementing new features with guidance
-7. **Optimize**: Work on performance improvements and advanced features
+## Document Control
 
-## Resources
-
-### Official Documentation
-
-- [Laravel Documentation](https://laravel.com/docs)
-- [Pest PHP Testing](https://pestphp.com)
-- [Tailwind CSS](https://tailwindcss.com)
-- [Vite Documentation](https://vitejs.dev)
-
-### Project-Specific Guides
-
-- `AGENTS.md` - AI agent development guidelines
-- `README.md` - Project setup and overview
-- Database migrations - Understanding data structures
-
-### Community Resources
-
-- Uma Musume game wikis and guides
-- Laravel community forums and Discord
-- PHP and web development resources
-
-## Contribution Guidelines
-
-Before contributing, ensure you:
-
-1. Follow the coding standards outlined in `AGENTS.md`
-2. Write tests for new features and bug fixes
-3. Update documentation when adding new functionality
-4. Use Laravel Pint for code formatting: `./vendor/bin/pint`
-5. Verify your changes don't break existing functionality
-6. Keep commits focused and write clear commit messages
-
-## Conclusion
-
-This project combines web application development with deep domain knowledge of Uma Musume game mechanics. Success requires both technical proficiency in the Laravel ecosystem and understanding of the strategic elements of career planning and skill optimization in the game. Start with the fundamentals, gradually build domain knowledge, and don't hesitate to ask questions or refer to existing code patterns.
+| Version | Date | Author | Changes |
+|---|---|---|---|
+| 2.0.0 | 2026-01-23 | Development Team | Rewritten to align with v2.0.0 docs: services/events/caching, AI+external+OCR integrations, testing and accessibility expectations |

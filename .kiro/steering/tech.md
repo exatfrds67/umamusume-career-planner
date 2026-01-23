@@ -18,6 +18,8 @@
 - `aws/aws-sdk-php` - AWS Bedrock integration
 - `cloudstudio/ollama-laravel` - Local AI integration
 - `symfony/dom-crawler` - HTML parsing
+- `laravel/livewire` v3 - Full-stack reactivity
+- `pestphp/pest` v4 - Testing framework
 
 ### Frontend
 
@@ -25,6 +27,7 @@
 - `@alpinejs/persist` - State persistence
 - `tailwindcss` v4 - Utility-first CSS
 - `@tailwindcss/vite` - Vite integration
+- `vite` v7 - Build tool
 
 ### Development
 
@@ -32,7 +35,7 @@
 - `phpunit/phpunit` v12 - Unit testing
 - `laravel/pint` v1 - Code formatting
 - `larastan/larastan` v3 - Static analysis
-- `laravel/boost` - Laravel MCP server
+- `laravel/sail` v1 - Docker development
 
 ## Common Commands
 
@@ -196,20 +199,84 @@ npm run build
 ### AI Services
 
 - **Ollama**: Local AI models (primary)
-- **AWS Bedrock**: Cloud AI fallback (Claude 4.5, Nova 2)
+- **AWS Bedrock**: Cloud AI fallback (Claude, Nova)
 
 ### External APIs
 
-- **umapyoi.net**: Game data (replaces deprecated SimpleSandman API)
+- **umapyoi.net**: Game data (character info, skills, rates)
 - **UmamusumeDB.com**: Community calculator tools
 
 ### OCR Processing
 
-- **Tesseract**: Text extraction with Japanese support
+- **Tesseract**: Optical character recognition
 - **OpenCV**: Image preprocessing
+- **GD**: Image manipulation
 
-### MCP Servers
+## Architecture Patterns
 
-- Model Context Protocol for enhanced development workflow
-- AWS integration and external API management
-- Configuration in `.kiro/settings/mcp.json`
+### Service Layer
+
+- Business logic decoupled from controllers
+- Dependency injection for testability
+- Clear separation of concerns
+
+### Repository Pattern
+
+- Data access abstraction
+- Eloquent models wrapped with repositories
+- Consistent query interface
+
+### Events & Listeners
+
+- Decoupled event handling
+- Database event triggers
+- Queue integration
+
+## Security
+
+### Authentication
+
+- Laravel Sanctum for API token auth
+- Session-based web auth
+- CSRF protection on all state-changing requests
+
+### Data Protection
+
+- Input validation and sanitization
+- SQL injection prevention via Eloquent
+- XSS protection via Blade templating
+- Rate limiting on API endpoints
+
+## Monitoring & Logging
+
+### Development Tools
+
+- Laravel Telescope for debugging
+- Laravel Horizon for queue monitoring
+- Laravel Pail for real-time logs
+
+### Production Ready
+
+- Structured logging
+- Error tracking integration ready
+- Performance monitoring hooks
+
+## Deployment
+
+### Build Artifacts
+
+- Compiled frontend assets in `public/build/`
+- Optimized CSS and JavaScript
+- Source maps for debugging
+
+### Database Migrations
+
+- Version controlled schema changes
+- Reversible migrations
+- Seed data support
+
+### Environment Variables
+
+- Development, staging, production configs
+- Sensitive data in `.env` (not version controlled)
+- Docker support via Laravel Sail

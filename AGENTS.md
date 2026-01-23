@@ -1,931 +1,343 @@
-# AI Agent Development Guidelines
+# AI Agent Development Guidelines (v2.0.0)
 
-This file contains development guidelines and coding standards for AI coding assistants working on this Laravel application. These guidelines ensure consistent, high-quality code that follows Laravel best practices and project conventions.
+This document defines development guidelines, coding standards, and documentation practices for AI coding assistants working on the **Uma Musume Career Planner / Umamusume Pretty Derby Career Planner** Laravel application.
 
-**Based on official recommendations from:** Anthropic Claude Code, Amazon Q Developer, GitHub Copilot, OpenAI Codex, Google Gemini Code Assist, Cursor IDE, and JetBrains AI Assistant.
+It is intended to ensure consistent, secure, testable, and maintainable output aligned with:
+
+- Laravel 12 conventions and common industry practices
+- The project’s **dual storage architecture** (Local vs Account)
+- The project documentation set (PRDs, SPECs, FLOWS, SEQs, TECH-FLOWs, USER FLOWs, WIREFRAMES)
+- The current codebase structure (Service Layer + Livewire 3 + Alpine.js + TailwindCSS v4)
+
+**Document Version**: 2.0.0  
+**Date**: 2026-01-23  
+**Project**: UmamusumeCareerPlanner  
+**Status**: Current (v2 aligned)  
 
 ---
 
 ## Table of Contents
 
 1. [Project Overview](#project-overview)
-2. [Development Principles](#development-principles)
-3. [Context and Prompt Engineering](#context-and-prompt-engineering)
-4. [PHP Coding Standards](#php-coding-standards)
-5. [Laravel Framework Guidelines](#laravel-framework-guidelines)
-6. [Laravel 12 Specific Guidelines](#laravel-12-specific-guidelines)
-7. [Testing Standards with Pest](#testing-standards-with-pest)
-8. [Security Best Practices](#security-best-practices)
-9. [Code Quality and Formatting](#code-quality-and-formatting)
-10. [Development Workflow](#development-workflow)
-11. [Quality Assurance](#quality-assurance)
+2. [Golden Rules](#golden-rules)
+3. [Architecture & Domain Model](#architecture--domain-model)
+4. [Dual Storage Mode Rules](#dual-storage-mode-rules)
+5. [Laravel 12 + PHP Standards](#laravel-12--php-standards)
+6. [Frontend Standards (Livewire + Alpine + Tailwind)](#frontend-standards-livewire--alpine--tailwind)
+7. [API & Integration Guidance](#api--integration-guidance)
+8. [Data Import/Export & Migration Guidance](#data-importexport--migration-guidance)
+9. [Testing Standards](#testing-standards)
+10. [Security Standards](#security-standards)
+11. [Performance, Caching, and Reliability](#performance-caching-and-reliability)
+12. [Documentation Standards](#documentation-standards)
+13. [Pull Request & Change Management](#pull-request--change-management)
+14. [Definition of Done](#definition-of-done)
 
 ---
 
 ## Project Overview
 
-This is a **Laravel 12** application for the **Umamusume Pretty Derby Career Planner** - a comprehensive local-first web application for optimizing gameplay through AI-powered recommendations.
+### Product Summary
 
-### Core Technology Stack
+A **local-first** career planning / career tracking application for *Uma Musume: Pretty Derby* that supports:
 
-- **PHP**: 8.4.11
-- **Laravel Framework**: v12 (released February 24, 2025)
-- **Testing**: Pest v4, PHPUnit v12
-- **Code Quality**: Laravel Pint v1, Larastan v3
-- **Development Tools**: Laravel Sail v1, Telescope v5, Horizon v5
-- **Authentication**: Laravel Sanctum v4
-- **Frontend**: Tailwind CSS v4, Alpine.js v3
-- **Build Tool**: Vite v7
-- **Database**: MySQL 8.0+ with Redis (WSL) for caching
-- **AI Integration**: Ollama (local) + AWS Bedrock (cloud fallback)
-- **MCP Integration**: Laravel MCP v0
+- Character/career run tracking
+- Turn-by-turn stat progression (Speed/Stamina/Power/Guts/Wit)
+- Aptitude grades and growth rates
+- Skill acquisition planning and SP budgeting
+- Race planning and outcomes tracking (as documented)
+- Import/export, backup/restore, and migration workflows
+- AI advisory and external integrations (as documented)
 
-### Project Architecture
+### Technical Stack (v2)
 
-- **Local-First**: All personal data stored locally (MySQL + Redis via WSL)
-- **Privacy-Focused**: No data transmission without explicit consent
-- **Hybrid AI**: Local models primary, cloud fallback for complex tasks
-- **Accessibility**: WCAG 2.2 AA compliant
-- **Performance**: Sub-2-second response times, Core Web Vitals compliance
-
-### Project Structure
-
-This application follows Laravel 12's streamlined directory structure:
-
-- `app/` - Application logic (Models, Controllers, Services, etc.)
-- `bootstrap/` - Application bootstrapping and configuration
-- `config/` - Configuration files
-- `database/` - Migrations, factories, seeders
-- `resources/` - Views, assets, language files
-- `routes/` - Route definitions
-- `tests/` - Feature and unit tests (Pest framework)
-- `storage/` - Application storage
-- `public/` - Public web assets
+- **Backend**: Laravel 12+, PHP 8.2+ (project guidelines mention 8.4.11 also; follow repository `composer.json` and CI)
+- **Frontend**: Livewire 3, Alpine.js, TailwindCSS v4, Vite
+- **DB**: MySQL 8+ (prod), SQLite supported for dev/testing
+- **Cache/Queues**: Redis (where enabled)
+- **Testing**: Pest (PHP), Playwright (E2E), optional JS unit tests as configured
+- **Docs**: PRDs, SPECs, FLOWs, SEQs, TECH-FLOWs, USER FLOWs, WIREFRAMES, plus core docs (SDP/BRS/SRS/SDS/DBD/SCD/SUM)
 
 ---
 
-## Development Principles
+## Golden Rules
 
-### Code Quality Standards
-
-> **From GitHub Copilot:** "While Copilot is very powerful, it is still a tool capable of making mistakes, and you should always validate the code it suggests."
-
-- **Follow existing code conventions** by examining sibling files
-- **Use descriptive names** for variables and methods (e.g., `isRegisteredForDiscounts`, not `discount()`)
-- **Check for existing components** before creating new ones
-- **Prioritize tests over verification scripts** - programmatic testing is essential
-- **Maintain existing directory structure** without approval for changes
-- **Be concise in explanations** - focus on important details
-- **Only create documentation files when explicitly requested**
-
-### Architecture Guidelines
-
-> **From OpenAI Codex:** "Act as a discerning engineer: optimize for correctness, clarity, and reliability over speed; avoid risky shortcuts, speculative changes, and messy hacks."
-
-- **Stick to existing directory structure** - don't create new base folders without approval
-- **Do not change application dependencies** without approval
-- **For frontend changes not reflecting in UI**, suggest running `npm run build`, `npm run dev`, or `composer run dev`
-- **Follow DRY principle** - search for existing implementations before creating new ones
-- **Implement comprehensive solutions** - cover all relevant surfaces, don't just fix symptoms
-
-### Iteration and Refinement
-
-> **From Claude Code:** "Like humans, Claude's outputs tend to improve significantly with iteration. While the first version might be good, after 2-3 iterations it will typically look much better."
-
-- **Expect to iterate** - first attempts are rarely perfect
-- **Provide feedback early and often** to guide toward better solutions
-- **Use undo/redo** to explore alternatives
-- **Clear context** when switching tasks
-- **Request planning** before implementation for complex problems
+1. **Do not break dual storage mode behavior.** Any feature touching plans/runs must work in both:
+   - **Local Mode** (browser storage, UUID routes)
+   - **Account Mode** (database, numeric ID routes)
+2. **Prefer the Service Layer for business logic.** Livewire components/controllers coordinate, validate, and delegate.
+3. **Maintain canonical naming.** Prefer canonical fields (e.g., `total_sp_available`, `stamina_percentage`, `turn_number`) over legacy variants.
+4. **Be explicit with enums and validation.** Use PHP enums for domain states and validate inputs with Form Requests / Livewire validation.
+5. **Test critical flows.** Any change impacting plan creation/edit/save/import/export must include tests (Pest + Playwright where applicable).
+6. **Keep docs consistent and cross-linked.** When updating behavior, ensure docs align with the related PRD/SPEC/FLOW/SEQ.
 
 ---
 
-## Context and Prompt Engineering
+## Architecture & Domain Model
 
-### Providing Effective Context
+### High-Level Architecture (v2)
 
-> **From Amazon Q Developer:** "Start with existing code, import libraries, create classes and functions, or establish code skeletons. This context significantly improves code generation quality."
+Layered application with strong separation:
 
-**Best Practices:**
+- **Presentation**: Blade views, Livewire components, Alpine-driven UI components
+- **Application**: Controllers (API), Livewire actions, Form Requests, orchestration
+- **Domain**: Eloquent models + Enums + domain rules
+- **Infrastructure**: MySQL/SQLite, Redis, file storage, integrations
 
-1. **Open Relevant Files**
-   - Keep relevant files open in your IDE
-   - Close irrelevant files to reduce noise
-   - AI assistants use open files as context
+### Canonical Domain Entities (v2)
 
-2. **Include Import Statements**
-   - Import relevant libraries before requesting code
-   - AI uses imports to understand your tech stack
-   - Helps generate framework-specific code
+- `UmaMusume` → `CareerRun` → `StatProgress`, `SkillCareerRun`, `Goal`, `RacePrediction` (+ additional features documented elsewhere)
+- Enums used across domain: `StorageMode`, `RunStatus`, `SkillStatus`, `CareerStage`, `AptitudeGrade`, `Mood`
 
-3. **Establish Code Skeletons**
-   - Create class structures and function signatures first
-   - Define interfaces and types
-   - Provides architectural context
-
-4. **Reference Project Documentation**
-   - Check `.kiro/steering/` files for project conventions
-   - Review `docs/` for feature specifications
-   - Reference existing similar implementations
-
-### Crafting Effective Prompts
-
-> **From GitHub Copilot:** "Prompt engineering plays a critical role in Copilot's ability to generate valuable responses."
-
-**Key Principles:**
-
-1. **Be Specific and Detailed**
-   - ❌ Poor: "add tests for CharacterService"
-   - ✅ Good: "write Pest feature tests for CharacterService, covering character creation with valid data, validation failures, and edge cases where stats exceed 1200. Use factories, avoid mocks."
-
-2. **Provide Examples**
-   - Show input/output pairs
-   - Reference similar existing code
-   - Demonstrate desired patterns
-
-3. **Break Down Complex Tasks**
-   - Split large requests into smaller steps
-   - Request planning before implementation
-   - Use iterative refinement
-
-4. **Specify Constraints**
-   - Mention Laravel 12 and PHP 8.4
-   - State security requirements
-   - Define performance expectations
-   - Specify testing requirements (Pest v4)
-
-5. **Use Natural Language**
-   - Write prompts as you would explain to a colleague
-   - Be conversational but precise
-   - Use standard comment blocks for inline generation
+Keep domain invariants consistent with SRS/SDS/DBD and the older detailed docs (PRDs/SPECs/FLOWs/SEQs).
 
 ---
 
-## PHP Coding Standards
+## Dual Storage Mode Rules
 
-### General PHP Rules
+### Storage Modes
 
-- **Always use curly braces** for control structures, even single-line statements
-- **Use explicit return type declarations** for all methods and functions
-- **Use appropriate PHP type hints** for method parameters
-- **Prefer PHPDoc blocks** over inline comments
-- **Never use inline comments** within code unless handling complex logic
-- **Add useful array shape type definitions** in PHPDoc when appropriate
+- **Local Mode**
+  - Stored in browser (`localStorage` today; may migrate to IndexedDB later per roadmap)
+  - UUID-based routes: `/plans/local/{uuid}` (and `/edit`)
+  - Must be fully usable offline
+- **Account Mode**
+  - Stored in database
+  - Numeric ID routes: `/plans/{id}` (and `/edit`)
+  - Requires connectivity for persistence; drafts must still be preserved locally
 
-### Constructor Standards
+### Engineering Guidelines
 
-Use PHP 8 constructor property promotion:
+- Never assume a plan ID is numeric.
+- Always propagate storage mode explicitly:
+  - UI badges (Local/Account)
+  - Route generation helpers
+  - Serialization/deserialization functions
 
-```php
-// ✅ Good
-public function __construct(
-    public TrainingCalculationService $trainingService,
-    public CharacterRepositoryInterface $characterRepository
-) {}
+### Conversion: Local → Account
 
-// ❌ Bad - verbose old style
-private TrainingCalculationService $trainingService;
-private CharacterRepositoryInterface $characterRepository;
+- Provide a safe conversion that:
+  - Validates data
+  - Detects duplicates
+  - Persists relations correctly
+  - Optionally keeps local copy
+  - Produces a results report
 
-public function __construct(
-    TrainingCalculationService $trainingService,
-    CharacterRepositoryInterface $characterRepository
-) {
-    $this->trainingService = $trainingService;
-    $this->characterRepository = $characterRepository;
-}
-```
+This aligns with:
 
-- **Do not allow empty `__construct()` methods** with zero parameters unless the constructor is private
-
-### Type Declarations
-
-Always use explicit return types and parameter types:
-
-```php
-// ✅ Good
-protected function isAccessible(User $user, ?string $path = null): bool
-{
-    return $user->hasPermission($path);
-}
-
-// ❌ Bad - missing return type
-protected function isAccessible(User $user, ?string $path = null)
-{
-    return $user->hasPermission($path);
-}
-```
-
-### Enums
-
-- Use **TitleCase** for enum keys: `FavoritePerson`, `BestLake`, `Monthly`
+- User flows (Local-to-Account conversion flows)
+- Sequences describing import/migration and state preservation
+- Import/export schema definitions
 
 ---
 
-## Laravel Framework Guidelines
+## Laravel 12 + PHP Standards
 
-### Do Things the Laravel Way
+### PHP Style and Type Safety
 
-> **From Laravel AI Documentation:** "Laravel is uniquely positioned to be the best framework for AI assisted and agentic development due to its opinionated conventions and well-defined structure."
+- Follow **PSR-12** and project formatting tooling (`pint`).
+- Use strict types where the project uses them; prefer type hints everywhere.
+- Prefer PHP 8.2+ features:
+  - Enums
+  - Readonly properties where appropriate
+  - Typed properties
+- Avoid “magic arrays” for domain objects; prefer DTOs or validated arrays with clear keys.
 
-- **Use `php artisan make:` commands** to create new files (migrations, controllers, models, etc.)
-- For generic PHP classes, use `php artisan make:class`
-- **Pass `--no-interaction`** to all Artisan commands
-- **Include appropriate `--options`** for correct behavior
+### Laravel Conventions
 
-### Database and Eloquent
-
-> **From Laravel Boost:** "Always use proper Eloquent relationship methods with return type hints. Prefer relationship methods over raw queries or manual joins."
-
-**Best Practices:**
-
-1. **Use Eloquent Relationships**
-
-   ```php
-   // ✅ Good - proper relationship with return type
-   public function supportCards(): BelongsToMany
-   {
-       return $this->belongsToMany(SupportCard::class, 'character_support_cards')
-           ->withPivot('friendship_level', 'position')
-           ->withTimestamps();
-   }
-   
-   // ❌ Bad - manual join
-   $cards = DB::table('characters')
-       ->join('character_support_cards', ...)
-       ->get();
-   ```
-
-2. **Prevent N+1 Queries**
-
-   ```php
-   // ✅ Good - eager loading
-   $characters = Character::with(['supportCards', 'aptitudes', 'skills'])->get();
-   
-   // ❌ Bad - N+1 problem
-   $characters = Character::all();
-   foreach ($characters as $character) {
-       $cards = $character->supportCards; // N+1 query
-   }
-   ```
-
-3. **Use Query Builder Properly**
-   - Avoid `DB::`; prefer `Model::query()`
-   - Use Eloquent models and relationships before suggesting raw queries
-   - Use Laravel's query builder for complex database operations only
-
-### Model Management
-
-> **From Security Research:** "45% of AI-generated code contains vulnerabilities like SQL injection and cross-site scripting."
-
-**When creating models:**
-
-1. Create useful **factories** and **seeders**
-2. Ask users about additional requirements using `list-artisan-commands`
-3. Use the `casts()` method on models rather than the `$casts` property (follow existing conventions)
-4. Always define **fillable** or **guarded** properties
-5. Add proper **relationship return types**
-
-```php
-// ✅ Good - Laravel 12 style
-class Character extends Model
-{
-    protected $fillable = [
-        'name',
-        'speed',
-        'stamina',
-        'power',
-        'guts',
-        'wit',
-    ];
-
-    protected function casts(): array
-    {
-        return [
-            'speed' => 'integer',
-            'stamina' => 'integer',
-            'created_at' => 'datetime',
-        ];
-    }
-
-    public function careers(): HasMany
-    {
-        return $this->hasMany(Career::class);
-    }
-}
-```
-
-### API Development
-
-- **Default to using Eloquent API Resources** and API versioning
-- Follow existing application conventions if they differ
-- Use proper HTTP status codes
-- Implement rate limiting
-
-### Controllers and Validation
-
-> **From Laravel Boost:** "Always create Form Request classes for validation rather than inline validation in controllers."
-
-**Best Practices:**
-
-1. **Always create Form Request classes** for validation
-2. Include both **validation rules** and **custom error messages**
-3. Check sibling Form Requests for array vs string validation rule conventions
-
-```php
-// ✅ Good - Form Request class
-class StoreCharacterRequest extends FormRequest
-{
-    public function rules(): array
-    {
-        return [
-            'name' => ['required', 'string', 'max:255'],
-            'speed' => ['required', 'integer', 'min:0', 'max:1200'],
-            'stamina' => ['required', 'integer', 'min:0', 'max:1200'],
-        ];
-    }
-
-    public function messages(): array
-    {
-        return [
-            'speed.max' => 'Speed cannot exceed 1200.',
-            'stamina.max' => 'Stamina cannot exceed 1200.',
-        ];
-    }
-}
-
-// ❌ Bad - inline validation
-public function store(Request $request)
-{
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'speed' => 'required|integer|min:0|max:1200',
-    ]);
-}
-```
-
-### Background Processing
-
-- Use **queued jobs** with `ShouldQueue` interface for time-consuming operations
-- Implement proper error handling and retry logic
-- Use Horizon for queue monitoring
-
-### Authentication and Authorization
-
-- Use Laravel's built-in features: **gates**, **policies**, **Sanctum**
-- Implement proper role-based access control
-- Never bypass authorization checks
-
-### URL Generation
-
-- Prefer **named routes** and the `route()` function for generating links
-- Use `get-absolute-url` tool (Laravel Boost) when sharing project URLs
-
-### Configuration Management
-
-> **Critical Rule:** "Use environment variables only in configuration files - never use the `env()` function directly outside of config files."
-
-```php
-// ✅ Good - use config helper
-$appName = config('app.name');
-$aiEnabled = config('ai.enabled');
-
-// ❌ Bad - direct env() usage
-$appName = env('APP_NAME');
-$aiEnabled = env('AI_ENABLED');
-```
+- Validation:
+  - Use **Form Requests** for controllers.
+  - Use Livewire validation rules for Livewire components.
+- Database:
+  - Prefer migrations with proper foreign keys and indexes.
+  - Use soft deletes where required and documented.
+- Error handling:
+  - Standardize error responses for APIs.
+  - Use consistent toast/alert events for UI.
 
 ---
 
-## Laravel 12 Specific Guidelines
+## Frontend Standards (Livewire + Alpine + Tailwind)
 
-### Modern Laravel Structure
+### Livewire
 
-> **From Laravel 12 Documentation:** "Laravel 12 uses a streamlined file structure with declarative configuration."
+- Keep Livewire component state minimal; avoid hydrating heavy relationships unnecessarily.
+- Use `wire:key` for dynamic lists (skills, turns).
+- Prefer “save/apply” actions rather than continuous server roundtrips for high-frequency UI updates.
 
-#### Middleware Configuration
+### Alpine.js
 
-- Middleware are **no longer registered** in `app/Http/Kernel.php`
-- Configure middleware **declaratively** in `bootstrap/app.php` using `Application::configure()->withMiddleware()`
+- Use Alpine for:
+  - Modals, dropdowns, tabs, toasts
+  - Client-side localStorage helpers (drafts, local runs)
+  - Non-critical UI state that does not require server persistence
+- Keep Alpine state names predictable and scoped.
 
-```php
-// bootstrap/app.php
-return Application::configure(basePath: dirname(__DIR__))
-    ->withMiddleware(function (Middleware $middleware) {
-        $middleware->web(append: [
-            \App\Http\Middleware\HandleInertiaRequests::class,
-        ]);
-    })
-    ->create();
-```
+### TailwindCSS v4
 
-#### Application Bootstrap
-
-- `bootstrap/app.php` - Register middleware, exceptions, and routing files
-- `bootstrap/providers.php` - Application-specific service providers
-- `app/Console/Kernel.php` **no longer exists**
-- Use `bootstrap/app.php` or `routes/console.php` for console configuration
-- Console commands in `app/Console/Commands/` are **automatically available**
-
-#### Database Features
-
-- When **modifying columns**, include all previously defined attributes to prevent data loss
-- Laravel 12 supports **limiting eagerly loaded records** natively: `$query->latest()->limit(10)`
-
-```php
-// ✅ Good - Laravel 12 native limit
-$characters = Character::with([
-    'careers' => fn($query) => $query->latest()->limit(5)
-])->get();
-
-// ❌ Bad - missing attributes in migration
-Schema::table('characters', function (Blueprint $table) {
-    $table->integer('speed')->change(); // Lost nullable, default, etc.
-});
-
-// ✅ Good - preserve all attributes
-Schema::table('characters', function (Blueprint $table) {
-    $table->integer('speed')->nullable()->default(0)->change();
-});
-```
-
-### Error Handling
-
-For Vite manifest errors, suggest running:
-
-- `npm run build`
-- `npm run dev`
-- `composer run dev`
+- Prefer utility classes and shared Blade components.
+- Maintain WCAG AA contrast in both light and dark modes.
+- Ensure touch targets and responsive behavior per the user flows and wireframes.
 
 ---
 
-## Testing Standards with Pest
+## API & Integration Guidance
 
-### Testing Philosophy
+### Internal APIs (Read-heavy)
 
-> **From Multiple Sources:** "AI-generated code must be programmatically tested. Write tests or update existing tests, then run affected tests to ensure they pass."
+- Use internal JSON endpoints where appropriate (e.g., skill search/autocomplete) to reduce Livewire payload size.
+- Cache read-heavy endpoints (skills list/search) with sensible TTL.
 
-- **Write tests to verify features** rather than creating verification scripts
-- **Unit and feature tests are more important** than manual verification
-- Tests should cover **happy paths**, **failure paths**, and **edge cases**
+### External Integrations (if enabled in module set)
 
-### Pest Framework Guidelines
-
-- **All tests must be written using Pest framework**
-- Use `php artisan make:test --pest {name}` to create tests
-- **Never remove tests or test files** without approval - they are core to the application
-- Tests live in `tests/Feature` and `tests/Unit` directories
-- **Most tests should be feature tests**; use `--unit` flag only when appropriate
-
-### Test Structure
-
-Basic Pest test structure:
-
-```php
-<?php
-
-use App\Models\Character;
-use App\Models\User;
-
-it('creates a character with valid data', function () {
-    $user = User::factory()->create();
-    
-    $response = $this->actingAs($user)->postJson('/api/characters', [
-        'name' => 'Special Week',
-        'speed' => 800,
-        'stamina' => 700,
-        'power' => 600,
-        'guts' => 500,
-        'wit' => 650,
-    ]);
-    
-    $response->assertSuccessful();
-    expect(Character::count())->toBe(1);
-    expect(Character::first()->name)->toBe('Special Week');
-});
-
-it('validates character stats do not exceed 1200', function () {
-    $user = User::factory()->create();
-    
-    $response = $this->actingAs($user)->postJson('/api/characters', [
-        'name' => 'Invalid Character',
-        'speed' => 1500, // Exceeds maximum
-    ]);
-    
-    $response->assertUnprocessable();
-    $response->assertJsonValidationErrors(['speed']);
-});
-```
-
-### Test Execution
-
-> **From Laravel Boost:** "Run the minimum number of tests needed to ensure code quality and speed."
-
-- Run minimal tests using appropriate filters before finalizing code
-- Run all tests: `php artisan test --compact`
-- Run specific file: `php artisan test --compact tests/Feature/CharacterTest.php`
-- Filter by test name: `php artisan test --compact --filter=testName`
-- Ask users about running full test suite after changes pass related tests
-
-### Assertions
-
-Use **specific assertion methods** instead of generic ones:
-
-```php
-// ✅ Good - specific assertions
-$response->assertSuccessful();
-$response->assertForbidden();
-$response->assertNotFound();
-$response->assertUnprocessable();
-
-// ❌ Bad - generic status assertions
-$response->assertStatus(200);
-$response->assertStatus(403);
-$response->assertStatus(404);
-$response->assertStatus(422);
-```
-
-### Test Data and Factories
-
-- Use **model factories** for test data creation
-- Check for **custom factory states** before manual model setup
-- Follow existing conventions for `$this->faker` vs `fake()`
-
-```php
-// ✅ Good - use factories
-$character = Character::factory()->create([
-    'speed' => 1000,
-]);
-
-// ✅ Good - use factory states if available
-$character = Character::factory()->withHighStats()->create();
-
-// ❌ Bad - manual model creation
-$character = new Character();
-$character->name = 'Test';
-$character->speed = 1000;
-$character->save();
-```
-
-### Mocking
-
-- Use mocking when appropriate for external dependencies
-- Import Pest mock function: `use function Pest\Laravel\mock;`
-- Alternative: use `$this->mock()` if existing tests follow this pattern
-- Create partial mocks using the same import pattern
-
-```php
-use function Pest\Laravel\mock;
-
-it('uses external API service', function () {
-    $mock = mock(ExternalAPIService::class);
-    $mock->shouldReceive('fetchData')
-        ->once()
-        ->andReturn(['data' => 'test']);
-    
-    // Test code using the mock
-});
-```
-
-### Datasets
-
-Use **datasets** to reduce test duplication, especially for validation rules:
-
-```php
-it('validates email formats', function (string $email, bool $valid) {
-    $response = $this->postJson('/api/register', [
-        'email' => $email,
-    ]);
-    
-    if ($valid) {
-        $response->assertSuccessful();
-    } else {
-        $response->assertJsonValidationErrors(['email']);
-    }
-})->with([
-    'valid email' => ['test@example.com', true],
-    'invalid email' => ['not-an-email', false],
-    'missing @ symbol' => ['testexample.com', false],
-]);
-```
-
-### Test-Driven Development
-
-> **From Claude Code:** "Write tests first based on expected behavior. Confirm tests fail. Generate code to pass tests. Iterate until all tests pass."
-
-**TDD Workflow:**
-
-1. Write tests based on expected input/output pairs
-2. Run tests to confirm they fail
-3. Commit tests
-4. Generate code to pass tests
-5. Iterate until all tests pass
-6. Commit implementation
+- Follow resilience patterns documented:
+  - Circuit breaker / fallback for external APIs
+  - Timeouts, retries, caching
+- Log and track failures without exposing sensitive data.
 
 ---
 
-## Security Best Practices
+## Data Import/Export & Migration Guidance
 
-### Critical Security Principles
+### Export Requirements
 
-> **From Security Research:** "AI-generated code is a security minefield. Speed over scrutiny leads to vulnerabilities. 45% of AI-generated code contains vulnerabilities like SQL injection and cross-site scripting."
+- Include `schema_version`
+- Include `exported_at` (ISO 8601)
+- Preserve canonical fields and enum normalization
+- Support export for:
+  - Individual plan/run
+  - Bulk local runs (“Export All”)
 
-**Security Best Practices:**
+### Import Requirements
 
-1. **Input Validation**
-   - Never trust AI-generated input handling without explicit validation
-   - Implement sanitization for all user inputs
-   - Use parameterized queries (Eloquent handles this)
-   - Validate data types and formats
+- Detect format (JSON versioned, legacy JSON, CSV, etc.)
+- Validate schema + business rules
+- Provide a preview stage
+- Handle duplicates: Skip / Overwrite / Import as copy (Merge optional future feature)
+- Provide clear error reporting and partial success reporting
 
-2. **Dependency Verification**
-   - Verify all AI-suggested packages exist and are legitimate
-   - Check package versions and security advisories
-   - Review package permissions and dependencies
-   - Use trusted package sources only (Packagist for PHP)
+### Migration Considerations
 
-3. **Secrets Management**
-   - Never hardcode API keys or credentials
-   - Use environment variables properly (only in config files)
-   - Implement proper secrets rotation
-   - Use secure secret management services
-
-4. **Authentication and Authorization**
-   - Use Laravel Sanctum for API authentication
-   - Implement proper role-based access control
-   - Verify permissions at every level
-   - Use secure session management
-
-### Common Vulnerabilities to Check
-
-**SQL Injection:**
-
-```php
-// ✅ Good - Eloquent prevents SQL injection
-$characters = Character::where('name', $request->input('name'))->get();
-
-// ❌ Bad - vulnerable to SQL injection
-$characters = DB::select("SELECT * FROM characters WHERE name = '{$request->input('name')}'");
-```
-
-**Cross-Site Scripting (XSS):**
-
-```blade
-{{-- ✅ Good - Blade escapes output --}}
-<h1>{{ $character->name }}</h1>
-
-{{-- ❌ Bad - unescaped output --}}
-<h1>{!! $character->name !!}</h1>
-```
-
-**Mass Assignment:**
-
-```php
-// ✅ Good - protected with fillable
-class Character extends Model
-{
-    protected $fillable = ['name', 'speed', 'stamina'];
-}
-
-// ❌ Bad - no protection
-class Character extends Model
-{
-    // No $fillable or $guarded
-}
-```
-
-### Security Review Process
-
-1. **Automated Security Scanning**
-   - Run Larastan for static analysis
-   - Use Laravel Pint for code style
-   - Check for known vulnerabilities
-
-2. **Manual Security Review**
-   - Review authentication flows
-   - Check authorization logic
-   - Verify data encryption
-   - Audit API endpoints
-
-3. **Security Documentation**
-   - Document security decisions
-   - Track security issues
-   - Document remediation steps
+- Always be able to rollback or explain how to reverse imported batches.
+- Never silently drop data: record warnings and errors in an import report object.
 
 ---
 
-## Code Quality and Formatting
+## Testing Standards
 
-### Laravel Pint
+### Minimum Test Expectations (v2)
 
-> **From Laravel Boost:** "You must run `vendor/bin/pint --dirty` before finalizing changes to ensure your code matches the project's expected style."
+- **Pest Unit/Feature**
+  - Services: stat validation/calculation, SP calculations, import detection/validation
+  - Storage mode decision logic
+- **Playwright E2E**
+  - Create plan (Local)
+  - Create plan (Account)
+  - Edit plan fields across tabs
+  - Skill add/remove + status changes
+  - Export and import basic cases
+  - Local → Account conversion
 
-- Run `vendor/bin/pint --dirty` before finalizing changes
-- **Do not run** `vendor/bin/pint --test`
-- Simply run `vendor/bin/pint` to fix any formatting issues
+### General Testing Rules
 
-### Static Analysis
-
-- Run `vendor/bin/phpstan analyse` for static analysis
-- Address all errors and warnings
-- Use proper type hints to help static analysis
-
----
-
-## Development Workflow
-
-### Documentation Research
-
-> **From Laravel Boost:** "Use the `search-docs` tool before any other approaches when dealing with Laravel or Laravel ecosystem packages."
-
-**Best Practices:**
-
-1. **Search documentation before making code changes**
-2. Use **multiple, broad, topic-based queries**
-3. Examples: `['rate limiting', 'routing rate limiting', 'routing']`
-4. **Do not include package names** in queries (version info is automatically included)
-5. The `search-docs` tool is perfect for Laravel, Inertia, Livewire, Filament, Tailwind, Pest, Nova, etc.
-
-### Search Query Syntax
-
-1. **Simple Word Searches**: `authentication` (finds 'authenticate', 'auth')
-2. **Multiple Words (AND)**: `rate limit` (finds both "rate" AND "limit")
-3. **Quoted Phrases**: `"infinite scroll"` (exact phrase match)
-4. **Mixed Queries**: `middleware "rate limit"` (combines approaches)
-5. **Multiple Queries**: `["authentication", "middleware"]` (ANY of these terms)
-
-### Debugging and Development
-
-- Use **`tinker` tool** for PHP execution and Eloquent queries
-- Use **`database-query` tool** for read-only database operations
-- Check **`browser-logs`** for frontend issues (focus on recent logs only)
-- Use **`get-absolute-url`** tool for sharing project URLs
-
-### File Organization
-
-- Follow existing file structure and naming conventions
-- Check sibling files for structure, approach, and naming patterns
-- Reuse existing components before creating new ones
-- Maintain consistency with established patterns
-
-### Recommended Workflows
-
-#### 1. Explore, Plan, Code, Commit
-
-> **From Claude Code:** "Ask AI to read relevant files first (don't code yet). Request a plan with 'think hard' for complex problems. Implement the solution. Commit and create PR."
-
-```
-1. Ask AI to read relevant files (don't code yet)
-2. Request a plan for complex problems
-3. Implement the solution
-4. Run tests to verify
-5. Run Pint to format
-6. Commit changes
-```
-
-#### 2. Test-Driven Development
-
-```
-1. Write tests based on expected behavior
-2. Run tests to confirm they fail
-3. Commit tests
-4. Generate code to pass tests
-5. Iterate until all tests pass
-6. Commit implementation
-```
-
-#### 3. Feature Implementation
-
-```
-1. Review requirements and design documents
-2. Check existing similar implementations
-3. Create necessary models, migrations, factories
-4. Implement service layer logic
-5. Create controllers and routes
-6. Write comprehensive tests
-7. Verify all tests pass
-8. Format code with Pint
-9. Commit changes
-```
+- Prefer deterministic tests; avoid time-based flakes.
+- Add regression tests when fixing bugs.
+- Ensure tests run in CI with minimal env assumptions.
 
 ---
 
-## Quality Assurance
+## Security Standards
 
-### Code Review Checklist
-
-Before finalizing any code changes, verify:
-
-- [ ] Follows existing code conventions
-- [ ] Uses descriptive variable and method names
-- [ ] Includes proper type declarations
-- [ ] Has appropriate test coverage
-- [ ] Follows Laravel best practices
-- [ ] Uses proper Eloquent relationships
-- [ ] Implements proper validation via Form Requests
-- [ ] Follows Laravel 12 structure guidelines
-- [ ] Passes code formatting standards (Pint)
-- [ ] Passes static analysis (Larastan)
-- [ ] Includes necessary documentation (when requested)
-- [ ] No security vulnerabilities
-- [ ] No N+1 query problems
-- [ ] Proper error handling
-
-### Performance Considerations
-
-- **Prevent N+1 queries** with eager loading
-- Use **queued jobs** for time-consuming operations
-- Leverage **Laravel's built-in caching** mechanisms (Redis)
-- Optimize database queries using Eloquent best practices
-- Use **database indexes** appropriately
-- Implement **query result caching** where beneficial
-
-### Testing Requirements
-
-- **80%+ test coverage** for critical components
-- All new features must have tests
-- All bug fixes must have regression tests
-- Tests must pass before committing
-- Use factories for test data
-- Avoid mocks when possible
+- Treat localStorage data as **untrusted input**.
+- Validate all user-provided data:
+  - File uploads: strict MIME/type/size
+  - Imported data: schema + business rules
+  - Text fields: avoid XSS; rely on Blade escaping and careful rendering
+- Enforce per-user authorization on Account runs:
+  - Do not allow IDOR via `/plans/{id}`.
+- Apply rate limiting to public endpoints where configured.
+- Keep secrets out of logs and documentation.
 
 ---
 
-## Project-Specific Guidelines
+## Performance, Caching, and Reliability
 
-### Umamusume Career Planner Specifics
+### Performance Targets (v2 alignment)
 
-**Domain Concepts:**
+- Prefer p95 targets consistent with SRS:
+  - Fast page loads
+  - Skill autocomplete and predictions responsive
+- Cache where data is stable:
+  - Skill catalog, character lists, read-only reference data
+- Avoid N+1 queries; eager load relationships intentionally.
 
-- **Characters**: Stats (0-1200 range), aptitudes (G-SS ratings)
-- **Training**: URA Finale vs Unity Cup scenarios
-- **Skills**: Evolution chains, hint-based SP cost reduction
-- **Support Cards**: 6-card deck configuration
-- **Careers**: 60-70 turn progression tracking
+### Reliability
 
-**Key Services:**
-
-- `TrainingCalculationService` - Training outcome predictions
-- `SkillEvolutionService` - Skill evolution and hint management
-- `CharacterStateService` - Character state tracking
-- `DeckOptimizationService` - Support card deck optimization
-
-**External Integrations:**
-
-- **Ollama**: Local AI models (primary)
-- **AWS Bedrock**: Cloud AI fallback
-- **umapyoi.net**: Game data API
-- **Tesseract OCR**: Screenshot processing
-
-**Performance Targets:**
-
-- Core features: <2 seconds
-- AI recommendations: <3 seconds (local), <5 seconds (cloud)
-- Database queries: <500ms
-- User interactions: <100ms feedback
+- Offline handling:
+  - Account mode must degrade gracefully when offline (disable save; preserve draft)
+  - Local mode must remain functional offline
+- Draft autosave:
+  - Ensure draft clearing after successful save
+  - Provide restore/discard flows
 
 ---
 
-## Additional Resources
+## Documentation Standards
 
-### Internal Documentation
+### Source of Truth and Consistency
 
-- `.kiro/steering/product.md` - Product overview
-- `.kiro/steering/tech.md` - Technology stack and commands
-- `.kiro/steering/structure.md` - Project structure
-- `docs/` - Comprehensive feature documentation
-- `docs/ai-coding-assistant-best-practices.md` - Detailed research compilation
+When updating implementation or docs, ensure alignment with:
 
-### External Resources
+- **PRDs**: product requirements per module
+- **SPECs**: technical requirements and contracts
+- **FLOWs**: system flows (Mermaid)
+- **SEQs**: interaction sequences (Mermaid)
+- **TECH-FLOWs**: architecture + task breakdowns
+- **USER FLOWs**: journey maps and decision points
+- **WIREFRAMES**: UX expectations
 
-- [Laravel 12 Documentation](https://laravel.com/docs/12.x)
-- [Pest Documentation](https://pestphp.com)
-- [Tailwind CSS v4 Documentation](https://tailwindcss.com)
-- [Laravel AI Development Guide](https://laravel.com/docs/12.x/ai)
+### Formatting Rules
 
----
+- Use clear headings, ToC when appropriate, and consistent terminology.
+- Prefer Mermaid diagrams when describing flows and sequences.
+- Provide document control:
+  - Version, date, status
+  - Change log section
 
-## Conclusion
+### Terminology Rules
 
-This document serves as the authoritative guide for AI coding assistants working on this Laravel application. Following these guidelines ensures consistent, maintainable, and high-quality code that aligns with Laravel best practices and project-specific requirements.
-
-**Key Takeaways:**
-
-1. **Context is Critical** - Provide relevant files, imports, and project structure
-2. **Be Specific** - Clear, detailed instructions yield better results
-3. **Validate Everything** - Test, review, and verify all AI-generated code
-4. **Iterate Continuously** - First attempts are rarely perfect
-5. **Prioritize Security** - Never trust AI-generated code without security review
-6. **Follow Laravel Conventions** - Leverage Laravel's opinionated structure
-7. **Test Thoroughly** - Use Pest framework for comprehensive testing
-8. **Maintain Quality** - Run Pint and Larastan before committing
+- Use “Plan” and “Career Run” consistently (define once per doc).
+- Use canonical field names in any schema examples.
+- Define enums and valid values when relevant.
 
 ---
 
-**Document Version:** 1.0  
-**Last Updated:** January 2026  
-**Based On:** Official recommendations from Anthropic, Amazon, GitHub, OpenAI, Google, Cursor, and JetBrains  
-**Review Status:** Ready for team adoption
+## Pull Request & Change Management
+
+When generating changes (code or docs):
+
+- Keep changes minimal and scoped.
+- Write meaningful commit messages.
+- Document behavior changes in:
+  - README (if user-facing)
+  - Core docs (SDP/SRS/SDS/etc. if architectural/requirement-affecting)
+- Update tests alongside changes.
+
+---
+
+## Definition of Done
+
+A change is considered complete when:
+
+- [ ] Works in **Local** and **Account** modes (if applicable)
+- [ ] Validation rules are present and tested
+- [ ] Unit/feature tests pass (`php artisan test`)
+- [ ] E2E tests pass where relevant (`npm run playwright:test`)
+- [ ] Formatting passes (`pint`, prettier)
+- [ ] Accessibility considerations are met (keyboard nav, focus management, contrast)
+- [ ] Documentation is updated when behavior or interfaces changed
+
+---
 
 ===
 
@@ -950,8 +362,8 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - laravel/pint (PINT) - v1
 - laravel/sail (SAIL) - v1
 - laravel/telescope (TELESCOPE) - v5
-- pestphp/pest (PEST) - v3
-- phpunit/phpunit (PHPUNIT) - v11
+- pestphp/pest (PEST) - v4
+- phpunit/phpunit (PHPUNIT) - v12
 - alpinejs (ALPINEJS) - v3
 - tailwindcss (TAILWINDCSS) - v4
 
@@ -1214,6 +626,51 @@ it('has emails', function (string $email) {
     'james' => 'james@laravel.com',
     'taylor' => 'taylor@laravel.com',
 ]);
+</code-snippet>
+
+=== pest/v4 rules ===
+
+## Pest 4
+
+- Pest 4 is a huge upgrade to Pest and offers: browser testing, smoke testing, visual regression testing, test sharding, and faster type coverage.
+- Browser testing is incredibly powerful and useful for this project.
+- Browser tests should live in `tests/Browser/`.
+- Use the `search-docs` tool for detailed guidance on utilizing these features.
+
+### Browser Testing
+
+- You can use Laravel features like `Event::fake()`, `assertAuthenticated()`, and model factories within Pest 4 browser tests, as well as `RefreshDatabase` (when needed) to ensure a clean state for each test.
+- Interact with the page (click, type, scroll, select, submit, drag-and-drop, touch gestures, etc.) when appropriate to complete the test.
+- If requested, test on multiple browsers (Chrome, Firefox, Safari).
+- If requested, test on different devices and viewports (like iPhone 14 Pro, tablets, or custom breakpoints).
+- Switch color schemes (light/dark mode) when appropriate.
+- Take screenshots or pause tests for debugging when appropriate.
+
+### Example Tests
+
+<code-snippet name="Pest Browser Test Example" lang="php">
+it('may reset the password', function () {
+    Notification::fake();
+
+    $this->actingAs(User::factory()->create());
+
+    $page = visit('/sign-in'); // Visit on a real browser...
+
+    $page->assertSee('Sign In')
+        ->assertNoJavascriptErrors() // or ->assertNoConsoleLogs()
+        ->click('Forgot Password?')
+        ->fill('email', 'nuno@laravel.com')
+        ->click('Send Reset Link')
+        ->assertSee('We have emailed your password reset link!')
+
+    Notification::assertSent(ResetPassword::class);
+});
+</code-snippet>
+
+<code-snippet name="Pest Smoke Testing Example" lang="php">
+$pages = visit(['/', '/about', '/contact']);
+
+$pages->assertNoJavascriptErrors()->assertNoConsoleLogs();
 </code-snippet>
 
 === tailwindcss/core rules ===
