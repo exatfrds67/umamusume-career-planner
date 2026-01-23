@@ -26,6 +26,8 @@ class AgentFeedbackService
 
     /**
      * Record feedback for an agent message
+     *
+     * @param  array<string>  $categories
      */
     public function recordFeedback(
         ConversationMessage $message,
@@ -48,7 +50,7 @@ class AgentFeedbackService
 
             // Update agent performance metrics
             if ($message->agent_id !== null) {
-                $this->updateAgentMetrics((string) $message->agent_id, $rating);
+                $this->updateAgentMetrics((is_string($message) ? (string) $message : '')->agent_id, $rating);
             }
 
             Log::info('[AgentFeedback] Feedback recorded', [
@@ -69,8 +71,7 @@ class AgentFeedbackService
     /**
      * Get agent performance summary
      */
-    public function getAgentPerformanceSummary(string $agentId): array
-    {
+    public function getAgentPerformanceSummary(): array
         try {
             $messages = ConversationMessage::where('agent_id', $agentId)
                 ->whereNotNull('quality_rating')
@@ -103,8 +104,7 @@ class AgentFeedbackService
     /**
      * Get improvement recommendations for an agent
      */
-    public function getImprovementRecommendations(string $agentId): array
-    {
+    public function getImprovementRecommendations(): array
         try {
             $lowRatedMessages = ConversationMessage::where('agent_id', $agentId)
                 ->where('quality_rating', '<=', 2)
@@ -152,8 +152,7 @@ class AgentFeedbackService
     /**
      * Apply learning from feedback
      */
-    public function applyLearning(string $agentId): array
-    {
+    public function applyLearning(): array
         try {
             // Get all feedback for this agent
             $feedback = $this->memoryService->getLearnings($agentId);
@@ -198,10 +197,7 @@ class AgentFeedbackService
     /**
      * Get feedback trends over time
      */
-    public function getFeedbackTrends(
-        string $agentId,
-        string $timeframe = '30d'
-    ): array {
+    public function getFeedbackTrends(): array
         try {
             $startDate = $this->getTimeframeStart($timeframe);
 
@@ -244,9 +240,10 @@ class AgentFeedbackService
 
     /**
      * Compare agent performance
+     *
+     * @param  array<string>  $agentIds
      */
-    public function compareAgents(array $agentIds): array
-    {
+    public function compareAgents(): array
         try {
             $comparison = [];
 
@@ -275,6 +272,8 @@ class AgentFeedbackService
 
     /**
      * Protected helper methods
+     *
+     * @param  array<string>  $categories
      */
     protected function storeFeedbackForLearning(
         ConversationMessage $message,
@@ -294,14 +293,14 @@ class AgentFeedbackService
             'context' => [
                 'message_type' => $message->message_type,
                 'tools_used' => $message->tools_used,
-                'processing_time' => $message->processing_time,
+                'processing_time' => $$message->getAttribute('processing_time'),
                 'tokens_used' => $message->tokens_used,
             ],
             'timestamp' => now()->toIso8601String(),
         ];
 
         $this->memoryService->storeLearning(
-            (string) $message->agent_id,
+            (is_string($message) ? (string) $message : '')->agent_id,
             "feedback:{$message->id}",
             $learningData
         );
@@ -325,8 +324,7 @@ class AgentFeedbackService
         Cache::put($cacheKey, $metrics, 86400); // 24 hours
     }
 
-    protected function getRatingDistribution(Collection $messages): array
-    {
+    protected function getRatingDistribution(): array
         $distribution = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0];
 
         foreach ($messages as $message) {
@@ -362,8 +360,7 @@ class AgentFeedbackService
         }
     }
 
-    protected function identifyImprovementAreas(string $agentId): array
-    {
+    protected function identifyImprovementAreas(): array
         $lowRatedMessages = ConversationMessage::where('agent_id', $agentId)
             ->where('quality_rating', '<=', 2)
             ->get();
@@ -393,8 +390,7 @@ class AgentFeedbackService
         return $areas;
     }
 
-    protected function identifyStrengths(string $agentId): array
-    {
+    protected function identifyStrengths(): array
         $highRatedMessages = ConversationMessage::where('agent_id', $agentId)
             ->where('quality_rating', '>=', 4)
             ->get();
@@ -414,8 +410,7 @@ class AgentFeedbackService
         return $strengths;
     }
 
-    protected function analyzeCommonIssues(Collection $messages): array
-    {
+    protected function analyzeCommonIssues(): array
         $issues = [];
 
         foreach ($messages as $message) {
@@ -465,26 +460,34 @@ class AgentFeedbackService
         };
     }
 
-    protected function analyzeToolUsagePatterns(string $agentId): array
-    {
+    protected function analyzeToolUsagePatterns(): array
         // Analyze which tools correlate with low ratings
         return [];
     }
 
-    protected function analyzeResponsePatterns(string $agentId): array
-    {
+    protected function analyzeResponsePatterns(): array
         // Analyze response characteristics that correlate with ratings
         return [];
     }
 
-    protected function analyzePatterns(array $feedback): array
-    {
+    /**
+     * Analyze patterns
+     *
+     * @param  array<string, mixed>  $feedback
+     * @return array<int, array<string, mixed>>
+     */
+    protected function analyzePatterns(): array
         // Analyze feedback to identify patterns
         return [];
     }
 
-    protected function generateConfigurationUpdates(array $patterns): array
-    {
+    /**
+     * Generate configuration updates
+     *
+     * @param  array<int, array<string, mixed>>  $patterns
+     * @return array<int, array<string, mixed>>
+     */
+    protected function generateConfigurationUpdates(): array
         // Generate configuration updates based on learned patterns
         return [];
     }
@@ -499,8 +502,13 @@ class AgentFeedbackService
         };
     }
 
-    protected function calculateOverallImprovement(array $trends): array
-    {
+    /**
+     * Calculate overall improvement
+     *
+     * @param  array<int, array<string, mixed>>  $trends
+     * @return array<string, mixed>
+     */
+    protected function calculateOverallImprovement(): array
         if (count($trends) < 2) {
             return ['status' => 'insufficient_data'];
         }
@@ -516,56 +524,74 @@ class AgentFeedbackService
         ];
     }
 
-    protected function calculateRankings(array $comparison): array
-    {
+    /**
+     * Calculate rankings
+     *
+     * @param  array<string, array<string, mixed>>  $comparison
+     * @return array<string, array<string, int>>
+     */
+    protected function calculateRankings(): array
         $rankings = [];
 
         // Rank by average rating
         $byRating = collect($comparison)->sortByDesc('avg_rating');
         $rank = 1;
         foreach ($byRating as $agentId => $data) {
-            $rankings[$agentId]['rating_rank'] = $rank++;
+            $rankings[$agentId]['rating_rank'] = $rank = ($rank ?? 0) + 1;
         }
 
         // Rank by helpful rate
         $byHelpful = collect($comparison)->sortByDesc('helpful_rate');
         $rank = 1;
         foreach ($byHelpful as $agentId => $data) {
-            $rankings[$agentId]['helpful_rank'] = $rank++;
+            $rankings[$agentId]['helpful_rank'] = $rank = ($rank ?? 0) + 1;
         }
 
         return $rankings;
     }
 
+    /**
+     * Identify best performer
+     *
+     * @param  array<string, array<string, mixed>>  $comparison
+     */
     protected function identifyBestPerformer(array $comparison): ?string
     {
         $best = collect($comparison)->sortByDesc('avg_rating')->first();
 
-        return $best ? array_search($best, $comparison) : null;
+        if ($best === null) {
+            return null;
+        }
+
+        $key = array_search($best, $comparison, true);
+
+        return is_string($key) ? $key : null;
     }
 
-    protected function identifyNeedsImprovement(array $comparison): array
-    {
+    /**
+     * Identify needs improvement
+     *
+     * @param  array<string, array<string, mixed>>  $comparison
+     * @return array<int, string>
+     */
+    protected function identifyNeedsImprovement(): array
         return collect($comparison)
-            ->filter(fn ($data) => $data['avg_rating'] < 3.5)
+            ->filter(fn ($data) => (is_array($data) && isset($data['avg_rating']) ? $data['avg_rating'] : null) < 3.5)
             ->keys()
             ->toArray();
     }
 
-    protected function analyzeToolIssues(Collection $messages): array
-    {
+    protected function analyzeToolIssues(): array
         // Analyze tool-related issues
         return [];
     }
 
-    protected function analyzeSuccessfulPatterns(Collection $messages): array
-    {
+    protected function analyzeSuccessfulPatterns(): array
         // Analyze what makes messages successful
         return [];
     }
 
-    protected function getDefaultPerformanceSummary(string $agentId): array
-    {
+    protected function getDefaultPerformanceSummary(): array
         return [
             'agent_id' => $agentId,
             'total_messages' => 0,

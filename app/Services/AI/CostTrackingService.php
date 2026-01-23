@@ -55,9 +55,9 @@ class CostTrackingService
                 'input_cost' => $this->calculateInputCost($model, $inputTokens),
                 'output_cost' => $this->calculateOutputCost($model, $outputTokens),
                 'total_cost' => $cost,
-                'response_time' => $metadata['response_time'] ?? null,
-                'cached' => $metadata['cached'] ?? false,
-                'request_summary' => $metadata['summary'] ?? null,
+                'response_time' => is_numeric((is_array($metadata) && isset($metadata['response_time']) ? $metadata['response_time'] : null)) ? (float) ($metadata['response_time']) : null,
+                'cached' => (bool) ($metadata['cached'] ?? false),
+                'request_summary' => isset($metadata['summary']) && is_string($metadata['summary']) ? $metadata['summary'] : null,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -82,10 +82,12 @@ class CostTrackingService
             ->where('created_at', '>=', $since);
 
         if ($userId) {
-            $query->where('user_id', $userId);
+            $query->where('user_id', '=', $userId);
         }
 
-        return $query->sum('total_cost') ?? 0.0;
+        $sum = $query->sum('total_cost');
+
+        return is_numeric($sum) ? (float) $sum : 0.0;
     }
 
     /**
@@ -93,8 +95,7 @@ class CostTrackingService
      *
      * @return array<string, float>
      */
-    public function getCostByProvider(string $period = '30d', ?int $userId = null): array
-    {
+    public function getCostByProvider(): array
         $hours = $this->periodToHours($period);
         $since = now()->subHours($hours);
 
@@ -104,12 +105,12 @@ class CostTrackingService
             ->groupBy('provider');
 
         if ($userId) {
-            $query->where('user_id', $userId);
+            $query->where('user_id', '=', $userId);
         }
 
         return $query->get()
             ->pluck('total', 'provider')
-            ->map(fn ($cost) => round($cost, 6))
+            ->map(fn ($cost) => is_numeric($cost) ? round((float) $cost, 6) : 0.0)
             ->toArray();
     }
 
@@ -118,8 +119,7 @@ class CostTrackingService
      *
      * @return array<string, float>
      */
-    public function getCostByModel(string $period = '30d', ?int $userId = null): array
-    {
+    public function getCostByModel(): array
         $hours = $this->periodToHours($period);
         $since = now()->subHours($hours);
 
@@ -129,12 +129,12 @@ class CostTrackingService
             ->groupBy('model');
 
         if ($userId) {
-            $query->where('user_id', $userId);
+            $query->where('user_id', '=', $userId);
         }
 
         return $query->get()
             ->pluck('total', 'model')
-            ->map(fn ($cost) => round($cost, 6))
+            ->map(fn ($cost) => is_numeric($cost) ? round((float) $cost, 6) : 0.0)
             ->toArray();
     }
 
@@ -143,8 +143,7 @@ class CostTrackingService
      *
      * @return array<string, float>
      */
-    public function getCostByRequestType(string $period = '30d', ?int $userId = null): array
-    {
+    public function getCostByRequestType(): array
         $hours = $this->periodToHours($period);
         $since = now()->subHours($hours);
 
@@ -155,12 +154,12 @@ class CostTrackingService
             ->groupBy('request_type');
 
         if ($userId) {
-            $query->where('user_id', $userId);
+            $query->where('user_id', '=', $userId);
         }
 
         return $query->get()
             ->pluck('total', 'request_type')
-            ->map(fn ($cost) => round($cost, 6))
+            ->map(fn ($cost) => is_numeric($cost) ? round((float) $cost, 6) : 0.0)
             ->toArray();
     }
 
@@ -169,8 +168,7 @@ class CostTrackingService
      *
      * @return array<int, array{date: string, cost: float}>
      */
-    public function getDailyCostTrend(int $days = 30, ?int $userId = null): array
-    {
+    public function getDailyCostTrend(): array
         $since = now()->subDays($days);
 
         $query = DB::table('ucp_ai_costs')
@@ -180,13 +178,13 @@ class CostTrackingService
             ->orderBy('date');
 
         if ($userId) {
-            $query->where('user_id', $userId);
+            $query->where('user_id', '=', $userId);
         }
 
         return $query->get()
             ->map(fn ($record) => [
                 'date' => $record->date,
-                'cost' => round($record->cost, 6),
+                'cost' => is_numeric($$record->getAttribute('cost')) ? round((float) $$record->getAttribute('cost'), 6) : 0.0,
             ])
             ->toArray();
     }
@@ -206,8 +204,7 @@ class CostTrackingService
      *     alert_level: string
      * }
      */
-    public function getBudgetStatus(?int $userId = null, ?float $customBudget = null): array
-    {
+    public function getBudgetStatus(): array
         $budgetLimit = $customBudget ?? $this->defaultBudgetLimit;
 
         // Get current month's spend
@@ -266,8 +263,7 @@ class CostTrackingService
      *     }>
      * }
      */
-    public function getCostOptimizationRecommendations(?int $userId = null): array
-    {
+    public function getCostOptimizationRecommendations(): array
         $currentCost = $this->getTotalCost('30d', $userId);
         $costByProvider = $this->getCostByProvider('30d', $userId);
         $costByModel = $this->getCostByModel('30d', $userId);
@@ -279,7 +275,7 @@ class CostTrackingService
         $bedrockCost = $costByProvider['bedrock'] ?? 0.0;
         if ($bedrockCost > 0) {
             $estimatedSavings = $bedrockCost * 0.4; // 40% of Bedrock costs could be local
-            $potentialSavings += $estimatedSavings;
+            $potentialSavings = ($potentialSavings ?? 0) + $estimatedSavings;
 
             $recommendations[] = [
                 'type' => 'local_processing',
@@ -293,7 +289,7 @@ class CostTrackingService
         $sonnetCost = $costByModel['claude-3-5-sonnet'] ?? 0.0;
         if ($sonnetCost > 0) {
             $estimatedSavings = $sonnetCost * 0.3; // 30% could use Haiku instead
-            $potentialSavings += $estimatedSavings;
+            $potentialSavings = ($potentialSavings ?? 0) + $estimatedSavings;
 
             $recommendations[] = [
                 'type' => 'model_selection',
@@ -307,7 +303,7 @@ class CostTrackingService
         $cachedPercentage = $this->getCachedRequestPercentage($userId);
         if ($cachedPercentage < 20) {
             $estimatedSavings = $currentCost * 0.2; // 20% savings from caching
-            $potentialSavings += $estimatedSavings;
+            $potentialSavings = ($potentialSavings ?? 0) + $estimatedSavings;
 
             $recommendations[] = [
                 'type' => 'caching',
@@ -321,7 +317,7 @@ class CostTrackingService
         $avgTokensPerRequest = $this->getAverageTokensPerRequest($userId);
         if ($avgTokensPerRequest > 2000) {
             $estimatedSavings = $currentCost * 0.15; // 15% savings from optimization
-            $potentialSavings += $estimatedSavings;
+            $potentialSavings = ($potentialSavings ?? 0) + $estimatedSavings;
 
             $recommendations[] = [
                 'type' => 'token_optimization',
@@ -353,7 +349,11 @@ class CostTrackingService
         }
 
         $modelPricing = $pricing['models'][$model];
-        $inputPrice = $modelPricing['input_price'];
+        if (! \is_array($modelPricing) || ! isset($modelPricing['input_price'], $modelPricing['unit'])) {
+            return 0.0;
+        }
+
+        $inputPrice = is_numeric($modelPricing['input_price']) ? (float) $modelPricing['input_price'] : 0.0;
 
         // Check if pricing is per 1K or 1M tokens
         if ($modelPricing['unit'] === 'per 1K tokens') {
@@ -375,7 +375,11 @@ class CostTrackingService
         }
 
         $modelPricing = $pricing['models'][$model];
-        $outputPrice = $modelPricing['output_price'];
+        if (! \is_array($modelPricing) || ! isset($modelPricing['output_price'], $modelPricing['unit'])) {
+            return 0.0;
+        }
+
+        $outputPrice = is_numeric($modelPricing['output_price']) ? (float) $modelPricing['output_price'] : 0.0;
 
         // Check if pricing is per 1K or 1M tokens
         if ($modelPricing['unit'] === 'per 1K tokens') {
@@ -394,11 +398,11 @@ class CostTrackingService
             ->where('created_at', '>=', now()->subDays(30));
 
         if ($userId) {
-            $query->where('user_id', $userId);
+            $query->where('user_id', '=', $userId);
         }
 
         $total = $query->count();
-        $cached = $query->where('cached', true)->count();
+        $cached = (clone $query)->where('cached', '=', true)->count();
 
         return $total > 0 ? ($cached / $total) * 100 : 0;
     }
@@ -412,10 +416,12 @@ class CostTrackingService
             ->where('created_at', '>=', now()->subDays(30));
 
         if ($userId) {
-            $query->where('user_id', $userId);
+            $query->where('user_id', '=', $userId);
         }
 
-        return $query->avg('total_tokens') ?? 0.0;
+        $avg = $query->avg('total_tokens');
+
+        return is_numeric($avg) ? (float) $avg : 0.0;
     }
 
     /**

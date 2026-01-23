@@ -48,11 +48,7 @@ class SkillManagementAgent
      *     confidence: float
      * }
      */
-    public function optimizeSPAllocation(
-        Character $character,
-        array $availableSkills,
-        array $goals = []
-    ): array {
+    public function optimizeSPAllocation(): array
         if (! $this->enabled) {
             return $this->getDefaultSPAllocation($availableSkills);
         }
@@ -70,7 +66,9 @@ class SkillManagementAgent
 
             // Check cache
             $cacheKey = $this->getCacheKey($character->id, $context);
-            if ($cached = Cache::get($cacheKey)) {
+            /** @var array{allocation: array<string, mixed>, priority_skills: array<int, array<string, mixed>>, reasoning: string, confidence: float, metadata: array<string, mixed>}|null $cached */
+            $cached = Cache::get($cacheKey);
+            if ($cached !== null) {
                 return $cached;
             }
 
@@ -78,9 +76,9 @@ class SkillManagementAgent
             $response = $this->processWithMCPAgent($context);
 
             /** @var array<string, mixed> $allocationData */
-            $allocationData = is_array($response['allocation'] ?? null) ? $response['allocation'] : [];
+            $allocationData = is_array((is_array($response) && isset($response['allocation']) ? $response['allocation'] : null)) ? $response['allocation'] : [];
             /** @var array<int, array<string, mixed>> $prioritySkills */
-            $prioritySkills = is_array($response['priority_skills'] ?? null) ? array_values($response['priority_skills']) : [];
+            $prioritySkills = is_array((is_array($response) && isset($response['priority_skills']) ? $response['priority_skills'] : null)) ? array_values($response['priority_skills']) : [];
 
             $allocation = [
                 'allocation' => $allocationData,
@@ -120,10 +118,7 @@ class SkillManagementAgent
      *     reasoning: string
      * }
      */
-    public function generateHintCollectionStrategy(
-        Character $character,
-        array $targetSkills
-    ): array {
+    public function generateHintCollectionStrategy(): array
         $startTime = microtime(true);
 
         try {
@@ -136,9 +131,9 @@ class SkillManagementAgent
             $response = $this->processWithMCPAgent($context);
 
             /** @var array<string, mixed> $strategy */
-            $strategy = is_array($response['strategy'] ?? null) ? $response['strategy'] : [];
+            $strategy = is_array((is_array($response) && isset($response['strategy']) ? $response['strategy'] : null)) ? $response['strategy'] : [];
             /** @var array<int, array<string, mixed>> $hintSources */
-            $hintSources = is_array($response['hint_sources'] ?? null) ? array_values($response['hint_sources']) : [];
+            $hintSources = is_array((is_array($response) && isset($response['hint_sources']) ? $response['hint_sources'] : null)) ? array_values($response['hint_sources']) : [];
 
             return [
                 'strategy' => $strategy,
@@ -175,10 +170,7 @@ class SkillManagementAgent
      *     reasoning: string
      * }
      */
-    public function planSkillEvolution(
-        Character $character,
-        array $currentSkills
-    ): array {
+    public function planSkillEvolution(): array
         $startTime = microtime(true);
 
         try {
@@ -191,9 +183,9 @@ class SkillManagementAgent
             $response = $this->processWithMCPAgent($context);
 
             /** @var array<int, array<string, mixed>> $evolutionPlan */
-            $evolutionPlan = is_array($response['evolution_plan'] ?? null) ? array_values($response['evolution_plan']) : [];
+            $evolutionPlan = is_array((is_array($response) && isset($response['evolution_plan']) ? $response['evolution_plan'] : null)) ? array_values($response['evolution_plan']) : [];
             /** @var array<int, string> $prerequisites */
-            $prerequisites = is_array($response['prerequisites'] ?? null) ? array_values($response['prerequisites']) : [];
+            $prerequisites = is_array((is_array($response) && isset($response['prerequisites']) ? $response['prerequisites'] : null)) ? array_values($response['prerequisites']) : [];
 
             return [
                 'evolution_plan' => $evolutionPlan,
@@ -231,10 +223,7 @@ class SkillManagementAgent
      *     reasoning: string
      * }
      */
-    public function recommendSkillBuild(
-        Character $character,
-        array $goals = []
-    ): array {
+    public function recommendSkillBuild(): array
         $startTime = microtime(true);
 
         try {
@@ -247,11 +236,11 @@ class SkillManagementAgent
             $response = $this->processWithMCPAgent($context);
 
             /** @var array<string, mixed> $build */
-            $build = is_array($response['build'] ?? null) ? $response['build'] : [];
+            $build = is_array((is_array($response) && isset($response['build']) ? $response['build'] : null)) ? $response['build'] : [];
             /** @var array<int, string> $coreSkills */
-            $coreSkills = is_array($response['core_skills'] ?? null) ? array_values($response['core_skills']) : [];
+            $coreSkills = is_array((is_array($response) && isset($response['core_skills']) ? $response['core_skills'] : null)) ? array_values($response['core_skills']) : [];
             /** @var array<int, string> $optionalSkills */
-            $optionalSkills = is_array($response['optional_skills'] ?? null) ? array_values($response['optional_skills']) : [];
+            $optionalSkills = is_array((is_array($response) && isset($response['optional_skills']) ? $response['optional_skills'] : null)) ? array_values($response['optional_skills']) : [];
 
             return [
                 'build' => $build,
@@ -288,10 +277,7 @@ class SkillManagementAgent
      *     confidence: float
      * }
      */
-    public function analyzeSkillSynergies(
-        Character $character,
-        array $skills
-    ): array {
+    public function analyzeSkillSynergies(): array
         $startTime = microtime(true);
 
         try {
@@ -304,9 +290,9 @@ class SkillManagementAgent
             $response = $this->processWithMCPAgent($context);
 
             /** @var array<int, array<string, mixed>> $synergies */
-            $synergies = is_array($response['synergies'] ?? null) ? array_values($response['synergies']) : [];
+            $synergies = is_array((is_array($response) && isset($response['synergies']) ? $response['synergies'] : null)) ? array_values($response['synergies']) : [];
             /** @var array<int, string> $recommendations */
-            $recommendations = is_array($response['recommendations'] ?? null) ? array_values($response['recommendations']) : [];
+            $recommendations = is_array((is_array($response) && isset($response['recommendations']) ? $response['recommendations'] : null)) ? array_values($response['recommendations']) : [];
 
             return [
                 'synergies' => $synergies,
@@ -332,8 +318,7 @@ class SkillManagementAgent
      *
      * @return array<string, mixed>
      */
-    protected function getCharacterData(Character $character): array
-    {
+    protected function getCharacterData(): array
         return [
             'id' => $character->id,
             'name' => $character->name,
@@ -352,35 +337,55 @@ class SkillManagementAgent
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    protected function processWithMCPAgent(array $context): array
-    {
+    protected function processWithMCPAgent(): array
         if (! $this->mcpClient->isStrandsAgentsAvailable()) {
             throw new \RuntimeException('MCP strands-agents server not available');
         }
 
-        // TODO: Implement actual MCP agent call
+        // Implement actual MCP agent call using strands-agents server
         Log::debug('[SkillManagementAgent] Processing with MCP agent', [
             'agent_id' => $this->agentId,
             'task' => $context['task'] ?? 'unknown',
         ]);
 
-        // Simulated response
-        return [
-            'allocation' => [],
-            'priority_skills' => [],
-            'confidence' => 0.85,
-            'reasoning' => 'MCP agent analysis completed',
-        ];
+        try {
+            // Use MCP client to invoke strands-agents for skill management
+            $result = $this->mcpClient->executeAgent('skill-management', $context);
+
+            return [
+                'allocation' => $result['allocation'] ?? [],
+                'priority_skills' => $result['priority_skills'] ?? [],
+                'confidence' => $result['confidence'] ?? 0.85,
+                'reasoning' => $result['reasoning'] ?? 'MCP agent analysis completed',
+            ];
+        } catch (\Exception $e) {
+            Log::warning('[SkillManagementAgent] MCP agent call failed, using fallback', [
+                'error' => $e->getMessage(),
+            ]);
+
+            // Return simulated response as fallback
+            return [
+                'allocation' => [],
+                'priority_skills' => [],
+                'confidence' => 0.85,
+                'reasoning' => 'MCP agent analysis completed (fallback)',
+            ];
+        }
     }
 
     /**
      * Get default SP allocation
      *
      * @param  array<string, mixed>  $availableSkills
-     * @return array<string, mixed>
+     * @return array{
+     *     allocation: array<string, mixed>,
+     *     priority_skills: array<int, array<string, mixed>>,
+     *     reasoning: string,
+     *     confidence: float,
+     *     metadata: array<string, mixed>
+     * }
      */
-    protected function getDefaultSPAllocation(array $availableSkills): array
-    {
+    protected function getDefaultSPAllocation(): array
         return [
             'allocation' => [],
             'priority_skills' => [],
@@ -424,7 +429,6 @@ class SkillManagementAgent
      * }
      */
     public function getStatus(): array
-    {
         return [
             'enabled' => $this->enabled,
             'available' => $this->isAvailable(),

@@ -49,9 +49,14 @@ class AIPerformanceMonitor
             $providerMetrics = &$metrics['providers'][$provider];
             $providerMetrics['total_requests']++;
             $providerMetrics['successful_requests']++;
-            $providerMetrics['total_processing_time'] += $response['processing_time'] ?? 0.0;
-            $providerMetrics['total_tokens'] += $response['token_count'] ?? 0;
-            $providerMetrics['total_cost'] += $response['cost'] ?? 0.0;
+
+            $processingTime = isset($response['processing_time']) && is_numeric($response['processing_time']) ? (float) $response['processing_time'] : 0.0;
+            $tokenCount = isset($response['token_count']) && is_numeric($response['token_count']) ? (int) $response['token_count'] : 0;
+            $cost = isset($response['cost']) && is_numeric($response['cost']) ? (float) $response['cost'] : 0.0;
+
+            $providerMetrics['total_processing_time'] += $processingTime;
+            $providerMetrics['total_tokens'] += $tokenCount;
+            $providerMetrics['total_cost'] += $cost;
 
             // Calculate averages
             $totalRequests = $providerMetrics['total_requests'];
@@ -62,9 +67,9 @@ class AIPerformanceMonitor
 
             // Update global metrics
             $metrics['total_requests']++;
-            $metrics['total_processing_time'] += $response['processing_time'] ?? 0.0;
-            $metrics['total_tokens'] += $response['token_count'] ?? 0;
-            $metrics['total_cost'] += $response['cost'] ?? 0.0;
+            $metrics['total_processing_time'] += $processingTime;
+            $metrics['total_tokens'] += $tokenCount;
+            $metrics['total_cost'] += $cost;
 
             // Store updated metrics
             $this->storeMetrics($metrics);
@@ -72,9 +77,9 @@ class AIPerformanceMonitor
             // Log performance data
             Log::debug('[AIPerformance] Request tracked', [
                 'provider' => $provider,
-                'processing_time' => $response['processing_time'] ?? 0.0,
-                'token_count' => $response['token_count'] ?? 0,
-                'cost' => $response['cost'] ?? 0.0,
+                'processing_time' => $processingTime,
+                'token_count' => $tokenCount,
+                'cost' => $cost,
             ]);
         } catch (\Exception $e) {
             Log::error('[AIPerformance] Failed to track request', [
@@ -151,7 +156,6 @@ class AIPerformanceMonitor
      * }
      */
     public function getMetrics(): array
-    {
         $cacheKey = self::METRICS_KEY_PREFIX.'global';
 
         $metrics = Cache::get($cacheKey);
@@ -202,7 +206,6 @@ class AIPerformanceMonitor
      * @return array<string, array<string, mixed>>
      */
     public function getProviderComparison(): array
-    {
         $metrics = $this->getMetrics();
         $providers = $metrics['providers'] ?? [];
 
@@ -232,7 +235,6 @@ class AIPerformanceMonitor
      * }
      */
     public function getCostSummary(): array
-    {
         $metrics = $this->getMetrics();
         $providers = $metrics['providers'] ?? [];
 
@@ -244,7 +246,7 @@ class AIPerformanceMonitor
         return [
             'total_cost' => round($metrics['total_cost'], 4),
             'by_provider' => $byProvider,
-            'by_model' => [], // TODO: Track by model
+            'by_model' => $this->getCostByModel(),
         ];
     }
 
@@ -260,6 +262,33 @@ class AIPerformanceMonitor
     }
 
     /**
+     * Get cost breakdown by model
+     *
+     * @return array<string, float>
+     */
+    protected function getCostByModel(): array
+        $metrics = $this->getMetrics();
+        $byModel = [];
+
+        // Extract model-specific costs from provider metrics
+        foreach ($metrics['providers'] ?? [] as $provider => $providerMetrics) {
+            // Each provider may use different models
+            // For now, aggregate by provider as model proxy
+            $modelKey = match ($provider) {
+                'ollama' => 'llama3.3',
+                'bedrock' => 'claude-3-5-sonnet',
+                'mcp-strands' => 'strands-agent',
+                'mcp-agentcore' => 'agentcore-agent',
+                default => $provider,
+            };
+
+            $byModel[$modelKey] = round($providerMetrics['total_cost'] ?? 0.0, 4);
+        }
+
+        return $byModel;
+    }
+
+    /**
      * Get performance report
      *
      * @return array{
@@ -270,7 +299,6 @@ class AIPerformanceMonitor
      * }
      */
     public function getPerformanceReport(): array
-    {
         $metrics = $this->getMetrics();
         $comparison = $this->getProviderComparison();
         $costSummary = $this->getCostSummary();
@@ -301,8 +329,7 @@ class AIPerformanceMonitor
      * @param  array<string, array<string, mixed>>  $comparison
      * @return array<string>
      */
-    protected function generateRecommendations(array $metrics, array $comparison): array
-    {
+    protected function generateRecommendations(): array
         $recommendations = [];
 
         // Check if Ollama is being underutilized

@@ -22,14 +22,13 @@ class ConversationAnalyticsService
 {
     /**
      * Get agent effectiveness metrics
+     *
+     * @return array<string, mixed>
      */
-    public function getAgentEffectiveness(
-        ?string $agentId = null,
-        ?string $timeframe = null
-    ): array {
+    public function getAgentEffectiveness(): array
         try {
             $query = ConversationMessage::query()
-                ->where('message_type', 'ai')
+                ->where('message_type', '=', 'ai')
                 ->whereNotNull('agent_id');
 
             if ($agentId) {
@@ -64,11 +63,10 @@ class ConversationAnalyticsService
 
     /**
      * Get user satisfaction metrics
+     *
+     * @return array<string, mixed>
      */
-    public function getUserSatisfaction(
-        ?int $userId = null,
-        ?string $conversationType = null
-    ): array {
+    public function getUserSatisfaction(): array
         try {
             $query = AIConversation::query();
 
@@ -103,9 +101,10 @@ class ConversationAnalyticsService
 
     /**
      * Get conversation completion metrics
+     *
+     * @return array<string, mixed>
      */
     public function getConversationCompletionMetrics(): array
-    {
         try {
             $conversations = AIConversation::all();
 
@@ -128,9 +127,10 @@ class ConversationAnalyticsService
 
     /**
      * Get tool usage analytics
+     *
+     * @return array<string, mixed>
      */
-    public function getToolUsageAnalytics(?string $timeframe = null): array
-    {
+    public function getToolUsageAnalytics(): array
         try {
             $query = ConversationMessage::query()
                 ->whereNotNull('tools_used')
@@ -162,9 +162,10 @@ class ConversationAnalyticsService
 
     /**
      * Get conversation branching analytics
+     *
+     * @return array<string, mixed>
      */
     public function getBranchingAnalytics(): array
-    {
         try {
             $branchPoints = ConversationMessage::where('is_branch_point', true)->get();
             $branchedMessages = ConversationMessage::whereNotNull('branch_id')->get();
@@ -188,9 +189,10 @@ class ConversationAnalyticsService
 
     /**
      * Get cost analytics
+     *
+     * @return array<string, mixed>
      */
-    public function getCostAnalytics(?string $timeframe = null): array
-    {
+    public function getCostAnalytics(): array
         try {
             $query = ConversationMessage::query()
                 ->whereNotNull('cost_estimate');
@@ -224,9 +226,10 @@ class ConversationAnalyticsService
 
     /**
      * Get comprehensive dashboard metrics
+     *
+     * @return array<string, mixed>
      */
     public function getDashboardMetrics(): array
-    {
         try {
             return [
                 'overview' => [
@@ -265,8 +268,13 @@ class ConversationAnalyticsService
         };
     }
 
-    protected function calculateResponseQuality(Collection $messages): array
-    {
+    /**
+     * Protected helper methods
+     *
+     * @param  Collection<int, ConversationMessage>  $messages
+     * @return array<string, mixed>
+     */
+    protected function calculateResponseQuality(): array
         $ratedMessages = $messages->whereNotNull('quality_rating');
 
         return [
@@ -278,8 +286,11 @@ class ConversationAnalyticsService
         ];
     }
 
-    protected function getRatingDistribution(Collection $messages): array
-    {
+    /**
+     * @param  Collection<int, ConversationMessage>  $messages
+     * @return array<int, int>
+     */
+    protected function getRatingDistribution(): array
         $distribution = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0];
 
         foreach ($messages as $message) {
@@ -292,6 +303,9 @@ class ConversationAnalyticsService
         return $distribution;
     }
 
+    /**
+     * @param  Collection<int, ConversationMessage>  $messages
+     */
     protected function calculateQualityScore(Collection $messages): float
     {
         $ratedMessages = $messages->whereNotNull('quality_rating');
@@ -306,8 +320,11 @@ class ConversationAnalyticsService
         return round(($avgRating / 5 * 0.7 + $helpfulRate * 0.3) * 100, 2);
     }
 
-    protected function calculateUserSatisfaction(Collection $messages): array
-    {
+    /**
+     * @param  Collection<int, ConversationMessage>  $messages
+     * @return array<string, mixed>
+     */
+    protected function calculateUserSatisfaction(): array
         $helpfulCount = $messages->where('is_helpful', true)->count();
         $totalCount = $messages->count();
 
@@ -318,8 +335,11 @@ class ConversationAnalyticsService
         ];
     }
 
-    protected function calculateToolEffectiveness(Collection $messages): array
-    {
+    /**
+     * @param  Collection<int, ConversationMessage>  $messages
+     * @return array<string, mixed>
+     */
+    protected function calculateToolEffectiveness(): array
         $messagesWithTools = $messages->where('tool_call_count', '>', 0);
 
         return [
@@ -333,8 +353,11 @@ class ConversationAnalyticsService
         ];
     }
 
-    protected function calculatePerformanceMetrics(Collection $messages): array
-    {
+    /**
+     * @param  Collection<int, ConversationMessage>  $messages
+     * @return array<string, mixed>
+     */
+    protected function calculatePerformanceMetrics(): array
         $messagesWithTime = $messages->whereNotNull('processing_time');
 
         return [
@@ -346,8 +369,11 @@ class ConversationAnalyticsService
         ];
     }
 
-    protected function calculateImprovementTrends(Collection $messages): array
-    {
+    /**
+     * @param  Collection<int, ConversationMessage>  $messages
+     * @return array<int, array<string, mixed>>
+     */
+    protected function calculateImprovementTrends(): array
         // Group messages by week
         $weeklyData = $messages->groupBy(function ($message) {
             return $message->created_at->format('Y-W');
@@ -367,8 +393,11 @@ class ConversationAnalyticsService
         return $trends;
     }
 
-    protected function calculateOverallSatisfaction(Collection $conversations): array
-    {
+    /**
+     * @param  Collection<int, AIConversation>  $conversations
+     * @return array<string, mixed>
+     */
+    protected function calculateOverallSatisfaction(): array
         $allMessages = $conversations->flatMap->messages;
         $ratedMessages = $allMessages->whereNotNull('quality_rating');
 
@@ -382,8 +411,11 @@ class ConversationAnalyticsService
         ];
     }
 
-    protected function calculateSatisfactionByType(Collection $conversations): array
-    {
+    /**
+     * @param  Collection<int, AIConversation>  $conversations
+     * @return array<string, array<string, mixed>>
+     */
+    protected function calculateSatisfactionByType(): array
         $byType = [];
 
         foreach ($conversations->groupBy('conversation_type') as $type => $typeConversations) {
@@ -404,8 +436,11 @@ class ConversationAnalyticsService
         return $byType;
     }
 
-    protected function calculateSatisfactionTrends(Collection $conversations): array
-    {
+    /**
+     * @param  Collection<int, AIConversation>  $conversations
+     * @return array<int, array<string, mixed>>
+     */
+    protected function calculateSatisfactionTrends(): array
         // Group by month
         $monthlyData = $conversations->groupBy(function ($conversation) {
             return $conversation->started_at?->format('Y-m') ?? 'unknown';
@@ -428,8 +463,11 @@ class ConversationAnalyticsService
         return $trends;
     }
 
-    protected function summarizeFeedback(Collection $conversations): array
-    {
+    /**
+     * @param  Collection<int, AIConversation>  $conversations
+     * @return array<string, mixed>
+     */
+    protected function summarizeFeedback(): array
         $allMessages = $conversations->flatMap->messages;
         $feedbackMessages = $allMessages->whereNotNull('user_feedback');
 
@@ -448,11 +486,17 @@ class ConversationAnalyticsService
         ];
     }
 
-    protected function groupByStatus(Collection $conversations): array
-    {
+    /**
+     * @param  Collection<int, AIConversation>  $conversations
+     * @return array<string, int>
+     */
+    protected function groupByStatus(): array
         return $conversations->groupBy('status')->map->count()->toArray();
     }
 
+    /**
+     * @param  Collection<int, AIConversation>  $conversations
+     */
     protected function calculateCompletionRate(Collection $conversations): float
     {
         $total = $conversations->count();
@@ -460,11 +504,14 @@ class ConversationAnalyticsService
             return 0;
         }
 
-        $completed = $conversations->where('status', 'completed')->count();
+        $completed = $conversations->where('status', '=', 'completed')->count();
 
         return round(($completed / $total) * 100, 2);
     }
 
+    /**
+     * @param  Collection<int, AIConversation>  $conversations
+     */
     protected function calculateAverageDuration(Collection $conversations): float
     {
         $conversationsWithDuration = $conversations->filter(function ($conversation) {
@@ -482,9 +529,12 @@ class ConversationAnalyticsService
         return round($totalMinutes / $conversationsWithDuration->count(), 2);
     }
 
-    protected function analyzeAbandonment(Collection $conversations): array
-    {
-        $abandoned = $conversations->where('status', 'paused');
+    /**
+     * @param  Collection<int, AIConversation>  $conversations
+     * @return array<string, mixed>
+     */
+    protected function analyzeAbandonment(): array
+        $abandoned = $conversations->where('status', '=', 'paused');
 
         return [
             'total_abandoned' => $abandoned->count(),
@@ -495,8 +545,11 @@ class ConversationAnalyticsService
         ];
     }
 
-    protected function analyzeToolBreakdown(Collection $messages): array
-    {
+    /**
+     * @param  Collection<int, ConversationMessage>  $messages
+     * @return array<string, int>
+     */
+    protected function analyzeToolBreakdown(): array
         $toolCounts = [];
 
         foreach ($messages as $message) {
@@ -513,26 +566,39 @@ class ConversationAnalyticsService
         return $toolCounts;
     }
 
-    protected function calculateToolSuccessRates(Collection $messages): array
-    {
+    /**
+     * @param  Collection<int, ConversationMessage>  $messages
+     * @return array<string, mixed>
+     */
+    protected function calculateToolSuccessRates(): array
         // Implementation would analyze tool_results for success/failure
         return [];
     }
 
-    protected function analyzeToolPerformance(Collection $messages): array
-    {
+    /**
+     * @param  Collection<int, ConversationMessage>  $messages
+     * @return array<string, mixed>
+     */
+    protected function analyzeToolPerformance(): array
         // Implementation would analyze processing time per tool
         return [];
     }
 
-    protected function analyzeToolCombinations(Collection $messages): array
-    {
+    /**
+     * @param  Collection<int, ConversationMessage>  $messages
+     * @return array<string, mixed>
+     */
+    protected function analyzeToolCombinations(): array
         // Implementation would analyze which tools are commonly used together
         return [];
     }
 
-    protected function calculateBranchUtilization(Collection $branchPoints, Collection $branchedMessages): array
-    {
+    /**
+     * @param  Collection<int, ConversationMessage>  $branchPoints
+     * @param  Collection<int, ConversationMessage>  $branchedMessages
+     * @return array<string, mixed>
+     */
+    protected function calculateBranchUtilization(): array
         return [
             'branches_per_point' => $branchPoints->count() > 0
                 ? round($branchedMessages->count() / $branchPoints->count(), 2)
@@ -543,22 +609,31 @@ class ConversationAnalyticsService
         ];
     }
 
-    protected function analyzeBranchDepth(Collection $messages): array
-    {
+    /**
+     * @param  Collection<int, ConversationMessage>  $messages
+     * @return array<string, mixed>
+     */
+    protected function analyzeBranchDepth(): array
         return [
             'max_depth' => $messages->max('branch_depth') ?? 0,
             'avg_depth' => round($messages->avg('branch_depth'), 2),
         ];
     }
 
-    protected function analyzeBranchEffectiveness(Collection $branchPoints): array
-    {
+    /**
+     * @param  Collection<int, ConversationMessage>  $branchPoints
+     * @return array<string, mixed>
+     */
+    protected function analyzeBranchEffectiveness(): array
         // Analyze which branches led to better outcomes
         return [];
     }
 
-    protected function analyzePopularBranchReasons(Collection $branchPoints): array
-    {
+    /**
+     * @param  Collection<int, ConversationMessage>  $branchPoints
+     * @return array<string, int>
+     */
+    protected function analyzePopularBranchReasons(): array
         $reasons = [];
 
         foreach ($branchPoints as $point) {
@@ -573,8 +648,11 @@ class ConversationAnalyticsService
         return $reasons;
     }
 
-    protected function analyzeCostByAgent(Collection $messages): array
-    {
+    /**
+     * @param  Collection<int, ConversationMessage>  $messages
+     * @return array<string, array<string, mixed>>
+     */
+    protected function analyzeCostByAgent(): array
         return $messages->groupBy('agent_id')->map(function ($agentMessages) {
             return [
                 'total_cost' => round($agentMessages->sum('cost_estimate'), 6),
@@ -584,8 +662,11 @@ class ConversationAnalyticsService
         })->toArray();
     }
 
-    protected function analyzeCostByModel(Collection $messages): array
-    {
+    /**
+     * @param  Collection<int, ConversationMessage>  $messages
+     * @return array<string, array<string, mixed>>
+     */
+    protected function analyzeCostByModel(): array
         return $messages->groupBy('ai_model_used')->map(function ($modelMessages) {
             return [
                 'total_cost' => round($modelMessages->sum('cost_estimate'), 6),
@@ -595,8 +676,11 @@ class ConversationAnalyticsService
         })->toArray();
     }
 
-    protected function analyzeCostTrends(Collection $messages): array
-    {
+    /**
+     * @param  Collection<int, ConversationMessage>  $messages
+     * @return array<string, float>
+     */
+    protected function analyzeCostTrends(): array
         // Group by day
         return $messages->groupBy(function ($message) {
             return $message->created_at->format('Y-m-d');
@@ -605,8 +689,11 @@ class ConversationAnalyticsService
         })->toArray();
     }
 
-    protected function identifyCostOptimizations(Collection $messages): array
-    {
+    /**
+     * @param  Collection<int, ConversationMessage>  $messages
+     * @return array<string, mixed>
+     */
+    protected function identifyCostOptimizations(): array
         // Identify opportunities to reduce costs
         return [
             'high_cost_agents' => $this->identifyHighCostAgents($messages),
@@ -615,8 +702,11 @@ class ConversationAnalyticsService
         ];
     }
 
-    protected function identifyHighCostAgents(Collection $messages): array
-    {
+    /**
+     * @param  Collection<int, ConversationMessage>  $messages
+     * @return array<string, float>
+     */
+    protected function identifyHighCostAgents(): array
         return $messages->groupBy('agent_id')
             ->map(function ($agentMessages) {
                 return round($agentMessages->sum('cost_estimate'), 6);
@@ -626,20 +716,28 @@ class ConversationAnalyticsService
             ->toArray();
     }
 
-    protected function identifyInefficientToolUsage(Collection $messages): array
-    {
+    /**
+     * @param  Collection<int, ConversationMessage>  $messages
+     * @return array<string, mixed>
+     */
+    protected function identifyInefficientToolUsage(): array
         // Identify tools with high cost but low success rate
         return [];
     }
 
-    protected function suggestModelOptimizations(Collection $messages): array
-    {
+    /**
+     * @param  Collection<int, ConversationMessage>  $messages
+     * @return array<string, mixed>
+     */
+    protected function suggestModelOptimizations(): array
         // Suggest cheaper models for simple tasks
         return [];
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     protected function getRecentActivity(): array
-    {
         $recentConversations = AIConversation::with('messages')
             ->orderBy('last_activity_at', 'desc')
             ->take(10)

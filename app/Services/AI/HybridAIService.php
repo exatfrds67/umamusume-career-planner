@@ -4,7 +4,7 @@ namespace App\Services\AI;
 
 use App\Models\AIConversation;
 use App\Services\MCP\MCPClientService;
-use CloudStudio\Ollama\Facades\Ollama;
+use Cloudstudio\Ollama\Facades\Ollama;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
 
@@ -75,12 +75,7 @@ class HybridAIService
      *     metadata: array<string, mixed>
      * }
      */
-    public function processRequest(
-        string $prompt,
-        array $context = [],
-        ?int $characterId = null,
-        ?string $conversationId = null
-    ): array {
+    public function processRequest(): array
         $startTime = microtime(true);
 
         // Analyze request complexity
@@ -149,8 +144,7 @@ class HybridAIService
      *     estimated_cost: float
      * }
      */
-    protected function analyzeComplexity(string $prompt, array $context = []): array
-    {
+    protected function analyzeComplexity(): array
         $tokenEstimate = $this->estimateTokenCount($prompt, $context);
         $requiresRAG = $this->requiresRAG($prompt, $context);
         $requiresMultiStep = $this->requiresMultiStepReasoning($prompt, $context);
@@ -240,8 +234,7 @@ class HybridAIService
      * @param  array<string, mixed>  $complexity
      * @return array<string, mixed>
      */
-    protected function processWithOllama(string $prompt, array $context, array $complexity): array
-    {
+    protected function processWithOllama(): array
         $startTime = microtime(true);
 
         try {
@@ -265,16 +258,20 @@ class HybridAIService
                 throw new \RuntimeException('Ollama processing timeout');
             }
 
+            $tokenCount = isset($response['token_count']) && is_int($response['token_count'])
+                ? $response['token_count']
+                : (isset($complexity['token_estimate']) && is_int($complexity['token_estimate']) ? $complexity['token_estimate'] : 0);
+
             return [
                 'content' => $response['content'],
                 'model' => $response['model'],
-                'token_count' => $response['token_count'] ?? $complexity['token_estimate'],
+                'token_count' => $tokenCount,
                 'cost' => 0.0, // Local processing is free
-                'confidence' => $response['confidence'] ?? 0.8,
+                'confidence' => isset($response['confidence']) && (is_float($response['confidence']) || is_int($response['confidence'])) ? (float) $response['confidence'] : 0.8,
                 'metadata' => [
                     'provider' => 'ollama',
                     'processing_time' => $processingTime,
-                    'model_version' => $response['model_version'] ?? 'unknown',
+                    'model_version' => isset($response['model_version']) && is_string($response['model_version']) ? $response['model_version'] : 'unknown',
                 ],
             ];
         } catch (\Exception $e) {
@@ -294,8 +291,7 @@ class HybridAIService
      * @param  array<string, mixed>  $complexity
      * @return array<string, mixed>
      */
-    protected function processWithBedrock(string $prompt, array $context, array $complexity): array
-    {
+    protected function processWithBedrock(): array
         $startTime = microtime(true);
 
         // Select appropriate Bedrock model based on complexity
@@ -317,12 +313,12 @@ class HybridAIService
                 'model' => $model,
                 'token_count' => $response['token_count'],
                 'cost' => $cost,
-                'confidence' => $response['confidence'] ?? 0.9,
+                'confidence' => isset($response['confidence']) && (is_float($response['confidence']) || is_int($response['confidence'])) ? (float) $response['confidence'] : 0.9,
                 'metadata' => [
                     'provider' => 'bedrock',
                     'processing_time' => $processingTime,
-                    'model_version' => $response['model_version'] ?? 'unknown',
-                    'request_id' => $response['request_id'] ?? null,
+                    'model_version' => isset($response['model_version']) && is_string($response['model_version']) ? $response['model_version'] : 'unknown',
+                    'request_id' => (is_array($response) && isset($response['request_id']) ? $response['request_id'] : null),
                 ],
             ];
         } catch (\Exception $e) {
@@ -342,8 +338,7 @@ class HybridAIService
      * @param  array<string, mixed>  $complexity
      * @return array<string, mixed>
      */
-    protected function processWithMCPStrands(string $prompt, array $context, array $complexity): array
-    {
+    protected function processWithMCPStrands(): array
         $startTime = microtime(true);
 
         try {
@@ -354,19 +349,25 @@ class HybridAIService
             $response = $agent->process($prompt, $context);
 
             $processingTime = microtime(true) - $startTime;
-            $cost = $this->calculateCost($response['token_count'] ?? $complexity['token_estimate'], $response['model'] ?? 'claude-3-5-sonnet');
+
+            $tokenCount = isset($response['token_count']) && is_int($response['token_count'])
+                ? $response['token_count']
+                : (isset($complexity['token_estimate']) && is_int($complexity['token_estimate']) ? $complexity['token_estimate'] : 0);
+
+            $model = isset($response['model']) && is_string($response['model']) ? $response['model'] : 'claude-3-5-sonnet';
+            $cost = $this->calculateCost($tokenCount, $model);
 
             return [
                 'content' => $response['content'],
-                'model' => $response['model'] ?? 'claude-3-5-sonnet',
-                'token_count' => $response['token_count'] ?? $complexity['token_estimate'],
+                'model' => $model,
+                'token_count' => $tokenCount,
                 'cost' => $cost,
-                'confidence' => $response['confidence'] ?? 0.95,
+                'confidence' => isset($response['confidence']) && (is_float($response['confidence']) || is_int($response['confidence'])) ? (float) $response['confidence'] : 0.95,
                 'metadata' => [
                     'provider' => 'mcp-strands',
                     'processing_time' => $processingTime,
-                    'agent_id' => $response['agent_id'] ?? null,
-                    'workflow_steps' => $response['workflow_steps'] ?? [],
+                    'agent_id' => (is_array($response) && isset($response['agent_id']) ? $response['agent_id'] : null),
+                    'workflow_steps' => isset($response['workflow_steps']) && is_array($response['workflow_steps']) ? $response['workflow_steps'] : [],
                 ],
             ];
         } catch (\Exception $e) {
@@ -385,8 +386,7 @@ class HybridAIService
      * @param  array<string, mixed>  $complexity
      * @return array<string, mixed>
      */
-    protected function processWithMCPAgentCore(string $prompt, array $context, array $complexity): array
-    {
+    protected function processWithMCPAgentCore(): array
         $startTime = microtime(true);
 
         try {
@@ -397,19 +397,25 @@ class HybridAIService
             $response = $agent->process($prompt, $context);
 
             $processingTime = microtime(true) - $startTime;
-            $cost = $this->calculateCost($response['token_count'] ?? $complexity['token_estimate'], $response['model'] ?? 'claude-3-5-sonnet');
+
+            $tokenCount = isset($response['token_count']) && is_int($response['token_count'])
+                ? $response['token_count']
+                : (isset($complexity['token_estimate']) && is_int($complexity['token_estimate']) ? $complexity['token_estimate'] : 0);
+
+            $model = isset($response['model']) && is_string($response['model']) ? $response['model'] : 'claude-3-5-sonnet';
+            $cost = $this->calculateCost($tokenCount, $model);
 
             return [
                 'content' => $response['content'],
-                'model' => $response['model'] ?? 'claude-3-5-sonnet',
-                'token_count' => $response['token_count'] ?? $complexity['token_estimate'],
+                'model' => $model,
+                'token_count' => $tokenCount,
                 'cost' => $cost,
-                'confidence' => $response['confidence'] ?? 0.95,
+                'confidence' => isset($response['confidence']) && (is_float($response['confidence']) || is_int($response['confidence'])) ? (float) $response['confidence'] : 0.95,
                 'metadata' => [
                     'provider' => 'mcp-agentcore',
                     'processing_time' => $processingTime,
-                    'agent_id' => $response['agent_id'] ?? null,
-                    'workflow_steps' => $response['workflow_steps'] ?? [],
+                    'agent_id' => (is_array($response) && isset($response['agent_id']) ? $response['agent_id'] : null),
+                    'workflow_steps' => isset($response['workflow_steps']) && is_array($response['workflow_steps']) ? $response['workflow_steps'] : [],
                 ],
             ];
         } catch (\Exception $e) {
@@ -427,12 +433,7 @@ class HybridAIService
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    protected function handleFailureWithFallback(
-        string $prompt,
-        array $context,
-        string $failedProvider,
-        \Exception $exception
-    ): array {
+    protected function handleFailureWithFallback(): array
         Log::warning('[HybridAI] Attempting fallback after failure', [
             'failed_provider' => $failedProvider,
             'error' => $exception->getMessage(),
@@ -469,25 +470,127 @@ class HybridAIService
     /**
      * Create Strands agent via MCP
      *
+     * Creates an agent using the MCP strands-agents server for advanced
+     * multi-step reasoning and tool orchestration.
+     *
      * @param  array<string, mixed>  $context
+     * @return object{process: callable(string, array<string, mixed>): array<string, mixed>}
      */
     protected function createStrandsAgent(array $context): object
     {
-        // TODO: Implement MCP Strands agent creation
-        // This will be implemented in Task 4.1.3
-        throw new \RuntimeException('MCP Strands agent creation not yet implemented');
+        // Check if MCP Strands server is available
+        if (! $this->mcpClient->isStrandsAgentsAvailable()) {
+            throw new \RuntimeException('MCP Strands agents server is not available');
+        }
+
+        // Create a simple agent wrapper that delegates to MCP
+        return new class($this->mcpClient, $context)
+        {
+            private MCPClientService $mcpClient;
+
+            /** @var array<string, mixed> */
+            private array $context;
+
+            /**
+             * @param  array<string, mixed>  $context
+             */
+            public function __construct(MCPClientService $mcpClient, array $context)
+            {
+                $this->mcpClient = $mcpClient;
+                $this->context = $context;
+            }
+
+            /**
+             * Process request through Strands agent
+             *
+             * @param  array<string, mixed>  $requestContext
+             * @return array<string, mixed>
+             */
+            public function process(): array
+                // Use MCP client to invoke strands-agents tools
+                $result = $this->mcpClient->callTool('strands-agents', 'create_agent', [
+                    'prompt' => $prompt,
+                    'context' => [...$this->context, ...$requestContext],
+                    'model' => 'claude-3-5-sonnet',
+                ]);
+
+                if (! is_array($result)) {
+                    $result = [];
+                }
+
+                return [
+                    'content' => isset($result['response']) && is_string($result['response']) ? $result['response'] : '',
+                    'model' => isset($result['model']) && is_string($result['model']) ? $result['model'] : 'claude-3-5-sonnet',
+                    'token_count' => isset($result['token_count']) && is_int($result['token_count']) ? $result['token_count'] : 0,
+                    'confidence' => isset($result['confidence']) && (is_float($result['confidence']) || is_int($result['confidence'])) ? (float) $result['confidence'] : 0.95,
+                    'agent_id' => (is_array($result) && isset($result['agent_id']) ? $result['agent_id'] : null),
+                    'workflow_steps' => isset($result['workflow_steps']) && is_array($result['workflow_steps']) ? $result['workflow_steps'] : [],
+                ];
+            }
+        };
     }
 
     /**
      * Create AgentCore agent via MCP
      *
+     * Creates an agent using the MCP agentcore-mcp-server for AWS Bedrock
+     * AgentCore integration with advanced orchestration capabilities.
+     *
      * @param  array<string, mixed>  $context
+     * @return object{process: callable(string, array<string, mixed>): array<string, mixed>}
      */
     protected function createAgentCoreAgent(array $context): object
     {
-        // TODO: Implement MCP AgentCore agent creation
-        // This will be implemented in Task 4.1.3
-        throw new \RuntimeException('MCP AgentCore agent creation not yet implemented');
+        // Check if MCP AgentCore server is available
+        if (! $this->mcpClient->isAgentCoreAvailable()) {
+            throw new \RuntimeException('MCP AgentCore server is not available');
+        }
+
+        // Create a simple agent wrapper that delegates to MCP
+        return new class($this->mcpClient, $context)
+        {
+            private MCPClientService $mcpClient;
+
+            /** @var array<string, mixed> */
+            private array $context;
+
+            /**
+             * @param  array<string, mixed>  $context
+             */
+            public function __construct(MCPClientService $mcpClient, array $context)
+            {
+                $this->mcpClient = $mcpClient;
+                $this->context = $context;
+            }
+
+            /**
+             * Process request through AgentCore agent
+             *
+             * @param  array<string, mixed>  $requestContext
+             * @return array<string, mixed>
+             */
+            public function process(): array
+                // Use MCP client to invoke agentcore-mcp-server tools
+                $result = $this->mcpClient->callTool('agentcore-mcp-server', 'invoke_agent', [
+                    'prompt' => $prompt,
+                    'context' => [...$this->context, ...$requestContext],
+                    'model' => 'claude-3-5-sonnet',
+                ]);
+
+                if (! is_array($result)) {
+                    $result = [];
+                }
+
+                return [
+                    'content' => isset($result['response']) && is_string($result['response']) ? $result['response'] : '',
+                    'model' => isset($result['model']) && is_string($result['model']) ? $result['model'] : 'claude-3-5-sonnet',
+                    'token_count' => isset($result['token_count']) && is_int($result['token_count']) ? $result['token_count'] : 0,
+                    'confidence' => isset($result['confidence']) && (is_float($result['confidence']) || is_int($result['confidence'])) ? (float) $result['confidence'] : 0.95,
+                    'agent_id' => (is_array($result) && isset($result['agent_id']) ? $result['agent_id'] : null),
+                    'workflow_steps' => isset($result['workflow_steps']) && is_array($result['workflow_steps']) ? $result['workflow_steps'] : [],
+                ];
+            }
+        };
     }
 
     /**
@@ -572,8 +675,16 @@ class HybridAIService
         }
 
         $pricing = $this->modelPricing[$model];
-        $inputCost = ($pricing['input'] ?? 0.0) * ($tokenCount / 1000000);
-        $outputCost = ($pricing['output'] ?? 0.0) * ($tokenCount / 1000000);
+        if (! is_array($pricing)) {
+            return 0.0;
+        }
+
+        $inputCost = isset($pricing['input']) && (is_float($pricing['input']) || is_int($pricing['input']))
+            ? (float) $pricing['input'] * ($tokenCount / 1000000)
+            : 0.0;
+        $outputCost = isset($pricing['output']) && (is_float($pricing['output']) || is_int($pricing['output']))
+            ? (float) $pricing['output'] * ($tokenCount / 1000000)
+            : 0.0;
 
         return $inputCost + $outputCost;
     }
@@ -647,11 +758,7 @@ class HybridAIService
      *
      * @return array<int, array<string, mixed>>
      */
-    public function getConversationHistory(
-        int $characterId,
-        ?string $conversationId = null,
-        int $limit = 50
-    ): array {
+    public function getConversationHistory(): array
         $query = AIConversation::where('character_id', $characterId);
 
         if ($conversationId) {
@@ -666,10 +773,10 @@ class HybridAIService
                 'conversation_id' => $conv->conversation_id,
                 'message_type' => $conv->message_type,
                 'message_content' => $conv->message_content,
-                'ai_model_used' => $conv->ai_model_used,
-                'processing_time' => $conv->processing_time,
-                'token_count' => $conv->token_count,
-                'cost' => $conv->cost,
+                'ai_model_used' => $$conv->getAttribute('ai_model_used'),
+                'processing_time' => $$conv->getAttribute('processing_time'),
+                'token_count' => $$conv->getAttribute('token_count'),
+                'cost' => $$conv->getAttribute('cost'),
                 'created_at' => $conv->created_at?->toIso8601String(),
             ])
             ->toArray();
@@ -686,7 +793,6 @@ class HybridAIService
      * }
      */
     public function getStatus(): array
-    {
         return [
             'enabled' => $this->enabled,
             'providers' => [

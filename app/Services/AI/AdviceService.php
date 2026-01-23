@@ -77,8 +77,7 @@ PROMPT;
      *     provider: string
      * }
      */
-    public function getTrainingAdvice(Character $character): array
-    {
+    public function getTrainingAdvice(): array
         try {
             // Build context from character data
             $context = $this->buildCharacterContext($character);
@@ -120,8 +119,7 @@ PROMPT;
      *
      * @return array<string, mixed>
      */
-    protected function buildCharacterContext(Character $character): array
-    {
+    protected function buildCharacterContext(): array
         $stats = $character->current_stats ?? [];
 
         return [
@@ -219,8 +217,7 @@ PROMPT;
      *
      * @return array{recommended: string, reasoning: string, alternative: string, should_rest: bool, strategy: string, confidence: float, provider: string}
      */
-    protected function parseAdviceResponse(string $content, string $provider, float $confidence): array
-    {
+    protected function parseAdviceResponse(): array
         // Simple parsing - extract key sections
         $recommended = 'speed';
         $alternative = 'stamina';
@@ -257,8 +254,7 @@ PROMPT;
      *
      * @return array{recommended: string, reasoning: string, alternative: string, should_rest: bool, strategy: string, confidence: float, provider: string}
      */
-    protected function getRuleBasedAdvice(Character $character): array
-    {
+    protected function getRuleBasedAdvice(): array
         $energy = $character->energy_level ?? 100;
         $priorities = $character->stat_priorities ?? [];
 

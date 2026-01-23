@@ -19,7 +19,7 @@ class BedrockConfigurationService
 {
     protected MCPClientService $mcpClient;
 
-    /** @var array<string, mixed> */
+    /** @var array<string, array<string, mixed>> */
     protected array $models;
 
     /** @var array<string> */
@@ -45,10 +45,10 @@ class BedrockConfigurationService
      * }
      */
     public function validateCredentials(): array
-    {
         $credentials = Config::get('aws.credentials', []);
-        $accessKey = $credentials['key'] ?? null;
-        $secretKey = $credentials['secret'] ?? null;
+        $credentials = is_array($credentials) ? $credentials : [];
+        $accessKey = isset($credentials['key']) && is_string($credentials['key']) ? $credentials['key'] : null;
+        $secretKey = isset($credentials['secret']) && is_string($credentials['secret']) ? $credentials['secret'] : null;
         $region = (string) Config::get('aws.bedrock.region', Config::get('aws.region', 'us-east-1'));
 
         if (! $accessKey || ! $secretKey) {
@@ -84,7 +84,6 @@ class BedrockConfigurationService
      * @return array<string, array<string, mixed>>
      */
     public function getAvailableModels(): array
-    {
         return $this->models;
     }
 
@@ -104,7 +103,6 @@ class BedrockConfigurationService
      * @return array<string>
      */
     public function getModelPreferences(): array
-    {
         return $this->modelPreferences;
     }
 
@@ -130,8 +128,7 @@ class BedrockConfigurationService
      *     currency: string
      * }
      */
-    public function calculateCost(string $modelName, int $inputTokens, int $outputTokens): array
-    {
+    public function calculateCost(): array
         $model = $this->getModelConfig($modelName);
 
         if (! $model) {
@@ -174,7 +171,6 @@ class BedrockConfigurationService
      * }
      */
     public function getHealthStatus(): array
-    {
         $issues = [];
 
         // Check credentials
@@ -222,10 +218,9 @@ class BedrockConfigurationService
      * }
      */
     public function getAPIStatus(): array
-    {
         $cacheKey = 'bedrock_api_status';
 
-        return Cache::remember($cacheKey, 300, function () {
+        $cached = Cache::remember($cacheKey, 300, function () {
             $startTime = microtime(true);
 
             try {
@@ -252,6 +247,12 @@ class BedrockConfigurationService
                 ];
             }
         });
+
+        return is_array($cached) ? $cached : [
+            'status' => 'error',
+            'last_check' => time(),
+            'response_time' => null,
+        ];
     }
 
     /**
@@ -260,13 +261,14 @@ class BedrockConfigurationService
      * @return array<string>
      */
     public function getRequiredPermissions(): array
-    {
-        return Config::get('aws.iam.required_permissions', [
+        $permissions = Config::get('aws.iam.required_permissions', [
             'bedrock:InvokeModel',
             'bedrock:InvokeModelWithResponseStream',
             'bedrock:ListFoundationModels',
             'bedrock:GetFoundationModel',
         ]);
+
+        return is_array($permissions) ? $permissions : [];
     }
 
     /**
@@ -285,13 +287,12 @@ class BedrockConfigurationService
      * }
      */
     public function getConfigurationSummary(): array
-    {
         $credentialsCheck = $this->validateCredentials();
 
         return [
             'enabled' => (bool) Config::get('ai.bedrock.enabled', true),
             'credentials_valid' => (bool) $credentialsCheck['valid'],
-            'region' => (string) $credentialsCheck['region'],
+            'region' => (is_string($credentialsCheck) ? (string) $credentialsCheck : '')['region'],
             'models' => $this->getAvailableModels(),
             'preferred_model' => $this->getPreferredModel(),
             'model_preferences' => $this->getModelPreferences(),
@@ -316,7 +317,13 @@ class BedrockConfigurationService
     {
         $model = $this->getModelConfig($modelName);
 
-        return $model['id'] ?? null;
+        if (! is_array($model)) {
+            return null;
+        }
+
+        $id = (is_array($model) && isset($model['id']) ? $model['id'] : null);
+
+        return is_string($id) ? $id : null;
     }
 
     /**
@@ -325,7 +332,6 @@ class BedrockConfigurationService
      * @return array<string, array<string, mixed>>
      */
     public function getClaudeModels(): array
-    {
         return array_filter($this->models, fn ($model) => $model['provider'] === 'anthropic');
     }
 
@@ -335,7 +341,6 @@ class BedrockConfigurationService
      * @return array<string, array<string, mixed>>
      */
     public function getAmazonModels(): array
-    {
         return array_filter($this->models, fn ($model) => $model['provider'] === 'amazon');
     }
 
@@ -345,8 +350,7 @@ class BedrockConfigurationService
      * @param  string  $tier  'budget', 'standard', 'premium'
      * @return array<string, array<string, mixed>>
      */
-    public function getModelsByTier(string $tier): array
-    {
+    public function getModelsByTier(): array
         return match ($tier) {
             'budget' => array_filter($this->models, fn ($model) => ($model['input_cost'] ?? 0) < 1.0),
             'standard' => array_filter($this->models, fn ($model) => ($model['input_cost'] ?? 0) >= 1.0 && ($model['input_cost'] ?? 0) < 5.0),

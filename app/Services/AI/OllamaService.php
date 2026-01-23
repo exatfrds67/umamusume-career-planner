@@ -2,7 +2,7 @@
 
 namespace App\Services\AI;
 
-use CloudStudio\Ollama\Facades\Ollama;
+use Cloudstudio\Ollama\Facades\Ollama;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
@@ -51,12 +51,7 @@ class OllamaService
      *     model_version: string
      * }
      */
-    public function generate(
-        string $prompt,
-        array $context = [],
-        ?string $model = null,
-        ?int $timeout = null
-    ): array {
+    public function generate(): array
         $model = $model ?? $this->defaultModel;
         $timeout = $timeout ?? $this->timeout;
 
@@ -149,22 +144,32 @@ class OllamaService
         $contextStr = "Context:\n";
 
         // Add character context
-        if (isset($context['character'])) {
+        if (isset($context['character']) && is_array($context['character'])) {
             $char = $context['character'];
-            $contextStr .= "Character: {$char['name']}\n";
-            $contextStr .= "Scenario: {$char['scenario_type']}\n";
-            $contextStr .= "Stats: Speed {$char['speed']}, Stamina {$char['stamina']}, Power {$char['power']}\n";
+            $name = isset($char['name']) && is_string($char['name']) ? $char['name'] : 'Unknown';
+            $scenario = isset($char['scenario_type']) && is_string($char['scenario_type']) ? $char['scenario_type'] : 'Unknown';
+            $speed = isset($char['speed']) ? (is_string($char) ? (string) $char : '')['speed'] : '0';
+            $stamina = isset($char['stamina']) ? (is_string($char) ? (string) $char : '')['stamina'] : '0';
+            $power = isset($char['power']) ? (is_string($char) ? (string) $char : '')['power'] : '0';
+
+            $contextStr .= "Character: {$name}\n";
+            $contextStr .= "Scenario: {$scenario}\n";
+            $contextStr .= "Stats: Speed {$speed}, Stamina {$stamina}, Power {$power}\n";
         }
 
         // Add career context
-        if (isset($context['career'])) {
+        if (isset($context['career']) && is_array($context['career'])) {
             $career = $context['career'];
-            $contextStr .= "Career Stage: {$career['stage']}\n";
-            $contextStr .= "Turn: {$career['turn']}/{$career['total_turns']}\n";
+            $stage = isset($career['stage']) && is_string($career['stage']) ? $career['stage'] : 'Unknown';
+            $turn = isset($career['turn']) ? (is_string($career) ? (string) $career : '')['turn'] : '0';
+            $totalTurns = isset($career['total_turns']) ? (is_string($career) ? (string) $career : '')['total_turns'] : '0';
+
+            $contextStr .= "Career Stage: {$stage}\n";
+            $contextStr .= "Turn: {$turn}/{$totalTurns}\n";
         }
 
         // Add goals context
-        if (isset($context['goals'])) {
+        if (isset($context['goals']) && is_array($context['goals'])) {
             $contextStr .= 'Goals: '.implode(', ', $context['goals'])."\n";
         }
 
@@ -183,14 +188,14 @@ class OllamaService
         }
 
         if (\is_array($response) && isset($response['response'])) {
-            return (string) $response['response'];
+            return (is_string($response) ? (string) $response : '')['response'];
         }
 
         if (\is_object($response) && method_exists($response, 'getContent')) {
-            return (string) $response->getContent();
+            return (is_string($response) ? (string) $response : '')->getContent();
         }
 
-        return (string) $response;
+        return is_string($response) ? (string) $response : '';
     }
 
     /**
@@ -207,7 +212,14 @@ class OllamaService
      */
     protected function getModelVersion(string $model): string
     {
-        return $this->availableModels[$model]['version'] ?? 'unknown';
+        if (isset($this->availableModels[$model]['version'])) {
+            $version = $this->availableModels[$model]['version'];
+            if (is_string($version)) {
+                return $version;
+            }
+        }
+
+        return 'unknown';
     }
 
     /**
@@ -255,7 +267,6 @@ class OllamaService
      * @return array<string, mixed>
      */
     public function getAvailableModels(): array
-    {
         return $this->availableModels;
     }
 
@@ -272,7 +283,6 @@ class OllamaService
      * }
      */
     public function getStatus(): array
-    {
         return [
             'available' => $this->isAvailable(),
             'healthy' => $this->isHealthy(),

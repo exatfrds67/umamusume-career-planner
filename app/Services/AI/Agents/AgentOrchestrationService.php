@@ -64,10 +64,7 @@ class AgentOrchestrationService
      *     metadata: array{processing_time: float, agents_used: int, character_id: int}
      * }
      */
-    public function executeComprehensiveAnalysis(
-        Character $character,
-        array $goals = []
-    ): array {
+    public function executeComprehensiveAnalysis(): array
         if (! $this->enabled) {
             return $this->getDefaultAnalysis($character);
         }
@@ -150,10 +147,7 @@ class AgentOrchestrationService
      *     metadata?: array{processing_time: float, tasks_executed: int}
      * }
      */
-    public function executeParallelWorkflow(
-        Character $character,
-        array $tasks
-    ): array {
+    public function executeParallelWorkflow(): array
         $startTime = microtime(true);
         $results = [];
         $workflow = [];
@@ -209,10 +203,7 @@ class AgentOrchestrationService
      *     metadata?: array{processing_time: float, steps_executed: int}
      * }
      */
-    public function executeSequentialWorkflow(
-        Character $character,
-        array $steps
-    ): array {
+    public function executeSequentialWorkflow(): array
         $startTime = microtime(true);
         $results = [];
         $sharedContext = [];
@@ -273,8 +264,7 @@ class AgentOrchestrationService
      * @param  array<string, mixed>  $taskConfig
      * @return array<string, mixed>
      */
-    protected function executeTrainingTask(Character $character, array $taskConfig): array
-    {
+    protected function executeTrainingTask(): array
         $action = $taskConfig['action'] ?? 'analyze';
 
         return match ($action) {
@@ -302,8 +292,7 @@ class AgentOrchestrationService
      * @param  array<string, mixed>  $taskConfig
      * @return array<string, mixed>
      */
-    protected function executeCareerTask(Character $character, array $taskConfig): array
-    {
+    protected function executeCareerTask(): array
         $action = $taskConfig['action'] ?? 'plan';
 
         return match ($action) {
@@ -333,8 +322,7 @@ class AgentOrchestrationService
      * @param  array<string, mixed>  $taskConfig
      * @return array<string, mixed>
      */
-    protected function executeRaceTask(Character $character, array $taskConfig): array
-    {
+    protected function executeRaceTask(): array
         $action = $taskConfig['action'] ?? 'analyze';
 
         return match ($action) {
@@ -365,8 +353,7 @@ class AgentOrchestrationService
      * @param  array<string, mixed>  $taskConfig
      * @return array<string, mixed>
      */
-    protected function executeSkillTask(Character $character, array $taskConfig): array
-    {
+    protected function executeSkillTask(): array
         $action = $taskConfig['action'] ?? 'optimize';
 
         return match ($action) {
@@ -431,10 +418,17 @@ class AgentOrchestrationService
     /**
      * Get default analysis when orchestration is unavailable
      *
-     * @return array<string, mixed>
+     * @return array{
+     *     career_plan: array<string, mixed>,
+     *     training_recommendations: array<string, mixed>,
+     *     race_strategy: array<string, mixed>,
+     *     skill_plan: array<string, mixed>,
+     *     workflow: array<int, array{agent: string, status: string}>,
+     *     confidence: float,
+     *     metadata: array<string, mixed>
+     * }
      */
-    protected function getDefaultAnalysis(Character $character): array
-    {
+    protected function getDefaultAnalysis(): array
         return [
             'career_plan' => [],
             'training_recommendations' => [],
@@ -459,7 +453,6 @@ class AgentOrchestrationService
      * }
      */
     public function getStatus(): array
-    {
         return [
             'enabled' => $this->enabled,
             'agents' => [

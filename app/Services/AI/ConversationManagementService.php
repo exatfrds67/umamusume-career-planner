@@ -24,6 +24,9 @@ class ConversationManagementService
 {
     /**
      * Create a new conversation
+     *
+     * @param  array<string, mixed>  $contextEntities
+     * @param  array<string, mixed>  $aiConfiguration
      */
     public function createConversation(
         User $user,
@@ -34,7 +37,7 @@ class ConversationManagementService
     ): AIConversation {
         try {
             $conversation = AIConversation::create([
-                'user_id' => $user->id,
+                'user_id' => $user?->id ?? throw new \Exception('User required'),
                 'conversation_id' => Str::uuid()->toString(),
                 'conversation_type' => $conversationType,
                 'conversation_title' => $title ?? $this->generateConversationTitle($conversationType),
@@ -50,14 +53,14 @@ class ConversationManagementService
 
             Log::info('[ConversationManagement] Conversation created', [
                 'conversation_id' => $conversation->conversation_id,
-                'user_id' => $user->id,
+                'user_id' => $user?->id ?? throw new \Exception('User required'),
                 'type' => $conversationType,
             ]);
 
             return $conversation;
         } catch (\Exception $e) {
             Log::error('[ConversationManagement] Failed to create conversation', [
-                'user_id' => $user->id,
+                'user_id' => $user?->id ?? throw new \Exception('User required'),
                 'error' => $e->getMessage(),
             ]);
 
@@ -67,6 +70,10 @@ class ConversationManagementService
 
     /**
      * Add a message to a conversation
+     *
+     * @param  array<int, mixed>  $toolsUsed
+     * @param  array<string, mixed>  $toolResults
+     * @param  array<string, mixed>  $metadata
      */
     public function addMessage(
         AIConversation $conversation,
@@ -102,11 +109,11 @@ class ConversationManagementService
                     'agent_name' => $agentName,
                     'tools_used' => $toolsUsed,
                     'tool_results' => $toolResults,
-                    'tool_call_count' => count($toolsUsed),
-                    'ai_model_used' => $metadata['ai_model'] ?? null,
-                    'processing_time' => $metadata['processing_time'] ?? null,
-                    'tokens_used' => $metadata['tokens_used'] ?? null,
-                    'cost_estimate' => $metadata['cost_estimate'] ?? null,
+                    'tool_call_count' => \count($toolsUsed),
+                    'ai_model_used' => (is_array($metadata) && isset($metadata['ai_model']) ? $metadata['ai_model'] : null),
+                    'processing_time' => (is_array($metadata) && isset($metadata['processing_time']) ? $metadata['processing_time'] : null),
+                    'tokens_used' => (is_array($metadata) && isset($metadata['tokens_used']) ? $metadata['tokens_used'] : null),
+                    'cost_estimate' => (is_array($metadata) && isset($metadata['cost_estimate']) ? $metadata['cost_estimate'] : null),
                     'sent_at' => now(),
                     'status' => 'completed',
                 ]);
@@ -138,12 +145,11 @@ class ConversationManagementService
 
     /**
      * Create a conversation branch
+     *
+     * @param  array<int, mixed>  $alternatives
+     * @return array<string, mixed>
      */
-    public function createBranch(
-        ConversationMessage $parentMessage,
-        string $branchReason,
-        array $alternatives = []
-    ): array {
+    public function createBranch(): array
         try {
             $branchId = Str::uuid()->toString();
 
@@ -181,6 +187,8 @@ class ConversationManagementService
 
     /**
      * Add a message to a branch
+     *
+     * @param  array<string, mixed>  $metadata
      */
     public function addBranchMessage(
         AIConversation $conversation,
@@ -226,9 +234,8 @@ class ConversationManagementService
 
     /**
      * Get conversation history with agent attribution
-     */
-    /**
-     * @return Collection<int, array{id: int, type: string, content: string, sent_at: string|null, agent: array{id: string|null, type: string|null, name: string|null}, quality: array{rating: int|null, is_helpful: bool|null, feedback: string|null}, branching: array{is_branch_point: bool, branch_id: string|null, has_branches: bool}, tools?: array{used: string, results: string|null, count: int}}>
+     *
+     * @return Collection<int, array{id: int, type: string, content: string, sent_at: string|null, agent: array{id: string|null, type: string|null, name: string|null}, quality: array{rating: int|null, is_helpful: bool|null, feedback: string|null}, branching: array{is_branch_point: bool, branch_id: string|null, has_branches: bool}, tools?: array{used: mixed, results: mixed, count: int}}>
      */
     public function getConversationHistory(
         AIConversation $conversation,
@@ -300,17 +307,18 @@ class ConversationManagementService
 
     /**
      * Get conversation analytics
+     *
+     * @return array<string, mixed>
      */
-    public function getConversationAnalytics(AIConversation $conversation): array
-    {
+    public function getConversationAnalytics(): array
         try {
             $messages = $conversation->messages;
 
             $analytics = [
                 'conversation_id' => $conversation->conversation_id,
                 'total_messages' => $messages->count(),
-                'user_messages' => $messages->where('message_type', 'user')->count(),
-                'ai_messages' => $messages->where('message_type', 'ai')->count(),
+                'user_messages' => $messages->where('message_type', '=', 'user')->count(),
+                'ai_messages' => $messages->where('message_type', '=', 'ai')->count(),
                 'agent_breakdown' => $this->getAgentBreakdown($messages),
                 'tool_usage' => $this->getToolUsageStats($messages),
                 'quality_metrics' => $this->getQualityMetrics($messages),
@@ -332,11 +340,10 @@ class ConversationManagementService
 
     /**
      * Export conversation workflow
+     *
+     * @return array<string, mixed>
      */
-    public function exportWorkflow(
-        AIConversation $conversation,
-        string $format = 'json'
-    ): array {
+    public function exportWorkflow(): array
         try {
             $messages = $this->getConversationHistory($conversation, true);
 
@@ -372,6 +379,8 @@ class ConversationManagementService
 
     /**
      * Add feedback to improve agent performance
+     *
+     * @param  array<int, mixed>  $improvementSuggestions
      */
     public function addAgentFeedback(
         ConversationMessage $message,
@@ -406,23 +415,10 @@ class ConversationManagementService
 
     /**
      * Protected helper methods
+     *
+     * @return array<int, mixed>
      */
-    protected function generateConversationTitle(string $type): string
-    {
-        $titles = [
-            'career_planning' => 'Career Planning Session',
-            'skill_optimization' => 'Skill Optimization Discussion',
-            'training_advice' => 'Training Advice',
-            'race_strategy' => 'Race Strategy Planning',
-            'general_help' => 'General Help',
-            'debugging' => 'Debugging Session',
-        ];
-
-        return $titles[$type] ?? 'Conversation';
-    }
-
-    protected function getAgentBreakdown(Collection $messages): array
-    {
+    protected function getAgentBreakdown(): array
         $breakdown = [];
 
         foreach ($messages as $message) {
@@ -442,7 +438,7 @@ class ConversationManagementService
                 }
 
                 $breakdown[$agentKey]['message_count']++;
-                $breakdown[$agentKey]['tool_calls'] += $message->tool_call_count;
+                $breakdown[$agentKey]['tool_calls'] += $message->tool_call_count ?? 0;
 
                 if ($message->quality_rating) {
                     $breakdown[$agentKey]['avg_rating'] += $message->quality_rating;
@@ -456,24 +452,43 @@ class ConversationManagementService
 
         // Calculate averages
         foreach ($breakdown as $key => $data) {
-            if ($data['message_count'] > 0) {
-                $breakdown[$key]['avg_rating'] = round($data['avg_rating'] / $data['message_count'], 2);
-                $breakdown[$key]['helpfulness_rate'] = round(($data['helpful_count'] / $data['message_count']) * 100, 2);
+            if ((is_array($data) && isset($data['message_count']) ? $data['message_count'] : null) > 0) {
+                $breakdown[$key]['avg_rating'] = round((is_array($data) && isset($data['avg_rating']) ? $data['avg_rating'] : null) / (is_array($data) && isset($data['message_count']) ? $data['message_count'] : null), 2);
+                $breakdown[$key]['helpfulness_rate'] = round(((is_array($data) && isset($data['helpful_count']) ? $data['helpful_count'] : null) / (is_array($data) && isset($data['message_count']) ? $data['message_count'] : null)) * 100, 2);
             }
         }
 
         return array_values($breakdown);
     }
 
-    protected function getToolUsageStats(Collection $messages): array
+    protected function generateConversationTitle(string $type): string
     {
+        $titles = [
+            'career_planning' => 'Career Planning Session',
+            'skill_optimization' => 'Skill Optimization Discussion',
+            'training_advice' => 'Training Advice',
+            'race_strategy' => 'Race Strategy Planning',
+            'general_help' => 'General Help',
+            'debugging' => 'Debugging Session',
+        ];
+
+        return $titles[$type] ?? 'Conversation';
+    }
+
+    /**
+     * Get tool usage stats
+     *
+     * @return array<string, mixed>
+     */
+    protected function getToolUsageStats(): array
         $toolStats = [];
         $totalToolCalls = 0;
 
         foreach ($messages as $message) {
-            if ($message->tools_used) {
-                foreach ($message->tools_used as $tool) {
-                    $toolName = is_array($tool) ? ($tool['name'] ?? 'unknown') : $tool;
+            $toolsUsed = $message->tools_used;
+            if ($toolsUsed && \is_array($toolsUsed)) {
+                foreach ($toolsUsed as $tool) {
+                    $toolName = \is_array($tool) ? ($tool['name'] ?? 'unknown') : $tool;
 
                     if (! isset($toolStats[$toolName])) {
                         $toolStats[$toolName] = [
@@ -485,12 +500,13 @@ class ConversationManagementService
                     }
 
                     $toolStats[$toolName]['call_count']++;
-                    $totalToolCalls++;
+                    $totalToolCalls = ($totalToolCalls ?? 0) + 1;
 
                     // Check if tool call was successful
-                    if ($message->tool_results && isset($message->tool_results[$toolName])) {
-                        $result = $message->tool_results[$toolName];
-                        if (is_array($result) && isset($result['success']) && $result['success']) {
+                    $toolResults = $message->tool_results;
+                    if ($toolResults && \is_array($toolResults) && isset($toolResults[$toolName])) {
+                        $result = $toolResults[$toolName];
+                        if (\is_array($result) && isset($result['success']) && $result['success']) {
                             $toolStats[$toolName]['success_count']++;
                         } else {
                             $toolStats[$toolName]['failure_count']++;
@@ -509,14 +525,18 @@ class ConversationManagementService
 
         return [
             'total_tool_calls' => $totalToolCalls,
-            'unique_tools' => count($toolStats),
+            'unique_tools' => \count($toolStats),
             'tools' => array_values($toolStats),
         ];
     }
 
-    protected function getQualityMetrics(Collection $messages): array
-    {
-        $aiMessages = $messages->where('message_type', 'ai');
+    /**
+     * Get quality metrics
+     *
+     * @return array<string, mixed>
+     */
+    protected function getQualityMetrics(): array
+        $aiMessages = $messages->where('message_type', '=', 'ai');
         $ratedMessages = $aiMessages->whereNotNull('quality_rating');
 
         $totalRating = $ratedMessages->sum('quality_rating');
@@ -532,8 +552,12 @@ class ConversationManagementService
         ];
     }
 
-    protected function getRatingDistribution(Collection $messages): array
-    {
+    /**
+     * Get rating distribution
+     *
+     * @return array<int, int>
+     */
+    protected function getRatingDistribution(): array
         $distribution = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0];
 
         foreach ($messages as $message) {
@@ -546,8 +570,12 @@ class ConversationManagementService
         return $distribution;
     }
 
-    protected function getBranchingStats(Collection $messages): array
-    {
+    /**
+     * Get branching stats
+     *
+     * @return array<string, mixed>
+     */
+    protected function getBranchingStats(): array
         $branchPoints = $messages->where('is_branch_point', true);
         $branchedMessages = $messages->whereNotNull('branch_id');
 
@@ -561,9 +589,13 @@ class ConversationManagementService
         ];
     }
 
-    protected function getPerformanceMetrics(Collection $messages): array
-    {
-        $aiMessages = $messages->where('message_type', 'ai')->whereNotNull('processing_time');
+    /**
+     * Get performance metrics
+     *
+     * @return array<string, mixed>
+     */
+    protected function getPerformanceMetrics(): array
+        $aiMessages = $messages->where('message_type', '=', 'ai')->whereNotNull('processing_time');
 
         return [
             'total_processing_time' => round($aiMessages->sum('processing_time'), 2),
@@ -583,9 +615,13 @@ class ConversationManagementService
         ];
     }
 
-    protected function getCostAnalysis(Collection $messages): array
-    {
-        $aiMessages = $messages->where('message_type', 'ai')->whereNotNull('cost_estimate');
+    /**
+     * Get cost analysis
+     *
+     * @return array<string, mixed>
+     */
+    protected function getCostAnalysis(): array
+        $aiMessages = $messages->where('message_type', '=', 'ai')->whereNotNull('cost_estimate');
 
         return [
             'total_cost' => round($aiMessages->sum('cost_estimate'), 6),
@@ -596,8 +632,12 @@ class ConversationManagementService
         ];
     }
 
-    protected function getCostByAgent(Collection $messages): array
-    {
+    /**
+     * Get cost by agent
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    protected function getCostByAgent(): array
         $costByAgent = [];
 
         foreach ($messages as $message) {
@@ -620,13 +660,18 @@ class ConversationManagementService
 
         // Calculate averages
         foreach ($costByAgent as $key => $data) {
-            $costByAgent[$key]['total_cost'] = round($data['total_cost'], 6);
-            $costByAgent[$key]['avg_cost'] = round($data['total_cost'] / $data['message_count'], 6);
+            $costByAgent[$key]['total_cost'] = round((is_array($data) && isset($data['total_cost']) ? $data['total_cost'] : null), 6);
+            $costByAgent[$key]['avg_cost'] = round((is_array($data) && isset($data['total_cost']) ? $data['total_cost'] : null) / (is_array($data) && isset($data['message_count']) ? $data['message_count'] : null), 6);
         }
 
         return array_values($costByAgent);
     }
 
+    /**
+     * Store agent learning
+     *
+     * @param  array<int, mixed>  $suggestions
+     */
     protected function storeAgentLearning(
         ConversationMessage $message,
         int $rating,

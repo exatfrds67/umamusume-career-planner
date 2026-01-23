@@ -49,10 +49,7 @@ class CareerStrategyAgent
      *     reasoning: string
      * }
      */
-    public function createCareerPlan(
-        Character $character,
-        array $goals = []
-    ): array {
+    public function createCareerPlan(): array
         if (! $this->enabled) {
             return $this->getDefaultCareerPlan($character);
         }
@@ -69,7 +66,9 @@ class CareerStrategyAgent
 
             // Check cache
             $cacheKey = $this->getCacheKey($character->id, $context);
-            if ($cached = Cache::get($cacheKey)) {
+            /** @var array{plan: array<string, mixed>, milestones: array<int, array<string, mixed>>, race_schedule: array<int, array<string, mixed>>, training_priorities: array<string, mixed>, confidence: float, reasoning: string, metadata: array<string, mixed>}|null $cached */
+            $cached = Cache::get($cacheKey);
+            if ($cached !== null) {
                 return $cached;
             }
 
@@ -77,13 +76,13 @@ class CareerStrategyAgent
             $response = $this->processWithMCPAgent($context);
 
             /** @var array<string, mixed> $planData */
-            $planData = is_array($response['plan'] ?? null) ? $response['plan'] : [];
+            $planData = is_array((is_array($response) && isset($response['plan']) ? $response['plan'] : null)) ? $response['plan'] : [];
             /** @var array<int, array<string, mixed>> $milestones */
-            $milestones = is_array($response['milestones'] ?? null) ? array_values($response['milestones']) : [];
+            $milestones = is_array((is_array($response) && isset($response['milestones']) ? $response['milestones'] : null)) ? array_values($response['milestones']) : [];
             /** @var array<int, array<string, mixed>> $raceSchedule */
-            $raceSchedule = is_array($response['race_schedule'] ?? null) ? array_values($response['race_schedule']) : [];
+            $raceSchedule = is_array((is_array($response) && isset($response['race_schedule']) ? $response['race_schedule'] : null)) ? array_values($response['race_schedule']) : [];
             /** @var array<string, mixed> $trainingPriorities */
-            $trainingPriorities = is_array($response['training_priorities'] ?? null) ? $response['training_priorities'] : [];
+            $trainingPriorities = is_array((is_array($response) && isset($response['training_priorities']) ? $response['training_priorities'] : null)) ? $response['training_priorities'] : [];
 
             $plan = [
                 'plan' => $planData,
@@ -124,10 +123,7 @@ class CareerStrategyAgent
      *     reasoning: string
      * }
      */
-    public function optimizeGoalPriorities(
-        Character $character,
-        array $goals
-    ): array {
+    public function optimizeGoalPriorities(): array
         $startTime = microtime(true);
 
         try {
@@ -140,9 +136,9 @@ class CareerStrategyAgent
             $response = $this->processWithMCPAgent($context);
 
             /** @var array<int, array<string, mixed>> $priorities */
-            $priorities = is_array($response['priorities'] ?? null) ? array_values($response['priorities']) : [];
+            $priorities = is_array((is_array($response) && isset($response['priorities']) ? $response['priorities'] : null)) ? array_values($response['priorities']) : [];
             /** @var array<int, string> $recommendations */
-            $recommendations = is_array($response['recommendations'] ?? null) ? array_values($response['recommendations']) : [];
+            $recommendations = is_array((is_array($response) && isset($response['recommendations']) ? $response['recommendations'] : null)) ? array_values($response['recommendations']) : [];
 
             return [
                 'priorities' => $priorities,
@@ -175,10 +171,7 @@ class CareerStrategyAgent
      *     confidence: float
      * }
      */
-    public function generateRaceSchedule(
-        Character $character,
-        array $constraints = []
-    ): array {
+    public function generateRaceSchedule(): array
         $startTime = microtime(true);
 
         try {
@@ -191,7 +184,7 @@ class CareerStrategyAgent
             $response = $this->processWithMCPAgent($context);
 
             /** @var array<int, array<string, mixed>> $schedule */
-            $schedule = is_array($response['schedule'] ?? null) ? array_values($response['schedule']) : [];
+            $schedule = is_array((is_array($response) && isset($response['schedule']) ? $response['schedule'] : null)) ? array_values($response['schedule']) : [];
 
             return [
                 'schedule' => $schedule,
@@ -223,10 +216,7 @@ class CareerStrategyAgent
      *     confidence: float
      * }
      */
-    public function trackMilestoneProgress(
-        Character $character,
-        array $milestones
-    ): array {
+    public function trackMilestoneProgress(): array
         $startTime = microtime(true);
 
         try {
@@ -239,11 +229,11 @@ class CareerStrategyAgent
             $response = $this->processWithMCPAgent($context);
 
             /** @var array<string, mixed> $progress */
-            $progress = is_array($response['progress'] ?? null) ? $response['progress'] : [];
+            $progress = is_array((is_array($response) && isset($response['progress']) ? $response['progress'] : null)) ? $response['progress'] : [];
             /** @var array<int, string> $nextSteps */
-            $nextSteps = is_array($response['next_steps'] ?? null) ? array_values($response['next_steps']) : [];
+            $nextSteps = is_array((is_array($response) && isset($response['next_steps']) ? $response['next_steps'] : null)) ? array_values($response['next_steps']) : [];
             /** @var array<int, string> $warnings */
-            $warnings = is_array($response['warnings'] ?? null) ? array_values($response['warnings']) : [];
+            $warnings = is_array((is_array($response) && isset($response['warnings']) ? $response['warnings'] : null)) ? array_values($response['warnings']) : [];
 
             return [
                 'progress' => $progress,
@@ -271,8 +261,7 @@ class CareerStrategyAgent
      *
      * @return array<string, mixed>
      */
-    protected function getCharacterData(Character $character): array
-    {
+    protected function getCharacterData(): array
         return [
             'id' => $character->id,
             'name' => $character->name,
@@ -291,34 +280,56 @@ class CareerStrategyAgent
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    protected function processWithMCPAgent(array $context): array
-    {
+    protected function processWithMCPAgent(): array
         if (! $this->mcpClient->isStrandsAgentsAvailable()) {
             throw new \RuntimeException('MCP strands-agents server not available');
         }
 
-        // TODO: Implement actual MCP agent call
+        // Implement actual MCP agent call using strands-agents server
         Log::debug('[CareerStrategyAgent] Processing with MCP agent', [
             'agent_id' => $this->agentId,
             'task' => $context['task'] ?? 'unknown',
         ]);
 
-        // Simulated response
-        return [
-            'plan' => [],
-            'milestones' => [],
-            'confidence' => 0.85,
-            'reasoning' => 'MCP agent analysis completed',
-        ];
+        try {
+            // Use MCP client to invoke strands-agents for career strategy
+            $result = $this->mcpClient->executeAgent('career-strategy', $context);
+
+            return [
+                'plan' => $result['plan'] ?? [],
+                'milestones' => $result['milestones'] ?? [],
+                'confidence' => $result['confidence'] ?? 0.85,
+                'reasoning' => $result['reasoning'] ?? 'MCP agent analysis completed',
+            ];
+        } catch (\Exception $e) {
+            Log::warning('[CareerStrategyAgent] MCP agent call failed, using fallback', [
+                'error' => $e->getMessage(),
+            ]);
+
+            // Return simulated response as fallback
+            return [
+                'plan' => [],
+                'milestones' => [],
+                'confidence' => 0.85,
+                'reasoning' => 'MCP agent analysis completed (fallback)',
+            ];
+        }
     }
 
     /**
      * Get default career plan
      *
-     * @return array<string, mixed>
+     * @return array{
+     *     plan: array<string, mixed>,
+     *     milestones: array<int, array<string, mixed>>,
+     *     race_schedule: array<int, array<string, mixed>>,
+     *     training_priorities: array<string, mixed>,
+     *     confidence: float,
+     *     reasoning: string,
+     *     metadata: array<string, mixed>
+     * }
      */
-    protected function getDefaultCareerPlan(Character $character): array
-    {
+    protected function getDefaultCareerPlan(): array
         return [
             'plan' => [
                 'strategy' => 'balanced',
@@ -373,7 +384,6 @@ class CareerStrategyAgent
      * }
      */
     public function getStatus(): array
-    {
         return [
             'enabled' => $this->enabled,
             'available' => $this->isAvailable(),

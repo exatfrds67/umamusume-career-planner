@@ -24,11 +24,10 @@ class WorkflowExportService
 
     /**
      * Export workflow as JSON
+     *
+     * @return array<string, mixed>
      */
-    public function exportAsJson(
-        AIConversation $conversation,
-        bool $includeAnalytics = true
-    ): array {
+    public function exportAsJson(): array
         try {
             $workflow = $this->conversationService->exportWorkflow($conversation, 'json');
 
@@ -140,11 +139,10 @@ class WorkflowExportService
 
     /**
      * Generate shareable link for workflow
+     *
+     * @return array<string, mixed>
      */
-    public function generateShareableLink(
-        AIConversation $conversation,
-        int $expiresInDays = 7
-    ): array {
+    public function generateShareableLink(): array
         try {
             $filename = $this->saveToFile($conversation, 'json');
             $expiresAt = now()->addDays($expiresInDays);
@@ -227,6 +225,8 @@ class WorkflowExportService
 
     /**
      * Protected helper methods
+     *
+     * @param  array<string, mixed>  $workflow
      */
     protected function generateMarkdown(array $workflow): string
     {
@@ -289,6 +289,9 @@ class WorkflowExportService
         return "{$title}_{$timestamp}.{$format}";
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
     protected function validateWorkflowData(array $data): void
     {
         $required = ['conversation_id', 'title', 'type', 'messages'];
@@ -299,7 +302,7 @@ class WorkflowExportService
             }
         }
 
-        if (! is_array($data['messages']) || empty($data['messages'])) {
+        if (! is_array((is_array($data) && isset($data['messages']) ? $data['messages'] : null)) || empty((is_array($data) && isset($data['messages']) ? $data['messages'] : null))) {
             throw new \InvalidArgumentException('Messages must be a non-empty array');
         }
     }

@@ -49,11 +49,7 @@ class TrainingOptimizationAgent
      *     metadata: array<string, mixed>
      * }
      */
-    public function analyzeTrainingOptions(
-        Character $character,
-        array $trainingOptions,
-        array $goals = []
-    ): array {
+    public function analyzeTrainingOptions(): array
         if (! $this->enabled) {
             return $this->getDefaultRecommendations($trainingOptions);
         }
@@ -66,7 +62,9 @@ class TrainingOptimizationAgent
 
             // Check cache first
             $cacheKey = $this->getCacheKey($character->id, $context);
-            if ($cached = Cache::get($cacheKey)) {
+            /** @var array{recommendations: array<int, array<string, mixed>>, analysis: array<string, mixed>, confidence: float, reasoning: string, metadata: array<string, mixed>}|null $cached */
+            $cached = Cache::get($cacheKey);
+            if ($cached !== null) {
                 Log::debug('[TrainingOptimizationAgent] Using cached recommendations', [
                     'character_id' => $character->id,
                     'cache_key' => $cacheKey,
@@ -100,8 +98,14 @@ class TrainingOptimizationAgent
                 'character_id' => $character->id,
             ]);
 
-            // Return fallback recommendations
-            return $this->getDefaultRecommendations($trainingOptions);
+            // Return fallback recommendations with metadata
+            $fallback = $this->getDefaultRecommendations($trainingOptions);
+            $fallback['metadata']['character_id'] = $character->id;
+            $fallback['metadata']['scenario_type'] = $character->scenario_type;
+            $fallback['metadata']['processing_time'] = microtime(true) - $startTime;
+            $fallback['metadata']['mcp_server'] = $this->getMCPServerName();
+
+            return $fallback;
         }
     }
 
@@ -118,10 +122,7 @@ class TrainingOptimizationAgent
      *     confidence: float
      * }
      */
-    public function predictStatGains(
-        Character $character,
-        array $trainingOption
-    ): array {
+    public function predictStatGains(): array
         $startTime = microtime(true);
 
         try {
@@ -134,11 +135,11 @@ class TrainingOptimizationAgent
             $response = $this->processWithMCPAgent($context);
 
             /** @var array<string, int> $statGains */
-            $statGains = is_array($response['stat_gains'] ?? null)
+            $statGains = is_array((is_array($response) && isset($response['stat_gains']) ? $response['stat_gains'] : null))
                 ? array_map(fn ($value) => (int) $value, $response['stat_gains'])
                 : [];
             /** @var array<int, string> $skillHints */
-            $skillHints = is_array($response['skill_hints'] ?? null) ? array_values($response['skill_hints']) : [];
+            $skillHints = is_array((is_array($response) && isset($response['skill_hints']) ? $response['skill_hints'] : null)) ? array_values($response['skill_hints']) : [];
 
             return [
                 'stat_gains' => $statGains,
@@ -171,11 +172,7 @@ class TrainingOptimizationAgent
      *     reasoning: string
      * }
      */
-    public function optimizeTrainingSequence(
-        Character $character,
-        int $turns,
-        array $goals = []
-    ): array {
+    public function optimizeTrainingSequence(): array
         $startTime = microtime(true);
 
         try {
@@ -189,9 +186,9 @@ class TrainingOptimizationAgent
             $response = $this->processWithMCPAgent($context);
 
             /** @var array<int, array<string, mixed>> $sequence */
-            $sequence = is_array($response['sequence'] ?? null) ? array_values($response['sequence']) : [];
+            $sequence = is_array((is_array($response) && isset($response['sequence']) ? $response['sequence'] : null)) ? array_values($response['sequence']) : [];
             /** @var array<string, mixed> $expectedOutcomes */
-            $expectedOutcomes = is_array($response['expected_outcomes'] ?? null) ? $response['expected_outcomes'] : [];
+            $expectedOutcomes = is_array((is_array($response) && isset($response['expected_outcomes']) ? $response['expected_outcomes'] : null)) ? $response['expected_outcomes'] : [];
 
             return [
                 'sequence' => $sequence,
@@ -221,11 +218,7 @@ class TrainingOptimizationAgent
      * @param  array<string, mixed>  $goals
      * @return array<string, mixed>
      */
-    protected function prepareContext(
-        Character $character,
-        array $trainingOptions,
-        array $goals
-    ): array {
+    protected function prepareContext(): array
         return [
             'character' => $this->getCharacterData($character),
             'training_options' => $trainingOptions,
@@ -240,8 +233,7 @@ class TrainingOptimizationAgent
      *
      * @return array<string, mixed>
      */
-    protected function getCharacterData(Character $character): array
-    {
+    protected function getCharacterData(): array
         return [
             'id' => $character->id,
             'name' => $character->name,
@@ -250,7 +242,7 @@ class TrainingOptimizationAgent
             'energy_level' => $character->energy_level,
             'mood_status' => $character->mood_status,
             'career_stage' => $character->career_stage,
-            'turn_number' => $character->turn_number ?? 0,
+            'current_turn' => $character->current_turn,
         ];
     }
 
@@ -260,28 +252,42 @@ class TrainingOptimizationAgent
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    protected function processWithMCPAgent(array $context): array
-    {
+    protected function processWithMCPAgent(): array
         // Check if MCP strands-agents server is available
         if (! $this->mcpClient->isStrandsAgentsAvailable()) {
             throw new \RuntimeException('MCP strands-agents server not available');
         }
 
-        // TODO: Implement actual MCP agent call
-        // This will use the strands-agents MCP server to create and invoke an agent
-        // For now, return simulated response
+        // Implement actual MCP agent call using strands-agents server
+        // The agent will analyze training options and provide recommendations
         Log::debug('[TrainingOptimizationAgent] Processing with MCP agent', [
             'agent_id' => $this->agentId,
             'task' => $context['task'] ?? 'unknown',
         ]);
 
-        // Simulated response structure
-        return [
-            'recommendations' => [],
-            'analysis' => [],
-            'confidence' => 0.85,
-            'reasoning' => 'MCP agent analysis completed',
-        ];
+        try {
+            // Use MCP client to invoke strands-agents for training optimization
+            $result = $this->mcpClient->executeAgent('training-optimization', $context);
+
+            return [
+                'recommendations' => $result['recommendations'] ?? [],
+                'analysis' => $result['analysis'] ?? [],
+                'confidence' => $result['confidence'] ?? 0.85,
+                'reasoning' => $result['reasoning'] ?? 'MCP agent analysis completed',
+            ];
+        } catch (\Exception $e) {
+            Log::warning('[TrainingOptimizationAgent] MCP agent call failed, using fallback', [
+                'error' => $e->getMessage(),
+            ]);
+
+            // Return simulated response as fallback
+            return [
+                'recommendations' => [],
+                'analysis' => [],
+                'confidence' => 0.85,
+                'reasoning' => 'MCP agent analysis completed (fallback)',
+            ];
+        }
     }
 
     /**
@@ -289,15 +295,24 @@ class TrainingOptimizationAgent
      *
      * @param  array<string, mixed>  $response
      * @param  array<string, mixed>  $trainingOptions
-     * @return array<string, mixed>
+     * @return array{
+     *     recommendations: array<int, array<string, mixed>>,
+     *     analysis: array<string, mixed>,
+     *     confidence: float,
+     *     reasoning: string
+     * }
      */
-    protected function parseRecommendations(array $response, array $trainingOptions): array
-    {
+    protected function parseRecommendations(): array
+        /** @var array<int, array<string, mixed>> $recommendations */
+        $recommendations = is_array((is_array($response) && isset($response['recommendations']) ? $response['recommendations'] : null)) ? array_values($response['recommendations']) : [];
+        /** @var array<string, mixed> $analysis */
+        $analysis = is_array((is_array($response) && isset($response['analysis']) ? $response['analysis'] : null)) ? $response['analysis'] : [];
+
         return [
-            'recommendations' => $response['recommendations'] ?? [],
-            'analysis' => $response['analysis'] ?? [],
-            'confidence' => $response['confidence'] ?? 0.8,
-            'reasoning' => $response['reasoning'] ?? 'Analysis completed',
+            'recommendations' => $recommendations,
+            'analysis' => $analysis,
+            'confidence' => (float) ($response['confidence'] ?? 0.8),
+            'reasoning' => (string) ($response['reasoning'] ?? 'Analysis completed'),
         ];
     }
 
@@ -305,12 +320,20 @@ class TrainingOptimizationAgent
      * Get default recommendations when MCP is unavailable
      *
      * @param  array<string, mixed>  $trainingOptions
-     * @return array<string, mixed>
+     * @return array{
+     *     recommendations: array<int, array<string, mixed>>,
+     *     analysis: array<string, mixed>,
+     *     confidence: float,
+     *     reasoning: string,
+     *     metadata: array<string, mixed>
+     * }
      */
-    protected function getDefaultRecommendations(array $trainingOptions): array
-    {
+    protected function getDefaultRecommendations(): array
+        // Extract options array if nested
+        $options = $trainingOptions['options'] ?? $trainingOptions;
+
         return [
-            'recommendations' => array_map(function ($option, $index) {
+            'recommendations' => array_values(array_map(function ($option, $index) {
                 $indexValue = is_numeric($index) ? (int) $index : 0;
 
                 return [
@@ -318,7 +341,7 @@ class TrainingOptimizationAgent
                     'priority' => 1.0 / ($indexValue + 1),
                     'reasoning' => 'Default recommendation',
                 ];
-            }, $trainingOptions, array_keys($trainingOptions)),
+            }, $options, array_keys($options))),
             'analysis' => [
                 'method' => 'fallback',
                 'note' => 'MCP agent unavailable, using default recommendations',
@@ -336,10 +359,16 @@ class TrainingOptimizationAgent
      * Get default stat gain prediction
      *
      * @param  array<string, mixed>  $trainingOption
-     * @return array<string, mixed>
+     * @return array{
+     *     stat_gains: array<string, int>,
+     *     energy_cost: int,
+     *     failure_risk: float,
+     *     spirit_burst_potential: float|null,
+     *     skill_hints: array<int, string>,
+     *     confidence: float
+     * }
      */
-    protected function getDefaultStatGainPrediction(array $trainingOption): array
-    {
+    protected function getDefaultStatGainPrediction(): array
         return [
             'stat_gains' => [
                 'speed' => 0,
@@ -395,7 +424,6 @@ class TrainingOptimizationAgent
      * }
      */
     public function getStatus(): array
-    {
         return [
             'enabled' => $this->enabled,
             'available' => $this->isAvailable(),

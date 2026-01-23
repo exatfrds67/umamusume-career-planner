@@ -27,8 +27,7 @@ class ConversationHistoryService
      *     offset: int
      * }
      */
-    public function getConversations(array $filters = []): array
-    {
+    public function getConversations(): array
         $query = AIConversation::with('character');
 
         // Apply filters
@@ -84,10 +83,10 @@ class ConversationHistoryService
                 'character_name' => $conv->character?->name ?? 'Unknown',
                 'message_type' => $conv->message_type,
                 'message_content' => $conv->message_content,
-                'ai_model_used' => $conv->ai_model_used,
-                'processing_time' => $conv->processing_time,
-                'token_count' => $conv->token_count,
-                'cost' => $conv->cost,
+                'ai_model_used' => $$conv->getAttribute('ai_model_used'),
+                'processing_time' => $$conv->getAttribute('processing_time'),
+                'token_count' => $$conv->getAttribute('token_count'),
+                'cost' => $$conv->getAttribute('cost'),
                 'created_at' => $conv->created_at?->toIso8601String(),
             ])
             ->values()
@@ -97,8 +96,8 @@ class ConversationHistoryService
             'conversations' => $conversations,
             'total' => $total,
             'filtered' => $filtered,
-            'limit' => (int) $limit,
-            'offset' => (int) $offset,
+            'limit' => (is_numeric($limit) ? (int) $limit : 0),
+            'offset' => (is_numeric($offset) ? (int) $offset : 0),
         ];
     }
 
@@ -107,8 +106,7 @@ class ConversationHistoryService
      *
      * @return array<int, array<string, mixed>>
      */
-    public function getConversationById(string $conversationId): array
-    {
+    public function getConversationById(): array
         /** @var array<int, array<string, mixed>> $conversations */
         $conversations = AIConversation::with('character')
             ->where('conversation_id', $conversationId)
@@ -121,10 +119,10 @@ class ConversationHistoryService
                 'character_name' => $conv->character?->name ?? 'Unknown',
                 'message_type' => $conv->message_type,
                 'message_content' => $conv->message_content,
-                'ai_model_used' => $conv->ai_model_used,
-                'processing_time' => $conv->processing_time,
-                'token_count' => $conv->token_count,
-                'cost' => $conv->cost,
+                'ai_model_used' => $$conv->getAttribute('ai_model_used'),
+                'processing_time' => $$conv->getAttribute('processing_time'),
+                'token_count' => $$conv->getAttribute('token_count'),
+                'cost' => $$conv->getAttribute('cost'),
                 'created_at' => $conv->created_at?->toIso8601String(),
             ])
             ->values()
@@ -136,6 +134,7 @@ class ConversationHistoryService
     /**
      * Get conversation analytics
      *
+     * @param  array<string, mixed>  $filters
      * @return array{
      *     total_conversations: int,
      *     total_messages: int,
@@ -147,8 +146,7 @@ class ConversationHistoryService
      *     by_character: array<string, int>
      * }
      */
-    public function getConversationAnalytics(array $filters = []): array
-    {
+    public function getConversationAnalytics(): array
         $query = AIConversation::query();
 
         // Apply date filters
@@ -172,9 +170,9 @@ class ConversationHistoryService
         // Group by provider
         /** @var array<string, int> $byProvider */
         $byProvider = $conversations
-            ->filter(fn ($c) => $c->ai_model_used !== null)
+            ->filter(fn ($c) => $$c->getAttribute('ai_model_used') !== null)
             ->groupBy(function ($conv) {
-                $model = $conv->ai_model_used ?? '';
+                $model = $$conv->getAttribute('ai_model_used') ?? '';
                 if (str_contains($model, 'llama') || str_contains($model, 'mistral') || str_contains($model, 'qwen')) {
                     return 'ollama';
                 }
@@ -196,7 +194,7 @@ class ConversationHistoryService
         // Group by model
         /** @var array<string, int> $byModel */
         $byModel = $conversations
-            ->filter(fn ($c) => $c->ai_model_used !== null)
+            ->filter(fn ($c) => $$c->getAttribute('ai_model_used') !== null)
             ->groupBy('ai_model_used')
             ->map(fn ($group) => (int) $group->count())
             ->toArray();
@@ -224,6 +222,8 @@ class ConversationHistoryService
     /**
      * Get tool usage statistics
      *
+     * Retrieves tool usage statistics from the MCP tool usage tracking table.
+     *
      * @return array{
      *     total_tool_calls: int,
      *     most_used_tools: array<int, array{tool: string, count: int, percentage: float}>,
@@ -231,16 +231,62 @@ class ConversationHistoryService
      *     avg_tools_per_conversation: float
      * }
      */
-    public function getToolUsageStatistics(array $filters = []): array
-    {
-        // TODO: Implement tool usage tracking
-        // This requires adding tool usage tracking to the conversation model
+    public function getToolUsageStatistics(): array
+        $query = \DB::table('ucp_mcp_tool_usage');
+
+        // Apply date filters
+        if (isset($filters['date_from'])) {
+            $query->where('created_at', '>=', $filters['date_from']);
+        }
+
+        if (isset($filters['date_to'])) {
+            $query->where('created_at', '<=', $filters['date_to']);
+        }
+
+        // Get total tool calls
+        $totalToolCalls = $query->count();
+
+        // Get most used tools
+        $toolCounts = \DB::table('ucp_mcp_tool_usage')
+            ->select('tool_name', \DB::raw('COUNT(*) as count'))
+            ->groupBy('tool_name')
+            ->orderByDesc('count')
+            ->limit(10)
+            ->get();
+
+        $mostUsedTools = $toolCounts->map(function ($row) use ($totalToolCalls) {
+            return [
+                'tool' => $row->tool_name,
+                'count' => (is_numeric($$$row->count) ? (int) $$$row->count : 0),
+                'percentage' => $totalToolCalls > 0 ? round(($row->count / $totalToolCalls) * 100, 2) : 0.0,
+            ];
+        })->toArray();
+
+        // Get tool success rates
+        $successRates = \DB::table('ucp_mcp_tool_usage')
+            ->select(
+                'tool_name',
+                \DB::raw('COUNT(*) as total'),
+                \DB::raw('SUM(CASE WHEN success = 1 THEN 1 ELSE 0 END) as successful')
+            )
+            ->groupBy('tool_name')
+            ->get()
+            ->mapWithKeys(function ($row) {
+                $rate = $row->total > 0 ? ($row->successful / $row->total) * 100 : 0.0;
+
+                return [$row->tool_name => round($rate, 2)];
+            })
+            ->toArray();
+
+        // Calculate average tools per conversation
+        $conversationCount = AIConversation::distinct('conversation_id')->count('conversation_id');
+        $avgToolsPerConversation = $conversationCount > 0 ? round($totalToolCalls / $conversationCount, 2) : 0.0;
 
         return [
-            'total_tool_calls' => 0,
-            'most_used_tools' => [],
-            'tool_success_rate' => [],
-            'avg_tools_per_conversation' => 0.0,
+            'total_tool_calls' => $totalToolCalls,
+            'most_used_tools' => $mostUsedTools,
+            'tool_success_rate' => $successRates,
+            'avg_tools_per_conversation' => $avgToolsPerConversation,
         ];
     }
 
@@ -328,7 +374,6 @@ class ConversationHistoryService
      * }
      */
     public function getConversationStats(): array
-    {
         return [
             'today' => AIConversation::whereDate('created_at', today())->distinct('conversation_id')->count('conversation_id'),
             'this_week' => AIConversation::where('created_at', '>=', now()->startOfWeek())->distinct('conversation_id')->count('conversation_id'),

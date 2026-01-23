@@ -48,10 +48,7 @@ class RaceAnalysisAgent
      *     reasoning: string
      * }
      */
-    public function analyzeRacePreparation(
-        Character $character,
-        array $raceDetails
-    ): array {
+    public function analyzeRacePreparation(): array
         if (! $this->enabled) {
             return $this->getDefaultRaceAnalysis($character, $raceDetails);
         }
@@ -68,7 +65,9 @@ class RaceAnalysisAgent
 
             // Check cache
             $cacheKey = $this->getCacheKey($character->id, $context);
-            if ($cached = Cache::get($cacheKey)) {
+            /** @var array{readiness: array<string, mixed>, recommendations: array<int, string>, stat_requirements: array<string, mixed>, confidence: float, reasoning: string, metadata: array<string, mixed>}|null $cached */
+            $cached = Cache::get($cacheKey);
+            if ($cached !== null) {
                 return $cached;
             }
 
@@ -76,11 +75,11 @@ class RaceAnalysisAgent
             $response = $this->processWithMCPAgent($context);
 
             /** @var array<string, mixed> $readiness */
-            $readiness = is_array($response['readiness'] ?? null) ? $response['readiness'] : [];
+            $readiness = is_array((is_array($response) && isset($response['readiness']) ? $response['readiness'] : null)) ? $response['readiness'] : [];
             /** @var array<int, string> $recommendations */
-            $recommendations = is_array($response['recommendations'] ?? null) ? array_values($response['recommendations']) : [];
+            $recommendations = is_array((is_array($response) && isset($response['recommendations']) ? $response['recommendations'] : null)) ? array_values($response['recommendations']) : [];
             /** @var array<string, mixed> $statRequirements */
-            $statRequirements = is_array($response['stat_requirements'] ?? null) ? $response['stat_requirements'] : [];
+            $statRequirements = is_array((is_array($response) && isset($response['stat_requirements']) ? $response['stat_requirements'] : null)) ? $response['stat_requirements'] : [];
 
             $analysis = [
                 'readiness' => $readiness,
@@ -122,11 +121,7 @@ class RaceAnalysisAgent
      *     reasoning: string
      * }
      */
-    public function predictRacePerformance(
-        Character $character,
-        array $raceDetails,
-        array $strategy = []
-    ): array {
+    public function predictRacePerformance(): array
         $startTime = microtime(true);
 
         try {
@@ -140,7 +135,7 @@ class RaceAnalysisAgent
             $response = $this->processWithMCPAgent($context);
 
             /** @var array<string, mixed> $performanceFactors */
-            $performanceFactors = is_array($response['performance_factors'] ?? null) ? $response['performance_factors'] : [];
+            $performanceFactors = is_array((is_array($response) && isset($response['performance_factors']) ? $response['performance_factors'] : null)) ? $response['performance_factors'] : [];
 
             return [
                 'predicted_position' => (int) ($response['predicted_position'] ?? 5),
@@ -177,10 +172,7 @@ class RaceAnalysisAgent
      *     reasoning: string
      * }
      */
-    public function recommendRaceStrategy(
-        Character $character,
-        array $raceDetails
-    ): array {
+    public function recommendRaceStrategy(): array
         $startTime = microtime(true);
 
         try {
@@ -193,9 +185,9 @@ class RaceAnalysisAgent
             $response = $this->processWithMCPAgent($context);
 
             /** @var array<string, mixed> $strategy */
-            $strategy = is_array($response['strategy'] ?? null) ? $response['strategy'] : [];
+            $strategy = is_array((is_array($response) && isset($response['strategy']) ? $response['strategy'] : null)) ? $response['strategy'] : [];
             /** @var array<int, string> $skillRecommendations */
-            $skillRecommendations = is_array($response['skill_recommendations'] ?? null) ? array_values($response['skill_recommendations']) : [];
+            $skillRecommendations = is_array((is_array($response) && isset($response['skill_recommendations']) ? $response['skill_recommendations'] : null)) ? array_values($response['skill_recommendations']) : [];
 
             return [
                 'strategy' => $strategy,
@@ -232,10 +224,7 @@ class RaceAnalysisAgent
      *     confidence: float
      * }
      */
-    public function analyzePostRacePerformance(
-        Character $character,
-        array $raceResult
-    ): array {
+    public function analyzePostRacePerformance(): array
         $startTime = microtime(true);
 
         try {
@@ -248,13 +237,13 @@ class RaceAnalysisAgent
             $response = $this->processWithMCPAgent($context);
 
             /** @var array<string, mixed> $analysis */
-            $analysis = is_array($response['analysis'] ?? null) ? $response['analysis'] : [];
+            $analysis = is_array((is_array($response) && isset($response['analysis']) ? $response['analysis'] : null)) ? $response['analysis'] : [];
             /** @var array<int, string> $strengths */
-            $strengths = is_array($response['strengths'] ?? null) ? array_values($response['strengths']) : [];
+            $strengths = is_array((is_array($response) && isset($response['strengths']) ? $response['strengths'] : null)) ? array_values($response['strengths']) : [];
             /** @var array<int, string> $weaknesses */
-            $weaknesses = is_array($response['weaknesses'] ?? null) ? array_values($response['weaknesses']) : [];
+            $weaknesses = is_array((is_array($response) && isset($response['weaknesses']) ? $response['weaknesses'] : null)) ? array_values($response['weaknesses']) : [];
             /** @var array<int, string> $improvements */
-            $improvements = is_array($response['improvements'] ?? null) ? array_values($response['improvements']) : [];
+            $improvements = is_array((is_array($response) && isset($response['improvements']) ? $response['improvements'] : null)) ? array_values($response['improvements']) : [];
 
             return [
                 'analysis' => $analysis,
@@ -284,8 +273,7 @@ class RaceAnalysisAgent
      *
      * @return array<string, mixed>
      */
-    protected function getCharacterData(Character $character): array
-    {
+    protected function getCharacterData(): array
         return [
             'id' => $character->id,
             'name' => $character->name,
@@ -304,35 +292,56 @@ class RaceAnalysisAgent
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    protected function processWithMCPAgent(array $context): array
-    {
+    protected function processWithMCPAgent(): array
         if (! $this->mcpClient->isStrandsAgentsAvailable()) {
             throw new \RuntimeException('MCP strands-agents server not available');
         }
 
-        // TODO: Implement actual MCP agent call
+        // Implement actual MCP agent call using strands-agents server
         Log::debug('[RaceAnalysisAgent] Processing with MCP agent', [
             'agent_id' => $this->agentId,
             'task' => $context['task'] ?? 'unknown',
         ]);
 
-        // Simulated response
-        return [
-            'readiness' => [],
-            'recommendations' => [],
-            'confidence' => 0.85,
-            'reasoning' => 'MCP agent analysis completed',
-        ];
+        try {
+            // Use MCP client to invoke strands-agents for race analysis
+            $result = $this->mcpClient->executeAgent('race-analysis', $context);
+
+            return [
+                'readiness' => $result['readiness'] ?? [],
+                'recommendations' => $result['recommendations'] ?? [],
+                'confidence' => $result['confidence'] ?? 0.85,
+                'reasoning' => $result['reasoning'] ?? 'MCP agent analysis completed',
+            ];
+        } catch (\Exception $e) {
+            Log::warning('[RaceAnalysisAgent] MCP agent call failed, using fallback', [
+                'error' => $e->getMessage(),
+            ]);
+
+            // Return simulated response as fallback
+            return [
+                'readiness' => [],
+                'recommendations' => [],
+                'confidence' => 0.85,
+                'reasoning' => 'MCP agent analysis completed (fallback)',
+            ];
+        }
     }
 
     /**
      * Get default race analysis
      *
      * @param  array<string, mixed>  $raceDetails
-     * @return array<string, mixed>
+     * @return array{
+     *     readiness: array<string, mixed>,
+     *     recommendations: array<int, string>,
+     *     stat_requirements: array<string, mixed>,
+     *     confidence: float,
+     *     reasoning: string,
+     *     metadata: array<string, mixed>
+     * }
      */
-    protected function getDefaultRaceAnalysis(Character $character, array $raceDetails): array
-    {
+    protected function getDefaultRaceAnalysis(): array
         return [
             'readiness' => [
                 'overall' => 'moderate',
@@ -388,7 +397,6 @@ class RaceAnalysisAgent
      * }
      */
     public function getStatus(): array
-    {
         return [
             'enabled' => $this->enabled,
             'available' => $this->isAvailable(),

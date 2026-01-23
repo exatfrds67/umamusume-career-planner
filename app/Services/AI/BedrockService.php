@@ -51,8 +51,8 @@ class BedrockService
     {
         try {
             $credentials = Config::get('aws.credentials', []);
-            $accessKey = $credentials['key'] ?? null;
-            $secretKey = $credentials['secret'] ?? null;
+            $accessKey = (is_array($credentials) && isset($credentials['key']) ? $credentials['key'] : null);
+            $secretKey = (is_array($credentials) && isset($credentials['secret']) ? $credentials['secret'] : null);
 
             if (! $accessKey || ! $secretKey) {
                 throw new \RuntimeException('AWS credentials not configured. Set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY environment variables.');
@@ -92,12 +92,7 @@ class BedrockService
      *     request_id: string
      * }
      */
-    public function generate(
-        string $prompt,
-        array $context = [],
-        ?string $model = null,
-        ?int $timeout = null
-    ): array {
+    public function generate(): array
         $model = $model ?? $this->defaultModel;
         $modelId = $this->getModelId($model);
 
@@ -156,8 +151,7 @@ class BedrockService
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    protected function buildPayload(string $prompt, array $context, string $model): array
-    {
+    protected function buildPayload(): array
         // Build full prompt with context
         $fullPrompt = $this->buildPromptWithContext($prompt, $context);
 
@@ -210,22 +204,32 @@ class BedrockService
         $contextStr = "Context:\n";
 
         // Add character context
-        if (isset($context['character'])) {
+        if (isset($context['character']) && is_array($context['character'])) {
             $char = $context['character'];
-            $contextStr .= "Character: {$char['name']}\n";
-            $contextStr .= "Scenario: {$char['scenario_type']}\n";
-            $contextStr .= "Stats: Speed {$char['speed']}, Stamina {$char['stamina']}, Power {$char['power']}\n";
+            $name = isset($char['name']) && is_string($char['name']) ? $char['name'] : 'Unknown';
+            $scenario = isset($char['scenario_type']) && is_string($char['scenario_type']) ? $char['scenario_type'] : 'Unknown';
+            $speed = isset($char['speed']) ? (is_string($char) ? (string) $char : '')['speed'] : '0';
+            $stamina = isset($char['stamina']) ? (is_string($char) ? (string) $char : '')['stamina'] : '0';
+            $power = isset($char['power']) ? (is_string($char) ? (string) $char : '')['power'] : '0';
+
+            $contextStr .= "Character: {$name}\n";
+            $contextStr .= "Scenario: {$scenario}\n";
+            $contextStr .= "Stats: Speed {$speed}, Stamina {$stamina}, Power {$power}\n";
         }
 
         // Add career context
-        if (isset($context['career'])) {
+        if (isset($context['career']) && is_array($context['career'])) {
             $career = $context['career'];
-            $contextStr .= "Career Stage: {$career['stage']}\n";
-            $contextStr .= "Turn: {$career['turn']}/{$career['total_turns']}\n";
+            $stage = isset($career['stage']) && is_string($career['stage']) ? $career['stage'] : 'Unknown';
+            $turn = isset($career['turn']) ? (is_string($career) ? (string) $career : '')['turn'] : '0';
+            $totalTurns = isset($career['total_turns']) ? (is_string($career) ? (string) $career : '')['total_turns'] : '0';
+
+            $contextStr .= "Career Stage: {$stage}\n";
+            $contextStr .= "Turn: {$turn}/{$totalTurns}\n";
         }
 
         // Add goals context
-        if (isset($context['goals'])) {
+        if (isset($context['goals']) && is_array($context['goals'])) {
             $contextStr .= 'Goals: '.implode(', ', $context['goals'])."\n";
         }
 
@@ -243,25 +247,37 @@ class BedrockService
     {
         // Claude models
         if (str_starts_with($model, 'claude')) {
-            if (isset($response['content'][0]['text'])) {
-                return (string) $response['content'][0]['text'];
+            if (isset($response['content']) && is_array($response['content']) && isset($response['content'][0]['text'])) {
+                $text = $response['content'][0]['text'];
+                if (is_string($text)) {
+                    return $text;
+                }
             }
         }
 
         // Nova models
         if (str_starts_with($model, 'nova')) {
-            if (isset($response['results'][0]['outputText'])) {
-                return (string) $response['results'][0]['outputText'];
+            if (isset($response['results']) && is_array($response['results']) && isset($response['results'][0]['outputText'])) {
+                $outputText = $response['results'][0]['outputText'];
+                if (is_string($outputText)) {
+                    return $outputText;
+                }
             }
         }
 
         // Default
         if (isset($response['completion'])) {
-            return (string) $response['completion'];
+            $completion = $response['completion'];
+            if (is_string($completion)) {
+                return $completion;
+            }
         }
 
         if (isset($response['text'])) {
-            return (string) $response['text'];
+            $text = $response['text'];
+            if (is_string($text)) {
+                return $text;
+            }
         }
 
         throw new \RuntimeException('Unable to extract content from Bedrock response');
@@ -276,15 +292,28 @@ class BedrockService
     {
         // Claude models
         if (str_starts_with($model, 'claude')) {
-            $inputTokens = $response['usage']['input_tokens'] ?? 0;
-            $outputTokens = $response['usage']['output_tokens'] ?? 0;
+            $inputTokens = 0;
+            $outputTokens = 0;
+
+            if (isset($response['usage']) && is_array($response['usage'])) {
+                if (isset($response['usage']['input_tokens']) && is_int($response['usage']['input_tokens'])) {
+                    $inputTokens = $response['usage']['input_tokens'];
+                }
+                if (isset($response['usage']['output_tokens']) && is_int($response['usage']['output_tokens'])) {
+                    $outputTokens = $response['usage']['output_tokens'];
+                }
+            }
 
             return $inputTokens + $outputTokens;
         }
 
         // Nova models
         if (str_starts_with($model, 'nova')) {
-            return $response['results'][0]['tokenCount'] ?? 0;
+            if (isset($response['results']) && is_array($response['results']) && isset($response['results'][0]['tokenCount']) && is_int($response['results'][0]['tokenCount'])) {
+                return $response['results'][0]['tokenCount'];
+            }
+
+            return 0;
         }
 
         // Estimate if not provided
@@ -298,6 +327,7 @@ class BedrockService
      */
     protected function getModelId(string $model): string
     {
+        /** @var array<string, string> */
         $modelIds = [
             'claude-3-5-sonnet' => 'anthropic.claude-3-5-sonnet-20241022-v2:0',
             'claude-3-5-haiku' => 'anthropic.claude-3-5-haiku-20241022-v1:0',
@@ -314,6 +344,7 @@ class BedrockService
      */
     protected function getModelVersion(string $model): string
     {
+        /** @var array<string, string> */
         $versions = [
             'claude-3-5-sonnet' => '20241022-v2',
             'claude-3-5-haiku' => '20241022-v1',
@@ -333,8 +364,9 @@ class BedrockService
         try {
             // Check if AWS credentials are configured
             $credentials = Config::get('aws.credentials', []);
-            $accessKey = $credentials['key'] ?? null;
-            $secretKey = $credentials['secret'] ?? null;
+            $credentials = is_array($credentials) ? $credentials : [];
+            $accessKey = isset($credentials['key']) && is_string($credentials['key']) ? $credentials['key'] : null;
+            $secretKey = isset($credentials['secret']) && is_string($credentials['secret']) ? $credentials['secret'] : null;
 
             if (! $accessKey || ! $secretKey) {
                 return false;
@@ -343,10 +375,12 @@ class BedrockService
             // Check cached availability
             $cacheKey = 'bedrock_availability';
 
-            return Cache::remember($cacheKey, 300, function () {
+            $cached = Cache::remember($cacheKey, 300, function () {
                 // BedrockRuntimeClient does not expose listFoundationModels; treat configured credentials as available.
                 return true;
             });
+
+            return is_bool($cached) ? $cached : false;
         } catch (\Exception $e) {
             return false;
         }
@@ -366,7 +400,6 @@ class BedrockService
      * @return array<string, mixed>
      */
     public function getModelPricing(): array
-    {
         return $this->modelPricing;
     }
 
@@ -383,7 +416,6 @@ class BedrockService
      * }
      */
     public function getStatus(): array
-    {
         return [
             'available' => $this->isAvailable(),
             'healthy' => $this->isHealthy(),
