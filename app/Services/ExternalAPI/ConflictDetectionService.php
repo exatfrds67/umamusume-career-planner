@@ -85,7 +85,8 @@ class ConflictDetectionService
      * @param  array<string, array{data: mixed, source: string, timestamp?: string, metadata?: array<string, mixed>}>  $sources
      * @return array{has_conflicts: bool, conflicts: array<string, array<string, mixed>>, summary: array<string, mixed>}
      */
-    public function detectConflicts(): array
+    public function detectConflicts(array $sources): array
+    {
         $startTime = microtime(true);
 
         Log::info('[ConflictDetection] Starting conflict detection', [
@@ -109,8 +110,8 @@ class ConflictDetectionService
         $sourceNames = array_keys($sources);
 
         // Compare each pair of sources
-        for ($i = 0; $i < \count($sourceNames); $i = ($i ?? 0) + 1) {
-            for ($j = $i + 1; $j < \count($sourceNames); $j = ($j ?? 0) + 1) {
+        for ($i = 0; $i < \count($sourceNames); $i++) {
+            for ($j = $i + 1; $j < \count($sourceNames); $j++) {
                 $source1Name = $sourceNames[$i];
                 $source2Name = $sourceNames[$j];
 
@@ -157,7 +158,8 @@ class ConflictDetectionService
      * @param  array{data: mixed, source: string, timestamp?: string, metadata?: array<string, mixed>}  $source2Data
      * @return array<string, array<string, mixed>>
      */
-    protected function compareSourcePair(): array
+    protected function compareSourcePair(string $source1Name, array $source1Data, string $source2Name, array $source2Data): array
+    {
         $conflicts = [];
 
         $data1 = $this->normalizeData($source1Data['data'] ?? []);
@@ -189,7 +191,8 @@ class ConflictDetectionService
      * @param  array<int|string, mixed>  $data2
      * @return array<string, array<string, mixed>>
      */
-    protected function compareListData(): array
+    protected function compareListData(string $source1Name, array $data1, string $source2Name, array $data2): array
+    {
         $conflicts = [];
 
         // Index data by ID for comparison
@@ -250,7 +253,8 @@ class ConflictDetectionService
      * @param  array<string, mixed>  $data2
      * @return array<string, array<string, mixed>>
      */
-    protected function compareSingleRecord(): array
+    protected function compareSingleRecord(string $source1Name, array $data1, string $source2Name, array $data2): array
+    {
         $conflicts = [];
         $fieldConflicts = $this->compareFields($data1, $data2);
 
@@ -275,13 +279,14 @@ class ConflictDetectionService
      * @param  array<string, mixed>  $item2
      * @return array<string, array{value1: mixed, value2: mixed, type: string}>
      */
-    protected function compareFields(): array
+    protected function compareFields(array $item1, array $item2): array
+    {
         $conflicts = [];
         $allFields = array_unique(array_merge(array_keys($item1), array_keys($item2)));
 
         foreach ($allFields as $field) {
             // Skip metadata fields
-            if (\str_starts_with($field, '_')) {
+            if (! is_string($field) || \str_starts_with($field, '_')) {
                 continue;
             }
 
@@ -384,7 +389,7 @@ class ConflictDetectionService
     /**
      * Calculate confidence score for a data source
      *
-     * @param  array{data: mixed, source: string, timestamp?: string, metadata?: array<string, mixed>}  $sourceData
+     * @param  array{data?: mixed, source?: string, timestamp?: string, metadata?: array<string, mixed>}  $sourceData
      */
     public function calculateConfidence(string $sourceName, array $sourceData): float
     {
@@ -399,8 +404,9 @@ class ConflictDetectionService
 
         // Adjust for data completeness
         $completenessModifier = 1.0;
-        if (isset($sourceData['metadata']['completeness'])) {
-            $completenessModifier = $sourceData['metadata']['completeness'] / 100;
+        $metadata = $sourceData['metadata'] ?? [];
+        if (is_array($metadata) && isset($metadata['completeness']) && is_numeric($metadata['completeness'])) {
+            $completenessModifier = (float) $metadata['completeness'] / 100;
         }
 
         // Calculate final confidence (capped at 1.0)
@@ -458,21 +464,22 @@ class ConflictDetectionService
         }
 
         // Field mismatches depend on the fields involved
-        if ($type === 'field_mismatch' && isset($conflict['fields'])) {
+        $fields = $conflict['fields'] ?? null;
+        if ($type === 'field_mismatch' && is_array($fields)) {
             $criticalFields = ['id', 'name', 'rarity', 'stats'];
             $highFields = ['speed', 'stamina', 'power', 'guts', 'wit', 'sp_cost'];
 
-            foreach ($conflict['fields'] as $field => $details) {
-                if (\in_array($field, $criticalFields, true)) {
+            foreach ($fields as $field => $details) {
+                if (is_string($field) && in_array($field, $criticalFields, true)) {
                     return self::SEVERITY_CRITICAL;
                 }
 
-                if (\in_array($field, $highFields, true)) {
+                if (is_string($field) && in_array($field, $highFields, true)) {
                     return self::SEVERITY_HIGH;
                 }
             }
 
-            return \count($conflict['fields']) > 5 ? self::SEVERITY_HIGH : self::SEVERITY_MEDIUM;
+            return count($fields) > 5 ? self::SEVERITY_HIGH : self::SEVERITY_MEDIUM;
         }
 
         return self::SEVERITY_LOW;
@@ -485,8 +492,8 @@ class ConflictDetectionService
      */
     protected function recommendResolution(array $conflict): string
     {
-        $source1Confidence = $conflict['source1_confidence'] ?? 0.5;
-        $source2Confidence = $conflict['source2_confidence'] ?? 0.5;
+        $source1Confidence = is_numeric($conflict['source1_confidence'] ?? null) ? (float) $conflict['source1_confidence'] : 0.5;
+        $source2Confidence = is_numeric($conflict['source2_confidence'] ?? null) ? (float) $conflict['source2_confidence'] : 0.5;
         $severity = $conflict['severity'] ?? self::SEVERITY_LOW;
 
         // Critical conflicts should be manually reviewed
@@ -516,30 +523,43 @@ class ConflictDetectionService
      * @param  array<string, array{data: mixed, source: string, timestamp?: string, metadata?: array<string, mixed>}>  $sources
      * @return array{resolved_data: mixed, resolution_log: array<string, mixed>}
      */
-    public function resolveConflicts(): array
+    public function resolveConflicts(array $conflicts, array $sources, string $strategy = self::STRATEGY_HIGHEST_CONFIDENCE): array
+    {
         Log::info('[ConflictDetection] Resolving conflicts', [
             'conflict_count' => \count($conflicts),
             'strategy' => $strategy,
         ]);
 
         $resolutionLog = [];
+        /** @var array<string, mixed> $resolvedData */
         $resolvedData = [];
 
         // Get source with highest confidence as base
         $primarySource = $this->selectPrimarySource($sources, $strategy);
-        $resolvedData = $sources[$primarySource]['data'] ?? [];
+        $primaryData = $sources[$primarySource]['data'] ?? [];
+        $resolvedData = is_array($primaryData) ? $primaryData : [];
 
         // Conflicts are structured as: pair_key => array of conflicts
         foreach ($conflicts as $pairKey => $pairConflicts) {
+            if (! is_array($pairConflicts)) {
+                continue;
+            }
             // Handle both nested and flat conflict structures
             if (isset($pairConflicts['type'])) {
                 // Flat structure - single conflict
-                $resolution = $this->resolveConflict($pairConflicts, $sources, $strategy);
+                /** @var array<string, mixed> $flatConflict */
+                $flatConflict = $pairConflicts;
+                $resolution = $this->resolveConflict($flatConflict, $sources, $strategy);
                 $resolutionLog[$pairKey] = $resolution;
             } else {
                 // Nested structure - multiple conflicts per pair
                 foreach ($pairConflicts as $conflictKey => $conflict) {
-                    $resolution = $this->resolveConflict($conflict, $sources, $strategy);
+                    if (! is_array($conflict)) {
+                        continue;
+                    }
+                    /** @var array<string, mixed> $typedConflict */
+                    $typedConflict = $conflict;
+                    $resolution = $this->resolveConflict($typedConflict, $sources, $strategy);
                     $resolutionLog["{$pairKey}:{$conflictKey}"] = $resolution;
 
                     // Apply resolution to data
@@ -576,11 +596,21 @@ class ConflictDetectionService
             $sourceConfidences[$name] = $this->calculateConfidence($name, $data);
         }
 
+        // Handle empty sources - return first key or empty string
+        if ($sourceConfidences === []) {
+            $keys = array_keys($sources);
+
+            return $keys[0] ?? '';
+        }
+
+        $maxConfidence = max($sourceConfidences);
+        $defaultSource = array_keys($sourceConfidences, $maxConfidence)[0];
+
         return match ($strategy) {
-            self::STRATEGY_HIGHEST_CONFIDENCE => array_keys($sourceConfidences, max($sourceConfidences))[0],
+            self::STRATEGY_HIGHEST_CONFIDENCE => $defaultSource,
             self::STRATEGY_NEWEST => $this->selectNewestSource($sources),
             self::STRATEGY_PRIORITY => $this->selectPrioritySource($sources),
-            default => array_keys($sourceConfidences, max($sourceConfidences))[0],
+            default => $defaultSource,
         };
     }
 
@@ -595,8 +625,9 @@ class ConflictDetectionService
         $newestTime = null;
 
         foreach ($sources as $name => $data) {
-            if (isset((is_array($data) && isset($data['timestamp']) ? $data['timestamp'] : null))) {
-                $time = \Carbon\Carbon::parse((is_array($data) && isset($data['timestamp']) ? $data['timestamp'] : null));
+            $timestampValue = is_array($data) && isset($data['timestamp']) ? $data['timestamp'] : null;
+            if ($timestampValue !== null) {
+                $time = \Carbon\Carbon::parse($timestampValue);
                 if ($newestTime === null || $time->gt($newestTime)) {
                     $newestTime = $time;
                     $newest = $name;
@@ -604,7 +635,13 @@ class ConflictDetectionService
             }
         }
 
-        return $newest ?? array_key_first($sources);
+        if ($newest !== null) {
+            return $newest;
+        }
+
+        $firstKey = array_key_first($sources);
+
+        return is_string($firstKey) ? $firstKey : '';
     }
 
     /**
@@ -622,7 +659,9 @@ class ConflictDetectionService
             }
         }
 
-        return array_key_first($sources);
+        $firstKey = array_key_first($sources);
+
+        return is_string($firstKey) ? $firstKey : '';
     }
 
     /**
@@ -632,8 +671,10 @@ class ConflictDetectionService
      * @param  array<string, array{data: mixed, source: string, timestamp?: string, metadata?: array<string, mixed>}>  $sources
      * @return array<string, mixed>
      */
-    protected function resolveConflict(): array
+    protected function resolveConflict(array $conflict, array $sources, string $strategy): array
+    {
         $conflictType = $conflict['type'] ?? 'unknown';
+        $conflictType = is_string($conflictType) ? $conflictType : 'unknown';
 
         $resolution = [
             'conflict_type' => $conflictType,
@@ -648,29 +689,34 @@ class ConflictDetectionService
             return $resolution;
         }
 
-        if ($conflictType === 'field_mismatch' && isset($conflict['fields'])) {
-            $source1 = $conflict['source1'] ?? '';
-            $source2 = $conflict['source2'] ?? '';
-            $source1Confidence = $conflict['source1_confidence'] ?? 0.5;
-            $source2Confidence = $conflict['source2_confidence'] ?? 0.5;
+        $conflictFields = $conflict['fields'] ?? null;
+        if ($conflictType === 'field_mismatch' && is_array($conflictFields)) {
+            $source1 = isset($conflict['source1']) && is_string($conflict['source1']) ? $conflict['source1'] : '';
+            $source2 = isset($conflict['source2']) && is_string($conflict['source2']) ? $conflict['source2'] : '';
+            $source1Confidence = is_numeric($conflict['source1_confidence'] ?? null) ? (float) $conflict['source1_confidence'] : 0.5;
+            $source2Confidence = is_numeric($conflict['source2_confidence'] ?? null) ? (float) $conflict['source2_confidence'] : 0.5;
+
+            // Build typed source arrays for method calls
+            /** @var array<string, array{data: mixed, source: string, timestamp?: string, metadata?: array<string, mixed>}> $sourcePair */
+            $sourcePair = [];
+            if ($source1 !== '' && isset($sources[$source1])) {
+                $sourcePair[$source1] = $sources[$source1];
+            }
+            if ($source2 !== '' && isset($sources[$source2])) {
+                $sourcePair[$source2] = $sources[$source2];
+            }
 
             $selectedSource = match ($strategy) {
                 self::STRATEGY_HIGHEST_CONFIDENCE => $source1Confidence >= $source2Confidence ? $source1 : $source2,
-                self::STRATEGY_NEWEST => $this->selectNewestSource([
-                    $source1 => $sources[$source1] ?? [],
-                    $source2 => $sources[$source2] ?? [],
-                ]),
-                self::STRATEGY_PRIORITY => $this->selectPrioritySource([
-                    $source1 => $sources[$source1] ?? [],
-                    $source2 => $sources[$source2] ?? [],
-                ]),
+                self::STRATEGY_NEWEST => $sourcePair !== [] ? $this->selectNewestSource($sourcePair) : $source1,
+                self::STRATEGY_PRIORITY => $sourcePair !== [] ? $this->selectPrioritySource($sourcePair) : $source1,
                 default => $source1Confidence >= $source2Confidence ? $source1 : $source2,
             };
 
             $resolution['selected_source'] = $selectedSource;
             $resolution['source1_confidence'] = $source1Confidence;
             $resolution['source2_confidence'] = $source2Confidence;
-            $resolution['fields_resolved'] = array_keys($conflict['fields']);
+            $resolution['fields_resolved'] = array_keys($conflictFields);
         }
 
         return $resolution;
@@ -684,8 +730,9 @@ class ConflictDetectionService
      */
     protected function applyResolution(array &$data, array $resolution): void
     {
-        if (isset($resolution['field']) && isset($resolution['resolved_value'])) {
-            $data[$resolution['field']] = $resolution['resolved_value'];
+        $field = $resolution['field'] ?? null;
+        if (is_string($field) && isset($resolution['resolved_value'])) {
+            $data[$field] = $resolution['resolved_value'];
         }
     }
 
@@ -708,14 +755,15 @@ class ConflictDetectionService
             $logEntry['conflicts'][$key] = [
                 'type' => $conflict['type'] ?? 'unknown',
                 'severity' => $conflict['severity'] ?? self::SEVERITY_LOW,
-                'source1_confidence' => (is_array($conflict) && isset($conflict['source1_confidence']) ? $conflict['source1_confidence'] : null),
-                'source2_confidence' => (is_array($conflict) && isset($conflict['source2_confidence']) ? $conflict['source2_confidence'] : null),
-                'recommended_resolution' => (is_array($conflict) && isset($conflict['recommended_resolution']) ? $conflict['recommended_resolution'] : null),
+                'source1_confidence' => $conflict['source1_confidence'] ?? null,
+                'source2_confidence' => $conflict['source2_confidence'] ?? null,
+                'recommended_resolution' => $conflict['recommended_resolution'] ?? null,
             ];
 
             // Add field details for field mismatches
-            if (isset($conflict['fields'])) {
-                $logEntry['conflicts'][$key]['affected_fields'] = array_keys($conflict['fields']);
+            $conflictFields = $conflict['fields'] ?? null;
+            if (is_array($conflictFields)) {
+                $logEntry['conflicts'][$key]['affected_fields'] = array_keys($conflictFields);
             }
         }
 
@@ -727,7 +775,11 @@ class ConflictDetectionService
 
         // Store in cache for persistence
         $cacheKey = self::CONFLICT_LOG_KEY.now()->format('Y-m-d');
+        /** @var array<int, array<string, mixed>> $existingLogs */
         $existingLogs = Cache::get($cacheKey, []);
+        if (! is_array($existingLogs)) {
+            $existingLogs = [];
+        }
         $existingLogs[] = $logEntry;
 
         // Keep only last MAX_LOG_ENTRIES per day
@@ -751,7 +803,8 @@ class ConflictDetectionService
      * @param  array<string, array{data: mixed, source: string, timestamp?: string, metadata?: array<string, mixed>}>  $sources
      * @return array<string, mixed>
      */
-    protected function generateConflictSummary(): array
+    protected function generateConflictSummary(array $conflicts, array $sources, float $durationMs): array
+    {
         $severityCounts = [
             self::SEVERITY_CRITICAL => 0,
             self::SEVERITY_HIGH => 0,
@@ -759,18 +812,29 @@ class ConflictDetectionService
             self::SEVERITY_LOW => 0,
         ];
 
+        /** @var array<string, int> $typeCounts */
         $typeCounts = [];
+        /** @var array<int, string> $affectedFields */
         $affectedFields = [];
 
         foreach ($conflicts as $conflict) {
             $severity = $conflict['severity'] ?? self::SEVERITY_LOW;
-            $severityCounts[$severity]++;
+            $severity = is_string($severity) ? $severity : self::SEVERITY_LOW;
+            if (isset($severityCounts[$severity])) {
+                $severityCounts[$severity]++;
+            }
 
             $type = $conflict['type'] ?? 'unknown';
+            $type = is_string($type) ? $type : 'unknown';
             $typeCounts[$type] = ($typeCounts[$type] ?? 0) + 1;
 
-            if (isset($conflict['fields'])) {
-                $affectedFields = array_merge($affectedFields, array_keys($conflict['fields']));
+            $conflictFields = $conflict['fields'] ?? null;
+            if (is_array($conflictFields)) {
+                foreach (array_keys($conflictFields) as $fieldKey) {
+                    if (is_string($fieldKey)) {
+                        $affectedFields[] = $fieldKey;
+                    }
+                }
             }
         }
 
@@ -790,7 +854,8 @@ class ConflictDetectionService
      *
      * @return array<int, array<string, mixed>>
      */
-    public function getConflictHistory(): array
+    public function getConflictHistory(int $limit = 100): array
+    {
         return \array_slice($this->conflictHistory, -$limit);
     }
 
@@ -799,11 +864,14 @@ class ConflictDetectionService
      *
      * @return array<int, array<string, mixed>>
      */
-    public function getConflictLogs(): array
+    public function getConflictLogs(?string $date = null): array
+    {
         $date = $date ?? now()->format('Y-m-d');
         $cacheKey = self::CONFLICT_LOG_KEY.$date;
+        /** @var array<int, array<string, mixed>> $logs */
+        $logs = Cache::get($cacheKey, []);
 
-        return Cache::get($cacheKey, []);
+        return is_array($logs) ? $logs : [];
     }
 
     /**
@@ -812,6 +880,7 @@ class ConflictDetectionService
      * @return array{total: int, by_severity: array<string, int>, by_type: array<string, int>, avg_per_detection: float}
      */
     public function getConflictStatistics(): array
+    {
         $total = 0;
         $bySeverity = [
             self::SEVERITY_CRITICAL => 0,
@@ -819,18 +888,29 @@ class ConflictDetectionService
             self::SEVERITY_MEDIUM => 0,
             self::SEVERITY_LOW => 0,
         ];
+        /** @var array<string, int> $byType */
         $byType = [];
 
         foreach ($this->conflictHistory as $entry) {
             $conflictCount = $entry['conflict_count'] ?? 0;
-            $total = ($total ?? 0) + $conflictCount;
+            $total += is_int($conflictCount) ? $conflictCount : 0;
 
-            foreach ($entry['conflicts'] ?? [] as $conflict) {
-                $severity = $conflict['severity'] ?? self::SEVERITY_LOW;
-                $bySeverity[$severity]++;
+            $entryConflicts = $entry['conflicts'] ?? null;
+            if (is_array($entryConflicts)) {
+                foreach ($entryConflicts as $conflict) {
+                    if (! is_array($conflict)) {
+                        continue;
+                    }
+                    $severity = $conflict['severity'] ?? self::SEVERITY_LOW;
+                    $severity = is_string($severity) ? $severity : self::SEVERITY_LOW;
+                    if (isset($bySeverity[$severity])) {
+                        $bySeverity[$severity]++;
+                    }
 
-                $type = $conflict['type'] ?? 'unknown';
-                $byType[$type] = ($byType[$type] ?? 0) + 1;
+                    $type = $conflict['type'] ?? 'unknown';
+                    $type = is_string($type) ? $type : 'unknown';
+                    $byType[$type] = ($byType[$type] ?? 0) + 1;
+                }
             }
         }
 
@@ -859,12 +939,19 @@ class ConflictDetectionService
      *
      * @return array<string, mixed>
      */
-    protected function normalizeData(): array
+    protected function normalizeData(mixed $data): array
+    {
         if (! \is_array($data)) {
             return [];
         }
 
-        return $data;
+        /** @var array<string, mixed> $normalized */
+        $normalized = [];
+        foreach ($data as $key => $value) {
+            $normalized[(string) $key] = $value;
+        }
+
+        return $normalized;
     }
 
     /**
@@ -890,15 +977,19 @@ class ConflictDetectionService
     /**
      * Index array data by ID field
      *
-     * @param  array<int, array<string, mixed>>  $data
+     * @param  array<int|string, mixed>  $data
      * @return array<string|int, array<string, mixed>>
      */
-    protected function indexById(): array
+    protected function indexById(array $data): array
+    {
         $indexed = [];
 
         foreach ($data as $item) {
             if (\is_array($item) && isset($item['id'])) {
-                $indexed[$item['id']] = $item;
+                $idValue = $item['id'];
+                if (is_string($idValue) || is_int($idValue)) {
+                    $indexed[$idValue] = $item;
+                }
             }
         }
 
@@ -919,6 +1010,7 @@ class ConflictDetectionService
      * @return array<string, float>
      */
     public function getAllSourceConfidences(): array
+    {
         return self::SOURCE_CONFIDENCE;
     }
 
@@ -930,7 +1022,8 @@ class ConflictDetectionService
      * @param  array<string, array{data: mixed, source: string, timestamp?: string, metadata?: array<string, mixed>}>  $sources
      * @return array{data: mixed, has_conflicts: bool, conflicts: array<string, mixed>, resolution: array<string, mixed>}
      */
-    public function validateAndResolve(): array
+    public function validateAndResolve(array $sources, string $strategy = self::STRATEGY_HIGHEST_CONFIDENCE): array
+    {
         $detection = $this->detectConflicts($sources);
 
         if (! $detection['has_conflicts']) {

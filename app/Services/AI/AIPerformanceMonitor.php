@@ -47,23 +47,34 @@ class AIPerformanceMonitor
 
             // Update metrics
             $providerMetrics = &$metrics['providers'][$provider];
-            $providerMetrics['total_requests']++;
-            $providerMetrics['successful_requests']++;
+            /** @var array{total_requests: int, successful_requests: int, failed_requests: int, total_processing_time: float, total_tokens: int, total_cost: float, average_processing_time: float, average_tokens: int, average_cost: float, success_rate: float} $providerMetrics */
+            $totalReqs = (int) $providerMetrics['total_requests'];
+            $successfulReqs = (int) $providerMetrics['successful_requests'];
+            $totalProcTime = (float) $providerMetrics['total_processing_time'];
+            $totalTokensVal = (int) $providerMetrics['total_tokens'];
+            $totalCostVal = (float) $providerMetrics['total_cost'];
+
+            $totalReqs++;
+            $successfulReqs++;
 
             $processingTime = isset($response['processing_time']) && is_numeric($response['processing_time']) ? (float) $response['processing_time'] : 0.0;
             $tokenCount = isset($response['token_count']) && is_numeric($response['token_count']) ? (int) $response['token_count'] : 0;
             $cost = isset($response['cost']) && is_numeric($response['cost']) ? (float) $response['cost'] : 0.0;
 
-            $providerMetrics['total_processing_time'] += $processingTime;
-            $providerMetrics['total_tokens'] += $tokenCount;
-            $providerMetrics['total_cost'] += $cost;
+            $totalProcTime += $processingTime;
+            $totalTokensVal += $tokenCount;
+            $totalCostVal += $cost;
 
-            // Calculate averages
-            $totalRequests = $providerMetrics['total_requests'];
-            $providerMetrics['average_processing_time'] = $providerMetrics['total_processing_time'] / $totalRequests;
-            $providerMetrics['average_tokens'] = (int) ($providerMetrics['total_tokens'] / $totalRequests);
-            $providerMetrics['average_cost'] = $providerMetrics['total_cost'] / $totalRequests;
-            $providerMetrics['success_rate'] = $providerMetrics['successful_requests'] / $totalRequests;
+            // Calculate averages and update provider metrics
+            $providerMetrics['total_requests'] = $totalReqs;
+            $providerMetrics['successful_requests'] = $successfulReqs;
+            $providerMetrics['total_processing_time'] = $totalProcTime;
+            $providerMetrics['total_tokens'] = $totalTokensVal;
+            $providerMetrics['total_cost'] = $totalCostVal;
+            $providerMetrics['average_processing_time'] = $totalProcTime / $totalReqs;
+            $providerMetrics['average_tokens'] = (int) ($totalTokensVal / $totalReqs);
+            $providerMetrics['average_cost'] = $totalCostVal / $totalReqs;
+            $providerMetrics['success_rate'] = $successfulReqs / $totalReqs;
 
             // Update global metrics
             $metrics['total_requests']++;
@@ -115,12 +126,20 @@ class AIPerformanceMonitor
 
             // Update metrics
             $providerMetrics = &$metrics['providers'][$provider];
-            $providerMetrics['total_requests']++;
-            $providerMetrics['failed_requests']++;
+            /** @var array{total_requests: int, successful_requests: int, failed_requests: int, total_processing_time: float, total_tokens: int, total_cost: float, average_processing_time: float, average_tokens: int, average_cost: float, success_rate: float} $providerMetrics */
+            $totalReqs = (int) $providerMetrics['total_requests'];
+            $successfulReqs = (int) $providerMetrics['successful_requests'];
+            $failedReqs = (int) $providerMetrics['failed_requests'];
+
+            $totalReqs++;
+            $failedReqs++;
+
+            // Update provider metrics
+            $providerMetrics['total_requests'] = $totalReqs;
+            $providerMetrics['failed_requests'] = $failedReqs;
 
             // Calculate success rate
-            $totalRequests = $providerMetrics['total_requests'];
-            $providerMetrics['success_rate'] = $providerMetrics['successful_requests'] / $totalRequests;
+            $providerMetrics['success_rate'] = $successfulReqs / $totalReqs;
 
             // Update global metrics
             $metrics['total_requests']++;
@@ -156,12 +175,13 @@ class AIPerformanceMonitor
      * }
      */
     public function getMetrics(): array
+    {
         $cacheKey = self::METRICS_KEY_PREFIX.'global';
 
         $metrics = Cache::get($cacheKey);
 
         if (! $metrics || ! \is_array($metrics)) {
-            $metrics = [
+            return [
                 'total_requests' => 0,
                 'total_processing_time' => 0.0,
                 'total_tokens' => 0,
@@ -172,7 +192,27 @@ class AIPerformanceMonitor
             ];
         }
 
-        return $metrics;
+        // Ensure all keys exist with proper types
+        $totalRequestsRaw = $metrics['total_requests'] ?? 0;
+        $totalProcessingTimeRaw = $metrics['total_processing_time'] ?? 0.0;
+        $totalTokensRaw = $metrics['total_tokens'] ?? 0;
+        $totalCostRaw = $metrics['total_cost'] ?? 0.0;
+        $totalFailuresRaw = $metrics['total_failures'] ?? 0;
+        $providersRaw = $metrics['providers'] ?? [];
+        $lastUpdatedRaw = $metrics['last_updated'] ?? now()->toIso8601String();
+
+        /** @var array<string, array<string, mixed>> $providers */
+        $providers = is_array($providersRaw) ? $providersRaw : [];
+
+        return [
+            'total_requests' => is_numeric($totalRequestsRaw) ? (int) $totalRequestsRaw : 0,
+            'total_processing_time' => is_numeric($totalProcessingTimeRaw) ? (float) $totalProcessingTimeRaw : 0.0,
+            'total_tokens' => is_numeric($totalTokensRaw) ? (int) $totalTokensRaw : 0,
+            'total_cost' => is_numeric($totalCostRaw) ? (float) $totalCostRaw : 0.0,
+            'total_failures' => is_numeric($totalFailuresRaw) ? (int) $totalFailuresRaw : 0,
+            'providers' => $providers,
+            'last_updated' => is_string($lastUpdatedRaw) ? $lastUpdatedRaw : now()->toIso8601String(),
+        ];
     }
 
     /**
@@ -206,19 +246,32 @@ class AIPerformanceMonitor
      * @return array<string, array<string, mixed>>
      */
     public function getProviderComparison(): array
+    {
         $metrics = $this->getMetrics();
         $providers = $metrics['providers'] ?? [];
 
         $comparison = [];
 
         foreach ($providers as $provider => $providerMetrics) {
+            if (! is_array($providerMetrics)) {
+                continue;
+            }
+            $totalRequestsRaw = $providerMetrics['total_requests'] ?? 0;
+            $totalRequests = is_numeric($totalRequestsRaw) ? (int) $totalRequestsRaw : 0;
+            $successRate = is_numeric($providerMetrics['success_rate'] ?? null) ? (float) $providerMetrics['success_rate'] : 0.0;
+            $avgProcessingTime = is_numeric($providerMetrics['average_processing_time'] ?? null) ? (float) $providerMetrics['average_processing_time'] : 0.0;
+            $avgTokensRaw = $providerMetrics['average_tokens'] ?? 0;
+            $avgTokens = is_numeric($avgTokensRaw) ? (int) $avgTokensRaw : 0;
+            $avgCost = is_numeric($providerMetrics['average_cost'] ?? null) ? (float) $providerMetrics['average_cost'] : 0.0;
+            $totalCost = is_numeric($providerMetrics['total_cost'] ?? null) ? (float) $providerMetrics['total_cost'] : 0.0;
+
             $comparison[$provider] = [
-                'total_requests' => $providerMetrics['total_requests'],
-                'success_rate' => round($providerMetrics['success_rate'] * 100, 2),
-                'average_processing_time' => round($providerMetrics['average_processing_time'], 3),
-                'average_tokens' => $providerMetrics['average_tokens'],
-                'average_cost' => round($providerMetrics['average_cost'], 6),
-                'total_cost' => round($providerMetrics['total_cost'], 4),
+                'total_requests' => $totalRequests,
+                'success_rate' => round($successRate * 100, 2),
+                'average_processing_time' => round($avgProcessingTime, 3),
+                'average_tokens' => $avgTokens,
+                'average_cost' => round($avgCost, 6),
+                'total_cost' => round($totalCost, 4),
             ];
         }
 
@@ -235,12 +288,17 @@ class AIPerformanceMonitor
      * }
      */
     public function getCostSummary(): array
+    {
         $metrics = $this->getMetrics();
         $providers = $metrics['providers'] ?? [];
 
         $byProvider = [];
         foreach ($providers as $provider => $providerMetrics) {
-            $byProvider[$provider] = round($providerMetrics['total_cost'], 4);
+            if (! is_array($providerMetrics)) {
+                continue;
+            }
+            $totalCost = is_numeric($providerMetrics['total_cost'] ?? null) ? (float) $providerMetrics['total_cost'] : 0.0;
+            $byProvider[$provider] = round($totalCost, 4);
         }
 
         return [
@@ -267,11 +325,15 @@ class AIPerformanceMonitor
      * @return array<string, float>
      */
     protected function getCostByModel(): array
+    {
         $metrics = $this->getMetrics();
         $byModel = [];
 
         // Extract model-specific costs from provider metrics
         foreach ($metrics['providers'] ?? [] as $provider => $providerMetrics) {
+            if (! is_array($providerMetrics)) {
+                continue;
+            }
             // Each provider may use different models
             // For now, aggregate by provider as model proxy
             $modelKey = match ($provider) {
@@ -282,7 +344,8 @@ class AIPerformanceMonitor
                 default => $provider,
             };
 
-            $byModel[$modelKey] = round($providerMetrics['total_cost'] ?? 0.0, 4);
+            $totalCost = is_numeric($providerMetrics['total_cost'] ?? null) ? (float) $providerMetrics['total_cost'] : 0.0;
+            $byModel[$modelKey] = round($totalCost, 4);
         }
 
         return $byModel;
@@ -299,6 +362,7 @@ class AIPerformanceMonitor
      * }
      */
     public function getPerformanceReport(): array
+    {
         $metrics = $this->getMetrics();
         $comparison = $this->getProviderComparison();
         $costSummary = $this->getCostSummary();
@@ -329,13 +393,16 @@ class AIPerformanceMonitor
      * @param  array<string, array<string, mixed>>  $comparison
      * @return array<string>
      */
-    protected function generateRecommendations(): array
+    protected function generateRecommendations(array $metrics = [], array $comparison = []): array
+    {
         $recommendations = [];
 
         // Check if Ollama is being underutilized
         if (isset($comparison['ollama']) && isset($comparison['bedrock'])) {
-            $ollamaRequests = $comparison['ollama']['total_requests'];
-            $bedrockRequests = $comparison['bedrock']['total_requests'];
+            $ollamaRequestsRaw = $comparison['ollama']['total_requests'] ?? 0;
+            $ollamaRequests = is_numeric($ollamaRequestsRaw) ? (int) $ollamaRequestsRaw : 0;
+            $bedrockRequestsRaw = $comparison['bedrock']['total_requests'] ?? 0;
+            $bedrockRequests = is_numeric($bedrockRequestsRaw) ? (int) $bedrockRequestsRaw : 0;
 
             if ($bedrockRequests > $ollamaRequests * 2) {
                 $recommendations[] = 'Consider routing more simple requests to Ollama to reduce costs';
@@ -343,20 +410,23 @@ class AIPerformanceMonitor
         }
 
         // Check for high costs
-        if ($metrics['total_cost'] > 1.0) {
+        $totalCost = is_numeric($metrics['total_cost'] ?? null) ? (float) $metrics['total_cost'] : 0.0;
+        if ($totalCost > 1.0) {
             $recommendations[] = 'Total AI costs are high. Review request complexity and model selection';
         }
 
         // Check for slow processing
         foreach ($comparison as $provider => $providerMetrics) {
-            if ($providerMetrics['average_processing_time'] > 10.0) {
+            $avgProcTime = is_numeric($providerMetrics['average_processing_time'] ?? null) ? (float) $providerMetrics['average_processing_time'] : 0.0;
+            if ($avgProcTime > 10.0) {
                 $recommendations[] = "Provider '{$provider}' has slow average processing time. Consider optimization";
             }
         }
 
         // Check for high failure rates
         foreach ($comparison as $provider => $providerMetrics) {
-            if ($providerMetrics['success_rate'] < 90.0) {
+            $successRate = is_numeric($providerMetrics['success_rate'] ?? null) ? (float) $providerMetrics['success_rate'] : 100.0;
+            if ($successRate < 90.0) {
                 $recommendations[] = "Provider '{$provider}' has low success rate. Check health and configuration";
             }
         }

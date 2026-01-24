@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class Race extends Model
 {
+    /** @use HasFactory<\Database\Factories\RaceFactory> */
     use HasFactory;
 
     /**
@@ -32,7 +33,7 @@ class Race extends Model
     /**
      * The attributes that are mass assignable.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $fillable = [
         'career_id',

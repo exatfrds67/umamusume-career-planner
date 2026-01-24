@@ -8,6 +8,7 @@ use App\Models\Career;
 use App\Models\Character;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 /**
  * Career State Synchronization Service
@@ -34,8 +35,11 @@ class CareerStateSyncService
 
     /**
      * Synchronize career state across all agents
+     *
+     * @return array<string, mixed>
      */
-    public function synchronizeCareerState(): array
+    public function synchronizeCareerState(Career $career): array
+    {
         try {
             $syncId = $this->generateSyncId();
 
@@ -60,7 +64,7 @@ class CareerStateSyncService
             Log::info('[CareerStateSync] Career state synchronization completed', [
                 'sync_id' => $syncId,
                 'career_id' => $career->id,
-                'agents_synced' => \count($broadcastResult['agents']),
+                'agents_synced' => is_array($broadcastResult['agents']) ? \count($broadcastResult['agents']) : 0,
             ]);
 
             return [
@@ -88,8 +92,11 @@ class CareerStateSyncService
 
     /**
      * Synchronize character state across agents
+     *
+     * @return array<string, mixed>
      */
-    public function synchronizeCharacterState(): array
+    public function synchronizeCharacterState(Character $character): array
+    {
         try {
             $syncId = $this->generateSyncId();
 
@@ -114,7 +121,7 @@ class CareerStateSyncService
             Log::info('[CareerStateSync] Character state synchronization completed', [
                 'sync_id' => $syncId,
                 'character_id' => $character->id,
-                'agents_synced' => \count($broadcastResult['agents']),
+                'agents_synced' => is_array($broadcastResult['agents']) ? \count($broadcastResult['agents']) : 0,
             ]);
 
             return [
@@ -141,19 +148,33 @@ class CareerStateSyncService
 
     /**
      * Get current synchronization status
+     *
+     * @return array<string, mixed>|null
      */
     public function getSyncStatus(string $syncId): ?array
     {
-        return Cache::get("sync_status:{$syncId}");
+        $result = Cache::get("sync_status:{$syncId}");
+
+        if (! is_array($result)) {
+            return null;
+        }
+
+        /** @var array<string, mixed> $typedResult */
+        $typedResult = $result;
+
+        return $typedResult;
     }
 
     /**
      * Subscribe agent to state updates
+     *
+     * @param  array<int, string>  $stateTypes
      */
     public function subscribeAgent(string $agentId, array $stateTypes = []): bool
     {
         try {
-            $subscriptions = Cache::get('agent_subscriptions', []);
+            $result = Cache::get('agent_subscriptions');
+            $subscriptions = is_array($result) ? $result : [];
 
             $subscriptions[$agentId] = [
                 'state_types' => $stateTypes,
@@ -184,7 +205,8 @@ class CareerStateSyncService
     public function unsubscribeAgent(string $agentId): bool
     {
         try {
-            $subscriptions = Cache::get('agent_subscriptions', []);
+            $result = Cache::get('agent_subscriptions');
+            $subscriptions = is_array($result) ? $result : [];
 
             if (isset($subscriptions[$agentId])) {
                 unset($subscriptions[$agentId]);
@@ -208,17 +230,27 @@ class CareerStateSyncService
 
     /**
      * Notify agents of state change
+     *
+     * @param  array<string, mixed>  $stateData
+     * @return array<string, mixed>
      */
-    public function notifyStateChange(): array
+    public function notifyStateChange(string $stateType, array $stateData): array
+    {
         try {
-            $subscriptions = Cache::get('agent_subscriptions', []);
+            $result = Cache::get('agent_subscriptions');
+            $subscriptions = is_array($result) ? $result : [];
             $notifiedAgents = [];
 
             foreach ($subscriptions as $agentId => $subscription) {
                 // Check if agent is subscribed to this state type
-                if (empty($subscription['state_types']) || \in_array($stateType, $subscription['state_types'])) {
-                    $this->sendStateUpdate($agentId, $stateType, $stateData);
-                    $notifiedAgents[] = $agentId;
+                if (! is_array($subscription)) {
+                    continue;
+                }
+                $stateTypes = isset($subscription['state_types']) && is_array($subscription['state_types']) ? $subscription['state_types'] : [];
+                if (empty($stateTypes) || \in_array($stateType, $stateTypes)) {
+                    $agentIdStr = is_string($agentId) ? $agentId : (string) $agentId;
+                    $this->sendStateUpdate($agentIdStr, $stateType, $stateData);
+                    $notifiedAgents[] = $agentIdStr;
                 }
             }
 
@@ -245,16 +277,22 @@ class CareerStateSyncService
 
     /**
      * Build career state snapshot
+     *
+     * @return array<string, mixed>
      */
-    protected function buildCareerState(): array
+    protected function buildCareerState(Career $career): array
+    {
+        $startDate = $career->started_at;
+        $endDate = $career->completed_at;
+
         return [
             'career_id' => $career->id,
             'character_id' => $career->character_id,
             'scenario_type' => $career->scenario_type,
             'current_turn' => $career->current_turn ?? 0,
             'is_active' => $career->completed_at === null,
-            'start_date' => $career->started_at?->toIso8601String(),
-            'end_date' => $career->completed_at?->toIso8601String(),
+            'start_date' => $startDate instanceof \Illuminate\Support\Carbon ? $startDate->toIso8601String() : (is_string($startDate) ? $startDate : null),
+            'end_date' => $endDate instanceof \Illuminate\Support\Carbon ? $endDate->toIso8601String() : (is_string($endDate) ? $endDate : null),
             'final_stats' => [
                 'speed' => $career->final_speed,
                 'stamina' => $career->final_stamina,
@@ -268,8 +306,11 @@ class CareerStateSyncService
 
     /**
      * Build character state snapshot
+     *
+     * @return array<string, mixed>
      */
-    protected function buildCharacterState(): array
+    protected function buildCharacterState(Character $character): array
+    {
         return [
             'character_id' => $character->id,
             'name' => $character->name,
@@ -294,9 +335,14 @@ class CareerStateSyncService
 
     /**
      * Broadcast state to all active agents
+     *
+     * @param  array<string, mixed>  $state
+     * @return array<string, mixed>
      */
-    protected function broadcastStateToAgents(): array
-        $subscriptions = Cache::get('agent_subscriptions', []);
+    protected function broadcastStateToAgents(string $syncId, array $state): array
+    {
+        $result = Cache::get('agent_subscriptions');
+        $subscriptions = is_array($result) ? $result : [];
         $broadcastResults = [];
 
         foreach ($subscriptions as $agentId => $subscription) {
@@ -331,12 +377,15 @@ class CareerStateSyncService
 
     /**
      * Send state update to specific agent
+     *
+     * @param  array<string, mixed>  $stateData
      */
     protected function sendStateUpdate(string $agentId, string $stateType, array $stateData): void
     {
         $updateKey = "agent_state_update:{$agentId}";
 
-        $updates = Cache::get($updateKey, []);
+        $result = Cache::get($updateKey);
+        $updates = is_array($result) ? $result : [];
         $updates[] = [
             'type' => $stateType,
             'data' => $stateData,
@@ -353,19 +402,30 @@ class CareerStateSyncService
 
     /**
      * Verify synchronization success
+     *
+     * @param  array<string, mixed>  $state
+     * @return array<string, mixed>
      */
-    protected function verifySynchronization(): array
-        $subscriptions = Cache::get('agent_subscriptions', []);
+    protected function verifySynchronization(string $syncId, array $state): array
+    {
+        $subResult = Cache::get('agent_subscriptions');
+        $subscriptions = is_array($subResult) ? $subResult : [];
         $verificationResults = [];
 
         foreach ($subscriptions as $agentId => $subscription) {
             $updateKey = "agent_state_update:{$agentId}";
-            $updates = Cache::get($updateKey, []);
+            $updResult = Cache::get($updateKey);
+            $updates = is_array($updResult) ? $updResult : [];
 
             // Check if agent received the sync
             $received = false;
             foreach ($updates as $update) {
-                if ($update['type'] === 'sync' && isset($update['data']['snapshot_at']) && $update['data']['snapshot_at'] === $state['snapshot_at']) {
+                if (! is_array($update)) {
+                    continue;
+                }
+                $updateType = $update['type'] ?? null;
+                $updateData = isset($update['data']) && is_array($update['data']) ? $update['data'] : [];
+                if ($updateType === 'sync' && isset($updateData['snapshot_at']) && $updateData['snapshot_at'] === $state['snapshot_at']) {
                     $received = true;
                     break;
                 }
@@ -394,7 +454,7 @@ class CareerStateSyncService
      */
     protected function generateSyncId(): string
     {
-        return 'sync_'.uniqid().'_'.bin2hex(\random_bytes(4));
+        return 'sync_'.Str::uuid()->toString();
     }
 
     protected function updateSyncStatus(string $syncId, string $status): void

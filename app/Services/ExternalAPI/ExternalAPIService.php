@@ -78,9 +78,10 @@ abstract class ExternalAPIService
      * @return array<string, array{priority: int, base_url: string, timeout: int, rate_limit: int, enabled: bool}>
      */
     protected function getSortedApiSources(): array
-        $sources = array_filter($this->apiSources, fn ($source) => $source['enabled'] ?? true);
+    {
+        $sources = array_filter($this->apiSources, fn ($source) => $source['enabled']);
 
-        uasort($sources, fn ($a, $b) => ($a['priority'] ?? 999) <=> ($b['priority'] ?? 999));
+        uasort($sources, fn ($a, $b) => $a['priority'] <=> $b['priority']);
 
         return $sources;
     }
@@ -91,7 +92,12 @@ abstract class ExternalAPIService
      * @param  array<string, mixed>  $params
      * @return array{success: bool, data: mixed, source: string, error?: string, metadata: array<string, mixed>}
      */
-    protected function fetchWithFallback(): array
+    protected function fetchWithFallback(
+        string $endpoint,
+        string $method,
+        array $params = [],
+        ?string $preferredSource = null
+    ): array {
         $sources = $this->getSortedApiSources();
 
         // Try preferred source first if specified
@@ -159,7 +165,12 @@ abstract class ExternalAPIService
      * @param  array<string, mixed>  $params
      * @return array{success: bool, data: mixed, source: string, error?: string, metadata: array<string, mixed>}
      */
-    protected function fetchFromSource(): array
+    protected function fetchFromSource(
+        string $sourceName,
+        string $endpoint,
+        string $method,
+        array $params = []
+    ): array {
         $sourceConfig = $this->apiSources[$sourceName] ?? null;
 
         if (! $sourceConfig) {
@@ -212,7 +223,7 @@ abstract class ExternalAPIService
 
             return [
                 'success' => true,
-                'data' => $response['data'] ?? (is_array($response) && isset($response['body']) ? $response['body'] : null),
+                'data' => $response['data'] ?? (isset($response['body']) ? $response['body'] : null),
                 'source' => $sourceName,
                 'metadata' => [
                     'response_time_ms' => round($duration, 2),
@@ -252,7 +263,8 @@ abstract class ExternalAPIService
      * @param  array<string, mixed>  $params
      * @return array{success: bool, status: int, headers: array<string, string>, body: string, data?: mixed}
      */
-    protected function makeRequest(): array
+    protected function makeRequest(string $url, string $method, array $params, int $timeout): array
+    {
         $headers = [
             'Accept' => 'application/json',
             'User-Agent' => 'UmamusumeCareerPlanner/1.0',
@@ -272,18 +284,27 @@ abstract class ExternalAPIService
 
                 // Parse JSON response if available
                 $data = null;
-                if (isset($response['body'])) {
+                if (isset($response['body']) && is_string($response['body'])) {
                     $decoded = json_decode($response['body'], true);
                     if (json_last_error() === JSON_ERROR_NONE) {
                         $data = $decoded;
                     }
                 }
 
+                /** @var bool $success */
+                $success = $response['success'] ?? false;
+                /** @var int $status */
+                $status = isset($response['status']) && is_numeric($response['status']) ? (int) $response['status'] : 200;
+                /** @var array<string, string> $headers */
+                $headers = isset($response['headers']) && is_array($response['headers']) ? $response['headers'] : [];
+                /** @var string $body */
+                $body = isset($response['body']) && is_string($response['body']) ? $response['body'] : '';
+
                 return [
-                    'success' => $response['success'] ?? false,
-                    'status' => $response['status'] ?? 200,
-                    'headers' => $response['headers'] ?? [],
-                    'body' => $response['body'] ?? '',
+                    'success' => $success,
+                    'status' => $status,
+                    'headers' => $headers,
+                    'body' => $body,
                     'data' => $data,
                 ];
             } catch (\Exception $e) {
@@ -301,7 +322,8 @@ abstract class ExternalAPIService
     {
         $key = "api_rate_limit:{$sourceName}";
 
-        return RateLimiter::attempt(
+        /** @var bool $result */
+        $result = RateLimiter::attempt(
             $key,
             $maxAttempts,
             function () {
@@ -309,6 +331,8 @@ abstract class ExternalAPIService
             },
             60 // 1 minute decay
         );
+
+        return $result;
     }
 
     /**
@@ -379,8 +403,8 @@ abstract class ExternalAPIService
     protected function incrementCircuitBreaker(string $sourceName): void
     {
         $key = "circuit_breaker:{$sourceName}";
-        $failures = Cache::get($key, 0);
-        $failures = ($failures ?? 0) + 1;
+        $cachedFailures = Cache::get($key, 0);
+        $failures = (is_numeric($cachedFailures) ? (int) $cachedFailures : 0) + 1;
 
         Cache::put($key, $failures, self::CIRCUIT_BREAKER_RESET_TIME);
 
@@ -408,11 +432,13 @@ abstract class ExternalAPIService
      * @return array<string, array{failures: int, is_open: bool}>
      */
     public function getCircuitBreakerStatus(): array
+    {
         $status = [];
 
         foreach (array_keys($this->apiSources) as $sourceName) {
             $key = "circuit_breaker:{$sourceName}";
-            $failures = Cache::get($key, 0);
+            $cachedFailures = Cache::get($key, 0);
+            $failures = is_numeric($cachedFailures) ? (int) $cachedFailures : 0;
 
             $status[$sourceName] = [
                 'failures' => $failures,
@@ -429,6 +455,7 @@ abstract class ExternalAPIService
      * @return array<string, array{priority: int, base_url: string, timeout: int, rate_limit: int, enabled: bool}>
      */
     public function getApiSources(): array
+    {
         return $this->apiSources;
     }
 
@@ -474,6 +501,7 @@ abstract class ExternalAPIService
      * @return array<string, array{enabled: bool, circuit_breaker_open: bool, priority: int}>
      */
     public function getHealthStatus(): array
+    {
         $status = [];
 
         foreach ($this->apiSources as $sourceName => $config) {

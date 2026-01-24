@@ -392,8 +392,8 @@ class DashboardController extends Controller
             $current = isset($stats[$stat]) && is_numeric($stats[$stat]) ? (float) $stats[$stat] : 0;
             $requiredValue = (float) $required;
             $readiness = $requiredValue > 0 ? min(100, ($current / $requiredValue) * 100) : 100;
-            $totalReadiness = ($totalReadiness ?? 0) + $readiness;
-            $count = ($count ?? 0) + 1;
+            $totalReadiness += $readiness;
+            $count += 1;
         }
 
         return $count > 0 ? (int) ($totalReadiness / $count) : 50;
@@ -456,7 +456,7 @@ class DashboardController extends Controller
                 'recommended' => $index === 0,
             ];
 
-            $index = ($index ?? 0) + 1;
+            $index += 1;
         }
 
         // Always suggest rest if energy is low

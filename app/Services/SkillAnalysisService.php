@@ -21,7 +21,8 @@ class SkillAnalysisService
      * @param  Collection<int, Skill>  $skills
      * @return array<int, array{skill: Skill, synergies: Collection<int, Skill>, synergy_count: int, synergy_strength: float}>
      */
-    public function analyzeSynergies(): array
+    public function analyzeSynergies(Collection $skills): array
+    {
         $synergyMap = [];
 
         foreach ($skills as $skill) {
@@ -57,12 +58,15 @@ class SkillAnalysisService
 
         // Same skill type bonus
         $sameTypeCount = $synergisticSkills->where('skill_type', $skill->skill_type)->count();
-        $strength = ($strength ?? 0) + $sameTypeCount * 0.2;
+        $strength += $sameTypeCount * 0.2;
 
         // Meta tier bonus
         $metaTierValues = ['S+' => 1.0, 'S' => 0.8, 'A' => 0.6, 'B' => 0.4, 'C' => 0.2];
         foreach ($synergisticSkills as $synSkill) {
-            $strength = ($strength ?? 0) + $metaTierValues[$synSkill->meta_tier] ?? 0.0;
+            $tier = $synSkill->meta_tier;
+            if (is_string($tier) && array_key_exists($tier, $metaTierValues)) {
+                $strength += $metaTierValues[$tier];
+            }
         }
 
         // Normalize to 0-10 scale
@@ -73,9 +77,11 @@ class SkillAnalysisService
      * Recommend optimal skill acquisition order.
      *
      * @param  Collection<int, Skill>  $targetSkills
+     * @param  int  $availableSP  Available SP for skill acquisition
      * @return array<int, array{skill: Skill, priority: int, min_cost: int, max_cost: int, recommended_hints: int, reasoning: string}>
      */
-    public function recommendAcquisitionOrder(): array
+    public function recommendAcquisitionOrder(Collection $targetSkills, int $availableSP): array
+    {
         $recommendations = [];
         $remainingSP = $availableSP;
 
@@ -86,7 +92,7 @@ class SkillAnalysisService
 
             // Prioritize evolution sources
             if ($skill->can_evolve) {
-                $tierValue = ($tierValue ?? 0) + 10;
+                $tierValue += 10;
             }
 
             return $tierValue;
@@ -121,16 +127,19 @@ class SkillAnalysisService
 
         // Meta tier priority
         $metaTierPriority = ['S+' => 100, 'S' => 80, 'A' => 60, 'B' => 40, 'C' => 20];
-        $priority = ($priority ?? 0) + $metaTierPriority[$skill->meta_tier] ?? 0;
+        $tier = $skill->meta_tier;
+        if (is_string($tier) && array_key_exists($tier, $metaTierPriority)) {
+            $priority += $metaTierPriority[$tier];
+        }
 
         // Evolution potential
         if ($skill->can_evolve) {
-            $priority = ($priority ?? 0) + 30;
+            $priority += 30;
         }
 
         // Synergy count
         if (! empty($skill->synergy_skills)) {
-            $priority = ($priority ?? 0) + count($skill->synergy_skills) * 5;
+            $priority += count($skill->synergy_skills) * 5;
         }
 
         return $priority;
@@ -177,7 +186,8 @@ class SkillAnalysisService
      *     recommendations: array<int, array{type: string, message: string, priority: string}>
      * }
      */
-    public function analyzeSkillBuild(): array
+    public function analyzeSkillBuild(Character $character, Collection $skills): array
+    {
         return [
             'character_id' => $character->id,
             'total_skills' => $skills->count(),
@@ -195,7 +205,8 @@ class SkillAnalysisService
      * @param  Collection<int, Skill>  $skills
      * @return array<string, int>
      */
-    private function analyzeSkillTypes(): array
+    private function analyzeSkillTypes(Collection $skills): array
+    {
         return [
             'speed' => $skills->where('skill_type', '=', 'speed')->count(),
             'passive' => $skills->where('skill_type', '=', 'passive')->count(),
@@ -211,7 +222,8 @@ class SkillAnalysisService
      * @param  Collection<int, Skill>  $skills
      * @return array<string, int>
      */
-    private function analyzeMetaDistribution(): array
+    private function analyzeMetaDistribution(Collection $skills): array
+    {
         return [
             'S+' => $skills->where('meta_tier', '=', 'S+')->count(),
             'S' => $skills->where('meta_tier', '=', 'S')->count(),
@@ -227,7 +239,8 @@ class SkillAnalysisService
      * @param  Collection<int, Skill>  $skills
      * @return array{evolvable_count: int, evolved_count: int, evolution_rate: float, potential_upgrades: array<int, string>}
      */
-    private function analyzeEvolutionPotential(): array
+    private function analyzeEvolutionPotential(Collection $skills): array
+    {
         $evolvableSkills = $skills->where('can_evolve', true);
         $evolvedSkills = $skills->where('is_evolution', true);
 
@@ -250,7 +263,8 @@ class SkillAnalysisService
      * @param  Collection<int, Skill>  $skills
      * @return array<int, array{type: string, message: string, priority: string}>
      */
-    private function generateBuildRecommendations(): array
+    private function generateBuildRecommendations(Character $character, Collection $skills): array
+    {
         $recommendations = [];
 
         // Check skill type balance

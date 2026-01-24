@@ -28,6 +28,8 @@ class RedisCacheOptimizationService
 
     /**
      * Hit rate statistics storage
+     *
+     * @var array<string, array{hits: int, misses: int, total_latency: float}>
      */
     private array $hitRateStats = [];
 
@@ -42,7 +44,7 @@ class RedisCacheOptimizationService
     /**
      * Cache data with intelligent TTL
      */
-    public function remember(string $key, string $strategy, callable $callback): mixed
+    public function remember(string $key, string $strategy, \Closure $callback): mixed
     {
         $ttl = $this->getTTL($strategy);
 
@@ -51,11 +53,14 @@ class RedisCacheOptimizationService
 
     /**
      * Cache data with tags for efficient invalidation
+     *
+     * @param  array<string>  $tags  Cache tags
      */
-    public function rememberWithTags(array $tags, string $key, string $strategy, callable $callback): mixed
+    public function rememberWithTags(array $tags, string $key, string $strategy, \Closure $callback): mixed
     {
         $ttl = $this->getTTL($strategy);
 
+        // @phpstan-ignore argument.templateType
         return Cache::tags($tags)->remember($key, $ttl, $callback);
     }
 
@@ -72,8 +77,14 @@ class RedisCacheOptimizationService
             }
 
             // Remove prefix from keys before deletion
-            $prefix = config('database.redis.options.prefix', '');
-            $cleanKeys = array_map(fn ($key) => str_replace($prefix, '', $key), $keys);
+            $prefixConfig = config('database.redis.options.prefix', '');
+            $prefix = is_string($prefixConfig) ? $prefixConfig : '';
+            /** @var array<int|string, mixed> $keys */
+            $cleanKeys = array_map(static function (mixed $keyValue) use ($prefix): string {
+                $keyString = is_string($keyValue) ? $keyValue : '';
+
+                return str_replace($prefix, '', $keyString);
+            }, $keys);
 
             Redis::connection('cache')->del($cleanKeys);
 
@@ -95,6 +106,8 @@ class RedisCacheOptimizationService
 
     /**
      * Invalidate cache by tags
+     *
+     * @param  array<string>  $tags  Tags to invalidate
      */
     public function invalidateTags(array $tags): void
     {
@@ -114,8 +127,12 @@ class RedisCacheOptimizationService
 
     /**
      * Warm cache with providers
+     *
+     * @param  array<string, callable>  $providers  Cache providers keyed by cache key
+     * @return array<string, mixed>
      */
-    public function warmCache(): array
+    public function warmCache(array $providers): array
+    {
         $startTime = microtime(true);
         $warmed = 0;
         $failed = 0;
@@ -131,7 +148,7 @@ class RedisCacheOptimizationService
             try {
                 // Check if already cached
                 if (Cache::has($cacheKey)) {
-                    $skipped = ($skipped ?? 0) + 1;
+                    $skipped++;
                     $details[$key] = [
                         'status' => 'skipped',
                         'reason' => 'Already cached',
@@ -145,13 +162,13 @@ class RedisCacheOptimizationService
                 $ttl = $this->getTTLForKey($key);
                 Cache::put($cacheKey, $value, $ttl);
 
-                $warmed = ($warmed ?? 0) + 1;
+                $warmed = $warmed + 1;
                 $details[$key] = [
                     'status' => 'success',
                     'ttl' => $ttl,
                 ];
             } catch (\Exception $e) {
-                $failed = ($failed ?? 0) + 1;
+                $failed = $failed + 1;
                 $details[$key] = [
                     'status' => 'failed',
                     'error' => $e->getMessage(),
@@ -204,8 +221,11 @@ class RedisCacheOptimizationService
 
     /**
      * Get cache statistics
+     *
+     * @return array<string, mixed>
      */
     public function getStatistics(): array
+    {
         try {
             $info = Redis::connection('cache')->info();
 
@@ -233,6 +253,8 @@ class RedisCacheOptimizationService
 
     /**
      * Calculate cache hit rate
+     *
+     * @param  array<string, mixed>  $info  Redis info array
      */
     protected function calculateHitRate(array $info): string
     {
@@ -240,8 +262,10 @@ class RedisCacheOptimizationService
             return 'N/A';
         }
 
-        $hits = (int) $info['keyspace_hits'];
-        $misses = (int) $info['keyspace_misses'];
+        $hitsValue = $info['keyspace_hits'];
+        $missesValue = $info['keyspace_misses'];
+        $hits = is_numeric($hitsValue) ? (int) $hitsValue : 0;
+        $misses = is_numeric($missesValue) ? (int) $missesValue : 0;
         $total = $hits + $misses;
 
         if ($total === 0) {
@@ -255,8 +279,11 @@ class RedisCacheOptimizationService
 
     /**
      * Optimize Redis memory usage
+     *
+     * @return array<string, mixed>
      */
     public function optimizeMemory(): array
+    {
         $results = [];
 
         try {
@@ -301,8 +328,11 @@ class RedisCacheOptimizationService
 
     /**
      * Analyze memory usage by key patterns
+     *
+     * @return array<string, int>
      */
     protected function analyzeMemoryUsage(): array
+    {
         try {
             $analysis = [];
             $patterns = [
@@ -369,8 +399,11 @@ class RedisCacheOptimizationService
 
     /**
      * Check Redis health
+     *
+     * @return array<string, mixed>
      */
     public function checkHealth(): array
+    {
         $startTime = microtime(true);
 
         try {
@@ -410,8 +443,11 @@ class RedisCacheOptimizationService
 
     /**
      * Get memory usage statistics
+     *
+     * @return array<string, mixed>
      */
     public function getMemoryUsage(): array
+    {
         try {
             if (! $this->isRedisAvailable()) {
                 return $this->getDefaultMemoryStats();
@@ -448,8 +484,11 @@ class RedisCacheOptimizationService
 
     /**
      * Get default memory statistics
+     *
+     * @return array<string, mixed>
      */
     protected function getDefaultMemoryStats(): array
+    {
         return [
             'used_memory' => 0,
             'used_memory_human' => '0B',
@@ -483,8 +522,13 @@ class RedisCacheOptimizationService
 
     /**
      * Get memory recommendations
+     *
+     * @param  float  $usagePercent  Current memory usage percentage
+     * @param  float  $fragmentationRatio  Current fragmentation ratio
+     * @return array<int, string>
      */
-    protected function getMemoryRecommendations(): array
+    protected function getMemoryRecommendations(float $usagePercent, float $fragmentationRatio): array
+    {
         $recommendations = [];
 
         if ($usagePercent > 80) {
@@ -505,7 +549,7 @@ class RedisCacheOptimizationService
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
         $bytes = max($bytes, 0);
-        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+        $pow = (int) floor(($bytes ? log($bytes) : 0) / log(1024));
         $pow = min($pow, count($units) - 1);
         $bytes /= (1 << (10 * $pow));
 
@@ -514,11 +558,16 @@ class RedisCacheOptimizationService
 
     /**
      * Sort providers by priority
+     *
+     * @param  array<string, callable>  $providers  Providers to sort
+     * @return array<string, callable>
      */
-    protected function sortProvidersByPriority(): array
+    protected function sortProvidersByPriority(array $providers): array
+    {
+        /** @var array<string, array{priority?: int, ttl?: int}> $priorityTypes */
         $priorityTypes = config('cache-management.warming.priority_types', []);
 
-        uksort($providers, function ($a, $b) use ($priorityTypes) {
+        uksort($providers, function (string $a, string $b) use ($priorityTypes): int {
             $priorityA = $priorityTypes[$a]['priority'] ?? 999;
             $priorityB = $priorityTypes[$b]['priority'] ?? 999;
 
@@ -533,19 +582,26 @@ class RedisCacheOptimizationService
      */
     protected function getTTLForKey(string $key): int
     {
+        /** @var array<string, array{priority?: int, ttl?: int}> $priorityTypes */
         $priorityTypes = config('cache-management.warming.priority_types', []);
 
         if (isset($priorityTypes[$key]['ttl'])) {
             return $priorityTypes[$key]['ttl'];
         }
 
-        return config('cache-management.ttl.default', 3600);
+        $default = config('cache-management.ttl.default', 3600);
+
+        return is_int($default) ? $default : 3600;
     }
 
     /**
      * Invalidate cache by tags
+     *
+     * @param  array<string>  $tags  Tags to invalidate
+     * @return array<string, mixed>
      */
-    public function invalidateByTags(): array
+    public function invalidateByTags(array $tags): array
+    {
         try {
             if (config('cache-management.invalidation.tags_enabled', true)) {
                 Cache::tags($tags)->flush();
@@ -571,8 +627,13 @@ class RedisCacheOptimizationService
 
     /**
      * Invalidate cache with cascade
+     *
+     * @param  string  $type  The data type to invalidate
+     * @return array<string, mixed>
      */
-    public function invalidateWithCascade(): array
+    public function invalidateWithCascade(string $type): array
+    {
+        /** @var array<string, array<string>> $cascadeRules */
         $cascadeRules = config('cache-management.invalidation.cascade_rules', []);
         $cascaded = [];
 
@@ -581,11 +642,13 @@ class RedisCacheOptimizationService
         $this->invalidateByTags($tags);
 
         // Cascade to dependent types
-        if (isset($cascadeRules[$type])) {
+        if (isset($cascadeRules[$type]) && is_array($cascadeRules[$type])) {
             foreach ($cascadeRules[$type] as $dependentType) {
-                $dependentTags = $this->getTagsForType($dependentType);
-                $this->invalidateByTags($dependentTags);
-                $cascaded[] = $dependentType;
+                if (is_string($dependentType)) {
+                    $dependentTags = $this->getTagsForType($dependentType);
+                    $this->invalidateByTags($dependentTags);
+                    $cascaded[] = $dependentType;
+                }
             }
         }
 
@@ -597,8 +660,13 @@ class RedisCacheOptimizationService
 
     /**
      * Get tags for a data type
+     *
+     * @param  string  $type  The data type
+     * @return array<string>
      */
-    protected function getTagsForType(): array
+    protected function getTagsForType(string $type): array
+    {
+        /** @var array<string, array<string>> $defaultTags */
         $defaultTags = config('cache-management.invalidation.default_tags', []);
 
         return $defaultTags[$type] ?? [];
@@ -639,8 +707,11 @@ class RedisCacheOptimizationService
 
     /**
      * Get hit rate statistics
+     *
+     * @return array<string, mixed>
      */
     public function getHitRateStatistics(): array
+    {
         $overallHits = 0;
         $overallMisses = 0;
         $byKey = [];
@@ -658,8 +729,8 @@ class RedisCacheOptimizationService
                 'avg_latency_ms' => round($avgLatency, 2),
             ];
 
-            $overallHits = ($overallHits ?? 0) + $stats['hits'];
-            $overallMisses = ($overallMisses ?? 0) + $stats['misses'];
+            $overallHits += $stats['hits'];
+            $overallMisses += $stats['misses'];
         }
 
         $overallTotal = $overallHits + $overallMisses;
@@ -681,10 +752,16 @@ class RedisCacheOptimizationService
 
     /**
      * Get hit rate recommendations
+     *
+     * @param  float  $hitRate  Current overall hit rate
+     * @param  array<string, array{hits: int, misses: int, total: int, hit_rate: float, avg_latency_ms: float}>  $byKey  Hit rate stats by key
+     * @return array<int, string>
      */
-    protected function getHitRateRecommendations(): array
+    protected function getHitRateRecommendations(float $hitRate, array $byKey): array
+    {
         $recommendations = [];
-        $minHitRate = config('cache-management.monitoring.min_hit_rate', 70);
+        $minHitRateConfig = config('cache-management.monitoring.min_hit_rate', 70);
+        $minHitRate = is_numeric($minHitRateConfig) ? (int) $minHitRateConfig : 70;
 
         if ($hitRate < $minHitRate) {
             $recommendations[] = "Overall hit rate ({$hitRate}%) is below target ({$minHitRate}%). Consider adjusting TTL values or cache warming strategies.";
@@ -702,8 +779,11 @@ class RedisCacheOptimizationService
 
     /**
      * Clean up stale cache entries
+     *
+     * @return array<string, int|float>
      */
     public function cleanupStaleEntries(): array
+    {
         $startTime = microtime(true);
         $scanned = 0;
         $deleted = 0;
@@ -742,8 +822,11 @@ class RedisCacheOptimizationService
 
     /**
      * Get optimization recommendations
+     *
+     * @return array<int, array<string, string>>
      */
     public function getOptimizationRecommendations(): array
+    {
         $recommendations = [];
 
         // Check Redis availability
@@ -758,30 +841,35 @@ class RedisCacheOptimizationService
 
         // Check memory usage
         $memory = $this->getMemoryUsage();
-        if ($memory['status'] === 'critical') {
+        $memoryStatus = is_string($memory['status']) ? $memory['status'] : '';
+        $memoryUsagePercent = is_numeric($memory['usage_percent']) ? $memory['usage_percent'] : 0;
+        if ($memoryStatus === 'critical') {
             $recommendations[] = [
                 'type' => 'memory',
                 'severity' => 'critical',
-                'message' => "Redis memory usage is critical ({$memory['usage_percent']}%)",
+                'message' => "Redis memory usage is critical ({$memoryUsagePercent}%)",
                 'action' => 'Increase max memory or implement more aggressive eviction',
             ];
-        } elseif ($memory['status'] === 'warning') {
+        } elseif ($memoryStatus === 'warning') {
             $recommendations[] = [
                 'type' => 'memory',
                 'severity' => 'warning',
-                'message' => "Redis memory usage is high ({$memory['usage_percent']}%)",
+                'message' => "Redis memory usage is high ({$memoryUsagePercent}%)",
                 'action' => 'Monitor memory usage and consider optimization',
             ];
         }
 
         // Check hit rate
         $hitRate = $this->getHitRateStatistics();
-        $minHitRate = config('cache-management.monitoring.min_hit_rate', 70);
-        if ($hitRate['overall']['hit_rate'] < $minHitRate && $hitRate['overall']['total'] > 0) {
+        $minHitRateConfig = config('cache-management.monitoring.min_hit_rate', 70);
+        $minHitRate = is_numeric($minHitRateConfig) ? (int) $minHitRateConfig : 70;
+        /** @var array{hit_rate: float, hits: int, misses: int, total: int} $overall */
+        $overall = $hitRate['overall'];
+        if ($overall['hit_rate'] < $minHitRate && $overall['total'] > 0) {
             $recommendations[] = [
                 'type' => 'hit_rate',
                 'severity' => 'warning',
-                'message' => "Cache hit rate ({$hitRate['overall']['hit_rate']}%) is below target ({$minHitRate}%)",
+                'message' => "Cache hit rate ({$overall['hit_rate']}%) is below target ({$minHitRate}%)",
                 'action' => 'Review cache warming and TTL strategies',
             ];
         }
@@ -791,8 +879,11 @@ class RedisCacheOptimizationService
 
     /**
      * Get comprehensive statistics
+     *
+     * @return array<string, mixed>
      */
     public function getComprehensiveStats(): array
+    {
         return [
             'health' => $this->checkHealth(),
             'memory' => $this->getMemoryUsage(),

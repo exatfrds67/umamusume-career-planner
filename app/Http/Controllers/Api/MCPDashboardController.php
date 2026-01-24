@@ -179,7 +179,7 @@ class MCPDashboardController extends Controller
             if ($user) {
                 $user->userPreferences()->updateOrCreate(
                     [
-                        'user_id' => $user?->id ?? throw new \Exception('User required'),
+                        'user_id' => $user->id ?? throw new \Exception('User required'),
                         'preference_category' => 'mcp',
                         'preference_key' => 'dashboard_settings',
                         'scope' => 'global',

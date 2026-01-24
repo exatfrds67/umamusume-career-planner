@@ -71,8 +71,8 @@ class TrainingOptimizationAgent
      *         current_stats: array<string, int>,
      *         energy_level: int,
      *         mood_status: string,
-     *         growth_rates: array<string, int>|null,
-     *         facility_levels: array<string, int>|null
+     *         growth_rates: array<string, mixed>|null,
+     *         facility_levels: array<string, mixed>|null
      *     },
      *     goals: array<string, mixed>,
      *     support_cards: array<int, array<string, mixed>>,
@@ -81,7 +81,12 @@ class TrainingOptimizationAgent
      *     team_members: array<int, mixed>
      * }
      */
-    protected function prepareAgentContext(): array
+    protected function prepareAgentContext(Character $character, array $context): array
+    {
+        $trainingHistory = $context['training_history'] ?? [];
+        $upcomingRaces = $context['upcoming_races'] ?? [];
+        $teamMembers = $context['team_members'] ?? [];
+
         return [
             'character' => [
                 'id' => $character->id,
@@ -95,9 +100,9 @@ class TrainingOptimizationAgent
             ],
             'goals' => $character->goals ?? [],
             'support_cards' => $this->getSupportCardContext($character),
-            'training_history' => $context['training_history'] ?? [],
-            'upcoming_races' => $context['upcoming_races'] ?? [],
-            'team_members' => $context['team_members'] ?? [],
+            'training_history' => is_array($trainingHistory) ? array_values($trainingHistory) : [],
+            'upcoming_races' => is_array($upcomingRaces) ? array_values($upcomingRaces) : [],
+            'team_members' => is_array($teamMembers) ? array_values($teamMembers) : [],
         ];
     }
 
@@ -117,7 +122,8 @@ class TrainingOptimizationAgent
      * }  $context
      * @return array<string, mixed>
      */
-    protected function executeAgentWorkflow(): array
+    protected function executeAgentWorkflow(array $context): array
+    {
         $startTime = microtime(true);
         $agentsConsulted = [];
         $recommendations = [];
@@ -161,25 +167,34 @@ class TrainingOptimizationAgent
      *     character: array{current_stats: array<string, int>},
      *     goals: array<string, mixed>
      * }  $context
-     * @return array{priority_stats: array<int, string>, stat_gaps: array<string, int>, resource_efficiency: array<string, mixed>, recommended_focus: string|null}
+     * @return array{priority_stats: array<int, string>, stat_gaps: array<string, int>, resource_efficiency: float, recommended_focus: string|null}
      */
-    protected function consultResourceManagementAgent(): array
+    protected function consultResourceManagementAgent(array $context): array
+    {
         $character = $context['character'];
         $goals = $context['goals'];
 
         // Analyze stat gaps
+        /** @var array<string, int> $statGaps */
         $statGaps = [];
         $targetStats = $goals['target_stats'] ?? [];
-        foreach ($targetStats as $stat => $target) {
-            $current = $character['current_stats'][$stat] ?? 0;
-            $statGaps[$stat] = max(0, $target - $current);
+        if (is_array($targetStats)) {
+            foreach ($targetStats as $stat => $target) {
+                $statKey = is_string($stat) ? $stat : (string) $stat;
+                $targetValue = is_numeric($target) ? (int) $target : 0;
+                $current = $character['current_stats'][$statKey] ?? 0;
+                $statGaps[$statKey] = max(0, $targetValue - $current);
+            }
         }
 
         // Prioritize stats by gap size
         arsort($statGaps);
 
+        /** @var array<int, string> $priorityStats */
+        $priorityStats = array_keys($statGaps);
+
         return [
-            'priority_stats' => array_keys($statGaps),
+            'priority_stats' => $priorityStats,
             'stat_gaps' => $statGaps,
             'resource_efficiency' => $this->calculateResourceEfficiency($statGaps, $character),
             'recommended_focus' => array_key_first($statGaps),
@@ -192,19 +207,28 @@ class TrainingOptimizationAgent
      * @param  array{support_cards: array<int, array<string, mixed>>}  $context
      * @return array{available_skills: array<int, string>, skill_priority: array<int, string>, sp_allocation_strategy: string}
      */
-    protected function consultSkillBuildPlanningAgent(): array
+    protected function consultSkillBuildPlanningAgent(array $context): array
+    {
         $supportCards = $context['support_cards'];
 
         // Analyze available skill hints
+        /** @var array<string> $availableSkills */
         $availableSkills = [];
         foreach ($supportCards as $card) {
-            if (isset($card['skills_provided'])) {
-                $availableSkills = array_merge($availableSkills, $card['skills_provided']);
+            if (isset($card['skills_provided']) && is_array($card['skills_provided'])) {
+                foreach ($card['skills_provided'] as $skill) {
+                    if (is_string($skill)) {
+                        $availableSkills[] = $skill;
+                    }
+                }
             }
         }
 
+        /** @var array<int, string> $uniqueSkills */
+        $uniqueSkills = array_values(array_unique($availableSkills));
+
         return [
-            'available_skills' => array_unique($availableSkills),
+            'available_skills' => $uniqueSkills,
             'skill_priority' => $this->prioritizeSkills($availableSkills, $context),
             'sp_allocation_strategy' => 'prioritize_core_skills',
         ];
@@ -216,7 +240,8 @@ class TrainingOptimizationAgent
      * @param  array{character: array{scenario_type: string}}  $context
      * @return array<string, mixed>
      */
-    protected function consultScenarioStrategyAgent(): array
+    protected function consultScenarioStrategyAgent(array $context): array
+    {
         $scenarioType = $context['character']['scenario_type'];
 
         return match ($scenarioType) {
@@ -232,7 +257,8 @@ class TrainingOptimizationAgent
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    protected function getUnityCupStrategy(): array
+    protected function getUnityCupStrategy(array $context): array
+    {
         return [
             'strategy' => 'team_coordination',
             'focus' => 'spirit_burst_optimization',
@@ -250,7 +276,8 @@ class TrainingOptimizationAgent
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    protected function getUraFinaleStrategy(): array
+    protected function getUraFinaleStrategy(array $context): array
+    {
         return [
             'strategy' => 'individual_optimization',
             'focus' => 'race_preparation',
@@ -269,16 +296,23 @@ class TrainingOptimizationAgent
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    protected function synthesizeRecommendations(): array
-        $resourceRec = $recommendations['resource_allocation'];
-        $skillRec = $recommendations['skill_priorities'];
-        $scenarioRec = $recommendations['scenario_strategy'];
+    protected function synthesizeRecommendations(array $recommendations, array $context): array
+    {
+        /** @var array{recommended_focus: string|null, priority_stats: array<string>, stat_gaps: array<string, int>, resource_efficiency: float} $resourceRec */
+        $resourceRec = is_array($recommendations['resource_allocation']) ? $recommendations['resource_allocation'] : [];
+        /** @var array{available_skills: array<int, string>, skill_priority: array<int, string>, sp_allocation_strategy: string} $skillRec */
+        $skillRec = is_array($recommendations['skill_priorities']) ? $recommendations['skill_priorities'] : [];
+        /** @var array{strategy?: string, focus?: string, recommendations?: array<string>} $scenarioRec */
+        $scenarioRec = is_array($recommendations['scenario_strategy']) ? $recommendations['scenario_strategy'] : [];
+
+        $priorityStats = $resourceRec['priority_stats'] ?? [];
+        $skillPriority = $skillRec['skill_priority'] ?? [];
 
         return [
-            'primary_focus' => $resourceRec['recommended_focus'],
-            'secondary_focus' => $this->getSecondaryFocus($resourceRec['priority_stats']),
-            'skill_priorities' => $skillRec['skill_priority'],
-            'strategy' => $scenarioRec['strategy'],
+            'primary_focus' => $resourceRec['recommended_focus'] ?? null,
+            'secondary_focus' => $this->getSecondaryFocus($priorityStats),
+            'skill_priorities' => $skillPriority,
+            'strategy' => $scenarioRec['strategy'] ?? 'balanced',
             'action_plan' => $this->generateActionPlan($recommendations, $context),
         ];
     }
@@ -291,14 +325,16 @@ class TrainingOptimizationAgent
      */
     protected function generateWorkflowReasoning(array $synthesized, array $context): string
     {
-        $primaryFocus = $synthesized['primary_focus'];
-        $strategy = $synthesized['strategy'];
+        $primaryFocus = is_string($synthesized['primary_focus']) ? $synthesized['primary_focus'] : 'stats';
+        $strategy = is_string($synthesized['strategy']) ? $synthesized['strategy'] : 'balanced';
 
         $reasoning = "Multi-agent analysis recommends focusing on {$primaryFocus} training. ";
         $reasoning .= "Strategy: {$strategy}. ";
 
-        if (isset($synthesized['action_plan'])) {
-            $reasoning .= 'Action plan: '.implode(', ', array_slice($synthesized['action_plan'], 0, 3)).'.';
+        if (isset($synthesized['action_plan']) && is_array($synthesized['action_plan'])) {
+            /** @var array<string> $actionPlan */
+            $actionPlan = array_slice($synthesized['action_plan'], 0, 3);
+            $reasoning .= 'Action plan: '.implode(', ', $actionPlan).'.';
         }
 
         return $reasoning;
@@ -315,8 +351,11 @@ class TrainingOptimizationAgent
         $confidence = 0.7;
 
         // Increase confidence if multiple agents agree
-        $agentCount = count($workflow['agents_consulted']);
-        $confidence = ($confidence ?? 0) + ($agentCount - 1) * 0.1;
+        $agentsConsulted = $workflow['agents_consulted'] ?? [];
+        $agentCount = is_array($agentsConsulted) || $agentsConsulted instanceof \Countable
+            ? count($agentsConsulted)
+            : 0;
+        $confidence += ($agentCount - 1) * 0.1;
 
         // Cap at 0.95
         return min(0.95, $confidence);
@@ -327,15 +366,19 @@ class TrainingOptimizationAgent
      *
      * @return array<int, array<string, mixed>>
      */
-    protected function getSupportCardContext(): array
-        return $character->supportCards->map(function ($characterCard) {
+    protected function getSupportCardContext(Character $character): array
+    {
+        /** @var array<int, array<string, mixed>> $result */
+        $result = $character->supportCards->map(function ($characterCard): array {
             return [
                 'card_id' => $characterCard->support_card_id,
                 'card_type' => $characterCard->supportCard->card_type ?? 'unknown',
                 'limit_break_level' => $characterCard->limit_break_level ?? 0,
                 'skills_provided' => $characterCard->supportCard->skills_provided ?? [],
             ];
-        })->toArray();
+        })->values()->all();
+
+        return $result;
     }
 
     /**
@@ -347,7 +390,9 @@ class TrainingOptimizationAgent
     protected function calculateResourceEfficiency(array $statGaps, array $character): float
     {
         $totalGap = array_sum($statGaps);
-        $energyLevel = $character['energy_level'];
+        $energyLevel = isset($character['energy_level']) && is_numeric($character['energy_level'])
+            ? (float) $character['energy_level']
+            : 100.0;
 
         // Higher energy = higher efficiency
         return ($energyLevel / 100) * min(1.0, $totalGap / 1000);
@@ -358,11 +403,12 @@ class TrainingOptimizationAgent
      *
      * @param  array<string>  $skills
      * @param  array<string, mixed>  $context
-     * @return array<string>
+     * @return array<int, string>
      */
-    protected function prioritizeSkills(): array
+    protected function prioritizeSkills(array $skills, array $context): array
+    {
         // Simple prioritization - can be enhanced with ML
-        return array_slice($skills, 0, 5);
+        return array_values(array_slice($skills, 0, 5));
     }
 
     /**
@@ -382,18 +428,29 @@ class TrainingOptimizationAgent
      * @param  array<string, mixed>  $context
      * @return array<string>
      */
-    protected function generateActionPlan(): array
+    protected function generateActionPlan(array $recommendations, array $context): array
+    {
+        /** @var array<string> $plan */
         $plan = [];
 
-        $resourceRec = $recommendations['resource_allocation'];
-        $scenarioRec = $recommendations['scenario_strategy'];
+        /** @var array{recommended_focus?: string|null, priority_stats?: array<string>} $resourceRec */
+        $resourceRec = is_array($recommendations['resource_allocation']) ? $recommendations['resource_allocation'] : [];
+        /** @var array{strategy?: string, recommendations?: array<string>} $scenarioRec */
+        $scenarioRec = is_array($recommendations['scenario_strategy']) ? $recommendations['scenario_strategy'] : [];
 
         // Add primary focus
-        $plan[] = "Train {$resourceRec['recommended_focus']} to close stat gap";
+        $recommendedFocus = $resourceRec['recommended_focus'] ?? 'stats';
+        $focusStr = is_string($recommendedFocus) ? $recommendedFocus : 'stats';
+        $plan[] = "Train {$focusStr} to close stat gap";
 
         // Add scenario-specific recommendations
-        if (isset($scenarioRec['recommendations'])) {
-            $plan = array_merge($plan, array_slice($scenarioRec['recommendations'], 0, 2));
+        if (isset($scenarioRec['recommendations']) && is_array($scenarioRec['recommendations'])) {
+            $scenarioItems = array_slice($scenarioRec['recommendations'], 0, 2);
+            foreach ($scenarioItems as $item) {
+                if (is_string($item)) {
+                    $plan[] = $item;
+                }
+            }
         }
 
         return $plan;

@@ -51,11 +51,13 @@ class APIAlertingService
      */
     public function sendAlert(string $alertType, string $severity, string $message, array $context = []): void
     {
+        $apiName = isset($context['api']) && is_string($context['api']) ? $context['api'] : 'unknown';
+
         // Check if alert is in cooldown
-        if ($this->isAlertInCooldown($alertType, $context['api'] ?? 'unknown')) {
+        if ($this->isAlertInCooldown($alertType, $apiName)) {
             Log::debug('[APIAlerting] Alert in cooldown, skipping', [
                 'alert_type' => $alertType,
-                'api' => $context['api'] ?? 'unknown',
+                'api' => $apiName,
             ]);
 
             return;
@@ -75,7 +77,7 @@ class APIAlertingService
         $this->storeAlertHistory($alert);
 
         // Set cooldown
-        $this->setAlertCooldown($alertType, $context['api'] ?? 'unknown');
+        $this->setAlertCooldown($alertType, $apiName);
 
         // Send alert via MCP tools if available
         $this->sendViaMCP($alert);
@@ -198,7 +200,8 @@ class APIAlertingService
         Redis::ltrim($historyKey, 0, self::MAX_HISTORY_ENTRIES - 1);
 
         // Also store by type
-        $typeHistoryKey = self::ALERT_HISTORY_KEY.$alert['type'];
+        $alertType = isset($alert['type']) && is_string($alert['type']) ? $alert['type'] : 'unknown';
+        $typeHistoryKey = self::ALERT_HISTORY_KEY.$alertType;
         Redis::lpush($typeHistoryKey, json_encode($alert));
         Redis::ltrim($typeHistoryKey, 0, self::MAX_HISTORY_ENTRIES - 1);
     }
@@ -264,14 +267,24 @@ class APIAlertingService
      *
      * @return array<int, array<string, mixed>>
      */
-    public function getAlertHistory(): array
-        $historyKey = $type
+    public function getAlertHistory(?string $type = null, int $limit = 100): array
+    {
+        $historyKey = $type !== null
             ? self::ALERT_HISTORY_KEY.$type
             : self::ALERT_HISTORY_KEY.'all';
 
+        /** @var array<int, string> $entries */
         $entries = Redis::lrange($historyKey, 0, $limit - 1);
 
-        return array_map(fn ($entry) => json_decode($entry, true), $entries);
+        $result = [];
+        foreach ($entries as $entry) {
+            $decoded = json_decode($entry, true);
+            if (is_array($decoded)) {
+                $result[] = $decoded;
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -280,9 +293,10 @@ class APIAlertingService
      * @return array<int, array<string, mixed>>
      */
     public function getUnacknowledgedAlerts(): array
-        $allAlerts = $this->getAlertHistory(100);
+    {
+        $allAlerts = $this->getAlertHistory(null, 100);
 
-        return array_filter($allAlerts, fn ($alert) => ! $alert['acknowledged']);
+        return array_values(array_filter($allAlerts, fn ($alert) => ! ($alert['acknowledged'] ?? true)));
     }
 
     /**
@@ -290,10 +304,11 @@ class APIAlertingService
      */
     public function acknowledgeAlert(string $alertId): bool
     {
-        $allAlerts = $this->getAlertHistory(self::MAX_HISTORY_ENTRIES);
+        $allAlerts = $this->getAlertHistory(null, self::MAX_HISTORY_ENTRIES);
 
         foreach ($allAlerts as $index => $alert) {
-            if ($alert['id'] === $alertId) {
+            $currentId = isset($alert['id']) && is_string($alert['id']) ? $alert['id'] : '';
+            if ($currentId === $alertId) {
                 $alert['acknowledged'] = true;
                 $alert['acknowledged_at'] = now()->toIso8601String();
 
@@ -318,9 +333,12 @@ class APIAlertingService
      * @return array{total: int, by_type: array<string, int>, by_severity: array<string, int>, unacknowledged: int, recent_24h: int}
      */
     public function getAlertStatistics(): array
-        $allAlerts = $this->getAlertHistory(self::MAX_HISTORY_ENTRIES);
+    {
+        $allAlerts = $this->getAlertHistory(null, self::MAX_HISTORY_ENTRIES);
 
+        /** @var array<string, int> $byType */
         $byType = [];
+        /** @var array<string, int> $bySeverity */
         $bySeverity = [];
         $unacknowledged = 0;
         $recent24h = 0;
@@ -329,22 +347,23 @@ class APIAlertingService
 
         foreach ($allAlerts as $alert) {
             // Count by type
-            $type = $alert['type'];
+            $type = isset($alert['type']) && is_string($alert['type']) ? $alert['type'] : 'unknown';
             $byType[$type] = ($byType[$type] ?? 0) + 1;
 
             // Count by severity
-            $severity = $alert['severity'];
+            $severity = isset($alert['severity']) && is_string($alert['severity']) ? $alert['severity'] : 'unknown';
             $bySeverity[$severity] = ($bySeverity[$severity] ?? 0) + 1;
 
             // Count unacknowledged
-            if (! $alert['acknowledged']) {
-                $unacknowledged = ($unacknowledged ?? 0) + 1;
+            if (! ($alert['acknowledged'] ?? true)) {
+                $unacknowledged++;
             }
 
             // Count recent (last 24 hours)
-            $timestamp = strtotime($alert['timestamp']);
-            if ($timestamp >= $cutoff) {
-                $recent24h = ($recent24h ?? 0) + 1;
+            $timestampStr = isset($alert['timestamp']) && is_string($alert['timestamp']) ? $alert['timestamp'] : '';
+            $timestamp = strtotime($timestampStr);
+            if ($timestamp !== false && $timestamp >= $cutoff) {
+                $recent24h++;
             }
         }
 
@@ -395,11 +414,19 @@ class APIAlertingService
      * @return array<string, mixed>
      */
     public function getAlertConfiguration(): array
-        return Cache::get(self::ALERT_CONFIG_KEY, [
+    {
+        $config = Cache::get(self::ALERT_CONFIG_KEY);
+
+        if (is_array($config)) {
+            /** @var array<string, mixed> $config */
+            return $config;
+        }
+
+        return [
             'enabled' => true,
             'cooldown_seconds' => self::ALERT_COOLDOWN,
             'max_history_entries' => self::MAX_HISTORY_ENTRIES,
             'severity_levels' => ['critical', 'error', 'warning', 'info', 'debug'],
-        ]);
+        ];
     }
 }

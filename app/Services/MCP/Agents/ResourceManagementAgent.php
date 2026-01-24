@@ -56,7 +56,8 @@ class ResourceManagementAgent
      *     efficiency_score: float
      * }
      */
-    public function analyzeResourceManagement(): array
+    public function analyzeResourceManagement(Character $character, array $context = []): array
+    {
         // Analyze turn economy
         $turnEconomy = $this->analyzeTurnEconomy($character, $context);
 
@@ -96,9 +97,10 @@ class ResourceManagementAgent
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    protected function analyzeTurnEconomy(): array
-        $currentTurn = $context['current_turn'] ?? 1;
-        $totalTurns = $context['total_turns'] ?? 65;
+    protected function analyzeTurnEconomy(Character $character, array $context): array
+    {
+        $currentTurn = isset($context['current_turn']) && is_numeric($context['current_turn']) ? (int) $context['current_turn'] : 1;
+        $totalTurns = isset($context['total_turns']) && is_numeric($context['total_turns']) ? (int) $context['total_turns'] : 65;
         $careerStage = $character->career_stage ?? 'junior';
 
         // Calculate turns remaining in current phase
@@ -145,24 +147,35 @@ class ResourceManagementAgent
      */
     protected function calculateTurnEfficiency(Character $character, int $currentTurn, int $totalTurns): float
     {
+        /** @var array<string, int> $currentStats */
         $currentStats = $character->current_stats ?? [];
+        /** @var array<string, mixed> $goals */
         $goals = $character->goals ?? [];
-        $targetStats = $goals['target_stats'] ?? [];
+        /** @var array<string, int> $targetStats */
+        $targetStats = is_array($goals) && isset($goals['target_stats']) && is_array($goals['target_stats'])
+            ? $goals['target_stats']
+            : [];
 
         if (empty($targetStats)) {
             return 0.5; // Neutral efficiency if no goals
         }
 
         // Calculate average progress toward goals
-        $totalProgress = 0;
+        $totalProgress = 0.0;
         $statCount = 0;
 
         foreach ($targetStats as $stat => $target) {
-            $current = $currentStats[$stat] ?? 0;
-            if ($target > 0) {
-                $progress = min(1.0, $current / $target);
-                $totalProgress = ($totalProgress ?? 0) + $progress;
-                $statCount = ($statCount ?? 0) + 1;
+            if (! is_string($stat) || ! is_numeric($target)) {
+                continue;
+            }
+
+            $current = is_array($currentStats) && isset($currentStats[$stat]) ? (int) $currentStats[$stat] : 0;
+            $targetVal = (int) $target;
+
+            if ($targetVal > 0) {
+                $progress = min(1.0, $current / $targetVal);
+                $totalProgress += $progress;
+                $statCount++;
             }
         }
 
@@ -180,9 +193,10 @@ class ResourceManagementAgent
     /**
      * Calculate phase breakdown
      *
-     * @return array<string, array{start: int, end: int, turns: int, priority: string}>
+     * @return array<string, array<string, mixed>>
      */
-    protected function calculatePhaseBreakdown(): array
+    protected function calculatePhaseBreakdown(int $currentTurn, int $totalTurns): array
+    {
         return [
             'junior' => [
                 'start' => 1,
@@ -213,7 +227,8 @@ class ResourceManagementAgent
      *
      * @return array<string, mixed>
      */
-    protected function analyzeEnergyManagement(): array
+    protected function analyzeEnergyManagement(Character $character): array
+    {
         $energyLevel = $character->energy_level ?? 100;
         $moodStatus = $character->mood_status ?? 'normal';
 
@@ -268,9 +283,11 @@ class ResourceManagementAgent
     /**
      * Analyze mood impact on training
      *
-     * @return array<string, mixed>
+     * @return array{multiplier: float, description: string}
      */
-    protected function analyzeMoodImpact(): array
+    protected function analyzeMoodImpact(string $moodStatus): array
+    {
+        /** @var array<string, array{multiplier: float, description: string}> $impacts */
         $impacts = [
             'great' => ['multiplier' => 1.20, 'description' => '+20% training effectiveness'],
             'good' => ['multiplier' => 1.10, 'description' => '+10% training effectiveness'],
@@ -317,19 +334,13 @@ class ResourceManagementAgent
      * @param  array<string, mixed>  $turnEconomy
      * @return array<string, mixed>
      */
-    protected function calculateResourceAllocation(): array
-        $turnsRemaining = $turnEconomy['turns_remaining'];
-        $currentPhase = $turnEconomy['current_phase'];
-
-        // Calculate allocation for different activities
-        $allocation = [
-            'training' => 0,
-            'racing' => 0,
-            'rest' => 0,
-            'events' => 0,
-        ];
+    protected function calculateResourceAllocation(Character $character, array $turnEconomy): array
+    {
+        $turnsRemaining = isset($turnEconomy['turns_remaining']) && is_numeric($turnEconomy['turns_remaining']) ? (int) $turnEconomy['turns_remaining'] : 30;
+        $currentPhase = isset($turnEconomy['current_phase']) && is_string($turnEconomy['current_phase']) ? $turnEconomy['current_phase'] : 'junior';
 
         // Phase-specific allocation strategies
+        /** @var array{training: int, racing: int, rest: int, events: int} $allocation */
         $allocation = match ($currentPhase) {
             'junior' => [
                 'training' => (int) ($turnsRemaining * 0.70),
@@ -359,9 +370,10 @@ class ResourceManagementAgent
 
         // Calculate allocation percentages
         $total = array_sum($allocation);
+        /** @var array<string, float> $percentages */
         $percentages = [];
         foreach ($allocation as $activity => $turns) {
-            $percentages[$activity] = $total > 0 ? round(($turns / $total) * 100, 1) : 0;
+            $percentages[$activity] = $total > 0 ? round(($turns / $total) * 100, 1) : 0.0;
         }
 
         return [
@@ -374,9 +386,10 @@ class ResourceManagementAgent
     /**
      * Get priority activities for current phase
      *
-     * @return array<string>
+     * @return array<int, string>
      */
-    protected function getPriorityActivities(): array
+    protected function getPriorityActivities(string $phase): array
+    {
         return match ($phase) {
             'junior' => ['training', 'foundation_building'],
             'classic' => ['training', 'racing', 'skill_acquisition'],
@@ -393,11 +406,17 @@ class ResourceManagementAgent
      * @param  array<string, mixed>  $resourceAllocation
      * @return array<string, string>
      */
-    protected function generateOptimizationRecommendations(): array
+    protected function generateOptimizationRecommendations(
+        Character $character,
+        array $turnEconomy,
+        array $energyManagement,
+        array $resourceAllocation
+    ): array {
+        /** @var array<string, string> $recommendations */
         $recommendations = [];
 
         // Turn economy recommendations
-        $turnEfficiency = $turnEconomy['turn_efficiency'];
+        $turnEfficiency = isset($turnEconomy['turn_efficiency']) && is_numeric($turnEconomy['turn_efficiency']) ? (float) $turnEconomy['turn_efficiency'] : 0.5;
         if ($turnEfficiency < 0.7) {
             $recommendations['turn_efficiency'] = 'Turn efficiency is low. Focus on high-value training options.';
         } elseif ($turnEfficiency > 1.2) {
@@ -405,7 +424,7 @@ class ResourceManagementAgent
         }
 
         // Energy management recommendations
-        $energyStatus = $energyManagement['energy_status'];
+        $energyStatus = isset($energyManagement['energy_status']) && is_string($energyManagement['energy_status']) ? $energyManagement['energy_status'] : 'good';
         if ($energyStatus === 'critical' || $energyStatus === 'low') {
             $recommendations['energy'] = 'Energy is critically low. Rest immediately to avoid training failures.';
         } elseif ($energyStatus === 'moderate') {
@@ -413,7 +432,7 @@ class ResourceManagementAgent
         }
 
         // Resource allocation recommendations
-        $turnsRemaining = $turnEconomy['turns_remaining'];
+        $turnsRemaining = isset($turnEconomy['turns_remaining']) && is_numeric($turnEconomy['turns_remaining']) ? (int) $turnEconomy['turns_remaining'] : 30;
         if ($turnsRemaining < 10) {
             $recommendations['urgency'] = 'Final turns approaching. Focus on critical stat gaps and race preparation.';
         } elseif ($turnsRemaining < 20) {
@@ -421,7 +440,7 @@ class ResourceManagementAgent
         }
 
         // Phase-specific recommendations
-        $currentPhase = $turnEconomy['current_phase'];
+        $currentPhase = isset($turnEconomy['current_phase']) && is_string($turnEconomy['current_phase']) ? $turnEconomy['current_phase'] : 'junior';
         $recommendations['phase'] = match ($currentPhase) {
             'junior' => 'Foundation phase: Build base stats and establish training patterns.',
             'classic' => 'Development phase: Balance training with race participation.',
@@ -446,23 +465,24 @@ class ResourceManagementAgent
         $score = 0.0;
 
         // Turn efficiency component (40%)
-        $turnEfficiency = $turnEconomy['turn_efficiency'];
-        $score = ($score ?? 0) + $turnEfficiency * 0.4;
+        $turnEfficiency = isset($turnEconomy['turn_efficiency']) && is_numeric($turnEconomy['turn_efficiency']) ? (float) $turnEconomy['turn_efficiency'] : 0.5;
+        $score += $turnEfficiency * 0.4;
 
         // Energy management component (30%)
-        $energyLevel = $energyManagement['current_energy'];
+        $energyLevel = isset($energyManagement['current_energy']) && is_numeric($energyManagement['current_energy']) ? (int) $energyManagement['current_energy'] : 100;
         $energyScore = $energyLevel / 100;
-        $score = ($score ?? 0) + $energyScore * 0.3;
+        $score += $energyScore * 0.3;
 
         // Mood component (20%)
-        $moodImpact = $energyManagement['mood_impact'];
-        $moodScore = ($moodImpact['multiplier'] - 0.8) / 0.4; // Normalize 0.8-1.2 to 0-1
-        $score = ($score ?? 0) + $moodScore * 0.2;
+        $moodImpact = is_array($energyManagement['mood_impact'] ?? null) ? $energyManagement['mood_impact'] : [];
+        $moodMultiplier = isset($moodImpact['multiplier']) && is_numeric($moodImpact['multiplier']) ? (float) $moodImpact['multiplier'] : 1.0;
+        $moodScore = ($moodMultiplier - 0.8) / 0.4; // Normalize 0.8-1.2 to 0-1
+        $score += $moodScore * 0.2;
 
         // Progress component (10%)
-        $progressPercent = $turnEconomy['progress_percent'];
+        $progressPercent = isset($turnEconomy['progress_percent']) && is_numeric($turnEconomy['progress_percent']) ? (float) $turnEconomy['progress_percent'] : 0.0;
         $progressScore = min(1.0, $progressPercent / 100);
-        $score = ($score ?? 0) + $progressScore * 0.1;
+        $score += $progressScore * 0.1;
 
         return round(min(1.0, $score), 2);
     }

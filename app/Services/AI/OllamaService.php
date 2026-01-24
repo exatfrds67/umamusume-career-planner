@@ -30,10 +30,14 @@ class OllamaService
 
     public function __construct()
     {
-        $this->defaultModel = (string) Config::get('ai.ollama.default_model', 'llama3.3');
-        $this->timeout = (int) Config::get('ai.ollama.timeout', 15);
-        $this->temperature = (float) Config::get('ai.ollama.temperature', 0.3);
-        $this->maxTokens = (int) Config::get('ai.ollama.max_tokens', 2048);
+        $defaultModelValue = Config::get('ai.ollama.default_model', 'llama3.3');
+        $this->defaultModel = is_string($defaultModelValue) ? $defaultModelValue : 'llama3.3';
+        $timeoutValue = Config::get('ai.ollama.timeout', 15);
+        $this->timeout = is_int($timeoutValue) ? $timeoutValue : 15;
+        $temperatureValue = Config::get('ai.ollama.temperature', 0.3);
+        $this->temperature = is_float($temperatureValue) || is_int($temperatureValue) ? (float) $temperatureValue : 0.3;
+        $maxTokensValue = Config::get('ai.ollama.max_tokens', 2048);
+        $this->maxTokens = is_int($maxTokensValue) ? $maxTokensValue : 2048;
 
         $models = Config::get('ai.ollama.available_models', []);
         $this->availableModels = \is_array($models) ? $models : [];
@@ -51,7 +55,8 @@ class OllamaService
      *     model_version: string
      * }
      */
-    public function generate(): array
+    public function generate(string $prompt, array $context = [], ?string $model = null, ?int $timeout = null): array
+    {
         $model = $model ?? $this->defaultModel;
         $timeout = $timeout ?? $this->timeout;
 
@@ -111,7 +116,7 @@ class OllamaService
             $fullPrompt = $this->buildPromptWithContext($prompt, $context);
 
             // Stream response using Ollama
-            return Ollama::agent('Umamusume Career Advisor')
+            $streamResult = Ollama::agent('Umamusume Career Advisor')
                 ->model($model)
                 ->prompt($fullPrompt)
                 ->options([
@@ -119,7 +124,14 @@ class OllamaService
                     'top_p' => 0.9,
                     'max_tokens' => $this->maxTokens,
                 ])
-                ->stream($callback);
+                ->stream($callback !== null);
+
+            // Yield chunks from stream
+            if (is_iterable($streamResult)) {
+                foreach ($streamResult as $chunk) {
+                    yield is_string($chunk) ? $chunk : '';
+                }
+            }
         } catch (\Exception $e) {
             Log::error('[Ollama] Streaming failed', [
                 'error' => $e->getMessage(),
@@ -148,9 +160,9 @@ class OllamaService
             $char = $context['character'];
             $name = isset($char['name']) && is_string($char['name']) ? $char['name'] : 'Unknown';
             $scenario = isset($char['scenario_type']) && is_string($char['scenario_type']) ? $char['scenario_type'] : 'Unknown';
-            $speed = isset($char['speed']) ? (is_string($char) ? (string) $char : '')['speed'] : '0';
-            $stamina = isset($char['stamina']) ? (is_string($char) ? (string) $char : '')['stamina'] : '0';
-            $power = isset($char['power']) ? (is_string($char) ? (string) $char : '')['power'] : '0';
+            $speed = isset($char['speed']) && (is_string($char['speed']) || is_int($char['speed'])) ? (string) $char['speed'] : '0';
+            $stamina = isset($char['stamina']) && (is_string($char['stamina']) || is_int($char['stamina'])) ? (string) $char['stamina'] : '0';
+            $power = isset($char['power']) && (is_string($char['power']) || is_int($char['power'])) ? (string) $char['power'] : '0';
 
             $contextStr .= "Character: {$name}\n";
             $contextStr .= "Scenario: {$scenario}\n";
@@ -161,8 +173,8 @@ class OllamaService
         if (isset($context['career']) && is_array($context['career'])) {
             $career = $context['career'];
             $stage = isset($career['stage']) && is_string($career['stage']) ? $career['stage'] : 'Unknown';
-            $turn = isset($career['turn']) ? (is_string($career) ? (string) $career : '')['turn'] : '0';
-            $totalTurns = isset($career['total_turns']) ? (is_string($career) ? (string) $career : '')['total_turns'] : '0';
+            $turn = isset($career['turn']) && (is_string($career['turn']) || is_int($career['turn'])) ? (string) $career['turn'] : '0';
+            $totalTurns = isset($career['total_turns']) && (is_string($career['total_turns']) || is_int($career['total_turns'])) ? (string) $career['total_turns'] : '0';
 
             $contextStr .= "Career Stage: {$stage}\n";
             $contextStr .= "Turn: {$turn}/{$totalTurns}\n";
@@ -170,7 +182,13 @@ class OllamaService
 
         // Add goals context
         if (isset($context['goals']) && is_array($context['goals'])) {
-            $contextStr .= 'Goals: '.implode(', ', $context['goals'])."\n";
+            $goalsArr = [];
+            foreach ($context['goals'] as $goal) {
+                if (is_string($goal)) {
+                    $goalsArr[] = $goal;
+                }
+            }
+            $contextStr .= 'Goals: '.implode(', ', $goalsArr)."\n";
         }
 
         $contextStr .= "\nQuestion: {$prompt}";
@@ -187,15 +205,17 @@ class OllamaService
             return $response;
         }
 
-        if (\is_array($response) && isset($response['response'])) {
-            return (is_string($response) ? (string) $response : '')['response'];
+        if (\is_array($response) && isset($response['response']) && is_string($response['response'])) {
+            return $response['response'];
         }
 
         if (\is_object($response) && method_exists($response, 'getContent')) {
-            return (is_string($response) ? (string) $response : '')->getContent();
+            $content = $response->getContent();
+
+            return is_string($content) ? $content : '';
         }
 
-        return is_string($response) ? (string) $response : '';
+        return '';
     }
 
     /**
@@ -212,10 +232,10 @@ class OllamaService
      */
     protected function getModelVersion(string $model): string
     {
-        if (isset($this->availableModels[$model]['version'])) {
-            $version = $this->availableModels[$model]['version'];
-            if (is_string($version)) {
-                return $version;
+        if (isset($this->availableModels[$model]) && is_array($this->availableModels[$model])) {
+            $modelConfig = $this->availableModels[$model];
+            if (isset($modelConfig['version']) && is_string($modelConfig['version'])) {
+                return $modelConfig['version'];
             }
         }
 
@@ -231,7 +251,7 @@ class OllamaService
             // Check if Ollama service is running
             $cacheKey = 'ollama_availability';
 
-            return Cache::remember($cacheKey, 60, function () {
+            $result = Cache::remember($cacheKey, 60, function (): bool {
                 try {
                     // Try a simple health check
                     Ollama::agent('Health Check')
@@ -248,6 +268,8 @@ class OllamaService
                     return false;
                 }
             });
+
+            return is_bool($result) ? $result : false;
         } catch (\Exception $e) {
             return false;
         }
@@ -267,6 +289,7 @@ class OllamaService
      * @return array<string, mixed>
      */
     public function getAvailableModels(): array
+    {
         return $this->availableModels;
     }
 
@@ -283,6 +306,7 @@ class OllamaService
      * }
      */
     public function getStatus(): array
+    {
         return [
             'available' => $this->isAvailable(),
             'healthy' => $this->isHealthy(),

@@ -34,7 +34,8 @@ class DataExtractionService
      * @param  array<string, mixed>  $options
      * @return array<string, mixed>
      */
-    public function extractData(): array
+    public function extractData(string $screenType, string $ocrText, array $options = []): array
+    {
         Log::info('[DataExtractionService] Starting data extraction', [
             'screen_type' => $screenType,
             'text_length' => \strlen($ocrText),
@@ -49,7 +50,7 @@ class DataExtractionService
             $parseResult = $parser->parse($ocrText);
 
             // Validate extracted data
-            $validationResult = $this->validator->validate($screenType, $parseResult['data']);
+            $validationResult = $this->validator->validate($parseResult['data'], $screenType);
 
             // Merge results
             $result = [
@@ -102,7 +103,8 @@ class DataExtractionService
      *
      * @return array<string, mixed>
      */
-    public function extractCharacterStats(): array
+    public function extractCharacterStats(string $ocrText): array
+    {
         return $this->extractData('character_stats', $ocrText);
     }
 
@@ -111,7 +113,8 @@ class DataExtractionService
      *
      * @return array<string, mixed>
      */
-    public function extractTrainingSession(): array
+    public function extractTrainingSession(string $ocrText): array
+    {
         return $this->extractData('training_session', $ocrText);
     }
 
@@ -120,7 +123,8 @@ class DataExtractionService
      *
      * @return array<string, mixed>
      */
-    public function extractRaceResult(): array
+    public function extractRaceResult(string $ocrText): array
+    {
         return $this->extractData('race_result', $ocrText);
     }
 
@@ -129,7 +133,8 @@ class DataExtractionService
      *
      * @return array<string, mixed>
      */
-    public function extractSkillList(): array
+    public function extractSkillList(string $ocrText): array
+    {
         return $this->extractData('skill_list', $ocrText);
     }
 
@@ -139,7 +144,8 @@ class DataExtractionService
      * @param  array<int, array{screen_type: string, ocr_text: string}>  $screenshots
      * @return array<int, array<string, mixed>>
      */
-    public function batchExtract(): array
+    public function batchExtract(array $screenshots): array
+    {
         $results = [];
 
         foreach ($screenshots as $index => $screenshot) {

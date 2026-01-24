@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,57 +18,55 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $user_id
  * @property string $preference_category
  * @property string $preference_key
- * @property array $preference_value
+ * @property array<string, mixed> $preference_value
  * @property string $value_type
  * @property string|null $description
- * @property array|null $allowed_values
- * @property array|null $default_value
+ * @property array<string, mixed>|null $allowed_values
+ * @property array<string, mixed>|null $default_value
  * @property string $scope
  * @property string|null $context_id
  * @property bool $is_inherited
- * @property array|null $inheritance_chain
- * @property array|null $validation_rules
+ * @property array<string, mixed>|null $inheritance_chain
+ * @property array<string, mixed>|null $validation_rules
  * @property float|null $min_value
  * @property float|null $max_value
  * @property int|null $max_length
  * @property \Illuminate\Support\Carbon $last_modified_at
  * @property string $modified_by
- * @property array|null $modification_history
+ * @property array<int|string, mixed>|null $modification_history
  * @property bool $is_system_managed
  * @property bool $sync_across_devices
  * @property \Illuminate\Support\Carbon|null $last_synced_at
- * @property array|null $sync_conflicts
+ * @property array<string, mixed>|null $sync_conflicts
  * @property bool $has_local_override
- * @property array|null $affects_features
- * @property array|null $dependent_preferences
- * @property array|null $conflicts_with
+ * @property array<string, mixed>|null $affects_features
+ * @property array<string, mixed>|null $dependent_preferences
+ * @property array<string, mixed>|null $conflicts_with
  * @property bool $requires_restart
  * @property bool $is_sensitive
  * @property string $privacy_level
  * @property bool $encrypted
- * @property array|null $access_permissions
+ * @property array<string, mixed>|null $access_permissions
  * @property string|null $display_name
  * @property string|null $help_text
  * @property string|null $ui_component
- * @property array|null $ui_options
+ * @property array<string, mixed>|null $ui_options
  * @property int|null $display_order
  * @property int $access_count
  * @property \Illuminate\Support\Carbon|null $last_accessed_at
  * @property int $modification_count
- * @property array|null $usage_analytics
- * @property array|null $tags
- * @property array|null $custom_metadata
+ * @property array<string, mixed>|null $usage_analytics
+ * @property array<string, mixed>|null $tags
+ * @property array<string, mixed>|null $custom_metadata
  * @property string|null $notes
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- */
-/**
- * @property int $id
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ *
+ * @use HasFactory<\Database\Factories\UserPreferenceFactory>
  */
 class UserPreference extends Model
 {
+    /** @use HasFactory<\Database\Factories\UserPreferenceFactory> */
     use HasFactory;
 
     /**
@@ -78,7 +77,7 @@ class UserPreference extends Model
     /**
      * The attributes that are mass assignable.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $fillable = [
         'user_id',
@@ -267,64 +266,88 @@ class UserPreference extends Model
 
     /**
      * Scope a query to filter by category.
+     *
+     * @param  Builder<UserPreference>  $query
+     * @return Builder<UserPreference>
      */
-    public function scopeCategory($query, string $category)
+    public function scopeCategory(Builder $query, string $category): Builder
     {
         return $query->where('preference_category', $category);
     }
 
     /**
      * Scope a query to filter by user.
+     *
+     * @param  Builder<UserPreference>  $query
+     * @return Builder<UserPreference>
      */
-    public function scopeForUser($query, int $userId)
+    public function scopeForUser(Builder $query, int $userId): Builder
     {
         return $query->where('user_id', $userId);
     }
 
     /**
      * Scope a query to get a specific preference.
+     *
+     * @param  Builder<UserPreference>  $query
+     * @return Builder<UserPreference>
      */
-    public function scopeByKey($query, string $key)
+    public function scopeByKey(Builder $query, string $key): Builder
     {
         return $query->where('preference_key', $key);
     }
 
     /**
      * Scope a query to filter by scope.
+     *
+     * @param  Builder<UserPreference>  $query
+     * @return Builder<UserPreference>
      */
-    public function scopeScope($query, string $scope)
+    public function scopeScope(Builder $query, string $scope): Builder
     {
         return $query->where('scope', $scope);
     }
 
     /**
      * Scope a query to filter by context.
+     *
+     * @param  Builder<UserPreference>  $query
+     * @return Builder<UserPreference>
      */
-    public function scopeContext($query, string $contextId)
+    public function scopeContext(Builder $query, string $contextId): Builder
     {
         return $query->where('context_id', $contextId);
     }
 
     /**
      * Scope a query to only include system-managed preferences.
+     *
+     * @param  Builder<UserPreference>  $query
+     * @return Builder<UserPreference>
      */
-    public function scopeSystemManaged(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    public function scopeSystemManaged(Builder $query): Builder
     {
         return $query->where('is_system_managed', true);
     }
 
     /**
      * Scope a query to only include user-managed preferences.
+     *
+     * @param  Builder<UserPreference>  $query
+     * @return Builder<UserPreference>
      */
-    public function scopeUserManaged(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    public function scopeUserManaged(Builder $query): Builder
     {
         return $query->where('is_system_managed', false);
     }
 
     /**
      * Scope a query to only include sensitive preferences.
+     *
+     * @param  Builder<UserPreference>  $query
+     * @return Builder<UserPreference>
      */
-    public function scopeSensitive(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    public function scopeSensitive(Builder $query): Builder
     {
         return $query->where('is_sensitive', true);
     }

@@ -35,7 +35,7 @@ class OCRUploadController extends Controller
             /** @var \App\Models\User $user */
             // Support both 'screenshot' and 'image' field names
             $file = $request->file('screenshot') ?? $request->file('image');
-            $userId = $user?->id ?? throw new \Exception('User required');
+            $userId = $user->id ?? throw new \Exception('User required');
             $characterId = $request->input('character_id');
             $dataType = $request->input('data_type', 'character_stats');
 

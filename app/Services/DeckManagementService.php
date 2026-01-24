@@ -33,6 +33,8 @@ class DeckManagementService
 
     /**
      * Get the complete deck for a character
+     *
+     * @return Collection<int, CharacterSupportCard>
      */
     public function getDeck(int $characterId): Collection
     {
@@ -319,8 +321,11 @@ class DeckManagementService
 
     /**
      * Get deck statistics
+     *
+     * @return array{total_cards: int, owned_cards: int, friend_cards: int, card_types: array<string, int>, average_limit_break: float, average_friendship: float, rarity_distribution: array<string, int>}
      */
-    public function getDeckStatistics(): array
+    public function getDeckStatistics(int $characterId): array
+    {
         $deck = $this->getDeck($characterId);
 
         $stats = [
@@ -338,28 +343,35 @@ class DeckManagementService
         }
 
         // Card type distribution
-        $stats['card_types'] = $deck->groupBy('supportCard.card_type')
+        /** @var array<string, int> $cardTypes */
+        $cardTypes = $deck->groupBy('supportCard.card_type')
             ->map->count()
             ->toArray();
+        $stats['card_types'] = $cardTypes;
 
         // Average limit break level
-        $stats['average_limit_break'] = round($deck->avg('limit_break_level'), 2);
+        $stats['average_limit_break'] = round($deck->avg('limit_break_level') ?? 0, 2);
 
         // Average friendship level
-        $stats['average_friendship'] = round($deck->avg('friendship_level'), 2);
+        $stats['average_friendship'] = round($deck->avg('friendship_level') ?? 0, 2);
 
         // Rarity distribution
-        $stats['rarity_distribution'] = $deck->groupBy('supportCard.rarity')
+        /** @var array<string, int> $rarityDistribution */
+        $rarityDistribution = $deck->groupBy('supportCard.rarity')
             ->map->count()
             ->toArray();
+        $stats['rarity_distribution'] = $rarityDistribution;
 
         return $stats;
     }
 
     /**
      * Check if deck is valid (has exactly 6 cards with proper constraints)
+     *
+     * @return array{is_valid: bool, errors: list<string>, warnings: list<string>}
      */
-    public function validateDeck(): array
+    public function validateDeck(int $characterId): array
+    {
         $deck = $this->getDeck($characterId);
 
         $validation = [

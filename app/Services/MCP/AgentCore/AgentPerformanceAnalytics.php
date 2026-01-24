@@ -115,17 +115,49 @@ class AgentPerformanceAnalytics
      *     last_updated: string
      * }
      */
-    public function getAgentMetrics(): array
+    public function getAgentMetrics(string $agentId): array
+    {
         /** @var array<string, mixed>|null $metrics */
         $metrics = Cache::get("agent_metrics_{$agentId}");
 
         if (! $metrics || ! is_array($metrics)) {
             // Initialize if not found
             $this->initializeAgent($agentId);
+            /** @var array<string, mixed>|null $metrics */
             $metrics = Cache::get("agent_metrics_{$agentId}");
         }
 
-        return is_array($metrics) ? $metrics : $this->getDefaultMetrics($agentId);
+        if (is_array($metrics)) {
+            $agentIdVal = $metrics['agent_id'] ?? $agentId;
+            $totalInvocations = $metrics['total_invocations'] ?? 0;
+            $successfulInvocations = $metrics['successful_invocations'] ?? 0;
+            $failedInvocations = $metrics['failed_invocations'] ?? 0;
+            $totalExecutionTime = $metrics['total_execution_time'] ?? 0.0;
+            $totalTokens = $metrics['total_tokens'] ?? 0;
+            $totalCost = $metrics['total_cost'] ?? 0.0;
+            $avgResponseTime = $metrics['average_response_time'] ?? 0.0;
+            $successRate = $metrics['success_rate'] ?? 1.0;
+            $costPerInvocation = $metrics['cost_per_invocation'] ?? 0.0;
+            $initializedAt = $metrics['initialized_at'] ?? now()->toIso8601String();
+            $lastUpdated = $metrics['last_updated'] ?? now()->toIso8601String();
+
+            return [
+                'agent_id' => is_string($agentIdVal) || is_numeric($agentIdVal) ? (string) $agentIdVal : $agentId,
+                'total_invocations' => is_numeric($totalInvocations) ? (int) $totalInvocations : 0,
+                'successful_invocations' => is_numeric($successfulInvocations) ? (int) $successfulInvocations : 0,
+                'failed_invocations' => is_numeric($failedInvocations) ? (int) $failedInvocations : 0,
+                'total_execution_time' => is_numeric($totalExecutionTime) ? (float) $totalExecutionTime : 0.0,
+                'total_tokens' => is_numeric($totalTokens) ? (int) $totalTokens : 0,
+                'total_cost' => is_numeric($totalCost) ? (float) $totalCost : 0.0,
+                'average_response_time' => is_numeric($avgResponseTime) ? (float) $avgResponseTime : 0.0,
+                'success_rate' => is_numeric($successRate) ? (float) $successRate : 1.0,
+                'cost_per_invocation' => is_numeric($costPerInvocation) ? (float) $costPerInvocation : 0.0,
+                'initialized_at' => is_string($initializedAt) || is_numeric($initializedAt) ? (string) $initializedAt : now()->toIso8601String(),
+                'last_updated' => is_string($lastUpdated) || is_numeric($lastUpdated) ? (string) $lastUpdated : now()->toIso8601String(),
+            ];
+        }
+
+        return $this->getDefaultMetrics($agentId);
     }
 
     /**
@@ -143,20 +175,26 @@ class AgentPerformanceAnalytics
      *     analysis: array<string, mixed>
      * }
      */
-    public function getPerformanceTrends(): array
+    public function getPerformanceTrends(string $agentId, int $days = 7): array
+    {
         $invocations = $this->getInvocationHistory($agentId, $days);
 
-        $trends = [
-            'success_rate' => [],
-            'response_time' => [],
-            'cost' => [],
-            'invocations' => [],
-        ];
+        /** @var array<string, float> $successRateTrends */
+        $successRateTrends = [];
+        /** @var array<string, float> $responseTimeTrends */
+        $responseTimeTrends = [];
+        /** @var array<string, float> $costTrends */
+        $costTrends = [];
+        /** @var array<string, int> $invocationTrends */
+        $invocationTrends = [];
 
         // Group by date
+        /** @var array<string, array<int, array<string, mixed>>> $groupedByDate */
         $groupedByDate = [];
         foreach ($invocations as $invocation) {
-            $date = substr($invocation['timestamp'], 0, 10); // YYYY-MM-DD
+            $timestamp = $invocation['timestamp'] ?? '';
+            $timestampStr = is_string($timestamp) || is_numeric($timestamp) ? (string) $timestamp : '';
+            $date = substr($timestampStr, 0, 10); // YYYY-MM-DD
             if (! isset($groupedByDate[$date])) {
                 $groupedByDate[$date] = [];
             }
@@ -165,18 +203,27 @@ class AgentPerformanceAnalytics
 
         // Calculate daily metrics
         foreach ($groupedByDate as $date => $dayInvocations) {
-            $successful = count(array_filter($dayInvocations, fn ($i) => $i['success']));
+            $successful = count(array_filter($dayInvocations, fn ($i): bool => (bool) ($i['success'] ?? false)));
             $total = count($dayInvocations);
 
-            $trends['success_rate'][$date] = $total > 0 ? $successful / $total : 0.0;
-            $trends['invocations'][$date] = $total;
+            $successRateTrends[$date] = $total > 0 ? (float) ($successful / $total) : 0.0;
+            $invocationTrends[$date] = $total;
 
-            $avgResponseTime = array_sum(array_column($dayInvocations, 'execution_time')) / $total;
-            $trends['response_time'][$date] = $avgResponseTime;
+            $executionTimes = array_column($dayInvocations, 'execution_time');
+            $avgResponseTime = count($executionTimes) > 0 ? (float) (array_sum($executionTimes) / count($executionTimes)) : 0.0;
+            $responseTimeTrends[$date] = $avgResponseTime;
 
-            $totalCost = array_sum(array_column($dayInvocations, 'cost'));
-            $trends['cost'][$date] = $totalCost;
+            $costs = array_column($dayInvocations, 'cost');
+            $totalCost = (float) array_sum($costs);
+            $costTrends[$date] = $totalCost;
         }
+
+        $trends = [
+            'success_rate' => $successRateTrends,
+            'response_time' => $responseTimeTrends,
+            'cost' => $costTrends,
+            'invocations' => $invocationTrends,
+        ];
 
         // Analyze trends
         $analysis = $this->analyzeTrends($trends);
@@ -203,7 +250,8 @@ class AgentPerformanceAnalytics
      *     overall_score: float
      * }
      */
-    public function getOptimizationRecommendations(): array
+    public function getOptimizationRecommendations(string $agentId): array
+    {
         $metrics = $this->getAgentMetrics($agentId);
         $trends = $this->getPerformanceTrends($agentId, 7);
 
@@ -301,8 +349,11 @@ class AgentPerformanceAnalytics
      *     insights: array<int, string>
      * }
      */
-    public function compareAgents(): array
+    public function compareAgents(array $agentIds): array
+    {
+        /** @var array<string, array{metrics: array<string, mixed>, score: float}> $comparison */
         $comparison = [];
+        /** @var array<string, float> $scores */
         $scores = [];
 
         foreach ($agentIds as $agentId) {
@@ -322,9 +373,9 @@ class AgentPerformanceAnalytics
         $bestAgentId = array_key_first($scores);
 
         $bestPerformer = [
-            'agent_id' => $bestAgentId,
+            'agent_id' => (string) ($bestAgentId ?? ''),
             'category' => 'overall',
-            'score' => $scores[$bestAgentId],
+            'score' => $scores[$bestAgentId] ?? 0.0,
         ];
 
         // Generate insights
@@ -370,16 +421,16 @@ class AgentPerformanceAnalytics
     {
         $record = [
             'agent_id' => $agentId,
-            'execution_time' => $invocationData['execution_time'],
+            'execution_time' => $invocationData['execution_time'] ?? 0.0,
             'tokens_used' => $invocationData['tokens_used'] ?? 0,
             'cost' => $invocationData['cost'] ?? 0.0,
-            'success' => $invocationData['success'],
-            'error' => (is_array($invocationData) && isset($invocationData['error']) ? $invocationData['error'] : null),
+            'success' => $invocationData['success'] ?? false,
+            'error' => $invocationData['error'] ?? null,
             'timestamp' => now()->toIso8601String(),
         ];
 
         // Get existing records
-        /** @var array<int, array<string, mixed>>|null $records */
+        /** @var array<int, array<string, mixed>> $records */
         $records = Cache::get("agent_invocations_{$agentId}", []);
         if (! is_array($records)) {
             $records = [];
@@ -400,8 +451,9 @@ class AgentPerformanceAnalytics
      *
      * @return array<int, array<string, mixed>>
      */
-    protected function getInvocationHistory(): array
-        /** @var array<int, array<string, mixed>>|null $records */
+    protected function getInvocationHistory(string $agentId, int $days): array
+    {
+        /** @var array<int, array<string, mixed>> $records */
         $records = Cache::get("agent_invocations_{$agentId}", []);
         if (! is_array($records)) {
             return [];
@@ -410,16 +462,22 @@ class AgentPerformanceAnalytics
         // Filter by date range
         $cutoffDate = now()->subDays($days)->toIso8601String();
 
-        return array_filter($records, fn ($record) => $record['timestamp'] >= $cutoffDate);
+        return array_values(array_filter($records, function (array $record) use ($cutoffDate): bool {
+            $timestampVal = $record['timestamp'] ?? '';
+            $timestamp = is_string($timestampVal) || is_numeric($timestampVal) ? (string) $timestampVal : '';
+
+            return $timestamp >= $cutoffDate;
+        }));
     }
 
     /**
      * Analyze trends
      *
-     * @param  array<string, array<string, mixed>>  $trends
+     * @param  array{success_rate: array<string, float>, response_time: array<string, float>, cost: array<string, float>, invocations: array<string, int>}  $trends
      * @return array<string, mixed>
      */
-    protected function analyzeTrends(): array
+    protected function analyzeTrends(array $trends): array
+    {
         $analysis = [];
 
         // Analyze success rate trend
@@ -428,8 +486,8 @@ class AgentPerformanceAnalytics
             $firstHalf = array_slice($successRates, 0, (int) ceil(count($successRates) / 2));
             $secondHalf = array_slice($successRates, (int) floor(count($successRates) / 2));
 
-            $avgFirst = array_sum($firstHalf) / count($firstHalf);
-            $avgSecond = array_sum($secondHalf) / count($secondHalf);
+            $avgFirst = count($firstHalf) > 0 ? array_sum($firstHalf) / count($firstHalf) : 0.0;
+            $avgSecond = count($secondHalf) > 0 ? array_sum($secondHalf) / count($secondHalf) : 0.0;
 
             $analysis['declining_success_rate'] = $avgSecond < $avgFirst - 0.05;
             $analysis['improving_success_rate'] = $avgSecond > $avgFirst + 0.05;
@@ -441,8 +499,8 @@ class AgentPerformanceAnalytics
             $firstHalf = array_slice($responseTimes, 0, (int) ceil(count($responseTimes) / 2));
             $secondHalf = array_slice($responseTimes, (int) floor(count($responseTimes) / 2));
 
-            $avgFirst = array_sum($firstHalf) / count($firstHalf);
-            $avgSecond = array_sum($secondHalf) / count($secondHalf);
+            $avgFirst = count($firstHalf) > 0 ? array_sum($firstHalf) / count($firstHalf) : 0.0;
+            $avgSecond = count($secondHalf) > 0 ? array_sum($secondHalf) / count($secondHalf) : 0.0;
 
             $analysis['increasing_response_time'] = $avgSecond > $avgFirst * 1.2;
             $analysis['improving_response_time'] = $avgSecond < $avgFirst * 0.8;
@@ -458,11 +516,21 @@ class AgentPerformanceAnalytics
      */
     protected function calculatePerformanceScore(array $metrics): float
     {
+        $successRateVal = $metrics['success_rate'] ?? 0.0;
+        $avgResponseTimeVal = $metrics['average_response_time'] ?? 1.0;
+        $costPerInvocationVal = $metrics['cost_per_invocation'] ?? 0.01;
+        $totalInvocationsVal = $metrics['total_invocations'] ?? 0;
+
+        $successRate = is_numeric($successRateVal) ? (float) $successRateVal : 0.0;
+        $avgResponseTime = is_numeric($avgResponseTimeVal) ? (float) $avgResponseTimeVal : 1.0;
+        $costPerInvocation = is_numeric($costPerInvocationVal) ? (float) $costPerInvocationVal : 0.01;
+        $totalInvocations = is_numeric($totalInvocationsVal) ? (int) $totalInvocationsVal : 0;
+
         // Weighted scoring
-        $successRateScore = ($metrics['success_rate'] ?? 0.0) * 40; // 40% weight
-        $responseTimeScore = min(1.0, 5.0 / max(0.1, $metrics['average_response_time'] ?? 1.0)) * 30; // 30% weight
-        $costEfficiencyScore = min(1.0, 0.01 / max(0.001, $metrics['cost_per_invocation'] ?? 0.01)) * 20; // 20% weight
-        $usageScore = min(1.0, ($metrics['total_invocations'] ?? 0) / 100) * 10; // 10% weight
+        $successRateScore = $successRate * 40; // 40% weight
+        $responseTimeScore = min(1.0, 5.0 / max(0.1, $avgResponseTime)) * 30; // 30% weight
+        $costEfficiencyScore = min(1.0, 0.01 / max(0.001, $costPerInvocation)) * 20; // 20% weight
+        $usageScore = min(1.0, $totalInvocations / 100) * 10; // 10% weight
 
         return round($successRateScore + $responseTimeScore + $costEfficiencyScore + $usageScore, 2);
     }
@@ -470,24 +538,26 @@ class AgentPerformanceAnalytics
     /**
      * Generate comparison insights
      *
-     * @param  array<string, array<string, mixed>>  $comparison
+     * @param  array<string, array{metrics: array<string, mixed>, score: float}>  $comparison
      * @return array<int, string>
      */
-    protected function generateComparisonInsights(): array
+    protected function generateComparisonInsights(array $comparison): array
+    {
         $insights = [];
 
         // Find agent with best success rate
         $bestSuccessRate = 0.0;
         $bestSuccessAgent = '';
         foreach ($comparison as $agentId => $data) {
-            $successRate = (is_array($data) && isset($data['metrics']) ? $data['metrics'] : null)['success_rate'] ?? 0.0;
+            $successRateVal = $data['metrics']['success_rate'] ?? 0.0;
+            $successRate = is_numeric($successRateVal) ? (float) $successRateVal : 0.0;
             if ($successRate > $bestSuccessRate) {
                 $bestSuccessRate = $successRate;
                 $bestSuccessAgent = $agentId;
             }
         }
 
-        if ($bestSuccessAgent) {
+        if ($bestSuccessAgent !== '') {
             $insights[] = "Agent {$bestSuccessAgent} has the highest success rate at ".round($bestSuccessRate * 100, 1).'%';
         }
 
@@ -495,14 +565,15 @@ class AgentPerformanceAnalytics
         $lowestCost = PHP_FLOAT_MAX;
         $cheapestAgent = '';
         foreach ($comparison as $agentId => $data) {
-            $cost = (is_array($data) && isset($data['metrics']) ? $data['metrics'] : null)['cost_per_invocation'] ?? PHP_FLOAT_MAX;
+            $costVal = $data['metrics']['cost_per_invocation'] ?? PHP_FLOAT_MAX;
+            $cost = is_numeric($costVal) ? (float) $costVal : PHP_FLOAT_MAX;
             if ($cost < $lowestCost) {
                 $lowestCost = $cost;
                 $cheapestAgent = $agentId;
             }
         }
 
-        if ($cheapestAgent) {
+        if ($cheapestAgent !== '') {
             $insights[] = "Agent {$cheapestAgent} is the most cost-effective at $".round($lowestCost, 4).' per invocation';
         }
 
@@ -512,9 +583,23 @@ class AgentPerformanceAnalytics
     /**
      * Get default metrics
      *
-     * @return array<string, mixed>
+     * @return array{
+     *     agent_id: string,
+     *     total_invocations: int,
+     *     successful_invocations: int,
+     *     failed_invocations: int,
+     *     total_execution_time: float,
+     *     total_tokens: int,
+     *     total_cost: float,
+     *     average_response_time: float,
+     *     success_rate: float,
+     *     cost_per_invocation: float,
+     *     initialized_at: string,
+     *     last_updated: string
+     * }
      */
-    protected function getDefaultMetrics(): array
+    protected function getDefaultMetrics(string $agentId): array
+    {
         return [
             'agent_id' => $agentId,
             'total_invocations' => 0,

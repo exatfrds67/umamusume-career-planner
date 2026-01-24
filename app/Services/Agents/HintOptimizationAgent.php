@@ -27,10 +27,17 @@ class HintOptimizationAgent
     /**
      * Analyze hint collection opportunities and provide strategic recommendations.
      *
+     * @param  Collection<int, \App\Models\Skill>  $targetSkills
+     * @param  Collection<int, \App\Models\SupportCard>  $supportCards
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    public function analyzeHintOpportunities(): array
+    public function analyzeHintOpportunities(
+        Character $character,
+        Collection $targetSkills,
+        Collection $supportCards,
+        array $context = []
+    ): array {
         $startTime = microtime(true);
 
         try {
@@ -78,32 +85,48 @@ class HintOptimizationAgent
 
     /**
      * Gather comprehensive hint data for analysis.
+     *
+     * @param  Collection<int, \App\Models\Skill>  $targetSkills
+     * @param  Collection<int, \App\Models\SupportCard>  $supportCards
+     * @return array{skill_hint_data: array<int, mixed>, hint_statistics: mixed, collection_strategies: mixed, support_cards: array<int, array<string, mixed>>}
      */
-    private function gatherHintData(): array
+    private function gatherHintData(
+        Character $character,
+        Collection $targetSkills,
+        Collection $supportCards
+    ): array {
         $skillHintData = [];
 
         foreach ($targetSkills as $skill) {
-            $costBreakdown = $this->hintService->getCostBreakdown($character, $skill);
+            /** @var \App\Models\Skill|null $skillModel */
+            $skillModel = $skill;
+            $costBreakdown = \call_user_func([$this->hintService, 'getCostBreakdown'], $character, $skillModel);
             $skillHintData[] = $costBreakdown;
         }
 
         // Get hint statistics
-        $hintStats = $this->hintService->getHintStatistics($character);
+        $hintStats = \call_user_func([$this->hintService, 'getHintStatistics'], $character);
 
         // Get hint collection strategies
-        $strategies = $this->hintService->getHintCollectionStrategy($character, $targetSkills);
+        $strategies = \call_user_func([$this->hintService, 'getHintCollectionStrategy'], $character, $targetSkills);
+
+        /** @var array<int, array<string, mixed>> $supportCardData */
+        $supportCardData = $supportCards->map(function ($card): array {
+            /** @var \App\Models\SupportCard $card */
+            return [
+                'id' => $card->id,
+                'name' => $card->name,
+                'specialization' => $card->specialization,
+                'friendship_level' => $card->friendship_level,
+                'limit_break_level' => $card->limit_break_level,
+            ];
+        })->toArray();
 
         return [
             'skill_hint_data' => $skillHintData,
             'hint_statistics' => $hintStats,
             'collection_strategies' => $strategies,
-            'support_cards' => $supportCards->map(fn ($card) => [
-                'id' => $card->id,
-                'name' => $card->card_name,
-                'specialization' => $card->specialization,
-                'friendship_level' => $card->friendship_level,
-                'limit_break_level' => $card->limit_break_level,
-            ])->toArray(),
+            'support_cards' => $supportCardData,
         ];
     }
 
@@ -114,7 +137,8 @@ class HintOptimizationAgent
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    private function performMCPAnalysis(): array
+    private function performMCPAnalysis(array $hintData, array $context): array
+    {
         // Check if MCP is enabled
         if (! $this->mcpClient->isEnabled()) {
             Log::info('MCP is disabled, using local analysis only');
@@ -153,15 +177,17 @@ class HintOptimizationAgent
      * @param  array<string, mixed>  $hintData
      * @return array<string, mixed>
      */
-    private function getLocalAnalysis(): array
+    private function getLocalAnalysis(array $hintData): array
+    {
         $insights = [];
         $prioritySkills = [];
         $trainingRecommendations = [];
 
         // Analyze hint collection efficiency
-        $totalHints = $hintData['hint_statistics']['total_hints'];
-        $unusedHints = $hintData['hint_statistics']['unused_hints'];
-        $skillsWithMaxDiscount = $hintData['hint_statistics']['skills_with_max_discount'];
+        $hintStats = is_array($hintData['hint_statistics']) ? $hintData['hint_statistics'] : [];
+        $totalHints = isset($hintStats['total_hints']) && is_int($hintStats['total_hints']) ? $hintStats['total_hints'] : 0;
+        $unusedHints = isset($hintStats['unused_hints']) && is_int($hintStats['unused_hints']) ? $hintStats['unused_hints'] : 0;
+        $skillsWithMaxDiscount = isset($hintStats['skills_with_max_discount']) && is_int($hintStats['skills_with_max_discount']) ? $hintStats['skills_with_max_discount'] : 0;
 
         if ($skillsWithMaxDiscount > 0) {
             $insights[] = "You have {$skillsWithMaxDiscount} skill(s) with maximum discount (40%). Consider acquiring these skills soon to maximize SP efficiency.";
@@ -172,18 +198,33 @@ class HintOptimizationAgent
         }
 
         // Identify priority skills
-        foreach ($hintData['skill_hint_data'] as $skillData) {
-            if ($skillData['hint_count'] === 1) {
+        $skillHintData = is_array($hintData['skill_hint_data']) ? $hintData['skill_hint_data'] : [];
+        foreach ($skillHintData as $skillData) {
+            if (! is_array($skillData)) {
+                continue;
+            }
+            $hintCount = isset($skillData['hint_count']) && is_int($skillData['hint_count']) ? $skillData['hint_count'] : 0;
+            if ($hintCount === 1) {
+                $skillName = isset($skillData['skill_name']) && is_string($skillData['skill_name']) ? $skillData['skill_name'] : 'Unknown';
+                $baseSpCost = isset($skillData['base_sp_cost']) && is_numeric($skillData['base_sp_cost']) ? (int) $skillData['base_sp_cost'] : 0;
                 $prioritySkills[] = [
-                    'skill_name' => $skillData['skill_name'],
+                    'skill_name' => $skillName,
                     'reason' => 'One hint away from maximum discount',
-                    'potential_savings' => (int) ($skillData['base_sp_cost'] * 0.2),
+                    'potential_savings' => (int) ($baseSpCost * 0.2),
                 ];
             }
         }
 
         // Generate training recommendations
-        $supportCardTypes = array_unique(array_column($hintData['support_cards'], 'specialization'));
+        $supportCards = is_array($hintData['support_cards']) ? $hintData['support_cards'] : [];
+        /** @var array<string> $specializations */
+        $specializations = [];
+        foreach ($supportCards as $card) {
+            if (is_array($card) && isset($card['specialization']) && is_string($card['specialization'])) {
+                $specializations[] = $card['specialization'];
+            }
+        }
+        $supportCardTypes = array_unique($specializations);
         foreach ($supportCardTypes as $type) {
             $trainingRecommendations[] = [
                 'training_type' => $type,
@@ -211,24 +252,27 @@ class HintOptimizationAgent
         $score = 0;
         $maxScore = 100;
 
+        $hintStats = is_array($hintData['hint_statistics']) ? $hintData['hint_statistics'] : [];
+        $skillHintData = is_array($hintData['skill_hint_data']) ? $hintData['skill_hint_data'] : [];
+
         // Score based on skills with max discount
-        $skillsWithMaxDiscount = $hintData['hint_statistics']['skills_with_max_discount'];
-        $totalSkills = count($hintData['skill_hint_data']);
+        $skillsWithMaxDiscount = isset($hintStats['skills_with_max_discount']) && is_int($hintStats['skills_with_max_discount']) ? $hintStats['skills_with_max_discount'] : 0;
+        $totalSkills = count($skillHintData);
 
         if ($totalSkills > 0) {
-            $score = ($score ?? 0) + (int) (($skillsWithMaxDiscount / $totalSkills) * 40);
+            $score += (int) (($skillsWithMaxDiscount / $totalSkills) * 40);
         }
 
         // Score based on total SP saved
-        $totalSpSaved = $hintData['hint_statistics']['total_sp_saved'];
+        $totalSpSaved = isset($hintStats['total_sp_saved']) && is_numeric($hintStats['total_sp_saved']) ? (int) $hintStats['total_sp_saved'] : 0;
         if ($totalSpSaved > 0) {
-            $score = ($score ?? 0) + min(30, (int) ($totalSpSaved / 10));
+            $score += min(30, (int) ($totalSpSaved / 10));
         }
 
         // Score based on hint collection rate
-        $totalHints = $hintData['hint_statistics']['total_hints'];
+        $totalHints = isset($hintStats['total_hints']) && is_numeric($hintStats['total_hints']) ? (int) $hintStats['total_hints'] : 0;
         if ($totalHints > 0) {
-            $score = ($score ?? 0) + min(30, (int) ($totalHints / 2));
+            $score += min(30, (int) ($totalHints / 2));
         }
 
         return min($maxScore, $score);
@@ -242,27 +286,50 @@ class HintOptimizationAgent
      */
     private function buildAnalysisPrompt(array $hintData, array $context): string
     {
+        $hintStats = is_array($hintData['hint_statistics']) ? $hintData['hint_statistics'] : [];
+        $skillHintData = is_array($hintData['skill_hint_data']) ? $hintData['skill_hint_data'] : [];
+        $supportCards = is_array($hintData['support_cards']) ? $hintData['support_cards'] : [];
+
+        $totalHints = isset($hintStats['total_hints']) && is_scalar($hintStats['total_hints']) ? (string) $hintStats['total_hints'] : '0';
+        $unusedHints = isset($hintStats['unused_hints']) && is_scalar($hintStats['unused_hints']) ? (string) $hintStats['unused_hints'] : '0';
+        $skillsMaxDiscount = isset($hintStats['skills_with_max_discount']) && is_scalar($hintStats['skills_with_max_discount']) ? (string) $hintStats['skills_with_max_discount'] : '0';
+        $totalSpSaved = isset($hintStats['total_sp_saved']) && is_scalar($hintStats['total_sp_saved']) ? (string) $hintStats['total_sp_saved'] : '0';
+
         $prompt = "Analyze skill hint collection opportunities and provide strategic recommendations.\n\n";
 
         $prompt .= "## Current Hint Status\n";
-        $prompt .= "Total hints collected: {$hintData['hint_statistics']['total_hints']}\n";
-        $prompt .= "Unused hints: {$hintData['hint_statistics']['unused_hints']}\n";
-        $prompt .= "Skills with max discount: {$hintData['hint_statistics']['skills_with_max_discount']}\n";
-        $prompt .= "Total SP saved: {$hintData['hint_statistics']['total_sp_saved']}\n\n";
+        $prompt .= "Total hints collected: {$totalHints}\n";
+        $prompt .= "Unused hints: {$unusedHints}\n";
+        $prompt .= "Skills with max discount: {$skillsMaxDiscount}\n";
+        $prompt .= "Total SP saved: {$totalSpSaved}\n\n";
 
         $prompt .= "## Target Skills\n";
-        foreach ($hintData['skill_hint_data'] as $skillData) {
-            $prompt .= "- {$skillData['skill_name']}: ";
-            $prompt .= "{$skillData['hint_count']} hints, ";
-            $prompt .= "{$skillData['discount_percentage']}% discount, ";
-            $prompt .= "Final cost: {$skillData['final_sp_cost']} SP\n";
+        foreach ($skillHintData as $skillData) {
+            if (! is_array($skillData)) {
+                continue;
+            }
+            $skillName = isset($skillData['skill_name']) && is_scalar($skillData['skill_name']) ? (string) $skillData['skill_name'] : 'Unknown';
+            $hintCount = isset($skillData['hint_count']) && is_scalar($skillData['hint_count']) ? (string) $skillData['hint_count'] : '0';
+            $discountPct = isset($skillData['discount_percentage']) && is_scalar($skillData['discount_percentage']) ? (string) $skillData['discount_percentage'] : '0';
+            $finalCost = isset($skillData['final_sp_cost']) && is_scalar($skillData['final_sp_cost']) ? (string) $skillData['final_sp_cost'] : '0';
+            $prompt .= "- {$skillName}: ";
+            $prompt .= "{$hintCount} hints, ";
+            $prompt .= "{$discountPct}% discount, ";
+            $prompt .= "Final cost: {$finalCost} SP\n";
         }
 
         $prompt .= "\n## Support Cards\n";
-        foreach ($hintData['support_cards'] as $card) {
-            $prompt .= "- {$card['name']} ({$card['specialization']}): ";
-            $prompt .= "Friendship {$card['friendship_level']}%, ";
-            $prompt .= "LB{$card['limit_break_level']}\n";
+        foreach ($supportCards as $card) {
+            if (! is_array($card)) {
+                continue;
+            }
+            $cardName = isset($card['name']) && is_scalar($card['name']) ? (string) $card['name'] : 'Unknown';
+            $spec = isset($card['specialization']) && is_scalar($card['specialization']) ? (string) $card['specialization'] : 'Unknown';
+            $friendship = isset($card['friendship_level']) && is_scalar($card['friendship_level']) ? (string) $card['friendship_level'] : '0';
+            $lb = isset($card['limit_break_level']) && is_scalar($card['limit_break_level']) ? (string) $card['limit_break_level'] : '0';
+            $prompt .= "- {$cardName} ({$spec}): ";
+            $prompt .= "Friendship {$friendship}%, ";
+            $prompt .= "LB{$lb}\n";
         }
 
         if (! empty($context)) {
@@ -286,13 +353,17 @@ class HintOptimizationAgent
      * @param  array<string, mixed>  $mcpAnalysis
      * @return array<int, array<string, mixed>>
      */
-    private function generateRecommendations(): array
+    private function generateRecommendations(array $hintData, array $mcpAnalysis): array
+    {
         $recommendations = [];
 
+        $skillHintData = is_array($hintData['skill_hint_data']) ? $hintData['skill_hint_data'] : [];
+
         // High priority: Skills with 1 hint (one more for max discount)
+        /** @var array<int|string, array{hint_count: int, skill_name?: string, base_sp_cost?: int|float}> $oneHintSkills */
         $oneHintSkills = array_filter(
-            $hintData['skill_hint_data'],
-            fn ($skill) => $skill['hint_count'] === 1
+            $skillHintData,
+            fn ($skill) => is_array($skill) && isset($skill['hint_count']) && $skill['hint_count'] === 1
         );
 
         if (! empty($oneHintSkills)) {
@@ -300,9 +371,9 @@ class HintOptimizationAgent
                 'type' => 'urgent',
                 'title' => 'One Hint Away from Maximum Discount',
                 'description' => 'These skills need just one more hint to reach 40% discount',
-                'skills' => array_map(fn ($s) => $s['skill_name'], $oneHintSkills),
-                'potential_savings' => array_sum(array_map(
-                    fn ($s) => $s['base_sp_cost'] * 0.2,
+                'skills' => array_map(fn ($s) => isset($s['skill_name']) && is_scalar($s['skill_name']) ? (string) $s['skill_name'] : 'Unknown', $oneHintSkills),
+                'potential_savings' => (int) array_sum(array_map(
+                    fn ($s) => isset($s['base_sp_cost']) && is_numeric($s['base_sp_cost']) ? $s['base_sp_cost'] * 0.2 : 0,
                     $oneHintSkills
                 )),
                 'priority' => 'high',
@@ -310,9 +381,10 @@ class HintOptimizationAgent
         }
 
         // Medium priority: Skills with no hints but high SP cost
+        /** @var array<int|string, array{hint_count: int, base_sp_cost: int|float, skill_name?: string}> $noHintHighCostSkills */
         $noHintHighCostSkills = array_filter(
-            $hintData['skill_hint_data'],
-            fn ($skill) => $skill['hint_count'] === 0 && $skill['base_sp_cost'] >= 180
+            $skillHintData,
+            fn ($skill) => is_array($skill) && isset($skill['hint_count'], $skill['base_sp_cost']) && $skill['hint_count'] === 0 && is_numeric($skill['base_sp_cost']) && $skill['base_sp_cost'] >= 180
         );
 
         if (! empty($noHintHighCostSkills)) {
@@ -320,8 +392,8 @@ class HintOptimizationAgent
                 'type' => 'opportunity',
                 'title' => 'High-Value Hint Collection Opportunities',
                 'description' => 'Expensive skills with no hints yet - maximum savings potential',
-                'skills' => array_map(fn ($s) => $s['skill_name'], $noHintHighCostSkills),
-                'potential_savings' => array_sum(array_map(
+                'skills' => array_map(fn ($s) => isset($s['skill_name']) && is_scalar($s['skill_name']) ? (string) $s['skill_name'] : 'Unknown', $noHintHighCostSkills),
+                'potential_savings' => (int) array_sum(array_map(
                     fn ($s) => $s['base_sp_cost'] * 0.4,
                     $noHintHighCostSkills
                 )),
@@ -330,9 +402,10 @@ class HintOptimizationAgent
         }
 
         // Skills ready to acquire (max discount reached)
+        /** @var array<int|string, array{max_discount_reached: bool, skill_name?: string, final_sp_cost?: int|float}> $maxDiscountSkills */
         $maxDiscountSkills = array_filter(
-            $hintData['skill_hint_data'],
-            fn ($skill) => $skill['max_discount_reached']
+            $skillHintData,
+            fn ($skill) => is_array($skill) && isset($skill['max_discount_reached']) && $skill['max_discount_reached'] === true
         );
 
         if (! empty($maxDiscountSkills)) {
@@ -340,8 +413,8 @@ class HintOptimizationAgent
                 'type' => 'ready',
                 'title' => 'Skills Ready for Acquisition',
                 'description' => 'Maximum discount achieved - optimal time to acquire',
-                'skills' => array_map(fn ($s) => $s['skill_name'], $maxDiscountSkills),
-                'total_cost' => array_sum(array_map(fn ($s) => $s['final_sp_cost'], $maxDiscountSkills)),
+                'skills' => array_map(fn ($s) => isset($s['skill_name']) && is_scalar($s['skill_name']) ? (string) $s['skill_name'] : 'Unknown', $maxDiscountSkills),
+                'total_cost' => (int) array_sum(array_map(fn ($s) => isset($s['final_sp_cost']) && is_numeric($s['final_sp_cost']) ? (int) $s['final_sp_cost'] : 0, $maxDiscountSkills)),
                 'priority' => 'high',
             ];
         }
@@ -353,7 +426,7 @@ class HintOptimizationAgent
                 'title' => 'AI-Powered Strategic Insights',
                 'description' => 'Advanced analysis from Hint Optimization Agent',
                 'insights' => $mcpAnalysis['insights'],
-                'confidence' => $mcpAnalysis['confidence'],
+                'confidence' => $mcpAnalysis['confidence'] ?? 0.0,
                 'priority' => 'info',
             ];
         }
@@ -363,37 +436,59 @@ class HintOptimizationAgent
 
     /**
      * Get fallback recommendations when MCP is unavailable.
+     *
+     * @param  Collection<int, \App\Models\Skill>  $targetSkills
+     * @return array<int, array{skill_name: string, recommendation: string, priority: string}>
      */
-    private function getFallbackRecommendations(): array
-        $strategies = $this->hintService->getHintCollectionStrategy($character, $targetSkills);
+    private function getFallbackRecommendations(Character $character, Collection $targetSkills): array
+    {
+        /** @var array<int, array<string, mixed>>|mixed $strategies */
+        $strategies = \call_user_func([$this->hintService, 'getHintCollectionStrategy'], $character, $targetSkills);
+        if (! is_array($strategies)) {
+            return [];
+        }
 
-        return array_map(fn ($strategy) => [
-            'skill_name' => $strategy['skill_name'],
-            'recommendation' => $strategy['recommendation'],
-            'priority' => $strategy['priority'],
-        ], $strategies);
+        return array_map(function ($strategy): array {
+            if (! is_array($strategy)) {
+                return ['skill_name' => 'Unknown', 'recommendation' => '', 'priority' => 'low'];
+            }
+
+            return [
+                'skill_name' => isset($strategy['skill_name']) && is_string($strategy['skill_name']) ? $strategy['skill_name'] : 'Unknown',
+                'recommendation' => isset($strategy['recommendation']) && is_string($strategy['recommendation']) ? $strategy['recommendation'] : '',
+                'priority' => isset($strategy['priority']) && is_string($strategy['priority']) ? $strategy['priority'] : 'low',
+            ];
+        }, $strategies);
     }
 
     /**
      * Calculate optimal hint collection sequence.
+     *
+     * @param  Collection<int, \App\Models\Skill>  $targetSkills
+     * @return array{sequence: array<int, array<string, mixed>>, total_turns_needed: int, turns_available: int, feasible: bool}
      */
-    public function calculateOptimalSequence(): array
+    public function calculateOptimalSequence(
+        Character $character,
+        Collection $targetSkills,
+        int $availableTurns
+    ): array {
         $sequence = [];
         $currentTurn = 1;
 
         // Sort skills by hint collection priority
-        $sortedSkills = $targetSkills->sortByDesc(function ($skill) use ($character) {
+        $sortedSkills = $targetSkills->sortByDesc(function ($skill) use ($character): int {
+            /** @var \App\Models\Skill $skill */
             $hints = $this->hintService->getHintsForSkill($character, $skill);
             $hintCount = $hints->count();
 
             // Priority score: skills with 1 hint get highest priority
             if ($hintCount === 1) {
-                return 1000 + $skill->base_sp_cost;
+                return 1000 + (int) $skill->base_sp_cost;
             }
 
             // Then skills with 0 hints and high SP cost
             if ($hintCount === 0) {
-                return 500 + $skill->base_sp_cost;
+                return 500 + (int) $skill->base_sp_cost;
             }
 
             // Already at max discount
@@ -401,6 +496,7 @@ class HintOptimizationAgent
         });
 
         foreach ($sortedSkills as $skill) {
+            /** @var \App\Models\Skill $skill */
             if ($currentTurn > $availableTurns) {
                 break;
             }
@@ -420,7 +516,7 @@ class HintOptimizationAgent
                     'priority' => $hintCount === 1 ? 'high' : 'medium',
                 ];
 
-                $currentTurn = ($currentTurn ?? 0) + $hintsNeeded;
+                $currentTurn += $hintsNeeded;
             }
         }
 
@@ -434,8 +530,12 @@ class HintOptimizationAgent
 
     /**
      * Evaluate hint collection efficiency.
+     *
+     * @param  Collection<int, \App\Models\Skill>  $acquiredSkills
+     * @return array<string, mixed>
      */
-    public function evaluateEfficiency(): array
+    public function evaluateEfficiency(Character $character, Collection $acquiredSkills): array
+    {
         $totalBaseCost = 0;
         $totalFinalCost = 0;
         $totalSpSaved = 0;
@@ -444,26 +544,27 @@ class HintOptimizationAgent
         $skillsWithNoDiscount = 0;
 
         foreach ($acquiredSkills as $skill) {
+            /** @var \App\Models\Skill $skill */
             $hints = $this->hintService->getHintsForSkill($character, $skill);
             $hintCount = $hints->count();
 
-            $totalBaseCost = ($totalBaseCost ?? 0) + $skill->base_sp_cost;
+            $totalBaseCost += (int) $skill->base_sp_cost;
             $finalCost = $this->hintService->calculateFinalCost($skill, $hintCount);
-            $totalFinalCost = ($totalFinalCost ?? 0) + $finalCost;
-            $totalSpSaved = ($totalSpSaved ?? 0) + $skill->base_sp_cost - $finalCost;
+            $totalFinalCost += $finalCost;
+            $totalSpSaved += (int) $skill->base_sp_cost - $finalCost;
 
             if ($hintCount >= 2) {
-                $skillsWithMaxDiscount = ($skillsWithMaxDiscount ?? 0) + 1;
+                $skillsWithMaxDiscount++;
             } elseif ($hintCount > 0) {
-                $skillsWithPartialDiscount = ($skillsWithPartialDiscount ?? 0) + 1;
+                $skillsWithPartialDiscount++;
             } else {
-                $skillsWithNoDiscount = ($skillsWithNoDiscount ?? 0) + 1;
+                $skillsWithNoDiscount++;
             }
         }
 
         $efficiencyPercentage = $totalBaseCost > 0
             ? ($totalSpSaved / $totalBaseCost) * 100
-            : 0;
+            : 0.0;
 
         return [
             'total_skills' => $acquiredSkills->count(),
@@ -474,7 +575,7 @@ class HintOptimizationAgent
             'skills_with_max_discount' => $skillsWithMaxDiscount,
             'skills_with_partial_discount' => $skillsWithPartialDiscount,
             'skills_with_no_discount' => $skillsWithNoDiscount,
-            'optimization_grade' => $this->getOptimizationGrade($efficiencyPercentage),
+            'optimization_grade' => $this->getOptimizationGrade((float) $efficiencyPercentage),
         ];
     }
 

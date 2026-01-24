@@ -7,7 +7,6 @@ namespace App\Services;
 use App\Models\OCRExtraction;
 use App\Services\OCR\ParserFactory;
 use App\Services\OCR\ScreenTypeDetector;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
@@ -107,13 +106,13 @@ class TesseractService
      * @return array{
      *     success: bool,
      *     extraction_id: int|null,
-     *     stats: array<string, int>|null,
+     *     stats: array<string, int|null>|null,
      *     raw_text: string|null,
      *     confidence: float,
      *     error: string|null
      * }
      */
-    public function processScreenshot(): array
+    public function processScreenshot(\Illuminate\Http\UploadedFile $file, int $userId): array
     {
         try {
             // Validate image first
@@ -279,9 +278,10 @@ class TesseractService
     /**
      * Extract stats from OCR text using regex patterns
      *
-     * @return array<string, int>
+     * @return array<string, int|null>
      */
-    protected function extractStats(): array
+    protected function extractStats(string $text): array
+    {
         $stats = [];
 
         foreach (self::STAT_PATTERNS as $stat => $pattern) {
@@ -290,7 +290,11 @@ class TesseractService
                 // Validate reasonable stat range (50-1200)
                 if ($value >= 50 && $value <= 1200) {
                     $stats[$stat] = $value;
+                } else {
+                    $stats[$stat] = null;
                 }
+            } else {
+                $stats[$stat] = null;
             }
         }
 
@@ -300,16 +304,18 @@ class TesseractService
     /**
      * Extract additional data from OCR text
      *
+     * @param  string  $text  The OCR text to extract data from
      * @return array<string, mixed>
      */
-    protected function extractAdditionalData(): array
+    protected function extractAdditionalData(string $text): array
+    {
         $data = [];
 
         // Extract turn
         if (preg_match(self::ADDITIONAL_PATTERNS['turn'], $text, $matches)) {
-            (is_array($data) && isset($data['current_turn']) ? $data['current_turn'] : null) = (int) $matches[1];
+            $data['current_turn'] = (int) $matches[1];
             if (isset($matches[2])) {
-                (is_array($data) && isset($data['total_turns']) ? $data['total_turns'] : null) = (int) $matches[2];
+                $data['total_turns'] = (int) $matches[2];
             }
         }
 
@@ -317,13 +323,13 @@ class TesseractService
         if (preg_match(self::ADDITIONAL_PATTERNS['energy'], $text, $matches)) {
             $energy = (int) $matches[1];
             if ($energy >= 0 && $energy <= 100) {
-                (is_array($data) && isset($data['energy_level']) ? $data['energy_level'] : null) = $energy;
+                $data['energy_level'] = $energy;
             }
         }
 
         // Extract mood
         if (preg_match(self::ADDITIONAL_PATTERNS['mood'], $text, $matches)) {
-            (is_array($data) && isset($data['mood_status']) ? $data['mood_status'] : null) = $this->normalizeMood($matches[1]);
+            $data['mood_status'] = $this->normalizeMood($matches[1]);
         }
 
         return $data;
@@ -361,12 +367,12 @@ class TesseractService
     /**
      * Calculate confidence score based on extracted stats
      *
-     * @param  array<string, int>  $stats
+     * @param  array<string, int|null>  $stats
      * @return float Score 0.0 to 1.0
      */
     protected function calculateConfidence(array $stats): float
     {
-        $foundCount = \count($stats);
+        $foundCount = \count(array_filter($stats, static fn ($value): bool => $value !== null));
         $totalStats = 5;
 
         return round($foundCount / $totalStats, 2);

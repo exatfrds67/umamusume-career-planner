@@ -20,6 +20,12 @@ class TrainingPredictionResource extends JsonResource
         /** @var array<string, mixed> $breakdown */
         $breakdown = isset($data['breakdown']) && is_array($data['breakdown']) ? $data['breakdown'] : [];
 
+        $supportCardBonus = $breakdown['support_card_bonus'] ?? 0.0;
+        $friendshipMultiplier = $breakdown['friendship_multiplier'] ?? 0.0;
+        $facilityBonus = $breakdown['facility_bonus'] ?? 0.0;
+        $growthRateBonus = $breakdown['growth_rate_bonus'] ?? 0.0;
+        $totalMultiplier = $breakdown['total_multiplier'] ?? 1.0;
+
         return [
             'training_type' => $data['training_type'] ?? null,
             'stat_gains' => $data['stat_gains'] ?? [],
@@ -28,11 +34,11 @@ class TrainingPredictionResource extends JsonResource
             'total_bonus' => $data['total_bonus'] ?? 0.0,
             'breakdown' => [
                 'base_gains' => $breakdown['base_gains'] ?? [],
-                'support_card_bonus' => (float) ($breakdown['support_card_bonus'] ?? 0.0),
-                'friendship_multiplier' => (float) ($breakdown['friendship_multiplier'] ?? 0.0),
-                'facility_bonus' => (float) ($breakdown['facility_bonus'] ?? 0.0),
-                'growth_rate_bonus' => (float) ($breakdown['growth_rate_bonus'] ?? 0.0),
-                'total_multiplier' => (float) ($breakdown['total_multiplier'] ?? 1.0),
+                'support_card_bonus' => is_numeric($supportCardBonus) ? (float) $supportCardBonus : 0.0,
+                'friendship_multiplier' => is_numeric($friendshipMultiplier) ? (float) $friendshipMultiplier : 0.0,
+                'facility_bonus' => is_numeric($facilityBonus) ? (float) $facilityBonus : 0.0,
+                'growth_rate_bonus' => is_numeric($growthRateBonus) ? (float) $growthRateBonus : 0.0,
+                'total_multiplier' => is_numeric($totalMultiplier) ? (float) $totalMultiplier : 1.0,
             ],
             'scenario_specific' => $data['scenario_specific'] ?? [],
             'mcp_optimization' => $this->when(

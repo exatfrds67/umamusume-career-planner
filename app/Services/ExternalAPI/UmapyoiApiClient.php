@@ -57,8 +57,10 @@ class UmapyoiApiClient
         protected ResponseValidator $validator,
         protected ResponseTransformer $transformer
     ) {
-        $this->baseUrl = (string) config('services.umapyoi.url', 'https://api.umapyoi.net');
-        $this->timeout = (int) config('services.umapyoi.timeout', 30);
+        $configUrl = config('services.umapyoi.url', 'https://api.umapyoi.net');
+        $this->baseUrl = is_string($configUrl) ? $configUrl : 'https://api.umapyoi.net';
+        $configTimeout = config('services.umapyoi.timeout', 30);
+        $this->timeout = is_numeric($configTimeout) ? (int) $configTimeout : 30;
     }
 
     /**
@@ -66,7 +68,8 @@ class UmapyoiApiClient
      *
      * @return array{success: bool, data: array<int, array<string, mixed>>, source: string, error?: string}
      */
-    public function getCharacters(): array
+    public function getCharacters(bool $forceRefresh = false): array
+    {
         $cacheKey = self::CACHE_PREFIX.'characters';
 
         // If force refresh, invalidate cache first
@@ -105,6 +108,7 @@ class UmapyoiApiClient
                     $characters = $validation['data'] ?? [];
 
                     // Transform to internal format
+                    /** @var array<int, array<string, mixed>> $transformedCharacters */
                     $transformedCharacters = $this->transformer->transform('characters', $characters);
 
                     Log::info('[UmapyoiApiClient] Characters fetched successfully', [
@@ -140,13 +144,17 @@ class UmapyoiApiClient
      *
      * @return array{success: bool, data: array<string, mixed>|null, source: string, error?: string}
      */
-    public function getCharacter(): array
+    public function getCharacter(string $characterId, bool $forceRefresh = false): array
+    {
         $cacheKey = self::CACHE_PREFIX."character:{$characterId}";
 
         if (! $forceRefresh && Cache::has($cacheKey)) {
+            /** @var array<string, mixed>|null $cachedData */
+            $cachedData = Cache::get($cacheKey);
+
             return [
                 'success' => true,
-                'data' => Cache::get($cacheKey),
+                'data' => is_array($cachedData) ? $cachedData : null,
                 'source' => 'cache',
             ];
         }
@@ -170,9 +178,9 @@ class UmapyoiApiClient
                 throw new \RuntimeException('Invalid response format: '.implode(', ', $validation['errors']));
             }
 
-            $character = (is_array($validation) && isset($validation['data']) ? $validation['data'] : null);
+            $character = (isset($validation['data']) && is_array($validation['data']) ? $validation['data'] : null);
 
-            if ($character) {
+            if ($character !== null) {
                 // Transform to internal format
                 $transformedCharacter = $this->transformer->transform('character', $character);
                 Cache::put($cacheKey, $transformedCharacter, self::CACHE_TTL);
@@ -210,13 +218,17 @@ class UmapyoiApiClient
      *
      * @return array{success: bool, data: array<int, array<string, mixed>>, source: string, error?: string}
      */
-    public function getSupportCards(): array
+    public function getSupportCards(bool $forceRefresh = false): array
+    {
         $cacheKey = self::CACHE_PREFIX.'support_cards';
 
         if (! $forceRefresh && Cache::has($cacheKey)) {
+            /** @var array<int, array<string, mixed>> $cachedData */
+            $cachedData = Cache::get($cacheKey, []);
+
             return [
                 'success' => true,
-                'data' => Cache::get($cacheKey, []),
+                'data' => is_array($cachedData) ? $cachedData : [],
                 'source' => 'cache',
             ];
         }
@@ -242,6 +254,7 @@ class UmapyoiApiClient
             $cards = $validation['data'] ?? [];
 
             // Transform to internal format
+            /** @var array<int, array<string, mixed>> $transformedCards */
             $transformedCards = $this->transformer->transform('support_cards', $cards);
 
             // Cache the result
@@ -276,13 +289,17 @@ class UmapyoiApiClient
      *
      * @return array{success: bool, data: array<string, mixed>|null, source: string, error?: string}
      */
-    public function getSupportCard(): array
+    public function getSupportCard(string $cardId, bool $forceRefresh = false): array
+    {
         $cacheKey = self::CACHE_PREFIX."support_card:{$cardId}";
 
         if (! $forceRefresh && Cache::has($cacheKey)) {
+            /** @var array<string, mixed>|null $cachedData */
+            $cachedData = Cache::get($cacheKey);
+
             return [
                 'success' => true,
-                'data' => Cache::get($cacheKey),
+                'data' => is_array($cachedData) ? $cachedData : null,
                 'source' => 'cache',
             ];
         }
@@ -306,9 +323,9 @@ class UmapyoiApiClient
                 throw new \RuntimeException('Invalid response format: '.implode(', ', $validation['errors']));
             }
 
-            $card = (is_array($validation) && isset($validation['data']) ? $validation['data'] : null);
+            $card = (isset($validation['data']) && is_array($validation['data']) ? $validation['data'] : null);
 
-            if ($card) {
+            if ($card !== null) {
                 // Transform to internal format
                 $transformedCard = $this->transformer->transform('support_card', $card);
                 Cache::put($cacheKey, $transformedCard, self::CACHE_TTL);
@@ -346,13 +363,17 @@ class UmapyoiApiClient
      *
      * @return array{success: bool, data: array<int, array<string, mixed>>, source: string, error?: string}
      */
-    public function getSkills(): array
+    public function getSkills(bool $forceRefresh = false): array
+    {
         $cacheKey = self::CACHE_PREFIX.'skills';
 
         if (! $forceRefresh && Cache::has($cacheKey)) {
+            /** @var array<int, array<string, mixed>> $cachedData */
+            $cachedData = Cache::get($cacheKey, []);
+
             return [
                 'success' => true,
-                'data' => Cache::get($cacheKey, []),
+                'data' => is_array($cachedData) ? $cachedData : [],
                 'source' => 'cache',
             ];
         }
@@ -378,6 +399,7 @@ class UmapyoiApiClient
             $skills = $validation['data'] ?? [];
 
             // Transform to internal format
+            /** @var array<int, array<string, mixed>> $transformedSkills */
             $transformedSkills = $this->transformer->transform('skills', $skills);
 
             // Cache the result
@@ -412,13 +434,17 @@ class UmapyoiApiClient
      *
      * @return array{success: bool, data: array<string, mixed>|null, source: string, error?: string}
      */
-    public function getSkill(): array
+    public function getSkill(string $skillId, bool $forceRefresh = false): array
+    {
         $cacheKey = self::CACHE_PREFIX."skill:{$skillId}";
 
         if (! $forceRefresh && Cache::has($cacheKey)) {
+            /** @var array<string, mixed>|null $cachedData */
+            $cachedData = Cache::get($cacheKey);
+
             return [
                 'success' => true,
-                'data' => Cache::get($cacheKey),
+                'data' => is_array($cachedData) ? $cachedData : null,
                 'source' => 'cache',
             ];
         }
@@ -442,9 +468,9 @@ class UmapyoiApiClient
                 throw new \RuntimeException('Invalid response format: '.implode(', ', $validation['errors']));
             }
 
-            $skill = (is_array($validation) && isset($validation['data']) ? $validation['data'] : null);
+            $skill = (isset($validation['data']) && is_array($validation['data']) ? $validation['data'] : null);
 
-            if ($skill) {
+            if ($skill !== null) {
                 // Transform to internal format
                 $transformedSkill = $this->transformer->transform('skill', $skill);
                 Cache::put($cacheKey, $transformedSkill, self::CACHE_TTL);
@@ -482,13 +508,17 @@ class UmapyoiApiClient
      *
      * @return array{success: bool, data: array<int, array<string, mixed>>, source: string, error?: string}
      */
-    public function getNews(): array
+    public function getNews(int $limit = 10, bool $forceRefresh = false): array
+    {
         $cacheKey = self::CACHE_PREFIX."news:limit:{$limit}";
 
         if (! $forceRefresh && Cache::has($cacheKey)) {
+            /** @var array<int, array<string, mixed>> $cachedData */
+            $cachedData = Cache::get($cacheKey, []);
+
             return [
                 'success' => true,
-                'data' => Cache::get($cacheKey, []),
+                'data' => is_array($cachedData) ? $cachedData : [],
                 'source' => 'cache',
             ];
         }
@@ -516,6 +546,7 @@ class UmapyoiApiClient
             $news = $validation['data'] ?? [];
 
             // Transform to internal format
+            /** @var array<int, array<string, mixed>> $transformedNews */
             $transformedNews = $this->transformer->transform('news', $news);
 
             // Cache the result for 1 hour (news updates more frequently)
@@ -551,12 +582,13 @@ class UmapyoiApiClient
      * @param  array<string, mixed>  $params
      * @return array{success: bool, data: array<string, mixed>, error?: string}
      */
-    protected function makeRequest(): array
+    protected function makeRequest(string $method, string $endpoint, array $params = []): array
+    {
         $url = $this->baseUrl.$endpoint;
         $attempt = 0;
 
         while ($attempt < self::MAX_RETRIES) {
-            $attempt = ($attempt ?? 0) + 1;
+            $attempt = $attempt + 1;
 
             try {
                 // Check if MCP fetch server is available for enhanced capabilities
@@ -595,7 +627,8 @@ class UmapyoiApiClient
      * @param  array<string, mixed>  $params
      * @return array{success: bool, data: array<string, mixed>, error?: string}
      */
-    protected function makeRequestViaMCP(): array
+    protected function makeRequestViaMCP(string $method, string $url, array $params = []): array
+    {
         // In production, this would use actual MCP fetch server
         // For now, we'll use the standard HTTP client as fallback
         Log::debug('[UmapyoiApiClient] MCP fetch server not yet implemented, using HTTP fallback');
@@ -609,7 +642,8 @@ class UmapyoiApiClient
      * @param  array<string, mixed>  $params
      * @return array{success: bool, data: array<string, mixed>, error?: string}
      */
-    protected function makeRequestViaHttp(): array
+    protected function makeRequestViaHttp(string $method, string $url, array $params = []): array
+    {
         $response = Http::timeout($this->timeout)
             ->withHeaders([
                 'Accept' => 'application/json',
@@ -627,9 +661,13 @@ class UmapyoiApiClient
             ];
         }
 
+        $jsonData = $response->json();
+        /** @var array<string, mixed> $data */
+        $data = is_array($jsonData) ? $jsonData : [];
+
         return [
             'success' => true,
-            'data' => $response->json() ?? [],
+            'data' => $data,
         ];
     }
 
@@ -671,6 +709,7 @@ class UmapyoiApiClient
      * @return array{characters: bool, support_cards: bool, skills: bool, news: bool}
      */
     public function getCacheStatus(): array
+    {
         return [
             'characters' => Cache::has(self::CACHE_PREFIX.'characters'),
             'support_cards' => Cache::has(self::CACHE_PREFIX.'support_cards'),

@@ -184,7 +184,7 @@ class TieredRateLimiting
         $user = $request->user();
 
         if ($user !== null) {
-            return 'rate_limit:'.$tier.':user:'.$user?->id ?? throw new \Exception('User required');
+            return 'rate_limit:'.$tier.':user:'.$user->id;
         }
 
         return 'rate_limit:'.$tier.':ip:'.$request->ip();

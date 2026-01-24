@@ -78,19 +78,21 @@ class AgentRoutingService
      * @param  array<string, mixed>  $request
      * @return array{provider: string, model: string, reason: string, estimated_cost: float}
      */
-    public function routeRequest(): array
+    public function routeRequest(array $request): array
+    {
         // Check if specific provider/model is requested
         if (! empty($request['preferred_provider'])) {
-            $provider = $request['preferred_provider'];
-            $model = (is_array($request) && isset($request['preferred_model']) ? $request['preferred_model'] : null);
+            $provider = is_string($request['preferred_provider']) ? $request['preferred_provider'] : 'unknown';
+            $model = isset($request['preferred_model']) && is_string($request['preferred_model']) ? $request['preferred_model'] : null;
 
             // Resolve default model for provider if not specified
             if (! $model) {
-                $model = match ($provider) {
+                $modelConfig = match ($provider) {
                     self::PROVIDER_OLLAMA => config('ai.ollama.default_model', 'llama3'),
                     self::PROVIDER_BEDROCK => config('ai.bedrock.default_model', 'anthropic.claude-3-5-sonnet-20241022-v2:0'),
                     default => 'default'
                 };
+                $model = is_string($modelConfig) ? $modelConfig : 'default';
             }
 
             return [
@@ -105,13 +107,18 @@ class AgentRoutingService
         $cacheKey = $this->generateRouteCacheKey($request);
         $cachedRoute = Cache::get($cacheKey);
 
-        if ($cachedRoute && $this->isRouteValid($cachedRoute)) {
-            Log::debug('[AgentRouting] Using cached route', [
-                'provider' => $cachedRoute['provider'],
-                'cache_key' => $cacheKey,
-            ]);
+        if (is_array($cachedRoute)) {
+            /** @var array<string, mixed> $cachedRoute */
+            if ($this->isRouteValid($cachedRoute)) {
+                $cachedProvider = is_string($cachedRoute['provider'] ?? null) ? $cachedRoute['provider'] : 'unknown';
+                Log::debug('[AgentRouting] Using cached route', [
+                    'provider' => $cachedProvider,
+                    'cache_key' => $cacheKey,
+                ]);
 
-            return $cachedRoute;
+                /** @var array{provider: string, model: string, reason: string, estimated_cost: float} $cachedRoute */
+                return $cachedRoute;
+            }
         }
 
         // Detect request complexity
@@ -143,10 +150,10 @@ class AgentRoutingService
      */
     protected function detectComplexity(array $request): string
     {
-        $prompt = $request['prompt'] ?? '';
-        $context = $request['context'] ?? [];
-        $requiresRAG = $request['requires_rag'] ?? false;
-        $multiStep = $request['multi_step'] ?? false;
+        $prompt = is_string($request['prompt'] ?? null) ? $request['prompt'] : '';
+        $context = is_array($request['context'] ?? null) ? $request['context'] : [];
+        $requiresRAG = (bool) ($request['requires_rag'] ?? false);
+        $multiStep = (bool) ($request['multi_step'] ?? false);
 
         // Token count estimation
         $tokenCount = $this->estimateTokenCount($prompt, $context);
@@ -177,7 +184,8 @@ class AgentRoutingService
      * @param  array<string, mixed>  $request
      * @return array{provider: string, model: string, reason: string, estimated_cost: float}
      */
-    protected function selectProvider(): array
+    protected function selectProvider(string $complexity, array $budgetStatus, array $request): array
+    {
         // Check if budget is exceeded
         if ($budgetStatus['is_exceeded']) {
             return $this->selectFallbackProvider($complexity, 'budget_exceeded');
@@ -199,12 +207,15 @@ class AgentRoutingService
      * @param  array<string, mixed>  $request
      * @return array{provider: string, model: string, reason: string, estimated_cost: float}
      */
-    protected function selectSimpleProvider(): array
+    protected function selectSimpleProvider(array $request): array
+    {
         // Try Ollama first (free, fast)
         if ($this->isOllamaAvailable()) {
+            $defaultModel = config('ai.ollama.default_model', 'llama3');
+
             return [
                 'provider' => self::PROVIDER_OLLAMA,
-                'model' => (string) config('ai.ollama.default_model', 'llama3'),
+                'model' => is_string($defaultModel) ? $defaultModel : 'llama3',
                 'reason' => 'Simple request - using local Ollama for speed and cost efficiency',
                 'estimated_cost' => self::OLLAMA_COST,
             ];
@@ -225,12 +236,15 @@ class AgentRoutingService
      * @param  array<string, mixed>  $request
      * @return array{provider: string, model: string, reason: string, estimated_cost: float}
      */
-    protected function selectModerateProvider(): array
+    protected function selectModerateProvider(array $request): array
+    {
         // Try Ollama first
         if ($this->isOllamaAvailable()) {
+            $defaultModel = config('ai.ollama.default_model', 'llama3');
+
             return [
                 'provider' => self::PROVIDER_OLLAMA,
-                'model' => (string) config('ai.ollama.default_model', 'llama3'),
+                'model' => is_string($defaultModel) ? $defaultModel : 'llama3',
                 'reason' => 'Moderate request - attempting local Ollama first',
                 'estimated_cost' => self::OLLAMA_COST,
             ];
@@ -251,7 +265,8 @@ class AgentRoutingService
      * @param  array<string, mixed>  $request
      * @return array{provider: string, model: string, reason: string, estimated_cost: float}
      */
-    protected function selectComplexProvider(): array
+    protected function selectComplexProvider(array $request): array
+    {
         // Complex requests go directly to Bedrock
         return [
             'provider' => self::PROVIDER_BEDROCK,
@@ -267,8 +282,9 @@ class AgentRoutingService
      * @param  array<string, mixed>  $request
      * @return array{provider: string, model: string, reason: string, estimated_cost: float}
      */
-    protected function selectSpecializedProvider(): array
-        $agentType = $request['agent_type'] ?? 'generic';
+    protected function selectSpecializedProvider(array $request): array
+    {
+        $agentType = is_string($request['agent_type'] ?? null) ? $request['agent_type'] : 'generic';
 
         return [
             'provider' => self::PROVIDER_AGENT,
@@ -284,9 +300,12 @@ class AgentRoutingService
      * @return array{provider: string, model: string, reason: string, estimated_cost: float}
      */
     protected function selectDefaultProvider(): array
+    {
+        $defaultModel = config('ai.ollama.default_model', 'llama3');
+
         return [
             'provider' => self::PROVIDER_OLLAMA,
-            'model' => config('ai.ollama.default_model', 'llama3'),
+            'model' => is_string($defaultModel) ? $defaultModel : 'llama3',
             'reason' => 'Default routing to local Ollama',
             'estimated_cost' => self::OLLAMA_COST,
         ];
@@ -297,12 +316,15 @@ class AgentRoutingService
      *
      * @return array{provider: string, model: string, reason: string, estimated_cost: float}
      */
-    protected function selectFallbackProvider(): array
+    protected function selectFallbackProvider(string $complexity, string $reason): array
+    {
         // If budget exceeded, use Ollama if available
         if ($reason === 'budget_exceeded' && $this->isOllamaAvailable()) {
+            $defaultModel = config('ai.ollama.default_model', 'llama3');
+
             return [
                 'provider' => self::PROVIDER_OLLAMA,
-                'model' => config('ai.ollama.default_model', 'llama3'),
+                'model' => is_string($defaultModel) ? $defaultModel : 'llama3',
                 'reason' => 'Budget exceeded - falling back to free local Ollama',
                 'estimated_cost' => self::OLLAMA_COST,
             ];
@@ -323,7 +345,8 @@ class AgentRoutingService
      * @param  array<string, mixed>  $request
      * @return array{success: bool, response: mixed, provider: string, model: string, execution_time: float, cost: float, fallback_used: bool}
      */
-    public function executeWithFallback(): array
+    public function executeWithFallback(array $request): array
+    {
         $route = $this->routeRequest($request);
         $startTime = microtime(true);
 
@@ -375,7 +398,8 @@ class AgentRoutingService
      * @param  array<string, mixed>  $primaryRoute
      * @return array{success: bool, response: mixed, provider: string, model: string, execution_time: float, cost: float, fallback_used: bool}
      */
-    protected function executeFallback(): array
+    protected function executeFallback(array $request, array $primaryRoute, string $reason): array
+    {
         $complexity = $this->detectComplexity($request);
         $fallbackRoute = $this->selectFallbackProvider($complexity, $reason);
 
@@ -418,11 +442,14 @@ class AgentRoutingService
      */
     protected function executeRequest(array $route, array $request): mixed
     {
-        return match ($route['provider']) {
-            self::PROVIDER_OLLAMA => $this->executeOllama($route['model'], $request),
-            self::PROVIDER_BEDROCK => $this->executeBedrock($route['model'], $request),
-            self::PROVIDER_AGENT => $this->executeAgent($route['model'], $request),
-            default => throw new \InvalidArgumentException("Unknown provider: {$route['provider']}"),
+        $provider = is_string($route['provider'] ?? null) ? $route['provider'] : '';
+        $model = is_string($route['model'] ?? null) ? $route['model'] : '';
+
+        return match ($provider) {
+            self::PROVIDER_OLLAMA => $this->executeOllama($model, $request),
+            self::PROVIDER_BEDROCK => $this->executeBedrock($model, $request),
+            self::PROVIDER_AGENT => $this->executeAgent($model, $request),
+            default => throw new \InvalidArgumentException("Unknown provider: {$provider}"),
         };
     }
 
@@ -433,8 +460,8 @@ class AgentRoutingService
      */
     protected function executeOllama(string $model, array $request): string
     {
-        $prompt = $request['prompt'] ?? '';
-        $context = $request['context'] ?? [];
+        $prompt = is_string($request['prompt'] ?? null) ? $request['prompt'] : '';
+        $context = is_array($request['context'] ?? null) ? $request['context'] : [];
 
         // Enrich prompt with context if available
         if (! empty($context)) {
@@ -446,14 +473,14 @@ class AgentRoutingService
             ->model($model)
             ->prompt($prompt)
             ->options([
-                'temperature' => $request['temperature'] ?? 0.3,
-                'top_p' => $request['top_p'] ?? 0.9,
-                'max_tokens' => $request['max_tokens'] ?? 2048,
+                'temperature' => is_numeric($request['temperature'] ?? null) ? (float) $request['temperature'] : 0.3,
+                'top_p' => is_numeric($request['top_p'] ?? null) ? (float) $request['top_p'] : 0.9,
+                'max_tokens' => is_numeric($request['max_tokens'] ?? null) ? (int) $request['max_tokens'] : 2048,
             ])
             ->ask();
 
         if (is_array($response)) {
-            return $response['response'] ?? $response['content'] ?? json_encode($response);
+            return is_string($response['response'] ?? null) ? $response['response'] : (is_string($response['content'] ?? null) ? $response['content'] : (json_encode($response) ?: ''));
         }
 
         return is_string($response) ? (string) $response : '';
@@ -461,32 +488,41 @@ class AgentRoutingService
 
     /**
      * Build system context string from context array
+     *
+     * @param  array<string, mixed>  $context
      */
     protected function buildSystemContext(array $context): string
     {
         $lines = ['You are an expert Umamusume Career Advisor. Analyze the following character data to provide specific, strategic advice.'];
 
-        if (isset($context['character'])) {
+        if (isset($context['character']) && is_array($context['character'])) {
             $c = $context['character'];
             $lines[] = "\n[CHARACTER PROFILE]";
-            $lines[] = 'Name: '.($c['name'] ?? 'Unknown');
-            $lines[] = 'Stage: '.($c['career_stage'] ?? 'Unknown');
-            $lines[] = 'Scenario: '.ucfirst($c['scenario_type'] ?? 'Unknown');
+            $lines[] = 'Name: '.(is_string($c['name'] ?? null) ? $c['name'] : 'Unknown');
+            $lines[] = 'Stage: '.(is_string($c['career_stage'] ?? null) ? $c['career_stage'] : 'Unknown');
+            $scenarioType = is_string($c['scenario_type'] ?? null) ? $c['scenario_type'] : 'Unknown';
+            $lines[] = 'Scenario: '.ucfirst($scenarioType);
 
-            if (isset($c['stats'])) {
+            if (isset($c['stats']) && is_array($c['stats'])) {
                 $stats = $c['stats'];
-                $lines[] = "Stats: Speed {$stats['speed']}, Stamina {$stats['stamina']}, Power {$stats['power']}, Guts {$stats['guts']}, Wisdom {$stats['wisdom']}";
+                $speed = is_numeric($stats['speed'] ?? null) ? (int) $stats['speed'] : 0;
+                $stamina = is_numeric($stats['stamina'] ?? null) ? (int) $stats['stamina'] : 0;
+                $power = is_numeric($stats['power'] ?? null) ? (int) $stats['power'] : 0;
+                $guts = is_numeric($stats['guts'] ?? null) ? (int) $stats['guts'] : 0;
+                $wisdom = is_numeric($stats['wisdom'] ?? null) ? (int) $stats['wisdom'] : 0;
+                $lines[] = "Stats: Speed {$speed}, Stamina {$stamina}, Power {$power}, Guts {$guts}, Wisdom {$wisdom}";
             }
 
-            if (isset($c['energy_level'])) {
-                $lines[] = 'Energy: '.$c['energy_level'].'/100';
+            if (isset($c['energy_level']) && is_numeric($c['energy_level'])) {
+                $lines[] = 'Energy: '.(int) $c['energy_level'].'/100';
             }
         }
 
-        if (isset($context['career'])) {
+        if (isset($context['career']) && is_array($context['career'])) {
             $cr = $context['career'];
             $lines[] = "\n[CAREER STATUS]";
-            $lines[] = 'Current Turn: '.($cr['current_turn'] ?? 0);
+            $currentTurn = is_numeric($cr['current_turn'] ?? null) ? (int) $cr['current_turn'] : 0;
+            $lines[] = 'Current Turn: '.$currentTurn;
         }
 
         return implode("\n", $lines);
@@ -515,8 +551,8 @@ class AgentRoutingService
         ]);
 
         $modelId = $this->mapBedrockModelId($modelKey);
-        $prompt = $request['prompt'] ?? '';
-        $context = $request['context'] ?? [];
+        $prompt = is_string($request['prompt'] ?? null) ? $request['prompt'] : '';
+        $context = is_array($request['context'] ?? null) ? $request['context'] : [];
 
         // Build system prompt if context exists
         $systemPrompt = 'You are an expert Umamusume Career Advisor.';
@@ -526,9 +562,10 @@ class AgentRoutingService
 
         // Prepare body based on model family
         if (str_contains($modelId, 'anthropic.claude')) {
+            $maxTokens = is_numeric($request['max_tokens'] ?? null) ? (int) $request['max_tokens'] : 4096;
             $body = [
                 'anthropic_version' => 'bedrock-2023-05-31',
-                'max_tokens' => (int) ($request['max_tokens'] ?? 4096),
+                'max_tokens' => $maxTokens,
                 'messages' => [
                     [
                         'role' => 'user',
@@ -544,9 +581,10 @@ class AgentRoutingService
         } else {
             // Nova / Titan / Generic (using Converse style or text)
             // For simplicity, fallback to generic "inputText" or "messages" if supported
+            $maxTokens = is_numeric($request['max_tokens'] ?? null) ? (int) $request['max_tokens'] : 4096;
             $body = [
                 'inferenceConfig' => [
-                    'max_new_tokens' => (int) ($request['max_tokens'] ?? 4096),
+                    'max_new_tokens' => $maxTokens,
                 ],
                 'messages' => [
                     [
@@ -567,17 +605,38 @@ class AgentRoutingService
                 'body' => json_encode($body),
             ]);
 
-            $responseBody = json_decode($result['body']->getContents(), true);
+            /** @var \GuzzleHttp\Psr7\Stream|null $bodyStream */
+            $bodyStream = $result['body'] ?? null;
+            if ($bodyStream === null) {
+                return '';
+            }
+            $responseBody = json_decode($bodyStream->getContents(), true);
 
             // Parse response based on model
-            if (str_contains($modelId, 'anthropic.claude')) {
-                return $responseBody['content'][0]['text'] ?? '';
-            } elseif (isset($responseBody['output']['message']['content'][0]['text'])) {
+            if (str_contains($modelId, 'anthropic.claude') && is_array($responseBody)) {
+                $content = $responseBody['content'] ?? null;
+                if (is_array($content) && isset($content[0]) && is_array($content[0])) {
+                    return is_string($content[0]['text'] ?? null) ? $content[0]['text'] : '';
+                }
+
+                return '';
+            } elseif (is_array($responseBody)) {
                 // Nova structure
-                return $responseBody['output']['message']['content'][0]['text'];
+                $output = $responseBody['output'] ?? null;
+                if (is_array($output)) {
+                    $message = $output['message'] ?? null;
+                    if (is_array($message)) {
+                        $content = $message['content'] ?? null;
+                        if (is_array($content) && isset($content[0]) && is_array($content[0])) {
+                            return is_string($content[0]['text'] ?? null) ? $content[0]['text'] : '';
+                        }
+                    }
+                }
             }
 
-            return json_encode($responseBody); // Fallback debug
+            $jsonEncoded = json_encode($responseBody);
+
+            return $jsonEncoded !== false ? $jsonEncoded : ''; // Fallback debug
 
         } catch (\Aws\Exception\AwsException $e) {
             Log::error('[Bedrock] AWS Error: '.$e->getMessage());
@@ -606,7 +665,8 @@ class AgentRoutingService
      * @param  array<string, mixed>  $request
      * @return array<string, mixed>
      */
-    protected function executeAgent(): array
+    protected function executeAgent(string $agentType, array $request): array
+    {
         return $this->mcpClient->executeAgent($agentType, $request);
     }
 
@@ -622,9 +682,10 @@ class AgentRoutingService
                 return (bool) Cache::get($cacheKey);
             }
 
-            $host = config('ai.ollama.host', 'http://localhost:11434');
+            $hostConfig = config('ai.ollama.host', 'http://localhost:11434');
+            $host = is_string($hostConfig) ? $hostConfig : 'http://localhost:11434';
             /** @var \Illuminate\Http\Client\Response $response */
-            $response = \Illuminate\Support\Facades\Http::timeout(2)->get("$host/api/tags");
+            $response = \Illuminate\Support\Facades\Http::timeout(2)->get("{$host}/api/tags");
 
             $available = $response->successful();
 
@@ -663,18 +724,21 @@ class AgentRoutingService
      */
     protected function calculateActualCost(array $route, array $request, mixed $response): float
     {
-        if ($route['provider'] === self::PROVIDER_OLLAMA) {
+        $provider = is_string($route['provider'] ?? null) ? $route['provider'] : '';
+        if ($provider === self::PROVIDER_OLLAMA) {
             return 0.0; // Free
         }
 
         // Estimate token usage
-        $inputTokens = $this->estimateTokenCount($request['prompt'] ?? '', $request['context'] ?? []);
+        $promptText = is_string($request['prompt'] ?? null) ? $request['prompt'] : '';
+        $contextData = is_array($request['context'] ?? null) ? $request['context'] : [];
+        $inputTokens = $this->estimateTokenCount($promptText, $contextData);
         $outputTokens = $this->estimateTokenCount(
             is_string($response) ? $response : (json_encode($response) ?: '')
         );
 
         // Calculate cost based on model
-        $costPer1K = $route['estimated_cost'];
+        $costPer1K = is_numeric($route['estimated_cost'] ?? null) ? (float) $route['estimated_cost'] : 0.0;
         $totalTokens = $inputTokens + $outputTokens;
 
         return ($totalTokens / 1000) * $costPer1K;
@@ -689,7 +753,8 @@ class AgentRoutingService
     {
         // Simple estimation: ~4 characters per token
         $textLength = strlen($text);
-        $contextLength = strlen(json_encode($context));
+        $jsonContext = json_encode($context);
+        $contextLength = $jsonContext !== false ? strlen($jsonContext) : 0;
 
         return (int) (($textLength + $contextLength) / 4);
     }
@@ -752,8 +817,8 @@ class AgentRoutingService
      */
     protected function generateRouteCacheKey(array $request): string
     {
-        $prompt = $request['prompt'] ?? '';
-        $agentType = $request['agent_type'] ?? '';
+        $prompt = is_string($request['prompt'] ?? null) ? $request['prompt'] : '';
+        $agentType = is_string($request['agent_type'] ?? null) ? $request['agent_type'] : '';
         $complexity = $this->detectComplexity($request);
 
         return 'route_'.md5($prompt.$agentType.$complexity);
@@ -821,6 +886,7 @@ class AgentRoutingService
      * }
      */
     public function getRoutingAnalytics(): array
+    {
         $providers = [self::PROVIDER_OLLAMA, self::PROVIDER_BEDROCK, self::PROVIDER_AGENT];
         /** @var array<int, array{provider: string, model: string, execution_time: float, success: bool, timestamp: string}> $allMetrics */
         $allMetrics = [];
@@ -851,7 +917,7 @@ class AgentRoutingService
         foreach ($providers as $provider) {
             $providerMetrics = array_filter(
                 $allMetrics,
-                fn ($m) => is_array($m) && ((is_array($m) && isset($m['provider']) ? $m['provider'] : null)) === $provider
+                fn ($m) => (is_array($m) && isset($m['provider']) ? $m['provider'] : null) === $provider
             );
             $count = count($providerMetrics);
 
@@ -863,7 +929,7 @@ class AgentRoutingService
 
                 $successCount = count(array_filter(
                     $providerMetrics,
-                    fn ($m) => is_array($m) && ($m['success'] ?? false)
+                    fn ($m): bool => is_array($m) && ($m['success'] ?? false) === true
                 ));
                 $successRate[$provider] = ($successCount / $count) * 100;
             }
@@ -881,7 +947,7 @@ class AgentRoutingService
     /**
      * Calculate fallback rate from metrics
      *
-     * @param  array<int, array{provider: string, model: string, execution_time: float, success: bool, timestamp: string}>  $metrics
+     * @param  array<int, mixed>  $metrics
      */
     protected function calculateFallbackRate(array $metrics): float
     {
@@ -891,11 +957,10 @@ class AgentRoutingService
 
         // Count metrics that indicate fallback usage
         // Fallback is indicated by failed primary attempts followed by successful secondary attempts
-        $fallbackCount = 0;
         $totalAttempts = count($metrics);
 
         // Simple heuristic: failed requests that were retried
-        $failedMetrics = array_filter($metrics, fn ($m) => ! ($m['success'] ?? true));
+        $failedMetrics = array_filter($metrics, fn ($m) => is_array($m) && ! ($m['success'] ?? true));
         $fallbackCount = count($failedMetrics);
 
         return $totalAttempts > 0 ? ($fallbackCount / $totalAttempts) * 100 : 0.0;

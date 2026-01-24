@@ -33,7 +33,8 @@ class DataIntegrationService
      * @param  array<string, mixed>  $extractedData
      * @return array{success: bool, character_id: int|null, updated_fields: array<string>, message: string}
      */
-    public function importCharacterStats(): array
+    public function importCharacterStats(int $characterId, array $extractedData): array
+    {
         try {
             DB::beginTransaction();
 
@@ -98,7 +99,8 @@ class DataIntegrationService
      * @param  array<string, mixed>  $extractedData
      * @return array{success: bool, training_session_id: int|null, message: string}
      */
-    public function importTrainingSession(): array
+    public function importTrainingSession(int $careerId, array $extractedData): array
+    {
         try {
             DB::beginTransaction();
 
@@ -108,7 +110,7 @@ class DataIntegrationService
             $transformedData = $this->transformer->transformTrainingSession($extractedData);
 
             // Prepare creation data
-            $createData = $this->transformer->prepareTrainingSessionCreate($careerId, $transformedData);
+            $createData = $this->transformer->prepareTrainingSessionCreate($transformedData, $careerId);
 
             // Set character_id from career
             $createData['character_id'] = $career->character_id;
@@ -152,7 +154,8 @@ class DataIntegrationService
      * @param  array<string, mixed>  $extractedData
      * @return array{success: bool, race_id: int|null, message: string}
      */
-    public function importRaceResult(): array
+    public function importRaceResult(int $careerId, array $extractedData): array
+    {
         try {
             DB::beginTransaction();
 
@@ -162,7 +165,7 @@ class DataIntegrationService
             $transformedData = $this->transformer->transformRaceResult($extractedData);
 
             // Prepare creation data
-            $createData = $this->transformer->prepareRaceCreate($careerId, $transformedData);
+            $createData = $this->transformer->prepareRaceCreate($transformedData, $careerId);
 
             // Set character_id from career
             $createData['character_id'] = $career->character_id;
@@ -171,10 +174,11 @@ class DataIntegrationService
             $race = Race::create($createData);
 
             // Update character stats if available
-            if (isset($extractedData['data']['fans_gained']) && $extractedData['data']['fans_gained'] > 0) {
-                $character = $career->character;
-                // Note: Assuming character has a fans_count field
-                // $character->increment('fans_count', $extractedData['data']['fans_gained']);
+            $dataArray = is_array($extractedData['data'] ?? null) ? $extractedData['data'] : [];
+            if (isset($dataArray['fans_gained']) && is_int($dataArray['fans_gained']) && $dataArray['fans_gained'] > 0) {
+                // Note: Career->character relationship should be defined
+                // $character = $career->character;
+                // $character->increment('fans_count', $dataArray['fans_gained']);
             }
 
             DB::commit();
@@ -214,7 +218,8 @@ class DataIntegrationService
      * @param  array<string, mixed>  $extractedData
      * @return array{success: bool, skills_processed: int, message: string}
      */
-    public function importSkillList(): array
+    public function importSkillList(int $characterId, array $extractedData): array
+    {
         try {
             DB::beginTransaction();
 
@@ -226,27 +231,39 @@ class DataIntegrationService
             $skillsProcessed = 0;
 
             // Process each skill
-            foreach ($transformedData['skills'] as $skillData) {
-                if (empty($skillData['name'])) {
+            $skills = is_array($transformedData['skills'] ?? null) ? $transformedData['skills'] : [];
+            /** @var array<string, mixed> $skillData */
+            foreach ($skills as $skillData) {
+                if (! is_array($skillData) || empty($skillData['name'])) {
+                    continue;
+                }
+
+                $skillName = is_string($skillData['name']) ? $skillData['name'] : '';
+                if ($skillName === '') {
                     continue;
                 }
 
                 // Find or create the global skill first
+                $skillType = is_string($skillData['skill_type'] ?? null) ? $skillData['skill_type'] : '';
                 $skill = Skill::firstOrCreate(
                     [
-                        'name' => $skillData['name'],
+                        'name' => $skillName,
                     ],
                     [
-                        'internal_id' => 'ocr_'.strtolower(str_replace(' ', '_', $skillData['name'])),
-                        'skill_type' => in_array($skillData['skill_type'] ?? '', ['speed', 'passive', 'recovery', 'debuff', 'unique'])
-                            ? $skillData['skill_type']
+                        'internal_id' => 'ocr_'.strtolower(str_replace(' ', '_', $skillName)),
+                        'skill_type' => in_array($skillType, ['speed', 'passive', 'recovery', 'debuff', 'unique'], true)
+                            ? $skillType
                             : 'passive',
                         'rarity' => 'normal',
-                        'base_sp_cost' => $skillData['sp_cost'] ?? 0,
+                        'base_sp_cost' => is_int($skillData['sp_cost'] ?? null) ? $skillData['sp_cost'] : 0,
                         'effects' => [],
                         'description' => 'Imported from OCR',
                     ]
                 );
+
+                $spCost = is_int($skillData['sp_cost'] ?? null) ? $skillData['sp_cost'] : 0;
+                $hintLevel = is_int($skillData['hint_level'] ?? null) ? $skillData['hint_level'] : 0;
+                $isAcquired = is_bool($skillData['is_acquired'] ?? null) ? $skillData['is_acquired'] : false;
 
                 // Find or create skill acquisition for this character
                 $acquisition = SkillAcquisition::firstOrCreate(
@@ -258,24 +275,24 @@ class DataIntegrationService
                         'turn_acquired' => 1, // Default value
                         'career_phase' => 'junior', // Default value
                         'acquisition_method' => 'ocr_import',
-                        'base_sp_cost' => $skillData['sp_cost'] ?? 0,
-                        'hints_used' => $skillData['hint_level'] ?? 0,
-                        'final_sp_cost' => $skillData['sp_cost'] ?? 0,
-                        'is_active' => $skillData['is_acquired'] ?? false,
+                        'base_sp_cost' => $spCost,
+                        'hints_used' => $hintLevel,
+                        'final_sp_cost' => $spCost,
+                        'is_active' => $isAcquired,
                     ]
                 );
 
                 // Update if already exists
                 if (! $acquisition->wasRecentlyCreated) {
                     $acquisition->fill([
-                        'base_sp_cost' => $skillData['sp_cost'] ?? $acquisition->base_sp_cost,
-                        'hints_used' => $skillData['hint_level'] ?? $acquisition->hints_used,
-                        'is_active' => $skillData['is_acquired'] ?? $acquisition->is_active,
+                        'base_sp_cost' => $spCost ?: $acquisition->base_sp_cost,
+                        'hints_used' => $hintLevel ?: $acquisition->hints_used,
+                        'is_active' => $isAcquired,
                     ]);
                     $acquisition->save();
                 }
 
-                $skillsProcessed = ($skillsProcessed ?? 0) + 1;
+                $skillsProcessed++;
             }
 
             DB::commit();
@@ -314,7 +331,8 @@ class DataIntegrationService
      * @param  array<int, array{screen_type: string, extracted_data: array<string, mixed>, target_id: int}>  $imports
      * @return array{success: bool, processed: int, failed: int, results: array<int, array<string, mixed>>}
      */
-    public function batchImport(): array
+    public function batchImport(array $imports): array
+    {
         $results = [];
         $processed = 0;
         $failed = 0;
@@ -334,9 +352,9 @@ class DataIntegrationService
             $results[$index] = $result;
 
             if ($result['success']) {
-                $processed = ($processed ?? 0) + 1;
+                $processed++;
             } else {
-                $failed = ($failed ?? 0) + 1;
+                $failed++;
             }
         }
 

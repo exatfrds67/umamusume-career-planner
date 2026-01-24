@@ -30,7 +30,7 @@ class SkillController extends Controller
         if ($request->has('search')) {
             $searchTerm = $request->input('search');
             if (is_string($searchTerm)) {
-                $query->where('name', 'like', '%'.(is_string($searchTerm) ? $searchTerm : '').'%');
+                $query->where('name', 'like', '%'.$searchTerm.'%');
             }
         }
 
@@ -75,14 +75,7 @@ class SkillController extends Controller
     public function show(int $id): JsonResponse
     {
         $skill = Skill::find($id);
-        if ($skill instanceof \Illuminate\Database\Eloquent\Collection) {
-            $skill = $skill->first();
-        }
-        if (! $skill instanceof \App\Models\Skill) {
-            return response()->json(['error' => 'Skill not found'], 404);
-        }
-
-        if (! $skill) {
+        if (! $skill instanceof Skill) {
             return response()->json([
                 'message' => 'Skill not found',
             ], 404);
@@ -108,14 +101,7 @@ class SkillController extends Controller
     public function hints(int $id): JsonResponse
     {
         $skill = Skill::find($id);
-        if ($skill instanceof \Illuminate\Database\Eloquent\Collection) {
-            $skill = $skill->first();
-        }
-        if (! $skill instanceof \App\Models\Skill) {
-            return response()->json(['error' => 'Skill not found'], 404);
-        }
-
-        if (! $skill) {
+        if (! $skill instanceof Skill) {
             return response()->json([
                 'message' => 'Skill not found',
             ], 404);
@@ -167,11 +153,7 @@ class SkillController extends Controller
 
         return response()->json([
             'data' => [
-                'recommended_skills' => $recommendations->map(function ($skill) {
-                    if (! ($skill instanceof Skill)) {
-                        return null;
-                    }
-
+                'recommended_skills' => $recommendations->map(function (Skill $skill): array {
                     return [
                         'id' => $skill->id,
                         'name' => $skill->name,
@@ -179,7 +161,7 @@ class SkillController extends Controller
                         'base_sp_cost' => $skill->base_sp_cost,
                         'meta_tier' => $skill->meta_tier,
                     ];
-                })->filter(),
+                }),
                 'reasoning' => 'Recommended based on meta tier S skills not yet acquired',
             ],
         ]);

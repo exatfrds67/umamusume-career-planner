@@ -10,10 +10,11 @@ class TrainingPredictionService
      * Calculate projected stats gain for a specific training type.
      * Based on URA Finale scenario baseline (approximate).
      *
+     * @param  Character  $character  The character to calculate gains for
      * @param  string  $trainingType  'speed', 'stamina', 'power', 'guts', 'wit'
-     * @return array ['stats' => ['speed' => int, ...], 'energy' => int]
+     * @return array{stats: array<string, int>, energy: int}
      */
-    public function calculateGain(): array
+    public function calculateGain(Character $character, string $trainingType): array
     {
         // Base gains for Facility Level 1
         // Facility levels would multiply gains by (1 + level * 0.1) if implemented
@@ -62,12 +63,20 @@ class TrainingPredictionService
         }
 
         // Apply Growth Rates (e.g. +20% Speed)
-        $growthRates = json_decode($character->growth_rates ?? '[]', true) ?: [];
+        $rawGrowthRates = $character->growth_rates;
+        /** @var array<string, int|float> $growthRates */
+        $growthRates = [];
+        if (is_string($rawGrowthRates)) {
+            $decoded = json_decode($rawGrowthRates, true);
+            $growthRates = is_array($decoded) ? $decoded : [];
+        } elseif (is_array($rawGrowthRates)) {
+            $growthRates = $rawGrowthRates;
+        }
         foreach ($gains as $stat => $value) {
             if ($value > 0 && isset($growthRates[$stat])) {
-                $bonus = $growthRates[$stat]; // e.g., 20 for 20%
+                $bonus = is_numeric($growthRates[$stat]) ? (float) $growthRates[$stat] : 0;
                 $multiplier = 1 + ($bonus / 100);
-                $gains[$stat] = floor($value * $multiplier);
+                $gains[$stat] = (int) floor($value * $multiplier);
             }
         }
 
@@ -85,7 +94,7 @@ class TrainingPredictionService
 
         foreach ($gains as $stat => $value) {
             if ($value > 0) {
-                $gains[$stat] = floor($value * $multiplier);
+                $gains[$stat] = (int) floor($value * $multiplier);
             }
         }
 
@@ -131,9 +140,12 @@ class TrainingPredictionService
     /**
      * Execute the training logic.
      *
-     * @return array Result data
+     * @param  Character  $character  The character to train
+     * @param  string  $trainingType  The type of training to execute
+     * @return array<string, mixed> Result data
      */
-    public function executeTraining(): array
+    public function executeTraining(Character $character, string $trainingType): array
+    {
         $prediction = $this->calculateGain($character, $trainingType);
         $failureRate = $this->calculateFailureRate($character, $trainingType);
 

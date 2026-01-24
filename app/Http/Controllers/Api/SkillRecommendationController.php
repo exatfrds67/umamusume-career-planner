@@ -74,7 +74,7 @@ class SkillRecommendationController extends Controller
             $recommendations = $this->skillRecommendationService->getRecommendations(
                 $characterId,
                 $skillContext,
-                $user?->id ?? throw new \Exception('User required')
+                $user->id ?? throw new \Exception('User required')
             );
 
             // Parse response for API format
@@ -168,7 +168,7 @@ class SkillRecommendationController extends Controller
         return response()->stream(function () use ($characterId, $skillContext, $user) {
             try {
                 // Stream recommendations from service
-                foreach ($this->skillRecommendationService->getRecommendationsStreaming($characterId, $skillContext, $user?->id ?? throw new \Exception('User required')) as $chunk) {
+                foreach ($this->skillRecommendationService->getRecommendationsStreaming($characterId, $skillContext, $user->id ?? throw new \Exception('User required')) as $chunk) {
                     echo 'data: '.json_encode([
                         'chunk' => $chunk,
                     ])."\n\n";
@@ -183,7 +183,7 @@ class SkillRecommendationController extends Controller
             } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
                 Log::warning('Streaming skill recommendation request for non-existent character', [
                     'character_id' => $characterId,
-                    'user_id' => $user?->id ?? throw new \Exception('User required'),
+                    'user_id' => $user->id ?? throw new \Exception('User required'),
                 ]);
 
                 echo 'data: '.json_encode([
@@ -194,7 +194,7 @@ class SkillRecommendationController extends Controller
                 // Log error with context
                 Log::error('Streaming skill recommendation generation failed', [
                     'character_id' => $characterId,
-                    'user_id' => $user?->id ?? throw new \Exception('User required'),
+                    'user_id' => $user->id ?? throw new \Exception('User required'),
                     'error' => $e->getMessage(),
                     'trace' => $e->getTraceAsString(),
                 ]);

@@ -101,14 +101,14 @@ class AgentMemoryService
             $memoryKey = $this->buildMemoryKey($agentId, $memoryType, $key);
             $memory = Cache::get($memoryKey);
 
-            if ($memory) {
+            if (is_array($memory)) {
                 Log::debug('[AgentMemory] Memory retrieved', [
                     'agent_id' => $agentId,
                     'type' => $memoryType,
                     'key' => $key,
                 ]);
 
-                return $memory['value'];
+                return $memory['value'] ?? null;
             }
 
             return null;
@@ -126,8 +126,11 @@ class AgentMemoryService
 
     /**
      * Get all memories for an agent
+     *
+     * @return array<int, array<string, mixed>>
      */
-    public function getAgentMemories(): array
+    public function getAgentMemories(string $agentId, ?string $memoryType = null): array
+    {
         try {
             $index = $this->getMemoryIndex($agentId);
             $memories = [];
@@ -163,6 +166,8 @@ class AgentMemoryService
 
     /**
      * Store episodic memory (specific interaction/event)
+     *
+     * @param  array<string, mixed>  $episodeData
      */
     public function storeEpisode(
         string $agentId,
@@ -185,14 +190,19 @@ class AgentMemoryService
 
     /**
      * Retrieve episodic memories
+     *
+     * @return array<int, array<string, mixed>>
      */
-    public function getEpisodes(): array
+    public function getEpisodes(string $agentId, ?int $limit = null): array
+    {
         $memories = $this->getAgentMemories($agentId, self::MEMORY_EPISODIC);
 
         // Sort by timestamp (most recent first)
-        usort($memories, function ($a, $b) {
-            $timeA = $a['value']['timestamp'] ?? '';
-            $timeB = $b['value']['timestamp'] ?? '';
+        usort($memories, function (array $a, array $b): int {
+            $valueA = is_array($a['value'] ?? null) ? $a['value'] : [];
+            $valueB = is_array($b['value'] ?? null) ? $b['value'] : [];
+            $timeA = is_string($valueA['timestamp'] ?? null) ? $valueA['timestamp'] : '';
+            $timeB = is_string($valueB['timestamp'] ?? null) ? $valueB['timestamp'] : '';
 
             return strcmp($timeB, $timeA);
         });
@@ -236,6 +246,8 @@ class AgentMemoryService
 
     /**
      * Store conversation context
+     *
+     * @param  array<string, mixed>  $context
      */
     public function storeConversationContext(
         string $agentId,
@@ -252,6 +264,8 @@ class AgentMemoryService
 
     /**
      * Retrieve conversation context
+     *
+     * @return array<string, mixed>|null
      */
     public function getConversationContext(
         string $agentId,
@@ -263,11 +277,18 @@ class AgentMemoryService
             "conversation:{$conversationId}"
         );
 
-        return is_array($context) ? $context : null;
+        if (is_array($context)) {
+            /** @var array<string, mixed> $context */
+            return $context;
+        }
+
+        return null;
     }
 
     /**
      * Store agent learning/insights
+     *
+     * @param  array<string, mixed>  $learningData
      */
     public function storeLearning(
         string $agentId,
@@ -284,12 +305,21 @@ class AgentMemoryService
 
     /**
      * Retrieve agent learnings
+     *
+     * @return array<int, array<string, mixed>>
      */
-    public function getLearnings(): array
+    public function getLearnings(?string $agentId = null): array
+    {
+        if ($agentId === null) {
+            return [];
+        }
+
         $memories = $this->getAgentMemories($agentId, self::MEMORY_LONG_TERM);
 
-        return array_filter($memories, function ($memory) {
-            return str_starts_with($memory['key'], 'learning:');
+        return array_filter($memories, function (array $memory): bool {
+            $key = isset($memory['key']) && is_string($memory['key']) ? $memory['key'] : '';
+
+            return str_starts_with($key, 'learning:');
         });
     }
 
@@ -371,8 +401,11 @@ class AgentMemoryService
 
     /**
      * Get memory statistics for an agent
+     *
+     * @return array<string, mixed>
      */
-    public function getMemoryStatistics(): array
+    public function getMemoryStatistics(string $agentId): array
+    {
         $index = $this->getMemoryIndex($agentId);
         $stats = [
             'agent_id' => $agentId,
@@ -391,8 +424,11 @@ class AgentMemoryService
 
     /**
      * Consolidate short-term memories to long-term
+     *
+     * @return array<string, mixed>
      */
-    public function consolidateMemories(): array
+    public function consolidateMemories(string $agentId): array
+    {
         try {
             $shortTermMemories = $this->getAgentMemories($agentId, self::MEMORY_SHORT_TERM);
             $consolidated = [];
@@ -400,19 +436,20 @@ class AgentMemoryService
             foreach ($shortTermMemories as $memory) {
                 // Determine if memory should be consolidated
                 if ($this->shouldConsolidate($memory)) {
-                    $longTermKey = "consolidated:{$memory['key']}";
+                    $memoryKey = isset($memory['key']) && is_string($memory['key']) ? $memory['key'] : '';
+                    $longTermKey = "consolidated:{$memoryKey}";
 
                     $this->storeMemory(
                         $agentId,
                         self::MEMORY_LONG_TERM,
                         $longTermKey,
-                        $memory['value']
+                        $memory['value'] ?? null
                     );
 
                     $consolidated[] = $longTermKey;
 
                     // Optionally clear short-term memory
-                    $this->clearMemory($agentId, self::MEMORY_SHORT_TERM, $memory['key']);
+                    $this->clearMemory($agentId, self::MEMORY_SHORT_TERM, $memoryKey);
                 }
             }
 
@@ -455,8 +492,19 @@ class AgentMemoryService
         };
     }
 
-    protected function getMemoryIndex(): array
-        return Cache::get("agent_memory_index:{$agentId}", []);
+    /**
+     * @return array<string, array<int, string>>
+     */
+    protected function getMemoryIndex(string $agentId): array
+    {
+        $result = Cache::get("agent_memory_index:{$agentId}");
+
+        if (is_array($result)) {
+            /** @var array<string, array<int, string>> $result */
+            return $result;
+        }
+
+        return [];
     }
 
     protected function updateMemoryIndex(string $agentId, string $memoryType, string $key): void
@@ -492,12 +540,17 @@ class AgentMemoryService
         }
     }
 
+    /**
+     * @param  array<string, mixed>  $memory
+     */
     protected function shouldConsolidate(array $memory): bool
     {
         // Consolidate if memory is important or frequently accessed
         // This is a simple heuristic - can be enhanced with ML
-        return str_contains($memory['key'], 'important')
-            || str_contains($memory['key'], 'learning')
-            || str_contains($memory['key'], 'insight');
+        $key = isset($memory['key']) && is_string($memory['key']) ? $memory['key'] : '';
+
+        return str_contains($key, 'important')
+            || str_contains($key, 'learning')
+            || str_contains($key, 'insight');
     }
 }

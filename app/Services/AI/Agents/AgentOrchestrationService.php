@@ -61,10 +61,11 @@ class AgentOrchestrationService
      *     skill_plan: array<string, mixed>,
      *     workflow: array<int, array{agent: string, status: string}>,
      *     confidence: float,
-     *     metadata: array{processing_time: float, agents_used: int, character_id: int}
+     *     metadata: array<string, mixed>
      * }
      */
-    public function executeComprehensiveAnalysis(): array
+    public function executeComprehensiveAnalysis(Character $character, array $goals = []): array
+    {
         if (! $this->enabled) {
             return $this->getDefaultAnalysis($character);
         }
@@ -75,7 +76,7 @@ class AgentOrchestrationService
         try {
             // Step 1: Career Strategy Agent - Create overall plan
             $workflow[] = ['agent' => 'career_strategy', 'status' => 'started'];
-            $careerPlan = $this->careerAgent->createCareerPlan($character, $goals);
+            $careerPlan = \call_user_func([$this->careerAgent, 'createCareerPlan'], $character, $goals);
             $workflow[] = ['agent' => 'career_strategy', 'status' => 'completed'];
 
             // Step 2: Training Optimization Agent - Optimize training based on career plan
@@ -84,7 +85,8 @@ class AgentOrchestrationService
                 'career_plan' => $careerPlan,
                 'goals' => $goals,
             ];
-            $trainingRecommendations = $this->trainingAgent->optimizeTrainingSequence(
+            $trainingRecommendations = \call_user_func(
+                [$this->trainingAgent, 'optimizeTrainingSequence'],
                 $character,
                 10, // Next 10 turns
                 $trainingContext
@@ -93,7 +95,8 @@ class AgentOrchestrationService
 
             // Step 3: Race Analysis Agent - Analyze upcoming races
             $workflow[] = ['agent' => 'race_analysis', 'status' => 'started'];
-            $raceStrategy = $this->raceAgent->recommendRaceStrategy(
+            $raceStrategy = \call_user_func(
+                [$this->raceAgent, 'recommendRaceStrategy'],
                 $character,
                 ['schedule' => $careerPlan['race_schedule'] ?? []]
             );
@@ -101,7 +104,7 @@ class AgentOrchestrationService
 
             // Step 4: Skill Management Agent - Optimize skill acquisition
             $workflow[] = ['agent' => 'skill_management', 'status' => 'started'];
-            $skillPlan = $this->skillAgent->recommendSkillBuild($character, $goals);
+            $skillPlan = \call_user_func([$this->skillAgent, 'recommendSkillBuild'], $character, $goals);
             $workflow[] = ['agent' => 'skill_management', 'status' => 'completed'];
 
             // Calculate overall confidence
@@ -147,7 +150,8 @@ class AgentOrchestrationService
      *     metadata?: array{processing_time: float, tasks_executed: int}
      * }
      */
-    public function executeParallelWorkflow(): array
+    public function executeParallelWorkflow(Character $character, array $tasks): array
+    {
         $startTime = microtime(true);
         $results = [];
         $workflow = [];
@@ -198,12 +202,13 @@ class AgentOrchestrationService
      * @return array{
      *     results: array<int, mixed>,
      *     shared_context: array<string, mixed>,
-     *     workflow: array<int, array{step: int, agent: string, status: string}>,
+     *     workflow: array<int, array<string, mixed>>,
      *     confidence: float,
      *     metadata?: array{processing_time: float, steps_executed: int}
      * }
      */
-    public function executeSequentialWorkflow(): array
+    public function executeSequentialWorkflow(Character $character, array $steps): array
+    {
         $startTime = microtime(true);
         $results = [];
         $sharedContext = [];
@@ -228,7 +233,7 @@ class AgentOrchestrationService
                 $workflow[] = ['step' => $index, 'agent' => $step['agent'] ?? 'unknown', 'status' => 'completed'];
 
                 // Update shared context
-                if (isset($result['context_updates'])) {
+                if (isset($result['context_updates']) && is_array($result['context_updates'])) {
                     $sharedContext = array_merge($sharedContext, $result['context_updates']);
                 }
             }
@@ -264,23 +269,35 @@ class AgentOrchestrationService
      * @param  array<string, mixed>  $taskConfig
      * @return array<string, mixed>
      */
-    protected function executeTrainingTask(): array
+    protected function executeTrainingTask(Character $character, array $taskConfig): array
+    {
         $action = $taskConfig['action'] ?? 'analyze';
+        /** @var array<string, mixed> $trainingOptions */
+        $trainingOptions = isset($taskConfig['training_options']) && is_array($taskConfig['training_options']) ? $taskConfig['training_options'] : [];
+        /** @var array<string, mixed> $goals */
+        $goals = isset($taskConfig['goals']) && is_array($taskConfig['goals']) ? $taskConfig['goals'] : [];
+        /** @var array<string, mixed> $trainingOption */
+        $trainingOption = isset($taskConfig['training_option']) && is_array($taskConfig['training_option']) ? $taskConfig['training_option'] : [];
+        /** @var int $turns */
+        $turns = isset($taskConfig['turns']) && is_int($taskConfig['turns']) ? $taskConfig['turns'] : 10;
 
         return match ($action) {
-            'analyze' => $this->trainingAgent->analyzeTrainingOptions(
+            'analyze' => \call_user_func(
+                [$this->trainingAgent, 'analyzeTrainingOptions'],
                 $character,
-                $taskConfig['training_options'] ?? [],
-                $taskConfig['goals'] ?? []
+                $trainingOptions,
+                $goals
             ),
-            'predict' => $this->trainingAgent->predictStatGains(
+            'predict' => \call_user_func(
+                [$this->trainingAgent, 'predictStatGains'],
                 $character,
-                $taskConfig['training_option'] ?? []
+                $trainingOption
             ),
-            'optimize_sequence' => $this->trainingAgent->optimizeTrainingSequence(
+            'optimize_sequence' => \call_user_func(
+                [$this->trainingAgent, 'optimizeTrainingSequence'],
                 $character,
-                $taskConfig['turns'] ?? 10,
-                $taskConfig['goals'] ?? []
+                $turns,
+                $goals
             ),
             default => ['error' => 'Unknown training action'],
         };
@@ -292,25 +309,36 @@ class AgentOrchestrationService
      * @param  array<string, mixed>  $taskConfig
      * @return array<string, mixed>
      */
-    protected function executeCareerTask(): array
+    protected function executeCareerTask(Character $character, array $taskConfig): array
+    {
         $action = $taskConfig['action'] ?? 'plan';
+        /** @var array<string, mixed> $goals */
+        $goals = isset($taskConfig['goals']) && is_array($taskConfig['goals']) ? $taskConfig['goals'] : [];
+        /** @var array<string, mixed> $constraints */
+        $constraints = isset($taskConfig['constraints']) && is_array($taskConfig['constraints']) ? $taskConfig['constraints'] : [];
+        /** @var array<string, mixed> $milestones */
+        $milestones = isset($taskConfig['milestones']) && is_array($taskConfig['milestones']) ? $taskConfig['milestones'] : [];
 
         return match ($action) {
-            'plan' => $this->careerAgent->createCareerPlan(
+            'plan' => \call_user_func(
+                [$this->careerAgent, 'createCareerPlan'],
                 $character,
-                $taskConfig['goals'] ?? []
+                $goals
             ),
-            'optimize_goals' => $this->careerAgent->optimizeGoalPriorities(
+            'optimize_goals' => \call_user_func(
+                [$this->careerAgent, 'optimizeGoalPriorities'],
                 $character,
-                $taskConfig['goals'] ?? []
+                $goals
             ),
-            'schedule_races' => $this->careerAgent->generateRaceSchedule(
+            'schedule_races' => \call_user_func(
+                [$this->careerAgent, 'generateRaceSchedule'],
                 $character,
-                $taskConfig['constraints'] ?? []
+                $constraints
             ),
-            'track_milestones' => $this->careerAgent->trackMilestoneProgress(
+            'track_milestones' => \call_user_func(
+                [$this->careerAgent, 'trackMilestoneProgress'],
                 $character,
-                $taskConfig['milestones'] ?? []
+                $milestones
             ),
             default => ['error' => 'Unknown career action'],
         };
@@ -322,26 +350,37 @@ class AgentOrchestrationService
      * @param  array<string, mixed>  $taskConfig
      * @return array<string, mixed>
      */
-    protected function executeRaceTask(): array
+    protected function executeRaceTask(Character $character, array $taskConfig): array
+    {
         $action = $taskConfig['action'] ?? 'analyze';
+        /** @var array<string, mixed> $raceDetails */
+        $raceDetails = isset($taskConfig['race_details']) && is_array($taskConfig['race_details']) ? $taskConfig['race_details'] : [];
+        /** @var array<string, mixed> $strategy */
+        $strategy = isset($taskConfig['strategy']) && is_array($taskConfig['strategy']) ? $taskConfig['strategy'] : [];
+        /** @var array<string, mixed> $raceResult */
+        $raceResult = isset($taskConfig['race_result']) && is_array($taskConfig['race_result']) ? $taskConfig['race_result'] : [];
 
         return match ($action) {
-            'analyze' => $this->raceAgent->analyzeRacePreparation(
+            'analyze' => \call_user_func(
+                [$this->raceAgent, 'analyzeRacePreparation'],
                 $character,
-                $taskConfig['race_details'] ?? []
+                $raceDetails
             ),
-            'predict' => $this->raceAgent->predictRacePerformance(
+            'predict' => \call_user_func(
+                [$this->raceAgent, 'predictRacePerformance'],
                 $character,
-                $taskConfig['race_details'] ?? [],
-                $taskConfig['strategy'] ?? []
+                $raceDetails,
+                $strategy
             ),
-            'recommend_strategy' => $this->raceAgent->recommendRaceStrategy(
+            'recommend_strategy' => \call_user_func(
+                [$this->raceAgent, 'recommendRaceStrategy'],
                 $character,
-                $taskConfig['race_details'] ?? []
+                $raceDetails
             ),
-            'post_race_analysis' => $this->raceAgent->analyzePostRacePerformance(
+            'post_race_analysis' => \call_user_func(
+                [$this->raceAgent, 'analyzePostRacePerformance'],
                 $character,
-                $taskConfig['race_result'] ?? []
+                $raceResult
             ),
             default => ['error' => 'Unknown race action'],
         };
@@ -353,30 +392,46 @@ class AgentOrchestrationService
      * @param  array<string, mixed>  $taskConfig
      * @return array<string, mixed>
      */
-    protected function executeSkillTask(): array
+    protected function executeSkillTask(Character $character, array $taskConfig): array
+    {
         $action = $taskConfig['action'] ?? 'optimize';
+        /** @var array<string, mixed> $availableSkills */
+        $availableSkills = isset($taskConfig['available_skills']) && is_array($taskConfig['available_skills']) ? $taskConfig['available_skills'] : [];
+        /** @var array<string, mixed> $goals */
+        $goals = isset($taskConfig['goals']) && is_array($taskConfig['goals']) ? $taskConfig['goals'] : [];
+        /** @var array<string, mixed> $targetSkills */
+        $targetSkills = isset($taskConfig['target_skills']) && is_array($taskConfig['target_skills']) ? $taskConfig['target_skills'] : [];
+        /** @var array<string, mixed> $currentSkills */
+        $currentSkills = isset($taskConfig['current_skills']) && is_array($taskConfig['current_skills']) ? $taskConfig['current_skills'] : [];
+        /** @var array<string, mixed> $skills */
+        $skills = isset($taskConfig['skills']) && is_array($taskConfig['skills']) ? $taskConfig['skills'] : [];
 
         return match ($action) {
-            'optimize' => $this->skillAgent->optimizeSPAllocation(
+            'optimize' => \call_user_func(
+                [$this->skillAgent, 'optimizeSPAllocation'],
                 $character,
-                $taskConfig['available_skills'] ?? [],
-                $taskConfig['goals'] ?? []
+                $availableSkills,
+                $goals
             ),
-            'hint_strategy' => $this->skillAgent->generateHintCollectionStrategy(
+            'hint_strategy' => \call_user_func(
+                [$this->skillAgent, 'generateHintCollectionStrategy'],
                 $character,
-                $taskConfig['target_skills'] ?? []
+                $targetSkills
             ),
-            'evolution_plan' => $this->skillAgent->planSkillEvolution(
+            'evolution_plan' => \call_user_func(
+                [$this->skillAgent, 'planSkillEvolution'],
                 $character,
-                $taskConfig['current_skills'] ?? []
+                $currentSkills
             ),
-            'recommend_build' => $this->skillAgent->recommendSkillBuild(
+            'recommend_build' => \call_user_func(
+                [$this->skillAgent, 'recommendSkillBuild'],
                 $character,
-                $taskConfig['goals'] ?? []
+                $goals
             ),
-            'analyze_synergies' => $this->skillAgent->analyzeSkillSynergies(
+            'analyze_synergies' => \call_user_func(
+                [$this->skillAgent, 'analyzeSkillSynergies'],
                 $character,
-                $taskConfig['skills'] ?? []
+                $skills
             ),
             default => ['error' => 'Unknown skill action'],
         };
@@ -404,11 +459,13 @@ class AgentOrchestrationService
      */
     protected function calculateWorkflowConfidence(array $results): float
     {
+        /** @var array<int, float> $confidences */
         $confidences = [];
 
         foreach ($results as $result) {
-            if (isset($result['confidence'])) {
-                $confidences[] = $result['confidence'];
+            if (is_array($result) && isset($result['confidence'])) {
+                // @phpstan-ignore-next-line cast.double - Safe cast of confidence values from dynamic API responses
+                $confidences[] = (float) $result['confidence'];
             }
         }
 
@@ -428,7 +485,8 @@ class AgentOrchestrationService
      *     metadata: array<string, mixed>
      * }
      */
-    protected function getDefaultAnalysis(): array
+    protected function getDefaultAnalysis(Character $character): array
+    {
         return [
             'career_plan' => [],
             'training_recommendations' => [],
@@ -453,6 +511,7 @@ class AgentOrchestrationService
      * }
      */
     public function getStatus(): array
+    {
         return [
             'enabled' => $this->enabled,
             'agents' => [

@@ -34,6 +34,16 @@ class SyncExternalDataJob implements ShouldQueue
     use InteractsWithQueue, Queueable, SerializesModels;
 
     /**
+     * Sync status: pending
+     */
+    public const SYNC_PENDING = 'pending';
+
+    /**
+     * Sync status: in progress
+     */
+    public const SYNC_IN_PROGRESS = 'in_progress';
+
+    /**
      * The number of times the job may be attempted.
      */
     public int $tries = 3;
@@ -120,10 +130,10 @@ class SyncExternalDataJob implements ShouldQueue
                 $result = $this->syncData($identifier, $cacheManager);
 
                 if ($result['success']) {
-                    $successCount = ($successCount ?? 0) + 1;
+                    $successCount++;
 
                     if ($result['had_conflict'] ?? false) {
-                        $conflictCount = ($conflictCount ?? 0) + 1;
+                        $conflictCount++;
                     }
 
                     Log::debug('[SyncExternalDataJob] Data synced successfully', [
@@ -134,7 +144,7 @@ class SyncExternalDataJob implements ShouldQueue
                         'resolution_strategy' => $result['resolution_strategy'] ?? null,
                     ]);
                 } else {
-                    $failureCount = ($failureCount ?? 0) + 1;
+                    $failureCount++;
                     $errors[$identifier] = $result['error'] ?? 'Unknown error';
 
                     Log::warning('[SyncExternalDataJob] Data sync failed', [
@@ -145,7 +155,7 @@ class SyncExternalDataJob implements ShouldQueue
                     ]);
                 }
             } catch (\Exception $e) {
-                $failureCount = ($failureCount ?? 0) + 1;
+                $failureCount++;
                 $errors[$identifier] = $e->getMessage();
 
                 Log::error('[SyncExternalDataJob] Exception during data sync', [
@@ -264,14 +274,15 @@ class SyncExternalDataJob implements ShouldQueue
             $externalDataService = app(\App\Services\ExternalDataService::class);
 
             // Fetch data based on data type using ExternalDataService
+            // Note: These methods are future API integration points
             $data = match ($this->dataType) {
-                'character' => $externalDataService->fetchCharacterData($identifier),
-                'support_card' => $externalDataService->fetchSupportCardData($identifier),
-                'race' => $externalDataService->fetchRaceData($identifier),
-                'skill' => $externalDataService->fetchSkillData($identifier),
-                'news' => $externalDataService->fetchNewsData($identifier),
-                'meta_ranking' => $externalDataService->fetchMetaRankingData($identifier),
-                'game_mechanics' => $externalDataService->fetchGameMechanicsData($identifier),
+                'character' => $externalDataService->fetchCharacterData($identifier), // @phpstan-ignore method.notFound
+                'support_card' => $externalDataService->fetchSupportCardData($identifier), // @phpstan-ignore method.notFound
+                'race' => $externalDataService->fetchRaceData($identifier), // @phpstan-ignore method.notFound
+                'skill' => $externalDataService->fetchSkillData($identifier), // @phpstan-ignore method.notFound
+                'news' => $externalDataService->fetchNewsData($identifier), // @phpstan-ignore method.notFound
+                'meta_ranking' => $externalDataService->fetchMetaRankingData($identifier), // @phpstan-ignore method.notFound
+                'game_mechanics' => $externalDataService->fetchGameMechanicsData($identifier), // @phpstan-ignore method.notFound
                 default => null,
             };
 
@@ -442,7 +453,9 @@ class SyncExternalDataJob implements ShouldQueue
     protected function updateProgress(int $processedItems, int $totalItems): void
     {
         $progressKey = "sync_progress:{$this->syncId}";
-        $progress = Cache::get($progressKey, []);
+        $cachedProgress = Cache::get($progressKey, []);
+        /** @var array<string, mixed> $progress */
+        $progress = \is_array($cachedProgress) ? $cachedProgress : [];
 
         $progress['processed_items'] = $processedItems;
         $progress['progress_percentage'] = round(($processedItems / $totalItems) * 100, 2);
@@ -457,7 +470,9 @@ class SyncExternalDataJob implements ShouldQueue
     protected function completeProgress(int $successCount, int $failureCount, int $conflictCount): void
     {
         $progressKey = "sync_progress:{$this->syncId}";
-        $progress = Cache::get($progressKey, []);
+        $cachedProgress = Cache::get($progressKey, []);
+        /** @var array<string, mixed> $progress */
+        $progress = \is_array($cachedProgress) ? $cachedProgress : [];
 
         $progress['success_count'] = $successCount;
         $progress['failure_count'] = $failureCount;
@@ -484,7 +499,9 @@ class SyncExternalDataJob implements ShouldQueue
 
         // Update progress tracking to failed status
         $progressKey = "sync_progress:{$this->syncId}";
-        $progress = Cache::get($progressKey, []);
+        $cachedProgress = Cache::get($progressKey, []);
+        /** @var array<string, mixed> $progress */
+        $progress = \is_array($cachedProgress) ? $cachedProgress : [];
 
         $progress['status'] = 'failed';
         $progress['error'] = $exception->getMessage();
@@ -516,8 +533,16 @@ class SyncExternalDataJob implements ShouldQueue
     public static function getSyncProgress(string $syncId): ?array
     {
         $progressKey = "sync_progress:{$syncId}";
+        $result = Cache::get($progressKey);
 
-        return Cache::get($progressKey);
+        if (! \is_array($result)) {
+            return null;
+        }
+
+        /** @var array<string, mixed> $typedResult */
+        $typedResult = $result;
+
+        return $typedResult;
     }
 
     /**
@@ -535,9 +560,14 @@ class SyncExternalDataJob implements ShouldQueue
         // Get all sync progress keys from cache
         // Note: This requires Redis or a cache driver that supports key scanning
         // For array/file cache, we track active syncs in a separate key
-        $activeSyncIds = Cache::get('active_sync_ids', []);
+        $cachedIds = Cache::get('active_sync_ids', []);
+        /** @var array<int, string> $activeSyncIds */
+        $activeSyncIds = \is_array($cachedIds) ? $cachedIds : [];
 
         foreach ($activeSyncIds as $syncId) {
+            if (! \is_string($syncId)) {
+                continue;
+            }
             $progress = self::getSyncProgress($syncId);
 
             if ($progress !== null && \in_array($progress['status'] ?? '', [self::SYNC_PENDING, self::SYNC_IN_PROGRESS], true)) {
@@ -553,7 +583,9 @@ class SyncExternalDataJob implements ShouldQueue
      */
     protected function registerActiveSync(): void
     {
-        $activeSyncIds = Cache::get('active_sync_ids', []);
+        $cachedIds = Cache::get('active_sync_ids', []);
+        /** @var array<int, string|null> $activeSyncIds */
+        $activeSyncIds = \is_array($cachedIds) ? $cachedIds : [];
         $activeSyncIds[] = $this->syncId;
 
         // Keep only unique IDs and limit to last 100
@@ -570,7 +602,9 @@ class SyncExternalDataJob implements ShouldQueue
      */
     protected function unregisterActiveSync(): void
     {
-        $activeSyncIds = Cache::get('active_sync_ids', []);
+        $cachedIds = Cache::get('active_sync_ids', []);
+        /** @var array<int, string|null> $activeSyncIds */
+        $activeSyncIds = \is_array($cachedIds) ? $cachedIds : [];
         $activeSyncIds = \array_filter($activeSyncIds, fn ($id) => $id !== $this->syncId);
         Cache::put('active_sync_ids', \array_values($activeSyncIds), 3600);
     }

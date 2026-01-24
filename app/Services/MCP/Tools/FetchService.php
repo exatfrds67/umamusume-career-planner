@@ -36,10 +36,14 @@ class FetchService
     {
         $this->mcpClient = $mcpClient;
         $this->enabled = (bool) Config::get('mcp.tools.fetch.enabled', true);
-        $this->cacheTTL = (int) Config::get('mcp.tools.fetch.cache_ttl', 3600);
-        $this->timeout = (int) Config::get('mcp.tools.fetch.timeout', 30);
-        $this->maxRetries = (int) Config::get('mcp.tools.fetch.max_retries', 3);
-        $this->retryDelay = (int) Config::get('mcp.tools.fetch.retry_delay', 1000);
+        $configTTL = Config::get('mcp.tools.fetch.cache_ttl', 3600);
+        $this->cacheTTL = is_numeric($configTTL) ? (int) $configTTL : 3600;
+        $configTimeout = Config::get('mcp.tools.fetch.timeout', 30);
+        $this->timeout = is_numeric($configTimeout) ? (int) $configTimeout : 30;
+        $configMaxRetries = Config::get('mcp.tools.fetch.max_retries', 3);
+        $this->maxRetries = is_numeric($configMaxRetries) ? (int) $configMaxRetries : 3;
+        $configRetryDelay = Config::get('mcp.tools.fetch.retry_delay', 1000);
+        $this->retryDelay = is_numeric($configRetryDelay) ? (int) $configRetryDelay : 1000;
     }
 
     /**
@@ -56,27 +60,26 @@ class FetchService
      * Fetch data from external API with retry logic
      *
      * @param  array<string, mixed>  $options
-     * @return array{
-     *     success: bool,
-     *     data: mixed,
-     *     status_code: int,
-     *     headers: array<string, string>,
-     *     cached: bool,
-     *     attempts: int,
-     *     response_time: float
-     * }
+     * @return array{success: bool, data: mixed, status_code: int, headers: array<string, string>, cached: bool, attempts: int, response_time: float}
      */
-    public function fetch(): array
+    public function fetch(string $url, string $method = 'GET', array $options = []): array
+    {
         $startTime = microtime(true);
         $cacheKey = $this->generateCacheKey($url, $method, $options);
+        $shouldCache = isset($options['cache']) ? (bool) $options['cache'] : true;
 
         // Check cache if enabled
-        if ($options['cache'] ?? true) {
+        if ($shouldCache) {
             $cached = Cache::get($cacheKey);
-            if ($cached !== null) {
+            if (is_array($cached)) {
+                /** @var array{success: bool, data: mixed, status_code: int, headers: array<string, string>} $cached */
                 return [
-                    ...$cached,
+                    'success' => $cached['success'] ?? false,
+                    'data' => $cached['data'] ?? null,
+                    'status_code' => $cached['status_code'] ?? 0,
+                    'headers' => $cached['headers'] ?? [],
                     'cached' => true,
+                    'attempts' => 0,
                     'response_time' => microtime(true) - $startTime,
                 ];
             }
@@ -87,22 +90,28 @@ class FetchService
         $lastError = null;
 
         while ($attempts < $this->maxRetries) {
-            $attempts = ($attempts ?? 0) + 1;
+            $attempts++;
 
             try {
                 $response = $this->performFetch($url, $method, $options);
 
                 // Cache successful responses
-                if ($response['success'] && ($options['cache'] ?? true)) {
-                    $cacheTTL = $options['cache_ttl'] ?? $this->cacheTTL;
+                $success = isset($response['success']) && $response['success'];
+                $cacheTTL = isset($options['cache_ttl']) && is_numeric($options['cache_ttl']) ? (int) $options['cache_ttl'] : $this->cacheTTL;
+                if ($success && $shouldCache) {
                     Cache::put($cacheKey, $response, $cacheTTL);
                 }
 
-                $response['cached'] = false;
-                $response['attempts'] = $attempts;
-                $response['response_time'] = microtime(true) - $startTime;
-
-                return $response;
+                /** @var array{success: bool, data: mixed, status_code: int, headers: array<string, string>} $response */
+                return [
+                    'success' => $success,
+                    'data' => $response['data'] ?? null,
+                    'status_code' => isset($response['status_code']) && is_int($response['status_code']) ? $response['status_code'] : 0,
+                    'headers' => isset($response['headers']) && is_array($response['headers']) ? $response['headers'] : [],
+                    'cached' => false,
+                    'attempts' => $attempts,
+                    'response_time' => microtime(true) - $startTime,
+                ];
             } catch (\Exception $e) {
                 $lastError = $e;
 
@@ -129,7 +138,6 @@ class FetchService
             'cached' => false,
             'attempts' => $attempts,
             'response_time' => microtime(true) - $startTime,
-            'error' => $lastError?->getMessage() ?? 'Unknown error',
         ];
     }
 
@@ -137,14 +145,12 @@ class FetchService
      * Fetch data from umapyoi.net API
      *
      * @param  array<string, mixed>  $params
-     * @return array{
-     *     success: bool,
-     *     data: mixed,
-     *     cached: bool
-     * }
+     * @return array{success: bool, data: mixed, cached: bool}
      */
-    public function fetchUmapyoiData(): array
-        $baseUrl = Config::get('external_apis.umapyoi.base_url', 'https://api.umapyoi.net');
+    public function fetchUmapyoiData(string $endpoint, array $params = []): array
+    {
+        $baseUrlConfig = Config::get('external_apis.umapyoi.base_url', 'https://api.umapyoi.net');
+        $baseUrl = is_string($baseUrlConfig) ? $baseUrlConfig : 'https://api.umapyoi.net';
         $url = "{$baseUrl}/{$endpoint}";
 
         if (! empty($params)) {
@@ -171,19 +177,17 @@ class FetchService
      * Batch fetch multiple URLs
      *
      * @param  array<int, array{url: string, method?: string, options?: array<string, mixed>}>  $requests
-     * @return array<int, array{
-     *     success: bool,
-     *     data: mixed,
-     *     status_code: int,
-     *     cached: bool
-     * }>
+     * @return array<int, array{success: bool, data: mixed, status_code: int, headers: array<string, string>, cached: bool, attempts: int, response_time: float}>
      */
-    public function batchFetch(): array
+    public function batchFetch(array $requests): array
+    {
+        /** @var array<int, array{success: bool, data: mixed, status_code: int, headers: array<string, string>, cached: bool, attempts: int, response_time: float}> $results */
         $results = [];
 
         foreach ($requests as $index => $request) {
             $url = $request['url'];
             $method = $request['method'] ?? 'GET';
+            /** @var array<string, mixed> $options */
             $options = $request['options'] ?? [];
 
             $results[$index] = $this->fetch($url, $method, $options);
@@ -196,15 +200,20 @@ class FetchService
      * Fetch with circuit breaker pattern
      *
      * @param  array<string, mixed>  $options
-     * @return array<string, mixed>
+     * @return array{success: bool, data: mixed, status_code: int, headers: array<string, string>, cached: bool, attempts: int, response_time: float}
      */
-    public function fetchWithCircuitBreaker(): array
+    public function fetchWithCircuitBreaker(string $url, string $method = 'GET', array $options = []): array
+    {
         $circuitKey = "fetch_circuit_{$url}";
-        $circuitState = Cache::get($circuitKey, ['state' => 'closed', 'failures' => 0]);
+        $defaultState = ['state' => 'closed', 'failures' => 0, 'opened_at' => 0];
+        $circuitStateRaw = Cache::get($circuitKey);
+        /** @var array{state: string, failures: int, opened_at: int} $circuitState */
+        $circuitState = is_array($circuitStateRaw) ? array_merge($defaultState, $circuitStateRaw) : $defaultState;
 
         // Check if circuit is open
         if ($circuitState['state'] === 'open') {
-            $timeSinceOpen = time() - ($circuitState['opened_at'] ?? 0);
+            $openedAt = is_numeric($circuitState['opened_at']) ? (int) $circuitState['opened_at'] : 0;
+            $timeSinceOpen = time() - $openedAt;
 
             // Try to close circuit after timeout
             if ($timeSinceOpen > 60) {
@@ -219,7 +228,6 @@ class FetchService
                     'cached' => false,
                     'attempts' => 0,
                     'response_time' => 0.0,
-                    'error' => 'Circuit breaker is open',
                 ];
             }
         }
@@ -230,16 +238,17 @@ class FetchService
         // Update circuit state
         if ($response['success']) {
             // Reset circuit on success
-            Cache::put($circuitKey, ['state' => 'closed', 'failures' => 0], 300);
+            Cache::put($circuitKey, ['state' => 'closed', 'failures' => 0, 'opened_at' => 0], 300);
         } else {
             // Increment failures
-            $circuitState['failures']++;
+            $failures = is_int($circuitState['failures']) ? $circuitState['failures'] + 1 : 1;
 
             // Open circuit if threshold exceeded
-            if ($circuitState['failures'] >= 5) {
+            if ($failures >= 5) {
                 $circuitState['state'] = 'open';
                 $circuitState['opened_at'] = time();
             }
+            $circuitState['failures'] = $failures;
 
             Cache::put($circuitKey, $circuitState, 300);
         }
@@ -251,27 +260,30 @@ class FetchService
      * Perform actual HTTP fetch
      *
      * @param  array<string, mixed>  $options
-     * @return array<string, mixed>
+     * @return array{success: bool, data: mixed, status_code: int, headers: array<string, string>}
      */
-    protected function performFetch(): array
-        $headers = $options['headers'] ?? [];
-        $body = (is_array($options) && isset($options['body']) ? $options['body'] : null);
-        $timeout = $options['timeout'] ?? $this->timeout;
+    protected function performFetch(string $url, string $method, array $options = []): array
+    {
+        /** @var array<string, string> $headers */
+        $headers = isset($options['headers']) && is_array($options['headers']) ? $options['headers'] : [];
+        /** @var array<string, mixed>|null $body */
+        $body = isset($options['body']) && is_array($options['body']) ? $options['body'] : null;
+        $timeout = isset($options['timeout']) && is_numeric($options['timeout']) ? (int) $options['timeout'] : $this->timeout;
 
         // Build HTTP request
         $request = Http::timeout($timeout);
 
         // Add headers
-        if (! empty($headers)) {
+        if (\count($headers) > 0) {
             $request = $request->withHeaders($headers);
         }
 
         // Perform request
         $response = match (strtoupper($method)) {
             'GET' => $request->get($url),
-            'POST' => $request->post($url, $body),
-            'PUT' => $request->put($url, $body),
-            'PATCH' => $request->patch($url, $body),
+            'POST' => $request->post($url, $body ?? []),
+            'PUT' => $request->put($url, $body ?? []),
+            'PATCH' => $request->patch($url, $body ?? []),
             'DELETE' => $request->delete($url),
             default => throw new \InvalidArgumentException("Unsupported HTTP method: {$method}"),
         };
@@ -279,6 +291,7 @@ class FetchService
         // Parse response
         $success = $response->successful();
         $statusCode = $response->status();
+        /** @var array<string, string> $responseHeaders */
         $responseHeaders = $response->headers();
 
         // Try to parse JSON, fallback to raw body
@@ -334,6 +347,7 @@ class FetchService
      * }
      */
     public function getStatistics(): array
+    {
         // TODO: Implement actual statistics tracking
         return [
             'total_requests' => 0,
@@ -357,6 +371,7 @@ class FetchService
      * }
      */
     public function getStatus(): array
+    {
         return [
             'enabled' => $this->enabled,
             'available' => $this->isAvailable(),

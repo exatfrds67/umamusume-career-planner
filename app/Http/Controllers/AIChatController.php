@@ -237,10 +237,7 @@ class AIChatController extends Controller
     public function getToolUsage(): JsonResponse
     {
         try {
-            $userId = Auth::id();
-            $toolData = $this->realTimeMonitoringService->getToolExecutionMonitoring(
-                is_int($userId) ? $userId : null
-            );
+            $toolData = $this->realTimeMonitoringService->getToolExecutionMonitoring();
 
             return response()->json([
                 'success' => true,
@@ -270,10 +267,7 @@ class AIChatController extends Controller
     public function getPerformanceMetrics(): JsonResponse
     {
         try {
-            $userId = Auth::id();
-            $metrics = $this->realTimeMonitoringService->getPerformanceMetrics(
-                is_int($userId) ? $userId : null
-            );
+            $metrics = $this->realTimeMonitoringService->getPerformanceMetrics();
 
             return response()->json([
                 'success' => true,

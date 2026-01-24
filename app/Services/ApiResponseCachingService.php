@@ -74,18 +74,22 @@ class ApiResponseCachingService
         if ($this->hasInMemory($cacheKey)) {
             $this->recordCacheHit($cacheKey, 'memory');
 
-            return $this->memoryCache[$cacheKey]['data'];
+            /** @var array{data: mixed, metadata: array{cached_at: string, ttl: int, cache_key: string}} $memData */
+            $memData = $this->memoryCache[$cacheKey]['data'];
+
+            return $memData;
         }
 
         // Check Redis cache
         $cached = Cache::get($cacheKey);
 
-        if ($cached !== null) {
+        if ($cached !== null && is_array($cached)) {
             $this->recordCacheHit($cacheKey, 'redis');
 
             // Store in memory cache for subsequent requests
             $this->storeInMemory($cacheKey, $cached, 60);
 
+            /** @var array{data: mixed, metadata: array{cached_at: string, ttl: int, cache_key: string}} $cached */
             return $cached;
         }
 
@@ -148,7 +152,8 @@ class ApiResponseCachingService
      * @param  array<string>  $tags
      * @return array{invalidated: bool, tags: array<string>}
      */
-    public function invalidateByTags(): array
+    public function invalidateByTags(array $tags): array
+    {
         try {
             Cache::tags($tags)->flush();
 
@@ -182,7 +187,8 @@ class ApiResponseCachingService
      *
      * @return array{invalidated: int, pattern: string}
      */
-    public function invalidateByEndpoint(): array
+    public function invalidateByEndpoint(string $endpointPattern): array
+    {
         $invalidated = 0;
 
         try {
@@ -195,9 +201,9 @@ class ApiResponseCachingService
                     if ($keys === false) {
                         break;
                     }
-                    if (is_array($keys) && ! empty($keys)) {
+                    if (! empty($keys)) {
                         Redis::del(...$keys);
-                        $invalidated = ($invalidated ?? 0) + count($keys);
+                        $invalidated += count($keys);
                     }
                 } while ($cursor !== 0);
             }
@@ -233,28 +239,34 @@ class ApiResponseCachingService
      *
      * @return array{invalidated: int, cascaded: array<string>}
      */
-    public function invalidateWithCascade(): array
+    public function invalidateWithCascade(string $dataType): array
+    {
         $invalidated = 0;
+        /** @var array<string> $cascaded */
         $cascaded = [];
 
         // Get cascade rules from config
+        /** @var array<string, array<string>> $cascadeRules */
         $cascadeRules = config('api-performance.cache.cascade_rules', []);
 
         // Invalidate primary type
         $primaryTags = $this->getTagsForDataType($dataType);
         if (! empty($primaryTags)) {
             $this->invalidateByTags($primaryTags);
-            $invalidated = ($invalidated ?? 0) + 1;
+            $invalidated += 1;
         }
 
         // Apply cascade rules
-        if (isset($cascadeRules[$dataType])) {
+        if (isset($cascadeRules[$dataType]) && is_array($cascadeRules[$dataType])) {
             foreach ($cascadeRules[$dataType] as $cascadeType) {
+                if (! is_string($cascadeType)) {
+                    continue;
+                }
                 $cascadeTags = $this->getTagsForDataType($cascadeType);
                 if (! empty($cascadeTags)) {
                     $this->invalidateByTags($cascadeTags);
                     $cascaded[] = $cascadeType;
-                    $invalidated = ($invalidated ?? 0) + 1;
+                    $invalidated += 1;
                 }
             }
         }
@@ -271,7 +283,8 @@ class ApiResponseCachingService
      * @param  array<array{method: string, path: string, params?: array<string, mixed>}>  $endpoints
      * @return array{warmed: int, failed: int, details: array<string, array{status: string, ttl?: int, error?: string}>}
      */
-    public function warmCache(): array
+    public function warmCache(array $endpoints): array
+    {
         $warmed = 0;
         $failed = 0;
         $details = [];
@@ -303,13 +316,13 @@ class ApiResponseCachingService
                 $warmingKey = 'api_cache_warming:'.$cacheKey;
                 Cache::put($warmingKey, true, 3600);
 
-                $warmed = ($warmed ?? 0) + 1;
+                $warmed += 1;
                 $details[$key] = [
                     'status' => 'queued',
                     'cache_key' => $cacheKey,
                 ];
             } catch (\Exception $e) {
-                $failed = ($failed ?? 0) + 1;
+                $failed += 1;
                 $details[$key] = [
                     'status' => 'failed',
                     'error' => $e->getMessage(),
@@ -330,6 +343,7 @@ class ApiResponseCachingService
      * @return array{hit_rate: float, hits: int, misses: int, stores: int, total_size_bytes: int, by_endpoint: array<string, array{hits: int, misses: int, avg_ttl: float}>}
      */
     public function getStatistics(): array
+    {
         $stats = [
             'hit_rate' => 0.0,
             'hits' => 0,
@@ -342,24 +356,30 @@ class ApiResponseCachingService
         try {
             // Get metrics from Redis
             $metricsKey = self::METRICS_PREFIX.'totals';
-            $totals = Cache::get($metricsKey, [
+            $rawTotals = Cache::get($metricsKey);
+            /** @var array{hits: int, misses: int, stores: int, total_size: int} $totals */
+            $totals = is_array($rawTotals) ? $rawTotals : [
                 'hits' => 0,
                 'misses' => 0,
                 'stores' => 0,
                 'total_size' => 0,
-            ]);
+            ];
 
-            $stats['hits'] = $totals['hits'];
-            $stats['misses'] = $totals['misses'];
-            $stats['stores'] = $totals['stores'];
-            $stats['total_size_bytes'] = $totals['total_size'];
+            $stats['hits'] = (int) ($totals['hits'] ?? 0);
+            $stats['misses'] = (int) ($totals['misses'] ?? 0);
+            $stats['stores'] = (int) ($totals['stores'] ?? 0);
+            $stats['total_size_bytes'] = (int) ($totals['total_size'] ?? 0);
 
             $total = $stats['hits'] + $stats['misses'];
             $stats['hit_rate'] = $total > 0 ? round(($stats['hits'] / $total) * 100, 2) : 0.0;
 
             // Get per-endpoint metrics
             $endpointMetricsKey = self::METRICS_PREFIX.'endpoints';
-            $stats['by_endpoint'] = Cache::get($endpointMetricsKey, []);
+            $rawEndpointStats = Cache::get($endpointMetricsKey);
+            if (is_array($rawEndpointStats)) {
+                /** @var array<string, array{hits: int, misses: int, avg_ttl: float}> $rawEndpointStats */
+                $stats['by_endpoint'] = $rawEndpointStats;
+            }
         } catch (\Exception $e) {
             Log::warning('[ApiResponseCaching] Failed to get statistics', [
                 'error' => $e->getMessage(),
@@ -374,11 +394,12 @@ class ApiResponseCachingService
      */
     public function generateCacheKey(Request $request): string
     {
+        $user = $request->user();
         $components = [
             $request->method(),
             $request->path(),
             $this->normalizeQueryParams($request->query()),
-            $request->user()?->id ?? 'guest',
+            $user !== null ? $user->id : 'guest',
         ];
 
         return self::CACHE_PREFIX.md5(implode(':', array_filter($components)));
@@ -392,11 +413,13 @@ class ApiResponseCachingService
         $path = $request->path();
 
         // Get TTL configuration
-        $ttlConfig = config('api-performance.cache.ttl_by_endpoint', []);
+        $rawTtlConfig = config('api-performance.cache.ttl_by_endpoint', []);
+        /** @var array<string, int> $ttlConfig */
+        $ttlConfig = is_array($rawTtlConfig) ? $rawTtlConfig : [];
 
         foreach ($ttlConfig as $pattern => $ttl) {
-            if (fnmatch($pattern, $path)) {
-                return $ttl;
+            if (is_string($pattern) && fnmatch($pattern, $path)) {
+                return (int) $ttl;
             }
         }
 
@@ -421,7 +444,8 @@ class ApiResponseCachingService
      *
      * @return array<string>
      */
-    protected function getEndpointTags(): array
+    protected function getEndpointTags(Request $request): array
+    {
         $path = $request->path();
         $tags = ['api_response'];
 
@@ -460,16 +484,21 @@ class ApiResponseCachingService
      *
      * @return array<string>
      */
-    protected function getTagsForDataType(): array
-        $tagMap = config('api-performance.cache.data_type_tags', [
+    protected function getTagsForDataType(string $dataType): array
+    {
+        /** @var array<string, array<string>> $defaultTagMap */
+        $defaultTagMap = [
             'characters' => ['api_response', 'characters'],
             'skills' => ['api_response', 'skills'],
             'training' => ['api_response', 'training'],
             'support_cards' => ['api_response', 'support_cards'],
             'careers' => ['api_response', 'careers'],
-        ]);
+        ];
+        $rawTagMap = config('api-performance.cache.data_type_tags');
+        /** @var array<string, array<string>> $tagMap */
+        $tagMap = is_array($rawTagMap) ? $rawTagMap : $defaultTagMap;
 
-        return $tagMap[$dataType] ?? ['api_response'];
+        return isset($tagMap[$dataType]) && is_array($tagMap[$dataType]) ? $tagMap[$dataType] : ['api_response'];
     }
 
     /**
@@ -573,14 +602,17 @@ class ApiResponseCachingService
     {
         try {
             $metricsKey = self::METRICS_PREFIX.'totals';
-            $metrics = Cache::get($metricsKey, [
+            $rawMetrics = Cache::get($metricsKey);
+            /** @var array{hits: int, misses: int, stores: int, total_size: int} $metrics */
+            $metrics = is_array($rawMetrics) ? $rawMetrics : [
                 'hits' => 0,
                 'misses' => 0,
                 'stores' => 0,
                 'total_size' => 0,
-            ]);
+            ];
 
-            $metrics[$field] = ($metrics[$field] ?? 0) + $increment;
+            $currentValue = isset($metrics[$field]) && is_int($metrics[$field]) ? $metrics[$field] : 0;
+            $metrics[$field] = $currentValue + $increment;
             Cache::put($metricsKey, $metrics, 86400);
         } catch (\Exception $e) {
             // Silently fail metrics update

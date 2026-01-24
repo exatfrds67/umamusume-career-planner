@@ -89,7 +89,9 @@ class ApiPerformanceMonitoringService
         }
 
         $metadata = $requestData['metadata'];
-        $endpoint = $metadata['method'].':'.$metadata['path'];
+        $method = isset($metadata['method']) && is_string($metadata['method']) ? $metadata['method'] : '';
+        $path = isset($metadata['path']) && is_string($metadata['path']) ? $metadata['path'] : '';
+        $endpoint = $method.':'.$path;
 
         // Store metrics
         $this->storeRequestMetrics($endpoint, $metrics);
@@ -109,6 +111,7 @@ class ApiPerformanceMonitoringService
      * @return array{overview: array<string, mixed>, endpoints: array<string, mixed>, bottlenecks: array<int, array<string, mixed>>, trends: array<string, mixed>}
      */
     public function getDashboard(): array
+    {
         return [
             'overview' => $this->getOverviewMetrics(),
             'endpoints' => $this->getEndpointMetrics(),
@@ -123,10 +126,12 @@ class ApiPerformanceMonitoringService
      * @return array{total_requests: int, avg_response_time_ms: float, p95_response_time_ms: float, p99_response_time_ms: float, error_rate: float, slow_request_rate: float, requests_per_minute: float}
      */
     public function getOverviewMetrics(): array
+    {
         $metricsKey = self::METRICS_PREFIX.'overview';
         $cached = Cache::get($metricsKey);
 
-        if ($cached !== null) {
+        if (is_array($cached)) {
+            /** @var array{total_requests: int, avg_response_time_ms: float, p95_response_time_ms: float, p99_response_time_ms: float, error_rate: float, slow_request_rate: float, requests_per_minute: float} $cached */
             return $cached;
         }
 
@@ -160,34 +165,48 @@ class ApiPerformanceMonitoringService
                 ];
             }
 
-            $metrics['total_requests'] = $totals['total_requests'];
+            $metrics['total_requests'] = is_int($totals['total_requests']) ? $totals['total_requests'] : 0;
 
-            if ($totals['total_requests'] > 0) {
+            $totalRequests = is_numeric($totals['total_requests']) ? (int) $totals['total_requests'] : 0;
+            $totalDurationMs = is_numeric($totals['total_duration_ms']) ? (float) $totals['total_duration_ms'] : 0.0;
+            $errorCount = is_numeric($totals['error_count']) ? (int) $totals['error_count'] : 0;
+            $slowCount = is_numeric($totals['slow_count']) ? (int) $totals['slow_count'] : 0;
+
+            if ($totalRequests > 0) {
                 $metrics['avg_response_time_ms'] = round(
-                    $totals['total_duration_ms'] / $totals['total_requests'],
+                    $totalDurationMs / $totalRequests,
                     2
                 );
                 $metrics['error_rate'] = round(
-                    ($totals['error_count'] / $totals['total_requests']) * 100,
+                    ($errorCount / $totalRequests) * 100,
                     2
                 );
                 $metrics['slow_request_rate'] = round(
-                    ($totals['slow_count'] / $totals['total_requests']) * 100,
+                    ($slowCount / $totalRequests) * 100,
                     2
                 );
             }
 
             // Calculate percentiles from stored response times
-            if (! empty($totals['response_times'])) {
-                sort($totals['response_times']);
-                $count = count($totals['response_times']);
-                $metrics['p95_response_time_ms'] = $totals['response_times'][(int) ($count * 0.95)] ?? 0;
-                $metrics['p99_response_time_ms'] = $totals['response_times'][(int) ($count * 0.99)] ?? 0;
+            $responseTimes = is_array($totals['response_times']) ? $totals['response_times'] : [];
+            if (! empty($responseTimes)) {
+                /** @var array<int, float> $responseTimes */
+                sort($responseTimes);
+                $count = count($responseTimes);
+                $p95Index = (int) ($count * 0.95);
+                $p99Index = (int) ($count * 0.99);
+                $metrics['p95_response_time_ms'] = isset($responseTimes[$p95Index]) && is_numeric($responseTimes[$p95Index])
+                    ? (float) $responseTimes[$p95Index]
+                    : 0.0;
+                $metrics['p99_response_time_ms'] = isset($responseTimes[$p99Index]) && is_numeric($responseTimes[$p99Index])
+                    ? (float) $responseTimes[$p99Index]
+                    : 0.0;
             }
 
             // Calculate requests per minute (last hour)
             $requestsLastHour = Cache::get(self::METRICS_PREFIX.'requests_last_hour', 0);
-            $metrics['requests_per_minute'] = round($requestsLastHour / 60, 2);
+            $requestsLastHourNum = is_numeric($requestsLastHour) ? (float) $requestsLastHour : 0.0;
+            $metrics['requests_per_minute'] = round($requestsLastHourNum / 60, 2);
 
             // Cache for 30 seconds
             Cache::put($metricsKey, $metrics, 30);
@@ -206,9 +225,16 @@ class ApiPerformanceMonitoringService
      * @return array<string, array{total_requests: int, avg_response_time_ms: float, max_response_time_ms: float, min_response_time_ms: float, error_rate: float, last_request: string|null}>
      */
     public function getEndpointMetrics(): array
+    {
         $metricsKey = self::METRICS_PREFIX.'endpoints';
+        $cached = Cache::get($metricsKey, []);
 
-        return Cache::get($metricsKey, []);
+        if (! is_array($cached)) {
+            return [];
+        }
+
+        /** @var array<string, array{total_requests: int, avg_response_time_ms: float, max_response_time_ms: float, min_response_time_ms: float, error_rate: float, last_request: string|null}> $cached */
+        return $cached;
     }
 
     /**
@@ -217,6 +243,7 @@ class ApiPerformanceMonitoringService
      * @return array<int, array{type: string, severity: string, endpoint: string, description: string, recommendation: string, metrics: array<string, mixed>}>
      */
     public function identifyBottlenecks(): array
+    {
         $bottlenecks = [];
         $endpoints = $this->getEndpointMetrics();
 
@@ -296,6 +323,7 @@ class ApiPerformanceMonitoringService
      * @return array{hourly: array<string, array{requests: int, avg_response_time_ms: float, error_rate: float}>, daily: array<string, array{requests: int, avg_response_time_ms: float, error_rate: float}>}
      */
     public function getPerformanceTrends(): array
+    {
         return [
             'hourly' => $this->getHourlyTrends(),
             'daily' => $this->getDailyTrends(),
@@ -307,10 +335,16 @@ class ApiPerformanceMonitoringService
      *
      * @return array<int, array{request_id: string, endpoint: string, duration_ms: float, timestamp: string, metadata: array<string, mixed>}>
      */
-    public function getSlowRequests(): array
+    public function getSlowRequests(int $limit = 10): array
+    {
         $slowRequestsKey = self::METRICS_PREFIX.'slow_requests';
         $slowRequests = Cache::get($slowRequestsKey, []);
 
+        if (! is_array($slowRequests)) {
+            return [];
+        }
+
+        /** @var array<int, array{request_id: string, endpoint: string, duration_ms: float, timestamp: string, metadata: array<string, mixed>}> $slowRequests */
         // Sort by duration descending
         usort($slowRequests, fn ($a, $b) => $b['duration_ms'] <=> $a['duration_ms']);
 
@@ -323,6 +357,7 @@ class ApiPerformanceMonitoringService
      * @return array<int, array{endpoints: array<string>, reason: string, potential_savings_ms: float}>
      */
     public function getBatchingRecommendations(): array
+    {
         $recommendations = [];
         $endpoints = $this->getEndpointMetrics();
 
@@ -364,6 +399,16 @@ class ApiPerformanceMonitoringService
      * @return array{memory: array{current_mb: float, peak_mb: float, limit_mb: float|null}, cpu: array{load_average: array<float>|null}, database: array{active_connections: int|null, slow_queries: int}}
      */
     public function getResourceUtilization(): array
+    {
+        $loadAverage = null;
+        if (function_exists('sys_getloadavg')) {
+            $loadResult = sys_getloadavg();
+            if (is_array($loadResult)) {
+                /** @var array<float> $loadAverage */
+                $loadAverage = array_map('floatval', $loadResult);
+            }
+        }
+
         return [
             'memory' => [
                 'current_mb' => round(memory_get_usage(true) / 1024 / 1024, 2),
@@ -371,7 +416,7 @@ class ApiPerformanceMonitoringService
                 'limit_mb' => $this->getMemoryLimit(),
             ],
             'cpu' => [
-                'load_average' => function_exists('sys_getloadavg') ? sys_getloadavg() : null,
+                'load_average' => $loadAverage,
             ],
             'database' => [
                 'active_connections' => $this->getDatabaseConnectionCount(),
@@ -399,7 +444,8 @@ class ApiPerformanceMonitoringService
                         if ($keys === false) {
                             break;
                         }
-                        if (is_array($keys) && ! empty($keys)) {
+                        /** @var array<int, string> $keys */
+                        if (! empty($keys)) {
                             Redis::del(...$keys);
                         }
                     } while ($cursor !== 0);
@@ -424,7 +470,7 @@ class ApiPerformanceMonitoringService
         try {
             // Update totals
             $totalsKey = self::METRICS_PREFIX.'totals';
-            $totals = Cache::get($totalsKey, [
+            $totalsRaw = Cache::get($totalsKey, [
                 'total_requests' => 0,
                 'total_duration_ms' => 0,
                 'error_count' => 0,
@@ -432,25 +478,38 @@ class ApiPerformanceMonitoringService
                 'response_times' => [],
             ]);
 
-            $durationMs = (float) ($metrics['duration_ms'] ?? 0);
-            $statusCode = (int) ($metrics['status_code'] ?? 0);
+            /** @var array{total_requests: int, total_duration_ms: float, error_count: int, slow_count: int, response_times: array<int, float>} $totals */
+            $totals = is_array($totalsRaw) ? $totalsRaw : [
+                'total_requests' => 0,
+                'total_duration_ms' => 0,
+                'error_count' => 0,
+                'slow_count' => 0,
+                'response_times' => [],
+            ];
 
-            $totals['total_requests']++;
-            $totals['total_duration_ms'] += $durationMs;
+            $durationMsRaw = $metrics['duration_ms'] ?? 0;
+            $statusCodeRaw = $metrics['status_code'] ?? 0;
+            $durationMs = is_numeric($durationMsRaw) ? (float) $durationMsRaw : 0.0;
+            $statusCode = is_numeric($statusCodeRaw) ? (int) $statusCodeRaw : 0;
+
+            $totals['total_requests'] = (is_int($totals['total_requests']) ? $totals['total_requests'] : 0) + 1;
+            $totals['total_duration_ms'] = (is_numeric($totals['total_duration_ms']) ? (float) $totals['total_duration_ms'] : 0.0) + $durationMs;
 
             if ($statusCode >= 400) {
-                $totals['error_count']++;
+                $totals['error_count'] = (is_int($totals['error_count']) ? $totals['error_count'] : 0) + 1;
             }
 
             if ($durationMs >= self::SLOW_REQUEST_THRESHOLD_MS) {
-                $totals['slow_count']++;
+                $totals['slow_count'] = (is_int($totals['slow_count']) ? $totals['slow_count'] : 0) + 1;
             }
 
             // Keep last 1000 response times for percentile calculation
-            $totals['response_times'][] = $durationMs;
-            if (count($totals['response_times']) > 1000) {
-                $totals['response_times'] = array_slice($totals['response_times'], -1000);
+            $responseTimes = is_array($totals['response_times']) ? $totals['response_times'] : [];
+            $responseTimes[] = $durationMs;
+            if (count($responseTimes) > 1000) {
+                $responseTimes = array_slice($responseTimes, -1000);
             }
+            $totals['response_times'] = $responseTimes;
 
             Cache::put($totalsKey, $totals, 86400);
 
@@ -478,17 +537,22 @@ class ApiPerformanceMonitoringService
                 $slowRequests = [];
             }
 
+            $durationMsRaw = $metrics['duration_ms'] ?? 0;
+            $statusCodeRaw = $metrics['status_code'] ?? 0;
+            $memoryBytesRaw = $metrics['memory_bytes'] ?? 0;
+            $responseSizeRaw = $metrics['response_size'] ?? 0;
+
             $slowRequests[] = [
                 'request_id' => $requestId,
                 'endpoint' => $endpoint,
-                'duration_ms' => (float) ($metrics['duration_ms'] ?? 0),
-                'status_code' => (int) ($metrics['status_code'] ?? 0),
-                'memory_bytes' => (int) ($metrics['memory_bytes'] ?? 0),
-                'response_size' => (int) ($metrics['response_size'] ?? 0),
+                'duration_ms' => is_numeric($durationMsRaw) ? (float) $durationMsRaw : 0.0,
+                'status_code' => is_numeric($statusCodeRaw) ? (int) $statusCodeRaw : 0,
+                'memory_bytes' => is_numeric($memoryBytesRaw) ? (int) $memoryBytesRaw : 0,
+                'response_size' => is_numeric($responseSizeRaw) ? (int) $responseSizeRaw : 0,
                 'timestamp' => now()->toIso8601String(),
                 'metadata' => [
-                    'user_id' => (is_array($metadata) && isset($metadata['user_id']) ? $metadata['user_id'] : null),
-                    'ip' => (is_array($metadata) && isset($metadata['ip']) ? $metadata['ip'] : null),
+                    'user_id' => (isset($metadata['user_id']) ? $metadata['user_id'] : null),
+                    'ip' => (isset($metadata['ip']) ? $metadata['ip'] : null),
                 ],
             ];
 
@@ -512,44 +576,58 @@ class ApiPerformanceMonitoringService
     {
         try {
             $endpointsKey = self::METRICS_PREFIX.'endpoints';
-            $endpoints = Cache::get($endpointsKey, []);
+            $endpointsRaw = Cache::get($endpointsKey, []);
+
+            /** @var array<string, array{total_requests: int, total_duration_ms: float, error_count: int, max_response_time_ms: float, min_response_time_ms: float, last_request: string|null, avg_response_time_ms?: float, error_rate?: float}> $endpoints */
+            $endpoints = is_array($endpointsRaw) ? $endpointsRaw : [];
 
             if (! isset($endpoints[$endpoint])) {
                 $endpoints[$endpoint] = [
                     'total_requests' => 0,
-                    'total_duration_ms' => 0,
+                    'total_duration_ms' => 0.0,
                     'error_count' => 0,
-                    'max_response_time_ms' => 0,
+                    'max_response_time_ms' => 0.0,
                     'min_response_time_ms' => PHP_FLOAT_MAX,
                     'last_request' => null,
                 ];
             }
 
-            $endpoints[$endpoint]['total_requests']++;
-            $endpoints[$endpoint]['total_duration_ms'] += $metrics['duration_ms'];
-            $endpoints[$endpoint]['max_response_time_ms'] = max(
-                $endpoints[$endpoint]['max_response_time_ms'],
-                $metrics['duration_ms']
-            );
-            $endpoints[$endpoint]['min_response_time_ms'] = min(
-                $endpoints[$endpoint]['min_response_time_ms'],
-                $metrics['duration_ms']
-            );
-            $endpoints[$endpoint]['last_request'] = now()->toIso8601String();
+            $durationMsRaw = $metrics['duration_ms'] ?? 0;
+            $statusCodeRaw = $metrics['status_code'] ?? 0;
+            $durationMs = is_numeric($durationMsRaw) ? (float) $durationMsRaw : 0.0;
+            $statusCode = is_numeric($statusCodeRaw) ? (int) $statusCodeRaw : 0;
 
-            if ($metrics['status_code'] >= 400) {
-                $endpoints[$endpoint]['error_count']++;
+            $currentStats = $endpoints[$endpoint];
+            $totalRequests = (is_int($currentStats['total_requests']) ? $currentStats['total_requests'] : 0) + 1;
+            $totalDurationMs = (is_numeric($currentStats['total_duration_ms']) ? (float) $currentStats['total_duration_ms'] : 0.0) + $durationMs;
+            $maxResponseTimeMs = max(
+                is_numeric($currentStats['max_response_time_ms']) ? (float) $currentStats['max_response_time_ms'] : 0.0,
+                $durationMs
+            );
+            $minResponseTimeMs = min(
+                is_numeric($currentStats['min_response_time_ms']) ? (float) $currentStats['min_response_time_ms'] : PHP_FLOAT_MAX,
+                $durationMs
+            );
+            $errorCount = is_int($currentStats['error_count']) ? $currentStats['error_count'] : 0;
+
+            if ($statusCode >= 400) {
+                $errorCount++;
             }
 
             // Calculate derived metrics
-            $endpoints[$endpoint]['avg_response_time_ms'] = round(
-                $endpoints[$endpoint]['total_duration_ms'] / $endpoints[$endpoint]['total_requests'],
-                2
-            );
-            $endpoints[$endpoint]['error_rate'] = round(
-                ($endpoints[$endpoint]['error_count'] / $endpoints[$endpoint]['total_requests']) * 100,
-                2
-            );
+            $avgResponseTimeMs = $totalRequests > 0 ? round($totalDurationMs / $totalRequests, 2) : 0.0;
+            $errorRate = $totalRequests > 0 ? round(($errorCount / $totalRequests) * 100, 2) : 0.0;
+
+            $endpoints[$endpoint] = [
+                'total_requests' => $totalRequests,
+                'total_duration_ms' => $totalDurationMs,
+                'error_count' => $errorCount,
+                'max_response_time_ms' => $maxResponseTimeMs,
+                'min_response_time_ms' => $minResponseTimeMs,
+                'last_request' => now()->toIso8601String(),
+                'avg_response_time_ms' => $avgResponseTimeMs,
+                'error_rate' => $errorRate,
+            ];
 
             Cache::put($endpointsKey, $endpoints, 86400);
         } catch (\Exception $e) {
@@ -563,25 +641,37 @@ class ApiPerformanceMonitoringService
      * @return array<string, array{requests: int, avg_response_time_ms: float, error_rate: float}>
      */
     protected function getHourlyTrends(): array
+    {
         $trends = [];
 
         for ($i = 23; $i >= 0; $i--) {
             $hour = now()->subHours($i)->format('Y-m-d H:00');
             $hourKey = self::METRICS_PREFIX.'hourly:'.$hour;
-            $hourData = Cache::get($hourKey, [
+            $hourDataRaw = Cache::get($hourKey, [
                 'requests' => 0,
                 'total_duration_ms' => 0,
                 'error_count' => 0,
             ]);
 
+            /** @var array{requests: int, total_duration_ms: float, error_count: int} $hourData */
+            $hourData = is_array($hourDataRaw) ? $hourDataRaw : [
+                'requests' => 0,
+                'total_duration_ms' => 0,
+                'error_count' => 0,
+            ];
+
+            $requests = is_int($hourData['requests']) ? $hourData['requests'] : 0;
+            $totalDurationMs = is_numeric($hourData['total_duration_ms']) ? (float) $hourData['total_duration_ms'] : 0.0;
+            $errorCount = is_int($hourData['error_count']) ? $hourData['error_count'] : 0;
+
             $trends[$hour] = [
-                'requests' => $hourData['requests'],
-                'avg_response_time_ms' => $hourData['requests'] > 0
-                    ? round($hourData['total_duration_ms'] / $hourData['requests'], 2)
-                    : 0,
-                'error_rate' => $hourData['requests'] > 0
-                    ? round(($hourData['error_count'] / $hourData['requests']) * 100, 2)
-                    : 0,
+                'requests' => $requests,
+                'avg_response_time_ms' => $requests > 0
+                    ? round($totalDurationMs / $requests, 2)
+                    : 0.0,
+                'error_rate' => $requests > 0
+                    ? round(($errorCount / $requests) * 100, 2)
+                    : 0.0,
             ];
         }
 
@@ -594,25 +684,37 @@ class ApiPerformanceMonitoringService
      * @return array<string, array{requests: int, avg_response_time_ms: float, error_rate: float}>
      */
     protected function getDailyTrends(): array
+    {
         $trends = [];
 
         for ($i = 6; $i >= 0; $i--) {
             $day = now()->subDays($i)->format('Y-m-d');
             $dayKey = self::METRICS_PREFIX.'daily:'.$day;
-            $dayData = Cache::get($dayKey, [
+            $dayDataRaw = Cache::get($dayKey, [
                 'requests' => 0,
                 'total_duration_ms' => 0,
                 'error_count' => 0,
             ]);
 
+            /** @var array{requests: int, total_duration_ms: float, error_count: int} $dayData */
+            $dayData = is_array($dayDataRaw) ? $dayDataRaw : [
+                'requests' => 0,
+                'total_duration_ms' => 0,
+                'error_count' => 0,
+            ];
+
+            $requests = is_int($dayData['requests']) ? $dayData['requests'] : 0;
+            $totalDurationMs = is_numeric($dayData['total_duration_ms']) ? (float) $dayData['total_duration_ms'] : 0.0;
+            $errorCount = is_int($dayData['error_count']) ? $dayData['error_count'] : 0;
+
             $trends[$day] = [
-                'requests' => $dayData['requests'],
-                'avg_response_time_ms' => $dayData['requests'] > 0
-                    ? round($dayData['total_duration_ms'] / $dayData['requests'], 2)
-                    : 0,
-                'error_rate' => $dayData['requests'] > 0
-                    ? round(($dayData['error_count'] / $dayData['requests']) * 100, 2)
-                    : 0,
+                'requests' => $requests,
+                'avg_response_time_ms' => $requests > 0
+                    ? round($totalDurationMs / $requests, 2)
+                    : 0.0,
+                'error_rate' => $requests > 0
+                    ? round(($errorCount / $requests) * 100, 2)
+                    : 0.0,
             ];
         }
 

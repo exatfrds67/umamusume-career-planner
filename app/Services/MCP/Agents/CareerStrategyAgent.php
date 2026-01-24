@@ -59,7 +59,8 @@ class CareerStrategyAgent
      *     confidence: float
      * }
      */
-    public function analyzeCareerStrategy(): array
+    public function analyzeCareerStrategy(Character $character, array $context = []): array
+    {
         // Determine primary strategy based on scenario and goals
         $strategy = $this->determineStrategy($character);
 
@@ -99,7 +100,6 @@ class CareerStrategyAgent
     protected function determineStrategy(Character $character): string
     {
         $scenarioType = $character->scenario_type;
-        $goals = $character->goals ?? [];
 
         // Analyze character aptitudes
         $aptitudes = $character->aptitudes;
@@ -117,8 +117,10 @@ class CareerStrategyAgent
      */
     protected function determineUraStrategy(Character $character, string $bestDistance): string
     {
+        /** @var array<string, mixed> $goals */
         $goals = $character->goals ?? [];
-        $targetGrade = $goals['target_grade'] ?? 'A';
+        $goalsTargetGrade = is_array($goals) && isset($goals['target_grade']) ? $goals['target_grade'] : null;
+        $targetGrade = is_string($goalsTargetGrade) ? $goalsTargetGrade : 'A';
 
         // Strategy based on target grade and distance specialization
         return match (true) {
@@ -134,18 +136,27 @@ class CareerStrategyAgent
      *
      * @return array<string, array{current: int, target: int, gap: int, priority: int, weight: float}>
      */
-    protected function calculatePriorityStats(): array
+    protected function calculatePriorityStats(Character $character): array
+    {
+        /** @var array<string, int> $currentStats */
         $currentStats = $character->current_stats ?? [];
+        /** @var array<string, mixed> $goals */
         $goals = $character->goals ?? [];
-        $targetStats = $goals['target_stats'] ?? [];
+        /** @var array<string, int> $targetStats */
+        $targetStats = is_array($goals) && isset($goals['target_stats']) && is_array($goals['target_stats'])
+            ? $goals['target_stats']
+            : [];
 
+        /** @var array<string, array{current: int, target: int, gap: int, priority: int, weight: float}> $priorityStats */
         $priorityStats = [];
         $totalGap = 0;
 
         // Calculate gaps for each stat
         foreach ($this->statPriorityWeights as $stat => $basePriority) {
-            $current = $currentStats[$stat] ?? 0;
-            $target = $targetStats[$stat] ?? $this->getDefaultTarget($stat, $character);
+            $current = is_array($currentStats) && isset($currentStats[$stat]) ? (int) $currentStats[$stat] : 0;
+            $target = is_array($targetStats) && isset($targetStats[$stat])
+                ? (int) $targetStats[$stat]
+                : $this->getDefaultTarget($stat, $character);
             $gap = max(0, $target - $current);
 
             $priorityStats[$stat] = [
@@ -156,15 +167,15 @@ class CareerStrategyAgent
                 'weight' => 0.0, // Will be calculated after total gap is known
             ];
 
-            $totalGap = ($totalGap ?? 0) + $gap * $basePriority;
+            $totalGap += $gap * $basePriority;
         }
 
         // Calculate weights based on gap and priority
         foreach ($priorityStats as $stat => &$data) {
             if ($totalGap > 0) {
-                (is_array($data) && isset($data['weight']) ? $data['weight'] : null) = ((is_array($data) && isset($data['gap']) ? $data['gap'] : null) * (is_array($data) && isset($data['priority']) ? $data['priority'] : null)) / $totalGap;
+                $data['weight'] = ($data['gap'] * $data['priority']) / $totalGap;
             } else {
-                (is_array($data) && isset($data['weight']) ? $data['weight'] : null) = 1.0 / count($priorityStats);
+                $data['weight'] = 1.0 / count($priorityStats);
             }
         }
 
@@ -179,8 +190,6 @@ class CareerStrategyAgent
      */
     protected function getDefaultTarget(string $stat, Character $character): int
     {
-        $scenarioType = $character->scenario_type;
-
         // Default targets for A-grade career
         $defaults = [
             'speed' => 900,
@@ -207,7 +216,8 @@ class CareerStrategyAgent
      * @param  array<string, array{current: int, target: int, gap: int, priority: int, weight: float}>  $priorityStats
      * @return array<string, mixed>
      */
-    protected function determineTrainingFocus(): array
+    protected function determineTrainingFocus(Character $character, array $priorityStats): array
+    {
         // Get top 3 priority stats
         $topStats = array_slice(array_keys($priorityStats), 0, 3);
 
@@ -251,11 +261,13 @@ class CareerStrategyAgent
      * @param  array<string, array{current: int, target: int, gap: int, priority: int, weight: float}>  $priorityStats
      * @return array<string, float>
      */
-    protected function calculateTrainingDistribution(): array
+    protected function calculateTrainingDistribution(array $priorityStats): array
+    {
         $distribution = [];
 
         foreach ($priorityStats as $stat => $data) {
-            $distribution[$stat] = round((is_array($data) && isset($data['weight']) ? $data['weight'] : null) * 100, 1);
+            $weight = is_array($data) && isset($data['weight']) ? (float) $data['weight'] : 0.0;
+            $distribution[$stat] = round($weight * 100, 1);
         }
 
         return $distribution;
@@ -267,13 +279,14 @@ class CareerStrategyAgent
      * @param  array<string, array{current: int, target: int, gap: int, priority: int, weight: float}>  $priorityStats
      * @return array<string, mixed>
      */
-    protected function trackMilestones(): array
+    protected function trackMilestones(Character $character, array $priorityStats): array
+    {
         $milestones = [];
 
         // Check stat breakpoints (901 and 1200)
         foreach ($priorityStats as $stat => $data) {
-            $current = (is_array($data) && isset($data['current']) ? $data['current'] : null);
-            $target = (is_array($data) && isset($data['target']) ? $data['target'] : null);
+            $current = isset($data['current']) ? (int) $data['current'] : 0;
+            $target = isset($data['target']) ? (int) $data['target'] : 0;
 
             $milestones[$stat] = [
                 'current' => $current,
@@ -293,9 +306,9 @@ class CareerStrategyAgent
         }
 
         // Calculate overall progress
-        $totalProgress = 0;
+        $totalProgress = 0.0;
         foreach ($milestones as $milestone) {
-            $totalProgress = ($totalProgress ?? 0) + $milestone['progress_percent'];
+            $totalProgress += (float) $milestone['progress_percent'];
         }
         $overallProgress = count($milestones) > 0 ? $totalProgress / count($milestones) : 0;
 
@@ -328,7 +341,12 @@ class CareerStrategyAgent
      * @param  array<string, mixed>  $trainingFocus
      * @return array<string, string>
      */
-    protected function generateRecommendations(): array
+    protected function generateRecommendations(
+        Character $character,
+        string $strategy,
+        array $priorityStats,
+        array $trainingFocus
+    ): array {
         $recommendations = [];
 
         // Strategy-specific recommendations
@@ -342,7 +360,9 @@ class CareerStrategyAgent
 
         // Training focus recommendations
         $topStat = array_key_first($priorityStats);
-        $topGap = $priorityStats[$topStat]['gap'] ?? 0;
+        $topGap = is_string($topStat) && isset($priorityStats[$topStat]['gap'])
+            ? (int) $priorityStats[$topStat]['gap']
+            : 0;
 
         if ($topGap > 300) {
             $recommendations['priority'] = "Critical gap in {$topStat} ({$topGap} points). Focus heavily on {$topStat} training.";
@@ -384,8 +404,9 @@ class CareerStrategyAgent
         $confidence = 1.0;
 
         // Reduce confidence if goals are not well-defined
+        /** @var array<string, mixed> $goals */
         $goals = $character->goals ?? [];
-        if (empty($goals['target_stats'])) {
+        if (empty($goals) || ! is_array($goals) || ! isset($goals['target_stats'])) {
             $confidence *= 0.7;
         }
 
@@ -405,14 +426,26 @@ class CareerStrategyAgent
 
     /**
      * Get best distance aptitude from character aptitudes
+     *
+     * @param  mixed  $aptitudes
      */
     protected function getBestDistanceAptitude($aptitudes): string
     {
         $distanceGrades = [];
 
+        if (! is_iterable($aptitudes)) {
+            return 'mile';
+        }
+
         foreach ($aptitudes as $aptitude) {
-            if (in_array($aptitude->distance_type, ['sprint', 'mile', 'medium', 'long'])) {
-                $distanceGrades[$aptitude->distance_type] = $this->gradeToNumeric($aptitude->grade);
+            if (! is_object($aptitude)) {
+                continue;
+            }
+
+            $distanceType = $aptitude->distance_type ?? null;
+            if (is_string($distanceType) && in_array($distanceType, ['sprint', 'mile', 'medium', 'long'])) {
+                $grade = $aptitude->grade ?? 'C';
+                $distanceGrades[$distanceType] = $this->gradeToNumeric((string) $grade);
             }
         }
 
@@ -422,7 +455,7 @@ class CareerStrategyAgent
 
         arsort($distanceGrades);
 
-        return array_key_first($distanceGrades);
+        return (string) array_key_first($distanceGrades);
     }
 
     /**

@@ -74,7 +74,7 @@ class TrainingAdvisorController extends Controller
             $advice = $this->trainingAdvisorService->getAdvice(
                 $characterId,
                 $trainingOptions,
-                $user?->id ?? throw new \Exception('User required')
+                $user->id ?? throw new \Exception('User required')
             );
 
             // Parse response for API format
@@ -168,7 +168,7 @@ class TrainingAdvisorController extends Controller
         return response()->stream(function () use ($characterId, $trainingOptions, $user) {
             try {
                 // Stream advice from service
-                foreach ($this->trainingAdvisorService->getAdviceStreaming($characterId, $trainingOptions, $user?->id ?? throw new \Exception('User required')) as $chunk) {
+                foreach ($this->trainingAdvisorService->getAdviceStreaming($characterId, $trainingOptions, $user->id ?? throw new \Exception('User required')) as $chunk) {
                     echo 'data: '.json_encode([
                         'chunk' => $chunk,
                     ])."\n\n";
@@ -183,7 +183,7 @@ class TrainingAdvisorController extends Controller
             } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
                 Log::warning('Streaming training advice request for non-existent character', [
                     'character_id' => $characterId,
-                    'user_id' => $user?->id ?? throw new \Exception('User required'),
+                    'user_id' => $user->id ?? throw new \Exception('User required'),
                 ]);
 
                 echo 'data: '.json_encode([
@@ -194,7 +194,7 @@ class TrainingAdvisorController extends Controller
                 // Log error with context
                 Log::error('Streaming training advice generation failed', [
                     'character_id' => $characterId,
-                    'user_id' => $user?->id ?? throw new \Exception('User required'),
+                    'user_id' => $user->id ?? throw new \Exception('User required'),
                     'error' => $e->getMessage(),
                     'trace' => $e->getTraceAsString(),
                 ]);
@@ -234,7 +234,7 @@ class TrainingAdvisorController extends Controller
             // Get advice history from service
             $history = $this->trainingAdvisorService->getAdviceHistory(
                 $characterId,
-                $user?->id ?? throw new \Exception('User required'),
+                $user->id ?? throw new \Exception('User required'),
                 limit: 20
             );
 

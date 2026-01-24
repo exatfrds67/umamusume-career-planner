@@ -42,7 +42,10 @@ class RaceStrategyAgent extends BaseAgent
      */
     protected function provider(): AIProviderInterface
     {
-        return AIProvider::driver('anthropic');
+        /** @var AIProviderInterface $provider */
+        $provider = AIProvider::driver('anthropic');
+
+        return $provider;
     }
 
     /**

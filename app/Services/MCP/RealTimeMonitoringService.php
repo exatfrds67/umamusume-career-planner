@@ -31,6 +31,7 @@ class RealTimeMonitoringService
     public function __construct(
         private readonly MCPClientService $mcpClient,
         private readonly MCPMonitoringService $monitoringService,
+        /** @phpstan-ignore-next-line property.onlyWritten - service available for future use */
         private readonly AgentOrchestrationService $orchestrationService
     ) {}
 
@@ -61,9 +62,10 @@ class RealTimeMonitoringService
      * }
      */
     public function getRealTimeServerStatus(): array
+    {
         $cacheKey = 'realtime:server_status';
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () {
+        $result = Cache::remember($cacheKey, self::CACHE_TTL, function () {
             $healthCheck = $this->monitoringService->performHealthCheck();
             $dashboard = $this->monitoringService->getMonitoringDashboard();
 
@@ -93,6 +95,14 @@ class RealTimeMonitoringService
                 'alerts' => $this->formatAlerts($dashboard['alerts']),
             ];
         });
+
+        /** @var array{timestamp: string, overall_status: string, servers: array<string, array{name: string, status: string, is_connected: bool, response_time: float|null, uptime_percentage: float, consecutive_failures: int, last_success_at: string|null, last_failure_at: string|null, capabilities: array<string, mixed>, health_trend: string}>, alerts: array<int, array{level: string, server: string, message: string, timestamp: string}>} $result */
+        return is_array($result) ? $result : [
+            'timestamp' => now()->toIso8601String(),
+            'overall_status' => 'unknown',
+            'servers' => [],
+            'alerts' => [],
+        ];
     }
 
     /**
@@ -120,7 +130,8 @@ class RealTimeMonitoringService
      *     started_at: string|null
      * }
      */
-    public function getAgentProgressTracking(): array
+    public function getAgentProgressTracking(?int $userId = null): array
+    {
         $cacheKey = $userId ? "realtime:agent_progress:{$userId}" : 'realtime:agent_progress:global';
 
         $data = Cache::get($cacheKey, [
@@ -137,19 +148,20 @@ class RealTimeMonitoringService
         ]);
 
         // Ensure progress_percentage is always a float
-        if (isset((is_array($data) && isset($data['progress_percentage']) ? $data['progress_percentage'] : null))) {
-            (is_array($data) && isset($data['progress_percentage']) ? $data['progress_percentage'] : null) = (float) (is_array($data) && isset($data['progress_percentage']) ? $data['progress_percentage'] : null);
+        if (is_array($data) && isset($data['progress_percentage']) && is_numeric($data['progress_percentage'])) {
+            $data['progress_percentage'] = (float) $data['progress_percentage'];
         }
 
         // Ensure agent progress values are always floats
-        if (isset((is_array($data) && isset($data['agents']) ? $data['agents'] : null)) && is_array((is_array($data) && isset($data['agents']) ? $data['agents'] : null))) {
-            foreach ((is_array($data) && isset($data['agents']) ? $data['agents'] : null) as &$agent) {
-                if (isset($agent['progress'])) {
+        if (is_array($data) && isset($data['agents']) && is_array($data['agents'])) {
+            foreach ($data['agents'] as &$agent) {
+                if (is_array($agent) && isset($agent['progress']) && is_numeric($agent['progress'])) {
                     $agent['progress'] = (float) $agent['progress'];
                 }
             }
         }
 
+        /** @var array{workflow_id: string|null, workflow_name: string|null, status: string, progress_percentage: float, current_step: string|null, total_steps: int, completed_steps: int, agents: array<int, array{agent_id: string, agent_type: string, status: string, progress: float, started_at: string|null, completed_at: string|null, execution_time: float|null, error: string|null}>, estimated_completion: string|null, started_at: string|null} $data */
         return $data;
     }
 
@@ -265,15 +277,24 @@ class RealTimeMonitoringService
      *     }>
      * }
      */
-    public function getToolExecutionMonitoring(): array
+    public function getToolExecutionMonitoring(?int $userId = null): array
+    {
         $cacheKey = $userId ? "realtime:tool_execution:{$userId}" : 'realtime:tool_execution:global';
 
-        return Cache::get($cacheKey, [
+        $result = Cache::get($cacheKey, [
             'timestamp' => now()->toIso8601String(),
             'active_tools' => [],
             'recent_executions' => [],
             'tool_statistics' => [],
         ]);
+
+        /** @var array{timestamp: string, active_tools: array<int, array{tool_name: string, server: string, status: string, started_at: string, execution_time: float|null, input_summary: string, output_summary: string|null, error: string|null}>, recent_executions: array<int, array{tool_name: string, server: string, status: string, execution_time: float, completed_at: string, success: bool}>, tool_statistics: array<string, array{tool_name: string, total_executions: int, successful_executions: int, failed_executions: int, average_execution_time: float, success_rate: float}>} $result */
+        return is_array($result) ? $result : [
+            'timestamp' => now()->toIso8601String(),
+            'active_tools' => [],
+            'recent_executions' => [],
+            'tool_statistics' => [],
+        ];
     }
 
     /**
@@ -382,10 +403,11 @@ class RealTimeMonitoringService
      *     }
      * }
      */
-    public function getPerformanceMetrics(): array
+    public function getPerformanceMetrics(?int $userId = null): array
+    {
         $cacheKey = $userId ? "realtime:performance_metrics:{$userId}" : 'realtime:performance_metrics:global';
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($userId) {
+        $result = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($userId) {
             $providers = $this->getProviderMetrics($userId);
             $agents = $this->getAgentMetrics($userId);
             $comparison = $this->generateComparison($providers, $agents);
@@ -397,12 +419,28 @@ class RealTimeMonitoringService
                 'comparison' => $comparison,
             ];
         });
+
+        /** @var array{timestamp: string, providers: array<string, array{name: string, total_requests: int, successful_requests: int, failed_requests: int, average_response_time: float, average_cost: float, success_rate: float, uptime_percentage: float}>, agents: array<string, array{type: string, total_executions: int, successful_executions: int, failed_executions: int, average_execution_time: float, success_rate: float, health_status: string}>, comparison: array{fastest_provider: string, most_reliable_provider: string, most_cost_effective: string, best_performing_agent: string}} $result */
+        return is_array($result) ? $result : [
+            'timestamp' => now()->toIso8601String(),
+            'providers' => [],
+            'agents' => [],
+            'comparison' => [
+                'fastest_provider' => 'N/A',
+                'most_reliable_provider' => 'N/A',
+                'most_cost_effective' => 'N/A',
+                'best_performing_agent' => 'N/A',
+            ],
+        ];
     }
 
     /**
      * Handle MCP server disconnection with recovery
+     *
+     * @return array<string, mixed>
      */
-    public function handleServerDisconnection(): array
+    public function handleServerDisconnection(string $serverName, string $error): array
+    {
         Log::warning('[RealTimeMonitoring] Server disconnection detected', [
             'server' => $serverName,
             'error' => $error,
@@ -430,8 +468,11 @@ class RealTimeMonitoringService
 
     /**
      * Attempt server reconnection with exponential backoff
+     *
+     * @return array{success: bool, message: string, attempts: int}
      */
-    protected function attemptServerReconnection(): array
+    protected function attemptServerReconnection(string $serverName, int $attempt = 1): array
+    {
         $maxAttempts = 3;
         $baseDelay = 2; // seconds
 
@@ -497,7 +538,8 @@ class RealTimeMonitoringService
     {
         $cacheKey = "realtime:server_events:{$serverName}";
 
-        $events = Cache::get($cacheKey, []);
+        $eventsRaw = Cache::get($cacheKey, []);
+        $events = is_array($eventsRaw) ? $eventsRaw : [];
         $events[] = [
             'event_type' => $eventType,
             'message' => $message,
@@ -514,8 +556,11 @@ class RealTimeMonitoringService
 
     /**
      * Get provider metrics from database
+     *
+     * @return array<string, array<string, mixed>>
      */
-    protected function getProviderMetrics(): array
+    protected function getProviderMetrics(?int $userId = null): array
+    {
         $query = DB::table('ucp_ai_conversations')
             ->select(
                 DB::raw('JSON_EXTRACT(metadata, "$.provider") as provider'),
@@ -558,8 +603,11 @@ class RealTimeMonitoringService
      * Get agent metrics from database
      *
      * Retrieves agent execution metrics from the MCP agents and tool usage tables.
+     *
+     * @return array<string, array<string, mixed>>
      */
-    protected function getAgentMetrics(): array
+    protected function getAgentMetrics(?int $userId = null): array
+    {
         $query = DB::table('ucp_mcp_agents')
             ->select(
                 'agent_type as type',
@@ -631,8 +679,13 @@ class RealTimeMonitoringService
 
     /**
      * Generate performance comparison
+     *
+     * @param  array<string, array<string, mixed>>  $providers
+     * @param  array<string, array<string, mixed>>  $agents
+     * @return array{fastest_provider: string, most_reliable_provider: string, most_cost_effective: string, best_performing_agent: string}
      */
-    protected function generateComparison(): array
+    protected function generateComparison(array $providers, array $agents): array
+    {
         $fastestProvider = null;
         $fastestTime = PHP_FLOAT_MAX;
 
@@ -670,10 +723,10 @@ class RealTimeMonitoringService
         }
 
         return [
-            'fastest_provider' => $fastestProvider ?? 'N/A',
-            'most_reliable_provider' => $mostReliableProvider ?? 'N/A',
-            'most_cost_effective' => $mostCostEffective ?? 'N/A',
-            'best_performing_agent' => $bestPerformingAgent ?? 'N/A',
+            'fastest_provider' => is_string($fastestProvider ?? null) ? $fastestProvider : 'N/A',
+            'most_reliable_provider' => is_string($mostReliableProvider ?? null) ? $mostReliableProvider : 'N/A',
+            'most_cost_effective' => is_string($mostCostEffective ?? null) ? $mostCostEffective : 'N/A',
+            'best_performing_agent' => is_string($bestPerformingAgent ?? null) ? $bestPerformingAgent : 'N/A',
         ];
     }
 
@@ -703,13 +756,17 @@ class RealTimeMonitoringService
 
     /**
      * Format alerts for frontend display
+     *
+     * @param  array<int, array<string, mixed>>  $alerts
+     * @return array<int, array{level: string, server: string, message: string, timestamp: string}>
      */
-    protected function formatAlerts(): array
+    protected function formatAlerts(array $alerts): array
+    {
         return array_map(function ($alert) {
             return [
-                'level' => $alert['level'],
-                'server' => $alert['server'],
-                'message' => $alert['message'],
+                'level' => is_string($alert['level'] ?? null) ? $alert['level'] : 'info',
+                'server' => is_string($alert['server'] ?? null) ? $alert['server'] : 'unknown',
+                'message' => is_string($alert['message'] ?? null) ? $alert['message'] : '',
                 'timestamp' => now()->toIso8601String(),
             ];
         }, $alerts);

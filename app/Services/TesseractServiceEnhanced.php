@@ -7,7 +7,6 @@ namespace App\Services;
 use App\Models\OCRExtraction;
 use App\Services\OCR\ParserFactory;
 use App\Services\OCR\ScreenTypeDetector;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
@@ -61,10 +60,21 @@ class TesseractServiceEnhanced
         $this->imageProcessor = $imageProcessor;
         $this->screenDetector = new ScreenTypeDetector;
         $this->parserFactory = new ParserFactory;
-        $this->tesseractPath = config('services.tesseract.path', 'tesseract');
-        $this->language = config('services.tesseract.language', 'jpn+eng');
-        $this->psm = config('services.tesseract.psm', '6');
-        $this->oem = config('services.tesseract.oem', '3');
+        /** @var string $tesseractPath */
+        $tesseractPath = config('services.tesseract.path', 'tesseract');
+        $this->tesseractPath = is_string($tesseractPath) ? $tesseractPath : 'tesseract';
+
+        /** @var string $language */
+        $language = config('services.tesseract.language', 'jpn+eng');
+        $this->language = is_string($language) ? $language : 'jpn+eng';
+
+        /** @var string $psm */
+        $psm = config('services.tesseract.psm', '6');
+        $this->psm = is_string($psm) ? $psm : '6';
+
+        /** @var string $oem */
+        $oem = config('services.tesseract.oem', '3');
+        $this->oem = is_string($oem) ? $oem : '3';
     }
 
     /**
@@ -80,18 +90,27 @@ class TesseractServiceEnhanced
      *     error: string|null
      * }
      */
-    public function processScreenshot(): array
+    public function processScreenshot(\Illuminate\Http\UploadedFile $file, int $userId): array
     {
         try {
             // Validate image first
             $validation = $this->imageProcessor->validateImage($file);
             if (! $validation['valid']) {
-                return $this->errorResponse($validation['error']);
+                $error = $validation['error'] ?? 'Image validation failed';
+
+                return $this->errorResponse($error);
             }
 
             // Store the uploaded file
             $path = $file->store('ocr-uploads', 'local');
+            if ($path === false) {
+                throw new \RuntimeException('Failed to store uploaded file');
+            }
+
             $fullPath = Storage::disk('local')->path($path);
+            if (! is_string($fullPath) || $fullPath === '') {
+                throw new \RuntimeException('Failed to get file path');
+            }
 
             // Calculate image hash for deduplication
             $imageHash = $this->imageProcessor->calculateImageHash($fullPath);
@@ -151,6 +170,7 @@ class TesseractServiceEnhanced
     /**
      * Process OCR text with intelligent screen detection and parsing
      *
+     * @param  string  $text  The OCR extracted text to process
      * @return array{
      *     success: bool,
      *     screen_type: string|null,
@@ -161,7 +181,8 @@ class TesseractServiceEnhanced
      *     errors: array<string>
      * }
      */
-    public function processWithIntelligentParsing(): array
+    public function processWithIntelligentParsing(string $text): array
+    {
         // Detect screen type
         $detection = $this->screenDetector->detectScreenType($text);
 
@@ -180,13 +201,13 @@ class TesseractServiceEnhanced
         $parseResult = $parser->parse($text);
 
         return [
-            'success' => $parseResult['success'],
+            'success' => (bool) ($parseResult['success'] ?? false),
             'screen_type' => $detection['detected_type'],
-            'screen_detection_confidence' => $detection['confidence'],
+            'screen_detection_confidence' => (float) ($detection['confidence'] ?? 0.0),
             'parser_used' => $parser->getScreenType(),
-            'data' => $parseResult['data'],
-            'confidence' => $parseResult['confidence'],
-            'errors' => $parseResult['errors'],
+            'data' => is_array($parseResult['data'] ?? null) ? $parseResult['data'] : [],
+            'confidence' => is_numeric($parseResult['confidence'] ?? null) ? (float) $parseResult['confidence'] : 0.0,
+            'errors' => is_array($parseResult['errors'] ?? null) ? $parseResult['errors'] : [],
         ];
     }
 
@@ -196,13 +217,22 @@ class TesseractServiceEnhanced
     protected function performOCRWithPreprocessing(string $fullPath): string
     {
         $preprocessResult = $this->imageProcessor->preprocessForOCR($fullPath);
-        $ocrImagePath = $preprocessResult['success'] ? $preprocessResult['processed_path'] : $fullPath;
+        $ocrImagePath = $fullPath;
+        if (isset($preprocessResult['success']) && $preprocessResult['success'] === true) {
+            $processedPath = $preprocessResult['processed_path'] ?? null;
+            if (is_string($processedPath) && $processedPath !== '') {
+                $ocrImagePath = $processedPath;
+            }
+        }
 
         $rawText = $this->performOCR($ocrImagePath);
 
         // Clean up processed image if it was created
-        if ($preprocessResult['success'] && $preprocessResult['processed_path'] !== $fullPath) {
-            @unlink($preprocessResult['processed_path']);
+        if (isset($preprocessResult['success']) && $preprocessResult['success'] === true) {
+            $processedPath = $preprocessResult['processed_path'] ?? null;
+            if (is_string($processedPath) && $processedPath !== '' && $processedPath !== $fullPath) {
+                @unlink($processedPath);
+            }
         }
 
         return $rawText;
@@ -224,7 +254,7 @@ class TesseractServiceEnhanced
 
         $output = shell_exec($command);
 
-        if ($output === null) {
+        if (! is_string($output)) {
             throw new \RuntimeException('Tesseract execution failed');
         }
 
@@ -234,7 +264,15 @@ class TesseractServiceEnhanced
     /**
      * Check for existing extraction
      *
-     * @return array<string, mixed>|null
+     * @return array{
+     *     success: bool,
+     *     extraction_id: int|null,
+     *     screen_type: string|null,
+     *     data: array<string, mixed>|null,
+     *     raw_text: string|null,
+     *     confidence: float,
+     *     error: string|null
+     * }|null
      */
     protected function checkExistingExtraction(string $imageHash): ?array
     {
@@ -246,11 +284,13 @@ class TesseractServiceEnhanced
             return null;
         }
 
+        $data = is_array($existing->parsed_data) ? $existing->parsed_data : null;
+
         return [
             'success' => true,
             'extraction_id' => $existing->id,
             'screen_type' => $existing->data_type,
-            'data' => $existing->parsed_data,
+            'data' => $data,
             'raw_text' => $existing->extracted_text,
             'confidence' => (is_numeric($existing->confidence_score) ? (float) $existing->confidence_score : 0.0),
             'error' => null,
@@ -259,6 +299,16 @@ class TesseractServiceEnhanced
 
     /**
      * Update extraction record with results
+     */
+    /**
+     * @param  array{
+     *     data: array<string, mixed>,
+     *     confidence: float,
+     *     screen_type: string|null,
+     *     screen_detection_confidence?: float,
+     *     parser_used?: string|null,
+     *     errors?: array<string>
+     * }  $result
      */
     protected function updateExtraction(OCRExtraction $extraction, string $rawText, array $result): void
     {
@@ -284,9 +334,21 @@ class TesseractServiceEnhanced
     /**
      * Fallback parsing when screen type detection fails
      *
-     * @return array<string, mixed>
+     * @param  string  $text  The OCR text to parse
+     * @param  string|null  $detectedType  The detected screen type, if any
+     * @param  float  $detectionConfidence  The detection confidence score
+     * @return array{
+     *     success: bool,
+     *     screen_type: string|null,
+     *     screen_detection_confidence: float,
+     *     parser_used: string|null,
+     *     data: array<string, mixed>,
+     *     confidence: float,
+     *     errors: array<string>
+     * }
      */
-    protected function fallbackParsing(): array
+    protected function fallbackParsing(string $text, ?string $detectedType, float $detectionConfidence): array
+    {
         // Basic stats extraction as fallback
         $stats = $this->extractBasicStats($text);
         $confidence = $this->calculateBasicConfidence($stats);
@@ -312,9 +374,11 @@ class TesseractServiceEnhanced
     /**
      * Extract basic stats (fallback method)
      *
+     * @param  string  $text  The OCR text to extract stats from
      * @return array<string, int|null>
      */
-    protected function extractBasicStats(): array
+    protected function extractBasicStats(string $text): array
+    {
         $patterns = [
             'speed' => '/(?:スピード|Speed|SPD)\s*[:：]?\s*(\d{2,4})/iu',
             'stamina' => '/(?:スタミナ|Stamina|STA)\s*[:：]?\s*(\d{2,4})/iu',
@@ -353,9 +417,20 @@ class TesseractServiceEnhanced
     /**
      * Create error response
      *
-     * @return array<string, mixed>
+     * @param  string  $error  The error message
+     * @param  int|null  $extractionId  The extraction ID if available
+     * @return array{
+     *     success: bool,
+     *     extraction_id: int|null,
+     *     screen_type: string|null,
+     *     data: array<string, mixed>|null,
+     *     raw_text: string|null,
+     *     confidence: float,
+     *     error: string|null
+     * }
      */
-    protected function errorResponse(): array
+    protected function errorResponse(string $error, ?int $extractionId = null): array
+    {
         return [
             'success' => false,
             'extraction_id' => $extractionId,
@@ -374,6 +449,6 @@ class TesseractServiceEnhanced
     {
         $output = shell_exec("{$this->tesseractPath} --version 2>&1");
 
-        return $output !== null && str_contains($output, 'tesseract');
+        return is_string($output) && str_contains($output, 'tesseract');
     }
 }

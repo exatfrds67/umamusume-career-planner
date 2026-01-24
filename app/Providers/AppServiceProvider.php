@@ -41,7 +41,7 @@ class AppServiceProvider extends ServiceProvider
             $user = $request->user();
 
             return Limit::perMinute(10)->by(
-                $user instanceof \App\Models\User ? $user?->id ?? throw new \Exception('User required') : $request->ip()
+                $user instanceof \App\Models\User ? $user->id ?? throw new \Exception('User required') : $request->ip()
             )->response(function (Request $request, array $headers) {
                 return response()->json([
                     'success' => false,
@@ -56,7 +56,7 @@ class AppServiceProvider extends ServiceProvider
             $user = $request->user();
 
             return Limit::perMinute(60)->by(
-                $user instanceof \App\Models\User ? $user?->id ?? throw new \Exception('User required') : $request->ip()
+                $user instanceof \App\Models\User ? $user->id ?? throw new \Exception('User required') : $request->ip()
             )->response(function (Request $request, array $headers) {
                 return response()->json([
                     'success' => false,

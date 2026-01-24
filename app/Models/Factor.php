@@ -35,6 +35,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class Factor extends Model
 {
+    /** @use HasFactory<\Database\Factories\FactorFactory> */
     use HasFactory;
 
     protected $table = 'ucp_factors';

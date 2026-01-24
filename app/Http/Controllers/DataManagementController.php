@@ -61,7 +61,7 @@ class DataManagementController extends Controller
                 return response()->json(['error' => 'Unauthenticated'], 401);
             }
             /** @var \App\Models\User $user */
-            $userId = $user?->id ?? throw new \Exception('User required');
+            $userId = $user->id ?? throw new \Exception('User required');
 
             // Get statistics
             $statistics = $this->historyService->getStatistics($userId, 'month');
@@ -113,7 +113,7 @@ class DataManagementController extends Controller
         try {
             $user = $request->user();
             /** @var \App\Models\User $user */
-            $userId = $user?->id ?? throw new \Exception('User required');
+            $userId = $user->id ?? throw new \Exception('User required');
             $page = (int) $request->query('page', 1);
             $perPage = (int) $request->query('per_page', 20);
 
@@ -158,7 +158,7 @@ class DataManagementController extends Controller
         try {
             $user = $request->user();
             /** @var \App\Models\User $user */
-            $userId = $user?->id ?? throw new \Exception('User required');
+            $userId = $user->id ?? throw new \Exception('User required');
             $operationId = $request->query('operation_id');
 
             if ($operationId) {
@@ -205,7 +205,7 @@ class DataManagementController extends Controller
         try {
             $user = $request->user();
             /** @var \App\Models\User $user */
-            $userId = $user?->id ?? throw new \Exception('User required');
+            $userId = $user->id ?? throw new \Exception('User required');
             $period = $request->query('period', 'month');
 
             $statistics = $this->historyService->getStatistics($userId, $period);

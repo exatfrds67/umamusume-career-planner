@@ -178,11 +178,13 @@ class APIMonitoringController extends Controller
      */
     public function alerts(Request $request): JsonResponse
     {
-        $limit = (int) $request->query('limit', 50);
-        $type = $request->query('type');
+        $limitInput = $request->query('limit', 50);
+        $limit = is_numeric($limitInput) ? (int) $limitInput : 50;
+        $typeInput = $request->query('type');
+        $type = is_string($typeInput) ? $typeInput : null;
 
         $unacknowledged = $this->alertingService->getUnacknowledgedAlerts();
-        $history = $this->alertingService->getAlertHistory($limit, $type);
+        $history = $this->alertingService->getAlertHistory($type, $limit);
         $statistics = $this->alertingService->getAlertStatistics();
 
         return response()->json([

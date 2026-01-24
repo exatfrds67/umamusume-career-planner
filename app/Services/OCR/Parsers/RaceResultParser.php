@@ -40,55 +40,56 @@ class RaceResultParser extends AbstractScreenParser
         return 'race_result';
     }
 
-    public function parse(): array
+    public function parse(string $text): array
+    {
         $data = [];
         $errors = [];
 
         // Extract position
         $position = $this->extractNumeric($text, self::RACE_PATTERNS['position']);
         if ($position !== null) {
-            (is_array($data) && isset($data['position']) ? $data['position'] : null) = $position;
+            $data['position'] = $position;
         }
 
         // Extract race name
         $raceName = $this->extractText($text, self::RACE_PATTERNS['race_name']);
         if ($raceName) {
-            (is_array($data) && isset($data['race_name']) ? $data['race_name'] : null) = trim($raceName);
+            $data['race_name'] = trim($raceName);
         }
 
         // Extract race grade
         $raceGrade = $this->extractRaceGrade($text);
         if ($raceGrade) {
-            (is_array($data) && isset($data['race_grade']) ? $data['race_grade'] : null) = $raceGrade;
+            $data['race_grade'] = $raceGrade;
         }
 
         // Extract distance
         $distance = $this->extractNumeric($text, self::RACE_PATTERNS['distance']);
         if ($distance !== null) {
-            (is_array($data) && isset($data['distance']) ? $data['distance'] : null) = $distance;
-            (is_array($data) && isset($data['distance_category']) ? $data['distance_category'] : null) = $this->categorizeDistance($distance);
+            $data['distance'] = $distance;
+            $data['distance_category'] = $this->categorizeDistance($distance);
         }
 
         // Extract surface
         $surface = $this->extractSurface($text);
         if ($surface) {
-            (is_array($data) && isset($data['surface']) ? $data['surface'] : null) = $surface;
+            $data['surface'] = $surface;
         }
 
         // Extract rewards
         $fansGained = $this->extractNumeric($text, self::RACE_PATTERNS['fans_gained']);
         if ($fansGained !== null) {
-            (is_array($data) && isset($data['fans_gained']) ? $data['fans_gained'] : null) = $fansGained;
+            $data['fans_gained'] = $fansGained;
         }
 
         $skillPoints = $this->extractNumeric($text, self::RACE_PATTERNS['skill_points']);
         if ($skillPoints !== null) {
-            (is_array($data) && isset($data['skill_points_gained']) ? $data['skill_points_gained'] : null) = $skillPoints;
+            $data['skill_points_gained'] = $skillPoints;
         }
 
         // Determine race outcome
-        if (isset((is_array($data) && isset($data['position']) ? $data['position'] : null))) {
-            (is_array($data) && isset($data['outcome']) ? $data['outcome'] : null) = $this->determineOutcome((is_array($data) && isset($data['position']) ? $data['position'] : null));
+        if (isset($data['position'])) {
+            $data['outcome'] = $this->determineOutcome($data['position']);
         }
 
         // Validate extracted data
@@ -113,27 +114,40 @@ class RaceResultParser extends AbstractScreenParser
         return $result;
     }
 
-    public function validate(): array
+    public function validate(array $data): array
+    {
         $errors = [];
 
         // Validate position
-        if (isset((is_array($data) && isset($data['position']) ? $data['position'] : null)) && ((is_array($data) && isset($data['position']) ? $data['position'] : null) < 1 || (is_array($data) && isset($data['position']) ? $data['position'] : null) > 18)) {
-            $errors[] = "Invalid position: {(is_array($data) && isset($data['position']) ? $data['position'] : null)} (must be 1-18)";
+        if (isset($data['position'])) {
+            $position = is_int($data['position']) ? $data['position'] : 0;
+            if ($position < 1 || $position > 18) {
+                $errors[] = "Invalid position: {$position} (must be 1-18)";
+            }
         }
 
         // Validate distance
-        if (isset((is_array($data) && isset($data['distance']) ? $data['distance'] : null)) && ((is_array($data) && isset($data['distance']) ? $data['distance'] : null) < 1000 || (is_array($data) && isset($data['distance']) ? $data['distance'] : null) > 3600)) {
-            $errors[] = "Invalid distance: {(is_array($data) && isset($data['distance']) ? $data['distance'] : null)} (must be 1000-3600m)";
+        if (isset($data['distance'])) {
+            $distance = is_int($data['distance']) ? $data['distance'] : 0;
+            if ($distance < 1000 || $distance > 3600) {
+                $errors[] = "Invalid distance: {$distance} (must be 1000-3600m)";
+            }
         }
 
         // Validate fans gained
-        if (isset((is_array($data) && isset($data['fans_gained']) ? $data['fans_gained'] : null)) && (is_array($data) && isset($data['fans_gained']) ? $data['fans_gained'] : null) < 0) {
-            $errors[] = "Invalid fans gained: {(is_array($data) && isset($data['fans_gained']) ? $data['fans_gained'] : null)} (must be >= 0)";
+        if (isset($data['fans_gained'])) {
+            $fansGained = is_int($data['fans_gained']) ? $data['fans_gained'] : 0;
+            if ($fansGained < 0) {
+                $errors[] = "Invalid fans gained: {$fansGained} (must be >= 0)";
+            }
         }
 
         // Validate skill points
-        if (isset((is_array($data) && isset($data['skill_points_gained']) ? $data['skill_points_gained'] : null)) && (is_array($data) && isset($data['skill_points_gained']) ? $data['skill_points_gained'] : null) < 0) {
-            $errors[] = "Invalid skill points: {(is_array($data) && isset($data['skill_points_gained']) ? $data['skill_points_gained'] : null)} (must be >= 0)";
+        if (isset($data['skill_points_gained'])) {
+            $skillPointsGained = is_int($data['skill_points_gained']) ? $data['skill_points_gained'] : 0;
+            if ($skillPointsGained < 0) {
+                $errors[] = "Invalid skill points: {$skillPointsGained} (must be >= 0)";
+            }
         }
 
         return [

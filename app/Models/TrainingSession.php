@@ -27,6 +27,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class TrainingSession extends Model
 {
+    /** @use HasFactory<\Database\Factories\TrainingSessionFactory> */
     use HasFactory;
 
     protected $table = 'ucp_training_sessions';

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -34,6 +35,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $terminated_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ *
+ * @use HasFactory<\Database\Factories\MCPAgentFactory>
  */
 /**
  * @property int $id
@@ -42,6 +45,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class MCPAgent extends Model
 {
+    /** @use HasFactory<\Database\Factories\MCPAgentFactory> */
     use HasFactory;
 
     /**
@@ -52,7 +56,7 @@ class MCPAgent extends Model
     /**
      * The attributes that are mass assignable.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $fillable = [
         'user_id',
@@ -109,6 +113,8 @@ class MCPAgent extends Model
 
     /**
      * Get the user that owns the agent.
+     *
+     * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {
@@ -141,11 +147,18 @@ class MCPAgent extends Model
         return Attribute::make(
             get: function (mixed $value, array $attributes) {
                 // Access dates from $this if model is hydrated to ensure Carbon casting
-                if ($this->terminated_at) {
-                    return $this->terminated_at->diffInSeconds($this->created_at);
+                $createdAt = $this->created_at ? $this->asDateTime($this->created_at) : null;
+                $terminatedAt = $this->terminated_at ? $this->asDateTime($this->terminated_at) : null;
+
+                if (! $createdAt) {
+                    return 0;
                 }
 
-                return now()->diffInSeconds($this->created_at);
+                if ($terminatedAt) {
+                    return $terminatedAt->diffInSeconds($createdAt);
+                }
+
+                return now()->diffInSeconds($createdAt);
             }
         );
     }
@@ -157,24 +170,33 @@ class MCPAgent extends Model
 
     /**
      * Scope a query to only include active agents.
+     *
+     * @param  Builder<MCPAgent>  $query
+     * @return Builder<MCPAgent>
      */
-    public function scopeActive(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    public function scopeActive(Builder $query): Builder
     {
         return $query->where('status', 'active');
     }
 
     /**
      * Scope a query to only include terminated agents.
+     *
+     * @param  Builder<MCPAgent>  $query
+     * @return Builder<MCPAgent>
      */
-    public function scopeTerminated(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    public function scopeTerminated(Builder $query): Builder
     {
         return $query->where('status', 'terminated');
     }
 
     /**
      * Scope a query to only include healthy agents.
+     *
+     * @param  Builder<MCPAgent>  $query
+     * @return Builder<MCPAgent>
      */
-    public function scopeHealthy(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    public function scopeHealthy(Builder $query): Builder
     {
         return $query->where('health_status', 'healthy');
     }

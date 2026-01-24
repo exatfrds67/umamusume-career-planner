@@ -55,6 +55,7 @@ class PerformanceRegressionService
      * @return array{checked: int, detected: int, regressions: array<int, array<string, mixed>>}
      */
     public function checkRegressions(): array
+    {
         if (! config('apm.regression.enabled', true)) {
             return ['checked' => 0, 'detected' => 0, 'regressions' => []];
         }
@@ -64,34 +65,34 @@ class PerformanceRegressionService
         $regressions = [];
 
         // Check response time regression
-        $checked = ($checked ?? 0) + 1;
+        $checked++;
         $responseTimeRegression = $this->checkMetricRegression('response_time');
         if ($responseTimeRegression !== null) {
-            $detected = ($detected ?? 0) + 1;
+            $detected++;
             $regressions[] = $responseTimeRegression;
         }
 
         // Check error rate regression
-        $checked = ($checked ?? 0) + 1;
+        $checked++;
         $errorRateRegression = $this->checkMetricRegression('error_rate');
         if ($errorRateRegression !== null) {
-            $detected = ($detected ?? 0) + 1;
+            $detected++;
             $regressions[] = $errorRateRegression;
         }
 
         // Check throughput regression
-        $checked = ($checked ?? 0) + 1;
+        $checked++;
         $throughputRegression = $this->checkMetricRegression('throughput');
         if ($throughputRegression !== null) {
-            $detected = ($detected ?? 0) + 1;
+            $detected++;
             $regressions[] = $throughputRegression;
         }
 
         // Check memory usage regression
-        $checked = ($checked ?? 0) + 1;
+        $checked++;
         $memoryRegression = $this->checkMetricRegression('memory_usage');
         if ($memoryRegression !== null) {
-            $detected = ($detected ?? 0) + 1;
+            $detected++;
             $regressions[] = $memoryRegression;
         }
 
@@ -109,8 +110,10 @@ class PerformanceRegressionService
      */
     public function calculateBaseline(string $metric): ?array
     {
-        $baselinePeriod = (int) config('apm.regression.baseline_period_hours', 24);
-        $minDataPoints = (int) config('apm.regression.min_data_points', 100);
+        $baselinePeriodConfig = config('apm.regression.baseline_period_hours', 24);
+        $minDataPointsConfig = config('apm.regression.min_data_points', 100);
+        $baselinePeriod = is_numeric($baselinePeriodConfig) ? (int) $baselinePeriodConfig : 24;
+        $minDataPoints = is_numeric($minDataPointsConfig) ? (int) $minDataPointsConfig : 100;
 
         // Get historical data
         $data = $this->getHistoricalData($metric, $baselinePeriod);
@@ -160,19 +163,37 @@ class PerformanceRegressionService
             return $this->calculateBaseline($metric);
         }
 
+        if (! is_array($baseline)) {
+            return null;
+        }
+
+        /** @var array{metric: string, baseline: float, std_dev: float, data_points: int, calculated_at: string} $baseline */
         return $baseline;
     }
 
     /**
      * Get all regressions.
      *
+     * @param  int  $limit  Maximum number of regressions to return
      * @return array<int, array<string, mixed>>
      */
-    public function getRegressions(): array
+    public function getRegressions(int $limit = 100): array
+    {
         $regressions = Cache::get(self::REGRESSION_PREFIX.'list', []);
 
+        if (! is_array($regressions)) {
+            return [];
+        }
+
+        /** @var array<int, array<string, mixed>> $regressions */
+
         // Sort by detected_at descending
-        usort($regressions, fn ($a, $b) => strtotime($b['detected_at']) <=> strtotime($a['detected_at']));
+        usort($regressions, function (array $a, array $b): int {
+            $aTime = is_string($a['detected_at'] ?? null) ? strtotime($a['detected_at']) : 0;
+            $bTime = is_string($b['detected_at'] ?? null) ? strtotime($b['detected_at']) : 0;
+
+            return ($bTime ?: 0) <=> ($aTime ?: 0);
+        });
 
         return \array_slice($regressions, 0, $limit);
     }
@@ -183,6 +204,7 @@ class PerformanceRegressionService
      * @return array<int, array<string, mixed>>
      */
     public function getActiveRegressions(): array
+    {
         $regressions = $this->getRegressions();
 
         return array_values(array_filter(
@@ -196,10 +218,21 @@ class PerformanceRegressionService
      */
     public function updateRegressionStatus(string $regressionId, string $status, ?string $notes = null): bool
     {
-        $regressions = Cache::get(self::REGRESSION_PREFIX.'list', []);
+        $regressionsCache = Cache::get(self::REGRESSION_PREFIX.'list', []);
+
+        if (! is_array($regressionsCache)) {
+            return false;
+        }
+
+        /** @var array<int, array<string, mixed>> $regressions */
+        $regressions = $regressionsCache;
 
         foreach ($regressions as &$regression) {
-            if ($regression['id'] === $regressionId) {
+            if (! is_array($regression)) {
+                continue;
+            }
+
+            if (($regression['id'] ?? '') === $regressionId) {
                 $regression['status'] = $status;
                 $regression['updated_at'] = now()->toIso8601String();
 
@@ -226,6 +259,7 @@ class PerformanceRegressionService
      * @return array{total: int, active: int, resolved: int, by_metric: array<string, int>, avg_deviation: float}
      */
     public function getRegressionStatistics(): array
+    {
         $regressions = $this->getRegressions();
 
         $active = 0;
@@ -234,14 +268,21 @@ class PerformanceRegressionService
         $totalDeviation = 0.0;
 
         foreach ($regressions as $regression) {
-            if ($regression['status'] === self::STATUS_DETECTED || $regression['status'] === self::STATUS_INVESTIGATING) {
-                $active = ($active ?? 0) + 1;
-            } elseif ($regression['status'] === self::STATUS_RESOLVED) {
-                $resolved = ($resolved ?? 0) + 1;
+            /** @var array{status: string, metric: string, deviation_percent: float} $regression */
+            $status = is_string($regression['status'] ?? null) ? $regression['status'] : '';
+            $metric = is_string($regression['metric'] ?? null) ? $regression['metric'] : '';
+            $deviation = is_numeric($regression['deviation_percent'] ?? null) ? (float) $regression['deviation_percent'] : 0.0;
+
+            if ($status === self::STATUS_DETECTED || $status === self::STATUS_INVESTIGATING) {
+                $active++;
+            } elseif ($status === self::STATUS_RESOLVED) {
+                $resolved++;
             }
 
-            $byMetric[$regression['metric']] = ($byMetric[$regression['metric']] ?? 0) + 1;
-            $totalDeviation = ($totalDeviation ?? 0) + abs($regression['deviation_percent']);
+            if ($metric !== '') {
+                $byMetric[$metric] = ($byMetric[$metric] ?? 0) + 1;
+            }
+            $totalDeviation += abs($deviation);
         }
 
         return [
@@ -266,6 +307,7 @@ class PerformanceRegressionService
      * }
      */
     public function generateReport(): array
+    {
         $activeRegressions = $this->getActiveRegressions();
         $statistics = $this->getRegressionStatistics();
 
@@ -281,9 +323,12 @@ class PerformanceRegressionService
 
         $recommendations = $this->generateRecommendations($activeRegressions);
 
+        $periodConfig = config('apm.regression.baseline_period_hours', 24);
+        $period = (is_numeric($periodConfig) ? (string) $periodConfig : '24').' hours';
+
         return [
             'generated_at' => now()->toIso8601String(),
-            'period' => config('apm.regression.baseline_period_hours', 24).' hours',
+            'period' => $period,
             'summary' => $statistics,
             'active_regressions' => $activeRegressions,
             'baselines' => $baselines,
@@ -344,9 +389,14 @@ class PerformanceRegressionService
     /**
      * Create a regression record.
      *
+     * @param  string  $metric  The metric name
+     * @param  float  $baseline  The baseline value
+     * @param  float  $current  The current value
+     * @param  float  $deviation  The deviation percentage
      * @return array<string, mixed>
      */
-    protected function createRegression(): array
+    protected function createRegression(string $metric, float $baseline, float $current, float $deviation): array
+    {
         $regression = [
             'id' => uniqid('reg_', true),
             'metric' => $metric,
@@ -362,8 +412,10 @@ class PerformanceRegressionService
         $this->storeRegression($regression);
 
         // Also update APM regressions cache for dashboard
-        $regressions = Cache::get(self::REGRESSION_PREFIX.'list', []);
-        Cache::put('apm:regressions', $regressions, 604800);
+        $regressionsCache = Cache::get(self::REGRESSION_PREFIX.'list', []);
+        if (is_array($regressionsCache)) {
+            Cache::put('apm:regressions', $regressionsCache, 604800);
+        }
 
         Log::warning('[RegressionDetection] Performance regression detected', $regression);
 
@@ -377,7 +429,8 @@ class PerformanceRegressionService
      */
     protected function storeRegression(array $regression): void
     {
-        $regressions = Cache::get(self::REGRESSION_PREFIX.'list', []);
+        $regressionsCache = Cache::get(self::REGRESSION_PREFIX.'list', []);
+        $regressions = is_array($regressionsCache) ? $regressionsCache : [];
         $regressions[] = $regression;
 
         // Keep last 500 regressions
@@ -405,15 +458,12 @@ class PerformanceRegressionService
     protected function getCurrentMetricValue(string $metric): ?float
     {
         $healthScore = $this->apmService->calculateHealthScore();
-        $components = $healthScore['components'];
+        $components = is_array($healthScore['components'] ?? null) ? $healthScore['components'] : [];
 
-        return match ($metric) {
-            'response_time' => $components['response_time']['value'] ?? null,
-            'error_rate' => $components['error_rate']['value'] ?? null,
-            'throughput' => $components['throughput']['value'] ?? null,
-            'memory_usage' => $components['memory_usage']['value'] ?? null,
-            default => null,
-        };
+        $component = is_array($components[$metric] ?? null) ? $components[$metric] : [];
+        $value = $component['value'] ?? null;
+
+        return is_numeric($value) ? (float) $value : null;
     }
 
     /**
@@ -423,7 +473,13 @@ class PerformanceRegressionService
     {
         $thresholds = config('apm.regression.thresholds', []);
 
-        return (float) ($thresholds[$metric] ?? 25);
+        if (! is_array($thresholds)) {
+            return 25.0;
+        }
+
+        $threshold = $thresholds[$metric] ?? 25;
+
+        return is_numeric($threshold) ? (float) $threshold : 25.0;
     }
 
     /**
@@ -453,7 +509,7 @@ class PerformanceRegressionService
 
         $sumSquaredDiff = 0.0;
         foreach ($values as $value) {
-            $sumSquaredDiff = ($sumSquaredDiff ?? 0) + ($value - $mean) ** 2;
+            $sumSquaredDiff += ($value - $mean) ** 2;
         }
 
         return sqrt($sumSquaredDiff / ($count - 1));
@@ -462,15 +518,26 @@ class PerformanceRegressionService
     /**
      * Get historical data for a metric.
      *
+     * @param  string  $metric  The metric name
+     * @param  int  $hours  Number of hours of historical data to retrieve
      * @return array<int, array{value: float, recorded_at: string}>
      */
-    protected function getHistoricalData(): array
+    protected function getHistoricalData(string $metric, int $hours): array
+    {
+        /** @var array<int, array{value: float, recorded_at: string}> $data */
         $data = [];
 
         for ($i = $hours - 1; $i >= 0; $i--) {
-            $hourKey = "apm:metrics:{$metric}:".date('Y-m-d-H', strtotime("-{$i} hours"));
+            $timestamp = strtotime("-{$i} hours");
+            if ($timestamp === false) {
+                continue;
+            }
+            $hourKey = "apm:metrics:{$metric}:".date('Y-m-d-H', $timestamp);
             $hourData = Cache::get($hourKey, []);
-            $data = array_merge($data, $hourData);
+            if (is_array($hourData)) {
+                /** @var array<int, array{value: float, recorded_at: string}> $hourData */
+                $data = array_merge($data, $hourData);
+            }
         }
 
         return $data;
@@ -482,12 +549,13 @@ class PerformanceRegressionService
      * @param  array<int, array<string, mixed>>  $regressions
      * @return array<int, string>
      */
-    protected function generateRecommendations(): array
+    protected function generateRecommendations(array $regressions): array
+    {
         $recommendations = [];
 
         foreach ($regressions as $regression) {
-            $metric = $regression['metric'];
-            $deviation = $regression['deviation_percent'];
+            $metric = is_string($regression['metric'] ?? null) ? $regression['metric'] : 'unknown';
+            $deviation = is_numeric($regression['deviation_percent'] ?? null) ? (float) $regression['deviation_percent'] : 0.0;
 
             $recommendations[] = match ($metric) {
                 'response_time' => \sprintf(

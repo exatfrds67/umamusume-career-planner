@@ -61,6 +61,7 @@ class AIDashboardService
      * }
      */
     public function getDashboardOverview(): array
+    {
         $cacheKey = 'ai_dashboard_overview';
 
         $result = Cache::remember($cacheKey, 60, fn () => [
@@ -72,13 +73,24 @@ class AIDashboardService
             'conversations' => $this->getConversationsSummary(),
         ]);
 
-        return is_array($result) ? $result : [
-            'summary' => [],
-            'servers' => [],
-            'performance' => [],
-            'costs' => [],
-            'agents' => [],
-            'conversations' => [],
+        if (! is_array($result)) {
+            return [
+                'summary' => [],
+                'servers' => [],
+                'performance' => [],
+                'costs' => [],
+                'agents' => [],
+                'conversations' => [],
+            ];
+        }
+
+        return [
+            'summary' => is_array($result['summary'] ?? null) ? $result['summary'] : [],
+            'servers' => is_array($result['servers'] ?? null) ? $result['servers'] : [],
+            'performance' => is_array($result['performance'] ?? null) ? $result['performance'] : [],
+            'costs' => is_array($result['costs'] ?? null) ? $result['costs'] : [],
+            'agents' => is_array($result['agents'] ?? null) ? $result['agents'] : [],
+            'conversations' => is_array($result['conversations'] ?? null) ? $result['conversations'] : [],
         ];
     }
 
@@ -96,10 +108,13 @@ class AIDashboardService
      * }
      */
     public function getSummaryMetrics(): array
+    {
         $metrics24h = $this->getMetricsForPeriod('24h');
 
-        $totalRequests = is_numeric($metrics24h['total_requests'] ?? 0) ? (int) $metrics24h['total_requests'] : 0;
-        $successfulRequests = is_numeric($metrics24h['successful_requests'] ?? 0) ? (int) $metrics24h['successful_requests'] : 0;
+        $totalRequestsRaw = $metrics24h['total_requests'] ?? 0;
+        $totalRequests = is_numeric($totalRequestsRaw) ? (int) $totalRequestsRaw : 0;
+        $successfulRequestsRaw = $metrics24h['successful_requests'] ?? 0;
+        $successfulRequests = is_numeric($successfulRequestsRaw) ? (int) $successfulRequestsRaw : 0;
         $successRate = $totalRequests > 0 ? ($successfulRequests / $totalRequests) * 100 : 0;
 
         $serverHealth = $this->mcpClient->getAllServerHealth();
@@ -135,6 +150,7 @@ class AIDashboardService
      * }>
      */
     public function getServerStatus(): array
+    {
         $healthCheck = $this->mcpClient->healthCheck();
         $servers = [];
 
@@ -177,23 +193,36 @@ class AIDashboardService
      * }
      */
     public function getPerformanceComparison(): array
+    {
         $providers = ['ollama', 'bedrock', 'mcp-strands', 'mcp-agentcore'];
         $providerMetrics = [];
 
         foreach ($providers as $provider) {
             $metrics = $this->getProviderMetrics($provider, '24h');
+
+            $requestCountRaw = $metrics['request_count'] ?? 0;
+            $successRateRaw = $metrics['success_rate'] ?? 0.0;
+            $avgResponseTimeRaw = $metrics['avg_response_time'] ?? 0.0;
+            $minResponseTimeRaw = $metrics['min_response_time'] ?? 0.0;
+            $maxResponseTimeRaw = $metrics['max_response_time'] ?? 0.0;
+            $p95ResponseTimeRaw = $metrics['p95_response_time'] ?? 0.0;
+            $p99ResponseTimeRaw = $metrics['p99_response_time'] ?? 0.0;
+            $totalTokensRaw = $metrics['total_tokens'] ?? 0;
+            $totalCostRaw = $metrics['total_cost'] ?? 0.0;
+            $avgConfidenceRaw = $metrics['avg_confidence'] ?? 0.0;
+
             $providerMetrics[$provider] = [
                 'name' => $provider,
-                'requests_24h' => is_numeric($metrics['request_count'] ?? 0) ? (int) $metrics['request_count'] : 0,
-                'success_rate' => is_numeric($metrics['success_rate'] ?? 0.0) ? (float) $metrics['success_rate'] : 0.0,
-                'avg_response_time' => is_numeric($metrics['avg_response_time'] ?? 0.0) ? (float) $metrics['avg_response_time'] : 0.0,
-                'min_response_time' => is_numeric($metrics['min_response_time'] ?? 0.0) ? (float) $metrics['min_response_time'] : 0.0,
-                'max_response_time' => is_numeric($metrics['max_response_time'] ?? 0.0) ? (float) $metrics['max_response_time'] : 0.0,
-                'p95_response_time' => is_numeric($metrics['p95_response_time'] ?? 0.0) ? (float) $metrics['p95_response_time'] : 0.0,
-                'p99_response_time' => is_numeric($metrics['p99_response_time'] ?? 0.0) ? (float) $metrics['p99_response_time'] : 0.0,
-                'total_tokens' => is_numeric($metrics['total_tokens'] ?? 0) ? (int) $metrics['total_tokens'] : 0,
-                'total_cost' => is_numeric($metrics['total_cost'] ?? 0.0) ? (float) $metrics['total_cost'] : 0.0,
-                'avg_confidence' => is_numeric($metrics['avg_confidence'] ?? 0.0) ? (float) $metrics['avg_confidence'] : 0.0,
+                'requests_24h' => is_numeric($requestCountRaw) ? (int) $requestCountRaw : 0,
+                'success_rate' => is_numeric($successRateRaw) ? (float) $successRateRaw : 0.0,
+                'avg_response_time' => is_numeric($avgResponseTimeRaw) ? (float) $avgResponseTimeRaw : 0.0,
+                'min_response_time' => is_numeric($minResponseTimeRaw) ? (float) $minResponseTimeRaw : 0.0,
+                'max_response_time' => is_numeric($maxResponseTimeRaw) ? (float) $maxResponseTimeRaw : 0.0,
+                'p95_response_time' => is_numeric($p95ResponseTimeRaw) ? (float) $p95ResponseTimeRaw : 0.0,
+                'p99_response_time' => is_numeric($p99ResponseTimeRaw) ? (float) $p99ResponseTimeRaw : 0.0,
+                'total_tokens' => is_numeric($totalTokensRaw) ? (int) $totalTokensRaw : 0,
+                'total_cost' => is_numeric($totalCostRaw) ? (float) $totalCostRaw : 0.0,
+                'avg_confidence' => is_numeric($avgConfidenceRaw) ? (float) $avgConfidenceRaw : 0.0,
             ];
         }
 
@@ -221,6 +250,7 @@ class AIDashboardService
      * }
      */
     public function getCostSummary(): array
+    {
         $dailyCost = $this->getCostForPeriod('1d');
         $weeklyCost = $this->getCostForPeriod('7d');
         $monthlyCost = $this->getCostForPeriod('30d');
@@ -261,7 +291,10 @@ class AIDashboardService
      * }
      */
     public function getAgentsSummary(): array
+    {
         // Get agent status from orchestration service
+        // TODO: Implement actual agent status retrieval from orchestration service
+        /** @var array<string, array{status?: string, tasks_completed?: int, success_rate?: float, avg_duration?: float, last_active_at?: string|null}> $agentStatuses */
         $agentStatuses = [];
 
         $agents = [];
@@ -274,7 +307,7 @@ class AIDashboardService
                 'tasks_completed' => $status['tasks_completed'] ?? 0,
                 'success_rate' => $status['success_rate'] ?? 0.0,
                 'avg_duration' => $status['avg_duration'] ?? 0.0,
-                'last_active_at' => (is_array($status) && isset($status['last_active_at']) ? $status['last_active_at'] : null),
+                'last_active_at' => $status['last_active_at'] ?? null,
             ];
         }
 
@@ -301,6 +334,7 @@ class AIDashboardService
      * }
      */
     public function getConversationsSummary(): array
+    {
         $totalConversations = AIConversation::distinct()->count('conversation_id');
         $totalMessages = AIConversation::count();
 
@@ -315,11 +349,11 @@ class AIDashboardService
             ->map(fn ($conv) => [
                 'id' => $conv->id,
                 'conversation_id' => $conv->conversation_id,
-                'character_name' => $conv->character?->name ?? 'Unknown',
+                'character_name' => $conv->character->name ?? 'Unknown',
                 'message_type' => $conv->message_type,
-                'ai_model_used' => $$conv->getAttribute('ai_model_used'),
-                'processing_time' => $$conv->getAttribute('processing_time'),
-                'cost' => $$conv->getAttribute('cost'),
+                'ai_model_used' => $conv->getAttribute('ai_model_used'),
+                'processing_time' => $conv->getAttribute('processing_time'),
+                'cost' => $conv->getAttribute('cost'),
                 'created_at' => $conv->created_at?->toIso8601String(),
             ])
             ->values()
@@ -353,7 +387,8 @@ class AIDashboardService
      *
      * @return array<string, mixed>
      */
-    protected function getMetricsForPeriod(): array
+    protected function getMetricsForPeriod(string $period = '24h'): array
+    {
         $hours = match ($period) {
             '1h' => 1,
             '24h' => 24,
@@ -369,7 +404,7 @@ class AIDashboardService
             ->get();
 
         $totalRequests = $conversations->count();
-        $successfulRequests = $conversations->filter(fn ($c) => $$c->getAttribute('ai_model_used') !== null)->count();
+        $successfulRequests = $conversations->filter(fn ($c) => $c->getAttribute('ai_model_used') !== null)->count();
         $avgResponseTimeValue = $conversations->avg('processing_time');
         $avgResponseTime = is_numeric($avgResponseTimeValue) ? (float) $avgResponseTimeValue : 0.0;
         $totalCostValue = $conversations->sum('cost');
@@ -388,7 +423,8 @@ class AIDashboardService
      *
      * @return array<string, mixed>
      */
-    protected function getProviderMetrics(): array
+    protected function getProviderMetrics(string $provider = '', string $period = '24h'): array
+    {
         $hours = match ($period) {
             '1h' => 1,
             '24h' => 24,
@@ -422,22 +458,29 @@ class AIDashboardService
         $conversations = $query->get();
 
         $requestCount = $conversations->count();
-        $successCount = $conversations->filter(fn ($c) => $$c->getAttribute('ai_model_used') !== null)->count();
+        $successCount = $conversations->filter(fn ($c) => $c->getAttribute('ai_model_used') !== null)->count();
         $successRate = $requestCount > 0 ? ($successCount / $requestCount) * 100 : 0;
 
         $responseTimes = $conversations->pluck('processing_time')->filter()->sort()->values();
-        $avgResponseTime = $responseTimes->avg() ?? 0.0;
-        $minResponseTime = $responseTimes->min() ?? 0.0;
-        $maxResponseTime = $responseTimes->max() ?? 0.0;
+        $avgResponseTimeRaw = $responseTimes->avg();
+        $avgResponseTime = is_numeric($avgResponseTimeRaw) ? (float) $avgResponseTimeRaw : 0.0;
+        $minResponseTimeRaw = $responseTimes->min();
+        $minResponseTime = is_numeric($minResponseTimeRaw) ? (float) $minResponseTimeRaw : 0.0;
+        $maxResponseTimeRaw = $responseTimes->max();
+        $maxResponseTime = is_numeric($maxResponseTimeRaw) ? (float) $maxResponseTimeRaw : 0.0;
 
         // Calculate percentiles
         $p95Index = (int) ceil($responseTimes->count() * 0.95) - 1;
         $p99Index = (int) ceil($responseTimes->count() * 0.99) - 1;
-        $p95ResponseTime = $responseTimes->get($p95Index) ?? 0.0;
-        $p99ResponseTime = $responseTimes->get($p99Index) ?? 0.0;
+        $p95ResponseTimeRaw = $responseTimes->get($p95Index);
+        $p95ResponseTime = is_numeric($p95ResponseTimeRaw) ? (float) $p95ResponseTimeRaw : 0.0;
+        $p99ResponseTimeRaw = $responseTimes->get($p99Index);
+        $p99ResponseTime = is_numeric($p99ResponseTimeRaw) ? (float) $p99ResponseTimeRaw : 0.0;
 
-        $totalTokens = $conversations->sum('token_count') ?? 0;
-        $totalCost = $conversations->sum('cost') ?? 0.0;
+        $totalTokensRaw = $conversations->sum('token_count');
+        $totalTokens = is_numeric($totalTokensRaw) ? (int) $totalTokensRaw : 0;
+        $totalCostRaw = $conversations->sum('cost');
+        $totalCost = is_numeric($totalCostRaw) ? (float) $totalCostRaw : 0.0;
 
         return [
             'request_count' => $requestCount,
@@ -459,7 +502,8 @@ class AIDashboardService
      * @param  array<string, array<string, mixed>>  $providerMetrics
      * @return array<string, mixed>
      */
-    protected function generateProviderComparison(): array
+    protected function generateProviderComparison(array $providerMetrics = []): array
+    {
         $fastest = null;
         $cheapest = null;
         $mostReliable = null;
@@ -536,7 +580,8 @@ class AIDashboardService
      *
      * @return array<string, float>
      */
-    protected function getCostByProvider(): array
+    protected function getCostByProvider(string $period = '30d'): array
+    {
         $hours = match ($period) {
             '1h' => 1,
             '1d' => 24,
@@ -552,7 +597,8 @@ class AIDashboardService
             ->whereNotNull('ai_model_used')
             ->get()
             ->groupBy(function ($conv) {
-                $model = $$conv->getAttribute('ai_model_used') ?? '';
+                $modelRaw = $conv->getAttribute('ai_model_used');
+                $model = is_string($modelRaw) ? $modelRaw : '';
                 if (str_contains($model, 'llama') || str_contains($model, 'mistral') || str_contains($model, 'qwen')) {
                     return 'ollama';
                 }
@@ -568,9 +614,14 @@ class AIDashboardService
 
                 return 'unknown';
             })
-            ->map(fn ($group) => round($group->sum('cost'), 6))
+            ->map(function ($group) {
+                $sum = $group->sum('cost');
+
+                return is_numeric($sum) ? round((float) $sum, 6) : 0.0;
+            })
             ->toArray();
 
+        /** @var array<string, float> $costs */
         return $costs;
     }
 
@@ -579,7 +630,8 @@ class AIDashboardService
      *
      * @return array<string, float>
      */
-    protected function getCostByModel(): array
+    protected function getCostByModel(string $period = '30d'): array
+    {
         $hours = match ($period) {
             '1h' => 1,
             '1d' => 24,
@@ -600,6 +652,7 @@ class AIDashboardService
             ->map(fn ($cost) => is_numeric($cost) ? round((float) $cost, 6) : 0.0)
             ->toArray();
 
+        /** @var array<string, float> $costs */
         return $costs;
     }
 
@@ -616,10 +669,14 @@ class AIDashboardService
      *     alert_level: string
      * }
      */
-    protected function getBudgetStatus(): array
+    protected function getBudgetStatus(float $monthlyCost = 0.0, float $projectedMonthly = 0.0): array
+    {
         // Budget limit is configurable via config/ai.php
-        $budgetLimit = (float) config('ai.budget.monthly_limit', 100.0);
+        $budgetLimitRaw = config('ai.budget.monthly_limit', 100.0);
+        $budgetLimit = is_numeric($budgetLimitRaw) ? (float) $budgetLimitRaw : 100.0;
 
+        $currentSpend = $monthlyCost;
+        $projectedSpend = $projectedMonthly;
         $remainingBudget = $budgetLimit - $currentSpend;
         $budgetUtilization = ($currentSpend / $budgetLimit) * 100;
 
@@ -680,7 +737,9 @@ class AIDashboardService
             ->filter()
             ->values();
 
-        return $confidenceScores->isEmpty() ? 0.0 : round($confidenceScores->avg(), 2);
+        $avgScore = $confidenceScores->avg();
+
+        return $confidenceScores->isEmpty() ? 0.0 : round(is_numeric($avgScore) ? (float) $avgScore : 0.0, 2);
     }
 
     /**
@@ -706,7 +765,9 @@ class AIDashboardService
             ->filter()
             ->values();
 
-        return $confidenceScores->isEmpty() ? 0.0 : round($confidenceScores->avg(), 2);
+        $avgScore = $confidenceScores->avg();
+
+        return $confidenceScores->isEmpty() ? 0.0 : round(is_numeric($avgScore) ? (float) $avgScore : 0.0, 2);
     }
 
     /**

@@ -33,9 +33,12 @@ class Context7Service
     {
         $this->mcpClient = $mcpClient;
         $this->enabled = (bool) Config::get('mcp.tools.context7.enabled', true);
-        $this->cacheTTL = (int) Config::get('mcp.tools.context7.cache_ttl', 600);
-        $this->maxContextSize = (int) Config::get('mcp.tools.context7.max_context_size', 10000);
-        $this->contextRetentionDays = (int) Config::get('mcp.tools.context7.retention_days', 30);
+        $configTTL = Config::get('mcp.tools.context7.cache_ttl', 600);
+        $this->cacheTTL = is_numeric($configTTL) ? (int) $configTTL : 600;
+        $configMaxSize = Config::get('mcp.tools.context7.max_context_size', 10000);
+        $this->maxContextSize = is_numeric($configMaxSize) ? (int) $configMaxSize : 10000;
+        $configRetention = Config::get('mcp.tools.context7.retention_days', 30);
+        $this->contextRetentionDays = is_numeric($configRetention) ? (int) $configRetention : 30;
     }
 
     /**
@@ -52,14 +55,10 @@ class Context7Service
      * Store conversation context
      *
      * @param  array<string, mixed>  $context
-     * @return array{
-     *     context_id: string,
-     *     stored: bool,
-     *     size: int,
-     *     expires_at: int
-     * }
+     * @return array{context_id: string, stored: bool, size: int, expires_at: int}
      */
-    public function storeContext(): array
+    public function storeContext(string $conversationId, array $context, ?int $ttl = null): array
+    {
         $ttl = $ttl ?? ($this->contextRetentionDays * 86400);
 
         try {
@@ -101,14 +100,10 @@ class Context7Service
     /**
      * Retrieve conversation context
      *
-     * @return array{
-     *     context: array<string, mixed>,
-     *     found: bool,
-     *     age: int,
-     *     source: string
-     * }
+     * @return array{context: array<string, mixed>, found: bool, age: int, source: string}
      */
-    public function retrieveContext(): array
+    public function retrieveContext(string $conversationId): array
+    {
         try {
             $contextId = $this->generateContextId($conversationId);
 
@@ -158,13 +153,10 @@ class Context7Service
      * Update existing context
      *
      * @param  array<string, mixed>  $updates
-     * @return array{
-     *     updated: bool,
-     *     context_id: string,
-     *     size: int
-     * }
+     * @return array{updated: bool, context_id: string, size: int}
      */
-    public function updateContext(): array
+    public function updateContext(string $conversationId, array $updates, bool $merge = true): array
+    {
         try {
             $contextId = $this->generateContextId($conversationId);
 
@@ -202,13 +194,10 @@ class Context7Service
      * Share context across agents
      *
      * @param  array<int, string>  $agentIds
-     * @return array{
-     *     shared: bool,
-     *     agent_count: int,
-     *     context_id: string
-     * }
+     * @return array{shared: bool, agent_count: int, context_id: string}
      */
-    public function shareContextAcrossAgents(): array
+    public function shareContextAcrossAgents(string $conversationId, array $agentIds): array
+    {
         try {
             $context = $this->retrieveContext($conversationId);
 
@@ -225,7 +214,7 @@ class Context7Service
             foreach ($agentIds as $agentId) {
                 $agentContextId = $this->generateContextId("{$conversationId}_agent_{$agentId}");
                 Cache::put($agentContextId, $context['context'], $this->cacheTTL);
-                $sharedCount = ($sharedCount ?? 0) + 1;
+                $sharedCount++;
             }
 
             if ($this->isAvailable()) {
@@ -259,15 +248,10 @@ class Context7Service
     /**
      * Analyze context for optimization
      *
-     * @return array{
-     *     size: int,
-     *     token_estimate: int,
-     *     optimization_suggestions: array<int, string>,
-     *     can_compress: bool,
-     *     estimated_savings: int
-     * }
+     * @return array{size: int, token_estimate: int, optimization_suggestions: array<int, string>, can_compress: bool, estimated_savings: int}
      */
-    public function analyzeContext(): array
+    public function analyzeContext(string $conversationId): array
+    {
         try {
             $context = $this->retrieveContext($conversationId);
 
@@ -300,14 +284,14 @@ class Context7Service
             if ($this->hasRedundantData($context['context'])) {
                 $suggestions[] = 'Detected redundant data, consider deduplication';
                 $canCompress = true;
-                $estimatedSavings = ($estimatedSavings ?? 0) + (int) ($size * 0.2);
+                $estimatedSavings += (int) ($size * 0.2);
             }
 
             // Check for old data
             if ($this->hasOldData($context['context'])) {
                 $suggestions[] = 'Context contains old data, consider archiving';
                 $canCompress = true;
-                $estimatedSavings = ($estimatedSavings ?? 0) + (int) ($size * 0.3);
+                $estimatedSavings += (int) ($size * 0.3);
             }
 
             return [
@@ -336,14 +320,10 @@ class Context7Service
     /**
      * Compress context by removing old or redundant data
      *
-     * @return array{
-     *     compressed: bool,
-     *     original_size: int,
-     *     new_size: int,
-     *     savings: int
-     * }
+     * @return array{compressed: bool, original_size: int, new_size: int, savings: int}
      */
-    public function compressContext(): array
+    public function compressContext(string $conversationId): array
+    {
         try {
             $context = $this->retrieveContext($conversationId);
 
@@ -430,7 +410,8 @@ class Context7Service
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    protected function prepareContextData(): array
+    protected function prepareContextData(array $context): array
+    {
         return [
             'data' => $context,
             'timestamp' => time(),
@@ -447,8 +428,9 @@ class Context7Service
     {
         // Simple check: if context has duplicate keys or values
         $jsonContext = json_encode($context) ?: '{}';
+        $parts = explode(',', $jsonContext);
 
-        return \strlen($jsonContext) > \strlen(array_unique(explode(',', $jsonContext)));
+        return \count($parts) > \count(array_unique($parts));
     }
 
     /**
@@ -458,8 +440,8 @@ class Context7Service
      */
     protected function hasOldData(array $context): bool
     {
-        if (isset($context['timestamp'])) {
-            $age = time() - $context['timestamp'];
+        if (isset($context['timestamp']) && is_numeric($context['timestamp'])) {
+            $age = time() - (int) $context['timestamp'];
 
             return $age > ($this->contextRetentionDays * 86400);
         }
@@ -473,7 +455,8 @@ class Context7Service
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    protected function performCompression(): array
+    protected function performCompression(array $context): array
+    {
         // Remove old messages (keep last 50)
         if (isset($context['messages']) && \is_array($context['messages'])) {
             $context['messages'] = \array_slice($context['messages'], -50);
@@ -510,6 +493,7 @@ class Context7Service
      * }
      */
     public function getStatus(): array
+    {
         return [
             'enabled' => $this->enabled,
             'available' => $this->isAvailable(),

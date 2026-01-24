@@ -49,7 +49,8 @@ class CareerStrategyAgent
      *     reasoning: string
      * }
      */
-    public function createCareerPlan(): array
+    public function createCareerPlan(Character $character, array $goals = []): array
+    {
         if (! $this->enabled) {
             return $this->getDefaultCareerPlan($character);
         }
@@ -76,21 +77,30 @@ class CareerStrategyAgent
             $response = $this->processWithMCPAgent($context);
 
             /** @var array<string, mixed> $planData */
-            $planData = is_array((is_array($response) && isset($response['plan']) ? $response['plan'] : null)) ? $response['plan'] : [];
+            $planData = isset($response['plan']) && is_array($response['plan']) ? $response['plan'] : [];
+            /** @var array<int|string, mixed> $rawMilestones */
+            $rawMilestones = isset($response['milestones']) && is_array($response['milestones']) ? $response['milestones'] : [];
             /** @var array<int, array<string, mixed>> $milestones */
-            $milestones = is_array((is_array($response) && isset($response['milestones']) ? $response['milestones'] : null)) ? array_values($response['milestones']) : [];
+            $milestones = array_values($rawMilestones);
+            /** @var array<int|string, mixed> $rawRaceSchedule */
+            $rawRaceSchedule = isset($response['race_schedule']) && is_array($response['race_schedule']) ? $response['race_schedule'] : [];
             /** @var array<int, array<string, mixed>> $raceSchedule */
-            $raceSchedule = is_array((is_array($response) && isset($response['race_schedule']) ? $response['race_schedule'] : null)) ? array_values($response['race_schedule']) : [];
+            $raceSchedule = array_values($rawRaceSchedule);
             /** @var array<string, mixed> $trainingPriorities */
-            $trainingPriorities = is_array((is_array($response) && isset($response['training_priorities']) ? $response['training_priorities'] : null)) ? $response['training_priorities'] : [];
+            $trainingPriorities = isset($response['training_priorities']) && is_array($response['training_priorities']) ? $response['training_priorities'] : [];
+
+            /** @var float|int|string $confidenceRaw */
+            $confidenceRaw = $response['confidence'] ?? 0.85;
+            /** @var string $reasoningRaw */
+            $reasoningRaw = $response['reasoning'] ?? 'Career plan created';
 
             $plan = [
                 'plan' => $planData,
                 'milestones' => $milestones,
                 'race_schedule' => $raceSchedule,
                 'training_priorities' => $trainingPriorities,
-                'confidence' => (float) ($response['confidence'] ?? 0.85),
-                'reasoning' => (string) ($response['reasoning'] ?? 'Career plan created'),
+                'confidence' => (float) $confidenceRaw,
+                'reasoning' => (string) $reasoningRaw,
                 'metadata' => [
                     'agent_id' => $this->agentId,
                     'processing_time' => microtime(true) - $startTime,
@@ -123,7 +133,8 @@ class CareerStrategyAgent
      *     reasoning: string
      * }
      */
-    public function optimizeGoalPriorities(): array
+    public function optimizeGoalPriorities(Character $character, array $goals = []): array
+    {
         $startTime = microtime(true);
 
         try {
@@ -135,16 +146,26 @@ class CareerStrategyAgent
 
             $response = $this->processWithMCPAgent($context);
 
+            /** @var array<int|string, mixed> $rawPriorities */
+            $rawPriorities = isset($response['priorities']) && is_array($response['priorities']) ? $response['priorities'] : [];
             /** @var array<int, array<string, mixed>> $priorities */
-            $priorities = is_array((is_array($response) && isset($response['priorities']) ? $response['priorities'] : null)) ? array_values($response['priorities']) : [];
+            $priorities = array_values($rawPriorities);
+            /** @var array<int|string, mixed> $rawRecommendations */
+            $rawRecommendations = isset($response['recommendations']) && is_array($response['recommendations']) ? $response['recommendations'] : [];
             /** @var array<int, string> $recommendations */
-            $recommendations = is_array((is_array($response) && isset($response['recommendations']) ? $response['recommendations'] : null)) ? array_values($response['recommendations']) : [];
+            // @phpstan-ignore-next-line cast.string - Safe cast of mixed values from dynamic API response
+            $recommendations = array_map(static fn (mixed $v): string => (string) $v, array_values($rawRecommendations));
+
+            /** @var float|int|string $confidenceRaw */
+            $confidenceRaw = $response['confidence'] ?? 0.85;
+            /** @var string $reasoningRaw */
+            $reasoningRaw = $response['reasoning'] ?? 'Goals optimized';
 
             return [
                 'priorities' => $priorities,
                 'recommendations' => $recommendations,
-                'confidence' => (float) ($response['confidence'] ?? 0.85),
-                'reasoning' => (string) ($response['reasoning'] ?? 'Goals optimized'),
+                'confidence' => (float) $confidenceRaw,
+                'reasoning' => (string) $reasoningRaw,
             ];
         } catch (\Exception $e) {
             Log::error('[CareerStrategyAgent] Goal optimization failed', [
@@ -171,7 +192,8 @@ class CareerStrategyAgent
      *     confidence: float
      * }
      */
-    public function generateRaceSchedule(): array
+    public function generateRaceSchedule(Character $character, array $constraints = []): array
+    {
         $startTime = microtime(true);
 
         try {
@@ -183,13 +205,20 @@ class CareerStrategyAgent
 
             $response = $this->processWithMCPAgent($context);
 
+            /** @var array<int|string, mixed> $rawSchedule */
+            $rawSchedule = isset($response['schedule']) && is_array($response['schedule']) ? $response['schedule'] : [];
             /** @var array<int, array<string, mixed>> $schedule */
-            $schedule = is_array((is_array($response) && isset($response['schedule']) ? $response['schedule'] : null)) ? array_values($response['schedule']) : [];
+            $schedule = array_values($rawSchedule);
+
+            /** @var string $reasoningRaw */
+            $reasoningRaw = $response['reasoning'] ?? 'Schedule generated';
+            /** @var float|int|string $confidenceRaw */
+            $confidenceRaw = $response['confidence'] ?? 0.85;
 
             return [
                 'schedule' => $schedule,
-                'reasoning' => (string) ($response['reasoning'] ?? 'Schedule generated'),
-                'confidence' => (float) ($response['confidence'] ?? 0.85),
+                'reasoning' => (string) $reasoningRaw,
+                'confidence' => (float) $confidenceRaw,
             ];
         } catch (\Exception $e) {
             Log::error('[CareerStrategyAgent] Race schedule generation failed', [
@@ -216,7 +245,8 @@ class CareerStrategyAgent
      *     confidence: float
      * }
      */
-    public function trackMilestoneProgress(): array
+    public function trackMilestoneProgress(Character $character, array $milestones = []): array
+    {
         $startTime = microtime(true);
 
         try {
@@ -229,17 +259,26 @@ class CareerStrategyAgent
             $response = $this->processWithMCPAgent($context);
 
             /** @var array<string, mixed> $progress */
-            $progress = is_array((is_array($response) && isset($response['progress']) ? $response['progress'] : null)) ? $response['progress'] : [];
+            $progress = isset($response['progress']) && is_array($response['progress']) ? $response['progress'] : [];
+            /** @var array<int|string, mixed> $rawNextSteps */
+            $rawNextSteps = isset($response['next_steps']) && is_array($response['next_steps']) ? $response['next_steps'] : [];
             /** @var array<int, string> $nextSteps */
-            $nextSteps = is_array((is_array($response) && isset($response['next_steps']) ? $response['next_steps'] : null)) ? array_values($response['next_steps']) : [];
+            // @phpstan-ignore-next-line cast.string - Safe cast of mixed values from dynamic API response
+            $nextSteps = array_map(static fn (mixed $v): string => (string) $v, array_values($rawNextSteps));
+            /** @var array<int|string, mixed> $rawWarnings */
+            $rawWarnings = isset($response['warnings']) && is_array($response['warnings']) ? $response['warnings'] : [];
             /** @var array<int, string> $warnings */
-            $warnings = is_array((is_array($response) && isset($response['warnings']) ? $response['warnings'] : null)) ? array_values($response['warnings']) : [];
+            // @phpstan-ignore-next-line cast.string - Safe cast of mixed values from dynamic API response
+            $warnings = array_map(static fn (mixed $v): string => (string) $v, array_values($rawWarnings));
+
+            /** @var float|int|string $confidenceRaw */
+            $confidenceRaw = $response['confidence'] ?? 0.85;
 
             return [
                 'progress' => $progress,
                 'next_steps' => $nextSteps,
                 'warnings' => $warnings,
-                'confidence' => (float) ($response['confidence'] ?? 0.85),
+                'confidence' => (float) $confidenceRaw,
             ];
         } catch (\Exception $e) {
             Log::error('[CareerStrategyAgent] Milestone tracking failed', [
@@ -261,7 +300,8 @@ class CareerStrategyAgent
      *
      * @return array<string, mixed>
      */
-    protected function getCharacterData(): array
+    protected function getCharacterData(Character $character): array
+    {
         return [
             'id' => $character->id,
             'name' => $character->name,
@@ -280,7 +320,8 @@ class CareerStrategyAgent
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    protected function processWithMCPAgent(): array
+    protected function processWithMCPAgent(array $context): array
+    {
         if (! $this->mcpClient->isStrandsAgentsAvailable()) {
             throw new \RuntimeException('MCP strands-agents server not available');
         }
@@ -329,7 +370,8 @@ class CareerStrategyAgent
      *     metadata: array<string, mixed>
      * }
      */
-    protected function getDefaultCareerPlan(): array
+    protected function getDefaultCareerPlan(Character $character): array
+    {
         return [
             'plan' => [
                 'strategy' => 'balanced',
@@ -384,6 +426,7 @@ class CareerStrategyAgent
      * }
      */
     public function getStatus(): array
+    {
         return [
             'enabled' => $this->enabled,
             'available' => $this->isAvailable(),

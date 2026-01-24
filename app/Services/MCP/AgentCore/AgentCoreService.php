@@ -62,7 +62,8 @@ class AgentCoreService
      *     error?: string
      * }
      */
-    public function deployAgent(): array
+    public function deployAgent(array $agentConfig): array
+    {
         if (! $this->isAvailable()) {
             return [
                 'agent_id' => '',
@@ -87,7 +88,7 @@ class AgentCoreService
             $payload = $this->prepareDeploymentPayload($agentConfig);
 
             // Simulate AgentCore deployment (in production, this would call MCP server)
-            $agentId = $this->generateAgentId($agentConfig['name']);
+            $agentId = $this->generateAgentId((string) ($agentConfig['name'] ?? 'unknown'));
 
             // Cache agent configuration
             $this->cacheAgentConfig($agentId, $agentConfig);
@@ -133,7 +134,8 @@ class AgentCoreService
      *     error?: string
      * }
      */
-    public function invokeAgent(): array
+    public function invokeAgent(string $agentId, array $input = []): array
+    {
         if (! $this->isAvailable()) {
             return [
                 'output' => null,
@@ -200,7 +202,8 @@ class AgentCoreService
      *     error?: string
      * }
      */
-    public function getAgentStatus(): array
+    public function getAgentStatus(string $agentId): array
+    {
         try {
             $agentConfig = $this->getAgentConfig($agentId);
             if (! $agentConfig) {
@@ -248,7 +251,8 @@ class AgentCoreService
      *     error?: string
      * }
      */
-    public function terminateAgent(): array
+    public function terminateAgent(string $agentId): array
+    {
         $startTime = microtime(true);
 
         try {
@@ -299,19 +303,30 @@ class AgentCoreService
      * }>
      */
     public function listAgents(): array
+    {
         try {
+            /** @var array<int, string> $agentIds */
             $agentIds = Cache::get('agentcore_agent_list', []);
+            if (! is_array($agentIds)) {
+                $agentIds = [];
+            }
             $agents = [];
 
             foreach ($agentIds as $agentId) {
+                if (! is_string($agentId)) {
+                    continue;
+                }
                 $config = $this->getAgentConfig($agentId);
                 if ($config) {
+                    $name = isset($config['name']) && (is_string($config['name']) || is_numeric($config['name'])) ? (string) $config['name'] : 'unknown';
+                    $type = isset($config['type']) && (is_string($config['type']) || is_numeric($config['type'])) ? (string) $config['type'] : 'unknown';
+                    $deployedAt = isset($config['deployed_at']) && (is_string($config['deployed_at']) || is_numeric($config['deployed_at'])) ? (string) $config['deployed_at'] : now()->toIso8601String();
                     $agents[] = [
                         'agent_id' => $agentId,
-                        'name' => $config['name'] ?? 'unknown',
-                        'type' => $config['type'] ?? 'unknown',
+                        'name' => $name,
+                        'type' => $type,
                         'status' => 'active',
-                        'deployed_at' => $config['deployed_at'] ?? now()->toIso8601String(),
+                        'deployed_at' => $deployedAt,
                     ];
                 }
             }
@@ -348,13 +363,14 @@ class AgentCoreService
      * @param  array<string, mixed>  $config
      * @return array<string, mixed>
      */
-    protected function prepareDeploymentPayload(): array
+    protected function prepareDeploymentPayload(array $config): array
+    {
         return [
             'agent_config' => [
-                'name' => $config['name'],
-                'type' => $config['type'],
-                'model' => $config['model'],
-                'instructions' => $config['instructions'],
+                'name' => $config['name'] ?? '',
+                'type' => $config['type'] ?? '',
+                'model' => $config['model'] ?? '',
+                'instructions' => $config['instructions'] ?? '',
                 'tools' => $config['tools'] ?? [],
                 'memory' => $config['memory'] ?? ['type' => 'ephemeral'],
                 'guardrails' => $config['guardrails'] ?? [],
@@ -391,7 +407,11 @@ class AgentCoreService
         Cache::put("agentcore_agent_{$agentId}", $config, 86400); // 24 hours
 
         // Add to agent list
+        /** @var array<int, string> $agentIds */
         $agentIds = Cache::get('agentcore_agent_list', []);
+        if (! is_array($agentIds)) {
+            $agentIds = [];
+        }
         if (! in_array($agentId, $agentIds, true)) {
             $agentIds[] = $agentId;
             Cache::put('agentcore_agent_list', $agentIds, 86400);
@@ -419,9 +439,13 @@ class AgentCoreService
         Cache::forget("agentcore_agent_{$agentId}");
 
         // Remove from agent list
+        /** @var array<int, string> $agentIds */
         $agentIds = Cache::get('agentcore_agent_list', []);
+        if (! is_array($agentIds)) {
+            $agentIds = [];
+        }
         $agentIds = array_filter($agentIds, fn ($id) => $id !== $agentId);
-        Cache::put('agentcore_agent_list', $agentIds, 86400);
+        Cache::put('agentcore_agent_list', array_values($agentIds), 86400);
     }
 
     /**
@@ -431,15 +455,18 @@ class AgentCoreService
      * @param  array<string, mixed>  $input
      * @return array<string, mixed>
      */
-    protected function simulateAgentExecution(): array
+    protected function simulateAgentExecution(array $config, array $input): array
+    {
         // In production, this would call the actual AgentCore MCP server
 
         // Handle coordinator decompose task
         if (isset($input['task']) && $input['task'] === 'decompose') {
-            $workerCount = count($input['worker_agents'] ?? []);
+            /** @var array<int, mixed> $workerAgents */
+            $workerAgents = $input['worker_agents'] ?? [];
+            $workerCount = is_array($workerAgents) ? count($workerAgents) : 0;
             $subtasks = [];
 
-            for ($i = 0; $i < $workerCount; $i = ($i ?? 0) + 1) {
+            for ($i = 0; $i < $workerCount; $i++) {
                 $subtasks[] = [
                     'subtask_id' => "subtask_{$i}",
                     'description' => "Worker subtask {$i}",
@@ -482,7 +509,8 @@ class AgentCoreService
      *
      * @return array<string, mixed>
      */
-    protected function getAgentMetrics(): array
+    protected function getAgentMetrics(string $agentId): array
+    {
         /** @var array<string, mixed>|null $metrics */
         $metrics = Cache::get("agentcore_metrics_{$agentId}");
 
@@ -509,7 +537,8 @@ class AgentCoreService
      *
      * @return array<string, mixed>
      */
-    protected function checkAgentHealth(): array
+    protected function checkAgentHealth(string $agentId): array
+    {
         return [
             'status' => 'healthy',
             'last_check' => now()->toIso8601String(),
@@ -543,7 +572,7 @@ class AgentCoreService
     protected function estimateCost(array $config, array $input, array $output): float
     {
         $tokens = $this->estimateTokens($input, $output);
-        $model = $config['model'] ?? 'claude-3-5-sonnet';
+        $model = isset($config['model']) && (is_string($config['model']) || is_numeric($config['model'])) ? (string) $config['model'] : 'claude-3-5-sonnet';
 
         // Cost per 1K tokens (approximate)
         $costPer1K = match (true) {
@@ -567,7 +596,12 @@ class AgentCoreService
      * }
      */
     public function getStatus(): array
+    {
+        /** @var array<int, string> $agentIds */
         $agentIds = Cache::get('agentcore_agent_list', []);
+        if (! is_array($agentIds)) {
+            $agentIds = [];
+        }
 
         return [
             'enabled' => $this->enabled,

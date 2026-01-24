@@ -17,8 +17,10 @@ class MemoryGuardServiceProvider extends ServiceProvider
     {
         // Set a global PHP memory limit from configuration to prevent OOM
         // Determine appropriate memory limit
-        $defaultLimit = (string) config('api-performance.memory.limit', '2048M');
-        $testingLimit = (string) config('api-performance.memory.testing_limit', '2048M');
+        $defaultLimitConfig = config('api-performance.memory.limit', '2048M');
+        $testingLimitConfig = config('api-performance.memory.testing_limit', '2048M');
+        $defaultLimit = is_string($defaultLimitConfig) ? $defaultLimitConfig : '2048M';
+        $testingLimit = is_string($testingLimitConfig) ? $testingLimitConfig : '2048M';
 
         $limitToApply = $defaultLimit;
 

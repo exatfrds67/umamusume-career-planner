@@ -50,6 +50,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class ConversationMessage extends Model
 {
+    /** @use HasFactory<\Database\Factories\ConversationMessageFactory> */
     use HasFactory;
 
     /**
@@ -173,6 +174,9 @@ class ConversationMessage extends Model
 
     /**
      * Scope a query to only include user messages.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<ConversationMessage>  $query
+     * @return \Illuminate\Database\Eloquent\Builder<ConversationMessage>
      */
     public function scopeUserMessages(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
     {
@@ -181,6 +185,9 @@ class ConversationMessage extends Model
 
     /**
      * Scope a query to only include AI messages.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<ConversationMessage>  $query
+     * @return \Illuminate\Database\Eloquent\Builder<ConversationMessage>
      */
     public function scopeAiMessages(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
     {
@@ -189,14 +196,20 @@ class ConversationMessage extends Model
 
     /**
      * Scope a query to only include messages from a specific agent.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<ConversationMessage>  $query
+     * @return \Illuminate\Database\Eloquent\Builder<ConversationMessage>
      */
-    public function scopeFromAgent($query, string $agentId)
+    public function scopeFromAgent(\Illuminate\Database\Eloquent\Builder $query, string $agentId): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('agent_id', $agentId);
     }
 
     /**
      * Scope a query to only include branch points.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<ConversationMessage>  $query
+     * @return \Illuminate\Database\Eloquent\Builder<ConversationMessage>
      */
     public function scopeBranchPoints(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
     {
@@ -205,14 +218,20 @@ class ConversationMessage extends Model
 
     /**
      * Scope a query to only include messages in a specific branch.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<ConversationMessage>  $query
+     * @return \Illuminate\Database\Eloquent\Builder<ConversationMessage>
      */
-    public function scopeInBranch($query, string $branchId)
+    public function scopeInBranch(\Illuminate\Database\Eloquent\Builder $query, string $branchId): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('branch_id', $branchId);
     }
 
     /**
      * Scope a query to only include visible messages.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<ConversationMessage>  $query
+     * @return \Illuminate\Database\Eloquent\Builder<ConversationMessage>
      */
     public function scopeVisible(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
     {
@@ -250,6 +269,7 @@ class ConversationMessage extends Model
      */
     public function getBranches(): \Illuminate\Database\Eloquent\Collection
     {
+        /** @var \Illuminate\Database\Eloquent\Collection<int, ConversationMessage> */
         return $this->childMessages()->where('is_branch_point', false)->get();
     }
 

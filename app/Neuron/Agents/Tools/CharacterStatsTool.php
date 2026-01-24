@@ -82,6 +82,8 @@ class CharacterStatsTool extends Tool
 
     /**
      * Format character stats with grades
+     *
+     * @return array<string, array{value: int, grade: string}>
      */
     private function formatStats(Character $character): array
     {
@@ -101,6 +103,8 @@ class CharacterStatsTool extends Tool
 
     /**
      * Format aptitudes for LLM consumption
+     *
+     * @return array<string, string>
      */
     private function formatAptitudes(Character $character): array
     {
@@ -116,6 +120,8 @@ class CharacterStatsTool extends Tool
 
     /**
      * Format acquired skills
+     *
+     * @return array<int, array{name: string, type: string, sp_cost: int|null, is_evolution: bool, turn_acquired: int|null}>
      */
     private function formatSkills(Character $character): array
     {
@@ -138,6 +144,8 @@ class CharacterStatsTool extends Tool
 
     /**
      * Format support cards
+     *
+     * @return array<int, array{name: string, type: string, rarity: string, friendship_level: int, limit_break_level: int}>
      */
     private function formatSupportCards(Character $character): array
     {
@@ -160,6 +168,16 @@ class CharacterStatsTool extends Tool
 
     /**
      * Format the output array as a readable string for LLM
+     *
+     * @param array{
+     *     character_info: array{id: int, name: string, scenario_type: string|null, career_stage: string|null, current_turn: int|null, status: string|null},
+     *     current_stats: array<string, array{value: int, grade: string}>,
+     *     aptitudes: array<string, string>,
+     *     skills: array<int, array{name: string, type: string, sp_cost: int|null, is_evolution: bool, turn_acquired: int|null}>,
+     *     career_progress: array{energy_level: int|null, mood_status: string|null, conditions: array<string>, days_until_race: int|null, progress_percentage: float|int},
+     *     goals: array<string, mixed>,
+     *     support_cards: array<int, array{name: string, type: string, rarity: string, friendship_level: int, limit_break_level: int}>
+     * } $data
      */
     private function formatForLLM(array $data): string
     {
@@ -168,11 +186,11 @@ class CharacterStatsTool extends Tool
 
         // Character Info
         $info = $data['character_info'];
-        $output .= "Character: {$info['name']}\n";
-        $output .= "Scenario: {$info['scenario_type']}\n";
-        $output .= "Career Stage: {$info['career_stage']}\n";
-        $output .= "Current Turn: {$info['current_turn']}\n";
-        $output .= "Status: {$info['status']}\n\n";
+        $output .= 'Character: '.$info['name']."\n";
+        $output .= 'Scenario: '.($info['scenario_type'] ?? 'N/A')."\n";
+        $output .= 'Career Stage: '.($info['career_stage'] ?? 'N/A')."\n";
+        $output .= 'Current Turn: '.($info['current_turn'] ?? 'N/A')."\n";
+        $output .= 'Status: '.($info['status'] ?? 'N/A')."\n\n";
 
         // Current Stats
         $output .= "CURRENT STATS:\n";
@@ -196,17 +214,18 @@ class CharacterStatsTool extends Tool
         }
 
         // Skills
-        if (! empty($data['skills'])) {
-            $skillCount = count($data['skills']);
+        $skills = $data['skills'];
+        if (! empty($skills)) {
+            $skillCount = count($skills);
             $output .= "ACQUIRED SKILLS ({$skillCount} total):\n";
-            foreach (array_slice($data['skills'], 0, 10) as $skill) {
+            foreach (array_slice($skills, 0, 10) as $skill) {
                 $evolution = $skill['is_evolution'] ? ' (Evolved)' : '';
                 $output .= sprintf(
-                    "  - %s [%s] (SP: %d, Turn: %d)%s\n",
+                    "  - %s [%s] (SP: %s, Turn: %s)%s\n",
                     $skill['name'],
                     $skill['type'],
-                    $skill['sp_cost'],
-                    $skill['turn_acquired'],
+                    $skill['sp_cost'] ?? 'N/A',
+                    $skill['turn_acquired'] ?? 'N/A',
                     $evolution
                 );
             }
@@ -219,34 +238,39 @@ class CharacterStatsTool extends Tool
         // Career Progress
         $progress = $data['career_progress'];
         $output .= "CAREER PROGRESS:\n";
-        $output .= "  Energy Level: {$progress['energy_level']}\n";
-        $output .= "  Mood: {$progress['mood_status']}\n";
+        $output .= '  Energy Level: '.($progress['energy_level'] ?? 'N/A')."\n";
+        $output .= '  Mood: '.($progress['mood_status'] ?? 'N/A')."\n";
         if (! empty($progress['conditions'])) {
             $output .= '  Conditions: '.implode(', ', $progress['conditions'])."\n";
         }
         if ($progress['days_until_race'] !== null) {
-            $output .= "  Days Until Race: {$progress['days_until_race']}\n";
+            $output .= '  Days Until Race: '.$progress['days_until_race']."\n";
         }
-        $output .= "  Overall Progress: {$progress['progress_percentage']}%\n\n";
+        $output .= '  Overall Progress: '.$progress['progress_percentage']."%\n\n";
 
         // Goals
-        if (! empty($data['goals'])) {
+        $goals = $data['goals'];
+        if (! empty($goals)) {
             $output .= "GOALS:\n";
-            if (isset($data['goals']['target_stats'])) {
+            if (isset($goals['target_stats']) && is_array($goals['target_stats'])) {
                 $output .= "  Target Stats:\n";
-                foreach ($data['goals']['target_stats'] as $stat => $target) {
-                    $current = $data['current_stats'][$stat]['value'] ?? 0;
-                    $remaining = max(0, $target - $current);
-                    $output .= "    {$stat}: {$target} (remaining: {$remaining})\n";
+                foreach ($goals['target_stats'] as $stat => $target) {
+                    $statStr = is_string($stat) ? $stat : (string) $stat;
+                    $targetVal = is_numeric($target) ? (int) $target : 0;
+                    $currentStats = $data['current_stats'][$statStr] ?? null;
+                    $current = is_array($currentStats) && isset($currentStats['value']) ? (int) $currentStats['value'] : 0;
+                    $remaining = max(0, $targetVal - $current);
+                    $output .= "    {$statStr}: {$targetVal} (remaining: {$remaining})\n";
                 }
             }
             $output .= "\n";
         }
 
         // Support Cards
-        if (! empty($data['support_cards'])) {
+        $supportCards = $data['support_cards'];
+        if (! empty($supportCards)) {
             $output .= "SUPPORT CARDS:\n";
-            foreach ($data['support_cards'] as $card) {
+            foreach ($supportCards as $card) {
                 $output .= sprintf(
                     "  - %s [%s, %s] (Friendship: %d, LB: %d)\n",
                     $card['name'],

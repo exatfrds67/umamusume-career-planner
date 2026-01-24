@@ -57,37 +57,23 @@ class ToolChainingService
     /**
      * Execute a tool chain workflow
      *
-     * @param  array<int, array{
-     *     tool: string,
-     *     method: string,
-     *     params: array<string, mixed>,
-     *     condition?: string,
-     *     on_success?: array<string, mixed>,
-     *     on_failure?: array<string, mixed>
-     * }>  $steps
+     * @param  array<int, array{tool: string, method: string, params: array<string, mixed>, condition?: string, on_success?: array<string, mixed>, on_failure?: array<string, mixed>, continue_on_error?: bool}>  $steps
      * @param  array<string, mixed>  $context
-     * @return array{
-     *     success: bool,
-     *     results: array<int, mixed>,
-     *     workflow: array<int, array{
-     *         step: int,
-     *         tool: string,
-     *         method: string,
-     *         status: string,
-     *         duration: float,
-     *         error?: string
-     *     }>,
-     *     total_duration: float,
-     *     context: array<string, mixed>
-     * }
+     * @return array{success: bool, results: array<int, mixed>, workflow: array<int, array{step: int, tool: string, method: string, status: string, duration: float, error?: string}>, total_duration: float, context: array<string, mixed>}
      */
-    public function executeChain(): array
+    public function executeChain(array $steps, array $context = []): array
+    {
         if (! $this->enabled) {
-            return $this->getDisabledResponse();
+            /** @var array{success: bool, results: array<int, mixed>, workflow: array<int, array{step: int, tool: string, method: string, status: string, duration: float, error?: string}>, total_duration: float, context: array<string, mixed>} $disabled */
+            $disabled = $this->getDisabledResponse();
+
+            return $disabled;
         }
 
         $startTime = microtime(true);
+        /** @var array<int, mixed> $results */
         $results = [];
+        /** @var array<int, array{step: int, tool: string, method: string, status: string, duration: float, error?: string}> $workflow */
         $workflow = [];
         $sharedContext = $context;
 
@@ -121,8 +107,8 @@ class ToolChainingService
                 ];
 
                 // Update shared context
-                if (isset($result['context_updates'])) {
-                    $sharedContext = [...$sharedContext, ...$result['context_updates']];
+                if (is_array($result) && isset($result['context_updates']) && is_array($result['context_updates'])) {
+                    $sharedContext = array_merge($sharedContext, $result['context_updates']);
                 }
 
                 // Handle on_success actions
@@ -173,7 +159,8 @@ class ToolChainingService
      * @param  array<string, mixed>  $params
      * @return array<string, mixed>
      */
-    public function executeTemplate(): array
+    public function executeTemplate(string $templateName, array $params = []): array
+    {
         if (! isset($this->workflowTemplates[$templateName])) {
             return [
                 'success' => false,
@@ -182,12 +169,18 @@ class ToolChainingService
         }
 
         $template = $this->workflowTemplates[$templateName];
-        $steps = $template['steps'] ?? [];
+        /** @var array<int, array{tool: string, method: string, params: array<string, mixed>}> $templateSteps */
+        $templateSteps = is_array($template) && isset($template['steps']) && is_array($template['steps'])
+            ? $template['steps']
+            : [];
 
         // Replace parameters in steps
-        $steps = $this->replaceParameters($steps, $params);
+        $processedSteps = $this->replaceParameters($templateSteps, $params);
 
-        return $this->executeChain($steps, $params);
+        /** @var array<int, array{tool: string, method: string, params: array<string, mixed>}> $finalSteps */
+        $finalSteps = $processedSteps;
+
+        return $this->executeChain($finalSteps, $params);
     }
 
     /**
@@ -196,7 +189,9 @@ class ToolChainingService
      * @param  array<string, mixed>  $usageData
      * @return array<string, mixed>
      */
-    public function createCostOptimizationWorkflow(): array
+    public function createCostOptimizationWorkflow(array $usageData = []): array
+    {
+        /** @var array<int, array{tool: string, method: string, params: array<string, mixed>}> $steps */
         $steps = [
             [
                 'tool' => 'aws_pricing',
@@ -224,7 +219,9 @@ class ToolChainingService
      * @param  array<int, string>  $endpoints
      * @return array<string, mixed>
      */
-    public function createDataFetchWorkflow(): array
+    public function createDataFetchWorkflow(array $endpoints): array
+    {
+        /** @var array<int, array{tool: string, method: string, params: array<string, mixed>, continue_on_error: bool}> $steps */
         $steps = [];
 
         foreach ($endpoints as $endpoint) {
@@ -245,7 +242,9 @@ class ToolChainingService
      * @param  array<string, mixed>  $aiRequest
      * @return array<string, mixed>
      */
-    public function createContextAwareAIWorkflow(): array
+    public function createContextAwareAIWorkflow(string $conversationId, array $aiRequest = []): array
+    {
+        /** @var array<int, array{tool: string, method: string, params: array<string, mixed>}> $steps */
         $steps = [
             [
                 'tool' => 'context7',
@@ -284,6 +283,7 @@ class ToolChainingService
     {
         $tool = $this->getTool($step['tool']);
         $method = $step['method'];
+        /** @var array<string, mixed> $params */
         $params = $step['params'];
 
         // Replace context variables in params
@@ -357,9 +357,9 @@ class ToolChainingService
                 'result' => $result,
             ]),
             'cache' => Cache::put(
-                $action['key'] ?? 'tool_chain_result',
+                isset($action['key']) && is_string($action['key']) ? $action['key'] : 'tool_chain_result',
                 $result,
-                $action['ttl'] ?? 3600
+                isset($action['ttl']) && is_int($action['ttl']) ? $action['ttl'] : 3600
             ),
             'notify' => $this->sendNotification($action, $result),
             default => Log::warning('[ToolChaining] Unknown action type', ['type' => $actionType]),
@@ -403,14 +403,20 @@ class ToolChainingService
      * @param  array<string, mixed>  $params
      * @return array<int, array<string, mixed>>
      */
-    protected function replaceParameters(): array
+    protected function replaceParameters(array $steps, array $params): array
+    {
         $json = json_encode($steps) ?: '[]';
 
         foreach ($params as $key => $value) {
-            $json = str_replace("{{$key}}", (is_string($value) ? (string) $value : ''), $json);
+            $replacement = is_string($value) ? $value : (is_scalar($value) ? (string) $value : '');
+            $json = str_replace("{{$key}}", $replacement, $json);
         }
 
-        return json_decode($json, true) ?: [];
+        $decoded = json_decode($json, true);
+        /** @var array<int, array<string, mixed>> $result */
+        $result = is_array($decoded) ? $decoded : [];
+
+        return $result;
     }
 
     /**
@@ -420,7 +426,8 @@ class ToolChainingService
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    protected function replaceContextVariables(): array
+    protected function replaceContextVariables(array $params, array $context): array
+    {
         foreach ($params as $key => $value) {
             if (\is_string($value) && str_starts_with($value, 'context.')) {
                 $contextKey = substr($value, 8); // Remove 'context.' prefix
@@ -437,6 +444,7 @@ class ToolChainingService
      * @return array<string, mixed>
      */
     protected function getDisabledResponse(): array
+    {
         return [
             'success' => false,
             'results' => [],
@@ -450,20 +458,29 @@ class ToolChainingService
     /**
      * Get available workflow templates
      *
-     * @return array<string, array{
-     *     name: string,
-     *     description: string,
-     *     parameters: array<string, string>
-     * }>
+     * @return array<string, array{name: string, description: string, parameters: array<string, string>}>
      */
     public function getAvailableTemplates(): array
+    {
+        /** @var array<string, array{name: string, description: string, parameters: array<string, string>}> $templates */
         $templates = [];
 
         foreach ($this->workflowTemplates as $name => $template) {
+            if (! is_array($template)) {
+                continue;
+            }
+            $description = isset($template['description']) && is_string($template['description'])
+                ? $template['description']
+                : '';
+            /** @var array<string, string> $parameters */
+            $parameters = isset($template['parameters']) && is_array($template['parameters'])
+                ? $template['parameters']
+                : [];
+
             $templates[$name] = [
                 'name' => $name,
-                'description' => $template['description'] ?? '',
-                'parameters' => $template['parameters'] ?? [],
+                'description' => $description,
+                'parameters' => $parameters,
             ];
         }
 
@@ -480,6 +497,7 @@ class ToolChainingService
      * }
      */
     public function getStatus(): array
+    {
         return [
             'enabled' => $this->enabled,
             'available_tools' => [

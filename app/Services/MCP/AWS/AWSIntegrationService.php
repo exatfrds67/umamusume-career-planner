@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services\MCP\AWS;
 
-use App\Services\MCP\MCPClientService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
@@ -30,7 +29,6 @@ class AWSIntegrationService
     protected const RETRY_DELAY_MS = 1000;
 
     public function __construct(
-        private readonly MCPClientService $mcpClient,
         private readonly AWSPricingService $pricingService,
         private readonly AWSKnowledgeService $knowledgeService,
         private readonly AWSAPIService $apiService
@@ -47,6 +45,7 @@ class AWSIntegrationService
      * }
      */
     public function checkAvailability(): array
+    {
         $availability = [
             'pricing' => $this->pricingService->isAvailable(),
             'knowledge' => $this->knowledgeService->isAvailable(),
@@ -64,6 +63,7 @@ class AWSIntegrationService
      * Get comprehensive cost analysis
      *
      * @param  array<string, mixed>  $usage
+     * @param  array<string, mixed>  $historicalUsage
      * @return array{
      *     current_costs: array<string, mixed>,
      *     pricing_data: array<string, mixed>,
@@ -72,13 +72,21 @@ class AWSIntegrationService
      *     budget_status: array<string, mixed>
      * }
      */
-    public function getCostAnalysis(): array
-        return $this->executeWithRateLimit(function () use ($usage, $historicalUsage) {
-            return $this->executeWithRetry(function () use ($usage, $historicalUsage) {
+    public function getCostAnalysis(array $usage = [], array $historicalUsage = []): array
+    {
+        return $this->executeWithRateLimit(function () use ($usage, $historicalUsage): array {
+            return $this->executeWithRetry(function () use ($usage, $historicalUsage): array {
                 $currentCosts = $this->pricingService->calculateMonthlyCost($usage);
                 $pricingData = $this->pricingService->getBedrockPricing();
                 $optimizationRecommendations = $this->pricingService->getBudgetOptimizationRecommendations($usage);
                 $forecast = $this->pricingService->forecastCosts($historicalUsage);
+
+                /** @var float $currentMonthCost */
+                $currentMonthCost = $currentCosts['estimated_cost'] ?? 0.0;
+                /** @var float $nextMonthForecast */
+                $nextMonthForecast = $forecast['next_month_forecast'] ?? 0.0;
+                /** @var string $trend */
+                $trend = $forecast['trend'] ?? 'unknown';
 
                 return [
                     'current_costs' => $currentCosts,
@@ -86,9 +94,9 @@ class AWSIntegrationService
                     'optimization_recommendations' => $optimizationRecommendations,
                     'forecast' => $forecast,
                     'budget_status' => [
-                        'current_month' => $currentCosts['estimated_cost'],
-                        'forecast_next_month' => $forecast['next_month_forecast'],
-                        'trend' => $forecast['trend'],
+                        'current_month' => $currentMonthCost,
+                        'forecast_next_month' => $nextMonthForecast,
+                        'trend' => $trend,
                     ],
                 ];
             });
@@ -106,8 +114,9 @@ class AWSIntegrationService
      * }
      */
     public function getBedrockGuidance(): array
-        return $this->executeWithRateLimit(function () {
-            return $this->executeWithRetry(function () {
+    {
+        return $this->executeWithRateLimit(function (): array {
+            return $this->executeWithRetry(function (): array {
                 $bestPractices = $this->knowledgeService->getBedrockBestPractices();
                 $healthStatus = $this->apiService->getBedrockHealth();
                 $availableModels = $this->apiService->listBedrockModels();
@@ -140,21 +149,29 @@ class AWSIntegrationService
      * }
      */
     public function getServiceHealthDashboard(): array
-        return $this->executeWithRateLimit(function () {
-            return $this->executeWithRetry(function () {
+    {
+        return $this->executeWithRateLimit(function (): array {
+            return $this->executeWithRetry(function (): array {
                 $bedrockHealth = $this->apiService->getBedrockHealth();
                 $quotas = $this->apiService->checkServiceQuotas('bedrock');
                 $alarms = $this->apiService->getCloudWatchAlarms('bedrock');
 
-                $overallStatus = $bedrockHealth['status'] === 'operational' ? 'healthy' : 'degraded';
+                /** @var string $bedrockStatus */
+                $bedrockStatus = $bedrockHealth['status'] ?? 'unknown';
+                $overallStatus = $bedrockStatus === 'operational' ? 'healthy' : 'degraded';
+
+                /** @var array<int, string> $quotaWarnings */
+                $quotaWarnings = $quotas['warnings'] ?? [];
+                /** @var int $activeAlarmsCount */
+                $activeAlarmsCount = $alarms['active_alarms'] ?? 0;
 
                 $recommendations = [];
-                if ($quotas['warnings']) {
+                if (count($quotaWarnings) > 0) {
                     $recommendations[] = 'Review service quotas - some limits are approaching';
                 }
 
-                if ($alarms['active_alarms'] > 0) {
-                    $recommendations[] = sprintf('Active alarms detected: %d', $alarms['active_alarms']);
+                if ($activeAlarmsCount > 0) {
+                    $recommendations[] = sprintf('Active alarms detected: %d', $activeAlarmsCount);
                 }
 
                 return [
@@ -181,9 +198,10 @@ class AWSIntegrationService
      *     priority_actions: array<int, string>
      * }
      */
-    public function getOptimizationRecommendations(): array
-        return $this->executeWithRateLimit(function () use ($currentUsage, $requirements) {
-            return $this->executeWithRetry(function () use ($currentUsage, $requirements) {
+    public function getOptimizationRecommendations(array $currentUsage = [], array $requirements = []): array
+    {
+        return $this->executeWithRateLimit(function () use ($currentUsage, $requirements): array {
+            return $this->executeWithRetry(function () use ($currentUsage, $requirements): array {
                 $costOptimization = $this->pricingService->getBudgetOptimizationRecommendations($currentUsage);
 
                 $architectureOptimization = $this->knowledgeService->getArchitectureRecommendations(
@@ -193,20 +211,33 @@ class AWSIntegrationService
                 $securityRecommendations = $this->knowledgeService->getSecurityBestPractices('ai_services');
 
                 $bedrockBestPractices = $this->knowledgeService->getBedrockBestPractices();
-                $performanceTips = $bedrockBestPractices['performance_tips'] ?? [];
+
+                /** @var array<int, string> $performanceTips */
+                $performanceTips = isset($bedrockBestPractices['performance_tips']) && is_array($bedrockBestPractices['performance_tips'])
+                    ? $bedrockBestPractices['performance_tips']
+                    : [];
+
+                /** @var array<int, array{title: string, description: string, severity: string, implementation: string, compliance: array<int, string>}> $practices */
+                $practices = isset($securityRecommendations['practices']) && is_array($securityRecommendations['practices'])
+                    ? $securityRecommendations['practices']
+                    : [];
 
                 // Aggregate priority actions
                 $priorityActions = [];
 
                 foreach ($costOptimization as $recommendation) {
-                    if ($recommendation['priority'] === 'high') {
-                        $priorityActions[] = $recommendation['recommendation'];
+                    if (is_array($recommendation) && isset($recommendation['priority']) && $recommendation['priority'] === 'high') {
+                        $priorityActions[] = is_string($recommendation['recommendation'] ?? null)
+                            ? $recommendation['recommendation']
+                            : '';
                     }
                 }
 
-                foreach ($securityRecommendations['practices'] as $practice) {
-                    if ($practice['severity'] === 'critical') {
-                        $priorityActions[] = $practice['title'];
+                foreach ($practices as $practice) {
+                    if (is_array($practice) && isset($practice['severity']) && $practice['severity'] === 'critical') {
+                        $priorityActions[] = is_string($practice['title'] ?? null)
+                            ? $practice['title']
+                            : '';
                     }
                 }
 
@@ -215,7 +246,7 @@ class AWSIntegrationService
                     'architecture_optimization' => $architectureOptimization,
                     'security_recommendations' => $securityRecommendations,
                     'performance_tips' => $performanceTips,
-                    'priority_actions' => array_slice($priorityActions, 0, 5),
+                    'priority_actions' => array_slice(array_filter($priorityActions), 0, 5),
                 ];
             });
         });
@@ -231,9 +262,10 @@ class AWSIntegrationService
      *     troubleshooting_guides: array<int, mixed>
      * }
      */
-    public function searchDocumentation(): array
-        return $this->executeWithRateLimit(function () use ($query) {
-            return $this->executeWithRetry(function () use ($query) {
+    public function searchDocumentation(string $query): array
+    {
+        return $this->executeWithRateLimit(function () use ($query): array {
+            return $this->executeWithRetry(function () use ($query): array {
                 $searchResults = $this->knowledgeService->searchDocumentation($query);
 
                 // Get related best practices if query is service-specific
@@ -252,10 +284,15 @@ class AWSIntegrationService
                     $troubleshootingGuides = [$this->knowledgeService->getTroubleshootingGuidance($query, 'bedrock')];
                 }
 
+                /** @var array<int, mixed> $results */
+                $results = isset($searchResults['results']) && is_array($searchResults['results'])
+                    ? $searchResults['results']
+                    : [];
+
                 return [
                     'query' => $query,
-                    'results' => $searchResults['results'],
-                    'related_best_practices' => $relatedBestPractices ? [$relatedBestPractices] : [],
+                    'results' => $results,
+                    'related_best_practices' => $relatedBestPractices !== [] ? [$relatedBestPractices] : [],
                     'troubleshooting_guides' => $troubleshootingGuides,
                 ];
             });
@@ -273,14 +310,21 @@ class AWSIntegrationService
      *     cost_savings_potential: float
      * }
      */
-    public function getModelComparison(): array
-        return $this->executeWithRateLimit(function () use ($tokenCounts) {
-            return $this->executeWithRetry(function () use ($tokenCounts) {
+    public function getModelComparison(array $tokenCounts = []): array
+    {
+        return $this->executeWithRateLimit(function () use ($tokenCounts): array {
+            return $this->executeWithRetry(function () use ($tokenCounts): array {
                 $pricingComparison = $this->pricingService->comparePricing($tokenCounts);
                 $bestPractices = $this->knowledgeService->getBedrockBestPractices();
 
                 // Calculate cost savings potential
-                $costs = array_column($pricingComparison, 'estimated_cost');
+                $costs = [];
+                foreach ($pricingComparison as $comparison) {
+                    if (is_array($comparison) && isset($comparison['estimated_cost']) && is_numeric($comparison['estimated_cost'])) {
+                        $costs[] = (float) $comparison['estimated_cost'];
+                    }
+                }
+
                 if (empty($costs)) {
                     $minCost = 0.0;
                     $maxCost = 0.0;
@@ -290,7 +334,10 @@ class AWSIntegrationService
                 }
                 $costSavingsPotential = $maxCost - $minCost;
 
-                $modelRecommendations = $bestPractices['model_selection'] ?? [];
+                /** @var array<string, mixed> $modelRecommendations */
+                $modelRecommendations = isset($bestPractices['model_selection']) && is_array($bestPractices['model_selection'])
+                    ? $bestPractices['model_selection']
+                    : [];
 
                 return [
                     'pricing_comparison' => $pricingComparison,
@@ -313,7 +360,8 @@ class AWSIntegrationService
     protected function executeWithRateLimit(callable $operation): mixed
     {
         $key = self::RATE_LIMIT_KEY;
-        $count = (int) Cache::get($key, 0);
+        /** @var int $count */
+        $count = Cache::get($key, 0);
 
         if ($count >= self::MAX_REQUESTS_PER_MINUTE) {
             Log::warning('[AWSIntegration] Rate limit exceeded', [
@@ -339,9 +387,10 @@ class AWSIntegrationService
      */
     protected function executeWithRetry(callable $operation): mixed
     {
+        /** @var \Exception|null $lastException */
         $lastException = null;
 
-        for ($attempt = 1; $attempt <= self::RETRY_ATTEMPTS; $attempt = ($attempt ?? 0) + 1) {
+        for ($attempt = 1; $attempt <= self::RETRY_ATTEMPTS; $attempt++) {
             try {
                 return $operation();
             } catch (\Exception $e) {
@@ -359,10 +408,9 @@ class AWSIntegrationService
             }
         }
 
-        if ($lastException === null) {
-            throw new \RuntimeException('Operation failed after retries');
-        }
-
+        // $lastException is guaranteed to be set if we reach this point
+        // since the loop only exits without returning when an exception is caught
+        /** @var \Exception $lastException */
         Log::error('[AWSIntegration] Operation failed after all retries', [
             'attempts' => self::RETRY_ATTEMPTS,
             'error' => $lastException->getMessage(),
@@ -383,6 +431,7 @@ class AWSIntegrationService
         ];
 
         foreach ($patterns as $pattern) {
+            unset($pattern); // Patterns reserved for future targeted cache clearing
             Cache::flush(); // In production, use more targeted cache clearing
         }
 
@@ -403,9 +452,11 @@ class AWSIntegrationService
      * }
      */
     public function getStatistics(): array
+    {
         $availability = $this->checkAvailability();
 
-        $rateLimitCount = (int) Cache::get(self::RATE_LIMIT_KEY, 0);
+        /** @var int $rateLimitCount */
+        $rateLimitCount = Cache::get(self::RATE_LIMIT_KEY, 0);
 
         return [
             'availability' => $availability,

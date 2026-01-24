@@ -56,7 +56,7 @@ class RaceStrategyService
         $context = $this->formatRaceContext($character, $raceData);
 
         // Determine race ID for session scoping
-        $raceId = (is_array($raceData) && isset($raceData['race_id']) ? $raceData['race_id'] : null);
+        $raceId = isset($raceData['race_id']) && is_int($raceData['race_id']) ? $raceData['race_id'] : null;
 
         // Create agent instance
         $agent = new RaceStrategyAgent($userId, $raceId);
@@ -68,6 +68,11 @@ class RaceStrategyService
                 RaceStrategyResponse::class,
                 3
             );
+
+            // Ensure response is of correct type
+            if (! $response instanceof RaceStrategyResponse) {
+                throw new \RuntimeException('Unexpected response type from agent');
+            }
 
             // Log successful strategy generation
             Log::info('Race strategy generated', [
@@ -111,23 +116,32 @@ class RaceStrategyService
 
         // Race information
         $context .= "## Race Information\n";
-        $context .= '- Race Name: '.($raceData['race_name'] ?? 'Unknown Race')."\n";
-        $context .= '- Grade: '.($raceData['race_grade'] ?? 'Unknown')."\n";
-        $context .= '- Distance: '.($raceData['distance_meters'] ?? 'Unknown')." meters\n";
-        $context .= '- Distance Category: '.($raceData['distance_category'] ?? 'Unknown')."\n";
-        $context .= '- Surface: '.($raceData['surface'] ?? 'Unknown')."\n";
-        $context .= '- Track Type: '.($raceData['track_type'] ?? 'Unknown')."\n";
+        $raceName = isset($raceData['race_name']) && is_scalar($raceData['race_name']) ? (string) $raceData['race_name'] : 'Unknown Race';
+        $raceGrade = isset($raceData['race_grade']) && is_scalar($raceData['race_grade']) ? (string) $raceData['race_grade'] : 'Unknown';
+        $distanceMeters = isset($raceData['distance_meters']) && is_scalar($raceData['distance_meters']) ? (string) $raceData['distance_meters'] : 'Unknown';
+        $distanceCategory = isset($raceData['distance_category']) && is_scalar($raceData['distance_category']) ? (string) $raceData['distance_category'] : 'Unknown';
+        $surfaceStr = isset($raceData['surface']) && is_scalar($raceData['surface']) ? (string) $raceData['surface'] : 'Unknown';
+        $trackType = isset($raceData['track_type']) && is_scalar($raceData['track_type']) ? (string) $raceData['track_type'] : 'Unknown';
+        $context .= "- Race Name: {$raceName}\n";
+        $context .= "- Grade: {$raceGrade}\n";
+        $context .= "- Distance: {$distanceMeters} meters\n";
+        $context .= "- Distance Category: {$distanceCategory}\n";
+        $context .= "- Surface: {$surfaceStr}\n";
+        $context .= "- Track Type: {$trackType}\n";
 
-        if (isset($raceData['weather'])) {
-            $context .= "- Weather: {$raceData['weather']}\n";
+        if (isset($raceData['weather']) && is_scalar($raceData['weather'])) {
+            $weather = (string) $raceData['weather'];
+            $context .= "- Weather: {$weather}\n";
         }
 
-        if (isset($raceData['track_condition'])) {
-            $context .= "- Track Condition: {$raceData['track_condition']}\n";
+        if (isset($raceData['track_condition']) && is_scalar($raceData['track_condition'])) {
+            $trackCondition = (string) $raceData['track_condition'];
+            $context .= "- Track Condition: {$trackCondition}\n";
         }
 
         if (isset($raceData['field_size'])) {
-            $context .= "- Field Size: {$raceData['field_size']} horses\n";
+            $fieldSize = is_scalar($raceData['field_size']) ? (string) $raceData['field_size'] : 'Unknown';
+            $context .= "- Field Size: {$fieldSize} horses\n";
         }
 
         $context .= "\n";
@@ -214,18 +228,23 @@ class RaceStrategyService
         }
 
         // Available skills (if provided)
-        if (! empty($raceData['available_skills'])) {
+        if (! empty($raceData['available_skills']) && is_array($raceData['available_skills'])) {
             $context .= "## Available Skills to Equip\n";
             foreach ($raceData['available_skills'] as $skillData) {
-                $skillName = $skillData['name'] ?? 'Unknown Skill';
+                if (! is_array($skillData)) {
+                    continue;
+                }
+                $skillName = isset($skillData['name']) && is_string($skillData['name']) ? $skillData['name'] : 'Unknown Skill';
                 $context .= "- {$skillName}";
 
-                if (isset($skillData['skill_type'])) {
-                    $context .= " (Type: {$skillData['skill_type']})";
+                if (isset($skillData['skill_type']) && is_string($skillData['skill_type'])) {
+                    $skillType = $skillData['skill_type'];
+                    $context .= " (Type: {$skillType})";
                 }
 
-                if (isset($skillData['description'])) {
-                    $context .= "\n  Description: {$skillData['description']}";
+                if (isset($skillData['description']) && is_string($skillData['description'])) {
+                    $skillDescription = $skillData['description'];
+                    $context .= "\n  Description: {$skillDescription}";
                 }
 
                 $context .= "\n";
@@ -254,10 +273,12 @@ class RaceStrategyService
             $context .= "## Race Conditions\n";
             if (\is_array($raceData['race_conditions'])) {
                 foreach ($raceData['race_conditions'] as $key => $value) {
-                    $context .= '- '.ucfirst((string) $key).": {$value}\n";
+                    $valueStr = is_scalar($value) ? (string) $value : 'N/A';
+                    $context .= '- '.ucfirst((string) $key).": {$valueStr}\n";
                 }
-            } else {
-                $context .= $raceData['race_conditions']."\n";
+            } elseif (is_scalar($raceData['race_conditions'])) {
+                $conditionStr = (string) $raceData['race_conditions'];
+                $context .= $conditionStr."\n";
             }
             $context .= "\n";
         }
@@ -268,15 +289,15 @@ class RaceStrategyService
             $context .= "This is a URA Finale race.\n";
 
             if (! empty($raceData['ura_finale_stage'])) {
-                $context .= "Stage: {$raceData['ura_finale_stage']}\n";
+                $uraStage = is_scalar($raceData['ura_finale_stage']) ? (string) $raceData['ura_finale_stage'] : 'Unknown';
+                $context .= "Stage: {$uraStage}\n";
             }
 
-            if (! empty($raceData['ura_finale_requirements'])) {
+            if (! empty($raceData['ura_finale_requirements']) && is_array($raceData['ura_finale_requirements'])) {
                 $context .= "Requirements:\n";
-                if (\is_array($raceData['ura_finale_requirements'])) {
-                    foreach ($raceData['ura_finale_requirements'] as $req) {
-                        $context .= "  - {$req}\n";
-                    }
+                foreach ($raceData['ura_finale_requirements'] as $req) {
+                    $reqStr = is_scalar($req) ? (string) $req : 'N/A';
+                    $context .= "  - {$reqStr}\n";
                 }
             }
             $context .= "\n";
@@ -288,7 +309,8 @@ class RaceStrategyService
             $context .= "This is a Unity Cup match.\n";
 
             if (isset($raceData['unity_cup_opponent_rank'])) {
-                $context .= "Opponent Rank: {$raceData['unity_cup_opponent_rank']}\n";
+                $opponentRank = is_scalar($raceData['unity_cup_opponent_rank']) ? (string) $raceData['unity_cup_opponent_rank'] : 'Unknown';
+                $context .= "Opponent Rank: {$opponentRank}\n";
             }
 
             $context .= "\n";
@@ -328,15 +350,17 @@ class RaceStrategyService
         }
 
         // Strategic importance
-        if (! empty($raceData['strategic_importance'])) {
+        if (! empty($raceData['strategic_importance']) && is_scalar($raceData['strategic_importance'])) {
             $context .= "## Strategic Importance\n";
-            $context .= $raceData['strategic_importance']."\n\n";
+            $importance = (string) $raceData['strategic_importance'];
+            $context .= $importance."\n\n";
         }
 
         // Additional context
-        if (! empty($raceData['additional_context'])) {
+        if (! empty($raceData['additional_context']) && is_scalar($raceData['additional_context'])) {
             $context .= "## Additional Context\n";
-            $context .= $raceData['additional_context']."\n\n";
+            $additionalCtx = (string) $raceData['additional_context'];
+            $context .= $additionalCtx."\n\n";
         }
 
         $context .= 'Please analyze this information and provide your race strategy recommendation.';
@@ -353,7 +377,8 @@ class RaceStrategyService
      * @param  RaceStrategyResponse  $response  The agent response
      * @return array<string, mixed> Parsed response data
      */
-    public function parseResponse(): array
+    public function parseResponse(RaceStrategyResponse $response): array
+    {
         return [
             'recommended_running_style' => $response->recommendedRunningStyle,
             'recommended_skills' => $response->recommendedSkills,
@@ -388,7 +413,7 @@ class RaceStrategyService
         $context = $this->formatRaceContext($character, $raceData);
 
         // Determine race ID for session scoping
-        $raceId = (is_array($raceData) && isset($raceData['race_id']) ? $raceData['race_id'] : null);
+        $raceId = isset($raceData['race_id']) && is_int($raceData['race_id']) ? $raceData['race_id'] : null;
 
         // Create agent instance
         $agent = new RaceStrategyAgent($userId, $raceId);
@@ -396,7 +421,7 @@ class RaceStrategyService
         try {
             // Stream response from agent
             foreach ($agent->stream(new UserMessage($context)) as $chunk) {
-                yield $chunk;
+                yield is_scalar($chunk) ? (string) $chunk : '';
             }
 
             // Log successful streaming
@@ -427,11 +452,12 @@ class RaceStrategyService
      * @param  array<string, mixed>  $raceData  Race data to validate
      * @return array<string, string> Validation errors (empty if valid)
      */
-    public function validateRaceData(): array
+    public function validateRaceData(array $raceData): array
+    {
         $errors = [];
 
         // Check required fields
-        if (! isset($raceData['race_name']) || trim((string) $raceData['race_name']) === '') {
+        if (! isset($raceData['race_name']) || ! is_scalar($raceData['race_name']) || trim((string) $raceData['race_name']) === '') {
             $errors['race_name'] = 'Race name is required';
         }
 
@@ -492,7 +518,8 @@ class RaceStrategyService
      * @param  int  $limit  Maximum number of messages to retrieve
      * @return array<int, array<string, mixed>> Array of past strategy messages
      */
-    public function getStrategyHistory(): array
+    public function getStrategyHistory(int $characterId, int $userId, ?int $raceId = null, int $limit = 10): array
+    {
         // Chat history is managed internally by Neuron AI agents
         // When Neuron AI provides a public API for chat history retrieval,
         // this method can be implemented to fetch past strategy conversations
@@ -509,8 +536,10 @@ class RaceStrategyService
      * @param  array<string, mixed>  $raceData  Race information
      * @return array<int, array<string, mixed>> Array of recommended skills
      */
-    public function getRecommendedSkills(): array
+    public function getRecommendedSkills(int $characterId, array $raceData = []): array
+    {
         // Load character with acquired skills
+        /** @var Character $character */
         $character = $this->characterModel
             ->with(['skillAcquisitions.skill'])
             ->findOrFail($characterId);

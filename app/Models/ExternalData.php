@@ -28,13 +28,9 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @use HasFactory<\Database\Factories\ExternalDataFactory>
  */
-/**
- * @property int $id
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- */
 class ExternalData extends Model
 {
+    /** @use HasFactory<\Database\Factories\ExternalDataFactory> */
     use HasFactory;
 
     protected $table = 'ucp_external_data';
@@ -67,9 +63,13 @@ class ExternalData extends Model
 
     public function isValid(): bool
     {
-        return $this->is_valid && ($this->expires_at === null || $this->expires_at->isFuture());
+        return $this->is_valid && ($this->expires_at === null || ($this->expires_at instanceof \Illuminate\Support\Carbon && $this->expires_at->isFuture()));
     }
 
+    /**
+     * @param  \Illuminate\Database\Eloquent\Builder<ExternalData>  $query
+     * @return \Illuminate\Database\Eloquent\Builder<ExternalData>
+     */
     public function scopeValid(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('is_valid', true)
@@ -79,12 +79,20 @@ class ExternalData extends Model
             });
     }
 
-    public function scopeSource($query, string $source)
+    /**
+     * @param  \Illuminate\Database\Eloquent\Builder<ExternalData>  $query
+     * @return \Illuminate\Database\Eloquent\Builder<ExternalData>
+     */
+    public function scopeSource(\Illuminate\Database\Eloquent\Builder $query, string $source): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('source', $source);
     }
 
-    public function scopeDataType($query, string $type)
+    /**
+     * @param  \Illuminate\Database\Eloquent\Builder<ExternalData>  $query
+     * @return \Illuminate\Database\Eloquent\Builder<ExternalData>
+     */
+    public function scopeDataType(\Illuminate\Database\Eloquent\Builder $query, string $type): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('data_type', $type);
     }

@@ -39,21 +39,22 @@ class SkillListParser extends AbstractScreenParser
         return 'skill_list';
     }
 
-    public function parse(): array
+    public function parse(string $text): array
+    {
         $data = [];
         $errors = [];
 
         // Extract total SP
         $totalSP = $this->extractNumeric($text, self::SKILL_PATTERNS['total_sp']);
         if ($totalSP !== null) {
-            (is_array($data) && isset($data['total_sp']) ? $data['total_sp'] : null) = $totalSP;
+            $data['total_sp'] = $totalSP;
         }
 
         // Extract skills
         $skills = $this->extractSkills($text);
         if (! empty($skills)) {
-            (is_array($data) && isset($data['skills']) ? $data['skills'] : null) = $skills;
-            (is_array($data) && isset($data['skill_count']) ? $data['skill_count'] : null) = count($skills);
+            $data['skills'] = $skills;
+            $data['skill_count'] = count($skills);
         }
 
         // Validate extracted data
@@ -78,27 +79,45 @@ class SkillListParser extends AbstractScreenParser
         return $result;
     }
 
-    public function validate(): array
+    public function validate(array $data): array
+    {
         $errors = [];
 
         // Validate total SP
-        if (isset((is_array($data) && isset($data['total_sp']) ? $data['total_sp'] : null)) && ((is_array($data) && isset($data['total_sp']) ? $data['total_sp'] : null) < 0 || (is_array($data) && isset($data['total_sp']) ? $data['total_sp'] : null) > 99999)) {
-            $errors[] = "Invalid total SP: {(is_array($data) && isset($data['total_sp']) ? $data['total_sp'] : null)} (must be 0-99999)";
+        if (isset($data['total_sp'])) {
+            $totalSp = is_int($data['total_sp']) ? $data['total_sp'] : 0;
+            if ($totalSp < 0 || $totalSp > 99999) {
+                $errors[] = "Invalid total SP: {$totalSp} (must be 0-99999)";
+            }
         }
 
         // Validate skills
-        if (isset((is_array($data) && isset($data['skills']) ? $data['skills'] : null))) {
-            foreach ((is_array($data) && isset($data['skills']) ? $data['skills'] : null) as $index => $skill) {
-                if (! isset($skill['name']) || empty($skill['name'])) {
+        if (isset($data['skills']) && is_array($data['skills'])) {
+            /** @var array<int, mixed> $skills */
+            $skills = $data['skills'];
+            foreach ($skills as $index => $skill) {
+                if (! is_array($skill)) {
+                    $errors[] = "Skill #{$index}: Invalid skill data";
+
+                    continue;
+                }
+                $skillName = $skill['name'] ?? null;
+                if (! isset($skillName) || empty($skillName)) {
                     $errors[] = "Skill #{$index}: Missing skill name";
                 }
 
-                if (isset($skill['sp_cost']) && ($skill['sp_cost'] < 0 || $skill['sp_cost'] > 500)) {
-                    $errors[] = "Skill #{$index}: Invalid SP cost {$skill['sp_cost']} (must be 0-500)";
+                if (isset($skill['sp_cost'])) {
+                    $spCost = is_int($skill['sp_cost']) ? $skill['sp_cost'] : 0;
+                    if ($spCost < 0 || $spCost > 500) {
+                        $errors[] = "Skill #{$index}: Invalid SP cost {$spCost} (must be 0-500)";
+                    }
                 }
 
-                if (isset($skill['hint_level']) && ($skill['hint_level'] < 0 || $skill['hint_level'] > 5)) {
-                    $errors[] = "Skill #{$index}: Invalid hint level {$skill['hint_level']} (must be 0-5)";
+                if (isset($skill['hint_level'])) {
+                    $hintLevel = is_int($skill['hint_level']) ? $skill['hint_level'] : 0;
+                    if ($hintLevel < 0 || $hintLevel > 5) {
+                        $errors[] = "Skill #{$index}: Invalid hint level {$hintLevel} (must be 0-5)";
+                    }
                 }
             }
         }
@@ -114,7 +133,8 @@ class SkillListParser extends AbstractScreenParser
      *
      * @return array<int, array<string, mixed>>
      */
-    protected function extractSkills(): array
+    protected function extractSkills(string $text): array
+    {
         $skills = [];
 
         // Find all skill patterns

@@ -26,8 +26,7 @@ use Illuminate\View\View;
 class MigrationController extends Controller
 {
     public function __construct(
-        private readonly DataMigrationService $migrationService,
-        private readonly DataImportService $importService
+        private readonly DataMigrationService $migrationService
     ) {}
 
     /**
@@ -134,7 +133,7 @@ class MigrationController extends Controller
             /** @var \App\Models\User $user */
             $data = $request->input('data');
             $importType = $request->input('import_type');
-            $userId = $user?->id ?? throw new \Exception('User required');
+            $userId = $user->id ?? throw new \Exception('User required');
 
             $conflictStrategyInput = $request->input('conflict_strategy', DataMigrationService::CONFLICT_STRATEGY_SKIP);
             $batchSizeInput = $request->input('batch_size', 50);
@@ -143,8 +142,10 @@ class MigrationController extends Controller
                 'batch_size' => is_numeric($batchSizeInput) ? (int) $batchSizeInput : 50,
             ];
 
+            /** @var array<int, array<string, mixed>> $importData */
+            $importData = is_array($data) ? array_values($data) : [];
             $result = $this->migrationService->startBatchImport(
-                is_array($data) ? $data : [],
+                $importData,
                 is_string($importType) ? $importType : 'character',
                 $userId,
                 $options
@@ -289,8 +290,10 @@ class MigrationController extends Controller
             $data = $request->input('data');
             $importType = $request->input('import_type');
 
+            /** @var array<int, array<string, mixed>> $validateData */
+            $validateData = is_array($data) ? array_values($data) : [];
             $result = $this->migrationService->validateData(
-                is_array($data) ? $data : [],
+                $validateData,
                 is_string($importType) ? $importType : 'character'
             );
 

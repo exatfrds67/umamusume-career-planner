@@ -30,7 +30,13 @@ abstract class BaseAgent extends Agent
      */
     protected function provider(): AIProviderInterface
     {
-        return AIProvider::driver(config('neuron.provider.default'));
+        /** @var string|null $driverName */
+        $driverName = config('neuron.provider.default');
+
+        /** @var AIProviderInterface $provider */
+        $provider = AIProvider::driver($driverName);
+
+        return $provider;
     }
 
     /**

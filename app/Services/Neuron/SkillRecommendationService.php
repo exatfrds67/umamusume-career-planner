@@ -68,6 +68,11 @@ class SkillRecommendationService
                 3
             );
 
+            // Ensure response is of correct type
+            if (! $response instanceof SkillRecommendationResponse) {
+                throw new \RuntimeException('Unexpected response type from agent');
+            }
+
             // Log successful recommendation generation
             Log::info('Skill recommendations generated', [
                 'character_id' => $characterId,
@@ -129,8 +134,9 @@ class SkillRecommendationService
 
         // Available SP
         if (isset($skillContext['available_sp'])) {
+            $availableSp = is_scalar($skillContext['available_sp']) ? (string) $skillContext['available_sp'] : '0';
             $context .= "## Available Skill Points\n";
-            $context .= "- Current SP: {$skillContext['available_sp']}\n\n";
+            $context .= "- Current SP: {$availableSp}\n\n";
         }
 
         // Aptitudes
@@ -153,17 +159,21 @@ class SkillRecommendationService
         }
 
         // Race preferences
-        if (! empty($skillContext['race_preferences'])) {
+        if (! empty($skillContext['race_preferences']) && is_array($skillContext['race_preferences'])) {
             $context .= "## Race Preferences\n";
+            /** @var array<string, mixed> $prefs */
             $prefs = $skillContext['race_preferences'];
-            if (isset($prefs['preferred_distance'])) {
-                $context .= "- Preferred Distance: {$prefs['preferred_distance']}\n";
+            if (isset($prefs['preferred_distance']) && is_string($prefs['preferred_distance'])) {
+                $preferredDistance = $prefs['preferred_distance'];
+                $context .= "- Preferred Distance: {$preferredDistance}\n";
             }
-            if (isset($prefs['preferred_surface'])) {
-                $context .= "- Preferred Surface: {$prefs['preferred_surface']}\n";
+            if (isset($prefs['preferred_surface']) && is_string($prefs['preferred_surface'])) {
+                $preferredSurface = $prefs['preferred_surface'];
+                $context .= "- Preferred Surface: {$preferredSurface}\n";
             }
-            if (isset($prefs['preferred_running_style'])) {
-                $context .= "- Preferred Running Style: {$prefs['preferred_running_style']}\n";
+            if (isset($prefs['preferred_running_style']) && is_string($prefs['preferred_running_style'])) {
+                $preferredStyle = $prefs['preferred_running_style'];
+                $context .= "- Preferred Running Style: {$preferredStyle}\n";
             }
             $context .= "\n";
         }
@@ -205,30 +215,40 @@ class SkillRecommendationService
         $availableSkills = $this->getAvailableSkillsWithHints($character->id);
         if (! empty($availableSkills)) {
             $context .= "## Available Skills to Acquire\n";
+            /** @var array<string, mixed> $skillData */
             foreach ($availableSkills as $skillData) {
-                $context .= "- {$skillData['name']}";
+                $skillName = isset($skillData['name']) && is_string($skillData['name']) ? $skillData['name'] : 'Unknown';
+                $context .= "- {$skillName}";
 
-                if (isset($skillData['skill_type'])) {
-                    $context .= " (Type: {$skillData['skill_type']})";
+                if (isset($skillData['skill_type']) && is_string($skillData['skill_type'])) {
+                    $skillType = $skillData['skill_type'];
+                    $context .= " (Type: {$skillType})";
                 }
 
-                if (isset($skillData['rarity'])) {
-                    $context .= " [Rarity: {$skillData['rarity']}]";
+                if (isset($skillData['rarity']) && is_string($skillData['rarity'])) {
+                    $rarity = $skillData['rarity'];
+                    $context .= " [Rarity: {$rarity}]";
                 }
 
                 $context .= "\n";
 
-                if (isset($skillData['description'])) {
-                    $context .= "  Description: {$skillData['description']}\n";
+                if (isset($skillData['description']) && is_string($skillData['description'])) {
+                    $description = $skillData['description'];
+                    $context .= "  Description: {$description}\n";
                 }
 
-                if (isset($skillData['base_sp_cost'])) {
-                    $context .= "  Base Cost: {$skillData['base_sp_cost']} SP";
+                if (isset($skillData['base_sp_cost']) && is_numeric($skillData['base_sp_cost'])) {
+                    $baseCost = (string) $skillData['base_sp_cost'];
+                    $context .= "  Base Cost: {$baseCost} SP";
 
-                    if (isset($skillData['hint_count']) && $skillData['hint_count'] > 0) {
+                    if (isset($skillData['hint_count']) && is_int($skillData['hint_count']) && $skillData['hint_count'] > 0) {
                         $hintCount = $skillData['hint_count'];
-                        $finalCost = $skillData['final_sp_cost'] ?? $skillData['base_sp_cost'];
-                        $discount = $skillData['discount_percentage'] ?? 0;
+                        $finalCost = isset($skillData['final_sp_cost']) && is_numeric($skillData['final_sp_cost'])
+                            ? (string) $skillData['final_sp_cost']
+                            : $baseCost;
+                        $discount = isset($skillData['discount_percentage']) && is_numeric($skillData['discount_percentage'])
+                            ? (string) $skillData['discount_percentage']
+                            : '0';
                         $context .= " (With {$hintCount} hint(s): {$finalCost} SP, {$discount}% discount)";
                     }
 
@@ -236,14 +256,18 @@ class SkillRecommendationService
                 }
 
                 if (isset($skillData['can_evolve']) && $skillData['can_evolve']) {
-                    $context .= '  Can evolve to: '.$skillData['evolution_target_name']."\n";
+                    $evolutionName = isset($skillData['evolution_target_name']) && is_string($skillData['evolution_target_name'])
+                        ? $skillData['evolution_target_name']
+                        : 'Unknown';
+                    $context .= '  Can evolve to: '.$evolutionName."\n";
                 }
 
-                if (isset($skillData['meta_tier'])) {
-                    $context .= "  Meta Tier: {$skillData['meta_tier']}\n";
+                if (isset($skillData['meta_tier']) && is_string($skillData['meta_tier'])) {
+                    $metaTier = $skillData['meta_tier'];
+                    $context .= "  Meta Tier: {$metaTier}\n";
                 }
 
-                if (! empty($skillData['synergy_skills'])) {
+                if (! empty($skillData['synergy_skills']) && is_array($skillData['synergy_skills'])) {
                     $context .= '  Synergizes with: '.\implode(', ', $skillData['synergy_skills'])."\n";
                 }
             }
@@ -267,28 +291,35 @@ class SkillRecommendationService
         }
 
         // Build strategy
-        if (! empty($skillContext['build_strategy'])) {
+        if (! empty($skillContext['build_strategy']) && is_scalar($skillContext['build_strategy'])) {
             $context .= "## Build Strategy\n";
-            $context .= $skillContext['build_strategy']."\n\n";
+            $buildStrategy = (string) $skillContext['build_strategy'];
+            $context .= $buildStrategy."\n\n";
         }
 
         // Upcoming races
-        if (! empty($skillContext['upcoming_races'])) {
+        if (! empty($skillContext['upcoming_races']) && is_array($skillContext['upcoming_races'])) {
             $context .= "## Upcoming Races\n";
             foreach ($skillContext['upcoming_races'] as $race) {
-                $raceName = $race['name'] ?? 'Unknown Race';
+                if (! is_array($race)) {
+                    continue;
+                }
+                $raceName = isset($race['name']) && is_string($race['name']) ? $race['name'] : 'Unknown Race';
                 $context .= "- {$raceName}";
 
-                if (isset($race['distance_category'])) {
-                    $context .= " ({$race['distance_category']})";
+                if (isset($race['distance_category']) && is_string($race['distance_category'])) {
+                    $distanceCat = $race['distance_category'];
+                    $context .= " ({$distanceCat})";
                 }
 
-                if (isset($race['surface'])) {
-                    $context .= " [{$race['surface']}]";
+                if (isset($race['surface']) && is_string($race['surface'])) {
+                    $surface = $race['surface'];
+                    $context .= " [{$surface}]";
                 }
 
-                if (isset($race['turns_until'])) {
-                    $context .= " - in {$race['turns_until']} turn(s)";
+                if (isset($race['turns_until']) && is_numeric($race['turns_until'])) {
+                    $turnsUntil = (string) $race['turns_until'];
+                    $context .= " - in {$turnsUntil} turn(s)";
                 }
 
                 $context .= "\n";
@@ -299,36 +330,48 @@ class SkillRecommendationService
         // Scenario-specific context
         if ($character->scenario_type === 'unity_cup') {
             $context .= "## Unity Cup Specific\n";
-            if (! empty($character->facility_levels)) {
+            if (! empty($character->facility_levels) && is_array($character->facility_levels)) {
                 $context .= "Facility Levels:\n";
-                foreach ($character->facility_levels as $type => $level) {
-                    $context .= '- '.ucfirst($type).": Level {$level}\n";
+                /** @var array<string, int|string> $facilityLevels */
+                $facilityLevels = $character->facility_levels;
+                foreach ($facilityLevels as $type => $level) {
+                    $typeStr = is_string($type) ? $type : (string) $type;
+                    $levelStr = is_scalar($level) ? (string) $level : '0';
+                    $context .= '- '.ucfirst($typeStr).": Level {$levelStr}\n";
                 }
             }
             $context .= "\n";
         }
 
         // Goals and priorities
-        if (! empty($character->goals)) {
+        if (! empty($character->goals) && is_array($character->goals)) {
             $context .= "## Character Goals\n";
-            if (! empty($character->goals['target_stats'])) {
+            if (! empty($character->goals['target_stats']) && is_array($character->goals['target_stats'])) {
                 $context .= "Target Stats:\n";
-                foreach ($character->goals['target_stats'] as $stat => $target) {
+                /** @var array<string, int|float> $targetStats */
+                $targetStats = $character->goals['target_stats'];
+                foreach ($targetStats as $stat => $target) {
+                    if (! is_string($stat)) {
+                        continue;
+                    }
+                    $targetInt = is_numeric($target) ? (int) $target : 0;
                     $current = $currentStats[$stat] ?? 0;
-                    $gap = \max(0, $target - $current);
-                    $context .= '- '.ucfirst($stat).": {$current}/{$target} (Gap: {$gap})\n";
+                    $gap = \max(0, $targetInt - $current);
+                    $context .= '- '.ucfirst($stat).": {$current}/{$targetInt} (Gap: {$gap})\n";
                 }
             }
             if (! empty($character->goals['target_grade'])) {
-                $context .= "Target Grade: {$character->goals['target_grade']}\n";
+                $targetGrade = is_scalar($character->goals['target_grade']) ? (string) $character->goals['target_grade'] : 'Unknown';
+                $context .= "Target Grade: {$targetGrade}\n";
             }
             $context .= "\n";
         }
 
         // Additional context
-        if (! empty($skillContext['additional_context'])) {
+        if (! empty($skillContext['additional_context']) && is_scalar($skillContext['additional_context'])) {
             $context .= "## Additional Context\n";
-            $context .= $skillContext['additional_context']."\n\n";
+            $additionalCtx = (string) $skillContext['additional_context'];
+            $context .= $additionalCtx."\n\n";
         }
 
         $context .= 'Please analyze this information and provide your skill acquisition recommendations.';
@@ -345,7 +388,8 @@ class SkillRecommendationService
      * @param  int  $characterId  The character ID
      * @return array<int, array<string, mixed>> Array of available skills with hint data
      */
-    protected function getAvailableSkillsWithHints(): array
+    protected function getAvailableSkillsWithHints(int $characterId): array
+    {
         // Get IDs of already acquired skills
         /** @var array<int> $acquiredSkillIds */
         $acquiredSkillIds = $this->skillAcquisitionModel->query()
@@ -434,7 +478,8 @@ class SkillRecommendationService
      * @param  SkillRecommendationResponse  $response  The agent response
      * @return array<string, mixed> Parsed response data
      */
-    public function parseResponse(): array
+    public function parseResponse(SkillRecommendationResponse $response): array
+    {
         return [
             'recommended_skills' => $response->recommendedSkills,
             'acquisition_strategy' => $response->acquisitionStrategy,
@@ -473,7 +518,7 @@ class SkillRecommendationService
         try {
             // Stream response from agent
             foreach ($agent->stream(new UserMessage($context)) as $chunk) {
-                yield $chunk;
+                yield is_scalar($chunk) ? (string) $chunk : '';
             }
 
             // Log successful streaming
@@ -502,7 +547,8 @@ class SkillRecommendationService
      * @param  array<string, mixed>  $skillContext  Skill context to validate
      * @return array<string, string> Validation errors (empty if valid)
      */
-    public function validateSkillContext(): array
+    public function validateSkillContext(array $skillContext): array
+    {
         $errors = [];
 
         // Validate available SP if present
@@ -518,6 +564,7 @@ class SkillRecommendationService
             if (! \is_array($skillContext['race_preferences'])) {
                 $errors['race_preferences'] = 'Race preferences must be an array';
             } else {
+                /** @var array<string, mixed> $prefs */
                 $prefs = $skillContext['race_preferences'];
 
                 if (isset($prefs['preferred_distance'])) {
@@ -574,7 +621,8 @@ class SkillRecommendationService
      * @param  int  $limit  Maximum number of acquisitions to retrieve
      * @return array<int, array<string, mixed>> Array of past skill acquisitions
      */
-    public function getAcquisitionHistory(): array
+    public function getAcquisitionHistory(int $characterId, int $limit = 10): array
+    {
         $acquisitions = $this->skillAcquisitionModel->query()
             ->where('character_id', $characterId)
             ->with(['skill', 'career'])
@@ -613,7 +661,8 @@ class SkillRecommendationService
      * @param  int  $characterId  The character ID
      * @return array<int, array<string, mixed>> Array of skill synergies
      */
-    public function calculateSkillSynergies(): array
+    public function calculateSkillSynergies(int $characterId): array
+    {
         // Get acquired skills
         $acquisitions = $this->skillAcquisitionModel->query()
             ->where('character_id', $characterId)

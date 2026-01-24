@@ -62,9 +62,10 @@ class MCPMonitoringController extends Controller
     public function costAnalytics(Request $request): JsonResponse
     {
         $userId = (int) Auth::id();
-        $period = $request->input('period', 'month');
+        $periodInput = $request->input('period', 'month');
+        $period = is_string($periodInput) ? $periodInput : 'month';
 
-        $data = $this->monitoringService->getCostAnalytics($userId, is_string($period) ? $period : null);
+        $data = $this->monitoringService->getCostAnalytics($userId, $period);
 
         return response()->json([
             'success' => true,
@@ -78,9 +79,10 @@ class MCPMonitoringController extends Controller
     public function performanceMetrics(Request $request): JsonResponse
     {
         $userId = (int) Auth::id();
-        $period = $request->input('period', 'day');
+        $periodInput = $request->input('period', 'day');
+        $period = is_string($periodInput) ? $periodInput : 'day';
 
-        $data = $this->monitoringService->getPerformanceMetrics($userId, is_string($period) ? $period : null);
+        $data = $this->monitoringService->getPerformanceMetrics($userId, $period);
 
         return response()->json([
             'success' => true,
@@ -224,7 +226,7 @@ class MCPMonitoringController extends Controller
     {
         $userId = Auth::id();
         $limitInput = $request->input('limit', 100);
-        $limit = is_numeric($limitInput) ? (is_numeric($limit) ? (int) $limit : 0)Input : 100;
+        $limit = is_numeric($limitInput) ? (int) $limitInput : 100;
 
         $history = $this->monitoringService->getToolUsageHistory(
             $userId !== null ? (int) $userId : 0,

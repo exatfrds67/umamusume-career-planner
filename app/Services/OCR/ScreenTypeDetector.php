@@ -56,7 +56,8 @@ class ScreenTypeDetector
      *     scores: array<string, float>
      * }
      */
-    public function detectScreenType(): array
+    public function detectScreenType(string $text): array
+    {
         $scores = [];
 
         foreach (self::DETECTION_PATTERNS as $type => $config) {
@@ -64,7 +65,7 @@ class ScreenTypeDetector
 
             foreach ($config['keywords'] as $keyword) {
                 if (mb_stripos($text, $keyword) !== false) {
-                    $matchCount = ($matchCount ?? 0) + 1;
+                    $matchCount++;
                 }
             }
 
@@ -76,7 +77,7 @@ class ScreenTypeDetector
         // Find the highest scoring type
         arsort($scores);
         $topType = array_key_first($scores);
-        $topScore = $scores[$topType] ?? 0.0;
+        $topScore = $scores[$topType];
 
         // Require minimum confidence threshold
         $detectedType = $topScore >= 0.3 ? $topType : null;
@@ -110,6 +111,7 @@ class ScreenTypeDetector
      * @return array<string>
      */
     public function getSupportedTypes(): array
+    {
         return array_keys(self::DETECTION_PATTERNS);
     }
 }

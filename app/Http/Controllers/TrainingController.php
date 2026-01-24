@@ -69,8 +69,12 @@ class TrainingController extends Controller
         // Build message
         if ($result['success']) {
             $msg = 'Training Successful! ';
-            foreach ($result['gains'] as $stat => $gain) {
-                $msg .= ucfirst($stat)."+{$gain} ";
+            /** @var array<string, int|float> $gains */
+            $gains = is_array($result['gains']) ? $result['gains'] : [];
+            foreach ($gains as $stat => $gain) {
+                if (is_string($stat) && (is_int($gain) || is_float($gain))) {
+                    $msg .= ucfirst($stat)."+{$gain} ";
+                }
             }
         } else {
             $msg = 'Training Failed... Mood worsened and energy dropped.';

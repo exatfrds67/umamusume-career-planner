@@ -73,21 +73,30 @@ class TrainingCalculationService
      *     scenario_specific: array<string, mixed>
      * }
      */
-    public function calculateTrainingPrediction(): array
+    public function calculateTrainingPrediction(Character $character, string $trainingType, array $trainingData = []): array
     {
         // Get base stat gains
         $baseGains = $this->baseStatGains[$trainingType] ?? [];
+
+        // Extract and validate support cards
+        $supportCardsRaw = $trainingData['support_cards'] ?? [];
+        /** @var array<int, mixed> $supportCards */
+        $supportCards = is_array($supportCardsRaw) ? $supportCardsRaw : [];
 
         // Calculate support card bonuses
         $supportCardBonus = $this->calculateSupportCardBonus(
             $character,
             $trainingType,
-            $trainingData['support_cards'] ?? []
+            $supportCards
         );
+
+        // Extract and validate participants
+        $participantsRaw = $trainingData['participants'] ?? 0;
+        $participants = is_int($participantsRaw) ? $participantsRaw : (is_numeric($participantsRaw) ? (int) $participantsRaw : 0);
 
         // Calculate friendship training multiplier
         $friendshipMultiplier = $this->calculateFriendshipMultiplier(
-            $trainingData['participants'] ?? 0
+            $participants
         );
 
         // Calculate facility level bonus (Unity Cup)
@@ -182,13 +191,19 @@ class TrainingCalculationService
 
             if ($cardType && strtolower($cardType) === strtolower($trainingType)) {
                 // Base bonus: 10% per matching card
-                $bonus = ($bonus ?? 0) + 0.10;
+                $bonus += 0.10;
 
                 // Additional bonus based on limit break level (if available)
                 if (is_object($characterCard) && isset($characterCard->limit_break_level)) {
-                    $bonus = ($bonus ?? 0) + $characterCard->limit_break_level * 0.02;
+                    $limitBreakLevel = $characterCard->limit_break_level;
+                    if (is_numeric($limitBreakLevel)) {
+                        $bonus += (float) $limitBreakLevel * 0.02;
+                    }
                 } elseif (is_array($characterCard) && isset($characterCard['limit_break_level'])) {
-                    $bonus = ($bonus ?? 0) + $characterCard['limit_break_level'] * 0.02;
+                    $limitBreakLevel = $characterCard['limit_break_level'];
+                    if (is_numeric($limitBreakLevel)) {
+                        $bonus += (float) $limitBreakLevel * 0.02;
+                    }
                 }
             }
         }
@@ -222,8 +237,11 @@ class TrainingCalculationService
             return 0.0;
         }
 
-        $facilityLevels = $character->facility_levels ?? [];
-        $level = $facilityLevels[$trainingType] ?? 1;
+        $facilityLevelsRaw = $character->facility_levels ?? [];
+        /** @var array<string, mixed> $facilityLevels */
+        $facilityLevels = is_array($facilityLevelsRaw) ? $facilityLevelsRaw : [];
+        $levelRaw = $facilityLevels[$trainingType] ?? 1;
+        $level = is_numeric($levelRaw) ? (int) $levelRaw : 1;
 
         // Facility level bonus: Level 1 = 0%, Level 5 = 100%
         return ($level - 1) * 0.25; // 0%, 25%, 50%, 75%, 100%
@@ -236,8 +254,11 @@ class TrainingCalculationService
         Character $character,
         string $trainingType
     ): float {
-        $growthRates = $character->growth_rates ?? [];
-        $rate = $growthRates[$trainingType] ?? 0;
+        $growthRatesRaw = $character->growth_rates ?? [];
+        /** @var array<string, mixed> $growthRates */
+        $growthRates = is_array($growthRatesRaw) ? $growthRatesRaw : [];
+        $rateRaw = $growthRates[$trainingType] ?? 0;
+        $rate = is_numeric($rateRaw) ? (float) $rateRaw : 0.0;
 
         // Growth rates are stored as percentages (10, 20, 30)
         return $rate / 100.0;
@@ -301,7 +322,8 @@ class TrainingCalculationService
      *     breakdown: array<string, mixed>
      * }>
      */
-    public function calculateBatchPredictions(): array
+    public function calculateBatchPredictions(Character $character, array $trainingTypes, array $trainingData = []): array
+    {
         $predictions = [];
 
         foreach ($trainingTypes as $trainingType) {
@@ -342,7 +364,7 @@ class TrainingCalculationService
         $cacheKey = "mcp_training_optimization_{$character->id}_".md5(json_encode($context) ?: '');
 
         // Try to get from cache first (5 minutes TTL)
-        return Cache::remember($cacheKey, 300, function () use ($character, $context) {
+        $result = Cache::remember($cacheKey, 300, function () use ($character, $context): ?array {
             try {
                 // Use the TrainingOptimizationAgent for multi-agent workflow
                 $optimization = $this->trainingAgent->getOptimization($character, $context);
@@ -375,6 +397,9 @@ class TrainingCalculationService
                 return null;
             }
         });
+
+        /** @var array<string, mixed>|null $result */
+        return is_array($result) ? $result : null;
     }
 
     /**
@@ -388,7 +413,8 @@ class TrainingCalculationService
      *     alternatives: array<string, array<string, mixed>>
      * }
      */
-    public function getRecommendedTraining(): array
+    public function getRecommendedTraining(Character $character, array $trainingData = []): array
+    {
         // Get all available training types
         $trainingTypes = ['speed', 'stamina', 'power', 'guts', 'wit'];
 
@@ -418,6 +444,9 @@ class TrainingCalculationService
 
         // Get recommended training (highest score)
         $recommendedTraining = array_key_first($scores);
+        if ($recommendedTraining === null) {
+            $recommendedTraining = 'speed'; // Default fallback
+        }
         $recommendedPrediction = $predictions[$recommendedTraining];
 
         // Get alternatives (next 2 best options)
@@ -448,15 +477,27 @@ class TrainingCalculationService
      *
      * @return array<string, int>
      */
-    protected function getPriorityStats(): array
+    protected function getPriorityStats(Character $character): array
+    {
+        /** @var array<string, int> $priorities */
         $priorities = [];
-        $goals = $character->goals ?? [];
-        $targetStats = $goals['target_stats'] ?? [];
-        $currentStats = $character->current_stats ?? [];
+        $goalsRaw = $character->goals ?? [];
+        /** @var array<string, mixed> $goals */
+        $goals = is_array($goalsRaw) ? $goalsRaw : [];
+        $targetStatsRaw = $goals['target_stats'] ?? [];
+        /** @var array<string, mixed> $targetStats */
+        $targetStats = is_array($targetStatsRaw) ? $targetStatsRaw : [];
+        $currentStatsRaw = $character->current_stats ?? [];
+        /** @var array<string, mixed> $currentStats */
+        $currentStats = is_array($currentStatsRaw) ? $currentStatsRaw : [];
 
         foreach ($targetStats as $stat => $target) {
-            $current = $currentStats[$stat] ?? 0;
-            $gap = max(0, $target - $current);
+            if (! is_string($stat)) {
+                continue;
+            }
+            $targetVal = is_numeric($target) ? (int) $target : 0;
+            $currentVal = isset($currentStats[$stat]) && is_numeric($currentStats[$stat]) ? (int) $currentStats[$stat] : 0;
+            $gap = max(0, $targetVal - $currentVal);
             $priorities[$stat] = $gap;
         }
 
@@ -480,26 +521,43 @@ class TrainingCalculationService
         $score = 0.0;
 
         // Score based on stat gains for priority stats
-        foreach ($prediction['stat_gains'] as $stat => $gain) {
+        $statGainsRaw = $prediction['stat_gains'] ?? [];
+        /** @var array<string, int> $statGains */
+        $statGains = is_array($statGainsRaw) ? $statGainsRaw : [];
+        foreach ($statGains as $stat => $gain) {
+            if (! is_string($stat)) {
+                continue;
+            }
+            $gainVal = is_numeric($gain) ? (float) $gain : 0.0;
             $priority = $priorityStats[$stat] ?? 0;
             if ($priority > 0) {
                 // Higher priority stats get more weight
                 $weight = $priority / max(1, array_sum($priorityStats));
-                $score = ($score ?? 0) + $gain * $weight * 10;
+                $score += $gainVal * $weight * 10;
             }
         }
 
         // Penalize high failure risk
-        $score -= $prediction['failure_risk'] * 50;
+        $failureRisk = isset($prediction['failure_risk']) && is_numeric($prediction['failure_risk'])
+            ? (float) $prediction['failure_risk']
+            : 0.0;
+        $score -= $failureRisk * 50;
 
         // Penalize if energy would drop too low
-        $energyAfter = ($character->energy_level ?? 100) - $prediction['energy_cost'];
+        $energyLevel = $character->energy_level ?? 100;
+        $energyCost = isset($prediction['energy_cost']) && is_numeric($prediction['energy_cost'])
+            ? (int) $prediction['energy_cost']
+            : 0;
+        $energyAfter = (is_numeric($energyLevel) ? (int) $energyLevel : 100) - $energyCost;
         if ($energyAfter < 30) {
             $score -= 20;
         }
 
         // Bonus for high total bonus multiplier
-        $score = ($score ?? 0) + $prediction['total_bonus'] * 20;
+        $totalBonus = isset($prediction['total_bonus']) && is_numeric($prediction['total_bonus'])
+            ? (float) $prediction['total_bonus']
+            : 0.0;
+        $score += $totalBonus * 20;
 
         return $score;
     }
@@ -520,7 +578,13 @@ class TrainingCalculationService
 
         // Check which priority stats this training improves
         $improvedPriorityStats = [];
-        foreach ($prediction['stat_gains'] as $stat => $gain) {
+        $statGainsRaw = $prediction['stat_gains'] ?? [];
+        /** @var array<string, mixed> $statGains */
+        $statGains = is_array($statGainsRaw) ? $statGainsRaw : [];
+        foreach ($statGains as $stat => $gain) {
+            if (! is_string($stat)) {
+                continue;
+            }
             if (isset($priorityStats[$stat]) && $priorityStats[$stat] > 0) {
                 $improvedPriorityStats[] = ucfirst($stat);
             }
@@ -531,22 +595,31 @@ class TrainingCalculationService
         }
 
         // Mention bonus multiplier if significant
-        if ($prediction['total_bonus'] > 0.3) {
-            $bonusPercent = round($prediction['total_bonus'] * 100);
+        $totalBonus = isset($prediction['total_bonus']) && is_numeric($prediction['total_bonus'])
+            ? (float) $prediction['total_bonus']
+            : 0.0;
+        if ($totalBonus > 0.3) {
+            $bonusPercent = round($totalBonus * 100);
             $reasons[] = "High bonus multiplier (+{$bonusPercent}%)";
         }
 
         // Mention friendship training if applicable
-        if (
-            isset($prediction['breakdown']['friendship_multiplier']) &&
-            $prediction['breakdown']['friendship_multiplier'] > 0
-        ) {
+        $breakdownRaw = $prediction['breakdown'] ?? [];
+        /** @var array<string, mixed> $breakdown */
+        $breakdown = is_array($breakdownRaw) ? $breakdownRaw : [];
+        $friendshipMultiplier = isset($breakdown['friendship_multiplier']) && is_numeric($breakdown['friendship_multiplier'])
+            ? (float) $breakdown['friendship_multiplier']
+            : 0.0;
+        if ($friendshipMultiplier > 0) {
             $reasons[] = 'Friendship training available';
         }
 
         // Warn about failure risk if high
-        if ($prediction['failure_risk'] > 0.15) {
-            $riskPercent = round($prediction['failure_risk'] * 100);
+        $failureRisk = isset($prediction['failure_risk']) && is_numeric($prediction['failure_risk'])
+            ? (float) $prediction['failure_risk']
+            : 0.0;
+        if ($failureRisk > 0.15) {
+            $riskPercent = round($failureRisk * 100);
             $reasons[] = "Warning: {$riskPercent}% failure risk";
         }
 
@@ -561,7 +634,8 @@ class TrainingCalculationService
      * @param  array<string, mixed>  $trainingData
      * @return array<string, mixed>
      */
-    protected function calculateScenarioSpecificMechanics(): array
+    protected function calculateScenarioSpecificMechanics(Character $character, string $trainingType, array $trainingData = []): array
+    {
         return match ($character->scenario_type) {
             'unity_cup' => $this->calculateUnityCupMechanics(
                 $character,
@@ -587,7 +661,8 @@ class TrainingCalculationService
      * @param  array<string, mixed>  $trainingData
      * @return array<string, mixed>
      */
-    protected function calculateUraFinaleMechanics(): array
+    protected function calculateUraFinaleMechanics(Character $character, string $trainingType, array $trainingData = []): array
+    {
         return [
             'scenario' => 'ura_finale',
             'optimization_focus' => 'individual',
@@ -611,7 +686,8 @@ class TrainingCalculationService
      * @param  array<string, mixed>  $trainingData
      * @return array<string, mixed>
      */
-    protected function calculateUnityCupMechanics(): array
+    protected function calculateUnityCupMechanics(Character $character, string $trainingType, array $trainingData = []): array
+    {
         // Calculate Spirit Burst mechanics
         $spiritBurst = $this->calculateSpiritBurstMechanics(
             $character,
@@ -655,10 +731,14 @@ class TrainingCalculationService
      * @param  array<string, mixed>  $trainingData
      * @return array<string, mixed>
      */
-    protected function calculateSpiritBurstMechanics(): array
+    protected function calculateSpiritBurstMechanics(Character $character, string $trainingType, array $trainingData = []): array
+    {
         // Get current Spirit Burst gauge (0-4 sessions)
-        $currentGauge = $trainingData['spirit_burst_gauge'] ?? 0;
-        $teammatesPresent = $trainingData['teammates_present'] ?? [];
+        $currentGaugeRaw = $trainingData['spirit_burst_gauge'] ?? 0;
+        $currentGauge = is_numeric($currentGaugeRaw) ? (int) $currentGaugeRaw : 0;
+        $teammatesPresentRaw = $trainingData['teammates_present'] ?? [];
+        /** @var array<string, mixed> $teammatesPresent */
+        $teammatesPresent = is_array($teammatesPresentRaw) ? $teammatesPresentRaw : [];
 
         // Check if this training will contribute to Spirit Burst gauge
         $willContribute = count($teammatesPresent) > 0;
@@ -703,8 +783,11 @@ class TrainingCalculationService
      * @param  array<string, mixed>  $trainingData
      * @return array<string, mixed>
      */
-    protected function calculateTeamMemberInteractions(): array
-        $teammatesPresent = $trainingData['teammates_present'] ?? [];
+    protected function calculateTeamMemberInteractions(Character $character, string $trainingType, array $trainingData = []): array
+    {
+        $teammatesPresentRaw = $trainingData['teammates_present'] ?? [];
+        /** @var array<string, mixed> $teammatesPresent */
+        $teammatesPresent = is_array($teammatesPresentRaw) ? $teammatesPresentRaw : [];
         $teammateCount = count($teammatesPresent);
 
         // Calculate Unity training bonus
@@ -737,7 +820,9 @@ class TrainingCalculationService
      * @param  array<string, mixed>  $trainingData
      * @return array<string, mixed>
      */
-    protected function calculateDistanceTeamPerformance(): array
+    protected function calculateDistanceTeamPerformance(Character $character, array $trainingData = []): array
+    {
+        /** @var array<string, array{distance_range: string, members: array<mixed>}> $distanceTeams */
         $distanceTeams = [
             'sprint' => ['distance_range' => '1000-1400m', 'members' => []],
             'mile' => ['distance_range' => '1401-1800m', 'members' => []],
@@ -750,12 +835,15 @@ class TrainingCalculationService
         $characterDistance = $this->getCharacterDistanceSpecialization($character);
 
         // Calculate team stat ranks (D-S determining facility levels 1-5)
-        $teamStatRanks = $trainingData['team_stat_ranks'] ?? [];
+        $teamStatRanksRaw = $trainingData['team_stat_ranks'] ?? [];
+        /** @var array<string, string> $teamStatRanks */
+        $teamStatRanks = is_array($teamStatRanksRaw) ? $teamStatRanksRaw : [];
 
         // Calculate facility level impacts
         $facilityImpacts = [];
         foreach ($distanceTeams as $teamName => $teamData) {
-            $statRank = $teamStatRanks[$teamName] ?? 'D';
+            $statRankRaw = $teamStatRanks[$teamName] ?? 'D';
+            $statRank = is_string($statRankRaw) ? $statRankRaw : 'D';
             $facilityLevel = $this->convertStatRankToFacilityLevel($statRank);
 
             $facilityImpacts[$teamName] = [
@@ -779,18 +867,20 @@ class TrainingCalculationService
      *
      * @return array<string, mixed>
      */
-    protected function getUraFinaleRaceFocus(): array
+    protected function getUraFinaleRaceFocus(Character $character): array
+    {
         // Load aptitudes relationship
         $aptitudesCollection = $character->aptitudes;
 
         // Convert to associative array for easier access
         $aptitudes = [];
         foreach ($aptitudesCollection as $aptitude) {
+            $grade = $aptitude->grade ?? 'C';
             if ($aptitude->distance_type) {
-                $aptitudes[$aptitude->distance_type] = (is_string($aptitude) ? (string) $aptitude : '')->grade;
+                $aptitudes[$aptitude->distance_type] = $grade;
             }
             if ($aptitude->surface_type) {
-                $aptitudes[$aptitude->surface_type] = (is_string($aptitude) ? (string) $aptitude : '')->grade;
+                $aptitudes[$aptitude->surface_type] = $grade;
             }
         }
 
@@ -831,15 +921,27 @@ class TrainingCalculationService
      *
      * @return array<string, int>
      */
-    protected function getUraFinaleStatPriority(): array
-        $goals = $character->goals ?? [];
-        $targetStats = $goals['target_stats'] ?? [];
-        $currentStats = $character->current_stats ?? [];
-
+    protected function getUraFinaleStatPriority(Character $character): array
+    {
+        /** @var array<string, int> $priorities */
         $priorities = [];
+        $goalsRaw = $character->goals ?? [];
+        /** @var array<string, mixed> $goals */
+        $goals = is_array($goalsRaw) ? $goalsRaw : [];
+        $targetStatsRaw = $goals['target_stats'] ?? [];
+        /** @var array<string, mixed> $targetStats */
+        $targetStats = is_array($targetStatsRaw) ? $targetStatsRaw : [];
+        $currentStatsRaw = $character->current_stats ?? [];
+        /** @var array<string, mixed> $currentStats */
+        $currentStats = is_array($currentStatsRaw) ? $currentStatsRaw : [];
+
         foreach ($targetStats as $stat => $target) {
-            $current = $currentStats[$stat] ?? 0;
-            $gap = max(0, $target - $current);
+            if (! is_string($stat)) {
+                continue;
+            }
+            $targetVal = is_numeric($target) ? (int) $target : 0;
+            $currentVal = isset($currentStats[$stat]) && is_numeric($currentStats[$stat]) ? (int) $currentStats[$stat] : 0;
+            $gap = max(0, $targetVal - $currentVal);
             $priorities[$stat] = $gap;
         }
 
@@ -855,7 +957,8 @@ class TrainingCalculationService
      * @param  array<string, mixed>  $teammatesPresent
      * @return array<string, mixed>
      */
-    protected function calculateTeamSynergy(): array
+    protected function calculateTeamSynergy(Character $character, array $teammatesPresent, string $trainingType): array
+    {
         if (empty($teammatesPresent)) {
             return [
                 'level' => 'none',
@@ -898,8 +1001,9 @@ class TrainingCalculationService
         // Convert to associative array for easier access
         $aptitudes = [];
         foreach ($aptitudesCollection as $aptitude) {
+            $grade = $aptitude->grade ?? 'C';
             if ($aptitude->distance_type) {
-                $aptitudes[$aptitude->distance_type] = (is_string($aptitude) ? (string) $aptitude : '')->grade;
+                $aptitudes[$aptitude->distance_type] = $grade;
             }
         }
 

@@ -91,7 +91,8 @@ class OptimizedImage extends Component
     {
         $attrString = '';
         foreach ($attributes as $key => $value) {
-            $attrString .= sprintf(' %s="%s"', $key, htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8'));
+            $stringValue = is_scalar($value) ? (string) $value : '';
+            $attrString .= sprintf(' %s="%s"', $key, htmlspecialchars($stringValue, ENT_QUOTES, 'UTF-8'));
         }
 
         $loadingAttr = $this->lazy ? ' loading="lazy" decoding="async"' : '';

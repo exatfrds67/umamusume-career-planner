@@ -317,9 +317,10 @@ class SkillHintController extends Controller
             ->get();
 
         // Transform to support card instances with friendship/limit break data
-        $supportCards = $characterSupportCards->map(function ($csc) {
+        /** @var \Illuminate\Support\Collection<int, \App\Models\SupportCard> $supportCards */
+        $supportCards = $characterSupportCards->map(function ($csc): ?\App\Models\SupportCard {
             $card = $csc->supportCard;
-            if ($card === null) {
+            if (! $card instanceof \App\Models\SupportCard) {
                 return null;
             }
 
@@ -328,7 +329,7 @@ class SkillHintController extends Controller
             $card->limit_break_level = $csc->limit_break_level;
 
             return $card;
-        })->filter();
+        })->filter()->values();
 
         $analysis = $this->hintAgent->analyzeHintOpportunities(
             character: $character,

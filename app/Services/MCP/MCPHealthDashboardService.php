@@ -56,19 +56,22 @@ class MCPHealthDashboardService
      *     agents: array<string, mixed>,
      *     performance: array<string, mixed>,
      *     costs: array<string, mixed>,
-     *     recommendations: array<string>,
+     *     recommendations: array<array{type: string, severity: string, title: string, description: string, action: string, metadata: array<string, mixed>}>,
      *     last_updated: string
      * }
      */
-    public function getDashboardData(): array
+    public function getDashboardData(int $userId, bool $forceRefresh = false): array
+    {
         $cacheKey = self::DASHBOARD_CACHE_KEY.":{$userId}";
 
-        if (! $forceRefresh && Cache::has($cacheKey)) {
+        $cachedResult = $forceRefresh ? null : Cache::get($cacheKey);
+        if (is_array($cachedResult)) {
             Log::debug('[MCPHealthDashboard] Returning cached dashboard data', [
                 'user_id' => $userId,
             ]);
 
-            return Cache::get($cacheKey);
+            /** @var array{overview: array<string, mixed>, mcp_servers: array<string, mixed>, external_apis: array<string, mixed>, agents: array<string, mixed>, performance: array<string, mixed>, costs: array<string, mixed>, recommendations: array<array{type: string, severity: string, title: string, description: string, action: string, metadata: array<string, mixed>}>, last_updated: string} $cachedResult */
+            return $cachedResult;
         }
 
         Log::info('[MCPHealthDashboard] Generating fresh dashboard data', [
@@ -119,7 +122,8 @@ class MCPHealthDashboardService
      *     uptime_percentage: float
      * }
      */
-    protected function getOverviewMetrics(): array
+    protected function getOverviewMetrics(int $userId): array
+    {
         // Get MCP server status
         $mcpServers = MCPServer::all();
         $healthyServers = $mcpServers->filter(fn ($server) => $server->isHealthy())->count();
@@ -130,8 +134,14 @@ class MCPHealthDashboardService
 
         // Get external API status
         $apiHealth = $this->apiHealthMonitor->getCachedAllHealth() ?? $this->apiHealthMonitor->checkAllAPIs();
-        $healthyAPIs = collect([$apiHealth['umapyoi'], $apiHealth['umamusumedb']])
-            ->filter(fn ($api) => $api['status'] === 'healthy')
+
+        /** @var array{status: string, available: bool} $umapyoiHealth */
+        $umapyoiHealth = is_array($apiHealth['umapyoi'] ?? null) ? $apiHealth['umapyoi'] : ['status' => 'unknown', 'available' => false];
+        /** @var array{status: string, available: bool} $umamusumedbHealth */
+        $umamusumedbHealth = is_array($apiHealth['umamusumedb'] ?? null) ? $apiHealth['umamusumedb'] : ['status' => 'unknown', 'available' => false];
+
+        $healthyAPIs = collect([$umapyoiHealth, $umamusumedbHealth])
+            ->filter(fn (array $api): bool => $api['status'] === 'healthy')
             ->count();
 
         // Calculate overall health score (0-100)
@@ -179,11 +189,15 @@ class MCPHealthDashboardService
      * }
      */
     protected function getMCPServerHealth(): array
+    {
         $servers = MCPServer::all();
 
         $serverData = $servers->map(function ($server) {
             $isHealthy = $server->isHealthy();
             $status = $this->determineServerStatus($server);
+            $successRate = is_numeric($server->success_rate) ? (float) $server->success_rate : 0.0;
+            $failureRate = is_numeric($server->failure_rate) ? (float) $server->failure_rate : 0.0;
+            $avgResponseTime = is_numeric($server->average_response_time) ? (float) $server->average_response_time : 0.0;
 
             return [
                 'id' => $server->id,
@@ -191,9 +205,9 @@ class MCPHealthDashboardService
                 'type' => $server->server_type,
                 'status' => $status,
                 'is_healthy' => $isHealthy,
-                'success_rate' => round($server->success_rate, 2),
-                'failure_rate' => round($server->failure_rate, 2),
-                'average_response_time' => round($server->average_response_time, 3),
+                'success_rate' => round($successRate, 2),
+                'failure_rate' => round($failureRate, 2),
+                'average_response_time' => round($avgResponseTime, 3),
                 'total_requests' => $server->total_requests,
                 'consecutive_failures' => $server->consecutive_failures,
                 'last_health_check' => $server->last_health_check?->toIso8601String(),
@@ -228,30 +242,42 @@ class MCPHealthDashboardService
      * }
      */
     protected function getExternalAPIHealth(): array
+    {
         $apiHealth = $this->apiHealthMonitor->getCachedAllHealth() ?? $this->apiHealthMonitor->checkAllAPIs();
+
+        /** @var array{status: string, available: bool, response_time_ms: float, failure_count: int, circuit_breaker_open: bool, last_check: string, message: string} $umapyoiApi */
+        $umapyoiApi = is_array($apiHealth['umapyoi'] ?? null) ? $apiHealth['umapyoi'] : [
+            'status' => 'unknown', 'available' => false, 'response_time_ms' => 0.0,
+            'failure_count' => 0, 'circuit_breaker_open' => false, 'last_check' => '', 'message' => '',
+        ];
+        /** @var array{status: string, available: bool, response_time_ms: float, failure_count: int, circuit_breaker_open: bool, last_check: string, message: string} $umamusumedbApi */
+        $umamusumedbApi = is_array($apiHealth['umamusumedb'] ?? null) ? $apiHealth['umamusumedb'] : [
+            'status' => 'unknown', 'available' => false, 'response_time_ms' => 0.0,
+            'failure_count' => 0, 'circuit_breaker_open' => false, 'last_check' => '', 'message' => '',
+        ];
 
         $apis = [
             [
                 'name' => 'umapyoi',
                 'display_name' => 'Umapyoi.net API',
-                'status' => $apiHealth['umapyoi']['status'],
-                'available' => $apiHealth['umapyoi']['available'],
-                'response_time_ms' => $apiHealth['umapyoi']['response_time_ms'],
-                'failure_count' => $apiHealth['umapyoi']['failure_count'],
-                'circuit_breaker_open' => $apiHealth['umapyoi']['circuit_breaker_open'],
-                'last_check' => $apiHealth['umapyoi']['last_check'],
-                'message' => $apiHealth['umapyoi']['message'],
+                'status' => $umapyoiApi['status'],
+                'available' => $umapyoiApi['available'],
+                'response_time_ms' => $umapyoiApi['response_time_ms'],
+                'failure_count' => $umapyoiApi['failure_count'],
+                'circuit_breaker_open' => $umapyoiApi['circuit_breaker_open'],
+                'last_check' => $umapyoiApi['last_check'],
+                'message' => $umapyoiApi['message'],
             ],
             [
                 'name' => 'umamusumedb',
                 'display_name' => 'UmamusumeDB API',
-                'status' => $apiHealth['umamusumedb']['status'],
-                'available' => $apiHealth['umamusumedb']['available'],
-                'response_time_ms' => $apiHealth['umamusumedb']['response_time_ms'],
-                'failure_count' => $apiHealth['umamusumedb']['failure_count'],
-                'circuit_breaker_open' => $apiHealth['umamusumedb']['circuit_breaker_open'],
-                'last_check' => $apiHealth['umamusumedb']['last_check'],
-                'message' => $apiHealth['umamusumedb']['message'],
+                'status' => $umamusumedbApi['status'],
+                'available' => $umamusumedbApi['available'],
+                'response_time_ms' => $umamusumedbApi['response_time_ms'],
+                'failure_count' => $umamusumedbApi['failure_count'],
+                'circuit_breaker_open' => $umamusumedbApi['circuit_breaker_open'],
+                'last_check' => $umamusumedbApi['last_check'],
+                'message' => $umamusumedbApi['message'],
             ],
         ];
 
@@ -263,10 +289,12 @@ class MCPHealthDashboardService
             'circuit_open' => collect($apis)->where('circuit_breaker_open', true)->count(),
         ];
 
+        $overallStatusVal = is_string($apiHealth['overall_status'] ?? null) ? $apiHealth['overall_status'] : 'unknown';
+
         return [
             'apis' => $apis,
             'summary' => $summary,
-            'overall_status' => $apiHealth['overall_status'],
+            'overall_status' => $overallStatusVal,
         ];
     }
 
@@ -278,10 +306,14 @@ class MCPHealthDashboardService
      *     summary: array{total: int, active: int, terminated: int, healthy: int, unhealthy: int}
      * }
      */
-    protected function getAgentHealth(): array
+    protected function getAgentHealth(int $userId): array
+    {
         $agents = MCPAgent::where('user_id', $userId)->get();
 
-        $agentData = $agents->map(function ($agent) {
+        /** @var array<array<string, mixed>> $agentData */
+        $agentData = $agents->map(function (MCPAgent $agent): array {
+            $deploymentTime = $agent->deployment_time;
+
             return [
                 'id' => $agent->id,
                 'agent_id' => $agent->agent_id,
@@ -291,10 +323,10 @@ class MCPHealthDashboardService
                 'status' => $agent->status,
                 'health_status' => $agent->health_status,
                 'uptime_seconds' => $agent->getUptimeSeconds(),
-                'deployment_time' => $agent->deployment_time,
+                'deployment_time' => $deploymentTime instanceof \Carbon\Carbon ? $deploymentTime->toIso8601String() : $deploymentTime,
                 'performance_metrics' => $agent->performance_metrics ?? [],
-                'last_health_check' => $agent->last_health_check?->toIso8601String(),
-                'created_at' => $agent->created_at->toIso8601String(),
+                'last_health_check' => $agent->last_health_check instanceof \Carbon\Carbon ? $agent->last_health_check->toIso8601String() : null,
+                'created_at' => $agent->created_at instanceof \Carbon\Carbon ? $agent->created_at->toIso8601String() : (string) $agent->created_at,
             ];
         })->values()->all();
 
@@ -322,7 +354,8 @@ class MCPHealthDashboardService
      *     system_health: array<string, mixed>
      * }
      */
-    protected function getPerformanceMetrics(): array
+    protected function getPerformanceMetrics(int $userId): array
+    {
         // Cache performance
         $cacheStats = $this->cacheManagement->getHitRateStatistics();
 
@@ -357,22 +390,31 @@ class MCPHealthDashboardService
      *     budget_status: array<string, mixed>
      * }
      */
-    protected function getCostAnalytics(): array
+    protected function getCostAnalytics(int $userId): array
+    {
         $costData = $this->mcpMonitoring->getCostAnalytics($userId, 'month');
 
         // Get budget information
-        $budgetStatus = $this->getBudgetStatus($userId, $costData['total_cost']);
+        $totalCostForBudget = is_numeric($costData['total_cost'] ?? null) ? (float) $costData['total_cost'] : 0.0;
+        $budgetStatus = $this->getBudgetStatus($userId, $totalCostForBudget);
+
+        /** @var array<array<string, mixed>> $dailyCosts */
+        $dailyCosts = is_array($costData['daily_costs'] ?? null) ? $costData['daily_costs'] : [];
+        /** @var array<array<string, mixed>> $costByServer */
+        $costByServer = is_array($costData['cost_by_server'] ?? null) ? $costData['cost_by_server'] : [];
+        /** @var array<array<string, mixed>> $costByTool */
+        $costByTool = is_array($costData['cost_by_tool'] ?? null) ? $costData['cost_by_tool'] : [];
 
         return [
             'current_month' => [
-                'total_cost' => $costData['total_cost'],
-                'total_tokens' => $costData['total_tokens'],
-                'total_requests' => $costData['total_requests'],
-                'average_cost_per_request' => $costData['average_cost_per_request'],
+                'total_cost' => $costData['total_cost'] ?? 0,
+                'total_tokens' => $costData['total_tokens'] ?? 0,
+                'total_requests' => $costData['total_requests'] ?? 0,
+                'average_cost_per_request' => $costData['average_cost_per_request'] ?? 0,
             ],
-            'daily_costs' => $costData['daily_costs'],
-            'cost_by_server' => $costData['cost_by_server'],
-            'cost_by_tool' => $costData['cost_by_tool'],
+            'daily_costs' => $dailyCosts,
+            'cost_by_server' => $costByServer,
+            'cost_by_tool' => $costByTool,
             'budget_status' => $budgetStatus,
         ];
     }
@@ -382,30 +424,39 @@ class MCPHealthDashboardService
      *
      * @return array<array{type: string, severity: string, title: string, description: string, action: string, metadata: array<string, mixed>}>
      */
-    protected function getRecommendations(): array
+    protected function getRecommendations(int $userId): array
+    {
+        /** @var array<array{type: string, severity: string, title: string, description: string, action: string, metadata: array<string, mixed>}> $recommendations */
         $recommendations = [];
 
         // Get MCP monitoring recommendations
+        /** @var array<array{type: string, severity: string, title: string, description: string, action: string, metadata: array<string, mixed>}> $mcpRecommendations */
         $mcpRecommendations = $this->mcpMonitoring->getOptimizationRecommendations($userId);
         $recommendations = array_merge($recommendations, $mcpRecommendations);
 
         // Get API health recommendations
         $apiMetrics = $this->apiHealthMonitor->getHealthMetrics();
-        $recommendations = array_merge($recommendations, $apiMetrics['recommendations']);
+        /** @var array<array{type: string, severity: string, title: string, description: string, action: string, metadata: array<string, mixed>}> $apiRecommendations */
+        $apiRecommendations = is_array($apiMetrics['recommendations'] ?? null) ? $apiMetrics['recommendations'] : [];
+        $recommendations = array_merge($recommendations, $apiRecommendations);
 
         // Add cache optimization recommendations
+        /** @var array<array{type: string, severity: string, title: string, description: string, action: string, metadata: array<string, mixed>}> $cacheRecommendations */
         $cacheRecommendations = $this->getCacheOptimizationRecommendations();
         $recommendations = array_merge($recommendations, $cacheRecommendations);
 
         // Add cost optimization recommendations
+        /** @var array<array{type: string, severity: string, title: string, description: string, action: string, metadata: array<string, mixed>}> $costRecommendations */
         $costRecommendations = $this->getCostOptimizationRecommendations($userId);
         $recommendations = array_merge($recommendations, $costRecommendations);
 
         // Sort by severity
-        usort($recommendations, function ($a, $b) {
+        usort($recommendations, function (array $a, array $b): int {
             $severityOrder = ['critical' => 0, 'high' => 1, 'medium' => 2, 'low' => 3];
-            $aSeverity = $severityOrder[$a['severity'] ?? 'low'] ?? 999;
-            $bSeverity = $severityOrder[$b['severity'] ?? 'low'] ?? 999;
+            $aSeverityKey = $a['severity'];
+            $bSeverityKey = $b['severity'];
+            $aSeverity = $severityOrder[$aSeverityKey] ?? 999;
+            $bSeverity = $severityOrder[$bSeverityKey] ?? 999;
 
             return $aSeverity <=> $bSeverity;
         });
@@ -469,21 +520,21 @@ class MCPHealthDashboardService
 
         // Check for unhealthy servers
         $unhealthyServers = MCPServer::all()->filter(fn ($server) => ! $server->isHealthy())->count();
-        $alertCount = ($alertCount ?? 0) + $unhealthyServers;
+        $alertCount += $unhealthyServers;
 
         // Check for circuit breakers
         if ($this->apiHealthMonitor->isCircuitBreakerOpen('umapyoi')) {
-            $alertCount = ($alertCount ?? 0) + 1;
+            $alertCount++;
         }
         if ($this->apiHealthMonitor->isCircuitBreakerOpen('umamusumedb')) {
-            $alertCount = ($alertCount ?? 0) + 1;
+            $alertCount++;
         }
 
         // Check for unhealthy agents
         $unhealthyAgents = MCPAgent::where('user_id', $userId)
             ->where('health_status', '=', 'unhealthy')
             ->count();
-        $alertCount = ($alertCount ?? 0) + $unhealthyAgents;
+        $alertCount += $unhealthyAgents;
 
         return $alertCount;
     }
@@ -511,7 +562,8 @@ class MCPHealthDashboardService
      *
      * @return array{total_executions: int, successful_executions: int, failed_executions: int, success_rate: float, average_execution_time: float}
      */
-    protected function getToolUsageStatistics(): array
+    protected function getToolUsageStatistics(int $userId): array
+    {
         $toolUsage = MCPToolUsage::forUser($userId)
             ->betweenDates(now()->startOfDay(), now())
             ->get();
@@ -537,6 +589,7 @@ class MCPHealthDashboardService
      * @return array{redis_status: string, database_status: string, queue_status: string}
      */
     protected function getSystemHealthMetrics(): array
+    {
         // Check Redis status
         $redisStatus = 'healthy';
         try {
@@ -574,12 +627,13 @@ class MCPHealthDashboardService
      *
      * @return array{budget_limit: float, current_spend: float, remaining_budget: float, percentage_used: float, status: string}
      */
-    protected function getBudgetStatus(): array
+    protected function getBudgetStatus(int $userId, float $currentSpend): array
+    {
         // Get user's budget limit from preferences
         $budgetLimit = 10.0; // Default $10/month
 
         $remainingBudget = max(0, $budgetLimit - $currentSpend);
-        $percentageUsed = $budgetLimit > 0 ? ($currentSpend / $budgetLimit) * 100 : 0;
+        $percentageUsed = ($currentSpend / $budgetLimit) * 100;
 
         $status = match (true) {
             $percentageUsed >= 100 => 'exceeded',
@@ -603,6 +657,7 @@ class MCPHealthDashboardService
      * @return array<array{type: string, severity: string, title: string, description: string, action: string}>
      */
     protected function getCacheOptimizationRecommendations(): array
+    {
         $recommendations = [];
         $cacheStats = $this->cacheManagement->getHitRateStatistics();
 
@@ -627,26 +682,33 @@ class MCPHealthDashboardService
      *
      * @return array<array{type: string, severity: string, title: string, description: string, action: string}>
      */
-    protected function getCostOptimizationRecommendations(): array
+    protected function getCostOptimizationRecommendations(int $userId): array
+    {
         $recommendations = [];
         $costData = $this->mcpMonitoring->getCostAnalytics($userId, 'month');
 
         // Check for expensive tools
-        if (! empty($costData['cost_by_tool'])) {
-            $topCostTool = $costData['cost_by_tool'][0] ?? null;
+        $costByToolRaw = $costData['cost_by_tool'] ?? [];
+        if (is_array($costByToolRaw) && ! empty($costByToolRaw)) {
+            $topCostTool = $costByToolRaw[0] ?? null;
 
-            if ($topCostTool && $topCostTool['cost'] > 1.0) {
-                $recommendations[] = [
-                    'type' => 'cost_optimization',
-                    'severity' => 'medium',
-                    'title' => 'High-cost tool usage detected',
-                    'description' => sprintf(
-                        'Tool "%s" has cost $%.4f this month. Consider optimizing usage or implementing caching.',
-                        $topCostTool['tool'],
-                        $topCostTool['cost']
-                    ),
-                    'action' => 'optimize_tool_usage',
-                ];
+            if (is_array($topCostTool)) {
+                $toolCost = is_numeric($topCostTool['cost'] ?? null) ? (float) $topCostTool['cost'] : 0.0;
+                $toolName = is_string($topCostTool['tool'] ?? null) ? $topCostTool['tool'] : 'unknown';
+
+                if ($toolCost > 1.0) {
+                    $recommendations[] = [
+                        'type' => 'cost_optimization',
+                        'severity' => 'medium',
+                        'title' => 'High-cost tool usage detected',
+                        'description' => sprintf(
+                            'Tool "%s" has cost $%.4f this month. Consider optimizing usage or implementing caching.',
+                            $toolName,
+                            $toolCost
+                        ),
+                        'action' => 'optimize_tool_usage',
+                    ];
+                }
             }
         }
 
@@ -655,8 +717,11 @@ class MCPHealthDashboardService
 
     /**
      * Force refresh dashboard data
+     *
+     * @return array<string, mixed>
      */
-    public function refreshDashboard(): array
+    public function refreshDashboard(int $userId): array
+    {
         // Clear cached dashboard data
         $cacheKey = self::DASHBOARD_CACHE_KEY.":{$userId}";
         Cache::forget($cacheKey);
@@ -674,7 +739,8 @@ class MCPHealthDashboardService
      * @param  string  $period  'hour', 'day', 'week', 'month'
      * @return array<array{timestamp: string, health_score: float, alerts_count: int}>
      */
-    public function getHealthHistory(): array
+    public function getHealthHistory(string $period = 'day'): array
+    {
         // In production, this would query historical health data from database
         // For now, we'll return a simplified response
 

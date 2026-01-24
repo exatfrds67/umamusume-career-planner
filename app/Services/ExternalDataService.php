@@ -54,9 +54,10 @@ class ExternalDataService
      * Sync character data from external source
      *
      * @param  bool  $forceRefresh  Force cache refresh
-     * @return array{success: bool, synced_count: int, errors: array<string>}
+     * @return array{success: bool, synced_count: int, errors: array<string>, source: string}
      */
-    public function syncCharacterData(): array
+    public function syncCharacterData(bool $forceRefresh = false): array
+    {
         $cacheKey = self::CACHE_PREFIX.'characters';
 
         if (! $forceRefresh && Cache::has($cacheKey)) {
@@ -91,13 +92,14 @@ class ExternalDataService
                 try {
                     /** @var array<string, mixed> $charData */
                     $this->upsertCharacterData($charData);
-                    $syncedCount = ($syncedCount ?? 0) + 1;
+                    $syncedCount++;
                 } catch (\Exception $e) {
                     $charId = 'unknown';
                     if (isset($charData['id'])) {
-                        $charId = \is_string($charData['id']) || \is_int($charData['id'])
-                            ? (is_string($charData) ? (string) $charData : '')['id']
-                            : 'unknown';
+                        $idValue = $charData['id'];
+                        if (\is_string($idValue) || \is_int($idValue)) {
+                            $charId = (string) $idValue;
+                        }
                     }
                     $errors[] = "Character {$charId}: {$e->getMessage()}";
                 }
@@ -136,9 +138,10 @@ class ExternalDataService
      * Sync support card data from external source
      *
      * @param  bool  $forceRefresh  Force cache refresh
-     * @return array{success: bool, synced_count: int, errors: array<string>}
+     * @return array{success: bool, synced_count: int, errors: array<string>, source: string}
      */
-    public function syncSupportCardData(): array
+    public function syncSupportCardData(bool $forceRefresh = false): array
+    {
         $cacheKey = self::CACHE_PREFIX.'support_cards';
 
         if (! $forceRefresh && Cache::has($cacheKey)) {
@@ -173,13 +176,14 @@ class ExternalDataService
                 try {
                     /** @var array<string, mixed> $cardData */
                     $this->upsertSupportCardData($cardData);
-                    $syncedCount = ($syncedCount ?? 0) + 1;
+                    $syncedCount++;
                 } catch (\Exception $e) {
                     $cardId = 'unknown';
                     if (isset($cardData['id'])) {
-                        $cardId = \is_string($cardData['id']) || \is_int($cardData['id'])
-                            ? (is_string($cardData) ? (string) $cardData : '')['id']
-                            : 'unknown';
+                        $idValue = $cardData['id'];
+                        if (\is_string($idValue) || \is_int($idValue)) {
+                            $cardId = (string) $idValue;
+                        }
                     }
                     $errors[] = "Card {$cardId}: {$e->getMessage()}";
                 }
@@ -254,6 +258,7 @@ class ExternalDataService
      * @return array<string, array{synced_at: string|null, count: int}>
      */
     public function getSyncStatus(): array
+    {
         /** @var array<string, mixed>|null $characters */
         $characters = Cache::get(self::CACHE_PREFIX.'characters', [
             'synced_at' => null,
@@ -291,7 +296,7 @@ class ExternalDataService
             [
                 'source' => 'umapyoi',
                 'data_type' => 'character',
-                'external_id' => (is_array($data) && isset((is_array($data) && isset($data['id']) ? $data['id'] : null)) ? (is_array($data) && isset($data['id']) ? $data['id'] : null) : null),
+                'external_id' => $data['id'] ?? null,
             ],
             [
                 'name' => $data['name'] ?? 'Unknown',
@@ -312,7 +317,7 @@ class ExternalDataService
             [
                 'source' => 'umapyoi',
                 'data_type' => 'support_card',
-                'external_id' => (is_array($data) && isset((is_array($data) && isset($data['id']) ? $data['id'] : null)) ? (is_array($data) && isset($data['id']) ? $data['id'] : null) : null),
+                'external_id' => $data['id'] ?? null,
             ],
             [
                 'name' => $data['name'] ?? 'Unknown',

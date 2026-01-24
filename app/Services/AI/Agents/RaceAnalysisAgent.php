@@ -45,10 +45,12 @@ class RaceAnalysisAgent
      *     recommendations: array<int, string>,
      *     stat_requirements: array<string, mixed>,
      *     confidence: float,
-     *     reasoning: string
+     *     reasoning: string,
+     *     metadata?: array<string, mixed>
      * }
      */
-    public function analyzeRacePreparation(): array
+    public function analyzeRacePreparation(Character $character, array $raceDetails = []): array
+    {
         if (! $this->enabled) {
             return $this->getDefaultRaceAnalysis($character, $raceDetails);
         }
@@ -75,18 +77,26 @@ class RaceAnalysisAgent
             $response = $this->processWithMCPAgent($context);
 
             /** @var array<string, mixed> $readiness */
-            $readiness = is_array((is_array($response) && isset($response['readiness']) ? $response['readiness'] : null)) ? $response['readiness'] : [];
+            $readiness = isset($response['readiness']) && is_array($response['readiness']) ? $response['readiness'] : [];
+            /** @var array<int|string, mixed> $rawRecommendations */
+            $rawRecommendations = isset($response['recommendations']) && is_array($response['recommendations']) ? $response['recommendations'] : [];
             /** @var array<int, string> $recommendations */
-            $recommendations = is_array((is_array($response) && isset($response['recommendations']) ? $response['recommendations'] : null)) ? array_values($response['recommendations']) : [];
+            // @phpstan-ignore-next-line cast.string - Safe cast of mixed values from dynamic API response
+            $recommendations = array_map(static fn (mixed $v): string => (string) $v, array_values($rawRecommendations));
             /** @var array<string, mixed> $statRequirements */
-            $statRequirements = is_array((is_array($response) && isset($response['stat_requirements']) ? $response['stat_requirements'] : null)) ? $response['stat_requirements'] : [];
+            $statRequirements = isset($response['stat_requirements']) && is_array($response['stat_requirements']) ? $response['stat_requirements'] : [];
+
+            /** @var float|int|string $confidenceRaw */
+            $confidenceRaw = $response['confidence'] ?? 0.85;
+            /** @var string $reasoningRaw */
+            $reasoningRaw = $response['reasoning'] ?? 'Race analysis completed';
 
             $analysis = [
                 'readiness' => $readiness,
                 'recommendations' => $recommendations,
                 'stat_requirements' => $statRequirements,
-                'confidence' => (float) ($response['confidence'] ?? 0.85),
-                'reasoning' => (string) ($response['reasoning'] ?? 'Race analysis completed'),
+                'confidence' => (float) $confidenceRaw,
+                'reasoning' => (string) $reasoningRaw,
                 'metadata' => [
                     'agent_id' => $this->agentId,
                     'processing_time' => microtime(true) - $startTime,
@@ -121,7 +131,8 @@ class RaceAnalysisAgent
      *     reasoning: string
      * }
      */
-    public function predictRacePerformance(): array
+    public function predictRacePerformance(Character $character, array $raceDetails = [], array $strategy = []): array
+    {
         $startTime = microtime(true);
 
         try {
@@ -135,14 +146,23 @@ class RaceAnalysisAgent
             $response = $this->processWithMCPAgent($context);
 
             /** @var array<string, mixed> $performanceFactors */
-            $performanceFactors = is_array((is_array($response) && isset($response['performance_factors']) ? $response['performance_factors'] : null)) ? $response['performance_factors'] : [];
+            $performanceFactors = isset($response['performance_factors']) && is_array($response['performance_factors']) ? $response['performance_factors'] : [];
+
+            /** @var int|string $positionRaw */
+            $positionRaw = $response['predicted_position'] ?? 5;
+            /** @var float|int|string $winProbRaw */
+            $winProbRaw = $response['win_probability'] ?? 0.5;
+            /** @var float|int|string $confidenceRaw */
+            $confidenceRaw = $response['confidence'] ?? 0.8;
+            /** @var string $reasoningRaw */
+            $reasoningRaw = $response['reasoning'] ?? 'Performance prediction completed';
 
             return [
-                'predicted_position' => (int) ($response['predicted_position'] ?? 5),
-                'win_probability' => (float) ($response['win_probability'] ?? 0.5),
+                'predicted_position' => (int) $positionRaw,
+                'win_probability' => (float) $winProbRaw,
                 'performance_factors' => $performanceFactors,
-                'confidence' => (float) ($response['confidence'] ?? 0.8),
-                'reasoning' => (string) ($response['reasoning'] ?? 'Performance prediction completed'),
+                'confidence' => (float) $confidenceRaw,
+                'reasoning' => (string) $reasoningRaw,
             ];
         } catch (\Exception $e) {
             Log::error('[RaceAnalysisAgent] Performance prediction failed', [
@@ -172,7 +192,8 @@ class RaceAnalysisAgent
      *     reasoning: string
      * }
      */
-    public function recommendRaceStrategy(): array
+    public function recommendRaceStrategy(Character $character, array $raceDetails = []): array
+    {
         $startTime = microtime(true);
 
         try {
@@ -185,16 +206,26 @@ class RaceAnalysisAgent
             $response = $this->processWithMCPAgent($context);
 
             /** @var array<string, mixed> $strategy */
-            $strategy = is_array((is_array($response) && isset($response['strategy']) ? $response['strategy'] : null)) ? $response['strategy'] : [];
+            $strategy = isset($response['strategy']) && is_array($response['strategy']) ? $response['strategy'] : [];
+            /** @var array<int|string, mixed> $rawSkillRecs */
+            $rawSkillRecs = isset($response['skill_recommendations']) && is_array($response['skill_recommendations']) ? $response['skill_recommendations'] : [];
             /** @var array<int, string> $skillRecommendations */
-            $skillRecommendations = is_array((is_array($response) && isset($response['skill_recommendations']) ? $response['skill_recommendations'] : null)) ? array_values($response['skill_recommendations']) : [];
+            // @phpstan-ignore-next-line cast.string - Safe cast of mixed values from dynamic API response
+            $skillRecommendations = array_map(static fn (mixed $v): string => (string) $v, array_values($rawSkillRecs));
+
+            /** @var string $runningStyleRaw */
+            $runningStyleRaw = $response['running_style'] ?? 'pace_chaser';
+            /** @var float|int|string $confidenceRaw */
+            $confidenceRaw = $response['confidence'] ?? 0.85;
+            /** @var string $reasoningRaw */
+            $reasoningRaw = $response['reasoning'] ?? 'Strategy recommendation completed';
 
             return [
                 'strategy' => $strategy,
-                'running_style' => (string) ($response['running_style'] ?? 'pace_chaser'),
+                'running_style' => (string) $runningStyleRaw,
                 'skill_recommendations' => $skillRecommendations,
-                'confidence' => (float) ($response['confidence'] ?? 0.85),
-                'reasoning' => (string) ($response['reasoning'] ?? 'Strategy recommendation completed'),
+                'confidence' => (float) $confidenceRaw,
+                'reasoning' => (string) $reasoningRaw,
             ];
         } catch (\Exception $e) {
             Log::error('[RaceAnalysisAgent] Strategy recommendation failed', [
@@ -224,7 +255,8 @@ class RaceAnalysisAgent
      *     confidence: float
      * }
      */
-    public function analyzePostRacePerformance(): array
+    public function analyzePostRacePerformance(Character $character, array $raceResult = []): array
+    {
         $startTime = microtime(true);
 
         try {
@@ -237,20 +269,32 @@ class RaceAnalysisAgent
             $response = $this->processWithMCPAgent($context);
 
             /** @var array<string, mixed> $analysis */
-            $analysis = is_array((is_array($response) && isset($response['analysis']) ? $response['analysis'] : null)) ? $response['analysis'] : [];
+            $analysis = isset($response['analysis']) && is_array($response['analysis']) ? $response['analysis'] : [];
+            /** @var array<int|string, mixed> $rawStrengths */
+            $rawStrengths = isset($response['strengths']) && is_array($response['strengths']) ? $response['strengths'] : [];
             /** @var array<int, string> $strengths */
-            $strengths = is_array((is_array($response) && isset($response['strengths']) ? $response['strengths'] : null)) ? array_values($response['strengths']) : [];
+            // @phpstan-ignore-next-line cast.string - Safe cast of mixed values from dynamic API response
+            $strengths = array_map(static fn (mixed $v): string => (string) $v, array_values($rawStrengths));
+            /** @var array<int|string, mixed> $rawWeaknesses */
+            $rawWeaknesses = isset($response['weaknesses']) && is_array($response['weaknesses']) ? $response['weaknesses'] : [];
             /** @var array<int, string> $weaknesses */
-            $weaknesses = is_array((is_array($response) && isset($response['weaknesses']) ? $response['weaknesses'] : null)) ? array_values($response['weaknesses']) : [];
+            // @phpstan-ignore-next-line cast.string - Safe cast of mixed values from dynamic API response
+            $weaknesses = array_map(static fn (mixed $v): string => (string) $v, array_values($rawWeaknesses));
+            /** @var array<int|string, mixed> $rawImprovements */
+            $rawImprovements = isset($response['improvements']) && is_array($response['improvements']) ? $response['improvements'] : [];
             /** @var array<int, string> $improvements */
-            $improvements = is_array((is_array($response) && isset($response['improvements']) ? $response['improvements'] : null)) ? array_values($response['improvements']) : [];
+            // @phpstan-ignore-next-line cast.string - Safe cast of mixed values from dynamic API response
+            $improvements = array_map(static fn (mixed $v): string => (string) $v, array_values($rawImprovements));
+
+            /** @var float|int|string $confidenceRaw */
+            $confidenceRaw = $response['confidence'] ?? 0.85;
 
             return [
                 'analysis' => $analysis,
                 'strengths' => $strengths,
                 'weaknesses' => $weaknesses,
                 'improvements' => $improvements,
-                'confidence' => (float) ($response['confidence'] ?? 0.85),
+                'confidence' => (float) $confidenceRaw,
             ];
         } catch (\Exception $e) {
             Log::error('[RaceAnalysisAgent] Post-race analysis failed', [
@@ -273,7 +317,8 @@ class RaceAnalysisAgent
      *
      * @return array<string, mixed>
      */
-    protected function getCharacterData(): array
+    protected function getCharacterData(Character $character): array
+    {
         return [
             'id' => $character->id,
             'name' => $character->name,
@@ -292,7 +337,8 @@ class RaceAnalysisAgent
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    protected function processWithMCPAgent(): array
+    protected function processWithMCPAgent(array $context): array
+    {
         if (! $this->mcpClient->isStrandsAgentsAvailable()) {
             throw new \RuntimeException('MCP strands-agents server not available');
         }
@@ -341,7 +387,8 @@ class RaceAnalysisAgent
      *     metadata: array<string, mixed>
      * }
      */
-    protected function getDefaultRaceAnalysis(): array
+    protected function getDefaultRaceAnalysis(Character $character, array $raceDetails = []): array
+    {
         return [
             'readiness' => [
                 'overall' => 'moderate',
@@ -397,6 +444,7 @@ class RaceAnalysisAgent
      * }
      */
     public function getStatus(): array
+    {
         return [
             'enabled' => $this->enabled,
             'available' => $this->isAvailable(),

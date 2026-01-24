@@ -23,7 +23,7 @@ class UpdateProfileRequest extends FormRequest
     public function rules(): array
     {
         $user = $this->user();
-        $userId = $user instanceof \App\Models\User ? $user?->id ?? throw new \Exception('User required') : null;
+        $userId = $user instanceof \App\Models\User ? $user->id : null;
 
         return [
             'name' => ['required', 'string', 'max:255'],

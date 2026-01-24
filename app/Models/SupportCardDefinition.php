@@ -56,13 +56,9 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @use HasFactory<\Database\Factories\SupportCardDefinitionFactory>
  */
-/**
- * @property int $id
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- */
 class SupportCardDefinition extends Model
 {
+    /** @use HasFactory<\Database\Factories\SupportCardDefinitionFactory> */
     use HasFactory;
 
     protected $table = 'ucp_support_cards';

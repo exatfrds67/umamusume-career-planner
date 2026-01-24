@@ -53,7 +53,8 @@ class AgentLifecycleManager
      *     error?: string
      * }
      */
-    public function createAgent(): array
+    public function createAgent(array $config): array
+    {
         $startTime = microtime(true);
 
         try {
@@ -66,7 +67,8 @@ class AgentLifecycleManager
             $deployment = $this->agentCore->deployAgent($config);
 
             if ($deployment['status'] !== 'deployed') {
-                throw new \RuntimeException('Agent deployment failed: '.$deployment['error'] ?? 'Unknown error');
+                $errorMessage = isset($deployment['error']) ? (string) $deployment['error'] : 'Unknown error';
+                throw new \RuntimeException('Agent deployment failed: '.$errorMessage);
             }
 
             // Store in database
@@ -130,7 +132,8 @@ class AgentLifecycleManager
      *     recommendations: array<int, string>
      * }
      */
-    public function monitorAgent(): array
+    public function monitorAgent(string $agentId): array
+    {
         try {
             Log::info('[AgentLifecycle] Monitoring agent', ['agent_id' => $agentId]);
 
@@ -193,7 +196,8 @@ class AgentLifecycleManager
      *     error?: string
      * }
      */
-    public function terminateAgent(): array
+    public function terminateAgent(string $agentId): array
+    {
         $startTime = microtime(true);
         $resourcesCleaned = [
             'agentcore' => false,
@@ -278,7 +282,8 @@ class AgentLifecycleManager
      *     error?: string
      * }
      */
-    public function restartAgent(): array
+    public function restartAgent(string $agentId): array
+    {
         $startTime = microtime(true);
 
         try {
@@ -297,15 +302,24 @@ class AgentLifecycleManager
             }
 
             // Create new agent with same configuration
+            /** @var array<string, mixed> $tools */
+            $tools = $agent->tools ?? [];
+            /** @var array<string, mixed> $memoryConfig */
+            $memoryConfig = $agent->memory_config ?? [];
+            /** @var array<string, mixed> $guardrails */
+            $guardrails = $agent->guardrails ?? [];
+            /** @var array<string, mixed> $metadata */
+            $metadata = $agent->metadata ?? [];
+
             $config = [
                 'name' => $agent->name,
                 'type' => $agent->type,
                 'model' => $agent->model,
                 'instructions' => $agent->instructions,
-                'tools' => $agent->tools,
-                'memory' => $agent->memory_config,
-                'guardrails' => $agent->guardrails,
-                'metadata' => $agent->metadata,
+                'tools' => $tools,
+                'memory' => $memoryConfig,
+                'guardrails' => $guardrails,
+                'metadata' => $metadata,
             ];
 
             $creation = $this->createAgent($config);
@@ -354,19 +368,23 @@ class AgentLifecycleManager
      * }>
      */
     public function listActiveAgents(): array
+    {
         try {
             $agents = MCPAgent::where('status', 'active')->get();
 
-            return $agents->map(function ($agent) {
+            /** @var array<int, array{agent_id: string, name: string, type: string, status: string, health_status: string, uptime_seconds: int}> $result */
+            $result = $agents->map(function ($agent): array {
                 return [
-                    'agent_id' => $agent->agent_id,
-                    'name' => $agent->name,
-                    'type' => $agent->type,
-                    'status' => $agent->status,
-                    'health_status' => $agent->health_status,
-                    'uptime_seconds' => now()->diffInSeconds($agent->created_at),
+                    'agent_id' => is_string($agent->agent_id) ? $agent->agent_id : (string) $agent->agent_id,
+                    'name' => is_string($agent->name) ? $agent->name : (string) $agent->name,
+                    'type' => is_string($agent->type) ? $agent->type : (string) $agent->type,
+                    'status' => is_string($agent->status) ? $agent->status : (string) $agent->status,
+                    'health_status' => is_string($agent->health_status) ? $agent->health_status : (string) $agent->health_status,
+                    'uptime_seconds' => (int) now()->diffInSeconds($agent->created_at),
                 ];
             })->toArray();
+
+            return $result;
         } catch (\Exception $e) {
             Log::error('[AgentLifecycle] Failed to list active agents', [
                 'error' => $e->getMessage(),
@@ -386,13 +404,20 @@ class AgentLifecycleManager
      *     last_activity: string
      * }
      */
-    protected function checkAgentHealth(): array
+    protected function checkAgentHealth(string $agentId): array
+    {
         $status = $this->agentCore->getAgentStatus($agentId);
+
+        /** @var array<string, mixed> $health */
+        $health = is_array($status['health']) ? $status['health'] : [];
+
+        $responseTime = isset($health['response_time']) && is_numeric($health['response_time']) ? (float) $health['response_time'] : 0.0;
+        $errorRate = isset($health['error_rate']) && is_numeric($health['error_rate']) ? (float) $health['error_rate'] : 0.0;
 
         return [
             'status' => $status['status'] === 'active' ? 'healthy' : 'unhealthy',
-            'response_time' => $status['health']['response_time'] ?? 0.0,
-            'error_rate' => $status['health']['error_rate'] ?? 0.0,
+            'response_time' => $responseTime,
+            'error_rate' => $errorRate,
             'last_activity' => now()->toIso8601String(),
         ];
     }
@@ -404,26 +429,30 @@ class AgentLifecycleManager
      * @param  array<string, mixed>  $performanceMetrics
      * @return array<int, string>
      */
-    protected function identifyIssues(): array
+    protected function identifyIssues(array $healthStatus, array $performanceMetrics): array
+    {
         $issues = [];
 
         // Check health status
-        if ($healthStatus['status'] === 'unhealthy') {
+        if (($healthStatus['status'] ?? '') === 'unhealthy') {
             $issues[] = 'Agent health status is unhealthy';
         }
 
         // Check response time
-        if (($healthStatus['response_time'] ?? 0.0) > 5.0) {
+        $responseTime = isset($healthStatus['response_time']) && is_numeric($healthStatus['response_time']) ? (float) $healthStatus['response_time'] : 0.0;
+        if ($responseTime > 5.0) {
             $issues[] = 'High response time detected (>5 seconds)';
         }
 
         // Check error rate
-        if (($healthStatus['error_rate'] ?? 0.0) > 0.1) {
+        $errorRate = isset($healthStatus['error_rate']) && is_numeric($healthStatus['error_rate']) ? (float) $healthStatus['error_rate'] : 0.0;
+        if ($errorRate > 0.1) {
             $issues[] = 'High error rate detected (>10%)';
         }
 
         // Check success rate
-        if (($performanceMetrics['success_rate'] ?? 1.0) < 0.9) {
+        $successRate = isset($performanceMetrics['success_rate']) && is_numeric($performanceMetrics['success_rate']) ? (float) $performanceMetrics['success_rate'] : 1.0;
+        if ($successRate < 0.9) {
             $issues[] = 'Low success rate (<90%)';
         }
 
@@ -437,7 +466,8 @@ class AgentLifecycleManager
      * @param  array<string, mixed>  $performanceMetrics
      * @return array<int, string>
      */
-    protected function generateRecommendations(): array
+    protected function generateRecommendations(array $issues, array $performanceMetrics): array
+    {
         $recommendations = [];
 
         foreach ($issues as $issue) {
@@ -476,6 +506,7 @@ class AgentLifecycleManager
      * }
      */
     public function getStatistics(): array
+    {
         try {
             $totalAgents = MCPAgent::count();
             $activeAgents = MCPAgent::where('status', 'active')->count();
@@ -489,7 +520,7 @@ class AgentLifecycleManager
                 'total_agents' => $totalAgents,
                 'active_agents' => $activeAgents,
                 'terminated_agents' => $terminatedAgents,
-                'average_uptime_hours' => round($avgUptime ?? 0.0, 2),
+                'average_uptime_hours' => round((float) ($avgUptime ?? 0.0), 2),
             ];
         } catch (\Exception $e) {
             Log::error('[AgentLifecycle] Failed to get statistics', [

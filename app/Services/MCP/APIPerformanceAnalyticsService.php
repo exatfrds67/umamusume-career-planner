@@ -7,6 +7,7 @@ namespace App\Services\MCP;
 use App\Models\MCPToolUsage;
 use App\Services\CacheManagementService;
 use App\Services\ExternalAPI\APIHealthMonitorService;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
@@ -50,6 +51,7 @@ class APIPerformanceAnalyticsService
     /**
      * Get comprehensive API performance analytics
      *
+     * @param  int  $userId  The user ID for filtering
      * @param  string  $period  'hour', 'day', 'week', 'month'
      * @return array{
      *     summary: array<string, mixed>,
@@ -60,16 +62,19 @@ class APIPerformanceAnalyticsService
      *     recommendations: array<string>
      * }
      */
-    public function getPerformanceAnalytics(): array
+    public function getPerformanceAnalytics(int $userId, string $period = 'day'): array
+    {
         $cacheKey = self::ANALYTICS_CACHE_PREFIX."{$userId}:{$period}";
 
-        if (Cache::has($cacheKey)) {
+        $cached = Cache::get($cacheKey);
+        if (is_array($cached)) {
             Log::debug('[APIPerformanceAnalytics] Returning cached analytics', [
                 'user_id' => $userId,
                 'period' => $period,
             ]);
 
-            return Cache::get($cacheKey);
+            /** @var array{summary: array<string, mixed>, api_performance: array<string, mixed>, mcp_tool_performance: array<string, mixed>, trends: array<string, mixed>, anomalies: array<string, mixed>, recommendations: array<string>} $cached */
+            return $cached;
         }
 
         Log::info('[APIPerformanceAnalytics] Generating performance analytics', [
@@ -80,6 +85,7 @@ class APIPerformanceAnalyticsService
         $startTime = microtime(true);
         $dateRange = $this->getDateRange($period);
 
+        /** @var array{summary: array<string, mixed>, api_performance: array<string, mixed>, mcp_tool_performance: array<string, mixed>, trends: array<string, mixed>, anomalies: array<string, mixed>, recommendations: array<string>} $analytics */
         $analytics = [
             'summary' => $this->getPerformanceSummary($userId, $dateRange),
             'api_performance' => $this->getAPIPerformanceMetrics($dateRange),
@@ -107,6 +113,7 @@ class APIPerformanceAnalyticsService
      * Get performance summary
      *
      * @param  array{start: \Carbon\Carbon, end: \Carbon\Carbon}  $dateRange
+     * @param  array{start: Carbon, end: Carbon}  $dateRange
      * @return array{
      *     total_requests: int,
      *     successful_requests: int,
@@ -120,7 +127,8 @@ class APIPerformanceAnalyticsService
      *     very_slow_requests: int
      * }
      */
-    protected function getPerformanceSummary(): array
+    protected function getPerformanceSummary(int $userId, array $dateRange): array
+    {
         // Get API response times
         $apiStats = [
             'umapyoi' => $this->cacheManagement->getApiResponseTimeStats('umapyoi'),
@@ -137,10 +145,11 @@ class APIPerformanceAnalyticsService
         $failedRequests = $toolUsage->where('execution_status', '=', 'failure')->count();
 
         // Calculate combined metrics
+        /** @var array<float> $allResponseTimes */
         $allResponseTimes = array_merge(
             $this->getApiResponseTimes('umapyoi'),
             $this->getApiResponseTimes('umamusumedb'),
-            $toolUsage->pluck('execution_time')->map(fn ($t) => $t * 1000)->all()
+            $toolUsage->pluck('execution_time')->map(fn ($t) => is_numeric($t) ? (float) $t * 1000 : 0.0)->all()
         );
 
         sort($allResponseTimes);
@@ -173,6 +182,7 @@ class APIPerformanceAnalyticsService
      * Get API performance metrics
      *
      * @param  array{start: \Carbon\Carbon, end: \Carbon\Carbon}  $dateRange
+     * @param  array{start: Carbon, end: Carbon}  $dateRange
      * @return array<string, array{
      *     api_name: string,
      *     total_requests: int,
@@ -186,13 +196,16 @@ class APIPerformanceAnalyticsService
      *     availability: float
      * }>
      */
-    protected function getAPIPerformanceMetrics(): array
+    protected function getAPIPerformanceMetrics(array $dateRange): array
+    {
         $apis = ['umapyoi', 'umamusumedb'];
         $metrics = [];
 
         foreach ($apis as $apiName) {
             $stats = $this->cacheManagement->getApiResponseTimeStats($apiName);
             $health = $this->apiHealthMonitor->getCachedHealth($apiName);
+            $healthStatusValue = is_array($health) && isset($health['status']) ? $health['status'] : 'unknown';
+            $healthStatus = is_string($healthStatusValue) ? $healthStatusValue : 'unknown';
 
             $metrics[$apiName] = [
                 'api_name' => $apiName,
@@ -203,7 +216,7 @@ class APIPerformanceAnalyticsService
                 'p99' => $stats['p99'],
                 'min' => $stats['min'],
                 'max' => $stats['max'],
-                'health_status' => $health['status'] ?? 'unknown',
+                'health_status' => $healthStatus,
                 'availability' => $this->calculateAPIAvailability($apiName, $dateRange),
             ];
         }
@@ -214,14 +227,16 @@ class APIPerformanceAnalyticsService
     /**
      * Get MCP tool performance metrics
      *
-     * @param  array{start: \Carbon\Carbon, end: \Carbon\Carbon}  $dateRange
+     * @param  int  $userId  The user ID
+     * @param  array{start: Carbon, end: Carbon}  $dateRange
      * @return array{
-     *     by_server: array<string, array<string, mixed>>,
-     *     by_tool: array<string, array<string, mixed>>,
-     *     slowest_tools: array<array<string, mixed>>
+     *     by_server: array<int, array<string, mixed>>,
+     *     by_tool: array<int, array<string, mixed>>,
+     *     slowest_tools: array<int, array<string, mixed>>
      * }
      */
-    protected function getMCPToolPerformanceMetrics(): array
+    protected function getMCPToolPerformanceMetrics(int $userId, array $dateRange): array
+    {
         $toolUsage = MCPToolUsage::forUser($userId)
             ->betweenDates($dateRange['start'], $dateRange['end'])
             ->get();
@@ -230,6 +245,8 @@ class APIPerformanceAnalyticsService
         $byServer = $toolUsage->groupBy('server_name')->map(function ($items, $serverName) {
             $successful = $items->where('execution_status', '=', 'success')->count();
             $total = $items->count();
+            $avgTime = $items->avg('execution_time');
+            $totalCost = $items->sum('cost_estimate');
 
             return [
                 'server_name' => $serverName,
@@ -237,8 +254,8 @@ class APIPerformanceAnalyticsService
                 'successful_requests' => $successful,
                 'failed_requests' => $total - $successful,
                 'success_rate' => $total > 0 ? round(($successful / $total) * 100, 2) : 0,
-                'average_execution_time' => round($items->avg('execution_time'), 3),
-                'total_cost' => round($items->sum('cost_estimate'), 6),
+                'average_execution_time' => round(is_numeric($avgTime) ? (float) $avgTime : 0.0, 3),
+                'total_cost' => round(is_numeric($totalCost) ? (float) $totalCost : 0.0, 6),
             ];
         })->values()->all();
 
@@ -246,6 +263,8 @@ class APIPerformanceAnalyticsService
         $byTool = $toolUsage->groupBy('tool_name')->map(function ($items, $toolName) {
             $successful = $items->where('execution_status', '=', 'success')->count();
             $total = $items->count();
+            $avgTime = $items->avg('execution_time');
+            $totalCost = $items->sum('cost_estimate');
 
             return [
                 'tool_name' => $toolName,
@@ -253,8 +272,8 @@ class APIPerformanceAnalyticsService
                 'total_requests' => $total,
                 'successful_requests' => $successful,
                 'success_rate' => $total > 0 ? round(($successful / $total) * 100, 2) : 0,
-                'average_execution_time' => round($items->avg('execution_time'), 3),
-                'total_cost' => round($items->sum('cost_estimate'), 6),
+                'average_execution_time' => round(is_numeric($avgTime) ? (float) $avgTime : 0.0, 3),
+                'total_cost' => round(is_numeric($totalCost) ? (float) $totalCost : 0.0, 6),
             ];
         })->values()->all();
 
@@ -279,14 +298,17 @@ class APIPerformanceAnalyticsService
     /**
      * Get performance trends
      *
+     * @param  int  $userId  The user ID
      * @param  array{start: \Carbon\Carbon, end: \Carbon\Carbon}  $dateRange
+     * @param  array{start: Carbon, end: Carbon}  $dateRange
      * @return array{
      *     response_time_trend: array<array{timestamp: string, average_response_time: float}>,
      *     success_rate_trend: array<array{timestamp: string, success_rate: float}>,
      *     request_volume_trend: array<array{timestamp: string, request_count: int}>
      * }
      */
-    protected function getPerformanceTrends(): array
+    protected function getPerformanceTrends(int $userId, array $dateRange): array
+    {
         $toolUsage = MCPToolUsage::forUser($userId)
             ->betweenDates($dateRange['start'], $dateRange['end'])
             ->get();
@@ -295,9 +317,11 @@ class APIPerformanceAnalyticsService
         $responseTimeTrend = $toolUsage->groupBy(function ($item) {
             return $item->executed_at->format('Y-m-d H:00:00');
         })->map(function ($items, $timestamp) {
+            $avgTime = $items->avg('execution_time');
+
             return [
                 'timestamp' => $timestamp,
-                'average_response_time' => round($items->avg('execution_time') * 1000, 2),
+                'average_response_time' => round((is_numeric($avgTime) ? (float) $avgTime : 0.0) * 1000, 2),
             ];
         })->values()->all();
 
@@ -332,7 +356,7 @@ class APIPerformanceAnalyticsService
     /**
      * Detect performance anomalies
      *
-     * @param  array{start: \Carbon\Carbon, end: \Carbon\Carbon}  $dateRange
+     * @param  array{start: Carbon, end: Carbon}  $dateRange
      * @return array<array{
      *     type: string,
      *     severity: string,
@@ -343,7 +367,8 @@ class APIPerformanceAnalyticsService
      *     threshold: float
      * }>
      */
-    protected function detectPerformanceAnomalies(): array
+    protected function detectPerformanceAnomalies(int $userId, array $dateRange): array
+    {
         $anomalies = [];
 
         // Check for response time anomalies
@@ -422,10 +447,12 @@ class APIPerformanceAnalyticsService
     /**
      * Generate performance recommendations
      *
-     * @param  array{start: \Carbon\Carbon, end: \Carbon\Carbon}  $dateRange
+     * @param  int  $userId  The user ID
+     * @param  array{start: Carbon, end: Carbon}  $dateRange
      * @return array<string>
      */
-    protected function generatePerformanceRecommendations(): array
+    protected function generatePerformanceRecommendations(int $userId, array $dateRange): array
+    {
         $recommendations = [];
 
         // Check API response times
@@ -476,24 +503,28 @@ class APIPerformanceAnalyticsService
     /**
      * Get date range for period
      *
-     * @return array{start: \Carbon\Carbon, end: \Carbon\Carbon}
+     * @param  string  $period  The period identifier
+     * @return array{start: Carbon, end: Carbon}
      */
-    protected function getDateRange(): array
+    protected function getDateRange(string $period): array
+    {
         return match ($period) {
-            'hour' => ['start' => now()->subHour(), 'end' => now()],
-            'day' => ['start' => now()->startOfDay(), 'end' => now()],
-            'week' => ['start' => now()->startOfWeek(), 'end' => now()],
-            'month' => ['start' => now()->startOfMonth(), 'end' => now()],
-            default => ['start' => now()->startOfDay(), 'end' => now()],
+            'hour' => ['start' => Carbon::now()->subHour(), 'end' => Carbon::now()],
+            'day' => ['start' => Carbon::now()->startOfDay(), 'end' => Carbon::now()],
+            'week' => ['start' => Carbon::now()->startOfWeek(), 'end' => Carbon::now()],
+            'month' => ['start' => Carbon::now()->startOfMonth(), 'end' => Carbon::now()],
+            default => ['start' => Carbon::now()->startOfDay(), 'end' => Carbon::now()],
         };
     }
 
     /**
      * Get API response times from Redis
      *
+     * @param  string  $apiName  The API name
      * @return array<float>
      */
-    protected function getApiResponseTimes(): array
+    protected function getApiResponseTimes(string $apiName): array
+    {
         $key = "api_response_time:{$apiName}";
 
         try {
@@ -538,7 +569,7 @@ class APIPerformanceAnalyticsService
     /**
      * Calculate API availability percentage
      *
-     * @param  array{start: \Carbon\Carbon, end: \Carbon\Carbon}  $dateRange
+     * @param  array{start: Carbon, end: Carbon}  $dateRange
      */
     protected function calculateAPIAvailability(string $apiName, array $dateRange): float
     {
@@ -573,13 +604,19 @@ class APIPerformanceAnalyticsService
 
         // Export summary metrics
         foreach ($analytics['summary'] as $metric => $value) {
-            $csv .= sprintf("%s,%s,%s\n", now()->toIso8601String(), $metric, $value);
+            $valueStr = is_scalar($value) ? (string) $value : json_encode($value);
+            $csv .= sprintf("%s,%s,%s\n", now()->toIso8601String(), $metric, $valueStr);
         }
 
         // Export API performance
-        foreach ($analytics['api_performance'] as $apiName => $metrics) {
-            foreach ($metrics as $metric => $value) {
-                $csv .= sprintf("%s,%s_%s,%s\n", now()->toIso8601String(), $apiName, $metric, $value);
+        if (is_array($analytics['api_performance'])) {
+            foreach ($analytics['api_performance'] as $apiName => $metrics) {
+                if (is_array($metrics)) {
+                    foreach ($metrics as $metric => $value) {
+                        $valueStr = is_scalar($value) ? (string) $value : json_encode($value);
+                        $csv .= sprintf("%s,%s_%s,%s\n", now()->toIso8601String(), $apiName, $metric, $valueStr);
+                    }
+                }
             }
         }
 

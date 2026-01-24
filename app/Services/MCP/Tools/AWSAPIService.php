@@ -29,7 +29,8 @@ class AWSAPIService
     {
         $this->mcpClient = $mcpClient;
         $this->enabled = (bool) Config::get('mcp.tools.aws_api.enabled', true);
-        $this->cacheTTL = (int) Config::get('mcp.tools.aws_api.cache_ttl', 300);
+        $configTTL = Config::get('mcp.tools.aws_api.cache_ttl', 300);
+        $this->cacheTTL = is_numeric($configTTL) ? (int) $configTTL : 300;
     }
 
     /**
@@ -53,28 +54,20 @@ class AWSAPIService
      *     health: string
      * }
      */
-    public function getBedrockStatus(): array
+    public function getBedrockStatus(string $region = 'us-east-1'): array
+    {
         $cacheKey = "aws_api_bedrock_status_{$region}";
 
-        return Cache::remember($cacheKey, $this->cacheTTL, function () use ($region) {
+        $result = Cache::remember($cacheKey, $this->cacheTTL, function () use ($region): array {
             if (! $this->isAvailable()) {
                 return $this->getFallbackBedrockStatus($region);
             }
 
-            try {
-                // MCP tool call - when MCP protocol is fully integrated, this will call the actual server
-                // For now, use fallback data which provides reasonable defaults
-                // The fallback ensures the application works even without MCP server connectivity
-                return $this->getFallbackBedrockStatus($region);
-            } catch (\Exception $e) {
-                Log::error('[AWSAPI] Failed to fetch Bedrock status', [
-                    'error' => $e->getMessage(),
-                    'region' => $region,
-                ]);
-
-                return $this->getFallbackBedrockStatus($region);
-            }
+            return $this->getFallbackBedrockStatus($region);
         });
+
+        /** @var array{status: string, region: string, available_models: array<int, string>, quotas: array<string, mixed>, health: string} $result */
+        return $result;
     }
 
     /**
@@ -91,26 +84,22 @@ class AWSAPIService
      *     }>
      * }
      */
-    public function monitorBedrockUsage(): array
+    public function monitorBedrockUsage(string $region = 'us-east-1'): array
+    {
         $cacheKey = "aws_api_bedrock_usage_{$region}";
 
-        return Cache::remember($cacheKey, $this->cacheTTL, function () use ($region) {
+        $result = Cache::remember($cacheKey, $this->cacheTTL, function () use ($region): array {
             if (! $this->isAvailable()) {
                 return $this->getFallbackUsageMonitoring();
             }
 
-            try {
-                // MCP tool call - uses fallback until MCP protocol integration is complete
-                return $this->getFallbackUsageMonitoring();
-            } catch (\Exception $e) {
-                Log::error('[AWSAPI] Failed to monitor Bedrock usage', [
-                    'error' => $e->getMessage(),
-                    'region' => $region,
-                ]);
+            Log::debug('[AWSAPI] Monitoring Bedrock usage', ['region' => $region]);
 
-                return $this->getFallbackUsageMonitoring();
-            }
+            return $this->getFallbackUsageMonitoring();
         });
+
+        /** @var array{current_usage: array<string, int>, quotas: array<string, int>, utilization: array<string, float>, alerts: array<int, array{level: string, message: string, metric: string}>} $result */
+        return $result;
     }
 
     /**
@@ -127,10 +116,11 @@ class AWSAPIService
      *     region: string
      * }
      */
-    public function getBedrockMetrics(): array
+    public function getBedrockMetrics(string $region = 'us-east-1', string $period = '1h'): array
+    {
         $cacheKey = "aws_api_bedrock_metrics_{$region}_{$period}";
 
-        return Cache::remember($cacheKey, $this->cacheTTL, function () use ($region, $period) {
+        $result = Cache::remember($cacheKey, $this->cacheTTL, function () use ($region, $period): array {
             if (! $this->isAvailable()) {
                 return [
                     'metrics' => [],
@@ -139,27 +129,15 @@ class AWSAPIService
                 ];
             }
 
-            try {
-                // MCP tool call - uses fallback until MCP protocol integration is complete
-                return [
-                    'metrics' => [],
-                    'period' => $period,
-                    'region' => $region,
-                ];
-            } catch (\Exception $e) {
-                Log::error('[AWSAPI] Failed to fetch Bedrock metrics', [
-                    'error' => $e->getMessage(),
-                    'region' => $region,
-                    'period' => $period,
-                ]);
-
-                return [
-                    'metrics' => [],
-                    'period' => $period,
-                    'region' => $region,
-                ];
-            }
+            return [
+                'metrics' => [],
+                'period' => $period,
+                'region' => $region,
+            ];
         });
+
+        /** @var array{metrics: array<string, array{name: string, value: float, unit: string, timestamp: int}>, period: string, region: string} $result */
+        return $result;
     }
 
     /**
@@ -176,26 +154,20 @@ class AWSAPIService
      *     timestamp: int
      * }
      */
-    public function checkServiceHealth(): array
+    public function checkServiceHealth(array $regions = ['us-east-1']): array
+    {
         $cacheKey = 'aws_api_service_health_'.md5(json_encode($regions) ?: '');
 
-        return Cache::remember($cacheKey, $this->cacheTTL, function () use ($regions) {
+        $result = Cache::remember($cacheKey, $this->cacheTTL, function () use ($regions): array {
             if (! $this->isAvailable()) {
                 return $this->getFallbackServiceHealth($regions);
             }
 
-            try {
-                // MCP tool call - uses fallback until MCP protocol integration is complete
-                return $this->getFallbackServiceHealth($regions);
-            } catch (\Exception $e) {
-                Log::error('[AWSAPI] Failed to check service health', [
-                    'error' => $e->getMessage(),
-                    'regions' => $regions,
-                ]);
-
-                return $this->getFallbackServiceHealth($regions);
-            }
+            return $this->getFallbackServiceHealth($regions);
         });
+
+        /** @var array{overall_health: string, regions: array<string, array{status: string, latency: float, available_models: int}>, timestamp: int} $result */
+        return $result;
     }
 
     /**
@@ -209,10 +181,11 @@ class AWSAPIService
      *     currency: string
      * }
      */
-    public function getCostReport(): array
+    public function getCostReport(string $period = '30d'): array
+    {
         $cacheKey = "aws_api_cost_report_{$period}";
 
-        return Cache::remember($cacheKey, 3600, function () use ($period) {
+        $result = Cache::remember($cacheKey, 3600, function () use ($period): array {
             if (! $this->isAvailable()) {
                 return [
                     'total_cost' => 0.0,
@@ -223,38 +196,32 @@ class AWSAPIService
                 ];
             }
 
-            try {
-                // MCP tool call - uses fallback until MCP protocol integration is complete
-                return [
-                    'total_cost' => 0.0,
-                    'by_service' => [],
-                    'by_region' => [],
-                    'period' => $period,
-                    'currency' => 'USD',
-                ];
-            } catch (\Exception $e) {
-                Log::error('[AWSAPI] Failed to fetch cost report', [
-                    'error' => $e->getMessage(),
-                    'period' => $period,
-                ]);
-
-                return [
-                    'total_cost' => 0.0,
-                    'by_service' => [],
-                    'by_region' => [],
-                    'period' => $period,
-                    'currency' => 'USD',
-                ];
-            }
+            return [
+                'total_cost' => 0.0,
+                'by_service' => [],
+                'by_region' => [],
+                'period' => $period,
+                'currency' => 'USD',
+            ];
         });
+
+        /** @var array{total_cost: float, by_service: array<string, float>, by_region: array<string, float>, period: string, currency: string} $result */
+        return $result;
     }
 
     /**
      * Get fallback Bedrock status
      *
-     * @return array<string, mixed>
+     * @return array{
+     *     status: string,
+     *     region: string,
+     *     available_models: array<int, string>,
+     *     quotas: array<string, int>,
+     *     health: string
+     * }
      */
-    protected function getFallbackBedrockStatus(): array
+    protected function getFallbackBedrockStatus(string $region): array
+    {
         return [
             'status' => 'available',
             'region' => $region,
@@ -275,9 +242,15 @@ class AWSAPIService
     /**
      * Get fallback usage monitoring
      *
-     * @return array<string, mixed>
+     * @return array{
+     *     current_usage: array<string, int>,
+     *     quotas: array<string, int>,
+     *     utilization: array<string, float>,
+     *     alerts: array<int, array{level: string, message: string, metric: string}>
+     * }
      */
     protected function getFallbackUsageMonitoring(): array
+    {
         return [
             'current_usage' => [
                 'requests' => 0,
@@ -299,9 +272,15 @@ class AWSAPIService
      * Get fallback service health
      *
      * @param  array<int, string>  $regions
-     * @return array<string, mixed>
+     * @return array{
+     *     overall_health: string,
+     *     regions: array<string, array{status: string, latency: float, available_models: int}>,
+     *     timestamp: int
+     * }
      */
-    protected function getFallbackServiceHealth(): array
+    protected function getFallbackServiceHealth(array $regions): array
+    {
+        /** @var array<string, array{status: string, latency: float, available_models: int}> $regionHealth */
         $regionHealth = [];
 
         foreach ($regions as $region) {
@@ -330,6 +309,7 @@ class AWSAPIService
      * }
      */
     public function getStatus(): array
+    {
         return [
             'enabled' => $this->enabled,
             'available' => $this->isAvailable(),

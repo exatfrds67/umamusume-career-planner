@@ -22,11 +22,17 @@ class EloquentCharacterRepository implements CharacterRepositoryInterface
         return Character::where('user_id', $userId)->get();
     }
 
+    /**
+     * @param  array<string, mixed>  $attributes
+     */
     public function store(array $attributes): Character
     {
         return Character::create($attributes);
     }
 
+    /**
+     * @param  array<string, mixed>  $attributes
+     */
     public function update(Character $character, array $attributes): bool
     {
         return $character->update($attributes);

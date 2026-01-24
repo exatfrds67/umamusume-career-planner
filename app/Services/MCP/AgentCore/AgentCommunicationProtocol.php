@@ -33,7 +33,8 @@ class AgentCommunicationProtocol
      *     delivered_at: string
      * }
      */
-    public function sendMessage(): array
+    public function sendMessage(string $fromAgentId, string $toAgentId, array $message): array
+    {
         $messageId = $this->generateMessageId();
 
         $envelope = [
@@ -83,7 +84,8 @@ class AgentCommunicationProtocol
      *     broadcast_at: string
      * }
      */
-    public function broadcastMessage(): array
+    public function broadcastMessage(array $message): array
+    {
         $messageId = $this->generateMessageId();
 
         $envelope = [
@@ -126,7 +128,8 @@ class AgentCommunicationProtocol
      *
      * @return array<int, array<string, mixed>>
      */
-    public function receiveMessages(): array
+    public function receiveMessages(string $agentId): array
+    {
         $messages = [];
 
         // Get direct messages
@@ -151,14 +154,14 @@ class AgentCommunicationProtocol
     /**
      * Share data in shared memory
      *
-     * @param  mixed  $data
      * @return array{
      *     key: string,
      *     status: string,
      *     stored_at: string
      * }
      */
-    public function shareData(): array
+    public function shareData(string $agentId, string $key, mixed $data): array
+    {
         $fullKey = "{$agentId}:{$key}";
 
         $this->sharedMemory[$fullKey] = [
@@ -208,8 +211,8 @@ class AgentCommunicationProtocol
         // Try cache
         /** @var array<string, mixed>|null $cached */
         $cached = Cache::get("agent_shared_{$fullKey}");
-        if ($cached && is_array($cached)) {
-            return is_array($cached) && isset($cached['data']) ? $cached['data'] : null;
+        if (is_array($cached) && isset($cached['data'])) {
+            return $cached['data'];
         }
 
         return null;
@@ -225,7 +228,8 @@ class AgentCommunicationProtocol
      *     requested_at: string
      * }
      */
-    public function requestCollaboration(): array
+    public function requestCollaboration(string $fromAgentId, string $toAgentId, array $request): array
+    {
         $requestId = $this->generateMessageId();
 
         $collaborationRequest = [
@@ -264,7 +268,8 @@ class AgentCommunicationProtocol
      *     responded_at: string
      * }
      */
-    public function respondToCollaboration(): array
+    public function respondToCollaboration(string $requestId, string $agentId, array $response): array
+    {
         $collaborationResponse = [
             'request_id' => $requestId,
             'type' => 'collaboration_response',
@@ -303,7 +308,8 @@ class AgentCommunicationProtocol
      *     created_at: string
      * }
      */
-    public function createSharedContext(): array
+    public function createSharedContext(string $workflowId, array $initialContext = []): array
+    {
         $contextId = "context_{$workflowId}";
 
         $context = [
@@ -345,12 +351,13 @@ class AgentCommunicationProtocol
      *     updated_at: string
      * }
      */
-    public function updateSharedContext(): array
+    public function updateSharedContext(string $contextId, array $updates): array
+    {
         if (! isset($this->sharedMemory[$contextId])) {
             // Try to load from cache
             /** @var array<string, mixed>|null $cached */
             $cached = Cache::get("agent_context_{$contextId}");
-            if ($cached && is_array($cached)) {
+            if (is_array($cached)) {
                 $this->sharedMemory[$contextId] = $cached;
             } else {
                 throw new \RuntimeException("Context not found: {$contextId}");
@@ -358,10 +365,11 @@ class AgentCommunicationProtocol
         }
 
         // Merge updates
-        $this->sharedMemory[$contextId]['data'] = array_merge(
-            $this->sharedMemory[$contextId]['data'],
-            $updates
-        );
+        /** @var array<string, mixed> $existingData */
+        $existingData = is_array($this->sharedMemory[$contextId]['data'])
+            ? $this->sharedMemory[$contextId]['data']
+            : [];
+        $this->sharedMemory[$contextId]['data'] = array_merge($existingData, $updates);
         $this->sharedMemory[$contextId]['updated_at'] = now()->toIso8601String();
 
         // Update cache
@@ -378,7 +386,7 @@ class AgentCommunicationProtocol
         return [
             'context_id' => $contextId,
             'status' => 'updated',
-            'updated_at' => $this->sharedMemory[$contextId]['updated_at'],
+            'updated_at' => (string) $this->sharedMemory[$contextId]['updated_at'],
         ];
     }
 
@@ -390,14 +398,20 @@ class AgentCommunicationProtocol
     public function getSharedContext(string $contextId): ?array
     {
         if (isset($this->sharedMemory[$contextId])) {
-            return $this->sharedMemory[$contextId]['data'];
+            /** @var array<string, mixed>|null $data */
+            $data = $this->sharedMemory[$contextId]['data'] ?? null;
+
+            return is_array($data) ? $data : null;
         }
 
         // Try cache
         /** @var array<string, mixed>|null $cached */
         $cached = Cache::get("agent_context_{$contextId}");
-        if ($cached && is_array($cached)) {
-            return is_array($cached) && isset($cached['data']) ? $cached['data'] : null;
+        if (is_array($cached) && isset($cached['data']) && is_array($cached['data'])) {
+            /** @var array<string, mixed> $cachedData */
+            $cachedData = $cached['data'];
+
+            return $cachedData;
         }
 
         return null;
@@ -453,9 +467,10 @@ class AgentCommunicationProtocol
      * }
      */
     public function getStatistics(): array
+    {
         $totalMessages = 0;
         foreach ($this->messageQueues as $queue) {
-            $totalMessages = ($totalMessages ?? 0) + count($queue);
+            $totalMessages += count($queue);
         }
 
         return [

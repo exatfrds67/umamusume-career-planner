@@ -12,7 +12,8 @@ class CharacterStateService
      *
      * @return array{recovered: int, result: string, new_energy: int, new_mood: string} Result of the rest action (recovered amount, success/fail/great success)
      */
-    public function rest(): array
+    public function rest(Character $character): array
+    {
         // Implement proper RNG logic with Success/Failure/Great Success outcomes
         // 0-60 energy: High chance of success (50 recovery base)
         // 60-80 energy: Moderate chance (30 recovery base)
@@ -61,8 +62,8 @@ class CharacterStateService
         return [
             'recovered' => $recovery,
             'result' => $resultType,
-            'new_energy' => $character->energy_level,
-            'new_mood' => $character->mood_status,
+            'new_energy' => (int) $character->energy_level,
+            'new_mood' => (string) $character->mood_status,
         ];
     }
 
@@ -115,8 +116,11 @@ class CharacterStateService
      *
      * @return array{turn: int, stage: string, stage_changed: bool} Information about the turn progression
      */
-    public function progressTurn(): array
-        $character->current_turn++;
+    public function progressTurn(Character $character): array
+    {
+        $currentTurn = (int) $character->current_turn;
+        $currentTurn++;
+        $character->current_turn = $currentTurn;
 
         // Scenario lasts 3 years (Junior, Classic, Senior) + URA
         // Year 1: Junior (Tu 1-24)
@@ -124,14 +128,14 @@ class CharacterStateService
         // Year 3: Senior (Tu 49-72)
         // URA: (Tu 73+)
 
-        $oldStage = $character->career_stage;
+        $oldStage = (string) $character->career_stage;
         $newStage = $oldStage;
 
-        if ($character->current_turn >= 73) {
+        if ($currentTurn >= 73) {
             $newStage = 'ura'; // Custom stage for finale
-        } elseif ($character->current_turn >= 49) {
+        } elseif ($currentTurn >= 49) {
             $newStage = 'senior';
-        } elseif ($character->current_turn >= 25) {
+        } elseif ($currentTurn >= 25) {
             $newStage = 'classic';
         } else {
             $newStage = 'junior';
@@ -144,8 +148,8 @@ class CharacterStateService
         $character->save();
 
         return [
-            'turn' => $character->current_turn,
-            'stage' => $character->career_stage,
+            'turn' => $currentTurn,
+            'stage' => $newStage,
             'stage_changed' => $newStage !== $oldStage,
         ];
     }
@@ -155,7 +159,8 @@ class CharacterStateService
      *
      * @return array{added: array<int, string>, removed: array<int, string>} Added/Removed conditions
      */
-    public function checkCondition(): array
+    public function checkCondition(Character $character): array
+    {
         /** @var array<int, string> $added */
         $added = [];
         /** @var array<int, string> $removed */
@@ -170,7 +175,7 @@ class CharacterStateService
         // Here we'll just simulate a sanity check.
 
         // If energy is max, remove "Tired" if present
-        if ($character->energy_level > 80) {
+        if ((int) $character->energy_level > 80) {
             if (($key = array_search('tired', $conditions)) !== false) {
                 unset($conditions[$key]);
                 $removed[] = 'tired';

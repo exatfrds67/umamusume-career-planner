@@ -81,7 +81,8 @@ class SkillHintService
      */
     public function getHintsForSkill(Character $character, Skill $skill): Collection
     {
-        return SkillHint::where('character_id', $character->id)
+        return SkillHint::query()
+            ->where('character_id', $character->id)
             ->where('skill_id', $skill->id)
             ->orderBy('turn_obtained')
             ->get();
@@ -94,7 +95,8 @@ class SkillHintService
      */
     public function getUnusedHintsForSkill(Character $character, Skill $skill): Collection
     {
-        return SkillHint::where('character_id', $character->id)
+        return SkillHint::query()
+            ->where('character_id', $character->id)
             ->where('skill_id', $skill->id)
             ->unused()
             ->orderBy('turn_obtained')
@@ -133,43 +135,41 @@ class SkillHintService
     /**
      * Get cost breakdown for a skill with current hints.
      *
-     * @return array{
-     *   skill_id: int,
-     *   skill_name: string,
-     *   base_sp_cost: int,
-     *   hint_count: int,
-     *   discount_percentage: float,
-     *   final_sp_cost: int,
-     *   sp_saved: int,
-     *   max_discount_reached: bool,
-     *   hints: array<int, array{id: int, source_type: string, source_name: string, turn_obtained: int, guaranteed: bool}>
-     * }
+     * @return array<string, mixed>
      */
-    public function getCostBreakdown(): array
+    public function getCostBreakdown(?Character $character = null, ?Skill $skill = null): array
+    {
+        if ($character === null || $skill === null) {
+            return [];
+        }
+
         $hints = $this->getUnusedHintsForSkill($character, $skill);
         $hintCount = $hints->count();
         $discountPercentage = $this->calculateDiscountPercentage($hintCount);
         $finalCost = $this->calculateFinalCost($skill, $hintCount);
         $spSaved = $this->calculateSpSaved($skill, $hintCount);
 
+        /** @var array<int, array{id: int, source_type: string, source_name: string, turn_obtained: int, guaranteed: bool}> $hintsArray */
+        $hintsArray = $hints->map(function (SkillHint $hint): array {
+            return [
+                'id' => $hint->id,
+                'source_type' => $hint->source_type,
+                'source_name' => $hint->source_name,
+                'turn_obtained' => $hint->turn_obtained,
+                'guaranteed' => $hint->guaranteed_hint,
+            ];
+        })->toArray();
+
         return [
             'skill_id' => $skill->id,
             'skill_name' => $skill->name,
             'base_sp_cost' => $skill->base_sp_cost,
             'hint_count' => $hintCount,
-            'discount_percentage' => (float) $discountPercentage, // Ensure float type
+            'discount_percentage' => (float) $discountPercentage,
             'final_sp_cost' => $finalCost,
             'sp_saved' => $spSaved,
             'max_discount_reached' => $hintCount >= self::MAX_DISCOUNT_HINTS,
-            'hints' => $hints->map(function ($hint) {
-                return [
-                    'id' => $hint->id,
-                    'source_type' => $hint->source_type,
-                    'source_name' => $hint->source_name,
-                    'turn_obtained' => $hint->turn_obtained,
-                    'guaranteed' => $hint->guaranteed_hint,
-                ];
-            })->toArray(),
+            'hints' => $hintsArray,
         ];
     }
 
@@ -210,7 +210,11 @@ class SkillHintService
      *   max_discount_reached: bool
      * }>
      */
-    public function predictHintOpportunities(): array
+    public function predictHintOpportunities(
+        Character $character,
+        string $trainingType,
+        Collection $supportCards
+    ): array {
         $opportunities = [];
 
         foreach ($supportCards as $supportCard) {
@@ -218,24 +222,28 @@ class SkillHintService
             $providedSkills = $this->getSkillsProvidedByCard($supportCard, $trainingType);
 
             foreach ($providedSkills as $skillData) {
-                $skill = Skill::find($skillData['skill_id']);
-                if (! $skill) {
+                if (! isset($skillData['skill_id']) || ! is_int($skillData['skill_id'])) {
                     continue;
                 }
 
-                $existingHints = $this->getHintsForSkill($character, $skill);
-                $isGuaranteed = $this->isGuaranteedHint($supportCard, $trainingType, $skill);
+                $skillModel = Skill::query()->find($skillData['skill_id']);
+                if (! $skillModel instanceof Skill) {
+                    continue;
+                }
+
+                $existingHints = $this->getHintsForSkill($character, $skillModel);
+                $isGuaranteed = $this->isGuaranteedHint($supportCard, $trainingType, $skillModel);
 
                 $opportunities[] = [
-                    'skill_id' => $skill->id,
-                    'skill_name' => $skill->name,
+                    'skill_id' => $skillModel->id,
+                    'skill_name' => $skillModel->name,
                     'support_card_id' => $supportCard->id,
                     'support_card_name' => $supportCard->name,
                     'guaranteed' => $isGuaranteed,
-                    'probability' => $isGuaranteed ? 100.0 : $this->calculateHintProbability($supportCard, $skill),
+                    'probability' => $isGuaranteed ? 100.0 : $this->calculateHintProbability($supportCard, $skillModel),
                     'current_hints' => $existingHints->count(),
                     'potential_discount' => $this->calculateDiscountPercentage($existingHints->count() + 1),
-                    'sp_savings' => $this->calculateSpSaved($skill, $existingHints->count() + 1),
+                    'sp_savings' => $this->calculateSpSaved($skillModel, $existingHints->count() + 1),
                     'max_discount_reached' => $existingHints->count() >= self::MAX_DISCOUNT_HINTS,
                 ];
             }
@@ -263,7 +271,8 @@ class SkillHintService
         // 2. Support card is at high friendship level (80%+)
         // 3. Skill is in the card's primary skill provision list
 
-        $specializationMatches = strtolower($supportCard->specialization) === strtolower($trainingType);
+        $specialization = $supportCard->specialization ?? '';
+        $specializationMatches = strtolower($specialization) === strtolower($trainingType);
         $highFriendship = $supportCard->friendship_level >= 80;
         $isPrimarySkill = $this->isPrimarySkillForCard($supportCard, $skill);
 
@@ -301,7 +310,8 @@ class SkillHintService
      *
      * @return array<int, array<string, mixed>>
      */
-    private function getSkillsProvidedByCard(): array
+    private function getSkillsProvidedByCard(SupportCardDefinition $supportCard, string $trainingType): array
+    {
         $supportCardSources = $supportCard->skill_provision ?? [];
 
         if (empty($supportCardSources)) {
@@ -309,9 +319,13 @@ class SkillHintService
         }
 
         // Filter skills that match the training type
-        return array_filter($supportCardSources, function ($skillData) use ($trainingType) {
-            return isset($skillData['training_type']) &&
-                strtolower($skillData['training_type']) === strtolower($trainingType);
+        return array_filter($supportCardSources, function (array $skillData) use ($trainingType): bool {
+            if (! isset($skillData['training_type'])) {
+                return false;
+            }
+            $skillTrainingType = $skillData['training_type'];
+
+            return is_string($skillTrainingType) && strtolower($skillTrainingType) === strtolower($trainingType);
         });
     }
 
@@ -341,7 +355,12 @@ class SkillHintService
      * @param  Collection<int, Skill>  $targetSkills
      * @return array<int, array{skill_id: int, skill_name: string, status: string, recommendation: string, priority: string, current_hints: int, final_cost?: int, potential_savings?: int}>
      */
-    public function getHintCollectionStrategy(): array
+    public function getHintCollectionStrategy(?Character $character = null, ?Collection $targetSkills = null): array
+    {
+        if ($character === null || $targetSkills === null) {
+            return [];
+        }
+
         $strategies = [];
 
         foreach ($targetSkills as $skill) {
@@ -383,8 +402,13 @@ class SkillHintService
 
         // Sort by priority
         $priorityOrder = ['high' => 3, 'medium' => 2, 'low' => 1];
-        usort($strategies, function ($a, $b) use ($priorityOrder) {
-            return ($priorityOrder[$b['priority']] ?? 0) <=> ($priorityOrder[$a['priority']] ?? 0);
+        usort($strategies, function (array $a, array $b) use ($priorityOrder): int {
+            /** @var string $priorityA */
+            $priorityA = $a['priority'];
+            /** @var string $priorityB */
+            $priorityB = $b['priority'];
+
+            return $priorityOrder[$priorityB] <=> $priorityOrder[$priorityA];
         });
 
         return $strategies;
@@ -395,13 +419,33 @@ class SkillHintService
      *
      * @return array<string, mixed>
      */
-    public function getHintStatistics(): array
-        $allHints = SkillHint::where('character_id', $character->id)->with('skill')->get();
+    public function getHintStatistics(?Character $character = null): array
+    {
+        if ($character === null) {
+            return [
+                'total_hints' => 0,
+                'unused_hints' => 0,
+                'used_hints' => 0,
+                'guaranteed_hints' => 0,
+                'source_distribution' => [],
+                'total_sp_saved' => 0,
+                'skills_with_max_discount' => 0,
+                'average_hints_per_skill' => 0,
+            ];
+        }
+
+        $allHints = SkillHint::query()
+            ->where('character_id', $character->id)
+            ->with('skill')
+            ->get();
         $unusedHints = $allHints->where('is_used', false);
         $usedHints = $allHints->where('is_used', true);
 
         // Group by source type
-        $sourceTypeDistribution = $allHints->groupBy('source_type')->map->count();
+        $sourceTypeDistribution = $allHints
+            ->groupBy('source_type')
+            ->map(fn (Collection $group) => $group->count())
+            ->toArray();
 
         // Calculate total SP saved
         $totalSpSaved = $usedHints->sum(function ($hint) {
@@ -420,17 +464,22 @@ class SkillHintService
             })
             ->count();
 
+        $averageHintsPerSkill = $allHints->count() > 0
+            ? round(
+                $allHints->groupBy('skill_id')->map(fn (Collection $group) => $group->count())->avg() ?? 0,
+                2
+            )
+            : 0;
+
         return [
             'total_hints' => $allHints->count(),
             'unused_hints' => $unusedHints->count(),
             'used_hints' => $usedHints->count(),
             'guaranteed_hints' => $allHints->where('guaranteed_hint', true)->count(),
-            'source_distribution' => $sourceTypeDistribution->toArray(),
+            'source_distribution' => $sourceTypeDistribution,
             'total_sp_saved' => (int) $totalSpSaved,
             'skills_with_max_discount' => $skillsWithMaxDiscount,
-            'average_hints_per_skill' => $allHints->count() > 0
-                ? round($allHints->groupBy('skill_id')->map->count()->avg(), 2)
-                : 0,
+            'average_hints_per_skill' => $averageHintsPerSkill,
         ];
     }
 }

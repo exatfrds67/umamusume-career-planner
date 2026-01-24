@@ -61,7 +61,7 @@ class DataOperationHistoryService
      *
      * @param  int  $userId  User ID
      * @param  string  $operationType  Type of operation
-     * @param  array  $metadata  Operation metadata
+     * @param  array<string, mixed>  $metadata  Operation metadata
      * @return string Operation ID
      */
     public function logOperationStart(int $userId, string $operationType, array $metadata = []): string
@@ -114,7 +114,7 @@ class DataOperationHistoryService
      *
      * @param  string  $operationId  Operation ID
      * @param  int  $progress  Progress percentage (0-100)
-     * @param  array  $details  Progress details
+     * @param  array<string, mixed>  $details  Progress details
      */
     public function logOperationProgress(string $operationId, int $progress, array $details = []): void
     {
@@ -149,7 +149,7 @@ class DataOperationHistoryService
      * @param  int  $userId  User ID
      * @param  string  $operationType  Type of operation
      * @param  bool  $success  Whether operation succeeded
-     * @param  array  $results  Operation results
+     * @param  array<string, mixed>  $results  Operation results
      */
     public function logOperationComplete(
         string $operationId,
@@ -201,12 +201,13 @@ class DataOperationHistoryService
      * Get operation history with filtering and pagination
      *
      * @param  int  $userId  User ID
-     * @param  array  $filters  Filter options
+     * @param  array<string, mixed>  $filters  Filter options
      * @param  int  $page  Page number
      * @param  int  $perPage  Items per page
-     * @return array{data: array, pagination: array}
+     * @return array{data: array<int, array<string, mixed>>, pagination: array<string, int|bool>}
      */
-    public function getHistory(): array
+    public function getHistory(int $userId, array $filters = [], int $page = 1, int $perPage = 20): array
+    {
         try {
             $query = DB::table('ucp_system_logs')
                 ->where('log_category', '=', 'data_operation')
@@ -225,7 +226,7 @@ class DataOperationHistoryService
                 ]);
 
             // Apply filters
-            if (! empty($filters['operation_type'])) {
+            if (! empty($filters['operation_type']) && is_string($filters['operation_type'])) {
                 $query->where('event_type', 'like', $filters['operation_type'].'%');
             }
 
@@ -252,22 +253,27 @@ class DataOperationHistoryService
                 ->get();
 
             // Transform results
-            $data = $results->map(function ($row) {
+            /** @var array<int, array<string, mixed>> $data */
+            $data = $results->map(function ($row): array {
+                /** @var array<string, mixed> $contextData */
                 $contextData = json_decode($row->context_data, true) ?? [];
+                if (! is_array($contextData)) {
+                    $contextData = [];
+                }
 
                 return [
                     'id' => $row->id,
-                    'operation_id' => (is_array($contextData) && isset($contextData['operation_id']) ? $contextData['operation_id'] : null),
-                    'operation_type' => $contextData['operation_type'] ?? $this->extractOperationType($row->event_type),
-                    'status' => $contextData['status'] ?? 'unknown',
+                    'operation_id' => (isset($contextData['operation_id']) ? $contextData['operation_id'] : null),
+                    'operation_type' => (isset($contextData['operation_type']) && is_string($contextData['operation_type'])) ? $contextData['operation_type'] : $this->extractOperationType($row->event_type),
+                    'status' => (isset($contextData['status']) && is_string($contextData['status'])) ? $contextData['status'] : 'unknown',
                     'message' => $row->message,
-                    'metadata' => $contextData['metadata'] ?? [],
-                    'results' => $contextData['results'] ?? [],
-                    'started_at' => (is_array($contextData) && isset($contextData['started_at']) ? $contextData['started_at'] : null),
-                    'completed_at' => (is_array($contextData) && isset($contextData['completed_at']) ? $contextData['completed_at'] : null),
+                    'metadata' => (isset($contextData['metadata']) && is_array($contextData['metadata'])) ? $contextData['metadata'] : [],
+                    'results' => (isset($contextData['results']) && is_array($contextData['results'])) ? $contextData['results'] : [],
+                    'started_at' => (isset($contextData['started_at']) ? $contextData['started_at'] : null),
+                    'completed_at' => (isset($contextData['completed_at']) ? $contextData['completed_at'] : null),
                     'created_at' => $row->created_at,
                 ];
-            })->toArray();
+            })->all();
 
             return [
                 'data' => $data,
@@ -303,8 +309,10 @@ class DataOperationHistoryService
      *
      * @param  int  $userId  User ID
      * @param  int  $limit  Number of operations to return
+     * @return array<int, array<string, mixed>>
      */
-    public function getRecentOperations(): array
+    public function getRecentOperations(int $userId, int $limit = 10): array
+    {
         try {
             $results = DB::table('ucp_system_logs')
                 ->where('log_category', '=', 'data_operation')
@@ -320,18 +328,25 @@ class DataOperationHistoryService
                 ->limit($limit)
                 ->get();
 
-            return $results->map(function ($row) {
+            /** @var array<int, array<string, mixed>> $result */
+            $result = $results->map(function ($row): array {
+                /** @var array<string, mixed> $contextData */
                 $contextData = json_decode($row->context_data, true) ?? [];
+                if (! is_array($contextData)) {
+                    $contextData = [];
+                }
 
                 return [
-                    'operation_id' => (is_array($contextData) && isset($contextData['operation_id']) ? $contextData['operation_id'] : null),
-                    'operation_type' => $contextData['operation_type'] ?? $this->extractOperationType($row->event_type),
-                    'status' => $contextData['status'] ?? 'unknown',
+                    'operation_id' => (isset($contextData['operation_id']) ? $contextData['operation_id'] : null),
+                    'operation_type' => (isset($contextData['operation_type']) && is_string($contextData['operation_type'])) ? $contextData['operation_type'] : $this->extractOperationType($row->event_type),
+                    'status' => (isset($contextData['status']) && is_string($contextData['status'])) ? $contextData['status'] : 'unknown',
                     'message' => $row->message,
-                    'results' => $contextData['results'] ?? [],
-                    'completed_at' => $contextData['completed_at'] ?? $row->created_at,
+                    'results' => (isset($contextData['results']) && is_array($contextData['results'])) ? $contextData['results'] : [],
+                    'completed_at' => isset($contextData['completed_at']) ? $contextData['completed_at'] : $row->created_at,
                 ];
-            })->toArray();
+            })->all();
+
+            return $result;
         } catch (\Exception $e) {
             Log::error('[DataOperationHistoryService] Failed to get recent operations', [
                 'user_id' => $userId,
@@ -346,12 +361,15 @@ class DataOperationHistoryService
      * Get operation statistics
      *
      * @param  int  $userId  User ID
-     * @param  string|null  $period  Time period (day, week, month, all)
+     * @param  string  $period  Time period (day, week, month, all)
+     * @return array<string, mixed>
      */
-    public function getStatistics(): array
+    public function getStatistics(int $userId, string $period = 'month'): array
+    {
         $cacheKey = self::CACHE_PREFIX."stats_{$userId}_{$period}";
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($userId, $period) {
+        /** @var array<string, mixed> $result */
+        $result = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($userId, $period): array {
             try {
                 $query = DB::table('ucp_system_logs')
                     ->where('log_category', '=', 'data_operation')
@@ -395,10 +413,25 @@ class DataOperationHistoryService
                 ];
 
                 foreach ($results as $row) {
+                    /** @var array<string, mixed> $contextData */
                     $contextData = json_decode($row->context_data, true) ?? [];
-                    $operationType = $contextData['operation_type'] ?? $this->extractOperationType($row->event_type);
-                    $status = $contextData['status'] ?? 'unknown';
-                    $recordsCount = $contextData['results']['imported'] ?? $contextData['results']['exported'] ?? $contextData['results']['record_count'] ?? 0;
+                    if (! is_array($contextData)) {
+                        $contextData = [];
+                    }
+                    $operationType = (isset($contextData['operation_type']) && is_string($contextData['operation_type'])) ? $contextData['operation_type'] : $this->extractOperationType($row->event_type);
+                    $status = (isset($contextData['status']) && is_string($contextData['status'])) ? $contextData['status'] : 'unknown';
+
+                    $recordsCount = 0;
+                    if (isset($contextData['results']) && is_array($contextData['results'])) {
+                        $resultsData = $contextData['results'];
+                        if (isset($resultsData['imported']) && is_numeric($resultsData['imported'])) {
+                            $recordsCount = (int) $resultsData['imported'];
+                        } elseif (isset($resultsData['exported']) && is_numeric($resultsData['exported'])) {
+                            $recordsCount = (int) $resultsData['exported'];
+                        } elseif (isset($resultsData['record_count']) && is_numeric($resultsData['record_count'])) {
+                            $recordsCount = (int) $resultsData['record_count'];
+                        }
+                    }
 
                     $stats['total_operations']++;
                     $stats['records_processed'] += $recordsCount;
@@ -442,14 +475,18 @@ class DataOperationHistoryService
                 ];
             }
         });
+
+        return $result;
     }
 
     /**
      * Get ongoing operations
      *
      * @param  int  $userId  User ID
+     * @return array<int, array<string, mixed>>
      */
-    public function getOngoingOperations(): array
+    public function getOngoingOperations(int $userId): array
+    {
         try {
             $results = DB::table('ucp_system_logs')
                 ->where('log_category', '=', 'data_operation')
@@ -479,6 +516,9 @@ class DataOperationHistoryService
                 ->where('created_at', '>=', now()->subHours(24))
                 ->pluck('context_data')
                 ->map(function ($data) {
+                    if (! is_string($data)) {
+                        return null;
+                    }
                     $decoded = json_decode($data, true);
 
                     return is_array($decoded) && isset($decoded['operation_id']) ? $decoded['operation_id'] : null;
@@ -487,22 +527,30 @@ class DataOperationHistoryService
                 ->toArray();
 
             return $results->filter(function ($row) use ($completedIds) {
+                /** @var array<string, mixed> $contextData */
                 $contextData = json_decode($row->context_data, true) ?? [];
-                $operationId = (is_array($contextData) && isset($contextData['operation_id']) ? $contextData['operation_id'] : null);
+                if (! is_array($contextData)) {
+                    $contextData = [];
+                }
+                $operationId = (isset($contextData['operation_id']) ? $contextData['operation_id'] : null);
 
                 return $operationId && ! in_array($operationId, $completedIds);
-            })->map(function ($row) {
+            })->map(function ($row): array {
+                /** @var array<string, mixed> $contextData */
                 $contextData = json_decode($row->context_data, true) ?? [];
+                if (! is_array($contextData)) {
+                    $contextData = [];
+                }
 
                 return [
-                    'operation_id' => (is_array($contextData) && isset($contextData['operation_id']) ? $contextData['operation_id'] : null),
-                    'operation_type' => $contextData['operation_type'] ?? $this->extractOperationType($row->event_type),
+                    'operation_id' => (isset($contextData['operation_id']) ? $contextData['operation_id'] : null),
+                    'operation_type' => (isset($contextData['operation_type']) && is_string($contextData['operation_type'])) ? $contextData['operation_type'] : $this->extractOperationType($row->event_type),
                     'status' => self::STATUS_IN_PROGRESS,
                     'message' => $row->message,
-                    'metadata' => $contextData['metadata'] ?? [],
-                    'started_at' => $contextData['started_at'] ?? $row->created_at,
+                    'metadata' => (isset($contextData['metadata']) && is_array($contextData['metadata'])) ? $contextData['metadata'] : [],
+                    'started_at' => isset($contextData['started_at']) ? $contextData['started_at'] : $row->created_at,
                 ];
-            })->values()->toArray();
+            })->values()->all();
         } catch (\Exception $e) {
             Log::error('[DataOperationHistoryService] Failed to get ongoing operations', [
                 'user_id' => $userId,

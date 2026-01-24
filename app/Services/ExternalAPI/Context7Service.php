@@ -81,13 +81,17 @@ class Context7Service
      *
      * @return array<int, array<string, mixed>>
      */
-    public function getApiCallContext(): array
+    public function getApiCallContext(string $apiName, string $endpoint): array
+    {
         $contextKey = $this->generateContextKey($apiName, $endpoint);
         $cacheKey = self::CACHE_PREFIX."api_call:{$contextKey}";
 
         $context = Cache::get($cacheKey, []);
 
-        return is_array($context) ? $context : [];
+        /** @var array<int, array<string, mixed>> $result */
+        $result = is_array($context) ? $context : [];
+
+        return $result;
     }
 
     /**
@@ -100,7 +104,9 @@ class Context7Service
         $cacheKey = self::CACHE_PREFIX."character:{$characterId}";
 
         $existingContext = Cache::get($cacheKey, []);
-        $mergedContext = array_merge($existingContext, $context);
+        /** @var array<string, mixed> $existingArray */
+        $existingArray = is_array($existingContext) ? $existingContext : [];
+        $mergedContext = array_merge($existingArray, $context);
 
         Cache::put($cacheKey, $mergedContext, self::CONTEXT_CACHE_TTL);
 
@@ -115,10 +121,16 @@ class Context7Service
      *
      * @return array<string, mixed>
      */
-    public function getCharacterContext(): array
+    public function getCharacterContext(int $characterId): array
+    {
         $cacheKey = self::CACHE_PREFIX."character:{$characterId}";
 
-        return Cache::get($cacheKey, []);
+        $context = Cache::get($cacheKey, []);
+
+        /** @var array<string, mixed> $result */
+        $result = is_array($context) ? $context : [];
+
+        return $result;
     }
 
     /**
@@ -131,7 +143,9 @@ class Context7Service
         $cacheKey = self::CACHE_PREFIX."career:{$careerId}";
 
         $existingContext = Cache::get($cacheKey, []);
-        $mergedContext = array_merge($existingContext, $context);
+        /** @var array<string, mixed> $existingArray */
+        $existingArray = is_array($existingContext) ? $existingContext : [];
+        $mergedContext = array_merge($existingArray, $context);
 
         Cache::put($cacheKey, $mergedContext, self::CONTEXT_CACHE_TTL);
 
@@ -146,10 +160,16 @@ class Context7Service
      *
      * @return array<string, mixed>
      */
-    public function getCareerContext(): array
+    public function getCareerContext(int $careerId): array
+    {
         $cacheKey = self::CACHE_PREFIX."career:{$careerId}";
 
-        return Cache::get($cacheKey, []);
+        $context = Cache::get($cacheKey, []);
+
+        /** @var array<string, mixed> $result */
+        $result = is_array($context) ? $context : [];
+
+        return $result;
     }
 
     /**
@@ -191,10 +211,16 @@ class Context7Service
      *
      * @return array<int, array<string, mixed>>
      */
-    public function getConversationContext(): array
+    public function getConversationContext(string $conversationId): array
+    {
         $cacheKey = self::CACHE_PREFIX."conversation:{$conversationId}";
 
-        return Cache::get($cacheKey, []);
+        $context = Cache::get($cacheKey, []);
+
+        /** @var array<int, array<string, mixed>> $result */
+        $result = is_array($context) ? $context : [];
+
+        return $result;
     }
 
     /**
@@ -202,7 +228,8 @@ class Context7Service
      *
      * @return array{frequent_endpoints: array<string, int>, cache_hit_rate: float, recommendations: array<string>}
      */
-    public function analyzeContextPatterns(): array
+    public function analyzeContextPatterns(string $apiName = ''): array
+    {
         $pattern = self::CACHE_PREFIX."api_call:{$apiName}:*";
 
         // In production, this would analyze actual cache patterns
@@ -228,6 +255,7 @@ class Context7Service
      * @return array{total_contexts: int, character_contexts: int, career_contexts: int, api_contexts: int}
      */
     public function getContextSummary(): array
+    {
         // In production, this would count actual cached contexts
         // For now, return mock summary
         return [
@@ -284,6 +312,7 @@ class Context7Service
      * @return array{enabled: bool, healthy: bool, capabilities: array<string, mixed>}
      */
     public function getServerStatus(): array
+    {
         return [
             'enabled' => $this->mcpClient->isServerEnabled('context7'),
             'healthy' => $this->mcpClient->isServerHealthy('context7'),

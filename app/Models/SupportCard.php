@@ -14,5 +14,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  */
 class SupportCard extends SupportCardDefinition
 {
+    /** @use HasFactory<\Database\Factories\SupportCardDefinitionFactory> */
     use HasFactory;
 }

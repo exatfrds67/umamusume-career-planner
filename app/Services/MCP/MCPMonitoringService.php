@@ -45,6 +45,7 @@ class MCPMonitoringService
      * }>
      */
     public function performHealthCheck(): array
+    {
         $healthCheck = $this->mcpClient->healthCheck();
         $results = [];
 
@@ -89,7 +90,8 @@ class MCPMonitoringService
      *     created_at: string
      * }>
      */
-    public function getServerHealthHistory(): array
+    public function getServerHealthHistory(string $serverName, int $hours = 24): array
+    {
         $since = now()->subHours($hours);
 
         $history = DB::table('ucp_mcp_server_health')
@@ -97,16 +99,17 @@ class MCPMonitoringService
             ->where('created_at', '>=', $since)
             ->orderBy('created_at', 'desc')
             ->get()
-            ->map(fn ($record) => [
-                'server_name' => $record->server_name,
-                'status' => $record->status,
+            ->map(fn ($record): array => [
+                'server_name' => (string) $record->server_name,
+                'status' => (string) $record->status,
                 'is_connected' => (bool) $record->is_connected,
                 'response_time' => $record->response_time,
-                'consecutive_failures' => $record->consecutive_failures,
-                'created_at' => $record->created_at,
+                'consecutive_failures' => (int) $record->consecutive_failures,
+                'created_at' => (string) $record->created_at,
             ])
             ->toArray();
 
+        /** @var array<int, array{server_name: string, status: string, is_connected: bool, response_time: float|null, consecutive_failures: int, created_at: string}> $history */
         return $history;
     }
 
@@ -122,7 +125,8 @@ class MCPMonitoringService
      *     max_consecutive_failures: int
      * }
      */
-    public function getServerUptimeStats(): array
+    public function getServerUptimeStats(string $serverName, int $hours = 24): array
+    {
         $since = now()->subHours($hours);
 
         $stats = DB::table('ucp_mcp_server_health')
@@ -162,7 +166,8 @@ class MCPMonitoringService
      *     last_check_at: string|null
      * }>
      */
-    public function getAllServersUptimeSummary(): array
+    public function getAllServersUptimeSummary(int $hours = 24): array
+    {
         $servers = $this->mcpClient->getServers();
         $summary = [];
 
@@ -184,7 +189,7 @@ class MCPMonitoringService
                 'current_status' => $health['status'] ?? 'unknown',
                 'uptime_percentage' => $stats['uptime_percentage'],
                 'avg_response_time' => $stats['avg_response_time'],
-                'last_check_at' => $lastCheck,
+                'last_check_at' => is_string($lastCheck) ? $lastCheck : null,
             ];
         }
 
@@ -197,6 +202,7 @@ class MCPMonitoringService
      * @return array<int, array{tool: string, status: string, last_used_at: string|null}>
      */
     public function getActiveTools(): array
+    {
         return [];
     }
 
@@ -305,6 +311,7 @@ class MCPMonitoringService
      * }
      */
     public function getMonitoringDashboard(): array
+    {
         $healthCheck = $this->performHealthCheck();
 
         $healthyCount = collect($healthCheck)->filter(fn ($s) => $s['status'] === 'healthy')->count();

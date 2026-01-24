@@ -57,7 +57,8 @@ class SummerCampOptimizationAgent
      *     efficiency_score: float
      * }
      */
-    public function analyzeSummerCampOptimization(): array
+    public function analyzeSummerCampOptimization(Character $character, array $context = []): array
+    {
         // Determine Summer Camp status
         $summerCampStatus = $this->determineSummerCampStatus($character, $context);
 
@@ -112,8 +113,9 @@ class SummerCampOptimizationAgent
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    protected function determineSummerCampStatus(): array
-        $currentTurn = $context['current_turn'] ?? 1;
+    protected function determineSummerCampStatus(Character $character, array $context): array
+    {
+        $currentTurn = isset($context['current_turn']) && is_numeric($context['current_turn']) ? (int) $context['current_turn'] : 1;
         $careerStage = $character->career_stage ?? 'junior';
 
         // Determine which Summer Camp period we're in or approaching
@@ -148,7 +150,8 @@ class SummerCampOptimizationAgent
      *
      * @return array{year: string, start: int, end: int, turns: int}
      */
-    protected function identifyCampPeriod(): array
+    protected function identifyCampPeriod(int $currentTurn, string $careerStage): array
+    {
         // Determine which year's camp is relevant
         $year = match ($careerStage) {
             'junior' => 'junior_year',
@@ -224,10 +227,12 @@ class SummerCampOptimizationAgent
      * @param  array<string, mixed>  $summerCampStatus
      * @return array<string, mixed>
      */
-    protected function calculateOptimizationStrategy(): array
-        $campPhase = $summerCampStatus['camp_phase'];
+    protected function calculateOptimizationStrategy(Character $character, array $summerCampStatus): array
+    {
+        $campPhase = isset($summerCampStatus['camp_phase']) && is_string($summerCampStatus['camp_phase']) ? $summerCampStatus['camp_phase'] : 'distant';
 
         // Strategy varies by phase
+        /** @var array<string, mixed> $strategy */
         $strategy = match ($campPhase) {
             'active' => $this->getActiveCampStrategy($character, $summerCampStatus),
             'preparation' => $this->getPreparationStrategy($character, $summerCampStatus),
@@ -244,8 +249,11 @@ class SummerCampOptimizationAgent
      * @param  array<string, mixed>  $summerCampStatus
      * @return array<string, mixed>
      */
-    protected function getActiveCampStrategy(): array
-        $turnsRemaining = $summerCampStatus['turns_remaining_in_camp'];
+    protected function getActiveCampStrategy(Character $character, array $summerCampStatus): array
+    {
+        $turnsRemaining = isset($summerCampStatus['turns_remaining_in_camp']) && is_numeric($summerCampStatus['turns_remaining_in_camp'])
+            ? (int) $summerCampStatus['turns_remaining_in_camp']
+            : 4;
 
         return [
             'phase' => 'active',
@@ -271,12 +279,13 @@ class SummerCampOptimizationAgent
      * @param  array<string, mixed>  $summerCampStatus
      * @return array<string, mixed>
      */
-    protected function getPreparationStrategy(): array
+    protected function getPreparationStrategy(Character $character, array $summerCampStatus): array
+    {
         return [
             'phase' => 'preparation',
             'focus' => 'optimize_state',
             'intensity' => 'moderate',
-            'turns_until_camp' => $summerCampStatus['turns_until_camp'],
+            'turns_until_camp' => $summerCampStatus['turns_until_camp'] ?? 0,
             'priorities' => [
                 'maximize_energy',
                 'improve_mood',
@@ -297,12 +306,13 @@ class SummerCampOptimizationAgent
      * @param  array<string, mixed>  $summerCampStatus
      * @return array<string, mixed>
      */
-    protected function getPlanningStrategy(): array
+    protected function getPlanningStrategy(Character $character, array $summerCampStatus): array
+    {
         return [
             'phase' => 'planning',
             'focus' => 'strategic_preparation',
             'intensity' => 'balanced',
-            'turns_until_camp' => $summerCampStatus['turns_until_camp'],
+            'turns_until_camp' => $summerCampStatus['turns_until_camp'] ?? 0,
             'priorities' => [
                 'identify_priority_stats',
                 'plan_training_sequence',
@@ -318,12 +328,13 @@ class SummerCampOptimizationAgent
      * @param  array<string, mixed>  $summerCampStatus
      * @return array<string, mixed>
      */
-    protected function getDistantStrategy(): array
+    protected function getDistantStrategy(Character $character, array $summerCampStatus): array
+    {
         return [
             'phase' => 'distant',
             'focus' => 'normal_development',
             'intensity' => 'standard',
-            'turns_until_camp' => $summerCampStatus['turns_until_camp'],
+            'turns_until_camp' => $summerCampStatus['turns_until_camp'] ?? 0,
             'priorities' => [
                 'balanced_training',
                 'resource_accumulation',
@@ -337,10 +348,14 @@ class SummerCampOptimizationAgent
      *
      * @param  array<string, mixed>  $summerCampStatus
      * @param  array<string, mixed>  $optimizationStrategy
-     * @return array<string, mixed>
+     * @return array<array-key, array<string, mixed>>
      */
-    protected function determinePriorityActions(): array
-        $campPhase = $summerCampStatus['camp_phase'];
+    protected function determinePriorityActions(
+        Character $character,
+        array $summerCampStatus,
+        array $optimizationStrategy
+    ): array {
+        $campPhase = isset($summerCampStatus['camp_phase']) && is_string($summerCampStatus['camp_phase']) ? $summerCampStatus['camp_phase'] : 'distant';
 
         if ($campPhase === 'active') {
             return $this->getActiveCampActions($character, $summerCampStatus);
@@ -355,18 +370,29 @@ class SummerCampOptimizationAgent
      * Get priority actions during active Summer Camp
      *
      * @param  array<string, mixed>  $summerCampStatus
-     * @return array<string, mixed>
+     * @return array<string, array<string, mixed>>
      */
-    protected function getActiveCampActions(): array
+    protected function getActiveCampActions(Character $character, array $summerCampStatus): array
+    {
+        /** @var array<string, int> $currentStats */
         $currentStats = $character->current_stats ?? [];
+        /** @var array<string, mixed> $goals */
         $goals = $character->goals ?? [];
-        $targetStats = $goals['target_stats'] ?? [];
+        /** @var array<string, int> $targetStats */
+        $targetStats = is_array($goals) && isset($goals['target_stats']) && is_array($goals['target_stats'])
+            ? $goals['target_stats']
+            : [];
 
         // Identify stats with largest gaps
+        /** @var array<string, int> $statGaps */
         $statGaps = [];
         foreach ($targetStats as $stat => $target) {
-            $current = $currentStats[$stat] ?? 0;
-            $gap = max(0, $target - $current);
+            if (! is_string($stat) || ! is_numeric($target)) {
+                continue;
+            }
+
+            $current = is_array($currentStats) && isset($currentStats[$stat]) ? (int) $currentStats[$stat] : 0;
+            $gap = max(0, (int) $target - $current);
             $statGaps[$stat] = $gap;
         }
 
@@ -401,12 +427,14 @@ class SummerCampOptimizationAgent
      * Get preparation actions before Summer Camp
      *
      * @param  array<string, mixed>  $summerCampStatus
-     * @return array<string, mixed>
+     * @return array<int, array<string, mixed>>
      */
-    protected function getPreparationActions(): array
+    protected function getPreparationActions(Character $character, array $summerCampStatus): array
+    {
         $energyLevel = $character->energy_level ?? 100;
         $moodStatus = $character->mood_status ?? 'normal';
 
+        /** @var array<int, array<string, mixed>> $actions */
         $actions = [];
 
         // Energy preparation
@@ -445,9 +473,10 @@ class SummerCampOptimizationAgent
      * Get planning actions before Summer Camp
      *
      * @param  array<string, mixed>  $summerCampStatus
-     * @return array<string, mixed>
+     * @return array<int, array<string, mixed>>
      */
-    protected function getPlanningActions(): array
+    protected function getPlanningActions(Character $character, array $summerCampStatus): array
+    {
         return [
             [
                 'priority' => 'medium',
@@ -474,8 +503,14 @@ class SummerCampOptimizationAgent
      * @param  array<string, mixed>  $priorityActions
      * @return array<string, mixed>
      */
-    protected function calculateExpectedGains(): array
-        if ($summerCampStatus['camp_phase'] !== 'active') {
+    protected function calculateExpectedGains(
+        Character $character,
+        array $summerCampStatus,
+        array $priorityActions
+    ): array {
+        $campPhase = isset($summerCampStatus['camp_phase']) && is_string($summerCampStatus['camp_phase']) ? $summerCampStatus['camp_phase'] : 'distant';
+
+        if ($campPhase !== 'active') {
             return [
                 'estimated_stat_gains' => [],
                 'total_gain_potential' => 0,
@@ -520,21 +555,28 @@ class SummerCampOptimizationAgent
      * @param  array<string, mixed>  $priorityActions
      * @return array<string, string>
      */
-    protected function generateSummerCampRecommendations(): array
+    protected function generateSummerCampRecommendations(
+        Character $character,
+        array $summerCampStatus,
+        array $optimizationStrategy,
+        array $priorityActions
+    ): array {
+        /** @var array<string, string> $recommendations */
         $recommendations = [];
-        $campPhase = $summerCampStatus['camp_phase'];
+        $campPhase = isset($summerCampStatus['camp_phase']) && is_string($summerCampStatus['camp_phase']) ? $summerCampStatus['camp_phase'] : 'distant';
+        $turnsUntilCamp = isset($summerCampStatus['turns_until_camp']) && is_numeric($summerCampStatus['turns_until_camp']) ? (int) $summerCampStatus['turns_until_camp'] : 0;
 
         // Phase-specific recommendations
         $recommendations['phase'] = match ($campPhase) {
             'active' => 'Summer Camp is ACTIVE! Focus exclusively on high-priority training. Avoid rest unless energy is critical.',
-            'preparation' => 'Summer Camp starts in '.$summerCampStatus['turns_until_camp'].' turns. Maximize energy and mood NOW.',
-            'planning' => 'Summer Camp in '.$summerCampStatus['turns_until_camp'].' turns. Plan your priority stats and prepare support deck.',
-            default => 'Summer Camp is '.$summerCampStatus['turns_until_camp'].' turns away. Continue normal development.',
+            'preparation' => "Summer Camp starts in {$turnsUntilCamp} turns. Maximize energy and mood NOW.",
+            'planning' => "Summer Camp in {$turnsUntilCamp} turns. Plan your priority stats and prepare support deck.",
+            default => "Summer Camp is {$turnsUntilCamp} turns away. Continue normal development.",
         };
 
         // Energy recommendations
+        $energyLevel = $character->energy_level ?? 100;
         if ($campPhase === 'active') {
-            $energyLevel = $character->energy_level ?? 100;
             if ($energyLevel < 40) {
                 $recommendations['energy'] = 'Energy is low during Summer Camp. Rest if below 30, otherwise push through with caution.';
             } else {
@@ -572,7 +614,7 @@ class SummerCampOptimizationAgent
         array $optimizationStrategy
     ): float {
         $score = 0.0;
-        $campPhase = $summerCampStatus['camp_phase'];
+        $campPhase = isset($summerCampStatus['camp_phase']) && is_string($summerCampStatus['camp_phase']) ? $summerCampStatus['camp_phase'] : 'distant';
 
         if ($campPhase === 'active') {
             // Score based on character state during active camp
@@ -581,7 +623,7 @@ class SummerCampOptimizationAgent
 
             // Energy component (50%)
             $energyScore = $energyLevel / 100;
-            $score = ($score ?? 0) + $energyScore * 0.5;
+            $score += $energyScore * 0.5;
 
             // Mood component (50%)
             $moodScore = match ($moodStatus) {
@@ -592,7 +634,7 @@ class SummerCampOptimizationAgent
                 'awful' => 0.2,
                 default => 0.6,
             };
-            $score = ($score ?? 0) + $moodScore * 0.5;
+            $score += $moodScore * 0.5;
         } elseif ($campPhase === 'preparation') {
             // Score based on readiness for camp
             $energyLevel = $character->energy_level ?? 100;

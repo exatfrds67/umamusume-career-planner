@@ -37,8 +37,12 @@ class AgentLifecycleManager
 
     /**
      * Create and initialize a new agent
+     *
+     * @param  array<string, mixed>  $config
+     * @return array<string, mixed>
      */
-    public function createAgent(): array
+    public function createAgent(string $type, string $name, array $config = []): array
+    {
         try {
             $agentId = $this->generateAgentId($type);
 
@@ -64,7 +68,12 @@ class AgentLifecycleManager
             // Initialize agent
             $this->initializeAgent($agentId);
 
-            return $this->getAgent($agentId);
+            $agent = $this->getAgent($agentId);
+            if ($agent === null) {
+                throw new \RuntimeException("Failed to retrieve created agent: {$agentId}");
+            }
+
+            return $agent;
         } catch (\Exception $e) {
             Log::error('[AgentLifecycle] Failed to create agent', [
                 'type' => $type,
@@ -85,6 +94,9 @@ class AgentLifecycleManager
             $this->updateAgentStage($agentId, self::STAGE_INITIALIZING);
 
             $agent = $this->getAgent($agentId);
+            if ($agent === null) {
+                throw new \RuntimeException("Agent not found: {$agentId}");
+            }
 
             // Perform initialization tasks
             $this->setupAgentResources($agentId);
@@ -112,8 +124,11 @@ class AgentLifecycleManager
 
     /**
      * Monitor agent health and performance
+     *
+     * @return array<string, mixed>
      */
-    public function monitorAgent(): array
+    public function monitorAgent(string $agentId): array
+    {
         $agent = $this->getAgent($agentId);
 
         if (! $agent) {
@@ -163,7 +178,12 @@ class AgentLifecycleManager
         try {
             $agent = $this->getAgent($agentId);
 
-            if ($agent['stage'] !== self::STAGE_PAUSED) {
+            if ($agent === null) {
+                throw new \RuntimeException("Agent not found: {$agentId}");
+            }
+
+            $stage = $agent['stage'] ?? null;
+            if ($stage !== self::STAGE_PAUSED) {
                 throw new \RuntimeException("Agent is not paused: {$agentId}");
             }
 
@@ -216,20 +236,36 @@ class AgentLifecycleManager
 
     /**
      * Get all active agents
+     *
+     * @return array<int, array<string, mixed>>
      */
     public function getActiveAgents(): array
-        return DB::table('ucp_mcp_agents')
+    {
+        /** @var array<int, array<string, mixed>> $agents */
+        $agents = DB::table('ucp_mcp_agents')
             ->where('stage', self::STAGE_ACTIVE)
             ->get()
-            ->map(fn ($agent) => (array) $agent)
-            ->toArray();
+            ->map(fn ($agent): array => (array) $agent)
+            ->all();
+
+        return $agents;
     }
 
     /**
      * Get agent lifecycle history
+     *
+     * @return array<int, array<string, mixed>>
      */
-    public function getAgentHistory(): array
-        return Cache::get("agent_history:{$agentId}", []);
+    public function getAgentHistory(string $agentId): array
+    {
+        $result = Cache::get("agent_history:{$agentId}");
+
+        if (is_array($result)) {
+            /** @var array<int, array<string, mixed>> $result */
+            return $result;
+        }
+
+        return [];
     }
 
     /**
@@ -240,6 +276,9 @@ class AgentLifecycleManager
         return 'agent_'.$type.'_'.uniqid().'_'.bin2hex(random_bytes(4));
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     protected function getAgent(string $agentId): ?array
     {
         $agent = DB::table('ucp_mcp_agents')
@@ -288,11 +327,16 @@ class AgentLifecycleManager
         ], 3600);
     }
 
+    /**
+     * @param  array<string, mixed>  $agent
+     */
     protected function registerAgentWithMCP(string $agentId, array $agent): void
     {
         // Register agent with MCP server
         try {
-            $this->mcpClient->registerAgent($agentId, $agent['type'], $agent['config']);
+            $type = is_string($agent['type'] ?? null) ? $agent['type'] : '';
+            $config = is_array($agent['config'] ?? null) ? $agent['config'] : [];
+            $this->mcpClient->registerAgent($agentId, $type, $config);
         } catch (\Exception $e) {
             Log::warning('[AgentLifecycle] Failed to register agent with MCP', [
                 'agent_id' => $agentId,
@@ -309,15 +353,24 @@ class AgentLifecycleManager
         ], 3600);
     }
 
-    protected function collectAgentMetrics(): array
-        return Cache::get("agent_metrics:{$agentId}", [
+    /**
+     * @return array<string, mixed>
+     */
+    protected function collectAgentMetrics(string $agentId): array
+    {
+        $result = Cache::get("agent_metrics:{$agentId}");
+
+        return is_array($result) ? $result : [
             'execution_count' => 0,
             'average_execution_time' => 0,
             'success_rate' => 100,
             'last_execution' => null,
-        ]);
+        ];
     }
 
+    /**
+     * @param  array<string, mixed>  $metrics
+     */
     protected function assessAgentHealth(string $agentId, array $metrics): string
     {
         $successRate = $metrics['success_rate'] ?? 100;
@@ -331,7 +384,12 @@ class AgentLifecycleManager
         }
     }
 
-    protected function generateMaintenanceRecommendations(): array
+    /**
+     * @param  array<string, mixed>  $metrics
+     * @return array<int, array<string, string>>
+     */
+    protected function generateMaintenanceRecommendations(array $metrics, string $health): array
+    {
         $recommendations = [];
 
         if ($health === 'unhealthy') {

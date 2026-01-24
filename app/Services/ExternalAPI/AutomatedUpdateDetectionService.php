@@ -58,7 +58,8 @@ class AutomatedUpdateDetectionService
      * @param  array<string, mixed>  $options
      * @return array{updates_detected: bool, changes: array<string, mixed>, last_check: string, next_check: string}
      */
-    public function monitorDataSource(): array
+    public function monitorDataSource(string $dataSource, array $options = []): array
+    {
         Log::info('[UpdateDetection] Monitoring data source', [
             'data_source' => $dataSource,
             'options' => $options,
@@ -126,6 +127,7 @@ class AutomatedUpdateDetectionService
      * @return array<string, array{updates_detected: bool, changes: array<string, mixed>, last_check: string, next_check: string}>
      */
     public function monitorAllSources(): array
+    {
         $dataSources = [
             'umapyoi_characters',
             'umapyoi_support_cards',
@@ -166,8 +168,14 @@ class AutomatedUpdateDetectionService
     protected function getLastKnownState(string $dataSource): ?array
     {
         $stateKey = self::UPDATE_DETECTION_KEY.$dataSource.':state';
+        $cached = Cache::get($stateKey);
 
-        return Cache::get($stateKey);
+        if (is_array($cached)) {
+            /** @var array<string, mixed> $cached */
+            return $cached;
+        }
+
+        return null;
     }
 
     /**
@@ -194,7 +202,7 @@ class AutomatedUpdateDetectionService
             // Create state snapshot
             return [
                 'data' => $data,
-                'count' => is_array($data) ? count($data) : 0,
+                'count' => count($data),
                 'checksum' => $this->calculateChecksum($data),
                 'timestamp' => now()->toIso8601String(),
             ];
@@ -215,7 +223,8 @@ class AutomatedUpdateDetectionService
      * @param  array<string, mixed>  $currentState
      * @return array<string, mixed>
      */
-    protected function detectChanges(): array
+    protected function detectChanges(?array $lastState, array $currentState, string $dataSource): array
+    {
         if ($lastState === null) {
             return [
                 'type' => 'initial_state',
@@ -226,12 +235,15 @@ class AutomatedUpdateDetectionService
         $changes = [];
 
         // Check for count changes
-        if ($lastState['count'] !== $currentState['count']) {
+        $lastCount = isset($lastState['count']) && is_int($lastState['count']) ? $lastState['count'] : 0;
+        $currentCount = isset($currentState['count']) && is_int($currentState['count']) ? $currentState['count'] : 0;
+
+        if ($lastCount !== $currentCount) {
             $changes['count_change'] = [
                 'type' => 'count',
-                'previous' => $lastState['count'],
-                'current' => $currentState['count'],
-                'difference' => $currentState['count'] - $lastState['count'],
+                'previous' => $lastCount,
+                'current' => $currentCount,
+                'difference' => $currentCount - $lastCount,
             ];
         }
 
@@ -256,8 +268,10 @@ class AutomatedUpdateDetectionService
         }
 
         // Check for significant time gap
-        $lastTimestamp = \Carbon\Carbon::parse($lastState['timestamp']);
-        $currentTimestamp = \Carbon\Carbon::parse($currentState['timestamp']);
+        $lastTimestampStr = isset($lastState['timestamp']) && is_string($lastState['timestamp']) ? $lastState['timestamp'] : 'now';
+        $currentTimestampStr = isset($currentState['timestamp']) && is_string($currentState['timestamp']) ? $currentState['timestamp'] : 'now';
+        $lastTimestamp = \Carbon\Carbon::parse($lastTimestampStr);
+        $currentTimestamp = \Carbon\Carbon::parse($currentTimestampStr);
         $hoursSinceLastCheck = $lastTimestamp->diffInHours($currentTimestamp);
 
         if ($hoursSinceLastCheck > 24) {
@@ -276,7 +290,8 @@ class AutomatedUpdateDetectionService
      *
      * @return array<string, mixed>
      */
-    protected function analyzeDetailedChanges(): array
+    protected function analyzeDetailedChanges(mixed $lastData, mixed $currentData): array
+    {
         if (! is_array($lastData) || ! is_array($currentData)) {
             return [];
         }
@@ -319,11 +334,18 @@ class AutomatedUpdateDetectionService
             $currentItem = $currentNormalized[$id];
 
             if (json_encode($lastItem) !== json_encode($currentItem)) {
+                $fieldsChanged = [];
+                if (is_array($lastItem) && is_array($currentItem)) {
+                    /** @var array<string, mixed> $lastItem */
+                    /** @var array<string, mixed> $currentItem */
+                    $fieldsChanged = $this->findChangedFields($lastItem, $currentItem);
+                }
+
                 $changes['modified'][] = [
                     'id' => $id,
                     'previous' => $lastItem,
                     'current' => $currentItem,
-                    'fields_changed' => $this->findChangedFields($lastItem, $currentItem),
+                    'fields_changed' => $fieldsChanged,
                 ];
             }
         }
@@ -337,12 +359,16 @@ class AutomatedUpdateDetectionService
      * @param  array<mixed>  $data
      * @return array<string|int, mixed>
      */
-    protected function normalizeDataById(): array
+    protected function normalizeDataById(array $data): array
+    {
         $normalized = [];
 
         foreach ($data as $item) {
             if (is_array($item) && isset($item['id'])) {
-                $normalized[$item['id']] = $item;
+                $itemId = $item['id'];
+                if (is_string($itemId) || is_int($itemId)) {
+                    $normalized[$itemId] = $item;
+                }
             }
         }
 
@@ -356,7 +382,8 @@ class AutomatedUpdateDetectionService
      * @param  array<string, mixed>  $currentItem
      * @return array<string>
      */
-    protected function findChangedFields(): array
+    protected function findChangedFields(array $lastItem, array $currentItem): array
+    {
         $changedFields = [];
 
         $allFields = array_unique(array_merge(array_keys($lastItem), array_keys($currentItem)));
@@ -378,7 +405,9 @@ class AutomatedUpdateDetectionService
      */
     protected function calculateChecksum(mixed $data): string
     {
-        return md5(json_encode($data));
+        $encoded = json_encode($data);
+
+        return md5($encoded !== false ? $encoded : '');
     }
 
     /**
@@ -446,12 +475,22 @@ class AutomatedUpdateDetectionService
      *
      * @return array<int, array<string, mixed>>
      */
-    public function getChangeLog(): array
+    public function getChangeLog(string $dataSource, int $limit = 100): array
+    {
         $changeLogKey = self::CHANGE_LOG_KEY.$dataSource;
 
+        /** @var array<int, string> $entries */
         $entries = Redis::lrange($changeLogKey, 0, $limit - 1);
 
-        return array_map(fn ($entry) => json_decode($entry, true), $entries);
+        $result = [];
+        foreach ($entries as $entry) {
+            $decoded = json_decode($entry, true);
+            if (is_array($decoded)) {
+                $result[] = $decoded;
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -460,6 +499,7 @@ class AutomatedUpdateDetectionService
      * @return array<string, array{last_check: string|null, updates_detected: int, last_change: string|null}>
      */
     public function getMonitoringStatus(): array
+    {
         $dataSources = [
             'umapyoi_characters',
             'umapyoi_support_cards',
@@ -474,10 +514,20 @@ class AutomatedUpdateDetectionService
             $lastState = $this->getLastKnownState($source);
             $changeLog = $this->getChangeLog($source, 1);
 
+            $lastCheck = null;
+            if (is_array($lastState) && isset($lastState['timestamp']) && is_string($lastState['timestamp'])) {
+                $lastCheck = $lastState['timestamp'];
+            }
+
+            $lastChange = null;
+            if (! empty($changeLog) && isset($changeLog[0]['timestamp']) && is_string($changeLog[0]['timestamp'])) {
+                $lastChange = $changeLog[0]['timestamp'];
+            }
+
             $status[$source] = [
-                'last_check' => (is_array($lastState) && isset($lastState['timestamp']) ? $lastState['timestamp'] : null),
+                'last_check' => $lastCheck,
                 'updates_detected' => count($changeLog),
-                'last_change' => ! empty($changeLog) ? $changeLog[0]['timestamp'] : null,
+                'last_change' => $lastChange,
             ];
         }
 
@@ -490,6 +540,7 @@ class AutomatedUpdateDetectionService
      * @return array{total_checks: int, updates_detected: int, avg_changes_per_update: float, most_active_source: string}
      */
     public function getUpdateStatistics(): array
+    {
         $dataSources = [
             'umapyoi_characters',
             'umapyoi_support_cards',
@@ -507,11 +558,12 @@ class AutomatedUpdateDetectionService
             $changeLog = $this->getChangeLog($source, 100);
             $updateCount = count($changeLog);
 
-            $totalChecks = ($totalChecks ?? 0) + $updateCount;
-            $totalUpdates = ($totalUpdates ?? 0) + $updateCount;
+            $totalChecks += $updateCount;
+            $totalUpdates += $updateCount;
 
             foreach ($changeLog as $entry) {
-                $totalChanges = ($totalChanges ?? 0) + count($entry['changes']);
+                $changes = isset($entry['changes']) && is_array($entry['changes']) ? $entry['changes'] : [];
+                $totalChanges += count($changes);
             }
 
             $sourceActivity[$source] = $updateCount;

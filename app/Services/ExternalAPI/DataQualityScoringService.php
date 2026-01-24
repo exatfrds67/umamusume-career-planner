@@ -64,7 +64,8 @@ class DataQualityScoringService
      * @param  array<string, mixed>  $metadata
      * @return array{overall_score: float, dimensions: array<string, float>, grade: string, recommendations: array<string>, details: array<string, mixed>}
      */
-    public function calculateQualityScore(): array
+    public function calculateQualityScore(string $dataType, mixed $data, array $metadata = []): array
+    {
         Log::info('[DataQualityScoring] Calculating quality score', [
             'data_type' => $dataType,
             'data_size' => is_array($data) ? count($data) : 0,
@@ -133,13 +134,13 @@ class DataQualityScoringService
         $accuracyScore = 100.0;
 
         // Check for data validation errors
-        if (isset($metadata['validation_errors'])) {
+        if (isset($metadata['validation_errors']) && is_array($metadata['validation_errors'])) {
             $errorCount = count($metadata['validation_errors']);
             $accuracyScore -= min($errorCount * 5, 50); // Max 50 points penalty
         }
 
         // Check for data conflicts
-        if (isset($metadata['conflicts'])) {
+        if (isset($metadata['conflicts']) && is_array($metadata['conflicts'])) {
             $conflictCount = count($metadata['conflicts']);
             $accuracyScore -= min($conflictCount * 3, 30); // Max 30 points penalty
         }
@@ -162,7 +163,9 @@ class DataQualityScoringService
             return 0.0;
         }
 
-        $requiredFields = $metadata['required_fields'] ?? [];
+        /** @var array<int|string, string> $requiredFieldsRaw */
+        $requiredFieldsRaw = $metadata['required_fields'] ?? [];
+        $requiredFields = is_array($requiredFieldsRaw) ? $requiredFieldsRaw : [];
 
         if (empty($requiredFields)) {
             return 100.0; // No required fields defined
@@ -177,8 +180,10 @@ class DataQualityScoringService
             }
 
             foreach ($requiredFields as $field) {
-                if (isset($item[$field]) && $item[$field] !== '') {
-                    $filledFields = ($filledFields ?? 0) + 1;
+                $fieldKey = is_scalar($field) ? (string) $field : '';
+
+                if ($fieldKey !== '' && isset($item[$fieldKey]) && $item[$fieldKey] !== '') {
+                    $filledFields++;
                 }
             }
         }
@@ -224,11 +229,12 @@ class DataQualityScoringService
     protected function calculateTimelinessScore(mixed $data, array $metadata): float
     {
         // Check data age
-        $dataAge = $metadata['data_age_hours'] ?? 0;
+        $dataAgeValue = $metadata['data_age_hours'] ?? 0;
+        $dataAge = is_numeric($dataAgeValue) ? (float) $dataAgeValue : 0.0;
 
         // Timeliness decreases with age
         // 100% at 0 hours, 50% at 24 hours, 0% at 168 hours (7 days)
-        $timelinessScore = max(0, 100 - ($dataAge * 0.595));
+        $timelinessScore = max(0.0, 100 - ($dataAge * 0.595));
 
         // Check if data has timestamp field
         if (is_array($data) && ! empty($data)) {
@@ -264,12 +270,12 @@ class DataQualityScoringService
                 continue;
             }
 
-            foreach ($item as $field => $value) {
-                $totalChecks = ($totalChecks ?? 0) + 1;
+            foreach ($item as $value) {
+                $totalChecks++;
 
                 // Check for obviously invalid values
                 if ($this->isInvalidValue($value)) {
-                    $invalidCount = ($invalidCount ?? 0) + 1;
+                    $invalidCount++;
                 }
             }
         }
@@ -280,7 +286,7 @@ class DataQualityScoringService
         }
 
         // Check for schema violations
-        if (isset($metadata['schema_violations'])) {
+        if (isset($metadata['schema_violations']) && is_array($metadata['schema_violations'])) {
             $violationCount = count($metadata['schema_violations']);
             $validityScore -= min($violationCount * 5, 30);
         }
@@ -299,7 +305,7 @@ class DataQualityScoringService
 
         foreach ($dimensionScores as $dimension => $score) {
             $weight = $this->dimensionWeights[$dimension] ?? 0.0;
-            $weightedSum = ($weightedSum ?? 0) + $score * $weight;
+            $weightedSum += $score * $weight;
         }
 
         return round($weightedSum, 2);
@@ -325,7 +331,8 @@ class DataQualityScoringService
      * @param  array<string, float>  $dimensionScores
      * @return array<string>
      */
-    protected function generateRecommendations(): array
+    protected function generateRecommendations(array $dimensionScores, float $overallScore): array
+    {
         $recommendations = [];
 
         // Overall score recommendations
@@ -399,7 +406,7 @@ class DataQualityScoringService
                     $numericValue = (float) $value;
                     // Check for unreasonably large or small values
                     if (abs($numericValue) > 1000000 || ($numericValue < 0 && $field !== 'id')) {
-                        $anomalyCount = ($anomalyCount ?? 0) + 1;
+                        $anomalyCount++;
                     }
                 }
             }
@@ -429,7 +436,7 @@ class DataQualityScoringService
                 if (! isset($fieldTypes[$field])) {
                     $fieldTypes[$field] = $type;
                 } elseif ($fieldTypes[$field] !== $type && $value !== null) {
-                    $inconsistencies = ($inconsistencies ?? 0) + 1;
+                    $inconsistencies++;
                 }
             }
         }
@@ -460,7 +467,7 @@ class DataQualityScoringService
                     if (! isset($dateFormats[$field])) {
                         $dateFormats[$field] = $format;
                     } elseif ($dateFormats[$field] !== $format) {
-                        $inconsistencies = ($inconsistencies ?? 0) + 1;
+                        $inconsistencies++;
                     }
                 }
             }
@@ -486,7 +493,7 @@ class DataQualityScoringService
 
             // Example: Check for negative IDs
             if (isset($item['id']) && is_numeric($item['id']) && $item['id'] < 0) {
-                $inconsistencies = ($inconsistencies ?? 0) + 1;
+                $inconsistencies++;
             }
         }
 
@@ -621,7 +628,10 @@ class DataQualityScoringService
     {
         $cacheKey = self::QUALITY_SCORE_KEY.$dataType;
 
-        return Cache::get($cacheKey);
+        /** @var array<string, mixed>|null $cachedData */
+        $cachedData = Cache::get($cacheKey);
+
+        return is_array($cachedData) ? $cachedData : null;
     }
 
     /**
@@ -629,9 +639,16 @@ class DataQualityScoringService
      *
      * @return array<int, array<string, mixed>>
      */
-    public function getQualityHistory(): array
+    public function getQualityHistory(string $dataType, int $limit = 100): array
+    {
         $historyKey = self::QUALITY_HISTORY_KEY.$dataType;
+
+        /** @var array<int, array<string, mixed>> $history */
         $history = Cache::get($historyKey, []);
+
+        if (! is_array($history)) {
+            $history = [];
+        }
 
         return array_slice($history, -$limit);
     }
@@ -641,7 +658,8 @@ class DataQualityScoringService
      *
      * @return array{trend: string, avg_score: float, score_change: float, grade_distribution: array<string, int>}
      */
-    public function getQualityTrend(): array
+    public function getQualityTrend(string $dataType): array
+    {
         $history = $this->getQualityHistory($dataType, 20);
 
         if (empty($history)) {
@@ -654,11 +672,25 @@ class DataQualityScoringService
         }
 
         $scores = array_column($history, 'score');
-        $avgScore = array_sum($scores) / count($scores);
+
+        // Filter to ensure we only have numeric scores
+        $numericScores = array_filter($scores, 'is_numeric');
+        $numericScores = array_map('floatval', $numericScores);
+
+        if (empty($numericScores)) {
+            return [
+                'trend' => 'no_data',
+                'avg_score' => 0.0,
+                'score_change' => 0.0,
+                'grade_distribution' => [],
+            ];
+        }
+
+        $avgScore = array_sum($numericScores) / count($numericScores);
 
         // Calculate trend
-        $firstScore = $scores[0];
-        $lastScore = end($scores);
+        $firstScore = (float) reset($numericScores);
+        $lastScore = (float) end($numericScores);
         $scoreChange = $lastScore - $firstScore;
 
         $trend = match (true) {

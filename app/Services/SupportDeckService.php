@@ -20,7 +20,8 @@ class SupportDeckService
      * @param  array<int, array{support_card_id: int, is_friend_card: bool}>  $cards
      * @return array{valid: bool, errors: array<int, string>, warnings: array<int, string>}
      */
-    public function validateDeck(): array
+    public function validateDeck(array $cards): array
+    {
         /** @var array<int, string> $errors */
         $errors = [];
         /** @var array<int, string> $warnings */
@@ -61,7 +62,6 @@ class SupportDeckService
         }
 
         // Check for excessive same-type cards
-        /** @var array<string, int> $typeCounts */
         $typeCounts = array_count_values($specializations);
         foreach ($typeCounts as $type => $count) {
             if ($count > 2 && $type !== 'friend') {
@@ -170,8 +170,10 @@ class SupportDeckService
         foreach ($deck as $characterCard) {
             if ($characterCard->supportCard) {
                 $tier = $characterCard->supportCard->meta_tier;
-                $totalScore = ($totalScore ?? 0) + $tierScores[$tier] ?? 0;
-                $cardCount = ($cardCount ?? 0) + 1;
+                if (is_string($tier) && array_key_exists($tier, $tierScores)) {
+                    $totalScore += $tierScores[$tier];
+                }
+                $cardCount++;
             }
         }
 

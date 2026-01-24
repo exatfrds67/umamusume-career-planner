@@ -64,7 +64,8 @@ class FailureRateTrackingService
      *     alerts: array<array<string, mixed>>
      * }
      */
-    public function getFailureRateAnalytics(): array
+    public function getFailureRateAnalytics(int $userId, string $period = 'day'): array
+    {
         Log::info('[FailureRateTracking] Generating failure rate analytics', [
             'user_id' => $userId,
             'period' => $period,
@@ -97,10 +98,13 @@ class FailureRateTrackingService
      *     recovery_success_rate: float
      * }
      */
-    protected function getFailureSummary(): array
+    protected function getFailureSummary(int $userId, array $dateRange): array
+    {
         // Get MCP tool failures
+        $startDate = \Illuminate\Support\Carbon::parse($dateRange['start']);
+        $endDate = \Illuminate\Support\Carbon::parse($dateRange['end']);
         $toolUsage = MCPToolUsage::forUser($userId)
-            ->betweenDates($dateRange['start'], $dateRange['end'])
+            ->betweenDates($startDate, $endDate)
             ->get();
 
         $mcpFailures = $toolUsage->where('execution_status', '=', 'failure')->count();
@@ -141,6 +145,7 @@ class FailureRateTrackingService
      * }>
      */
     protected function getMCPServerFailureRates(): array
+    {
         $servers = MCPServer::all();
 
         return $servers->mapWithKeys(function ($server) {
@@ -171,6 +176,7 @@ class FailureRateTrackingService
      * }>
      */
     protected function getExternalAPIFailureRates(): array
+    {
         $apis = ['umapyoi', 'umamusumedb'];
         $failureRates = [];
 
@@ -183,8 +189,8 @@ class FailureRateTrackingService
                 'api_name' => $apiName,
                 'failure_count' => $failureCount,
                 'circuit_breaker_open' => $circuitBreakerOpen,
-                'last_failure' => (is_array($health) && isset($health['last_check']) ? $health['last_check'] : null),
-                'status' => $health['status'] ?? 'unknown',
+                'last_failure' => (is_array($health) && isset($health['last_check']) ? (is_string($health['last_check']) ? $health['last_check'] : null) : null),
+                'status' => is_string($health['status'] ?? null) ? $health['status'] : 'unknown',
                 'recovery_needed' => $circuitBreakerOpen || $failureCount > 0,
             ];
         }
@@ -201,9 +207,12 @@ class FailureRateTrackingService
      *     failure_by_component: array<array{component: string, failure_count: int, failure_rate: float}>
      * }
      */
-    protected function getFailureTrends(): array
+    protected function getFailureTrends(int $userId, array $dateRange): array
+    {
+        $startDate = \Illuminate\Support\Carbon::parse($dateRange['start']);
+        $endDate = \Illuminate\Support\Carbon::parse($dateRange['end']);
         $toolUsage = MCPToolUsage::forUser($userId)
-            ->betweenDates($dateRange['start'], $dateRange['end'])
+            ->betweenDates($startDate, $endDate)
             ->get();
 
         // Hourly failure trend
@@ -248,6 +257,7 @@ class FailureRateTrackingService
      * }
      */
     protected function getRecoveryStatus(): array
+    {
         // Get active recovery attempts from Redis
         $activeRecoveries = $this->getActiveRecoveries();
 
@@ -278,7 +288,8 @@ class FailureRateTrackingService
      *     recovery_action: string
      * }>
      */
-    protected function getFailureAlerts(): array
+    protected function getFailureAlerts(int $userId): array
+    {
         $alerts = [];
 
         // Check MCP server failure rates
@@ -340,6 +351,7 @@ class FailureRateTrackingService
      * }
      */
     public function attemptAutomatedRecovery(): array
+    {
         Log::info('[FailureRateTracking] Starting automated recovery');
 
         $attempted = [];
@@ -406,7 +418,8 @@ class FailureRateTrackingService
      *
      * @return array{success: bool, message: string, recovery_time: float, attempts: int}
      */
-    protected function recoverMCPServer(): array
+    protected function recoverMCPServer(MCPServer $server): array
+    {
         $startTime = microtime(true);
         $attempts = $this->getRecoveryAttempts($server->server_name);
 
@@ -464,7 +477,8 @@ class FailureRateTrackingService
      *
      * @return array{success: bool, message: string, recovery_time: float, attempts: int}
      */
-    protected function recoverAPI(): array
+    protected function recoverAPI(string $apiName): array
+    {
         $startTime = microtime(true);
         $attempts = $this->getRecoveryAttempts($apiName);
 
@@ -551,7 +565,7 @@ class FailureRateTrackingService
         $lastAttemptKey = self::FAILURE_CACHE_PREFIX."last_recovery:{$component}";
         $lastAttempt = Redis::get($lastAttemptKey);
 
-        if ($lastAttempt) {
+        if ($lastAttempt && is_numeric($lastAttempt)) {
             $timeSinceLastAttempt = time() - (int) $lastAttempt;
 
             if ($timeSinceLastAttempt < self::RECOVERY_ATTEMPT_INTERVAL) {
@@ -576,7 +590,7 @@ class FailureRateTrackingService
         $key = self::FAILURE_CACHE_PREFIX."recovery_attempts:{$component}";
         $attempts = Redis::get($key);
 
-        return $attempts ? (int) $attempts : 0;
+        return is_numeric($attempts) ? (int) $attempts : 0;
     }
 
     /**
@@ -618,6 +632,7 @@ class FailureRateTrackingService
      * @return array<array<string, mixed>>
      */
     protected function getActiveRecoveries(): array
+    {
         // In production, this would query active recovery processes
         return [];
     }
@@ -628,6 +643,7 @@ class FailureRateTrackingService
      * @return array<array<string, mixed>>
      */
     protected function getRecentRecoveries(): array
+    {
         $recentRecoveries = [];
 
         // Get recovery history for all components
@@ -637,18 +653,25 @@ class FailureRateTrackingService
         );
 
         foreach ($components as $component) {
-            $historyKey = self::FAILURE_CACHE_PREFIX."recovery_history:{$component}";
+            $componentStr = is_string($component) ? $component : '';
+            $historyKey = self::FAILURE_CACHE_PREFIX."recovery_history:{$componentStr}";
             $history = Redis::lrange($historyKey, 0, 9); // Last 10 entries
 
             foreach ($history as $entry) {
-                $data = json_decode($entry, true);
-                $recentRecoveries[] = array_merge($data, ['component' => $component]);
+                $entryStr = is_string($entry) ? $entry : '';
+                $data = json_decode($entryStr, true);
+                if (is_array($data)) {
+                    $recentRecoveries[] = array_merge($data, ['component' => $componentStr]);
+                }
             }
         }
 
         // Sort by timestamp descending
-        usort($recentRecoveries, function ($a, $b) {
-            return strcmp($b['timestamp'], $a['timestamp']);
+        usort($recentRecoveries, function ($a, $b): int {
+            $timestampA = is_string($a['timestamp'] ?? null) ? $a['timestamp'] : '';
+            $timestampB = is_string($b['timestamp'] ?? null) ? $b['timestamp'] : '';
+
+            return strcmp($timestampB, $timestampA);
         });
 
         return array_slice($recentRecoveries, 0, 20); // Return last 20
@@ -660,6 +683,7 @@ class FailureRateTrackingService
      * @return array<array<string, mixed>>
      */
     protected function getRecoveryQueue(): array
+    {
         // In production, this would query queued recovery jobs
         return [];
     }
@@ -681,6 +705,7 @@ class FailureRateTrackingService
      * @return array{attempts: int, successful: int, failed: int, success_rate: float}
      */
     protected function getRecoveryStatistics(): array
+    {
         $components = array_merge(
             MCPServer::pluck('server_name')->all(),
             ['umapyoi', 'umamusumedb']
@@ -690,15 +715,17 @@ class FailureRateTrackingService
         $totalSuccessful = 0;
 
         foreach ($components as $component) {
-            $historyKey = self::FAILURE_CACHE_PREFIX."recovery_history:{$component}";
+            $componentStr = is_string($component) ? $component : '';
+            $historyKey = self::FAILURE_CACHE_PREFIX."recovery_history:{$componentStr}";
             $history = Redis::lrange($historyKey, 0, -1);
 
             foreach ($history as $entry) {
-                $data = json_decode($entry, true);
-                $totalAttempts = ($totalAttempts ?? 0) + 1;
+                $entryStr = is_string($entry) ? $entry : '';
+                $data = json_decode($entryStr, true);
+                $totalAttempts = $totalAttempts + 1;
 
-                if ((is_array($data) && isset($data['success']) ? $data['success'] : null)) {
-                    $totalSuccessful = ($totalSuccessful ?? 0) + 1;
+                if (is_array($data) && ! empty($data['success'])) {
+                    $totalSuccessful = $totalSuccessful + 1;
                 }
             }
         }
@@ -718,7 +745,8 @@ class FailureRateTrackingService
      *
      * @return array{start: \Carbon\Carbon, end: \Carbon\Carbon}
      */
-    protected function getDateRange(): array
+    protected function getDateRange(string $period): array
+    {
         return match ($period) {
             'hour' => ['start' => now()->subHour(), 'end' => now()],
             'day' => ['start' => now()->startOfDay(), 'end' => now()],

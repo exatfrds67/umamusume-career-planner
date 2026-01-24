@@ -48,7 +48,7 @@ class CareerExportController extends Controller
                 'stat_priorities' => $character->stat_priorities,
                 'goals' => $character->goals,
             ],
-            'careers' => $character->careers->map(function (Career $career) {
+            'careers' => $character->careers->map(function (Career $career): array {
                 return [
                     'status' => $career->status,
                     'final_stats' => [
@@ -59,8 +59,8 @@ class CareerExportController extends Controller
                         'wit' => $career->final_wit,
                         'sp' => $career->final_sp,
                     ],
-                    'started_at' => $career->started_at?->toIso8601String(),
-                    'completed_at' => $career->completed_at?->toIso8601String(),
+                    'started_at' => $career->started_at instanceof \Carbon\Carbon ? $career->started_at->toIso8601String() : null,
+                    'completed_at' => $career->completed_at instanceof \Carbon\Carbon ? $career->completed_at->toIso8601String() : null,
                     'training_sessions' => $career->trainingSessions->map(fn ($s) => [
                         'training_type' => $s->training_type,
                         'stat_gains' => $s->stat_gains,

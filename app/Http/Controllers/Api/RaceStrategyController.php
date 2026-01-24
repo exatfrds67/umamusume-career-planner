@@ -81,7 +81,7 @@ class RaceStrategyController extends Controller
             $strategy = $this->raceStrategyService->getStrategy(
                 $characterId,
                 $raceData,
-                $user?->id ?? throw new \Exception('User required')
+                $user->id ?? throw new \Exception('User required')
             );
 
             // Parse response for API format
@@ -189,7 +189,7 @@ class RaceStrategyController extends Controller
         return response()->stream(function () use ($characterId, $raceData, $user) {
             try {
                 // Stream strategy from service
-                foreach ($this->raceStrategyService->getStrategyStreaming($characterId, $raceData, $user?->id ?? throw new \Exception('User required')) as $chunk) {
+                foreach ($this->raceStrategyService->getStrategyStreaming($characterId, $raceData, $user->id ?? throw new \Exception('User required')) as $chunk) {
                     echo 'data: '.json_encode([
                         'chunk' => $chunk,
                     ])."\n\n";
@@ -204,7 +204,7 @@ class RaceStrategyController extends Controller
             } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
                 Log::warning('Streaming race strategy request for non-existent character', [
                     'character_id' => $characterId,
-                    'user_id' => $user?->id ?? throw new \Exception('User required'),
+                    'user_id' => $user->id ?? throw new \Exception('User required'),
                 ]);
 
                 echo 'data: '.json_encode([
@@ -215,7 +215,7 @@ class RaceStrategyController extends Controller
                 // Log error with context
                 Log::error('Streaming race strategy generation failed', [
                     'character_id' => $characterId,
-                    'user_id' => $user?->id ?? throw new \Exception('User required'),
+                    'user_id' => $user->id ?? throw new \Exception('User required'),
                     'race_name' => isset($raceData['race_name']) ? $raceData['race_name'] : 'unknown',
                     'error' => $e->getMessage(),
                     'trace' => $e->getTraceAsString(),
@@ -257,7 +257,7 @@ class RaceStrategyController extends Controller
             // Get strategy history from service
             $history = $this->raceStrategyService->getStrategyHistory(
                 $characterId,
-                $user?->id ?? throw new \Exception('User required'),
+                $user->id ?? throw new \Exception('User required'),
                 $raceId,
                 limit: 20
             );

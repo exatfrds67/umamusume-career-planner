@@ -40,7 +40,7 @@ class SupportCardController extends Controller
             $searchTerm = $request->input('search');
             $search = is_string($searchTerm) ? $searchTerm : '';
             if ($search !== '') {
-                $query->where('name', 'like', '%'.(is_string($search) ? $search : '').'%');
+                $query->where('name', 'like', '%'.$search.'%');
             }
         }
 

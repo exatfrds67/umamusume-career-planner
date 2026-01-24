@@ -46,6 +46,7 @@ use Illuminate\Support\Str;
  */
 class Character extends Model
 {
+    /** @use HasFactory<\Database\Factories\CharacterFactory> */
     use HasFactory;
 
     protected $table = 'ucp_characters';
@@ -168,10 +169,7 @@ class Character extends Model
     }
 
     /**
-     * @return BelongsToMany<Skill>
-     */
-    /**
-     * @return BelongsToMany<Skill, $this>
+     * @return BelongsToMany<Skill, $this, SkillAcquisition>
      */
     public function skills(): BelongsToMany
     {
@@ -200,6 +198,9 @@ class Character extends Model
 
     /**
      * Scope a query to only include active characters.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<Character>  $query
+     * @return \Illuminate\Database\Eloquent\Builder<Character>
      */
     public function scopeActive(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
     {
@@ -208,8 +209,11 @@ class Character extends Model
 
     /**
      * Scope a query to filter by scenario type.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<Character>  $query
+     * @return \Illuminate\Database\Eloquent\Builder<Character>
      */
-    public function scopeScenarioType($query, string $type)
+    public function scopeScenarioType(\Illuminate\Database\Eloquent\Builder $query, string $type): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('scenario_type', $type);
     }
@@ -246,7 +250,7 @@ class Character extends Model
 
     public function getProgressPercentage(): float
     {
-        if (empty($this->goals['target_stats'])) {
+        if (! is_array($this->goals) || ! isset($this->goals['target_stats']) || ! is_array($this->goals['target_stats'])) {
             return 0;
         }
 
@@ -255,12 +259,13 @@ class Character extends Model
         $statCount = 0;
 
         foreach ($stats as $stat) {
-            if (isset($this->goals['target_stats'][$stat]) && $this->goals['target_stats'][$stat] > 0) {
+            $targetValue = $this->goals['target_stats'][$stat] ?? null;
+            if (is_numeric($targetValue) && (float) $targetValue > 0) {
                 $current = $this->getStat($stat);
-                $target = $this->goals['target_stats'][$stat];
+                $target = (int) $targetValue;
                 $progress = min(100, ($current / $target) * 100);
-                $totalProgress = ($totalProgress ?? 0) + $progress;
-                $statCount = ($statCount ?? 0) + 1;
+                $totalProgress += $progress;
+                $statCount += 1;
             }
         }
 

@@ -62,15 +62,18 @@ class CostOptimizationService
      *     projected_costs: array<string, mixed>
      * }
      */
-    public function getCostOptimizationRecommendations(): array
+    public function getCostOptimizationRecommendations(int $userId): array
+    {
         $cacheKey = self::COST_CACHE_PREFIX."recommendations:{$userId}";
 
-        if (Cache::has($cacheKey)) {
+        $cachedResult = Cache::get($cacheKey);
+        if (is_array($cachedResult)) {
             Log::debug('[CostOptimization] Returning cached recommendations', [
                 'user_id' => $userId,
             ]);
 
-            return Cache::get($cacheKey);
+            /** @var array{summary: array<string, mixed>, budget_status: array<string, mixed>, cost_breakdown: array<string, mixed>, optimization_opportunities: array<array<string, mixed>>, recommendations: array<string>, projected_costs: array<string, mixed>} $cachedResult */
+            return $cachedResult;
         }
 
         Log::info('[CostOptimization] Generating cost optimization recommendations', [
@@ -81,10 +84,11 @@ class CostOptimizationService
 
         // Get current cost data
         $costAnalytics = $this->mcpMonitoring->getCostAnalytics($userId, 'month');
+        $totalCostForBudget = is_numeric($costAnalytics['total_cost'] ?? null) ? (float) $costAnalytics['total_cost'] : 0.0;
 
         $recommendations = [
             'summary' => $this->getCostSummary($userId, $costAnalytics),
-            'budget_status' => $this->getBudgetStatus($userId, $costAnalytics['total_cost']),
+            'budget_status' => $this->getBudgetStatus($userId, $totalCostForBudget),
             'cost_breakdown' => $this->getCostBreakdown($costAnalytics),
             'optimization_opportunities' => $this->identifyOptimizationOpportunities($userId, $costAnalytics),
             'recommendations' => $this->generateCostRecommendations($userId, $costAnalytics),
@@ -118,8 +122,9 @@ class CostOptimizationService
      *     cost_efficiency_score: float
      * }
      */
-    protected function getCostSummary(): array
-        $currentMonthCost = $costAnalytics['total_cost'];
+    protected function getCostSummary(int $userId, array $costAnalytics): array
+    {
+        $currentMonthCost = is_numeric($costAnalytics['total_cost'] ?? null) ? (float) $costAnalytics['total_cost'] : 0.0;
         $daysInMonth = now()->daysInMonth;
         $currentDay = now()->day;
 
@@ -130,7 +135,10 @@ class CostOptimizationService
         $costTrend = $this->determineCostTrend($userId);
 
         // Find highest cost day
-        $highestCostDay = collect($costAnalytics['daily_costs'])
+        $dailyCostsRaw = $costAnalytics['daily_costs'] ?? [];
+        /** @var array<int, array{date: string, cost: float}> $dailyCostsArray */
+        $dailyCostsArray = is_array($dailyCostsRaw) ? $dailyCostsRaw : [];
+        $highestCostDay = collect($dailyCostsArray)
             ->sortByDesc('cost')
             ->first() ?? ['date' => 'N/A', 'cost' => 0];
 
@@ -161,7 +169,8 @@ class CostOptimizationService
      *     alert_level: string
      * }
      */
-    protected function getBudgetStatus(): array
+    protected function getBudgetStatus(int $userId, float $currentSpend): array
+    {
         // Get user's budget limit from preferences
         $budgetLimit = $this->getUserBudgetLimit($userId);
 
@@ -211,10 +220,15 @@ class CostOptimizationService
      *     by_category: array<array<string, mixed>>
      * }
      */
-    protected function getCostBreakdown(): array
+    protected function getCostBreakdown(array $costAnalytics): array
+    {
         // Cost by server with percentages
-        $totalCost = $costAnalytics['total_cost'];
-        $byServer = collect($costAnalytics['cost_by_server'])->map(function ($item) use ($totalCost) {
+        $totalCost = is_numeric($costAnalytics['total_cost'] ?? null) ? (float) $costAnalytics['total_cost'] : 0.0;
+
+        $costByServerRaw = $costAnalytics['cost_by_server'] ?? [];
+        /** @var array<int, array{cost: float, requests: int}> $costByServerArray */
+        $costByServerArray = is_array($costByServerRaw) ? $costByServerRaw : [];
+        $byServer = collect($costByServerArray)->map(function (array $item) use ($totalCost): array {
             $percentage = $totalCost > 0 ? ($item['cost'] / $totalCost) * 100 : 0;
 
             return array_merge($item, [
@@ -224,7 +238,10 @@ class CostOptimizationService
         })->all();
 
         // Cost by tool with percentages
-        $byTool = collect($costAnalytics['cost_by_tool'])->map(function ($item) use ($totalCost) {
+        $costByToolRaw = $costAnalytics['cost_by_tool'] ?? [];
+        /** @var array<int, array{cost: float}> $costByToolArray */
+        $costByToolArray = is_array($costByToolRaw) ? $costByToolRaw : [];
+        $byTool = collect($costByToolArray)->map(function (array $item) use ($totalCost): array {
             $percentage = $totalCost > 0 ? ($item['cost'] / $totalCost) * 100 : 0;
 
             return array_merge($item, [
@@ -256,11 +273,15 @@ class CostOptimizationService
      *     action: string
      * }>
      */
-    protected function identifyOptimizationOpportunities(): array
+    protected function identifyOptimizationOpportunities(int $userId, array $costAnalytics): array
+    {
         $opportunities = [];
 
         // Check for expensive tools
-        foreach ($costAnalytics['cost_by_tool'] as $tool) {
+        $costByToolRaw = $costAnalytics['cost_by_tool'] ?? [];
+        /** @var array<int, array{cost: float, requests: int, average_cost: float, tool: string}> $costByToolArray */
+        $costByToolArray = is_array($costByToolRaw) ? $costByToolRaw : [];
+        foreach ($costByToolArray as $tool) {
             if ($tool['cost'] > 1.0 && $tool['requests'] > 10) {
                 $avgCost = $tool['average_cost'];
                 $potentialSavings = $tool['cost'] * 0.3; // Assume 30% savings with optimization
@@ -298,8 +319,10 @@ class CostOptimizationService
             });
 
         foreach ($highFrequencyTools as $tool) {
-            if ($tool['avg_cost'] < 0.001) {
-                $potentialSavings = $tool['total_cost'] * 0.5; // 50% savings with batching
+            $avgCostVal = is_numeric($tool['avg_cost'] ?? null) ? (float) $tool['avg_cost'] : 0.0;
+            $totalCostVal = is_numeric($tool['total_cost'] ?? null) ? (float) $tool['total_cost'] : 0.0;
+            if ($avgCostVal < 0.001) {
+                $potentialSavings = $totalCostVal * 0.5; // 50% savings with batching
 
                 $opportunities[] = [
                     'type' => 'high_frequency_calls',
@@ -319,12 +342,13 @@ class CostOptimizationService
 
         // Check for model selection optimization
         if ($this->mcpClient->isServerEnabled('agentcore-mcp-server')) {
+            $totalCostForRouting = is_numeric($costAnalytics['total_cost'] ?? null) ? (float) $costAnalytics['total_cost'] : 0.0;
             $opportunities[] = [
                 'type' => 'model_selection',
                 'priority' => 'medium',
                 'title' => 'Optimize AI model selection',
                 'description' => 'Use cost-effective models (Claude Haiku, Nova Lite) for simple tasks instead of premium models.',
-                'potential_savings' => round($costAnalytics['total_cost'] * 0.2, 2),
+                'potential_savings' => round($totalCostForRouting * 0.2, 2),
                 'implementation_effort' => 'medium',
                 'action' => 'implement_smart_routing',
             ];
@@ -342,10 +366,12 @@ class CostOptimizationService
      * @param  array<string, mixed>  $costAnalytics
      * @return array<string>
      */
-    protected function generateCostRecommendations(): array
+    protected function generateCostRecommendations(int $userId, array $costAnalytics): array
+    {
         $recommendations = [];
 
-        $budgetStatus = $this->getBudgetStatus($userId, $costAnalytics['total_cost']);
+        $totalCostForBudget = is_numeric($costAnalytics['total_cost'] ?? null) ? (float) $costAnalytics['total_cost'] : 0.0;
+        $budgetStatus = $this->getBudgetStatus($userId, $totalCostForBudget);
 
         // Budget-based recommendations
         if ($budgetStatus['status'] === 'exceeded') {
@@ -357,7 +383,10 @@ class CostOptimizationService
         }
 
         // Tool-specific recommendations
-        $topCostTools = collect($costAnalytics['cost_by_tool'])->take(3);
+        $costByToolRaw = $costAnalytics['cost_by_tool'] ?? [];
+        /** @var array<int, array{cost: float, tool: string}> $costByToolArrayRecs */
+        $costByToolArrayRecs = is_array($costByToolRaw) ? $costByToolRaw : [];
+        $topCostTools = collect($costByToolArrayRecs)->take(3);
 
         foreach ($topCostTools as $tool) {
             if ($tool['cost'] > 0.5) {
@@ -366,14 +395,18 @@ class CostOptimizationService
         }
 
         // Server-specific recommendations
-        foreach ($costAnalytics['cost_by_server'] as $server) {
+        $costByServerRaw = $costAnalytics['cost_by_server'] ?? [];
+        /** @var array<int, array{cost: float, server: string}> $costByServerArrayRecs */
+        $costByServerArrayRecs = is_array($costByServerRaw) ? $costByServerRaw : [];
+        foreach ($costByServerArrayRecs as $server) {
             if ($server['cost'] > 2.0) {
                 $recommendations[] = "🔧 Server '{$server['server']}' costs $".round($server['cost'], 2).'. Review usage patterns.';
             }
         }
 
         // General optimization recommendations
-        if ($costAnalytics['total_cost'] > 5.0) {
+        $totalCostForGeneral = is_numeric($costAnalytics['total_cost'] ?? null) ? (float) $costAnalytics['total_cost'] : 0.0;
+        if ($totalCostForGeneral > 5.0) {
             $recommendations[] = '✨ Implement response caching to reduce redundant API calls and lower costs.';
             $recommendations[] = '🎯 Use cost-aware routing to automatically select cheaper models for simple tasks.';
         }
@@ -402,10 +435,11 @@ class CostOptimizationService
      *     factors: array<string>
      * }
      */
-    protected function projectFutureCosts(): array
+    protected function projectFutureCosts(int $userId, array $costAnalytics): array
+    {
         $currentDay = now()->day;
         $daysInMonth = now()->daysInMonth;
-        $currentCost = $costAnalytics['total_cost'];
+        $currentCost = is_numeric($costAnalytics['total_cost'] ?? null) ? (float) $costAnalytics['total_cost'] : 0.0;
 
         $dailyAverage = $currentDay > 0 ? $currentCost / $currentDay : 0;
 
@@ -427,7 +461,8 @@ class CostOptimizationService
             'Daily average: $'.round($dailyAverage, 4),
         ];
 
-        if ($costAnalytics['total_requests'] < 100) {
+        $totalRequests = is_numeric($costAnalytics['total_requests'] ?? null) ? (int) $costAnalytics['total_requests'] : 0;
+        if ($totalRequests < 100) {
             $factors[] = 'Low request volume may affect accuracy';
         }
 
@@ -525,21 +560,25 @@ class CostOptimizationService
         $score = 100.0;
 
         // Deduct points for high costs
-        if ($costAnalytics['total_cost'] > 10.0) {
+        $totalCostForScore = is_numeric($costAnalytics['total_cost'] ?? null) ? (float) $costAnalytics['total_cost'] : 0.0;
+        if ($totalCostForScore > 10.0) {
             $score -= 20;
-        } elseif ($costAnalytics['total_cost'] > 5.0) {
+        } elseif ($totalCostForScore > 5.0) {
             $score -= 10;
         }
 
         // Deduct points for expensive tools
-        $expensiveTools = collect($costAnalytics['cost_by_tool'])
-            ->filter(fn ($tool) => $tool['average_cost'] > 0.01)
+        $costByToolRaw = $costAnalytics['cost_by_tool'] ?? [];
+        /** @var array<int, array{average_cost: float}> $costByToolArrayScore */
+        $costByToolArrayScore = is_array($costByToolRaw) ? $costByToolRaw : [];
+        $expensiveTools = collect($costByToolArrayScore)
+            ->filter(fn (array $tool): bool => $tool['average_cost'] > 0.01)
             ->count();
 
         $score -= min($expensiveTools * 5, 20);
 
         // Deduct points for budget overage
-        $budgetStatus = $this->getBudgetStatus($userId, $costAnalytics['total_cost']);
+        $budgetStatus = $this->getBudgetStatus($userId, $totalCostForScore);
 
         if ($budgetStatus['status'] === 'exceeded') {
             $score -= 30;
@@ -556,7 +595,8 @@ class CostOptimizationService
      * @param  array<string, mixed>  $costAnalytics
      * @return array<array{category: string, cost: float, percentage: float}>
      */
-    protected function categorizeCosts(): array
+    protected function categorizeCosts(array $costAnalytics): array
+    {
         $categories = [
             'ai' => 0.0,
             'infrastructure' => 0.0,
@@ -564,7 +604,10 @@ class CostOptimizationService
             'other' => 0.0,
         ];
 
-        foreach ($costAnalytics['cost_by_server'] as $server) {
+        $costByServerRaw = $costAnalytics['cost_by_server'] ?? [];
+        /** @var array<int, array{server: string, cost: float}> $costByServerArrayCat */
+        $costByServerArrayCat = is_array($costByServerRaw) ? $costByServerRaw : [];
+        foreach ($costByServerArrayCat as $server) {
             $category = match (true) {
                 str_contains($server['server'], 'agentcore') || str_contains($server['server'], 'strands') => 'ai',
                 str_contains($server['server'], 'aws') => 'infrastructure',

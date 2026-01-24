@@ -199,11 +199,15 @@ class RaceDataTool extends Tool
 
         if (! empty($race->race_conditions)) {
             $output .= "  Additional Conditions:\n";
-            foreach ($race->race_conditions as $condition) {
+            /** @var array<mixed> $raceConditions */
+            $raceConditions = $race->race_conditions;
+            foreach ($raceConditions as $condition) {
                 if (\is_array($condition)) {
                     $output .= '    - '.\json_encode($condition)."\n";
-                } else {
+                } elseif (is_string($condition)) {
                     $output .= "    - {$condition}\n";
+                } else {
+                    $output .= '    - '.\json_encode($condition)."\n";
                 }
             }
         }
@@ -217,8 +221,12 @@ class RaceDataTool extends Tool
             }
             if (! empty($race->ura_finale_requirements)) {
                 $output .= "  Requirements:\n";
-                foreach ($race->ura_finale_requirements as $req => $value) {
-                    $output .= "    {$req}: {$value}\n";
+                /** @var array<string|int, mixed> $uraFinaleRequirements */
+                $uraFinaleRequirements = $race->ura_finale_requirements;
+                foreach ($uraFinaleRequirements as $req => $value) {
+                    $reqStr = is_string($req) ? $req : (string) $req;
+                    $valueStr = is_scalar($value) ? (string) $value : (string) \json_encode($value);
+                    $output .= "    {$reqStr}: {$valueStr}\n";
                 }
             }
             $output .= "\n";
@@ -277,7 +285,8 @@ class RaceDataTool extends Tool
             }
 
             // Character Condition
-            if ($race->character_condition || $race->motivation || $race->energy_level) {
+            $hasConditionInfo = $race->character_condition !== null || $race->motivation !== null || ($race->energy_level !== null && $race->energy_level !== 0);
+            if ($hasConditionInfo) {
                 $output .= "CHARACTER CONDITION:\n";
                 if ($race->character_condition) {
                     $output .= "  Condition: {$race->character_condition}\n";
@@ -293,16 +302,22 @@ class RaceDataTool extends Tool
 
             // Skills Activated
             if (! empty($race->skills_activated)) {
-                $output .= 'SKILLS ACTIVATED: '.\count($race->skills_activated)."\n";
-                foreach (\array_slice($race->skills_activated, 0, 10) as $skill) {
+                /** @var array<mixed> $skillsActivated */
+                $skillsActivated = $race->skills_activated;
+                $output .= 'SKILLS ACTIVATED: '.\count($skillsActivated)."\n";
+                /** @var list<mixed> $slicedSkills */
+                $slicedSkills = \array_slice($skillsActivated, 0, 10);
+                foreach ($slicedSkills as $skill) {
                     if (\is_array($skill)) {
                         $output .= '  - '.\json_encode($skill)."\n";
-                    } else {
+                    } elseif (is_string($skill)) {
                         $output .= "  - {$skill}\n";
+                    } else {
+                        $output .= '  - '.\json_encode($skill)."\n";
                     }
                 }
-                if (\count($race->skills_activated) > 10) {
-                    $output .= '  ... and '.(\count($race->skills_activated) - 10)." more skills\n";
+                if (\count($skillsActivated) > 10) {
+                    $output .= '  ... and '.(\count($skillsActivated) - 10)." more skills\n";
                 }
                 $output .= "\n";
             }
@@ -310,11 +325,15 @@ class RaceDataTool extends Tool
             // Performance Analysis
             if (! empty($race->performance_analysis)) {
                 $output .= "PERFORMANCE ANALYSIS:\n";
-                foreach ($race->performance_analysis as $key => $value) {
+                /** @var array<string|int, mixed> $performanceAnalysis */
+                $performanceAnalysis = $race->performance_analysis;
+                foreach ($performanceAnalysis as $key => $value) {
+                    $keyStr = is_string($key) ? $key : (string) $key;
                     if (\is_array($value)) {
-                        $output .= "  {$key}: ".\json_encode($value)."\n";
+                        $output .= "  {$keyStr}: ".\json_encode($value)."\n";
                     } else {
-                        $output .= "  {$key}: {$value}\n";
+                        $valueStr = is_scalar($value) ? (string) $value : (string) \json_encode($value);
+                        $output .= "  {$keyStr}: {$valueStr}\n";
                     }
                 }
                 $output .= "\n";
@@ -332,12 +351,19 @@ class RaceDataTool extends Tool
                 $output .= "  SP Reward: {$race->sp_reward}\n";
             }
             if (! empty($race->item_rewards)) {
-                $output .= '  Items: '.\implode(', ', $race->item_rewards)."\n";
+                /** @var array<mixed> $itemRewardsArray */
+                $itemRewardsArray = $race->item_rewards;
+                $itemRewards = array_map(fn ($item): string => is_string($item) ? $item : (string) \json_encode($item), $itemRewardsArray);
+                $output .= '  Items: '.\implode(', ', $itemRewards)."\n";
             }
             if (! empty($race->stat_bonuses)) {
                 $output .= "  Stat Bonuses:\n";
-                foreach ($race->stat_bonuses as $stat => $bonus) {
-                    $output .= "    {$stat}: +{$bonus}\n";
+                /** @var array<string|int, mixed> $statBonuses */
+                $statBonuses = $race->stat_bonuses;
+                foreach ($statBonuses as $stat => $bonus) {
+                    $statStr = is_string($stat) ? $stat : (string) $stat;
+                    $bonusStr = is_numeric($bonus) ? (string) $bonus : (string) \json_encode($bonus);
+                    $output .= "    {$statStr}: +{$bonusStr}\n";
                 }
             }
             $output .= "\n";
@@ -351,11 +377,15 @@ class RaceDataTool extends Tool
 
         if (! empty($race->preparation_strategy)) {
             $output .= "PREPARATION STRATEGY:\n";
-            foreach ($race->preparation_strategy as $key => $value) {
+            /** @var array<string|int, mixed> $preparationStrategy */
+            $preparationStrategy = $race->preparation_strategy;
+            foreach ($preparationStrategy as $key => $value) {
+                $keyStr = is_string($key) ? $key : (string) $key;
                 if (\is_array($value)) {
-                    $output .= "  {$key}: ".\json_encode($value)."\n";
+                    $output .= "  {$keyStr}: ".\json_encode($value)."\n";
                 } else {
-                    $output .= "  {$key}: {$value}\n";
+                    $valueStr = is_scalar($value) ? (string) $value : (string) \json_encode($value);
+                    $output .= "  {$keyStr}: {$valueStr}\n";
                 }
             }
             $output .= "\n";
@@ -363,11 +393,15 @@ class RaceDataTool extends Tool
 
         if (! empty($race->lessons_learned)) {
             $output .= "LESSONS LEARNED:\n";
-            foreach ($race->lessons_learned as $lesson) {
+            /** @var array<mixed> $lessonsLearned */
+            $lessonsLearned = $race->lessons_learned;
+            foreach ($lessonsLearned as $lesson) {
                 if (\is_array($lesson)) {
                     $output .= '  - '.\json_encode($lesson)."\n";
-                } else {
+                } elseif (is_string($lesson)) {
                     $output .= "  - {$lesson}\n";
+                } else {
+                    $output .= '  - '.\json_encode($lesson)."\n";
                 }
             }
             $output .= "\n";
@@ -393,8 +427,10 @@ class RaceDataTool extends Tool
 
     /**
      * Format multiple races as a list
+     *
+     * @param  \Illuminate\Database\Eloquent\Collection<int, Race>  $races
      */
-    private function formatMultipleRaces($races): string
+    private function formatMultipleRaces(\Illuminate\Database\Eloquent\Collection $races): string
     {
         $output = "RACE LIST\n";
         $output .= "=========\n\n";

@@ -45,32 +45,33 @@ class TrainingSessionParser extends AbstractScreenParser
         return 'training_session';
     }
 
-    public function parse(): array
+    public function parse(string $text): array
+    {
         $data = [];
         $errors = [];
 
         // Extract training type
         $trainingType = $this->extractTrainingType($text);
         if ($trainingType) {
-            (is_array($data) && isset($data['training_type']) ? $data['training_type'] : null) = $trainingType;
+            $data['training_type'] = $trainingType;
         }
 
         // Extract stat gains
         $statGains = $this->extractStatGains($text);
         if (! empty($statGains)) {
-            (is_array($data) && isset($data['stat_gains']) ? $data['stat_gains'] : null) = $statGains;
+            $data['stat_gains'] = $statGains;
         }
 
         // Extract energy cost
         $energyCost = $this->extractNumeric($text, self::TRAINING_PATTERNS['energy_cost']);
         if ($energyCost !== null) {
-            (is_array($data) && isset($data['energy_cost']) ? $data['energy_cost'] : null) = $energyCost;
+            $data['energy_cost'] = $energyCost;
         }
 
         // Check for special indicators
-        (is_array($data) && isset($data['has_skill_hint']) ? $data['has_skill_hint'] : null) = preg_match(self::TRAINING_PATTERNS['skill_hint'], $text) === 1;
-        (is_array($data) && isset($data['has_friendship']) ? $data['has_friendship'] : null) = preg_match(self::TRAINING_PATTERNS['friendship'], $text) === 1;
-        (is_array($data) && isset($data['has_spirit_burst']) ? $data['has_spirit_burst'] : null) = preg_match(self::TRAINING_PATTERNS['spirit_burst'], $text) === 1;
+        $data['has_skill_hint'] = preg_match(self::TRAINING_PATTERNS['skill_hint'], $text) === 1;
+        $data['has_friendship'] = preg_match(self::TRAINING_PATTERNS['friendship'], $text) === 1;
+        $data['has_spirit_burst'] = preg_match(self::TRAINING_PATTERNS['spirit_burst'], $text) === 1;
 
         // Validate extracted data
         $validation = $this->validate($data);
@@ -94,29 +95,38 @@ class TrainingSessionParser extends AbstractScreenParser
         return $result;
     }
 
-    public function validate(): array
+    public function validate(array $data): array
+    {
         $errors = [];
 
         // Validate training type
-        if (isset((is_array($data) && isset($data['training_type']) ? $data['training_type'] : null))) {
+        if (isset($data['training_type'])) {
             $validTypes = array_values(self::TRAINING_TYPES);
-            if (! in_array((is_array($data) && isset($data['training_type']) ? $data['training_type'] : null), $validTypes)) {
-                $errors[] = "Invalid training type: {(is_array($data) && isset($data['training_type']) ? $data['training_type'] : null)}";
+            $trainingType = is_string($data['training_type']) ? $data['training_type'] : '';
+            if (! in_array($trainingType, $validTypes)) {
+                $errors[] = "Invalid training type: {$trainingType}";
             }
         }
 
         // Validate stat gains
-        if (isset((is_array($data) && isset($data['stat_gains']) ? $data['stat_gains'] : null))) {
-            foreach ((is_array($data) && isset($data['stat_gains']) ? $data['stat_gains'] : null) as $stat => $gain) {
-                if ($gain < 0 || $gain > 200) {
-                    $errors[] = "Invalid stat gain for {$stat}: {$gain} (must be 0-200)";
+        if (isset($data['stat_gains']) && is_array($data['stat_gains'])) {
+            /** @var array<string, mixed> $statGains */
+            $statGains = $data['stat_gains'];
+            foreach ($statGains as $stat => $gain) {
+                $statName = is_string($stat) ? $stat : '';
+                $gainValue = is_int($gain) ? $gain : 0;
+                if ($gainValue < 0 || $gainValue > 200) {
+                    $errors[] = "Invalid stat gain for {$statName}: {$gainValue} (must be 0-200)";
                 }
             }
         }
 
         // Validate energy cost
-        if (isset((is_array($data) && isset($data['energy_cost']) ? $data['energy_cost'] : null)) && ! $this->validatePercentage((is_array($data) && isset($data['energy_cost']) ? $data['energy_cost'] : null))) {
-            $errors[] = "Invalid energy cost: {(is_array($data) && isset($data['energy_cost']) ? $data['energy_cost'] : null)} (must be 0-100)";
+        if (isset($data['energy_cost'])) {
+            $energyCost = is_int($data['energy_cost']) ? $data['energy_cost'] : 0;
+            if (! $this->validatePercentage($energyCost)) {
+                $errors[] = "Invalid energy cost: {$energyCost} (must be 0-100)";
+            }
         }
 
         return [
@@ -150,7 +160,8 @@ class TrainingSessionParser extends AbstractScreenParser
      *
      * @return array<string, int>
      */
-    protected function extractStatGains(): array
+    protected function extractStatGains(string $text): array
+    {
         $gains = [];
 
         // Find all stat gain patterns

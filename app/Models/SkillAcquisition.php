@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
 /**
  * @property int $id
@@ -39,7 +40,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * @use HasFactory<SkillAcquisitionFactory>
  */
-class SkillAcquisition extends Model
+class SkillAcquisition extends Pivot
 {
     /** @use HasFactory<SkillAcquisitionFactory> */
     use HasFactory;
@@ -115,6 +116,8 @@ class SkillAcquisition extends Model
 
     /**
      * Whether the skill is currently equipped. Defaults to false when absent.
+     *
+     * @return Attribute<bool, never>
      */
     protected function isEquipped(): Attribute
     {

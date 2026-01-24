@@ -22,16 +22,21 @@ class DataTransformationService
      * @param  array<string, mixed>  $extractedData
      * @return array<string, mixed>
      */
-    public function transformCharacterStats(): array
-        $data = $extractedData['data'] ?? [];
+    public function transformCharacterStats(array $extractedData): array
+    {
+        /** @var array<string, mixed> $data */
+        $data = is_array($extractedData['data'] ?? null) ? $extractedData['data'] : [];
+
+        /** @var array<string, int|null> $stats */
+        $stats = is_array($data['stats'] ?? null) ? $data['stats'] : [];
 
         $transformed = [
-            'stats' => $this->normalizeStats($data['stats'] ?? []),
-            'energy_level' => (is_array($data) && isset((is_array($data) && isset($data['energy_level']) ? $data['energy_level'] : null)) ? (is_array($data) && isset($data['energy_level']) ? $data['energy_level'] : null) : null),
+            'stats' => $this->normalizeStats($stats),
+            'energy_level' => $data['energy_level'] ?? null,
             'mood_status' => $data['mood_status'] ?? 'normal',
-            'current_turn' => (is_array($data) && isset((is_array($data) && isset($data['current_turn']) ? $data['current_turn'] : null)) ? (is_array($data) && isset($data['current_turn']) ? $data['current_turn'] : null) : null),
-            'total_turns' => (is_array($data) && isset((is_array($data) && isset($data['total_turns']) ? $data['total_turns'] : null)) ? (is_array($data) && isset($data['total_turns']) ? $data['total_turns'] : null) : null),
-            'character_name' => (is_array($data) && isset((is_array($data) && isset($data['character_name']) ? $data['character_name'] : null)) ? (is_array($data) && isset($data['character_name']) ? $data['character_name'] : null) : null),
+            'current_turn' => $data['current_turn'] ?? null,
+            'total_turns' => $data['total_turns'] ?? null,
+            'character_name' => $data['character_name'] ?? null,
             'extracted_at' => $extractedData['extracted_at'] ?? now()->toIso8601String(),
             'confidence' => $extractedData['confidence'] ?? 0.0,
         ];
@@ -50,13 +55,18 @@ class DataTransformationService
      * @param  array<string, mixed>  $extractedData
      * @return array<string, mixed>
      */
-    public function transformTrainingSession(): array
-        $data = $extractedData['data'] ?? [];
+    public function transformTrainingSession(array $extractedData): array
+    {
+        /** @var array<string, mixed> $data */
+        $data = is_array($extractedData['data'] ?? null) ? $extractedData['data'] : [];
+
+        /** @var array<string, int|null> $statGains */
+        $statGains = is_array($data['stat_gains'] ?? null) ? $data['stat_gains'] : [];
 
         $transformed = [
-            'training_type' => (is_array($data) && isset((is_array($data) && isset($data['training_type']) ? $data['training_type'] : null)) ? (is_array($data) && isset($data['training_type']) ? $data['training_type'] : null) : null),
-            'stat_gains' => $this->normalizeStats($data['stat_gains'] ?? []),
-            'energy_cost' => (is_array($data) && isset((is_array($data) && isset($data['energy_cost']) ? $data['energy_cost'] : null)) ? (is_array($data) && isset($data['energy_cost']) ? $data['energy_cost'] : null) : null),
+            'training_type' => $data['training_type'] ?? null,
+            'stat_gains' => $this->normalizeStats($statGains),
+            'energy_cost' => $data['energy_cost'] ?? null,
             'has_skill_hint' => $data['has_skill_hint'] ?? false,
             'has_friendship' => $data['has_friendship'] ?? false,
             'has_spirit_burst' => $data['has_spirit_burst'] ?? false,
@@ -79,19 +89,21 @@ class DataTransformationService
      * @param  array<string, mixed>  $extractedData
      * @return array<string, mixed>
      */
-    public function transformRaceResult(): array
-        $data = $extractedData['data'] ?? [];
+    public function transformRaceResult(array $extractedData): array
+    {
+        /** @var array<string, mixed> $data */
+        $data = is_array($extractedData['data'] ?? null) ? $extractedData['data'] : [];
 
         $transformed = [
-            'race_name' => (is_array($data) && isset((is_array($data) && isset($data['race_name']) ? $data['race_name'] : null)) ? (is_array($data) && isset($data['race_name']) ? $data['race_name'] : null) : null),
-            'race_grade' => (is_array($data) && isset((is_array($data) && isset($data['race_grade']) ? $data['race_grade'] : null)) ? (is_array($data) && isset($data['race_grade']) ? $data['race_grade'] : null) : null),
-            'position' => (is_array($data) && isset((is_array($data) && isset($data['position']) ? $data['position'] : null)) ? (is_array($data) && isset($data['position']) ? $data['position'] : null) : null),
-            'distance' => (is_array($data) && isset((is_array($data) && isset($data['distance']) ? $data['distance'] : null)) ? (is_array($data) && isset($data['distance']) ? $data['distance'] : null) : null),
-            'distance_category' => (is_array($data) && isset((is_array($data) && isset($data['distance_category']) ? $data['distance_category'] : null)) ? (is_array($data) && isset($data['distance_category']) ? $data['distance_category'] : null) : null),
-            'surface' => (is_array($data) && isset((is_array($data) && isset($data['surface']) ? $data['surface'] : null)) ? (is_array($data) && isset($data['surface']) ? $data['surface'] : null) : null),
+            'race_name' => $data['race_name'] ?? null,
+            'race_grade' => $data['race_grade'] ?? null,
+            'position' => $data['position'] ?? null,
+            'distance' => $data['distance'] ?? null,
+            'distance_category' => $data['distance_category'] ?? null,
+            'surface' => $data['surface'] ?? null,
             'fans_gained' => $data['fans_gained'] ?? 0,
             'skill_points_gained' => $data['skill_points_gained'] ?? 0,
-            'outcome' => (is_array($data) && isset((is_array($data) && isset($data['outcome']) ? $data['outcome'] : null)) ? (is_array($data) && isset($data['outcome']) ? $data['outcome'] : null) : null),
+            'outcome' => $data['outcome'] ?? null,
             'extracted_at' => $extractedData['extracted_at'] ?? now()->toIso8601String(),
             'confidence' => $extractedData['confidence'] ?? 0.0,
         ];
@@ -111,12 +123,17 @@ class DataTransformationService
      * @param  array<string, mixed>  $extractedData
      * @return array<string, mixed>
      */
-    public function transformSkillList(): array
-        $data = $extractedData['data'] ?? [];
+    public function transformSkillList(array $extractedData): array
+    {
+        /** @var array<string, mixed> $data */
+        $data = is_array($extractedData['data'] ?? null) ? $extractedData['data'] : [];
+
+        /** @var array<int, array<string, mixed>> $skills */
+        $skills = is_array($data['skills'] ?? null) ? $data['skills'] : [];
 
         $transformed = [
-            'total_sp' => (is_array($data) && isset((is_array($data) && isset($data['total_sp']) ? $data['total_sp'] : null)) ? (is_array($data) && isset($data['total_sp']) ? $data['total_sp'] : null) : null),
-            'skills' => $this->normalizeSkills($data['skills'] ?? []),
+            'total_sp' => $data['total_sp'] ?? null,
+            'skills' => $this->normalizeSkills($skills),
             'skill_count' => $data['skill_count'] ?? 0,
             'extracted_at' => $extractedData['extracted_at'] ?? now()->toIso8601String(),
             'confidence' => $extractedData['confidence'] ?? 0.0,
@@ -137,7 +154,8 @@ class DataTransformationService
      * @param  array<string, mixed>  $transformedData
      * @return array<string, mixed>
      */
-    public function prepareCharacterUpdate(): array
+    public function prepareCharacterUpdate(array $transformedData): array
+    {
         $updateData = [];
 
         // Update stats if present (keep as array - model handles JSON encoding)
@@ -164,9 +182,12 @@ class DataTransformationService
      * @param  array<string, mixed>  $transformedData
      * @return array<string, mixed>
      */
-    public function prepareTrainingSessionCreate(): array
-        $statGains = $transformedData['stat_gains'];
+    public function prepareTrainingSessionCreate(array $transformedData, int $careerId): array
+    {
+        /** @var array<string, int|null> $statGains */
+        $statGains = is_array($transformedData['stat_gains'] ?? null) ? $transformedData['stat_gains'] : [];
         $totalStatPoints = array_sum(array_filter($statGains, fn ($v) => $v !== null));
+        $energyCost = is_int($transformedData['energy_cost'] ?? null) ? $transformedData['energy_cost'] : 0;
 
         return [
             'career_id' => $careerId,
@@ -180,12 +201,12 @@ class DataTransformationService
             'guts_gain' => $statGains['guts'] ?? 0,
             'wit_gain' => $statGains['wit'] ?? 0,
             'sp_gain' => $statGains['sp'] ?? 0,
-            'energy_cost' => $transformedData['energy_cost'],
+            'energy_cost' => $energyCost,
             'energy_before' => 100, // Default value
-            'energy_after' => max(0, 100 - $transformedData['energy_cost']),
+            'energy_after' => max(0, 100 - $energyCost),
             'total_stat_points_gained' => $totalStatPoints,
-            'skill_hints_obtained' => $transformedData['has_skill_hint'] ? ['detected' => true] : null,
-            'friendship_training' => $transformedData['has_friendship'],
+            'skill_hints_obtained' => ($transformedData['has_skill_hint'] ?? false) ? ['detected' => true] : null,
+            'friendship_training' => $transformedData['has_friendship'] ?? false,
             'training_metadata' => [
                 'spirit_burst' => $transformedData['has_spirit_burst'],
             ],
@@ -198,7 +219,8 @@ class DataTransformationService
      * @param  array<string, mixed>  $transformedData
      * @return array<string, mixed>
      */
-    public function prepareRaceCreate(): array
+    public function prepareRaceCreate(array $transformedData, int $careerId): array
+    {
         return [
             'career_id' => $careerId,
             'character_id' => 1, // Will be updated by service
@@ -237,7 +259,8 @@ class DataTransformationService
      * @param  array<string, int|null>  $stats
      * @return array<string, int|null>
      */
-    private function normalizeStats(): array
+    private function normalizeStats(array $stats): array
+    {
         $normalized = [
             'speed' => null,
             'stamina' => null,
@@ -261,10 +284,11 @@ class DataTransformationService
      * @param  array<int, array<string, mixed>>  $skills
      * @return array<int, array<string, mixed>>
      */
-    private function normalizeSkills(): array
+    private function normalizeSkills(array $skills): array
+    {
         return \array_map(fn (array $skill) => [
-            'name' => (is_array($skill) && isset($skill['name']) ? $skill['name'] : null),
-            'sp_cost' => (is_array($skill) && isset($skill['sp_cost']) ? $skill['sp_cost'] : null),
+            'name' => $skill['name'] ?? null,
+            'sp_cost' => $skill['sp_cost'] ?? null,
             'hint_level' => $skill['hint_level'] ?? 0,
             'is_acquired' => $skill['is_acquired'] ?? false,
             'skill_type' => $skill['skill_type'] ?? 'passive',

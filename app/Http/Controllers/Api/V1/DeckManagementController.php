@@ -336,9 +336,6 @@ class DeckManagementController extends Controller
         try {
             $options = $request->input('options', []);
             $options = is_array($options) ? $options : [];
-            if (! is_array($options)) {
-                $options = [];
-            }
             $recommendations = $this->optimizationService->recommendDeck($character->id, $options);
 
             return response()->json([

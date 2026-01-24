@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -59,6 +60,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class AIConversation extends Model
 {
+    /** @use HasFactory<\Database\Factories\AIConversationFactory> */
     use HasFactory;
 
     /**
@@ -180,7 +182,11 @@ class AIConversation extends Model
     /**
      * Scope a query to only include user messages.
      */
-    public function scopeUserMessages(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    /**
+     * @param  Builder<AIConversation>  $query
+     * @return Builder<AIConversation>
+     */
+    public function scopeUserMessages(Builder $query): Builder
     {
         return $query->where('message_type', 'user');
     }
@@ -188,7 +194,11 @@ class AIConversation extends Model
     /**
      * Scope a query to only include AI messages.
      */
-    public function scopeAiMessages(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    /**
+     * @param  Builder<AIConversation>  $query
+     * @return Builder<AIConversation>
+     */
+    public function scopeAiMessages(Builder $query): Builder
     {
         return $query->where('message_type', 'ai');
     }
@@ -196,7 +206,11 @@ class AIConversation extends Model
     /**
      * Scope a query to filter by conversation ID.
      */
-    public function scopeConversation($query, string $conversationId)
+    /**
+     * @param  Builder<AIConversation>  $query
+     * @return Builder<AIConversation>
+     */
+    public function scopeConversation(Builder $query, string $conversationId): Builder
     {
         return $query->where('conversation_id', $conversationId);
     }

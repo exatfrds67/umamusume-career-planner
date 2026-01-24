@@ -151,11 +151,15 @@ class SkillDataTool extends Tool
         // Effects
         if (! empty($skill->effects)) {
             $output .= "EFFECTS:\n";
-            foreach ($skill->effects as $effect) {
+            /** @var array<mixed> $effects */
+            $effects = $skill->effects;
+            foreach ($effects as $effect) {
                 if (is_array($effect)) {
                     $output .= '  - '.json_encode($effect)."\n";
-                } else {
+                } elseif (is_string($effect)) {
                     $output .= "  - {$effect}\n";
+                } else {
+                    $output .= '  - '.json_encode($effect)."\n";
                 }
             }
             $output .= "\n";
@@ -164,11 +168,15 @@ class SkillDataTool extends Tool
         // Activation Conditions
         if (! empty($skill->activation_conditions)) {
             $output .= "ACTIVATION CONDITIONS:\n";
-            foreach ($skill->activation_conditions as $condition) {
+            /** @var array<mixed> $activationConditions */
+            $activationConditions = $skill->activation_conditions;
+            foreach ($activationConditions as $condition) {
                 if (is_array($condition)) {
                     $output .= '  - '.json_encode($condition)."\n";
-                } else {
+                } elseif (is_string($condition)) {
                     $output .= "  - {$condition}\n";
+                } else {
+                    $output .= '  - '.json_encode($condition)."\n";
                 }
             }
             $output .= "\n";
@@ -177,8 +185,12 @@ class SkillDataTool extends Tool
         // Stat Requirements
         if (! empty($skill->stat_requirements)) {
             $output .= "STAT REQUIREMENTS:\n";
-            foreach ($skill->stat_requirements as $stat => $value) {
-                $output .= "  {$stat}: {$value}\n";
+            /** @var array<string|int, mixed> $statRequirements */
+            $statRequirements = $skill->stat_requirements;
+            foreach ($statRequirements as $stat => $value) {
+                $statStr = is_string($stat) ? $stat : (string) $stat;
+                $valueStr = is_scalar($value) ? (string) $value : (string) json_encode($value);
+                $output .= "  {$statStr}: {$valueStr}\n";
             }
             $output .= "\n";
         }
@@ -221,8 +233,12 @@ class SkillDataTool extends Tool
             $output .= "SYNERGY SKILLS:\n";
             $synergySkills = $skill->getSynergySkills();
             if (! empty($synergySkills)) {
-                foreach (array_slice($synergySkills, 0, 5) as $synergySkill) {
-                    $output .= "  - {$synergySkill['name']} [{$synergySkill['skill_type']}]\n";
+                /** @var list<array<string, mixed>> $slicedSynergySkills */
+                $slicedSynergySkills = array_slice($synergySkills, 0, 5);
+                foreach ($slicedSynergySkills as $synergySkill) {
+                    $name = isset($synergySkill['name']) && is_string($synergySkill['name']) ? $synergySkill['name'] : 'Unknown';
+                    $type = isset($synergySkill['skill_type']) && is_string($synergySkill['skill_type']) ? $synergySkill['skill_type'] : 'unknown';
+                    $output .= "  - {$name} [{$type}]\n";
                 }
                 if (count($synergySkills) > 5) {
                     $output .= '  ... and '.(count($synergySkills) - 5)." more synergy skills\n";
@@ -254,11 +270,15 @@ class SkillDataTool extends Tool
         // Strategic Notes
         if (! empty($skill->strategic_notes)) {
             $output .= "STRATEGIC NOTES:\n";
-            foreach ($skill->strategic_notes as $note) {
+            /** @var array<mixed> $strategicNotes */
+            $strategicNotes = $skill->strategic_notes;
+            foreach ($strategicNotes as $note) {
                 if (is_array($note)) {
                     $output .= '  - '.json_encode($note)."\n";
-                } else {
+                } elseif (is_string($note)) {
                     $output .= "  - {$note}\n";
+                } else {
+                    $output .= '  - '.json_encode($note)."\n";
                 }
             }
         }
@@ -268,8 +288,10 @@ class SkillDataTool extends Tool
 
     /**
      * Format multiple skills as a list
+     *
+     * @param  \Illuminate\Database\Eloquent\Collection<int, Skill>  $skills
      */
-    private function formatMultipleSkills($skills, string $title): string
+    private function formatMultipleSkills(\Illuminate\Database\Eloquent\Collection $skills, string $title): string
     {
         $output = strtoupper($title)."\n";
         $output .= str_repeat('=', strlen($title))."\n\n";
@@ -278,9 +300,9 @@ class SkillDataTool extends Tool
 
         foreach ($skills as $skill) {
             $evolution = '';
-            if ($skill->canEvolve()) {
+            if ($skill->canEvolve() && $skill->evolutionTarget !== null) {
                 $evolution = ' → '.$skill->evolutionTarget->name;
-            } elseif ($skill->isEvolved()) {
+            } elseif ($skill->isEvolved() && $skill->evolutionSource !== null) {
                 $evolution = ' (Evolved from '.$skill->evolutionSource->name.')';
             }
 

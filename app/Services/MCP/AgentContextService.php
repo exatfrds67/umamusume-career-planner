@@ -37,12 +37,15 @@ class AgentContextService
 
     /**
      * Build comprehensive character context for MCP agents
+     *
+     * @return array<string, mixed>
      */
-    public function buildCharacterContext(): array
+    public function buildCharacterContext(Character $character): array
+    {
         try {
             $cacheKey = "agent_context:character:{$character->id}";
 
-            return Cache::remember($cacheKey, 300, function () use ($character) {
+            $result = Cache::remember($cacheKey, 300, function () use ($character): array {
                 // Load all relationships
                 $character->load([
                     'aptitudes',
@@ -116,9 +119,9 @@ class AgentContextService
 
                         return [
                             'id' => $card->id,
-                            'name' => $definition?->name ?? '',
-                            'rarity' => $definition?->rarity ?? '',
-                            'specialization' => $definition?->specialization ?? '',
+                            'name' => $definition->name ?? '',
+                            'rarity' => $definition->rarity ?? '',
+                            'specialization' => $definition->specialization ?? '',
                             'friendship_level' => $card->friendship_level ?? 0,
                         ];
                     })->toArray(),
@@ -127,7 +130,7 @@ class AgentContextService
                     'goals' => $character->goals ?? [],
 
                     // Recent career history
-                    'career_history' => $character->careers->map(function ($career) {
+                    'career_history' => $character->careers->map(function (Career $career): array {
                         return [
                             'id' => $career->id,
                             'final_stats' => [
@@ -137,7 +140,7 @@ class AgentContextService
                                 'guts' => $career->final_guts,
                                 'wit' => $career->final_wit,
                             ],
-                            'completed_at' => $career->completed_at?->toIso8601String(),
+                            'completed_at' => $career->completed_at instanceof \Illuminate\Support\Carbon ? $career->completed_at->toIso8601String() : null,
                         ];
                     })->toArray(),
 
@@ -146,6 +149,8 @@ class AgentContextService
                     'context_version' => '1.0',
                 ];
             });
+
+            return is_array($result) ? $result : [];
         } catch (\Exception $e) {
             Log::error('[AgentContext] Failed to build character context', [
                 'character_id' => $character->id,
@@ -158,8 +163,11 @@ class AgentContextService
 
     /**
      * Build career context for MCP agents
+     *
+     * @return array<string, mixed>
      */
-    public function buildCareerContext(): array
+    public function buildCareerContext(?Career $career): array
+    {
         if (! $career) {
             return [
                 'active' => false,
@@ -170,7 +178,7 @@ class AgentContextService
         try {
             $cacheKey = "agent_context:career:{$career->id}";
 
-            return Cache::remember($cacheKey, 300, function () use ($career) {
+            $result = Cache::remember($cacheKey, 300, function () use ($career): array {
                 // Load relationships
                 $career->load([
                     'trainingSessions' => function ($query) {
@@ -188,7 +196,7 @@ class AgentContextService
                     'id' => $career->id,
                     'character_id' => $career->character_id,
                     'scenario_type' => $career->scenario_type,
-                    'start_date' => $career->started_at?->toIso8601String(),
+                    'start_date' => $career->started_at instanceof \Illuminate\Support\Carbon ? $career->started_at->toIso8601String() : null,
                     'current_turn' => $career->current_turn ?? 0,
                     'is_active' => $career->completed_at === null,
 
@@ -239,6 +247,8 @@ class AgentContextService
                     'context_version' => '1.0',
                 ];
             });
+
+            return is_array($result) ? $result : [];
         } catch (\Exception $e) {
             Log::error('[AgentContext] Failed to build career context', [
                 'career_id' => $career->id,
@@ -251,14 +261,17 @@ class AgentContextService
 
     /**
      * Build user context for MCP agents
+     *
+     * @return array<string, mixed>
      */
-    public function buildUserContext(): array
+    public function buildUserContext(User $user): array
+    {
         try {
-            $cacheKey = "agent_context:user:{$user?->id ?? throw new \Exception('User required')}";
+            $cacheKey = "agent_context:user:{$user->id}";
 
-            return Cache::remember($cacheKey, 600, function () use ($user) {
+            $result = Cache::remember($cacheKey, 600, function () use ($user): array {
                 return [
-                    'id' => $user?->id ?? throw new \Exception('User required'),
+                    'id' => $user->id,
                     'name' => $user->name,
                     'preferences' => $this->getUserPreferences($user),
                     'ai_settings' => $this->getUserAISettings($user),
@@ -266,9 +279,11 @@ class AgentContextService
                     'context_generated_at' => now()->toIso8601String(),
                 ];
             });
+
+            return is_array($result) ? $result : [];
         } catch (\Exception $e) {
             Log::error('[AgentContext] Failed to build user context', [
-                'user_id' => $user?->id ?? throw new \Exception('User required'),
+                'user_id' => $user->id,
                 'error' => $e->getMessage(),
             ]);
 
@@ -278,17 +293,22 @@ class AgentContextService
 
     /**
      * Build session context for MCP agents
+     *
+     * @param  array<string, mixed>  $additionalData
+     * @return array<string, mixed>
      */
-    public function buildSessionContext(): array
+    public function buildSessionContext(string $sessionId, array $additionalData = []): array
+    {
         try {
             $cacheKey = "agent_context:session:{$sessionId}";
 
-            $context = Cache::get($cacheKey, [
+            $cached = Cache::get($cacheKey);
+            $context = is_array($cached) ? $cached : [
                 'session_id' => $sessionId,
                 'started_at' => now()->toIso8601String(),
                 'interactions' => [],
                 'agent_history' => [],
-            ]);
+            ];
 
             // Merge additional data
             $context = array_merge($context, $additionalData);
@@ -310,8 +330,17 @@ class AgentContextService
 
     /**
      * Build unified context for multi-agent workflows
+     *
+     * @param  array<string, mixed>  $additionalContext
+     * @return array<string, mixed>
      */
-    public function buildUnifiedContext(): array
+    public function buildUnifiedContext(
+        Character $character,
+        ?Career $career = null,
+        ?User $user = null,
+        ?string $sessionId = null,
+        array $additionalContext = []
+    ): array {
         try {
             $context = [
                 'character' => $this->buildCharacterContext($character),
@@ -378,14 +407,19 @@ class AgentContextService
         // Also invalidate related career contexts
         $careers = Career::where('character_id', $characterId)->pluck('id');
         foreach ($careers as $careerId) {
-            $this->invalidateContext(self::CONTEXT_CAREER, $careerId);
+            if (is_int($careerId) || is_string($careerId)) {
+                $this->invalidateContext(self::CONTEXT_CAREER, $careerId);
+            }
         }
     }
 
     /**
      * Get user preferences
+     *
+     * @return array<string, mixed>
      */
-    protected function getUserPreferences(): array
+    protected function getUserPreferences(User $user): array
+    {
         return [
             'ai_provider_preference' => 'ollama', // Default to local
             'agent_verbosity' => 'normal',
@@ -396,8 +430,11 @@ class AgentContextService
 
     /**
      * Get user AI settings
+     *
+     * @return array<string, mixed>
      */
-    protected function getUserAISettings(): array
+    protected function getUserAISettings(User $user): array
+    {
         return [
             'enable_ollama' => true,
             'enable_bedrock' => false,
@@ -412,15 +449,18 @@ class AgentContextService
 
     /**
      * Get user statistics
+     *
+     * @return array<string, mixed>
      */
-    protected function getUserStatistics(): array
+    protected function getUserStatistics(User $user): array
+    {
         return [
             'total_characters' => $user->characters()->count(),
-            'total_careers' => Career::whereHas('character', function ($query) use ($user) {
-                $query->where('user_id', $user?->id ?? throw new \Exception('User required'));
+            'total_careers' => Career::whereHas('character', function ($query) use ($user): void {
+                $query->where('user_id', $user->id);
             })->count(),
             'total_ai_conversations' => $user->aiConversations()->count(),
-            'member_since' => $user->created_at->toIso8601String(),
+            'member_since' => $user->created_at instanceof \Illuminate\Support\Carbon ? $user->created_at->toIso8601String() : (string) $user->created_at,
         ];
     }
 }

@@ -30,7 +30,8 @@ class TrainingAdvisorService
     public function __construct(
         private Character $characterModel,
         private TrainingSession $trainingSessionModel,
-        private SupportCard $supportCardModel
+        /** @phpstan-ignore-next-line property.onlyWritten */
+        private SupportCard $supportCardModel // Used for potential card-based recommendations
     ) {}
 
     /**
@@ -61,10 +62,15 @@ class TrainingAdvisorService
         try {
             // Call agent with structured output
             $response = $agent->structured(
-                TrainingAdviceResponse::class,
                 new UserMessage($context),
-                maxRetry: 3
+                TrainingAdviceResponse::class,
+                3
             );
+
+            // Ensure response is of correct type
+            if (! $response instanceof TrainingAdviceResponse) {
+                throw new \RuntimeException('Unexpected response type from agent');
+            }
 
             // Log successful advice generation
             Log::info('Training advice generated', [
@@ -128,12 +134,18 @@ class TrainingAdvisorService
         $context .= "\n";
 
         // Target goals
-        if (! empty($character->goals['target_stats'])) {
+        if (! empty($character->goals) && is_array($character->goals) && ! empty($character->goals['target_stats']) && is_array($character->goals['target_stats'])) {
             $context .= "## Target Goals\n";
-            foreach ($character->goals['target_stats'] as $stat => $target) {
+            /** @var array<string, int|float> $targetStats */
+            $targetStats = $character->goals['target_stats'];
+            foreach ($targetStats as $stat => $target) {
+                if (! is_string($stat)) {
+                    continue;
+                }
+                $targetInt = is_numeric($target) ? (int) $target : 0;
                 $current = $currentStats[$stat] ?? 0;
-                $gap = max(0, $target - $current);
-                $context .= '- '.ucfirst($stat).": {$current}/{$target} (Gap: {$gap})\n";
+                $gap = max(0, $targetInt - $current);
+                $context .= '- '.ucfirst($stat).": {$current}/{$targetInt} (Gap: {$gap})\n";
             }
             $context .= "\n";
         }
@@ -174,28 +186,35 @@ class TrainingAdvisorService
 
         // Training options
         $context .= "## Available Training Options\n";
-        if (! empty($trainingOptions['available_trainings'])) {
+        if (! empty($trainingOptions['available_trainings']) && is_array($trainingOptions['available_trainings'])) {
             foreach ($trainingOptions['available_trainings'] as $training) {
-                $type = $training['type'] ?? 'unknown';
+                if (! is_array($training)) {
+                    continue;
+                }
+                $type = isset($training['type']) && is_string($training['type']) ? $training['type'] : 'unknown';
                 $context .= '- '.ucfirst($type)." Training\n";
 
-                if (! empty($training['support_cards_present'])) {
-                    $context .= '  Support Cards Present: '.count($training['support_cards_present'])."\n";
+                if (! empty($training['support_cards_present']) && is_array($training['support_cards_present'])) {
+                    $cardCount = count($training['support_cards_present']);
+                    $context .= "  Support Cards Present: {$cardCount}\n";
                 }
 
-                if (isset($training['energy_cost'])) {
-                    $context .= "  Energy Cost: {$training['energy_cost']}\n";
+                if (isset($training['energy_cost']) && is_numeric($training['energy_cost'])) {
+                    $energyCost = (string) $training['energy_cost'];
+                    $context .= "  Energy Cost: {$energyCost}\n";
                 }
 
-                if (isset($training['failure_risk'])) {
-                    $riskPercent = round($training['failure_risk'] * 100);
+                if (isset($training['failure_risk']) && is_numeric($training['failure_risk'])) {
+                    $riskPercent = (string) round((float) $training['failure_risk'] * 100);
                     $context .= "  Failure Risk: {$riskPercent}%\n";
                 }
 
-                if (! empty($training['expected_gains'])) {
+                if (! empty($training['expected_gains']) && is_array($training['expected_gains'])) {
                     $gains = [];
                     foreach ($training['expected_gains'] as $stat => $gain) {
-                        $gains[] = ucfirst($stat).": +{$gain}";
+                        $statStr = is_string($stat) ? ucfirst($stat) : 'Unknown';
+                        $gainStr = is_numeric($gain) ? (string) $gain : '0';
+                        $gains[] = "{$statStr}: +{$gainStr}";
                     }
                     $context .= '  Expected Gains: '.implode(', ', $gains)."\n";
                 }
@@ -208,14 +227,18 @@ class TrainingAdvisorService
         // Scenario-specific context
         if ($character->scenario_type === 'unity_cup') {
             $context .= "## Unity Cup Specific\n";
-            if (! empty($character->facility_levels)) {
+            if (! empty($character->facility_levels) && is_array($character->facility_levels)) {
                 $context .= "Facility Levels:\n";
-                foreach ($character->facility_levels as $type => $level) {
-                    $context .= '- '.ucfirst($type).": Level {$level}\n";
+                /** @var array<string, int|string> $facilityLevels */
+                $facilityLevels = $character->facility_levels;
+                foreach ($facilityLevels as $type => $level) {
+                    $typeStr = is_string($type) ? $type : (string) $type;
+                    $levelStr = is_scalar($level) ? (string) $level : '0';
+                    $context .= '- '.ucfirst($typeStr).": Level {$levelStr}\n";
                 }
             }
             if (! empty($trainingOptions['spirit_burst_gauge'])) {
-                $gauge = $trainingOptions['spirit_burst_gauge'];
+                $gauge = is_scalar($trainingOptions['spirit_burst_gauge']) ? (string) $trainingOptions['spirit_burst_gauge'] : '0';
                 $context .= "Spirit Burst Gauge: {$gauge}/4\n";
             }
             $context .= "\n";
@@ -246,9 +269,10 @@ class TrainingAdvisorService
         }
 
         // Additional context
-        if (! empty($trainingOptions['additional_context'])) {
+        if (! empty($trainingOptions['additional_context']) && is_scalar($trainingOptions['additional_context'])) {
             $context .= "## Additional Context\n";
-            $context .= $trainingOptions['additional_context']."\n\n";
+            $additionalCtx = (string) $trainingOptions['additional_context'];
+            $context .= $additionalCtx."\n\n";
         }
 
         $context .= 'Please analyze this information and provide your training recommendation.';
@@ -265,7 +289,8 @@ class TrainingAdvisorService
      * @param  TrainingAdviceResponse  $response  The agent response
      * @return array<string, mixed> Parsed response data
      */
-    public function parseResponse(): array
+    public function parseResponse(TrainingAdviceResponse $response): array
+    {
         return [
             'recommended_training' => $response->recommendedTraining,
             'reasoning' => $response->reasoning,
@@ -304,7 +329,7 @@ class TrainingAdvisorService
         try {
             // Stream response from agent
             foreach ($agent->stream(new UserMessage($context)) as $chunk) {
-                yield $chunk;
+                yield is_scalar($chunk) ? (string) $chunk : '';
             }
 
             // Log successful streaming
@@ -333,7 +358,8 @@ class TrainingAdvisorService
      * @param  array<string, mixed>  $trainingOptions  Training options to validate
      * @return array<string, string> Validation errors (empty if valid)
      */
-    public function validateTrainingOptions(): array
+    public function validateTrainingOptions(array $trainingOptions): array
+    {
         $errors = [];
 
         // Check if available_trainings is present and is an array
@@ -342,7 +368,9 @@ class TrainingAdvisorService
                 $errors['available_trainings'] = 'Must be an array';
             } else {
                 // Validate each training option
-                foreach ($trainingOptions['available_trainings'] as $index => $training) {
+                /** @var array<int|string, mixed> $trainings */
+                $trainings = $trainingOptions['available_trainings'];
+                foreach ($trainings as $index => $training) {
                     if (! is_array($training)) {
                         $errors["available_trainings.{$index}"] = 'Must be an array';
 
@@ -377,7 +405,8 @@ class TrainingAdvisorService
      * @param  int  $limit  Maximum number of messages to retrieve
      * @return array<int, array<string, mixed>> Array of past advice messages
      */
-    public function getAdviceHistory(): array
+    public function getAdviceHistory(int $characterId, int $userId, int $limit = 10): array
+    {
         // Create agent to access chat history
         $agent = new TrainingAdvisorAgent($userId, $characterId);
         $chatHistory = $agent->getChatHistory();
@@ -385,7 +414,7 @@ class TrainingAdvisorService
         // Get messages from chat history
         $messages = $chatHistory->getMessages();
         if ($limit > 0) {
-            $messages = array_slice($messages, -$limit);
+            $messages = array_slice($messages, -$limit, null, true);
         }
 
         // Format messages for display

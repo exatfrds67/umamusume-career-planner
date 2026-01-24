@@ -27,7 +27,8 @@ class WorkflowExportService
      *
      * @return array<string, mixed>
      */
-    public function exportAsJson(): array
+    public function exportAsJson(AIConversation $conversation, bool $includeAnalytics = true): array
+    {
         try {
             $workflow = $this->conversationService->exportWorkflow($conversation, 'json');
 
@@ -112,7 +113,7 @@ class WorkflowExportService
             $filename = $filename ?? $this->generateFilename($conversation, $format);
 
             $content = match ($format) {
-                'json' => json_encode($this->exportAsJson($conversation), JSON_PRETTY_PRINT),
+                'json' => json_encode($this->exportAsJson($conversation), JSON_PRETTY_PRINT) ?: '',
                 'markdown', 'md' => $this->exportAsMarkdown($conversation),
                 'pdf' => $this->exportAsPdf($conversation),
                 default => throw new \InvalidArgumentException("Unsupported format: {$format}"),
@@ -142,7 +143,8 @@ class WorkflowExportService
      *
      * @return array<string, mixed>
      */
-    public function generateShareableLink(): array
+    public function generateShareableLink(AIConversation $conversation, int $expiresInDays = 7): array
+    {
         try {
             $filename = $this->saveToFile($conversation, 'json');
             $expiresAt = now()->addDays($expiresInDays);
@@ -175,6 +177,8 @@ class WorkflowExportService
 
     /**
      * Import workflow from JSON
+     *
+     * @param  array<string, mixed>  $workflowData
      */
     public function importFromJson(array $workflowData): AIConversation
     {
@@ -182,29 +186,80 @@ class WorkflowExportService
             // Validate workflow data
             $this->validateWorkflowData($workflowData);
 
+            $conversationId = isset($workflowData['conversation_id']) && is_string($workflowData['conversation_id'])
+                ? $workflowData['conversation_id']
+                : \Illuminate\Support\Str::uuid()->toString();
+            $conversationType = isset($workflowData['type']) && is_string($workflowData['type'])
+                ? $workflowData['type']
+                : 'imported';
+            $title = isset($workflowData['title']) && is_string($workflowData['title'])
+                ? $workflowData['title'].' (Imported)'
+                : 'Imported Workflow';
+            $createdAt = isset($workflowData['created_at']) && is_string($workflowData['created_at'])
+                ? $workflowData['created_at']
+                : now();
+
             // Create conversation from imported data
             $conversation = AIConversation::create([
                 'user_id' => auth()->id(),
-                'conversation_id' => $workflowData['conversation_id'] ?? \Illuminate\Support\Str::uuid()->toString(),
-                'conversation_type' => $workflowData['type'],
-                'conversation_title' => $workflowData['title'].' (Imported)',
+                'conversation_id' => $conversationId,
+                'conversation_type' => $conversationType,
+                'conversation_title' => $title,
                 'status' => 'archived',
-                'started_at' => $workflowData['created_at'] ?? now(),
+                'started_at' => $createdAt,
                 'ai_model' => 'imported',
                 'ai_version' => '1.0',
             ]);
 
             // Import messages
-            foreach ($workflowData['messages'] as $messageData) {
+            $messages = isset($workflowData['messages']) && is_array($workflowData['messages'])
+                ? $workflowData['messages']
+                : [];
+
+            foreach ($messages as $messageData) {
+                if (! is_array($messageData)) {
+                    continue;
+                }
+
+                $msgType = isset($messageData['type']) && is_string($messageData['type'])
+                    ? $messageData['type']
+                    : 'message';
+                $msgContent = isset($messageData['content']) && is_string($messageData['content'])
+                    ? $messageData['content']
+                    : '';
+                $agentData = isset($messageData['agent']) && is_array($messageData['agent'])
+                    ? $messageData['agent']
+                    : [];
+                $agentId = isset($agentData['id']) && is_string($agentData['id'])
+                    ? $agentData['id']
+                    : null;
+                $agentType = isset($agentData['type']) && is_string($agentData['type'])
+                    ? $agentData['type']
+                    : null;
+                $agentName = isset($agentData['name']) && is_string($agentData['name'])
+                    ? $agentData['name']
+                    : null;
+                $toolsData = isset($messageData['tools']) && is_array($messageData['tools'])
+                    ? $messageData['tools']
+                    : [];
+                /** @var array<int, mixed> */
+                $toolsUsed = isset($toolsData['used']) && is_array($toolsData['used'])
+                    ? $toolsData['used']
+                    : [];
+                /** @var array<string, mixed> */
+                $toolResults = isset($toolsData['results']) && is_array($toolsData['results'])
+                    ? $toolsData['results']
+                    : [];
+
                 $this->conversationService->addMessage(
                     $conversation,
-                    $messageData['type'],
-                    $messageData['content'],
-                    $messageData['agent']['id'] ?? null,
-                    $messageData['agent']['type'] ?? null,
-                    $messageData['agent']['name'] ?? null,
-                    $messageData['tools']['used'] ?? [],
-                    $messageData['tools']['results'] ?? [],
+                    $msgType,
+                    $msgContent,
+                    $agentId,
+                    $agentType,
+                    $agentName,
+                    $toolsUsed,
+                    $toolResults,
                     []
                 );
             }
@@ -230,49 +285,86 @@ class WorkflowExportService
      */
     protected function generateMarkdown(array $workflow): string
     {
-        $md = "# {$workflow['title']}\n\n";
-        $md .= "**Type:** {$workflow['type']}\n";
-        $md .= "**Created:** {$workflow['created_at']}\n";
-        $md .= "**Conversation ID:** {$workflow['conversation_id']}\n\n";
+        $title = isset($workflow['title']) && is_string($workflow['title']) ? $workflow['title'] : 'Untitled';
+        $type = isset($workflow['type']) && is_string($workflow['type']) ? $workflow['type'] : 'Unknown';
+        $createdAt = isset($workflow['created_at']) && is_string($workflow['created_at']) ? $workflow['created_at'] : 'Unknown';
+        $conversationId = isset($workflow['conversation_id']) && is_string($workflow['conversation_id']) ? $workflow['conversation_id'] : 'Unknown';
+
+        $md = "# {$title}\n\n";
+        $md .= "**Type:** {$type}\n";
+        $md .= "**Created:** {$createdAt}\n";
+        $md .= "**Conversation ID:** {$conversationId}\n\n";
 
         $md .= "## Messages\n\n";
 
-        foreach ($workflow['messages'] as $message) {
-            $type = ucfirst($message['type']);
-            $agent = $message['agent']['name'] ?? 'Unknown';
-            $time = $message['sent_at'];
+        $messages = isset($workflow['messages']) && is_array($workflow['messages']) ? $workflow['messages'] : [];
+        foreach ($messages as $message) {
+            if (! is_array($message)) {
+                continue;
+            }
 
-            $md .= "### {$type} Message";
-            if ($message['agent']['name']) {
+            $msgType = isset($message['type']) && is_string($message['type']) ? ucfirst($message['type']) : 'Unknown';
+            $agentData = isset($message['agent']) && is_array($message['agent']) ? $message['agent'] : [];
+            $agent = isset($agentData['name']) && is_string($agentData['name']) ? $agentData['name'] : 'Unknown';
+            $time = isset($message['sent_at']) && is_string($message['sent_at']) ? $message['sent_at'] : 'Unknown';
+
+            $md .= "### {$msgType} Message";
+            if (isset($agentData['name']) && is_string($agentData['name'])) {
                 $md .= " (Agent: {$agent})";
             }
             $md .= "\n";
             $md .= "*{$time}*\n\n";
-            $md .= "{$message['content']}\n\n";
+            $content = isset($message['content']) && is_string($message['content']) ? $message['content'] : '';
+            $md .= "{$content}\n\n";
 
-            if (isset($message['tools']) && ! empty($message['tools']['used'])) {
-                $md .= '**Tools Used:** '.implode(', ', $message['tools']['used'])."\n\n";
+            $toolsData = isset($message['tools']) && is_array($message['tools']) ? $message['tools'] : [];
+            $toolsUsed = isset($toolsData['used']) && is_array($toolsData['used']) ? $toolsData['used'] : [];
+            if (! empty($toolsUsed)) {
+                $toolNames = [];
+                foreach ($toolsUsed as $tool) {
+                    if (is_string($tool)) {
+                        $toolNames[] = $tool;
+                    }
+                }
+                $md .= '**Tools Used:** '.implode(', ', $toolNames)."\n\n";
             }
 
-            if ($message['quality']['rating']) {
-                $md .= "**Rating:** {$message['quality']['rating']}/5\n\n";
+            $qualityData = isset($message['quality']) && is_array($message['quality']) ? $message['quality'] : [];
+            $rating = isset($qualityData['rating']) ? $qualityData['rating'] : null;
+            if ($rating !== null) {
+                $ratingStr = is_int($rating) || is_float($rating) ? (string) $rating : '';
+                $md .= "**Rating:** {$ratingStr}/5\n\n";
             }
 
             $md .= "---\n\n";
         }
 
-        if (isset($workflow['analytics'])) {
-            $md .= "## Analytics\n\n";
-            $md .= "- **Total Messages:** {$workflow['analytics']['total_messages']}\n";
-            $md .= "- **User Messages:** {$workflow['analytics']['user_messages']}\n";
-            $md .= "- **AI Messages:** {$workflow['analytics']['ai_messages']}\n\n";
+        if (isset($workflow['analytics']) && is_array($workflow['analytics'])) {
+            $analytics = $workflow['analytics'];
+            $totalMessages = isset($analytics['total_messages']) && is_int($analytics['total_messages']) ? (string) $analytics['total_messages'] : '0';
+            $userMessages = isset($analytics['user_messages']) && is_int($analytics['user_messages']) ? (string) $analytics['user_messages'] : '0';
+            $aiMessages = isset($analytics['ai_messages']) && is_int($analytics['ai_messages']) ? (string) $analytics['ai_messages'] : '0';
 
-            if (! empty($workflow['analytics']['agent_breakdown'])) {
+            $md .= "## Analytics\n\n";
+            $md .= "- **Total Messages:** {$totalMessages}\n";
+            $md .= "- **User Messages:** {$userMessages}\n";
+            $md .= "- **AI Messages:** {$aiMessages}\n\n";
+
+            $agentBreakdown = isset($analytics['agent_breakdown']) && is_array($analytics['agent_breakdown']) ? $analytics['agent_breakdown'] : [];
+            if (! empty($agentBreakdown)) {
                 $md .= "### Agent Breakdown\n\n";
-                foreach ($workflow['analytics']['agent_breakdown'] as $agent) {
-                    $md .= "- **{$agent['agent_name']}**: {$agent['message_count']} messages, ";
-                    $md .= "Avg Rating: {$agent['avg_rating']}, ";
-                    $md .= "Helpfulness: {$agent['helpfulness_rate']}%\n";
+                foreach ($agentBreakdown as $agentStats) {
+                    if (! is_array($agentStats)) {
+                        continue;
+                    }
+                    $agentName = isset($agentStats['agent_name']) && is_string($agentStats['agent_name']) ? $agentStats['agent_name'] : 'Unknown';
+                    $msgCount = isset($agentStats['message_count']) && is_int($agentStats['message_count']) ? (string) $agentStats['message_count'] : '0';
+                    $avgRating = isset($agentStats['avg_rating']) && (is_float($agentStats['avg_rating']) || is_int($agentStats['avg_rating'])) ? (string) $agentStats['avg_rating'] : '0';
+                    $helpfulness = isset($agentStats['helpfulness_rate']) && (is_float($agentStats['helpfulness_rate']) || is_int($agentStats['helpfulness_rate'])) ? (string) $agentStats['helpfulness_rate'] : '0';
+
+                    $md .= "- **{$agentName}**: {$msgCount} messages, ";
+                    $md .= "Avg Rating: {$avgRating}, ";
+                    $md .= "Helpfulness: {$helpfulness}%\n";
                 }
                 $md .= "\n";
             }
@@ -302,7 +394,8 @@ class WorkflowExportService
             }
         }
 
-        if (! is_array((is_array($data) && isset($data['messages']) ? $data['messages'] : null)) || empty((is_array($data) && isset($data['messages']) ? $data['messages'] : null))) {
+        $messages = $data['messages'];
+        if (! is_array($messages) || empty($messages)) {
             throw new \InvalidArgumentException('Messages must be a non-empty array');
         }
     }

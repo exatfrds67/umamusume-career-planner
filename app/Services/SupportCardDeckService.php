@@ -31,7 +31,8 @@ class SupportCardDeckService
      * @param  array<int, array{card_id: int, position: int}>  $cards
      * @return array{valid: bool, errors: array<string>, warnings: array<string>}
      */
-    public function validateDeck(): array
+    public function validateDeck(array $cards): array
+    {
         $errors = [];
         $warnings = [];
 
@@ -117,7 +118,8 @@ class SupportCardDeckService
      *     total_multiplier: float
      * }
      */
-    public function calculateDeckBonuses(): array
+    public function calculateDeckBonuses(Character $character): array
+    {
         $character->load('supportCards.supportCard');
 
         $statBonuses = [
@@ -140,26 +142,29 @@ class SupportCardDeckService
 
             // Calculate stat bonuses based on card type
             $cardType = $card->card_type ?? 'speed';
+            if (! array_key_exists($cardType, $statBonuses)) {
+                $cardType = 'speed';
+            }
             $limitBreak = $deckCard->limit_break_level ?? 0;
 
             // Base bonus per matching stat (5% + 2% per limit break level)
             $baseBonus = 0.05 + ($limitBreak * 0.02);
-            $statBonuses[$cardType] = ($statBonuses[$cardType] ?? 0) + $baseBonus;
+            $statBonuses[$cardType] += $baseBonus;
 
             // Friendship bonus (when friendship is at 80+)
             if (($deckCard->friendship_level ?? 0) >= 80) {
-                $friendshipBonus = ($friendshipBonus ?? 0) + 0.05; // 5% per maxed friendship
+                $friendshipBonus += 0.05; // 5% per maxed friendship
             }
 
             // Race bonus from card effects
             $effects = $card->training_effects ?? [];
             if (isset($effects['race_bonus'])) {
-                $raceBonus = ($raceBonus ?? 0) + (isset($effects['race_bonus']) && is_numeric($effects['race_bonus']) ? (float) $effects['race_bonus'] : 0.0);
+                $raceBonus += is_numeric($effects['race_bonus']) ? (float) $effects['race_bonus'] : 0.0;
             }
 
             // Training bonus
             if (isset($effects['training_bonus'])) {
-                $trainingBonus = ($trainingBonus ?? 0) + (isset($effects['training_bonus']) && is_numeric($effects['training_bonus']) ? (float) $effects['training_bonus'] : 0.0);
+                $trainingBonus += is_numeric($effects['training_bonus']) ? (float) $effects['training_bonus'] : 0.0;
             }
         }
 
@@ -192,20 +197,20 @@ class SupportCardDeckService
 
         // Score for full deck
         if ($cards->count() === self::MAX_DECK_SIZE) {
-            $score = ($score ?? 0) + 20.0;
+            $score += 20.0;
         }
 
         // Score for type diversity
         $types = $cards->pluck('supportCard.card_type')->unique()->count();
-        $score = ($score ?? 0) + min($types * 10.0, 30.0);
+        $score += min($types * 10.0, 30.0);
 
         // Score for limit breaks
         $avgLimitBreak = $cards->avg('limit_break_level') ?? 0;
-        $score = ($score ?? 0) + $avgLimitBreak * 5.0; // Max 20 points
+        $score += $avgLimitBreak * 5.0; // Max 20 points
 
         // Score for friendship levels
         $avgFriendship = $cards->avg('friendship_level') ?? 0;
-        $score = ($score ?? 0) + ($avgFriendship / 100) * 20.0;
+        $score += ($avgFriendship / 100) * 20.0;
 
         // Score for matching priority stats
         $priorities = $character->stat_priorities ?? [];
@@ -217,7 +222,7 @@ class SupportCardDeckService
                 return ($card->supportCard->card_type ?? '') === $topPriority;
             })->count();
 
-            $score = ($score ?? 0) + min($matchingCards * 5.0, 10.0);
+            $score += min($matchingCards * 5.0, 10.0);
         }
 
         return min($score, 100.0);

@@ -19,10 +19,10 @@ class ResponseTransformer
     /**
      * Transform API response to internal format
      *
-     * @param  mixed  $data
      * @return array<string, mixed>
      */
-    public function transform(): array
+    public function transform(string $dataType, mixed $data): array
+    {
         if (! is_array($data)) {
             Log::warning('[ResponseTransformer] Invalid data type for transformation', [
                 'data_type' => $dataType,
@@ -47,15 +47,18 @@ class ResponseTransformer
     /**
      * Transform single character data
      *
-     * @param  array<string, mixed>  $character
+     * @param  array<mixed, mixed>  $character
      * @return array<string, mixed>
      */
-    protected function transformCharacter(): array
+    protected function transformCharacter(array $character): array
+    {
+        $aptitudes = isset($character['aptitudes']) && is_array($character['aptitudes']) ? $character['aptitudes'] : [];
+
         return [
-            'id' => (is_array($character) && isset($character['id']) ? $character['id'] : null),
+            'id' => $character['id'] ?? null,
             'name' => $character['name'] ?? '',
-            'title' => (is_array($character) && isset($character['title']) ? $character['title'] : null),
-            'rarity' => (is_array($character) && isset($character['rarity']) ? $character['rarity'] : null),
+            'title' => $character['title'] ?? null,
+            'rarity' => $character['rarity'] ?? null,
             'base_stats' => [
                 'speed' => $character['speed'] ?? 0,
                 'stamina' => $character['stamina'] ?? 0,
@@ -63,9 +66,9 @@ class ResponseTransformer
                 'guts' => $character['guts'] ?? 0,
                 'wisdom' => $character['wisdom'] ?? 0,
             ],
-            'aptitudes' => $this->transformAptitudes($character['aptitudes'] ?? []),
+            'aptitudes' => $this->transformAptitudes($aptitudes),
             'skills' => $character['skills'] ?? [],
-            'growth_rate' => (is_array($character) && isset($character['growth_rate']) ? $character['growth_rate'] : null),
+            'growth_rate' => $character['growth_rate'] ?? null,
             'metadata' => [
                 'source' => 'umapyoi',
                 'transformed_at' => now()->toISOString(),
@@ -76,12 +79,13 @@ class ResponseTransformer
     /**
      * Transform multiple characters
      *
-     * @param  array<int, array<string, mixed>>  $characters
+     * @param  array<mixed, mixed>  $characters
      * @return array<int, array<string, mixed>>
      */
-    protected function transformCharacters(): array
+    protected function transformCharacters(array $characters): array
+    {
         return array_map(
-            fn ($character) => $this->transformCharacter($character),
+            fn ($character) => $this->transformCharacter(is_array($character) ? $character : []),
             $characters
         );
     }
@@ -92,18 +96,21 @@ class ResponseTransformer
      * @param  array<string, mixed>  $aptitudes
      * @return array<string, mixed>
      */
-    protected function transformAptitudes(): array
+    protected function transformAptitudes(array $aptitudes): array
+    {
         $transformed = [];
 
         foreach (['turf', 'dirt'] as $surface) {
             foreach (['short', 'mile', 'medium', 'long'] as $distance) {
                 $key = "{$surface}_{$distance}";
-                $transformed[$key] = $this->normalizeAptitude($aptitudes[$key] ?? null);
+                $value = $aptitudes[$key] ?? null;
+                $transformed[$key] = $this->normalizeAptitude(is_string($value) ? $value : null);
             }
         }
 
         foreach (['runner', 'leader', 'betweener', 'chaser'] as $style) {
-            $transformed[$style] = $this->normalizeAptitude($aptitudes[$style] ?? null);
+            $value = $aptitudes[$style] ?? null;
+            $transformed[$style] = $this->normalizeAptitude(is_string($value) ? $value : null);
         }
 
         return $transformed;
@@ -129,16 +136,19 @@ class ResponseTransformer
     /**
      * Transform single support card data
      *
-     * @param  array<string, mixed>  $card
+     * @param  array<mixed, mixed>  $card
      * @return array<string, mixed>
      */
-    protected function transformSupportCard(): array
+    protected function transformSupportCard(array $card): array
+    {
+        $rarityValue = $card['rarity'] ?? null;
+
         return [
-            'id' => (is_array($card) && isset($card['id']) ? $card['id'] : null),
+            'id' => $card['id'] ?? null,
             'name' => $card['name'] ?? '',
-            'rarity' => $this->normalizeRarity((is_array($card) && isset($card['rarity']) ? $card['rarity'] : null)),
-            'type' => (is_array($card) && isset($card['type']) ? $card['type'] : null),
-            'character_id' => (is_array($card) && isset($card['character_id']) ? $card['character_id'] : null),
+            'rarity' => $this->normalizeRarity(is_string($rarityValue) ? $rarityValue : null),
+            'type' => $card['type'] ?? null,
+            'character_id' => $card['character_id'] ?? null,
             'stats' => [
                 'speed' => $card['speed_bonus'] ?? 0,
                 'stamina' => $card['stamina_bonus'] ?? 0,
@@ -148,7 +158,7 @@ class ResponseTransformer
             ],
             'effects' => $card['effects'] ?? [],
             'skills' => $card['skills'] ?? [],
-            'unique_effect' => (is_array($card) && isset($card['unique_effect']) ? $card['unique_effect'] : null),
+            'unique_effect' => $card['unique_effect'] ?? null,
             'friendship_bonus' => $card['friendship_bonus'] ?? 0,
             'metadata' => [
                 'source' => 'umapyoi',
@@ -160,12 +170,13 @@ class ResponseTransformer
     /**
      * Transform multiple support cards
      *
-     * @param  array<int, array<string, mixed>>  $cards
+     * @param  array<mixed, mixed>  $cards
      * @return array<int, array<string, mixed>>
      */
-    protected function transformSupportCards(): array
+    protected function transformSupportCards(array $cards): array
+    {
         return array_map(
-            fn ($card) => $this->transformSupportCard($card),
+            fn ($card) => $this->transformSupportCard(is_array($card) ? $card : []),
             $cards
         );
     }
@@ -189,17 +200,20 @@ class ResponseTransformer
     /**
      * Transform single skill data
      *
-     * @param  array<string, mixed>  $skill
+     * @param  array<mixed, mixed>  $skill
      * @return array<string, mixed>
      */
-    protected function transformSkill(): array
+    protected function transformSkill(array $skill): array
+    {
+        $rarityValue = $skill['rarity'] ?? null;
+
         return [
-            'id' => (is_array($skill) && isset($skill['id']) ? $skill['id'] : null),
+            'id' => $skill['id'] ?? null,
             'name' => $skill['name'] ?? '',
             'description' => $skill['description'] ?? '',
             'effect' => $skill['effect'] ?? '',
             'type' => $skill['type'] ?? 'normal',
-            'rarity' => $this->normalizeSkillRarity((is_array($skill) && isset($skill['rarity']) ? $skill['rarity'] : null)),
+            'rarity' => $this->normalizeSkillRarity(is_string($rarityValue) ? $rarityValue : null),
             'conditions' => $skill['conditions'] ?? [],
             'metadata' => [
                 'source' => 'umapyoi',
@@ -211,12 +225,13 @@ class ResponseTransformer
     /**
      * Transform multiple skills
      *
-     * @param  array<int, array<string, mixed>>  $skills
+     * @param  array<mixed, mixed>  $skills
      * @return array<int, array<string, mixed>>
      */
-    protected function transformSkills(): array
+    protected function transformSkills(array $skills): array
+    {
         return array_map(
-            fn ($skill) => $this->transformSkill($skill),
+            fn ($skill) => $this->transformSkill(is_array($skill) ? $skill : []),
             $skills
         );
     }
@@ -240,16 +255,33 @@ class ResponseTransformer
     /**
      * Transform news data
      *
-     * @param  array<int, array<string, mixed>>  $news
+     * @param  array<mixed, mixed>  $news
      * @return array<int, array<string, mixed>>
      */
-    protected function transformNews(): array
-        return array_map(function ($item) {
+    protected function transformNews(array $news): array
+    {
+        return array_map(function (mixed $item): array {
+            if (! is_array($item)) {
+                return [
+                    'id' => null,
+                    'title' => '',
+                    'content' => '',
+                    'published_at' => null,
+                    'category' => 'general',
+                    'metadata' => [
+                        'source' => 'umapyoi',
+                        'transformed_at' => now()->toISOString(),
+                    ],
+                ];
+            }
+
+            $publishedAt = $item['published_at'] ?? null;
+
             return [
-                'id' => (is_array($item) && isset($item['id']) ? $item['id'] : null),
+                'id' => $item['id'] ?? null,
                 'title' => $item['title'] ?? '',
                 'content' => $item['content'] ?? '',
-                'published_at' => $this->normalizeDate((is_array($item) && isset($item['published_at']) ? $item['published_at'] : null)),
+                'published_at' => $this->normalizeDate(is_string($publishedAt) ? $publishedAt : null),
                 'category' => $item['category'] ?? 'general',
                 'metadata' => [
                     'source' => 'umapyoi',
@@ -287,16 +319,14 @@ class ResponseTransformer
      * @param  array<string, mixed>  $additionalMetadata
      * @return array<string, mixed>
      */
-    public function addMetadata(): array
+    public function addMetadata(array $data, array $additionalMetadata = []): array
+    {
         $metadata = array_merge([
             'transformed_at' => now()->toISOString(),
         ], $additionalMetadata);
 
-        if (isset((is_array($data) && isset($data['metadata']) ? $data['metadata'] : null))) {
-            (is_array($data) && isset($data['metadata']) ? $data['metadata'] : null) = array_merge((is_array($data) && isset($data['metadata']) ? $data['metadata'] : null), $metadata);
-        } else {
-            (is_array($data) && isset($data['metadata']) ? $data['metadata'] : null) = $metadata;
-        }
+        $existingMetadata = isset($data['metadata']) && is_array($data['metadata']) ? $data['metadata'] : [];
+        $data['metadata'] = array_merge($existingMetadata, $metadata);
 
         return $data;
     }
@@ -307,7 +337,8 @@ class ResponseTransformer
      * @param  array<int, mixed>  $items
      * @return array<int, array<string, mixed>>
      */
-    public function batchTransform(): array
+    public function batchTransform(array $items, string $dataType): array
+    {
         return array_map(
             fn ($item) => $this->transform($dataType, $item),
             $items

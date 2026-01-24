@@ -259,7 +259,7 @@ class ApiPerformanceMiddleware
 
         while ($floatBytes >= 1024 && $i < count($units) - 1) {
             $floatBytes /= 1024;
-            $i = ($i ?? 0) + 1;
+            $i++;
         }
 
         return round($floatBytes, 2).' '.$units[$i];

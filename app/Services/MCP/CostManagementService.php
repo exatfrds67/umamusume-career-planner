@@ -57,6 +57,7 @@ class CostManagementService
     protected const ALERT_THRESHOLD_EXCEEDED = 1.0; // 100%
 
     public function __construct(
+        /** @phpstan-ignore-next-line property.onlyWritten - service available for future use */
         private readonly MCPClientService $mcpClient
     ) {}
 
@@ -67,11 +68,11 @@ class CostManagementService
      */
     public function trackCost(array $operation): void
     {
-        $provider = $operation['provider'] ?? 'unknown';
-        $model = $operation['model'] ?? 'unknown';
-        $inputTokens = $operation['input_tokens'] ?? 0;
-        $outputTokens = $operation['output_tokens'] ?? 0;
-        $executionTime = $operation['execution_time'] ?? 0.0;
+        $provider = is_string($operation['provider'] ?? null) ? $operation['provider'] : 'unknown';
+        $model = is_string($operation['model'] ?? null) ? $operation['model'] : 'unknown';
+        $inputTokens = is_numeric($operation['input_tokens'] ?? null) ? (int) $operation['input_tokens'] : 0;
+        $outputTokens = is_numeric($operation['output_tokens'] ?? null) ? (int) $operation['output_tokens'] : 0;
+        $executionTime = is_numeric($operation['execution_time'] ?? null) ? (float) $operation['execution_time'] : 0.0;
 
         // Calculate cost
         $cost = $this->calculateCost($provider, $model, $inputTokens, $outputTokens);
@@ -79,8 +80,10 @@ class CostManagementService
         // Calculate input and output costs separately
         $costKey = $this->mapModelToCostKey($provider, $model);
         $costs = self::COSTS[$costKey] ?? self::COSTS['bedrock_sonnet'];
-        $inputCost = ($inputTokens / 1000) * $costs['input'];
-        $outputCost = ($outputTokens / 1000) * $costs['output'];
+        $inputCostRate = (float) $costs['input'];
+        $outputCostRate = (float) $costs['output'];
+        $inputCost = ($inputTokens / 1000) * $inputCostRate;
+        $outputCost = ($outputTokens / 1000) * $outputCostRate;
 
         // Store cost record
         try {
@@ -94,11 +97,11 @@ class CostManagementService
                 'output_cost' => round($outputCost, 6),
                 'total_cost' => $cost,
                 'response_time' => $executionTime,
-                'request_type' => $operation['type'] ?? 'unknown',
-                'user_id' => (is_array($operation) && isset($operation['user_id']) ? $operation['user_id'] : null),
-                'character_id' => (is_array($operation) && isset($operation['character_id']) ? $operation['character_id'] : null),
-                'request_summary' => (is_array($operation) && isset($operation['summary']) ? $operation['summary'] : null),
-                'cached' => $operation['cached'] ?? false,
+                'request_type' => is_string($operation['type'] ?? null) ? $operation['type'] : 'unknown',
+                'user_id' => isset($operation['user_id']) ? $operation['user_id'] : null,
+                'character_id' => isset($operation['character_id']) ? $operation['character_id'] : null,
+                'request_summary' => isset($operation['summary']) && is_string($operation['summary']) ? $operation['summary'] : null,
+                'cached' => (bool) ($operation['cached'] ?? false),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -176,14 +179,16 @@ class CostManagementService
     protected function updateCachedTotals(string $provider, float $cost): void
     {
         $cacheKey = "cost_total_{$provider}";
-        $currentTotal = Cache::get($cacheKey, 0.0);
+        $currentTotalRaw = Cache::get($cacheKey, 0.0);
+        $currentTotal = is_numeric($currentTotalRaw) ? (float) $currentTotalRaw : 0.0;
         $newTotal = $currentTotal + $cost;
 
         Cache::put($cacheKey, $newTotal, 3600); // 1 hour
 
         // Update overall total
         $overallKey = 'cost_total_all';
-        $overallTotal = Cache::get($overallKey, 0.0);
+        $overallTotalRaw = Cache::get($overallKey, 0.0);
+        $overallTotal = is_numeric($overallTotalRaw) ? (float) $overallTotalRaw : 0.0;
         Cache::put($overallKey, $overallTotal + $cost, 3600);
     }
 
@@ -201,6 +206,7 @@ class CostManagementService
      * }
      */
     public function checkBudgetStatus(): array
+    {
         $budgetLimit = $this->getBudgetLimit();
         $currentSpending = $this->getCurrentSpending();
         $remainingBudget = max(0, $budgetLimit - $currentSpending);
@@ -225,7 +231,9 @@ class CostManagementService
      */
     protected function getBudgetLimit(): float
     {
-        return (float) config('ai.budget.monthly_limit', 100.0);
+        $limit = config('ai.budget.monthly_limit', 100.0);
+
+        return is_numeric($limit) ? (float) $limit : 100.0;
     }
 
     /**
@@ -237,7 +245,7 @@ class CostManagementService
         $cacheKey = 'cost_total_all';
         $cached = Cache::get($cacheKey);
 
-        if ($cached !== null) {
+        if ($cached !== null && is_numeric($cached)) {
             return (float) $cached;
         }
 
@@ -286,7 +294,8 @@ class CostManagementService
      *     avg_cost_per_request: float
      * }>
      */
-    public function getCostBreakdownByProvider(): array
+    public function getCostBreakdownByProvider(int $days = 30): array
+    {
         $since = now()->subDays($days);
 
         $breakdown = DB::table('ucp_ai_costs')
@@ -300,14 +309,15 @@ class CostManagementService
             ->get()
             ->mapWithKeys(fn ($row) => [
                 $row->provider => [
-                    'total_cost' => round((is_numeric($$$row->total_cost) ? (float) $$$row->total_cost : 0.0), 4),
-                    'total_tokens' => (is_numeric($$$row->total_tokens) ? (int) $$$row->total_tokens : 0),
-                    'request_count' => (is_numeric($$$row->request_count) ? (int) $$$row->request_count : 0),
-                    'avg_cost_per_request' => round((is_numeric($$$row->avg_cost_per_request) ? (float) $$$row->avg_cost_per_request : 0.0), 6),
+                    'total_cost' => round((is_numeric($row->total_cost) ? (float) $row->total_cost : 0.0), 4),
+                    'total_tokens' => (is_numeric($row->total_tokens) ? (int) $row->total_tokens : 0),
+                    'request_count' => (is_numeric($row->request_count) ? (int) $row->request_count : 0),
+                    'avg_cost_per_request' => round((is_numeric($row->avg_cost_per_request) ? (float) $row->avg_cost_per_request : 0.0), 6),
                 ],
             ])
             ->toArray();
 
+        /** @var array<string, array{total_cost: float, total_tokens: int, request_count: int, avg_cost_per_request: float}> $breakdown */
         return $breakdown;
     }
 
@@ -321,7 +331,8 @@ class CostManagementService
      *     avg_cost_per_request: float
      * }>
      */
-    public function getCostBreakdownByModel(): array
+    public function getCostBreakdownByModel(int $days = 30): array
+    {
         $since = now()->subDays($days);
 
         $breakdown = DB::table('ucp_ai_costs')
@@ -335,14 +346,15 @@ class CostManagementService
             ->get()
             ->mapWithKeys(fn ($row) => [
                 $row->model => [
-                    'total_cost' => round((is_numeric($$$row->total_cost) ? (float) $$$row->total_cost : 0.0), 4),
-                    'total_tokens' => (is_numeric($$$row->total_tokens) ? (int) $$$row->total_tokens : 0),
-                    'request_count' => (is_numeric($$$row->request_count) ? (int) $$$row->request_count : 0),
-                    'avg_cost_per_request' => round((is_numeric($$$row->avg_cost_per_request) ? (float) $$$row->avg_cost_per_request : 0.0), 6),
+                    'total_cost' => round((is_numeric($row->total_cost) ? (float) $row->total_cost : 0.0), 4),
+                    'total_tokens' => (is_numeric($row->total_tokens) ? (int) $row->total_tokens : 0),
+                    'request_count' => (is_numeric($row->request_count) ? (int) $row->request_count : 0),
+                    'avg_cost_per_request' => round((is_numeric($row->avg_cost_per_request) ? (float) $row->avg_cost_per_request : 0.0), 6),
                 ],
             ])
             ->toArray();
 
+        /** @var array<string, array{total_cost: float, total_tokens: int, request_count: int, avg_cost_per_request: float}> $breakdown */
         return $breakdown;
     }
 
@@ -351,7 +363,8 @@ class CostManagementService
      *
      * @return array<string, float>
      */
-    public function getDailyCostTrend(): array
+    public function getDailyCostTrend(int $days = 30): array
+    {
         $since = now()->subDays($days);
 
         $trend = DB::table('ucp_ai_costs')
@@ -362,10 +375,11 @@ class CostManagementService
             ->orderBy('date')
             ->get()
             ->mapWithKeys(fn ($row) => [
-                $row->date => round((is_numeric($$$row->daily_cost) ? (float) $$$row->daily_cost : 0.0), 4),
+                $row->date => round((is_numeric($row->daily_cost) ? (float) $row->daily_cost : 0.0), 4),
             ])
             ->toArray();
 
+        /** @var array<string, float> $trend */
         return $trend;
     }
 
@@ -381,6 +395,7 @@ class CostManagementService
      * }>
      */
     public function getOptimizationRecommendations(): array
+    {
         $recommendations = [];
         $breakdown = $this->getCostBreakdownByProvider(30);
 
@@ -404,7 +419,7 @@ class CostManagementService
 
         foreach ($modelBreakdown as $model => $data) {
             if (str_contains($model, 'opus')) {
-                $opusCost = ($opusCost ?? 0) + (is_array($data) && isset($data['total_cost']) ? $data['total_cost'] : null);
+                $opusCost += (is_array($data) && isset($data['total_cost']) && is_numeric($data['total_cost']) ? (float) $data['total_cost'] : 0.0);
             }
         }
 
@@ -450,7 +465,8 @@ class CostManagementService
      *     recommendations: array<int, mixed>
      * }
      */
-    public function getUsageAnalytics(): array
+    public function getUsageAnalytics(int $days = 30): array
+    {
         $since = now()->subDays($days);
 
         $totals = DB::table('ucp_ai_costs')

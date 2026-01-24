@@ -27,7 +27,8 @@ class ExternalAPIFacade
      *
      * @return array{success: bool, data: array<int, array<string, mixed>>, source: string, error?: string}
      */
-    public function getCharacters(): array
+    public function getCharacters(bool $forceRefresh = false): array
+    {
         // Store context for this API call
         $this->contextService->storeApiCallContext('umapyoi', '/v1/characters', [
             'force_refresh' => $forceRefresh,
@@ -59,7 +60,8 @@ class ExternalAPIFacade
      *
      * @return array{success: bool, data: array<string, mixed>|null, source: string, error?: string}
      */
-    public function getCharacter(): array
+    public function getCharacter(string $characterId, bool $forceRefresh = false): array
+    {
         $this->contextService->storeApiCallContext('umapyoi', "/v1/characters/{$characterId}", [
             'character_id' => $characterId,
             'force_refresh' => $forceRefresh,
@@ -74,7 +76,8 @@ class ExternalAPIFacade
      *
      * @return array{success: bool, data: array<int, array<string, mixed>>, source: string, error?: string}
      */
-    public function getSupportCards(): array
+    public function getSupportCards(bool $forceRefresh = false): array
+    {
         $this->contextService->storeApiCallContext('umapyoi', '/v1/support-cards', [
             'force_refresh' => $forceRefresh,
             'timestamp' => now()->toIso8601String(),
@@ -103,7 +106,8 @@ class ExternalAPIFacade
      *
      * @return array{success: bool, data: array<string, mixed>|null, source: string, error?: string}
      */
-    public function getSupportCard(): array
+    public function getSupportCard(string $cardId, bool $forceRefresh = false): array
+    {
         $this->contextService->storeApiCallContext('umapyoi', "/v1/support-cards/{$cardId}", [
             'card_id' => $cardId,
             'force_refresh' => $forceRefresh,
@@ -118,7 +122,8 @@ class ExternalAPIFacade
      *
      * @return array{success: bool, data: array<int, array<string, mixed>>, source: string, error?: string}
      */
-    public function getNews(): array
+    public function getNews(int $limit = 10, bool $forceRefresh = false): array
+    {
         $this->contextService->storeApiCallContext('umapyoi', '/v1/news', [
             'limit' => $limit,
             'force_refresh' => $forceRefresh,
@@ -134,7 +139,8 @@ class ExternalAPIFacade
      * @param  array<string, mixed>  $params
      * @return array{success: bool, data: array<string, mixed>|null, source: string, error?: string}
      */
-    public function getTrainingCalculation(): array
+    public function getTrainingCalculation(array $params, bool $forceRefresh = false): array
+    {
         $this->contextService->storeApiCallContext('umamusumedb', '/v1/training/calculate', [
             'params' => $params,
             'force_refresh' => $forceRefresh,
@@ -149,7 +155,8 @@ class ExternalAPIFacade
      *
      * @return array{success: bool, data: array<int, array<string, mixed>>, source: string, error?: string}
      */
-    public function getMetaTierRankings(): array
+    public function getMetaTierRankings(bool $forceRefresh = false): array
+    {
         $this->contextService->storeApiCallContext('umamusumedb', '/v1/meta/tier-rankings', [
             'force_refresh' => $forceRefresh,
             'timestamp' => now()->toIso8601String(),
@@ -163,7 +170,8 @@ class ExternalAPIFacade
      *
      * @return array{success: bool, data: array<int, array<string, mixed>>, source: string, error?: string}
      */
-    public function getCommunityBuilds(): array
+    public function getCommunityBuilds(string $characterId, bool $forceRefresh = false): array
+    {
         $this->contextService->storeApiCallContext('umamusumedb', "/v1/characters/{$characterId}/builds", [
             'character_id' => $characterId,
             'force_refresh' => $forceRefresh,
@@ -178,7 +186,8 @@ class ExternalAPIFacade
      *
      * @return array{success: bool, data: array<int, array<string, mixed>>, source: string, error?: string}
      */
-    public function getSkillEffectiveness(): array
+    public function getSkillEffectiveness(bool $forceRefresh = false): array
+    {
         $this->contextService->storeApiCallContext('umamusumedb', '/v1/skills/effectiveness', [
             'force_refresh' => $forceRefresh,
             'timestamp' => now()->toIso8601String(),
@@ -193,7 +202,8 @@ class ExternalAPIFacade
      * @param  array<string, mixed>  $params
      * @return array{success: bool, data: array<string, mixed>|null, source: string, error?: string}
      */
-    public function getRaceStrategy(): array
+    public function getRaceStrategy(array $params, bool $forceRefresh = false): array
+    {
         $this->contextService->storeApiCallContext('umamusumedb', '/v1/race/strategy', [
             'params' => $params,
             'force_refresh' => $forceRefresh,
@@ -209,6 +219,7 @@ class ExternalAPIFacade
      * @return array{umapyoi: array{available: bool, cache_status: array<string, bool>}, umamusumedb: array{available: bool, cache_status: array<string, bool>}, context7: array{enabled: bool, healthy: bool}}
      */
     public function getHealthStatus(): array
+    {
         return [
             'umapyoi' => [
                 'available' => $this->umapyoiClient->isAvailable(),
@@ -243,6 +254,7 @@ class ExternalAPIFacade
      * @return array{health: array<string, mixed>, context_summary: array<string, int>, cache_status: array<string, array<string, bool>>}
      */
     public function getStatistics(): array
+    {
         return [
             'health' => $this->getHealthStatus(),
             'context_summary' => $this->contextService->getContextSummary(),
@@ -256,9 +268,10 @@ class ExternalAPIFacade
     /**
      * Sync all external data
      *
-     * @return array{characters: array{success: bool, synced_count: int}, support_cards: array{success: bool, synced_count: int}, meta_data: array{success: bool, synced_count: int}}
+     * @return array{characters: array{success: bool, data: array<int, array<string, mixed>>, source: string, error?: string}, support_cards: array{success: bool, data: array<int, array<string, mixed>>, source: string, error?: string}, meta_data: array{success: bool, data: array<int, array<string, mixed>>, source: string, error?: string}}
      */
     public function syncAllData(): array
+    {
         Log::info('[ExternalAPIFacade] Starting full data sync');
 
         $results = [

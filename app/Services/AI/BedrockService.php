@@ -33,10 +33,17 @@ class BedrockService
 
     public function __construct()
     {
-        $this->defaultModel = (string) Config::get('ai.bedrock.default_model', 'claude-3-5-sonnet');
-        $this->timeout = (int) Config::get('aws.bedrock.timeout', 30);
-        $this->temperature = (float) Config::get('ai.bedrock.temperature', 0.3);
-        $this->maxTokens = (int) Config::get('ai.bedrock.max_tokens', 4096);
+        $defaultModelConfig = Config::get('ai.bedrock.default_model', 'claude-3-5-sonnet');
+        $this->defaultModel = is_scalar($defaultModelConfig) ? (string) $defaultModelConfig : 'claude-3-5-sonnet';
+
+        $timeoutConfig = Config::get('aws.bedrock.timeout', 30);
+        $this->timeout = is_numeric($timeoutConfig) ? (int) $timeoutConfig : 30;
+
+        $temperatureConfig = Config::get('ai.bedrock.temperature', 0.3);
+        $this->temperature = is_numeric($temperatureConfig) ? (float) $temperatureConfig : 0.3;
+
+        $maxTokensConfig = Config::get('ai.bedrock.max_tokens', 4096);
+        $this->maxTokens = is_numeric($maxTokensConfig) ? (int) $maxTokensConfig : 4096;
 
         $pricing = Config::get('ai.bedrock.pricing', []);
         $this->modelPricing = \is_array($pricing) ? $pricing : [];
@@ -92,7 +99,8 @@ class BedrockService
      *     request_id: string
      * }
      */
-    public function generate(): array
+    public function generate(string $prompt = '', array $context = [], ?string $model = null): array
+    {
         $model = $model ?? $this->defaultModel;
         $modelId = $this->getModelId($model);
 
@@ -109,15 +117,28 @@ class BedrockService
             ]);
 
             // Parse response
-            $responseBody = json_decode($response['body']->getContents(), true);
+            $body = $response['body'] ?? null;
+            if (! \is_object($body) || ! method_exists($body, 'getContents')) {
+                throw new \RuntimeException('Invalid Bedrock response body');
+            }
+            $responseBody = json_decode($body->getContents(), true);
 
-            if (! $responseBody) {
+            if (! \is_array($responseBody)) {
                 throw new \RuntimeException('Failed to parse Bedrock response');
             }
+
+            /** @var array<string, mixed> $responseBody */
 
             // Extract content based on model type
             $content = $this->extractContent($responseBody, $model);
             $tokenCount = $this->extractTokenCount($responseBody, $model);
+
+            // Get request ID safely
+            $requestId = 'unknown';
+            $metadata = $response['ResponseMetadata'] ?? null;
+            if (\is_array($metadata) && isset($metadata['RequestId']) && is_scalar($metadata['RequestId'])) {
+                $requestId = (string) $metadata['RequestId'];
+            }
 
             return [
                 'content' => $content,
@@ -125,7 +146,7 @@ class BedrockService
                 'token_count' => $tokenCount,
                 'confidence' => 0.9, // Bedrock models have high confidence
                 'model_version' => $this->getModelVersion($model),
-                'request_id' => (string) ($response['ResponseMetadata']['RequestId'] ?? 'unknown'),
+                'request_id' => $requestId,
             ];
         } catch (AwsException $e) {
             Log::error('[Bedrock] AWS API error', [
@@ -151,7 +172,8 @@ class BedrockService
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    protected function buildPayload(): array
+    protected function buildPayload(string $prompt = '', array $context = [], string $model = ''): array
+    {
         // Build full prompt with context
         $fullPrompt = $this->buildPromptWithContext($prompt, $context);
 
@@ -208,9 +230,9 @@ class BedrockService
             $char = $context['character'];
             $name = isset($char['name']) && is_string($char['name']) ? $char['name'] : 'Unknown';
             $scenario = isset($char['scenario_type']) && is_string($char['scenario_type']) ? $char['scenario_type'] : 'Unknown';
-            $speed = isset($char['speed']) ? (is_string($char) ? (string) $char : '')['speed'] : '0';
-            $stamina = isset($char['stamina']) ? (is_string($char) ? (string) $char : '')['stamina'] : '0';
-            $power = isset($char['power']) ? (is_string($char) ? (string) $char : '')['power'] : '0';
+            $speed = isset($char['speed']) && is_scalar($char['speed']) ? (string) $char['speed'] : '0';
+            $stamina = isset($char['stamina']) && is_scalar($char['stamina']) ? (string) $char['stamina'] : '0';
+            $power = isset($char['power']) && is_scalar($char['power']) ? (string) $char['power'] : '0';
 
             $contextStr .= "Character: {$name}\n";
             $contextStr .= "Scenario: {$scenario}\n";
@@ -221,8 +243,8 @@ class BedrockService
         if (isset($context['career']) && is_array($context['career'])) {
             $career = $context['career'];
             $stage = isset($career['stage']) && is_string($career['stage']) ? $career['stage'] : 'Unknown';
-            $turn = isset($career['turn']) ? (is_string($career) ? (string) $career : '')['turn'] : '0';
-            $totalTurns = isset($career['total_turns']) ? (is_string($career) ? (string) $career : '')['total_turns'] : '0';
+            $turn = isset($career['turn']) && is_scalar($career['turn']) ? (string) $career['turn'] : '0';
+            $totalTurns = isset($career['total_turns']) && is_scalar($career['total_turns']) ? (string) $career['total_turns'] : '0';
 
             $contextStr .= "Career Stage: {$stage}\n";
             $contextStr .= "Turn: {$turn}/{$totalTurns}\n";
@@ -247,20 +269,20 @@ class BedrockService
     {
         // Claude models
         if (str_starts_with($model, 'claude')) {
-            if (isset($response['content']) && is_array($response['content']) && isset($response['content'][0]['text'])) {
-                $text = $response['content'][0]['text'];
-                if (is_string($text)) {
-                    return $text;
+            if (isset($response['content']) && is_array($response['content'])) {
+                $firstContent = $response['content'][0] ?? null;
+                if (\is_array($firstContent) && isset($firstContent['text']) && is_string($firstContent['text'])) {
+                    return $firstContent['text'];
                 }
             }
         }
 
         // Nova models
         if (str_starts_with($model, 'nova')) {
-            if (isset($response['results']) && is_array($response['results']) && isset($response['results'][0]['outputText'])) {
-                $outputText = $response['results'][0]['outputText'];
-                if (is_string($outputText)) {
-                    return $outputText;
+            if (isset($response['results']) && is_array($response['results'])) {
+                $firstResult = $response['results'][0] ?? null;
+                if (\is_array($firstResult) && isset($firstResult['outputText']) && is_string($firstResult['outputText'])) {
+                    return $firstResult['outputText'];
                 }
             }
         }
@@ -309,8 +331,11 @@ class BedrockService
 
         // Nova models
         if (str_starts_with($model, 'nova')) {
-            if (isset($response['results']) && is_array($response['results']) && isset($response['results'][0]['tokenCount']) && is_int($response['results'][0]['tokenCount'])) {
-                return $response['results'][0]['tokenCount'];
+            if (isset($response['results']) && is_array($response['results'])) {
+                $firstResult = $response['results'][0] ?? null;
+                if (\is_array($firstResult) && isset($firstResult['tokenCount']) && is_int($firstResult['tokenCount'])) {
+                    return $firstResult['tokenCount'];
+                }
             }
 
             return 0;
@@ -400,6 +425,7 @@ class BedrockService
      * @return array<string, mixed>
      */
     public function getModelPricing(): array
+    {
         return $this->modelPricing;
     }
 
@@ -416,6 +442,7 @@ class BedrockService
      * }
      */
     public function getStatus(): array
+    {
         return [
             'available' => $this->isAvailable(),
             'healthy' => $this->isHealthy(),

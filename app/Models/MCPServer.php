@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -35,7 +36,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $failed_requests
  * @property float|null $average_response_time
  * @property \Illuminate\Support\Carbon|null $last_used_at
- * @property array<string, mixed>|null $recent_errors
+ * @property array<int|string, mixed>|null $recent_errors
  * @property string|null $last_error_message
  * @property \Illuminate\Support\Carbon|null $last_error_at
  * @property array<string, mixed>|null $debug_information
@@ -60,14 +61,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null $notes
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- */
-/**
- * @property int $id
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ *
+ * @use HasFactory<\Database\Factories\MCPServerFactory>
  */
 class MCPServer extends Model
 {
+    /** @use HasFactory<\Database\Factories\MCPServerFactory> */
     use HasFactory;
 
     /**
@@ -78,7 +77,7 @@ class MCPServer extends Model
     /**
      * The attributes that are mass assignable.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $fillable = [
         'server_name',
@@ -192,6 +191,8 @@ class MCPServer extends Model
 
     /**
      * Get the agents using this server.
+     *
+     * @return HasMany<MCPAgent, $this>
      */
     public function agents(): HasMany
     {
@@ -233,11 +234,25 @@ class MCPServer extends Model
     {
         return Attribute::make(
             get: function (mixed $value, array $attributes) {
-                if ($attributes['total_requests'] === 0) {
+                $totalRequests = 0;
+                $successfulRequests = 0;
+
+                $rawTotalRequests = $attributes['total_requests'] ?? null;
+                $rawSuccessfulRequests = $attributes['successful_requests'] ?? null;
+
+                if (is_int($rawTotalRequests) || is_float($rawTotalRequests) || (is_string($rawTotalRequests) && is_numeric($rawTotalRequests))) {
+                    $totalRequests = (int) $rawTotalRequests;
+                }
+
+                if (is_int($rawSuccessfulRequests) || is_float($rawSuccessfulRequests) || (is_string($rawSuccessfulRequests) && is_numeric($rawSuccessfulRequests))) {
+                    $successfulRequests = (int) $rawSuccessfulRequests;
+                }
+
+                if ($totalRequests === 0) {
                     return 0.0;
                 }
 
-                return round(($attributes['successful_requests'] / $attributes['total_requests']) * 100, 2);
+                return round(($successfulRequests / $totalRequests) * 100, 2);
             }
         );
     }
@@ -251,11 +266,25 @@ class MCPServer extends Model
     {
         return Attribute::make(
             get: function (mixed $value, array $attributes) {
-                if ($attributes['total_requests'] === 0) {
+                $totalRequests = 0;
+                $failedRequests = 0;
+
+                $rawTotalRequests = $attributes['total_requests'] ?? null;
+                $rawFailedRequests = $attributes['failed_requests'] ?? null;
+
+                if (is_int($rawTotalRequests) || is_float($rawTotalRequests) || (is_string($rawTotalRequests) && is_numeric($rawTotalRequests))) {
+                    $totalRequests = (int) $rawTotalRequests;
+                }
+
+                if (is_int($rawFailedRequests) || is_float($rawFailedRequests) || (is_string($rawFailedRequests) && is_numeric($rawFailedRequests))) {
+                    $failedRequests = (int) $rawFailedRequests;
+                }
+
+                if ($totalRequests === 0) {
                     return 0.0;
                 }
 
-                return round(($attributes['failed_requests'] / $attributes['total_requests']) * 100, 2);
+                return round(($failedRequests / $totalRequests) * 100, 2);
             }
         );
     }
@@ -281,8 +310,19 @@ class MCPServer extends Model
                     return 0.0;
                 }
 
-                $checks = $healthStatus['uptime_checks'];
-                $successful = $healthStatus['successful_checks'] ?? 0;
+                $checks = 0;
+                $successful = 0;
+
+                $rawChecks = $healthStatus['uptime_checks'] ?? null;
+                $rawSuccessful = $healthStatus['successful_checks'] ?? null;
+
+                if (is_int($rawChecks) || is_float($rawChecks) || (is_string($rawChecks) && is_numeric($rawChecks))) {
+                    $checks = (int) $rawChecks;
+                }
+
+                if (is_int($rawSuccessful) || is_float($rawSuccessful) || (is_string($rawSuccessful) && is_numeric($rawSuccessful))) {
+                    $successful = (int) $rawSuccessful;
+                }
 
                 if ($checks === 0) {
                     return 0.0;
@@ -321,7 +361,7 @@ class MCPServer extends Model
         $this->last_error_at = now();
 
         // Add to recent errors
-        $recentErrors = $this->recent_errors ?? [];
+        $recentErrors = is_array($this->recent_errors) ? $this->recent_errors : [];
         array_unshift($recentErrors, [
             'message' => $errorMessage,
             'timestamp' => now()->toIso8601String(),
@@ -354,6 +394,7 @@ class MCPServer extends Model
     /**
      * Update health status.
      */
+    /** @param array<string, mixed> $healthData */
     public function updateHealthStatus(array $healthData): void
     {
         $this->health_status = $healthData;
@@ -396,40 +437,55 @@ class MCPServer extends Model
 
     /**
      * Scope a query to only include active servers.
+     *
+     * @param  Builder<MCPServer>  $query
+     * @return Builder<MCPServer>
      */
-    public function scopeActive(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    public function scopeActive(Builder $query): Builder
     {
         return $query->where('status', 'active');
     }
 
     /**
      * Scope a query to only include inactive servers.
+     *
+     * @param  Builder<MCPServer>  $query
+     * @return Builder<MCPServer>
      */
-    public function scopeInactive(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    public function scopeInactive(Builder $query): Builder
     {
         return $query->where('status', 'inactive');
     }
 
     /**
      * Scope a query to only include servers with errors.
+     *
+     * @param  Builder<MCPServer>  $query
+     * @return Builder<MCPServer>
      */
-    public function scopeWithErrors(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    public function scopeWithErrors(Builder $query): Builder
     {
         return $query->where('status', 'error');
     }
 
     /**
      * Scope a query to only include servers by type.
+     *
+     * @param  Builder<MCPServer>  $query
+     * @return Builder<MCPServer>
      */
-    public function scopeOfType($query, string $type)
+    public function scopeOfType(Builder $query, string $type): Builder
     {
         return $query->where('server_type', $type);
     }
 
     /**
      * Scope a query to only include servers that auto-start.
+     *
+     * @param  Builder<MCPServer>  $query
+     * @return Builder<MCPServer>
      */
-    public function scopeAutoStart(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    public function scopeAutoStart(Builder $query): Builder
     {
         return $query->where('auto_start', true);
     }

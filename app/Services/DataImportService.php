@@ -58,9 +58,10 @@ class DataImportService
      *
      * @param  string  $text  Raw text input
      * @param  string  $importType  Type of data being imported
-     * @return array{success: bool, data: array, format: string, errors: array}
+     * @return array{success: bool, data: array<int, array<string, mixed>>, format: string, errors: array<string>}
      */
-    public function parseText(): array
+    public function parseText(string $text, string $importType): array
+    {
         $text = trim($text);
 
         if (empty($text)) {
@@ -85,9 +86,9 @@ class DataImportService
 
         return [
             'success' => (bool) ($result['success'] ?? false),
-            'data' => is_array((is_array($result) && isset($result['data']) ? $result['data'] : null)) ? $result['data'] : [],
+            'data' => isset($result['data']) && is_array($result['data']) ? $result['data'] : [],
             'format' => (string) ($result['format'] ?? $format),
-            'errors' => is_array((is_array($result) && isset($result['errors']) ? $result['errors'] : null)) ? $result['errors'] : [],
+            'errors' => isset($result['errors']) && is_array($result['errors']) ? $result['errors'] : [],
         ];
     }
 
@@ -137,8 +138,12 @@ class DataImportService
 
     /**
      * Parse JSON input
+     *
+     * @return array{success: bool, data: array<int, array<string, mixed>>, format: string, errors: array<string>, total_records?: int, valid_records?: int}
      */
-    public function parseJson(): array
+    public function parseJson(string $text, string $importType): array
+    {
+        /** @var array<string> $errors */
         $errors = [];
         $data = json_decode($text, true);
 
@@ -152,17 +157,34 @@ class DataImportService
         }
 
         // Normalize to array of records
-        if (! isset($data[0]) && ! empty($data)) {
+        if (is_array($data) && ! isset($data[0]) && ! empty($data)) {
             $data = [$data];
         }
 
+        if (! is_array($data)) {
+            return [
+                'success' => false,
+                'data' => [],
+                'format' => 'json',
+                'errors' => ['Invalid JSON structure'],
+            ];
+        }
+
+        /** @var array<int, array<string, mixed>> $validatedData */
         $validatedData = [];
         foreach ($data as $index => $record) {
-            $validation = $this->validateRecord($record, $importType);
+            if (! is_array($record)) {
+                $errors[] = "Record {$index}: Not a valid record array";
+
+                continue;
+            }
+            /** @var array<string, mixed> $recordArray */
+            $recordArray = $record;
+            $validation = $this->validateRecord($recordArray, $importType);
             if (! $validation['valid']) {
-                $errors[] = "Record {$index}: ".implode(', ', $validation['errors']);
+                $errors[] = 'Record '.(string) $index.': '.implode(', ', $validation['errors']);
             } else {
-                $validatedData[] = $this->normalizeRecord($record, $importType);
+                $validatedData[] = $this->normalizeRecord($recordArray, $importType);
             }
         }
 
@@ -178,8 +200,12 @@ class DataImportService
 
     /**
      * Parse CSV input
+     *
+     * @return array{success: bool, data: array<int, array<string, mixed>>, format: string, errors: array<string>, headers?: array<string>, total_records?: int, valid_records?: int}
      */
-    public function parseCsv(): array
+    public function parseCsv(string $text, string $importType): array
+    {
+        /** @var array<string> $errors */
         $errors = [];
         $lines = array_filter(explode("\n", $text), fn ($line) => trim($line) !== '');
 
@@ -193,9 +219,12 @@ class DataImportService
         }
 
         // Parse header
-        $headers = str_getcsv(array_shift($lines));
-        $headers = array_map(fn ($h) => $this->normalizeHeader($h), $headers);
+        $headerLine = array_shift($lines);
+        $rawHeaders = str_getcsv($headerLine ?? '');
+        /** @var array<string> $headers */
+        $headers = array_map(fn ($h) => $this->normalizeHeader($h ?? ''), $rawHeaders);
 
+        /** @var array<int, array<string, mixed>> $validatedData */
         $validatedData = [];
         foreach ($lines as $index => $line) {
             $values = str_getcsv($line);
@@ -206,6 +235,7 @@ class DataImportService
                 continue;
             }
 
+            /** @var array<string, mixed> $record */
             $record = array_combine($headers, $values);
             $validation = $this->validateRecord($record, $importType);
 
@@ -229,8 +259,11 @@ class DataImportService
 
     /**
      * Parse TSV (tab-separated values) input
+     *
+     * @return array{success: bool, data: array<int, array<string, mixed>>, format: string, errors: array<string>, headers?: array<string>, total_records?: int, valid_records?: int}
      */
-    public function parseTsv(): array
+    public function parseTsv(string $text, string $importType): array
+    {
         // Convert TSV to CSV format and use CSV parser
         $csvText = str_replace("\t", ',', $text);
         $result = $this->parseCsv($csvText, $importType);
@@ -241,9 +274,14 @@ class DataImportService
 
     /**
      * Parse key-value pair format
+     *
+     * @return array{success: bool, data: array<int, array<string, mixed>>, format: string, errors: array<string>, total_records?: int, valid_records?: int}
      */
-    public function parseKeyValue(): array
+    public function parseKeyValue(string $text, string $importType): array
+    {
+        /** @var array<string> $errors */
         $errors = [];
+        /** @var array<string, mixed> $record */
         $record = [];
 
         $lines = explode("\n", $text);
@@ -287,9 +325,14 @@ class DataImportService
 
     /**
      * Parse structured text with intelligent field detection
+     *
+     * @return array{success: bool, data: array<int, array<string, mixed>>, format: string, errors: array<string>, total_records?: int, valid_records?: int}
      */
-    public function parseStructuredText(): array
+    public function parseStructuredText(string $text, string $importType): array
+    {
+        /** @var array<string> $errors */
         $errors = [];
+        /** @var array<string, mixed> $record */
         $record = [];
 
         // Try to extract common patterns based on import type
@@ -328,13 +371,16 @@ class DataImportService
 
     /**
      * Extract character data from structured text
+     *
+     * @return array<string, mixed>
      */
-    private function extractCharacterData(): array
+    private function extractCharacterData(string $text): array
+    {
         $data = [];
 
         // Extract name
         if (preg_match('/(?:name|character|trainee)[:=\s]+([^\n,]+)/i', $text, $matches)) {
-            (is_array($data) && isset($data['name']) ? $data['name'] : null) = trim($matches[1]);
+            $data['name'] = trim($matches[1]);
         }
 
         // Extract stats (Speed, Stamina, Power, Guts, Wit)
@@ -347,17 +393,17 @@ class DataImportService
 
         // Extract scenario type
         if (preg_match('/(?:scenario|mode)[:=\s]+(ura[_\s]?finale|unity[_\s]?cup)/i', $text, $matches)) {
-            (is_array($data) && isset($data['scenario_type']) ? $data['scenario_type'] : null) = Str::snake(strtolower($matches[1]));
+            $data['scenario_type'] = Str::snake(strtolower($matches[1]));
         }
 
         // Extract energy level
         if (preg_match('/(?:energy|stamina[_\s]?level)[:=\s]+(\d+)/i', $text, $matches)) {
-            (is_array($data) && isset($data['energy_level']) ? $data['energy_level'] : null) = (int) $matches[1];
+            $data['energy_level'] = (int) $matches[1];
         }
 
         // Extract mood
         if (preg_match('/(?:mood|condition)[:=\s]+(great|good|normal|bad|awful)/i', $text, $matches)) {
-            (is_array($data) && isset($data['mood_status']) ? $data['mood_status'] : null) = strtolower($matches[1]);
+            $data['mood_status'] = strtolower($matches[1]);
         }
 
         return $data;
@@ -365,23 +411,26 @@ class DataImportService
 
     /**
      * Extract career data from structured text
+     *
+     * @return array<string, mixed>
      */
-    private function extractCareerData(): array
+    private function extractCareerData(string $text): array
+    {
         $data = [];
 
         // Extract career name
         if (preg_match('/(?:career[_\s]?name|run[_\s]?name)[:=\s]+([^\n,]+)/i', $text, $matches)) {
-            (is_array($data) && isset($data['career_name']) ? $data['career_name'] : null) = trim($matches[1]);
+            $data['career_name'] = trim($matches[1]);
         }
 
         // Extract scenario type
         if (preg_match('/(?:scenario|mode)[:=\s]+(ura[_\s]?finale|unity[_\s]?cup)/i', $text, $matches)) {
-            (is_array($data) && isset($data['scenario_type']) ? $data['scenario_type'] : null) = Str::snake(strtolower($matches[1]));
+            $data['scenario_type'] = Str::snake(strtolower($matches[1]));
         }
 
         // Extract turn number
         if (preg_match('/(?:turn|current[_\s]?turn)[:=\s]+(\d+)/i', $text, $matches)) {
-            (is_array($data) && isset($data['current_turn']) ? $data['current_turn'] : null) = (int) $matches[1];
+            $data['current_turn'] = (int) $matches[1];
         }
 
         // Extract final stats
@@ -394,7 +443,7 @@ class DataImportService
 
         // Extract status
         if (preg_match('/(?:status)[:=\s]+(active|completed|abandoned)/i', $text, $matches)) {
-            (is_array($data) && isset($data['status']) ? $data['status'] : null) = strtolower($matches[1]);
+            $data['status'] = strtolower($matches[1]);
         }
 
         return $data;
@@ -402,18 +451,21 @@ class DataImportService
 
     /**
      * Extract training session data from structured text
+     *
+     * @return array<string, mixed>
      */
-    private function extractTrainingData(): array
+    private function extractTrainingData(string $text): array
+    {
         $data = [];
 
         // Extract turn number
         if (preg_match('/(?:turn)[:=\s]+(\d+)/i', $text, $matches)) {
-            (is_array($data) && isset($data['turn_number']) ? $data['turn_number'] : null) = (int) $matches[1];
+            $data['turn_number'] = (int) $matches[1];
         }
 
         // Extract training type
         if (preg_match('/(?:training[_\s]?type|type)[:=\s]+(speed|stamina|power|guts|wit|rest)/i', $text, $matches)) {
-            (is_array($data) && isset($data['training_type']) ? $data['training_type'] : null) = strtolower($matches[1]);
+            $data['training_type'] = strtolower($matches[1]);
         }
 
         // Extract stat gains
@@ -426,7 +478,7 @@ class DataImportService
 
         // Extract energy cost
         if (preg_match('/(?:energy[_\s]?cost|energy)[:=\s]+([+-]?\d+)/i', $text, $matches)) {
-            (is_array($data) && isset($data['energy_cost']) ? $data['energy_cost'] : null) = (int) $matches[1];
+            $data['energy_cost'] = (int) $matches[1];
         }
 
         return $data;
@@ -434,28 +486,31 @@ class DataImportService
 
     /**
      * Extract skill data from structured text
+     *
+     * @return array<string, mixed>
      */
-    private function extractSkillData(): array
+    private function extractSkillData(string $text): array
+    {
         $data = [];
 
         // Extract skill name
         if (preg_match('/(?:skill[_\s]?name|name)[:=\s]+([^\n,]+)/i', $text, $matches)) {
-            (is_array($data) && isset($data['name']) ? $data['name'] : null) = trim($matches[1]);
+            $data['name'] = trim($matches[1]);
         }
 
         // Extract skill type
         if (preg_match('/(?:skill[_\s]?type|type)[:=\s]+(speed|stamina|power|guts|wit|recovery|debuff|passive)/i', $text, $matches)) {
-            (is_array($data) && isset($data['skill_type']) ? $data['skill_type'] : null) = strtolower($matches[1]);
+            $data['skill_type'] = strtolower($matches[1]);
         }
 
         // Extract rarity
         if (preg_match('/(?:rarity)[:=\s]+(normal|rare|unique)/i', $text, $matches)) {
-            (is_array($data) && isset($data['rarity']) ? $data['rarity'] : null) = strtolower($matches[1]);
+            $data['rarity'] = strtolower($matches[1]);
         }
 
         // Extract SP cost
         if (preg_match('/(?:sp[_\s]?cost|cost)[:=\s]+(\d+)/i', $text, $matches)) {
-            (is_array($data) && isset($data['base_sp_cost']) ? $data['base_sp_cost'] : null) = (int) $matches[1];
+            $data['base_sp_cost'] = (int) $matches[1];
         }
 
         return $data;
@@ -463,28 +518,31 @@ class DataImportService
 
     /**
      * Extract support card data from structured text
+     *
+     * @return array<string, mixed>
      */
-    private function extractSupportCardData(): array
+    private function extractSupportCardData(string $text): array
+    {
         $data = [];
 
         // Extract card name
         if (preg_match('/(?:card[_\s]?name|name)[:=\s]+([^\n,]+)/i', $text, $matches)) {
-            (is_array($data) && isset($data['name']) ? $data['name'] : null) = trim($matches[1]);
+            $data['name'] = trim($matches[1]);
         }
 
         // Extract rarity
         if (preg_match('/(?:rarity)[:=\s]+(ssr|sr|r)/i', $text, $matches)) {
-            (is_array($data) && isset($data['rarity']) ? $data['rarity'] : null) = strtoupper($matches[1]);
+            $data['rarity'] = strtoupper($matches[1]);
         }
 
         // Extract specialization
         if (preg_match('/(?:specialization|type)[:=\s]+(speed|stamina|power|guts|wit|pal)/i', $text, $matches)) {
-            (is_array($data) && isset($data['specialization']) ? $data['specialization'] : null) = strtolower($matches[1]);
+            $data['specialization'] = strtolower($matches[1]);
         }
 
         // Extract limit break level
         if (preg_match('/(?:limit[_\s]?break|lb)[:=\s]+(\d)/i', $text, $matches)) {
-            (is_array($data) && isset($data['limit_break_level']) ? $data['limit_break_level'] : null) = (int) $matches[1];
+            $data['limit_break_level'] = (int) $matches[1];
         }
 
         return $data;
@@ -492,8 +550,12 @@ class DataImportService
 
     /**
      * Validate a record based on import type
+     *
+     * @param  array<string, mixed>  $record
+     * @return array{valid: bool, errors: array<string>}
      */
-    public function validateRecord(): array
+    public function validateRecord(array $record, string $importType): array
+    {
         $rules = $this->getValidationRules($importType);
         $validator = Validator::make($record, $rules);
 
@@ -518,8 +580,11 @@ class DataImportService
 
     /**
      * Get validation rules for import type
+     *
+     * @return array<string, string>
      */
-    private function getValidationRules(): array
+    private function getValidationRules(string $importType): array
+    {
         return match ($importType) {
             'character' => [
                 'name' => 'required|string|max:255',
@@ -572,8 +637,12 @@ class DataImportService
 
     /**
      * Custom validation logic
+     *
+     * @param  array<string, mixed>  $record
+     * @return array<string>
      */
-    private function customValidation(): array
+    private function customValidation(array $record, string $importType): array
+    {
         $errors = [];
 
         if ($importType === 'character') {
@@ -600,16 +669,20 @@ class DataImportService
     private function normalizeHeader(string $header): string
     {
         $header = trim($header);
-        $header = preg_replace('/[^a-zA-Z0-9\s_]/', '', $header);
-        $header = Str::snake($header);
+        $cleaned = preg_replace('/[^a-zA-Z0-9\s_]/', '', $header);
+        $header = Str::snake($cleaned ?? '');
 
         return strtolower($header);
     }
 
     /**
      * Normalize record data
+     *
+     * @param  array<string, mixed>  $record
+     * @return array<string, mixed>
      */
-    private function normalizeRecord(): array
+    private function normalizeRecord(array $record, string $importType): array
+    {
         $normalized = [];
 
         foreach ($record as $key => $value) {
@@ -632,8 +705,12 @@ class DataImportService
 
     /**
      * Generate import preview with validation results
+     *
+     * @param  array<int, array<string, mixed>>  $data
+     * @return array<string, mixed>
      */
-    public function generatePreview(): array
+    public function generatePreview(array $data, string $importType): array
+    {
         $preview = [
             'import_type' => $importType,
             'import_type_label' => self::IMPORT_TYPES[$importType] ?? $importType,
@@ -673,8 +750,11 @@ class DataImportService
 
     /**
      * Get field mapping for import type
+     *
+     * @return array<string, array<string, bool|int|string|array<string>>>
      */
-    public function getFieldMapping(): array
+    public function getFieldMapping(string $importType): array
+    {
         return match ($importType) {
             'character' => [
                 'name' => ['label' => 'Character Name', 'required' => true, 'type' => 'string'],
@@ -727,8 +807,12 @@ class DataImportService
 
     /**
      * Execute import of validated data
+     *
+     * @param  array<int, array<string, mixed>>  $data
+     * @return array<string, mixed>
      */
-    public function executeImport(): array
+    public function executeImport(array $data, string $importType, int $userId): array
+    {
         $results = [
             'success' => true,
             'imported' => 0,
@@ -785,6 +869,8 @@ class DataImportService
 
     /**
      * Import a character record
+     *
+     * @param  array<string, mixed>  $record
      */
     private function importCharacter(array $record, int $userId): int
     {
@@ -824,11 +910,13 @@ class DataImportService
 
     /**
      * Import a career record
+     *
+     * @param  array<string, mixed>  $record
      */
     private function importCareer(array $record, int $userId): int
     {
         // Find or create character for this career
-        $characterId = (is_array($record) && isset($record['character_id']) ? $record['character_id'] : null);
+        $characterId = $record['character_id'] ?? null;
 
         if (! $characterId) {
             // Create a placeholder character if none specified
@@ -851,15 +939,15 @@ class DataImportService
         $career = Career::create([
             'character_id' => $characterId,
             'user_id' => $userId,
-            'career_name' => (is_array($record) && isset($record['career_name']) ? $record['career_name'] : null),
+            'career_name' => $record['career_name'] ?? null,
             'scenario_type' => $record['scenario_type'] ?? 'ura_finale',
             'status' => $record['status'] ?? 'active',
             'current_turn' => $record['current_turn'] ?? 1,
-            'final_speed' => (is_array($record) && isset($record['final_speed']) ? $record['final_speed'] : null),
-            'final_stamina' => (is_array($record) && isset($record['final_stamina']) ? $record['final_stamina'] : null),
-            'final_power' => (is_array($record) && isset($record['final_power']) ? $record['final_power'] : null),
-            'final_guts' => (is_array($record) && isset($record['final_guts']) ? $record['final_guts'] : null),
-            'final_wit' => (is_array($record) && isset($record['final_wit']) ? $record['final_wit'] : null),
+            'final_speed' => $record['final_speed'] ?? null,
+            'final_stamina' => $record['final_stamina'] ?? null,
+            'final_power' => $record['final_power'] ?? null,
+            'final_guts' => $record['final_guts'] ?? null,
+            'final_wit' => $record['final_wit'] ?? null,
         ]);
 
         return $career->id;
@@ -867,10 +955,12 @@ class DataImportService
 
     /**
      * Import a training session record
+     *
+     * @param  array<string, mixed>  $record
      */
     private function importTrainingSession(array $record, int $userId): int
     {
-        $careerId = (is_array($record) && isset($record['career_id']) ? $record['career_id'] : null);
+        $careerId = $record['career_id'] ?? null;
 
         if (! $careerId) {
             throw new \InvalidArgumentException('Training session requires a career_id');
@@ -904,6 +994,8 @@ class DataImportService
 
     /**
      * Import a skill record
+     *
+     * @param  array<string, mixed>  $record
      */
     private function importSkill(array $record): int
     {
@@ -922,7 +1014,7 @@ class DataImportService
 
         $skill = Skill::create([
             'name' => $record['name'],
-            'internal_id' => Str::slug($record['name']),
+            'internal_id' => Str::slug(is_string($record['name']) ? $record['name'] : ''),
             'skill_type' => $record['skill_type'] ?? 'passive',
             'rarity' => $record['rarity'] ?? 'normal',
             'base_sp_cost' => $record['base_sp_cost'] ?? 120,
@@ -934,6 +1026,8 @@ class DataImportService
 
     /**
      * Import a support card record
+     *
+     * @param  array<string, mixed>  $record
      */
     private function importSupportCard(array $record): int
     {
@@ -945,7 +1039,7 @@ class DataImportService
 
         $card = SupportCard::create([
             'name' => $record['name'],
-            'internal_id' => Str::slug($record['name']),
+            'internal_id' => Str::slug(is_string($record['name']) ? $record['name'] : ''),
             'rarity' => $record['rarity'] ?? 'SR',
             'specialization' => $record['specialization'] ?? 'speed',
             'is_active' => true,
@@ -956,8 +1050,11 @@ class DataImportService
 
     /**
      * Get import templates for different formats
+     *
+     * @return array<string, array<string, string|false>>
      */
     public function getTemplates(): array
+    {
         return [
             'character' => [
                 'csv' => "name,speed,stamina,power,guts,wit,scenario_type,energy_level,mood_status\nSilence Suzuka,800,600,700,500,650,ura_finale,100,good",
@@ -1025,6 +1122,8 @@ class DataImportService
 
     /**
      * Get import history for a user
+     *
+     * @return Collection<int, mixed>
      */
     public function getImportHistory(int $userId, int $limit = 20): Collection
     {

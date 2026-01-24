@@ -94,7 +94,8 @@ class CacheManagementService
      * @param  array<string, callable>  $callbacks
      * @return array{warmed: int, failed: int, duration_ms: float}
      */
-    public function warmCache(): array
+    public function warmCache(array $keys, array $callbacks): array
+    {
         $startTime = microtime(true);
         $warmed = 0;
         $failed = 0;
@@ -112,7 +113,7 @@ class CacheManagementService
                 try {
                     if (! isset($callbacks[$key])) {
                         Log::warning('[CacheManagementService] No callback for key', ['key' => $key]);
-                        $failed = ($failed ?? 0) + 1;
+                        $failed++;
 
                         continue;
                     }
@@ -128,13 +129,13 @@ class CacheManagementService
                     $value = $callbacks[$key]();
                     Cache::put($fullKey, $value, self::DEFAULT_TTL);
 
-                    $warmed = ($warmed ?? 0) + 1;
+                    $warmed++;
                 } catch (\Exception $e) {
                     Log::error('[CacheManagementService] Cache warming failed', [
                         'key' => $key,
                         'error' => $e->getMessage(),
                     ]);
-                    $failed = ($failed ?? 0) + 1;
+                    $failed++;
                 }
             }
         }
@@ -169,7 +170,7 @@ class CacheManagementService
 
             if (Cache::has($fullKey)) {
                 Cache::forget($fullKey);
-                $invalidated = ($invalidated ?? 0) + 1;
+                $invalidated++;
             }
         }
 
@@ -197,7 +198,7 @@ class CacheManagementService
                 // Remove prefix from Redis key
                 $cacheKey = str_replace(self::CACHE_PREFIX, '', $key);
                 Cache::forget($cacheKey);
-                $invalidated = ($invalidated ?? 0) + 1;
+                $invalidated++;
             }
 
             Log::info('[CacheManagementService] Pattern invalidation completed', [
@@ -220,14 +221,15 @@ class CacheManagementService
      * @return array{hit_rate: float, total_hits: int, total_misses: int, total_requests: int, avg_response_time_ms: float}
      */
     public function getHitRateStatistics(): array
+    {
         $totalHits = 0;
         $totalMisses = 0;
         $totalTime = 0.0;
 
         foreach ($this->metrics as $metric) {
-            $totalHits = ($totalHits ?? 0) + $metric['hits'];
-            $totalMisses = ($totalMisses ?? 0) + $metric['misses'];
-            $totalTime = ($totalTime ?? 0) + $metric['total_time_ms'];
+            $totalHits += $metric['hits'];
+            $totalMisses += $metric['misses'];
+            $totalTime += $metric['total_time_ms'];
         }
 
         $totalRequests = $totalHits + $totalMisses;
@@ -249,6 +251,7 @@ class CacheManagementService
      * @return array<string, array{hits: int, misses: int, hit_rate: float, avg_time_ms: float}>
      */
     public function getDetailedMetrics(): array
+    {
         $detailed = [];
 
         foreach ($this->metrics as $key => $metric) {
@@ -272,10 +275,11 @@ class CacheManagementService
      *
      * @return array{recommended_ttl: int, estimated_cost: float, strategy: string}
      */
-    public function getCostOptimizedStrategy(): array
+    public function getCostOptimizedStrategy(string $dataType = 'training_calculations', int $estimatedSize = 0): array
+    {
         // Check if awspricing MCP server is available
         if (! $this->mcpClient->isServerEnabled('awspricing')) {
-            return $this->getDefaultStrategy($dataType);
+            return $this->getDefaultStrategy();
         }
 
         try {
@@ -288,7 +292,7 @@ class CacheManagementService
                 'error' => $e->getMessage(),
             ]);
 
-            return $this->getDefaultStrategy($dataType);
+            return $this->getDefaultStrategy();
         }
     }
 
@@ -319,7 +323,8 @@ class CacheManagementService
      *
      * @return array{avg: float, min: float, max: float, p50: float, p95: float, p99: float, count: int}
      */
-    public function getApiResponseTimeStats(): array
+    public function getApiResponseTimeStats(string $apiName): array
+    {
         $key = "api_response_time:{$apiName}";
 
         try {
@@ -426,7 +431,8 @@ class CacheManagementService
      *
      * @return array{recommended_ttl: int, estimated_cost: float, strategy: string}
      */
-    protected function calculateOptimalStrategy(): array
+    protected function calculateOptimalStrategy(string $dataType, int $estimatedSize): array
+    {
         // Strategy based on data type and size
         $strategies = [
             'characters' => ['ttl' => 86400, 'cost' => 0.001, 'strategy' => 'long_term'],
@@ -440,8 +446,8 @@ class CacheManagementService
         $strategy = $strategies[$dataType] ?? $strategies['training_calculations'];
 
         // Adjust cost based on size (rough estimate: $0.0001 per MB)
-        $sizeMB = $estimatedSize / 1024 / 1024;
-        $strategy['cost'] += $sizeMB * 0.0001;
+        $sizeMB = (float) $estimatedSize / 1024 / 1024;
+        $strategy['cost'] = (float) $strategy['cost'] + $sizeMB * 0.0001;
 
         return [
             'recommended_ttl' => $strategy['ttl'],
@@ -456,6 +462,7 @@ class CacheManagementService
      * @return array{recommended_ttl: int, estimated_cost: float, strategy: string}
      */
     protected function getDefaultStrategy(): array
+    {
         return [
             'recommended_ttl' => self::DEFAULT_TTL,
             'estimated_cost' => 0.001,

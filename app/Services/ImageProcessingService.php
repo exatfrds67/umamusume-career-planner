@@ -51,7 +51,8 @@ class ImageProcessingService
      *
      * @return array{valid: bool, error: string|null}
      */
-    public function validateImage(): array
+    public function validateImage(UploadedFile $file): array
+    {
         // Check file size
         /** @var int $maxSize */
         $maxSize = config('services.image_processing.max_file_size', 10485760);
@@ -156,7 +157,8 @@ class ImageProcessingService
      *
      * @return array{safe: bool, reason: string|null}
      */
-    protected function performSecurityScan(): array
+    protected function performSecurityScan(UploadedFile $file): array
+    {
         try {
             // Read first 1KB of file for signature detection
             $handle = fopen($file->getRealPath(), 'rb');
@@ -206,7 +208,8 @@ class ImageProcessingService
      * @param  string  $imagePath  Path to image file
      * @return array{success: bool, processed_path: string|null, error: string|null}
      */
-    public function preprocessForOCR(): array
+    public function preprocessForOCR(string $imagePath): array
+    {
         try {
             // Load image
             $image = $this->loadImage($imagePath);

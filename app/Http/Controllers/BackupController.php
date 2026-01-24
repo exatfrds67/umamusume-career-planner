@@ -39,7 +39,7 @@ class BackupController extends Controller
             abort(401, 'Unauthenticated');
         }
 
-        return $user?->id ?? throw new \Exception('User required');
+        return $user->id ?? throw new \Exception('User required');
     }
 
     /**
@@ -316,8 +316,8 @@ class BackupController extends Controller
                 'success' => true,
                 'message' => 'Backup schedule created successfully',
                 'data' => [
-                    'schedule_id' => isset($result['schedule_id']) ? $result['schedule_id'] : null,
-                    'schedule' => isset((isset($result['schedule']) ? $result['schedule'] : [])) ? (isset($result['schedule']) ? $result['schedule'] : []) : null,
+                    'schedule_id' => $result['schedule_id'] ?? null,
+                    'schedule' => $result['schedule'] ?? null,
                 ],
             ]);
         } catch (\Exception $e) {
@@ -397,7 +397,7 @@ class BackupController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Schedule updated successfully',
-                'data' => (isset($result['schedule']) ? $result['schedule'] : []) ?? null,
+                'data' => $result['schedule'] ?? null,
             ]);
         } catch (\Exception $e) {
             Log::error('[BackupController] Update schedule failed', [

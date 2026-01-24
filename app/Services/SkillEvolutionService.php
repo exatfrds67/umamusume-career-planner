@@ -97,7 +97,8 @@ class SkillEvolutionService
      *
      * @return array<string, mixed>
      */
-    public function evolveSkill(): array
+    public function evolveSkill(Character $character, Skill $normalSkill): array
+    {
         if (! $this->canEvolve($character, $normalSkill)) {
             return [
                 'success' => false,
@@ -138,7 +139,7 @@ class SkillEvolutionService
             'skill_id' => $rareSkill->id,
             'career_id' => $normalAcquisition?->career_id,
             'turn_acquired' => $normalAcquisition?->turn_acquired,
-            'career_phase' => $normalAcquisition?->career_phase ?? $character->career_stage,
+            'career_phase' => $normalAcquisition->career_phase ?? $character->career_stage,
             'acquisition_method' => 'evolution',
             'base_sp_cost' => $rareSkill->base_sp_cost,
             'hints_used' => $hintCount,
@@ -211,8 +212,9 @@ class SkillEvolutionService
         if (! empty($evolutionTarget->stat_requirements)) {
             foreach ($evolutionTarget->stat_requirements as $stat => $required) {
                 $currentStat = $character->current_stats[$stat] ?? 0;
-                if ($currentStat < $required) {
-                    return "Insufficient {$stat}: {$currentStat}/{$required} required";
+                $requiredValue = is_numeric($required) ? (int) $required : 0;
+                if ($currentStat < $requiredValue) {
+                    return "Insufficient {$stat}: {$currentStat}/{$requiredValue} required";
                 }
             }
         }
@@ -250,7 +252,8 @@ class SkillEvolutionService
      *
      * @return array<string, mixed>
      */
-    public function calculateEvolutionEfficiency(): array
+    public function calculateEvolutionEfficiency(Character $character, Skill $normalSkill): array
+    {
         $rareSkill = $normalSkill->evolutionTarget;
 
         if (! $rareSkill) {
@@ -318,7 +321,8 @@ class SkillEvolutionService
      *
      * @return array<int, array<string, mixed>>
      */
-    public function getEvolutionOpportunities(): array
+    public function getEvolutionOpportunities(Character $character): array
+    {
         // Get all Normal skills that can evolve
         $evolvableSkills = Skill::where('can_evolve', true)
             ->where('rarity', '=', 'normal')
@@ -357,17 +361,24 @@ class SkillEvolutionService
 
         // Can evolve now gets highest priority
         if ($canEvolve) {
-            $priority = ($priority ?? 0) + 100;
+            $priority += 100;
         }
 
         // SP savings bonus
-        if (isset($efficiency['comparison']['sp_savings']) && $efficiency['comparison']['sp_savings'] > 0) {
-            $priority = ($priority ?? 0) + min(50, $efficiency['comparison']['sp_savings']);
+        /** @var array<string, mixed> $comparison */
+        $comparison = isset($efficiency['comparison']) && is_array($efficiency['comparison'])
+            ? $efficiency['comparison']
+            : [];
+        $spSavings = isset($comparison['sp_savings']) && is_numeric($comparison['sp_savings'])
+            ? (int) $comparison['sp_savings']
+            : 0;
+        if ($spSavings > 0) {
+            $priority += min(50, $spSavings);
         }
 
         // Meta tier bonus
         $metaTierBonus = ['S+' => 30, 'S' => 25, 'A' => 20, 'B' => 10, 'C' => 5];
-        $priority = ($priority ?? 0) + $metaTierBonus[$skill->meta_tier] ?? 0;
+        $priority += $metaTierBonus[$skill->meta_tier] ?? 0;
 
         return $priority;
     }
@@ -377,7 +388,8 @@ class SkillEvolutionService
      *
      * @return array<int, array<string, mixed>>
      */
-    public function getEvolutionChain(): array
+    public function getEvolutionChain(Skill $skill): array
+    {
         $chain = [];
 
         // Get the source (Normal) skill
@@ -422,7 +434,8 @@ class SkillEvolutionService
      * @param  Collection<int, Skill>  $targetSkills
      * @return array<int, array<string, mixed>>
      */
-    public function planEvolutionTiming(): array
+    public function planEvolutionTiming(Character $character, Collection $targetSkills): array
+    {
         $plan = [];
 
         foreach ($targetSkills as $skill) {
@@ -469,17 +482,30 @@ class SkillEvolutionService
      *
      * @return array<string, mixed>
      */
-    public function getEvolutionRoadmap(): array
+    public function getEvolutionRoadmap(Character $character): array
+    {
         $opportunities = $this->getEvolutionOpportunities($character);
 
         // Separate into categories
-        $readyToEvolve = array_filter($opportunities, fn ($opp) => $opp['can_evolve_now']);
-        $pendingPrerequisites = array_filter($opportunities, fn ($opp) => ! $opp['can_evolve_now']);
+        /** @var array<int, array<string, mixed>> $readyToEvolve */
+        $readyToEvolve = array_filter($opportunities, static fn (array $opp): bool => (bool) $opp['can_evolve_now']);
+        /** @var array<int, array<string, mixed>> $pendingPrerequisites */
+        $pendingPrerequisites = array_filter($opportunities, static fn (array $opp): bool => ! $opp['can_evolve_now']);
 
         // Calculate total potential SP savings
-        $totalPotentialSavings = array_reduce($opportunities, function ($carry, $opp) {
-            if (isset($opp['efficiency']['comparison']['sp_savings']) && $opp['efficiency']['comparison']['sp_savings'] > 0) {
-                return $carry + $opp['efficiency']['comparison']['sp_savings'];
+        $totalPotentialSavings = array_reduce($opportunities, static function (int $carry, array $opp): int {
+            /** @var array<string, mixed> $efficiency */
+            $efficiency = $opp['efficiency'] ?? [];
+            /** @var array<string, mixed> $comparison */
+            $comparison = is_array($efficiency) && isset($efficiency['comparison']) && is_array($efficiency['comparison'])
+                ? $efficiency['comparison']
+                : [];
+            $spSavings = isset($comparison['sp_savings']) && is_numeric($comparison['sp_savings'])
+                ? (int) $comparison['sp_savings']
+                : 0;
+
+            if ($spSavings > 0) {
+                return $carry + $spSavings;
             }
 
             return $carry;
@@ -504,16 +530,21 @@ class SkillEvolutionService
      * @param  array<int, array<string, mixed>>  $pendingPrerequisites
      * @return array<int, array<string, mixed>>
      */
-    private function generateRoadmapRecommendations(): array
+    private function generateRoadmapRecommendations(array $readyToEvolve, array $pendingPrerequisites): array
+    {
         $recommendations = [];
 
         if (! empty($readyToEvolve)) {
             $topPriority = reset($readyToEvolve);
+            /** @var Skill|null $topSkill */
+            $topSkill = $topPriority['skill'] ?? null;
+            $skillName = $topSkill instanceof Skill ? $topSkill->name : 'Unknown';
+            $skillId = $topSkill instanceof Skill ? $topSkill->id : null;
             $recommendations[] = [
                 'type' => 'immediate_action',
                 'priority' => 'high',
-                'message' => "Evolve {$topPriority['skill']->name} immediately for maximum benefit",
-                'skill_id' => $topPriority['skill']->id,
+                'message' => "Evolve {$skillName} immediately for maximum benefit",
+                'skill_id' => $skillId,
             ];
         }
 

@@ -75,7 +75,7 @@ class CleanupOCRFiles extends Command
                 // Get file size before deletion
                 if (Storage::disk('local')->exists($extraction->image_path)) {
                     $fileSize = Storage::disk('local')->size($extraction->image_path);
-                    $totalSize = ($totalSize ?? 0) + $fileSize;
+                    $totalSize += $fileSize;
 
                     if (! $dryRun) {
                         // Delete the file
@@ -91,16 +91,16 @@ class CleanupOCRFiles extends Command
                         $extraction->delete();
                     }
 
-                    $deletedCount = ($deletedCount ?? 0) + 1;
+                    $deletedCount++;
                 } else {
                     // File doesn't exist, just delete the record
                     if (! $dryRun) {
                         $extraction->delete();
                     }
-                    $deletedCount = ($deletedCount ?? 0) + 1;
+                    $deletedCount++;
                 }
             } catch (\Exception $e) {
-                $errorCount = ($errorCount ?? 0) + 1;
+                $errorCount++;
                 Log::error('[CleanupOCRFiles] Failed to delete extraction', [
                     'extraction_id' => $extraction->id,
                     'error' => $e->getMessage(),
@@ -158,7 +158,7 @@ class CleanupOCRFiles extends Command
                     if (! $dryRun) {
                         Storage::disk('local')->delete($file);
                     }
-                    $orphanedCount = ($orphanedCount ?? 0) + 1;
+                    $orphanedCount++;
                 }
             }
         } catch (\Exception $e) {
@@ -194,7 +194,7 @@ class CleanupOCRFiles extends Command
 
         while ($bytes >= 1024 && $i < count($units) - 1) {
             $bytes /= 1024;
-            $i = ($i ?? 0) + 1;
+            $i++;
         }
 
         return round($bytes, 2).' '.$units[$i];

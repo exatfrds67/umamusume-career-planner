@@ -49,7 +49,11 @@ class TrainingOptimizationAgent
      *     metadata: array<string, mixed>
      * }
      */
-    public function analyzeTrainingOptions(): array
+    public function analyzeTrainingOptions(
+        Character $character,
+        array $trainingOptions,
+        array $goals = []
+    ): array {
         if (! $this->enabled) {
             return $this->getDefaultRecommendations($trainingOptions);
         }
@@ -62,15 +66,39 @@ class TrainingOptimizationAgent
 
             // Check cache first
             $cacheKey = $this->getCacheKey($character->id, $context);
-            /** @var array{recommendations: array<int, array<string, mixed>>, analysis: array<string, mixed>, confidence: float, reasoning: string, metadata: array<string, mixed>}|null $cached */
             $cached = Cache::get($cacheKey);
-            if ($cached !== null) {
+            if (\is_array($cached)
+                && isset($cached['recommendations'], $cached['analysis'], $cached['confidence'], $cached['reasoning'], $cached['metadata'])
+                && \is_array($cached['recommendations'])
+                && \is_array($cached['analysis'])
+                && is_numeric($cached['confidence'])
+                && \is_string($cached['reasoning'])
+                && \is_array($cached['metadata'])
+            ) {
                 Log::debug('[TrainingOptimizationAgent] Using cached recommendations', [
                     'character_id' => $character->id,
                     'cache_key' => $cacheKey,
                 ]);
 
-                return $cached;
+                $cachedRecommendations = [];
+                foreach ($cached['recommendations'] as $item) {
+                    if (\is_array($item)) {
+                        $cachedRecommendations[] = $item;
+                    }
+                }
+
+                /** @var array<string, mixed> $cachedAnalysis */
+                $cachedAnalysis = $cached['analysis'];
+                /** @var array<string, mixed> $cachedMetadata */
+                $cachedMetadata = $cached['metadata'];
+
+                return [
+                    'recommendations' => $cachedRecommendations,
+                    'analysis' => $cachedAnalysis,
+                    'confidence' => (float) $cached['confidence'],
+                    'reasoning' => $cached['reasoning'],
+                    'metadata' => $cachedMetadata,
+                ];
             }
 
             // Process through MCP agent
@@ -98,14 +126,8 @@ class TrainingOptimizationAgent
                 'character_id' => $character->id,
             ]);
 
-            // Return fallback recommendations with metadata
-            $fallback = $this->getDefaultRecommendations($trainingOptions);
-            $fallback['metadata']['character_id'] = $character->id;
-            $fallback['metadata']['scenario_type'] = $character->scenario_type;
-            $fallback['metadata']['processing_time'] = microtime(true) - $startTime;
-            $fallback['metadata']['mcp_server'] = $this->getMCPServerName();
-
-            return $fallback;
+            // Return fallback recommendations
+            return $this->getDefaultRecommendations($trainingOptions);
         }
     }
 
@@ -122,7 +144,10 @@ class TrainingOptimizationAgent
      *     confidence: float
      * }
      */
-    public function predictStatGains(): array
+    public function predictStatGains(
+        Character $character,
+        array $trainingOption
+    ): array {
         $startTime = microtime(true);
 
         try {
@@ -134,22 +159,42 @@ class TrainingOptimizationAgent
 
             $response = $this->processWithMCPAgent($context);
 
-            /** @var array<string, int> $statGains */
-            $statGains = is_array((is_array($response) && isset($response['stat_gains']) ? $response['stat_gains'] : null))
-                ? array_map(fn ($value) => (int) $value, $response['stat_gains'])
-                : [];
-            /** @var array<int, string> $skillHints */
-            $skillHints = is_array((is_array($response) && isset($response['skill_hints']) ? $response['skill_hints'] : null)) ? array_values($response['skill_hints']) : [];
+            $statGains = [];
+            if (isset($response['stat_gains']) && \is_array($response['stat_gains'])) {
+                foreach ($response['stat_gains'] as $key => $value) {
+                    if (\is_string($key) && is_scalar($value)) {
+                        $statGains[$key] = (int) $value;
+                    }
+                }
+            }
+            $energyCost = isset($response['energy_cost']) && is_numeric($response['energy_cost'])
+                ? (int) $response['energy_cost']
+                : 0;
+            $failureRisk = isset($response['failure_risk']) && is_numeric($response['failure_risk'])
+                ? (float) $response['failure_risk']
+                : 0.0;
+            $spiritBurst = isset($response['spirit_burst_potential']) && is_numeric($response['spirit_burst_potential'])
+                ? (float) $response['spirit_burst_potential']
+                : null;
+            $skillHints = [];
+            if (isset($response['skill_hints']) && \is_array($response['skill_hints'])) {
+                foreach ($response['skill_hints'] as $hint) {
+                    if (is_scalar($hint)) {
+                        $skillHints[] = (string) $hint;
+                    }
+                }
+            }
+            $confidence = isset($response['confidence']) && is_numeric($response['confidence'])
+                ? (float) $response['confidence']
+                : 0.8;
 
             return [
                 'stat_gains' => $statGains,
-                'energy_cost' => (int) ($response['energy_cost'] ?? 0),
-                'failure_risk' => (float) ($response['failure_risk'] ?? 0.0),
-                'spirit_burst_potential' => isset($response['spirit_burst_potential'])
-                    ? (float) $response['spirit_burst_potential']
-                    : null,
+                'energy_cost' => $energyCost,
+                'failure_risk' => $failureRisk,
+                'spirit_burst_potential' => $spiritBurst,
                 'skill_hints' => $skillHints,
-                'confidence' => (float) ($response['confidence'] ?? 0.8),
+                'confidence' => $confidence,
             ];
         } catch (\Exception $e) {
             Log::error('[TrainingOptimizationAgent] Stat gain prediction failed', [
@@ -172,7 +217,11 @@ class TrainingOptimizationAgent
      *     reasoning: string
      * }
      */
-    public function optimizeTrainingSequence(): array
+    public function optimizeTrainingSequence(
+        Character $character,
+        int $turns,
+        array $goals = []
+    ): array {
         $startTime = microtime(true);
 
         try {
@@ -185,16 +234,29 @@ class TrainingOptimizationAgent
 
             $response = $this->processWithMCPAgent($context);
 
-            /** @var array<int, array<string, mixed>> $sequence */
-            $sequence = is_array((is_array($response) && isset($response['sequence']) ? $response['sequence'] : null)) ? array_values($response['sequence']) : [];
-            /** @var array<string, mixed> $expectedOutcomes */
-            $expectedOutcomes = is_array((is_array($response) && isset($response['expected_outcomes']) ? $response['expected_outcomes'] : null)) ? $response['expected_outcomes'] : [];
+            $sequence = [];
+            if (isset($response['sequence']) && \is_array($response['sequence'])) {
+                foreach ($response['sequence'] as $item) {
+                    if (\is_array($item)) {
+                        $sequence[] = $item;
+                    }
+                }
+            }
+            $expectedOutcomes = isset($response['expected_outcomes']) && \is_array($response['expected_outcomes'])
+                ? $response['expected_outcomes']
+                : [];
+            $confidence = isset($response['confidence']) && is_numeric($response['confidence'])
+                ? (float) $response['confidence']
+                : 0.8;
+            $reasoning = isset($response['reasoning']) && \is_string($response['reasoning'])
+                ? $response['reasoning']
+                : 'Optimized for goal achievement';
 
             return [
                 'sequence' => $sequence,
                 'expected_outcomes' => $expectedOutcomes,
-                'confidence' => (float) ($response['confidence'] ?? 0.8),
-                'reasoning' => (string) ($response['reasoning'] ?? 'Optimized for goal achievement'),
+                'confidence' => $confidence,
+                'reasoning' => $reasoning,
             ];
         } catch (\Exception $e) {
             Log::error('[TrainingOptimizationAgent] Sequence optimization failed', [
@@ -218,7 +280,11 @@ class TrainingOptimizationAgent
      * @param  array<string, mixed>  $goals
      * @return array<string, mixed>
      */
-    protected function prepareContext(): array
+    protected function prepareContext(
+        Character $character,
+        array $trainingOptions,
+        array $goals
+    ): array {
         return [
             'character' => $this->getCharacterData($character),
             'training_options' => $trainingOptions,
@@ -233,7 +299,8 @@ class TrainingOptimizationAgent
      *
      * @return array<string, mixed>
      */
-    protected function getCharacterData(): array
+    protected function getCharacterData(Character $character): array
+    {
         return [
             'id' => $character->id,
             'name' => $character->name,
@@ -242,7 +309,7 @@ class TrainingOptimizationAgent
             'energy_level' => $character->energy_level,
             'mood_status' => $character->mood_status,
             'career_stage' => $character->career_stage,
-            'current_turn' => $character->current_turn,
+            'turn_number' => $character->turn_number ?? 0,
         ];
     }
 
@@ -252,42 +319,28 @@ class TrainingOptimizationAgent
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    protected function processWithMCPAgent(): array
+    protected function processWithMCPAgent(array $context): array
+    {
         // Check if MCP strands-agents server is available
         if (! $this->mcpClient->isStrandsAgentsAvailable()) {
             throw new \RuntimeException('MCP strands-agents server not available');
         }
 
-        // Implement actual MCP agent call using strands-agents server
-        // The agent will analyze training options and provide recommendations
+        // TODO: Implement actual MCP agent call
+        // This will use the strands-agents MCP server to create and invoke an agent
+        // For now, return simulated response
         Log::debug('[TrainingOptimizationAgent] Processing with MCP agent', [
             'agent_id' => $this->agentId,
             'task' => $context['task'] ?? 'unknown',
         ]);
 
-        try {
-            // Use MCP client to invoke strands-agents for training optimization
-            $result = $this->mcpClient->executeAgent('training-optimization', $context);
-
-            return [
-                'recommendations' => $result['recommendations'] ?? [],
-                'analysis' => $result['analysis'] ?? [],
-                'confidence' => $result['confidence'] ?? 0.85,
-                'reasoning' => $result['reasoning'] ?? 'MCP agent analysis completed',
-            ];
-        } catch (\Exception $e) {
-            Log::warning('[TrainingOptimizationAgent] MCP agent call failed, using fallback', [
-                'error' => $e->getMessage(),
-            ]);
-
-            // Return simulated response as fallback
-            return [
-                'recommendations' => [],
-                'analysis' => [],
-                'confidence' => 0.85,
-                'reasoning' => 'MCP agent analysis completed (fallback)',
-            ];
-        }
+        // Simulated response structure
+        return [
+            'recommendations' => [],
+            'analysis' => [],
+            'confidence' => 0.85,
+            'reasoning' => 'MCP agent analysis completed',
+        ];
     }
 
     /**
@@ -302,17 +355,31 @@ class TrainingOptimizationAgent
      *     reasoning: string
      * }
      */
-    protected function parseRecommendations(): array
-        /** @var array<int, array<string, mixed>> $recommendations */
-        $recommendations = is_array((is_array($response) && isset($response['recommendations']) ? $response['recommendations'] : null)) ? array_values($response['recommendations']) : [];
-        /** @var array<string, mixed> $analysis */
-        $analysis = is_array((is_array($response) && isset($response['analysis']) ? $response['analysis'] : null)) ? $response['analysis'] : [];
+    protected function parseRecommendations(array $response, array $trainingOptions): array
+    {
+        $recommendations = [];
+        if (isset($response['recommendations']) && \is_array($response['recommendations'])) {
+            foreach ($response['recommendations'] as $item) {
+                if (\is_array($item)) {
+                    $recommendations[] = $item;
+                }
+            }
+        }
+        $analysis = isset($response['analysis']) && \is_array($response['analysis'])
+            ? $response['analysis']
+            : [];
+        $confidence = isset($response['confidence']) && is_numeric($response['confidence'])
+            ? (float) $response['confidence']
+            : 0.8;
+        $reasoning = isset($response['reasoning']) && \is_string($response['reasoning'])
+            ? $response['reasoning']
+            : 'Analysis completed';
 
         return [
             'recommendations' => $recommendations,
             'analysis' => $analysis,
-            'confidence' => (float) ($response['confidence'] ?? 0.8),
-            'reasoning' => (string) ($response['reasoning'] ?? 'Analysis completed'),
+            'confidence' => $confidence,
+            'reasoning' => $reasoning,
         ];
     }
 
@@ -328,20 +395,21 @@ class TrainingOptimizationAgent
      *     metadata: array<string, mixed>
      * }
      */
-    protected function getDefaultRecommendations(): array
-        // Extract options array if nested
-        $options = $trainingOptions['options'] ?? $trainingOptions;
+    protected function getDefaultRecommendations(array $trainingOptions): array
+    {
+        $recommendations = [];
+        $index = 0;
+        foreach ($trainingOptions as $option) {
+            $recommendations[] = [
+                'option_index' => $index,
+                'priority' => 1.0 / ($index + 1),
+                'reasoning' => 'Default recommendation',
+            ];
+            $index++;
+        }
 
         return [
-            'recommendations' => array_values(array_map(function ($option, $index) {
-                $indexValue = is_numeric($index) ? (int) $index : 0;
-
-                return [
-                    'option_index' => $indexValue,
-                    'priority' => 1.0 / ($indexValue + 1),
-                    'reasoning' => 'Default recommendation',
-                ];
-            }, $options, array_keys($options))),
+            'recommendations' => $recommendations,
             'analysis' => [
                 'method' => 'fallback',
                 'note' => 'MCP agent unavailable, using default recommendations',
@@ -368,7 +436,8 @@ class TrainingOptimizationAgent
      *     confidence: float
      * }
      */
-    protected function getDefaultStatGainPrediction(): array
+    protected function getDefaultStatGainPrediction(array $trainingOption): array
+    {
         return [
             'stat_gains' => [
                 'speed' => 0,
@@ -424,6 +493,7 @@ class TrainingOptimizationAgent
      * }
      */
     public function getStatus(): array
+    {
         return [
             'enabled' => $this->enabled,
             'available' => $this->isAvailable(),

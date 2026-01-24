@@ -186,7 +186,7 @@ class SkillManagementController extends Controller
                 return null;
             }
 
-            $evolutionTarget = (is_object($skill) && property_exists($skill, 'evolutionTarget') ? $skill->evolutionTarget : null);
+            $evolutionTarget = property_exists($skill, 'evolutionTarget') ? $skill->evolutionTarget : null;
             if (! ($evolutionTarget instanceof Skill)) {
                 return null;
             }

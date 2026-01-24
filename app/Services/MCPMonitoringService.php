@@ -14,8 +14,12 @@ class MCPMonitoringService
 {
     /**
      * Get comprehensive MCP dashboard data.
+     *
+     * @param  int|null  $userId  The user ID to filter by (optional for server-level data)
+     * @return array<string, mixed>
      */
-    public function getDashboardData(): array
+    public function getDashboardData(?int $userId = null): array
+    {
         return [
             'servers' => $this->getServerStatus(),
             'agents' => $this->getAgentStatus($userId),
@@ -27,8 +31,11 @@ class MCPMonitoringService
 
     /**
      * Get server status information.
+     *
+     * @return array<string, mixed>
      */
     public function getServerStatus(): array
+    {
         $servers = MCPServer::all();
 
         return [
@@ -36,7 +43,9 @@ class MCPMonitoringService
             'active' => $servers->where('status', '=', 'active')->count(),
             'inactive' => $servers->where('status', '=', 'inactive')->count(),
             'error' => $servers->where('status', '=', 'error')->count(),
-            'servers' => $servers->map(function ($server) {
+            'servers' => $servers->map(function (MCPServer $server): array {
+                $lastHealthCheck = $server->last_health_check;
+
                 return [
                     'id' => $server->id,
                     'name' => $server->server_name,
@@ -45,7 +54,7 @@ class MCPMonitoringService
                     'health' => $server->isHealthy() ? 'healthy' : 'unhealthy',
                     'success_rate' => $server->success_rate,
                     'average_response_time' => $server->average_response_time,
-                    'last_health_check' => $server->last_health_check?->toIso8601String(),
+                    'last_health_check' => $lastHealthCheck instanceof \Carbon\Carbon ? $lastHealthCheck->toIso8601String() : null,
                     'consecutive_failures' => $server->consecutive_failures,
                     'total_requests' => $server->total_requests,
                 ];
@@ -55,11 +64,15 @@ class MCPMonitoringService
 
     /**
      * Get agent status information.
+     *
+     * @param  int|null  $userId  The user ID to filter by
+     * @return array<string, mixed>
      */
-    public function getAgentStatus(): array
+    public function getAgentStatus(?int $userId = null): array
+    {
         $query = MCPAgent::query();
 
-        if ($userId) {
+        if ($userId !== null) {
             $query->where('user_id', $userId);
         }
 
@@ -70,7 +83,9 @@ class MCPMonitoringService
             'active' => $agents->where('status', '=', 'active')->count(),
             'terminated' => $agents->where('status', '=', 'terminated')->count(),
             'healthy' => $agents->where('health_status', '=', 'healthy')->count(),
-            'agents' => $agents->map(function ($agent) {
+            'agents' => $agents->map(function (MCPAgent $agent): array {
+                $lastHealthCheck = $agent->last_health_check;
+
                 return [
                     'id' => $agent->id,
                     'agent_id' => $agent->agent_id,
@@ -82,7 +97,7 @@ class MCPMonitoringService
                     'uptime_seconds' => $agent->getUptimeSeconds(),
                     'deployment_time' => $agent->deployment_time,
                     'performance_metrics' => $agent->performance_metrics,
-                    'last_health_check' => $agent->last_health_check?->toIso8601String(),
+                    'last_health_check' => $lastHealthCheck instanceof \Carbon\Carbon ? $lastHealthCheck->toIso8601String() : null,
                 ];
             })->values(),
         ];
@@ -90,8 +105,13 @@ class MCPMonitoringService
 
     /**
      * Get cost analytics.
+     *
+     * @param  int|null  $userId  The user ID to filter by
+     * @param  string  $period  The period for analytics (day, week, month, year)
+     * @return array<string, mixed>
      */
-    public function getCostAnalytics(): array
+    public function getCostAnalytics(?int $userId = null, string $period = 'month'): array
+    {
         $startDate = match ($period) {
             'day' => now()->startOfDay(),
             'week' => now()->startOfWeek(),
@@ -100,17 +120,20 @@ class MCPMonitoringService
             default => now()->startOfMonth(),
         };
 
-        $toolUsage = MCPToolUsage::forUser($userId)
-            ->betweenDates($startDate, now())
-            ->get();
+        $query = MCPToolUsage::query();
+        if ($userId !== null) {
+            $query->forUser($userId);
+        }
+        $toolUsage = $query->betweenDates($startDate, now())->get();
 
         $totalCost = $toolUsage->sum('cost_estimate');
         $totalTokens = $toolUsage->sum('tokens_used');
+        $floatTotalCost = is_numeric($totalCost) ? (float) $totalCost : 0.0;
 
         // Cost by server
-        $costByServer = $toolUsage->groupBy('server_name')->map(function ($items, $serverName) {
+        $costByServer = $toolUsage->groupBy('server_name')->map(function (Collection $items, int|string $serverName): array {
             return [
-                'server' => $serverName,
+                'server' => (string) $serverName,
                 'cost' => $items->sum('cost_estimate'),
                 'requests' => $items->count(),
                 'tokens' => $items->sum('tokens_used'),
@@ -118,9 +141,9 @@ class MCPMonitoringService
         })->values();
 
         // Cost by tool
-        $costByTool = $toolUsage->groupBy('tool_name')->map(function ($items, $toolName) {
+        $costByTool = $toolUsage->groupBy('tool_name')->map(function (Collection $items, int|string $toolName): array {
             return [
-                'tool' => $toolName,
+                'tool' => (string) $toolName,
                 'cost' => $items->sum('cost_estimate'),
                 'requests' => $items->count(),
                 'average_cost' => $items->avg('cost_estimate'),
@@ -128,9 +151,9 @@ class MCPMonitoringService
         })->sortByDesc('cost')->take(10)->values();
 
         // Daily cost trend
-        $dailyCosts = $toolUsage->groupBy(function ($item) {
+        $dailyCosts = $toolUsage->groupBy(function (MCPToolUsage $item): string {
             return $item->executed_at->format('Y-m-d');
-        })->map(function ($items, $date) {
+        })->map(function (Collection $items, string $date): array {
             return [
                 'date' => $date,
                 'cost' => $items->sum('cost_estimate'),
@@ -138,12 +161,14 @@ class MCPMonitoringService
             ];
         })->values();
 
+        $totalRequestCount = $toolUsage->count();
+
         return [
             'period' => $period,
-            'total_cost' => round($totalCost, 6),
+            'total_cost' => round($floatTotalCost, 6),
             'total_tokens' => $totalTokens,
-            'total_requests' => $toolUsage->count(),
-            'average_cost_per_request' => $toolUsage->count() > 0 ? round($totalCost / $toolUsage->count(), 6) : 0,
+            'total_requests' => $totalRequestCount,
+            'average_cost_per_request' => $totalRequestCount > 0 ? round($floatTotalCost / $totalRequestCount, 6) : 0,
             'cost_by_server' => $costByServer,
             'cost_by_tool' => $costByTool,
             'daily_costs' => $dailyCosts,
@@ -152,8 +177,13 @@ class MCPMonitoringService
 
     /**
      * Get performance metrics.
+     *
+     * @param  int|null  $userId  The user ID to filter by
+     * @param  string  $period  The period for metrics (hour, day, week)
+     * @return array<string, mixed>
      */
-    public function getPerformanceMetrics(): array
+    public function getPerformanceMetrics(?int $userId = null, string $period = 'day'): array
+    {
         $startDate = match ($period) {
             'hour' => now()->subHour(),
             'day' => now()->startOfDay(),
@@ -161,29 +191,32 @@ class MCPMonitoringService
             default => now()->startOfDay(),
         };
 
-        $toolUsage = MCPToolUsage::forUser($userId)
-            ->betweenDates($startDate, now())
-            ->get();
+        $query = MCPToolUsage::query();
+        if ($userId !== null) {
+            $query->forUser($userId);
+        }
+        $toolUsage = $query->betweenDates($startDate, now())->get();
 
         $successfulRequests = $toolUsage->where('execution_status', '=', 'success')->count();
         $failedRequests = $toolUsage->where('execution_status', '=', 'failure')->count();
         $totalRequests = $toolUsage->count();
 
         // Performance by server
-        $performanceByServer = $toolUsage->groupBy('server_name')->map(function ($items, $serverName) {
+        $performanceByServer = $toolUsage->groupBy('server_name')->map(function (Collection $items, int|string $serverName): array {
             $successful = $items->where('execution_status', '=', 'success')->count();
             $total = $items->count();
+            $avgExecutionTime = $items->avg('execution_time');
 
             return [
-                'server' => $serverName,
+                'server' => (string) $serverName,
                 'success_rate' => $total > 0 ? round(($successful / $total) * 100, 2) : 0,
-                'average_execution_time' => round($items->avg('execution_time'), 3),
+                'average_execution_time' => round(is_numeric($avgExecutionTime) ? (float) $avgExecutionTime : 0.0, 3),
                 'total_requests' => $total,
             ];
         })->values();
 
         // Slowest tools
-        $slowestTools = $toolUsage->sortByDesc('execution_time')->take(10)->map(function ($item) {
+        $slowestTools = $toolUsage->sortByDesc('execution_time')->take(10)->map(function (MCPToolUsage $item): array {
             return [
                 'tool' => $item->tool_name,
                 'server' => $item->server_name,
@@ -192,13 +225,15 @@ class MCPMonitoringService
             ];
         })->values();
 
+        $avgExecutionTime = $toolUsage->avg('execution_time');
+
         return [
             'period' => $period,
             'total_requests' => $totalRequests,
             'successful_requests' => $successfulRequests,
             'failed_requests' => $failedRequests,
             'success_rate' => $totalRequests > 0 ? round(($successfulRequests / $totalRequests) * 100, 2) : 0,
-            'average_execution_time' => round($toolUsage->avg('execution_time') ?? 0, 3),
+            'average_execution_time' => round(is_numeric($avgExecutionTime) ? (float) $avgExecutionTime : 0.0, 3),
             'performance_by_server' => $performanceByServer,
             'slowest_tools' => $slowestTools,
         ];
@@ -206,30 +241,39 @@ class MCPMonitoringService
 
     /**
      * Get optimization recommendations.
+     *
+     * @param  int|null  $userId  The user ID to filter by
+     * @return array<int, array<string, mixed>>
      */
-    public function getOptimizationRecommendations(): array
+    public function getOptimizationRecommendations(?int $userId = null): array
+    {
+        /** @var array<int, array<string, mixed>> $recommendations */
         $recommendations = [];
 
         // Check for underperforming servers
         $servers = MCPServer::all();
         foreach ($servers as $server) {
-            if ($server->failure_rate > 10) {
+            $failureRate = $server->failure_rate;
+            $serverName = (string) $server->server_name;
+            $avgResponseTime = $server->average_response_time;
+
+            if (is_numeric($failureRate) && $failureRate > 10) {
                 $recommendations[] = [
                     'type' => 'server_health',
                     'severity' => 'high',
-                    'title' => "High failure rate on {$server->server_name}",
-                    'description' => "Server {$server->server_name} has a failure rate of {$server->failure_rate}%. Consider investigating or restarting the server.",
+                    'title' => "High failure rate on {$serverName}",
+                    'description' => "Server {$serverName} has a failure rate of {$failureRate}%. Consider investigating or restarting the server.",
                     'action' => 'restart_server',
                     'server_id' => $server->id,
                 ];
             }
 
-            if ($server->average_response_time > 5.0) {
+            if (is_numeric($avgResponseTime) && $avgResponseTime > 5.0) {
                 $recommendations[] = [
                     'type' => 'performance',
                     'severity' => 'medium',
-                    'title' => "Slow response time on {$server->server_name}",
-                    'description' => "Server {$server->server_name} has an average response time of {$server->average_response_time}s. Consider optimizing or scaling the server.",
+                    'title' => "Slow response time on {$serverName}",
+                    'description' => "Server {$serverName} has an average response time of {$avgResponseTime}s. Consider optimizing or scaling the server.",
                     'action' => 'optimize_server',
                     'server_id' => $server->id,
                 ];
@@ -238,31 +282,36 @@ class MCPMonitoringService
 
         // Check for cost optimization opportunities
         $costAnalytics = $this->getCostAnalytics($userId, 'month');
-        if ($costAnalytics['total_cost'] > 10.0) {
-            $topCostTools = collect($costAnalytics['cost_by_tool'])->take(3);
+        $totalCost = $costAnalytics['total_cost'];
+        if (is_numeric($totalCost) && $totalCost > 10.0) {
+            $costByTool = $costAnalytics['cost_by_tool'];
+            /** @var Collection<int, array<string, mixed>> $topCostTools */
+            $topCostTools = is_array($costByTool) ? collect($costByTool)->take(3) : collect([]);
             $recommendations[] = [
                 'type' => 'cost_optimization',
                 'severity' => 'medium',
                 'title' => 'High monthly costs detected',
-                'description' => 'Your monthly MCP costs are $'.$costAnalytics['total_cost'].'. Top cost drivers: '.$topCostTools->pluck('tool')->implode(', '),
+                'description' => 'Your monthly MCP costs are $'.$totalCost.'. Top cost drivers: '.$topCostTools->pluck('tool')->implode(', '),
                 'action' => 'review_usage',
             ];
         }
 
         // Check for inactive agents
-        $inactiveAgents = MCPAgent::where('user_id', $userId)
-            ->where('status', '=', 'active')
-            ->where('last_health_check', '<', now()->subHours(24)->toDateTimeString())
-            ->count();
+        if ($userId !== null) {
+            $inactiveAgents = MCPAgent::where('user_id', $userId)
+                ->where('status', '=', 'active')
+                ->where('last_health_check', '<', now()->subHours(24)->toDateTimeString())
+                ->count();
 
-        if ($inactiveAgents > 0) {
-            $recommendations[] = [
-                'type' => 'agent_lifecycle',
-                'severity' => 'low',
-                'title' => 'Inactive agents detected',
-                'description' => "You have {$inactiveAgents} agents that haven't been used in 24 hours. Consider terminating them to save resources.",
-                'action' => 'cleanup_agents',
-            ];
+            if ($inactiveAgents > 0) {
+                $recommendations[] = [
+                    'type' => 'agent_lifecycle',
+                    'severity' => 'low',
+                    'title' => 'Inactive agents detected',
+                    'description' => "You have {$inactiveAgents} agents that haven't been used in 24 hours. Consider terminating them to save resources.",
+                    'action' => 'cleanup_agents',
+                ];
+            }
         }
 
         return $recommendations;
@@ -270,8 +319,13 @@ class MCPMonitoringService
 
     /**
      * Connect to an MCP server.
+     *
+     * @param  int  $serverId  The server ID to connect to
+     * @return array<string, mixed>
      */
-    public function connectServer(): array
+    public function connectServer(int $serverId): array
+    {
+        /** @var MCPServer $server */
         $server = MCPServer::findOrFail($serverId);
 
         try {
@@ -299,8 +353,13 @@ class MCPMonitoringService
 
     /**
      * Disconnect from an MCP server.
+     *
+     * @param  int  $serverId  The server ID to disconnect from
+     * @return array<string, mixed>
      */
-    public function disconnectServer(): array
+    public function disconnectServer(int $serverId): array
+    {
+        /** @var MCPServer $server */
         $server = MCPServer::findOrFail($serverId);
 
         $server->status = 'inactive';
@@ -315,11 +374,18 @@ class MCPMonitoringService
 
     /**
      * Update server configuration.
+     *
+     * @param  int  $serverId  The server ID to update
+     * @param  array<string, mixed>  $config  The configuration to merge
+     * @return array<string, mixed>
      */
-    public function updateServerConfig(): array
+    public function updateServerConfig(int $serverId, array $config): array
+    {
+        /** @var MCPServer $server */
         $server = MCPServer::findOrFail($serverId);
 
-        $server->server_config = array_merge($server->server_config ?? [], $config);
+        $existingConfig = $server->server_config;
+        $server->server_config = array_merge(is_array($existingConfig) ? $existingConfig : [], $config);
         $server->save();
 
         return [
@@ -331,6 +397,9 @@ class MCPMonitoringService
 
     /**
      * Create a new agent.
+     *
+     * @param  int  $userId  The user ID to create the agent for
+     * @param  array<string, mixed>  $agentData  The agent data
      */
     public function createAgent(int $userId, array $agentData): MCPAgent
     {
@@ -353,12 +422,18 @@ class MCPMonitoringService
 
     /**
      * Terminate an agent.
+     *
+     * @param  int  $agentId  The agent ID to terminate
+     * @return array<string, mixed>
      */
-    public function terminateAgent(): array
+    public function terminateAgent(int $agentId): array
+    {
+        /** @var MCPAgent $agent */
         $agent = MCPAgent::findOrFail($agentId);
 
+        /** @phpstan-ignore assign.propertyType */
         $agent->status = 'terminated';
-        $agent->terminated_at = now();
+        $agent->terminated_at = now()->toDateTimeString();
         $agent->save();
 
         return [
@@ -423,6 +498,8 @@ class MCPMonitoringService
 
     /**
      * Record tool usage.
+     *
+     * @param  array<string, mixed>  $data  The tool usage data to record
      */
     public function recordToolUsage(array $data): MCPToolUsage
     {

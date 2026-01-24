@@ -252,7 +252,7 @@ class FallbackRecoveryController extends Controller
             ], 400);
         }
 
-        $limitValue = is_numeric($limit) ? (is_numeric($limit) ? (int) $limit : 0) : 10;
+        $limitValue = is_numeric($limit) ? (int) $limit : 10;
         $history = $this->syncService->getSyncHistory($dataType, $limitValue);
 
         return response()->json([
@@ -291,10 +291,10 @@ class FallbackRecoveryController extends Controller
         $limit = $request->input('limit', 50);
         $type = $request->input('type');
 
-        $limitValue = is_numeric($limit) ? (is_numeric($limit) ? (int) $limit : 0) : 50;
+        $limitValue = is_numeric($limit) ? (int) $limit : 50;
         $typeValue = is_string($type) ? $type : null;
 
-        $history = $this->alertingService->getAlertHistory($limitValue, $typeValue);
+        $history = $this->alertingService->getAlertHistory($typeValue, $limitValue);
 
         return response()->json([
             'success' => true,

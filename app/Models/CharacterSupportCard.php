@@ -29,6 +29,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class CharacterSupportCard extends Model
 {
+    /** @use HasFactory<\Database\Factories\CharacterSupportCardFactory> */
     use HasFactory;
 
     protected $table = 'character_support_cards';

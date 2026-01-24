@@ -27,7 +27,7 @@ class DataValidationService
     /**
      * Validation history
      *
-     * @var array<string, array<string, mixed>>
+     * @var array<int, array<string, mixed>>
      */
     protected array $validationHistory = [];
 
@@ -42,7 +42,8 @@ class DataValidationService
      *
      * @return array{valid: bool, errors: array<string>, warnings: array<string>, score: float, details: array<string, mixed>}
      */
-    public function validateData(): array
+    public function validateData(string $dataType, mixed $data): array
+    {
         Log::info('[DataValidation] Starting validation', [
             'data_type' => $dataType,
             'data_size' => is_array($data) ? count($data) : 0,
@@ -102,13 +103,24 @@ class DataValidationService
      * @param  array<string, mixed>  $rules
      * @return array{valid: bool, errors: array<string>, warnings: array<string>, details: array<string, mixed>}
      */
-    protected function executeValidationWorkflow(): array
+    protected function executeValidationWorkflow(mixed $data, array $rules): array
+    {
         $errors = [];
         $warnings = [];
         $details = [];
 
+        // Extract rules with type guards
+        /** @var array<string, mixed> $schemaRules */
+        $schemaRules = isset($rules['schema']) && is_array($rules['schema']) ? $rules['schema'] : [];
+        /** @var array<string, mixed> $integrityRules */
+        $integrityRules = isset($rules['integrity']) && is_array($rules['integrity']) ? $rules['integrity'] : [];
+        /** @var array<string, mixed> $businessRulesConfig */
+        $businessRulesConfig = isset($rules['business']) && is_array($rules['business']) ? $rules['business'] : [];
+        /** @var array<string, mixed> $qualityRules */
+        $qualityRules = isset($rules['quality']) && is_array($rules['quality']) ? $rules['quality'] : [];
+
         // Step 1: Schema validation
-        $schemaValidation = $this->validateSchema($data, $rules['schema'] ?? []);
+        $schemaValidation = $this->validateSchema($data, $schemaRules);
 
         if (! $schemaValidation['valid']) {
             $errors = array_merge($errors, $schemaValidation['errors']);
@@ -118,7 +130,7 @@ class DataValidationService
         $details['schema_validation'] = $schemaValidation;
 
         // Step 2: Data integrity checks
-        $integrityChecks = $this->validateDataIntegrity($data, $rules['integrity'] ?? []);
+        $integrityChecks = $this->validateDataIntegrity($data, $integrityRules);
 
         if (! $integrityChecks['valid']) {
             $errors = array_merge($errors, $integrityChecks['errors']);
@@ -128,17 +140,17 @@ class DataValidationService
         $details['integrity_checks'] = $integrityChecks;
 
         // Step 3: Business rules validation
-        $businessRules = $this->validateBusinessRules($data, $rules['business'] ?? []);
+        $businessRulesResult = $this->validateBusinessRules($data, $businessRulesConfig);
 
-        if (! $businessRules['valid']) {
-            $errors = array_merge($errors, $businessRules['errors']);
+        if (! $businessRulesResult['valid']) {
+            $errors = array_merge($errors, $businessRulesResult['errors']);
         }
 
-        $warnings = array_merge($warnings, $businessRules['warnings']);
-        $details['business_rules'] = $businessRules;
+        $warnings = array_merge($warnings, $businessRulesResult['warnings']);
+        $details['business_rules'] = $businessRulesResult;
 
         // Step 4: Data quality checks
-        $qualityChecks = $this->validateDataQuality($data, $rules['quality'] ?? []);
+        $qualityChecks = $this->validateDataQuality($data, $qualityRules);
 
         $warnings = array_merge($warnings, $qualityChecks['warnings']);
         $details['quality_checks'] = $qualityChecks;
@@ -157,7 +169,8 @@ class DataValidationService
      * @param  array<string, mixed>  $schemaRules
      * @return array{valid: bool, errors: array<string>, warnings: array<string>}
      */
-    protected function validateSchema(): array
+    protected function validateSchema(mixed $data, array $schemaRules = []): array
+    {
         $errors = [];
         $warnings = [];
 
@@ -190,22 +203,33 @@ class DataValidationService
                 }
 
                 // Validate required fields for each item
-                if (isset($schemaRules['required_fields'])) {
-                    foreach ($schemaRules['required_fields'] as $field) {
-                        if (! isset($item[$field]) && ! array_key_exists($field, $item)) {
-                            $errors[] = "Required field missing: {$field} at index {$index}";
+                $requiredFields = $schemaRules['required_fields'] ?? [];
+                if (is_array($requiredFields)) {
+                    foreach ($requiredFields as $field) {
+                        if (! is_scalar($field)) {
+                            continue;
+                        }
+                        $fieldStr = (string) $field;
+                        if (! isset($item[$fieldStr]) && ! array_key_exists($fieldStr, $item)) {
+                            $errors[] = "Required field missing: {$fieldStr} at index {$index}";
                         }
                     }
                 }
 
                 // Validate field types for each item
-                if (isset($schemaRules['field_types'])) {
-                    foreach ($schemaRules['field_types'] as $field => $expectedType) {
-                        if (isset($item[$field])) {
-                            $actualType = gettype($item[$field]);
+                $fieldTypes = $schemaRules['field_types'] ?? [];
+                if (is_array($fieldTypes)) {
+                    foreach ($fieldTypes as $field => $expectedType) {
+                        if (! is_scalar($expectedType)) {
+                            continue;
+                        }
+                        $fieldStr = (string) $field;
+                        $expectedTypeStr = (string) $expectedType;
+                        if (isset($item[$fieldStr])) {
+                            $actualType = gettype($item[$fieldStr]);
 
-                            if ($actualType !== $expectedType) {
-                                $errors[] = "Field '{$field}' has incorrect type. Expected: {$expectedType}, Got: {$actualType} at index {$index}";
+                            if ($actualType !== $expectedTypeStr) {
+                                $errors[] = "Field '{$fieldStr}' has incorrect type. Expected: {$expectedTypeStr}, Got: {$actualType} at index {$index}";
                             }
                         }
                     }
@@ -214,22 +238,33 @@ class DataValidationService
         } else {
             // Validate single record
             // Validate required fields
-            if (isset($schemaRules['required_fields'])) {
-                foreach ($schemaRules['required_fields'] as $field) {
-                    if (! isset($data[$field]) && ! array_key_exists($field, $data)) {
-                        $errors[] = "Required field missing: {$field}";
+            $requiredFields = $schemaRules['required_fields'] ?? [];
+            if (is_array($requiredFields)) {
+                foreach ($requiredFields as $field) {
+                    if (! is_scalar($field)) {
+                        continue;
+                    }
+                    $fieldStr = (string) $field;
+                    if (! isset($data[$fieldStr]) && ! array_key_exists($fieldStr, $data)) {
+                        $errors[] = "Required field missing: {$fieldStr}";
                     }
                 }
             }
 
             // Validate field types
-            if (isset($schemaRules['field_types'])) {
-                foreach ($schemaRules['field_types'] as $field => $expectedType) {
-                    if (isset($data[$field])) {
-                        $actualType = gettype($data[$field]);
+            $fieldTypes = $schemaRules['field_types'] ?? [];
+            if (is_array($fieldTypes)) {
+                foreach ($fieldTypes as $field => $expectedType) {
+                    if (! is_scalar($expectedType)) {
+                        continue;
+                    }
+                    $fieldStr = (string) $field;
+                    $expectedTypeStr = (string) $expectedType;
+                    if (isset($data[$fieldStr])) {
+                        $actualType = gettype($data[$fieldStr]);
 
-                        if ($actualType !== $expectedType) {
-                            $errors[] = "Field '{$field}' has incorrect type. Expected: {$expectedType}, Got: {$actualType}";
+                        if ($actualType !== $expectedTypeStr) {
+                            $errors[] = "Field '{$fieldStr}' has incorrect type. Expected: {$expectedTypeStr}, Got: {$actualType}";
                         }
                     }
                 }
@@ -249,7 +284,8 @@ class DataValidationService
      * @param  array<string, mixed>  $integrityRules
      * @return array{valid: bool, errors: array<string>, warnings: array<string>}
      */
-    protected function validateDataIntegrity(): array
+    protected function validateDataIntegrity(mixed $data, array $integrityRules = []): array
+    {
         $errors = [];
         $warnings = [];
 
@@ -260,20 +296,27 @@ class DataValidationService
         // Check for duplicate entries
         if (isset($integrityRules['unique_field'])) {
             $uniqueField = $integrityRules['unique_field'];
-            $values = array_column($data, $uniqueField);
-            $duplicates = array_diff_assoc($values, array_unique($values));
+            if (is_string($uniqueField)) {
+                $values = array_column($data, $uniqueField);
+                $duplicates = array_diff_assoc($values, array_unique($values));
 
-            if (! empty($duplicates)) {
-                $errors[] = "Duplicate values found in field: {$uniqueField}";
+                if (! empty($duplicates)) {
+                    $errors[] = "Duplicate values found in field: {$uniqueField}";
+                }
             }
         }
 
         // Check for null values in critical fields
-        if (isset($integrityRules['non_null_fields'])) {
-            foreach ($integrityRules['non_null_fields'] as $field) {
+        $nonNullFields = $integrityRules['non_null_fields'] ?? [];
+        if (is_array($nonNullFields)) {
+            foreach ($nonNullFields as $field) {
+                if (! is_scalar($field)) {
+                    continue;
+                }
+                $fieldStr = (string) $field;
                 foreach ($data as $index => $item) {
-                    if (is_array($item) && ! isset($item[$field])) {
-                        $warnings[] = "Null value found in critical field '{$field}' at index {$index}";
+                    if (is_array($item) && ! isset($item[$fieldStr])) {
+                        $warnings[] = "Null value found in critical field '{$fieldStr}' at index {$index}";
                     }
                 }
             }
@@ -299,7 +342,8 @@ class DataValidationService
      * @param  array<string, mixed>  $businessRules
      * @return array{valid: bool, errors: array<string>, warnings: array<string>}
      */
-    protected function validateBusinessRules(): array
+    protected function validateBusinessRules(mixed $data, array $businessRules = []): array
+    {
         $errors = [];
         $warnings = [];
 
@@ -308,18 +352,26 @@ class DataValidationService
         }
 
         // Validate value ranges
-        if (isset($businessRules['value_ranges'])) {
-            foreach ($businessRules['value_ranges'] as $field => $range) {
+        $valueRanges = $businessRules['value_ranges'] ?? [];
+        if (is_array($valueRanges)) {
+            foreach ($valueRanges as $field => $range) {
+                if (! is_array($range)) {
+                    continue;
+                }
+                $fieldStr = (string) $field;
                 foreach ($data as $index => $item) {
-                    if (is_array($item) && isset($item[$field])) {
-                        $value = $item[$field];
+                    if (is_array($item) && isset($item[$fieldStr])) {
+                        $value = $item[$fieldStr];
 
-                        if (isset($range['min']) && $value < $range['min']) {
-                            $errors[] = "Value in field '{$field}' at index {$index} is below minimum ({$range['min']})";
+                        $minVal = $range['min'] ?? null;
+                        $maxVal = $range['max'] ?? null;
+
+                        if (is_numeric($minVal) && is_numeric($value) && $value < $minVal) {
+                            $errors[] = "Value in field '{$fieldStr}' at index {$index} is below minimum ({$minVal})";
                         }
 
-                        if (isset($range['max']) && $value > $range['max']) {
-                            $errors[] = "Value in field '{$field}' at index {$index} exceeds maximum ({$range['max']})";
+                        if (is_numeric($maxVal) && is_numeric($value) && $value > $maxVal) {
+                            $errors[] = "Value in field '{$fieldStr}' at index {$index} exceeds maximum ({$maxVal})";
                         }
                     }
                 }
@@ -327,12 +379,17 @@ class DataValidationService
         }
 
         // Validate enum values
-        if (isset($businessRules['enum_fields'])) {
-            foreach ($businessRules['enum_fields'] as $field => $allowedValues) {
+        $enumFields = $businessRules['enum_fields'] ?? [];
+        if (is_array($enumFields)) {
+            foreach ($enumFields as $field => $allowedValues) {
+                $fieldStr = (string) $field;
+                if (! is_array($allowedValues)) {
+                    continue;
+                }
                 foreach ($data as $index => $item) {
-                    if (is_array($item) && isset($item[$field])) {
-                        if (! in_array($item[$field], $allowedValues, true)) {
-                            $errors[] = "Invalid value in field '{$field}' at index {$index}. Allowed: ".implode(', ', $allowedValues);
+                    if (is_array($item) && isset($item[$fieldStr])) {
+                        if (! in_array($item[$fieldStr], $allowedValues, true)) {
+                            $errors[] = "Invalid value in field '{$fieldStr}' at index {$index}. Allowed: ".implode(', ', $allowedValues);
                         }
                     }
                 }
@@ -352,7 +409,8 @@ class DataValidationService
      * @param  array<string, mixed>  $qualityRules
      * @return array{valid: bool, warnings: array<string>, metrics: array<string, mixed>}
      */
-    protected function validateDataQuality(): array
+    protected function validateDataQuality(mixed $data, array $qualityRules = []): array
+    {
         $warnings = [];
         $metrics = [];
 
@@ -377,8 +435,9 @@ class DataValidationService
         }
 
         // Check data freshness
-        if (isset($qualityRules['freshness_field'])) {
-            $freshness = $this->calculateFreshness($data, $qualityRules['freshness_field']);
+        $freshnessField = $qualityRules['freshness_field'] ?? null;
+        if (is_string($freshnessField)) {
+            $freshness = $this->calculateFreshness($data, $freshnessField);
             $metrics['freshness'] = $freshness;
 
             if ($freshness < 70) {
@@ -407,7 +466,7 @@ class DataValidationService
 
         $requiredFields = $qualityRules['required_fields'] ?? [];
 
-        if (empty($requiredFields)) {
+        if (! is_array($requiredFields) || empty($requiredFields)) {
             return 100.0;
         }
 
@@ -420,8 +479,12 @@ class DataValidationService
             }
 
             foreach ($requiredFields as $field) {
-                if (isset($item[$field]) && $item[$field] !== '') {
-                    $filledFields = ($filledFields ?? 0) + 1;
+                if (! is_scalar($field)) {
+                    continue;
+                }
+                $fieldStr = (string) $field;
+                if (isset($item[$fieldStr]) && $item[$fieldStr] !== '') {
+                    $filledFields++;
                 }
             }
         }
@@ -457,10 +520,10 @@ class DataValidationService
                 if (! isset($fieldTypes[$field])) {
                     $fieldTypes[$field] = $type;
                 } elseif ($fieldTypes[$field] !== $type) {
-                    $inconsistencies = ($inconsistencies ?? 0) + 1;
+                    $inconsistencies++;
                 }
 
-                $totalChecks = ($totalChecks ?? 0) + 1;
+                $totalChecks++;
             }
         }
 
@@ -488,13 +551,17 @@ class DataValidationService
             }
 
             try {
-                $timestamp = \Carbon\Carbon::parse($item[$freshnessField]);
+                $timestampValue = $item[$freshnessField];
+                if (! is_string($timestampValue) && ! is_int($timestampValue) && ! $timestampValue instanceof \DateTimeInterface) {
+                    continue;
+                }
+                $timestamp = \Carbon\Carbon::parse($timestampValue);
                 $ageInDays = $now->diffInDays($timestamp);
 
                 // Freshness decreases with age (100% at 0 days, 0% at 30+ days)
                 $freshness = max(0, 100 - ($ageInDays * 3.33));
-                $totalAge = ($totalAge ?? 0) + $freshness;
-                $count = ($count ?? 0) + 1;
+                $totalAge += $freshness;
+                $count++;
             } catch (\Exception $e) {
                 // Invalid timestamp, skip
                 continue;
@@ -522,11 +589,12 @@ class DataValidationService
         // Adjust based on quality metrics
         $qualityBonus = 0.0;
 
-        if (isset($validationResult['details']['quality_checks']['metrics'])) {
-            $metrics = $validationResult['details']['quality_checks']['metrics'];
+        $qualityChecks = $validationResult['details']['quality_checks'] ?? null;
+        if (is_array($qualityChecks) && isset($qualityChecks['metrics']) && is_array($qualityChecks['metrics'])) {
+            $metrics = $qualityChecks['metrics'];
 
-            $completeness = $metrics['completeness'] ?? 0;
-            $consistency = $metrics['consistency'] ?? 0;
+            $completeness = is_numeric($metrics['completeness'] ?? null) ? (float) $metrics['completeness'] : 0.0;
+            $consistency = is_numeric($metrics['consistency'] ?? null) ? (float) $metrics['consistency'] : 0.0;
 
             // Bonus for high quality (up to 10 points)
             if ($completeness > 90 && $consistency > 95) {
@@ -568,7 +636,8 @@ class DataValidationService
      *
      * @return array<string, mixed>
      */
-    protected function getValidationRules(): array
+    protected function getValidationRules(string $dataType): array
+    {
         return $this->validationRules[$dataType] ?? [];
     }
 
@@ -665,7 +734,8 @@ class DataValidationService
      *
      * @return array<int, array<string, mixed>>
      */
-    public function getValidationHistory(): array
+    public function getValidationHistory(int $limit = 100): array
+    {
         return array_slice($this->validationHistory, -$limit);
     }
 
@@ -675,16 +745,18 @@ class DataValidationService
      * @return array{total_validations: int, successful: int, failed: int, avg_score: float}
      */
     public function getValidationStatistics(): array
+    {
         $total = count($this->validationHistory);
         $successful = 0;
         $totalScore = 0.0;
 
         foreach ($this->validationHistory as $entry) {
             if ($entry['valid']) {
-                $successful = ($successful ?? 0) + 1;
+                $successful++;
             }
 
-            $totalScore = ($totalScore ?? 0) + $entry['score'];
+            $score = $entry['score'] ?? 0;
+            $totalScore += is_numeric($score) ? (float) $score : 0.0;
         }
 
         return [

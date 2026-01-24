@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\ExternalAPI;
 
 use App\Services\MCP\MCPClientService;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
@@ -97,7 +98,7 @@ class CacheManagementAgent
     /**
      * Access pattern tracking
      *
-     * @var array<string, array{count: int, last_access: int, first_access: int}>
+     * @var array<string, array{count: int, last_access: int, first_access: int, hits: int, misses: int}>
      */
     private array $accessPatterns = [];
 
@@ -122,7 +123,8 @@ class CacheManagementAgent
      * @param  array{strategy?: string, memory_threshold?: int, eviction_count?: int}  $options
      * @return array{success: bool, optimizations: array<string, mixed>, metrics: array<string, mixed>}
      */
-    public function optimizeCache(): array
+    public function optimizeCache(array $options = []): array
+    {
         $startTime = microtime(true);
         $strategy = $options['strategy'] ?? $this->optimizationStrategy;
         $memoryThreshold = $options['memory_threshold'] ?? self::DEFAULT_MEMORY_THRESHOLD_PERCENT;
@@ -182,7 +184,8 @@ class CacheManagementAgent
      * @param  array{strategy?: string, max_items?: int, threshold?: float}  $options
      * @return array{success: bool, prefetched: array<string>, skipped: array<string>, metadata: array<string, mixed>}
      */
-    public function performPrefetch(): array
+    public function performPrefetch(array $options = []): array
+    {
         $startTime = microtime(true);
         $strategy = $options['strategy'] ?? self::PREFETCH_PREDICTIVE;
         $maxItems = $options['max_items'] ?? 10;
@@ -211,11 +214,16 @@ class CacheManagementAgent
 
             // Skip if already cached and not stale
             if ($this->cacheManager->has($cacheKey)) {
+                /** @var array{_cache?: array{is_stale?: bool}}|null $cached */
                 $cached = $this->cacheManager->get($cacheKey);
-                if ($cached && ! ($cached['_cache']['is_stale'] ?? false)) {
-                    $skipped[] = $cacheKey;
+                if (is_array($cached)) {
+                    $cacheInfo = $cached['_cache'] ?? [];
+                    $isStale = is_array($cacheInfo) ? ($cacheInfo['is_stale'] ?? false) : false;
+                    if (! $isStale) {
+                        $skipped[] = $cacheKey;
 
-                    continue;
+                        continue;
+                    }
                 }
             }
 
@@ -256,7 +264,8 @@ class CacheManagementAgent
      *
      * @return array{success: bool, evicted_count: int, evicted_keys: array<string>, freed_bytes: int, strategy: string}
      */
-    public function performEviction(): array
+    public function performEviction(int $count = 10): array
+    {
         $startTime = microtime(true);
         $strategy = $this->evictionStrategy;
 
@@ -284,7 +293,7 @@ class CacheManagementAgent
 
             if ($this->cacheManager->delete($key)) {
                 $evictedKeys[] = $key;
-                $freedBytes = ($freedBytes ?? 0) + $size;
+                $freedBytes += $size;
 
                 // Remove from access patterns
                 unset($this->accessPatterns[$key]);
@@ -321,6 +330,7 @@ class CacheManagementAgent
      * @return array{hit_rate: float, miss_rate: float, latency: array<string, float>, memory: array<string, mixed>, throughput: array<string, mixed>, trends: array<string, mixed>}
      */
     public function getPerformanceAnalytics(): array
+    {
         $cacheStats = $this->cacheManager->getStatistics();
         $cacheInfo = $this->cacheManager->getCacheInfo();
         $cacheSize = $this->cacheManager->getCacheSize();
@@ -458,6 +468,7 @@ class CacheManagementAgent
      * @return array<string, array{count: int, last_access: int, first_access: int, hits: int, misses: int}>
      */
     public function getAccessPatterns(): array
+    {
         return $this->accessPatterns;
     }
 
@@ -475,6 +486,7 @@ class CacheManagementAgent
      * @return array{healthy: bool, mcp_enabled: bool, cache_available: bool, eviction_strategy: string, optimization_strategy: string, access_patterns_count: int}
      */
     public function getStatus(): array
+    {
         return [
             'healthy' => $this->isHealthy(),
             'mcp_enabled' => $this->mcpClient->isEnabled(),
@@ -519,6 +531,7 @@ class CacheManagementAgent
      * @return array<string, mixed>
      */
     protected function collectMetrics(): array
+    {
         $cacheStats = $this->cacheManager->getStatistics();
         $cacheSize = $this->cacheManager->getCacheSize();
 
@@ -542,6 +555,7 @@ class CacheManagementAgent
      * @return array<array{key: string, score: float, reason: string}>
      */
     protected function analyzePrefetchOpportunities(): array
+    {
         $opportunities = [];
         $now = time();
 
@@ -579,6 +593,7 @@ class CacheManagementAgent
      * @return array<array{key: string, age_seconds: int, staleness_percent: float}>
      */
     protected function identifyStaleEntries(): array
+    {
         $staleEntries = [];
         $cachedKeys = $this->cacheManager->getCachedKeys();
 
@@ -588,9 +603,10 @@ class CacheManagementAgent
                 continue;
             }
 
-            $cachedAt = $metadata['cached_at'] ?? now();
-            $ttl = $metadata['ttl'] ?? 3600;
-            $age = now()->diffInSeconds($cachedAt);
+            $cachedAtRaw = $metadata['cached_at'] ?? null;
+            $cachedAt = is_string($cachedAtRaw) ? Carbon::parse($cachedAtRaw) : now();
+            $ttl = is_numeric($metadata['ttl'] ?? null) ? (int) $metadata['ttl'] : 3600;
+            $age = (int) now()->diffInSeconds($cachedAt);
             $stalenessPercent = ($age / $ttl) * 100;
 
             if ($stalenessPercent > 80) {
@@ -614,7 +630,8 @@ class CacheManagementAgent
      * @param  array<string, mixed>  $metrics
      * @return array<string, mixed>
      */
-    protected function applyStrategyOptimizations(): array
+    protected function applyStrategyOptimizations(string $strategy, array $metrics): array
+    {
         $optimizations = [];
 
         switch ($strategy) {
@@ -663,7 +680,8 @@ class CacheManagementAgent
      *
      * @return array<array{key: string, size: int, last_access: int}>
      */
-    protected function getLRUCandidates(): array
+    protected function getLRUCandidates(int $count): array
+    {
         $candidates = [];
 
         foreach ($this->accessPatterns as $key => $pattern) {
@@ -685,7 +703,8 @@ class CacheManagementAgent
      *
      * @return array<array{key: string, size: int, access_count: int}>
      */
-    protected function getLFUCandidates(): array
+    protected function getLFUCandidates(int $count): array
+    {
         $candidates = [];
 
         foreach ($this->accessPatterns as $key => $pattern) {
@@ -707,7 +726,8 @@ class CacheManagementAgent
      *
      * @return array<array{key: string, size: int, ttl_remaining: int}>
      */
-    protected function getTTLCandidates(): array
+    protected function getTTLCandidates(int $count): array
+    {
         $candidates = [];
         $cachedKeys = $this->cacheManager->getCachedKeys();
 
@@ -717,9 +737,10 @@ class CacheManagementAgent
                 continue;
             }
 
-            $cachedAt = $metadata['cached_at'] ?? now();
-            $ttl = $metadata['ttl'] ?? 3600;
-            $age = now()->diffInSeconds($cachedAt);
+            $cachedAtRaw = $metadata['cached_at'] ?? null;
+            $cachedAt = is_string($cachedAtRaw) ? Carbon::parse($cachedAtRaw) : now();
+            $ttl = is_numeric($metadata['ttl'] ?? null) ? (int) $metadata['ttl'] : 3600;
+            $age = (int) now()->diffInSeconds($cachedAt);
             $ttlRemaining = max(0, $ttl - $age);
 
             $candidates[] = [
@@ -740,7 +761,8 @@ class CacheManagementAgent
      *
      * @return array<array{key: string, size: int, first_access: int}>
      */
-    protected function getFIFOCandidates(): array
+    protected function getFIFOCandidates(int $count): array
+    {
         $candidates = [];
 
         foreach ($this->accessPatterns as $key => $pattern) {
@@ -762,7 +784,8 @@ class CacheManagementAgent
      *
      * @return array<array{key: string, size: int}>
      */
-    protected function getRandomCandidates(): array
+    protected function getRandomCandidates(int $count): array
+    {
         $keys = array_keys($this->accessPatterns);
 
         if (empty($keys)) {
@@ -801,7 +824,8 @@ class CacheManagementAgent
      *
      * @return array<array{key: string, score: float, type: string}>
      */
-    protected function getPredictivePrefetchItems(): array
+    protected function getPredictivePrefetchItems(int $maxItems, float $threshold): array
+    {
         $items = [];
         $now = time();
 
@@ -833,7 +857,8 @@ class CacheManagementAgent
      *
      * @return array<array{key: string, score: float, type: string}>
      */
-    protected function getRelatedPrefetchItems(): array
+    protected function getRelatedPrefetchItems(int $maxItems): array
+    {
         $items = [];
 
         // Get recently accessed items and find related data
@@ -860,7 +885,8 @@ class CacheManagementAgent
      *
      * @return array<array{key: string, score: float, type: string}>
      */
-    protected function getPopularPrefetchItems(): array
+    protected function getPopularPrefetchItems(int $maxItems): array
+    {
         $items = [];
 
         foreach ($this->accessPatterns as $key => $pattern) {
@@ -882,8 +908,13 @@ class CacheManagementAgent
      *
      * @return array<array{key: string, score: float, type: string}>
      */
-    protected function getScheduledPrefetchItems(): array
+    protected function getScheduledPrefetchItems(int $maxItems): array
+    {
+        /** @var array<array{key: string, score: float, type: string}> $queue */
         $queue = Cache::get(self::PREFETCH_QUEUE_KEY, []);
+        if (! is_array($queue)) {
+            return [];
+        }
 
         return array_slice($queue, 0, $maxItems);
     }
@@ -895,12 +926,16 @@ class CacheManagementAgent
      */
     protected function queueForPrefetch(string $key, array $item): void
     {
+        /** @var array<array{key: string, score: float, type: string, queued_at: string}> $queue */
         $queue = Cache::get(self::PREFETCH_QUEUE_KEY, []);
+        if (! is_array($queue)) {
+            $queue = [];
+        }
 
         $queue[] = [
             'key' => $key,
-            'score' => $item['score'] ?? 0.5,
-            'type' => $item['type'] ?? 'unknown',
+            'score' => is_numeric($item['score'] ?? null) ? (float) $item['score'] : 0.5,
+            'type' => is_string($item['type'] ?? null) ? $item['type'] : 'unknown',
             'queued_at' => now()->toIso8601String(),
         ];
 
@@ -917,7 +952,8 @@ class CacheManagementAgent
      *
      * @return array<string>
      */
-    protected function getRecentlyAccessedKeys(): array
+    protected function getRecentlyAccessedKeys(int $count): array
+    {
         $patterns = $this->accessPatterns;
 
         // Sort by last_access descending
@@ -931,7 +967,8 @@ class CacheManagementAgent
      *
      * @return array<string>
      */
-    protected function findRelatedKeys(): array
+    protected function findRelatedKeys(string $key): array
+    {
         $relatedKeys = [];
         $type = $this->extractTypeFromKey($key);
         $name = $this->extractNameFromKey($key);
@@ -1004,11 +1041,19 @@ class CacheManagementAgent
      * @return array{avg_ms: float, p50_ms: float, p95_ms: float, p99_ms: float}
      */
     protected function calculateLatencyMetrics(): array
+    {
+        /** @var array<float> $latencies */
         $latencies = [];
 
-        foreach ($this->analyticsData['optimizations'] ?? [] as $optimization) {
-            if (isset($optimization['metrics']['optimization_duration_ms'])) {
-                $latencies[] = $optimization['metrics']['optimization_duration_ms'];
+        /** @var array<array{metrics?: array{optimization_duration_ms?: float}}> $optimizations */
+        $optimizations = $this->analyticsData['optimizations'] ?? [];
+        foreach ($optimizations as $optimization) {
+            if (! is_array($optimization)) {
+                continue;
+            }
+            $metrics = $optimization['metrics'] ?? [];
+            if (is_array($metrics) && isset($metrics['optimization_duration_ms'])) {
+                $latencies[] = (float) $metrics['optimization_duration_ms'];
             }
         }
 
@@ -1038,29 +1083,50 @@ class CacheManagementAgent
      * @return array{operations_per_minute: float, evictions_per_hour: int, prefetches_per_hour: int}
      */
     protected function calculateThroughputMetrics(): array
+    {
         $now = time();
         $oneHourAgo = $now - 3600;
 
         $recentEvictions = 0;
         $recentPrefetches = 0;
 
-        foreach ($this->analyticsData['evictions'] ?? [] as $eviction) {
-            $timestamp = strtotime($eviction['timestamp'] ?? '');
+        /** @var array<array{timestamp?: string, evicted_count?: int}> $evictions */
+        $evictions = $this->analyticsData['evictions'] ?? [];
+        foreach ($evictions as $eviction) {
+            if (! is_array($eviction)) {
+                continue;
+            }
+            $timestampStr = $eviction['timestamp'] ?? '';
+            $timestamp = is_string($timestampStr) ? strtotime($timestampStr) : 0;
             if ($timestamp > $oneHourAgo) {
-                $recentEvictions = ($recentEvictions ?? 0) + $eviction['evicted_count'] ?? 0;
+                $recentEvictions += (int) ($eviction['evicted_count'] ?? 0);
             }
         }
 
-        foreach ($this->analyticsData['prefetches'] ?? [] as $prefetch) {
-            $timestamp = strtotime($prefetch['metadata']['timestamp'] ?? '');
+        /** @var array<array{metadata?: array{timestamp?: string, items_prefetched?: int}}> $prefetches */
+        $prefetches = $this->analyticsData['prefetches'] ?? [];
+        foreach ($prefetches as $prefetch) {
+            if (! is_array($prefetch)) {
+                continue;
+            }
+            $metadata = $prefetch['metadata'] ?? [];
+            if (! is_array($metadata)) {
+                continue;
+            }
+            $timestampStr = $metadata['timestamp'] ?? '';
+            $timestamp = is_string($timestampStr) ? strtotime($timestampStr) : 0;
             if ($timestamp > $oneHourAgo) {
-                $recentPrefetches = ($recentPrefetches ?? 0) + $prefetch['metadata']['items_prefetched'] ?? 0;
+                $recentPrefetches += (int) ($metadata['items_prefetched'] ?? 0);
             }
         }
 
-        $totalOperations = count($this->analyticsData['optimizations'] ?? []) +
-            count($this->analyticsData['evictions'] ?? []) +
-            count($this->analyticsData['prefetches'] ?? []);
+        /** @var array<mixed> $optimizations */
+        $optimizations = $this->analyticsData['optimizations'] ?? [];
+        $optimizationsCount = is_array($optimizations) ? count($optimizations) : 0;
+        $evictionsCount = count($evictions);
+        $prefetchesCount = count($prefetches);
+
+        $totalOperations = $optimizationsCount + $evictionsCount + $prefetchesCount;
 
         return [
             'operations_per_minute' => round($totalOperations / 60, 2),
@@ -1075,7 +1141,13 @@ class CacheManagementAgent
      * @return array{hit_rate_trend: string, memory_trend: string, efficiency_score: float}
      */
     protected function analyzeTrends(): array
-        $recentOptimizations = array_slice($this->analyticsData['optimizations'] ?? [], -10);
+    {
+        /** @var array<array{metrics?: array{hit_rate?: float, memory_usage_percent?: float}}> $allOptimizations */
+        $allOptimizations = $this->analyticsData['optimizations'] ?? [];
+        if (! is_array($allOptimizations)) {
+            $allOptimizations = [];
+        }
+        $recentOptimizations = array_slice($allOptimizations, -10);
 
         if (count($recentOptimizations) < 2) {
             return [
@@ -1087,21 +1159,29 @@ class CacheManagementAgent
 
         // Analyze hit rate trend
         $hitRates = array_map(
-            fn ($opt) => $opt['metrics']['hit_rate'] ?? 0,
+            function (array $opt): float {
+                $metrics = $opt['metrics'] ?? [];
+
+                return (float) ($metrics['hit_rate'] ?? 0);
+            },
             $recentOptimizations
         );
         $hitRateTrend = $this->calculateTrend($hitRates);
 
         // Analyze memory usage trend
         $memoryUsages = array_map(
-            fn ($opt) => $opt['metrics']['memory_usage_percent'] ?? 0,
+            function (array $opt): float {
+                $metrics = $opt['metrics'] ?? [];
+
+                return (float) ($metrics['memory_usage_percent'] ?? 0);
+            },
             $recentOptimizations
         );
         $memoryTrend = $this->calculateTrend($memoryUsages);
 
         // Calculate efficiency score (higher hit rate + lower memory = better)
-        $avgHitRate = array_sum($hitRates) / count($hitRates);
-        $avgMemory = array_sum($memoryUsages) / count($memoryUsages);
+        $avgHitRate = count($hitRates) > 0 ? array_sum($hitRates) / count($hitRates) : 0.0;
+        $avgMemory = count($memoryUsages) > 0 ? array_sum($memoryUsages) / count($memoryUsages) : 0.0;
         $efficiencyScore = ($avgHitRate * 0.7) + ((100 - $avgMemory) * 0.3);
 
         return [
@@ -1149,16 +1229,25 @@ class CacheManagementAgent
      */
     protected function recordAnalytics(string $type, array $data): void
     {
-        (is_array($data) && isset($data['timestamp']) ? $data['timestamp'] : null) = now()->toIso8601String();
+        $data['timestamp'] = now()->toIso8601String();
 
         switch ($type) {
             case 'optimization':
+                if (! isset($this->analyticsData['optimizations']) || ! is_array($this->analyticsData['optimizations'])) {
+                    $this->analyticsData['optimizations'] = [];
+                }
                 $this->analyticsData['optimizations'][] = $data;
                 break;
             case 'prefetch':
+                if (! isset($this->analyticsData['prefetches']) || ! is_array($this->analyticsData['prefetches'])) {
+                    $this->analyticsData['prefetches'] = [];
+                }
                 $this->analyticsData['prefetches'][] = $data;
                 break;
             case 'eviction':
+                if (! isset($this->analyticsData['evictions']) || ! is_array($this->analyticsData['evictions'])) {
+                    $this->analyticsData['evictions'] = [];
+                }
                 $this->analyticsData['evictions'][] = $data;
                 break;
         }
@@ -1182,13 +1271,31 @@ class CacheManagementAgent
                 continue;
             }
 
-            $this->analyticsData[$type] = array_filter(
-                $this->analyticsData[$type],
-                fn ($item) => ($item['timestamp'] ?? '') > $cutoff
-            );
+            $data = $this->analyticsData[$type];
+            if (! is_array($data)) {
+                $this->analyticsData[$type] = [];
 
-            // Re-index array
-            $this->analyticsData[$type] = array_values($this->analyticsData[$type]);
+                continue;
+            }
+
+            $this->analyticsData[$type] = array_values(array_filter(
+                $data,
+                function (mixed $item): bool {
+                    if (! is_array($item)) {
+                        return false;
+                    }
+
+                    return true;
+                }
+            ));
+
+            // Now filter by timestamp
+            /** @var array<array{timestamp?: string}> $filteredData */
+            $filteredData = $this->analyticsData[$type];
+            $this->analyticsData[$type] = array_values(array_filter(
+                $filteredData,
+                fn (array $item): bool => ($item['timestamp'] ?? '') > $cutoff
+            ));
         }
     }
 
@@ -1213,7 +1320,32 @@ class CacheManagementAgent
     protected function loadAccessPatterns(): void
     {
         $patterns = Cache::get(self::ACCESS_PATTERN_KEY, []);
-        $this->accessPatterns = is_array($patterns) ? $patterns : [];
+        if (! is_array($patterns)) {
+            $this->accessPatterns = [];
+
+            return;
+        }
+
+        /** @var array<string, array{count: int, last_access: int, first_access: int, hits: int, misses: int}> $validated */
+        $validated = [];
+        foreach ($patterns as $key => $pattern) {
+            if (is_string($key) && is_array($pattern)) {
+                $count = $pattern['count'] ?? 0;
+                $lastAccess = $pattern['last_access'] ?? time();
+                $firstAccess = $pattern['first_access'] ?? time();
+                $hits = $pattern['hits'] ?? 0;
+                $misses = $pattern['misses'] ?? 0;
+
+                $validated[$key] = [
+                    'count' => is_numeric($count) ? (int) $count : 0,
+                    'last_access' => is_numeric($lastAccess) ? (int) $lastAccess : time(),
+                    'first_access' => is_numeric($firstAccess) ? (int) $firstAccess : time(),
+                    'hits' => is_numeric($hits) ? (int) $hits : 0,
+                    'misses' => is_numeric($misses) ? (int) $misses : 0,
+                ];
+            }
+        }
+        $this->accessPatterns = $validated;
     }
 
     /**

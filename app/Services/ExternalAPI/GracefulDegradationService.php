@@ -46,8 +46,10 @@ class GracefulDegradationService
     public function isDegradationModeActive(string $apiName): bool
     {
         $key = self::DEGRADATION_MODE_KEY.$apiName;
+        /** @var bool $result */
+        $result = Cache::get($key, false);
 
-        return Cache::get($key, false);
+        return $result;
     }
 
     /**
@@ -87,13 +89,17 @@ class GracefulDegradationService
      * @param  array<string, mixed>  $fallbackOptions
      * @return array{success: bool, data: mixed, source: string, degraded: bool, stale: bool, message: string}
      */
-    public function getDataWithFallback(): array
+    public function getDataWithFallback(string $apiName, array $apiResult, array $fallbackOptions = []): array
+    {
         // If API call was successful, return the data
         if ($apiResult['success']) {
+            /** @var string $source */
+            $source = $apiResult['source'] ?? 'api';
+
             return [
                 'success' => true,
                 'data' => $apiResult['data'],
-                'source' => $apiResult['source'],
+                'source' => $source,
                 'degraded' => false,
                 'stale' => false,
                 'message' => 'Data retrieved successfully from API',
@@ -101,10 +107,12 @@ class GracefulDegradationService
         }
 
         // API call failed, enable degradation mode
-        $this->enableDegradationMode($apiName, $apiResult['error'] ?? 'Unknown error');
+        /** @var string $errorReason */
+        $errorReason = isset($apiResult['error']) && is_string($apiResult['error']) ? $apiResult['error'] : 'Unknown error';
+        $this->enableDegradationMode($apiName, $errorReason);
 
         // Try to get cached data
-        $cacheKey = (is_array($fallbackOptions) && isset($fallbackOptions['cache_key']) ? $fallbackOptions['cache_key'] : null);
+        $cacheKey = isset($fallbackOptions['cache_key']) && is_string($fallbackOptions['cache_key']) ? $fallbackOptions['cache_key'] : null;
 
         if ($cacheKey && Cache::has($cacheKey)) {
             $cachedData = Cache::get($cacheKey);
@@ -145,7 +153,7 @@ class GracefulDegradationService
         // Return empty data with degradation notice
         return [
             'success' => false,
-            'data' => (is_array($fallbackOptions) && isset($fallbackOptions['default_data']) ? $fallbackOptions['default_data'] : null),
+            'data' => $fallbackOptions['default_data'] ?? null,
             'source' => 'degraded',
             'degraded' => true,
             'stale' => false,
@@ -185,8 +193,10 @@ class GracefulDegradationService
     public function isManualInputEnabled(string $apiName): bool
     {
         $key = self::MANUAL_INPUT_SESSION_KEY.$apiName;
+        /** @var bool $result */
+        $result = Cache::get($key, false);
 
-        return Cache::get($key, false);
+        return $result;
     }
 
     /**
@@ -198,8 +208,8 @@ class GracefulDegradationService
         $timestampKey = $cacheKey.':timestamp';
         $timestamp = Cache::get($timestampKey);
 
-        if ($timestamp) {
-            return time() - $timestamp;
+        if (is_numeric($timestamp)) {
+            return time() - (int) $timestamp;
         }
 
         // If no timestamp, assume cache is fresh
@@ -223,6 +233,7 @@ class GracefulDegradationService
      * @return array{umapyoi: array<string, mixed>, umamusumedb: array<string, mixed>, overall_degraded: bool}
      */
     public function getDegradationStatus(): array
+    {
         $umapyoiDegraded = $this->isDegradationModeActive('umapyoi');
         $umamusumeDBDegraded = $this->isDegradationModeActive('umamusumedb');
 
@@ -246,7 +257,8 @@ class GracefulDegradationService
      *
      * @return array{title: string, message: string, actions: array<string>, severity: string}
      */
-    public function getDegradationMessage(): array
+    public function getDegradationMessage(string $apiName): array
+    {
         $isDegraded = $this->isDegradationModeActive($apiName);
         $manualInputEnabled = $this->isManualInputEnabled($apiName);
         $healthStatus = $this->healthMonitor->getCachedHealth($apiName);
@@ -334,13 +346,15 @@ class GracefulDegradationService
      *
      * @return array{recovered: bool, api: string, message: string}
      */
-    public function attemptRecovery(): array
+    public function attemptRecovery(string $apiName): array
+    {
         Log::info('[GracefulDegradation] Attempting recovery', [
             'api' => $apiName,
         ]);
 
         // Check current health status
-        $healthStatus = $this->healthMonitor->checkAPIHealth(
+        $healthStatus = \call_user_func(
+            [$this->healthMonitor, 'checkAPIHealth'],
             $apiName,
             function () use ($apiName) {
                 if ($apiName === 'umapyoi') {
@@ -401,6 +415,7 @@ class GracefulDegradationService
      * @return array<string, array{recovered: bool, api: string, message: string}>
      */
     public function attemptAllRecovery(): array
+    {
         return [
             'umapyoi' => $this->attemptRecovery('umapyoi'),
             'umamusumedb' => $this->attemptRecovery('umamusumedb'),
@@ -413,6 +428,7 @@ class GracefulDegradationService
      * @return array{status: array<string, mixed>, cache_availability: array<string, bool>, manual_input_status: array<string, bool>, recovery_recommendations: array<string>}
      */
     public function getDegradationMetrics(): array
+    {
         $status = $this->getDegradationStatus();
 
         $cacheAvailability = [
@@ -444,7 +460,8 @@ class GracefulDegradationService
      * @param  array<string, bool>  $cacheAvailability
      * @return array<string>
      */
-    protected function generateRecoveryRecommendations(): array
+    protected function generateRecoveryRecommendations(array $status, array $cacheAvailability): array
+    {
         $recommendations = [];
 
         if ($status['overall_degraded']) {
@@ -465,15 +482,24 @@ class GracefulDegradationService
             }
 
             // Check manual input status
-            if ($status['umapyoi']['manual_input_enabled'] || $status['umamusumedb']['manual_input_enabled']) {
+            $umapyoiStatus = is_array($status['umapyoi']) ? $status['umapyoi'] : [];
+            $umamusumedbStatus = is_array($status['umamusumedb']) ? $status['umamusumedb'] : [];
+
+            $umapyoiManualInput = $umapyoiStatus['manual_input_enabled'] ?? false;
+            $umamusumedbManualInput = $umamusumedbStatus['manual_input_enabled'] ?? false;
+
+            if ($umapyoiManualInput || $umamusumedbManualInput) {
                 $recommendations[] = 'Manual input mode is enabled. You can enter data manually.';
             } else {
                 $recommendations[] = 'Enable manual input mode if you need to enter data immediately.';
             }
 
             // Check circuit breaker status
-            $umapyoiCircuitOpen = $status['umapyoi']['health_status']['circuit_breaker_open'] ?? false;
-            $umamusumeDBCircuitOpen = $status['umamusumedb']['health_status']['circuit_breaker_open'] ?? false;
+            $umapyoiHealthStatus = is_array($umapyoiStatus['health_status'] ?? null) ? $umapyoiStatus['health_status'] : [];
+            $umamusumedbHealthStatus = is_array($umamusumedbStatus['health_status'] ?? null) ? $umamusumedbStatus['health_status'] : [];
+
+            $umapyoiCircuitOpen = $umapyoiHealthStatus['circuit_breaker_open'] ?? false;
+            $umamusumeDBCircuitOpen = $umamusumedbHealthStatus['circuit_breaker_open'] ?? false;
 
             if ($umapyoiCircuitOpen || $umamusumeDBCircuitOpen) {
                 $recommendations[] = 'Circuit breaker is open. System will automatically retry after timeout.';

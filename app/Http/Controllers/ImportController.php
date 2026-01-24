@@ -127,7 +127,7 @@ class ImportController extends Controller
             /** @var \App\Models\User $user */
             $importType = $request->input('import_type');
             $data = $request->input('data');
-            $userId = $user?->id ?? throw new \Exception('User required');
+            $userId = $user->id ?? throw new \Exception('User required');
 
             if (empty($data)) {
                 return response()->json([
@@ -139,8 +139,10 @@ class ImportController extends Controller
 
             // Execute the import
             $importTypeStr = is_string($importType) ? $importType : 'character';
+            /** @var array<int, array<string, mixed>> $importData */
+            $importData = is_array($data) ? array_values($data) : [];
             $result = $this->importService->executeImport(
-                is_array($data) ? $data : [],
+                $importData,
                 $importTypeStr,
                 $userId
             );
@@ -155,9 +157,12 @@ class ImportController extends Controller
                 ], 422);
             }
 
+            /** @var int $importedCount */
+            $importedCount = $result['imported'];
+
             return response()->json([
                 'success' => true,
-                'message' => "Successfully imported {$result['imported']} record(s)",
+                'message' => "Successfully imported {$importedCount} record(s)",
                 'data' => [
                     'imported' => $result['imported'],
                     'failed' => $result['failed'],
@@ -231,9 +236,9 @@ class ImportController extends Controller
         try {
             $user = $request->user();
             /** @var \App\Models\User $user */
-            $userId = $user?->id ?? throw new \Exception('User required');
+            $userId = $user->id ?? throw new \Exception('User required');
             $limitInput = $request->query('limit', 20);
-            $limit = is_numeric($limitInput) ? (is_numeric($limit) ? (int) $limit : 0)Input : 20;
+            $limit = is_numeric($limitInput) ? (int) $limitInput : 20;
 
             $history = $this->importService->getImportHistory($userId, $limit);
 

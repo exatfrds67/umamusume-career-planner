@@ -27,7 +27,7 @@ class ProfileController extends Controller
 
         // Get user statistics
         $stats = [
-            'characters_created' => Character::where('user_id', '=', $user?->id ?? throw new \Exception('User required'))->count(),
+            'characters_created' => Character::where('user_id', '=', $user->id ?? throw new \Exception('User required'))->count(),
             'training_sessions' => $user->trainingSessions()->count(),
             // Count races where finish_position is not null (completed races)
             'races_completed' => $user->races()->whereNotNull('finish_position')->count(),
@@ -80,8 +80,11 @@ class ProfileController extends Controller
         $user = $request->user();
 
         // Update password with hashed value
+        $validated = $request->validated();
+        /** @var string $password */
+        $password = $validated['password'];
         $user->update([
-            'password' => Hash::make((string) $request->validated()['password']),
+            'password' => Hash::make($password),
         ]);
 
         return redirect()->route('profile.show')
@@ -96,9 +99,13 @@ class ProfileController extends Controller
         /** @var User $user */
         $user = $request->user();
 
+        $validated = $request->validated();
+        /** @var string $password */
+        $password = $validated['password'];
+
         // Update password with hashed value
         $user->update([
-            'password' => Hash::make((string) $request->validated()['password']),
+            'password' => Hash::make($password),
         ]);
 
         return response()->json([
@@ -156,7 +163,7 @@ class ProfileController extends Controller
                 'mcp_settings' => $user->mcp_settings,
             ],
             // Export all characters with relationships
-            'characters' => Character::where('user_id', '=', $user?->id ?? throw new \Exception('User required'))
+            'characters' => Character::where('user_id', '=', $user->id ?? throw new \Exception('User required'))
                 ->with(['aptitudes', 'supportCards', 'skillAcquisitions'])
                 ->get()
                 ->toArray(),

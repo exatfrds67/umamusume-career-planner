@@ -335,7 +335,10 @@ class PerformanceController extends Controller
                 $store = Cache::store('redis');
                 if ($store instanceof \Illuminate\Cache\RedisStore) {
                     $redis = $store->getRedis();
-                    $info = $redis->info();
+                    /** @var \Illuminate\Redis\Connections\Connection $connection */
+                    $connection = $redis->connection();
+                    /** @var array<string, mixed> $info */
+                    $info = $connection->command('info') ?: [];
                 } else {
                     throw new \RuntimeException('Cache store is not RedisStore');
                 }
@@ -451,10 +454,10 @@ class PerformanceController extends Controller
             if ($cascade) {
                 $result = $this->redisCacheService->invalidateWithCascade($validated['data_type']);
             } else {
-                $tags = config("cache-management.invalidation.default_tags.{$validated['data_type']}", []);
-                $result = $this->redisCacheService->invalidateByTags(
-                    is_array($tags) ? $tags : []
-                );
+                $configTags = config("cache-management.invalidation.default_tags.{$validated['data_type']}", []);
+                /** @var array<string> $tags */
+                $tags = is_array($configTags) ? $configTags : [];
+                $result = $this->redisCacheService->invalidateByTags($tags);
             }
         } elseif (isset($validated['tags'])) {
             $result = $this->redisCacheService->invalidateByTags($validated['tags']);
@@ -624,12 +627,17 @@ class PerformanceController extends Controller
     private function getDatabaseConnectionInfo(): array
     {
         $connection = DB::connection();
+        /** @var array<string, mixed> $config */
         $config = $connection->getConfig();
 
+        $driverValue = $config['driver'] ?? 'unknown';
+        $databaseValue = $config['database'] ?? 'unknown';
+        $hostValue = $config['host'] ?? null;
+
         return [
-            'driver' => isset($config['driver']) ? (is_array($config) && isset($config['driver']) && is_string($config['driver']) ? $config['driver'] : 'unknown') : 'unknown',
-            'database' => isset($config['database']) ? (is_array($config) && isset($config['database']) && is_string($config['database']) ? $config['database'] : 'unknown') : 'unknown',
-            'host' => isset($config['host']) ? (is_array($config) && isset($config['host']) && is_string($config['host']) ? $config['host'] : 'localhost') : null,
+            'driver' => is_string($driverValue) ? $driverValue : 'unknown',
+            'database' => is_string($databaseValue) ? $databaseValue : 'unknown',
+            'host' => is_string($hostValue) ? $hostValue : null,
             'connection_count' => null, // Would need specific driver support
         ];
     }
@@ -905,10 +913,10 @@ class PerformanceController extends Controller
             if ($cascade) {
                 $result = $this->apiCachingService->invalidateWithCascade($validated['data_type']);
             } else {
-                $tags = config("api-performance.cache.data_type_tags.{$validated['data_type']}", ['api_response']);
-                $result = $this->apiCachingService->invalidateByTags(
-                    is_array($tags) ? $tags : ['api_response']
-                );
+                $configTags = config("api-performance.cache.data_type_tags.{$validated['data_type']}", ['api_response']);
+                /** @var array<string> $tags */
+                $tags = is_array($configTags) ? $configTags : ['api_response'];
+                $result = $this->apiCachingService->invalidateByTags($tags);
             }
         } elseif (isset($validated['tags'])) {
             $result = $this->apiCachingService->invalidateByTags($validated['tags']);
@@ -997,29 +1005,41 @@ class PerformanceController extends Controller
      */
     public function apiConfig(): JsonResponse
     {
+        $compressionEnabled = config('api-performance.compression.enabled', true);
+        $compressionLevel = config('api-performance.compression.level', 6);
+        $compressionMinSize = config('api-performance.compression.min_size', 1024);
+        $rateLimitingEnabled = config('api-performance.rate_limiting.enabled', true);
+        $rateLimitingTiers = config('api-performance.rate_limiting.tiers', []);
+        $cacheEnabled = config('api-performance.cache.enabled', true);
+        $cacheTtl = config('api-performance.cache.default_ttl', 300);
+        $monitoringEnabled = config('api-performance.monitoring.enabled', true);
+        $slowRequestThreshold = config('api-performance.monitoring.slow_request_threshold_ms', 1000);
+        $batchingEnabled = config('api-performance.batching.enabled', true);
+        $maxBatchSize = config('api-performance.batching.max_batch_size', 10);
+
         return response()->json([
             'success' => true,
             'data' => [
                 'compression' => [
-                    'enabled' => (bool) config('api-performance.compression.enabled', true),
-                    'level' => (int) config('api-performance.compression.level', 6),
-                    'min_size' => (int) config('api-performance.compression.min_size', 1024),
+                    'enabled' => (bool) $compressionEnabled,
+                    'level' => is_numeric($compressionLevel) ? (int) $compressionLevel : 6,
+                    'min_size' => is_numeric($compressionMinSize) ? (int) $compressionMinSize : 1024,
                 ],
                 'rate_limiting' => [
-                    'enabled' => (bool) config('api-performance.rate_limiting.enabled', true),
-                    'tiers' => array_keys((array) config('api-performance.rate_limiting.tiers', [])),
+                    'enabled' => (bool) $rateLimitingEnabled,
+                    'tiers' => array_keys(is_array($rateLimitingTiers) ? $rateLimitingTiers : []),
                 ],
                 'caching' => [
-                    'enabled' => (bool) config('api-performance.cache.enabled', true),
-                    'default_ttl' => (int) config('api-performance.cache.default_ttl', 300),
+                    'enabled' => (bool) $cacheEnabled,
+                    'default_ttl' => is_numeric($cacheTtl) ? (int) $cacheTtl : 300,
                 ],
                 'monitoring' => [
-                    'enabled' => (bool) config('api-performance.monitoring.enabled', true),
-                    'slow_request_threshold_ms' => (int) config('api-performance.monitoring.slow_request_threshold_ms', 1000),
+                    'enabled' => (bool) $monitoringEnabled,
+                    'slow_request_threshold_ms' => is_numeric($slowRequestThreshold) ? (int) $slowRequestThreshold : 1000,
                 ],
                 'batching' => [
-                    'enabled' => (bool) config('api-performance.batching.enabled', true),
-                    'max_batch_size' => (int) config('api-performance.batching.max_batch_size', 10),
+                    'enabled' => (bool) $batchingEnabled,
+                    'max_batch_size' => is_numeric($maxBatchSize) ? (int) $maxBatchSize : 10,
                 ],
             ],
             'timestamp' => now()->toIso8601String(),

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\MCP;
 
+use App\Models\Career;
 use App\Models\Character;
 use App\Services\MCP\Agents\CareerStrategyAgent;
 use App\Services\MCP\Agents\PerformanceAnalyticsAgent;
@@ -57,8 +58,17 @@ class AgentOrchestrationService
 
     /**
      * Create a new agent workflow
+     *
+     * @param  array<int, array<string, mixed>>  $agents
+     * @param  array<string, mixed>  $config
+     * @return array<string, mixed>
      */
-    public function createWorkflow(): array
+    public function createWorkflow(
+        string $name,
+        string $pattern,
+        array $agents,
+        array $config = []
+    ): array {
         try {
             $workflowId = $this->generateWorkflowId($name);
 
@@ -96,8 +106,12 @@ class AgentOrchestrationService
 
     /**
      * Execute a workflow
+     *
+     * @param  array<string, mixed>  $input
+     * @return array<string, mixed>
      */
-    public function executeWorkflow(): array
+    public function executeWorkflow(string $workflowId, array $input = []): array
+    {
         $workflow = $this->getWorkflow($workflowId);
 
         if (! $workflow) {
@@ -107,12 +121,14 @@ class AgentOrchestrationService
         try {
             $this->updateWorkflowState($workflowId, self::STATE_RUNNING);
 
-            $result = match ($workflow['pattern']) {
+            $pattern = is_string($workflow['pattern'] ?? null) ? $workflow['pattern'] : self::PATTERN_SEQUENTIAL;
+
+            $result = match ($pattern) {
                 self::PATTERN_SEQUENTIAL => $this->executeSequential($workflow, $input),
                 self::PATTERN_PARALLEL => $this->executeParallel($workflow, $input),
                 self::PATTERN_HIERARCHICAL => $this->executeHierarchical($workflow, $input),
                 self::PATTERN_COLLABORATIVE => $this->executeCollaborative($workflow, $input),
-                default => throw new \InvalidArgumentException("Unknown pattern: {$workflow['pattern']}"),
+                default => throw new \InvalidArgumentException("Unknown pattern: {$pattern}"),
             };
 
             $this->updateWorkflowState($workflowId, self::STATE_COMPLETED);
@@ -132,6 +148,8 @@ class AgentOrchestrationService
 
     /**
      * Get current workflow for user context
+     *
+     * @return array<string, mixed>|null
      */
     public function getCurrentWorkflow(?int $userId = null): ?array
     {
@@ -140,8 +158,19 @@ class AgentOrchestrationService
 
     /**
      * Create context-aware workflow with character and career state
+     *
+     * @param  array<int, array<string, mixed>>  $agents
+     * @param  array<string, mixed>  $config
+     * @return array<string, mixed>
      */
-    public function createContextAwareWorkflow(): array
+    public function createContextAwareWorkflow(
+        string $name,
+        string $pattern,
+        array $agents,
+        Character $character,
+        ?Career $career = null,
+        array $config = []
+    ): array {
         try {
             // Build unified context
             $context = $this->contextService->buildUnifiedContext($character, $career);
@@ -153,8 +182,10 @@ class AgentOrchestrationService
                 'career_id' => $career?->id,
             ]));
 
+            $workflowId = isset($workflow['id']) && is_scalar($workflow['id']) ? (string) $workflow['id'] : '';
+
             // Store context reference
-            Cache::put("workflow_context:{$workflow['id']}", $context, 3600);
+            Cache::put("workflow_context:{$workflowId}", $context, 3600);
 
             // Synchronize state with agents
             if ($career) {
@@ -162,7 +193,7 @@ class AgentOrchestrationService
             }
 
             Log::info('[AgentOrchestration] Context-aware workflow created', [
-                'workflow_id' => $workflow['id'],
+                'workflow_id' => $workflowId,
                 'character_id' => $character->id,
                 'career_id' => $career?->id,
             ]);
@@ -180,8 +211,15 @@ class AgentOrchestrationService
 
     /**
      * Execute workflow with memory persistence
+     *
+     * @param  array<string, mixed>  $input
+     * @return array<string, mixed>
      */
-    public function executeWorkflowWithMemory(): array
+    public function executeWorkflowWithMemory(
+        string $workflowId,
+        string $agentId,
+        array $input = []
+    ): array {
         try {
             // Retrieve agent memories
             $memories = $this->memoryService->getAgentMemories($agentId);
@@ -225,7 +263,8 @@ class AgentOrchestrationService
      *     orchestration_metadata: array<string, mixed>
      * }
      */
-    public function executeComprehensiveAnalysis(): array
+    public function executeComprehensiveAnalysis(Character $character, array $context = []): array
+    {
         $startTime = microtime(true);
 
         $careerStrategy = app(CareerStrategyAgent::class)->analyzeCareerStrategy($character, $context);
@@ -266,7 +305,8 @@ class AgentOrchestrationService
      *
      * @return array{action: string, reason: string, confidence: float}
      */
-    public function getQuickRecommendation(): array
+    public function getQuickRecommendation(Character $character): array
+    {
         $cacheKey = "mcp_quick_recommendation:{$character->id}";
         $cached = Cache::get($cacheKey);
 
@@ -283,14 +323,20 @@ class AgentOrchestrationService
         }
 
         $performanceAnalytics = app(PerformanceAnalyticsAgent::class)->analyzePerformance($character, []);
-        $energy = (int) ($performanceAnalytics['energy_analysis']['current_energy'] ?? 100);
+        $energyAnalysis = is_array($performanceAnalytics['energy_analysis'] ?? null) ? $performanceAnalytics['energy_analysis'] : [];
+        $energy = isset($energyAnalysis['current_energy']) && is_numeric($energyAnalysis['current_energy'])
+            ? (int) $energyAnalysis['current_energy']
+            : 100;
 
         $action = $energy <= 25 ? 'rest' : 'training';
         $reason = $energy <= 25
             ? 'Energy critically low; prioritize recovery.'
             : 'Energy stable; proceed with training.';
 
-        $confidence = max(0.0, min(1.0, (float) ($performanceAnalytics['optimization_score'] ?? 0.7)));
+        $optimizationScore = isset($performanceAnalytics['optimization_score']) && is_numeric($performanceAnalytics['optimization_score'])
+            ? (float) $performanceAnalytics['optimization_score']
+            : 0.7;
+        $confidence = max(0.0, min(1.0, $optimizationScore));
 
         $result = [
             'action' => $action,
@@ -310,30 +356,46 @@ class AgentOrchestrationService
      * @param  array<string, mixed>  $summerCamp
      * @return array<string, mixed>
      */
-    protected function buildIntegratedRecommendations(): array
-        $energy = (int) ($performanceAnalytics['energy_analysis']['current_energy'] ?? $character->energy_level ?? 100);
-        $isInCamp = (bool) ($summerCamp['summer_camp_status']['is_in_camp'] ?? false);
+    protected function buildIntegratedRecommendations(
+        Character $character,
+        array $careerStrategy,
+        array $resourceManagement,
+        array $performanceAnalytics,
+        array $summerCamp
+    ): array {
+        $energyAnalysis = is_array($performanceAnalytics['energy_analysis'] ?? null) ? $performanceAnalytics['energy_analysis'] : [];
+        $energy = isset($energyAnalysis['current_energy']) && is_numeric($energyAnalysis['current_energy'])
+            ? (int) $energyAnalysis['current_energy']
+            : ($character->energy_level ?? 100);
+
+        $summerCampStatus = is_array($summerCamp['summer_camp_status'] ?? null) ? $summerCamp['summer_camp_status'] : [];
+        $isInCamp = isset($summerCampStatus['is_in_camp']) && $summerCampStatus['is_in_camp'] === true;
 
         $priorityRecommendation = $this->determinePriorityRecommendation($energy, $isInCamp);
+
+        $careerRecommendations = is_array($careerStrategy['recommendations'] ?? null) ? $careerStrategy['recommendations'] : [];
+        $resourceRecommendations = is_array($resourceManagement['optimization_recommendations'] ?? null) ? $resourceManagement['optimization_recommendations'] : [];
+        $performanceRecommendations = is_array($performanceAnalytics['recommendations'] ?? null) ? $performanceAnalytics['recommendations'] : [];
+        $summerCampRecommendations = is_array($summerCamp['recommendations'] ?? null) ? $summerCamp['recommendations'] : [];
 
         return [
             'priority_recommendation' => $priorityRecommendation,
             'action_plan' => [
                 'primary_action' => $priorityRecommendation['action'],
-                'secondary_actions' => array_values($careerStrategy['recommendations'] ?? []),
+                'secondary_actions' => array_values($careerRecommendations),
             ],
             'consensus_score' => $this->calculateConsensusScore([
-                $careerStrategy['confidence'] ?? 0.8,
-                $resourceManagement['efficiency_score'] ?? 0.8,
-                $performanceAnalytics['optimization_score'] ?? 0.8,
-                $summerCamp['efficiency_score'] ?? 0.8,
+                isset($careerStrategy['confidence']) && is_numeric($careerStrategy['confidence']) ? (float) $careerStrategy['confidence'] : 0.8,
+                isset($resourceManagement['efficiency_score']) && is_numeric($resourceManagement['efficiency_score']) ? (float) $resourceManagement['efficiency_score'] : 0.8,
+                isset($performanceAnalytics['optimization_score']) && is_numeric($performanceAnalytics['optimization_score']) ? (float) $performanceAnalytics['optimization_score'] : 0.8,
+                isset($summerCamp['efficiency_score']) && is_numeric($summerCamp['efficiency_score']) ? (float) $summerCamp['efficiency_score'] : 0.8,
             ]),
             'summary' => 'Integrated recommendations generated from core MCP agents.',
             'all_recommendations' => [
-                'career_strategy' => $careerStrategy['recommendations'] ?? [],
-                'resource_management' => $resourceManagement['optimization_recommendations'] ?? [],
-                'performance_analytics' => $performanceAnalytics['recommendations'] ?? [],
-                'summer_camp' => $summerCamp['recommendations'] ?? [],
+                'career_strategy' => $careerRecommendations,
+                'resource_management' => $resourceRecommendations,
+                'performance_analytics' => $performanceRecommendations,
+                'summer_camp' => $summerCampRecommendations,
             ],
         ];
     }
@@ -341,7 +403,8 @@ class AgentOrchestrationService
     /**
      * @return array{priority: string, action: string, reason: string, source: string}
      */
-    protected function determinePriorityRecommendation(): array
+    protected function determinePriorityRecommendation(int $energy, bool $isInCamp): array
+    {
         if ($energy <= 25) {
             return [
                 'priority' => 'critical',
@@ -373,47 +436,73 @@ class AgentOrchestrationService
      */
     protected function calculateConsensusScore(array $scores): float
     {
-        $filtered = array_values(array_filter($scores, static fn ($score) => is_numeric($score)));
-
-        if ($filtered === []) {
+        if ($scores === []) {
             return 0.0;
         }
 
-        $total = array_sum($filtered);
+        $total = array_sum($scores);
 
-        return max(0.0, min(1.0, $total / count($filtered)));
+        return max(0.0, min(1.0, $total / count($scores)));
     }
 
     /**
      * Execute agents sequentially
+     *
+     * @param  array<string, mixed>  $workflow
+     * @param  array<string, mixed>  $input
+     * @return array<string, mixed>
      */
-    protected function executeSequential(): array
+    protected function executeSequential(array $workflow, array $input): array
+    {
+        /** @var array<int, array<string, mixed>> $results */
         $results = [];
         $currentInput = $input;
 
-        foreach ($workflow['agents'] as $agentConfig) {
-            $agentResult = $this->executeAgent($agentConfig, $currentInput);
+        $agents = is_array($workflow['agents'] ?? null) ? $workflow['agents'] : [];
+
+        foreach ($agents as $agentConfig) {
+            if (! is_array($agentConfig)) {
+                continue;
+            }
+            /** @var array<string, mixed> $typedAgentConfig */
+            $typedAgentConfig = $agentConfig;
+            $agentResult = $this->executeAgent($typedAgentConfig, $currentInput);
             $results[] = $agentResult;
 
             // Pass output to next agent
-            $currentInput = $agentResult['output'] ?? [];
+            $currentInput = is_array($agentResult['output'] ?? null) ? $agentResult['output'] : [];
         }
+
+        $lastResult = end($results);
 
         return [
             'pattern' => self::PATTERN_SEQUENTIAL,
             'results' => $results,
-            'final_output' => end($results)['output'] ?? [],
+            'final_output' => is_array($lastResult) && is_array($lastResult['output'] ?? null) ? $lastResult['output'] : [],
         ];
     }
 
     /**
      * Execute agents in parallel
+     *
+     * @param  array<string, mixed>  $workflow
+     * @param  array<string, mixed>  $input
+     * @return array<string, mixed>
      */
-    protected function executeParallel(): array
+    protected function executeParallel(array $workflow, array $input): array
+    {
+        /** @var array<int, array<string, mixed>> $results */
         $results = [];
 
-        foreach ($workflow['agents'] as $agentConfig) {
-            $results[] = $this->executeAgent($agentConfig, $input);
+        $agents = is_array($workflow['agents'] ?? null) ? $workflow['agents'] : [];
+
+        foreach ($agents as $agentConfig) {
+            if (! is_array($agentConfig)) {
+                continue;
+            }
+            /** @var array<string, mixed> $typedAgentConfig */
+            $typedAgentConfig = $agentConfig;
+            $results[] = $this->executeAgent($typedAgentConfig, $input);
         }
 
         return [
@@ -425,28 +514,42 @@ class AgentOrchestrationService
 
     /**
      * Execute agents hierarchically
+     *
+     * @param  array<string, mixed>  $workflow
+     * @param  array<string, mixed>  $input
+     * @return array<string, mixed>
      */
-    protected function executeHierarchical(): array
+    protected function executeHierarchical(array $workflow, array $input): array
+    {
+        /** @var array<string, mixed> $results */
         $results = [];
 
+        $agents = is_array($workflow['agents'] ?? null) ? $workflow['agents'] : [];
+
         // Execute coordinator agent first
-        $coordinator = $workflow['agents'][0] ?? null;
+        $coordinator = is_array($agents[0] ?? null) ? $agents[0] : null;
         if (! $coordinator) {
             throw new \RuntimeException('Hierarchical workflow requires coordinator agent');
         }
 
-        $coordinatorResult = $this->executeAgent($coordinator, $input);
+        /** @var array<string, mixed> $typedCoordinator */
+        $typedCoordinator = $coordinator;
+        $coordinatorResult = $this->executeAgent($typedCoordinator, $input);
         $results['coordinator'] = $coordinatorResult;
 
         // Execute subordinate agents based on coordinator output
-        $subordinates = array_slice($workflow['agents'], 1);
+        $subordinates = array_slice($agents, 1);
+        /** @var array<int, array<string, mixed>> $subordinateResults */
         $subordinateResults = [];
 
         foreach ($subordinates as $agentConfig) {
-            $subordinateResults[] = $this->executeAgent(
-                $agentConfig,
-                $coordinatorResult['output'] ?? []
-            );
+            if (! is_array($agentConfig)) {
+                continue;
+            }
+            /** @var array<string, mixed> $typedAgentConfig */
+            $typedAgentConfig = $agentConfig;
+            $coordinatorOutput = is_array($coordinatorResult['output'] ?? null) ? $coordinatorResult['output'] : [];
+            $subordinateResults[] = $this->executeAgent($typedAgentConfig, $coordinatorOutput);
         }
 
         $results['subordinates'] = $subordinateResults;
@@ -460,17 +563,31 @@ class AgentOrchestrationService
 
     /**
      * Execute agents collaboratively
+     *
+     * @param  array<string, mixed>  $workflow
+     * @param  array<string, mixed>  $input
+     * @return array<string, mixed>
      */
-    protected function executeCollaborative(): array
+    protected function executeCollaborative(array $workflow, array $input): array
+    {
+        /** @var array<int, array<string, mixed>> $results */
         $results = [];
         $sharedContext = $input;
 
-        foreach ($workflow['agents'] as $agentConfig) {
-            $agentResult = $this->executeAgent($agentConfig, $sharedContext);
+        $agents = is_array($workflow['agents'] ?? null) ? $workflow['agents'] : [];
+
+        foreach ($agents as $agentConfig) {
+            if (! is_array($agentConfig)) {
+                continue;
+            }
+            /** @var array<string, mixed> $typedAgentConfig */
+            $typedAgentConfig = $agentConfig;
+            $agentResult = $this->executeAgent($typedAgentConfig, $sharedContext);
             $results[] = $agentResult;
 
             // Update shared context with agent output
-            $sharedContext = array_merge($sharedContext, $agentResult['output'] ?? []);
+            $agentOutput = is_array($agentResult['output'] ?? null) ? $agentResult['output'] : [];
+            $sharedContext = array_merge($sharedContext, $agentOutput);
         }
 
         return [
@@ -482,10 +599,15 @@ class AgentOrchestrationService
 
     /**
      * Execute a single agent
+     *
+     * @param  array<string, mixed>  $agentConfig
+     * @param  array<string, mixed>  $input
+     * @return array<string, mixed>
      */
-    protected function executeAgent(): array
-        $agentId = $agentConfig['id'] ?? uniqid('agent_');
-        $agentType = $agentConfig['type'] ?? 'generic';
+    protected function executeAgent(array $agentConfig, array $input): array
+    {
+        $agentId = isset($agentConfig['id']) && is_string($agentConfig['id']) ? $agentConfig['id'] : uniqid('agent_');
+        $agentType = isset($agentConfig['type']) && is_string($agentConfig['type']) ? $agentConfig['type'] : 'generic';
 
         try {
             $startTime = microtime(true);
@@ -504,8 +626,8 @@ class AgentOrchestrationService
             // Record performance metrics
             $this->recordAgentMetrics($agentId, [
                 'execution_time' => $executionTime,
-                'input_size' => strlen(json_encode($input)),
-                'output_size' => strlen(json_encode($output)),
+                'input_size' => strlen(json_encode($input) ?: ''),
+                'output_size' => strlen(json_encode($output) ?: ''),
             ]);
 
             return [
@@ -535,8 +657,12 @@ class AgentOrchestrationService
 
     /**
      * Create a new agent
+     *
+     * @param  array<string, mixed>  $config
+     * @return array<string, mixed>
      */
-    public function createAgent(): array
+    public function createAgent(string $type, array $config = []): array
+    {
         try {
             $agentId = $this->generateAgentId($type);
 
@@ -570,8 +696,11 @@ class AgentOrchestrationService
 
     /**
      * Monitor agent performance
+     *
+     * @return array<string, mixed>
      */
-    public function monitorAgent(): array
+    public function monitorAgent(string $agentId): array
+    {
         $agent = $this->getAgent($agentId);
 
         if (! $agent) {
@@ -582,8 +711,8 @@ class AgentOrchestrationService
 
         return [
             'agent_id' => $agentId,
-            'type' => $agent['type'],
-            'state' => $agent['state'],
+            'type' => $agent['type'] ?? 'unknown',
+            'state' => $agent['state'] ?? self::STATE_IDLE,
             'metrics' => $metrics,
             'health' => $this->calculateAgentHealth($metrics),
         ];
@@ -618,8 +747,11 @@ class AgentOrchestrationService
 
     /**
      * Get agent performance analytics
+     *
+     * @return array<string, mixed>
      */
-    public function getAgentAnalytics(): array
+    public function getAgentAnalytics(string $agentId): array
+    {
         $metrics = $this->getAgentMetrics($agentId);
 
         if (empty($metrics)) {
@@ -633,8 +765,15 @@ class AgentOrchestrationService
         }
 
         $totalExecutions = count($metrics);
-        $successfulExecutions = count(array_filter($metrics, fn ($m) => $m['success'] ?? false));
-        $executionTimes = array_column($metrics, 'execution_time');
+        $successfulExecutions = count(array_filter($metrics, static fn (array $m): bool => (bool) ($m['success'] ?? false)));
+
+        /** @var array<int, float|int> $executionTimes */
+        $executionTimes = [];
+        foreach ($metrics as $metric) {
+            if (isset($metric['execution_time']) && is_numeric($metric['execution_time'])) {
+                $executionTimes[] = (float) $metric['execution_time'];
+            }
+        }
 
         $analytics = [
             'agent_id' => $agentId,
@@ -653,16 +792,28 @@ class AgentOrchestrationService
 
     /**
      * Generate optimization recommendations
+     *
+     * @param  array<int, array<string, mixed>>  $metrics
+     * @return array<int, array<string, mixed>>
      */
-    protected function generateOptimizationRecommendations(): array
+    protected function generateOptimizationRecommendations(array $metrics): array
+    {
+        /** @var array<int, array<string, mixed>> $recommendations */
         $recommendations = [];
 
         if (empty($metrics)) {
             return $recommendations;
         }
 
-        $executionTimes = array_column($metrics, 'execution_time');
-        $avgTime = array_sum($executionTimes) / count($executionTimes);
+        /** @var array<int, float> $executionTimes */
+        $executionTimes = [];
+        foreach ($metrics as $metric) {
+            if (is_array($metric) && isset($metric['execution_time']) && is_numeric($metric['execution_time'])) {
+                $executionTimes[] = (float) $metric['execution_time'];
+            }
+        }
+
+        $avgTime = ! empty($executionTimes) ? array_sum($executionTimes) / count($executionTimes) : 0.0;
 
         // Performance recommendations
         if ($avgTime > 5.0) {
@@ -674,7 +825,8 @@ class AgentOrchestrationService
         }
 
         // Success rate recommendations
-        $successRate = count(array_filter($metrics, fn ($m) => $m['success'] ?? false)) / count($metrics);
+        $successCount = count(array_filter($metrics, static fn (array $m): bool => (bool) ($m['success'] ?? false)));
+        $successRate = count($metrics) > 0 ? $successCount / count($metrics) : 0.0;
         if ($successRate < 0.8) {
             $recommendations[] = [
                 'type' => 'reliability',
@@ -699,20 +851,44 @@ class AgentOrchestrationService
         return 'agent_'.$type.'_'.uniqid();
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     protected function getWorkflow(string $workflowId): ?array
     {
-        return Cache::get("workflow:{$workflowId}");
+        $workflow = Cache::get("workflow:{$workflowId}");
+
+        if (! is_array($workflow)) {
+            return null;
+        }
+
+        /** @var array<string, mixed> $typedWorkflow */
+        $typedWorkflow = $workflow;
+
+        return $typedWorkflow;
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     protected function getAgent(string $agentId): ?array
     {
-        return Cache::get("agent:{$agentId}");
+        $agent = Cache::get("agent:{$agentId}");
+
+        if (! is_array($agent)) {
+            return null;
+        }
+
+        /** @var array<string, mixed> $typedAgent */
+        $typedAgent = $agent;
+
+        return $typedAgent;
     }
 
     protected function updateWorkflowState(string $workflowId, string $state): void
     {
         $workflow = $this->getWorkflow($workflowId);
-        if (is_array($workflow)) {
+        if ($workflow !== null) {
             $workflow['state'] = $state;
             $workflow['updated_at'] = now()->toIso8601String();
             Cache::put("workflow:{$workflowId}", $workflow, 3600);
@@ -722,13 +898,16 @@ class AgentOrchestrationService
     protected function updateAgentState(string $agentId, string $state): void
     {
         $agent = $this->getAgent($agentId);
-        if (is_array($agent)) {
+        if ($agent !== null) {
             $agent['state'] = $state;
             $agent['updated_at'] = now()->toIso8601String();
             Cache::put("agent:{$agentId}", $agent, 3600);
         }
     }
 
+    /**
+     * @param  array<string, mixed>  $metrics
+     */
     protected function recordAgentMetrics(string $agentId, array $metrics): void
     {
         $allMetrics = Cache::get("agent_metrics:{$agentId}", []);
@@ -748,12 +927,26 @@ class AgentOrchestrationService
         Cache::put("agent_metrics:{$agentId}", $allMetrics, 3600);
     }
 
-    protected function getAgentMetrics(): array
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    protected function getAgentMetrics(string $agentId): array
+    {
         $metrics = Cache::get("agent_metrics:{$agentId}", []);
 
-        return is_array($metrics) ? $metrics : [];
+        if (! is_array($metrics)) {
+            return [];
+        }
+
+        /** @var array<int, array<string, mixed>> $typedMetrics */
+        $typedMetrics = $metrics;
+
+        return $typedMetrics;
     }
 
+    /**
+     * @param  array<int, array<string, mixed>>  $metrics
+     */
     protected function calculateAgentHealth(array $metrics): string
     {
         if (empty($metrics)) {
@@ -761,7 +954,8 @@ class AgentOrchestrationService
         }
 
         $recentMetrics = array_slice($metrics, -10);
-        $successRate = count(array_filter($recentMetrics, fn ($m) => $m['success'] ?? false)) / count($recentMetrics);
+        $successCount = count(array_filter($recentMetrics, static fn (array $m): bool => (bool) ($m['success'] ?? false)));
+        $successRate = count($recentMetrics) > 0 ? $successCount / count($recentMetrics) : 0.0;
 
         if ($successRate >= 0.9) {
             return 'healthy';
@@ -772,7 +966,13 @@ class AgentOrchestrationService
         }
     }
 
-    protected function combineOutputs(): array
+    /**
+     * @param  array<int, array<string, mixed>>  $results
+     * @return array<string, mixed>
+     */
+    protected function combineOutputs(array $results): array
+    {
+        /** @var array<string, mixed> $combined */
         $combined = [];
         foreach ($results as $result) {
             if (isset($result['output']) && is_array($result['output'])) {
@@ -783,11 +983,19 @@ class AgentOrchestrationService
         return $combined;
     }
 
-    protected function aggregateHierarchicalResults(): array
-        $aggregated = $results['coordinator']['output'] ?? [];
+    /**
+     * @param  array<string, mixed>  $results
+     * @return array<string, mixed>
+     */
+    protected function aggregateHierarchicalResults(array $results): array
+    {
+        $coordinator = is_array($results['coordinator'] ?? null) ? $results['coordinator'] : [];
+        /** @var array<string, mixed> $aggregated */
+        $aggregated = is_array($coordinator['output'] ?? null) ? $coordinator['output'] : [];
 
-        foreach ($results['subordinates'] as $subordinateResult) {
-            if (isset($subordinateResult['output']) && is_array($subordinateResult['output'])) {
+        $subordinates = is_array($results['subordinates'] ?? null) ? $results['subordinates'] : [];
+        foreach ($subordinates as $subordinateResult) {
+            if (is_array($subordinateResult) && isset($subordinateResult['output']) && is_array($subordinateResult['output'])) {
                 $aggregated = array_merge($aggregated, $subordinateResult['output']);
             }
         }

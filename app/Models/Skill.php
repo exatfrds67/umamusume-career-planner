@@ -295,7 +295,10 @@ class Skill extends Model
             return [];
         }
 
-        return self::whereIn('internal_id', $this->synergy_skills)->get()->toArray();
+        /** @var array<int, array<string, mixed>> $skills */
+        $skills = self::whereIn('internal_id', $this->synergy_skills)->get()->toArray();
+
+        return $skills;
     }
 
     /**

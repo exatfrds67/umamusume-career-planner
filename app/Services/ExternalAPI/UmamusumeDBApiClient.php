@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\ExternalAPI;
 
 use App\Services\MCP\MCPClientService;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -57,8 +58,11 @@ class UmamusumeDBApiClient
     public function __construct(
         protected MCPClientService $mcpClient
     ) {
-        $this->baseUrl = (string) config('services.umamusumedb.url', 'https://api.umamusumedb.com');
-        $this->timeout = (int) config('services.umamusumedb.timeout', 30);
+        $configUrl = config('services.umamusumedb.url', 'https://api.umamusumedb.com');
+        $this->baseUrl = is_string($configUrl) ? $configUrl : 'https://api.umamusumedb.com';
+
+        $configTimeout = config('services.umamusumedb.timeout', 30);
+        $this->timeout = is_numeric($configTimeout) ? (int) $configTimeout : 30;
     }
 
     /**
@@ -67,13 +71,18 @@ class UmamusumeDBApiClient
      * @param  array<string, mixed>  $params
      * @return array{success: bool, data: array<string, mixed>|null, source: string, error?: string}
      */
-    public function getTrainingCalculation(): array
+    public function getTrainingCalculation(array $params, bool $forceRefresh = false): array
+    {
         $cacheKey = self::CACHE_PREFIX.'training:'.md5(json_encode($params) ?: '');
 
         if (! $forceRefresh && Cache::has($cacheKey)) {
+            $cachedData = Cache::get($cacheKey);
+            /** @var array<string, mixed>|null $data */
+            $data = is_array($cachedData) ? $cachedData : null;
+
             return [
                 'success' => true,
-                'data' => Cache::get($cacheKey),
+                'data' => $data,
                 'source' => 'cache',
             ];
         }
@@ -85,7 +94,11 @@ class UmamusumeDBApiClient
                 throw new \RuntimeException($response['error'] ?? 'Unknown error');
             }
 
-            $calculation = $response['data']['calculation'] ?? null;
+            $responseData = is_array($response['data']) ? $response['data'] : [];
+            /** @var array<string, mixed>|null $calculation */
+            $calculation = isset($responseData['calculation']) && is_array($responseData['calculation'])
+                ? $responseData['calculation']
+                : null;
 
             if ($calculation) {
                 // Cache training calculations for 1 hour
@@ -117,13 +130,18 @@ class UmamusumeDBApiClient
      *
      * @return array{success: bool, data: array<int, array<string, mixed>>, source: string, error?: string}
      */
-    public function getMetaTierRankings(): array
+    public function getMetaTierRankings(bool $forceRefresh = false): array
+    {
         $cacheKey = self::CACHE_PREFIX.'meta:tier_rankings';
 
         if (! $forceRefresh && Cache::has($cacheKey)) {
+            $cachedData = Cache::get($cacheKey, []);
+            /** @var array<int, array<string, mixed>> $rankings */
+            $rankings = is_array($cachedData) ? $cachedData : [];
+
             return [
                 'success' => true,
-                'data' => Cache::get($cacheKey, []),
+                'data' => $rankings,
                 'source' => 'cache',
             ];
         }
@@ -135,7 +153,11 @@ class UmamusumeDBApiClient
                 throw new \RuntimeException($response['error'] ?? 'Unknown error');
             }
 
-            $rankings = $response['data']['rankings'] ?? [];
+            $responseData = is_array($response['data']) ? $response['data'] : [];
+            /** @var array<int, array<string, mixed>> $rankings */
+            $rankings = isset($responseData['rankings']) && is_array($responseData['rankings'])
+                ? $responseData['rankings']
+                : [];
 
             // Cache meta data for 12 hours
             Cache::put($cacheKey, $rankings, self::CACHE_TTL);
@@ -169,13 +191,18 @@ class UmamusumeDBApiClient
      *
      * @return array{success: bool, data: array<int, array<string, mixed>>, source: string, error?: string}
      */
-    public function getCommunityBuilds(): array
+    public function getCommunityBuilds(int|string $characterId, bool $forceRefresh = false): array
+    {
         $cacheKey = self::CACHE_PREFIX."builds:{$characterId}";
 
         if (! $forceRefresh && Cache::has($cacheKey)) {
+            $cachedData = Cache::get($cacheKey, []);
+            /** @var array<int, array<string, mixed>> $builds */
+            $builds = is_array($cachedData) ? $cachedData : [];
+
             return [
                 'success' => true,
-                'data' => Cache::get($cacheKey, []),
+                'data' => $builds,
                 'source' => 'cache',
             ];
         }
@@ -187,7 +214,11 @@ class UmamusumeDBApiClient
                 throw new \RuntimeException($response['error'] ?? 'Unknown error');
             }
 
-            $builds = $response['data']['builds'] ?? [];
+            $responseData = is_array($response['data']) ? $response['data'] : [];
+            /** @var array<int, array<string, mixed>> $builds */
+            $builds = isset($responseData['builds']) && is_array($responseData['builds'])
+                ? $responseData['builds']
+                : [];
 
             // Cache community builds for 6 hours
             Cache::put($cacheKey, $builds, 21600);
@@ -223,13 +254,18 @@ class UmamusumeDBApiClient
      *
      * @return array{success: bool, data: array<int, array<string, mixed>>, source: string, error?: string}
      */
-    public function getSkillEffectiveness(): array
+    public function getSkillEffectiveness(bool $forceRefresh = false): array
+    {
         $cacheKey = self::CACHE_PREFIX.'skills:effectiveness';
 
         if (! $forceRefresh && Cache::has($cacheKey)) {
+            $cachedData = Cache::get($cacheKey, []);
+            /** @var array<int, array<string, mixed>> $effectiveness */
+            $effectiveness = is_array($cachedData) ? $cachedData : [];
+
             return [
                 'success' => true,
-                'data' => Cache::get($cacheKey, []),
+                'data' => $effectiveness,
                 'source' => 'cache',
             ];
         }
@@ -241,7 +277,11 @@ class UmamusumeDBApiClient
                 throw new \RuntimeException($response['error'] ?? 'Unknown error');
             }
 
-            $effectiveness = $response['data']['skills'] ?? [];
+            $responseData = is_array($response['data']) ? $response['data'] : [];
+            /** @var array<int, array<string, mixed>> $effectiveness */
+            $effectiveness = isset($responseData['skills']) && is_array($responseData['skills'])
+                ? $responseData['skills']
+                : [];
 
             // Cache skill effectiveness for 12 hours
             Cache::put($cacheKey, $effectiveness, self::CACHE_TTL);
@@ -276,13 +316,18 @@ class UmamusumeDBApiClient
      * @param  array<string, mixed>  $params
      * @return array{success: bool, data: array<string, mixed>|null, source: string, error?: string}
      */
-    public function getRaceStrategy(): array
-        $cacheKey = self::CACHE_PREFIX.'race_strategy:'.md5(json_encode($params));
+    public function getRaceStrategy(array $params, bool $forceRefresh = false): array
+    {
+        $cacheKey = self::CACHE_PREFIX.'race_strategy:'.md5(json_encode($params) ?: '');
 
         if (! $forceRefresh && Cache::has($cacheKey)) {
+            $cachedData = Cache::get($cacheKey);
+            /** @var array<string, mixed>|null $strategy */
+            $strategy = is_array($cachedData) ? $cachedData : null;
+
             return [
                 'success' => true,
-                'data' => Cache::get($cacheKey),
+                'data' => $strategy,
                 'source' => 'cache',
             ];
         }
@@ -294,7 +339,11 @@ class UmamusumeDBApiClient
                 throw new \RuntimeException($response['error'] ?? 'Unknown error');
             }
 
-            $strategy = $response['data']['strategy'] ?? null;
+            $responseData = is_array($response['data']) ? $response['data'] : [];
+            /** @var array<string, mixed>|null $strategy */
+            $strategy = isset($responseData['strategy']) && is_array($responseData['strategy'])
+                ? $responseData['strategy']
+                : null;
 
             if ($strategy) {
                 // Cache race strategies for 2 hours
@@ -327,13 +376,14 @@ class UmamusumeDBApiClient
      * @param  array<string, mixed>  $params
      * @return array{success: bool, data: array<string, mixed>, error?: string}
      */
-    protected function makeRequestWithRetry(): array
+    protected function makeRequestWithRetry(string $method, string $endpoint, array $params = []): array
+    {
         $url = $this->baseUrl.$endpoint;
         $attempt = 0;
         $delay = self::INITIAL_RETRY_DELAY;
 
         while ($attempt < self::MAX_RETRIES) {
-            $attempt = ($attempt ?? 0) + 1;
+            $attempt++;
 
             try {
                 // Check if MCP fetch server is available for enhanced capabilities
@@ -365,7 +415,7 @@ class UmamusumeDBApiClient
                 }
 
                 // Exponential backoff with jitter
-                $jitter = rand(0, (int) ($delay * 0.1));
+                $jitter = 0;
                 usleep(($delay + $jitter) * 1000);
 
                 // Increase delay for next attempt (exponential backoff)
@@ -386,7 +436,8 @@ class UmamusumeDBApiClient
      * @param  array<string, mixed>  $params
      * @return array{success: bool, data: array<string, mixed>, error?: string}
      */
-    protected function makeRequestViaMCP(): array
+    protected function makeRequestViaMCP(string $method, string $url, array $params = []): array
+    {
         // In production, this would use actual MCP fetch server
         // For now, we'll use the standard HTTP client as fallback
         Log::debug('[UmamusumeDBApiClient] MCP fetch server not yet implemented, using HTTP fallback');
@@ -400,7 +451,8 @@ class UmamusumeDBApiClient
      * @param  array<string, mixed>  $params
      * @return array{success: bool, data: array<string, mixed>, error?: string}
      */
-    protected function makeRequestViaHttp(): array
+    protected function makeRequestViaHttp(string $method, string $url, array $params = []): array
+    {
         $httpClient = Http::timeout($this->timeout)
             ->withHeaders([
                 'Accept' => 'application/json',
@@ -408,8 +460,10 @@ class UmamusumeDBApiClient
             ]);
 
         if ($method === 'GET') {
+            /** @var Response $response */
             $response = $httpClient->get($url, $params);
         } else {
+            /** @var Response $response */
             $response = $httpClient->send($method, $url, [
                 'json' => $params,
             ]);
@@ -423,9 +477,13 @@ class UmamusumeDBApiClient
             ];
         }
 
+        $jsonData = $response->json();
+        /** @var array<string, mixed> $data */
+        $data = is_array($jsonData) ? $jsonData : [];
+
         return [
             'success' => true,
-            'data' => $response->json() ?? [],
+            'data' => $data,
         ];
     }
 
@@ -435,6 +493,7 @@ class UmamusumeDBApiClient
     public function isAvailable(): bool
     {
         try {
+            /** @var Response $response */
             $response = Http::timeout(5)->get("{$this->baseUrl}/health");
 
             return $response->successful();
@@ -471,6 +530,7 @@ class UmamusumeDBApiClient
      * @return array{meta_tier_rankings: bool, skill_effectiveness: bool}
      */
     public function getCacheStatus(): array
+    {
         return [
             'meta_tier_rankings' => Cache::has(self::CACHE_PREFIX.'meta:tier_rankings'),
             'skill_effectiveness' => Cache::has(self::CACHE_PREFIX.'skills:effectiveness'),

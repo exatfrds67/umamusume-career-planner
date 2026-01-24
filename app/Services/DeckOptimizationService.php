@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\Character;
 use App\Models\SupportCardDefinition;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
 /**
@@ -51,7 +50,8 @@ class DeckOptimizationService
      *
      * @return array<string, mixed>
      */
-    public function analyzeDeckComposition(): array
+    public function analyzeDeckComposition(int $characterId): array
+    {
         $deck = $this->deckService->getDeck($characterId);
 
         if ($deck->isEmpty()) {
@@ -87,7 +87,8 @@ class DeckOptimizationService
      * @param  \Illuminate\Support\Collection<int, \App\Models\CharacterSupportCard>  $deck
      * @return array<string, mixed>
      */
-    private function calculateStatCoverage(): array
+    private function calculateStatCoverage(\Illuminate\Support\Collection $deck): array
+    {
         /** @var array<string, int> $coverage */
         $coverage = [
             'speed' => 0,
@@ -114,6 +115,8 @@ class DeckOptimizationService
 
     /**
      * Check if stat coverage is balanced
+     *
+     * @param  array<string, int>  $coverage
      */
     private function isStatCoverageBalanced(array $coverage): bool
     {
@@ -128,9 +131,15 @@ class DeckOptimizationService
 
     /**
      * Calculate skill provision coverage
+     *
+     * @param  \Illuminate\Support\Collection<int, \App\Models\CharacterSupportCard>  $deck
+     * @return array<string, mixed>
      */
-    private function calculateSkillProvisionCoverage(): array
+    private function calculateSkillProvisionCoverage(\Illuminate\Support\Collection $deck): array
+    {
+        /** @var array<int, string> $allSkills */
         $allSkills = [];
+        /** @var array<string, array<int, string>> $skillsByType */
         $skillsByType = [
             'speed' => [],
             'passive' => [],
@@ -139,6 +148,7 @@ class DeckOptimizationService
         ];
 
         foreach ($deck as $card) {
+            /** @var array<int, string> $skillsProvided */
             $skillsProvided = $card->supportCard->skill_hints_provided ?? [];
 
             foreach ($skillsProvided as $skill) {
@@ -186,6 +196,8 @@ class DeckOptimizationService
 
     /**
      * Calculate skill diversity score
+     *
+     * @param  array<string, array<int, string>>  $skillsByType
      */
     private function calculateSkillDiversityScore(array $skillsByType): float
     {
@@ -197,12 +209,21 @@ class DeckOptimizationService
 
     /**
      * Identify gaps in deck composition
+     *
+     * @param  array<string, mixed>  $statCoverage
+     * @param  array<string, mixed>  $skillProvisionCoverage
+     * @return array<string, mixed>
      */
-    private function identifyGaps(): array
+    private function identifyGaps(array $statCoverage, array $skillProvisionCoverage): array
+    {
+        /** @var array<int, string> $missingStats */
         $missingStats = [];
+        /** @var array<int, string> $weakStats */
         $weakStats = [];
 
-        foreach ($statCoverage['counts'] as $stat => $count) {
+        /** @var array<string, int> $counts */
+        $counts = is_array($statCoverage['counts'] ?? null) ? $statCoverage['counts'] : [];
+        foreach ($counts as $stat => $count) {
             if ($stat === 'friend') {
                 continue;
             }
@@ -214,8 +235,11 @@ class DeckOptimizationService
             }
         }
 
+        /** @var array<int, string> $missingSkillTypes */
         $missingSkillTypes = [];
-        foreach ($skillProvisionCoverage['skills_by_type'] as $type => $skills) {
+        /** @var array<string, array<int, string>> $skillsByType */
+        $skillsByType = is_array($skillProvisionCoverage['skills_by_type'] ?? null) ? $skillProvisionCoverage['skills_by_type'] : [];
+        foreach ($skillsByType as $type => $skills) {
             if (empty($skills)) {
                 $missingSkillTypes[] = $type;
             }
@@ -231,22 +255,34 @@ class DeckOptimizationService
 
     /**
      * Calculate overall coverage score
+     *
+     * @param  array<string, mixed>  $statCoverage
+     * @param  array<string, mixed>  $skillProvisionCoverage
      */
     private function calculateCoverageScore(array $statCoverage, array $skillProvisionCoverage): float
     {
         // Stat coverage score (60% weight)
-        $statScore = $statCoverage['is_balanced'] ? 60 : 30;
+        $isBalanced = (bool) ($statCoverage['is_balanced'] ?? false);
+        $statScore = $isBalanced ? 60 : 30;
 
         // Skill diversity score (40% weight)
-        $skillScore = ($skillProvisionCoverage['skill_diversity_score'] / 100) * 40;
+        $diversityScore = is_numeric($skillProvisionCoverage['skill_diversity_score'] ?? null)
+            ? (float) $skillProvisionCoverage['skill_diversity_score']
+            : 0.0;
+        $skillScore = ($diversityScore / 100) * 40;
 
         return round($statScore + $skillScore, 1);
     }
 
     /**
      * Generate composition recommendations
+     *
+     * @param  array<string, mixed>  $gaps
+     * @return array<int, string>
      */
-    private function generateCompositionRecommendations(): array
+    private function generateCompositionRecommendations(array $gaps, float $coverageScore): array
+    {
+        /** @var array<int, string> $recommendations */
         $recommendations = [];
 
         if ($coverageScore >= self::OPTIMAL_STAT_COVERAGE) {
@@ -257,16 +293,22 @@ class DeckOptimizationService
             $recommendations[] = 'Deck composition needs improvement for optimal performance.';
         }
 
-        if (! empty($gaps['missing_stats'])) {
-            $recommendations[] = 'Add cards for missing stat types: '.implode(', ', $gaps['missing_stats']);
+        /** @var array<int, string> $missingStats */
+        $missingStats = is_array($gaps['missing_stats'] ?? null) ? $gaps['missing_stats'] : [];
+        if (! empty($missingStats)) {
+            $recommendations[] = 'Add cards for missing stat types: '.implode(', ', $missingStats);
         }
 
-        if (! empty($gaps['weak_stats'])) {
-            $recommendations[] = 'Consider adding more cards for: '.implode(', ', $gaps['weak_stats']);
+        /** @var array<int, string> $weakStats */
+        $weakStats = is_array($gaps['weak_stats'] ?? null) ? $gaps['weak_stats'] : [];
+        if (! empty($weakStats)) {
+            $recommendations[] = 'Consider adding more cards for: '.implode(', ', $weakStats);
         }
 
-        if (! empty($gaps['missing_skill_types'])) {
-            $recommendations[] = 'Improve skill diversity by adding '.implode(', ', $gaps['missing_skill_types']).' skills';
+        /** @var array<int, string> $missingSkillTypes */
+        $missingSkillTypes = is_array($gaps['missing_skill_types'] ?? null) ? $gaps['missing_skill_types'] : [];
+        if (! empty($missingSkillTypes)) {
+            $recommendations[] = 'Improve skill diversity by adding '.implode(', ', $missingSkillTypes).' skills';
         }
 
         return $recommendations;
@@ -274,8 +316,11 @@ class DeckOptimizationService
 
     /**
      * Analyze synergy between cards in the deck
+     *
+     * @return array<string, mixed>
      */
-    public function analyzeDeckSynergy(): array
+    public function analyzeDeckSynergy(int $characterId): array
+    {
         $deck = $this->deckService->getDeck($characterId);
 
         if ($deck->isEmpty()) {
@@ -301,26 +346,49 @@ class DeckOptimizationService
 
     /**
      * Identify synergy pairs in the deck
+     *
+     * @param  \Illuminate\Support\Collection<int, \App\Models\CharacterSupportCard>  $deck
+     * @return array<int, array<string, mixed>>
      */
-    private function identifySynergyPairs(): array
+    private function identifySynergyPairs(\Illuminate\Support\Collection $deck): array
+    {
+        /** @var array<string, array<string, mixed>> $pairs */
         $pairs = [];
 
         foreach ($deck as $card1) {
             $synergyData = $this->metaService->getCardSynergies($card1->support_card_id);
 
-            foreach ($synergyData['synergy_cards'] as $synergyCard) {
+            /** @var array<int, array<string, mixed>> $synergyCards */
+            $synergyCards = is_array($synergyData['synergy_cards'] ?? null) ? $synergyData['synergy_cards'] : [];
+            foreach ($synergyCards as $synergyCard) {
+                /** @var int|null $synergyCardId */
+                $synergyCardId = null;
+                if (is_array($synergyCard) && isset($synergyCard['id'])) {
+                    $rawId = $synergyCard['id'];
+                    if (is_int($rawId) || is_string($rawId)) {
+                        $synergyCardId = (int) $rawId;
+                    }
+                }
+                if ($synergyCardId === null) {
+                    continue;
+                }
+
                 // Check if synergy card is in the deck
-                $matchingCard = $deck->first(function ($card2) use ($synergyCard) {
-                    return $card2->support_card_id === $synergyCard['id'];
+                $matchingCard = $deck->first(function ($card2) use ($synergyCardId) {
+                    return $card2->support_card_id === $synergyCardId;
                 });
 
-                if ($matchingCard) {
+                if ($matchingCard !== null && $matchingCard->supportCard !== null) {
+                    $card1SupportCard = $card1->supportCard;
+                    if ($card1SupportCard === null) {
+                        continue;
+                    }
                     $pairKey = min($card1->support_card_id, $matchingCard->support_card_id).'-'.
                         max($card1->support_card_id, $matchingCard->support_card_id);
 
                     if (! isset($pairs[$pairKey])) {
                         $pairs[$pairKey] = [
-                            'card1' => $card1->supportCard->name,
+                            'card1' => $card1SupportCard->name,
                             'card2' => $matchingCard->supportCard->name,
                             'synergy_type' => 'deck_synergy',
                             'strength' => 'high',
@@ -335,9 +403,15 @@ class DeckOptimizationService
 
     /**
      * Analyze strategic alignment of the deck
+     *
+     * @param  \Illuminate\Support\Collection<int, \App\Models\CharacterSupportCard>  $deck
+     * @return array<string, mixed>
      */
-    private function analyzeStrategicAlignment(): array
+    private function analyzeStrategicAlignment(\Illuminate\Support\Collection $deck): array
+    {
+        /** @var array<string, int> $cardTypes */
         $cardTypes = $deck->pluck('supportCard.card_type')->countBy()->toArray();
+        /** @var array<string, int> $metaTiers */
         $metaTiers = $deck->pluck('supportCard.meta_tier')->countBy()->toArray();
 
         // Determine primary strategy based on card type distribution
@@ -357,6 +431,8 @@ class DeckOptimizationService
 
     /**
      * Determine primary strategy from card types
+     *
+     * @param  array<string, int>  $cardTypes
      */
     private function determinePrimaryStrategy(array $cardTypes): string
     {
@@ -366,10 +442,11 @@ class DeckOptimizationService
 
         arsort($cardTypes);
         $dominantType = array_key_first($cardTypes);
-        $dominantCount = $cardTypes[$dominantType];
+        /** @var int $dominantCount */
+        $dominantCount = $cardTypes[$dominantType] ?? 0;
 
         if ($dominantCount >= 3) {
-            return ucfirst($dominantType).' Focus';
+            return ucfirst((string) $dominantType).' Focus';
         }
 
         if (count($cardTypes) >= 4) {
@@ -381,6 +458,8 @@ class DeckOptimizationService
 
     /**
      * Calculate strategic alignment score
+     *
+     * @param  array<string, int>  $cardTypes
      */
     private function calculateAlignmentScore(array $cardTypes, string $primaryStrategy): float
     {
@@ -412,6 +491,9 @@ class DeckOptimizationService
 
     /**
      * Calculate overall synergy score
+     *
+     * @param  array<int, array<string, mixed>>  $synergyPairs
+     * @param  array<string, mixed>  $strategicAlignment
      */
     private function calculateSynergyScore(array $synergyPairs, array $strategicAlignment): float
     {
@@ -419,15 +501,24 @@ class DeckOptimizationService
         $pairScore = min(50, count($synergyPairs) * 10);
 
         // Strategic alignment contributes 50%
-        $alignmentScore = ($strategicAlignment['alignment_score'] / 100) * 50;
+        $alignmentValue = is_numeric($strategicAlignment['alignment_score'] ?? null)
+            ? (float) $strategicAlignment['alignment_score']
+            : 0.0;
+        $alignmentScore = ($alignmentValue / 100) * 50;
 
         return round($pairScore + $alignmentScore, 1);
     }
 
     /**
      * Generate synergy recommendations
+     *
+     * @param  array<int, array<string, mixed>>  $synergyPairs
+     * @param  array<string, mixed>  $strategicAlignment
+     * @return array<int, string>
      */
-    private function generateSynergyRecommendations(): array
+    private function generateSynergyRecommendations(array $synergyPairs, array $strategicAlignment): array
+    {
+        /** @var array<int, string> $recommendations */
         $recommendations = [];
 
         if (count($synergyPairs) === 0) {
@@ -438,8 +529,12 @@ class DeckOptimizationService
             $recommendations[] = 'Good synergy detected. Consider adding more synergistic cards.';
         }
 
-        if (! $strategicAlignment['is_well_aligned']) {
-            $recommendations[] = 'Strategic alignment could be improved. Current strategy: '.$strategicAlignment['primary_strategy'];
+        $isWellAligned = (bool) ($strategicAlignment['is_well_aligned'] ?? false);
+        $primaryStrategy = is_string($strategicAlignment['primary_strategy'] ?? null)
+            ? $strategicAlignment['primary_strategy']
+            : 'unknown';
+        if (! $isWellAligned) {
+            $recommendations[] = 'Strategic alignment could be improved. Current strategy: '.$primaryStrategy;
         }
 
         return $recommendations;
@@ -447,14 +542,17 @@ class DeckOptimizationService
 
     /**
      * Optimize deck for meta tier and character build compatibility
+     *
+     * @return array<string, mixed>
      */
-    public function optimizeForMetaTier(): array
+    public function optimizeForMetaTier(int $characterId): array
+    {
         $character = Character::findOrFail($characterId);
         $deck = $this->deckService->getDeck($characterId);
 
         $metaScore = $this->calculateMetaScore($deck);
         $buildCompatibility = $this->analyzeBuildCompatibility($character, $deck);
-        $optimizationSuggestions = $this->generateOptimizationSuggestions($character, $deck, $metaScore, $buildCompatibility);
+        $optimizationSuggestions = $this->generateOptimizationSuggestions($character, $metaScore, $buildCompatibility);
 
         return [
             'meta_score' => $metaScore,
@@ -466,8 +564,12 @@ class DeckOptimizationService
 
     /**
      * Calculate meta score for the deck
+     *
+     * @param  \Illuminate\Support\Collection<int, \App\Models\CharacterSupportCard>  $deck
+     * @return array<string, mixed>
      */
-    private function calculateMetaScore(): array
+    private function calculateMetaScore(\Illuminate\Support\Collection $deck): array
+    {
         if ($deck->isEmpty()) {
             return [
                 'total_score' => 0,
@@ -476,13 +578,15 @@ class DeckOptimizationService
             ];
         }
 
-        $totalWeight = 0;
+        $totalWeight = 0.0;
+        /** @var array<string, int> $tierBreakdown */
         $tierBreakdown = [];
 
         foreach ($deck as $card) {
+            /** @var string $tier */
             $tier = $card->supportCard->meta_tier ?? 'C';
             $weight = self::META_TIER_WEIGHTS[$tier] ?? 1.0;
-            $totalWeight = ($totalWeight ?? 0) + $weight;
+            $totalWeight += $weight;
 
             if (! isset($tierBreakdown[$tier])) {
                 $tierBreakdown[$tier] = 0;
@@ -502,30 +606,45 @@ class DeckOptimizationService
 
     /**
      * Analyze build compatibility between character and deck
+     *
+     * @param  \Illuminate\Support\Collection<int, \App\Models\CharacterSupportCard>  $deck
+     * @return array<string, mixed>
      */
-    private function analyzeBuildCompatibility(): array
-        $statPriorities = $character->stat_priorities ?? [];
+    private function analyzeBuildCompatibility(Character $character, \Illuminate\Support\Collection $deck): array
+    {
+        /** @var array<string, mixed> $statPriorities */
+        $statPriorities = is_array($character->stat_priorities) ? $character->stat_priorities : [];
+        /** @var string|null $scenario */
         $scenario = $character->scenario_type;
 
         $compatibilityScore = 0;
+        /** @var array<int, string> $matches */
         $matches = [];
+        /** @var array<int, string> $mismatches */
         $mismatches = [];
 
         foreach ($deck as $card) {
-            $cardType = strtolower($card->supportCard->card_type ?? '');
+            $supportCard = $card->supportCard;
+            if ($supportCard === null) {
+                continue;
+            }
+            $cardType = strtolower($supportCard->card_type ?? '');
 
             // Check if card type matches stat priorities
             if (in_array($cardType, array_map('strtolower', array_keys($statPriorities)))) {
-                $compatibilityScore = ($compatibilityScore ?? 0) + 20;
-                $matches[] = $card->supportCard->name.' ('.$cardType.')';
+                $compatibilityScore += 20;
+                $matches[] = $supportCard->name.' ('.$cardType.')';
             } else {
-                $mismatches[] = $card->supportCard->name.' ('.$cardType.')';
+                $mismatches[] = $supportCard->name.' ('.$cardType.')';
             }
 
             // Check scenario compatibility
-            $recommendedScenarios = $card->supportCard->recommended_scenarios ?? [];
-            if (in_array($scenario, $recommendedScenarios)) {
-                $compatibilityScore = ($compatibilityScore ?? 0) + 10;
+            /** @var array<int, string> $recommendedScenarios */
+            $recommendedScenarios = is_array($supportCard->recommended_scenarios ?? null)
+                ? $supportCard->recommended_scenarios
+                : [];
+            if ($scenario !== null && in_array($scenario, $recommendedScenarios)) {
+                $compatibilityScore += 10;
             }
         }
 
@@ -539,12 +658,19 @@ class DeckOptimizationService
 
     /**
      * Generate optimization suggestions
+     *
+     * @param  array<string, mixed>  $metaScore
+     * @param  array<string, mixed>  $buildCompatibility
+     * @return array<int, array<string, string>>
      */
-    private function generateOptimizationSuggestions(): array
+    private function generateOptimizationSuggestions(Character $character, array $metaScore, array $buildCompatibility): array
+    {
+        /** @var array<int, array<string, string>> $suggestions */
         $suggestions = [];
 
         // Meta tier suggestions
-        if ($metaScore['total_score'] < 60) {
+        $totalScore = is_numeric($metaScore['total_score'] ?? null) ? (float) $metaScore['total_score'] : 0.0;
+        if ($totalScore < 60) {
             $suggestions[] = [
                 'type' => 'meta_tier',
                 'priority' => 'high',
@@ -553,7 +679,8 @@ class DeckOptimizationService
         }
 
         // Build compatibility suggestions
-        if (! $buildCompatibility['is_compatible']) {
+        $isCompatible = (bool) ($buildCompatibility['is_compatible'] ?? false);
+        if (! $isCompatible) {
             $suggestions[] = [
                 'type' => 'build_compatibility',
                 'priority' => 'high',
@@ -575,32 +702,51 @@ class DeckOptimizationService
 
     /**
      * Suggest card replacements for optimization
+     *
+     * @param  \Illuminate\Support\Collection<int, \App\Models\CharacterSupportCard>  $deck
+     * @return array<int, array<string, mixed>>
      */
-    private function suggestReplacements(): array
+    private function suggestReplacements(Character $character, \Illuminate\Support\Collection $deck): array
+    {
+        /** @var array<int, array<string, mixed>> $replacements */
         $replacements = [];
-        $statPriorities = array_keys($character->stat_priorities ?? []);
+        /** @var array<string, mixed> $charStatPriorities */
+        $charStatPriorities = is_array($character->stat_priorities) ? $character->stat_priorities : [];
+        /** @var array<int, string> $statPriorities */
+        $statPriorities = array_keys($charStatPriorities);
 
         foreach ($deck as $card) {
-            $tier = $card->supportCard->meta_tier ?? 'C';
+            $supportCard = $card->supportCard;
+            if ($supportCard === null) {
+                continue;
+            }
+            /** @var string $tier */
+            $tier = $supportCard->meta_tier ?? 'C';
 
             // Suggest replacement for low-tier cards
             if (in_array($tier, ['B', 'C'])) {
-                $cardType = $card->supportCard->card_type;
+                /** @var string|null $cardType */
+                $cardType = $supportCard->card_type;
+                if ($cardType === null) {
+                    continue;
+                }
                 $betterCards = $this->metaService->getTopCardsByType($cardType, 3);
 
                 if ($betterCards->isNotEmpty()) {
                     $replacements[] = [
-                        'current_card' => $card->supportCard->name,
+                        'current_card' => $supportCard->name,
                         'current_tier' => $tier,
                         'position_slot' => $card->position_slot,
-                        'suggested_replacements' => $betterCards->map(function ($betterCard) {
-                            return [
-                                'id' => $betterCard->id,
-                                'name' => $betterCard->name,
-                                'tier' => $betterCard->meta_tier,
-                                'rarity' => $betterCard->rarity,
-                            ];
-                        })->toArray(),
+                        'suggested_replacements' => $betterCards->map(
+                            function (SupportCardDefinition $betterCard): array {
+                                return [
+                                    'id' => $betterCard->id,
+                                    'name' => $betterCard->name,
+                                    'tier' => $betterCard->meta_tier,
+                                    'rarity' => $betterCard->rarity,
+                                ];
+                            }
+                        )->toArray(),
                     ];
                 }
             }
@@ -611,16 +757,24 @@ class DeckOptimizationService
 
     /**
      * Generate deck recommendations based on character goals and scenario
+     *
+     * @param  array<string, mixed>  $options
+     * @return array<string, mixed>
      */
-    public function recommendDeck(): array
+    public function recommendDeck(int $characterId, array $options = []): array
+    {
         $character = Character::findOrFail($characterId);
+        /** @var string|null $scenario */
         $scenario = $character->scenario_type;
-        $statPriorities = $character->stat_priorities ?? [];
+        /** @var array<string, mixed> $statPriorities */
+        $statPriorities = is_array($character->stat_priorities) ? $character->stat_priorities : [];
 
-        $cacheKey = "deck_recommendations_{$characterId}_".md5(json_encode($options));
+        $jsonOptions = json_encode($options);
+        $cacheKey = "deck_recommendations_{$characterId}_".md5($jsonOptions !== false ? $jsonOptions : '');
 
-        return Cache::remember($cacheKey, self::CACHE_DURATION, function () use ($character, $scenario, $statPriorities, $options) {
-            $recommendedCards = $this->selectOptimalCards($character, $statPriorities, $scenario, $options);
+        /** @var array<string, mixed> $result */
+        $result = Cache::remember($cacheKey, self::CACHE_DURATION, function () use ($character, $scenario, $statPriorities): array {
+            $recommendedCards = $this->selectOptimalCards($statPriorities);
 
             return [
                 'character_id' => $character->id,
@@ -632,23 +786,40 @@ class DeckOptimizationService
                 'reasoning' => $this->generateRecommendationReasoning($character, $recommendedCards),
             ];
         });
+
+        return is_array($result) ? $result : [];
     }
 
     /**
      * Select optimal cards for the character
+     *
+     * @param  array<string, mixed>  $statPriorities
+     * @return array<int, array<string, mixed>>
      */
-    private function selectOptimalCards(): array
+    private function selectOptimalCards(array $statPriorities): array
+    {
+        /** @var array<int, array<string, mixed>> $selectedCards */
         $selectedCards = [];
+        /** @var array<string, \Illuminate\Support\Collection<int, SupportCardDefinition>> $cardsByType */
         $cardsByType = [];
 
         // Get top cards for each stat priority
         foreach (array_keys($statPriorities) as $stat) {
+            if (! is_string($stat)) {
+                continue;
+            }
             $topCards = $this->metaService->getTopCardsByType($stat, 5);
             $cardsByType[$stat] = $topCards;
         }
 
         // Select cards based on priorities (simplified algorithm)
-        $priorityStats = array_slice(array_keys($statPriorities), 0, 3);
+        /** @var array<int, string> $priorityStats */
+        $priorityStats = [];
+        foreach (array_slice(array_keys($statPriorities), 0, 3) as $stat) {
+            if (is_string($stat)) {
+                $priorityStats[] = $stat;
+            }
+        }
 
         foreach ($priorityStats as $index => $stat) {
             $cards = $cardsByType[$stat] ?? collect();
@@ -657,6 +828,7 @@ class DeckOptimizationService
                 // Select 2 cards for highest priority, 1 for others
                 $count = $index === 0 ? 2 : 1;
 
+                /** @var SupportCardDefinition $card */
                 foreach ($cards->take($count) as $card) {
                     if (count($selectedCards) < 5) { // Leave room for friend card
                         $selectedCards[] = [
@@ -675,61 +847,7 @@ class DeckOptimizationService
         }
 
         // Fill remaining slots if needed (before friend card)
-        while (count($selectedCards) < 5) {
-            // Get any available card from priority stats
-            foreach ($priorityStats as $stat) {
-                if (count($selectedCards) >= 5) {
-                    break;
-                }
-
-                $cards = $cardsByType[$stat] ?? collect();
-                $alreadySelected = array_column($selectedCards, 'id');
-
-                foreach ($cards as $card) {
-                    if (! in_array($card->id, $alreadySelected) && count($selectedCards) < 5) {
-                        $selectedCards[] = [
-                            'id' => $card->id,
-                            'name' => $card->name,
-                            'card_type' => $card->card_type,
-                            'meta_tier' => $card->meta_tier,
-                            'rarity' => $card->rarity,
-                            'position_slot' => count($selectedCards) + 1,
-                            'is_friend_card' => false,
-                            'reason' => "Additional {$stat} support",
-                        ];
-                        break;
-                    }
-                }
-            }
-
-            // If still not enough cards, break to avoid infinite loop
-            if (count($selectedCards) < 5) {
-                $allAvailableCards = SupportCardDefinition::where('is_active', '=', true)
-                    ->where('card_type', '!=', 'friend')
-                    ->orderBy('meta_tier', 'asc')
-                    ->limit(5 - count($selectedCards))
-                    ->get();
-
-                $alreadySelected = array_column($selectedCards, 'id');
-
-                foreach ($allAvailableCards as $card) {
-                    if (! in_array($card->id, $alreadySelected) && count($selectedCards) < 5) {
-                        $selectedCards[] = [
-                            'id' => $card->id,
-                            'name' => $card->name,
-                            'card_type' => $card->card_type,
-                            'meta_tier' => $card->meta_tier,
-                            'rarity' => $card->rarity,
-                            'position_slot' => count($selectedCards) + 1,
-                            'is_friend_card' => false,
-                            'reason' => 'Filler card for deck completion',
-                        ];
-                    }
-                }
-            }
-
-            break; // Prevent infinite loop
-        }
+        $this->fillRemainingSlots($selectedCards, $cardsByType, $priorityStats);
 
         // Add friend card recommendation
         if (count($selectedCards) < 6) {
@@ -755,14 +873,20 @@ class DeckOptimizationService
 
     /**
      * Estimate performance of recommended deck
+     *
+     * @param  array<int, array<string, mixed>>  $recommendedCards
+     * @return array<string, mixed>
      */
-    private function estimatePerformance(): array
-        $metaTierScore = 0;
+    private function estimatePerformance(array $recommendedCards): array
+    {
+        $metaTierScore = 0.0;
+        /** @var array<string, int> $tierCounts */
         $tierCounts = [];
 
         foreach ($recommendedCards as $card) {
-            $tier = $card['meta_tier'] ?? 'C';
-            $metaTierScore = ($metaTierScore ?? 0) + self::META_TIER_WEIGHTS[$tier] ?? 1.0;
+            /** @var string $tier */
+            $tier = is_array($card) && is_string($card['meta_tier'] ?? null) ? $card['meta_tier'] : 'C';
+            $metaTierScore += (self::META_TIER_WEIGHTS[$tier] ?? 1.0);
 
             if (! isset($tierCounts[$tier])) {
                 $tierCounts[$tier] = 0;
@@ -795,21 +919,39 @@ class DeckOptimizationService
 
     /**
      * Generate reasoning for recommendations
+     *
+     * @param  array<int, array<string, mixed>>  $recommendedCards
+     * @return array<int, string>
      */
-    private function generateRecommendationReasoning(): array
+    private function generateRecommendationReasoning(Character $character, array $recommendedCards): array
+    {
+        /** @var array<int, string> $reasoning */
         $reasoning = [];
 
-        $reasoning[] = "Deck optimized for {$character->scenario_type} scenario";
+        /** @var string $scenarioType */
+        $scenarioType = is_string($character->scenario_type) ? $character->scenario_type : 'unknown';
+        $reasoning[] = "Deck optimized for {$scenarioType} scenario";
 
-        $statPriorities = $character->stat_priorities ?? [];
+        /** @var array<string, mixed> $statPriorities */
+        $statPriorities = is_array($character->stat_priorities) ? $character->stat_priorities : [];
         if (! empty($statPriorities)) {
-            $topStats = array_slice(array_keys($statPriorities), 0, 2);
-            $reasoning[] = 'Prioritizes '.implode(' and ', $topStats).' development';
+            /** @var array<int, string> $topStats */
+            $topStats = [];
+            foreach (array_slice(array_keys($statPriorities), 0, 2) as $stat) {
+                if (is_string($stat)) {
+                    $topStats[] = $stat;
+                }
+            }
+            if (! empty($topStats)) {
+                $reasoning[] = 'Prioritizes '.implode(' and ', $topStats).' development';
+            }
         }
 
+        /** @var array<string, int> $tierCounts */
         $tierCounts = [];
         foreach ($recommendedCards as $card) {
-            $tier = $card['meta_tier'] ?? 'C';
+            /** @var string $tier */
+            $tier = is_array($card) && is_string($card['meta_tier'] ?? null) ? $card['meta_tier'] : 'C';
             if (! isset($tierCounts[$tier])) {
                 $tierCounts[$tier] = 0;
             }
@@ -826,8 +968,11 @@ class DeckOptimizationService
 
     /**
      * Get comprehensive deck analysis
+     *
+     * @return array<string, mixed>
      */
-    public function getComprehensiveAnalysis(): array
+    public function getComprehensiveAnalysis(int $characterId): array
+    {
         return [
             'composition' => $this->analyzeDeckComposition($characterId),
             'synergy' => $this->analyzeDeckSynergy($characterId),
@@ -836,5 +981,74 @@ class DeckOptimizationService
             'friendship_overview' => $this->friendshipService->getDeckFriendshipOverview($characterId),
             'deck_statistics' => $this->deckService->getDeckStatistics($characterId),
         ];
+    }
+
+    /**
+     * Fill remaining card slots to reach 5 cards
+     *
+     * @param  array<int, array<string, mixed>>  $selectedCards
+     * @param  array<string, \Illuminate\Support\Collection<int, SupportCardDefinition>>  $cardsByType
+     * @param  array<int, string>  $priorityStats
+     */
+    private function fillRemainingSlots(array &$selectedCards, array $cardsByType, array $priorityStats): void
+    {
+        // Try to fill from priority stat cards first
+        foreach ($priorityStats as $stat) {
+            if (count($selectedCards) >= 5) {
+                return;
+            }
+
+            $cards = $cardsByType[$stat] ?? collect();
+            $alreadySelected = array_column($selectedCards, 'id');
+
+            /** @var SupportCardDefinition $card */
+            foreach ($cards as $card) {
+                if (count($selectedCards) >= 5) {
+                    return;
+                }
+                if (! in_array($card->id, $alreadySelected)) {
+                    $selectedCards[] = [
+                        'id' => $card->id,
+                        'name' => $card->name,
+                        'card_type' => $card->card_type,
+                        'meta_tier' => $card->meta_tier,
+                        'rarity' => $card->rarity,
+                        'position_slot' => count($selectedCards) + 1,
+                        'is_friend_card' => false,
+                        'reason' => "Additional {$stat} support",
+                    ];
+                }
+            }
+        }
+
+        // If still not enough cards, fill from all available
+        if (count($selectedCards) < 5) {
+            $allAvailableCards = SupportCardDefinition::where('is_active', '=', true)
+                ->where('card_type', '!=', 'friend')
+                ->orderBy('meta_tier', 'asc')
+                ->limit(5 - count($selectedCards))
+                ->get();
+
+            $alreadySelected = array_column($selectedCards, 'id');
+
+            /** @var SupportCardDefinition $card */
+            foreach ($allAvailableCards as $card) {
+                if (count($selectedCards) >= 5) {
+                    return;
+                }
+                if (! in_array($card->id, $alreadySelected)) {
+                    $selectedCards[] = [
+                        'id' => $card->id,
+                        'name' => $card->name,
+                        'card_type' => $card->card_type,
+                        'meta_tier' => $card->meta_tier,
+                        'rarity' => $card->rarity,
+                        'position_slot' => count($selectedCards) + 1,
+                        'is_friend_card' => false,
+                        'reason' => 'Filler card for deck completion',
+                    ];
+                }
+            }
+        }
     }
 }

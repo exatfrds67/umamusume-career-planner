@@ -64,7 +64,8 @@ class DataValidationService
      * @param  array<string, mixed>  $data
      * @return array{valid: bool, errors: array<string>, warnings: array<string>}
      */
-    public function validate(): array
+    public function validate(array $data, string $screenType): array
+    {
         return match ($screenType) {
             'character_stats' => $this->validateCharacterStats($data),
             'training_session' => $this->validateTrainingSession($data),
@@ -84,12 +85,13 @@ class DataValidationService
      * @param  array<string, mixed>  $data
      * @return array{valid: bool, errors: array<string>, warnings: array<string>}
      */
-    public function validateCharacterStats(): array
+    public function validateCharacterStats(array $data): array
+    {
         $errors = [];
         $warnings = [];
 
         // Validate stats exist
-        if (! isset((is_array($data) && isset($data['stats']) ? $data['stats'] : null)) || ! \is_array((is_array($data) && isset($data['stats']) ? $data['stats'] : null))) {
+        if (! isset($data['stats']) || ! \is_array($data['stats'])) {
             $errors[] = 'Stats data is missing or invalid';
 
             return ['valid' => false, 'errors' => $errors, 'warnings' => $warnings];
@@ -98,11 +100,11 @@ class DataValidationService
         // Validate each stat
         $statsFound = 0;
         foreach (self::VALID_STATS as $statName) {
-            if (isset((is_array($data) && isset($data['stats']) ? $data['stats'] : null)[$statName])) {
-                $value = (is_array($data) && isset($data['stats']) ? $data['stats'] : null)[$statName];
+            if (isset($data['stats'][$statName])) {
+                $value = $data['stats'][$statName];
 
-                if ($value === null) {
-                    $warnings[] = "Stat '{$statName}' is null";
+                if (! is_int($value)) {
+                    $errors[] = "Invalid {$statName} value type: expected integer";
 
                     continue;
                 }
@@ -110,7 +112,7 @@ class DataValidationService
                 if (! $this->validateStatValue($value)) {
                     $errors[] = "Invalid {$statName} value: {$value} (must be ".self::STAT_MIN.'-'.self::STAT_MAX.')';
                 } else {
-                    $statsFound = ($statsFound ?? 0) + 1;
+                    $statsFound++;
 
                     // Warning for unusually low stats
                     if ($value < 100) {
@@ -131,36 +133,46 @@ class DataValidationService
         }
 
         // Validate energy level if present
-        if (isset((is_array($data) && isset($data['energy_level']) ? $data['energy_level'] : null))) {
-            if (! $this->validatePercentage((is_array($data) && isset($data['energy_level']) ? $data['energy_level'] : null))) {
-                $errors[] = "Invalid energy level: {(is_array($data) && isset($data['energy_level']) ? $data['energy_level'] : null)} (must be ".self::PERCENTAGE_MIN.'-'.self::PERCENTAGE_MAX.')';
-            } elseif ((is_array($data) && isset($data['energy_level']) ? $data['energy_level'] : null) < 30) {
-                $warnings[] = "Low energy level: {(is_array($data) && isset($data['energy_level']) ? $data['energy_level'] : null)}%";
+        if (isset($data['energy_level'])) {
+            $energyLevel = $data['energy_level'];
+            if (! is_int($energyLevel)) {
+                $errors[] = 'Invalid energy level type: expected integer';
+            } elseif (! $this->validatePercentage($energyLevel)) {
+                $errors[] = "Invalid energy level: {$energyLevel} (must be ".self::PERCENTAGE_MIN.'-'.self::PERCENTAGE_MAX.')';
+            } elseif ($energyLevel < 30) {
+                $warnings[] = "Low energy level: {$energyLevel}%";
             }
         }
 
         // Validate mood status if present
-        if (isset((is_array($data) && isset($data['mood_status']) ? $data['mood_status'] : null))) {
-            if (! \in_array((is_array($data) && isset($data['mood_status']) ? $data['mood_status'] : null), self::VALID_MOODS, true)) {
-                $errors[] = "Invalid mood status: {(is_array($data) && isset($data['mood_status']) ? $data['mood_status'] : null)} (must be one of: ".\implode(', ', self::VALID_MOODS).')';
+        if (isset($data['mood_status'])) {
+            $moodStatus = is_string($data['mood_status']) ? $data['mood_status'] : '';
+            if (! \in_array($moodStatus, self::VALID_MOODS, true)) {
+                $errors[] = "Invalid mood status: {$moodStatus} (must be one of: ".\implode(', ', self::VALID_MOODS).')';
             }
         }
 
         // Validate turn numbers if present
-        if (isset((is_array($data) && isset($data['current_turn']) ? $data['current_turn'] : null))) {
-            if ((is_array($data) && isset($data['current_turn']) ? $data['current_turn'] : null) < 1 || (is_array($data) && isset($data['current_turn']) ? $data['current_turn'] : null) > 78) {
-                $errors[] = "Invalid current turn: {(is_array($data) && isset($data['current_turn']) ? $data['current_turn'] : null)} (must be 1-78)";
+        if (isset($data['current_turn'])) {
+            $currentTurn = is_int($data['current_turn']) ? $data['current_turn'] : 0;
+            if ($currentTurn < 1 || $currentTurn > 78) {
+                $errors[] = "Invalid current turn: {$currentTurn} (must be 1-78)";
             }
         }
 
-        if (isset((is_array($data) && isset($data['total_turns']) ? $data['total_turns'] : null))) {
-            if ((is_array($data) && isset($data['total_turns']) ? $data['total_turns'] : null) < 1 || (is_array($data) && isset($data['total_turns']) ? $data['total_turns'] : null) > 78) {
-                $errors[] = "Invalid total turns: {(is_array($data) && isset($data['total_turns']) ? $data['total_turns'] : null)} (must be 1-78)";
+        if (isset($data['total_turns'])) {
+            $totalTurns = is_int($data['total_turns']) ? $data['total_turns'] : 0;
+            if ($totalTurns < 1 || $totalTurns > 78) {
+                $errors[] = "Invalid total turns: {$totalTurns} (must be 1-78)";
             }
         }
 
-        if (isset((is_array($data) && isset($data['current_turn']) ? $data['current_turn'] : null), (is_array($data) && isset($data['total_turns']) ? $data['total_turns'] : null)) && (is_array($data) && isset($data['current_turn']) ? $data['current_turn'] : null) > (is_array($data) && isset($data['total_turns']) ? $data['total_turns'] : null)) {
-            $errors[] = "Current turn ({(is_array($data) && isset($data['current_turn']) ? $data['current_turn'] : null)}) exceeds total turns ({(is_array($data) && isset($data['total_turns']) ? $data['total_turns'] : null)})";
+        if (isset($data['current_turn'], $data['total_turns'])) {
+            $currentTurn = is_int($data['current_turn']) ? $data['current_turn'] : 0;
+            $totalTurns = is_int($data['total_turns']) ? $data['total_turns'] : 0;
+            if ($currentTurn > $totalTurns) {
+                $errors[] = "Current turn ({$currentTurn}) exceeds total turns ({$totalTurns})";
+            }
         }
 
         return [
@@ -176,40 +188,47 @@ class DataValidationService
      * @param  array<string, mixed>  $data
      * @return array{valid: bool, errors: array<string>, warnings: array<string>}
      */
-    public function validateTrainingSession(): array
+    public function validateTrainingSession(array $data): array
+    {
         $errors = [];
         $warnings = [];
 
         // Validate training type
-        if (isset((is_array($data) && isset($data['training_type']) ? $data['training_type'] : null))) {
-            if (! \in_array((is_array($data) && isset($data['training_type']) ? $data['training_type'] : null), self::VALID_TRAINING_TYPES, true)) {
-                $errors[] = "Invalid training type: {(is_array($data) && isset($data['training_type']) ? $data['training_type'] : null)} (must be one of: ".\implode(', ', self::VALID_TRAINING_TYPES).')';
+        if (isset($data['training_type'])) {
+            $trainingType = is_string($data['training_type']) ? $data['training_type'] : '';
+            if (! \in_array($trainingType, self::VALID_TRAINING_TYPES, true)) {
+                $errors[] = "Invalid training type: {$trainingType} (must be one of: ".\implode(', ', self::VALID_TRAINING_TYPES).')';
             }
         } else {
             $warnings[] = 'Training type not extracted';
         }
 
         // Validate stat gains
-        if (isset((is_array($data) && isset($data['stat_gains']) ? $data['stat_gains'] : null))) {
-            if (! \is_array((is_array($data) && isset($data['stat_gains']) ? $data['stat_gains'] : null))) {
+        if (isset($data['stat_gains'])) {
+            if (! \is_array($data['stat_gains'])) {
                 $errors[] = 'Stat gains must be an array';
             } else {
-                foreach ((is_array($data) && isset($data['stat_gains']) ? $data['stat_gains'] : null) as $stat => $gain) {
-                    if (! \in_array($stat, self::VALID_STATS, true)) {
-                        $errors[] = "Invalid stat name in gains: {$stat}";
+                /** @var array<string, mixed> $statGains */
+                $statGains = $data['stat_gains'];
+                foreach ($statGains as $stat => $gain) {
+                    $statName = is_string($stat) ? $stat : '';
+                    $gainValue = is_int($gain) ? $gain : 0;
+
+                    if (! \in_array($statName, self::VALID_STATS, true)) {
+                        $errors[] = "Invalid stat name in gains: {$statName}";
                     }
 
-                    if ($gain < 0 || $gain > 200) {
-                        $errors[] = "Invalid stat gain for {$stat}: {$gain} (must be 0-200)";
+                    if ($gainValue < 0 || $gainValue > 200) {
+                        $errors[] = "Invalid stat gain for {$statName}: {$gainValue} (must be 0-200)";
                     }
 
                     // Warning for unusually high gains
-                    if ($gain > 100) {
-                        $warnings[] = "Unusually high {$stat} gain: {$gain}";
+                    if ($gainValue > 100) {
+                        $warnings[] = "Unusually high {$statName} gain: {$gainValue}";
                     }
                 }
 
-                if (empty((is_array($data) && isset($data['stat_gains']) ? $data['stat_gains'] : null))) {
+                if (empty($statGains)) {
                     $warnings[] = 'No stat gains extracted';
                 }
             }
@@ -218,14 +237,15 @@ class DataValidationService
         }
 
         // Validate energy cost
-        if (isset((is_array($data) && isset($data['energy_cost']) ? $data['energy_cost'] : null))) {
-            if (! $this->validatePercentage((is_array($data) && isset($data['energy_cost']) ? $data['energy_cost'] : null))) {
-                $errors[] = "Invalid energy cost: {(is_array($data) && isset($data['energy_cost']) ? $data['energy_cost'] : null)} (must be ".self::PERCENTAGE_MIN.'-'.self::PERCENTAGE_MAX.')';
+        if (isset($data['energy_cost'])) {
+            $energyCost = is_int($data['energy_cost']) ? $data['energy_cost'] : 0;
+            if (! $this->validatePercentage($energyCost)) {
+                $errors[] = "Invalid energy cost: {$energyCost} (must be ".self::PERCENTAGE_MIN.'-'.self::PERCENTAGE_MAX.')';
             }
 
             // Warning for high energy cost
-            if ((is_array($data) && isset($data['energy_cost']) ? $data['energy_cost'] : null) > 70) {
-                $warnings[] = "High energy cost: {(is_array($data) && isset($data['energy_cost']) ? $data['energy_cost'] : null)}%";
+            if ($energyCost > 70) {
+                $warnings[] = "High energy cost: {$energyCost}%";
             }
         }
 
@@ -249,71 +269,80 @@ class DataValidationService
      * @param  array<string, mixed>  $data
      * @return array{valid: bool, errors: array<string>, warnings: array<string>}
      */
-    public function validateRaceResult(): array
+    public function validateRaceResult(array $data): array
+    {
         $errors = [];
         $warnings = [];
 
         // Validate position
-        if (isset((is_array($data) && isset($data['position']) ? $data['position'] : null))) {
-            if ((is_array($data) && isset($data['position']) ? $data['position'] : null) < 1 || (is_array($data) && isset($data['position']) ? $data['position'] : null) > 18) {
-                $errors[] = "Invalid position: {(is_array($data) && isset($data['position']) ? $data['position'] : null)} (must be 1-18)";
+        if (isset($data['position'])) {
+            $position = is_int($data['position']) ? $data['position'] : 0;
+            if ($position < 1 || $position > 18) {
+                $errors[] = "Invalid position: {$position} (must be 1-18)";
             }
         } else {
             $warnings[] = 'Race position not extracted';
         }
 
         // Validate race name
-        if (! isset((is_array($data) && isset($data['race_name']) ? $data['race_name'] : null)) || empty((is_array($data) && isset($data['race_name']) ? $data['race_name'] : null))) {
+        if (! isset($data['race_name']) || empty($data['race_name'])) {
             $warnings[] = 'Race name not extracted';
         }
 
         // Validate race grade
-        if (isset((is_array($data) && isset($data['race_grade']) ? $data['race_grade'] : null))) {
-            if (! \in_array((is_array($data) && isset($data['race_grade']) ? $data['race_grade'] : null), self::VALID_RACE_GRADES, true)) {
-                $errors[] = "Invalid race grade: {(is_array($data) && isset($data['race_grade']) ? $data['race_grade'] : null)} (must be one of: ".\implode(', ', self::VALID_RACE_GRADES).')';
+        if (isset($data['race_grade'])) {
+            $raceGrade = is_string($data['race_grade']) ? $data['race_grade'] : '';
+            if (! \in_array($raceGrade, self::VALID_RACE_GRADES, true)) {
+                $errors[] = "Invalid race grade: {$raceGrade} (must be one of: ".\implode(', ', self::VALID_RACE_GRADES).')';
             }
         }
 
         // Validate distance
-        if (isset((is_array($data) && isset($data['distance']) ? $data['distance'] : null))) {
-            if ((is_array($data) && isset($data['distance']) ? $data['distance'] : null) < 1000 || (is_array($data) && isset($data['distance']) ? $data['distance'] : null) > 3600) {
-                $errors[] = "Invalid distance: {(is_array($data) && isset($data['distance']) ? $data['distance'] : null)} (must be 1000-3600m)";
+        if (isset($data['distance'])) {
+            $distance = is_int($data['distance']) ? $data['distance'] : 0;
+            if ($distance < 1000 || $distance > 3600) {
+                $errors[] = "Invalid distance: {$distance} (must be 1000-3600m)";
             }
         }
 
         // Validate distance category
-        if (isset((is_array($data) && isset($data['distance_category']) ? $data['distance_category'] : null))) {
-            if (! \in_array((is_array($data) && isset($data['distance_category']) ? $data['distance_category'] : null), self::VALID_DISTANCE_CATEGORIES, true)) {
-                $errors[] = "Invalid distance category: {(is_array($data) && isset($data['distance_category']) ? $data['distance_category'] : null)} (must be one of: ".\implode(', ', self::VALID_DISTANCE_CATEGORIES).')';
+        if (isset($data['distance_category'])) {
+            $distanceCategory = is_string($data['distance_category']) ? $data['distance_category'] : '';
+            if (! \in_array($distanceCategory, self::VALID_DISTANCE_CATEGORIES, true)) {
+                $errors[] = "Invalid distance category: {$distanceCategory} (must be one of: ".\implode(', ', self::VALID_DISTANCE_CATEGORIES).')';
             }
         }
 
         // Validate surface
-        if (isset((is_array($data) && isset($data['surface']) ? $data['surface'] : null))) {
-            if (! \in_array((is_array($data) && isset($data['surface']) ? $data['surface'] : null), self::VALID_SURFACES, true)) {
-                $errors[] = "Invalid surface: {(is_array($data) && isset($data['surface']) ? $data['surface'] : null)} (must be one of: ".\implode(', ', self::VALID_SURFACES).')';
+        if (isset($data['surface'])) {
+            $surface = is_string($data['surface']) ? $data['surface'] : '';
+            if (! \in_array($surface, self::VALID_SURFACES, true)) {
+                $errors[] = "Invalid surface: {$surface} (must be one of: ".\implode(', ', self::VALID_SURFACES).')';
             }
         }
 
         // Validate fans gained
-        if (isset((is_array($data) && isset($data['fans_gained']) ? $data['fans_gained'] : null))) {
-            if ((is_array($data) && isset($data['fans_gained']) ? $data['fans_gained'] : null) < 0 || (is_array($data) && isset($data['fans_gained']) ? $data['fans_gained'] : null) > 999999) {
-                $errors[] = "Invalid fans gained: {(is_array($data) && isset($data['fans_gained']) ? $data['fans_gained'] : null)} (must be 0-999999)";
+        if (isset($data['fans_gained'])) {
+            $fansGained = is_int($data['fans_gained']) ? $data['fans_gained'] : 0;
+            if ($fansGained < 0 || $fansGained > 999999) {
+                $errors[] = "Invalid fans gained: {$fansGained} (must be 0-999999)";
             }
         }
 
         // Validate skill points gained
-        if (isset((is_array($data) && isset($data['skill_points_gained']) ? $data['skill_points_gained'] : null))) {
-            if ((is_array($data) && isset($data['skill_points_gained']) ? $data['skill_points_gained'] : null) < 0 || (is_array($data) && isset($data['skill_points_gained']) ? $data['skill_points_gained'] : null) > 9999) {
-                $errors[] = "Invalid skill points gained: {(is_array($data) && isset($data['skill_points_gained']) ? $data['skill_points_gained'] : null)} (must be 0-9999)";
+        if (isset($data['skill_points_gained'])) {
+            $skillPointsGained = is_int($data['skill_points_gained']) ? $data['skill_points_gained'] : 0;
+            if ($skillPointsGained < 0 || $skillPointsGained > 9999) {
+                $errors[] = "Invalid skill points gained: {$skillPointsGained} (must be 0-9999)";
             }
         }
 
         // Validate outcome
-        if (isset((is_array($data) && isset($data['outcome']) ? $data['outcome'] : null))) {
+        if (isset($data['outcome'])) {
             $validOutcomes = ['victory', 'podium', 'top_5', 'defeat'];
-            if (! \in_array((is_array($data) && isset($data['outcome']) ? $data['outcome'] : null), $validOutcomes, true)) {
-                $errors[] = "Invalid outcome: {(is_array($data) && isset($data['outcome']) ? $data['outcome'] : null)} (must be one of: ".\implode(', ', $validOutcomes).')';
+            $outcome = is_string($data['outcome']) ? $data['outcome'] : '';
+            if (! \in_array($outcome, $validOutcomes, true)) {
+                $errors[] = "Invalid outcome: {$outcome} (must be one of: ".\implode(', ', $validOutcomes).')';
             }
         }
 
@@ -330,28 +359,39 @@ class DataValidationService
      * @param  array<string, mixed>  $data
      * @return array{valid: bool, errors: array<string>, warnings: array<string>}
      */
-    public function validateSkillList(): array
+    public function validateSkillList(array $data): array
+    {
         $errors = [];
         $warnings = [];
 
         // Validate total SP
-        if (isset((is_array($data) && isset($data['total_sp']) ? $data['total_sp'] : null))) {
-            if ((is_array($data) && isset($data['total_sp']) ? $data['total_sp'] : null) < 0 || (is_array($data) && isset($data['total_sp']) ? $data['total_sp'] : null) > 99999) {
-                $errors[] = "Invalid total SP: {(is_array($data) && isset($data['total_sp']) ? $data['total_sp'] : null)} (must be 0-99999)";
+        if (isset($data['total_sp'])) {
+            $totalSp = is_int($data['total_sp']) ? $data['total_sp'] : 0;
+            if ($totalSp < 0 || $totalSp > 99999) {
+                $errors[] = "Invalid total SP: {$totalSp} (must be 0-99999)";
             }
         }
 
         // Validate skills array
-        if (isset((is_array($data) && isset($data['skills']) ? $data['skills'] : null))) {
-            if (! \is_array((is_array($data) && isset($data['skills']) ? $data['skills'] : null))) {
+        if (isset($data['skills'])) {
+            if (! \is_array($data['skills'])) {
                 $errors[] = 'Skills must be an array';
             } else {
-                foreach ((is_array($data) && isset($data['skills']) ? $data['skills'] : null) as $index => $skill) {
-                    $skillErrors = $this->validateSkill($skill, $index);
+                /** @var array<int, mixed> $skills */
+                $skills = $data['skills'];
+                foreach ($skills as $index => $skill) {
+                    if (! is_array($skill)) {
+                        $errors[] = "Skill #{$index}: Invalid skill data type";
+
+                        continue;
+                    }
+                    /** @var array<string, mixed> $skillData */
+                    $skillData = $skill;
+                    $skillErrors = $this->validateSkill($skillData, (int) $index);
                     $errors = [...$errors, ...$skillErrors];
                 }
 
-                if (empty((is_array($data) && isset($data['skills']) ? $data['skills'] : null))) {
+                if (empty($skills)) {
                     $warnings[] = 'No skills extracted';
                 }
             }
@@ -360,13 +400,14 @@ class DataValidationService
         }
 
         // Validate skill count
-        if (isset((is_array($data) && isset($data['skill_count']) ? $data['skill_count'] : null))) {
-            if ((is_array($data) && isset($data['skill_count']) ? $data['skill_count'] : null) < 0 || (is_array($data) && isset($data['skill_count']) ? $data['skill_count'] : null) > 100) {
-                $errors[] = "Invalid skill count: {(is_array($data) && isset($data['skill_count']) ? $data['skill_count'] : null)} (must be 0-100)";
+        if (isset($data['skill_count'])) {
+            $skillCount = is_int($data['skill_count']) ? $data['skill_count'] : 0;
+            if ($skillCount < 0 || $skillCount > 100) {
+                $errors[] = "Invalid skill count: {$skillCount} (must be 0-100)";
             }
 
-            if (isset((is_array($data) && isset($data['skills']) ? $data['skills'] : null)) && (is_array($data) && isset($data['skill_count']) ? $data['skill_count'] : null) !== \count((is_array($data) && isset($data['skills']) ? $data['skills'] : null))) {
-                $warnings[] = "Skill count mismatch: reported {(is_array($data) && isset($data['skill_count']) ? $data['skill_count'] : null)}, found ".\count((is_array($data) && isset($data['skills']) ? $data['skills'] : null));
+            if (isset($data['skills']) && is_array($data['skills']) && $skillCount !== \count($data['skills'])) {
+                $warnings[] = "Skill count mismatch: reported {$skillCount}, found ".\count($data['skills']);
             }
         }
 
@@ -383,7 +424,8 @@ class DataValidationService
      * @param  array<string, mixed>  $skill
      * @return array<string>
      */
-    private function validateSkill(): array
+    private function validateSkill(array $skill, int $index): array
+    {
         $errors = [];
 
         // Validate skill name
@@ -393,15 +435,17 @@ class DataValidationService
 
         // Validate SP cost
         if (isset($skill['sp_cost'])) {
-            if ($skill['sp_cost'] < 0 || $skill['sp_cost'] > 500) {
-                $errors[] = "Skill #{$index}: Invalid SP cost {$skill['sp_cost']} (must be 0-500)";
+            $spCost = is_int($skill['sp_cost']) ? $skill['sp_cost'] : 0;
+            if ($spCost < 0 || $spCost > 500) {
+                $errors[] = "Skill #{$index}: Invalid SP cost {$spCost} (must be 0-500)";
             }
         }
 
         // Validate hint level
         if (isset($skill['hint_level'])) {
-            if ($skill['hint_level'] < 0 || $skill['hint_level'] > 5) {
-                $errors[] = "Skill #{$index}: Invalid hint level {$skill['hint_level']} (must be 0-5)";
+            $hintLevel = is_int($skill['hint_level']) ? $skill['hint_level'] : 0;
+            if ($hintLevel < 0 || $hintLevel > 5) {
+                $errors[] = "Skill #{$index}: Invalid hint level {$hintLevel} (must be 0-5)";
             }
         }
 

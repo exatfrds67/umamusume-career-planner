@@ -54,10 +54,12 @@ class DataValidationAgent
     /** @var array<int, array<string, mixed>> */
     private array $validationHistory = [];
 
-    private ?ConflictDetectionService $conflictDetectionService = null;
+    private ConflictDetectionService $conflictDetectionService;
 
     public function __construct(
+        /** @phpstan-ignore property.onlyWritten */
         private MCPClientService $mcpClient,
+        /** @phpstan-ignore property.onlyWritten */
         private DataValidationService $validationService,
         private DataQualityScoringService $qualityScoringService,
         ?ConflictDetectionService $conflictDetectionService = null
@@ -69,10 +71,13 @@ class DataValidationAgent
     /**
      * Validate data against schema and integrity rules
      *
+     * @param  string  $dataType  Type of data being validated
+     * @param  mixed  $data  Data to validate
      * @param  array<string, mixed>  $options  Additional validation options
      * @return array{valid: bool, score: float, grade: string, errors: array<string>, warnings: array<string>, report: array<string, mixed>}
      */
-    public function validate(): array
+    public function validate(string $dataType, mixed $data, array $options = []): array
+    {
         $startTime = microtime(true);
 
         Log::info('[DataValidationAgent] Starting validation', [
@@ -135,7 +140,8 @@ class DataValidationAgent
      * @param  array<array{type: string, data: mixed, options?: array<string, mixed>}>  $dataSets
      * @return array{success: bool, results: array<string, array<string, mixed>>, summary: array<string, mixed>}
      */
-    public function validateBatch(): array
+    public function validateBatch(array $dataSets): array
+    {
         $startTime = microtime(true);
 
         if (\count($dataSets) > self::MAX_BATCH_SIZE) {
@@ -148,18 +154,22 @@ class DataValidationAgent
         $totalScore = 0.0;
 
         foreach ($dataSets as $index => $dataSet) {
-            $type = $dataSet['type'] ?? 'unknown';
-            $data = (is_array($dataSet) && isset($dataSet['data']) ? $dataSet['data'] : null);
-            $options = $dataSet['options'] ?? [];
-            $key = $dataSet['key'] ?? "{$type}_{$index}";
+            if (! is_array($dataSet)) {
+                continue;
+            }
+            $type = isset($dataSet['type']) && is_string($dataSet['type']) ? $dataSet['type'] : 'unknown';
+            $data = $dataSet['data'] ?? null;
+            /** @var array<string, mixed> $options */
+            $options = isset($dataSet['options']) && is_array($dataSet['options']) ? $dataSet['options'] : [];
+            $key = isset($dataSet['key']) && is_string($dataSet['key']) ? $dataSet['key'] : "{$type}_{$index}";
 
             try {
                 $result = $this->validate($type, $data, $options);
                 $results[$key] = $result;
-                $result['valid'] ? $successCount = ($successCount ?? 0) + 1 : $failureCount = ($failureCount ?? 0) + 1;
-                $totalScore = ($totalScore ?? 0) + $result['score'];
+                $result['valid'] ? $successCount++ : $failureCount++;
+                $totalScore += $result['score'];
             } catch (\Exception $e) {
-                $failureCount = ($failureCount ?? 0) + 1;
+                $failureCount++;
                 $results[$key] = [
                     'valid' => false,
                     'score' => 0.0,
@@ -194,9 +204,12 @@ class DataValidationAgent
     /**
      * Validate data against schema definition
      *
+     * @param  string  $dataType  Type of data being validated
+     * @param  mixed  $data  Data to validate
      * @return array{valid: bool, errors: array<string>, warnings: array<string>, details: array<string, mixed>}
      */
-    protected function validateSchema(): array
+    protected function validateSchema(string $dataType, mixed $data): array
+    {
         $errors = [];
         $warnings = [];
         $details = [];
@@ -213,18 +226,27 @@ class DataValidationAgent
             return ['valid' => false, 'errors' => ['Data must be an array'], 'warnings' => [], 'details' => []];
         }
 
-        if (isset($schema['required_fields'])) {
-            $missingFields = $this->checkRequiredFields($data, $schema['required_fields']);
+        if (isset($schema['required_fields']) && is_array($schema['required_fields'])) {
+            /** @var array<string> $requiredFields */
+            $requiredFields = array_filter($schema['required_fields'], 'is_string');
+            $missingFields = $this->checkRequiredFields($data, $requiredFields);
             foreach ($missingFields as $field) {
                 $errors[] = "Required field missing: {$field}";
             }
-            $details['required_fields_check'] = ['required' => $schema['required_fields'], 'missing' => $missingFields];
+            $details['required_fields_check'] = ['required' => $requiredFields, 'missing' => $missingFields];
         }
 
-        if (isset($schema['field_types'])) {
-            $typeErrors = $this->checkFieldTypes($data, $schema['field_types']);
+        if (isset($schema['field_types']) && is_array($schema['field_types'])) {
+            /** @var array<string, string> $fieldTypes */
+            $fieldTypes = [];
+            foreach ($schema['field_types'] as $fieldName => $fieldType) {
+                if (is_string($fieldName) && is_string($fieldType)) {
+                    $fieldTypes[$fieldName] = $fieldType;
+                }
+            }
+            $typeErrors = $this->checkFieldTypes($data, $fieldTypes);
             $errors = [...$errors, ...$typeErrors];
-            $details['field_types_check'] = ['expected_types' => $schema['field_types'], 'errors' => $typeErrors];
+            $details['field_types_check'] = ['expected_types' => $fieldTypes, 'errors' => $typeErrors];
         }
 
         if (isset($schema['is_list']) && $schema['is_list'] && ! $this->isSequentialArray($data)) {
@@ -237,9 +259,12 @@ class DataValidationAgent
     /**
      * Validate data integrity
      *
+     * @param  string  $dataType  Type of data being validated
+     * @param  mixed  $data  Data to validate
      * @return array{valid: bool, errors: array<string>, warnings: array<string>, details: array<string, mixed>}
      */
-    protected function validateIntegrity(): array
+    protected function validateIntegrity(string $dataType, mixed $data): array
+    {
         $errors = [];
         $warnings = [];
         $details = [];
@@ -255,10 +280,11 @@ class DataValidationAgent
         }
 
         $schema = $this->getSchemaDefinition($dataType);
-        $integrityRules = $schema['integrity'] ?? [];
+        /** @phpstan-ignore function.alreadyNarrowedType */
+        $integrityRules = is_array($schema) && isset($schema['integrity']) && is_array($schema['integrity']) ? $schema['integrity'] : [];
 
-        if (isset($integrityRules['unique_field'])) {
-            $uniqueField = $integrityRules['unique_field'];
+        $uniqueField = $integrityRules['unique_field'] ?? null;
+        if (is_string($uniqueField)) {
             $duplicates = $this->findDuplicates($data, $uniqueField);
             if (! empty($duplicates)) {
                 $errors[] = "Duplicate values found in field '{$uniqueField}': ".\implode(', ', \array_slice($duplicates, 0, 5));
@@ -266,18 +292,24 @@ class DataValidationAgent
             $details['duplicates'] = ['field' => $uniqueField, 'count' => \count($duplicates)];
         }
 
-        if (isset($integrityRules['non_null_fields'])) {
-            $nullFields = $this->findNullFields($data, $integrityRules['non_null_fields']);
+        $nonNullFieldsRaw = $integrityRules['non_null_fields'] ?? null;
+        if (is_array($nonNullFieldsRaw)) {
+            /** @var array<string> $nonNullFields */
+            $nonNullFields = \array_values(\array_filter($nonNullFieldsRaw, 'is_string'));
+            $nullFields = $this->findNullFields($data, $nonNullFields);
             foreach ($nullFields as $field => $indices) {
-                $warnings[] = "Null values found in field '{$field}' at indices: ".\implode(', ', \array_slice($indices, 0, 5));
+                if (is_string($field) && is_array($indices)) {
+                    $warnings[] = "Null values found in field '{$field}' at indices: ".\implode(', ', \array_slice($indices, 0, 5));
+                }
             }
-            $details['null_check'] = ['fields_checked' => $integrityRules['non_null_fields'], 'null_found' => $nullFields];
+            $details['null_check'] = ['fields_checked' => $nonNullFields, 'null_found' => $nullFields];
         }
 
         $consistencyResult = $this->checkDataConsistency($data);
         $details['consistency'] = $consistencyResult;
-        if ($consistencyResult['inconsistencies'] > 0) {
-            $warnings[] = "Found {$consistencyResult['inconsistencies']} data type inconsistencies across records";
+        $inconsistencies = $consistencyResult['inconsistencies'] ?? 0;
+        if (is_int($inconsistencies) && $inconsistencies > 0) {
+            $warnings[] = "Found {$inconsistencies} data type inconsistencies across records";
         }
 
         return ['valid' => empty($errors), 'errors' => $errors, 'warnings' => $warnings, 'details' => $details];
@@ -286,10 +318,13 @@ class DataValidationAgent
     /**
      * Score data quality using the DataQualityScoringService
      *
-     * @param  array<string, mixed>  $options
+     * @param  string  $dataType  Type of data being scored
+     * @param  mixed  $data  Data to score
+     * @param  array<string, mixed>  $options  Additional options
      * @return array{score: float, grade: string, dimensions: array<string, float>, warnings: array<string>, recommendations: array<string>}
      */
-    protected function scoreDataQuality(): array
+    protected function scoreDataQuality(string $dataType, mixed $data, array $options = []): array
+    {
         $metadata = [
             'required_fields' => $this->getRequiredFields($dataType),
             'data_age_hours' => $options['data_age_hours'] ?? 0,
@@ -300,27 +335,34 @@ class DataValidationAgent
         $qualityResult = $this->qualityScoringService->calculateQualityScore($dataType, $data, $metadata);
         $warnings = [];
 
-        foreach ($qualityResult['dimensions'] as $dimension => $score) {
-            if ($score < self::QUALITY_ACCEPTABLE) {
-                $warnings[] = \sprintf('%s score is below acceptable threshold: %.2f%%', \ucfirst($dimension), $score);
+        $dimensions = is_array($qualityResult['dimensions'] ?? null) ? $qualityResult['dimensions'] : [];
+        foreach ($dimensions as $dimension => $score) {
+            if (! is_string($dimension) || ! is_numeric($score)) {
+                continue;
+            }
+            if ((float) $score < self::QUALITY_ACCEPTABLE) {
+                $warnings[] = \sprintf('%s score is below acceptable threshold: %.2f%%', \ucfirst($dimension), (float) $score);
             }
         }
 
         return [
-            'score' => $qualityResult['overall_score'],
-            'grade' => $qualityResult['grade'],
-            'dimensions' => $qualityResult['dimensions'],
+            'score' => is_numeric($qualityResult['overall_score'] ?? null) ? (float) $qualityResult['overall_score'] : 0.0,
+            'grade' => is_string($qualityResult['grade'] ?? null) ? $qualityResult['grade'] : 'F',
+            'dimensions' => $dimensions,
             'warnings' => $warnings,
-            'recommendations' => $qualityResult['recommendations'],
+            'recommendations' => is_array($qualityResult['recommendations'] ?? null) ? $qualityResult['recommendations'] : [],
         ];
     }
 
     /**
      * Validate business rules specific to data type
      *
+     * @param  string  $dataType  Type of data being validated
+     * @param  mixed  $data  Data to validate
      * @return array{valid: bool, errors: array<string>, warnings: array<string>, details: array<string, mixed>}
      */
-    protected function validateBusinessRules(): array
+    protected function validateBusinessRules(string $dataType, mixed $data): array
+    {
         $errors = [];
         $warnings = [];
         $details = [];
@@ -330,16 +372,35 @@ class DataValidationAgent
         }
 
         $schema = $this->getSchemaDefinition($dataType);
-        $businessRules = $schema['business'] ?? [];
+        /** @phpstan-ignore function.alreadyNarrowedType */
+        $businessRules = is_array($schema) && isset($schema['business']) && is_array($schema['business']) ? $schema['business'] : [];
 
-        if (isset($businessRules['value_ranges'])) {
-            $rangeErrors = $this->validateValueRanges($data, $businessRules['value_ranges']);
+        $valueRangesRaw = $businessRules['value_ranges'] ?? null;
+        if (is_array($valueRangesRaw)) {
+            /** @var array<string, array{min?: int|float, max?: int|float}> $valueRanges */
+            $valueRanges = [];
+            foreach ($valueRangesRaw as $field => $range) {
+                if (is_string($field) && is_array($range)) {
+                    $min = isset($range['min']) && (is_int($range['min']) || is_float($range['min'])) ? $range['min'] : null;
+                    $max = isset($range['max']) && (is_int($range['max']) || is_float($range['max'])) ? $range['max'] : null;
+                    $valueRanges[$field] = array_filter(['min' => $min, 'max' => $max], fn ($v) => $v !== null);
+                }
+            }
+            $rangeErrors = $this->validateValueRanges($data, $valueRanges);
             $errors = [...$errors, ...$rangeErrors];
             $details['value_ranges'] = ['errors' => $rangeErrors];
         }
 
-        if (isset($businessRules['enum_fields'])) {
-            $enumErrors = $this->validateEnumFields($data, $businessRules['enum_fields']);
+        $enumFieldsRaw = $businessRules['enum_fields'] ?? null;
+        if (is_array($enumFieldsRaw)) {
+            /** @var array<string, array<string>> $enumFields */
+            $enumFields = [];
+            foreach ($enumFieldsRaw as $field => $values) {
+                if (is_string($field) && is_array($values)) {
+                    $enumFields[$field] = array_filter($values, 'is_string');
+                }
+            }
+            $enumErrors = $this->validateEnumFields($data, $enumFields);
             $errors = [...$errors, ...$enumErrors];
             $details['enum_fields'] = ['errors' => $enumErrors];
         }
@@ -355,17 +416,26 @@ class DataValidationAgent
     /**
      * Generate comprehensive validation report
      *
-     * @param  array<string, mixed>  $details
+     * @param  string  $dataType  Type of data being reported
+     * @param  mixed  $data  Data being reported
+     * @param  array<string, mixed>  $details  Validation details
+     * @param  float  $durationMs  Duration in milliseconds
      * @return array<string, mixed>
      */
-    protected function generateValidationReport(): array
+    protected function generateValidationReport(string $dataType, mixed $data, array $details, float $durationMs): array
+    {
         $dataSize = \is_array($data) ? \count($data) : 0;
         $totalErrors = 0;
         $totalWarnings = 0;
 
         foreach ($details as $sectionDetails) {
-            $totalErrors = ($totalErrors ?? 0) + \count($sectionDetails['errors'] ?? []);
-            $totalWarnings = ($totalWarnings ?? 0) + \count($sectionDetails['warnings'] ?? []);
+            if (! is_array($sectionDetails)) {
+                continue;
+            }
+            $sectionErrors = $sectionDetails['errors'] ?? [];
+            $sectionWarnings = $sectionDetails['warnings'] ?? [];
+            $totalErrors += is_array($sectionErrors) ? \count($sectionErrors) : 0;
+            $totalWarnings += is_array($sectionWarnings) ? \count($sectionWarnings) : 0;
         }
 
         $report = [
@@ -383,15 +453,20 @@ class DataValidationAgent
         ];
 
         foreach ($details as $section => $sectionDetails) {
+            if (! is_string($section) || ! is_array($sectionDetails)) {
+                continue;
+            }
+            $sectionErrors = $sectionDetails['errors'] ?? [];
+            $sectionWarnings = $sectionDetails['warnings'] ?? [];
             $report['sections'][$section] = [
                 'name' => $section,
-                'passed' => empty($sectionDetails['errors'] ?? []),
-                'error_count' => \count($sectionDetails['errors'] ?? []),
-                'warning_count' => \count($sectionDetails['warnings'] ?? []),
+                'passed' => empty($sectionErrors),
+                'error_count' => is_array($sectionErrors) ? \count($sectionErrors) : 0,
+                'warning_count' => is_array($sectionWarnings) ? \count($sectionWarnings) : 0,
             ];
         }
 
-        if (isset($details['quality'])) {
+        if (isset($details['quality']) && is_array($details['quality'])) {
             $report['quality_metrics'] = [
                 'overall_score' => $details['quality']['score'] ?? 0,
                 'grade' => $details['quality']['grade'] ?? 'N/A',
@@ -408,27 +483,37 @@ class DataValidationAgent
      * @param  array<string, mixed>  $details
      * @return array<string>
      */
-    protected function generateRecommendations(): array
+    protected function generateRecommendations(array $details): array
+    {
         $recommendations = [];
 
-        if (isset($details['schema']['details']['required_fields_check']['missing'])) {
-            $missing = $details['schema']['details']['required_fields_check']['missing'];
-            if (! empty($missing)) {
-                $recommendations[] = 'Ensure all required fields are populated: '.\implode(', ', $missing);
-            }
+        $schemaDetails = is_array($details['schema'] ?? null) && is_array($details['schema']['details'] ?? null) ? $details['schema']['details'] : [];
+        $requiredFieldsCheck = is_array($schemaDetails['required_fields_check'] ?? null) ? $schemaDetails['required_fields_check'] : [];
+        $missingFields = is_array($requiredFieldsCheck['missing'] ?? null) ? $requiredFieldsCheck['missing'] : [];
+        if (! empty($missingFields)) {
+            $recommendations[] = 'Ensure all required fields are populated: '.\implode(', ', $missingFields);
         }
 
-        if (isset($details['integrity']['details']['duplicates']['count']) && $details['integrity']['details']['duplicates']['count'] > 0) {
-            $field = $details['integrity']['details']['duplicates']['field'];
+        $integrityDetails = is_array($details['integrity'] ?? null) && is_array($details['integrity']['details'] ?? null) ? $details['integrity']['details'] : [];
+        $duplicatesInfo = is_array($integrityDetails['duplicates'] ?? null) ? $integrityDetails['duplicates'] : [];
+        $duplicatesCount = $duplicatesInfo['count'] ?? 0;
+        if (is_int($duplicatesCount) && $duplicatesCount > 0) {
+            $field = is_string($duplicatesInfo['field'] ?? null) ? $duplicatesInfo['field'] : 'unknown';
             $recommendations[] = "Remove duplicate entries in field '{$field}'";
         }
 
-        if (isset($details['integrity']['details']['consistency']['inconsistencies']) && $details['integrity']['details']['consistency']['inconsistencies'] > 0) {
+        $consistencyInfo = is_array($integrityDetails['consistency'] ?? null) ? $integrityDetails['consistency'] : [];
+        $inconsistencies = $consistencyInfo['inconsistencies'] ?? 0;
+        if (is_int($inconsistencies) && $inconsistencies > 0) {
             $recommendations[] = 'Standardize data types across all records to improve consistency';
         }
 
-        if (isset($details['quality']['recommendations'])) {
-            $recommendations = [...$recommendations, ...$details['quality']['recommendations']];
+        $qualityDetails = is_array($details['quality'] ?? null) ? $details['quality'] : [];
+        $qualityRecommendations = is_array($qualityDetails['recommendations'] ?? null) ? $qualityDetails['recommendations'] : [];
+        foreach ($qualityRecommendations as $rec) {
+            if (is_string($rec)) {
+                $recommendations[] = $rec;
+            }
         }
 
         if (empty($recommendations)) {
@@ -450,20 +535,24 @@ class DataValidationAgent
         $weightedScore = 0.0;
 
         foreach ($weights as $section => $weight) {
-            if (! isset($details[$section])) {
+            if (! isset($details[$section]) || ! is_array($details[$section])) {
                 continue;
             }
 
-            $sectionScore = 100.0;
-            $sectionScore -= \min(\count($details[$section]['errors'] ?? []) * 15, 60);
-            $sectionScore -= \min(\count($details[$section]['warnings'] ?? []) * 5, 20);
+            $sectionData = $details[$section];
+            $sectionErrors = is_array($sectionData['errors'] ?? null) ? $sectionData['errors'] : [];
+            $sectionWarnings = is_array($sectionData['warnings'] ?? null) ? $sectionData['warnings'] : [];
 
-            if ($section === 'quality' && isset($details[$section]['score'])) {
-                $sectionScore = $details[$section]['score'];
+            $sectionScore = 100.0;
+            $sectionScore -= \min(\count($sectionErrors) * 15, 60);
+            $sectionScore -= \min(\count($sectionWarnings) * 5, 20);
+
+            if ($section === 'quality' && isset($sectionData['score']) && is_numeric($sectionData['score'])) {
+                $sectionScore = (float) $sectionData['score'];
             }
 
-            $weightedScore = ($weightedScore ?? 0) + \max(0, $sectionScore) * $weight;
-            $totalWeight = ($totalWeight ?? 0) + $weight;
+            $weightedScore += \max(0, $sectionScore) * $weight;
+            $totalWeight += $weight;
         }
 
         return $totalWeight > 0 ? round($weightedScore / $totalWeight, 2) : 0.0;
@@ -501,9 +590,11 @@ class DataValidationAgent
     /**
      * Get validation history
      *
+     * @param  int  $limit  Maximum number of history entries to return
      * @return array<int, array<string, mixed>>
      */
-    public function getValidationHistory(): array
+    public function getValidationHistory(int $limit = 100): array
+    {
         return \array_slice($this->validationHistory, -$limit);
     }
 
@@ -513,15 +604,20 @@ class DataValidationAgent
      * @return array{total: int, passed: int, failed: int, avg_score: float, pass_rate: float}
      */
     public function getValidationStatistics(): array
+    {
         $total = \count($this->validationHistory);
         $passed = 0;
         $totalScore = 0.0;
 
         foreach ($this->validationHistory as $entry) {
-            if ($entry['errors'] === 0) {
-                $passed = ($passed ?? 0) + 1;
+            $errorCount = $entry['errors'] ?? 0;
+            if (is_int($errorCount) && $errorCount === 0) {
+                $passed++;
             }
-            $totalScore = ($totalScore ?? 0) + $entry['score'];
+            $entryScore = $entry['score'] ?? 0;
+            if (is_numeric($entryScore)) {
+                $totalScore += (float) $entryScore;
+            }
         }
 
         return [
@@ -581,9 +677,11 @@ class DataValidationAgent
     /**
      * Get schema definition for a data type
      *
+     * @param  string  $dataType  Type of data
      * @return array<string, mixed>
      */
-    protected function getSchemaDefinition(): array
+    protected function getSchemaDefinition(string $dataType): array
+    {
         return $this->schemaDefinitions[$dataType] ?? [];
     }
 
@@ -601,10 +699,18 @@ class DataValidationAgent
     /**
      * Get required fields for a data type
      *
+     * @param  string  $dataType  Type of data
      * @return array<string>
      */
-    protected function getRequiredFields(): array
-        return $this->getSchemaDefinition($dataType)['required_fields'] ?? [];
+    protected function getRequiredFields(string $dataType): array
+    {
+        $schema = $this->getSchemaDefinition($dataType);
+        $requiredFields = $schema['required_fields'] ?? [];
+        if (! is_array($requiredFields)) {
+            return [];
+        }
+
+        return array_filter($requiredFields, 'is_string');
     }
 
     /**
@@ -614,7 +720,8 @@ class DataValidationAgent
      * @param  array<string>  $requiredFields
      * @return array<string>
      */
-    protected function checkRequiredFields(): array
+    protected function checkRequiredFields(array $data, array $requiredFields): array
+    {
         $missing = [];
         $items = $this->isSequentialArray($data) && ! empty($data) ? [$data[0]] : [$data];
 
@@ -623,7 +730,7 @@ class DataValidationAgent
                 continue;
             }
             foreach ($requiredFields as $field) {
-                if (! \array_key_exists($field, $item)) {
+                if (is_string($field) && ! \array_key_exists($field, $item)) {
                     $missing[] = $field;
                 }
             }
@@ -639,7 +746,8 @@ class DataValidationAgent
      * @param  array<string, string>  $expectedTypes
      * @return array<string>
      */
-    protected function checkFieldTypes(): array
+    protected function checkFieldTypes(array $data, array $expectedTypes): array
+    {
         $errors = [];
         $items = $this->isSequentialArray($data) ? $data : [$data];
 
@@ -648,7 +756,7 @@ class DataValidationAgent
                 continue;
             }
             foreach ($expectedTypes as $field => $expectedType) {
-                if (! isset($item[$field])) {
+                if (! is_string($field) || ! is_string($expectedType) || ! isset($item[$field])) {
                     continue;
                 }
                 $actualType = \gettype($item[$field]);
@@ -687,9 +795,11 @@ class DataValidationAgent
      * Find duplicate values in a field
      *
      * @param  array<mixed>  $data
+     * @param  string  $field  Field to check for duplicates
      * @return array<mixed>
      */
-    protected function findDuplicates(): array
+    protected function findDuplicates(array $data, string $field): array
+    {
         $values = [];
         $duplicates = [];
 
@@ -715,15 +825,20 @@ class DataValidationAgent
      * @param  array<string>  $fields
      * @return array<string, array<int>>
      */
-    protected function findNullFields(): array
+    protected function findNullFields(array $data, array $fields): array
+    {
+        /** @var array<string, array<int>> $nullFields */
         $nullFields = [];
 
         foreach ($data as $index => $item) {
-            if (! \is_array($item)) {
+            if (! \is_array($item) || ! is_int($index)) {
                 continue;
             }
             foreach ($fields as $field) {
-                if (! isset($item[$field]) || $item[$field] === null) {
+                if (! is_string($field)) {
+                    continue;
+                }
+                if (! isset($item[$field])) {
                     if (! isset($nullFields[$field])) {
                         $nullFields[$field] = [];
                     }
@@ -741,7 +856,9 @@ class DataValidationAgent
      * @param  array<mixed>  $data
      * @return array{inconsistencies: int, field_types: array<string, array<string>>}
      */
-    protected function checkDataConsistency(): array
+    protected function checkDataConsistency(array $data): array
+    {
+        /** @var array<string, array<string>> $fieldTypes */
         $fieldTypes = [];
         $inconsistencies = 0;
 
@@ -750,12 +867,15 @@ class DataValidationAgent
                 continue;
             }
             foreach ($item as $field => $value) {
+                if (! is_string($field)) {
+                    continue;
+                }
                 $type = \gettype($value);
                 if (! isset($fieldTypes[$field])) {
                     $fieldTypes[$field] = [$type];
                 } elseif (! \in_array($type, $fieldTypes[$field], true)) {
                     $fieldTypes[$field][] = $type;
-                    $inconsistencies = ($inconsistencies ?? 0) + 1;
+                    $inconsistencies++;
                 }
             }
         }
@@ -770,7 +890,8 @@ class DataValidationAgent
      * @param  array<string, array{min?: int|float, max?: int|float}>  $ranges
      * @return array<string>
      */
-    protected function validateValueRanges(): array
+    protected function validateValueRanges(array $data, array $ranges): array
+    {
         $errors = [];
         $items = $this->isSequentialArray($data) ? $data : [$data];
 
@@ -802,7 +923,8 @@ class DataValidationAgent
      * @param  array<string, array<string>>  $enumFields
      * @return array<string>
      */
-    protected function validateEnumFields(): array
+    protected function validateEnumFields(array $data, array $enumFields): array
+    {
         $errors = [];
         $items = $this->isSequentialArray($data) ? $data : [$data];
 
@@ -826,22 +948,20 @@ class DataValidationAgent
     /**
      * Validate data type specific rules
      *
+     * @param  string  $dataType  Type of data being validated
      * @param  array<mixed>  $data
      * @return array{errors: array<string>, warnings: array<string>, details: array<string, mixed>}
      */
-    protected function validateDataTypeSpecificRules(): array
+    protected function validateDataTypeSpecificRules(string $dataType, array $data): array
+    {
         $errors = [];
         $warnings = [];
         $details = [];
 
-        if (! \is_array($data)) {
-            return ['errors' => [], 'warnings' => [], 'details' => []];
-        }
-
         switch ($dataType) {
             case 'umapyoi_characters':
                 foreach ($data as $index => $item) {
-                    if (\is_array($item) && isset($item['name']) && \strlen($item['name']) < 2) {
+                    if (\is_array($item) && isset($item['name']) && \is_string($item['name']) && \strlen($item['name']) < 2) {
                         $warnings[] = "Character name at index {$index} is very short";
                     }
                 }
@@ -851,7 +971,8 @@ class DataValidationAgent
             case 'umapyoi_support_cards':
                 foreach ($data as $index => $item) {
                     if (\is_array($item) && isset($item['rarity']) && ! \in_array($item['rarity'], ['SSR', 'SR', 'R'], true)) {
-                        $errors[] = "Invalid rarity at index {$index}: {$item['rarity']}";
+                        $rarity = is_scalar($item['rarity']) ? (string) $item['rarity'] : 'unknown';
+                        $errors[] = "Invalid rarity at index {$index}: {$rarity}";
                     }
                 }
                 $details['support_card_validation'] = true;
@@ -861,8 +982,11 @@ class DataValidationAgent
                 foreach ($data as $index => $item) {
                     if (\is_array($item) && isset($item['distance'])) {
                         $distance = $item['distance'];
-                        if ($distance < 1000 || $distance > 3600) {
-                            $errors[] = "Invalid race distance at index {$index}: {$distance}m";
+                        if (is_numeric($distance)) {
+                            $distanceNum = (int) $distance;
+                            if ($distanceNum < 1000 || $distanceNum > 3600) {
+                                $errors[] = "Invalid race distance at index {$index}: {$distanceNum}m";
+                            }
                         }
                     }
                 }
@@ -884,7 +1008,8 @@ class DataValidationAgent
      * @param  array<string, array{data: mixed, source: string, timestamp?: string, metadata?: array<string, mixed>}>  $sources
      * @return array{has_conflicts: bool, conflicts: array<string, array<string, mixed>>, summary: array<string, mixed>}
      */
-    public function detectConflicts(): array
+    public function detectConflicts(array $sources): array
+    {
         Log::info('[DataValidationAgent] Detecting conflicts between sources', [
             'sources_count' => \count($sources),
             'source_names' => array_keys($sources),
@@ -900,9 +1025,11 @@ class DataValidationAgent
      *
      * @param  array<string, array<string, mixed>>  $conflicts
      * @param  array<string, array{data: mixed, source: string, timestamp?: string, metadata?: array<string, mixed>}>  $sources
+     * @param  string  $strategy  Resolution strategy to use
      * @return array{resolved_data: mixed, resolution_log: array<string, mixed>}
      */
-    public function resolveConflicts(): array
+    public function resolveConflicts(array $conflicts, array $sources, string $strategy = 'highest_confidence'): array
+    {
         Log::info('[DataValidationAgent] Resolving conflicts', [
             'conflict_count' => \count($conflicts),
             'strategy' => $strategy,
@@ -916,10 +1043,13 @@ class DataValidationAgent
      *
      * Task: 3.2.2 - Combined validation and conflict resolution
      *
+     * @param  string  $dataType  Type of data being validated
      * @param  array<string, array{data: mixed, source: string, timestamp?: string, metadata?: array<string, mixed>}>  $sources
+     * @param  string  $strategy  Resolution strategy to use
      * @return array{data: mixed, has_conflicts: bool, conflicts: array<string, mixed>, resolution: array<string, mixed>, validation: array<string, mixed>}
      */
-    public function validateAndResolveMultiSource(): array
+    public function validateAndResolveMultiSource(string $dataType, array $sources, string $strategy = 'highest_confidence'): array
+    {
         $startTime = microtime(true);
 
         Log::info('[DataValidationAgent] Starting multi-source validation and conflict resolution', [
@@ -957,7 +1087,7 @@ class DataValidationAgent
      *
      * Task: 3.2.2 - Add confidence scoring
      *
-     * @param  array{data: mixed, source: string, timestamp?: string, metadata?: array<string, mixed>}  $sourceData
+     * @param  array{data?: mixed, source?: string, timestamp?: string, metadata?: array<string, mixed>}  $sourceData
      */
     public function getSourceConfidence(string $sourceName, array $sourceData = []): float
     {
@@ -970,6 +1100,7 @@ class DataValidationAgent
      * @return array<string, float>
      */
     public function getAllSourceConfidences(): array
+    {
         return $this->conflictDetectionService->getAllSourceConfidences();
     }
 
@@ -979,15 +1110,18 @@ class DataValidationAgent
      * @return array{total: int, by_severity: array<string, int>, by_type: array<string, int>, avg_per_detection: float}
      */
     public function getConflictStatistics(): array
+    {
         return $this->conflictDetectionService->getConflictStatistics();
     }
 
     /**
      * Get conflict history
      *
+     * @param  int  $limit  Maximum number of history entries to return
      * @return array<int, array<string, mixed>>
      */
-    public function getConflictHistory(): array
+    public function getConflictHistory(int $limit = 100): array
+    {
         return $this->conflictDetectionService->getConflictHistory($limit);
     }
 }

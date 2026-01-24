@@ -63,7 +63,8 @@ class PerformanceAnalyticsAgent
      *     optimization_score: float
      * }
      */
-    public function analyzePerformance(): array
+    public function analyzePerformance(Character $character, array $context = []): array
+    {
         // Analyze energy state
         $energyAnalysis = $this->analyzeEnergyState($character);
 
@@ -112,7 +113,8 @@ class PerformanceAnalyticsAgent
      *
      * @return array<string, mixed>
      */
-    protected function analyzeEnergyState(): array
+    protected function analyzeEnergyState(Character $character): array
+    {
         $energyLevel = $character->energy_level ?? 100;
 
         // Determine energy status
@@ -160,7 +162,8 @@ class PerformanceAnalyticsAgent
      *
      * @return array{trainings_available: int, max_intensity: string}
      */
-    protected function calculateTrainingCapacity(): array
+    protected function calculateTrainingCapacity(int $energyLevel): array
+    {
         // Each training costs ~20 energy
         $trainingsAvailable = (int) floor($energyLevel / 20);
 
@@ -197,7 +200,8 @@ class PerformanceAnalyticsAgent
      *
      * @return array{action: string, turns_needed: int, priority: string}
      */
-    protected function determineRecoveryStrategy(): array
+    protected function determineRecoveryStrategy(int $energyLevel): array
+    {
         return match (true) {
             $energyLevel < 20 => [
                 'action' => 'immediate_rest',
@@ -228,6 +232,7 @@ class PerformanceAnalyticsAgent
      * @return array{min: int, max: int}
      */
     protected function getOptimalEnergyRange(): array
+    {
         return ['min' => 60, 'max' => 100];
     }
 
@@ -236,7 +241,8 @@ class PerformanceAnalyticsAgent
      *
      * @return array<string, mixed>
      */
-    protected function analyzeMoodState(): array
+    protected function analyzeMoodState(Character $character): array
+    {
         $moodStatus = $character->mood_status ?? 'normal';
 
         // Get mood effects
@@ -267,7 +273,8 @@ class PerformanceAnalyticsAgent
      * @param  array{multiplier: float, energy_cost_modifier: float, failure_risk_modifier: float}  $effects
      * @return array<string, mixed>
      */
-    protected function calculateMoodTrainingImpact(): array
+    protected function calculateMoodTrainingImpact(array $effects): array
+    {
         $multiplier = $effects['multiplier'];
         $impactPercent = ($multiplier - 1.0) * 100;
 
@@ -297,9 +304,10 @@ class PerformanceAnalyticsAgent
     /**
      * Determine mood improvement strategy
      *
-     * @return array{action: string, priority: string, methods: array<string>}
+     * @return array{action: string, priority: string, methods: array<int, string>}
      */
-    protected function determineMoodImprovementStrategy(): array
+    protected function determineMoodImprovementStrategy(string $moodStatus): array
+    {
         return match ($moodStatus) {
             'awful' => [
                 'action' => 'urgent_improvement',
@@ -350,17 +358,25 @@ class PerformanceAnalyticsAgent
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    protected function analyzeConditions(): array
-        $activeConditions = $context['active_conditions'] ?? [];
+    protected function analyzeConditions(Character $character, array $context): array
+    {
+        /** @var array<int, string> $activeConditions */
+        $activeConditions = is_array($context['active_conditions'] ?? null) ? $context['active_conditions'] : [];
 
+        /** @var array<int, array{name: string, effect: string, impact: float}> $positiveConditions */
         $positiveConditions = [];
+        /** @var array<int, array{name: string, effect: string, impact: float}> $negativeConditions */
         $negativeConditions = [];
         $totalImpact = 0.0;
 
         foreach ($activeConditions as $condition) {
+            if (! is_string($condition)) {
+                continue;
+            }
+
             $conditionData = $this->conditionEffects[$condition] ?? null;
 
-            if ($conditionData) {
+            if ($conditionData !== null) {
                 if ($conditionData['type'] === 'positive') {
                     $positiveConditions[] = [
                         'name' => $condition,
@@ -375,7 +391,7 @@ class PerformanceAnalyticsAgent
                     ];
                 }
 
-                $totalImpact = ($totalImpact ?? 0) + $conditionData['impact'];
+                $totalImpact += $conditionData['impact'];
             }
         }
 
@@ -410,12 +426,25 @@ class PerformanceAnalyticsAgent
      * @param  array<string, mixed>  $conditionAnalysis
      * @return array<string, mixed>
      */
-    protected function calculatePerformanceMetrics(): array
+    protected function calculatePerformanceMetrics(
+        Character $character,
+        array $energyAnalysis,
+        array $moodAnalysis,
+        array $conditionAnalysis
+    ): array {
         // Calculate overall training effectiveness
         $baseEffectiveness = 1.0;
-        $moodMultiplier = $moodAnalysis['effects']['multiplier'];
-        $conditionImpact = $conditionAnalysis['total_impact'];
-        $energyModifier = $this->getEnergyEffectivenessModifier($energyAnalysis['current_energy']);
+
+        $moodEffects = is_array($moodAnalysis['effects'] ?? null) ? $moodAnalysis['effects'] : [];
+        $moodMultiplierValue = $moodEffects['multiplier'] ?? null;
+        $moodMultiplier = is_numeric($moodMultiplierValue) ? (float) $moodMultiplierValue : 1.0;
+
+        $conditionImpactValue = $conditionAnalysis['total_impact'] ?? null;
+        $conditionImpact = is_numeric($conditionImpactValue) ? (float) $conditionImpactValue : 0.0;
+
+        $currentEnergyValue = $energyAnalysis['current_energy'] ?? null;
+        $currentEnergy = is_numeric($currentEnergyValue) ? (int) $currentEnergyValue : 100;
+        $energyModifier = $this->getEnergyEffectivenessModifier($currentEnergy);
 
         $overallEffectiveness = $baseEffectiveness * $moodMultiplier * (1 + $conditionImpact) * $energyModifier;
 
@@ -460,11 +489,18 @@ class PerformanceAnalyticsAgent
      * @param  array<string, mixed>  $conditionAnalysis
      * @return array<string, mixed>
      */
-    protected function calculateRiskFactors(): array
+    protected function calculateRiskFactors(
+        array $energyAnalysis,
+        array $moodAnalysis,
+        array $conditionAnalysis
+    ): array {
+        /** @var array<int, array{type: string, severity: string, description: string}> $risks */
         $risks = [];
 
         // Energy risk
-        if ($energyAnalysis['failure_risk'] > 0.15) {
+        $failureRiskValue = $energyAnalysis['failure_risk'] ?? null;
+        $failureRisk = is_numeric($failureRiskValue) ? (float) $failureRiskValue : 0.0;
+        if ($failureRisk > 0.15) {
             $risks[] = [
                 'type' => 'energy',
                 'severity' => 'high',
@@ -473,7 +509,9 @@ class PerformanceAnalyticsAgent
         }
 
         // Mood risk
-        if ($moodAnalysis['current_mood'] === 'awful' || $moodAnalysis['current_mood'] === 'bad') {
+        $currentMoodValue = $moodAnalysis['current_mood'] ?? null;
+        $currentMood = is_string($currentMoodValue) ? $currentMoodValue : 'normal';
+        if ($currentMood === 'awful' || $currentMood === 'bad') {
             $risks[] = [
                 'type' => 'mood',
                 'severity' => 'medium',
@@ -482,7 +520,10 @@ class PerformanceAnalyticsAgent
         }
 
         // Condition risk
-        if (count($conditionAnalysis['negative_conditions']) > 0) {
+        $negativeConditions = is_array($conditionAnalysis['negative_conditions'] ?? null)
+            ? $conditionAnalysis['negative_conditions']
+            : [];
+        if (count($negativeConditions) > 0) {
             $risks[] = [
                 'type' => 'conditions',
                 'severity' => 'medium',
@@ -518,36 +559,52 @@ class PerformanceAnalyticsAgent
      * @param  array<string, mixed>  $conditionAnalysis
      * @return array<string, mixed>
      */
-    protected function calculateOptimizationPotential(): array
+    protected function calculateOptimizationPotential(
+        array $energyAnalysis,
+        array $moodAnalysis,
+        array $conditionAnalysis
+    ): array {
+        /** @var array<string, array<string, mixed>> $improvements */
         $improvements = [];
 
         // Energy optimization
-        if (! $energyAnalysis['is_optimal']) {
+        $isEnergyOptimal = isset($energyAnalysis['is_optimal']) ? (bool) $energyAnalysis['is_optimal'] : true;
+        if (! $isEnergyOptimal) {
             $improvements['energy'] = [
-                'current' => $energyAnalysis['current_energy'],
-                'optimal' => $energyAnalysis['optimal_range'],
+                'current' => $energyAnalysis['current_energy'] ?? 100,
+                'optimal' => $energyAnalysis['optimal_range'] ?? ['min' => 60, 'max' => 100],
                 'potential_gain' => 0.15,
             ];
         }
 
         // Mood optimization
-        if (! $moodAnalysis['is_optimal']) {
+        $isMoodOptimal = isset($moodAnalysis['is_optimal']) ? (bool) $moodAnalysis['is_optimal'] : true;
+        if (! $isMoodOptimal) {
             $improvements['mood'] = [
-                'current' => $moodAnalysis['current_mood'],
+                'current' => $moodAnalysis['current_mood'] ?? 'normal',
                 'optimal' => 'great',
                 'potential_gain' => 0.20,
             ];
         }
 
         // Condition optimization
-        if (count($conditionAnalysis['negative_conditions']) > 0) {
+        $negativeConditions = is_array($conditionAnalysis['negative_conditions'] ?? null)
+            ? $conditionAnalysis['negative_conditions']
+            : [];
+        if (count($negativeConditions) > 0) {
             $improvements['conditions'] = [
-                'negative_count' => count($conditionAnalysis['negative_conditions']),
+                'negative_count' => count($negativeConditions),
                 'potential_gain' => 0.10,
             ];
         }
 
-        $totalPotential = array_sum(array_column($improvements, 'potential_gain'));
+        $totalPotential = 0.0;
+        foreach ($improvements as $improvement) {
+            if (is_array($improvement) && isset($improvement['potential_gain'])) {
+                $potentialGainValue = $improvement['potential_gain'];
+                $totalPotential += is_numeric($potentialGainValue) ? (float) $potentialGainValue : 0.0;
+            }
+        }
 
         return [
             'improvements' => $improvements,
@@ -592,11 +649,19 @@ class PerformanceAnalyticsAgent
      * @param  array<string, mixed>  $performanceMetrics
      * @return array<string, string>
      */
-    protected function generatePerformanceRecommendations(): array
+    protected function generatePerformanceRecommendations(
+        Character $character,
+        array $energyAnalysis,
+        array $moodAnalysis,
+        array $conditionAnalysis,
+        array $performanceMetrics
+    ): array {
+        /** @var array<string, string> $recommendations */
         $recommendations = [];
 
         // Energy recommendations
-        $energyStatus = $energyAnalysis['status'];
+        $energyStatusValue = $energyAnalysis['status'] ?? null;
+        $energyStatus = is_string($energyStatusValue) ? $energyStatusValue : 'good';
         if ($energyStatus === 'critical' || $energyStatus === 'low') {
             $recommendations['energy'] = 'URGENT: Rest immediately. Energy is too low for safe training.';
         } elseif ($energyStatus === 'moderate') {
@@ -606,7 +671,8 @@ class PerformanceAnalyticsAgent
         }
 
         // Mood recommendations
-        $moodStatus = $moodAnalysis['current_mood'];
+        $moodStatusValue = $moodAnalysis['current_mood'] ?? null;
+        $moodStatus = is_string($moodStatusValue) ? $moodStatusValue : 'normal';
         if ($moodStatus === 'awful' || $moodStatus === 'bad') {
             $recommendations['mood'] = 'Poor mood significantly reduces training effectiveness. Prioritize mood improvement.';
         } elseif ($moodStatus === 'great') {
@@ -614,20 +680,34 @@ class PerformanceAnalyticsAgent
         }
 
         // Condition recommendations
-        if (count($conditionAnalysis['negative_conditions']) > 0) {
+        $negativeConditions = is_array($conditionAnalysis['negative_conditions'] ?? null)
+            ? $conditionAnalysis['negative_conditions']
+            : [];
+        $positiveConditions = is_array($conditionAnalysis['positive_conditions'] ?? null)
+            ? $conditionAnalysis['positive_conditions']
+            : [];
+
+        if (count($negativeConditions) > 0) {
             $recommendations['conditions'] = 'Negative conditions active. Consider waiting or using items to remove them.';
-        } elseif (count($conditionAnalysis['positive_conditions']) > 0) {
+        } elseif (count($positiveConditions) > 0) {
             $recommendations['conditions'] = 'Positive conditions active! Take advantage of enhanced training effectiveness.';
         }
 
         // Performance optimization recommendations
-        $optimizationPotential = $performanceMetrics['optimization_potential'];
-        if ($optimizationPotential['total_potential_gain'] > 0.20) {
+        $optimizationPotential = is_array($performanceMetrics['optimization_potential'] ?? null)
+            ? $performanceMetrics['optimization_potential']
+            : [];
+        $totalPotentialGainValue = $optimizationPotential['total_potential_gain'] ?? null;
+        $totalPotentialGain = is_numeric($totalPotentialGainValue) ? (float) $totalPotentialGainValue : 0.0;
+
+        if ($totalPotentialGain > 0.20) {
             $recommendations['optimization'] = 'Significant optimization potential available. Address energy, mood, and conditions for maximum effectiveness.';
         }
 
         // Overall strategy recommendation
-        $effectiveness = $performanceMetrics['overall_effectiveness'];
+        $effectivenessValue = $performanceMetrics['overall_effectiveness'] ?? null;
+        $effectiveness = is_numeric($effectivenessValue) ? (float) $effectivenessValue : 1.0;
+
         if ($effectiveness >= 1.15) {
             $recommendations['strategy'] = 'Performance is excellent! This is an ideal time for high-priority training.';
         } elseif ($effectiveness < 0.90) {
@@ -652,18 +732,23 @@ class PerformanceAnalyticsAgent
         $score = 0.0;
 
         // Energy component (40%)
-        $energyScore = $energyAnalysis['current_energy'] / 100;
-        $score = ($score ?? 0) + $energyScore * 0.4;
+        $currentEnergyValue = $energyAnalysis['current_energy'] ?? null;
+        $currentEnergy = is_numeric($currentEnergyValue) ? (int) $currentEnergyValue : 100;
+        $energyScore = $currentEnergy / 100;
+        $score += $energyScore * 0.4;
 
         // Mood component (30%)
-        $moodMultiplier = $moodAnalysis['effects']['multiplier'];
+        $moodEffects = is_array($moodAnalysis['effects'] ?? null) ? $moodAnalysis['effects'] : [];
+        $moodMultiplierValue = $moodEffects['multiplier'] ?? null;
+        $moodMultiplier = is_numeric($moodMultiplierValue) ? (float) $moodMultiplierValue : 1.0;
         $moodScore = ($moodMultiplier - 0.8) / 0.4; // Normalize 0.8-1.2 to 0-1
-        $score = ($score ?? 0) + $moodScore * 0.3;
+        $score += $moodScore * 0.3;
 
         // Performance component (30%)
-        $effectiveness = $performanceMetrics['overall_effectiveness'];
+        $performanceEffectivenessValue = $performanceMetrics['overall_effectiveness'] ?? null;
+        $effectiveness = is_numeric($performanceEffectivenessValue) ? (float) $performanceEffectivenessValue : 1.0;
         $performanceScore = min(1.0, $effectiveness / 1.2); // Normalize with 1.2 as max
-        $score = ($score ?? 0) + $performanceScore * 0.3;
+        $score += $performanceScore * 0.3;
 
         return round(min(1.0, $score), 2);
     }

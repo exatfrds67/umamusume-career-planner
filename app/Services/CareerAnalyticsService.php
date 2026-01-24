@@ -62,14 +62,16 @@ class CareerAnalyticsService
      *     average_final_grade: string,
      *     total_careers: int,
      *     completed_careers: int,
-     *     metrics_by_scenario: array<string, array>,
+     *     metrics_by_scenario: array<string, array<string, mixed>>,
      *     performance_trend: array<string, mixed>
      * }
      */
-    public function calculateCareerPerformanceMetrics(): array
+    public function calculateCareerPerformanceMetrics(Character $character): array
+    {
         $cacheKey = "analytics:career_performance:{$character->id}";
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($character) {
+        /** @var array{overall_efficiency: float, success_rate: float, completion_rate: float, average_final_grade: string, total_careers: int, completed_careers: int, metrics_by_scenario: array<string, array<string, mixed>>, performance_trend: array<string, mixed>} $result */
+        $result = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($character) {
             $careers = Career::where('character_id', $character->id)->get();
 
             if ($careers->isEmpty()) {
@@ -112,6 +114,8 @@ class CareerAnalyticsService
                 'performance_trend' => $performanceTrend,
             ];
         });
+
+        return $result;
     }
 
     /**
@@ -132,8 +136,8 @@ class CareerAnalyticsService
             $sessions = TrainingSession::where('career_id', $career->id)->get();
             if ($sessions->isNotEmpty()) {
                 $careerEfficiency = $this->calculateCareerEfficiency($sessions);
-                $totalEfficiency = ($totalEfficiency ?? 0) + $careerEfficiency;
-                $careerCount = ($careerCount ?? 0) + 1;
+                $totalEfficiency += $careerEfficiency;
+                $careerCount++;
             }
         }
 
@@ -151,7 +155,7 @@ class CareerAnalyticsService
         $totalTurns = $sessions->count();
 
         foreach ($sessions as $session) {
-            $totalStatGains = ($totalStatGains ?? 0) + ($session->speed_gain ?? 0)
+            $totalStatGains += ($session->speed_gain ?? 0)
                 + ($session->stamina_gain ?? 0)
                 + ($session->power_gain ?? 0)
                 + ($session->guts_gain ?? 0)
@@ -172,18 +176,8 @@ class CareerAnalyticsService
         // Check if career has performance analysis with success indicators
         $analysis = $career->performance_analysis ?? [];
 
-        if (isset($analysis['goals_achieved'])) {
+        if (is_array($analysis) && isset($analysis['goals_achieved'])) {
             return $analysis['goals_achieved'] === true;
-        }
-
-        // Check rating if available (safely)
-        try {
-            $rating = $career->rating;
-            if ($rating !== null) {
-                return $rating >= 4; // 4+ out of 5 is considered successful
-            }
-        } catch (\Throwable) {
-            // Rating attribute doesn't exist, continue to default check
         }
 
         // Default: check if completed
@@ -227,8 +221,8 @@ class CareerAnalyticsService
             $grade = (is_array($analysis) && isset($analysis['final_grade']) ? $analysis['final_grade'] : null);
 
             if ($grade && isset($gradeValues[$grade])) {
-                $totalValue = ($totalValue ?? 0) + $gradeValues[$grade];
-                $count = ($count ?? 0) + 1;
+                $totalValue += $gradeValues[$grade];
+                $count++;
             }
         }
 
@@ -254,9 +248,11 @@ class CareerAnalyticsService
     /**
      * Calculate metrics grouped by scenario type
      *
-     * @return array<string, array{count: int, success_rate: float, avg_efficiency: float}>
+     * @param  \Illuminate\Support\Collection<int, \App\Models\Career>  $careers
+     * @return array<string, array{count: int, completed: int, success_rate: float, avg_efficiency: float}>
      */
-    protected function calculateMetricsByScenario(): array
+    protected function calculateMetricsByScenario(Collection $careers): array
+    {
         $scenarios = ['ura_finale', 'unity_cup'];
         $result = [];
 
@@ -282,9 +278,11 @@ class CareerAnalyticsService
     /**
      * Calculate performance trend over completed careers
      *
-     * @return array{trend: string, improvement_rate: float, recent_performance: array}
+     * @param  \Illuminate\Support\Collection<int, \App\Models\Career>  $completedCareers
+     * @return array{trend: string, improvement_rate: float, recent_performance: array<int, array<string, mixed>>}
      */
-    protected function calculatePerformanceTrend(): array
+    protected function calculatePerformanceTrend(Collection $completedCareers): array
+    {
         if ($completedCareers->count() < 2) {
             return [
                 'trend' => 'insufficient_data',
@@ -348,14 +346,16 @@ class CareerAnalyticsService
      *     efficiency_rating: float,
      *     best_training_type: string,
      *     improvement_suggestions: array<string>,
-     *     stat_gain_distribution: array<string, array>,
-     *     training_type_effectiveness: array<string, array>
+     *     stat_gain_distribution: array<string, array<string, mixed>>,
+     *     training_type_effectiveness: array<string, array<string, mixed>>
      * }
      */
-    public function calculateStatEfficiency(): array
+    public function calculateStatEfficiency(Character $character): array
+    {
         $cacheKey = "analytics:stat_efficiency:{$character->id}";
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($character) {
+        /** @var array{average_gains_per_turn: array<string, float>, efficiency_rating: float, best_training_type: string, improvement_suggestions: array<string>, stat_gain_distribution: array<string, array<string, mixed>>, training_type_effectiveness: array<string, array<string, mixed>>} $result */
+        $result = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($character) {
             $sessions = TrainingSession::where('character_id', $character->id)
                 ->whereNotNull('training_type')
                 ->get();
@@ -369,7 +369,7 @@ class CareerAnalyticsService
 
             // Find best training type
             arsort($averageGains);
-            $bestType = array_key_first($averageGains);
+            $bestType = array_key_first($averageGains) ?? 'N/A';
 
             // Calculate efficiency rating
             $totalAverage = array_sum($averageGains);
@@ -390,6 +390,8 @@ class CareerAnalyticsService
                 'training_type_effectiveness' => $trainingTypeEffectiveness,
             ];
         });
+
+        return $result;
     }
 
     /**
@@ -398,7 +400,8 @@ class CareerAnalyticsService
      * @param  \Illuminate\Support\Collection<int, \App\Models\TrainingSession>  $sessions
      * @return array<string, float>
      */
-    protected function calculateAverageGainsPerTurn(): array
+    protected function calculateAverageGainsPerTurn(Collection $sessions): array
+    {
         /** @var array<string, int> $statTotals */
         $statTotals = array_fill_keys(self::STAT_TYPES, 0);
         $turnCount = $sessions->count();
@@ -420,12 +423,15 @@ class CareerAnalyticsService
     /**
      * Calculate stat gain distribution (min, max, median, std dev)
      *
+     * @param  \Illuminate\Support\Collection<int, \App\Models\TrainingSession>  $sessions
      * @return array<string, array{min: int, max: int, median: float, std_dev: float, total: int}>
      */
-    protected function calculateStatGainDistribution(): array
+    protected function calculateStatGainDistribution(Collection $sessions): array
+    {
         $distribution = [];
 
         foreach (self::STAT_TYPES as $stat) {
+            /** @var array<int, int|float> $gains */
             $gains = $sessions->pluck("{$stat}_gain")->filter()->values()->toArray();
 
             if (empty($gains)) {
@@ -442,19 +448,20 @@ class CareerAnalyticsService
 
             sort($gains);
             $count = count($gains);
+            $medianIndex = (int) floor($count / 2);
             $median = $count % 2 === 0
-                ? ($gains[$count / 2 - 1] + $gains[$count / 2]) / 2
-                : $gains[(int) floor($count / 2)];
+                ? ((float) $gains[$medianIndex - 1] + (float) $gains[$medianIndex]) / 2
+                : (float) $gains[$medianIndex];
 
             $mean = array_sum($gains) / $count;
-            $variance = array_sum(array_map(fn ($g) => pow($g - $mean, 2), $gains)) / $count;
+            $variance = array_sum(array_map(fn ($g) => pow((float) $g - $mean, 2), $gains)) / $count;
 
             $distribution[$stat] = [
-                'min' => min($gains),
-                'max' => max($gains),
+                'min' => (int) min($gains),
+                'max' => (int) max($gains),
                 'median' => round($median, 1),
                 'std_dev' => round(sqrt($variance), 2),
-                'total' => array_sum($gains),
+                'total' => (int) array_sum($gains),
             ];
         }
 
@@ -464,9 +471,11 @@ class CareerAnalyticsService
     /**
      * Calculate effectiveness of each training type
      *
+     * @param  \Illuminate\Support\Collection<int, \App\Models\TrainingSession>  $sessions
      * @return array<string, array{count: int, avg_total_gain: float, success_rate: float, avg_sp_gain: float}>
      */
-    protected function calculateTrainingTypeEffectiveness(): array
+    protected function calculateTrainingTypeEffectiveness(Collection $sessions): array
+    {
         $trainingTypes = ['speed', 'stamina', 'power', 'guts', 'wit', 'rest'];
         $effectiveness = [];
 
@@ -489,15 +498,17 @@ class CareerAnalyticsService
                 return ($s->speed_gain ?? 0) + ($s->stamina_gain ?? 0)
                     + ($s->power_gain ?? 0) + ($s->guts_gain ?? 0) + ($s->wit_gain ?? 0);
             });
+            $totalGainsFloat = is_numeric($totalGains) ? (float) $totalGains : 0.0;
 
             $failures = $typeSessions->where('training_failed', true)->count();
             $spGains = $typeSessions->sum('sp_gain');
+            $spGainsFloat = is_numeric($spGains) ? (float) $spGains : 0.0;
 
             $effectiveness[$type] = [
                 'count' => $count,
-                'avg_total_gain' => round($totalGains / $count, 1),
+                'avg_total_gain' => round($totalGainsFloat / $count, 1),
                 'success_rate' => round((($count - $failures) / $count) * 100, 1),
-                'avg_sp_gain' => round($spGains / $count, 1),
+                'avg_sp_gain' => round($spGainsFloat / $count, 1),
             ];
         }
 
@@ -511,13 +522,16 @@ class CareerAnalyticsService
      *     turn_range: string,
      *     avg_gains: array<string, float>,
      *     efficiency: float,
+     *     session_count: int,
      *     recommendations: array<string>
      * }>
      */
-    public function analyzeTrainingByPhase(): array
+    public function analyzeTrainingByPhase(Character $character): array
+    {
         $cacheKey = "analytics:training_by_phase:{$character->id}";
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($character) {
+        /** @var array<string, array{turn_range: string, avg_gains: array<string, float>, efficiency: float, session_count: int, recommendations: array<string>}> $result */
+        $result = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($character) {
             $sessions = TrainingSession::where('character_id', $character->id)->get();
 
             $phases = [
@@ -526,7 +540,7 @@ class CareerAnalyticsService
                 'senior' => ['min' => 49, 'max' => 72],
             ];
 
-            $result = [];
+            $phaseResult = [];
 
             foreach ($phases as $phase => $range) {
                 $phaseSessions = $sessions->filter(function ($s) use ($range) {
@@ -536,7 +550,7 @@ class CareerAnalyticsService
                 });
 
                 if ($phaseSessions->isEmpty()) {
-                    $result[$phase] = [
+                    $phaseResult[$phase] = [
                         'turn_range' => "{$range['min']}-{$range['max']}",
                         'avg_gains' => array_fill_keys(self::STAT_TYPES, 0.0),
                         'efficiency' => 0.0,
@@ -550,7 +564,7 @@ class CareerAnalyticsService
                 $avgGains = $this->calculateAverageGainsPerTurn($phaseSessions);
                 $efficiency = $this->calculateCareerEfficiency($phaseSessions);
 
-                $result[$phase] = [
+                $phaseResult[$phase] = [
                     'turn_range' => "{$range['min']}-{$range['max']}",
                     'avg_gains' => $avgGains,
                     'efficiency' => $efficiency,
@@ -559,8 +573,10 @@ class CareerAnalyticsService
                 ];
             }
 
-            return $result;
+            return $phaseResult;
         });
+
+        return $result;
     }
 
     /**
@@ -569,10 +585,12 @@ class CareerAnalyticsService
      * @param  array<string, float>  $avgGains
      * @return array<string>
      */
-    protected function generatePhaseRecommendations(): array
+    protected function generatePhaseRecommendations(string $phase, array $avgGains, float $efficiency): array
+    {
         $recommendations = [];
 
         // Phase-specific recommendations
+        /** @var array<string, array{focus: string, target_efficiency: int}> $phaseTargets */
         $phaseTargets = [
             'junior' => ['focus' => 'Build foundation stats', 'target_efficiency' => 60],
             'classic' => ['focus' => 'Maximize stat growth', 'target_efficiency' => 75],
@@ -582,11 +600,13 @@ class CareerAnalyticsService
         $target = $phaseTargets[$phase] ?? $phaseTargets['junior'];
 
         if ($efficiency < $target['target_efficiency']) {
-            $recommendations[] = "Efficiency ({$efficiency}%) is below target ({$target['target_efficiency']}%). {$target['focus']}.";
+            $efficiencyStr = (string) $efficiency;
+            $targetEfficiencyStr = (string) $target['target_efficiency'];
+            $recommendations[] = "Efficiency ({$efficiencyStr}%) is below target ({$targetEfficiencyStr}%). {$target['focus']}.";
         }
 
         // Check for stat imbalances
-        $avgTotal = array_sum($avgGains) / count($avgGains);
+        $avgTotal = count($avgGains) > 0 ? array_sum($avgGains) / count($avgGains) : 0.0;
         foreach ($avgGains as $stat => $gain) {
             if ($gain < $avgTotal * 0.5) {
                 $recommendations[] = "Consider more {$stat} training to balance your build.";
@@ -610,19 +630,22 @@ class CareerAnalyticsService
      * @return array{
      *     goals_summary: array{total: int, completed: int, in_progress: int, failed: int},
      *     completion_rate: float,
-     *     goals_by_type: array<string, array>,
+     *     goals_by_type: array<string, array<int, array<string, mixed>>>,
      *     timeline_analysis: array<string, mixed>,
-     *     upcoming_deadlines: array<array>
+     *     upcoming_deadlines: array<int, array<string, mixed>>
      * }
      */
-    public function trackGoalCompletion(): array
+    public function trackGoalCompletion(Character $character): array
+    {
         $cacheKey = "analytics:goal_completion:{$character->id}";
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($character) {
+        /** @var array{goals_summary: array{total: int, completed: int, in_progress: int, failed: int}, completion_rate: float, goals_by_type: array<string, array<int, array<string, mixed>>>, timeline_analysis: array<string, mixed>, upcoming_deadlines: array<int, array<string, mixed>>} $result */
+        $result = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($character) {
+            /** @var array<string, mixed> $goals */
             $goals = $character->goals ?? [];
             $currentTurn = $character->current_turn ?? 1;
 
-            if (empty($goals)) {
+            if (empty($goals) || ! is_array($goals)) {
                 return $this->getEmptyGoalCompletionResult();
             }
 
@@ -643,16 +666,21 @@ class CareerAnalyticsService
                 'upcoming_deadlines' => $upcomingDeadlines,
             ];
         });
+
+        return $result;
     }
 
     /**
      * Analyze goals and their completion status
      *
      * @param  array<string, mixed>  $goals
-     * @return array{summary: array, completion_rate: float, by_type: array}
+     * @return array{summary: array{total: int, completed: int, in_progress: int, failed: int}, completion_rate: float, by_type: array<string, array<int, array<string, mixed>>>}
      */
-    protected function analyzeGoals(): array
+    protected function analyzeGoals(array $goals, Character $character): array
+    {
+        /** @var array{total: int, completed: int, in_progress: int, failed: int} $summary */
         $summary = ['total' => 0, 'completed' => 0, 'in_progress' => 0, 'failed' => 0];
+        /** @var array<string, array<int, array<string, mixed>>> $byType */
         $byType = [
             'stat_goals' => [],
             'race_goals' => [],
@@ -661,20 +689,20 @@ class CareerAnalyticsService
         ];
 
         // Analyze stat goals
-        if (isset($goals['target_stats'])) {
+        if (isset($goals['target_stats']) && is_array($goals['target_stats'])) {
             foreach ($goals['target_stats'] as $stat => $target) {
-                if ($target <= 0) {
+                if (! is_string($stat) || ! is_numeric($target) || $target <= 0) {
                     continue;
                 }
 
                 $current = $character->getStat($stat);
-                $status = $this->determineGoalStatus($current, $target);
+                $status = $this->determineGoalStatus($current, (int) $target);
 
                 $byType['stat_goals'][] = [
                     'name' => ucfirst($stat),
                     'target' => $target,
                     'current' => $current,
-                    'progress' => min(100, round(($current / $target) * 100, 1)),
+                    'progress' => min(100, round(($current / (int) $target) * 100, 1)),
                     'status' => $status,
                 ];
 
@@ -684,14 +712,17 @@ class CareerAnalyticsService
         }
 
         // Analyze race goals
-        if (isset($goals['race_goals'])) {
+        if (isset($goals['race_goals']) && is_array($goals['race_goals'])) {
             foreach ($goals['race_goals'] as $raceGoal) {
-                $status = $raceGoal['completed'] ?? false ? 'completed' : 'in_progress';
+                if (! is_array($raceGoal)) {
+                    continue;
+                }
+                $status = ($raceGoal['completed'] ?? false) ? 'completed' : 'in_progress';
 
                 $byType['race_goals'][] = [
                     'name' => $raceGoal['race_name'] ?? 'Unknown Race',
                     'target_position' => $raceGoal['target_position'] ?? 1,
-                    'deadline_turn' => (is_array($raceGoal) && isset($raceGoal['deadline_turn']) ? $raceGoal['deadline_turn'] : null),
+                    'deadline_turn' => $raceGoal['deadline_turn'] ?? null,
                     'status' => $status,
                 ];
 
@@ -701,9 +732,12 @@ class CareerAnalyticsService
         }
 
         // Analyze skill goals
-        if (isset($goals['skill_goals'])) {
+        if (isset($goals['skill_goals']) && is_array($goals['skill_goals'])) {
             foreach ($goals['skill_goals'] as $skillGoal) {
-                $status = $skillGoal['acquired'] ?? false ? 'completed' : 'in_progress';
+                if (! is_array($skillGoal)) {
+                    continue;
+                }
+                $status = ($skillGoal['acquired'] ?? false) ? 'completed' : 'in_progress';
 
                 $byType['skill_goals'][] = [
                     'name' => $skillGoal['skill_name'] ?? 'Unknown Skill',
@@ -720,8 +754,11 @@ class CareerAnalyticsService
             ? round(($summary['completed'] / $summary['total']) * 100, 1)
             : 0.0;
 
+        /** @var array{total: int, completed: int, in_progress: int, failed: int} $summaryResult */
+        $summaryResult = $summary;
+
         return [
-            'summary' => $summary,
+            'summary' => $summaryResult,
             'completion_rate' => $completionRate,
             'by_type' => $byType,
         ];
@@ -751,10 +788,11 @@ class CareerAnalyticsService
      *     total_turns: int,
      *     turns_remaining: int,
      *     projected_completion: array<string, mixed>,
-     *     at_risk_goals: array<array>
+     *     at_risk_goals: array<int, array<string, mixed>>
      * }
      */
-    protected function analyzeGoalTimeline(): array
+    protected function analyzeGoalTimeline(array $goals, int $currentTurn, Character $character): array
+    {
         $totalTurns = match ($character->scenario_type) {
             'unity_cup' => 72,
             default => 72,
@@ -766,7 +804,7 @@ class CareerAnalyticsService
         $projectedCompletion = [];
         $atRiskGoals = [];
 
-        if (isset($goals['target_stats'])) {
+        if (isset($goals['target_stats']) && is_array($goals['target_stats'])) {
             // Get recent training rate
             $recentSessions = TrainingSession::where('character_id', $character->id)
                 ->orderBy('turn_number', 'desc')
@@ -776,13 +814,13 @@ class CareerAnalyticsService
             $avgGainsPerTurn = $this->calculateAverageGainsPerTurn($recentSessions);
 
             foreach ($goals['target_stats'] as $stat => $target) {
-                if ($target <= 0) {
+                if (! is_string($stat) || ! is_numeric($target) || $target <= 0) {
                     continue;
                 }
 
                 $current = $character->getStat($stat);
-                $remaining = max(0, $target - $current);
-                $avgGain = $avgGainsPerTurn[$stat] ?? 0;
+                $remaining = max(0, (int) $target - $current);
+                $avgGain = $avgGainsPerTurn[$stat] ?? 0.0;
 
                 if ($avgGain > 0) {
                     $turnsNeeded = (int) ceil($remaining / $avgGain);
@@ -802,7 +840,7 @@ class CareerAnalyticsService
                         $atRiskGoals[] = [
                             'type' => 'stat',
                             'name' => ucfirst($stat),
-                            'shortfall' => $remaining - ($turnsRemaining * $avgGain),
+                            'shortfall' => $remaining - (int) ($turnsRemaining * $avgGain),
                             'turns_over' => $projectedTurn - $totalTurns,
                         ];
                     }
@@ -814,10 +852,10 @@ class CareerAnalyticsService
                         'avg_gain_per_turn' => 0,
                         'turns_needed' => null,
                         'projected_completion_turn' => null,
-                        'will_complete_in_time' => $current >= $target,
+                        'will_complete_in_time' => $current >= (int) $target,
                     ];
 
-                    if ($current < $target) {
+                    if ($current < (int) $target) {
                         $atRiskGoals[] = [
                             'type' => 'stat',
                             'name' => ucfirst($stat),
@@ -842,20 +880,24 @@ class CareerAnalyticsService
      * Get upcoming goal deadlines
      *
      * @param  array<string, mixed>  $goals
-     * @return array<array{name: string, deadline_turn: int, turns_until: int, type: string}>
+     * @return array<int, array{name: string, deadline_turn: int, turns_until: int, type: string}>
      */
-    protected function getUpcomingDeadlines(): array
+    protected function getUpcomingDeadlines(array $goals, int $currentTurn): array
+    {
         $deadlines = [];
 
         // Check race goals for deadlines
-        if (isset($goals['race_goals'])) {
+        if (isset($goals['race_goals']) && is_array($goals['race_goals'])) {
             foreach ($goals['race_goals'] as $raceGoal) {
-                if (isset($raceGoal['deadline_turn']) && ! ($raceGoal['completed'] ?? false)) {
-                    $turnsUntil = $raceGoal['deadline_turn'] - $currentTurn;
+                if (! is_array($raceGoal)) {
+                    continue;
+                }
+                if (isset($raceGoal['deadline_turn']) && is_numeric($raceGoal['deadline_turn']) && ! ($raceGoal['completed'] ?? false)) {
+                    $turnsUntil = (int) $raceGoal['deadline_turn'] - $currentTurn;
                     if ($turnsUntil > 0) {
                         $deadlines[] = [
-                            'name' => $raceGoal['race_name'] ?? 'Unknown Race',
-                            'deadline_turn' => $raceGoal['deadline_turn'],
+                            'name' => is_string($raceGoal['race_name'] ?? null) ? $raceGoal['race_name'] : 'Unknown Race',
+                            'deadline_turn' => (int) $raceGoal['deadline_turn'],
                             'turns_until' => $turnsUntil,
                             'type' => 'race',
                         ];
@@ -880,16 +922,18 @@ class CareerAnalyticsService
      * @return array{
      *     overall_accuracy: float,
      *     stat_prediction_accuracy: array<string, float>,
-     *     training_type_accuracy: array<string, array>,
+     *     training_type_accuracy: array<string, array<string, mixed>>,
      *     race_prediction_accuracy: array<string, mixed>,
      *     improvement_tracking: array<string, mixed>,
      *     accuracy_trend: array<string, mixed>
      * }
      */
-    public function measurePredictionAccuracy(): array
+    public function measurePredictionAccuracy(Character $character): array
+    {
         $cacheKey = "analytics:prediction_accuracy:{$character->id}";
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($character) {
+        /** @var array{overall_accuracy: float, stat_prediction_accuracy: array<string, float>, training_type_accuracy: array<string, array<string, mixed>>, race_prediction_accuracy: array<string, mixed>, improvement_tracking: array<string, mixed>, accuracy_trend: array<string, mixed>} $result */
+        $result = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($character) {
             $sessions = TrainingSession::where('character_id', $character->id)
                 ->whereNotNull('training_metadata')
                 ->get();
@@ -918,7 +962,7 @@ class CareerAnalyticsService
             $improvementTracking = $this->trackPredictionImprovement($sessions, $races);
 
             // Calculate accuracy trend
-            $accuracyTrend = $this->calculateAccuracyTrend($sessions, $races);
+            $accuracyTrend = $this->calculateAccuracyTrend($sessions);
 
             return [
                 'overall_accuracy' => $overallAccuracy,
@@ -929,27 +973,40 @@ class CareerAnalyticsService
                 'accuracy_trend' => $accuracyTrend,
             ];
         });
+
+        return $result;
     }
 
     /**
      * Calculate stat prediction accuracy from training sessions
      *
+     * @param  \Illuminate\Support\Collection<int, \App\Models\TrainingSession>  $sessions
      * @return array<string, float>
      */
-    protected function calculateStatPredictionAccuracy(): array
+    protected function calculateStatPredictionAccuracy(Collection $sessions): array
+    {
         $accuracy = [];
 
         foreach (self::STAT_TYPES as $stat) {
+            /** @var array<int, int|float> $predictions */
             $predictions = [];
+            /** @var array<int, int|float> $actuals */
             $actuals = [];
 
             foreach ($sessions as $session) {
+                /** @var array<string, mixed> $metadata */
                 $metadata = $session->training_metadata ?? [];
 
                 // Check if we have prediction data
-                if (isset($metadata['predicted_gains'][$stat]) && isset($session->{"{$stat}_gain"})) {
-                    $predictions[] = $metadata['predicted_gains'][$stat];
-                    $actuals[] = $session->{"{$stat}_gain"};
+                if (is_array($metadata)
+                    && isset($metadata['predicted_gains'])
+                    && is_array($metadata['predicted_gains'])
+                    && isset($metadata['predicted_gains'][$stat])
+                    && is_numeric($metadata['predicted_gains'][$stat])
+                    && isset($session->{"{$stat}_gain"})
+                ) {
+                    $predictions[] = (float) $metadata['predicted_gains'][$stat];
+                    $actuals[] = (float) $session->{"{$stat}_gain"};
                 }
             }
 
@@ -966,9 +1023,11 @@ class CareerAnalyticsService
     /**
      * Calculate training type prediction accuracy
      *
+     * @param  \Illuminate\Support\Collection<int, \App\Models\TrainingSession>  $sessions
      * @return array<string, array{count: int, accuracy: float, avg_deviation: float}>
      */
-    protected function calculateTrainingTypePredictionAccuracy(): array
+    protected function calculateTrainingTypePredictionAccuracy(Collection $sessions): array
+    {
         $trainingTypes = ['speed', 'stamina', 'power', 'guts', 'wit'];
         $accuracy = [];
 
@@ -986,19 +1045,20 @@ class CareerAnalyticsService
                 continue;
             }
 
-            $totalDeviation = 0;
+            $totalDeviation = 0.0;
             $validPredictions = 0;
 
             foreach ($typeSessions as $session) {
+                /** @var array<string, mixed> $metadata */
                 $metadata = $session->training_metadata ?? [];
 
-                if (isset($metadata['predicted_total_gain'])) {
+                if (is_array($metadata) && isset($metadata['predicted_total_gain']) && is_numeric($metadata['predicted_total_gain'])) {
                     $actualTotal = ($session->speed_gain ?? 0) + ($session->stamina_gain ?? 0)
                         + ($session->power_gain ?? 0) + ($session->guts_gain ?? 0) + ($session->wit_gain ?? 0);
 
-                    $deviation = abs($metadata['predicted_total_gain'] - $actualTotal);
-                    $totalDeviation = ($totalDeviation ?? 0) + $deviation;
-                    $validPredictions = ($validPredictions ?? 0) + 1;
+                    $deviation = abs((float) $metadata['predicted_total_gain'] - $actualTotal);
+                    $totalDeviation += $deviation;
+                    $validPredictions++;
                 }
             }
 
@@ -1023,6 +1083,7 @@ class CareerAnalyticsService
     /**
      * Calculate race prediction accuracy
      *
+     * @param  \Illuminate\Support\Collection<int, \App\Models\Race>  $races
      * @return array{
      *     position_accuracy: float,
      *     win_prediction_accuracy: float,
@@ -1031,7 +1092,8 @@ class CareerAnalyticsService
      *     position_deviation: float
      * }
      */
-    protected function calculateRacePredictionAccuracy(): array
+    protected function calculateRacePredictionAccuracy(Collection $races): array
+    {
         if ($races->isEmpty()) {
             return [
                 'position_accuracy' => 0.0,
@@ -1045,28 +1107,33 @@ class CareerAnalyticsService
         $totalRaces = $races->count();
         $correctPositionPredictions = 0;
         $correctWinPredictions = 0;
-        $totalPositionDeviation = 0;
+        $totalPositionDeviation = 0.0;
         $validPredictions = 0;
 
         foreach ($races as $race) {
+            /** @var array<string, mixed> $analysis */
             $analysis = $race->performance_analysis ?? [];
 
-            if (isset($analysis['predicted_position']) && isset($race->finish_position)) {
-                $predictedPosition = $analysis['predicted_position'];
+            if (is_array($analysis)
+                && isset($analysis['predicted_position'])
+                && is_numeric($analysis['predicted_position'])
+                && isset($race->finish_position)
+            ) {
+                $predictedPosition = (int) $analysis['predicted_position'];
                 $actualPosition = $race->finish_position;
 
                 $deviation = abs($predictedPosition - $actualPosition);
-                $totalPositionDeviation = ($totalPositionDeviation ?? 0) + $deviation;
-                $validPredictions = ($validPredictions ?? 0) + 1;
+                $totalPositionDeviation += $deviation;
+                $validPredictions++;
 
                 // Exact position match
                 if ($predictedPosition === $actualPosition) {
-                    $correctPositionPredictions = ($correctPositionPredictions ?? 0) + 1;
+                    $correctPositionPredictions++;
                 }
 
                 // Win prediction (predicted 1st and finished 1st)
                 if ($predictedPosition === 1 && $actualPosition === 1) {
-                    $correctWinPredictions = ($correctWinPredictions ?? 0) + 1;
+                    $correctWinPredictions++;
                 }
             }
         }
@@ -1104,7 +1171,8 @@ class CareerAnalyticsService
             ? array_sum($statAccuracy) / count($statAccuracy)
             : 0.0;
 
-        $raceAvg = $raceAccuracy['position_accuracy'] ?? 0.0;
+        $raceAvgValue = $raceAccuracy['position_accuracy'] ?? 0.0;
+        $raceAvg = is_numeric($raceAvgValue) ? (float) $raceAvgValue : 0.0;
 
         // Weight: 60% training predictions, 40% race predictions
         $overall = ($statAvg * 0.6) + ($raceAvg * 0.4);
@@ -1115,6 +1183,8 @@ class CareerAnalyticsService
     /**
      * Track prediction improvement over time
      *
+     * @param  \Illuminate\Support\Collection<int, \App\Models\TrainingSession>  $sessions
+     * @param  \Illuminate\Support\Collection<int, \App\Models\Race>  $races
      * @return array{
      *     early_accuracy: float,
      *     recent_accuracy: float,
@@ -1123,18 +1193,21 @@ class CareerAnalyticsService
      *     learning_rate: float
      * }
      */
-    protected function trackPredictionImprovement(): array
+    protected function trackPredictionImprovement(Collection $sessions, Collection $races): array
+    {
         // Combine and sort by date
+        /** @var \Illuminate\Support\Collection<int, array{date: mixed, accuracy: float, type: string}> $allPredictions */
         $allPredictions = collect();
 
         foreach ($sessions as $session) {
+            /** @var array<string, mixed> $metadata */
             $metadata = $session->training_metadata ?? [];
-            if (isset($metadata['predicted_total_gain'])) {
+            if (is_array($metadata) && isset($metadata['predicted_total_gain']) && is_numeric($metadata['predicted_total_gain'])) {
                 $actualTotal = ($session->speed_gain ?? 0) + ($session->stamina_gain ?? 0)
                     + ($session->power_gain ?? 0) + ($session->guts_gain ?? 0) + ($session->wit_gain ?? 0);
 
-                $deviation = abs($metadata['predicted_total_gain'] - $actualTotal);
-                $accuracy = max(0, 100 - ($deviation / 30 * 100));
+                $deviation = abs((float) $metadata['predicted_total_gain'] - $actualTotal);
+                $accuracy = max(0.0, 100.0 - ($deviation / 30 * 100));
 
                 $allPredictions->push([
                     'date' => $session->created_at,
@@ -1145,11 +1218,16 @@ class CareerAnalyticsService
         }
 
         foreach ($races as $race) {
+            /** @var array<string, mixed> $analysis */
             $analysis = $race->performance_analysis ?? [];
-            if (isset($analysis['predicted_position']) && isset($race->finish_position)) {
-                $deviation = abs($analysis['predicted_position'] - $race->finish_position);
+            if (is_array($analysis)
+                && isset($analysis['predicted_position'])
+                && is_numeric($analysis['predicted_position'])
+                && isset($race->finish_position)
+            ) {
+                $deviation = abs((int) $analysis['predicted_position'] - $race->finish_position);
                 // Position accuracy: 0 deviation = 100%, 5+ deviation = 0%
-                $accuracy = max(0, 100 - ($deviation * 20));
+                $accuracy = max(0.0, 100.0 - ($deviation * 20));
 
                 $allPredictions->push([
                     'date' => $race->created_at,
@@ -1177,8 +1255,10 @@ class CareerAnalyticsService
         $earlyPredictions = $sorted->slice(0, $midpoint);
         $recentPredictions = $sorted->slice($midpoint);
 
-        $earlyAccuracy = $earlyPredictions->avg('accuracy') ?? 0.0;
-        $recentAccuracy = $recentPredictions->avg('accuracy') ?? 0.0;
+        $earlyAccuracyVal = $earlyPredictions->avg('accuracy');
+        $recentAccuracyVal = $recentPredictions->avg('accuracy');
+        $earlyAccuracy = is_numeric($earlyAccuracyVal) ? (float) $earlyAccuracyVal : 0.0;
+        $recentAccuracy = is_numeric($recentAccuracyVal) ? (float) $recentAccuracyVal : 0.0;
 
         $improvementPercentage = $earlyAccuracy > 0
             ? round((($recentAccuracy - $earlyAccuracy) / $earlyAccuracy) * 100, 1)
@@ -1207,6 +1287,7 @@ class CareerAnalyticsService
     /**
      * Calculate accuracy trend over time periods
      *
+     * @param  \Illuminate\Support\Collection<int, \App\Models\TrainingSession>  $sessions
      * @return array{
      *     weekly_accuracy: array<string, float>,
      *     monthly_accuracy: array<string, float>,
@@ -1214,8 +1295,11 @@ class CareerAnalyticsService
      *     consistency_score: float
      * }
      */
-    protected function calculateAccuracyTrend(): array
+    protected function calculateAccuracyTrend(Collection $sessions): array
+    {
+        /** @var array<string, float> $weeklyAccuracy */
         $weeklyAccuracy = [];
+        /** @var array<string, float> $monthlyAccuracy */
         $monthlyAccuracy = [];
 
         // Group sessions by week
@@ -1224,19 +1308,21 @@ class CareerAnalyticsService
         });
 
         foreach ($sessionsByWeek as $week => $weekSessions) {
-            if ($week === 'unknown') {
+            if (! is_string($week) || $week === 'unknown') {
                 continue;
             }
 
+            /** @var array<int, float> $accuracies */
             $accuracies = [];
             foreach ($weekSessions as $session) {
+                /** @var array<string, mixed> $metadata */
                 $metadata = $session->training_metadata ?? [];
-                if (isset($metadata['predicted_total_gain'])) {
+                if (is_array($metadata) && isset($metadata['predicted_total_gain']) && is_numeric($metadata['predicted_total_gain'])) {
                     $actualTotal = ($session->speed_gain ?? 0) + ($session->stamina_gain ?? 0)
                         + ($session->power_gain ?? 0) + ($session->guts_gain ?? 0) + ($session->wit_gain ?? 0);
 
-                    $deviation = abs($metadata['predicted_total_gain'] - $actualTotal);
-                    $accuracies[] = max(0, 100 - ($deviation / 30 * 100));
+                    $deviation = abs((float) $metadata['predicted_total_gain'] - $actualTotal);
+                    $accuracies[] = max(0.0, 100.0 - ($deviation / 30 * 100));
                 }
             }
 
@@ -1251,19 +1337,21 @@ class CareerAnalyticsService
         });
 
         foreach ($sessionsByMonth as $month => $monthSessions) {
-            if ($month === 'unknown') {
+            if (! is_string($month) || $month === 'unknown') {
                 continue;
             }
 
+            /** @var array<int, float> $accuracies */
             $accuracies = [];
             foreach ($monthSessions as $session) {
+                /** @var array<string, mixed> $metadata */
                 $metadata = $session->training_metadata ?? [];
-                if (isset($metadata['predicted_total_gain'])) {
+                if (is_array($metadata) && isset($metadata['predicted_total_gain']) && is_numeric($metadata['predicted_total_gain'])) {
                     $actualTotal = ($session->speed_gain ?? 0) + ($session->stamina_gain ?? 0)
                         + ($session->power_gain ?? 0) + ($session->guts_gain ?? 0) + ($session->wit_gain ?? 0);
 
-                    $deviation = abs($metadata['predicted_total_gain'] - $actualTotal);
-                    $accuracies[] = max(0, 100 - ($deviation / 30 * 100));
+                    $deviation = abs((float) $metadata['predicted_total_gain'] - $actualTotal);
+                    $accuracies[] = max(0.0, 100.0 - ($deviation / 30 * 100));
                 }
             }
 
@@ -1312,8 +1400,8 @@ class CareerAnalyticsService
     /**
      * Calculate Mean Absolute Percentage Accuracy
      *
-     * @param  array<int|float>  $predictions
-     * @param  array<int|float>  $actuals
+     * @param  array<int, int|float>  $predictions
+     * @param  array<int, int|float>  $actuals
      */
     protected function calculateMeanAbsolutePercentageAccuracy(array $predictions, array $actuals): float
     {
@@ -1321,21 +1409,21 @@ class CareerAnalyticsService
             return 0.0;
         }
 
-        $totalError = 0;
+        $totalError = 0.0;
         $validCount = 0;
 
-        for ($i = 0; $i < count($predictions); $i = ($i ?? 0) + 1) {
-            $predicted = $predictions[$i];
-            $actual = $actuals[$i];
+        for ($i = 0; $i < count($predictions); $i++) {
+            $predicted = (float) $predictions[$i];
+            $actual = (float) $actuals[$i];
 
             // Avoid division by zero
             if ($actual > 0) {
                 $error = abs(($actual - $predicted) / $actual) * 100;
-                $totalError = ($totalError ?? 0) + $error;
-                $validCount = ($validCount ?? 0) + 1;
-            } elseif ($predicted === 0 && $actual === 0) {
+                $totalError += $error;
+                $validCount++;
+            } elseif ($predicted === 0.0 && $actual === 0.0) {
                 // Perfect prediction for zero values
-                $validCount = ($validCount ?? 0) + 1;
+                $validCount++;
             }
         }
 
@@ -1353,15 +1441,16 @@ class CareerAnalyticsService
      * Get comprehensive analytics summary for a character
      *
      * @return array{
-     *     career_performance: array,
-     *     training_effectiveness: array,
-     *     goal_completion: array,
-     *     prediction_accuracy: array,
+     *     career_performance: array<string, mixed>,
+     *     training_effectiveness: array<string, mixed>,
+     *     goal_completion: array<string, mixed>,
+     *     prediction_accuracy: array<string, mixed>,
      *     overall_score: float,
      *     recommendations: array<string>
      * }
      */
-    public function getComprehensiveAnalytics(): array
+    public function getComprehensiveAnalytics(Character $character): array
+    {
         $careerPerformance = $this->calculateCareerPerformanceMetrics($character);
         $trainingEffectiveness = $this->calculateStatEfficiency($character);
         $goalCompletion = $this->trackGoalCompletion($character);
@@ -1395,6 +1484,11 @@ class CareerAnalyticsService
 
     /**
      * Calculate overall analytics score
+     *
+     * @param  array<string, mixed>  $careerPerformance
+     * @param  array<string, mixed>  $trainingEffectiveness
+     * @param  array<string, mixed>  $goalCompletion
+     * @param  array<string, mixed>  $predictionAccuracy
      */
     protected function calculateOverallAnalyticsScore(
         array $careerPerformance,
@@ -1402,18 +1496,24 @@ class CareerAnalyticsService
         array $goalCompletion,
         array $predictionAccuracy
     ): float {
-        $scores = [
-            'career' => $careerPerformance['overall_efficiency'] ?? 0,
-            'training' => $trainingEffectiveness['efficiency_rating'] ?? 0,
-            'goals' => $goalCompletion['completion_rate'] ?? 0,
-            'prediction' => $predictionAccuracy['overall_accuracy'] ?? 0,
-        ];
+        $careerEfficiency = isset($careerPerformance['overall_efficiency']) && is_numeric($careerPerformance['overall_efficiency'])
+            ? (float) $careerPerformance['overall_efficiency']
+            : 0.0;
+        $trainingRating = isset($trainingEffectiveness['efficiency_rating']) && is_numeric($trainingEffectiveness['efficiency_rating'])
+            ? (float) $trainingEffectiveness['efficiency_rating']
+            : 0.0;
+        $goalsRate = isset($goalCompletion['completion_rate']) && is_numeric($goalCompletion['completion_rate'])
+            ? (float) $goalCompletion['completion_rate']
+            : 0.0;
+        $predictionAcc = isset($predictionAccuracy['overall_accuracy']) && is_numeric($predictionAccuracy['overall_accuracy'])
+            ? (float) $predictionAccuracy['overall_accuracy']
+            : 0.0;
 
         // Weighted average: Career 30%, Training 30%, Goals 25%, Prediction 15%
-        $weightedScore = ($scores['career'] * 0.30)
-            + ($scores['training'] * 0.30)
-            + ($scores['goals'] * 0.25)
-            + ($scores['prediction'] * 0.15);
+        $weightedScore = ($careerEfficiency * 0.30)
+            + ($trainingRating * 0.30)
+            + ($goalsRate * 0.25)
+            + ($predictionAcc * 0.15);
 
         return round($weightedScore, 1);
     }
@@ -1421,43 +1521,71 @@ class CareerAnalyticsService
     /**
      * Generate analytics-based recommendations
      *
+     * @param  array<string, mixed>  $careerPerformance
+     * @param  array<string, mixed>  $trainingEffectiveness
+     * @param  array<string, mixed>  $goalCompletion
+     * @param  array<string, mixed>  $predictionAccuracy
      * @return array<string>
      */
-    protected function generateAnalyticsRecommendations(): array
+    protected function generateAnalyticsRecommendations(
+        array $careerPerformance,
+        array $trainingEffectiveness,
+        array $goalCompletion,
+        array $predictionAccuracy
+    ): array {
         $recommendations = [];
 
         // Career performance recommendations
-        if (($careerPerformance['success_rate'] ?? 0) < 50) {
+        $successRate = isset($careerPerformance['success_rate']) && is_numeric($careerPerformance['success_rate'])
+            ? (float) $careerPerformance['success_rate']
+            : 0.0;
+        if ($successRate < 50) {
             $recommendations[] = 'Career success rate is below 50%. Review your training strategies and goal setting.';
         }
 
-        if (($careerPerformance['performance_trend']['trend'] ?? '') === 'declining') {
+        $perfTrend = is_array($careerPerformance['performance_trend'] ?? null)
+            ? ($careerPerformance['performance_trend']['trend'] ?? '')
+            : '';
+        if ($perfTrend === 'declining') {
             $recommendations[] = 'Performance is declining. Consider adjusting your approach based on successful past careers.';
         }
 
         // Training effectiveness recommendations
-        if (($trainingEffectiveness['efficiency_rating'] ?? 0) < 60) {
+        $efficiencyRating = isset($trainingEffectiveness['efficiency_rating']) && is_numeric($trainingEffectiveness['efficiency_rating'])
+            ? (float) $trainingEffectiveness['efficiency_rating']
+            : 0.0;
+        if ($efficiencyRating < 60) {
             $recommendations[] = 'Training efficiency is low. Focus on friendship training and support card synergies.';
         }
 
-        $bestType = $trainingEffectiveness['best_training_type'] ?? '';
-        if ($bestType) {
+        $bestType = is_string($trainingEffectiveness['best_training_type'] ?? null)
+            ? $trainingEffectiveness['best_training_type']
+            : '';
+        if ($bestType !== '' && $bestType !== 'N/A') {
             $recommendations[] = "Your most effective training type is {$bestType}. Consider building around this strength.";
         }
 
         // Goal completion recommendations
-        $atRiskGoals = $goalCompletion['timeline_analysis']['at_risk_goals'] ?? [];
+        $timelineAnalysis = is_array($goalCompletion['timeline_analysis'] ?? null) ? $goalCompletion['timeline_analysis'] : [];
+        $atRiskGoals = is_array($timelineAnalysis['at_risk_goals'] ?? null) ? $timelineAnalysis['at_risk_goals'] : [];
         if (count($atRiskGoals) > 0) {
             $goalNames = array_column($atRiskGoals, 'name');
             $recommendations[] = 'At-risk goals: '.implode(', ', array_slice($goalNames, 0, 3)).'. Prioritize these in upcoming turns.';
         }
 
         // Prediction accuracy recommendations
-        if (($predictionAccuracy['overall_accuracy'] ?? 0) < 70) {
+        $overallAccuracy = isset($predictionAccuracy['overall_accuracy']) && is_numeric($predictionAccuracy['overall_accuracy'])
+            ? (float) $predictionAccuracy['overall_accuracy']
+            : 0.0;
+        if ($overallAccuracy < 70) {
             $recommendations[] = 'Prediction accuracy is below 70%. The system is still learning your play patterns.';
         }
 
-        if (($predictionAccuracy['improvement_tracking']['trend'] ?? '') === 'improving') {
+        $improvementTracking = is_array($predictionAccuracy['improvement_tracking'] ?? null)
+            ? $predictionAccuracy['improvement_tracking']
+            : [];
+        $improvementTrend = is_string($improvementTracking['trend'] ?? null) ? $improvementTracking['trend'] : '';
+        if ($improvementTrend === 'improving') {
             $recommendations[] = 'Prediction accuracy is improving! Continue providing feedback on training outcomes.';
         }
 
@@ -1475,22 +1603,33 @@ class CareerAnalyticsService
      * @param  array<string, float>  $averageGains
      * @return array<string>
      */
-    protected function generateEfficiencySuggestions(): array
+    protected function generateEfficiencySuggestions(array $averageGains, Character $character): array
+    {
         $suggestions = [];
 
         // Find weakest stat
-        $weakestStat = array_keys($averageGains, min($averageGains))[0] ?? null;
-        if ($weakestStat && $averageGains[$weakestStat] < 3) {
-            $suggestions[] = "Consider more {$weakestStat} training to balance your build.";
+        if (count($averageGains) > 0) {
+            $minGain = min($averageGains);
+            $weakestStats = array_keys($averageGains, $minGain);
+            $weakestStat = $weakestStats[0] ?? null;
+            if ($weakestStat !== null && is_string($weakestStat) && $minGain < 3) {
+                $suggestions[] = "Consider more {$weakestStat} training to balance your build.";
+            }
         }
 
         // Check if any stat is significantly behind goals
+        /** @var array<string, mixed> $goals */
         $goals = $character->goals ?? [];
-        if (isset($goals['target_stats'])) {
+        if (is_array($goals) && isset($goals['target_stats']) && is_array($goals['target_stats'])) {
             foreach ($goals['target_stats'] as $stat => $target) {
+                if (! is_string($stat) || ! is_numeric($target) || (int) $target <= 0) {
+                    continue;
+                }
                 $current = $character->getStat($stat);
-                if ($target > 0 && ($current / $target) < 0.5) {
-                    $suggestions[] = "Focus on {$stat} training - currently at ".round(($current / $target) * 100).'% of target.';
+                $targetInt = (int) $target;
+                if (($current / $targetInt) < 0.5) {
+                    $percentage = (string) round(($current / $targetInt) * 100);
+                    $suggestions[] = "Focus on {$stat} training - currently at {$percentage}% of target.";
                 }
             }
         }
@@ -1510,6 +1649,7 @@ class CareerAnalyticsService
      * @return array<string, mixed>
      */
     protected function getEmptyCareerPerformanceResult(): array
+    {
         return [
             'overall_efficiency' => 0.0,
             'success_rate' => 0.0,
@@ -1532,6 +1672,7 @@ class CareerAnalyticsService
      * @return array<string, mixed>
      */
     protected function getEmptyEfficiencyResult(): array
+    {
         return [
             'average_gains_per_turn' => array_fill_keys(self::STAT_TYPES, 0.0),
             'efficiency_rating' => 0.0,
@@ -1548,6 +1689,7 @@ class CareerAnalyticsService
      * @return array<string, mixed>
      */
     protected function getEmptyGoalCompletionResult(): array
+    {
         return [
             'goals_summary' => ['total' => 0, 'completed' => 0, 'in_progress' => 0, 'failed' => 0],
             'completion_rate' => 0.0,
@@ -1569,6 +1711,7 @@ class CareerAnalyticsService
      * @return array<string, mixed>
      */
     protected function getEmptyPredictionAccuracyResult(): array
+    {
         return [
             'overall_accuracy' => 0.0,
             'stat_prediction_accuracy' => array_fill_keys(self::STAT_TYPES, 0.0),

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Services\MCP;
 
 use App\Models\Career;
-use App\Models\Character;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
@@ -41,8 +40,11 @@ class WorkflowTemplateService
 
     /**
      * Get all available workflow templates
+     *
+     * @return array<string, array<string, mixed>>
      */
     public function getAvailableTemplates(): array
+    {
         return [
             self::TEMPLATE_TRAINING_OPTIMIZATION => [
                 'name' => 'Training Optimization',
@@ -98,8 +100,16 @@ class WorkflowTemplateService
 
     /**
      * Execute a workflow template
+     *
+     * @param  array<string, mixed>  $additionalContext
+     * @return array<string, mixed>
      */
-    public function executeTemplate(): array
+    public function executeTemplate(
+        string $templateType,
+        \App\Models\Character $character,
+        ?Career $career = null,
+        array $additionalContext = []
+    ): array {
         try {
             $template = $this->getTemplate($templateType);
 
@@ -123,15 +133,20 @@ class WorkflowTemplateService
             );
 
             // Create workflow from template
+            $templateName = is_string($template['name']) ? $template['name'] : 'Unknown';
+            $templatePattern = is_string($template['pattern']) ? $template['pattern'] : AgentOrchestrationService::PATTERN_SEQUENTIAL;
+            /** @var array<string> $templateAgents */
+            $templateAgents = is_array($template['agents']) ? $template['agents'] : [];
             $workflow = $this->orchestration->createWorkflow(
-                $template['name'],
-                $template['pattern'],
-                $this->buildAgentConfigs($template['agents']),
+                $templateName,
+                $templatePattern,
+                $this->buildAgentConfigs($templateAgents),
                 ['template' => $templateType]
             );
 
             // Execute workflow
-            $result = $this->orchestration->executeWorkflow($workflow['id'], $context);
+            $workflowId = is_string($workflow['id']) ? $workflow['id'] : '';
+            $result = $this->orchestration->executeWorkflow($workflowId, $context);
 
             // Post-process results
             $processedResult = $this->postProcessTemplateResult($templateType, $result);
@@ -162,8 +177,15 @@ class WorkflowTemplateService
 
     /**
      * Execute training optimization template
+     *
+     * @param  array<string, mixed>  $trainingOptions
+     * @return array<string, mixed>
      */
-    public function executeTrainingOptimization(): array
+    public function executeTrainingOptimization(
+        \App\Models\Character $character,
+        ?Career $career = null,
+        array $trainingOptions = []
+    ): array {
         return $this->executeTemplate(
             self::TEMPLATE_TRAINING_OPTIMIZATION,
             $character,
@@ -174,8 +196,15 @@ class WorkflowTemplateService
 
     /**
      * Execute race preparation template
+     *
+     * @param  array<string, mixed>  $upcomingRace
+     * @return array<string, mixed>
      */
-    public function executeRacePreparation(): array
+    public function executeRacePreparation(
+        \App\Models\Character $character,
+        ?Career $career = null,
+        array $upcomingRace = []
+    ): array {
         return $this->executeTemplate(
             self::TEMPLATE_RACE_PREPARATION,
             $character,
@@ -186,8 +215,14 @@ class WorkflowTemplateService
 
     /**
      * Execute skill planning template
+     *
+     * @param  array<string, mixed>  $availableSkills
+     * @return array<string, mixed>
      */
-    public function executeSkillPlanning(): array
+    public function executeSkillPlanning(
+        \App\Models\Character $character,
+        array $availableSkills = []
+    ): array {
         return $this->executeTemplate(
             self::TEMPLATE_SKILL_PLANNING,
             $character,
@@ -198,8 +233,14 @@ class WorkflowTemplateService
 
     /**
      * Execute career strategy template
+     *
+     * @param  array<string, mixed>  $goals
+     * @return array<string, mixed>
      */
-    public function executeCareerStrategy(): array
+    public function executeCareerStrategy(
+        \App\Models\Character $character,
+        array $goals = []
+    ): array {
         return $this->executeTemplate(
             self::TEMPLATE_CAREER_STRATEGY,
             $character,
@@ -210,8 +251,15 @@ class WorkflowTemplateService
 
     /**
      * Execute turn decision template
+     *
+     * @param  array<string, mixed>  $availableActions
+     * @return array<string, mixed>
      */
-    public function executeTurnDecision(): array
+    public function executeTurnDecision(
+        \App\Models\Character $character,
+        ?Career $career = null,
+        array $availableActions = []
+    ): array {
         return $this->executeTemplate(
             self::TEMPLATE_TURN_DECISION,
             $character,
@@ -222,8 +270,18 @@ class WorkflowTemplateService
 
     /**
      * Create custom workflow template
+     *
+     * @param  array<string>  $agents
+     * @param  array<string, mixed>  $config
+     * @return array<string, mixed>
      */
-    public function createCustomTemplate(): array
+    public function createCustomTemplate(
+        string $name,
+        string $description,
+        array $agents,
+        string $pattern,
+        array $config = []
+    ): array {
         try {
             $templateId = $this->generateTemplateId($name);
 
@@ -259,6 +317,8 @@ class WorkflowTemplateService
 
     /**
      * Get template by type
+     *
+     * @return array<string, mixed>|null
      */
     protected function getTemplate(string $templateType): ?array
     {
@@ -269,8 +329,12 @@ class WorkflowTemplateService
 
     /**
      * Build agent configurations from agent names
+     *
+     * @param  array<string>  $agentNames
+     * @return array<int, array{id: string, type: string, config: array<string, mixed>}>
      */
-    protected function buildAgentConfigs(): array
+    protected function buildAgentConfigs(array $agentNames): array
+    {
         $configs = [];
 
         foreach ($agentNames as $agentName) {
@@ -286,8 +350,12 @@ class WorkflowTemplateService
 
     /**
      * Post-process template results
+     *
+     * @param  array<string, mixed>  $result
+     * @return array<string, mixed>
      */
-    protected function postProcessTemplateResult(): array
+    protected function postProcessTemplateResult(string $templateType, array $result): array
+    {
         // Add template-specific formatting and insights
         $processed = $result;
 
@@ -301,6 +369,8 @@ class WorkflowTemplateService
 
     /**
      * Generate result summary
+     *
+     * @param  array<string, mixed>  $result
      */
     protected function generateResultSummary(string $templateType, array $result): string
     {
@@ -318,13 +388,17 @@ class WorkflowTemplateService
 
     /**
      * Extract recommendations from results
+     *
+     * @param  array<string, mixed>  $result
+     * @return array<int, mixed>
      */
-    protected function extractRecommendations(): array
+    protected function extractRecommendations(array $result): array
+    {
         $recommendations = [];
 
         if (isset($result['results']) && is_array($result['results'])) {
             foreach ($result['results'] as $agentResult) {
-                if (isset($agentResult['output']['recommendations'])) {
+                if (is_array($agentResult) && isset($agentResult['output']) && is_array($agentResult['output']) && isset($agentResult['output']['recommendations'])) {
                     $recommendations[] = $agentResult['output']['recommendations'];
                 }
             }
@@ -335,17 +409,19 @@ class WorkflowTemplateService
 
     /**
      * Calculate confidence score
+     *
+     * @param  array<string, mixed>  $result
      */
     protected function calculateConfidence(array $result): float
     {
         // Simple confidence calculation based on agent agreement
-        if (! isset($result['results']) || empty($result['results'])) {
+        if (! isset($result['results']) || empty($result['results']) || ! is_array($result['results'])) {
             return 0.5;
         }
 
         $successfulAgents = count(array_filter(
             $result['results'],
-            fn ($r) => $r['state'] === AgentOrchestrationService::STATE_COMPLETED
+            fn ($r) => is_array($r) && ($r['state'] ?? null) === AgentOrchestrationService::STATE_COMPLETED
         ));
 
         $totalAgents = count($result['results']);

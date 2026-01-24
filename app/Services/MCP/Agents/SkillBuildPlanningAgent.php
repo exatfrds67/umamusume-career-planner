@@ -55,6 +55,8 @@ class SkillBuildPlanningAgent
     /**
      * Analyze skill build and provide comprehensive planning recommendations
      *
+     * @param  Collection<int, object>  $availableSkills
+     * @param  Collection<int, object>  $currentSkills
      * @param  array<string, mixed>  $context
      * @return array{
      *     character_analysis: array<string, mixed>,
@@ -65,7 +67,12 @@ class SkillBuildPlanningAgent
      *     confidence: float
      * }
      */
-    public function analyzeSkillBuild(): array
+    public function analyzeSkillBuild(
+        Character $character,
+        Collection $availableSkills,
+        Collection $currentSkills,
+        array $context = []
+    ): array {
         // Analyze character strengths and weaknesses
         $characterAnalysis = $this->analyzeCharacter($character);
 
@@ -108,12 +115,14 @@ class SkillBuildPlanningAgent
      *
      * @return array<string, mixed>
      */
-    protected function analyzeCharacter(): array
+    protected function analyzeCharacter(Character $character): array
+    {
         // Analyze aptitudes
-        $aptitudes = $character->aptitudes;
+        $aptitudes = $character->aptitudes ?? collect();
         $aptitudeAnalysis = $this->analyzeAptitudes($aptitudes);
 
         // Analyze stats
+        /** @var array<string, int> $stats */
         $stats = $character->current_stats ?? [];
         $statAnalysis = $this->analyzeStats($stats);
 
@@ -137,33 +146,52 @@ class SkillBuildPlanningAgent
     /**
      * Analyze character aptitudes
      *
+     * @param  Collection<int, object>|mixed  $aptitudes
      * @return array<string, mixed>
      */
-    protected function analyzeAptitudes(): array
+    protected function analyzeAptitudes(mixed $aptitudes): array
+    {
+        /** @var array<string, array{grade: string, numeric: int}> $distanceAptitudes */
         $distanceAptitudes = [];
+        /** @var array<string, array{grade: string, numeric: int}> $surfaceAptitudes */
         $surfaceAptitudes = [];
+        /** @var array<string, array{grade: string, numeric: int}> $styleAptitudes */
         $styleAptitudes = [];
 
+        if (! ($aptitudes instanceof Collection)) {
+            /** @var iterable<int|string, mixed> $iterableAptitudes */
+            $iterableAptitudes = is_iterable($aptitudes) ? $aptitudes : [];
+            $aptitudes = collect($iterableAptitudes);
+        }
+
         foreach ($aptitudes as $aptitude) {
-            $grade = $aptitude->grade;
+            if (! is_object($aptitude)) {
+                continue;
+            }
+
+            $grade = isset($aptitude->grade) ? (string) $aptitude->grade : 'C';
             $numericGrade = $this->gradeToNumeric($grade);
 
-            if (in_array($aptitude->distance_type, ['sprint', 'mile', 'medium', 'long'])) {
-                $distanceAptitudes[$aptitude->distance_type] = [
+            $distanceType = isset($aptitude->distance_type) ? (string) $aptitude->distance_type : '';
+            $surfaceType = isset($aptitude->surface_type) ? (string) $aptitude->surface_type : '';
+            $runningStyle = isset($aptitude->running_style) ? (string) $aptitude->running_style : '';
+
+            if (in_array($distanceType, ['sprint', 'mile', 'medium', 'long'])) {
+                $distanceAptitudes[$distanceType] = [
                     'grade' => $grade,
                     'numeric' => $numericGrade,
                 ];
             }
 
-            if (in_array($aptitude->surface_type, ['turf', 'dirt'])) {
-                $surfaceAptitudes[$aptitude->surface_type] = [
+            if (in_array($surfaceType, ['turf', 'dirt'])) {
+                $surfaceAptitudes[$surfaceType] = [
                     'grade' => $grade,
                     'numeric' => $numericGrade,
                 ];
             }
 
-            if (in_array($aptitude->running_style, ['front_runner', 'pace_chaser', 'late_surger', 'end_closer'])) {
-                $styleAptitudes[$aptitude->running_style] = [
+            if (in_array($runningStyle, ['front_runner', 'pace_chaser', 'late_surger', 'end_closer'])) {
+                $styleAptitudes[$runningStyle] = [
                     'grade' => $grade,
                     'numeric' => $numericGrade,
                 ];
@@ -188,7 +216,7 @@ class SkillBuildPlanningAgent
     /**
      * Find best aptitude from a set
      *
-     * @param  array<string, array>  $aptitudes
+     * @param  array<string, array{grade: string, numeric: int}>  $aptitudes
      */
     protected function findBestAptitude(array $aptitudes): ?string
     {
@@ -200,8 +228,9 @@ class SkillBuildPlanningAgent
         $bestScore = 0;
 
         foreach ($aptitudes as $type => $data) {
-            if ((is_array($data) && isset($data['numeric']) ? $data['numeric'] : null) > $bestScore) {
-                $bestScore = (is_array($data) && isset($data['numeric']) ? $data['numeric'] : null);
+            $numericValue = isset($data['numeric']) ? (int) $data['numeric'] : 0;
+            if ($numericValue > $bestScore) {
+                $bestScore = $numericValue;
                 $best = $type;
             }
         }
@@ -234,14 +263,20 @@ class SkillBuildPlanningAgent
      * @param  array<string, int>  $stats
      * @return array<string, mixed>
      */
-    protected function analyzeStats(): array
+    protected function analyzeStats(array $stats): array
+    {
+        /** @var array<string, array{value: int, rating: string, breakpoint_status: string}> $statRatings */
         $statRatings = [];
 
         foreach ($stats as $stat => $value) {
+            if (! is_string($stat) || ! is_numeric($value)) {
+                continue;
+            }
+
             $statRatings[$stat] = [
-                'value' => $value,
-                'rating' => $this->rateStatValue($value),
-                'breakpoint_status' => $this->getBreakpointStatus($value),
+                'value' => (int) $value,
+                'rating' => $this->rateStatValue((int) $value),
+                'breakpoint_status' => $this->getBreakpointStatus((int) $value),
             ];
         }
 
@@ -294,7 +329,9 @@ class SkillBuildPlanningAgent
             return null;
         }
 
-        return array_key_first(array_slice($stats, 0, 1, true));
+        arsort($stats);
+
+        return array_key_first($stats);
     }
 
     /**
@@ -321,8 +358,10 @@ class SkillBuildPlanningAgent
      */
     protected function determineRacingStyle(array $aptitudeAnalysis, array $statAnalysis): string
     {
-        $bestStyle = $aptitudeAnalysis['best_style'];
-        $bestDistance = $aptitudeAnalysis['best_distance'];
+        $bestStyleValue = $aptitudeAnalysis['best_style'] ?? '';
+        $bestStyle = is_scalar($bestStyleValue) ? (string) $bestStyleValue : '';
+        $bestDistanceValue = $aptitudeAnalysis['best_distance'] ?? '';
+        $bestDistance = is_scalar($bestDistanceValue) ? (string) $bestDistanceValue : '';
 
         // Combine style and distance for racing style
         return match (true) {
@@ -341,25 +380,34 @@ class SkillBuildPlanningAgent
      * @param  array<string, mixed>  $statAnalysis
      * @return array<string, string>
      */
-    protected function identifyStrengths(): array
+    protected function identifyStrengths(array $aptitudeAnalysis, array $statAnalysis): array
+    {
+        /** @var array<string, string> $strengths */
         $strengths = [];
 
         // Aptitude strengths
-        $bestDistance = $aptitudeAnalysis['best_distance'];
-        $bestStyle = $aptitudeAnalysis['best_style'];
+        $bestDistanceValue = $aptitudeAnalysis['best_distance'] ?? '';
+        $bestDistance = is_scalar($bestDistanceValue) ? (string) $bestDistanceValue : '';
+        $bestStyleValue = $aptitudeAnalysis['best_style'] ?? '';
+        $bestStyle = is_scalar($bestStyleValue) ? (string) $bestStyleValue : '';
 
-        if ($bestDistance) {
+        if ($bestDistance !== '') {
             $strengths['distance'] = "Excellent {$bestDistance} aptitude";
         }
 
-        if ($bestStyle) {
+        if ($bestStyle !== '') {
             $strengths['style'] = "Strong {$bestStyle} aptitude";
         }
 
         // Stat strengths
-        $highestStat = $statAnalysis['highest_stat'];
-        if ($highestStat) {
-            $value = $statAnalysis['stat_ratings'][$highestStat]['value'];
+        $highestStatValue = $statAnalysis['highest_stat'] ?? '';
+        $highestStat = is_scalar($highestStatValue) ? (string) $highestStatValue : '';
+        $statRatings = is_array($statAnalysis['stat_ratings'] ?? null) ? $statAnalysis['stat_ratings'] : [];
+
+        if ($highestStat !== '' && isset($statRatings[$highestStat])) {
+            $highestStatData = is_array($statRatings[$highestStat]) ? $statRatings[$highestStat] : [];
+            $valueRaw = $highestStatData['value'] ?? 0;
+            $value = is_numeric($valueRaw) ? (int) $valueRaw : 0;
             if ($value >= 900) {
                 $strengths['stat'] = "High {$highestStat} ({$value})";
             }
@@ -375,13 +423,20 @@ class SkillBuildPlanningAgent
      * @param  array<string, mixed>  $statAnalysis
      * @return array<string, string>
      */
-    protected function identifyWeaknesses(): array
+    protected function identifyWeaknesses(array $aptitudeAnalysis, array $statAnalysis): array
+    {
+        /** @var array<string, string> $weaknesses */
         $weaknesses = [];
 
         // Stat weaknesses
-        $lowestStat = $statAnalysis['lowest_stat'];
-        if ($lowestStat) {
-            $value = $statAnalysis['stat_ratings'][$lowestStat]['value'];
+        $lowestStatValue = $statAnalysis['lowest_stat'] ?? '';
+        $lowestStat = is_scalar($lowestStatValue) ? (string) $lowestStatValue : '';
+        $statRatings = is_array($statAnalysis['stat_ratings'] ?? null) ? $statAnalysis['stat_ratings'] : [];
+
+        if ($lowestStat !== '' && isset($statRatings[$lowestStat])) {
+            $lowestStatData = is_array($statRatings[$lowestStat]) ? $statRatings[$lowestStat] : [];
+            $valueRaw = $lowestStatData['value'] ?? 0;
+            $value = is_numeric($valueRaw) ? (int) $valueRaw : 0;
             if ($value < 600) {
                 $weaknesses['stat'] = "Low {$lowestStat} ({$value})";
             }
@@ -397,8 +452,10 @@ class SkillBuildPlanningAgent
      */
     protected function determineSpecialization(array $aptitudeAnalysis): string
     {
-        $bestDistance = $aptitudeAnalysis['best_distance'];
-        $bestSurface = $aptitudeAnalysis['best_surface'];
+        $bestDistanceValue = $aptitudeAnalysis['best_distance'] ?? 'medium';
+        $bestDistance = is_scalar($bestDistanceValue) ? (string) $bestDistanceValue : 'medium';
+        $bestSurfaceValue = $aptitudeAnalysis['best_surface'] ?? 'turf';
+        $bestSurface = is_scalar($bestSurfaceValue) ? (string) $bestSurfaceValue : 'turf';
 
         return "{$bestDistance}_{$bestSurface}";
     }
@@ -406,9 +463,15 @@ class SkillBuildPlanningAgent
     /**
      * Identify skill synergies
      *
+     * @param  Collection<int, object>  $availableSkills
+     * @param  Collection<int, object>  $currentSkills
      * @return array<string, mixed>
      */
-    protected function identifySkillSynergies(): array
+    protected function identifySkillSynergies(
+        Character $character,
+        Collection $availableSkills,
+        Collection $currentSkills
+    ): array {
         // Analyze current skill synergies
         $currentSynergies = $this->analyzeCurrentSynergies($currentSkills);
 
@@ -432,13 +495,20 @@ class SkillBuildPlanningAgent
     /**
      * Analyze current skill synergies
      *
+     * @param  Collection<int, object>  $currentSkills
      * @return array<string, mixed>
      */
-    protected function analyzeCurrentSynergies(): array
+    protected function analyzeCurrentSynergies(Collection $currentSkills): array
+    {
+        /** @var array<string, int> $categoryCounts */
         $categoryCounts = [];
 
         foreach ($currentSkills as $skill) {
-            $category = $skill->category ?? 'unknown';
+            if (! is_object($skill)) {
+                continue;
+            }
+
+            $category = isset($skill->category) ? (string) $skill->category : 'unknown';
             $categoryCounts[$category] = ($categoryCounts[$category] ?? 0) + 1;
         }
 
@@ -477,17 +547,30 @@ class SkillBuildPlanningAgent
     /**
      * Find complementary skills
      *
-     * @return array<string, mixed>
+     * @param  Collection<int, object>  $availableSkills
+     * @param  Collection<int, object>  $currentSkills
+     * @return array<int, array<string, mixed>>
      */
-    protected function findComplementarySkills(): array
-        $currentCategories = $currentSkills->pluck('category')->unique()->toArray();
+    protected function findComplementarySkills(
+        Character $character,
+        Collection $availableSkills,
+        Collection $currentSkills
+    ): array {
+        /** @var array<int, array<string, mixed>> $complementary */
         $complementary = [];
 
         foreach ($availableSkills as $skill) {
-            $category = $skill->category ?? 'unknown';
+            if (! is_object($skill)) {
+                continue;
+            }
+
+            $category = isset($skill->category) ? (string) $skill->category : 'unknown';
 
             // Skip if already have many skills in this category
-            $currentCount = $currentSkills->where('category', $category)->count();
+            $currentCount = $currentSkills->filter(function ($s) use ($category) {
+                return isset($s->category) && $s->category === $category;
+            })->count();
+
             if ($currentCount >= 3) {
                 continue;
             }
@@ -495,8 +578,8 @@ class SkillBuildPlanningAgent
             // Check if skill complements character
             if ($this->isComplementaryToCharacter($skill, $character)) {
                 $complementary[] = [
-                    'skill_id' => $skill->id,
-                    'skill_name' => $skill->name,
+                    'skill_id' => $skill->id ?? 0,
+                    'skill_name' => $skill->name ?? 'Unknown',
                     'category' => $category,
                     'synergy_reason' => $this->getSynergyReason($skill, $character),
                 ];
@@ -512,11 +595,11 @@ class SkillBuildPlanningAgent
     protected function isComplementaryToCharacter(object $skill, Character $character): bool
     {
         // Check if skill matches character's best distance
-        $aptitudes = $character->aptitudes;
+        $aptitudes = $character->aptitudes ?? collect();
         $bestDistance = $this->getBestDistanceAptitude($aptitudes);
 
         // Simple check: skill name contains distance type
-        $skillName = strtolower($skill->name);
+        $skillName = isset($skill->name) ? strtolower((string) $skill->name) : '';
 
         return str_contains($skillName, $bestDistance);
     }
@@ -526,7 +609,7 @@ class SkillBuildPlanningAgent
      */
     protected function getSynergyReason(object $skill, Character $character): string
     {
-        $aptitudes = $character->aptitudes;
+        $aptitudes = $character->aptitudes ?? collect();
         $bestDistance = $this->getBestDistanceAptitude($aptitudes);
 
         return "Complements {$bestDistance} specialization";
@@ -534,14 +617,30 @@ class SkillBuildPlanningAgent
 
     /**
      * Get best distance aptitude
+     *
+     * @param  Collection<int, object>|mixed  $aptitudes
      */
-    protected function getBestDistanceAptitude($aptitudes): string
+    protected function getBestDistanceAptitude(mixed $aptitudes): string
     {
+        /** @var array<string, int> $distanceGrades */
         $distanceGrades = [];
 
+        if (! ($aptitudes instanceof Collection)) {
+            /** @var iterable<int|string, mixed> $iterableAptitudes */
+            $iterableAptitudes = is_iterable($aptitudes) ? $aptitudes : [];
+            $aptitudes = collect($iterableAptitudes);
+        }
+
         foreach ($aptitudes as $aptitude) {
-            if (in_array($aptitude->distance_type, ['sprint', 'mile', 'medium', 'long'])) {
-                $distanceGrades[$aptitude->distance_type] = $this->gradeToNumeric($aptitude->grade);
+            if (! is_object($aptitude)) {
+                continue;
+            }
+
+            $distanceType = isset($aptitude->distance_type) ? (string) $aptitude->distance_type : '';
+            $grade = isset($aptitude->grade) ? (string) $aptitude->grade : 'C';
+
+            if (in_array($distanceType, ['sprint', 'mile', 'medium', 'long'])) {
+                $distanceGrades[$distanceType] = $this->gradeToNumeric($grade);
             }
         }
 
@@ -551,20 +650,31 @@ class SkillBuildPlanningAgent
 
         arsort($distanceGrades);
 
-        return array_key_first($distanceGrades);
+        return (string) array_key_first($distanceGrades);
     }
 
     /**
      * Identify skill gaps
      *
-     * @return array<string, mixed>
+     * @param  Collection<int, object>  $currentSkills
+     * @return array<int, array<string, mixed>>
      */
-    protected function identifySkillGaps(): array
+    protected function identifySkillGaps(Character $character, Collection $currentSkills): array
+    {
+        /** @var array<int, array<string, mixed>> $gaps */
         $gaps = [];
 
         // Check for missing essential categories
-        $currentCategories = $currentSkills->pluck('category')->unique()->toArray();
+        /** @var array<int, string> $currentCategories */
+        $currentCategories = [];
+        foreach ($currentSkills as $skill) {
+            if (is_object($skill) && isset($skill->category)) {
+                $currentCategories[] = (string) $skill->category;
+            }
+        }
+        $currentCategories = array_unique($currentCategories);
 
+        /** @var array<int, string> $essentialCategories */
         $essentialCategories = ['speed', 'recovery', 'positioning'];
 
         foreach ($essentialCategories as $category) {
@@ -584,15 +694,16 @@ class SkillBuildPlanningAgent
      * Calculate synergy score
      *
      * @param  array<string, mixed>  $currentSynergies
-     * @param  array<string, mixed>  $skillGaps
+     * @param  array<int, array<string, mixed>>  $skillGaps
      */
     protected function calculateSynergyScore(array $currentSynergies, array $skillGaps): int
     {
-        $score = $currentSynergies['balance_score'];
+        $balanceScoreRaw = $currentSynergies['balance_score'] ?? 50;
+        $score = is_numeric($balanceScoreRaw) ? (int) $balanceScoreRaw : 50;
 
         // Deduct for gaps
         foreach ($skillGaps as $gap) {
-            if ($gap['severity'] === 'high') {
+            if (is_array($gap) && isset($gap['severity']) && $gap['severity'] === 'high') {
                 $score -= 15;
             }
         }
@@ -603,10 +714,15 @@ class SkillBuildPlanningAgent
     /**
      * Optimize for meta performance
      *
+     * @param  Collection<int, object>  $availableSkills
      * @param  array<string, mixed>  $characterAnalysis
      * @return array<string, mixed>
      */
-    protected function optimizeForMeta(): array
+    protected function optimizeForMeta(
+        Character $character,
+        Collection $availableSkills,
+        array $characterAnalysis
+    ): array {
         // Identify meta skills
         $metaSkills = $this->identifyMetaSkills($availableSkills);
 
@@ -626,26 +742,33 @@ class SkillBuildPlanningAgent
     /**
      * Identify meta skills
      *
-     * @return array<string, mixed>
+     * @param  Collection<int, object>  $availableSkills
+     * @return array<int, array<string, mixed>>
      */
-    protected function identifyMetaSkills(): array
+    protected function identifyMetaSkills(Collection $availableSkills): array
+    {
+        /** @var array<int, array<string, mixed>> $metaSkills */
         $metaSkills = [];
 
         foreach ($availableSkills as $skill) {
-            $metaTier = $skill->meta_tier ?? 'C';
+            if (! is_object($skill)) {
+                continue;
+            }
+
+            $metaTier = isset($skill->meta_tier) ? (string) $skill->meta_tier : 'C';
 
             if (in_array($metaTier, ['SS', 'S', 'A'])) {
                 $metaSkills[] = [
-                    'skill_id' => $skill->id,
-                    'skill_name' => $skill->name,
+                    'skill_id' => $skill->id ?? 0,
+                    'skill_name' => $skill->name ?? 'Unknown',
                     'meta_tier' => $metaTier,
-                    'tier_score' => $this->metaTierScores[$metaTier],
+                    'tier_score' => $this->metaTierScores[$metaTier] ?? 40,
                 ];
             }
         }
 
         // Sort by tier score
-        usort($metaSkills, fn ($a, $b) => $b['tier_score'] <=> $a['tier_score']);
+        usort($metaSkills, fn ($a, $b) => (int) ($b['tier_score'] ?? 0) <=> (int) ($a['tier_score'] ?? 0));
 
         return $metaSkills;
     }
@@ -653,21 +776,28 @@ class SkillBuildPlanningAgent
     /**
      * Match meta skills to character
      *
-     * @param  array<string, mixed>  $metaSkills
+     * @param  array<int, array<string, mixed>>  $metaSkills
      * @param  array<string, mixed>  $characterAnalysis
-     * @return array<string, mixed>
+     * @return array<int, array<string, mixed>>
      */
-    protected function matchMetaSkillsToCharacter(): array
+    protected function matchMetaSkillsToCharacter(array $metaSkills, array $characterAnalysis): array
+    {
+        /** @var array<int, array<string, mixed>> $matched */
         $matched = [];
 
-        $specialization = $characterAnalysis['specialization'];
-
         foreach ($metaSkills as $skill) {
+            if (! is_array($skill)) {
+                continue;
+            }
+
+            $tierScoreRaw = $skill['tier_score'] ?? 0;
+            $tierScore = is_numeric($tierScoreRaw) ? (int) $tierScoreRaw : 0;
+
             // Simple matching: all meta skills are good
             $matched[] = [
                 ...$skill,
                 'match_reason' => 'High meta tier skill',
-                'priority' => $skill['tier_score'] >= 85 ? 'high' : 'medium',
+                'priority' => $tierScore >= 85 ? 'high' : 'medium',
             ];
         }
 
@@ -677,7 +807,7 @@ class SkillBuildPlanningAgent
     /**
      * Calculate meta optimization score
      *
-     * @param  array<string, mixed>  $matchedMetaSkills
+     * @param  array<int, array<string, mixed>>  $matchedMetaSkills
      */
     protected function calculateMetaScore(array $matchedMetaSkills): int
     {
@@ -687,7 +817,10 @@ class SkillBuildPlanningAgent
 
         $totalScore = 0;
         foreach ($matchedMetaSkills as $skill) {
-            $totalScore = ($totalScore ?? 0) + $skill['tier_score'];
+            if (is_array($skill) && isset($skill['tier_score'])) {
+                $tierScoreRaw = $skill['tier_score'];
+                $totalScore += is_numeric($tierScoreRaw) ? (int) $tierScoreRaw : 0;
+            }
         }
 
         return (int) ($totalScore / count($matchedMetaSkills));
@@ -701,11 +834,20 @@ class SkillBuildPlanningAgent
      * @param  array<string, mixed>  $metaOptimization
      * @return array<string, mixed>
      */
-    protected function generateBuildRecommendations(): array
+    protected function generateBuildRecommendations(
+        Character $character,
+        array $characterAnalysis,
+        array $skillSynergies,
+        array $metaOptimization
+    ): array {
+        /** @var array<string, mixed> $recommendations */
         $recommendations = [];
 
         // Priority 1: Meta skills that match character
-        $matchedMeta = array_slice($metaOptimization['matched_meta_skills'], 0, 3);
+        $matchedMeta = is_array($metaOptimization['matched_meta_skills'] ?? null)
+            ? array_slice($metaOptimization['matched_meta_skills'], 0, 3)
+            : [];
+
         if (! empty($matchedMeta)) {
             $recommendations['meta_priority'] = [
                 'title' => 'High Priority Meta Skills',
@@ -715,7 +857,10 @@ class SkillBuildPlanningAgent
         }
 
         // Priority 2: Complementary skills
-        $complementary = array_slice($skillSynergies['complementary_skills'], 0, 3);
+        $complementary = is_array($skillSynergies['complementary_skills'] ?? null)
+            ? array_slice($skillSynergies['complementary_skills'], 0, 3)
+            : [];
+
         if (! empty($complementary)) {
             $recommendations['synergy_priority'] = [
                 'title' => 'Synergy-Enhancing Skills',
@@ -725,7 +870,10 @@ class SkillBuildPlanningAgent
         }
 
         // Priority 3: Gap-filling skills
-        $gaps = $skillSynergies['skill_gaps'];
+        $gaps = is_array($skillSynergies['skill_gaps'] ?? null)
+            ? $skillSynergies['skill_gaps']
+            : [];
+
         if (! empty($gaps)) {
             $recommendations['gap_filling'] = [
                 'title' => 'Essential Gap-Filling Skills',
@@ -745,21 +893,29 @@ class SkillBuildPlanningAgent
      * @param  array<string, mixed>  $metaOptimization
      * @return array<string, string>
      */
-    protected function generateRecommendations(): array
+    protected function generateRecommendations(
+        array $characterAnalysis,
+        array $skillSynergies,
+        array $metaOptimization
+    ): array {
+        /** @var array<string, string> $recommendations */
         $recommendations = [];
 
         // Character-specific recommendations
-        $racingStyle = $characterAnalysis['racing_style'];
+        $racingStyleRaw = $characterAnalysis['racing_style'] ?? 'all_rounder';
+        $racingStyle = is_scalar($racingStyleRaw) ? (string) $racingStyleRaw : 'all_rounder';
         $recommendations['racing_style'] = "Build optimized for {$racingStyle} racing style";
 
         // Synergy recommendations
-        $synergyScore = $skillSynergies['synergy_score'];
+        $synergyScoreRaw = $skillSynergies['synergy_score'] ?? 50;
+        $synergyScore = is_numeric($synergyScoreRaw) ? (int) $synergyScoreRaw : 50;
         if ($synergyScore < 70) {
             $recommendations['synergy'] = 'Improve skill synergy by balancing skill categories';
         }
 
         // Meta recommendations
-        $metaScore = $metaOptimization['meta_score'];
+        $metaScoreRaw = $metaOptimization['meta_score'] ?? 50;
+        $metaScore = is_numeric($metaScoreRaw) ? (int) $metaScoreRaw : 50;
         if ($metaScore >= 80) {
             $recommendations['meta'] = 'Excellent meta optimization - continue current strategy';
         } elseif ($metaScore < 60) {
@@ -780,12 +936,14 @@ class SkillBuildPlanningAgent
         $confidence = 1.0;
 
         // Reduce confidence if character analysis is incomplete
-        if (empty($characterAnalysis['strengths'])) {
+        $strengths = is_array($characterAnalysis['strengths'] ?? null) ? $characterAnalysis['strengths'] : [];
+        if (empty($strengths)) {
             $confidence *= 0.8;
         }
 
         // Reduce confidence if synergy score is low
-        $synergyScore = $skillSynergies['synergy_score'];
+        $synergyScoreRaw = $skillSynergies['synergy_score'] ?? 50;
+        $synergyScore = is_numeric($synergyScoreRaw) ? (int) $synergyScoreRaw : 50;
         if ($synergyScore < 50) {
             $confidence *= 0.9;
         }

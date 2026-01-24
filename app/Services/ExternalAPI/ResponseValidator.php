@@ -31,13 +31,14 @@ class ResponseValidator
     /**
      * Validate API response against schema
      *
-     * @param  array<string, mixed>  $response
+     * @param  array<string, mixed>|mixed  $response
      * @return array{valid: bool, errors: array<string>, data: mixed}
      */
-    public function validate(): array
+    public function validate(string $responseType, mixed $response): array
+    {
         $schema = $this->schemas[$responseType] ?? null;
 
-        if (! $schema) {
+        if (! is_array($schema)) {
             Log::warning('[ResponseValidator] No schema found for response type', [
                 'response_type' => $responseType,
             ]);
@@ -50,11 +51,12 @@ class ResponseValidator
         }
 
         $errors = [];
+        $wrapperKey = isset($schema['wrapper_key']) && is_string($schema['wrapper_key']) ? $schema['wrapper_key'] : null;
 
         // Validate response structure
-        if (isset($schema['wrapper_key'])) {
-            if (! isset($response[$schema['wrapper_key']])) {
-                $errors[] = "Missing wrapper key: {$schema['wrapper_key']}";
+        if ($wrapperKey !== null) {
+            if (! is_array($response) || ! isset($response[$wrapperKey])) {
+                $errors[] = "Missing wrapper key: {$wrapperKey}";
 
                 return [
                     'valid' => false,
@@ -63,13 +65,15 @@ class ResponseValidator
                 ];
             }
 
-            $data = $response[$schema['wrapper_key']];
+            $data = $response[$wrapperKey];
         } else {
             $data = $response;
         }
 
+        $itemSchema = isset($schema['item_schema']) && is_array($schema['item_schema']) ? $schema['item_schema'] : [];
+
         // Validate data type
-        if (isset($schema['is_array']) && $schema['is_array']) {
+        if (isset($schema['is_array']) && $schema['is_array'] === true) {
             if (! is_array($data)) {
                 $errors[] = 'Expected array data';
 
@@ -82,7 +86,7 @@ class ResponseValidator
 
             // Validate each item in array
             foreach ($data as $index => $item) {
-                $itemErrors = $this->validateItem($item, $schema['item_schema'] ?? []);
+                $itemErrors = $this->validateItem($item, $itemSchema);
 
                 foreach ($itemErrors as $error) {
                     $errors[] = "Item {$index}: {$error}";
@@ -90,7 +94,7 @@ class ResponseValidator
             }
         } else {
             // Validate single item
-            $errors = $this->validateItem($data, $schema['item_schema'] ?? []);
+            $errors = $this->validateItem($data, $itemSchema);
         }
 
         $valid = empty($errors);
@@ -112,11 +116,11 @@ class ResponseValidator
     /**
      * Validate a single item against schema
      *
-     * @param  mixed  $item
      * @param  array<string, mixed>  $schema
      * @return array<string>
      */
-    protected function validateItem(): array
+    protected function validateItem(mixed $item, array $schema): array
+    {
         $errors = [];
 
         if (! is_array($item)) {
@@ -126,58 +130,71 @@ class ResponseValidator
         }
 
         // Check required fields
-        if (isset($schema['required'])) {
-            foreach ($schema['required'] as $field) {
-                if (! isset($item[$field]) && ! array_key_exists($field, $item)) {
-                    $errors[] = "Missing required field: {$field}";
-                }
+        $required = isset($schema['required']) && is_array($schema['required']) ? $schema['required'] : [];
+        foreach ($required as $field) {
+            if (! is_string($field)) {
+                continue;
+            }
+            if (! isset($item[$field]) && ! array_key_exists($field, $item)) {
+                $errors[] = "Missing required field: {$field}";
             }
         }
 
         // Check field types
-        if (isset($schema['types'])) {
-            foreach ($schema['types'] as $field => $expectedType) {
-                if (isset($item[$field])) {
-                    $actualType = gettype($item[$field]);
+        $types = isset($schema['types']) && is_array($schema['types']) ? $schema['types'] : [];
+        foreach ($types as $field => $expectedType) {
+            if (! is_string($field) || ! is_string($expectedType)) {
+                continue;
+            }
+            if (isset($item[$field])) {
+                $fieldValue = $item[$field];
+                $actualType = gettype($fieldValue);
 
-                    // Handle nullable types
-                    if (str_ends_with($expectedType, '|null') && $item[$field] === null) {
-                        continue;
-                    }
+                // Handle nullable types
+                if (str_ends_with($expectedType, '|null') && $actualType === 'NULL') {
+                    continue;
+                }
 
-                    $expectedType = str_replace('|null', '', $expectedType);
+                $expectedType = str_replace('|null', '', $expectedType);
 
-                    if ($actualType !== $expectedType) {
-                        $errors[] = "Field '{$field}' has incorrect type. Expected: {$expectedType}, Got: {$actualType}";
-                    }
+                if ($actualType !== $expectedType) {
+                    $errors[] = "Field '{$field}' has incorrect type. Expected: {$expectedType}, Got: {$actualType}";
                 }
             }
         }
 
         // Check enum values
-        if (isset($schema['enums'])) {
-            foreach ($schema['enums'] as $field => $allowedValues) {
-                if (isset($item[$field])) {
-                    if (! in_array($item[$field], $allowedValues, true)) {
-                        $errors[] = "Field '{$field}' has invalid value. Allowed: ".implode(', ', $allowedValues);
-                    }
+        $enums = isset($schema['enums']) && is_array($schema['enums']) ? $schema['enums'] : [];
+        foreach ($enums as $field => $allowedValues) {
+            if (! is_string($field) || ! is_array($allowedValues)) {
+                continue;
+            }
+            if (isset($item[$field])) {
+                if (! in_array($item[$field], $allowedValues, true)) {
+                    $stringValues = array_map(static fn ($v): string => is_scalar($v) ? (string) $v : 'complex', $allowedValues);
+                    $errors[] = "Field '{$field}' has invalid value. Allowed: ".implode(', ', $stringValues);
                 }
             }
         }
 
         // Check value ranges
-        if (isset($schema['ranges'])) {
-            foreach ($schema['ranges'] as $field => $range) {
-                if (isset($item[$field])) {
-                    $value = $item[$field];
+        $ranges = isset($schema['ranges']) && is_array($schema['ranges']) ? $schema['ranges'] : [];
+        foreach ($ranges as $field => $range) {
+            if (! is_string($field) || ! is_array($range)) {
+                continue;
+            }
+            if (isset($item[$field])) {
+                $value = $item[$field];
+                $valueStr = is_scalar($value) ? (string) $value : 'N/A';
 
-                    if (isset($range['min']) && $value < $range['min']) {
-                        $errors[] = "Field '{$field}' value {$value} is below minimum {$range['min']}";
-                    }
+                if (isset($range['min']) && is_numeric($value) && is_numeric($range['min']) && $value < $range['min']) {
+                    $minStr = (string) $range['min'];
+                    $errors[] = "Field '{$field}' value {$valueStr} is below minimum {$minStr}";
+                }
 
-                    if (isset($range['max']) && $value > $range['max']) {
-                        $errors[] = "Field '{$field}' value {$value} exceeds maximum {$range['max']}";
-                    }
+                if (isset($range['max']) && is_numeric($value) && is_numeric($range['max']) && $value > $range['max']) {
+                    $maxStr = (string) $range['max'];
+                    $errors[] = "Field '{$field}' value {$valueStr} exceeds maximum {$maxStr}";
                 }
             }
         }
@@ -311,6 +328,7 @@ class ResponseValidator
      * @return array<string, array<string, mixed>>
      */
     public function getSchemas(): array
+    {
         return $this->schemas;
     }
 }

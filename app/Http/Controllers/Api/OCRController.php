@@ -47,7 +47,7 @@ class OCRController extends Controller
             ], 400);
         }
 
-        $result = $this->tesseractService->processScreenshot($file, $user?->id ?? throw new \Exception('User required'));
+        $result = $this->tesseractService->processScreenshot($file, $user->id ?? throw new \Exception('User required'));
 
         if (! $result['success']) {
             return response()->json([

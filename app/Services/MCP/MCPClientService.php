@@ -40,9 +40,12 @@ class MCPClientService
     {
         $this->enabled = (bool) Config::get('mcp.enabled', true);
         $this->debug = (bool) Config::get('mcp.debug', false);
-        $this->healthCheckInterval = (int) Config::get('mcp.health_check_interval', 300);
-        $this->connectionTimeout = (int) Config::get('mcp.connection_timeout', 10);
-        $this->maxConcurrentCalls = (int) Config::get('mcp.max_concurrent_calls', 5);
+        $healthCheckInterval = Config::get('mcp.health_check_interval', 300);
+        $this->healthCheckInterval = is_int($healthCheckInterval) ? $healthCheckInterval : 300;
+        $connectionTimeout = Config::get('mcp.connection_timeout', 10);
+        $this->connectionTimeout = is_int($connectionTimeout) ? $connectionTimeout : 10;
+        $maxConcurrentCalls = Config::get('mcp.max_concurrent_calls', 5);
+        $this->maxConcurrentCalls = is_int($maxConcurrentCalls) ? $maxConcurrentCalls : 5;
 
         $servers = Config::get('mcp.servers', []);
         $this->servers = is_array($servers) ? $servers : [];
@@ -82,6 +85,7 @@ class MCPClientService
      * @return array<string, mixed>
      */
     public function getServers(): array
+    {
         return $this->servers;
     }
 
@@ -113,7 +117,8 @@ class MCPClientService
      *
      * @return array<string, mixed>
      */
-    public function getServerCapabilities(): array
+    public function getServerCapabilities(string $name): array
+    {
         $server = $this->getServer($name);
         if (! $server) {
             return [];
@@ -181,6 +186,7 @@ class MCPClientService
      * @return array<string, array{status: string, message: string, capabilities?: array<string, mixed>, health?: array<string, mixed>}>
      */
     public function healthCheck(): array
+    {
         $results = [];
 
         foreach ($this->servers as $name => $config) {
@@ -239,7 +245,8 @@ class MCPClientService
      * @param  array<string, mixed>  $config
      * @return array{status: string, message: string, capabilities: array<string, mixed>, health: array<string, mixed>}
      */
-    protected function performHealthCheck(): array
+    protected function performHealthCheck(string $name, array $config): array
+    {
         $capabilities = $config['capabilities'] ?? [];
         $health = $this->getServerHealth($name) ?? [
             'status' => 'unknown',
@@ -328,6 +335,7 @@ class MCPClientService
      * @return array<string, array{status: string, last_check: int, consecutive_failures: int}>
      */
     public function getAllServerHealth(): array
+    {
         return $this->serverHealth;
     }
 
@@ -389,6 +397,7 @@ class MCPClientService
      * @return array{strands_agents: bool, agentcore: bool}
      */
     public function getAIServicesStatus(): array
+    {
         return [
             'strands_agents' => $this->isStrandsAgentsAvailable(),
             'agentcore' => $this->isAgentCoreAvailable(),
@@ -401,7 +410,8 @@ class MCPClientService
      * @param  array<string, mixed>  $input
      * @return array<string, mixed>
      */
-    public function executeAgent(): array
+    public function executeAgent(string $agentType, array $input): array
+    {
         // Simulate agent execution via MCP
         // In production, this would make actual MCP protocol calls
         $this->debugLog('Executing agent via MCP', [
@@ -453,7 +463,8 @@ class MCPClientService
      *
      * @throws \RuntimeException
      */
-    public function callTool(): array
+    public function callTool(string $serverName, string $toolName, array $arguments): array
+    {
         if (! $this->isEnabled()) {
             throw new \RuntimeException('MCP is not enabled');
         }
@@ -490,7 +501,8 @@ class MCPClientService
      *
      * @throws \RuntimeException
      */
-    public function get(): array
+    public function get(string $url, array $headers = [], int $timeout = 30): array
+    {
         return $this->fetch($url, 'GET', [], $headers, $timeout);
     }
 
@@ -503,7 +515,8 @@ class MCPClientService
      *
      * @throws \RuntimeException
      */
-    public function post(): array
+    public function post(string $url, array $data = [], array $headers = [], int $timeout = 30): array
+    {
         return $this->fetch($url, 'POST', $data, $headers, $timeout);
     }
 
@@ -516,7 +529,8 @@ class MCPClientService
      *
      * @throws \RuntimeException
      */
-    public function put(): array
+    public function put(string $url, array $data = [], array $headers = [], int $timeout = 30): array
+    {
         return $this->fetch($url, 'PUT', $data, $headers, $timeout);
     }
 
@@ -528,7 +542,8 @@ class MCPClientService
      *
      * @throws \RuntimeException
      */
-    public function delete(): array
+    public function delete(string $url, array $headers = [], int $timeout = 30): array
+    {
         return $this->fetch($url, 'DELETE', [], $headers, $timeout);
     }
 
@@ -541,7 +556,8 @@ class MCPClientService
      *
      * @throws \RuntimeException
      */
-    public function patch(): array
+    public function patch(string $url, array $data = [], array $headers = [], int $timeout = 30): array
+    {
         return $this->fetch($url, 'PATCH', $data, $headers, $timeout);
     }
 
@@ -554,7 +570,14 @@ class MCPClientService
      *
      * @throws \RuntimeException
      */
-    public function fetch(): array
+    public function fetch(
+        string $url,
+        string $method = 'GET',
+        array $data = [],
+        array $headers = [],
+        int $timeout = 30,
+        int $maxRetries = 3
+    ): array {
         if (! $this->isServerEnabled('fetch')) {
             throw new \RuntimeException('MCP fetch server is not enabled');
         }
@@ -577,7 +600,7 @@ class MCPClientService
         }
 
         while ($attempt < $maxRetries) {
-            $attempt = ($attempt ?? 0) + 1;
+            $attempt = $attempt + 1;
 
             try {
                 $this->debugLog("HTTP {$method} request (attempt {$attempt}/{$maxRetries})", [
@@ -652,7 +675,13 @@ class MCPClientService
      *
      * @throws \RuntimeException
      */
-    protected function performFetch(): array
+    protected function performFetch(
+        string $url,
+        string $method,
+        array $data = [],
+        array $headers = [],
+        int $timeout = 30
+    ): array {
         // In production, this would make actual MCP protocol calls to the fetch server
         // For now, we simulate a successful response structure
 
@@ -692,16 +721,24 @@ class MCPClientService
      *
      * @throws \RuntimeException
      */
-    public function fetchJson(): array
+    public function fetchJson(
+        string $url,
+        string $method = 'GET',
+        array $data = [],
+        array $headers = [],
+        int $timeout = 30
+    ): array {
         $response = $this->fetch($url, $method, $data, $headers, $timeout);
 
         if (! $response['success']) {
             $error = $response['error'] ?? 'Unknown error';
-            throw new \RuntimeException("Fetch failed: {$error}");
+            $errorStr = is_string($error) ? $error : 'Unknown error';
+            throw new \RuntimeException("Fetch failed: {$errorStr}");
         }
 
         $body = $response['body'] ?? '';
-        $decoded = json_decode($body, true);
+        $bodyStr = is_string($body) ? $body : '';
+        $decoded = json_decode($bodyStr, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new \RuntimeException('Failed to decode JSON response: '.json_last_error_msg());

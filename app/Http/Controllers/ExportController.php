@@ -58,7 +58,7 @@ class ExportController extends Controller
             $filters = $request->input('filters', []);
             $filters = is_array($filters) ? $filters : [];
             $saveToFile = $request->boolean('save_to_file', false);
-            $userId = $user?->id ?? throw new \Exception('User required');
+            $userId = $user->id ?? throw new \Exception('User required');
 
             // Generate export data
             $result = $this->exportService->generateExport($exportType, $userId, $filters);
@@ -72,19 +72,19 @@ class ExportController extends Controller
             }
 
             // Convert to requested format
-            $exportTypeStr = is_string($exportType) ? $exportType : 'character';
-            $formatStr = is_string($format) ? $format : 'json';
+            /** @var string $formatStr */
+            $formatStr = $format;
             $content = match ($formatStr) {
                 'json' => $this->exportService->toJson($result['data']),
-                'csv' => $this->exportService->toCsv($result['data'], $exportTypeStr),
-                'pdf' => $this->exportService->toPdf($result['data'], $exportTypeStr),
+                'csv' => $this->exportService->toCsv($result['data'], $exportType),
+                'pdf' => $this->exportService->toPdf($result['data'], $exportType),
                 default => $this->exportService->toJson($result['data']),
             };
 
             // Save to file if requested
             $fileInfo = null;
             if ($saveToFile) {
-                $fileInfo = $this->exportService->saveExport($content, $formatStr, $exportTypeStr, $userId);
+                $fileInfo = $this->exportService->saveExport($content, $formatStr, $exportType, $userId);
             }
 
             return response()->json([
@@ -101,7 +101,7 @@ class ExportController extends Controller
         } catch (\Exception $e) {
             Log::error('[ExportController] Generate failed', [
                 'error' => $e->getMessage(),
-                'user_id' => $request->user()?->id,
+                'user_id' => $request->user()->id ?? null,
             ]);
 
             return response()->json([
@@ -122,7 +122,7 @@ class ExportController extends Controller
         try {
             $user = $request->user();
             /** @var \App\Models\User $user */
-            $userId = $user?->id ?? throw new \Exception('User required');
+            $userId = $user->id ?? throw new \Exception('User required');
             $result = $this->exportService->downloadExport($path, $userId);
 
             if (! $result['success']) {
@@ -135,7 +135,7 @@ class ExportController extends Controller
             return response($result['content'])
                 ->header('Content-Type', $result['mime_type'])
                 ->header('Content-Disposition', 'attachment; filename="'.$result['file_name'].'"')
-                ->header('Content-Length', \strlen($result['content']));
+                ->header('Content-Length', (string) \strlen($result['content']));
         } catch (\Exception $e) {
             Log::error('[ExportController] Download failed', [
                 'error' => $e->getMessage(),
@@ -207,7 +207,7 @@ class ExportController extends Controller
         try {
             $user = $request->user();
             /** @var \App\Models\User $user */
-            $userId = $user?->id ?? throw new \Exception('User required');
+            $userId = $user->id ?? throw new \Exception('User required');
             $limit = (int) $request->query('limit', 20);
 
             $history = $this->exportService->getExportHistory($userId, $limit);
@@ -242,7 +242,7 @@ class ExportController extends Controller
         try {
             $user = $request->user();
             /** @var \App\Models\User $user */
-            $userId = $user?->id ?? throw new \Exception('User required');
+            $userId = $user->id ?? throw new \Exception('User required');
             $scheduleConfig = [
                 'export_type' => $request->input('export_type'),
                 'format' => $request->input('format', 'json'),
@@ -295,7 +295,7 @@ class ExportController extends Controller
         try {
             $user = $request->user();
             /** @var \App\Models\User $user */
-            $userId = $user?->id ?? throw new \Exception('User required');
+            $userId = $user->id ?? throw new \Exception('User required');
             $schedules = $this->exportService->getScheduledExports($userId);
 
             return response()->json([
@@ -327,7 +327,7 @@ class ExportController extends Controller
         try {
             $user = $request->user();
             /** @var \App\Models\User $user */
-            $userId = $user?->id ?? throw new \Exception('User required');
+            $userId = $user->id ?? throw new \Exception('User required');
             $deleted = $this->exportService->deleteScheduledExport($userId, $scheduleId);
 
             if (! $deleted) {
@@ -369,7 +369,7 @@ class ExportController extends Controller
             $exportType = is_string($exportType) ? $exportType : 'json';
             $filters = $request->input('filters', []);
             $filters = is_array($filters) ? $filters : [];
-            $userId = $user?->id ?? throw new \Exception('User required');
+            $userId = $user->id ?? throw new \Exception('User required');
 
             // Generate export data
             $result = $this->exportService->generateExport($exportType, $userId, $filters);

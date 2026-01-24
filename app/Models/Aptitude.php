@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class Aptitude extends Model
 {
+    /** @use HasFactory<\Database\Factories\AptitudeFactory> */
     use HasFactory;
 
     protected $table = 'ucp_aptitudes';

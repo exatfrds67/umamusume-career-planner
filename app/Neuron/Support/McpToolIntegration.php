@@ -185,7 +185,7 @@ class McpToolIntegration
      */
     public static function isEnabled(): bool
     {
-        return config('neuron.mcp.enabled', false);
+        return (bool) config('neuron.mcp.enabled', false);
     }
 
     /**
@@ -203,14 +203,18 @@ class McpToolIntegration
 
         // Get all local servers
         $localServers = config('neuron.mcp.local_servers', []);
-        foreach (array_keys($localServers) as $name) {
-            $servers[] = $name;
+        if (is_array($localServers)) {
+            foreach (array_keys($localServers) as $name) {
+                $servers[] = (string) $name;
+            }
         }
 
         // Get all remote servers
         $remoteServers = config('neuron.mcp.remote_servers', []);
-        foreach (array_keys($remoteServers) as $name) {
-            $servers[] = $name;
+        if (is_array($remoteServers)) {
+            foreach (array_keys($remoteServers) as $name) {
+                $servers[] = (string) $name;
+            }
         }
 
         return $servers;
@@ -219,29 +223,35 @@ class McpToolIntegration
     /**
      * Get server configuration details.
      *
-     * @return array{type: string, enabled: bool, description: string, tools: array}|null
+     * @return array{type: string, enabled: bool, description: string, tools: array<string, array<string>>}|null
      */
     public static function getServerInfo(string $serverName): ?array
     {
         // Check local servers
         $localConfig = config("neuron.mcp.local_servers.{$serverName}");
-        if ($localConfig) {
+        if (is_array($localConfig)) {
+            /** @var array<string, array<string>> $tools */
+            $tools = is_array($localConfig['tools'] ?? null) ? $localConfig['tools'] : ['exclude' => [], 'only' => []];
+
             return [
                 'type' => 'local',
-                'enabled' => $localConfig['enabled'] ?? false,
-                'description' => $localConfig['description'] ?? '',
-                'tools' => $localConfig['tools'] ?? ['exclude' => [], 'only' => []],
+                'enabled' => (bool) ($localConfig['enabled'] ?? false),
+                'description' => is_string($localConfig['description'] ?? null) ? $localConfig['description'] : '',
+                'tools' => $tools,
             ];
         }
 
         // Check remote servers
         $remoteConfig = config("neuron.mcp.remote_servers.{$serverName}");
-        if ($remoteConfig) {
+        if (is_array($remoteConfig)) {
+            /** @var array<string, array<string>> $tools */
+            $tools = is_array($remoteConfig['tools'] ?? null) ? $remoteConfig['tools'] : ['exclude' => [], 'only' => []];
+
             return [
                 'type' => 'remote',
-                'enabled' => $remoteConfig['enabled'] ?? false,
-                'description' => $remoteConfig['description'] ?? '',
-                'tools' => $remoteConfig['tools'] ?? ['exclude' => [], 'only' => []],
+                'enabled' => (bool) ($remoteConfig['enabled'] ?? false),
+                'description' => is_string($remoteConfig['description'] ?? null) ? $remoteConfig['description'] : '',
+                'tools' => $tools,
             ];
         }
 

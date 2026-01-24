@@ -44,7 +44,10 @@ class WarmCache extends Command
             // For actual cache warming, use WarmCacheCommand instead
             $result = $cacheService->warmCache([]);
 
-            $this->info("Warmed: {$result['warmed']}, Failed: {$result['failed']}, Skipped: {$result['skipped']}");
+            $warmed = isset($result['warmed']) && is_numeric($result['warmed']) ? (int) $result['warmed'] : 0;
+            $failed = isset($result['failed']) && is_numeric($result['failed']) ? (int) $result['failed'] : 0;
+            $skipped = isset($result['skipped']) && is_numeric($result['skipped']) ? (int) $result['skipped'] : 0;
+            $this->info("Warmed: {$warmed}, Failed: {$failed}, Skipped: {$skipped}");
 
             // Get cache statistics
             $stats = $cacheService->getStatistics();

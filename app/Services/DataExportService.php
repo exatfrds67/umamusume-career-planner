@@ -102,15 +102,26 @@ class DataExportService
      * @param  array<string, mixed>  $filters  Optional filters for selective export
      * @return array{success: bool, data: array<int, array<string, mixed>>, count: int, errors: array<int, string>}
      */
-    public function generateExport(): array
+    public function generateExport(string $exportType = 'full_backup', int $userId = 0, array $filters = []): array
+    {
         try {
+            if ($userId <= 0 || $exportType === '') {
+                return [
+                    'success' => false,
+                    'data' => [],
+                    'count' => 0,
+                    'errors' => ['Invalid export request'],
+                ];
+            }
+
+            /** @var array<int, array<string, mixed>> $data */
             $data = match ($exportType) {
                 'character' => $this->exportCharacters($userId, $filters),
                 'career' => $this->exportCareers($userId, $filters),
                 'training_session' => $this->exportTrainingSessions($userId, $filters),
                 'skill' => $this->exportSkills($userId, $filters),
                 'support_card' => $this->exportSupportCards($userId, $filters),
-                'full_backup' => $this->exportFullBackup($userId, $filters),
+                'full_backup' => $this->exportFullBackupAsIndexed($userId, $filters),
                 default => throw new \InvalidArgumentException("Unknown export type: {$exportType}"),
             };
 
@@ -142,7 +153,8 @@ class DataExportService
      * @param  array<string, mixed>  $filters
      * @return array<int, array<string, mixed>>
      */
-    private function exportCharacters(): array
+    private function exportCharacters(int $userId, array $filters = []): array
+    {
         $query = Character::where('user_id', $userId)
             ->with(['aptitudes', 'factors', 'skillAcquisitions.skill']);
 
@@ -167,7 +179,8 @@ class DataExportService
             $query->whereIn('id', $filters['character_ids']);
         }
 
-        return $query->get()->map(function ($character) {
+        /** @var array<int, array<string, mixed>> $result */
+        $result = $query->get()->map(function (Character $character): array {
             return [
                 'id' => $character->id,
                 'uuid' => $character->uuid,
@@ -182,19 +195,19 @@ class DataExportService
                 'goals' => $character->goals,
                 'growth_rates' => $character->growth_rates,
                 'status' => $character->status,
-                'aptitudes' => $character->aptitudes->map(fn ($apt) => [
+                'aptitudes' => $character->aptitudes->map(fn (\App\Models\Aptitude $apt): array => [
                     'distance_type' => $apt->distance_type,
                     'surface_type' => $apt->surface_type,
                     'running_style' => $apt->running_style,
                     'grade' => $apt->grade,
                 ])->toArray(),
-                'factors' => $character->factors->map(fn ($factor) => [
+                'factors' => $character->factors->map(fn (\App\Models\Factor $factor): array => [
                     'factor_type' => $factor->factor_type,
-                    'factor_level' => $factor->factor_level,
+                    'star_level' => $factor->star_level,
                     'stat_bonus' => $factor->stat_bonus,
                     'source_parent' => $factor->source_parent,
                 ])->toArray(),
-                'skills' => $character->skillAcquisitions->map(fn ($acq) => [
+                'skills' => $character->skillAcquisitions->map(fn (\App\Models\SkillAcquisition $acq): array => [
                     'skill_name' => $acq->skill?->name,
                     'skill_type' => $acq->skill?->skill_type,
                     'sp_cost' => $acq->final_sp_cost,
@@ -204,6 +217,8 @@ class DataExportService
                 'updated_at' => $character->updated_at?->toIso8601String(),
             ];
         })->toArray();
+
+        return $result;
     }
 
     /**
@@ -212,7 +227,8 @@ class DataExportService
      * @param  array<string, mixed>  $filters
      * @return array<int, array<string, mixed>>
      */
-    private function exportCareers(): array
+    private function exportCareers(int $userId, array $filters = []): array
+    {
         $query = Career::where('user_id', $userId)
             ->with(['character', 'trainingSessions', 'races']);
 
@@ -237,7 +253,11 @@ class DataExportService
             $query->whereIn('id', $filters['career_ids']);
         }
 
-        return $query->get()->map(function ($career) {
+        /** @var array<int, array<string, mixed>> $result */
+        $result = $query->get()->map(function (Career $career): array {
+            $startedAt = $career->started_at;
+            $completedAt = $career->completed_at;
+
             return [
                 'id' => $career->id,
                 'career_name' => $career->career_name,
@@ -261,10 +281,12 @@ class DataExportService
                 'performance_analysis' => $career->performance_analysis,
                 'training_sessions_count' => $career->trainingSessions->count(),
                 'races_count' => $career->races->count(),
-                'started_at' => $career->started_at?->toIso8601String(),
-                'completed_at' => $career->completed_at?->toIso8601String(),
+                'started_at' => $startedAt instanceof \Illuminate\Support\Carbon ? $startedAt->toIso8601String() : $startedAt,
+                'completed_at' => $completedAt instanceof \Illuminate\Support\Carbon ? $completedAt->toIso8601String() : $completedAt,
             ];
         })->toArray();
+
+        return $result;
     }
 
     /**
@@ -273,7 +295,8 @@ class DataExportService
      * @param  array<string, mixed>  $filters
      * @return array<int, array<string, mixed>>
      */
-    private function exportTrainingSessions(): array
+    private function exportTrainingSessions(int $userId, array $filters = []): array
+    {
         $query = TrainingSession::whereHas('career', function ($q) use ($userId) {
             $q->where('user_id', $userId);
         })->with(['career', 'character']);
@@ -303,7 +326,8 @@ class DataExportService
             $query->where('created_at', '<=', $filters['date_to']);
         }
 
-        return $query->orderBy('turn_number')->get()->map(function ($session) {
+        /** @var array<int, array<string, mixed>> $result */
+        $result = $query->orderBy('turn_number')->get()->map(function (TrainingSession $session): array {
             return [
                 'id' => $session->id,
                 'career_name' => $session->career?->career_name,
@@ -333,6 +357,8 @@ class DataExportService
                 'created_at' => $session->created_at?->toIso8601String(),
             ];
         })->toArray();
+
+        return $result;
     }
 
     /**
@@ -341,7 +367,8 @@ class DataExportService
      * @param  array<string, mixed>  $filters
      * @return array<int, array<string, mixed>>
      */
-    private function exportSkills(): array
+    private function exportSkills(int $userId, array $filters = []): array
+    {
         // Get all skills (reference data)
         $query = Skill::query();
 
@@ -358,7 +385,8 @@ class DataExportService
             $query->where('is_evolution', $filters['is_evolution']);
         }
 
-        return $query->get()->map(function ($skill) {
+        /** @var array<int, array<string, mixed>> $result */
+        $result = $query->get()->map(function (Skill $skill): array {
             return [
                 'id' => $skill->id,
                 'name' => $skill->name,
@@ -366,13 +394,15 @@ class DataExportService
                 'rarity' => $skill->rarity,
                 'base_sp_cost' => $skill->base_sp_cost,
                 'description' => $skill->description,
-                'effect' => $skill->effect,
+                'effects' => $skill->effects,
                 'is_evolution' => $skill->is_evolution,
-                'evolves_from' => $skill->evolves_from,
-                'evolves_to' => $skill->evolves_to,
+                'evolution_source_id' => $skill->evolution_source_id,
+                'evolution_target_id' => $skill->evolution_target_id,
                 'meta_tier' => $skill->meta_tier,
             ];
         })->toArray();
+
+        return $result;
     }
 
     /**
@@ -381,7 +411,8 @@ class DataExportService
      * @param  array<string, mixed>  $filters
      * @return array<int, array<string, mixed>>
      */
-    private function exportSupportCards(): array
+    private function exportSupportCards(int $userId, array $filters = []): array
+    {
         // Get support cards used by user's characters
         $query = SupportCard::query();
 
@@ -398,7 +429,8 @@ class DataExportService
             $query->where('meta_tier', $filters['meta_tier']);
         }
 
-        return $query->get()->map(function ($card) {
+        /** @var array<int, array<string, mixed>> $result */
+        $result = $query->get()->map(function (SupportCard $card): array {
             return [
                 'id' => $card->id,
                 'name' => $card->name,
@@ -417,15 +449,29 @@ class DataExportService
                 'meta_tier' => $card->meta_tier,
             ];
         })->toArray();
+
+        return $result;
     }
 
     /**
-     * Export full backup for a user
+     * Export full backup for a user (returns indexed array for generateExport)
+     *
+     * @param  array<string, mixed>  $filters
+     * @return array<int, array<string, mixed>>
+     */
+    private function exportFullBackupAsIndexed(int $userId, array $filters = []): array
+    {
+        return [$this->exportFullBackupData($userId, $filters)];
+    }
+
+    /**
+     * Export full backup for a user (structured data)
      *
      * @param  array<string, mixed>  $filters
      * @return array<string, mixed>
      */
-    private function exportFullBackup(): array
+    private function exportFullBackupData(int $userId, array $filters = []): array
+    {
         return [
             'export_info' => [
                 'version' => '1.0',
@@ -443,7 +489,7 @@ class DataExportService
     /**
      * Convert data to JSON format
      *
-     * @param  array  $data  Data to convert
+     * @param  array<string|int, mixed>  $data  Data to convert
      * @param  bool  $pretty  Whether to pretty print
      * @return string JSON string
      */
@@ -472,7 +518,10 @@ class DataExportService
 
         // For full backup, we need to handle nested structure
         if ($exportType === 'full_backup') {
-            return $this->fullBackupToCsv($data);
+            /** @var array<string, array<int, array<string, mixed>>|array<string, mixed>> $fullBackupData */
+            $fullBackupData = $data;
+
+            return $this->fullBackupToCsv($fullBackupData);
         }
 
         $output = fopen('php://temp', 'r+');
@@ -490,12 +539,21 @@ class DataExportService
         }
 
         // Write headers
-        $headers = array_keys($flattenedData[0]);
+        $firstRow = $flattenedData[0];
+        $headers = array_keys($firstRow);
         fputcsv($output, $headers);
 
         // Write data rows
         foreach ($flattenedData as $row) {
-            fputcsv($output, array_values($row));
+            /** @var array<int|string, bool|float|int|string|null> $values */
+            $values = array_map(function (mixed $val): bool|float|int|string|null {
+                if (\is_scalar($val) || $val === null) {
+                    return $val;
+                }
+
+                return json_encode($val) ?: '';
+            }, array_values($row));
+            fputcsv($output, $values);
         }
 
         rewind($output);
@@ -511,7 +569,8 @@ class DataExportService
      * @param  array<int, array<string, mixed>>  $data
      * @return array<int, array<string, mixed>>
      */
-    private function flattenForCsv(): array
+    private function flattenForCsv(array $data): array
+    {
         return array_map(function ($item) {
             $flattened = [];
             foreach ($item as $key => $value) {
@@ -530,7 +589,7 @@ class DataExportService
     /**
      * Convert full backup to CSV (multiple sheets as separate sections)
      *
-     * @param  array<string, mixed>  $data
+     * @param  array<string, array<int, array<string, mixed>>|array<string, mixed>>  $data
      */
     private function fullBackupToCsv(array $data): string
     {
@@ -539,8 +598,12 @@ class DataExportService
         foreach ($data as $section => $sectionData) {
             if ($section === 'export_info') {
                 $output .= "# Export Information\n";
-                foreach ($sectionData as $key => $value) {
-                    $output .= "{$key},{$value}\n";
+                if (\is_array($sectionData)) {
+                    foreach ($sectionData as $key => $value) {
+                        $keyStr = (string) $key;
+                        $valueStr = \is_scalar($value) || $value === null ? (string) $value : json_encode($value);
+                        $output .= "{$keyStr},{$valueStr}\n";
+                    }
                 }
                 $output .= "\n";
 
@@ -552,7 +615,9 @@ class DataExportService
             }
 
             $output .= "# {$section}\n";
-            $flattenedData = $this->flattenForCsv($sectionData);
+            /** @var array<int, array<string, mixed>> $sectionDataTyped */
+            $sectionDataTyped = $sectionData;
+            $flattenedData = $this->flattenForCsv($sectionDataTyped);
 
             if (! empty($flattenedData)) {
                 $headers = array_keys($flattenedData[0]);
@@ -595,6 +660,9 @@ class DataExportService
 
     /**
      * Generate HTML for PDF export
+     *
+     * @param  array<int|string, mixed>  $data
+     * @param  array<string, mixed>  $options
      */
     private function generatePdfHtml(array $data, string $exportType, string $title, string $exportDate, array $options): string
     {
@@ -647,11 +715,16 @@ HTML;
 
     /**
      * Generate PDF content based on export type
+     *
+     * @param  array<int|string, mixed>  $data
      */
     private function generatePdfContent(array $data, string $exportType): string
     {
         if ($exportType === 'full_backup') {
-            return $this->generateFullBackupPdfContent($data);
+            /** @var array<string, array<int, array<string, mixed>>|array<string, mixed>> $fullBackupData */
+            $fullBackupData = $data;
+
+            return $this->generateFullBackupPdfContent($fullBackupData);
         }
 
         if (empty($data)) {
@@ -663,7 +736,10 @@ HTML;
         $html .= '<table><thead><tr>';
 
         // Generate headers from first item
-        $firstItem = $data[0];
+        $firstItem = $data[0] ?? [];
+        if (! \is_array($firstItem)) {
+            return '<div class="section"><p>Invalid data format.</p></div>';
+        }
         foreach (array_keys($firstItem) as $key) {
             $label = ucwords(str_replace('_', ' ', (string) $key));
             $html .= "<th>{$label}</th>";
@@ -672,6 +748,9 @@ HTML;
 
         // Generate rows
         foreach ($data as $item) {
+            if (! \is_array($item)) {
+                continue;
+            }
             $html .= '<tr>';
             foreach ($item as $value) {
                 $displayValue = $this->formatPdfValue($value);
@@ -687,19 +766,23 @@ HTML;
 
     /**
      * Generate full backup PDF content
+     *
+     * @param  array<string, array<int, array<string, mixed>>|array<string, mixed>>  $data
      */
     private function generateFullBackupPdfContent(array $data): string
     {
         $html = '';
 
         // Export info section
-        if (isset((is_array($data) && isset($data['export_info']) ? $data['export_info'] : null))) {
+        $exportInfo = $data['export_info'] ?? null;
+        if (\is_array($exportInfo)) {
             $html .= '<div class="section">';
             $html .= '<div class="section-title">Export Information</div>';
             $html .= '<table>';
-            foreach ((is_array($data) && isset($data['export_info']) ? $data['export_info'] : null) as $key => $value) {
+            foreach ($exportInfo as $key => $value) {
                 $label = ucwords(str_replace('_', ' ', (string) $key));
-                $html .= "<tr><th>{$label}</th><td>{$value}</td></tr>";
+                $valueStr = \is_scalar($value) || $value === null ? (string) $value : json_encode($value);
+                $html .= "<tr><th>{$label}</th><td>{$valueStr}</td></tr>";
             }
             $html .= '</table></div>';
         }
@@ -707,38 +790,48 @@ HTML;
         // Other sections
         $sections = ['characters', 'careers', 'training_sessions', 'skills', 'support_cards'];
         foreach ($sections as $section) {
-            if (isset($data[$section]) && ! empty($data[$section])) {
-                $sectionTitle = ucwords(str_replace('_', ' ', $section));
-                $html .= '<div class="section">';
-                $html .= "<div class=\"section-title\">{$sectionTitle} (".count($data[$section]).' records)</div>';
-
-                // Summary table for each section
-                $html .= '<table><thead><tr>';
-                $firstItem = $data[$section][0];
-                $displayKeys = array_slice(array_keys($firstItem), 0, 6); // Limit columns for readability
-                foreach ($displayKeys as $key) {
-                    $label = ucwords(str_replace('_', ' ', (string) $key));
-                    $html .= "<th>{$label}</th>";
-                }
-                $html .= '</tr></thead><tbody>';
-
-                foreach (array_slice($data[$section], 0, 10) as $item) { // Limit rows for PDF
-                    $html .= '<tr>';
-                    foreach ($displayKeys as $key) {
-                        $value = $item[$key] ?? '';
-                        $displayValue = $this->formatPdfValue($value);
-                        $html .= "<td>{$displayValue}</td>";
-                    }
-                    $html .= '</tr>';
-                }
-
-                if (count($data[$section]) > 10) {
-                    $remaining = count($data[$section]) - 10;
-                    $html .= '<tr><td colspan="'.count($displayKeys)."\" style=\"text-align: center; font-style: italic;\">... and {$remaining} more records</td></tr>";
-                }
-
-                $html .= '</tbody></table></div>';
+            $sectionDataRaw = $data[$section] ?? null;
+            if (! \is_array($sectionDataRaw) || empty($sectionDataRaw)) {
+                continue;
             }
+            /** @var array<int, array<string, mixed>> $sectionItems */
+            $sectionItems = $sectionDataRaw;
+            $sectionTitle = ucwords(str_replace('_', ' ', $section));
+            $html .= '<div class="section">';
+            $html .= "<div class=\"section-title\">{$sectionTitle} (".count($sectionItems).' records)</div>';
+
+            // Summary table for each section
+            $html .= '<table><thead><tr>';
+            $firstItem = $sectionItems[0] ?? [];
+            if (! \is_array($firstItem)) {
+                continue;
+            }
+            $displayKeys = array_slice(array_keys($firstItem), 0, 6); // Limit columns for readability
+            foreach ($displayKeys as $key) {
+                $label = ucwords(str_replace('_', ' ', (string) $key));
+                $html .= "<th>{$label}</th>";
+            }
+            $html .= '</tr></thead><tbody>';
+
+            foreach (array_slice($sectionItems, 0, 10) as $item) { // Limit rows for PDF
+                if (! \is_array($item)) {
+                    continue;
+                }
+                $html .= '<tr>';
+                foreach ($displayKeys as $key) {
+                    $value = $item[$key] ?? '';
+                    $displayValue = $this->formatPdfValue($value);
+                    $html .= "<td>{$displayValue}</td>";
+                }
+                $html .= '</tr>';
+            }
+
+            if (count($sectionItems) > 10) {
+                $remaining = count($sectionItems) - 10;
+                $html .= '<tr><td colspan="'.count($displayKeys)."\" style=\"text-align: center; font-style: italic;\">... and {$remaining} more records</td></tr>";
+            }
+
+            $html .= '</tbody></table></div>';
         }
 
         return $html;
@@ -766,7 +859,9 @@ HTML;
                 $parts = [];
                 foreach ($value as $stat => $val) {
                     if ($val !== null && $val !== 0) {
-                        $parts[] = ucfirst($stat).': '.$val;
+                        $statStr = \is_string($stat) ? ucfirst($stat) : (string) $stat;
+                        $valStr = \is_scalar($val) ? (string) $val : (json_encode($val) ?: '');
+                        $parts[] = $statStr.': '.$valStr;
                     }
                 }
 
@@ -776,7 +871,11 @@ HTML;
             return htmlspecialchars(json_encode($value, JSON_UNESCAPED_UNICODE) ?: '[]');
         }
 
-        return htmlspecialchars((string) $value);
+        if (\is_scalar($value)) {
+            return htmlspecialchars((string) $value);
+        }
+
+        return '-';
     }
 
     /**
@@ -796,7 +895,8 @@ HTML;
      * @param  int  $userId  User ID
      * @return array{success: bool, file_path: string, file_name: string, file_size: int, download_url: string}
      */
-    public function saveExport(): array
+    public function saveExport(string $content, string $format, string $exportType, int $userId): array
+    {
         try {
             $timestamp = now()->format('Y-m-d_His');
             $fileName = "export_{$exportType}_{$timestamp}.{$format}";
@@ -864,35 +964,47 @@ HTML;
      *
      * @param  int  $userId  User ID
      * @param  int  $limit  Number of records to return
-     * @return array Export history records
+     * @return array<int, array{id: mixed, export_type: string, format: string, file_path: string, created_at: mixed}> Export history records
      */
-    public function getExportHistory(): array
-        return DB::table('ucp_system_logs')
+    public function getExportHistory(int $userId, int $limit = 20): array
+    {
+        /** @var array<int, array{id: mixed, export_type: string, format: string, file_path: string, created_at: mixed}> $result */
+        $result = DB::table('ucp_system_logs')
             ->where('user_id', $userId)
             ->where('log_category', '=', 'export')
             ->orderBy('created_at', 'desc')
             ->limit($limit)
             ->get()
-            ->map(function ($log) {
-                $context = json_decode($log->context_data ?? '{}', true);
+            ->map(function (object $log): array {
+                $contextData = \is_string($log->context_data) ? $log->context_data : '{}';
+                /** @var array<string, mixed>|null $context */
+                $context = json_decode($contextData, true);
+                $context = \is_array($context) ? $context : [];
+
+                $exportType = isset($context['export_type']) && \is_string($context['export_type']) ? $context['export_type'] : 'unknown';
+                $format = isset($context['format']) && \is_string($context['format']) ? $context['format'] : 'unknown';
+                $filePath = isset($context['file_path']) && \is_string($context['file_path']) ? $context['file_path'] : '';
 
                 return [
                     'id' => $log->id,
-                    'export_type' => $context['export_type'] ?? 'unknown',
-                    'format' => $context['format'] ?? 'unknown',
-                    'file_path' => $context['file_path'] ?? '',
+                    'export_type' => $exportType,
+                    'format' => $format,
+                    'file_path' => $filePath,
                     'created_at' => $log->created_at,
                 ];
             })
             ->toArray();
+
+        return $result;
     }
 
     /**
      * Get available export templates
      *
-     * @return array Export templates
+     * @return array<string, array{name: string, description: string, types: array<int, string>, fields: array<int, string>}> Export templates
      */
     public function getTemplates(): array
+    {
         return self::EXPORT_TEMPLATES;
     }
 
@@ -900,9 +1012,10 @@ HTML;
      * Get field mapping for export type
      *
      * @param  string  $exportType  Export type
-     * @return array Field mapping
+     * @return array<string, array<string, mixed>> Field mapping
      */
-    public function getFieldMapping(): array
+    public function getFieldMapping(string $exportType): array
+    {
         return match ($exportType) {
             'character' => [
                 'id' => ['label' => 'ID', 'type' => 'integer'],
@@ -965,7 +1078,8 @@ HTML;
      * @param  int  $userId  User ID for verification
      * @return array{success: bool, content: string, file_name: string, mime_type: string}
      */
-    public function downloadExport(): array
+    public function downloadExport(string $encodedPath, int $userId): array
+    {
         try {
             $filePath = base64_decode($encodedPath, true);
             if ($filePath === false) {
@@ -1037,10 +1151,11 @@ HTML;
      * Schedule an automated export
      *
      * @param  int  $userId  User ID
-     * @param  array  $scheduleConfig  Schedule configuration
+     * @param  array<string, mixed>  $scheduleConfig  Schedule configuration
      * @return array{success: bool, schedule_id: string, message: string}
      */
-    public function scheduleExport(): array
+    public function scheduleExport(int $userId, array $scheduleConfig): array
+    {
         try {
             $scheduleId = Str::uuid()->toString();
 
@@ -1086,17 +1201,21 @@ HTML;
      * Get scheduled exports for a user
      *
      * @param  int  $userId  User ID
-     * @return array Scheduled exports
+     * @return array<int, array{schedule_id: string, config: mixed, created_at: mixed, updated_at: mixed}> Scheduled exports
      */
-    public function getScheduledExports(): array
-        return DB::table('ucp_user_preferences')
+    public function getScheduledExports(int $userId): array
+    {
+        /** @var array<int, array{schedule_id: string, config: mixed, created_at: mixed, updated_at: mixed}> $result */
+        $result = DB::table('ucp_user_preferences')
             ->where('user_id', $userId)
             ->where('preference_category', '=', 'export')
             ->where('preference_key', 'like', 'export_schedule_%')
             ->get()
-            ->map(function ($pref) {
-                $scheduleId = str_replace('export_schedule_', '', $pref->preference_key);
-                $config = json_decode($pref->preference_value, true);
+            ->map(function (object $pref): array {
+                $prefKey = \is_string($pref->preference_key) ? $pref->preference_key : '';
+                $prefValue = \is_string($pref->preference_value) ? $pref->preference_value : '{}';
+                $scheduleId = str_replace('export_schedule_', '', $prefKey);
+                $config = json_decode($prefValue, true);
 
                 return [
                     'schedule_id' => $scheduleId,
@@ -1106,6 +1225,8 @@ HTML;
                 ];
             })
             ->toArray();
+
+        return $result;
     }
 
     /**

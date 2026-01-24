@@ -71,6 +71,7 @@ class APIHealthMonitorService
      * @return array{umapyoi: array<string, mixed>, umamusumedb: array<string, mixed>, overall_status: string, timestamp: string}
      */
     public function checkAllAPIs(): array
+    {
         Log::info('[APIHealthMonitor] Starting comprehensive health check');
 
         $umapyoiHealth = $this->checkAPIHealth('umapyoi', function () {
@@ -120,10 +121,9 @@ class APIHealthMonitorService
      *
      * @return array{status: string, available: bool, response_time_ms: float|null, failure_count: int, circuit_breaker_open: bool, last_check: string, message: string}
      */
-    public function checkAPIHealth(): array
+    public function checkAPIHealth(string $apiName, callable $healthCheck): array
+    {
         $startTime = microtime(true);
-        $circuitBreakerKey = self::CIRCUIT_BREAKER_KEY.$apiName;
-        $failureCountKey = self::FAILURE_COUNT_KEY.$apiName;
 
         // Check if circuit breaker is open
         if ($this->isCircuitBreakerOpen($apiName)) {
@@ -203,8 +203,14 @@ class APIHealthMonitorService
     public function getCachedHealth(string $apiName): ?array
     {
         $cacheKey = self::CACHE_PREFIX.$apiName;
+        $cached = Cache::get($cacheKey);
 
-        return Cache::get($cacheKey);
+        if (is_array($cached)) {
+            /** @var array<string, mixed> $cached */
+            return $cached;
+        }
+
+        return null;
     }
 
     /**
@@ -214,7 +220,14 @@ class APIHealthMonitorService
      */
     public function getCachedAllHealth(): ?array
     {
-        return Cache::get(self::CACHE_PREFIX.'all');
+        $cached = Cache::get(self::CACHE_PREFIX.'all');
+
+        if (is_array($cached)) {
+            /** @var array<string, mixed> $cached */
+            return $cached;
+        }
+
+        return null;
     }
 
     /**
@@ -230,8 +243,8 @@ class APIHealthMonitorService
             // Check if circuit breaker timeout has expired
             $circuitOpenTime = Redis::get($key);
 
-            if ($circuitOpenTime) {
-                $elapsedTime = time() - (int) $circuitOpenTime;
+            if ($circuitOpenTime !== null && $circuitOpenTime !== false) {
+                $elapsedTime = time() - (is_numeric($circuitOpenTime) ? (int) $circuitOpenTime : 0);
 
                 if ($elapsedTime < self::CIRCUIT_BREAKER_TIMEOUT) {
                     return true;
@@ -267,7 +280,7 @@ class APIHealthMonitorService
         $key = self::FAILURE_COUNT_KEY.$apiName;
         $count = Redis::get($key);
 
-        return $count ? (int) $count : 0;
+        return is_numeric($count) ? (int) $count : 0;
     }
 
     /**
@@ -375,6 +388,7 @@ class APIHealthMonitorService
      * @return array{current_status: array<string, mixed>, failure_counts: array<string, int>, circuit_breakers: array<string, bool>, response_times: array<string, array<string, float>>, recommendations: array<string>}
      */
     public function getHealthMetrics(): array
+    {
         $currentStatus = $this->getCachedAllHealth() ?? $this->checkAllAPIs();
 
         $failureCounts = [
@@ -389,20 +403,31 @@ class APIHealthMonitorService
 
         $recommendations = $this->generateRecommendations($currentStatus, $failureCounts, $circuitBreakers);
 
+        // Extract response times with proper type validation
+        $umapyoiStatus = is_array($currentStatus['umapyoi'] ?? null) ? $currentStatus['umapyoi'] : [];
+        $umamusumedbStatus = is_array($currentStatus['umamusumedb'] ?? null) ? $currentStatus['umamusumedb'] : [];
+
+        $umapyoiResponseTime = isset($umapyoiStatus['response_time_ms']) && is_numeric($umapyoiStatus['response_time_ms'])
+            ? (float) $umapyoiStatus['response_time_ms']
+            : 0.0;
+        $umamusumedbResponseTime = isset($umamusumedbStatus['response_time_ms']) && is_numeric($umamusumedbStatus['response_time_ms'])
+            ? (float) $umamusumedbStatus['response_time_ms']
+            : 0.0;
+
         return [
             'current_status' => $currentStatus,
             'failure_counts' => $failureCounts,
             'circuit_breakers' => $circuitBreakers,
             'response_times' => [
                 'umapyoi' => [
-                    'current' => $currentStatus['umapyoi']['response_time_ms'] ?? 0,
-                    'threshold_degraded' => self::DEGRADED_THRESHOLD_MS,
-                    'threshold_unhealthy' => self::UNHEALTHY_THRESHOLD_MS,
+                    'current' => $umapyoiResponseTime,
+                    'threshold_degraded' => (float) self::DEGRADED_THRESHOLD_MS,
+                    'threshold_unhealthy' => (float) self::UNHEALTHY_THRESHOLD_MS,
                 ],
                 'umamusumedb' => [
-                    'current' => $currentStatus['umamusumedb']['response_time_ms'] ?? 0,
-                    'threshold_degraded' => self::DEGRADED_THRESHOLD_MS,
-                    'threshold_unhealthy' => self::UNHEALTHY_THRESHOLD_MS,
+                    'current' => $umamusumedbResponseTime,
+                    'threshold_degraded' => (float) self::DEGRADED_THRESHOLD_MS,
+                    'threshold_unhealthy' => (float) self::UNHEALTHY_THRESHOLD_MS,
                 ],
             ],
             'recommendations' => $recommendations,
@@ -417,11 +442,16 @@ class APIHealthMonitorService
      * @param  array<string, bool>  $circuitBreakers
      * @return array<string>
      */
-    protected function generateRecommendations(): array
+    protected function generateRecommendations(
+        array $currentStatus,
+        array $failureCounts,
+        array $circuitBreakers
+    ): array {
         $recommendations = [];
 
         foreach (['umapyoi', 'umamusumedb'] as $apiName) {
-            $status = $currentStatus[$apiName]['status'] ?? 'unknown';
+            $apiStatus = is_array($currentStatus[$apiName] ?? null) ? $currentStatus[$apiName] : [];
+            $status = isset($apiStatus['status']) && is_string($apiStatus['status']) ? $apiStatus['status'] : 'unknown';
             $failureCount = $failureCounts[$apiName] ?? 0;
             $circuitOpen = $circuitBreakers[$apiName] ?? false;
 

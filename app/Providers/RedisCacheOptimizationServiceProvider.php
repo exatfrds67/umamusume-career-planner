@@ -81,7 +81,7 @@ class RedisCacheOptimizationServiceProvider extends ServiceProvider
     protected function configureCacheTags(): void
     {
         // Define cache tag groups for efficient invalidation
-        $this->app['cache.tags'] = [
+        $this->app->instance('cache.tags', [
             'training' => ['training_predictions', 'training_sessions', 'training_options'],
             'character' => ['character_data', 'character_stats', 'character_aptitudes'],
             'skills' => ['skill_data', 'skill_hints', 'skill_costs'],
@@ -89,7 +89,7 @@ class RedisCacheOptimizationServiceProvider extends ServiceProvider
             'external_api' => ['umapyoi_data', 'umamusumedb_data', 'meta_data'],
             'ai' => ['ai_conversations', 'ai_predictions', 'ai_recommendations'],
             'mcp' => ['mcp_servers', 'mcp_agents', 'mcp_tools'],
-        ];
+        ]);
     }
 
     /**

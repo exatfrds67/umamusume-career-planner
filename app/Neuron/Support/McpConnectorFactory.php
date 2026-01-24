@@ -31,13 +31,13 @@ class McpConnectorFactory
 
         // Try local servers first
         $localConfig = config("neuron.mcp.local_servers.{$serverName}");
-        if ($localConfig && ($localConfig['enabled'] ?? false)) {
+        if (is_array($localConfig) && ($localConfig['enabled'] ?? false)) {
             return self::createLocalConnector($localConfig);
         }
 
         // Try remote servers
         $remoteConfig = config("neuron.mcp.remote_servers.{$serverName}");
-        if ($remoteConfig && ($remoteConfig['enabled'] ?? false)) {
+        if (is_array($remoteConfig) && ($remoteConfig['enabled'] ?? false)) {
             return self::createRemoteConnector($remoteConfig);
         }
 
@@ -63,12 +63,14 @@ class McpConnectorFactory
             $connector = McpConnector::make($connectorConfig);
 
             // Apply tool filtering if configured
-            if (! empty($config['tools']['exclude'])) {
-                $connector->exclude($config['tools']['exclude']);
+            /** @var array{exclude?: array<string>, only?: array<string>}|null $tools */
+            $tools = $config['tools'] ?? null;
+            if (is_array($tools) && ! empty($tools['exclude']) && is_array($tools['exclude'])) {
+                $connector->exclude($tools['exclude']);
             }
 
-            if (! empty($config['tools']['only'])) {
-                $connector->only($config['tools']['only']);
+            if (is_array($tools) && ! empty($tools['only']) && is_array($tools['only'])) {
+                $connector->only($tools['only']);
             }
 
             return $connector;
@@ -109,12 +111,14 @@ class McpConnectorFactory
             $connector = McpConnector::make($connectorConfig);
 
             // Apply tool filtering if configured
-            if (! empty($config['tools']['exclude'])) {
-                $connector->exclude($config['tools']['exclude']);
+            /** @var array{exclude?: array<string>, only?: array<string>}|null $tools */
+            $tools = $config['tools'] ?? null;
+            if (is_array($tools) && ! empty($tools['exclude']) && is_array($tools['exclude'])) {
+                $connector->exclude($tools['exclude']);
             }
 
-            if (! empty($config['tools']['only'])) {
-                $connector->only($config['tools']['only']);
+            if (is_array($tools) && ! empty($tools['only']) && is_array($tools['only'])) {
+                $connector->only($tools['only']);
             }
 
             return $connector;
@@ -141,18 +145,24 @@ class McpConnectorFactory
         $servers = [];
 
         // Get enabled local servers
+        /** @var array<string, array<string, mixed>> $localServers */
         $localServers = config('neuron.mcp.local_servers', []);
-        foreach ($localServers as $name => $config) {
-            if ($config['enabled'] ?? false) {
-                $servers[] = $name;
+        if (is_array($localServers)) {
+            foreach ($localServers as $name => $config) {
+                if (is_array($config) && ($config['enabled'] ?? false)) {
+                    $servers[] = (string) $name;
+                }
             }
         }
 
         // Get enabled remote servers
+        /** @var array<string, array<string, mixed>> $remoteServers */
         $remoteServers = config('neuron.mcp.remote_servers', []);
-        foreach ($remoteServers as $name => $config) {
-            if ($config['enabled'] ?? false) {
-                $servers[] = $name;
+        if (is_array($remoteServers)) {
+            foreach ($remoteServers as $name => $config) {
+                if (is_array($config) && ($config['enabled'] ?? false)) {
+                    $servers[] = (string) $name;
+                }
             }
         }
 
@@ -169,12 +179,12 @@ class McpConnectorFactory
         }
 
         $localConfig = config("neuron.mcp.local_servers.{$serverName}");
-        if ($localConfig && ($localConfig['enabled'] ?? false)) {
+        if (is_array($localConfig) && ($localConfig['enabled'] ?? false)) {
             return true;
         }
 
         $remoteConfig = config("neuron.mcp.remote_servers.{$serverName}");
-        if ($remoteConfig && ($remoteConfig['enabled'] ?? false)) {
+        if (is_array($remoteConfig) && ($remoteConfig['enabled'] ?? false)) {
             return true;
         }
 

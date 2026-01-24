@@ -65,6 +65,8 @@ class LongTermDevelopmentAgent
     /**
      * Analyze long-term development and provide comprehensive roadmap
      *
+     * @param  Collection<int, object>  $targetSkills
+     * @param  array<string, mixed>  $goals
      * @param  array<string, mixed>  $context
      * @return array{
      *     development_roadmap: array<string, mixed>,
@@ -75,7 +77,12 @@ class LongTermDevelopmentAgent
      *     confidence: float
      * }
      */
-    public function analyzeLongTermDevelopment(): array
+    public function analyzeLongTermDevelopment(
+        Character $character,
+        Collection $targetSkills,
+        array $goals = [],
+        array $context = []
+    ): array {
         // Create development roadmap
         $developmentRoadmap = $this->createDevelopmentRoadmap($character, $targetSkills, $goals);
 
@@ -111,13 +118,17 @@ class LongTermDevelopmentAgent
     /**
      * Create comprehensive development roadmap
      *
+     * @param  Collection<int, object>  $targetSkills
      * @param  array<string, mixed>  $goals
      * @return array<string, mixed>
      */
-    protected function createDevelopmentRoadmap(): array
+    protected function createDevelopmentRoadmap(
+        Character $character,
+        Collection $targetSkills,
+        array $goals
+    ): array {
         // Determine current career stage
         $currentStage = $character->career_stage ?? 'junior';
-        $stageInfo = $this->careerStages[$currentStage] ?? $this->careerStages['junior'];
 
         // Calculate remaining turns
         $turnsRemaining = $this->calculateRemainingTurns($character, $currentStage);
@@ -158,9 +169,15 @@ class LongTermDevelopmentAgent
     /**
      * Create skill acquisition timeline
      *
+     * @param  Collection<int, object>  $targetSkills
      * @return array<string, mixed>
      */
-    protected function createSkillTimeline(): array
+    protected function createSkillTimeline(
+        Character $character,
+        Collection $targetSkills,
+        int $turnsRemaining
+    ): array {
+        /** @var array<int, array<string, mixed>> $timeline */
         $timeline = [];
         $currentTurn = 1;
 
@@ -176,25 +193,27 @@ class LongTermDevelopmentAgent
             $hintsNeeded = $this->calculateHintsNeeded($character, $skill);
             $hintCollectionTurns = $hintsNeeded * 2; // Estimate 2 turns per hint
 
+            $skillName = (string) ($skill->name ?? 'Unknown');
+
             // Add to timeline
             $timeline[] = [
                 'turn_range' => [$currentTurn, $currentTurn + $hintCollectionTurns],
                 'action' => 'hint_collection',
-                'skill_name' => $skill->name,
+                'skill_name' => $skillName,
                 'hints_needed' => $hintsNeeded,
             ];
 
-            $currentTurn = ($currentTurn ?? 0) + $hintCollectionTurns;
+            $currentTurn += $hintCollectionTurns;
 
             // Add acquisition turn
             $timeline[] = [
                 'turn' => $currentTurn,
                 'action' => 'skill_acquisition',
-                'skill_name' => $skill->name,
+                'skill_name' => $skillName,
                 'estimated_cost' => $this->estimateSkillCost($character, $skill),
             ];
 
-            $currentTurn = ($currentTurn ?? 0) + 1;
+            $currentTurn++;
         }
 
         return [
@@ -206,6 +225,9 @@ class LongTermDevelopmentAgent
 
     /**
      * Prioritize skills for acquisition
+     *
+     * @param  Collection<int, object>  $targetSkills
+     * @return Collection<int, object>
      */
     protected function prioritizeSkills(Character $character, Collection $targetSkills): Collection
     {
@@ -213,15 +235,22 @@ class LongTermDevelopmentAgent
             $score = 0;
 
             // Priority for skills with hints
-            $hints = $character->skillHints()->where('skill_id', $skill->id)->count();
-            $score = ($score ?? 0) + $hints * 50;
+            $skillId = $skill->id ?? 0;
+            $baseCost = (int) ($skill->base_sp_cost ?? 0);
+            $metaTier = (string) ($skill->meta_tier ?? 'C');
+
+            // Check hints via relationship (if exists)
+            $hints = 0;
+            if (method_exists($character, 'skillHints')) {
+                $hints = $character->skillHints()->where('skill_id', $skillId)->count();
+            }
+            $score += $hints * 50;
 
             // Priority for high-cost skills
-            $score = ($score ?? 0) + $skill->base_sp_cost / 10;
+            $score += (int) ($baseCost / 10);
 
             // Priority for meta-tier skills
-            $metaTier = $skill->meta_tier ?? 'C';
-            $score = ($score ?? 0) + match ($metaTier) {
+            $score += match ($metaTier) {
                 'SS' => 100,
                 'S' => 80,
                 'A' => 60,
@@ -237,9 +266,14 @@ class LongTermDevelopmentAgent
      */
     protected function calculateHintsNeeded(Character $character, object $skill): int
     {
-        $currentHints = $character->skillHints()->where('skill_id', $skill->id)->count();
+        $skillId = $skill->id ?? 0;
+        $currentHints = 0;
 
-        return max(0, 2 - $currentHints); // Need 2 hints for max discount
+        if (method_exists($character, 'skillHints')) {
+            $currentHints = $character->skillHints()->where('skill_id', $skillId)->count();
+        }
+
+        return (int) max(0, 2 - $currentHints); // Need 2 hints for max discount
     }
 
     /**
@@ -247,12 +281,19 @@ class LongTermDevelopmentAgent
      */
     protected function estimateSkillCost(Character $character, object $skill): int
     {
-        $currentHints = $character->skillHints()->where('skill_id', $skill->id)->count();
+        $skillId = $skill->id ?? 0;
+        $baseCost = (int) ($skill->base_sp_cost ?? 0);
+
+        $currentHints = 0;
+        if (method_exists($character, 'skillHints')) {
+            $currentHints = $character->skillHints()->where('skill_id', $skillId)->count();
+        }
+
         $hintsAfterCollection = min(2, $currentHints + $this->calculateHintsNeeded($character, $skill));
 
         $discount = min(0.40, $hintsAfterCollection * 0.20);
 
-        return (int) ($skill->base_sp_cost * (1 - $discount));
+        return (int) ($baseCost * (1 - $discount));
     }
 
     /**
@@ -261,46 +302,66 @@ class LongTermDevelopmentAgent
      * @param  array<string, mixed>  $goals
      * @return array<string, mixed>
      */
-    protected function createStatTimeline(): array
+    protected function createStatTimeline(
+        Character $character,
+        array $goals,
+        int $turnsRemaining
+    ): array {
+        /** @var array<string, int> $currentStats */
         $currentStats = $character->current_stats ?? [];
-        $targetStats = $goals['target_stats'] ?? [];
+        /** @var array<string, int> $targetStats */
+        $targetStats = isset($goals['target_stats']) && is_array($goals['target_stats'])
+            ? $goals['target_stats']
+            : [];
 
+        /** @var array<int, array<string, mixed>> $timeline */
         $timeline = [];
 
         foreach ($targetStats as $stat => $target) {
-            $current = $currentStats[$stat] ?? 0;
-            $gap = max(0, $target - $current);
+            if (! is_string($stat) || ! is_numeric($target)) {
+                continue;
+            }
+
+            $currentStatValue = $currentStats[$stat] ?? 0;
+            $current = is_numeric($currentStatValue) ? (int) $currentStatValue : 0;
+            $targetVal = (int) $target;
+            $gap = max(0, $targetVal - $current);
 
             if ($gap === 0) {
                 continue;
             }
 
             // Estimate turns needed (assuming ~20 points per turn)
-            $turnsNeeded = ceil($gap / 20);
+            $turnsNeeded = (int) ceil($gap / 20);
 
             // Identify breakpoints
+            /** @var array<int, array<string, int>> $breakpoints */
             $breakpoints = [];
-            if ($current < 900 && $target >= 900) {
-                $breakpoints[] = ['value' => 900, 'turn' => ceil((900 - $current) / 20)];
+            if ($current < 900 && $targetVal >= 900) {
+                $breakpoints[] = ['value' => 900, 'turn' => (int) ceil((900 - $current) / 20)];
             }
-            if ($current < 1200 && $target >= 1200) {
-                $breakpoints[] = ['value' => 1200, 'turn' => ceil((1200 - $current) / 20)];
+            if ($current < 1200 && $targetVal >= 1200) {
+                $breakpoints[] = ['value' => 1200, 'turn' => (int) ceil((1200 - $current) / 20)];
             }
 
             $timeline[] = [
                 'stat' => $stat,
                 'current' => $current,
-                'target' => $target,
+                'target' => $targetVal,
                 'gap' => $gap,
                 'turns_needed' => $turnsNeeded,
                 'breakpoints' => $breakpoints,
             ];
         }
 
+        /** @var array<int> $turnsNeededArray */
+        $turnsNeededArray = array_column($timeline, 'turns_needed');
+        $maxTurnsNeeded = ! empty($turnsNeededArray) ? (int) max($turnsNeededArray) : 0;
+
         return [
             'timeline' => $timeline,
-            'total_turns_needed' => max(array_column($timeline, 'turns_needed')),
-            'feasibility' => max(array_column($timeline, 'turns_needed')) <= $turnsRemaining ? 'feasible' : 'requires_adjustment',
+            'total_turns_needed' => $maxTurnsNeeded,
+            'feasibility' => $maxTurnsNeeded <= $turnsRemaining ? 'feasible' : 'requires_adjustment',
         ];
     }
 
@@ -309,37 +370,74 @@ class LongTermDevelopmentAgent
      *
      * @param  array<string, mixed>  $skillTimeline
      * @param  array<string, mixed>  $statTimeline
-     * @return array<string, mixed>
+     * @return array<int, array<string, mixed>>
      */
-    protected function identifyCriticalDecisionPoints(): array
+    protected function identifyCriticalDecisionPoints(array $skillTimeline, array $statTimeline): array
+    {
+        /** @var array<int, array<string, mixed>> $decisionPoints */
         $decisionPoints = [];
 
         // Add stat breakpoint decisions
-        foreach ($statTimeline['timeline'] as $statPlan) {
-            foreach ($statPlan['breakpoints'] as $breakpoint) {
+        /** @var array<int, array<string, mixed>> $statTimelineList */
+        $statTimelineList = isset($statTimeline['timeline']) && is_array($statTimeline['timeline']) ? $statTimeline['timeline'] : [];
+        foreach ($statTimelineList as $statPlan) {
+            if (! is_array($statPlan)) {
+                continue;
+            }
+            $statValue = $statPlan['stat'] ?? '';
+            $stat = is_string($statValue) ? $statValue : '';
+            /** @var array<int, array<string, int>> $breakpoints */
+            $breakpoints = isset($statPlan['breakpoints']) && is_array($statPlan['breakpoints']) ? $statPlan['breakpoints'] : [];
+
+            foreach ($breakpoints as $breakpoint) {
+                if (! is_array($breakpoint)) {
+                    continue;
+                }
+                $turnValue = $breakpoint['turn'] ?? 0;
+                $turn = is_numeric($turnValue) ? (int) $turnValue : 0;
+                $valueNum = $breakpoint['value'] ?? 0;
+                $value = is_numeric($valueNum) ? (int) $valueNum : 0;
+
                 $decisionPoints[] = [
-                    'turn' => $breakpoint['turn'],
+                    'turn' => $turn,
                     'type' => 'stat_breakpoint',
-                    'description' => "Reach {$statPlan['stat']} {$breakpoint['value']} breakpoint",
+                    'description' => "Reach {$stat} {$value} breakpoint",
                     'importance' => 'high',
                 ];
             }
         }
 
         // Add skill acquisition decisions
-        foreach ($skillTimeline['timeline'] as $event) {
-            if ($event['action'] === 'skill_acquisition') {
+        /** @var array<int, array<string, mixed>> $skillTimelineList */
+        $skillTimelineList = isset($skillTimeline['timeline']) && is_array($skillTimeline['timeline']) ? $skillTimeline['timeline'] : [];
+        foreach ($skillTimelineList as $event) {
+            if (! is_array($event)) {
+                continue;
+            }
+            $actionValue = $event['action'] ?? '';
+            $action = is_string($actionValue) ? $actionValue : '';
+            if ($action === 'skill_acquisition') {
+                $turnValue = $event['turn'] ?? 0;
+                $turn = is_numeric($turnValue) ? (int) $turnValue : 0;
+                $skillNameValue = $event['skill_name'] ?? 'Unknown';
+                $skillName = is_string($skillNameValue) ? $skillNameValue : 'Unknown';
+
                 $decisionPoints[] = [
-                    'turn' => $event['turn'],
+                    'turn' => $turn,
                     'type' => 'skill_acquisition',
-                    'description' => "Acquire {$event['skill_name']}",
+                    'description' => "Acquire {$skillName}",
                     'importance' => 'medium',
                 ];
             }
         }
 
         // Sort by turn
-        usort($decisionPoints, fn ($a, $b) => $a['turn'] <=> $b['turn']);
+        usort($decisionPoints, function ($a, $b) {
+            $turnA = isset($a['turn']) && is_numeric($a['turn']) ? (int) $a['turn'] : 0;
+            $turnB = isset($b['turn']) && is_numeric($b['turn']) ? (int) $b['turn'] : 0;
+
+            return $turnA <=> $turnB;
+        });
 
         return $decisionPoints;
     }
@@ -352,8 +450,10 @@ class LongTermDevelopmentAgent
      */
     protected function estimateCompletionTurn(array $skillTimeline, array $statTimeline): int
     {
-        $skillCompletion = $skillTimeline['total_turns_needed'];
-        $statCompletion = $statTimeline['total_turns_needed'];
+        $skillCompletionValue = $skillTimeline['total_turns_needed'] ?? 0;
+        $skillCompletion = is_numeric($skillCompletionValue) ? (int) $skillCompletionValue : 0;
+        $statCompletionValue = $statTimeline['total_turns_needed'] ?? 0;
+        $statCompletion = is_numeric($statCompletionValue) ? (int) $statCompletionValue : 0;
 
         return max($skillCompletion, $statCompletion);
     }
@@ -361,10 +461,16 @@ class LongTermDevelopmentAgent
     /**
      * Track milestones
      *
+     * @param  Collection<int, object>  $targetSkills
      * @param  array<string, mixed>  $goals
      * @return array<string, mixed>
      */
-    protected function trackMilestones(): array
+    protected function trackMilestones(
+        Character $character,
+        Collection $targetSkills,
+        array $goals
+    ): array {
+        /** @var array<int, array<string, mixed>> $milestones */
         $milestones = [];
 
         // Stat milestones
@@ -380,7 +486,7 @@ class LongTermDevelopmentAgent
 
         return [
             'milestones' => $milestones,
-            'completed_count' => count(array_filter($milestones, fn ($m) => $m['completed'])),
+            'completed_count' => count(array_filter($milestones, fn ($m) => ($m['completed'] ?? false) === true)),
             'total_count' => count($milestones),
             'overall_progress' => $overallProgress,
         ];
@@ -390,34 +496,45 @@ class LongTermDevelopmentAgent
      * Track stat milestones
      *
      * @param  array<string, mixed>  $goals
-     * @return array<string, mixed>
+     * @return array<int, array<string, mixed>>
      */
-    protected function trackStatMilestones(): array
+    protected function trackStatMilestones(Character $character, array $goals): array
+    {
+        /** @var array<int, array<string, mixed>> $milestones */
         $milestones = [];
+        /** @var array<string, int> $currentStats */
         $currentStats = $character->current_stats ?? [];
-        $targetStats = $goals['target_stats'] ?? [];
+        /** @var array<string, int> $targetStats */
+        $targetStats = isset($goals['target_stats']) && is_array($goals['target_stats'])
+            ? $goals['target_stats']
+            : [];
 
         foreach ($targetStats as $stat => $target) {
-            $current = $currentStats[$stat] ?? 0;
+            if (! is_string($stat) || ! is_numeric($target)) {
+                continue;
+            }
+
+            $current = is_array($currentStats) && isset($currentStats[$stat]) ? (int) $currentStats[$stat] : 0;
+            $targetVal = (int) $target;
 
             // 900 breakpoint milestone
-            if ($target >= 900) {
+            if ($targetVal >= 900) {
                 $milestones[] = [
                     'type' => 'stat_breakpoint',
                     'description' => "{$stat} reaches 900",
                     'completed' => $current >= 900,
-                    'progress' => min(100, ($current / 900) * 100),
+                    'progress' => min(100.0, ($current / 900) * 100),
                     'importance' => 'high',
                 ];
             }
 
             // 1200 breakpoint milestone
-            if ($target >= 1200) {
+            if ($targetVal >= 1200) {
                 $milestones[] = [
                     'type' => 'stat_breakpoint',
                     'description' => "{$stat} reaches 1200",
                     'completed' => $current >= 1200,
-                    'progress' => min(100, ($current / 1200) * 100),
+                    'progress' => min(100.0, ($current / 1200) * 100),
                     'importance' => 'high',
                 ];
             }
@@ -425,9 +542,9 @@ class LongTermDevelopmentAgent
             // Target milestone
             $milestones[] = [
                 'type' => 'stat_target',
-                'description' => "{$stat} reaches target ({$target})",
-                'completed' => $current >= $target,
-                'progress' => $target > 0 ? min(100, ($current / $target) * 100) : 100,
+                'description' => "{$stat} reaches target ({$targetVal})",
+                'completed' => $current >= $targetVal,
+                'progress' => $targetVal > 0 ? min(100.0, ($current / $targetVal) * 100) : 100.0,
                 'importance' => 'medium',
             ];
         }
@@ -438,19 +555,34 @@ class LongTermDevelopmentAgent
     /**
      * Track skill milestones
      *
-     * @return array<string, mixed>
+     * @param  Collection<int, object>  $targetSkills
+     * @return array<int, array<string, mixed>>
      */
-    protected function trackSkillMilestones(): array
+    protected function trackSkillMilestones(Character $character, Collection $targetSkills): array
+    {
+        /** @var array<int, array<string, mixed>> $milestones */
         $milestones = [];
 
         foreach ($targetSkills as $skill) {
-            $hints = $character->skillHints()->where('skill_id', $skill->id)->count();
-            $acquired = $character->skills()->where('skill_id', $skill->id)->exists();
+            if (! is_object($skill)) {
+                continue;
+            }
+
+            $skillId = $skill->id ?? 0;
+            $skillName = (string) ($skill->name ?? 'Unknown');
+
+            $hints = 0;
+            $acquired = false;
+
+            if (method_exists($character, 'skillHints')) {
+                $hints = $character->skillHints()->where('skill_id', $skillId)->count();
+            }
+            $acquired = $character->skills()->where('skill_id', $skillId)->exists();
 
             // Hint collection milestone
             $milestones[] = [
                 'type' => 'max_hint_discount',
-                'description' => "Collect 2 hints for {$skill->name}",
+                'description' => "Collect 2 hints for {$skillName}",
                 'completed' => $hints >= 2,
                 'progress' => ($hints / 2) * 100,
                 'importance' => 'medium',
@@ -459,9 +591,9 @@ class LongTermDevelopmentAgent
             // Skill acquisition milestone
             $milestones[] = [
                 'type' => 'skill_acquisition',
-                'description' => "Acquire {$skill->name}",
+                'description' => "Acquire {$skillName}",
                 'completed' => $acquired,
-                'progress' => $acquired ? 100 : 0,
+                'progress' => $acquired ? 100.0 : 0.0,
                 'importance' => 'medium',
             ];
         }
@@ -472,7 +604,7 @@ class LongTermDevelopmentAgent
     /**
      * Calculate overall progress
      *
-     * @param  array<string, mixed>  $milestones
+     * @param  array<int, array<string, mixed>>  $milestones
      */
     protected function calculateOverallProgress(array $milestones): float
     {
@@ -480,9 +612,12 @@ class LongTermDevelopmentAgent
             return 0.0;
         }
 
-        $totalProgress = 0;
+        $totalProgress = 0.0;
         foreach ($milestones as $milestone) {
-            $totalProgress = ($totalProgress ?? 0) + $milestone['progress'];
+            if (is_array($milestone) && isset($milestone['progress'])) {
+                $progressValue = $milestone['progress'];
+                $totalProgress += is_numeric($progressValue) ? (float) $progressValue : 0.0;
+            }
         }
 
         return round($totalProgress / count($milestones), 1);
@@ -495,9 +630,13 @@ class LongTermDevelopmentAgent
      * @param  array<string, mixed>  $milestoneTracking
      * @return array<string, mixed>
      */
-    protected function planDevelopmentPhases(): array
-        $currentStage = $developmentRoadmap['current_stage'];
-        $turnsRemaining = $developmentRoadmap['turns_remaining'];
+    protected function planDevelopmentPhases(
+        Character $character,
+        array $developmentRoadmap,
+        array $milestoneTracking
+    ): array {
+        $turnsRemainingValue = $developmentRoadmap['turns_remaining'] ?? 24;
+        $turnsRemaining = is_numeric($turnsRemainingValue) ? (int) $turnsRemainingValue : 24;
 
         // Divide remaining turns into phases
         $phases = $this->divideTurnsIntoPhases($turnsRemaining);
@@ -516,8 +655,9 @@ class LongTermDevelopmentAgent
      *
      * @return array<string, array{start: int, end: int, focus: string}>
      */
-    protected function divideTurnsIntoPhases(): array
-        $phaseLength = ceil($turnsRemaining / 3);
+    protected function divideTurnsIntoPhases(int $turnsRemaining): array
+    {
+        $phaseLength = (int) ceil($turnsRemaining / 3);
 
         return [
             'early' => [
@@ -545,17 +685,24 @@ class LongTermDevelopmentAgent
      * @param  array<string, mixed>  $milestoneTracking
      * @return array<string, mixed>
      */
-    protected function assignMilestonesToPhases(): array
+    protected function assignMilestonesToPhases(array $phases, array $milestoneTracking): array
+    {
+        /** @var array<string, mixed> $phasePlans */
         $phasePlans = [];
+
+        /** @var array<int, array<string, mixed>> $allMilestones */
+        $allMilestones = isset($milestoneTracking['milestones']) && is_array($milestoneTracking['milestones']) ? $milestoneTracking['milestones'] : [];
 
         foreach ($phases as $phaseName => $phaseInfo) {
             $phaseMilestones = array_filter(
-                $milestoneTracking['milestones'],
-                fn ($m) => ! $m['completed']
+                $allMilestones,
+                fn ($m) => ($m['completed'] ?? true) === false
             );
 
             $phasePlans[$phaseName] = [
-                ...$phaseInfo,
+                'start' => $phaseInfo['start'],
+                'end' => $phaseInfo['end'],
+                'focus' => $phaseInfo['focus'],
                 'milestones' => array_slice($phaseMilestones, 0, 3),
                 'priority' => $this->determinePhasePriority($phaseName),
             ];
@@ -585,7 +732,8 @@ class LongTermDevelopmentAgent
      */
     protected function determineCurrentPhase(array $phases, array $milestoneTracking): string
     {
-        $progress = $milestoneTracking['overall_progress'];
+        $progressValue = $milestoneTracking['overall_progress'] ?? 0.0;
+        $progress = is_numeric($progressValue) ? (float) $progressValue : 0.0;
 
         return match (true) {
             $progress < 33 => 'early',
@@ -601,12 +749,24 @@ class LongTermDevelopmentAgent
      * @param  array<string, mixed>  $context
      * @return array<string, mixed>
      */
-    protected function assessRisks(): array
+    protected function assessRisks(
+        Character $character,
+        array $developmentRoadmap,
+        array $context
+    ): array {
+        /** @var array<int, array<string, string>> $risks */
         $risks = [];
 
         // Time constraint risk
-        $skillFeasibility = $developmentRoadmap['skill_timeline']['feasibility'];
-        $statFeasibility = $developmentRoadmap['stat_timeline']['feasibility'];
+        /** @var array<string, mixed> $skillTimeline */
+        $skillTimeline = isset($developmentRoadmap['skill_timeline']) && is_array($developmentRoadmap['skill_timeline']) ? $developmentRoadmap['skill_timeline'] : [];
+        /** @var array<string, mixed> $statTimeline */
+        $statTimeline = isset($developmentRoadmap['stat_timeline']) && is_array($developmentRoadmap['stat_timeline']) ? $developmentRoadmap['stat_timeline'] : [];
+
+        $skillFeasibilityValue = $skillTimeline['feasibility'] ?? 'feasible';
+        $skillFeasibility = is_string($skillFeasibilityValue) ? $skillFeasibilityValue : 'feasible';
+        $statFeasibilityValue = $statTimeline['feasibility'] ?? 'feasible';
+        $statFeasibility = is_string($statFeasibilityValue) ? $statFeasibilityValue : 'feasible';
 
         if ($skillFeasibility !== 'feasible' || $statFeasibility !== 'feasible') {
             $risks[] = [
@@ -657,9 +817,21 @@ class LongTermDevelopmentAgent
     {
         $totalCost = 0;
 
-        foreach ($developmentRoadmap['skill_timeline']['timeline'] as $event) {
-            if ($event['action'] === 'skill_acquisition') {
-                $totalCost = ($totalCost ?? 0) + $event['estimated_cost'];
+        /** @var array<string, mixed> $skillTimeline */
+        $skillTimeline = isset($developmentRoadmap['skill_timeline']) && is_array($developmentRoadmap['skill_timeline']) ? $developmentRoadmap['skill_timeline'] : [];
+        /** @var array<int, array<string, mixed>> $timeline */
+        $timeline = isset($skillTimeline['timeline']) && is_array($skillTimeline['timeline']) ? $skillTimeline['timeline'] : [];
+
+        foreach ($timeline as $event) {
+            if (! is_array($event)) {
+                continue;
+            }
+            $actionValue = $event['action'] ?? '';
+            $action = is_string($actionValue) ? $actionValue : '';
+            if ($action === 'skill_acquisition') {
+                $estimatedCostValue = $event['estimated_cost'] ?? 0;
+                $estimatedCost = is_numeric($estimatedCostValue) ? (int) $estimatedCostValue : 0;
+                $totalCost += $estimatedCost;
             }
         }
 
@@ -669,7 +841,7 @@ class LongTermDevelopmentAgent
     /**
      * Get highest severity from risks
      *
-     * @param  array<string, mixed>  $risks
+     * @param  array<int, array<string, string>>  $risks
      */
     protected function getHighestSeverity(array $risks): string
     {
@@ -698,11 +870,17 @@ class LongTermDevelopmentAgent
      * @param  array<string, mixed>  $riskAssessment
      * @return array<string, string>
      */
-    protected function generateRecommendations(): array
+    protected function generateRecommendations(
+        array $developmentRoadmap,
+        array $milestoneTracking,
+        array $riskAssessment
+    ): array {
+        /** @var array<string, string> $recommendations */
         $recommendations = [];
 
         // Progress recommendations
-        $progress = $milestoneTracking['overall_progress'];
+        $progressValue = $milestoneTracking['overall_progress'] ?? 0.0;
+        $progress = is_numeric($progressValue) ? (float) $progressValue : 0.0;
         $recommendations['progress'] = match (true) {
             $progress >= 75 => 'Excellent progress! Focus on final optimization',
             $progress >= 50 => 'Good progress. Continue with current development plan',
@@ -711,7 +889,8 @@ class LongTermDevelopmentAgent
         };
 
         // Risk mitigation recommendations
-        $highestRisk = $riskAssessment['highest_severity'];
+        $highestRiskValue = $riskAssessment['highest_severity'] ?? 'none';
+        $highestRisk = is_string($highestRiskValue) ? $highestRiskValue : 'none';
         if ($highestRisk === 'high') {
             $recommendations['risk'] = 'High-risk factors detected. Review and adjust development plan';
         } elseif ($highestRisk === 'medium') {
@@ -719,8 +898,10 @@ class LongTermDevelopmentAgent
         }
 
         // Timeline recommendations
-        $estimatedCompletion = $developmentRoadmap['estimated_completion'];
-        $turnsRemaining = $developmentRoadmap['turns_remaining'];
+        $estimatedCompletionValue = $developmentRoadmap['estimated_completion'] ?? 0;
+        $estimatedCompletion = is_numeric($estimatedCompletionValue) ? (int) $estimatedCompletionValue : 0;
+        $turnsRemainingValue = $developmentRoadmap['turns_remaining'] ?? 0;
+        $turnsRemaining = is_numeric($turnsRemainingValue) ? (int) $turnsRemainingValue : 0;
 
         if ($estimatedCompletion > $turnsRemaining) {
             $recommendations['timeline'] = 'Development plan exceeds available turns. Prioritize critical goals';
@@ -743,16 +924,27 @@ class LongTermDevelopmentAgent
         $confidence = 1.0;
 
         // Reduce confidence if timeline is not feasible
-        if ($developmentRoadmap['skill_timeline']['feasibility'] !== 'feasible') {
+        /** @var array<string, mixed> $skillTimeline */
+        $skillTimeline = isset($developmentRoadmap['skill_timeline']) && is_array($developmentRoadmap['skill_timeline']) ? $developmentRoadmap['skill_timeline'] : [];
+        /** @var array<string, mixed> $statTimeline */
+        $statTimeline = isset($developmentRoadmap['stat_timeline']) && is_array($developmentRoadmap['stat_timeline']) ? $developmentRoadmap['stat_timeline'] : [];
+
+        $skillFeasibilityValue = $skillTimeline['feasibility'] ?? 'feasible';
+        $skillFeasibility = is_string($skillFeasibilityValue) ? $skillFeasibilityValue : 'feasible';
+        $statFeasibilityValue = $statTimeline['feasibility'] ?? 'feasible';
+        $statFeasibility = is_string($statFeasibilityValue) ? $statFeasibilityValue : 'feasible';
+
+        if ($skillFeasibility !== 'feasible') {
             $confidence *= 0.7;
         }
 
-        if ($developmentRoadmap['stat_timeline']['feasibility'] !== 'feasible') {
+        if ($statFeasibility !== 'feasible') {
             $confidence *= 0.8;
         }
 
         // Reduce confidence based on risk severity
-        $highestRisk = $riskAssessment['highest_severity'];
+        $highestRiskValue = $riskAssessment['highest_severity'] ?? 'none';
+        $highestRisk = is_string($highestRiskValue) ? $highestRiskValue : 'none';
         if ($highestRisk === 'high') {
             $confidence *= 0.7;
         } elseif ($highestRisk === 'medium') {

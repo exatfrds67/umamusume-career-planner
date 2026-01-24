@@ -21,10 +21,12 @@ class SupportCardMetaService
     /**
      * Get all support cards grouped by meta tier
      *
-     * @return array<string, Collection>
+     * @return array<string, Collection<int, SupportCardDefinition>>
      */
     public function getCardsByTier(): array
-        return Cache::remember('support_cards_by_tier', self::CACHE_DURATION, function () {
+    {
+        /** @var array<string, Collection<int, SupportCardDefinition>> $result */
+        $result = Cache::remember('support_cards_by_tier', self::CACHE_DURATION, function () {
             return [
                 'S+' => SupportCardDefinition::where('meta_tier', 'S+')
                     ->where('is_active', true)
@@ -48,24 +50,33 @@ class SupportCardMetaService
                     ->get(),
             ];
         });
+
+        return $result;
     }
 
     /**
      * Get top cards by card type
+     *
+     * @return Collection<int, SupportCardDefinition>
      */
     public function getTopCardsByType(string $cardType, int $limit = 5): Collection
     {
-        return Cache::remember("top_cards_{$cardType}_{$limit}", self::CACHE_DURATION, function () use ($cardType, $limit) {
+        /** @var Collection<int, SupportCardDefinition> $result */
+        $result = Cache::remember("top_cards_{$cardType}_{$limit}", self::CACHE_DURATION, function () use ($cardType, $limit) {
             return SupportCardDefinition::where('card_type', $cardType)
                 ->where('is_active', true)
                 ->orderBy('usage_rate', 'desc')
                 ->limit($limit)
                 ->get();
         });
+
+        return $result;
     }
 
     /**
      * Update meta tier for a support card
+     *
+     * @param  array<string, mixed>  $metadata
      */
     public function updateMetaTier(int $cardId, string $newTier, array $metadata = []): bool
     {
@@ -75,18 +86,20 @@ class SupportCardMetaService
 
             $card->meta_tier = $newTier;
 
-            if (isset($metadata['usage_rate'])) {
-                $card->usage_rate = $metadata['usage_rate'];
+            if (isset($metadata['usage_rate']) && is_numeric($metadata['usage_rate'])) {
+                $card->usage_rate = (float) $metadata['usage_rate'];
             }
 
-            if (isset($metadata['win_rate_contribution'])) {
-                $card->win_rate_contribution = $metadata['win_rate_contribution'];
+            if (isset($metadata['win_rate_contribution']) && is_numeric($metadata['win_rate_contribution'])) {
+                $card->win_rate_contribution = (float) $metadata['win_rate_contribution'];
             }
 
-            if (isset($metadata['performance_data'])) {
+            if (isset($metadata['performance_data']) && is_array($metadata['performance_data'])) {
+                /** @var array<string, mixed> $performanceData */
+                $performanceData = $metadata['performance_data'];
                 $card->performance_data = array_merge(
                     $card->performance_data ?? [],
-                    $metadata['performance_data']
+                    $performanceData
                 );
             }
 
@@ -115,8 +128,11 @@ class SupportCardMetaService
 
     /**
      * Get skill provision mapping for a card
+     *
+     * @return array<string, mixed>
      */
-    public function getSkillProvisionMapping(): array
+    public function getSkillProvisionMapping(int $cardId): array
+    {
         $card = SupportCardDefinition::findOrFail($cardId);
 
         return [
@@ -130,10 +146,13 @@ class SupportCardMetaService
 
     /**
      * Get all skill provision mappings
+     *
+     * @return Collection<int, array{id: int, name: string, card_type: string, skills_provided: array<mixed>, meta_tier: string|null}>
      */
     public function getAllSkillProvisionMappings(): Collection
     {
-        return Cache::remember('all_skill_provision_mappings', self::CACHE_DURATION, function () {
+        /** @var Collection<int, array{id: int, name: string, card_type: string, skills_provided: array<mixed>, meta_tier: string|null}> $result */
+        $result = Cache::remember('all_skill_provision_mappings', self::CACHE_DURATION, function () {
             return SupportCardDefinition::where('is_active', true)
                 ->get()
                 ->map(function ($card) {
@@ -146,10 +165,14 @@ class SupportCardMetaService
                     ];
                 });
         });
+
+        return $result;
     }
 
     /**
      * Find cards that provide a specific skill
+     *
+     * @return Collection<int, SupportCardDefinition>
      */
     public function findCardsBySkill(string $skillName): Collection
     {
@@ -162,21 +185,29 @@ class SupportCardMetaService
 
     /**
      * Get recommended cards for a scenario
+     *
+     * @return Collection<int, SupportCardDefinition>
      */
     public function getRecommendedCardsForScenario(string $scenario): Collection
     {
-        return Cache::remember("recommended_cards_{$scenario}", self::CACHE_DURATION, function () use ($scenario) {
+        /** @var Collection<int, SupportCardDefinition> $result */
+        $result = Cache::remember("recommended_cards_{$scenario}", self::CACHE_DURATION, function () use ($scenario) {
             return SupportCardDefinition::where('is_active', true)
                 ->whereJsonContains('recommended_scenarios', $scenario)
                 ->orderBy('usage_rate', 'desc')
                 ->get();
         });
+
+        return $result;
     }
 
     /**
      * Get card synergies
+     *
+     * @return array<string, mixed>
      */
-    public function getCardSynergies(): array
+    public function getCardSynergies(int $cardId): array
+    {
         $card = SupportCardDefinition::findOrFail($cardId);
 
         $synergyCardNames = $card->deck_synergies ?? [];
@@ -201,8 +232,12 @@ class SupportCardMetaService
 
     /**
      * Bulk update meta tiers from external source
+     *
+     * @param  array<int, array{internal_id: string, meta_tier: string, metadata?: array<string, mixed>}>  $updates
+     * @return array{success: int, failed: int, errors: array<string>}
      */
-    public function bulkUpdateMetaTiers(): array
+    public function bulkUpdateMetaTiers(array $updates): array
+    {
         $results = [
             'success' => 0,
             'failed' => 0,

@@ -31,24 +31,31 @@ class ExampleAPIService extends ExternalAPIService
      */
     protected function initializeApiSources(): void
     {
+        /** @var string $umapyoiUrl */
+        $umapyoiUrl = config('services.umapyoi.url', 'https://api.umapyoi.net');
+        /** @var string $umamusumedbUrl */
+        $umamusumedbUrl = config('services.umamusumedb.url', 'https://umamusumedb.com/api');
+        /** @var string $umalatorUrl */
+        $umalatorUrl = config('services.umalator.url', 'https://umalator.com/api');
+
         $this->apiSources = [
             'umapyoi' => [
                 'priority' => 1,
-                'base_url' => config('services.umapyoi.url', 'https://api.umapyoi.net'),
+                'base_url' => $umapyoiUrl,
                 'timeout' => 5,
                 'rate_limit' => 100,
                 'enabled' => true,
             ],
             'umamusumedb' => [
                 'priority' => 2,
-                'base_url' => config('services.umamusumedb.url', 'https://umamusumedb.com/api'),
+                'base_url' => $umamusumedbUrl,
                 'timeout' => 5,
                 'rate_limit' => 60,
                 'enabled' => true,
             ],
             'umalator' => [
                 'priority' => 3,
-                'base_url' => config('services.umalator.url', 'https://umalator.com/api'),
+                'base_url' => $umalatorUrl,
                 'timeout' => 5,
                 'rate_limit' => 30,
                 'enabled' => true,
@@ -64,8 +71,9 @@ class ExampleAPIService extends ExternalAPIService
      *
      * @return array{success: bool, data: mixed, source: string, error?: string, metadata: array<string, mixed>}
      */
-    public function fetchCharacter(): array
-        return $this->fetchWithFallback("/characters/{$characterId}");
+    public function fetchCharacter(string $characterId): array
+    {
+        return $this->fetchWithFallback("/characters/{$characterId}", 'GET');
     }
 
     /**
@@ -73,8 +81,9 @@ class ExampleAPIService extends ExternalAPIService
      *
      * @return array{success: bool, data: mixed, source: string, error?: string, metadata: array<string, mixed>}
      */
-    public function fetchSupportCard(): array
-        return $this->fetchWithFallback("/support-cards/{$cardId}");
+    public function fetchSupportCard(string $cardId): array
+    {
+        return $this->fetchWithFallback("/support-cards/{$cardId}", 'GET');
     }
 
     /**
@@ -82,8 +91,9 @@ class ExampleAPIService extends ExternalAPIService
      *
      * @return array{success: bool, data: mixed, source: string, error?: string, metadata: array<string, mixed>}
      */
-    public function fetchFromSpecificSource(): array
-        return $this->fetchFromSource($sourceName, $endpoint);
+    public function fetchFromSpecificSource(string $sourceName, string $endpoint): array
+    {
+        return $this->fetchFromSource($sourceName, $endpoint, 'GET');
     }
 
     /**
@@ -91,7 +101,8 @@ class ExampleAPIService extends ExternalAPIService
      *
      * @return array{success: bool, data: mixed, source: string, error?: string, metadata: array<string, mixed>}
      */
-    public function fetchWithPreferredSource(): array
+    public function fetchWithPreferredSource(string $endpoint, ?string $preferredSource = null): array
+    {
         return $this->fetchWithFallback($endpoint, 'GET', [], $preferredSource);
     }
 }

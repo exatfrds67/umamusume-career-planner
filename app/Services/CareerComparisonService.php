@@ -64,23 +64,25 @@ class CareerComparisonService
      *
      * @param  array<int>  $careerIds  Array of career IDs to compare
      * @return array{
-     *     careers: array<array>,
-     *     comparison_summary: array,
-     *     stat_comparison: array<string, array>,
-     *     training_comparison: array,
-     *     race_comparison: array,
+     *     careers: array<array<string, mixed>>,
+     *     comparison_summary: array<string, mixed>,
+     *     stat_comparison: array<string, array<string, mixed>>,
+     *     training_comparison: array<string, mixed>,
+     *     race_comparison: array<string, mixed>,
      *     key_differences: array<string>,
-     *     best_performer: array
+     *     best_performer: array<string, mixed>
      * }
      */
-    public function compareCareers(): array
+    public function compareCareers(array $careerIds): array
+    {
         if (count($careerIds) < 2) {
             return $this->getEmptyComparisonResult('At least 2 careers required for comparison');
         }
 
         $cacheKey = 'career_comparison:'.md5(implode(',', $careerIds));
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($careerIds) {
+        /** @var array{careers: array<array<string, mixed>>, comparison_summary: array<string, mixed>, stat_comparison: array<string, array<string, mixed>>, training_comparison: array<string, mixed>, race_comparison: array<string, mixed>, key_differences: array<string>, best_performer: array<string, mixed>} $cached */
+        $cached = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($careerIds): array {
             $careers = Career::with(['character', 'trainingSessions', 'races'])
                 ->whereIn('id', $careerIds)
                 ->get();
@@ -120,14 +122,21 @@ class CareerComparisonService
                 'best_performer' => $bestPerformer,
             ];
         });
+
+        /** @var array{careers: array<array<string, mixed>>, comparison_summary: array<string, mixed>, stat_comparison: array<string, array<string, mixed>>, training_comparison: array<string, mixed>, race_comparison: array<string, mixed>, key_differences: array<string>, best_performer: array<string, mixed>} $result */
+        $result = $cached;
+
+        return $result;
     }
 
     /**
      * Build comprehensive comparison data for each career
      *
-     * @return array<array>
+     * @param  Collection<int, Career>  $careers
+     * @return array<int, array<string, mixed>>
      */
-    protected function buildCareerComparisonData(): array
+    protected function buildCareerComparisonData(Collection $careers): array
+    {
         $careerData = [];
 
         foreach ($careers as $career) {
@@ -146,20 +155,20 @@ class CareerComparisonService
             $careerData[] = [
                 'career_id' => $career->id,
                 'career_name' => $career->career_name ?? "Career #{$career->id}",
-                'character_name' => $career->character?->name ?? 'Unknown',
+                'character_name' => $career->character->name ?? 'Unknown',
                 'scenario_type' => $career->scenario_type,
                 'status' => $career->status,
-                'started_at' => $career->started_at?->format('Y-m-d'),
-                'completed_at' => $career->completed_at?->format('Y-m-d'),
+                'started_at' => $career->started_at instanceof \DateTimeInterface ? $career->started_at->format('Y-m-d') : null,
+                'completed_at' => $career->completed_at instanceof \DateTimeInterface ? $career->completed_at->format('Y-m-d') : null,
                 'total_turns' => $career->current_turn ?? $sessions->max('turn_number') ?? 0,
                 'final_stats' => $finalStats,
-                'total_stat_points' => array_sum($finalStats),
+                'total_stat_points' => (int) array_sum($finalStats),
                 'efficiency_rating' => $efficiency['rating'],
                 'training_sessions_count' => $sessions->count(),
                 'races_count' => $races->count(),
                 'race_win_rate' => $racePerformance['win_rate'],
                 'average_finish_position' => $racePerformance['avg_position'],
-                'total_sp_earned' => $sessions->sum('sp_gain') + $races->sum('sp_reward'),
+                'total_sp_earned' => (is_numeric($sessions->sum('sp_gain')) ? (int) $sessions->sum('sp_gain') : 0) + (is_numeric($races->sum('sp_reward')) ? (int) $races->sum('sp_reward') : 0),
                 'skills_acquired' => $this->countSkillsAcquired($sessions),
                 'training_failures' => $sessions->where('training_failed', true)->count(),
                 'injuries' => $sessions->where('injury_occurred', true)->count(),
@@ -174,11 +183,16 @@ class CareerComparisonService
      *
      * @return array<string, int>
      */
-    protected function extractFinalStats(): array
+    protected function extractFinalStats(Career $career): array
+    {
         // Try to get from performance analysis first
+        /** @var array<string, mixed> $analysis */
         $analysis = $career->performance_analysis ?? [];
-        if (isset($analysis['final_stats'])) {
-            return $analysis['final_stats'];
+        if (isset($analysis['final_stats']) && is_array($analysis['final_stats'])) {
+            /** @var array<string, int> $finalStats */
+            $finalStats = $analysis['final_stats'];
+
+            return $finalStats;
         }
 
         // Fall back to last training session stats
@@ -202,9 +216,11 @@ class CareerComparisonService
     /**
      * Calculate career efficiency metrics
      *
+     * @param  Collection<int, \App\Models\TrainingSession>  $sessions
      * @return array{rating: float, avg_gain_per_turn: float, failure_rate: float}
      */
-    protected function calculateCareerEfficiency(): array
+    protected function calculateCareerEfficiency(Collection $sessions): array
+    {
         if ($sessions->isEmpty()) {
             return ['rating' => 0.0, 'avg_gain_per_turn' => 0.0, 'failure_rate' => 0.0];
         }
@@ -214,7 +230,7 @@ class CareerComparisonService
         $failures = $sessions->where('training_failed', true)->count();
 
         foreach ($sessions as $session) {
-            $totalGains = ($totalGains ?? 0) + ($session->speed_gain ?? 0)
+            $totalGains += ($session->speed_gain ?? 0)
                 + ($session->stamina_gain ?? 0)
                 + ($session->power_gain ?? 0)
                 + ($session->guts_gain ?? 0)
@@ -239,34 +255,40 @@ class CareerComparisonService
     /**
      * Calculate race performance metrics
      *
+     * @param  Collection<int, Race>  $races
      * @return array{win_rate: float, avg_position: float, total_races: int}
      */
-    protected function calculateRacePerformance(): array
+    protected function calculateRacePerformance(Collection $races): array
+    {
         if ($races->isEmpty()) {
             return ['win_rate' => 0.0, 'avg_position' => 0.0, 'total_races' => 0];
         }
 
         $totalRaces = $races->count();
         $wins = $races->where('won_race', true)->count();
-        $totalPosition = $races->sum('finish_position');
+        $sumPosition = $races->sum('finish_position');
+        $totalPosition = is_numeric($sumPosition) ? (float) $sumPosition : 0.0;
 
         return [
             'win_rate' => round(($wins / $totalRaces) * 100, 1),
-            'avg_position' => round($totalPosition / $totalRaces, 2),
+            'avg_position' => $totalRaces > 0 ? round($totalPosition / $totalRaces, 2) : 0.0,
             'total_races' => $totalRaces,
         ];
     }
 
     /**
      * Count skills acquired during career
+     *
+     * @param  Collection<int, \App\Models\TrainingSession>  $sessions
      */
     protected function countSkillsAcquired(Collection $sessions): int
     {
         $totalSkills = 0;
 
         foreach ($sessions as $session) {
+            /** @var array<mixed> $hints */
             $hints = $session->skill_hints_obtained ?? [];
-            $totalSkills = ($totalSkills ?? 0) + count($hints);
+            $totalSkills += is_array($hints) ? count($hints) : 0;
         }
 
         return $totalSkills;
@@ -275,9 +297,11 @@ class CareerComparisonService
     /**
      * Calculate stat comparison across careers
      *
-     * @return array<string, array{min: int, max: int, avg: float, std_dev: float, values: array}>
+     * @param  Collection<int, Career>  $careers
+     * @return array<string, array{min: int, max: int, avg: float, std_dev: float, values: array<int, int>}>
      */
-    protected function calculateStatComparison(): array
+    protected function calculateStatComparison(Collection $careers): array
+    {
         $comparison = [];
 
         foreach (self::STAT_TYPES as $stat) {
@@ -313,13 +337,15 @@ class CareerComparisonService
     /**
      * Calculate training comparison across careers
      *
+     * @param  Collection<int, Career>  $careers
      * @return array{
-     *     training_type_distribution: array<int, array>,
+     *     training_type_distribution: array<int, array<string, int>>,
      *     efficiency_comparison: array<int, float>,
-     *     phase_comparison: array<string, array>
+     *     phase_comparison: array<string, array<int, array<string, mixed>>>
      * }
      */
-    protected function calculateTrainingComparison(): array
+    protected function calculateTrainingComparison(Collection $careers): array
+    {
         $typeDistribution = [];
         $efficiencyComparison = [];
         $phaseComparison = [];
@@ -364,9 +390,11 @@ class CareerComparisonService
     /**
      * Calculate training type distribution
      *
+     * @param  Collection<int, \App\Models\TrainingSession>  $sessions
      * @return array<string, int>
      */
-    protected function calculateTrainingTypeDistribution(): array
+    protected function calculateTrainingTypeDistribution(Collection $sessions): array
+    {
         $distribution = array_fill_keys(['speed', 'stamina', 'power', 'guts', 'wit', 'rest', 'other'], 0);
 
         foreach ($sessions as $session) {
@@ -384,9 +412,11 @@ class CareerComparisonService
     /**
      * Calculate average stat gains from sessions
      *
+     * @param  Collection<int, \App\Models\TrainingSession>  $sessions
      * @return array<string, float>
      */
-    protected function calculateAverageGains(): array
+    protected function calculateAverageGains(Collection $sessions): array
+    {
         if ($sessions->isEmpty()) {
             return array_fill_keys(self::STAT_TYPES, 0.0);
         }
@@ -406,13 +436,15 @@ class CareerComparisonService
     /**
      * Calculate race comparison across careers
      *
+     * @param  Collection<int, Career>  $careers
      * @return array{
      *     win_rates: array<int, float>,
      *     avg_positions: array<int, float>,
-     *     race_grade_performance: array<int, array>
+     *     race_grade_performance: array<int, array<string, array{count: int, wins: int, win_rate: float}>>
      * }
      */
-    protected function calculateRaceComparison(): array
+    protected function calculateRaceComparison(Collection $careers): array
+    {
         $winRates = [];
         $avgPositions = [];
         $gradePerformance = [];
@@ -438,9 +470,11 @@ class CareerComparisonService
     /**
      * Calculate performance by race grade
      *
+     * @param  Collection<int, Race>  $races
      * @return array<string, array{count: int, wins: int, win_rate: float}>
      */
-    protected function calculateRaceGradePerformance(): array
+    protected function calculateRaceGradePerformance(Collection $races): array
+    {
         $grades = ['G1', 'G2', 'G3', 'OP', 'Pre-OP'];
         $performance = [];
 
@@ -462,7 +496,7 @@ class CareerComparisonService
     /**
      * Generate comparison summary
      *
-     * @param  array<array>  $careerData
+     * @param  array<int, array<string, mixed>>  $careerData
      * @return array{
      *     total_careers: int,
      *     avg_efficiency: float,
@@ -472,7 +506,8 @@ class CareerComparisonService
      *     stat_variance: float
      * }
      */
-    protected function generateComparisonSummary(): array
+    protected function generateComparisonSummary(array $careerData): array
+    {
         $count = count($careerData);
 
         if ($count === 0) {
@@ -486,8 +521,11 @@ class CareerComparisonService
             ];
         }
 
+        /** @var array<float|int> $efficiencies */
         $efficiencies = array_column($careerData, 'efficiency_rating');
+        /** @var array<float|int> $totalStats */
         $totalStats = array_column($careerData, 'total_stat_points');
+        /** @var array<float|int> $winRates */
         $winRates = array_column($careerData, 'race_win_rate');
 
         $avgEfficiency = array_sum($efficiencies) / $count;
@@ -527,42 +565,54 @@ class CareerComparisonService
     /**
      * Identify key differences between careers
      *
-     * @param  array<array>  $careerData
-     * @param  array<string, array>  $statComparison
+     * @param  array<int, array<string, mixed>>  $careerData
+     * @param  array<string, array<string, mixed>>  $statComparison
+     * @param  array<string, mixed>  $trainingComparison
      * @return array<string>
      */
-    protected function identifyKeyDifferences(): array
+    protected function identifyKeyDifferences(array $careerData, array $statComparison, array $trainingComparison = []): array
+    {
         $differences = [];
 
         // Check stat differences
         foreach ($statComparison as $stat => $data) {
-            if ((is_array($data) && isset($data['range']) ? $data['range'] : null) > 100) {
-                $differences[] = ucfirst($stat)." varies significantly ({(is_array($data) && isset($data['range']) ? $data['range'] : null)} point range)";
+            $range = is_numeric($data['range'] ?? null) ? (int) $data['range'] : 0;
+            if ($range > 100) {
+                $differences[] = ucfirst($stat)." varies significantly ({$range} point range)";
             }
         }
 
         // Check efficiency differences
+        /** @var array<float|int> $efficiencies */
         $efficiencies = array_column($careerData, 'efficiency_rating');
-        $efficiencyRange = max($efficiencies) - min($efficiencies);
-        if ($efficiencyRange > 15) {
-            $differences[] = "Training efficiency varies by {$efficiencyRange}%";
+        if (count($efficiencies) > 0) {
+            $efficiencyRange = (float) max($efficiencies) - (float) min($efficiencies);
+            if ($efficiencyRange > 15) {
+                $differences[] = "Training efficiency varies by {$efficiencyRange}%";
+            }
         }
 
         // Check win rate differences
+        /** @var array<float|int> $winRates */
         $winRates = array_column($careerData, 'race_win_rate');
-        $winRateRange = max($winRates) - min($winRates);
-        if ($winRateRange > 20) {
-            $differences[] = "Race win rate varies by {$winRateRange}%";
+        if (count($winRates) > 0) {
+            $winRateRange = (float) max($winRates) - (float) min($winRates);
+            if ($winRateRange > 20) {
+                $differences[] = "Race win rate varies by {$winRateRange}%";
+            }
         }
 
         // Check training type distribution differences
-        if (isset($trainingComparison['training_type_distribution'])) {
+        if (isset($trainingComparison['training_type_distribution']) && is_array($trainingComparison['training_type_distribution'])) {
+            /** @var array<int, array<string, int>> $distributions */
             $distributions = $trainingComparison['training_type_distribution'];
             foreach (['speed', 'stamina', 'power'] as $type) {
                 $typeCounts = array_map(fn ($d) => $d[$type] ?? 0, $distributions);
-                $typeRange = max($typeCounts) - min($typeCounts);
-                if ($typeRange > 10) {
-                    $differences[] = ucfirst($type).' training frequency varies significantly';
+                if (count($typeCounts) > 0) {
+                    $typeRange = max($typeCounts) - min($typeCounts);
+                    if ($typeRange > 10) {
+                        $differences[] = ucfirst($type).' training frequency varies significantly';
+                    }
                 }
             }
         }
@@ -573,10 +623,11 @@ class CareerComparisonService
     /**
      * Determine the best performing career
      *
-     * @param  array<array>  $careerData
+     * @param  array<int, array<string, mixed>>  $careerData
      * @return array{career_id: int, career_name: string, score: float, strengths: array<string>}
      */
-    protected function determineBestPerformer(): array
+    protected function determineBestPerformer(array $careerData): array
+    {
         if (empty($careerData)) {
             return ['career_id' => 0, 'career_name' => 'N/A', 'score' => 0.0, 'strengths' => []];
         }
@@ -585,12 +636,18 @@ class CareerComparisonService
 
         foreach ($careerData as $career) {
             // Calculate composite score (weighted)
-            $score = ($career['efficiency_rating'] * 0.3)
-                + ($career['race_win_rate'] * 0.3)
-                + (min(100, $career['total_stat_points'] / 50) * 0.25)
-                + ((100 - ($career['training_failures'] * 5)) * 0.15);
+            $effRating = is_numeric($career['efficiency_rating'] ?? null) ? (float) $career['efficiency_rating'] : 0.0;
+            $winRate = is_numeric($career['race_win_rate'] ?? null) ? (float) $career['race_win_rate'] : 0.0;
+            $totalStats = is_numeric($career['total_stat_points'] ?? null) ? (float) $career['total_stat_points'] : 0.0;
+            $failures = is_int($career['training_failures'] ?? null) ? $career['training_failures'] : 0;
 
-            $scores[$career['career_id']] = [
+            $score = ($effRating * 0.3)
+                + ($winRate * 0.3)
+                + (min(100.0, $totalStats / 50) * 0.25)
+                + ((100 - ($failures * 5)) * 0.15);
+
+            $careerId = is_int($career['career_id'] ?? null) ? $career['career_id'] : 0;
+            $scores[$careerId] = [
                 'career' => $career,
                 'score' => $score,
             ];
@@ -601,9 +658,9 @@ class CareerComparisonService
         $bestScore = -1;
 
         foreach ($scores as $careerId => $data) {
-            if ((is_array($data) && isset($data['score']) ? $data['score'] : null) > $bestScore) {
-                $bestScore = (is_array($data) && isset($data['score']) ? $data['score'] : null);
-                $best = (is_array($data) && isset($data['career']) ? $data['career'] : null);
+            if ($data['score'] > $bestScore) {
+                $bestScore = $data['score'];
+                $best = $data['career'];
             }
         }
 
@@ -628,8 +685,8 @@ class CareerComparisonService
         }
 
         return [
-            'career_id' => $best['career_id'] ?? 0,
-            'career_name' => $best['career_name'] ?? 'N/A',
+            'career_id' => is_int($best['career_id'] ?? null) ? $best['career_id'] : 0,
+            'career_name' => is_string($best['career_name'] ?? null) ? $best['career_name'] : 'N/A',
             'score' => round($bestScore, 1),
             'strengths' => $strengths,
         ];
@@ -644,17 +701,19 @@ class CareerComparisonService
      *
      * @param  array<int>  $careerIds
      * @return array{
-     *     training_patterns: array,
-     *     race_strategy_patterns: array,
-     *     decision_sequences: array,
-     *     success_correlations: array,
+     *     training_patterns: array<string, mixed>,
+     *     race_strategy_patterns: array<string, mixed>,
+     *     decision_sequences: array<string, mixed>,
+     *     success_correlations: array<string, array{correlation: float, strength: string}>,
      *     recommended_patterns: array<string>
      * }
      */
-    public function identifySuccessPatterns(): array
+    public function identifySuccessPatterns(array $careerIds): array
+    {
         $cacheKey = 'success_patterns:'.md5(implode(',', $careerIds));
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($careerIds) {
+        /** @var array{training_patterns: array<string, mixed>, race_strategy_patterns: array<string, mixed>, decision_sequences: array<string, mixed>, success_correlations: array<string, array{correlation: float, strength: string}>, recommended_patterns: array<string>} $result */
+        $result = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($careerIds) {
             $careers = Career::with(['trainingSessions', 'races'])
                 ->whereIn('id', $careerIds)
                 ->get();
@@ -694,6 +753,8 @@ class CareerComparisonService
                 'recommended_patterns' => $recommendedPatterns,
             ];
         });
+
+        return $result;
     }
 
     /**
@@ -701,15 +762,16 @@ class CareerComparisonService
      */
     protected function isCareerSuccessful(Career $career): bool
     {
+        /** @var array<string, mixed> $analysis */
         $analysis = $career->performance_analysis ?? [];
 
         if (isset($analysis['goals_achieved'])) {
             return $analysis['goals_achieved'] === true;
         }
 
-        // Check rating if available
-        if (isset($career->rating) && $career->rating !== null) {
-            return $career->rating >= 4;
+        // Check rating from performance analysis if available
+        if (isset($analysis['rating']) && is_numeric($analysis['rating'])) {
+            return (float) $analysis['rating'] >= 4;
         }
 
         // Default: check if completed with good efficiency
@@ -726,14 +788,17 @@ class CareerComparisonService
     /**
      * Identify training patterns that correlate with success
      *
+     * @param  Collection<int, Career>  $successfulCareers
+     * @param  Collection<int, Career>  $unsuccessfulCareers
      * @return array{
-     *     successful_patterns: array,
-     *     unsuccessful_patterns: array,
-     *     key_differences: array,
-     *     phase_patterns: array
+     *     successful_patterns: array<string, mixed>,
+     *     unsuccessful_patterns: array<string, mixed>,
+     *     key_differences: array<int, array<string, mixed>>,
+     *     phase_patterns: array<string, array<string, mixed>>
      * }
      */
-    protected function identifyTrainingPatterns(): array
+    protected function identifyTrainingPatterns(Collection $successfulCareers, Collection $unsuccessfulCareers): array
+    {
         $successfulPatterns = $this->extractTrainingPatterns($successfulCareers);
         $unsuccessfulPatterns = $this->extractTrainingPatterns($unsuccessfulCareers);
 
@@ -754,14 +819,16 @@ class CareerComparisonService
     /**
      * Extract training patterns from a collection of careers
      *
+     * @param  Collection<int, Career>  $careers
      * @return array{
      *     avg_training_distribution: array<string, float>,
      *     avg_efficiency: float,
-     *     common_sequences: array,
+     *     common_sequences: array<int, array{sequence: array<string>, frequency: int}>,
      *     friendship_training_rate: float
      * }
      */
-    protected function extractTrainingPatterns(): array
+    protected function extractTrainingPatterns(Collection $careers): array
+    {
         if ($careers->isEmpty()) {
             return [
                 'avg_training_distribution' => [],
@@ -804,7 +871,9 @@ class CareerComparisonService
                 ->values()
                 ->toArray();
             if (! empty($earlySequence)) {
-                $sequences[] = $earlySequence;
+                /** @var array<int, string> $stringSequence */
+                $stringSequence = array_map(fn ($v) => is_string($v) ? $v : '', $earlySequence);
+                $sequences[] = $stringSequence;
             }
         }
 
@@ -825,10 +894,11 @@ class CareerComparisonService
     /**
      * Find common training sequences
      *
-     * @param  array<array<string>>  $sequences
-     * @return array<array{sequence: array, frequency: int}>
+     * @param  array<int, array<int, string>>  $sequences
+     * @return array<int, array{sequence: array<string>, frequency: int}>
      */
-    protected function findCommonSequences(): array
+    protected function findCommonSequences(array $sequences): array
+    {
         if (empty($sequences)) {
             return [];
         }
@@ -837,7 +907,7 @@ class CareerComparisonService
         $subsequenceCounts = [];
 
         foreach ($sequences as $sequence) {
-            for ($i = 0; $i <= count($sequence) - 3; $i = ($i ?? 0) + 1) {
+            for ($i = 0; $i <= count($sequence) - 3; $i++) {
                 $subseq = array_slice($sequence, $i, 3);
                 $key = implode('->', $subseq);
                 $subsequenceCounts[$key] = ($subsequenceCounts[$key] ?? 0) + 1;
@@ -862,18 +932,23 @@ class CareerComparisonService
     /**
      * Compare patterns between successful and unsuccessful careers
      *
-     * @return array<array{factor: string, successful_value: float, unsuccessful_value: float, difference: float}>
+     * @param  array<string, mixed>  $successfulPatterns
+     * @param  array<string, mixed>  $unsuccessfulPatterns
+     * @return array<int, array{factor: string, successful_value: float, unsuccessful_value: float, difference: float}>
      */
-    protected function comparePatterns(): array
+    protected function comparePatterns(array $successfulPatterns, array $unsuccessfulPatterns): array
+    {
         $differences = [];
 
         // Compare training distributions
+        /** @var array<string, float> $successDist */
         $successDist = $successfulPatterns['avg_training_distribution'] ?? [];
+        /** @var array<string, float> $unsuccessDist */
         $unsuccessDist = $unsuccessfulPatterns['avg_training_distribution'] ?? [];
 
         foreach (self::STAT_TYPES as $type) {
-            $successVal = $successDist[$type] ?? 0;
-            $unsuccessVal = $unsuccessDist[$type] ?? 0;
+            $successVal = is_numeric($successDist[$type] ?? null) ? (float) $successDist[$type] : 0.0;
+            $unsuccessVal = is_numeric($unsuccessDist[$type] ?? null) ? (float) $unsuccessDist[$type] : 0.0;
             $diff = $successVal - $unsuccessVal;
 
             if (abs($diff) > 5) {
@@ -887,23 +962,27 @@ class CareerComparisonService
         }
 
         // Compare efficiency
-        $effDiff = ($successfulPatterns['avg_efficiency'] ?? 0) - ($unsuccessfulPatterns['avg_efficiency'] ?? 0);
+        $successEfficiency = is_numeric($successfulPatterns['avg_efficiency'] ?? null) ? (float) $successfulPatterns['avg_efficiency'] : 0.0;
+        $unsuccessEfficiency = is_numeric($unsuccessfulPatterns['avg_efficiency'] ?? null) ? (float) $unsuccessfulPatterns['avg_efficiency'] : 0.0;
+        $effDiff = $successEfficiency - $unsuccessEfficiency;
         if (abs($effDiff) > 5) {
             $differences[] = [
                 'factor' => 'Training efficiency',
-                'successful_value' => $successfulPatterns['avg_efficiency'] ?? 0,
-                'unsuccessful_value' => $unsuccessfulPatterns['avg_efficiency'] ?? 0,
+                'successful_value' => $successEfficiency,
+                'unsuccessful_value' => $unsuccessEfficiency,
                 'difference' => round($effDiff, 1),
             ];
         }
 
         // Compare friendship training rate
-        $friendDiff = ($successfulPatterns['friendship_training_rate'] ?? 0) - ($unsuccessfulPatterns['friendship_training_rate'] ?? 0);
+        $successFriendship = is_numeric($successfulPatterns['friendship_training_rate'] ?? null) ? (float) $successfulPatterns['friendship_training_rate'] : 0.0;
+        $unsuccessFriendship = is_numeric($unsuccessfulPatterns['friendship_training_rate'] ?? null) ? (float) $unsuccessfulPatterns['friendship_training_rate'] : 0.0;
+        $friendDiff = $successFriendship - $unsuccessFriendship;
         if (abs($friendDiff) > 5) {
             $differences[] = [
                 'factor' => 'Friendship training rate',
-                'successful_value' => $successfulPatterns['friendship_training_rate'] ?? 0,
-                'unsuccessful_value' => $unsuccessfulPatterns['friendship_training_rate'] ?? 0,
+                'successful_value' => $successFriendship,
+                'unsuccessful_value' => $unsuccessFriendship,
                 'difference' => round($friendDiff, 1),
             ];
         }
@@ -914,9 +993,12 @@ class CareerComparisonService
     /**
      * Analyze phase-specific patterns
      *
-     * @return array<string, array{successful: array, unsuccessful: array, recommendation: string}>
+     * @param  Collection<int, Career>  $successfulCareers
+     * @param  Collection<int, Career>  $unsuccessfulCareers
+     * @return array<string, array{successful: array<string, mixed>, unsuccessful: array<string, mixed>, recommendation: string}>
      */
-    protected function analyzePhasePatterns(): array
+    protected function analyzePhasePatterns(Collection $successfulCareers, Collection $unsuccessfulCareers): array
+    {
         $phasePatterns = [];
 
         foreach (self::CAREER_PHASES as $phase => $range) {
@@ -938,10 +1020,12 @@ class CareerComparisonService
     /**
      * Extract phase-specific data from careers
      *
+     * @param  Collection<int, Career>  $careers
      * @param  array{min: int, max: int}  $range
-     * @return array{avg_efficiency: float, dominant_training: string, avg_gains: array}
+     * @return array{avg_efficiency: float, dominant_training: string, avg_gains: array<string, float>}
      */
-    protected function extractPhaseData(): array
+    protected function extractPhaseData(Collection $careers, array $range): array
+    {
         if ($careers->isEmpty()) {
             return [
                 'avg_efficiency' => 0.0,
@@ -986,17 +1070,25 @@ class CareerComparisonService
 
     /**
      * Generate phase-specific recommendation
+     *
+     * @param  array<string, mixed>  $successfulData
+     * @param  array<string, mixed>  $unsuccessfulData
      */
     protected function generatePhaseRecommendation(string $phase, array $successfulData, array $unsuccessfulData): string
     {
-        $effDiff = $successfulData['avg_efficiency'] - $unsuccessfulData['avg_efficiency'];
+        $successEfficiency = is_numeric($successfulData['avg_efficiency'] ?? null) ? (float) $successfulData['avg_efficiency'] : 0.0;
+        $unsuccessEfficiency = is_numeric($unsuccessfulData['avg_efficiency'] ?? null) ? (float) $unsuccessfulData['avg_efficiency'] : 0.0;
+        $effDiff = $successEfficiency - $unsuccessEfficiency;
+
+        $successDominant = is_string($successfulData['dominant_training'] ?? null) ? $successfulData['dominant_training'] : 'mixed';
+        $unsuccessDominant = is_string($unsuccessfulData['dominant_training'] ?? null) ? $unsuccessfulData['dominant_training'] : 'mixed';
 
         if ($effDiff > 10) {
-            return "In {$phase} phase, successful careers focus on {$successfulData['dominant_training']} training with {$successfulData['avg_efficiency']}% efficiency.";
+            return "In {$phase} phase, successful careers focus on {$successDominant} training with {$successEfficiency}% efficiency.";
         }
 
-        if ($successfulData['dominant_training'] !== $unsuccessfulData['dominant_training']) {
-            return "Successful careers prioritize {$successfulData['dominant_training']} training during {$phase} phase.";
+        if ($successDominant !== $unsuccessDominant) {
+            return "Successful careers prioritize {$successDominant} training during {$phase} phase.";
         }
 
         return "Maintain consistent training during {$phase} phase.";
@@ -1005,14 +1097,17 @@ class CareerComparisonService
     /**
      * Identify race strategy patterns
      *
+     * @param  Collection<int, Career>  $successfulCareers
+     * @param  Collection<int, Career>  $unsuccessfulCareers
      * @return array{
-     *     successful_strategies: array,
-     *     unsuccessful_strategies: array,
-     *     strategy_effectiveness: array,
-     *     distance_patterns: array
+     *     successful_strategies: array<string, mixed>,
+     *     unsuccessful_strategies: array<string, mixed>,
+     *     strategy_effectiveness: array<string, array{races: int, wins: int, win_rate: float, avg_position: float}>,
+     *     distance_patterns: array<string, array{successful_win_rate: float, unsuccessful_win_rate: float, recommended_style: string}>
      * }
      */
-    protected function identifyRaceStrategyPatterns(): array
+    protected function identifyRaceStrategyPatterns(Collection $successfulCareers, Collection $unsuccessfulCareers): array
+    {
         $successfulStrategies = $this->extractRaceStrategies($successfulCareers);
         $unsuccessfulStrategies = $this->extractRaceStrategies($unsuccessfulCareers);
 
@@ -1035,9 +1130,11 @@ class CareerComparisonService
     /**
      * Extract race strategies from careers
      *
-     * @return array{running_style_distribution: array, avg_win_rate: float, avg_position: float}
+     * @param  Collection<int, Career>  $careers
+     * @return array{running_style_distribution: array<string, float>, avg_win_rate: float, avg_position: float}
      */
-    protected function extractRaceStrategies(): array
+    protected function extractRaceStrategies(Collection $careers): array
+    {
         if ($careers->isEmpty()) {
             return [
                 'running_style_distribution' => [],
@@ -1075,7 +1172,8 @@ class CareerComparisonService
         // Win rate and average position
         $wins = $allRaces->where('won_race', true)->count();
         $totalRaces = $allRaces->count();
-        $avgPosition = $allRaces->avg('finish_position') ?? 0;
+        $avgPositionValue = $allRaces->avg('finish_position');
+        $avgPosition = is_numeric($avgPositionValue) ? (float) $avgPositionValue : 0.0;
 
         return [
             'running_style_distribution' => $styleDistribution,
@@ -1087,9 +1185,11 @@ class CareerComparisonService
     /**
      * Calculate effectiveness of each running style
      *
+     * @param  Collection<int, Career>  $careers
      * @return array<string, array{races: int, wins: int, win_rate: float, avg_position: float}>
      */
-    protected function calculateStrategyEffectiveness(): array
+    protected function calculateStrategyEffectiveness(Collection $careers): array
+    {
         $allRaces = collect();
         foreach ($careers as $career) {
             $allRaces = $allRaces->merge($career->races);
@@ -1102,12 +1202,13 @@ class CareerComparisonService
             $styleRaces = $allRaces->where('running_style', $style);
             $count = $styleRaces->count();
             $wins = $styleRaces->where('won_race', true)->count();
+            $avgPos = $styleRaces->avg('finish_position');
 
             $effectiveness[$style] = [
                 'races' => $count,
                 'wins' => $wins,
                 'win_rate' => $count > 0 ? round(($wins / $count) * 100, 1) : 0.0,
-                'avg_position' => $count > 0 ? round($styleRaces->avg('finish_position'), 2) : 0.0,
+                'avg_position' => $count > 0 && is_numeric($avgPos) ? round((float) $avgPos, 2) : 0.0,
             ];
         }
 
@@ -1117,9 +1218,12 @@ class CareerComparisonService
     /**
      * Analyze distance-specific patterns
      *
+     * @param  Collection<int, Career>  $successfulCareers
+     * @param  Collection<int, Career>  $unsuccessfulCareers
      * @return array<string, array{successful_win_rate: float, unsuccessful_win_rate: float, recommended_style: string}>
      */
-    protected function analyzeDistancePatterns(): array
+    protected function analyzeDistancePatterns(Collection $successfulCareers, Collection $unsuccessfulCareers): array
+    {
         $distances = ['short', 'mile', 'intermediate', 'long'];
         $patterns = [];
 
@@ -1150,9 +1254,13 @@ class CareerComparisonService
 
     /**
      * Get races by distance category
+     *
+     * @param  Collection<int, Career>  $careers
+     * @return Collection<int, Race>
      */
     protected function getRacesByDistance(Collection $careers, string $distance): Collection
     {
+        /** @var Collection<int, Race> $allRaces */
         $allRaces = collect();
         foreach ($careers as $career) {
             $allRaces = $allRaces->merge($career->races);
@@ -1165,6 +1273,8 @@ class CareerComparisonService
 
     /**
      * Find the best running style for a distance
+     *
+     * @param  Collection<int, Race>  $races
      */
     protected function findBestStyleForDistance(Collection $races): string
     {
@@ -1197,14 +1307,16 @@ class CareerComparisonService
     /**
      * Identify successful decision sequences
      *
+     * @param  Collection<int, Career>  $successfulCareers
      * @return array{
-     *     early_game_sequences: array,
-     *     mid_game_sequences: array,
-     *     late_game_sequences: array,
-     *     critical_decision_points: array
+     *     early_game_sequences: array<string, mixed>,
+     *     mid_game_sequences: array<string, mixed>,
+     *     late_game_sequences: array<string, mixed>,
+     *     critical_decision_points: array<string, mixed>
      * }
      */
-    protected function identifyDecisionSequences(): array
+    protected function identifyDecisionSequences(Collection $successfulCareers): array
+    {
         $earlySequences = [];
         $midSequences = [];
         $lateSequences = [];
@@ -1246,9 +1358,12 @@ class CareerComparisonService
     /**
      * Extract decision sequence from sessions
      *
-     * @return array{training_types: array, efficiency: float, key_decisions: array}
+     * @param  Collection<int, \App\Models\TrainingSession>  $sessions
+     * @return array{training_types: array<int, string>, efficiency: float, key_decisions: array<int, array<string, mixed>>}
      */
-    protected function extractDecisionSequence(): array
+    protected function extractDecisionSequence(Collection $sessions): array
+    {
+        /** @var array<int, string> $trainingTypes */
         $trainingTypes = $sessions->pluck('training_type')->filter()->values()->toArray();
         $efficiency = $this->calculateCareerEfficiency($sessions)['rating'];
 
@@ -1278,9 +1393,10 @@ class CareerComparisonService
     /**
      * Identify critical decision points in a career
      *
-     * @return array<array{turn: int, type: string, impact: string}>
+     * @return array<int, array{turn: int, type: string, impact: string}>
      */
-    protected function identifyCriticalDecisions(): array
+    protected function identifyCriticalDecisions(Career $career): array
+    {
         $criticalPoints = [];
         $sessions = $career->trainingSessions->sortBy('turn_number');
 
@@ -1310,7 +1426,7 @@ class CareerComparisonService
                 if ($streak === 0) {
                     $streakStart = $session->turn_number ?? 0;
                 }
-                $streak = ($streak ?? 0) + 1;
+                $streak++;
             } else {
                 if ($streak >= 3) {
                     $criticalPoints[] = [
@@ -1329,10 +1445,11 @@ class CareerComparisonService
     /**
      * Summarize decision sequences
      *
-     * @param  array<array>  $sequences
-     * @return array{common_patterns: array, avg_efficiency: float, key_insights: array}
+     * @param  array<int, array<string, mixed>>  $sequences
+     * @return array{common_patterns: array<string, int>, avg_efficiency: float, key_insights: array<int, string>}
      */
-    protected function summarizeSequences(): array
+    protected function summarizeSequences(array $sequences): array
+    {
         if (empty($sequences)) {
             return [
                 'common_patterns' => [],
@@ -1346,12 +1463,15 @@ class CareerComparisonService
         $efficiencies = [];
 
         foreach ($sequences as $seq) {
-            $allTypes = array_merge($allTypes, $seq['training_types'] ?? []);
-            $efficiencies[] = $seq['efficiency'] ?? 0;
+            $seqTypes = is_array($seq['training_types'] ?? null) ? $seq['training_types'] : [];
+            $allTypes = array_merge($allTypes, $seqTypes);
+            $efficiencies[] = is_numeric($seq['efficiency'] ?? null) ? (float) $seq['efficiency'] : 0.0;
         }
 
-        // Count type frequencies
-        $typeCounts = array_count_values($allTypes);
+        // Count type frequencies - ensure all values are strings
+        /** @var array<string> $stringTypes */
+        $stringTypes = array_filter($allTypes, fn ($v) => is_string($v));
+        $typeCounts = array_count_values($stringTypes);
         arsort($typeCounts);
 
         $avgEfficiency = count($efficiencies) > 0 ? array_sum($efficiencies) / count($efficiencies) : 0;
@@ -1359,7 +1479,7 @@ class CareerComparisonService
         // Generate insights
         $insights = [];
         $topType = array_key_first($typeCounts);
-        if ($topType) {
+        if (is_string($topType)) {
             $insights[] = 'Most common training: '.ucfirst($topType);
         }
         if ($avgEfficiency > 70) {
@@ -1376,10 +1496,11 @@ class CareerComparisonService
     /**
      * Summarize critical decision points
      *
-     * @param  array<array>  $criticalPoints
-     * @return array{most_common_types: array, total_critical_points: int, recommendations: array}
+     * @param  array<int, array<string, mixed>>  $criticalPoints
+     * @return array{most_common_types: array<string, int>, total_critical_points: int, recommendations: array<int, string>}
      */
-    protected function summarizeCriticalPoints(): array
+    protected function summarizeCriticalPoints(array $criticalPoints): array
+    {
         if (empty($criticalPoints)) {
             return [
                 'most_common_types' => [],
@@ -1390,7 +1511,7 @@ class CareerComparisonService
 
         $typeCounts = [];
         foreach ($criticalPoints as $point) {
-            $type = $point['type'] ?? 'unknown';
+            $type = is_string($point['type'] ?? null) ? $point['type'] : 'unknown';
             $typeCounts[$type] = ($typeCounts[$type] ?? 0) + 1;
         }
         arsort($typeCounts);
@@ -1419,16 +1540,18 @@ class CareerComparisonService
      *
      * @param  array<int>  $careerIds
      * @return array{
-     *     success_factors: array,
-     *     factor_importance: array,
-     *     correlation_matrix: array,
+     *     success_factors: array<int, array<string, mixed>>,
+     *     factor_importance: array<string, array<string, mixed>>,
+     *     correlation_matrix: array<string, array<string, float>>,
      *     actionable_insights: array<string>
      * }
      */
-    public function analyzeSuccessFactors(): array
+    public function analyzeSuccessFactors(array $careerIds): array
+    {
         $cacheKey = 'success_factors:'.md5(implode(',', $careerIds));
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($careerIds) {
+        /** @var array{success_factors: array<int, array<string, mixed>>, factor_importance: array<string, array<string, mixed>>, correlation_matrix: array<string, array<string, float>>, actionable_insights: array<string>} $result */
+        $result = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($careerIds) {
             $careers = Career::with(['trainingSessions', 'races'])
                 ->whereIn('id', $careerIds)
                 ->get();
@@ -1461,14 +1584,18 @@ class CareerComparisonService
                 'actionable_insights' => $actionableInsights,
             ];
         });
+
+        return $result;
     }
 
     /**
      * Extract measurable factors from each career
      *
-     * @return array<int, array{career_id: int, is_successful: bool, factors: array}>
+     * @param  Collection<int, Career>  $careers
+     * @return array<int, array{career_id: int, is_successful: bool, factors: array<string, float|int>}>
      */
-    protected function extractCareerFactors(): array
+    protected function extractCareerFactors(Collection $careers): array
+    {
         $careerFactors = [];
 
         foreach ($careers as $career) {
@@ -1503,6 +1630,8 @@ class CareerComparisonService
 
     /**
      * Calculate friendship training rate
+     *
+     * @param  Collection<int, \App\Models\TrainingSession>  $sessions
      */
     protected function calculateFriendshipRate(Collection $sessions): float
     {
@@ -1517,13 +1646,18 @@ class CareerComparisonService
 
     /**
      * Calculate total stat points gained
+     *
+     * @param  Collection<int, \App\Models\TrainingSession>  $sessions
      */
     protected function calculateTotalStatPoints(Collection $sessions): int
     {
         $total = 0;
 
         foreach ($sessions as $session) {
-            $total = ($total ?? 0) + ($session->speed_gain ?? 0)
+            if (! is_object($session)) {
+                continue;
+            }
+            $total += ($session->speed_gain ?? 0)
                 + ($session->stamina_gain ?? 0)
                 + ($session->power_gain ?? 0)
                 + ($session->guts_gain ?? 0)
@@ -1535,6 +1669,8 @@ class CareerComparisonService
 
     /**
      * Calculate skill acquisition rate
+     *
+     * @param  Collection<int, \App\Models\TrainingSession>  $sessions
      */
     protected function calculateSkillAcquisitionRate(Collection $sessions): float
     {
@@ -1544,8 +1680,12 @@ class CareerComparisonService
 
         $skillsAcquired = 0;
         foreach ($sessions as $session) {
+            if (! is_object($session)) {
+                continue;
+            }
+            /** @var array<mixed> $hints */
             $hints = $session->skill_hints_obtained ?? [];
-            $skillsAcquired = ($skillsAcquired ?? 0) + count($hints);
+            $skillsAcquired += is_array($hints) ? count($hints) : 0;
         }
 
         return round(($skillsAcquired / $sessions->count()) * 100, 1);
@@ -1553,6 +1693,8 @@ class CareerComparisonService
 
     /**
      * Calculate training consistency (inverse of variance)
+     *
+     * @param  Collection<int, \App\Models\TrainingSession>  $sessions
      */
     protected function calculateTrainingConsistency(Collection $sessions): float
     {
@@ -1577,11 +1719,14 @@ class CareerComparisonService
 
     /**
      * Calculate efficiency for a specific phase
+     *
+     * @param  Collection<int, \App\Models\TrainingSession>  $sessions
      */
     protected function calculatePhaseEfficiency(Collection $sessions, string $phase): float
     {
         $range = self::CAREER_PHASES[$phase] ?? ['min' => 1, 'max' => 24];
 
+        /** @var Collection<int, \App\Models\TrainingSession> $phaseSessions */
         $phaseSessions = $sessions->filter(function ($s) use ($range) {
             $turn = $s->turn_number ?? 0;
 
@@ -1594,10 +1739,11 @@ class CareerComparisonService
     /**
      * Calculate factor importance using correlation with success
      *
-     * @param  array<array>  $careerFactors
+     * @param  array<int, array{career_id: int, is_successful: bool, factors: array<string, float|int>}>  $careerFactors
      * @return array<string, array{correlation: float, importance: string, direction: string}>
      */
-    protected function calculateFactorImportance(): array
+    protected function calculateFactorImportance(array $careerFactors): array
+    {
         $factorNames = [
             'training_efficiency',
             'failure_rate',
@@ -1657,10 +1803,10 @@ class CareerComparisonService
         $sumX2 = 0;
         $sumY2 = 0;
 
-        for ($i = 0; $i < $n; $i = ($i ?? 0) + 1) {
-            $sumXY = ($sumXY ?? 0) + $x[$i] * $y[$i];
-            $sumX2 = ($sumX2 ?? 0) + $x[$i] * $x[$i];
-            $sumY2 = ($sumY2 ?? 0) + $y[$i] * $y[$i];
+        for ($i = 0; $i < $n; $i++) {
+            $sumXY += $x[$i] * $y[$i];
+            $sumX2 += $x[$i] * $x[$i];
+            $sumY2 += $y[$i] * $y[$i];
         }
 
         $numerator = ($n * $sumXY) - ($sumX * $sumY);
@@ -1692,10 +1838,11 @@ class CareerComparisonService
     /**
      * Build correlation matrix between factors
      *
-     * @param  array<array>  $careerFactors
+     * @param  array<int, array{career_id: int, is_successful: bool, factors: array<string, float|int>}>  $careerFactors
      * @return array<string, array<string, float>>
      */
-    protected function buildCorrelationMatrix(): array
+    protected function buildCorrelationMatrix(array $careerFactors): array
+    {
         $factorNames = [
             'training_efficiency',
             'race_win_rate',
@@ -1722,21 +1869,24 @@ class CareerComparisonService
     /**
      * Generate actionable insights from factor analysis
      *
-     * @param  array<string, array>  $factorImportance
-     * @param  array<string, array>  $correlationMatrix
+     * @param  array<string, array{correlation: float, importance: string, direction: string}>  $factorImportance
+     * @param  array<string, array<string, float>>  $correlationMatrix
      * @return array<string>
      */
-    protected function generateActionableInsights(): array
+    protected function generateActionableInsights(array $factorImportance, array $correlationMatrix): array
+    {
         $insights = [];
 
         // Top factors
         $topFactors = array_slice($factorImportance, 0, 3, true);
 
         foreach ($topFactors as $factor => $data) {
-            if ((is_array($data) && isset($data['importance']) ? $data['importance'] : null) === 'very_high' || (is_array($data) && isset($data['importance']) ? $data['importance'] : null) === 'high') {
-                $direction = (is_array($data) && isset($data['direction']) ? $data['direction'] : null) === 'positive' ? 'increases' : 'decreases';
+            $importance = $data['importance'] ?? '';
+            $direction = $data['direction'] ?? '';
+            if ($importance === 'very_high' || $importance === 'high') {
+                $directionLabel = $direction === 'positive' ? 'increases' : 'decreases';
                 $factorLabel = str_replace('_', ' ', $factor);
-                $insights[] = "Higher {$factorLabel} strongly {$direction} success probability";
+                $insights[] = "Higher {$factorLabel} strongly {$directionLabel} success probability";
             }
         }
 
@@ -1770,17 +1920,19 @@ class CareerComparisonService
      *
      * @param  array<int>  $careerIds
      * @return array{
-     *     t_tests: array,
-     *     chi_square_tests: array,
-     *     effect_sizes: array,
-     *     confidence_intervals: array,
-     *     overall_significance: array
+     *     t_tests: array<string, array<string, mixed>>,
+     *     chi_square_tests: array<string, array<string, mixed>>,
+     *     effect_sizes: array<string, array<string, mixed>>,
+     *     confidence_intervals: array<string, array<string, mixed>>,
+     *     overall_significance: array<string, mixed>
      * }
      */
-    public function performStatisticalTests(): array
+    public function performStatisticalTests(array $careerIds): array
+    {
         $cacheKey = 'statistical_tests:'.md5(implode(',', $careerIds));
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($careerIds) {
+        /** @var array{t_tests: array<string, array<string, mixed>>, chi_square_tests: array<string, array<string, mixed>>, effect_sizes: array<string, array<string, mixed>>, confidence_intervals: array<string, array<string, mixed>>, overall_significance: array<string, mixed>} $result */
+        $result = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($careerIds) {
             $careers = Career::with(['trainingSessions', 'races'])
                 ->whereIn('id', $careerIds)
                 ->get();
@@ -1825,14 +1977,19 @@ class CareerComparisonService
                 'overall_significance' => $overallSignificance,
             ];
         });
+
+        return $result;
     }
 
     /**
      * Perform independent samples t-tests
      *
+     * @param  Collection<int, Career>  $successfulCareers
+     * @param  Collection<int, Career>  $unsuccessfulCareers
      * @return array<string, array{t_statistic: float, p_value: float, significant: bool, interpretation: string}>
      */
-    protected function performTTests(): array
+    protected function performTTests(Collection $successfulCareers, Collection $unsuccessfulCareers): array
+    {
         $variables = [
             'training_efficiency' => fn ($c) => $this->calculateCareerEfficiency($c->trainingSessions)['rating'],
             'total_stat_points' => fn ($c) => $this->calculateTotalStatPoints($c->trainingSessions),
@@ -1843,7 +2000,9 @@ class CareerComparisonService
         $results = [];
 
         foreach ($variables as $name => $extractor) {
+            /** @var array<int, float|int> $successValues */
             $successValues = $successfulCareers->map($extractor)->values()->toArray();
+            /** @var array<int, float|int> $unsuccessValues */
             $unsuccessValues = $unsuccessfulCareers->map($extractor)->values()->toArray();
 
             if (count($successValues) >= 2 && count($unsuccessValues) >= 2) {
@@ -1858,11 +2017,12 @@ class CareerComparisonService
     /**
      * Calculate independent samples t-test
      *
-     * @param  array<float>  $group1
-     * @param  array<float>  $group2
+     * @param  array<int, float|int>  $group1
+     * @param  array<int, float|int>  $group2
      * @return array{t_statistic: float, p_value: float, significant: bool, interpretation: string}
      */
-    protected function calculateTTest(): array
+    protected function calculateTTest(array $group1, array $group2): array
+    {
         $n1 = count($group1);
         $n2 = count($group2);
 
@@ -1999,9 +2159,12 @@ class CareerComparisonService
     /**
      * Perform chi-square tests for categorical variables
      *
+     * @param  Collection<int, Career>  $successfulCareers
+     * @param  Collection<int, Career>  $unsuccessfulCareers
      * @return array<string, array{chi_square: float, p_value: float, significant: bool, interpretation: string}>
      */
-    protected function performChiSquareTests(): array
+    protected function performChiSquareTests(Collection $successfulCareers, Collection $unsuccessfulCareers): array
+    {
         $results = [];
 
         // Test training type preference
@@ -2016,9 +2179,12 @@ class CareerComparisonService
     /**
      * Chi-square test for training type preference
      *
+     * @param  Collection<int, Career>  $successfulCareers
+     * @param  Collection<int, Career>  $unsuccessfulCareers
      * @return array{chi_square: float, p_value: float, significant: bool, interpretation: string}
      */
-    protected function chiSquareTrainingType(): array
+    protected function chiSquareTrainingType(Collection $successfulCareers, Collection $unsuccessfulCareers): array
+    {
         $trainingTypes = ['speed', 'stamina', 'power', 'guts', 'wit'];
 
         // Build contingency table
@@ -2048,9 +2214,12 @@ class CareerComparisonService
     /**
      * Chi-square test for running style preference
      *
+     * @param  Collection<int, Career>  $successfulCareers
+     * @param  Collection<int, Career>  $unsuccessfulCareers
      * @return array{chi_square: float, p_value: float, significant: bool, interpretation: string}
      */
-    protected function chiSquareRunningStyle(): array
+    protected function chiSquareRunningStyle(Collection $successfulCareers, Collection $unsuccessfulCareers): array
+    {
         $styles = ['front_runner', 'pace_chaser', 'late_surger', 'end_closer'];
 
         // Build contingency table
@@ -2088,7 +2257,8 @@ class CareerComparisonService
      * @param  array<string>  $categories
      * @return array{chi_square: float, p_value: float, significant: bool, interpretation: string}
      */
-    protected function calculateChiSquare(): array
+    protected function calculateChiSquare(array $observed, array $categories): array
+    {
         // Calculate row and column totals
         $rowTotals = [];
         $colTotals = array_fill_keys($categories, 0);
@@ -2096,7 +2266,7 @@ class CareerComparisonService
 
         foreach ($observed as $row => $cols) {
             $rowTotals[$row] = array_sum($cols);
-            $grandTotal = ($grandTotal ?? 0) + $rowTotals[$row];
+            $grandTotal += $rowTotals[$row];
 
             foreach ($cols as $col => $count) {
                 $colTotals[$col] += $count;
@@ -2120,7 +2290,7 @@ class CareerComparisonService
                 $expected = ($rowTotals[$row] * $colTotals[$col]) / $grandTotal;
 
                 if ($expected > 0) {
-                    $chiSquare = ($chiSquare ?? 0) + pow($observedCount - $expected, 2) / $expected;
+                    $chiSquare += pow($observedCount - $expected, 2) / $expected;
                 }
             }
         }
@@ -2159,19 +2329,20 @@ class CareerComparisonService
         }
 
         // Use approximation based on critical values
+        /** @var array<int, array<int, float>> $criticalValues */
         $criticalValues = [
-            1 => [3.84 => 0.05, 6.63 => 0.01, 10.83 => 0.001],
-            2 => [5.99 => 0.05, 9.21 => 0.01, 13.82 => 0.001],
-            3 => [7.81 => 0.05, 11.34 => 0.01, 16.27 => 0.001],
-            4 => [9.49 => 0.05, 13.28 => 0.01, 18.47 => 0.001],
-            5 => [11.07 => 0.05, 15.09 => 0.01, 20.52 => 0.001],
+            1 => [4 => 0.05, 7 => 0.01, 11 => 0.001],
+            2 => [6 => 0.05, 9 => 0.01, 14 => 0.001],
+            3 => [8 => 0.05, 11 => 0.01, 16 => 0.001],
+            4 => [9 => 0.05, 13 => 0.01, 18 => 0.001],
+            5 => [11 => 0.05, 15 => 0.01, 21 => 0.001],
         ];
 
         $dfKey = min($df, 5);
 
         if (isset($criticalValues[$dfKey])) {
             foreach ($criticalValues[$dfKey] as $critical => $pValue) {
-                if ($chiSquare >= $critical) {
+                if ($chiSquare >= (float) $critical) {
                     return $pValue;
                 }
             }
@@ -2183,9 +2354,12 @@ class CareerComparisonService
     /**
      * Calculate effect sizes (Cohen's d)
      *
+     * @param  Collection<int, Career>  $successfulCareers
+     * @param  Collection<int, Career>  $unsuccessfulCareers
      * @return array<string, array{cohens_d: float, effect_size: string, interpretation: string}>
      */
-    protected function calculateEffectSizes(): array
+    protected function calculateEffectSizes(Collection $successfulCareers, Collection $unsuccessfulCareers): array
+    {
         $variables = [
             'training_efficiency' => fn ($c) => $this->calculateCareerEfficiency($c->trainingSessions)['rating'],
             'total_stat_points' => fn ($c) => $this->calculateTotalStatPoints($c->trainingSessions),
@@ -2195,7 +2369,9 @@ class CareerComparisonService
         $results = [];
 
         foreach ($variables as $name => $extractor) {
+            /** @var array<float> $successValues */
             $successValues = $successfulCareers->map($extractor)->values()->toArray();
+            /** @var array<float> $unsuccessValues */
             $unsuccessValues = $unsuccessfulCareers->map($extractor)->values()->toArray();
 
             if (count($successValues) >= 2 && count($unsuccessValues) >= 2) {
@@ -2256,9 +2432,12 @@ class CareerComparisonService
     /**
      * Calculate confidence intervals for key metrics
      *
+     * @param  Collection<int, Career>  $successfulCareers
+     * @param  Collection<int, Career>  $unsuccessfulCareers
      * @return array<string, array{mean_diff: float, ci_lower: float, ci_upper: float, interpretation: string}>
      */
-    protected function calculateConfidenceIntervals(): array
+    protected function calculateConfidenceIntervals(Collection $successfulCareers, Collection $unsuccessfulCareers): array
+    {
         $variables = [
             'training_efficiency' => fn ($c) => $this->calculateCareerEfficiency($c->trainingSessions)['rating'],
             'race_win_rate' => fn ($c) => $this->calculateRacePerformance($c->races)['win_rate'],
@@ -2267,7 +2446,9 @@ class CareerComparisonService
         $results = [];
 
         foreach ($variables as $name => $extractor) {
+            /** @var array<float> $successValues */
             $successValues = $successfulCareers->map($extractor)->values()->toArray();
+            /** @var array<float> $unsuccessValues */
             $unsuccessValues = $unsuccessfulCareers->map($extractor)->values()->toArray();
 
             if (count($successValues) >= 2 && count($unsuccessValues) >= 2) {
@@ -2286,7 +2467,8 @@ class CareerComparisonService
      * @param  array<float>  $group2
      * @return array{mean_diff: float, ci_lower: float, ci_upper: float, interpretation: string}
      */
-    protected function calculateMeanDifferenceCI(): array
+    protected function calculateMeanDifferenceCI(array $group1, array $group2): array
+    {
         $n1 = count($group1);
         $n2 = count($group2);
 
@@ -2324,28 +2506,31 @@ class CareerComparisonService
     /**
      * Summarize overall statistical significance
      *
-     * @param  array<string, array>  $tTests
-     * @param  array<string, array>  $chiSquareTests
-     * @param  array<string, array>  $effectSizes
+     * @param  array<string, array<string, mixed>>  $tTests
+     * @param  array<string, array<string, mixed>>  $chiSquareTests
+     * @param  array<string, array<string, mixed>>  $effectSizes
      * @return array{sufficient_data: bool, significant_findings: int, key_findings: array<string>, overall_conclusion: string}
      */
-    protected function summarizeSignificance(): array
+    protected function summarizeSignificance(array $tTests, array $chiSquareTests, array $effectSizes): array
+    {
         $significantFindings = 0;
         $keyFindings = [];
 
         // Count significant t-tests
         foreach ($tTests as $name => $result) {
             if ($result['significant'] ?? false) {
-                $significantFindings = ($significantFindings ?? 0) + 1;
-                $keyFindings[] = ucfirst(str_replace('_', ' ', $name)).': '.$result['interpretation'];
+                $significantFindings++;
+                $interpretation = is_string($result['interpretation'] ?? null) ? $result['interpretation'] : '';
+                $keyFindings[] = ucfirst(str_replace('_', ' ', $name)).': '.$interpretation;
             }
         }
 
         // Count significant chi-square tests
         foreach ($chiSquareTests as $name => $result) {
             if ($result['significant'] ?? false) {
-                $significantFindings = ($significantFindings ?? 0) + 1;
-                $keyFindings[] = ucfirst(str_replace('_', ' ', $name)).': '.$result['interpretation'];
+                $significantFindings++;
+                $interpretation = is_string($result['interpretation'] ?? null) ? $result['interpretation'] : '';
+                $keyFindings[] = ucfirst(str_replace('_', ' ', $name)).': '.$interpretation;
             }
         }
 
@@ -2379,9 +2564,11 @@ class CareerComparisonService
     /**
      * Calculate success correlations across all factors
      *
+     * @param  Collection<int, Career>  $careers
      * @return array<string, array{correlation: float, strength: string}>
      */
-    protected function calculateSuccessCorrelations(): array
+    protected function calculateSuccessCorrelations(Collection $careers): array
+    {
         $factors = [
             'training_efficiency' => fn ($c) => $this->calculateCareerEfficiency($c->trainingSessions)['rating'],
             'friendship_rate' => fn ($c) => $this->calculateFriendshipRate($c->trainingSessions),
@@ -2390,9 +2577,11 @@ class CareerComparisonService
         ];
 
         $correlations = [];
+        /** @var array<float|int> $successValues */
         $successValues = $careers->map(fn ($c) => $this->isCareerSuccessful($c) ? 1 : 0)->values()->toArray();
 
         foreach ($factors as $name => $extractor) {
+            /** @var array<float|int> $factorValues */
             $factorValues = $careers->map($extractor)->values()->toArray();
             $correlation = $this->calculatePearsonCorrelation($factorValues, $successValues);
 
@@ -2415,46 +2604,58 @@ class CareerComparisonService
     /**
      * Generate recommended patterns based on analysis
      *
+     * @param  array<string, mixed>  $trainingPatterns
+     * @param  array<string, mixed>  $raceStrategyPatterns
+     * @param  array<string, array{correlation: float, strength: string}>  $successCorrelations
      * @return array<string>
      */
-    protected function generateRecommendedPatterns(): array
+    protected function generateRecommendedPatterns(array $trainingPatterns, array $raceStrategyPatterns, array $successCorrelations): array
+    {
         $recommendations = [];
 
         // Training recommendations
-        $successfulPatterns = $trainingPatterns['successful_patterns'] ?? [];
-        if (! empty($successfulPatterns['avg_training_distribution'])) {
-            $topTraining = array_keys($successfulPatterns['avg_training_distribution']);
+        /** @var array<string, mixed> $successfulPatterns */
+        $successfulPatterns = is_array($trainingPatterns['successful_patterns'] ?? null) ? $trainingPatterns['successful_patterns'] : [];
+        $avgDistribution = is_array($successfulPatterns['avg_training_distribution'] ?? null) ? $successfulPatterns['avg_training_distribution'] : [];
+        if (! empty($avgDistribution)) {
+            $topTraining = array_keys($avgDistribution);
             if (! empty($topTraining)) {
-                arsort($successfulPatterns['avg_training_distribution']);
-                $topType = array_key_first($successfulPatterns['avg_training_distribution']);
+                arsort($avgDistribution);
+                $topType = array_key_first($avgDistribution);
                 $recommendations[] = "Focus on {$topType} training (most common in successful careers)";
             }
         }
 
         // Friendship training recommendation
-        if (isset($successfulPatterns['friendship_training_rate']) && $successfulPatterns['friendship_training_rate'] > 20) {
-            $recommendations[] = "Prioritize friendship training when available (successful careers average {$successfulPatterns['friendship_training_rate']}% friendship training)";
+        $friendshipRate = is_numeric($successfulPatterns['friendship_training_rate'] ?? null) ? (float) $successfulPatterns['friendship_training_rate'] : 0.0;
+        if ($friendshipRate > 20) {
+            $recommendations[] = "Prioritize friendship training when available (successful careers average {$friendshipRate}% friendship training)";
         }
 
         // Race strategy recommendations
-        $strategyEffectiveness = $raceStrategyPatterns['strategy_effectiveness'] ?? [];
+        /** @var array<string, array<string, mixed>> $strategyEffectiveness */
+        $strategyEffectiveness = is_array($raceStrategyPatterns['strategy_effectiveness'] ?? null) ? $raceStrategyPatterns['strategy_effectiveness'] : [];
         $bestStrategy = null;
-        $bestWinRate = 0;
+        $bestWinRate = 0.0;
 
         foreach ($strategyEffectiveness as $style => $data) {
-            if (($data['win_rate'] ?? 0) > $bestWinRate && ($data['races'] ?? 0) >= 3) {
-                $bestWinRate = (is_array($data) && isset($data['win_rate']) ? $data['win_rate'] : null);
-                $bestStrategy = $style;
+            $winRate = is_numeric($data['win_rate'] ?? null) ? (float) $data['win_rate'] : 0.0;
+            $races = is_int($data['races'] ?? null) ? $data['races'] : 0;
+            if ($winRate > $bestWinRate && $races >= 3) {
+                $bestWinRate = $winRate;
+                $bestStrategy = is_string($style) ? $style : null;
             }
         }
 
-        if ($bestStrategy) {
+        if ($bestStrategy !== null) {
             $recommendations[] = 'Consider '.str_replace('_', ' ', $bestStrategy)." running style ({$bestWinRate}% win rate)";
         }
 
         // Correlation-based recommendations
         foreach ($successCorrelations as $factor => $data) {
-            if ((is_array($data) && isset($data['strength']) ? $data['strength'] : null) === 'strong' && (is_array($data) && isset($data['correlation']) ? $data['correlation'] : null) > 0) {
+            $strength = $data['strength'] ?? 'negligible';
+            $correlation = $data['correlation'] ?? 0.0;
+            if ($strength === 'strong' && $correlation > 0) {
                 $recommendations[] = 'Higher '.str_replace('_', ' ', $factor).' strongly correlates with success';
             }
         }
@@ -2468,8 +2669,21 @@ class CareerComparisonService
 
     /**
      * Get empty comparison result
+     *
+     * @param  string  $message  Error/status message
+     * @return array{
+     *     careers: array<array<string, mixed>>,
+     *     comparison_summary: array<string, mixed>,
+     *     stat_comparison: array<string, array<string, mixed>>,
+     *     training_comparison: array<string, mixed>,
+     *     race_comparison: array<string, mixed>,
+     *     key_differences: array<string>,
+     *     best_performer: array<string, mixed>,
+     *     message?: string
+     * }
      */
-    protected function getEmptyComparisonResult(): array
+    protected function getEmptyComparisonResult(string $message = ''): array
+    {
         return [
             'careers' => [],
             'comparison_summary' => [
@@ -2491,8 +2705,11 @@ class CareerComparisonService
 
     /**
      * Get empty pattern result
+     *
+     * @return array<string, mixed>
      */
     protected function getEmptyPatternResult(): array
+    {
         return [
             'training_patterns' => [],
             'race_strategy_patterns' => [],
@@ -2526,13 +2743,14 @@ class CareerComparisonService
      *
      * @param  array<int>  $careerIds
      * @return array{
-     *     comparison: array,
-     *     patterns: array,
-     *     success_factors: array,
-     *     statistical_tests: array
+     *     comparison: array<string, mixed>,
+     *     patterns: array<string, mixed>,
+     *     success_factors: array<string, mixed>,
+     *     statistical_tests: array<string, mixed>
      * }
      */
-    public function getComprehensiveAnalysis(): array
+    public function getComprehensiveAnalysis(array $careerIds): array
+    {
         return [
             'comparison' => $this->compareCareers($careerIds),
             'patterns' => $this->identifySuccessPatterns($careerIds),

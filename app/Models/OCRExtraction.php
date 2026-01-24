@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -37,6 +38,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class OCRExtraction extends Model
 {
+    /** @use HasFactory<\Database\Factories\OCRExtractionFactory> */
     use HasFactory;
 
     protected $table = 'ucp_ocr_extractions';
@@ -66,22 +68,37 @@ class OCRExtraction extends Model
         ];
     }
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function scopeProcessed(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    /**
+     * @param  Builder<OCRExtraction>  $query
+     * @return Builder<OCRExtraction>
+     */
+    public function scopeProcessed(Builder $query): Builder
     {
         return $query->where('status', 'processed');
     }
 
-    public function scopeFailed(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    /**
+     * @param  Builder<OCRExtraction>  $query
+     * @return Builder<OCRExtraction>
+     */
+    public function scopeFailed(Builder $query): Builder
     {
         return $query->where('status', 'failed');
     }
 
-    public function scopeDataType($query, string $type)
+    /**
+     * @param  Builder<OCRExtraction>  $query
+     * @return Builder<OCRExtraction>
+     */
+    public function scopeDataType(Builder $query, string $type): Builder
     {
         return $query->where('data_type', $type);
     }

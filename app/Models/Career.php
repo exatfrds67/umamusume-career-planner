@@ -50,6 +50,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Career extends Model
 {
+    /** @use HasFactory<\Database\Factories\CareerFactory> */
     use HasFactory;
 
     /**
@@ -62,7 +63,7 @@ class Career extends Model
     /**
      * The attributes that are mass assignable.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $fillable = [
         'character_id',

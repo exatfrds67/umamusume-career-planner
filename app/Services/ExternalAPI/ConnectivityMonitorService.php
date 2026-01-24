@@ -46,11 +46,6 @@ class ConnectivityMonitorService
     private const CHECK_INTERVAL = 30;
 
     /**
-     * Timeout for connectivity checks in seconds
-     */
-    private const CHECK_TIMEOUT = 5;
-
-    /**
      * Number of consecutive failures before marking as offline
      */
     private const FAILURE_THRESHOLD = 3;
@@ -66,6 +61,7 @@ class ConnectivityMonitorService
      * @return array{is_online: bool, api_status: array<string, mixed>, last_check: string, offline_since: string|null, consecutive_failures: int}
      */
     public function checkConnectivity(): array
+    {
         Log::debug('[ConnectivityMonitor] Checking connectivity status');
 
         $startTime = microtime(true);
@@ -134,7 +130,14 @@ class ConnectivityMonitorService
      */
     public function getCachedStatus(): ?array
     {
-        return Cache::get(self::CONNECTIVITY_STATUS_KEY);
+        $cached = Cache::get(self::CONNECTIVITY_STATUS_KEY);
+
+        if (is_array($cached)) {
+            /** @var array{is_online: bool, api_status: array<string, mixed>, last_check: string, offline_since: string|null, consecutive_failures: int} $cached */
+            return $cached;
+        }
+
+        return null;
     }
 
     /**
@@ -143,6 +146,7 @@ class ConnectivityMonitorService
      * @return array{is_online: bool, api_status: array<string, mixed>, last_check: string, offline_since: string|null, consecutive_failures: int, cached: bool}
      */
     public function getStatus(): array
+    {
         $cached = $this->getCachedStatus();
 
         if ($cached) {
@@ -181,6 +185,7 @@ class ConnectivityMonitorService
      * @return array{is_offline: bool, offline_since: string|null, duration_seconds: int|null, cached_data_available: bool, cache_statistics: array<string, mixed>}
      */
     public function getOfflineModeInfo(): array
+    {
         $status = $this->getStatus();
         $offlineSince = $status['offline_since'];
 
@@ -208,6 +213,7 @@ class ConnectivityMonitorService
      * @return array{is_online: bool, api_status: array<string, mixed>, last_check: string, offline_since: string|null, consecutive_failures: int}
      */
     public function forceCheck(): array
+    {
         // Clear cached status
         Cache::forget(self::CONNECTIVITY_STATUS_KEY);
 
@@ -239,7 +245,9 @@ class ConnectivityMonitorService
      */
     protected function getOfflineSince(): ?string
     {
-        return Cache::get(self::OFFLINE_MODE_KEY);
+        $value = Cache::get(self::OFFLINE_MODE_KEY);
+
+        return is_string($value) ? $value : null;
     }
 
     /**
@@ -249,7 +257,9 @@ class ConnectivityMonitorService
      */
     protected function determineOnlineStatus(array $apiHealth): bool
     {
-        $overallStatus = $apiHealth['overall_status'] ?? 'unhealthy';
+        $overallStatus = isset($apiHealth['overall_status']) && is_string($apiHealth['overall_status'])
+            ? $apiHealth['overall_status']
+            : 'unhealthy';
 
         // Consider online if at least one API is healthy or degraded
         if (in_array($overallStatus, ['healthy', 'degraded'])) {
@@ -257,8 +267,15 @@ class ConnectivityMonitorService
         }
 
         // Check individual API statuses
-        $umapyoiStatus = $apiHealth['umapyoi']['status'] ?? 'error';
-        $umamusumeDBStatus = $apiHealth['umamusumedb']['status'] ?? 'error';
+        $umapyoiData = is_array($apiHealth['umapyoi'] ?? null) ? $apiHealth['umapyoi'] : [];
+        $umamusumedbData = is_array($apiHealth['umamusumedb'] ?? null) ? $apiHealth['umamusumedb'] : [];
+
+        $umapyoiStatus = isset($umapyoiData['status']) && is_string($umapyoiData['status'])
+            ? $umapyoiData['status']
+            : 'error';
+        $umamusumeDBStatus = isset($umamusumedbData['status']) && is_string($umamusumedbData['status'])
+            ? $umamusumedbData['status']
+            : 'error';
 
         // Online if at least one API is available
         if (in_array($umapyoiStatus, ['healthy', 'degraded']) ||
@@ -281,7 +298,9 @@ class ConnectivityMonitorService
      */
     protected function getConsecutiveFailures(): int
     {
-        return (int) Cache::get('connectivity:failures', 0);
+        $value = Cache::get('connectivity:failures', 0);
+
+        return is_numeric($value) ? (int) $value : 0;
     }
 
     /**
@@ -316,7 +335,9 @@ class ConnectivityMonitorService
      */
     public function getLastSuccessfulConnection(): ?string
     {
-        return Cache::get(self::LAST_SUCCESS_KEY);
+        $value = Cache::get(self::LAST_SUCCESS_KEY);
+
+        return is_string($value) ? $value : null;
     }
 
     /**
@@ -325,6 +346,7 @@ class ConnectivityMonitorService
      * @return array<string>
      */
     public function getRecommendations(): array
+    {
         $status = $this->getStatus();
         $recommendations = [];
 
@@ -368,6 +390,7 @@ class ConnectivityMonitorService
      * @return array{status: array<string, mixed>, offline_info: array<string, mixed>, recommendations: array<string>, cache_info: array<string, mixed>}
      */
     public function getConnectivityReport(): array
+    {
         return [
             'status' => $this->getStatus(),
             'offline_info' => $this->getOfflineModeInfo(),

@@ -43,15 +43,15 @@ class APIPerformanceMetricsService
      */
     public function recordResponseTime(string $source, string $endpoint, float $responseTimeMs, bool $success): void
     {
-        $timestamp = now()->timestamp;
+        $timestamp = (int) now()->timestamp;
 
         // Store response time in sorted set for percentile calculations
         $responseTimeKey = self::METRICS_PREFIX."response_times:{$source}";
-        Redis::zadd($responseTimeKey, $timestamp, "{$timestamp}:{$responseTimeMs}");
+        Redis::zadd($responseTimeKey, (float) $timestamp, "{$timestamp}:{$responseTimeMs}");
 
         // Trim old entries
         $cutoff = $timestamp - self::METRICS_WINDOW;
-        Redis::zremrangebyscore($responseTimeKey, '-inf', $cutoff);
+        Redis::zremrangebyscore($responseTimeKey, '-inf', (string) $cutoff);
 
         // Limit total samples
         $count = Redis::zcard($responseTimeKey);
@@ -128,7 +128,8 @@ class APIPerformanceMetricsService
      *
      * @return array{p50: float, p95: float, p99: float, avg: float, min: float, max: float, count: int}
      */
-    public function getResponseTimeStats(): array
+    public function getResponseTimeStats(string $source = 'umapyoi'): array
+    {
         $responseTimeKey = self::METRICS_PREFIX."response_times:{$source}";
         $samples = Redis::zrange($responseTimeKey, 0, -1);
 
@@ -173,6 +174,7 @@ class APIPerformanceMetricsService
      * @return array{hit_rate: float, hits: int, misses: int, total: int, by_type: array<string, array{hit_rate: float, hits: int, misses: int}>}
      */
     public function getCacheHitRateStats(): array
+    {
         $totalHits = $this->getCounter('cache:hits:total');
         $totalMisses = $this->getCounter('cache:misses:total');
         $total = $totalHits + $totalMisses;
@@ -211,10 +213,12 @@ class APIPerformanceMetricsService
      * @return array{error_rate: float, total_requests: int, total_errors: int, by_source: array<string, array{error_rate: float, success: int, errors: int}>, recent_errors: array<int, array<string, mixed>>}
      */
     public function getErrorRateStats(): array
+    {
         $sources = ['umapyoi', 'umamusumedb'];
         $bySource = [];
         $totalRequests = 0;
         $totalErrors = 0;
+        /** @var array<int, array<string, mixed>> $recentErrors */
         $recentErrors = [];
 
         foreach ($sources as $source) {
@@ -222,8 +226,8 @@ class APIPerformanceMetricsService
             $errors = $this->getCounter("{$source}:error");
             $sourceTotal = $success + $errors;
 
-            $totalRequests = ($totalRequests ?? 0) + $sourceTotal;
-            $totalErrors = ($totalErrors ?? 0) + $errors;
+            $totalRequests += $sourceTotal;
+            $totalErrors += $errors;
 
             if ($sourceTotal > 0) {
                 $bySource[$source] = [
@@ -235,13 +239,19 @@ class APIPerformanceMetricsService
 
             // Get recent errors for this source
             $errorKey = self::METRICS_PREFIX."errors:{$source}";
+            /** @var array<int, string> $sourceErrors */
             $sourceErrors = Redis::lrange($errorKey, 0, 9); // Last 10 errors
 
             foreach ($sourceErrors as $errorJson) {
                 $error = json_decode($errorJson, true);
-                if ($error) {
-                    $error['source'] = $source;
-                    $recentErrors[] = $error;
+                if (is_array($error)) {
+                    $errorTimestamp = isset($error['timestamp']) && is_int($error['timestamp']) ? $error['timestamp'] : 0;
+                    $recentErrors[] = [
+                        'source' => $source,
+                        'timestamp' => $errorTimestamp,
+                        'type' => isset($error['type']) && is_string($error['type']) ? $error['type'] : 'unknown',
+                        'message' => isset($error['message']) && is_string($error['message']) ? $error['message'] : '',
+                    ];
                 }
             }
         }
@@ -267,6 +277,7 @@ class APIPerformanceMetricsService
      * @return array<string, mixed>
      */
     public function getDashboardMetrics(): array
+    {
         $sources = ['umapyoi', 'umamusumedb'];
         $responseTimeStats = [];
 
@@ -290,6 +301,7 @@ class APIPerformanceMetricsService
      * @return array{total: int, by_source: array<string, int>, by_endpoint: array<string, array<string, int>>}
      */
     public function getRequestVolumeStats(): array
+    {
         $sources = ['umapyoi', 'umamusumedb'];
         $bySource = [];
         $byEndpoint = [];
@@ -301,7 +313,7 @@ class APIPerformanceMetricsService
             $sourceTotal = $success + $errors;
 
             $bySource[$source] = $sourceTotal;
-            $total = ($total ?? 0) + $sourceTotal;
+            $total += $sourceTotal;
 
             // Get endpoint breakdown
             $endpointPattern = self::METRICS_PREFIX."{$source}:endpoints:*";
@@ -309,8 +321,12 @@ class APIPerformanceMetricsService
 
             $sourceEndpoints = [];
             foreach ($endpointKeys as $key) {
+                if (! is_string($key)) {
+                    continue;
+                }
                 $endpoint = str_replace(self::METRICS_PREFIX."{$source}:endpoints:", '', $key);
-                $count = (int) Redis::get($key);
+                $countValue = Redis::get($key);
+                $count = is_numeric($countValue) ? (int) $countValue : 0;
                 $sourceEndpoints[$endpoint] = $count;
             }
 
@@ -333,6 +349,7 @@ class APIPerformanceMetricsService
      * @return array{overall: string, sources: array<string, string>, alerts: array<int, string>}
      */
     public function getHealthStatusSummary(): array
+    {
         $sources = ['umapyoi', 'umamusumedb'];
         $sourceStatuses = [];
         $alerts = [];
@@ -445,11 +462,13 @@ class APIPerformanceMetricsService
         $fullKey = self::METRICS_PREFIX.$key;
         $value = Redis::get($fullKey);
 
-        return $value ? (int) $value : 0;
+        return is_numeric($value) ? (int) $value : 0;
     }
 
     /**
      * Calculate percentile from sorted array
+     *
+     * @param  array<int, float>  $sortedValues
      */
     protected function calculatePercentile(array $sortedValues, int $percentile): float
     {
@@ -495,13 +514,13 @@ class APIPerformanceMetricsService
         $this->incrementCounter('batch:total_requests', $requestCount);
 
         // Store batch execution time
-        $timestamp = now()->timestamp;
+        $timestamp = (int) now()->timestamp;
         $batchKey = self::METRICS_PREFIX.'batch:execution_times';
-        Redis::zadd($batchKey, $timestamp, "{$timestamp}:{$durationMs}:{$requestCount}");
+        Redis::zadd($batchKey, (float) $timestamp, "{$timestamp}:{$durationMs}:{$requestCount}");
 
         // Trim old entries
         $cutoff = $timestamp - self::METRICS_WINDOW;
-        Redis::zremrangebyscore($batchKey, '-inf', $cutoff);
+        Redis::zremrangebyscore($batchKey, '-inf', (string) $cutoff);
 
         Log::debug('[APIPerformanceMetrics] Batch execution recorded', [
             'batch_id' => $batchId,
@@ -519,13 +538,13 @@ class APIPerformanceMetricsService
         $this->incrementCounter('parallel:total_requests', $requestCount);
 
         // Store parallel fetch time
-        $timestamp = now()->timestamp;
+        $timestamp = (int) now()->timestamp;
         $parallelKey = self::METRICS_PREFIX.'parallel:execution_times';
-        Redis::zadd($parallelKey, $timestamp, "{$timestamp}:{$durationMs}:{$requestCount}");
+        Redis::zadd($parallelKey, (float) $timestamp, "{$timestamp}:{$durationMs}:{$requestCount}");
 
         // Trim old entries
         $cutoff = $timestamp - self::METRICS_WINDOW;
-        Redis::zremrangebyscore($parallelKey, '-inf', $cutoff);
+        Redis::zremrangebyscore($parallelKey, '-inf', (string) $cutoff);
 
         Log::debug('[APIPerformanceMetrics] Parallel fetch recorded', [
             'request_count' => $requestCount,
@@ -556,6 +575,7 @@ class APIPerformanceMetricsService
      * @return array{total_executions: int, total_requests: int, avg_batch_size: float, avg_duration_ms: float}
      */
     public function getBatchExecutionStats(): array
+    {
         $executions = $this->getCounter('batch:executions');
         $totalRequests = $this->getCounter('batch:total_requests');
 
@@ -587,6 +607,7 @@ class APIPerformanceMetricsService
      * @return array{total_fetches: int, total_requests: int, avg_parallel_size: float, avg_duration_ms: float}
      */
     public function getParallelFetchStats(): array
+    {
         $fetches = $this->getCounter('parallel:fetches');
         $totalRequests = $this->getCounter('parallel:total_requests');
 
@@ -618,6 +639,7 @@ class APIPerformanceMetricsService
      * @return array{total_operations: int, bytes_saved: int, original_bytes: int, compressed_bytes: int, compression_ratio: float, savings_percent: float}
      */
     public function getCompressionStats(): array
+    {
         $operations = $this->getCounter('compression:operations');
         $bytesSaved = $this->getCounter('compression:bytes_saved');
         $originalBytes = $this->getCounter('compression:original_bytes');

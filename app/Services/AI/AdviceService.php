@@ -77,16 +77,17 @@ PROMPT;
      *     provider: string
      * }
      */
-    public function getTrainingAdvice(): array
+    public function getTrainingAdvice(Character $character): array
+    {
         try {
             // Build context from character data
             $context = $this->buildCharacterContext($character);
 
             // Get training predictions for all types
-            $predictions = $this->trainingService->calculateBatchPredictions(
-                $character,
-                ['speed', 'stamina', 'power', 'guts', 'wit']
-            );
+            $predictions = \call_user_func([
+                $this->trainingService,
+                'calculateBatchPredictions',
+            ], $character, ['speed', 'stamina', 'power', 'guts', 'wit']);
 
             // Build the prompt
             $prompt = $this->buildAdvicePrompt($character, $predictions);
@@ -119,8 +120,14 @@ PROMPT;
      *
      * @return array<string, mixed>
      */
-    protected function buildCharacterContext(): array
+    protected function buildCharacterContext(Character $character): array
+    {
         $stats = $character->current_stats ?? [];
+        $goalsData = $character->goals;
+        /** @var array<string, int> $targetStats */
+        $targetStats = is_array($goalsData) && isset($goalsData['target_stats']) && is_array($goalsData['target_stats'])
+            ? $goalsData['target_stats']
+            : [];
 
         return [
             'character' => [
@@ -137,7 +144,7 @@ PROMPT;
                 'turn' => $character->current_turn ?? 1,
                 'total_turns' => 72,
             ],
-            'goals' => array_keys($character->goals['target_stats'] ?? []),
+            'goals' => array_keys($targetStats),
         ];
     }
 
@@ -149,14 +156,22 @@ PROMPT;
     protected function buildAdvicePrompt(Character $character, array $predictions): string
     {
         $stats = $character->current_stats ?? [];
-        $goals = $character->goals['target_stats'] ?? [];
-        $priorities = $character->stat_priorities ?? [];
+        $goalsData = $character->goals;
+        /** @var array<string, int> $goals */
+        $goals = is_array($goalsData) && isset($goalsData['target_stats']) && is_array($goalsData['target_stats'])
+            ? $goalsData['target_stats']
+            : [];
+        $prioritiesData = $character->stat_priorities;
+        /** @var array<string, int> $priorities */
+        $priorities = is_array($prioritiesData) ? $prioritiesData : [];
 
         // Format goals
         $goalsStr = '';
         foreach ($goals as $stat => $target) {
-            $current = $stats[$stat] ?? 0;
-            $goalsStr .= "- {$stat}: {$current}/{$target}\n";
+            $statName = (string) $stat;
+            $targetValue = (int) $target;
+            $current = $stats[$statName] ?? 0;
+            $goalsStr .= "- {$statName}: {$current}/{$targetValue}\n";
         }
         if (empty($goalsStr)) {
             $goalsStr = "No specific goals set.\n";
@@ -166,7 +181,9 @@ PROMPT;
         $prioritiesStr = '';
         arsort($priorities);
         foreach ($priorities as $stat => $priority) {
-            $prioritiesStr .= "- {$stat}: Priority {$priority}\n";
+            $statName = (string) $stat;
+            $priorityValue = (int) $priority;
+            $prioritiesStr .= "- {$statName}: Priority {$priorityValue}\n";
         }
         if (empty($prioritiesStr)) {
             $prioritiesStr = "No priorities set.\n";
@@ -175,11 +192,17 @@ PROMPT;
         // Format training options
         $optionsStr = '';
         foreach ($predictions as $type => $prediction) {
-            $gains = $prediction['stat_gains'] ?? [];
-            $primaryGain = $gains[$type] ?? 0;
-            $energy = $prediction['energy_cost'] ?? 0;
-            $risk = ($prediction['failure_risk'] ?? 0) * 100;
-            $optionsStr .= "- {$type}: +{$primaryGain} {$type}, Energy: -{$energy}, Risk: {$risk}%\n";
+            $typeStr = (string) $type;
+            /** @var array<string, mixed> $predictionArray */
+            $predictionArray = is_array($prediction) ? $prediction : [];
+            $gains = is_array($predictionArray['stat_gains'] ?? null) ? $predictionArray['stat_gains'] : [];
+            $primaryGainRaw = $gains[$typeStr] ?? 0;
+            $primaryGain = is_numeric($primaryGainRaw) ? (int) $primaryGainRaw : 0;
+            $energyCostRaw = $predictionArray['energy_cost'] ?? 0;
+            $energy = is_numeric($energyCostRaw) ? (int) $energyCostRaw : 0;
+            $failureRiskRaw = $predictionArray['failure_risk'] ?? 0;
+            $risk = is_numeric($failureRiskRaw) ? (float) $failureRiskRaw * 100 : 0.0;
+            $optionsStr .= "- {$typeStr}: +{$primaryGain} {$typeStr}, Energy: -{$energy}, Risk: {$risk}%\n";
         }
 
         // Build prompt from template
@@ -217,7 +240,8 @@ PROMPT;
      *
      * @return array{recommended: string, reasoning: string, alternative: string, should_rest: bool, strategy: string, confidence: float, provider: string}
      */
-    protected function parseAdviceResponse(): array
+    protected function parseAdviceResponse(string $content, string $provider, float $confidence): array
+    {
         // Simple parsing - extract key sections
         $recommended = 'speed';
         $alternative = 'stamina';
@@ -254,7 +278,8 @@ PROMPT;
      *
      * @return array{recommended: string, reasoning: string, alternative: string, should_rest: bool, strategy: string, confidence: float, provider: string}
      */
-    protected function getRuleBasedAdvice(): array
+    protected function getRuleBasedAdvice(Character $character): array
+    {
         $energy = $character->energy_level ?? 100;
         $priorities = $character->stat_priorities ?? [];
 

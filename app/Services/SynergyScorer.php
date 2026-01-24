@@ -11,7 +11,8 @@ class SynergyScorer
      *
      * @return array{score: float, breakdown: array<string, mixed>, recommendations: array<int, string>}
      */
-    public function calculateDeckScore(): array
+    public function calculateDeckScore(Character $character): array
+    {
         $deck = $character->supportCards()->with('supportCard')->get();
 
         if ($deck->isEmpty()) {
@@ -41,7 +42,7 @@ class SynergyScorer
 
         $totalScore = 0;
         foreach ($scores as $key => $score) {
-            $totalScore = ($totalScore ?? 0) + $score * $weights[$key];
+            $totalScore += $score * $weights[$key];
         }
 
         $recommendations = $this->generateRecommendations($scores, $deck);
@@ -55,8 +56,10 @@ class SynergyScorer
 
     /**
      * Score based on meta tier quality
+     *
+     * @param  \Illuminate\Support\Collection<int, \App\Models\CharacterSupportCard>  $deck
      */
-    private function scoreMetaQuality($deck): float
+    private function scoreMetaQuality(\Illuminate\Support\Collection $deck): float
     {
         $tierScores = [
             'S+' => 100,
@@ -72,8 +75,8 @@ class SynergyScorer
         foreach ($deck as $characterCard) {
             if ($characterCard->supportCard) {
                 $tier = $characterCard->supportCard->meta_tier;
-                $totalScore = ($totalScore ?? 0) + $tierScores[$tier] ?? 0;
-                $count = ($count ?? 0) + 1;
+                $totalScore += $tierScores[$tier] ?? 0;
+                $count++;
             }
         }
 
@@ -82,8 +85,10 @@ class SynergyScorer
 
     /**
      * Score based on type diversity
+     *
+     * @param  \Illuminate\Support\Collection<int, \App\Models\CharacterSupportCard>  $deck
      */
-    private function scoreTypeDiversity($deck): float
+    private function scoreTypeDiversity(\Illuminate\Support\Collection $deck): float
     {
         $types = [];
         foreach ($deck as $characterCard) {
@@ -138,7 +143,7 @@ class SynergyScorer
             if ($characterCard->supportCard) {
                 $cardType = $characterCard->supportCard->card_type;
                 if (in_array($cardType, $weakestStats)) {
-                    $coverage = ($coverage ?? 0) + 1;
+                    $coverage++;
                 }
             }
         }
@@ -148,14 +153,16 @@ class SynergyScorer
 
     /**
      * Score based on limit break levels
+     *
+     * @param  \Illuminate\Support\Collection<int, \App\Models\CharacterSupportCard>  $deck
      */
-    private function scoreLimitBreaks($deck): float
+    private function scoreLimitBreaks(\Illuminate\Support\Collection $deck): float
     {
         $totalLB = 0;
         $maxPossible = $deck->count() * 4; // Max 4 LB per card
 
         foreach ($deck as $characterCard) {
-            $totalLB = ($totalLB ?? 0) + $characterCard->limit_break_level ?? 0;
+            $totalLB += $characterCard->limit_break_level ?? 0;
         }
 
         return $maxPossible > 0 ? ($totalLB / $maxPossible) * 100 : 0;
@@ -163,14 +170,16 @@ class SynergyScorer
 
     /**
      * Score based on friendship levels
+     *
+     * @param  \Illuminate\Support\Collection<int, \App\Models\CharacterSupportCard>  $deck
      */
-    private function scoreFriendship($deck): float
+    private function scoreFriendship(\Illuminate\Support\Collection $deck): float
     {
         $totalFriendship = 0;
         $maxPossible = $deck->count() * 100; // Max 100 per card
 
         foreach ($deck as $characterCard) {
-            $totalFriendship = ($totalFriendship ?? 0) + $characterCard->friendship_level ?? 0;
+            $totalFriendship += $characterCard->friendship_level ?? 0;
         }
 
         return $maxPossible > 0 ? ($totalFriendship / $maxPossible) * 100 : 0;
@@ -183,7 +192,8 @@ class SynergyScorer
      * @param  \Illuminate\Support\Collection<int, \App\Models\CharacterSupportCard>  $deck
      * @return array<int, string>
      */
-    private function generateRecommendations(): array
+    private function generateRecommendations(array $scores, $deck): array
+    {
         /** @var array<int, string> $recommendations */
         $recommendations = [];
 

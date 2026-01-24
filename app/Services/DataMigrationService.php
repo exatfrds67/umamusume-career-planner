@@ -95,7 +95,8 @@ class DataMigrationService
      * @param  string  $content  Raw content to analyze
      * @return array{format: string, confidence: float, details: array<string, mixed>}
      */
-    public function detectLegacyFormat(): array
+    public function detectLegacyFormat(string $content): array
+    {
         $content = trim($content);
 
         if (empty($content)) {
@@ -110,6 +111,7 @@ class DataMigrationService
         if (str_starts_with($content, '{') || str_starts_with($content, '[')) {
             $decoded = json_decode($content, true);
             if (json_last_error() === JSON_ERROR_NONE && \is_array($decoded)) {
+                /** @var array<int|string, mixed> $decoded */
                 return $this->detectJsonVersion($decoded);
             }
         }
@@ -121,6 +123,7 @@ class DataMigrationService
             $firstLineTabs = substr_count($lines[0], "\t");
 
             if ($firstLineCommas > 2) {
+                /** @var array<int, string> $lines */
                 return $this->detectCsvVersion($lines);
             }
 
@@ -159,7 +162,8 @@ class DataMigrationService
      * @param  array<int|string, mixed>  $data
      * @return array{format: string, confidence: float, details: array<string, mixed>}
      */
-    private function detectJsonVersion(): array
+    private function detectJsonVersion(array $data): array
+    {
         // Check for v1 format markers
         $hasV1Markers = false;
         $hasCurrentMarkers = false;
@@ -208,7 +212,8 @@ class DataMigrationService
      * @param  array<int, string>  $lines
      * @return array{format: string, confidence: float, details: array<string, mixed>}
      */
-    private function detectCsvVersion(): array
+    private function detectCsvVersion(array $lines): array
+    {
         $firstLine = $lines[0] ?? '';
         $headers = str_getcsv($firstLine);
         $normalizedHeaders = array_map(fn ($h) => strtolower(trim(\is_string($h) ? $h : '')), $headers);
@@ -253,7 +258,8 @@ class DataMigrationService
      * @param  string  $targetType  Target data type (character, career, etc.)
      * @return array{success: bool, data: array<int, array<string, mixed>>, errors: array<int, string>, warnings: array<int, string>}
      */
-    public function convertLegacyFormat(): array
+    public function convertLegacyFormat(string $content, string $sourceFormat, string $targetType): array
+    {
         $errors = [];
         $warnings = [];
         $convertedData = [];
@@ -324,9 +330,11 @@ class DataMigrationService
     /**
      * Parse V1 JSON format
      *
+     * @param  string  $content  Raw JSON content
      * @return array{success: bool, data: array<int, array<string, mixed>>, errors: array<int, string>}
      */
-    private function parseV1Json(): array
+    private function parseV1Json(string $content): array
+    {
         $data = json_decode($content, true);
 
         if (json_last_error() !== JSON_ERROR_NONE || ! \is_array($data)) {
@@ -353,9 +361,11 @@ class DataMigrationService
     /**
      * Parse V1 CSV format
      *
+     * @param  string  $content  Raw CSV content
      * @return array{success: bool, data: array<int, array<string, mixed>>, errors: array<int, string>}
      */
-    private function parseV1Csv(): array
+    private function parseV1Csv(string $content): array
+    {
         $lines = array_filter(explode("\n", $content), fn ($line) => trim($line) !== '');
 
         if (count($lines) < 2) {
@@ -374,10 +384,9 @@ class DataMigrationService
         foreach ($lines as $line) {
             $values = str_getcsv($line);
             if (count($values) === count($headers)) {
+                /** @var array<string, string|null> $combined */
                 $combined = array_combine($headers, $values);
-                if (\is_array($combined)) {
-                    $data[] = $combined;
-                }
+                $data[] = $combined;
             }
         }
 
@@ -391,9 +400,11 @@ class DataMigrationService
     /**
      * Parse Google Sheets export (TSV format)
      *
+     * @param  string  $content  Raw TSV content
      * @return array{success: bool, data: array<int, array<string, mixed>>, errors: array<int, string>}
      */
-    private function parseGoogleSheets(): array
+    private function parseGoogleSheets(string $content): array
+    {
         // Convert tabs to commas and use CSV parser
         $csvContent = str_replace("\t", ',', $content);
 
@@ -403,9 +414,11 @@ class DataMigrationService
     /**
      * Parse Excel export
      *
+     * @param  string  $content  Raw Excel export content
      * @return array{success: bool, data: array<int, array<string, mixed>>, errors: array<int, string>}
      */
-    private function parseExcel(): array
+    private function parseExcel(string $content): array
+    {
         // Excel exports are typically tab-separated
         return $this->parseGoogleSheets($content);
     }
@@ -413,26 +426,42 @@ class DataMigrationService
     /**
      * Parse custom format with intelligent field detection
      *
+     * @param  string  $content  Raw content
+     * @param  string  $targetType  Target data type
      * @return array{success: bool, data: array<int, array<string, mixed>>, errors: array<int, string>}
      */
-    private function parseCustomFormat(): array
-        // Use the import service's intelligent parsing
-        $result = $this->importService->parseText($content, $targetType);
+    private function parseCustomFormat(string $content, string $targetType): array
+    {
+        // Try JSON parsing as fallback for custom format
+        $data = json_decode($content, true);
+        if (json_last_error() === JSON_ERROR_NONE && \is_array($data)) {
+            // Normalize to array of records
+            if (! isset($data[0]) && ! empty($data)) {
+                $data = [$data];
+            }
 
-        return [
-            'success' => $result['success'],
-            'data' => $result['data'],
-            'errors' => $result['errors'],
-        ];
+            /** @var array<int, array<string, mixed>> $data */
+            return [
+                'success' => true,
+                'data' => $data,
+                'errors' => [],
+            ];
+        }
+
+        // Fall back to CSV parsing
+        return $this->parseV1Csv($content);
     }
 
     /**
      * Transform a record from legacy format to current format
      *
-     * @param  array<string, mixed>  $record
+     * @param  array<string, mixed>  $record  Record to transform
+     * @param  string  $sourceFormat  Source format identifier
+     * @param  string  $targetType  Target data type
      * @return array{success: bool, data: array<string, mixed>, errors: array<int, string>, warnings: array<int, string>}
      */
-    private function transformRecord(): array
+    private function transformRecord(array $record, string $sourceFormat, string $targetType): array
+    {
         $transformed = [];
         $warnings = [];
         $errors = [];
@@ -453,7 +482,7 @@ class DataMigrationService
                         $warnings[] = $transformedValue['warning'];
                     }
                 } else {
-                    $errors[] = $transformedValue['error'];
+                    $errors[] = $transformedValue['error'] ?? 'Unknown transformation error';
                 }
             }
         }
@@ -489,9 +518,12 @@ class DataMigrationService
     /**
      * Get field mappings for legacy format conversion
      *
+     * @param  string  $sourceFormat  Source format identifier
+     * @param  string  $targetType  Target data type
      * @return array<string, string>
      */
-    private function getFieldMappings(): array
+    private function getFieldMappings(string $sourceFormat, string $targetType): array
+    {
         $baseMappings = [
             // V1 character field mappings
             'trainee_name' => 'name',
@@ -548,9 +580,14 @@ class DataMigrationService
     /**
      * Transform a field value during conversion
      *
+     * @param  string  $oldField  Original field name
+     * @param  string  $newField  New field name
+     * @param  mixed  $value  Field value
+     * @param  string  $targetType  Target data type
      * @return array{success: bool, value: mixed, warning: string|null, error?: string}
      */
-    private function transformFieldValue(): array
+    private function transformFieldValue(string $oldField, string $newField, mixed $value, string $targetType): array
+    {
         // Handle stat values
         if (in_array($newField, ['speed', 'stamina', 'power', 'guts', 'wit', 'energy_level'])) {
             if (! is_numeric($value)) {
@@ -642,7 +679,8 @@ class DataMigrationService
      */
     private function normalizeScenarioType(mixed $value): ?string
     {
-        $value = strtolower(trim((string) $value));
+        $valueStr = is_scalar($value) ? (string) $value : '';
+        $normalizedValue = strtolower(trim($valueStr));
 
         $mappings = [
             'ura' => 'ura_finale',
@@ -654,7 +692,7 @@ class DataMigrationService
             'team' => 'unity_cup',
         ];
 
-        return $mappings[$value] ?? null;
+        return $mappings[$normalizedValue] ?? null;
     }
 
     /**
@@ -662,7 +700,8 @@ class DataMigrationService
      */
     private function normalizeMoodStatus(mixed $value): string
     {
-        $value = strtolower(trim((string) $value));
+        $valueStr = is_scalar($value) ? (string) $value : '';
+        $normalizedValue = strtolower(trim($valueStr));
 
         $mappings = [
             'excellent' => 'great',
@@ -678,7 +717,7 @@ class DataMigrationService
             'terrible' => 'awful',
         ];
 
-        return $mappings[$value] ?? 'normal';
+        return $mappings[$normalizedValue] ?? 'normal';
     }
 
     /**
@@ -704,7 +743,8 @@ class DataMigrationService
      * @param  array<string, mixed>  $options  Batch options
      * @return array{batch_id: string, status: string, total_records: int}
      */
-    public function startBatchImport(): array
+    public function startBatchImport(array $data, string $importType, int $userId, array $options = []): array
+    {
         $batchId = Str::uuid()->toString();
         $batchSize = $options['batch_size'] ?? self::DEFAULT_BATCH_SIZE;
         $conflictStrategy = $options['conflict_strategy'] ?? self::CONFLICT_STRATEGY_SKIP;
@@ -753,7 +793,8 @@ class DataMigrationService
      * @param  string  $batchId  Batch ID
      * @return array{success: bool, status: string, progress: array<string, mixed>, error?: string}
      */
-    public function processBatch(): array
+    public function processBatch(string $batchId): array
+    {
         /** @var array<string, mixed>|null $batchData */
         $batchData = Cache::get(self::BATCH_CACHE_PREFIX.$batchId);
 
@@ -789,21 +830,28 @@ class DataMigrationService
 
         try {
             $result = $this->processNextBatch($batchData);
-            $batchDataResult = (is_array($result) && isset($result['batch_data']) ? $result['batch_data'] : null);
-            if (! is_array($batchDataResult)) {
+            /** @var array<string, mixed>|null $batchDataResult */
+            $batchDataResult = isset($result['batch_data']) && is_array($result['batch_data']) ? $result['batch_data'] : null;
+            if ($batchDataResult === null) {
                 $batchDataResult = $batchData;
             }
 
             Cache::put(self::BATCH_CACHE_PREFIX.$batchId, $batchDataResult, now()->addHours(24));
 
+            /** @var string $resultStatus */
+            $resultStatus = $batchDataResult['status'] ?? self::BATCH_STATUS_PROCESSING;
+
             return [
                 'success' => true,
-                'status' => $batchDataResult['status'] ?? self::BATCH_STATUS_PROCESSING,
+                'status' => $resultStatus,
                 'progress' => $this->getProgressData($batchDataResult),
             ];
         } catch (\Exception $e) {
             $batchData['status'] = self::BATCH_STATUS_FAILED;
-            $batchData['errors'][] = $e->getMessage();
+            /** @var array<int, string> $errorsList */
+            $errorsList = $batchData['errors'] ?? [];
+            $errorsList[] = $e->getMessage();
+            $batchData['errors'] = $errorsList;
             $batchData['updated_at'] = now()->toIso8601String();
             Cache::put(self::BATCH_CACHE_PREFIX.$batchId, $batchData, now()->addHours(24));
 
@@ -827,77 +875,116 @@ class DataMigrationService
      * @param  array<string, mixed>  $batchData
      * @return array<string, mixed>
      */
-    private function processNextBatch(): array
-        $startIndex = $batchData['processed_records'];
-        $endIndex = min($startIndex + $batchData['batch_size'], $batchData['total_records']);
-        $recordsToProcess = array_slice($batchData['data'], $startIndex, $endIndex - $startIndex);
+    private function processNextBatch(array $batchData): array
+    {
+        /** @var int $startIndex */
+        $startIndex = $batchData['processed_records'] ?? 0;
+        /** @var int $batchSize */
+        $batchSize = $batchData['batch_size'] ?? self::DEFAULT_BATCH_SIZE;
+        /** @var int $totalRecords */
+        $totalRecords = $batchData['total_records'] ?? 0;
+        $endIndex = min($startIndex + $batchSize, $totalRecords);
+        /** @var array<int, array<string, mixed>> $dataRecords */
+        $dataRecords = $batchData['data'] ?? [];
+        $recordsToProcess = array_slice($dataRecords, $startIndex, $endIndex - $startIndex);
 
         DB::beginTransaction();
 
         try {
+            /** @var string $importType */
+            $importType = $batchData['import_type'] ?? '';
+            /** @var int $userId */
+            $userId = $batchData['user_id'] ?? 0;
+            /** @var string $conflictStrategy */
+            $conflictStrategy = $batchData['conflict_strategy'] ?? self::CONFLICT_STRATEGY_SKIP;
+            /** @var int $processedRecords */
+            $processedRecords = $batchData['processed_records'] ?? 0;
+            /** @var int $skippedRecords */
+            $skippedRecords = $batchData['skipped_records'] ?? 0;
+            /** @var int $successfulRecords */
+            $successfulRecords = $batchData['successful_records'] ?? 0;
+            /** @var int $failedRecords */
+            $failedRecords = $batchData['failed_records'] ?? 0;
+            /** @var array<int, mixed> $importedIds */
+            $importedIds = $batchData['imported_ids'] ?? [];
+            /** @var array<int, string> $errors */
+            $errors = $batchData['errors'] ?? [];
+            /** @var array<int, array<string, mixed>> $conflicts */
+            $conflicts = $batchData['conflicts'] ?? [];
+
             foreach ($recordsToProcess as $index => $record) {
                 $recordIndex = $startIndex + $index;
 
                 // Check for conflicts
-                $conflict = $this->detectConflict($record, $batchData['import_type'], $batchData['user_id']);
+                $conflict = $this->detectConflict($record, $importType, $userId);
 
                 if ($conflict['has_conflict']) {
                     $resolution = $this->resolveConflict(
                         $record,
                         $conflict,
-                        $batchData['conflict_strategy'],
-                        $batchData['import_type'],
-                        $batchData['user_id']
+                        $conflictStrategy,
+                        $importType,
+                        $userId
                     );
 
                     if ($resolution['action'] === 'skip') {
-                        $batchData['skipped_records']++;
-                        $batchData['conflicts'][] = [
+                        $skippedRecords++;
+                        $conflicts[] = [
                             'index' => $recordIndex,
                             'record' => $record,
                             'existing' => $conflict['existing_record'],
                             'resolution' => 'skipped',
                         ];
                     } elseif ($resolution['success']) {
-                        $batchData['successful_records']++;
-                        $batchData['imported_ids'][] = $resolution['id'];
+                        $successfulRecords++;
+                        $importedIds[] = $resolution['id'];
                     } else {
-                        $batchData['failed_records']++;
-                        $batchData['errors'][] = "Record {$recordIndex}: ".($resolution['error'] ?? 'Unknown error');
+                        $failedRecords++;
+                        $errors[] = "Record {$recordIndex}: ".($resolution['error'] ?? 'Unknown error');
                     }
                 } else {
                     // No conflict, import directly
                     $importResult = $this->importService->executeImport(
                         [$record],
-                        $batchData['import_type'],
-                        $batchData['user_id']
+                        $importType,
+                        $userId
                     );
 
                     if ($importResult['success'] && $importResult['imported'] > 0) {
-                        $batchData['successful_records']++;
-                        $batchData['imported_ids'] = array_merge(
-                            $batchData['imported_ids'],
-                            $importResult['imported_ids']
-                        );
+                        $successfulRecords++;
+                        /** @var array<int, mixed> $newIds */
+                        $newIds = $importResult['imported_ids'] ?? [];
+                        $importedIds = array_merge($importedIds, $newIds);
                     } else {
-                        $batchData['failed_records']++;
-                        if (! empty($importResult['errors'])) {
-                            $batchData['errors'][] = "Record {$recordIndex}: ".implode(', ', $importResult['errors']);
+                        $failedRecords++;
+                        /** @var array<int, string> $importErrors */
+                        $importErrors = $importResult['errors'] ?? [];
+                        if (! empty($importErrors)) {
+                            $errors[] = "Record {$recordIndex}: ".implode(', ', $importErrors);
                         }
                     }
                 }
 
-                $batchData['processed_records']++;
+                $processedRecords++;
             }
 
             DB::commit();
+
+            // Update batchData with new values
+            $batchData['processed_records'] = $processedRecords;
+            $batchData['skipped_records'] = $skippedRecords;
+            $batchData['successful_records'] = $successfulRecords;
+            $batchData['failed_records'] = $failedRecords;
+            $batchData['imported_ids'] = $importedIds;
+            $batchData['errors'] = $errors;
+            $batchData['conflicts'] = $conflicts;
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;
         }
 
         // Update status
-        if ($batchData['processed_records'] >= $batchData['total_records']) {
+        if ($processedRecords >= $totalRecords) {
             $batchData['status'] = self::BATCH_STATUS_COMPLETED;
             $batchData['completed_at'] = now()->toIso8601String();
         }
@@ -922,33 +1009,50 @@ class DataMigrationService
             return null;
         }
 
+        /** @var array<int, string> $errors */
+        $errors = $batchData['errors'] ?? [];
+        /** @var array<int, array<string, mixed>> $conflicts */
+        $conflicts = $batchData['conflicts'] ?? [];
+
         return [
             'batch_id' => $batchData['batch_id'] ?? '',
             'status' => $batchData['status'] ?? '',
             'import_type' => $batchData['import_type'] ?? '',
             'progress' => $this->getProgressData($batchData),
-            'errors' => array_slice($batchData['errors'] ?? [], -10), // Last 10 errors
-            'conflicts' => array_slice($batchData['conflicts'] ?? [], -10), // Last 10 conflicts
+            'errors' => array_slice($errors, -10), // Last 10 errors
+            'conflicts' => array_slice($conflicts, -10), // Last 10 conflicts
             'started_at' => $batchData['started_at'] ?? '',
-            'updated_at' => $batchData['updated_at'],
-            'completed_at' => $batchData['completed_at'],
+            'updated_at' => $batchData['updated_at'] ?? '',
+            'completed_at' => $batchData['completed_at'] ?? null,
         ];
     }
 
     /**
      * Get progress data from batch
+     *
+     * @param  array<string, mixed>  $batchData
+     * @return array{total_records: int, processed_records: int, successful_records: int, failed_records: int, skipped_records: int, percentage: float, remaining_records: int}
      */
-    private function getProgressData(): array
-        $total = $batchData['total_records'];
-        $processed = $batchData['processed_records'];
+    private function getProgressData(array $batchData): array
+    {
+        /** @var int $total */
+        $total = $batchData['total_records'] ?? 0;
+        /** @var int $processed */
+        $processed = $batchData['processed_records'] ?? 0;
+        /** @var int $successful */
+        $successful = $batchData['successful_records'] ?? 0;
+        /** @var int $failed */
+        $failed = $batchData['failed_records'] ?? 0;
+        /** @var int $skipped */
+        $skipped = $batchData['skipped_records'] ?? 0;
 
         return [
             'total_records' => $total,
             'processed_records' => $processed,
-            'successful_records' => $batchData['successful_records'],
-            'failed_records' => $batchData['failed_records'],
-            'skipped_records' => $batchData['skipped_records'],
-            'percentage' => $total > 0 ? round(($processed / $total) * 100, 2) : 0,
+            'successful_records' => $successful,
+            'failed_records' => $failed,
+            'skipped_records' => $skipped,
+            'percentage' => $total > 0 ? round(($processed / $total) * 100, 2) : 0.0,
             'remaining_records' => $total - $processed,
         ];
     }
@@ -962,11 +1066,13 @@ class DataMigrationService
     {
         $batchData = Cache::get(self::BATCH_CACHE_PREFIX.$batchId);
 
-        if (! $batchData) {
+        if (! is_array($batchData)) {
             return false;
         }
 
-        if (in_array($batchData['status'], [self::BATCH_STATUS_COMPLETED, self::BATCH_STATUS_CANCELLED])) {
+        /** @var string $status */
+        $status = $batchData['status'] ?? '';
+        if (in_array($status, [self::BATCH_STATUS_COMPLETED, self::BATCH_STATUS_CANCELLED])) {
             return false;
         }
 
@@ -976,7 +1082,7 @@ class DataMigrationService
 
         Log::info('[DataMigrationService] Batch import cancelled', [
             'batch_id' => $batchId,
-            'processed_records' => $batchData['processed_records'],
+            'processed_records' => $batchData['processed_records'] ?? 0,
         ]);
 
         return true;
@@ -985,12 +1091,14 @@ class DataMigrationService
     /**
      * Detect conflicts with existing data
      *
-     * @param  array  $record  Record to check
+     * @param  array<string, mixed>  $record  Record to check
      * @param  string  $importType  Type of data
      * @param  int  $userId  User ID
-     * @return array{has_conflict: bool, existing_record: array|null, conflict_type: string|null}
+     * @return array{has_conflict: bool, existing_record: array<string, mixed>|null, conflict_type: string|null}
      */
-    public function detectConflict(): array
+    public function detectConflict(array $record, string $importType, int $userId): array
+    {
+        /** @var array<string, mixed>|null $existingRecord */
         $existingRecord = null;
         $conflictType = null;
 
@@ -1054,14 +1162,15 @@ class DataMigrationService
     /**
      * Resolve a conflict based on strategy
      *
-     * @param  array  $record  New record
-     * @param  array  $conflict  Conflict details
+     * @param  array<string, mixed>  $record  New record
+     * @param  array{has_conflict: bool, existing_record: array<string, mixed>|null, conflict_type: string|null}  $conflict  Conflict details
      * @param  string  $strategy  Resolution strategy
      * @param  string  $importType  Type of data
      * @param  int  $userId  User ID
      * @return array{success: bool, action: string, id: int|null, error: string|null}
      */
-    public function resolveConflict(): array
+    public function resolveConflict(array $record, array $conflict, string $strategy, string $importType, int $userId): array
+    {
         switch ($strategy) {
             case self::CONFLICT_STRATEGY_SKIP:
                 return [
@@ -1072,10 +1181,10 @@ class DataMigrationService
                 ];
 
             case self::CONFLICT_STRATEGY_OVERWRITE:
-                return $this->overwriteRecord($record, $conflict['existing_record'], $importType, $userId);
+                return $this->overwriteRecord($record, $conflict['existing_record'] ?? [], $importType, $userId);
 
             case self::CONFLICT_STRATEGY_MERGE:
-                return $this->mergeRecords($record, $conflict['existing_record'], $importType, $userId);
+                return $this->mergeRecords($record, $conflict['existing_record'] ?? [], $importType, $userId);
 
             case self::CONFLICT_STRATEGY_RENAME:
                 return $this->renameAndImport($record, $importType, $userId);
@@ -1092,21 +1201,36 @@ class DataMigrationService
 
     /**
      * Overwrite existing record with new data
-     */
-    /**
+     *
+     * @param  array<string, mixed>  $record  New record data
+     * @param  array<string, mixed>  $existing  Existing record data
+     * @param  string  $importType  Type of data
+     * @param  int  $userId  User ID
      * @return array{success: bool, action: string, id: int|null, error: string|null}
      */
-    private function overwriteRecord(): array
+    private function overwriteRecord(array $record, array $existing, string $importType, int $userId): array
+    {
         try {
+            /** @var int|null $existingId */
+            $existingId = $existing['id'] ?? null;
+            if ($existingId === null) {
+                return [
+                    'success' => false,
+                    'action' => 'overwrite',
+                    'id' => null,
+                    'error' => 'Existing record ID not found',
+                ];
+            }
+
             $model = match ($importType) {
-                'character' => Character::query()->find($existing['id']),
-                'career' => Career::query()->find($existing['id']),
-                'skill' => Skill::query()->find($existing['id']),
-                'support_card' => SupportCard::query()->find($existing['id']),
+                'character' => Character::query()->find($existingId),
+                'career' => Career::query()->find($existingId),
+                'skill' => Skill::query()->find($existingId),
+                'support_card' => SupportCard::query()->find($existingId),
                 default => null,
             };
 
-            if (! $model) {
+            if (! $model instanceof Character && ! $model instanceof Career && ! $model instanceof Skill && ! $model instanceof SupportCard) {
                 return [
                     'success' => false,
                     'action' => 'overwrite',
@@ -1122,7 +1246,7 @@ class DataMigrationService
             return [
                 'success' => true,
                 'action' => 'overwrite',
-                'id' => $model->id,
+                'id' => (int) $model->id,
                 'error' => null,
             ];
         } catch (\Exception $e) {
@@ -1137,21 +1261,36 @@ class DataMigrationService
 
     /**
      * Merge new record with existing record
-     */
-    /**
+     *
+     * @param  array<string, mixed>  $record  New record data
+     * @param  array<string, mixed>  $existing  Existing record data
+     * @param  string  $importType  Type of data
+     * @param  int  $userId  User ID
      * @return array{success: bool, action: string, id: int|null, error: string|null}
      */
-    private function mergeRecords(): array
+    private function mergeRecords(array $record, array $existing, string $importType, int $userId): array
+    {
         try {
+            /** @var int|null $existingId */
+            $existingId = $existing['id'] ?? null;
+            if ($existingId === null) {
+                return [
+                    'success' => false,
+                    'action' => 'merge',
+                    'id' => null,
+                    'error' => 'Existing record ID not found',
+                ];
+            }
+
             $model = match ($importType) {
-                'character' => Character::query()->find($existing['id']),
-                'career' => Career::query()->find($existing['id']),
-                'skill' => Skill::query()->find($existing['id']),
-                'support_card' => SupportCard::query()->find($existing['id']),
+                'character' => Character::query()->find($existingId),
+                'career' => Career::query()->find($existingId),
+                'skill' => Skill::query()->find($existingId),
+                'support_card' => SupportCard::query()->find($existingId),
                 default => null,
             };
 
-            if (! $model) {
+            if (! $model instanceof Character && ! $model instanceof Career && ! $model instanceof Skill && ! $model instanceof SupportCard) {
                 return [
                     'success' => false,
                     'action' => 'merge',
@@ -1164,12 +1303,15 @@ class DataMigrationService
             // and are either null or different in existing record
             foreach ($record as $key => $value) {
                 if ($value !== null && $value !== '') {
-                    // For stats, take the higher value
-                    if (in_array($key, ['speed', 'stamina', 'power', 'guts', 'wit'])) {
-                        $existingValue = $model->$key ?? 0;
-                        $model->$key = max($existingValue, (int) $value);
+                    // For stats, take the higher value (only for Character model)
+                    if (in_array($key, ['speed', 'stamina', 'power', 'guts', 'wit']) && $model instanceof Character) {
+                        /** @var mixed $existingAttr */
+                        $existingAttr = $model->getAttribute($key);
+                        $existingValue = is_numeric($existingAttr) ? (int) $existingAttr : 0;
+                        $newValue = is_numeric($value) ? (int) $value : 0;
+                        $model->setAttribute($key, max($existingValue, $newValue));
                     } else {
-                        $model->$key = $value;
+                        $model->setAttribute($key, $value);
                     }
                 }
             }
@@ -1179,7 +1321,7 @@ class DataMigrationService
             return [
                 'success' => true,
                 'action' => 'merge',
-                'id' => $model->id,
+                'id' => (int) $model->id,
                 'error' => null,
             ];
         } catch (\Exception $e) {
@@ -1194,11 +1336,14 @@ class DataMigrationService
 
     /**
      * Rename record and import as new
-     */
-    /**
+     *
+     * @param  array<string, mixed>  $record  Record data
+     * @param  string  $importType  Type of data
+     * @param  int  $userId  User ID
      * @return array{success: bool, action: string, id: int|null, error: string|null}
      */
-    private function renameAndImport(): array
+    private function renameAndImport(array $record, string $importType, int $userId): array
+    {
         // Add suffix to name to make it unique
         $nameField = match ($importType) {
             'character', 'skill', 'support_card' => 'name',
@@ -1207,13 +1352,14 @@ class DataMigrationService
         };
 
         if (isset($record[$nameField])) {
-            $originalName = $record[$nameField];
+            $nameValue = $record[$nameField];
+            $originalName = is_scalar($nameValue) ? (string) $nameValue : '';
             $counter = 1;
 
             do {
                 $record[$nameField] = "{$originalName} ({$counter})";
                 $conflict = $this->detectConflict($record, $importType, $userId);
-                $counter = ($counter ?? 0) + 1;
+                $counter++;
             } while ($conflict['has_conflict'] && $counter < 100);
 
             if ($counter >= 100) {
@@ -1229,11 +1375,16 @@ class DataMigrationService
         // Import with new name
         $result = $this->importService->executeImport([$record], $importType, $userId);
 
+        /** @var array<int, int> $importedIds */
+        $importedIds = $result['imported_ids'] ?? [];
+        /** @var array<int, string> $resultErrors */
+        $resultErrors = $result['errors'] ?? [];
+
         return [
             'success' => $result['success'] && $result['imported'] > 0,
             'action' => 'rename',
-            'id' => $result['imported_ids'][0] ?? null,
-            'error' => $result['success'] ? null : implode(', ', $result['errors']),
+            'id' => $importedIds[0] ?? null,
+            'error' => $result['success'] ? null : implode(', ', $resultErrors),
         ];
     }
 
@@ -1241,20 +1392,20 @@ class DataMigrationService
      * Get pending conflicts for manual resolution
      *
      * @param  string  $batchId  Batch ID
+     * @return array<int, array<string, mixed>>
      */
-    public function getPendingConflicts(): array
+    public function getPendingConflicts(string $batchId): array
+    {
         $batchData = Cache::get(self::BATCH_CACHE_PREFIX.$batchId);
 
         if (! is_array($batchData)) {
             return [];
         }
 
+        /** @var array<int, array<string, mixed>> $conflicts */
         $conflicts = $batchData['conflicts'] ?? [];
-        if (! is_array($conflicts)) {
-            return [];
-        }
 
-        return array_filter($conflicts, fn ($c) => $c['resolution'] === 'pending');
+        return array_filter($conflicts, fn ($c) => ($c['resolution'] ?? null) === 'pending');
     }
 
     /**
@@ -1265,36 +1416,45 @@ class DataMigrationService
      * @param  string  $resolution  Resolution action (skip, overwrite, merge, rename)
      * @return array{success: bool, message: string}
      */
-    public function resolveConflictManually(): array
+    public function resolveConflictManually(string $batchId, int $conflictIndex, string $resolution): array
+    {
         $batchData = Cache::get(self::BATCH_CACHE_PREFIX.$batchId);
 
         if (! is_array($batchData)) {
             return ['success' => false, 'message' => 'Batch not found'];
         }
 
-        if (! isset($batchData['conflicts'][$conflictIndex])) {
+        /** @var array<int, array<string, mixed>> $conflicts */
+        $conflicts = $batchData['conflicts'] ?? [];
+        if (! isset($conflicts[$conflictIndex])) {
             return ['success' => false, 'message' => 'Conflict not found'];
         }
 
-        $conflict = $batchData['conflicts'][$conflictIndex];
-        $record = $conflict['record'];
+        $conflict = $conflicts[$conflictIndex];
+        /** @var array<string, mixed> $record */
+        $record = is_array($conflict['record'] ?? null) ? $conflict['record'] : [];
+        /** @var array<string, mixed>|null $existingRecord */
+        $existingRecord = is_array($conflict['existing'] ?? null) ? $conflict['existing'] : null;
 
         $result = $this->resolveConflict(
             $record,
-            ['existing_record' => $conflict['existing']],
+            ['has_conflict' => true, 'existing_record' => $existingRecord, 'conflict_type' => null],
             $resolution,
-            $batchData['import_type'],
-            $batchData['user_id']
+            (string) ($batchData['import_type'] ?? ''),
+            (int) ($batchData['user_id'] ?? 0)
         );
 
         // Update conflict status
-        $batchData['conflicts'][$conflictIndex]['resolution'] = $result['action'];
-        $batchData['conflicts'][$conflictIndex]['resolved_at'] = now()->toIso8601String();
+        $conflicts[$conflictIndex]['resolution'] = $result['action'];
+        $conflicts[$conflictIndex]['resolved_at'] = now()->toIso8601String();
+        $batchData['conflicts'] = $conflicts;
 
         if ($result['success'] && $result['action'] !== 'skip') {
-            $batchData['successful_records']++;
+            $batchData['successful_records'] = ($batchData['successful_records'] ?? 0) + 1;
             if ($result['id']) {
-                $batchData['imported_ids'][] = $result['id'];
+                $importedIds = $batchData['imported_ids'] ?? [];
+                $importedIds[] = $result['id'];
+                $batchData['imported_ids'] = $importedIds;
             }
         }
 
@@ -1311,13 +1471,17 @@ class DataMigrationService
     /**
      * Validate data before import with detailed error reporting
      *
-     * @param  array  $data  Data to validate
+     * @param  array<int, array<string, mixed>>  $data  Data to validate
      * @param  string  $importType  Type of data
-     * @return array{valid: bool, records: array, summary: array}
+     * @return array{valid: bool, records: array<string, array<int, array<string, mixed>>>, summary: array<string, int>, warnings: array<int, string>}
      */
-    public function validateData(): array
+    public function validateData(array $data, string $importType): array
+    {
+        /** @var array<int, array<string, mixed>> $validRecords */
         $validRecords = [];
+        /** @var array<int, array<string, mixed>> $invalidRecords */
         $invalidRecords = [];
+        /** @var array<int, string> $warnings */
         $warnings = [];
 
         foreach ($data as $index => $record) {
@@ -1369,12 +1533,15 @@ class DataMigrationService
     /**
      * Clean a record by normalizing and sanitizing values
      *
-     * @param  array  $record  Record to clean
+     * @param  array<string, mixed>  $record  Record to clean
      * @param  string  $importType  Type of data
-     * @return array{data: array, warnings: array}
+     * @return array{data: array<string, mixed>, warnings: array<int, string>}
      */
-    public function cleanRecord(): array
+    public function cleanRecord(array $record, string $importType): array
+    {
+        /** @var array<string, mixed> $cleaned */
         $cleaned = [];
+        /** @var array<int, string> $warnings */
         $warnings = [];
 
         foreach ($record as $key => $value) {
@@ -1393,7 +1560,7 @@ class DataMigrationService
             // Clean stat values
             if (in_array($normalizedKey, ['speed', 'stamina', 'power', 'guts', 'wit'])) {
                 if ($value !== null) {
-                    $numValue = (int) $value;
+                    $numValue = is_numeric($value) ? (int) $value : 0;
                     if ($numValue < self::STAT_MIN) {
                         $warnings[] = "Stat {$normalizedKey} was negative ({$numValue}), set to 0";
                         $numValue = self::STAT_MIN;
@@ -1407,7 +1574,7 @@ class DataMigrationService
 
             // Clean energy level
             if ($normalizedKey === 'energy_level' && $value !== null) {
-                $numValue = (int) $value;
+                $numValue = is_numeric($value) ? (int) $value : 0;
                 if ($numValue < 0 || $numValue > 100) {
                     $warnings[] = "Energy level was out of range ({$numValue}), clamped to 0-100";
                     $value = max(0, min(100, $numValue));
@@ -1420,7 +1587,8 @@ class DataMigrationService
             if ($normalizedKey === 'scenario_type' && $value !== null) {
                 $normalized = $this->normalizeScenarioType($value);
                 if ($normalized === null) {
-                    $warnings[] = "Invalid scenario type '{$value}', defaulting to 'ura_finale'";
+                    $valueStr = is_scalar($value) ? (string) $value : 'invalid';
+                    $warnings[] = "Invalid scenario type '{$valueStr}', defaulting to 'ura_finale'";
                     $value = 'ura_finale';
                 } else {
                     $value = $normalized;
@@ -1445,8 +1613,10 @@ class DataMigrationService
      * Get transformation rules for a specific import type
      *
      * @param  string  $importType  Type of data
+     * @return array<string, mixed>
      */
-    public function getTransformationRules(): array
+    public function getTransformationRules(string $importType): array
+    {
         $baseRules = [
             'field_mappings' => $this->getFieldMappings('v1_json', $importType),
             'stat_range' => [
@@ -1497,38 +1667,66 @@ class DataMigrationService
      * Generate migration summary report
      *
      * @param  string  $batchId  Batch ID
+     * @return array<string, mixed>
      */
-    public function generateMigrationReport(): array
+    public function generateMigrationReport(string $batchId): array
+    {
         $batchData = Cache::get(self::BATCH_CACHE_PREFIX.$batchId);
 
-        if (! $batchData) {
+        if (! is_array($batchData)) {
             return ['error' => 'Batch not found'];
+        }
+
+        /** @var string $importType */
+        $importType = $batchData['import_type'] ?? '';
+        /** @var string $status */
+        $status = $batchData['status'] ?? '';
+        /** @var int $totalRecords */
+        $totalRecords = $batchData['total_records'] ?? 0;
+        /** @var int $successfulRecords */
+        $successfulRecords = $batchData['successful_records'] ?? 0;
+        /** @var int $failedRecords */
+        $failedRecords = $batchData['failed_records'] ?? 0;
+        /** @var int $skippedRecords */
+        $skippedRecords = $batchData['skipped_records'] ?? 0;
+        /** @var string|null $startedAt */
+        $startedAt = $batchData['started_at'] ?? null;
+        /** @var string|null $completedAt */
+        $completedAt = $batchData['completed_at'] ?? null;
+        /** @var array<int, string> $errors */
+        $errors = $batchData['errors'] ?? [];
+        /** @var array<int, array<string, mixed>> $conflicts */
+        $conflicts = $batchData['conflicts'] ?? [];
+        /** @var array<int, int> $importedIds */
+        $importedIds = $batchData['imported_ids'] ?? [];
+
+        $durationSeconds = null;
+        if ($completedAt !== null && $startedAt !== null) {
+            $durationSeconds = now()->parse($completedAt)->diffInSeconds(now()->parse($startedAt));
         }
 
         return [
             'batch_id' => $batchId,
-            'import_type' => $batchData['import_type'],
-            'status' => $batchData['status'],
+            'import_type' => $importType,
+            'status' => $status,
             'summary' => [
-                'total_records' => $batchData['total_records'],
-                'successful' => $batchData['successful_records'],
-                'failed' => $batchData['failed_records'],
-                'skipped' => $batchData['skipped_records'],
-                'success_rate' => $batchData['total_records'] > 0
-                    ? round(($batchData['successful_records'] / $batchData['total_records']) * 100, 2)
+                'total_records' => $totalRecords,
+                'successful' => $successfulRecords,
+                'failed' => $failedRecords,
+                'skipped' => $skippedRecords,
+                'success_rate' => $totalRecords > 0
+                    ? round(($successfulRecords / $totalRecords) * 100, 2)
                     : 0,
             ],
             'timing' => [
-                'started_at' => $batchData['started_at'],
-                'completed_at' => $batchData['completed_at'],
-                'duration_seconds' => $batchData['completed_at']
-                    ? now()->parse($batchData['completed_at'])->diffInSeconds(now()->parse($batchData['started_at']))
-                    : null,
+                'started_at' => $startedAt,
+                'completed_at' => $completedAt,
+                'duration_seconds' => $durationSeconds,
             ],
-            'errors' => $batchData['errors'],
-            'conflicts_resolved' => count(array_filter($batchData['conflicts'], fn ($c) => $c['resolution'] !== 'pending')),
-            'conflicts_pending' => count(array_filter($batchData['conflicts'], fn ($c) => $c['resolution'] === 'pending')),
-            'imported_ids' => $batchData['imported_ids'],
+            'errors' => $errors,
+            'conflicts_resolved' => count(array_filter($conflicts, fn ($c) => ($c['resolution'] ?? null) !== 'pending')),
+            'conflicts_pending' => count(array_filter($conflicts, fn ($c) => ($c['resolution'] ?? null) === 'pending')),
+            'imported_ids' => $importedIds,
         ];
     }
 }

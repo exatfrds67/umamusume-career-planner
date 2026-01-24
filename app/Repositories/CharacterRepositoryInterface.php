@@ -16,8 +16,14 @@ interface CharacterRepositoryInterface
      */
     public function findByUserId(int $userId): Collection;
 
+    /**
+     * @param  array<string, mixed>  $attributes
+     */
     public function store(array $attributes): Character;
 
+    /**
+     * @param  array<string, mixed>  $attributes
+     */
     public function update(Character $character, array $attributes): bool;
 
     public function delete(int $id): bool;

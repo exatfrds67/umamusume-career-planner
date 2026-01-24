@@ -27,8 +27,8 @@ abstract class AbstractScreenParser implements ScreenParserInterface
         $totalFields = count($requiredFields);
 
         foreach ($requiredFields as $field) {
-            if (isset($data[$field]) && $data[$field] !== null) {
-                $foundCount = ($foundCount ?? 0) + 1;
+            if (isset($data[$field])) {
+                $foundCount++;
             }
         }
 
@@ -84,10 +84,14 @@ abstract class AbstractScreenParser implements ScreenParserInterface
      */
     protected function logResult(array $result): void
     {
+        /** @var array<string, mixed> $resultData */
+        $resultData = $result['data'] ?? [];
+        $dataCount = is_array($resultData) ? count($resultData) : 0;
+
         Log::info("[{$this->getScreenType()}Parser] Parsing completed", [
             'success' => $result['success'],
             'confidence' => $result['confidence'],
-            'fields_extracted' => count($result['data']),
+            'fields_extracted' => $dataCount,
             'errors' => $result['errors'],
         ]);
     }

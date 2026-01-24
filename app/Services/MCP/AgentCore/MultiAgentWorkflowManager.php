@@ -2,7 +2,7 @@
 
 namespace App\Services\MCP\AgentCore;
 
-use App\Models\Character;
+use App\Models\MCPAgent;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -19,7 +19,7 @@ class MultiAgentWorkflowManager
 
     protected AgentCommunicationProtocol $communication;
 
-    /** @var array<string, mixed> */
+    /** @var array<string, array<string, mixed>> */
     protected array $activeWorkflows = [];
 
     public function __construct(
@@ -39,6 +39,7 @@ class MultiAgentWorkflowManager
      *     input: array<string, mixed>,
      *     dependencies?: array<int, int>
      * }>  $steps
+     * @param  array<string, mixed>  $context
      * @return array{
      *     workflow_id: string,
      *     status: string,
@@ -48,9 +49,11 @@ class MultiAgentWorkflowManager
      *     error?: string
      * }
      */
-    public function executeSequentialWorkflow(): array
+    public function executeSequentialWorkflow(array $steps, array $context = []): array
+    {
         $workflowId = $this->generateWorkflowId();
         $startTime = microtime(true);
+        /** @var array<int, array<string, mixed>> $results */
         $results = [];
         $totalCost = 0.0;
         $sharedContext = $context;
@@ -81,15 +84,18 @@ class MultiAgentWorkflowManager
                 $result = $this->agentCore->invokeAgent($step['agent_id'], $stepInput);
 
                 if ($result['status'] !== 'success') {
-                    throw new \RuntimeException("Step {$index} failed: ".$result['error'] ?? 'Unknown error');
+                    $errorMessage = isset($result['error']) ? (string) $result['error'] : 'Unknown error';
+                    throw new \RuntimeException("Step {$index} failed: ".$errorMessage);
                 }
 
                 $results[$index] = $result;
-                $totalCost = ($totalCost ?? 0) + $result['cost'] ?? 0.0;
+                $totalCost += (float) ($result['cost'] ?? 0.0);
 
                 // Update shared context with step results
-                if (isset($result['output']['context_updates'])) {
-                    $sharedContext = array_merge($sharedContext, $result['output']['context_updates']);
+                /** @var array<string, mixed>|null $output */
+                $output = is_array($result['output']) ? $result['output'] : null;
+                if ($output !== null && isset($output['context_updates']) && is_array($output['context_updates'])) {
+                    $sharedContext = array_merge($sharedContext, $output['context_updates']);
                 }
 
                 // Share results with other agents
@@ -97,7 +103,7 @@ class MultiAgentWorkflowManager
                     'workflow_id' => $workflowId,
                     'step' => $index,
                     'agent_id' => $step['agent_id'],
-                    'result' => $result['output'],
+                    'result' => $result['output'] ?? null,
                 ]);
             }
 
@@ -147,6 +153,7 @@ class MultiAgentWorkflowManager
      *     task: string,
      *     input: array<string, mixed>
      * }>  $tasks
+     * @param  array<string, mixed>  $context
      * @return array{
      *     workflow_id: string,
      *     status: string,
@@ -156,9 +163,11 @@ class MultiAgentWorkflowManager
      *     error?: string
      * }
      */
-    public function executeParallelWorkflow(): array
+    public function executeParallelWorkflow(array $tasks, array $context = []): array
+    {
         $workflowId = $this->generateWorkflowId();
         $startTime = microtime(true);
+        /** @var array<int, array<string, mixed>> $results */
         $results = [];
         $totalCost = 0.0;
 
@@ -186,14 +195,14 @@ class MultiAgentWorkflowManager
                 $result = $this->agentCore->invokeAgent($task['agent_id'], $taskInput);
 
                 $results[$index] = $result;
-                $totalCost = ($totalCost ?? 0) + $result['cost'] ?? 0.0;
+                $totalCost += (float) ($result['cost'] ?? 0.0);
 
                 // Share results with other agents
                 $this->communication->broadcastMessage([
                     'workflow_id' => $workflowId,
                     'task' => $index,
                     'agent_id' => $task['agent_id'],
-                    'result' => $result['output'],
+                    'result' => $result['output'] ?? null,
                 ]);
             }
 
@@ -253,10 +262,13 @@ class MultiAgentWorkflowManager
      *     error?: string
      * }
      */
-    public function executeHierarchicalWorkflow(): array
+    public function executeHierarchicalWorkflow(array $workflowConfig): array
+    {
         $workflowId = $this->generateWorkflowId();
         $startTime = microtime(true);
         $totalCost = 0.0;
+        /** @var array<int, array<string, mixed>> $workerResults */
+        $workerResults = [];
 
         try {
             Log::info('[MultiAgentWorkflow] Starting hierarchical workflow', [
@@ -281,18 +293,24 @@ class MultiAgentWorkflowManager
                 ]
             );
 
-            $totalCost = ($totalCost ?? 0) + $coordinatorResult['cost'] ?? 0.0;
+            $totalCost += (float) ($coordinatorResult['cost'] ?? 0.0);
 
             if ($coordinatorResult['status'] !== 'success') {
-                throw new \RuntimeException('Coordinator failed: '.$coordinatorResult['error'] ?? 'Unknown error');
+                $errorMessage = isset($coordinatorResult['error']) ? (string) $coordinatorResult['error'] : 'Unknown error';
+                throw new \RuntimeException('Coordinator failed: '.$errorMessage);
             }
 
             // Step 2: Execute worker tasks
-            $workerResults = [];
-            $subtasks = $coordinatorResult['output']['subtasks'] ?? [];
+            /** @var array<string, mixed>|null $coordinatorOutput */
+            $coordinatorOutput = is_array($coordinatorResult['output']) ? $coordinatorResult['output'] : null;
+            /** @var array<int, array<string, mixed>> $subtasks */
+            $subtasks = [];
+            if ($coordinatorOutput !== null && isset($coordinatorOutput['subtasks']) && is_array($coordinatorOutput['subtasks'])) {
+                $subtasks = $coordinatorOutput['subtasks'];
+            }
 
             foreach ($subtasks as $index => $subtask) {
-                $workerAgentId = $workflowConfig['worker_agents'][$index] ?? $workflowConfig['worker_agents'][0];
+                $workerAgentId = $workflowConfig['worker_agents'][$index] ?? $workflowConfig['worker_agents'][0] ?? '';
 
                 Log::info('[MultiAgentWorkflow] Executing worker task', [
                     'workflow_id' => $workflowId,
@@ -300,9 +318,9 @@ class MultiAgentWorkflowManager
                     'subtask' => $index,
                 ]);
 
-                $workerResult = $this->agentCore->invokeAgent($workerAgentId, $subtask);
+                $workerResult = $this->agentCore->invokeAgent($workerAgentId, is_array($subtask) ? $subtask : []);
                 $workerResults[$index] = $workerResult;
-                $totalCost = ($totalCost ?? 0) + $workerResult['cost'] ?? 0.0;
+                $totalCost += (float) ($workerResult['cost'] ?? 0.0);
             }
 
             // Step 3: Coordinator synthesizes results
@@ -314,7 +332,7 @@ class MultiAgentWorkflowManager
                 ]
             );
 
-            $totalCost = ($totalCost ?? 0) + $synthesisResult['cost'] ?? 0.0;
+            $totalCost += (float) ($synthesisResult['cost'] ?? 0.0);
 
             $executionTime = microtime(true) - $startTime;
 
@@ -347,7 +365,7 @@ class MultiAgentWorkflowManager
                 'workflow_id' => $workflowId,
                 'status' => 'failed',
                 'coordinator_result' => [],
-                'worker_results' => [],
+                'worker_results' => $workerResults,
                 'execution_time' => microtime(true) - $startTime,
                 'total_cost' => round($totalCost, 6),
                 'error' => $e->getMessage(),
@@ -368,7 +386,8 @@ class MultiAgentWorkflowManager
      *     error?: string
      * }
      */
-    public function executeCareerAnalysisWorkflow(): array
+    public function executeCareerAnalysisWorkflow(\Illuminate\Database\Eloquent\Model $character, array $goals = []): array
+    {
         try {
             // Find agents by type
             $agentTypes = [
@@ -378,9 +397,10 @@ class MultiAgentWorkflowManager
                 'skill_management_agent',
             ];
 
+            /** @var array<string, string> $agents */
             $agents = [];
             foreach ($agentTypes as $type) {
-                $agent = \App\Models\MCPAgent::where('type', $type)
+                $agent = MCPAgent::where('type', $type)
                     ->where('status', '=', 'active')
                     ->first();
 
@@ -388,16 +408,17 @@ class MultiAgentWorkflowManager
                     throw new \RuntimeException("Required agent not found: {$type}");
                 }
 
-                $agents[$type] = $agent->agent_id;
+                $agents[$type] = (string) $agent->agent_id;
             }
 
             // Define workflow steps
+            $characterId = $character->getKey();
             $steps = [
                 [
                     'agent_id' => $agents['career_strategy_agent'],
                     'task' => 'analyze_career_strategy',
                     'input' => [
-                        'character_id' => $character->id,
+                        'character_id' => $characterId,
                         'goals' => $goals,
                     ],
                 ],
@@ -405,21 +426,21 @@ class MultiAgentWorkflowManager
                     'agent_id' => $agents['training_optimization_agent'],
                     'task' => 'optimize_training',
                     'input' => [
-                        'character_id' => $character->id,
+                        'character_id' => $characterId,
                     ],
                 ],
                 [
                     'agent_id' => $agents['race_analysis_agent'],
                     'task' => 'analyze_races',
                     'input' => [
-                        'character_id' => $character->id,
+                        'character_id' => $characterId,
                     ],
                 ],
                 [
                     'agent_id' => $agents['skill_management_agent'],
                     'task' => 'optimize_skills',
                     'input' => [
-                        'character_id' => $character->id,
+                        'character_id' => $characterId,
                     ],
                 ],
             ];
@@ -430,7 +451,9 @@ class MultiAgentWorkflowManager
             ]);
 
             // Synthesize analysis
-            $analysis = $this->synthesizeCareerAnalysis($result['results'] ?? []);
+            /** @var array<int, array<string, mixed>> $workflowResults */
+            $workflowResults = is_array($result['results']) ? $result['results'] : [];
+            $analysis = $this->synthesizeCareerAnalysis($workflowResults);
 
             return [
                 'workflow_id' => $result['workflow_id'],
@@ -495,10 +518,11 @@ class MultiAgentWorkflowManager
     /**
      * Synthesize career analysis from workflow results
      *
-     * @param  array<int, mixed>  $results
+     * @param  array<int, array<string, mixed>>  $results
      * @return array<string, mixed>
      */
-    protected function synthesizeCareerAnalysis(): array
+    protected function synthesizeCareerAnalysis(array $results): array
+    {
         $synthesis = [
             'career_strategy' => $results[0]['output'] ?? [],
             'training_optimization' => $results[1]['output'] ?? [],
@@ -507,10 +531,12 @@ class MultiAgentWorkflowManager
         ];
 
         // Calculate overall confidence
+        /** @var array<int, float> $confidences */
         $confidences = [];
         foreach ($results as $result) {
-            if (isset($result['output']['confidence'])) {
-                $confidences[] = $result['output']['confidence'];
+            if (is_array($result) && isset($result['output']) && is_array($result['output']) && isset($result['output']['confidence'])) {
+                $confValue = $result['output']['confidence'];
+                $confidences[] = is_numeric($confValue) ? (float) $confValue : 0.0;
             }
         }
 
@@ -530,21 +556,25 @@ class MultiAgentWorkflowManager
      * @param  array<string, mixed>  $analysis
      * @return array<string, mixed>
      */
-    protected function generateIntegratedRecommendations(): array
+    protected function generateIntegratedRecommendations(array $analysis): array
+    {
+        $overallConfidence = $analysis['overall_confidence'] ?? 0.5;
+
         return [
             'priority_action' => 'training',
             'focus' => 'speed',
             'reasoning' => 'Based on comprehensive multi-agent analysis',
-            'confidence' => $analysis['overall_confidence'] ?? 0.5,
+            'confidence' => is_numeric($overallConfidence) ? (float) $overallConfidence : 0.5,
         ];
     }
 
     /**
      * Get active workflows
      *
-     * @return array<string, mixed>
+     * @return array<string, array<string, mixed>>
      */
     public function getActiveWorkflows(): array
+    {
         return $this->activeWorkflows;
     }
 }

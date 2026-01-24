@@ -51,13 +51,14 @@ class CharacterStatsParser extends AbstractScreenParser
         return 'character_stats';
     }
 
-    public function parse(): array
+    public function parse(string $text): array
+    {
         $data = [];
         $errors = [];
 
         // Extract stats
         $stats = $this->extractStats($text);
-        (is_array($data) && isset($data['stats']) ? $data['stats'] : null) = $stats;
+        $data['stats'] = $stats;
 
         // Extract additional data
         $additionalData = $this->extractAdditionalData($text);
@@ -85,26 +86,40 @@ class CharacterStatsParser extends AbstractScreenParser
         return $result;
     }
 
-    public function validate(): array
+    public function validate(array $data): array
+    {
         $errors = [];
 
         // Validate stats exist
-        if (! isset((is_array($data) && isset($data['stats']) ? $data['stats'] : null)) || ! is_array((is_array($data) && isset($data['stats']) ? $data['stats'] : null))) {
+        if (! isset($data['stats']) || ! is_array($data['stats'])) {
             $errors[] = 'Stats data is missing or invalid';
 
             return ['valid' => false, 'errors' => $errors];
         }
 
         // Validate each stat value
-        foreach ((is_array($data) && isset($data['stats']) ? $data['stats'] : null) as $stat => $value) {
-            if ($value !== null && ! $this->validateStatValue($value)) {
-                $errors[] = "Invalid {$stat} value: {$value} (must be 0-1200)";
+        /** @var array<string, mixed> $stats */
+        $stats = $data['stats'];
+        foreach ($stats as $stat => $value) {
+            $statName = is_string($stat) ? $stat : '';
+            if ($value !== null) {
+                if (! is_int($value)) {
+                    $errors[] = "Invalid {$statName} value type: expected integer";
+
+                    continue;
+                }
+                if (! $this->validateStatValue($value)) {
+                    $errors[] = "Invalid {$statName} value: {$value} (must be 0-1200)";
+                }
             }
         }
 
         // Validate energy if present
-        if (isset((is_array($data) && isset($data['energy_level']) ? $data['energy_level'] : null)) && ! $this->validatePercentage((is_array($data) && isset($data['energy_level']) ? $data['energy_level'] : null))) {
-            $errors[] = "Invalid energy level: {(is_array($data) && isset($data['energy_level']) ? $data['energy_level'] : null)} (must be 0-100)";
+        if (isset($data['energy_level'])) {
+            $energyLevel = is_int($data['energy_level']) ? $data['energy_level'] : 0;
+            if (! $this->validatePercentage($energyLevel)) {
+                $errors[] = "Invalid energy level: {$energyLevel} (must be 0-100)";
+            }
         }
 
         return [
@@ -118,7 +133,8 @@ class CharacterStatsParser extends AbstractScreenParser
      *
      * @return array<string, int|null>
      */
-    protected function extractStats(): array
+    protected function extractStats(string $text): array
+    {
         $stats = [
             'speed' => null,
             'stamina' => null,
@@ -142,33 +158,34 @@ class CharacterStatsParser extends AbstractScreenParser
      *
      * @return array<string, mixed>
      */
-    protected function extractAdditionalData(): array
+    protected function extractAdditionalData(string $text): array
+    {
         $data = [];
 
         // Extract character name
         $characterName = $this->extractText($text, self::ADDITIONAL_PATTERNS['character_name']);
         if ($characterName) {
-            (is_array($data) && isset($data['character_name']) ? $data['character_name'] : null) = $characterName;
+            $data['character_name'] = $characterName;
         }
 
         // Extract turn
         if (preg_match(self::ADDITIONAL_PATTERNS['turn'], $text, $matches)) {
-            (is_array($data) && isset($data['current_turn']) ? $data['current_turn'] : null) = (int) $matches[1];
+            $data['current_turn'] = (int) $matches[1];
             if (isset($matches[2])) {
-                (is_array($data) && isset($data['total_turns']) ? $data['total_turns'] : null) = (int) $matches[2];
+                $data['total_turns'] = (int) $matches[2];
             }
         }
 
         // Extract energy
         $energy = $this->extractNumeric($text, self::ADDITIONAL_PATTERNS['energy']);
         if ($energy !== null && $this->validatePercentage($energy)) {
-            (is_array($data) && isset($data['energy_level']) ? $data['energy_level'] : null) = $energy;
+            $data['energy_level'] = $energy;
         }
 
         // Extract mood
         $mood = $this->extractText($text, self::ADDITIONAL_PATTERNS['mood']);
         if ($mood) {
-            (is_array($data) && isset($data['mood_status']) ? $data['mood_status'] : null) = $this->normalizeMood($mood);
+            $data['mood_status'] = $this->normalizeMood($mood);
         }
 
         return $data;

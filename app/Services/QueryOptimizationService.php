@@ -116,14 +116,16 @@ class QueryOptimizationService
         ];
 
         // Store in executed queries (limited to max stored)
-        $maxStored = (int) config('query-optimization.slow_query.max_stored_queries', 100);
+        $configMaxStored = config('query-optimization.slow_query.max_stored_queries', 100);
+        $maxStored = is_numeric($configMaxStored) ? (int) $configMaxStored : 100;
         if (count($this->executedQueries) >= $maxStored) {
             array_shift($this->executedQueries);
         }
         $this->executedQueries[] = $queryData;
 
         // Check for slow query
-        $warningThreshold = (float) config('query-optimization.slow_query.warning_threshold_ms', 100);
+        $configWarningThreshold = config('query-optimization.slow_query.warning_threshold_ms', 100);
+        $warningThreshold = is_numeric($configWarningThreshold) ? (float) $configWarningThreshold : 100.0;
         if ($query->time >= $warningThreshold) {
             $this->recordSlowQuery($queryData);
         }
@@ -139,7 +141,8 @@ class QueryOptimizationService
      */
     private function recordSlowQuery(array $queryData): void
     {
-        $maxStored = (int) config('query-optimization.slow_query.max_stored_queries', 100);
+        $configMaxStored = config('query-optimization.slow_query.max_stored_queries', 100);
+        $maxStored = is_numeric($configMaxStored) ? (int) $configMaxStored : 100;
         if (count($this->slowQueries) >= $maxStored) {
             array_shift($this->slowQueries);
         }
@@ -147,10 +150,13 @@ class QueryOptimizationService
 
         // Log slow query if enabled
         if (config('query-optimization.slow_query.logging_enabled', true)) {
-            $criticalThreshold = (float) config('query-optimization.slow_query.critical_threshold_ms', 500);
+            $configCriticalThreshold = config('query-optimization.slow_query.critical_threshold_ms', 500);
+            $criticalThreshold = is_numeric($configCriticalThreshold) ? (float) $configCriticalThreshold : 500.0;
             $level = $queryData['time'] >= $criticalThreshold ? 'error' : 'warning';
 
-            Log::channel((string) config('query-optimization.slow_query.log_channel', 'daily'))
+            $configLogChannel = config('query-optimization.slow_query.log_channel', 'daily');
+            $logChannel = is_string($configLogChannel) ? $configLogChannel : 'daily';
+            Log::channel($logChannel)
                 ->$level('Slow query detected', [
                     'sql' => $queryData['sql'],
                     'time_ms' => $queryData['time'],
@@ -210,11 +216,14 @@ class QueryOptimizationService
      * @return array<string, array{table: string, columns: array<string>, reason: string, priority: string, estimated_improvement: string}>
      */
     public function analyzeAndRecommendIndexes(): array
+    {
         $this->indexRecommendations = [];
 
         foreach ($this->queryStats as $hash => $stats) {
-            $minQueryCount = (int) config('query-optimization.indexing.min_query_count', 10);
-            $minAvgExecution = (float) config('query-optimization.indexing.min_avg_execution_ms', 50);
+            $configMinQueryCount = config('query-optimization.indexing.min_query_count', 10);
+            $minQueryCount = is_numeric($configMinQueryCount) ? (int) $configMinQueryCount : 10;
+            $configMinAvgExecution = config('query-optimization.indexing.min_avg_execution_ms', 50);
+            $minAvgExecution = is_numeric($configMinAvgExecution) ? (float) $configMinAvgExecution : 50.0;
 
             if ($stats['count'] >= $minQueryCount && $stats['avg_time'] >= $minAvgExecution) {
                 $recommendation = $this->generateIndexRecommendation($stats['sql'], $stats);
@@ -242,7 +251,8 @@ class QueryOptimizationService
         }
 
         // Check if table is excluded
-        $excludedTables = config('query-optimization.indexing.excluded_tables', []);
+        $configExcludedTables = config('query-optimization.indexing.excluded_tables', []);
+        $excludedTables = is_array($configExcludedTables) ? $configExcludedTables : [];
         if (in_array($table, $excludedTables, true)) {
             return null;
         }
@@ -303,9 +313,11 @@ class QueryOptimizationService
     /**
      * Extract columns that could benefit from indexing.
      *
+     * @param  string  $sql  The SQL query to analyze
      * @return array<string>
      */
-    private function extractIndexableColumns(): array
+    private function extractIndexableColumns(string $sql): array
+    {
         $columns = [];
 
         // Extract columns from WHERE clause
@@ -383,9 +395,11 @@ class QueryOptimizationService
             return $queryCallback();
         }
 
-        $prefix = config('query-optimization.cache.prefix', 'query_cache:');
+        $configPrefix = config('query-optimization.cache.prefix', 'query_cache:');
+        $prefix = is_string($configPrefix) ? $configPrefix : 'query_cache:';
         $fullKey = $prefix.$cacheKey;
-        $ttl = $ttl ?? (int) config('query-optimization.cache.default_ttl', 300);
+        $configDefaultTtl = config('query-optimization.cache.default_ttl', 300);
+        $ttl = $ttl ?? (is_numeric($configDefaultTtl) ? (int) $configDefaultTtl : 300);
 
         $this->cacheStats['total']++;
 
@@ -408,10 +422,15 @@ class QueryOptimizationService
      */
     public function invalidateTableCache(string $table): void
     {
-        $prefix = config('query-optimization.cache.prefix', 'query_cache:');
+        $configPrefix = config('query-optimization.cache.prefix', 'query_cache:');
+        $prefix = is_string($configPrefix) ? $configPrefix : 'query_cache:';
 
         // For Redis, use pattern-based deletion
-        if (config('cache.default', '') === 'redis' && config('query-optimization.cache.driver', '') === 'redis') {
+        $configCacheDefault = config('cache.default', '');
+        $configCacheDriver = config('query-optimization.cache.driver', '');
+        $cacheDefault = is_string($configCacheDefault) ? $configCacheDefault : '';
+        $cacheDriver = is_string($configCacheDriver) ? $configCacheDriver : '';
+        if ($cacheDefault === 'redis' && $cacheDriver === 'redis') {
             try {
                 $pattern = $prefix.$table.':*';
                 $store = Cache::store('redis')->getStore();
@@ -452,6 +471,7 @@ class QueryOptimizationService
      * @return array<int, array{sql: string, bindings: array<mixed>, time: float, connection: string, timestamp: int}>
      */
     public function getSlowQueries(): array
+    {
         return $this->slowQueries;
     }
 
@@ -461,6 +481,7 @@ class QueryOptimizationService
      * @return array<string, array{sql: string, count: int, total_time: float, avg_time: float, max_time: float, min_time: float}>
      */
     public function getQueryStats(): array
+    {
         return $this->queryStats;
     }
 
@@ -470,9 +491,10 @@ class QueryOptimizationService
      * @return array{hits: int, misses: int, total: int, hit_rate: float}
      */
     public function getCacheStats(): array
+    {
         $hitRate = $this->cacheStats['total'] > 0
-            ? ($this->cacheStats['hits'] / $this->cacheStats['total']) * 100
-            : 0.0;
+        ? ($this->cacheStats['hits'] / $this->cacheStats['total']) * 100
+        : 0.0;
 
         return [
             ...$this->cacheStats,
@@ -486,6 +508,7 @@ class QueryOptimizationService
      * @return array{total_queries: int, slow_queries: int, avg_query_time: float, cache_hit_rate: float, recommendations_count: int}
      */
     public function getPerformanceMetrics(): array
+    {
         $totalQueries = count($this->executedQueries);
         $slowQueries = count($this->slowQueries);
 
@@ -506,9 +529,11 @@ class QueryOptimizationService
     /**
      * Run EXPLAIN on a query and return the execution plan.
      *
+     * @param  string  $sql  The SQL query to explain
      * @return array<int, array<string, mixed>>
      */
-    public function explainQuery(): array
+    public function explainQuery(string $sql): array
+    {
         try {
             $results = DB::select('EXPLAIN '.$sql);
 
@@ -526,9 +551,11 @@ class QueryOptimizationService
     /**
      * Check if a table has proper indexes for common query patterns.
      *
+     * @param  string  $table  The table name to analyze
      * @return array{table: string, existing_indexes: array<string>, missing_indexes: array<string>, recommendations: array<string>}
      */
-    public function analyzeTableIndexes(): array
+    public function analyzeTableIndexes(string $table): array
+    {
         $existingIndexes = [];
         $missingIndexes = [];
         $recommendations = [];
@@ -586,6 +613,7 @@ class QueryOptimizationService
      * @return array<string>
      */
     public function generateIndexSQL(): array
+    {
         $sqlStatements = [];
 
         foreach ($this->indexRecommendations as $recommendation) {
@@ -611,6 +639,7 @@ class QueryOptimizationService
      * @return array<string, array{query: string, count: int, potential_n_plus_1: bool}>
      */
     public function detectNPlusOneQueries(): array
+    {
         $potentialIssues = [];
 
         // Group queries by normalized pattern
@@ -694,10 +723,23 @@ class QueryOptimizationService
             $slowQueries = $cached['slow_queries'] ?? [];
             $recommendations = $cached['recommendations'] ?? [];
 
-            $this->queryStats = is_array($queryStats) ? $queryStats : [];
-            $this->cacheStats = is_array($cacheStats) ? $cacheStats : $this->cacheStats;
-            $this->slowQueries = is_array($slowQueries) ? $slowQueries : [];
-            $this->indexRecommendations = is_array($recommendations) ? $recommendations : [];
+            /** @var array<string, array{sql: string, count: int, total_time: float, avg_time: float, max_time: float, min_time: float}> $validatedQueryStats */
+            $validatedQueryStats = is_array($queryStats) ? $queryStats : [];
+            $this->queryStats = $validatedQueryStats;
+
+            /** @var array{hits: int, misses: int, total: int} $validatedCacheStats */
+            $validatedCacheStats = is_array($cacheStats) && isset($cacheStats['hits'], $cacheStats['misses'], $cacheStats['total'])
+                ? $cacheStats
+                : $this->cacheStats;
+            $this->cacheStats = $validatedCacheStats;
+
+            /** @var array<int, array{sql: string, bindings: array<mixed>, time: float, connection: string, timestamp: int}> $validatedSlowQueries */
+            $validatedSlowQueries = is_array($slowQueries) ? $slowQueries : [];
+            $this->slowQueries = $validatedSlowQueries;
+
+            /** @var array<string, array{table: string, columns: array<string>, reason: string, priority: string, estimated_improvement: string}> $validatedRecommendations */
+            $validatedRecommendations = is_array($recommendations) ? $recommendations : [];
+            $this->indexRecommendations = $validatedRecommendations;
         }
     }
 }
