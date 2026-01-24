@@ -2,12 +2,12 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 1.0  
-**Date**: January 14, 2026  
+**Document Version**: 2.1.0  
+**Date**: January 24, 2026  
 **Project**: UmamusumeCareerPlanner  
-**Author**: AI Development Team  
-**Status**: Draft  
-**Related Documents**: [SRS-3.4], [SDS-4.4], [DBD-009], [SPEC-004], [PRD-001], [PRD-002]
+**Author**: Development Team  
+**Status**: Current - Aligned with codebase v2.0.0  
+**Related Documents**: [SRS-FR-05], [SDS-4.4], [DBD-4.3], [SPEC-004]
 
 **Source Specs**:
 
@@ -28,8 +28,6 @@
 ## Table of Contents
 
 - [PRD-004: Skill Management System](#prd-004-skill-management-system)
-  - [Umamusume Pretty Derby Career Planner](#umamusume-pretty-derby-career-planner)
-  - [Table of Contents](#table-of-contents)
   - [1. Executive Summary](#1-executive-summary)
     - [1.1 Purpose](#11-purpose)
     - [1.2 Problem Statement](#12-problem-statement)
@@ -53,17 +51,17 @@
 
 ### 1.1 Purpose
 
-Enable players to acquire, upgrade, and manage skills efficiently with clear costs, prerequisites, and synergy guidance.
+Provide a comprehensive system for browsing, planning, and acquiring skills, managing Skill Points (SP) budgets, and tracking skill evolution paths. This system ensures players maximize their character's performance by selecting the optimal skills for specific race conditions.
 
 ### 1.2 Problem Statement
 
-Players often overspend skill points on low-impact skills or miss prerequisites; lack of visibility causes wasted turns and poor race readiness.
+The vast number of skills, complex prerequisite chains, and varying costs based on hint levels make manual planning error-prone. Players often overspend SP on low-impact skills or fail to save enough for crucial Rare/Gold skills for the URA Finals.
 
 ### 1.3 Solution Overview
 
-- Structured skill board with prerequisites, costs, conflicts, and synergies.  
-- Validation and projection of skill point usage.  
-- Recommendations based on race plan and current stats.
+- **Skill Catalog**: A searchable, filterable database of all skills with metadata (cost, rarity, conditions).
+- **Hint Tracker**: Automatic calculation of SP discounts (20%/40%) based on acquired hints.
+- **AI Builder**: Integration with **Skill Advisor Agent** (Neuron AI) to recommend skill loadouts tailored to specific race targets.
 
 ---
 
@@ -71,92 +69,158 @@ Players often overspend skill points on low-impact skills or miss prerequisites;
 
 ### 2.1 Objectives
 
-- Provide accurate skill costs and prerequisite checks.  
-- Prevent conflicting skills and highlight synergies for targeted races.  
-- Track skill point balance and forecast after planned purchases.
+- Ensure accurate SP cost calculations accounting for all discount levels.
+- prevent invalid skill combinations (e.g., conflicting Unique skills or unmet prerequisites).
+- Simplify the "Evolution" process for upgrading Normal skills to Rare/Unique versions.
 
 ### 2.2 Scope (In)
 
-- Skill catalog with tags (distance/ground/strategy).  
-- Purchase, upgrade, and refund (if supported by game rules).  
-- Recommendation engine aligned to race targets (PRD-003).  
-- Validation APIs and UI board.
+- **Catalog Management**: Database of Normal, Rare, and Unique skills.
+- **Acquisition Logic**: Purchase validation, SP deduction, and inventory tracking.
+- **Hint System**: Tracking hint levels (1-3) and applying cost reductions.
+- **Evolution**: Managing logic for upgrading skills (e.g., *Go with the Flow* → *Lane Legerdemain*).
+- **Loadouts**: Creating and saving skill sets for specific race scenarios.
 
 ### 2.3 Scope (Out)
 
-- Training prediction logic (PRD-002).  
-- Support deck management (PRD-005).
+- **Real-time Activation**: Visual simulation of skill triggers during a race (handled statistically in PRD-003).
+- **Skill Creation**: Users cannot define custom skills; data must come from external sources.
 
 ---
 
 ## 3. User Stories
 
-- As a player, I want to see prerequisites and conflicts before buying a skill.  
-- As a player, I want recommendations for skills that best fit my next race.  
-- As a player, I want to know my remaining skill points after a set of purchases.  
-- As a coach, I want a history of purchased skills per run.
+| ID | Actor | Story | Acceptance Criteria |
+|----|-------|-------|---------------------|
+| US-4.1 | Player | I want to find skills compatible with "Long Distance" and "Betweener" strategy. | Catalog filters display only relevant skills. |
+| US-4.2 | Player | I want to see how much SP I save if I wait for another hint. | UI shows "Current Cost" vs "Cost at Next Hint Level". |
+| US-4.3 | Player | I want to evolve my Gold skill after meeting the success conditions. | "Evolve" button becomes active; evolution requirements are checked. |
+| US-4.4 | Player | I want the AI to suggest skills for the Japan Cup (2400m Turf). | AI returns a list of recommended skills prioritizing recovery and speed. |
+| US-4.5 | Coach | I want to save a "PvP Dirt" skill loadout for quick reference. | Ability to save, name, and recall a set of acquired skills. |
 
 ---
 
 ## 4. Functional Requirements
 
-- FR1: Provide skill catalog with metadata (cost, tags, prerequisites, conflicts, rarity).  
-- FR2: Validate purchases against prerequisites, conflicts, and available points.  
-- FR3: Support upgrades with increasing cost and effect tiers.  
-- FR4: Compute synergy score versus target race(s) and recommend top options.  
-- FR5: Track skill point balance and log purchase history.  
-- FR6: Expose APIs for listing skills, validating, purchasing, upgrading, and undo (if allowed).  
-- FR7: Integrate with readiness scoring (PRD-003) and training suggestions (PRD-002) for coordinated guidance.
+### 4.1 Skill Catalog & Discovery [FR-05.1]
+
+- **Database**: Maintain a repository of skills with attributes: Name (EN/JP), Rarity, Base Cost, Cooldown, Duration, and Effect Logic.
+- **Filtering**: Allow search by Name, Strategy (Nige/Senkou...), Distance, Surface, and Effect Type (Heal/Buff/Debuff).
+- **Prerequisites**: Enforce logic where Skill B requires possession of Skill A.
+
+### 4.2 Acquisition & Cost Logic [FR-05.2, FR-05.3]
+
+- **Base Cost**: Define standard SP cost per skill.
+- **Hint Discounts**:
+  - Level 0: 100% Cost
+  - Level 1: 80% Cost (-20%)
+  - Level 2: 70% Cost (-30%)
+  - Level 3+: 60% Cost (-40%)
+- **Validation**: Prevent purchase if SP balance is insufficient or prerequisites are unmet.
+
+### 4.3 Skill Evolution [FR-05.4]
+
+- **Upgrade Path**: Map Normal skills to their Rare/Evolved counterparts.
+- **Cost Adjustment**: Deduct the difference in SP if upgrading from an owned base skill.
+- **Status Tracking**: Mark base skill as "Upgraded" (effectively replaced) in the inventory.
+
+### 4.4 AI Recommendations [FR-05.5]
+
+- **Agent**: `SkillAdvisorAgent` (Neuron AI).
+- **Context**: Input current stats, available SP, hints, and target race.
+- **Output**: Optimized list of skills to purchase within budget to maximize win probability.
+
+### 4.5 Loadout Management [FR-05.7]
+
+- **Configurations**: Allow users to toggle "Equipped" status for acquired skills (limited by game slots/points if applicable).
+- **Validation**: Alert on conflicting skills (e.g., two versions of the same unique skill family).
 
 ---
 
 ## 5. User Interface Requirements
 
-- Skill board with search, filters (tags, cost, synergy score), and sorting.  
-- Detail drawer: description, cost, prerequisites/conflicts, synergy badge, recommendation reason.  
-- Purchase/upgrade confirmation with point delta preview and remaining balance.  
-- Error states for unmet prerequisites or conflicts.  
-- Accessible components: focus order, screen reader labels, keyboard shortcuts for purchase/close.
+### 5.1 Skill Shop Dashboard
+
+- **Header**: Current SP Balance, Total Earned SP.
+- **Tabs**: Recommended / Available / Owned / Evolvable.
+- **Skill Card**:
+  - Icon/Color indicating type (Blue=Heal, Orange=Buff, Red=Debuff, Green=Passive).
+  - Cost display with strikethrough for discounted prices.
+  - "Hint Lv X" badge.
+- **Filter Bar**: Dropdowns for Rarity, Type, and Aptitude compatibility.
+
+### 5.2 Purchase Confirmation Modal
+
+- **Summary**: Skill Name, Effect Description.
+- **Cost Breakdown**: Base Cost - Hint Discount = Final Price.
+- **Balance Update**: Old SP → New SP.
+- **Evolution Warning**: If purchasing a base skill that has an available evolution.
+
+### 5.3 Skill Detail View
+
+- **Description**: Full text of skill effect.
+- **Conditions**: Activation triggers (e.g., "Middle leg", "Behind leader").
+- **Synergy**: List of other skills that work well with this one.
 
 ---
 
 ## 6. Data and Integration
 
-- Data: skills table, prerequisites map, conflicts map, synergy model weights.  
-- Inputs: run stats (PRD-001), race targets (PRD-003), training plan (PRD-002).  
-- Services: SkillService, SynergyScorer, Validation engine.  
-- Dependencies: SRS-3.4, SDS-4.4, DBD-009 skill tables; external updates via PRD-007.
+### 6.1 Data Models
+
+- **Inputs**: `CareerRun` (SP, Hints), `SkillDefinitions`.
+- **Outputs**: `SkillAcquisition` records, `SkillLoadout`.
+- **Entities**:
+  - `ucp_skills` (Reference data)
+  - `ucp_skill_hints` (Run-specific state)
+  - `ucp_skill_acquisitions` (History)
+
+### 6.2 External Data
+
+- **Skill Data**: Synced from `umapyoi.net` (names, icons, effects).
+- **Meta Data**: Tier lists/ratings fetched from community sources (optional).
+
+### 6.3 Internal Integration
+
+- **Training (PRD-002)**: Training events generate hints (`ucp_skill_hints`).
+- **Race (PRD-003)**: Race results provide SP; Race Strategy uses equipped skills for simulation.
+- **Support Cards (PRD-005)**: Support cards determine available hints during training.
 
 ---
 
 ## 7. Non-Functional Requirements
 
-- Performance: validation and purchase response ≤800ms (p95).  
-- Consistency: atomic updates of skill set and point balance.  
-- Observability: audit trail of purchases; anomaly detection for unexpected costs.  
-- Accessibility: WCAG 2.2 AA for board interactions.
+- **Performance**: Skill search and filtering must respond in < 100ms.
+- **Accuracy**: Cost calculations must exactly match in-game values (integer rounding).
+- **Usability**: Hint levels and discounts must be visually distinct to prevent wasted SP.
+- **Data Integrity**: Cannot acquire the same skill twice; cannot acquire evolved skill without base.
 
 ---
 
 ## 8. Success Metrics
 
-- Validation failure rate <3% after guidance.  
-- ≥85% of recommended skills purchased lead to readiness improvement vs baseline.  
-- Support-related skill conflicts reduced by ≥50%.  
-- User satisfaction (CSAT) ≥4.5/5 for skill board UX.
+- **Optimization**: Users utilizing the planner finish runs with < 50 wasted SP on average.
+- **Adoption**: > 75% of active runs have at least 5 skills logged.
+- **Hint Usage**: Users wait for Hint Lv 1+ for > 60% of Rare skill purchases.
 
 ---
 
 ## 9. Release Plan
 
-- Phase A: Catalog + validation + purchase flow.  
-- Phase B: Synergy scoring and recommendations + upgrade path.  
-- Phase C: History/audit export and optional refund support (if rules permit).
+- **v2.0.0 (Current)**:
+  - Full catalog browsing and search.
+  - Basic acquisition tracking.
+  - Hint logic (manual entry or auto from training).
+  - SP budget tracking.
+- **v2.1.0 (Next)**:
+  - Skill Evolution wizard.
+  - "Chain" visualization (viewing dependency trees).
+  - Loadout sharing via QR/Link.
 
 ---
 
 ## 10. Open Questions and Assumptions
 
-- Assumption: Skill costs and effects refreshed regularly from game data.  
-- Question: Should partial refunds exist for misclicks?  
-- Question: How to handle limited-time skills in catalog visibility?
+- **Assumption**: Unique skills are treated as "Normal" rarity for cost purposes unless evolved.
+- **Open Question**: How to handle "Steel Will" (Hagane no Ishi) and other skills given via specific scenario events? *Current: Treat as 0-cost acquisition events.*
+- **Open Question**: Should we track skill specific levels (Lv 1-5)? *Current: Yes, but simplified to "Acquired" vs "Maxed" for simulation.*

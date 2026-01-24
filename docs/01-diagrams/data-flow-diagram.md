@@ -1,425 +1,727 @@
 # Umamusume Career Planner - Data Flow Diagram (DFD)
 
-## Overview
+**Document Version**: 2.0.0  
+**Date**: January 23, 2026  
+**Project**: UmamusumeCareerPlanner  
+**Author**: Development Team  
+**Status**: Current - Aligned with codebase v2.0.0
 
-This document presents the Data Flow Diagrams for the Umamusume Pretty Derby Career Planner application, showing how data flows through the system from external sources, user inputs, and internal processes to provide optimization recommendations and analytics. The system is built with **Laravel 12** (released February 24, 2025) with **TypeScript support**, **Tailwind CSS v4** (released January 22, 2025), and integrates with **AWS Bedrock Claude 4.5** models and **AWS Bedrock Nova 2** for AI capabilities.
+---
 
-## Context Diagram (Level 0)
+## Table of Contents
 
-The highest level view showing the system boundary and external entities.
+1. [Overview](#1-overview)
+2. [Context Diagram (Level 0)](#2-context-diagram-level-0)
+3. [Level 1 DFD - Major System Processes](#3-level-1-dfd---major-system-processes)
+4. [Level 2 DFD - Training Optimization Engine](#4-level-2-dfd---training-optimization-engine)
+5. [Level 2 DFD - AI Advisory System](#5-level-2-dfd---ai-advisory-system)
+6. [Level 2 DFD - External Integration](#6-level-2-dfd---external-integration)
+7. [Level 2 DFD - Data Management](#7-level-2-dfd---data-management)
+8. [Data Store Specifications](#8-data-store-specifications)
+9. [Data Flow Summary](#9-data-flow-summary)
 
-### Text Description
+---
 
-The Umamusume Career Planner system sits at the center, receiving inputs from:
+## 1. Overview
 
-- **Player**: Provides manual data entry, screenshots, career goals, and configuration
-- **External APIs**: **umapyoi.net** (active public API), **UmamusumeDB.com** (verification pending), and community sources provide game data
-- **Community Sources**: Real-time meta data, tier lists, and strategy information
-- **Game Client**: Screenshot data and current game state information
+### 1.1 Purpose
 
-The system outputs:
+This document presents the Data Flow Diagrams for the Umamusume Pretty Derby Career Planner application, showing how data flows through the system from external sources, user inputs, and internal processes to provide optimization recommendations and analytics.
 
-- **Optimization Recommendations**: Training suggestions, race strategies, skill builds
-- **Analytics Reports**: Performance analysis, career comparisons, statistical insights
-- **Community Data**: Shared builds, strategies, and collaborative information
+### 1.2 System Architecture
 
-### ASCII Diagram
+The system is built with:
 
-```text
-                    External APIs
-                   (umapyoi.net,              Community Sources
-                   UmamusumeDB - pending)     (Meta data, Tier lists)
-                        |                    |
-                        v                    v
-    Player ---------> [UMAMUSUME] ---------> Analytics Reports
-    (Manual input,     CAREER            (Performance analysis,
-     Screenshots,      PLANNER           Career comparisons)
-     Goals)            SYSTEM               |
-                         |
-                         v
-                   Game Client ---------> Optimization Recommendations
-                   (Screenshots,          (Training suggestions,
-                    Game state)           Race strategies)
-                         |
-                         v
-                   Community Data
-                   (Shared builds,
-                    Strategies)
-```
+- **Backend**: Laravel 12 (PHP 8.2+)
+- **Frontend**: Livewire 3, Alpine.js, TailwindCSS v4
+- **AI Integration**: Neuron AI agents, Ollama (local), AWS Bedrock (cloud)
+- **MCP Integration**: Model Context Protocol servers
+- **External APIs**: umapyoi.net (active), UmamusumeDB.com (pending verification)
+- **OCR Processing**: Tesseract with GD preprocessing
 
-### Mermaid Diagram
+### 1.3 DFD Notation
 
 ```mermaid
-graph TB
-    Player[Player<br/>Manual Input, Screenshots, Goals]
-    APIs[External APIs<br/>umapyoi.net, UmamusumeDB - pending]
-    Community[Community Sources<br/>Meta Data, Tier Lists]
-    GameClient[Game Client<br/>Screenshots, Game State]
-
-    UmamusumeCareerPlanner[UMAMUSUME<br/>CAREER<br/>PLANNER<br/>SYSTEM]
-
-    OptRecommendations[Optimization Recommendations<br/>Training Suggestions, Race Strategies]
-    Analytics[Analytics Reports<br/>Performance Analysis, Career Comparisons]
-    CommunityData[Community Data<br/>Shared Builds, Strategies]
-
-    Player --> UmamusumeCareerPlanner
-    APIs --> UmamusumeCareerPlanner
-    Community --> UmamusumeCareerPlanner
-    GameClient --> UmamusumeCareerPlanner
-
-    UmamusumeCareerPlanner --> OptRecommendations
-    UmamusumeCareerPlanner --> Analytics
-    UmamusumeCareerPlanner --> CommunityData
+flowchart LR
+    subgraph Legend[DFD Notation]
+        Process[Process<br/>Bubble]
+        ExternalEntity[External Entity<br/>Rectangle]
+        DataStore[(Data Store<br/>Open Rectangle)]
+        DataFlow1[Data Flow 1] -->|Arrow| DataFlow2[Data Flow 2]
+    end
+    
+    style Process fill:#e3f2fd
+    style ExternalEntity fill:#fff3e0
+    style DataStore fill:#e8f5e9
 ```
 
-## Level 1 DFD - Major System Processes
+| Symbol | Meaning |
+|--------|---------|
+| Circle/Bubble | Process that transforms data |
+| Rectangle | External entity (source/destination) |
+| Open Rectangle | Data store (database, cache, file) |
+| Arrow | Data flow direction |
 
-### Text Description
+---
 
-The system breaks down into 8 major processes supporting all **59 requirements**:
+## 2. Context Diagram (Level 0)
 
-1. **Data Collection & Integration**: Aggregates data from **umapyoi.net** API, community sources, and user inputs
-2. **Screenshot Analysis & OCR**: Processes game screenshots to extract current state information using **AWS Bedrock Claude 4.5**
-3. **AI Advisory System**: Provides intelligent recommendations using **Ollama** (local) and **AWS Bedrock** (cloud) models
-4. **Training Optimization Engine**: Calculates optimal training strategies and predictions with **Laravel 12** backend
-5. **Career Management System**: Tracks career progression and historical data across all 59 requirements
-6. **PvP & Competition Analysis**: Manages Champions Meeting and competitive strategies
-7. **Resource Management**: Handles items, gacha planning, and resource optimization
-8. **Analytics & Reporting**: Generates performance reports and statistical analysis
-
-### ASCII Diagram
-
-```text
-External APIs -----> [1. Data Collection] -----> Game Data Store
-Community Data ----> [   & Integration  ]
-User Input --------> [   (umapyoi.net)  ]
-
-Screenshots -------> [2. Screenshot     ] -----> Extracted Game State
-Game State --------> [   Analysis & OCR ]
-                     [   (AWS Bedrock)  ]
-
-User Queries ------> [3. AI Advisory    ] -----> AI Recommendations
-Career Context ----> [   System         ]
-                     [   (Ollama/AWS)   ]
-
-Character Data ----> [4. Training       ] -----> Training Recommendations
-Support Cards -----> [   Optimization   ] -----> Stat Predictions
-Goals -------------> [   Engine         ]
-                     [   (Laravel 12)   ]
-
-Career History ----> [5. Career         ] -----> Career Analytics
-Character Progress -> [   Management     ] -----> Progress Tracking
-                     [   System         ]
-
-Team Data ---------> [6. PvP &          ] -----> PvP Strategies
-Meta Information --> [   Competition     ] -----> Team Recommendations
-                     [   Analysis       ]
-
-Inventory Data ----> [7. Resource       ] -----> Resource Plans
-Gacha Status ------> [   Management     ] -----> Spending Strategies
-
-All Data Sources --> [8. Analytics &    ] -----> Performance Reports
-                     [   Reporting      ] -----> Statistical Analysis
-```
-
-### Mermaid Diagram
+### 2.1 System Boundary
 
 ```mermaid
-graph TB
-    %% External Entities
-    ExtAPIs[External APIs]
-    CommunityData[Community Data]
-    UserInput[User Input]
-    Screenshots[Screenshots]
-    GameState[Game State]
-    UserQueries[User Queries]
-
-    %% Data Stores
-    GameDataStore[(Game Data Store)]
-    CareerHistory[(Career History)]
-    UserProfiles[(User Profiles)]
-    MetaDatabase[(Meta Database)]
-
-    %% Processes
-    DataCollection[1. Data Collection<br/>& Integration]
-    ScreenshotAnalysis[2. Screenshot<br/>Analysis & OCR]
-    AIAdvisory[3. AI Advisory<br/>System]
-    TrainingOptimization[4. Training<br/>Optimization Engine]
-    CareerManagement[5. Career<br/>Management System]
-    PvPAnalysis[6. PvP &<br/>Competition Analysis]
-    ResourceManagement[7. Resource<br/>Management]
-    Analytics[8. Analytics<br/>& Reporting]
-
-    %% Outputs
-    AIRecommendations[AI Recommendations]
-    TrainingRecs[Training Recommendations]
-    CareerAnalytics[Career Analytics]
-    PvPStrategies[PvP Strategies]
-    ResourcePlans[Resource Plans]
-    Reports[Performance Reports]
-
-    %% Data Flow
-    ExtAPIs --> DataCollection
-    CommunityData --> DataCollection
-    UserInput --> DataCollection
-    DataCollection --> GameDataStore
-
-    Screenshots --> ScreenshotAnalysis
-    GameState --> ScreenshotAnalysis
-    ScreenshotAnalysis --> UserProfiles
-
-    UserQueries --> AIAdvisory
-    GameDataStore --> AIAdvisory
-    CareerHistory --> AIAdvisory
-    AIAdvisory --> AIRecommendations
-
-    GameDataStore --> TrainingOptimization
-    UserProfiles --> TrainingOptimization
-    TrainingOptimization --> TrainingRecs
-
-    CareerHistory --> CareerManagement
-    UserProfiles --> CareerManagement
-    CareerManagement --> CareerAnalytics
-
-    MetaDatabase --> PvPAnalysis
-    GameDataStore --> PvPAnalysis
-    PvPAnalysis --> PvPStrategies
-
-    UserProfiles --> ResourceManagement
-    GameDataStore --> ResourceManagement
-    ResourceManagement --> ResourcePlans
-
-    GameDataStore --> Analytics
-    CareerHistory --> Analytics
-    UserProfiles --> Analytics
-    MetaDatabase --> Analytics
-    Analytics --> Reports
+flowchart TB
+    subgraph External[External Entities]
+        Player[Player<br/>Manual Input, Screenshots]
+        UmapyoiAPI[umapyoi.net API<br/>Game Data]
+        UmamusumeDBAPI[UmamusumeDB.com API<br/>Verification Pending]
+        Community[Community Sources<br/>Meta Data, Tiers]
+        OllamaServer[Ollama Server<br/>Local AI]
+        BedrockAPI[AWS Bedrock API<br/>Cloud AI]
+    end
+    
+    subgraph System[Umamusume Career Planner System]
+        Core[Career Planning<br/>& Optimization<br/>System]
+    end
+    
+    subgraph Outputs[System Outputs]
+        Recommendations[Training Recommendations<br/>Race Strategies<br/>Skill Builds]
+        Analytics[Performance Analytics<br/>Career Reports<br/>Stat Progression]
+        Exports[Data Exports<br/>Backups<br/>Shared Builds]
+    end
+    
+    Player -->|Character data, Goals, Actions| Core
+    UmapyoiAPI -->|Characters, Skills, Cards| Core
+    UmamusumeDBAPI -->|Fallback data| Core
+    Community -->|Meta rankings, Strategies| Core
+    
+    Core -->|AI queries| OllamaServer
+    Core -->|Complex queries| BedrockAPI
+    OllamaServer -->|Responses| Core
+    BedrockAPI -->|Responses| Core
+    
+    Core -->|Recommendations| Recommendations
+    Core -->|Reports| Analytics
+    Core -->|Files| Exports
+    
+    Recommendations -->|Display| Player
+    Analytics -->|Display| Player
+    Exports -->|Download| Player
+    
+    style Core fill:#f3e5f5
+    style External fill:#fff3e0
+    style Outputs fill:#e8f5e9
 ```
 
-## Level 2 DFD - Training Optimization Engine Detail
+### 2.2 External Entity Descriptions
 
-### Text Description
+| Entity | Type | Description | Data Flow |
+|--------|------|-------------|-----------|
+| **Player** | Human | End user interacting with system | Input: Manual data, Screenshots, Goals<br/>Output: Recommendations, Analytics |
+| **umapyoi.net API** | System | Primary external game data source | Input: Character catalog, Skills, Support cards |
+| **UmamusumeDB.com API** | System | Secondary data source (verification pending) | Input: Fallback game data |
+| **Community Sources** | System | Meta rankings and strategies | Input: Tier lists, Meta data |
+| **Ollama Server** | System | Local AI inference engine | Input: AI queries<br/>Output: Recommendations |
+| **AWS Bedrock API** | System | Cloud AI fallback | Input: Complex queries<br/>Output: Recommendations |
 
-The Training Optimization Engine is the core of the system, containing several sub-processes:
+---
 
-1. **Stat Prediction Calculator**: Calculates expected stat gains from training options
-2. **Skill Hint Manager**: Manages skill hint collection and SP cost reduction
-3. **Energy & Condition Manager**: Tracks energy, mood, and condition states
-4. **Friendship Training Analyzer**: Optimizes support card friendship training
-5. **Weather & Environment Processor**: Adapts strategies for weather conditions
-6. **Turn Economy Manager**: Manages optimal turn usage throughout career
+## 3. Level 1 DFD - Major System Processes
 
-### ASCII Diagram
-
-```text
-Character Stats -----> [4.1 Stat Prediction] -----> Predicted Gains
-Support Cards ------> [    Calculator      ]
-Growth Rates -------> [                    ]
-
-Available Skills ----> [4.2 Skill Hint     ] -----> Skill Recommendations
-Hint Status --------> [    Manager         ] -----> SP Optimization
-SP Points ----------> [                    ]
-
-Energy Level -------> [4.3 Energy &        ] -----> Energy Management
-Mood Status --------> [    Condition       ] -----> Condition Recommendations
-Conditions ---------> [    Manager         ]
-
-Support Card Bonds -> [4.4 Friendship      ] -----> Friendship Strategies
-Training History ---> [    Training        ] -----> Rainbow Training Plans
-                      [    Analyzer        ]
-
-Weather Data -------> [4.5 Weather &       ] -----> Weather Adaptations
-Track Conditions ---> [    Environment     ] -----> Strategy Adjustments
-                      [    Processor       ]
-
-Career Phase -------> [4.6 Turn Economy    ] -----> Turn Optimization
-Goals Timeline -----> [    Manager         ] -----> Priority Recommendations
-Remaining Turns ----> [                    ]
-```
-
-### Mermaid Diagram
+### 3.1 Top-Level Processes
 
 ```mermaid
-graph TB
-    %% Inputs
-    CharacterStats[Character Stats]
-    SupportCards[Support Cards]
-    GrowthRates[Growth Rates]
-    AvailableSkills[Available Skills]
-    HintStatus[Hint Status]
-    SPPoints[SP Points]
-    EnergyLevel[Energy Level]
-    MoodStatus[Mood Status]
-    Conditions[Conditions]
-    SupportBonds[Support Card Bonds]
-    TrainingHistory[Training History]
-    WeatherData[Weather Data]
-    TrackConditions[Track Conditions]
-    CareerPhase[Career Phase]
-    GoalsTimeline[Goals Timeline]
-    RemainingTurns[Remaining Turns]
-
-    %% Sub-processes
-    StatPrediction[4.1 Stat Prediction<br/>Calculator]
-    SkillHintOpt[4.2 Skill Hint<br/>Manager]
-    EnergyManager[4.3 Energy &<br/>Condition Manager]
-    FriendshipAnalyzer[4.4 Friendship<br/>Training Analyzer]
-    WeatherProcessor[4.5 Weather &<br/>Environment Processor]
-    TurnOptimizer[4.6 Turn Economy<br/>Manager]
-
-    %% Outputs
-    PredictedGains[Predicted Gains]
-    SkillRecs[Skill Recommendations]
-    EnergyMgmt[Energy Management]
-    FriendshipStrats[Friendship Strategies]
-    WeatherAdapt[Weather Adaptations]
-    TurnOpt[Turn Optimization]
-
-    %% Data Flow
-    CharacterStats --> StatPrediction
-    SupportCards --> StatPrediction
-    GrowthRates --> StatPrediction
-    StatPrediction --> PredictedGains
-
-    AvailableSkills --> SkillHintOpt
-    HintStatus --> SkillHintOpt
-    SPPoints --> SkillHintOpt
-    SkillHintOpt --> SkillRecs
-
-    EnergyLevel --> EnergyManager
-    MoodStatus --> EnergyManager
-    Conditions --> EnergyManager
-    EnergyManager --> EnergyMgmt
-
-    SupportBonds --> FriendshipAnalyzer
-    TrainingHistory --> FriendshipAnalyzer
-    FriendshipAnalyzer --> FriendshipStrats
-
-    WeatherData --> WeatherProcessor
-    TrackConditions --> WeatherProcessor
-    WeatherProcessor --> WeatherAdapt
-
-    CareerPhase --> TurnOptimizer
-    GoalsTimeline --> TurnOptimizer
-    RemainingTurns --> TurnOptimizer
-    TurnOptimizer --> TurnOpt
+flowchart TB
+    subgraph External[External Entities]
+        Player[Player]
+        ExternalAPIs[External APIs<br/>umapyoi.net<br/>UmamusumeDB]
+        AIProviders[AI Providers<br/>Ollama/Bedrock]
+    end
+    
+    subgraph Processes[System Processes]
+        P1[1.0<br/>Data Collection<br/>& Integration]
+        P2[2.0<br/>Character<br/>Management]
+        P3[3.0<br/>Training<br/>Optimization]
+        P4[4.0<br/>Race Strategy<br/>Analysis]
+        P5[5.0<br/>Skill<br/>Management]
+        P6[6.0<br/>Support Card<br/>Management]
+        P7[7.0<br/>AI Advisory<br/>System]
+        P8[8.0<br/>Data Management<br/>& Export]
+    end
+    
+    subgraph DataStores[Data Stores]
+        D1[(D1: Characters)]
+        D2[(D2: Careers)]
+        D3[(D3: Skills)]
+        D4[(D4: Support Cards)]
+        D5[(D5: External Cache)]
+        D6[(D6: AI Conversations)]
+    end
+    
+    Player -->|Character input| P2
+    Player -->|Training actions| P3
+    Player -->|Race entries| P4
+    Player -->|Skill selections| P5
+    Player -->|Deck configurations| P6
+    Player -->|AI queries| P7
+    Player -->|Import/Export requests| P8
+    
+    ExternalAPIs -->|Game data| P1
+    P1 -->|Validated data| D5
+    D5 -->|Cached data| P2
+    D5 -->|Cached data| P3
+    D5 -->|Cached data| P5
+    D5 -->|Cached data| P6
+    
+    P2 -->|Character records| D1
+    D1 -->|Character state| P3
+    D1 -->|Character state| P4
+    
+    P3 -->|Training sessions| D2
+    D2 -->|Career history| P4
+    
+    P5 -->|Skill data| D3
+    D3 -->|Available skills| P3
+    
+    P6 -->|Deck configs| D4
+    D4 -->|Active decks| P3
+    
+    P3 -->|Optimization requests| P7
+    P4 -->|Strategy requests| P7
+    P5 -->|Recommendation requests| P7
+    
+    P7 -->|AI queries| AIProviders
+    AIProviders -->|AI responses| P7
+    P7 -->|Conversation logs| D6
+    
+    P2 -->|Export data| P8
+    P3 -->|Export data| P8
+    P4 -->|Export data| P8
+    P5 -->|Export data| P8
+    
+    P8 -->|Import data| P2
+    P8 -->|Files| Player
+    
+    P3 -->|Recommendations| Player
+    P4 -->|Strategies| Player
+    P5 -->|Skill builds| Player
+    P7 -->|Advice| Player
+    
+    style Processes fill:#e3f2fd
+    style DataStores fill:#e8f5e9
+    style External fill:#fff3e0
 ```
 
-## Level 2 DFD - AI Advisory System Detail
+### 3.2 Process Descriptions
 
-### Text Description
+| Process | Name | Description | Key Inputs | Key Outputs |
+|---------|------|-------------|------------|-------------|
+| **1.0** | Data Collection & Integration | Aggregates external game data with caching and circuit breaker | External API responses | Validated, cached game data |
+| **2.0** | Character Management | Manages character lifecycle, stats, aptitudes | User input, imported data | Character records |
+| **3.0** | Training Optimization | Predicts stat gains, calculates bonuses, provides recommendations | Character state, support deck | Training predictions, recommendations |
+| **4.0** | Race Strategy Analysis | Analyzes race requirements, calculates readiness, recommends strategies | Character stats, race data | Race strategies, win probabilities |
+| **5.0** | Skill Management | Manages skill catalog, tracks hints, optimizes SP budget | Available skills, character SP | Skill recommendations, acquisition tracking |
+| **6.0** | Support Card Management | Manages card inventory, builds decks, calculates synergy | Card collection, deck configs | Optimized decks, synergy scores |
+| **7.0** | AI Advisory System | Provides intelligent recommendations via hybrid AI | User queries, context data | AI-powered advice, confidence scores |
+| **8.0** | Data Management & Export | Handles import, export, backup, migration | User files, system data | Exported files, imported records |
 
-The AI Advisory System manages intelligent recommendations through multiple components:
+---
 
-1. **Query Processor**: Analyzes user questions and determines appropriate response strategy
-2. **Ollama Local Engine**: Processes queries using local AI models for privacy
-3. **AWS Bedrock Fallback**: Handles complex queries when local processing is insufficient
-4. **Context Manager**: Maintains conversation history and career context
-5. **Response Synthesizer**: Combines AI responses with game data for comprehensive advice
+## 4. Level 2 DFD - Training Optimization Engine
 
-### ASCII Diagram
-
-```text
-User Questions -----> [3.1 Query          ] -----> Processed Queries
-Chat History -------> [    Processor      ] -----> Response Strategy
-                      [                   ]
-
-Processed Queries --> [3.2 Ollama Local   ] -----> Local AI Responses
-Game Context -------> [    Engine         ]
-Career Data --------> [                   ]
-
-Complex Queries ----> [3.3 AWS Bedrock    ] -----> Cloud AI Responses
-Fallback Triggers --> [    Fallback       ]
-                      [                   ]
-
-Conversation -------> [3.4 Context        ] -----> Updated Context
-Career Progress ----> [    Manager        ] -----> Session State
-User Preferences ---> [                   ]
-
-AI Responses -------> [3.5 Response       ] -----> Final Recommendations
-Game Data ----------> [    Synthesizer    ] -----> Contextual Advice
-Current State ------> [                   ]
-```
-
-### Mermaid Diagram
+### 4.1 Training Optimization Decomposition
 
 ```mermaid
-graph TB
-    %% Inputs
-    UserQuestions[User Questions]
-    ChatHistory[Chat History]
-    GameContext[Game Context]
-    CareerData[Career Data]
-    ComplexQueries[Complex Queries]
-    FallbackTriggers[Fallback Triggers]
-    Conversation[Conversation]
-    CareerProgress[Career Progress]
-    UserPrefs[User Preferences]
-    AIResponses[AI Responses]
-    GameData[Game Data]
-    CurrentState[Current State]
-
-    %% Sub-processes
-    QueryProcessor[3.1 Query<br/>Processor]
-    OllamaEngine[3.2 Ollama Local<br/>Engine]
-    AWSFallback[3.3 AWS Bedrock<br/>Fallback]
-    ContextManager[3.4 Context<br/>Manager]
-    ResponseSynth[3.5 Response<br/>Synthesizer]
-
-    %% Outputs
-    ProcessedQueries[Processed Queries]
-    LocalResponses[Local AI Responses]
-    CloudResponses[Cloud AI Responses]
-    UpdatedContext[Updated Context]
-    FinalRecs[Final Recommendations]
-
-    %% Data Flow
-    UserQuestions --> QueryProcessor
-    ChatHistory --> QueryProcessor
-    QueryProcessor --> ProcessedQueries
-
-    ProcessedQueries --> OllamaEngine
-    GameContext --> OllamaEngine
-    CareerData --> OllamaEngine
-    OllamaEngine --> LocalResponses
-
-    ComplexQueries --> AWSFallback
-    FallbackTriggers --> AWSFallback
-    AWSFallback --> CloudResponses
-
-    Conversation --> ContextManager
-    CareerProgress --> ContextManager
-    UserPrefs --> ContextManager
-    ContextManager --> UpdatedContext
-
-    AIResponses --> ResponseSynth
-    GameData --> ResponseSynth
-    CurrentState --> ResponseSynth
-    ResponseSynth --> FinalRecs
+flowchart TB
+    subgraph Inputs[Inputs]
+        CharacterState[Character State<br/>Stats, Energy, Mood]
+        SupportDeck[Support Deck<br/>6 Cards]
+        CareerContext[Career Context<br/>Turn, Stage, Goals]
+    end
+    
+    subgraph Processes[Training Optimization Processes]
+        P31[3.1<br/>Base Stat<br/>Calculator]
+        P32[3.2<br/>Support Bonus<br/>Calculator]
+        P33[3.3<br/>Risk<br/>Assessor]
+        P34[3.4<br/>Skill Hint<br/>Predictor]
+        P35[3.5<br/>Recommendation<br/>Ranker]
+        P36[3.6<br/>AI Training<br/>Advisor]
+    end
+    
+    subgraph DataStores[Data Stores]
+        D2[(D2: Careers<br/>Training Sessions)]
+        D4[(D4: Support Cards)]
+        D7[(D7: Prediction<br/>Cache)]
+    end
+    
+    subgraph Outputs[Outputs]
+        Predictions[Training<br/>Predictions]
+        Recommendations[Ranked<br/>Recommendations]
+        AIAdvice[AI Training<br/>Advice]
+    end
+    
+    CharacterState -->|Current stats| P31
+    CharacterState -->|Energy/Mood| P33
+    
+    SupportDeck -->|Card bonuses| P32
+    D4 -->|Card effects| P32
+    
+    CareerContext -->|Turn context| P31
+    CareerContext -->|Goals| P35
+    
+    P31 -->|Base gains| P32
+    P32 -->|Adjusted gains| P33
+    P33 -->|Risk-adjusted gains| P34
+    P34 -->|Hint probabilities| P35
+    
+    P35 -->|Ranked options| P36
+    CharacterState -->|Context| P36
+    CareerContext -->|Goals| P36
+    
+    P31 -->|Prediction data| D7
+    D7 -->|Cached predictions| P35
+    
+    P33 -->|Risk scores| Predictions
+    P34 -->|Hint chances| Predictions
+    P35 -->|Rankings| Recommendations
+    P36 -->|AI insights| AIAdvice
+    
+    P31 -->|Session logs| D2
+    D2 -->|Historical data| P35
+    
+    style Processes fill:#e3f2fd
+    style DataStores fill:#e8f5e9
+    style Inputs fill:#fff3e0
+    style Outputs fill:#c8e6c9
 ```
 
-## Data Flow Summary
+### 4.2 Training Process Details
 
-### Key Data Flows
+| Sub-Process | Description | Algorithm | Caching |
+|-------------|-------------|-----------|---------|
+| **3.1 Base Stat Calculator** | Calculates raw stat gains per facility | Growth rates × Facility multipliers | No |
+| **3.2 Support Bonus Calculator** | Applies support card bonuses and friendship multipliers | Bonus stacking with friendship thresholds | No |
+| **3.3 Risk Assessor** | Calculates failure probability based on energy/mood/conditions | Risk score = f(energy, mood, conditions) | No |
+| **3.4 Skill Hint Predictor** | Determines probability of skill hints per facility | Hint chance based on support participation | No |
+| **3.5 Recommendation Ranker** | Ranks training options by expected value and alignment with goals | Multi-criteria scoring | 5 min TTL |
+| **3.6 AI Training Advisor** | Provides intelligent training recommendations via Neuron agents | Neuron AI + Ollama/Bedrock | Session-based |
 
-1. **External Data Integration**: APIs → Data Collection → Game Data Store → All Processes
-2. **User Input Processing**: Screenshots → OCR → Game State → Optimization Engines
-3. **AI Advisory Flow**: User Queries → AI Processing → Contextual Recommendations
-4. **Training Optimization**: Character Data → Prediction Engines → Training Recommendations
-5. **Analytics Pipeline**: All Data Sources → Analytics Engine → Performance Reports
+---
 
-### Data Stores
+## 5. Level 2 DFD - AI Advisory System
 
-- **Game Data Store**: Master game data from external APIs
-- **Career History**: Historical career data and performance metrics
-- **User Profiles**: Character states, preferences, and current game data
-- **Meta Database**: Real-time competitive meta and community data
+### 5.1 AI Advisory Decomposition
 
-### Critical Data Flows
+```mermaid
+flowchart TB
+    subgraph Inputs[Inputs]
+        UserQuery[User Query<br/>Text]
+        Context[Context Data<br/>Character, Career]
+    end
+    
+    subgraph Processes[AI Advisory Processes]
+        P71[7.1<br/>Query<br/>Analyzer]
+        P72[7.2<br/>Context<br/>Builder]
+        P73[7.3<br/>Provider<br/>Router]
+        P74[7.4<br/>Ollama<br/>Service]
+        P75[7.5<br/>Bedrock<br/>Service]
+        P76[7.6<br/>Response<br/>Synthesizer]
+        P77[7.7<br/>Cost<br/>Tracker]
+    end
+    
+    subgraph DataStores[Data Stores]
+        D1[(D1: Characters)]
+        D2[(D2: Careers)]
+        D6[(D6: AI<br/>Conversations)]
+        D8[(D8: AI Costs)]
+    end
+    
+    subgraph External[External Services]
+        Ollama[Ollama Server<br/>Local AI]
+        Bedrock[AWS Bedrock<br/>Cloud AI]
+    end
+    
+    subgraph Outputs[Outputs]
+        Response[AI Response<br/>with Confidence]
+        Metrics[Cost &<br/>Performance<br/>Metrics]
+    end
+    
+    UserQuery -->|Raw query| P71
+    P71 -->|Analyzed intent| P72
+    
+    Context -->|Character state| P72
+    D1 -->|Character data| P72
+    D2 -->|Career history| P72
+    
+    P72 -->|Enriched context| P73
+    P73 -->|Simple queries| P74
+    P73 -->|Complex queries| P75
+    
+    P74 -->|API request| Ollama
+    Ollama -->|AI response| P74
+    
+    P75 -->|API request| Bedrock
+    Bedrock -->|AI response| P75
+    
+    P74 -->|Local response| P76
+    P75 -->|Cloud response| P76
+    
+    P76 -->|Formatted response| Response
+    P76 -->|Conversation| D6
+    
+    P75 -->|Token usage| P77
+    P77 -->|Cost data| D8
+    P77 -->|Metrics| Metrics
+    
+    style Processes fill:#e3f2fd
+    style DataStores fill:#e8f5e9
+    style Inputs fill:#fff3e0
+    style External fill:#fff9c4
+    style Outputs fill:#c8e6c9
+```
 
-1. **Real-time Meta Updates**: Community Sources → Meta Database → PvP Analysis
-2. **Screenshot Processing**: Game Screenshots → OCR → Character State Updates
-3. **AI Context Management**: Career Progress → Context Manager → Enhanced AI Responses
-4. **Performance Analytics**: All Activities → Analytics Engine → Optimization Insights
+### 5.2 AI Advisory Process Details
 
-This comprehensive DFD structure ensures efficient data flow throughout the system while maintaining clear separation of concerns and enabling scalable optimization processing.
+| Sub-Process | Description | Implementation |
+|-------------|-------------|----------------|
+| **7.1 Query Analyzer** | Analyzes user query intent and complexity | Pattern matching, keyword extraction |
+| **7.2 Context Builder** | Enriches query with character and career context | Data aggregation from multiple stores |
+| **7.3 Provider Router** | Routes query to appropriate AI provider based on complexity | Ollama (simple) vs Bedrock (complex) |
+| **7.4 Ollama Service** | Processes queries using local Ollama models | HTTP API client, timeout 30s |
+| **7.5 Bedrock Service** | Processes queries using AWS Bedrock Claude models | AWS SDK, Claude 4.5 Sonnet/Haiku |
+| **7.6 Response Synthesizer** | Formats and enriches AI responses with confidence scores | JSON formatting, confidence calculation |
+| **7.7 Cost Tracker** | Tracks token usage and calculates costs for cloud AI | Database persistence, budget monitoring |
+
+---
+
+## 6. Level 2 DFD - External Integration
+
+### 6.1 External Integration Decomposition
+
+```mermaid
+flowchart TB
+    subgraph Triggers[Triggers]
+        Scheduler[Laravel<br/>Scheduler]
+        UserRequest[User Request<br/>Manual Sync]
+        OCRUpload[Screenshot<br/>Upload]
+    end
+    
+    subgraph Processes[External Integration Processes]
+        P11[1.1<br/>Circuit<br/>Breaker]
+        P12[1.2<br/>API Client<br/>Manager]
+        P13[1.3<br/>Response<br/>Parser]
+        P14[1.4<br/>Cache<br/>Manager]
+        P15[1.5<br/>OCR<br/>Processor]
+    end
+    
+    subgraph External[External Services]
+        Umapyoi[umapyoi.net<br/>API]
+        UmamusumeDB[UmamusumeDB.com<br/>API]
+        Tesseract[Tesseract OCR<br/>Engine]
+    end
+    
+    subgraph DataStores[Data Stores]
+        D5[(D5: External<br/>API Cache)]
+        D9[(D9: OCR<br/>Extractions)]
+    end
+    
+    subgraph Outputs[Outputs]
+        ValidatedData[Validated<br/>Game Data]
+        ExtractedData[Extracted<br/>Character Data]
+    end
+    
+    Scheduler -->|Sync trigger| P11
+    UserRequest -->|Manual sync| P11
+    
+    P11 -->|Check status| P12
+    P11 -->|Circuit open| D5
+    
+    P12 -->|Primary request| Umapyoi
+    P12 -->|Fallback request| UmamusumeDB
+    
+    Umapyoi -->|Response| P13
+    UmamusumeDB -->|Response| P13
+    
+    P13 -->|Parsed data| P14
+    P14 -->|Cached data| D5
+    P14 -->|Fresh data| ValidatedData
+    
+    OCRUpload -->|Image| P15
+    P15 -->|OCR request| Tesseract
+    Tesseract -->|Text| P15
+    P15 -->|Parsed data| D9
+    P15 -->|Validated data| ExtractedData
+    
+    D5 -->|Cached response| ValidatedData
+    
+    style Processes fill:#e3f2fd
+    style DataStores fill:#e8f5e9
+    style Triggers fill:#fff3e0
+    style External fill:#fff9c4
+    style Outputs fill:#c8e6c9
+```
+
+### 6.2 Integration Process Details
+
+| Sub-Process | Description | Resilience Pattern |
+|-------------|-------------|--------------------|
+| **1.1 Circuit Breaker** | Monitors API health and opens circuit on failure threshold | Open after 5 failures in 120s window |
+| **1.2 API Client Manager** | Manages connections to external APIs with fallback logic | Primary → Fallback → Cached |
+| **1.3 Response Parser** | Parses and validates API responses against schema | JSON schema validation |
+| **1.4 Cache Manager** | Stores and retrieves cached responses with TTL management | 24-hour TTL, Redis-backed |
+| **1.5 OCR Processor** | Processes screenshots with GD preprocessing and Tesseract OCR | GD grayscale → threshold → OCR |
+
+---
+
+## 7. Level 2 DFD - Data Management
+
+### 7.1 Data Management Decomposition
+
+```mermaid
+flowchart TB
+    subgraph Inputs[Inputs]
+        ImportFile[Import File<br/>JSON/CSV/XLSX]
+        ExportRequest[Export Request<br/>Format Selection]
+        BackupRequest[Backup Request]
+    end
+    
+    subgraph Processes[Data Management Processes]
+        P81[8.1<br/>Format<br/>Detector]
+        P82[8.2<br/>Data<br/>Validator]
+        P83[8.3<br/>Conflict<br/>Resolver]
+        P84[8.4<br/>Data<br/>Importer]
+        P85[8.5<br/>Data<br/>Exporter]
+        P86[8.6<br/>Backup<br/>Manager]
+    end
+    
+    subgraph DataStores[Data Stores]
+        D1[(D1: Characters)]
+        D2[(D2: Careers)]
+        D3[(D3: Skills)]
+        D10[(D10: Migration<br/>History)]
+        D11[(D11: Backups)]
+    end
+    
+    subgraph Outputs[Outputs]
+        ImportResult[Import Result<br/>Success/Errors]
+        ExportFile[Export File<br/>JSON/CSV/XLSX]
+        BackupArchive[Backup Archive<br/>ZIP]
+    end
+    
+    ImportFile -->|Raw data| P81
+    P81 -->|Detected format| P82
+    P82 -->|Validation result| P83
+    P83 -->|Conflict strategy| P84
+    
+    P84 -->|Character data| D1
+    P84 -->|Career data| D2
+    P84 -->|Skill data| D3
+    P84 -->|Migration log| D10
+    P84 -->|Result| ImportResult
+    
+    ExportRequest -->|Format spec| P85
+    D1 -->|Character records| P85
+    D2 -->|Career records| P85
+    D3 -->|Skill records| P85
+    P85 -->|Generated file| ExportFile
+    
+    BackupRequest -->|Backup trigger| P86
+    D1 -->|All characters| P86
+    D2 -->|All careers| P86
+    D3 -->|All skills| P86
+    P86 -->|Backup record| D11
+    P86 -->|Archive| BackupArchive
+    
+    style Processes fill:#e3f2fd
+    style DataStores fill:#e8f5e9
+    style Inputs fill:#fff3e0
+    style Outputs fill:#c8e6c9
+```
+
+### 7.2 Data Management Process Details
+
+| Sub-Process | Description | Supported Formats |
+|-------------|-------------|-------------------|
+| **8.1 Format Detector** | Detects import file format and schema version | JSON v1.0, CSV, XLSX, Legacy formats |
+| **8.2 Data Validator** | Validates imported data against business rules | Stat ranges, enum values, relationships |
+| **8.3 Conflict Resolver** | Resolves duplicate/conflict records using user strategy | Skip, Overwrite, Merge, Rename |
+| **8.4 Data Importer** | Imports validated records into database with transaction management | Batch processing, rollback on error |
+| **8.5 Data Exporter** | Exports data to requested format with schema versioning | JSON, CSV, XLSX with metadata |
+| **8.6 Backup Manager** | Creates full backup archives with restore capability | ZIP with manifest, incremental support |
+
+---
+
+## 8. Data Store Specifications
+
+### 8.1 Primary Data Stores
+
+```mermaid
+erDiagram
+    D1_Characters ||--o{ D2_Careers : "has"
+    D2_Careers ||--o{ TrainingSessions : "contains"
+    D2_Careers ||--o{ RaceResults : "logs"
+    D2_Careers }o--|| D4_SupportDecks : "uses"
+    D1_Characters }o--o{ D3_Skills : "acquires"
+    D4_SupportDecks ||--|{ SupportCards : "contains"
+    
+    D1_Characters {
+        bigint id PK
+        string name
+        json current_stats
+        enum scenario_type
+        int energy_level
+        enum mood_status
+    }
+    
+    D2_Careers {
+        bigint id PK
+        uuid uuid
+        bigint character_id FK
+        enum status
+        int current_turn
+        json goals
+    }
+    
+    D3_Skills {
+        bigint id PK
+        string name
+        int base_sp_cost
+        enum rarity
+        json effects
+    }
+    
+    D4_SupportDecks {
+        bigint id PK
+        bigint character_id FK
+        json card_assignments
+        float synergy_score
+    }
+```
+
+### 8.2 Data Store Catalog
+
+| Store ID | Name | Type | Persistence | Description |
+|----------|------|------|-------------|-------------|
+| **D1** | Characters | MySQL | Permanent | Character records with stats and aptitudes |
+| **D2** | Careers | MySQL | Permanent | Career run tracking and progression |
+| **D3** | Skills | MySQL | Permanent | Skill catalog and acquisition history |
+| **D4** | Support Cards | MySQL | Permanent | Support card inventory and deck configurations |
+| **D5** | External API Cache | Redis | 24h TTL | Cached responses from external APIs |
+| **D6** | AI Conversations | MySQL | 90 days | AI conversation history and context |
+| **D7** | Prediction Cache | Redis | 5 min TTL | Training prediction results |
+| **D8** | AI Costs | MySQL | Permanent | Token usage and cost tracking |
+| **D9** | OCR Extractions | MySQL | Permanent | OCR processing results |
+| **D10** | Migration History | MySQL | Permanent | Data migration audit trail |
+| **D11** | Backups | File System | User-managed | Backup archives |
+
+### 8.3 Cache Strategy
+
+```mermaid
+flowchart LR
+    subgraph Caching[Cache Layers]
+        L1[L1: Application<br/>Array Cache]
+        L2[L2: Redis<br/>Shared Cache]
+        L3[L3: Database<br/>Persistent Storage]
+    end
+    
+    Request[Request] --> Check1{In L1?}
+    Check1 -->|Yes| Return1[Return from L1]
+    Check1 -->|No| Check2{In L2?}
+    Check2 -->|Yes| Store1[Store in L1]
+    Store1 --> Return2[Return from L2]
+    Check2 -->|No| Query[Query L3]
+    Query --> Store2[Store in L2]
+    Store2 --> Store1
+    
+    style Caching fill:#e8f5e9
+```
+
+| Cache Level | Technology | Use Case | TTL |
+|-------------|-----------|----------|-----|
+| **L1 Application** | PHP Array | Request-scoped data | Request lifetime |
+| **L2 Shared** | Redis | Cross-request data, predictions | 5 min - 24 hours |
+| **L3 Database** | MySQL | Persistent data | Permanent |
+
+---
+
+## 9. Data Flow Summary
+
+### 9.1 Critical Data Flows
+
+```mermaid
+flowchart TD
+    subgraph CriticalFlows[Critical Data Flows]
+        F1[User Input → Character State]
+        F2[Character State → Training Predictions]
+        F3[Training Predictions → AI Recommendations]
+        F4[AI Recommendations → User Display]
+        F5[External APIs → Cached Game Data]
+        F6[Cached Data → System Processes]
+    end
+    
+    F1 -->|Real-time| F2
+    F2 -->|Cached 5min| F3
+    F3 -->|Session-based| F4
+    F5 -->|24h TTL| F6
+    F6 -->|On-demand| F2
+    
+    style CriticalFlows fill:#e3f2fd
+```
+
+### 9.2 Data Flow Volumes
+
+| Flow | Volume | Frequency | Latency Target |
+|------|--------|-----------|----------------|
+| User input → Character update | 1 record | Per action | < 200ms |
+| Training predictions request | 6-8 options | Per turn | < 1.2s |
+| AI advisory request | 1 query | As needed | < 2.5s |
+| External API sync | 100-500 records | Daily | < 30s |
+| OCR processing | 1 image | Manual | < 10s |
+| Data export | 1-100 careers | Manual | < 60s |
+
+### 9.3 Data Transformation Points
+
+| Transformation | Input Format | Output Format | Process |
+|----------------|--------------|---------------|---------|
+| **External API Response** | JSON (external schema) | JSON (internal schema) | Schema mapping, validation |
+| **OCR Text Extraction** | Image (PNG/JPG) | Structured text | GD preprocessing → Tesseract → Parsing |
+| **Training Calculation** | Character state + Deck | Prediction array | Multi-step calculation pipeline |
+| **AI Query** | Natural language | Structured response | Context enrichment → LLM → Formatting |
+| **Export** | Database records | JSON/CSV/XLSX | Serialization with schema versioning |
+
+### 9.4 Data Quality Controls
+
+| Control Point | Validation | Error Handling |
+|---------------|------------|----------------|
+| **User Input** | Laravel validation rules | Return 422 with errors |
+| **External API** | JSON schema validation | Fallback to cache or alternate API |
+| **OCR Extraction** | Confidence threshold ≥ 80% | Manual correction UI |
+| **AI Response** | Format and content validation | Retry with fallback provider |
+| **Import Data** | Business rule validation | Preview + error report |
+
+---
+
+## Document Control
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 2.0.0 | 2026-01-23 | Development Team | Complete rewrite aligned with v2.0.0 implementation; added AI, MCP, external integration, and OCR flows; updated all diagrams and specifications |
+| 1.0.0 | 2026-01-03 | Development Team | Initial draft |
+
+---
+
+## Related Documents
+
+- [002_BRS - Business Requirements Specifications](002_BRS_Business_Requirements_Specifications.md)
+- [003_SRS - Software Requirements Specifications](003_SRS_Software_Requirement_Specifications.md)
+- [004_SDS - Software Design Specifications](004_SDS_Software_Design_Specifications.md)
+- [007_SIP - Software Integration Plan](007_SIP_Software_Integration_Plan.md)
+- [008_SIS - Software Integration Specifications](008_SIS_Software_Integration_Specifications.md)
+- [009_DBD - Database Documentation](009_DBD_Database_Documentation.md)
+- [SPEC-006 - AI Advisory Technical Specification](../specs/SPEC-006_AI_Advisory_Technical.md)
+- [SPEC-007 - External Integration Technical Specification](../specs/SPEC-007_External_Integration_Technical.md)
+- [FLOW-006 - AI Advisory System Flow](../flows/FLOW-006_AI_Advisory_System.md)
+- [FLOW-007 - External Integration System Flow](../flows/FLOW-007_External_Integration_System.md)
+
+---
+
+*This DFD document provides comprehensive data flow analysis for the Umamusume Pretty Derby Career Planner v2.0.0, reflecting the current implementation architecture and integration patterns.*

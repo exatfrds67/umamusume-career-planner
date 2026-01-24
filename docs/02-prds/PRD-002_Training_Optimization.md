@@ -2,12 +2,12 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 1.0  
-**Date**: January 14, 2026  
+**Document Version**: 2.1.0  
+**Date**: January 24, 2026  
 **Project**: UmamusumeCareerPlanner  
-**Author**: AI Development Team  
-**Status**: Draft  
-**Related Documents**: [SRS-3.2], [SDS-4.2], [DBD-009], [SPEC-002], [PRD-001]
+**Author**: Development Team  
+**Status**: Current - Aligned with codebase v2.0.0  
+**Related Documents**: [SRS-FR-03], [SDS-4.2], [DBD-4.4], [SPEC-002]
 
 **Source Specs**:
 
@@ -28,8 +28,6 @@
 ## Table of Contents
 
 - [PRD-002: Training Optimization Engine](#prd-002-training-optimization-engine)
-  - [Umamusume Pretty Derby Career Planner](#umamusume-pretty-derby-career-planner)
-  - [Table of Contents](#table-of-contents)
   - [1. Executive Summary](#1-executive-summary)
     - [1.1 Purpose](#11-purpose)
     - [1.2 Problem Statement](#12-problem-statement)
@@ -53,17 +51,17 @@
 
 ### 1.1 Purpose
 
-Deliver turn-level training recommendations with predicted stat gains, risk, and bond growth to maximize run success.
+Deliver a highly accurate, turn-level training recommendation engine that predicts stat gains, assesses failure risks, and optimizes support card bonding. This system leverages **Neuron AI Agents** to provide contextual advice beyond simple stat math.
 
 ### 1.2 Problem Statement
 
-Players guess optimal training each turn; this leads to suboptimal stat distribution, missed goals, and injuries.
+Players often rely on intuition for training decisions, leading to suboptimal stat distributions, missed skill hints, or catastrophic training failures due to unmanaged energy/mood levels.
 
 ### 1.3 Solution Overview
 
-- Turn context ingestion (stats, mood, energy, deck, goals, upcoming races).  
-- Prediction of gains, risks, bond progress, and hint opportunities.  
-- Ranked recommendations with rationale and what-if comparisons.
+- **Prediction Engine**: Deterministic calculation of base gains + deck bonuses + friendship multipliers.
+- **Risk Assessment**: Probability modeling for training failure based on energy, mood, and negative conditions (e.g., "Lazy").
+- **AI Advisory**: Integration with **Neuron AI (TrainingAdvisorAgent)** to evaluate trade-offs between immediate gains and long-term goals.
 
 ---
 
@@ -71,93 +69,149 @@ Players guess optimal training each turn; this leads to suboptimal stat distribu
 
 ### 2.1 Objectives
 
-- Provide accurate per-turn predictions using deck, facility levels, conditions, and support events.  
-- Minimize injury risk by surfacing failure probabilities and fatigue impact.  
-- Align training choices with mid/long-term goals (race readiness, stat caps).
+- Provide accurate per-turn predictions (±5% variance from game values).
+- Minimize injury risk by surfacing failure probabilities clearly.
+- Maximize bond progression by highlighting optimal card stacking.
+- Offer strategic "Why?" explanations via AI for recommended actions.
 
 ### 2.2 Scope (In)
 
-- Training action simulation (speed, stamina, power, guts, wisdom, rest).  
-- Risk modeling (fatigue, failure rate, mood impact).  
-- Bond gain projection and hint drop probabilities.  
-- REST API for predictions and decision logs.
+- **Simulation**: Speed, Stamina, Power, Guts, Wit training, plus Rest and Race options.
+- **Calculations**: Support card bonuses, friendship stacking, scenario buffs.
+- **Risk Modeling**: Energy depletion, mood impact, failure rates (0-90%).
+- **Hint Tracking**: Probability of skill hint drops based on support card presence.
+- **AI Integration**: Training Advisor Agent for qualitative recommendations.
 
 ### 2.3 Scope (Out)
 
-- Race outcome simulation (PRD-003).  
-- Skill purchasing (PRD-004).  
-- Deck editing (PRD-005).
+- Race outcome simulation (see PRD-003).
+- Skill purchase logic (see PRD-004).
+- Deck editing during a run (restricted by game rules).
 
 ---
 
 ## 3. User Stories
 
-- As a player, I want to see stat/bond gains for each training option so I can pick the best action.  
-- As a player, I want risk warnings when injury chance is high so I can avoid failed turns.  
-- As a player, I want to compare top 3 options with rationale.  
-- As a coach, I want to log chosen actions to review run quality.
+| ID | Actor | Story | Acceptance Criteria |
+|----|-------|-------|---------------------|
+| US-2.1 | Player | I want to see exactly how much Speed/Power I will gain before clicking a button. | UI shows predicted +Value for all stats per facility. |
+| US-2.2 | Player | I want to know the risk of failure so I don't waste a turn. | Risk % displayed (Green/Yellow/Red) based on energy. |
+| US-2.3 | Player | I want the system to tell me if a support card is offering a skill hint. | "Hint" icon appears next to the facility. |
+| US-2.4 | Player | I want an AI recommendation for the best training choice when I'm unsure. | "Recommended" badge appears with a reasoning tooltip. |
+| US-2.5 | Coach | I want to review past training sessions to analyze my strategy. | History log available showing chosen facility vs. gains. |
 
 ---
 
 ## 4. Functional Requirements
 
-- FR1: Load run context (stats, mood, energy, deck, support bonuses, facilities, goals, schedule).  
-- FR2: Simulate each available action and compute gains, bond increases, hint probabilities, and energy deltas.  
-- FR3: Compute risk score including injury chance, failure probability, and condition degradation.  
-- FR4: Rank options by configurable strategy (max score, balanced, safety-first).  
-- FR5: Return API response with top N options, full breakdown, and rationale (tie to SRS-3.2.x).  
-- FR6: Persist chosen action and outcome deltas for analytics (telemetry).  
-- FR7: Provide what-if endpoint for alternate decks or facility levels (optional after MVP).
+### 4.1 Prediction Engine [FR-03.1, FR-03.2]
+
+- **Stat Calculation**: Base Facility Gain × (1 + Support Bonuses) × (1 + Friendship Multiplier) × Mood Modifier.
+- **Energy Calculation**: Standard depletion rates per facility level, adjusted by support cards (e.g., "Training Energy Down").
+- **Batch Processing**: Calculate outcomes for all 5 facilities + Rest simultaneously for comparison.
+
+### 4.2 Support Card Integration [FR-03.4]
+
+- **Bonus Aggregation**: Sum bonuses from all cards present in a facility (e.g., Speed Bonus +1, Power Bonus +1).
+- **Friendship Training**: Apply unique multipliers when card bond ≥ 80 (Orange bar).
+- **Type Synergy**: Apply scenario-specific bonuses (e.g., URA link bonuses).
+
+### 4.3 Risk & Condition Modeling [FR-03.5]
+
+- **Failure Probability**:
+  - Energy > 50%: 0% Risk (usually).
+  - Energy < 50%: Exponential risk increase.
+- **Condition Impact**:
+  - "Lazy": Chance to refuse training.
+  - "Overweight": Speed growth penalty.
+  - "Skinny": Stamina growth penalty.
+
+### 4.4 AI Recommendations [FR-03.8]
+
+- **Agent**: `TrainingAdvisorAgent` (Neuron AI).
+- **Logic**: Evaluates goal alignment (are we behind on Speed?), turn efficiency (is this a triple friendship turn?), and risk tolerance.
+- **Output**: Ranked list of actions with "Confidence Score" and natural language reasoning.
 
 ---
 
 ## 5. User Interface Requirements
 
-- Training panel shows each option with: predicted stat gains, bond gain, hint chance, risk meter, energy cost.  
-- Filters for strategy style (balanced/speed/safety).  
-- Tooltip with rationale and contributing factors.  
-- Warnings when risk exceeds threshold; suggest rest if safest.  
-- Keyboard navigation and screen reader labels for all buttons.
+### 5.1 Training Selection Panel
+
+- **Facility Grid**: 5 cards (Speed, Stamina, Power, Guts, Wit) + 1 Rest card.
+- **Gain Indicators**: Colored numbers (+20 Speed) showing projected gains.
+- **Support Icons**: Small avatars of support cards present in each facility.
+- **Risk Meter**: Progress bar or percentage showing failure chance.
+- **Recommendation Badge**: "AI Pick" icon on the optimal choice.
+
+### 5.2 Result Screen
+
+- **Success/Failure Animation**: Visual feedback on training outcome.
+- **Stat Delta**: Pop-up showing actual gains vs. predicted.
+- **Event Trigger**: Modal if a support card event or skill hint occurred.
+
+### 5.3 Mobile Responsiveness
+
+- **Layout**: Stacked cards on mobile, horizontal grid on desktop.
+- **Touch Targets**: 44px minimum for selection buttons.
 
 ---
 
 ## 6. Data and Integration
 
-- Inputs: run state from PRD-001, deck data from PRD-005, facility levels, upcoming race schedule.  
-- Outputs: prediction payload stored in telemetry (see SEQ-011) and run diff (stats/mood/energy).  
-- Services: TrainingSimulator, RiskModel, RecommendationEngine.  
-- Dependencies: SRS-3.2, SDS-4.2, DBD-009 training tables, FactorService, Support bonuses.
+### 6.1 Data Models
+
+- **Inputs**: `Character` (current stats, deck), `SupportDeck` (card details), `Scenario` (constants).
+- **Outputs**: `TrainingPrediction` (transient), `TrainingSession` (persisted log).
+- **Reference**: `ucp_training_sessions` table (see DBD).
+
+### 6.2 External Data
+
+- **Card Bonuses**: Sourced from `ucp_support_cards` (synced via PRD-007).
+- **Game Constants**: Base gain values sourced from game data config.
+
+### 6.3 Internal Services
+
+- **TrainingService**: Orchestrates the prediction and execution logic.
+- **AIAdvisoryService**: Routes complex decision requests to Neuron/Bedrock.
+- **Redis Cache**: Caches predictions for 5 minutes (`training_prediction:{run_id}`).
 
 ---
 
 ## 7. Non-Functional Requirements
 
-- Performance: prediction response ≤1.2s (p95) with warm cache.  
-- Availability: degradation mode returns baseline heuristics if model unavailable.  
-- Observability: log inputs/outputs with trace IDs; redact PII.  
-- Accuracy: model error margin within ±5% vs validated dataset; track drift.
+- **Performance**: Prediction generation for all facilities < 200ms (p95).
+- **Accuracy**: Prediction math must match game logic within ±1 stat point.
+- **Availability**: AI recommendations degrade gracefully if Cloud API is unreachable (fallback to heuristic scoring).
+- **Persistence**: Every executed turn is committed to the database immediately to prevent state desync.
 
 ---
 
 ## 8. Success Metrics
 
-- Reduction in failed turns due to injury by ≥20%.  
-- ≥80% of players use recommendations on ≥50% of turns.  
-- Mean stat target attainment improves by ≥10% vs baseline runs.  
-- Prediction latency meets SLA in 95th percentile.
+- **Usage Rate**: > 90% of turns in active runs use the training interface (vs manual entry).
+- **AI Adherence**: > 60% of users select the AI-recommended training option.
+- **Failure Reduction**: Users engaging with risk warnings have 20% fewer training failures than baseline.
+- **Prediction Latency**: Average API response time < 150ms.
 
 ---
 
 ## 9. Release Plan
 
-- Phase A: Deterministic simulator (static formulas) + risk meter.  
-- Phase B: ML-driven scoring with strategy filters; decision logging.  
-- Phase C: What-if comparisons and facility progression modeling.
+- **v2.0.0 (Current)**:
+  - Full deterministic prediction engine.
+  - Support card bonus integration.
+  - Risk calculation.
+  - Basic AI recommendations (Heuristic/Local LLM).
+- **v2.1.0 (Next)**:
+  - Advanced AI (long-term goal alignment).
+  - "What-If" scenario mode (previewing item usage).
+  - Facility level-up tracking.
 
 ---
 
 ## 10. Open Questions and Assumptions
 
-- Assumption: Facility level data is available per turn.  
-- Question: Should players pin preferred strategy per run or per turn?  
-- Question: Model retrain cadence (weekly vs per event) and source-of-truth dataset.
+- **Assumption**: Support card effect logic (multiplicative vs additive) follows the standard URA scenario formulas unless specified otherwise.
+- **Open Question**: How to handle RNG-based events during training (e.g., "Great Success")? *Current Approach: Predict normal success, log actual result.*
+- **Open Question**: Should we track specific facility levels (Lv 1-5) per run? *Status: Currently inferred from turn count and usage history.*

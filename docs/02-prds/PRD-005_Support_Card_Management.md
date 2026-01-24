@@ -1,13 +1,13 @@
-# PRD-005: Support Card Management
+# PRD-005: Support Card Management System
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 1.0  
-**Date**: January 14, 2026  
+**Document Version**: 2.1.0  
+**Date**: January 24, 2026  
 **Project**: UmamusumeCareerPlanner  
-**Author**: AI Development Team  
-**Status**: Draft  
-**Related Documents**: [SRS-3.5], [SDS-4.5], [DBD-009], [SPEC-005], [PRD-001], [PRD-002], [PRD-004]
+**Author**: Development Team  
+**Status**: Current - Aligned with codebase v2.0.0  
+**Related Documents**: [SRS-FR-06], [SDS-4.5], [DBD-4.5], [SPEC-005]
 
 **Source Specs**:
 
@@ -27,9 +27,7 @@
 
 ## Table of Contents
 
-- [PRD-005: Support Card Management](#prd-005-support-card-management)
-  - [Umamusume Pretty Derby Career Planner](#umamusume-pretty-derby-career-planner)
-  - [Table of Contents](#table-of-contents)
+- [PRD-005: Support Card Management System](#prd-005-support-card-management-system)
   - [1. Executive Summary](#1-executive-summary)
     - [1.1 Purpose](#11-purpose)
     - [1.2 Problem Statement](#12-problem-statement)
@@ -53,17 +51,17 @@
 
 ### 1.1 Purpose
 
-Manage support card inventory, decks, and upgrades to maximize training outcomes and bond gains.
+Provide a centralized system for managing support card inventories, constructing optimal decks, and tracking meta-relevance to maximize training efficiency and skill acquisition.
 
 ### 1.2 Problem Statement
 
-Players struggle to pick optimal decks and track upgrade materials; suboptimal decks reduce training gains and hint availability.
+Players struggle to select the best combination of 6 cards from hundreds of options. Without tools to calculate synergy or track bond milestones, players often build suboptimal decks that fail to support their training goals or provide necessary skill hints.
 
 ### 1.3 Solution Overview
 
-- Deck builder with synergy scores and facility coverage checks.  
-- Inventory management with upgrade/limit-break material tracking.  
-- Validation to prevent illegal decks and highlight gaps.
+- **Inventory Manager**: Track owned cards, limit break (LB) levels, and levels.
+- **Deck Builder**: Interactive 6-slot builder (5 Owned + 1 Friend) with real-time synergy scoring.
+- **Meta Integration**: Automatic synchronization of tier list rankings from external community sources.
 
 ---
 
@@ -71,92 +69,157 @@ Players struggle to pick optimal decks and track upgrade materials; suboptimal d
 
 ### 2.1 Objectives
 
-- Optimize deck composition for target strategy and race plan.  
-- Surface coverage gaps (training types, friend/support effects).  
-- Track upgrade progress and material requirements.
+- Simplify deck composition by highlighting cards that complement the character's growth rates and target race.
+- Provide visibility into "Bond" progression mechanics to optimize Friendship Training timing.
+- Ensure card data (effects, events) remains current via external API sync.
 
 ### 2.2 Scope (In)
 
-- Deck creation/editing (six cards) with validation rules.  
-- Synergy scoring vs training plan and race targets.  
-- Inventory and upgrade flow with material/rarity tracking.  
-- Export/import deck templates.
+- **Collection**: CRUD operations for user's card inventory.
+- **Deck Management**: Creation, validation, and storage of `SupportDeck` configurations.
+- **Analysis**: Calculation of total deck bonuses (e.g., "Total Speed Bonus +5").
+- **Bond Tracking**: Monitoring bond gauges (0-100) and milestone rewards during training.
+- **External Sync**: Fetching card metadata (Images, Rarity, Type) from `umapyoi.net`.
 
 ### 2.3 Scope (Out)
 
-- Training simulation (PRD-002) except for providing bonuses and events.  
-- Real-money transactions for card acquisition.
+- **Gacha Simulation**: No "pull" mechanics or probability simulators.
+- **Trade System**: No card trading between users (cards are account-bound).
 
 ---
 
 ## 3. User Stories
 
-- As a player, I want to build a deck that boosts my target stats.  
-- As a player, I want to know which cards conflict or overlap excessively.  
-- As a player, I want to see material needs to upgrade a card to the next limit break.  
-- As a coach, I want deck usage analytics across runs.
+| ID | Actor | Story | Acceptance Criteria |
+|----|-------|-------|---------------------|
+| US-5.1 | Player | I want to register which SSR cards I own and their limit break level. | Inventory view allows adding cards and setting LB (0-4). |
+| US-5.2 | Player | I want to build a deck with 3 Speed and 2 Intelligence cards. | Deck builder validates types and counts; warns if unbalanced. |
+| US-5.3 | Player | I want to borrow a "Friend" card that I don't own. | The 6th slot allows selection from the global database, not just inventory. |
+| US-5.4 | Player | I want to see which cards are currently "S-Tier" in the meta. | Cards display a "Meta Tier" badge synced from external sources. |
+| US-5.5 | Coach | I want to know total "Race Bonus" provided by my deck. | Summary panel sums up specific effect values across all 6 cards. |
 
 ---
 
 ## 4. Functional Requirements
 
-- FR1: Manage inventory with rarity, level, bond bonus, hint bonus, event list.  
-- FR2: Validate deck composition (slot count, duplicates, scenario restrictions).  
-- FR3: Compute deck synergy score vs training plan and race goals; flag coverage gaps.  
-- FR4: Provide recommendations for replacements based on desired stat focus.  
-- FR5: Track upgrade/limit-break materials and costs; update card stats on upgrade.  
-- FR6: Expose APIs for deck CRUD, validation, scoring, and upgrade operations.  
-- FR7: Integrate deck bonuses into training predictions (PRD-002) and readiness (PRD-003).
+### 4.1 Inventory Management [FR-06.1]
+
+- **Card Database**: Maintain a local cache of all available game cards (`ucp_support_cards`) synced via PRD-007.
+- **User Ownership**: Track specific instances of cards owned by the user, including Level and Limit Break (LB) status.
+- **Filtering**: Filter by Type (Speed/Stamina/etc.), Rarity (R/SR/SSR), and Meta Tier.
+
+### 4.2 Deck Building Logic [FR-06.2]
+
+- **Composition Rules**:
+  - Max 6 cards total.
+  - Max 5 cards from User Inventory.
+  - Max 1 card from Friend/Global pool.
+  - No duplicate character names allowed (e.g., cannot have SSR Special Week and R Special Week).
+- **Synergy Scoring**: Calculate a score (0-100) based on:
+  - Alignment with Character Growth Rates (e.g., Speed cards for Speed growth char).
+  - Coverage of needed Skills.
+  - Rarity/Level power.
+
+### 4.3 Bonus Calculation [FR-06.4]
+
+- **Effect Aggregation**: Sum effects like `training_effect_up`, `race_bonus`, `fan_bonus`, `skill_pt_bonus`.
+- **Training Integration**: Expose these aggregates to the Training Optimization Engine (PRD-002) to adjust gain predictions.
+
+### 4.4 Bond & Event Tracking [FR-06.3]
+
+- **Bond Gauge**: Track bond points (0-100) per card during a run.
+- **Thresholds**:
+  - 80+: Enable Rainbow/Friendship Training.
+  - 60+: Enable Card Events.
+- **Event Lookup**: Provide quick access to event choices and outcomes (e.g., "Top choice gives Speed +10").
+
+### 4.5 Meta Synchronization [FR-06.5]
+
+- **Sync Job**: Periodically fetch tier list data from configured external sources.
+- **Visual Indicators**: Display tier badges (SS, S, A, B) on card faces.
 
 ---
 
 ## 5. User Interface Requirements
 
-- Deck builder grid with card slots, synergy score, and gap badges.  
-- Card detail drawer: stats, skills, events, bonuses, upgrade path, material needs.  
-- Validation badges and warnings on deck save.  
-- Import/export buttons for templates; QR/URL share if allowed.  
-- Accessible drag/drop alternatives; keyboard slot assignment.
+### 5.1 Card Collection View
+
+- **Grid Layout**: Responsive grid of card thumbnails.
+- **Status Indicators**: Badges for "Owned", "LB Level" (e.g., 3★), and "Meta Tier".
+- **Quick Edit**: Click on a card to toggle ownership or adjust LB level without leaving the grid.
+
+### 5.2 Deck Builder Interface
+
+- **Slot View**: 6 clear slots. Slot 6 visually distinct (Friend slot).
+- **Drag & Drop**: Ability to drag cards from inventory sidebar into slots.
+- **Stats Radar**: Real-time radar chart showing the deck's bias (e.g., heavy Speed, low Guts).
+- **Warnings**: Visual alerts for "Duplicate Character" or "Empty Slot".
+
+### 5.3 Card Detail Modal
+
+- **Header**: Large artwork, Name, Title.
+- **Bonuses Table**: List of all unique bonuses at current level.
+- **Skills**: List of skills this card can teach (Hints) or give (Events).
+- **Event Cheatsheet**: Collapsible list of events and the best answers.
 
 ---
 
 ## 6. Data and Integration
 
-- Data: support cards, events, bonuses, material tables, synergy weights.  
-- Inputs: training plan (PRD-002), race targets (PRD-003), skill plan (PRD-004).  
-- Services: SupportDeckService, SynergyScorer, UpgradeService.  
-- Dependencies: SRS-3.5, SDS-4.5, DBD-009 support tables; external data updates via PRD-007.
+### 6.1 Data Models
+
+- **Entities**:
+  - `SupportCard` (Reference data)
+  - `SupportDeck` (User configuration)
+  - `CareerRun` (Links to used deck)
+- **Relationships**: A `CareerRun` belongs to a `SupportDeck`. A `SupportDeck` has many `SupportCards`.
+
+### 6.2 External Data (via PRD-007)
+
+- **Source**: `umapyoi.net` API.
+- **Fields**: Name, Rarity, Type, Image URL, Max Stats, Unique Effect logic.
+
+### 6.3 Internal Integration
+
+- **Training (PRD-002)**: Deck bonuses directly modify training gain formulas.
+- **Skills (PRD-004)**: Cards determine the pool of available skill hints.
+- **Character (PRD-001)**: Decks are assigned during the creation wizard.
 
 ---
 
 ## 7. Non-Functional Requirements
 
-- Performance: deck validation/scoring ≤900ms (p95).  
-- Consistency: atomic deck saves; prevent partial updates.  
-- Observability: deck change audits; upgrade outcome logs.  
-- Accessibility: WCAG 2.2 AA for deck builder interactions.
+- **Responsiveness**: Drag-and-drop actions must be jank-free (60fps).
+- **Data Freshness**: Meta tiers update within 24 hours of external source changes.
+- **Validation**: Server-side validation of decks prevents illegal configurations even if client-side checks fail.
+- **Storage**: Decks are persisted to `ucp_support_decks` and linked to User ID.
 
 ---
 
 ## 8. Success Metrics
 
-- Deck save success rate ≥98%.  
-- Synergy score improvement ≥12% vs user’s baseline deck.  
-- Upgrade completion tracking accuracy ≥99%.  
-- User satisfaction ≥4.4/5 for deck builder.
+- **Builder Usage**: > 95% of Career Runs have a valid 6-card deck assigned.
+- **Optimization**: Users interacting with the "Synergy Score" build decks with 15% higher average output.
+- **Inventory Tracking**: Active users track an average of 30+ cards in their inventory.
 
 ---
 
 ## 9. Release Plan
 
-- Phase A: Inventory + deck CRUD + validation.  
-- Phase B: Synergy scoring and recommendations; upgrade flow.  
-- Phase C: Template sharing and analytics.
+- **v2.0.0 (Current)**:
+  - Inventory management (Owned/LB).
+  - Basic Deck Builder (5+1 slots).
+  - Bonus aggregation logic.
+  - External data sync for card list.
+- **v2.1.0 (Next)**:
+  - "Auto-Fill" deck based on strategy (e.g., "Max Speed").
+  - Event choice helper during training.
+  - Deck sharing via shortlink.
 
 ---
 
 ## 10. Open Questions and Assumptions
 
-- Assumption: Card event data stays up to date via PRD-007 sync.  
-- Question: Allow duplicate friend cards if game rules change?  
-- Question: Should synergy scoring be scenario-specific or global?
+- **Assumption**: The "Friend" card pool allows selecting any card in the database, regardless of ownership.
+- **Open Question**: How to handle "Group" type cards which have different event mechanics? *Current: Treated as normal cards with specific event triggers.*
+- **Open Question**: Should we track specific card levels (1-50)? *Current: Yes, inferred from Rarity/LB, but editable.*

@@ -2,12 +2,12 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 1.0  
-**Date**: January 14, 2026  
+**Document Version**: 2.1.0  
+**Date**: January 24, 2026  
 **Project**: UmamusumeCareerPlanner  
-**Author**: AI Development Team  
-**Status**: Draft  
-**Related Documents**: [SRS-3.7], [SDS-4.7], [DBD-009], [SPEC-007], [PRD-001], [PRD-006]
+**Author**: Development Team  
+**Status**: Current - Aligned with codebase v2.0.0  
+**Related Documents**: [SRS-FR-08], [SDS-4.7], [DBD-2.1], [SPEC-007]
 
 **Source Specs**:
 
@@ -19,8 +19,7 @@
 
 - SPEC: [SPEC-007](../specs/SPEC-007_External_Integration_Technical.md)
 - Flow: [FLOW-007](../flows/FLOW-007_External_Integration_System.md)
-- Wireframes: [WF-001](../wireframes/WF-001_Dashboard_Overview.md)
-- Sequences: [SEQ-007](../sequences/SEQ-007_External_Data_Sync.md), [SEQ-015](../sequences/SEQ-015_Data_Migration_Snapshot_to_Live.md)
+- Sequence: [SEQ-007](../sequences/SEQ-007_External_Data_Sync.md)
 - User Flows: [UF-008](../user-flows/UF-008_OCR_and_Data_Import_Flow.md)
 
 ---
@@ -28,8 +27,6 @@
 ## Table of Contents
 
 - [PRD-007: External Integration System](#prd-007-external-integration-system)
-  - [Umamusume Pretty Derby Career Planner](#umamusume-pretty-derby-career-planner)
-  - [Table of Contents](#table-of-contents)
   - [1. Executive Summary](#1-executive-summary)
     - [1.1 Purpose](#11-purpose)
     - [1.2 Problem Statement](#12-problem-statement)
@@ -53,17 +50,18 @@
 
 ### 1.1 Purpose
 
-Integrate external data sources (umapyoi.net, optional UmamusumeDB.com) to keep characters, races, skills, and support cards current.
+Ensure the application maintains up-to-date game data and provides robust data interchange capabilities. This includes syncing reference data (Characters, Cards, Skills) from external community APIs and enabling user data import via OCR and file upload.
 
 ### 1.2 Problem Statement
 
-Stale data leads to incorrect recommendations, invalid validations, and poor AI advice.
+Game data changes frequently (new banners, balance patches). Manual updates are unsustainable. Additionally, manually inputting character stats for planning is tedious and error-prone.
 
 ### 1.3 Solution Overview
 
-- Scheduled ingests for characters, races, skills, support cards, and events.  
-- Normalization/mapping to internal schema with versioning.  
-- Health checks, retries, and audit logs for data quality.
+- **API Sync**: Automated background jobs to fetch data from `umapyoi.net` (Primary) and `umamusumedb.com` (Fallback).
+- **OCR Pipeline**: Automated extraction of game stats from screenshots using **Tesseract** with **GD** image preprocessing.
+- **Resilience**: Implementation of **Circuit Breaker** patterns to handle external API downtime gracefully.
+- **Real-time**: **WebSocket (Laravel Reverb)** integration to push updates to connected clients.
 
 ---
 
@@ -71,90 +69,146 @@ Stale data leads to incorrect recommendations, invalid validations, and poor AI 
 
 ### 2.1 Objectives
 
-- Maintain up-to-date reference data with provenance and timestamps.  
-- Provide rollback and diff visibility for each sync.  
-- Supply validated data to PRDs 001–006 without breaking changes.
+- Maintain >99% data accuracy compared to the live game.
+- Reduce user data entry time by >80% via OCR.
+- Ensure system stability even when external data providers are offline.
 
 ### 2.2 Scope (In)
 
-- API clients for primary/secondary sources; rate limit handling.  
-- Normalization of races, skills, support cards, factors, scenarios.  
-- Validation rules (schema, referential integrity, required fields).  
-- Audit logging and monitoring dashboards.
+- **External APIs**: Connectors for `umapyoi.net` and `umamusumedb.com`.
+- **OCR Service**: Image upload, preprocessing, text extraction, and parsing logic.
+- **Data Management**: Import/Export of user plans (JSON/CSV/Excel).
+- **Caching**: Redis-backed caching for external responses (24h TTL).
+- **Real-time**: Broadcasting sync completion events via WebSockets.
 
 ### 2.3 Scope (Out)
 
-- User-provided custom data ingestion (future consideration).  
-- Real-time webhooks from external providers (pull-only for now).
+- **Game Server Interaction**: No direct packet sniffing or connection to Cygames servers.
+- **Video Processing**: OCR is limited to static screenshots, not video streams.
 
 ---
 
 ## 3. User Stories
 
-- As an operator, I want scheduled syncs with alerts on failures.  
-- As a developer, I want schema-stable data with version tags to avoid breaking consumers.  
-- As a player, I want accurate race requirements and skill data in recommendations.
+| ID | Actor | Story | Acceptance Criteria |
+|----|-------|-------|---------------------|
+| US-7.1 | Admin | I want the card database to update automatically when a new banner drops. | Scheduled job runs daily; fetches new cards; updates DB. |
+| US-7.2 | Player | I want to upload a screenshot of my character's end-of-run stats to save time. | Upload image -> System fills in Speed/Stamina/etc. fields. |
+| US-7.3 | Player | I want to export my race plans to Excel to share with my circle. | "Export" button generates a valid .xlsx file. |
+| US-7.4 | System | I want to stop calling an API if it keeps timing out to prevent app lag. | Circuit breaker opens after 5 failures; returns cached/stale data. |
 
 ---
 
 ## 4. Functional Requirements
 
-- FR1: Implement connectors for primary source (umapyoi.net) and optional backup (UmamusumeDB.com).  
-- FR2: Normalize payloads to internal schema with mapping tables and enums.  
-- FR3: Validate data (required fields, referential integrity, value ranges).  
-- FR4: Upsert reference tables with versioning and changelog.  
-- FR5: Provide health endpoints and sync status dashboard.  
-- FR6: Retry with backoff on transient errors; alert on persistent failures.  
-- FR7: Expose data access APIs to consuming services (training, race, skills, decks, AI advisory).
+### 4.1 External Data Sync [FR-08.1, FR-08.3]
+
+- **Sources**: Support multiple upstream providers.
+- **Strategy**:
+  1. Attempt Primary (`umapyoi.net`).
+  2. If Fail/Timeout -> Log Error -> Attempt Fallback (`umamusumedb.com`).
+  3. If All Fail -> Use Stale Cache -> Notify Admin.
+- **Normalization**: Map external JSON schemas to internal `ucp_` database schema.
+
+### 4.2 OCR Pipeline [FR-08.4]
+
+- **Preprocessing**: Resize to max 2000px, Grayscale, Adaptive Thresholding (GD Library).
+- **Extraction**: Tesseract OCR engine (v5+) with Japanese/English language packs.
+- **Parsing**: Regex-based extraction for Stats (S/S/P/G/W), Skill names, and Race results.
+- **Validation**: Confidence scoring. Flag low-confidence (<80%) fields for manual user review.
+
+### 4.3 Data Management [FR-09]
+
+- **Import**:
+  - Detect format (JSON v1/v2, CSV).
+  - Validate schema.
+  - Conflict resolution (Skip/Overwrite/Copy).
+- **Export**:
+  - JSON (Full backup).
+  - Excel/CSV (Tabular data for analysis).
+
+### 4.4 Real-time Updates [FR-08.5]
+
+- **Technology**: Laravel Reverb.
+- **Events**: `DataSyncCompleted`, `OCRProcessingFinished`.
+- **UX**: Show "New Data Available" toast to active users without page reload.
 
 ---
 
 ## 5. User Interface Requirements
 
-- Operator dashboard with last sync time, record counts, and diff summary.  
-- Error log viewer with sample payloads and validation issues.  
-- Manual re-run button for a specific feed and dry-run mode.  
-- Permission-gated access for operators only.
+### 5.1 OCR Upload Modal
+
+- **Dropzone**: Drag & drop area for images.
+- **Preview**: Thumbnail of uploaded image.
+- **Processing State**: Progress bar / Spinner.
+- **Review Screen**: Side-by-side view of Image Crop vs Extracted Value for manual correction.
+
+### 5.2 Sync Status Dashboard (Admin)
+
+- **Status Indicators**: Green/Red badges for each API provider.
+- **Logs**: Recent sync attempts, duration, and record counts.
+- **Controls**: "Force Sync Now" button.
+
+### 5.3 Import/Export Panel
+
+- **Export**: Checkboxes for data types (Characters, Decks, History). Format dropdown.
+- **Import**: File picker. Conflict resolution radio buttons.
 
 ---
 
 ## 6. Data and Integration
 
-- Data: reference tables for characters, races, skills, support cards, factors, scenarios.  
-- Services: SyncScheduler, SourceClient(s), Normalizer, Validator, AuditLogger.  
-- Dependencies: SRS-3.7, SDS-4.7, DBD-009 reference schema.  
-- Downstream consumers: PRD-001..006, MCP configuration reference.
+### 6.1 Data Models
+
+- **Cache**: `ucp_external_api_cache` (stores raw JSON responses).
+- **OCR Logs**: `ucp_ocr_extractions` (audit trail of uploads and confidence scores).
+- **Reference Tables**: `ucp_game_data` (versioning metadata).
+
+### 6.2 Service Architecture
+
+- **ExternalAPIService**: Facade for API clients.
+- **CircuitBreaker**: Middleware state machine (Closed -> Open -> Half-Open).
+- **OCRService**: Orchestrator for ImageProc -> Tesseract -> Parser.
 
 ---
 
 ## 7. Non-Functional Requirements
 
-- Reliability: failed sync auto-retries 3 times with backoff; alert within 5 minutes.  
-- Performance: nightly full sync completes within 10 minutes; incremental sync within 90 seconds.  
-- Observability: metrics for success/fail counts, records processed, and validation errors.  
-- Security: API keys stored in secrets; encrypted at rest; least privilege access.
+- **Resilience**: System must not crash if external APIs return 500 or 404.
+- **Performance**:
+  - API Sync: Background job, zero impact on frontend latency.
+  - OCR: < 5 seconds processing time per image.
+- **Security**:
+  - Validate all uploaded files (MIME type, magic bytes) to prevent malware.
+  - Sanitize all external strings before DB insertion (XSS prevention).
 
 ---
 
 ## 8. Success Metrics
 
-- Sync success rate ≥99%.  
-- Data freshness: ≥95% of records updated within 24 hours of source change.  
-- Validation error rate <1% of records per sync.  
-- Rollback time <5 minutes using versioned snapshots.
+- **Data Freshness**: Database reflects game updates within 24 hours.
+- **OCR Accuracy**: > 90% field recognition rate on standard UI screenshots.
+- **Resilience**: 100% uptime of the planner even during external API outages.
 
 ---
 
 ## 9. Release Plan
 
-- Phase A: Primary source connector + normalization + audit logs.  
-- Phase B: Validation, retries, and operator dashboard.  
-- Phase C: Backup source failover and rollback tooling.
+- **v2.0.0 (Current)**:
+  - Connectors for primary/fallback APIs.
+  - Circuit Breaker logic.
+  - Basic OCR (Stats only).
+  - JSON Import/Export.
+- **v2.1.0 (Next)**:
+  - Advanced OCR (Skill icons, Race results).
+  - Community-shared deck imports via URL.
+  - Auto-repair of corrupted local data.
 
 ---
 
 ## 10. Open Questions and Assumptions
 
-- Assumption: Source APIs remain stable; rate limits documented.  
-- Question: How to handle license/attribution requirements for external data?  
-- Question: Should we expose public API endpoints for third parties?
+- **Assumption**: `umapyoi.net` API remains free and public.
+- **Assumption**: Tesseract language data files are installed on the server environment.
+- **Open Question**: How to handle copyright on card images fetched from external APIs? *Current: Proxy/Cache images locally.*

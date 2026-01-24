@@ -1,571 +1,1249 @@
 # SPEC-002: Training Optimization System - Technical Specification
 
-## Umamusume Pretty Derby Career Planner
+**Document Version**: 2.0.0  
+**Date**: 2026-01-24  
+**Project**: Umamusume Pretty Derby Career Planner  
+**Status**: Active  
+**Classification**: Internal - Development Team
 
-**Document Version**: 1.0  
-**Date**: January 14, 2026  
-**Project**: UmamusumeCareerPlanner  
-**Author**: AI Development Team  
-**Status**: Draft  
-**Related Documents**: [PRD-002], [SRS-3.2], [SDS-4.2], [SPEC-001]
+---
 
-**Source Specs**:
+## Document Information
 
-- `.kiro/specs/umamusume-career-planner-main/requirements.md` (Requirement 2: Training Prediction Engine)
-- `.kiro/specs/umamusume-career-planner-main/design.md` (Training Optimization Architecture)
-- `.kiro/specs/umamusume-career-planner-main/tasks.md` (Task 2.x: Training System)
+| Attribute | Value |
+|-----------|-------|
+| **Document ID** | SPEC-002 |
+| **Related PRD** | [PRD-002: Training Optimization](../prds/PRD-002_Training_Optimization.md) |
+| **Architecture Version** | v2.0.0 |
+| **Approval Status** | Approved |
+| **Last Reviewed** | 2026-01-24 |
 
-**Related Artifacts**:
+### Related Documents
 
-- PRD: [PRD-002](../prds/PRD-002_Training_Optimization.md)
-- Flow: [FLOW-002](../flows/FLOW-002_Training_Optimization_System.md)
-- Wireframes: [WF-004](../wireframes/WF-004_Training_Selection_Interface.md), [WF-005](../wireframes/WF-005_Training_Result_Screen.md)
-- Sequences: [SEQ-002](../sequences/SEQ-002_Training_Block_Resolution.md)
-- User Flows: [UF-003](../user-flows/UF-003_Training_Day_Flow.md)
+**Requirements & Design**:
+
+- [SRS Section 3.2: Training System](../003_SRS_Software_Requirement_Specifications.md#32-training-system)
+- [SDS Section 4.2: Training Architecture](../004_SDS_Software_Design_Specifications.md#42-training-module)
+
+**Data & Integration**:
+
+- [DBD Section 5.2: Training Tables](../009_DBD_Database_Documentation.md#52-training-tables)
+- [API Section 4.2: Training Endpoints](../010_API_API_Documentation.md#42-training-endpoints)
+
+**Visual Documentation**:
+
+- [FLOW-002: Training Optimization System](../flows/FLOW-002_Training_Optimization_System.md)
+- [SEQ-002: Training Session Execution](../sequences/SEQ-002_Training_Session_Execution.md)
+- [WF-004: Training Optimizer Interface](../wireframes/WF-004_Training_Optimizer_Interface.md)
+- [UF-003: Training Optimization Flow](../user-flows/UF-003_Training_Optimization_Flow.md)
 
 ---
 
 ## Table of Contents
 
 1. [Technical Overview](#1-technical-overview)
-2. [Training Prediction Engine](#2-training-prediction-engine)
-3. [Support Card Integration](#3-support-card-integration)
-4. [Scenario-Specific Mechanics](#4-scenario-specific-mechanics)
+2. [Architecture Design](#2-architecture-design)
+3. [Calculation Engines](#3-calculation-engines)
+4. [Service Layer](#4-service-layer)
 5. [API Specification](#5-api-specification)
 6. [Database Schema](#6-database-schema)
-7. [AI/ML Integration](#7-aiml-integration)
-8. [Performance & Caching](#8-performance--caching)
-9. [Testing Requirements](#9-testing-requirements)
+7. [AI Integration](#7-ai-integration)
+8. [Business Logic](#8-business-logic)
+9. [Integration Points](#9-integration-points)
+10. [Error Handling](#10-error-handling)
+11. [Performance Optimization](#11-performance-optimization)
+12. [Security Considerations](#12-security-considerations)
+13. [Testing Strategy](#13-testing-strategy)
+14. [Appendices](#14-appendices)
 
 ---
 
 ## 1. Technical Overview
 
-### 1.1 Component Architecture
+### 1.1 Module Purpose
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│        TRAINING OPTIMIZATION MODULE (SPEC-002)                  │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│  ┌──────────────────────────────────────────────────────────┐   │
-│  │  API Layer (Controllers)                                  │   │
-│  │  • TrainingPredictionController                          │   │
-│  │  • TrainingRecommendationController                      │   │
-│  │  • TrainingSessionController                             │   │
-│  └──────────────────────────────────────────────────────────┘   │
-│                           ↓                                      │
-│  ┌──────────────────────────────────────────────────────────┐   │
-│  │  Service Layer (Business Logic)                           │   │
-│  │  • TrainingPredictionService                              │   │
-│  │  • TrainingOptimizationService (CQRS)                    │   │
-│  │  • SupportCardBonusService                                │   │
-│  │  • ScenarioSpecificService (URA vs Unity)                │   │
-│  │  • TrainingSessionService                                 │   │
-│  └──────────────────────────────────────────────────────────┘   │
-│                           ↓                                      │
-│  ┌──────────────────────────────────────────────────────────┐   │
-│  │  Engine Layer (Complex Calculations)                      │   │
-│  │  • StatGainCalculationEngine                              │   │
-│  │  • BonusMultiplierEngine                                  │   │
-│  │  • SkillHintProbabilityEngine                             │   │
-│  │  • RankingEngine (effectiveness scoring)                  │   │
-│  └──────────────────────────────────────────────────────────┘   │
-│                           ↓                                      │
-│  ┌──────────────────────────────────────────────────────────┐   │
-│  │  Repository Layer (Data Access)                           │   │
-│  │  • TrainingSessionRepository                              │   │
-│  │  • SupportCardRepository                                  │   │
-│  │  • SkillHintRepository                                    │   │
-│  │  • PredictionHistoryRepository                            │   │
-│  └──────────────────────────────────────────────────────────┘   │
-│                           ↓                                      │
-│  ┌──────────────────────────────────────────────────────────┐   │
-│  │  Data Layer (Models & Database)                           │   │
-│  │  • TrainingSession, SupportCard, SkillHint models        │   │
-│  │  • Training cache, session history                        │   │
-│  └──────────────────────────────────────────────────────────┘   │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
-```
+The Training Optimization System is the core gameplay simulation engine responsible for
+predicting training outcomes, calculating stat gains, assessing failure risks, and
+generating AI-driven recommendations. It orchestrates the interaction between character
+state, support cards, and training facilities to maximize career run efficiency.
 
-### 1.2 Core Entities
+**Core Responsibilities**:
 
-| Entity | Purpose | Relationships |
-| --- | --- | --- |
-| Training Session | Single training activity | Has: Stat gains, Mood changes, Skill hints |
-| Training Prediction | Forecasted training outcomes | Belongs to: Character, Facility |
-| Support Card | Training bonus provider | Has many: Training bonuses, Skill hints |
-| Skill Hint | SP cost reduction opportunity | Belongs to: Skill, Support Card |
-| Training Recommendation | AI-recommended training choice | Depends on: Goals, Current state |
+- Stat gain prediction with support card bonuses
+- Failure risk calculation based on energy and mood
+- Training option ranking and recommendations
+- Training session execution and validation
+- Bond level tracking with support cards
+- Skill hint probability calculations
+- Integration with Neuron AI for intelligent advisories
+
+### 1.2 Business Context
+
+In Umamusume Pretty Derby, each turn during a career run presents 5 training facility
+options plus a Rest action. Players must optimize their choices based on:
+
+- **Current Stats**: Character's progression toward goals
+- **Energy Level**: Affects failure risk and stat gains
+- **Mood Status**: Modifies training effectiveness
+- **Support Cards**: Provide bonuses when present at facilities
+- **Friendship Training**: Enhanced gains at 80+ bond level
+- **Upcoming Races**: Strategic timing for race preparation
+
+This module provides deterministic predictions to enable informed decision-making.
+
+### 1.3 Technical Scope
+
+**In Scope**:
+
+- Training prediction calculations for all 6 action types
+- Support card bonus aggregation
+- Risk assessment algorithms
+- Training session execution with RNG resolution
+- Bond level progression tracking
+- Skill hint generation
+- AI recommendation integration
+- Performance caching for predictions
+
+**Out of Scope**:
+
+- Character creation (SPEC-001)
+- Race execution (SPEC-003)
+- Skill acquisition (SPEC-004)
+- Support deck configuration (SPEC-005)
+
+### 1.4 Technology Stack
+
+| Component | Technology | Version | Purpose |
+|-----------|-----------|---------|---------|
+| **Framework** | Laravel | 12.x | Application foundation |
+| **Language** | PHP | 8.3+ | Server-side logic |
+| **Database** | MySQL | 8.0+ | Data persistence |
+| **Cache** | Redis | 7.x | Prediction caching |
+| **AI** | Neuron Framework | 1.x | Advisory agents |
+| **AI Provider (Local)** | Ollama | Latest | Local recommendations |
+| **AI Provider (Cloud)** | AWS Bedrock Claude | 4.5 | Complex analysis |
 
 ---
 
-## 2. Training Prediction Engine
+## 2. Architecture Design
 
-### 2.1 Stat Gain Calculation Algorithm
+### 2.1 Component Architecture
 
+```mermaid
+graph TB
+    subgraph "Presentation Layer"
+        API[TrainingController]
+        Livewire[TrainingOptimizer Component]
+        FormRequest[TrainingRequest]
+    end
+
+    subgraph "Application Layer"
+        TrainingSvc[TrainingService]
+        PredictionSvc[TrainingPredictionService]
+        AdvisorySvc[AIAdvisoryService]
+    end
+
+    subgraph "Domain Layer"
+        Session[TrainingSession Model]
+        Prediction[Prediction DTO]
+        Calculators[Calculator Services]
+    end
+
+    subgraph "Infrastructure Layer"
+        DB[(MySQL)]
+        Cache[(Redis)]
+        NeuronAI[Neuron AI Agent]
+    end
+
+    API --> FormRequest
+    FormRequest --> TrainingSvc
+    Livewire --> PredictionSvc
+    
+    TrainingSvc --> Session
+    TrainingSvc --> DB
+    
+    PredictionSvc --> Calculators
+    PredictionSvc --> Cache
+    
+    AdvisorySvc --> NeuronAI
+    AdvisorySvc --> PredictionSvc
+    
+    Calculators --> StatGainCalc[StatGainCalculator]
+    Calculators --> BonusCalc[SupportBonusCalculator]
+    Calculators --> RiskCalc[RiskCalculator]
+    Calculators --> HintCalc[SkillHintCalculator]
 ```
-FUNCTION calculateStatGains(character, trainingFacility, supportCards)
-    
-    // Step 1: Base stat gain (facility dependent)
-    baseStat[facility] = TRAINING_BASE_STATS[facility]  // 20-60 range
-    
-    // Step 2: Character modifiers
-    characterMod = 1.0
-    characterMod *= (1 + character.growthRate[facility] / 100)
-    
-    // Step 3: Support card bonuses
-    supportBonus = 0
-    FOR EACH card IN supportCards:
-        IF card.providesBonus(facility):
-            supportBonus += card.bonusValue
-            
-            // Check for friendship training (bond >= 80%)
-            IF card.bondLevel >= 80:
-                supportBonus += card.friendshipBonusValue
-                
-            // Check for red exclamation (skill hint guaranteed)
-            IF card.hasRedExclamation:
-                skillHintGuaranteed = TRUE
-    
-    // Step 4: Facility level multiplier (Unity Cup specific)
-    facilityMult = FACILITY_MULTIPLIERS[character.facilityLevel]  // 1.0x to 2.0x
-    
-    // Step 5: Final calculation
-    FOR EACH stat IN [Speed, Stamina, Power, Guts, Wit]:
-        statGain[stat] = (
-            baseStat[facility] + 
-            supportBonus * characterMod * 
-            facilityMult
-        )
-        
-        // Round to nearest integer
-        statGain[stat] = ROUND(statGain[stat])
-    
-    RETURN statGain
 
-END FUNCTION
-```
+### 2.2 Layer Responsibilities
 
-### 2.2 Support Card Bonus Matrix
+**Presentation Layer**:
 
-**Support Card Specializations**:
+- HTTP request/response handling
+- Training action validation
+- Real-time prediction updates via Livewire
+
+**Application Layer**:
+
+- Training workflow orchestration
+- Prediction generation and caching
+- AI advisory coordination
+
+**Domain Layer**:
+
+- Training business rules
+- Calculation algorithms
+- Data transfer objects
+
+**Infrastructure Layer**:
+
+- Database persistence
+- Cache management
+- AI service integration
+
+### 2.3 Design Patterns
+
+| Pattern | Implementation | Purpose |
+|---------|---------------|---------|
+| **Strategy** | Calculator interfaces | Pluggable calculation algorithms |
+| **DTO** | `TrainingPrediction` | Immutable prediction data |
+| **Repository** | `TrainingSessionRepository` | Data access abstraction |
+| **Service Layer** | `TrainingService` | Business logic encapsulation |
+| **Cache-Aside** | Redis predictions | Performance optimization |
+| **Chain of Responsibility** | Risk calculators | Modular risk assessment |
+
+---
+
+## 3. Calculation Engines
+
+### 3.1 Stat Gain Calculator
+
+The `StatGainCalculator` computes raw stat increases based on facility type, character
+growth rates, facility level, and current training conditions.
 
 ```php
-const SUPPORT_CARD_BONUSES = [
-    'Speed' => [
-        'base_bonus' => 8,
-        'friendship_bonus' => 3,
-        'level_factors' => [0, 1, 2, 3, 4],  // per limit break
-        'red_exclamation_chance' => 0.25,
-    ],
-    'Stamina' => [
-        'base_bonus' => 7,
-        'friendship_bonus' => 2,
-        'level_factors' => [0, 1, 2, 3, 4],
-        'red_exclamation_chance' => 0.20,
-    ],
-    // ... other stats
-];
-```
+<?php
 
-**Meta Tier Support Cards**:
+namespace App\Services\Training\Calculators;
 
-```php
-const META_TIER_RANKINGS = [
-    'SS' => [
-        'Kitasan Black (Power, Speed)' => 'Universal tank, exceptional survival',
-        'Narita Brian (Speed, Wit)' => 'Late game specialist, skill focused',
-        'Symboli Rudolf (Stamina, Guts)' => 'Endurance powerhouse',
-    ],
-    'S' => [
-        // 15-20 cards with 80%+ effectiveness
-    ],
-    'A' => [
-        // 25-30 cards with 60-80% effectiveness
-    ],
-];
-```
+use App\Models\Character;
+use App\Enums\TrainingType;
+use App\ValueObjects\StatCollection;
 
-### 2.3 Friendship Training Mechanics
-
-Friendship training is unlocked at 80% bond level:
-
-```php
-class FriendshipTrainingCalculation
+/**
+ * Stat Gain Calculator
+ * 
+ * Calculates base stat gains for training facilities.
+ */
+class StatGainCalculator
 {
-    const BOND_THRESHOLD = 80;  // 80% = bond level max
-    
-    public function calculateBonus(int $bondLevel, int $participantCount): int
-    {
-        if ($bondLevel < self::BOND_THRESHOLD) {
-            return 0;  // Not eligible
-        }
-        
-        // Participant effects
-        // 2 participants: +2 stat bonus
-        // 3 participants: +3 stat bonus
-        // (Single training facility dedicated to that stat)
-        
-        $participantBonus = $participantCount - 1;  // -1 for the trainee
-        
-        return $participantBonus;
-    }
-    
     /**
-     * Example:
-     * - Character training Speed with Kitasan (80% bond) and another support card
-     * - Speed facility with 3 participants (trainee + 2 support card owners)
-     * - Result: Speed gain +2 bonus
+     * Base stat gains per training type
      */
-}
-```
+    private const FACILITY_BASE_GAINS = [
+        'speed' => ['speed' => 10, 'power' => 5],
+        'stamina' => ['stamina' => 10, 'guts' => 5],
+        'power' => ['power' => 10, 'stamina' => 5],
+        'guts' => ['guts' => 10, 'speed' => 5],
+        'wisdom' => ['wit' => 10, 'speed' => 2],
+    ];
 
-### 2.4 Training Option Ranking Algorithm
+    /**
+     * Facility level multipliers (Level 1-5)
+     */
+    private const LEVEL_MULTIPLIERS = [
+        1 => 1.0,
+        2 => 1.1,
+        3 => 1.2,
+        4 => 1.3,
+        5 => 1.5,
+    ];
 
-```php
-class TrainingRankingEngine
-{
-    public function rankTrainingOptions(
+    /**
+     * Calculate base stat gains
+     * 
+     * @param TrainingType $type Training facility type
+     * @param Character $character Character instance
+     * @param int $facilityLevel Facility level (1-5)
+     * @return StatCollection
+     */
+    public function calculateBase(
+        TrainingType $type,
         Character $character,
-        array $availableTrainings,
-        TrainingGoals $goals
-    ): array {
+        int $facilityLevel = 1
+    ): StatCollection {
+        $baseGains = self::FACILITY_BASE_GAINS[$type->value] ?? [];
+        $growthRates = $character->growth_rates;
         
-        $rankedOptions = [];
+        // Apply facility level multiplier
+        $levelMultiplier = self::LEVEL_MULTIPLIERS[$facilityLevel] ?? 1.0;
+
+        $gains = [];
         
-        foreach ($availableTrainings as $training) {
-            $score = 0;
+        foreach ($baseGains as $stat => $baseValue) {
+            // Apply growth rate bonus (e.g., 20% = 1.20x)
+            $growthBonus = 1 + (($growthRates[$stat] ?? 0) / 100);
             
-            // Component 1: Goal Alignment (0-40 points)
-            $goalAlignment = $this->calculateGoalAlignment(
-                $training->predictedStatGains,
-                $goals
-            );
-            $score += $goalAlignment * 40;
+            // Calculate final gain
+            $finalGain = $baseValue * $levelMultiplier * $growthBonus;
             
-            // Component 2: Stat Efficiency (0-30 points)
-            $efficiency = $this->calculateStatEfficiency(
-                $training->totalPredictedGain,
-                $training->facility->type
-            );
-            $score += $efficiency * 30;
-            
-            // Component 3: Scenario-Specific Bonus (0-20 points)
-            $scenarioBonus = $this->calculateScenarioBonus(
-                $training,
-                $character->scenario
-            );
-            $score += $scenarioBonus * 20;
-            
-            // Component 4: Skill Hint Probability (0-10 points)
-            $skillHintProb = $training->skillHintProbability ?? 0;
-            $score += $skillHintProb * 10;
-            
-            $rankedOptions[] = [
-                'training' => $training,
-                'score' => $score,
-                'components' => [
-                    'goal_alignment' => $goalAlignment * 40,
-                    'efficiency' => $efficiency * 30,
-                    'scenario_bonus' => $scenarioBonus * 20,
-                    'skill_hint' => $skillHintProb * 10,
-                ]
-            ];
+            $gains[$stat] = (int) round($finalGain);
         }
-        
-        // Sort by score (highest first)
-        usort($rankedOptions, fn($a, $b) => $b['score'] <=> $a['score']);
-        
-        return $rankedOptions;
+
+        return new StatCollection($gains);
     }
-    
-    private function calculateGoalAlignment(array $gains, TrainingGoals $goals): float
-    {
-        $alignment = 0;
-        
-        foreach ($goals->activeGoals as $goal) {
-            if (isset($gains[$goal->stat_type])) {
-                $alignment += $gains[$goal->stat_type] / $goal->remainingValue;
-            }
-        }
-        
-        return min(1.0, $alignment);  // Normalize to 0-1
-    }
-}
-```
 
----
-
-## 3. Support Card Integration
-
-### 3.1 Support Card Management
-
-```php
-class SupportCard extends Model
-{
-    protected $fillable = [
-        'character_id',
-        'card_id',
-        'card_name',
-        'rarity',        // SSR, SR, R
-        'limit_breaks',  // 0-4 (stars)
-        'specialization', // Speed, Power, Stamina, Guts, Wit, Pal
-        'bond_level',    // 0-100 (0% to 100%)
-        'training_bonus',
-        'skill_hints_provided',
-        'event_skills',
-        'career_skills',
-    ];
-    
-    public function getTrainingBonus(string $facility): int
-    {
-        // Base bonus from specialization + limit break bonuses
-        $baseBonus = self::BONUS_VALUES[$this->specialization];
-        $limitBreakBonus = $this->limit_breaks * 2;
-        
-        return $baseBonus + $limitBreakBonus;
-    }
-    
-    public function isFriendshipTrainingAvailable(): bool
-    {
-        return $this->bond_level >= 80;
-    }
-    
-    public function hasRedExclamation(): bool
-    {
-        // Determined by support card type and rarity
-        return in_array($this->card_id, self::RED_EXCLAMATION_CARDS);
-    }
-}
-```
-
-### 3.2 Support Deck Configuration
-
-```php
-class SupportDeck extends Model
-{
-    protected $fillable = [
-        'character_id',
-        'support_cards',  // JSON array of 6 card configurations
-    ];
-    
-    const DECK_SIZE = 6;  // Exactly 6 cards: 5 owned + 1 borrowed
-    
-    public function validateDeckComposition(): bool
-    {
-        // Verify exactly 6 cards
-        if (count($this->support_cards) !== self::DECK_SIZE) {
-            return false;
-        }
-        
-        // Verify stat type distribution
-        $types = array_map(fn($card) => $card['specialization'], $this->support_cards);
-        
-        // Ideal distribution: variety across all 5 stats
-        // Acceptable: some concentration on target stats
-        
-        return true;
-    }
-    
-    public function getTotalBonus(string $facility): int
-    {
-        $total = 0;
-        
-        foreach ($this->support_cards as $card) {
-            if ($card['specialization'] === $facility || $card['specialization'] === 'Pal') {
-                $total += $card['bonus'];
-            }
-        }
-        
-        return $total;
-    }
-}
-```
-
-### 3.3 Skill Hint Tracking
-
-```php
-class SkillHint extends Model
-{
-    protected $fillable = [
-        'character_id',
-        'skill_id',
-        'support_card_id',
-        'hint_count',      // Number of hints acquired
-        'total_sp_saved',  // Total SP cost reduction
-        'acquired_at',
-    ];
-    
-    const HINT_VALUES = [1, 2, 3, 4];  // Hint counts
-    const SP_DISCOUNT_PER_HINT = 20;   // 20% per hint
-    const MAX_DISCOUNT = 40;            // 40% maximum (2 hints)
-    
-    public function calculateFinalSkillCost(int $baseCost): int
-    {
-        $discountPercentage = min(
-            $this->hint_count * self::SP_DISCOUNT_PER_HINT,
-            self::MAX_DISCOUNT
-        );
-        
-        $discount = (int)($baseCost * $discountPercentage / 100);
-        
-        return $baseCost - $discount;
-    }
-}
-```
-
----
-
-## 4. Scenario-Specific Mechanics
-
-### 4.1 URA Finale Mechanics
-
-**Focus**: Individual character stat optimization
-
-```php
-class URAFinaleService
-{
-    public function predictTrainingOptions(Character $character, SupportDeck $deck): array
-    {
-        $predictions = [];
-        
-        // URA Finale has 5 main training facilities
-        // Speed, Stamina, Power, Guts, Wit
-        
-        $facilities = ['Speed', 'Stamina', 'Power', 'Guts', 'Wit'];
-        
-        foreach ($facilities as $facility) {
-            // Calculate stat gains with support card bonuses
-            $gains = $this->calculateStatGains(
-                $character,
-                $facility,
-                $deck->getCardsForFacility($facility)
-            );
-            
-            // Check for skill hints
-            $skillHints = $this->identifySkillHints(
-                $deck->getCardsForFacility($facility)
-            );
-            
-            // Probability of mood/condition changes
-            $moodChange = $this->predictMoodChange($character, $facility);
-            
-            $predictions[] = [
-                'facility' => $facility,
-                'stat_gains' => $gains,
-                'total_gain' => array_sum($gains),
-                'skill_hints' => $skillHints,
-                'mood_change' => $moodChange,
-                'energy_cost' => 20,  // Standard training costs 20% energy
-            ];
-        }
-        
-        return $predictions;
-    }
-    
-    public function identifySkillHints(array $facilitySupportCards): array
-    {
-        $hints = [];
-        
-        foreach ($facilitySupportCards as $card) {
-            // Each card provides specific skills during training
-            if ($card->hasRedExclamation()) {
-                $hints[] = [
-                    'skill_name' => $card->getGuaranteedSkill(),
-                    'probability' => 1.0,  // 100% guaranteed
-                    'support_card' => $card->name,
-                ];
-            } else {
-                // Normal skill hint chances based on training outcomes
-                foreach ($card->providedSkills as $skill) {
-                    $hints[] = [
-                        'skill_name' => $skill,
-                        'probability' => 0.25,  // ~25% chance
-                        'support_card' => $card->name,
-                    ];
-                }
-            }
-        }
-        
-        return $hints;
-    }
-}
-```
-
-### 4.2 Unity Cup Mechanics
-
-**Focus**: Team synergy and Spirit Burst optimization
-
-```php
-class UnityEupService
-{
-    public function predictTrainingOptions(
+    /**
+     * Calculate gains with all modifiers applied
+     * 
+     * @param TrainingType $type
+     * @param Character $character
+     * @param int $facilityLevel
+     * @param float $moodMultiplier
+     * @param float $supportMultiplier
+     * @return StatCollection
+     */
+    public function calculateWithModifiers(
+        TrainingType $type,
         Character $character,
-        array $teamMembers,
-        int $spiritBurstGauge
-    ): array {
+        int $facilityLevel,
+        float $moodMultiplier,
+        float $supportMultiplier
+    ): StatCollection {
+        $baseGains = $this->calculateBase($type, $character, $facilityLevel);
         
-        $predictions = [];
+        $modifiedGains = [];
         
-        // Unity Cup considerations:
-        // 1. Team stat distribution (need balanced team)
-        // 2. Distance specialization (Sprint/Mile/Medium/Long teams)
-        // 3. Spirit Burst filling (4 training = full gauge)
-        // 4. Facility level bonuses (1.0x to 2.0x based on team rank)
-        
-        foreach ($this->getAvailableFacilities() as $facility) {
-            $gains = $this->calculateStatGains(
-                $character,
-                $facility,
-                $this->getSupportDeck($character)
-            );
-            
-            // Add Spirit Burst bonus if available
-            $spiritBurstBonus = $this->calculateSpiritBurstBonus(
-                $facility,
-                $spiritBurstGauge
-            );
-            
-            // Team synergy bonus for balanced training
-            $teamSynergyBonus = $this->calculateTeamSynergyBonus(
-                $character,
-                $facility,
-                $teamMembers
-            );
-            
-            // Facility level multiplier
-            $facilityMultiplier = FACILITY_MULTIPLIERS[$character->facilityLevel];
-            
-            // Apply all multipliers
-            $finalGains = array_map(
-                fn($gain) => (int)($gain * (1 + $spiritBurstBonus) * (1 + $teamSynergyBonus) * $facilityMultiplier),
-                $gains
-            );
-            
-            $predictions[] = [
-                'facility' => $facility,
-                'stat_gains' => $finalGains,
-                'spirit_burst_potential' => $this->calculateSpiritBurstFilling($facility),
-                'team_synergy_bonus' => $teamSynergyBonus,
-                'facility_level_boost' => $facilityMultiplier,
-            ];
+        foreach ($baseGains->toArray() as $stat => $value) {
+            $modified = $value * $moodMultiplier * $supportMultiplier;
+            $modifiedGains[$stat] = (int) round($modified);
         }
         
-        return $predictions;
+        return new StatCollection($modifiedGains);
     }
-    
-    private function calculateSpiritBurstFilling(string $facility): array
-    {
-        // 4 training sessions fill the Spirit Burst gauge
-        // Full meter grants large stat bonuses + random skill hints
+}
+```
+
+### 3.2 Support Bonus Calculator
+
+Aggregates bonuses from support cards present at a training facility.
+
+```php
+<?php
+
+namespace App\Services\Training\Calculators;
+
+use App\Models\CareerRun;
+use App\Models\SupportDeck;
+use App\Enums\TrainingType;
+
+/**
+ * Support Bonus Calculator
+ * 
+ * Calculates stat bonuses from support cards at training facilities.
+ */
+class SupportBonusCalculator
+{
+    /**
+     * Friendship training bond threshold
+     */
+    private const FRIENDSHIP_THRESHOLD = 80;
+
+    /**
+     * Friendship training multiplier
+     */
+    private const FRIENDSHIP_MULTIPLIER = 1.2;
+
+    /**
+     * Calculate total support bonuses for a facility
+     * 
+     * @param CareerRun $career
+     * @param TrainingType $type
+     * @param array $cardsAtFacility Card IDs present at facility
+     * @return array{multiplier: float, is_friendship: bool, cards: array}
+     */
+    public function calculate(
+        CareerRun $career,
+        TrainingType $type,
+        array $cardsAtFacility
+    ): array {
+        $deck = $career->supportDeck;
         
+        if (!$deck) {
+            return [
+                'multiplier' => 1.0,
+                'is_friendship' => false,
+                'cards' => [],
+            ];
+        }
+
+        $totalBonus = 0;
+        $isFriendship = false;
+        $activeCards = [];
+
+        foreach ($cardsAtFacility as $cardId) {
+            $card = $deck->cards()->find($cardId);
+            
+            if (!$card) {
+                continue;
+            }
+
+            $bondLevel = $card->pivot->bond_level ?? 0;
+            
+            // Get base bonus for this card's specialization
+            $baseBonus = $this->getCardBonus($card, $type);
+            $totalBonus += $baseBonus;
+
+            // Check for friendship training
+            if ($bondLevel >= self::FRIENDSHIP_THRESHOLD) {
+                $isFriendship = true;
+            }
+
+            $activeCards[] = [
+                'id' => $card->id,
+                'name' => $card->name,
+                'bond_level' => $bondLevel,
+                'bonus' => $baseBonus,
+            ];
+        }
+
+        // Convert bonus percentage to multiplier
+        $multiplier = 1.0 + ($totalBonus / 100);
+
+        // Apply friendship multiplier if triggered
+        if ($isFriendship) {
+            $multiplier *= self::FRIENDSHIP_MULTIPLIER;
+        }
+
         return [
-            'training_count_needed' => 4,
-            'bonus_stats' => [10, 10, 10, 10, 10],  // +10 to all stats
-            'skill_hint_guarantee' => true,
+            'multiplier' => $multiplier,
+            'is_friendship' => $isFriendship,
+            'cards' => $activeCards,
         ];
+    }
+
+    /**
+     * Get bonus value for a specific card and training type
+     * 
+     * @param \App\Models\SupportCard $card
+     * @param TrainingType $type
+     * @return int
+     */
+    private function getCardBonus($card, TrainingType $type): int
+    {
+        // Match card specialization to training type
+        if (strtolower($card->specialization) === $type->value) {
+            // Base bonus for matching specialization
+            $baseBonus = match ($card->rarity) {
+                'SSR' => 10,
+                'SR' => 7,
+                'R' => 5,
+                default => 3,
+            };
+
+            // Apply limit break multiplier
+            $limitBreakBonus = $card->limit_breaks * 2;
+
+            return $baseBonus + $limitBreakBonus;
+        }
+
+        return 0;
+    }
+}
+```
+
+### 3.3 Risk Calculator
+
+Determines failure probability based on energy, mood, and training type.
+
+```php
+<?php
+
+namespace App\Services\Training\Calculators;
+
+use App\Models\Character;
+use App\Enums\TrainingType;
+use App\Enums\MoodStatus;
+
+/**
+ * Training Risk Calculator
+ * 
+ * Calculates failure probability for training actions.
+ */
+class RiskCalculator
+{
+    /**
+     * Calculate training failure risk
+     * 
+     * @param Character $character
+     * @param TrainingType $type
+     * @return array{risk: float, factors: array}
+     */
+    public function calculate(Character $character, TrainingType $type): array
+    {
+        $baseRisk = $this->calculateBaseRisk($character->energy_level);
+        $moodModifier = $this->getMoodModifier($character->mood_status);
+        $typeModifier = $this->getTrainingTypeModifier($type);
+        
+        // Combine risk factors
+        $totalRisk = ($baseRisk + $moodModifier + $typeModifier);
+        
+        // Clamp to valid range (0-100%)
+        $totalRisk = max(0, min(100, $totalRisk));
+
+        return [
+            'risk' => $totalRisk,
+            'factors' => [
+                'energy_risk' => $baseRisk,
+                'mood_modifier' => $moodModifier,
+                'type_modifier' => $typeModifier,
+            ],
+        ];
+    }
+
+    /**
+     * Calculate base risk from energy level
+     * 
+     * Energy > 50: 0% risk
+     * Energy 30-50: Linear 0% -> 15%
+     * Energy < 30: Exponential 15% -> 70%
+     * 
+     * @param int $energy Energy level (0-100)
+     * @return float
+     */
+    private function calculateBaseRisk(int $energy): float
+    {
+        if ($energy > 50) {
+            return 0.0;
+        }
+
+        if ($energy >= 30) {
+            // Linear interpolation from 0% at 50 to 15% at 30
+            return 15 * (50 - $energy) / 20;
+        }
+
+        // Exponential growth below 30
+        // Formula: 15 + 55 * ((30 - energy) / 30)^2
+        $factor = (30 - $energy) / 30;
+        return 15 + (55 * pow($factor, 2));
+    }
+
+    /**
+     * Get mood modifier for risk
+     * 
+     * @param MoodStatus $mood
+     * @return float
+     */
+    private function getMoodModifier(MoodStatus $mood): float
+    {
+        return match ($mood) {
+            MoodStatus::Awful => 10.0,
+            MoodStatus::Bad => 5.0,
+            MoodStatus::Normal => 0.0,
+            MoodStatus::Good => -2.0,
+            MoodStatus::Great => -5.0,
+        };
+    }
+
+    /**
+     * Get training type modifier
+     * 
+     * @param TrainingType $type
+     * @return float
+     */
+    private function getTrainingTypeModifier(TrainingType $type): float
+    {
+        return match ($type) {
+            TrainingType::Wisdom => -5.0, // Wisdom has lower risk
+            TrainingType::Rest => -100.0, // Rest has no risk
+            default => 0.0,
+        };
+    }
+
+    /**
+     * Resolve training outcome based on risk
+     * 
+     * @param float $riskPercentage
+     * @return bool True if successful, false if failed
+     */
+    public function resolveOutcome(float $riskPercentage): bool
+    {
+        $roll = mt_rand(1, 10000) / 100; // Random 0.00-100.00
+        
+        return $roll > $riskPercentage;
+    }
+}
+```
+
+### 3.4 Skill Hint Calculator
+
+Calculates probability of receiving skill hints from support cards.
+
+```php
+<?php
+
+namespace App\Services\Training\Calculators;
+
+use App\Models\CareerRun;
+use App\Models\SupportCard;
+
+/**
+ * Skill Hint Probability Calculator
+ * 
+ * Calculates chances of receiving skill hints during training.
+ */
+class SkillHintCalculator
+{
+    /**
+     * Calculate skill hint probability
+     * 
+     * @param CareerRun $career
+     * @param array $cardsAtFacility
+     * @return array{hints: array, probability: float}
+     */
+    public function calculate(CareerRun $career, array $cardsAtFacility): array
+    {
+        $deck = $career->supportDeck;
+        
+        if (!$deck) {
+            return ['hints' => [], 'probability' => 0.0];
+        }
+
+        $possibleHints = [];
+        $totalProbability = 0;
+
+        foreach ($cardsAtFacility as $cardId) {
+            $card = $deck->cards()->find($cardId);
+            
+            if (!$card) {
+                continue;
+            }
+
+            $hintRate = $card->hint_rate ?? 10; // Base 10%
+            $bondBonus = ($card->pivot->bond_level ?? 0) / 10; // +1% per 10 bond
+            
+            $finalRate = min(50, $hintRate + $bondBonus); // Cap at 50%
+
+            // Get skills this card can hint
+            $skills = $this->getCardSkills($card, $career);
+
+            foreach ($skills as $skill) {
+                $possibleHints[] = [
+                    'skill_id' => $skill['id'],
+                    'skill_name' => $skill['name'],
+                    'probability' => $finalRate,
+                    'source_card' => $card->name,
+                ];
+
+                $totalProbability = max($totalProbability, $finalRate);
+            }
+        }
+
+        return [
+            'hints' => $possibleHints,
+            'probability' => $totalProbability,
+        ];
+    }
+
+    /**
+     * Get skills a card can provide hints for
+     * 
+     * @param SupportCard $card
+     * @param CareerRun $career
+     * @return array
+     */
+    private function getCardSkills(SupportCard $card, CareerRun $career): array
+    {
+        // Get skills from card metadata
+        $cardSkills = $card->skills_provided ?? [];
+        
+        // Filter out skills already owned by character
+        $ownedSkills = $career->character->skills->pluck('id')->toArray();
+        
+        return collect($cardSkills)
+            ->reject(fn($skill) => in_array($skill['id'], $ownedSkills))
+            ->values()
+            ->toArray();
+    }
+}
+```
+
+---
+
+## 4. Service Layer
+
+### 4.1 TrainingPredictionService
+
+Generates forecast data for all training options for the current turn.
+
+```php
+<?php
+
+namespace App\Services\Training;
+
+use App\Models\CareerRun;
+use App\DTOs\TrainingPrediction;
+use App\Enums\TrainingType;
+use App\Services\Training\Calculators\{
+    StatGainCalculator,
+    SupportBonusCalculator,
+    RiskCalculator,
+    SkillHintCalculator
+};
+use Illuminate\Support\Facades\Cache;
+
+/**
+ * Training Prediction Service
+ * 
+ * Generates predictions for all available training options.
+ */
+class TrainingPredictionService
+{
+    public function __construct(
+        private StatGainCalculator $statCalc,
+        private SupportBonusCalculator $bonusCalc,
+        private RiskCalculator $riskCalc,
+        private SkillHintCalculator $hintCalc
+    ) {}
+
+    /**
+     * Get predictions for all training options
+     * 
+     * @param CareerRun $career
+     * @return array<TrainingPrediction>
+     */
+    public function getPredictions(CareerRun $career): array
+    {
+        $cacheKey = "training:predictions:{$career->id}:{$career->current_turn}";
+
+        return Cache::tags(['training', "career:{$career->id}"])->remember(
+            $cacheKey,
+            now()->addMinutes(5),
+            fn() => $this->generatePredictions($career)
+        );
+    }
+
+    /**
+     * Generate fresh predictions
+     * 
+     * @param CareerRun $career
+     * @return array<TrainingPrediction>
+     */
+    private function generatePredictions(CareerRun $career): array
+    {
+        $character = $career->character;
+        $predictions = [];
+
+        // Generate predictions for each training type
+        foreach (TrainingType::cases() as $type) {
+            if ($type === TrainingType::Rest) {
+                $predictions[] = $this->predictRest($character);
+                continue;
+            }
+
+            $predictions[] = $this->predictTraining($career, $type);
+        }
+
+        // Sort by recommendation score
+        usort($predictions, fn($a, $b) => $b->score <=> $a->score);
+
+        return $predictions;
+    }
+
+    /**
+     * Predict training outcome
+     * 
+     * @param CareerRun $career
+     * @param TrainingType $type
+     * @return TrainingPrediction
+     */
+    private function predictTraining(CareerRun $career, TrainingType $type): TrainingPrediction
+    {
+        $character = $career->character;
+        
+        // Simulate card distribution (in real scenario, this comes from game state)
+        $cardsAtFacility = $this->getCardsAtFacility($career, $type);
+
+        // Calculate support bonuses
+        $supportData = $this->bonusCalc->calculate($career, $type, $cardsAtFacility);
+
+        // Calculate stat gains
+        $gains = $this->statCalc->calculateWithModifiers(
+            $type,
+            $character,
+            $career->facility_levels[$type->value] ?? 1,
+            $character->mood_status->getMultiplier(),
+            $supportData['multiplier']
+        );
+
+        // Calculate risk
+        $riskData = $this->riskCalc->calculate($character, $type);
+
+        // Calculate skill hints
+        $hintData = $this->hintCalc->calculate($career, $cardsAtFacility);
+
+        // Calculate energy cost
+        $energyCost = $this->calculateEnergyCost($type, $supportData['is_friendship']);
+
+        // Calculate recommendation score
+        $score = $this->calculateScore($gains, $riskData['risk'], $energyCost, $career);
+
+        return new TrainingPrediction(
+            type: $type->value,
+            gains: $gains->toArray(),
+            energyCost: $energyCost,
+            risk: $riskData['risk'],
+            riskFactors: $riskData['factors'],
+            hints: $hintData['hints'],
+            hintProbability: $hintData['probability'],
+            supportCards: $supportData['cards'],
+            isFriendship: $supportData['is_friendship'],
+            bondGains: $this->calculateBondGains($supportData['cards']),
+            score: $score
+        );
+    }
+
+    /**
+     * Predict rest outcome
+     * 
+     * @param \App\Models\Character $character
+     * @return TrainingPrediction
+     */
+    private function predictRest($character): TrainingPrediction
+    {
+        $energyGain = 50;
+        
+        // Bonus energy in good mood
+        if (in_array($character->mood_status, [MoodStatus::Good, MoodStatus::Great])) {
+            $energyGain += 10;
+        }
+
+        return new TrainingPrediction(
+            type: 'rest',
+            gains: [],
+            energyCost: -$energyGain,
+            risk: 0,
+            riskFactors: [],
+            hints: [],
+            hintProbability: 0,
+            supportCards: [],
+            isFriendship: false,
+            bondGains: [],
+            score: $this->calculateRestScore($character, $energyGain)
+        );
+    }
+
+    /**
+     * Calculate energy cost for training
+     * 
+     * @param TrainingType $type
+     * @param bool $isFriendship
+     * @return int
+     */
+    private function calculateEnergyCost(TrainingType $type, bool $isFriendship): int
+    {
+        $baseCost = match ($type) {
+            TrainingType::Speed => 20,
+            TrainingType::Stamina => 22,
+            TrainingType::Power => 24,
+            TrainingType::Guts => 18,
+            TrainingType::Wisdom => 15,
+            default => 0,
+        };
+
+        // Friendship training reduces cost
+        if ($isFriendship) {
+            $baseCost = (int) ($baseCost * 0.8);
+        }
+
+        return $baseCost;
+    }
+
+    /**
+     * Calculate bond gains for active cards
+     * 
+     * @param array $cards
+     * @return array
+     */
+    private function calculateBondGains(array $cards): array
+    {
+        return array_map(function ($card) {
+            $baseGain = 5;
+            
+            // Higher gains for lower bond levels
+            if ($card['bond_level'] < 50) {
+                $baseGain = 7;
+            }
+
+            return [
+                'card_id' => $card['id'],
+                'gain' => $baseGain,
+            ];
+        }, $cards);
+    }
+
+    /**
+     * Calculate recommendation score
+     * 
+     * @param StatCollection $gains
+     * @param float $risk
+     * @param int $energyCost
+     * @param CareerRun $career
+     * @return int
+     */
+    private function calculateScore(
+        $gains,
+        float $risk,
+        int $energyCost,
+        CareerRun $career
+    ): int {
+        $score = 0;
+
+        // Stat gain value
+        foreach ($gains->toArray() as $stat => $value) {
+            $score += $value * $this->getStatPriority($stat, $career);
+        }
+
+        // Risk penalty
+        $score -= (int) ($risk * 2);
+
+        // Energy efficiency
+        if ($energyCost > 0) {
+            $score -= (int) ($energyCost * 0.5);
+        }
+
+        return max(0, $score);
+    }
+
+    /**
+     * Get stat priority based on career goals
+     * 
+     * @param string $stat
+     * @param CareerRun $career
+     * @return float
+     */
+    private function getStatPriority(string $stat, CareerRun $career): float
+    {
+        $goals = $career->character->goals ?? [];
+        
+        foreach ($goals as $goal) {
+            if ($goal['type'] === 'stat' && $goal['target'] === $stat) {
+                return 1.5; // Prioritize goal stats
+            }
+        }
+
+        return 1.0;
+    }
+
+    /**
+     * Calculate rest recommendation score
+     * 
+     * @param \App\Models\Character $character
+     * @param int $energyGain
+     * @return int
+     */
+    private function calculateRestScore($character, int $energyGain): int
+    {
+        // Rest is highly recommended when energy is low
+        if ($character->energy_level < 30) {
+            return 90;
+        }
+
+        if ($character->energy_level < 50) {
+            return 60;
+        }
+
+        return 30;
+    }
+
+    /**
+     * Get cards present at facility (simulation)
+     * 
+     * @param CareerRun $career
+     * @param TrainingType $type
+     * @return array
+     */
+    private function getCardsAtFacility(CareerRun $career, TrainingType $type): array
+    {
+        $deck = $career->supportDeck;
+        
+        if (!$deck) {
+            return [];
+        }
+
+        // Filter cards by specialization matching training type
+        return $deck->cards()
+            ->where('specialization', ucfirst($type->value))
+            ->pluck('id')
+            ->toArray();
+    }
+}
+```
+
+### 4.2 TrainingService
+
+Handles execution of training actions with validation and persistence.
+
+```php
+<?php
+
+namespace App\Services\Training;
+
+use App\Models\{CareerRun, TrainingSession};
+use App\DTOs\TrainingResult;
+use App\Enums\TrainingType;
+use App\Services\Training\Calculators\RiskCalculator;
+use App\Events\TrainingCompleted;
+use Illuminate\Support\Facades\{DB, Cache};
+
+/**
+ * Training Execution Service
+ * 
+ * Handles training action execution and state updates.
+ */
+class TrainingService
+{
+    public function __construct(
+        private TrainingPredictionService $predictionService,
+        private RiskCalculator $riskCalc
+    ) {}
+
+    /**
+     * Execute training action
+     * 
+     * @param CareerRun $career
+     * @param string $facilityType
+     * @return TrainingResult
+     * @throws \App\Exceptions\InvalidTrainingException
+     */
+    public function executeTraining(CareerRun $career, string $facilityType): TrainingResult
+    {
+        return DB::transaction(function () use ($career, $facilityType) {
+            // Validate turn limit
+            $this->validateTurnLimit($career);
+
+            // Get prediction
+            $predictions = $this->predictionService->getPredictions($career);
+            $prediction = collect($predictions)->firstWhere('type', $facilityType);
+
+            if (!$prediction) {
+                throw new \App\Exceptions\InvalidTrainingException(
+                    "Invalid training type: {$facilityType}"
+                );
+            }
+
+            // Resolve RNG for success/failure
+            $isSuccess = $this->riskCalc->resolveOutcome($prediction->risk);
+
+            // Apply results
+            if ($isSuccess) {
+                $result = $this->applySuccess($career, $prediction);
+            } else {
+                $result = $this->applyFailure($career, $prediction);
+            }
+
+            // Create training session record
+            $session = $this->createSession($career, $prediction, $result);
+
+            // Update career state
+            $this->updateCareerState($career, $result);
+
+            // Invalidate cache
+            Cache::tags(["career:{$career->id}"])->flush();
+
+            // Fire event
+            event(new TrainingCompleted($career, $session));
+
+            return $result;
+        });
+    }
+
+    /**
+     * Validate turn limit
+     * 
+     * @param CareerRun $career
+     * @return void
+     * @throws \App\Exceptions\InvalidTrainingException
+     */
+    private function validateTurnLimit(CareerRun $career): void
+    {
+        if ($career->current_turn >= $career->max_turns) {
+            throw new \App\Exceptions\InvalidTrainingException(
+                'Career run has reached maximum turns'
+            );
+        }
+    }
+
+    /**
+     * Apply successful training results
+     * 
+     * @param CareerRun $career
+     * @param TrainingPrediction $prediction
+     * @return TrainingResult
+     */
+    private function applySuccess(CareerRun $career, $prediction): TrainingResult
+    {
+        $character = $career->character;
+
+        // Apply stat gains
+        foreach ($prediction->gains as $stat => $value) {
+            $character->updateStats([$stat => $value]);
+        }
+
+        // Reduce energy
+        $character->energy_level = $character->clampEnergy(
+            $character->energy_level - $prediction->energyCost
+        );
+
+        // Apply bond gains
+        if ($prediction->bondGains) {
+            $this->applyBondGains($career, $prediction->bondGains);
+        }
+
+        // Roll for skill hints
+        $hintsGained = $this->rollSkillHints($prediction);
+
+        $character->save();
+
+        return new TrainingResult(
+            outcome: 'success',
+            statDeltas: $prediction->gains,
+            energyDelta: -$prediction->energyCost,
+            bondGains: $prediction->bondGains,
+            hintsGained: $hintsGained,
+            turn: $career->current_turn + 1
+        );
+    }
+
+    /**
+     * Apply failure penalties
+     * 
+     * @param CareerRun $career
+     * @param TrainingPrediction $prediction
+     * @return TrainingResult
+     */
+    private function applyFailure(CareerRun $career, $prediction): TrainingResult
+    {
+        $character = $career->character;
+
+        // Reduce stats slightly
+        $penalties = [];
+        foreach ($prediction->gains as $stat => $value) {
+            $penalty = (int) ($value * 0.3); // 30% of expected gain
+            $penalties[$stat] = -$penalty;
+            $character->updateStats([$stat => -$penalty]);
+        }
+
+        // Reduce energy more
+        $energyPenalty = (int) ($prediction->energyCost * 1.5);
+        $character->energy_level = $character->clampEnergy(
+            $character->energy_level - $energyPenalty
+        );
+
+        // Mood may drop
+        if ($character->mood_status !== MoodStatus::Awful) {
+            // 30% chance to drop mood
+            if (mt_rand(1, 100) <= 30) {
+                $character->mood_status = match ($character->mood_status) {
+                    MoodStatus::Great => MoodStatus::Good,
+                    MoodStatus::Good => MoodStatus::Normal,
+                    MoodStatus::Normal => MoodStatus::Bad,
+                    MoodStatus::Bad => MoodStatus::Awful,
+                    default => $character->mood_status,
+                };
+            }
+        }
+
+        $character->save();
+
+        return new TrainingResult(
+            outcome: 'failure',
+            statDeltas: $penalties,
+            energyDelta: -$energyPenalty,
+            bondGains: [],
+            hintsGained: [],
+            turn: $career->current_turn + 1
+        );
+    }
+
+    /**
+     * Create training session record
+     * 
+     * @param CareerRun $career
+     * @param TrainingPrediction $prediction
+     * @param TrainingResult $result
+     * @return TrainingSession
+     */
+    private function createSession(
+        CareerRun $career,
+        $prediction,
+        TrainingResult $result
+    ): TrainingSession {
+        return TrainingSession::create([
+            'career_id' => $career->id,
+            'turn_number' => $career->current_turn + 1,
+            'training_type' => $prediction->type,
+            'stat_gains' => $result->statDeltas,
+            'support_bonuses' => $prediction->supportCards,
+            'skill_hints_gained' => $result->hintsGained,
+            'success_rate' => 100 - $prediction->risk,
+            'was_successful' => $result->outcome === 'success',
+            'energy_delta' => $result->energyDelta,
+        ]);
+    }
+
+    /**
+     * Update career run state
+     * 
+     * @param CareerRun $career
+     * @param TrainingResult $result
+     * @return void
+     */
+    private function updateCareerState(CareerRun $career, TrainingResult $result): void
+    {
+        $career->increment('current_turn');
+        $career->save();
+    }
+
+    /**
+     * Apply bond gains to support deck
+     * 
+     * @param CareerRun $career
+     * @param array $bondGains
+     * @return void
+     */
+    private function applyBondGains(CareerRun $career, array $bondGains): void
+    {
+        foreach ($bondGains as $bondGain) {
+            $career->supportDeck->cards()
+                ->updateExistingPivot($bondGain['card_id'], [
+                    'bond_level' => DB::raw("LEAST(100, bond_level + {$bondGain['gain']})")
+                ]);
+        }
+    }
+
+    /**
+     * Roll for skill hints based on probability
+     * 
+     * @param TrainingPrediction $prediction
+     * @return array
+     */
+    private function rollSkillHints($prediction): array
+    {
+        if (empty($prediction->hints)) {
+            return [];
+        }
+
+        $gained = [];
+
+        foreach ($prediction->hints as $hint) {
+            $roll = mt_rand(1, 10000) / 100;
+            
+            if ($roll <= $hint['probability']) {
+                $gained[] = $hint;
+            }
+        }
+
+        return $gained;
     }
 }
 ```
@@ -574,242 +1252,199 @@ class UnityEupService
 
 ## 5. API Specification
 
-### 5.1 Training Prediction Endpoints
+### 5.1 Endpoint Overview
 
-#### 5.1.1 Get Training Options with Predictions
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/api/v1/training/predict` | Get predictions for current turn | Yes |
+| POST | `/api/v1/training/execute` | Execute training action | Yes |
+| GET | `/api/v1/training/history/{career_id}` | Get training history | Yes |
 
-```http
-GET /api/v1/characters/{id}/training-predictions
-Authorization: Bearer {token}
-```
+### 5.2 Get Training Predictions
 
-**Response** (200 OK):
+**Endpoint**: `POST /api/v1/training/predict`
 
-```json
-{
-    "character_id": 1,
-    "current_stats": {
-        "speed": 520,
-        "stamina": 480,
-        "power": 440,
-        "guts": 460,
-        "wit": 450
-    },
-    "available_trainings": [
-        {
-            "facility": "Speed",
-            "rank": 1,
-            "score": 92.5,
-            "predicted_gains": {
-                "speed": 45,
-                "stamina": 5,
-                "power": 3,
-                "guts": 2,
-                "wit": 1,
-                "total": 56
-            },
-            "support_cards": [
-                {
-                    "card_id": 1001,
-                    "name": "Mejiro Dober",
-                    "bonus": 12,
-                    "bond_level": 85,
-                    "friendship_bonus": 3
-                },
-                {
-                    "card_id": 1002,
-                    "name": "Tokai Teio",
-                    "bonus": 8,
-                    "bond_level": 70
-                }
-            ],
-            "skill_hints": [
-                {
-                    "skill_name": "Lane Guidance",
-                    "probability": 1.0,
-                    "source": "Mejiro Dober",
-                    "guaranteed": true
-                },
-                {
-                    "skill_name": "Going Strong",
-                    "probability": 0.25,
-                    "source": "Tokai Teio"
-                }
-            ],
-            "mood_prediction": {
-                "current": "Good",
-                "after_training": "Normal",
-                "change": -1
-            },
-            "energy_cost": 20,
-            "efficiency_rating": "Excellent",
-            "goal_alignment": "High"
-        },
-        {
-            "facility": "Stamina",
-            "rank": 2,
-            "score": 88.3,
-            ...
-        }
-    ],
-    "scenario": "URA",
-    "current_goals": [
-        {
-            "goal_type": "stat",
-            "target_stat": "speed",
-            "target_value": 800,
-            "remaining": 280,
-            "aligned_trainings": ["Speed"]
-        }
-    ]
-}
-```
-
-#### 5.1.2 Get Training Recommendation
+**Request Headers**:
 
 ```http
-GET /api/v1/characters/{id}/training-recommendation
-Authorization: Bearer {token}
-```
-
-**Response** (200 OK):
-
-```json
-{
-    "recommended_facility": "Speed",
-    "reasoning": "Highest alignment with Speed goal (280 remaining). Red exclamation on Mejiro Dober guarantees Lane Guidance skill hint.",
-    "recommendation_details": {
-        "primary_reason": "goal_alignment",
-        "secondary_reason": "skill_hint_opportunity",
-        "confidence": 0.96,
-        "expected_benefit": 56,
-        "estimated_time_to_goal": 5,
-        "turn_number": 150,
-        "days_until_race": 15
-    },
-    "alternative_options": [
-        {
-            "facility": "Stamina",
-            "reasoning": "Secondary goal support",
-            "score": 88.3
-        },
-        {
-            "facility": "Power",
-            "reasoning": "Balanced training",
-            "score": 82.1
-        }
-    ],
-    "warnings": [
-        "Energy at 78% - next training may incur fatigue penalty",
-        "No mood bonuses active - consider rest for mood recovery"
-    ]
-}
-```
-
-### 5.2 Training Session Endpoints
-
-#### 5.2.1 Create Training Session
-
-```http
-POST /api/v1/characters/{id}/training-sessions
 Content-Type: application/json
 Authorization: Bearer {token}
-
-{
-    "facility": "Speed",
-    "actual_mood": "Good",
-    "actual_energy": 78,
-    "skills_acquired": [
-        {
-            "skill_id": 5,
-            "cost": 96,  // 20% discount from hints
-            "hints_used": 1
-        }
-    ]
-}
+Accept: application/json
 ```
 
-**Response** (201 Created):
+**Request Body**:
 
 ```json
 {
-    "id": 1,
-    "character_id": 1,
-    "facility": "Speed",
-    "prediction_accuracy": {
-        "speed_gain_predicted": 45,
-        "speed_gain_actual": 48,
-        "accuracy_percentage": 106.7
-    },
-    "stat_gains": {
-        "speed": 48,
-        "stamina": 6,
-        "power": 2,
-        "guts": 1,
-        "wit": 0,
-        "total": 57
-    },
-    "energy_after": 58,
-    "mood_after": "Normal",
-    "skills_acquired": [
-        {
-            "skill_id": 5,
-            "skill_name": "Going Strong",
-            "base_cost": 120,
-            "final_cost": 96,
-            "sp_saved": 24
-        }
-    ],
-    "conditions_applied": [
-        {
-            "condition": "Practice Poor",
-            "expires_in_turns": 2
-        }
-    ],
-    "character_state_updated": true,
-    "next_race_in": 14,
-    "created_at": "2026-01-14T10:30:00Z"
+    "career_run_id": "uuid-here",
+    "current_turn": 45
 }
 ```
 
-### 5.3 Prediction History Endpoint
-
-#### 5.3.1 Get Prediction Accuracy
-
-```http
-GET /api/v1/characters/{id}/prediction-history
-?limit=20&accuracy=true
-Authorization: Bearer {token}
-```
-
-**Response** (200 OK):
+**Success Response** (200 OK):
 
 ```json
 {
     "data": [
         {
-            "training_session_id": 150,
-            "facility": "Speed",
-            "predicted_gain": 45,
-            "actual_gain": 48,
-            "accuracy": 106.7,
-            "date": "2026-01-13T10:30:00Z"
+            "type": "speed",
+            "gains": {
+                "speed": 42,
+                "power": 12
+            },
+            "energy_cost": 22,
+            "risk": 0,
+            "risk_factors": {
+                "energy_risk": 0,
+                "mood_modifier": 0,
+                "type_modifier": 0
+            },
+            "hints": [
+                {
+                    "skill_id": 101,
+                    "skill_name": "Lane Guidance",
+                    "probability": 15,
+                    "source_card": "Kitasan Black"
+                }
+            ],
+            "hint_probability": 15,
+            "support_cards": [
+                {
+                    "id": 1,
+                    "name": "Kitasan Black",
+                    "bond_level": 85,
+                    "bonus": 12
+                }
+            ],
+            "is_friendship": true,
+            "bond_gains": [
+                {
+                    "card_id": 1,
+                    "gain": 5
+                }
+            ],
+            "score": 95
         },
         {
-            "training_session_id": 149,
-            "facility": "Stamina",
-            "predicted_gain": 42,
-            "actual_gain": 40,
-            "accuracy": 95.2,
-            "date": "2026-01-12T10:30:00Z"
+            "type": "rest",
+            "gains": {},
+            "energy_cost": -50,
+            "risk": 0,
+            "risk_factors": {},
+            "hints": [],
+            "hint_probability": 0,
+            "support_cards": [],
+            "is_friendship": false,
+            "bond_gains": [],
+            "score": 40
         }
     ],
-    "statistics": {
-        "total_sessions": 150,
-        "average_accuracy": 97.3,
-        "accuracy_trend": "improving",
-        "most_accurate_facility": "Speed",
-        "least_accurate_facility": "Guts"
+    "meta": {
+        "cached": true,
+        "generated_at": "2026-01-24T10:30:00Z"
+    }
+}
+```
+
+**Error Responses**:
+
+```json
+// 404 Not Found
+{
+    "message": "Career run not found",
+    "error_code": "CAREER_NOT_FOUND"
+}
+
+// 422 Validation Error
+{
+    "message": "The given data was invalid.",
+    "errors": {
+        "career_run_id": ["The career_run_id field is required."]
+    }
+}
+```
+
+### 5.3 Execute Training
+
+**Endpoint**: `POST /api/v1/training/execute`
+
+**Request Body**:
+
+```json
+{
+    "career_run_id": "uuid-here",
+    "facility": "speed"
+}
+```
+
+**Success Response** (200 OK):
+
+```json
+{
+    "success": true,
+    "result": {
+        "outcome": "success",
+        "stat_deltas": {
+            "speed": 42,
+            "power": 12
+        },
+        "energy_delta": -22,
+        "bond_gains": [
+            {
+                "card_id": 1,
+                "gain": 5
+            }
+        ],
+        "hints_gained": [
+            {
+                "skill_id": 101,
+                "skill_name": "Lane Guidance",
+                "probability": 15,
+                "source_card": "Kitasan Black"
+            }
+        ],
+        "turn": 46
+    },
+    "character_state": {
+        "current_stats": {
+            "speed": 542,
+            "stamina": 380,
+            "power": 432,
+            "guts": 350,
+            "wit": 420
+        },
+        "energy_level": 78,
+        "mood_status": "great"
+    }
+}
+```
+
+**Failure Response** (200 OK):
+
+```json
+{
+    "success": true,
+    "result": {
+        "outcome": "failure",
+        "stat_deltas": {
+            "speed": -13,
+            "power": -4
+        },
+        "energy_delta": -33,
+        "bond_gains": [],
+        "hints_gained": [],
+        "turn": 46
+    },
+    "character_state": {
+        "current_stats": {
+            "speed": 487,
+            "stamina": 380,
+            "power": 416,
+            "guts": 350,
+            "wit": 420
+        },
+        "energy_level": 67,
+        "mood_status": "normal"
     }
 }
 ```
@@ -818,271 +1453,542 @@ Authorization: Bearer {token}
 
 ## 6. Database Schema
 
-### 6.1 Training Sessions Table
+### 6.1 Table: `ucp_training_sessions`
+
+Stores historical record of all training actions.
 
 ```sql
-CREATE TABLE training_sessions (
-    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    character_id BIGINT UNSIGNED NOT NULL,
-    facility_id INT NOT NULL,
-    facility_type VARCHAR(50) NOT NULL,
-    turn_number INT NOT NULL,
-    predicted_stat_gains JSON,
-    actual_stat_gains JSON,
-    support_card_ids JSON,
-    skills_acquired JSON,
-    conditions_applied JSON,
-    mood_before VARCHAR(50),
-    mood_after VARCHAR(50),
-    energy_before INT,
-    energy_after INT,
-    created_at TIMESTAMP,
-    FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE,
-    INDEX idx_character_id (character_id),
-    INDEX idx_facility_type (facility_type),
-    INDEX idx_turn_number (turn_number)
-) ENGINE=InnoDB;
+CREATE TABLE ucp_training_sessions (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    career_id BIGINT UNSIGNED NOT NULL,
+    turn_number TINYINT UNSIGNED NOT NULL COMMENT 'Turn when training occurred (1-78)',
+    training_type VARCHAR(20) NOT NULL COMMENT 'speed, stamina, power, guts, wisdom, rest',
+    stat_gains JSON NOT NULL COMMENT 'Actual stat changes {"speed": 42, "power": 12}',
+    support_bonuses JSON NULL COMMENT 'Breakdown of support card contributions',
+    skill_hints_gained JSON NULL COMMENT 'Array of skill hint objects',
+    success_rate DECIMAL(5,2) NOT NULL COMMENT 'Calculated success probability (0-100)',
+    was_successful BOOLEAN NOT NULL DEFAULT TRUE,
+    energy_delta TINYINT NOT NULL COMMENT 'Energy change (negative for consumption)',
+    mood_change VARCHAR(20) NULL COMMENT 'Mood status after training if changed',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (career_id) REFERENCES ucp_careers(id) ON DELETE CASCADE,
+    INDEX idx_career_turn (career_id, turn_number),
+    INDEX idx_training_type (training_type),
+    INDEX idx_success (was_successful)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
-### 6.2 Support Cards Table
+### 6.2 Table: `ucp_careers` (Updates)
+
+Training execution updates these fields:
 
 ```sql
-CREATE TABLE support_cards (
-    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    character_id BIGINT UNSIGNED NOT NULL,
-    card_id INT NOT NULL,
-    card_name VARCHAR(255),
-    rarity VARCHAR(10),
-    limit_breaks INT DEFAULT 0,
-    specialization VARCHAR(50),
-    bond_level INT DEFAULT 0,
-    training_bonus_speed INT,
-    training_bonus_stamina INT,
-    training_bonus_power INT,
-    training_bonus_guts INT,
-    training_bonus_wit INT,
-    skills_provided JSON,
-    created_at TIMESTAMP,
-    FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE,
-    UNIQUE KEY unique_deck_card (character_id, card_id),
-    INDEX idx_bond_level (bond_level)
-) ENGINE=InnoDB;
+-- Fields updated by training service
+current_turn TINYINT UNSIGNED NOT NULL DEFAULT 1,
+current_stats JSON NOT NULL,
+energy_level TINYINT UNSIGNED NOT NULL DEFAULT 100,
+mood_status ENUM('awful','bad','normal','good','great') NOT NULL DEFAULT 'normal',
+conditions JSON NULL
 ```
 
-### 6.3 Skill Hints Table
+### 6.3 Table: `ucp_support_deck_cards` (Updates)
+
+Bond level updates during training:
 
 ```sql
-CREATE TABLE skill_hints (
-    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    character_id BIGINT UNSIGNED NOT NULL,
-    skill_id INT NOT NULL,
-    support_card_id BIGINT UNSIGNED,
-    hint_count INT DEFAULT 1,
-    total_sp_saved INT DEFAULT 0,
-    acquired_at TIMESTAMP,
-    FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE,
-    FOREIGN KEY (support_card_id) REFERENCES support_cards(id) ON DELETE SET NULL,
-    UNIQUE KEY unique_skill_hint (character_id, skill_id),
-    INDEX idx_support_card_id (support_card_id)
-) ENGINE=InnoDB;
-```
-
-### 6.4 Training Predictions Table
-
-```sql
-CREATE TABLE training_predictions (
-    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    character_id BIGINT UNSIGNED NOT NULL,
-    facility_type VARCHAR(50),
-    rank_score DECIMAL(5, 2),
-    predicted_stat_gains JSON,
-    support_cards_considered JSON,
-    skill_hints_expected JSON,
-    goal_alignment_score DECIMAL(5, 2),
-    efficiency_rating VARCHAR(50),
-    created_at TIMESTAMP,
-    expires_at TIMESTAMP,
-    FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE,
-    INDEX idx_character_id (character_id),
-    INDEX idx_expires_at (expires_at)
-) ENGINE=InnoDB;
+-- Pivot table fields
+bond_level TINYINT UNSIGNED NOT NULL DEFAULT 0 CHECK (bond_level BETWEEN 0 AND 100)
 ```
 
 ---
 
-## 7. AI/ML Integration
+## 7. AI Integration
 
-### 7.1 Prediction Accuracy Learning
+### 7.1 Training Advisor Agent
 
-The system learns from historical training data to improve future predictions:
+**Agent Class**: `App\Neuron\Agents\TrainingAdvisorAgent`
+
+**Purpose**: Provides intelligent training recommendations based on character state,
+goals, and long-term strategy.
+
+**System Prompt Template**:
+
+```text
+You are an expert Umamusume training strategist.
+
+Analyze the following training context and provide recommendations:
+
+**Character State:**
+- Name: {{ character_name }}
+- Current Stats: Speed {{ speed }}, Stamina {{ stamina }}, Power {{ power }}, Guts {{ guts }}, Wit {{ wit }}
+- Energy: {{ energy }}%
+- Mood: {{ mood }}
+
+**Training Options:**
+{{ predictions_json }}
+
+**Goals:**
+{{ goals_json }}
+
+**Upcoming Events:**
+- Next Race: {{ next_race }} (Turn {{ race_turn }})
+- Turns Remaining: {{ turns_remaining }}
+
+Provide a recommendation in JSON format:
+{
+    "recommended_facility": "speed|stamina|power|guts|wisdom|rest",
+    "confidence": 0.0-1.0,
+    "reasoning": "Brief explanation",
+    "alternative": "Alternative option if primary is unavailable",
+    "long_term_impact": "How this affects overall strategy"
+}
+```
+
+**Tool Integration**:
 
 ```php
-class PredictionAccuracyLearningService
+// Available MCP tools for the agent
+[
+    'TrainingPredictionTool' => 'Query current predictions',
+    'StatAnalysisTool' => 'Analyze stat gaps vs goals',
+    'RaceRequirementTool' => 'Check race readiness',
+]
+```
+
+### 7.2 Hybrid AI Routing
+
+**Local (Ollama)**:
+
+- Quick turn-by-turn recommendations
+- Pattern recognition for common scenarios
+- Offline availability
+- Response time: < 1s
+
+**Cloud (AWS Bedrock Claude)**:
+
+- Complex multi-turn strategic planning
+- Goal conflict resolution
+- Scenario-specific optimizations
+- Response time: 2-5s
+
+**Fallback Logic**:
+
+```php
+try {
+    // Attempt local AI first
+    $advice = $this->ollamaService->getAdvice($context);
+} catch (OllamaUnavailableException $e) {
+    // Fallback to cloud AI
+    $advice = $this->bedrockService->getAdvice($context);
+} catch (Exception $e) {
+    // Fallback to rule-based recommendation
+    $advice = $this->ruleBasedRecommendation($predictions);
+}
+```
+
+---
+
+## 8. Business Logic
+
+### 8.1 Training Type Effects
+
+| Type | Primary Stat | Secondary Stat | Energy Cost | Base Risk |
+|------|-------------|----------------|-------------|-----------|
+| Speed | Speed +10 | Power +5 | 20 | Normal |
+| Stamina | Stamina +10 | Guts +5 | 22 | Normal |
+| Power | Power +10 | Stamina +5 | 24 | Normal |
+| Guts | Guts +10 | Speed +5 | 18 | Normal |
+| Wisdom | Wit +10 | Speed +2 | 15 | Low |
+| Rest | - | - | -50 | None |
+
+### 8.2 Friendship Training
+
+**Activation Requirements**:
+
+- At least 1 support card at facility
+- Card bond level ≥ 80
+
+**Effects**:
+
+- 1.2x stat gain multiplier
+- 20% energy cost reduction
+- Enhanced skill hint probability (+5%)
+
+### 8.3 Energy Management Thresholds
+
+| Energy Range | Training Impact | Recommended Action |
+|-------------|----------------|-------------------|
+| 80-100 | Optimal performance | Train freely |
+| 50-79 | Normal performance | Monitor carefully |
+| 30-49 | Reduced gains, risk starts | Consider rest soon |
+| 0-29 | High risk, poor gains | Rest immediately |
+
+### 8.4 Mood Effects on Training
+
+| Mood | Stat Multiplier | Risk Modifier | Duration |
+|------|----------------|---------------|----------|
+| Awful | 0.90x | +10% | 3-5 turns |
+| Bad | 0.95x | +5% | 2-3 turns |
+| Normal | 1.00x | 0% | Baseline |
+| Good | 1.05x | -2% | 2-4 turns |
+| Great | 1.10x | -5% | 3-6 turns |
+
+---
+
+## 9. Integration Points
+
+### 9.1 Character Service Integration
+
+Training system reads and updates character state:
+
+```php
+// Read character state
+$character = $career->character;
+$currentStats = $character->current_stats;
+$energy = $character->energy_level;
+$mood = $character->mood_status;
+
+// Update after training
+$character->updateStats(['speed' => 42, 'power' => 12]);
+$character->energy_level = $character->clampEnergy($energy - 22);
+$character->save();
+```
+
+### 9.2 Support Card Service Integration
+
+Retrieves support deck configuration and updates bond levels:
+
+```php
+// Get active deck
+$deck = $career->supportDeck;
+$cards = $deck->cards()->with('pivot')->get();
+
+// Update bond levels
+$deck->cards()->updateExistingPivot($cardId, [
+    'bond_level' => DB::raw('LEAST(100, bond_level + 5)')
+]);
+```
+
+### 9.3 Skill Service Integration
+
+Registers skill hints gained during training:
+
+```php
+foreach ($hintsGained as $hint) {
+    app(SkillService::class)->addHint(
+        characterId: $character->id,
+        skillId: $hint['skill_id'],
+        level: 1,
+        source: 'training'
+    );
+}
+```
+
+### 9.4 Event Broadcasting
+
+**Events Fired**:
+
+- `TrainingCompleted`: After successful execution
+- `BondLevelIncreased`: When bond threshold crossed
+- `SkillHintReceived`: When hint gained
+- `EnergyLow`: When energy drops below 30
+
+**Listeners**:
+
+- `UpdateTrainingAnalytics`: Track training patterns
+- `InvalidateTrainingCache`: Clear prediction cache
+- `NotifyLowEnergy`: Alert user via WebSocket
+
+---
+
+## 10. Error Handling
+
+### 10.1 Exception Hierarchy
+
+```php
+App\Exceptions\TrainingException (Base)
+├── InvalidTrainingException
+├── InsufficientEnergyException
+├── TurnLimitExceededException
+└── PredictionCacheException
+```
+
+### 10.2 Error Codes
+
+| Code | HTTP Status | Description | Resolution |
+|------|-------------|-------------|------------|
+| `TRAIN_INVALID_TYPE` | 422 | Invalid training facility type | Use valid type |
+| `TRAIN_TURN_LIMIT` | 422 | Career reached max turns | Start new career |
+| `TRAIN_INSUFFICIENT_ENERGY` | 422 | Energy below minimum threshold | Rest first |
+| `TRAIN_CAREER_NOT_FOUND` | 404 | Career run not found | Verify ID |
+| `TRAIN_PREDICTION_FAILED` | 500 | Prediction generation failed | Retry request |
+
+### 10.3 Validation Rules
+
+```php
+// Training execution validation
+[
+    'career_run_id' => 'required|uuid|exists:ucp_careers,id',
+    'facility' => 'required|in:speed,stamina,power,guts,wisdom,rest',
+]
+
+// Prediction request validation
+[
+    'career_run_id' => 'required|uuid|exists:ucp_careers,id',
+    'current_turn' => 'required|integer|min:1|max:78',
+]
+```
+
+---
+
+## 11. Performance Optimization
+
+### 11.1 Caching Strategy
+
+**Prediction Cache**:
+
+```php
+Cache::tags(['training', "career:{$career_id}"])->remember(
+    "training:predictions:{$career_id}:{$turn}",
+    now()->addMinutes(5),
+    fn() => $this->generatePredictions($career)
+);
+```
+
+**Cache Invalidation**:
+
+- On training execution: Flush career tag
+- On stat update: Flush character tag
+- On support deck change: Flush career tag
+
+**Cache Keys**:
+
+- `training:predictions:{career_id}:{turn}`: Prediction data
+- `training:history:{career_id}`: Session history
+
+**TTL Strategy**:
+
+- Predictions: 5 minutes (state-dependent)
+- History: 15 minutes (static data)
+
+### 11.2 Query Optimization
+
+**Eager Loading**:
+
+```php
+$career = CareerRun::with([
+    'character.aptitudes',
+    'supportDeck.cards',
+])->findOrFail($id);
+```
+
+**Selective Loading**:
+
+```php
+TrainingSession::select([
+    'id',
+    'turn_number',
+    'training_type',
+    'stat_gains',
+    'was_successful'
+])->where('career_id', $careerId)->get();
+```
+
+### 11.3 Performance Targets
+
+| Operation | Target | Measurement |
+|-----------|--------|-------------|
+| Prediction generation | < 100ms | p95 |
+| Training execution | < 200ms | p95 |
+| History retrieval (50 turns) | < 50ms | p95 |
+| AI recommendation | < 2s (local) / < 5s (cloud) | p95 |
+
+---
+
+## 12. Security Considerations
+
+### 12.1 Authorization
+
+```php
+// Training execution policy
+public function execute(User $user, CareerRun $career): bool
 {
-    public function updateModelFromTrainingSession(TrainingSession $session): void
-    {
-        // Collect prediction vs actual data
-        $accuracy = $this->calculateAccuracy(
-            $session->predicted_stat_gains,
-            $session->actual_stat_gains
-        );
-        
-        // Store for model retraining
-        $this->db->table('prediction_training_data')->insert([
-            'character_id' => $session->character_id,
-            'facility_type' => $session->facility_type,
-            'support_cards' => $session->support_card_ids,
-            'mood' => $session->mood_before,
-            'energy' => $session->energy_before,
-            'prediction_accuracy' => $accuracy,
-            'collected_at' => now(),
+    return $user->id === $career->character->user_id;
+}
+```
+
+### 12.2 Input Validation
+
+- Facility type must be enum value
+- Career must belong to authenticated user
+- Turn number must not exceed maximum
+- Energy level must be sufficient for non-rest actions
+
+### 12.3 Rate Limiting
+
+```php
+// Apply rate limiting to training endpoints
+RateLimiter::for('training', function (Request $request) {
+    return Limit::perMinute(60)->by($request->user()->id);
+});
+```
+
+---
+
+## 13. Testing Strategy
+
+### 13.1 Unit Tests
+
+```php
+// tests/Unit/Services/StatGainCalculatorTest.php
+
+test('calculates base gains correctly', function () {
+    $character = Character::factory()->make([
+        'growth_rates' => ['speed' => 20, 'power' => 10],
+    ]);
+    
+    $calculator = app(StatGainCalculator::class);
+    $gains = $calculator->calculateBase(TrainingType::Speed, $character, 1);
+    
+    expect($gains->get('speed'))->toBe(12) // 10 * 1.2 (20% growth)
+        ->and($gains->get('power'))->toBe(6); // 5 * 1.1 (10% growth) rounded
+});
+
+test('risk increases exponentially below 30 energy', function () {
+    $character = Character::factory()->make(['energy_level' => 20]);
+    
+    $calculator = app(RiskCalculator::class);
+    $result = $calculator->calculate($character, TrainingType::Speed);
+    
+    expect($result['risk'])->toBeGreaterThan(30);
+});
+```
+
+### 13.2 Feature Tests
+
+```php
+// tests/Feature/TrainingExecutionTest.php
+
+test('successful training updates character stats', function () {
+    $user = User::factory()->create();
+    $career = CareerRun::factory()->for($user)->create();
+    
+    $response = $this->actingAs($user)
+        ->postJson('/api/v1/training/execute', [
+            'career_run_id' => $career->id,
+            'facility' => 'speed',
         ]);
-        
-        // Trigger model retraining if threshold reached
-        if ($this->shouldRetrain()) {
-            RetrainPredictionModel::dispatch();
-        }
-    }
     
-    private function calculateAccuracy(array $predicted, array $actual): float
-    {
-        $totalPredicted = array_sum($predicted);
-        $totalActual = array_sum($actual);
-        
-        if ($totalActual === 0) return 0;
-        
-        return ($totalActual / $totalPredicted) * 100;
-    }
-}
+    $response->assertStatus(200)
+        ->assertJsonStructure([
+            'result' => ['outcome', 'stat_deltas', 'turn']
+        ]);
+    
+    $career->refresh();
+    expect($career->current_turn)->toBe(2);
+});
+
+test('training creates session record', function () {
+    $career = CareerRun::factory()->create();
+    
+    app(TrainingService::class)->executeTraining($career, 'speed');
+    
+    $this->assertDatabaseHas('ucp_training_sessions', [
+        'career_id' => $career->id,
+        'training_type' => 'speed',
+        'turn_number' => 1,
+    ]);
+});
 ```
 
-### 7.2 Recommendation Engine (AI/Ollama Integration)
+### 13.3 Integration Tests
 
 ```php
-class TrainingRecommendationEngine
-{
-    public function __construct(
-        private OllamaService $ollama,
-        private TrainingPredictionService $predictions,
-        private GoalService $goals
-    ) {}
+// tests/Integration/TrainingPredictionTest.php
+
+test('predictions include all training types', function () {
+    $career = CareerRun::factory()->create();
     
-    public function generateRecommendation(Character $character): TrainingRecommendation
-    {
-        // Get raw prediction data
-        $predictions = $this->predictions->getPredictions($character);
-        $activeGoals = $this->goals->getActiveGoals($character);
-        
-        // Create prompt for Ollama/Claude
-        $prompt = $this->buildRecommendationPrompt(
-            $character,
-            $predictions,
-            $activeGoals
-        );
-        
-        // Get AI recommendation
-        $aiResponse = $this->ollama->generateCompletion(
-            model: 'neural-network-model',
-            prompt: $prompt,
-            temperature: 0.7,
-        );
-        
-        // Parse and structure response
-        return $this->parseAIResponse($aiResponse, $predictions);
-    }
+    $service = app(TrainingPredictionService::class);
+    $predictions = $service->getPredictions($career);
     
-    private function buildRecommendationPrompt(
-        Character $character,
-        array $predictions,
-        array $goals
-    ): string {
-        
-        return <<<PROMPT
-You are an expert Umamusume Career Mode strategist. Recommend the optimal training facility for this character:
-
-Character: {$character->name}
-Scenario: {$character->scenario}
-Current Stats: Speed {$character->stats['speed']}, Stamina {$character->stats['stamina']}, Power {$character->stats['power']}, Guts {$character->stats['guts']}, Wit {$character->stats['wit']}
-Current Mood: {$character->current_mood}
-Energy: {$character->current_energy}%
-Days Until Race: {$character->days_until_race}
-
-Active Goals:
-{json_encode($goals, JSON_PRETTY_PRINT)}
-
-Training Options with Predictions:
-{json_encode($predictions, JSON_PRETTY_PRINT)}
-
-Provide a single recommended facility and explain your reasoning considering:
-1. Goal alignment and progress
-2. Stat efficiency
-3. Skill hint opportunities
-4. Upcoming race preparation
-5. Character condition management
-
-Format your response as JSON.
-PROMPT;
-    }
-}
+    expect($predictions)->toHaveCount(6) // 5 facilities + rest
+        ->and($predictions[0])->toHaveKeys(['type', 'gains', 'risk', 'score']);
+});
 ```
 
 ---
 
-## 8. Performance & Caching
+## 14. Appendices
 
-### 8.1 Caching Strategy
+### Appendix A: Calculation Formulas
 
-| Data | TTL | Key Pattern |
-| --- | --- | --- |
-| Training Predictions | 5 min | `training:predictions:{character_id}` |
-| Support Card Bonuses | 1 hour | `support_cards:bonuses:{card_id}` |
-| Prediction Accuracy Model | 24 hour | `ml:prediction_model` |
-| Skill Hint Probabilities | 2 hour | `skill_hints:prob:{character_id}` |
-| Ranking Scores | 5 min | `training:ranking:{character_id}` |
+**Stat Gain Formula**:
 
-### 8.2 Optimizations
+```text
+Final Gain = Base Gain × Level Multiplier × Growth Rate × Mood × Support Multiplier
 
-- **Query Optimization**: Eager load support cards, skills, hints
-- **Batch Processing**: Calculate predictions for all facilities at once
-- **Async Updates**: Store training sessions asynchronously
-- **Cache Invalidation**: Clear caches on stat/condition changes
+Where:
+- Base Gain: Facility constant (10 for primary, 5 for secondary)
+- Level Multiplier: 1.0 + (Level - 1) × 0.1
+- Growth Rate: 1.0 + (Rate / 100)
+- Mood: 0.90 - 1.10
+- Support Multiplier: 1.0 + (Bonus / 100) × 1.2 (if friendship)
+```
 
----
+**Risk Formula**:
 
-## 9. Testing Requirements
+```text
+Total Risk = Base Risk + Mood Modifier + Type Modifier
 
-### 9.1 Unit Tests
+Base Risk (Energy):
+- Energy > 50: 0%
+- Energy 30-50: 15% × (50 - Energy) / 20
+- Energy < 30: 15% + 55% × ((30 - Energy) / 30)²
+```
 
-- [ ] Stat gain calculation with all modifiers
-- [ ] Support card bonus calculations
-- [ ] Friendship training bonus application
-- [ ] Spirit Burst filling mechanics
-- [ ] Skill hint probability calculations
-- [ ] Training ranking algorithm
-- [ ] Mood/energy change predictions
+### Appendix B: Support Card Bonuses
 
-### 9.2 Integration Tests
+| Rarity | Base Bonus | LB0 | LB1 | LB2 | LB3 | LB4 |
+|--------|-----------|-----|-----|-----|-----|-----|
+| SSR | 10% | 10% | 12% | 14% | 16% | 18% |
+| SR | 7% | 7% | 9% | 11% | 13% | 15% |
+| R | 5% | 5% | 7% | 9% | 11% | 13% |
 
-- [ ] End-to-end training prediction workflow
-- [ ] Support deck management and validation
-- [ ] Skill hint tracking and SP cost reduction
-- [ ] Training session creation and character update
-- [ ] Prediction accuracy learning
+### Appendix C: Energy Recovery
 
-### 9.3 API Tests
+| Action | Base Recovery | Mood Bonus | Final Recovery |
+|--------|--------------|------------|----------------|
+| Rest (Normal) | 50 | 0 | 50 |
+| Rest (Good) | 50 | +10 | 60 |
+| Rest (Great) | 50 | +20 | 70 |
 
-- [ ] GET /api/v1/characters/{id}/training-predictions
-- [ ] GET /api/v1/characters/{id}/training-recommendation
-- [ ] POST /api/v1/characters/{id}/training-sessions
-- [ ] GET /api/v1/characters/{id}/prediction-history
+### Appendix D: Change Log
 
-### 9.4 Performance Tests
-
-- [ ] Training prediction generation < 200ms
-- [ ] Ranking calculation < 100ms
-- [ ] Recommendation generation (with AI) < 2s
-- [ ] Bulk session creation < 500ms
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 2.0.0 | 2026-01-24 | Development Team | Full v2.0.0 alignment, added AI integration, complete calculation engines |
+| 1.0.0 | 2026-01-23 | Development Team | Initial technical specification |
 
 ---
 
-**Next Document**: [SPEC-003_Race_Strategy_Technical.md](SPEC-003_Race_Strategy_Technical.md)
+**Document Approval**
+
+| Role | Name | Signature | Date |
+|------|------|-----------|------|
+| Tech Lead | [Name] | _________ | 2026-01-24 |
+| Product Owner | [Name] | _________ | 2026-01-24 |
+| QA Lead | [Name] | _________ | 2026-01-24 |
+
+---
+
+**Document Control**  
+**Maintained By**: Backend Development Team  
+**Review Frequency**: Bi-weekly during active development  
+**Next Review Date**: 2026-02-07  
+**Distribution**: Development Team, QA Team, Product Management
+
+---
+
+**End of Document**

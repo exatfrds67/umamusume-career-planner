@@ -1,1096 +1,1945 @@
 # SPEC-001: Character Management System - Technical Specification
 
-## Umamusume Pretty Derby Career Planner
+**Document Version**: 2.0.0  
+**Date**: 2026-01-24  
+**Project**: Umamusume Pretty Derby Career Planner  
+**Status**: Active  
+**Classification**: Internal - Development Team
 
-**Document Version**: 1.0  
-**Date**: January 14, 2026  
-**Project**: UmamusumeCareerPlanner  
-**Author**: AI Development Team  
-**Status**: Draft  
-**Related Documents**: [PRD-001], [SRS-3.1], [SDS-4.1], [DBD-009]
+---
 
-**Source Specs**:
+## Document Information
 
-- `.kiro/specs/umamusume-career-planner-main/requirements.md` (Requirement 1: Character State Management)
-- `.kiro/specs/umamusume-career-planner-main/design.md` (Character Management Architecture)
-- `.kiro/specs/umamusume-career-planner-main/tasks.md` (Task 1.4: Core Models)
+| Attribute | Value |
+|-----------|-------|
+| **Document ID** | SPEC-001 |
+| **Related PRD** | [PRD-001: Character Management](../prds/PRD-001_Character_Management.md) |
+| **Architecture Version** | v2.0.0 |
+| **Approval Status** | Approved |
+| **Last Reviewed** | 2026-01-24 |
 
-**Related Artifacts**:
+### Related Documents
 
-- PRD: [PRD-001](../prds/PRD-001_Character_Management.md)
-- Flow: [FLOW-001](../flows/FLOW-001_Character_Management_System.md)
-- Wireframes: [WF-002](../wireframes/WF-002_Character_Creation_Wizard.md), [WF-003](../wireframes/WF-003_Character_Detail_Management.md)
-- Sequences: [SEQ-001](../sequences/SEQ-001_Character_Creation_Sequence.md)
-- User Flows: [UF-002](../user-flows/UF-002_Career_Setup_Flow.md)
+**Requirements & Design**:
+
+- [SRS Section 3.1: Character Management](../003_SRS_Software_Requirement_Specifications.md#31-character-management)
+- [SDS Section 4.1: Character Management Architecture](../004_SDS_Software_Design_Specifications.md#41-character-management-module)
+
+**Data & Integration**:
+
+- [DBD Section 5.1: Character Tables](../009_DBD_Database_Documentation.md#51-character-tables)
+- [API Section 4.1: Character Endpoints](../010_API_API_Documentation.md#41-character-management-endpoints)
+
+**Visual Documentation**:
+
+- [FLOW-001: Character Management System](../flows/FLOW-001_Character_Management_System.md)
+- [SEQ-001: Character Creation Sequence](../sequences/SEQ-001_Character_Creation_Sequence.md)
+- [WF-002: Character Creation Wizard](../wireframes/WF-002_Character_Creation_Wizard.md)
+- [WF-003: Character Detail Management](../wireframes/WF-003_Character_Detail_Management.md)
+- [UF-002: Career Setup Flow](../user-flows/UF-002_Career_Setup_Flow.md)
 
 ---
 
 ## Table of Contents
 
 1. [Technical Overview](#1-technical-overview)
-2. [Data Model](#2-data-model)
-3. [API Specification](#3-api-specification)
-4. [Database Schema](#4-database-schema)
-5. [System Interactions](#5-system-interactions)
-6. [Error Handling](#6-error-handling)
-7. [Performance Considerations](#7-performance-considerations)
-8. [Testing Requirements](#8-testing-requirements)
+2. [Architecture Design](#2-architecture-design)
+3. [Data Models](#3-data-models)
+4. [Service Layer](#4-service-layer)
+5. [API Specification](#5-api-specification)
+6. [Database Schema](#6-database-schema)
+7. [Business Logic](#7-business-logic)
+8. [Integration Points](#8-integration-points)
+9. [Error Handling](#9-error-handling)
+10. [Performance Optimization](#10-performance-optimization)
+11. [Security Considerations](#11-security-considerations)
+12. [Testing Strategy](#12-testing-strategy)
+13. [Appendices](#13-appendices)
 
 ---
 
 ## 1. Technical Overview
 
-### 1.1 Component Architecture
+### 1.1 Module Purpose
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│          CHARACTER MANAGEMENT MODULE (SPEC-001)                │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│  ┌──────────────────────────────────────────────────────────┐   │
-│  │  API Layer (Controllers)                                  │   │
-│  │  • CharacterController (CRUD operations)                 │   │
-│  │  • CharacterStatsController (stat management)            │   │
-│  │  • CharacterGoalController (goal management)             │   │
-│  └──────────────────────────────────────────────────────────┘   │
-│                           ↓                                      │
-│  ┌──────────────────────────────────────────────────────────┐   │
-│  │  Service Layer (Business Logic)                           │   │
-│  │  • CharacterService (lifecycle management)               │   │
-│  │  • CharacterStateService (state tracking)                │   │
-│  │  • GoalManagementService (goal operations)               │   │
-│  │  • FactorInheritanceService (inheritance calculations)   │   │
-│  └──────────────────────────────────────────────────────────┘   │
-│                           ↓                                      │
-│  ┌──────────────────────────────────────────────────────────┐   │
-│  │  Repository Layer (Data Access)                           │   │
-│  │  • CharacterRepository                                    │   │
-│  │  • AptitudeRepository                                     │   │
-│  │  • FactorRepository                                       │   │
-│  │  • GoalRepository                                         │   │
-│  └──────────────────────────────────────────────────────────┘   │
-│                           ↓                                      │
-│  ┌──────────────────────────────────────────────────────────┐   │
-│  │  Data Layer (Models & Database)                           │   │
-│  │  • Character (primary entity)                             │   │
-│  │  • Aptitude, Factor, Goal, Condition models               │   │
-│  │  • MySQL Database (18 tables)                             │   │
-│  └──────────────────────────────────────────────────────────┘   │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
-```
+The Character Management System is the foundational module responsible for managing Uma Musume trainee characters throughout their lifecycle. It handles character creation, state tracking (stats, energy, mood), aptitude configuration, and factor inheritance mechanics.
 
-### 1.2 Core Entities
+**Core Responsibilities**:
 
-| Entity | Purpose | Relationships |
-| --- | --- | --- |
-| Character | Main trainee entity | Has many: Aptitudes, Factors, Goals, Skills, Conditions |
-| Aptitude | Distance/Surface/Style rating | Belongs to: Character |
-| Factor | Inherited stat bonus | Belongs to: Character, Legacy Character |
-| Goal | Training objective | Belongs to: Character |
-| Condition | Status effects | Belongs to: Character |
-| Skill | Acquired abilities | Belongs to: Character |
-| SkillHint | SP cost reduction | Belongs to: Skill |
+- Character entity lifecycle management (CRUD operations)
+- Real-time stat tracking with validation and clamping
+- Aptitude rating system for distance, surface, and running style
+- Factor inheritance calculation from parent characters
+- Goal tracking and status monitoring
+- Condition and status effect management
+
+### 1.2 Business Context
+
+In Umamusume Pretty Derby, each trainee character represents a single career run attempt. Characters maintain:
+
+- **Base Attributes**: Derived from the trainee template (e.g., Special Week, Tokai Teio)
+- **Current State**: Dynamic stats modified through training and events
+- **Aptitudes**: Compatibility ratings affecting race performance
+- **Factors**: Inherited bonuses from parent characters
+- **Goals**: Career objectives defined at creation
+
+### 1.3 Technical Scope
+
+**In Scope**:
+
+- Character entity management with soft deletes
+- Stat validation and clamping (0-1200 range)
+- Aptitude CRUD operations
+- Factor inheritance calculations
+- Goal status tracking
+- Integration with External API for base character data
+- Cache management for frequently accessed character state
+
+**Out of Scope**:
+
+- Training execution logic (handled by SPEC-002)
+- Race participation (handled by SPEC-003)
+- Skill management (handled by SPEC-004)
+- Support deck configuration (handled by SPEC-005)
+
+### 1.4 Technology Stack
+
+| Component | Technology | Version | Purpose |
+|-----------|-----------|---------|---------|
+| **Framework** | Laravel | 12.x | Application foundation |
+| **Language** | PHP | 8.3+ | Server-side logic |
+| **Database** | MySQL | 8.0+ | Data persistence |
+| **Cache** | Redis | 7.x | State caching |
+| **ORM** | Eloquent | 12.x | Database abstraction |
+| **Validation** | Laravel Form Requests | 12.x | Input validation |
 
 ---
 
-## 2. Data Model
+## 2. Architecture Design
 
-### 2.1 Character Entity Model
+### 2.1 Component Architecture
+
+```mermaid
+graph TB
+    subgraph "Presentation Layer"
+        API[CharacterController]
+        Livewire[CharacterManager Component]
+        FormRequest[CharacterRequest Validation]
+    end
+
+    subgraph "Application Layer"
+        CharService[CharacterService]
+        StateService[CharacterStateService]
+        FactorService[FactorInheritanceService]
+    end
+
+    subgraph "Domain Layer"
+        Model[Character Model]
+        Aptitude[Aptitude Model]
+        Factor[Factor Model]
+        Events[Domain Events]
+        ValueObjects[Stat Collection VO]
+    end
+
+    subgraph "Infrastructure Layer"
+        Repository[CharacterRepository]
+        Cache[Redis Cache]
+        DB[(MySQL Database)]
+        External[ExternalAPIService]
+    end
+
+    API --> FormRequest
+    FormRequest --> CharService
+    Livewire --> CharService
+    
+    CharService --> StateService
+    CharService --> FactorService
+    CharService --> Repository
+    
+    StateService --> Model
+    FactorService --> Factor
+    Repository --> Model
+    
+    Model --> DB
+    Model --> Events
+    Model --> ValueObjects
+    
+    CharService --> Cache
+    CharService --> External
+    
+    Events -.->|Analytics| EventListeners[Event Listeners]
+```
+
+### 2.2 Layer Responsibilities
+
+**Presentation Layer**:
+
+- HTTP request/response handling
+- Input validation via Form Requests
+- Livewire component rendering for UI interactions
+
+**Application Layer**:
+
+- Business workflow orchestration
+- Service coordination
+- Transaction management
+
+**Domain Layer**:
+
+- Core business rules
+- Entity definitions
+- Domain event publishing
+
+**Infrastructure Layer**:
+
+- Data persistence
+- External service communication
+- Cache management
+
+### 2.3 Design Patterns
+
+| Pattern | Implementation | Purpose |
+|---------|---------------|---------|
+| **Repository** | `CharacterRepository` | Abstract data access logic |
+| **Service Layer** | `CharacterService` | Encapsulate business operations |
+| **Factory** | `CharacterFactory` | Streamline object creation |
+| **Value Object** | `StatCollection` | Encapsulate stat logic |
+| **Observer** | Event Listeners | React to domain events |
+| **Strategy** | Factor Calculators | Pluggable inheritance algorithms |
+
+---
+
+## 3. Data Models
+
+### 3.1 Character Entity
+
+The `Character` model represents a single trainee instance within a user's account.
 
 ```php
+<?php
+
 namespace App\Models;
 
+use App\Enums\ScenarioType;
+use App\Enums\MoodStatus;
+use App\ValueObjects\StatCollection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
+/**
+ * Character Entity
+ * 
+ * Represents an Uma Musume trainee instance with stats, aptitudes, and inheritance.
+ * 
+ * @property int $id
+ * @property string $user_id
+ * @property string $name
+ * @property string|null $name_jp
+ * @property int|null $trainee_id External game character ID
+ * @property string|null $image_path
+ * @property ScenarioType $scenario_type
+ * @property array $base_stats {speed, stamina, power, guts, wit}
+ * @property array $growth_rates Percentage bonuses per stat
+ * @property array $current_stats Current training values
+ * @property int $energy_level 0-100
+ * @property MoodStatus $mood_status
+ * @property array|null $goals Array of goal definitions
+ * @property array|null $conditions Active status effects
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ * @property \Carbon\Carbon|null $deleted_at
+ */
 class Character extends Model
 {
+    use HasFactory, SoftDeletes;
+
+    protected $table = 'ucp_characters';
+
     protected $fillable = [
         'user_id',
         'name',
+        'name_jp',
         'trainee_id',
-        'scenario',
-        'career_stage',
-        'class',
-        'current_energy',
-        'current_mood',
-        'days_until_race',
-        'facility_level',
+        'image_path',
+        'scenario_type',
+        'base_stats',
+        'growth_rates',
+        'current_stats',
+        'energy_level',
+        'mood_status',
+        'goals',
+        'conditions',
     ];
 
     protected $casts = [
-        'current_energy' => 'integer',
-        'facility_level' => 'integer',
+        'trainee_id' => 'integer',
+        'base_stats' => 'array',
+        'growth_rates' => 'array',
+        'current_stats' => 'array',
+        'goals' => 'array',
+        'conditions' => 'array',
+        'energy_level' => 'integer',
+        'scenario_type' => ScenarioType::class,
+        'mood_status' => MoodStatus::class,
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'deleted_at' => 'datetime',
+    ];
+
+    protected $attributes = [
+        'energy_level' => 100,
+        'mood_status' => MoodStatus::Normal,
+        'current_stats' => '{"speed":0,"stamina":0,"power":0,"guts":0,"wit":0}',
     ];
 
     // Relationships
-    public function aptitudes(): HasMany { }
-    public function factors(): HasMany { }
-    public function goals(): HasMany { }
-    public function conditions(): HasMany { }
-    public function skills(): HasMany { }
-    public function snapshots(): HasMany { }
-    public function auditLog(): HasMany { }
-}
-```
 
-### 2.2 Stat System
-
-**Stat Types**: Speed, Stamina, Power, Guts, Wit  
-**Value Range**: 0-1200 (training cap)  
-**Grade Scale**: G+, G, F+, F, E+, E, D+, D, C+, C, B+, B, A+, A, S+, S, SS
-
-```php
-class Stat
-{
-    public int $speed;      // Priority: ★★★★★
-    public int $stamina;    // Priority: ★★★★
-    public int $power;      // Priority: ★★★
-    public int $guts;       // Priority: ★
-    public int $wit;        // Priority: ★★
-    
-    public function calculateGrade(): string { }
-    public function isAtBreakpoint(): bool { }  // 901 or 1600
-}
-```
-
-### 2.3 Aptitude System
-
-**Aptitude Ratings**: G, G+, F, F+, E, E+, D, D+, C, C+, B, B+, A, A+, S, S+, SS
-
-**Distance Categories**:
-
-- Sprint: 1000-1400m
-- Mile: 1401-1800m
-- Medium: 1801-2400m
-- Long: 2401m+
-
-**Surface Types**: Turf, Dirt
-
-**Running Styles**: Front Runner, Pace Chaser, Late Surger, End Closer
-
-```php
-class Aptitude extends Model
-{
-    protected $fillable = [
-        'character_id',
-        'category',      // 'distance', 'surface', 'style'
-        'type',          // specific value
-        'rating',        // G through SS
-    ];
-
-    const RATINGS = [
-        'G', 'G+', 'F', 'F+', 'E', 'E+', 'D', 'D+', 
-        'C', 'C+', 'B', 'B+', 'A', 'A+', 'S', 'S+', 'SS'
-    ];
-
-    const DISTANCES = ['Sprint', 'Mile', 'Medium', 'Long'];
-    const SURFACES = ['Turf', 'Dirt'];
-    const STYLES = ['FrontRunner', 'PaceChaser', 'LateSurger', 'EndCloser'];
-}
-```
-
-### 2.4 Factor System
-
-**Factor Types**:
-
-- Blue Stat Factors (Inherited stats)
-- Red Aptitude Factors (Inherited aptitudes)
-- Green Unique Skill Factors (Inherited unique skills)
-- White Normal Skill Factors (Inherited normal skills)
-
-**Stat Factor Ratings**:
-
-- ★☆☆ = +5 bonus
-- ★★☆ = +12 bonus
-- ★★★ = +21 bonus
-
-**Aptitude Factor Ratings**:
-
-- 1★ = +1 grade
-- 2★ = +2 grades
-- 3★ = +3 grades
-
-```php
-class Factor extends Model
-{
-    protected $fillable = [
-        'character_id',
-        'legacy_character_id',
-        'factor_type',   // 'stat', 'aptitude', 'unique_skill', 'normal_skill'
-        'category',      // stat name or aptitude category
-        'rating',        // ★★★ or grade increase
-        'inherited_value',
-    ];
-
-    const TYPES = ['Stat', 'Aptitude', 'UniqueSkill', 'NormalSkill'];
-    const STAT_RATINGS = ['★☆☆' => 5, '★★☆' => 12, '★★★' => 21];
-
-    public function calculateBonus(): int { }
-}
-```
-
-### 2.5 Growth Rate System
-
-Growth rates are inherited bonuses that multiply training effectiveness.
-
-```php
-class GrowthRate extends Model
-{
-    protected $fillable = [
-        'character_id',
-        'stat_type',     // speed, stamina, power, guts, wit
-        'rate',          // 10, 20, or 30 (percentage)
-    ];
-
-    const RATES = [10, 20, 30];  // +10%, +20%, +30%
-
-    public function applyToTraining(int $baseGain): int
+    public function user()
     {
-        return (int)($baseGain * (1 + $this->rate / 100));
+        return $this->belongsTo(User::class);
+    }
+
+    public function careerRuns()
+    {
+        return $this->hasMany(CareerRun::class);
+    }
+
+    public function aptitudes()
+    {
+        return $this->hasMany(Aptitude::class);
+    }
+
+    public function factors()
+    {
+        return $this->hasMany(Factor::class);
+    }
+
+    // Accessors & Mutators
+
+    public function getStatsAttribute(): StatCollection
+    {
+        return new StatCollection($this->current_stats);
+    }
+
+    public function setStatsAttribute(StatCollection $stats): void
+    {
+        $this->current_stats = $stats->toArray();
+    }
+
+    // Business Methods
+
+    public function updateStats(array $deltas): void
+    {
+        $stats = $this->stats;
+        
+        foreach ($deltas as $stat => $delta) {
+            $stats->add($stat, $delta);
+        }
+        
+        $this->stats = $stats;
+    }
+
+    public function clampEnergy(int $value): int
+    {
+        return max(0, min(100, $value));
+    }
+
+    public function hasAchievedGoal(string $goalId): bool
+    {
+        if (!$this->goals) {
+            return false;
+        }
+        
+        $goal = collect($this->goals)->firstWhere('id', $goalId);
+        
+        return $goal['status'] ?? false === 'completed';
     }
 }
 ```
 
-### 2.6 Goal Entity Model
+### 3.2 Aptitude Model
 
 ```php
-class Goal extends Model
+<?php
+
+namespace App\Models;
+
+use App\Enums\AptitudeGrade;
+use App\Enums\AptitudeCategory;
+use Illuminate\Database\Eloquent\Model;
+
+/**
+ * Aptitude Entity
+ * 
+ * Represents character compatibility ratings for distance, surface, and running style.
+ * 
+ * @property int $id
+ * @property int $character_id
+ * @property AptitudeCategory $category
+ * @property string $type Specific type (e.g., 'mile', 'turf', 'front_runner')
+ * @property AptitudeGrade $grade Rating from G to SS
+ * @property int $bonus_value Numeric bonus applied
+ */
+class Aptitude extends Model
 {
+    protected $table = 'ucp_aptitudes';
+
+    public $timestamps = false;
+
     protected $fillable = [
         'character_id',
-        'goal_type',     // 'stat', 'race', 'aptitude'
-        'target_stat',   // if stat goal
-        'target_value',  // target number
-        'distance_type', // if distance-specific
-        'status',        // 'active', 'completed', 'abandoned'
+        'category',
+        'type',
+        'grade',
+        'bonus_value',
     ];
 
-    const MINIMUM_STATS = [
-        'Sprint' => ['career' => 350, 'pvp' => 500],
-        'Mile' => ['career' => 400, 'pvp' => 600],
-        'Medium' => ['career' => 500, 'pvp' => 800],
-        'Long' => ['career' => 600, 'pvp' => 900],
+    protected $casts = [
+        'character_id' => 'integer',
+        'category' => AptitudeCategory::class,
+        'grade' => AptitudeGrade::class,
+        'bonus_value' => 'integer',
     ];
 
-    public function calculateProgress(): float { }
-    public function getRemaining(): int { }
+    public function character()
+    {
+        return $this->belongsTo(Character::class);
+    }
+
+    public function upgradeGrade(): void
+    {
+        $this->grade = $this->grade->upgrade();
+        $this->bonus_value = $this->grade->getBonusValue();
+    }
 }
 ```
 
-### 2.7 Condition Entity Model
+### 3.3 Factor Model
 
 ```php
-class Condition extends Model
+<?php
+
+namespace App\Models;
+
+use App\Enums\FactorType;
+use Illuminate\Database\Eloquent\Model;
+
+/**
+ * Factor Entity
+ * 
+ * Represents inherited traits from parent characters.
+ * 
+ * @property int $id
+ * @property int $character_id
+ * @property int|null $source_character_id Parent character ID
+ * @property FactorType $factor_type
+ * @property string $target Stat, aptitude, or skill name
+ * @property int $stars Star rating (1-3)
+ * @property int|null $bonus_value Numeric bonus applied
+ */
+class Factor extends Model
 {
+    protected $table = 'ucp_factors';
+
+    public $timestamps = false;
+
     protected $fillable = [
         'character_id',
-        'condition_type',  // 'positive' or 'negative'
-        'condition_name',  // specific condition
-        'effect',          // description
-        'modifier',        // percentage modifier
-        'expires_at',      // when condition ends
+        'source_character_id',
+        'factor_type',
+        'target',
+        'stars',
+        'bonus_value',
     ];
 
-    const POSITIVE_CONDITIONS = [
-        'Charming' => ['effect' => '+2 bond'],
-        'Sharp' => ['effect' => '-10% skill costs'],
-        'PracticePerfect' => ['effect' => '-2% failure rate'],
+    protected $casts = [
+        'character_id' => 'integer',
+        'source_character_id' => 'integer',
+        'factor_type' => FactorType::class,
+        'stars' => 'integer',
+        'bonus_value' => 'integer',
     ];
 
-    const NEGATIVE_CONDITIONS = [
-        'PracticePoor' => ['effect' => '+2% failure rate'],
-        'Migraine' => ['effect' => 'mood resistance'],
-        'DrySkin' => ['effect' => 'motivation decrease'],
-    ];
+    public function character()
+    {
+        return $this->belongsTo(Character::class);
+    }
+
+    public function sourceCharacter()
+    {
+        return $this->belongsTo(Character::class, 'source_character_id');
+    }
+}
+```
+
+### 3.4 Enumerations
+
+**ScenarioType**:
+
+```php
+<?php
+
+namespace App\Enums;
+
+enum ScenarioType: string
+{
+    case UraFinale = 'ura_finale';
+    case AohariCup = 'aohari_cup';
+    case MakeCupDebut = 'make_cup_debut';
+    case GrandMasters = 'grand_masters';
+    case ProjectLArc = 'project_larc';
+}
+```
+
+**MoodStatus**:
+
+```php
+<?php
+
+namespace App\Enums;
+
+enum MoodStatus: string
+{
+    case Awful = 'awful';
+    case Bad = 'bad';
+    case Normal = 'normal';
+    case Good = 'good';
+    case Great = 'great';
+    
+    public function getMultiplier(): float
+    {
+        return match($this) {
+            self::Awful => 0.90,
+            self::Bad => 0.95,
+            self::Normal => 1.00,
+            self::Good => 1.05,
+            self::Great => 1.10,
+        };
+    }
+}
+```
+
+**AptitudeGrade**:
+
+```php
+<?php
+
+namespace App\Enums;
+
+enum AptitudeGrade: string
+{
+    case SS = 'SS';
+    case S = 'S';
+    case A = 'A';
+    case B = 'B';
+    case C = 'C';
+    case D = 'D';
+    case E = 'E';
+    case F = 'F';
+    case G = 'G';
+    
+    public function getBonusValue(): int
+    {
+        return match($this) {
+            self::SS => 20,
+            self::S => 15,
+            self::A => 10,
+            self::B => 5,
+            self::C => 0,
+            self::D => -5,
+            self::E => -10,
+            self::F => -15,
+            self::G => -20,
+        };
+    }
+    
+    public function upgrade(): self
+    {
+        return match($this) {
+            self::G => self::F,
+            self::F => self::E,
+            self::E => self::D,
+            self::D => self::C,
+            self::C => self::B,
+            self::B => self::A,
+            self::A => self::S,
+            self::S => self::SS,
+            self::SS => self::SS, // Max
+        };
+    }
+}
+```
+
+### 3.5 Value Objects
+
+**StatCollection**:
+
+```php
+<?php
+
+namespace App\ValueObjects;
+
+class StatCollection
+{
+    private const STAT_MIN = 0;
+    private const STAT_MAX = 1200;
+    
+    public function __construct(
+        private array $stats = [
+            'speed' => 0,
+            'stamina' => 0,
+            'power' => 0,
+            'guts' => 0,
+            'wit' => 0,
+        ]
+    ) {
+        $this->clampAll();
+    }
+    
+    public function add(string $stat, int $value): void
+    {
+        $this->stats[$stat] = $this->clamp($this->stats[$stat] + $value);
+    }
+    
+    public function get(string $stat): int
+    {
+        return $this->stats[$stat] ?? 0;
+    }
+    
+    public function toArray(): array
+    {
+        return $this->stats;
+    }
+    
+    private function clamp(int $value): int
+    {
+        return max(self::STAT_MIN, min(self::STAT_MAX, $value));
+    }
+    
+    private function clampAll(): void
+    {
+        foreach ($this->stats as $stat => $value) {
+            $this->stats[$stat] = $this->clamp($value);
+        }
+    }
 }
 ```
 
 ---
 
-## 3. API Specification
+## 4. Service Layer
 
-### 3.1 Character Management Endpoints
+### 4.1 CharacterService
 
-#### 3.1.1 Create Character
+Main orchestration service for character operations.
+
+```php
+<?php
+
+namespace App\Services;
+
+use App\Models\Character;
+use App\Repositories\CharacterRepository;
+use App\Services\External\ExternalAPIService;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
+
+/**
+ * Character Management Service
+ * 
+ * Handles business logic for character lifecycle management.
+ */
+class CharacterService
+{
+    public function __construct(
+        private CharacterRepository $repository,
+        private FactorInheritanceService $factorService,
+        private CharacterStateService $stateService,
+        private ExternalAPIService $externalApi
+    ) {}
+
+    /**
+     * Create a new character instance
+     * 
+     * @param array $data Character creation data
+     * @return Character
+     * @throws \App\Exceptions\CharacterCreationException
+     */
+    public function create(array $data): Character
+    {
+        return DB::transaction(function () use ($data) {
+            // Step 1: Fetch base data from external API if trainee_id provided
+            if (isset($data['trainee_id'])) {
+                $externalData = $this->externalApi->getCharacter($data['trainee_id']);
+                $data = $this->mergeExternalData($data, $externalData);
+            }
+
+            // Step 2: Calculate inheritance from parent factors
+            if (isset($data['parent_ids'])) {
+                $inheritance = $this->factorService->calculateInheritance($data['parent_ids']);
+                $data['current_stats'] = $this->applyInheritanceToStats($data['base_stats'], $inheritance);
+            } else {
+                $data['current_stats'] = $data['base_stats'];
+            }
+
+            // Step 3: Create character entity
+            $character = $this->repository->create($data);
+
+            // Step 4: Create aptitudes
+            if (isset($data['aptitudes'])) {
+                $this->createAptitudes($character, $data['aptitudes'], $inheritance ?? []);
+            }
+
+            // Step 5: Create factors
+            if (isset($inheritance)) {
+                $this->createFactors($character, $inheritance);
+            }
+
+            // Step 6: Fire domain event
+            event(new \App\Events\CharacterCreated($character));
+
+            return $character->fresh(['aptitudes', 'factors']);
+        });
+    }
+
+    /**
+     * Update character state
+     * 
+     * @param Character $character
+     * @param array $changes
+     * @return Character
+     */
+    public function updateState(Character $character, array $changes): Character
+    {
+        return $this->stateService->updateState($character, $changes);
+    }
+
+    /**
+     * Get character by ID with caching
+     * 
+     * @param int $id
+     * @return Character|null
+     */
+    public function findById(int $id): ?Character
+    {
+        return Cache::tags(['characters'])->remember(
+            "character:{$id}",
+            now()->addMinutes(5),
+            fn () => $this->repository->findWithRelations($id, ['aptitudes', 'factors'])
+        );
+    }
+
+    /**
+     * Invalidate character cache
+     * 
+     * @param Character $character
+     * @return void
+     */
+    public function invalidateCache(Character $character): void
+    {
+        Cache::tags(['characters'])->forget("character:{$character->id}");
+    }
+
+    /**
+     * Merge external API data with user input
+     * 
+     * @param array $userData
+     * @param array $externalData
+     * @return array
+     */
+    private function mergeExternalData(array $userData, array $externalData): array
+    {
+        return array_merge($userData, [
+            'name_jp' => $externalData['name_jp'] ?? null,
+            'image_path' => $externalData['image_url'] ?? null,
+            'base_stats' => $externalData['base_stats'] ?? [],
+            'growth_rates' => $externalData['growth_rates'] ?? [],
+        ]);
+    }
+
+    /**
+     * Apply inheritance bonuses to base stats
+     * 
+     * @param array $baseStats
+     * @param array $inheritance
+     * @return array
+     */
+    private function applyInheritanceToStats(array $baseStats, array $inheritance): array
+    {
+        $stats = new \App\ValueObjects\StatCollection($baseStats);
+        
+        foreach ($inheritance['stat_bonuses'] ?? [] as $stat => $bonus) {
+            $stats->add($stat, $bonus);
+        }
+        
+        return $stats->toArray();
+    }
+
+    /**
+     * Create aptitude records
+     * 
+     * @param Character $character
+     * @param array $aptitudes
+     * @param array $inheritance
+     * @return void
+     */
+    private function createAptitudes(Character $character, array $aptitudes, array $inheritance): void
+    {
+        foreach ($aptitudes as $category => $types) {
+            foreach ($types as $type => $grade) {
+                // Apply red factor bonuses if applicable
+                $finalGrade = $this->applyAptitudeInheritance($category, $type, $grade, $inheritance);
+                
+                $character->aptitudes()->create([
+                    'category' => $category,
+                    'type' => $type,
+                    'grade' => $finalGrade,
+                    'bonus_value' => \App\Enums\AptitudeGrade::from($finalGrade)->getBonusValue(),
+                ]);
+            }
+        }
+    }
+
+    /**
+     * Create factor records
+     * 
+     * @param Character $character
+     * @param array $inheritance
+     * @return void
+     */
+    private function createFactors(Character $character, array $inheritance): void
+    {
+        foreach ($inheritance['factors'] ?? [] as $factor) {
+            $character->factors()->create([
+                'source_character_id' => $factor['source_id'] ?? null,
+                'factor_type' => $factor['type'],
+                'target' => $factor['target'],
+                'stars' => $factor['stars'],
+                'bonus_value' => $factor['value'],
+            ]);
+        }
+    }
+
+    /**
+     * Apply red factor bonuses to aptitude grades
+     * 
+     * @param string $category
+     * @param string $type
+     * @param string $baseGrade
+     * @param array $inheritance
+     * @return string
+     */
+    private function applyAptitudeInheritance(
+        string $category,
+        string $type,
+        string $baseGrade,
+        array $inheritance
+    ): string {
+        $bonus = 0;
+        
+        foreach ($inheritance['aptitude_bonuses'] ?? [] as $aptBonus) {
+            if ($aptBonus['category'] === $category && $aptBonus['type'] === $type) {
+                $bonus += $aptBonus['levels'];
+            }
+        }
+        
+        $grade = \App\Enums\AptitudeGrade::from($baseGrade);
+        
+        for ($i = 0; $i < $bonus; $i++) {
+            $grade = $grade->upgrade();
+        }
+        
+        return $grade->value;
+    }
+}
+```
+
+### 4.2 CharacterStateService
+
+Handles state mutation operations with validation.
+
+```php
+<?php
+
+namespace App\Services;
+
+use App\Models\Character;
+use Illuminate\Support\Facades\DB;
+
+/**
+ * Character State Management Service
+ * 
+ * Handles validation and persistence of character state changes.
+ */
+class CharacterStateService
+{
+    /**
+     * Update character state with validation
+     * 
+     * @param Character $character
+     * @param array $changes
+     * @return Character
+     */
+    public function updateState(Character $character, array $changes): Character
+    {
+        return DB::transaction(function () use ($character, $changes) {
+            // Update stats if provided
+            if (isset($changes['current_stats'])) {
+                $character->updateStats($changes['current_stats']);
+            }
+
+            // Update energy with clamping
+            if (isset($changes['energy_level'])) {
+                $character->energy_level = $character->clampEnergy($changes['energy_level']);
+            }
+
+            // Update mood
+            if (isset($changes['mood_status'])) {
+                $character->mood_status = \App\Enums\MoodStatus::from($changes['mood_status']);
+            }
+
+            // Update conditions
+            if (isset($changes['conditions'])) {
+                $character->conditions = $this->validateConditions($changes['conditions']);
+            }
+
+            // Update goals
+            if (isset($changes['goals'])) {
+                $character->goals = $changes['goals'];
+            }
+
+            $character->save();
+
+            // Fire state updated event
+            event(new \App\Events\CharacterStateUpdated($character, $changes));
+
+            return $character->fresh();
+        });
+    }
+
+    /**
+     * Validate condition data structure
+     * 
+     * @param array $conditions
+     * @return array
+     */
+    private function validateConditions(array $conditions): array
+    {
+        return collect($conditions)->map(function ($condition) {
+            return [
+                'type' => $condition['type'] ?? 'unknown',
+                'severity' => $condition['severity'] ?? 'minor',
+                'turns_remaining' => max(0, $condition['turns_remaining'] ?? 0),
+            ];
+        })->toArray();
+    }
+}
+```
+
+### 4.3 FactorInheritanceService
+
+Calculates stat and aptitude bonuses from parent characters.
+
+```php
+<?php
+
+namespace App\Services;
+
+use App\Models\Character;
+use App\Enums\FactorType;
+
+/**
+ * Factor Inheritance Calculation Service
+ * 
+ * Handles calculation of inherited bonuses from parent characters.
+ */
+class FactorInheritanceService
+{
+    private const BLUE_FACTOR_VALUES = [
+        1 => 10,  // 1-star
+        2 => 15,  // 2-star
+        3 => 20,  // 3-star
+    ];
+
+    /**
+     * Calculate inheritance from parent characters
+     * 
+     * @param array $parentIds
+     * @return array
+     */
+    public function calculateInheritance(array $parentIds): array
+    {
+        $parents = Character::with('factors')->whereIn('id', $parentIds)->get();
+        
+        $inheritance = [
+            'stat_bonuses' => [],
+            'aptitude_bonuses' => [],
+            'skill_hints' => [],
+            'factors' => [],
+        ];
+
+        foreach ($parents as $parent) {
+            foreach ($parent->factors as $factor) {
+                match ($factor->factor_type) {
+                    FactorType::Stat => $this->applyStatFactor($inheritance, $factor),
+                    FactorType::Aptitude => $this->applyAptitudeFactor($inheritance, $factor),
+                    FactorType::Skill => $this->applySkillFactor($inheritance, $factor),
+                };
+            }
+        }
+
+        return $inheritance;
+    }
+
+    /**
+     * Apply blue factor (stat bonus)
+     * 
+     * @param array &$inheritance
+     * @param \App\Models\Factor $factor
+     * @return void
+     */
+    private function applyStatFactor(array &$inheritance, $factor): void
+    {
+        $stat = $factor->target;
+        $bonus = self::BLUE_FACTOR_VALUES[$factor->stars] ?? 0;
+        
+        $inheritance['stat_bonuses'][$stat] = ($inheritance['stat_bonuses'][$stat] ?? 0) + $bonus;
+        
+        $inheritance['factors'][] = [
+            'source_id' => $factor->character_id,
+            'type' => FactorType::Stat,
+            'target' => $stat,
+            'stars' => $factor->stars,
+            'value' => $bonus,
+        ];
+    }
+
+    /**
+     * Apply red factor (aptitude bonus)
+     * 
+     * @param array &$inheritance
+     * @param \App\Models\Factor $factor
+     * @return void
+     */
+    private function applyAptitudeFactor(array &$inheritance, $factor): void
+    {
+        [$category, $type] = explode(':', $factor->target);
+        
+        $inheritance['aptitude_bonuses'][] = [
+            'category' => $category,
+            'type' => $type,
+            'levels' => $factor->stars,
+        ];
+        
+        $inheritance['factors'][] = [
+            'source_id' => $factor->character_id,
+            'type' => FactorType::Aptitude,
+            'target' => $factor->target,
+            'stars' => $factor->stars,
+            'value' => $factor->stars,
+        ];
+    }
+
+    /**
+     * Apply green/white factor (skill hint)
+     * 
+     * @param array &$inheritance
+     * @param \App\Models\Factor $factor
+     * @return void
+     */
+    private function applySkillFactor(array &$inheritance, $factor): void
+    {
+        $inheritance['skill_hints'][] = [
+            'skill_id' => $factor->target,
+            'hint_level' => $factor->stars,
+        ];
+        
+        $inheritance['factors'][] = [
+            'source_id' => $factor->character_id,
+            'type' => FactorType::Skill,
+            'target' => $factor->target,
+            'stars' => $factor->stars,
+            'value' => 0,
+        ];
+    }
+}
+```
+
+---
+
+## 5. API Specification
+
+### 5.1 Endpoint Overview
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v1/characters` | List user's characters | Yes |
+| POST | `/api/v1/characters` | Create new character | Yes |
+| GET | `/api/v1/characters/{id}` | Get character details | Yes |
+| PATCH | `/api/v1/characters/{id}` | Update character | Yes |
+| DELETE | `/api/v1/characters/{id}` | Soft delete character | Yes |
+| PATCH | `/api/v1/characters/{id}/state` | Update character state | Yes |
+| POST | `/api/v1/characters/{id}/sync` | Sync external data | Yes |
+
+### 5.2 Create Character
+
+**Endpoint**: `POST /api/v1/characters`
+
+**Request Headers**:
 
 ```http
-POST /api/v1/characters
 Content-Type: application/json
 Authorization: Bearer {token}
-
-{
-    "name": "Mejiro Ardan",
-    "trainee_id": 10004,
-    "scenario": "URA",
-    "parent1_id": 10001,
-    "parent2_id": 10002,
-    "support_cards": [
-        {"card_id": 1001, "rarity": "SSR", "limit_breaks": 4},
-        {"card_id": 1002, "rarity": "SR", "limit_breaks": 2},
-        ...
-    ]
-}
+Accept: application/json
 ```
 
-**Response** (201 Created):
+**Request Body**:
 
 ```json
 {
-    "id": 1,
-    "user_id": 1,
-    "name": "Mejiro Ardan",
-    "trainee_id": 10004,
-    "scenario": "URA",
-    "current_energy": 100,
-    "current_mood": "Normal",
-    "days_until_race": 0,
-    "facility_level": 1,
-    "stats": {
-        "speed": 450,
-        "stamina": 420,
-        "power": 380,
-        "guts": 400,
-        "wit": 390
-    },
-    "aptitudes": [...],
-    "factors": [...],
-    "created_at": "2026-01-14T10:00:00Z",
-    "updated_at": "2026-01-14T10:00:00Z"
-}
-```
-
-#### 3.1.2 Get Character Details
-
-```http
-GET /api/v1/characters/{id}
-Authorization: Bearer {token}
-```
-
-**Response** (200 OK):
-
-```json
-{
-    "id": 1,
-    "name": "Mejiro Ardan",
-    "trainee_id": 10004,
-    "scenario": "URA",
-    "career_stage": "Debut",
-    "class": "Middle Distance Specialist",
-    "current_energy": 78,
-    "current_mood": "Good",
-    "days_until_race": 15,
-    "facility_level": 2,
-    "stats": {
-        "speed": 520,
-        "stamina": 480,
-        "power": 440,
-        "guts": 460,
-        "wit": 450,
-        "grades": {
-            "speed": "A",
-            "stamina": "A",
-            "power": "A",
-            "guts": "A",
-            "wit": "A"
-        }
-    },
-    "aptitudes": [
-        {"category": "distance", "type": "Mile", "rating": "A+"},
-        {"category": "surface", "type": "Turf", "rating": "A"},
-        {"category": "style", "type": "LateSurger", "rating": "S"}
-    ],
-    "factors": [
-        {
-            "id": 1,
-            "factor_type": "Stat",
-            "category": "Speed",
-            "rating": "★★★",
-            "bonus": 21
+    "name": "Special Week",
+    "trainee_id": 1001,
+    "scenario_type": "ura_finale",
+    "parent_ids": [12, 45],
+    "aptitudes": {
+        "distance": {
+            "sprint": "C",
+            "mile": "B",
+            "medium": "A",
+            "long": "B"
         },
-        ...
-    ],
-    "growth_rates": {
-        "speed": 20,
-        "stamina": 20,
-        "power": 10,
-        "guts": 20,
-        "wit": 10
+        "surface": {
+            "turf": "A",
+            "dirt": "C"
+        },
+        "style": {
+            "front_runner": "B",
+            "pace_chaser": "A",
+            "late_surger": "B",
+            "end_closer": "C"
+        }
     },
     "goals": [
         {
-            "id": 1,
-            "goal_type": "stat",
-            "target_stat": "speed",
-            "target_value": 800,
-            "current_value": 520,
-            "progress": 65,
-            "status": "active"
-        }
-    ],
-    "conditions": [
+            "id": "goal_1",
+            "type": "stat",
+            "target": "speed",
+            "value": 1200,
+            "status": "pending"
+        },
         {
-            "id": 1,
-            "condition_type": "positive",
-            "condition_name": "Sharp",
-            "effect": "-10% skill costs",
-            "expires_at": "2026-01-20T00:00:00Z"
-        }
-    ],
-    "skills": [
-        {
-            "id": 1,
-            "name": "Nimble",
-            "sp_cost": 120,
-            "category": "Normal",
-            "acquired_at": "2026-01-10T12:00:00Z"
-        }
-    ],
-    "support_deck": [
-        {
-            "card_id": 1001,
-            "name": "Mejiro Dober",
-            "rarity": "SSR",
-            "limit_breaks": 4,
-            "bond_level": 80,
-            "skills_provided": ["Lane Guidance", "Cool Breeze"]
+            "id": "goal_2",
+            "type": "race",
+            "target": "ura_finals",
+            "value": "win",
+            "status": "pending"
         }
     ]
 }
 ```
 
-#### 3.1.3 Update Character Stats
+**Success Response** (201 Created):
 
-```http
-PATCH /api/v1/characters/{id}/stats
-Content-Type: application/json
-Authorization: Bearer {token}
-
+```json
 {
-    "stats": {
-        "speed": 530,
-        "stamina": 490,
-        "power": 450,
-        "guts": 470,
-        "wit": 460
-    },
-    "source": "training_session",
-    "metadata": {
-        "training_session_id": 123,
-        "facility": "Speed"
+    "data": {
+        "id": 123,
+        "user_id": "uuid-here",
+        "name": "Special Week",
+        "name_jp": "スペシャルウィーク",
+        "trainee_id": 1001,
+        "image_path": "/images/characters/special_week.png",
+        "scenario_type": "ura_finale",
+        "base_stats": {
+            "speed": 100,
+            "stamina": 90,
+            "power": 85,
+            "guts": 80,
+            "wit": 75
+        },
+        "growth_rates": {
+            "speed": 20,
+            "stamina": 10,
+            "power": 15,
+            "guts": 10,
+            "wit": 10
+        },
+        "current_stats": {
+            "speed": 120,
+            "stamina": 100,
+            "power": 100,
+            "guts": 90,
+            "wit": 85
+        },
+        "energy_level": 100,
+        "mood_status": "normal",
+        "goals": [
+            {
+                "id": "goal_1",
+                "type": "stat",
+                "target": "speed",
+                "value": 1200,
+                "status": "pending"
+            }
+        ],
+        "conditions": null,
+        "aptitudes": [
+            {
+                "id": 1,
+                "category": "distance",
+                "type": "mile",
+                "grade": "A",
+                "bonus_value": 10
+            }
+        ],
+        "factors": [
+            {
+                "id": 1,
+                "factor_type": "stat",
+                "target": "speed",
+                "stars": 3,
+                "bonus_value": 20
+            }
+        ],
+        "created_at": "2026-01-24T10:00:00Z",
+        "updated_at": "2026-01-24T10:00:00Z"
     }
 }
 ```
 
-**Response** (200 OK): Updated character object
+**Error Responses**:
 
-#### 3.1.4 Update Character Mood/Energy
-
-```http
-PATCH /api/v1/characters/{id}/condition
-Content-Type: application/json
-Authorization: Bearer {token}
-
+```json
+// 422 Validation Error
 {
-    "current_energy": 65,
-    "current_mood": "Normal",
+    "message": "The given data was invalid.",
+    "errors": {
+        "trainee_id": ["The trainee_id field is required."],
+        "scenario_type": ["The selected scenario_type is invalid."]
+    }
+}
+
+// 404 Not Found (parent character)
+{
+    "message": "Parent character not found",
+    "error_code": "PARENT_NOT_FOUND"
+}
+
+// 503 Service Unavailable (external API)
+{
+    "message": "Unable to fetch character data from external source",
+    "error_code": "EXTERNAL_API_UNAVAILABLE"
+}
+```
+
+### 5.3 Update Character State
+
+**Endpoint**: `PATCH /api/v1/characters/{id}/state`
+
+**Request Body**:
+
+```json
+{
+    "current_stats": {
+        "speed": 450,
+        "stamina": 380,
+        "power": 420
+    },
+    "energy_level": 85,
+    "mood_status": "great",
     "conditions": [
         {
-            "condition_type": "positive",
-            "condition_name": "Charming",
-            "expires_at": "2026-01-20T00:00:00Z"
+            "type": "practice_poor",
+            "severity": "moderate",
+            "turns_remaining": 3
         }
     ]
 }
 ```
 
-**Response** (200 OK): Updated character object
-
-### 3.2 Goal Management Endpoints
-
-#### 3.2.1 Create Goal
-
-```http
-POST /api/v1/characters/{id}/goals
-Content-Type: application/json
-Authorization: Bearer {token}
-
-{
-    "goal_type": "stat",
-    "target_stat": "speed",
-    "target_value": 800,
-    "distance_type": "Mile"
-}
-```
-
-**Response** (201 Created):
+**Success Response** (200 OK):
 
 ```json
 {
-    "id": 1,
-    "character_id": 1,
-    "goal_type": "stat",
-    "target_stat": "speed",
-    "target_value": 800,
-    "current_value": 520,
-    "remaining": 280,
-    "progress": 65,
-    "status": "active",
-    "created_at": "2026-01-14T10:00:00Z"
-}
-```
-
-#### 3.2.2 Update Goal
-
-```http
-PATCH /api/v1/goals/{id}
-Content-Type: application/json
-Authorization: Bearer {token}
-
-{
-    "target_value": 850,
-    "status": "active"
-}
-```
-
-**Response** (200 OK): Updated goal object
-
-#### 3.2.3 List Character Goals
-
-```http
-GET /api/v1/characters/{id}/goals?status=active
-Authorization: Bearer {token}
-```
-
-**Response** (200 OK):
-
-```json
-{
-    "data": [
-        {
-            "id": 1,
-            "character_id": 1,
-            "goal_type": "stat",
-            "target_stat": "speed",
-            "target_value": 800,
-            "current_value": 520,
-            "progress": 65,
-            "status": "active"
+    "data": {
+        "id": 123,
+        "current_stats": {
+            "speed": 450,
+            "stamina": 380,
+            "power": 420,
+            "guts": 90,
+            "wit": 85
         },
-        ...
-    ],
-    "meta": {
-        "total": 5,
-        "count": 3,
-        "per_page": 15,
-        "current_page": 1
+        "energy_level": 85,
+        "mood_status": "great",
+        "conditions": [
+            {
+                "type": "practice_poor",
+                "severity": "moderate",
+                "turns_remaining": 3
+            }
+        ],
+        "updated_at": "2026-01-24T11:30:00Z"
     }
 }
 ```
 
-### 3.3 Aptitude & Factor Endpoints
+### 5.4 Sync External Data
 
-#### 3.3.1 Get Character Aptitudes
+**Endpoint**: `POST /api/v1/characters/{id}/sync`
 
-```http
-GET /api/v1/characters/{id}/aptitudes
-Authorization: Bearer {token}
-```
+Triggers a refresh of base metadata from external APIs.
 
-**Response** (200 OK):
+**Success Response** (200 OK):
 
 ```json
 {
-    "distances": [
-        {"type": "Sprint", "rating": "B+", "is_specialty": false},
-        {"type": "Mile", "rating": "A+", "is_specialty": true},
-        {"type": "Medium", "rating": "A", "is_specialty": false},
-        {"type": "Long", "rating": "B", "is_specialty": false}
-    ],
-    "surfaces": [
-        {"type": "Turf", "rating": "A", "is_specialty": false},
-        {"type": "Dirt", "rating": "B", "is_specialty": false}
-    ],
-    "styles": [
-        {"type": "FrontRunner", "rating": "B"},
-        {"type": "PaceChaser", "rating": "C+"},
-        {"type": "LateSurger", "rating": "S", "is_specialty": true},
-        {"type": "EndCloser", "rating": "C"}
-    ]
-}
-```
-
-#### 3.3.2 Get Character Factors
-
-```http
-GET /api/v1/characters/{id}/factors
-Authorization: Bearer {token}
-```
-
-**Response** (200 OK):
-
-```json
-{
-    "stat_factors": [
-        {
-            "id": 1,
-            "stat_type": "Speed",
-            "rating": "★★★",
-            "bonus": 21,
-            "legacy_character": "Power Lance"
-        },
-        {
-            "id": 2,
-            "stat_type": "Stamina",
-            "rating": "★★☆",
-            "bonus": 12,
-            "legacy_character": "Dancer's Image"
-        }
-    ],
-    "aptitude_factors": [
-        {
-            "id": 3,
-            "category": "distance",
-            "type": "Mile",
-            "rating": "3★",
-            "upgrade_grades": 3,
-            "legacy_character": "Power Lance"
-        }
-    ],
-    "skill_factors": [
-        {
-            "id": 5,
-            "skill_type": "Unique",
-            "skill_name": "Predator's Instinct",
-            "guaranteed": true,
-            "legacy_character": "Power Lance"
-        }
-    ]
-}
-```
-
-### 3.4 Character Snapshot Endpoints
-
-#### 3.4.1 Create Snapshot
-
-```http
-POST /api/v1/characters/{id}/snapshots
-Content-Type: application/json
-Authorization: Bearer {token}
-
-{
-    "label": "Day 150 - Pre-Finals Checkpoint",
-    "description": "Character state before final training push"
-}
-```
-
-**Response** (201 Created):
-
-```json
-{
-    "id": 1,
-    "character_id": 1,
-    "label": "Day 150 - Pre-Finals Checkpoint",
-    "description": "Character state before final training push",
-    "snapshot_data": {
-        "stats": {...},
-        "aptitudes": [...],
-        "conditions": [...],
-        "skills": [...],
-        "mood": "Good",
-        "energy": 78
-    },
-    "created_at": "2026-01-14T10:00:00Z"
-}
-```
-
-#### 3.4.2 List Snapshots
-
-```http
-GET /api/v1/characters/{id}/snapshots
-Authorization: Bearer {token}
-```
-
-**Response** (200 OK):
-
-```json
-{
-    "data": [
-        {
-            "id": 3,
-            "label": "Day 200 - Finals Started",
-            "created_at": "2026-01-12T10:00:00Z"
-        },
-        {
-            "id": 2,
-            "label": "Day 150 - Pre-Finals Checkpoint",
-            "created_at": "2026-01-10T10:00:00Z"
-        },
-        {
-            "id": 1,
-            "label": "Initial State",
-            "created_at": "2026-01-05T10:00:00Z"
-        }
-    ],
-    "meta": {
-        "total": 3,
-        "count": 3
+    "message": "Character data synchronized successfully",
+    "data": {
+        "fields_updated": ["name_jp", "image_path", "base_stats"],
+        "synced_at": "2026-01-24T12:00:00Z"
     }
 }
 ```
 
 ---
 
-## 4. Database Schema
+## 6. Database Schema
 
-### 4.1 Characters Table
+### 6.1 Table: `ucp_characters`
+
+Primary table storing character instances.
 
 ```sql
-CREATE TABLE characters (
-    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    user_id BIGINT UNSIGNED NOT NULL,
+CREATE TABLE ucp_characters (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id CHAR(36) NOT NULL,
     name VARCHAR(255) NOT NULL,
-    trainee_id INT NOT NULL,
-    scenario ENUM('URA', 'Unity') NOT NULL DEFAULT 'URA',
-    career_stage VARCHAR(100),
-    class VARCHAR(100),
-    current_energy INT NOT NULL DEFAULT 100,
-    current_mood ENUM('Awful', 'Bad', 'Normal', 'Good', 'Great') DEFAULT 'Normal',
-    days_until_race INT DEFAULT 0,
-    facility_level INT NOT NULL DEFAULT 1,
-    created_at TIMESTAMP,
-    updated_at TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    name_jp VARCHAR(255) NULL,
+    trainee_id INT UNSIGNED NULL,
+    image_path VARCHAR(500) NULL,
+    scenario_type ENUM('ura_finale', 'aohari_cup', 'make_cup_debut', 'grand_masters', 'project_larc') NOT NULL,
+    base_stats JSON NOT NULL COMMENT '{"speed":0,"stamina":0,"power":0,"guts":0,"wit":0}',
+    growth_rates JSON NOT NULL DEFAULT '{"speed":0,"stamina":0,"power":0,"guts":0,"wit":0}',
+    current_stats JSON NOT NULL DEFAULT '{"speed":0,"stamina":0,"power":0,"guts":0,"wit":0}',
+    energy_level TINYINT UNSIGNED NOT NULL DEFAULT 100 CHECK (energy_level BETWEEN 0 AND 100),
+    mood_status ENUM('awful', 'bad', 'normal', 'good', 'great') NOT NULL DEFAULT 'normal',
+    goals JSON NULL,
+    conditions JSON NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP NULL,
+    
+    FOREIGN KEY (user_id) REFERENCES ucp_users(id) ON DELETE CASCADE,
     INDEX idx_user_id (user_id),
-    INDEX idx_created_at (created_at)
-) ENGINE=InnoDB;
+    INDEX idx_trainee_id (trainee_id),
+    INDEX idx_scenario_type (scenario_type),
+    INDEX idx_deleted_at (deleted_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
-### 4.2 Character Stats Table
+### 6.2 Table: `ucp_aptitudes`
+
+Stores aptitude ratings for each character.
 
 ```sql
-CREATE TABLE character_stats (
-    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+CREATE TABLE ucp_aptitudes (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     character_id BIGINT UNSIGNED NOT NULL,
-    stat_type ENUM('Speed', 'Stamina', 'Power', 'Guts', 'Wit') NOT NULL,
-    current_value INT NOT NULL DEFAULT 0,
-    base_value INT NOT NULL DEFAULT 0,
-    growth_rate INT DEFAULT 0,
-    created_at TIMESTAMP,
-    updated_at TIMESTAMP,
-    FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE,
-    UNIQUE KEY unique_stat (character_id, stat_type),
-    INDEX idx_stat_type (stat_type)
-) ENGINE=InnoDB;
-```
-
-### 4.3 Aptitudes Table
-
-```sql
-CREATE TABLE aptitudes (
-    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    character_id BIGINT UNSIGNED NOT NULL,
-    category ENUM('Distance', 'Surface', 'Style') NOT NULL,
-    type VARCHAR(50) NOT NULL,
-    rating VARCHAR(10) NOT NULL,
-    is_specialty BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP,
-    updated_at TIMESTAMP,
-    FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE,
+    category ENUM('distance', 'surface', 'style') NOT NULL,
+    type VARCHAR(50) NOT NULL COMMENT 'sprint, mile, turf, front_runner, etc.',
+    grade ENUM('SS', 'S', 'A', 'B', 'C', 'D', 'E', 'F', 'G') NOT NULL,
+    bonus_value TINYINT NOT NULL DEFAULT 0,
+    
+    FOREIGN KEY (character_id) REFERENCES ucp_characters(id) ON DELETE CASCADE,
     UNIQUE KEY unique_aptitude (character_id, category, type),
-    INDEX idx_category (category),
-    INDEX idx_rating (rating)
-) ENGINE=InnoDB;
+    INDEX idx_grade (grade)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
-### 4.4 Factors Table
+### 6.3 Table: `ucp_factors`
+
+Stores inherited factors from parent characters.
 
 ```sql
-CREATE TABLE factors (
-    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+CREATE TABLE ucp_factors (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     character_id BIGINT UNSIGNED NOT NULL,
-    legacy_character_id INT,
-    factor_type ENUM('Stat', 'Aptitude', 'UniqueSkill', 'NormalSkill') NOT NULL,
-    category VARCHAR(100),
-    rating VARCHAR(20),
-    inherited_value INT,
-    created_at TIMESTAMP,
-    updated_at TIMESTAMP,
-    FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE,
+    source_character_id BIGINT UNSIGNED NULL COMMENT 'Parent character ID',
+    factor_type ENUM('stat', 'aptitude', 'skill') NOT NULL,
+    target VARCHAR(100) NOT NULL COMMENT 'Stat name, aptitude type, or skill ID',
+    stars TINYINT UNSIGNED NOT NULL CHECK (stars BETWEEN 1 AND 3),
+    bonus_value SMALLINT NULL,
+    
+    FOREIGN KEY (character_id) REFERENCES ucp_characters(id) ON DELETE CASCADE,
+    FOREIGN KEY (source_character_id) REFERENCES ucp_characters(id) ON DELETE SET NULL,
     INDEX idx_character_id (character_id),
     INDEX idx_factor_type (factor_type)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
-### 4.5 Goals Table
+### 6.4 Indexes & Performance
 
-```sql
-CREATE TABLE goals (
-    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    character_id BIGINT UNSIGNED NOT NULL,
-    goal_type ENUM('Stat', 'Race', 'Aptitude') NOT NULL,
-    target_stat VARCHAR(50),
-    target_value INT,
-    distance_type VARCHAR(50),
-    status ENUM('Active', 'Completed', 'Abandoned') DEFAULT 'Active',
-    created_at TIMESTAMP,
-    completed_at TIMESTAMP,
-    updated_at TIMESTAMP,
-    FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE,
-    INDEX idx_character_id (character_id),
-    INDEX idx_status (status),
-    INDEX idx_goal_type (goal_type)
-) ENGINE=InnoDB;
-```
+**Query Optimization**:
 
-### 4.6 Conditions Table
+- `idx_user_id`: Fast user character lookups
+- `idx_trainee_id`: External sync operations
+- `idx_deleted_at`: Soft delete filtering
+- `unique_aptitude`: Prevent duplicate aptitude entries
 
-```sql
-CREATE TABLE conditions (
-    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    character_id BIGINT UNSIGNED NOT NULL,
-    condition_type ENUM('Positive', 'Negative') NOT NULL,
-    condition_name VARCHAR(100) NOT NULL,
-    effect TEXT,
-    modifier INT,
-    expires_at TIMESTAMP,
-    created_at TIMESTAMP,
-    FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE,
-    INDEX idx_character_id (character_id),
-    INDEX idx_expires_at (expires_at)
-) ENGINE=InnoDB;
-```
+**Storage Estimates**:
 
-### 4.7 Character Snapshots Table
-
-```sql
-CREATE TABLE character_snapshots (
-    id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    character_id BIGINT UNSIGNED NOT NULL,
-    label VARCHAR(255),
-    description TEXT,
-    snapshot_data JSON NOT NULL,
-    created_at TIMESTAMP,
-    FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE,
-    INDEX idx_character_id (character_id),
-    INDEX idx_created_at (created_at)
-) ENGINE=InnoDB;
-```
+- Characters: ~1KB per row
+- Aptitudes: ~50B per row (avg 10 per character)
+- Factors: ~100B per row (avg 5 per character)
 
 ---
 
-## 5. System Interactions
+## 7. Business Logic
 
-### 5.1 Character Creation Workflow
+### 7.1 Stat Clamping Rules
 
-```
-User Initiates Character Creation
-        ↓
-[CharacterController.store()]
-        ↓
-[CharacterService.createCharacter()]
-        ↓
-├─→ Create Character record
-├─→ [FactorInheritanceService] Calculate inherited stats
-├─→ [GrowthRateService] Initialize growth rates
-├─→ Create initial Aptitudes (fixed, non-trainable)
-├─→ Create initial Conditions (if any)
-├─→ Create initial Goals (default or user-provided)
-├─→ Create first Snapshot
-└─→ [AuditLogger] Log creation event
-        ↓
-Return Character with full details
-```
+All character stats must be clamped to the valid range:
 
-### 5.2 Character State Update Workflow
-
-```
-Training Session Complete
-        ↓
-[TrainingSessionController.complete()]
-        ↓
-[CharacterStateService.updateAfterTraining()]
-        ↓
-├─→ Update Stats (with growth rate multiplier)
-├─→ Update Energy (reduce 20-30%)
-├─→ Update Mood (based on training results)
-├─→ Update Conditions (apply/remove as needed)
-├─→ Check Goal Progress
-├─→ Trigger "CharacterUpdated" Event
-├─→ [AuditLogger] Log stat changes
-└─→ [CacheService] Invalidate character cache
-        ↓
-Return Updated Character
-```
-
-### 5.3 Goal Progress Calculation
-
-```
-Character Stats Updated
-        ↓
-[GoalManagementService.updateGoalProgress()]
-        ↓
-For each Active Goal:
-    ├─→ Calculate current progress value
-    ├─→ Calculate remaining to target
-    ├─→ Calculate percentage progress
-    ├─→ If progress >= target:
-    │   └─→ Mark goal as "Completed"
-    │   └─→ Trigger "GoalCompleted" Event
-    └─→ Emit Progress event for UI update
-        ↓
-Update Goal records in database
-```
-
----
-
-## 6. Error Handling
-
-### 6.1 Validation Errors
-
-| Scenario | Error Code | HTTP Status | Response |
-| --- | --- | --- | --- |
-| Invalid trainee_id | INVALID_TRAINEE | 422 | {"error": "Trainee not found in database"} |
-| Invalid parent selection | INVALID_PARENTS | 422 | {"error": "Parent characters incompatible"} |
-| Invalid support card count | INVALID_DECK_SIZE | 422 | {"error": "Support deck must contain exactly 6 cards"} |
-| Goal target below minimum | GOAL_BELOW_MINIMUM | 422 | {"error": "Target stat below minimum for distance type"} |
-| Energy below 0 | INVALID_ENERGY | 422 | {"error": "Character energy cannot be negative"} |
-
-### 6.2 Business Logic Errors
-
-| Scenario | Error Code | HTTP Status | Response |
-| --- | --- | --- | --- |
-| Character doesn't exist | CHARACTER_NOT_FOUND | 404 | {"error": "Character not found"} |
-| Unauthorized access | UNAUTHORIZED | 403 | {"error": "Not authorized to access this character"} |
-| Goal doesn't exist | GOAL_NOT_FOUND | 404 | {"error": "Goal not found"} |
-| Snapshot doesn't exist | SNAPSHOT_NOT_FOUND | 404 | {"error": "Snapshot not found"} |
-| Database error | DB_ERROR | 500 | {"error": "Database operation failed"} |
-
----
-
-## 7. Performance Considerations
-
-### 7.1 Caching Strategy
-
-- **Character Cache**: 5-minute TTL for character details with stats/aptitudes
-- **Aptitude Cache**: 1-hour TTL for fixed aptitude data
-- **Factor Cache**: 1-hour TTL for inheritance calculations
-- **Goal Cache**: 10-minute TTL for progress calculations
-
-### 7.2 Query Optimization
+- **Minimum**: 0
+- **Maximum**: 1200
+- **Enforcement**: Validated in `StatCollection` value object
 
 ```php
-// Use eager loading to prevent N+1 queries
-Character::with([
-    'aptitudes',
-    'factors',
-    'goals',
-    'conditions',
-    'skills',
-    'stats'
-])->find($id);
+// Example usage
+$stats = new StatCollection(['speed' => 1500]); // Clamped to 1200
+$stats->add('speed', -2000); // Results in 0
 ```
 
-### 7.3 Database Indexes
+### 7.2 Energy Management
 
-- `characters` table: user_id, created_at
-- `character_stats` table: character_id + stat_type
-- `aptitudes` table: character_id, category, rating
-- `factors` table: character_id, factor_type
-- `goals` table: character_id, status, goal_type
-- `conditions` table: character_id, expires_at
+Energy governs training risk and recovery:
 
----
+- **Range**: 0-100
+- **Starting Value**: 100
+- **Depletion**: 15-30 per training session
+- **Recovery**: 50-70 via Rest action
+- **Risk Threshold**: Below 50 increases failure probability
 
-## 8. Testing Requirements
+### 7.3 Mood Effects
 
-### 8.1 Unit Tests
+Mood status affects training outcomes:
 
-- [ ] Character model creation and relationships
-- [ ] Stat calculation and grade conversion
-- [ ] Aptitude validation
-- [ ] Factor inheritance calculations
-- [ ] Growth rate application
-- [ ] Goal progress tracking
-- [ ] Condition application and expiry
+| Status | Multiplier | Training Gain Impact |
+|--------|-----------|---------------------|
+| Awful | 0.90x | -10% effectiveness |
+| Bad | 0.95x | -5% effectiveness |
+| Normal | 1.00x | Baseline |
+| Good | 1.05x | +5% effectiveness |
+| Great | 1.10x | +10% effectiveness |
 
-### 8.2 Integration Tests
+### 7.4 Inheritance Calculation
 
-- [ ] Character creation with full workflow
-- [ ] Character state updates after training
-- [ ] Goal completion and updates
-- [ ] Snapshot creation and retrieval
-- [ ] Support card deck management
-- [ ] Factor inheritance from legacy characters
+**Blue Factors (Stats)**:
 
-### 8.3 API Tests
+- 1-star: +10 to target stat
+- 2-star: +15 to target stat
+- 3-star: +20 to target stat
 
-- [ ] POST /api/v1/characters - creation
-- [ ] GET /api/v1/characters/{id} - retrieval
-- [ ] PATCH /api/v1/characters/{id}/stats - update stats
-- [ ] PATCH /api/v1/characters/{id}/condition - update condition
-- [ ] Goal CRUD operations
-- [ ] Snapshot operations
-- [ ] Error handling and validation
+**Red Factors (Aptitudes)**:
 
-### 8.4 Performance Tests
+- 1-star: +1 grade level
+- 2-star: +2 grade levels
+- 3-star: +3 grade levels
 
-- [ ] Character loading with full relationships < 100ms
-- [ ] Bulk stat updates < 200ms
-- [ ] Goal progress calculation < 50ms
-- [ ] Cache invalidation and refresh < 500ms
+**Green/White Factors (Skills)**:
 
----
+- Grants initial skill hint at specified level
 
-## 9. Implementation Checklist
+### 7.5 Goal Tracking
 
-### 9.1 Models & Relationships
+Goals are stored as JSON arrays with the following structure:
 
-- [ ] Character model with relationships
-- [ ] Stat model and calculations
-- [ ] Aptitude model
-- [ ] Factor model
-- [ ] Goal model
-- [ ] Condition model
-- [ ] Snapshot model
+```json
+{
+    "id": "unique_goal_id",
+    "type": "stat|race|achievement",
+    "target": "speed|race_name|achievement_id",
+    "value": 1200,
+    "status": "pending|in_progress|completed|failed",
+    "progress": 850,
+    "required": 1200
+}
+```
 
-### 9.2 Controllers & Endpoints
+**Validation Rules**:
 
-- [ ] CharacterController (CRUD)
-- [ ] CharacterStatsController
-- [ ] GoalController
-- [ ] AptitudeController
-- [ ] FactorController
-- [ ] ConditionController
-- [ ] SnapshotController
-
-### 9.3 Services & Business Logic
-
-- [ ] CharacterService
-- [ ] CharacterStateService
-- [ ] GoalManagementService
-- [ ] FactorInheritanceService
-- [ ] GrowthRateService
-
-### 9.4 Repositories
-
-- [ ] CharacterRepository
-- [ ] StatRepository
-- [ ] AptitudeRepository
-- [ ] GoalRepository
-
-### 9.5 Database & Migrations
-
-- [ ] All tables created with indexes
-- [ ] Foreign key relationships
-- [ ] Seeders for test data
-
-### 9.6 Testing
-
-- [ ] Unit tests (80%+ coverage)
-- [ ] Integration tests
-- [ ] API tests with assertions
+- `type` must be one of: stat, race, achievement
+- `status` must be one of: pending, in_progress, completed, failed
+- `progress` must be ≥ 0
+- `required` must be > 0
 
 ---
 
-**Next Document**: [SPEC-002_Training_Optimization_Technical.md](SPEC-002_Training_Optimization_Technical.md)
+## 8. Integration Points
+
+### 8.1 External API Integration
+
+**Primary Source**: `umapyoi.net`  
+**Fallback**: `umamusumedb.com`
+
+**Data Synced**:
+
+- Character base stats
+- Growth rate modifiers
+- Official Japanese names
+- Character images
+
+**Sync Strategy**:
+
+- On character creation (if `trainee_id` provided)
+- Manual sync via `/sync` endpoint
+- Cached for 24 hours
+
+```php
+// Example integration
+$externalData = $this->externalApi->getCharacter(1001);
+
+// Expected response structure
+[
+    'id' => 1001,
+    'name_en' => 'Special Week',
+    'name_jp' => 'スペシャルウィーク',
+    'image_url' => 'https://...',
+    'base_stats' => ['speed' => 100, 'stamina' => 90, ...],
+    'growth_rates' => ['speed' => 20, 'stamina' => 10, ...],
+]
+```
+
+### 8.2 Event Broadcasting
+
+**Events Fired**:
+
+1. `CharacterCreated`: After successful character creation
+2. `CharacterStateUpdated`: After state mutation
+3. `CharacterDeleted`: After soft delete
+
+**Listeners**:
+
+- `UpdateAnalyticsDashboard`: Track character creation metrics
+- `InvalidateCharacterCache`: Clear Redis cache
+- `NotifyUserOfMilestone`: Trigger notifications for goal completion
+
+### 8.3 Cache Integration
+
+**Cache Strategy**:
+
+```php
+// Read-through cache pattern
+$character = Cache::tags(['characters'])->remember(
+    "character:{$id}",
+    now()->addMinutes(5),
+    fn() => Character::with(['aptitudes', 'factors'])->find($id)
+);
+
+// Invalidation on write
+Cache::tags(['characters'])->forget("character:{$id}");
+```
+
+**Cache Keys**:
+
+- `character:{id}`: Full character data with relations
+- `user:{user_id}:characters`: Character list per user
+
+**TTL**: 5 minutes for active characters
+
+---
+
+## 9. Error Handling
+
+### 9.1 Exception Hierarchy
+
+```php
+App\Exceptions\CharacterException (Base)
+├── CharacterNotFoundException
+├── CharacterCreationException
+├── InvalidStatValueException
+├── InvalidAptitudeGradeException
+├── ParentCharacterIncompatibleException
+└─��� ExternalAPIUnavailableException
+```
+
+### 9.2 Error Codes
+
+| Code | HTTP Status | Description | Resolution |
+|------|-------------|-------------|------------|
+| `CHAR_NOT_FOUND` | 404 | Character ID does not exist | Verify ID |
+| `CHAR_INVALID_STAT` | 422 | Stat value outside 0-1200 | Validate input |
+| `CHAR_PARENT_INCOMPATIBLE` | 422 | Parent selection invalid | Choose different parents |
+| `CHAR_SCENARIO_INVALID` | 422 | Unsupported scenario type | Use valid scenario |
+| `CHAR_EXTERNAL_API_FAIL` | 503 | External API unavailable | Retry or use cache |
+
+### 9.3 Validation Rules
+
+```php
+// Character creation validation
+[
+    'name' => 'required|string|max:255',
+    'trainee_id' => 'nullable|integer|exists:external_characters,id',
+    'scenario_type' => 'required|in:ura_finale,aohari_cup,make_cup_debut,grand_masters,project_larc',
+    'parent_ids' => 'nullable|array|size:2',
+    'parent_ids.*' => 'integer|exists:ucp_characters,id',
+    'aptitudes' => 'required|array',
+    'aptitudes.*.*.grade' => 'required|in:SS,S,A,B,C,D,E,F,G',
+]
+```
+
+---
+
+## 10. Performance Optimization
+
+### 10.1 Query Optimization
+
+**Eager Loading**:
+
+```php
+// Always eager load relationships to avoid N+1
+Character::with(['aptitudes', 'factors', 'careerRuns'])->get();
+```
+
+**Selective Column Loading**:
+
+```php
+// Load only required columns
+Character::select(['id', 'name', 'current_stats'])->get();
+```
+
+**Index Usage**:
+
+- Ensure queries use `idx_user_id` for user-scoped queries
+- Use `idx_trainee_id` for external sync operations
+
+### 10.2 Caching Strategy
+
+**Read-Heavy Operations**:
+
+- Character detail views: 5-minute cache
+- Character lists: 3-minute cache
+- External API data: 24-hour cache
+
+**Write Operations**:
+
+- Invalidate specific character cache on update
+- Use cache tags for bulk invalidation
+
+### 10.3 Performance Targets
+
+| Operation | Target | Measurement |
+|-----------|--------|-------------|
+| Character list (10 items) | < 50ms | p95 |
+| Character detail with relations | < 100ms | p95 |
+| Character creation | < 300ms | p95 |
+| State update | < 150ms | p95 |
+
+---
+
+## 11. Security Considerations
+
+### 11.1 Authorization
+
+**Policy Rules**:
+
+```php
+// CharacterPolicy.php
+
+public function view(User $user, Character $character): bool
+{
+    return $user->id === $character->user_id;
+}
+
+public function update(User $user, Character $character): bool
+{
+    return $user->id === $character->user_id;
+}
+
+public function delete(User $user, Character $character): bool
+{
+    return $user->id === $character->user_id;
+}
+```
+
+**Enforcement**:
+
+```php
+// Controller
+$this->authorize('update', $character);
+```
+
+### 11.2 Input Sanitization
+
+All user input is validated via Form Requests:
+
+```php
+class StoreCharacterRequest extends FormRequest
+{
+    public function rules(): array
+    {
+        return [
+            'name' => ['required', 'string', 'max:255', 'regex:/^[\pL\s\-]+$/u'],
+            'current_stats.*' => ['integer', 'between:0,1200'],
+            // ... additional rules
+        ];
+    }
+}
+```
+
+### 11.3 SQL Injection Prevention
+
+- All queries use Eloquent ORM with parameter binding
+- No raw SQL with user input concatenation
+- JSON columns use native JSON operations
+
+### 11.4 Mass Assignment Protection
+
+```php
+// Model
+protected $fillable = [
+    'name',
+    'trainee_id',
+    // ... explicit allowed fields
+];
+
+protected $guarded = [
+    'id',
+    'user_id', // Never mass-assignable
+];
+```
+
+---
+
+## 12. Testing Strategy
+
+### 12.1 Unit Tests
+
+**Coverage Targets**: 80% minimum
+
+```php
+// tests/Unit/Services/CharacterServiceTest.php
+
+test('creates character with inheritance from parents', function () {
+    $parent1 = Character::factory()->create();
+    $parent2 = Character::factory()->create();
+    
+    $data = [
+        'name' => 'Test Character',
+        'trainee_id' => 1001,
+        'scenario_type' => 'ura_finale',
+        'parent_ids' => [$parent1->id, $parent2->id],
+    ];
+    
+    $character = app(CharacterService::class)->create($data);
+    
+    expect($character->current_stats['speed'])->toBeGreaterThan(0)
+        ->and($character->factors)->toHaveCount(2);
+});
+
+test('clamps stat values to valid range', function () {
+    $stats = new StatCollection(['speed' => 1500]);
+    
+    expect($stats->get('speed'))->toBe(1200);
+});
+```
+
+### 12.2 Feature Tests
+
+```php
+// tests/Feature/CharacterManagementTest.php
+
+test('authenticated user can create character', function () {
+    $user = User::factory()->create();
+    
+    $response = $this->actingAs($user)
+        ->postJson('/api/v1/characters', [
+            'name' => 'Special Week',
+            'trainee_id' => 1001,
+            'scenario_type' => 'ura_finale',
+        ]);
+    
+    $response->assertStatus(201)
+        ->assertJsonStructure([
+            'data' => ['id', 'name', 'current_stats']
+        ]);
+    
+    $this->assertDatabaseHas('ucp_characters', [
+        'user_id' => $user->id,
+        'name' => 'Special Week',
+    ]);
+});
+
+test('user cannot view another users character', function () {
+    $user1 = User::factory()->create();
+    $user2 = User::factory()->create();
+    $character = Character::factory()->for($user2)->create();
+    
+    $response = $this->actingAs($user1)
+        ->getJson("/api/v1/characters/{$character->id}");
+    
+    $response->assertStatus(403);
+});
+```
+
+### 12.3 Integration Tests
+
+```php
+// tests/Integration/FactorInheritanceTest.php
+
+test('blue factors correctly apply stat bonuses', function () {
+    $parent = Character::factory()->create();
+    $parent->factors()->create([
+        'factor_type' => 'stat',
+        'target' => 'speed',
+        'stars' => 3,
+        'bonus_value' => 20,
+    ]);
+    
+    $service = app(FactorInheritanceService::class);
+    $inheritance = $service->calculateInheritance([$parent->id]);
+    
+    expect($inheritance['stat_bonuses']['speed'])->toBe(20);
+});
+```
+
+### 12.4 Test Data Factories
+
+```php
+// database/factories/CharacterFactory.php
+
+class CharacterFactory extends Factory
+{
+    public function definition(): array
+    {
+        return [
+            'user_id' => User::factory(),
+            'name' => $this->faker->firstName(),
+            'trainee_id' => $this->faker->numberBetween(1001, 1050),
+            'scenario_type' => 'ura_finale',
+            'base_stats' => [
+                'speed' => 100,
+                'stamina' => 90,
+                'power' => 85,
+                'guts' => 80,
+                'wit' => 75,
+            ],
+            'growth_rates' => [
+                'speed' => 20,
+                'stamina' => 10,
+                'power' => 15,
+                'guts' => 10,
+                'wit' => 10,
+            ],
+            'current_stats' => [
+                'speed' => 100,
+                'stamina' => 90,
+                'power' => 85,
+                'guts' => 80,
+                'wit' => 75,
+            ],
+            'energy_level' => 100,
+            'mood_status' => 'normal',
+        ];
+    }
+}
+```
+
+---
+
+## 13. Appendices
+
+### Appendix A: Stat Grade Mapping
+
+| Grade | Stat Range | Training Difficulty |
+|-------|-----------|---------------------|
+| SS | 1100-1200 | Extremely Hard |
+| S | 950-1099 | Very Hard |
+| A | 850-949 | Hard |
+| B+ | 750-849 | Moderate+ |
+| B | 650-749 | Moderate |
+| C+ | 550-649 | Easy+ |
+| C | 450-549 | Easy |
+| D+ | 350-449 | Very Easy+ |
+| D | 250-349 | Very Easy |
+| E | 150-249 | Trivial |
+| F | 0-149 | Minimal |
+
+### Appendix B: Scenario Comparison
+
+| Scenario | Difficulty | Unique Mechanics | Best For |
+|----------|-----------|------------------|----------|
+| URA Finale | Standard | Classic structure | Beginners |
+| Aoharu Cup | Hard | Team battles | Advanced players |
+| Make Cup Debut | Moderate | Skill focus | Skill farming |
+| Grand Masters | Very Hard | Multi-phase | Veterans |
+| Project L'Arc | Expert | Arc training | Min-maxing |
+
+### Appendix C: Growth Rate Examples
+
+**Speed-focused Character** (e.g., Silence Suzuka):
+
+```json
+{
+    "speed": 30,
+    "stamina": 0,
+    "power": 10,
+    "guts": 0,
+    "wit": 10
+}
+```
+
+**Balanced Character** (e.g., Special Week):
+
+```json
+{
+    "speed": 20,
+    "stamina": 10,
+    "power": 15,
+    "guts": 10,
+    "wit": 10
+}
+```
+
+**Stamina-focused Character** (e.g., Gold Ship):
+
+```json
+{
+    "speed": 0,
+    "stamina": 30,
+    "power": 0,
+    "guts": 20,
+    "wit": 0
+}
+```
+
+### Appendix D: Change Log
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 2.0.0 | 2026-01-24 | Development Team | Full v2.0.0 alignment, added enums, value objects |
+| 1.0.0 | 2026-01-23 | Development Team | Initial technical specification |
+
+---
+
+**Document Approval**
+
+| Role | Name | Signature | Date |
+|------|------|-----------|------|
+| Tech Lead | [Name] | _________ | 2026-01-24 |
+| Product Owner | [Name] | _________ | 2026-01-24 |
+| QA Lead | [Name] | _________ | 2026-01-24 |
+
+---
+
+**Document Control**  
+**Maintained By**: Backend Development Team  
+**Review Frequency**: Bi-weekly during active development  
+**Next Review Date**: 2026-02-07  
+**Distribution**: Development Team, QA Team, Product Management
+
+---
+
+**End of Document**

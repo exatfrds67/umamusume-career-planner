@@ -2,112 +2,186 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 1.0
-**Date**: January 14, 2026
-**Related Documents**: [PRD-003], [SPEC-003]
+**Document Version**: 2.1.0
+**Date**: January 24, 2026
+**Project**: UmamusumeCareerPlanner
+**Author**: Development Team
+**Status**: Current - Aligned with codebase v2.0.0
 
 ---
 
-## 1. Race Preparation Flow
+## 1. Race Preparation & Strategy Analysis Flow
+
+This flow details how `RaceService` and the **Race Strategy Agent** (Neuron AI) analyze upcoming races to provide readiness assessments and strategy recommendations.
 
 ```mermaid
 flowchart TD
-    Start([View Races]) --> LoadSchedule[Load Race Schedule]
-    LoadSchedule --> SelectRace[Select Target Race]
-    SelectRace --> GenerateCompetitors[Generate Competitor Set]
-    GenerateCompetitors --> CalcReadiness[Calculate Readiness Score]
-    CalcReadiness --> CalcWinProb[Calculate Win Probability]
-    CalcWinProb --> Recommendations[Generate Prep Recommendations]
-    Recommendations --> PreviewUI[Return Preview]
-    PreviewUI --> ConfirmEntry{Enter Race?}
-    ConfirmEntry -->|No| Exit
-    ConfirmEntry -->|Yes| SaveEntry[Save Entry + Schedule]
+    Start([User Selects Race]) --> FetchDetails[Fetch Race Details]
+    FetchDetails --> LoadContext[Load Character Context]
+    
+    LoadContext --> CalcReadiness[Calculate Readiness Score]
+    CalcReadiness --> GenRivals[Generate/Fetch Competitors]
+    
+    GenRivals --> SimRun[Simulate Race Scenarios]
+    SimRun --> CalcWinProb[Calculate Win Probability]
+    
+    CalcWinProb --> AIAnalysis{AI Analysis Enabled?}
+    
+    AIAnalysis -->|Yes| TriggerAgent[Trigger RaceStrategyAgent]
+    AIAnalysis -->|No| BasicRecs[Generate Basic Recommendations]
+    
+    TriggerAgent --> AnalyzeStyle[Analyze Running Styles (Nige/Senkou/Sashi/Oikomi)]
+    AnalyzeStyle --> CheckSkills[Evaluate Skill Synergies]
+    CheckSkills --> RecommendStrategy[Recommend Optimal Strategy]
+    
+    RecommendStrategy --> DisplayUI[Display Race Preview UI]
+    BasicRecs --> DisplayUI
+    
+    DisplayUI --> UserAction{User Action}
+    UserAction -->|Register| SaveRegistration[Save to Plan]
+    UserAction -->|Cancel| ReturnToCalendar
 ```
 
 ---
 
-## 2. Race Execution Simulation Flow
+## 2. Race Result Processing Flow
+
+The workflow for recording actual race outcomes during a career run, handling stat updates and scenario objective checks.
 
 ```mermaid
 flowchart TD
-    Start([Execute Race]) --> LoadContext[Load Run + Competitors]
-    LoadContext --> SimStart[Simulate Start Phase]
-    SimStart --> SimMid[Simulate Mid Phase]
-    SimMid --> SimFinal[Simulate Final Phase]
-    SimFinal --> ApplySkills[Apply Skill Triggers]
-    ApplySkills --> RankCompetitors[Rank Competitors]
-    RankCompetitors --> DetermineRewards[Determine Rewards]
-    DetermineRewards --> Persist[Persist History + Rewards]
-    Persist --> ReturnResult[Return Result]
+    Start([User Records Result]) --> InputResult[Input Placement & Mood]
+    
+    InputResult --> CalcRewards[Calculate Rewards]
+    CalcRewards -->|Fans| UpdateFans
+    CalcRewards -->|Skill Pts| UpdateSP
+    CalcRewards -->|Stats| UpdateStats
+    
+    UpdateFans --> CheckObjectives[Check Scenario Objectives]
+    UpdateSP --> CheckObjectives
+    UpdateStats --> CheckObjectives
+    
+    CheckObjectives -->|Objective Met| MarkGoalComplete
+    CheckObjectives -->|Objective Failed| FlagRisk
+    
+    FlagRisk --> AIAdvice[Trigger AI Recovery Advice]
+    MarkGoalComplete --> SaveState
+    
+    SaveState --> UpdateHistory[Update Race History]
+    UpdateHistory --> InvalidateCache[Invalidate Predictions]
+    
+    InvalidateCache --> ReturnDashboard[Return to Dashboard]
 ```
 
 ---
 
 ## 3. Win Probability Calculation Flow
 
+The algorithmic logic used by `RaceService` to estimate victory chances based on current character state against generated rivals.
+
 ```mermaid
 flowchart TD
-    Start([Win Prob]) --> Base50[Base 50%]
-    Base50 --> GradeAdj[Adjust by Race Grade]
-    GradeAdj --> AptitudeAdj[Adjust by Aptitude Match]
-    AptitudeAdj --> StatCompare[Adjust by Stat Comparison]
-    StatCompare --> SkillAdj[Adjust by Skill Advantage]
-    SkillAdj --> CompetitorAdj[Adjust by Competitor Strength]
-    CompetitorAdj --> Clamp[Clamp 5-95%]
-    Clamp --> Confidence[Classify Confidence]
-    Confidence --> ReturnProb[Return Probability]
+    Start([Calc Win Probability]) --> GatherInputs[Inputs: Stats, Aptitudes, Skills]
+    
+    GatherInputs --> RivalCompare[Compare vs Rivals]
+    RivalCompare --> CalcStatDelta[Calculate Stat Differentials]
+    
+    CalcStatDelta --> ApplyAptitude[Apply Aptitude Modifiers]
+    ApplyAptitude -->|Distance| DistMod
+    ApplyAptitude -->|Surface| SurfMod
+    ApplyAptitude -->|Style| StyleMod
+    
+    DistMod --> BaseScore
+    SurfMod --> BaseScore
+    StyleMod --> BaseScore
+    
+    BaseScore --> ApplySkills[Apply Skill Multipliers]
+    ApplySkills -->|Speed Skills| SpdBonus
+    ApplySkills -->|Stamina Skills| StaBonus
+    ApplySkills -->|Acceleration| AccBonus
+    
+    SpdBonus --> FinalScore
+    StaBonus --> FinalScore
+    AccBonus --> FinalScore
+    
+    FinalScore --> Normalize[Normalize 0-100%]
+    Normalize --> ApplyVariance[Apply RNG Variance (+/- 5%)]
+    
+    ApplyVariance --> ReturnProb[Return Probability]
 ```
 
 ---
 
-## 4. Race Reward Distribution Flow
+## 4. Race Schedule Planning Flow
+
+How the **Race Strategy Agent** assists users in building a race rotation to meet fan count objectives and skill point targets.
 
 ```mermaid
 flowchart TD
-    Start([Distribute Rewards]) --> GetPlacement[Get Placement]
-    GetPlacement --> PlacementMult[Placement Multiplier]
-    PlacementMult --> GradeMult[Grade Multiplier]
-    GradeMult --> CalculateRewards[Calculate Money/Fans/Items]
-    CalculateRewards --> ApplyBonuses[Apply Event/Factor Bonuses]
-    ApplyBonuses --> PersistRewards[Persist Rewards]
-    PersistRewards --> ReturnRewards[Return to UI]
+    Start([Plan Schedule]) --> LoadGoals[Load Career Goals]
+    LoadGoals --> FetchCalendar[Fetch Race Calendar]
+    
+    FetchCalendar --> FilterEligible[Filter by Grade/Distance/Surface]
+    FilterEligible --> ScoreRaces[Score Races by Value]
+    
+    ScoreRaces -->|Fan Efficiency| FanScore
+    ScoreRaces -->|Skill Pt Efficiency| SPScore
+    ScoreRaces -->|Factor Bonus| FactorScore
+    
+    FanScore --> RankRaces
+    SPScore --> RankRaces
+    FactorScore --> RankRaces
+    
+    RankRaces --> DetectConflicts[Detect Turn Conflicts]
+    DetectConflicts --> Resolve[Resolve via Priority]
+    
+    Resolve --> GeneratePlan[Generate Rotation Plan]
+    GeneratePlan --> PresentUser[Present to User]
+    
+    PresentUser --> Confirm[Confirm Schedule]
+    Confirm --> SaveSchedule[Persist Race Reservations]
 ```
 
 ---
 
 ## 5. Competitor Generation Flow
 
+Logic for generating realistic rivals for race simulations based on the race grade and current scenario.
+
 ```mermaid
 flowchart TD
-    Start([Generate Competitors]) --> LoadTemplate[Load Baseline by Grade]
-    LoadTemplate --> RandomizeStats[Randomize Stats within band]
-    RandomizeStats --> AssignStyle[Assign Race Style]
-    AssignStyle --> AssignSkills[Assign Skills by Style]
-    AssignSkills --> MarkStrong[Mark Strong Competitor if needed]
-    MarkStrong --> ReturnSet[Return Competitor Set]
+    Start([Generate Rivals]) --> GetRaceGrade{Race Grade}
+    
+    GetRaceGrade -->|G1| TemplateG1[Load G1 Templates]
+    GetRaceGrade -->|G2/G3| TemplateG2[Load G2/G3 Templates]
+    GetRaceGrade -->|OP/Pre-OP| TemplateOP[Load OP Templates]
+    
+    TemplateG1 --> Scaling[Apply Stat Scaling Logic]
+    TemplateG2 --> Scaling
+    TemplateOP --> Scaling
+    
+    Scaling --> Randomize[Apply Random Variance]
+    Randomize --> AssignStyles[Assign Running Styles]
+    
+    AssignStyles --> AssignSkills[Equip Competitor Skills]
+    AssignSkills --> DetermineUnique[Identify Named Rivals]
+    
+    DetermineUnique --> ReturnRoster[Return Competitor Roster]
 ```
 
 ---
 
-## 6. Race History & Analytics Flow
+## Document Control
 
-```mermaid
-flowchart TD
-    Start([Record Race]) --> SaveResult[Save placement, rewards, logs]
-    SaveResult --> UpdateTrends[Update stats: win rate, placements]
-    UpdateTrends --> Charts[Expose to charts/tables]
-    Charts --> UI[Show analytics]
-```
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 2.1.0 | 2026-01-24 | Development Team | Updated to align with v2.0.0 codebase, Neuron AI agents, and Service layer architecture |
+| 1.0.0 | 2026-01-14 | Development Team | Initial flow definitions |
 
 ---
 
-## 7. Race Schedule Planning Flow
+## Related Documents
 
-```mermaid
-flowchart TD
-    Start([Plan Schedule]) --> LoadGoals[Load Scenario Goals]
-    LoadGoals --> RecommendRaces[Recommend Races per goal]
-    RecommendRaces --> EvaluatePrep[Evaluate readiness gap]
-    EvaluatePrep --> MarkDeadlines[Mark deadlines with alerts]
-    MarkDeadlines --> SavePlan[Save race plan]
-```
+- [PRD-003: Race Strategy](../prds/PRD-003_Race_Strategy.md)
+- [SPEC-003: Race Strategy Technical](../specs/SPEC-003_Race_Strategy_Technical.md)
+- [010_SCD: Source Code Documentation](../010_SCD_Source_Code_Documentation.md)

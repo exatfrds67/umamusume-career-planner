@@ -2,12 +2,12 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 1.0  
-**Date**: January 14, 2026  
+**Document Version**: 2.1.0  
+**Date**: January 24, 2026  
 **Project**: UmamusumeCareerPlanner  
-**Author**: AI Development Team  
-**Status**: Draft  
-**Related Documents**: [SRS-3.3], [SDS-4.3], [DBD-009], [SPEC-003], [PRD-001], [PRD-002]
+**Author**: Development Team  
+**Status**: Current - Aligned with codebase v2.0.0  
+**Related Documents**: [SRS-FR-04], [SDS-4.3], [DBD-4.2], [SPEC-003]
 
 **Source Specs**:
 
@@ -28,8 +28,6 @@
 ## Table of Contents
 
 - [PRD-003: Race Strategy System](#prd-003-race-strategy-system)
-  - [Umamusume Pretty Derby Career Planner](#umamusume-pretty-derby-career-planner)
-  - [Table of Contents](#table-of-contents)
   - [1. Executive Summary](#1-executive-summary)
     - [1.1 Purpose](#11-purpose)
     - [1.2 Problem Statement](#12-problem-statement)
@@ -53,17 +51,17 @@
 
 ### 1.1 Purpose
 
-Support race selection, preparation, and outcome simulation to maximize placements and rewards.
+Provide a strategic command center for race management, enabling players to select the optimal race rotation, assess pre-race readiness, and determine the best running style (Strategy) to maximize victory probability.
 
 ### 1.2 Problem Statement
 
-Players over/under-train or choose poor race schedules; missing required stats and skills results in poor placements.
+Players often enter races underprepared or with the wrong strategy (e.g., using "Front Runner" with poor Stamina), leading to unexpected losses, missed alarm clock usage, and failed scenario objectives.
 
 ### 1.3 Solution Overview
 
-- Race calendar with requirements and recommended readiness.  
-- Pre-race readiness checks (stats, skills, condition).  
-- Race outcome simulation and result logging with rewards.
+- **Race Calendar**: A filtered view of eligible races based on current turn and character aptitudes.
+- **Readiness Engine**: A scoring algorithm that compares current stats against race difficulty (Grade) and rival strength.
+- **Strategy Advisor**: AI-driven recommendation for the optimal Running Style (Nige/Senkou/Sashi/Oikomi) based on stats and skills.
 
 ---
 
@@ -71,92 +69,156 @@ Players over/under-train or choose poor race schedules; missing required stats a
 
 ### 2.1 Objectives
 
-- Help players pick optimal race schedule aligned to goals and stat growth.  
-- Provide readiness scoring and risk flags before registration.  
-- Deliver post-race analytics to improve future decisions.
+- Help players pick optimal race schedules aligned to fan count goals and skill point needs.
+- Provide clear "Red Light/Green Light" readiness indicators before registration.
+- Deliver detailed win probability forecasts to manage risk.
 
 ### 2.2 Scope (In)
 
-- Race catalog search with filters (grade, distance, ground, date).  
-- Readiness assessment using stats, aptitudes, skills, condition, support effects.  
-- Outcome simulation (placement, rewards, condition changes).  
-- Logging of rewards, fame, and condition deltas.
+- **Race Catalog**: Searchable database of all URA/Scenario races with filters (Grade, Distance, Surface).
+- **Readiness Assessment**: Scoring system (0-100) using stats, aptitudes, and skills.
+- **Strategy Selection**: Recommendation logic for Running Style.
+- **Outcome Simulation**: Probabilistic forecast of placement distribution (1st, 2nd-5th, 6th+).
+- **Result Logging**: Tracking of actual race results for history and analytics.
 
 ### 2.3 Scope (Out)
 
-- Real-time race replay visualizations.  
-- PvP matches; covered by external game client.
+- **Real-time Replay**: Visual 3D simulation of the race itself.
+- **PvP Matchmaking**: Integration with the game's Team Stadium (Champions Meeting) matchmaking.
 
 ---
 
 ## 3. User Stories
 
-- As a player, I want to know if my stats meet race requirements before registering.  
-- As a player, I want the tool to suggest the next best race slots.  
-- As a player, I want to see expected rewards and risks before committing.  
-- As a coach, I want race history to analyze training quality.
+| ID | Actor | Story | Acceptance Criteria |
+|----|-------|-------|---------------------|
+| US-3.1 | Player | I want to see which races are available on the current turn. | Calendar view shows G1/G2/G3/OP races eligible for entry. |
+| US-3.2 | Player | I want to know if my stats are high enough to win a G1 race. | "Readiness" score displayed with specific warnings (e.g., "Stamina too low"). |
+| US-3.3 | Player | I want the system to tell me which running style gives the highest win chance. | Recommended strategy (e.g., "Late Surger") is highlighted with reasoning. |
+| US-3.4 | Player | I want to track my race history to analyze my win rate. | "Race Results" tab lists past placements and rewards. |
+| US-3.5 | Coach | I want to simulate a race against typical rivals to test my build. | "Simulation" button generates a predicted placement distribution. |
 
 ---
 
 ## 4. Functional Requirements
 
-- FR1: Provide race catalog with filters and scenario alignment.  
-- FR2: Compute readiness score using stats, aptitudes, skills, condition, deck bonuses.  
-- FR3: Validate registration (date conflicts, fatigue thresholds).  
-- FR4: Simulate race outcome with probability distribution for placements.  
-- FR5: Persist results (placement, rewards, fame, condition changes, injuries).  
-- FR6: Expose API endpoints for listing races, registering, simulating, and retrieving history.  
-- FR7: Generate recommendations for next races based on goals and season timeline.
+### 4.1 Race Calendar & Selection [FR-04.1]
+
+- **Filtering**: Filter races by Grade (G1-Pre-OP), Distance (Sprint-Long), and Surface (Turf/Dirt).
+- **Eligibility**: Automatically hide races where the character does not meet baseline requirements (e.g., fan count).
+- **Goal Alignment**: Highlight races that satisfy specific Scenario Objectives (e.g., "Win the Japan Cup").
+
+### 4.2 Readiness Assessment [FR-04.5]
+
+- **Scoring Formula**: Weighted average of:
+  - Stat Sufficiency (vs. Grade baseline)
+  - Distance/Surface Aptitude modifiers
+  - Skill Activation Probability
+  - Mood/Condition modifiers
+- **Output**:
+  - Score (0-100)
+  - Classification (Excellent/Good/Fair/Poor)
+  - Specific warnings (e.g., "Lack of Recovery Skills for Long Distance").
+
+### 4.3 Strategy Optimization [FR-04.7]
+
+- **Style Analysis**: Evaluate all 4 running styles against character Aptitudes and Stats.
+- **Recommendations**: Suggest the style with the highest win probability.
+- **AI Integration**: Use **Race Strategy Agent** (Neuron AI) to explain *why* a strategy is preferred (e.g., "Your high Power supports Late Surger acceleration").
+
+### 4.4 Outcome Simulation [FR-04.6]
+
+- **Rival Generation**: Generate synthetic rivals based on race grade difficulty curves.
+- **Simulation**: Run statistical trials (Monte Carlo method) to determine win % probability.
+- **Confidence**: Display confidence interval for the prediction.
+
+### 4.5 Result Management [FR-04.2]
+
+- **Input**: User records actual placement (1st-18th).
+- **Rewards**: Auto-calculate fan/SP gains based on placement and race modifiers.
+- **History**: Persist result to `ucp_training_sessions` (or dedicated race log) linked to `CareerRun`.
 
 ---
 
 ## 5. User Interface Requirements
 
-- Race finder table with filters and readiness badge.  
-- Pre-race modal showing requirements, readiness score, risk meter, expected rewards.  
-- Post-race summary card with placement, gains, and condition changes.  
-- Alerting for over-scheduling or fatigue.  
-- Accessible table sorting and keyboard navigation.
+### 5.1 Race Calendar View
+
+- **Grid Layout**: Monthly view showing turns (Early/Late) and available races.
+- **Readiness Badges**: Small colored dots (Green/Yellow/Red) on calendar slots indicating readiness for the best available race.
+- **Details Panel**: Slide-out panel showing race specifics (Track, Weather, Rivals) when a race is clicked.
+
+### 5.2 Preparation Screen
+
+- **Header**: Race Name, Grade, Track info.
+- **Readiness Gauge**: Circular gauge showing overall score.
+- **Strategy Selector**: 4 cards for Running Styles, highlighting the recommended one.
+- **Stat Comparison**: Radar chart comparing User vs. Average Rival.
+- **Skill List**: List of equipped skills, dimming those unlikely to activate (e.g., wrong distance).
+
+### 5.3 Post-Race Modal
+
+- **Result Input**: Simple number input for placement.
+- **Reward Confirmation**: Display of Fans/Stat/SP gained.
+- **Analysis**: "Did you win?" check. If loss, provide AI analysis of potential causes (e.g., "Stamina depletion detected").
 
 ---
 
 ## 6. Data and Integration
 
-- Inputs: character state (PRD-001), training outputs (PRD-002), skill set (PRD-004), deck buffs (PRD-005).  
-- Data: race catalog, readiness model coefficients, reward tables.  
-- Services: RaceService, ReadinessScorer, RaceSimulator.  
-- Dependencies: SRS-3.3, SDS-4.3, DBD-009 race tables; external data sync via PRD-007.
+### 6.1 Data Models
+
+- **Inputs**:
+  - `CareerRun` (Stats, Aptitudes, Skills)
+  - `RaceDefinition` (Distance, Surface, Rivals)
+- **Outputs**:
+  - `RacePrediction` (Win %, Recommended Strategy)
+  - `RaceResult` (Placement, Rewards)
+
+### 6.2 External Integration
+
+- **Race Data**: Sourced from `ucp_game_data` (synced via PRD-007 from umapyoi.net).
+- **Rival Data**: Rival stats/skills templates sourced from external game databases.
+
+### 6.3 AI Services
+
+- **Race Strategy Agent**: Neuron AI agent providing qualitative advice.
+- **Win Probability Model**: Statistical model (internal logic) or potentially AI-assisted for complex scenarios.
 
 ---
 
 ## 7. Non-Functional Requirements
 
-- Performance: readiness check and registration ≤1.0s (p95).  
-- Reliability: prevent double booking; idempotent registration.  
-- Accuracy: readiness score calibration within ±7% vs benchmark data.  
-- Observability: log simulations with seeds for replay.
+- **Performance**: Readiness check must complete in < 500ms.
+- **Accuracy**: Win probability should correlate with actual outcomes (within statistical variance).
+- **Usability**: Calendar filters must persist across navigation.
+- **Resilience**: If external race data is missing, fall back to generic templates based on Grade/Distance.
 
 ---
 
 ## 8. Success Metrics
 
-- ≥90% of registered races meet readiness threshold.  
-- Placement improvement ≥8% vs baseline runs without guidance.  
-- Registration error rate <2% (e.g., date conflicts).  
-- Simulation latency within SLA.
+- **Win Rate**: Users following recommendations achieve > 10% higher win rates in G1 races compared to baseline.
+- **Adoption**: > 80% of race entries are logged through the planner.
+- **Prediction Accuracy**: > 70% alignment between predicted outcome bucket and actual result.
 
 ---
 
 ## 9. Release Plan
 
-- Phase A: Race catalog + readiness check + registration validation.  
-- Phase B: Outcome simulation with probability bands and rewards logging.  
-- Phase C: Recommendation engine for schedules and post-race analytics.
+- **v2.0.0 (Current)**:
+  - Race Calendar with basic filtering.
+  - Deterministic Readiness Scoring.
+  - Strategy recommendation based on Aptitude/Stats.
+- **v2.1.0 (Next)**:
+  - Rival generation and specific rival analysis (named characters).
+  - Advanced simulation (Monte Carlo).
+  - Weather/Track Condition support.
 
 ---
 
 ## 10. Open Questions and Assumptions
 
-- Assumption: Race catalog kept current via PRD-007 sync.  
-- Question: How to handle event-limited races (cutoff logic)?  
-- Question: Should readiness weights adapt per scenario or remain global?
+- **Assumption**: Rival stats scale linearly with race grade (this is a simplification; actual game logic is complex).
+- **Open Question**: How to model "blocked" states (where a character gets stuck behind others)? *Current Approach: Abstracted into Power/Guts check.*
+- **Open Question**: Should we support "Rotation" planning (booking races in advance)? *Yes, implemented as "Race Goals".*

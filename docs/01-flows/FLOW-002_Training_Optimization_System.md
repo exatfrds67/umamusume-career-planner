@@ -2,109 +2,196 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 1.0
-**Date**: January 14, 2026
-**Related Documents**: [PRD-002], [SPEC-002]
+**Document Version**: 2.1.0
+**Date**: January 24, 2026
+**Project**: UmamusumeCareerPlanner
+**Author**: Development Team
+**Status**: Current - Aligned with codebase v2.0.0
 
 ---
 
 ## 1. Training Prediction Pipeline Flow
 
+This flow illustrates how `TrainingPredictionService` generates forecasts for all training facilities, utilizing Redis caching to optimize performance.
+
 ```mermaid
 flowchart TD
-    Start([User Opens Training]) --> LoadContext[Load Run Context: stats, mood, energy, deck]
-    LoadContext --> BaseCalc[Calculate Base Gains by Training Type]
-    BaseCalc --> ApplyBonuses[Apply Support Card Bonuses]
-    ApplyBonuses --> RiskCalc[Calculate Failure Risk]
-    RiskCalc --> HintChance[Determine Hint Chance]
-    HintChance --> BuildPrediction[Build Prediction Payload]
-    BuildPrediction --> ReturnUI[Return to UI]
+    Start([User Opens Training]) --> CheckCache{Cache Hit?}
+    
+    CheckCache -->|Yes| ReturnCache[Return Cached Predictions]
+    CheckCache -->|No| LoadContext[Load Context]
+    
+    LoadContext --> FetchState[Fetch Character Stats/Mood/Energy]
+    FetchState --> FetchDeck[Fetch Support Deck]
+    FetchDeck --> FetchScenario[Fetch Scenario Config]
+    
+    FetchScenario --> IterateFacilities[Iterate Facilities]
+    
+    IterateFacilities --> CalcBase[Calculate Base Gains]
+    CalcBase --> ApplySupport[Apply Deck Bonuses]
+    ApplySupport --> CalcRisk[Calculate Failure Risk]
+    CalcRisk --> CalcHints[Determine Hint Probabilities]
+    
+    CalcHints --> BuildObject[Build TrainingPrediction Object]
+    BuildObject --> NextFacility{More Facilities?}
+    
+    NextFacility -->|Yes| IterateFacilities
+    NextFacility -->|No| CacheResults[Cache Results (Redis: 5m)]
+    
+    CacheResults --> ReturnNew[Return Predictions]
+    ReturnCache --> AIAnalysis[Optional: Neuron Agent Analysis]
+    ReturnNew --> AIAnalysis
 ```
 
 ---
 
-## 2. Training Execution Flow
+## 2. Neuron AI Recommendation Flow
+
+This flow details how the **Training Advisor Agent** analyzes raw predictions to provide actionable advice.
 
 ```mermaid
 flowchart TD
-    Start([User Confirms Training]) --> LoadPrediction[Load Cached Prediction]
-    LoadPrediction --> ValidateEnergy{Energy Sufficient?}
-    ValidateEnergy -->|No| Block[Block Action]
-    ValidateEnergy -->|Yes| RollOutcome[Roll Success vs Risk]
-    RollOutcome -->|Success| ApplyFull[Apply Full Gains + Bond + Hints]
-    RollOutcome -->|Failure| ApplyPartial[Apply Partial Gains + Possible Condition Down]
-    ApplyFull --> ProcessEvents[Process Events/Story]
-    ApplyPartial --> ProcessEvents
-    ProcessEvents --> Persist[Persist State + History]
-    Persist --> ReturnResult[Return Result to UI]
+    Start([Analyze Predictions]) --> InputData[Input: Predictions + Goals]
+    
+    InputData --> Agent[Trigger TrainingAdvisorAgent]
+    
+    Agent --> EvalGoals[Evaluate Goal Progress]
+    Agent --> EvalEconomy[Analyze Turn Economy]
+    Agent --> EvalRisk[Assess Risk vs Reward]
+    
+    EvalGoals --> ScoreOptions[Score Training Options]
+    EvalEconomy --> ScoreOptions
+    EvalRisk --> ScoreOptions
+    
+    ScoreOptions --> Rank[Rank Recommendations]
+    
+    Rank --> GenReasoning[Generate Natural Language Reasoning]
+    GenReasoning --> Output[Return Advice Payload]
 ```
 
 ---
 
-## 3. Support Card Bonus Calculation Flow
+## 3. Training Execution Flow
+
+The transactional process of executing a training turn via `TrainingService`.
 
 ```mermaid
 flowchart TD
-    Start([Support Bonus]) --> LoadDeck[Load Active Deck]
-    LoadDeck --> IdentifyParticipants[Identify Cards Participating]
-    IdentifyParticipants --> SumBonuses[Sum Training Bonuses (type, rarity, level, LB)]
-    SumBonuses --> BondFactor[Apply Bond Multipliers]
-    BondFactor --> FriendBonus[Apply Friend Slot Bonus if present]
-    FriendBonus --> ReturnBonuses[Return Bonus Multipliers]
+    Start([User Confirms Action]) --> Validate[Validate Constraints]
+    
+    Validate -->|Energy Low| Fail[Reject Action]
+    Validate -->|Valid| Execute{Execute Transaction}
+    
+    Execute --> RollOutcome{Roll RNG}
+    
+    RollOutcome -->|Success| ApplyFull[Apply Full Gains + Bond]
+    RollOutcome -->|Failure| ApplyPartial[Apply Partial/Zero Gains]
+    
+    ApplyFull --> CheckHints[Check Skill Hints]
+    CheckHints --> AssignHints[Assign Hints]
+    
+    ApplyPartial --> CheckConditions[Check Bad Conditions]
+    CheckConditions --> ApplyCondition[Apply Condition (e.g. Lazy)]
+    
+    AssignHints --> UpdateTurn[Increment Turn]
+    ApplyCondition --> UpdateTurn
+    
+    UpdateTurn --> ProcessEvents[Process Support/Scenario Events]
+    
+    ProcessEvents --> Save[Commit Transaction]
+    Save --> Invalidate[Invalidate Predictions Cache]
+    Invalidate --> Return[Return TrainingResult]
 ```
 
 ---
 
-## 4. Failure Risk Assessment Flow
+## 4. Support Card Bonus Calculation Flow
+
+Logic handled by `SupportBonusCalculator` to determine effective stat multipliers.
 
 ```mermaid
 flowchart TD
-    Start([Risk Calc]) --> BaseRisk[Base Risk = 0]
-    BaseRisk --> EnergyPenalty[Add penalty if low energy]
-    EnergyPenalty --> MoodPenalty[Add penalty if mood bad]
-    MoodPenalty --> ConditionPenalty[Add penalty if debuff]
-    ConditionPenalty --> TrainingLevelAdj[Adjust by training difficulty]
-    TrainingLevelAdj --> Clamp[Clamp 0-90%]
-    Clamp --> ReturnRisk[Return Risk]
+    Start([Calculate Bonuses]) --> LoadDeck[Load Active Deck]
+    
+    LoadDeck --> Identify[Identify Participants]
+    Identify --> Filter[Filter by Facility Type]
+    
+    Filter --> SumBase[Sum Base Bonuses]
+    SumBase -->|Speed/Stamina/etc| StatBonuses
+    
+    Filter --> CheckFriendship{Bond >= 80%?}
+    CheckFriendship -->|Yes| ApplyMotivation[Apply Motivation Multiplier]
+    CheckFriendship -->|No| BaseOnly[Base Multiplier Only]
+    
+    ApplyMotivation --> UniqueBonus[Check Unique Card Bonuses]
+    BaseOnly --> UniqueBonus
+    
+    UniqueBonus --> Finalize[Return Multipliers]
 ```
 
 ---
 
-## 5. Skill Hint Acquisition Flow
+## 5. Failure Risk Assessment Flow
+
+Logic handled by `RiskCalculator` to determine the probability of training failure.
 
 ```mermaid
 flowchart TD
-    Start([Hint Chance]) --> CheckParticipants[Check participating cards with hints]
-    CheckParticipants --> RollHint{Roll per card}
-    RollHint -->|Win| AssignHint[Assign Skill Hint Level +1]
-    RollHint -->|Lose| NoHint[No hint]
-    AssignHint --> UpdateHintState[Update hint levels, cap at 3]
-    UpdateHintState --> ReturnHints
+    Start([Calc Risk]) --> GetRate[Get Facility Fail Rate]
+    
+    GetRate --> EnergyCheck[Check Energy %]
+    EnergyCheck -->|Energy > 50%| Base0[Risk = 0%]
+    EnergyCheck -->|Energy < 50%| CalcCurve[Calculate Risk Curve]
+    
+    CalcCurve --> MoodMod[Apply Mood Modifier]
+    MoodMod --> ConditionMod[Apply Condition Modifiers]
+    
+    ConditionMod -->|Overweight| Pen1[Risk +10%]
+    ConditionMod -->|Lazy| Pen2[Risk +5%]
+    
+    Pen1 --> Clamp[Clamp 0-99%]
+    Pen2 --> Clamp
+    
+    Clamp --> Return[Return Failure Probability]
 ```
 
 ---
 
-## 6. Friendship Training Activation Flow
+## 6. Skill Hint Acquisition Flow
+
+Logic handled by `SkillService` during training execution.
 
 ```mermaid
 flowchart TD
-    Start([Friendship Check]) --> BondThreshold{Bond >= 80?}
-    BondThreshold -->|No| NoFriend[Normal Training]
-    BondThreshold -->|Yes| ApplyFriendBonus[Apply Friendship Bonus +2..+5 per stat]
-    ApplyFriendBonus --> UpdateGains
-    NoFriend --> UpdateGains[Keep normal gains]
-    UpdateGains --> ReturnPrediction
+    Start([Check Hints]) --> GetParticipants[Get Support Cards present]
+    
+    GetParticipants --> FilterHints[Filter Cards with 'Hint Lv Up']
+    
+    FilterHints --> Roll{Roll Probability}
+    Roll -->|Pass| SelectSkill[Select Random Skill from Card]
+    Roll -->|Fail| NoHint
+    
+    SelectSkill --> CheckOwned{Already Max Hint?}
+    CheckOwned -->|Yes| NoHint
+    CheckOwned -->|No| GrantHint[Grant Hint Level +1]
+    
+    GrantHint --> ReduceCost[Update SP Cost -20%]
+    ReduceCost --> ReturnResult
 ```
 
 ---
 
-## 7. Training History & Analytics Flow
+## Document Control
 
-```mermaid
-flowchart TD
-    Start([Record Training]) --> CaptureOutcome[Capture gains, risk, success/failure]
-    CaptureOutcome --> SaveHistory[Save to history table]
-    SaveHistory --> UpdateStats[Update aggregate: success rate, avg gains]
-    UpdateStats --> Analytics[Expose for charts]
-    Analytics --> UI[Show trends in dashboard]
-```
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 2.1.0 | 2026-01-24 | Development Team | Updated to include caching, Neuron AI agents, and Service layer architecture |
+| 1.0.0 | 2026-01-14 | Development Team | Initial flow definitions |
+
+---
+
+## Related Documents
+
+- [PRD-002: Training Optimization](../prds/PRD-002_Training_Optimization.md)
+- [SPEC-002: Training Optimization Technical](../specs/SPEC-002_Training_Optimization_Technical.md)
+- [010_SCD: Source Code Documentation](../010_SCD_Source_Code_Documentation.md)

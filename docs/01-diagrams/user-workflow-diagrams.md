@@ -1,49 +1,76 @@
-# Umamusume Career Planner - User Workflow Flow Diagrams
+# Umamusume Career Planner - User Workflow Diagrams
 
 ## Overview
 
-This document presents the key user workflow flow diagrams for the Umamusume Pretty Derby Career Planner application, showing how users interact with the system to achieve their optimization goals through various pathways and decision points. The system is built with **Laravel 12** (released February 24, 2025) with **TypeScript support**, **Tailwind CSS v4** (released January 22, 2025), and integrates with **AWS Bedrock Claude 4.5** models and **AWS Bedrock Nova 2** for AI capabilities, supporting all **59 requirements**.
+This document presents the key user workflow diagrams for the Umamusume Pretty Derby Career Planner application, showing how users interact with the system to achieve their optimization goals through various pathways and decision points. The system is built with **Laravel 12** (released February 24, 2025) with **PHP 8.2+**, **Livewire 3**, **Alpine.js**, **TailwindCSS v4** (released January 22, 2025), and integrates with **AWS Bedrock Claude** models and **Ollama** for AI capabilities.
+
+**Document Version**: 2.1.0  
+**Date**: January 24, 2026  
+**Project**: UmamusumeCareerPlanner  
+**Author**: Development Team  
+**Status**: Current - Aligned with codebase v2.0.0
+
+---
+
+## Table of Contents
+
+1. [Career Setup and Initialization Flow](#1-career-setup-and-initialization-flow)
+2. [Turn-by-Turn Training Optimization Flow](#2-turn-by-turn-training-optimization-flow)
+3. [Race Preparation and Strategy Flow](#3-race-preparation-and-strategy-flow)
+4. [AI Chatbot Interaction Flow](#4-ai-chatbot-interaction-flow)
+5. [Screenshot Analysis and Data Extraction Flow](#5-screenshot-analysis-and-data-extraction-flow)
+6. [Data Import and Export Flow](#6-data-import-and-export-flow)
+7. [Storage Mode and Offline Flow](#7-storage-mode-and-offline-flow)
+8. [Flow Diagram Summary](#8-flow-diagram-summary)
+
+---
 
 ## 1. Career Setup and Initialization Flow
 
-### Text Description
+### 1.1 Text Description
 
-The career setup flow guides users through the initial configuration of a new career run, including character selection, support card deck composition, legacy character inheritance, and goal setting. This is the foundation workflow that determines the optimization strategy for the entire career, supporting all **59 requirements** including advanced PvP team building, resource management, and multi-scenario planning.
+The career setup flow guides users through the initial configuration of a new career run, including character selection, support card deck composition, legacy character inheritance, and goal setting. This foundational workflow determines the optimization strategy for the entire career and supports all core requirements including training optimization, race strategy, and skill planning.
 
-### ASCII Diagram
+**Related Documents:**
+- PRD: [PRD-001](prds/PRD-001_Character_Management.md)
+- SPEC: [SPEC-001](specs/SPEC-001_Character_Management_Technical.md)
+- Flow: [FLOW-001](flows/FLOW-001_Character_Management_System.md)
+- Wireframe: [WF-002](wireframes/WF-002_Character_Creation_Wizard.md)
+
+### 1.2 ASCII Diagram
 
 ```text
 [Start New Career]
         |
         v
-[Select Character] -----> [Character Database]
-        |                        |
-        v                        v
-[Set Character Goals] <----------+
+[Select Character] ────────> [Character Database]
+        |                           |
+        v                           v
+[Set Character Goals] <─────────────+
         |
         v
-[Configure Support Deck] -----> [Support Card Database]
+[Configure Support Deck] ────> [Support Card Database]
         |                              |
         v                              v
-[Select 5 Owned Cards] <---------------+
+[Select 5 Owned Cards] <───────────────+
         |
         v
-[Select Friend Card] -----> [Friend Card Meta Analysis]
+[Select Friend Card] ────> [Friend Card Meta Analysis]
         |                          |
         v                          v
-[Configure Legacy Team] <----------+
+[Configure Legacy Team] <──────────+
         |
         v
-[Select 2 Parents + 4 Grandparents] -----> [Legacy Database]
+[Select 2 Parents + 4 Grandparents] ────> [Legacy Database]
         |                                         |
         v                                         v
-[Calculate Inheritance] <-------------------------+
+[Calculate Inheritance] <─────────────────────────+
         |
         v
-[Set Training Goals] -----> [Goal Optimization Engine]
+[Set Training Goals] ────> [Goal Optimization Engine]
         |                          |
         v                          v
-[Review Setup Summary] <-----------+
+[Review Setup Summary] <───────────+
         |
         v
 [Confirm and Start Career]
@@ -52,7 +79,7 @@ The career setup flow guides users through the initial configuration of a new ca
 [Career Dashboard]
 ```
 
-### Mermaid Diagram
+### 1.3 Mermaid Diagram
 
 ```mermaid
 flowchart TD
@@ -81,89 +108,97 @@ flowchart TD
     ConfigLegacy -->|Legacy Stats| LegacyDB
 ```
 
+### 1.4 Step Details
+
+| Step | Description | Validation Rules |
+|------|-------------|------------------|
+| Select Character | Choose trainee from character database | Required selection |
+| Set Character Goals | Define target stats (0-1200 range) | Stat values within valid range |
+| Configure Support Deck | Build 6-card deck (5 owned + 1 borrowed) | Exactly 6 cards required |
+| Configure Legacy Team | Select inheritance parents | 2 parents + 4 grandparents |
+| Calculate Inheritance | Apply factor bonuses (★☆☆=+5, ★★☆=+12, ★★★=+21) | Valid factor ratings |
+| Review Setup Summary | Verify all selections | All required fields complete |
+
+---
+
 ## 2. Turn-by-Turn Training Optimization Flow
 
-### Text Description
+### 2.1 Text Description
 
-The core optimization flow that occurs every turn, analyzing current character state, available training options, support card participation, and providing recommendations based on goals, energy management, and long-term strategy. Enhanced by **AWS Bedrock Claude 4.5** AI models for intelligent decision making and **Laravel 12** backend for robust processing.
+The core optimization flow occurs every turn (1-78), analyzing current character state, available training options, support card participation, and providing AI-powered recommendations based on goals, energy management, and long-term strategy. Enhanced by **Neuron AI agents** for intelligent decision making and **Laravel 12** backend for robust processing.
 
-### ASCII Diagram
+**Related Documents:**
+
+- PRD: [PRD-002](prds/PRD-002_Training_Optimization.md)
+- SPEC: [SPEC-002](specs/SPEC-002_Training_Optimization_Technical.md)
+- Flow: [FLOW-002](flows/FLOW-002_Training_Optimization_System.md)
+- Tech Flow: [TECH-FLOW-002](tech-flow/TECH-FLOW-002_Training_Optimization_Flow.md)
+
+### 2.2 ASCII Diagram
 
 ```text
-[Start Turn] -----> [Current Turn: X/72]
+[Start Turn] ────────> [Current Turn: X/78]
      |
      v
 [Analyze Character State]
      |
-     +-----> [Stats Analysis] -----> [Goal Progress Check]
+     +────> [Stats Analysis] ────────> [Goal Progress Check]
      |
-     +-----> [Energy Level] -----> [Failure Risk Assessment]
+     +────> [Energy Level] ──────────> [Failure Risk Assessment]
      |
-     +-----> [Mood Status] -----> [Training Effectiveness]
+     +────> [Mood Status] ───────────> [Training Effectiveness]
      |
-     +-----> [Conditions] -----> [Condition Impact Analysis]
+     +────> [Conditions] ────────────> [Condition Impact Analysis]
      |
      v
 [Evaluate Training Options]
      |
-     +-----> [Speed Training] -----> [Stat Gain Prediction]
-     |
-     +-----> [Stamina Training] -----> [Support Card Participation]
-     |
-     +-----> [Power Training] -----> [Friendship Training Bonus]
-     |
-     +-----> [Guts Training] -----> [Skill Hint Opportunities]
-     |
-     +-----> [Wit Training] -----> [Red "!" Indicators]
-     |
-     +-----> [Rest] -----> [Energy Recovery]
-     |
-     +-----> [Recreation] -----> [Mood Improvement]
+     +────> [Speed Training] ────────> [Stat Gain Prediction]
+     +────> [Stamina Training] ──────> [Support Card Participation]
+     +────> [Power Training] ────────> [Friendship Training Bonus]
+     +────> [Guts Training] ─────────> [Skill Hint Opportunities]
+     +────> [Wit Training] ──────────> [Red "!" Indicators]
+     +────> [Rest] ──────────────────> [Energy Recovery]
      |
      v
-[Optimization Engine Analysis]
+[Neuron AI Agent Analysis]
      |
-     +-----> [Goal Priority Weighting]
-     |
-     +-----> [Turn Economy Calculation]
-     |
-     +-----> [Risk-Reward Analysis]
-     |
-     +-----> [Long-term Strategy Impact]
+     +────> [Goal Priority Weighting]
+     +────> [Turn Economy Calculation]
+     +────> [Risk-Reward Analysis]
+     +────> [Long-term Strategy Impact]
      |
      v
 [Generate Recommendations]
      |
-     +-----> [Primary Recommendation] -----> [Expected Outcomes]
-     |
-     +-----> [Alternative Options] -----> [Trade-off Analysis]
-     |
-     +-----> [Risk Warnings] -----> [Mitigation Strategies]
+     +────> [Primary Recommendation] ────> [Expected Outcomes]
+     +────> [Alternative Options] ───────> [Trade-off Analysis]
+     +────> [Risk Warnings] ─────────────> [Mitigation Strategies]
      |
      v
-[User Decision] -----> [Execute Training]
-     |                      |
-     |                      v
-     |                 [Record Actual Results]
-     |                      |
-     |                      v
-     |                 [Update Prediction Accuracy]
-     |                      |
-     v                      v
-[AI Chatbot Query?] -----> [Next Turn]
+[User Decision] ────────> [Execute Training]
+     |                         |
+     |                         v
+     |                    [Record Actual Results]
+     |                         |
+     |                         v
+     |                    [Update Prediction Accuracy]
+     |                         |
+     v                         v
+[AI Chatbot Query?] ────> [Next Turn]
      |
      v
-[AI Advisory System] -----> [Contextual Advice]
+[Neuron Advisory Agent] ────> [Contextual Advice]
      |
      v
 [Next Turn]
 ```
 
-### Mermaid Diagram
+### 2.3 Mermaid Diagram
 
 ```mermaid
 flowchart TD
-    StartTurn([Start Turn]) --> TurnCounter[Current Turn: X/72]
+    StartTurn([Start Turn]) --> TurnCounter[Current Turn: X/78]
     TurnCounter --> AnalyzeState[Analyze Character State]
 
     AnalyzeState --> StatsAnalysis[Stats Analysis]
@@ -187,7 +222,6 @@ flowchart TD
     EvaluateOptions --> GutsTraining[Guts Training]
     EvaluateOptions --> WitTraining[Wit Training]
     EvaluateOptions --> Rest[Rest]
-    EvaluateOptions --> Recreation[Recreation]
 
     SpeedTraining --> StatGains[Stat Gain Prediction]
     StaminaTraining --> SupportParticipation[Support Card Participation]
@@ -195,15 +229,13 @@ flowchart TD
     GutsTraining --> SkillHints[Skill Hint Opportunities]
     WitTraining --> RedIndicators[Red "!" Indicators]
     Rest --> EnergyRecovery[Energy Recovery]
-    Recreation --> MoodImprovement[Mood Improvement]
 
-    StatGains --> OptEngine[Optimization Engine Analysis]
+    StatGains --> OptEngine[Neuron AI Agent Analysis]
     SupportParticipation --> OptEngine
     FriendshipBonus --> OptEngine
     SkillHints --> OptEngine
     RedIndicators --> OptEngine
     EnergyRecovery --> OptEngine
-    MoodImprovement --> OptEngine
 
     OptEngine --> GoalPriority[Goal Priority Weighting]
     OptEngine --> TurnEconomy[Turn Economy Calculation]
@@ -224,7 +256,7 @@ flowchart TD
     RiskWarnings --> UserDecision
 
     UserDecision -->|Execute| ExecuteTraining[Execute Training]
-    UserDecision -->|Ask AI| AIChatbot[AI Advisory System]
+    UserDecision -->|Ask AI| AIChatbot[Neuron Advisory Agent]
 
     ExecuteTraining --> RecordResults[Record Actual Results]
     RecordResults --> UpdateAccuracy[Update Prediction Accuracy]
@@ -234,84 +266,105 @@ flowchart TD
     ContextualAdvice --> NextTurn
 ```
 
+### 2.4 Training Prediction Components
+
+| Component | Description | Cache TTL |
+|-----------|-------------|-----------|
+| Base Gains | Raw stat increases from training type | 5 minutes |
+| Support Bonuses | Multipliers from active support cards | 5 minutes |
+| Failure Risk | Chance of training failure (0-90%) | Real-time |
+| Hint Chance | Probability of receiving skill hints | 5 minutes |
+| Bond Gains | Friendship points with support cards | 5 minutes |
+
+### 2.5 Risk Level Indicators
+
+| Risk Level | Percentage | Indicator | Action |
+|------------|------------|-----------|--------|
+| Low | <15% | 🟢 Green | Safe to proceed |
+| Moderate | 15-40% | 🟡 Amber | Consider alternatives |
+| High | >40% | 🔴 Red | Rest recommended |
+
+---
+
 ## 3. Race Preparation and Strategy Flow
 
-### Text Description
+### 3.1 Text Description
 
-The race preparation workflow that activates when races are approaching, analyzing race requirements, character readiness, strategy selection, and providing comprehensive preparation recommendations.
+The race preparation workflow activates when races approach, analyzing race requirements, character readiness, strategy selection, and providing comprehensive preparation recommendations powered by the Race Strategy Agent.
 
-### ASCII Diagram
+**Related Documents:**
+
+- PRD: [PRD-003](prds/PRD-003_Race_Strategy.md)
+- SPEC: [SPEC-003](specs/SPEC-003_Race_Strategy_Technical.md)
+- Flow: [FLOW-003](flows/FLOW-003_Race_Strategy_System.md)
+- Sequence: [SEQ-004](sequences/SEQ-004_Race_Registration_and_Outcome.md)
+
+### 3.2 ASCII Diagram
 
 ```text
-[Upcoming Race Detected] -----> [Race Calendar Check]
+[Upcoming Race Detected] ────> [Race Calendar Check]
          |
          v
 [Race Analysis]
          |
-         +-----> [Race Details] -----> [Grade: G1/G2/G3/OP/Pre-OP]
-         |                            [Distance: Sprint/Mile/Medium/Long]
-         |                            [Surface: Turf/Dirt]
-         |                            [Track: Kyoto/Tokyo/etc.]
+         +────> [Race Details] ────> [Grade: G1/G2/G3/OP/Pre-OP]
+         |                           [Distance: Sprint/Mile/Medium/Long]
+         |                           [Surface: Turf/Dirt]
+         |                           [Track: Tokyo/Kyoto/etc.]
          |
-         +-----> [Weather Forecast] -----> [Track Conditions]
-         |                                [Firm/Good/Soft/Heavy]
+         +────> [Weather Forecast] ────> [Track Conditions]
+         |                               [Firm/Good/Soft/Heavy]
          |
-         +-----> [Competition Analysis] -----> [Expected Field Strength]
+         +────> [Competition Analysis] ────> [Expected Field Strength]
          |
          v
 [Character Readiness Assessment]
          |
-         +-----> [Stat Requirements Check]
+         +────> [Stat Requirements Check]
          |       |
-         |       +-----> [Speed: ○/⦾/△/×]
-         |       +-----> [Stamina: ○/⦾/△/×]
-         |       +-----> [Power: ○/⦾/△/×]
-         |       +-----> [Guts: ○/⦾/△/×]
-         |       +-----> [Wit: ○/⦾/△/×]
+         |       +────> [Speed: ○/⦾/△/×]
+         |       +────> [Stamina: ○/⦾/△/×]
+         |       +────> [Power: ○/⦾/△/×]
+         |       +────> [Guts: ○/⦾/△/×]
+         |       +────> [Wit: ○/⦾/△/×]
          |
-         +-----> [Aptitude Analysis]
+         +────> [Aptitude Analysis]
          |       |
-         |       +-----> [Distance Aptitude: G-SS]
-         |       +-----> [Surface Aptitude: G-SS]
-         |       +-----> [Running Style Aptitude: G-SS]
+         |       +────> [Distance Aptitude: G-SS]
+         |       +────> [Surface Aptitude: G-SS]
+         |       +────> [Running Style Aptitude: G-SS]
          |
-         +-----> [Skill Evaluation]
+         +────> [Skill Evaluation]
          |       |
-         |       +-----> [Weather Skills Available]
-         |       +-----> [Distance-Specific Skills]
-         |       +-----> [Racing Skills Equipped]
+         |       +────> [Weather Skills Available]
+         |       +────> [Distance-Specific Skills]
+         |       +────> [Racing Skills Equipped]
          |
          v
 [Strategy Optimization]
          |
-         +-----> [Running Style Selection]
+         +────> [Running Style Selection]
          |       |
-         |       +-----> [Front Runner] -----> [Speed/Stamina Focus]
-         |       +-----> [Pace Chaser] -----> [Balanced Approach]
-         |       +-----> [Late Surger] -----> [Speed/Power Focus]
-         |       +-----> [End Closer] -----> [Power/Guts Focus]
+         |       +────> [Front Runner (逃げ)] ────> [Speed/Stamina Focus]
+         |       +────> [Pace Chaser (先行)] ────> [Balanced Approach]
+         |       +────> [Late Surger (差し)] ────> [Speed/Power Focus]
+         |       +────> [End Closer (追込)] ────> [Power/Guts Focus]
          |
-         +-----> [Weather Strategy]
-         |       |
-         |       +-----> [Firm Conditions] -----> [Standard Strategy]
-         |       +-----> [Wet Conditions] -----> [Weather Skill Priority]
+         +────> [Win Probability Calculation]
          |
          v
 [Preparation Recommendations]
          |
-         +-----> [Training Focus] -----> [Stat Gap Priorities]
-         |
-         +-----> [Skill Acquisition] -----> [Weather/Distance Skills]
-         |
-         +-----> [Energy Management] -----> [Pre-Race Rest Strategy]
-         |
-         +-----> [Condition Optimization] -----> [Infirmary Timing]
+         +────> [Training Focus] ────> [Stat Gap Priorities]
+         +────> [Skill Acquisition] ────> [Race-Specific Skills]
+         +────> [Energy Management] ────> [Pre-Race Rest Strategy]
+         +────> [Condition Optimization] ────> [Timing Adjustments]
          |
          v
-[Race Day Execution] -----> [Performance Tracking]
+[Race Day Execution] ────> [Performance Tracking]
          |                        |
          v                        v
-[Post-Race Analysis] <-----------+
+[Post-Race Analysis] <────────────+
          |
          v
 [Strategy Effectiveness Update]
@@ -320,7 +373,7 @@ The race preparation workflow that activates when races are approaching, analyzi
 [Next Race Planning]
 ```
 
-### Mermaid Diagram
+### 3.3 Mermaid Diagram
 
 ```mermaid
 flowchart TD
@@ -334,7 +387,7 @@ flowchart TD
     RaceDetails --> Grade[Grade: G1/G2/G3/OP/Pre-OP]
     RaceDetails --> Distance[Distance: Sprint/Mile/Medium/Long]
     RaceDetails --> Surface[Surface: Turf/Dirt]
-    RaceDetails --> Track[Track: Kyoto/Tokyo/etc.]
+    RaceDetails --> Track[Track: Tokyo/Kyoto/etc.]
 
     WeatherForecast --> TrackConditions[Track Conditions<br/>Firm/Good/Soft/Heavy]
     CompetitionAnalysis --> FieldStrength[Expected Field Strength]
@@ -377,27 +430,23 @@ flowchart TD
     RacingSkills --> StrategyOpt
 
     StrategyOpt --> RunningStyleSelect[Running Style Selection]
-    StrategyOpt --> WeatherStrategy[Weather Strategy]
+    StrategyOpt --> WinProbability[Win Probability Calculation]
 
     RunningStyleSelect --> FrontRunner[Front Runner<br/>Speed/Stamina Focus]
     RunningStyleSelect --> PaceChaser[Pace Chaser<br/>Balanced Approach]
     RunningStyleSelect --> LateSurger[Late Surger<br/>Speed/Power Focus]
     RunningStyleSelect --> EndCloser[End Closer<br/>Power/Guts Focus]
 
-    WeatherStrategy --> FirmConditions[Firm Conditions<br/>Standard Strategy]
-    WeatherStrategy --> WetConditions[Wet Conditions<br/>Weather Skill Priority]
-
     FrontRunner --> PrepRecs[Preparation Recommendations]
     PaceChaser --> PrepRecs
     LateSurger --> PrepRecs
     EndCloser --> PrepRecs
-    FirmConditions --> PrepRecs
-    WetConditions --> PrepRecs
+    WinProbability --> PrepRecs
 
     PrepRecs --> TrainingFocus[Training Focus<br/>Stat Gap Priorities]
-    PrepRecs --> SkillAcquisition[Skill Acquisition<br/>Weather/Distance Skills]
+    PrepRecs --> SkillAcquisition[Skill Acquisition<br/>Race-Specific Skills]
     PrepRecs --> EnergyMgmt[Energy Management<br/>Pre-Race Rest Strategy]
-    PrepRecs --> ConditionOpt[Condition Optimization<br/>Infirmary Timing]
+    PrepRecs --> ConditionOpt[Condition Optimization<br/>Timing Adjustments]
 
     TrainingFocus --> RaceDay[Race Day Execution]
     SkillAcquisition --> RaceDay
@@ -410,78 +459,106 @@ flowchart TD
     StrategyUpdate --> NextRacePlanning[Next Race Planning]
 ```
 
+### 3.4 Readiness Classification
+
+| Readiness Score | Classification | Indicator |
+|-----------------|----------------|-----------|
+| ≥85% | Excellent | 🟢 Ready |
+| 70-84% | Good | 🟡 Prepared |
+| 55-69% | Fair | 🟠 Borderline |
+| <55% | Poor | 🔴 Not Ready |
+
+### 3.5 Aptitude Effectiveness
+
+| Rating | Effectiveness | Description |
+|--------|---------------|-------------|
+| SS | 120% | Exceptional aptitude |
+| S | 110% | Superior aptitude |
+| A | 100% | Standard aptitude |
+| B | 90% | Below average |
+| C | 80% | Poor aptitude |
+| D | 70% | Very poor |
+| E | 60% | Extremely poor |
+| F | 50% | Minimal |
+| G | 40% | Worst possible |
+
+---
+
 ## 4. AI Chatbot Interaction Flow
 
-### Text Description
+### 4.1 Text Description
 
-The AI advisory system workflow showing how users interact with the chatbot for strategic advice, the system's decision process for using local **Ollama** vs cloud **AWS Bedrock** models, and how contextual recommendations are generated. The system intelligently routes between **Claude 4.5** models (Opus, Sonnet, Haiku) and **Nova 2** models (Lite, Pro) based on query complexity and performance requirements.
+The AI advisory system workflow shows how users interact with the chatbot for strategic advice, the system's decision process for using local **Ollama** vs cloud **AWS Bedrock** models, and how contextual recommendations are generated via **Neuron AI agents**. The system intelligently routes based on query complexity and local model availability.
 
-### ASCII Diagram
+**Related Documents:**
+
+- PRD: [PRD-006](prds/PRD-006_AI_Advisory.md)
+- SPEC: [SPEC-006](specs/SPEC-006_AI_Advisory_Technical.md)
+- Flow: [FLOW-006](flows/FLOW-006_AI_Advisory_System.md)
+- Sequence: [SEQ-006](sequences/SEQ-006_AI_Advice_Generation.md)
+
+### 4.2 ASCII Diagram
 
 ```text
-[User Query Input] -----> [Query Analysis]
+[User Query Input] ────> [Query Analysis]
         |
         v
 [Query Classification]
         |
-        +-----> [Simple Question] -----> [Local Knowledge Base]
+        +────> [Simple Question] ────> [Local Knowledge Base]
         |
-        +-----> [Complex Strategy] -----> [AI Processing Required]
+        +────> [Complex Strategy] ────> [AI Processing Required]
         |
-        +-----> [Screenshot Analysis] -----> [OCR + AI Analysis]
+        +────> [Screenshot Analysis] ────> [OCR + AI Analysis]
         |
         v
 [AI Model Selection]
         |
-        +-----> [Try Ollama Local] -----> [Response Time Check]
-        |                                      |
-        |                                      +-----> [< 10 seconds] -----> [Quality Check]
-        |                                      |                                    |
-        |                                      |                                    +-----> [Good Quality] -----> [Use Ollama Response]
-        |                                      |                                    |
-        |                                      |                                    +-----> [Poor Quality] -----> [Fallback to AWS]
-        |                                      |
-        |                                      +-----> [> 10 seconds] -----> [Fallback to AWS]
+        +────> [Check Ollama Availability]
+        |              |
+        |              +────> [Available] ────> [Assess Complexity]
+        |              |                              |
+        |              |                              +────> [Simple] ────> [Use Ollama]
+        |              |                              |
+        |              |                              +────> [Complex] ────> [Use Bedrock]
+        |              |
+        |              +────> [Unavailable] ────> [Fallback to Bedrock]
         |
-        +-----> [AWS Bedrock Fallback]
-                |
-                +-----> [Nova Pro/Lite] -----> [Complex Analysis]
-                |
-                +-----> [Claude 4.5 Sonnet/Haiku] -----> [Strategic Advice]
-                |
-                v
+        v
+[Neuron Agent Selection]
+        |
+        +────> [Training Advisor Agent] ────> [Training Context]
+        +────> [Race Strategy Agent] ────> [Race Context]
+        +────> [Skill Advisor Agent] ────> [Skill Context]
+        +────> [Career Planning Agent] ────> [Career Context]
+        |
+        v
 [Context Integration]
         |
-        +-----> [Current Career State] -----> [Character Stats/Goals]
-        |
-        +-----> [Historical Decisions] -----> [Previous Conversations]
-        |
-        +-----> [Game Knowledge Base] -----> [Meta Information]
-        |
-        +-----> [Community Data] -----> [Tier Lists/Strategies]
+        +────> [Current Career State] ────> [Character Stats/Goals]
+        +────> [Historical Decisions] ────> [Previous Conversations]
+        +────> [Game Knowledge Base] ────> [Meta Information]
+        +────> [Community Data] ────> [Tier Lists/Strategies]
         |
         v
 [Response Generation]
         |
-        +-----> [Strategic Recommendations] -----> [Reasoning Explanation]
-        |
-        +-----> [Alternative Approaches] -----> [Trade-off Analysis]
-        |
-        +-----> [Confidence Indicators] -----> [Model Used Disclosure]
-        |
-        +-----> [Follow-up Suggestions] -----> [Related Resources]
+        +────> [Strategic Recommendations] ────> [Reasoning Explanation]
+        +────> [Alternative Approaches] ────> [Trade-off Analysis]
+        +────> [Confidence Indicators] ────> [Model Used Disclosure]
+        +────> [Follow-up Suggestions] ────> [Related Resources]
         |
         v
-[Response Delivery] -----> [User Feedback Collection]
+[Response Delivery] ────> [User Feedback Collection]
         |                        |
         v                        v
-[Conversation History Update] <--+
+[Conversation History Update] <──+
         |
         v
-[Learning Integration] -----> [Improve Future Responses]
+[Cost Tracking] ────> [Token Usage Recording]
 ```
 
-### Mermaid Diagram
+### 4.3 Mermaid Diagram
 
 ```mermaid
 flowchart TD
@@ -500,24 +577,26 @@ flowchart TD
     AIProcessing --> ModelSelection[AI Model Selection]
     OCRAnalysis --> ModelSelection
 
-    ModelSelection --> TryOllama[Try Ollama Local]
-    TryOllama --> ResponseTimeCheck{Response Time Check}
+    ModelSelection --> CheckOllama{Ollama Available?}
+    CheckOllama -->|Yes| AssessComplexity{Complexity?}
+    CheckOllama -->|No| FallbackAWS[Fallback to AWS Bedrock]
 
-    ResponseTimeCheck -->|< 10 seconds| QualityCheck{Quality Check}
-    ResponseTimeCheck -->|> 10 seconds| FallbackAWS[Fallback to AWS]
+    AssessComplexity -->|Simple| UseOllama[Use Ollama Local]
+    AssessComplexity -->|Complex| UseCloud[Use AWS Bedrock]
 
-    QualityCheck -->|Good Quality| UseOllama[Use Ollama Response]
-    QualityCheck -->|Poor Quality| FallbackAWS
+    UseOllama --> AgentSelection[Neuron Agent Selection]
+    UseCloud --> AgentSelection
+    FallbackAWS --> AgentSelection
 
-    ModelSelection --> AWSFallback[AWS Bedrock Fallback]
-    FallbackAWS --> AWSFallback
+    AgentSelection --> TrainingAgent[Training Advisor Agent]
+    AgentSelection --> RaceAgent[Race Strategy Agent]
+    AgentSelection --> SkillAgent[Skill Advisor Agent]
+    AgentSelection --> CareerAgent[Career Planning Agent]
 
-    AWSFallback --> NovaModels[Nova Pro/Lite<br/>Complex Analysis]
-    AWSFallback --> ClaudeModels[Claude 4.5 Sonnet/Haiku<br/>Strategic Advice]
-
-    UseOllama --> ContextIntegration[Context Integration]
-    NovaModels --> ContextIntegration
-    ClaudeModels --> ContextIntegration
+    TrainingAgent --> ContextIntegration[Context Integration]
+    RaceAgent --> ContextIntegration
+    SkillAgent --> ContextIntegration
+    CareerAgent --> ContextIntegration
 
     ContextIntegration --> CareerState[Current Career State<br/>Character Stats/Goals]
     ContextIntegration --> HistoricalDecisions[Historical Decisions<br/>Previous Conversations]
@@ -541,139 +620,144 @@ flowchart TD
 
     ResponseDelivery --> UserFeedback[User Feedback Collection]
     UserFeedback --> ConversationUpdate[Conversation History Update]
-    ConversationUpdate --> LearningIntegration[Learning Integration<br/>Improve Future Responses]
+    ConversationUpdate --> CostTracking[Cost Tracking<br/>Token Usage Recording]
 ```
+
+### 4.4 AI Provider Configuration
+
+| Provider | Model | Use Case | Cost |
+|----------|-------|----------|------|
+| Ollama | Local Models (llama3.2) | Simple queries, high volume | Free |
+| AWS Bedrock | Claude 3.5 Haiku | Standard recommendations | $0.25/1M input |
+| AWS Bedrock | Claude 3.5 Sonnet | Complex strategy analysis | $3/1M input |
+| AWS Bedrock | Claude 4.5 | Advanced reasoning (fallback) | $5/1M input |
+
+### 4.5 Neuron Agent Tools
+
+| Agent | Primary Tools | Purpose |
+|-------|---------------|---------|
+| Training Advisor | GetCharacterStatsTool, GetTrainingPredictionsTool | Training recommendations |
+| Race Strategy | GetRaceRequirementsTool, GetAptitudeAnalysisTool | Race preparation |
+| Skill Advisor | GetSkillCatalogTool, GetSkillHintsTool | Skill acquisition planning |
+| Career Planning | GetGoalProgressTool, GetCareerTimelineTool | Long-term strategy |
+
+---
 
 ## 5. Screenshot Analysis and Data Extraction Flow
 
-### Text Description
+### 5.1 Text Description
 
-The screenshot processing workflow that handles image uploads, performs OCR analysis, extracts game state information, and provides contextual recommendations based on the captured data. Enhanced by **AWS Bedrock Claude 4.5** models for intelligent image analysis and **Laravel 12** backend for robust processing.
+The screenshot processing workflow handles image uploads, performs OCR analysis using Tesseract with GD preprocessing, extracts game state information, and provides contextual recommendations based on the captured data.
 
-### ASCII Diagram
+**Related Documents:**
+
+- SPEC: [SPEC-007](specs/SPEC-007_External_Integration_Technical.md)
+- Flow: [FLOW-007](flows/FLOW-007_External_Integration_System.md)
+- Tech Flow: [TECH-FLOW-007](tech-flow/TECH-FLOW-007_External_Integration_Flow.md)
+
+### 5.2 ASCII Diagram
 
 ```text
-[Screenshot Upload] -----> [Image Validation]
+[Screenshot Upload] ────> [Image Validation]
         |                        |
-        v                        +-----> [Format Check: PNG/JPG/WebP]
+        v                        +────> [Format Check: PNG/JPG/WebP]
 [Image Processing]               |
-        |                        +-----> [Size Validation: < 10MB]
+        |                        +────> [Size Validation: < 2MB]
         v                        |
-[OCR Analysis]                   +-----> [Resolution Check: Min 800x600]
+[GD Preprocessing]               +────> [Resolution Check: Min 800x600]
         |
-        +-----> [Screen Type Detection]
+        +────> [Resize to Normalize]
+        +────> [Grayscale Conversion]
+        +────> [Threshold Application]
+        +────> [Deskew Correction]
+        +────> [Denoise Filter]
+        |
+        v
+[Tesseract OCR]
+        |
+        +────> [Screen Type Detection]
         |       |
-        |       +-----> [Training Screen] -----> [Training Options Extraction]
+        |       +────> [Training Screen] ────> [Training Options Extraction]
         |       |                                      |
-        |       |                                      +-----> [Available Training Types]
-        |       |                                      +-----> [Support Card Participation]
-        |       |                                      +-----> [Red "!" Indicators]
-        |       |                                      +-----> [Predicted Stat Gains]
+        |       |                                      +────> [Available Training Types]
+        |       |                                      +────> [Support Card Participation]
+        |       |                                      +────> [Red "!" Indicators]
+        |       |                                      +────> [Predicted Stat Gains]
         |       |
-        |       +-----> [Character Stats Screen] -----> [Stats Extraction]
+        |       +────> [Character Stats Screen] ────> [Stats Extraction]
         |       |                                            |
-        |       |                                            +-----> [Current Stat Values]
-        |       |                                            +-----> [Energy/Mood Status]
-        |       |                                            +-----> [Conditions Present]
-        |       |                                            +-----> [Turn Number]
+        |       |                                            +────> [Current Stat Values]
+        |       |                                            +────> [Energy/Mood Status]
+        |       |                                            +────> [Conditions Present]
+        |       |                                            +────> [Turn Number]
         |       |
-        |       +-----> [Race Preparation Screen] -----> [Race Info Extraction]
+        |       +────> [Race Preparation Screen] ────> [Race Info Extraction]
         |       |                                             |
-        |       |                                             +-----> [Race Details]
-        |       |                                             +-----> [Strategy Options]
-        |       |                                             +-----> [Weather Conditions]
-        |       |                                             +-----> [Readiness Indicators]
+        |       |                                             +────> [Race Details]
+        |       |                                             +────> [Strategy Options]
+        |       |                                             +────> [Readiness Indicators]
         |       |
-        |       +-----> [Skill Screen] -----> [Skill Data Extraction]
+        |       +────> [Skill Screen] ────> [Skill Data Extraction]
         |       |                                  |
-        |       |                                  +-----> [Available Skills]
-        |       |                                  +-----> [SP Costs]
-        |       |                                  +-----> [Hint Discounts]
-        |       |                                  +-----> [Current SP Balance]
+        |       |                                  +────> [Available Skills]
+        |       |                                  +────> [SP Costs]
+        |       |                                  +────> [Hint Discounts]
+        |       |                                  +────> [Current SP Balance]
         |       |
-        |       +-----> [Support Card Screen] -----> [Deck Analysis]
+        |       +────> [Support Card Screen] ────> [Deck Analysis]
         |                                                |
-        |                                                +-----> [Card Composition]
-        |                                                +-----> [Friendship Levels]
-        |                                                +-----> [Limit Break Status]
-        |                                                +-----> [Specializations]
+        |                                                +────> [Card Composition]
+        |                                                +────> [Bond Levels]
+        |                                                +────> [Limit Break Status]
         |
         v
 [Data Validation and Confidence Scoring]
         |
-        +-----> [High Confidence (>90%)] -----> [Auto-Accept Data]
+        +────> [High Confidence (>85%)] ────> [Auto-Accept Data]
         |
-        +-----> [Medium Confidence (70-90%)] -----> [Flag for Review]
+        +────> [Medium Confidence (70-85%)] ────> [Flag for Review]
         |
-        +-----> [Low Confidence (<70%)] -----> [Manual Correction Required]
+        +────> [Low Confidence (<70%)] ────> [Manual Correction Required]
         |
         v
-[Context Analysis]
-        |
-        +-----> [Current Career State] -----> [Goal Progress Assessment]
-        |
-        +-----> [Historical Patterns] -----> [Decision Pattern Analysis]
-        |
-        +-----> [Meta Knowledge] -----> [Current Strategy Effectiveness]
+[Context Analysis via AI]
         |
         v
 [Recommendation Generation]
         |
-        +-----> [Training Screen] -----> [Optimal Training Choice]
-        |                                     |
-        |                                     +-----> [Primary Recommendation]
-        |                                     +-----> [Alternative Options]
-        |                                     +-----> [Risk Assessment]
-        |
-        +-----> [Stats Screen] -----> [Development Analysis]
-        |                                   |
-        |                                   +-----> [Goal Progress Update]
-        |                                   +-----> [Stat Gap Analysis]
-        |                                   +-----> [Next Steps Guidance]
-        |
-        +-----> [Race Screen] -----> [Race Strategy Optimization]
-        |                                 |
-        |                                 +-----> [Readiness Assessment]
-        |                                 +-----> [Strategy Recommendations]
-        |                                 +-----> [Preparation Advice]
-        |
-        +-----> [Skill Screen] -----> [Skill Acquisition Strategy]
-        |                                   |
-        |                                   +-----> [Priority Skills]
-        |                                   +-----> [SP Optimization]
-        |                                   +-----> [Hint Collection Strategy]
-        |
-        +-----> [Support Screen] -----> [Deck Optimization]
-                                             |
-                                             +-----> [Deck Analysis]
-                                             +-----> [Improvement Suggestions]
-                                             +-----> [Friend Card Recommendations]
+        v
+[Response Delivery] ────> [User Confirmation]
         |
         v
-[AI Chatbot Integration] -----> [Contextual Conversation]
-        |
-        v
-[Response Delivery] -----> [User Interaction]
-        |
-        v
-[Learning Update] -----> [Improve OCR Accuracy]
+[Data Import to Career Run]
 ```
 
-### Mermaid Diagram
+### 5.3 Mermaid Diagram
 
 ```mermaid
 flowchart TD
     ScreenshotUpload([Screenshot Upload]) --> ImageValidation[Image Validation]
 
     ImageValidation --> FormatCheck[Format Check: PNG/JPG/WebP]
-    ImageValidation --> SizeValidation[Size Validation: < 10MB]
+    ImageValidation --> SizeValidation[Size Validation: < 2MB]
     ImageValidation --> ResolutionCheck[Resolution Check: Min 800x600]
 
-    FormatCheck --> ImageProcessing[Image Processing]
+    FormatCheck --> ImageProcessing[GD Preprocessing]
     SizeValidation --> ImageProcessing
     ResolutionCheck --> ImageProcessing
 
-    ImageProcessing --> OCRAnalysis[OCR Analysis]
+    ImageProcessing --> Resize[Resize to Normalize]
+    ImageProcessing --> Grayscale[Grayscale Conversion]
+    ImageProcessing --> Threshold[Threshold Application]
+    ImageProcessing --> Deskew[Deskew Correction]
+    ImageProcessing --> Denoise[Denoise Filter]
+
+    Resize --> OCRAnalysis[Tesseract OCR]
+    Grayscale --> OCRAnalysis
+    Threshold --> OCRAnalysis
+    Deskew --> OCRAnalysis
+    Denoise --> OCRAnalysis
+
     OCRAnalysis --> ScreenTypeDetection[Screen Type Detection]
 
     ScreenTypeDetection --> TrainingScreen[Training Screen]
@@ -683,142 +767,288 @@ flowchart TD
     ScreenTypeDetection --> SupportScreen[Support Card Screen]
 
     TrainingScreen --> TrainingExtraction[Training Options Extraction]
-    TrainingExtraction --> TrainingTypes[Available Training Types]
-    TrainingExtraction --> SupportParticipation[Support Card Participation]
-    TrainingExtraction --> RedIndicators[Red "!" Indicators]
-    TrainingExtraction --> PredictedGains[Predicted Stat Gains]
-
     StatsScreen --> StatsExtraction[Stats Extraction]
-    StatsExtraction --> CurrentStats[Current Stat Values]
-    StatsExtraction --> EnergyMood[Energy/Mood Status]
-    StatsExtraction --> ConditionsPresent[Conditions Present]
-    StatsExtraction --> TurnNumber[Turn Number]
-
     RaceScreen --> RaceExtraction[Race Info Extraction]
-    RaceExtraction --> RaceDetails[Race Details]
-    RaceExtraction --> StrategyOptions[Strategy Options]
-    RaceExtraction --> WeatherConditions[Weather Conditions]
-    RaceExtraction --> ReadinessIndicators[Readiness Indicators]
-
     SkillScreen --> SkillExtraction[Skill Data Extraction]
-    SkillExtraction --> AvailableSkills[Available Skills]
-    SkillExtraction --> SPCosts[SP Costs]
-    SkillExtraction --> HintDiscounts[Hint Discounts]
-    SkillExtraction --> SPBalance[Current SP Balance]
-
     SupportScreen --> DeckAnalysis[Deck Analysis]
-    DeckAnalysis --> CardComposition[Card Composition]
-    DeckAnalysis --> FriendshipLevels[Friendship Levels]
-    DeckAnalysis --> LimitBreakStatus[Limit Break Status]
-    DeckAnalysis --> Specializations[Specializations]
 
-    TrainingTypes --> DataValidation[Data Validation and Confidence Scoring]
-    SupportParticipation --> DataValidation
-    RedIndicators --> DataValidation
-    PredictedGains --> DataValidation
-    CurrentStats --> DataValidation
-    EnergyMood --> DataValidation
-    ConditionsPresent --> DataValidation
-    TurnNumber --> DataValidation
-    RaceDetails --> DataValidation
-    StrategyOptions --> DataValidation
-    WeatherConditions --> DataValidation
-    ReadinessIndicators --> DataValidation
-    AvailableSkills --> DataValidation
-    SPCosts --> DataValidation
-    HintDiscounts --> DataValidation
-    SPBalance --> DataValidation
-    CardComposition --> DataValidation
-    FriendshipLevels --> DataValidation
-    LimitBreakStatus --> DataValidation
-    Specializations --> DataValidation
+    TrainingExtraction --> DataValidation[Data Validation and Confidence Scoring]
+    StatsExtraction --> DataValidation
+    RaceExtraction --> DataValidation
+    SkillExtraction --> DataValidation
+    DeckAnalysis --> DataValidation
 
-    DataValidation --> HighConfidence[High Confidence >90%<br/>Auto-Accept Data]
-    DataValidation --> MediumConfidence[Medium Confidence 70-90%<br/>Flag for Review]
+    DataValidation --> HighConfidence[High Confidence >85%<br/>Auto-Accept Data]
+    DataValidation --> MediumConfidence[Medium Confidence 70-85%<br/>Flag for Review]
     DataValidation --> LowConfidence[Low Confidence <70%<br/>Manual Correction Required]
 
-    HighConfidence --> ContextAnalysis[Context Analysis]
+    HighConfidence --> ContextAnalysis[Context Analysis via AI]
     MediumConfidence --> ContextAnalysis
-    LowConfidence --> ContextAnalysis
+    LowConfidence --> ManualCorrection[Manual Correction UI]
+    ManualCorrection --> ContextAnalysis
 
-    ContextAnalysis --> CareerState[Current Career State<br/>Goal Progress Assessment]
-    ContextAnalysis --> HistoricalPatterns[Historical Patterns<br/>Decision Pattern Analysis]
-    ContextAnalysis --> MetaKnowledge[Meta Knowledge<br/>Current Strategy Effectiveness]
-
-    CareerState --> RecommendationGeneration[Recommendation Generation]
-    HistoricalPatterns --> RecommendationGeneration
-    MetaKnowledge --> RecommendationGeneration
-
-    RecommendationGeneration --> TrainingRecs[Training Screen<br/>Optimal Training Choice]
-    RecommendationGeneration --> StatsRecs[Stats Screen<br/>Development Analysis]
-    RecommendationGeneration --> RaceRecs[Race Screen<br/>Race Strategy Optimization]
-    RecommendationGeneration --> SkillRecs[Skill Screen<br/>Skill Acquisition Strategy]
-    RecommendationGeneration --> SupportRecs[Support Screen<br/>Deck Optimization]
-
-    TrainingRecs --> PrimaryRec[Primary Recommendation]
-    TrainingRecs --> AltOptions[Alternative Options]
-    TrainingRecs --> RiskAssessment[Risk Assessment]
-
-    StatsRecs --> GoalProgressUpdate[Goal Progress Update]
-    StatsRecs --> StatGapAnalysis[Stat Gap Analysis]
-    StatsRecs --> NextStepsGuidance[Next Steps Guidance]
-
-    RaceRecs --> ReadinessAssessment[Readiness Assessment]
-    RaceRecs --> StrategyRecommendations[Strategy Recommendations]
-    RaceRecs --> PreparationAdvice[Preparation Advice]
-
-    SkillRecs --> PrioritySkills[Priority Skills]
-    SkillRecs --> SPOptimization[SP Optimization]
-    SkillRecs --> HintCollectionStrategy[Hint Collection Strategy]
-
-    SupportRecs --> DeckAnalysisResult[Deck Analysis]
-    SupportRecs --> ImprovementSuggestions[Improvement Suggestions]
-    SupportRecs --> FriendCardRecs[Friend Card Recommendations]
-
-    PrimaryRec --> AIChatbotIntegration[AI Chatbot Integration]
-    AltOptions --> AIChatbotIntegration
-    RiskAssessment --> AIChatbotIntegration
-    GoalProgressUpdate --> AIChatbotIntegration
-    StatGapAnalysis --> AIChatbotIntegration
-    NextStepsGuidance --> AIChatbotIntegration
-    ReadinessAssessment --> AIChatbotIntegration
-    StrategyRecommendations --> AIChatbotIntegration
-    PreparationAdvice --> AIChatbotIntegration
-    PrioritySkills --> AIChatbotIntegration
-    SPOptimization --> AIChatbotIntegration
-    HintCollectionStrategy --> AIChatbotIntegration
-    DeckAnalysisResult --> AIChatbotIntegration
-    ImprovementSuggestions --> AIChatbotIntegration
-    FriendCardRecs --> AIChatbotIntegration
-
-    AIChatbotIntegration --> ContextualConversation[Contextual Conversation]
-    ContextualConversation --> ResponseDelivery[Response Delivery]
-    ResponseDelivery --> UserInteraction[User Interaction]
-    UserInteraction --> LearningUpdate[Learning Update<br/>Improve OCR Accuracy]
+    ContextAnalysis --> RecommendationGeneration[Recommendation Generation]
+    RecommendationGeneration --> ResponseDelivery[Response Delivery]
+    ResponseDelivery --> UserConfirmation[User Confirmation]
+    UserConfirmation --> DataImport[Data Import to Career Run]
 ```
 
-## Flow Diagram Summary
+### 5.4 OCR Confidence Thresholds
 
-### Key User Workflows
+| Data Type | Detection Pattern | Minimum Confidence |
+|-----------|-------------------|-------------------|
+| Character stats | Stat labels + numeric values | 85% |
+| Skill names | Japanese/English text regions | 80% |
+| Race results | Placement + time format | 90% |
+| Support cards | Card frame detection | 75% |
 
-1. **Career Setup Flow**: Comprehensive initialization process with character selection, support deck configuration, and legacy inheritance
-2. **Turn-by-Turn Optimization**: Core gameplay loop with training analysis, recommendation generation, and decision support
-3. **Race Preparation Flow**: Strategic race planning with readiness assessment and strategy optimization
-4. **AI Chatbot Interaction**: Intelligent advisory system with local/cloud model selection and contextual advice
-5. **Screenshot Analysis Flow**: Automated data extraction from game screenshots with OCR and AI-powered recommendations
+### 5.5 Preprocessing Operations
 
-### Critical Decision Points
+| Operation | Purpose | Implementation |
+|-----------|---------|----------------|
+| Resize | Normalize dimensions | Max 2000px width |
+| Grayscale | Improve contrast | GD `imagefilter()` |
+| Threshold | Binary conversion | Adaptive threshold |
+| Deskew | Correct rotation | Angle detection |
+| Denoise | Remove artifacts | Median filter |
 
-- **Model Selection**: Ollama local vs AWS cloud based on response time and quality
-- **Training Optimization**: Risk-reward analysis with energy management and goal prioritization
-- **Race Strategy**: Running style selection based on character stats and race conditions
-- **Data Validation**: Confidence-based acceptance of OCR extracted data
+---
 
-### Integration Points
+## 6. Data Import and Export Flow
 
-- **AI Chatbot**: Integrated throughout all workflows for contextual advice
-- **Screenshot Analysis**: Feeds into all optimization workflows for automated data input
-- **Historical Learning**: Continuous improvement of predictions and recommendations
-- **Community Data**: Real-time integration of meta information and tier lists
+### 6.1 Text Description
 
-These flow diagrams provide comprehensive coverage of the user experience and system interactions, ensuring optimal workflow design for the Umamusume career planner application.
+The data import/export workflow enables users to backup, restore, and migrate their career data across devices and storage modes. Supports JSON, Excel, and CSV formats with schema versioning and conflict resolution.
+
+**Related Documents:**
+
+- D05: [Data Migration Plan](005_DMP_Data_Migration_Plan.md)
+- D06: Data Migration Specifications
+
+### 6.2 Mermaid Diagram
+
+```mermaid
+flowchart TD
+    subgraph Export[Export Workflow]
+        ExportStart([User Requests Export]) --> SelectFormat{Select Format}
+        SelectFormat -->|JSON| JSONExport[Generate JSON]
+        SelectFormat -->|Excel| ExcelExport[Generate XLSX]
+        SelectFormat -->|CSV| CSVExport[Generate CSV]
+        
+        JSONExport --> AddSchema[Add Schema Version]
+        ExcelExport --> FormatTables[Format Worksheets]
+        CSVExport --> FlattenData[Flatten Nested Data]
+        
+        AddSchema --> Preview[Preview Export]
+        FormatTables --> Preview
+        FlattenData --> Preview
+        
+        Preview --> DownloadAction{Action}
+        DownloadAction -->|Download| DownloadFile[Download File]
+        DownloadAction -->|Copy| CopyClipboard[Copy to Clipboard]
+    end
+
+    subgraph Import[Import Workflow]
+        ImportStart([User Uploads File]) --> DetectFormat[Detect Format]
+        DetectFormat --> ValidateSchema[Validate Schema]
+        ValidateSchema --> ParseData[Parse Data]
+        ParseData --> DetectConflicts{Conflicts?}
+        
+        DetectConflicts -->|Yes| ConflictUI[Show Conflict Resolution]
+        DetectConflicts -->|No| PreviewImport[Preview Import]
+        
+        ConflictUI --> ResolveStrategy{Resolution Strategy}
+        ResolveStrategy -->|Skip| SkipDuplicates[Skip Existing]
+        ResolveStrategy -->|Overwrite| OverwriteExisting[Replace Existing]
+        ResolveStrategy -->|Rename| RenameImport[Import as Copy]
+        
+        SkipDuplicates --> PreviewImport
+        OverwriteExisting --> PreviewImport
+        RenameImport --> PreviewImport
+        
+        PreviewImport --> ConfirmImport[User Confirms]
+        ConfirmImport --> ExecuteImport[Execute Import]
+        ExecuteImport --> ImportComplete([Import Complete])
+    end
+```
+
+### 6.3 Export Formats
+
+| Format | Extension | Use Case | Size Limit |
+|--------|-----------|----------|------------|
+| JSON | .json | Full backup with schema | No limit |
+| Excel | .xlsx | Spreadsheet analysis | 50k rows |
+| CSV | .csv | Data processing | No limit |
+
+### 6.4 Conflict Resolution Strategies
+
+| Strategy | Behavior | Use Case |
+|----------|----------|----------|
+| Skip | Keep existing, ignore imported | Preserve user modifications |
+| Overwrite | Replace existing with imported | Fresh data sync |
+| Rename | Create new with modified identifier | Keep both versions |
+
+---
+
+## 7. Storage Mode and Offline Flow
+
+### 7.1 Text Description
+
+The storage mode workflow manages data persistence across Local (browser localStorage) and Account (database) modes, with seamless offline functionality and automatic draft saving.
+
+**Related Documents:**
+
+- SRS: [FR-10 Local Storage Mode](003_SRS_Software_Requirement_Specifications.md#210-local-storage-mode-fr-10)
+- User Manual: [Storage Modes](017_SUM_Software_User_Manual.md#12-storage-modes)
+
+### 7.2 Mermaid Diagram
+
+```mermaid
+flowchart TD
+    subgraph StorageSelection[Storage Mode Selection]
+        NewUser([New User]) --> ModeChoice{Choose Storage Mode}
+        ModeChoice -->|No Account| LocalMode[🟠 Local Mode]
+        ModeChoice -->|Has Account| AccountMode[🟣 Account Mode]
+        
+        LocalMode --> LocalStorage[(Browser localStorage)]
+        AccountMode --> DatabaseStorage[(MySQL Database)]
+    end
+
+    subgraph LocalWorkflow[Local Mode Workflow]
+        LocalStorage --> UUIDIdentifier[UUID-based Identification]
+        UUIDIdentifier --> OfflineCapable[Full Offline Functionality]
+        OfflineCapable --> LocalDraft[Auto-save Drafts]
+        LocalDraft --> StorageLimitCheck{Storage Limit Check}
+        StorageLimitCheck -->|OK| ContinueLocal[Continue Working]
+        StorageLimitCheck -->|Near Limit| WarningPrompt[Show Warning]
+        WarningPrompt --> ConvertOption[Offer Account Conversion]
+    end
+
+    subgraph AccountWorkflow[Account Mode Workflow]
+        DatabaseStorage --> IntegerID[Integer ID Identification]
+        IntegerID --> CloudSync[Cloud Sync Available]
+        CloudSync --> CrossDevice[Cross-Device Access]
+    end
+
+    subgraph ConversionFlow[Local to Account Conversion]
+        ConvertOption --> UserLogin[User Logs In]
+        UserLogin --> SelectPlans[Select Plans to Convert]
+        SelectPlans --> UploadData[Upload to Database]
+        UploadData --> AssignNewID[Assign Integer ID]
+        AssignNewID --> RemoveLocal{Remove Local Copy?}
+        RemoveLocal -->|Yes| DeleteLocal[Delete from localStorage]
+        RemoveLocal -->|No| KeepBoth[Keep Both Copies]
+        DeleteLocal --> ConversionComplete([Conversion Complete])
+        KeepBoth --> ConversionComplete
+    end
+
+    subgraph OfflineHandling[Offline State Management]
+        OnlineState([Online]) --> ConnectionCheck{Connection Lost?}
+        ConnectionCheck -->|Yes| OfflineState[Offline Mode]
+        OfflineState --> AutoSaveDraft[Auto-save to Draft]
+        AutoSaveDraft --> OfflineIndicator[Show Offline Badge]
+        OfflineIndicator --> ContinueEditing[Continue Editing]
+        ContinueEditing --> ConnectionRestored{Connection Restored?}
+        ConnectionRestored -->|Yes| SyncPrompt[Sync Prompt]
+        SyncPrompt --> SyncAction{Action}
+        SyncAction -->|Save| SaveDraft[Save Draft to Server]
+        SyncAction -->|Discard| DiscardDraft[Discard Draft]
+        SaveDraft --> OnlineState
+        DiscardDraft --> OnlineState
+    end
+```
+
+### 7.3 Storage Mode Comparison
+
+| Feature | Local Mode 🟠 | Account Mode 🟣 |
+|---------|---------------|-----------------|
+| Login Required | No | Yes |
+| Data Location | Browser localStorage | MySQL Database |
+| Offline Support | Full | Draft only |
+| Cross-Device | No | Yes |
+| Identifier | UUID | Integer ID |
+| Storage Limit | 5-10MB | Unlimited |
+| Data Risk | Browser cache clear | Server backup |
+
+### 7.4 Draft Auto-Save Configuration
+
+| Setting | Value | Description |
+|---------|-------|-------------|
+| Auto-save Interval | 30 seconds | Time between saves |
+| Draft Versions | 3 | Maximum versions kept |
+| Draft Expiration | 7 days | Prompt after this period |
+| Clear on Save | Yes | Remove drafts after successful save |
+
+---
+
+## 8. Flow Diagram Summary
+
+### 8.1 Key User Workflows
+
+| Workflow | Description | Primary Documents |
+|----------|-------------|-------------------|
+| Career Setup | Character, deck, and goal configuration | PRD-001, SPEC-001, FLOW-001 |
+| Turn-by-Turn Training | Core gameplay with AI recommendations | PRD-002, SPEC-002, FLOW-002 |
+| Race Preparation | Strategy and readiness optimization | PRD-003, SPEC-003, FLOW-003 |
+| AI Advisory | Intelligent recommendations via Neuron agents | PRD-006, SPEC-006, FLOW-006 |
+| Screenshot Analysis | OCR-based data extraction | SPEC-007, FLOW-007 |
+| Data Import/Export | Backup, restore, and migration | D05, D06 |
+| Storage Modes | Local/Account mode management | SRS FR-10, User Manual |
+
+### 8.2 Critical Decision Points
+
+| Decision Point | Options | Impact |
+|----------------|---------|--------|
+| AI Model Selection | Ollama local vs AWS Bedrock | Cost, response time, availability |
+| Training Selection | 5 training types + rest | Stat development, energy management |
+| Race Strategy | 4 running styles | Win probability, skill activation |
+| Storage Mode | Local vs Account | Offline capability, data persistence |
+| Data Validation | Accept/Review/Reject | Data accuracy, user intervention |
+
+### 8.3 Integration Points
+
+| Integration | Service | Purpose |
+|-------------|---------|---------|
+| AI Chatbot | Neuron AI Agents | Contextual advice across all workflows |
+| OCR Pipeline | Tesseract + GD | Automated data input from screenshots |
+| External APIs | umapyoi.net, UmamusumeDB | Game data synchronization |
+| WebSocket | Laravel Reverb | Real-time updates |
+| Caching | Redis | Performance optimization |
+
+### 8.4 Performance Targets
+
+| Metric | Target | Workflow |
+|--------|--------|----------|
+| Training Prediction | < 1.2s (p95) | Turn-by-Turn Training |
+| AI Advisory Response | < 2.5s | AI Chatbot Interaction |
+| OCR Processing | < 5s | Screenshot Analysis |
+| Export (50k rows) | < 60s | Data Export |
+| Page Load | < 2s | All workflows |
+
+---
+
+## Document Control
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 2.1.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 codebase, updated AI integration to Neuron agents, added storage mode and import/export flows, updated technical specifications |
+| 2.0.0 | 2026-01-14 | Development Team | Prior revision with initial workflow diagrams |
+| 1.0.0 | 2026-01-03 | Development Team | Initial draft |
+
+---
+
+## Related Documents
+
+- [PRD-001: Character Management](prds/PRD-001_Character_Management.md)
+- [PRD-002: Training Optimization](prds/PRD-002_Training_Optimization.md)
+- [PRD-003: Race Strategy](prds/PRD-003_Race_Strategy.md)
+- [PRD-006: AI Advisory](prds/PRD-006_AI_Advisory.md)
+- [PRD-007: External Integration](prds/PRD-007_External_Integration.md)
+- [SPEC-001 through SPEC-007](specs/000_SPECS_INDEX.md)
+- [FLOW-001 through FLOW-007](flows/000_FLOWS_INDEX.md)
+- [Software User Manual](017_SUM_Software_User_Manual.md)
+- [Software Integration Plan](007_SIP_Software_Integration_Plan.md)
+
+---
+
+*This document reflects the current user workflow design aligned with the Umamusume Career Planner v2.0.0 implementation.*
