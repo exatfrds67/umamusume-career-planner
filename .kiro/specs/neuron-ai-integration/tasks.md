@@ -68,7 +68,7 @@ This implementation plan breaks down the Neuron AI integration into discrete, ma
     - **Property 4: Chat History Retrieval**
     - **Validates: Requirements 11.2**
 
-  - [~]* 3.5 Write property test for chat history user association
+  - [ ]* 3.5 Write property test for chat history user association
     - **Property 5: Chat History User Association**
     - **Validates: Requirements 11.3**
 

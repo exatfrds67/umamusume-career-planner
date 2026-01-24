@@ -144,6 +144,27 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Agent Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for individual AI agents.
+    |
+    */
+
+    'agents' => [
+        'training_optimization' => [
+            'enabled' => env('AI_AGENT_TRAINING_OPTIMIZATION_ENABLED', true),
+            'timeout' => env('AI_AGENT_TRAINING_OPTIMIZATION_TIMEOUT', 30),
+        ],
+
+        'skill_management' => [
+            'enabled' => env('AI_AGENT_SKILL_MANAGEMENT_ENABLED', true),
+            'timeout' => env('AI_AGENT_SKILL_MANAGEMENT_TIMEOUT', 30),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Performance Monitoring Configuration
     |--------------------------------------------------------------------------
     |
