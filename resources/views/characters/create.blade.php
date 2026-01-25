@@ -112,6 +112,36 @@
             </div>
         @endif
 
+        <!-- External Data Prefill Notice -->
+        <div x-show="showExternalPrefillNotice" x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 transform -translate-y-2"
+            x-transition:enter-end="opacity-100 transform translate-y-0"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100 transform translate-y-0"
+            x-transition:leave-end="opacity-0 transform -translate-y-2"
+            class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+            <div class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-green-500 mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clip-rule="evenodd" />
+                </svg>
+                <div class="flex-1">
+                    <p class="text-sm font-medium text-green-800 dark:text-green-200">
+                        Character data loaded from External Database
+                    </p>
+                    <p class="text-xs text-green-700 dark:text-green-300 mt-1">
+                        Name and image have been pre-filled. You can modify them as needed.
+                    </p>
+                </div>
+                <button @click="showExternalPrefillNotice = false" class="text-green-500 hover:text-green-700">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
         <form method="POST" action="{{ route('characters.store') }}" id="character-form">
             @csrf
 
@@ -125,11 +155,14 @@
                 <div class="card-body space-y-6">
 
                     <!-- Toggle Button for Database -->
-                    <div class="flex items-center justify-between p-4 bg-primary-50 dark:bg-primary-900/10 rounded-lg border border-primary-100 dark:border-primary-800">
+                    <div
+                        class="flex items-center justify-between p-4 bg-primary-50 dark:bg-primary-900/10 rounded-lg border border-primary-100 dark:border-primary-800">
                         <div class="flex items-center gap-3">
                             <div class="p-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-                                <svg class="w-6 h-6 text-primary-600 dark:text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                <svg class="w-6 h-6 text-primary-600 dark:text-primary-400" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                                 </svg>
                             </div>
                             <div>
@@ -140,18 +173,20 @@
                                 </p>
                             </div>
                         </div>
-                        <button type="button" 
-                                @click="showDatabase = !showDatabase" 
-                                class="btn btn-primary btn-sm">
+                        <button type="button"
+                            @click="showDatabase = !showDatabase; if(showDatabase) showExternalApi = false"
+                            class="btn btn-primary btn-sm">
                             <span x-show="!showDatabase" class="flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7" />
                                 </svg>
                                 Open Database
                             </span>
                             <span x-show="showDatabase" class="flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 15l7-7 7 7" />
                                 </svg>
                                 Close Database
                             </span>
@@ -159,18 +194,20 @@
                     </div>
 
                     <!-- Database Search Grid - Hidden by Default -->
-                    <div x-show="showDatabase" x-transition class="grid grid-cols-1 xl:grid-cols-3 gap-6 p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50/50 dark:bg-gray-800/50">
+                    <div x-show="showDatabase" x-transition
+                        class="grid grid-cols-1 xl:grid-cols-3 gap-6 p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50/50 dark:bg-gray-800/50">
                         <div class="xl:col-span-2 space-y-4">
                             @include('characters.partials.database-search')
                         </div>
 
                         <div class="space-y-4">
-                            <div class="rounded-lg border border-gray-200 dark:border-gray-700 p-4 bg-white dark:bg-gray-800">
+                            <div
+                                class="rounded-lg border border-gray-200 dark:border-gray-700 p-4 bg-white dark:bg-gray-800">
                                 <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Selected Preview</h4>
                                 <div x-show="formData.trainee" class="space-y-3">
                                     <div class="flex items-center gap-3">
-                                        <img :src="formData.trainee?.image" :alt="formData.trainee?.name"
-                                            loading="lazy" decoding="async"
+                                        <img :src="formData.trainee?.image" :alt="formData.trainee?.name" loading="lazy"
+                                            decoding="async"
                                             x-on:error="$el.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(formData.trainee?.name || 'Chk') + '&background=random&color=fff'"
                                             class="w-16 h-16 rounded-lg object-cover border border-gray-200 dark:border-gray-700">
                                         <div>
@@ -181,7 +218,8 @@
                                         </div>
                                     </div>
                                     <div class="grid grid-cols-5 gap-2">
-                                        <template x-for="(value, stat) in formData.trainee?.baseStats || {}" :key="stat">
+                                        <template x-for="(value, stat) in formData.trainee?.baseStats || {}"
+                                            :key="stat">
                                             <div class="text-center">
                                                 <div class="text-[10px] text-gray-500 dark:text-gray-400 uppercase"
                                                     x-text="stat"></div>
@@ -191,7 +229,8 @@
                                         </template>
                                     </div>
                                     <div class="flex flex-wrap gap-2 text-xs">
-                                        <template x-for="aptitude in formData.trainee?.aptitudes || []" :key="aptitude">
+                                        <template x-for="aptitude in formData.trainee?.aptitudes || []"
+                                            :key="aptitude">
                                             <span
                                                 class="px-2 py-0.5 rounded-full bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-200"
                                                 x-text="aptitude"></span>
@@ -202,6 +241,96 @@
                                     Select a trainee to see the preview.
                                 </div>
                                 <input type="hidden" name="trainee_id" :value="formData.trainee?.id || ''">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Toggle Button for External API -->
+                    <div
+                        class="flex items-center justify-between p-4 bg-green-50 dark:bg-green-900/10 rounded-lg border border-green-100 dark:border-green-800">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+                                <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-semibold text-gray-900 dark:text-white">External API (umapyoi.net)
+                                </h4>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">
+                                    <span x-show="!showExternalApi">Search and import from official game data</span>
+                                    <span x-show="showExternalApi">Select a character to autofill with real game
+                                        data</span>
+                                </p>
+                            </div>
+                        </div>
+                        <button type="button"
+                            @click="showExternalApi = !showExternalApi; if(showExternalApi) showDatabase = false"
+                            class="btn btn-success btn-sm">
+                            <span x-show="!showExternalApi" class="flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7" />
+                                </svg>
+                                Open External API
+                            </span>
+                            <span x-show="showExternalApi" class="flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 15l7-7 7 7" />
+                                </svg>
+                                Close External API
+                            </span>
+                        </button>
+                    </div>
+
+                    <!-- External API Search Grid - Hidden by Default -->
+                    <div x-show="showExternalApi" x-transition
+                        class="grid grid-cols-1 xl:grid-cols-3 gap-6 p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50/50 dark:bg-gray-800/50">
+                        <div class="xl:col-span-2 space-y-4">
+                            @include('characters.partials.external-api-search')
+                        </div>
+
+                        <div class="space-y-4">
+                            <div
+                                class="rounded-lg border border-gray-200 dark:border-gray-700 p-4 bg-white dark:bg-gray-800">
+                                <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">External Character
+                                    Preview</h4>
+                                <div x-show="selectedExternalCharacter" class="space-y-3">
+                                    <div class="flex items-center gap-3">
+                                        <img :src="selectedExternalCharacter?.image"
+                                            :alt="selectedExternalCharacter?.name" loading="lazy" decoding="async"
+                                            x-on:error="$el.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(selectedExternalCharacter?.name || 'Char') + '&background=random&color=fff'"
+                                            class="w-16 h-16 rounded-lg object-cover border border-gray-200 dark:border-gray-700">
+                                        <div>
+                                            <p class="text-sm font-semibold text-gray-900 dark:text-white"
+                                                x-text="selectedExternalCharacter?.name"></p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400"
+                                                x-text="selectedExternalCharacter?.name_jp"></p>
+                                        </div>
+                                    </div>
+                                    <div class="text-xs text-gray-600 dark:text-gray-400">
+                                        <p><strong>Source:</strong> umapyoi.net</p>
+                                        <p><strong>ID:</strong> <span x-text="selectedExternalCharacter?.id"></span></p>
+                                        <p x-show="selectedExternalCharacter?.category"><strong>Category:</strong> <span
+                                                x-text="selectedExternalCharacter?.category"></span></p>
+                                    </div>
+                                    <button type="button" @click="loadExternalCharacterData()"
+                                        :disabled="externalDataLoading" class="btn btn-primary btn-sm w-full">
+                                        <svg class="w-4 h-4 mr-2" :class="{ 'animate-spin': externalDataLoading }"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                        </svg>
+                                        <span x-show="!externalDataLoading">Load Full Data</span>
+                                        <span x-show="externalDataLoading">Loading...</span>
+                                    </button>
+                                </div>
+                                <div x-show="!selectedExternalCharacter" class="text-sm text-gray-500 dark:text-gray-400">
+                                    Search and select a character to see the preview.
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -468,9 +597,8 @@
                                             style="width: 256px; height: 256px; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(0.375); transform-origin: center center;">
                                             <div class="absolute inset-0"
                                                 :style="`transform: translate(${formData.imageX}px, ${formData.imageY}px);`">
-                                                <img :src="formData.avatar_preview" alt="Character avatar"
-                                                    loading="lazy" decoding="async"
-                                                    class="w-full h-full object-cover"
+                                                <img :src="formData.avatar_preview" alt="Character avatar" loading="lazy"
+                                                    decoding="async" class="w-full h-full object-cover"
                                                     x-on:error="$el.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(formData.name || 'User') + '&background=random'"
                                                     :style="`transform: scale(${formData.imageZoom}) rotate(${formData.imageRotation}deg) scaleX(${formData.imageFlipH ? -1 : 1}); transform-origin: center center;`">
                                             </div>
@@ -586,6 +714,21 @@
                 currentStep: 1,
                 showGallery: false,
                 showDatabase: false,
+                showExternalApi: false,
+                showExternalPrefillNotice: false,
+
+                // External API state
+                externalCharacters: [],
+                selectedExternalCharacter: null,
+                externalLoading: false,
+                externalDataLoading: false,
+                externalError: null,
+                externalSearched: false,
+                externalFilters: {
+                    query: '',
+                    category: ''
+                },
+
                 formData: {
                     title: '',
                     name: '',
@@ -597,6 +740,8 @@
                     imageX: 0,
                     imageY: 0,
                     scenario_type: '',
+                    external_source: null,
+                    external_id: null,
                     stats: {
                         speed: 0,
                         stamina: 0,
@@ -637,8 +782,7 @@
                 },
 
                 // Trainee Database (Simulated)
-                trainees: [
-                    {
+                trainees: [{
                         id: 1,
                         name: "Special Week",
                         rarity: 3,
@@ -647,8 +791,20 @@
                         style: "Betweener",
                         aptitudes: ["Turf", "Medium", "Long", "Betweener", "Leader"],
                         image: "/images/trainee_images/__special_week_umamusume_drawn_by_mikawa_ayumu__c5289136bde8f5e1cb096090308a8496.jpg",
-                        stats: { speed: 98, stamina: 93, power: 94, guts: 88, wisdom: 91 },
-                        growth: { speed: 0, stamina: 20, power: 0, guts: 10, wisdom: 0 }
+                        stats: {
+                            speed: 98,
+                            stamina: 93,
+                            power: 94,
+                            guts: 88,
+                            wisdom: 91
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 20,
+                            power: 0,
+                            guts: 10,
+                            wisdom: 0
+                        }
                     },
                     {
                         id: 2,
@@ -659,8 +815,20 @@
                         style: "Runner",
                         aptitudes: ["Turf", "Mile", "Medium", "Runner"],
                         image: "/images/trainee_images/bb962aabeafaee5cbf7831e4d178ca64.jpg",
-                        stats: { speed: 105, stamina: 85, power: 88, guts: 80, wisdom: 95 },
-                        growth: { speed: 20, stamina: 0, power: 0, guts: 10, wisdom: 0 }
+                        stats: {
+                            speed: 105,
+                            stamina: 85,
+                            power: 88,
+                            guts: 80,
+                            wisdom: 95
+                        },
+                        growth: {
+                            speed: 20,
+                            stamina: 0,
+                            power: 0,
+                            guts: 10,
+                            wisdom: 0
+                        }
                     },
                     {
                         id: 3,
@@ -671,8 +839,20 @@
                         style: "Leader",
                         aptitudes: ["Turf", "Medium", "Long", "Leader"],
                         image: "/images/trainee_images/__tokai_teio_umamusume_drawn_by_so_on__305c01834a0c0cf3fe3593c281a0b05b.jpg",
-                        stats: { speed: 100, stamina: 90, power: 90, guts: 85, wisdom: 92 },
-                        growth: { speed: 20, stamina: 10, power: 0, guts: 0, wisdom: 0 }
+                        stats: {
+                            speed: 100,
+                            stamina: 90,
+                            power: 90,
+                            guts: 85,
+                            wisdom: 92
+                        },
+                        growth: {
+                            speed: 20,
+                            stamina: 10,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 0
+                        }
                     },
                     {
                         id: 4,
@@ -683,8 +863,20 @@
                         style: "Runner",
                         aptitudes: ["Turf", "Mile", "Medium", "Runner"],
                         image: "/images/trainee_images/__maruzensky_umamusume_drawn_by_kamishima_kanon__sample-297ecca0da3990374954a514f06bea2b.jpg",
-                        stats: { speed: 102, stamina: 88, power: 92, guts: 85, wisdom: 95 },
-                        growth: { speed: 10, stamina: 0, power: 0, guts: 0, wisdom: 20 }
+                        stats: {
+                            speed: 102,
+                            stamina: 88,
+                            power: 92,
+                            guts: 85,
+                            wisdom: 95
+                        },
+                        growth: {
+                            speed: 10,
+                            stamina: 0,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 20
+                        }
                     },
                     {
                         id: 5,
@@ -695,8 +887,20 @@
                         style: "Leader",
                         aptitudes: ["Turf", "Mile", "Medium", "Leader", "Betweener"],
                         image: "/images/trainee_images/__fuji_kiseki_umamusume_drawn_by_snowater__79fb8292647cf289359469f2fec0ed4a.jpg",
-                        stats: { speed: 94, stamina: 85, power: 100, guts: 88, wisdom: 90 },
-                        growth: { speed: 0, stamina: 0, power: 20, guts: 0, wisdom: 10 }
+                        stats: {
+                            speed: 94,
+                            stamina: 85,
+                            power: 100,
+                            guts: 88,
+                            wisdom: 90
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 0,
+                            power: 20,
+                            guts: 0,
+                            wisdom: 10
+                        }
                     },
                     {
                         id: 6,
@@ -707,8 +911,20 @@
                         style: "Leader",
                         aptitudes: ["Turf", "Dirt", "Mile", "Medium", "Long", "Leader", "Betweener"],
                         image: "/images/trainee_images/__oguri_cap_and_jacques_villeneuve_umamusume_and_1_more_drawn_by_holeecrab__sample-9628095fc1e0ee5bcc8c96c47d5722a1.jpg",
-                        stats: { speed: 100, stamina: 92, power: 105, guts: 90, wisdom: 85 },
-                        growth: { speed: 20, stamina: 0, power: 10, guts: 0, wisdom: 0 }
+                        stats: {
+                            speed: 100,
+                            stamina: 92,
+                            power: 105,
+                            guts: 90,
+                            wisdom: 85
+                        },
+                        growth: {
+                            speed: 20,
+                            stamina: 0,
+                            power: 10,
+                            guts: 0,
+                            wisdom: 0
+                        }
                     },
                     {
                         id: 7,
@@ -719,8 +935,20 @@
                         style: "Chaser",
                         aptitudes: ["Turf", "Medium", "Long", "Chaser"],
                         image: "/images/trainee_images/__gold_ship_umamusume_drawn_by_advarcher__sample-2713426899554240b99dc00440e97745.jpg",
-                        stats: { speed: 90, stamina: 110, power: 100, guts: 95, wisdom: 80 },
-                        growth: { speed: 0, stamina: 20, power: 10, guts: 0, wisdom: 0 }
+                        stats: {
+                            speed: 90,
+                            stamina: 110,
+                            power: 100,
+                            guts: 95,
+                            wisdom: 80
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 20,
+                            power: 10,
+                            guts: 0,
+                            wisdom: 0
+                        }
                     },
                     {
                         id: 8,
@@ -731,8 +959,20 @@
                         style: "Betweener",
                         aptitudes: ["Turf", "Mile", "Medium", "Betweener", "Leader"],
                         image: "/images/trainee_images/__vodka_umamusume_drawn_by_mayata__41166bfaeb2670ae37c8785af4566d58.jpg",
-                        stats: { speed: 95, stamina: 80, power: 108, guts: 85, wisdom: 82 },
-                        growth: { speed: 10, stamina: 0, power: 20, guts: 0, wisdom: 0 }
+                        stats: {
+                            speed: 95,
+                            stamina: 80,
+                            power: 108,
+                            guts: 85,
+                            wisdom: 82
+                        },
+                        growth: {
+                            speed: 10,
+                            stamina: 0,
+                            power: 20,
+                            guts: 0,
+                            wisdom: 0
+                        }
                     },
                     {
                         id: 9,
@@ -743,8 +983,20 @@
                         style: "Runner",
                         aptitudes: ["Turf", "Mile", "Medium", "Runner", "Leader"],
                         image: "/images/trainee_images/__daiwa_scarlet_umamusume_drawn_by_kurokawa_heuy__sample-9576ae268cdddfe167c2300d5453f2cf.jpg",
-                        stats: { speed: 98, stamina: 90, power: 92, guts: 95, wisdom: 88 },
-                        growth: { speed: 0, stamina: 0, power: 0, guts: 20, wisdom: 10 }
+                        stats: {
+                            speed: 98,
+                            stamina: 90,
+                            power: 92,
+                            guts: 95,
+                            wisdom: 88
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 0,
+                            power: 0,
+                            guts: 20,
+                            wisdom: 10
+                        }
                     },
                     {
                         id: 10,
@@ -755,8 +1007,20 @@
                         style: "Leader",
                         aptitudes: ["Turf", "Dirt", "Sprint", "Mile", "Leader", "Runner"],
                         image: "/images/trainee_images/__taiki_shuttle_umamusume_drawn_by_kitsutsuki_dzgu4744__2923a6d9bcc13a323eda812483bd7569.jpg",
-                        stats: { speed: 105, stamina: 80, power: 95, guts: 85, wisdom: 92 },
-                        growth: { speed: 20, stamina: 0, power: 0, guts: 0, wisdom: 10 }
+                        stats: {
+                            speed: 105,
+                            stamina: 80,
+                            power: 95,
+                            guts: 85,
+                            wisdom: 92
+                        },
+                        growth: {
+                            speed: 20,
+                            stamina: 0,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 10
+                        }
                     },
                     {
                         id: 11,
@@ -767,8 +1031,20 @@
                         style: "Betweener",
                         aptitudes: ["Turf", "Mile", "Medium", "Long", "Betweener", "Leader"],
                         image: "/images/trainee_images/__special_week_and_grass_wonder_umamusume_drawn_by_murasaki_himuro__c5cd811241a372d775e9ba2e2d09c65f.jpg",
-                        stats: { speed: 96, stamina: 92, power: 98, guts: 90, wisdom: 90 },
-                        growth: { speed: 20, stamina: 0, power: 10, guts: 0, wisdom: 0 }
+                        stats: {
+                            speed: 96,
+                            stamina: 92,
+                            power: 98,
+                            guts: 90,
+                            wisdom: 90
+                        },
+                        growth: {
+                            speed: 20,
+                            stamina: 0,
+                            power: 10,
+                            guts: 0,
+                            wisdom: 0
+                        }
                     },
                     {
                         id: 12,
@@ -779,8 +1055,20 @@
                         style: "Chaser",
                         aptitudes: ["Turf", "Mile", "Medium", "Chaser", "Betweener"],
                         image: "/images/trainee_images/__hishi_amazon_umamusume_drawn_by_eve_on_k__a46dc4de4b4fb109f54b72bc3ae44a2c.png",
-                        stats: { speed: 92, stamina: 88, power: 102, guts: 94, wisdom: 85 },
-                        growth: { speed: 0, stamina: 10, power: 20, guts: 0, wisdom: 0 }
+                        stats: {
+                            speed: 92,
+                            stamina: 88,
+                            power: 102,
+                            guts: 94,
+                            wisdom: 85
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 10,
+                            power: 20,
+                            guts: 0,
+                            wisdom: 0
+                        }
                     },
                     {
                         id: 13,
@@ -791,8 +1079,20 @@
                         style: "Leader",
                         aptitudes: ["Turf", "Medium", "Long", "Leader"],
                         image: "/images/trainee_images/__mejiro_mcqueen_umamusume_drawn_by_miwerjooggetser__52537bea1d60aaa40c1532613769ce26.png",
-                        stats: { speed: 90, stamina: 105, power: 92, guts: 90, wisdom: 95 },
-                        growth: { speed: 0, stamina: 20, power: 0, guts: 0, wisdom: 10 }
+                        stats: {
+                            speed: 90,
+                            stamina: 105,
+                            power: 92,
+                            guts: 90,
+                            wisdom: 95
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 20,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 10
+                        }
                     },
                     {
                         id: 14,
@@ -803,8 +1103,20 @@
                         style: "Leader",
                         aptitudes: ["Turf", "Dirt", "Mile", "Medium", "Leader", "Betweener"],
                         image: "/images/trainee_images/__el_condor_pasa_umamusume_drawn_by_nekogusa_kinako__85cfefb3697093d2c40c9db031ab46a5.jpg",
-                        stats: { speed: 98, stamina: 90, power: 95, guts: 90, wisdom: 88 },
-                        growth: { speed: 20, stamina: 0, power: 0, guts: 0, wisdom: 10 }
+                        stats: {
+                            speed: 98,
+                            stamina: 90,
+                            power: 95,
+                            guts: 90,
+                            wisdom: 88
+                        },
+                        growth: {
+                            speed: 20,
+                            stamina: 0,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 10
+                        }
                     },
                     {
                         id: 15,
@@ -815,8 +1127,20 @@
                         style: "Leader",
                         aptitudes: ["Turf", "Medium", "Long", "Leader", "Betweener"],
                         image: "/images/trainee_images/__t_m_opera_o_umamusume_drawn_by_eriario__7e3d265d1e3e405cf79bdce81ba87adf.jpg",
-                        stats: { speed: 95, stamina: 100, power: 94, guts: 92, wisdom: 90 },
-                        growth: { speed: 0, stamina: 20, power: 0, guts: 0, wisdom: 10 }
+                        stats: {
+                            speed: 95,
+                            stamina: 100,
+                            power: 94,
+                            guts: 92,
+                            wisdom: 90
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 20,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 10
+                        }
                     },
                     {
                         id: 16,
@@ -827,8 +1151,20 @@
                         style: "Betweener",
                         aptitudes: ["Turf", "Medium", "Long", "Betweener", "Leader"],
                         image: "/images/trainee_images/__narita_brian_and_biwa_hayahide_umamusume_drawn_by_hitoto__sample-e1edfe57e7e12f49d5a724698f738783.jpg",
-                        stats: { speed: 102, stamina: 98, power: 100, guts: 95, wisdom: 90 },
-                        growth: { speed: 10, stamina: 20, power: 0, guts: 0, wisdom: 0 }
+                        stats: {
+                            speed: 102,
+                            stamina: 98,
+                            power: 100,
+                            guts: 95,
+                            wisdom: 90
+                        },
+                        growth: {
+                            speed: 10,
+                            stamina: 20,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 0
+                        }
                     },
                     {
                         id: 17,
@@ -839,8 +1175,20 @@
                         style: "Betweener",
                         aptitudes: ["Turf", "Medium", "Long", "Betweener", "Leader"],
                         image: "/images/trainee_images/__symboli_rudolf_umamusume_drawn_by_kusanagi_kaoru__da889d95df3f77d7d1b3f7105f463d36.png",
-                        stats: { speed: 98, stamina: 100, power: 95, guts: 90, wisdom: 98 },
-                        growth: { speed: 0, stamina: 20, power: 0, guts: 0, wisdom: 10 }
+                        stats: {
+                            speed: 98,
+                            stamina: 100,
+                            power: 95,
+                            guts: 90,
+                            wisdom: 98
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 20,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 10
+                        }
                     },
                     {
                         id: 18,
@@ -851,8 +1199,20 @@
                         style: "Betweener",
                         aptitudes: ["Turf", "Mile", "Medium", "Betweener", "Leader"],
                         image: "/images/trainee_images/__air_groove_umamusume_drawn_by_nil__9c09dc404769151d63e3ddfa37513b20.jpg",
-                        stats: { speed: 96, stamina: 88, power: 98, guts: 85, wisdom: 90 },
-                        growth: { speed: 10, stamina: 0, power: 20, guts: 0, wisdom: 0 }
+                        stats: {
+                            speed: 96,
+                            stamina: 88,
+                            power: 98,
+                            guts: 85,
+                            wisdom: 90
+                        },
+                        growth: {
+                            speed: 10,
+                            stamina: 0,
+                            power: 20,
+                            guts: 0,
+                            wisdom: 0
+                        }
                     },
                     {
                         id: 19,
@@ -863,8 +1223,20 @@
                         style: "Betweener",
                         aptitudes: ["Turf", "Dirt", "Mile", "Medium", "Betweener", "Leader"],
                         image: "/images/trainee_images/__agnes_digital_umamusume_drawn_by_shinmai_kyata__65f32dbc74a3429009c967bb2cf5f7b7.png",
-                        stats: { speed: 95, stamina: 85, power: 95, guts: 90, wisdom: 95 },
-                        growth: { speed: 10, stamina: 0, power: 10, guts: 0, wisdom: 10 }
+                        stats: {
+                            speed: 95,
+                            stamina: 85,
+                            power: 95,
+                            guts: 90,
+                            wisdom: 95
+                        },
+                        growth: {
+                            speed: 10,
+                            stamina: 0,
+                            power: 10,
+                            guts: 0,
+                            wisdom: 10
+                        }
                     },
                     {
                         id: 20,
@@ -875,8 +1247,20 @@
                         style: "Runner",
                         aptitudes: ["Turf", "Medium", "Long", "Runner"],
                         image: "/images/trainee_images/__seiun_sky_umamusume_drawn_by_masaki_shino__65730ce77e97e0b5a2c44211de420fa3.jpg",
-                        stats: { speed: 94, stamina: 98, power: 85, guts: 90, wisdom: 105 },
-                        growth: { speed: 0, stamina: 10, power: 0, guts: 0, wisdom: 20 }
+                        stats: {
+                            speed: 94,
+                            stamina: 98,
+                            power: 85,
+                            guts: 90,
+                            wisdom: 105
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 10,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 20
+                        }
                     },
                     {
                         id: 21,
@@ -887,8 +1271,20 @@
                         style: "Betweener",
                         aptitudes: ["Turf", "Medium", "Long", "Betweener", "Chaser"],
                         image: "/images/trainee_images/__tamamo_cross_umamusume_drawn_by_ayrw7t1__d15ea703c90277149049cb36a6d0fa62.jpg",
-                        stats: { speed: 98, stamina: 96, power: 95, guts: 92, wisdom: 88 },
-                        growth: { speed: 0, stamina: 20, power: 10, guts: 0, wisdom: 0 }
+                        stats: {
+                            speed: 98,
+                            stamina: 96,
+                            power: 95,
+                            guts: 92,
+                            wisdom: 88
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 20,
+                            power: 10,
+                            guts: 0,
+                            wisdom: 0
+                        }
                     },
                     {
                         id: 22,
@@ -899,8 +1295,20 @@
                         style: "Leader",
                         aptitudes: ["Turf", "Mile", "Medium", "Leader"],
                         image: "/images/trainee_images/__fine_motion_umamusume_drawn_by_fuku_f2uk9u__85b37e5fc89efc667ae0f67aa20e5d73.png",
-                        stats: { speed: 92, stamina: 85, power: 90, guts: 80, wisdom: 100 },
-                        growth: { speed: 0, stamina: 0, power: 15, guts: 0, wisdom: 15 }
+                        stats: {
+                            speed: 92,
+                            stamina: 85,
+                            power: 90,
+                            guts: 80,
+                            wisdom: 100
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 0,
+                            power: 15,
+                            guts: 0,
+                            wisdom: 15
+                        }
                     },
                     {
                         id: 23,
@@ -911,8 +1319,20 @@
                         style: "Leader",
                         aptitudes: ["Turf", "Medium", "Long", "Leader"],
                         image: "/images/trainee_images/__narita_brian_and_biwa_hayahide_umamusume_drawn_by_hitoto__sample-e1edfe57e7e12f49d5a724698f738783.jpg",
-                        stats: { speed: 95, stamina: 94, power: 90, guts: 90, wisdom: 98 },
-                        growth: { speed: 0, stamina: 0, power: 0, guts: 10, wisdom: 20 }
+                        stats: {
+                            speed: 95,
+                            stamina: 94,
+                            power: 90,
+                            guts: 90,
+                            wisdom: 98
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 0,
+                            power: 0,
+                            guts: 10,
+                            wisdom: 20
+                        }
                     },
                     {
                         id: 24,
@@ -923,8 +1343,20 @@
                         style: "Runner",
                         aptitudes: ["Turf", "Medium", "Long", "Runner", "Leader", "Betweener", "Chaser"],
                         image: "/images/trainee_images/__mayano_top_gun_umamusume_drawn_by_shibuki_kamone__24fecd157b3aaa34baee37d155c51862.jpg",
-                        stats: { speed: 90, stamina: 100, power: 90, guts: 95, wisdom: 85 },
-                        growth: { speed: 0, stamina: 20, power: 0, guts: 10, wisdom: 0 }
+                        stats: {
+                            speed: 90,
+                            stamina: 100,
+                            power: 90,
+                            guts: 95,
+                            wisdom: 85
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 20,
+                            power: 0,
+                            guts: 10,
+                            wisdom: 0
+                        }
                     },
                     {
                         id: 25,
@@ -935,8 +1367,20 @@
                         style: "Betweener",
                         aptitudes: ["Turf", "Long", "Betweener", "Chaser"],
                         image: "/images/trainee_images/__manhattan_cafe_umamusume_drawn_by_omotil__bcb209e6d3735c1ea79aa9b3cc4a1aae.jpg",
-                        stats: { speed: 92, stamina: 108, power: 88, guts: 95, wisdom: 85 },
-                        growth: { speed: 0, stamina: 30, power: 0, guts: 0, wisdom: 0 }
+                        stats: {
+                            speed: 92,
+                            stamina: 108,
+                            power: 88,
+                            guts: 95,
+                            wisdom: 85
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 30,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 0
+                        }
                     },
                     {
                         id: 26,
@@ -947,8 +1391,20 @@
                         style: "Runner",
                         aptitudes: ["Turf", "Mile", "Medium", "Runner"],
                         image: "/images/trainee_images/__mihono_bourbon_umamusume_drawn_by_yukke_jan__1e0736fa3d9611b5316f1a142ed55b93.jpg",
-                        stats: { speed: 100, stamina: 95, power: 95, guts: 85, wisdom: 88 },
-                        growth: { speed: 0, stamina: 20, power: 10, guts: 0, wisdom: 0 }
+                        stats: {
+                            speed: 100,
+                            stamina: 95,
+                            power: 95,
+                            guts: 85,
+                            wisdom: 88
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 20,
+                            power: 10,
+                            guts: 0,
+                            wisdom: 0
+                        }
                     },
                     {
                         id: 27,
@@ -959,8 +1415,20 @@
                         style: "Betweener",
                         aptitudes: ["Turf", "Medium", "Long", "Betweener"],
                         image: "/images/trainee_images/__mejiro_ryan_umamusume_drawn_by_otono_bkt4b__9befe399d00d71c6b9870eb0c6096245.png",
-                        stats: { speed: 85, stamina: 88, power: 95, guts: 85, wisdom: 85 },
-                        growth: { speed: 0, stamina: 0, power: 20, guts: 0, wisdom: 10 }
+                        stats: {
+                            speed: 85,
+                            stamina: 88,
+                            power: 95,
+                            guts: 85,
+                            wisdom: 85
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 0,
+                            power: 20,
+                            guts: 0,
+                            wisdom: 10
+                        }
                     },
                     {
                         id: 28,
@@ -971,8 +1439,20 @@
                         style: "Front",
                         aptitudes: ["Turf", "Sprint", "Mile", "Leader"],
                         image: "/images/trainee_images/__hishi_akebono_umamusume_drawn_by_buta_don__09316b18d340a98b9c72115f259eefef.png",
-                        stats: { speed: 95, stamina: 80, power: 110, guts: 90, wisdom: 80 },
-                        growth: { speed: 0, stamina: 0, power: 20, guts: 10, wisdom: 0 }
+                        stats: {
+                            speed: 95,
+                            stamina: 80,
+                            power: 110,
+                            guts: 90,
+                            wisdom: 80
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 0,
+                            power: 20,
+                            guts: 10,
+                            wisdom: 0
+                        }
                     },
                     {
                         id: 29,
@@ -983,8 +1463,20 @@
                         style: "Leader",
                         aptitudes: ["Turf", "Dirt", "Mile", "Medium", "Leader", "Betweener"],
                         image: "/images/trainee_images/__yukino_bijin_umamusume_drawn_by_migolu__e054e36adacdaab18766d5dcf3d662a4.jpg",
-                        stats: { speed: 94, stamina: 85, power: 90, guts: 92, wisdom: 95 },
-                        growth: { speed: 0, stamina: 0, power: 0, guts: 20, wisdom: 10 }
+                        stats: {
+                            speed: 94,
+                            stamina: 85,
+                            power: 90,
+                            guts: 92,
+                            wisdom: 95
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 0,
+                            power: 0,
+                            guts: 20,
+                            wisdom: 10
+                        }
                     },
                     {
                         id: 30,
@@ -995,8 +1487,20 @@
                         style: "Leader",
                         aptitudes: ["Turf", "Medium", "Long", "Leader", "Betweener"],
                         image: "/images/trainee_images/__rice_shower_umamusume_drawn_by_jjjsss__ab0944b4a248893cddca61ce1ee4a1e9.jpg",
-                        stats: { speed: 88, stamina: 105, power: 85, guts: 100, wisdom: 90 },
-                        growth: { speed: 0, stamina: 10, power: 0, guts: 20, wisdom: 0 }
+                        stats: {
+                            speed: 88,
+                            stamina: 105,
+                            power: 85,
+                            guts: 100,
+                            wisdom: 90
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 10,
+                            power: 0,
+                            guts: 20,
+                            wisdom: 0
+                        }
                     },
                     {
                         id: 31,
@@ -1007,8 +1511,20 @@
                         style: "Runner",
                         aptitudes: ["Turf", "Dirt", "Medium", "Runner"],
                         image: "/images/trainee_images/__ines_fujin_umamusume_drawn_by_codename47__3b98b45424e1cdbf84c1f69c9cd8baca.jpg",
-                        stats: { speed: 96, stamina: 88, power: 85, guts: 94, wisdom: 85 },
-                        growth: { speed: 10, stamina: 0, power: 0, guts: 20, wisdom: 0 }
+                        stats: {
+                            speed: 96,
+                            stamina: 88,
+                            power: 85,
+                            guts: 94,
+                            wisdom: 85
+                        },
+                        growth: {
+                            speed: 10,
+                            stamina: 0,
+                            power: 0,
+                            guts: 20,
+                            wisdom: 0
+                        }
                     },
                     {
                         id: 32,
@@ -1019,8 +1535,20 @@
                         style: "Leader",
                         aptitudes: ["Turf", "Medium", "Long", "Leader"],
                         image: "/images/trainee_images/__agnes_tachyon_umamusume_drawn_by_welchino__sample-1db2ca428e2545fcae81fe526d7a8e96.jpg",
-                        stats: { speed: 94, stamina: 85, power: 88, guts: 85, wisdom: 98 },
-                        growth: { speed: 10, stamina: 0, power: 0, guts: 0, wisdom: 20 }
+                        stats: {
+                            speed: 94,
+                            stamina: 85,
+                            power: 88,
+                            guts: 85,
+                            wisdom: 98
+                        },
+                        growth: {
+                            speed: 10,
+                            stamina: 0,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 20
+                        }
                     },
                     {
                         id: 33,
@@ -1031,8 +1559,20 @@
                         style: "Chaser",
                         aptitudes: ["Turf", "Medium", "Long", "Chaser", "Betweener"],
                         image: "/images/trainee_images/__admire_vega_umamusume_drawn_by_starheart__73f0bb397f0b402e876d32e31699e7f8.png",
-                        stats: { speed: 95, stamina: 90, power: 96, guts: 88, wisdom: 90 },
-                        growth: { speed: 0, stamina: 0, power: 20, guts: 0, wisdom: 10 }
+                        stats: {
+                            speed: 95,
+                            stamina: 90,
+                            power: 96,
+                            guts: 88,
+                            wisdom: 90
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 0,
+                            power: 20,
+                            guts: 0,
+                            wisdom: 10
+                        }
                     },
                     {
                         id: 34,
@@ -1043,8 +1583,20 @@
                         style: "Leader",
                         aptitudes: ["Turf", "Sprint", "Mile", "Leader", "Runner"],
                         image: "/images/trainee_images/__curren_chan_umamusume_drawn_by_motsutoko__214a9ed5e49207f8f6c3daaab732e40f.jpg",
-                        stats: { speed: 100, stamina: 80, power: 95, guts: 88, wisdom: 90 },
-                        growth: { speed: 10, stamina: 0, power: 20, guts: 0, wisdom: 0 }
+                        stats: {
+                            speed: 100,
+                            stamina: 80,
+                            power: 95,
+                            guts: 88,
+                            wisdom: 90
+                        },
+                        growth: {
+                            speed: 10,
+                            stamina: 0,
+                            power: 20,
+                            guts: 0,
+                            wisdom: 0
+                        }
                     },
                     {
                         id: 35,
@@ -1055,8 +1607,20 @@
                         style: "Betweener",
                         aptitudes: ["Turf", "Medium", "Betweener", "Chaser"],
                         image: "/images/trainee_images/__kawakami_princess_umamusume_drawn_by_kurokawa_heuy__f291f768b02437eb7e1db94e5560f720.jpg",
-                        stats: { speed: 92, stamina: 85, power: 105, guts: 94, wisdom: 82 },
-                        growth: { speed: 0, stamina: 0, power: 10, guts: 20, wisdom: 0 }
+                        stats: {
+                            speed: 92,
+                            stamina: 85,
+                            power: 105,
+                            guts: 94,
+                            wisdom: 82
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 0,
+                            power: 10,
+                            guts: 20,
+                            wisdom: 0
+                        }
                     },
                     {
                         id: 36,
@@ -1067,8 +1631,20 @@
                         style: "Leader",
                         aptitudes: ["Turf", "Mile", "Medium", "Long", "Leader", "Betweener"],
                         image: "/images/trainee_images/__gold_city_umamusume_drawn_by_chahiro__67945e12fb1202e37bfb10604e906125.jpg",
-                        stats: { speed: 96, stamina: 88, power: 88, guts: 94, wisdom: 88 },
-                        growth: { speed: 0, stamina: 10, power: 0, guts: 20, wisdom: 0 }
+                        stats: {
+                            speed: 96,
+                            stamina: 88,
+                            power: 88,
+                            guts: 94,
+                            wisdom: 88
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 10,
+                            power: 0,
+                            guts: 20,
+                            wisdom: 0
+                        }
                     },
                     {
                         id: 37,
@@ -1079,8 +1655,20 @@
                         style: "Runner",
                         aptitudes: ["Turf", "Sprint", "Mile", "Runner", "Leader"],
                         image: "/images/trainee_images/__sakura_bakushin_o_umamusume_drawn_by_itou_onsoku_tassha__8b4727be2ac678c0c1cad199ce9c18e3.jpg",
-                        stats: { speed: 105, stamina: 75, power: 85, guts: 90, wisdom: 90 },
-                        growth: { speed: 20, stamina: 0, power: 0, guts: 0, wisdom: 10 }
+                        stats: {
+                            speed: 105,
+                            stamina: 75,
+                            power: 85,
+                            guts: 90,
+                            wisdom: 90
+                        },
+                        growth: {
+                            speed: 20,
+                            stamina: 0,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 10
+                        }
                     },
                     {
                         id: 38,
@@ -1091,8 +1679,20 @@
                         style: "Leader",
                         aptitudes: ["Turf", "Dirt", "Mile", "Medium", "Leader"],
                         image: "/images/trainee_images/__shinko_windy_umamusume_drawn_by_toriga_naku__95b4fbdeb3df9122e8131289abd13cb1.jpg",
-                        stats: { speed: 90, stamina: 85, power: 94, guts: 90, wisdom: 88 },
-                        growth: { speed: 10, stamina: 0, power: 0, guts: 0, wisdom: 20 }
+                        stats: {
+                            speed: 90,
+                            stamina: 85,
+                            power: 94,
+                            guts: 90,
+                            wisdom: 88
+                        },
+                        growth: {
+                            speed: 10,
+                            stamina: 0,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 20
+                        }
                     },
                     {
                         id: 39,
@@ -1103,8 +1703,20 @@
                         style: "Runner",
                         aptitudes: ["Dirt", "Mile", "Medium", "Runner"],
                         image: "/images/trainee_images/__smart_falcon_umamusume_drawn_by_motsutoko__695387267327663d2f7a9eb898107126.jpg",
-                        stats: { speed: 100, stamina: 90, power: 92, guts: 88, wisdom: 88 },
-                        growth: { speed: 20, stamina: 0, power: 10, guts: 0, wisdom: 0 }
+                        stats: {
+                            speed: 100,
+                            stamina: 90,
+                            power: 92,
+                            guts: 88,
+                            wisdom: 88
+                        },
+                        growth: {
+                            speed: 20,
+                            stamina: 0,
+                            power: 10,
+                            guts: 0,
+                            wisdom: 0
+                        }
                     },
                     {
                         id: 40,
@@ -1115,8 +1727,20 @@
                         style: "Leader",
                         aptitudes: ["Turf", "Medium", "Long", "Leader", "Betweener"],
                         image: "/images/trainee_images/__zenno_rob_roy_umamusume_drawn_by_factory314__2ea22f996f5a613b62bb354cf31c0b64.png",
-                        stats: { speed: 92, stamina: 94, power: 90, guts: 85, wisdom: 95 },
-                        growth: { speed: 0, stamina: 10, power: 0, guts: 0, wisdom: 20 }
+                        stats: {
+                            speed: 92,
+                            stamina: 94,
+                            power: 90,
+                            guts: 85,
+                            wisdom: 95
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 10,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 20
+                        }
                     },
                     {
                         id: 41,
@@ -1127,8 +1751,20 @@
                         style: "Leader",
                         aptitudes: ["Turf", "Medium", "Long", "Leader", "Betweener"],
                         image: "/images/trainee_images/__tosen_jordan_umamusume_drawn_by_hiyo_uma__a352b60dedc127b826458915c0a8b94d.jpg",
-                        stats: { speed: 94, stamina: 90, power: 92, guts: 88, wisdom: 90 },
-                        growth: { speed: 0, stamina: 10, power: 10, guts: 0, wisdom: 10 }
+                        stats: {
+                            speed: 94,
+                            stamina: 90,
+                            power: 92,
+                            guts: 88,
+                            wisdom: 90
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 10,
+                            power: 10,
+                            guts: 0,
+                            wisdom: 10
+                        }
                     },
                     {
                         id: 42,
@@ -1139,8 +1775,20 @@
                         style: "Betweener",
                         aptitudes: ["Turf", "Medium", "Long", "Betweener"],
                         image: "/images/trainee_images/__nakayama_festa_and_alex_umamusume_and_2_more_drawn_by_hakuki__c80d09aab832bf5d94c91dfbe030df9f.jpg",
-                        stats: { speed: 92, stamina: 96, power: 94, guts: 92, wisdom: 85 },
-                        growth: { speed: 0, stamina: 10, power: 0, guts: 20, wisdom: 0 }
+                        stats: {
+                            speed: 92,
+                            stamina: 96,
+                            power: 94,
+                            guts: 92,
+                            wisdom: 85
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 10,
+                            power: 0,
+                            guts: 20,
+                            wisdom: 0
+                        }
                     },
                     {
                         id: 43,
@@ -1151,8 +1799,20 @@
                         style: "Chaser",
                         aptitudes: ["Turf", "Medium", "Long", "Chaser"],
                         image: "/images/trainee_images/__narita_taishin_umamusume_drawn_by_izumi_mahiru__60b068372d0a2398231aea82bfd89de7.jpg",
-                        stats: { speed: 95, stamina: 92, power: 88, guts: 96, wisdom: 82 },
-                        growth: { speed: 10, stamina: 0, power: 0, guts: 20, wisdom: 0 }
+                        stats: {
+                            speed: 95,
+                            stamina: 92,
+                            power: 88,
+                            guts: 96,
+                            wisdom: 82
+                        },
+                        growth: {
+                            speed: 10,
+                            stamina: 0,
+                            power: 0,
+                            guts: 20,
+                            wisdom: 0
+                        }
                     },
                     {
                         id: 44,
@@ -1163,8 +1823,20 @@
                         style: "Leader",
                         aptitudes: ["Turf", "Sprint", "Mile", "Leader", "Betweener"],
                         image: "/images/trainee_images/__nishino_flower_umamusume_drawn_by_otono_bkt4b__c4ec03e283e403171cb8dc47175b920f.png",
-                        stats: { speed: 98, stamina: 82, power: 94, guts: 85, wisdom: 95 },
-                        growth: { speed: 10, stamina: 0, power: 20, guts: 0, wisdom: 0 }
+                        stats: {
+                            speed: 98,
+                            stamina: 82,
+                            power: 94,
+                            guts: 85,
+                            wisdom: 95
+                        },
+                        growth: {
+                            speed: 10,
+                            stamina: 0,
+                            power: 20,
+                            guts: 0,
+                            wisdom: 0
+                        }
                     },
                     {
                         id: 45,
@@ -1175,8 +1847,20 @@
                         style: "Betweener",
                         aptitudes: ["Dirt", "Sprint", "Mile", "Betweener", "Chaser"],
                         image: "/images/trainee_images/__haru_urara_umamusume_drawn_by_advarcher__sample-7d1c3c431ef193e5e061bdda73f97fd5.jpg",
-                        stats: { speed: 85, stamina: 80, power: 90, guts: 100, wisdom: 75 },
-                        growth: { speed: 0, stamina: 0, power: 10, guts: 20, wisdom: 0 }
+                        stats: {
+                            speed: 85,
+                            stamina: 80,
+                            power: 90,
+                            guts: 100,
+                            wisdom: 75
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 0,
+                            power: 10,
+                            guts: 20,
+                            wisdom: 0
+                        }
                     },
                     {
                         id: 46,
@@ -1187,8 +1871,20 @@
                         style: "Betweener",
                         aptitudes: ["Turf", "Medium", "Long", "Betweener"],
                         image: "/images/trainee_images/__matikanefukukitaru_umamusume_drawn_by_kawashina_momen_silicon__00780ddf644b4efef3e7744b2b946a28.png",
-                        stats: { speed: 88, stamina: 95, power: 88, guts: 90, wisdom: 92 },
-                        growth: { speed: 0, stamina: 20, power: 0, guts: 0, wisdom: 10 }
+                        stats: {
+                            speed: 88,
+                            stamina: 95,
+                            power: 88,
+                            guts: 90,
+                            wisdom: 92
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 20,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 10
+                        }
                     },
                     {
                         id: 47,
@@ -1199,8 +1895,20 @@
                         style: "Leader",
                         aptitudes: ["Turf", "Medium", "Long", "Leader"],
                         image: "/images/trainee_images/__meisho_doto_umamusume_drawn_by_tukune__d3e176e31aa10898a48e01654298cc07.jpg",
-                        stats: { speed: 92, stamina: 98, power: 94, guts: 90, wisdom: 85 },
-                        growth: { speed: 0, stamina: 10, power: 0, guts: 20, wisdom: 0 }
+                        stats: {
+                            speed: 92,
+                            stamina: 98,
+                            power: 94,
+                            guts: 90,
+                            wisdom: 85
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 10,
+                            power: 0,
+                            guts: 20,
+                            wisdom: 0
+                        }
                     },
                     {
                         id: 48,
@@ -1211,8 +1919,20 @@
                         style: "Betweener",
                         aptitudes: ["Turf", "Medium", "Long", "Betweener"],
                         image: "/images/trainee_images/__nice_nature_umamusume_drawn_by_sekiyu_inu__d1d0d3773cf6b911f6ac6b1f753acff0.jpg",
-                        stats: { speed: 85, stamina: 85, power: 90, guts: 88, wisdom: 92 },
-                        growth: { speed: 0, stamina: 0, power: 10, guts: 0, wisdom: 20 }
+                        stats: {
+                            speed: 85,
+                            stamina: 85,
+                            power: 90,
+                            guts: 88,
+                            wisdom: 92
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 0,
+                            power: 10,
+                            guts: 0,
+                            wisdom: 20
+                        }
                     },
                     {
                         id: 49,
@@ -1223,8 +1943,20 @@
                         style: "Betweener",
                         aptitudes: ["Turf", "Sprint", "Mile", "Betweener", "Chaser"],
                         image: "/images/trainee_images/__king_halo_umamusume_drawn_by_jjjsss__1d5e6f12cd1a62d961c95a210cb275b2.jpg",
-                        stats: { speed: 90, stamina: 82, power: 95, guts: 90, wisdom: 85 },
-                        growth: { speed: 0, stamina: 0, power: 20, guts: 10, wisdom: 0 }
+                        stats: {
+                            speed: 90,
+                            stamina: 82,
+                            power: 95,
+                            guts: 90,
+                            wisdom: 85
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 0,
+                            power: 20,
+                            guts: 10,
+                            wisdom: 0
+                        }
                     },
                     {
                         id: 50,
@@ -1235,8 +1967,20 @@
                         style: "Leader",
                         aptitudes: ["Turf", "Medium", "Long", "Leader", "Betweener"],
                         image: "/images/trainee_images/__matikanetannhauser_umamusume_drawn_by_funamori__d3c68aae9e0247b1c79ad830d655fe27.jpg",
-                        stats: { speed: 88, stamina: 96, power: 90, guts: 94, wisdom: 85 },
-                        growth: { speed: 0, stamina: 20, power: 0, guts: 10, wisdom: 0 }
+                        stats: {
+                            speed: 88,
+                            stamina: 96,
+                            power: 90,
+                            guts: 94,
+                            wisdom: 85
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 20,
+                            power: 0,
+                            guts: 10,
+                            wisdom: 0
+                        }
                     },
                     {
                         id: 51,
@@ -1247,8 +1991,20 @@
                         style: "Betweener",
                         aptitudes: ["Turf", "Mile", "Medium", "Betweener", "Chaser"],
                         image: "/images/trainee_images/__ikuno_dictus_umamusume_drawn_by_zukki_bijitaru__b5bd688fe98c5379acac9ed07537db83.png",
-                        stats: { speed: 85, stamina: 94, power: 85, guts: 92, wisdom: 95 },
-                        growth: { speed: 0, stamina: 15, power: 0, guts: 0, wisdom: 15 }
+                        stats: {
+                            speed: 85,
+                            stamina: 94,
+                            power: 85,
+                            guts: 92,
+                            wisdom: 95
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 15,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 15
+                        }
                     },
                     {
                         id: 52,
@@ -1259,8 +2015,20 @@
                         style: "Runner",
                         aptitudes: ["Turf", "Mile", "Medium", "Runner"],
                         image: "/images/trainee_images/__twin_turbo_umamusume_drawn_by_urujika__718f48540797d2872f7a1d578edae44a.jpg",
-                        stats: { speed: 100, stamina: 70, power: 80, guts: 85, wisdom: 75 },
-                        growth: { speed: 30, stamina: 0, power: 0, guts: 0, wisdom: 0 }
+                        stats: {
+                            speed: 100,
+                            stamina: 70,
+                            power: 80,
+                            guts: 85,
+                            wisdom: 75
+                        },
+                        growth: {
+                            speed: 30,
+                            stamina: 0,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 0
+                        }
                     },
                     {
                         id: 53,
@@ -1271,8 +2039,20 @@
                         style: "Betweener",
                         aptitudes: ["Turf", "Medium", "Long", "Betweener"],
                         image: "/images/trainee_images/__satono_diamond_umamusume_drawn_by_freely2327__80fbdecd4f5c28f8501c032031d978d0.png",
-                        stats: { speed: 94, stamina: 102, power: 90, guts: 95, wisdom: 92 },
-                        growth: { speed: 0, stamina: 15, power: 0, guts: 0, wisdom: 15 }
+                        stats: {
+                            speed: 94,
+                            stamina: 102,
+                            power: 90,
+                            guts: 95,
+                            wisdom: 92
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 15,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 15
+                        }
                     },
                     {
                         id: 54,
@@ -1283,8 +2063,20 @@
                         style: "Runner",
                         aptitudes: ["Turf", "Medium", "Long", "Runner", "Leader"],
                         image: "/images/trainee_images/__kitasan_black_umamusume_drawn_by_mattya122__47e067dbb97ad9a28758789d05c28f90.jpg",
-                        stats: { speed: 100, stamina: 98, power: 92, guts: 88, wisdom: 90 },
-                        growth: { speed: 20, stamina: 10, power: 0, guts: 0, wisdom: 0 }
+                        stats: {
+                            speed: 100,
+                            stamina: 98,
+                            power: 92,
+                            guts: 88,
+                            wisdom: 90
+                        },
+                        growth: {
+                            speed: 20,
+                            stamina: 10,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 0
+                        }
                     },
                     {
                         id: 55,
@@ -1295,8 +2087,20 @@
                         style: "Leader",
                         aptitudes: ["Turf", "Medium", "Leader"],
                         image: "/images/trainee_images/__mejiro_ardan_umamusume_drawn_by_kentan_kingtaiki__3e95bc0615337fe4e260aaf5c73b1595.jpg",
-                        stats: { speed: 96, stamina: 88, power: 90, guts: 85, wisdom: 100 },
-                        growth: { speed: 10, stamina: 0, power: 0, guts: 0, wisdom: 20 }
+                        stats: {
+                            speed: 96,
+                            stamina: 88,
+                            power: 90,
+                            guts: 85,
+                            wisdom: 100
+                        },
+                        growth: {
+                            speed: 10,
+                            stamina: 0,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 20
+                        }
                     },
                     {
                         id: 56,
@@ -1307,8 +2111,20 @@
                         style: "Betweener",
                         aptitudes: ["Turf", "Medium", "Mile", "Betweener"],
                         image: "/images/trainee_images/__mejiro_dober_umamusume_drawn_by_puddinghomhom__fa2912aaa50460a0804ff3253ad00be1.png",
-                        stats: { speed: 92, stamina: 90, power: 85, guts: 90, wisdom: 102 },
-                        growth: { speed: 0, stamina: 0, power: 0, guts: 10, wisdom: 20 }
+                        stats: {
+                            speed: 92,
+                            stamina: 90,
+                            power: 85,
+                            guts: 90,
+                            wisdom: 102
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 0,
+                            power: 0,
+                            guts: 10,
+                            wisdom: 20
+                        }
                     },
                     {
                         id: 57,
@@ -1319,8 +2135,20 @@
                         style: "Runner",
                         aptitudes: ["Turf", "Medium", "Long", "Runner"],
                         image: "/images/trainee_images/__mejiro_palmer_umamusume_drawn_by_fuchina__9867288e81382c6cacc9bdd33d1eb582.png",
-                        stats: { speed: 95, stamina: 94, power: 92, guts: 98, wisdom: 80 },
-                        growth: { speed: 0, stamina: 0, power: 10, guts: 20, wisdom: 0 }
+                        stats: {
+                            speed: 95,
+                            stamina: 94,
+                            power: 92,
+                            guts: 98,
+                            wisdom: 80
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 0,
+                            power: 10,
+                            guts: 20,
+                            wisdom: 0
+                        }
                     },
                     {
                         id: 58,
@@ -1331,8 +2159,20 @@
                         style: "Chaser",
                         aptitudes: ["Turf", "Medium", "Long", "Chaser"],
                         image: "/images/trainee_images/__mr_c_b_umamusume_drawn_by_taromarun__f18d9b885cd85cacc316047a32b2af8f.jpg",
-                        stats: { speed: 92, stamina: 100, power: 90, guts: 88, wisdom: 105 },
-                        growth: { speed: 0, stamina: 10, power: 0, guts: 0, wisdom: 20 }
+                        stats: {
+                            speed: 92,
+                            stamina: 100,
+                            power: 90,
+                            guts: 88,
+                            wisdom: 105
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 10,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 20
+                        }
                     },
                     {
                         id: 59,
@@ -1343,8 +2183,20 @@
                         style: "Leader",
                         aptitudes: ["Turf", "Medium", "Mile", "Leader"],
                         image: "/images/trainee_images/__yaeno_muteki_umamusume_drawn_by_rinka_tonariuta__4b68983d5d9e3e3243a2a2c8901047d8.png",
-                        stats: { speed: 90, stamina: 90, power: 105, guts: 95, wisdom: 85 },
-                        growth: { speed: 0, stamina: 0, power: 10, guts: 20, wisdom: 0 }
+                        stats: {
+                            speed: 90,
+                            stamina: 90,
+                            power: 105,
+                            guts: 95,
+                            wisdom: 85
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 0,
+                            power: 10,
+                            guts: 20,
+                            wisdom: 0
+                        }
                     },
                     {
                         id: 60,
@@ -1355,25 +2207,37 @@
                         style: "Leader",
                         aptitudes: ["Turf", "Medium", "Mile", "Leader"],
                         image: "/images/trainee_images/__sakura_chiyono_o_umamusume_drawn_by_gamyuu_gamyu__cdf9c12c540c3c6222ddca538485f180.png",
-                        stats: { speed: 94, stamina: 92, power: 88, guts: 96, wisdom: 90 },
-                        growth: { speed: 10, stamina: 0, power: 0, guts: 20, wisdom: 0 }
+                        stats: {
+                            speed: 94,
+                            stamina: 92,
+                            power: 88,
+                            guts: 96,
+                            wisdom: 90
+                        },
+                        growth: {
+                            speed: 10,
+                            stamina: 0,
+                            power: 0,
+                            guts: 20,
+                            wisdom: 0
+                        }
                     }
                 ],
 
                 filteredTrainees() {
                     return this.trainees.filter(trainee => {
-                        const matchesQuery = this.filters.query === '' || 
+                        const matchesQuery = this.filters.query === '' ||
                             trainee.name.toLowerCase().includes(this.filters.query.toLowerCase());
-                        
-                        const matchesRarity = this.filters.rarity === '' || 
+
+                        const matchesRarity = this.filters.rarity === '' ||
                             trainee.rarity.toString() === this.filters.rarity;
-                            
-                        const matchesDistance = this.filters.distance === '' || 
+
+                        const matchesDistance = this.filters.distance === '' ||
                             trainee.distance === this.filters.distance;
-                            
-                        const matchesSurface = this.filters.surface === '' || 
+
+                        const matchesSurface = this.filters.surface === '' ||
                             trainee.surface === this.filters.surface;
-                            
+
                         return matchesQuery && matchesRarity && matchesDistance && matchesSurface;
                     });
                 },
@@ -1386,7 +2250,7 @@
                     this.formData.name = trainee.name;
                     this.formData.avatar_url = trainee.image;
                     this.formData.avatar_preview = trainee.image;
-                    
+
                     // Populate Stats
                     this.formData.stats.speed = trainee.stats.speed;
                     this.formData.stats.stamina = trainee.stats.stamina;
@@ -1396,13 +2260,16 @@
 
                     // Reset Filters
                     this.showGallery = false;
-                    
+
                     // Visual feedback could be added here
                     // Move to next step if desired
                     // this.nextStep();
                 },
 
                 init() {
+                    // Check for external character prefill data
+                    this.loadExternalPrefill();
+
                     // Load saved data from localStorage
                     this.loadFromStorage();
 
@@ -1419,6 +2286,46 @@
                     document.addEventListener('touchmove', (e) => this.onDrag(e));
                     document.addEventListener('touchend', () => this.stopDrag());
                 },
+
+                loadExternalPrefill() {
+                    // Check if we're coming from external data browser
+                    const urlParams = new URLSearchParams(window.location.search);
+                    if (urlParams.get('from_external') !== '1') return;
+
+                    const prefillData = sessionStorage.getItem('external_character_prefill');
+                    if (!prefillData) return;
+
+                    try {
+                        const data = JSON.parse(prefillData);
+
+                        // Prefill form data
+                        if (data.name) {
+                            this.formData.name = data.name;
+                        }
+                        if (data.image) {
+                            this.formData.avatar_url = data.image;
+                            this.formData.avatar_preview = data.image;
+                        }
+
+                        // Store external reference
+                        this.formData.external_source = data.source || 'umapyoi.net';
+                        this.formData.external_id = data.external_id;
+
+                        // Clear the prefill data after use
+                        sessionStorage.removeItem('external_character_prefill');
+
+                        // Show a notification
+                        this.showExternalPrefillNotice = true;
+                        setTimeout(() => {
+                            this.showExternalPrefillNotice = false;
+                        }, 5000);
+
+                        console.log('Loaded external character data:', data);
+                    } catch (e) {
+                        console.error('Failed to load external prefill data:', e);
+                    }
+                },
+
 
                 loadFromStorage() {
                     const saved = localStorage.getItem('characterWizardData');
@@ -1496,6 +2403,138 @@
                     this.formData.avatar_url = imagePath;
                     this.formData.avatar_preview = imagePath;
                     this.showGallery = false;
+                },
+
+                // External API Methods
+                async searchExternalCharacters() {
+                    this.externalLoading = true;
+                    this.externalError = null;
+                    this.externalSearched = true;
+
+                    try {
+                        const params = new URLSearchParams();
+                        if (this.externalFilters.query) {
+                            params.append('q', this.externalFilters.query);
+                        }
+                        if (this.externalFilters.category) {
+                            params.append('category', this.externalFilters.category);
+                        }
+
+                        const response = await fetch(`/api/characters/prefill/search?${params.toString()}`, {
+                            headers: {
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+
+                        const data = await response.json();
+
+                        if (data.success) {
+                            this.externalCharacters = data.data || [];
+                        } else {
+                            throw new Error(data.message || 'Failed to fetch characters');
+                        }
+                    } catch (error) {
+                        console.error('External API search error:', error);
+                        this.externalError = error.message || 'Failed to search external database';
+                        this.externalCharacters = [];
+                    } finally {
+                        this.externalLoading = false;
+                    }
+                },
+
+                selectExternalCharacter(character) {
+                    this.selectedExternalCharacter = character;
+                    this.formData.external_id = character.id;
+                    this.formData.external_source = 'umapyoi.net';
+                },
+
+                async loadExternalCharacterData() {
+                    if (!this.selectedExternalCharacter) return;
+
+                    this.externalDataLoading = true;
+                    this.externalError = null;
+
+                    try {
+                        const response = await fetch(`/api/characters/prefill/${this.selectedExternalCharacter.id}`, {
+                            headers: {
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+
+                        const result = await response.json();
+
+                        if (result.success && result.data) {
+                            const data = result.data;
+
+                            // Prefill form data
+                            this.formData.name = data.name || data.name_en || '';
+                            this.formData.avatar_url = data.image_url || '';
+                            this.formData.avatar_preview = data.image_url || '';
+                            this.formData.external_id = data.external_id;
+                            this.formData.external_source = data.metadata?.source || 'umapyoi.net';
+
+                            // Prefill stats
+                            if (data.stats) {
+                                this.formData.stats.speed = data.stats.speed || 0;
+                                this.formData.stats.stamina = data.stats.stamina || 0;
+                                this.formData.stats.power = data.stats.power || 0;
+                                this.formData.stats.guts = data.stats.guts || 0;
+                                this.formData.stats.wit = data.stats.wit || 0;
+                            }
+
+                            // Prefill aptitudes
+                            if (data.aptitudes) {
+                                // Distance aptitudes
+                                if (data.aptitudes.distance) {
+                                    this.formData.aptitudes.distance.sprint = data.aptitudes.distance.sprint || '';
+                                    this.formData.aptitudes.distance.mile = data.aptitudes.distance.mile || '';
+                                    this.formData.aptitudes.distance.medium = data.aptitudes.distance.medium || '';
+                                    this.formData.aptitudes.distance.long = data.aptitudes.distance.long || '';
+                                }
+
+                                // Surface aptitudes
+                                if (data.aptitudes.surface) {
+                                    this.formData.aptitudes.surface.turf = data.aptitudes.surface.turf || '';
+                                    this.formData.aptitudes.surface.dirt = data.aptitudes.surface.dirt || '';
+                                }
+
+                                // Running style aptitudes
+                                if (data.aptitudes.style) {
+                                    this.formData.aptitudes.style.front_runner = data.aptitudes.style.front_runner ||
+                                    '';
+                                    this.formData.aptitudes.style.pace_chaser = data.aptitudes.style.pace_chaser || '';
+                                    this.formData.aptitudes.style.late_surger = data.aptitudes.style.late_surger || '';
+                                    this.formData.aptitudes.style.end_closer = data.aptitudes.style.end_closer || '';
+                                }
+                            }
+
+                            // Close the external API panel and show success message
+                            this.showExternalApi = false;
+                            this.showExternalPrefillNotice = true;
+                            setTimeout(() => {
+                                this.showExternalPrefillNotice = false;
+                            }, 5000);
+
+                            console.log('Loaded external character data:', data);
+                        } else {
+                            throw new Error(result.message || 'Failed to load character data');
+                        }
+                    } catch (error) {
+                        console.error('External API load error:', error);
+                        this.externalError = error.message || 'Failed to load character data';
+                    } finally {
+                        this.externalDataLoading = false;
+                    }
                 },
 
                 useDefaultAvatar() {

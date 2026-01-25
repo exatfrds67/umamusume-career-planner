@@ -326,8 +326,3 @@ export default function connectivityMonitor() {
         },
     };
 }
-
-// Auto-initialize if Alpine is available
-if (window.Alpine) {
-    window.Alpine.data("connectivityMonitor", connectivityMonitor);
-}

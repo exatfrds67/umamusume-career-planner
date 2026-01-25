@@ -666,7 +666,9 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->prefix('neuron')->name('ap
 Route::middleware('auth:sanctum')->prefix('v1')->name('api.v1.')->group(function () {
     // User endpoint
     Route::get('/user', function (Request $request) {
-        return response()->json($request->user()->only(['id', 'name', 'email', 'created_at', 'updated_at']));
+        $user = $request->user();
+
+        return response()->json($user?->only(['id', 'name', 'email', 'created_at', 'updated_at']) ?? []);
     });
 
     // Character routes
@@ -765,94 +767,94 @@ Route::middleware('auth:sanctum')->prefix('v1/characters/{character}')->name('ap
 // Cache Management API Routes (Task 4.4.2)
 Route::middleware('auth:sanctum')->prefix('cache')->name('api.cache.')->group(function () {
     // Statistics and monitoring
-    Route::get('/statistics', [\App\Http\Controllers\API\CacheManagementController::class, 'getStatistics'])
+    Route::get('/statistics', [\App\Http\Controllers\Api\CacheManagementController::class, 'getStatistics'])
         ->name('statistics');
 
-    Route::get('/api-performance', [\App\Http\Controllers\API\CacheManagementController::class, 'getApiPerformance'])
+    Route::get('/api-performance', [\App\Http\Controllers\Api\CacheManagementController::class, 'getApiPerformance'])
         ->name('api-performance');
 
-    Route::get('/health', [\App\Http\Controllers\API\CacheManagementController::class, 'getHealth'])
+    Route::get('/health', [\App\Http\Controllers\Api\CacheManagementController::class, 'getHealth'])
         ->name('health');
 
     // Cache operations
-    Route::post('/warm', [\App\Http\Controllers\API\CacheManagementController::class, 'warmCache'])
+    Route::post('/warm', [\App\Http\Controllers\Api\CacheManagementController::class, 'warmCache'])
         ->name('warm');
 
-    Route::post('/invalidate', [\App\Http\Controllers\API\CacheManagementController::class, 'invalidateCache'])
+    Route::post('/invalidate', [\App\Http\Controllers\Api\CacheManagementController::class, 'invalidateCache'])
         ->name('invalidate');
 
-    Route::post('/clear-all', [\App\Http\Controllers\API\CacheManagementController::class, 'clearAll'])
+    Route::post('/clear-all', [\App\Http\Controllers\Api\CacheManagementController::class, 'clearAll'])
         ->name('clear-all');
 
     // Cost optimization
-    Route::post('/optimize-strategy', [\App\Http\Controllers\API\CacheManagementController::class, 'getOptimizedStrategy'])
+    Route::post('/optimize-strategy', [\App\Http\Controllers\Api\CacheManagementController::class, 'getOptimizedStrategy'])
         ->name('optimize-strategy');
 });
 
 // Fallback and Recovery API Routes (Task 4.4.3)
 Route::middleware('auth:sanctum')->prefix('fallback')->name('api.fallback.')->group(function () {
     // Health monitoring
-    Route::get('/health/status', [\App\Http\Controllers\API\FallbackRecoveryController::class, 'healthStatus'])
+    Route::get('/health/status', [\App\Http\Controllers\Api\FallbackRecoveryController::class, 'healthStatus'])
         ->name('health.status');
 
-    Route::get('/health/metrics', [\App\Http\Controllers\API\FallbackRecoveryController::class, 'healthMetrics'])
+    Route::get('/health/metrics', [\App\Http\Controllers\Api\FallbackRecoveryController::class, 'healthMetrics'])
         ->name('health.metrics');
 
     // Circuit breaker management
-    Route::post('/circuit-breaker/reset', [\App\Http\Controllers\API\FallbackRecoveryController::class, 'resetCircuitBreaker'])
+    Route::post('/circuit-breaker/reset', [\App\Http\Controllers\Api\FallbackRecoveryController::class, 'resetCircuitBreaker'])
         ->name('circuit-breaker.reset');
 
-    Route::post('/circuit-breaker/reset-all', [\App\Http\Controllers\API\FallbackRecoveryController::class, 'resetAllCircuitBreakers'])
+    Route::post('/circuit-breaker/reset-all', [\App\Http\Controllers\Api\FallbackRecoveryController::class, 'resetAllCircuitBreakers'])
         ->name('circuit-breaker.reset-all');
 
     // Degradation management
-    Route::get('/degradation/status', [\App\Http\Controllers\API\FallbackRecoveryController::class, 'degradationStatus'])
+    Route::get('/degradation/status', [\App\Http\Controllers\Api\FallbackRecoveryController::class, 'degradationStatus'])
         ->name('degradation.status');
 
-    Route::get('/degradation/metrics', [\App\Http\Controllers\API\FallbackRecoveryController::class, 'degradationMetrics'])
+    Route::get('/degradation/metrics', [\App\Http\Controllers\Api\FallbackRecoveryController::class, 'degradationMetrics'])
         ->name('degradation.metrics');
 
-    Route::post('/manual-input/enable', [\App\Http\Controllers\API\FallbackRecoveryController::class, 'enableManualInput'])
+    Route::post('/manual-input/enable', [\App\Http\Controllers\Api\FallbackRecoveryController::class, 'enableManualInput'])
         ->name('manual-input.enable');
 
-    Route::post('/manual-input/disable', [\App\Http\Controllers\API\FallbackRecoveryController::class, 'disableManualInput'])
+    Route::post('/manual-input/disable', [\App\Http\Controllers\Api\FallbackRecoveryController::class, 'disableManualInput'])
         ->name('manual-input.disable');
 
     // Recovery operations
-    Route::post('/recovery/attempt', [\App\Http\Controllers\API\FallbackRecoveryController::class, 'attemptRecovery'])
+    Route::post('/recovery/attempt', [\App\Http\Controllers\Api\FallbackRecoveryController::class, 'attemptRecovery'])
         ->name('recovery.attempt');
 
     // Background sync
-    Route::get('/sync/status', [\App\Http\Controllers\API\FallbackRecoveryController::class, 'syncStatus'])
+    Route::get('/sync/status', [\App\Http\Controllers\Api\FallbackRecoveryController::class, 'syncStatus'])
         ->name('sync.status');
 
-    Route::post('/sync/queue', [\App\Http\Controllers\API\FallbackRecoveryController::class, 'queueSync'])
+    Route::post('/sync/queue', [\App\Http\Controllers\Api\FallbackRecoveryController::class, 'queueSync'])
         ->name('sync.queue');
 
-    Route::post('/sync/process', [\App\Http\Controllers\API\FallbackRecoveryController::class, 'processSyncQueue'])
+    Route::post('/sync/process', [\App\Http\Controllers\Api\FallbackRecoveryController::class, 'processSyncQueue'])
         ->name('sync.process');
 
-    Route::get('/sync/history', [\App\Http\Controllers\API\FallbackRecoveryController::class, 'syncHistory'])
+    Route::get('/sync/history', [\App\Http\Controllers\Api\FallbackRecoveryController::class, 'syncHistory'])
         ->name('sync.history');
 
-    Route::post('/sync/reconcile', [\App\Http\Controllers\API\FallbackRecoveryController::class, 'reconcileData'])
+    Route::post('/sync/reconcile', [\App\Http\Controllers\Api\FallbackRecoveryController::class, 'reconcileData'])
         ->name('sync.reconcile');
 
     // Alerting
-    Route::get('/alerts/history', [\App\Http\Controllers\API\FallbackRecoveryController::class, 'alertHistory'])
+    Route::get('/alerts/history', [\App\Http\Controllers\Api\FallbackRecoveryController::class, 'alertHistory'])
         ->name('alerts.history');
 
-    Route::get('/alerts/unacknowledged', [\App\Http\Controllers\API\FallbackRecoveryController::class, 'unacknowledgedAlerts'])
+    Route::get('/alerts/unacknowledged', [\App\Http\Controllers\Api\FallbackRecoveryController::class, 'unacknowledgedAlerts'])
         ->name('alerts.unacknowledged');
 
-    Route::post('/alerts/acknowledge', [\App\Http\Controllers\API\FallbackRecoveryController::class, 'acknowledgeAlert'])
+    Route::post('/alerts/acknowledge', [\App\Http\Controllers\Api\FallbackRecoveryController::class, 'acknowledgeAlert'])
         ->name('alerts.acknowledge');
 
-    Route::get('/alerts/statistics', [\App\Http\Controllers\API\FallbackRecoveryController::class, 'alertStatistics'])
+    Route::get('/alerts/statistics', [\App\Http\Controllers\Api\FallbackRecoveryController::class, 'alertStatistics'])
         ->name('alerts.statistics');
 
     // System status
-    Route::get('/system/status', [\App\Http\Controllers\API\FallbackRecoveryController::class, 'systemStatus'])
+    Route::get('/system/status', [\App\Http\Controllers\Api\FallbackRecoveryController::class, 'systemStatus'])
         ->name('system.status');
 });
 
@@ -1186,4 +1188,48 @@ Route::middleware('auth:sanctum')->prefix('skill-recommendations')->name('api.sk
     // Get skill synergies
     Route::get('/synergies/{characterId}', [\App\Http\Controllers\Api\SkillRecommendationController::class, 'getSynergies'])
         ->name('synergies');
+});
+
+// External Data API Routes (umapyoi.net, umamusumedb.com)
+Route::middleware(['web', 'auth', 'throttle:api'])->prefix('external')->name('api.external.')->group(function () {
+    // Fetch characters from umapyoi.net
+    Route::get('/characters', [\App\Http\Controllers\Api\ExternalDataController::class, 'getCharacters'])
+        ->name('characters');
+
+    // Fetch support cards from umapyoi.net
+    Route::get('/support-cards', [\App\Http\Controllers\Api\ExternalDataController::class, 'getSupportCards'])
+        ->name('support-cards');
+
+    // Fetch skills from umapyoi.net
+    Route::get('/skills', [\App\Http\Controllers\Api\ExternalDataController::class, 'getSkills'])
+        ->name('skills');
+
+    // Fetch news from umapyoi.net
+    Route::get('/news', [\App\Http\Controllers\Api\ExternalDataController::class, 'getNews'])
+        ->name('news');
+
+    // Check API status
+    Route::get('/status', [\App\Http\Controllers\Api\ExternalDataController::class, 'getStatus'])
+        ->name('status');
+
+    // Clear cache
+    Route::post('/clear-cache', [\App\Http\Controllers\Api\ExternalDataController::class, 'clearCache'])
+        ->name('clear-cache');
+});
+
+// Character Prefill API Routes
+Route::middleware(['web', 'auth', 'throttle:api'])->prefix('characters/prefill')->name('api.characters.prefill.')->group(function () {
+    // Search characters for prefill
+    Route::get('/search', [\App\Http\Controllers\Api\CharacterPrefillController::class, 'search'])
+        ->name('search');
+
+    // Get character prefill data
+    Route::get('/{externalId}', [\App\Http\Controllers\Api\CharacterPrefillController::class, 'getPrefillData'])
+        ->name('get');
+});
+
+// Support Card Import from External Sources
+Route::middleware(['web', 'auth', 'throttle:api'])->group(function () {
+    Route::post('/support-cards/import-external', [\App\Http\Controllers\Api\ExternalImportController::class, 'importSupportCard'])
+        ->name('api.support-cards.import-external');
 });

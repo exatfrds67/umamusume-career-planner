@@ -8,7 +8,7 @@
     Task: 2.2.1
 --}}
 
-<div x-data="connectivityMonitor()" x-init="init()" class="connectivity-monitor">
+<div x-data="connectivityMonitor()" class="connectivity-monitor">
     {{-- Offline Banner --}}
     {{-- Offline Toast (formerly Banner) --}}
     <div x-show="showBanner && !isOnline" x-transition:enter="transition ease-out duration-300"
@@ -164,14 +164,3 @@
         </div>
     </div>
 </div>
-
-@push('scripts')
-    <script type="module">
-        import connectivityMonitor from '/resources/js/core/connectivity-monitor.js';
-
-        // Register Alpine component
-        if (window.Alpine) {
-            window.Alpine.data('connectivityMonitor', connectivityMonitor);
-        }
-    </script>
-@endpush

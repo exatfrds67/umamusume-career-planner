@@ -106,4 +106,46 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Umapyoi.net API Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for umapyoi.net API integration. Provides Uma Musume
+    | character data, support cards, skills, and news.
+    |
+    */
+
+    'umapyoi' => [
+        'url' => env('UMAPYOI_API_URL', 'https://api.umapyoi.net'),
+        'timeout' => env('UMAPYOI_API_TIMEOUT', 30),
+        'enabled' => env('UMAPYOI_API_ENABLED', true),
+        'cache_ttl' => env('UMAPYOI_CACHE_TTL', 86400), // 24 hours
+        'retry' => [
+            'max_attempts' => env('UMAPYOI_MAX_RETRIES', 3),
+            'delay_ms' => env('UMAPYOI_RETRY_DELAY', 1000),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | UmamusumeDB.com API Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for UmamusumeDB.com API integration (fallback source).
+    |
+    */
+
+    'umamusumedb' => [
+        'url' => env('UMAMUSUMEDB_API_URL', 'https://api.umamusumedb.com'),
+        'timeout' => env('UMAMUSUMEDB_API_TIMEOUT', 30),
+        'enabled' => env('UMAMUSUMEDB_API_ENABLED', true),
+        'cache_ttl' => env('UMAMUSUMEDB_CACHE_TTL', 43200), // 12 hours
+        'retry' => [
+            'max_attempts' => env('UMAMUSUMEDB_MAX_RETRIES', 5),
+            'initial_delay_ms' => env('UMAMUSUMEDB_INITIAL_RETRY_DELAY', 500),
+            'max_delay_ms' => env('UMAMUSUMEDB_MAX_RETRY_DELAY', 10000),
+        ],
+    ],
+
 ];

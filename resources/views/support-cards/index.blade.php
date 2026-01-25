@@ -11,6 +11,15 @@
                 </p>
             </div>
             <div class="mt-4 sm:ml-4 sm:mt-0 flex gap-3">
+                <button @click="showExternalImport = !showExternalImport" class="btn btn-success"
+                    :class="{ 'ring-2 ring-green-500': showExternalImport }">
+                    <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                    </svg>
+                    <span x-show="!showExternalImport">Import from API</span>
+                    <span x-show="showExternalImport">Close Import</span>
+                </button>
                 <button @click="viewMode = viewMode === 'grid' ? 'list' : 'grid'" class="btn btn-outline"
                     :aria-label="viewMode === 'grid' ? 'Switch to list view' : 'Switch to grid view'">
                     <svg x-show="viewMode === 'grid'" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
@@ -24,6 +33,12 @@
                     </svg>
                 </button>
             </div>
+        </div>
+
+        <!-- External API Import Panel -->
+        <div x-show="showExternalImport" x-transition
+            class="card bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 p-6 rounded-lg shadow-lg border-2 border-green-200 dark:border-green-800">
+            @include('support-cards.partials.external-import')
         </div>
 
         <!-- Filters -->
@@ -158,10 +173,145 @@
         function supportCardManager() {
             return {
                 viewMode: localStorage.getItem('supportCardViewMode') || 'grid',
+                showExternalImport: false,
+
+                // External API state
+                externalCards: [],
+                externalLoading: false,
+                externalError: null,
+                externalFilters: {
+                    rarity: '',
+                    importStatus: ''
+                },
+                importedCards: new Set(),
+
                 init() {
                     this.$watch('viewMode', value => {
                         localStorage.setItem('supportCardViewMode', value);
                     });
+
+                    // Load external cards when panel opens
+                    this.$watch('showExternalImport', value => {
+                        if (value && this.externalCards.length === 0) {
+                            this.loadExternalCards();
+                        }
+                    });
+                },
+
+                async loadExternalCards() {
+                    this.externalLoading = true;
+                    this.externalError = null;
+
+                    try {
+                        const response = await fetch('/api/external/support-cards', {
+                            headers: {
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+
+                        const data = await response.json();
+
+                        if (data.success) {
+                            this.externalCards = data.data || [];
+                        } else {
+                            throw new Error(data.message || 'Failed to fetch support cards');
+                        }
+                    } catch (error) {
+                        console.error('External API error:', error);
+                        this.externalError = error.message || 'Failed to load external support cards';
+                    } finally {
+                        this.externalLoading = false;
+                    }
+                },
+
+                async importCard(card) {
+                    if (this.importedCards.has(card.id)) {
+                        return; // Already imported
+                    }
+
+                    try {
+                        // Construct image URL from card ID (gametora.com pattern)
+                        const imageUrl = card.id ?
+                            `https://gametora.com/images/umamusume/supports/tex_support_card_${card.id}.png` :
+                            null;
+
+                        const response = await fetch('/api/support-cards/import-external', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                            },
+                            body: JSON.stringify({
+                                external_id: card.id,
+                                title_en: card.title_en || card.name,
+                                chara_id: card.chara_id,
+                                gametora: card.gametora,
+                                rarity: card.rarity,
+                                image_url: imageUrl,
+                                source: 'umapyoi.net'
+                            })
+                        });
+
+                        const result = await response.json();
+
+                        if (result.success) {
+                            this.importedCards.add(card.id);
+
+                            // Show success notification
+                            this.showNotification('success', result.message || 'Card imported successfully!');
+
+                            // Reload page after a short delay to show the new card
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1500);
+                        } else {
+                            throw new Error(result.message || 'Import failed');
+                        }
+                    } catch (error) {
+                        console.error('Import error:', error);
+                        this.showNotification('error', error.message || 'Failed to import card');
+                    }
+                },
+
+                isImported(cardId) {
+                    return this.importedCards.has(cardId);
+                },
+
+                filteredExternalCards() {
+                    let filtered = this.externalCards;
+
+                    if (this.externalFilters.rarity) {
+                        filtered = filtered.filter(card => card.rarity === this.externalFilters.rarity);
+                    }
+
+                    if (this.externalFilters.importStatus === 'imported') {
+                        filtered = filtered.filter(card => this.isImported(card.id));
+                    } else if (this.externalFilters.importStatus === 'not_imported') {
+                        filtered = filtered.filter(card => !this.isImported(card.id));
+                    }
+
+                    return filtered;
+                },
+
+                showNotification(type, message) {
+                    // Simple notification - you can enhance this with a toast library
+                    const color = type === 'success' ? 'green' : 'red';
+                    const notification = document.createElement('div');
+                    notification.className =
+                        `fixed top-4 right-4 bg-${color}-100 border border-${color}-400 text-${color}-700 px-4 py-3 rounded shadow-lg z-50`;
+                    notification.textContent = message;
+                    document.body.appendChild(notification);
+
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 3000);
                 }
             }
         }

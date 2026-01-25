@@ -14,7 +14,7 @@ Route::get('/', fn () => view('welcome'))->name('welcome');
 Route::get('/sw.js', function () {
     $content = file_get_contents(public_path('sw.js'));
 
-    return response($content, 200, [
+    return response($content !== false ? $content : '', 200, [
         'Content-Type' => 'application/javascript; charset=utf-8',
     ]);
 })->name('sw');
@@ -22,7 +22,7 @@ Route::get('/sw.js', function () {
 Route::get('/manifest.json', function () {
     $content = file_get_contents(public_path('manifest.json'));
 
-    return response($content, 200, [
+    return response($content !== false ? $content : '{}', 200, [
         'Content-Type' => 'application/json',
     ]);
 })->name('manifest');
@@ -30,7 +30,7 @@ Route::get('/manifest.json', function () {
 Route::get('/offline.html', function () {
     $content = file_get_contents(public_path('offline.html'));
 
-    return response($content, 200, [
+    return response($content !== false ? $content : '', 200, [
         'Content-Type' => 'text/html',
     ]);
 })->name('offline');
@@ -68,6 +68,14 @@ Route::middleware('auth')->group(function () {
     // Training routes
     Route::get('/characters/{character}/training', [App\Http\Controllers\TrainingController::class, 'index'])->name('training.index');
     Route::post('/characters/{character}/training', [App\Http\Controllers\TrainingController::class, 'store'])->name('training.store');
+
+    // Training API routes (Phase 3)
+    Route::prefix('api/training')->name('api.training.')->group(function () {
+        Route::get('/characters/{character}/predictions', [App\Http\Controllers\TrainingController::class, 'predictions'])->name('predictions');
+        Route::get('/characters/{character}/predictions/{facility}', [App\Http\Controllers\TrainingController::class, 'facilityPrediction'])->name('facility-prediction');
+        Route::post('/characters/{character}/execute', [App\Http\Controllers\TrainingController::class, 'execute'])->name('execute');
+        Route::get('/characters/{character}/deck', [App\Http\Controllers\TrainingController::class, 'deck'])->name('deck');
+    });
 
     Route::get('/training/predictions', [App\Http\Controllers\TrainingPredictionController::class, 'index'])
         ->name('training.predictions');
@@ -115,6 +123,10 @@ Route::middleware('auth')->group(function () {
 
     // Data Management Hub routes (Task 5.3.5)
     Route::get('/data-management', [App\Http\Controllers\DataManagementController::class, 'index'])->name('data-management.index');
+
+    // External Data Browser routes
+    Route::get('/external-data/browse', fn () => view('external-data.browse'))->name('external-data.browse');
+    Route::post('/external-data/import-support-card', [App\Http\Controllers\Api\ExternalImportController::class, 'importSupportCard'])->name('external-data.import-support-card');
 
     // Profile routes
     Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
@@ -208,3 +220,8 @@ Route::get('/design-system-demo', function () {
 Route::get('/demo', function () {
     return view('demo');
 })->name('demo');
+
+// API Testing route (development/testing only)
+Route::get('/test-api', function () {
+    return view('test-api');
+})->name('test.api');
