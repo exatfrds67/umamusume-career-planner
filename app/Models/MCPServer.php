@@ -313,7 +313,7 @@ class MCPServer extends Model
                 $checks = 0;
                 $successful = 0;
 
-                $rawChecks = $healthStatus['uptime_checks'] ?? null;
+                $rawChecks = $healthStatus['uptime_checks'];
                 $rawSuccessful = $healthStatus['successful_checks'] ?? null;
 
                 if (is_int($rawChecks) || is_float($rawChecks) || (is_string($rawChecks) && is_numeric($rawChecks))) {

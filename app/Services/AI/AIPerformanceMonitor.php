@@ -248,14 +248,11 @@ class AIPerformanceMonitor
     public function getProviderComparison(): array
     {
         $metrics = $this->getMetrics();
-        $providers = $metrics['providers'] ?? [];
+        $providers = $metrics['providers'];
 
         $comparison = [];
 
         foreach ($providers as $provider => $providerMetrics) {
-            if (! is_array($providerMetrics)) {
-                continue;
-            }
             $totalRequestsRaw = $providerMetrics['total_requests'] ?? 0;
             $totalRequests = is_numeric($totalRequestsRaw) ? (int) $totalRequestsRaw : 0;
             $successRate = is_numeric($providerMetrics['success_rate'] ?? null) ? (float) $providerMetrics['success_rate'] : 0.0;
@@ -290,13 +287,10 @@ class AIPerformanceMonitor
     public function getCostSummary(): array
     {
         $metrics = $this->getMetrics();
-        $providers = $metrics['providers'] ?? [];
+        $providers = $metrics['providers'];
 
         $byProvider = [];
         foreach ($providers as $provider => $providerMetrics) {
-            if (! is_array($providerMetrics)) {
-                continue;
-            }
             $totalCost = is_numeric($providerMetrics['total_cost'] ?? null) ? (float) $providerMetrics['total_cost'] : 0.0;
             $byProvider[$provider] = round($totalCost, 4);
         }
@@ -330,10 +324,7 @@ class AIPerformanceMonitor
         $byModel = [];
 
         // Extract model-specific costs from provider metrics
-        foreach ($metrics['providers'] ?? [] as $provider => $providerMetrics) {
-            if (! is_array($providerMetrics)) {
-                continue;
-            }
+        foreach ($metrics['providers'] as $provider => $providerMetrics) {
             // Each provider may use different models
             // For now, aggregate by provider as model proxy
             $modelKey = match ($provider) {

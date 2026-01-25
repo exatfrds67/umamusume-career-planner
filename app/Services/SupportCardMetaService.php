@@ -156,11 +156,13 @@ class SupportCardMetaService
             return SupportCardDefinition::where('is_active', true)
                 ->get()
                 ->map(function ($card) {
+                    $skillsProvided = $card->skill_hints_provided;
+
                     return [
                         'id' => $card->id,
                         'name' => $card->name,
                         'card_type' => $card->card_type,
-                        'skills_provided' => $card->skill_hints_provided ?? [],
+                        'skills_provided' => is_array($skillsProvided) ? $skillsProvided : [],
                         'meta_tier' => $card->meta_tier,
                     ];
                 });
@@ -210,7 +212,7 @@ class SupportCardMetaService
     {
         $card = SupportCardDefinition::findOrFail($cardId);
 
-        $synergyCardNames = $card->deck_synergies ?? [];
+        $synergyCardNames = is_array($card->deck_synergies) ? $card->deck_synergies : [];
 
         $synergyCards = SupportCardDefinition::whereIn('name', $synergyCardNames)
             ->where('is_active', true)

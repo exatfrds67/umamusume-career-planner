@@ -61,14 +61,20 @@ class BenchmarkingService
     /**
      * Get or calculate community benchmark data
      *
-     * @return array<string, mixed>
+     * @return array{
+     *     benchmarks: array,
+     *     sample_size: int,
+     *     last_updated: string,
+     *     scenario_benchmarks: array<string, array>,
+     *     percentile_thresholds: array<string, array>
+     * }
      */
     public function getCommunityBenchmarks(): array
     {
         $cacheKey = 'benchmarks:community';
 
-        /** @var array<string, mixed> $result */
-        $result = Cache::remember($cacheKey, self::CACHE_TTL, function () {
+        return Cache::remember($cacheKey, self::CACHE_TTL, function () {
+            /** @phpstan-ignore-next-line - Eloquent whereNotNull() is valid */
             $careers = Career::whereNotNull('completed_at')
                 ->with(['trainingSessions', 'races'])
                 ->get();
@@ -85,8 +91,6 @@ class BenchmarkingService
                 'percentile_thresholds' => $this->calculatePercentileThresholds($careers),
             ];
         });
-
-        return $result;
     }
 
     /**
@@ -94,10 +98,10 @@ class BenchmarkingService
      *
      * @param  Collection<int, Career>  $careers
      * @return array{
-     *     efficiency: array{mean: float, median: float, std_dev: float, min: float|int, max: float|int},
-     *     win_rate: array{mean: float, median: float, std_dev: float, min: float|int, max: float|int},
-     *     total_stats: array{mean: float, median: float, std_dev: float, min: float|int, max: float|int},
-     *     stat_averages: array<string, array{mean: float, median: float, std_dev: float, min: float|int, max: float|int}>
+     *     efficiency: array{mean: float, median: float, std_dev: float, min: float, max: float},
+     *     win_rate: array{mean: float, median: float, std_dev: float, min: float, max: float},
+     *     total_stats: array{mean: float, median: float, std_dev: float, min: int, max: int},
+     *     stat_averages: array<string, array>
      * }
      */
     protected function calculateOverallBenchmarks(Collection $careers): array
@@ -154,9 +158,9 @@ class BenchmarkingService
      * @param  Collection<int, Career>  $careers
      * @return array<string, array{
      *     sample_size: int,
-     *     efficiency: array{mean: float, median: float, std_dev: float, min?: float|int, max?: float|int},
-     *     win_rate: array{mean: float, median: float, std_dev: float, min?: float|int, max?: float|int},
-     *     total_stats: array{mean: float, median: float, std_dev: float, min?: float|int, max?: float|int}
+     *     efficiency: array,
+     *     win_rate: array,
+     *     total_stats: array
      * }>
      */
     protected function calculateScenarioBenchmarks(Collection $careers): array
@@ -259,14 +263,20 @@ class BenchmarkingService
     /**
      * Compare user performance against community benchmarks
      *
-     * @return array<string, mixed>
+     * @return array{
+     *     user_metrics: array,
+     *     benchmark_comparison: array,
+     *     percentile_rankings: array,
+     *     performance_summary: array,
+     *     improvement_areas: array<string>
+     * }
      */
     public function compareUserPerformance(User $user): array
     {
         $cacheKey = "benchmarks:user_comparison:{$user->id}";
 
-        /** @var array<string, mixed> $result */
-        $result = Cache::remember($cacheKey, self::CACHE_TTL / 2, function () use ($user) {
+        return Cache::remember($cacheKey, self::CACHE_TTL / 2, function () use ($user) {
+            /** @phpstan-ignore-next-line - Eloquent where() with 2 args is valid */
             $userCareers = Career::where('user_id', $user->id)
                 ->whereNotNull('completed_at')
                 ->with(['trainingSessions', 'races'])
@@ -289,13 +299,8 @@ class BenchmarkingService
             }
 
             $userMetrics = $this->calculateUserMetrics($userCareers);
-            /** @var array<string, mixed> $benchmarkData */
-            $benchmarkData = is_array($benchmarks['benchmarks'] ?? null) ? $benchmarks['benchmarks'] : [];
-            /** @var array<string, array<int, float>> $thresholdData */
-            $thresholdData = is_array($benchmarks['percentile_thresholds'] ?? null) ? $benchmarks['percentile_thresholds'] : [];
-
-            $benchmarkComparison = $this->compareToBenchmarks($userMetrics, $benchmarkData);
-            $percentileRankings = $this->calculateUserPercentiles($userMetrics, $thresholdData);
+            $benchmarkComparison = $this->compareToBenchmarks($userMetrics, $benchmarks['benchmarks']);
+            $percentileRankings = $this->calculateUserPercentiles($userMetrics, $benchmarks['percentile_thresholds']);
             $performanceSummary = $this->generatePerformanceSummary($benchmarkComparison, $percentileRankings);
             $improvementAreas = $this->identifyImprovementAreas($benchmarkComparison, $percentileRankings);
 
@@ -307,8 +312,6 @@ class BenchmarkingService
                 'improvement_areas' => $improvementAreas,
             ];
         });
-
-        return $result;
     }
 
     /**
@@ -319,9 +322,9 @@ class BenchmarkingService
      *     career_count: int,
      *     average_efficiency: float,
      *     average_win_rate: float,
-     *     average_total_stats: float|int,
+     *     average_total_stats: float,
      *     stat_averages: array<string, float>,
-     *     best_career: array{career_id: int, efficiency: float, win_rate: float, total_stats: int}|null,
+     *     best_career: array|null,
      *     recent_trend: string
      * }
      */
@@ -400,40 +403,19 @@ class BenchmarkingService
      *     efficiency: array{user: float, benchmark: float, difference: float, status: string},
      *     win_rate: array{user: float, benchmark: float, difference: float, status: string},
      *     total_stats: array{user: float, benchmark: float, difference: float, status: string},
-     *     stat_comparison: array<string, array{user: float, benchmark: float, difference: float, status: string}>
+     *     stat_comparison: array<string, array>
      * }
      */
     protected function compareToBenchmarks(array $userMetrics, array $benchmarks): array
     {
-        $userEfficiency = is_numeric($userMetrics['average_efficiency'] ?? null) ? (float) $userMetrics['average_efficiency'] : 0.0;
-        $userWinRate = is_numeric($userMetrics['average_win_rate'] ?? null) ? (float) $userMetrics['average_win_rate'] : 0.0;
-        $userTotalStats = is_numeric($userMetrics['average_total_stats'] ?? null) ? (float) $userMetrics['average_total_stats'] : 0.0;
-
-        /** @var array<string, mixed> $benchmarkEfficiency */
-        $benchmarkEfficiency = is_array($benchmarks['efficiency'] ?? null) ? $benchmarks['efficiency'] : [];
-        /** @var array<string, mixed> $benchmarkWinRate */
-        $benchmarkWinRate = is_array($benchmarks['win_rate'] ?? null) ? $benchmarks['win_rate'] : [];
-        /** @var array<string, mixed> $benchmarkTotalStats */
-        $benchmarkTotalStats = is_array($benchmarks['total_stats'] ?? null) ? $benchmarks['total_stats'] : [];
-        /** @var array<string, array<string, mixed>> $benchmarkStatAverages */
-        $benchmarkStatAverages = is_array($benchmarks['stat_averages'] ?? null) ? $benchmarks['stat_averages'] : [];
-
-        $benchmarkEfficiencyMean = is_numeric($benchmarkEfficiency['mean'] ?? null) ? (float) $benchmarkEfficiency['mean'] : 0.0;
-        $benchmarkWinRateMean = is_numeric($benchmarkWinRate['mean'] ?? null) ? (float) $benchmarkWinRate['mean'] : 0.0;
-        $benchmarkTotalStatsMean = is_numeric($benchmarkTotalStats['mean'] ?? null) ? (float) $benchmarkTotalStats['mean'] : 0.0;
-
-        $efficiencyDiff = $userEfficiency - $benchmarkEfficiencyMean;
-        $winRateDiff = $userWinRate - $benchmarkWinRateMean;
-        $totalStatsDiff = $userTotalStats - $benchmarkTotalStatsMean;
+        $efficiencyDiff = $userMetrics['average_efficiency'] - ($benchmarks['efficiency']['mean'] ?? 0);
+        $winRateDiff = $userMetrics['average_win_rate'] - ($benchmarks['win_rate']['mean'] ?? 0);
+        $totalStatsDiff = $userMetrics['average_total_stats'] - ($benchmarks['total_stats']['mean'] ?? 0);
 
         $statComparison = [];
-        /** @var array<string, float> $userStatAverages */
-        $userStatAverages = is_array($userMetrics['stat_averages'] ?? null) ? $userMetrics['stat_averages'] : [];
-
         foreach (self::STAT_TYPES as $stat) {
-            $userAvg = is_numeric($userStatAverages[$stat] ?? null) ? (float) $userStatAverages[$stat] : 0.0;
-            $benchmarkStatData = is_array($benchmarkStatAverages[$stat] ?? null) ? $benchmarkStatAverages[$stat] : [];
-            $benchmarkAvg = is_numeric($benchmarkStatData['mean'] ?? null) ? (float) $benchmarkStatData['mean'] : 0.0;
+            $userAvg = $userMetrics['stat_averages'][$stat] ?? 0;
+            $benchmarkAvg = $benchmarks['stat_averages'][$stat]['mean'] ?? 0;
             $diff = $userAvg - $benchmarkAvg;
 
             $statComparison[$stat] = [
@@ -446,20 +428,20 @@ class BenchmarkingService
 
         return [
             'efficiency' => [
-                'user' => $userEfficiency,
-                'benchmark' => round($benchmarkEfficiencyMean, 1),
+                'user' => $userMetrics['average_efficiency'],
+                'benchmark' => round($benchmarks['efficiency']['mean'] ?? 0, 1),
                 'difference' => round($efficiencyDiff, 1),
                 'status' => $this->getComparisonStatus($efficiencyDiff, 5),
             ],
             'win_rate' => [
-                'user' => $userWinRate,
-                'benchmark' => round($benchmarkWinRateMean, 1),
+                'user' => $userMetrics['average_win_rate'],
+                'benchmark' => round($benchmarks['win_rate']['mean'] ?? 0, 1),
                 'difference' => round($winRateDiff, 1),
                 'status' => $this->getComparisonStatus($winRateDiff, 10),
             ],
             'total_stats' => [
-                'user' => $userTotalStats,
-                'benchmark' => round($benchmarkTotalStatsMean, 0),
+                'user' => $userMetrics['average_total_stats'],
+                'benchmark' => round($benchmarks['total_stats']['mean'] ?? 0, 0),
                 'difference' => round($totalStatsDiff, 0),
                 'status' => $this->getComparisonStatus($totalStatsDiff, 200),
             ],
@@ -486,22 +468,18 @@ class BenchmarkingService
      */
     protected function calculateUserPercentiles(array $userMetrics, array $thresholds): array
     {
-        $avgEfficiency = is_numeric($userMetrics['average_efficiency'] ?? null) ? (float) $userMetrics['average_efficiency'] : 0.0;
-        $avgWinRate = is_numeric($userMetrics['average_win_rate'] ?? null) ? (float) $userMetrics['average_win_rate'] : 0.0;
-        $avgTotalStats = is_numeric($userMetrics['average_total_stats'] ?? null) ? (float) $userMetrics['average_total_stats'] : 0.0;
-
         $efficiencyPercentile = $this->findPercentile(
-            $avgEfficiency,
+            $userMetrics['average_efficiency'],
             $thresholds['efficiency'] ?? []
         );
 
         $winRatePercentile = $this->findPercentile(
-            $avgWinRate,
+            $userMetrics['average_win_rate'],
             $thresholds['win_rate'] ?? []
         );
 
         $totalStatsPercentile = $this->findPercentile(
-            $avgTotalStats,
+            $userMetrics['average_total_stats'],
             $thresholds['total_stats'] ?? []
         );
 
@@ -577,35 +555,24 @@ class BenchmarkingService
         $weaknesses = [];
         $achievements = [];
 
-        /** @var array{status?: string} $efficiencyData */
-        $efficiencyData = is_array($comparison['efficiency'] ?? null) ? $comparison['efficiency'] : [];
-        /** @var array{status?: string} $winRateData */
-        $winRateData = is_array($comparison['win_rate'] ?? null) ? $comparison['win_rate'] : [];
-        /** @var array{status?: string} $totalStatsData */
-        $totalStatsData = is_array($comparison['total_stats'] ?? null) ? $comparison['total_stats'] : [];
-
-        $efficiencyStatus = is_string($efficiencyData['status'] ?? null) ? $efficiencyData['status'] : '';
-        $winRateStatus = is_string($winRateData['status'] ?? null) ? $winRateData['status'] : '';
-        $totalStatsStatus = is_string($totalStatsData['status'] ?? null) ? $totalStatsData['status'] : '';
-
         // Analyze efficiency
-        if ($efficiencyStatus === 'above_average') {
+        if ($comparison['efficiency']['status'] === 'above_average') {
             $strengths[] = 'Training efficiency is above community average';
-        } elseif ($efficiencyStatus === 'below_average') {
+        } elseif ($comparison['efficiency']['status'] === 'below_average') {
             $weaknesses[] = 'Training efficiency needs improvement';
         }
 
         // Analyze win rate
-        if ($winRateStatus === 'above_average') {
+        if ($comparison['win_rate']['status'] === 'above_average') {
             $strengths[] = 'Race win rate exceeds community average';
-        } elseif ($winRateStatus === 'below_average') {
+        } elseif ($comparison['win_rate']['status'] === 'below_average') {
             $weaknesses[] = 'Race performance could be improved';
         }
 
         // Analyze total stats
-        if ($totalStatsStatus === 'above_average') {
+        if ($comparison['total_stats']['status'] === 'above_average') {
             $strengths[] = 'Final stat totals are above average';
-        } elseif ($totalStatsStatus === 'below_average') {
+        } elseif ($comparison['total_stats']['status'] === 'below_average') {
             $weaknesses[] = 'Final stats are below community average';
         }
 
@@ -650,40 +617,22 @@ class BenchmarkingService
     {
         $improvements = [];
 
-        $efficiencyPercentile = is_numeric($percentiles['efficiency_percentile'] ?? null) ? (int) $percentiles['efficiency_percentile'] : 0;
-        $winRatePercentile = is_numeric($percentiles['win_rate_percentile'] ?? null) ? (int) $percentiles['win_rate_percentile'] : 0;
-
-        /** @var array{difference?: float|int} $efficiencyData */
-        $efficiencyData = is_array($comparison['efficiency'] ?? null) ? $comparison['efficiency'] : [];
-        /** @var array{difference?: float|int} $winRateData */
-        $winRateData = is_array($comparison['win_rate'] ?? null) ? $comparison['win_rate'] : [];
-
-        $efficiencyDiff = is_numeric($efficiencyData['difference'] ?? null) ? (float) $efficiencyData['difference'] : 0.0;
-        $winRateDiff = is_numeric($winRateData['difference'] ?? null) ? (float) $winRateData['difference'] : 0.0;
-
         // Check efficiency
-        if ($efficiencyPercentile < 50) {
-            $gap = abs($efficiencyDiff);
+        if ($percentiles['efficiency_percentile'] < 50) {
+            $gap = abs($comparison['efficiency']['difference']);
             $improvements[] = "Improve training efficiency by {$gap}% to reach community average.";
         }
 
         // Check win rate
-        if ($winRatePercentile < 50) {
-            $gap = abs($winRateDiff);
+        if ($percentiles['win_rate_percentile'] < 50) {
+            $gap = abs($comparison['win_rate']['difference']);
             $improvements[] = "Improve race win rate by {$gap}% to match community average.";
         }
 
         // Check individual stats
-        /** @var array<string, array{status?: string, difference?: float|int}> $statComparison */
-        $statComparison = is_array($comparison['stat_comparison'] ?? null) ? $comparison['stat_comparison'] : [];
-
-        foreach ($statComparison as $stat => $data) {
-            $statName = is_string($stat) ? $stat : '';
-            $status = is_string($data['status'] ?? null) ? $data['status'] : '';
-            $difference = is_numeric($data['difference'] ?? null) ? (float) $data['difference'] : 0.0;
-
-            if ($status === 'below_average' && abs($difference) > 100) {
-                $improvements[] = "Focus on {$statName} training - currently ".abs($difference).' points below average.';
+        foreach ($comparison['stat_comparison'] as $stat => $data) {
+            if ((is_array($data) && isset($data['status']) ? $data['status'] : null) === 'below_average' && abs((is_array($data) && isset($data['difference']) ? $data['difference'] : null)) > 100) {
+                $improvements[] = "Focus on {$stat} training - currently ".abs((is_array($data) && isset($data['difference']) ? $data['difference'] : null)).' points below average.';
             }
         }
 
@@ -704,8 +653,8 @@ class BenchmarkingService
      *
      * @return array{
      *     community_trend: string,
-     *     efficiency_trend: array<string, float>,
-     *     win_rate_trend: array<string, float>,
+     *     efficiency_trend: array,
+     *     win_rate_trend: array,
      *     meta_shifts: array<string>,
      *     trend_analysis: string
      * }
@@ -714,9 +663,9 @@ class BenchmarkingService
     {
         $cacheKey = 'benchmarks:trends';
 
-        /** @var array{community_trend: string, efficiency_trend: array<string, float>, win_rate_trend: array<string, float>, meta_shifts: array<string>, trend_analysis: string} $result */
-        $result = Cache::remember($cacheKey, self::CACHE_TTL, function () {
+        return Cache::remember($cacheKey, self::CACHE_TTL, function () {
             // Get careers grouped by month
+            /** @phpstan-ignore-next-line - Eloquent whereNotNull() is valid */
             $careers = Career::whereNotNull('completed_at')
                 ->where('completed_at', '>=', now()->subMonths(6))
                 ->with(['trainingSessions', 'races'])
@@ -749,32 +698,22 @@ class BenchmarkingService
                 'trend_analysis' => $trendAnalysis,
             ];
         });
-
-        return $result;
     }
 
     /**
      * Group careers by month
      *
      * @param  Collection<int, Career>  $careers
-     * @return array<string, Collection<int, Career>>
+     * @return array<string, Collection>
      */
     protected function groupCareersByMonth(Collection $careers): array
     {
-        /** @var array<string, Collection<int, Career>> $grouped */
         $grouped = [];
 
         foreach ($careers as $career) {
-            $completedAt = $career->completed_at;
-            if ($completedAt === null) {
-                continue;
-            }
-            /** @var \Carbon\Carbon $completedAt */
-            $month = $completedAt->format('Y-m');
+            $month = $career->completed_at->format('Y-m');
             if (! isset($grouped[$month])) {
-                /** @var Collection<int, Career> $collection */
-                $collection = collect();
-                $grouped[$month] = $collection;
+                $grouped[$month] = collect();
             }
             $grouped[$month]->push($career);
         }
@@ -785,7 +724,7 @@ class BenchmarkingService
     /**
      * Calculate monthly trend for a metric
      *
-     * @param  array<string, Collection<int, Career>>  $monthlyData
+     * @param  array<string, Collection>  $monthlyData
      * @return array<string, float>
      */
     protected function calculateMonthlyTrend(array $monthlyData, string $metric): array
@@ -796,9 +735,6 @@ class BenchmarkingService
             $values = [];
 
             foreach ($careers as $career) {
-                if (! ($career instanceof Career)) {
-                    continue;
-                }
                 if ($metric === 'efficiency') {
                     $values[] = $this->calculateCareerEfficiency($career->trainingSessions);
                 } elseif ($metric === 'win_rate') {
@@ -841,7 +777,7 @@ class BenchmarkingService
     /**
      * Identify meta shifts in the community
      *
-     * @param  array<string, Collection<int, Career>>  $monthlyData
+     * @param  array<string, Collection>  $monthlyData
      * @return array<string>
      */
     protected function identifyMetaShifts(array $monthlyData): array
@@ -855,9 +791,6 @@ class BenchmarkingService
             $typeCounts = array_fill_keys(self::STAT_TYPES, 0);
 
             foreach ($careers as $career) {
-                if (! ($career instanceof Career)) {
-                    continue;
-                }
                 foreach ($career->trainingSessions as $session) {
                     $type = $session->training_type ?? 'other';
                     if (isset($typeCounts[$type])) {
@@ -917,35 +850,26 @@ class BenchmarkingService
 
     /**
      * Calculate career efficiency from training sessions
-     *
-     * @param  Collection<int, \App\Models\TrainingSession>|array<mixed>|null  $sessions
      */
     protected function calculateCareerEfficiency(mixed $sessions): float
     {
-        if ($sessions === null) {
-            return 0.0;
-        }
-
-        /** @var Collection<int, mixed> $sessionsCollection */
-        $sessionsCollection = $sessions instanceof Collection ? $sessions : collect(is_array($sessions) ? $sessions : []);
+        $sessionsCollection = $sessions instanceof Collection ? $sessions : collect($sessions);
         if ($sessionsCollection->isEmpty()) {
             return 0.0;
         }
 
         $totalGains = 0;
         foreach ($sessionsCollection as $session) {
-            if (is_object($session)) {
-                $totalGains += (int) ($session->speed_gain ?? 0)
-                    + (int) ($session->stamina_gain ?? 0)
-                    + (int) ($session->power_gain ?? 0)
-                    + (int) ($session->guts_gain ?? 0)
-                    + (int) ($session->wit_gain ?? 0);
-            }
+            $totalGains = ($totalGains ?? 0) + ($session->speed_gain ?? 0)
+                + ($session->stamina_gain ?? 0)
+                + ($session->power_gain ?? 0)
+                + ($session->guts_gain ?? 0)
+                + ($session->wit_gain ?? 0);
         }
 
         $idealTotal = $sessionsCollection->count() * 30;
 
-        return $idealTotal > 0 ? min(100.0, round(($totalGains / $idealTotal) * 100, 1)) : 0.0;
+        return $idealTotal > 0 ? min(100, round(($totalGains / $idealTotal) * 100, 1)) : 0.0;
     }
 
     /**

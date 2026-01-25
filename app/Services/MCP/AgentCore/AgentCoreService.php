@@ -385,7 +385,7 @@ class AgentCoreService
      */
     protected function generateAgentId(string $name): string
     {
-        return 'agent_'.strtolower(str_replace(' ', '_', $name)).'_'.substr(md5(uniqid((string) mt_rand(), true)), 0, 8);
+        return 'agent_'.strtolower(str_replace(' ', '_', $name)).'_'.substr(\Illuminate\Support\Str::uuid()->toString(), 0, 8);
     }
 
     /**

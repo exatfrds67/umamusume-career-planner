@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Character;
 use App\Models\SupportCardDefinition;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
 /**
@@ -358,8 +359,15 @@ class DeckOptimizationService
         foreach ($deck as $card1) {
             $synergyData = $this->metaService->getCardSynergies($card1->support_card_id);
 
+            $synergyCardsData = $synergyData['synergy_cards'] ?? [];
+            if ($synergyCardsData instanceof Collection) {
+                $synergyCards = $synergyCardsData->toArray();
+            } elseif (is_array($synergyCardsData)) {
+                $synergyCards = $synergyCardsData;
+            } else {
+                $synergyCards = [];
+            }
             /** @var array<int, array<string, mixed>> $synergyCards */
-            $synergyCards = is_array($synergyData['synergy_cards'] ?? null) ? $synergyData['synergy_cards'] : [];
             foreach ($synergyCards as $synergyCard) {
                 /** @var int|null $synergyCardId */
                 $synergyCardId = null;
@@ -730,6 +738,7 @@ class DeckOptimizationService
                 if ($cardType === null) {
                     continue;
                 }
+                /** @var \Illuminate\Support\Collection<int, mixed> $betterCards */
                 $betterCards = $this->metaService->getTopCardsByType($cardType, 3);
 
                 if ($betterCards->isNotEmpty()) {
@@ -738,12 +747,49 @@ class DeckOptimizationService
                         'current_tier' => $tier,
                         'position_slot' => $card->position_slot,
                         'suggested_replacements' => $betterCards->map(
-                            function (SupportCardDefinition $betterCard): array {
+                            function ($betterCard): array {
+                                if ($betterCard instanceof SupportCardDefinition) {
+                                    return [
+                                        'id' => $betterCard->id,
+                                        'name' => $betterCard->name,
+                                        'tier' => $betterCard->meta_tier,
+                                        'rarity' => $betterCard->rarity,
+                                    ];
+                                }
+
+                                if (is_array($betterCard)) {
+                                    $id = is_scalar($betterCard['id'] ?? null) ? (int) $betterCard['id'] : 0;
+                                    $name = is_string($betterCard['name'] ?? null) ? $betterCard['name'] : 'Unknown';
+                                    $tier = is_string($betterCard['meta_tier'] ?? null) ? $betterCard['meta_tier'] : null;
+                                    $rarity = is_string($betterCard['rarity'] ?? null) ? $betterCard['rarity'] : null;
+
+                                    return [
+                                        'id' => $id,
+                                        'name' => $name,
+                                        'tier' => $tier,
+                                        'rarity' => $rarity,
+                                    ];
+                                }
+
+                                if (is_object($betterCard)) {
+                                    $id = isset($betterCard->id) && is_scalar($betterCard->id) ? (int) $betterCard->id : 0;
+                                    $name = isset($betterCard->name) && is_string($betterCard->name) ? $betterCard->name : 'Unknown';
+                                    $tier = isset($betterCard->meta_tier) && is_string($betterCard->meta_tier) ? $betterCard->meta_tier : null;
+                                    $rarity = isset($betterCard->rarity) && is_string($betterCard->rarity) ? $betterCard->rarity : null;
+
+                                    return [
+                                        'id' => $id,
+                                        'name' => $name,
+                                        'tier' => $tier,
+                                        'rarity' => $rarity,
+                                    ];
+                                }
+
                                 return [
-                                    'id' => $betterCard->id,
-                                    'name' => $betterCard->name,
-                                    'tier' => $betterCard->meta_tier,
-                                    'rarity' => $betterCard->rarity,
+                                    'id' => 0,
+                                    'name' => 'Unknown',
+                                    'tier' => null,
+                                    'rarity' => null,
                                 ];
                             }
                         )->toArray(),

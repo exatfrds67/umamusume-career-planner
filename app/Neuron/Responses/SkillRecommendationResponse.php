@@ -75,9 +75,9 @@ class SkillRecommendationResponse
         if (! empty($this->recommendedSkills)) {
             $summary .= "\nRecommended Skills:\n";
             foreach ($this->recommendedSkills as $skill) {
-                $name = $skill['name'] ?? 'unknown';
-                $reason = $skill['reason'] ?? 'no reason provided';
-                $priority = $skill['priority'] ?? 'medium';
+                $name = $skill['name'];
+                $reason = $skill['reason'];
+                $priority = $skill['priority'];
                 $summary .= "  - {$name} [{$priority}]: {$reason}\n";
             }
         }
@@ -85,8 +85,8 @@ class SkillRecommendationResponse
         if (! empty($this->skillSynergies)) {
             $summary .= "\nSkill Synergies:\n";
             foreach ($this->skillSynergies as $synergy) {
-                $skills = $synergy['skills'] ?? [];
-                $benefit = $synergy['benefit'] ?? 'no benefit described';
+                $skills = $synergy['skills'];
+                $benefit = $synergy['benefit'];
                 $skillNames = implode(' + ', $skills);
                 $summary .= "  - {$skillNames}: {$benefit}\n";
             }
@@ -117,22 +117,18 @@ class SkillRecommendationResponse
 
                     break;
                 }
-                if (! isset($skill['name']) || ! isset($skill['reason']) || ! isset($skill['priority'])) {
-                    $errors['recommended_skills'] = "Skill at index {$index} must contain 'name', 'reason', and 'priority' keys";
-
-                    break;
-                }
-                if (! is_string($skill['name']) || trim($skill['name']) === '') {
+                if (! array_key_exists('name', $skill) || ! is_string($skill['name']) || trim($skill['name']) === '') {
                     $errors['recommended_skills'] = "Skill name at index {$index} must be a non-empty string";
 
                     break;
                 }
-                if (! is_string($skill['reason']) || trim($skill['reason']) === '') {
+                if (! array_key_exists('reason', $skill) || ! is_string($skill['reason']) || trim($skill['reason']) === '') {
                     $errors['recommended_skills'] = "Skill reason at index {$index} must be a non-empty string";
 
                     break;
                 }
-                if (! in_array(strtolower($skill['priority']), $validPriorities, true)) {
+                $priority = $skill['priority'] ?? '';
+                if (! is_string($priority) || ! in_array(strtolower($priority), $validPriorities, true)) {
                     $errors['recommended_skills'] = "Skill priority at index {$index} must be one of: ".implode(', ', $validPriorities);
 
                     break;
@@ -158,29 +154,19 @@ class SkillRecommendationResponse
 
         // Validate skill synergies structure
         foreach ($this->skillSynergies as $index => $synergy) {
-            if (! is_array($synergy)) {
-                $errors['skill_synergies'] = "Synergy at index {$index} must be an array";
-
-                break;
-            }
-            if (! isset($synergy['skills']) || ! isset($synergy['benefit'])) {
-                $errors['skill_synergies'] = "Synergy at index {$index} must contain 'skills' and 'benefit' keys";
-
-                break;
-            }
-            if (! is_array($synergy['skills']) || empty($synergy['skills'])) {
+            if (empty($synergy['skills'])) {
                 $errors['skill_synergies'] = "Synergy skills at index {$index} must be a non-empty array";
 
                 break;
             }
             foreach ($synergy['skills'] as $skillIndex => $skillName) {
-                if (! is_string($skillName) || trim($skillName) === '') {
+                if (trim($skillName) === '') {
                     $errors['skill_synergies'] = "Skill name at synergy {$index}, skill {$skillIndex} must be a non-empty string";
 
                     break 2;
                 }
             }
-            if (! is_string($synergy['benefit']) || trim($synergy['benefit']) === '') {
+            if (trim($synergy['benefit']) === '') {
                 $errors['skill_synergies'] = "Synergy benefit at index {$index} must be a non-empty string";
 
                 break;

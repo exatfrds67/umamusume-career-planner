@@ -151,7 +151,9 @@ class CharacterController extends Controller
      */
     private function getAiTip(Character $character): string
     {
-        $nextRace = $character->race_schedule[0] ?? null;
+        $raceSchedule = $character->race_schedule ?? [];
+        /** @var array{grade?: string}|null $nextRace */
+        $nextRace = $raceSchedule[0] ?? null;
         $raceGrade = $nextRace['grade'] ?? 'G1';
 
         return "Based on recent races for {$character->name}, you should focus on increasing Stamina for the upcoming {$raceGrade} race.";
@@ -220,10 +222,8 @@ class CharacterController extends Controller
                 $newGoals = $request->input('goals');
 
                 // Merge with existing goals to preserve other goal data
-                if (is_array($currentGoals) && is_array($newGoals)) {
+                if (is_array($newGoals)) {
                     $updateData['goals'] = array_merge($currentGoals, $newGoals);
-                } elseif (is_array($newGoals)) {
-                    $updateData['goals'] = $newGoals;
                 }
             }
 

@@ -80,9 +80,7 @@ class AuthController extends Controller
         }
 
         $token = $user->currentAccessToken();
-        if ($token !== null) {
-            $token->delete();
-        }
+        $token->delete();
 
         return response()->json([
             'message' => 'Logged out successfully.',

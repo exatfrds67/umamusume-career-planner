@@ -56,8 +56,15 @@ class ResponseTransformer
 
         return [
             'id' => $character['id'] ?? null,
-            'name' => $character['name'] ?? '',
+            'name_en' => $character['name_en'] ?? '',
+            'name_jp' => $character['name_jp'] ?? '',
+            'name' => $character['name_en'] ?? $character['name_jp'] ?? '',
             'title' => $character['title'] ?? null,
+            'category_label_en' => $character['category_label_en'] ?? null,
+            'category_label' => $character['category_label'] ?? null,
+            'thumb_img' => $character['thumb_img'] ?? null,
+            'color_main' => $character['color_main'] ?? null,
+            'color_sub' => $character['color_sub'] ?? null,
             'rarity' => $character['rarity'] ?? null,
             'base_stats' => [
                 'speed' => $character['speed'] ?? 0,
@@ -141,14 +148,32 @@ class ResponseTransformer
      */
     protected function transformSupportCard(array $card): array
     {
+        // API returns: id, chara_id, gametora, title_en
+        // Map to internal format with name_en for display
         $rarityValue = $card['rarity'] ?? null;
+        $titleEn = $card['title_en'] ?? '';
+        $name = $card['name'] ?? $titleEn;
+        $cardId = $card['id'] ?? 0;
+
+        // Infer rarity from card ID if not provided
+        // Card ID ranges (based on Uma Musume game structure):
+        // 10001-10999: R cards
+        // 20001-29999: SR cards
+        // 30001-39999: SSR cards
+        if ($rarityValue === null && is_numeric($cardId)) {
+            $rarityValue = $this->inferRarityFromId((int) $cardId);
+        }
 
         return [
-            'id' => $card['id'] ?? null,
-            'name' => $card['name'] ?? '',
+            'id' => $cardId,
+            'name' => $name,
+            'name_en' => $titleEn,
+            'name_jp' => $card['name_jp'] ?? '',
+            'title_en' => $titleEn,
             'rarity' => $this->normalizeRarity(is_string($rarityValue) ? $rarityValue : null),
             'type' => $card['type'] ?? null,
-            'character_id' => $card['character_id'] ?? null,
+            'character_id' => $card['chara_id'] ?? $card['character_id'] ?? null,
+            'gametora' => $card['gametora'] ?? null,
             'stats' => [
                 'speed' => $card['speed_bonus'] ?? 0,
                 'stamina' => $card['stamina_bonus'] ?? 0,
@@ -165,6 +190,24 @@ class ResponseTransformer
                 'transformed_at' => now()->toISOString(),
             ],
         ];
+    }
+
+    /**
+     * Infer rarity from card ID based on Uma Musume card ID ranges
+     */
+    protected function inferRarityFromId(int $cardId): string
+    {
+        // Card ID ranges follow a pattern:
+        // 10001-19999: R (Rare)
+        // 20001-29999: SR (Super Rare)
+        // 30001-39999: SSR (Super Super Rare)
+        if ($cardId >= 30001 && $cardId <= 39999) {
+            return 'SSR';
+        } elseif ($cardId >= 20001 && $cardId <= 29999) {
+            return 'SR';
+        } else {
+            return 'R';
+        }
     }
 
     /**
@@ -260,14 +303,21 @@ class ResponseTransformer
      */
     protected function transformNews(array $news): array
     {
-        return array_map(function (mixed $item): array {
+        $index = 0;
+
+        return array_map(function (mixed $item) use (&$index): array {
+            $index++;
+
             if (! is_array($item)) {
                 return [
-                    'id' => null,
+                    'id' => 'news_'.$index,
                     'title' => '',
+                    'title_en' => '',
+                    'title_jp' => '',
                     'content' => '',
                     'published_at' => null,
                     'category' => 'general',
+                    'thumb_img' => null,
                     'metadata' => [
                         'source' => 'umapyoi',
                         'transformed_at' => now()->toISOString(),
@@ -275,17 +325,47 @@ class ResponseTransformer
                 ];
             }
 
-            $publishedAt = $item['published_at'] ?? null;
+            // API returns: message, message_english, post_at (Unix timestamp), label_name_en, image, article_image
+            $titleEn = $item['message_english'] ?? '';
+            $titleJp = $item['message'] ?? '';
+            $content = $item['message_english'] ?? $item['message'] ?? '';
+            $postAt = $item['post_at'] ?? null;
+
+            // Convert Unix timestamp to ISO 8601 date
+            $publishedAt = null;
+            if ($postAt !== null && is_numeric($postAt)) {
+                try {
+                    $publishedAt = \Carbon\Carbon::createFromTimestamp((int) $postAt)->toISOString();
+                } catch (\Exception $e) {
+                    Log::warning('[ResponseTransformer] Failed to parse Unix timestamp', [
+                        'timestamp' => $postAt,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
+
+            // Generate unique ID using announce_id or index
+            $uniqueId = $item['announce_id'] ?? $item['id'] ?? 'news_'.md5($titleEn.$index);
+
+            // Get thumbnail image
+            $thumbImg = $item['article_image'] ?? $item['image'] ?? null;
+            if ($thumbImg === '') {
+                $thumbImg = null;
+            }
 
             return [
-                'id' => $item['id'] ?? null,
-                'title' => $item['title'] ?? '',
-                'content' => $item['content'] ?? '',
-                'published_at' => $this->normalizeDate(is_string($publishedAt) ? $publishedAt : null),
-                'category' => $item['category'] ?? 'general',
+                'id' => $uniqueId,
+                'title' => $titleEn ?: $titleJp,
+                'title_en' => $titleEn,
+                'title_jp' => $titleJp,
+                'content' => $content,
+                'published_at' => $publishedAt,
+                'category' => $item['label_name_en'] ?? 'general',
+                'thumb_img' => $thumbImg,
                 'metadata' => [
                     'source' => 'umapyoi',
                     'transformed_at' => now()->toISOString(),
+                    'original_id' => $item['id'] ?? null,
                 ],
             ];
         }, $news);

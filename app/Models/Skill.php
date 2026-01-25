@@ -291,7 +291,7 @@ class Skill extends Model
      */
     public function getSynergySkills(): array
     {
-        if (empty($this->synergy_skills) || ! is_array($this->synergy_skills)) {
+        if (! is_array($this->synergy_skills) || empty($this->synergy_skills)) {
             return [];
         }
 

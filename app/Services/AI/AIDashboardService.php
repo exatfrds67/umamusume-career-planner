@@ -346,16 +346,21 @@ class AIDashboardService
             ->orderBy('created_at', 'desc')
             ->limit(10)
             ->get()
-            ->map(fn ($conv) => [
-                'id' => $conv->id,
-                'conversation_id' => $conv->conversation_id,
-                'character_name' => $conv->character->name ?? 'Unknown',
-                'message_type' => $conv->message_type,
-                'ai_model_used' => $conv->getAttribute('ai_model_used'),
-                'processing_time' => $conv->getAttribute('processing_time'),
-                'cost' => $conv->getAttribute('cost'),
-                'created_at' => $conv->created_at?->toIso8601String(),
-            ])
+            ->map(function ($conv) {
+                $processingTime = $conv->getAttribute('processing_time');
+                $cost = $conv->getAttribute('cost');
+
+                return [
+                    'id' => $conv->id,
+                    'conversation_id' => $conv->conversation_id,
+                    'character_name' => is_string($conv->character?->name) ? $conv->character->name : 'Unknown',
+                    'message_type' => $conv->message_type,
+                    'ai_model_used' => $conv->getAttribute('ai_model_used'),
+                    'processing_time' => is_numeric($processingTime) ? (float) $processingTime : null,
+                    'cost' => is_numeric($cost) ? (float) $cost : null,
+                    'created_at' => $conv->created_at?->toIso8601String(),
+                ];
+            })
             ->values()
             ->toArray();
 
@@ -404,7 +409,7 @@ class AIDashboardService
             ->get();
 
         $totalRequests = $conversations->count();
-        $successfulRequests = $conversations->filter(fn ($c) => $c->getAttribute('ai_model_used') !== null)->count();
+        $successfulRequests = $conversations->filter(fn ($c) => is_string($c->getAttribute('ai_model_used')))->count();
         $avgResponseTimeValue = $conversations->avg('processing_time');
         $avgResponseTime = is_numeric($avgResponseTimeValue) ? (float) $avgResponseTimeValue : 0.0;
         $totalCostValue = $conversations->sum('cost');
@@ -458,7 +463,7 @@ class AIDashboardService
         $conversations = $query->get();
 
         $requestCount = $conversations->count();
-        $successCount = $conversations->filter(fn ($c) => $c->getAttribute('ai_model_used') !== null)->count();
+        $successCount = $conversations->filter(fn ($c) => is_string($c->getAttribute('ai_model_used')))->count();
         $successRate = $requestCount > 0 ? ($successCount / $requestCount) * 100 : 0;
 
         $responseTimes = $conversations->pluck('processing_time')->filter()->sort()->values();

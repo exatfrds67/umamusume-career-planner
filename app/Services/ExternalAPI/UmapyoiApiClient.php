@@ -84,7 +84,7 @@ class UmapyoiApiClient
                 $startTime = microtime(true);
 
                 try {
-                    $response = $this->makeRequest('GET', '/v1/characters');
+                    $response = $this->makeRequest('GET', '/api/v1/character/list');
 
                     // Record API response time
                     $responseTime = (microtime(true) - $startTime) * 1000;
@@ -94,8 +94,11 @@ class UmapyoiApiClient
                         throw new \RuntimeException($response['error'] ?? 'Unknown error');
                     }
 
+                    // Wrap raw API response in expected wrapper key
+                    $wrappedData = $this->wrapResponseData($response['data'], 'characters');
+
                     // Validate response schema
-                    $validation = $this->validator->validate('umapyoi_characters', $response['data']);
+                    $validation = $this->validator->validate('umapyoi_characters', $wrappedData);
 
                     if (! $validation['valid']) {
                         Log::error('[UmapyoiApiClient] Response validation failed', [
@@ -160,14 +163,16 @@ class UmapyoiApiClient
         }
 
         try {
-            $response = $this->makeRequest('GET', "/v1/characters/{$characterId}");
+            $response = $this->makeRequest('GET', "/api/v1/character/{$characterId}");
 
             if (! $response['success']) {
                 throw new \RuntimeException($response['error'] ?? 'Unknown error');
             }
 
             // Validate response schema
-            $validation = $this->validator->validate('umapyoi_character', $response['data']);
+            $wrappedData = $this->wrapResponseData($response['data'], 'character');
+
+            $validation = $this->validator->validate('umapyoi_character', $wrappedData);
 
             if (! $validation['valid']) {
                 Log::error('[UmapyoiApiClient] Character validation failed', [
@@ -234,14 +239,17 @@ class UmapyoiApiClient
         }
 
         try {
-            $response = $this->makeRequest('GET', '/v1/support-cards');
+            $response = $this->makeRequest('GET', '/api/v1/support');
 
             if (! $response['success']) {
                 throw new \RuntimeException($response['error'] ?? 'Unknown error');
             }
 
+            // Wrap raw API response in expected wrapper key
+            $wrappedData = $this->wrapResponseData($response['data'], 'support_cards');
+
             // Validate response schema
-            $validation = $this->validator->validate('umapyoi_support_cards', $response['data']);
+            $validation = $this->validator->validate('umapyoi_support_cards', $wrappedData);
 
             if (! $validation['valid']) {
                 Log::error('[UmapyoiApiClient] Support cards validation failed', [
@@ -305,14 +313,16 @@ class UmapyoiApiClient
         }
 
         try {
-            $response = $this->makeRequest('GET', "/v1/support-cards/{$cardId}");
+            $response = $this->makeRequest('GET', "/api/v1/support/{$cardId}");
 
             if (! $response['success']) {
                 throw new \RuntimeException($response['error'] ?? 'Unknown error');
             }
 
             // Validate response schema
-            $validation = $this->validator->validate('umapyoi_support_card', $response['data']);
+            $wrappedData = $this->wrapResponseData($response['data'], 'support_card');
+
+            $validation = $this->validator->validate('umapyoi_support_card', $wrappedData);
 
             if (! $validation['valid']) {
                 Log::error('[UmapyoiApiClient] Support card validation failed', [
@@ -379,14 +389,16 @@ class UmapyoiApiClient
         }
 
         try {
-            $response = $this->makeRequest('GET', '/v1/skills');
+            $response = $this->makeRequest('GET', '/api/v1/skill');
 
             if (! $response['success']) {
                 throw new \RuntimeException($response['error'] ?? 'Unknown error');
             }
 
             // Validate response schema
-            $validation = $this->validator->validate('umapyoi_skills', $response['data']);
+            $wrappedData = $this->wrapResponseData($response['data'], 'skills');
+
+            $validation = $this->validator->validate('umapyoi_skills', $wrappedData);
 
             if (! $validation['valid']) {
                 Log::error('[UmapyoiApiClient] Skills validation failed', [
@@ -450,14 +462,16 @@ class UmapyoiApiClient
         }
 
         try {
-            $response = $this->makeRequest('GET', "/v1/skills/{$skillId}");
+            $response = $this->makeRequest('GET', "/api/v1/skill/{$skillId}");
 
             if (! $response['success']) {
                 throw new \RuntimeException($response['error'] ?? 'Unknown error');
             }
 
             // Validate response schema
-            $validation = $this->validator->validate('umapyoi_skill', $response['data']);
+            $wrappedData = $this->wrapResponseData($response['data'], 'skill');
+
+            $validation = $this->validator->validate('umapyoi_skill', $wrappedData);
 
             if (! $validation['valid']) {
                 Log::error('[UmapyoiApiClient] Skill validation failed', [
@@ -524,16 +538,17 @@ class UmapyoiApiClient
         }
 
         try {
-            $response = $this->makeRequest('GET', '/v1/news', [
-                'limit' => $limit,
-            ]);
+            $response = $this->makeRequest('GET', "/api/v1/news/latest/{$limit}");
 
             if (! $response['success']) {
                 throw new \RuntimeException($response['error'] ?? 'Unknown error');
             }
 
+            // Wrap raw API response in expected wrapper key
+            $wrappedData = $this->wrapResponseData($response['data'], 'news');
+
             // Validate response schema
-            $validation = $this->validator->validate('umapyoi_news', $response['data']);
+            $validation = $this->validator->validate('umapyoi_news', $wrappedData);
 
             if (! $validation['valid']) {
                 Log::error('[UmapyoiApiClient] News validation failed', [
@@ -677,7 +692,8 @@ class UmapyoiApiClient
     public function isAvailable(): bool
     {
         try {
-            $response = Http::timeout(5)->get("{$this->baseUrl}/health");
+            // Check the character list endpoint as a health check since /health doesn't exist
+            $response = Http::timeout(5)->get("{$this->baseUrl}/api/v1/character/list");
 
             return $response->successful();
         } catch (\Exception $e) {
@@ -716,5 +732,20 @@ class UmapyoiApiClient
             'skills' => Cache::has(self::CACHE_PREFIX.'skills'),
             'news' => Cache::has(self::CACHE_PREFIX.'news:limit:10'),
         ];
+    }
+
+    /**
+     * Ensure response data is wrapped with the expected key
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    protected function wrapResponseData(array $data, string $wrapperKey): array
+    {
+        if (array_key_exists($wrapperKey, $data)) {
+            return $data;
+        }
+
+        return [$wrapperKey => $data];
     }
 }

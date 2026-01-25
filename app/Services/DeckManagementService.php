@@ -357,7 +357,11 @@ class DeckManagementService
 
         // Rarity distribution
         /** @var array<string, int> $rarityDistribution */
-        $rarityDistribution = $deck->groupBy('supportCard.rarity')
+        $rarityDistribution = $deck->groupBy(function ($card) {
+            $rarity = $card->supportCard?->rarity;
+
+            return is_string($rarity) ? $rarity : 'unknown';
+        })
             ->map->count()
             ->toArray();
         $stats['rarity_distribution'] = $rarityDistribution;

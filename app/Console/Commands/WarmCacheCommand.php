@@ -176,10 +176,10 @@ class WarmCacheCommand extends Command
 
         // Get general statistics
         $stats = $cacheManager->getStatistics();
-        $hitRate = $stats['hit_rate'] ?? 0;
-        $hits = $stats['hits'] ?? 0;
-        $misses = $stats['misses'] ?? 0;
-        $totalRequests = $stats['total_requests'] ?? 0;
+        $hitRate = $stats['hit_rate'];
+        $hits = $stats['hits'];
+        $misses = $stats['misses'];
+        $totalRequests = $stats['total_requests'];
 
         $this->line("  Hit Rate: {$hitRate}%");
         $this->line("  Total Hits: {$hits}");
@@ -213,8 +213,8 @@ class WarmCacheCommand extends Command
 
         // Get cache size
         $sizeInfo = $cacheManager->getCacheSize();
-        $totalKeys = (int) ($sizeInfo['total_keys'] ?? 0);
-        $estimatedSize = (int) ($sizeInfo['estimated_size_bytes'] ?? 0);
+        $totalKeys = $sizeInfo['total_keys'];
+        $estimatedSize = $sizeInfo['estimated_size_bytes'];
 
         $this->info('Cache Size:');
         $this->line("  Total Keys: {$totalKeys}");

@@ -63,8 +63,8 @@ class CleanupOCRFiles extends Command
 
         foreach ($oldExtractions as $extraction) {
             try {
-                // Skip if image_path is null
-                if ($extraction->image_path === null) {
+                // Skip if image_path is empty
+                if (empty($extraction->image_path)) {
                     if (! $dryRun) {
                         $extraction->delete();
                     }

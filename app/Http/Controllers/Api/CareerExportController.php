@@ -59,8 +59,8 @@ class CareerExportController extends Controller
                         'wit' => $career->final_wit,
                         'sp' => $career->final_sp,
                     ],
-                    'started_at' => $career->started_at instanceof \Carbon\Carbon ? $career->started_at->toIso8601String() : null,
-                    'completed_at' => $career->completed_at instanceof \Carbon\Carbon ? $career->completed_at->toIso8601String() : null,
+                    'started_at' => $career->started_at ? \Carbon\Carbon::parse($career->started_at)->toIso8601String() : null,
+                    'completed_at' => $career->completed_at ? \Carbon\Carbon::parse($career->completed_at)->toIso8601String() : null,
                     'training_sessions' => $career->trainingSessions->map(fn ($s) => [
                         'training_type' => $s->training_type,
                         'stat_gains' => $s->stat_gains,

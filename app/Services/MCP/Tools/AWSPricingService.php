@@ -2,6 +2,7 @@
 
 namespace App\Services\MCP\Tools;
 
+use App\Models\AIConversation;
 use App\Services\MCP\MCPClientService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
@@ -225,9 +226,8 @@ class AWSPricingService
 
             $since = now()->subHours($hours);
 
-            // Get cost data from AI conversations
-            $costs = \DB::table('ucp_ai_conversations')
-                ->where('created_at', '>=', $since)
+            // Get cost data from AI conversations using Eloquent
+            $costs = AIConversation::where('created_at', '>=', $since)
                 ->where('message_type', '=', 'assistant')
                 ->whereNotNull('cost')
                 ->get();
@@ -238,7 +238,7 @@ class AWSPricingService
             // Group by model
             /** @var array<string, float> $byModel */
             $byModel = $costs
-                ->filter(fn ($c): bool => isset($c->ai_model_used))
+                ->filter(fn ($c): bool => is_string($c->ai_model_used))
                 ->groupBy('ai_model_used')
                 ->map(function ($group): float {
                     $sum = $group->sum('cost');
@@ -250,9 +250,9 @@ class AWSPricingService
             // Group by provider
             /** @var array<string, float> $byProvider */
             $byProvider = $costs
-                ->filter(fn ($c): bool => isset($c->ai_model_used))
+                ->filter(fn ($c): bool => is_string($c->ai_model_used))
                 ->groupBy(function ($conv): string {
-                    $model = isset($conv->ai_model_used) ? (string) $conv->ai_model_used : '';
+                    $model = is_string($conv->ai_model_used) ? $conv->ai_model_used : '';
                     if (str_contains($model, 'llama') || str_contains($model, 'mistral')) {
                         return 'ollama';
                     }
@@ -270,8 +270,7 @@ class AWSPricingService
                 ->toArray();
 
             // Determine trend
-            $previousPeriodCostRaw = \DB::table('ucp_ai_conversations')
-                ->where('created_at', '>=', now()->subHours($hours * 2))
+            $previousPeriodCostRaw = AIConversation::where('created_at', '>=', now()->subHours($hours * 2))
                 ->where('created_at', '<', $since)
                 ->where('message_type', '=', 'assistant')
                 ->sum('cost');

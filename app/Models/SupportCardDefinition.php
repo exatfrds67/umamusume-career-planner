@@ -66,6 +66,8 @@ class SupportCardDefinition extends Model
     protected $fillable = [
         'name',
         'internal_id',
+        'external_source_id',
+        'external_source',
         'card_type',
         'rarity',
         'max_level',

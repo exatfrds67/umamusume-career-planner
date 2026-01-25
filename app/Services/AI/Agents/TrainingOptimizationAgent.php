@@ -55,7 +55,7 @@ class TrainingOptimizationAgent
         array $goals = []
     ): array {
         if (! $this->enabled) {
-            return $this->getDefaultRecommendations($trainingOptions);
+            return $this->getDefaultRecommendations($trainingOptions, $character);
         }
 
         $startTime = microtime(true);
@@ -127,7 +127,7 @@ class TrainingOptimizationAgent
             ]);
 
             // Return fallback recommendations
-            return $this->getDefaultRecommendations($trainingOptions);
+            return $this->getDefaultRecommendations($trainingOptions, $character);
         }
     }
 
@@ -395,11 +395,18 @@ class TrainingOptimizationAgent
      *     metadata: array<string, mixed>
      * }
      */
-    protected function getDefaultRecommendations(array $trainingOptions): array
+    protected function getDefaultRecommendations(array $trainingOptions, ?Character $character = null): array
     {
         $recommendations = [];
+        $optionsList = is_array($trainingOptions['options'] ?? null)
+            ? $trainingOptions['options']
+            : $trainingOptions;
+
         $index = 0;
-        foreach ($trainingOptions as $option) {
+        foreach ($optionsList as $option) {
+            if (! is_array($option)) {
+                continue;
+            }
             $recommendations[] = [
                 'option_index' => $index,
                 'priority' => 1.0 / ($index + 1),
@@ -419,6 +426,9 @@ class TrainingOptimizationAgent
             'metadata' => [
                 'agent_id' => $this->agentId,
                 'fallback' => true,
+                'character_id' => $character?->id,
+                'scenario_type' => $character?->scenario_type,
+                'mcp_server' => $this->getMCPServerName(),
             ],
         ];
     }

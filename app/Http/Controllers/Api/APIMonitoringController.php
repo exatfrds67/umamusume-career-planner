@@ -234,7 +234,7 @@ class APIMonitoringController extends Controller
     public function recommendations(): JsonResponse
     {
         $healthMetrics = $this->healthMonitor->getHealthMetrics();
-        $recommendations = $healthMetrics['recommendations'] ?? [];
+        $recommendations = $healthMetrics['recommendations'];
 
         // Add cache-specific recommendations
         $cacheStats = $this->metricsService->getCacheHitRateStats();
@@ -318,13 +318,13 @@ class APIMonitoringController extends Controller
     public function circuitBreakers(): JsonResponse
     {
         $healthMetrics = $this->healthMonitor->getHealthMetrics();
-        $circuitBreakers = $healthMetrics['circuit_breakers'] ?? [];
+        $circuitBreakers = $healthMetrics['circuit_breakers'];
 
         return response()->json([
             'success' => true,
             'data' => [
                 'circuit_breakers' => $circuitBreakers,
-                'failure_counts' => $healthMetrics['failure_counts'] ?? [],
+                'failure_counts' => $healthMetrics['failure_counts'],
                 'threshold' => 5,
                 'timeout_seconds' => APIHealthMonitorService::CIRCUIT_BREAKER_TIMEOUT,
             ],
@@ -435,7 +435,7 @@ class APIMonitoringController extends Controller
     protected function getSourceErrorRate(string $source): float
     {
         $errorStats = $this->metricsService->getErrorRateStats();
-        $bySource = $errorStats['by_source'] ?? [];
+        $bySource = $errorStats['by_source'];
 
         return $bySource[$source]['error_rate'] ?? 0.0;
     }

@@ -134,7 +134,7 @@ class TesseractService
                 throw new \RuntimeException('Failed to store uploaded file');
             }
             $fullPath = Storage::disk('local')->path($path);
-            if ($fullPath === false) {
+            if ($fullPath === '') {
                 throw new \RuntimeException('Failed to get file path');
             }
 

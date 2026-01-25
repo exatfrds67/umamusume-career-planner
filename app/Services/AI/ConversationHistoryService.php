@@ -78,19 +78,25 @@ class ConversationHistoryService
             ->limit($limit)
             ->offset($offset)
             ->get()
-            ->map(fn ($conv) => [
-                'id' => $conv->id,
-                'conversation_id' => $conv->conversation_id,
-                'character_id' => $conv->character_id,
-                'character_name' => $conv->character->name ?? 'Unknown',
-                'message_type' => $conv->message_type,
-                'message_content' => $conv->getAttribute('message_content'),
-                'ai_model_used' => $conv->getAttribute('ai_model_used'),
-                'processing_time' => $conv->getAttribute('processing_time'),
-                'token_count' => $conv->getAttribute('token_count'),
-                'cost' => $conv->getAttribute('cost'),
-                'created_at' => $conv->created_at?->toIso8601String(),
-            ])
+            ->map(function ($conv) {
+                $processingTime = $conv->getAttribute('processing_time');
+                $tokenCount = $conv->getAttribute('token_count');
+                $cost = $conv->getAttribute('cost');
+
+                return [
+                    'id' => $conv->id,
+                    'conversation_id' => $conv->conversation_id,
+                    'character_id' => $conv->character_id,
+                    'character_name' => is_string($conv->character?->name) ? $conv->character->name : 'Unknown',
+                    'message_type' => $conv->message_type,
+                    'message_content' => $conv->getAttribute('message_content'),
+                    'ai_model_used' => $conv->getAttribute('ai_model_used'),
+                    'processing_time' => is_numeric($processingTime) ? (float) $processingTime : null,
+                    'token_count' => is_numeric($tokenCount) ? (int) $tokenCount : null,
+                    'cost' => is_numeric($cost) ? (float) $cost : null,
+                    'created_at' => $conv->created_at?->toIso8601String(),
+                ];
+            })
             ->values()
             ->toArray();
 
@@ -395,10 +401,10 @@ class ConversationHistoryService
     public function getConversationStats(): array
     {
         return [
-            'today' => AIConversation::whereDate('created_at', today())->distinct('conversation_id')->count('conversation_id'),
-            'this_week' => AIConversation::where('created_at', '>=', now()->startOfWeek())->distinct('conversation_id')->count('conversation_id'),
-            'this_month' => AIConversation::where('created_at', '>=', now()->startOfMonth())->distinct('conversation_id')->count('conversation_id'),
-            'total' => AIConversation::distinct('conversation_id')->count('conversation_id'),
+            'today' => (int) AIConversation::whereDate('created_at', today())->distinct('conversation_id')->count('conversation_id'),
+            'this_week' => (int) AIConversation::where('created_at', '>=', now()->startOfWeek())->distinct('conversation_id')->count('conversation_id'),
+            'this_month' => (int) AIConversation::where('created_at', '>=', now()->startOfMonth())->distinct('conversation_id')->count('conversation_id'),
+            'total' => (int) AIConversation::distinct('conversation_id')->count('conversation_id'),
         ];
     }
 }

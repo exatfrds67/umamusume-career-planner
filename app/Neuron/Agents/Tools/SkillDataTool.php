@@ -131,12 +131,17 @@ class SkillDataTool extends Tool
         $output .= "=============\n\n";
 
         // Basic Information
-        $output .= "Name: {$skill->name}\n";
-        $output .= "Type: {$skill->skill_type}\n";
-        $output .= "Rarity: {$skill->rarity}\n";
-        $output .= "Base SP Cost: {$skill->base_sp_cost}\n";
+        $skillName = $this->normalizeText($skill->name, 'Unknown Skill');
+        $skillType = $this->normalizeText($skill->skill_type, 'unknown');
+        $rarity = $this->normalizeText($skill->rarity, 'unknown');
+        $baseSpCost = is_numeric($skill->base_sp_cost) ? (int) $skill->base_sp_cost : 0;
 
-        if ($skill->meta_tier) {
+        $output .= "Name: {$skillName}\n";
+        $output .= "Type: {$skillType}\n";
+        $output .= "Rarity: {$rarity}\n";
+        $output .= "Base SP Cost: {$baseSpCost}\n";
+
+        if ($this->isMeaningfulText($skill->meta_tier)) {
             $output .= "Meta Tier: {$skill->meta_tier}\n";
         }
 
@@ -152,15 +157,13 @@ class SkillDataTool extends Tool
         if (! empty($skill->effects)) {
             $output .= "EFFECTS:\n";
             /** @var array<mixed> $effects */
-            $effects = $skill->effects;
+            $effects = $this->sanitizeArrayForOutput($skill->effects);
             foreach ($effects as $effect) {
-                if (is_array($effect)) {
-                    $output .= '  - '.json_encode($effect)."\n";
-                } elseif (is_string($effect)) {
-                    $output .= "  - {$effect}\n";
-                } else {
-                    $output .= '  - '.json_encode($effect)."\n";
+                $formatted = $this->formatListItem($effect);
+                if ($formatted === null) {
+                    continue;
                 }
+                $output .= "  - {$formatted}\n";
             }
             $output .= "\n";
         }
@@ -169,15 +172,13 @@ class SkillDataTool extends Tool
         if (! empty($skill->activation_conditions)) {
             $output .= "ACTIVATION CONDITIONS:\n";
             /** @var array<mixed> $activationConditions */
-            $activationConditions = $skill->activation_conditions;
+            $activationConditions = $this->sanitizeArrayForOutput($skill->activation_conditions);
             foreach ($activationConditions as $condition) {
-                if (is_array($condition)) {
-                    $output .= '  - '.json_encode($condition)."\n";
-                } elseif (is_string($condition)) {
-                    $output .= "  - {$condition}\n";
-                } else {
-                    $output .= '  - '.json_encode($condition)."\n";
+                $formatted = $this->formatListItem($condition);
+                if ($formatted === null) {
+                    continue;
                 }
+                $output .= "  - {$formatted}\n";
             }
             $output .= "\n";
         }
@@ -186,7 +187,7 @@ class SkillDataTool extends Tool
         if (! empty($skill->stat_requirements)) {
             $output .= "STAT REQUIREMENTS:\n";
             /** @var array<string|int, mixed> $statRequirements */
-            $statRequirements = $skill->stat_requirements;
+            $statRequirements = $this->sanitizeArrayForOutput($skill->stat_requirements);
             foreach ($statRequirements as $stat => $value) {
                 $statStr = is_string($stat) ? $stat : (string) $stat;
                 $valueStr = is_scalar($value) ? (string) $value : (string) json_encode($value);
@@ -197,7 +198,7 @@ class SkillDataTool extends Tool
 
         // Hint Information
         $output .= "HINT DISCOUNT INFORMATION:\n";
-        $output .= "  With 0 hints: {$skill->base_sp_cost} SP (0% discount)\n";
+        $output .= "  With 0 hints: {$baseSpCost} SP (0% discount)\n";
         $output .= '  With 1 hint: '.$skill->calculateFinalCost(1).' SP (20% discount, saves '.$skill->getSpSaved(1)." SP)\n";
         $output .= '  With 2+ hints: '.$skill->calculateFinalCost(2).' SP (40% discount, saves '.$skill->getSpSaved(2)." SP)\n\n";
 
@@ -250,13 +251,22 @@ class SkillDataTool extends Tool
         // Acquisition Sources
         $sources = [];
         if (! empty($skill->support_card_sources)) {
-            $sources[] = 'Support Cards: '.implode(', ', array_slice($skill->support_card_sources, 0, 3));
+            $supportSources = $this->sanitizeArrayForOutput($skill->support_card_sources);
+            if (! empty($supportSources)) {
+                $sources[] = 'Support Cards: '.implode(', ', array_slice($supportSources, 0, 3));
+            }
         }
         if (! empty($skill->event_sources)) {
-            $sources[] = 'Events: '.implode(', ', array_slice($skill->event_sources, 0, 3));
+            $eventSources = $this->sanitizeArrayForOutput($skill->event_sources);
+            if (! empty($eventSources)) {
+                $sources[] = 'Events: '.implode(', ', array_slice($eventSources, 0, 3));
+            }
         }
         if (! empty($skill->inheritance_sources)) {
-            $sources[] = 'Inheritance: '.implode(', ', array_slice($skill->inheritance_sources, 0, 3));
+            $inheritanceSources = $this->sanitizeArrayForOutput($skill->inheritance_sources);
+            if (! empty($inheritanceSources)) {
+                $sources[] = 'Inheritance: '.implode(', ', array_slice($inheritanceSources, 0, 3));
+            }
         }
 
         if (! empty($sources)) {
@@ -271,19 +281,98 @@ class SkillDataTool extends Tool
         if (! empty($skill->strategic_notes)) {
             $output .= "STRATEGIC NOTES:\n";
             /** @var array<mixed> $strategicNotes */
-            $strategicNotes = $skill->strategic_notes;
+            $strategicNotes = $this->sanitizeArrayForOutput($skill->strategic_notes);
             foreach ($strategicNotes as $note) {
-                if (is_array($note)) {
-                    $output .= '  - '.json_encode($note)."\n";
-                } elseif (is_string($note)) {
-                    $output .= "  - {$note}\n";
-                } else {
-                    $output .= '  - '.json_encode($note)."\n";
+                $formatted = $this->formatListItem($note);
+                if ($formatted === null) {
+                    continue;
                 }
+                $output .= "  - {$formatted}\n";
             }
         }
 
         return $output;
+    }
+
+    /**
+     * @param  array<mixed>  $data
+     * @return array<mixed>
+     */
+    private function sanitizeArrayForOutput(array $data): array
+    {
+        $sanitized = [];
+
+        foreach ($data as $key => $value) {
+            if ($value === null || $value === 'null') {
+                continue;
+            }
+
+            if (is_array($value)) {
+                $value = $this->sanitizeArrayForOutput($value);
+                if ($value === []) {
+                    continue;
+                }
+            }
+
+            $sanitized[$key] = $value;
+        }
+
+        return $sanitized;
+    }
+
+    private function normalizeText(?string $value, string $fallback): string
+    {
+        if (! $this->isMeaningfulText($value)) {
+            return $fallback;
+        }
+
+        return (string) $value;
+    }
+
+    private function isMeaningfulText(?string $value): bool
+    {
+        if (! is_string($value)) {
+            return false;
+        }
+
+        $trimmed = trim($value);
+
+        return $trimmed !== '' && strtolower($trimmed) !== 'null';
+    }
+
+    private function formatListItem(mixed $value): ?string
+    {
+        if ($value === null || $value === 'null') {
+            return null;
+        }
+
+        if (is_array($value)) {
+            $sanitized = $this->sanitizeArrayForOutput($value);
+            if ($sanitized === []) {
+                return null;
+            }
+
+            $encoded = json_encode($sanitized);
+
+            return $encoded === false ? null : $encoded;
+        }
+
+        if (is_string($value)) {
+            $trimmed = trim($value);
+            if ($trimmed === '' || strtolower($trimmed) === 'null') {
+                return null;
+            }
+
+            return $trimmed;
+        }
+
+        if (is_scalar($value)) {
+            return (string) $value;
+        }
+
+        $encoded = json_encode($value);
+
+        return $encoded === false ? null : $encoded;
     }
 
     /**

@@ -109,7 +109,7 @@ class SyncExternalDataJob implements ShouldQueue
             'data_type' => $this->dataType,
             'identifier_count' => count($this->identifiers),
             'attempt' => $this->attempts(),
-            'job_id' => $this->job?->getJobId(),
+            'job_id' => (string) ($this->job?->getJobId() ?? ''),
         ]);
 
         // Initialize progress tracking
@@ -132,7 +132,7 @@ class SyncExternalDataJob implements ShouldQueue
                 if ($result['success']) {
                     $successCount++;
 
-                    if ($result['had_conflict'] ?? false) {
+                    if ($result['had_conflict']) {
                         $conflictCount++;
                     }
 
@@ -140,8 +140,8 @@ class SyncExternalDataJob implements ShouldQueue
                         'sync_id' => $this->syncId,
                         'data_type' => $this->dataType,
                         'identifier' => $identifier,
-                        'had_conflict' => $result['had_conflict'] ?? false,
-                        'resolution_strategy' => $result['resolution_strategy'] ?? null,
+                        'had_conflict' => $result['had_conflict'],
+                        'resolution_strategy' => $result['resolution_strategy'],
                     ]);
                 } else {
                     $failureCount++;
@@ -565,9 +565,6 @@ class SyncExternalDataJob implements ShouldQueue
         $activeSyncIds = \is_array($cachedIds) ? $cachedIds : [];
 
         foreach ($activeSyncIds as $syncId) {
-            if (! \is_string($syncId)) {
-                continue;
-            }
             $progress = self::getSyncProgress($syncId);
 
             if ($progress !== null && \in_array($progress['status'] ?? '', [self::SYNC_PENDING, self::SYNC_IN_PROGRESS], true)) {

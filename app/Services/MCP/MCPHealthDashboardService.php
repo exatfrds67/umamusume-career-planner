@@ -604,7 +604,8 @@ class MCPHealthDashboardService
         // Check database status
         $databaseStatus = 'healthy';
         try {
-            \DB::connection()->getPdo();
+            // Simple query to verify database connectivity
+            \DB::select('SELECT 1');
         } catch (\Exception $e) {
             $databaseStatus = 'unhealthy';
             Log::error('[MCPHealthDashboard] Database health check failed', [

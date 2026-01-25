@@ -25,6 +25,11 @@ class StoreCharacterRequest extends FormRequest
             'name' => ['required', 'string', 'max:100'],
             'scenario_type' => ['required', 'in:ura_finale,unity_cup'],
 
+            // External API data (optional)
+            'external_source_id' => ['nullable', 'string', 'max:50'],
+            'external_source' => ['nullable', 'string', 'max:100'],
+            'avatar_url' => ['nullable', 'string', 'max:500'],
+
             // Stats validation (0-1200 range)
             'stats' => ['required', 'array'],
             'stats.speed' => ['required', 'integer', 'min:0', 'max:1200'],

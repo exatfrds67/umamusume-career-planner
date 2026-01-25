@@ -512,7 +512,7 @@ class MultiAgentWorkflowManager
      */
     protected function generateWorkflowId(): string
     {
-        return 'workflow_'.substr(md5(uniqid((string) mt_rand(), true)), 0, 12);
+        return 'workflow_'.\Illuminate\Support\Str::uuid()->toString();
     }
 
     /**

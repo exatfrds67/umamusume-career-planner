@@ -119,7 +119,7 @@ class RaceStrategyResponse
             $errors['recommended_skills'] = 'At least one skill must be recommended';
         } else {
             foreach ($this->recommendedSkills as $index => $skill) {
-                if (! \is_string($skill) || trim($skill) === '') {
+                if (trim($skill) === '') {
                     $errors['recommended_skills'] = "Skill at index {$index} must be a non-empty string";
 
                     break;
@@ -142,7 +142,7 @@ class RaceStrategyResponse
 
         // Validate risk factors structure
         foreach ($this->riskFactors as $index => $risk) {
-            if (! \is_string($risk) || trim($risk) === '') {
+            if (trim($risk) === '') {
                 $errors['risk_factors'] = "Risk factor at index {$index} must be a non-empty string";
 
                 break;

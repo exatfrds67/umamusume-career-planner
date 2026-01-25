@@ -100,7 +100,7 @@ class DataExportService
      * @param  string  $exportType  Type of data to export
      * @param  int  $userId  User ID for data ownership
      * @param  array<string, mixed>  $filters  Optional filters for selective export
-     * @return array{success: bool, data: array<int, array<string, mixed>>, count: int, errors: array<int, string>}
+     * @return array{success: bool, data: array<string, mixed>|array<int, array<string, mixed>>, count: int, errors: array<int, string>}
      */
     public function generateExport(string $exportType = 'full_backup', int $userId = 0, array $filters = []): array
     {
@@ -114,21 +114,29 @@ class DataExportService
                 ];
             }
 
-            /** @var array<int, array<string, mixed>> $data */
+            $count = 0;
+
+            /** @var array<string, mixed>|array<int, array<string, mixed>> $data */
             $data = match ($exportType) {
                 'character' => $this->exportCharacters($userId, $filters),
                 'career' => $this->exportCareers($userId, $filters),
                 'training_session' => $this->exportTrainingSessions($userId, $filters),
                 'skill' => $this->exportSkills($userId, $filters),
                 'support_card' => $this->exportSupportCards($userId, $filters),
-                'full_backup' => $this->exportFullBackupAsIndexed($userId, $filters),
+                'full_backup' => $this->exportFullBackupData($userId, $filters),
                 default => throw new \InvalidArgumentException("Unknown export type: {$exportType}"),
             };
+
+            if ($exportType === 'full_backup') {
+                $count = 1;
+            } else {
+                $count = \count($data);
+            }
 
             return [
                 'success' => true,
                 'data' => $data,
-                'count' => \count($data),
+                'count' => $count,
                 'errors' => [],
             ];
         } catch (\Exception $e) {
@@ -454,17 +462,6 @@ class DataExportService
     }
 
     /**
-     * Export full backup for a user (returns indexed array for generateExport)
-     *
-     * @param  array<string, mixed>  $filters
-     * @return array<int, array<string, mixed>>
-     */
-    private function exportFullBackupAsIndexed(int $userId, array $filters = []): array
-    {
-        return [$this->exportFullBackupData($userId, $filters)];
-    }
-
-    /**
      * Export full backup for a user (structured data)
      *
      * @param  array<string, mixed>  $filters
@@ -506,7 +503,7 @@ class DataExportService
     /**
      * Convert data to CSV format
      *
-     * @param  array<int, array<string, mixed>>  $data  Data to convert
+     * @param  array<int|string, mixed>  $data  Data to convert
      * @param  string  $exportType  Type of export for header mapping
      * @return string CSV string
      */
@@ -566,12 +563,17 @@ class DataExportService
     /**
      * Flatten nested arrays for CSV export
      *
-     * @param  array<int, array<string, mixed>>  $data
+     * @param  array<int|string, mixed>  $data
      * @return array<int, array<string, mixed>>
      */
     private function flattenForCsv(array $data): array
     {
-        return array_map(function ($item) {
+        $flattenedRows = [];
+
+        foreach ($data as $item) {
+            if (! \is_array($item)) {
+                continue;
+            }
             $flattened = [];
             foreach ($item as $key => $value) {
                 if (\is_array($value)) {
@@ -582,8 +584,10 @@ class DataExportService
                 }
             }
 
-            return $flattened;
-        }, $data);
+            $flattenedRows[] = $flattened;
+        }
+
+        return $flattenedRows;
     }
 
     /**

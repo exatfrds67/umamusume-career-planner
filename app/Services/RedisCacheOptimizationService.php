@@ -681,10 +681,11 @@ class RedisCacheOptimizationService
             return;
         }
 
-        $sampleRate = config('cache-management.monitoring.sample_rate', 1.0);
+        $sampleRateRaw = config('cache-management.monitoring.sample_rate', 1.0);
+        $sampleRate = is_numeric($sampleRateRaw) ? (float) $sampleRateRaw : 1.0;
 
-        // Sample rate check
-        if ($sampleRate < 1.0 && mt_rand() / mt_getrandmax() > $sampleRate) {
+        // Sample rate check using cryptographically secure random
+        if ($sampleRate < 1.0 && (random_int(0, 1000000) / 1000000) > $sampleRate) {
             return;
         }
 

@@ -197,6 +197,26 @@ class Character extends Model
     }
 
     /**
+     * Get the support decks for this character.
+     *
+     * @return HasMany<SupportDeck, $this>
+     */
+    public function supportDecks(): HasMany
+    {
+        return $this->hasMany(SupportDeck::class);
+    }
+
+    /**
+     * Get the active support deck for this character.
+     *
+     * @return HasOne<SupportDeck, $this>
+     */
+    public function activeSupportDeck(): HasOne
+    {
+        return $this->hasOne(SupportDeck::class)->where('is_active', true);
+    }
+
+    /**
      * Scope a query to only include active characters.
      *
      * @param  \Illuminate\Database\Eloquent\Builder<Character>  $query

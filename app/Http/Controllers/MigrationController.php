@@ -92,7 +92,7 @@ class MigrationController extends Controller
                     'success' => false,
                     'message' => 'Conversion failed',
                     'errors' => $result['errors'],
-                    'warnings' => $result['warnings'] ?? [],
+                    'warnings' => $result['warnings'],
                 ], 422);
             }
 
@@ -104,7 +104,7 @@ class MigrationController extends Controller
                     'source_format' => $sourceFormat,
                     'target_type' => $targetType,
                     'statistics' => $result['statistics'] ?? [],
-                    'warnings' => $result['warnings'] ?? [],
+                    'warnings' => $result['warnings'],
                 ],
             ]);
         } catch (\Exception $e) {
@@ -304,7 +304,7 @@ class MigrationController extends Controller
                     'summary' => $result['summary'],
                     'valid_records' => $result['records']['valid'],
                     'invalid_records' => $result['records']['invalid'],
-                    'warnings' => $result['warnings'] ?? [],
+                    'warnings' => $result['warnings'],
                 ],
             ]);
         } catch (\Exception $e) {

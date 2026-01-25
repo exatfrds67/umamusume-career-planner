@@ -61,7 +61,7 @@ class SupportCardDeckService
         $existingCards = SupportCardDefinition::whereIn('id', $cardIds)->pluck('id')->toArray();
         $missingCards = array_diff($cardIds, $existingCards);
         if (! empty($missingCards)) {
-            $errors[] = 'Some cards do not exist: '.implode(', ', $missingCards);
+            $errors[] = 'Some cards do not exist: '.implode(', ', array_map('strval', $missingCards));
         }
 
         // Warning for suboptimal compositions

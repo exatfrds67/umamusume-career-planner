@@ -248,7 +248,7 @@ class ImageOptimizationHelper
 
         foreach ($sources as $source) {
             $type = $source['type'] ?? 'image/png';
-            $links[] = self::preloadLink($source['src'], $type, $source['media'] ?? null);
+            $links[] = self::preloadLink($source['src'], $type, $source['media']);
         }
 
         return implode("\n", $links);
@@ -301,10 +301,6 @@ class ImageOptimizationHelper
         $parts = [];
 
         foreach ($attributes as $key => $value) {
-            if (! is_string($key)) {
-                continue;
-            }
-
             if ($value === true) {
                 $parts[] = $key;
             } elseif ($value !== false && $value !== null) {

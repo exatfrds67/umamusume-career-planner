@@ -63,7 +63,7 @@ class ExternalData extends Model
 
     public function isValid(): bool
     {
-        return $this->is_valid && ($this->expires_at === null || ($this->expires_at instanceof \Illuminate\Support\Carbon && $this->expires_at->isFuture()));
+        return $this->is_valid && ($this->expires_at === null || $this->expires_at->isFuture());
     }
 
     /**

@@ -232,8 +232,8 @@ class MCPDashboardController extends Controller
             'healthy_servers' => $healthyServers,
             'active_agents' => $activeAgents,
             'active_workflows' => collect($agents)->sum('workflow_steps'),
-            'cost_24h' => $costs['total_cost'] ?? 0,
-            'requests_24h' => $costs['total_requests'] ?? 0,
+            'cost_24h' => $costs['total_cost'],
+            'requests_24h' => $costs['total_requests'],
             'avg_response_time' => $this->calculateAverageResponseTime(),
             'p95_response_time' => $this->calculateP95ResponseTime(),
         ];
@@ -275,12 +275,12 @@ class MCPDashboardController extends Controller
         $recommendations = $this->costManagement->getOptimizationRecommendations();
 
         return [
-            'daily_cost' => $dailyCosts['total_cost'] ?? 0,
-            'daily_requests' => $dailyCosts['total_requests'] ?? 0,
-            'weekly_cost' => $weeklyCosts['total_cost'] ?? 0,
-            'weekly_requests' => $weeklyCosts['total_requests'] ?? 0,
-            'monthly_cost' => $monthlyCosts['total_cost'] ?? 0,
-            'monthly_requests' => $monthlyCosts['total_requests'] ?? 0,
+            'daily_cost' => $dailyCosts['total_cost'],
+            'daily_requests' => $dailyCosts['total_requests'],
+            'weekly_cost' => $weeklyCosts['total_cost'],
+            'weekly_requests' => $weeklyCosts['total_requests'],
+            'monthly_cost' => $monthlyCosts['total_cost'],
+            'monthly_requests' => $monthlyCosts['total_requests'],
             'budget_status' => $budgetStatus,
             'by_provider' => $costsByProvider,
             'top_tools' => [],
@@ -313,8 +313,8 @@ class MCPDashboardController extends Controller
                 'name' => $name,
                 'avg_response_time' => 0.0,
                 'success_rate' => 100.0,
-                'cost_per_request' => $data['avg_cost_per_request'] ?? 0.0,
-                'total_requests' => $data['request_count'] ?? 0,
+                'cost_per_request' => $data['avg_cost_per_request'],
+                'total_requests' => $data['request_count'],
             ];
         }
 
@@ -386,9 +386,9 @@ class MCPDashboardController extends Controller
 
         foreach ($servers as $name => $server) {
             $settings[$name] = [
-                'name' => $server['server_name'] ?? $name,
+                'name' => $server['server_name'],
                 'description' => $server['description'] ?? '',
-                'enabled' => $server['is_connected'] ?? false,
+                'enabled' => $server['is_connected'],
             ];
         }
 
@@ -402,7 +402,7 @@ class MCPDashboardController extends Controller
     {
         // Use monitoring dashboard data for response time
         $dashboard = $this->mcpMonitoring->getMonitoringDashboard();
-        $servers = $dashboard['servers'] ?? [];
+        $servers = $dashboard['servers'];
 
         if (empty($servers)) {
             return 0.0;
@@ -426,7 +426,7 @@ class MCPDashboardController extends Controller
     {
         // Use monitoring dashboard data for response time
         $dashboard = $this->mcpMonitoring->getMonitoringDashboard();
-        $servers = $dashboard['servers'] ?? [];
+        $servers = $dashboard['servers'];
 
         if (empty($servers)) {
             return 0.0;

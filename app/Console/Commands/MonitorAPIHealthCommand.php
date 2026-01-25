@@ -125,8 +125,8 @@ class MonitorAPIHealthCommand extends Command
      */
     protected function displayAPIStatus(string $apiName, array $status): void
     {
-        $statusText = is_string($status['status'] ?? null) ? $status['status'] : 'unknown';
-        $available = ($status['available'] ?? false) ? 'Yes' : 'No';
+        $statusText = $status['status'];
+        $available = $status['available'] ? 'Yes' : 'No';
         $responseTime = $status['response_time_ms'] ?? null;
         $responseTimeMs = is_numeric($responseTime) ? (float) $responseTime : null;
         $failureCount = is_numeric($status['failure_count'] ?? null) ? (int) $status['failure_count'] : 0;
@@ -167,8 +167,8 @@ class MonitorAPIHealthCommand extends Command
     {
         foreach (['umapyoi', 'umamusumedb'] as $apiName) {
             $status = $health[$apiName];
-            $statusCode = is_string($status['status'] ?? null) ? $status['status'] : 'unknown';
-            $statusMessage = is_string($status['message'] ?? null) ? $status['message'] : '';
+            $statusCode = $status['status'];
+            $statusMessage = $status['message'] ?? '';
 
             // Check if API is degraded or unhealthy
             if (in_array($statusCode, ['degraded', 'unhealthy', 'error'], true)) {

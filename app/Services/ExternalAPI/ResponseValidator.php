@@ -212,12 +212,13 @@ class ResponseValidator
                 'wrapper_key' => 'characters',
                 'is_array' => true,
                 'item_schema' => [
-                    'required' => ['id', 'name'],
+                    'required' => ['id', 'name_en'],
                     'types' => [
                         'id' => 'integer',
-                        'name' => 'string',
-                        'title' => 'string|null',
-                        'rarity' => 'integer|null',
+                        'name_en' => 'string',
+                        'name_jp' => 'string|null',
+                        'category_label' => 'string|null',
+                        'thumb_img' => 'string|null',
                     ],
                 ],
             ],
@@ -238,15 +239,12 @@ class ResponseValidator
                 'wrapper_key' => 'support_cards',
                 'is_array' => true,
                 'item_schema' => [
-                    'required' => ['id', 'name'],
+                    'required' => ['id'],
                     'types' => [
                         'id' => 'integer',
-                        'name' => 'string',
-                        'rarity' => 'string|null',
-                        'type' => 'string|null',
-                    ],
-                    'enums' => [
-                        'rarity' => ['SSR', 'SR', 'R'],
+                        'chara_id' => 'integer|null',
+                        'title_en' => 'string|null',
+                        'gametora' => 'string|null',
                     ],
                 ],
             ],
@@ -296,12 +294,14 @@ class ResponseValidator
                 'wrapper_key' => 'news',
                 'is_array' => true,
                 'item_schema' => [
-                    'required' => ['id', 'title'],
+                    'required' => ['id'],
                     'types' => [
                         'id' => 'integer',
-                        'title' => 'string',
-                        'content' => 'string|null',
-                        'published_at' => 'string|null',
+                        'message' => 'string|null',
+                        'message_english' => 'string|null',
+                        'post_at' => 'integer|null', // Unix timestamp
+                        'label_name_en' => 'string|null',
+                        'announce_id' => 'integer|null',
                     ],
                 ],
             ],

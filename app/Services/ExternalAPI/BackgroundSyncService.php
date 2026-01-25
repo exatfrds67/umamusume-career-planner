@@ -384,15 +384,12 @@ class BackgroundSyncService
      */
     public function getAllSyncStatus(): array
     {
-        $statuses = [
-            'characters' => $this->getSyncStatus('characters'),
-            'support_cards' => $this->getSyncStatus('support_cards'),
-            'meta_rankings' => $this->getSyncStatus('meta_rankings'),
-            'skill_effectiveness' => $this->getSyncStatus('skill_effectiveness'),
+        return [
+            'characters' => $this->getSyncStatus('characters') ?? [],
+            'support_cards' => $this->getSyncStatus('support_cards') ?? [],
+            'meta_rankings' => $this->getSyncStatus('meta_rankings') ?? [],
+            'skill_effectiveness' => $this->getSyncStatus('skill_effectiveness') ?? [],
         ];
-
-        // Filter out null values
-        return array_filter($statuses, fn ($status) => $status !== null);
     }
 
     /**

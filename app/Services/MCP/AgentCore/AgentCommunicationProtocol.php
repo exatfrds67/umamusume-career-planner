@@ -453,7 +453,7 @@ class AgentCommunicationProtocol
      */
     protected function generateMessageId(): string
     {
-        return 'msg_'.substr(md5(uniqid((string) mt_rand(), true)), 0, 12);
+        return 'msg_'.\Illuminate\Support\Str::uuid()->toString();
     }
 
     /**

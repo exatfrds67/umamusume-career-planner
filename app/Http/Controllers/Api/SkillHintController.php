@@ -222,9 +222,6 @@ class SkillHintController extends Controller
             // Map skill_hints_provided JSON to skill_provision format
             // skill_hints_provided contains skill IDs that this card can provide hints for
             $hintsProvided = $card->skill_hints_provided ?? [];
-            if (! is_array($hintsProvided)) {
-                $hintsProvided = [];
-            }
 
             /** @var array<int, array<string, mixed>> $skillProvision */
             $skillProvision = collect($hintsProvided)->map(fn ($skillId) => [
@@ -324,7 +321,7 @@ class SkillHintController extends Controller
                 return null;
             }
 
-            $friendshipLevel = is_numeric($csc->friendship_level) ? (int) $csc->friendship_level : 0;
+            $friendshipLevel = $csc->friendship_level;
             $card->friendship_level = $friendshipLevel;
             $card->limit_break_level = $csc->limit_break_level;
 

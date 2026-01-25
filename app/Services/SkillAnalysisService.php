@@ -26,7 +26,7 @@ class SkillAnalysisService
         $synergyMap = [];
 
         foreach ($skills as $skill) {
-            if (empty($skill->synergy_skills)) {
+            if (! is_array($skill->synergy_skills) || empty($skill->synergy_skills)) {
                 continue;
             }
 

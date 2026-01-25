@@ -260,7 +260,7 @@ class FetchService
      * Perform actual HTTP fetch
      *
      * @param  array<string, mixed>  $options
-     * @return array{success: bool, data: mixed, status_code: int, headers: array<string, string>}
+     * @return array{success: bool, data: mixed, status_code: int, headers: array<string, array<int, string>>}
      */
     protected function performFetch(string $url, string $method, array $options = []): array
     {
@@ -291,7 +291,7 @@ class FetchService
         // Parse response
         $success = $response->successful();
         $statusCode = $response->status();
-        /** @var array<string, string> $responseHeaders */
+        /** @var array<string, array<int, string>> $responseHeaders */
         $responseHeaders = $response->headers();
 
         // Try to parse JSON, fallback to raw body

@@ -229,14 +229,10 @@ class User extends Authenticatable
      */
     public function getSubscriptionTier(): string
     {
-        if ($this->ai_settings instanceof \ArrayObject) {
-            $settings = $this->ai_settings->getArrayCopy();
-            $tier = $settings['subscription_tier'] ?? null;
+        $settings = $this->ai_settings->getArrayCopy();
+        $tier = $settings['subscription_tier'] ?? null;
 
-            return is_string($tier) ? $tier : 'free';
-        }
-
-        return 'free';
+        return is_string($tier) ? $tier : 'free';
     }
 
     /**
@@ -244,14 +240,10 @@ class User extends Authenticatable
      */
     public function getAIBudgetLimit(): float
     {
-        if ($this->ai_settings instanceof \ArrayObject) {
-            $settings = $this->ai_settings->getArrayCopy();
-            $limit = $settings['budget_limit'] ?? null;
+        $settings = $this->ai_settings->getArrayCopy();
+        $limit = $settings['budget_limit'] ?? null;
 
-            return is_numeric($limit) ? (float) $limit : 10.0;
-        }
-
-        return 10.0;
+        return is_numeric($limit) ? (float) $limit : 10.0;
     }
 
     /**
@@ -259,14 +251,10 @@ class User extends Authenticatable
      */
     public function getPreferredAIModel(): string
     {
-        if ($this->ai_settings instanceof \ArrayObject) {
-            $settings = $this->ai_settings->getArrayCopy();
-            $model = $settings['preferred_model'] ?? null;
+        $settings = $this->ai_settings->getArrayCopy();
+        $model = $settings['preferred_model'] ?? null;
 
-            return is_string($model) ? $model : 'ollama';
-        }
-
-        return 'ollama';
+        return is_string($model) ? $model : 'ollama';
     }
 
     /**

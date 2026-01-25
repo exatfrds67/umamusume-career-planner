@@ -104,13 +104,13 @@ class PerformanceController extends Controller
         // Apply filters
         $minTime = $request->float('min_time', 0);
         $maxTime = $request->float('max_time', PHP_FLOAT_MAX);
-        $search = $request->string('search', '');
+        $search = (string) $request->string('search', '');
 
         $filtered = array_filter($slowQueries, function ($query) use ($minTime, $maxTime, $search) {
             if ($query['time'] < $minTime || $query['time'] > $maxTime) {
                 return false;
             }
-            if ($search !== '' && stripos($query['sql'], (string) $search) === false) {
+            if ($search !== '' && stripos($query['sql'], $search) === false) {
                 return false;
             }
 
@@ -164,9 +164,9 @@ class PerformanceController extends Controller
 
         // Analyze specific table if requested
         $tableAnalysis = null;
-        $table = $request->string('table', '');
+        $table = (string) $request->string('table', '');
         if ($table !== '') {
-            $tableAnalysis = $this->queryOptimizationService->analyzeTableIndexes((string) $table);
+            $tableAnalysis = $this->queryOptimizationService->analyzeTableIndexes($table);
         }
 
         // Group recommendations by priority

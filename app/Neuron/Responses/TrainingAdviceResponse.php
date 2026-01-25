@@ -82,8 +82,8 @@ class TrainingAdviceResponse
         if (! empty($this->alternatives)) {
             $summary .= "\nAlternatives:\n";
             foreach ($this->alternatives as $alt) {
-                $training = $alt['training'] ?? 'unknown';
-                $reason = $alt['reason'] ?? 'no reason provided';
+                $training = $alt['training'];
+                $reason = $alt['reason'];
                 $summary .= "  - {$training}: {$reason}\n";
             }
         }
@@ -127,7 +127,7 @@ class TrainingAdviceResponse
 
                     break;
                 }
-                if (! is_int($value) || $value < 0) {
+                if ($value < 0) {
                     $errors['expected_gains'] = 'Stat gain values must be non-negative integers';
 
                     break;
@@ -137,16 +137,6 @@ class TrainingAdviceResponse
 
         // Validate alternatives structure
         foreach ($this->alternatives as $index => $alt) {
-            if (! is_array($alt)) {
-                $errors['alternatives'] = "Alternative at index {$index} must be an array";
-
-                break;
-            }
-            if (! isset($alt['training']) || ! isset($alt['reason'])) {
-                $errors['alternatives'] = "Alternative at index {$index} must contain 'training' and 'reason' keys";
-
-                break;
-            }
             if (! in_array(strtolower($alt['training']), $validTrainingTypes, true)) {
                 $errors['alternatives'] = "Invalid training type in alternative at index {$index}";
 

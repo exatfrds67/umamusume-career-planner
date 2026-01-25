@@ -37,9 +37,6 @@ class AgentCommunicationService
 
     /**
      * Send a message from one agent to another
-     *
-     * @param  array<string, mixed>  $payload
-     * @return array<string, mixed>
      */
     public function sendMessage(
         string $fromAgentId,
@@ -86,10 +83,6 @@ class AgentCommunicationService
 
     /**
      * Broadcast a message to multiple agents
-     *
-     * @param  array<string>  $toAgentIds
-     * @param  array<string, mixed>  $payload
-     * @return array<array<string, mixed>>
      */
     public function broadcastMessage(
         string $fromAgentId,
@@ -118,25 +111,18 @@ class AgentCommunicationService
 
     /**
      * Receive messages for an agent
-     *
-     * @return array<array<string, mixed>>
      */
     public function receiveMessages(string $agentId, int $limit = 10): array
     {
         $inbox = $this->getInbox($agentId);
 
         // Sort by priority (high to low) and timestamp
-        usort($inbox, function (array $a, array $b): int {
-            $priorityA = isset($a['priority']) && is_int($a['priority']) ? $a['priority'] : 0;
-            $priorityB = isset($b['priority']) && is_int($b['priority']) ? $b['priority'] : 0;
-            if ($priorityA === $priorityB) {
-                $createdA = isset($a['created_at']) && is_string($a['created_at']) ? $a['created_at'] : '';
-                $createdB = isset($b['created_at']) && is_string($b['created_at']) ? $b['created_at'] : '';
-
-                return strcmp($createdA, $createdB);
+        usort($inbox, function ($a, $b) {
+            if ($a['priority'] === $b['priority']) {
+                return strcmp($a['created_at'], $b['created_at']);
             }
 
-            return $priorityB - $priorityA;
+            return $b['priority'] - $a['priority'];
         });
 
         return array_slice($inbox, 0, $limit);
@@ -226,9 +212,6 @@ class AgentCommunicationService
 
     /**
      * Create a shared context for collaborative agents
-     *
-     * @param  array<string, mixed>  $initialData
-     * @return array<string, mixed>
      */
     public function createSharedContext(string $contextId, array $initialData = []): array
     {
@@ -257,12 +240,11 @@ class AgentCommunicationService
         try {
             $context = Cache::get("shared_context:{$contextId}");
 
-            if (! is_array($context)) {
+            if (! $context) {
                 throw new \RuntimeException("Shared context not found: {$contextId}");
             }
 
-            $participants = is_array($context['participants'] ?? null) ? $context['participants'] : [];
-            if (! in_array($agentId, $participants)) {
+            if (! in_array($agentId, $context['participants'])) {
                 $context['participants'][] = $agentId;
                 $context['updated_at'] = now()->toIso8601String();
 
@@ -288,8 +270,6 @@ class AgentCommunicationService
 
     /**
      * Update shared context data
-     *
-     * @param  array<string, mixed>  $updates
      */
     public function updateSharedContext(
         string $contextId,
@@ -299,17 +279,15 @@ class AgentCommunicationService
         try {
             $context = Cache::get("shared_context:{$contextId}");
 
-            if (! is_array($context)) {
+            if (! $context) {
                 throw new \RuntimeException("Shared context not found: {$contextId}");
             }
 
-            $participants = is_array($context['participants'] ?? null) ? $context['participants'] : [];
-            if (! in_array($agentId, $participants)) {
+            if (! in_array($agentId, $context['participants'])) {
                 throw new \RuntimeException("Agent not in shared context: {$agentId}");
             }
 
-            $existingData = is_array($context['data'] ?? null) ? $context['data'] : [];
-            $context['data'] = array_merge($existingData, $updates);
+            $context['data'] = array_merge($context['data'], $updates);
             $context['updated_at'] = now()->toIso8601String();
             $context['last_updated_by'] = $agentId;
 
@@ -334,19 +312,10 @@ class AgentCommunicationService
 
     /**
      * Get shared context
-     *
-     * @return array<string, mixed>|null
      */
     public function getSharedContext(string $contextId): ?array
     {
-        $context = Cache::get("shared_context:{$contextId}");
-
-        if (is_array($context)) {
-            /** @var array<string, mixed> $context */
-            return $context;
-        }
-
-        return null;
+        return Cache::get("shared_context:{$contextId}");
     }
 
     /**
@@ -357,24 +326,11 @@ class AgentCommunicationService
         return 'msg_'.uniqid().'_'.bin2hex(random_bytes(4));
     }
 
-    /**
-     * @return array<array<string, mixed>>
-     */
     protected function getInbox(string $agentId): array
     {
-        $inbox = Cache::get("agent_inbox:{$agentId}");
-
-        if (is_array($inbox)) {
-            /** @var array<array<string, mixed>> $inbox */
-            return $inbox;
-        }
-
-        return [];
+        return Cache::get("agent_inbox:{$agentId}", []);
     }
 
-    /**
-     * @param  array<string, mixed>  $message
-     */
     protected function addToInbox(string $agentId, array $message): void
     {
         $inbox = $this->getInbox($agentId);
@@ -388,9 +344,6 @@ class AgentCommunicationService
         $this->saveInbox($agentId, $inbox);
     }
 
-    /**
-     * @param  array<array<string, mixed>>  $inbox
-     */
     protected function saveInbox(string $agentId, array $inbox): void
     {
         Cache::put("agent_inbox:{$agentId}", $inbox, 3600);

@@ -128,7 +128,7 @@ class ExportController extends Controller
             if (! $result['success']) {
                 return response()->json([
                     'success' => false,
-                    'message' => $result['error'] ?? 'Download failed',
+                    'message' => 'Download failed',
                 ], 404);
             }
 

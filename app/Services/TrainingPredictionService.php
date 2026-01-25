@@ -1,205 +1,271 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Models\Character;
+use App\Models\SupportDeck;
+use App\Services\Training\SupportBonusCalculator;
 
+/**
+ * Training Prediction Service
+ *
+ * Provides training predictions with support card bonuses.
+ */
 class TrainingPredictionService
 {
+    public function __construct(
+        protected SupportBonusCalculator $bonusCalculator
+    ) {}
+
     /**
-     * Calculate projected stats gain for a specific training type.
-     * Based on URA Finale scenario baseline (approximate).
+     * Get training predictions for all facilities.
      *
-     * @param  Character  $character  The character to calculate gains for
-     * @param  string  $trainingType  'speed', 'stamina', 'power', 'guts', 'wit'
-     * @return array{stats: array<string, int>, energy: int}
+     * @return array<string, mixed>
      */
-    public function calculateGain(Character $character, string $trainingType): array
+    public function getPredictions(Character $character): array
     {
-        // Base gains for Facility Level 1
-        // Facility levels would multiply gains by (1 + level * 0.1) if implemented
-        // Character model would need facility_levels JSON field to track this
+        $activeDeck = $character->activeSupportDeck;
 
-        $gains = [
-            'speed' => 0,
-            'stamina' => 0,
-            'power' => 0,
-            'guts' => 0,
-            'wit' => 0,
-        ];
-
-        $energyCost = 0;
-
-        switch ($trainingType) {
-            case 'speed':
-                $gains['speed'] = 10;
-                $gains['power'] = 5;
-                $energyCost = -20;
-                break;
-            case 'stamina':
-                $gains['stamina'] = 10;
-                $gains['guts'] = 5;
-                $energyCost = -20;
-                break;
-            case 'power':
-                $gains['power'] = 10;
-                $gains['stamina'] = 5;
-                $energyCost = -20;
-                break;
-            case 'guts':
-                $gains['guts'] = 10;
-                $gains['speed'] = 5;
-                $gains['power'] = 2; // Small bonus sometimes?
-                $energyCost = -20;
-                break;
-            case 'wit':
-                $gains['wit'] = 10;
-                $gains['speed'] = 5;
-                $energyCost = 5; // Wit recovers energy
-                break;
-            default:
-                // Unknown type, no gains
-                break;
+        if (! $activeDeck) {
+            return $this->getBasePredictions($character);
         }
 
-        // Apply Growth Rates (e.g. +20% Speed)
-        $rawGrowthRates = $character->growth_rates;
-        /** @var array<string, int|float> $growthRates */
-        $growthRates = [];
-        if (is_string($rawGrowthRates)) {
-            $decoded = json_decode($rawGrowthRates, true);
-            $growthRates = is_array($decoded) ? $decoded : [];
-        } elseif (is_array($rawGrowthRates)) {
-            $growthRates = $rawGrowthRates;
-        }
-        foreach ($gains as $stat => $value) {
-            if ($value > 0 && isset($growthRates[$stat])) {
-                $bonus = is_numeric($growthRates[$stat]) ? (float) $growthRates[$stat] : 0;
-                $multiplier = 1 + ($bonus / 100);
-                $gains[$stat] = (int) floor($value * $multiplier);
-            }
+        return $this->getPredictionsWithSupport($character, $activeDeck);
+    }
+
+    /**
+     * Get prediction for a specific training facility.
+     *
+     * @return array<string, mixed>
+     */
+    public function getPredictionForFacility(Character $character, string $facility): array
+    {
+        $activeDeck = $character->activeSupportDeck;
+
+        if (! $activeDeck) {
+            return $this->getBasePredictionForFacility($character, $facility);
         }
 
-        // Apply Mood Multiplier
-        // Great: 1.2x, Good: 1.1x, Normal: 1.0x, Bad: 0.9x, Awful: 0.8x
-        $moodMultiifiers = [
-            'great' => 1.2,
-            'good' => 1.1,
-            'normal' => 1.0,
-            'bad' => 0.9,
-            'awful' => 0.8,
-        ];
-        $mood = $character->mood_status ?? 'normal';
-        $multiplier = $moodMultiifiers[$mood] ?? 1.0;
+        return $this->getPredictionWithSupport($character, $activeDeck, $facility);
+    }
 
-        foreach ($gains as $stat => $value) {
-            if ($value > 0) {
-                $gains[$stat] = (int) floor($value * $multiplier);
-            }
+    /**
+     * Get base predictions without support cards.
+     *
+     * @return array<string, mixed>
+     */
+    protected function getBasePredictions(Character $character): array
+    {
+        $facilities = ['speed', 'stamina', 'power', 'guts', 'wit'];
+        $predictions = [];
+
+        foreach ($facilities as $facility) {
+            $predictions[$facility] = $this->getBasePredictionForFacility($character, $facility);
         }
 
         return [
-            'stats' => $gains,
-            'energy' => $energyCost,
+            'has_support_deck' => false,
+            'predictions' => $predictions,
         ];
     }
 
     /**
-     * Calculate failure failure rate percentage based on current energy.
+     * Get predictions with support card bonuses.
      *
-     * @return int Failure rate 0-100
+     * @return array<string, mixed>
      */
-    public function calculateFailureRate(Character $character, string $trainingType = 'speed'): int
+    protected function getPredictionsWithSupport(Character $character, SupportDeck $deck): array
     {
-        // Wit training usually has lower/no failure rate for energy, but let's standardize for now.
-        // If training recovers energy (Wit), failure rate should be 0 or very low (just failing to learn).
-        if ($trainingType === 'wit') {
-            return 0; // Simplified
+        $facilities = ['speed', 'stamina', 'power', 'guts', 'wit'];
+        $predictions = [];
+
+        foreach ($facilities as $facility) {
+            $predictions[$facility] = $this->getPredictionWithSupport($character, $deck, $facility);
         }
 
-        $energy = $character->energy_level;
-
-        // Formula approximation:
-        // Energy >= 50: 0% risk
-        // Energy < 50: Risk increases as energy drops
-
-        if ($energy >= 50) {
-            return 0;
-        }
-
-        // Linear scaling from 50 down to 0
-        // 50 energy -> 0%
-        // 0 energy -> 70% risk?
-        // Risk = (50 - energy) * 1.4
-
-        $risk = (50 - $energy) * 1.4;
-
-        return min(99, max(0, (int) $risk));
+        return [
+            'has_support_deck' => true,
+            'deck_id' => $deck->id,
+            'predictions' => $predictions,
+        ];
     }
 
     /**
-     * Execute the training logic.
+     * Get base prediction for a specific facility.
      *
-     * @param  Character  $character  The character to train
-     * @param  string  $trainingType  The type of training to execute
-     * @return array<string, mixed> Result data
+     * @return array<string, mixed>
      */
-    public function executeTraining(Character $character, string $trainingType): array
+    protected function getBasePredictionForFacility(Character $character, string $facility): array
     {
-        $prediction = $this->calculateGain($character, $trainingType);
-        $failureRate = $this->calculateFailureRate($character, $trainingType);
+        $baseGains = $this->calculateBaseGains($character, $facility);
 
-        $rand = \rand(1, 100);
-        $isSuccess = $rand > $failureRate;
+        return [
+            'facility' => $facility,
+            'base_gains' => $baseGains,
+            'final_gains' => $baseGains,
+            'support_bonus' => 0,
+            'is_friendship' => false,
+            'active_cards' => [],
+        ];
+    }
 
-        $resultData = [
-            'success' => $isSuccess,
-            'failure_rate' => $failureRate,
-            'training_type' => $trainingType,
-            'gains' => [],
-            'energy_change' => 0,
+    /**
+     * Get prediction with support card bonuses for a specific facility.
+     *
+     * @return array<string, mixed>
+     */
+    protected function getPredictionWithSupport(Character $character, SupportDeck $deck, string $facility): array
+    {
+        $baseGains = $this->calculateBaseGains($character, $facility);
+        $bonuses = $this->bonusCalculator->calculateBonuses($deck, $facility);
+        $finalGains = $this->bonusCalculator->applyBonusesToGains($baseGains, $bonuses);
+
+        return [
+            'facility' => $facility,
+            'base_gains' => $baseGains,
+            'final_gains' => $finalGains,
+            'support_bonus' => $bonuses['final_bonus'],
+            'is_friendship' => $bonuses['is_friendship'],
+            'friendship_card_count' => $bonuses['friendship_card_count'],
+            'active_cards' => $bonuses['active_cards'],
+            'total_cards' => $bonuses['total_cards'],
+        ];
+    }
+
+    /**
+     * Calculate base stat gains for a facility.
+     *
+     * @return array<string, int>
+     */
+    protected function calculateBaseGains(Character $character, string $facility): array
+    {
+        // Base gains depend on facility type and character's growth rates
+        $growthRates = $character->growth_rates ?? [];
+        $baseMultiplier = 1.0;
+
+        // Apply growth rate multiplier if available
+        if (isset($growthRates[$facility]) && is_numeric($growthRates[$facility])) {
+            $baseMultiplier = (float) $growthRates[$facility];
+        }
+
+        // Define base gains per facility (these are game mechanics)
+        $facilityGains = [
+            'speed' => ['speed' => 20, 'power' => 5],
+            'stamina' => ['stamina' => 20, 'guts' => 5],
+            'power' => ['power' => 20, 'speed' => 5],
+            'guts' => ['guts' => 20, 'wit' => 5],
+            'wit' => ['wit' => 20, 'stamina' => 5],
         ];
 
-        if ($isSuccess) {
-            // Apply stats
-            $currentStats = $character->current_stats;
-            foreach ($prediction['stats'] as $stat => $gain) {
-                if ($gain > 0) {
-                    $currentStats[$stat] = min(1200, ($currentStats[$stat] ?? 0) + $gain);
-                    $resultData['gains'][$stat] = $gain;
-                }
+        $gains = $facilityGains[$facility] ?? [];
+
+        // Apply growth rate multiplier to primary stat
+        if (isset($gains[$facility])) {
+            $gains[$facility] = (int) round($gains[$facility] * $baseMultiplier);
+        }
+
+        return $gains;
+    }
+
+    /**
+     * Get recommended training facility based on character goals.
+     *
+     * @return array<string, mixed>
+     */
+    public function getRecommendedTraining(Character $character): array
+    {
+        $predictions = $this->getPredictions($character);
+        $goals = $character->goals ?? [];
+        $targetStats = $goals['target_stats'] ?? [];
+        $currentStats = $character->current_stats;
+
+        if (empty($targetStats)) {
+            // No goals set, recommend based on lowest stat
+            return $this->recommendByLowestStat($predictions, $currentStats);
+        }
+
+        // Calculate stat gaps
+        $statGaps = [];
+        foreach ($targetStats as $stat => $target) {
+            if (! is_numeric($target)) {
+                continue;
             }
-            $character->current_stats = $currentStats;
+            $current = $currentStats[$stat] ?? 0;
+            $gap = max(0, (int) $target - $current);
+            $statGaps[$stat] = $gap;
+        }
 
-            // Apply energy cost
-            // Ensure energy doesn't go below 0 or above 100
-            $energyChange = $prediction['energy'];
-            $newEnergy = $character->energy_level + $energyChange;
-            $character->energy_level = max(0, min(100, $newEnergy));
+        // Find facility that best addresses largest gap
+        return $this->recommendByStatGaps($predictions, $statGaps);
+    }
 
-            $resultData['energy_change'] = $energyChange;
-        } else {
-            // Failure!
-            // Reduced/No stats, huge mood drop, maybe condition gained.
-            // Simplified: -10 energy, -1 mood, no stats.
+    /**
+     * Recommend training based on lowest stat.
+     *
+     * @param  array<string, mixed>  $predictions
+     * @param  array<string, int>  $currentStats
+     * @return array<string, mixed>
+     */
+    protected function recommendByLowestStat(array $predictions, array $currentStats): array
+    {
+        $lowestStat = null;
+        $lowestValue = PHP_INT_MAX;
 
-            $character->energy_level = max(0, $character->energy_level - 10);
-            $resultData['energy_change'] = -10;
-
-            // Worsen mood
-            // We need CharacterStateService helper for this ideally, or logic duplicate
-            // We'll simplisticly do it here or assume controller handles it?
-            // Let's do it here.
-            $moods = ['awful', 'bad', 'normal', 'good', 'great'];
-            $currentKey = array_search($character->mood_status, $moods);
-            if ($currentKey !== false && $currentKey > 0) {
-                $character->mood_status = $moods[$currentKey - 1];
-                $resultData['mood_change'] = -1;
+        foreach ($currentStats as $stat => $value) {
+            if ($value < $lowestValue) {
+                $lowestValue = $value;
+                $lowestStat = $stat;
             }
         }
 
-        $character->save();
+        $recommendedFacility = $lowestStat ?? 'speed';
+        $prediction = $predictions['predictions'][$recommendedFacility] ?? null;
 
-        return $resultData;
+        return [
+            'recommended_facility' => $recommendedFacility,
+            'reason' => "Lowest stat: {$lowestStat} ({$lowestValue})",
+            'prediction' => $prediction,
+        ];
+    }
+
+    /**
+     * Recommend training based on stat gaps.
+     *
+     * @param  array<string, mixed>  $predictions
+     * @param  array<string, int>  $statGaps
+     * @return array<string, mixed>
+     */
+    protected function recommendByStatGaps(array $predictions, array $statGaps): array
+    {
+        // Find stat with largest gap
+        $largestGap = 0;
+        $targetStat = null;
+
+        foreach ($statGaps as $stat => $gap) {
+            if ($gap > $largestGap) {
+                $largestGap = $gap;
+                $targetStat = $stat;
+            }
+        }
+
+        if (! $targetStat) {
+            // All goals met, train lowest stat
+            return [
+                'recommended_facility' => 'speed',
+                'reason' => 'All goals met',
+                'prediction' => $predictions['predictions']['speed'] ?? null,
+            ];
+        }
+
+        $recommendedFacility = $targetStat;
+        $prediction = $predictions['predictions'][$recommendedFacility] ?? null;
+
+        return [
+            'recommended_facility' => $recommendedFacility,
+            'reason' => "Largest gap: {$targetStat} (need {$largestGap} more)",
+            'prediction' => $prediction,
+        ];
     }
 }

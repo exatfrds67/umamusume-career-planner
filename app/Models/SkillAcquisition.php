@@ -46,6 +46,21 @@ class SkillAcquisition extends Pivot
     use HasFactory;
 
     /**
+     * The primary key associated with the table.
+     */
+    protected $primaryKey = 'id';
+
+    /**
+     * Indicates if the IDs are auto-incrementing.
+     */
+    public $incrementing = true;
+
+    /**
+     * The "type" of the primary key ID.
+     */
+    protected $keyType = 'int';
+
+    /**
      * The table associated with the model.
      */
     protected $table = 'ucp_skill_acquisitions';
@@ -79,6 +94,10 @@ class SkillAcquisition extends Pivot
         'is_active',
         'acquisition_metadata',
         'is_equipped',
+        'hint_level',
+        'sp_discount_applied',
+        'sp_cost',
+        'status',
     ];
 
     /**
@@ -109,6 +128,8 @@ class SkillAcquisition extends Pivot
             'total_discount_percentage' => 'decimal:2',
             'effectiveness_rating' => 'decimal:2',
             'is_equipped' => 'boolean',
+            'hint_level' => 'integer',
+            'sp_discount_applied' => 'integer',
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
         ];

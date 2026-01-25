@@ -1,85 +1,136 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\Character;
-use App\Services\CharacterStateService;
 use App\Services\TrainingPredictionService;
-use Illuminate\Http\RedirectResponse;
+use App\Services\TrainingService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
 
+/**
+ * Training Controller
+ *
+ * Handles training predictions and execution.
+ */
 class TrainingController extends Controller
 {
     public function __construct(
-        protected TrainingPredictionService $trainingService,
-        protected CharacterStateService $stateService
+        protected TrainingPredictionService $predictionService,
+        protected TrainingService $trainingService
     ) {}
 
     /**
-     * Show the training selection screen.
+     * Get training predictions for a character.
      */
-    public function index(Character $character): View
+    public function predictions(Character $character): JsonResponse
     {
-        if ($character->user_id !== Auth::id()) {
-            abort(403);
-        }
+        $this->authorize('view', $character);
 
-        // Prepare data for the view
-        $trainingTypes = ['speed', 'stamina', 'power', 'guts', 'wit'];
-        $trainingData = [];
+        $predictions = $this->predictionService->getPredictions($character);
+        $recommended = $this->predictionService->getRecommendedTraining($character);
 
-        foreach ($trainingTypes as $type) {
-            $gains = $this->trainingService->calculateGain($character, $type);
-            $failureRate = $this->trainingService->calculateFailureRate($character, $type);
-
-            $trainingData[$type] = [
-                'gains' => $gains['stats'],
-                'energy_cost' => $gains['energy'],
-                'failure_rate' => $failureRate,
-            ];
-        }
-
-        return view('training.index', compact('character', 'trainingData'));
+        return response()->json([
+            'success' => true,
+            'character_id' => $character->id,
+            'character_name' => $character->name,
+            'current_turn' => $character->current_turn,
+            'predictions' => $predictions,
+            'recommended' => $recommended,
+        ]);
     }
 
     /**
-     * Execute a training action.
+     * Get prediction for a specific facility.
      */
-    public function store(Request $request, Character $character): RedirectResponse
+    public function facilityPrediction(Character $character, string $facility): JsonResponse
     {
-        if ($character->user_id !== Auth::id()) {
-            abort(403);
+        $this->authorize('view', $character);
+
+        $validFacilities = ['speed', 'stamina', 'power', 'guts', 'wit'];
+        if (! in_array($facility, $validFacilities, true)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid facility type',
+            ], 400);
         }
 
-        $request->validate([
-            'training_type' => 'required|in:speed,stamina,power,guts,wit',
+        $prediction = $this->predictionService->getPredictionForFacility($character, $facility);
+
+        return response()->json([
+            'success' => true,
+            'character_id' => $character->id,
+            'prediction' => $prediction,
+        ]);
+    }
+
+    /**
+     * Execute training.
+     */
+    public function execute(Request $request, Character $character): JsonResponse
+    {
+        $this->authorize('update', $character);
+
+        $validated = $request->validate([
+            'training_type' => 'required|string|in:speed,stamina,power,guts,wit',
+            'actual_gains' => 'required|array',
+            'actual_gains.speed' => 'integer|min:0',
+            'actual_gains.stamina' => 'integer|min:0',
+            'actual_gains.power' => 'integer|min:0',
+            'actual_gains.guts' => 'integer|min:0',
+            'actual_gains.wit' => 'integer|min:0',
+            'actual_gains.sp' => 'integer|min:0',
         ]);
 
-        $trainingType = $request->input('training_type');
-        $type = is_string($trainingType) ? $trainingType : 'speed';
+        $result = $this->trainingService->executeTraining(
+            $character,
+            $validated['training_type'],
+            $validated['actual_gains']
+        );
 
-        // Execute training
-        $result = $this->trainingService->executeTraining($character, $type);
+        return response()->json([
+            'success' => true,
+            'message' => 'Training completed successfully',
+            'result' => $result,
+        ]);
+    }
 
-        // Advance turn (Training consumes 1 turn)
-        $turnResult = $this->stateService->progressTurn($character);
+    /**
+     * Get character's active support deck.
+     */
+    public function deck(Character $character): JsonResponse
+    {
+        $this->authorize('view', $character);
 
-        // Build message
-        if ($result['success']) {
-            $msg = 'Training Successful! ';
-            /** @var array<string, int|float> $gains */
-            $gains = is_array($result['gains']) ? $result['gains'] : [];
-            foreach ($gains as $stat => $gain) {
-                if (is_string($stat) && (is_int($gain) || is_float($gain))) {
-                    $msg .= ucfirst($stat)."+{$gain} ";
-                }
-            }
-        } else {
-            $msg = 'Training Failed... Mood worsened and energy dropped.';
+        $activeDeck = $character->activeSupportDeck()->with('supportCards')->first();
+
+        if (! $activeDeck) {
+            return response()->json([
+                'success' => true,
+                'has_deck' => false,
+                'message' => 'No active support deck',
+            ]);
         }
 
-        return redirect()->route('training.index', $character)->with($result['success'] ? 'success' : 'error', $msg);
+        return response()->json([
+            'success' => true,
+            'has_deck' => true,
+            'deck' => [
+                'id' => $activeDeck->id,
+                'name' => $activeDeck->name,
+                'cards' => $activeDeck->supportCards->map(function ($card) {
+                    return [
+                        'id' => $card->id,
+                        'name' => $card->name_en ?? $card->title_en ?? 'Unknown',
+                        'rarity' => $card->rarity,
+                        'position' => $card->pivot->position,
+                        'bond_level' => $card->pivot->bond_level,
+                        'is_borrowed' => $card->pivot->is_borrowed,
+                    ];
+                }),
+            ],
+        ]);
     }
 }

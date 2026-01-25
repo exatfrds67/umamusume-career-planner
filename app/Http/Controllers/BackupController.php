@@ -208,7 +208,7 @@ class BackupController extends Controller
                     'success' => false,
                     'message' => 'Restore failed',
                     'errors' => $result['errors'],
-                    'warnings' => $result['warnings'] ?? [],
+                    'warnings' => $result['warnings'],
                 ], 422);
             }
 
@@ -221,7 +221,7 @@ class BackupController extends Controller
                 'message' => $message,
                 'data' => [
                     'restored_counts' => $result['restored_counts'],
-                    'warnings' => $result['warnings'] ?? [],
+                    'warnings' => $result['warnings'],
                     'dry_run' => $result['dry_run'] ?? false,
                 ],
             ]);
@@ -316,7 +316,7 @@ class BackupController extends Controller
                 'success' => true,
                 'message' => 'Backup schedule created successfully',
                 'data' => [
-                    'schedule_id' => $result['schedule_id'] ?? null,
+                    'schedule_id' => $result['schedule_id'],
                     'schedule' => $result['schedule'] ?? null,
                 ],
             ]);

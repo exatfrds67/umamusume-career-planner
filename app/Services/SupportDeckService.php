@@ -49,8 +49,8 @@ class SupportDeckService
         }
 
         // Load cards to check specialization diversity
-        /** @var array<int> $cardIds */
-        $cardIds = collect($cards)->pluck('support_card_id')->unique()->toArray();
+        /** @var array<int, int> $cardIds */
+        $cardIds = collect($cards)->pluck('support_card_id')->filter()->map(fn ($id) => is_numeric($id) ? (int) $id : 0)->filter()->unique()->toArray();
         $supportCards = SupportCardDefinition::whereIn('id', $cardIds)->get();
 
         /** @var array<int, string> $specializations */
@@ -128,7 +128,7 @@ class SupportDeckService
             ->whereIn('meta_tier', ['S+', 'S', 'A']);
 
         // If focus stat specified, prioritize those cards
-        if ($focusStat && in_array($focusStat, ['speed', 'stamina', 'power', 'guts', 'wit'])) {
+        if (is_string($focusStat) && in_array($focusStat, ['speed', 'stamina', 'power', 'guts', 'wit'], true)) {
             $query->where('card_type', $focusStat);
         }
 

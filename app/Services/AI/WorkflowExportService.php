@@ -149,11 +149,8 @@ class WorkflowExportService
             $filename = $this->saveToFile($conversation, 'json');
             $expiresAt = now()->addDays($expiresInDays);
 
-            // Generate a temporary signed URL
-            $url = Storage::disk('local')->temporaryUrl(
-                "exports/{$filename}",
-                $expiresAt
-            );
+            // Local disk doesn't support temporaryUrl, use storage path or a download route
+            $path = Storage::disk('local')->path("exports/{$filename}");
 
             Log::info('[WorkflowExport] Shareable link generated', [
                 'conversation_id' => $conversation->conversation_id,
@@ -161,7 +158,7 @@ class WorkflowExportService
             ]);
 
             return [
-                'url' => $url,
+                'path' => $path,
                 'filename' => $filename,
                 'expires_at' => $expiresAt->toIso8601String(),
             ];

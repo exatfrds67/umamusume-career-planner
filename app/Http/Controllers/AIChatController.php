@@ -125,8 +125,8 @@ class AIChatController extends Controller
                     'confidence' => $response['confidence'] ?? null,
                     'processing_time' => $response['processing_time'],
                     'tokens' => $response['tokens'] ?? null,
-                    'cost' => $response['cost'] ?? null,
-                    'tools_used' => $response['tools_used'] ?? [],
+                    'cost' => $response['cost'],
+                    'tools_used' => $response['tools_used'],
                 ],
                 'conversation_id' => $conversationId,
             ]);
@@ -475,12 +475,12 @@ class AIChatController extends Controller
                 'ai_model_used' => $response['model'],
                 'processing_time' => $response['processing_time'],
                 'tokens_used' => $response['tokens'] ?? null,
-                'cost_estimate' => $response['cost'] ?? null,
+                'cost_estimate' => $response['cost'],
                 'metadata' => json_encode([
                     'provider' => $response['provider'],
                     'agent' => $response['agent'] ?? null,
                     'confidence' => $response['confidence'] ?? null,
-                    'tools_used' => $response['tools_used'] ?? [],
+                    'tools_used' => $response['tools_used'],
                 ]),
             ]);
         } catch (\Exception $e) {
