@@ -168,7 +168,7 @@ sequenceDiagram
 │ │ [Load More] (12 of 56 shown)                                 │   │
 │ └───────────────────────────────────────────────────────────────┘   │
 │                                                                      │
-│ ┌──────────────────────────────���───────────────────────────────┐   │
+│ ┌──────────────────────────────────────────────────────────────┐   │
 │ │ Select Scenario                                               │   │
 │ │ ┌────────────────────────────────────────────────────────┐   │   │
 │ │ │ [○ URA Championship Finals]                            │   │   │
@@ -201,7 +201,7 @@ sequenceDiagram
 ├────────────────────────────────────────────────────┤
 │                                                    │
 │ Select Trainee                                     │
-│ ┌──────────────────────────────────────────────┐  │
+│ ┌��─────────────────────────────────────────────┐  │
 │ │ 🔍 Search...                                  │  │
 │ └──────────────────────────────────────────────┘  │
 │                                                    │
@@ -249,7 +249,7 @@ sequenceDiagram
 │ ┌──────────────────────────┐ │
 │ │ Mejiro Ardan             │ │
 │ │ ┌──────────────────────┐ │ │
-│ │ │    [Portrait]        │ │ │
+│ │ │    [Portrait]        �� │ │
 │ │ └──────────────────────┘ │ │
 │ │ SSR · Speed              │ │
 │ │ Speed: 90 | Sta: 70      │ │
@@ -420,7 +420,7 @@ class TraineeSelector extends Component
 ### 4.1 Desktop Layout (≥1024px)
 
 ```
-┌──────────────────────────────────────────────────────────────────────┐
+┌─────────────────��────────────────────────────────────────────────────┐
 │ Character Creation Wizard                                     [✕]    │
 ├──────────────────────────────────────────────────────────────────────┤
 │                                                                      │
@@ -436,7 +436,7 @@ class TraineeSelector extends Component
 │ │ │ ┌─────────────────────┐ │ ┌─────────────────────────┐ │   │   │
 │ │ │ │   [Portrait]        │ │ │   [Portrait]            │ │   │   │
 │ │ │ │   Kitasan Black     │ │ │   Mejiro McQueen        │ │   │   │
-│ │ │ └────��────────────────┘ │ └─────────────────────────┘ │   │   │
+│ │ │ └─────────────────────┘ │ └─────────────────────────┘ │   │   │
 │ │ │                         │                             │   │   │
 │ │ │ Name: Kitasan Black     │ Name: Mejiro McQueen        │   │   │
 │ │ │ Rarity: SSR             │ Rarity: SSR                 │   │   │
@@ -461,7 +461,7 @@ class TraineeSelector extends Component
 │ │ │ Power:   ★☆☆   (+5 from Parent A)                      │   │   │
 │ │ │ Guts:    ☆☆☆   (No bonus)                              │   │   │
 │ │ │ Wit:     ★★☆   (+12 from Parent B)                     │   │   │
-│ │ └────────────────────────────────────────────────────────┘   │   │
+│ │ └──────────────────���─────────────────────────────────────┘   │   │
 │ │                                                               │   │
 │ │ Growth Rate Bonuses:                                          │   │
 │ │ ┌────────────────────────────────────────────────────────┐   │   │
@@ -475,7 +475,7 @@ class TraineeSelector extends Component
 │ │ Aptitude Bonuses:                                             │   │
 │ │ • Mile Distance: No change (already A+)                       │   │
 │ │ • Turf Surface: +1 grade (B → A)                              │   │
-│ │ • Late Surger Style: No change (already S)                    │   │   │
+│ │ • Late Surger Style: No change (already S)                    │   │
 │ │                                                               │   │
 │ │ 💡 Tip: Choose parents with complementary factor strengths    │   │
 │ └───────────────────────────────────────────────────────────────┘   │
@@ -550,7 +550,7 @@ class TraineeSelector extends Component
 │ • Speed: ★★☆ (+12)           │
 │ • Power: ★☆☆ (+5)            │
 │                              │
-│ ─────────────────────────── │
+│ ─────────────────────────────│
 │                              │
 │ Parent B                     │
 │ ┌──────────────────────────┐ │
@@ -690,7 +690,7 @@ class FactorInheritanceService
 │ │ │ [Portrait]      │ [Portrait]      │                     │ │   │
 │ │ │ SSR · Wit       │ SSR · Guts      │ Select a friend     │ │   │
 │ │ │ Meta: A         │ Meta: B         │ support card        │ │   │
-│ │ │ LB: 3/4 ���★★☆   │ LB: 2/4 ★★☆☆   │                     │ │   │
+│ │ │ LB: 3/4 ★★★☆   │ LB: 2/4 ★★☆☆   │                     │ │   │
 │ │ │ [CHANGE]        │ [CHANGE]        │ [SELECT FRIEND]     │ │   │
 │ │ └─────────────────┴─────────────────┴─────────────────────┘ │   │
 │ └───────────────────────────────────────────────────────────────┘   │
@@ -735,7 +735,7 @@ class FactorInheritanceService
 │                                                                      │
 │ Filter: [All Types ▼] [All Rarity ▼] | Sort: [Meta Tier ▼]         │
 │                                                                      │
-│ ┌─────────────────┬──────────────��──┬─────────────────────────┐   │
+│ ┌─────────────────┬──���──────────────┬─────────────────────────┐   │
 │ │ Special Week    │ Silence Suzuka  │ Grass Wonder            │   │
 │ │ [Portrait]      │ [Portrait]      │ [Portrait]              │   │
 │ │ SSR · Friend    │ SR · Friend     │ SR · Friend             │   │
@@ -915,7 +915,7 @@ class DeckBuilder extends Component
 │ └───────────────────────────────────────────────────────────────┘   │
 │                                                                      │
 │                                    [← Back] [Create Character]      │
-└────────────────���─────────────────────────────────────────────────────┘
+└──────────────────────────────────────────────────────────────────────┘
 ```
 
 ### 6.2 Character Creation Flow
@@ -1164,4 +1164,503 @@ test('validates deck type distribution', function () {
         ['type' => 'speed', 'id' => 3],
         ['type' => 'speed', 'id' => 4], // Too many speed cards
         ['type' => 'stamina', 'id' => 5],
-        ['type' => 'frien
+        ['type' => 'friend', 'id' => 6],
+    ];
+    
+    $service = app(DeckValidationService::class);
+    $result = $service->validateDeck($deck);
+    
+    expect($result->isValid())->toBeFalse()
+        ->and($result->errors)->toContain('Too many speed cards (max 3 allowed)');
+});
+
+test('parent selection prevents same character', function () {
+    $trainee = Character::factory()->create();
+    
+    $request = CreateCharacterRequest::factory()->create([
+        'trainee_id' => $trainee->id,
+        'parent_a_id' => 1,
+        'parent_b_id' => 1, // Same as parent A
+    ]);
+    
+    expect($request->validate())->toThrow(ValidationException::class);
+});
+```
+
+### 10.2 Feature Tests
+
+**Test File**: `tests/Feature/CharacterCreationTest.php`
+
+```php
+test('complete character creation wizard flow', function () {
+    $user = User::factory()->create();
+    
+    $this->actingAs($user)
+        ->get('/characters/create')
+        ->assertOk()
+        ->assertSee('Step 1 of 4');
+    
+    // Step 1: Select trainee
+    $trainee = Character::factory()->create(['rarity' => 'SSR']);
+    
+    Livewire::actingAs($user)
+        ->test(TraineeSelector::class)
+        ->set('selectedTraineeId', $trainee->id)
+        ->set('scenarioType', 'ura_finale')
+        ->call('nextStep')
+        ->assertEmitted('stepCompleted', 1);
+    
+    // Step 2: Select parents
+    $parentA = Character::factory()->create();
+    $parentB = Character::factory()->create();
+    
+    Livewire::actingAs($user)
+        ->test(ParentSelector::class)
+        ->set('parentAId', $parentA->id)
+        ->set('parentBId', $parentB->id)
+        ->call('nextStep')
+        ->assertEmitted('stepCompleted', 2);
+    
+    // Step 3: Build support deck
+    $cards = SupportCard::factory()->count(6)->create();
+    
+    Livewire::actingAs($user)
+        ->test(DeckBuilder::class)
+        ->set('supportDeck', $cards->pluck('id')->toArray())
+        ->call('validateDeck')
+        ->assertHasNoErrors()
+        ->call('nextStep')
+        ->assertEmitted('stepCompleted', 3);
+    
+    // Step 4: Review and confirm
+    Livewire::actingAs($user)
+        ->test(ReviewConfirm::class)
+        ->call('createCharacter')
+        ->assertRedirect('/characters');
+    
+    $this->assertDatabaseHas('ucp_characters', [
+        'user_id' => $user->id,
+        'scenario_type' => 'ura_finale',
+    ]);
+});
+
+test('wizard validates deck composition', function () {
+    $user = User::factory()->create();
+    
+    // Create deck with too many of same type
+    $speedCards = SupportCard::factory()->count(4)->create(['type' => 'speed']);
+    $otherCards = SupportCard::factory()->count(2)->create(['type' => 'stamina']);
+    
+    Livewire::actingAs($user)
+        ->test(DeckBuilder::class)
+        ->set('supportDeck', [
+            ...$speedCards->pluck('id')->toArray(),
+            ...$otherCards->pluck('id')->toArray(),
+        ])
+        ->call('validateDeck')
+        ->assertHasErrors(['supportDeck' => 'Too many speed cards']);
+});
+
+test('wizard calculates factor preview correctly', function () {
+    $trainee = Character::factory()->create([
+        'base_speed' => 90,
+        'base_stamina' => 70,
+    ]);
+    
+    $parentA = Character::factory()->create();
+    $parentB = Character::factory()->create();
+    
+    // Add factors to parents
+    Factor::factory()->create([
+        'character_id' => $parentA->id,
+        'stat_type' => 'speed',
+        'star_level' => 2, // ★★☆ = +12
+    ]);
+    
+    Factor::factory()->create([
+        'character_id' => $parentB->id,
+        'stat_type' => 'stamina',
+        'star_level' => 3, // ★★★ = +21
+    ]);
+    
+    $service = app(FactorInheritanceService::class);
+    $preview = $service->calculateInheritance($trainee, $parentA, $parentB);
+    
+    expect($preview['stat_factors']['speed']['bonus'])->toBe(12)
+        ->and($preview['stat_factors']['stamina']['bonus'])->toBe(21)
+        ->and($preview['projected_stats']['speed'])->toBe(102) // 90 + 12
+        ->and($preview['projected_stats']['stamina'])->toBe(91); // 70 + 21
+});
+```
+
+### 10.3 E2E Tests (Playwright)
+
+**Test File**: `tests/e2e/character-creation-wizard.spec.js`
+
+```javascript
+import { test, expect } from '@playwright/test';
+
+test.describe('WF-002: Character Creation Wizard', () => {
+    test.beforeEach(async ({ page }) => {
+        await page.goto('/characters/create');
+    });
+    
+    test('displays step 1 with trainee selection', async ({ page }) => {
+        await expect(page.getByTestId('wizard-step-indicator')).toContainText('Step 1 of 4');
+        await expect(page.getByTestId('trainee-grid')).toBeVisible();
+        await expect(page.getByTestId('scenario-selector')).toBeVisible();
+    });
+    
+    test('allows searching and filtering trainees', async ({ page }) => {
+        // Search by name
+        await page.getByTestId('trainee-search').fill('Mejiro Ardan');
+        await expect(page.getByTestId('trainee-card-mejiro-ardan')).toBeVisible();
+        
+        // Filter by rarity
+        await page.getByTestId('filter-rarity-ssr').click();
+        const cards = page.getByTestId(/^trainee-card-/);
+        const count = await cards.count();
+        
+        for (let i = 0; i < count; i++) {
+            await expect(cards.nth(i)).toContainText('SSR');
+        }
+    });
+    
+    test('completes full wizard flow', async ({ page }) => {
+        // Step 1: Select trainee
+        await page.getByTestId('trainee-card-mejiro-ardan').click();
+        await page.getByTestId('select-trainee-mejiro-ardan').click();
+        await page.getByTestId('scenario-selector').selectOption('ura_finale');
+        await page.getByTestId('next-button').click();
+        
+        // Step 2: Select parents
+        await expect(page.getByTestId('wizard-step-indicator')).toContainText('Step 2 of 4');
+        await page.getByTestId('choose-parent-a-button').click();
+        await page.getByTestId('parent-option-kitasan-black').click();
+        await page.getByTestId('choose-parent-b-button').click();
+        await page.getByTestId('parent-option-mejiro-mcqueen').click();
+        
+        // Verify factor preview
+        await expect(page.getByTestId('factor-preview-speed')).toContainText('★★☆');
+        await expect(page.getByTestId('factor-preview-stamina')).toContainText('★★★');
+        
+        await page.getByTestId('next-button').click();
+        
+        // Step 3: Build support deck
+        await expect(page.getByTestId('wizard-step-indicator')).toContainText('Step 3 of 4');
+        
+        for (let i = 1; i <= 6; i++) {
+            await page.getByTestId(`deck-slot-${i}`).click();
+            await page.getByTestId(`card-select-${i}`).first().click();
+        }
+        
+        // Verify deck validation
+        await expect(page.getByTestId('deck-score')).toBeVisible();
+        await expect(page.getByTestId('deck-validation-success')).toBeVisible();
+        
+        await page.getByTestId('next-button').click();
+        
+        // Step 4: Review and confirm
+        await expect(page.getByTestId('wizard-step-indicator')).toContainText('Step 4 of 4');
+        await expect(page.getByTestId('review-trainee-name')).toContainText('Mejiro Ardan');
+        await expect(page.getByTestId('review-scenario')).toContainText('URA Finals');
+        
+        await page.getByTestId('create-character-button').click();
+        
+        // Verify redirect to character page
+        await expect(page).toHaveURL(/\/characters\/\d+/);
+        await expect(page.getByRole('heading')).toContainText('Mejiro Ardan');
+    });
+    
+    test('validates deck type distribution', async ({ page }) => {
+        // Navigate to step 3
+        await page.getByTestId('trainee-card-mejiro-ardan').click();
+        await page.getByTestId('select-trainee-mejiro-ardan').click();
+        await page.getByTestId('next-button').click();
+        
+        await page.getByTestId('choose-parent-a-button').click();
+        await page.getByTestId('parent-option-kitasan-black').click();
+        await page.getByTestId('choose-parent-b-button').click();
+        await page.getByTestId('parent-option-mejiro-mcqueen').click();
+        await page.getByTestId('next-button').click();
+        
+        // Try to select 4 speed cards
+        const speedCards = await page.getByTestId(/^card-select-speed-/).count();
+        for (let i = 0; i < Math.min(4, speedCards); i++) {
+            await page.getByTestId(`deck-slot-${i + 1}`).click();
+            await page.getByTestId(/^card-select-speed-/).nth(i).click();
+        }
+        
+        // Verify validation error
+        await expect(page.getByTestId('deck-validation-error')).toContainText('Too many speed cards');
+        await expect(page.getByTestId('next-button')).toBeDisabled();
+    });
+    
+    test('supports keyboard navigation', async ({ page }) => {
+        await page.keyboard.press('Tab');
+        await expect(page.getByTestId('trainee-search')).toBeFocused();
+        
+        await page.keyboard.press('Tab');
+        await expect(page.getByTestId('trainee-card-mejiro-ardan')).toBeFocused();
+        
+        await page.keyboard.press('Enter');
+        await expect(page.getByTestId('trainee-card-mejiro-ardan')).toHaveAttribute('aria-selected', 'true');
+    });
+    
+    test('allows navigation back through wizard steps', async ({ page }) => {
+        // Complete step 1
+        await page.getByTestId('trainee-card-mejiro-ardan').click();
+        await page.getByTestId('select-trainee-mejiro-ardan').click();
+        await page.getByTestId('next-button').click();
+        
+        // Go to step 2
+        await expect(page.getByTestId('wizard-step-indicator')).toContainText('Step 2 of 4');
+        
+        // Click back
+        await page.getByTestId('back-button').click();
+        
+        // Verify back at step 1 with selections preserved
+        await expect(page.getByTestId('wizard-step-indicator')).toContainText('Step 1 of 4');
+        await expect(page.getByTestId('trainee-card-mejiro-ardan')).toHaveAttribute('aria-selected', 'true');
+    });
+});
+```
+
+### 10.4 Accessibility Tests
+
+**Test File**: `tests/e2e/accessibility/character-creation-wizard.spec.js`
+
+```javascript
+import { test, expect } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
+
+test.describe('WF-002: Accessibility', () => {
+    test('step 1 has no accessibility violations', async ({ page }) => {
+        await page.goto('/characters/create');
+        
+        const accessibilityScanResults = await new AxeBuilder({ page })
+            .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+            .analyze();
+        
+        expect(accessibilityScanResults.violations).toEqual([]);
+    });
+    
+    test('step 2 parent selection is accessible', async ({ page }) => {
+        await page.goto('/characters/create');
+        
+        // Navigate to step 2
+        await page.getByTestId('trainee-card-mejiro-ardan').click();
+        await page.getByTestId('select-trainee-mejiro-ardan').click();
+        await page.getByTestId('next-button').click();
+        
+        const accessibilityScanResults = await new AxeBuilder({ page })
+            .withTags(['wcag2a', 'wcag2aa'])
+            .analyze();
+        
+        expect(accessibilityScanResults.violations).toEqual([]);
+    });
+    
+    test('supports screen reader announcements', async ({ page }) => {
+        await page.goto('/characters/create');
+        
+        // Check for live region
+        const liveRegion = page.locator('[aria-live="polite"]');
+        await expect(liveRegion).toBeAttached();
+        
+        // Select trainee
+        await page.getByTestId('trainee-card-mejiro-ardan').click();
+        await page.getByTestId('select-trainee-mejiro-ardan').click();
+        
+        // Verify announcement
+        await expect(liveRegion).toContainText('Mejiro Ardan selected');
+        
+        // Proceed to next step
+        await page.getByTestId('next-button').click();
+        
+        // Verify step announcement
+        await expect(liveRegion).toContainText('Step 2 of 4');
+    });
+    
+    test('all interactive elements have accessible names', async ({ page }) => {
+        await page.goto('/characters/create');
+        
+        const buttons = page.getByRole('button');
+        const count = await buttons.count();
+        
+        for (let i = 0; i < count; i++) {
+            const name = await buttons.nth(i).getAttribute('aria-label');
+            const text = await buttons.nth(i).textContent();
+            
+            expect(name || text).toBeTruthy();
+        }
+    });
+    
+    test('form inputs have associated labels', async ({ page }) => {
+        await page.goto('/characters/create');
+        
+        const searchInput = page.getByTestId('trainee-search');
+        const labelledBy = await searchInput.getAttribute('aria-label');
+        
+        expect(labelledBy).toBe('Search trainee characters');
+    });
+    
+    test('error messages are announced', async ({ page }) => {
+        await page.goto('/characters/create');
+        
+        // Navigate to step 3
+        await page.getByTestId('trainee-card-mejiro-ardan').click();
+        await page.getByTestId('select-trainee-mejiro-ardan').click();
+        await page.getByTestId('next-button').click();
+        
+        await page.getByTestId('choose-parent-a-button').click();
+        await page.getByTestId('parent-option-kitasan-black').click();
+        await page.getByTestId('choose-parent-b-button').click();
+        await page.getByTestId('parent-option-mejiro-mcqueen').click();
+        await page.getByTestId('next-button').click();
+        
+        // Try to proceed without full deck
+        await page.getByTestId('next-button').click();
+        
+        // Verify error announcement
+        const errorRegion = page.locator('[aria-live="assertive"]');
+        await expect(errorRegion).toContainText('Deck must contain exactly 6 cards');
+    });
+});
+```
+
+### 10.5 Visual Regression Tests
+
+**Test File**: `tests/e2e/visual/character-creation-wizard.spec.js`
+
+```javascript
+import { test, expect } from '@playwright/test';
+
+test.describe('WF-002: Visual Regression', () => {
+    test('step 1 matches snapshot', async ({ page }) => {
+        await page.goto('/characters/create');
+        await expect(page).toHaveScreenshot('step-1-trainee-selection.png');
+    });
+    
+    test('step 2 factor preview matches snapshot', async ({ page }) => {
+        await page.goto('/characters/create');
+        
+        // Navigate to step 2
+        await page.getByTestId('trainee-card-mejiro-ardan').click();
+        await page.getByTestId('select-trainee-mejiro-ardan').click();
+        await page.getByTestId('next-button').click();
+        
+        await page.getByTestId('choose-parent-a-button').click();
+        await page.getByTestId('parent-option-kitasan-black').click();
+        await page.getByTestId('choose-parent-b-button').click();
+        await page.getByTestId('parent-option-mejiro-mcqueen').click();
+        
+        // Take snapshot of factor preview
+        const preview = page.getByTestId('factor-preview-panel');
+        await expect(preview).toHaveScreenshot('factor-preview.png');
+    });
+    
+    test('step 3 deck builder matches snapshot', async ({ page }) => {
+        await page.goto('/characters/create');
+        
+        // Navigate to step 3
+        await page.getByTestId('trainee-card-mejiro-ardan').click();
+        await page.getByTestId('select-trainee-mejiro-ardan').click();
+        await page.getByTestId('next-button').click();
+        
+        await page.getByTestId('choose-parent-a-button').click();
+        await page.getByTestId('parent-option-kitasan-black').click();
+        await page.getByTestId('choose-parent-b-button').click();
+        await page.getByTestId('parent-option-mejiro-mcqueen').click();
+        await page.getByTestId('next-button').click();
+        
+        await expect(page).toHaveScreenshot('step-3-deck-builder.png');
+    });
+    
+    test('step 4 review matches snapshot', async ({ page }) => {
+        await page.goto('/characters/create');
+        
+        // Complete all steps
+        await page.getByTestId('trainee-card-mejiro-ardan').click();
+        await page.getByTestId('select-trainee-mejiro-ardan').click();
+        await page.getByTestId('next-button').click();
+        
+        await page.getByTestId('choose-parent-a-button').click();
+        await page.getByTestId('parent-option-kitasan-black').click();
+        await page.getByTestId('choose-parent-b-button').click();
+        await page.getByTestId('parent-option-mejiro-mcqueen').click();
+        await page.getByTestId('next-button').click();
+        
+        for (let i = 1; i <= 6; i++) {
+            await page.getByTestId(`deck-slot-${i}`).click();
+            await page.getByTestId(`card-select-${i}`).first().click();
+        }
+        await page.getByTestId('next-button').click();
+        
+        await expect(page).toHaveScreenshot('step-4-review.png');
+    });
+    
+    test('mobile layout matches snapshot', async ({ page }) => {
+        await page.setViewportSize({ width: 375, height: 667 });
+        await page.goto('/characters/create');
+        
+        await expect(page).toHaveScreenshot('step-1-mobile.png');
+    });
+});
+```
+
+---
+
+## 11. Related Documentation
+
+### 11.1 Product Requirements
+
+- [PRD-001: Character Management](../prds/PRD-001_Character_Management.md)
+- [PRD-005: Support Card Management](../prds/PRD-005_Support_Card_Management.md)
+
+### 11.2 Technical Specifications
+
+- [SPEC-001: Character Management Technical](../specs/SPEC-001_Character_Management_Technical.md)
+- [SPEC-005: Support Card Management Technical](../specs/SPEC-005_Support_Card_Management_Technical.md)
+
+### 11.3 Flow Documentation
+
+- [FLOW-001: Character Management System](../flows/FLOW-001_Character_Management_System.md)
+- [TECH-FLOW-001: Character Management Flow](../tech-flow/TECH-FLOW-001_Character_Management_Flow.md)
+
+### 11.4 Sequence Diagrams
+
+- [SEQ-001: Character Creation Sequence](../sequences/SEQ-001_Character_Creation_Sequence.md)
+- [SEQ-005: Support Card Upgrade](../sequences/SEQ-005_Support_Card_Upgrade.md)
+
+### 11.5 User Flow Diagrams
+
+- [UF-002: Career Setup Flow](../user-flows/UF-002_Career_Setup_Flow.md)
+- [UF-006: Support Deck Building Flow](../user-flows/UF-006_Support_Deck_Building_Flow.md)
+
+---
+
+## 12. Version History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 2.0.0 | 2026-01-24 | Development Team | Complete wireframe specification with testing requirements, accessibility guidelines, and performance targets aligned with v2.0.0 implementation |
+| 1.0.0 | 2026-01-14 | Development Team | Initial wireframe specification |
+
+---
+
+## 13. Notes
+
+**Implementation Status**: ✅ Complete
+
+**Known Issues**: None
+
+**Future Enhancements**:
+
+- Drag-and-drop support deck building
+- Advanced deck synergy visualization
+- Character comparison tool before final selection
+- Saved deck templates for quick setup
+
+---
+
+*This wireframe specification reflects the current implementation of the Character Creation Wizard and serves as the authoritative reference for UI/UX development and testing.*

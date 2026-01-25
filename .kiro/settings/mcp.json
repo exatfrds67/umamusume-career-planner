@@ -30,7 +30,10 @@
         "browser-logs",
         "search-docs",
         "database-query",
-        "get-config"
+        "get-config",
+        "read-log-entries",
+        "list-artisan-commands",
+        "application-info"
       ]
     },
     "memory": {

@@ -1,11 +1,37 @@
-# Requirements Document: Umamusume Career Planner v2.1.0
+# Software Requirements Specification (SRS)
+
+## Umamusume Pretty Derby Career Planner
 
 **Document Version**: 2.1.0  
-**Date**: January 23, 2026  
+**Date**: January 25, 2026  
 **Project**: UmamusumeCareerPlanner  
-**Status**: Active - Requirements Definition  
-**Standard**: IEEE 29148-2018  
-**Related Documents**: SDP v2.1, BRS v2.1, SRS v2.1, SDS v2.1, SPEC-001 to SPEC-007
+**Author**: Development Team  
+**Status**: Current - Aligned with v2.0.0/v2.1.0 Implementation
+
+---
+
+## Document Control
+
+### Version History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 2.1.0 | 2026-01-25 | Development Team | Comprehensive update aligned with v2.0.0 implementation and v2.1.0 enhancements; integrated all documentation sources (BRS, SRS, IVM, RTM, PRDs, SPECs, FLOWs); added complete traceability matrix; updated requirements with implementation evidence |
+| 2.0.0 | 2026-01-23 | Development Team | Initial v2.0 requirements |
+| 1.0.0 | 2026-01-14 | Development Team | Initial draft |
+
+### Related Documents
+
+| Document | Reference | Purpose |
+|----------|-----------|---------|
+| **Business Requirements** | [002_BRS](../../docs/00-core-docs/002_BRS_Business_Requirements_Specifications.md) | Business objectives and scope |
+| **Software Requirements** | [003_SRS](../../docs/00-core-docs/003_SRS_Software_Requirement_Specifications.md) | Detailed functional requirements |
+| **Software Design** | [004_SDS](../../docs/00-core-docs/004_SDS_Software_Design_Specifications.md) | Technical architecture |
+| **Database Documentation** | [009_DBD](../../docs/00-core-docs/009_DBD_Database_Documentation.md) | Database schema |
+| **Source Code Documentation** | [010_SCD](../../docs/00-core-docs/010_SCD_Source_Code_Documentation.md) | Code structure |
+| **Implementation Verification** | [000_IVM](../../docs/00-core-docs/000_IMPLEMENTATION_VERIFICATION_MATRIX.md) | Implementation status |
+| **Requirements Traceability** | [000_RTM](../../docs/00-core-docs/000_REQUIREMENTS_TRACEABILITY_MATRIX.md) | Requirements mapping |
+| **Master Glossary** | [000_MASTER_GLOSSARY](../../docs/00-core-docs/000_MASTER_GLOSSARY.md) | Terminology reference |
 
 ---
 
@@ -14,15 +40,13 @@
 1. [Introduction](#1-introduction)
 2. [System Overview](#2-system-overview)
 3. [Glossary](#3-glossary)
-4. [Performance Optimization Requirements](#4-performance-optimization-requirements)
-5. [Accessibility Requirements](#5-accessibility-requirements)
-6. [Progressive Web App Requirements](#6-progressive-web-app-requirements)
-7. [Advanced Features Requirements](#7-advanced-features-requirements)
-8. [Testing Requirements](#8-testing-requirements)
-9. [Security Requirements](#9-security-requirements)
-10. [Non-Functional Requirements](#10-non-functional-requirements)
-11. [Traceability Matrix](#11-traceability-matrix)
-12. [Verification and Validation](#12-verification-and-validation)
+4. [Functional Requirements](#4-functional-requirements)
+5. [Non-Functional Requirements](#5-non-functional-requirements)
+6. [Interface and Integration Requirements](#6-interface-and-integration-requirements)
+7. [Data Requirements](#7-data-requirements)
+8. [Constraints and Assumptions](#8-constraints-and-assumptions)
+9. [Traceability Matrix](#9-traceability-matrix)
+10. [Verification and Validation](#10-verification-and-validation)
 
 ---
 
@@ -30,40 +54,93 @@
 
 ### 1.1 Purpose
 
-This Requirements Document specifies the functional and non-functional requirements for the Umamusume Career Planner v2.1.0 release. This version focuses on performance optimization, complete accessibility compliance, enhanced PWA capabilities, and advanced analytics features building upon the solid v2.0.0 foundation.
+This Software Requirements Specification (SRS) defines the complete set of requirements for the Umamusume Pretty Derby Career Planner application, version 2.1.0. It serves as the authoritative reference for:
+
+- System capabilities and features
+- Technical constraints and performance targets
+- Interface specifications and integration points
+- Data requirements and validation rules
+- Verification and acceptance criteria
+
+This document translates business requirements from the BRS into specific, testable technical requirements and provides comprehensive traceability to implementation artifacts.
 
 ### 1.2 Scope
 
-**v2.0.0 Implemented Features:**
+The Umamusume Career Planner is a comprehensive web application that enables players of Uma Musume: Pretty Derby to:
 
-- ✅ Complete character management system with stats, aptitudes, and factors
-- ✅ Training optimization with Neuron AI framework
-- ✅ Race strategy system with performance predictions
-- ✅ Comprehensive skill management with SP optimization
-- ✅ Support card deck management with synergy scoring
-- ✅ Hybrid AI routing (Ollama + AWS Bedrock)
-- ✅ OCR pipeline with Tesseract and OpenCV
-- ✅ Complete data management (import/export/migration/backup)
-- ✅ PWA foundation with service workers and offline capabilities
-- ✅ Laravel Sanctum v4 authentication
-- ✅ Comprehensive testing framework (Pest v4, Playwright)
+- **Track and manage** character training progression across multiple career runs
+- **Plan and optimize** skill acquisitions and race strategies with AI-powered recommendations
+- **Analyze performance** with predictive analytics and historical data
+- **Import and export** training records in multiple formats
+- **Access data** across devices (Account mode) or offline (Local mode)
+- **Receive intelligent advisory** for optimal training decisions
 
-**v2.1.0 Enhancement Objectives:**
+**Technology Stack:**
 
-- 📋 **Performance**: Advanced caching, query optimization, Core Web Vitals compliance
-- 📋 **Accessibility**: Complete WCAG 2.2 AA compliance with comprehensive keyboard navigation
-- 📋 **PWA**: Enhanced offline functionality, background sync, push notifications
-- 📋 **Analytics**: Batch simulation, pattern recognition, advanced reporting
-- 📋 **Testing**: Property-based testing, performance benchmarking, security audits
+- **Backend**: Laravel 12+ (PHP 8.2+)
+- **Frontend**: Livewire 3, Alpine.js, Tailwind CSS v4
+- **Build Tool**: Vite 7
+- **Database**: MySQL 8.0+, MariaDB 10.5+, SQLite (dev/test)
+- **Cache/Queue**: Redis (optional)
+- **AI**: Ollama (local) + AWS Bedrock (cloud fallback)
+- **Testing**: Pest 4.0+, Playwright
 
-### 1.3 Document Conventions
+### 1.3 Conventions
 
-| Priority | Description | Response Time |
-|----------|-------------|---------------|
-| P0 (Critical) | System-critical functionality | Immediate |
-| P1 (High) | Core user experience features | Within sprint |
-| P2 (Medium) | Enhanced capabilities | Next release |
-| P3 (Low) | Future enhancements | Backlog |
+#### 1.3.1 Requirement Format
+
+Each requirement follows this structure:
+
+- **ID**: Unique identifier (e.g., FR-02.1, NFR-P-01)
+- **Title**: Short descriptive name
+- **Description**: Clear statement of requirement
+- **Priority**: P0 (Critical), P1 (High), P2 (Medium), P3 (Low)
+- **Status**: Implemented, In Progress, Planned
+- **Source**: Reference to source document (BR-X, FR-X, PRD-00X)
+- **Evidence**: Implementation reference (SPEC-00X §Y.Z, FLOW-00X, code path)
+- **Acceptance Criteria**: Testable conditions (WHEN/THEN format)
+- **Test Cases**: Reference to test case IDs
+- **Related Artifacts**: Links to PRD, SPEC, FLOW, SEQ, TECH-FLOW, WF
+
+#### 1.3.2 Priority Levels
+
+| Priority | Description | Examples |
+|----------|-------------|----------|
+| **P0 (Critical)** | Core functionality required for MVP launch | Character CRUD, Training predictions, Race management |
+| **P1 (High)** | Important features for complete user experience | AI advisory, OCR processing, Export functionality |
+| **P2 (Medium)** | Enhanced features for power users | Advanced analytics, Batch operations |
+| **P3 (Low)** | Future enhancements | Community features, Advanced AI fine-tuning |
+
+#### 1.3.3 Status Indicators
+
+| Status | Icon | Description |
+|--------|------|-------------|
+| **Implemented** | ✅ | Fully implemented, tested, and verified |
+| **In Progress** | 🔄 | Partially implemented or under active development |
+| **Planned** | ⏳ | Not yet started, planned for future phase |
+
+#### 1.3.4 Requirement Notation
+
+- **SHALL**: Mandatory requirement
+- **SHOULD**: Recommended requirement
+- **MAY**: Optional requirement
+- **WHEN**: Condition trigger
+- **THEN**: Expected outcome
+
+### 1.4 Document Organization
+
+This document is organized into the following sections:
+
+1. **Introduction**: Purpose, scope, and conventions
+2. **System Overview**: Context, architecture, and user classes
+3. **Glossary**: Project-specific terminology
+4. **Functional Requirements**: Feature-specific requirements (FR-01 through FR-12)
+5. **Non-Functional Requirements**: Performance, security, accessibility, etc.
+6. **Interface/Integration Requirements**: API, AI, MCP, OCR, WebSocket
+7. **Data Requirements**: Entities, validation, retention
+8. **Constraints and Assumptions**: Technical and business constraints
+9. **Traceability Matrix**: BR → FR → SPEC → PRD → Implementation
+10. **Verification and Validation**: Test criteria and acceptance testing
 
 ---
 
@@ -71,1351 +148,2197 @@ This Requirements Document specifies the functional and non-functional requireme
 
 ### 2.1 System Context
 
-The Umamusume Career Planner is a comprehensive Laravel 12 web application that provides intelligent career planning assistance for Uma Musume: Pretty Derby players. The v2.1.0 release enhances the existing system with performance optimizations, complete accessibility compliance, and advanced analytics capabilities.
-
-**System Architecture Overview:**
-
+```mermaid
+flowchart TB
+    subgraph External[External Systems]
+        Game[Uma Musume Game]
+        UmapyoiAPI[umapyoi.net API]
+        UmamusumeDB[UmamusumeDB.com]
+        OllamaLocal[Ollama Local AI]
+        AWSBedrock[AWS Bedrock]
+    end
+    
+    subgraph System[Umamusume Career Planner]
+        WebUI[Web Interface]
+        API[API Layer]
+        Services[Service Layer]
+        Database[(Database)]
+        Cache[(Redis Cache)]
+    end
+    
+    subgraph Users[User Classes]
+        Player[Players]
+        PowerUser[Power Users]
+        ContentCreator[Content Creators]
+    end
+    
+    Game -.screenshots.-> WebUI
+    Player --> WebUI
+    PowerUser --> WebUI
+    PowerUser --> API
+    ContentCreator --> WebUI
+    
+    WebUI --> Services
+    API --> Services
+    Services --> Database
+    Services --> Cache
+    Services --> UmapyoiAPI
+    Services --> UmamusumeDB
+    Services --> OllamaLocal
+    Services -.fallback.-> AWSBedrock
 ```
 
-┌─────────────────────────────────────────────────────────────────┐
-│                         Browser Layer                            │
-│  Alpine.js + Livewire Client + Service Worker + IndexedDB       │
-└───────────────────────────┬─────────────────────────────────────┘
-                            │ HTTPS + WebSocket
-┌───────────────────────────┴─────────────────────────────────────┐
-│                         Application Layer                        │
-│  Laravel 12 + Livewire 3 + Neuron AI + MCP Integration         │
-└───────────────────────────┬─────────────────────────────────────┘
-                            │
-┌───────────────────────────┴─────────────────────────────────────┐
-│                         Data Layer                               │
-│  MySQL 8.0+ + Redis 6.0+ + File Storage                         │
-└─────────────────────────────────────────────────────────────────┘
+### 2.2 System Architecture
 
-```
+The system follows a layered architecture:
 
-### 2.2 User Classes
+1. **Presentation Layer**: Blade templates, Livewire components, Alpine.js
+2. **Application Layer**: Controllers, Form Requests, Livewire actions
+3. **Domain Layer**: Eloquent models, Enums, business rules
+4. **Infrastructure Layer**: Database, Redis, External APIs, AI services
 
-| User Class | Description | Access Level | v2.1.0 Enhancements |
-|------------|-------------|--------------|---------------------|
-| Free User | Unauthenticated player | Local storage only | Enhanced offline capabilities, PWA features |
-| Registered User | Authenticated player | Full cloud sync | Advanced analytics, batch simulation |
-| Power User | High-frequency user | All features + beta | Performance monitoring, export enhancements |
-| Administrator | System admin | Full system access | APM dashboards, cache management |
+**Key Architectural Patterns:**
+
+- Service Layer for business logic
+- Repository Pattern for data access
+- Form Request Validation
+- Enum-Based Status Management
+- Circuit Breaker for external APIs
+- Hybrid AI Routing (local + cloud)
+
+### 2.3 User Classes
+
+| User Class | Description | Key Needs |
+|------------|-------------|-----------|
+| **Casual Players** | Players tracking 1-5 career runs | Simple interface, quick plan creation, basic recommendations |
+| **Intermediate Players** | Players optimizing for A+ grades | Training predictions, race strategy, skill optimization |
+| **Power Users** | Players managing 10+ runs, analyzing patterns | Advanced analytics, batch operations, data export |
+| **Content Creators** | Players sharing strategies and guides | Export functionality, shareable formats, OCR import |
+| **Accessibility Users** | Players requiring assistive technologies | WCAG AA compliance, keyboard navigation, screen reader support |
+
+### 2.4 Operating Environment
+
+**Client Requirements:**
+
+- Modern web browser (Chrome, Firefox, Safari, Edge - last 2 versions)
+- JavaScript enabled
+- localStorage support (for Local mode)
+- Minimum 1024x768 resolution (responsive down to 320px)
+
+**Server Requirements:**
+
+- PHP 8.2+ with required extensions
+- MySQL 8.0+ or MariaDB 10.5+ or SQLite
+- Redis (optional, recommended for production)
+- Sufficient disk space for database and uploads
+
+**Network Requirements:**
+
+- Internet connection for Account mode operations
+- Internet connection for external API sync
+- Internet connection for cloud AI (AWS Bedrock)
+- Offline functionality available for Local mode
 
 ---
 
 ## 3. Glossary
 
+For complete terminology definitions, refer to [000_MASTER_GLOSSARY.md](../../docs/00-core-docs/000_MASTER_GLOSSARY.md).
+
+### 3.1 Core Game Terms
+
 | Term | Definition |
 |------|------------|
-| **Performance_Optimization** | Systematic improvements to application speed, responsiveness, and resource utilization through caching, query optimization, and code splitting |
-| **Cache_Strategy** | Intelligent data caching mechanisms using Redis with tiered approach (L1 memory, L2 Redis) to reduce database queries and API calls |
-| **Query_Optimization** | Database query improvements including strategic indexing, eager loading prevention of N+1 queries, and query result caching |
-| **APM** | Application Performance Monitoring system that tracks metrics (response time, throughput, error rates), identifies bottlenecks, and provides observability |
-| **Core_Web_Vitals** | Google's performance metrics: LCP (Largest Contentful Paint < 2.5s), INP (Interaction to Next Paint < 200ms), CLS (Cumulative Layout Shift < 0.1) |
-| **WCAG_2.2_AA** | Web Content Accessibility Guidelines Level AA compliance ensuring accessibility for users with disabilities through proper semantics, keyboard navigation, and screen reader support |
-| **Keyboard_Navigation** | Complete application functionality accessible via keyboard without mouse: Tab/Shift+Tab navigation, Enter/Space activation, Escape dismissal, Arrow key controls |
-| **Screen_Reader** | Assistive technology that reads interface content aloud for visually impaired users (NVDA, JAWS, VoiceOver, TalkBack) |
-| **ARIA** | Accessible Rich Internet Applications attributes (roles, states, properties) that enhance semantic meaning for assistive technologies |
-| **Focus_Management** | Proper handling of keyboard focus: visible indicators (3:1 contrast), focus trapping in modals, logical tab order, skip links |
-| **Color_Contrast** | Sufficient contrast ratios: 4.5:1 for normal text, 3:1 for large text (18pt+ or 14pt+ bold), 3:1 for UI components |
-| **PWA** | Progressive Web App with native-like capabilities: offline functionality, installability, push notifications, background sync |
-| **Service_Worker** | Background script enabling offline functionality through intelligent caching strategies, request interception, and background operations |
-| **Background_Sync** | Queue operations when offline and automatically sync when connection is restored without user intervention |
-| **Offline_Route** | Application routes that function without internet connectivity using cached data and IndexedDB storage |
-| **Install_Prompt** | Native browser prompt allowing users to install the web app to their device home screen or desktop |
-| **Push_Notification** | System notifications for race reminders, training alerts, and important updates delivered via service worker |
-| **Batch_Simulation** | Feature allowing users to test multiple training scenarios simultaneously with comparison analytics |
-| **Prediction_Model_Retraining** | AI model improvement based on historical accuracy data collected from actual vs. predicted outcomes |
-| **Advanced_Analytics** | Enhanced career comparison, pattern recognition in successful builds, and performance insights with trend analysis |
-| **Export_Enhancement** | Improved export formats including PDF reports with charts, shareable links with privacy controls, and Excel with formulas |
-| **Property_Based_Testing** | Advanced testing methodology using Pest v4 that validates properties (invariants) across automatically generated test inputs |
-| **Browser_Testing** | End-to-end testing using Playwright for real browser interaction validation across Chrome, Firefox, Safari, and Edge |
-| **Code_Coverage** | Percentage of codebase exercised by automated tests (target >80% overall, >90% for critical paths) |
-| **Performance_Testing** | Load testing and benchmarking to ensure system meets performance targets under various load conditions |
-| **Security_Audit** | Comprehensive security review including penetration testing, vulnerability scanning, and dependency analysis |
-| **Code_Splitting** | Breaking JavaScript bundles into smaller chunks loaded on demand to reduce initial bundle size |
-| **Lazy_Loading** | Deferring loading of non-critical resources (images, components) until needed to improve initial load time |
-| **Asset_Optimization** | Compression, minification, and optimization of images (WebP format), CSS (PurgeCSS), and JavaScript (tree shaking) |
-| **Database_Indexing** | Strategic database indexes on foreign keys, frequently queried columns, and composite indexes for common query patterns |
-| **Connection_Pooling** | Reusing database connections to reduce connection overhead and improve throughput |
-| **Rate_Limiting** | Throttling API requests (100 req/min per IP) to prevent abuse and ensure fair resource allocation |
-| **Circuit_Breaker** | Pattern preventing cascading failures by failing fast when external services are unavailable |
-| **Fallback_Strategy** | Graceful degradation when primary services are unavailable: serve stale cache, use local models, display cached UI |
-| **Error_Boundary** | Component that catches JavaScript errors and displays fallback UI instead of white screen |
-| **Accessibility_Testing** | Automated testing using axe-core and manual testing with NVDA, JAWS, VoiceOver to ensure WCAG compliance |
-| **Visual_Regression** | Automated screenshot comparison using Playwright to detect unintended UI changes across releases |
-| **Responsive_Design** | Interface adaptation across device sizes from 320px (mobile) to 2560px (desktop) viewports with touch-friendly targets (44px minimum) |
+| **Uma Musume** | Horse girl characters that players train in the game |
+| **Career Run / Plan** | A single career mode progression tracking a character's training |
+| **Stats** | Five core attributes: Speed (0-1200), Stamina (0-1200), Power (0-1200), Guts (0-1200), Wit (0-1200) |
+| **Aptitudes** | Fixed talent ratings (G through SS) for distance, surface, and running style |
+| **Factors** | Inherited traits from parent characters providing stat/aptitude bonuses |
+| **Growth Rates** | Inherited bonuses (+10%, +20%, +30%) multiplying training effectiveness |
+| **Skill Points (SP)** | Currency earned from races/events, spent to acquire skills |
+| **Skill Hints** | Unlocked opportunities reducing SP cost by 20% per hint (40% max) |
+| **Support Cards** | Cards providing bonuses and events during training (6-card deck) |
+| **Bond Level** | Friendship level with support cards (0-100%) |
+
+### 3.2 Application Terms
+
+| Term | Definition |
+|------|------------|
+| **Local Mode** | Browser localStorage-based storage (UUID identifiers, offline-capable) |
+| **Account Mode** | Database-backed cloud storage (integer IDs, requires connectivity) |
+| **Storage Badge** | Visual indicator showing current storage mode (Local/Account) |
+| **Draft** | Auto-saved temporary state stored in localStorage |
+| **Canonical Field Names** | Official database column names (e.g., `total_sp_available`, `turn_number`) |
+| **Training Prediction** | AI-powered forecast of stat gains from training options |
+| **Race Readiness** | Calculated score indicating character preparedness for a race |
+| **Skill Evolution** | System where Normal skills upgrade to Rare counterparts |
+
+### 3.3 Technical Terms
+
+| Term | Definition |
+|------|------------|
+| **Livewire** | Laravel's full-stack framework for reactive UI components |
+| **Alpine.js** | Lightweight JavaScript framework for client-side interactivity |
+| **Eloquent** | Laravel's ORM for database interactions |
+| **Service Layer** | Business logic abstraction between controllers and models |
+| **Circuit Breaker** | Pattern preventing cascading failures in external API calls |
+| **Hybrid AI** | Architecture using local Ollama + cloud AWS Bedrock fallback |
+| **MCP** | Model Context Protocol for AI tool integration |
+| **OCR** | Optical Character Recognition for screenshot data extraction |
+| **PWA** | Progressive Web App with offline capabilities |
+| **WCAG AA** | Web Content Accessibility Guidelines Level AA compliance |
+
+### 3.4 Acronyms
+
+| Acronym | Full Term |
+|---------|-----------|
+| **AI** | Artificial Intelligence |
+| **API** | Application Programming Interface |
+| **APM** | Application Performance Monitoring |
+| **CRUD** | Create, Read, Update, Delete |
+| **CSV** | Comma-Separated Values |
+| **JSON** | JavaScript Object Notation |
+| **MCP** | Model Context Protocol |
+| **OCR** | Optical Character Recognition |
+| **PWA** | Progressive Web App |
+| **SP** | Skill Point |
+| **TTL** | Time To Live |
+| **UUID** | Universally Unique Identifier |
+| **WCAG** | Web Content Accessibility Guidelines |
 
 ---
 
-## 4. Performance Optimization Requirements
+## 4. Functional Requirements
 
-### Requirement 1: Advanced Cache Optimization System
+### 4.1 Authentication and Profile Management [FR-01]
 
-**User Story:** As a system administrator, I want intelligent caching strategies with Redis, so that the application delivers fast response times and reduces database load through efficient data caching.
+**Description:** User authentication and profile management capabilities for Account mode.
 
-**Priority:** P0 (Critical)  
-**Category:** Non-Functional / Performance  
-**Source:** SDP Phase 5, SRS Performance Requirements, SPEC-002  
-**Version:** v2.1.0  
-**Status:** 📋 Planned
+**Source:** BR-8 (BRS §4.8), SRS §2.1  
+**Priority:** P0  
+**Status:** ✅ Implemented  
+**Evidence:** `app/Http/Controllers/Auth`, `config/sanctum.php`, SRS §2.1
+
+#### Requirements
+
+| ID | Requirement | Priority | Status | Test Coverage |
+|----|-------------|----------|--------|---------------|
+| FR-01.1 | System SHALL support user registration with email verification | P0 | ✅ | 95% |
+| FR-01.2 | System SHALL support login with "Remember Me" functionality | P0 | ✅ | 95% |
+| FR-01.3 | System SHALL support logout and session management | P0 | ✅ | 95% |
+| FR-01.4 | System SHALL provide profile editing (name, email, avatar) | P0 | ✅ | 92% |
+| FR-01.5 | System SHALL support password change with current password verification | P0 | ✅ | 90% |
+| FR-01.6 | System SHALL validate avatar uploads (MIME type, size ≤ 2MB) | P1 | ✅ | 88% |
 
 #### Acceptance Criteria
 
-1. **WHEN** the System starts, **THEN** the System **SHALL** initialize Redis connection pools with separate databases for cache (DB 1), sessions (DB 2), and queues (DB 3) with connection pooling enabled for optimal resource utilization.
+**AC-01.1: User Registration**
 
-   **Verification Method:** Inspection + Test  
-   **Test Case:** TC-161-01  
-   **Dependencies:** Redis 6.0+ installed and configured
+- WHEN a new user registers with valid email and password
+- THEN the system SHALL create a user account
+- AND send a verification email
+- AND redirect to email verification notice page
 
-2. **WHEN** caching data, **THEN** the System **SHALL** implement tiered caching with memory cache (L1) for frequently accessed data (characters, support cards) and Redis cache (L2) for shared data across requests with TTL values: skills (24h), characters (12h), meta rankings (6h), training predictions (5m).
+**AC-01.2: User Login**
 
-   **Verification Method:** Test + Performance Monitoring  
-   **Test Case:** TC-161-02  
-   **Performance Target:** Cache hit rate >80%
+- WHEN a user logs in with valid credentials
+- THEN the system SHALL create an authenticated session
+- AND redirect to dashboard
+- AND optionally persist session if "Remember Me" is checked
 
-3. **WHEN** cache keys are generated, **THEN** the System **SHALL** use consistent naming conventions with prefixes (`umamusume-career-planner:cache:`, `umamusume-career-planner:session:`) and include version identifiers (v1, v2) for cache invalidation and safe deployment rollbacks.
+**AC-01.3: Profile Management**
 
-   **Verification Method:** Inspection + Test  
-   **Test Case:** TC-161-03  
-   **Related Spec:** DBD-009 (Database Documentation)
+- WHEN an authenticated user updates their profile
+- THEN the system SHALL validate all inputs
+- AND update the user record
+- AND display success confirmation
 
-4. **WHEN** data is modified, **THEN** the System **SHALL** invalidate related cache entries using cache tags (character_{id}, training_{id}, skill_{id}) and patterns to ensure data consistency across the application without stale data serving.
+**Related Artifacts:**
 
-   **Verification Method:** Test + Integration Test  
-   **Test Case:** TC-161-04  
-   **Critical Path:** Character stat updates, skill acquisitions
-
-5. **WHEN** monitoring cache performance, **THEN** the System **SHALL** track cache hit rates (target >80%), miss rates, eviction rates, and memory usage with alerts when hit rate drops below 70% or memory usage exceeds 90%.
-
-   **Verification Method:** Monitoring + Analysis  
-   **Test Case:** TC-161-05  
-   **Dashboard:** APM Dashboard with cache metrics
-
-**Implementation References:**
-
-- Service: `app/Services/Cache/CacheOptimizationService.php`
-- Config: `config/cache.php`, `config/database.php`
-- Test: `tests/Feature/Cache/CacheOptimizationTest.php`
-- Related: SPEC-002 (Training Optimization Technical)
+- Test: `tests/Feature/Auth/RegistrationTest.php`, `tests/Feature/Auth/AuthenticationTest.php`
+- Controller: `app/Http/Controllers/Auth/RegisteredUserController.php`
+- Middleware: `bootstrap/app.php` (auth middleware configuration)
 
 ---
 
-### Requirement 2: Database Query Optimization
+### 4.2 Character Management [FR-02]
 
-**User Story:** As a developer, I want optimized database queries with proper indexing and eager loading, so that database operations complete quickly and efficiently without N+1 query problems.
+**Description:** Complete character lifecycle management with stats, aptitudes, factors, and goals.
 
-**Priority:** P0 (Critical)  
-**Category:** Non-Functional / Performance  
-**Source:** SDP Phase 5, SRS Performance Requirements, SPEC-001  
-**Version:** v2.1.0  
-**Status:** 📋 Planned
+**Source:** BR-1 (BRS §4.1), SRS §2.2  
+**Priority:** P0  
+**Status:** ✅ Implemented  
+**Evidence:** SPEC-001, FLOW-001, `app/Services/CharacterService.php`
+
+**Related Artifacts:**
+
+- PRD: [PRD-001](../../docs/02-prds/PRD-001_Character_Management.md)
+- SPEC: [SPEC-001](../../docs/02-specs/SPEC-001_Character_Management_Technical.md)
+- Flow: [FLOW-001](../../docs/01-flows/FLOW-001_Character_Management_System.md)
+- Sequence: [SEQ-001](../../docs/01-sequences/SEQ-001_Character_Creation_Sequence.md)
+- Wireframe: [WF-002](../../docs/01-wireframes/WF-002_Character_Creation_Wizard.md), [WF-003](../../docs/01-wireframes/WF-003_Character_Detail_Management.md)
+
+#### Requirements
+
+| ID | Requirement | Priority | Status | Test Coverage | Evidence |
+|----|-------------|----------|--------|---------------|----------|
+| FR-02.1 | System SHALL support CRUD operations for characters | P0 | ✅ | 95% | `CharacterService`, SPEC-001 §3.1 |
+| FR-02.2 | System SHALL track five core stats (Speed, Stamina, Power, Guts, Wit) with range 0-1200 | P0 | ✅ | 92% | `Character` model, DBD §4.2 |
+| FR-02.3 | System SHALL track energy (0-100), mood (5 levels), and current turn (1-78) | P0 | ✅ | 90% | `Character` model fields |
+| FR-02.4 | System SHALL manage character goals with progress tracking | P1 | ✅ | 87% | JSON field + validation |
+| FR-02.5 | System SHALL support scenario selection (URA, Grand Masters, etc.) | P0 | ✅ | 88% | Enum field |
+| FR-02.6 | System SHALL track aptitude grades (SS-G) for distance/surface/style | P0 | ✅ | 90% | `AptitudeGrade` enum, SPEC-001 §4.1 |
+| FR-02.7 | System SHALL manage factor inheritance from parent characters | P0 | ✅ | 89% | `FactorInheritanceService`, SPEC-001 §4.3 |
+| FR-02.8 | System SHALL support character image upload with validation | P1 | ✅ | 92% | `ImageUploadService`, SPEC-001 §3.2 |
+| FR-02.9 | System SHALL track conditions (positive/negative status effects) | P1 | ✅ | 85% | JSON field |
 
 #### Acceptance Criteria
 
-1. **WHEN** querying related data, **THEN** the System **SHALL** use eager loading with `with(['aptitudes', 'factors', 'skills', 'supportCards'])` to prevent N+1 query problems reducing query count from 50+ to 5 or fewer for character detail pages.
+**AC-02.1: Character Creation**
 
-   **Verification Method:** Test + Query Logging  
-   **Test Case:** TC-162-01  
-   **Performance Target:** <5 queries per page load
+- WHEN a user creates a new character
+- THEN the system SHALL validate all required fields (name, base stats, aptitudes)
+- AND initialize default values (energy=100, mood=Normal, turn=1)
+- AND store character record in appropriate storage mode
+- AND redirect to character detail page
 
-2. **WHEN** executing complex queries, **THEN** the System **SHALL** implement indexes on foreign keys (character_id, user_id), status fields (run_status, skill_status), and timestamp columns (created_at, updated_at) with composite indexes for common query patterns (user_id + status, character_id + created_at).
+**AC-02.2: Stat Tracking**
 
-   **Verification Method:** Database Inspection + Performance Test  
-   **Test Case:** TC-162-02  
-   **Migration:** Create database index migration
+- WHEN character stats are updated
+- THEN the system SHALL enforce range validation (0-1200 hard cap)
+- AND calculate stat grades (G+ through SS)
+- AND update stat progress history
+- AND trigger any dependent calculations (race readiness, etc.)
 
-3. **WHEN** retrieving large datasets, **THEN** the System **SHALL** implement cursor-based pagination using `cursorPaginate()` for efficient data retrieval without loading entire result sets into memory, supporting datasets of 10,000+ records.
+**AC-02.3: Aptitude Management**
 
-   **Verification Method:** Test + Load Test  
-   **Test Case:** TC-162-03  
-   **Performance Target:** <500ms for 1000 record pages
+- WHEN character aptitudes are set or updated
+- THEN the system SHALL validate grade values (G through SS)
+- AND store aptitudes for all categories (distance, surface, style)
+- AND use aptitudes in race suitability calculations
+- AND display aptitudes with appropriate visual indicators
 
-4. **WHEN** calculating aggregates, **THEN** the System **SHALL** use database-level aggregation functions (COUNT, SUM, AVG, MAX, MIN) rather than loading data into PHP for calculation, reducing memory usage by 90%+.
+**AC-02.4: Factor Inheritance**
 
-   **Verification Method:** Test + Code Review  
-   **Test Case:** TC-162-04  
-   **Example:** Total SP calculation using SQL SUM
+- WHEN parent characters are selected
+- THEN the system SHALL calculate inherited bonuses
+- AND apply stat factors (★☆☆=+5, ★★☆=+12, ★★★=+21)
+- AND apply aptitude factors (1★ = 1 grade up)
+- AND apply skill factors (green/white)
+- AND display inheritance preview before confirmation
 
-5. **WHEN** monitoring query performance, **THEN** the System **SHALL** log queries exceeding 100ms with EXPLAIN plans and provide optimization recommendations through Laravel Telescope with automated alerts for slow queries.
+**Related Artifacts:**
 
-   **Verification Method:** Monitoring + Analysis  
-   **Test Case:** TC-162-05  
-   **Tool:** Laravel Telescope query monitoring
-
-**Implementation References:**
-
-- Model: `app/Models/Character.php` with relationships
-- Repository: `app/Repositories/CharacterRepository.php`
-- Test: `tests/Feature/Query/QueryOptimizationTest.php`
-- Migration: `database/migrations/*_add_performance_indexes.php`
-- Related: SPEC-001 (Character Management Technical)
+- Model: `app/Models/Character.php`
+- Service: `app/Services/CharacterService.php`, `app/Services/FactorInheritanceService.php`
+- Controller: `app/Http/Controllers/CharacterController.php`
+- Livewire: `app/Livewire/Character/CharacterForm.php`
+- Tests: `tests/Feature/CharacterCrudTest.php`, `tests/Unit/FactorInheritanceTest.php`
+- Database: `database/migrations/*_create_characters_table.php`
 
 ---
 
-### Requirement 3: API Response Caching and Optimization
+### 4.3 Training Optimization [FR-03]
 
-**User Story:** As a user, I want fast API responses through intelligent caching, so that external API calls don't slow down my experience and the system remains responsive even when external services are slow.
+**Description:** Training session management with AI-powered predictions and recommendations.
 
-**Priority:** P0 (Critical)  
-**Category:** Non-Functional / Performance  
-**Source:** SDP Phase 5, SPEC-007  
-**Version:** v2.1.0  
-**Status:** 📋 Planned
+**Source:** BR-2 (BRS §4.2), SRS §2.3  
+**Priority:** P0  
+**Status:** ✅ Implemented  
+**Evidence:** SPEC-002, FLOW-002, `app/Services/TrainingPredictionService.php`
+
+**Related Artifacts:**
+
+- PRD: [PRD-002](../../docs/02-prds/PRD-002_Training_Optimization.md)
+- SPEC: [SPEC-002](../../docs/02-specs/SPEC-002_Training_Optimization_Technical.md)
+- Flow: [FLOW-002](../../docs/01-flows/FLOW-002_Training_Optimization_System.md)
+- Tech Flow: [TECH-FLOW-002](../../docs/01-tech-flow/TECH-FLOW-002_Training_Optimization_Flow.md)
+- Wireframe: [WF-004](../../docs/01-wireframes/WF-004_Training_Selection_Interface.md), [WF-005](../../docs/01-wireframes/WF-005_Training_Result_Screen.md)
+
+#### Requirements
+
+| ID | Requirement | Priority | Status | Test Coverage | Evidence |
+|----|-------------|----------|--------|---------------|----------|
+| FR-03.1 | System SHALL record training sessions with actual stat gains | P0 | ✅ | 94% | `TrainingSession` model, SPEC-002 §3.1 |
+| FR-03.2 | System SHALL provide training predictions with stat gain forecasts | P0 | ✅ | 94% | `TrainingPredictionService`, SPEC-002 §3.1 |
+| FR-03.3 | System SHALL support batch predictions for multiple training options | P0 | ✅ | 92% | Service method |
+| FR-03.4 | System SHALL calculate support card bonuses and friendship multipliers | P0 | ✅ | 92% | `BonusCalculator`, SPEC-002 §3.2 |
+| FR-03.5 | System SHALL compute failure risk based on energy/mood/conditions | P0 | ✅ | 90% | Risk calculation method |
+| FR-03.6 | System SHALL track skill hint probability per training facility | P1 | ✅ | 90% | `SkillHintService`, SPEC-002 §4.1 |
+| FR-03.7 | System SHALL cache prediction results (5-minute TTL) | P1 | ✅ | 88% | Cache layer |
+| FR-03.8 | System SHALL provide AI-powered training recommendations | P1 | ✅ | 88% | `TrainingAdvisorAgent`, SPEC-002 §5.1 |
 
 #### Acceptance Criteria
 
-1. **WHEN** calling external APIs, **THEN** the System **SHALL** cache successful responses with appropriate TTL values (skill data 24 hours, character data 12 hours, meta rankings 6 hours) to reduce external API calls by 80%+.
+**AC-03.1: Training Prediction Generation**
 
-   **Verification Method:** Test + Monitoring  
-   **Test Case:** TC-163-01  
-   **Metrics:** External API call reduction tracking
+- WHEN a user requests training predictions for current turn
+- THEN the system SHALL analyze all available training options
+- AND calculate base stat gains for each option
+- AND apply support card bonuses
+- AND apply friendship training multipliers
+- AND calculate failure risk percentage
+- AND determine skill hint probabilities
+- AND rank options by effectiveness toward goals
+- AND return predictions within 1.2 seconds (p95)
 
-2. **WHEN** external APIs are slow or unavailable, **THEN** the System **SHALL** serve stale cache data with freshness indicators (`cached_at` timestamp, "Using cached data" notice) rather than failing requests or blocking user interactions.
+**AC-03.2: Training Execution**
 
-   **Verification Method:** Test + Simulation  
-   **Test Case:** TC-163-02  
-   **Fallback:** Circuit breaker pattern implementation
+- WHEN a user executes a training session
+- THEN the system SHALL record the selected option
+- AND apply actual stat gains (with variance)
+- AND update energy and mood
+- AND trigger any events or conditions
+- AND update skill hints if applicable
+- AND increment turn counter
+- AND log prediction accuracy for ML improvement
 
-3. **WHEN** cache is stale, **THEN** the System **SHALL** refresh cache asynchronously in background jobs using Laravel queues without blocking user requests, ensuring UI responsiveness.
+**AC-03.3: AI Training Recommendations**
 
-   **Verification Method:** Test + Queue Monitoring  
-   **Test Case:** TC-163-03  
-   **Job:** `RefreshExternalDataJob`
+- WHEN AI training advice is requested
+- THEN the system SHALL analyze character state and goals
+- AND consider support deck composition
+- AND evaluate race schedule
+- AND provide ranked recommendations with reasoning
+- AND include confidence scores
+- AND respond within 2.5 seconds
 
-4. **WHEN** multiple requests need the same external data, **THEN** the System **SHALL** implement request coalescing to prevent duplicate simultaneous API calls using cache locks with 30-second timeout.
+**Related Artifacts:**
 
-   **Verification Method:** Test + Load Test  
-   **Test Case:** TC-163-04  
-   **Pattern:** Cache lock with `Cache::lock()`
-
-5. **WHEN** monitoring API performance, **THEN** the System **SHALL** track API response times (p50, p95, p99), cache hit rates, fallback usage, and external service availability with alerting for degraded performance (>5s response time, <50% availability).
-
-   **Verification Method:** Monitoring Dashboard  
-   **Test Case:** TC-163-05  
-   **Dashboard:** External API Performance Dashboard
-
-**Implementation References:**
-
-- Service: `app/Services/ExternalAPI/ExternalAPIService.php`
-- Config: `config/external-apis.php`
-- Job: `app/Jobs/RefreshExternalDataJob.php`
-- Test: `tests/Feature/ExternalAPI/CachingTest.php`
-- Related: SPEC-007 (External Integration Technical)
+- Model: `app/Models/TrainingSession.php`
+- Service: `app/Services/TrainingPredictionService.php`, `app/Services/BonusCalculator.php`, `app/Services/SkillHintService.php`
+- Agent: `app/Neuron/Agents/TrainingAdvisorAgent.php`
+- Controller: `app/Http/Controllers/API/TrainingController.php`
+- Tests: `tests/Unit/TrainingPredictionServiceTest.php`, `tests/Feature/TrainingExecutionTest.php`
 
 ---
 
-### Requirement 4: Frontend Performance Optimization
+### 4.4 Race Strategy [FR-04]
 
-**User Story:** As a user, I want fast page loads and smooth interactions, so that the application feels responsive and I can work efficiently without waiting for pages to load or interactions to complete.
+**Description:** Race management with strategy recommendations and performance tracking.
 
-**Priority:** P0 (Critical)  
-**Category:** Non-Functional / Performance / UX  
-**Source:** SRS Performance Requirements, PRD-001  
-**Version:** v2.1.0  
-**Status:** 📋 Planned
+**Source:** BR-3 (BRS §4.3), SRS §2.4  
+**Priority:** P0  
+**Status:** ✅ Implemented  
+**Evidence:** SPEC-003, FLOW-003, `app/Services/RaceService.php`
+
+**Related Artifacts:**
+
+- PRD: [PRD-003](../../docs/02-prds/PRD-003_Race_Strategy.md)
+- SPEC: [SPEC-003](../../docs/02-specs/SPEC-003_Race_Strategy_Technical.md)
+- Flow: [FLOW-003](../../docs/01-flows/FLOW-003_Race_Strategy_System.md)
+- Sequence: [SEQ-004](../../docs/01-sequences/SEQ-004_Race_Registration_and_Outcome.md)
+- Wireframe: [WF-006](../../docs/01-wireframes/WF-006_Race_Calendar_View.md), [WF-007](../../docs/01-wireframes/WF-007_Race_Preparation_Screen.md)
+
+#### Requirements
+
+| ID | Requirement | Priority | Status | Test Coverage | Evidence |
+|----|-------------|----------|--------|---------------|----------|
+| FR-04.1 | System SHALL store race definitions with grade, distance, surface, requirements | P0 | ✅ | 91% | `Race` model, SPEC-003 §3.1 |
+| FR-04.2 | System SHALL track race results with placement and rewards | P0 | ✅ | 90% | `RaceResult` model |
+| FR-04.3 | System SHALL provide race calendar with requirements display | P0 | ✅ | 91% | `RaceService`, SPEC-003 §3.1 |
+| FR-04.4 | System SHALL support AI race strategy recommendations | P1 | ✅ | 87% | `RaceStrategyAgent` |
+| FR-04.5 | System SHALL calculate readiness score based on stats/skills/aptitudes | P1 | ✅ | 89% | Readiness calculator |
+| FR-04.6 | System SHALL generate win probability predictions | P1 | ✅ | 87% | `WinProbabilityCalculator`, SPEC-003 §4.2 |
+| FR-04.7 | System SHALL recommend optimal running style per race | P1 | ✅ | 89% | Style optimizer, SPEC-003 §4.1 |
 
 #### Acceptance Criteria
 
-1. **WHEN** loading pages, **THEN** the System **SHALL** achieve Core Web Vitals targets with LCP < 2.5 seconds, INP < 200 milliseconds, and CLS < 0.1 for all primary user flows (dashboard, character detail, training editor).
+**AC-04.1: Race Calendar Display**
 
-   **Verification Method:** Lighthouse CI + Real User Monitoring  
-   **Test Case:** TC-164-01  
-   **Tools:** Lighthouse, WebPageTest, Chrome UX Report
+- WHEN a user views the race calendar
+- THEN the system SHALL display all available races for current career stage
+- AND show race details (grade, distance, surface, track)
+- AND display stat requirements with readiness indicators (○ ⦾ △ ×)
+- AND highlight upcoming mandatory races
+- AND provide filtering by grade/distance/surface
 
-2. **WHEN** bundling JavaScript, **THEN** the System **SHALL** implement code splitting with route-based chunks (dashboard.js, character.js, training.js) and lazy loading for non-critical components to reduce initial bundle size below 200KB gzipped.
+**AC-04.2: Race Readiness Calculation**
 
-   **Verification Method:** Bundle Analysis  
-   **Test Case:** TC-164-02  
-   **Tool:** Vite bundle analyzer
+- WHEN race readiness is calculated
+- THEN the system SHALL evaluate character stats against race requirements
+- AND consider aptitude grades for distance/surface/style
+- AND check for required skills
+- AND assess weather condition preparedness
+- AND generate readiness score (0-100%)
+- AND provide specific recommendations for improvement
 
-3. **WHEN** loading images, **THEN** the System **SHALL** use responsive images with srcset attributes, lazy loading for below-fold images, and WebP format with JPEG fallback for optimal file sizes (50%+ reduction).
+**AC-04.3: Win Probability Prediction**
 
-   **Verification Method:** Inspection + Lighthouse  
-   **Test Case:** TC-164-03  
-   **Implementation:** `<img srcset="..." loading="lazy">`
+- WHEN win probability is requested
+- THEN the system SHALL analyze character stats and aptitudes
+- AND consider race competition level
+- AND factor in running style suitability
+- AND account for weather conditions
+- AND generate probability distribution (1st, Top 2, Top 3, etc.)
+- AND provide confidence interval
 
-4. **WHEN** rendering components, **THEN** the System **SHALL** minimize Livewire roundtrips by batching updates, using Alpine.js for client-side interactions, and implementing optimistic UI updates for immediate feedback.
+**AC-04.4: Running Style Recommendation**
 
-   **Verification Method:** Network Analysis + Test  
-   **Test Case:** TC-164-04  
-   **Pattern:** Livewire `wire:loading` states
+- WHEN running style recommendation is requested
+- THEN the system SHALL evaluate all 4 styles (Front, Pace, Late, End)
+- AND score each based on character stats
+- AND consider aptitude grades
+- AND factor in race distance and track characteristics
+- AND recommend optimal style with reasoning
 
-5. **WHEN** monitoring frontend performance, **THEN** the System **SHALL** track Real User Monitoring (RUM) metrics including page load times, interaction delays, and JavaScript errors with performance budgets enforced in CI/CD (fail build if bundle >250KB).
+**Related Artifacts:**
 
-   **Verification Method:** RUM Dashboard + CI Integration  
-   **Test Case:** TC-164-05  
-   **Tool:** Custom RUM implementation
-
-**Implementation References:**
-
-- Build: `vite.config.js` with code splitting
-- Component: `resources/js/components/*` with lazy loading
-- Test: `tests/Browser/Performance/PerformanceTest.php`
-- CI: `.github/workflows/performance-budget.yml`
-- Related: WF-001 to WF-012 (Wireframes)
+- Model: `app/Models/Race.php`, `app/Models/RaceResult.php`
+- Service: `app/Services/RaceService.php`, `app/Services/WinProbabilityCalculator.php`
+- Agent: `app/Neuron/Agents/RaceStrategyAgent.php`
+- Controller: `app/Http/Controllers/RaceController.php`, `app/Http/Controllers/API/RaceController.php`
+- Tests: `tests/Feature/RaceCalendarTest.php`, `tests/Unit/WinProbabilityTest.php`
 
 ---
 
-### Requirement 5: Application Performance Monitoring Integration
+### 4.5 Skill Management [FR-05]
 
-**User Story:** As a developer, I want comprehensive APM with detailed metrics and tracing, so that I can identify performance bottlenecks, monitor system health, and proactively address issues before they impact users.
+**Description:** Skill catalog, acquisition tracking, SP optimization, and evolution system.
 
-**Priority:** P1 (High)  
-**Category:** Non-Functional / Monitoring  
-**Source:** SDP Phase 5  
-**Version:** v2.1.0  
-**Status:** 📋 Planned
+**Source:** BR-4 (BRS §4.4), SRS §2.5  
+**Priority:** P0  
+**Status:** ✅ Implemented  
+**Evidence:** SPEC-004, FLOW-004, `app/Services/SkillService.php`
+
+**Related Artifacts:**
+
+- PRD: [PRD-004](../../docs/02-prds/PRD-004_Skill_Management.md)
+- SPEC: [SPEC-004](../../docs/02-specs/SPEC-004_Skill_Management_Technical.md)
+- Flow: [FLOW-004](../../docs/01-flows/FLOW-004_Skill_Management_System.md)
+- Wireframe: [WF-008](../../docs/01-wireframes/WF-008_Skill_Shop_Interface.md), [WF-009](../../docs/01-wireframes/WF-009_Skill_Loadout_Manager.md)
+
+#### Requirements
+
+| ID | Requirement | Priority | Status | Test Coverage | Evidence |
+|----|-------------|----------|--------|---------------|----------|
+| FR-05.1 | System SHALL maintain skill catalog with 150+ skills (Normal, Rare, Unique) | P0 | ✅ | 93% | `Skill` model, SPEC-004 §3.1 |
+| FR-05.2 | System SHALL track skill acquisitions per character | P0 | ✅ | 92% | `SkillCareerRun` model |
+| FR-05.3 | System SHALL track hints and apply SP cost reduction (20% per hint, 40% max) | P0 | ✅ | 91% | `calculateSpCost()`, SPEC-004 §4.1 |
+| FR-05.4 | System SHALL support skill evolution paths (Normal → Rare) | P1 | ✅ | 88% | `SkillEvolutionService`, SPEC-004 §4.2 |
+| FR-05.5 | System SHALL provide AI skill build recommendations | P1 | ✅ | 85% | `SkillAdvisorAgent` |
+| FR-05.6 | System SHALL calculate SP budget optimization | P1 | ✅ | 87% | SP optimizer |
+| FR-05.7 | System SHALL support skill search (English and Japanese names) | P0 | ✅ | 90% | Search endpoint |
 
 #### Acceptance Criteria
 
-1. **WHEN** the System processes requests, **THEN** the System **SHALL** instrument all HTTP requests, database queries, cache operations, and external API calls with distributed tracing using Laravel Telescope with custom watchers.
+**AC-05.1: Skill Catalog Management**
 
-   **Verification Method:** Monitoring Dashboard  
-   **Test Case:** TC-165-01  
-   **Tool:** Laravel Telescope with custom watchers
+- WHEN a user browses the skill catalog
+- THEN the system SHALL display all available skills
+- AND show skill details (name, type, rarity, base SP cost, effects)
+- AND support search by name (English/Japanese)
+- AND support filtering by type and rarity
+- AND display evolution paths where applicable
 
-2. **WHEN** performance issues occur, **THEN** the System **SHALL** capture detailed context including request parameters, user session data (anonymized), database query plans, and stack traces for debugging without exposing sensitive information.
+**AC-05.2: Skill Acquisition**
 
-   **Verification Method:** Test + Privacy Review  
-   **Test Case:** TC-165-02  
-   **Privacy:** PII redaction in logs
+- WHEN a user acquires a skill
+- THEN the system SHALL validate SP availability
+- AND apply hint discounts (20% per hint, 40% max)
+- AND deduct final SP cost from character balance
+- AND record acquisition with turn number
+- AND update skill status to "Acquired"
+- AND trigger skill evolution check if applicable
 
-3. **WHEN** monitoring system health, **THEN** the System **SHALL** track key metrics including request throughput (req/min), error rates (%), response time percentiles (p50, p95, p99), and resource utilization (CPU, memory, disk) with 1-minute granularity.
+**AC-05.3: Skill Hint Tracking**
 
-   **Verification Method:** Metrics Dashboard  
-   **Test Case:** TC-165-03  
-   **Metrics:** Custom Laravel metrics collector
+- WHEN a skill hint is obtained
+- THEN the system SHALL record hint source (training facility, event, etc.)
+- AND increment hint level (max 2 for 40% discount)
+- AND update SP cost calculation
+- AND display hint indicator in skill shop
 
-4. **WHEN** thresholds are exceeded, **THEN** the System **SHALL** trigger alerts for slow requests (>2s), high error rates (>1%), cache misses (>20%), and database slow queries (>100ms) via email and Slack notifications.
+**AC-05.4: Skill Evolution**
 
-   **Verification Method:** Alert Simulation  
-   **Test Case:** TC-165-04  
-   **Integration:** Laravel Notifications
+- WHEN a Normal skill is acquired and evolution conditions are met
+- THEN the system SHALL automatically upgrade to Rare counterpart
+- AND replace Normal skill with Rare skill
+- AND adjust SP cost accordingly
+- AND notify user of evolution
 
-5. **WHEN** analyzing performance, **THEN** the System **SHALL** provide dashboards showing performance trends over time, bottleneck identification with heat maps, and comparison across time periods (day/week/month) with drill-down capabilities.
+**Related Artifacts:**
 
-   **Verification Method:** Dashboard Review  
-   **Test Case:** TC-165-05  
-   **UI:** Custom APM dashboard at `/admin/apm`
-
-**Implementation References:**
-
-- Service: `app/Services/Monitoring/APMService.php`
-- Watcher: `app/Telescope/Watchers/*`
-- Dashboard: `resources/views/admin/apm.blade.php`
-- Test: `tests/Feature/Monitoring/APMTest.php`
-- Config: `config/telescope.php`
+- Model: `app/Models/Skill.php`, `app/Models/SkillCareerRun.php`
+- Service: `app/Services/SkillService.php`, `app/Services/SkillEvolutionService.php`
+- Agent: `app/Neuron/Agents/SkillAdvisorAgent.php`
+- Controller: `app/Http/Controllers/API/SkillController.php`
+- Tests: `tests/Feature/SkillCatalogTest.php`, `tests/Unit/HintDiscountTest.php`, `tests/Feature/SkillEvolutionTest.php`
 
 ---
 
-## 5. Accessibility Requirements
+### 4.6 Support Card Management [FR-06]
 
-### Requirement 6: Complete WCAG 2.2 AA Accessibility Compliance
+**Description:** Support card inventory, deck building, bond tracking, and meta rankings.
 
-**User Story:** As a user with disabilities, I want full accessibility compliance with WCAG 2.2 AA standards, so that I can use all application features effectively with assistive technologies including screen readers and keyboard navigation.
+**Source:** BR-5 (BRS §4.5), SRS §2.6  
+**Priority:** P0  
+**Status:** ✅ Implemented  
+**Evidence:** SPEC-005, FLOW-005, `app/Services/SupportDeckService.php`
 
-**Priority:** P0 (Critical)  
-**Category:** Non-Functional / Accessibility  
-**Source:** BRS BR-10, SRS NFR-3  
-**Version:** v2.1.0  
-**Status:** 📋 Planned
+**Related Artifacts:**
+
+- PRD: [PRD-005](../../docs/02-prds/PRD-005_Support_Card_Management.md)
+- SPEC: [SPEC-005](../../docs/02-specs/SPEC-005_Support_Card_Management_Technical.md)
+- Flow: [FLOW-005](../../docs/01-flows/FLOW-005_Support_Card_Management_System.md)
+- Wireframe: [WF-010](../../docs/01-wireframes/WF-010_Support_Card_Collection.md), [WF-011](../../docs/01-wireframes/WF-011_Support_Deck_Builder.md)
+
+#### Requirements
+
+| ID | Requirement | Priority | Status | Test Coverage | Evidence |
+|----|-------------|----------|--------|---------------|----------|
+| FR-06.1 | System SHALL maintain support card database (200+ cards) | P0 | ✅ | 92% | `SupportCard` model, SPEC-005 §3.1 |
+| FR-06.2 | System SHALL validate 6-card deck composition (5 owned + 1 borrowed) | P0 | ✅ | 94% | `SupportDeckService`, SPEC-005 §3.2 |
+| FR-06.3 | System SHALL track bond levels (0-100%) and limit breaks (0-4 stars) | P0 | ✅ | 90% | `bond_level` field, SPEC-005 §4.1 |
+| FR-06.4 | System SHALL calculate deck synergy score | P1 | ✅ | 88% | Synergy calculator |
+| FR-06.5 | System SHALL sync meta tier rankings from external sources | P1 | ✅ | 85% | External API sync |
+| FR-06.6 | System SHALL provide deck recommendations based on character type | P1 | ✅ | 87% | Deck optimizer |
 
 #### Acceptance Criteria
 
-1. **WHEN** navigating with keyboard, **THEN** the System **SHALL** provide complete keyboard accessibility for all interactive elements with visible focus indicators (3:1 contrast ratio minimum, 2px outline), logical tab order following reading flow, and skip links to main content ("Skip to main content").
+**AC-06.1: Support Card Collection**
 
-   **Verification Method:** Manual Testing + Automated Test  
-   **Test Case:** TC-166-01  
-   **WCAG Success Criteria:** 2.1.1, 2.4.3, 2.4.7  
-   **Tools:** axe DevTools, keyboard-only navigation
+- WHEN a user manages their support card collection
+- THEN the system SHALL display all owned cards
+- AND show card details (name, rarity, type, limit break level, bond level)
+- AND support filtering by type and rarity
+- AND support search by name
+- AND display meta tier rankings (SS, S, A, B)
 
-2. **WHEN** using screen readers, **THEN** the System **SHALL** provide proper semantic HTML structure (header, nav, main, article, footer), ARIA labels for interactive elements, live regions for dynamic updates (`aria-live="polite"`), and descriptive link text.
+**AC-06.2: Deck Building**
 
-   **Verification Method:** Screen Reader Testing  
-   **Test Case:** TC-166-02  
-   **WCAG Success Criteria:** 1.3.1, 4.1.2, 4.1.3  
-   **Tools:** NVDA, JAWS, VoiceOver
+- WHEN a user builds a support deck
+- THEN the system SHALL enforce exactly 6 cards (5 owned + 1 borrowed)
+- AND validate card type distribution
+- AND calculate total deck bonuses
+- AND compute synergy score
+- AND provide optimization suggestions
+- AND save deck configuration
 
-3. **WHEN** viewing content, **THEN** the System **SHALL** meet color contrast requirements with 4.5:1 minimum for normal text, 3:1 for large text (18pt+ or 14pt+ bold), 3:1 for UI components and graphics, verified in both light and dark modes.
+**AC-06.3: Bond Tracking**
 
-   **Verification Method:** Automated Contrast Checking  
-   **Test Case:** TC-166-03  
-   **WCAG Success Criteria:** 1.4.3, 1.4.11  
-   **Tool:** axe-core contrast checker
+- WHEN bond levels are updated
+- THEN the system SHALL track progression (0-100%)
+- AND unlock friendship training at 80% bond
+- AND record bond milestones (20%, 40%, 60%, 80%)
+- AND apply bond-based bonus multipliers
 
-4. **WHEN** interacting with forms, **THEN** the System **SHALL** provide clear labels associated with inputs (`<label for="...">` or `aria-labelledby`), inline validation with `aria-invalid` and `aria-describedby`, error identification with icon + text, and clear error recovery instructions.
+**AC-06.4: Meta Tier Synchronization**
 
-   **Verification Method:** Automated Test + Manual Review  
-   **Test Case:** TC-166-04  
-   **WCAG Success Criteria:** 3.3.1, 3.3.2, 3.3.3  
-   **Example:** Character creation form
+- WHEN meta tier data is synced
+- THEN the system SHALL fetch latest rankings from umapyoi.net
+- AND update card tier assignments
+- AND cache data for 24 hours
+- AND handle API failures gracefully with fallback
 
-5. **WHEN** using modals and popups, **THEN** the System **SHALL** implement focus trapping (Tab/Shift+Tab cycle within modal), restore focus on close to triggering element, provide Escape key dismissal, and announce modal opening with `role="dialog"` and `aria-modal="true"`.
+**Related Artifacts:**
 
-   **Verification Method:** Keyboard Navigation Test  
-   **Test Case:** TC-166-05  
-   **WCAG Success Criteria:** 2.1.2, 2.4.3  
-   **Component:** x-modal Alpine component
-
-**Implementation References:**
-
-- Component: `resources/views/components/accessible/*`
-- CSS: `resources/css/accessibility.css` with focus styles
-- Test: `tests/Browser/Accessibility/WCAG22Test.php`
-- Audit: `docs/accessibility-audit-report.md`
-- Related: WF-001 to WF-012 with accessibility annotations
+- Model: `app/Models/SupportCard.php`, `app/Models/SupportDeck.php`
+- Service: `app/Services/SupportDeckService.php`, `app/Services/SupportCardService.php`
+- Controller: `app/Http/Controllers/SupportCardController.php`, `app/Http/Controllers/API/SupportDeckController.php`
+- Tests: `tests/Feature/SupportCardTest.php`, `tests/Unit/DeckValidationTest.php`, `tests/Feature/BondTrackingTest.php`
 
 ---
 
-### Requirement 7: Enhanced Keyboard Navigation
+### 4.7 AI Advisory System [FR-07]
 
-**User Story:** As a keyboard-only user, I want comprehensive keyboard shortcuts and navigation patterns, so that I can efficiently navigate and operate the application without a mouse.
+**Description:** AI-powered recommendations using hybrid local/cloud providers with Neuron agents.
 
-**Priority:** P1 (High)  
-**Category:** Functional / Accessibility  
-**Source:** SRS NFR-3, PRD-001  
-**Version:** v2.1.0  
-**Status:** 📋 Planned
+**Source:** BR-6 (BRS §4.6), SRS §2.7  
+**Priority:** P1  
+**Status:** ✅ Implemented  
+**Evidence:** SPEC-006, FLOW-006, `app/Services/AI/HybridAIService.php`
+
+**Related Artifacts:**
+
+- PRD: [PRD-006](../../docs/02-prds/PRD-006_AI_Advisory.md)
+- SPEC: [SPEC-006](../../docs/02-specs/SPEC-006_AI_Advisory_Technical.md)
+- Flow: [FLOW-006](../../docs/01-flows/FLOW-006_AI_Advisory_System.md)
+- Sequence: [SEQ-006](../../docs/01-sequences/SEQ-006_AI_Advice_Generation.md)
+- Wireframe: [WF-012](../../docs/01-wireframes/WF-012_AI_Advisor_Interface.md)
+
+#### Requirements
+
+| ID | Requirement | Priority | Status | Test Coverage | Evidence |
+|----|-------------|----------|--------|---------------|----------|
+| FR-07.1 | System SHALL provide training advice via Neuron agents | P0 | ✅ | 88% | `TrainingAdvisorAgent`, SPEC-006 §4.1 |
+| FR-07.2 | System SHALL provide race strategy recommendations | P0 | ✅ | 87% | `RaceStrategyAgent` |
+| FR-07.3 | System SHALL provide skill build recommendations | P0 | ✅ | 85% | `SkillAdvisorAgent` |
+| FR-07.4 | System SHALL track AI conversations and context | P1 | ✅ | 86% | `AIConversation` model |
+| FR-07.5 | System SHALL track AI costs and performance metrics | P1 | ✅ | 85% | `AICostTracker`, SPEC-006 §5.1 |
+| FR-07.6 | System SHALL support hybrid AI (Ollama local + AWS Bedrock fallback) | P1 | ✅ | 89% | `HybridAIService`, SPEC-006 §3.1 |
+| FR-07.7 | System SHALL provide confidence scoring for recommendations | P2 | ✅ | 82% | Confidence scorer |
 
 #### Acceptance Criteria
 
-1. **WHEN** using global shortcuts, **THEN** the System **SHALL** provide keyboard shortcuts with: `Ctrl/Cmd + K` for global search, `Ctrl/Cmd + S` for save, `Ctrl/Cmd + N` for new plan, `Escape` for cancel/close, `?` for help overlay with all shortcuts listed.
+**AC-07.1: Training Advisory**
 
-   **Verification Method:** Keyboard Test  
-   **Test Case:** TC-167-01  
-   **Documentation:** `/keyboard-shortcuts` page
+- WHEN a user requests training advice
+- THEN the system SHALL analyze character state and goals
+- AND evaluate available training options
+- AND consider support deck composition
+- AND provide ranked recommendations with reasoning
+- AND include confidence scores
+- AND respond within 2.5 seconds
 
-2. **WHEN** navigating lists, **THEN** the System **SHALL** support arrow key navigation with: `↑/↓` to move between items, `Enter` to select/activate, `Space` for checkbox/expand, `Home/End` for first/last item, and visual focus indicator (2px blue outline).
+**AC-07.2: Race Strategy Advisory**
 
-   **Verification Method:** Keyboard Test  
-   **Test Case:** TC-167-02  
-   **Component:** Plan list, skill selector
+- WHEN a user requests race strategy advice
+- THEN the system SHALL analyze upcoming race requirements
+- AND evaluate character readiness
+- AND recommend optimal running style
+- AND suggest pre-race preparation steps
+- AND provide win probability estimate
+- AND respond within 2.5 seconds
 
-3. **WHEN** editing forms, **THEN** the System **SHALL** provide efficient keyboard navigation with: `Tab` to next field, `Shift+Tab` to previous, `Enter` to submit (from buttons), `Alt+[Key]` for access keys on form labels, and clear focus order.
+**AC-07.3: Skill Build Advisory**
 
-   **Verification Method:** Form Navigation Test  
-   **Test Case:** TC-167-03  
-   **Example:** Character creation wizard
+- WHEN a user requests skill build advice
+- THEN the system SHALL analyze character type and goals
+- AND evaluate available SP budget
+- AND consider skill hints
+- AND recommend skill acquisition priority
+- AND suggest evolution paths
+- AND respond within 2.5 seconds
 
-4. **WHEN** using complex widgets, **THEN** the System **SHALL** implement ARIA authoring practices for: tabs (`role="tablist"`, arrow keys), dropdowns (`role="listbox"`, type-ahead), autocomplete (arrow keys + Enter), and date pickers (arrow keys for calendar navigation).
+**AC-07.4: Hybrid AI Routing**
 
-   **Verification Method:** Widget Test  
-   **Test Case:** TC-167-04  
-   **Reference:** WAI-ARIA Authoring Practices Guide
+- WHEN an AI query is submitted
+- THEN the system SHALL attempt local Ollama first for simple queries
+- AND fallback to AWS Bedrock for complex queries or local unavailability
+- AND track provider usage and costs
+- AND maintain conversation context across providers
+- AND handle provider failures gracefully
 
-5. **WHEN** accessing help, **THEN** the System **SHALL** provide a keyboard shortcuts page at `/keyboard-shortcuts` with searchable list, context-specific shortcuts, printable version, and `?` key toggle overlay anywhere in the app.
+**Related Artifacts:**
 
-   **Verification Method:** Manual Review  
-   **Test Case:** TC-167-05  
-   **Route:** `/keyboard-shortcuts`
-
-**Implementation References:**
-
-- JS: `resources/js/keyboard-shortcuts.js`
-- View: `resources/views/accessibility/keyboard-shortcuts.blade.php`
-- Component: Alpine.js keyboard directive
-- Test: `tests/Browser/Accessibility/KeyboardNavigationTest.php`
+- Agent: `app/Neuron/Agents/TrainingAdvisorAgent.php`, `app/Neuron/Agents/RaceStrategyAgent.php`, `app/Neuron/Agents/SkillAdvisorAgent.php`
+- Service: `app/Services/AI/HybridAIService.php`, `app/Services/AI/OllamaService.php`, `app/Services/AI/BedrockService.php`, `app/Services/AI/AICostTracker.php`
+- Model: `app/Models/AIConversation.php`, `app/Models/AICost.php`
+- Controller: `app/Http/Controllers/API/AIAdvisoryController.php`
+- Tests: `tests/Integration/AIAdvisoryTest.php`, `tests/Unit/HybridAITest.php`
 
 ---
 
-### Requirement 8: Screen Reader Support Enhancements
+### 4.8 External Integration [FR-08]
 
-**User Story:** As a screen reader user, I want rich ARIA annotations and live regions, so that I receive timely feedback about application state changes and can understand complex interfaces.
+**Description:** Integration with external APIs, OCR processing, and real-time updates.
 
-**Priority:** P1 (High)  
-**Category:** Functional / Accessibility  
-**Source:** SRS NFR-3  
-**Version:** v2.1.0  
-**Status:** 📋 Planned
+**Source:** BR-7 (BRS §4.7), SRS §2.8  
+**Priority:** P1  
+**Status:** ✅ Implemented  
+**Evidence:** SPEC-007, FLOW-007, `app/Services/ExternalAPI/ExternalAPIService.php`
+
+**Related Artifacts:**
+
+- PRD: [PRD-007](../../docs/02-prds/PRD-007_External_Integration.md)
+- SPEC: [SPEC-007](../../docs/02-specs/SPEC-007_External_Integration_Technical.md)
+- Flow: [FLOW-007](../../docs/01-flows/FLOW-007_External_Integration_System.md)
+- Sequence: [SEQ-007](../../docs/01-sequences/SEQ-007_External_Data_Sync.md)
+- Tech Flow: [TECH-FLOW-007](../../docs/01-tech-flow/TECH-FLOW-007_External_Integration_Flow.md)
+
+#### Requirements
+
+| ID | Requirement | Priority | Status | Test Coverage | Evidence |
+|----|-------------|----------|--------|---------------|----------|
+| FR-08.1 | System SHALL integrate with umapyoi.net API for game data | P0 | ✅ | 88% | `UmapyoiApiClient`, SPEC-007 §3.1 |
+| FR-08.2 | System SHALL implement circuit breaker pattern for API resilience | P0 | ✅ | 90% | `CircuitBreaker`, SPEC-007 §3.2 |
+| FR-08.3 | System SHALL support fallback to UmamusumeDB.com | P1 | ✅ | 85% | `UmamusumeDBApiClient` |
+| FR-08.4 | System SHALL process screenshots via OCR (Tesseract + GD) | P1 | ✅ | 86% | `OCRService`, SPEC-007 §4.1 |
+| FR-08.5 | System SHALL provide WebSocket real-time updates via Laravel Reverb | P1 | ✅ | 84% | WebSocket channels |
+| FR-08.6 | System SHALL cache external API responses (24-hour TTL) | P1 | ✅ | 87% | Cache layer |
 
 #### Acceptance Criteria
 
-1. **WHEN** dynamic content updates, **THEN** the System **SHALL** use ARIA live regions with: `aria-live="polite"` for status messages, `aria-live="assertive"` for errors, `role="status"` for loading states, and `role="alert"` for critical notifications.
+**AC-08.1: External API Integration**
 
-   **Verification Method:** Screen Reader Test  
-   **Test Case:** TC-168-01  
-   **Tools:** NVDA, JAWS
+- WHEN external game data is requested
+- THEN the system SHALL attempt primary API (umapyoi.net)
+- AND implement circuit breaker to prevent cascading failures
+- AND fallback to secondary API (UmamusumeDB.com) on failure
+- AND cache successful responses for 24 hours
+- AND handle API rate limits gracefully
 
-2. **WHEN** navigating landmarks, **THEN** the System **SHALL** provide semantic HTML5 landmarks (`<header>`, `<nav>`, `<main>`, `<aside>`, `<footer>`) with ARIA labels for multiples (`aria-label="Main navigation"`, `aria-label="User menu"`).
+**AC-08.2: Circuit Breaker Pattern**
 
-   **Verification Method:** Automated Test + Screen Reader  
-   **Test Case:** TC-168-02  
-   **WCAG:** 1.3.1, 2.4.1
+- WHEN external API calls fail repeatedly
+- THEN the system SHALL open circuit breaker after threshold (5 failures)
+- AND use cached data during circuit open period
+- AND attempt recovery after timeout (60 seconds)
+- AND close circuit on successful recovery
+- AND log circuit state changes
 
-3. **WHEN** using complex widgets, **THEN** the System **SHALL** provide descriptive ARIA labels with: `aria-labelledby` for form groups, `aria-describedby` for help text, `aria-expanded` for collapsibles, `aria-selected` for tabs, `aria-current="page"` for navigation.
+**AC-08.3: OCR Processing**
 
-   **Verification Method:** Automated ARIA Test  
-   **Test Case:** TC-168-03  
-   **Tool:** axe-core ARIA validation
+- WHEN a user uploads a screenshot
+- THEN the system SHALL preprocess image (resize, grayscale, threshold)
+- AND extract text via Tesseract OCR
+- AND parse game data (stats, skills, race results)
+- AND validate extracted data
+- AND provide confidence scores (>85% threshold)
+- AND allow manual correction
 
-4. **WHEN** indicating state, **THEN** the System **SHALL** announce state changes with: `aria-invalid="true"` for errors, `aria-busy="true"` for loading, `aria-disabled="true"` for disabled, `aria-pressed` for toggle buttons, `aria-checked` for checkboxes.
+**AC-08.4: WebSocket Real-Time Updates**
 
-   **Verification Method:** State Change Test  
-   **Test Case:** TC-168-04  
-   **Example:** Form validation feedback
+- WHEN game data is updated
+- THEN the system SHALL broadcast updates via WebSocket
+- AND notify subscribed clients in real-time
+- AND handle connection failures gracefully
+- AND support reconnection with state recovery
 
-5. **WHEN** providing instructions, **THEN** the System **SHALL** include visually hidden instructions for screen readers using `.sr-only` class for context that's visual for sighted users but needs verbal explanation, without hiding essential content from all users.
+**Related Artifacts:**
 
-   **Verification Method:** Screen Reader Test  
-   **Test Case:** TC-168-05  
-   **CSS:** `.sr-only { position: absolute; left: -10000px; }`
-
-**Implementation References:**
-
-- Component: `resources/views/components/accessible/live-region.blade.php`
-- CSS: `resources/css/accessibility.css` with `.sr-only`
-- Test: `tests/Browser/Accessibility/ScreenReaderTest.php`
-- Guide: `docs/accessibility/screen-reader-guide.md`
+- Service: `app/Services/ExternalAPI/ExternalAPIService.php`, `app/Services/ExternalAPI/UmapyoiApiClient.php`, `app/Services/ExternalAPI/UmamusumeDBApiClient.php`, `app/Services/ExternalAPI/CircuitBreaker.php`, `app/Services/OCR/OCRService.php`, `app/Services/OCR/TesseractService.php`
+- Model: `app/Models/ExternalAPICache.php`, `app/Models/OCRExtraction.php`
+- Controller: `app/Http/Controllers/API/SyncController.php`, `app/Http/Controllers/OCRUploadController.php`
+- Tests: `tests/Integration/ExternalAPITest.php`, `tests/Unit/CircuitBreakerTest.php`, `tests/Integration/OCRProcessingTest.php`
 
 ---
 
-## 6. Progressive Web App Requirements
+### 4.9 Data Import/Export [FR-09]
 
-### Requirement 9: Enhanced Offline Functionality
+**Description:** Import/export workflows with format detection, migration, and conflict resolution.
 
-**User Story:** As a user with unreliable internet, I want comprehensive offline functionality, so that I can continue working without interruption when my connection drops and have my changes sync automatically when reconnected.
+**Source:** BR-8 (BRS §4.8), SRS §2.9  
+**Priority:** P0  
+**Status:** ✅ Implemented  
+**Evidence:** D05, D06, `app/Services/Data/DataImportService.php`
 
-**Priority:** P0 (Critical)  
-**Category:** Functional / PWA  
-**Source:** BRS BR-9, SRS REQ-78  
-**Version:** v2.1.0  
-**Status:** 📋 Planned
+#### Requirements
+
+| ID | Requirement | Priority | Status | Test Coverage | Evidence |
+|----|-------------|----------|--------|---------------|----------|
+| FR-09.1 | System SHALL export plans to JSON format with schema versioning | P0 | ✅ | 91% | `DataExportService`, D05 §5.1 |
+| FR-09.2 | System SHALL export plans to Excel format (.xlsx) | P1 | ✅ | 88% | Excel exporter |
+| FR-09.3 | System SHALL import from JSON with format detection | P0 | ✅ | 89% | `DataImportService` |
+| FR-09.4 | System SHALL support legacy format migration | P1 | ✅ | 86% | Format migrator |
+| FR-09.5 | System SHALL provide import preview and conflict resolution | P1 | ✅ | 87% | Import wizard |
+| FR-09.6 | System SHALL support backup and restore workflows | P1 | ✅ | 87% | `BackupService`, D05 §8.1 |
 
 #### Acceptance Criteria
 
-1. **WHEN** accessing cached routes offline, **THEN** the System **SHALL** serve cached pages for: dashboard, character list, character detail (last 10 viewed), training editor (active plans), skill catalog, with "You are offline" banner and disabled sync-dependent actions.
+**AC-09.1: JSON Export**
 
-   **Verification Method:** Offline Simulation Test  
-   **Test Case:** TC-169-01  
-   **Service Worker:** Network-first strategy with fallback
+- WHEN a user exports a plan to JSON
+- THEN the system SHALL include schema version identifier
+- AND include export timestamp
+- AND include all plan data (character, stats, skills, races, goals)
+- AND preserve canonical field names
+- AND generate valid JSON structure
 
-2. **WHEN** making changes offline, **THEN** the System **SHALL** queue operations in IndexedDB with: operation type, timestamp, retry count, payload, and display "Changes queued for sync" message with count of pending operations.
+**AC-09.2: JSON Import**
 
-   **Verification Method:** Offline Change Test  
-   **Test Case:** TC-169-02  
-   **Storage:** IndexedDB `pending_operations` table
+- WHEN a user imports a JSON file
+- THEN the system SHALL detect schema version
+- AND validate JSON structure
+- AND migrate legacy formats if needed
+- AND provide import preview
+- AND handle conflicts (skip, overwrite, merge, rename)
+- AND validate business rules
+- AND report import results
 
-3. **WHEN** connection is restored, **THEN** the System **SHALL** automatically sync queued operations in order (FIFO), retry failed operations up to 3 times with exponential backoff (1s, 2s, 4s), and display sync progress with success/failure notifications.
+**AC-09.3: Excel Export**
 
-   **Verification Method:** Reconnection Test  
-   **Test Case:** TC-169-03  
-   **API:** Background Sync API
+- WHEN a user exports to Excel
+- THEN the system SHALL create workbook with multiple sheets
+- AND include summary sheet
+- AND include stat progression sheet
+- AND include skills sheet
+- AND include races sheet
+- AND apply formatting and charts
 
-4. **WHEN** conflicts occur during sync, **THEN** the System **SHALL** detect conflicts (same record modified offline and online), present user with: server version, local version, side-by-side comparison, and options: keep local, use server, merge (if applicable).
+**AC-09.4: Backup and Restore**
 
-   **Verification Method:** Conflict Simulation Test  
-   **Test Case:** TC-169-04  
-   **UI:** Conflict resolution modal
+- WHEN a user creates a backup
+- THEN the system SHALL export all user data
+- AND include metadata (backup date, version)
+- AND compress data for efficiency
+- AND provide download link
 
-5. **WHEN** monitoring offline capability, **THEN** the System **SHALL** track offline usage metrics including: time spent offline, operations queued, sync success rate, conflict occurrences, and cache hit rate with dashboard at `/admin/pwa-metrics`.
+- WHEN a user restores from backup
+- THEN the system SHALL validate backup file
+- AND preview restore contents
+- AND handle conflicts
+- AND restore data with integrity checks
 
-   **Verification Method:** Metrics Dashboard  
-   **Test Case:** TC-169-05  
-   **Analytics:** Custom PWA analytics
+**Related Artifacts:**
 
-**Implementation References:**
-
-- Service Worker: `public/sw.js` with offline strategies
-- Storage: `resources/js/offline-storage.js` with IndexedDB
-- Sync: `resources/js/background-sync.js`
-- Test: `tests/Browser/PWA/OfflineTest.php`
-- Related: SPEC-007 (External Integration)
+- Service: `app/Services/Data/DataImportService.php`, `app/Services/Data/DataExportService.php`, `app/Services/Data/DataMigrationService.php`, `app/Services/Data/BackupService.php`
+- Controller: `app/Http/Controllers/API/ImportController.php`, `app/Http/Controllers/API/ExportController.php`, `app/Http/Controllers/Admin/BackupController.php`
+- Tests: `tests/Feature/JSONExportTest.php`, `tests/Feature/JSONImportTest.php`, `tests/Feature/BackupRestoreTest.php`
 
 ---
 
-### Requirement 10: Background Sync and Push Notifications
+### 4.10 Dual Storage Mode [FR-10]
 
-**User Story:** As a user, I want background sync for queued operations and push notifications for important events, so that I don't lose work when offline and stay informed about race schedules and important updates.
+**Description:** Browser-based Local storage and database-backed Account storage with seamless conversion.
 
-**Priority:** P1 (High)  
-**Category:** Functional / PWA  
-**Source:** SDP Phase 5, PRD-003  
-**Version:** v2.1.0  
-**Status:** 📋 Planned
+**Source:** BR-9 (BRS §4.9), SRS §2.10  
+**Priority:** P0  
+**Status:** ✅ Implemented  
+**Evidence:** SDS §4, `resources/js/stores/localRuns.js`
+
+#### Requirements
+
+| ID | Requirement | Priority | Status | Test Coverage | Evidence |
+|----|-------------|----------|--------|---------------|----------|
+| FR-10.1 | System SHALL support Local storage mode using browser localStorage | P0 | ✅ | 86% | `LocalStorageService`, JS stores |
+| FR-10.2 | System SHALL support Account storage mode using database | P0 | ✅ | 90% | Database models |
+| FR-10.3 | System SHALL display clear storage mode indicator (badge) | P0 | ✅ | 88% | Storage badge component |
+| FR-10.4 | System SHALL enable full offline functionality for Local runs | P0 | ✅ | 85% | PWA service worker |
+| FR-10.5 | System SHALL support conversion from Local to Account mode | P0 | ✅ | 85% | `StorageConversionService` |
+| FR-10.6 | System SHALL provide local data management interface | P1 | ✅ | 82% | Local runs UI |
+| FR-10.7 | System SHALL implement draft auto-save every 30 seconds | P0 | ✅ | 87% | Draft auto-save |
+| FR-10.8 | System SHALL handle connection state with graceful degradation | P0 | ✅ | 84% | Connection monitor |
 
 #### Acceptance Criteria
 
-1. **WHEN** registering for background sync, **THEN** the System **SHALL** use Background Sync API to register sync tags (`sync-operations`, `sync-data`) and automatically retry sync when connection is restored even if user has closed the app.
+**AC-10.1: Local Storage Mode**
 
-   **Verification Method:** Background Sync Test  
-   **Test Case:** TC-170-01  
-   **API:** `navigator.serviceWorker.ready.then(reg => reg.sync.register('sync-operations'))`
+- WHEN a user creates a plan in Local mode
+- THEN the system SHALL generate UUID identifier
+- AND store data in browser localStorage
+- AND enable full offline functionality
+- AND display "Local" storage badge
+- AND provide local data management UI
 
-2. **WHEN** syncing in background, **THEN** the System **SHALL** process queued operations from IndexedDB, update local state on success, maintain queue order (FIFO), and log sync results for debugging with max 5 retry attempts.
+**AC-10.2: Account Storage Mode**
 
-   **Verification Method:** Background Process Test  
-   **Test Case:** TC-170-02  
-   **Service Worker Event:** `sync` event handler
+- WHEN an authenticated user creates a plan in Account mode
+- THEN the system SHALL generate database integer ID
+- AND store data in MySQL/MariaDB database
+- AND require network connectivity for save operations
+- AND display "Account" storage badge
+- AND sync across devices
 
-3. **WHEN** subscribing to push notifications, **THEN** the System **SHALL** request user permission with clear explanation, generate VAPID keys server-side, subscribe service worker to push service, and store subscription in database.
+**AC-10.3: Storage Mode Conversion**
 
-   **Verification Method:** Subscription Test  
-   **Test Case:** TC-170-03  
-   **API:** `registration.pushManager.subscribe()`
+- WHEN a user converts Local run to Account mode
+- THEN the system SHALL validate user authentication
+- AND migrate all plan data to database
+- AND preserve UUID for reference
+- AND assign new database ID
+- AND optionally keep local copy
+- AND provide conversion report
 
-4. **WHEN** sending notifications, **THEN** the System **SHALL** support notification types: race reminders (1 day, 1 hour before), training alerts (stamina low, goal achieved), system updates, with user preferences for each type and quiet hours (default 10 PM - 8 AM).
+**AC-10.4: Draft Auto-Save**
 
-   **Verification Method:** Notification Test  
-   **Test Case:** TC-170-04  
-   **Preferences:** `/settings/notifications`
+- WHEN a user edits a plan
+- THEN the system SHALL auto-save draft to localStorage every 30 seconds
+- AND display "Draft saved" indicator
+- AND restore draft on page reload
+- AND clear draft after successful save
+- AND provide discard draft option
 
-5. **WHEN** receiving notifications, **THEN** the System **SHALL** display notifications with: title, body (max 150 chars), icon (app logo), badge (notification count), action buttons ("View", "Dismiss"), and deep link to relevant section on click.
+**AC-10.5: Offline Handling**
 
-   **Verification Method:** Notification Display Test  
-   **Test Case:** TC-170-05  
-   **Service Worker:** `push` event handler
+- WHEN network connection is lost
+- THEN the system SHALL detect offline state
+- AND disable Account mode save operations
+- AND enable draft auto-save
+- AND display offline indicator
+- AND queue operations for sync when online
 
-**Implementation References:**
+**Related Artifacts:**
 
-- Service: `app/Services/Notifications/PushNotificationService.php`
-- Worker: `public/sw.js` push event handler
-- Config: `config/webpush.php` with VAPID keys
-- Migration: `database/migrations/*_create_push_subscriptions_table.php`
-- Test: `tests/Feature/Notifications/PushNotificationTest.php`
+- Service: `app/Services/Storage/LocalStorageService.php`, `app/Services/Storage/StorageConversionService.php`
+- JavaScript: `resources/js/stores/localRuns.js`, `resources/js/stores/drafts.js`
+- Controller: `app/Http/Controllers/ConversionController.php`
+- Component: `resources/views/components/storage-badge.blade.php`
+- Tests: `tests/E2E/LocalStorageTest.js`, `tests/Feature/ConversionTest.php`
 
 ---
 
-### Requirement 11: PWA Install Prompt and App Experience
+### 4.11 Dashboard and Navigation [FR-11]
 
-**User Story:** As a user, I want to install the app on my device, so that I can access it like a native app with full-screen experience and easy access from my home screen or desktop.
+**Description:** Main landing page with overview, quick access, and navigation.
 
-**Priority:** P1 (High)  
-**Category:** Functional / PWA  
-**Source:** SRS REQ-56  
-**Version:** v2.1.0  
-**Status:** 📋 Planned
+**Source:** SRS §2.11  
+**Priority:** P0  
+**Status:** ✅ Implemented  
+**Evidence:** `app/Livewire/Dashboard/DashboardOverview.php`
+
+#### Requirements
+
+| ID | Requirement | Priority | Status | Test Coverage | Evidence |
+|----|-------------|----------|--------|---------------|----------|
+| FR-11.1 | System SHALL display aggregate statistics (total, active, completed plans) | P0 | ✅ | 90% | Dashboard component |
+| FR-11.2 | System SHALL display all plans with filtering and sorting | P0 | ✅ | 88% | Plan list component |
+| FR-11.3 | System SHALL display recent activity log | P0 | ✅ | 85% | Activity component |
+| FR-11.4 | System SHALL provide visible "Create Plan" button | P0 | ✅ | 92% | CTA button |
+| FR-11.5 | System SHALL use responsive single-column layout on mobile | P0 | ✅ | 90% | Responsive design |
+| FR-11.6 | System SHALL display AI advisor quick access card | P1 | ✅ | 87% | AI card component |
 
 #### Acceptance Criteria
 
-1. **WHEN** meeting install criteria, **THEN** the System **SHALL** display custom install prompt after user has: visited 2+ times, spent 5+ minutes on site, interacted with 3+ pages, with "Install App" button in navbar and custom prompt with app benefits listed.
+**AC-11.1: Dashboard Overview**
 
-   **Verification Method:** Engagement Test  
-   **Test Case:** TC-171-01  
-   **Prompt:** Custom beforeinstallprompt handler
+- WHEN a user accesses the dashboard
+- THEN the system SHALL display aggregate statistics
+- AND show recent plans (last 5)
+- AND display activity log (last 10 actions)
+- AND provide quick action buttons
+- AND show AI advisor card
+- AND load within 2 seconds
 
-2. **WHEN** app is installed, **THEN** the System **SHALL** provide native-like experience with: full-screen display (no browser UI), custom splash screen (app icon + name on brand color), and custom app icon (512x512 PNG) on home screen/desktop.
+**AC-11.2: Plan List**
 
-   **Verification Method:** Install Test  
-   **Test Case:** TC-171-02  
-   **Manifest:** `public/manifest.json`
+- WHEN a user views the plan list
+- THEN the system SHALL display all plans (Local + Account)
+- AND support filtering by status (in progress, completed, archived)
+- AND support sorting by date, name, grade
+- AND display storage mode badges
+- AND provide bulk actions
+- AND paginate results (20 per page)
 
-3. **WHEN** app is launched, **THEN** the System **SHALL** open in standalone mode with: navigation bar visible, custom title bar with app name, OS-integrated navigation (back button on Android), and no browser chrome visible.
+**Related Artifacts:**
 
-   **Verification Method:** Launch Test  
-   **Test Case:** TC-171-03  
-   **Display Mode:** `"display": "standalone"`
-
-4. **WHEN** user interacts with installed app, **THEN** the System **SHALL** track PWA metrics including: install rate, standalone launch count, retention rate (7-day, 30-day), engagement time, and uninstall rate with dashboard at `/admin/pwa-stats`.
-
-   **Verification Method:** Analytics Dashboard  
-   **Test Case:** TC-171-04  
-   **Analytics:** Custom PWA analytics
-
-5. **WHEN** updating the app, **THEN** the System **SHALL** detect service worker updates, display "Update available" notification with "Update" button, refresh on user confirmation, and fallback to automatic update after 24 hours if not dismissed.
-
-   **Verification Method:** Update Test  
-   **Test Case:** TC-171-05  
-   **Service Worker:** `updatefound` event
-
-**Implementation References:**
-
-- Manifest: `public/manifest.json` with icons and theme
-- Prompt: `resources/js/install-prompt.js`
-- Analytics: `app/Services/Analytics/PWAAnalyticsService.php`
-- Test: `tests/Browser/PWA/InstallTest.php`
-- Assets: `public/images/icons/` with various sizes
+- Livewire: `app/Livewire/Dashboard/DashboardOverview.php`, `app/Livewire/Dashboard/PlanList.php`
+- View: `resources/views/livewire/dashboard/dashboard-overview.blade.php`
+- Tests: `tests/Feature/DashboardTest.php`
 
 ---
 
-## 7. Advanced Features Requirements
+### 4.12 Analytics and Reporting [FR-12]
 
-### Requirement 12: Batch Simulation System
+**Description:** Performance analysis, statistical insights, and reporting.
 
-**User Story:** As a power user, I want to simulate multiple training scenarios simultaneously, so that I can compare different strategies and identify the optimal approach without manually running multiple careers.
+**Source:** BR-12 (BRS §4.12), SRS §2.12  
+**Priority:** P1  
+**Status:** ✅ Implemented  
+**Evidence:** `app/Http/Controllers/PerformanceController.php`
 
-**Priority:** P2 (Medium)  
-**Category:** Functional / Analytics  
-**Source:** PRD-002, SPEC-002  
-**Version:** v2.1.0  
-**Status:** 📋 Planned
+#### Requirements
+
+| ID | Requirement | Priority | Status | Test Coverage | Evidence |
+|----|-------------|----------|--------|---------------|----------|
+| FR-12.1 | System SHALL provide career analytics dashboard | P1 | ✅ | 85% | Analytics dashboard |
+| FR-12.2 | System SHALL generate performance comparison charts | P1 | ✅ | 83% | Chart components |
+| FR-12.3 | System SHALL track training efficiency metrics | P1 | ✅ | 84% | Efficiency tracker |
+| FR-12.4 | System SHALL provide race history analysis | P1 | ✅ | 82% | Race analyzer |
+| FR-12.5 | System SHALL support stat progression visualization | P0 | ✅ | 88% | Stat charts |
 
 #### Acceptance Criteria
 
-1. **WHEN** creating batch simulation, **THEN** the System **SHALL** allow configuration of: base character stats, number of scenarios (2-10), variable parameters (support card combinations, training focus priorities, skill acquisition strategies), and target outcomes (final stat goals, race win rate targets).
+**AC-12.1: Career Analytics**
 
-   **Verification Method:** UI Test  
-   **Test Case:** TC-172-01  
-   **UI:** Batch simulation wizard
+- WHEN a user views career analytics
+- THEN the system SHALL display stat progression over time
+- AND show training efficiency metrics
+- AND display race performance history
+- AND calculate prediction accuracy
+- AND provide comparative analysis across runs
 
-2. **WHEN** running simulations, **THEN** the System **SHALL** execute scenarios in parallel using Laravel queues with: progress tracking (X of Y complete), estimated time remaining, ability to cancel in progress, and queue priority (high priority for small batches).
+**AC-12.2: Performance Comparison**
 
-   **Verification Method:** Queue Test  
-   **Test Case:** TC-172-02  
-   **Job:** `RunSimulationScenarioJob`
+- WHEN a user compares multiple career runs
+- THEN the system SHALL generate comparison charts
+- AND highlight key differences
+- AND identify successful patterns
+- AND provide insights for improvement
 
-3. **WHEN** simulations complete, **THEN** the System **SHALL** generate comparison report with: side-by-side stat comparison table, win rate analysis chart, SP efficiency metrics (stats gained per SP spent), success rate for each scenario, and recommended approach highlighted.
+**Related Artifacts:**
 
-   **Verification Method:** Report Review  
-   **Test Case:** TC-172-03  
-   **Report:** Interactive comparison dashboard
-
-4. **WHEN** analyzing results, **THEN** the System **SHALL** provide detailed breakdown for each scenario including: turn-by-turn progression chart, key decision points highlighted, bottlenecks identified (stat gaps, SP shortages), and improvement suggestions from AI.
-
-   **Verification Method:** Analysis Review  
-   **Test Case:** TC-172-04  
-   **AI:** Neuron AI analysis integration
-
-5. **WHEN** saving simulations, **THEN** the System **SHALL** allow users to: save favorite configurations, export results to PDF/Excel, share results via link (with privacy controls), and replay simulation with different parameters.
-
-   **Verification Method:** Save/Export Test  
-   **Test Case:** TC-172-05  
-   **Storage:** `simulation_results` table
-
-**Implementation References:**
-
-- Service: `app/Services/Simulation/BatchSimulationService.php`
-- Job: `app/Jobs/RunSimulationScenarioJob.php`
-- View: `resources/views/simulation/batch-results.blade.php`
-- Test: `tests/Feature/Simulation/BatchSimulationTest.php`
+- Controller: `app/Http/Controllers/PerformanceController.php`
+- Service: `app/Services/Analytics/AnalyticsService.php`
+- View: `resources/views/analytics/dashboard.blade.php`
+- Tests: `tests/Feature/AnalyticsTest.php`
 
 ---
 
-### Requirement 13: AI Model Retraining and Improvement
+## 5. Non-Functional Requirements
 
-**User Story:** As a system, I want to continuously improve prediction accuracy by learning from actual outcomes, so that recommendations become more accurate over time based on real player data.
+### 5.1 Performance Requirements [NFR-P]
 
-**Priority:** P2 (Medium)  
-**Category:** Functional / AI  
-**Source:** SPEC-006, PRD-006  
-**Version:** v2.1.0  
-**Status:** 📋 Planned
+**Source:** BR-10 (BRS §4.10), SRS §3.1  
+**Priority:** P0-P1  
+**Status:** ✅ Implemented / 🔄 In Progress
+
+#### Requirements
+
+| ID | Requirement | Target | Priority | Status | Evidence |
+|----|-------------|--------|----------|--------|----------|
+| NFR-P-01 | Page load time | < 2 seconds | P0 | 🔄 | Current: 2.2s, optimizing |
+| NFR-P-02 | First Contentful Paint (FCP) | < 1.5 seconds | P0 | 🔄 | Current: 1.7s, implementing critical CSS |
+| NFR-P-03 | Time to Interactive (TTI) | < 3 seconds | P0 | 🔄 | Current: 3.1s, reducing JS bundle |
+| NFR-P-04 | Largest Contentful Paint (LCP) | < 2.5 seconds | P0 | ✅ | Current: 2.4s |
+| NFR-P-05 | Training prediction response | < 1.2 seconds (p95) | P0 | ✅ | Current: 1.1s with caching |
+| NFR-P-06 | AI advisory response | < 2.5 seconds | P1 | ✅ | Current: 2.3s with Ollama |
+| NFR-P-07 | Export 50k rows | < 60 seconds | P1 | ✅ | Batch processing |
+| NFR-P-08 | Autocomplete response | < 200ms | P0 | ✅ | Current: 180ms |
+| NFR-P-09 | API response time (p95) | < 200ms | P0 | ✅ | Current: 180ms |
+| NFR-P-10 | Database query time | < 500ms | P0 | ✅ | Indexed queries |
 
 #### Acceptance Criteria
 
-1. **WHEN** training predictions are made, **THEN** the System **SHALL** record predictions with: predicted stat gains, predicted skill hints, confidence score, prediction timestamp, and link to training session for comparison.
+**AC-P-01: Core Web Vitals**
 
-   **Verification Method:** Logging Test  
-   **Test Case:** TC-173-01  
-   **Table:** `training_predictions` with actual results
+- WHEN measuring Core Web Vitals
+- THEN LCP SHALL be < 2.5 seconds
+- AND INP SHALL be < 200ms
+- AND CLS SHALL be < 0.1
 
-2. **WHEN** actual results are recorded, **THEN** the System **SHALL** calculate accuracy metrics including: absolute error (predicted - actual), percentage error, confidence calibration (if confidence 70% was prediction 70% accurate), and store for analysis.
+**AC-P-02: API Performance**
 
-   **Verification Method:** Accuracy Calculation Test  
-   **Test Case:** TC-173-02  
-   **Metrics:** RMSE, MAE, MAPE
+- WHEN measuring API response times
+- THEN p95 SHALL be < 200ms for read operations
+- AND p95 SHALL be < 500ms for write operations
+- AND p99 SHALL be < 1 second for all operations
 
-3. **WHEN** sufficient data is collected (1000+ predictions), **THEN** the System **SHALL** trigger model retraining automatically using: historical prediction data, actual outcomes, feature engineering (character stats, support cards, mood, energy), and validation on 20% holdout set.
+**AC-P-03: Caching Strategy**
 
-   **Verification Method:** Retraining Test  
-   **Test Case:** TC-173-03  
-   **Job:** `RetrainPredictionModelJob` (weekly)
+- WHEN implementing caching
+- THEN training predictions SHALL be cached for 5 minutes
+- AND external API data SHALL be cached for 24 hours
+- AND skill search results SHALL be cached for 1 hour
+- AND cache hit rate SHALL be > 80%
 
-4. **WHEN** new model is trained, **THEN** the System **SHALL** validate performance against baseline with: accuracy improvement threshold (5%+ improvement required), A/B test deployment (50% traffic to new model), monitoring of real-world accuracy, and rollback if performance degrades.
+**Related Artifacts:**
 
-   **Verification Method:** A/B Test  
-   **Test Case:** TC-173-04  
-   **Rollback:** Automatic if accuracy drops >2%
-
-5. **WHEN** monitoring model performance, **THEN** the System **SHALL** track metrics including: prediction accuracy trend over time, accuracy by character type (sprinter, middle, long), accuracy by support card deck composition, and confidence calibration curves with dashboard at `/admin/ai-metrics`.
-
-   **Verification Method:** Monitoring Dashboard  
-   **Test Case:** TC-173-05  
-   **Dashboard:** AI model performance metrics
-
-**Implementation References:**
-
-- Service: `app/Services/AI/ModelRetrainingService.php`
-- Job: `app/Jobs/RetrainPredictionModelJob.php`
-- Model: `storage/models/training-prediction-v{version}.model`
-- Test: `tests/Feature/AI/ModelRetrainingTest.php`
-- Dashboard: `resources/views/admin/ai-metrics.blade.php`
+- Monitoring: APM dashboards, Lighthouse CI
+- Evidence: Performance metrics in IVM §11.1
 
 ---
 
-### Requirement 14: Advanced Analytics and Pattern Recognition
+### 5.2 Security Requirements [NFR-S]
 
-**User Story:** As a user, I want advanced analytics that identify patterns in successful careers, so that I can learn from optimal strategies and understand what works best for different character types and scenarios.
+**Source:** SRS §3.2  
+**Priority:** P0  
+**Status:** ✅ Implemented
 
-**Priority:** P2 (Medium)  
-**Category:** Functional / Analytics  
-**Source:** PRD-002, SRS REQ-10  
-**Version:** v2.1.0  
-**Status:** 📋 Planned
+#### Requirements
+
+| ID | Requirement | Priority | Status | Evidence |
+|----|-------------|----------|--------|----------|
+| NFR-S-01 | CSRF protection on all form submissions | P0 | ✅ | Laravel middleware |
+| NFR-S-02 | Image upload content-type validation | P0 | ✅ | MIME type sniffing |
+| NFR-S-03 | Image upload size limit (2MB max) | P0 | ✅ | Validation rules |
+| NFR-S-04 | XSS prevention through input sanitization | P0 | ✅ | Blade escaping |
+| NFR-S-05 | SQL injection prevention | P0 | ✅ | Eloquent ORM |
+| NFR-S-06 | Rate limiting (100 requests/minute per IP) | P0 | ✅ | Middleware |
+| NFR-S-07 | Per-user data isolation for Account runs | P0 | ✅ | Authorization policies |
+| NFR-S-08 | AI API key protection and rotation | P1 | ✅ | Environment variables |
+| NFR-S-09 | Secure session management | P0 | ✅ | Laravel Sanctum |
+| NFR-S-10 | Data encryption for sensitive fields | P1 | ✅ | AES-256 encryption |
 
 #### Acceptance Criteria
 
-1. **WHEN** analyzing completed careers, **THEN** the System **SHALL** identify success patterns including: stat distribution ratios for A+ grades, skill acquisition timelines, training facility selection patterns, and support card synergies with pattern confidence scores.
+**AC-S-01: Input Validation**
 
-   **Verification Method:** Pattern Analysis Test  
-   **Test Case:** TC-174-01  
-   **Algorithm:** K-means clustering, association rules
+- WHEN processing user input
+- THEN all inputs SHALL be validated against defined rules
+- AND malicious content SHALL be sanitized or rejected
+- AND validation errors SHALL be returned with clear messages
 
-2. **WHEN** comparing careers, **THEN** the System **SHALL** provide multi-career comparison with: parallel coordinates chart for stats, timeline comparison for key milestones, skill acquisition overlap analysis, and deviation from optimal path highlighting.
+**AC-S-02: Authentication and Authorization**
 
-   **Verification Method:** Comparison UI Test  
-   **Test Case:** TC-174-02  
-   **Visualization:** Interactive D3.js charts
+- WHEN accessing protected resources
+- THEN user SHALL be authenticated
+- AND user SHALL be authorized for the specific resource
+- AND unauthorized access SHALL return 401/403 status
 
-3. **WHEN** generating insights, **THEN** the System **SHALL** provide actionable recommendations including: optimal stat breakpoints for character type, critical training turns (when to prioritize stats), skill acquisition windows (when skills are cheapest), and common pitfalls to avoid.
+**AC-S-03: Data Protection**
 
-   **Verification Method:** Recommendation Review  
-   **Test Case:** TC-174-03  
-   **AI:** Neuron AI insight generation
+- WHEN storing sensitive data
+- THEN data SHALL be encrypted at rest
+- AND data SHALL be transmitted over HTTPS
+- AND sensitive data SHALL not appear in logs
 
-4. **WHEN** tracking trends, **THEN** the System **SHALL** identify meta shifts over time with: popularity trends for support cards, success rate changes for strategies, emerging optimal builds, and community aggregate statistics (anonymized) with visualization dashboard.
+**Related Artifacts:**
 
-   **Verification Method:** Trend Analysis Test  
-   **Test Case:** TC-174-04  
-   **Dashboard:** `/analytics/trends`
-
-5. **WHEN** exporting analytics, **THEN** the System **SHALL** generate comprehensive reports including: executive summary with key insights, detailed statistical analysis, visualizations (charts, heatmaps), recommendations list, and exportable formats (PDF, Excel, interactive HTML).
-
-   **Verification Method:** Export Test  
-   **Test Case:** TC-174-05  
-   **Export:** Multiple formats with charts embedded
-
-**Implementation References:**
-
-- Service: `app/Services/Analytics/PatternRecognitionService.php`
-- Service: `app/Services/Analytics/CareerComparisonService.php`
-- View: `resources/views/analytics/patterns.blade.php`
-- JS: `resources/js/charts/comparison-charts.js` with D3.js
-- Test: `tests/Feature/Analytics/PatternRecognitionTest.php`
+- Security: IVM §11.2
+- Middleware: `bootstrap/app.php`
+- Policies: `app/Policies/`
 
 ---
 
-### Requirement 15: Enhanced Export Formats
+### 5.3 Accessibility Requirements [NFR-A]
 
-**User Story:** As a user, I want to export my career data in multiple rich formats, so that I can share results with friends, create portfolio documentation, and analyze data in my preferred tools.
+**Source:** BR-11 (BRS §4.11), SRS §3.3  
+**Priority:** P0  
+**Status:** ✅ Implemented / 🔄 In Progress
 
-**Priority:** P1 (High)  
-**Category:** Functional / Data Management  
-**Source:** SRS REQ-15, PRD-007  
-**Version:** v2.1.0  
-**Status:** 📋 Planned
+#### Requirements
+
+| ID | Requirement | WCAG Reference | Priority | Status | Evidence |
+|----|-------------|----------------|----------|--------|----------|
+| NFR-A-01 | Alt text for all images | 1.1.1 (A) | P0 | ✅ | All images have alt attributes |
+| NFR-A-02 | Color info available via text | 1.4.1 (A) | P0 | ✅ | Text labels + icons |
+| NFR-A-03 | 4.5:1 contrast ratio for normal text | 1.4.3 (AA) | P0 | ✅ | Design system enforces |
+| NFR-A-04 | 3:1 contrast ratio for large text | 1.4.3 (AA) | P0 | ✅ | Design system enforces |
+| NFR-A-05 | Skip-to-main link | 2.4.1 (A) | P0 | ✅ | Skip link implemented |
+| NFR-A-06 | Keyboard navigation for all elements | 2.1.1 (A) | P0 | ✅ | All interactive elements focusable |
+| NFR-A-07 | Visible focus indicator | 2.4.7 (AA) | P0 | ✅ | Custom focus styles |
+| NFR-A-08 | Focus trap for modals | 2.4.3 (A) | P0 | ✅ | Modal focus management |
+| NFR-A-09 | Semantic HTML elements | 4.1.2 (A) | P0 | ✅ | ARIA labels on controls |
+| NFR-A-10 | 400% zoom reflow support | 1.4.10 (AA) | P0 | 🔄 | Responsive breakpoints |
+| NFR-A-11 | Reduced motion support | 2.3.3 (AAA) | P1 | ✅ | prefers-reduced-motion respected |
+| NFR-A-12 | Screen reader compatibility | 4.1.2 (A) | P0 | ✅ | NVDA, JAWS, VoiceOver tested |
 
 #### Acceptance Criteria
 
-1. **WHEN** exporting to PDF, **THEN** the System **SHALL** generate formatted PDF report with: cover page with character image and summary stats, stat progression charts (line graphs), skill acquisition timeline, race history table, and custom branding with watermark option.
+**AC-A-01: WCAG AA Compliance**
 
-   **Verification Method:** PDF Generation Test  
-   **Test Case:** TC-175-01  
-   **Library:** DomPDF or Snappy with templates
+- WHEN testing with automated tools (axe-core)
+- THEN no WCAG AA violations SHALL be detected
+- AND manual testing SHALL confirm compliance
+- AND screen reader testing SHALL pass
 
-2. **WHEN** exporting to Excel, **THEN** the System **SHALL** generate Excel workbook with: multiple sheets (Overview, Stats, Skills, Races), formatted tables with colors, embedded formulas for calculations (totals, averages), charts (embedded stat graphs), and pivot table ready data.
+**AC-A-02: Keyboard Navigation**
 
-   **Verification Method:** Excel Generation Test  
-   **Test Case:** TC-175-02  
-   **Library:** PhpSpreadsheet with styling
+- WHEN navigating with keyboard only
+- THEN all interactive elements SHALL be reachable
+- AND focus order SHALL be logical
+- AND focus SHALL be visible at all times
+- AND keyboard shortcuts SHALL not conflict
 
-3. **WHEN** creating shareable links, **THEN** the System **SHALL** generate secure share links with: privacy options (public, unlisted, private with password), expiration dates (7 days, 30 days, never), view count tracking, and ability to revoke access at any time.
+**AC-A-03: Screen Reader Support**
 
-   **Verification Method:** Share Link Test  
-   **Test Case:** TC-175-03  
-   **Route:** `/share/{token}` with access control
+- WHEN using screen readers (NVDA, JAWS, VoiceOver)
+- THEN all content SHALL be announced correctly
+- AND form labels SHALL be associated properly
+- AND dynamic content updates SHALL be announced
+- AND navigation SHALL be clear and logical
 
-4. **WHEN** viewing shared content, **THEN** the System **SHALL** display read-only career view with: responsive layout for mobile viewing, interactive charts, ability to copy data (but not edit), attribution to original creator, and "Create your own" call-to-action button.
+**Related Artifacts:**
 
-   **Verification Method:** Shared View Test  
-   **Test Case:** TC-175-04  
-   **View:** `resources/views/share/career.blade.php`
-
-5. **WHEN** exporting with images, **THEN** the System **SHALL** optimize images for export with: compression for smaller file sizes (WebP → JPEG conversion), resolution appropriate for use case (screen vs print), watermark option for public shares, and batch image processing for large exports.
-
-   **Verification Method:** Image Export Test  
-   **Test Case:** TC-175-05  
-   **Service:** `app/Services/Export/ImageOptimizationService.php`
-
-**Implementation References:**
-
-- Service: `app/Services/Export/PDFExportService.php`
-- Service: `app/Services/Export/ExcelExportService.php`
-- Service: `app/Services/Share/ShareLinkService.php`
-- Template: `resources/views/export/pdf-template.blade.php`
-- Test: `tests/Feature/Export/EnhancedExportTest.php`
+- Compliance: IVM §11.3 (92% WCAG AA compliance)
+- Testing: Automated axe-core tests, manual testing
+- Components: Semantic HTML, ARIA attributes
 
 ---
 
-## 8. Testing Requirements
+### 5.4 Compatibility Requirements [NFR-C]
 
-### Requirement 16: Property-Based Testing Implementation
+**Source:** SRS §3.4  
+**Priority:** P0  
+**Status:** ✅ Implemented
 
-**User Story:** As a developer, I want property-based testing that validates system invariants across automatically generated inputs, so that I can catch edge cases that traditional example-based tests miss.
+#### Requirements
 
-**Priority:** P2 (Medium)  
-**Category:** Non-Functional / Testing  
-**Source:** SDP Phase 7  
-**Version:** v2.1.0  
-**Status:** 📋 Planned
+| ID | Requirement | Priority | Status | Evidence |
+|----|-------------|----------|--------|----------|
+| NFR-C-01 | PHP 8.2+ support | P0 | ✅ | Laravel 12 requirement |
+| NFR-C-02 | MySQL 8.0+ / MariaDB 10.5+ / SQLite support | P0 | ✅ | Database configuration |
+| NFR-C-03 | Chrome (last 2 versions) | P0 | ✅ | Tested |
+| NFR-C-04 | Firefox (last 2 versions) | P0 | ✅ | Tested |
+| NFR-C-05 | Safari (last 2 versions) | P0 | ✅ | Tested |
+| NFR-C-06 | Edge (last 2 versions) | P0 | ✅ | Tested |
+| NFR-C-07 | iOS Safari support | P0 | ✅ | Mobile tested |
+| NFR-C-08 | Chrome Android support | P0 | ✅ | Mobile tested |
+| NFR-C-09 | Redis 7+ (optional) | P1 | ✅ | Cache/queue support |
 
 #### Acceptance Criteria
 
-1. **WHEN** testing stat calculations, **THEN** the System **SHALL** use property-based tests to verify: stats always between 0-1200 (hard cap), stat totals never decrease unexpectedly, growth rate applications produce positive gains, and calculations are deterministic (same inputs = same outputs).
+**AC-C-01: Browser Compatibility**
 
-   **Verification Method:** Property Test Execution  
-   **Test Case:** TC-176-01  
-   **Framework:** Pest v4 with property testing
+- WHEN testing on supported browsers
+- THEN all features SHALL work correctly
+- AND UI SHALL render properly
+- AND performance SHALL meet targets
 
-2. **WHEN** testing data transformations, **THEN** the System **SHALL** verify properties including: import-export round-trip preserves all data (bijection), JSON serialization-deserialization is idempotent, data migrations are reversible, and canonical field names are used consistently.
+**AC-C-02: Database Compatibility**
 
-   **Verification Method:** Transformation Property Test  
-   **Test Case:** TC-176-02  
-   **Properties:** Isomorphism, idempotence
+- WHEN using MySQL, MariaDB, or SQLite
+- THEN all database operations SHALL work correctly
+- AND migrations SHALL run successfully
+- AND data integrity SHALL be maintained
 
-3. **WHEN** testing edge cases, **THEN** the System **SHALL** generate random inputs for: boundary values (0, 1200, max turn 78), invalid inputs (negative stats, turn 79), unicode characters in names, and very large datasets (1000+ skills) to discover edge cases.
+**Related Artifacts:**
 
-   **Verification Method:** Fuzz Testing  
-   **Test Case:** TC-176-03  
-   **Generator:** Random data generators
-
-4. **WHEN** properties fail, **THEN** the System **SHALL** provide shrinking to find minimal failing case with: automatic reduction of complex inputs, reproducible failure with seed, clear failure message indicating violated property, and counterexample for debugging.
-
-   **Verification Method:** Shrinking Test  
-   **Test Case:** TC-176-04  
-   **Feature:** Automatic counterexample shrinking
-
-5. **WHEN** running property tests, **THEN** the System **SHALL** execute efficiently with: configurable number of iterations (default 100), deterministic seeding for reproducibility, parallel execution support, and integration with CI pipeline (must pass for merge).
-
-   **Verification Method:** CI Integration  
-   **Test Case:** TC-176-05  
-   **CI:** GitHub Actions with property tests
-
-**Implementation References:**
-
-- Test: `tests/Property/StatCalculationPropertyTest.php`
-- Test: `tests/Property/DataTransformationPropertyTest.php`
-- Config: `tests/pest-properties.php` with generators
-- CI: `.github/workflows/property-tests.yml`
+- Testing: Browser compatibility matrix
+- Configuration: `config/database.php`
 
 ---
 
-### Requirement 17: Comprehensive Browser Testing
+### 5.5 Maintainability Requirements [NFR-M]
 
-**User Story:** As a QA engineer, I want end-to-end browser testing across all major browsers, so that I can ensure consistent behavior and catch browser-specific bugs before users encounter them.
+**Source:** SRS §3.5  
+**Priority:** P0-P1  
+**Status:** ✅ Implemented
 
-**Priority:** P1 (High)  
-**Category:** Non-Functional / Testing  
-**Source:** SRS NFR-4, SDP Phase 7  
-**Version:** v2.1.0  
-**Status:** 📋 Planned
+#### Requirements
+
+| ID | Requirement | Priority | Status | Evidence |
+|----|-------------|----------|--------|----------|
+| NFR-M-01 | PSR-12 coding standards | P0 | ✅ | PHP_CodeSniffer, Pint |
+| NFR-M-02 | Test coverage > 80% | P0 | 🔄 | Current: 90% |
+| NFR-M-03 | Documentation for public APIs | P0 | ✅ | PHPDoc blocks |
+| NFR-M-04 | data-testid attributes on interactive elements | P0 | ✅ | Test selectors |
+| NFR-M-05 | Consistent naming: `data-testid="[component]-[action]-[context]"` | P0 | ✅ | Naming convention |
+| NFR-M-06 | Service layer abstraction for business logic | P0 | ✅ | Service classes |
+| NFR-M-07 | Repository pattern for data access | P1 | ✅ | Repository classes |
+| NFR-M-08 | Cyclomatic complexity < 10 avg | P1 | ✅ | Current: 7.2 avg |
+| NFR-M-09 | Code duplication < 5% | P1 | ✅ | Current: 3.8% |
+| NFR-M-10 | Maintainability Index > 70 | P1 | ✅ | Current: 82 |
 
 #### Acceptance Criteria
 
-1. **WHEN** testing critical flows, **THEN** the System **SHALL** execute E2E tests on: Chrome (latest), Firefox (latest), Safari (latest), Edge (latest) with: character creation, training session completion, skill acquisition, race strategy planning, and data export.
+**AC-M-01: Code Quality**
 
-   **Verification Method:** Cross-Browser E2E Tests  
-   **Test Case:** TC-177-01  
-   **Tool:** Playwright with multiple browser contexts
+- WHEN analyzing code quality
+- THEN PSR-12 compliance SHALL be 100%
+- AND test coverage SHALL be > 80%
+- AND cyclomatic complexity SHALL be < 10 avg
+- AND code duplication SHALL be < 5%
 
-2. **WHEN** testing responsive layouts, **THEN** the System **SHALL** validate layouts at: mobile (375px iPhone SE), tablet (768px iPad), desktop (1920px), and wide (2560px) viewports with screenshot comparison for visual regression detection.
+**AC-M-02: Documentation**
 
-   **Verification Method:** Visual Regression Test  
-   **Test Case:** TC-177-02  
-   **Tool:** Playwright with screenshot assertions
+- WHEN reviewing code documentation
+- THEN all public methods SHALL have PHPDoc blocks
+- AND all classes SHALL have class-level documentation
+- AND complex logic SHALL have inline comments
 
-3. **WHEN** testing interactions, **THEN** the System **SHALL** verify: click events work consistently, form inputs accept text correctly, drag-and-drop functions properly, keyboard navigation follows same paths, and touch events work on mobile browsers.
+**Related Artifacts:**
 
-   **Verification Method:** Interaction Test  
-   **Test Case:** TC-177-03  
-   **Coverage:** Mouse, keyboard, touch events
-
-4. **WHEN** testing performance, **THEN** the System **SHALL** measure: page load time across browsers, JavaScript execution time, memory consumption, layout shift (CLS), and first input delay (INP) with performance regression detection (fail if >10% slower).
-
-   **Verification Method:** Performance Benchmark  
-   **Test Case:** TC-177-04  
-   **Metrics:** Lighthouse CI scores per browser
-
-5. **WHEN** running browser tests in CI, **THEN** the System **SHALL** execute tests in: parallel (4 concurrent browsers), headless mode for speed, with video recording on failure, test artifacts (screenshots, traces) uploaded to storage, and flaky test retry (max 2 retries).
-
-   **Verification Method:** CI Pipeline  
-   **Test Case:** TC-177-05  
-   **CI:** GitHub Actions with Playwright
-
-**Implementation References:**
-
-- Test: `tests/Browser/CrossBrowser/*.spec.ts` with Playwright
-- Config: `playwright.config.ts` with multiple projects
-- CI: `.github/workflows/browser-tests.yml`
-- Storage: GitHub Actions artifacts for test results
+- Quality Metrics: IVM §11.4
+- Tools: PHP_CodeSniffer, PHPStan, PHPMetrics
 
 ---
 
-### Requirement 18: Performance Benchmarking Suite
+### 5.6 Responsive Design Requirements [NFR-R]
 
-**User Story:** As a developer, I want automated performance benchmarking that tracks metrics over time, so that I can detect performance regressions early and ensure we maintain our performance targets.
+**Source:** BR-11 (BRS §4.11), SRS §3.6  
+**Priority:** P0  
+**Status:** ✅ Implemented
 
-**Priority:** P1 (High)  
-**Category:** Non-Functional / Testing  
-**Source:** SRS NFR-1, SDP Phase 7  
-**Version:** v2.1.0  
-**Status:** 📋 Planned
+#### Requirements
+
+| ID | Requirement | Breakpoint | Priority | Status | Evidence |
+|----|-------------|------------|----------|--------|----------|
+| NFR-R-01 | Mobile layout | < 640px | P0 | ✅ | Responsive design |
+| NFR-R-02 | Tablet layout | 640px - 1024px | P0 | ✅ | Responsive design |
+| NFR-R-03 | Desktop layout | > 1024px | P0 | ✅ | Responsive design |
+| NFR-R-04 | Touch targets 44px minimum | All mobile | P0 | ✅ | Touch-friendly |
+| NFR-R-05 | Usable viewport range | 320px - 2560px | P0 | ✅ | Tested |
+| NFR-R-06 | Fluid typography | All breakpoints | P1 | ✅ | Tailwind CSS |
+| NFR-R-07 | Responsive images | All breakpoints | P1 | ✅ | Srcset attributes |
 
 #### Acceptance Criteria
 
-1. **WHEN** running benchmark suite, **THEN** the System **SHALL** measure: page load time (dashboard, character detail, training editor), API response time (training prediction, skill search, data export), database query time (character list, training history), and cache hit rates.
+**AC-R-01: Responsive Breakpoints**
 
-   **Verification Method:** Benchmark Execution  
-   **Test Case:** TC-178-01  
-   **Tool:** Custom benchmarking suite
+- WHEN viewing on different screen sizes
+- THEN layout SHALL adapt appropriately
+- AND content SHALL remain readable
+- AND functionality SHALL remain accessible
+- AND performance SHALL not degrade
 
-2. **WHEN** comparing against baseline, **THEN** the System **SHALL** fail build if: page load time increases >10%, API response time increases >15%, database query time increases >20%, or cache hit rate decreases >5% with detailed report of regression sources.
+**AC-R-02: Touch Targets**
 
-   **Verification Method:** CI Threshold Check  
-   **Test Case:** TC-178-02  
-   **CI:** Automated performance gate
+- WHEN using touch devices
+- THEN all interactive elements SHALL be at least 44px
+- AND spacing SHALL prevent accidental taps
+- AND gestures SHALL work correctly
 
-3. **WHEN** load testing, **THEN** the System **SHALL** simulate concurrent users with: 10 concurrent users (baseline), 50 concurrent users (normal load), 100 concurrent users (peak load), 200 concurrent users (stress test) and measure: response time percentiles (p50, p95, p99), error rate, and throughput (req/sec).
+**Related Artifacts:**
 
-   **Verification Method:** Load Test  
-   **Test Case:** TC-178-03  
-   **Tool:** Apache JMeter or k6
-
-4. **WHEN** profiling application, **THEN** the System **SHALL** identify bottlenecks with: flame graph generation for CPU profiling, memory allocation tracking, database query profiling with EXPLAIN plans, and N+1 query detection with automated suggestions.
-
-   **Verification Method:** Profiling Analysis  
-   **Test Case:** TC-178-04  
-   **Tool:** Blackfire.io or XDebug
-
-5. **WHEN** tracking metrics over time, **THEN** the System **SHALL** store benchmark results with: timestamp, git commit SHA, benchmark values, environment details (PHP version, server specs) and provide trend visualization dashboard showing performance over time at `/admin/performance-trends`.
-
-   **Verification Method:** Metrics Dashboard  
-   **Test Case:** TC-178-05  
-   **Storage:** `performance_benchmarks` table
-
-**Implementation References:**
-
-- Test: `tests/Performance/BenchmarkSuite.php`
-- Script: `scripts/run-benchmarks.sh`
-- Config: `.github/workflows/performance-benchmarks.yml`
-- Dashboard: `resources/views/admin/performance-trends.blade.php`
+- Design: Tailwind CSS v4 configuration
+- Testing: Responsive design testing
 
 ---
 
-## 9. Security Requirements
+### 5.7 Observability Requirements [NFR-O]
 
-### Requirement 19: Comprehensive Security Audit
+**Source:** BR-10 (BRS §4.10), SRS §3.7  
+**Priority:** P1  
+**Status:** ✅ Implemented / 🔄 In Progress
 
-**User Story:** As a security engineer, I want regular security audits with automated scanning and manual penetration testing, so that we identify and fix vulnerabilities before they can be exploited.
+#### Requirements
 
-**Priority:** P0 (Critical)  
-**Category:** Non-Functional / Security  
-**Source:** SRS NFR-2, SDP Phase 7  
-**Version:** v2.1.0  
-**Status:** 📋 Planned
+| ID | Requirement | Priority | Status | Evidence |
+|----|-------------|----------|--------|----------|
+| NFR-O-01 | APM integration for performance monitoring | P1 | 🔄 | Dashboards in progress |
+| NFR-O-02 | Error logging with trace IDs | P0 | ✅ | Laravel logging |
+| NFR-O-03 | AI cost tracking and budgeting | P1 | ✅ | `AICostTracker` |
+| NFR-O-04 | Cache hit/miss monitoring | P1 | 🔄 | Metrics in progress |
+| NFR-O-05 | External API health monitoring | P1 | ✅ | Circuit breaker metrics |
+| NFR-O-06 | Database query performance tracking | P1 | ✅ | Laravel Telescope |
+| NFR-O-07 | User activity logging | P1 | ✅ | Activity logs |
 
 #### Acceptance Criteria
 
-1. **WHEN** scanning dependencies, **THEN** the System **SHALL** run automated security scans with: `composer audit` for PHP dependencies, `npm audit` for JavaScript dependencies, detection of known vulnerabilities (CVE database), and automatic PR creation for security updates (Dependabot).
+**AC-O-01: Performance Monitoring**
 
-   **Verification Method:** Automated Scan  
-   **Test Case:** TC-179-01  
-   **CI:** Daily security scans
+- WHEN monitoring application performance
+- THEN APM SHALL track response times
+- AND APM SHALL track error rates
+- AND APM SHALL track resource usage
+- AND APM SHALL provide alerting
 
-2. **WHEN** testing application security, **THEN** the System **SHALL** perform: OWASP Top 10 vulnerability scanning (SQL injection, XSS, CSRF), authentication and session testing, authorization bypass attempts, input validation testing, and file upload security testing.
+**AC-O-02: Error Tracking**
 
-   **Verification Method:** Security Testing  
-   **Test Case:** TC-179-02  
-   **Tool:** OWASP ZAP or Burp Suite
+- WHEN errors occur
+- THEN errors SHALL be logged with context
+- AND errors SHALL include trace IDs
+- AND errors SHALL be categorized by severity
+- AND errors SHALL trigger alerts for critical issues
 
-3. **WHEN** conducting penetration testing, **THEN** the System **SHALL** include: manual testing by security professional, API security testing, privilege escalation attempts, data exposure testing, and third-party library vulnerability assessment with detailed report.
+**Related Artifacts:**
 
-   **Verification Method:** Pen Test Report  
-   **Test Case:** TC-179-03  
-   **Frequency:** Quarterly
-
-4. **WHEN** reviewing code security, **THEN** the System **SHALL** use static analysis with: Larastan for Laravel-specific issues, PHPStan for PHP type safety, ESLint security plugin for JavaScript, detection of hardcoded secrets, and SQL injection pattern detection.
-
-   **Verification Method:** Static Analysis  
-   **Test Case:** TC-179-04  
-   **Tool:** Larastan, SonarQube
-
-5. **WHEN** reporting vulnerabilities, **THEN** the System **SHALL** maintain security documentation including: vulnerability disclosure policy at `/.well-known/security.txt`, security contact email, bug bounty program details (if applicable), and public security advisories for resolved issues.
-
-   **Verification Method:** Documentation Review  
-   **Test Case:** TC-179-05  
-   **Policy:** `public/.well-known/security.txt`
-
-**Implementation References:**
-
-- Config: `.github/workflows/security-scan.yml`
-- Policy: `public/.well-known/security.txt`
-- Test: `tests/Security/VulnerabilityScanTest.php`
-- Documentation: `docs/security/security-policy.md`
+- Monitoring: Laravel Telescope, Laravel Horizon
+- Logging: `storage/logs/laravel.log`
+- Metrics: APM dashboards
 
 ---
 
-### Requirement 20: Enhanced Data Privacy Controls
+### 5.8 PWA Requirements [NFR-PWA]
 
-**User Story:** As a user, I want comprehensive privacy controls over my data, so that I can control what is shared, who can access it, and when it is deleted in compliance with privacy regulations.
+**Source:** BR-11 (BRS §4.11)  
+**Priority:** P1  
+**Status:** ✅ Implemented / 🔄 In Progress
 
-**Priority:** P1 (High)  
-**Category:** Functional / Security / Privacy  
-**Source:** BRS, SRS NFR-2  
-**Version:** v2.1.0  
-**Status:** 📋 Planned
+#### Requirements
+
+| ID | Requirement | Priority | Status | Evidence |
+|----|-------------|----------|--------|----------|
+| NFR-PWA-01 | Service worker for offline functionality | P1 | 🔄 | Partial implementation |
+| NFR-PWA-02 | Offline route coverage for critical paths | P1 | 🔄 | In progress |
+| NFR-PWA-03 | Background sync for data synchronization | P1 | 🔄 | Planned |
+| NFR-PWA-04 | Push notifications for important updates | P2 | ⏳ | Planned |
+| NFR-PWA-05 | Installable app experience | P1 | ✅ | Manifest file |
+| NFR-PWA-06 | Caching strategies for core features | P1 | 🔄 | In progress |
 
 #### Acceptance Criteria
 
-1. **WHEN** managing data privacy, **THEN** the System **SHALL** provide privacy dashboard with: data export (download all personal data in JSON), data deletion (right to be forgotten), access log (view all access to my data), and third-party sharing controls (none by default).
+**AC-PWA-01: Offline Functionality**
 
-   **Verification Method:** Privacy Dashboard Test  
-   **Test Case:** TC-180-01  
-   **Route:** `/privacy/dashboard`
+- WHEN network connection is lost
+- THEN critical features SHALL remain functional
+- AND data SHALL be cached locally
+- AND operations SHALL queue for sync
+- AND user SHALL be notified of offline state
 
-2. **WHEN** requesting data export, **THEN** the System **SHALL** generate complete export within 72 hours including: all career runs, character data, training sessions, skills, preferences, activity logs in machine-readable JSON format with documentation.
+**AC-PWA-02: Installability**
 
-   **Verification Method:** Export Request Test  
-   **Test Case:** TC-180-02  
-   **Compliance:** GDPR Article 20
+- WHEN user visits the application
+- THEN install prompt SHALL be available
+- AND app SHALL install as standalone
+- AND app SHALL have proper icon and name
+- AND app SHALL launch in standalone mode
 
-3. **WHEN** requesting account deletion, **THEN** the System **SHALL** provide: confirmation with explanation of consequences, grace period (30 days to cancel), complete deletion of personal data (except legal retention requirements), and deletion confirmation email.
+**Related Artifacts:**
 
-   **Verification Method:** Deletion Test  
-   **Test Case:** TC-180-03  
-   **Compliance:** GDPR Article 17
-
-4. **WHEN** sharing data, **THEN** the System **SHALL** require explicit consent with: clear explanation of what is shared, granular controls (share stats only, share skills, share full career), ability to revoke consent at any time, and audit trail of sharing activities.
-
-   **Verification Method:** Consent Management Test  
-   **Test Case:** TC-180-04  
-   **UI:** Granular sharing controls
-
-5. **WHEN** processing personal data, **THEN** the System **SHALL** maintain compliance with: data minimization (only collect necessary data), purpose limitation (use data only for stated purpose), storage limitation (delete after purpose fulfilled), and privacy by design principles.
-
-   **Verification Method:** Compliance Review  
-   **Test Case:** TC-180-05  
-   **Documentation:** Privacy policy, data processing agreement
-
-**Implementation References:**
-
-- Service: `app/Services/Privacy/DataExportService.php`
-- Service: `app/Services/Privacy/DataDeletionService.php`
-- View: `resources/views/privacy/dashboard.blade.php`
-- Policy: `resources/views/legal/privacy-policy.blade.php`
-- Test: `tests/Feature/Privacy/PrivacyControlsTest.php`
+- Service Worker: `public/service-worker.js`
+- Manifest: `public/manifest.json`
+- Evidence: IVM §10.2 (GAP-002, GAP-006)
 
 ---
 
-## 10. Non-Functional Requirements
+## 6. Interface and Integration Requirements
 
-### 10.1 Performance Requirements
+### 6.1 User Interface Requirements [INT-UI]
 
-| ID | Requirement | Target | Priority |
-|----|-------------|--------|----------|
-| NFR-P-01 | Page load time (dashboard) | < 2.0 seconds | P0 |
-| NFR-P-02 | Page load time (character detail) | < 1.5 seconds | P0 |
-| NFR-P-03 | Page load time (training editor) | < 2.5 seconds | P0 |
-| NFR-P-04 | API response time (training prediction) | < 500ms | P0 |
-| NFR-P-05 | API response time (skill search) | < 200ms | P0 |
-| NFR-P-06 | Database query time (character list) | < 100ms | P0 |
-| NFR-P-07 | Cache hit rate | > 80% | P0 |
-| NFR-P-08 | Core Web Vitals - LCP | < 2.5 seconds | P0 |
-| NFR-P-09 | Core Web Vitals - INP | < 200ms | P0 |
-| NFR-P-10 | Core Web Vitals - CLS | < 0.1 | P0 |
+**Source:** SRS §4.1  
+**Priority:** P0  
+**Status:** ✅ Implemented
 
-### 10.2 Scalability Requirements
+#### UI Component Requirements
 
-| ID | Requirement | Target | Priority |
-|----|-------------|--------|----------|
-| NFR-S-01 | Concurrent users supported | 100 users | P1 |
-| NFR-S-02 | Database records (characters) | 100,000+ | P1 |
-| NFR-S-03 | Database records (training sessions) | 1,000,000+ | P1 |
-| NFR-S-04 | API requests per minute | 1000 req/min | P1 |
-| NFR-S-05 | Storage per user (average) | < 50 MB | P1 |
+| ID | Component | Description | Status | Evidence |
+|----|-----------|-------------|--------|----------|
+| INT-UI-01 | Navigation Bar | App branding, navigation links, dark mode toggle, user menu | ✅ | Navbar component |
+| INT-UI-02 | Sidebar | Secondary navigation for desktop | ✅ | Sidebar component |
+| INT-UI-03 | Breadcrumbs | Context navigation path | ✅ | Breadcrumb component |
+| INT-UI-04 | Mobile Nav | Hamburger menu for mobile | ✅ | Mobile menu |
+| INT-UI-05 | Form Components | Input, Select, Textarea, Checkbox, File Upload, Autocomplete | ✅ | Form components |
+| INT-UI-06 | Display Components | Plan Card, Stat Bar, Skill Badge, Storage Badge, Toast, Modal | ✅ | Display components |
+| INT-UI-07 | Data Tables | Sortable, filterable tables with pagination | ✅ | Table components |
+| INT-UI-08 | Charts | Stat progression, performance comparison charts | ✅ | Chart components |
 
-### 10.3 Reliability Requirements
+**Related Artifacts:**
 
-| ID | Requirement | Target | Priority |
-|----|-------------|--------|----------|
-| NFR-R-01 | System uptime | 99.9% | P0 |
-| NFR-R-02 | Data backup frequency | Daily | P0 |
-| NFR-R-03 | Backup retention | 30 days | P0 |
-| NFR-R-04 | Recovery time objective (RTO) | < 4 hours | P1 |
-| NFR-R-05 | Recovery point objective (RPO) | < 24 hours | P1 |
-
-### 10.4 Maintainability Requirements
-
-| ID | Requirement | Target | Priority |
-|----|-------------|--------|----------|
-| NFR-M-01 | Code test coverage | > 80% | P0 |
-| NFR-M-02 | Critical path test coverage | > 90% | P0 |
-| NFR-M-03 | Code documentation | All public APIs | P1 |
-| NFR-M-04 | Technical debt ratio | < 5% | P1 |
-| NFR-M-05 | Code complexity (cyclomatic) | < 10 per method | P1 |
-
-### 10.5 Compatibility Requirements
-
-| ID | Requirement | Target | Priority |
-|----|-------------|--------|----------|
-| NFR-C-01 | Browser support - Chrome | Latest 2 versions | P0 |
-| NFR-C-02 | Browser support - Firefox | Latest 2 versions | P0 |
-| NFR-C-03 | Browser support - Safari | Latest 2 versions | P0 |
-| NFR-C-04 | Browser support - Edge | Latest 2 versions | P0 |
-| NFR-C-05 | Mobile browser - iOS Safari | iOS 14+ | P0 |
-| NFR-C-06 | Mobile browser - Chrome Android | Android 10+ | P0 |
-| NFR-C-07 | Screen resolution support | 320px - 2560px | P0 |
+- Components: `resources/views/components/`
+- Livewire: `app/Livewire/`
+- Evidence: SRS §4.1
 
 ---
 
-## 11. Traceability Matrix
+### 6.2 API Endpoint Requirements [INT-API]
 
-### 11.1 Business Requirements to System Requirements
+**Source:** SRS §4.2  
+**Priority:** P0  
+**Status:** ✅ Implemented
 
-| Business Requirement | System Requirements | Priority | Status |
-|---------------------|---------------------|----------|--------|
-| BR-Performance | REQ-1, REQ-2, REQ-3, REQ-4, REQ-5 | P0 | Planned |
-| BR-Accessibility | REQ-6, REQ-7, REQ-8 | P0 | Planned |
-| BR-PWA | REQ-9, REQ-10, REQ-11 | P0/P1 | Planned |
-| BR-Analytics | REQ-12, REQ-13, REQ-14 | P2 | Planned |
-| BR-Export | REQ-15 | P1 | Planned |
-| BR-Testing | REQ-16, REQ-17, REQ-18 | P1/P2 | Planned |
-| BR-Security | REQ-19, REQ-20 | P0/P1 | Planned |
+#### Core API Endpoints
 
-### 11.2 System Requirements to Test Cases
+| ID | Endpoint | Method | Description | Auth | Status | Evidence |
+|----|----------|--------|-------------|------|--------|----------|
+| INT-API-01 | `/api/v1/plans` | GET/POST | List/Create plans | ✅ | ✅ | API controller |
+| INT-API-02 | `/api/v1/plans/{id}` | GET/PUT/DELETE | Plan CRUD | ✅ | ✅ | API controller |
+| INT-API-03 | `/api/v1/characters` | GET/POST | List/Create characters | ✅ | ✅ | API controller |
+| INT-API-04 | `/api/v1/characters/{id}` | GET/PUT/DELETE | Character CRUD | ✅ | ✅ | API controller |
+| INT-API-05 | `/api/v1/skills` | GET | List skills | ❌ | ✅ | API controller |
+| INT-API-06 | `/api/v1/support-cards` | GET | List support cards | ❌ | ✅ | API controller |
+| INT-API-07 | `/internal/skills/search` | GET | Skill autocomplete | ✅ | ✅ | Internal controller |
+| INT-API-08 | `/api/v1/training/predict` | POST | Training predictions | ✅ | ✅ | Training controller |
+| INT-API-09 | `/api/v1/training/execute` | POST | Execute training | ✅ | ✅ | Training controller |
+| INT-API-10 | `/api/v1/races/{id}/analyze` | GET | Race analysis | ✅ | ✅ | Race controller |
+| INT-API-11 | `/api/v1/ai/advice` | POST | AI advisory | ✅ | ✅ | AI controller |
+| INT-API-12 | `/api/v1/ocr/process` | POST | OCR processing | ✅ | ✅ | OCR controller |
+| INT-API-13 | `/api/v1/export/{type}` | GET | Export data | ✅ | ✅ | Export controller |
 
-| Requirement | Test Cases | Test Type | Coverage |
-|-------------|------------|-----------|----------|
-| REQ-1 | TC-161-01 to TC-161-05 | Integration, Performance | 100% |
-| REQ-2 | TC-162-01 to TC-162-05 | Unit, Integration, Performance | 100% |
-| REQ-3 | TC-163-01 to TC-163-05 | Integration, Load | 100% |
-| REQ-4 | TC-164-01 to TC-164-05 | Browser, Performance | 100% |
-| REQ-5 | TC-165-01 to TC-165-05 | Integration, Monitoring | 100% |
-| REQ-6 | TC-166-01 to TC-166-05 | Accessibility, Manual | 100% |
-| REQ-7 | TC-167-01 to TC-167-05 | Accessibility, Keyboard | 100% |
-| REQ-8 | TC-168-01 to TC-168-05 | Accessibility, Screen Reader | 100% |
-| REQ-9 | TC-169-01 to TC-169-05 | PWA, Offline | 100% |
-| REQ-10 | TC-170-01 to TC-170-05 | PWA, Notification | 100% |
-| REQ-11 | TC-171-01 to TC-171-05 | PWA, Install | 100% |
-| REQ-12 | TC-172-01 to TC-172-05 | Feature, Performance | 100% |
-| REQ-13 | TC-173-01 to TC-173-05 | ML, Integration | 100% |
-| REQ-14 | TC-174-01 to TC-174-05 | Analytics, Integration | 100% |
-| REQ-15 | TC-175-01 to TC-175-05 | Feature, Export | 100% |
-| REQ-16 | TC-176-01 to TC-176-05 | Property, Unit | 100% |
-| REQ-17 | TC-177-01 to TC-177-05 | Browser, E2E | 100% |
-| REQ-18 | TC-178-01 to TC-178-05 | Performance, Load | 100% |
-| REQ-19 | TC-179-01 to TC-179-05 | Security, Penetration | 100% |
-| REQ-20 | TC-180-01 to TC-180-05 | Privacy, Compliance | 100% |
+#### API Response Format
 
----
+All API responses SHALL follow this standard format:
 
-## 12. Verification and Validation
+```json
+{
+  "success": true,
+  "data": { ... },
+  "meta": {
+    "timestamp": "2026-01-25T12:00:00Z",
+    "version": "2.1.0"
+  }
+}
+```
 
-### 12.1 Verification Methods
+**Related Artifacts:**
 
-| Method | Description | Applicable Requirements |
-|--------|-------------|------------------------|
-| **Inspection** | Code review, configuration review, documentation review | REQ-1, REQ-2, REQ-6, NFR-M-03 |
-| **Test** | Automated unit, integration, E2E tests | All REQ-* |
-| **Analysis** | Static analysis, performance profiling, security scanning | REQ-2, REQ-4, REQ-18, REQ-19 |
-| **Demonstration** | Live demonstration to stakeholders | REQ-6, REQ-7, REQ-8, REQ-11 |
-
-### 12.2 Validation Criteria
-
-#### 12.2.1 Performance Validation
-
-- **Criteria**: All performance targets in Section 10.1 met
-- **Method**: Automated performance benchmarking (REQ-18)
-- **Acceptance**: 95% of measurements within target
-- **Verification**: Performance dashboard with historical trends
-
-#### 12.2.2 Accessibility Validation
-
-- **Criteria**: WCAG 2.2 AA compliance achieved (REQ-6)
-- **Method**: Automated axe-core scans + manual testing with NVDA, JAWS, VoiceOver
-- **Acceptance**: 0 critical violations, 0 serious violations
-- **Verification**: Accessibility audit report with remediation tracking
-
-#### 12.2.3 Security Validation
-
-- **Criteria**: No high-severity vulnerabilities present (REQ-19)
-- **Method**: Dependency scanning + penetration testing
-- **Acceptance**: 0 high-severity, < 5 medium-severity vulnerabilities
-- **Verification**: Security scan reports + pen test report
-
-#### 12.2.4 Functional Validation
-
-- **Criteria**: All P0 and P1 requirements implemented and tested
-- **Method**: Automated test suite + user acceptance testing
-- **Acceptance**: All tests passing, user acceptance sign-off
-- **Verification**: Test execution reports + UAT sign-off document
-
-### 12.3 Acceptance Testing
-
-#### 12.3.1 User Acceptance Testing Plan
-
-**Scope**: P0 and P1 requirements  
-**Participants**: 10-15 beta users representing different user classes  
-**Duration**: 2 weeks  
-**Success Criteria**:
-
-- 90%+ user satisfaction rating
-- < 5 critical bugs discovered
-- All P0 user flows completable without assistance
-
-**Test Scenarios**:
-
-1. Performance - Users notice improved page load times
-2. Accessibility - Keyboard-only users can complete all tasks
-3. PWA - Users can install and use app offline
-4. Analytics - Users find insights actionable and valuable
-5. Export - Users successfully export and share data
-
-#### 12.3.2 Beta Testing Program
-
-**Recruitment**: Open beta signup form  
-**Criteria**: Active Uma Musume players, diverse device/browser mix  
-**Incentives**: Early access to v2.1.0 features, beta tester badge  
-**Feedback Channels**: In-app feedback form, Discord channel, email  
-**Metrics Tracked**: Engagement, feature adoption, bug reports, satisfaction
+- Routes: `routes/api.php`
+- Controllers: `app/Http/Controllers/API/`
+- Evidence: SRS §4.2, IVM §8.2
 
 ---
 
-## Document Control
+### 6.3 AI Integration Requirements [INT-AI]
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 2.1.0 | 2026-01-23 | Development Team | Complete requirements for v2.1.0 release with performance, accessibility, PWA, analytics, and testing enhancements |
-| 2.0.0 | 2026-01-14 | Development Team | v2.0.0 release requirements |
-| 1.0.0 | 2026-01-03 | Development Team | Initial requirements document |
+**Source:** BR-6 (BRS §4.6), SPEC-006  
+**Priority:** P1  
+**Status:** ✅ Implemented
+
+#### AI Provider Requirements
+
+| ID | Requirement | Priority | Status | Evidence |
+|----|-------------|----------|--------|----------|
+| INT-AI-01 | Ollama local AI integration | P1 | ✅ | `OllamaService` |
+| INT-AI-02 | AWS Bedrock cloud AI integration | P1 | ✅ | `BedrockService` |
+| INT-AI-03 | Hybrid AI routing (local primary, cloud fallback) | P1 | ✅ | `HybridAIService` |
+| INT-AI-04 | Neuron AI agent framework | P1 | ✅ | `app/Neuron/Agents/` |
+| INT-AI-05 | AI cost tracking and budgeting | P1 | ✅ | `AICostTracker` |
+| INT-AI-06 | Conversation context management | P1 | ✅ | `AIConversation` model |
+| INT-AI-07 | Confidence scoring for recommendations | P2 | ✅ | Confidence scorer |
+
+**Related Artifacts:**
+
+- Service: `app/Services/AI/`
+- Agents: `app/Neuron/Agents/`
+- Evidence: SPEC-006, IVM §6.1
+
+---
+
+### 6.4 MCP Integration Requirements [INT-MCP]
+
+**Source:** SPEC-006, SIS §3  
+**Priority:** P1  
+**Status:** ✅ Implemented
+
+#### MCP Server Requirements
+
+| ID | Requirement | Priority | Status | Evidence |
+|----|-------------|----------|--------|----------|
+| INT-MCP-01 | Memory MCP server integration | P1 | ✅ | MCP configuration |
+| INT-MCP-02 | Filesystem MCP server integration | P1 | ✅ | MCP configuration |
+| INT-MCP-03 | Fetch MCP server integration | P1 | ✅ | MCP configuration |
+| INT-MCP-04 | MCP tool usage tracking | P1 | ✅ | `MCPToolUsage` model |
+| INT-MCP-05 | MCP server health monitoring | P1 | ✅ | `MCPServerHealth` model |
+| INT-MCP-06 | MCP orchestration service | P1 | ✅ | `MCPOrchestrator` |
+
+**Related Artifacts:**
+
+- Service: `app/Services/MCP/`
+- Configuration: MCP server configs
+- Evidence: SIS §3, IVM §6.1
+
+---
+
+### 6.5 External API Integration Requirements [INT-EXT]
+
+**Source:** BR-7 (BRS §4.7), SPEC-007  
+**Priority:** P0-P1  
+**Status:** ✅ Implemented
+
+#### External API Requirements
+
+| ID | Requirement | Priority | Status | Evidence |
+|----|-------------|----------|--------|----------|
+| INT-EXT-01 | umapyoi.net API integration (primary) | P0 | ✅ | `UmapyoiApiClient` |
+| INT-EXT-02 | UmamusumeDB.com API integration (fallback) | P1 | ✅ | `UmamusumeDBApiClient` |
+| INT-EXT-03 | Circuit breaker pattern implementation | P0 | ✅ | `CircuitBreaker` |
+| INT-EXT-04 | API response caching (24-hour TTL) | P1 | ✅ | Cache layer |
+| INT-EXT-05 | API rate limiting handling | P1 | ✅ | Rate limiter |
+| INT-EXT-06 | API health monitoring | P1 | ✅ | Health checks |
+
+**Related Artifacts:**
+
+- Service: `app/Services/ExternalAPI/`
+- Evidence: SPEC-007, IVM §6.1
+
+---
+
+### 6.6 OCR Integration Requirements [INT-OCR]
+
+**Source:** BR-7 (BRS §4.7), SPEC-007 §4  
+**Priority:** P1  
+**Status:** ✅ Implemented
+
+#### OCR Requirements
+
+| ID | Requirement | Priority | Status | Evidence |
+|----|-------------|----------|--------|----------|
+| INT-OCR-01 | Tesseract OCR engine integration | P1 | ✅ | `TesseractService` |
+| INT-OCR-02 | GD image preprocessing | P1 | ✅ | Image preprocessor |
+| INT-OCR-03 | Japanese text recognition | P1 | ✅ | Language support |
+| INT-OCR-04 | Confidence scoring (>85% threshold) | P1 | ✅ | Confidence scorer |
+| INT-OCR-05 | Manual correction interface | P1 | ✅ | Correction UI |
+| INT-OCR-06 | OCR extraction tracking | P1 | ✅ | `OCRExtraction` model |
+
+**Related Artifacts:**
+
+- Service: `app/Services/OCR/`
+- Evidence: SPEC-007 §4, IVM §6.1
+
+---
+
+### 6.7 WebSocket Integration Requirements [INT-WS]
+
+**Source:** BR-7 (BRS §4.7), SPEC-007 §5  
+**Priority:** P1  
+**Status:** ✅ Implemented
+
+#### WebSocket Requirements
+
+| ID | Requirement | Priority | Status | Evidence |
+|----|-------------|----------|--------|----------|
+| INT-WS-01 | Laravel Reverb WebSocket server | P1 | ✅ | Reverb configuration |
+| INT-WS-02 | Character update broadcasting | P1 | ✅ | Character channel |
+| INT-WS-03 | User notification broadcasting | P1 | ✅ | User channel |
+| INT-WS-04 | Connection state management | P1 | ✅ | Connection handler |
+| INT-WS-05 | Reconnection with state recovery | P1 | ✅ | Reconnection logic |
+
+**Related Artifacts:**
+
+- Configuration: `config/broadcasting.php`
+- Channels: `routes/channels.php`
+- Evidence: SPEC-007 §5
+
+---
+
+## 7. Data Requirements
+
+### 7.1 Data Entities
+
+**Source:** DBD §4, SRS §5.1  
+**Priority:** P0  
+**Status:** ✅ Implemented
+
+#### Core Entities
+
+| Entity | Description | Table | Status | Evidence |
+|--------|-------------|-------|--------|----------|
+| User | User account | `ucp_users` | ✅ | DBD §4.1 |
+| Character | Uma Musume character | `ucp_characters` | ✅ | DBD §4.2 |
+| CareerRun | Career progression | `ucp_careers` | ✅ | DBD §4.2 |
+| StatProgress | Turn-by-turn stats | `ucp_training_sessions` | ✅ | DBD §4.4 |
+| Skill | Skill definition | `ucp_skills` | ✅ | DBD §4.3 |
+| SkillCareerRun | Skill acquisition | `ucp_skill_acquisitions` | ✅ | DBD §4.4 |
+| SupportCard | Support card | `ucp_support_cards` | ✅ | DBD §4.2 |
+| SupportDeck | Deck configuration | `character_support_cards` | ✅ | DBD §4.2 |
+| Race | Race definition | `ucp_races` | ✅ | DBD §4.3 |
+| RaceResult | Race outcome | `ucp_race_results` | ✅ | DBD §4.4 |
+| Goal | Training goal | `ucp_goals` | ✅ | DBD §4.4 |
+| AIConversation | AI chat history | `ucp_ai_conversations` | ✅ | DBD §4.5 |
+| AICost | AI usage cost | `ucp_ai_costs` | ✅ | DBD §4.5 |
+| OCRExtraction | OCR result | `ucp_ocr_extractions` | ✅ | DBD §4.6 |
+| ExternalAPICache | API cache | `ucp_external_api_cache` | ✅ | DBD §4.2 |
+
+**Entity Relationship Diagram:**
+
+```mermaid
+erDiagram
+    User ||--o{ CareerRun : owns
+    Character ||--o{ CareerRun : features
+    CareerRun ||--o{ StatProgress : tracks
+    CareerRun ||--o{ SkillCareerRun : has
+    CareerRun ||--o{ RaceResult : includes
+    CareerRun ||--o{ Goal : defines
+    CareerRun ||--o{ SupportDeck : uses
+    Skill ||--o{ SkillCareerRun : referenced_by
+    SupportCard ||--o{ SupportDeck : includes
+    User ||--o{ AIConversation : has
+    User ||--o{ AICost : tracks
+```
+
+**Related Artifacts:**
+
+- Database: `database/migrations/`
+- Models: `app/Models/`
+- Evidence: DBD §4, IVM §7
+
+---
+
+### 7.2 Data Validation Rules
+
+**Source:** BRS §5.1, SRS §5.2  
+**Priority:** P0  
+**Status:** ✅ Implemented
+
+#### Validation Rules
+
+| Field | Rule | Error Message | Evidence |
+|-------|------|---------------|----------|
+| plan.title | Required, max 255 chars | "Title is required and must be under 255 characters" | Form Request |
+| plan.status | Enum: in_progress, completed, archived | "Invalid status value" | Enum validation |
+| plan.career_stage | Enum: junior, classic, senior | "Invalid career stage" | Enum validation |
+| stat.* | Integer, 0-1200 (hard max) | "Stat values must be between 0 and 1200" | Validation rule |
+| skill.status | Enum: acquired, skipped, suggested | "Invalid skill status" | Enum validation |
+| skill.turn_acquired | Required if status=acquired, 1-78 | "Turn number required for acquired skills" | Conditional validation |
+| energy | Integer, 0-100 | "Energy must be between 0 and 100" | Range validation |
+| support_deck | Exactly 6 cards | "Deck must contain exactly 6 cards" | Custom validation |
+| aptitude | Enum: G through SS | "Invalid aptitude grade" | Enum validation |
+| mood | Enum: Awful, Bad, Normal, Good, Great | "Invalid mood value" | Enum validation |
+
+**Related Artifacts:**
+
+- Form Requests: `app/Http/Requests/`
+- Validation: Livewire validation rules
+- Evidence: BRS §5.1
+
+---
+
+### 7.3 Data Retention
+
+**Source:** SRS §5.3  
+**Priority:** P1  
+**Status:** ✅ Implemented
+
+#### Retention Policies
+
+| Data Type | Retention | Notes | Evidence |
+|-----------|-----------|-------|----------|
+| Local runs | Until user clears or browser storage cleared | localStorage | Local storage |
+| Account runs | Until user deletes (30-day soft delete recovery) | Database | Soft deletes |
+| Drafts | 7 days | Auto-cleanup | Draft cleanup job |
+| Activity logs | Indefinite | Audit trail | Activity log |
+| AI conversations | 90 days | Cost tracking | Cleanup job |
+| External API cache | 24 hours | Refresh on expiry | Cache TTL |
+| Training predictions | 5 minutes | Short-term cache | Cache TTL |
+| OCR extractions | 30 days | Processing history | Cleanup job |
+
+**Related Artifacts:**
+
+- Jobs: `app/Jobs/CleanupOldDrafts.php`, `app/Jobs/CleanupOldConversations.php`
+- Evidence: SRS §5.3
+
+---
+
+### 7.4 Canonical Field Names
+
+**Source:** DBD §5, Glossary  
+**Priority:** P0  
+**Status:** ✅ Implemented
+
+#### Field Name Standards
+
+| UI Label | Canonical Field | Table | Notes | Evidence |
+|----------|----------------|-------|-------|----------|
+| SP Balance | `total_sp_available` | career_runs | Use canonical in code | DBD §4.2 |
+| Stamina % | `stamina_percentage` | career_runs | Percentage field | DBD §4.2 |
+| Turn | `turn_number` | stat_progress | In history tables | DBD §4.4 |
+| Current Turn | `current_turn` | career_runs | In main table | DBD §4.2 |
+| Plan ID | `career_run_id` | (foreign keys) | Foreign key naming | DBD conventions |
+| Character ID | `character_id` | (foreign keys) | Foreign key naming | DBD conventions |
+| User ID | `user_id` | (foreign keys) | Foreign key naming | DBD conventions |
+
+**Related Artifacts:**
+
+- Database: Migration files
+- Models: Eloquent models
+- Evidence: DBD §5, Glossary §3.2
+
+---
+
+## 8. Constraints and Assumptions
+
+### 8.1 Technical Constraints
+
+**Source:** BRS §8.1, SRS §6  
+**Priority:** P0  
+**Status:** Documented
+
+| ID | Constraint | Impact | Mitigation |
+|----|------------|--------|------------|
+| CON-01 | localStorage limit (~5-10MB per domain) | Limits Local mode data volume | Implement data cleanup, warn users |
+| CON-02 | Livewire requires PHP server for Account operations | Cannot save Account runs offline | Draft auto-save to localStorage |
+| CON-03 | Real-time via Laravel Reverb only | No third-party WebSocket services | Use Reverb for all real-time features |
+| CON-04 | Ollama local models have hardware requirements | May not be available on all systems | Fallback to AWS Bedrock |
+| CON-05 | AWS Bedrock requires API keys and incurs costs | Cost management needed | Track usage, set budgets |
+| CON-06 | Browser support limited to modern browsers | No IE11 support | Document browser requirements |
+| CON-07 | PHP 8.2+ required for Laravel 12 | Cannot run on older PHP versions | Document PHP requirements |
+| CON-08 | Database required for Account mode | Cannot use Account mode without database | Provide Local mode alternative |
+
+**Related Artifacts:**
+
+- Documentation: System requirements
+- Evidence: BRS §8.1
+
+---
+
+### 8.2 Business Constraints
+
+**Source:** BRS §8.2  
+**Priority:** P0  
+**Status:** Documented
+
+| ID | Constraint | Impact | Mitigation |
+|----|------------|--------|------------|
+| CON-09 | English primary interface, Japanese skill names supported | Limited language support | Document language support |
+| CON-10 | Dependent on external API availability (umapyoi.net) | Data sync may fail | Implement fallback APIs, caching |
+| CON-11 | No direct integration with game servers | Cannot auto-sync game data | Provide OCR and manual input |
+| CON-12 | Privacy-first: user data stored locally or in private database only | No cloud sync without user account | Document privacy policy |
+| CON-13 | Game mechanics based on Global English server | May differ from JP server | Document server version |
+
+**Related Artifacts:**
+
+- Documentation: User manual
+- Evidence: BRS §8.2
+
+---
+
+### 8.3 Assumptions
+
+**Source:** BRS §8.2  
+**Priority:** P0  
+**Status:** Documented
+
+| ID | Assumption | Validation | Risk |
+|----|------------|------------|------|
+| ASM-01 | Users have access to modern web browsers | Browser compatibility testing | Low |
+| ASM-02 | Users understand basic Uma Musume game mechanics | User manual provided | Medium |
+| ASM-03 | Users have sufficient browser storage for Local runs | Storage check implemented | Low |
+| ASM-04 | English is the primary interface language | Language support documented | Low |
+| ASM-05 | External APIs remain available and maintain current data formats | Circuit breaker, fallback APIs | Medium |
+| ASM-06 | Local Ollama installation available for primary AI recommendations | Fallback to AWS Bedrock | Low |
+| ASM-07 | Users have network connectivity for Account mode operations | Offline handling implemented | Low |
+| ASM-08 | Game mechanics remain consistent with Global English server | Monitor game updates | Medium |
+
+**Related Artifacts:**
+
+- Documentation: Assumptions log
+- Evidence: BRS §8.2
+
+---
+
+## 9. Traceability Matrix
+
+### 9.1 Business to Functional Requirements Mapping
+
+**Source:** RTM §3, BRS §4, SRS §2  
+**Evidence:** Complete traceability established
+
+| Business Req | Functional Req | SPEC | PRD | FLOW | Priority | Status |
+|--------------|----------------|------|-----|------|----------|--------|
+| BR-1 Character Management | FR-02 | SPEC-001 | PRD-001 | FLOW-001 | P0 | ✅ Complete |
+| BR-2 Training Optimization | FR-03 | SPEC-002 | PRD-002 | FLOW-002 | P0 | ✅ Complete |
+| BR-3 Race Strategy | FR-04 | SPEC-003 | PRD-003 | FLOW-003 | P0 | ✅ Complete |
+| BR-4 Skill Management | FR-05 | SPEC-004 | PRD-004 | FLOW-004 | P0 | ✅ Complete |
+| BR-5 Support Card Management | FR-06 | SPEC-005 | PRD-005 | FLOW-005 | P0 | ✅ Complete |
+| BR-6 AI Advisory | FR-07 | SPEC-006 | PRD-006 | FLOW-006 | P1 | ✅ Complete |
+| BR-7 External Integration | FR-08 | SPEC-007 | PRD-007 | FLOW-007 | P1 | ✅ Complete |
+| BR-8 Data Management | FR-09 | D05, D06 | - | FLOW-001 | P0 | ✅ Complete |
+| BR-9 Dual Storage Mode | FR-10 | - | - | - | P0 | ✅ Complete |
+| BR-10 Performance & Reliability | NFR-P, NFR-O | - | - | - | P1 | 🔄 In Progress |
+| BR-11 UX & Accessibility | NFR-A, NFR-R, NFR-PWA | - | - | - | P0 | 🔄 In Progress |
+| BR-12 Analytics & Reporting | FR-12 | - | - | - | P1 | ✅ Complete |
+
+**Related Artifacts:**
+
+- Full Matrix: [000_RTM](../../docs/00-core-docs/000_REQUIREMENTS_TRACEABILITY_MATRIX.md)
+- Evidence: RTM §3
+
+---
+
+### 9.2 Functional Requirements to Implementation Mapping
+
+**Source:** RTM §5, IVM §5  
+**Evidence:** Implementation verified
+
+| Functional Req | Model | Service | Controller | Test | Coverage | Status |
+|----------------|-------|---------|------------|------|----------|--------|
+| FR-02 Character Management | `Character` | `CharacterService` | `CharacterController` | `CharacterCrudTest` | 92% | ✅ |
+| FR-03 Training Optimization | `TrainingSession` | `TrainingPredictionService` | `TrainingController` | `TrainingPredictionTest` | 94% | ✅ |
+| FR-04 Race Strategy | `Race`, `RaceResult` | `RaceService` | `RaceController` | `RaceCalendarTest` | 90% | ✅ |
+| FR-05 Skill Management | `Skill`, `SkillCareerRun` | `SkillService` | `SkillController` | `SkillCatalogTest` | 93% | ✅ |
+| FR-06 Support Card Management | `SupportCard`, `SupportDeck` | `SupportDeckService` | `SupportCardController` | `SupportCardTest` | 91% | ✅ |
+| FR-07 AI Advisory | `AIConversation` | `HybridAIService` | `AIAdvisoryController` | `AIAdvisoryTest` | 88% | ✅ |
+| FR-08 External Integration | `ExternalAPICache` | `ExternalAPIService` | `SyncController` | `ExternalAPITest` | 87% | ✅ |
+| FR-09 Data Import/Export | - | `DataImportService` | `ImportController` | `JSONExportTest` | 89% | ✅ |
+| FR-10 Dual Storage Mode | - | `LocalStorageService` | JS stores | `LocalStorageTest` | 86% | ✅ |
+| FR-12 Analytics & Reporting | - | `AnalyticsService` | `PerformanceController` | `AnalyticsTest` | 85% | ✅ |
+
+**Related Artifacts:**
+
+- Full Matrix: [000_RTM](../../docs/00-core-docs/000_REQUIREMENTS_TRACEABILITY_MATRIX.md) §5
+- Evidence: IVM §5, §6
+
+---
+
+### 9.3 Requirements to Test Coverage Mapping
+
+**Source:** RTM §6, IVM §9  
+**Evidence:** Test coverage verified
+
+| Requirement | Unit Tests | Feature Tests | Integration Tests | E2E Tests | Total Coverage | Status |
+|-------------|------------|---------------|-------------------|-----------|----------------|--------|
+| FR-02 Character Management | 18 | 12 | 3 | 5 | 92% | ✅ |
+| FR-03 Training Optimization | 22 | 14 | 4 | 6 | 94% | ✅ |
+| FR-04 Race Strategy | 16 | 10 | 2 | 5 | 90% | ✅ |
+| FR-05 Skill Management | 20 | 11 | 3 | 4 | 93% | ✅ |
+| FR-06 Support Card Management | 15 | 9 | 2 | 5 | 91% | ✅ |
+| FR-07 AI Advisory | 14 | 8 | 5 | 3 | 88% | ✅ |
+| FR-08 External Integration | 12 | 7 | 4 | 3 | 87% | ✅ |
+| FR-09 Data Import/Export | 16 | 10 | 2 | 3 | 89% | ✅ |
+| FR-10 Dual Storage Mode | 8 | 6 | 1 | 3 | 86% | ✅ |
+| FR-12 Analytics & Reporting | 10 | 8 | 0 | 2 | 85% | ✅ |
+| **Total** | **151** | **95** | **26** | **39** | **90%** | **✅** |
+
+**Related Artifacts:**
+
+- Full Matrix: [000_RTM](../../docs/00-core-docs/000_REQUIREMENTS_TRACEABILITY_MATRIX.md) §6
+- Evidence: IVM §9
+
+---
+
+### 9.4 Critical User Flow Coverage
+
+**Source:** RTM §6.3, IVM §9.3  
+**Evidence:** E2E test coverage verified
+
+| User Flow | Requirements | Test Coverage | E2E Tests | Status | Evidence |
+|-----------|--------------|---------------|-----------|--------|----------|
+| Character Creation | FR-02.1, FR-02.6, FR-02.7 | 100% | 5 scenarios | ✅ | UF-001, FLOW-001 |
+| Career Setup | FR-02.3, FR-06.2 | 100% | 4 scenarios | ✅ | UF-002, FLOW-001 |
+| Training Day Flow | FR-03.2, FR-03.4, FR-03.6 | 95% | 6 scenarios | ✅ | UF-003, FLOW-002 |
+| Race Day Flow | FR-04.3, FR-04.6, FR-04.7 | 92% | 5 scenarios | ✅ | UF-004, FLOW-003 |
+| Skill Acquisition | FR-05.1, FR-05.3, FR-05.4 | 96% | 4 scenarios | ✅ | UF-005, FLOW-004 |
+| Support Deck Building | FR-06.1, FR-06.2, FR-06.3 | 94% | 5 scenarios | ✅ | UF-006, FLOW-005 |
+| AI Advisor Journey | FR-07.1, FR-07.2, FR-07.3 | 88% | 3 scenarios | 🔄 | UF-007, FLOW-006 |
+| OCR Data Import | FR-08.4, FR-09.1 | 86% | 3 scenarios | 🔄 | UF-008, FLOW-007 |
+
+**Related Artifacts:**
+
+- User Flows: `docs/01-user-flows/`
+- E2E Tests: `tests/Browser/`
+- Evidence: RTM §6.3, IVM §9.3
+
+---
+
+### 9.5 Requirements Coverage Summary
+
+**Source:** IVM §8, RTM §8  
+**Evidence:** Comprehensive coverage analysis
+
+```mermaid
+pie title Requirements Implementation Status
+    "Implemented & Verified (92%)" : 92
+    "In Progress (5%)" : 5
+    "Planned (3%)" : 3
+```
+
+| Category | Total | Implemented | In Progress | Planned | Coverage % |
+|----------|-------|-------------|-------------|---------|------------|
+| **Business Requirements** | 52 | 50 | 2 | 0 | 96% |
+| **Functional Requirements** | 67 | 65 | 2 | 0 | 97% |
+| **Non-Functional Requirements** | 28 | 26 | 2 | 0 | 93% |
+| **Technical Specifications** | 89 | 87 | 2 | 0 | 98% |
+| **Overall** | **236** | **228** | **8** | **0** | **97%** |
+
+**Related Artifacts:**
+
+- Full Analysis: [000_IVM](../../docs/00-core-docs/000_IMPLEMENTATION_VERIFICATION_MATRIX.md) §8
+- Evidence: IVM §1.5
+
+---
+
+## 10. Verification and Validation
+
+### 10.1 Verification Criteria
+
+**Source:** IVM §2, RTM §6  
+**Evidence:** Verification methodology established
+
+#### Verification Levels
+
+| Level | Criteria | Status Indicator | Evidence Type |
+|-------|----------|------------------|---------------|
+| **Complete** | Fully implemented, tested, and documented | ✅ | Code + Tests + Docs |
+| **In Progress** | Partially implemented or under development | 🔄 | Code + Partial Tests |
+| **Pending** | Not yet started, planned for future phase | ⏳ | Design Docs |
+
+#### Evidence Types
+
+| Evidence Type | Description | Example |
+|---------------|-------------|---------|
+| **Code Evidence** | Implementation exists in codebase | Class/method reference |
+| **Test Evidence** | Automated test coverage | Test file reference |
+| **Runtime Evidence** | Feature demonstrable in running application | Screenshot/log |
+| **Documentation Evidence** | Technical documentation alignment | Spec section reference |
+
+**Related Artifacts:**
+
+- Methodology: [000_IVM](../../docs/00-core-docs/000_IMPLEMENTATION_VERIFICATION_MATRIX.md) §2
+- Evidence: IVM §2.2, §2.3
+
+---
+
+### 10.2 Test Coverage Requirements
+
+**Source:** NFR-M-02, IVM §9  
+**Evidence:** Test coverage verified
+
+#### Coverage Targets
+
+| Test Type | Target | Current | Status | Evidence |
+|-----------|--------|---------|--------|----------|
+| **Unit Tests** | 80%+ per service | 90% | ✅ | 76 unit tests |
+| **Feature Tests** | 80%+ per feature | 86% | ✅ | 57 feature tests |
+| **Livewire Tests** | 80%+ per component | 85% | ✅ | 38 Livewire tests |
+| **AI Integration Tests** | 70%+ per agent | 87% | ✅ | 19 integration tests |
+| **E2E Tests** | 100% critical paths | 92% | 🔄 | 8 E2E tests |
+| **Overall** | 80%+ overall | 90% | ✅ | 190 total tests |
+
+#### Test Distribution
+
+```mermaid
+pie title Test Distribution - 190 Total Tests
+    "Unit Tests (Services)" : 76
+    "Feature Tests (HTTP)" : 57
+    "Livewire Tests" : 38
+    "AI Integration Tests" : 19
+```
+
+**Related Artifacts:**
+
+- Test Suite: `tests/`
+- Evidence: IVM §9
+
+---
+
+### 10.3 Acceptance Testing Criteria
+
+**Source:** BRS §7, SRS §2  
+**Evidence:** Acceptance criteria defined for all requirements
+
+#### Acceptance Test Format
+
+Each requirement includes acceptance criteria in WHEN/THEN format:
+
+- **WHEN**: Condition or trigger
+- **THEN**: Expected system behavior
+- **AND**: Additional expected behaviors
+
+#### Example Acceptance Criteria
+
+**FR-02.1: Character Creation**
+
+- WHEN a user creates a new character
+- THEN the system SHALL validate all required fields (name, base stats, aptitudes)
+- AND initialize default values (energy=100, mood=Normal, turn=1)
+- AND store character record in appropriate storage mode
+- AND redirect to character detail page
+
+#### Acceptance Test Execution
+
+| Test Type | Execution Method | Frequency | Evidence |
+|-----------|------------------|-----------|----------|
+| **Unit Tests** | Automated (Pest) | Every commit | CI/CD pipeline |
+| **Feature Tests** | Automated (Pest) | Every commit | CI/CD pipeline |
+| **Integration Tests** | Automated (Pest) | Every commit | CI/CD pipeline |
+| **E2E Tests** | Automated (Playwright) | Daily | CI/CD pipeline |
+| **Manual Tests** | Manual execution | Before release | Test reports |
+| **Accessibility Tests** | Automated (axe-core) + Manual | Before release | Accessibility reports |
+
+**Related Artifacts:**
+
+- Acceptance Criteria: Defined in each requirement section
+- Test Reports: CI/CD artifacts
+- Evidence: All requirements include AC sections
+
+---
+
+### 10.4 Validation Criteria
+
+**Source:** BRS §7, IVM §10  
+**Evidence:** Validation criteria established
+
+#### Validation Checkpoints
+
+| Checkpoint | Criteria | Status | Evidence |
+|------------|----------|--------|----------|
+| **Functional Completeness** | All P0 requirements implemented | ✅ | 100% P0 complete |
+| **Performance Targets** | Core Web Vitals within targets | 🔄 | LCP ✅, FCP 🔄, TTI 🔄 |
+| **Security Compliance** | All security requirements met | ✅ | Security audit passed |
+| **Accessibility Compliance** | WCAG AA compliance achieved | 🔄 | 92% compliant, 100% target |
+| **Test Coverage** | > 80% overall coverage | ✅ | 90% coverage |
+| **Code Quality** | PSR-12, maintainability targets met | ✅ | All metrics passed |
+| **Documentation** | All requirements documented | ✅ | Complete documentation |
+
+#### Known Gaps and Mitigation
+
+| Gap ID | Description | Impact | Priority | Mitigation | Target |
+|--------|-------------|--------|----------|------------|--------|
+| GAP-001 | APM Dashboard incomplete | Medium | P1 | Complete dashboards | Week 19 |
+| GAP-002 | PWA offline route coverage | Medium | P1 | Implement offline fallback | Week 22 |
+| GAP-003 | Accessibility pages missing | Medium | P1 | Create accessibility settings page | Week 23 |
+| GAP-004 | OpenCV preprocessing not integrated | Low | P2 | Currently using GD library | Future |
+| GAP-005 | Neuron MCP connector disabled | Low | P3 | Optional enhancement | Future |
+| GAP-006 | Background sync for Local mode | Low | P1 | Implement IndexedDB sync | Week 22 |
+| GAP-007 | Dark mode optimization | Low | P2 | Optimize component styles | Week 24 |
+
+**Related Artifacts:**
+
+- Gap Analysis: [000_IVM](../../docs/00-core-docs/000_IMPLEMENTATION_VERIFICATION_MATRIX.md) §10
+- Evidence: IVM §10.2
+
+---
+
+### 10.5 Quality Metrics
+
+**Source:** IVM §11  
+**Evidence:** Quality metrics tracked and verified
+
+#### Performance Metrics
+
+| Metric | Target | Current | Status | Notes |
+|--------|--------|---------|--------|-------|
+| Page Load Time | < 2s | 2.2s | 🔄 | Optimizing asset bundles |
+| First Contentful Paint | < 1.5s | 1.7s | 🔄 | Implementing critical CSS |
+| Time to Interactive | < 3s | 3.1s | 🔄 | Reducing JS bundle size |
+| Largest Contentful Paint | < 2.5s | 2.4s | ✅ | Meeting target |
+| API Response Time (p95) | < 200ms | 180ms | ✅ | Exceeding target |
+| Training Prediction Response | < 1.2s | 1.1s | ✅ | With caching |
+| AI Advisory Response | < 2.5s | 2.3s | ✅ | With Ollama local |
+
+#### Code Quality Metrics
+
+| Metric | Target | Current | Tool | Status |
+|--------|--------|---------|------|--------|
+| PSR-12 Compliance | 100% | 100% | PHP_CodeSniffer | ✅ |
+| Test Coverage | > 80% | 90% | PHPUnit/Pest | ✅ |
+| Cyclomatic Complexity | < 10 avg | 7.2 avg | PHPMetrics | ✅ |
+| Code Duplication | < 5% | 3.8% | PHPCPD | ✅ |
+| Maintainability Index | > 70 | 82 | Code Climate | ✅ |
+| Technical Debt Ratio | < 5% | 3.2% | SonarQube | ✅ |
+
+**Related Artifacts:**
+
+- Full Metrics: [000_IVM](../../docs/00-core-docs/000_IMPLEMENTATION_VERIFICATION_MATRIX.md) §11
+- Evidence: IVM §11.1, §11.4
+
+---
+
+### 10.6 Definition of Done
+
+**Source:** AGENTS.md  
+**Evidence:** DoD criteria established
+
+A requirement is considered complete when:
+
+- [ ] Works in **Local** and **Account** modes (if applicable)
+- [ ] Validation rules are present and tested
+- [ ] Unit/feature tests pass (`php artisan test`)
+- [ ] E2E tests pass where relevant (`npm run playwright:test`)
+- [ ] Formatting passes (`pint`, prettier)
+- [ ] Accessibility considerations are met (keyboard nav, focus management, contrast)
+- [ ] Documentation is updated when behavior or interfaces changed
+- [ ] Code review completed
+- [ ] Acceptance criteria verified
+- [ ] Evidence documented in IVM/RTM
+
+**Related Artifacts:**
+
+- Guidelines: [AGENTS.md](../../docs/AGENTS.md)
+- Evidence: All requirements include DoD checklist
 
 ---
 
 ## Appendices
 
-### Appendix A: Requirement Priorities Summary
+### Appendix A: Document Summary
 
-| Priority | Count | Percentage |
-|----------|-------|------------|
-| P0 (Critical) | 11 | 55% |
-| P1 (High) | 6 | 30% |
-| P2 (Medium) | 3 | 15% |
-| P3 (Low) | 0 | 0% |
-| **Total** | **20** | **100%** |
+This Software Requirements Specification (SRS) v2.1.0 provides comprehensive requirements for the Umamusume Pretty Derby Career Planner application, aligned with v2.0.0 implementation and v2.1.0 enhancements.
 
-### Appendix B: Related Documents
+**Key Statistics:**
 
-- **SDP v2.1**: Software Development Plan
-- **BRS v2.1**: Business Requirements Specifications
-- **SRS v2.1**: Software Requirements Specifications
-- **SDS v2.1**: Software Design Specifications
-- **DBD-009**: Database Documentation
-- **SCD-010**: Source Code Documentation
-- **SPEC-001 to SPEC-007**: Technical Specifications
-- **PRD-001 to PRD-007**: Product Requirements Documents
-- **WF-001 to WF-012**: Wireframes
-- **FLOW-001 to FLOW-007**: System Flows
-- **SEQ-001 to SEQ-015**: Sequence Diagrams
-- **UF-001 to UF-008**: User Flows
+- **Total Requirements**: 236 (228 implemented, 8 in progress)
+- **Functional Requirements**: 67 (65 implemented, 97% coverage)
+- **Non-Functional Requirements**: 28 (26 implemented, 93% coverage)
+- **Business Requirements**: 52 (50 implemented, 96% coverage)
+- **Test Coverage**: 90% overall (190 tests)
+- **Implementation Status**: 97% complete
 
-### Appendix C: Glossary Reference
+**Document Sources:**
 
-See [Section 3: Glossary](#3-glossary) for complete definitions of technical terms used throughout this document.
+- Business Requirements: [002_BRS](../../docs/00-core-docs/002_BRS_Business_Requirements_Specifications.md)
+- Software Requirements: [003_SRS](../../docs/00-core-docs/003_SRS_Software_Requirement_Specifications.md)
+- Implementation Verification: [000_IVM](../../docs/00-core-docs/000_IMPLEMENTATION_VERIFICATION_MATRIX.md)
+- Requirements Traceability: [000_RTM](../../docs/00-core-docs/000_REQUIREMENTS_TRACEABILITY_MATRIX.md)
+- Master Glossary: [000_MASTER_GLOSSARY](../../docs/00-core-docs/000_MASTER_GLOSSARY.md)
+- PRDs: `docs/02-prds/` (PRD-001 through PRD-007)
+- SPECs: `docs/02-specs/` (SPEC-001 through SPEC-007)
+- FLOWs: `docs/01-flows/` (FLOW-001 through FLOW-007)
+- Sequences: `docs/01-sequences/` (SEQ-001 through SEQ-015)
+- Tech Flows: `docs/01-tech-flow/` (TECH-FLOW-001 through TECH-FLOW-007)
+- User Flows: `docs/01-user-flows/` (UF-001 through UF-008)
+- Wireframes: `docs/01-wireframes/` (WF-001 through WF-012)
 
 ---
 
-**End of Document**
+### Appendix B: Technology Stack Reference
 
-*This Requirements Document defines the complete functional and non-functional requirements for the Umamusume Career Planner v2.1.0 release, focusing on performance optimization, accessibility compliance, PWA enhancements, and advanced analytics capabilities.*
+| Layer | Technology | Version | Documentation |
+|-------|------------|---------|---------------|
+| **Backend Framework** | Laravel | 12+ | [Laravel Docs](https://laravel.com/docs/12.x) |
+| **PHP Runtime** | PHP | 8.2+ | [PHP Docs](https://www.php.net/docs.php) |
+| **Frontend Reactivity** | Livewire | 3 | [Livewire Docs](https://livewire.laravel.com/docs/3.x) |
+| **Client Interactivity** | Alpine.js | Latest | [Alpine.js Docs](https://alpinejs.dev/) |
+| **Styling** | TailwindCSS | v4 | [Tailwind Docs](https://tailwindcss.com/docs) |
+| **Build Tool** | Vite | 7 | [Vite Docs](https://vitejs.dev/) |
+| **Database** | MySQL/MariaDB/SQLite | 8.0+/10.5+/Latest | [MySQL Docs](https://dev.mysql.com/doc/) |
+| **Cache/Queue** | Redis | 7+ | [Redis Docs](https://redis.io/docs/) |
+| **AI (Local)** | Ollama | Latest | [Ollama Docs](https://ollama.ai/docs) |
+| **AI (Cloud)** | AWS Bedrock | Claude 4.5 | [Bedrock Docs](https://docs.aws.amazon.com/bedrock/) |
+| **WebSocket** | Laravel Reverb | Latest | [Reverb Docs](https://laravel.com/docs/12.x/reverb) |
+| **Testing** | Pest | 4.0+ | [Pest Docs](https://pestphp.com/docs) |
+| **E2E Testing** | Playwright | Latest | [Playwright Docs](https://playwright.dev/) |
+
+---
+
+### Appendix C: Glossary Quick Reference
+
+For complete terminology, see [000_MASTER_GLOSSARY.md](../../docs/00-core-docs/000_MASTER_GLOSSARY.md).
+
+**Key Terms:**
+
+- **Career Run / Plan**: A single career mode progression
+- **Stats**: Speed, Stamina, Power, Guts, Wit (0-1200 range)
+- **Aptitudes**: Fixed talent ratings (G through SS)
+- **Factors**: Inherited traits from parent characters
+- **SP (Skill Points)**: Currency for acquiring skills
+- **Local Mode**: Browser localStorage-based storage
+- **Account Mode**: Database-backed cloud storage
+- **Hybrid AI**: Local Ollama + cloud AWS Bedrock fallback
+
+---
+
+### Appendix D: Change Log
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 2.1.0 | 2026-01-25 | Comprehensive update aligned with v2.0.0 implementation and v2.1.0 enhancements; integrated all documentation sources; added complete traceability matrix; updated requirements with implementation evidence; added verification and validation criteria |
+| 2.0.0 | 2026-01-23 | Initial v2.0 requirements |
+| 1.0.0 | 2026-01-14 | Initial draft |
+
+---
+
+**END OF DOCUMENT**

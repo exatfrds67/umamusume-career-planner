@@ -29,7 +29,7 @@ Primary data source for Uma Musume game data from umapyoi.net.
 - `GET /v1/characters/{id}` - Get specific character
 - `GET /v1/support-cards` - List all support cards
 - `GET /v1/support-cards/{id}` - Get specific support card
-- `GET /v1/news` - Get latest news
+- `GET /api/v1/news/latest/{limit}` - Get latest news
 
 **Key Methods:**
 
@@ -60,7 +60,7 @@ Training calculations and meta data from UmamusumeDB.com with enhanced retry log
 - `POST /v1/training/calculate` - Calculate training predictions
 - `GET /v1/meta/tier-rankings` - Get meta tier rankings
 - `GET /v1/characters/{id}/builds` - Get community builds
-- `GET /v1/skills/effectiveness` - Get skill effectiveness data
+- `GET /api/v1/skill` - Get skill list data
 - `POST /v1/race/strategy` - Get race strategy recommendations
 
 **Key Methods:**

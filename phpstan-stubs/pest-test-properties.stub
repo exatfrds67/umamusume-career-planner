@@ -11,27 +11,137 @@
  */
 
 namespace PHPUnit\Framework {
-    /**
-     * @property mixed $parser Parser instance used in various parsing tests
-     * @property mixed $service Service instance used in service tests
-     * @property mixed $detector Detector instance used in detection tests
-     * @property mixed $analysisService Analysis service instance
-     * @property mixed $character Character model instance used in character-related tests
-     * @property mixed $hintService Hint service instance used in skill hint tests
-     * @property mixed $evolutionService Evolution service instance used in skill evolution tests
-     * @property mixed $skillService Skill service instance used in skill-related tests
-     * @property mixed $synergyScorer Synergy scorer instance used in synergy calculation tests
-     * @property mixed $user User model instance used in authentication and authorization tests
-     * @property mixed $imageProcessor Image processor instance used in OCR and image processing tests
-     * @property mixed $predictionService Prediction service instance used in prediction tests
-     * @property mixed $mcpClient MCP client instance used in MCP integration tests
-     * @property mixed $conversationService Conversation service instance used in AI chat tests
-     * @property mixed $analyticsService Analytics service instance used in analytics tests
-     * @property mixed $exportService Export service instance used in export tests
-     * @property mixed $feedbackService Feedback service instance used in feedback tests
-     */
+
     abstract class TestCase
     {
+        /** @var mixed Parser instance used in various parsing tests */
+        public $parser;
+        
+        /** @var mixed Service instance used in service tests */
+        public $service;
+        
+        /** @var mixed Detector instance used in detection tests */
+        public $detector;
+        
+        /** @var mixed Analysis service instance */
+        public $analysisService;
+        
+        /** @var mixed Character model instance used in character-related tests */
+        public $character;
+        
+        /** @var mixed Hint service instance used in skill hint tests */
+        public $hintService;
+        
+        /** @var mixed Evolution service instance used in skill evolution tests */
+        public $evolutionService;
+        
+        /** @var mixed Skill service instance used in skill-related tests */
+        public $skillService;
+        
+        /** @var mixed Synergy scorer instance used in synergy calculation tests */
+        public $synergyScorer;
+        
+        /** @var mixed User model instance used in authentication and authorization tests */
+        public $user;
+        
+        /** @var mixed Image processor instance used in OCR and image processing tests */
+        public $imageProcessor;
+        
+        /** @var mixed Prediction service instance used in prediction tests */
+        public $predictionService;
+        
+        /** @var mixed MCP client instance used in MCP integration tests */
+        public $mcpClient;
+        
+        /** @var mixed Conversation service instance used in AI chat tests */
+        public $conversationService;
+        
+        /** @var mixed Analytics service instance used in analytics tests */
+        public $analyticsService;
+        
+        /** @var mixed Export service instance used in export tests */
+        public $exportService;
+        
+        /** @var mixed Feedback service instance used in feedback tests */
+        public $feedbackService;
+
+        /** @var mixed Support card instance used in support card tests */
+        public $supportCard;
+
+        /** @var mixed Trainee instance used in trainee-related tests */
+        public $trainee;
+
+        /** @var mixed Skill instance used in skill tests */
+        public $skill;
+
+        /** @var mixed Career run instance used in career tests */
+        public $careerRun;
+
+        /** @var mixed Request instance for HTTP tests */
+        public $request;
+
+        /** @var mixed Response instance for HTTP tests */
+        public $response;
+
+        /** @var mixed Config array for configuration tests */
+        public $config;
+
+        /** @var mixed Data array for data-driven tests */
+        public $data;
+
+        /** @var mixed Result from operation tests */
+        public $result;
+
+        /** @var mixed Item for collection/array tests */
+        public $item;
+
+        /** @var mixed Error message or error object for error tests */
+        public $error;
+
+        /** @var mixed Mock object for mocking tests */
+        public $mock;
+
+        /** @var mixed Factory instance for model creation tests */
+        public $factory;
+
+        /** @var mixed Agent instance for AI agent tests */
+        public $agent;
+
+        /** @var mixed Client instance for client tests */
+        public $client;
+
+        /** @var mixed Manager instance for manager service tests */
+        public $manager;
+
+        /** @var mixed Handler instance for handler tests */
+        public $handler;
+
+        /** @var mixed Provider instance for provider tests */
+        public $provider;
+
+        /** @var mixed Repository instance for repository tests */
+        public $repository;
+
+        /** @var mixed Calculator instance for calculation tests */
+        public $calculator;
+
+        /** @var mixed Validator instance for validation tests */
+        public $validator;
+
+        /** @var mixed Transformer instance for data transformation tests */
+        public $transformer;
+
+        /** @var mixed Cache for caching tests */
+        public $cache;
+
+        /** @var mixed Logger for logging tests */
+        public $logger;
+
+        /** @var mixed Events for event tests */
+        public $events;
+
+        /** @var mixed Queue for queue tests */
+        public $queue;
     }
 }
 
