@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>API Testing - Standalone</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            body {
+                font-family:
+                    system-ui,
+                    -apple-system,
+                    sans-serif;
+                padding: 20px;
+                background: #f5f5f5;
+            }
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+            h1 {
+                margin-bottom: 20px;
+                color: #333;
+            }
+            .section {
+                background: white;
+                padding: 20px;
+                margin-bottom: 20px;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            h2 {
+                margin-bottom: 15px;
+                color: #555;
+            }
+            .buttons {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 10px;
+                margin-bottom: 15px;
+            }
+            button {
+                padding: 12px 20px;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 14px;
+                font-weight: 500;
+                transition: all 0.2s;
+            }
+            button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            }
+            .btn-blue {
+                background: #3b82f6;
+                color: white;
+            }
+            .btn-green {
+                background: #10b981;
+                color: white;
+            }
+            .btn-purple {
+                background: #8b5cf6;
+                color: white;
+            }
+            .results {
+                background: #f9fafb;
+                padding: 15px;
+                border-radius: 6px;
+                border: 1px solid #e5e7eb;
+                min-height: 150px;
+                font-family: monospace;
+                font-size: 12px;
+                overflow: auto;
+                max-height: 400px;
+            }
+            .success {
+                color: #10b981;
+                font-weight: bold;
+            }
+            .error {
+                color: #ef4444;
+                font-weight: bold;
+            }
+            .info {
+                color: #f59e0b;
+                font-weight: bold;
+            }
+            pre {
+                white-space: pre-wrap;
+                word-wrap: break-word;
+            }
+            .note {
+                background: #fef3c7;
+                padding: 10px;
+                border-radius: 6px;
+                margin-bottom: 15px;
+                border-left: 4px solid #f59e0b;
+            }
+            code {
+                background: #e5e7eb;
+                padding: 2px 6px;
+                border-radius: 3px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>🧪 External API Testing</h1>
+
+            <!-- Umapyoi.net Section -->
+            <div class="section">
+                <h2>Umapyoi.net API</h2>
+                <p style="margin-bottom: 15px">
+                    Base URL: <code>https://api.umapyoi.net</code>
+                </p>
+
+                <div class="buttons">
+                    <button class="btn-blue" onclick="testUmapyoiCharacters()">
+                        Test Characters List
+                    </button>
+                    <button class="btn-blue" onclick="testUmapyoiCharacter()">
+                        Test Single Character
+                    </button>
+                    <button class="btn-blue" onclick="testUmapyoiSupport()">
+                        Test Support Cards
+                    </button>
+                    <button class="btn-blue" onclick="testUmapyoiSkills()">
+                        Test Skills
+                    </button>
+                    <button class="btn-blue" onclick="testUmapyoiNews()">
+                        Test News
+                    </button>
+                    <button class="btn-green" onclick="testUmapyoiHealth()">
+                        Test Health Check
+                    </button>
+                </div>
+
+                <div id="umapyoi-results" class="results">
+                    <p style="color: #6b7280">
+                        Click a button to test an endpoint. Check the browser
+                        console (F12) for detailed logs.
+                    </p>
+                </div>
+            </div>
+
+            <!-- UmamusumeDB.com Section -->
+            <div class="section">
+                <h2>UmamusumeDB.com</h2>
+                <p style="margin-bottom: 10px">
+                    Base URL: <code>https://umamusumedb.com</code>
+                </p>
+                <div class="note">
+                    <strong>⚠️ Note:</strong> No public API available. Testing
+                    web pages only.
+                </div>
+
+                <div class="buttons">
+                    <button
+                        class="btn-purple"
+                        onclick="testUmamusumeDBCharacter()"
+                    >
+                        Test Character Page
+                    </button>
+                    <button class="btn-purple" onclick="testUmamusumeDBCard()">
+                        Test Support Card Page
+                    </button>
+                    <button
+                        class="btn-purple"
+                        onclick="testUmamusumeDBRobots()"
+                    >
+                        Check robots.txt
+                    </button>
+                    <button
+                        class="btn-purple"
+                        onclick="testUmamusumeDBSitemap()"
+                    >
+                        Check Sitemap
+                    </button>
+                </div>
+
+                <div id="umamusumedb-results" class="results">
+                    <p style="color: #6b7280">
+                        Click a button to test. Check the browser console (F12)
+                        for detailed logs.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Instructions -->
+            <div class="section">
+                <h2>📖 Instructions</h2>
+                <ol style="line-height: 1.8; padding-left: 20px">
+                    <li>Open Chrome DevTools (F12 or Right-click → Inspect)</li>
+                    <li>Go to the "Network" tab to see HTTP requests</li>
+                    <li>Go to the "Console" tab to see detailed logs</li>
+                    <li>Click any button above to test an API endpoint</li>
+                    <li>Check the Network tab for request/response details</li>
+                    <li>Check the Console tab for parsed JSON data</li>
+                </ol>
+            </div>
+        </div>
+
+        <script>
+            console.log(
+                "%c🚀 API Testing Page Loaded",
+                "color: blue; font-size: 16px; font-weight: bold",
+            );
+            console.log(
+                "Click any button to test API endpoints. All requests will be logged here.",
+            );
+
+            // Helper function to display results
+            function displayResult(elementId, status, message, data = null) {
+                const element = document.getElementById(elementId);
+                const statusClass =
+                    status === "success"
+                        ? "success"
+                        : status === "error"
+                          ? "error"
+                          : "info";
+
+                let html = `<div class="${statusClass}">${status.toUpperCase()}: ${message}</div>`;
+
+                if (data) {
+                    html += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                }
+
+                element.innerHTML = html;
+            }
+
+            // Umapyoi.net API Tests
+            async function testUmapyoiCharacters() {
+                console.group("🧪 Testing Umapyoi Characters List");
+                const url = "https://api.umapyoi.net/api/v1/character/list";
+                console.log("URL:", url);
+
+                try {
+                    const response = await fetch(url, {
+                        method: "GET",
+                        headers: {
+                            Accept: "application/json",
+                            "User-Agent": "UmamusumeCareerPlanner/1.0",
+                        },
+                    });
+
+                    console.log(
+                        "Status:",
+                        response.status,
+                        response.statusText,
+                    );
+                    console.log(
+                        "Headers:",
+                        Object.fromEntries(response.headers.entries()),
+                    );
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        console.log("Response Data:", data);
+                        console.log(
+                            "Character Count:",
+                            Array.isArray(data) ? data.length : "Not an array",
+                        );
+                        displayResult(
+                            "umapyoi-results",
+                            "success",
+                            `Fetched ${Array.isArray(data) ? data.length : 0} characters`,
+                            data,
+                        );
+                    } else {
+                        const text = await response.text();
+                        console.error("Error Response:", text);
+                        displayResult(
+                            "umapyoi-results",
+                            "error",
+                            `HTTP ${response.status}: ${response.statusText}`,
+                            { body: text },
+                        );
+                    }
+                } catch (error) {
+                    console.error("Fetch Error:", error);
+                    displayResult("umapyoi-results", "error", error.message);
+                }
+                console.groupEnd();
+            }
+
+            async function testUmapyoiCharacter() {
+                console.group("🧪 Testing Umapyoi Single Character");
+                const characterId = "1";
+                const url = `https://api.umapyoi.net/api/v1/character/${characterId}`;
+                console.log("URL:", url);
+
+                try {
+                    const response = await fetch(url);
+                    console.log(
+                        "Status:",
+                        response.status,
+                        response.statusText,
+                    );
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        console.log("Response Data:", data);
+                        displayResult(
+                            "umapyoi-results",
+                            "success",
+                            `Fetched character ${characterId}`,
+                            data,
+                        );
+                    } else {
+                        const text = await response.text();
+                        console.error("Error Response:", text);
+                        displayResult(
+                            "umapyoi-results",
+                            "error",
+                            `HTTP ${response.status}: ${response.statusText}`,
+                            { body: text },
+                        );
+                    }
+                } catch (error) {
+                    console.error("Fetch Error:", error);
+                    displayResult("umapyoi-results", "error", error.message);
+                }
+                console.groupEnd();
+            }
+
+            async function testUmapyoiSupport() {
+                console.group("🧪 Testing Umapyoi Support Cards");
+                const url = "https://api.umapyoi.net/api/v1/support";
+                console.log("URL:", url);
+
+                try {
+                    const response = await fetch(url);
+                    console.log(
+                        "Status:",
+                        response.status,
+                        response.statusText,
+                    );
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        console.log("Response Data:", data);
+                        displayResult(
+                            "umapyoi-results",
+                            "success",
+                            `Fetched ${Array.isArray(data) ? data.length : 0} support cards`,
+                            data,
+                        );
+                    } else {
+                        const text = await response.text();
+                        console.error("Error Response:", text);
+                        displayResult(
+                            "umapyoi-results",
+                            "error",
+                            `HTTP ${response.status}: ${response.statusText}`,
+                            { body: text },
+                        );
+                    }
+                } catch (error) {
+                    console.error("Fetch Error:", error);
+                    displayResult("umapyoi-results", "error", error.message);
+                }
+                console.groupEnd();
+            }
+
+            async function testUmapyoiSkills() {
+                console.group("🧪 Testing Umapyoi Skills");
+                const url = "https://api.umapyoi.net/api/v1/skill";
+                console.log("URL:", url);
+
+                try {
+                    const response = await fetch(url);
+                    console.log(
+                        "Status:",
+                        response.status,
+                        response.statusText,
+                    );
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        console.log("Response Data:", data);
+                        displayResult(
+                            "umapyoi-results",
+                            "success",
+                            `Fetched ${Array.isArray(data) ? data.length : 0} skills`,
+                            data,
+                        );
+                    } else {
+                        const text = await response.text();
+                        console.error("Error Response:", text);
+                        displayResult(
+                            "umapyoi-results",
+                            "error",
+                            `HTTP ${response.status}: ${response.statusText}`,
+                            { body: text },
+                        );
+                    }
+                } catch (error) {
+                    console.error("Fetch Error:", error);
+                    displayResult("umapyoi-results", "error", error.message);
+                }
+                console.groupEnd();
+            }
+
+            async function testUmapyoiNews() {
+                console.group("🧪 Testing Umapyoi News");
+                const url = "https://api.umapyoi.net/api/v1/news/latest/10";
+                console.log("URL:", url);
+
+                try {
+                    const response = await fetch(url);
+                    console.log(
+                        "Status:",
+                        response.status,
+                        response.statusText,
+                    );
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        console.log("Response Data:", data);
+                        displayResult(
+                            "umapyoi-results",
+                            "success",
+                            `Fetched ${Array.isArray(data) ? data.length : 0} news items`,
+                            data,
+                        );
+                    } else {
+                        const text = await response.text();
+                        console.error("Error Response:", text);
+                        displayResult(
+                            "umapyoi-results",
+                            "error",
+                            `HTTP ${response.status}: ${response.statusText}`,
+                            { body: text },
+                        );
+                    }
+                } catch (error) {
+                    console.error("Fetch Error:", error);
+                    displayResult("umapyoi-results", "error", error.message);
+                }
+                console.groupEnd();
+            }
+
+            async function testUmapyoiHealth() {
+                console.group("🧪 Testing Umapyoi Health Check");
+                const url = "https://api.umapyoi.net/health";
+                console.log("URL:", url);
+
+                try {
+                    const response = await fetch(url);
+                    console.log(
+                        "Status:",
+                        response.status,
+                        response.statusText,
+                    );
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        console.log("Response Data:", data);
+                        displayResult(
+                            "umapyoi-results",
+                            "success",
+                            "API is healthy",
+                            data,
+                        );
+                    } else {
+                        const text = await response.text();
+                        console.error("Error Response:", text);
+                        displayResult(
+                            "umapyoi-results",
+                            "error",
+                            `HTTP ${response.status}: ${response.statusText}`,
+                            { body: text },
+                        );
+                    }
+                } catch (error) {
+                    console.error("Fetch Error:", error);
+                    displayResult("umapyoi-results", "error", error.message);
+                }
+                console.groupEnd();
+            }
+
+            // UmamusumeDB.com Tests
+            async function testUmamusumeDBCharacter() {
+                console.group("🧪 Testing UmamusumeDB Character Page");
+                const url =
+                    "https://umamusumedb.com/characters/special_week_2025/";
+                console.log("URL:", url);
+
+                try {
+                    const response = await fetch(url, { mode: "no-cors" });
+                    console.log(
+                        "Status:",
+                        response.status,
+                        response.statusText,
+                    );
+                    console.log(
+                        "Note: no-cors mode - limited response info available",
+                    );
+                    displayResult(
+                        "umamusumedb-results",
+                        "info",
+                        "Request sent (no-cors mode). Check Network tab for details.",
+                        {
+                            note: "CORS prevents reading response. Check Network tab in DevTools.",
+                        },
+                    );
+                } catch (error) {
+                    console.error("Fetch Error:", error);
+                    displayResult(
+                        "umamusumedb-results",
+                        "error",
+                        error.message,
+                    );
+                }
+                console.groupEnd();
+            }
+
+            async function testUmamusumeDBCard() {
+                console.group("🧪 Testing UmamusumeDB Support Card Page");
+                const url = "https://umamusumedb.com/cards/kitasan_black_ssr/";
+                console.log("URL:", url);
+
+                try {
+                    const response = await fetch(url, { mode: "no-cors" });
+                    console.log(
+                        "Status:",
+                        response.status,
+                        response.statusText,
+                    );
+                    displayResult(
+                        "umamusumedb-results",
+                        "info",
+                        "Request sent (no-cors mode). Check Network tab for details.",
+                        {
+                            note: "CORS prevents reading response. Check Network tab in DevTools.",
+                        },
+                    );
+                } catch (error) {
+                    console.error("Fetch Error:", error);
+                    displayResult(
+                        "umamusumedb-results",
+                        "error",
+                        error.message,
+                    );
+                }
+                console.groupEnd();
+            }
+
+            async function testUmamusumeDBRobots() {
+                console.group("🧪 Testing UmamusumeDB robots.txt");
+                const url = "https://umamusumedb.com/robots.txt";
+                console.log("URL:", url);
+
+                try {
+                    const response = await fetch(url);
+                    console.log(
+                        "Status:",
+                        response.status,
+                        response.statusText,
+                    );
+
+                    if (response.ok) {
+                        const text = await response.text();
+                        console.log("robots.txt content:", text);
+                        displayResult(
+                            "umamusumedb-results",
+                            "success",
+                            "Fetched robots.txt",
+                            { content: text },
+                        );
+                    } else {
+                        displayResult(
+                            "umamusumedb-results",
+                            "error",
+                            `HTTP ${response.status}: ${response.statusText}`,
+                        );
+                    }
+                } catch (error) {
+                    console.error("Fetch Error:", error);
+                    displayResult(
+                        "umamusumedb-results",
+                        "error",
+                        error.message,
+                    );
+                }
+                console.groupEnd();
+            }
+
+            async function testUmamusumeDBSitemap() {
+                console.group("🧪 Testing UmamusumeDB sitemap");
+                const url = "https://umamusumedb.com/sitemap-index.xml";
+                console.log("URL:", url);
+
+                try {
+                    const response = await fetch(url);
+                    console.log(
+                        "Status:",
+                        response.status,
+                        response.statusText,
+                    );
+
+                    if (response.ok) {
+                        const text = await response.text();
+                        console.log(
+                            "Sitemap content (first 500 chars):",
+                            text.substring(0, 500),
+                        );
+                        displayResult(
+                            "umamusumedb-results",
+                            "success",
+                            "Fetched sitemap",
+                            {
+                                preview: text.substring(0, 500) + "...",
+                                fullLength: text.length,
+                            },
+                        );
+                    } else {
+                        displayResult(
+                            "umamusumedb-results",
+                            "error",
+                            `HTTP ${response.status}: ${response.statusText}`,
+                        );
+                    }
+                } catch (error) {
+                    console.error("Fetch Error:", error);
+                    displayResult(
+                        "umamusumedb-results",
+                        "error",
+                        error.message,
+                    );
+                }
+                console.groupEnd();
+            }
+        </script>
+    </body>
+</html>
