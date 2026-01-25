@@ -85,11 +85,9 @@ afterEach(function () {
 describe('UmapyoiApiClient', function () {
     it('fetches characters successfully', function () {
         Http::fake([
-            'api.umapyoi.net/v1/characters' => Http::response([
-                'characters' => [
-                    ['id' => 1, 'name' => 'Silence Suzuka'],
-                    ['id' => 2, 'name' => 'Special Week'],
-                ],
+            'umapyoi.net/api/v1/character/list' => Http::response([
+                ['id' => 1, 'name_en' => 'Silence Suzuka'],
+                ['id' => 2, 'name_en' => 'Special Week'],
             ], 200),
         ]);
 
@@ -102,10 +100,8 @@ describe('UmapyoiApiClient', function () {
 
     it('caches character data', function () {
         Http::fake([
-            'api.umapyoi.net/v1/characters' => Http::response([
-                'characters' => [
-                    ['id' => 1, 'name' => 'Silence Suzuka'],
-                ],
+            'umapyoi.net/api/v1/character/list' => Http::response([
+                ['id' => 1, 'name_en' => 'Silence Suzuka'],
             ], 200),
         ]);
 
@@ -121,7 +117,7 @@ describe('UmapyoiApiClient', function () {
 
     it('handles API errors gracefully', function () {
         Http::fake([
-            'api.umapyoi.net/v1/characters' => Http::response([], 500),
+            'umapyoi.net/api/v1/character/list' => Http::response([], 500),
         ]);
 
         $result = $this->client->getCharacters();
@@ -133,7 +129,7 @@ describe('UmapyoiApiClient', function () {
 
     it('fetches a specific character by ID', function () {
         Http::fake([
-            'api.umapyoi.net/v1/characters/1' => Http::response([
+            'umapyoi.net/api/v1/character/1' => Http::response([
                 'character' => ['id' => 1, 'name' => 'Silence Suzuka'],
             ], 200),
         ]);
@@ -147,11 +143,9 @@ describe('UmapyoiApiClient', function () {
 
     it('fetches support cards successfully', function () {
         Http::fake([
-            'api.umapyoi.net/v1/support-cards' => Http::response([
-                'support_cards' => [
-                    ['id' => 1, 'name' => 'Kitasan Black'],
-                    ['id' => 2, 'name' => 'Narita Brian'],
-                ],
+            'umapyoi.net/api/v1/support' => Http::response([
+                ['id' => 1, 'title_en' => '[Tracen Academy]', 'chara_id' => 1001],
+                ['id' => 2, 'title_en' => '[Tracen Academy]', 'chara_id' => 1002],
             ], 200),
         ]);
 
@@ -163,7 +157,7 @@ describe('UmapyoiApiClient', function () {
 
     it('fetches a specific support card by ID', function () {
         Http::fake([
-            'api.umapyoi.net/v1/support-cards/1' => Http::response([
+            'umapyoi.net/api/v1/support/1' => Http::response([
                 'support_card' => ['id' => 1, 'name' => 'Kitasan Black'],
             ], 200),
         ]);
@@ -176,11 +170,9 @@ describe('UmapyoiApiClient', function () {
 
     it('fetches news with limit', function () {
         Http::fake([
-            'api.umapyoi.net/v1/news*' => Http::response([
-                'news' => [
-                    ['id' => 1, 'title' => 'New Event'],
-                    ['id' => 2, 'title' => 'Maintenance'],
-                ],
+            'umapyoi.net/api/v1/news/latest/*' => Http::response([
+                ['id' => 1, 'message_english' => 'New Event', 'post_at' => 1706140800],
+                ['id' => 2, 'message_english' => 'Maintenance', 'post_at' => 1706140800],
             ], 200),
         ]);
 
@@ -192,7 +184,7 @@ describe('UmapyoiApiClient', function () {
 
     it('checks API availability', function () {
         Http::fake([
-            'api.umapyoi.net/health' => Http::response([], 200),
+            'umapyoi.net/api/v1/character/list' => Http::response([1, 2, 3], 200),
         ]);
 
         $available = $this->client->isAvailable();
@@ -202,7 +194,7 @@ describe('UmapyoiApiClient', function () {
 
     it('returns false when API is unavailable', function () {
         Http::fake([
-            'api.umapyoi.net/health' => Http::response([], 500),
+            'umapyoi.net/api/v1/character/list' => Http::response([], 500),
         ]);
 
         $available = $this->client->isAvailable();
@@ -212,8 +204,8 @@ describe('UmapyoiApiClient', function () {
 
     it('clears cache successfully', function () {
         Http::fake([
-            'api.umapyoi.net/v1/characters' => Http::response([
-                'characters' => [['id' => 1, 'name' => 'Test']],
+            'umapyoi.net/api/v1/character/list' => Http::response([
+                ['id' => 1, 'name_en' => 'Test'],
             ], 200),
         ]);
 
@@ -234,8 +226,8 @@ describe('UmapyoiApiClient', function () {
 
     it('forces refresh when requested', function () {
         Http::fake([
-            'api.umapyoi.net/v1/characters' => Http::response([
-                'characters' => [['id' => 1, 'name' => 'Test']],
+            'umapyoi.net/api/v1/character/list' => Http::response([
+                ['id' => 1, 'name_en' => 'Test'],
             ], 200),
         ]);
 

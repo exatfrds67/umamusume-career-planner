@@ -22,7 +22,7 @@ describe('Focus Management System', function () {
 
         $response->assertStatus(200);
         // Verify the layout includes the necessary scripts
-        $response->assertSee('app.js', false);
+        $response->assertSee('build/assets/js/app-', false);
     });
 
     it('has proper focus indicator styles in CSS', function () {

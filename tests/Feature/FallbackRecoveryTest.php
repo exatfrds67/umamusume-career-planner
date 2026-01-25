@@ -187,7 +187,7 @@ describe('API Alerting', function () {
         );
 
         // Verify alert was stored
-        $history = $alertingService->getAlertHistory(1);
+        $history = $alertingService->getAlertHistory(null, 1);
 
         expect($history)->toHaveCount(1);
         expect($history[0])->toHaveKeys(['id', 'type', 'severity', 'message', 'context', 'timestamp', 'acknowledged']);
@@ -200,7 +200,7 @@ describe('API Alerting', function () {
 
         $alertingService->sendHealthDegradationAlert('umapyoi', 'degraded', 'API is slow');
 
-        $history = $alertingService->getAlertHistory(1);
+        $history = $alertingService->getAlertHistory(null, 1);
 
         expect($history)->toHaveCount(1);
         expect($history[0]['type'])->toBe('health_degradation');
@@ -211,7 +211,7 @@ describe('API Alerting', function () {
 
         $alertingService->sendRecoveryAlert('umapyoi', 123.45);
 
-        $history = $alertingService->getAlertHistory(1);
+        $history = $alertingService->getAlertHistory(null, 1);
 
         expect($history)->toHaveCount(1);
         expect($history[0]['type'])->toBe('api_recovery');
@@ -222,7 +222,7 @@ describe('API Alerting', function () {
 
         $alertingService->sendCircuitBreakerAlert('umapyoi', 5);
 
-        $history = $alertingService->getAlertHistory(1);
+        $history = $alertingService->getAlertHistory(null, 1);
 
         expect($history)->toHaveCount(1);
         expect($history[0]['type'])->toBe('circuit_breaker_open');
@@ -245,7 +245,7 @@ describe('API Alerting', function () {
 
         $alertingService->sendAlert('test_alert', 'info', 'Test message', []);
 
-        $history = $alertingService->getAlertHistory(1);
+        $history = $alertingService->getAlertHistory(null, 1);
         $alertId = $history[0]['id'];
 
         $acknowledged = $alertingService->acknowledgeAlert($alertId);

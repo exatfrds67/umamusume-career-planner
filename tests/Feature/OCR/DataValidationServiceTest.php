@@ -370,7 +370,7 @@ describe('Skill List Validation', function () {
 
 describe('General Validation', function () {
     it('handles unknown screen type', function () {
-        $result = $this->validator->validate('unknown_type', []);
+        $result = $this->validator->validate([], 'unknown_type');
 
         expect($result['valid'])->toBeFalse()
             ->and($result['errors'])->toContain('Unknown screen type: unknown_type');

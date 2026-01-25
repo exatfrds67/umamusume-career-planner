@@ -76,15 +76,17 @@ describe('ResponseValidator - Valid Responses', function () {
             'characters' => [
                 [
                     'id' => 1,
-                    'name' => 'Silence Suzuka',
-                    'title' => 'Silent Runner',
-                    'rarity' => 3,
+                    'name_en' => 'Silence Suzuka',
+                    'name_jp' => 'サイレンススズカ',
+                    'category_label' => 'Speed',
+                    'thumb_img' => 'https://example.com/image1.png',
                 ],
                 [
                     'id' => 2,
-                    'name' => 'Tokai Teio',
-                    'title' => 'Emperor',
-                    'rarity' => 3,
+                    'name_en' => 'Tokai Teio',
+                    'name_jp' => 'トウカイテイオー',
+                    'category_label' => 'Runner',
+                    'thumb_img' => 'https://example.com/image2.png',
                 ],
             ],
         ];
@@ -252,15 +254,15 @@ describe('ResponseValidator - Invalid Responses', function () {
             'characters' => [
                 [
                     'id' => 1,
-                    'name' => 'Valid Character',
+                    'name_en' => 'Valid Character',
                 ],
                 [
                     'id' => 'invalid', // Wrong type
-                    // Missing 'name' field
+                    // Missing 'name_en' field
                 ],
                 [
                     'id' => 3,
-                    'name' => 'Another Valid',
+                    'name_en' => 'Another Valid',
                 ],
             ],
         ];
@@ -437,9 +439,9 @@ describe('ResponseValidator - Complex Nested Validation', function () {
             'characters' => [
                 [
                     'id' => 1,
-                    'name' => 'Test Character',
-                    'title' => 'Test Title',
-                    'rarity' => 3,
+                    'name_en' => 'Test Character',
+                    'name_jp' => 'テストキャラクター',
+                    'category_label' => 'Speed',
                 ],
             ],
         ];
@@ -448,7 +450,7 @@ describe('ResponseValidator - Complex Nested Validation', function () {
 
         expect($result['valid'])->toBeTrue()
             ->and($result['data'])->toBeArray()
-            ->and($result['data'][0]['name'])->toBe('Test Character');
+            ->and($result['data'][0]['name_en'])->toBe('Test Character');
     });
 });
 

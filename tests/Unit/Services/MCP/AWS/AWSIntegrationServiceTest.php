@@ -6,14 +6,11 @@ use App\Services\MCP\AWS\AWSAPIService;
 use App\Services\MCP\AWS\AWSIntegrationService;
 use App\Services\MCP\AWS\AWSKnowledgeService;
 use App\Services\MCP\AWS\AWSPricingService;
-use App\Services\MCP\MCPClientService;
 use Illuminate\Support\Facades\Cache;
 
 // uses() removed - Pest handles this automatically
 
 beforeEach(function () {
-    /** @var MCPClientService&Mockery\MockInterface $mcpClient */
-    $mcpClient = Mockery::mock(MCPClientService::class);
     /** @var AWSPricingService&Mockery\MockInterface $pricingService */
     $pricingService = Mockery::mock(AWSPricingService::class);
     /** @var AWSKnowledgeService&Mockery\MockInterface $knowledgeService */
@@ -21,13 +18,11 @@ beforeEach(function () {
     /** @var AWSAPIService&Mockery\MockInterface $apiService */
     $apiService = Mockery::mock(AWSAPIService::class);
 
-    $this->mcpClient = $mcpClient;
     $this->pricingService = $pricingService;
     $this->knowledgeService = $knowledgeService;
     $this->apiService = $apiService;
 
     $this->service = new AWSIntegrationService(
-        $mcpClient,
         $pricingService,
         $knowledgeService,
         $apiService

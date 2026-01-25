@@ -131,7 +131,7 @@ describe('Training Session Transformation', function () {
             'current_turn' => 24,
         ];
 
-        $result = $this->transformer->prepareTrainingSessionCreate(1, $transformedData);
+        $result = $this->transformer->prepareTrainingSessionCreate($transformedData, 1);
 
         expect($result['career_id'])->toBe(1)
             ->and($result['training_type'])->toBe('speed')
@@ -183,7 +183,7 @@ describe('Race Result Transformation', function () {
             'outcome' => 'victory',
         ];
 
-        $result = $this->transformer->prepareRaceCreate(1, $transformedData);
+        $result = $this->transformer->prepareRaceCreate($transformedData, 1);
 
         expect($result['career_id'])->toBe(1)
             ->and($result['race_name'])->toBe('日本ダービー')

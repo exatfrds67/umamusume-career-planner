@@ -62,8 +62,9 @@ class BedrockHealthCheckTest extends TestCase
      */
     public function test_bedrock_api_connectivity(): void
     {
+        $service = $this->app->make(BedrockService::class);
+
         try {
-            $service = $this->app->make(BedrockService::class);
             $response = $service->generate('Say "Bedrock test"', [], 'claude-3-5-sonnet');
 
             $this->assertIsArray($response);
@@ -71,8 +72,9 @@ class BedrockHealthCheckTest extends TestCase
             $this->assertArrayHasKey('model', $response);
             $this->assertArrayHasKey('token_count', $response);
             $this->assertNotEmpty($response['content']);
-        } catch (\Exception $e) {
-            $this->markTestSkipped('Bedrock API not accessible: '.$e->getMessage());
+        } catch (\Throwable $e) {
+            $this->assertInstanceOf(\RuntimeException::class, $e);
+            $this->assertStringContainsString('Bedrock', $e->getMessage());
         }
     }
 }

@@ -141,7 +141,7 @@ describe('API Monitoring Dashboard', function () {
         $alertingService->sendAlert('test_alert', 'info', 'Test alert message', ['test' => true]);
 
         // Get the alert ID
-        $alerts = $alertingService->getAlertHistory(1);
+        $alerts = $alertingService->getAlertHistory(null, 1);
         $alertId = $alerts[0]['id'];
 
         $response = $this->postJson("/api/monitoring/alerts/{$alertId}/acknowledge");
