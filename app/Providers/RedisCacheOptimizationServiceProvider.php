@@ -25,27 +25,84 @@ class RedisCacheOptimizationServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Configure Redis connection settings
-        $this->configureRedisConnections();
+        // Only proceed if Redis is configured and available
+        if (! $this->isRedisConfigured()) {
+            Log::debug('Redis cache optimization provider skipped - Redis not configured or available');
 
-        // Set up cache warming for frequently accessed data
-        $this->setupCacheWarming();
+            return;
+        }
 
-        // Configure cache tags for efficient invalidation
-        $this->configureCacheTags();
+        try {
+            // Configure Redis connection settings
+            $this->configureRedisConnections();
 
-        // Monitor Redis health
-        $this->monitorRedisHealth();
+            // Set up cache warming for frequently accessed data
+            $this->setupCacheWarming();
+
+            // Configure cache tags for efficient invalidation
+            $this->configureCacheTags();
+
+            // Monitor Redis health
+            $this->monitorRedisHealth();
+        } catch (\Exception $e) {
+            Log::error('Redis cache optimization provider boot failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            // Don't let Redis issues break the application boot
+            // The application should continue to work without Redis optimization
+        }
+    }
+
+    /**
+     * Check if Redis is configured and available
+     */
+    private function isRedisConfigured(): bool
+    {
+        // Check if Redis is configured in the database config
+        $redisConfig = config('database.redis.default');
+        if (! is_array($redisConfig) || empty($redisConfig) || empty($redisConfig['host'])) {
+            return false;
+        }
+
+        // Check if cache or session is using Redis
+        $cacheStore = config('cache.default');
+        $sessionDriver = config('session.driver');
+        $queueConnection = config('queue.default');
+
+        $isRedisUsed = in_array($cacheStore, ['redis']) ||
+            in_array($sessionDriver, ['redis']) ||
+            in_array($queueConnection, ['redis']);
+
+        if (! $isRedisUsed) {
+            return false;
+        }
+
+        // Try a quick connection test with a short timeout
+        try {
+            $redis = Redis::connection('default');
+            $redis->ping();
+
+            return true;
+        } catch (\Exception $e) {
+            Log::debug('Redis not available for optimization', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return false;
+        }
     }
 
     /**
      * Configure Redis connections with optimized settings
      */
-    protected function configureRedisConnections(): void
+    private function configureRedisConnections(): void
     {
         try {
-            // Test Redis connection
-            Redis::connection('default')->ping();
+            // Test Redis connection with timeout
+            $redis = Redis::connection('default');
+            $redis->ping();
 
             Log::info('Redis connection established successfully', [
                 'host' => config('database.redis.default.host'),
@@ -57,13 +114,16 @@ class RedisCacheOptimizationServiceProvider extends ServiceProvider
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
+
+            // Don't let Redis connection failure break the application boot
+            // The application should continue to work without Redis
         }
     }
 
     /**
      * Setup cache warming for frequently accessed data
      */
-    protected function setupCacheWarming(): void
+    private function setupCacheWarming(): void
     {
         // Cache warming will be handled by scheduled commands
         // This method sets up the foundation for cache warming strategies
@@ -78,7 +138,7 @@ class RedisCacheOptimizationServiceProvider extends ServiceProvider
     /**
      * Configure cache tags for efficient invalidation
      */
-    protected function configureCacheTags(): void
+    private function configureCacheTags(): void
     {
         // Define cache tag groups for efficient invalidation
         $this->app->instance('cache.tags', [
@@ -95,7 +155,7 @@ class RedisCacheOptimizationServiceProvider extends ServiceProvider
     /**
      * Monitor Redis health and performance
      */
-    protected function monitorRedisHealth(): void
+    private function monitorRedisHealth(): void
     {
         if (! $this->app->runningInConsole()) {
             return;

@@ -191,6 +191,15 @@ class CacheManagementService
         $invalidated = 0;
 
         try {
+            // Check if Redis is available
+            if (! $this->isRedisAvailable()) {
+                Log::debug('[CacheManagementService] Redis not available for pattern invalidation', [
+                    'pattern' => $pattern,
+                ]);
+
+                return 0;
+            }
+
             // Get all keys matching pattern
             $keys = Redis::keys($fullPattern);
 
@@ -301,21 +310,40 @@ class CacheManagementService
      */
     public function recordApiResponseTime(string $apiName, float $responseTime): void
     {
-        $key = "api_response_time:{$apiName}";
+        try {
+            // Check if Redis is available
+            if (! $this->isRedisAvailable()) {
+                Log::debug('[CacheManagementService] Redis not available for response time recording', [
+                    'api' => $apiName,
+                    'response_time_ms' => round($responseTime, 2),
+                ]);
 
-        // Store in Redis sorted set for time-series analysis
-        Redis::zadd($key, time(), $responseTime);
+                return;
+            }
 
-        // Keep only last 1000 entries
-        Redis::zremrangebyrank($key, 0, -1001);
+            $key = "api_response_time:{$apiName}";
 
-        // Set expiry to 7 days
-        Redis::expire($key, 604800);
+            // Store in Redis sorted set for time-series analysis
+            Redis::zadd($key, time(), $responseTime);
 
-        Log::debug('[CacheManagementService] API response time recorded', [
-            'api' => $apiName,
-            'response_time_ms' => round($responseTime, 2),
-        ]);
+            // Keep only last 1000 entries
+            Redis::zremrangebyrank($key, 0, -1001);
+
+            // Set expiry to 7 days
+            Redis::expire($key, 604800);
+
+            Log::debug('[CacheManagementService] API response time recorded', [
+                'api' => $apiName,
+                'response_time_ms' => round($responseTime, 2),
+            ]);
+        } catch (\Exception $e) {
+            Log::warning('[CacheManagementService] Redis unavailable for response time recording', [
+                'api' => $apiName,
+                'response_time_ms' => round($responseTime, 2),
+                'error' => $e->getMessage(),
+            ]);
+            // Silently fail when Redis is unavailable
+        }
     }
 
     /**
@@ -328,18 +356,19 @@ class CacheManagementService
         $key = "api_response_time:{$apiName}";
 
         try {
+            // Check if Redis is available
+            if (! $this->isRedisAvailable()) {
+                Log::debug('[CacheManagementService] Redis not available for API stats', [
+                    'api' => $apiName,
+                ]);
+
+                return $this->getEmptyStats();
+            }
+
             $times = Redis::zrange($key, 0, -1);
 
             if (empty($times)) {
-                return [
-                    'avg' => 0.0,
-                    'min' => 0.0,
-                    'max' => 0.0,
-                    'p50' => 0.0,
-                    'p95' => 0.0,
-                    'p99' => 0.0,
-                    'count' => 0,
-                ];
+                return $this->getEmptyStats();
             }
 
             $times = array_map('floatval', $times);
@@ -365,15 +394,7 @@ class CacheManagementService
                 'error' => $e->getMessage(),
             ]);
 
-            return [
-                'avg' => 0.0,
-                'min' => 0.0,
-                'max' => 0.0,
-                'p50' => 0.0,
-                'p95' => 0.0,
-                'p99' => 0.0,
-                'count' => 0,
-            ];
+            return $this->getEmptyStats();
         }
     }
 
@@ -383,6 +404,16 @@ class CacheManagementService
     public function clearAll(): void
     {
         try {
+            // Check if Redis is available
+            if (! $this->isRedisAvailable()) {
+                Log::debug('[CacheManagementService] Redis not available for clearing all caches');
+                // Fallback to clearing Laravel cache
+                Cache::flush();
+                Log::info('[CacheManagementService] Laravel cache cleared (Redis unavailable)');
+
+                return;
+            }
+
             $pattern = self::CACHE_PREFIX.'*';
             $keys = Redis::keys($pattern);
             if (! \is_array($keys)) {
@@ -402,6 +433,38 @@ class CacheManagementService
                 'error' => $e->getMessage(),
             ]);
         }
+    }
+
+    /**
+     * Check if Redis is available
+     */
+    protected function isRedisAvailable(): bool
+    {
+        try {
+            Redis::ping();
+
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Get empty statistics array
+     *
+     * @return array{avg: float, min: float, max: float, p50: float, p95: float, p99: float, count: int}
+     */
+    protected function getEmptyStats(): array
+    {
+        return [
+            'avg' => 0.0,
+            'min' => 0.0,
+            'max' => 0.0,
+            'p50' => 0.0,
+            'p95' => 0.0,
+            'p99' => 0.0,
+            'count' => 0,
+        ];
     }
 
     /**

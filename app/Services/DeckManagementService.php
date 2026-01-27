@@ -225,6 +225,53 @@ class DeckManagementService
     }
 
     /**
+     * Update card details (limit break and friendship level)
+     */
+    public function updateCardDetails(
+        int $characterId,
+        int $positionSlot,
+        int $limitBreakLevel,
+        int $friendshipLevel
+    ): ?CharacterSupportCard {
+        try {
+            return DB::transaction(function () use ($characterId, $positionSlot, $limitBreakLevel, $friendshipLevel) {
+                $card = CharacterSupportCard::where('character_id', $characterId)
+                    ->where('position_slot', $positionSlot)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (! $card) {
+                    return null;
+                }
+
+                // Validate limit break level
+                $this->validateLimitBreakLevel($card->support_card_id, $limitBreakLevel);
+
+                $card->limit_break_level = $limitBreakLevel;
+                $card->friendship_level = max(0, min(100, $friendshipLevel)); // Clamp between 0-100
+                $card->save();
+
+                Log::info('Card details updated', [
+                    'character_id' => $characterId,
+                    'position_slot' => $positionSlot,
+                    'limit_break_level' => $limitBreakLevel,
+                    'friendship_level' => $friendshipLevel,
+                ]);
+
+                return $card;
+            });
+        } catch (\Exception $e) {
+            Log::error('Failed to update card details', [
+                'error' => $e->getMessage(),
+                'character_id' => $characterId,
+                'position_slot' => $positionSlot,
+            ]);
+
+            return null;
+        }
+    }
+
+    /**
      * Clear the entire deck
      */
     public function clearDeck(int $characterId): bool

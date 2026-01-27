@@ -110,14 +110,14 @@ return [
                 'enabled' => true,
                 'table' => 'ucp_system_logs',
             ],
-            // 'slack' => [
-            //     'enabled' => false,
-            //     'webhook_url' => env('APM_SLACK_WEBHOOK'),
-            // ],
-            // 'mail' => [
-            //     'enabled' => false,
-            //     'recipients' => [],
-            // ],
+            'slack' => [
+                'enabled' => env('APM_SLACK_ENABLED', false),
+                'webhook_url' => env('APM_SLACK_WEBHOOK'),
+            ],
+            'mail' => [
+                'enabled' => env('APM_MAIL_ENABLED', false),
+                'recipients' => explode(',', env('APM_MAIL_RECIPIENTS', 'admin@example.com')),
+            ],
         ],
 
         // Alert thresholds
