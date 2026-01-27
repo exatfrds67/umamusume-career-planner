@@ -1,4 +1,161 @@
 Note: Using configuration file C:\XAMPP\htdocs\umamusume-career-planner\phpstan.neon.
+   0/505 [>---------------------------]   0%[1G[2K  20/505 [=>--------------------------]   3%[1G[2K  40/505 [==>-------------------------]   7%[1G[2K  60/505 [===>------------------------]  11%[1G[2K 100/505 [=====>----------------------]  19%[1G[2K 120/505 [======>---------------------]  23%[1G[2K 160/505 [========>-------------------]  31%[1G[2K 200/505 [===========>----------------]  39%[1G[2K 240/505 [=============>--------------]  47%[1G[2K 260/505 [==============>-------------]  51%[1G[2K 280/505 [===============>------------]  55%[1G[2K 300/505 [================>-----------]  59%[1G[2K 320/505 [=================>----------]  63%[1G[2K 340/505 [==================>---------]  67%[1G[2K 360/505 [===================>--------]  71%[1G[2K 365/505 [====================>-------]  72%[1G[2K 385/505 [=====================>------]  76%[1G[2K 405/505 [======================>-----]  80%[1G[2K 425/505 [=======================>----]  84%[1G[2K 465/505 [=========================>--]  92%[1G[2K 485/505 [==========================>-]  96%[1G[2K 505/505 [============================] 100%
 
- [OK] No errors                                                                                                         
+ ------ ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+  Line   app\Http\Controllers\AIChatController.php                                                                                                                                    
+ ------ ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+  69     Parameter $characterId of method App\Http\Controllers\AIChatController::logConversation() expects int|null, mixed given.                                                     
+         ≡ƒ¬¬  argument.type                                                                                                                                                            
+  70     Parameter $conversationId of method App\Http\Controllers\AIChatController::logConversation() expects string|null, mixed given.                                               
+         ≡ƒ¬¬  argument.type                                                                                                                                                            
+  71     Parameter $message of method App\Http\Controllers\AIChatController::logConversation() expects string, mixed given.                                                           
+         ≡ƒ¬¬  argument.type                                                                                                                                                            
+  137    Parameter $characterId of method App\Http\Controllers\AIChatController::logConversation() expects int|null, mixed given.                                                     
+         ≡ƒ¬¬  argument.type                                                                                                                                                            
+  138    Parameter $conversationId of method App\Http\Controllers\AIChatController::logConversation() expects string|null, mixed given.                                               
+         ≡ƒ¬¬  argument.type                                                                                                                                                            
+  139    Parameter $message of method App\Http\Controllers\AIChatController::logConversation() expects string, mixed given.                                                           
+         ≡ƒ¬¬  argument.type                                                                                                                                                            
+  525    Method App\Http\Controllers\AIChatController::executeChatRequest() should return array{content: string, model: string, provider: string, processing_time: float, tokens:     
+         int|null, cost: float, tools_used: array<int, string>, agent: string|null, ...} but returns array{content: string, model: string, provider: string, processing_time: float,  
+          tokens: null, cost: float, tools_used: array{}, agent: mixed, ...}.                                                                                                         
+         ≡ƒ¬¬  return.type                                                                                                                                                              
+         ≡ƒÆí  Offset 'agent' (string|null) does not accept type mixed.                                                                                                                 
+         ≡ƒÆí  Offset 'confidence' (float|null) does not accept type mixed.                                                                                                             
+  535    Call to function is_array() with array will always evaluate to true.                                                                                                         
+         ≡ƒ¬¬  function.alreadyNarrowedType                                                                                                                                             
+  536    Call to function is_array() with array will always evaluate to true.                                                                                                         
+         ≡ƒ¬¬  function.alreadyNarrowedType                                                                                                                                             
+  536    Parameter #1 $knowledgeBase of method App\Http\Controllers\AIChatController::extractKnowledgeSources() expects string, mixed given.                                          
+         ≡ƒ¬¬  argument.type                                                                                                                                                            
+ ------ ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+
+ ------ --------------------------------------------------------------------------------------------------------------------------------------------- 
+  Line   app\Services\AI\VectorStoreService.php                                                                                                       
+ ------ --------------------------------------------------------------------------------------------------------------------------------------------- 
+  24     Constant App\Services\AI\VectorStoreService::EMBEDDING_DIMENSIONS is unused.                                                                 
+         ≡ƒ¬¬  classConstant.unused                                                                                                                     
+         ≡ƒÆí  See: https://phpstan.org/developing-extensions/always-used-class-constants                                                               
+  34     Property App\Services\AI\VectorStoreService::$apiKey (string) does not accept mixed.                                                         
+         ≡ƒ¬¬  assign.propertyType                                                                                                                      
+  40     Method App\Services\AI\VectorStoreService::loadKnowledgeBase() return type has no value type specified in iterable type array.               
+         ≡ƒ¬¬  missingType.iterableValue                                                                                                                
+         ≡ƒÆí  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type                                                   
+  76     Method App\Services\AI\VectorStoreService::chunkDocument() return type has no value type specified in iterable type array.                   
+         ≡ƒ¬¬  missingType.iterableValue                                                                                                                
+         ≡ƒÆí  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type                                                   
+  126    Method App\Services\AI\VectorStoreService::generateEmbedding() return type has no value type specified in iterable type array.               
+         ≡ƒ¬¬  missingType.iterableValue                                                                                                                
+         ≡ƒÆí  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type                                                   
+  136    Method App\Services\AI\VectorStoreService::generateEmbedding() should return array|null but returns mixed.                                   
+         ≡ƒ¬¬  return.type                                                                                                                              
+  149    Cannot access offset 'data' on mixed.                                                                                                        
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                                                                                         
+  149    Cannot access offset 'embedding' on mixed.                                                                                                   
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                                                                                         
+  149    Cannot access offset 0 on mixed.                                                                                                             
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                                                                                         
+  172    Method App\Services\AI\VectorStoreService::cosineSimilarity() has parameter $vecA with no value type specified in iterable type array.       
+         ≡ƒ¬¬  missingType.iterableValue                                                                                                                
+         ≡ƒÆí  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type                                                   
+  172    Method App\Services\AI\VectorStoreService::cosineSimilarity() has parameter $vecB with no value type specified in iterable type array.       
+         ≡ƒ¬¬  missingType.iterableValue                                                                                                                
+         ≡ƒÆí  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type                                                   
+  201    Method App\Services\AI\VectorStoreService::searchSimilar() return type has no value type specified in iterable type array.                   
+         ≡ƒ¬¬  missingType.iterableValue                                                                                                                
+         ≡ƒÆí  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type                                                   
+  244    Method App\Services\AI\VectorStoreService::keywordSearch() return type has no value type specified in iterable type array.                   
+         ≡ƒ¬¬  missingType.iterableValue                                                                                                                
+         ≡ƒÆí  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type                                                   
+  275    Method App\Services\AI\VectorStoreService::loadAllDocuments() return type has no value type specified in iterable type array.                
+         ≡ƒ¬¬  missingType.iterableValue                                                                                                                
+         ≡ƒÆí  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type                                                   
+  298    Method App\Services\AI\VectorStoreService::getRelevantContext() has parameter $options with no value type specified in iterable type array.  
+         ≡ƒ¬¬  missingType.iterableValue                                                                                                                
+         ≡ƒÆí  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type                                                   
+ ------ --------------------------------------------------------------------------------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+  Line   app\Services\ExternalAPI\DataQualityScoringService.php                                                                                                                       
+ ------ ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+  706    Method App\Services\ExternalAPI\DataQualityScoringService::getQualityTrend() should return array{trend: string, avg_score: float, score_change: float, grade_distribution:   
+         array<string, int>} but returns array{trend: 'declining'|'improving'|'stable', avg_score: float, score_change: float, grade_distribution: non-empty-array<int|string, int<1  
+         , max>>}.                                                                                                                                                                    
+         ≡ƒ¬¬  return.type                                                                                                                                                              
+         ≡ƒÆí  Offset 'grade_distribution' (array<string, int>) does not accept type array<int|string, int>.                                                                            
+ ------ ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+
+ ------ -------------------------------------------------------------------------------------------------- 
+  Line   app\Services\Neuron\CareerPlanningService.php                                                     
+ ------ -------------------------------------------------------------------------------------------------- 
+  254    Argument of an invalid type string supplied for foreach, only iterables are supported.            
+         ≡ƒ¬¬  foreach.nonIterable                                                                           
+  342    Part $planningContext['goal_horizon_turns'] (mixed) of encapsed string cannot be cast to string.  
+         ≡ƒ¬¬  encapsedStringPart.nonString                                                                  
+  349    Part $planningContext['target_grade'] (mixed) of encapsed string cannot be cast to string.        
+         ≡ƒ¬¬  encapsedStringPart.nonString                                                                  
+  352    Part $planningContext['additional_context'] (mixed) of encapsed string cannot be cast to string.  
+         ≡ƒ¬¬  encapsedStringPart.nonString                                                                  
+ ------ -------------------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------------------------------------------ 
+  Line   app\Services\RedisCacheOptimizationService.php                                                                    
+ ------ ------------------------------------------------------------------------------------------------------------------ 
+  51     Unable to resolve the template type TCacheValue in call to static method Illuminate\Cache\Repository::remember()  
+         ≡ƒ¬¬  argument.templateType                                                                                         
+         ≡ƒÆí  See: https://phpstan.org/blog/solving-phpstan-error-unable-to-resolve-template-type                           
+ ------ ------------------------------------------------------------------------------------------------------------------ 
+
+ ------ -------------------------------------------------------------------- 
+  Line   tests\Feature\Neuron\CareerPlanningAgentTest.php                    
+ ------ -------------------------------------------------------------------- 
+  94     Cannot access constant class on mixed.                              
+         ≡ƒ¬¬  classConstant.nonObject                                         
+  96     Parameter #1 $value of function expect contains unresolvable type.  
+         ≡ƒ¬¬  argument.unresolvableType                                       
+  96     Return type of call to function expect contains unresolvable type.  
+         ≡ƒ¬¬  function.unresolvableReturnType                                 
+  97     Parameter #1 $value of function expect contains unresolvable type.  
+         ≡ƒ¬¬  argument.unresolvableType                                       
+  97     Return type of call to function expect contains unresolvable type.  
+         ≡ƒ¬¬  function.unresolvableReturnType                                 
+ ------ -------------------------------------------------------------------- 
+
+ ------ -------------------------------------------------------------------------------------------------------------------------------------------------- 
+  Line   tests\Support\ExternalAPI\FailoverTestAPIService.php                                                                                              
+ ------ -------------------------------------------------------------------------------------------------------------------------------------------------- 
+  41     Method Tests\Support\ExternalAPI\FailoverTestAPIService::testFetchWithFallback() return type has no value type specified in iterable type array.  
+         ≡ƒ¬¬  missingType.iterableValue                                                                                                                     
+         ≡ƒÆí  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type                                                        
+  43     Method App\Services\ExternalAPI\ExternalAPIService::fetchWithFallback() invoked with 1 parameter, 2-4 required.                                   
+         ≡ƒ¬¬  arguments.count                                                                                                                               
+ ------ -------------------------------------------------------------------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+  Line   tests\Support\ExternalAPI\TestExternalAPIService.php                                                                                                         
+ ------ ------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+  48     Method Tests\Support\ExternalAPI\TestExternalAPIService::testFetchWithFallback() has parameter $params with no value type specified in iterable type array.  
+         ≡ƒ¬¬  missingType.iterableValue                                                                                                                                
+         ≡ƒÆí  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type                                                                   
+  48     Method Tests\Support\ExternalAPI\TestExternalAPIService::testFetchWithFallback() return type has no value type specified in iterable type array.             
+         ≡ƒ¬¬  missingType.iterableValue                                                                                                                                
+         ≡ƒÆí  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type                                                                   
+  53     Method Tests\Support\ExternalAPI\TestExternalAPIService::testFetchFromSource() has parameter $params with no value type specified in iterable type array.    
+         ≡ƒ¬¬  missingType.iterableValue                                                                                                                                
+         ≡ƒÆí  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type                                                                   
+  53     Method Tests\Support\ExternalAPI\TestExternalAPIService::testFetchFromSource() return type has no value type specified in iterable type array.               
+         ≡ƒ¬¬  missingType.iterableValue                                                                                                                                
+         ≡ƒÆí  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type                                                                   
+ ------ ------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+
+ -- -------------------------------------------------------------------------------------------------------------------------------------------------------- 
+     Error                                                                                                                                                   
+ -- -------------------------------------------------------------------------------------------------------------------------------------------------------- 
+     Ignored error pattern #Parameter .+ of method Pest.+TestCall::with\(\) expects# was not matched in reported errors.                                     
+     Ignored error pattern #Parameter .+ of method Illuminate\\Filesystem\\FilesystemAdapter::assertExists\(\) expects# was not matched in reported errors.  
+     Ignored error pattern #noEnvCallsOutsideOfConfig# in path C:\XAMPP\htdocs\umamusume-career-planner\tests was not matched in reported errors.            
+     Ignored error pattern #Call to an undefined method App\\Services\\.+::# was not matched in reported errors.                                             
+ -- -------------------------------------------------------------------------------------------------------------------------------------------------------- 
+
+ [ERROR] Found 46 errors                                                                                                
 

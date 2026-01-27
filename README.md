@@ -54,10 +54,11 @@ The **Umamusume Pretty Derby Career Planner** is a comprehensive local-first web
 
 | Requirement | Version |
 |-------------|---------|
-| PHP | 8.2+ |
+| PHP | 8.4.11 |
 | Node.js | 18+ |
 | MySQL/MariaDB | 8.0+ / 10.5+ |
-| Redis | 6.0+ (optional, for caching) |
+| SQLite | 3.35+ (for testing) |
+| Redis (WSL) | 6.0+ (optional, for caching) |
 | Composer | 2.0+ |
 
 ### Browser Support
@@ -66,6 +67,7 @@ The **Umamusume Pretty Derby Career Planner** is a comprehensive local-first web
 - Firefox (last 2 versions)
 - Safari (last 2 versions)
 - Edge (last 2 versions)
+- Progressive Web App (PWA) installable
 
 ---
 
@@ -75,38 +77,45 @@ The **Umamusume Pretty Derby Career Planner** is a comprehensive local-first web
 
 | Component | Technology | Version |
 |-----------|------------|---------|
-| Framework | Laravel | 12+ |
-| Frontend Reactivity | Livewire | 3 |
-| PHP Runtime | PHP | 8.2+ |
-| Database | MySQL/MariaDB/SQLite | - |
-| Cache | Redis | 6.0+ |
+| Framework | Laravel | v12 |
+| Frontend Reactivity | Livewire | v3 |
+| PHP Runtime | PHP | 8.4.11 |
+| Database | MySQL/MariaDB/SQLite | 8.0+ / 10.5+ / 3.35+ |
+| Cache | Redis (WSL) | 6.0+ |
+| Authentication | Laravel Sanctum | v4 |
+| Queue Management | Laravel Horizon | v5 |
+| Debugging | Laravel Telescope | v5 |
 
 ### Frontend
 
 | Component | Technology | Version |
 |-----------|------------|---------|
-| Client Interactivity | Alpine.js | Latest |
+| Client Interactivity | Alpine.js | v3 |
+| State Persistence | @alpinejs/persist | Latest |
 | Styling | TailwindCSS | v4 |
-| Build Tool | Vite | 7 |
+| Build Tool | Vite | v7 |
+| Icons | Heroicons | Latest |
 
 ### AI & Integration
 
-| Component | Technology |
-|-----------|------------|
-| Local AI | Ollama |
-| Cloud AI | AWS Bedrock (Claude 4.5) |
-| Agent Framework | Neuron AI |
-| MCP Integration | Memory, Filesystem, Fetch servers |
-| OCR | Tesseract with GD preprocessing |
+| Component | Technology | Version |
+|-----------|------------|----------|
+| Local AI | Ollama | Latest |
+| Cloud AI | AWS Bedrock | Claude 3.5 Sonnet, Nova |
+| Agent Framework | Custom Neuron Implementation | - |
+| MCP Integration | Memory, Filesystem, Fetch, GitKraken, Chrome DevTools | Latest |
+| OCR | Tesseract + OpenCV + GD | 5+ |
+| External APIs | umapyoi.net, UmamusumeDB.com | - |
 
-### Testing
+### Testing & Quality
 
-| Type | Tool |
-|------|------|
-| Backend Unit/Feature | Pest |
-| JavaScript Unit | Vitest |
-| E2E | Playwright |
-| Accessibility | axe-core |
+| Type | Tool | Version |
+|------|------|---------|
+| Backend Unit/Feature | Pest | v4 |
+| Static Analysis | Larastan | v3 |
+| Code Formatting | Laravel Pint | v1 |
+| E2E Testing | Playwright | Latest |
+| Accessibility | axe-core | Latest |
 
 ---
 
@@ -133,8 +142,14 @@ php artisan migrate --seed
 # Build assets
 npm run build
 
-# Start development server
+# Start all development services (server, queue, logs, vite)
 composer run dev
+
+# Or start services individually:
+# php artisan serve
+# php artisan queue:listen --tries=1
+# php artisan pail --timeout=0
+# npm run dev
 ```
 
 ### Development Commands
@@ -143,19 +158,38 @@ composer run dev
 # Run all services (server, queue, vite)
 composer run dev
 
-# Run tests
-php artisan test
-npm run test
+# Run all tests
+composer test
+# or
+php artisan test --compact
 
-# Run E2E tests
-npm run playwright:test
+# Run specific test suites
+composer test:unit
+composer test:feature
+composer test:integration
+composer test:architecture
+
+# Run tests in parallel
+composer test:parallel
+
+# Code coverage
+composer test:coverage
+composer test:coverage-html
 
 # Code formatting
+vendor/bin/pint
 vendor/bin/pint --dirty
-npm run prettier:fix
 
 # Static analysis
 vendor/bin/phpstan analyse
+
+# Cache management
+php artisan cache:clear
+php artisan cache:warm
+
+# Redis health check (WSL)
+wsl bash -c "redis-cli ping"
+php artisan redis:health --detailed
 ```
 
 ---
@@ -177,20 +211,38 @@ DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_DATABASE=umamusume_planner
 
+# Cache & Queue
+CACHE_STORE=redis
+QUEUE_CONNECTION=redis
+SESSION_DRIVER=redis
+
 # AI Configuration
 AI_PRIMARY_PROVIDER=ollama
 AI_FALLBACK_PROVIDER=bedrock
 OLLAMA_HOST=http://localhost:11434
-AWS_BEDROCK_REGION=us-east-1
+OLLAMA_MODEL=llama3.2
+
+# AWS Bedrock
+AWS_ACCESS_KEY_ID=your_key
+AWS_SECRET_ACCESS_KEY=your_secret
+AWS_DEFAULT_REGION=us-east-1
+AWS_BEDROCK_MODEL=anthropic.claude-3-5-sonnet-20241022-v2:0
 
 # MCP Configuration
 MCP_ENABLED=true
-MCP_MEMORY_SERVER=true
-MCP_FILESYSTEM_SERVER=true
+MCP_MEMORY_ENABLED=true
+MCP_FILESYSTEM_ENABLED=true
+MCP_FETCH_ENABLED=true
 
 # External APIs
-UMAPYOI_API_URL=https://api.umapyoi.net
+UMAPYOI_API_BASE_URL=https://api.umapyoi.net
+UMAPYOI_API_TIMEOUT=30
 UMAMUSUMEDB_API_URL=https://umamusumedb.com/api
+
+# Performance Monitoring
+APM_ENABLED=true
+TELESCOPE_ENABLED=true
+HORIZON_ENABLED=true
 ```
 
 ### Configuration Files
@@ -198,10 +250,16 @@ UMAMUSUMEDB_API_URL=https://umamusumedb.com/api
 | File | Purpose |
 |------|---------|
 | `config/ai.php` | AI provider settings and routing |
-| `config/neuron.php` | Neuron agent configuration |
+| `config/ai_agents.php` | AI agent configurations |
+| `config/neuron.php` | Neuron framework settings |
 | `config/mcp.php` | MCP server settings |
 | `config/mcp_tools.php` | MCP tool controls |
+| `config/mcp-agents.php` | MCP agent configurations |
 | `config/external-apis.php` | External API configuration |
+| `config/cache-management.php` | Cache warming and invalidation |
+| `config/apm.php` | Application performance monitoring |
+| `config/query-optimization.php` | Database query optimization |
+| `config/api-performance.php` | API performance tracking |
 
 ---
 
@@ -241,38 +299,84 @@ UMAMUSUMEDB_API_URL=https://umamusumedb.com/api
 ```
 umamusume-career-planner/
 ├── app/
+│   ├── Console/
+│   │   └── Commands/
+│   ├── Events/
+│   │   └── GameVersionUpdated.php
+│   ├── Helpers/
+│   │   └── ImageOptimizationHelper.php
 │   ├── Http/
 │   │   ├── Controllers/
 │   │   ├── Middleware/
 │   │   ├── Requests/
 │   │   └── Resources/
-│   ├── Livewire/
+│   ├── Jobs/
+│   │   ├── SyncExternalDataJob.php
+│   │   └── WarmCacheJob.php
+│   ├── Listeners/
+│   │   └── InvalidateCacheOnGameUpdate.php
+│   ├── MCP/
+│   │   └── SubagentCoordinationService.php
 │   ├── Models/
+│   │   ├── Character.php
+│   │   ├── Career.php
+│   │   ├── Skill.php
+│   │   ├── SupportCard.php
+│   │   ├── TrainingSession.php
+│   │   ├── AIConversation.php
+│   │   ├── MCPAgent.php
+│   │   ├── MCPServer.php
+│   │   └── MCPToolUsage.php
 │   ├── Neuron/
-│   │   └── Agents/
-│   │       ├── Tools/
-│   │       ├── TrainingAdvisorAgent.php
-│   │       ├── RaceStrategyAgent.php
-│   │       └── SkillRecommendationAgent.php
+│   │   ├── Agents/
+│   │   ├── Responses/
+│   │   └── Support/
+│   ├── Policies/
+│   │   └── CharacterPolicy.php
 │   ├── Repositories/
+│   │   ├── CharacterRepositoryInterface.php
+│   │   └── EloquentCharacterRepository.php
 │   ├── Services/
+│   │   ├── Agents/
 │   │   ├── AI/
-│   │   │   ├── OllamaService.php
-│   │   │   ├── BedrockService.php
-│   │   │   └── HybridAIService.php
 │   │   ├── ExternalAPI/
-│   │   │   ├── UmapyoiApiClient.php
-│   │   │   └── UmamusumeDBApiClient.php
 │   │   ├── MCP/
-│   │   │   ├── MCPMonitoringService.php
-│   │   │   └── MCPHealthDashboardService.php
+│   │   ├── Neuron/
 │   │   ├── OCR/
-│   │   │   └── ScreenshotProcessingService.php
-│   │   └── DataManagement/
-│   │       ├── DataImportService.php
-│   │       ├── DataExportService.php
-│   │       └── DataMigrationService.php
+│   │   ├── Training/
+│   │   ├── ApiPerformanceMonitoringService.php
+│   │   ├── ApiResponseCachingService.php
+│   │   ├── ApmService.php
+│   │   ├── BackupService.php
+│   │   ├── BenchmarkingService.php
+│   │   ├── CacheManagementService.php
+│   │   ├── CareerAnalyticsService.php
+│   │   ├── DataExportService.php
+│   │   ├── DataImportService.php
+│   │   ├── DataMigrationService.php
+│   │   ├── DeckOptimizationService.php
+│   │   ├── ExternalDataService.php
+│   │   ├── ImageProcessingService.php
+│   │   ├── MCPMonitoringService.php
+│   │   ├── PerformanceAlertingService.php
+│   │   ├── QueryOptimizationService.php
+│   │   ├── RedisCacheOptimizationService.php
+│   │   ├── SkillAnalysisService.php
+│   │   ├── SkillHintService.php
+│   │   ├── SupportCardMetaService.php
+│   │   ├── TesseractService.php
+│   │   └── TrainingPredictionService.php
+│   ├── View/
+│   │   └── Components/
 │   └── Providers/
+│       ├── AppServiceProvider.php
+│       ├── CacheServiceProvider.php
+│       ├── ExternalAPIServiceProvider.php
+│       ├── HorizonServiceProvider.php
+│       ├── MCPToolsServiceProvider.php
+│       ├── MemoryGuardServiceProvider.php
+│       ├── RedisCacheOptimizationServiceProvider.php
+│       └── TelescopeServiceProvider.php
 ├── config/
 ├── database/
 │   ├── migrations/
@@ -305,6 +409,8 @@ Track character progression with comprehensive stat management:
 - **Factors**: Blue (stat), Red (aptitude), Green (unique skill), White (normal skill)
 - **Goals**: Training objectives with progress tracking
 - **Conditions**: Positive/negative status effects
+- **Avatar Management**: Character images with optimization
+- **SP Tracking**: Available skill points calculation
 
 ### Training Optimization (SPEC-002)
 
@@ -339,9 +445,12 @@ Complete skill lifecycle management:
 Deck building and optimization:
 
 - Six-card deck composition and validation
-- Limit break multiplier system
+- Limit break multiplier system (★-★★★★★)
 - Meta tier rankings (SS, S, A, B)
 - Synergy scoring and recommendations
+- Bond level tracking (1-5)
+- Support deck persistence and management
+- External API integration for card data (umapyoi.net)
 
 ---
 
@@ -375,19 +484,31 @@ The system uses a hybrid approach with local-first AI:
 
 ### Neuron AI Agents
 
-| Agent | Purpose | Tools |
-|-------|---------|-------|
-| TrainingAdvisorAgent | Training recommendations | CharacterStatsTool, TrainingPredictionTool |
-| RaceStrategyAgent | Race preparation | RaceAnalysisTool, CompetitorTool |
-| SkillRecommendationAgent | Skill build planning | SkillCatalogTool, SPOptimizationTool |
+| Agent | Purpose | Status |
+|-------|---------|--------|
+| TrainingAdvisorAgent | Training recommendations | Implemented |
+| RaceStrategyAgent | Race preparation | Implemented |
+| SkillRecommendationAgent | Skill build planning | Implemented |
+| DeckOptimizationAgent | Support card deck building | Planned |
+| CareerPlanningAgent | Long-term career strategy | Planned |
 
 ### MCP Integration
 
 Model Context Protocol servers provide additional capabilities:
 
-- **Memory Server**: Conversation context and session state
-- **Filesystem Server**: Local file access for exports
-- **Fetch Server**: External API integration
+- **Memory Server**: Conversation context and knowledge graph
+- **Filesystem Server**: Local file access for exports and imports
+- **Fetch Server**: External API integration and web scraping
+- **GitKraken Server**: Git operations and repository management
+- **Chrome DevTools Server**: Browser automation and testing
+- **Sequential Thinking Server**: Advanced reasoning and problem-solving
+
+### MCP Monitoring
+
+- Real-time tool usage tracking
+- Server health monitoring
+- Performance metrics and cost tracking
+- Error logging and alerting
 
 ---
 
@@ -414,7 +535,9 @@ Source Data ──► Detect Format ──► Validate Schema ──► Transfor
 
 - Automatic backup creation before migrations
 - Batch tracking with per-record status
-- Rollback capability within 24 hours
+- Rollback capability within 30 days
+- Historical tracking of data operations
+- Snapshot and restore functionality
 
 ---
 
@@ -451,12 +574,16 @@ npm run a11y:test
 ### Critical User Flows
 
 1. Create character → upload image → save
-2. Create run via quick create → add stat turns → chart renders
-3. Add skill via autocomplete → keyboard navigate → set status + turn acquired
-4. Export Excel/CSV/Markdown with preview
-5. Import JSON → preview → confirm → verify data
-6. Dark mode toggle → refresh → persists
-7. Convert local run to account after login
+2. Create career run → configure aptitudes → set goals
+3. Add training sessions → track stat progression → visualize growth
+4. Add skills via autocomplete → manage hints → track SP costs
+5. Build support deck → select 6 cards → validate composition
+6. Request AI advice → receive recommendations → apply suggestions
+7. Export data (JSON/CSV/Excel) → preview → download
+8. Import data → detect format → validate → resolve conflicts → confirm
+9. Dark mode toggle → refresh → persists
+10. Convert local run to account after login
+11. OCR screenshot → extract data → validate → import
 
 ---
 
@@ -466,31 +593,43 @@ npm run a11y:test
 
 | Document | Description |
 |----------|-------------|
-| [D01_System_Development_Plan](docs/D01_System_Development_Plan.md) | Development phases and timeline |
-| [D02_Business_Requirements](docs/D02_Business_Requirements_Specifications.md) | Business objectives and scope |
-| [D03_System_Requirements](docs/D03_System_Requirements_Specifications.md) | Functional and non-functional requirements |
-| [D04_System_Design](docs/D04_System_Design_Specifications.md) | Architecture and component design |
-| [D09_Database_Documentation](docs/D09_Database_Documentation.md) | Schema and relationships |
+| [001_SDP](docs/00-core-docs/001_SDP_Software_Development_Plan.md) | Development phases and timeline |
+| [002_BRS](docs/00-core-docs/002_BRS_Business_Requirements_Specifications.md) | Business objectives and scope |
+| [003_SRS](docs/00-core-docs/003_SRS_Software_Requirement_Specifications.md) | Functional and non-functional requirements |
+| [004_SDS](docs/00-core-docs/004_SDS_Software_Design_Specifications.md) | Architecture and component design |
+| [009_DBD](docs/00-core-docs/009_DBD_Database_Documentation.md) | Schema and relationships |
+| [010_SCD](docs/00-core-docs/010_SCD_Source_Code_Documentation.md) | Code structure and conventions |
+| [017_SUM](docs/00-core-docs/017_SUM_Software_User_Manual.md) | User guide and tutorials |
 
 ### Technical Documentation
 
 | Document | Description |
 |----------|-------------|
-| [PRDs](docs/prds/) | Product requirement documents |
-| [SPECs](docs/specs/) | Technical specifications |
-| [Flows](docs/flows/) | System flow diagrams |
-| [Wireframes](docs/wireframes/) | UI specifications |
-| [Sequences](docs/sequences/) | Sequence diagrams |
+| [PRDs](docs/02-prds/) | Product requirement documents (7 modules) |
+| [SPECs](docs/02-specs/) | Technical specifications (7 modules) |
+| [Flows](docs/01-flows/) | System flow diagrams |
+| [Tech Flows](docs/01-tech-flow/) | Technical flow documentation |
+| [User Flows](docs/01-user-flows/) | User journey diagrams |
+| [Wireframes](docs/01-wireframes/) | UI specifications (12 screens) |
+| [Sequences](docs/01-sequences/) | Sequence diagrams (15 flows) |
+| [Diagrams](docs/01-diagrams/) | ERD, DFD, and process flows |
 
 ### API Documentation
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/api/v1/characters` | GET, POST | Character management |
-| `/api/v1/careers` | GET, POST | Career run management |
-| `/api/v1/training/predictions` | GET | Training predictions |
-| `/api/v1/skills/search` | GET | Skill autocomplete |
-| `/api/v1/ai/advice` | POST | AI recommendations |
+| `/api/characters` | GET, POST | Character management |
+| `/api/characters/{id}` | GET, PUT, DELETE | Character operations |
+| `/api/careers` | GET, POST | Career run management |
+| `/api/skills/search` | GET | Skill autocomplete |
+| `/api/support-cards` | GET | Support card catalog |
+| `/api/support-decks` | GET, POST | Support deck management |
+| `/api/training/predictions` | POST | Training predictions |
+| `/api/ai/conversations` | POST | AI chat interactions |
+| `/api/external-data/sync` | POST | External API sync |
+| `/api/ocr/extract` | POST | OCR screenshot processing |
+
+For detailed API documentation, see [openapi.yaml](docs/deployment/openapi.yaml)
 
 ---
 
@@ -517,14 +656,18 @@ npm run a11y:test
 
 ### Definition of Done
 
-- [ ] Code follows PSR-12 standards
+- [ ] Code follows PSR-12 standards (verified with `vendor/bin/pint`)
+- [ ] Static analysis passes (verified with `vendor/bin/phpstan analyse`)
 - [ ] Unit/feature tests pass with >80% coverage
-- [ ] All interactive elements have `data-testid` attributes
+- [ ] Works in both Local and Account storage modes (if applicable)
+- [ ] Validation rules are present and tested
+- [ ] All interactive elements have proper accessibility attributes
 - [ ] Playwright E2E coverage exists for key actions
-- [ ] axe-core accessibility scan passes
+- [ ] axe-core accessibility scan passes (WCAG 2.2 AA)
 - [ ] Works in both dark and light modes
-- [ ] Responsive on mobile devices
-- [ ] Documentation updated
+- [ ] Responsive on mobile devices (320px - 2560px)
+- [ ] Documentation updated (code comments, README, relevant docs)
+- [ ] No N+1 query issues (verified with Telescope)
 
 ---
 
@@ -540,7 +683,12 @@ This project is open-sourced software licensed under the [MIT license](LICENSE).
 - [Livewire](https://livewire.laravel.com) - Full-stack framework for Laravel
 - [Alpine.js](https://alpinejs.dev) - Lightweight JavaScript framework
 - [TailwindCSS](https://tailwindcss.com) - Utility-first CSS framework
-- [Neuron AI](https://github.com/inspector-apm/neuron-ai) - AI agent framework
+- [Pest](https://pestphp.com) - Elegant PHP testing framework
+- [Vite](https://vitejs.dev) - Next generation frontend tooling
+- [AWS Bedrock](https://aws.amazon.com/bedrock/) - Managed AI service
+- [Ollama](https://ollama.ai) - Local AI model runtime
+- [umapyoi.net](https://api.umapyoi.net) - Uma Musume game data API
+- [UmamusumeDB.com](https://umamusumedb.com) - Community calculator and tools
 
 ---
 
@@ -555,4 +703,7 @@ For support, please:
 ---
 
 **Version**: 2.0.0  
-**Last Updated**: January 23, 2026
+**Last Updated**: January 26, 2026  
+**PHP**: 8.4.11  
+**Laravel**: v12  
+**Status**: Active Development

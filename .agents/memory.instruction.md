@@ -148,3 +148,43 @@ applyTo: '**'
 - **Status**: All endpoints verified operational and production-ready
 - **Model Fix**: UmaMusume model doesn't exist - use `Character` model instead for character-related operations
 - **Validation Handling**: Some routes require parameters (e.g., character_id, skill_id) and correctly return 422 validation errors when omitted
+
+## RAG (Retrieval-Augmented Generation) Implementation
+
+- **Implementation Date**: 2026-01-27
+- **Status**: Production-ready, all tests passing (78 AI tests, 314 assertions)
+- **Purpose**: Enhance AI responses with curated game knowledge from markdown documentation
+
+### Architecture
+- **VectorStoreService**: Core RAG engine with OpenAI embeddings (`text-embedding-3-small`)
+- **HybridAIService**: Enhanced with knowledge retrieval before LLM routing
+  - **IMPORTANT**: Constructor requires 5 parameters: MCPClient, Ollama, Bedrock, PerformanceMonitor, **VectorStoreService**
+  - **Test Mocking**: Always include all 5 dependencies when mocking in tests
+  - **Example**: `new HybridAIService($mcpClient, $ollamaService, $bedrockService, $performanceMonitor, $vectorStore)`
+- **Knowledge Base**: Structured markdown docs in `storage/knowledge-base/`
+  - `game-mechanics/stat-system.md` - Stats, breakpoints, aptitudes
+  - `game-mechanics/training-system.md` - Training types, support cards
+  - `game-mechanics/skill-system.md` - SP management, skill optimization
+- **Frontend**: Purple "Knowledge" badge shows when RAG enhanced, lists source files
+
+### Key Features
+- Cosine similarity search with 0.7 threshold for relevance
+- Keyword fallback when OpenAI API unavailable (graceful degradation)
+- Smart caching: Documents 24h, embeddings 7 days (Redis)
+- Source attribution: Shows which markdown files were used
+- Cost-effective: ~$0.06/month for 30k queries (mostly cached)
+
+### RAG Trigger Keywords
+Game mechanics: stat, speed, stamina, power, guts, wit, training, skill, race, aptitude, support card
+Questions: how, why, what, when, which, should
+Strategy: strategy, build, optimal, best, breakpoint
+Resources: sp, energy, mood, bond, hint
+
+### Documentation
+- Implementation summary: `docs/implementation-summaries/RAG_IMPLEMENTATION_SUMMARY.md`
+- Neuron RAG guide: `docs/neuron/rag.md`
+
+### Test Fix History
+- **2025-01-23**: Fixed HybridAIServiceTest constructor - added VectorStoreService as 5th parameter
+  - All 10 tests now passing (previously failed with ArgumentCountError)
+  - Total: 78 AI tests passing, 314 assertions
