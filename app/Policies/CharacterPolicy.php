@@ -8,11 +8,24 @@ use App\Models\User;
 class CharacterPolicy
 {
     /**
+     * Perform pre-authorization checks.
+     * Admin users can perform any action.
+     */
+    public function before(User $user, string $ability): ?bool
+    {
+        if ($user->isAdmin()) {
+            return true;
+        }
+
+        return null;
+    }
+
+    /**
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -52,7 +65,7 @@ class CharacterPolicy
      */
     public function restore(User $user, Character $character): bool
     {
-        return false;
+        return $user->id === $character->user_id;
     }
 
     /**
@@ -60,6 +73,6 @@ class CharacterPolicy
      */
     public function forceDelete(User $user, Character $character): bool
     {
-        return false;
+        return $user->id === $character->user_id;
     }
 }
