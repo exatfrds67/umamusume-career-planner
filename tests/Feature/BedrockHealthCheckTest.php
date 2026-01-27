@@ -9,10 +9,22 @@ use Tests\TestCase;
 class BedrockHealthCheckTest extends TestCase
 {
     /**
+     * Helper to check if Bedrock credentials are configured
+     */
+    private function bedrockCredentialsConfigured(): bool
+    {
+        return ! empty(env('AWS_ACCESS_KEY_ID')) && ! empty(env('AWS_SECRET_ACCESS_KEY'));
+    }
+
+    /**
      * Test Bedrock configuration is properly set up
      */
     public function test_bedrock_credentials_are_configured(): void
     {
+        if (! $this->bedrockCredentialsConfigured()) {
+            $this->markTestSkipped('AWS Bedrock credentials are not configured');
+        }
+
         $this->assertNotEmpty(env('AWS_ACCESS_KEY_ID'));
         $this->assertNotEmpty(env('AWS_SECRET_ACCESS_KEY'));
         $this->assertNotEmpty(env('AWS_DEFAULT_REGION'));
@@ -23,6 +35,10 @@ class BedrockHealthCheckTest extends TestCase
      */
     public function test_bedrock_is_enabled(): void
     {
+        if (! $this->bedrockCredentialsConfigured()) {
+            $this->markTestSkipped('AWS Bedrock credentials are not configured');
+        }
+
         $this->assertTrue((bool) config('ai.bedrock.enabled'));
     }
 
@@ -31,6 +47,10 @@ class BedrockHealthCheckTest extends TestCase
      */
     public function test_bedrock_configuration_service_validates_credentials(): void
     {
+        if (! $this->bedrockCredentialsConfigured()) {
+            $this->markTestSkipped('AWS Bedrock credentials are not configured');
+        }
+
         $service = $this->app->make(BedrockConfigurationService::class);
         $validation = $service->validateCredentials();
 
@@ -43,6 +63,10 @@ class BedrockHealthCheckTest extends TestCase
      */
     public function test_bedrock_service_can_be_instantiated(): void
     {
+        if (! $this->bedrockCredentialsConfigured()) {
+            $this->markTestSkipped('AWS Bedrock credentials are not configured');
+        }
+
         $service = $this->app->make(BedrockService::class);
         $this->assertNotNull($service);
     }
@@ -62,6 +86,10 @@ class BedrockHealthCheckTest extends TestCase
      */
     public function test_bedrock_api_connectivity(): void
     {
+        if (! $this->bedrockCredentialsConfigured()) {
+            $this->markTestSkipped('AWS Bedrock credentials are not configured');
+        }
+
         $service = $this->app->make(BedrockService::class);
 
         try {

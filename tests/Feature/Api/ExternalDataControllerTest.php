@@ -179,24 +179,34 @@ it('clears API cache', function () {
     ]);
 });
 
-it('requires authentication for external data endpoints', function () {
+it('allows public access to external data endpoints', function () {
+    // External data endpoints are public (no auth required)
+    // They use throttling for rate limiting instead
+
+    Http::fake([
+        'api.umapyoi.net/*' => Http::response([
+            ['id' => 1, 'name_en' => 'Test', 'name_jp' => 'テスト', 'category_label' => 'ウマ娘'],
+        ], 200),
+    ]);
+
     $response = $this->getJson('/api/external/characters');
-    $response->assertUnauthorized();
+    $response->assertSuccessful();
 
     $response = $this->getJson('/api/external/support-cards');
-    $response->assertUnauthorized();
+    $response->assertSuccessful();
 
     $response = $this->getJson('/api/external/skills');
-    $response->assertUnauthorized();
+    $response->assertSuccessful();
 
     $response = $this->getJson('/api/external/news');
-    $response->assertUnauthorized();
+    $response->assertSuccessful();
 
     $response = $this->getJson('/api/external/status');
-    $response->assertUnauthorized();
+    $response->assertSuccessful();
 
+    // Clear cache requires POST
     $response = $this->postJson('/api/external/clear-cache');
-    $response->assertUnauthorized();
+    $response->assertSuccessful();
 });
 
 it('handles API errors gracefully', function () {

@@ -98,6 +98,21 @@ pest()->extend(Tests\TestCase::class)
 
 /*
 |--------------------------------------------------------------------------
+| Browser Tests Configuration
+|--------------------------------------------------------------------------
+|
+| Browser tests use Pest 4's built-in browser testing capabilities to test
+| the full application workflow in a real browser environment. These tests
+| verify end-to-end user journeys and UI interactions.
+|
+*/
+pest()->extend(Tests\TestCase::class)
+    ->use(RefreshDatabase::class)
+    ->use(WithFaker::class)
+    ->in('Browser');
+
+/*
+|--------------------------------------------------------------------------
 | Custom Expectations
 |--------------------------------------------------------------------------
 |

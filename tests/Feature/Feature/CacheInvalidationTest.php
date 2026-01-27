@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Event;
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
 
+/**
+ * @property CacheManagerService $cacheManager
+ */
 beforeEach(function () {
     $this->cacheManager = app(CacheManagerService::class);
     Cache::flush();

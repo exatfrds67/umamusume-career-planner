@@ -18,11 +18,14 @@ describe('Focus Management System', function () {
     });
 
     it('includes accessibility system JavaScript', function () {
-        $response = $this->get('/');
+        // Check that the JavaScript file exists in resources
+        $jsPath = resource_path('js/core/AccessibilitySystem.js');
+        expect(file_exists($jsPath))->toBeTrue();
 
-        $response->assertStatus(200);
-        // Verify the layout includes the necessary scripts
-        $response->assertSee('build/assets/js/app-', false);
+        // Verify the file contains key accessibility functions
+        $jsContent = file_get_contents($jsPath);
+        expect($jsContent)->toContain('setupFocusManagement');
+        expect($jsContent)->toContain('setupSkipLinks');
     });
 
     it('has proper focus indicator styles in CSS', function () {

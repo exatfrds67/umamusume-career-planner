@@ -196,7 +196,7 @@ describe('UmapyoiLiveApiTest - Live API Connectivity', function () {
     })->group('live', 'external');
 
     it('tests direct HTTP request to umapyoi.net /v1/characters', function () {
-        $baseUrl = config('services.umapyoi.url', 'https://api.umapyoi.net');
+        $baseUrl = (string) config('services.umapyoi.url', 'https://api.umapyoi.net');
         $endpoint = '/v1/characters';
         $url = $baseUrl.$endpoint;
 
@@ -236,11 +236,6 @@ describe('UmapyoiLiveApiTest - API Configuration Validation', function () {
         $timeout = config('services.umapyoi.timeout');
         $enabled = config('services.umapyoi.enabled');
 
-        echo "\nUmapyoi Configuration:\n";
-        echo "  URL: {$url}\n";
-        echo "  Timeout: {$timeout}s\n";
-        echo '  Enabled: '.($enabled ? 'YES' : 'NO')."\n";
-
         expect($url)->toBe('https://api.umapyoi.net')
             ->and($timeout)->toBe(30)
             ->and($enabled)->toBeTrue();
@@ -250,11 +245,6 @@ describe('UmapyoiLiveApiTest - API Configuration Validation', function () {
         $cacheTtl = config('services.umapyoi.cache_ttl');
         $maxRetries = config('services.umapyoi.retry.max_attempts');
         $retryDelay = config('services.umapyoi.retry.delay_ms');
-
-        echo "\nCache & Retry Configuration:\n";
-        echo "  Cache TTL: {$cacheTtl}s (".($cacheTtl / 3600)."h)\n";
-        echo "  Max Retries: {$maxRetries}\n";
-        echo "  Retry Delay: {$retryDelay}ms\n";
 
         expect($cacheTtl)->toBe(86400)
             ->and($maxRetries)->toBe(3)

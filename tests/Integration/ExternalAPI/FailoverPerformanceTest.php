@@ -6,59 +6,11 @@ namespace Tests\Integration\ExternalAPI;
 
 use App\Services\ExternalAPI\APIPerformanceMetricsService;
 use App\Services\ExternalAPI\CacheManagerService;
-use App\Services\ExternalAPI\ExternalAPIService;
 use App\Services\MCP\MCPClientService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Mockery;
-
-/**
- * Test implementation for failover performance testing
- */
-class FailoverTestAPIService extends ExternalAPIService
-{
-    protected function initializeApiSources(): void
-    {
-        $this->apiSources = [
-            'primary' => [
-                'priority' => 1,
-                'base_url' => 'https://api.primary.test',
-                'timeout' => 5,
-                'rate_limit' => 100,
-                'enabled' => true,
-            ],
-            'secondary' => [
-                'priority' => 2,
-                'base_url' => 'https://api.secondary.test',
-                'timeout' => 5,
-                'rate_limit' => 60,
-                'enabled' => true,
-            ],
-            'tertiary' => [
-                'priority' => 3,
-                'base_url' => 'https://api.tertiary.test',
-                'timeout' => 5,
-                'rate_limit' => 30,
-                'enabled' => true,
-            ],
-        ];
-    }
-
-    public function testFetchWithFallback(string $endpoint): array
-    {
-        return $this->fetchWithFallback($endpoint);
-    }
-
-    public function testIncrementCircuitBreaker(string $sourceName): void
-    {
-        $this->incrementCircuitBreaker($sourceName);
-    }
-
-    public function testIsCircuitBreakerOpen(string $sourceName): bool
-    {
-        return $this->isCircuitBreakerOpen($sourceName);
-    }
-}
+use Tests\Support\ExternalAPI\FailoverTestAPIService;
 
 beforeEach(function () {
     Cache::flush();

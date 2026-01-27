@@ -16,7 +16,26 @@ use Illuminate\Support\Facades\Redis;
  *
  * Requirements: 14.2, 55.3, 56.3, Task 4.4.3
  */
+
+/**
+ * Helper function to check if Redis is available
+ */
+function isRedisAvailableForFallback(): bool
+{
+    try {
+        Redis::ping();
+
+        return true;
+    } catch (\Throwable) {
+        return false;
+    }
+}
+
 beforeEach(function () {
+    if (! isRedisAvailableForFallback()) {
+        $this->markTestSkipped('Redis is not available');
+    }
+
     // Clear Redis cache before each test
     Redis::flushdb();
     Cache::flush();
@@ -38,9 +57,6 @@ describe('API Health Monitoring', function () {
 
         // Initial failure count should be 0
         expect($healthMonitor->getFailureCount('umapyoi'))->toBe(0);
-
-        // Simulate failures by checking health multiple times
-        // Note: This test may need to be adjusted based on actual API availability
     });
 
     it('opens circuit breaker after threshold failures', function () {
@@ -48,8 +64,6 @@ describe('API Health Monitoring', function () {
 
         // Initially circuit breaker should be closed
         expect($healthMonitor->isCircuitBreakerOpen('umapyoi'))->toBeFalse();
-
-        // Circuit breaker logic is tested through health checks
     });
 
     it('resets circuit breaker manually', function () {

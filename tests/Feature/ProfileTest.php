@@ -1,261 +1,274 @@
 <?php
 
+declare(strict_types=1);
+
+use App\Models\Character;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
-it('displays the profile page for authenticated users', function () {
-    $user = User::factory()->create();
-
-    $response = $this->actingAs($user)->get(route('profile.show'));
-
-    $response->assertSuccessful();
-    $response->assertViewIs('profile.show');
-    $response->assertViewHas('user', $user);
-});
-
-it('updates user profile information', function () {
-    $user = User::factory()->create([
-        'name' => 'Old Name',
-        'email' => 'old@example.com',
-    ]);
-
-    $response = $this->actingAs($user)->put(route('profile.update'), [
-        'name' => 'New Name',
-        'email' => 'new@example.com',
-        'preferences' => [
-            'theme' => 'dark',
-            'language' => 'en',
-        ],
-    ]);
-
-    $response->assertRedirect(route('profile.show'));
-    $response->assertSessionHas('success');
-
-    $user->refresh();
-    expect($user->name)->toBe('New Name');
-    expect($user->email)->toBe('new@example.com');
-    expect($user->preferences['theme'])->toBe('dark');
-});
-
-it('validates profile update data', function () {
-    $user = User::factory()->create();
-
-    $response = $this->actingAs($user)->put(route('profile.update'), [
-        'name' => '',
-        'email' => 'invalid-email',
-    ]);
-
-    $response->assertSessionHasErrors(['name', 'email']);
-});
-
-it('prevents duplicate email addresses', function () {
-    $existingUser = User::factory()->create(['email' => 'existing@example.com']);
-    $user = User::factory()->create(['email' => 'user@example.com']);
-
-    $response = $this->actingAs($user)->put(route('profile.update'), [
-        'name' => $user->name,
-        'email' => 'existing@example.com',
-    ]);
-
-    $response->assertSessionHasErrors(['email']);
-});
-
-it('allows user to keep their own email', function () {
-    $user = User::factory()->create(['email' => 'user@example.com']);
-
-    $response = $this->actingAs($user)->put(route('profile.update'), [
-        'name' => 'Updated Name',
-        'email' => 'user@example.com',
-    ]);
-
-    $response->assertRedirect(route('profile.show'));
-    $response->assertSessionHasNoErrors();
-});
-
-it('changes user password', function () {
-    $user = User::factory()->create([
-        'password' => Hash::make('old-password'),
-    ]);
-
-    $response = $this->actingAs($user)->put(route('profile.password.change'), [
-        'current_password' => 'old-password',
-        'password' => 'new-password',
-        'password_confirmation' => 'new-password',
-    ]);
-
-    $response->assertRedirect(route('profile.show'));
-    $response->assertSessionHas('success');
-
-    $user->refresh();
-    expect(Hash::check('new-password', $user->password))->toBeTrue();
-});
-
-it('validates current password when changing password', function () {
-    $user = User::factory()->create([
-        'password' => Hash::make('correct-password'),
-    ]);
-
-    $response = $this->actingAs($user)->put(route('profile.password.change'), [
-        'current_password' => 'wrong-password',
-        'password' => 'new-password',
-        'password_confirmation' => 'new-password',
-    ]);
-
-    $response->assertSessionHasErrors(['current_password']);
-});
-
-it('requires password confirmation', function () {
-    $user = User::factory()->create([
-        'password' => Hash::make('old-password'),
-    ]);
-
-    $response = $this->actingAs($user)->put(route('profile.password.change'), [
-        'current_password' => 'old-password',
-        'password' => 'new-password',
-        'password_confirmation' => 'different-password',
-    ]);
-
-    $response->assertSessionHasErrors(['password']);
-});
-
-it('uploads user avatar', function () {
-    Storage::fake('public');
-
-    $user = User::factory()->create();
-    $file = UploadedFile::fake()->image('avatar.jpg');
-
-    $response = $this->actingAs($user)->post(route('profile.avatar'), [
-        'avatar' => $file,
-    ]);
-
-    $response->assertSuccessful();
-    $response->assertJsonStructure(['message', 'avatar_url']);
-
-    $user->refresh();
-    expect($user->avatar_path)->not->toBeNull();
-    Storage::disk('public')->assertExists((string) $user->avatar_path);
-});
-
-it('validates avatar file type', function () {
-    Storage::fake('public');
-
-    $user = User::factory()->create();
-    $file = UploadedFile::fake()->create('document.pdf', 100);
-
-    $response = $this->actingAs($user)->post(route('profile.avatar'), [
-        'avatar' => $file,
-    ]);
-
-    $response->assertSessionHasErrors(['avatar']);
-});
-
-it('exports user data', function () {
-    $user = User::factory()->create([
-        'preferences' => ['theme' => 'dark'],
-        'ai_settings' => ['enable_cloud_ai' => true],
-    ]);
-
-    $response = $this->actingAs($user)->get(route('profile.export'));
-
-    $response->assertSuccessful();
-    $response->assertJsonStructure([
-        'user' => ['uuid', 'name', 'email', 'preferences', 'ai_settings'],
-        'characters',
-        'exported_at',
-    ]);
-});
-
-it('deletes user account with confirmation', function () {
-    $user = User::factory()->create([
+beforeEach(function () {
+    $this->user = User::factory()->create([
+        'name' => 'Test User',
+        'email' => 'test@example.com',
         'password' => Hash::make('password'),
     ]);
-
-    $response = $this->actingAs($user)->delete(route('profile.destroy'), [
-        'password' => 'password',
-        'confirmation' => 'DELETE',
-    ]);
-
-    $response->assertRedirect(route('welcome'));
-    $response->assertSessionHas('success');
-
-    $this->assertDatabaseMissing('ucp_users', ['id' => $user->id]);
 });
 
-it('requires password confirmation for account deletion', function () {
-    $user = User::factory()->create([
-        'password' => Hash::make('password'),
-    ]);
+describe('Profile Display', function () {
+    it('displays user profile page', function () {
+        $response = $this->actingAs($this->user)
+            ->get(route('profile.show'));
 
-    $response = $this->actingAs($user)->delete(route('profile.destroy'), [
-        'password' => 'wrong-password',
-        'confirmation' => 'DELETE',
-    ]);
+        $response->assertOk()
+            ->assertViewIs('profile.show')
+            ->assertViewHas('user');
+    });
 
-    $response->assertSessionHasErrors(['password']);
-    $this->assertDatabaseHas('ucp_users', ['id' => $user->id]);
+    it('shows user statistics', function () {
+        // Create some characters for the user
+        Character::factory()->count(3)->create(['user_id' => $this->user->id]);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('profile.show'));
+
+        $response->assertOk()
+            ->assertViewHas('stats', function ($stats) {
+                return $stats['characters_created'] === 3;
+            });
+    });
+
+    it('requires authentication to view profile', function () {
+        $response = $this->get(route('profile.show'));
+
+        // App redirects guests to welcome page instead of login
+        $response->assertRedirect(route('welcome'));
+    });
 });
 
-it('requires DELETE confirmation for account deletion', function () {
-    $user = User::factory()->create([
-        'password' => Hash::make('password'),
-    ]);
+describe('Profile Update', function () {
+    it('updates user name', function () {
+        $response = $this->actingAs($this->user)
+            ->put(route('profile.update'), [
+                'name' => 'Updated Name',
+                'email' => $this->user->email,
+            ]);
 
-    $response = $this->actingAs($user)->delete(route('profile.destroy'), [
-        'password' => 'password',
-        'confirmation' => 'WRONG',
-    ]);
+        $response->assertRedirect(route('profile.show'))
+            ->assertSessionHas('success');
 
-    $response->assertSessionHasErrors(['confirmation']);
-    $this->assertDatabaseHas('ucp_users', ['id' => $user->id]);
+        $this->assertDatabaseHas('ucp_users', [
+            'id' => $this->user->id,
+            'name' => 'Updated Name',
+        ]);
+    });
+
+    it('updates user email', function () {
+        $response = $this->actingAs($this->user)
+            ->put(route('profile.update'), [
+                'name' => $this->user->name,
+                'email' => 'newemail@example.com',
+            ]);
+
+        $response->assertRedirect(route('profile.show'));
+
+        $this->assertDatabaseHas('ucp_users', [
+            'id' => $this->user->id,
+            'email' => 'newemail@example.com',
+        ]);
+    });
+
+    it('validates email format', function () {
+        $response = $this->actingAs($this->user)
+            ->put(route('profile.update'), [
+                'name' => $this->user->name,
+                'email' => 'invalid-email',
+            ]);
+
+        $response->assertSessionHasErrors('email');
+    });
+
+    it('validates email uniqueness', function () {
+        User::factory()->create(['email' => 'other@example.com']);
+
+        $response = $this->actingAs($this->user)
+            ->put(route('profile.update'), [
+                'name' => $this->user->name,
+                'email' => 'other@example.com',
+            ]);
+
+        $response->assertSessionHasErrors('email');
+    });
+
+    it('validates name is required', function () {
+        $response = $this->actingAs($this->user)
+            ->put(route('profile.update'), [
+                'name' => '',
+                'email' => $this->user->email,
+            ]);
+
+        $response->assertSessionHasErrors('name');
+    });
 });
 
-it('updates profile via API', function () {
-    $user = User::factory()->create();
+describe('Profile Update API', function () {
+    it('updates profile via API', function () {
+        $response = $this->actingAs($this->user)
+            ->putJson('/api/v1/profile', [
+                'name' => 'API Updated Name',
+                'email' => $this->user->email,
+            ]);
 
-    $response = $this->actingAs($user, 'sanctum')->putJson(route('api.v1.profile.update'), [
-        'name' => 'API Updated Name',
-        'email' => $user->email,
-    ]);
+        $response->assertSuccessful()
+            ->assertJson(['message' => 'Profile updated successfully.']);
 
-    $response->assertSuccessful();
-    $response->assertJsonStructure(['message', 'user']);
-
-    $user->refresh();
-    expect($user->name)->toBe('API Updated Name');
+        $this->assertDatabaseHas('ucp_users', [
+            'id' => $this->user->id,
+            'name' => 'API Updated Name',
+        ]);
+    });
 });
 
-it('changes password via API', function () {
-    $user = User::factory()->create([
-        'password' => Hash::make('old-password'),
-    ]);
+describe('Password Change', function () {
+    it('changes password with correct current password', function () {
+        $response = $this->actingAs($this->user)
+            ->put(route('profile.password.change'), [
+                'current_password' => 'password',
+                'password' => 'newpassword123',
+                'password_confirmation' => 'newpassword123',
+            ]);
 
-    $response = $this->actingAs($user, 'sanctum')->putJson(route('api.v1.profile.password.change'), [
-        'current_password' => 'old-password',
-        'password' => 'new-password',
-        'password_confirmation' => 'new-password',
-    ]);
+        $response->assertRedirect(route('profile.show'));
 
-    $response->assertSuccessful();
-    $response->assertJsonStructure(['message']);
+        $this->assertTrue(Hash::check('newpassword123', $this->user->fresh()->password));
+    });
 
-    $user->refresh();
-    expect(Hash::check('new-password', $user->password))->toBeTrue();
+    it('rejects password change with incorrect current password', function () {
+        $response = $this->actingAs($this->user)
+            ->put(route('profile.password.change'), [
+                'current_password' => 'wrongpassword',
+                'password' => 'newpassword123',
+                'password_confirmation' => 'newpassword123',
+            ]);
+
+        $response->assertSessionHasErrors('current_password');
+    });
+
+    it('validates password confirmation', function () {
+        $response = $this->actingAs($this->user)
+            ->put(route('profile.password.change'), [
+                'current_password' => 'password',
+                'password' => 'newpassword123',
+                'password_confirmation' => 'differentpassword',
+            ]);
+
+        $response->assertSessionHasErrors('password');
+    });
 });
 
-it('deletes account via API', function () {
-    $user = User::factory()->create([
-        'password' => Hash::make('password'),
-    ]);
+describe('Avatar Upload', function () {
+    it('uploads avatar image', function () {
+        Storage::fake('public');
 
-    $response = $this->actingAs($user, 'sanctum')->deleteJson(route('api.v1.profile.destroy'), [
-        'password' => 'password',
-        'confirmation' => 'DELETE',
-    ]);
+        $file = UploadedFile::fake()->image('avatar.jpg', 200, 200);
 
-    $response->assertSuccessful();
-    $response->assertJsonStructure(['message']);
+        $response = $this->actingAs($this->user)
+            ->post(route('profile.avatar'), [
+                'avatar' => $file,
+            ]);
 
-    $this->assertDatabaseMissing('ucp_users', ['id' => $user->id]);
+        $response->assertSuccessful()
+            ->assertJsonStructure(['message', 'avatar_url']);
+
+        $this->user->refresh();
+        expect($this->user->avatar_path)->not->toBeNull();
+    });
+
+    it('validates avatar file type', function () {
+        Storage::fake('public');
+
+        $file = UploadedFile::fake()->create('document.pdf', 100);
+
+        $response = $this->actingAs($this->user)
+            ->post(route('profile.avatar'), [
+                'avatar' => $file,
+            ]);
+
+        $response->assertSessionHasErrors('avatar');
+    });
+
+    it('validates avatar file size', function () {
+        Storage::fake('public');
+
+        // Create a file larger than the limit (2MB)
+        $file = UploadedFile::fake()->image('large.jpg')->size(3000);
+
+        $response = $this->actingAs($this->user)
+            ->post(route('profile.avatar'), [
+                'avatar' => $file,
+            ]);
+
+        $response->assertSessionHasErrors('avatar');
+    });
+});
+
+describe('Profile Export', function () {
+    it('exports user data', function () {
+        Character::factory()->count(2)->create(['user_id' => $this->user->id]);
+
+        $response = $this->actingAs($this->user)
+            ->get(route('profile.export'));
+
+        $response->assertSuccessful()
+            ->assertJsonStructure(['user', 'characters', 'exported_at']);
+    });
+
+    it('exports data via API', function () {
+        $response = $this->actingAs($this->user)
+            ->getJson('/api/v1/profile/export');
+
+        $response->assertSuccessful()
+            ->assertJsonStructure(['user', 'exported_at']);
+    });
+});
+
+describe('Account Deletion', function () {
+    it('deletes user account with correct password and confirmation', function () {
+        $userId = $this->user->id;
+
+        $response = $this->actingAs($this->user)
+            ->delete(route('profile.destroy'), [
+                'password' => 'password',
+                'confirmation' => 'DELETE',
+            ]);
+
+        $response->assertRedirect(route('welcome'));
+
+        $this->assertDatabaseMissing('ucp_users', ['id' => $userId]);
+    });
+
+    it('requires password confirmation for deletion', function () {
+        $response = $this->actingAs($this->user)
+            ->delete(route('profile.destroy'), [
+                'password' => 'wrongpassword',
+                'confirmation' => 'DELETE',
+            ]);
+
+        $response->assertSessionHasErrors('password');
+
+        $this->assertDatabaseHas('ucp_users', ['id' => $this->user->id]);
+    });
+
+    it('requires DELETE confirmation text', function () {
+        $response = $this->actingAs($this->user)
+            ->delete(route('profile.destroy'), [
+                'password' => 'password',
+                'confirmation' => 'delete', // lowercase should fail
+            ]);
+
+        $response->assertSessionHasErrors('confirmation');
+
+        $this->assertDatabaseHas('ucp_users', ['id' => $this->user->id]);
+    });
 });

@@ -208,6 +208,34 @@ describe('Send Message API', function () {
             ])
             ->assertOk();
     });
+
+    it('streams a message response', function () {
+        $this->mock(AgentRoutingService::class, function ($mock) {
+            $mock->shouldReceive('executeWithFallback')
+                ->once()
+                ->andReturn([
+                    'success' => true,
+                    'response' => 'Test stream response',
+                    'model' => 'llama3.3',
+                    'provider' => 'ollama',
+                    'execution_time' => 1.0,
+                    'cost' => 0.0,
+                    'fallback_used' => false,
+                ]);
+        });
+
+        $response = actingAs($this->user)
+            ->postJson(route('api.ai.chat.message.stream'), [
+                'message' => 'Stream this',
+                'character_id' => $this->character->id,
+            ]);
+
+        $response->assertOk();
+
+        $content = $response->streamedContent();
+        expect($content)->toContain('Test stream response');
+        expect($content)->toContain('done');
+    });
 });
 
 describe('Server Status API', function () {

@@ -7,15 +7,30 @@ use App\Services\ExternalAPI\APIPerformanceMetricsService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
 
+/**
+ * Helper function to check if Redis is available
+ */
+function isRedisAvailableForMonitoring(): bool
+{
+    try {
+        Redis::ping();
+
+        return true;
+    } catch (\Throwable) {
+        return false;
+    }
+}
+
 beforeEach(function () {
+    if (! isRedisAvailableForMonitoring()) {
+        $this->markTestSkipped('Redis is not available');
+    }
+
     // Clear cache to ensure clean state
     Cache::flush();
 
     // Flush the entire Redis test database to ensure clean state
     Redis::connection()->flushdb();
-
-    // Get a fresh instance of the metrics service
-    $metricsService = app(\App\Services\ExternalAPI\APIPerformanceMetricsService::class);
 });
 
 describe('API Monitoring Dashboard', function () {
@@ -355,10 +370,6 @@ describe('API Performance Metrics Service', function () {
     });
 
     it('resets metrics correctly', function () {
-        // This test verifies that the resetMetrics method clears metrics data
-        // The implementation uses Redis pattern matching which may behave differently
-        // depending on the Redis configuration and prefix settings
-
         $metricsService = app(APIPerformanceMetricsService::class);
 
         // Clear any existing metrics first
@@ -379,8 +390,6 @@ describe('API Performance Metrics Service', function () {
         $metricsService->resetMetrics();
 
         // After reset, new queries should return zero counts
-        // Note: Due to Redis prefix handling, we verify the reset was called
-        // and the service returns expected default values for unknown sources
         $freshSource = 'fresh_source_'.uniqid();
         $freshStats = $metricsService->getResponseTimeStats($freshSource);
         expect($freshStats['count'])->toBe(0);
