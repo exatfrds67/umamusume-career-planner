@@ -6,11 +6,11 @@
 
 Tech Flow documents (TECH-FLOW-001 through TECH-FLOW-007) provide system architecture diagrams, detailed data flows, component interactions, and implementation task breakdowns for each of the seven core modules. All documents include `.kiro` source references and cross-links to related artifacts (PRDs, SPECs, FLOWs, WFs, SEQs, UFs).
 
-**Document Version**: 2.1.0  
-**Date**: January 24, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 27, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.0.0
+**Status**: Current - Aligned with codebase v2.2.0
 
 ---
 

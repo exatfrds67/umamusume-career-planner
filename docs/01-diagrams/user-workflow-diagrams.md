@@ -4,11 +4,11 @@
 
 This document presents the key user workflow diagrams for the Umamusume Pretty Derby Career Planner application, showing how users interact with the system to achieve their optimization goals through various pathways and decision points. The system is built with **Laravel 12** (released February 24, 2025) with **PHP 8.2+**, **Livewire 3**, **Alpine.js**, **TailwindCSS v4** (released January 22, 2025), and integrates with **AWS Bedrock Claude** models and **Ollama** for AI capabilities.
 
-**Document Version**: 2.1.0  
-**Date**: January 24, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 27, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.0.0
+**Status**: Current - Aligned with codebase v2.2.0
 
 ---
 
@@ -32,6 +32,7 @@ This document presents the key user workflow diagrams for the Umamusume Pretty D
 The career setup flow guides users through the initial configuration of a new career run, including character selection, support card deck composition, legacy character inheritance, and goal setting. This foundational workflow determines the optimization strategy for the entire career and supports all core requirements including training optimization, race strategy, and skill planning.
 
 **Related Documents:**
+
 - PRD: [PRD-001](prds/PRD-001_Character_Management.md)
 - SPEC: [SPEC-001](specs/SPEC-001_Character_Management_Technical.md)
 - Flow: [FLOW-001](flows/FLOW-001_Character_Management_System.md)

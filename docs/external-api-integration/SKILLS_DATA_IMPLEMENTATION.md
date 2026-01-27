@@ -142,11 +142,13 @@ php artisan db:seed --class=RealUmaMusumeSkillsSeeder
 **Current Database Contains: 61 real Uma Musume skills**
 
 **Distribution:**
+
 - **Rarities**: Normal (30), Rare (20), Unique (11)
 - **Types**: Speed (26), Passive (18), Recovery (3), Debuff (3), Unique (11)
 - **SP Costs**: Normal (110-170 SP), Rare (170-200 SP), Unique (270-320 SP)
 
 Features:
+
 - **All real skills from Uma Musume: Pretty Derby game**
 - Character-specific unique skills (Special Week, Silence Suzuka, Tokai Teio, Vodka, Daiwa Scarlet, Gold Ship, Mejiro McQueen, Grass Wonder, El Condor Pasa, Narita Brian, T.M. Opera O)
 - Skill evolution chains (Normal → Rare upgrades)

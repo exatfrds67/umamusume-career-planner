@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.1.0
-**Date**: January 24, 2026
+**Document Version**: 2.2.0
+**Date**: January 27, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned with codebase v2.0.0
+**Status**: Current - Aligned with codebase v2.0.0 + January 2026 deck management enhancements
 
 ---
 
@@ -211,10 +211,75 @@ flowchart TD
 
 ---
 
+## 8. Support Deck Persistence Flow (NEW)
+
+This flow documents the new deck persistence features added in January 2026, including deck creation, activation, and external sync.
+
+```mermaid
+flowchart TD
+    Start([Deck Management]) --> Action{User Action}
+    
+    Action -->|Create| CreateDeck[Enter Name/Description]
+    CreateDeck --> ValidateName[Validate Unique Name]
+    ValidateName -->|Valid| InsertDeck[INSERT ucp_support_decks]
+    ValidateName -->|Invalid| ShowError[Show Name Error]
+    InsertDeck --> InitSlots[Initialize 6 Empty Slots]
+    InitSlots --> OpenBuilder[Open Deck Builder]
+    
+    Action -->|Edit| LoadDeck[Load Deck with Cards]
+    LoadDeck --> OpenBuilder
+    
+    Action -->|Activate| CheckComplete{Deck Complete?}
+    CheckComplete -->|Yes| DeactivateOthers[Set Other Decks Inactive]
+    DeactivateOthers --> SetActive[Set This Deck Active]
+    SetActive --> CacheActiveDeck[Cache Active Deck ID]
+    CheckComplete -->|No| PromptComplete[Prompt to Complete Deck]
+    
+    Action -->|Delete| ConfirmDelete[Confirm Deletion]
+    ConfirmDelete --> DeleteDeck[DELETE ucp_support_decks CASCADE]
+    DeleteDeck --> InvalidateCache[Invalidate Deck Cache]
+    
+    OpenBuilder --> CardSlotAction{Slot Action}
+    
+    CardSlotAction -->|Assign| DragCard[Drag Card to Slot]
+    DragCard --> ValidateSlot[Validate Slot Rules]
+    ValidateSlot -->|Owned Slot| CheckOwnership[Verify Card Ownership]
+    ValidateSlot -->|Borrowed Slot| ValidateBorrowed[Validate Borrowed Card]
+    CheckOwnership --> InsertDeckCard[INSERT ucp_support_deck_cards]
+    ValidateBorrowed --> InsertDeckCard
+    InsertDeckCard --> RecalcSynergy[Recalculate Deck Synergy]
+    
+    CardSlotAction -->|Remove| RemoveCard[Remove Card from Slot]
+    RemoveCard --> DeleteDeckCard[DELETE ucp_support_deck_cards]
+    DeleteDeckCard --> RecalcSynergy
+    
+    RecalcSynergy --> UpdateSynergyScore[UPDATE synergy_score]
+    UpdateSynergyScore --> RefreshUI[Refresh Deck Builder UI]
+```
+
+### 8.1 Data Model (NEW Tables)
+
+| Table | Purpose |
+|-------|---------|
+| `ucp_support_decks` | Deck metadata (name, description, is_active, synergy_score) |
+| `ucp_support_deck_cards` | Card-to-deck relationships (slot_position, limit_break_level, is_borrowed) |
+| `ucp_support_card_definitions` | Master card templates for borrowed cards |
+
+### 8.2 External Sync Fields (NEW)
+
+Support cards now track external data sources:
+
+- `external_source`: Data provider identifier (e.g., 'gamewith', 'gamerch')
+- `external_id`: ID in external system
+- `last_synced_at`: Timestamp of last synchronization
+
+---
+
 ## Document Control
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.2.0 | 2026-01-27 | Development Team | Added §8 Support Deck Persistence Flow with new tables and external sync |
 | 2.1.0 | 2026-01-24 | Development Team | Updated to align with v2.0.0 codebase, External API sync, and Service layer architecture |
 | 1.0.0 | 2026-01-14 | Development Team | Initial flow definitions |
 
@@ -224,4 +289,5 @@ flowchart TD
 
 - [PRD-005: Support Card Management](../prds/PRD-005_Support_Card_Management.md)
 - [SPEC-005: Support Card Management Technical](../specs/SPEC-005_Support_Card_Management_Technical.md)
-- [009_DBD: Database Documentation](../009_DBD_Database_Documentation.md)
+- [SEQ-016: Support Deck Configuration](../01-sequences/SEQ-016_Support_Deck_Configuration.md)
+- [009_DBD: Database Documentation](../00-core-docs/009_DBD_Database_Documentation.md)

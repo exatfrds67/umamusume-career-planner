@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.1.0
-**Date**: January 23, 2026
+**Document Version**: 2.2.0
+**Date**: January 27, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned with codebase
+**Status**: Current - Aligned with codebase (January 2026 enhancements)
 
 ---
 
@@ -332,10 +332,18 @@ flowchart TD
         TesseractService["TesseractService"]
     end
     
+    subgraph PerformanceServices["Performance & Monitoring (NEW)"]
+        ApmService["ApmService"]
+        ApiPerformanceMonitoringService["ApiPerformanceMonitoringService"]
+        QueryOptimizationService["QueryOptimizationService"]
+        PerformanceAlertingService["PerformanceAlertingService"]
+    end
+    
     CoreServices --> AIServices
     AIServices --> MCPServices
     CoreServices --> DataServices
     CoreServices --> ExternalServices
+    CoreServices --> PerformanceServices
 ```
 
 ### 4.2 Core Service Implementations
@@ -592,6 +600,277 @@ class HybridAIService
     }
 }
 ```
+
+---
+
+## 5.3 Performance & Monitoring Services (NEW - January 2026)
+
+### 5.3.1 Overview
+
+Performance and monitoring services provide Application Performance Monitoring (APM), regression detection, and optimization capabilities. Implemented in January 2026 as part of Phase 5 completion.
+
+```mermaid
+flowchart TD
+    subgraph PerformanceServices["Performance & Monitoring - 8 Services"]
+        APM["ApmService"]
+        APIPerf["ApiPerformanceMonitoringService"]
+        APICaching["ApiResponseCachingService"]
+        QueryOpt["QueryOptimizationService"]
+        PerfRegression["PerformanceRegressionService"]
+        PerfAlerting["PerformanceAlertingService"]
+        RedisOpt["RedisCacheOptimizationService"]
+        Historical["HistoricalTrackingService"]
+    end
+    
+    APM --> APIPerf
+    APM --> QueryOpt
+    APIPerf --> PerfRegression
+    PerfRegression --> PerfAlerting
+    QueryOpt --> RedisOpt
+    RedisOpt --> APICaching
+    
+    style APM fill:#fff3e0
+    style PerfAlerting fill:#ffcdd2
+```
+
+### 5.3.2 ApmService
+
+**Location**: `app/Services/ApmService.php`  
+**Purpose**: Central Application Performance Monitoring coordination  
+**Database**: Stores metrics in `ucp_performance_metrics` table
+
+```php
+namespace App\Services;
+
+class ApmService
+{
+    public function captureMetric(string $name, float $value, array $tags = []): void
+    {
+        PerformanceMetric::create([
+            'metric_name' => $name,
+            'value' => $value,
+            'tags' => $tags,
+            'captured_at' => now(),
+        ]);
+    }
+    
+    public function captureException(Throwable $e, array $context = []): void
+    {
+        Log::error($e->getMessage(), [
+            'exception' => get_class($e),
+            'trace' => $e->getTraceAsString(),
+            'context' => $context,
+        ]);
+    }
+    
+    public function startTransaction(string $name): Transaction
+    {
+        return new Transaction($name, microtime(true));
+    }
+}
+```
+
+**Key Methods**:
+
+- `captureMetric(string $name, float $value, array $tags = []): void` - Record performance metric
+- `captureException(Throwable $e, array $context = []): void` - Log exception with context
+- `startTransaction(string $name): Transaction` - Begin performance transaction
+- `getMetrics(Carbon $since, ?string $metricName = null): Collection` - Retrieve metrics
+
+**Test Coverage**: 88%
+
+### 5.3.3 ApiPerformanceMonitoringService
+
+**Location**: `app/Services/ApiPerformanceMonitoringService.php`  
+**Purpose**: Track API endpoint latency, errors, and throughput
+
+```php
+namespace App\Services;
+
+class ApiPerformanceMonitoringService
+{
+    public function recordApiCall(
+        string $endpoint,
+        int $statusCode,
+        float $duration,
+        int $memoryUsage
+    ): void {
+        $this->apm->captureMetric('api.response_time', $duration, [
+            'endpoint' => $endpoint,
+            'status' => $statusCode,
+        ]);
+        
+        if ($statusCode >= 400) {
+            $this->apm->captureMetric('api.error', 1, ['endpoint' => $endpoint]);
+        }
+    }
+    
+    public function getEndpointMetrics(string $endpoint, Carbon $since): array
+    {
+        return [
+            'avg_latency' => $this->calculateAverageLatency($endpoint, $since),
+            'p95_latency' => $this->calculatePercentile($endpoint, $since, 95),
+            'error_rate' => $this->calculateErrorRate($endpoint, $since),
+            'throughput' => $this->calculateThroughput($endpoint, $since),
+        ];
+    }
+    
+    public function detectAnomalies(): Collection
+    {
+        // Detects endpoints exceeding 2 standard deviations from baseline
+        return $this->regressionService->detectAnomalies('api');
+    }
+}
+```
+
+**Key Methods**:
+
+- `recordApiCall(string $endpoint, int $statusCode, float $duration, int $memoryUsage): void`
+- `getEndpointMetrics(string $endpoint, Carbon $since): array`
+- `detectAnomalies(): Collection`
+- `getSlowEndpoints(int $thresholdMs = 500): Collection`
+
+**Test Coverage**: 90%
+
+### 5.3.4 QueryOptimizationService
+
+**Location**: `app/Services/QueryOptimizationService.php`  
+**Purpose**: Analyze database queries, detect N+1 problems, suggest index optimizations
+
+```php
+namespace App\Services;
+
+class QueryOptimizationService
+{
+    public function analyzeQuery(string $sql): array
+    {
+        $explain = DB::select("EXPLAIN {$sql}");
+        
+        return [
+            'type' => $explain[0]->type,
+            'possible_keys' => $explain[0]->possible_keys,
+            'key' => $explain[0]->key,
+            'rows' => $explain[0]->rows,
+            'extra' => $explain[0]->Extra,
+            'needs_optimization' => $this->needsOptimization($explain[0]),
+        ];
+    }
+    
+    public function detectNPlusOne(): Collection
+    {
+        // Analyzes query logs for N+1 patterns
+        $queries = DB::getQueryLog();
+        $patterns = [];
+        
+        foreach ($queries as $query) {
+            if ($this->isNPlusOnePattern($query)) {
+                $patterns[] = $query;
+            }
+        }
+        
+        return collect($patterns);
+    }
+    
+    public function suggestIndexes(): array
+    {
+        // Suggests indexes based on slow query analysis
+        $slowQueries = $this->getSlowQueries();
+        $suggestions = [];
+        
+        foreach ($slowQueries as $query) {
+            $suggestions[] = $this->analyzeForIndexes($query);
+        }
+        
+        return $suggestions;
+    }
+}
+```
+
+**Key Methods**:
+
+- `analyzeQuery(string $sql): array` - Run EXPLAIN on query
+- `detectNPlusOne(): Collection` - Find N+1 query patterns
+- `suggestIndexes(): array` - Recommend database indexes
+- `optimizeIndexes(array $suggestions): bool` - Apply index suggestions
+
+**Test Coverage**: 85%
+
+### 5.3.5 PerformanceAlertingService
+
+**Location**: `app/Services/PerformanceAlertingService.php`  
+**Purpose**: Threshold monitoring and alert dispatch
+
+```php
+namespace App\Services;
+
+class PerformanceAlertingService
+{
+    public function checkThresholds(): void
+    {
+        $metrics = $this->apm->getMetrics(now()->subMinutes(5));
+        
+        foreach ($metrics as $metric) {
+            if ($this->exceedsThreshold($metric)) {
+                $this->sendAlert($metric);
+            }
+        }
+    }
+    
+    public function sendAlert(PerformanceMetric $metric): void
+    {
+        Notification::route('mail', config('apm.alert_email'))
+            ->notify(new PerformanceAlertNotification($metric));
+    }
+    
+    public function configureAlerts(array $thresholds): void
+    {
+        foreach ($thresholds as $metric => $threshold) {
+            cache()->put("apm.threshold.{$metric}", $threshold, now()->addDays(30));
+        }
+    }
+}
+```
+
+**Key Methods**:
+
+- `checkThresholds(): void` - Check all metrics against thresholds
+- `sendAlert(PerformanceMetric $metric): void` - Dispatch alert notification
+- `configureAlerts(array $thresholds): void` - Update alert thresholds
+- `getActiveAlerts(): Collection` - Retrieve current alerts
+
+**Test Coverage**: 87%
+
+### 5.3.6 Additional Services
+
+**RedisCacheOptimizationService** (`app/Services/RedisCacheOptimizationService.php`)
+
+- Cache hit/miss ratio tracking
+- Cache eviction pattern analysis
+- TTL optimization suggestions
+
+**ApiResponseCachingService** (`app/Services/ApiResponseCachingService.php`)
+
+- Intelligent API response caching
+- Cache invalidation strategies
+- Cache warming for frequently accessed data
+
+**PerformanceRegressionService** (`app/Services/PerformanceRegressionService.php`)
+
+- Baseline establishment and tracking
+- Statistical anomaly detection
+- Performance degradation alerts
+
+**HistoricalTrackingService** (`app/Services/HistoricalTrackingService.php`)
+
+- Long-term performance trend analysis
+- Historical metric aggregation
+- Performance comparison across releases
+
+**Related Documentation**:
+
+- SPEC-008 (NEW): Performance Monitoring & APM Technical Specification
+- IVM §6.2: Service Method Verification
+- IVM §9.2: Performance & Monitoring Test Coverage (88%)
 
 ---
 

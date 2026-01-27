@@ -1,10 +1,10 @@
 # SEQUENCE DIAGRAMS: Critical Interaction Flows
 
-**Document Version**: 2.0.0 | **Date**: January 24, 2026 | **Status**: Production-Aligned
+**Document Version**: 2.2.0 | **Date**: January 27, 2026 | **Status**: Production-Aligned
 
 ## Overview
 
-Sequence diagrams document the detailed interactions between system components during critical operations in the Umamusume Pretty Derby Career Planner v2.0.0. These diagrams show message flows, timing, and dependencies for key workflows in the Laravel 12 application with AI integration, MCP services, and external API interactions.
+Sequence diagrams document the detailed interactions between system components during critical operations in the Umamusume Pretty Derby Career Planner v2.2.0. These diagrams show message flows, timing, and dependencies for key workflows in the Laravel 12 application with AI integration, MCP services, and external API interactions.
 
 ---
 
@@ -446,6 +446,26 @@ sequenceDiagram
 - SPEC: [SPEC-005](../specs/SPEC-005_Support_Card_Management_Technical.md)
 - Flow: [FLOW-005](../flows/FLOW-005_Support_Card_Management_System.md)
 - Wireframe: [WF-011](../wireframes/WF-011_Support_Deck_Builder.md)
+
+### SD-016.5: Support Deck Configuration (NEW)
+
+**Duration**: ~100ms (card assignment) | ~200ms (full synergy calculation)  
+**Scope**: Deck creation, card slot management, synergy optimization
+
+**Related Documents:**
+
+- Sequence File: [SEQ-016](SEQ-016_Support_Deck_Configuration.md)
+- SPEC: [SPEC-005](../specs/SPEC-005_Support_Card_Management_Technical.md)
+- Flow: [FLOW-005](../flows/FLOW-005_Support_Card_Management_System.md)
+- User Flow: [UF-006](../user-flows/UF-006_Support_Deck_Building_Flow.md)
+
+**Key Features:**
+
+- Deck creation with name and description
+- 6-slot card assignment (5 owned + 1 borrowed)
+- Synergy calculation with factor-based scoring
+- Deck activation for training integration
+- External card metadata synchronization
 
 ---
 

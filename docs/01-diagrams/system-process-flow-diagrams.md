@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.1.0  
-**Date**: January 23, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 27, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.0.0
+**Status**: Current - Aligned with codebase v2.0.0 + January 2026 Performance Monitoring enhancements
 
 ---
 
@@ -22,6 +22,7 @@
 8. [Error Handling and Recovery Process Flow](#8-error-handling-and-recovery-process-flow)
 9. [Real-Time Communication Flow](#9-real-time-communication-flow)
 10. [Process Flow Summary](#10-process-flow-summary)
+11. [Performance Monitoring & APM Flow](#11-performance-monitoring--apm-flow)
 
 ---
 
@@ -1392,10 +1393,239 @@ flowchart TB
 
 ---
 
+## 11. Performance Monitoring & APM Flow
+
+### 11.1 Overview
+
+The Performance Monitoring system provides comprehensive Application Performance Monitoring (APM) capabilities across all application layers. This includes real-time metrics collection, historical tracking, alerting, and optimization recommendations.
+
+**Key Services (NEW January 2026):**
+
+| Service | Purpose |
+|---------|---------|
+| `ApmService` | Core APM metrics collection and reporting |
+| `ApiPerformanceMonitoringService` | API endpoint performance tracking |
+| `QueryOptimizationService` | Database query analysis and optimization |
+| `PerformanceAlertingService` | Alert generation and threshold management |
+| `RedisCacheOptimizationService` | Cache hit/miss analysis and optimization |
+| `ApiResponseCachingService` | Response caching strategies and invalidation |
+| `PerformanceRegressionService` | Regression detection across deployments |
+| `HistoricalTrackingService` | Long-term metrics storage and analysis |
+
+### 11.2 APM Data Collection Flow
+
+```mermaid
+flowchart TD
+    Request([HTTP Request]) --> Middleware[Performance Middleware]
+    
+    Middleware --> StartTimer[Start Request Timer]
+    StartTimer --> ProcessRequest[Process Request]
+    
+    ProcessRequest --> QueryTracker[Query Tracker]
+    ProcessRequest --> CacheTracker[Cache Tracker]
+    ProcessRequest --> AITracker[AI Latency Tracker]
+    
+    QueryTracker --> QueryMetrics[Collect Query Metrics]
+    CacheTracker --> CacheMetrics[Collect Cache Metrics]
+    AITracker --> AIMetrics[Collect AI Metrics]
+    
+    QueryMetrics --> Aggregator[Metrics Aggregator]
+    CacheMetrics --> Aggregator
+    AIMetrics --> Aggregator
+    
+    ProcessRequest --> EndTimer[End Request Timer]
+    EndTimer --> ResponseMetrics[Calculate Response Time]
+    ResponseMetrics --> Aggregator
+    
+    Aggregator --> Store{Storage Decision}
+    
+    Store -->|Real-time| Redis[(Redis - Hot Metrics)]
+    Store -->|Historical| MySQL[(MySQL - Cold Storage)]
+    Store -->|Alert Check| AlertEngine[Alert Engine]
+    
+    AlertEngine --> ThresholdCheck{Threshold Exceeded?}
+    ThresholdCheck -->|Yes| GenerateAlert[Generate Alert]
+    ThresholdCheck -->|No| Continue([Continue])
+    
+    GenerateAlert --> NotifyChannel[Notify via Channel]
+    NotifyChannel --> Log[Log Alert]
+    NotifyChannel --> Slack[Slack Webhook]
+    NotifyChannel --> Dashboard[Dashboard Update]
+    
+    style Request fill:#e3f2fd
+    style AlertEngine fill:#fff3e0
+    style Redis fill:#e8f5e9
+    style MySQL fill:#e8f5e9
+```
+
+### 11.3 Query Optimization Flow
+
+```mermaid
+flowchart TD
+    Query([Database Query]) --> Analyzer[QueryOptimizationService]
+    
+    Analyzer --> ExtractPlan[Extract Query Plan]
+    ExtractPlan --> Metrics[Collect Metrics]
+    
+    Metrics --> Duration[Execution Time]
+    Metrics --> RowsScanned[Rows Scanned]
+    Metrics --> IndexUsage[Index Usage]
+    Metrics --> TempTables[Temp Table Usage]
+    
+    Duration --> ScoreCalc[Calculate Performance Score]
+    RowsScanned --> ScoreCalc
+    IndexUsage --> ScoreCalc
+    TempTables --> ScoreCalc
+    
+    ScoreCalc --> Evaluation{Score < Threshold?}
+    
+    Evaluation -->|Good| PassThrough[Log & Pass Through]
+    Evaluation -->|Poor| OptimizationEngine[Optimization Engine]
+    
+    OptimizationEngine --> Suggestions[Generate Suggestions]
+    
+    Suggestions --> IndexSuggestion[Missing Index Detection]
+    Suggestions --> QueryRewrite[Query Rewrite Hints]
+    Suggestions --> CacheSuggestion[Cache Candidates]
+    
+    IndexSuggestion --> Report[Optimization Report]
+    QueryRewrite --> Report
+    CacheSuggestion --> Report
+    
+    Report --> Store[Store Recommendation]
+    Store --> Dashboard[Update Dashboard]
+    
+    style Query fill:#e3f2fd
+    style OptimizationEngine fill:#fff3e0
+    style Report fill:#e8f5e9
+```
+
+### 11.4 Cache Optimization Flow
+
+```mermaid
+flowchart TD
+    CacheOp([Cache Operation]) --> Monitor[RedisCacheOptimizationService]
+    
+    Monitor --> OperationType{Operation Type}
+    
+    OperationType -->|GET| CheckHit{Cache Hit?}
+    OperationType -->|SET| TrackWrite[Track Write Pattern]
+    OperationType -->|DEL| TrackInvalidation[Track Invalidation]
+    
+    CheckHit -->|Hit| RecordHit[Record Hit - Latency]
+    CheckHit -->|Miss| RecordMiss[Record Miss - Source Query]
+    
+    RecordHit --> HitRateCalc[Update Hit Rate]
+    RecordMiss --> HitRateCalc
+    
+    HitRateCalc --> AnalyzePatterns[Analyze Access Patterns]
+    TrackWrite --> AnalyzePatterns
+    TrackInvalidation --> AnalyzePatterns
+    
+    AnalyzePatterns --> Recommendations{Generate Recommendations}
+    
+    Recommendations --> TTLAdjust[TTL Adjustment Suggestions]
+    Recommendations --> PrefetchCandidates[Prefetch Candidates]
+    Recommendations --> EvictionPolicy[Eviction Policy Hints]
+    
+    TTLAdjust --> OptReport[Optimization Report]
+    PrefetchCandidates --> OptReport
+    EvictionPolicy --> OptReport
+    
+    OptReport --> Store[(Store Recommendations)]
+    
+    style CacheOp fill:#e3f2fd
+    style AnalyzePatterns fill:#fff3e0
+    style Store fill:#e8f5e9
+```
+
+### 11.5 Performance Regression Detection
+
+```mermaid
+flowchart TD
+    Deploy([New Deployment]) --> Baseline[Load Baseline Metrics]
+    
+    Baseline --> CollectNew[Collect New Metrics - 1hr window]
+    
+    CollectNew --> Compare{Statistical Comparison}
+    
+    Compare --> ResponseTime[Response Time Delta]
+    Compare --> ErrorRate[Error Rate Delta]
+    Compare --> QueryPerf[Query Performance Delta]
+    Compare --> CacheHitRate[Cache Hit Rate Delta]
+    
+    ResponseTime --> StatTest[Statistical Significance Test]
+    ErrorRate --> StatTest
+    QueryPerf --> StatTest
+    CacheHitRate --> StatTest
+    
+    StatTest --> Significant{Significant Regression?}
+    
+    Significant -->|Yes| SeverityCalc[Calculate Severity]
+    Significant -->|No| Pass[Mark Deployment Healthy]
+    
+    SeverityCalc --> Critical{Critical?}
+    
+    Critical -->|Yes| ImmediateAlert[Immediate Alert + Rollback Suggestion]
+    Critical -->|No| WarningAlert[Warning Alert]
+    
+    ImmediateAlert --> NotifyOps[Notify Operations Team]
+    WarningAlert --> LogWarning[Log for Review]
+    
+    Pass --> UpdateBaseline[Update Baseline]
+    UpdateBaseline --> Complete([Monitoring Complete])
+    NotifyOps --> Complete
+    LogWarning --> Complete
+    
+    style Deploy fill:#e3f2fd
+    style SeverityCalc fill:#fff3e0
+    style ImmediateAlert fill:#ffcdd2
+```
+
+### 11.6 Historical Tracking Architecture
+
+```mermaid
+flowchart TB
+    subgraph RealTime[Real-Time Layer - Redis]
+        HotMetrics[Hot Metrics - 1hr retention]
+        LiveDashboard[Live Dashboard Data]
+        AlertBuffer[Alert Buffer]
+    end
+    
+    subgraph Aggregation[Aggregation Layer]
+        MinuteAgg[Minute Aggregates]
+        HourAgg[Hour Aggregates]
+        DayAgg[Day Aggregates]
+    end
+    
+    subgraph Persistence[Persistence Layer - MySQL]
+        RawMetrics[(Raw Metrics - 7 days)]
+        AggregatedMetrics[(Aggregated - 90 days)]
+        ArchivedMetrics[(Archived - 1 year)]
+    end
+    
+    HotMetrics --> MinuteAgg
+    MinuteAgg --> HourAgg
+    HourAgg --> DayAgg
+    
+    MinuteAgg --> RawMetrics
+    HourAgg --> AggregatedMetrics
+    DayAgg --> ArchivedMetrics
+    
+    AlertBuffer --> AlertHistory[(Alert History)]
+    
+    style RealTime fill:#e3f2fd
+    style Aggregation fill:#fff3e0
+    style Persistence fill:#e8f5e9
+```
+
+---
+
 ## Document Control
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.2.0 | 2026-01-27 | Development Team | Added §11 Performance Monitoring & APM Flow; added 8 Performance & Monitoring services |
 | 2.1.0 | 2026-01-23 | Development Team | Comprehensive update for v2.0.0: Added MCP integration, OCR pipeline, real-time communication flows; aligned with current implementation |
 | 2.0.0 | 2026-01-14 | Development Team | Major revision with Mermaid diagrams |
 | 1.0.0 | 2026-01-03 | Development Team | Initial specification |

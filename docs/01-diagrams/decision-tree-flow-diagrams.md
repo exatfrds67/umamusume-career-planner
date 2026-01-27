@@ -1,10 +1,10 @@
 # Umamusume Career Planner - Decision Tree Flow Diagrams
 
-**Document Version**: 2.0.0  
-**Date**: January 23, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 27, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.0.0
+**Status**: Current - Aligned with codebase v2.2.0
 
 ---
 

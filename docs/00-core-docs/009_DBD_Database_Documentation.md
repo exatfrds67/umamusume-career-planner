@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.1.0
-**Date**: January 23, 2026
+**Document Version**: 2.2.0
+**Date**: January 27, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned to codebase
+**Status**: Current - Aligned to codebase with January 2026 enhancements
 
 ---
 
@@ -78,18 +78,21 @@ mindmap
 | `ucp_characters` | Character state | user_id, name, scenario_type, current_stats, energy_level, mood_status, goals |
 | `ucp_aptitudes` | Aptitude grades | character_id, distance_type, surface_type, running_style, grade |
 | `ucp_factors` | Inheritance factors | character_id, factor_type, star_level, source_parent |
-| `ucp_skills` | Skill catalog | skill_type, rarity, base_sp_cost, evolution_links, effects |
+| `ucp_skills` | Skill catalog | skill_type, rarity, base_sp_cost, evolution_links, effects, **status** (NEW), **name_en** (NEW) |
 | `ucp_skill_hints` | Hint tracking | character_id, skill_id, source_type, discount_percentage, is_used |
-| `ucp_skill_acquisitions` | Acquisition history | character_id, skill_id, career_id, final_sp_cost, is_evolution, is_active |
+| `ucp_skill_acquisitions` | Acquisition history | character_id, skill_id, career_id, final_sp_cost, is_evolution, is_active, **hint_level** (NEW), **hint_count** (NEW), **first_hint_at** (NEW), **last_hint_at** (NEW) |
 | `ucp_careers` | Career runs | character_id, scenario_type, status, current_turn, final_stats |
 | `ucp_training_sessions` | Training logs | career_id, turn_number, training_type, stat_gains, support_bonuses |
-| `ucp_support_cards` | Support card inventory | user_id, card_name, rarity, specialization, limit_break_level |
-| `ucp_support_decks` | Deck configurations | character_id, card_ids, synergy_score |
+| `ucp_support_cards` | Support card inventory | user_id, card_name, rarity, specialization, **limit_break_level** (NEW), **external_source** (NEW), **external_id** (NEW), **last_synced_at** (NEW) |
+| `ucp_support_card_definitions` | Canonical card metadata (NEW) | card_name_jp, card_name_en, rarity, support_type, base_stats, skill_effects |
+| `ucp_support_decks` | Deck configurations (NEW) | user_id, name, description, card_ids (JSON), is_active |
+| `ucp_support_deck_cards` | Deck-card pivot (NEW) | support_deck_id, support_card_id |
 | `ucp_ai_conversations` | AI chat history | user_id, context_type, messages, model_used |
 | `ucp_ai_recommendations` | AI recommendations | character_id, recommendation_type, content, confidence_score |
 | `ucp_mcp_tool_usage` | MCP tool tracking | tool_name, invocation_count, avg_latency, error_count |
 | `ucp_external_api_cache` | API response cache | api_source, endpoint, response_data, expires_at |
 | `ucp_ocr_extractions` | OCR results | user_id, image_path, extracted_data, confidence_score |
+| `ucp_ocr_extracted_skills` | OCR skill detection cache (NEW) | ocr_extraction_id, skill_id, confidence_score |
 
 ### 2.2 Supporting Tables
 

@@ -1,10 +1,10 @@
 # Technical Specifications Index
 
-**Document Version**: 2.0.0  
-**Last Updated**: 2026-01-24  
+**Document Version**: 2.2.0  
+**Last Updated**: 2026-01-27  
 **Status**: Active  
 **Project**: Umamusume Pretty Derby Career Planner  
-**Architecture Version**: v2.0.0
+**Architecture Version**: v2.2.0
 
 ---
 
@@ -21,10 +21,11 @@ This index provides a comprehensive catalog of all Technical Specifications (SPE
 | [SPEC-001](#spec-001) | Character Management | Active | PRD-001 | 2026-01-24 |
 | [SPEC-002](#spec-002) | Training Optimization | Active | PRD-002 | 2026-01-24 |
 | [SPEC-003](#spec-003) | Race Strategy | Active | PRD-003 | 2026-01-24 |
-| [SPEC-004](#spec-004) | Skill Management | Active | PRD-004 | 2026-01-24 |
-| [SPEC-005](#spec-005) | Support Card Management | Active | PRD-005 | 2026-01-24 |
+| [SPEC-004](#spec-004) | Skill Management | Active | PRD-004 | 2026-01-27 |
+| [SPEC-005](#spec-005) | Support Card Management | Active | PRD-005 | 2026-01-27 |
 | [SPEC-006](#spec-006) | AI Advisory System | Active | PRD-006 | 2026-01-24 |
 | [SPEC-007](#spec-007) | External Integration | Active | PRD-007 | 2026-01-24 |
+| [SPEC-008](#spec-008) | Performance Monitoring & APM | Active | SRS §3.9 | 2026-01-27 |
 
 ---
 
@@ -191,9 +192,35 @@ This index provides a comprehensive catalog of all Technical Specifications (SPE
 
 ---
 
+### SPEC-008: Performance Monitoring & APM System
+
+**File**: [SPEC-008_Performance_Monitoring_Technical.md](SPEC-008_Performance_Monitoring_Technical.md)  
+**Covers**: SRS §3.9 (Performance Requirements)  
+**Focus**: Application performance monitoring, query optimization, alerting
+
+**Key Components**:
+
+- Real-time metrics collection via middleware instrumentation
+- API endpoint performance tracking with percentile analysis
+- Database query analysis with automatic optimization suggestions
+- Redis cache hit/miss analysis and TTL optimization
+- Performance alerting with configurable thresholds
+- Regression detection across deployments
+- Historical metrics storage with tiered retention
+
+**Technology Stack**:
+
+- Service Layer: 8 specialized services (ApmService, QueryOptimizationService, etc.)
+- Real-time Storage: Redis (1-hour hot metrics)
+- Historical Storage: MySQL with tiered retention (7 days raw → 1 year aggregated)
+- Alerting: Laravel Events + Notifications (Slack, Email, Dashboard)
+- Database: `ucp_apm_metrics`, `ucp_apm_alerts`, `ucp_apm_aggregates`
+
+---
+
 ## 4. Architecture Alignment
 
-All specifications adhere to the **v2.0.0 Architecture** defined in the Software Development Plan:
+All specifications adhere to the **v2.2.0 Architecture** defined in the Software Development Plan:
 
 **Backend Framework**:
 

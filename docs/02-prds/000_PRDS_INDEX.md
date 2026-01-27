@@ -2,17 +2,17 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.1.0
-**Date**: January 24, 2026
+**Document Version**: 2.2.0
+**Date**: January 27, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned with codebase v2.0.0
+**Status**: Current - Aligned with codebase v2.2.0
 
 ---
 
 ## Documentation Hierarchy
 
-These PRDs define the product requirements that drive the technical specifications and implementation logic for v2.0.0:
+These PRDs define the product requirements that drive the technical specifications and implementation logic for v2.2.0:
 
 1. **PRD (Product Requirements)**: What we are building and why (Business/User view).
 2. **SPEC (Technical Specifications)**: How we build it (Architecture/Implementation view).

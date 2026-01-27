@@ -1,10 +1,16 @@
 # USER FLOW DIAGRAMS: Complete Journey Maps
 
-**Document Version**: 2.1.0 | **Date**: January 23, 2026 | **Status**: Current - Aligned with v2.0.0
+**Document Version**: 2.2.0 | **Date**: January 27, 2026 | **Status**: Current - Aligned with v2.2.0
 
 ## Overview
 
 User flow diagrams document the complete journeys users take through the system. These maps show decision points, alternate paths, error recovery, and system states at each stage.
+
+**Changes in v2.2.0**:
+
+- Added Performance Monitoring dashboard flow
+- Added Support Deck Configuration flow
+- Enhanced external sync tracking
 
 **Changes in v2.0.0**:
 

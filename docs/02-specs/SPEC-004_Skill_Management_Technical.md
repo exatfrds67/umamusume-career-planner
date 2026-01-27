@@ -1,9 +1,9 @@
 # SPEC-004: Skill Management System - Technical Specification
 
-**Document Version**: 2.0.0  
-**Date**: 2026-01-24  
+**Document Version**: 2.2.0  
+**Date**: 2026-01-27  
 **Project**: Umamusume Pretty Derby Career Planner  
-**Status**: Active  
+**Status**: Active - Updated with January 2026 schema enhancements  
 **Classification**: Internal - Development Team
 
 ---
@@ -1491,10 +1491,12 @@ CREATE TABLE ucp_skills (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     name_jp VARCHAR(255) NULL,
+    name_en VARCHAR(255) NULL COMMENT 'NEW: English skill name for i18n',
     description TEXT NOT NULL,
     skill_type VARCHAR(50) NOT NULL COMMENT 'acceleration, speed, stamina, etc.',
     rarity ENUM('normal', 'rare', 'unique') NOT NULL,
     category VARCHAR(50) NOT NULL COMMENT 'start_dash, positioning, etc.',
+    status ENUM('active', 'deprecated', 'unreleased') NOT NULL DEFAULT 'active' COMMENT 'NEW: Skill availability status',
     base_sp_cost SMALLINT UNSIGNED NOT NULL,
     icon_path VARCHAR(500) NULL,
     evolution_from_id BIGINT UNSIGNED NULL COMMENT 'Base skill for evolutions',
@@ -1507,8 +1509,9 @@ CREATE TABLE ucp_skills (
     INDEX idx_skill_type (skill_type),
     INDEX idx_rarity (rarity),
     INDEX idx_category (category),
+    INDEX idx_status (status),
     INDEX idx_evolution_from (evolution_from_id),
-    FULLTEXT idx_search (name, description)
+    FULLTEXT idx_search (name, name_en, description)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
@@ -1548,6 +1551,10 @@ CREATE TABLE ucp_skill_acquisitions (
     sp_cost_paid SMALLINT UNSIGNED NOT NULL,
     is_evolution BOOLEAN NOT NULL DEFAULT FALSE,
     turn_acquired TINYINT UNSIGNED NULL,
+    hint_level TINYINT UNSIGNED NULL DEFAULT 0 COMMENT 'NEW: Hint level at acquisition (0-5)',
+    hint_count INT UNSIGNED NULL DEFAULT 0 COMMENT 'NEW: Total hints received for this skill',
+    first_hint_at TIMESTAMP NULL COMMENT 'NEW: When first hint was received',
+    last_hint_at TIMESTAMP NULL COMMENT 'NEW: When last hint was received',
     acquired_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     
     FOREIGN KEY (career_id) REFERENCES ucp_careers(id) ON DELETE CASCADE,
@@ -1556,7 +1563,8 @@ CREATE TABLE ucp_skill_acquisitions (
     UNIQUE KEY unique_character_skill (character_id, skill_id),
     INDEX idx_career_id (career_id),
     INDEX idx_character_id (character_id),
-    INDEX idx_is_evolution (is_evolution)
+    INDEX idx_is_evolution (is_evolution),
+    INDEX idx_hint_level (hint_level)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 

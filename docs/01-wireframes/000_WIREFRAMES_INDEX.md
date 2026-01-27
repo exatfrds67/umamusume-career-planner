@@ -1,8 +1,8 @@
 # WIREFRAMES & UI SPECIFICATIONS INDEX
 
-**Document Version**: 2.0.0  
-**Date**: January 24, 2026  
-**Status**: Current - Aligned with v2.0.0 Implementation
+**Document Version**: 2.2.0  
+**Date**: January 27, 2026  
+**Status**: Current - Aligned with v2.2.0 Implementation
 
 ---
 

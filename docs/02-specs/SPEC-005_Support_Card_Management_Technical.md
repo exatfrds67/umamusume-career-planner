@@ -1,10 +1,10 @@
 ```markdown
 # SPEC-005: Support Card Management System - Technical Specification
 
-**Document Version**: 2.0.0  
-**Date**: 2026-01-24  
+**Document Version**: 2.2.0  
+**Date**: 2026-01-27  
 **Project**: Umamusume Pretty Derby Career Planner  
-**Status**: Active  
+**Status**: Active - Updated with January 2026 deck management and external sync enhancements  
 **Classification**: Internal - Development Team
 
 ---
@@ -2066,6 +2066,9 @@ CREATE TABLE ucp_support_cards (
     meta_tier VARCHAR(10) NULL COMMENT 'SS, S, A, B, C',
     meta_score DECIMAL(3,1) NULL COMMENT '0.0-10.0',
     icon_path VARCHAR(500) NULL,
+    external_source VARCHAR(50) NULL COMMENT 'NEW: Data source identifier (e.g., gamewith, gamerch)',
+    external_id VARCHAR(100) NULL COMMENT 'NEW: ID in external source system',
+    last_synced_at TIMESTAMP NULL COMMENT 'NEW: Last sync timestamp from external source',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
@@ -2073,6 +2076,7 @@ CREATE TABLE ucp_support_cards (
     INDEX idx_specialization (specialization),
     INDEX idx_meta_tier (meta_tier),
     INDEX idx_meta_score (meta_score),
+    INDEX idx_external_source (external_source, external_id),
     FULLTEXT idx_search (name, character_name)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```

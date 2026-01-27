@@ -3,11 +3,11 @@
 ## Document Information
 
 **Document ID**: entity-relationship-diagram
-**Version**: 2.1.0
-**Date**: January 23, 2026
+**Version**: 2.2.0
+**Date**: January 27, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned with codebase v2.0.0
+**Status**: Current - Aligned with codebase v2.0.0 + January 2026 enhancements
 
 ---
 
@@ -73,6 +73,9 @@ mindmap
       ucp_skill_acquisitions
     Support System
       ucp_support_cards
+      ucp_support_card_definitions NEW
+      support_decks NEW
+      support_deck_cards NEW
       character_support_cards
     Race System
       ucp_races
@@ -89,6 +92,7 @@ mindmap
     External Data
       ucp_external_data
       ucp_ocr_extractions
+      ocr_extracted_skills NEW
 ```
 
 ---
@@ -156,9 +160,9 @@ flowchart TD
 | Race System | 2 | Race calendar and results |
 | AI Integration | 5 | AI conversations and metrics |
 | MCP Integration | 4 | MCP server and tool management |
-| External Data | 3 | External API cache and OCR |
+| External Data | 4 | External API cache and OCR (includes 1 new table) |
 
-**Total Tables**: 33
+**Total Tables**: 37 (was 33, +4 new tables from January 2026)
 
 ---
 
@@ -173,6 +177,7 @@ erDiagram
     users ||--o{ ucp_characters : owns
     users ||--o{ ucp_careers : tracks
     users ||--o{ ucp_support_cards : owns
+    users ||--o{ support_decks : creates
     
     ucp_characters ||--o{ ucp_careers : features
     ucp_characters ||--o{ ucp_aptitudes : has
@@ -186,8 +191,15 @@ erDiagram
     ucp_skills ||--o{ ucp_skill_hints : provides
     ucp_skills ||--o{ ucp_skill_acquisitions : acquired_as
     ucp_skills ||--o{ ucp_skills : evolves_to
+    ucp_skills ||--o{ ocr_extracted_skills : detected_in
     
     ucp_support_cards ||--o{ character_support_cards : assigned_to
+    ucp_support_cards }o--|| ucp_support_card_definitions : references
+    ucp_support_cards ||--o{ support_deck_cards : included_in
+    
+    support_decks ||--o{ support_deck_cards : contains
+    
+    ucp_ocr_extractions ||--o{ ocr_extracted_skills : produces
     
     users {
         uuid id PK

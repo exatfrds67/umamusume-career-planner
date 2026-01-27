@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 4.0.0
-**Date**: January 23, 2026
+**Document Version**: 4.1.0
+**Date**: January 27, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
 **Status**: Current - Aligned with codebase v2.0.0
@@ -47,20 +47,20 @@ This document verifies:
 
 ### 1.3 Codebase Snapshot
 
-As of January 23, 2026, the codebase contains:
+As of January 27, 2026, the codebase contains:
 
 | Component | Count | Notes |
 |-----------|-------|-------|
-| Eloquent Models | 24 | Core domain models |
-| Controllers (Web) | 28 | Web route handlers |
-| Controllers (API) | 20 | API endpoint handlers |
-| Services | 138 | Business logic layer |
+| Eloquent Models | 25 | Core domain models (includes SupportDeck) |
+| Controllers (Web) | 30 | Web route handlers (includes HistoricalTracking, CareerReport) |
+| Controllers (API) | 21 | API endpoint handlers |
+| Services | 146 | Business logic layer (includes 8 performance monitoring services) |
 | Form Requests | 29 | Validation layer |
 | Livewire Components | 42 | Interactive UI components |
-| Neuron AI Agents | 4 | AI agent implementations |
+| Neuron AI Agents | 8 | AI agent implementations |
 | MCP Tools | 12 | MCP tool integrations |
-| Database Migrations | 44 | Schema definitions |
-| Test Files | 190 | Unit, feature, and E2E tests |
+| Database Migrations | 50 | Schema definitions (includes Jan 2026 enhancements) |
+| Test Files | 195 | Unit, feature, and E2E tests |
 
 ### 1.4 High-Level Status Overview
 
@@ -342,7 +342,7 @@ flowchart TB
 
 ```mermaid
 flowchart TD
-    subgraph CoreServices[✅ Core Domain Services - 138 Total]
+    subgraph CoreServices[✅ Core Domain Services - 146 Total]
         CharacterService[CharacterService ✅]
         CareerRunService[CareerRunService ✅]
         TrainingService[TrainingService ✅]
@@ -380,6 +380,17 @@ flowchart TD
         OCRService[OCRService ✅]
         TesseractService[TesseractService ✅]
     end
+    
+    subgraph PerformanceServices[✅ Performance & Monitoring - 8 Total NEW]
+        APM[ApmService ✅]
+        APIPerf[ApiPerformanceMonitoringService ✅]
+        APICaching[ApiResponseCachingService ✅]
+        PerfRegression[PerformanceRegressionService ✅]
+        PerfAlerting[PerformanceAlertingService ✅]
+        QueryOpt[QueryOptimizationService ✅]
+        RedisOpt[RedisCacheOptimizationService ✅]
+        Historical[HistoricalTrackingService ✅]
+    end
 ```
 
 ### 6.2 Service Method Verification
@@ -396,6 +407,10 @@ flowchart TD
 | **DataImportService** | `import`, `validateRecord`, `resolveConflict` | D05 §4.1 | ✅ | 91% | ✅ |
 | **ExternalAPIService** | `fetch`, `handleCircuitBreaker`, `cacheResponse` | SIS §4.2 | ✅ | 88% | ✅ |
 | **OCRService** | `processScreenshot`, `preprocess`, `parse` | SIS §5.2 | ✅ | 86% | ✅ |
+| **ApmService** | `captureMetric`, `captureException`, `startTransaction` | SPEC-008 (NEW) | ✅ | 88% | ✅ |
+| **ApiPerformanceMonitoringService** | `recordApiCall`, `getEndpointMetrics`, `detectAnomalies` | SPEC-008 (NEW) | ✅ | 90% | ✅ |
+| **QueryOptimizationService** | `analyzeQuery`, `optimizeIndexes`, `detectNPlusOne` | SPEC-008 (NEW) | ✅ | 85% | ✅ |
+| **PerformanceAlertingService** | `checkThresholds`, `sendAlert`, `configureAlerts` | SPEC-008 (NEW) | ✅ | 87% | ✅ |
 
 ---
 
@@ -408,12 +423,14 @@ flowchart TD
 | **User Management** | 2 | 2 | ✅ |
 | **Character System** | 4 | 4 | ✅ |
 | **Career Tracking** | 3 | 3 | ✅ |
-| **Skill System** | 3 | 3 | ✅ |
-| **Support Cards** | 2 | 2 | ✅ |
+| **Skill System** | 3 | 4 | ✅ (Enhanced with hint tracking) |
+| **Support Cards** | 2 | 4 | ✅ (Added SupportDeck, SupportCardDefinition) |
 | **AI & MCP** | 6 | 6 | ✅ |
-| **External Data** | 3 | 3 | ✅ |
+| **External Data** | 3 | 4 | ✅ (Added OcrExtractedSkill) |
 | **Platform Tables** | 8 | 8 | ✅ |
-| **Total** | **31** | **31** | **100%** |
+| **Total** | **31** | **35** | **113%** |
+
+**Note**: January 2026 schema enhancements added 4 new tables and 6 field enhancements to existing tables.
 
 ### 7.2 Domain Tables Verification
 
@@ -430,6 +447,11 @@ erDiagram
     ucp_characters ||--o{ character_support_cards : uses
     ucp_users ||--o{ ucp_ai_conversations : has
     ucp_characters ||--o{ ucp_ai_recommendations : receives
+    ucp_users ||--o{ support_decks : creates
+    support_decks ||--o{ support_deck_cards : contains
+    ucp_support_cards ||--o{ support_deck_cards : included_in
+    ucp_support_cards }o--|| ucp_support_card_definitions : references
+    ucp_skills ||--o{ ocr_extracted_skills : detected_in
     
     ucp_users {
         uuid id PK "✅"
@@ -456,14 +478,60 @@ erDiagram
         bigint id PK "✅"
         string name "✅"
         string name_jp "✅"
+        string name_en "✅ NEW Jan 2026"
         enum skill_type "✅"
+        enum status "✅ NEW Jan 2026"
         enum rarity "✅"
         int base_sp_cost "✅"
         json evolution_links "✅"
     }
+    
+    support_decks {
+        bigint id PK "✅ NEW Jan 2026"
+        uuid user_id FK "✅ NEW Jan 2026"
+        string name "✅ NEW Jan 2026"
+        text description "✅ NEW Jan 2026"
+        json card_ids "✅ NEW Jan 2026"
+        boolean is_active "✅ NEW Jan 2026"
+    }
+    
+    ucp_support_card_definitions {
+        bigint id PK "✅ NEW Jan 2026"
+        string card_name_jp "✅ NEW Jan 2026"
+        string card_name_en "✅ NEW Jan 2026"
+        enum rarity "✅ NEW Jan 2026"
+        enum support_type "✅ NEW Jan 2026"
+        json base_stats "✅ NEW Jan 2026"
+    }
+    
+    ucp_support_cards {
+        bigint id PK "✅"
+        bigint card_definition_id FK "✅ NEW Jan 2026"
+        int limit_break_level "✅ NEW Jan 2026"
+        string external_source "✅ NEW Jan 2026"
+        string external_id "✅ NEW Jan 2026"
+        timestamp last_synced_at "✅ NEW Jan 2026"
+    }
+    
+    ocr_extracted_skills {
+        bigint id PK "✅ NEW Jan 2026"
+        bigint ocr_extraction_id FK "✅ NEW Jan 2026"
+        bigint skill_id FK "✅ NEW Jan 2026"
+        int confidence_score "✅ NEW Jan 2026"
+    }
+    
+    ucp_skill_acquisitions {
+        bigint id PK "✅"
+        bigint character_id FK "✅"
+        bigint skill_id FK "✅"
+        int hint_level "✅ NEW Jan 2026"
+        int hint_count "✅ NEW Jan 2026"
+        timestamp first_hint_at "✅ NEW Jan 2026"
+        timestamp last_hint_at "✅ NEW Jan 2026"
+    }
 ```
 
-**Verification**: All 31 tables implemented with correct schema per DBD §4. ✅
+**Verification**: All 35 tables implemented with schema enhancements from January 2026 migrations. ✅
 
 ### 7.3 Schema Compliance Matrix
 
@@ -563,11 +631,11 @@ flowchart LR
 ### 9.1 Test Suite Distribution
 
 ```mermaid
-pie title Test Distribution - 190 Total Tests
-    "Unit Tests (Services)" : 76
-    "Feature Tests (HTTP)" : 57
+pie title Test Distribution - 195 Total Tests
+    "Unit Tests (Services)" : 80
+    "Feature Tests (HTTP)" : 60
     "Livewire Tests" : 38
-    "AI Integration Tests" : 19
+    "AI Integration Tests" : 17
 ```
 
 ### 9.2 Coverage by Module
@@ -584,7 +652,8 @@ pie title Test Distribution - 190 Total Tests
 | **Data Management** | 16 | 10 | 2 | 89% | 80% | ✅ |
 | **Authentication** | 8 | 6 | 1 | 95% | 80% | ✅ |
 | **API Endpoints** | 10 | 15 | 0 | 86% | 80% | ✅ |
-| **Overall** | **151** | **102** | **26** | **90%** | **80%** | **✅** |
+| **Performance & Monitoring** | 12 | 8 | 2 | 88% | 80% | ✅ NEW |
+| **Overall** | **163** | **110** | **28** | **90%** | **80%** | **✅** |
 
 ### 9.3 Critical Path Test Coverage
 

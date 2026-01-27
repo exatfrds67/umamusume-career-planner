@@ -1,10 +1,10 @@
 # Umamusume Career Planner - Data Flow Diagram (DFD)
 
-**Document Version**: 2.0.0  
-**Date**: January 23, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 27, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.0.0
+**Status**: Current - Aligned with codebase v2.0.0 + January 2026 Performance Monitoring enhancements
 
 ---
 
@@ -17,8 +17,9 @@
 5. [Level 2 DFD - AI Advisory System](#5-level-2-dfd---ai-advisory-system)
 6. [Level 2 DFD - External Integration](#6-level-2-dfd---external-integration)
 7. [Level 2 DFD - Data Management](#7-level-2-dfd---data-management)
-8. [Data Store Specifications](#8-data-store-specifications)
-9. [Data Flow Summary](#9-data-flow-summary)
+8. [Level 2 DFD - Performance Monitoring (NEW)](#8-level-2-dfd---performance-monitoring-new)
+9. [Data Store Specifications](#9-data-store-specifications)
+10. [Data Flow Summary](#10-data-flow-summary)
 
 ---
 
@@ -550,9 +551,111 @@ flowchart TB
 
 ---
 
-## 8. Data Store Specifications
+## 8. Level 2 DFD - Performance Monitoring (NEW)
 
-### 8.1 Primary Data Stores
+### 8.1 Overview
+
+The Performance Monitoring subsystem collects, aggregates, and analyzes application performance metrics to enable proactive optimization and alerting.
+
+### 8.2 APM Data Flow Diagram
+
+```mermaid
+flowchart TB
+    subgraph Collection[Data Collection Layer]
+        Middleware[Performance Middleware]
+        QueryListener[Query Listener]
+        CacheListener[Cache Listener]
+        AIListener[AI Latency Listener]
+    end
+    
+    subgraph Processing[Processing Layer]
+        P1[8.1 Metrics Collector<br/>Aggregate raw metrics]
+        P2[8.2 Query Analyzer<br/>Analyze query performance]
+        P3[8.3 Cache Analyzer<br/>Analyze cache patterns]
+        P4[8.4 Alert Engine<br/>Check thresholds]
+        P5[8.5 Aggregator<br/>Create time-based aggregates]
+    end
+    
+    subgraph Storage[Storage Layer]
+        D1[(Redis<br/>Hot Metrics)]
+        D2[(MySQL<br/>Historical)]
+        D3[(Aggregates<br/>Tiered Retention)]
+    end
+    
+    subgraph Output[Output Layer]
+        Dashboard[Dashboard API]
+        Alerts[Alert Notifications]
+        Reports[Optimization Reports]
+    end
+    
+    Middleware --> P1
+    QueryListener --> P2
+    CacheListener --> P3
+    AIListener --> P1
+    
+    P1 --> D1
+    P2 --> D1
+    P3 --> D1
+    
+    D1 --> P4
+    P4 -->|Threshold Exceeded| Alerts
+    
+    D1 --> P5
+    P5 --> D2
+    P5 --> D3
+    
+    D2 --> Dashboard
+    D3 --> Reports
+    P2 --> Reports
+    P3 --> Reports
+    
+    style Collection fill:#e3f2fd
+    style Processing fill:#f3e5f5
+    style Storage fill:#e8f5e9
+    style Output fill:#fff3e0
+```
+
+### 8.3 Process Specifications
+
+| Process | Description | Key Inputs | Key Outputs |
+|---------|-------------|------------|-------------|
+| **8.1 Metrics Collector** | Collects request-level metrics from middleware | HTTP request data, timing info | Raw metrics records |
+| **8.2 Query Analyzer** | Analyzes database queries for optimization | SQL queries, EXPLAIN plans | Query scores, suggestions |
+| **8.3 Cache Analyzer** | Analyzes cache hit/miss patterns | Cache operations | Hit rates, TTL suggestions |
+| **8.4 Alert Engine** | Compares metrics against thresholds | Aggregated metrics, thresholds | Alert notifications |
+| **8.5 Aggregator** | Creates time-based metric aggregates | Raw metrics | Minute/hour/day aggregates |
+
+### 8.4 Data Flows
+
+| Flow | Source → Destination | Data Content |
+|------|---------------------|--------------|
+| **DF8.1** | Middleware → Metrics Collector | Request ID, endpoint, start time |
+| **DF8.2** | Query Listener → Query Analyzer | SQL, duration, bindings |
+| **DF8.3** | Cache Listener → Cache Analyzer | Key, operation, hit/miss, latency |
+| **DF8.4** | Metrics Collector → Redis | JSON metrics record |
+| **DF8.5** | Query Analyzer → Redis | Query performance score |
+| **DF8.6** | Redis → Alert Engine | Aggregated metrics |
+| **DF8.7** | Alert Engine → Notifications | Alert payload (Slack, Email) |
+| **DF8.8** | Aggregator → MySQL | Minute/hour/day aggregates |
+
+### 8.5 Performance Monitoring Services
+
+| Service | Function |
+|---------|----------|
+| `ApmService` | Core APM coordination and metrics storage |
+| `ApiPerformanceMonitoringService` | API endpoint performance tracking |
+| `QueryOptimizationService` | Database query analysis |
+| `PerformanceAlertingService` | Alert generation and delivery |
+| `RedisCacheOptimizationService` | Cache analytics and optimization |
+| `ApiResponseCachingService` | Response caching strategies |
+| `PerformanceRegressionService` | Regression detection |
+| `HistoricalTrackingService` | Long-term metrics storage |
+
+---
+
+## 9. Data Store Specifications
+
+### 9.1 Primary Data Stores
 
 ```mermaid
 erDiagram
@@ -643,7 +746,7 @@ flowchart LR
 
 ---
 
-## 9. Data Flow Summary
+## 10. Data Flow Summary
 
 ### 9.1 Critical Data Flows
 
@@ -704,6 +807,7 @@ flowchart TD
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.2.0 | 2026-01-27 | Development Team | Added §8 Level 2 DFD - Performance Monitoring with 8 APM services; renumbered sections |
 | 2.0.0 | 2026-01-23 | Development Team | Complete rewrite aligned with v2.0.0 implementation; added AI, MCP, external integration, and OCR flows; updated all diagrams and specifications |
 | 1.0.0 | 2026-01-03 | Development Team | Initial draft |
 
