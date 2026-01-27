@@ -6,6 +6,7 @@ use App\Services\AI\AIPerformanceMonitor;
 use App\Services\AI\BedrockService;
 use App\Services\AI\HybridAIService;
 use App\Services\AI\OllamaService;
+use App\Services\AI\VectorStoreService;
 use App\Services\MCP\MCPClientService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
@@ -21,11 +22,14 @@ beforeEach(function () {
     $bedrockService = Mockery::mock(BedrockService::class);
     /** @var AIPerformanceMonitor&Mockery\MockInterface $performanceMonitor */
     $performanceMonitor = Mockery::mock(AIPerformanceMonitor::class);
+    /** @var VectorStoreService&Mockery\MockInterface $vectorStore */
+    $vectorStore = Mockery::mock(VectorStoreService::class);
 
     $this->mcpClient = $mcpClient;
     $this->ollamaService = $ollamaService;
     $this->bedrockService = $bedrockService;
     $this->performanceMonitor = $performanceMonitor;
+    $this->vectorStore = $vectorStore;
 
     // Set default config values
     Config::set('ai.hybrid.enabled', true);
@@ -43,7 +47,8 @@ beforeEach(function () {
         $mcpClient,
         $ollamaService,
         $bedrockService,
-        $performanceMonitor
+        $performanceMonitor,
+        $vectorStore
     );
 });
 

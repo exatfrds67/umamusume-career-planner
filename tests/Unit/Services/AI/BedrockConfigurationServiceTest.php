@@ -24,6 +24,8 @@ beforeEach(function () {
     $this->mcpClient = $mcpClient;
 
     // Set up test configuration
+    Config::set('ai.bedrock.enabled', true);
+
     Config::set('aws.credentials', [
         'key' => 'test-access-key',
         'secret' => 'test-secret-key',

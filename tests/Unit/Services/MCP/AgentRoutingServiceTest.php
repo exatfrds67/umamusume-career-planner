@@ -13,6 +13,7 @@ use App\Services\MCP\CostManagementService;
 use App\Services\MCP\MCPClientService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Http;
 
 // uses() removed - Pest handles this automatically
 
@@ -21,6 +22,15 @@ beforeEach(function () {
     $mcpClient = Mockery::mock(MCPClientService::class);
     /** @var CostManagementService&Mockery\MockInterface $costManager */
     $costManager = Mockery::mock(CostManagementService::class);
+
+    // Set up default mock expectations for methods called during route validation
+    $mcpClient->shouldReceive('isServerHealthy')
+        ->andReturn(true)
+        ->byDefault();
+
+    $mcpClient->shouldReceive('isStrandsAgentsAvailable')
+        ->andReturn(true)
+        ->byDefault();
 
     $this->mcpClient = $mcpClient;
     $this->costManager = $costManager;
@@ -109,7 +119,13 @@ describe('Provider Selection', function () {
                 'usage_percentage' => 50.0,
             ]);
 
-        Config::set('ai.ollama.model', 'llama3');
+        Config::set('ai.ollama.default_model', 'llama3');
+        Config::set('ai.ollama.host', 'http://localhost:11434');
+
+        // Mock HTTP facade to make Ollama appear available
+        Http::fake([
+            'localhost:11434/api/tags' => Http::response(['models' => []], 200),
+        ]);
 
         $route = $this->service->routeRequest($request);
 
@@ -166,7 +182,13 @@ describe('Provider Selection', function () {
                 'usage_percentage' => 105.0,
             ]);
 
-        Config::set('ai.ollama.model', 'llama3');
+        Config::set('ai.ollama.default_model', 'llama3');
+        Config::set('ai.ollama.host', 'http://localhost:11434');
+
+        // Mock HTTP facade to make Ollama appear available
+        Http::fake([
+            'localhost:11434/api/tags' => Http::response(['models' => []], 200),
+        ]);
 
         $route = $this->service->routeRequest($request);
 
@@ -186,7 +208,13 @@ describe('Route Caching', function () {
                 'usage_percentage' => 50.0,
             ]);
 
-        Config::set('ai.ollama.model', 'llama3');
+        Config::set('ai.ollama.default_model', 'llama3');
+        Config::set('ai.ollama.host', 'http://localhost:11434');
+
+        // Mock HTTP facade to make Ollama appear available
+        Http::fake([
+            'localhost:11434/api/tags' => Http::response(['models' => []], 200),
+        ]);
 
         // First call
         $route1 = $this->service->routeRequest($request);
@@ -209,7 +237,13 @@ describe('Execution with Fallback', function () {
                 'usage_percentage' => 50.0,
             ]);
 
-        Config::set('ai.ollama.model', 'llama3');
+        Config::set('ai.ollama.default_model', 'llama3');
+        Config::set('ai.ollama.host', 'http://localhost:11434');
+
+        // Mock HTTP facade to make Ollama appear available
+        Http::fake([
+            'localhost:11434/api/tags' => Http::response(['models' => []], 200),
+        ]);
 
         // Mock Ollama facade
         $ollamaMock = Mockery::mock('alias:CloudStudio\Ollama\Facades\Ollama');
