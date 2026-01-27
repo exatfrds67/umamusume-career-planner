@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\ExternalAPI;
 
+use App\Models\ExternalData;
 use App\Services\CacheManagementService;
 use App\Services\MCP\MCPClientService;
 use Illuminate\Support\Facades\Cache;
@@ -64,7 +65,7 @@ class UmapyoiApiClient
     }
 
     /**
-     * Fetch all characters from umapyoi.net
+     * Fetch all characters from umapyoi.net with database fallback
      *
      * @return array{success: bool, data: array<int, array<string, mixed>>, source: string, error?: string}
      */
@@ -114,6 +115,11 @@ class UmapyoiApiClient
                     /** @var array<int, array<string, mixed>> $transformedCharacters */
                     $transformedCharacters = $this->transformer->transform('characters', $characters);
 
+                    // Store successful API response in database for offline access
+                    if (! empty($transformedCharacters)) {
+                        $this->storeInDatabase('characters', $transformedCharacters);
+                    }
+
                     Log::info('[UmapyoiApiClient] Characters fetched successfully', [
                         'count' => \count($transformedCharacters),
                         'source' => 'api',
@@ -126,9 +132,21 @@ class UmapyoiApiClient
                         'source' => 'api',
                     ];
                 } catch (\Exception $e) {
-                    Log::error('[UmapyoiApiClient] Failed to fetch characters', [
+                    Log::warning('[UmapyoiApiClient] External API unavailable, falling back to database', [
+                        'endpoint' => 'characters',
                         'error' => $e->getMessage(),
                     ]);
+
+                    // Fallback to database data
+                    $databaseData = $this->getFromDatabase('characters');
+
+                    if (! empty($databaseData)) {
+                        return [
+                            'success' => true,
+                            'data' => $databaseData,
+                            'source' => 'database_cache',
+                        ];
+                    }
 
                     return [
                         'success' => false,
@@ -265,6 +283,11 @@ class UmapyoiApiClient
             /** @var array<int, array<string, mixed>> $transformedCards */
             $transformedCards = $this->transformer->transform('support_cards', $cards);
 
+            // Store successful API response in database for offline access
+            if (! empty($transformedCards)) {
+                $this->storeInDatabase('support_cards', $transformedCards);
+            }
+
             // Cache the result
             Cache::put($cacheKey, $transformedCards, self::CACHE_TTL);
 
@@ -279,9 +302,21 @@ class UmapyoiApiClient
                 'source' => 'api',
             ];
         } catch (\Exception $e) {
-            Log::error('[UmapyoiApiClient] Failed to fetch support cards', [
+            Log::warning('[UmapyoiApiClient] External API unavailable, falling back to database', [
+                'endpoint' => 'support_cards',
                 'error' => $e->getMessage(),
             ]);
+
+            // Fallback to database data
+            $databaseData = $this->getFromDatabase('support_cards');
+
+            if (! empty($databaseData)) {
+                return [
+                    'success' => true,
+                    'data' => $databaseData,
+                    'source' => 'database_cache',
+                ];
+            }
 
             return [
                 'success' => false,
@@ -564,6 +599,11 @@ class UmapyoiApiClient
             /** @var array<int, array<string, mixed>> $transformedNews */
             $transformedNews = $this->transformer->transform('news', $news);
 
+            // Store successful API response in database for offline access
+            if (! empty($transformedNews)) {
+                $this->storeInDatabase('news', $transformedNews);
+            }
+
             // Cache the result for 1 hour (news updates more frequently)
             Cache::put($cacheKey, $transformedNews, 3600);
 
@@ -578,9 +618,21 @@ class UmapyoiApiClient
                 'source' => 'api',
             ];
         } catch (\Exception $e) {
-            Log::error('[UmapyoiApiClient] Failed to fetch news', [
+            Log::warning('[UmapyoiApiClient] External API unavailable, falling back to database', [
+                'endpoint' => 'news',
                 'error' => $e->getMessage(),
             ]);
+
+            // Fallback to database data
+            $databaseData = $this->getFromDatabase('news');
+
+            if (! empty($databaseData)) {
+                return [
+                    'success' => true,
+                    'data' => $databaseData,
+                    'source' => 'database_cache',
+                ];
+            }
 
             return [
                 'success' => false,
@@ -747,5 +799,87 @@ class UmapyoiApiClient
         }
 
         return [$wrapperKey => $data];
+    }
+
+    /**
+     * Store API data in database for offline access
+     *
+     * @param  array<int, array<string, mixed>>  $data
+     */
+    private function storeInDatabase(string $type, array $data): void
+    {
+        try {
+            ExternalData::updateOrCreate(
+                [
+                    'data_source' => 'umapyoi',
+                    'data_type' => $type,
+                    'data_key' => 'api_cache',
+                ],
+                [
+                    'data_content' => $data,
+                    'data_version' => '1.0',
+                    'data_description' => "Cached {$type} data from umapyoi.net API",
+                    'last_fetched_at' => now(),
+                    'expires_at' => now()->addDay(), // 24 hours
+                    'is_active' => true,
+                    'is_deprecated' => false,
+                    'is_validated' => true,
+                    'confidence_score' => 1.0,
+                    'data_quality' => 'good',
+                    'source_url' => $this->baseUrl,
+                    'source_api_version' => 'v1',
+                    'fetch_metadata' => [
+                        'records_count' => count($data),
+                        'cached_by' => 'UmapyoiApiClient',
+                        'cache_timestamp' => now()->toISOString(),
+                    ],
+                ]
+            );
+
+            Log::info('[UmapyoiApiClient] Data stored in database for offline access', [
+                'type' => $type,
+                'records_count' => count($data),
+            ]);
+        } catch (\Exception $e) {
+            Log::error('[UmapyoiApiClient] Failed to store external data in database', [
+                'type' => $type,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Get data from database when API is unavailable
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function getFromDatabase(string $type): array
+    {
+        try {
+            $externalData = ExternalData::where('data_source', 'umapyoi')
+                ->where('data_type', $type)
+                ->where('data_key', 'api_cache')
+                ->valid()
+                ->first();
+
+            if ($externalData && is_array($externalData->data_content)) {
+                Log::info('[UmapyoiApiClient] Serving cached data from database', [
+                    'type' => $type,
+                    'last_fetched_at' => $externalData->last_fetched_at,
+                    'records_count' => count($externalData->data_content),
+                ]);
+
+                // Ensure we return array<int, array<string, mixed>>
+                /** @var array<int, array<string, mixed>> */
+                return array_values($externalData->data_content);
+            }
+        } catch (\Exception $e) {
+            Log::error('[UmapyoiApiClient] Failed to retrieve external data from database', [
+                'type' => $type,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        return [];
     }
 }

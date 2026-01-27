@@ -345,7 +345,8 @@ class ResponseTransformer
             }
 
             // Generate unique ID using announce_id or index
-            $uniqueId = $item['announce_id'] ?? $item['id'] ?? 'news_'.md5($titleEn.$index);
+            $titleEnStr = \is_string($titleEn) ? $titleEn : '';
+            $uniqueId = $item['announce_id'] ?? $item['id'] ?? 'news_'.md5($titleEnStr.(string) $index);
 
             // Get thumbnail image
             $thumbImg = $item['article_image'] ?? $item['image'] ?? null;

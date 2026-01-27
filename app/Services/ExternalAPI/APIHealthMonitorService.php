@@ -235,41 +235,51 @@ class APIHealthMonitorService
      */
     public function isCircuitBreakerOpen(string $apiName): bool
     {
-        $key = self::CIRCUIT_BREAKER_KEY.$apiName;
-        $failureCount = $this->getFailureCount($apiName);
+        try {
+            $key = self::CIRCUIT_BREAKER_KEY.$apiName;
+            $failureCount = $this->getFailureCount($apiName);
 
-        // Open circuit breaker if failure threshold exceeded
-        if ($failureCount >= self::FAILURE_THRESHOLD) {
-            // Check if circuit breaker timeout has expired
-            $circuitOpenTime = Redis::get($key);
+            // Open circuit breaker if failure threshold exceeded
+            if ($failureCount >= self::FAILURE_THRESHOLD) {
+                // Check if circuit breaker timeout has expired
+                $circuitOpenTime = Redis::get($key);
 
-            if ($circuitOpenTime !== null && $circuitOpenTime !== false) {
-                $elapsedTime = time() - (is_numeric($circuitOpenTime) ? (int) $circuitOpenTime : 0);
+                if ($circuitOpenTime !== null && $circuitOpenTime !== false) {
+                    $elapsedTime = time() - (is_numeric($circuitOpenTime) ? (int) $circuitOpenTime : 0);
 
-                if ($elapsedTime < self::CIRCUIT_BREAKER_TIMEOUT) {
-                    return true;
+                    if ($elapsedTime < self::CIRCUIT_BREAKER_TIMEOUT) {
+                        return true;
+                    }
+
+                    // Timeout expired, allow retry
+                    Redis::del($key);
+                    $this->resetFailureCount($apiName);
+
+                    return false;
                 }
 
-                // Timeout expired, allow retry
-                Redis::del($key);
-                $this->resetFailureCount($apiName);
+                // Set circuit breaker open time
+                Redis::setex($key, self::CIRCUIT_BREAKER_TIMEOUT, (string) time());
 
-                return false;
+                Log::warning('[APIHealthMonitor] Circuit breaker opened', [
+                    'api' => $apiName,
+                    'failure_count' => $failureCount,
+                    'timeout_seconds' => self::CIRCUIT_BREAKER_TIMEOUT,
+                ]);
+
+                return true;
             }
 
-            // Set circuit breaker open time
-            Redis::setex($key, self::CIRCUIT_BREAKER_TIMEOUT, (string) time());
-
-            Log::warning('[APIHealthMonitor] Circuit breaker opened', [
+            return false;
+        } catch (\Exception $e) {
+            Log::warning('[APIHealthMonitor] Redis unavailable for circuit breaker check', [
                 'api' => $apiName,
-                'failure_count' => $failureCount,
-                'timeout_seconds' => self::CIRCUIT_BREAKER_TIMEOUT,
+                'error' => $e->getMessage(),
             ]);
 
-            return true;
+            // When Redis is unavailable, assume circuit breaker is closed (allow requests)
+            return false;
         }
-
-        return false;
     }
 
     /**
@@ -277,10 +287,20 @@ class APIHealthMonitorService
      */
     public function getFailureCount(string $apiName): int
     {
-        $key = self::FAILURE_COUNT_KEY.$apiName;
-        $count = Redis::get($key);
+        try {
+            $key = self::FAILURE_COUNT_KEY.$apiName;
+            $count = Redis::get($key);
 
-        return is_numeric($count) ? (int) $count : 0;
+            return is_numeric($count) ? (int) $count : 0;
+        } catch (\Exception $e) {
+            Log::warning('[APIHealthMonitor] Redis unavailable for failure count check', [
+                'api' => $apiName,
+                'error' => $e->getMessage(),
+            ]);
+
+            // Return 0 when Redis is unavailable - assume no failures
+            return 0;
+        }
     }
 
     /**
@@ -288,9 +308,17 @@ class APIHealthMonitorService
      */
     protected function incrementFailureCount(string $apiName): void
     {
-        $key = self::FAILURE_COUNT_KEY.$apiName;
-        Redis::incr($key);
-        Redis::expire($key, 3600); // Expire after 1 hour
+        try {
+            $key = self::FAILURE_COUNT_KEY.$apiName;
+            Redis::incr($key);
+            Redis::expire($key, 3600); // Expire after 1 hour
+        } catch (\Exception $e) {
+            Log::warning('[APIHealthMonitor] Redis unavailable for failure count increment', [
+                'api' => $apiName,
+                'error' => $e->getMessage(),
+            ]);
+            // Silently fail when Redis is unavailable
+        }
     }
 
     /**
@@ -298,8 +326,16 @@ class APIHealthMonitorService
      */
     protected function resetFailureCount(string $apiName): void
     {
-        $key = self::FAILURE_COUNT_KEY.$apiName;
-        Redis::del($key);
+        try {
+            $key = self::FAILURE_COUNT_KEY.$apiName;
+            Redis::del($key);
+        } catch (\Exception $e) {
+            Log::warning('[APIHealthMonitor] Redis unavailable for failure count reset', [
+                'api' => $apiName,
+                'error' => $e->getMessage(),
+            ]);
+            // Silently fail when Redis is unavailable
+        }
     }
 
     /**
@@ -492,13 +528,20 @@ class APIHealthMonitorService
      */
     public function resetCircuitBreaker(string $apiName): void
     {
-        $circuitBreakerKey = self::CIRCUIT_BREAKER_KEY.$apiName;
-        Redis::del($circuitBreakerKey);
-        $this->resetFailureCount($apiName);
+        try {
+            $circuitBreakerKey = self::CIRCUIT_BREAKER_KEY.$apiName;
+            Redis::del($circuitBreakerKey);
+            $this->resetFailureCount($apiName);
 
-        Log::info('[APIHealthMonitor] Circuit breaker manually reset', [
-            'api' => $apiName,
-        ]);
+            Log::info('[APIHealthMonitor] Circuit breaker manually reset', [
+                'api' => $apiName,
+            ]);
+        } catch (\Exception $e) {
+            Log::warning('[APIHealthMonitor] Redis unavailable for circuit breaker reset', [
+                'api' => $apiName,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     /**
