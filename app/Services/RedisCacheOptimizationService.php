@@ -43,6 +43,10 @@ class RedisCacheOptimizationService
 
     /**
      * Cache data with intelligent TTL
+     *
+     * @template TCacheValue
+     * @param  \Closure(): TCacheValue  $callback
+     * @return TCacheValue
      */
     public function remember(string $key, string $strategy, \Closure $callback): mixed
     {
@@ -143,7 +147,7 @@ class RedisCacheOptimizationService
         $providers = $this->sortProvidersByPriority($providers);
 
         foreach ($providers as $key => $provider) {
-            $cacheKey = self::CACHE_PREFIX.$key;
+            $cacheKey = self::CACHE_PREFIX . $key;
 
             try {
                 // Check if already cached
@@ -274,7 +278,7 @@ class RedisCacheOptimizationService
 
         $hitRate = ($hits / $total) * 100;
 
-        return round($hitRate, 2).'%';
+        return round($hitRate, 2) . '%';
     }
 
     /**
@@ -553,7 +557,7 @@ class RedisCacheOptimizationService
         $pow = min($pow, count($units) - 1);
         $bytes /= (1 << (10 * $pow));
 
-        return round($bytes, 2).' '.$units[$pow];
+        return round($bytes, 2) . ' ' . $units[$pow];
     }
 
     /**
@@ -801,7 +805,7 @@ class RedisCacheOptimizationService
             }
 
             // Get all keys with our prefix
-            $pattern = self::CACHE_PREFIX.'*';
+            $pattern = self::CACHE_PREFIX . '*';
             $keys = Redis::connection('cache')->keys($pattern);
             $scanned = count($keys);
 
