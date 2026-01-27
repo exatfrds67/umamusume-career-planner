@@ -266,6 +266,15 @@ class User extends Authenticatable
     }
 
     /**
+     * Check if the user is an admin.
+     * Admin users have full access to all resources in the application.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->email === 'admin@umamusume.local';
+    }
+
+    /**
      * Get the user's display name with accessibility support.
      *
      * @return Attribute<string, never>

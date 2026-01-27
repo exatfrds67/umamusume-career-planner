@@ -68,7 +68,6 @@ class Factor extends Model
     {
         return [
             'character_id' => 'integer',
-            'star_level' => 'integer',
             'stat_bonus' => 'integer',
             'skill_effects' => 'array',
             'race_bonuses' => 'array',
@@ -87,5 +86,17 @@ class Factor extends Model
     public function character(): BelongsTo
     {
         return $this->belongsTo(Character::class);
+    }
+
+    /**
+     * Get the stat bonus value for blue factors
+     */
+    public function getStatBonus(): int
+    {
+        if ($this->factor_type !== 'blue_stats') {
+            return 0;
+        }
+
+        return $this->stat_bonus ?? 0;
     }
 }

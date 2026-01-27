@@ -16,12 +16,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property bool $is_active
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ *
+ * @use HasFactory<\Database\Factories\SupportDeckFactory>
  */
 class SupportDeck extends Model
 {
+    /** @use HasFactory<\Database\Factories\SupportDeckFactory> */
     use HasFactory;
 
-    protected $table = 'support_decks';
+    protected $table = 'ucp_support_decks';
 
     /**
      * @var list<string>
@@ -62,10 +65,10 @@ class SupportDeck extends Model
      */
     public function supportCards(): BelongsToMany
     {
-        return $this->belongsToMany(SupportCard::class, 'support_deck_cards', 'support_deck_id', 'support_card_id')
+        return $this->belongsToMany(SupportCard::class, 'ucp_support_deck_cards', 'support_deck_id', 'support_card_id')
             ->withPivot(['position', 'bond_level', 'is_borrowed'])
             ->withTimestamps()
-            ->orderBy('support_deck_cards.position');
+            ->orderBy('ucp_support_deck_cards.position');
     }
 
     /**

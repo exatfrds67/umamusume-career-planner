@@ -25,7 +25,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class OcrExtractedSkill extends Model
 {
-    protected $table = 'ocr_extracted_skills';
+    protected $table = 'ucp_ocr_extracted_skills';
 
     protected $fillable = [
         'ocr_extraction_id',
