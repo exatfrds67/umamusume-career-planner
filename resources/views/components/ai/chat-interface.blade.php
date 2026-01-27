@@ -136,6 +136,26 @@
                                                 class="text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300"
                                                 x-text="msg.metadata.model"></span>
                                         </template>
+                                        <template x-if="msg.sender === 'ai' && msg.metadata?.provider">
+                                            <span
+                                                class="text-xs px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300"
+                                                x-text="msg.metadata.provider"></span>
+                                        </template>
+                                        <template x-if="msg.sender === 'ai' && msg.metadata?.agent">
+                                            <span
+                                                class="text-xs px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300"
+                                                x-text="msg.metadata.agent"></span>
+                                        </template>
+                                        <template x-if="msg.sender === 'ai' && msg.metadata?.rag_enhanced">
+                                            <span
+                                                class="text-xs px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 flex items-center gap-1"
+                                                title="Enhanced with game knowledge">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                                </svg>
+                                                Knowledge
+                                            </span>
+                                        </template>
                                     </div>
                                     <time class="text-xs opacity-75" :datetime="msg.timestamp"
                                         x-text="formatTime(msg.timestamp)"></time>
@@ -149,8 +169,8 @@
                                 {{-- AI Message Metadata --}}
                                 <template x-if="msg.sender === 'ai' && msg.metadata">
                                     <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
-                                        <template x-if="msg.metadata.processing_time">
-                                            <div class="flex items-center gap-3 text-xs opacity-75">
+                                        <div class="flex flex-wrap items-center gap-3 text-xs opacity-75">
+                                            <template x-if="msg.metadata.processing_time">
                                                 <span>
                                                     <svg class="w-3 h-3 inline mr-1" fill="none"
                                                         stroke="currentColor" viewBox="0 0 24 24">
@@ -160,8 +180,49 @@
                                                     </svg>
                                                     <span x-text="`${msg.metadata.processing_time}s`"></span>
                                                 </span>
+                                            </template>
+                                            <template x-if="msg.metadata.confidence !== null && msg.metadata.confidence !== undefined">
+                                                <span>
+                                                    <svg class="w-3 h-3 inline mr-1" fill="none"
+                                                        stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                                    </svg>
+                                                    <span x-text="`Confidence ${Math.round(msg.metadata.confidence * 100)}%`"></span>
+                                                </span>
+                                            </template>
+                                            <template x-if="msg.metadata.cost !== null && msg.metadata.cost !== undefined">
+                                                <span>
+                                                    <svg class="w-3 h-3 inline mr-1" fill="none"
+                                                        stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                    <span x-text="`$${Number(msg.metadata.cost).toFixed(4)}`"></span>
+                                                </span>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </template>
+
+                                {{-- Knowledge Sources (RAG Attribution) --}}
+                                <template x-if="msg.sender === 'ai' && msg.metadata?.knowledge_sources && msg.metadata.knowledge_sources.length > 0">
+                                    <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+                                        <div class="text-xs text-gray-600 dark:text-gray-400 flex items-start gap-2">
+                                            <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                            </svg>
+                                            <div class="flex-1">
+                                                <div class="font-medium mb-1">Knowledge sources used:</div>
+                                                <div class="flex flex-wrap gap-1">
+                                                    <template x-for="source in msg.metadata.knowledge_sources" :key="source">
+                                                        <span class="px-2 py-0.5 rounded bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 text-xs" x-text="source"></span>
+                                                    </template>
+                                                </div>
                                             </div>
-                                        </template>
+                                        </div>
                                     </div>
                                 </template>
 

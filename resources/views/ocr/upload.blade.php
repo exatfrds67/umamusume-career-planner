@@ -33,22 +33,46 @@
             <!-- Character Selection -->
             <div
                 class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
-                <label for="character-select" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Select Character
-                </label>
-                <select id="character-select"
-                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
-                    aria-label="Select character for OCR data import">
-                    <option value="">-- Select a character --</option>
-                    @foreach ($characters as $character)
-                        <option value="{{ $character->id }}">
-                            {{ $character->name }} ({{ ucfirst($character->scenario_type) }})
-                        </option>
-                    @endforeach
-                </select>
-                <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                    Select the character to import extracted data into.
-                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="character-select" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Select Character
+                        </label>
+                        <select id="character-select"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
+                            aria-label="Select character for OCR data import">
+                            <option value="">-- Select a character --</option>
+                            @foreach ($characters as $character)
+                                <option value="{{ $character->id }}">
+                                    {{ $character->name }} ({{ ucfirst($character->scenario_type) }})
+                                </option>
+                            @endforeach
+                        </select>
+                        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                            Select the character to import extracted data into.
+                        </p>
+                    </div>
+                    
+                    <!-- Data Type Selector (per OCR spec requirement) -->
+                    <div>
+                        <label for="data-type-select" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Data Type
+                        </label>
+                        <select id="data-type-select"
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
+                            aria-label="Select type of data to extract from screenshot">
+                            <option value="auto">Auto-detect</option>
+                            <option value="character_stats">Character Stats</option>
+                            <option value="training_session">Training Session</option>
+                            <option value="race_result">Race Result</option>
+                            <option value="skill_list">Skill List</option>
+                            <option value="support_card">Support Card Info</option>
+                        </select>
+                        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                            Choose the type of data to extract, or use auto-detect.
+                        </p>
+                    </div>
+                </div>
             </div>
 
             <!-- Upload Area -->

@@ -46,7 +46,7 @@
             <form method="GET" action="{{ route('support-cards.index') }}" class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
                     <!-- Search -->
-                    <div class="md:col-span-4">
+                    <div class="md:col-span-3">
                         <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                             Search
                         </label>
@@ -81,13 +81,13 @@
                     </div>
 
                     <!-- Rarity -->
-                    <div class="md:col-span-2">
+                    <div class="md:col-span-1">
                         <label for="rarity" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                             Rarity
                         </label>
                         <select id="rarity" name="rarity"
                             class="form-select block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                            <option value="">All Rarities</option>
+                            <option value="">All</option>
                             @foreach ($rarities as $rarity)
                                 <option value="{{ $rarity }}" {{ request('rarity') === $rarity ? 'selected' : '' }}>
                                     {{ $rarity }}
@@ -97,18 +97,64 @@
                     </div>
 
                     <!-- Meta Tier -->
-                    <div class="md:col-span-2">
+                    <div class="md:col-span-1">
                         <label for="tier" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Meta Tier
+                            Tier
                         </label>
                         <select id="tier" name="tier"
                             class="form-select block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                            <option value="">All Tiers</option>
+                            <option value="">All</option>
                             @foreach ($tiers as $tier)
                                 <option value="{{ $tier }}" {{ request('tier') === $tier ? 'selected' : '' }}>
                                     {{ $tier }}
                                 </option>
                             @endforeach
+                        </select>
+                    </div>
+                    
+                    <!-- Bond Level (WF-010 requirement) -->
+                    <div class="md:col-span-1">
+                        <label for="bond_level" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Bond
+                        </label>
+                        <select id="bond_level" name="bond_level"
+                            class="form-select block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                            <option value="">Any</option>
+                            <option value="100" {{ request('bond_level') === '100' ? 'selected' : '' }}>100</option>
+                            <option value="80" {{ request('bond_level') === '80' ? 'selected' : '' }}>80+</option>
+                            <option value="50" {{ request('bond_level') === '50' ? 'selected' : '' }}>50+</option>
+                            <option value="low" {{ request('bond_level') === 'low' ? 'selected' : '' }}>&lt;50</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Limit Break (WF-010 requirement) -->
+                    <div class="md:col-span-1">
+                        <label for="limit_break" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            LB
+                        </label>
+                        <select id="limit_break" name="limit_break"
+                            class="form-select block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                            <option value="">Any</option>
+                            <option value="4" {{ request('limit_break') === '4' ? 'selected' : '' }}>4★</option>
+                            <option value="3" {{ request('limit_break') === '3' ? 'selected' : '' }}>3★</option>
+                            <option value="2" {{ request('limit_break') === '2' ? 'selected' : '' }}>2★</option>
+                            <option value="1" {{ request('limit_break') === '1' ? 'selected' : '' }}>1★</option>
+                            <option value="0" {{ request('limit_break') === '0' ? 'selected' : '' }}>0★</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Sort (WF-010 requirement) -->
+                    <div class="md:col-span-1">
+                        <label for="sort" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Sort
+                        </label>
+                        <select id="sort" name="sort"
+                            class="form-select block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                            <option value="name" {{ request('sort', 'name') === 'name' ? 'selected' : '' }}>Name</option>
+                            <option value="rarity" {{ request('sort') === 'rarity' ? 'selected' : '' }}>Rarity</option>
+                            <option value="tier" {{ request('sort') === 'tier' ? 'selected' : '' }}>Tier</option>
+                            <option value="type" {{ request('sort') === 'type' ? 'selected' : '' }}>Type</option>
+                            <option value="recent" {{ request('sort') === 'recent' ? 'selected' : '' }}>Recent</option>
                         </select>
                     </div>
 
@@ -121,7 +167,7 @@
                             </svg>
                             Filter
                         </button>
-                        @if (request()->anyFilled(['search', 'type', 'rarity', 'tier']))
+                        @if (request()->anyFilled(['search', 'type', 'rarity', 'tier', 'bond_level', 'limit_break', 'sort']))
                             <a href="{{ route('support-cards.index') }}" class="btn btn-outline px-3"
                                 title="Clear Filters">
                                 <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -133,6 +179,49 @@
                     </div>
                 </div>
             </form>
+        </div>
+        
+        <!-- Collection Stats Widget (WF-010 requirement) -->
+        <div class="card bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div class="flex items-center gap-6">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-primary-600 dark:text-primary-400">{{ $cards->total() }}</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">Total Cards</div>
+                    </div>
+                    <div class="h-8 border-l border-gray-200 dark:border-gray-600"></div>
+                    <div class="flex gap-4">
+                        @php
+                            $rarityCounts = $cards->getCollection()->groupBy(fn($c) => $c->rarity)->map->count();
+                        @endphp
+                        @foreach (['SSR' => 'text-yellow-500', 'SR' => 'text-purple-500', 'R' => 'text-blue-500'] as $r => $color)
+                            <div class="text-center">
+                                <div class="text-lg font-semibold {{ $color }}">{{ $rarityCounts->get($r, 0) }}</div>
+                                <div class="text-xs text-gray-500 dark:text-gray-400">{{ $r }}</div>
+                            </div>
+                        @endforeach
+                    </div>
+                    <div class="h-8 border-l border-gray-200 dark:border-gray-600"></div>
+                    <div class="flex gap-3 text-xs">
+                        @php
+                            $typeCounts = $cards->getCollection()->groupBy(fn($c) => $c->card_type)->map->count();
+                        @endphp
+                        @foreach ($typeCounts as $type => $count)
+                            <span class="px-2 py-1 rounded bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+                                {{ ucfirst($type) }}: {{ $count }}
+                            </span>
+                        @endforeach
+                    </div>
+                </div>
+                @if(auth()->check())
+                <a href="{{ route('support-cards.deck-builder') }}" class="btn btn-primary flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Build Deck
+                </a>
+                @endif
+            </div>
         </div>
 
         <!-- Cards Grid -->

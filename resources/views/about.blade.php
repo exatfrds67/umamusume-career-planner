@@ -4,7 +4,7 @@
 
 @section('content')
     {{-- Hero Section --}}
-    <section class="py-16 md:py-24 bg-gradient-to-br from-primary-50 to-primary-100 dark:from-gray-800 dark:to-gray-900"
+    <section class="py-16 md:py-24 bg-linear-to-br from-primary-50 to-primary-100 dark:from-gray-800 dark:to-gray-900"
         aria-labelledby="about-heading">
         <div class="container mx-auto px-4 text-center">
             <h1 id="about-heading" class="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6">

@@ -3,11 +3,11 @@
 @section('title', 'Performance Dashboard - APM')
 
 @section('content')
-    <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
+    <div class="min-h-screen bg-gray-100 dark:bg-gray-900" x-data="apmDashboard()">
         {{-- Header --}}
         <header class="bg-white dark:bg-gray-800 shadow">
             <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                <div class="flex items-center justify-between">
+                <div class="flex items-center justify-between flex-wrap gap-4">
                     <div>
                         <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
                             Performance Dashboard
@@ -16,17 +16,61 @@
                             Real-time application performance monitoring
                         </p>
                     </div>
-                    <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-4 flex-wrap">
+                        <!-- Time Window Selector (SPEC-008) -->
+                        <div class="flex items-center gap-2">
+                            <label for="time-window" class="text-sm text-gray-500 dark:text-gray-400">Window:</label>
+                            <select id="time-window" x-model="timeWindow" @change="refreshDashboard()"
+                                class="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
+                                <option value="5m">5 min</option>
+                                <option value="15m">15 min</option>
+                                <option value="1h">1 hour</option>
+                                <option value="6h">6 hours</option>
+                                <option value="24h">24 hours</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Live Polling Toggle (SPEC-008) -->
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm text-gray-500 dark:text-gray-400">Live:</span>
+                            <button @click="togglePolling()" 
+                                :class="isPolling ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'"
+                                class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                role="switch" :aria-checked="isPolling">
+                                <span :class="isPolling ? 'translate-x-5' : 'translate-x-0'"
+                                    class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+                            </button>
+                            <span x-show="isPolling" class="text-xs text-green-500 flex items-center gap-1">
+                                <span class="relative flex h-2 w-2">
+                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                                </span>
+                                <span x-text="pollInterval/1000 + 's'"></span>
+                            </span>
+                        </div>
+                        
+                        <!-- Polling Interval Selector -->
+                        <div x-show="isPolling" class="flex items-center gap-2">
+                            <label for="poll-interval" class="text-sm text-gray-500 dark:text-gray-400">Interval:</label>
+                            <select id="poll-interval" x-model.number="pollInterval" @change="restartPolling()"
+                                class="px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
+                                <option value="5000">5s</option>
+                                <option value="10000">10s</option>
+                                <option value="30000">30s</option>
+                                <option value="60000">60s</option>
+                            </select>
+                        </div>
+                        
                         <span class="text-sm text-gray-500 dark:text-gray-400">
-                            Last updated: <span id="last-updated">{{ now()->format('H:i:s') }}</span>
+                            Last updated: <span id="last-updated" x-text="lastUpdated">{{ now()->format('H:i:s') }}</span>
                         </span>
-                        <button onclick="refreshDashboard()"
-                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <button @click="refreshDashboard()" :disabled="isLoading"
+                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50">
+                            <svg class="w-4 h-4 mr-2" :class="{ 'animate-spin': isLoading }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                             </svg>
-                            Refresh
+                            <span x-text="isLoading ? 'Refreshing...' : 'Refresh'"></span>
                         </button>
                     </div>
                 </div>
@@ -425,17 +469,154 @@
 
     @push('scripts')
         <script>
-            function refreshDashboard() {
-                window.location.reload();
+            function apmDashboard() {
+                return {
+                    isPolling: false,
+                    pollInterval: 10000,
+                    pollTimer: null,
+                    isLoading: false,
+                    lastUpdated: '{{ now()->format('H:i:s') }}',
+                    timeWindow: '15m',
+                    
+                    init() {
+                        // Update clock every second
+                        setInterval(() => {
+                            if (!this.isLoading) {
+                                // Only update if not actively refreshing
+                            }
+                        }, 1000);
+                        
+                        // Restore polling state from localStorage
+                        const savedPolling = localStorage.getItem('apm_polling');
+                        const savedInterval = localStorage.getItem('apm_poll_interval');
+                        const savedWindow = localStorage.getItem('apm_time_window');
+                        
+                        if (savedPolling === 'true') {
+                            this.isPolling = true;
+                        }
+                        if (savedInterval) {
+                            this.pollInterval = parseInt(savedInterval);
+                        }
+                        if (savedWindow) {
+                            this.timeWindow = savedWindow;
+                        }
+                        
+                        // Start polling if was enabled
+                        if (this.isPolling) {
+                            this.startPolling();
+                        }
+                    },
+                    
+                    togglePolling() {
+                        this.isPolling = !this.isPolling;
+                        localStorage.setItem('apm_polling', this.isPolling);
+                        
+                        if (this.isPolling) {
+                            this.startPolling();
+                        } else {
+                            this.stopPolling();
+                        }
+                    },
+                    
+                    startPolling() {
+                        this.stopPolling(); // Clear any existing timer
+                        this.pollTimer = setInterval(() => {
+                            this.refreshDashboard();
+                        }, this.pollInterval);
+                    },
+                    
+                    stopPolling() {
+                        if (this.pollTimer) {
+                            clearInterval(this.pollTimer);
+                            this.pollTimer = null;
+                        }
+                    },
+                    
+                    restartPolling() {
+                        localStorage.setItem('apm_poll_interval', this.pollInterval);
+                        if (this.isPolling) {
+                            this.startPolling();
+                        }
+                    },
+                    
+                    async refreshDashboard() {
+                        if (this.isLoading) return;
+                        
+                        this.isLoading = true;
+                        localStorage.setItem('apm_time_window', this.timeWindow);
+                        
+                        try {
+                            const response = await fetch(`/api/performance/apm/dashboard?window=${this.timeWindow}`, {
+                                headers: {
+                                    'Accept': 'application/json',
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                }
+                            });
+                            
+                            if (!response.ok) throw new Error('Failed to fetch');
+                            
+                            const data = await response.json();
+                            
+                            // Update health score
+                            this.updateHealthScore(data.health_score);
+                            
+                            // Update last updated time
+                            this.lastUpdated = new Date().toLocaleTimeString();
+                            
+                            // Dispatch event for other components to react
+                            window.dispatchEvent(new CustomEvent('apm-refresh', { detail: data }));
+                            
+                        } catch (error) {
+                            console.error('APM refresh error:', error);
+                            window.dispatchEvent(new CustomEvent('toast', {
+                                detail: { type: 'error', message: 'Failed to refresh dashboard data' }
+                            }));
+                        } finally {
+                            this.isLoading = false;
+                        }
+                    },
+                    
+                    updateHealthScore(healthScore) {
+                        if (!healthScore) return;
+                        
+                        const scoreEl = document.getElementById('health-score');
+                        const statusEl = document.getElementById('health-status');
+                        
+                        if (scoreEl) {
+                            scoreEl.textContent = healthScore.score;
+                            scoreEl.className = `text-5xl font-bold ${this.getStatusColor(healthScore.status)}`;
+                        }
+                        
+                        if (statusEl) {
+                            statusEl.textContent = healthScore.status;
+                            statusEl.className = `text-sm font-medium uppercase ${this.getStatusColor(healthScore.status)}`;
+                        }
+                    },
+                    
+                    getStatusColor(status) {
+                        switch (status) {
+                            case 'excellent': return 'text-green-500';
+                            case 'good': return 'text-blue-500';
+                            case 'fair': return 'text-yellow-500';
+                            default: return 'text-red-500';
+                        }
+                    },
+                    
+                    destroy() {
+                        this.stopPolling();
+                    }
+                };
             }
-
-            // Auto-refresh every 30 seconds
-            setInterval(function() {
-                document.getElementById('last-updated').textContent = new Date().toLocaleTimeString();
-            }, 1000);
-
-            // Optional: Auto-refresh dashboard data
-            // setInterval(refreshDashboard, 30000);
+            
+            // Legacy support for non-Alpine refresh button
+            window.refreshDashboard = function() {
+                const alpineComponent = document.querySelector('[x-data="apmDashboard()"]');
+                if (alpineComponent && alpineComponent.__x) {
+                    alpineComponent.__x.$data.refreshDashboard();
+                } else {
+                    window.location.reload();
+                }
+            };
         </script>
     @endpush
 @endsection

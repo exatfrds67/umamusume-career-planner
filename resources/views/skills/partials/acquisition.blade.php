@@ -1,7 +1,7 @@
 {{-- Skill Acquisition Tab --}}
 <div class="space-y-6">
     {{-- AI Recommendations Card --}}
-    <div class="card bg-gradient-to-br from-purple-500 to-purple-600 text-white">
+    <div class="card bg-linear-to-br from-purple-500 to-purple-600 text-white">
         <div class="card-body">
             <div class="flex items-start gap-4">
                 <div class="shrink-0">

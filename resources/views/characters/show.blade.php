@@ -58,27 +58,33 @@
                 <div class="flex flex-col md:flex-row gap-8 items-start relative">
                     <!-- Avatar -->
                     <div class="shrink-0 relative">
-                        @php
-                            $normalizedName = strtolower(str_replace(' ', '-', $character->name));
-                            $availableAvatars = [
-                                'agnes-tachyon',
-                                'gold-ship',
-                                'narita-brian',
-                                'tokai-teio',
-                                'vodka',
-                                'daiwa-scarlet',
-                                'el-condor-pasa',
-                                'haru-urara',
-                                'maruzensky',
-                                'oguri-cap',
-                            ];
-                            $avatarClass = in_array($normalizedName, $availableAvatars)
-                                ? "character-avatar-{$normalizedName}"
-                                : 'character-avatar-default';
-                        @endphp
-                        <div class="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white dark:border-gray-800 shadow-xl bg-cover bg-center bg-linear-to-br {{ $avatarClass }}"
-                            aria-label="{{ $character->name }} avatar" role="img">
-                        </div>
+                        @if ($character->avatar_url)
+                            <img src="{{ $character->avatar_url }}" alt="{{ $character->name }}"
+                                class="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white dark:border-gray-800 shadow-xl object-cover"
+                                loading="lazy" decoding="async">
+                        @else
+                            @php
+                                $normalizedName = strtolower(str_replace(' ', '-', $character->name));
+                                $availableAvatars = [
+                                    'agnes-tachyon',
+                                    'gold-ship',
+                                    'narita-brian',
+                                    'tokai-teio',
+                                    'vodka',
+                                    'daiwa-scarlet',
+                                    'el-condor-pasa',
+                                    'haru-urara',
+                                    'maruzensky',
+                                    'oguri-cap',
+                                ];
+                                $avatarClass = in_array($normalizedName, $availableAvatars)
+                                    ? "character-avatar-{$normalizedName}"
+                                    : 'character-avatar-default';
+                            @endphp
+                            <div class="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white dark:border-gray-800 shadow-xl bg-cover bg-center bg-linear-to-br {{ $avatarClass }}"
+                                aria-label="{{ $character->name }} avatar" role="img">
+                            </div>
+                        @endif
                         <span class="absolute bottom-2 right-2 flex h-5 w-5">
                             <span
                                 class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
@@ -336,7 +342,7 @@
                 --}}
             </div>
 
-            <!-- Right Column: Aptitudes & Skills -->
+            <!-- Right Column: Aptitudes -->
             <div class="space-y-6">
                 <!-- Aptitudes -->
                 <div class="glass-card-alt rounded-lg">
@@ -382,144 +388,272 @@
                         @endif
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <!-- Skills -->
-                <div class="glass-card-alt rounded-lg">
-                    <div class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50">
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Skills</h3>
-                    </div>
-                    <div class="p-2">
-                        @if ($character->skills->count() > 0)
-                            <div class="space-y-1">
-                                @foreach ($character->skills->take(10) as $skill)
-                                    <div
-                                        class="flex items-center justify-between p-2.5 rounded hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                                        <div class="flex items-center gap-2">
-                                            <div class="w-1.5 h-1.5 rounded-full bg-yellow-400"></div>
-                                            <span
-                                                class="text-sm font-medium text-gray-700 dark:text-gray-200">{{ $skill->skill_name }}</span>
-                                        </div>
-                                        @if ($skill->pivot && $skill->pivot->sp_cost)
-                                            <span
-                                                class="text-xs font-mono text-gray-400">{{ $skill->pivot->sp_cost }}pt</span>
-                                        @endif
-                                    </div>
-                                @endforeach
-                            </div>
-                        @else
-                            <div class="text-center text-sm text-gray-500 py-8">
-                                No skills acquired yet.
-                            </div>
-                        @endif
-                    </div>
+        <!-- Skills, Support Deck, and Inherited Factors Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Skills -->
+            <div class="glass-card-alt rounded-lg">
+                <div class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50">
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Skills</h3>
                 </div>
+                <div class="p-2">
+                    @if ($character->skills->count() > 0)
+                        <div class="space-y-1">
+                            @foreach ($character->skills->take(10) as $skill)
+                                <div
+                                    class="flex items-center justify-between p-2.5 rounded hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-1.5 h-1.5 rounded-full bg-yellow-400"></div>
+                                        <span
+                                            class="text-sm font-medium text-gray-700 dark:text-gray-200">{{ $skill->name }}</span>
+                                    </div>
+                                    @if ($skill->pivot && $skill->pivot->final_sp_cost)
+                                        <span
+                                            class="text-xs font-mono text-gray-400">{{ $skill->pivot->final_sp_cost }}pt</span>
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="text-center text-sm text-gray-500 py-8">
+                            No skills acquired yet.
+                        </div>
+                    @endif
+                </div>
+            </div>
 
-                <!-- Support Deck -->
-                <div class="glass-card-alt rounded-lg">
-                    <div class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50">
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Support Deck</h3>
-                    </div>
-                    <div class="card-body">
-                        @if ($character->supportCards->count() > 0)
-                            <div class="space-y-3">
-                                @foreach ($character->supportCards as $supportCard)
-                                    @php
-                                        $card = $supportCard->supportCardDefinition;
-                                        $bondLevel = $supportCard->bond_level ?? 0;
-                                        $bondMax = 100;
-                                        $bondPercentage = ($bondLevel / $bondMax) * 100;
-                                    @endphp
+            <!-- Support Deck -->
+            <div class="glass-card-alt rounded-lg">
+                <div
+                    class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between">
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Support Deck</h3>
+                    <a href="{{ route('characters.deck-builder', $character) }}" class="btn btn-sm btn-primary">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Manage Deck
+                    </a>
+                </div>
+                <div class="card-body">
+                    @if ($character->supportCards->count() > 0)
+                        <div class="space-y-3">
+                            @foreach ($character->supportCards as $supportCard)
+                                @php
+                                    $card = $supportCard->supportCard;
+                                    $bondLevel = $supportCard->friendship_level ?? 0;
+                                    $bondMax = 100;
+                                    $bondPercentage = ($bondLevel / $bondMax) * 100;
+                                @endphp
+                                <div
+                                    class="flex items-center gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700">
                                     <div
-                                        class="flex items-center gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700">
-                                        <div
-                                            class="shrink-0 w-10 h-10 rounded-full bg-linear-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-sm">
-                                            {{ strtoupper(substr($card->card_type ?? 'S', 0, 1)) }}
-                                        </div>
-                                        <div class="flex-1 min-w-0">
-                                            <div class="text-sm font-medium text-gray-900 dark:text-white truncate">
-                                                {{ $card->name ?? 'Unknown Card' }}</div>
-                                            <div class="flex items-center gap-2 mt-1">
-                                                <div
-                                                    class="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                                                    <div class="h-full bg-primary-500 rounded-full transition-all"
-                                                        @style(['width' => $bondPercentage . '%'])></div>
-                                                </div>
-                                                <span
-                                                    class="text-xs text-gray-500 dark:text-gray-400 tabular-nums">{{ $bondLevel }}</span>
+                                        class="shrink-0 w-10 h-10 rounded-full bg-linear-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-sm">
+                                        {{ strtoupper(substr($card->card_type ?? 'S', 0, 1)) }}
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                            {{ $card->name ?? 'Unknown Card' }}</div>
+                                        <div class="flex items-center gap-2 mt-1">
+                                            <div
+                                                class="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                                <div class="h-full bg-primary-500 rounded-full transition-all"
+                                                    @style(['width' => $bondPercentage . '%'])></div>
                                             </div>
+                                            <span
+                                                class="text-xs text-gray-500 dark:text-gray-400 tabular-nums">{{ $bondLevel }}</span>
                                         </div>
                                     </div>
-                                @endforeach
-                            </div>
-                        @else
-                            <div class="text-center text-sm text-gray-500 py-8">
-                                <svg class="mx-auto h-10 w-10 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="text-center text-sm text-gray-500 py-8">
+                            <svg class="mx-auto h-10 w-10 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                            </svg>
+                            <p class="mb-3">No support cards equipped.</p>
+                            <a href="{{ route('characters.deck-builder', $character) }}"
+                                class="inline-flex items-center text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                        d="M12 4v16m8-8H4" />
                                 </svg>
-                                No support cards equipped.
-                            </div>
-                        @endif
-                    </div>
+                                Add Support Cards
+                            </a>
+                        </div>
+                    @endif
                 </div>
+            </div>
 
-                <!-- Inherited Factors -->
-                <div class="glass-card-alt rounded-lg">
-                    <div class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50">
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Inherited Factors</h3>
-                    </div>
-                    <div class="card-body">
+            <!-- Inherited Factors -->
+            <div class="glass-card-alt rounded-lg">
+                <div
+                    class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between">
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Inherited Factors</h3>
+                    @can('update', $character)
+                        <a href="{{ route('characters.factors.manage', $character) }}"
+                            class="text-xs text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium">
+                            Manage
+                        </a>
+                    @endcan
+                </div>
+                <div class="card-body">
+                    @if ($character->factors->count() > 0)
                         @php
-                            $inheritedFactors = $character->inherited_factors ?? [];
-                            $legacyParents = $character->legacy_parents ?? [];
+                            $factorsByType = $character->factors->groupBy('factor_type');
+                            $factorTypeLabels = [
+                                'blue_stats' => 'Stat Bonuses',
+                                'red_aptitudes' => 'Aptitude Upgrades',
+                                'green_unique_skills' => 'Unique Skills',
+                                'white_normal_skills' => 'Normal Skills',
+                            ];
+                            $factorTypeColors = [
+                                'blue_stats' => 'text-blue-600 dark:text-blue-400',
+                                'red_aptitudes' => 'text-red-600 dark:text-red-400',
+                                'green_unique_skills' => 'text-green-600 dark:text-green-400',
+                                'white_normal_skills' => 'text-gray-600 dark:text-gray-400',
+                            ];
                         @endphp
-                        @if (!empty($legacyParents) && is_array($legacyParents))
-                            <div class="space-y-3 mb-4">
-                                <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Parents</h4>
-                                @foreach ($legacyParents as $parent)
-                                    @php
-                                        $parentName = is_array($parent) ? $parent['name'] ?? 'Unknown' : $parent;
-                                    @endphp
-                                    <div class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-                                        <svg class="w-4 h-4 text-primary-500" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd"
-                                                d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                                                clip-rule="evenodd" />
-                                        </svg>
-                                        <span>{{ $parentName }}</span>
-                                    </div>
-                                @endforeach
-                            </div>
-                        @endif
 
-                        @if (!empty($inheritedFactors) && is_array($inheritedFactors))
-                            <div class="space-y-2">
-                                <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Factor Bonuses
-                                </h4>
-                                <div class="grid grid-cols-2 gap-2">
-                                    @foreach ($inheritedFactors as $factor => $value)
+                        <div class="space-y-4">
+                            @foreach ($factorsByType as $type => $factors)
+                                <div>
+                                    <h4
+                                        class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-2">
                                         <div
-                                            class="flex items-center justify-between p-2 rounded bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
-                                            <span
-                                                class="text-xs text-gray-600 dark:text-gray-400">{{ ucfirst(str_replace('_', ' ', $factor)) }}</span>
-                                            <span
-                                                class="text-xs font-bold text-primary-600 dark:text-primary-400">+{{ $value }}</span>
+                                            class="w-2 h-2 rounded-full bg-{{ str_replace('_stats', '', str_replace('_aptitudes', '', str_replace('_unique_skills', '', str_replace('_normal_skills', '', $type)))) }}-500">
                                         </div>
-                                    @endforeach
+                                        {{ $factorTypeLabels[$type] ?? ucfirst($type) }}
+                                        <span class="text-gray-400">({{ $factors->count() }})</span>
+                                    </h4>
+                                    <div class="space-y-2">
+                                        @foreach ($factors as $factor)
+                                            <div
+                                                class="flex items-center justify-between p-2.5 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 {{ !$factor->is_active ? 'opacity-50' : '' }}">
+                                                <div class="flex items-center gap-2">
+                                                    <!-- Star Level -->
+                                                    <div class="flex items-center">
+                                                        @for ($i = 1; $i <= 3; $i++)
+                                                            <svg class="w-3 h-3 {{ $i <= (int) str_replace('_star', '', $factor->star_level) ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600' }}"
+                                                                fill="currentColor" viewBox="0 0 20 20">
+                                                                <path
+                                                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                            </svg>
+                                                        @endfor
+                                                    </div>
+
+                                                    <!-- Factor Name -->
+                                                    <span class="text-sm font-medium text-gray-900 dark:text-white">
+                                                        {{ $factor->factor_name }}
+                                                    </span>
+                                                </div>
+
+                                                <div class="flex items-center gap-2">
+                                                    <!-- Factor Value/Bonus -->
+                                                    @if ($factor->factor_type === 'blue_stats')
+                                                        <span class="text-xs font-bold text-blue-600 dark:text-blue-400">
+                                                            +{{ $factor->getStatBonus() }}
+                                                        </span>
+                                                    @elseif ($factor->factor_type === 'red_aptitudes')
+                                                        <span class="text-xs font-bold text-red-600 dark:text-red-400">
+                                                            +{{ (int) str_replace('_star', '', $factor->star_level) }}
+                                                            grade{{ (int) str_replace('_star', '', $factor->star_level) > 1 ? 's' : '' }}
+                                                        </span>
+                                                    @else
+                                                        <span
+                                                            class="text-xs font-bold {{ $factorTypeColors[$factor->factor_type] ?? 'text-gray-600 dark:text-gray-400' }}">
+                                                            {{ (int) str_replace('_star', '', $factor->star_level) }}★
+                                                        </span>
+                                                    @endif
+
+                                                    <!-- Active Status -->
+                                                    @if (!$factor->is_active)
+                                                        <span
+                                                            class="text-xs text-gray-400 bg-gray-200 dark:bg-gray-700 px-1.5 py-0.5 rounded">
+                                                            Inactive
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <!-- Factor Summary -->
+                        @php
+                            $activeFactors = $character->factors->where('is_active', true);
+                            $totalStatBonuses = $activeFactors
+                                ->where('factor_type', 'blue_stats')
+                                ->sum(function ($factor) {
+                                    return $factor->getStatBonus();
+                                });
+                            $totalAptitudeUpgrades = $activeFactors
+                                ->where('factor_type', 'red_aptitudes')
+                                ->sum(function ($factor) {
+                                    return (int) str_replace('_star', '', $factor->star_level);
+                                });
+                            $uniqueSkills = $activeFactors->where('factor_type', 'green_unique_skills')->count();
+                            $normalSkills = $activeFactors->where('factor_type', 'white_normal_skills')->count();
+                        @endphp
+
+                        @if ($activeFactors->count() > 0)
+                            <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                                <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Active
+                                    Bonuses</h4>
+                                <div class="grid grid-cols-2 gap-2 text-xs">
+                                    @if ($totalStatBonuses > 0)
+                                        <div class="flex justify-between p-2 bg-blue-50 dark:bg-blue-900/20 rounded">
+                                            <span class="text-blue-700 dark:text-blue-300">Total Stat Bonus</span>
+                                            <span
+                                                class="font-bold text-blue-800 dark:text-blue-200">+{{ $totalStatBonuses }}</span>
+                                        </div>
+                                    @endif
+                                    @if ($totalAptitudeUpgrades > 0)
+                                        <div class="flex justify-between p-2 bg-red-50 dark:bg-red-900/20 rounded">
+                                            <span class="text-red-700 dark:text-red-300">Aptitude Upgrades</span>
+                                            <span
+                                                class="font-bold text-red-800 dark:text-red-200">+{{ $totalAptitudeUpgrades }}</span>
+                                        </div>
+                                    @endif
+                                    @if ($uniqueSkills > 0)
+                                        <div class="flex justify-between p-2 bg-green-50 dark:bg-green-900/20 rounded">
+                                            <span class="text-green-700 dark:text-green-300">Unique Skills</span>
+                                            <span
+                                                class="font-bold text-green-800 dark:text-green-200">{{ $uniqueSkills }}</span>
+                                        </div>
+                                    @endif
+                                    @if ($normalSkills > 0)
+                                        <div class="flex justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded">
+                                            <span class="text-gray-700 dark:text-gray-300">Normal Skills</span>
+                                            <span
+                                                class="font-bold text-gray-800 dark:text-gray-200">{{ $normalSkills }}</span>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
-                        @else
-                            <div class="text-center text-sm text-gray-500 py-8">
-                                <svg class="mx-auto h-10 w-10 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                                </svg>
-                                No inherited factors.
-                            </div>
                         @endif
-                    </div>
+                    @else
+                        <div class="text-center text-sm text-gray-500 py-8">
+                            <svg class="mx-auto h-10 w-10 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                            <p class="mb-2">No inherited factors.</p>
+                            @can('update', $character)
+                                <a href="{{ route('characters.factors.manage', $character) }}"
+                                    class="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 text-sm font-medium">
+                                    Add Factors
+                                </a>
+                            @endcan
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

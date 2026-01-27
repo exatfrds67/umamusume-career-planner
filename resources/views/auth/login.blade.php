@@ -60,22 +60,20 @@
                             <input id="email" name="email" type="email" autocomplete="email" required
                                 value="{{ old('email') }}"
                                 class="appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm bg-white dark:bg-gray-800"
-                                placeholder="you@example.com">
+                                placeholder="Enter your email address">
                         </div>
 
                         <div>
-                            <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Password
-                            </label>
-                            <input id="password" name="password" type="password" autocomplete="current-password" required
-                                class="appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm bg-white dark:bg-gray-800"
-                                placeholder="••••••••">
+                            <x-password-input id="password" name="password" label="Password"
+                                autocomplete="current-password" placeholder="••••••••" required />
                         </div>
                     </div>
 
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
-                            <input id="remember" name="remember" type="checkbox"
+                            <input type="hidden" name="remember" value="0">
+                            <input id="remember" name="remember" type="checkbox" value="1"
+                                {{ old('remember') ? 'checked' : '' }}
                                 class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-600 rounded">
                             <label for="remember" class="ml-2 block text-sm text-gray-900 dark:text-gray-300">
                                 Remember me

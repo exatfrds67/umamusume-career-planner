@@ -155,10 +155,16 @@
                         <div class="p-5">
                             <div class="flex items-start justify-between mb-4">
                                 <div class="flex items-center gap-3">
-                                    <div
-                                        class="h-12 w-12 rounded-full bg-linear-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white text-lg font-bold shadow-sm ring-2 ring-white dark:ring-gray-800">
-                                        {{ strtoupper(substr($character->name, 0, 2)) }}
-                                    </div>
+                                    @if ($character->avatar_url)
+                                        <img src="{{ $character->avatar_url }}" alt="{{ $character->name }}"
+                                            class="h-12 w-12 rounded-full object-cover shadow-sm ring-2 ring-white dark:ring-gray-800"
+                                            loading="lazy" decoding="async">
+                                    @else
+                                        <div
+                                            class="h-12 w-12 rounded-full bg-linear-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white text-lg font-bold shadow-sm ring-2 ring-white dark:ring-gray-800">
+                                            {{ strtoupper(substr($character->name, 0, 2)) }}
+                                        </div>
+                                    @endif
                                     <div>
                                         <h3
                                             class="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
@@ -225,10 +231,16 @@
                             <div class="flex items-center gap-6">
                                 <!-- Avatar -->
                                 <div class="shrink-0">
-                                    <div
-                                        class="h-16 w-16 rounded-full bg-linear-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white text-xl font-bold shadow-sm ring-2 ring-white dark:ring-gray-800">
-                                        {{ strtoupper(substr($character->name, 0, 2)) }}
-                                    </div>
+                                    @if ($character->avatar_url)
+                                        <img src="{{ $character->avatar_url }}" alt="{{ $character->name }}"
+                                            class="h-16 w-16 rounded-full object-cover shadow-sm ring-2 ring-white dark:ring-gray-800"
+                                            loading="lazy" decoding="async">
+                                    @else
+                                        <div
+                                            class="h-16 w-16 rounded-full bg-linear-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white text-xl font-bold shadow-sm ring-2 ring-white dark:ring-gray-800">
+                                            {{ strtoupper(substr($character->name, 0, 2)) }}
+                                        </div>
+                                    @endif
                                 </div>
 
                                 <!-- Info -->

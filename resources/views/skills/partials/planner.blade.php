@@ -158,8 +158,7 @@
             </div>
 
             {{-- AI Optimization Results --}}
-            <div x-show="aiOptimization"
-                class="bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-lg p-6">
+                <div class="bg-linear-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-lg p-6">
                 <div class="flex items-start gap-4 mb-4">
                     <div class="shrink-0">
                         <svg class="w-10 h-10 text-purple-600 dark:text-purple-400" fill="none"
@@ -205,7 +204,8 @@
                         <div x-show="aiOptimization?.recommendations && aiOptimization.recommendations.length > 0">
                             <h5 class="font-medium text-gray-900 dark:text-white mb-2">Recommendations</h5>
                             <ul class="space-y-2">
-                                <template x-for="rec in aiOptimization.recommendations" :key="rec">
+                                <template x-for="rec in (aiOptimization?.recommendations || [])"
+                                    :key="rec">
                                     <li class="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300">
                                         <svg class="w-5 h-5 text-purple-500 shrink-0 mt-0.5" fill="currentColor"
                                             viewBox="0 0 20 20">
@@ -224,7 +224,7 @@
                             class="mt-4">
                             <h5 class="font-medium text-gray-900 dark:text-white mb-2">Optimal Acquisition Order</h5>
                             <div class="space-y-2">
-                                <template x-for="(step, index) in aiOptimization.acquisition_order"
+                                <template x-for="(step, index) in (aiOptimization?.acquisition_order || [])"
                                     :key="index">
                                     <div class="flex items-center gap-3 p-2 bg-white dark:bg-gray-800 rounded">
                                         <span

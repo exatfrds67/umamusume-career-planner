@@ -250,10 +250,11 @@
                                 View Details
                             </button>
                             <button @click="acquireSkill(skill)"
-                                :disabled="character.available_sp < (skill.discounted_cost || skill.base_sp_cost)"
+                                :disabled="!character || (character.available_sp || 0) < (skill.discounted_cost || skill
+                                    .base_sp_cost)"
                                 class="flex-1 btn btn-sm btn-primary"
-                                :class="{ 'opacity-50 cursor-not-allowed': character.available_sp < (skill.discounted_cost ||
-                                        skill.base_sp_cost) }">
+                                :class="{ 'opacity-50 cursor-not-allowed': !character || (character.available_sp || 0) < (skill
+                                        .discounted_cost || skill.base_sp_cost) }">
                                 Acquire
                             </button>
                         </div>

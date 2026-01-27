@@ -74,21 +74,13 @@
                         </div>
 
                         <div>
-                            <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Password
-                            </label>
-                            <input id="password" name="password" type="password" autocomplete="new-password" required
-                                class="appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm bg-white dark:bg-gray-800"
-                                placeholder="••••••••">
+                            <x-password-input id="password" name="password" label="Password" autocomplete="new-password"
+                                placeholder="••••••••" required />
                         </div>
 
                         <div>
-                            <label for="password_confirmation" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Confirm Password
-                            </label>
-                            <input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" required
-                                class="appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm bg-white dark:bg-gray-800"
-                                placeholder="••••••••">
+                            <x-password-input id="password_confirmation" name="password_confirmation"
+                                label="Confirm Password" autocomplete="new-password" placeholder="••••••••" required />
                         </div>
                     </div>
 

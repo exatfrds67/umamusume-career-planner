@@ -140,6 +140,28 @@
             </div>
         </div>
 
+        <!-- Unique Effects -->
+        @if (!empty($supportCard->unique_effects))
+            <div
+                class="card bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Unique Effects & Event Skills</h2>
+                <ul class="space-y-2">
+                    @foreach ($supportCard->unique_effects as $effect)
+                        <li class="flex items-start gap-2">
+                            @if (str_contains($effect, 'Event Skill:'))
+                                <span
+                                    class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 text-xs shrink-0 mt-0.5">★</span>
+                            @else
+                                <span
+                                    class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs shrink-0 mt-0.5">✓</span>
+                            @endif
+                            <span class="text-sm text-gray-700 dark:text-gray-300">{{ $effect }}</span>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <!-- Skill Hints -->
         @if (!empty($supportCard->skill_hints_provided))
             <div
@@ -150,6 +172,39 @@
                         <span
                             class="inline-flex items-center rounded-full bg-primary-100 px-3 py-1 text-sm font-medium text-primary-800 dark:bg-primary-900/30 dark:text-primary-400">
                             {{ $skill }}
+                        </span>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+
+        <!-- Strategic Notes -->
+        @if (!empty($supportCard->strategic_notes))
+            <div
+                class="card bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Strategic Notes</h2>
+                <ul class="space-y-2">
+                    @foreach ($supportCard->strategic_notes as $note)
+                        <li class="flex items-start gap-2">
+                            <span
+                                class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 text-xs shrink-0 mt-0.5">💡</span>
+                            <span class="text-sm text-gray-700 dark:text-gray-300">{{ $note }}</span>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <!-- Deck Synergies -->
+        @if (!empty($supportCard->deck_synergies))
+            <div
+                class="card bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Deck Synergies</h2>
+                <div class="flex flex-wrap gap-2">
+                    @foreach ($supportCard->deck_synergies as $synergy)
+                        <span
+                            class="inline-flex items-center rounded-full bg-indigo-100 px-3 py-1 text-sm font-medium text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400">
+                            {{ $synergy }}
                         </span>
                     @endforeach
                 </div>

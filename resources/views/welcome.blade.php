@@ -214,6 +214,18 @@
                                 </svg>
                                 GitHub
                             </a>
+                            @if (app()->environment('local', 'development'))
+                                <a href="{{ route('dev.demos') }}"
+                                    class="inline-flex items-center min-h-11 text-xs text-gray-500 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:focus:ring-offset-gray-800 rounded px-2"
+                                    aria-label="Developer demos and testing tools">
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                        aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                                    </svg>
+                                    Dev Tools
+                                </a>
+                            @endif
                         </div>
 
                         {{-- Additional info for screen readers --}}

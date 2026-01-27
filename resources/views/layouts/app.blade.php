@@ -10,9 +10,9 @@
 
     <!-- Favicons -->
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
-    <link rel="icon" type="image/png" sizes="16x16"
+    <link rel="icon" type="image/x-icon" sizes="16x16"
         href="{{ asset('images/app_logo/uma_musume_race_planner_logo_16.ico') }}">
-    <link rel="icon" type="image/png" sizes="32x32"
+    <link rel="icon" type="image/x-icon" sizes="32x32"
         href="{{ asset('images/app_logo/uma_musume_race_planner_logo_32.ico') }}">
     <link rel="icon" type="image/png" sizes="128x128"
         href="{{ asset('images/app_logo/uma_musume_race_planner_logo_128.png') }}">
@@ -24,15 +24,28 @@
         href="{{ asset('images/app_logo/uma_musume_race_planner_logo_128.png') }}">
 
     <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700|jetbrains-mono:400,500" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.bunny.net" crossorigin>
+    <link rel="dns-prefetch" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700|jetbrains-mono:400,500" rel="stylesheet"
+        media="print" onload="this.media='all'" />
+    <noscript>
+        <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700|jetbrains-mono:400,500" rel="stylesheet" />
+    </noscript>
 
     <!-- Synchronous Theme Initialization (prevents flash/mismatch on page load) -->
     <script>
         (function() {
-            const theme = localStorage.getItem('theme') || 
-                (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-            
+            const stored = localStorage.getItem('theme');
+            let theme;
+
+            if (stored) {
+                theme = stored;
+            } else {
+                theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                // Store the system preference so it's consistent across pages
+                localStorage.setItem('theme', theme);
+            }
+
             if (theme === 'dark') {
                 document.documentElement.classList.add('dark');
             } else {
@@ -125,6 +138,9 @@
 
     <!-- Offline Indicator (Task 2.2.1) -->
     <x-offline-indicator />
+
+    <!-- Accessibility Settings Panel (WCAG 2.2 AA) -->
+    <x-accessibility-settings-panel />
 
     @stack('scripts')
 </body>

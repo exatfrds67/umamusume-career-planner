@@ -256,10 +256,10 @@
 
                 getRankColorClass(rank) {
                     const colors = {
-                        'S': 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white',
-                        'A': 'bg-gradient-to-r from-purple-400 to-pink-500 text-white',
-                        'B': 'bg-gradient-to-r from-blue-400 to-cyan-500 text-white',
-                        'C': 'bg-gradient-to-r from-green-400 to-emerald-500 text-white',
+                        'S': 'bg-linear-to-r from-yellow-400 to-orange-500 text-white',
+                        'A': 'bg-linear-to-r from-purple-400 to-pink-500 text-white',
+                        'B': 'bg-linear-to-r from-blue-400 to-cyan-500 text-white',
+                        'C': 'bg-linear-to-r from-green-400 to-emerald-500 text-white',
                         'D': 'bg-gray-400 dark:bg-gray-600 text-white'
                     };
                     return colors[rank] || 'bg-gray-400 text-white';

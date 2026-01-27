@@ -12,7 +12,7 @@
     <div class="space-y-3">
         @foreach ($overview['cards'] as $card)
             <div
-                class="p-3 rounded-lg border border-gray-200 dark:border-gray-700 {{ $card['is_rainbow_available'] ? 'bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-purple-200 dark:border-purple-700' : 'bg-gray-50 dark:bg-gray-900/20' }}">
+                class="p-3 rounded-lg border border-gray-200 dark:border-gray-700 {{ $card['is_rainbow_available'] ? 'bg-linear-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-purple-200 dark:border-purple-700' : 'bg-gray-50 dark:bg-gray-900/20' }}">
                 <div class="flex items-center justify-between mb-2">
                     <div class="flex items-center gap-2">
                         <span class="text-sm font-medium text-gray-900 dark:text-white">
@@ -20,7 +20,7 @@
                         </span>
                         @if ($card['is_rainbow_available'])
                             <span
-                                class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 dark:from-purple-900 dark:to-pink-900 dark:text-purple-200">
+                                class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-linear-to-r from-purple-100 to-pink-100 text-purple-800 dark:from-purple-900 dark:to-pink-900 dark:text-purple-200">
                                 <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                     <path
                                         d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -37,7 +37,7 @@
 
                 <!-- Progress Bar -->
                 <div class="relative w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                    <div class="absolute inset-y-0 left-0 {{ $card['is_rainbow_available'] ? 'bg-gradient-to-r from-purple-500 to-pink-500' : 'bg-blue-500' }} rounded-full transition-all duration-300"
+                    <div class="absolute inset-y-0 left-0 {{ $card['is_rainbow_available'] ? 'bg-linear-to-r from-purple-500 to-pink-500' : 'bg-blue-500' }} rounded-full transition-all duration-300"
                         style="width: {{ $card['friendship_level'] }}%"></div>
 
                     <!-- Rainbow threshold marker -->
@@ -60,7 +60,7 @@
     <!-- Rainbow Training Info -->
     @if ($overview['rainbow_available_count'] > 0)
         <div
-            class="mt-4 p-3 rounded-lg bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border border-purple-200 dark:border-purple-700">
+            class="mt-4 p-3 rounded-lg bg-linear-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border border-purple-200 dark:border-purple-700">
             <div class="flex items-start gap-2">
                 <svg class="w-5 h-5 text-purple-600 dark:text-purple-400 shrink-0 mt-0.5" fill="currentColor"
                     viewBox="0 0 20 20">
