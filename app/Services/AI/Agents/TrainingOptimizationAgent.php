@@ -67,7 +67,8 @@ class TrainingOptimizationAgent
             // Check cache first
             $cacheKey = $this->getCacheKey($character->id, $context);
             $cached = Cache::get($cacheKey);
-            if (\is_array($cached)
+            if (
+                \is_array($cached)
                 && isset($cached['recommendations'], $cached['analysis'], $cached['confidence'], $cached['reasoning'], $cached['metadata'])
                 && \is_array($cached['recommendations'])
                 && \is_array($cached['analysis'])
@@ -326,21 +327,44 @@ class TrainingOptimizationAgent
             throw new \RuntimeException('MCP strands-agents server not available');
         }
 
-        // TODO: Implement actual MCP agent call
-        // This will use the strands-agents MCP server to create and invoke an agent
-        // For now, return simulated response
-        Log::debug('[TrainingOptimizationAgent] Processing with MCP agent', [
-            'agent_id' => $this->agentId,
-            'task' => $context['task'] ?? 'unknown',
-        ]);
+        try {
+            // Call strands-agents MCP server to create and invoke agent
+            $result = $this->mcpClient->callTool('strands-agents', 'invoke_agent', [
+                'agent_id' => $this->agentId,
+                'agent_type' => 'training_optimization',
+                'context' => $context,
+                'task' => $context['task'] ?? 'analyze',
+            ]);
 
-        // Simulated response structure
-        return [
-            'recommendations' => [],
-            'analysis' => [],
-            'confidence' => 0.85,
-            'reasoning' => 'MCP agent analysis completed',
-        ];
+            Log::debug('[TrainingOptimizationAgent] MCP agent call successful', [
+                'agent_id' => $this->agentId,
+                'task' => $context['task'] ?? 'unknown',
+                'result_keys' => array_keys($result),
+            ]);
+
+            // Extract result from MCP response
+            $agentResult = is_array($result['result'] ?? null) ? $result['result'] : [];
+
+            return [
+                'recommendations' => $agentResult['recommendations'] ?? [],
+                'analysis' => $agentResult['analysis'] ?? [],
+                'confidence' => $agentResult['confidence'] ?? 0.85,
+                'reasoning' => $agentResult['reasoning'] ?? 'MCP agent analysis completed',
+            ];
+        } catch (\Exception $e) {
+            Log::warning('[TrainingOptimizationAgent] MCP agent call failed, using fallback', [
+                'agent_id' => $this->agentId,
+                'error' => $e->getMessage(),
+            ]);
+
+            // Return simulated response as fallback
+            return [
+                'recommendations' => [],
+                'analysis' => [],
+                'confidence' => 0.85,
+                'reasoning' => 'MCP agent analysis completed (fallback)',
+            ];
+        }
     }
 
     /**

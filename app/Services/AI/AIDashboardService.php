@@ -293,12 +293,21 @@ class AIDashboardService
     public function getAgentsSummary(): array
     {
         // Get agent status from orchestration service
-        // TODO: Implement actual agent status retrieval from orchestration service
-        /** @var array<string, array{status?: string, tasks_completed?: int, success_rate?: float, avg_duration?: float, last_active_at?: string|null}> $agentStatuses */
-        $agentStatuses = [];
+        try {
+            $agentStatuses = $this->agentOrchestration->getAgentStatuses();
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('[AIDashboard] Failed to retrieve agent statuses', [
+                'error' => $e->getMessage(),
+            ]);
+            $agentStatuses = [];
+        }
 
         $agents = [];
         foreach ($agentStatuses as $agentType => $status) {
+            if (! \is_array($status)) {
+                continue;
+            }
+
             $agents[] = [
                 'id' => crc32($agentType),
                 'name' => ucwords(str_replace('_', ' ', $agentType)).' Agent',

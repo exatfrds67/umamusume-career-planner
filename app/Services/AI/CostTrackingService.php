@@ -43,6 +43,14 @@ class CostTrackingService
         array $metadata = []
     ): void {
         try {
+            $responseTime = isset($metadata['response_time']) && is_numeric($metadata['response_time'])
+                ? (float) $metadata['response_time']
+                : null;
+            $cached = isset($metadata['cached']) ? (bool) $metadata['cached'] : false;
+            $requestSummary = isset($metadata['summary']) && is_string($metadata['summary'])
+                ? $metadata['summary']
+                : null;
+
             DB::table('ucp_ai_costs')->insert([
                 'user_id' => $userId,
                 'character_id' => $characterId,
@@ -55,9 +63,9 @@ class CostTrackingService
                 'input_cost' => $this->calculateInputCost($model, $inputTokens),
                 'output_cost' => $this->calculateOutputCost($model, $outputTokens),
                 'total_cost' => $cost,
-                'response_time' => is_numeric((is_array($metadata) && isset($metadata['response_time']) ? $metadata['response_time'] : null)) ? (float) ($metadata['response_time']) : null,
-                'cached' => (bool) ($metadata['cached'] ?? false),
-                'request_summary' => isset($metadata['summary']) && is_string($metadata['summary']) ? $metadata['summary'] : null,
+                'response_time' => $responseTime,
+                'cached' => $cached,
+                'request_summary' => $requestSummary,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -109,10 +117,12 @@ class CostTrackingService
             $query->where('user_id', '=', $userId);
         }
 
-        return $query->get()
-            ->pluck('total', 'provider')
-            ->map(fn ($cost) => is_numeric($cost) ? round((float) $cost, 6) : 0.0)
-            ->toArray();
+        $result = [];
+        foreach ($query->get() as $record) {
+            $result[(string) $record->provider] = is_numeric($record->total) ? round((float) $record->total, 6) : 0.0;
+        }
+
+        return $result;
     }
 
     /**
@@ -134,10 +144,12 @@ class CostTrackingService
             $query->where('user_id', '=', $userId);
         }
 
-        return $query->get()
-            ->pluck('total', 'model')
-            ->map(fn ($cost) => is_numeric($cost) ? round((float) $cost, 6) : 0.0)
-            ->toArray();
+        $result = [];
+        foreach ($query->get() as $record) {
+            $result[(string) $record->model] = is_numeric($record->total) ? round((float) $record->total, 6) : 0.0;
+        }
+
+        return $result;
     }
 
     /**
@@ -145,7 +157,7 @@ class CostTrackingService
      *
      * @return array<string, float>
      */
-    public function getCostByRequestType(): array
+    public function getCostByRequestType(string $period = '24h', ?int $userId = null): array
     {
         $hours = $this->periodToHours($period);
         $since = now()->subHours($hours);
@@ -160,10 +172,12 @@ class CostTrackingService
             $query->where('user_id', '=', $userId);
         }
 
-        return $query->get()
-            ->pluck('total', 'request_type')
-            ->map(fn ($cost) => is_numeric($cost) ? round((float) $cost, 6) : 0.0)
-            ->toArray();
+        $result = [];
+        foreach ($query->get() as $record) {
+            $result[(string) $record->request_type] = is_numeric($record->total) ? round((float) $record->total, 6) : 0.0;
+        }
+
+        return $result;
     }
 
     /**
@@ -185,12 +199,15 @@ class CostTrackingService
             $query->where('user_id', '=', $userId);
         }
 
-        return $query->get()
-            ->map(fn ($record) => [
-                'date' => $record->date,
+        $result = [];
+        foreach ($query->get() as $record) {
+            $result[] = [
+                'date' => (string) $record->date,
                 'cost' => is_numeric($record->cost) ? round((float) $record->cost, 6) : 0.0,
-            ])
-            ->toArray();
+            ];
+        }
+
+        return $result;
     }
 
     /**
@@ -281,7 +298,7 @@ class CostTrackingService
         $bedrockCost = $costByProvider['bedrock'] ?? 0.0;
         if ($bedrockCost > 0) {
             $estimatedSavings = $bedrockCost * 0.4; // 40% of Bedrock costs could be local
-            $potentialSavings = ($potentialSavings ?? 0) + $estimatedSavings;
+            $potentialSavings += $estimatedSavings;
 
             $recommendations[] = [
                 'type' => 'local_processing',
@@ -295,7 +312,7 @@ class CostTrackingService
         $sonnetCost = $costByModel['claude-3-5-sonnet'] ?? 0.0;
         if ($sonnetCost > 0) {
             $estimatedSavings = $sonnetCost * 0.3; // 30% could use Haiku instead
-            $potentialSavings = ($potentialSavings ?? 0) + $estimatedSavings;
+            $potentialSavings += $estimatedSavings;
 
             $recommendations[] = [
                 'type' => 'model_selection',
@@ -309,7 +326,7 @@ class CostTrackingService
         $cachedPercentage = $this->getCachedRequestPercentage($userId);
         if ($cachedPercentage < 20) {
             $estimatedSavings = $currentCost * 0.2; // 20% savings from caching
-            $potentialSavings = ($potentialSavings ?? 0) + $estimatedSavings;
+            $potentialSavings += $estimatedSavings;
 
             $recommendations[] = [
                 'type' => 'caching',
@@ -323,7 +340,7 @@ class CostTrackingService
         $avgTokensPerRequest = $this->getAverageTokensPerRequest($userId);
         if ($avgTokensPerRequest > 2000) {
             $estimatedSavings = $currentCost * 0.15; // 15% savings from optimization
-            $potentialSavings = ($potentialSavings ?? 0) + $estimatedSavings;
+            $potentialSavings += $estimatedSavings;
 
             $recommendations[] = [
                 'type' => 'token_optimization',
