@@ -310,7 +310,8 @@ class AgentOrchestrationService
         $cacheKey = "mcp_quick_recommendation:{$character->id}";
         $cached = Cache::get($cacheKey);
 
-        if (is_array($cached)
+        if (
+            is_array($cached)
             && isset($cached['action'], $cached['reason'], $cached['confidence'])
             && is_string($cached['action'])
             && is_string($cached['reason'])
@@ -1001,5 +1002,84 @@ class AgentOrchestrationService
         }
 
         return $aggregated;
+    }
+
+    /**
+     * Get statuses of all registered agents
+     *
+     * @return array<string, array{status?: string, tasks_completed?: int, success_rate?: float, avg_duration?: float, last_active_at?: string|null}>
+     */
+    public function getAgentStatuses(): array
+    {
+        $cacheKey = 'agent_orchestration_statuses';
+        $cached = Cache::get($cacheKey);
+
+        if (is_array($cached)) {
+            // Ensure proper typing for cached result
+            $result = [];
+            foreach ($cached as $key => $value) {
+                if (\is_string($key) && \is_array($value)) {
+                    /** @var array{status?: string, tasks_completed?: int, success_rate?: float, avg_duration?: float, last_active_at?: string|null} $typedValue */
+                    $typedValue = $value;
+                    $result[$key] = $typedValue;
+                }
+            }
+
+            return $result;
+        }
+
+        // Get all agent keys from cache
+        $agentTypes = [
+            'career_strategy',
+            'resource_management',
+            'performance_analytics',
+            'summer_camp_optimization',
+            'training_optimization',
+        ];
+
+        $statuses = [];
+
+        foreach ($agentTypes as $agentType) {
+            $metrics = $this->getAgentMetrics("agent_{$agentType}");
+
+            if (empty($metrics)) {
+                $statuses[$agentType] = [
+                    'status' => 'idle',
+                    'tasks_completed' => 0,
+                    'success_rate' => 0.0,
+                    'avg_duration' => 0.0,
+                    'last_active_at' => null,
+                ];
+
+                continue;
+            }
+
+            $tasksCompleted = count($metrics);
+            $successCount = count(array_filter($metrics, static fn (array $m): bool => (bool) ($m['success'] ?? false)));
+            $successRate = $tasksCompleted > 0 ? ($successCount / $tasksCompleted) * 100 : 0.0;
+
+            $executionTimes = array_filter(
+                array_map(static fn (array $m): float => is_numeric($m['execution_time'] ?? null) ? (float) $m['execution_time'] : 0.0, $metrics),
+                static fn (float $time): bool => $time > 0
+            );
+            $avgDuration = ! empty($executionTimes) ? array_sum($executionTimes) / count($executionTimes) : 0.0;
+
+            $lastMetric = end($metrics);
+            $lastActiveAt = is_array($lastMetric) && isset($lastMetric['timestamp']) && is_string($lastMetric['timestamp'])
+                ? $lastMetric['timestamp']
+                : null;
+
+            $statuses[$agentType] = [
+                'status' => $this->calculateAgentHealth($metrics) === 'healthy' ? 'idle' : 'processing',
+                'tasks_completed' => $tasksCompleted,
+                'success_rate' => round($successRate, 2),
+                'avg_duration' => round($avgDuration, 3),
+                'last_active_at' => $lastActiveAt,
+            ];
+        }
+
+        Cache::put($cacheKey, $statuses, 60); // Cache for 1 minute
+
+        return $statuses;
     }
 }

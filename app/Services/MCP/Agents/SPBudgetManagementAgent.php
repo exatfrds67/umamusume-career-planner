@@ -104,7 +104,7 @@ class SPBudgetManagementAgent
         // Calculate total base cost of target skills
         $totalBaseCost = 0;
         foreach ($targetSkills as $skill) {
-            if (is_object($skill) && isset($skill->base_sp_cost)) {
+            if (isset($skill->base_sp_cost)) {
                 $totalBaseCost += (int) $skill->base_sp_cost;
             }
         }

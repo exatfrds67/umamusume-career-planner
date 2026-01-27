@@ -69,11 +69,25 @@ class Context7Service
             Cache::put($contextId, $contextData, $ttl);
 
             if ($this->isAvailable()) {
-                // TODO: Also store in MCP context7 server for persistent storage
-                $this->debugLog('Context stored in MCP server', [
-                    'context_id' => $contextId,
-                    'conversation_id' => $conversationId,
-                ]);
+                // Store in MCP context7 server for persistent storage
+                try {
+                    $this->mcpClient->callTool($this->serverName, 'store_context', [
+                        'context_id' => $contextId,
+                        'conversation_id' => $conversationId,
+                        'context_data' => $contextData,
+                        'ttl' => $ttl,
+                    ]);
+
+                    $this->debugLog('Context stored in MCP server', [
+                        'context_id' => $contextId,
+                        'conversation_id' => $conversationId,
+                    ]);
+                } catch (\Exception $e) {
+                    Log::warning('[Context7] Failed to store in MCP server, using cache only', [
+                        'error' => $e->getMessage(),
+                        'context_id' => $contextId,
+                    ]);
+                }
             }
 
             return [
@@ -121,11 +135,41 @@ class Context7Service
 
             // Try MCP server if available
             if ($this->isAvailable()) {
-                // TODO: Retrieve from MCP context7 server
-                $this->debugLog('Attempting to retrieve context from MCP server', [
-                    'context_id' => $contextId,
-                    'conversation_id' => $conversationId,
-                ]);
+                // Retrieve from MCP context7 server
+                try {
+                    $result = $this->mcpClient->callTool($this->serverName, 'retrieve_context', [
+                        'context_id' => $contextId,
+                        'conversation_id' => $conversationId,
+                    ]);
+
+                    if (isset($result['context']) && is_array($result['context'])) {
+                        // Cache the retrieved context
+                        Cache::put($contextId, $result['context'], $this->cacheTTL);
+
+                        $this->debugLog('Context retrieved from MCP server', [
+                            'context_id' => $contextId,
+                            'conversation_id' => $conversationId,
+                        ]);
+
+                        // Ensure proper typing for context array
+                        $contextData = [];
+                        foreach ($result['context'] as $key => $value) {
+                            $contextData[(string) $key] = $value;
+                        }
+
+                        return [
+                            'context' => $contextData,
+                            'found' => true,
+                            'age' => isset($result['age']) && is_numeric($result['age']) ? (int) $result['age'] : 0,
+                            'source' => 'mcp_server',
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    Log::warning('[Context7] Failed to retrieve from MCP server', [
+                        'error' => $e->getMessage(),
+                        'context_id' => $contextId,
+                    ]);
+                }
             }
 
             return [
@@ -218,11 +262,24 @@ class Context7Service
             }
 
             if ($this->isAvailable()) {
-                // TODO: Share via MCP context7 server
-                $this->debugLog('Context shared across agents via MCP', [
-                    'conversation_id' => $conversationId,
-                    'agent_count' => $sharedCount,
-                ]);
+                // Share via MCP context7 server
+                try {
+                    $this->mcpClient->callTool($this->serverName, 'share_context', [
+                        'conversation_id' => $conversationId,
+                        'agent_ids' => $agentIds,
+                        'context_data' => $context['context'],
+                    ]);
+
+                    $this->debugLog('Context shared across agents via MCP', [
+                        'conversation_id' => $conversationId,
+                        'agent_count' => $sharedCount,
+                    ]);
+                } catch (\Exception $e) {
+                    Log::warning('[Context7] Failed to share via MCP server, using cache only', [
+                        'error' => $e->getMessage(),
+                        'conversation_id' => $conversationId,
+                    ]);
+                }
             }
 
             return [
@@ -378,11 +435,23 @@ class Context7Service
             Cache::forget($contextId);
 
             if ($this->isAvailable()) {
-                // TODO: Delete from MCP context7 server
-                $this->debugLog('Context deleted from MCP server', [
-                    'context_id' => $contextId,
-                    'conversation_id' => $conversationId,
-                ]);
+                // Delete from MCP context7 server
+                try {
+                    $this->mcpClient->callTool($this->serverName, 'delete_context', [
+                        'context_id' => $contextId,
+                        'conversation_id' => $conversationId,
+                    ]);
+
+                    $this->debugLog('Context deleted from MCP server', [
+                        'context_id' => $contextId,
+                        'conversation_id' => $conversationId,
+                    ]);
+                } catch (\Exception $e) {
+                    Log::warning('[Context7] Failed to delete from MCP server, cache cleared', [
+                        'error' => $e->getMessage(),
+                        'context_id' => $contextId,
+                    ]);
+                }
             }
 
             return true;

@@ -73,15 +73,21 @@ class FetchService
             $cached = Cache::get($cacheKey);
             if (is_array($cached)) {
                 /** @var array{success: bool, data: mixed, status_code: int, headers: array<string, string>} $cached */
-                return [
+                $responseTime = microtime(true) - $startTime;
+                $result = [
                     'success' => $cached['success'] ?? false,
                     'data' => $cached['data'] ?? null,
                     'status_code' => $cached['status_code'] ?? 0,
                     'headers' => $cached['headers'] ?? [],
                     'cached' => true,
                     'attempts' => 0,
-                    'response_time' => microtime(true) - $startTime,
+                    'response_time' => $responseTime,
                 ];
+
+                // Track statistics
+                $this->trackStatistics(true, $result['success'], $responseTime);
+
+                return $result;
             }
         }
 
@@ -103,15 +109,21 @@ class FetchService
                 }
 
                 /** @var array{success: bool, data: mixed, status_code: int, headers: array<string, string>} $response */
-                return [
+                $responseTime = microtime(true) - $startTime;
+                $result = [
                     'success' => $success,
                     'data' => $response['data'] ?? null,
                     'status_code' => isset($response['status_code']) && is_int($response['status_code']) ? $response['status_code'] : 0,
                     'headers' => isset($response['headers']) && is_array($response['headers']) ? $response['headers'] : [],
                     'cached' => false,
                     'attempts' => $attempts,
-                    'response_time' => microtime(true) - $startTime,
+                    'response_time' => $responseTime,
                 ];
+
+                // Track statistics
+                $this->trackStatistics(false, $success, $responseTime);
+
+                return $result;
             } catch (\Exception $e) {
                 $lastError = $e;
 
@@ -130,15 +142,21 @@ class FetchService
             'error' => $lastError?->getMessage(),
         ]);
 
-        return [
+        $responseTime = microtime(true) - $startTime;
+        $result = [
             'success' => false,
             'data' => null,
             'status_code' => 0,
             'headers' => [],
             'cached' => false,
             'attempts' => $attempts,
-            'response_time' => microtime(true) - $startTime,
+            'response_time' => $responseTime,
         ];
+
+        // Track statistics
+        $this->trackStatistics(false, false, $responseTime);
+
+        return $result;
     }
 
     /**
@@ -348,14 +366,74 @@ class FetchService
      */
     public function getStatistics(): array
     {
-        // TODO: Implement actual statistics tracking
-        return [
+        $rawStats = Cache::get('mcp.fetch.statistics', [
             'total_requests' => 0,
             'cache_hits' => 0,
             'cache_misses' => 0,
             'failed_requests' => 0,
-            'average_response_time' => 0.0,
+            'total_response_time' => 0.0,
+        ]);
+
+        // Ensure proper typing from cache
+        $stats = \is_array($rawStats) ? $rawStats : [];
+        $totalRequests = isset($stats['total_requests']) && is_numeric($stats['total_requests']) ? (int) $stats['total_requests'] : 0;
+        $totalResponseTime = isset($stats['total_response_time']) && is_numeric($stats['total_response_time']) ? (float) $stats['total_response_time'] : 0.0;
+        $cacheHits = isset($stats['cache_hits']) && is_numeric($stats['cache_hits']) ? (int) $stats['cache_hits'] : 0;
+        $cacheMisses = isset($stats['cache_misses']) && is_numeric($stats['cache_misses']) ? (int) $stats['cache_misses'] : 0;
+        $failedRequests = isset($stats['failed_requests']) && is_numeric($stats['failed_requests']) ? (int) $stats['failed_requests'] : 0;
+
+        return [
+            'total_requests' => $totalRequests,
+            'cache_hits' => $cacheHits,
+            'cache_misses' => $cacheMisses,
+            'failed_requests' => $failedRequests,
+            'average_response_time' => $totalRequests > 0 ? $totalResponseTime / $totalRequests : 0.0,
         ];
+    }
+
+    /**
+     * Track fetch statistics
+     */
+    protected function trackStatistics(bool $cached, bool $success, float $responseTime): void
+    {
+        $rawStats = Cache::get('mcp.fetch.statistics', [
+            'total_requests' => 0,
+            'cache_hits' => 0,
+            'cache_misses' => 0,
+            'failed_requests' => 0,
+            'total_response_time' => 0.0,
+        ]);
+
+        // Ensure proper typing from cache
+        $stats = \is_array($rawStats) ? $rawStats : [];
+        $totalRequests = isset($stats['total_requests']) && is_numeric($stats['total_requests']) ? (int) $stats['total_requests'] : 0;
+        $cacheHits = isset($stats['cache_hits']) && is_numeric($stats['cache_hits']) ? (int) $stats['cache_hits'] : 0;
+        $cacheMisses = isset($stats['cache_misses']) && is_numeric($stats['cache_misses']) ? (int) $stats['cache_misses'] : 0;
+        $failedRequests = isset($stats['failed_requests']) && is_numeric($stats['failed_requests']) ? (int) $stats['failed_requests'] : 0;
+        $totalResponseTime = isset($stats['total_response_time']) && is_numeric($stats['total_response_time']) ? (float) $stats['total_response_time'] : 0.0;
+
+        $totalRequests++;
+
+        if ($cached) {
+            $cacheHits++;
+        } else {
+            $cacheMisses++;
+        }
+
+        if (! $success) {
+            $failedRequests++;
+        }
+
+        $totalResponseTime += $responseTime;
+
+        // Store statistics for 30 days
+        Cache::put('mcp.fetch.statistics', [
+            'total_requests' => $totalRequests,
+            'cache_hits' => $cacheHits,
+            'cache_misses' => $cacheMisses,
+            'failed_requests' => $failedRequests,
+            'total_response_time' => $totalResponseTime,
+        ], now()->addDays(30));
     }
 
     /**
