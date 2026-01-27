@@ -132,4 +132,250 @@ class SupportCardController extends Controller
             'cardsByTier'
         ));
     }
+
+    /**
+     * Add card to deck (API endpoint)
+     */
+    public function addCardToDeck(Request $request, Character $character): \Illuminate\Http\JsonResponse
+    {
+        $validated = $request->validate([
+            'support_card_id' => 'required|integer|exists:ucp_support_cards,id',
+            'position_slot' => 'required|integer|min:1|max:6',
+            'is_friend_card' => 'boolean',
+            'limit_break_level' => 'integer|min:0|max:4',
+        ]);
+
+        try {
+            $card = $this->deckService->addCardToDeck(
+                $character->id,
+                $validated['support_card_id'],
+                $validated['position_slot'],
+                $validated['is_friend_card'] ?? false,
+                $validated['limit_break_level'] ?? 0
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Card added to deck successfully',
+                'data' => [
+                    'card' => $card->load('supportCard'),
+                    'deck' => $this->deckService->getDeck($character->id),
+                ],
+            ], 201);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Remove card from deck (API endpoint)
+     */
+    public function removeCardFromDeck(Character $character, int $position): \Illuminate\Http\JsonResponse
+    {
+        try {
+            $success = $this->deckService->removeCardFromDeck($character->id, $position);
+
+            if ($success) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Card removed from deck successfully',
+                    'data' => [
+                        'deck' => $this->deckService->getDeck($character->id),
+                    ],
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Card not found at specified position',
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Update card in deck (API endpoint)
+     */
+    public function updateCardInDeck(Request $request, Character $character, int $position): \Illuminate\Http\JsonResponse
+    {
+        $validated = $request->validate([
+            'support_card_id' => 'required|integer|exists:ucp_support_cards,id',
+            'limit_break_level' => 'integer|min:0|max:4',
+        ]);
+
+        try {
+            $card = $this->deckService->replaceCard(
+                $character->id,
+                $position,
+                $validated['support_card_id'],
+                $validated['limit_break_level'] ?? 0
+            );
+
+            if ($card) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Card updated successfully',
+                    'data' => [
+                        'card' => $card->load('supportCard'),
+                        'deck' => $this->deckService->getDeck($character->id),
+                    ],
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update card',
+            ], 400);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Clear entire deck (API endpoint)
+     */
+    public function clearDeck(Character $character): \Illuminate\Http\JsonResponse
+    {
+        try {
+            $success = $this->deckService->clearDeck($character->id);
+
+            if ($success) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Deck cleared successfully',
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to clear deck',
+            ], 400);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Swap two cards in the deck (API endpoint)
+     */
+    public function swapCards(Request $request, Character $character): \Illuminate\Http\JsonResponse
+    {
+        $validated = $request->validate([
+            'position1' => 'required|integer|min:1|max:6',
+            'position2' => 'required|integer|min:1|max:6|different:position1',
+        ]);
+
+        try {
+            $success = $this->deckService->swapCards(
+                $character->id,
+                $validated['position1'],
+                $validated['position2']
+            );
+
+            if ($success) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Cards swapped successfully',
+                    'data' => [
+                        'deck' => $this->deckService->getDeck($character->id),
+                    ],
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to swap cards',
+            ], 400);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Optimize deck (API endpoint)
+     */
+    public function optimizeDeck(Request $request, Character $character): \Illuminate\Http\JsonResponse
+    {
+        try {
+            $options = $request->input('options', []);
+            $options = is_array($options) ? $options : [];
+            $recommendations = $this->optimizationService->recommendDeck($character->id, $options);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Deck optimization recommendations generated',
+                'data' => $recommendations,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Save entire deck (API endpoint)
+     */
+    public function saveDeck(Request $request, Character $character): \Illuminate\Http\JsonResponse
+    {
+        $validated = $request->validate([
+            'cards' => 'required|array|min:1|max:6',
+            'cards.*.support_card_id' => 'required|integer|exists:ucp_support_cards,id',
+            'cards.*.position_slot' => 'required|integer|min:1|max:6',
+            'cards.*.is_friend_card' => 'boolean',
+            'cards.*.limit_break_level' => 'integer|min:0|max:4',
+        ]);
+
+        try {
+            // Clear existing deck first
+            $this->deckService->clearDeck($character->id);
+
+            // Add each card
+            foreach ($validated['cards'] as $cardData) {
+                $this->deckService->addCardToDeck(
+                    $character->id,
+                    $cardData['support_card_id'],
+                    $cardData['position_slot'],
+                    $cardData['is_friend_card'] ?? false,
+                    $cardData['limit_break_level'] ?? 0
+                );
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Deck saved successfully',
+                'data' => [
+                    'deck' => $this->deckService->getDeck($character->id),
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }

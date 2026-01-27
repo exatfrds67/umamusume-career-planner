@@ -121,13 +121,15 @@ class TrainingController extends Controller
                 'id' => $activeDeck->id,
                 'name' => $activeDeck->name,
                 'cards' => $activeDeck->supportCards->map(function ($card) {
+                    $pivot = $card->pivot;
+
                     return [
                         'id' => $card->id,
                         'name' => $card->name_en ?? $card->title_en ?? 'Unknown',
                         'rarity' => $card->rarity,
-                        'position' => $card->pivot->position,
-                        'bond_level' => $card->pivot->bond_level,
-                        'is_borrowed' => $card->pivot->is_borrowed,
+                        'position' => $pivot?->getAttribute('position') ?? 0,
+                        'bond_level' => $pivot?->getAttribute('bond_level') ?? 0,
+                        'is_borrowed' => $pivot?->getAttribute('is_borrowed') ?? false,
                     ];
                 }),
             ],

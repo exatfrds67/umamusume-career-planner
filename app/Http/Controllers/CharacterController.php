@@ -6,7 +6,9 @@ use App\Http\Requests\StoreCharacterRequest;
 use App\Http\Requests\UpdateCharacterRequest;
 use App\Models\Aptitude;
 use App\Models\Character;
+use App\Models\Factor;
 use App\Services\CharacterStateService;
+use App\Services\FactorService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,7 +19,8 @@ use Illuminate\View\View;
 class CharacterController extends Controller
 {
     public function __construct(
-        protected CharacterStateService $characterStateService
+        protected CharacterStateService $characterStateService,
+        protected FactorService $factorService
     ) {}
 
     /**
@@ -390,5 +393,238 @@ class CharacterController extends Controller
         }
 
         return redirect()->back()->with('success', $message);
+    }
+
+    /**
+     * Show factor management page for a character
+     */
+    public function manageFactors(Character $character): View
+    {
+        $this->authorize('update', $character);
+
+        $character->load('factors');
+        $factorsByType = $this->factorService->getFactorsByType($character);
+        $factorCounts = $this->factorService->getFactorCountByStarLevel($character);
+
+        return view('characters.factors.manage', compact('character', 'factorsByType', 'factorCounts'));
+    }
+
+    /**
+     * Store new factors for a character
+     */
+    public function storeFactors(Request $request, Character $character): RedirectResponse
+    {
+        $this->authorize('update', $character);
+
+        $request->validate([
+            'factor_type' => 'required|in:blue_stats,red_aptitudes,green_unique_skills,white_normal_skills',
+            'factor_name' => 'required|string|max:255',
+            'star_level' => 'required|in:1_star,2_star,3_star',
+            'stat_type' => 'nullable|string|in:speed,stamina,power,guts,wit',
+            'aptitude_type' => 'nullable|string|in:sprint,mile,medium,long,turf,dirt,front_runner,pace_chaser,late_surger,end_closer',
+            'unique_skill_name' => 'nullable|string|max:255',
+            'normal_skill_name' => 'nullable|string|max:255',
+            'source_parent' => 'required|in:main_parent_1,main_parent_2,grandparent_1,grandparent_2,grandparent_3,grandparent_4',
+            'source_character_name' => 'nullable|string|max:255',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $factorType = $request->input('factor_type');
+            $starLevelInput = $request->input('star_level');
+            $starLevel = is_string($starLevelInput) ? $starLevelInput : '';
+            $sourceParentInput = $request->input('source_parent');
+            $sourceParent = is_string($sourceParentInput) ? $sourceParentInput : '';
+            $sourceCharacterName = $request->input('source_character_name');
+            $sourceCharacterName = is_string($sourceCharacterName) ? $sourceCharacterName : null;
+            $factorNameInput = $request->input('factor_name');
+            $factorName = is_string($factorNameInput) ? $factorNameInput : null;
+
+            switch ($factorType) {
+                case 'blue_stats':
+                    $statType = $request->input('stat_type');
+                    if (! $statType || ! is_string($statType)) {
+                        throw new \InvalidArgumentException('Stat type is required for blue factors');
+                    }
+                    $this->factorService->createBlueFactor(
+                        $character,
+                        $statType,
+                        $starLevel,
+                        $sourceParent,
+                        $sourceCharacterName,
+                        $factorName
+                    );
+                    break;
+
+                case 'red_aptitudes':
+                    $aptitudeType = $request->input('aptitude_type');
+                    if (! $aptitudeType || ! is_string($aptitudeType)) {
+                        throw new \InvalidArgumentException('Aptitude type is required for red factors');
+                    }
+                    $gradeImprovement = match ($starLevel) {
+                        '1_star' => 1,
+                        '2_star' => 2,
+                        '3_star' => 3,
+                        default => throw new \InvalidArgumentException('Invalid star level'),
+                    };
+                    $this->factorService->createRedFactor(
+                        $character,
+                        $aptitudeType,
+                        $gradeImprovement,
+                        $starLevel,
+                        $sourceParent,
+                        $sourceCharacterName,
+                        $factorName
+                    );
+                    break;
+
+                case 'green_unique_skills':
+                    $skillName = $request->input('unique_skill_name');
+                    if (! $skillName || ! is_string($skillName)) {
+                        throw new \InvalidArgumentException('Unique skill name is required for green factors');
+                    }
+                    $this->factorService->createGreenFactor(
+                        $character,
+                        $skillName,
+                        [], // Skill effects can be added later
+                        $sourceParent,
+                        $sourceCharacterName
+                    );
+                    break;
+
+                case 'white_normal_skills':
+                    $skillName = $request->input('normal_skill_name');
+                    if (! $skillName || ! is_string($skillName)) {
+                        throw new \InvalidArgumentException('Normal skill name is required for white factors');
+                    }
+                    $this->factorService->createWhiteFactor(
+                        $character,
+                        $skillName,
+                        [], // Race bonuses can be added later
+                        $starLevel,
+                        $sourceParent,
+                        $sourceCharacterName
+                    );
+                    break;
+            }
+
+            DB::commit();
+
+            return redirect()
+                ->route('characters.factors.manage', $character)
+                ->with('success', 'Factor added successfully!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Factor creation failed: '.$e->getMessage(), [
+                'character_id' => $character->id,
+                'exception' => $e,
+            ]);
+
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('error', 'Failed to add factor. Please try again.');
+        }
+    }
+
+    /**
+     * Update an existing factor
+     */
+    public function updateFactor(Request $request, Character $character, Factor $factor): RedirectResponse
+    {
+        $this->authorize('update', $character);
+
+        if ($factor->character_id !== $character->id) {
+            abort(404);
+        }
+
+        $request->validate([
+            'factor_name' => 'required|string|max:255',
+            'source_character_name' => 'nullable|string|max:255',
+        ]);
+
+        try {
+            $factor->update([
+                'factor_name' => $request->input('factor_name'),
+                'source_character_name' => $request->input('source_character_name'),
+            ]);
+
+            return redirect()
+                ->route('characters.factors.manage', $character)
+                ->with('success', 'Factor updated successfully!');
+        } catch (\Exception $e) {
+            Log::error('Factor update failed: '.$e->getMessage(), [
+                'factor_id' => $factor->id,
+                'exception' => $e,
+            ]);
+
+            return redirect()
+                ->back()
+                ->with('error', 'Failed to update factor. Please try again.');
+        }
+    }
+
+    /**
+     * Toggle factor active status
+     */
+    public function toggleFactor(Character $character, Factor $factor): RedirectResponse
+    {
+        $this->authorize('update', $character);
+
+        if ($factor->character_id !== $character->id) {
+            abort(404);
+        }
+
+        try {
+            $factor->update([
+                'is_active' => ! $factor->is_active,
+            ]);
+
+            $status = $factor->is_active ? 'activated' : 'deactivated';
+
+            return redirect()
+                ->route('characters.factors.manage', $character)
+                ->with('success', "Factor {$status} successfully!");
+        } catch (\Exception $e) {
+            Log::error('Factor toggle failed: '.$e->getMessage(), [
+                'factor_id' => $factor->id,
+                'exception' => $e,
+            ]);
+
+            return redirect()
+                ->back()
+                ->with('error', 'Failed to toggle factor. Please try again.');
+        }
+    }
+
+    /**
+     * Delete a factor
+     */
+    public function destroyFactor(Character $character, Factor $factor): RedirectResponse
+    {
+        $this->authorize('update', $character);
+
+        if ($factor->character_id !== $character->id) {
+            abort(404);
+        }
+
+        try {
+            $factor->delete();
+
+            return redirect()
+                ->route('characters.factors.manage', $character)
+                ->with('success', 'Factor deleted successfully!');
+        } catch (\Exception $e) {
+            Log::error('Factor deletion failed: '.$e->getMessage(), [
+                'factor_id' => $factor->id,
+                'exception' => $e,
+            ]);
+
+            return redirect()
+                ->back()
+                ->with('error', 'Failed to delete factor. Please try again.');
+        }
     }
 }

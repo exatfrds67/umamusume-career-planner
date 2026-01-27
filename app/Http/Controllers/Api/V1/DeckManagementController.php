@@ -356,6 +356,53 @@ class DeckManagementController extends Controller
     }
 
     /**
+     * Update card details (limit break and friendship level)
+     */
+    public function updateCardDetails(Request $request, Character $character, int $position): JsonResponse
+    {
+        $validated = $request->validate([
+            'limit_break_level' => 'required|integer|min:0|max:4',
+            'friendship_level' => 'required|integer|min:0|max:100',
+        ]);
+
+        try {
+            $card = $this->deckService->updateCardDetails(
+                $character->id,
+                $position,
+                $validated['limit_break_level'],
+                $validated['friendship_level']
+            );
+
+            if ($card) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Card details updated successfully',
+                    'data' => [
+                        'card' => $card->load('supportCard'),
+                        'statistics' => $this->deckService->getDeckStatistics($character->id),
+                    ],
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Card not found at specified position',
+            ], 404);
+        } catch (\Exception $e) {
+            Log::error('Failed to update card details', [
+                'character_id' => $character->id,
+                'position' => $position,
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update card details',
+            ], 500);
+        }
+    }
+
+    /**
      * Update friendship level
      */
     public function updateFriendship(Request $request, Character $character): JsonResponse

@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AIChatController extends Controller
 {
@@ -46,15 +47,7 @@ class AIChatController extends Controller
      */
     public function sendMessage(Request $request): JsonResponse
     {
-        $validated = $request->validate([
-            'message' => 'required|string|max:2000',
-            'character_id' => 'nullable|integer|exists:ucp_characters,id',
-            'career_id' => 'nullable|integer|exists:ucp_careers,id',
-            'provider' => 'nullable|string|in:ollama,bedrock,agent',
-            'model' => 'nullable|string|max:255',
-            'agent_type' => 'nullable|string|in:training,career,race,skill',
-            'conversation_id' => 'nullable|string|max:255',
-        ]);
+        $validated = $this->validateChatRequest($request);
 
         $userId = Auth::id();
         if (! is_int($userId)) {
@@ -67,51 +60,15 @@ class AIChatController extends Controller
         try {
             // Build context from character and career data
             $context = $this->buildContext($validated);
-
             $conversationId = $validated['conversation_id'] ?? Str::uuid()->toString();
 
-            $requestPayload = [
-                'prompt' => $validated['message'],
-                'context' => $context,
-                'agent_type' => $validated['agent_type'] ?? null,
-                'preferred_provider' => $validated['provider'] ?? null,
-                'preferred_model' => $validated['model'] ?? null,
-            ];
+            $response = $this->executeChatRequest($validated, $context);
 
-            /** @var array{response: mixed, model: string, provider: string, execution_time: float, cost: float} $execution */
-            $execution = $this->routingService->executeWithFallback($requestPayload);
-            $responseContent = $execution['response'];
-            $encodedResponse = json_encode($responseContent);
-            $encodedResponse = $encodedResponse === false ? '' : $encodedResponse;
-
-            $content = match (true) {
-                is_string($responseContent) => $responseContent,
-                is_array($responseContent) => is_string($responseContent['content'] ?? null)
-                    ? $responseContent['content']
-                    : $encodedResponse,
-                is_scalar($responseContent) => (string) $responseContent,
-                default => $encodedResponse,
-            };
-
-            /** @var array{content: string, model: string, provider: string, processing_time: float, tokens: int|null, cost: float, tools_used: array<int, string>, agent: string|null, confidence: float|null} $response */
-            $response = [
-                'content' => $content,
-                'model' => $execution['model'],
-                'provider' => $execution['provider'],
-                'processing_time' => $execution['execution_time'],
-                'tokens' => null,
-                'cost' => $execution['cost'],
-                'tools_used' => [],
-                'agent' => is_array($responseContent) ? ($responseContent['agent'] ?? null) : null,
-                'confidence' => is_array($responseContent) ? ($responseContent['confidence'] ?? null) : null,
-            ];
-
-            // Log the conversation
             $this->logConversation(
                 userId: $userId,
-                characterId: $validated['character_id'] ?? null,
-                conversationId: $conversationId,
-                message: $validated['message'],
+                characterId: isset($validated['character_id']) && is_int($validated['character_id']) ? $validated['character_id'] : null,
+                conversationId: is_string($conversationId) ? $conversationId : null,
+                message: is_string($validated['message']) ? $validated['message'] : '',
                 response: $response
             );
 
@@ -127,6 +84,8 @@ class AIChatController extends Controller
                     'tokens' => $response['tokens'] ?? null,
                     'cost' => $response['cost'],
                     'tools_used' => $response['tools_used'],
+                    'rag_enhanced' => $response['rag_enhanced'] ?? false,
+                    'knowledge_sources' => $response['knowledge_sources'] ?? [],
                 ],
                 'conversation_id' => $conversationId,
             ]);
@@ -143,6 +102,84 @@ class AIChatController extends Controller
                 'details' => config('app.debug') ? $e->getMessage() : null,
             ], 500);
         }
+    }
+
+    /**
+     * Stream a message response using Server-Sent Events (SSE).
+     */
+    public function sendMessageStreaming(Request $request): StreamedResponse
+    {
+        $validated = $this->validateChatRequest($request);
+
+        $userId = Auth::id();
+        if (! is_int($userId)) {
+            return response()->stream(function () {
+                echo 'data: ' . json_encode([
+                    'error' => 'Authentication required.',
+                ]) . "\n\n";
+                flush();
+            }, 401, [
+                'Content-Type' => 'text/event-stream',
+                'Cache-Control' => 'no-cache',
+                'X-Accel-Buffering' => 'no',
+            ]);
+        }
+
+        return response()->stream(function () use ($validated, $userId) {
+            try {
+                $context = $this->buildContext($validated);
+                $conversationId = $validated['conversation_id'] ?? Str::uuid()->toString();
+
+                $response = $this->executeChatRequest($validated, $context);
+
+                $this->logConversation(
+                    userId: $userId,
+                    characterId: isset($validated['character_id']) && is_int($validated['character_id']) ? $validated['character_id'] : null,
+                    conversationId: is_string($conversationId) ? $conversationId : null,
+                    message: is_string($validated['message']) ? $validated['message'] : '',
+                    response: $response
+                );
+
+                $chunks = $this->chunkResponse($response['content']);
+                foreach ($chunks as $chunk) {
+                    echo 'data: ' . json_encode([
+                        'chunk' => $chunk,
+                    ]) . "\n\n";
+                    flush();
+                }
+
+                echo 'data: ' . json_encode([
+                    'done' => true,
+                    'metadata' => [
+                        'model' => $response['model'],
+                        'provider' => $response['provider'],
+                        'agent' => $response['agent'] ?? null,
+                        'confidence' => $response['confidence'] ?? null,
+                        'processing_time' => $response['processing_time'],
+                        'tokens' => $response['tokens'] ?? null,
+                        'cost' => $response['cost'],
+                        'tools_used' => $response['tools_used'],
+                    ],
+                    'conversation_id' => $conversationId,
+                ]) . "\n\n";
+                flush();
+            } catch (\Exception $e) {
+                Log::error('AI chat streaming failed', [
+                    'error' => $e->getMessage(),
+                    'user_id' => $userId,
+                    'message' => $validated['message'] ?? null,
+                ]);
+
+                echo 'data: ' . json_encode([
+                    'error' => 'Failed to process your message. Please try again.',
+                ]) . "\n\n";
+                flush();
+            }
+        }, 200, [
+            'Content-Type' => 'text/event-stream',
+            'Cache-Control' => 'no-cache',
+            'X-Accel-Buffering' => 'no',
+        ]);
     }
 
     /**
@@ -352,7 +389,7 @@ class AIChatController extends Controller
             ]);
 
             // Store preferences in cache (or database if needed)
-            $cacheKey = 'ai_chat_preferences_'.Auth::id();
+            $cacheKey = 'ai_chat_preferences_' . Auth::id();
             $preferences = Cache::get($cacheKey, []);
             $preferences = is_array($preferences) ? $preferences : [];
             $preferences = array_merge($preferences, $validated);
@@ -365,7 +402,7 @@ class AIChatController extends Controller
         }
 
         // GET request - return current preferences
-        $cacheKey = 'ai_chat_preferences_'.Auth::id();
+        $cacheKey = 'ai_chat_preferences_' . Auth::id();
         $preferences = Cache::get($cacheKey, [
             'provider' => 'ollama',
             'model' => 'llama3.3',
@@ -429,6 +466,111 @@ class AIChatController extends Controller
         }
 
         return $context;
+    }
+
+    /**
+     * Validate AI chat request payload.
+     *
+     * @return array<string, mixed>
+     */
+    private function validateChatRequest(Request $request): array
+    {
+        if ($request->isJson()) {
+            $request->merge($request->json()->all());
+        }
+
+        return $request->validate([
+            'message' => 'required|string|max:2000',
+            'character_id' => 'nullable|integer|exists:ucp_characters,id',
+            'career_id' => 'nullable|integer|exists:ucp_careers,id',
+            'provider' => 'nullable|string|in:ollama,bedrock,agent',
+            'model' => 'nullable|string|max:255',
+            'agent_type' => 'nullable|string|in:training,career,race,skill',
+            'conversation_id' => 'nullable|string|max:255',
+        ]);
+    }
+
+    /**
+     * Execute AI chat request and normalize response.
+     *
+     * @param  array<string, mixed>  $validated
+     * @param  array<string, mixed>  $context
+     * @return array{content: string, model: string, provider: string, processing_time: float, tokens: int|null, cost: float, tools_used: array<int, string>, agent: string|null, confidence: float|null}
+     */
+    private function executeChatRequest(array $validated, array $context): array
+    {
+        $requestPayload = [
+            'prompt' => $validated['message'],
+            'context' => $context,
+            'agent_type' => $validated['agent_type'] ?? null,
+            'preferred_provider' => $validated['provider'] ?? null,
+            'preferred_model' => $validated['model'] ?? null,
+        ];
+
+        /** @var array{response: mixed, model: string, provider: string, execution_time: float, cost: float} $execution */
+        $execution = $this->routingService->executeWithFallback($requestPayload);
+        $responseContent = $execution['response'];
+        $encodedResponse = json_encode($responseContent);
+        $encodedResponse = $encodedResponse === false ? '' : $encodedResponse;
+
+        $content = match (true) {
+            is_string($responseContent) => $responseContent,
+            is_array($responseContent) => is_string($responseContent['content'] ?? null)
+                ? $responseContent['content']
+                : $encodedResponse,
+            is_scalar($responseContent) => (string) $responseContent,
+            default => $encodedResponse,
+        };
+
+        return [
+            'content' => $content,
+            'model' => $execution['model'],
+            'provider' => $execution['provider'],
+            'processing_time' => $execution['execution_time'],
+            'tokens' => null,
+            'cost' => $execution['cost'],
+            'tools_used' => [],
+            'agent' => is_array($responseContent) && isset($responseContent['agent']) && is_string($responseContent['agent']) ? $responseContent['agent'] : null,
+            'confidence' => is_array($responseContent) && isset($responseContent['confidence']) && is_float($responseContent['confidence']) ? $responseContent['confidence'] : null,
+            'rag_enhanced' => isset($context['rag_enhanced']) ? $context['rag_enhanced'] : false,
+            'knowledge_sources' => isset($context['knowledge_base']) && is_string($context['knowledge_base']) ? $this->extractKnowledgeSources($context['knowledge_base']) : [],
+        ];
+    }
+
+    /**
+     * Extract knowledge sources from RAG context for attribution
+     *
+     * @return array<int, string>
+     */
+    private function extractKnowledgeSources(string $knowledgeBase): array
+    {
+        $sources = [];
+        // Extract source filenames from knowledge base context
+        if (preg_match_all('/\(([^)]+\.md)\)/', $knowledgeBase, $matches)) {
+            $sources = array_unique($matches[1]);
+        }
+
+        return array_values($sources);
+    }
+
+    /**
+     * Split response text into SSE-friendly chunks.
+     *
+     * @return array<int, string>
+     */
+    private function chunkResponse(string $content, int $chunkSize = 160): array
+    {
+        if ($content === '') {
+            return [''];
+        }
+
+        $chunks = [];
+        $length = mb_strlen($content);
+        for ($offset = 0; $offset < $length; $offset += $chunkSize) {
+            $chunks[] = mb_substr($content, $offset, $chunkSize);
+        }
+
+        return $chunks;
     }
 
     /**

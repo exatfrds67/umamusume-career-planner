@@ -95,8 +95,10 @@ class SkillManagementController extends Controller
             /** @var Character $character */
             $character = Character::query()->findOrFail($validated['character_id']);
 
-            // Verify character ownership
-            if ($character->user_id !== auth()->id()) {
+            $isAdmin = auth()->user()?->isAdmin() ?? false;
+
+            // Verify character ownership (admins can access any character)
+            if (! $isAdmin && $character->user_id !== auth()->id()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Character not found',
@@ -113,8 +115,8 @@ class SkillManagementController extends Controller
             // Calculate final cost
             $finalCost = $this->hintService->calculateFinalCost($skill, $hintCount);
 
-            // Check if character has enough SP
-            if ($character->available_sp < $finalCost) {
+            // Check if character has enough SP (admins bypass this check)
+            if (! $isAdmin && $character->available_sp < $finalCost) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Insufficient SP',
@@ -129,7 +131,7 @@ class SkillManagementController extends Controller
                 'skill_id' => $skill->id,
                 'turn_acquired' => $validated['turn_acquired'] ?? $character->current_turn,
                 'career_phase' => $validated['career_phase'] ?? $character->career_stage,
-                'acquisition_method' => 'manual',
+                'acquisition_method' => 'purchase',
                 'base_sp_cost' => $skill->base_sp_cost,
                 'hints_used' => $hintCount,
                 'total_discount_percentage' => $skill->getDiscountPercentage($hintCount),
@@ -138,8 +140,10 @@ class SkillManagementController extends Controller
                 'is_active' => true,
             ]);
 
-            // Deduct SP from character
-            $character->decrement('available_sp', $finalCost);
+            // Deduct SP from character (admins bypass this)
+            if (! $isAdmin) {
+                $character->decrement('available_sp', $finalCost);
+            }
 
             // Mark hints as used
             $this->hintService->markHintsAsUsed($character, $skill);
@@ -232,8 +236,10 @@ class SkillManagementController extends Controller
             /** @var Character $character */
             $character = Character::query()->findOrFail($validated['character_id']);
 
-            // Verify character ownership
-            if ($character->user_id !== auth()->id()) {
+            $isAdmin = auth()->user()?->isAdmin() ?? false;
+
+            // Verify character ownership (admins can access any character)
+            if (! $isAdmin && $character->user_id !== auth()->id()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Character not found',

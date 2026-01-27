@@ -13,13 +13,20 @@ class SkillController extends Controller
      */
     public function index(Request $request): \Illuminate\View\View
     {
-        // Get all characters for the authenticated user
-        $characters = Character::where('user_id', Auth::id())
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $isAdmin = Auth::user()?->isAdmin() ?? false;
+
+        // Admins can see all characters, regular users only see their own
+        if ($isAdmin) {
+            $characters = Character::orderBy('name', 'asc')->get();
+        } else {
+            $characters = Character::where('user_id', Auth::id())
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
 
         return view('skills.index', [
             'characters' => $characters,
+            'isAdmin' => $isAdmin,
         ]);
     }
 }

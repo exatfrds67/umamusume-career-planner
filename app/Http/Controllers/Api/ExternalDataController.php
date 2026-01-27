@@ -36,14 +36,16 @@ class ExternalDataController extends Controller
                 return response()->json([
                     'success' => true,
                     'data' => $result['data'],
-                    'source' => 'umapyoi.net',
-                    'cached' => ($result['source'] ?? null) === 'cache',
+                    'source' => $result['source'] === 'database_cache' ? 'database_cache' : 'umapyoi.net',
+                    'cached' => in_array($result['source'], ['cache', 'database_cache']),
+                    'offline_mode' => $result['source'] === 'database_cache',
+                    'message' => $this->getSourceMessage($result['source']),
                 ]);
             }
 
             return response()->json([
                 'success' => false,
-                'message' => $result['message'] ?? 'Failed to fetch characters',
+                'message' => $result['error'] ?? 'Failed to fetch characters',
                 'error' => $result['error'] ?? null,
             ], 500);
         } catch (\Exception $e) {
@@ -74,14 +76,16 @@ class ExternalDataController extends Controller
                 return response()->json([
                     'success' => true,
                     'data' => $result['data'],
-                    'source' => 'umapyoi.net',
-                    'cached' => ($result['source'] ?? null) === 'cache',
+                    'source' => $result['source'] === 'database_cache' ? 'database_cache' : 'umapyoi.net',
+                    'cached' => in_array($result['source'], ['cache', 'database_cache']),
+                    'offline_mode' => $result['source'] === 'database_cache',
+                    'message' => $this->getSourceMessage($result['source']),
                 ]);
             }
 
             return response()->json([
                 'success' => false,
-                'message' => $result['message'] ?? 'Failed to fetch support cards',
+                'message' => $result['error'] ?? 'Failed to fetch support cards',
                 'error' => $result['error'] ?? null,
             ], 500);
         } catch (\Exception $e) {
@@ -202,7 +206,7 @@ class ExternalDataController extends Controller
     }
 
     /**
-     * Check API availability
+     * Check API availability and database cache status
      *
      * GET /api/external/status
      */
@@ -211,6 +215,7 @@ class ExternalDataController extends Controller
         try {
             $isAvailable = $this->umapyoiClient->isAvailable();
             $cacheStatus = $this->umapyoiClient->getCacheStatus();
+            $databaseCacheStatus = $this->getDatabaseCacheStatus();
 
             return response()->json([
                 'success' => true,
@@ -218,6 +223,7 @@ class ExternalDataController extends Controller
                     'umapyoi' => [
                         'available' => $isAvailable,
                         'cache_status' => $cacheStatus,
+                        'database_cache' => $databaseCacheStatus,
                     ],
                 ],
             ]);
@@ -232,6 +238,49 @@ class ExternalDataController extends Controller
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * Get database cache status for all data types
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    private function getDatabaseCacheStatus(): array
+    {
+        $types = ['characters', 'support_cards', 'news'];
+        $status = [];
+
+        foreach ($types as $type) {
+            $data = \App\Models\ExternalData::where('data_source', 'umapyoi')
+                ->where('data_type', $type)
+                ->where('data_key', 'api_cache')
+                ->valid()
+                ->first();
+
+            $status[$type] = [
+                'cached' => $data !== null,
+                'last_fetched' => $data?->last_fetched_at?->toISOString(),
+                'records_count' => $data ? count($data->data_content) : 0,
+                'expires_at' => $data?->expires_at?->toISOString(),
+                'is_valid' => $data?->isValid() ?? false,
+            ];
+        }
+
+        return $status;
+    }
+
+    /**
+     * Get user-friendly message based on data source
+     */
+    private function getSourceMessage(string $source): string
+    {
+        return match ($source) {
+            'api' => 'Fresh data from external API',
+            'cache' => 'Data from memory cache',
+            'database_cache' => 'Data from offline cache (API unavailable)',
+            'error' => 'Unable to fetch data',
+            default => 'Data retrieved successfully'
+        };
     }
 
     /**

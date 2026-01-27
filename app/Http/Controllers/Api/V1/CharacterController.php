@@ -94,8 +94,10 @@ class CharacterController extends Controller
     {
         $character = Character::findOrFail($id);
 
-        // Check authorization
-        if ($character->user_id !== Auth::id()) {
+        $isAdmin = Auth::user()?->isAdmin() ?? false;
+
+        // Check authorization (admins can view any character)
+        if (! $isAdmin && $character->user_id !== Auth::id()) {
             return response()->json([
                 'message' => 'Forbidden',
             ], 403);
@@ -197,8 +199,15 @@ class CharacterController extends Controller
             'skill_id' => ['required', 'integer', 'exists:ucp_skills,id'],
         ]);
 
-        $character = Character::where('user_id', Auth::id())
-            ->findOrFail($id);
+        $isAdmin = Auth::user()?->isAdmin() ?? false;
+
+        // Admins can access any character, regular users only their own
+        if ($isAdmin) {
+            $character = Character::findOrFail($id);
+        } else {
+            $character = Character::where('user_id', Auth::id())
+                ->findOrFail($id);
+        }
 
         $skill = Skill::findOrFail($validated['skill_id']);
 
@@ -225,11 +234,13 @@ class CharacterController extends Controller
             ], 422);
         }
 
-        // Check if character has sufficient SP
+        // Check if character has sufficient SP (bypass for admins)
         $availableSp = $character->available_sp ?? 0;
 
         $skillCost = $skill->base_sp_cost;
-        if ($availableSp < $skillCost) {
+        $isAdmin = Auth::user()?->isAdmin() ?? false;
+
+        if (! $isAdmin && $availableSp < $skillCost) {
             return response()->json([
                 'message' => 'Insufficient SP',
                 'errors' => [
@@ -238,10 +249,12 @@ class CharacterController extends Controller
             ], 422);
         }
 
-        // Deduct SP from character
-        $character->update([
-            'available_sp' => $availableSp - $skillCost,
-        ]);
+        // Deduct SP from character (only if not admin)
+        if (! $isAdmin) {
+            $character->update([
+                'available_sp' => $availableSp - $skillCost,
+            ]);
+        }
 
         // Create skill acquisition
         $acquisition = SkillAcquisition::create([

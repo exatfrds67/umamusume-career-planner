@@ -70,7 +70,8 @@ class CharacterPrefillController extends Controller
     public function search(Request $request): JsonResponse
     {
         try {
-            $query = $request->input('q', '');
+            $queryInput = $request->input('q', '');
+            $query = is_string($queryInput) ? $queryInput : '';
 
             $result = $this->umapyoiClient->getCharacters();
 
@@ -86,8 +87,8 @@ class CharacterPrefillController extends Controller
             // Filter by search query
             if ($query) {
                 $characters = array_filter($characters, function ($char) use ($query) {
-                    $nameEn = strtolower($char['name_en'] ?? '');
-                    $nameJp = strtolower($char['name_jp'] ?? '');
+                    $nameEn = isset($char['name_en']) && is_string($char['name_en']) ? strtolower($char['name_en']) : '';
+                    $nameJp = isset($char['name_jp']) && is_string($char['name_jp']) ? strtolower($char['name_jp']) : '';
                     $searchTerm = strtolower($query);
 
                     return str_contains($nameEn, $searchTerm) || str_contains($nameJp, $searchTerm);
@@ -128,59 +129,73 @@ class CharacterPrefillController extends Controller
 
     /**
      * Transform external character data to prefill format
+     *
+     * @param  array<string, mixed>  $character
+     * @return array{external_id: mixed, name: string, name_en: string, name_jp: string, image_url: string|null, category: string|null, color: string, stats: array{speed: int, stamina: int, power: int, guts: int, wit: int}, aptitudes: array{distance: array{sprint: string, mile: string, medium: string, long: string}, surface: array{turf: string, dirt: string}, style: array{front_runner: string, pace_chaser: string, late_surger: string, end_closer: string}}, metadata: array{source: string, fetched_at: string}}
      */
     protected function transformToPrefillFormat(array $character): array
     {
+        $baseStats = isset($character['base_stats']) && \is_array($character['base_stats']) ? $character['base_stats'] : [];
+        $aptitudes = isset($character['aptitudes']) && \is_array($character['aptitudes']) ? $character['aptitudes'] : [];
+
+        $nameEn = isset($character['name_en']) && \is_string($character['name_en']) ? $character['name_en'] : '';
+        $nameJp = isset($character['name_jp']) && \is_string($character['name_jp']) ? $character['name_jp'] : '';
+        $thumbImg = isset($character['thumb_img']) && \is_string($character['thumb_img']) ? $character['thumb_img'] : null;
+        $categoryLabel = isset($character['category_label_en']) && \is_string($character['category_label_en']) ? $character['category_label_en'] : null;
+        $colorMain = isset($character['color_main']) && \is_string($character['color_main']) ? $character['color_main'] : '#3B82F6';
+
         return [
             'external_id' => $character['id'] ?? null,
-            'name' => $character['name_en'] ?? $character['name_jp'] ?? '',
-            'name_en' => $character['name_en'] ?? '',
-            'name_jp' => $character['name_jp'] ?? '',
-            'image_url' => $character['thumb_img'] ?? null,
-            'category' => $character['category_label_en'] ?? null,
-            'color' => $character['color_main'] ?? '#3B82F6',
+            'name' => $nameEn !== '' ? $nameEn : $nameJp,
+            'name_en' => $nameEn,
+            'name_jp' => $nameJp,
+            'image_url' => $thumbImg,
+            'category' => $categoryLabel,
+            'color' => $colorMain,
             'stats' => [
-                'speed' => $character['base_stats']['speed'] ?? 0,
-                'stamina' => $character['base_stats']['stamina'] ?? 0,
-                'power' => $character['base_stats']['power'] ?? 0,
-                'guts' => $character['base_stats']['guts'] ?? 0,
-                'wit' => $character['base_stats']['wisdom'] ?? 0,
+                'speed' => isset($baseStats['speed']) && \is_numeric($baseStats['speed']) ? (int) $baseStats['speed'] : 0,
+                'stamina' => isset($baseStats['stamina']) && \is_numeric($baseStats['stamina']) ? (int) $baseStats['stamina'] : 0,
+                'power' => isset($baseStats['power']) && \is_numeric($baseStats['power']) ? (int) $baseStats['power'] : 0,
+                'guts' => isset($baseStats['guts']) && \is_numeric($baseStats['guts']) ? (int) $baseStats['guts'] : 0,
+                'wit' => isset($baseStats['wisdom']) && \is_numeric($baseStats['wisdom']) ? (int) $baseStats['wisdom'] : 0,
             ],
             'aptitudes' => [
                 'distance' => [
-                    'sprint' => $character['aptitudes']['turf_short'] ?? 'G',
-                    'mile' => $character['aptitudes']['turf_mile'] ?? 'G',
-                    'medium' => $character['aptitudes']['turf_medium'] ?? 'G',
-                    'long' => $character['aptitudes']['turf_long'] ?? 'G',
+                    'sprint' => isset($aptitudes['turf_short']) && \is_string($aptitudes['turf_short']) ? $aptitudes['turf_short'] : 'G',
+                    'mile' => isset($aptitudes['turf_mile']) && \is_string($aptitudes['turf_mile']) ? $aptitudes['turf_mile'] : 'G',
+                    'medium' => isset($aptitudes['turf_medium']) && \is_string($aptitudes['turf_medium']) ? $aptitudes['turf_medium'] : 'G',
+                    'long' => isset($aptitudes['turf_long']) && \is_string($aptitudes['turf_long']) ? $aptitudes['turf_long'] : 'G',
                 ],
                 'surface' => [
-                    'turf' => $this->getAverageTurfAptitude($character['aptitudes'] ?? []),
-                    'dirt' => $this->getAverageDirtAptitude($character['aptitudes'] ?? []),
+                    'turf' => $this->getAverageTurfAptitude($aptitudes),
+                    'dirt' => $this->getAverageDirtAptitude($aptitudes),
                 ],
                 'style' => [
-                    'front_runner' => $character['aptitudes']['runner'] ?? 'G',
-                    'pace_chaser' => $character['aptitudes']['leader'] ?? 'G',
-                    'late_surger' => $character['aptitudes']['betweener'] ?? 'G',
-                    'end_closer' => $character['aptitudes']['chaser'] ?? 'G',
+                    'front_runner' => isset($aptitudes['runner']) && \is_string($aptitudes['runner']) ? $aptitudes['runner'] : 'G',
+                    'pace_chaser' => isset($aptitudes['leader']) && \is_string($aptitudes['leader']) ? $aptitudes['leader'] : 'G',
+                    'late_surger' => isset($aptitudes['betweener']) && \is_string($aptitudes['betweener']) ? $aptitudes['betweener'] : 'G',
+                    'end_closer' => isset($aptitudes['chaser']) && \is_string($aptitudes['chaser']) ? $aptitudes['chaser'] : 'G',
                 ],
             ],
             'metadata' => [
                 'source' => 'umapyoi.net',
-                'fetched_at' => now()->toISOString(),
+                'fetched_at' => now()->toISOString() ?? '',
             ],
         ];
     }
 
     /**
      * Get average turf aptitude
+     *
+     * @param  array<string, mixed>  $aptitudes
      */
     protected function getAverageTurfAptitude(array $aptitudes): string
     {
         $turfAptitudes = [
-            $aptitudes['turf_short'] ?? 'G',
-            $aptitudes['turf_mile'] ?? 'G',
-            $aptitudes['turf_medium'] ?? 'G',
-            $aptitudes['turf_long'] ?? 'G',
+            is_string($aptitudes['turf_short'] ?? null) ? $aptitudes['turf_short'] : 'G',
+            is_string($aptitudes['turf_mile'] ?? null) ? $aptitudes['turf_mile'] : 'G',
+            is_string($aptitudes['turf_medium'] ?? null) ? $aptitudes['turf_medium'] : 'G',
+            is_string($aptitudes['turf_long'] ?? null) ? $aptitudes['turf_long'] : 'G',
         ];
 
         return $this->calculateAverageGrade($turfAptitudes);
@@ -188,14 +203,16 @@ class CharacterPrefillController extends Controller
 
     /**
      * Get average dirt aptitude
+     *
+     * @param  array<string, mixed>  $aptitudes
      */
     protected function getAverageDirtAptitude(array $aptitudes): string
     {
         $dirtAptitudes = [
-            $aptitudes['dirt_short'] ?? 'G',
-            $aptitudes['dirt_mile'] ?? 'G',
-            $aptitudes['dirt_medium'] ?? 'G',
-            $aptitudes['dirt_long'] ?? 'G',
+            is_string($aptitudes['dirt_short'] ?? null) ? $aptitudes['dirt_short'] : 'G',
+            is_string($aptitudes['dirt_mile'] ?? null) ? $aptitudes['dirt_mile'] : 'G',
+            is_string($aptitudes['dirt_medium'] ?? null) ? $aptitudes['dirt_medium'] : 'G',
+            is_string($aptitudes['dirt_long'] ?? null) ? $aptitudes['dirt_long'] : 'G',
         ];
 
         return $this->calculateAverageGrade($dirtAptitudes);
@@ -203,6 +220,8 @@ class CharacterPrefillController extends Controller
 
     /**
      * Calculate average grade from multiple grades
+     *
+     * @param  list<string>  $grades
      */
     protected function calculateAverageGrade(array $grades): string
     {
