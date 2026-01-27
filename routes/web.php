@@ -10,6 +10,15 @@ use Illuminate\Support\Facades\Route;
 // Main welcome route
 Route::get('/', fn () => view('welcome'))->name('welcome');
 
+// Demo routes for development and testing
+Route::prefix('demo')->group(function () {
+    Route::get('/password-toggle', fn () => view('test.password-demo'))->name('demo.password-toggle');
+    Route::get('/remember-me', fn () => view('test.remember-me-demo'))->name('demo.remember-me');
+});
+
+// Developer demos page
+Route::get('/dev/demos', fn () => view('dev.demos'))->name('dev.demos');
+
 // PWA routes - Service Worker and Offline Page
 Route::get('/sw.js', function () {
     $content = file_get_contents(public_path('sw.js'));
@@ -65,6 +74,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/characters/{character}/rest', [CharacterController::class, 'rest'])->name('characters.rest');
     Route::post('/characters/{character}/next-turn', [CharacterController::class, 'nextTurn'])->name('characters.next-turn');
 
+    // Factor management routes
+    Route::get('/characters/{character}/factors', [CharacterController::class, 'manageFactors'])->name('characters.factors.manage');
+    Route::post('/characters/{character}/factors', [CharacterController::class, 'storeFactors'])->name('characters.factors.store');
+    Route::put('/characters/{character}/factors/{factor}', [CharacterController::class, 'updateFactor'])->name('characters.factors.update');
+    Route::delete('/characters/{character}/factors/{factor}', [CharacterController::class, 'destroyFactor'])->name('characters.factors.destroy');
+    Route::patch('/characters/{character}/factors/{factor}/toggle', [CharacterController::class, 'toggleFactor'])->name('characters.factors.toggle');
+
     // Training routes
     Route::get('/characters/{character}/training', [App\Http\Controllers\TrainingController::class, 'index'])->name('training.index');
     Route::post('/characters/{character}/training', [App\Http\Controllers\TrainingController::class, 'store'])->name('training.store');
@@ -103,6 +119,19 @@ Route::middleware('auth')->group(function () {
     Route::get('/support-cards', [App\Http\Controllers\SupportCardController::class, 'index'])->name('support-cards.index');
     Route::get('/support-cards/{supportCard}', [App\Http\Controllers\SupportCardController::class, 'show'])->name('support-cards.show');
     Route::get('/characters/{character}/deck-builder', [App\Http\Controllers\SupportCardController::class, 'deckBuilder'])->name('characters.deck-builder');
+
+    // Support Card Deck Management API routes
+    Route::prefix('api/v1/characters/{character}/deck')->name('api.v1.characters.deck.')->group(function () {
+        Route::post('/save', [App\Http\Controllers\SupportCardController::class, 'saveDeck'])->name('save');
+        Route::post('/add-card', [App\Http\Controllers\SupportCardController::class, 'addCardToDeck'])->name('add-card');
+        Route::delete('/remove-card/{position}', [App\Http\Controllers\SupportCardController::class, 'removeCardFromDeck'])->name('remove-card');
+        Route::put('/update-card/{position}', [App\Http\Controllers\SupportCardController::class, 'updateCardInDeck'])->name('update-card');
+        Route::post('/swap', [App\Http\Controllers\SupportCardController::class, 'swapCards'])->name('swap');
+        Route::delete('/clear', [App\Http\Controllers\SupportCardController::class, 'clearDeck'])->name('clear');
+        Route::post('/optimize', [App\Http\Controllers\SupportCardController::class, 'optimizeDeck'])->name('optimize');
+        Route::get('/analysis', [App\Http\Controllers\Api\V1\DeckManagementController::class, 'getAnalysis'])->name('analysis');
+        Route::get('/recommendations', [App\Http\Controllers\Api\V1\DeckManagementController::class, 'getRecommendations'])->name('recommendations');
+    });
 
     // OCR Screenshot Processing routes
     Route::get('/ocr/upload', [App\Http\Controllers\OCRUploadController::class, 'showUploadPage'])->name('ocr.upload');

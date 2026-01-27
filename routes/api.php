@@ -21,7 +21,7 @@ Route::post('/password/email', [\App\Http\Controllers\Api\Auth\AuthController::c
 
 // Protected routes
 Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
-    Route::post('/logout', [\App\Http\Controllers\Api\Auth\AuthController::class, 'logout'])->name('logout');
+    Route::post('/logout', [\App\Http\Controllers\Api\Auth\AuthController::class, 'logout'])->name('api.logout');
     Route::get('/me', [\App\Http\Controllers\Api\Auth\AuthController::class, 'me'])->name('me');
     Route::get('/user', function (Request $request) {
         return $request->user();
@@ -312,11 +312,17 @@ Route::prefix('v1/characters/{character}/deck')->name('api.v1.characters.deck.')
     Route::delete('/cards', [\App\Http\Controllers\Api\V1\DeckManagementController::class, 'removeCard'])
         ->name('cards.remove');
 
+    Route::delete('/cards/{position}', [\App\Http\Controllers\Api\V1\DeckManagementController::class, 'removeCardBySlot'])
+        ->name('cards.remove-by-slot');
+
     Route::post('/cards/swap', [\App\Http\Controllers\Api\V1\DeckManagementController::class, 'swapCards'])
         ->name('cards.swap');
 
     Route::put('/cards/replace', [\App\Http\Controllers\Api\V1\DeckManagementController::class, 'replaceCard'])
         ->name('cards.replace');
+
+    Route::put('/cards/{position}/details', [\App\Http\Controllers\Api\V1\DeckManagementController::class, 'updateCardDetails'])
+        ->name('cards.update-details');
 
     // Deck operations
     Route::delete('/clear', [\App\Http\Controllers\Api\V1\DeckManagementController::class, 'clearDeck'])
@@ -414,6 +420,10 @@ Route::middleware('auth:sanctum')->prefix('ai/chat')->name('api.ai.chat.')->grou
     // Send message
     Route::post('/message', [\App\Http\Controllers\AIChatController::class, 'sendMessage'])
         ->name('message');
+
+    // Stream message response (SSE)
+    Route::post('/message/stream', [\App\Http\Controllers\AIChatController::class, 'sendMessageStreaming'])
+        ->name('message.stream');
 
     // Get server status with real-time monitoring
     Route::get('/server-status', [\App\Http\Controllers\AIChatController::class, 'getServerStatus'])
@@ -659,6 +669,16 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->prefix('neuron')->name('ap
             ->name('history');
         Route::get('/synergies/{characterId}', [\App\Http\Controllers\Api\SkillRecommendationController::class, 'getSynergies'])
             ->name('synergies');
+    });
+
+    // Career Planning Agent
+    Route::prefix('career-planning')->name('career-planning.')->group(function () {
+        Route::post('/plan', [\App\Http\Controllers\Api\CareerPlanningController::class, 'getPlan'])
+            ->name('plan');
+        Route::post('/plan/stream', [\App\Http\Controllers\Api\CareerPlanningController::class, 'getPlanStreaming'])
+            ->name('plan.stream');
+        Route::get('/history/{characterId}', [\App\Http\Controllers\Api\CareerPlanningController::class, 'getHistory'])
+            ->name('history');
     });
 });
 
@@ -1190,8 +1210,23 @@ Route::middleware('auth:sanctum')->prefix('skill-recommendations')->name('api.sk
         ->name('synergies');
 });
 
+// Career Planning API Routes (Neuron AI Integration - Task 12.4)
+Route::middleware('auth:sanctum')->prefix('career-planning')->name('api.career-planning.')->group(function () {
+    // Get career planning guidance
+    Route::post('/plan', [\App\Http\Controllers\Api\CareerPlanningController::class, 'getPlan'])
+        ->name('plan');
+
+    // Get streaming career plan (SSE)
+    Route::post('/plan/stream', [\App\Http\Controllers\Api\CareerPlanningController::class, 'getPlanStreaming'])
+        ->name('plan.stream');
+
+    // Get career planning history
+    Route::get('/history/{characterId}', [\App\Http\Controllers\Api\CareerPlanningController::class, 'getHistory'])
+        ->name('history');
+});
+
 // External Data API Routes (umapyoi.net, umamusumedb.com)
-Route::middleware(['web', 'auth', 'throttle:api'])->prefix('external')->name('api.external.')->group(function () {
+Route::middleware(['throttle:api'])->prefix('external')->name('api.external.')->group(function () {
     // Fetch characters from umapyoi.net
     Route::get('/characters', [\App\Http\Controllers\Api\ExternalDataController::class, 'getCharacters'])
         ->name('characters');
