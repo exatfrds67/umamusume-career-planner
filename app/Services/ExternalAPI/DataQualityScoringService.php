@@ -701,7 +701,6 @@ class DataQualityScoringService
 
         // Grade distribution
         $grades = array_column($history, 'grade');
-        /** @var array<string, int> $gradeDistribution */
         $gradeDistribution = array_count_values($grades);
 
         return [
