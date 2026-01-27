@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Services\Training;
 
 use App\Models\SupportDeck;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Manage bond level progression for support cards.
@@ -66,14 +65,11 @@ class BondProgressionService
             $newBond = min(self::MAX_BOND_LEVEL, $currentBond + $bondGain);
 
             // Update pivot table
-            DB::table('support_deck_cards')
-                ->where('support_deck_id', $deck->id)
-                ->where('support_card_id', $cardId)
-                ->update(['bond_level' => $newBond]);
+            $deck->supportCards()->updateExistingPivot($cardId, ['bond_level' => $newBond]);
 
             $updates[] = [
                 'card_id' => $cardId,
-                'card_name' => $card->name_en ?? $card->title_en ?? 'Unknown',
+                'card_name' => $card->name ?? 'Unknown',
                 'bond_before' => $currentBond,
                 'bond_after' => $newBond,
                 'bond_gain' => $bondGain,
@@ -109,10 +105,7 @@ class BondProgressionService
     {
         $bondLevel = max(0, min(self::MAX_BOND_LEVEL, $bondLevel));
 
-        return DB::table('support_deck_cards')
-            ->where('support_deck_id', $deck->id)
-            ->where('support_card_id', $cardId)
-            ->update(['bond_level' => $bondLevel]) > 0;
+        return $deck->supportCards()->updateExistingPivot($cardId, ['bond_level' => $bondLevel]) > 0;
     }
 
     /**
@@ -120,12 +113,9 @@ class BondProgressionService
      */
     public function getBondLevel(SupportDeck $deck, int $cardId): int
     {
-        $result = DB::table('support_deck_cards')
-            ->where('support_deck_id', $deck->id)
-            ->where('support_card_id', $cardId)
-            ->value('bond_level');
+        $card = $deck->supportCards()->where('support_card_id', $cardId)->first();
 
-        return (int) ($result ?? 0);
+        return $card ? ($card->pivot->bond_level ?? 0) : 0;
     }
 
     /**

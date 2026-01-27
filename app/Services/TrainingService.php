@@ -46,9 +46,17 @@ class TrainingService
             // Update bond levels if deck exists
             $bondUpdates = [];
             if ($activeDeck) {
-                $participatingCards = array_column($bonuses['active_cards'], 'id');
+                $activeCards = \is_array($bonuses['active_cards'] ?? null) ? $bonuses['active_cards'] : [];
+                $participatingCards = [];
+                foreach ($activeCards as $card) {
+                    if (\is_array($card) && isset($card['id']) && is_numeric($card['id'])) {
+                        $participatingCards[] = (int) $card['id'];
+                    }
+                }
                 $bondResult = $this->bondService->updateBondLevels($activeDeck, $participatingCards);
-                $bondUpdates = $bondResult['updated_cards'];
+                $bondUpdatesRaw = $bondResult['updated_cards'] ?? [];
+                /** @var array<int, array<string, mixed>> $bondUpdates */
+                $bondUpdates = \is_array($bondUpdatesRaw) ? $bondUpdatesRaw : [];
             }
 
             // Record skill hints (if any)
@@ -113,17 +121,23 @@ class TrainingService
 
         // Simulate hint drops (in real implementation, this would be based on game mechanics)
         // For now, we'll use a simple probability based on bond levels
-        foreach ($bonuses['active_cards'] as $card) {
-            $bondLevel = $card['bond'] ?? 0;
+        $activeCards = \is_array($bonuses['active_cards'] ?? null) ? $bonuses['active_cards'] : [];
+        foreach ($activeCards as $card) {
+            if (! \is_array($card)) {
+                continue;
+            }
+            $bondLevel = isset($card['bond']) && is_numeric($card['bond']) ? (int) $card['bond'] : 0;
             $hintProbability = min(0.3, $bondLevel / 300); // Max 30% at bond 90+
 
             // Random hint drop
             if (mt_rand(1, 100) <= ($hintProbability * 100)) {
                 // In real implementation, this would select a skill from the card's skill pool
                 // For now, we'll just record that a hint was obtained
+                $cardId = isset($card['id']) && is_numeric($card['id']) ? (int) $card['id'] : 0;
+                $cardName = isset($card['name']) && \is_string($card['name']) ? $card['name'] : 'Unknown';
                 $skillHints[] = [
-                    'card_id' => $card['id'],
-                    'card_name' => $card['name'],
+                    'card_id' => $cardId,
+                    'card_name' => $cardName,
                     'bond_level' => $bondLevel,
                     'hint_obtained' => true,
                 ];

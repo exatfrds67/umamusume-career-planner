@@ -177,9 +177,9 @@ class TrainingPredictionService
     public function getRecommendedTraining(Character $character): array
     {
         $predictions = $this->getPredictions($character);
-        $goals = $character->goals ?? [];
-        $targetStats = $goals['target_stats'] ?? [];
-        $currentStats = $character->current_stats;
+        $goals = \is_array($character->goals) ? $character->goals : [];
+        $targetStats = \is_array($goals['target_stats'] ?? null) ? $goals['target_stats'] : [];
+        $currentStats = \is_array($character->current_stats) ? $character->current_stats : [];
 
         if (empty($targetStats)) {
             // No goals set, recommend based on lowest stat
@@ -189,10 +189,10 @@ class TrainingPredictionService
         // Calculate stat gaps
         $statGaps = [];
         foreach ($targetStats as $stat => $target) {
-            if (! is_numeric($target)) {
+            if (! \is_string($stat) || ! is_numeric($target)) {
                 continue;
             }
-            $current = $currentStats[$stat] ?? 0;
+            $current = isset($currentStats[$stat]) && is_numeric($currentStats[$stat]) ? (int) $currentStats[$stat] : 0;
             $gap = max(0, (int) $target - $current);
             $statGaps[$stat] = $gap;
         }
@@ -221,7 +221,8 @@ class TrainingPredictionService
         }
 
         $recommendedFacility = $lowestStat ?? 'speed';
-        $prediction = $predictions['predictions'][$recommendedFacility] ?? null;
+        $predictionsArray = \is_array($predictions['predictions'] ?? null) ? $predictions['predictions'] : [];
+        $prediction = $predictionsArray[$recommendedFacility] ?? null;
 
         return [
             'recommended_facility' => $recommendedFacility,
@@ -250,17 +251,19 @@ class TrainingPredictionService
             }
         }
 
+        $predictionsArray = \is_array($predictions['predictions'] ?? null) ? $predictions['predictions'] : [];
+
         if (! $targetStat) {
             // All goals met, train lowest stat
             return [
                 'recommended_facility' => 'speed',
                 'reason' => 'All goals met',
-                'prediction' => $predictions['predictions']['speed'] ?? null,
+                'prediction' => $predictionsArray['speed'] ?? null,
             ];
         }
 
         $recommendedFacility = $targetStat;
-        $prediction = $predictions['predictions'][$recommendedFacility] ?? null;
+        $prediction = $predictionsArray[$recommendedFacility] ?? null;
 
         return [
             'recommended_facility' => $recommendedFacility,

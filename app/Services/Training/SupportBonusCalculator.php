@@ -102,11 +102,13 @@ class SupportBonusCalculator
 
     /**
      * Get limit break multiplier for a card.
+     *
+     * @param  \App\Models\SupportCard  $card
      */
     private function getLimitBreakMultiplier($card): float
     {
         // Limit break stars (0-4) add 10% per star
-        $limitBreak = $card->limit_break ?? 0;
+        $limitBreak = is_numeric($card->limit_break ?? null) ? (int) $card->limit_break : 0;
 
         return 1.0 + ($limitBreak * 0.1);
     }
@@ -138,7 +140,8 @@ class SupportBonusCalculator
      */
     public function applyBonusesToGains(array $baseGains, array $bonuses): array
     {
-        $multiplier = 1.0 + ($bonuses['final_bonus'] / 100);
+        $finalBonus = isset($bonuses['final_bonus']) && is_numeric($bonuses['final_bonus']) ? (float) $bonuses['final_bonus'] : 0.0;
+        $multiplier = 1.0 + ($finalBonus / 100);
 
         return array_map(
             fn ($gain) => (int) round($gain * $multiplier),

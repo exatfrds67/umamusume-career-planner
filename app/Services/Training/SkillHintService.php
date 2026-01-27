@@ -60,13 +60,14 @@ class SkillHintService
         $hintSources = $acquisition->hint_sources ?? [];
         $hintSources[] = [
             'card_id' => $sourceCard->id,
-            'card_name' => $sourceCard->name_en ?? $sourceCard->title_en ?? 'Unknown',
+            'card_name' => $sourceCard->name ?? 'Unknown',
             'obtained_at' => now()->toIso8601String(),
         ];
 
         // Calculate new SP discount
         $spDiscount = $newHintLevel * self::SP_DISCOUNT_PER_HINT;
-        $finalSpCost = $this->calculateDiscountedCost($acquisition->base_sp_cost, $spDiscount);
+        $baseCost = $acquisition->base_sp_cost ?? 0;
+        $finalSpCost = $this->calculateDiscountedCost($baseCost, $spDiscount);
 
         // Update acquisition
         $acquisition->update([
