@@ -417,8 +417,8 @@ class PerformanceMonitor {
 
         eventBus.emit("performanceMonitor:metric", report);
 
-        // Log warnings for poor metrics
-        if (rating === "poor") {
+        // Only log warnings for poor metrics in development
+        if (rating === "poor" && process.env.NODE_ENV === "development") {
             console.warn(
                 `[PerformanceMonitor] ${name} is poor: ${value.toFixed(2)}`,
                 report,

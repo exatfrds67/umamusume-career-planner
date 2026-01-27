@@ -1,42 +1,60 @@
 import "./bootstrap";
 import Alpine from "alpinejs";
 import persist from "@alpinejs/persist";
-
-// Import character validation module
-import "./character-validation.js";
-
-// Import training predictions module
-import "./training-predictions.js";
-
-// Import settings module
-import "./settings.js";
-
-// Import AI Chat module
-import "./ai-chat.js";
-
-// Import core modules
-import "./core/EventBus.js";
-import "./core/ResponsiveSystem.js";
-import "./core/AccessibilitySettings.js";
-import "./core/AccessibilitySystem.js";
-import "./core/ThemeSystem.js";
-
-// Import performance optimization modules
-import "./core/ImageOptimization.js";
-import "./core/PerformanceMonitor.js";
-
-// Import connectivity monitor (Task 2.2.1)
 import connectivityMonitor from "./core/connectivity-monitor.js";
 
-// Register Alpine plugins
+import deckBuilder from "./deck-builder.js";
+
+// Register Alpine plugins early
 Alpine.plugin(persist);
 
-// Register Alpine components
+// Register connectivity monitor before Alpine starts
 Alpine.data("connectivityMonitor", connectivityMonitor);
+Alpine.data("deckBuilder", deckBuilder);
 
-// Initialize Alpine.js
+// Initialize Alpine.js immediately for faster interactivity
 window.Alpine = Alpine;
+
+// Defer non-critical module loading
+const loadNonCriticalModules = () => {
+    // Import character validation module
+    import("./character-validation.js");
+
+    // Import training predictions module
+    import("./training-predictions.js");
+
+    // Import settings module
+    import("./settings.js");
+
+    // Import AI Chat module
+    import("./ai-chat.js");
+
+    // Import core modules
+    import("./core/EventBus.js");
+    import("./core/ResponsiveSystem.js");
+    import("./core/AccessibilitySettings.js");
+    import("./core/AccessibilitySystem.js");
+    import("./core/ThemeSystem.js");
+
+    // Import performance optimization modules
+    import("./core/ImageOptimization.js");
+    import("./core/PerformanceMonitor.js");
+};
+
+// Start Alpine immediately for better INP
 Alpine.start();
+
+// Load non-critical modules after Alpine starts
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", loadNonCriticalModules);
+} else {
+    // Use requestIdleCallback for better performance
+    if ("requestIdleCallback" in window) {
+        requestIdleCallback(loadNonCriticalModules, { timeout: 2000 });
+    } else {
+        setTimeout(loadNonCriticalModules, 1);
+    }
+}
 
 // Service Worker Management with advanced caching
 if ("serviceWorker" in navigator) {

@@ -23,6 +23,7 @@ window.aiChatInterface = function (config) {
         provider: "ollama",
         model: "llama3.3",
         status: "connecting",
+        selectedAgent: null,
 
         /**
          * Initialize the chat interface
@@ -78,50 +79,24 @@ window.aiChatInterface = function (config) {
             this.isProcessing = true;
             this.isTyping = true;
 
+            const aiMessageId = Date.now() + 1;
+            this.addMessage({
+                id: aiMessageId,
+                sender: "ai",
+                content: "",
+                timestamp: new Date().toISOString(),
+                metadata: {},
+                isStreaming: true,
+            });
+
             try {
-                const response = await fetch("/api/ai/chat/message", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": document.querySelector(
-                            'meta[name="csrf-token"]',
-                        ).content,
-                        Accept: "application/json",
-                    },
-                    body: JSON.stringify({
-                        message: userMessage,
-                        character_id: this.characterId,
-                        career_id: this.careerId,
-                        provider: this.provider,
-                        conversation_id: this.conversationId,
-                        model: this.model,
-                        agent_type: this.selectedAgent,
-                    }),
-                });
+                const streamed = await this.sendMessageStreaming(
+                    userMessage,
+                    aiMessageId,
+                );
 
-                const data = await response.json();
-
-                if (data.success) {
-                    // Add AI response to chat
-                    this.addMessage({
-                        id: Date.now() + 1,
-                        sender: "ai",
-                        content: data.message, // This is the success message content
-                        timestamp: new Date().toISOString(),
-                        metadata: data.metadata,
-                    });
-
-                    // Update conversation ID
-                    if (data.conversation_id) {
-                        this.conversationId = data.conversation_id;
-                    }
-                } else {
-                    // Handle Laravel standard error format (message) or custom error field
-                    this.showError(
-                        data.error ||
-                            data.message ||
-                            "Failed to get AI response",
-                    );
+                if (!streamed) {
+                    await this.sendMessageStandard(userMessage, aiMessageId);
                 }
             } catch (error) {
                 console.error("Failed to send message:", error);
@@ -132,6 +107,169 @@ window.aiChatInterface = function (config) {
                 this.isProcessing = false;
                 this.isTyping = false;
             }
+        },
+
+        /**
+         * Send a message using streaming SSE endpoint
+         */
+        async sendMessageStreaming(message, aiMessageId) {
+            try {
+                const response = await fetch("/api/ai/chat/message/stream", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": document.querySelector(
+                            'meta[name="csrf-token"]',
+                        ).content,
+                        Accept: "text/event-stream",
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        character_id: this.characterId,
+                        career_id: this.careerId,
+                        provider: this.provider,
+                        conversation_id: this.conversationId,
+                        model: this.model,
+                        agent_type: this.selectedAgent,
+                    }),
+                });
+
+                if (!response.ok || !response.body) {
+                    return false;
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder("utf-8");
+                let buffer = "";
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    buffer += decoder.decode(value, { stream: true });
+                    const parts = buffer.split("\n\n");
+                    buffer = parts.pop() || "";
+
+                    for (const part of parts) {
+                        const lines = part
+                            .split("\n")
+                            .map((line) => line.trim())
+                            .filter(Boolean);
+
+                        for (const line of lines) {
+                            if (!line.startsWith("data:")) continue;
+                            const payload = line.replace(/^data:\s*/, "");
+                            if (!payload) continue;
+
+                            let data;
+                            try {
+                                data = JSON.parse(payload);
+                            } catch (e) {
+                                continue;
+                            }
+
+                            if (data.error) {
+                                this.showError(data.error);
+                                return true;
+                            }
+
+                            if (data.chunk !== undefined) {
+                                this.appendToMessage(aiMessageId, data.chunk);
+                            }
+
+                            if (data.metadata) {
+                                this.updateMessageMetadata(
+                                    aiMessageId,
+                                    data.metadata,
+                                );
+                            }
+
+                            if (data.conversation_id) {
+                                this.conversationId = data.conversation_id;
+                            }
+
+                            if (data.done) {
+                                this.markMessageStreamingComplete(aiMessageId);
+                            }
+                        }
+                    }
+                }
+
+                return true;
+            } catch (error) {
+                console.error("Streaming failed:", error);
+                return false;
+            }
+        },
+
+        /**
+         * Send a message using the standard JSON endpoint
+         */
+        async sendMessageStandard(message, aiMessageId) {
+            const response = await fetch("/api/ai/chat/message", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": document.querySelector(
+                        'meta[name="csrf-token"]',
+                    ).content,
+                    Accept: "application/json",
+                },
+                body: JSON.stringify({
+                    message: message,
+                    character_id: this.characterId,
+                    career_id: this.careerId,
+                    provider: this.provider,
+                    conversation_id: this.conversationId,
+                    model: this.model,
+                    agent_type: this.selectedAgent,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                this.replaceMessageContent(aiMessageId, data.message);
+                this.updateMessageMetadata(aiMessageId, data.metadata);
+
+                if (data.conversation_id) {
+                    this.conversationId = data.conversation_id;
+                }
+            } else {
+                this.showError(
+                    data.error || data.message || "Failed to get AI response",
+                );
+            }
+
+            this.markMessageStreamingComplete(aiMessageId);
+        },
+
+        appendToMessage(messageId, chunk) {
+            const message = this.messages.find((m) => m.id === messageId);
+            if (!message) return;
+            message.content += chunk;
+            this.messages = [...this.messages];
+        },
+
+        replaceMessageContent(messageId, content) {
+            const message = this.messages.find((m) => m.id === messageId);
+            if (!message) return;
+            message.content = content;
+            this.messages = [...this.messages];
+        },
+
+        updateMessageMetadata(messageId, metadata) {
+            const message = this.messages.find((m) => m.id === messageId);
+            if (!message) return;
+            message.metadata = { ...message.metadata, ...metadata };
+            this.messages = [...this.messages];
+        },
+
+        markMessageStreamingComplete(messageId) {
+            const message = this.messages.find((m) => m.id === messageId);
+            if (!message) return;
+            message.isStreaming = false;
+            this.messages = [...this.messages];
         },
 
         /**
@@ -307,6 +445,7 @@ window.aiChatInterface = function (config) {
                 if (data.success && data.preferences) {
                     this.provider = data.preferences.provider || "ollama";
                     this.model = data.preferences.model || "llama3.3";
+                    this.selectedAgent = data.preferences.selected_agent || null;
                 }
             } catch (error) {
                 console.error("Failed to load preferences:", error);

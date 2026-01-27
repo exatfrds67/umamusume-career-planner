@@ -28,23 +28,25 @@ async function checkAvifSupport() {
     }
 
     return new Promise((resolve) => {
-        const img = new Image();
-        img.onload = () => {
-            formatSupport.avif = img.width > 0 && img.height > 0;
-            resolve(formatSupport.avif);
-        };
-        img.onerror = () => {
-            formatSupport.avif = false;
-            resolve(false);
-        };
-        // Minimal AVIF image (1x1 pixel) - suppress console error
-        img.onerror = (e) => {
-            e.preventDefault();
-            formatSupport.avif = false;
-            resolve(false);
-        };
-        img.src =
-            "data:image/avif;base64,AAAAIGZ0eXBhdmlmAAAAAGF2aWZtaWYxbWlhZk1BMUIAAADybWV0YQAAAAAAAAAoaGRscgAAAAAAAAAAcGljdAAAAAAAAAAAAAAAAGxpYmF2aWYAAAAADnBpdG0AAAAAAAEAAAAeaWxvYwAAAABEAAABAAEAAAABAAABGgAAAB0AAAAoaWluZgAAAAAAAQAAABppbmZlAgAAAAABAABhdjAxQ29sb3IAAAAAamlwcnAAAABLaXBjbwAAABRpc3BlAAAAAAAAAAIAAAACAAAAEHBpeGkAAAAAAwgICAAAAAxhdjFDgQ0MAAAAABNjb2xybmNseAACAAIAAYAAAAAXaXBtYQAAAAAAAAABAAEEAQKDBAAAACVtZGF0EgAKBzgABpAQ0AIAyAABAABAAIAMg=";
+        // Simple feature detection without loading images
+        // Most browsers that support AVIF will have it in the supported types
+        const canvas = document.createElement("canvas");
+        if (canvas.toDataURL && typeof canvas.toDataURL === "function") {
+            try {
+                const avifDataUrl = canvas.toDataURL("image/avif");
+                if (avifDataUrl.indexOf("data:image/avif") === 0) {
+                    formatSupport.avif = true;
+                    resolve(true);
+                    return;
+                }
+            } catch (e) {
+                // Canvas doesn't support AVIF
+            }
+        }
+
+        // Fallback: assume no AVIF support to avoid console errors
+        formatSupport.avif = false;
+        resolve(false);
     });
 }
 

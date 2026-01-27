@@ -6,18 +6,34 @@
 
 class ThemeSystem {
     constructor() {
-        // Get theme from localStorage or system preference
+        // Get theme from localStorage first, only fall back to system preference if no stored theme
         const stored = localStorage.getItem("theme");
-        this.theme = stored || this.getSystemTheme();
-        
-        // Always store in localStorage for consistency
-        localStorage.setItem("theme", this.theme);
+        if (stored) {
+            this.theme = stored;
+        } else {
+            this.theme = this.getSystemTheme();
+            // Only store in localStorage if there wasn't already a stored theme
+            localStorage.setItem("theme", this.theme);
+        }
+
         this.init();
     }
 
     init() {
         // Apply theme immediately (DOM already has dark class from inline script)
-        this.applyTheme(this.theme, true);
+        // Only apply if the current DOM state doesn't match localStorage
+        const storedTheme =
+            localStorage.getItem("theme") || this.getSystemTheme();
+        const currentlyDark =
+            document.documentElement.classList.contains("dark");
+        const shouldBeDark = storedTheme === "dark";
+
+        // Only apply theme if there's a mismatch
+        if (currentlyDark !== shouldBeDark) {
+            this.applyTheme(storedTheme, true);
+        } else {
+            this.theme = storedTheme;
+        }
 
         // Listen for system theme changes
         this.watchSystemTheme();
@@ -30,6 +46,23 @@ class ThemeSystem {
 
         // Set up background system
         this.setupBackgroundSystem();
+
+        // Listen for page navigation to reinitialize theme
+        this.setupNavigationListener();
+    }
+
+    setupNavigationListener() {
+        // For Laravel full-page navigation, we don't need to listen for URL changes
+        // The inline script in the layout handles theme initialization on each page load
+        // Only listen for popstate events for browser back/forward navigation
+        window.addEventListener("popstate", () => {
+            setTimeout(() => {
+                const storedTheme =
+                    localStorage.getItem("theme") || this.getSystemTheme();
+                this.theme = storedTheme;
+                this.applyTheme(this.theme, false);
+            }, 100);
+        });
     }
 
     setupKeyboardShortcut() {
@@ -69,14 +102,14 @@ class ThemeSystem {
     applyTheme(theme, isInitial = false) {
         this.theme = theme;
 
-        // Update HTML class (only if different from current state)
-        const htmlHasDark = document.documentElement.classList.contains("dark");
+        // Force theme application to ensure consistency
+        const htmlElement = document.documentElement;
         const shouldBeDark = theme === "dark";
-        
-        if (shouldBeDark && !htmlHasDark) {
-            document.documentElement.classList.add("dark");
-        } else if (!shouldBeDark && htmlHasDark) {
-            document.documentElement.classList.remove("dark");
+
+        // Always remove and re-add to ensure clean state
+        htmlElement.classList.remove("dark");
+        if (shouldBeDark) {
+            htmlElement.classList.add("dark");
         }
 
         // Store preference
@@ -87,8 +120,13 @@ class ThemeSystem {
             window.backgroundSystem.updateBackground();
         }
 
-        // Update toggle button state
+        // Update all toggle button states
         this.updateToggleButtonState();
+
+        // Re-setup theme toggles to handle any new buttons
+        setTimeout(() => {
+            this.setupThemeToggle();
+        }, 100);
 
         // Announce to screen readers (unless this is initial load)
         if (!isInitial) {
@@ -113,26 +151,46 @@ class ThemeSystem {
     }
 
     setupThemeToggle() {
-        const toggleButton = document.getElementById("theme-toggle");
+        // Handle multiple theme toggle buttons (welcome page and app header)
+        const toggleButtons = document.querySelectorAll(
+            '[id="theme-toggle"], [data-theme-toggle]',
+        );
 
-        if (toggleButton) {
-            toggleButton.addEventListener("click", () => {
-                this.toggleTheme();
-            });
+        toggleButtons.forEach((toggleButton) => {
+            if (toggleButton) {
+                // Remove existing listeners to prevent duplicates
+                toggleButton.removeEventListener(
+                    "click",
+                    this.toggleThemeHandler,
+                );
 
-            // Set initial aria-pressed state
-            this.updateToggleButtonState();
-        }
+                // Add click listener
+                this.toggleThemeHandler = () => {
+                    this.toggleTheme();
+                };
+                toggleButton.addEventListener("click", this.toggleThemeHandler);
+
+                // Set initial aria-pressed state
+                this.updateToggleButtonState(toggleButton);
+            }
+        });
     }
 
-    updateToggleButtonState() {
-        const toggleButton = document.getElementById("theme-toggle");
-        if (toggleButton) {
-            toggleButton.setAttribute(
-                "aria-pressed",
-                this.theme === "dark" ? "true" : "false",
-            );
-        }
+    updateToggleButtonState(specificButton = null) {
+        const toggleButtons = specificButton
+            ? [specificButton]
+            : document.querySelectorAll(
+                  '[id="theme-toggle"], [data-theme-toggle]',
+              );
+
+        toggleButtons.forEach((toggleButton) => {
+            if (toggleButton) {
+                toggleButton.setAttribute(
+                    "aria-pressed",
+                    this.theme === "dark" ? "true" : "false",
+                );
+            }
+        });
     }
 
     updateSettingsPageTheme() {
@@ -145,7 +203,7 @@ class ThemeSystem {
 
         const buttons = themeContainer.querySelectorAll("button");
         const themes = ["light", "dark", "system"];
-        
+
         // Find the button for current theme
         let activeIndex = themes.indexOf(this.theme);
         if (activeIndex === -1) activeIndex = 2; // Default to system
@@ -154,7 +212,7 @@ class ThemeSystem {
             if (idx === activeIndex) {
                 btn.classList.remove("border-gray-300", "dark:border-gray-600");
                 btn.classList.add("border-primary-500");
-                
+
                 // Add visual indicator if not present
                 if (!btn.querySelector(".border-primary-500")) {
                     const indicator = document.createElement("span");
