@@ -30,7 +30,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UcpSkillsSeeder::class,
             UcpSupportCardsSeeder::class,
-            // UcpAptitudesSeeder::class, // Skip for now - requires characters to be created first
+            EnhancedRealUmaMusumeCharactersSeeder::class, // Real Uma Musume characters with official baseline data
+            // UcpAptitudesSeeder::class, // Skip - aptitudes now created by EnhancedRealUmaMusumeCharactersSeeder
         ]);
     }
 }

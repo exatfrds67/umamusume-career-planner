@@ -62,6 +62,7 @@ class FactorFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'factor_type' => 'blue_stats',
+            'factor_name' => ucfirst($statType).' Factor',
             'stat_type' => $statType,
             'star_level' => $starLevel,
             'stat_bonus' => match ($starLevel) {
@@ -69,18 +70,148 @@ class FactorFactory extends Factory
                 '2_star' => 12,
                 '3_star' => 21,
             },
+            'aptitude_type' => null,
+            'grade_improvement' => null,
+            'unique_skill_name' => null,
+            'skill_effects' => null,
+            'normal_skill_name' => null,
+            'race_bonuses' => null,
         ]);
     }
 
     /**
      * Create a red aptitude factor.
      */
-    public function redAptitude(string $aptitudeType = 'turf'): static
+    public function redAptitude(string $aptitudeType = 'turf', int $gradeImprovement = 1): static
     {
         return $this->state(fn (array $attributes) => [
             'factor_type' => 'red_aptitudes',
+            'factor_name' => ucfirst(str_replace('_', ' ', $aptitudeType)).' Aptitude Factor',
+            'star_level' => '1_star', // Default to 1_star for red factors
             'aptitude_type' => $aptitudeType,
-            'grade_improvement' => fake()->numberBetween(1, 3),
+            'grade_improvement' => $gradeImprovement,
+            'stat_type' => null,
+            'stat_bonus' => null,
+            'unique_skill_name' => null,
+            'skill_effects' => null,
+            'normal_skill_name' => null,
+            'race_bonuses' => null,
+        ]);
+    }
+
+    /**
+     * Create a green unique skill factor.
+     */
+    public function greenUniqueSkill(string $skillName = 'Unique Skill'): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'factor_type' => 'green_unique_skills',
+            'factor_name' => $skillName,
+            'star_level' => '3_star',
+            'unique_skill_name' => $skillName,
+            'skill_effects' => [
+                'effect_type' => 'speed_boost',
+                'effect_value' => fake()->numberBetween(5, 15),
+                'condition' => 'final_straight',
+            ],
+            'stat_type' => null,
+            'stat_bonus' => null,
+            'aptitude_type' => null,
+            'grade_improvement' => null,
+            'normal_skill_name' => null,
+            'race_bonuses' => null,
+        ]);
+    }
+
+    /**
+     * Create a white normal skill factor.
+     */
+    public function whiteNormalSkill(string $skillName = 'Normal Skill'): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'factor_type' => 'white_normal_skills',
+            'factor_name' => $skillName,
+            'normal_skill_name' => $skillName,
+            'race_bonuses' => [
+                'distance_type' => fake()->randomElement(['sprint', 'mile', 'medium', 'long']),
+                'bonus_value' => fake()->numberBetween(3, 10),
+            ],
+            'stat_type' => null,
+            'stat_bonus' => null,
+            'aptitude_type' => null,
+            'grade_improvement' => null,
+            'unique_skill_name' => null,
+            'skill_effects' => null,
+        ]);
+    }
+
+    /**
+     * Create a 1-star factor.
+     */
+    public function oneStar(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'star_level' => '1_star',
+        ]);
+    }
+
+    /**
+     * Create a 2-star factor.
+     */
+    public function twoStar(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'star_level' => '2_star',
+        ]);
+    }
+
+    /**
+     * Create a 3-star factor.
+     */
+    public function threeStar(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'star_level' => '3_star',
+        ]);
+    }
+
+    /**
+     * Create an active factor.
+     */
+    public function active(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_active' => true,
+        ]);
+    }
+
+    /**
+     * Create an inactive factor.
+     */
+    public function inactive(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_active' => false,
+        ]);
+    }
+
+    /**
+     * Create a factor from main parent 1.
+     */
+    public function fromMainParent1(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'source_parent' => 'main_parent_1',
+        ]);
+    }
+
+    /**
+     * Create a factor from main parent 2.
+     */
+    public function fromMainParent2(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'source_parent' => 'main_parent_2',
         ]);
     }
 }
