@@ -580,7 +580,7 @@ class DataQualityScoringService
      */
     protected function cacheQualityScore(string $dataType, float $overallScore, array $dimensionScores): void
     {
-        $cacheKey = self::QUALITY_SCORE_KEY . $dataType;
+        $cacheKey = self::QUALITY_SCORE_KEY.$dataType;
 
         $scoreData = [
             'overall_score' => $overallScore,
@@ -596,7 +596,7 @@ class DataQualityScoringService
      */
     protected function recordQualityHistory(string $dataType, float $score, string $grade): void
     {
-        $historyKey = self::QUALITY_HISTORY_KEY . $dataType;
+        $historyKey = self::QUALITY_HISTORY_KEY.$dataType;
 
         $historyEntry = [
             'score' => $score,
@@ -626,7 +626,7 @@ class DataQualityScoringService
      */
     public function getCachedQualityScore(string $dataType): ?array
     {
-        $cacheKey = self::QUALITY_SCORE_KEY . $dataType;
+        $cacheKey = self::QUALITY_SCORE_KEY.$dataType;
 
         /** @var array<string, mixed>|null $cachedData */
         $cachedData = Cache::get($cacheKey);
@@ -641,7 +641,7 @@ class DataQualityScoringService
      */
     public function getQualityHistory(string $dataType, int $limit = 100): array
     {
-        $historyKey = self::QUALITY_HISTORY_KEY . $dataType;
+        $historyKey = self::QUALITY_HISTORY_KEY.$dataType;
 
         /** @var array<int, array<string, mixed>> $history */
         $history = Cache::get($historyKey, []);
@@ -656,7 +656,7 @@ class DataQualityScoringService
     /**
      * Get quality trend analysis
      *
-     * @return array{trend: string, avg_score: float, score_change: float, grade_distribution: array<string, int>}
+     * @return array{trend: string, avg_score: float, score_change: float, grade_distribution: array<int|string, int>}
      */
     public function getQualityTrend(string $dataType): array
     {

@@ -114,9 +114,9 @@ class AIChatController extends Controller
         $userId = Auth::id();
         if (! is_int($userId)) {
             return response()->stream(function () {
-                echo 'data: ' . json_encode([
+                echo 'data: '.json_encode([
                     'error' => 'Authentication required.',
-                ]) . "\n\n";
+                ])."\n\n";
                 flush();
             }, 401, [
                 'Content-Type' => 'text/event-stream',
@@ -142,13 +142,13 @@ class AIChatController extends Controller
 
                 $chunks = $this->chunkResponse($response['content']);
                 foreach ($chunks as $chunk) {
-                    echo 'data: ' . json_encode([
+                    echo 'data: '.json_encode([
                         'chunk' => $chunk,
-                    ]) . "\n\n";
+                    ])."\n\n";
                     flush();
                 }
 
-                echo 'data: ' . json_encode([
+                echo 'data: '.json_encode([
                     'done' => true,
                     'metadata' => [
                         'model' => $response['model'],
@@ -159,9 +159,11 @@ class AIChatController extends Controller
                         'tokens' => $response['tokens'] ?? null,
                         'cost' => $response['cost'],
                         'tools_used' => $response['tools_used'],
+                        'rag_enhanced' => $response['rag_enhanced'] ?? false,
+                        'knowledge_sources' => $response['knowledge_sources'] ?? [],
                     ],
                     'conversation_id' => $conversationId,
-                ]) . "\n\n";
+                ])."\n\n";
                 flush();
             } catch (\Exception $e) {
                 Log::error('AI chat streaming failed', [
@@ -170,9 +172,9 @@ class AIChatController extends Controller
                     'message' => $validated['message'] ?? null,
                 ]);
 
-                echo 'data: ' . json_encode([
+                echo 'data: '.json_encode([
                     'error' => 'Failed to process your message. Please try again.',
-                ]) . "\n\n";
+                ])."\n\n";
                 flush();
             }
         }, 200, [
@@ -389,7 +391,7 @@ class AIChatController extends Controller
             ]);
 
             // Store preferences in cache (or database if needed)
-            $cacheKey = 'ai_chat_preferences_' . Auth::id();
+            $cacheKey = 'ai_chat_preferences_'.Auth::id();
             $preferences = Cache::get($cacheKey, []);
             $preferences = is_array($preferences) ? $preferences : [];
             $preferences = array_merge($preferences, $validated);
@@ -402,7 +404,7 @@ class AIChatController extends Controller
         }
 
         // GET request - return current preferences
-        $cacheKey = 'ai_chat_preferences_' . Auth::id();
+        $cacheKey = 'ai_chat_preferences_'.Auth::id();
         $preferences = Cache::get($cacheKey, [
             'provider' => 'ollama',
             'model' => 'llama3.3',
@@ -513,6 +515,31 @@ class AIChatController extends Controller
         $encodedResponse = json_encode($responseContent);
         $encodedResponse = $encodedResponse === false ? '' : $encodedResponse;
 
+        $knowledgeBaseText = null;
+        if (isset($context['knowledge_base']) && is_string($context['knowledge_base'])) {
+            $knowledgeBaseText = $context['knowledge_base'];
+        } elseif (is_array($responseContent) && isset($responseContent['knowledge_base']) && is_string($responseContent['knowledge_base'])) {
+            $knowledgeBaseText = $responseContent['knowledge_base'];
+        } elseif (isset($execution['knowledge_base']) && is_string($execution['knowledge_base'])) {
+            $knowledgeBaseText = $execution['knowledge_base'];
+        }
+
+        $knowledgeSources = [];
+        if (is_array($responseContent) && isset($responseContent['knowledge_sources']) && is_array($responseContent['knowledge_sources'])) {
+            $knowledgeSources = array_values(array_filter($responseContent['knowledge_sources'], fn ($source) => is_string($source) && $source !== ''));
+        } elseif (isset($execution['knowledge_sources']) && is_array($execution['knowledge_sources'])) {
+            $knowledgeSources = array_values(array_filter($execution['knowledge_sources'], fn ($source) => is_string($source) && $source !== ''));
+        } elseif (is_string($knowledgeBaseText)) {
+            $knowledgeSources = $this->extractKnowledgeSources($knowledgeBaseText);
+        }
+
+        $ragEnhanced = (bool) (
+            (isset($context['rag_enhanced']) ? $context['rag_enhanced'] : null)
+            ?? (is_array($responseContent) && isset($responseContent['rag_enhanced']) ? $responseContent['rag_enhanced'] : null)
+            ?? (isset($execution['rag_enhanced']) ? $execution['rag_enhanced'] : null)
+            ?? (! empty($knowledgeSources))
+        );
+
         $content = match (true) {
             is_string($responseContent) => $responseContent,
             is_array($responseContent) => is_string($responseContent['content'] ?? null)
@@ -532,8 +559,8 @@ class AIChatController extends Controller
             'tools_used' => [],
             'agent' => is_array($responseContent) && isset($responseContent['agent']) && is_string($responseContent['agent']) ? $responseContent['agent'] : null,
             'confidence' => is_array($responseContent) && isset($responseContent['confidence']) && is_float($responseContent['confidence']) ? $responseContent['confidence'] : null,
-            'rag_enhanced' => isset($context['rag_enhanced']) ? $context['rag_enhanced'] : false,
-            'knowledge_sources' => isset($context['knowledge_base']) && is_string($context['knowledge_base']) ? $this->extractKnowledgeSources($context['knowledge_base']) : [],
+            'rag_enhanced' => $ragEnhanced,
+            'knowledge_sources' => $knowledgeSources,
         ];
     }
 
@@ -623,6 +650,8 @@ class AIChatController extends Controller
                     'agent' => $response['agent'] ?? null,
                     'confidence' => $response['confidence'] ?? null,
                     'tools_used' => $response['tools_used'],
+                    'rag_enhanced' => $response['rag_enhanced'] ?? false,
+                    'knowledge_sources' => $response['knowledge_sources'] ?? [],
                 ]),
             ]);
         } catch (\Exception $e) {

@@ -48,7 +48,7 @@ class VectorStoreService
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($category) {
             $documents = [];
-            $basePath = base_path($this->knowledgeBasePath . '/' . $category);
+            $basePath = base_path($this->knowledgeBasePath.'/'.$category);
 
             if (! File::exists($basePath)) {
                 Log::warning("Knowledge base path not found: {$basePath}");
@@ -140,13 +140,13 @@ class VectorStoreService
             return null;
         }
 
-        $cacheKey = 'embedding_' . md5($text);
+        $cacheKey = 'embedding_'.md5($text);
 
         /** @var array<int, float>|null $result */
         $result = Cache::remember($cacheKey, self::CACHE_TTL * 7, function () use ($text) {
             try {
                 $response = Http::withHeaders([
-                    'Authorization' => 'Bearer ' . $this->apiKey,
+                    'Authorization' => 'Bearer '.$this->apiKey,
                     'Content-Type' => 'application/json',
                 ])->post('https://api.openai.com/v1/embeddings', [
                     'model' => self::EMBEDDING_MODEL,
@@ -188,8 +188,8 @@ class VectorStoreService
     /**
      * Calculate cosine similarity between two vectors
      *
-     * @param array<int, float> $vecA
-     * @param array<int, float> $vecB
+     * @param  array<int, float>  $vecA
+     * @param  array<int, float>  $vecB
      */
     private function cosineSimilarity(array $vecA, array $vecB): float
     {
@@ -231,11 +231,12 @@ class VectorStoreService
 
             // Convert keyword search results to match expected format
             $keywordResults = $this->keywordSearch($query, $topK, $category);
+
             return array_map(function ($result) {
                 return [
                     'content' => $result['content'],
                     'metadata' => $result['metadata'],
-                    'similarity' => (float) ($result['score'] ?? 0) / 100, // Normalize score to 0-1 range
+                    'similarity' => (float) $result['score'] / 100, // Normalize score to 0-1 range
                 ];
             }, $keywordResults);
         }
@@ -265,7 +266,7 @@ class VectorStoreService
         }
 
         // Sort by similarity (highest first)
-        usort($results, fn($a, $b) => $b['similarity'] <=> $a['similarity']);
+        usort($results, fn ($a, $b) => $b['similarity'] <=> $a['similarity']);
 
         return array_slice($results, 0, $topK);
     }
@@ -298,7 +299,7 @@ class VectorStoreService
             }
         }
 
-        usort($results, fn($a, $b) => $b['score'] <=> $a['score']);
+        usort($results, fn ($a, $b) => $b['score'] <=> $a['score']);
 
         return array_slice($results, 0, $topK);
     }
@@ -331,7 +332,7 @@ class VectorStoreService
     /**
      * Retrieve relevant context for a query
      *
-     * @param array<string, mixed> $options
+     * @param  array<string, mixed>  $options
      */
     public function getRelevantContext(string $query, array $options = []): string
     {
@@ -348,14 +349,14 @@ class VectorStoreService
         $context = "**Relevant Game Knowledge:**\n\n";
 
         foreach ($results as $index => $result) {
-            $context .= '### Source ' . ($index + 1);
+            $context .= '### Source '.($index + 1);
 
             if ($includeMetadata && isset($result['metadata']['source'])) {
                 $context .= " ({$result['metadata']['source']})";
             }
 
             $context .= "\n\n";
-            $context .= trim($result['content']) . "\n\n";
+            $context .= trim($result['content'])."\n\n";
         }
 
         return $context;
