@@ -8,17 +8,18 @@
     <div class="py-12" x-data="aiDashboard()">
         <div class="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
             <!-- Summary Cards -->
-            <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <!-- Summary Cards -->
+            <section class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4" aria-label="Summary Statistics">
                 <!-- Total Requests Card -->
-                <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+                <article class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
                     <div class="p-6">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Requests (24h)</p>
+                                <h3 class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Requests (24h)</h3>
                                 <p class="mt-2 text-3xl font-semibold text-gray-900 dark:text-white"
                                     x-text="summary.total_requests_24h">0</p>
                             </div>
-                            <div class="rounded-full bg-blue-100 p-3 dark:bg-blue-900">
+                            <div class="rounded-full bg-blue-100 p-3 dark:bg-blue-900" aria-hidden="true">
                                 <svg class="h-6 w-6 text-blue-600 dark:text-blue-300" fill="none"
                                     stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -32,18 +33,18 @@
                                 x-text="summary.success_rate + '%'">0%</span>
                         </div>
                     </div>
-                </div>
+                </article>
 
                 <!-- Average Response Time Card -->
-                <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+                <article class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
                     <div class="p-6">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Avg Response Time</p>
+                                <h3 class="text-sm font-medium text-gray-600 dark:text-gray-400">Avg Response Time</h3>
                                 <p class="mt-2 text-3xl font-semibold text-gray-900 dark:text-white"
                                     x-text="summary.avg_response_time + 's'">0s</p>
                             </div>
-                            <div class="rounded-full bg-purple-100 p-3 dark:bg-purple-900">
+                            <div class="rounded-full bg-purple-100 p-3 dark:bg-purple-900" aria-hidden="true">
                                 <svg class="h-6 w-6 text-purple-600 dark:text-purple-300" fill="none"
                                     stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -52,18 +53,18 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </article>
 
                 <!-- Total Cost Card -->
-                <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+                <article class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
                     <div class="p-6">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Cost (24h)</p>
+                                <h3 class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Cost (24h)</h3>
                                 <p class="mt-2 text-3xl font-semibold text-gray-900 dark:text-white"
                                     x-text="'$' + summary.total_cost_24h">$0</p>
                             </div>
-                            <div class="rounded-full bg-green-100 p-3 dark:bg-green-900">
+                            <div class="rounded-full bg-green-100 p-3 dark:bg-green-900" aria-hidden="true">
                                 <svg class="h-6 w-6 text-green-600 dark:text-green-300" fill="none"
                                     stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -73,20 +74,20 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </article>
 
                 <!-- Server Health Card -->
-                <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+                <article class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
                     <div class="p-6">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Server Health</p>
+                                <h3 class="text-sm font-medium text-gray-600 dark:text-gray-400">Server Health</h3>
                                 <p class="mt-2 text-3xl font-semibold text-gray-900 dark:text-white">
                                     <span x-text="summary.healthy_servers">0</span>/<span
                                         x-text="summary.total_servers">0</span>
                                 </p>
                             </div>
-                            <div class="rounded-full bg-yellow-100 p-3 dark:bg-yellow-900">
+                            <div class="rounded-full bg-yellow-100 p-3 dark:bg-yellow-900" aria-hidden="true">
                                 <svg class="h-6 w-6 text-yellow-600 dark:text-yellow-300" fill="none"
                                     stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -96,13 +97,13 @@
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
+                </article>
+            </section>
 
             <!-- MCP Server Status -->
-            <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+            <section class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg" aria-labelledby="mcp-server-status-title">
                 <div class="p-6">
-                    <h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">MCP Server Status</h3>
+                    <h2 id="mcp-server-status-title" class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">MCP Server Status</h2>
                     <div class="space-y-4">
                         <template x-for="(server, name) in servers" :key="name">
                             <div
@@ -120,7 +121,7 @@
                                                 'text-red-600 dark:text-red-300': server.status === 'unhealthy',
                                                 'text-gray-600 dark:text-gray-400': server.status === 'disabled'
                                             }"
-                                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01">
                                             </path>
@@ -153,13 +154,13 @@
                         </template>
                     </div>
                 </div>
-            </div>
+            </section>
 
             <!-- Performance Comparison -->
-            <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+            <section class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg" aria-labelledby="performance-comparison-title">
                 <div class="p-6">
-                    <h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">AI Provider Performance
-                        Comparison</h3>
+                    <h2 id="performance-comparison-title" class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">AI Provider Performance
+                        Comparison</h2>
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead class="bg-gray-50 dark:bg-gray-900">
@@ -203,22 +204,22 @@
             </div>
 
             <!-- Cost Summary -->
-            <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+            <section class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg" aria-labelledby="cost-summary-title">
                 <div class="p-6">
-                    <h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Cost Summary</h3>
+                    <h2 id="cost-summary-title" class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Cost Summary</h2>
                     <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
                         <div>
-                            <p class="text-sm text-gray-600 dark:text-gray-400">Daily Cost</p>
+                            <h3 class="text-sm font-medium text-gray-600 dark:text-gray-400">Daily Cost</h3>
                             <p class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white"
                                 x-text="'$' + costs.daily_cost">$0</p>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-600 dark:text-gray-400">Weekly Cost</p>
+                            <h3 class="text-sm font-medium text-gray-600 dark:text-gray-400">Weekly Cost</h3>
                             <p class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white"
                                 x-text="'$' + costs.weekly_cost">$0</p>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-600 dark:text-gray-400">Monthly Cost</p>
+                            <h3 class="text-sm font-medium text-gray-600 dark:text-gray-400">Monthly Cost</h3>
                             <p class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white"
                                 x-text="'$' + costs.monthly_cost">$0</p>
                         </div>
@@ -235,7 +236,7 @@
                                 }"
                                 x-text="costs.budget_status?.budget_utilization + '%'">0%</span>
                         </div>
-                        <div class="mt-2 h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+                        <div class="mt-2 h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700" role="progressbar" :aria-valuenow="costs.budget_status?.budget_utilization || 0" aria-valuemin="0" aria-valuemax="100" aria-label="Budget status">
                             <div class="h-full transition-all duration-300"
                                 :class="{
                                     'bg-green-600': costs.budget_status?.budget_utilization < 75,
@@ -247,7 +248,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
         </div>
     </div>
 

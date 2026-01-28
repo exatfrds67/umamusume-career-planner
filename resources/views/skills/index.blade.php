@@ -5,7 +5,7 @@
 @section('content')
     <div class="space-y-6" x-data="skillManagement({{ $isAdmin ? 'true' : 'false' }})">
         {{-- Header Section --}}
-        <div class="flex items-center justify-between">
+        <header class="flex items-center justify-between">
             <div>
                 <div class="flex items-center gap-3">
                     <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Skill Management</h1>
@@ -40,7 +40,7 @@
                     <span class="ml-2">Refresh</span>
                 </button>
             </div>
-        </div>
+        </header>
 
         {{-- Loading State --}}
         <div x-show="loading && !character" class="card bg-white dark:bg-gray-800">
@@ -65,7 +65,9 @@
         {{-- Main Content --}}
         <div x-show="character && !loading" class="space-y-6">
             {{-- SP Overview Card --}}
-            <div class="card bg-linear-to-br from-primary-500 to-primary-600 text-white">
+            {{-- SP Overview Card --}}
+            <section class="card bg-linear-to-br from-primary-500 to-primary-600 text-white" aria-labelledby="sp-stats-heading">
+                <h2 id="sp-stats-heading" class="sr-only">SP Statistics</h2>
                 <div class="card-body">
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                         <div>
@@ -86,43 +88,53 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
 
             {{-- Tab Navigation --}}
             <div class="border-b border-gray-200 dark:border-gray-700">
-                <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                <nav class="-mb-px flex space-x-8" aria-label="Skill Management Sections" role="tablist">
                     <button @click="activeTab = 'inventory'"
+                        id="tab-inventory"
+                        aria-controls="panel-inventory"
                         :class="activeTab === 'inventory' ? 'border-primary-500 text-primary-600 dark:text-primary-400' :
                             'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
-                        class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" role="tab"
+                        class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500" role="tab"
                         :aria-selected="activeTab === 'inventory'">
                         Skill Inventory
                     </button>
                     <button @click="activeTab = 'acquisition'"
+                        id="tab-acquisition"
+                        aria-controls="panel-acquisition"
                         :class="activeTab === 'acquisition' ? 'border-primary-500 text-primary-600 dark:text-primary-400' :
                             'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
-                        class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" role="tab"
+                        class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500" role="tab"
                         :aria-selected="activeTab === 'acquisition'">
                         Skill Acquisition
                     </button>
                     <button @click="activeTab = 'evolution'"
+                        id="tab-evolution"
+                        aria-controls="panel-evolution"
                         :class="activeTab === 'evolution' ? 'border-primary-500 text-primary-600 dark:text-primary-400' :
                             'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
-                        class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" role="tab"
+                        class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500" role="tab"
                         :aria-selected="activeTab === 'evolution'">
                         Skill Evolution
                     </button>
                     <button @click="activeTab = 'planner'"
+                        id="tab-planner"
+                        aria-controls="panel-planner"
                         :class="activeTab === 'planner' ? 'border-primary-500 text-primary-600 dark:text-primary-400' :
                             'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
-                        class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" role="tab"
+                        class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500" role="tab"
                         :aria-selected="activeTab === 'planner'">
                         Build Planner
                     </button>
                     <button @click="activeTab = 'performance'"
+                        id="tab-performance"
+                        aria-controls="panel-performance"
                         :class="activeTab === 'performance' ? 'border-primary-500 text-primary-600 dark:text-primary-400' :
                             'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
-                        class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" role="tab"
+                        class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500" role="tab"
                         :aria-selected="activeTab === 'performance'">
                         Agent Performance
                     </button>
@@ -132,27 +144,27 @@
             {{-- Tab Content --}}
             <div class="mt-6">
                 {{-- Skill Inventory Tab --}}
-                <div x-show="activeTab === 'inventory'" role="tabpanel">
+                <div x-show="activeTab === 'inventory'" role="tabpanel" id="panel-inventory" aria-labelledby="tab-inventory" tabindex="0">
                     @include('skills.partials.inventory')
                 </div>
 
                 {{-- Skill Acquisition Tab --}}
-                <div x-show="activeTab === 'acquisition'" role="tabpanel">
+                <div x-show="activeTab === 'acquisition'" role="tabpanel" id="panel-acquisition" aria-labelledby="tab-acquisition" tabindex="0">
                     @include('skills.partials.acquisition')
                 </div>
 
                 {{-- Skill Evolution Tab --}}
-                <div x-show="activeTab === 'evolution'" role="tabpanel">
+                <div x-show="activeTab === 'evolution'" role="tabpanel" id="panel-evolution" aria-labelledby="tab-evolution" tabindex="0">
                     @include('skills.partials.evolution')
                 </div>
 
                 {{-- Build Planner Tab --}}
-                <div x-show="activeTab === 'planner'" role="tabpanel">
+                <div x-show="activeTab === 'planner'" role="tabpanel" id="panel-planner" aria-labelledby="tab-planner" tabindex="0">
                     @include('skills.partials.planner')
                 </div>
 
                 {{-- Agent Performance Tab --}}
-                <div x-show="activeTab === 'performance'" role="tabpanel">
+                <div x-show="activeTab === 'performance'" role="tabpanel" id="panel-performance" aria-labelledby="tab-performance" tabindex="0">
                     @include('skills.partials.performance')
                 </div>
             </div>

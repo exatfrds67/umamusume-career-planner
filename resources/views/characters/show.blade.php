@@ -48,11 +48,12 @@
         </div>
 
         <!-- Character Overview Card -->
-        <div class="glass-card overflow-visible rounded-xl">
+        <section class="card overflow-visible rounded-xl" role="region" aria-labelledby="character-overview-heading">
             <div class="p-6 md:p-8 relative overflow-hidden">
                 <!-- Background Decoration -->
                 <div
-                    class="absolute top-0 right-0 -mt-16 -mr-16 w-64 h-64 bg-primary-100 dark:bg-primary-900/20 rounded-full blur-3xl opacity-50 pointer-events-none">
+                    class="absolute top-0 right-0 -mt-16 -mr-16 w-64 h-64 bg-primary-100 dark:bg-primary-900/20 rounded-full blur-3xl opacity-50 pointer-events-none"
+                    aria-hidden="true">
                 </div>
 
                 <div class="flex flex-col md:flex-row gap-8 items-start relative">
@@ -98,8 +99,8 @@
                         <div class="flex justify-between items-start">
                             <div>
                                 <div class="flex items-center gap-3 mb-1">
-                                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
-                                        {{ $character->name }}</h1>
+                                    <h2 id="character-overview-heading" class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
+                                        {{ $character->name }}</h2>
                                     <x-ui.grade-badge :grade="$character->getStatGrade($character->current_stats['speed'] ?? 0)" size="sm" />
                                 </div>
                                 <div
@@ -161,20 +162,20 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Left Column: Stats -->
             <div class="lg:col-span-2 space-y-6">
                 <!-- Detailed Stats Card -->
-                <div class="glass-card-alt rounded-lg">
-                    <div
+                <section class="card rounded-lg" role="region" aria-labelledby="stats-heading">
+                    <header
                         class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between">
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Current Statistics</h3>
+                        <h2 id="stats-heading" class="text-lg font-bold text-gray-900 dark:text-white">Current Statistics</h2>
                         <span
                             class="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">Updated
                             {{ $character->updated_at->diffForHumans() }}</span>
-                    </div>
+                    </header>
                     <div class="card-body">
                         <div class="space-y-6">
                             @foreach (['speed' => 'blue', 'stamina' => 'orange', 'power' => 'red', 'guts' => 'pink', 'wit' => 'green'] as $stat => $color)
@@ -219,12 +220,12 @@
                 </div>
 
                 <!-- Race Schedule -->
-                <div class="glass-card-alt rounded-lg">
-                    <div
+                <section class="card rounded-lg" role="region" aria-labelledby="race-schedule-heading">
+                    <header
                         class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between">
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Race Schedule</h3>
+                        <h2 id="race-schedule-heading" class="text-lg font-bold text-gray-900 dark:text-white">Race Schedule</h2>
                         <span class="text-xs text-gray-500 dark:text-gray-400">Upcoming Races</span>
-                    </div>
+                    </header>
                     @php
                         $raceSchedule = $character->race_schedule ?? [];
                         $upcomingRaces = is_array($raceSchedule) ? array_slice($raceSchedule, 0, 5) : [];
@@ -298,7 +299,7 @@
                             <p class="mt-2">No races scheduled yet.</p>
                         </div>
                     @endif
-                </div>
+                </section>
 
                 {{-- 
                     Recent Careers / History Section
@@ -345,10 +346,10 @@
             <!-- Right Column: Aptitudes -->
             <div class="space-y-6">
                 <!-- Aptitudes -->
-                <div class="glass-card-alt rounded-lg">
-                    <div class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50">
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Aptitudes</h3>
-                    </div>
+                <section class="card rounded-lg" role="region" aria-labelledby="aptitudes-heading">
+                    <header class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50">
+                        <h2 id="aptitudes-heading" class="text-lg font-bold text-gray-900 dark:text-white">Aptitudes</h2>
+                    </header>
                     <div class="card-body space-y-6">
                         @php
                             $aptitudeGroups = [
@@ -387,17 +388,17 @@
                             <div class="text-center text-sm text-gray-500 py-4">No aptitude data available.</div>
                         @endif
                     </div>
-                </div>
+                </section>
             </div>
         </div>
 
         <!-- Skills, Support Deck, and Inherited Factors Row -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Skills -->
-            <div class="glass-card-alt rounded-lg">
-                <div class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50">
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Skills</h3>
-                </div>
+            <section class="card rounded-lg" role="region" aria-labelledby="skills-heading">
+                <header class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50">
+                    <h2 id="skills-heading" class="text-lg font-bold text-gray-900 dark:text-white">Skills</h2>
+                </header>
                 <div class="p-2">
                     @if ($character->skills->count() > 0)
                         <div class="space-y-1">
@@ -422,20 +423,20 @@
                         </div>
                     @endif
                 </div>
-            </div>
+            </section>
 
             <!-- Support Deck -->
-            <div class="glass-card-alt rounded-lg">
-                <div
+            <section class="card rounded-lg" role="region" aria-labelledby="support-deck-heading">
+                <header
                     class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between">
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Support Deck</h3>
-                    <a href="{{ route('characters.deck-builder', $character) }}" class="btn btn-sm btn-primary">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <h2 id="support-deck-heading" class="text-lg font-bold text-gray-900 dark:text-white">Support Deck</h2>
+                    <a href="{{ route('characters.deck-builder', $character) }}" class="btn btn-sm btn-primary" aria-label="Manage Support Deck">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                         </svg>
                         Manage Deck
                     </a>
-                </div>
+                </header>
                 <div class="card-body">
                     @if ($character->supportCards->count() > 0)
                         <div class="space-y-3">
@@ -487,20 +488,21 @@
                         </div>
                     @endif
                 </div>
-            </div>
+            </section>
 
             <!-- Inherited Factors -->
-            <div class="glass-card-alt rounded-lg">
-                <div
+            <section class="card rounded-lg" role="region" aria-labelledby="inherited-factors-heading">
+                <header
                     class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between">
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Inherited Factors</h3>
+                    <h2 id="inherited-factors-heading" class="text-lg font-bold text-gray-900 dark:text-white">Inherited Factors</h2>
                     @can('update', $character)
                         <a href="{{ route('characters.factors.manage', $character) }}"
-                            class="text-xs text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium">
+                            class="text-xs text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium"
+                            aria-label="Manage Inherited Factors">
                             Manage
                         </a>
                     @endcan
-                </div>
+                </header>
                 <div class="card-body">
                     @if ($character->factors->count() > 0)
                         @php
@@ -590,14 +592,14 @@
                             $activeFactors = $character->factors->where('is_active', true);
                             $totalStatBonuses = $activeFactors
                                 ->where('factor_type', 'blue_stats')
-                                ->sum(function ($factor) {
-                                    return $factor->getStatBonus();
-                                });
+                                ->reduce(function ($carry, $factor) {
+                                    return $carry + $factor->getStatBonus();
+                                }, 0);
                             $totalAptitudeUpgrades = $activeFactors
                                 ->where('factor_type', 'red_aptitudes')
-                                ->sum(function ($factor) {
-                                    return (int) str_replace('_star', '', $factor->star_level);
-                                });
+                                ->reduce(function ($carry, $factor) {
+                                    return $carry + (int) str_replace('_star', '', $factor->star_level);
+                                }, 0);
                             $uniqueSkills = $activeFactors->where('factor_type', 'green_unique_skills')->count();
                             $normalSkills = $activeFactors->where('factor_type', 'white_normal_skills')->count();
                         @endphp
@@ -655,7 +657,7 @@
                         </div>
                     @endif
                 </div>
-            </div>
+            </section>
         </div>
     </div>
 @endsection

@@ -19,7 +19,8 @@
                 @if ($selectedCharacter)
                     <div class="flex items-center gap-2">
                         <button onclick="refreshPredictions()"
-                            class="px-4 py-2 glass-card rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors duration-200 flex items-center gap-2">
+                            class="px-4 py-2 card hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 flex items-center gap-2"
+                            aria-label="Refresh predictions">
                             <svg class="w-5 h-5 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -28,7 +29,8 @@
                             <span class="text-sm font-medium text-gray-900 dark:text-white">Refresh</span>
                         </button>
                         <button onclick="clearCache()"
-                            class="px-4 py-2 glass-card rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200 flex items-center gap-2">
+                            class="px-4 py-2 card hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 flex items-center gap-2"
+                            aria-label="Clear prediction cache">
                             <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -42,8 +44,8 @@
         </div>
 
         <!-- Character Selection -->
-        <div class="glass-card rounded-xl p-6 mb-6 animate-fade-in-delay-1">
-            <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4 transition-colors duration-300">
+        <section class="card rounded-xl p-6 mb-6 animate-fade-in-delay-1" aria-labelledby="selection-heading">
+            <h2 id="selection-heading" class="text-xl font-semibold text-gray-900 dark:text-white mb-4 transition-colors duration-300">
                 Select Character
             </h2>
 
@@ -53,31 +55,38 @@
                         class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors duration-300">
                         Character
                     </label>
-                    <select id="character_id" name="character_id"
-                        class="w-full px-4 py-3 glass-card-inner rounded-lg focus:ring-4 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-all duration-200 text-gray-900 dark:text-white"
-                        onchange="this.form.submit()">
-                        <option value="">-- Select a character --</option>
-                        @foreach ($characters as $char)
-                            <option value="{{ $char->id }}"
-                                {{ $selectedCharacter && $selectedCharacter->id === $char->id ? 'selected' : '' }}>
-                                {{ $char->name }} ({{ ucfirst($char->scenario_type) }})
-                            </option>
-                        @endforeach
-                    </select>
+                    <div class="relative">
+                        <select id="character_id" name="character_id"
+                            class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-4 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-all duration-200 text-gray-900 dark:text-white appearance-none"
+                            onchange="this.form.submit()">
+                            <option value="">-- Select a character --</option>
+                            @foreach ($characters as $char)
+                                <option value="{{ $char->id }}"
+                                    {{ $selectedCharacter && $selectedCharacter->id === $char->id ? 'selected' : '' }}>
+                                    {{ $char->name }} ({{ ucfirst($char->scenario_type) }})
+                                </option>
+                            @endforeach
+                        </select>
+                        <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </div>
+                    </div>
                 </div>
             </form>
-        </div>
+        </section>
 
         @if ($selectedCharacter)
             <!-- Character Overview -->
-            <div class="glass-card rounded-xl p-6 mb-6 animate-fade-in-delay-2">
-                <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4 transition-colors duration-300">
+            <section class="card rounded-xl p-6 mb-6 animate-fade-in-delay-2" aria-labelledby="char-overview-heading">
+                <h2 id="char-overview-heading" class="text-xl font-semibold text-gray-900 dark:text-white mb-4 transition-colors duration-300">
                     {{ $selectedCharacter->name }}
                 </h2>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <!-- Current Stats -->
-                    <div class="glass-card-inner rounded-lg p-4">
+                    <div class="bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 rounded-lg p-4">
                         <h3
                             class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 transition-colors duration-300">
                             Current Stats</h3>
@@ -96,7 +105,7 @@
                     </div>
 
                     <!-- Energy & Mood -->
-                    <div class="glass-card-inner rounded-lg p-4">
+                    <div class="bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 rounded-lg p-4">
                         <h3
                             class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 transition-colors duration-300">
                             Status</h3>
@@ -129,7 +138,7 @@
                     </div>
 
                     <!-- Support Cards -->
-                    <div class="glass-card-inner rounded-lg p-4">
+                    <div class="bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 rounded-lg p-4">
                         <h3
                             class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 transition-colors duration-300">
                             Support Cards</h3>
@@ -145,7 +154,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
 
             <!-- Training Predictions App Container (WF-004: Six-Facility Grid) -->
             <div id="training-predictions-app" 
@@ -155,7 +164,7 @@
                 class="animate-fade-in-delay-3">
                 
                 <!-- Loading State -->
-                <div id="predictions-loading" class="glass-card rounded-xl p-12 text-center">
+                <div id="predictions-loading" class="card rounded-xl p-12 text-center" role="status" aria-busy="true" aria-live="polite">
                     <div class="text-primary-500 dark:text-primary-400 mb-4">
                         <svg class="mx-auto h-16 w-16 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -171,7 +180,7 @@
                 </div>
 
                 <!-- Error State -->
-                <div id="predictions-error" class="glass-card rounded-xl p-12 text-center hidden">
+                <div id="predictions-error" class="card rounded-xl p-12 text-center hidden" role="alert" aria-live="assertive">
                     <div class="text-red-500 dark:text-red-400 mb-4">
                         <svg class="mx-auto h-16 w-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -193,7 +202,7 @@
                 <div id="predictions-grid" class="hidden">
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         <!-- Speed Facility -->
-                        <div class="glass-card rounded-xl p-6 training-facility" data-facility="speed">
+                        <div class="card rounded-xl p-6 training-facility" data-facility="speed" role="article">
                             <div class="flex items-center justify-between mb-4">
                                 <div class="flex items-center gap-3">
                                     <div class="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
@@ -213,7 +222,7 @@
                         </div>
 
                         <!-- Stamina Facility -->
-                        <div class="glass-card rounded-xl p-6 training-facility" data-facility="stamina">
+                        <div class="card rounded-xl p-6 training-facility" data-facility="stamina" role="article">
                             <div class="flex items-center justify-between mb-4">
                                 <div class="flex items-center gap-3">
                                     <div class="w-10 h-10 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
@@ -233,7 +242,7 @@
                         </div>
 
                         <!-- Power Facility -->
-                        <div class="glass-card rounded-xl p-6 training-facility" data-facility="power">
+                        <div class="card rounded-xl p-6 training-facility" data-facility="power" role="article">
                             <div class="flex items-center justify-between mb-4">
                                 <div class="flex items-center gap-3">
                                     <div class="w-10 h-10 rounded-lg bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
@@ -253,7 +262,7 @@
                         </div>
 
                         <!-- Guts Facility -->
-                        <div class="glass-card rounded-xl p-6 training-facility" data-facility="guts">
+                        <div class="card rounded-xl p-6 training-facility" data-facility="guts" role="article">
                             <div class="flex items-center justify-between mb-4">
                                 <div class="flex items-center gap-3">
                                     <div class="w-10 h-10 rounded-lg bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center">
@@ -273,7 +282,7 @@
                         </div>
 
                         <!-- Wit Facility -->
-                        <div class="glass-card rounded-xl p-6 training-facility" data-facility="wit">
+                        <div class="card rounded-xl p-6 training-facility" data-facility="wit" role="article">
                             <div class="flex items-center justify-between mb-4">
                                 <div class="flex items-center gap-3">
                                     <div class="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
@@ -293,7 +302,7 @@
                         </div>
 
                         <!-- Rest Option -->
-                        <div class="glass-card rounded-xl p-6 training-facility" data-facility="rest">
+                        <div class="card rounded-xl p-6 training-facility" data-facility="rest" role="article">
                             <div class="flex items-center justify-between mb-4">
                                 <div class="flex items-center gap-3">
                                     <div class="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
@@ -313,8 +322,8 @@
                     </div>
                     
                     <!-- AI Summary -->
-                    <div id="predictions-summary" class="mt-6 glass-card rounded-xl p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                    <div id="predictions-summary" class="mt-6 card rounded-xl p-6" role="complementary" aria-labelledby="ai-recommendation-heading">
+                        <h3 id="ai-recommendation-heading" class="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                             <svg class="w-5 h-5 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                             </svg>
@@ -328,7 +337,7 @@
             </div>
         @else
             <!-- No Character Selected -->
-            <div class="glass-card rounded-xl p-12 text-center animate-fade-in-delay-2">
+            <div class="card rounded-xl p-12 text-center animate-fade-in-delay-2" role="status">
                 <div class="text-gray-400 dark:text-gray-500 mb-4 transition-colors duration-300">
                     <svg class="mx-auto h-16 w-16" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                         aria-hidden="true">

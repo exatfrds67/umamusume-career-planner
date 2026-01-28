@@ -1,12 +1,16 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="space-y-6" x-data="deckBuilder(@js($currentDeck), {{ $character->id }})" x-init="init()">
+    @php
+        $characterName = data_get($character, 'name', 'Unknown Character');
+    @endphp
+
+    <main class="space-y-6" x-data="deckBuilder()" x-init="init()">
         <!-- Header -->
-        <div class="sm:flex sm:items-center sm:justify-between">
+        <header class="sm:flex sm:items-center sm:justify-between">
             <div>
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-                    Deck Builder - {{ $character?->name ?? 'Unknown Character' }}
+                    Deck Builder - {{ $characterName }}
                 </h1>
                 <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
                     Build and optimize your support card deck (6 cards required: 5 owned + 1 friend)
@@ -44,13 +48,14 @@
                     Back to Character
                 </a>
             </div>
-        </div>
+        </header>
 
         <!-- Deck Status -->
         @isset($deckAnalysis)
             @if ($deckAnalysis && isset($deckAnalysis['synergy']))
-                <div
+                <section aria-labelledby="status-heading"
                     class="card bg-linear-to-r from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 p-4 rounded-lg border border-primary-200 dark:border-primary-700">
+                    <h2 id="status-heading" class="sr-only">Deck Analysis</h2>
                     <div class="flex items-center justify-between">
                         <div>
                             <h3 class="text-sm font-medium text-primary-900 dark:text-primary-100">Synergy Score</h3>
@@ -74,9 +79,9 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Deck Slots and Statistics (Left/Top) -->
             <div class="lg:col-span-2 space-y-4">
-                <div
+                <section aria-labelledby="slots-heading"
                     class="card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    <h2 id="slots-heading" class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                         Deck Slots ({{ $currentDeck->count() }}/6)
                     </h2>
 
@@ -236,9 +241,9 @@
                 </div>
 
                 <!-- Deck Statistics (WF-011/SPEC-005: Enhanced with type distribution and synergy) -->
-                <div
+                <section aria-labelledby="stats-heading"
                     class="card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Deck Statistics</h3>
+                    <h2 id="stats-heading" class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Deck Statistics</h2>
                     <dl class="space-y-2">
                         <div class="flex justify-between text-sm">
                             <dt class="text-gray-500 dark:text-gray-400">Cards</dt>
@@ -338,10 +343,10 @@
             </div>
 
             <!-- Card Library (Right/Bottom) -->
-            <div class="space-y-4">
+            <aside aria-labelledby="library-heading" class="space-y-4">
                 <div
                     class="card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col">
-                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Available Cards</h2>
+                    <h2 id="library-heading" class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Available Cards</h2>
 
                     <!-- Filters -->
                     <div class="space-y-3 mb-4">
@@ -375,12 +380,7 @@
                         style="max-height: calc(100vh - 400px); min-height: 600px;">
                         @foreach ($availableCards as $card)
                             <div class="p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-primary-400 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/10 hover:shadow-md transition-all cursor-pointer transform hover:scale-[1.02]"
-                                x-show="filterCard({{ json_encode([
-                                    'name' => $card->name,
-                                    'character_name' => $card->character_name,
-                                    'card_type' => $card->card_type,
-                                    'meta_tier' => $card->meta_tier,
-                                ]) }})"
+                                x-show="filterCard(@js(['name' => $card->name, 'character_name' => $card->character_name, 'card_type' => $card->card_type, 'meta_tier' => $card->meta_tier]))"
                                 @click="selectCard({{ $card->id }})" tabindex="0"
                                 @keydown.enter="selectCard({{ $card->id }})"
                                 @keydown.space.prevent="selectCard({{ $card->id }})">
@@ -421,7 +421,7 @@
                         @endforeach
                     </div>
                 </div>
-            </div>
+            </aside>
         </div>
 
         <!-- Edit Card Details Modal -->
@@ -516,7 +516,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </main>
     @php
         $deckData = $currentDeck
             ->map(function ($card) {
@@ -531,11 +531,41 @@
             })
             ->values()
             ->toArray();
+        
+        $apiRoutes = [
+            'addCard' => route('api.v1.characters.deck.add-card', $character),
+            'removeCard' => route('api.v1.characters.deck.remove-card', ['character' => $character, 'position' => '__POSITION__']),
+            'clearDeck' => route('api.v1.characters.deck.clear', $character),
+            'saveDeck' => route('api.v1.characters.deck.save', $character),
+            'swapCards' => route('api.v1.characters.deck.cards.swap', $character),
+            'updateDetails' => route('api.v1.characters.deck.cards.update-details', ['character' => $character, 'position' => '__POSITION__']),
+        ];
     @endphp
+    <div
+        id="deck-builder-data"
+        data-deck='@json($deckData)'
+        data-api-routes='@json($apiRoutes)'
+        class="hidden"
+    ></div>
+    <script>
+        window.deckBuilderData = (() => {
+            const dataEl = document.getElementById('deck-builder-data');
+            if (!dataEl) {
+                return { deck: [], apiRoutes: {} };
+            }
+
+            return {
+                deck: JSON.parse(dataEl.dataset.deck || '[]'),
+                apiRoutes: JSON.parse(dataEl.dataset.apiRoutes || '{}'),
+            };
+        })();
+    </script>
     <script>
         window.deckBuilder = function() {
+            const { deck: deckData, apiRoutes } = window.deckBuilderData;
+            
             return {
-                deck: @json($deckData),
+                deck: deckData,
                 selectedSlot: null,
                 isFriendSlot: false,
                 searchQuery: '',
@@ -666,8 +696,7 @@
                     const isFriend = targetSlot === 6;
 
                     try {
-                        const response = await fetch(
-                            '{{ route('api.v1.characters.deck.add-card', $character) }}', {
+                        const response = await fetch(apiRoutes.addCard, {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
@@ -698,8 +727,7 @@
                 async removeCard(slot) {
                     try {
                         const response = await fetch(
-                            `{{ route('api.v1.characters.deck.remove-card', ['character' => $character, 'position' => '__POSITION__']) }}`
-                            .replace('__POSITION__', slot), {
+                            apiRoutes.removeCard.replace('__POSITION__', slot), {
                                 method: 'DELETE',
                                 headers: {
                                     'Content-Type': 'application/json',
@@ -726,7 +754,7 @@
                     }
 
                     try {
-                        const response = await fetch('{{ route('api.v1.characters.deck.clear', $character) }}', {
+                        const response = await fetch(apiRoutes.clearDeck, {
                             method: 'DELETE',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -779,7 +807,7 @@
                     }
 
                     try {
-                        const response = await fetch('{{ route('api.v1.characters.deck.save', $character) }}', {
+                        const response = await fetch(apiRoutes.saveDeck, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -844,9 +872,7 @@
                     const sourceSlot = this.draggedSlot;
 
                     try {
-                        // Use swap API endpoint
-                        const response = await fetch(
-                            '{{ route('api.v1.characters.deck.cards.swap', $character) }}', {
+                        const response = await fetch(apiRoutes.swapCards, {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
@@ -882,11 +908,10 @@
 
                 // Keyboard controls
                 async moveCardUp(slot) {
-                    if (slot === 1) return; // Already at top
+                    if (slot === 1) return;
 
                     try {
-                        const response = await fetch(
-                            '{{ route('api.v1.characters.deck.cards.swap', $character) }}', {
+                        const response = await fetch(apiRoutes.swapCards, {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
@@ -912,11 +937,10 @@
                 },
 
                 async moveCardDown(slot) {
-                    if (slot === 6) return; // Already at bottom
+                    if (slot === 6) return;
 
                     try {
-                        const response = await fetch(
-                            '{{ route('api.v1.characters.deck.cards.swap', $character) }}', {
+                        const response = await fetch(apiRoutes.swapCards, {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
@@ -966,8 +990,7 @@
 
                     try {
                         const response = await fetch(
-                            `{{ route('api.v1.characters.deck.cards.update-details', ['character' => $character, 'position' => '__POSITION__']) }}`
-                            .replace('__POSITION__', this.editingSlot), {
+                            apiRoutes.updateDetails.replace('__POSITION__', this.editingSlot), {
                                 method: 'PUT',
                                 headers: {
                                     'Content-Type': 'application/json',

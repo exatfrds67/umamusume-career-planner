@@ -111,10 +111,30 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* Focus styles for accessibility (3:1 contrast ratio) */
+/* Focus styles for accessibility (WCAG 2.2 AA - 3:1 contrast ratio) */
 :focus-visible {
-    outline: 2px solid var(--color-primary-500);
+    outline: 3px solid var(--color-primary-500);
     outline-offset: 2px;
+}
+
+/* Enhanced focus for form elements */
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 3px solid var(--color-primary-500);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 1px var(--color-primary-100);
+}
+
+/* Dark mode focus adjustments */
+.dark :focus-visible {
+    outline-color: var(--color-primary-400);
+}
+
+.dark input:focus-visible,
+.dark select:focus-visible,
+.dark textarea:focus-visible {
+    box-shadow: 0 0 0 1px var(--color-primary-900);
 }
 
 /* Skip link for accessibility */

@@ -3,7 +3,7 @@
 @section('content')
     <div class="space-y-6" x-data="supportCardManager()">
         <!-- Header -->
-        <div class="sm:flex sm:items-center sm:justify-between">
+        <header class="sm:flex sm:items-center sm:justify-between">
             <div>
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Support Cards</h1>
                 <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -12,8 +12,8 @@
             </div>
             <div class="mt-4 sm:ml-4 sm:mt-0 flex gap-3">
                 <button @click="showExternalImport = !showExternalImport" class="btn btn-success"
-                    :class="{ 'ring-2 ring-green-500': showExternalImport }">
-                    <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    :class="{ 'ring-2 ring-green-500': showExternalImport }" aria-expanded="showExternalImport">
+                    <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
                     </svg>
@@ -23,26 +23,27 @@
                 <button @click="viewMode = viewMode === 'grid' ? 'list' : 'grid'" class="btn btn-outline"
                     :aria-label="viewMode === 'grid' ? 'Switch to list view' : 'Switch to grid view'">
                     <svg x-show="viewMode === 'grid'" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
+                        stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
                     <svg x-show="viewMode === 'list'" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
+                        stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                     </svg>
                 </button>
             </div>
-        </div>
+        </header>
 
         <!-- External API Import Panel -->
         <div x-show="showExternalImport" x-transition
-            class="card bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 p-6 rounded-lg shadow-lg border-2 border-green-200 dark:border-green-800">
+            class="card bg-linear-to-br from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 p-6 rounded-lg shadow-lg border-2 border-green-200 dark:border-green-800">
             @include('support-cards.partials.external-import')
         </div>
 
         <!-- Filters -->
-        <div class="card bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <aside class="card bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700" aria-label="Filters">
+            <h2 class="sr-only">Collection Filters</h2>
             <form method="GET" action="{{ route('support-cards.index') }}" class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
                     <!-- Search -->
@@ -179,10 +180,12 @@
                     </div>
                 </div>
             </form>
-        </div>
+        </aside>
         
         <!-- Collection Stats Widget (WF-010 requirement) -->
-        <div class="card bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <!-- Collection Stats Widget -->
+        <aside class="card bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700" aria-labelledby="stats-heading">
+            <h2 id="stats-heading" class="sr-only">Collection Statistics</h2>
             <div class="flex flex-wrap items-center justify-between gap-4">
                 <div class="flex items-center gap-6">
                     <div class="text-center">
@@ -214,17 +217,18 @@
                     </div>
                 </div>
                 @if(auth()->check())
-                <a href="{{ route('support-cards.deck-builder') }}" class="btn btn-primary flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <a href="{{ route('characters.index') }}" class="btn btn-primary flex items-center gap-2" title="Select a character to build a deck">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
                     Build Deck
                 </a>
                 @endif
             </div>
-        </div>
+        </aside>
 
         <!-- Cards Grid -->
+        <section aria-label="Support Card List">
         @if ($cards->count() > 0)
             <div x-show="viewMode === 'grid'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 @foreach ($cards as $card)
@@ -246,7 +250,7 @@
         @else
             <div
                 class="text-center py-12 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                 </svg>
@@ -256,6 +260,7 @@
                 </p>
             </div>
         @endif
+        </section>
     </div>
 
     <script>
