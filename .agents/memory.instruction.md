@@ -188,3 +188,4 @@ Resources: sp, energy, mood, bond, hint
 - **2025-01-23**: Fixed HybridAIServiceTest constructor - added VectorStoreService as 5th parameter
   - All 10 tests now passing (previously failed with ArgumentCountError)
   - Total: 78 AI tests passing, 314 assertions
+  - AIChatController now derives `rag_enhanced` and `knowledge_sources` from context **or** execution response and includes them in streaming metadata and conversation logs; added reflection-based test `RAGEnhancedChatTest::propagates rag metadata from execution response`

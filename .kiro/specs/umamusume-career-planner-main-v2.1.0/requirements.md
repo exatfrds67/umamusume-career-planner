@@ -1410,7 +1410,119 @@ For complete terminology definitions, refer to [000_MASTER_GLOSSARY.md](../../do
 | NFR-R-02 | Tablet layout | 640px - 1024px | P0 | ✅ | Responsive design |
 | NFR-R-03 | Desktop layout | > 1024px | P0 | ✅ | Responsive design |
 | NFR-R-04 | Touch targets 44px minimum | All mobile | P0 | ✅ | Touch-friendly |
-| NFR-R-05 | Usable viewport range | 320px - 2560px | P0 | ✅ | Tested |
+| NFR-R-05 | Usable viewport range | 320px - 2560px | P0 | ✅ | Tested across viewports |
+
+#### Acceptance Criteria
+
+**AC-R-01: Responsive Breakpoints**
+
+- WHEN viewing on different devices
+- THEN the system SHALL adapt layout for mobile (< 640px)
+- AND adapt layout for tablet (640px - 1024px)
+- AND adapt layout for desktop (> 1024px)
+- AND maintain usability across 320px - 2560px range
+
+**AC-R-02: Touch Targets**
+
+- WHEN using touch devices
+- THEN all interactive elements SHALL have minimum 44px touch targets
+- AND spacing between targets SHALL be sufficient to prevent mis-taps
+- AND touch feedback SHALL be provided
+
+**Related Artifacts:**
+
+- CSS: Tailwind responsive utilities
+- Testing: Responsive design tests
+- Evidence: IVM §11.3
+
+---
+
+### 5.7 Progressive Web App Requirements [NFR-PWA]
+
+**Source:** BR-11 (BRS §4.11), SRS §3.7  
+**Priority:** P1  
+**Status:** 🔄 In Progress
+
+#### Requirements
+
+| ID | Requirement | Priority | Status | Evidence |
+|----|-------------|----------|--------|----------|
+| NFR-PWA-01 | Service Worker for offline functionality | P1 | 🔄 | Service worker implemented |
+| NFR-PWA-02 | Web App Manifest | P1 | ✅ | manifest.json |
+| NFR-PWA-03 | Installable on mobile devices | P1 | 🔄 | Install prompt |
+| NFR-PWA-04 | Offline page fallback | P1 | ✅ | offline.html |
+| NFR-PWA-05 | Background sync for queued operations | P1 | ⏳ | Planned |
+
+#### Acceptance Criteria
+
+**AC-PWA-01: Offline Functionality**
+
+- WHEN network connection is lost
+- THEN the system SHALL continue to function for Local mode operations
+- AND display offline indicator
+- AND queue Account mode operations for sync
+- AND provide offline fallback page for unavailable routes
+
+**AC-PWA-02: Installation**
+
+- WHEN installation criteria are met
+- THEN the system SHALL prompt user to install
+- AND support installation on iOS and Android
+- AND provide app-like experience when installed
+
+**Related Artifacts:**
+
+- Service Worker: `public/sw.js`
+- Manifest: `public/manifest.json`
+- Evidence: SRS §3.7
+
+---
+
+### 5.8 Operational Requirements [NFR-O]
+
+**Source:** SRS §3.8  
+**Priority:** P1  
+**Status:** 🔄 In Progress
+
+#### Requirements
+
+| ID | Requirement | Priority | Status | Evidence |
+|----|-------------|----------|--------|----------|
+| NFR-O-01 | Uptime target 99% for Account mode | P1 | 🔄 | Monitoring in place |
+| NFR-O-02 | Automated backup every 24 hours | P1 | ✅ | Backup job |
+| NFR-O-03 | Error logging and monitoring | P1 | ✅ | Laravel Telescope |
+| NFR-O-04 | Performance monitoring and alerting | P1 | 🔄 | APM in progress |
+| NFR-O-05 | Graceful degradation on service failures | P1 | ✅ | Circuit breaker |
+
+#### Acceptance Criteria
+
+**AC-O-01: Reliability**
+
+- WHEN measuring uptime
+- THEN Account mode SHALL achieve 99% uptime
+- AND Local mode SHALL function offline 100% of time
+- AND service failures SHALL degrade gracefully
+
+**AC-O-02: Monitoring**
+
+- WHEN monitoring system health
+- THEN errors SHALL be logged and tracked
+- AND performance metrics SHALL be collected
+- AND alerts SHALL be sent for critical issues
+- AND dashboards SHALL provide visibility
+
+**Related Artifacts:**
+
+- Monitoring: Laravel Telescope, APM
+- Jobs: Backup jobs
+- Evidence: SRS §3.8
+
+---
+
+## 6. Interface and Integration Requirements
+
+### 6.1 User Interface Requirements [INT-UI]ted |
+
 | NFR-R-06 | Fluid typography | All breakpoints | P1 | ✅ | Tailwind CSS |
 | NFR-R-07 | Responsive images | All breakpoints | P1 | ✅ | Srcset attributes |
 
