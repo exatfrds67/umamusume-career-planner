@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\AIChatController;
 use App\Models\User;
 use App\Services\AI\VectorStoreService;
+use App\Services\MCP\AgentRoutingService;
 use Illuminate\Support\Facades\Cache;
 
 beforeEach(function () {
@@ -62,6 +64,39 @@ it('includes knowledge sources in response metadata', function () {
         }
         expect($hasRagKeyword)->toBeFalse();
     }
+});
+
+it('propagates rag metadata from execution response', function () {
+    $routing = \Mockery::mock(AgentRoutingService::class);
+    $routing->shouldReceive('executeWithFallback')->once()->andReturn([
+        'response' => [
+            'content' => 'RAG answer',
+            'agent' => 'training',
+            'confidence' => 0.91,
+            'rag_enhanced' => true,
+            'knowledge_sources' => ['stat-system.md', 'training-system.md'],
+        ],
+        'model' => 'mock-model',
+        'provider' => 'ollama',
+        'execution_time' => 0.12,
+        'cost' => 0.0,
+    ]);
+
+    $this->app->instance(AgentRoutingService::class, $routing);
+
+    $controller = app(AIChatController::class);
+    $reflection = new \ReflectionClass($controller);
+    $method = $reflection->getMethod('executeChatRequest');
+    $method->setAccessible(true);
+
+    /** @var array{rag_enhanced: bool, knowledge_sources: array<int, string>} $normalized */
+    $normalized = $method->invoke($controller, [
+        'message' => 'Explain speed stat',
+        'provider' => 'ollama',
+    ], []);
+
+    expect($normalized['rag_enhanced'])->toBeTrue()
+        ->and($normalized['knowledge_sources'])->toContain('stat-system.md');
 });
 
 it('displays knowledge badge when RAG is used', function () {
