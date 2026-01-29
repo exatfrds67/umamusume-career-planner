@@ -16,6 +16,7 @@ import { raceCalendar } from "./components/race-calendar.js";
 import { localStorageManager } from "./components/local-storage-manager.js";
 import { importExportHandler } from "./components/import-export-handler.js";
 import { notificationManager } from "./components/notification-manager.js";
+import { analyticsPanel } from "./components/analytics-panel.js";
 
 // Register Alpine plugins early
 Alpine.plugin(persist);
@@ -528,6 +529,7 @@ Alpine.data("raceCalendar", raceCalendar);
 Alpine.data("localStorageManager", localStorageManager);
 Alpine.data("importExportHandler", importExportHandler);
 Alpine.data("notificationManager", notificationManager);
+Alpine.data("analyticsPanel", analyticsPanel);
 
 // Initialize Alpine.js immediately for faster interactivity
 window.Alpine = Alpine;
