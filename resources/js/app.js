@@ -15,6 +15,7 @@ import { raceCalendar } from "./components/race-calendar.js";
 // Phase 6: Polish & Advanced Features Components
 import { localStorageManager } from "./components/local-storage-manager.js";
 import { importExportHandler } from "./components/import-export-handler.js";
+import { notificationManager } from "./components/notification-manager.js";
 
 // Register Alpine plugins early
 Alpine.plugin(persist);
@@ -526,6 +527,7 @@ Alpine.data("raceCalendar", raceCalendar);
 // Phase 6: Polish & Advanced Features
 Alpine.data("localStorageManager", localStorageManager);
 Alpine.data("importExportHandler", importExportHandler);
+Alpine.data("notificationManager", notificationManager);
 
 // Initialize Alpine.js immediately for faster interactivity
 window.Alpine = Alpine;
