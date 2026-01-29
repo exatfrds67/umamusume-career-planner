@@ -2099,3 +2099,102 @@ input[type="range"]::-moz-range-thumb:hover {
 #settings-search:focus {
     box-shadow: 0 0 0 3px rgba(var(--color-primary-600), 0.1);
 }
+/* ============================================
+   PHASE 1: Animation System (Game-Aligned)
+   Source: docs/research/ENHANCED_SCREENSHOT_ANALYSIS.md
+   ============================================ */
+
+/* Animation timing variables */
+:root {
+    --animate-duration-fast: 150ms;
+    --animate-duration-normal: 300ms;
+    --animate-duration-slow: 500ms;
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-out: cubic-bezier(0, 0, 0.2, 1);
+}
+
+/* Slide up animation (for modals, toasts) */
+@keyframes slide-up {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Slide down animation (for dropdowns) */
+@keyframes slide-down {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Pulse loading animation (for skeletons) */
+@keyframes pulse-loading {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Scale in animation (for cards on hover) */
+@keyframes scale-in {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Shake animation (for errors) */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+    20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+
+/* Utility classes for animations */
+.animate-slide-up {
+    animation: slide-up var(--animate-duration-normal) var(--ease-smooth);
+}
+
+.animate-slide-down {
+    animation: slide-down var(--animate-duration-normal) var(--ease-smooth);
+}
+
+.animate-pulse-loading {
+    animation: pulse-loading 2s var(--ease-smooth) infinite;
+}
+
+.animate-scale-in {
+    animation: scale-in var(--animate-duration-normal) var(--ease-spring);
+}
+
+.animate-shake {
+    animation: shake var(--animate-duration-normal) var(--ease-smooth);
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+    .animate-slide-up,
+    .animate-slide-down,
+    .animate-pulse-loading,
+    .animate-scale-in,
+    .animate-shake {
+        animation: none;
+    }
+    
+    * {
+        transition-duration: 0.01ms !important;
+    }
+}

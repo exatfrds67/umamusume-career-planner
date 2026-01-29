@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Deck Builder Syntax Test</title>
+    </head>
+    <body>
+        <h1>Testing Deck Builder JavaScript Syntax</h1>
+        <div id="result"></div>
+
+        <script>
+            window.deckBuilderData = {
+                deck: [],
+                apiRoutes: {},
+            };
+
+            // Define the deckBuilder function that Alpine will call
+            window.deckBuilder = function () {
+                const { deck: deckData, apiRoutes } = window.deckBuilderData;
+
+                return {
+                    deck: deckData,
+                    test: "working",
+                };
+            };
+
+            // Test the function
+            try {
+                const result = window.deckBuilder();
+                document.getElementById("result").innerHTML =
+                    '<p style="color: green;">✓ Syntax is valid! Test value: ' +
+                    result.test +
+                    "</p>";
+            } catch (error) {
+                document.getElementById("result").innerHTML =
+                    '<p style="color: red;">✗ Syntax error: ' +
+                    error.message +
+                    "</p>";
+            }
+        </script>
+    </body>
+</html>

@@ -32,11 +32,13 @@ This document provides a strategic framework for aligning the Umamusume Career P
 ```
 
 This is further subdivided into contextual sections:
+
 - **Training Section**: Facility selection → Trainee selection → Training execution
 - **Races Section**: Upcoming races → Race history → Race predictions
 - **Shop Section**: Item purchases → Skill shop → Support card management
 
 **Implication for Career Planner**:
+
 - Use task-oriented navigation (plan creation → execution tracking → analysis)
 - Create clear entry points for different user intents
 - Avoid overwhelming users with all options simultaneously
@@ -64,6 +66,7 @@ Level 3 (Remaining 50%):      DETAILED DATA
 ```
 
 **Implication for Career Planner**:
+
 - Place turn tracker, SP budget, and current stats in top 20% (persistent)
 - Next 30%: plan timeline, current focus areas, quick actions
 - Remaining space: detailed breakdowns, comparisons, forecasts
@@ -85,6 +88,7 @@ Level 3 (Remaining 50%):      DETAILED DATA
 | **Links/Actions** | Blue/Purple | Interactive | Menu buttons |
 
 **Implication for Career Planner**:
+
 - Use stat colors consistently (Speed=Red, Stamina=Blue, Power=Yellow, Guts=Green, Wit=Purple)
 - Adopt traffic-light conditions (GREAT/GOOD/NORMAL/BAD) with matching colors
 - Reserve orange/amber for critical SP alerts
@@ -94,6 +98,7 @@ Level 3 (Remaining 50%):      DETAILED DATA
 ### 1.4 Game's Navigation Patterns
 
 **Screen Type A: Grid/List Views** (Character selection, Race list)
+
 ```
 ┌─ Search/Filter bar (sticky) ─────────────────┐
 ├─ Sorting/View toggle options                   │
@@ -105,6 +110,7 @@ Level 3 (Remaining 50%):      DETAILED DATA
 ```
 
 **Screen Type B: Detail/Tabbed Views** (Character profile, Stat details)
+
 ```
 ┌─ Tab Navigation (Speed/Stamina/Power...) ───┐
 ├─ Detail header (back button, share) ───────┤
@@ -116,6 +122,7 @@ Level 3 (Remaining 50%):      DETAILED DATA
 ```
 
 **Screen Type C: Execution Flow** (Training screen, Race prediction)
+
 ```
 ┌─ Progress indicator (Turn 15/78) ──────────┐
 ├─ Primary decision area (6-9 options) ──────┤
@@ -127,6 +134,7 @@ Level 3 (Remaining 50%):      DETAILED DATA
 ```
 
 **Implication for Career Planner**:
+
 - Adopt these 3 screen types for plan interaction
 - Type A for: Plan list, Character list, Skill list, Training history
 - Type B for: Plan detail, Character detail, Skill detail, Run analysis
@@ -144,6 +152,7 @@ Level 3 (Remaining 50%):      DETAILED DATA
 6. **Long Press**: Implied for character selection and skill tooltips
 
 **Implication for Career Planner**:
+
 - Use horizontal scroll for turn-by-turn history view
 - Tab interface for stat/skill/aptitude breakdowns
 - Modals for confirmations (stat allocation, skill purchase)
@@ -157,28 +166,33 @@ Level 3 (Remaining 50%):      DETAILED DATA
 ### 2.1 Training System Alignment
 
 **Game Flow**:
+
 ```
 [Select Facility] → [Select Trainee] → [Show Stats Gained] → [Confirm] → [Update Status]
 ```
 
 **Game Characteristics**:
+
 - Single decision per turn
 - Immediate visual feedback (stats gained shown)
 - Limited time (turn counter visible)
 - Support cards provide multiplicative bonus
 
 **Career Planner Adaptation**:
+
 ```
 [Select Training Focus] → [Show Recommended Actions] → [Preview SP Impact] → [Allocate] → [Confirm]
 ```
 
 **Key Differences**:
+
 - Plan view instead of live execution
 - Multi-turn lookahead instead of single turn
 - SP budget management instead of facility selection
 - Offline-capable (no live timers needed)
 
 **Design Elements to Use**:
+
 - Training progress bar (like TP/RP gauges)
 - Stat gain preview with color-coded improvements
 - Grid-based facility selection → convert to "Training Focus Cards" (list/grid view)
@@ -187,11 +201,13 @@ Level 3 (Remaining 50%):      DETAILED DATA
 ### 2.2 Character Management Alignment
 
 **Game Flow**:
+
 ```
 [Character Grid] → [Select Character] → [View Details with Tabs] → [Manage Skills/Gear]
 ```
 
 **Game Characteristics**:
+
 - Visual character portraits with star ratings
 - Multi-tab breakdown (Potential/Hints/Star Unlock)
 - Skill list with SP costs
@@ -199,17 +215,20 @@ Level 3 (Remaining 50%):      DETAILED DATA
 - Clear potential level indicators (Lvl 1-9)
 
 **Career Planner Adaptation**:
+
 ```
 [Character Grid/List] → [Select for Plan] → [View with Tabs] → [Configure Training Path]
 ```
 
 **Key Differences**:
+
 - Plans are per-character, not global management
 - Tabs organize: Overview / Stats & Aptitudes / Factors / Skills & SP / Training History
 - Support card integration is for stat bonus reference only
 - Skill tree shown as "Available Skills" filtered by cost/level
 
 **Design Elements to Use**:
+
 - Character portrait grid (responsive 2-4 columns)
 - Star rating system for character tier (same as game)
 - Potential level badge (shows growth potential)
@@ -220,6 +239,7 @@ Level 3 (Remaining 50%):      DETAILED DATA
 ### 2.3 Stat Progression Tracking Alignment
 
 **Game Characteristics Observed**:
+
 - Live stat display with current/max values
 - Soft cap indicator at 1200 (shown with icon on some stats)
 - Percentage display (rarely, but implied in calculations)
@@ -227,6 +247,7 @@ Level 3 (Remaining 50%):      DETAILED DATA
 - Factor bonuses from inheritance (shown in details)
 
 **Career Planner Adaptation**:
+
 ```
 Current Turn 1:
 ├─ Speed: 750/2000 (50 from factor)
@@ -244,6 +265,7 @@ Turn 20 Projection:
 ```
 
 **Design Elements to Use**:
+
 - Stat bar with soft cap indicator (visual line at 1200)
 - Current/max display format
 - Factor bonus annotation in parentheses
@@ -255,11 +277,13 @@ Turn 20 Projection:
 ### 2.4 Skill & SP Management Alignment
 
 **Game Flow Observed**:
+
 ```
 [Character Detail] → [Skills Tab] → [Available Skills List] → [Select Skill] → [Preview Cost] → [Purchase]
 ```
 
 **Game Characteristics**:
+
 - Organized skill list by type/tier
 - SP cost clearly displayed
 - Rarity/type indicators (color-coded borders)
@@ -268,17 +292,20 @@ Turn 20 Projection:
 - Quick purchase button
 
 **Career Planner Adaptation**:
+
 ```
 [Plan Detail] → [Skills Tab] → [Skills Grid/List] → [Drag to Allocate] → [SP Impact Preview] → [Save]
 ```
 
 **Key Differences**:
+
 - Plan-view instead of action execution
 - Budget planning instead of single purchase
 - Drag-and-drop SP allocation (visual planning)
 - Multi-skill comparison
 
 **Design Elements to Use**:
+
 - Skill grid with 3-4 columns, responsive layout
 - Skill cards: icon, name, SP cost, type badge, current status
 - Color-coded borders by skill type (reference game's color scheme)
@@ -289,6 +316,7 @@ Turn 20 Projection:
 ### 2.5 Race Planning & Prediction Alignment
 
 **Game Characteristics Observed**:
+
 - Upcoming race list with:
   - Race name, distance, terrain, weather condition
   - Entry deadline
@@ -300,6 +328,7 @@ Turn 20 Projection:
   - Stat requirements display
 
 **Career Planner Adaptation**:
+
 ```
 Race Planning Tab:
 ├─ Upcoming races (calendar view)
@@ -310,6 +339,7 @@ Race Planning Tab:
 ```
 
 **Design Elements to Use**:
+
 - Race card: name, distance, type, date
 - Stat requirement breakdown (table: stat, required, current, delta)
 - Calendar grid for race schedule
@@ -356,6 +386,7 @@ Race Planning Tab:
 ### 3.2 Component Hierarchy
 
 **Level 1: Page Templates** (Container layouts)
+
 - `DashboardPage` - Overview & quick actions
 - `PlanDetailPage` - Plan execution interface
 - `CharacterDetailPage` - Character profile
@@ -363,6 +394,7 @@ Race Planning Tab:
 - `AnalysisPage` - Charts & comparisons
 
 **Level 2: Section Components** (Content areas)
+
 - `StatsSummary` - Current stats display
 - `SkillAllocator` - Drag-drop SP budget
 - `TrainingTimeline` - Turn-by-turn breakdown
@@ -370,6 +402,7 @@ Race Planning Tab:
 - `CharacterGrid` - Character selection
 
 **Level 3: UI Components** (Reusable elements)
+
 - `StatBar` - Single stat with progress
 - `GradeBadge` - A/B/C grade display
 - `ConditionIndicator` - GREAT/GOOD/NORMAL/BAD
@@ -379,6 +412,7 @@ Race Planning Tab:
 - `Modal` - Dialog/confirmation
 
 **Level 4: Atomic Components** (Design system)
+
 - `Button` - CTA buttons
 - `Card` - Content container
 - `Badge` - Small labels
@@ -403,6 +437,7 @@ Align with Tailwind default breakpoints:
 ### 4.1 Color Palette (Game-Aligned)
 
 **Stat Colors** (Primary palette):
+
 ```
 Speed:    #EF4444 (Red-500)      [Game: Crimson]
 Stamina:  #3B82F6 (Blue-500)     [Game: Azure]
@@ -412,6 +447,7 @@ Wit:      #A855F7 (Purple-500)   [Game: Violet]
 ```
 
 **Condition Colors** (Status):
+
 ```
 GREAT:    #10B981 (Emerald-500)  [Upward arrow, strong]
 GOOD:     #84CC16 (Lime-500)     [Slightly up, positive]
@@ -420,6 +456,7 @@ BAD:      #EF4444 (Red-500)      [Downward arrow, warning]
 ```
 
 **Resource Colors**:
+
 ```
 SP (Training Points):    #F59E0B (Amber-500)    [Primary resource]
 Training Focus Color:    #06B6D4 (Cyan-500)     [Current focus]
@@ -428,6 +465,7 @@ Progress:                #10B981 (Green-500)    [Completed/achieved]
 ```
 
 **Semantic Colors**:
+
 ```
 Success:  #10B981 (Green)
 Warning:  #F59E0B (Amber)
@@ -465,18 +503,21 @@ xl: 2rem (32px)
 ### 4.4 Component Sizing
 
 **Buttons**:
+
 - Large: 48px height (touch target)
 - Default: 40px height
 - Small: 32px height
 - Minimum width: 44px (WCAG touch requirement)
 
 **Cards**:
+
 - Padding: 16px (md)
 - Border radius: 8px
 - Box shadow: subtle (0 1px 3px rgba)
 - On hover: slight elevation
 
 **Inputs**:
+
 - Height: 40px (default)
 - Padding: 8px 12px
 - Border: 1px solid
@@ -537,6 +578,7 @@ APP:
 ```
 
 **Design Elements**:
+
 - Timeline view showing turns 1-78 (horizontal scroll)
 - Current turn highlighted and sticky
 - SP budget gauge (orange, like TP) at top
@@ -644,23 +686,27 @@ Turn   Skill Acquired         SP Cost   New Total Stats
 ### 7.1 Accessibility (WCAG 2.2 AA)
 
 **Color & Contrast**:
+
 - Stat colors must be distinguishable without color alone
   - Use icons + text labels (e.g., 🐎 Speed, 🚴 Stamina)
   - Ensure 4.5:1 contrast minimum on text
   - Provide pattern/texture variations for stat areas
 
 **Interactive Elements**:
+
 - Minimum touch target: 44×44px
 - Focus visible: 2px outline, color-coded
 - Tab order: logical flow (top to bottom, left to right)
 - ARIA labels: semantic HTML + aria-label where needed
 
 **Motion**:
+
 - Respect prefers-reduced-motion
 - Animations optional (can be disabled)
 - Transitions: < 300ms for responsiveness
 
 **Forms**:
+
 - Labels associated with inputs
 - Error messages linked to fields
 - Required fields marked clearly (*) and announced
@@ -669,11 +715,13 @@ Turn   Skill Acquired         SP Cost   New Total Stats
 ### 7.2 Performance Targets
 
 **Core Web Vitals (mobile)**:
+
 - LCP (Largest Contentful Paint): < 2.5s
 - FID (First Input Delay): < 100ms
 - CLS (Cumulative Layout Shift): < 0.1
 
 **Implementation**:
+
 - Lazy load character portraits (use `loading="lazy"`)
 - Code split by page (Vite dynamic imports)
 - Compress images (WebP, 80-90% quality for screenshots)
@@ -681,6 +729,7 @@ Turn   Skill Acquired         SP Cost   New Total Stats
 - Defer non-critical JS (Alpine components load on interaction)
 
 **Mobile Optimization**:
+
 - Responsive images (srcset for 2x/3x density)
 - No horizontal scroll on small screens
 - Bottom nav must be 44px minimum height
@@ -693,6 +742,7 @@ Turn   Skill Acquired         SP Cost   New Total Stats
 ### 8.1 Phase 1: Foundation (Weeks 1-2)
 
 **Priority**: Critical
+
 - [ ] Update Tailwind config with game-aligned color tokens
 - [ ] Create color token documentation (stat/condition/resource colors)
 - [ ] Build base layout components (AppLayout, TopStatusBar, SidebarNav)
@@ -703,6 +753,7 @@ Turn   Skill Acquired         SP Cost   New Total Stats
 ### 8.2 Phase 2: Core Components (Weeks 3-4)
 
 **Priority**: Critical
+
 - [ ] Stat display components (StatBar, ProgressBar, RadarChart)
 - [ ] Character selection grid with filtering
 - [ ] Plan card component for lists
@@ -713,6 +764,7 @@ Turn   Skill Acquired         SP Cost   New Total Stats
 ### 8.3 Phase 3: Plan Management (Weeks 5-6)
 
 **Priority**: High
+
 - [ ] Plan creation wizard (multi-step card flow)
 - [ ] Plan detail page with tabs (Overview/Stats/Skills/Races)
 - [ ] Training timeline view (turn-by-turn)
@@ -723,6 +775,7 @@ Turn   Skill Acquired         SP Cost   New Total Stats
 ### 8.4 Phase 4: Advanced Features (Weeks 7-8)
 
 **Priority**: Medium
+
 - [ ] Race planning interface with stat requirement matching
 - [ ] Skill allocation & SP tracking
 - [ ] Multi-plan comparison
@@ -733,6 +786,7 @@ Turn   Skill Acquired         SP Cost   New Total Stats
 ### 8.5 Phase 5: Analytics & Visualization (Weeks 9-10)
 
 **Priority**: Medium
+
 - [ ] Stat progression charts (radar, line graphs)
 - [ ] Training progress dashboard
 - [ ] Skill acquisition timeline
@@ -743,6 +797,7 @@ Turn   Skill Acquired         SP Cost   New Total Stats
 ### 8.6 Phase 6: Polish & Optimization (Weeks 11-12)
 
 **Priority**: High
+
 - [ ] Accessibility testing & fixes (WCAG 2.2 AA)
 - [ ] Performance optimization (Core Web Vitals)
 - [ ] Mobile responsiveness testing
@@ -758,51 +813,62 @@ Turn   Skill Acquired         SP Cost   New Total Stats
 ### 9.1 Anti-Patterns (Don't do these)
 
 ❌ **Exact Game UI Copy**
+
 - Don't recreate the mobile game interface in web
 - Do create complementary interface optimized for planning
 
 ❌ **Feature Bloat**
+
 - Don't try to include every game system (gacha, guild wars, etc.)
 - Do focus on training/career planning core loop
 
 ❌ **Over-Animation**
+
 - Don't use animations for their own sake
 - Do use purposeful transitions (< 300ms, meaningful)
 
 ❌ **Accessibility Afterthought**
+
 - Don't rely on color alone to convey information
 - Do design accessible from the start (icons, labels, contrast)
 
 ❌ **Mobile Unfriendly**
+
 - Don't force desktop layouts on mobile
 - Do adopt bottom navigation and responsive cards
 
 ❌ **Offline Incompatible**
+
 - Don't require constant server communication
 - Do cache critical data (character list, skills, races)
 
 ### 9.2 Design Pattern Go-Tos (Do these)
 
 ✅ **Task-Oriented Navigation**
+
 - Organize by what users do (create plan, execute training, analyze results)
 - Not by data model (characters, stats, runs)
 
 ✅ **Progressive Disclosure**
+
 - Show critical info upfront (current turn, SP available)
 - Hide advanced options until needed
 - Use modals/collapsibles for secondary info
 
 ✅ **Consistent Mental Models**
+
 - If turning red means "bad" in conditions, apply consistently
 - Stat colors always represent same stat type
 - Actions have expected outcomes
 
 ✅ **Responsive by Default**
+
 - Design mobile-first
 - Enhance for larger screens
 - Test at actual breakpoints (not just resize)
 
 ✅ **Accessibility First**
+
 - Test with keyboard only
 - Check color contrast before shipping
 - Use semantic HTML (buttons, links, headings)
@@ -821,6 +887,7 @@ This plan references and aligns with:
 - **IMPLEMENTATION_PLAN.md**: Actionable development tasks and phases
 
 **Related Documentation**:
+
 - docs/design/game-ui-alignment-strategy.md (visual design specifications)
 - docs/research/game-mechanics-research-report.md (mechanics validation)
 - AGENTS.md (coding standards and conventions)
@@ -830,26 +897,31 @@ This plan references and aligns with:
 ## Section 11: Design Decision Log
 
 **Decision 1**: Use stat-specific colors (Red=Speed, Blue=Stamina, etc.)
+
 - **Rationale**: Game uses color coding consistently; users recognize patterns
 - **Implementation**: Tailwind color tokens for each stat type
 - **Status**: ✅ Planned for Phase 1
 
 **Decision 2**: Multi-step wizard for plan creation
+
 - **Rationale**: Game uses sequential facility → trainee selection; app mirrors with plan → character → targets
 - **Implementation**: Card-based progression, 5 steps with preview
 - **Status**: ✅ Planned for Phase 3
 
 **Decision 3**: Bottom navigation for mobile instead of sidebar
+
 - **Rationale**: Game uses bottom nav (implied from mobile screenshots); suits touch navigation
 - **Implementation**: 5-tab navigation bar, Livewire routing
 - **Status**: ✅ Planned for Phase 1
 
 **Decision 4**: Tabbed detail views (not stacked single columns)
+
 - **Rationale**: Game uses tabs for related breakdowns; cleaner than scrolling long pages
 - **Implementation**: Tab component with lazy loading
 - **Status**: ✅ Planned for Phase 2
 
 **Decision 5**: Persistent top status bar
+
 - **Rationale**: Game's top bar is always visible; users need context on turn/SP/focus
 - **Implementation**: Sticky header with turn counter, SP gauge, current stats
 - **Status**: ✅ Planned for Phase 1
@@ -859,12 +931,14 @@ This plan references and aligns with:
 ## Appendix A: Game Screenshots Referenced
 
 This plan analyzes screenshots from:
+
 - **July 2025**: Game tutorial & basic flows (20 screenshots)
 - **October-November 2025**: Character management & training UI (35 screenshots)
 - **December 2025**: Race mechanics & predictions (25 screenshots)
 - **January 2026**: Recent career flows & detailed stat views (40 screenshots)
 
 **Total Analyzed**: 120+ screenshots covering:
+
 - Main menu & navigation
 - Character selection & profile
 - Training facility interface

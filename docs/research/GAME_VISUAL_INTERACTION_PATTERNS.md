@@ -13,6 +13,7 @@
 This research document catalogs visual design patterns, interaction conventions, and UX flows observed in Umamusume Pretty Derby game interface screenshots. The goal is to understand *why* certain patterns work for game UX and how they can inform (not copy) the Career Planner web application.
 
 **Key Findings**:
+
 - Game uses consistent color coding for functional meaning, not decoration
 - Information hierarchy follows 20/30/50 rule (critical/controls/details)
 - Navigation patterns are task-oriented with clear progression flows
@@ -95,6 +96,7 @@ Item Count:
 ```
 
 **Why This Matters**: Game uses color to show at a glance:
+
 - What's running out (orange TP gauge shrinks)
 - What's secondary (blue RP is less critical)
 - What's wealth/collectibles (yellow/green)
@@ -222,6 +224,7 @@ Interactive State:
 ```
 
 **Game Example**: Character detail screen shows stats as:
+
 ```
 Speed:    1350/2000  ████████░░
 Stamina:  930/2000   ███░░░░░░░
@@ -643,12 +646,14 @@ Linear (for continuous processes):
 ### 3.3 Accessibility with Animations
 
 **Important observation**:
+
 - App should respect `prefers-reduced-motion` media query
 - Users with vestibular disorders may get motion sickness from animations
 - Provide a setting to disable animations globally
 - Keep animations optional, not required for function
 
 **Implementation**:
+
 ```css
 @media (prefers-reduced-motion: reduce) {
   * {
@@ -706,11 +711,13 @@ Margin/gap between components:
 ### 5.1 Color Contrast Requirements
 
 **WCAG 2.2 AA** (minimum for this project):
+
 - Large text (18px+): 3:1 contrast ratio
 - Normal text (< 18px): 4.5:1 contrast ratio
 - UI components & graphical elements: 3:1 ratio
 
 **Tested combinations**:
+
 ```
 Red (#EF4444) on white: ~6.5:1 ✅ Pass
 Blue (#3B82F6) on white: ~5.2:1 ✅ Pass
@@ -829,6 +836,7 @@ Corresponding implementation files in progress per IMPLEMENTATION_PLAN.md
 ## Research Conclusion
 
 Game design patterns work because they're:
+
 1. **Consistent**: Color always means the same thing
 2. **Learnable**: After 2-3 uses, patterns become intuitive
 3. **Functional**: Visual design serves information, not decoration
@@ -840,13 +848,15 @@ The Career Planner should adopt these principles while creating its own distinct
 ---
 
 **Document Metadata**:
+
 - Screens analyzed: 120+
 - Date range: July 2025 - January 2026
 - Categories: Colors (5), Typography (4), Components (8), Interactions (6), Animations (3)
 - Compliance checked: WCAG 2.2 AA, Core Web Vitals
 - Status: Complete and ready for design team
 
-**Next Steps**: 
+**Next Steps**:
+
 - Design team reviews patterns
 - Create Figma component library matching patterns
 - Implement components in Blade with Tailwind

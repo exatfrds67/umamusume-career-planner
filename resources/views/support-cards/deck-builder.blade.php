@@ -3,9 +3,32 @@
 @section('content')
     @php
         $characterName = data_get($character, 'name', 'Unknown Character');
+
+        $deckData = $currentDeck
+            ->map(function ($card) {
+                return [
+                    'position_slot' => $card->position_slot,
+                    'support_card_id' => $card->support_card_id,
+                    'is_friend_card' => $card->is_friend_card,
+                    'limit_break_level' => $card->limit_break_level,
+                    'friendship_level' => $card->friendship_level,
+                    'supportCard' => $card->supportCard,
+                ];
+            })
+            ->values()
+            ->toArray();
+
+        $availableCardsData = $availableCards->toArray();
     @endphp
 
-    <main class="space-y-6" x-data="deckBuilder()" x-init="init()">
+    <!-- Initialize with available cards to avoid API call -->
+    <script>
+        // Pre-populate available cards to avoid 404 API call
+        window.preloadedCards = @json($availableCardsData);
+    </script>
+
+    <div class="space-y-6" x-data="deckBuilder(@js($deckData), {{ $character->id }})" x-init="availableCards = window.preloadedCards || [];
+    init()">
         <!-- Header -->
         <header class="sm:flex sm:items-center sm:justify-between">
             <div>
@@ -72,7 +95,7 @@
                             </p>
                         </div>
                     </div>
-                </div>
+                </section>
             @endif
         @endisset
 
@@ -238,784 +261,283 @@
                             Auto-Optimize
                         </button>
                     </div>
+            </div>
+
+            <!-- Deck Statistics (WF-011/SPEC-005: Enhanced with type distribution and synergy) -->
+            <section aria-labelledby="stats-heading"
+                class="card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                <h2 id="stats-heading" class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Deck Statistics
+                </h2>
+                <dl class="space-y-2">
+                    <div class="flex justify-between text-sm">
+                        <dt class="text-gray-500 dark:text-gray-400">Cards</dt>
+                        <dd class="font-medium text-gray-900 dark:text-white" x-text="deckCount + '/6'"></dd>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <dt class="text-gray-500 dark:text-gray-400">Friend Cards</dt>
+                        <dd class="font-medium text-gray-900 dark:text-white" x-text="friendCardCount + '/1'"></dd>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <dt class="text-gray-500 dark:text-gray-400">Unique Types</dt>
+                        <dd class="font-medium text-gray-900 dark:text-white" x-text="uniqueTypes"></dd>
+                    </div>
+                </dl>
+
+                <!-- Type Distribution (WF-011) -->
+                <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <h4 class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-2">Type Distribution</h4>
+                    <div class="flex flex-wrap gap-2">
+                        <template x-for="(count, type) in typeDistribution" :key="type">
+                            <span class="px-2 py-1 text-xs rounded-full"
+                                :class="{
+                                    'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300': type === 'speed',
+                                    'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300': type === 'stamina',
+                                    'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300': type === 'power',
+                                    'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300': type === 'guts',
+                                    'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300': type === 'wit',
+                                    'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300': type === 'friend'
+                                }">
+                                <span x-text="type.charAt(0).toUpperCase() + type.slice(1)"></span>: <span
+                                    x-text="count"></span>
+                            </span>
+                        </template>
+                    </div>
                 </div>
 
-                <!-- Deck Statistics (WF-011/SPEC-005: Enhanced with type distribution and synergy) -->
-                <section aria-labelledby="stats-heading"
-                    class="card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                    <h2 id="stats-heading" class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Deck Statistics</h2>
+                <!-- Average Stats (WF-011) -->
+                <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <h4 class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-2">Average Stats</h4>
                     <dl class="space-y-2">
                         <div class="flex justify-between text-sm">
-                            <dt class="text-gray-500 dark:text-gray-400">Cards</dt>
-                            <dd class="font-medium text-gray-900 dark:text-white" x-text="deckCount + '/6'"></dd>
+                            <dt class="text-gray-500 dark:text-gray-400">Avg Bond Level</dt>
+                            <dd class="font-medium text-gray-900 dark:text-white">
+                                <span x-text="averageBond"></span>%
+                            </dd>
                         </div>
                         <div class="flex justify-between text-sm">
-                            <dt class="text-gray-500 dark:text-gray-400">Friend Cards</dt>
-                            <dd class="font-medium text-gray-900 dark:text-white" x-text="friendCardCount + '/1'"></dd>
-                        </div>
-                        <div class="flex justify-between text-sm">
-                            <dt class="text-gray-500 dark:text-gray-400">Unique Types</dt>
-                            <dd class="font-medium text-gray-900 dark:text-white" x-text="uniqueTypes"></dd>
+                            <dt class="text-gray-500 dark:text-gray-400">Avg Limit Break</dt>
+                            <dd class="font-medium text-gray-900 dark:text-white">
+                                <span x-text="averageLimitBreak"></span>★
+                            </dd>
                         </div>
                     </dl>
-                    
-                    <!-- Type Distribution (WF-011) -->
-                    <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                        <h4 class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-2">Type Distribution</h4>
-                        <div class="flex flex-wrap gap-2">
-                            <template x-for="(count, type) in typeDistribution" :key="type">
-                                <span class="px-2 py-1 text-xs rounded-full" 
+                </div>
+
+                <!-- Synergy Score (WF-011) -->
+                <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Synergy Score</h4>
+                        <div class="flex items-center gap-2">
+                            <div class="w-24 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                <div class="h-full rounded-full transition-all duration-500"
                                     :class="{
-                                        'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300': type === 'speed',
-                                        'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300': type === 'stamina',
-                                        'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300': type === 'power',
-                                        'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300': type === 'guts',
-                                        'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300': type === 'wit',
-                                        'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300': type === 'friend'
-                                    }">
-                                    <span x-text="type.charAt(0).toUpperCase() + type.slice(1)"></span>: <span x-text="count"></span>
-                                </span>
+                                        'bg-green-500': synergyScore >= 70,
+                                        'bg-blue-500': synergyScore >= 50 && synergyScore < 70,
+                                        'bg-yellow-500': synergyScore >= 30 && synergyScore < 50,
+                                        'bg-red-500': synergyScore < 30
+                                    }"
+                                    :style="'width: ' + synergyScore + '%'">
+                                </div>
+                            </div>
+                            <span class="text-sm font-semibold text-gray-900 dark:text-white"
+                                x-text="synergyScore"></span>
+                        </div>
+                    </div>
+                </div>
+        </div>
+
+        <!-- Validation Messages -->
+        <div x-show="validationErrors.length > 0"
+            class="card bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-800">
+            <h3 class="text-sm font-medium text-red-800 dark:text-red-200 mb-2">Deck Validation Errors</h3>
+            <ul class="list-disc list-inside space-y-1">
+                <template x-for="error in validationErrors" :key="error">
+                    <li class="text-sm text-red-700 dark:text-red-300" x-text="error"></li>
+                </template>
+            </ul>
+        </div>
+
+        <div x-show="validationWarnings.length > 0"
+            class="card bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg border border-yellow-200 dark:border-yellow-800">
+            <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200 mb-2">Deck Warnings</h3>
+            <ul class="list-disc list-inside space-y-1">
+                <template x-for="warning in validationWarnings" :key="warning">
+                    <li class="text-sm text-yellow-700 dark:text-yellow-300" x-text="warning"></li>
+                </template>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Card Library (Right/Bottom) -->
+    <aside aria-labelledby="library-heading" class="space-y-4">
+        <div
+            class="card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col">
+            <h2 id="library-heading" class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Available Cards
+            </h2>
+
+            <!-- Filters -->
+            <div class="space-y-3 mb-4">
+                <input type="text" x-model="searchQuery" placeholder="Search cards..."
+                    class="form-input w-full rounded-md border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm">
+
+                <select x-model="filterType"
+                    class="form-select w-full rounded-md border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm">
+                    <option value="">All Types</option>
+                    <option value="speed">Speed</option>
+                    <option value="stamina">Stamina</option>
+                    <option value="power">Power</option>
+                    <option value="guts">Guts</option>
+                    <option value="wit">Wit</option>
+                    <option value="friend">Friend</option>
+                </select>
+
+                <select x-model="filterTier"
+                    class="form-select w-full rounded-md border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm">
+                    <option value="">All Tiers</option>
+                    <option value="S+">S+ Tier</option>
+                    <option value="S">S Tier</option>
+                    <option value="A">A Tier</option>
+                    <option value="B">B Tier</option>
+                    <option value="C">C Tier</option>
+                </select>
+            </div>
+
+            <!-- Card List -->
+            <div class="space-y-2 flex-1 overflow-y-auto" style="max-height: calc(100vh - 400px); min-height: 600px;">
+                @foreach ($availableCards as $card)
+                    <div class="p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-primary-400 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/10 hover:shadow-md transition-all cursor-pointer transform hover:scale-[1.02]"
+                        @click="selectCard({{ $card->id }})" tabindex="0"
+                        @keydown.enter="selectCard({{ $card->id }})"
+                        @keydown.space.prevent="selectCard({{ $card->id }})">
+                        <div class="flex items-start justify-between gap-2">
+                            <div class="flex items-center gap-2 flex-1 min-w-0">
+                                @if ($card->artwork_url)
+                                    <img src="{{ $card->artwork_url }}" alt="{{ $card->name }}"
+                                        class="w-10 h-10 rounded-md object-cover border border-gray-200 dark:border-gray-600 shrink-0">
+                                @else
+                                    <div
+                                        class="w-10 h-10 rounded-md bg-gray-200 dark:bg-gray-700 flex items-center justify-center shrink-0">
+                                        <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                            stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                    </div>
+                                @endif
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                        {{ $card->name }}
+                                    </h4>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                        {{ $card->character_name }}
+                                    </p>
+                                    <div class="flex items-center gap-1.5 mt-1.5">
+                                        <x-support-card-type-badge :type="$card->card_type" size="xs" />
+                                        <x-support-card-rarity-badge :rarity="$card->rarity" size="xs" />
+                                        <x-support-card-tier-badge :tier="$card->meta_tier" size="xs" />
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn btn-xs btn-primary shrink-0">
+                                Add
+                            </button>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </aside>
+
+    <!-- Edit Card Details Modal (Inside Alpine Component) -->
+    <div x-show="showEditModal" x-cloak @keydown.escape.window="closeEditModal()"
+        class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <!-- Background overlay -->
+            <div x-show="showEditModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200"
+                x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" @click="closeEditModal()"
+                class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75 dark:bg-gray-900 dark:bg-opacity-75">
+            </div>
+
+            <!-- Modal panel -->
+            <div x-show="showEditModal" x-transition:enter="ease-out duration-300"
+                x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200"
+                x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                class="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-lg">
+
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                        Edit Card in Deck - Slot <span x-text="editingSlot"></span>
+                    </h3>
+                    <button @click="closeEditModal()" class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Limit Break Level -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Limit Break Level (Stars)
+                        </label>
+                        <div class="flex items-center gap-2">
+                            <input type="range" x-model.number="editForm.limitBreak" min="0" max="4"
+                                step="1"
+                                class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
+                            <span class="text-lg font-semibold text-gray-900 dark:text-white min-w-12 text-center">
+                                <span x-text="editForm.limitBreak"></span>/4
+                            </span>
+                        </div>
+                        <div class="mt-2 flex gap-1">
+                            <template x-for="i in 5" :key="i">
+                                <button @click="editForm.limitBreak = i - 1" class="text-2xl transition-colors"
+                                    :class="i - 1 <= editForm.limitBreak ? 'text-yellow-400' :
+                                        'text-gray-300 dark:text-gray-600'">
+                                    ★
+                                </button>
                             </template>
                         </div>
                     </div>
-                    
-                    <!-- Average Stats (WF-011) -->
-                    <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                        <h4 class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-2">Average Stats</h4>
-                        <dl class="space-y-2">
-                            <div class="flex justify-between text-sm">
-                                <dt class="text-gray-500 dark:text-gray-400">Avg Bond Level</dt>
-                                <dd class="font-medium text-gray-900 dark:text-white">
-                                    <span x-text="averageBond"></span>%
-                                </dd>
-                            </div>
-                            <div class="flex justify-between text-sm">
-                                <dt class="text-gray-500 dark:text-gray-400">Avg Limit Break</dt>
-                                <dd class="font-medium text-gray-900 dark:text-white">
-                                    <span x-text="averageLimitBreak"></span>★
-                                </dd>
-                            </div>
-                        </dl>
-                    </div>
-                    
-                    <!-- Synergy Score (WF-011) -->
-                    <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                        <div class="flex items-center justify-between">
-                            <h4 class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Synergy Score</h4>
-                            <div class="flex items-center gap-2">
-                                <div class="w-24 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                                    <div class="h-full rounded-full transition-all duration-500"
-                                        :class="{
-                                            'bg-green-500': synergyScore >= 70,
-                                            'bg-blue-500': synergyScore >= 50 && synergyScore < 70,
-                                            'bg-yellow-500': synergyScore >= 30 && synergyScore < 50,
-                                            'bg-red-500': synergyScore < 30
-                                        }"
-                                        :style="'width: ' + synergyScore + '%'">
-                                    </div>
-                                </div>
-                                <span class="text-sm font-semibold text-gray-900 dark:text-white" x-text="synergyScore"></span>
-                            </div>
+
+                    <!-- Friendship Level -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Friendship Level (Bond)
+                        </label>
+                        <div class="flex items-center gap-2">
+                            <input type="range" x-model.number="editForm.bondLevel" min="0" max="100"
+                                step="5"
+                                class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
+                            <span class="text-lg font-semibold text-gray-900 dark:text-white min-w-16 text-center">
+                                <span x-text="editForm.bondLevel"></span>%
+                            </span>
+                        </div>
+                        <div class="mt-2 flex gap-2">
+                            <button @click="editForm.bondLevel = 0" class="btn btn-xs btn-outline">0%</button>
+                            <button @click="editForm.bondLevel = 25" class="btn btn-xs btn-outline">25%</button>
+                            <button @click="editForm.bondLevel = 50" class="btn btn-xs btn-outline">50%</button>
+                            <button @click="editForm.bondLevel = 75" class="btn btn-xs btn-outline">75%</button>
+                            <button @click="editForm.bondLevel = 100" class="btn btn-xs btn-outline">100%</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Validation Messages -->
-                <div x-show="validationErrors.length > 0"
-                    class="card bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-800">
-                    <h3 class="text-sm font-medium text-red-800 dark:text-red-200 mb-2">Deck Validation Errors</h3>
-                    <ul class="list-disc list-inside space-y-1">
-                        <template x-for="error in validationErrors" :key="error">
-                            <li class="text-sm text-red-700 dark:text-red-300" x-text="error"></li>
-                        </template>
-                    </ul>
-                </div>
-
-                <div x-show="validationWarnings.length > 0"
-                    class="card bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg border border-yellow-200 dark:border-yellow-800">
-                    <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200 mb-2">Deck Warnings</h3>
-                    <ul class="list-disc list-inside space-y-1">
-                        <template x-for="warning in validationWarnings" :key="warning">
-                            <li class="text-sm text-yellow-700 dark:text-yellow-300" x-text="warning"></li>
-                        </template>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Card Library (Right/Bottom) -->
-            <aside aria-labelledby="library-heading" class="space-y-4">
-                <div
-                    class="card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col">
-                    <h2 id="library-heading" class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Available Cards</h2>
-
-                    <!-- Filters -->
-                    <div class="space-y-3 mb-4">
-                        <input type="text" x-model="searchQuery" placeholder="Search cards..."
-                            class="form-input w-full rounded-md border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm">
-
-                        <select x-model="filterType"
-                            class="form-select w-full rounded-md border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm">
-                            <option value="">All Types</option>
-                            <option value="speed">Speed</option>
-                            <option value="stamina">Stamina</option>
-                            <option value="power">Power</option>
-                            <option value="guts">Guts</option>
-                            <option value="wit">Wit</option>
-                            <option value="friend">Friend</option>
-                        </select>
-
-                        <select x-model="filterTier"
-                            class="form-select w-full rounded-md border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm">
-                            <option value="">All Tiers</option>
-                            <option value="S+">S+ Tier</option>
-                            <option value="S">S Tier</option>
-                            <option value="A">A Tier</option>
-                            <option value="B">B Tier</option>
-                            <option value="C">C Tier</option>
-                        </select>
-                    </div>
-
-                    <!-- Card List -->
-                    <div class="space-y-2 flex-1 overflow-y-auto"
-                        style="max-height: calc(100vh - 400px); min-height: 600px;">
-                        @foreach ($availableCards as $card)
-                            <div class="p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-primary-400 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/10 hover:shadow-md transition-all cursor-pointer transform hover:scale-[1.02]"
-                                x-show="filterCard(@js(['name' => $card->name, 'character_name' => $card->character_name, 'card_type' => $card->card_type, 'meta_tier' => $card->meta_tier]))"
-                                @click="selectCard({{ $card->id }})" tabindex="0"
-                                @keydown.enter="selectCard({{ $card->id }})"
-                                @keydown.space.prevent="selectCard({{ $card->id }})">
-                                <div class="flex items-start justify-between gap-2">
-                                    <div class="flex items-center gap-2 flex-1 min-w-0">
-                                        @if ($card->artwork_url)
-                                            <img src="{{ $card->artwork_url }}" alt="{{ $card->name }}"
-                                                class="w-10 h-10 rounded-md object-cover border border-gray-200 dark:border-gray-600 shrink-0">
-                                        @else
-                                            <div
-                                                class="w-10 h-10 rounded-md bg-gray-200 dark:bg-gray-700 flex items-center justify-center shrink-0">
-                                                <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24"
-                                                    stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                </svg>
-                                            </div>
-                                        @endif
-                                        <div class="flex-1 min-w-0">
-                                            <h4 class="text-sm font-medium text-gray-900 dark:text-white truncate">
-                                                {{ $card->name }}
-                                            </h4>
-                                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                                                {{ $card->character_name }}
-                                            </p>
-                                            <div class="flex items-center gap-1.5 mt-1.5">
-                                                <x-support-card-type-badge :type="$card->card_type" size="xs" />
-                                                <x-support-card-rarity-badge :rarity="$card->rarity" size="xs" />
-                                                <x-support-card-tier-badge :tier="$card->meta_tier" size="xs" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <button class="btn btn-xs btn-primary shrink-0">
-                                        Add
-                                    </button>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            </aside>
-        </div>
-
-        <!-- Edit Card Details Modal -->
-        <div x-show="editModalOpen" x-cloak @keydown.escape.window="closeEditModal()"
-            class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
-            <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-                <!-- Background overlay -->
-                <div x-show="editModalOpen" x-transition:enter="ease-out duration-300"
-                    x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-                    x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100"
-                    x-transition:leave-end="opacity-0" @click="closeEditModal()"
-                    class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75 dark:bg-gray-900 dark:bg-opacity-75">
-                </div>
-
-                <!-- Modal panel -->
-                <div x-show="editModalOpen" x-transition:enter="ease-out duration-300"
-                    x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                    x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                    x-transition:leave="ease-in duration-200"
-                    x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                    x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                    class="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-lg">
-
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">
-                            Edit Card Details - Slot <span x-text="editingSlot"></span>
-                        </h3>
-                        <button @click="closeEditModal()"
-                            class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300">
-                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-
-                    <div class="space-y-4">
-                        <!-- Limit Break Level -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Limit Break Level (Stars)
-                            </label>
-                            <div class="flex items-center gap-2">
-                                <input type="range" x-model.number="editLimitBreak" min="0" max="4"
-                                    step="1"
-                                    class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
-                                <span class="text-lg font-semibold text-gray-900 dark:text-white min-w-12 text-center">
-                                    <span x-text="editLimitBreak"></span>/4
-                                </span>
-                            </div>
-                            <div class="mt-2 flex gap-1">
-                                <template x-for="i in 5" :key="i">
-                                    <button @click="editLimitBreak = i - 1" class="text-2xl transition-colors"
-                                        :class="i - 1 <= editLimitBreak ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600'">
-                                        ★
-                                    </button>
-                                </template>
-                            </div>
-                        </div>
-
-                        <!-- Friendship Level -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Friendship Level (Bond)
-                            </label>
-                            <div class="flex items-center gap-2">
-                                <input type="range" x-model.number="editFriendship" min="0" max="100"
-                                    step="5"
-                                    class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
-                                <span class="text-lg font-semibold text-gray-900 dark:text-white min-w-16 text-center">
-                                    <span x-text="editFriendship"></span>%
-                                </span>
-                            </div>
-                            <div class="mt-2 flex gap-2">
-                                <button @click="editFriendship = 0" class="btn btn-xs btn-outline">0%</button>
-                                <button @click="editFriendship = 25" class="btn btn-xs btn-outline">25%</button>
-                                <button @click="editFriendship = 50" class="btn btn-xs btn-outline">50%</button>
-                                <button @click="editFriendship = 75" class="btn btn-xs btn-outline">75%</button>
-                                <button @click="editFriendship = 100" class="btn btn-xs btn-outline">100%</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mt-6 flex gap-3 justify-end">
-                        <button @click="closeEditModal()" class="btn btn-outline">
-                            Cancel
-                        </button>
-                        <button @click="saveCardDetails()" class="btn btn-primary">
-                            Save Changes
-                        </button>
-                    </div>
+                <div class="mt-6 flex gap-3 justify-end">
+                    <button @click="closeEditModal()" class="btn btn-outline">
+                        Cancel
+                    </button>
+                    <button @click="saveEditModal()" class="btn btn-primary">
+                        Save Changes
+                    </button>
                 </div>
             </div>
         </div>
-    </main>
-    @php
-        $deckData = $currentDeck
-            ->map(function ($card) {
-                return [
-                    'slot' => $card->position_slot,
-                    'card_id' => $card->support_card_id,
-                    'is_friend' => $card->is_friend_card,
-                    'limit_break' => $card->limit_break_level,
-                    'friendship' => $card->friendship_level,
-                    'card' => $card->supportCard,
-                ];
-            })
-            ->values()
-            ->toArray();
-        
-        $apiRoutes = [
-            'addCard' => route('api.v1.characters.deck.add-card', $character),
-            'removeCard' => route('api.v1.characters.deck.remove-card', ['character' => $character, 'position' => '__POSITION__']),
-            'clearDeck' => route('api.v1.characters.deck.clear', $character),
-            'saveDeck' => route('api.v1.characters.deck.save', $character),
-            'swapCards' => route('api.v1.characters.deck.cards.swap', $character),
-            'updateDetails' => route('api.v1.characters.deck.cards.update-details', ['character' => $character, 'position' => '__POSITION__']),
-        ];
-    @endphp
-    <div
-        id="deck-builder-data"
-        data-deck='@json($deckData)'
-        data-api-routes='@json($apiRoutes)'
-        class="hidden"
-    ></div>
-    <script>
-        window.deckBuilderData = (() => {
-            const dataEl = document.getElementById('deck-builder-data');
-            if (!dataEl) {
-                return { deck: [], apiRoutes: {} };
-            }
-
-            return {
-                deck: JSON.parse(dataEl.dataset.deck || '[]'),
-                apiRoutes: JSON.parse(dataEl.dataset.apiRoutes || '{}'),
-            };
-        })();
-    </script>
-    <script>
-        window.deckBuilder = function() {
-            const { deck: deckData, apiRoutes } = window.deckBuilderData;
-            
-            return {
-                deck: deckData,
-                selectedSlot: null,
-                isFriendSlot: false,
-                searchQuery: '',
-                filterType: '',
-                filterTier: '',
-                validationErrors: [],
-                validationWarnings: [],
-                draggedSlot: null,
-                dragOverSlot: null,
-
-                init() {
-                    // Validation on init
-                    this.validateDeck();
-                },
-
-                get deckCount() {
-                    return this.deck.length;
-                },
-
-                get friendCardCount() {
-                    return this.deck.filter(c => c.is_friend).length;
-                },
-
-                get uniqueTypes() {
-                    const types = new Set(this.deck.map(c => c.card?.card_type).filter(Boolean));
-                    return types.size;
-                },
-                
-                // Type distribution breakdown (WF-011)
-                get typeDistribution() {
-                    const dist = {};
-                    this.deck.forEach(c => {
-                        const type = c.card?.card_type;
-                        if (type) {
-                            dist[type] = (dist[type] || 0) + 1;
-                        }
-                    });
-                    return dist;
-                },
-                
-                // Average bond level (WF-011)
-                get averageBond() {
-                    if (this.deck.length === 0) return 0;
-                    const total = this.deck.reduce((sum, c) => sum + (c.friendship || 0), 0);
-                    return Math.round(total / this.deck.length);
-                },
-                
-                // Average limit break (WF-011)
-                get averageLimitBreak() {
-                    if (this.deck.length === 0) return '0.0';
-                    const total = this.deck.reduce((sum, c) => sum + (c.limit_break || 0), 0);
-                    return (total / this.deck.length).toFixed(1);
-                },
-                
-                // Synergy score calculation (WF-011)
-                get synergyScore() {
-                    if (this.deck.length < 2) return 0;
-                    let score = 0;
-                    
-                    // Type diversity bonus (up to 20 points)
-                    const typeCount = this.uniqueTypes;
-                    if (typeCount >= 4) score += 20;
-                    else if (typeCount >= 3) score += 15;
-                    else if (typeCount >= 2) score += 10;
-                    
-                    // Bond level bonus (up to 30 points)
-                    const avgBond = this.averageBond;
-                    score += Math.min(30, avgBond * 0.3);
-                    
-                    // Limit break bonus (up to 20 points)
-                    const avgLB = parseFloat(this.averageLimitBreak);
-                    score += avgLB * 5;
-                    
-                    // Card completion bonus (up to 30 points)
-                    if (this.deck.length === 6) score += 20;
-                    else score += (this.deck.length / 6) * 20;
-                    
-                    // Friend card bonus
-                    if (this.friendCardCount === 1) score += 10;
-                    
-                    return Math.min(100, Math.round(score));
-                },
-
-                get isDeckValid() {
-                    return this.deckCount === 6 && this.friendCardCount <= 1 && this.validationErrors.length === 0;
-                },
-
-                filterCard(card) {
-                    if (this.searchQuery && !card.name.toLowerCase().includes(this.searchQuery.toLowerCase()) &&
-                        !card.character_name.toLowerCase().includes(this.searchQuery.toLowerCase())) {
-                        return false;
-                    }
-                    if (this.filterType && card.card_type !== this.filterType) {
-                        return false;
-                    }
-                    if (this.filterTier && card.meta_tier !== this.filterTier) {
-                        return false;
-                    }
-                    return true;
-                },
-
-                openCardSelector(slot, isFriend) {
-                    this.selectedSlot = slot;
-                    this.isFriendSlot = isFriend;
-                },
-
-                async selectCard(cardId) {
-                    // Auto-slot: find the next available slot
-                    let targetSlot = this.selectedSlot;
-
-                    if (!targetSlot) {
-                        // Find first empty slot (1-5 for owned cards, 6 for friend cards)
-                        const occupiedSlots = this.deck.map(c => c.slot);
-                        for (let i = 1; i <= 6; i++) {
-                            if (!occupiedSlots.includes(i)) {
-                                targetSlot = i;
-                                break;
-                            }
-                        }
-
-                        if (!targetSlot) {
-                            alert('All deck slots are full. Please remove a card first.');
-                            return;
-                        }
-                    }
-
-                    // Determine if this is a friend slot
-                    const isFriend = targetSlot === 6;
-
-                    try {
-                        const response = await fetch(apiRoutes.addCard, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                                },
-                                body: JSON.stringify({
-                                    support_card_id: cardId,
-                                    position_slot: targetSlot,
-                                    is_friend_card: isFriend,
-                                    limit_break_level: 0
-                                })
-                            });
-
-                        const data = await response.json();
-
-                        if (response.ok && data.success) {
-                            // Reload page to show updated deck
-                            window.location.reload();
-                        } else {
-                            alert(data.message || 'Failed to add card to deck. Please try again.');
-                        }
-                    } catch (error) {
-                        console.error('Error adding card to deck:', error);
-                        alert('An error occurred while adding the card.');
-                    }
-                },
-
-                async removeCard(slot) {
-                    try {
-                        const response = await fetch(
-                            apiRoutes.removeCard.replace('__POSITION__', slot), {
-                                method: 'DELETE',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                                }
-                            });
-
-                        const data = await response.json();
-
-                        if (response.ok && data.success) {
-                            window.location.reload();
-                        } else {
-                            alert(data.message || 'Failed to remove card from deck.');
-                        }
-                    } catch (error) {
-                        console.error('Error removing card from deck:', error);
-                        alert('An error occurred while removing the card.');
-                    }
-                },
-
-                async clearDeck() {
-                    if (!confirm('Are you sure you want to clear the entire deck?')) {
-                        return;
-                    }
-
-                    try {
-                        const response = await fetch(apiRoutes.clearDeck, {
-                            method: 'DELETE',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                            }
-                        });
-
-                        const data = await response.json();
-
-                        if (response.ok && data.success) {
-                            window.location.reload();
-                        } else {
-                            alert(data.message || 'Failed to clear deck.');
-                        }
-                    } catch (error) {
-                        console.error('Error clearing deck:', error);
-                        alert('An error occurred while clearing the deck.');
-                    }
-                },
-
-                validateDeck() {
-                    this.validationErrors = [];
-                    this.validationWarnings = [];
-
-                    if (this.deckCount !== 6) {
-                        this.validationErrors.push('Deck must contain exactly 6 cards');
-                    }
-
-                    if (this.friendCardCount > 1) {
-                        this.validationErrors.push('Deck can only have 1 friend card');
-                    }
-
-                    // Check for duplicates
-                    const cardIds = this.deck.filter(c => !c.is_friend).map(c => c.card_id);
-                    if (cardIds.length !== new Set(cardIds).size) {
-                        this.validationErrors.push('Deck cannot contain duplicate cards');
-                    }
-
-                    // Warnings
-                    if (this.uniqueTypes < 3) {
-                        this.validationWarnings.push(
-                            'Consider using at least 3 different card types for balanced training');
-                    }
-                },
-
-                async saveDeck() {
-                    if (!this.isDeckValid) {
-                        alert('Please fix validation errors before saving');
-                        return;
-                    }
-
-                    try {
-                        const response = await fetch(apiRoutes.saveDeck, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                            },
-                            body: JSON.stringify({
-                                cards: this.deck.map(c => ({
-                                    support_card_id: c.card_id,
-                                    is_friend_card: c.is_friend,
-                                    limit_break_level: c.limit_break || 0,
-                                    friendship_level: c.friendship || 0
-                                }))
-                            })
-                        });
-
-                        if (response.ok) {
-                            alert('Deck saved successfully!');
-                            window.location.reload();
-                        } else {
-                            alert('Failed to save deck. Please try again.');
-                        }
-                    } catch (error) {
-                        console.error('Error saving deck:', error);
-                        alert('An error occurred while saving the deck.');
-                    }
-                },
-
-                autoOptimize() {
-                    alert(
-                        'Auto-optimize feature coming soon! This will automatically select the best cards based on your character\'s goals.'
-                    );
-                },
-
-                // Drag and Drop handlers
-                handleDragStart(event, slot) {
-                    this.draggedSlot = slot;
-                    event.dataTransfer.effectAllowed = 'move';
-                    event.dataTransfer.setData('text/plain', slot);
-
-                    // Make the dragged element semi-transparent
-                    event.currentTarget.style.opacity = '0.5';
-                },
-
-                handleDragOver(event, slot) {
-                    event.preventDefault();
-
-                    // Only allow dropping on different slots when we have a dragged slot
-                    if (this.draggedSlot && this.draggedSlot !== slot) {
-                        this.dragOverSlot = slot;
-                        event.dataTransfer.dropEffect = 'move';
-                    }
-                },
-
-                async handleDrop(event, targetSlot) {
-                    event.preventDefault();
-                    this.dragOverSlot = null;
-
-                    if (!this.draggedSlot || this.draggedSlot === targetSlot) {
-                        return;
-                    }
-
-                    const sourceSlot = this.draggedSlot;
-
-                    try {
-                        const response = await fetch(apiRoutes.swapCards, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                                },
-                                body: JSON.stringify({
-                                    position1: sourceSlot,
-                                    position2: targetSlot
-                                })
-                            });
-
-                        const data = await response.json();
-
-                        if (response.ok && data.success) {
-                            window.location.reload();
-                        } else {
-                            console.error('Swap failed:', data);
-                            alert(data.message || 'Failed to swap cards.');
-                        }
-                    } catch (error) {
-                        console.error('Error swapping cards:', error);
-                        alert('An error occurred while swapping cards.');
-                    }
-                },
-
-                handleDragEnd(event) {
-                    // Restore opacity
-                    event.currentTarget.style.opacity = '1';
-
-                    this.draggedSlot = null;
-                    this.dragOverSlot = null;
-                },
-
-                // Keyboard controls
-                async moveCardUp(slot) {
-                    if (slot === 1) return;
-
-                    try {
-                        const response = await fetch(apiRoutes.swapCards, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                                },
-                                body: JSON.stringify({
-                                    position1: slot,
-                                    position2: slot - 1
-                                })
-                            });
-
-                        const data = await response.json();
-
-                        if (response.ok && data.success) {
-                            window.location.reload();
-                        } else {
-                            alert(data.message || 'Failed to move card.');
-                        }
-                    } catch (error) {
-                        console.error('Error moving card:', error);
-                        alert('An error occurred while moving the card.');
-                    }
-                },
-
-                async moveCardDown(slot) {
-                    if (slot === 6) return;
-
-                    try {
-                        const response = await fetch(apiRoutes.swapCards, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                                },
-                                body: JSON.stringify({
-                                    position1: slot,
-                                    position2: slot + 1
-                                })
-                            });
-
-                        const data = await response.json();
-
-                        if (response.ok && data.success) {
-                            window.location.reload();
-                        } else {
-                            alert(data.message || 'Failed to move card.');
-                        }
-                    } catch (error) {
-                        console.error('Error moving card:', error);
-                        alert('An error occurred while moving the card.');
-                    }
-                },
-
-                // Edit modal state
-                editModalOpen: false,
-                editingSlot: null,
-                editLimitBreak: 0,
-                editFriendship: 0,
-
-                openEditModal(slot, limitBreak, friendship) {
-                    this.editingSlot = slot;
-                    this.editLimitBreak = limitBreak;
-                    this.editFriendship = friendship;
-                    this.editModalOpen = true;
-                },
-
-                closeEditModal() {
-                    this.editModalOpen = false;
-                    this.editingSlot = null;
-                    this.editLimitBreak = 0;
-                    this.editFriendship = 0;
-                },
-
-                async saveCardDetails() {
-                    if (!this.editingSlot) return;
-
-                    try {
-                        const response = await fetch(
-                            apiRoutes.updateDetails.replace('__POSITION__', this.editingSlot), {
-                                method: 'PUT',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                                },
-                                body: JSON.stringify({
-                                    limit_break_level: this.editLimitBreak,
-                                    friendship_level: this.editFriendship
-                                })
-                            });
-
-                        const data = await response.json();
-
-                        if (response.ok && data.success) {
-                            this.closeEditModal();
-                            window.location.reload();
-                        } else {
-                            alert(data.message || 'Failed to update card details.');
-                        }
-                    } catch (error) {
-                        console.error('Error updating card details:', error);
-                        alert('An error occurred while updating card details.');
-                    }
-                }
-            }
-        }
-    </script>
+    </div>
+    </div><!-- End grid -->
+    </div><!-- End Alpine component -->
 @endsection

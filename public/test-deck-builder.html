@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="csrf-token" content="test-token" />
+        <title>Deck Builder API Test</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                padding: 20px;
+                max-width: 800px;
+                margin: 0 auto;
+            }
+            .test-section {
+                margin: 20px 0;
+                padding: 15px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+            }
+            .success {
+                background-color: #d4edda;
+                border-color: #c3e6cb;
+            }
+            .error {
+                background-color: #f8d7da;
+                border-color: #f5c6cb;
+            }
+            button {
+                padding: 10px 20px;
+                margin: 5px;
+                cursor: pointer;
+            }
+            pre {
+                background: #f5f5f5;
+                padding: 10px;
+                border-radius: 3px;
+                overflow-x: auto;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Deck Builder API Test</h1>
+
+        <div class="test-section">
+            <h2>Test Configuration</h2>
+            <label
+                >Character ID:
+                <input type="number" id="characterId" value="88" /></label
+            ><br />
+            <label
+                >Support Card ID:
+                <input type="number" id="supportCardId" value="1" /></label
+            ><br />
+            <label
+                >Position Slot:
+                <input
+                    type="number"
+                    id="positionSlot"
+                    value="2"
+                    min="1"
+                    max="6" /></label
+            ><br />
+            <label
+                ><input type="checkbox" id="isFriendCard" /> Is Friend
+                Card</label
+            >
+        </div>
+
+        <div class="test-section">
+            <h2>Actions</h2>
+            <button onclick="testAddCard()">Test Add Card</button>
+            <button onclick="testRemoveCard()">Test Remove Card</button>
+            <button onclick="testGetDeck()">Get Current Deck</button>
+            <button onclick="testClearDeck()">Clear Deck</button>
+        </div>
+
+        <div id="results" class="test-section">
+            <h2>Results</h2>
+            <pre id="output">No tests run yet...</pre>
+        </div>
+
+        <script>
+            const output = document.getElementById("output");
+
+            function log(message, isError = false) {
+                const timestamp = new Date().toLocaleTimeString();
+                output.textContent += `[${timestamp}] ${message}\n`;
+                if (isError) {
+                    output.parentElement.className = "test-section error";
+                } else {
+                    output.parentElement.className = "test-section success";
+                }
+            }
+
+            function clearOutput() {
+                output.textContent = "";
+                output.parentElement.className = "test-section";
+            }
+
+            async function testAddCard() {
+                clearOutput();
+                const characterId =
+                    document.getElementById("characterId").value;
+                const supportCardId =
+                    document.getElementById("supportCardId").value;
+                const positionSlot =
+                    document.getElementById("positionSlot").value;
+                const isFriendCard =
+                    document.getElementById("isFriendCard").checked;
+
+                log(`Testing Add Card API...`);
+                log(`Character ID: ${characterId}`);
+                log(`Support Card ID: ${supportCardId}`);
+                log(`Position Slot: ${positionSlot}`);
+                log(`Is Friend Card: ${isFriendCard}`);
+
+                try {
+                    const response = await fetch(
+                        `/api/v1/characters/${characterId}/deck/add-card`,
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                Accept: "application/json",
+                                "X-CSRF-TOKEN": document.querySelector(
+                                    'meta[name="csrf-token"]',
+                                ).content,
+                            },
+                            body: JSON.stringify({
+                                support_card_id: parseInt(supportCardId),
+                                position_slot: parseInt(positionSlot),
+                                is_friend_card: isFriendCard,
+                                limit_break_level: 0,
+                            }),
+                        },
+                    );
+
+                    const data = await response.json();
+                    log(`Response Status: ${response.status}`);
+                    log(`Response Data: ${JSON.stringify(data, null, 2)}`);
+
+                    if (response.ok && data.success) {
+                        log("✅ Card added successfully!");
+                    } else {
+                        log(
+                            `❌ Failed: ${data.message || "Unknown error"}`,
+                            true,
+                        );
+                    }
+                } catch (error) {
+                    log(`❌ Error: ${error.message}`, true);
+                    console.error(error);
+                }
+            }
+
+            async function testRemoveCard() {
+                clearOutput();
+                const characterId =
+                    document.getElementById("characterId").value;
+                const positionSlot =
+                    document.getElementById("positionSlot").value;
+
+                log(`Testing Remove Card API...`);
+                log(`Character ID: ${characterId}`);
+                log(`Position Slot: ${positionSlot}`);
+
+                try {
+                    const response = await fetch(
+                        `/api/v1/characters/${characterId}/deck/remove-card/${positionSlot}`,
+                        {
+                            method: "DELETE",
+                            headers: {
+                                "Content-Type": "application/json",
+                                Accept: "application/json",
+                                "X-CSRF-TOKEN": document.querySelector(
+                                    'meta[name="csrf-token"]',
+                                ).content,
+                            },
+                        },
+                    );
+
+                    const data = await response.json();
+                    log(`Response Status: ${response.status}`);
+                    log(`Response Data: ${JSON.stringify(data, null, 2)}`);
+
+                    if (response.ok && data.success) {
+                        log("✅ Card removed successfully!");
+                    } else {
+                        log(
+                            `❌ Failed: ${data.message || "Unknown error"}`,
+                            true,
+                        );
+                    }
+                } catch (error) {
+                    log(`❌ Error: ${error.message}`, true);
+                    console.error(error);
+                }
+            }
+
+            async function testGetDeck() {
+                clearOutput();
+                const characterId =
+                    document.getElementById("characterId").value;
+
+                log(`Getting current deck for character ${characterId}...`);
+
+                try {
+                    const response = await fetch(
+                        `/api/v1/characters/${characterId}/deck/analysis`,
+                        {
+                            method: "GET",
+                            headers: {
+                                Accept: "application/json",
+                            },
+                        },
+                    );
+
+                    const data = await response.json();
+                    log(`Response Status: ${response.status}`);
+                    log(`Deck Data: ${JSON.stringify(data, null, 2)}`);
+                } catch (error) {
+                    log(`❌ Error: ${error.message}`, true);
+                    console.error(error);
+                }
+            }
+
+            async function testClearDeck() {
+                clearOutput();
+                const characterId =
+                    document.getElementById("characterId").value;
+
+                if (
+                    !confirm("Are you sure you want to clear the entire deck?")
+                ) {
+                    log("Cancelled by user");
+                    return;
+                }
+
+                log(`Testing Clear Deck API...`);
+                log(`Character ID: ${characterId}`);
+
+                try {
+                    const response = await fetch(
+                        `/api/v1/characters/${characterId}/deck/clear`,
+                        {
+                            method: "DELETE",
+                            headers: {
+                                "Content-Type": "application/json",
+                                Accept: "application/json",
+                                "X-CSRF-TOKEN": document.querySelector(
+                                    'meta[name="csrf-token"]',
+                                ).content,
+                            },
+                        },
+                    );
+
+                    const data = await response.json();
+                    log(`Response Status: ${response.status}`);
+                    log(`Response Data: ${JSON.stringify(data, null, 2)}`);
+
+                    if (response.ok && data.success) {
+                        log("✅ Deck cleared successfully!");
+                    } else {
+                        log(
+                            `❌ Failed: ${data.message || "Unknown error"}`,
+                            true,
+                        );
+                    }
+                } catch (error) {
+                    log(`❌ Error: ${error.message}`, true);
+                    console.error(error);
+                }
+            }
+        </script>
+    </body>
+</html>
