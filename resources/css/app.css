@@ -939,6 +939,106 @@ textarea:focus-visible {
 }
 
 /* ============================================
+   Deck Builder Module (Added)
+   ============================================ */
+.btn-icon {
+    padding: 0.25rem;
+    border-radius: 0.25rem;
+    transition:
+        background-color 0.2s,
+        color 0.2s;
+}
+
+.btn-icon:hover {
+    background-color: var(--color-neutral-100);
+}
+
+:is(.dark .btn-icon):hover {
+    background-color: var(--color-neutral-700);
+}
+
+.card-library-item {
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--color-neutral-200);
+    cursor: pointer;
+    transition: all 0.2s;
+    transform: scale(1);
+}
+
+.card-library-item:hover {
+    border-color: var(--color-primary-400);
+    background-color: var(--color-primary-50);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    transform: scale(1.02);
+}
+
+:is(.dark .card-library-item) {
+    border-color: var(--color-neutral-700);
+}
+
+:is(.dark .card-library-item):hover {
+    border-color: var(--color-primary-500);
+    background-color: rgba(30, 58, 138, 0.1);
+}
+
+.slot-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.friend-slot {
+    background-color: var(--color-secondary-100);
+    color: var(--color-secondary-600);
+}
+
+:is(.dark .friend-slot) {
+    background-color: var(--color-secondary-900);
+    color: var(--color-secondary-300);
+}
+
+.normal-slot {
+    background-color: var(--color-neutral-100);
+    color: var(--color-neutral-600);
+}
+
+:is(.dark .normal-slot) {
+    background-color: var(--color-neutral-700);
+    color: var(--color-neutral-300);
+}
+
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    overflow-y: auto;
+    background-color: rgba(107, 114, 128, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+    padding: 1.5rem;
+    width: 100%;
+    max-width: 28rem;
+    margin: 0 1rem;
+}
+
+:is(.dark .modal-content) {
+    background-color: var(--color-neutral-800);
+}
+
+/* ============================================
    Asset Optimization & Lazy Loading
    ============================================ */
 
@@ -1161,6 +1261,11 @@ textarea:focus-visible {
 
 .character-avatar-vodka {
     background-image: url("/images/trainee_images/__vodka_umamusume_drawn_by_mayata__41166bfaeb2670ae37c8785af4566d58.jpg");
+}
+
+/* Fallback for missing character avatars */
+.character-avatar:not([class*="character-avatar-"]) {
+    background-image: url("/images/trainee_images/bb962aabeafaee5cbf7831e4d178ca64.jpg");
 }
 
 .character-avatar-daiwa-scarlet {
@@ -2016,18 +2121,7 @@ body {
     padding: 0.75rem 1rem !important;
 }
 
-/* Toast Animations */
-@keyframes fade-in {
-    from {
-        opacity: 0;
-        transform: translateY(1rem);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
+/* Toast Animations - Removed duplicate fade-in, using the one from Animation System section */
 @keyframes fade-out {
     from {
         opacity: 1;
@@ -2037,10 +2131,6 @@ body {
         opacity: 0;
         transform: translateY(1rem);
     }
-}
-
-.animate-fade-in {
-    animation: fade-in 0.3s ease-out;
 }
 
 .animate-fade-out {
@@ -2140,8 +2230,13 @@ input[type="range"]::-moz-range-thumb:hover {
 
 /* Pulse loading animation (for skeletons) */
 @keyframes pulse-loading {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
 }
 
 /* Scale in animation (for cards on hover) */
@@ -2158,9 +2253,23 @@ input[type="range"]::-moz-range-thumb:hover {
 
 /* Shake animation (for errors) */
 @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
-    20%, 40%, 60%, 80% { transform: translateX(4px); }
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+        transform: translateX(-4px);
+    }
+    20%,
+    40%,
+    60%,
+    80% {
+        transform: translateX(4px);
+    }
 }
 
 /* Utility classes for animations */
@@ -2193,7 +2302,7 @@ input[type="range"]::-moz-range-thumb:hover {
     .animate-shake {
         animation: none;
     }
-    
+
     * {
         transition-duration: 0.01ms !important;
     }

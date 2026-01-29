@@ -12,6 +12,10 @@ import { spAllocator } from "./components/sp-allocator.js";
 // Phase 5: Race Planning & Analytics Components
 import { raceCalendar } from "./components/race-calendar.js";
 
+// Phase 6: Polish & Advanced Features Components
+import { localStorageManager } from "./components/local-storage-manager.js";
+import { importExportHandler } from "./components/import-export-handler.js";
+
 // Register Alpine plugins early
 Alpine.plugin(persist);
 
@@ -321,12 +325,12 @@ const deckBuilder = () => ({
         event.dataTransfer.setData("text/plain", slot);
     },
 
-    handleDragOver(event, slot) {
+    handleDragOver(_event, slot) {
         if (this.draggedSlot === slot) return;
         this.dragOverSlot = slot;
     },
 
-    handleDragEnd(event) {
+    handleDragEnd() {
         this.dragOverSlot = null;
         this.draggedSlot = null;
     },
@@ -397,7 +401,7 @@ const deckBuilder = () => ({
         this.editingSlot = null;
     },
 
-    openCardSelector(slot) {
+    openCardSelector() {
         const library = document.querySelector("aside"); // Assuming aside is library
         if (library) library.scrollIntoView({ behavior: "smooth" });
     },
@@ -518,6 +522,10 @@ Alpine.data("spAllocator", spAllocator);
 
 // Phase 5: Race Planning & Analytics
 Alpine.data("raceCalendar", raceCalendar);
+
+// Phase 6: Polish & Advanced Features
+Alpine.data("localStorageManager", localStorageManager);
+Alpine.data("importExportHandler", importExportHandler);
 
 // Initialize Alpine.js immediately for faster interactivity
 window.Alpine = Alpine;
@@ -648,6 +656,7 @@ if ("serviceWorker" in navigator) {
 }
 
 // Utility functions for service worker communication
+// @ts-ignore - ServiceWorkerUtils is intentionally added to window
 window.ServiceWorkerUtils = {
     /**
      * Clear all service worker caches

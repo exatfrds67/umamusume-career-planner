@@ -497,12 +497,12 @@
                         Aptitude Display
                     </h3>
                     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                        <x-aptitude-display category="turf" grade="S" />
-                        <x-aptitude-display category="dirt" grade="A" />
-                        <x-aptitude-display category="sprint" grade="B" />
-                        <x-aptitude-display category="mile" grade="A" />
-                        <x-aptitude-display category="medium" grade="S" />
-                        <x-aptitude-display category="long" grade="B" />
+                        <x-aptitude-display type="turf" grade="S" />
+                        <x-aptitude-display type="dirt" grade="A" />
+                        <x-aptitude-display type="sprint" grade="B" />
+                        <x-aptitude-display type="mile" grade="A" />
+                        <x-aptitude-display type="medium" grade="S" />
+                        <x-aptitude-display type="long" grade="B" />
                     </div>
                 </div>
 
@@ -548,14 +548,27 @@
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="bg-white dark:bg-neutral-800 p-4 rounded-lg">
-                            <p class="text-sm text-neutral-600 dark:text-neutral-400 mb-3 text-center">Balanced Build</p>
-                            <x-stat-radar-chart :stats="['speed' => 1200, 'stamina' => 1000, 'power' => 1100, 'guts' => 900, 'wit' => 1050]"
-                                size="md" show-labels show-values :animated="true" />
+                            <p class="text-sm text-neutral-600 dark:text-neutral-400 mb-3 text-center">Balanced Build
+                            </p>
+                            <x-stat-radar-chart :stats="[
+                                'speed' => 1200,
+                                'stamina' => 1000,
+                                'power' => 1100,
+                                'guts' => 900,
+                                'wit' => 1050,
+                            ]" size="md" show-labels show-values
+                                :animated="true" />
                         </div>
                         <div class="bg-white dark:bg-neutral-800 p-4 rounded-lg">
-                            <p class="text-sm text-neutral-600 dark:text-neutral-400 mb-3 text-center">Speed Focus Build</p>
-                            <x-stat-radar-chart :stats="['speed' => 1500, 'stamina' => 800, 'power' => 900, 'guts' => 700, 'wit' => 1000]"
-                                size="md" show-labels :animated="true" />
+                            <p class="text-sm text-neutral-600 dark:text-neutral-400 mb-3 text-center">Speed Focus
+                                Build</p>
+                            <x-stat-radar-chart :stats="[
+                                'speed' => 1500,
+                                'stamina' => 800,
+                                'power' => 900,
+                                'guts' => 700,
+                                'wit' => 1000,
+                            ]" size="md" show-labels :animated="true" />
                         </div>
                     </div>
                 </div>
@@ -587,7 +600,8 @@
                     <div class="space-y-3">
                         @for ($i = 1; $i <= 5; $i++)
                             <div class="flex items-center gap-3">
-                                <span class="text-sm text-neutral-600 dark:text-neutral-400 w-20">{{ $i }} Star{{ $i > 1 ? 's' : '' }}</span>
+                                <span class="text-sm text-neutral-600 dark:text-neutral-400 w-20">{{ $i }}
+                                    Star{{ $i > 1 ? 's' : '' }}</span>
                                 <x-star-rating :rating="$i" size="md" />
                             </div>
                         @endfor
@@ -614,13 +628,8 @@
                         Character Profile Card
                     </h3>
                     <div class="max-w-md">
-                        <x-character-profile
-                            name="Special Week"
-                            :image-url="null"
-                            rarity="3"
-                            potential="S"
-                            show-details
-                        />
+                        <x-character-profile name="Special Week" :image-url="null" rarity="3" potential="S"
+                            show-details />
                     </div>
                 </div>
 
@@ -629,14 +638,28 @@
                     <h3 class="text-lg font-semibold text-neutral-800 dark:text-neutral-200 mb-4">
                         Memories Grid
                     </h3>
-                    <x-memories-grid
-                        :memories="[
-                            ['title' => 'First Victory', 'description' => 'Won first race at Nakayama', 'unlocked_at' => '2024-01-15'],
-                            ['title' => 'Triple Crown', 'description' => 'Completed Classic Triple Crown', 'unlocked_at' => '2024-02-20'],
-                            ['title' => 'S Rank Stats', 'description' => 'Achieved S rank in all stats', 'unlocked_at' => '2024-03-10'],
-                            ['title' => 'Perfect Run', 'description' => 'Completed career with perfect condition', 'unlocked_at' => null]
-                        ]"
-                    />
+                    <x-memories-grid :memories="[
+                        [
+                            'title' => 'First Victory',
+                            'description' => 'Won first race at Nakayama',
+                            'unlocked_at' => '2024-01-15',
+                        ],
+                        [
+                            'title' => 'Triple Crown',
+                            'description' => 'Completed Classic Triple Crown',
+                            'unlocked_at' => '2024-02-20',
+                        ],
+                        [
+                            'title' => 'S Rank Stats',
+                            'description' => 'Achieved S rank in all stats',
+                            'unlocked_at' => '2024-03-10',
+                        ],
+                        [
+                            'title' => 'Perfect Run',
+                            'description' => 'Completed career with perfect condition',
+                            'unlocked_at' => null,
+                        ],
+                    ]" />
                 </div>
             </div>
 
@@ -666,10 +689,14 @@
                         Goal Progress Tracking
                     </h3>
                     <div class="space-y-4 max-w-md">
-                        <x-goal-progress goal="G1" :current="3" :target="5" size="md" show-label />
-                        <x-goal-progress goal="G2" :current="4" :target="4" size="md" show-label />
-                        <x-goal-progress goal="G3" :current="2" :target="6" size="md" show-label />
-                        <x-goal-progress goal="OP" :current="5" :target="3" size="md" show-label />
+                        <x-goal-progress goal="G1" :current="3" :target="5" size="md"
+                            show-label />
+                        <x-goal-progress goal="G2" :current="4" :target="4" size="md"
+                            show-label />
+                        <x-goal-progress goal="G3" :current="2" :target="6" size="md"
+                            show-label />
+                        <x-goal-progress goal="OP" :current="5" :target="3" size="md"
+                            show-label />
                     </div>
                 </div>
 
@@ -679,30 +706,15 @@
                         Event Notification Banners
                     </h3>
                     <div class="space-y-4">
-                        <x-trainee-event-banner
-                            type="event"
-                            title="New Training Option Available"
-                            message="Special training session unlocked at the track!"
-                            icon="🎯"
-                        />
-                        <x-trainee-event-banner
-                            type="warning"
-                            title="Low Energy Warning"
+                        <x-trainee-event-banner type="event" title="New Training Option Available"
+                            message="Special training session unlocked at the track!" icon="🎯" />
+                        <x-trainee-event-banner type="warning" title="Low Energy Warning"
                             message="Current energy is below 30%. Consider resting or visiting the infirmary."
-                            icon="⚠️"
-                        />
-                        <x-trainee-event-banner
-                            type="achievement"
-                            title="Milestone Reached!"
-                            message="Congratulations on reaching 1000 Speed!"
-                            icon="🏆"
-                        />
-                        <x-trainee-event-banner
-                            type="training"
-                            title="Training Bonus Active"
-                            message="Support card effects are at maximum today!"
-                            icon="💪"
-                        />
+                            icon="⚠️" />
+                        <x-trainee-event-banner type="achievement" title="Milestone Reached!"
+                            message="Congratulations on reaching 1000 Speed!" icon="🏆" />
+                        <x-trainee-event-banner type="training" title="Training Bonus Active"
+                            message="Support card effects are at maximum today!" icon="💪" />
                     </div>
                 </div>
             </div>
@@ -712,7 +724,8 @@
                 <p>All components are WCAG 2.2 AA compliant and support dark mode</p>
                 <p class="mt-2">Colors verified from game screenshots | S is maximum grade (no SS)</p>
                 <p class="mt-2">Skill hint discounts: 10%/20%/30%/35%/40% (max 5 levels)</p>
-                <p class="mt-2">✅ Phase 2 Complete: 18 new components implemented and tested (155 tests, 386 assertions)</p>
+                <p class="mt-2">✅ Phase 2 Complete: 18 new components implemented and tested (155 tests, 386
+                    assertions)</p>
             </div>
         </div>
     </div>
