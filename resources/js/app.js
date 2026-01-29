@@ -4,6 +4,8 @@ import persist from "@alpinejs/persist";
 import axios from "axios"; // Ensure axios is available for the deck builder
 import connectivityMonitor from "./core/connectivity-monitor.js";
 import planWizard from "./components/plan-wizard.js";
+import { trainingTimeline } from "./components/training-timeline.js";
+import { spAllocator } from "./components/sp-allocator.js";
 
 // Register Alpine plugins early
 Alpine.plugin(persist);
@@ -350,6 +352,8 @@ const deckBuilder = () => ({
 // Register connectivity monitor and other components
 Alpine.data("connectivityMonitor", connectivityMonitor);
 Alpine.data("planWizard", planWizard);
+Alpine.data("trainingTimeline", trainingTimeline);
+Alpine.data("spAllocator", spAllocator);
 
 // Register the consolidated Deck Builder
 Alpine.data("deckBuilder", deckBuilder);
