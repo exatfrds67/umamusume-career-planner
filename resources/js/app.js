@@ -18,6 +18,7 @@ import { importExportHandler } from "./components/import-export-handler.js";
 import { notificationManager } from "./components/notification-manager.js";
 import { analyticsPanel } from "./components/analytics-panel.js";
 import { searchFilter } from "./components/search-filter.js";
+import { keyboardShortcuts } from "./components/keyboard-shortcuts.js";
 
 // Register Alpine plugins early
 Alpine.plugin(persist);
@@ -532,6 +533,7 @@ Alpine.data("importExportHandler", importExportHandler);
 Alpine.data("notificationManager", notificationManager);
 Alpine.data("analyticsPanel", analyticsPanel);
 Alpine.data("searchFilter", searchFilter);
+Alpine.data("keyboardShortcuts", keyboardShortcuts);
 
 // Initialize Alpine.js immediately for faster interactivity
 window.Alpine = Alpine;
