@@ -223,6 +223,43 @@
 
             <!-- Quick Actions -->
             <div class="animate-fade-in-delay-3">
+                <h3 class="text-lg font-medium mb-4">Analytics & Race Planning</h3>
+                
+                {{-- Phase 5: Analytics Section --}}
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    {{-- Stat Progression Chart --}}
+                    <x-line-chart 
+                        title="Stat Progression" 
+                        :data="$statProgression ?? [[100, 150, 200, 280, 350, 420, 480]]"
+                        :labels="$progressionLabels ?? ['Turn 5', 'Turn 10', 'Turn 15', 'Turn 20', 'Turn 24', 'Turn 28', 'Turn 32']"
+                        :colors="['#3B82F6', '#10B981', '#F59E0B']"
+                        height="h-72"
+                    />
+                    
+                    {{-- Fan Count Hierarchy --}}
+                    <x-class-pyramid 
+                        title="Race Grade Distribution" 
+                        :grades="$raceGrades ?? [
+                            ['grade' => 'G1', 'fans' => 5000, 'color' => 'bg-red-500'],
+                            ['grade' => 'G2', 'fans' => 3500, 'color' => 'bg-orange-500'],
+                            ['grade' => 'G3', 'fans' => 2000, 'color' => 'bg-yellow-500'],
+                            ['grade' => 'Listed', 'fans' => 1200, 'color' => 'bg-green-500'],
+                            ['grade' => 'Open', 'fans' => 800, 'color' => 'bg-blue-500']
+                        ]"
+                        variant="pyramid"
+                    />
+                </div>
+
+                {{-- Activity Timeline --}}
+                <x-activity-timeline 
+                    title="Recent Activity" 
+                    :events="$recentActivity ?? []"
+                    variant="timeline"
+                    class="mb-6"
+                />
+            </div>
+
+            <div class="animate-fade-in-delay-3">
                 <h3 class="text-lg font-medium mb-4">Quick Actions</h3>
                 <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
                     <a href="{{ $selectedCharacter ? route('training.predictions.show', $selectedCharacter) : route('training.predictions') }}"

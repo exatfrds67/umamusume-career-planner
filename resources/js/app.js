@@ -1,16 +1,21 @@
 import "./bootstrap";
 import Alpine from "alpinejs";
 import persist from "@alpinejs/persist";
-import axios from "axios"; // Ensure axios is available for the deck builder
+import axios from "axios";
 import connectivityMonitor from "./core/connectivity-monitor.js";
 import planWizard from "./components/plan-wizard.js";
+
+// Phase 4: Training & SP Management Components
 import { trainingTimeline } from "./components/training-timeline.js";
 import { spAllocator } from "./components/sp-allocator.js";
+
+// Phase 5: Race Planning & Analytics Components
+import { raceCalendar } from "./components/race-calendar.js";
 
 // Register Alpine plugins early
 Alpine.plugin(persist);
 
-// --- Deck Builder Component (Consolidated) ---
+// --- Deck Builder Component (Fully Consolidated) ---
 const deckBuilder = () => ({
     // Data Models
     deckData: [],
@@ -21,7 +26,7 @@ const deckBuilder = () => ({
     searchQuery: "",
     filterType: "",
     filterTier: "",
-    sortBy: "name",
+    sortBy: "name", // Options: name, rarity, type, tier
     dragOverSlot: null,
     draggedSlot: null,
     isLoading: false,
@@ -47,19 +52,27 @@ const deckBuilder = () => ({
             this.deckData = window.deckBuilderData.deck || [];
             this.availableCards = window.deckBuilderData.availableCards || [];
             this.characterId = window.deckBuilderData.characterId;
+        } else {
+            // Fallback: Fetch if no window data provided
+            this.fetchAvailableCards();
         }
 
-        // 2. Initial Setup
+        // 2. Initial Validation
         this.validateDeck();
 
         // 3. Watchers
         this.$watch("searchQuery", () => {
             clearTimeout(this._searchDebounce);
-            this._searchDebounce = setTimeout(() => this.validateDeck(), 300); // Re-validate or filter
+            // Re-evaluating filteredCards handled by Alpine reactivity,
+            // but we might want to fetch server-side if list is too large
+            this._searchDebounce = setTimeout(() => {
+                // Optional: Fetch from API if client-side list is incomplete
+                // this.fetchAvailableCards();
+            }, 300);
         });
     },
 
-    // --- Computed Properties ---
+    // --- Computed Properties: Stats & Counts ---
 
     get deckCount() {
         return this.deckData.filter((c) => c && c.support_card_id).length;
@@ -70,25 +83,99 @@ const deckBuilder = () => ({
     },
 
     get isDeckValid() {
-        return this.deckCount === 6 && this.friendCardCount === 1;
+        return (
+            this.deckCount === 6 &&
+            this.friendCardCount === 1 &&
+            this.validationErrors.length === 0
+        );
+    },
+
+    get uniqueTypes() {
+        if (!this.deckData.length) return 0;
+        const types = new Set(
+            this.deckData
+                .filter((c) => c && c.supportCard)
+                .map((c) => c.supportCard.card_type),
+        );
+        return types.size;
+    },
+
+    get typeDistribution() {
+        const dist = {};
+        this.deckData
+            .filter((c) => c && c.supportCard)
+            .forEach((c) => {
+                const type = c.supportCard.card_type || "unknown";
+                dist[type] = (dist[type] || 0) + 1;
+            });
+        return dist;
+    },
+
+    get averageBond() {
+        const cards = this.deckData.filter((c) => c && c.supportCard);
+        if (!cards.length) return 0;
+        const total = cards.reduce(
+            (sum, c) => sum + (c.friendship_level || 0),
+            0,
+        );
+        return Math.round(total / cards.length);
+    },
+
+    get averageLimitBreak() {
+        const cards = this.deckData.filter((c) => c && c.supportCard);
+        if (!cards.length) return 0;
+        const total = cards.reduce(
+            (sum, c) => sum + (c.limit_break_level || 0),
+            0,
+        );
+        return (total / cards.length).toFixed(1);
+    },
+
+    get synergyScore() {
+        if (this.deckCount < 2) return 0;
+        let score = 0;
+        const cards = this.deckData.filter((c) => c && c.supportCard);
+
+        // 1. Diversity Bonus
+        const typeCount = this.uniqueTypes;
+        if (typeCount >= 4) score += 20;
+        else if (typeCount >= 3) score += 10;
+
+        // 2. Bond Synergy
+        const avgBond = this.averageBond;
+        score += Math.min(30, avgBond * 0.3);
+
+        // 3. Limit Break Synergy
+        const avgLB = parseFloat(this.averageLimitBreak);
+        score += avgLB * 5;
+
+        // 4. Meta Tier Bonus
+        cards.forEach((c) => {
+            const tier = c.supportCard.meta_tier;
+            if (tier === "S" || tier === "SS") score += 10;
+            else if (tier === "A") score += 7;
+            else if (tier === "B") score += 4;
+        });
+
+        return Math.min(100, Math.round(score));
     },
 
     get filteredCards() {
         let cards = this.availableCards.filter((card) => {
-            // 1. Search Text
+            // Search Text
             const searchLower = this.searchQuery.toLowerCase();
             const matchesSearch =
                 card.name.toLowerCase().includes(searchLower) ||
                 (card.character_name &&
                     card.character_name.toLowerCase().includes(searchLower));
 
-            // 2. Dropdown Filters
+            // Dropdown Filters
             const matchesType =
                 this.filterType === "" || card.card_type === this.filterType;
             const matchesTier =
                 this.filterTier === "" || card.meta_tier === this.filterTier;
 
-            // 3. Exclude Owned Cards (allow Friend card duplicates if needed)
+            // Exclude Owned Cards (Allow Friend card duplicates usually, but exclude owned for now)
             const isInDeck = this.deckData.some(
                 (c) => c.support_card_id === card.id && !c.is_friend_card,
             );
@@ -96,45 +183,31 @@ const deckBuilder = () => ({
             return matchesSearch && matchesType && matchesTier && !isInDeck;
         });
 
-        // 4. Sorting
+        // Sorting
         return cards.sort((a, b) => {
-            return (a.name || "").localeCompare(b.name || "");
+            switch (this.sortBy) {
+                case "rarity":
+                    const rarityOrder = { SSR: 0, SR: 1, R: 2 };
+                    return (
+                        (rarityOrder[a.rarity] || 99) -
+                        (rarityOrder[b.rarity] || 99)
+                    );
+                case "type":
+                    return (a.card_type || "").localeCompare(b.card_type || "");
+                case "tier":
+                    const tierOrder = { SS: 0, S: 1, A: 2, B: 3, C: 4, D: 5 };
+                    return (
+                        (tierOrder[a.meta_tier] || 99) -
+                        (tierOrder[b.meta_tier] || 99)
+                    );
+                case "name":
+                default:
+                    return (a.name || "").localeCompare(b.name || "");
+            }
         });
     },
 
-    get synergyScore() {
-        if (this.deckCount < 2) return 0;
-        let score = 0;
-
-        // Count unique types
-        const types = new Set(
-            this.deckData
-                .filter((c) => c.supportCard)
-                .map((c) => c.supportCard.card_type),
-        );
-
-        // Diversity Bonus
-        if (types.size >= 4) score += 20;
-        else if (types.size >= 3) score += 10;
-
-        // Stats Bonus
-        const cards = this.deckData.filter((c) => c.supportCard);
-        if (cards.length > 0) {
-            const avgBond =
-                cards.reduce((sum, c) => sum + (c.friendship_level || 0), 0) /
-                cards.length;
-            const avgLB =
-                cards.reduce((sum, c) => sum + (c.limit_break_level || 0), 0) /
-                cards.length;
-
-            score += Math.min(30, avgBond * 0.3);
-            score += avgLB * 5;
-        }
-
-        return Math.min(100, Math.round(score));
-    },
-
-    // --- View Helper Methods ---
+    // --- View Helpers ---
 
     getCardAtSlot(slot) {
         return this.deckData.find((c) => c.position_slot === slot);
@@ -157,10 +230,9 @@ const deckBuilder = () => ({
         }
     },
 
-    // --- Actions ---
+    // --- Actions: Add/Remove/Move ---
 
     selectCard(cardId) {
-        // Find first empty slot logic
         const takenSlots = this.deckData.map((c) => c.position_slot);
         let targetSlot = null;
 
@@ -184,7 +256,7 @@ const deckBuilder = () => ({
         this.addCardToSlot(cardId, targetSlot);
     },
 
-    async addCardToSlot(cardId, slot) {
+    addCardToSlot(cardId, slot) {
         const card = this.availableCards.find((c) => c.id === cardId);
         if (!card) return;
 
@@ -212,6 +284,33 @@ const deckBuilder = () => ({
             this.deckData = [];
             this.validateDeck();
         }
+    },
+
+    moveCardUp(slot) {
+        // Logic: swap with slot-1
+        if (slot <= 1) return;
+        this.swapSlots(slot, slot - 1);
+    },
+
+    moveCardDown(slot) {
+        // Logic: swap with slot+1
+        if (slot >= 6) return;
+        this.swapSlots(slot, slot + 1);
+    },
+
+    swapSlots(slotA, slotB) {
+        const indexA = this.deckData.findIndex(
+            (c) => c.position_slot === slotA,
+        );
+        const indexB = this.deckData.findIndex(
+            (c) => c.position_slot === slotB,
+        );
+
+        if (indexA > -1) this.deckData[indexA].position_slot = slotB;
+        if (indexB > -1) this.deckData[indexB].position_slot = slotA;
+
+        // Force Alpine reactivity
+        this.deckData = [...this.deckData];
     },
 
     // --- Drag and Drop ---
@@ -248,7 +347,7 @@ const deckBuilder = () => ({
         // Swap Logic
         if (sourceIndex > -1) {
             this.deckData[sourceIndex].position_slot = targetSlot;
-            // Update friend status based on slot
+            // Update friend status based on slot (Slot 6 is Friend)
             this.deckData[sourceIndex].is_friend_card = targetSlot === 6;
         }
 
@@ -257,7 +356,6 @@ const deckBuilder = () => ({
             this.deckData[targetIndex].is_friend_card = sourceSlot === 6;
         }
 
-        // Force Alpine Reactivity
         this.deckData = [...this.deckData];
         this.validateDeck();
     },
@@ -287,8 +385,7 @@ const deckBuilder = () => ({
             this.deckData[index].friendship_level = parseInt(
                 this.editForm.bondLevel,
             );
-            // Trigger reactivity
-            this.deckData = [...this.deckData];
+            this.deckData = [...this.deckData]; // Trigger reactivity
         }
 
         this.closeEditModal();
@@ -301,12 +398,25 @@ const deckBuilder = () => ({
     },
 
     openCardSelector(slot) {
-        // UI Interaction to focus library
-        const library = document.querySelector("aside"); // assuming aside is library
+        const library = document.querySelector("aside"); // Assuming aside is library
         if (library) library.scrollIntoView({ behavior: "smooth" });
     },
 
     // --- Backend Sync ---
+
+    async fetchAvailableCards() {
+        this.isLoading = true;
+        try {
+            const response = await axios.get(
+                "/api/v1/support-cards?is_active=1",
+            );
+            this.availableCards = response.data.data;
+        } catch (error) {
+            console.error("Failed to fetch cards:", error);
+        } finally {
+            this.isLoading = false;
+        }
+    },
 
     async saveDeck() {
         if (!this.characterId) return;
@@ -331,32 +441,83 @@ const deckBuilder = () => ({
     },
 
     async autoOptimize() {
-        alert("Optimization requested (Endpoint logic needed)");
+        if (!this.characterId) return;
+        this.isLoading = true;
+        try {
+            const response = await axios.post(
+                `/api/v1/characters/${this.characterId}/deck/optimize`,
+            );
+            if (response.data.data) {
+                this.deckData = response.data.data;
+                this.validateDeck();
+                alert("Deck optimized!");
+            }
+        } catch (error) {
+            alert("Optimization failed or endpoint not implemented yet.");
+        } finally {
+            this.isLoading = false;
+        }
     },
 
     validateDeck() {
         this.validationErrors = [];
-        // Required: 6 cards
+        this.validationWarnings = [];
+
+        // 1. Errors
         if (this.deckCount < 6) {
             this.validationErrors.push(
                 `Deck incomplete: ${this.deckCount}/6 cards.`,
             );
         }
-        // Required: 1 Friend Card
-        if (this.friendCardCount !== 1) {
-            this.validationErrors.push("Deck must have exactly 1 Friend Card.");
+        if (this.friendCardCount > 1) {
+            this.validationErrors.push("Only 1 Friend Card is allowed.");
+        }
+
+        // Duplicate Check
+        const ids = this.deckData.map((c) => c.support_card_id);
+        const hasDuplicates = ids.some((id, idx) => ids.indexOf(id) !== idx);
+        if (hasDuplicates) {
+            this.validationErrors.push("Duplicate cards detected.");
+        }
+
+        // 2. Warnings
+        if (this.friendCardCount === 0 && this.deckCount > 0) {
+            this.validationWarnings.push(
+                "Consider adding a Friend Card to slot 6.",
+            );
+        }
+
+        // Type Diversity Warning
+        const types = Object.keys(this.typeDistribution);
+        if (this.deckCount >= 4 && types.length < 3) {
+            this.validationWarnings.push(
+                "Consider diversifying card types for better coverage.",
+            );
+        }
+
+        // Low Bond Warning
+        const lowBondCount = this.deckData.filter(
+            (c) => (c.friendship_level || 0) < 50,
+        ).length;
+        if (lowBondCount >= 3) {
+            this.validationWarnings.push(
+                "Several cards have low bond levels (<50).",
+            );
         }
     },
 });
 
-// Register connectivity monitor and other components
+// Register Components
 Alpine.data("connectivityMonitor", connectivityMonitor);
 Alpine.data("planWizard", planWizard);
+Alpine.data("deckBuilder", deckBuilder);
+
+// Phase 4: Training & SP Management
 Alpine.data("trainingTimeline", trainingTimeline);
 Alpine.data("spAllocator", spAllocator);
 
-// Register the consolidated Deck Builder
-Alpine.data("deckBuilder", deckBuilder);
+// Phase 5: Race Planning & Analytics
+Alpine.data("raceCalendar", raceCalendar);
 
 // Initialize Alpine.js immediately for faster interactivity
 window.Alpine = Alpine;
