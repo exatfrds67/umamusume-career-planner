@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.1.0  
-**Date**: January 24, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-007], [SPEC-007], [SRS], [BRS]
 
 **Source Specifications**:
@@ -382,6 +382,16 @@ stateDiagram-v2
 | 70-84% | Medium | 🟡 | User review recommended |
 | < 70% | Low | 🔴 | Manual correction required |
 
+**Game Data Validation Rules** (verified Global English Server Jan 2026):
+
+| Data Type | Valid Range | Notes |
+|-----------|-------------|-------|
+| Stats (Speed, Stamina, Power, Guts, Wit) | 0-2000+ | Soft cap at 1200, diminishing returns above |
+| Aptitude Grades | G, F, E, D, C, B, A, S | S is maximum (no SS grade exists) |
+| Turn Number | 1-78 | Career spans ~70-78 turns across 3 years |
+| Energy | 0-100% | Percentage value |
+| Bond Level | 0-100% | Friendship Training unlocks at 80% |
+
 #### 3.3.2 Manual Correction Interface
 
 ```
@@ -740,7 +750,23 @@ class OCRParserService
     
     private function validateStatValue(int $value): int
     {
-        return max(0, min(1200, $value)); // Clamp to 0-1200
+        // Stats can exceed 1200 (soft cap) but count for half value above cap
+        // Common range: 0-1600+ for optimized builds
+        // Important breakpoints: 901, 1200, 1600
+        return max(0, min(2000, $value)); // Allow up to 2000 for edge cases
+    }
+    
+    /**
+     * Calculate effective stat value considering soft cap
+     * Stats above 1200 count for half value
+     */
+    private function calculateEffectiveStatValue(int $value): int
+    {
+        if ($value <= 1200) {
+            return $value;
+        }
+        // Above 1200: base 1200 + half of excess
+        return 1200 + (int)(($value - 1200) / 2);
     }
 }
 ```
@@ -960,6 +986,7 @@ flowchart LR
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: stat validation allows values above 1200 (soft cap with diminishing returns), aptitude grade validation (G→S scale, no SS), effective stat calculation for soft cap |
 | 2.1.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 architecture; added OCR pipeline details, file import workflows, external API sync, comprehensive error handling and testing criteria |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with basic flow |
 | 1.0.0 | 2026-01-03 | Development Team | Initial draft |
@@ -980,4 +1007,4 @@ flowchart LR
 
 ---
 
-*This user flow reflects the current OCR and data import system implementation as of version 2.1.0. For the latest updates, refer to the online documentation.*
+*This user flow reflects the current OCR and data import system implementation as of version 2.2.0. For the latest updates, refer to the online documentation.*

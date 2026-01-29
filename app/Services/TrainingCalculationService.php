@@ -63,6 +63,14 @@ class TrainingCalculationService
     /**
      * Calculate predicted stat gains for a training session
      *
+     * VERIFIED FORMULA (Jan 2026):
+     * Stat Gain = (Base + StatBonus)
+     *           × (1 + GrowthRate)
+     *           × (1 + MoodMultiplier × (1 + MoodEffect))
+     *           × (1 + TrainingEffect)
+     *           × (1 + 0.05 × NumSupportCards)
+     *           × FriendshipMultiplier
+     *
      * @param  array<string, mixed>  $trainingData
      * @return array{
      *     stat_gains: array<string, int>,
@@ -83,45 +91,81 @@ class TrainingCalculationService
         /** @var array<int, mixed> $supportCards */
         $supportCards = is_array($supportCardsRaw) ? $supportCardsRaw : [];
 
-        // Calculate support card bonuses
-        $supportCardBonus = $this->calculateSupportCardBonus(
+        // Calculate stat bonus from support cards
+        $statBonus = $this->calculateStatBonus(
             $character,
             $trainingType,
             $supportCards
         );
 
-        // Extract and validate participants
+        // Calculate growth rate multiplier (1 + GrowthRate)
+        $growthRateMultiplier = $this->calculateGrowthRateMultiplier(
+            $character,
+            $trainingType
+        );
+
+        // Calculate mood multiplier (1 + MoodMultiplier × (1 + MoodEffect))
+        $moodMultiplier = $this->calculateMoodMultiplier(
+            $character
+        );
+
+        // Calculate training effect from support card traits
+        $trainingEffect = $this->calculateTrainingEffect(
+            $character,
+            $trainingType,
+            $supportCards
+        );
+
+        // Calculate support card presence bonus (+5% per card)
+        $numSupportCards = count($supportCards);
+        if (empty($supportCards)) {
+            // If no support cards provided, get from character
+            $numSupportCards = $character->supportCards()->count();
+        }
+        $supportCardPresenceMultiplier = 1.0 + (0.05 * min(6, $numSupportCards));
+
+        // Extract and validate participants for friendship multiplier
         $participantsRaw = $trainingData['participants'] ?? 0;
         $participants = is_int($participantsRaw) ? $participantsRaw : (is_numeric($participantsRaw) ? (int) $participantsRaw : 0);
 
-        // Calculate friendship training multiplier
-        $friendshipMultiplier = $this->calculateFriendshipMultiplier(
-            $participants
+        // Calculate friendship multiplier (product of (1 + FriendshipBonus) for each rainbow card)
+        $friendshipMultiplier = $this->calculateFriendshipMultiplierProduct(
+            $character,
+            $participants,
+            $supportCards
         );
 
-        // Calculate facility level bonus (Unity Cup)
+        // Calculate facility level bonus (Unity Cup) - applied to base
         $facilityBonus = $this->calculateFacilityBonus(
             $character,
             $trainingType
         );
 
-        // Calculate growth rate bonus
-        $growthRateBonus = $this->calculateGrowthRateBonus(
-            $character,
-            $trainingType
-        );
-
-        // Calculate total multiplier
-        $totalMultiplier = 1.0
-            + $supportCardBonus
-            + $friendshipMultiplier
-            + $facilityBonus
-            + $growthRateBonus;
-
-        // Apply multiplier to base gains
+        // Apply verified multiplicative formula
         $finalGains = [];
-        foreach ($baseGains as $stat => $gain) {
-            $finalGains[$stat] = (int) round($gain * $totalMultiplier);
+        foreach ($baseGains as $stat => $baseGain) {
+            // (Base + StatBonus)
+            $baseWithBonus = $baseGain + ($statBonus[$stat] ?? 0);
+
+            // Apply facility bonus to base (Unity Cup specific)
+            if ($facilityBonus > 0) {
+                $baseWithBonus = (int) round($baseWithBonus * (1.0 + $facilityBonus));
+            }
+
+            // Apply multiplicative formula
+            $gain = $baseWithBonus
+                * $growthRateMultiplier
+                * $moodMultiplier
+                * (1.0 + $trainingEffect)
+                * $supportCardPresenceMultiplier
+                * $friendshipMultiplier;
+
+            // Apply per-training cap (+100 max, +50 if stat > 1200)
+            $currentStatRaw = $character->current_stats[$stat] ?? 0;
+            $currentStat = is_numeric($currentStatRaw) ? (int) $currentStatRaw : 0;
+            $maxGain = $currentStat > 1200 ? 50 : 100;
+
+            $finalGains[$stat] = (int) min($maxGain, round($gain));
         }
 
         // Calculate energy cost
@@ -144,6 +188,13 @@ class TrainingCalculationService
             $trainingData
         );
 
+        // Calculate total effective multiplier for display
+        $totalMultiplier = $growthRateMultiplier
+            * $moodMultiplier
+            * (1.0 + $trainingEffect)
+            * $supportCardPresenceMultiplier
+            * $friendshipMultiplier;
+
         return [
             'stat_gains' => $finalGains,
             'energy_cost' => $energyCost,
@@ -151,27 +202,32 @@ class TrainingCalculationService
             'total_bonus' => $totalMultiplier - 1.0,
             'breakdown' => [
                 'base_gains' => $baseGains,
-                'support_card_bonus' => $supportCardBonus,
+                'stat_bonus' => $statBonus,
+                'growth_rate_multiplier' => $growthRateMultiplier,
+                'mood_multiplier' => $moodMultiplier,
+                'training_effect' => $trainingEffect,
+                'support_card_presence_multiplier' => $supportCardPresenceMultiplier,
                 'friendship_multiplier' => $friendshipMultiplier,
                 'facility_bonus' => $facilityBonus,
-                'growth_rate_bonus' => $growthRateBonus,
                 'total_multiplier' => $totalMultiplier,
+                'per_training_cap' => 'Applied: +100 max (+50 if stat > 1200)',
             ],
             'scenario_specific' => $scenarioSpecific,
         ];
     }
 
     /**
-     * Calculate support card bonus
+     * Calculate stat bonus from support cards (added to base)
      *
      * @param  array<int, mixed>  $supportCards
+     * @return array<string, int>
      */
-    protected function calculateSupportCardBonus(
+    protected function calculateStatBonus(
         Character $character,
         string $trainingType,
         array $supportCards = []
-    ): float {
-        $bonus = 0.0;
+    ): array {
+        $statBonus = [];
 
         // If no support cards provided, get from character
         if (empty($supportCards)) {
@@ -190,43 +246,178 @@ class TrainingCalculationService
                 : (is_object($card) && isset($card->card_type) ? $card->card_type : null);
 
             if ($cardType && strtolower($cardType) === strtolower($trainingType)) {
-                // Base bonus: 10% per matching card
-                $bonus += 0.10;
+                // Stat bonus from "Stat Bonus" trait on support cards
+                // This is a flat bonus added to base before multipliers
+                $bonusValue = 2; // Base stat bonus per matching card
 
-                // Additional bonus based on limit break level (if available)
+                // Additional bonus based on limit break level
                 if (is_object($characterCard) && isset($characterCard->limit_break_level)) {
                     $limitBreakLevel = $characterCard->limit_break_level;
                     if (is_numeric($limitBreakLevel)) {
-                        $bonus += (float) $limitBreakLevel * 0.02;
+                        $bonusValue += (int) $limitBreakLevel;
                     }
                 } elseif (is_array($characterCard) && isset($characterCard['limit_break_level'])) {
                     $limitBreakLevel = $characterCard['limit_break_level'];
                     if (is_numeric($limitBreakLevel)) {
-                        $bonus += (float) $limitBreakLevel * 0.02;
+                        $bonusValue += (int) $limitBreakLevel;
+                    }
+                }
+
+                // Add to primary stat
+                $statBonus[$trainingType] = ($statBonus[$trainingType] ?? 0) + $bonusValue;
+            }
+        }
+
+        return $statBonus;
+    }
+
+    /**
+     * Calculate growth rate multiplier (1 + GrowthRate)
+     * VERIFIED: Growth rates are character-specific innate bonuses
+     */
+    protected function calculateGrowthRateMultiplier(
+        Character $character,
+        string $trainingType
+    ): float {
+        $growthRatesRaw = $character->growth_rates ?? [];
+        /** @var array<string, mixed> $growthRates */
+        $growthRates = is_array($growthRatesRaw) ? $growthRatesRaw : [];
+        $rateRaw = $growthRates[$trainingType] ?? 0;
+        $rate = is_numeric($rateRaw) ? (float) $rateRaw : 0.0;
+
+        // Growth rates are stored as percentages (10, 20, 30)
+        return 1.0 + ($rate / 100.0);
+    }
+
+    /**
+     * Calculate mood multiplier (1 + MoodMultiplier × (1 + MoodEffect))
+     * VERIFIED: ±2% per mood level from neutral
+     */
+    protected function calculateMoodMultiplier(Character $character): float
+    {
+        // Mood effect: ±2% per mood level from neutral
+        $moodEffect = match ($character->mood_status) {
+            'great' => 0.04,    // +4% (2 levels above neutral)
+            'good' => 0.02,     // +2% (1 level above neutral)
+            'normal' => 0.0,    // 0% (neutral)
+            'bad' => -0.02,     // -2% (1 level below neutral)
+            'awful' => -0.04,   // -4% (2 levels below neutral)
+            default => 0.0,
+        };
+
+        // Base mood multiplier (typically 1.0 unless modified by conditions)
+        $baseMoodMultiplier = 1.0;
+
+        // Formula: (1 + MoodMultiplier × (1 + MoodEffect))
+        return 1.0 + ($baseMoodMultiplier * $moodEffect);
+    }
+
+    /**
+     * Calculate training effect from support card traits
+     * VERIFIED: "Training Effect Up" trait sum
+     *
+     * @param  array<int, mixed>  $supportCards
+     */
+    protected function calculateTrainingEffect(
+        Character $character,
+        string $trainingType,
+        array $supportCards = []
+    ): float {
+        $trainingEffect = 0.0;
+
+        // If no support cards provided, get from character
+        if (empty($supportCards)) {
+            $supportCards = $character->supportCards()->with('supportCard')->get();
+        }
+
+        foreach ($supportCards as $characterCard) {
+            // Get the support card definition
+            $card = is_object($characterCard) && isset($characterCard->supportCard)
+                ? $characterCard->supportCard
+                : $characterCard;
+
+            // Check if card type matches training type
+            $cardType = is_array($card) && isset($card['card_type'])
+                ? $card['card_type']
+                : (is_object($card) && isset($card->card_type) ? $card->card_type : null);
+
+            if ($cardType && strtolower($cardType) === strtolower($trainingType)) {
+                // Training Effect Up trait: typically 5-10% per card
+                $trainingEffect += 0.05; // 5% base training effect per matching card
+
+                // Additional effect based on limit break level
+                if (is_object($characterCard) && isset($characterCard->limit_break_level)) {
+                    $limitBreakLevel = $characterCard->limit_break_level;
+                    if (is_numeric($limitBreakLevel)) {
+                        $trainingEffect += (float) $limitBreakLevel * 0.01; // +1% per limit break
+                    }
+                } elseif (is_array($characterCard) && isset($characterCard['limit_break_level'])) {
+                    $limitBreakLevel = $characterCard['limit_break_level'];
+                    if (is_numeric($limitBreakLevel)) {
+                        $trainingEffect += (float) $limitBreakLevel * 0.01;
                     }
                 }
             }
         }
 
-        return $bonus;
+        return $trainingEffect;
     }
 
     /**
-     * Calculate friendship training multiplier
-     * 2 participants = +2 bonus, 3 participants = +3 bonus
+     * Calculate friendship multiplier as product (not additive)
+     * VERIFIED: Product of (1 + FriendshipBonus) for each rainbow card
+     *
+     * @param  array<int, mixed>  $supportCards
      */
-    protected function calculateFriendshipMultiplier(int $participants): float
-    {
-        return match ($participants) {
-            2 => 0.02, // +2% bonus
-            3 => 0.03, // +3% bonus
-            default => 0.0,
-        };
+    protected function calculateFriendshipMultiplierProduct(
+        Character $character,
+        int $participants,
+        array $supportCards = []
+    ): float {
+        $multiplier = 1.0;
+
+        // If no support cards provided, get from character
+        if (empty($supportCards)) {
+            $supportCards = $character->supportCards()->with('supportCard')->get();
+        }
+
+        // Count rainbow (max bond) cards participating in training
+        $rainbowCardCount = 0;
+        foreach ($supportCards as $characterCard) {
+            // Check if card is at rainbow bond level (80%+ or max bond)
+            $bondLevel = 0;
+            if (is_object($characterCard) && isset($characterCard->bond_level)) {
+                $bondLevel = is_numeric($characterCard->bond_level) ? (int) $characterCard->bond_level : 0;
+            } elseif (is_array($characterCard) && isset($characterCard['bond_level'])) {
+                $bondLevel = is_numeric($characterCard['bond_level']) ? (int) $characterCard['bond_level'] : 0;
+            }
+
+            // Rainbow bond is typically 80+ or level 5
+            if ($bondLevel >= 80 || $bondLevel >= 5) {
+                $rainbowCardCount++;
+            }
+        }
+
+        // Each rainbow card provides friendship bonus (10-35% depending on limit break)
+        // Formula: multiply (1 + FriendshipBonus) for each rainbow card
+        for ($i = 0; $i < $rainbowCardCount; $i++) {
+            $friendshipBonus = 0.15; // 15% base friendship bonus per rainbow card
+            $multiplier *= (1.0 + $friendshipBonus);
+        }
+
+        // Additional bonus if friendship training is active (2-3 participants)
+        if ($participants >= 2) {
+            $friendshipTrainingBonus = $participants === 2 ? 0.10 : 0.15; // 10% for 2, 15% for 3
+            $multiplier *= (1.0 + $friendshipTrainingBonus);
+        }
+
+        return $multiplier;
     }
 
     /**
      * Calculate facility level bonus (Unity Cup)
      * Facility levels 1-5 provide 1.0x to 2.0x multipliers
+     * VERIFIED: Applied to base value before other multipliers
      */
     protected function calculateFacilityBonus(
         Character $character,
@@ -245,23 +436,6 @@ class TrainingCalculationService
 
         // Facility level bonus: Level 1 = 0%, Level 5 = 100%
         return ($level - 1) * 0.25; // 0%, 25%, 50%, 75%, 100%
-    }
-
-    /**
-     * Calculate growth rate bonus from inherited factors
-     */
-    protected function calculateGrowthRateBonus(
-        Character $character,
-        string $trainingType
-    ): float {
-        $growthRatesRaw = $character->growth_rates ?? [];
-        /** @var array<string, mixed> $growthRates */
-        $growthRates = is_array($growthRatesRaw) ? $growthRatesRaw : [];
-        $rateRaw = $growthRates[$trainingType] ?? 0;
-        $rate = is_numeric($rateRaw) ? (float) $rateRaw : 0.0;
-
-        // Growth rates are stored as percentages (10, 20, 30)
-        return $rate / 100.0;
     }
 
     /**

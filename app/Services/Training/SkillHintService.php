@@ -12,18 +12,40 @@ use Illuminate\Support\Collection;
 
 /**
  * Manage skill hints from support cards.
+ *
+ * VERIFIED (Jan 2026): Skill hints provide progressive discounts:
+ * - Level 1: 10% discount
+ * - Level 2: 20% discount
+ * - Level 3: 30% discount
+ * - Level 4: 35% discount
+ * - Level 5: 40% discount (MAXIMUM)
  */
 class SkillHintService
 {
     /**
-     * SP discount per hint level.
+     * Maximum hint level (5 hints = 40% max discount).
+     *
+     * VERIFIED: Levels 1-3 provide 10% each, levels 4-5 provide 5% each.
      */
-    private const SP_DISCOUNT_PER_HINT = 20;
+    private const MAX_HINT_LEVEL = 5;
 
     /**
-     * Maximum hint level.
+     * Calculate SP discount percentage based on hint level.
+     *
+     * @param  int  $hintLevel  Hint level (1-5)
+     * @return int Discount percentage (10, 20, 30, 35, or 40)
      */
-    private const MAX_HINT_LEVEL = 2;
+    private function calculateDiscountPercentage(int $hintLevel): int
+    {
+        return match (min($hintLevel, self::MAX_HINT_LEVEL)) {
+            1 => 10,  // 10%
+            2 => 20,  // 20% (cumulative)
+            3 => 30,  // 30% (cumulative)
+            4 => 35,  // 35% (cumulative, +5%)
+            5 => 40,  // 40% max (cumulative, +5%)
+            default => 0,
+        };
+    }
 
     /**
      * Record a skill hint obtained during training.
@@ -64,8 +86,8 @@ class SkillHintService
             'obtained_at' => now()->toIso8601String(),
         ];
 
-        // Calculate new SP discount
-        $spDiscount = $newHintLevel * self::SP_DISCOUNT_PER_HINT;
+        // Calculate new SP discount using verified rates
+        $spDiscount = $this->calculateDiscountPercentage($newHintLevel);
         $baseCost = $acquisition->base_sp_cost ?? 0;
         $finalSpCost = $this->calculateDiscountedCost($baseCost, $spDiscount);
 

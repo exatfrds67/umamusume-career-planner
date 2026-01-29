@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.1.0  
-**Date**: January 24, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.0.0  
+**Status**: Current - Aligned with codebase v2.2.0  
 **Related Documents**: [SRS-FR-03], [SDS-4.2], [DBD-4.4], [SPEC-002]
 
 **Source Specs**:
@@ -29,13 +29,7 @@
 
 - [PRD-002: Training Optimization Engine](#prd-002-training-optimization-engine)
   - [1. Executive Summary](#1-executive-summary)
-    - [1.1 Purpose](#11-purpose)
-    - [1.2 Problem Statement](#12-problem-statement)
-    - [1.3 Solution Overview](#13-solution-overview)
   - [2. Product Overview](#2-product-overview)
-    - [2.1 Objectives](#21-objectives)
-    - [2.2 Scope (In)](#22-scope-in)
-    - [2.3 Scope (Out)](#23-scope-out)
   - [3. User Stories](#3-user-stories)
   - [4. Functional Requirements](#4-functional-requirements)
   - [5. User Interface Requirements](#5-user-interface-requirements)
@@ -44,6 +38,7 @@
   - [8. Success Metrics](#8-success-metrics)
   - [9. Release Plan](#9-release-plan)
   - [10. Open Questions and Assumptions](#10-open-questions-and-assumptions)
+  - [Changelog](#changelog)
 
 ---
 
@@ -60,7 +55,7 @@ Players often rely on intuition for training decisions, leading to suboptimal st
 ### 1.3 Solution Overview
 
 - **Prediction Engine**: Deterministic calculation of base gains + deck bonuses + friendship multipliers.
-- **Risk Assessment**: Probability modeling for training failure based on energy, mood, and negative conditions (e.g., "Lazy").
+- **Risk Assessment**: Probability modeling for training failure based on energy, mood, and negative conditions.
 - **AI Advisory**: Integration with **Neuron AI (TrainingAdvisorAgent)** to evaluate trade-offs between immediate gains and long-term goals.
 
 ---
@@ -106,31 +101,79 @@ Players often rely on intuition for training decisions, leading to suboptimal st
 
 ### 4.1 Prediction Engine [FR-03.1, FR-03.2]
 
-- **Stat Calculation**: Base Facility Gain × (1 + Support Bonuses) × (1 + Friendship Multiplier) × Mood Modifier.
-- **Energy Calculation**: Standard depletion rates per facility level, adjusted by support cards (e.g., "Training Energy Down").
-- **Batch Processing**: Calculate outcomes for all 5 facilities + Rest simultaneously for comparison.
+**Stat Calculation Formula** (Game-Accurate):
+
+```
+Stat Gain = (Base + StatBonus)
+          × (1 + GrowthRate)
+          × (1 + MoodMultiplier × (1 + MoodEffect))
+          × (1 + TrainingEffect)
+          × (1 + 0.05 × NumSupportCards)
+          × FriendshipMultiplier
+```
+
+**Key Components**:
+
+- **Base**: Facility Base Value (Level 1-5 specific)
+- **StatBonus**: Determined by "Stat Bonus" trait on support cards
+- **GrowthRate**: Character-specific innate bonus
+- **MoodMultiplier**: Great (+20%), Good (+10%), Normal (0%), Bad (-10%), Worst (-20%)
+- **TrainingEffect**: "Training Effect Up" trait sum
+- **NumSupportCards**: Count of support cards in training (Max +30% at 6 cards)
+- **FriendshipMultiplier**: Product of (1 + FriendshipBonus) for each active rainbow card
+
+**Caps**:
+
+- **Per Training Cap**: +100 max gain per stat (reduced to +50 if stat > 1200)
+
+**Facility Level Multipliers**:
+
+| Level | Multiplier |
+|-------|------------|
+| 1 | 1.0× (base) |
+| 2 | 1.25× |
+| 3 | 1.5× |
+| 4 | 1.75× |
+| 5 | 2.0× |
+
+**Facility Upgrade**: Train at a facility 4 times to upgrade it by 1 level (max level 5).
 
 ### 4.2 Support Card Integration [FR-03.4]
 
-- **Bonus Aggregation**: Sum bonuses from all cards present in a facility (e.g., Speed Bonus +1, Power Bonus +1).
-- **Friendship Training**: Apply unique multipliers when card bond ≥ 80 (Orange bar).
+- **Bonus Aggregation**: Sum bonuses from all cards present in a facility.
+- **Friendship Training**: Apply unique multipliers when card bond ≥ 80% (Orange bar).
+  - Bonus range: 10% (unupgraded) to 35% (fully uncapped)
 - **Type Synergy**: Apply scenario-specific bonuses (e.g., URA link bonuses).
 
 ### 4.3 Risk & Condition Modeling [FR-03.5]
 
 - **Failure Probability**:
-  - Energy > 50%: 0% Risk (usually).
-  - Energy < 50%: Exponential risk increase.
+  - Energy > 50%: 0% Risk (usually)
+  - Energy < 50%: Exponential risk increase
 - **Condition Impact**:
-  - "Lazy": Chance to refuse training.
-  - "Overweight": Speed growth penalty.
-  - "Skinny": Stamina growth penalty.
+  - "Lazy": Chance to refuse training
+  - "Overweight": Speed growth penalty
+  - "Skinny": Stamina growth penalty
 
-### 4.4 AI Recommendations [FR-03.8]
+### 4.4 Career Structure [FR-03.6]
 
-- **Agent**: `TrainingAdvisorAgent` (Neuron AI).
-- **Logic**: Evaluates goal alignment (are we behind on Speed?), turn efficiency (is this a triple friendship turn?), and risk tolerance.
-- **Output**: Ranked list of actions with "Confidence Score" and natural language reasoning.
+**Career Timeline** (Game-Accurate):
+
+- **Total turns**: ~70-78 turns
+- **Duration**: 3 in-game years (Junior, Classic, Senior)
+
+**Summer Training Camp**:
+
+- **Duration**: 4 turns
+- **Timing**: Early July (both Classic and Senior years)
+- **Effect**: All facilities at maximum level (Level 5)
+- **Strategy**: Have maximum energy and Great mood by Early July
+
+### 4.5 AI Recommendations [FR-03.8]
+
+- **Agent**: `TrainingAdvisorAgent` (Neuron AI)
+- **Logic**: Evaluates goal alignment, turn efficiency, and risk tolerance
+- **Output**: Ranked list of actions with "Confidence Score" and natural language reasoning
 
 ---
 
@@ -182,36 +225,51 @@ Players often rely on intuition for training decisions, leading to suboptimal st
 
 - **Performance**: Prediction generation for all facilities < 200ms (p95).
 - **Accuracy**: Prediction math must match game logic within ±1 stat point.
-- **Availability**: AI recommendations degrade gracefully if Cloud API is unreachable (fallback to heuristic scoring).
-- **Persistence**: Every executed turn is committed to the database immediately to prevent state desync.
+- **Availability**: AI recommendations degrade gracefully if Cloud API is unreachable.
+- **Persistence**: Every executed turn is committed to the database immediately.
 
 ---
 
 ## 8. Success Metrics
 
-- **Usage Rate**: > 90% of turns in active runs use the training interface (vs manual entry).
+- **Usage Rate**: > 90% of turns in active runs use the training interface.
 - **AI Adherence**: > 60% of users select the AI-recommended training option.
-- **Failure Reduction**: Users engaging with risk warnings have 20% fewer training failures than baseline.
+- **Failure Reduction**: Users engaging with risk warnings have 20% fewer training failures.
 - **Prediction Latency**: Average API response time < 150ms.
 
 ---
 
 ## 9. Release Plan
 
-- **v2.0.0 (Current)**:
+- **v2.0.0**:
   - Full deterministic prediction engine.
   - Support card bonus integration.
   - Risk calculation.
-  - Basic AI recommendations (Heuristic/Local LLM).
-- **v2.1.0 (Next)**:
+  - Basic AI recommendations.
+- **v2.1.0**:
   - Advanced AI (long-term goal alignment).
-  - "What-If" scenario mode (previewing item usage).
+  - "What-If" scenario mode.
   - Facility level-up tracking.
+- **v2.2.0 (Current)**:
+  - Game-accurate training formula with all multipliers.
+  - Facility level multipliers (1.0× to 2.0×).
+  - Summer Training Camp mechanics (4 turns, all Level 5).
+  - Career structure (~70-78 turns across 3 years).
 
 ---
 
 ## 10. Open Questions and Assumptions
 
-- **Assumption**: Support card effect logic (multiplicative vs additive) follows the standard URA scenario formulas unless specified otherwise.
-- **Open Question**: How to handle RNG-based events during training (e.g., "Great Success")? *Current Approach: Predict normal success, log actual result.*
-- **Open Question**: Should we track specific facility levels (Lv 1-5) per run? *Status: Currently inferred from turn count and usage history.*
+- **Assumption**: Support card effect logic follows standard URA scenario formulas.
+- **Open Question**: How to handle RNG-based events during training? *Current: Predict normal success, log actual result.*
+- **Open Question**: Should we track specific facility levels (Lv 1-5) per run? *Current: Yes, tracked and displayed.*
+
+---
+
+## Changelog
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 2.2.0 | January 28, 2026 | Updated with verified game mechanics from Global English Server: added complete training formula, facility level multipliers (1.0×-2.0×), Summer Training Camp mechanics (4 turns, all Level 5), career structure (~70-78 turns), stat gain caps (+100 normal, +50 above 1200). |
+| 2.1.0 | January 24, 2026 | Aligned with codebase v2.0.0, added source specs references. |
+| 2.0.0 | January 2026 | Initial v2 release with prediction engine. |

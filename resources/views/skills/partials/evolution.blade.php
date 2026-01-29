@@ -361,7 +361,7 @@
                                 clip-rule="evenodd" />
                         </svg>
                         <span><strong>Hint Discounts Apply:</strong> Hints collected for the Rare skill reduce evolution
-                            cost by 20% per hint (40% max)</span>
+                            cost progressively: 10%/20%/30%/35%/40% (max at 5 hints)</span>
                     </li>
                     <li class="flex items-start gap-2">
                         <svg class="w-5 h-5 text-primary-500 shrink-0 mt-0.5" fill="currentColor"

@@ -21,7 +21,7 @@ Successfully implemented a comprehensive skill management system with 20+ skills
 - **Strategic data**: effects, description, activation_conditions, meta_tier, synergy_skills
 - **Business logic methods**:
   - `calculateFinalCost($hintCount)`: Calculate SP cost with hint discounts
-  - `getDiscountPercentage($hintCount)`: Get discount percentage (20% per hint, 40% max)
+  - `getDiscountPercentage($hintCount)`: Get discount percentage (5 levels: 10%/20%/30%/35%/40% max)
   - `getSpSaved($hintCount)`: Calculate SP saved through hints
   - `canEvolve()`: Check if skill can evolve
   - `isEvolved()`: Check if skill is evolved
@@ -173,10 +173,13 @@ Successfully implemented a comprehensive skill management system with 20+ skills
 ### 1. SP Cost Calculation System
 
 ```php
-// Hint-based discount system (20% per hint, 40% max)
+// Hint-based discount system (5 levels: 10%/20%/30%/35%/40% max)
 $skill->calculateFinalCost(0); // 120 SP (no discount)
-$skill->calculateFinalCost(1); // 96 SP (20% discount)
-$skill->calculateFinalCost(2); // 72 SP (40% discount - maximum)
+$skill->calculateFinalCost(1); // 108 SP (10% discount)
+$skill->calculateFinalCost(2); // 96 SP (20% discount)
+$skill->calculateFinalCost(3); // 84 SP (30% discount)
+$skill->calculateFinalCost(4); // 78 SP (35% discount)
+$skill->calculateFinalCost(5); // 72 SP (40% discount - maximum)
 ```
 
 ### 2. Skill Evolution Chains
@@ -232,7 +235,7 @@ if ($driver === 'mysql') {
 
 ✅ **Requirement 4.4**: Comprehensive skill management with hint-based cost reduction
 
-- Implemented full hint tracking system with 20% per hint discount (40% max)
+- Implemented full hint tracking system with 5-level progressive discount (10%/20%/30%/35%/40% max)
 - SkillHint model tracks source, turn obtained, and usage status
 - SkillAcquisition model tracks cost breakdown and SP saved
 
@@ -318,7 +321,7 @@ Task 3.2.1 has been successfully completed with a comprehensive skill management
 
 - ✅ 20+ skills across all categories with proper SP costs
 - ✅ Complete skill evolution chains (Normal → Rare)
-- ✅ Hint-based discount system (20% per hint, 40% max)
+- ✅ Hint-based discount system (5 levels: 10%/20%/30%/35%/40% max)
 - ✅ AI-powered skill analysis service
 - ✅ MCP agent integration with 5 specialized agents
 - ✅ Comprehensive testing (25 tests, 138 assertions, 100% pass rate)

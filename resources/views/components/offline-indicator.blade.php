@@ -16,7 +16,7 @@
         x-transition:enter-end="opacity-100 transform translate-y-0" x-transition:leave="transition ease-in duration-200"
         x-transition:leave-start="opacity-100 transform translate-y-0"
         x-transition:leave-end="opacity-0 transform translate-y-8"
-        class="fixed bottom-4 right-4 z-50 w-full max-w-sm bg-yellow-500 dark:bg-yellow-600 text-white shadow-lg rounded-lg overflow-hidden" 
+        class="fixed bottom-4 right-4 z-50 w-full max-w-sm bg-yellow-500 dark:bg-yellow-600 text-white shadow-lg rounded-lg overflow-hidden"
         role="alert" aria-live="assertive">
         <div class="px-4 py-3">
             <div class="flex items-start justify-between gap-3">
@@ -54,10 +54,10 @@
                     </svg>
                 </button>
             </div>
-            
+
             {{-- Actions --}}
             <div class="mt-3 flex justify-end gap-2">
-                 <button @click="forceCheck()" :disabled="isChecking"
+                <button @click="forceCheck()" :disabled="isChecking"
                     class="px-3 py-1.5 text-xs font-medium bg-white/20 hover:bg-white/30 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                     title="Check connectivity">
                     <span x-show="!isChecking">Retry Connection</span>
@@ -144,23 +144,15 @@
         </div>
     </div>
 
-    {{-- Online Status Indicator (small badge in corner) --}}
-    <div class="fixed bottom-4 left-4 z-40">
-        <div class="flex items-center gap-2 px-3 py-2 rounded-full shadow-lg text-xs font-medium transition-colors"
-            :class="{
-                'bg-green-500 text-white': isOnline,
-                'bg-red-500 text-white': !isOnline
-            }"
-            :title="isOnline ? 'Online' : 'Offline'">
+    {{-- Online Status Indicator (small badge in corner) - Only show when offline --}}
+    <div x-show="!isOnline" class="fixed bottom-4 left-4 z-40">
+        <div class="flex items-center gap-2 px-3 py-2 rounded-full shadow-lg text-xs font-medium transition-colors bg-red-500 text-white"
+            title="Offline">
             {{-- Status Dot --}}
-            <span class="w-2 h-2 rounded-full"
-                :class="{
-                    'bg-white animate-pulse': isOnline,
-                    'bg-white': !isOnline
-                }"></span>
+            <span class="w-2 h-2 rounded-full bg-white"></span>
 
             {{-- Status Text --}}
-            <span x-text="isOnline ? 'Online' : 'Offline'"></span>
+            <span>Offline</span>
         </div>
     </div>
 </div>

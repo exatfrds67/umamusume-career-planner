@@ -19,6 +19,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @property string $name
  * @property string $email
  * @property string $password
+ * @property string|null $bio
  * @property string|null $avatar_path
  * @property \ArrayObject<string, mixed> $preferences
  * @property \ArrayObject<string, mixed> $accessibility_settings
@@ -49,6 +50,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'bio',
         'avatar_path',
         'preferences',
         'accessibility_settings',
@@ -97,6 +99,28 @@ class User extends Authenticatable
             'ai_settings' => AsArrayObject::class,
             'mcp_settings' => AsArrayObject::class,
         ];
+    }
+
+    /**
+     * Get the user's avatar URL.
+     */
+    protected function avatarUrl(): Attribute
+    {
+        return Attribute::make(
+            get: function (): string {
+                // Safely check if avatar_path exists
+                if ($this->relationLoaded('avatar') || array_key_exists('avatar_path', $this->attributes)) {
+                    $avatarPath = $this->attributes['avatar_path'] ?? null;
+
+                    if ($avatarPath) {
+                        return \Illuminate\Support\Facades\Storage::url($avatarPath);
+                    }
+                }
+
+                // Fallback to UI Avatars
+                return 'https://ui-avatars.com/api/?name='.urlencode($this->name).'&background=3b82f6&color=fff&size=128';
+            }
+        );
     }
 
     /**

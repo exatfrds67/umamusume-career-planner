@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.1.0
-**Date**: January 23, 2026
+**Document Version**: 2.2.0
+**Date**: January 28, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned with codebase
+**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
 
 ---
 
@@ -42,7 +42,7 @@ The Umamusume Career Planner is a comprehensive web application built with **Lar
 | Plan/Career Run | A career run record tracking an Uma Musume character's training progression |
 | Uma Musume | A horse girl character from the Uma Musume: Pretty Derby game |
 | SP (Skill Points) | Points earned from races and events, spent to purchase skills |
-| Stat Max | Maximum stat value (1200) - hard cap, no values above allowed |
+| Stat Soft Cap | Soft cap at 1200 - stats above 1200 count for 50% value (diminishing returns) |
 | URA Finale | The final race series at the end of Senior Year |
 | OCR | Optical Character Recognition for screenshot data extraction |
 | MCP | Model Context Protocol for AI integration |
@@ -231,7 +231,7 @@ quadrantChart
 | ID | Requirement | Priority | Status |
 |----|-------------|----------|--------|
 | BR-4.1 | Skill catalog with search (English and Japanese) | P0 | Implemented |
-| BR-4.2 | Hint-based SP cost reduction (20% per hint, 40% max) | P0 | Implemented |
+| BR-4.2 | Hint-based SP cost reduction (5 levels: 10%/20%/30%/35%/40% max) | P0 | Implemented |
 | BR-4.3 | Skill evolution system (Normal → Rare) | P0 | Implemented |
 | BR-4.4 | SP budget optimization | P1 | Implemented |
 | BR-4.5 | AI skill build recommendations | P1 | Implemented |
@@ -365,22 +365,22 @@ pie title Requirements by Priority
 | Rule ID | Rule Description |
 |---------|------------------|
 | BV-1 | Plan title is required and cannot be empty |
-| BV-2 | Stat values must be between 0 and 1200 (hard max) |
+| BV-2 | Stat values have soft cap at 1200 (50% effectiveness above), practical max ~1600 |
 | BV-3 | Turn numbers must be between 1 and 78 |
 | BV-4 | Skill status "Acquired" requires turn_acquired value |
 | BV-5 | Energy level must be between 0 and 100 |
 | BV-6 | Support deck must contain exactly 6 cards (5 owned + 1 borrowed) |
-| BV-7 | Skill hint levels cap at 3 (40% maximum discount) |
+| BV-7 | Skill hint levels cap at 5 (40% maximum discount: 10%/20%/30%/35%/40%) |
 
 ### 5.2 Calculation Rules
 
 | Rule ID | Rule Description |
 |---------|------------------|
-| BC-1 | Stat values capped at 1200 (hard max, no overflow) |
+| BC-1 | Stat soft cap at 1200 (values above count for 50%, practical max ~1600) |
 | BC-2 | Acquired SP = sum of sp_cost where status = acquired |
 | BC-3 | Mood modifiers: Great +4%, Good +2%, Normal 0%, Bad -2%, Awful -4% |
-| BC-4 | Aptitude effectiveness: SS=120%, S=110%, A=100%, B=90%, C=80%, D=70%, E=60%, F=50%, G=40% |
-| BC-5 | Skill hint discount: 20% per hint level, max 40% at level 2+ |
+| BC-4 | Aptitude effectiveness: S=+5% (max), A=0% (baseline), B=-10%, C=-20%, D=-30%/-40%, E=-50%/-60%, F=-70%/-80%, G=-90% |
+| BC-5 | Skill hint discount: Level 1=10%, Level 2=20%, Level 3=30%, Level 4=35%, Level 5=40% (max) |
 | BC-6 | Factor inheritance: ★☆☆=+5, ★★☆=+12, ★★★=+21 bonus |
 
 ### 5.3 Storage Rules

@@ -491,7 +491,7 @@ $skillAcquisition = SkillAcquisition::create([
     'acquisition_source' => 'support_card',
     'source_id' => $supportCard->id, // Which card provided it
     'sp_cost' => $skill->base_sp_cost * (1 - $hintDiscount), // Hint discount
-    'hint_level' => $hintLevel, // 0, 1, or 2 hints
+    'hint_level' => $hintLevel, // 0-5 hint levels (0=no hints, 5=40% max discount)
     'acquired_at_turn' => $career->current_turn,
 ]);
 ```

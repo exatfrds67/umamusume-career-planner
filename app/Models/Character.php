@@ -38,6 +38,8 @@ use Illuminate\Support\Str;
  * @property array<string, mixed>|null $facility_levels
  * @property array<string, mixed>|null $spirit_burst_data
  * @property string $status
+ * @property bool $is_pinned
+ * @property bool $is_seeded
  * @property array<string, mixed>|null $completion_data
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -76,6 +78,8 @@ class Character extends Model
         'facility_levels',
         'spirit_burst_data',
         'status',
+        'is_pinned',
+        'is_seeded',
         'completion_data',
         'available_sp',
     ];
@@ -103,6 +107,8 @@ class Character extends Model
             'team_composition' => 'array',
             'facility_levels' => 'array',
             'spirit_burst_data' => 'array',
+            'is_pinned' => 'boolean',
+            'is_seeded' => 'boolean',
             'completion_data' => 'array',
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
@@ -217,6 +223,17 @@ class Character extends Model
     }
 
     /**
+     * Get the users who have pinned this character.
+     *
+     * @return BelongsToMany<User, $this>
+     */
+    public function pinnedByUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'ucp_character_user_pins')
+            ->withTimestamps();
+    }
+
+    /**
      * Scope a query to only include active characters.
      *
      * @param  \Illuminate\Database\Eloquent\Builder<Character>  $query
@@ -290,5 +307,103 @@ class Character extends Model
         }
 
         return $statCount > 0 ? round($totalProgress / $statCount, 1) : 0;
+    }
+
+    /**
+     * Pin this character for quick access.
+     * For seeded characters, creates a user-specific pin.
+     * For user-created characters, updates the is_pinned field.
+     */
+    public function pin(?int $userId = null): void
+    {
+        if ($this->is_seeded) {
+            // For seeded characters, use the pivot table
+            $userId = $userId ?? auth()->id();
+            if ($userId && ! $this->pinnedByUsers()->where('user_id', $userId)->exists()) {
+                $this->pinnedByUsers()->attach($userId);
+            }
+        } else {
+            // For user-created characters, update the field directly
+            $this->update(['is_pinned' => true]);
+        }
+    }
+
+    /**
+     * Unpin this character.
+     * For seeded characters, removes the user-specific pin.
+     * For user-created characters, updates the is_pinned field.
+     */
+    public function unpin(?int $userId = null): void
+    {
+        if ($this->is_seeded) {
+            // For seeded characters, use the pivot table
+            $userId = $userId ?? auth()->id();
+            if ($userId) {
+                $this->pinnedByUsers()->detach($userId);
+            }
+        } else {
+            // For user-created characters, update the field directly
+            $this->update(['is_pinned' => false]);
+        }
+    }
+
+    /**
+     * Toggle the pinned status of this character.
+     * For seeded characters, toggles the user-specific pin.
+     * For user-created characters, toggles the is_pinned field.
+     */
+    public function togglePin(?int $userId = null): bool
+    {
+        if ($this->is_seeded) {
+            // For seeded characters, use the pivot table
+            $userId = $userId ?? auth()->id();
+            if (! $userId) {
+                return false;
+            }
+
+            if ($this->pinnedByUsers()->where('user_id', $userId)->exists()) {
+                $this->pinnedByUsers()->detach($userId);
+
+                return false;
+            } else {
+                $this->pinnedByUsers()->attach($userId);
+
+                return true;
+            }
+        } else {
+            // For user-created characters, update the field directly
+            $this->is_pinned = ! $this->is_pinned;
+            $this->save();
+
+            return $this->is_pinned;
+        }
+    }
+
+    /**
+     * Check if this character is pinned by a specific user.
+     */
+    public function isPinnedBy(?int $userId = null): bool
+    {
+        $userId = $userId ?? auth()->id();
+        if (! $userId) {
+            return false;
+        }
+
+        if ($this->is_seeded) {
+            return $this->pinnedByUsers()->where('user_id', $userId)->exists();
+        } else {
+            return $this->is_pinned;
+        }
+    }
+
+    /**
+     * Scope a query to only include pinned characters.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<Character>  $query
+     * @return \Illuminate\Database\Eloquent\Builder<Character>
+     */
+    public function scopePinned(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    {
+        return $query->where('is_pinned', true);
     }
 }

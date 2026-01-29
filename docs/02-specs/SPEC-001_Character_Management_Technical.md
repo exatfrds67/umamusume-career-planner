@@ -1,9 +1,9 @@
 # SPEC-001: Character Management System - Technical Specification
 
-**Document Version**: 2.0.0  
-**Date**: 2026-01-24  
+**Document Version**: 2.2.0  
+**Date**: 2026-01-28  
 **Project**: Umamusume Pretty Derby Career Planner  
-**Status**: Active  
+**Status**: Active - Updated with game-accurate mechanics  
 **Classification**: Internal - Development Team
 
 ---
@@ -14,9 +14,9 @@
 |-----------|-------|
 | **Document ID** | SPEC-001 |
 | **Related PRD** | [PRD-001: Character Management](../prds/PRD-001_Character_Management.md) |
-| **Architecture Version** | v2.0.0 |
+| **Architecture Version** | v2.2.0 |
 | **Approval Status** | Approved |
-| **Last Reviewed** | 2026-01-24 |
+| **Last Reviewed** | 2026-01-28 |
 
 ### Related Documents
 
@@ -67,8 +67,8 @@ The Character Management System is the foundational module responsible for manag
 **Core Responsibilities**:
 
 - Character entity lifecycle management (CRUD operations)
-- Real-time stat tracking with validation and clamping
-- Aptitude rating system for distance, surface, and running style
+- Real-time stat tracking with validation and soft cap handling
+- Aptitude rating system for distance, surface, and running style (G-S grades)
 - Factor inheritance calculation from parent characters
 - Goal tracking and status monitoring
 - Condition and status effect management
@@ -78,8 +78,8 @@ The Character Management System is the foundational module responsible for manag
 In Umamusume Pretty Derby, each trainee character represents a single career run attempt. Characters maintain:
 
 - **Base Attributes**: Derived from the trainee template (e.g., Special Week, Tokai Teio)
-- **Current State**: Dynamic stats modified through training and events
-- **Aptitudes**: Compatibility ratings affecting race performance
+- **Current State**: Dynamic stats modified through training and events (can exceed 1200 with diminishing returns)
+- **Aptitudes**: Compatibility ratings (G-S grades) affecting race performance
 - **Factors**: Inherited bonuses from parent characters
 - **Goals**: Career objectives defined at creation
 
@@ -88,8 +88,8 @@ In Umamusume Pretty Derby, each trainee character represents a single career run
 **In Scope**:
 
 - Character entity management with soft deletes
-- Stat validation and clamping (0-1200 range)
-- Aptitude CRUD operations
+- Stat validation with soft cap handling (diminishing returns above 1200)
+- Aptitude CRUD operations (G-S grade system)
 - Factor inheritance calculations
 - Goal status tracking
 - Integration with External API for base character data
@@ -378,7 +378,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $character_id
  * @property AptitudeCategory $category
  * @property string $type Specific type (e.g., 'mile', 'turf', 'front_runner')
- * @property AptitudeGrade $grade Rating from G to SS
+ * @property AptitudeGrade $grade Rating from G to S (S is maximum)
  * @property int $bonus_value Numeric bonus applied
  */
 class Aptitude extends Model
@@ -527,9 +527,19 @@ enum MoodStatus: string
 
 namespace App\Enums;
 
+/**
+ * AptitudeGrade Enum
+ * 
+ * Game-accurate aptitude grades (G-S). S is maximum grade.
+ * A-rank is baseline (0% modifier). Only S provides positive bonus.
+ * 
+ * Modifiers vary by category:
+ * - Surface (Power): S=+5%, A=0%, B=-10%, C=-20%, D=-30%, E=-50%, F=-70%, G=-90%
+ * - Distance (Speed): S=+5%, A=0%, B=-10%, C=-20%, D=-40%, E=-60%, F=-80%, G=-90%
+ * - Style (Wit): S=+10%, A=0%, B=-15%, C=-25%, D=-40%, E=-60%, F=-80%, G=-90%
+ */
 enum AptitudeGrade: string
 {
-    case SS = 'SS';
     case S = 'S';
     case A = 'A';
     case B = 'B';
@@ -539,18 +549,72 @@ enum AptitudeGrade: string
     case F = 'F';
     case G = 'G';
     
+    /**
+     * Get surface aptitude modifier (affects Power)
+     */
+    public function getSurfaceModifier(): float
+    {
+        return match($this) {
+            self::S => 0.05,   // +5%
+            self::A => 0.00,   // Baseline
+            self::B => -0.10,  // -10%
+            self::C => -0.20,  // -20%
+            self::D => -0.30,  // -30%
+            self::E => -0.50,  // -50%
+            self::F => -0.70,  // -70%
+            self::G => -0.90,  // -90%
+        };
+    }
+    
+    /**
+     * Get distance aptitude modifier (affects Speed)
+     */
+    public function getDistanceModifier(): float
+    {
+        return match($this) {
+            self::S => 0.05,   // +5%
+            self::A => 0.00,   // Baseline
+            self::B => -0.10,  // -10%
+            self::C => -0.20,  // -20%
+            self::D => -0.40,  // -40%
+            self::E => -0.60,  // -60%
+            self::F => -0.80,  // -80%
+            self::G => -0.90,  // -90%
+        };
+    }
+    
+    /**
+     * Get running style aptitude modifier (affects Wit)
+     */
+    public function getStyleModifier(): float
+    {
+        return match($this) {
+            self::S => 0.10,   // +10%
+            self::A => 0.00,   // Baseline
+            self::B => -0.15,  // -15%
+            self::C => -0.25,  // -25%
+            self::D => -0.40,  // -40%
+            self::E => -0.60,  // -60%
+            self::F => -0.80,  // -80%
+            self::G => -0.90,  // -90%
+        };
+    }
+    
+    /**
+     * Get legacy bonus value (for backward compatibility)
+     * @deprecated Use category-specific modifiers instead
+     */
     public function getBonusValue(): int
     {
         return match($this) {
-            self::SS => 20,
-            self::S => 15,
-            self::A => 10,
-            self::B => 5,
-            self::C => 0,
-            self::D => -5,
-            self::E => -10,
-            self::F => -15,
-            self::G => -20,
+            self::S => 10,
+            self::A => 0,
+            self::B => -5,
+            self::C => -10,
+            self::D => -15,
+            self::E => -20,
+            self::F => -25,
+            self::G => -30,
         };
     }
     
@@ -564,8 +628,7 @@ enum AptitudeGrade: string
             self::C => self::B,
             self::B => self::A,
             self::A => self::S,
-            self::S => self::SS,
-            self::SS => self::SS, // Max
+            self::S => self::S, // Max grade
         };
     }
 }
@@ -580,10 +643,19 @@ enum AptitudeGrade: string
 
 namespace App\ValueObjects;
 
+/**
+ * StatCollection Value Object
+ * 
+ * Encapsulates stat logic with game-accurate soft cap handling.
+ * Stats can exceed 1200 but values above 1200 have diminishing returns (50% effectiveness).
+ * Per-training cap: +100 (reduced to +50 if stat > 1200)
+ */
 class StatCollection
 {
     private const STAT_MIN = 0;
-    private const STAT_MAX = 1200;
+    private const SOFT_CAP = 1200;
+    private const PER_TRAINING_CAP = 100;
+    private const PER_TRAINING_CAP_ABOVE_SOFT = 50;
     
     public function __construct(
         private array $stats = [
@@ -594,12 +666,23 @@ class StatCollection
             'wit' => 0,
         ]
     ) {
-        $this->clampAll();
+        $this->validateAll();
     }
     
+    /**
+     * Add stat value with per-training cap enforcement
+     */
     public function add(string $stat, int $value): void
     {
-        $this->stats[$stat] = $this->clamp($this->stats[$stat] + $value);
+        $current = $this->stats[$stat] ?? 0;
+        
+        // Apply per-training cap based on current stat level
+        $maxGain = $current > self::SOFT_CAP 
+            ? self::PER_TRAINING_CAP_ABOVE_SOFT 
+            : self::PER_TRAINING_CAP;
+        
+        $cappedValue = min($value, $maxGain);
+        $this->stats[$stat] = max(self::STAT_MIN, $current + $cappedValue);
     }
     
     public function get(string $stat): int
@@ -607,20 +690,44 @@ class StatCollection
         return $this->stats[$stat] ?? 0;
     }
     
+    /**
+     * Get effective stat value (with diminishing returns above soft cap)
+     * Values above 1200 count for 50% effectiveness
+     */
+    public function getEffective(string $stat): int
+    {
+        $value = $this->stats[$stat] ?? 0;
+        
+        if ($value <= self::SOFT_CAP) {
+            return $value;
+        }
+        
+        // Diminishing returns: values above 1200 count for half
+        $excess = $value - self::SOFT_CAP;
+        return self::SOFT_CAP + (int)($excess * 0.5);
+    }
+    
     public function toArray(): array
     {
         return $this->stats;
     }
     
-    private function clamp(int $value): int
+    /**
+     * Get array of effective values (with diminishing returns applied)
+     */
+    public function toEffectiveArray(): array
     {
-        return max(self::STAT_MIN, min(self::STAT_MAX, $value));
+        $effective = [];
+        foreach ($this->stats as $stat => $value) {
+            $effective[$stat] = $this->getEffective($stat);
+        }
+        return $effective;
     }
     
-    private function clampAll(): void
+    private function validateAll(): void
     {
         foreach ($this->stats as $stat => $value) {
-            $this->stats[$stat] = $this->clamp($value);
+            $this->stats[$stat] = max(self::STAT_MIN, (int)$value);
         }
     }
 }
@@ -1919,6 +2026,7 @@ class CharacterFactory extends Factory
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.2.0 | 2026-01-28 | Development Team | Game-accurate mechanics: S max aptitude grade (removed SS), category-specific aptitude modifiers, stat soft cap with diminishing returns above 1200, per-training caps |
 | 2.0.0 | 2026-01-24 | Development Team | Full v2.0.0 alignment, added enums, value objects |
 | 1.0.0 | 2026-01-23 | Development Team | Initial technical specification |
 

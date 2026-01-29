@@ -733,13 +733,13 @@ describe('SkillRecommendationAgent - Skill Hint Cost Reduction', function () {
         expect($speedStar['hint_count'])->toBe(2);
         expect($speedStar['base_sp_cost'])->toBe(180);
 
-        // 2 hints = 40% discount (20% per hint, max 40%)
-        expect($speedStar['discount_percentage'])->toBe(40);
-        expect($speedStar['final_sp_cost'])->toBe(108); // 180 * 0.6 = 108
+        // 2 hints = 20% discount (progressive: 10%/20%/30%/35%/40% at levels 1-5)
+        expect($speedStar['discount_percentage'])->toBe(20);
+        expect($speedStar['final_sp_cost'])->toBe(144); // 180 * 0.8 = 144
     });
 
     it('respects maximum 40% discount from hints', function () {
-        // Create 3 hints for stamina skill (should cap at 40%)
+        // Create 3 hints for stamina skill (30% discount at level 3)
         SkillHint::factory()->create([
             'character_id' => $this->character->id,
             'skill_id' => $this->staminaSkill->id,
@@ -767,8 +767,8 @@ describe('SkillRecommendationAgent - Skill Hint Cost Reduction', function () {
 
         expect($staminaKeeper)->not->toBeNull();
         expect($staminaKeeper['hint_count'])->toBe(3);
-        expect($staminaKeeper['discount_percentage'])->toBe(40); // Capped at 40%
-        expect($staminaKeeper['final_sp_cost'])->toBe(102); // 170 * 0.6 = 102
+        expect($staminaKeeper['discount_percentage'])->toBe(30); // 3 hints = 30% discount
+        expect($staminaKeeper['final_sp_cost'])->toBe(119); // 170 * 0.7 = 119
     });
 
     it('prioritizes skills with hints in available skills list', function () {

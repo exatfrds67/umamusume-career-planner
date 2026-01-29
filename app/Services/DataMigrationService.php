@@ -67,8 +67,9 @@ class DataMigrationService
 
     /**
      * Valid aptitude grades
+     * VERIFIED (Jan 2026): S is the maximum aptitude grade. SS does NOT exist.
      */
-    private const VALID_GRADES = ['G', 'G+', 'F', 'F+', 'E', 'E+', 'D', 'D+', 'C', 'C+', 'B', 'B+', 'A', 'A+', 'S', 'SS'];
+    private const VALID_GRADES = ['G', 'G+', 'F', 'F+', 'E', 'E+', 'D', 'D+', 'C', 'C+', 'B', 'B+', 'A', 'A+', 'S'];
 
     /**
      * Valid scenario types

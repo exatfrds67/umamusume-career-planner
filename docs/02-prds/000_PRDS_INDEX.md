@@ -3,7 +3,7 @@
 ## Umamusume Pretty Derby Career Planner
 
 **Document Version**: 2.2.0
-**Date**: January 27, 2026
+**Date**: January 28, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
 **Status**: Current - Aligned with codebase v2.2.0
@@ -34,6 +34,40 @@ These PRDs define the product requirements that drive the technical specificatio
 
 ---
 
+## v2.2.0 Key Updates (Game-Accurate Mechanics)
+
+This version includes verified game mechanics from the **Global English Server**:
+
+### Skill Hint System (PRD-004)
+
+- **Corrected**: 5 hint levels with 10%/10%/10%/5%/5% discounts (40% max)
+- **Added**: Additional discount sources (Fast Learner +10%, Skill Sparks, Hint Books)
+
+### Aptitude System (PRD-001, PRD-003)
+
+- **Corrected**: Maximum grade is S (not SS)
+- **Clarified**: A-rank is baseline (0%); only S-rank provides positive bonuses
+- **Added**: Complete aptitude modifier table
+
+### Stat System (PRD-001, PRD-002)
+
+- **Updated**: Stats can exceed 1200 with diminishing returns (half value above 1200)
+- **Added**: Important breakpoints (901, 1200, 1600)
+- **Added**: Stamina 1200+ activates "Stamina Contest" buff
+
+### Track Conditions (PRD-003)
+
+- **Added**: Complete track condition system (Firm/Good/Soft/Heavy)
+- **Added**: Surface-specific penalties (Turf vs Dirt)
+- **Added**: Stamina drain modifiers (+2%/sec for Soft/Heavy)
+
+### Career Structure (PRD-002)
+
+- **Clarified**: ~70-78 turns across 3 years (Junior, Classic, Senior)
+- **Added**: Summer Training Camp mechanics (4 turns, all facilities Level 5)
+
+---
+
 ## Alignment with Technical Specs
 
 Each PRD has a corresponding Technical Specification (SPEC) document detailing the implementation:
@@ -55,3 +89,13 @@ Each PRD has a corresponding Technical Specification (SPEC) document detailing t
 - **QA/Testers**: Use User Stories in PRDs as the basis for acceptance criteria.
 
 For a high-level view of the entire system documentation, refer to the [Software Development Plan](../001_SDP_Software_Development_Plan.md).
+
+---
+
+## Changelog
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 2.2.0 | January 28, 2026 | Updated all PRDs with verified game mechanics from Global English Server. Key corrections: skill hint system (5 levels, 40% max), aptitude scale (G-S, no SS), stat system (1200+ diminishing returns), track conditions, career structure. |
+| 2.1.0 | January 27, 2026 | Aligned with codebase v2.2.0, added source specs references. |
+| 2.0.0 | January 2026 | Initial v2 release with dual storage architecture. |

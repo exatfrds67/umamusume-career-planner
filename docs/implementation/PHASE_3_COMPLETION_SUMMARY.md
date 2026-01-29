@@ -38,7 +38,7 @@ Phase 3 of the Training System Integration is **75% complete**. All backend serv
 
 #### SkillHintService
 
-- Manages skill hints with 20% SP discount per hint (max 40%)
+- Manages skill hints with progressive SP discount (5 levels: 10%/20%/30%/35%/40% max)
 - Tracks hint sources (which card provided the hint)
 - Records hint levels (0-2)
 - Provides hint summaries for characters
@@ -244,9 +244,9 @@ TrainingController
 
 ### Skill Hints
 
-- 20% SP discount per hint (max 40%)
+- Progressive SP discount (5 levels: 10%/20%/30%/35%/40% max)
 - Hint source tracking
-- Hint level progression (0-2)
+- Hint level progression (0-5)
 - Hint probability calculation
 
 ### Bond Progression

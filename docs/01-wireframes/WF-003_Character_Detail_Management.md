@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.0.0  
-**Date**: January 24, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-001], [SPEC-001], [FLOW-001], [SEQ-001]
 
 **Source Specs**:
@@ -31,23 +31,23 @@ The Character Detail & Management screen provides a comprehensive view and manag
 
 ### 1.2 Key Objectives
 
-| Objective | Description |
-|-----------|-------------|
-| **State Overview** | Complete view of current character state and progression |
-| **Goal Tracking** | Visual progress toward short-term and long-term objectives |
-| **Quick Actions** | One-click access to training, races, skills, and AI advisor |
-| **Analytics Display** | Stat trends, race history, and performance metrics |
-| **Real-time Updates** | Live stat updates via WebSocket connections |
+| Objective             | Description                                                 |
+| --------------------- | ----------------------------------------------------------- |
+| **State Overview**    | Complete view of current character state and progression    |
+| **Goal Tracking**     | Visual progress toward short-term and long-term objectives  |
+| **Quick Actions**     | One-click access to training, races, skills, and AI advisor |
+| **Analytics Display** | Stat trends, race history, and performance metrics          |
+| **Real-time Updates** | Live stat updates via WebSocket connections                 |
 
 ### 1.3 User Stories
 
-| ID | User Story | Priority |
-|----|------------|----------|
-| US-001 | As a player, I want to see all my character stats at a glance | P0 |
-| US-002 | As a player, I want to track my progress toward goals visually | P0 |
-| US-003 | As a player, I want quick access to training and race actions | P0 |
-| US-004 | As a player, I want to see my upcoming race schedule | P0 |
-| US-005 | As a player, I want to manage my support deck from this view | P1 |
+| ID     | User Story                                                     | Priority |
+| ------ | -------------------------------------------------------------- | -------- |
+| US-001 | As a player, I want to see all my character stats at a glance  | P0       |
+| US-002 | As a player, I want to track my progress toward goals visually | P0       |
+| US-003 | As a player, I want quick access to training and race actions  | P0       |
+| US-004 | As a player, I want to see my upcoming race schedule           | P0       |
+| US-005 | As a player, I want to manage my support deck from this view   | P1       |
 
 ---
 
@@ -57,111 +57,42 @@ The Character Detail & Management screen provides a comprehensive view and manag
 
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
-│ App Header: Run Selector | Character: Mejiro Ardan | [Export][≡]    │
+│ [≡] Menu  |  Character: Mejiro Ardan                |  [?] Help      │
+├──────────────────────────────────────────────────────────────────────┤
+│ ┌──────────────────────┬──────────────────────┬────────────────────┐ │
+│ │ 📛 Rank: A (Top 15%)│ 👥 Fans: 320,000     │ 🏆 Wins: 14        │ │
+│ │ 📅 Senior Year FEB 1│ ⚡ Energy: --        │ 😀 Mood: --        │ │
+│ └──────────────────────┴──────────────────────┴────────────────────┘ │
 ├──────────────────────────────────────────────────────────────────────┤
 │                                                                      │
-│ ┌────────────┬───────────────────────────────────────────────────┐  │
-│ │ Sidebar    │ Main Content Area                                 │  │
-│ │            │                                                   │  │
-│ │ Dashboard  │ ┌──────────────────────────────────────────────┐ │  │
-│ │ Character ●│ │ Character Overview Card                      │ │  │
-│ │ Training   │ │ ┌─────────────────────────────────────────┐ │ │  │
-│ │ Races      │ │ │ [Portrait]  Mejiro Ardan                │ │ │  │
-│ │ Skills     │ │ │ Turn 45/78 | Senior Year                 │ │ │  │
-│ │ Support    │ │ │ Scenario: URA Championship Finals       │ │ │  │
-│ │ AI Advisor │ │ │                                         │ │ │  │
-│ │ Settings   │ │ │ Status Bar:                             │ │ │  │
-│ │            │ │ │ Energy: ████████░░ 78% | Mood: Good 🙂 │ │ │  │
-│ │            │ │ │ Condition: Normal | Race in: 8 days    │ │ │  │
-│ │            │ │ └─────────────────────────────────────────┘ │ │  │
-│ │            │ │                                              │ │  │
-│ │            │ │ [Edit Character] [Duplicate] [Delete]        │ │  │
-│ │            │ └──────────────────────────────────────────────┘ │  │
-│ │            │                                                   │  │
-│ │            │ ┌──────────────────────┬────────────────────────┐│  │
-│ │            │ │ Stats Panel          │ Goals Progress         ││  │
-│ │            │ ├──────────────────────┼────────────────────────┤│  │
-│ │            │ │ Speed    A  (980)    │ Short-term Goals:      ││  │
-│ │            │ │ █��██████████████████ │ • Speed 800 ███░░ 65%  ││  │
-│ │            │ │ Grade: A (850-949)   │ • Win G1 ◐ Upcoming    ││  │
-│ │            │ │                      │                        ││  │
-│ │            │ │ Stamina  B+ (820)    │ Long-term Goals:       ││  │
-│ │            │ │ ████████████████░░░░ │ • URA Finals Champion  ││  │
-│ │            │ │ Grade: B+ (750-849)  │   ◐ On Track           ││  │
-│ │            │ │                      │                        ││  │
-│ │            │ │ Power    B  (780)    │ [+ Add Goal]           ││  │
-│ │            │ │ ███████████████░░░░░ │                        ││  │
-│ │            │ │                      │                        ││  │
-│ │            │ │ Guts     B  (760)    │ Aptitudes:             ││  │
-│ │            │ │ ██████████████░░░░░░ │ Distance:              ││  │
-│ │            │ │                      │ • Mile: A+ ◎           ││  │
-│ │            │ │ Wit      A- (890)    │ • Medium: A            ││  │
-│ │            │ │ █████████████████░░░ │ Surface:               ││  │
-│ │            │ │                      │ • Turf: A              ││  │
-│ │            │ │ [View Stat History]  │ • Dirt: B              ││  │
-│ │            │ │                      │ Style:                 ││  │
-│ │            │ │ Factor Bonuses:      │ • Late Surger: S ◎     ││  │
-│ │            │ │ • Speed: ★★☆ (+12)   │                        ││  │
-│ │            │ │ • Stamina: ★★★ (+21) │                        ││  │
-│ │            │ └──────────────────────┴────────────────────────┘│  │
-│ │            │                                                   │  │
-│ │            │ ┌──────────────────────┬────────────────────────┐│  │
-│ │            │ │ Upcoming Races (3)   │ Support Deck Summary   ││  │
-│ │            │ ├──────────────────────┼────────────────────────┤│  │
-│ │            │ │ Jan 15: Kanto Okami  │ [Card 1] [Card 2]      ││  │
-│ │            │ │ G1 | 2400m | Turf    │ Mejiro   Tokai         ││  │
-│ │            │ │ Readiness: 85% ✓     │ Dober    Teio          ││  │
-│ │            │ │ Win Prob: 35%        │ Bond:90% Bond:75%      ││  │
-│ │            │ │ [ENTER] [PREP]       │                        ││  │
-│ │            │ │                      │ [Card 3] [Card 4]      ││  │
-│ │            │ │ Jan 29: Kyoto G2     │ Kitasan  Narita        ││  │
-│ │            │ │ 2000m | Turf         │ Black    Brian         ││  │
-│ │            │ │ Readiness: 72% ⚠️    │ Bond:85% Bond:80%      ││  │
-│ │            │ │ [ENTER] [PREP]       │                        ││  │
-│ │            │ │                      │ [Card 5] [Card 6]      ││  │
-│ │            │ │ Feb 12: Arima G3     │ Symboli  Special       ││  │
-│ │            │ │ 1600m | Turf         │ Rudolf   Week          ││  │
-│ │            │ │ Readiness: 68% ⚠️    │ Bond:70% Bond:95%      ││  │
-│ │            │ │ [ENTER] [PREP]       │                        ││  │
-│ │            │ │                      │                        ││  │
-│ │            │ │ [View Full Calendar] │ [Edit Deck]            ││  │
-│ │            │ └──────────────────────┴────────────────────────┘│  │
-│ │            │                                                   │  │
-│ │            │ ┌──────────────────────┬────────────────────────┐│  │
-│ │            │ │ Skills Summary       │ AI Quick Advisor       ││  │
-│ │            │ ├──────────────────────┼────────────────────────┤│  │
-│ │            │ │ Acquired: 22 skills  │ 💡 Recommendation      ││  │
-│ │            │ │ SP: 450/2400         │                        ││  │
-│ │            │ │                      │ Focus on Speed training││  │
-│ │            │ │ Key Skills:          │ for next 3 turns to    ││  │
-│ │            │ │ ✅ Predator Instinct │ prepare for G1 race.   ││  │
-│ │            │ │ ✅ Lane Legerdemain  │                        ││  │
-│ │            │ │ ✅ Going Strong      │ Confidence: 85%        ││  │
-│ │            │ │                      │                        ││  │
-│ │            │ │ [Manage Skills]      │ [Ask AI] [Details]     ││  │
-│ │            │ └──────────────────────┴─────���──────────────────┘│  │
-│ │            │                                                   │  │
-│ │            │ ┌───────────────────────────────────────────────┐│  │
-│ │            │ │ Recent Activity Timeline                      ││  │
-│ │            │ ├───────────────────────────────────────────────┤│  │
-│ │            │ │ ○ Turn 45: Speed Training (+48 Speed)         ││  │
-│ │            │ │   Support: Mejiro Dober (+12), Tokai Teio (+8)││  │
-│ │            │ │                                               ││  │
-│ │            │ │ ○ Turn 44: Skill Acquired (Lane Guidance)     ││  │
-│ │            │ │   SP Cost: 96 (2 hints applied)               ││  │
-│ │            │ │                                               ││  │
-│ │            │ │ ● Turn 43: Race Won (2nd Place, G2 Kyoto)     ││  │
-│ │            │ │   Rewards: +150 SP, +5 all stats              ││  │
-│ │            │ │                                               ││  │
-│ │            │ │ ○ Turn 42: Power Training (+35 Power)         ││  │
-│ │            │ │   Support: Mejiro Dober (+12)                 ││  │
-│ │            │ │                                               ││  │
-│ │            │ │ ○ Turn 41: Goal Completed (Speed 500)         ││  │
-│ │            │ │   Reward: Motivation boost                    ││  │
-│ │            │ │                                               ││  │
-│ │            │ │ [View Full History]                           ││  │
-│ │            │ └───────────────────────────────────────────────┘│  │
-│ └────────────┴───────────────────────────────────────────────────┘  │
+│ ┌──────────────────────┐  ┌────────────────────────────────────────┐ │
+│ │ Character Portrait   │  │ [Stats] [Skills] [History] [Factors]   │ │
+│ │                      │  ├────────────────────────────────────────┤ │
+│ │   Mejiro Ardan       │  │ Stats Overview (Soft Cap: 1200)        │ │
+│ │   [★★★★★] Lvl 5      │  │                                        │ │
+│ │   "Eternal Beauty"   │  │        [Speed]  980 (A)                │ │
+│ │                      │  │    [Wit]           [Stamina]           │ │
+│ │   [Edit] [Share]     │  │  890 (A)     ⬡     820 (B)             │ │
+│ │                      │  │                                        │ │
+│ └──────────────────────┘  │    [Guts]          [Power]             │ │
+│                           │  760 (B)           780 (B)             │ │
+│                           │                                        │ │
+│                           │ Aptitudes (S is max, no SS):           │ │
+│                           │ 🏟️ Turf: A   Dirt: B                  │ │
+│                           │ 📏 Mile: S   Med: A   Lng: B           │ │
+│                           │ 🏃 Nige: A   Senk: B  Sashi: G Oiko: G │ │
+│                           │                                        │ │
+│                           │ Unique Skill:                          │ │
+│                           │ ✨ "Function of the Future" (Lvl 4)    │ │
+│                           └────────────────────────────────────────┘ │
+│                                                                      │
+│ ┌──────────────────────────────────────────────────────────────────┐ │
+│ │ Active Skills                                                    │ │
+│ ├───────────────────────┬──────────────────────┬───────────────────┤ │
+│ │ [Gold] Arc Maestro    │ [White] Corner Pro   │ [White] Slipstrm  │ │
+│ │ [Gold] One Chance     │ [White] Focus        │ ...               │ │
+│ └───────────────────────┴──────────────────────┴───────────────────┘ │
+│                                                                      │
 └──────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -311,7 +242,7 @@ class OverviewCard extends Component
 {
     public Character $character;
     public CareerRun $careerRun;
-    
+
     public function render()
     {
         return view('livewire.character.overview-card', [
@@ -325,7 +256,7 @@ class OverviewCard extends Component
             'nextRace' => $this->getNextRace(),
         ]);
     }
-    
+
     private function getNextRace()
     {
         // Logic to find next scheduled race
@@ -353,12 +284,12 @@ class OverviewCard extends Component
 
 **Component**: `app/Livewire/Character/StatsPanel.php`
 
-| Element | Description | Interactions |
-|---------|-------------|--------------|
-| **Stat Bars** | Visual representation with grade indicator | Hover → Show exact value and rank |
-| **Grade Badges** | Letter grade based on value | Click → Show grade boundaries |
-| **Factor Indicators** | Star ratings for inherited bonuses | Hover → Show source parent |
-| **Stat History** | Link to progression chart | Click → Open modal with chart |
+| Element               | Description                                | Interactions                      |
+| --------------------- | ------------------------------------------ | --------------------------------- |
+| **Stat Bars**         | Visual representation with grade indicator | Hover → Show exact value and rank |
+| **Grade Badges**      | Letter grade based on value                | Click → Show grade boundaries     |
+| **Factor Indicators** | Star ratings for inherited bonuses         | Hover → Show source parent        |
+| **Stat History**      | Link to progression chart                  | Click → Open modal with chart     |
 
 **Stat Display Format**:
 
@@ -370,13 +301,13 @@ Factor Bonus: ★★☆ (+12 from Parent A)
 
 **Color Coding**:
 
-| Stat | Color | CSS Variable |
-|------|-------|--------------|
-| Speed | Blue | `--stat-speed: #3399ff` |
-| Stamina | Green | `--stat-stamina: #33cc99` |
-| Power | Red | `--stat-power: #ff4d4d` |
-| Guts | Orange | `--stat-guts: #ffa500` |
-| Wit | Purple | `--stat-wisdom: #9933ff` |
+| Stat    | Color  | CSS Variable              |
+| ------- | ------ | ------------------------- |
+| Speed   | Blue   | `--stat-speed: #3399ff`   |
+| Stamina | Green  | `--stat-stamina: #33cc99` |
+| Power   | Red    | `--stat-power: #ff4d4d`   |
+| Guts    | Orange | `--stat-guts: #ffa500`    |
+| Wit     | Purple | `--stat-wisdom: #9933ff`  |
 
 ### 3.3 Goals Progress Panel
 
@@ -387,24 +318,24 @@ class GoalsPanel extends Component
 {
     public Character $character;
     public Collection $goals;
-    
+
     public $showAddGoalModal = false;
-    
+
     public function addGoal($goalData)
     {
         $this->character->goals()->create($goalData);
         $this->goals = $this->character->goals()->active()->get();
         $this->showAddGoalModal = false;
-        
+
         $this->dispatch('goal-added');
     }
-    
+
     public function deleteGoal($goalId)
     {
         Goal::find($goalId)->delete();
         $this->goals = $this->character->goals()->active()->get();
     }
-    
+
     public function render()
     {
         return view('livewire.character.goals-panel');
@@ -414,21 +345,21 @@ class GoalsPanel extends Component
 
 **Goal Types**:
 
-| Type | Format | Example |
-|------|--------|---------|
-| Stat Target | `{stat} ≥ {value}` | "Speed ≥ 800" |
-| Race Win | `Win {grade} race` | "Win G1 race" |
+| Type              | Format                   | Example            |
+| ----------------- | ------------------------ | ------------------ |
+| Stat Target       | `{stat} ≥ {value}`       | "Speed ≥ 800"      |
+| Race Win          | `Win {grade} race`       | "Win G1 race"      |
 | Skill Acquisition | `Acquire {count} skills` | "Acquire 9 skills" |
-| Turn Deadline | `By turn {turn}` | "By turn 60" |
+| Turn Deadline     | `By turn {turn}`         | "By turn 60"       |
 
 **Goal Status Indicators**:
 
-| Status | Icon | Color | Criteria |
-|--------|------|-------|----------|
-| Completed | ✅ | Green | Target achieved |
-| On Track | 🟢 | Green | Progress ≥ expected |
-| At Risk | 🟡 | Amber | Progress < expected |
-| Behind | 🔴 | Red | Unlikely to complete |
+| Status    | Icon | Color | Criteria             |
+| --------- | ---- | ----- | -------------------- |
+| Completed | ✅   | Green | Target achieved      |
+| On Track  | 🟢   | Green | Progress ≥ expected  |
+| At Risk   | 🟡   | Amber | Progress < expected  |
+| Behind    | 🔴   | Red   | Unlikely to complete |
 
 ### 3.4 Upcoming Races Panel
 
@@ -503,12 +434,12 @@ Deck Score: 92/100 (Excellent)
 
 **Bond Level Colors**:
 
-| Range | Color | Status |
-|-------|-------|--------|
-| 80-100% | Gold | Friendship Training Active |
-| 60-79% | Silver | High bond |
-| 40-59% | Bronze | Medium bond |
-| 0-39% | Gray | Low bond |
+| Range   | Color  | Status                     |
+| ------- | ------ | -------------------------- |
+| 80-100% | Gold   | Friendship Training Active |
+| 60-79%  | Silver | High bond                  |
+| 40-59%  | Bronze | Medium bond                |
+| 0-39%   | Gray   | Low bond                   |
 
 ### 3.6 Skills Summary Panel
 
@@ -555,19 +486,19 @@ class AIQuickAdvisor extends Component
 {
     public Character $character;
     public ?AIRecommendation $latestRecommendation = null;
-    
+
     public function mount()
     {
         $this->latestRecommendation = $this->character->aiRecommendations()
             ->latest()
             ->first();
     }
-    
+
     public function askAI()
     {
         return redirect()->route('ai-advisor', ['character' => $this->character]);
     }
-    
+
     public function render()
     {
         return view('livewire.character.ai-quick-advisor');
@@ -605,13 +536,13 @@ class AIQuickAdvisor extends Component
 
 **Event Types**:
 
-| Type | Icon | Format |
-|------|------|--------|
-| Training | ⚡ | "Turn X: [Type] Training (+Y [Stat])" |
-| Race | 🏆 | "Turn X: Race [Result] ([Name], [Grade])" |
-| Skill | ✨ | "Turn X: Skill Acquired ([Name])" |
-| Goal | 🎯 | "Turn X: Goal Completed ([Name])" |
-| Event | 📅 | "Turn X: Event Triggered ([Name])" |
+| Type     | Icon | Format                                    |
+| -------- | ---- | ----------------------------------------- |
+| Training | ⚡   | "Turn X: [Type] Training (+Y [Stat])"     |
+| Race     | 🏆   | "Turn X: Race [Result] ([Name], [Grade])" |
+| Skill    | ✨   | "Turn X: Skill Acquired ([Name])"         |
+| Goal     | 🎯   | "Turn X: Goal Completed ([Name])"         |
+| Event    | 📅   | "Turn X: Event Triggered ([Name])"        |
 
 **Visual Design**:
 
@@ -655,24 +586,24 @@ class DetailPage extends Component
 {
     public Character $character;
     public CareerRun $careerRun;
-    
+
     public $activeTab = 'overview'; // overview, stats, goals, races, skills
-    
+
     protected $listeners = [
         'character-updated' => '$refresh',
         'goal-added' => '$refresh',
         'training-completed' => 'handleTrainingCompleted',
     ];
-    
+
     public function handleTrainingCompleted($data)
     {
         $this->careerRun->refresh();
-        $this->dispatch('show-toast', 
+        $this->dispatch('show-toast',
             type: 'success',
             message: 'Training completed! Stats updated.'
         );
     }
-    
+
     public function render()
     {
         return view('livewire.character.detail-page');
@@ -687,26 +618,26 @@ class DetailPage extends Component
 ```javascript
 // Listen for character updates
 Echo.private(`character.${characterId}`)
-    .listen('CharacterStatsUpdated', (e) => {
-        Livewire.dispatch('character-updated', e.character);
+    .listen("CharacterStatsUpdated", (e) => {
+        Livewire.dispatch("character-updated", e.character);
     })
-    .listen('TrainingCompleted', (e) => {
-        Livewire.dispatch('training-completed', e.session);
+    .listen("TrainingCompleted", (e) => {
+        Livewire.dispatch("training-completed", e.session);
     })
-    .listen('RaceCompleted', (e) => {
-        Livewire.dispatch('race-completed', e.result);
+    .listen("RaceCompleted", (e) => {
+        Livewire.dispatch("race-completed", e.result);
     });
 ```
 
 ### 4.3 Cache Strategy
 
-| Data Type | Cache Key | TTL | Invalidation |
-|-----------|-----------|-----|--------------|
-| Character stats | `character:{id}:stats` | 1 minute | On stat update |
-| Goals progress | `character:{id}:goals` | 5 minutes | On goal change |
-| Upcoming races | `character:{id}:races` | 1 hour | On race entry/result |
-| Support deck | `character:{id}:deck` | 1 hour | On deck modification |
-| Activity timeline | `character:{id}:activity` | 30 seconds | On new activity |
+| Data Type         | Cache Key                 | TTL        | Invalidation         |
+| ----------------- | ------------------------- | ---------- | -------------------- |
+| Character stats   | `character:{id}:stats`    | 1 minute   | On stat update       |
+| Goals progress    | `character:{id}:goals`    | 5 minutes  | On goal change       |
+| Upcoming races    | `character:{id}:races`    | 1 hour     | On race entry/result |
+| Support deck      | `character:{id}:deck`     | 1 hour     | On deck modification |
+| Activity timeline | `character:{id}:activity` | 30 seconds | On new activity      |
 
 ---
 
@@ -721,11 +652,11 @@ sequenceDiagram
     participant Service
     participant Database
     participant WebSocket
-    
+
     User->>DetailPage: Click [ENTER] on race
     DetailPage->>Service: validateRaceEntry(character, race)
     Service-->>DetailPage: Validation result
-    
+
     alt Readiness >= 70%
         DetailPage->>Database: Create race entry
         Database-->>DetailPage: Entry confirmed
@@ -749,7 +680,7 @@ sequenceDiagram
     participant Service
     participant Database
     participant Analytics
-    
+
     User->>GoalsPanel: Click [+ Add Goal]
     GoalsPanel->>User: Show goal creation form
     User->>GoalsPanel: Submit goal data
@@ -771,7 +702,7 @@ sequenceDiagram
     participant WebSocket
     participant DetailPage
     participant StatsPanel
-    
+
     Training->>Character: Execute training
     Character->>Character: Update stats
     Character->>WebSocket: Broadcast stats-updated
@@ -787,27 +718,27 @@ sequenceDiagram
 
 ### 6.1 WCAG 2.2 AA Compliance
 
-| Criterion | Implementation | Test Method |
-|-----------|----------------|-------------|
-| **1.1.1 Non-text Content** | All images and icons have `alt` text | Screen reader testing |
-| **1.4.3 Contrast Ratio** | 4.5:1 minimum for text | Color contrast analyzer |
-| **2.1.1 Keyboard** | All interactive elements keyboard accessible | Keyboard-only testing |
-| **2.4.3 Focus Order** | Logical tab order through panels | Tab key traversal |
-| **2.4.7 Focus Visible** | Clear focus indicators | Visual inspection |
-| **3.3.1 Error Identification** | Validation errors clearly announced | Screen reader + visual |
-| **4.1.2 Name, Role, Value** | Proper ARIA attributes | axe-core scan |
+| Criterion                      | Implementation                               | Test Method             |
+| ------------------------------ | -------------------------------------------- | ----------------------- |
+| **1.1.1 Non-text Content**     | All images and icons have `alt` text         | Screen reader testing   |
+| **1.4.3 Contrast Ratio**       | 4.5:1 minimum for text                       | Color contrast analyzer |
+| **2.1.1 Keyboard**             | All interactive elements keyboard accessible | Keyboard-only testing   |
+| **2.4.3 Focus Order**          | Logical tab order through panels             | Tab key traversal       |
+| **2.4.7 Focus Visible**        | Clear focus indicators                       | Visual inspection       |
+| **3.3.1 Error Identification** | Validation errors clearly announced          | Screen reader + visual  |
+| **4.1.2 Name, Role, Value**    | Proper ARIA attributes                       | axe-core scan           |
 
 ### 6.2 Keyboard Navigation
 
-| Action | Shortcut | Context |
-|--------|----------|---------|
-| Navigate panels | `Tab` / `Shift+Tab` | Global |
-| Edit character | `E` | When focused on overview |
-| Add goal | `G` | When in goals panel |
-| View race calendar | `R` | When in races panel |
-| Manage skills | `S` | When in skills panel |
-| Open AI advisor | `A` | Global |
-| Save changes | `Ctrl+S` | When editing |
+| Action             | Shortcut            | Context                  |
+| ------------------ | ------------------- | ------------------------ |
+| Navigate panels    | `Tab` / `Shift+Tab` | Global                   |
+| Edit character     | `E`                 | When focused on overview |
+| Add goal           | `G`                 | When in goals panel      |
+| View race calendar | `R`                 | When in races panel      |
+| Manage skills      | `S`                 | When in skills panel     |
+| Open AI advisor    | `A`                 | Global                   |
+| Save changes       | `Ctrl+S`            | When editing             |
 
 ### 6.3 Screen Reader Announcements
 
@@ -839,33 +770,33 @@ sequenceDiagram
 
 ### 7.1 Performance Targets
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| **Page Load** | < 2.0s | Time to Interactive |
-| **Component Render** | < 300ms | Stats panel render time |
-| **Stat Update Animation** | < 500ms | Smooth transition |
-| **API Response** | < 200ms | Character data fetch |
-| **WebSocket Latency** | < 100ms | Real-time update delay |
+| Metric                    | Target  | Measurement             |
+| ------------------------- | ------- | ----------------------- |
+| **Page Load**             | < 2.0s  | Time to Interactive     |
+| **Component Render**      | < 300ms | Stats panel render time |
+| **Stat Update Animation** | < 500ms | Smooth transition       |
+| **API Response**          | < 200ms | Character data fetch    |
+| **WebSocket Latency**     | < 100ms | Real-time update delay  |
 
 ### 7.2 Optimization Strategies
 
-| Strategy | Implementation | Impact |
-|----------|----------------|--------|
-| **Lazy Loading** | Defer activity timeline until scroll | -30% initial load |
-| **Component Caching** | Cache rendered components (1 min) | -50% repeat renders |
-| **Debounced Updates** | 300ms debounce on stat changes | Reduced API calls |
-| **Virtual Scrolling** | Activity timeline pagination | Handles 1000+ events |
-| **Image Optimization** | WebP format, responsive sizes | -60% image bandwidth |
+| Strategy               | Implementation                       | Impact               |
+| ---------------------- | ------------------------------------ | -------------------- |
+| **Lazy Loading**       | Defer activity timeline until scroll | -30% initial load    |
+| **Component Caching**  | Cache rendered components (1 min)    | -50% repeat renders  |
+| **Debounced Updates**  | 300ms debounce on stat changes       | Reduced API calls    |
+| **Virtual Scrolling**  | Activity timeline pagination         | Handles 1000+ events |
+| **Image Optimization** | WebP format, responsive sizes        | -60% image bandwidth |
 
 ### 7.3 Bundle Size Budget
 
-| Asset Type | Budget | Current | Status |
-|------------|--------|---------|--------|
-| JavaScript | 80 KB | 72 KB | ✅ Within budget |
-| CSS | 30 KB | 28 KB | ✅ Within budget |
-| Fonts | 20 KB | 18 KB | ✅ Within budget |
-| Images | 150 KB | 142 KB | ✅ Within budget |
-| Total | 280 KB | 260 KB | ✅ Within budget |
+| Asset Type | Budget | Current | Status           |
+| ---------- | ------ | ------- | ---------------- |
+| JavaScript | 80 KB  | 72 KB   | ✅ Within budget |
+| CSS        | 30 KB  | 28 KB   | ✅ Within budget |
+| Fonts      | 20 KB  | 18 KB   | ✅ Within budget |
+| Images     | 150 KB | 142 KB  | ✅ Within budget |
+| Total      | 280 KB | 260 KB  | ✅ Within budget |
 
 ---
 
@@ -884,7 +815,7 @@ test('renders character overview correctly', function () {
         'energy' => 78,
         'mood' => Mood::Good,
     ]);
-    
+
     Livewire::actingAs($user)
         ->test(DetailPage::class, ['character' => $character])
         ->assertSee($character->name)
@@ -895,13 +826,13 @@ test('renders character overview correctly', function () {
 
 test('displays goals with progress', function () {
     $character = Character::factory()->create();
-    
+
     Goal::factory()->for($character)->create([
         'type' => 'stat_target',
         'target_stat' => 'speed',
         'target_value' => 800,
     ]);
-    
+
     Livewire::test(DetailPage::class, ['character' => $character])
         ->assertSee('Speed')
         ->assertSee('800')
@@ -919,14 +850,14 @@ test('displays goals with progress', function () {
 test('user can update character stats', function () {
     $user = User::factory()->create();
     $character = Character::factory()->for($user)->create();
-    
+
     $this->actingAs($user)
         ->patch("/characters/{$character->id}/stats", [
             'speed' => 950,
             'stamina' => 800,
         ])
         ->assertOk();
-    
+
     expect($character->fresh()->speed)->toBe(950)
         ->and($character->fresh()->stamina)->toBe(800);
 });
@@ -934,7 +865,7 @@ test('user can update character stats', function () {
 test('user can add and delete goals', function () {
     $user = User::factory()->create();
     $character = Character::factory()->for($user)->create();
-    
+
     Livewire::actingAs($user)
         ->test(GoalsPanel::class, ['character' => $character])
         ->call('addGoal', [
@@ -943,13 +874,13 @@ test('user can add and delete goals', function () {
             'target_value' => 1000,
         ])
         ->assertEmitted('goal-added');
-    
+
     expect($character->goals()->count())->toBe(1);
-    
+
     Livewire::actingAs($user)
         ->test(GoalsPanel::class, ['character' => $character])
         ->call('deleteGoal', $character->goals()->first()->id);
-    
+
     expect($character->goals()->count())->toBe(0);
 });
 ```
@@ -959,57 +890,59 @@ test('user can add and delete goals', function () {
 **Test File**: `tests/e2e/character-detail.spec.js`
 
 ```javascript
-test.describe('WF-003: Character Detail Management', () => {
-    test('displays all core panels', async ({ page }) => {
-        await page.goto('/characters/1');
-        
-        await expect(page.getByTestId('character-overview')).toBeVisible();
-        await expect(page.getByTestId('stats-panel')).toBeVisible();
-        await expect(page.getByTestId('goals-panel')).toBeVisible();
-        await expect(page.getByTestId('upcoming-races')).toBeVisible();
-        await expect(page.getByTestId('support-deck-summary')).toBeVisible();
-        await expect(page.getByTestId('skills-summary')).toBeVisible();
+test.describe("WF-003: Character Detail Management", () => {
+    test("displays all core panels", async ({ page }) => {
+        await page.goto("/characters/1");
+
+        await expect(page.getByTestId("character-overview")).toBeVisible();
+        await expect(page.getByTestId("stats-panel")).toBeVisible();
+        await expect(page.getByTestId("goals-panel")).toBeVisible();
+        await expect(page.getByTestId("upcoming-races")).toBeVisible();
+        await expect(page.getByTestId("support-deck-summary")).toBeVisible();
+        await expect(page.getByTestId("skills-summary")).toBeVisible();
     });
-    
-    test('updates stats in real-time', async ({ page }) => {
-        await page.goto('/characters/1');
-        
-        const statValue = page.getByTestId('stat-speed-value');
+
+    test("updates stats in real-time", async ({ page }) => {
+        await page.goto("/characters/1");
+
+        const statValue = page.getByTestId("stat-speed-value");
         const initialValue = await statValue.textContent();
-        
+
         // Trigger training completion via WebSocket simulation
         await page.evaluate(() => {
-            window.Echo.private('character.1')
-                .trigger('CharacterStatsUpdated', {
-                    character: { speed: 1000 }
-                });
+            window.Echo.private("character.1").trigger(
+                "CharacterStatsUpdated",
+                {
+                    character: { speed: 1000 },
+                },
+            );
         });
-        
+
         await expect(statValue).not.toHaveText(initialValue);
-        await expect(statValue).toContainText('1000');
+        await expect(statValue).toContainText("1000");
     });
-    
-    test('allows goal management', async ({ page }) => {
-        await page.goto('/characters/1');
-        
-        await page.getByTestId('add-goal-button').click();
-        
-        await page.getByTestId('goal-type-select').selectOption('stat_target');
-        await page.getByTestId('goal-stat-select').selectOption('speed');
-        await page.getByTestId('goal-target-input').fill('1000');
-        
-        await page.getByTestId('save-goal-button').click();
-        
-        await expect(page.getByTestId('goal-item-speed-1000')).toBeVisible();
+
+    test("allows goal management", async ({ page }) => {
+        await page.goto("/characters/1");
+
+        await page.getByTestId("add-goal-button").click();
+
+        await page.getByTestId("goal-type-select").selectOption("stat_target");
+        await page.getByTestId("goal-stat-select").selectOption("speed");
+        await page.getByTestId("goal-target-input").fill("1000");
+
+        await page.getByTestId("save-goal-button").click();
+
+        await expect(page.getByTestId("goal-item-speed-1000")).toBeVisible();
     });
-    
-    test('supports keyboard navigation', async ({ page }) => {
-        await page.goto('/characters/1');
-        
-        await page.keyboard.press('Tab');
-        await expect(page.getByTestId('character-overview')).toBeFocused();
-        
-        await page.keyboard.press('E');
+
+    test("supports keyboard navigation", async ({ page }) => {
+        await page.goto("/characters/1");
+
+        await page.keyboard.press("Tab");
+        await expect(page.getByTestId("character-overview")).toBeFocused();
+
+        await page.keyboard.press("E");
         await expect(page).toHaveURL(/.*\/edit$/);
     });
 });
@@ -1020,40 +953,42 @@ test.describe('WF-003: Character Detail Management', () => {
 **Test File**: `tests/e2e/accessibility/character-detail.spec.js`
 
 ```javascript
-import { test, expect } from '@playwright/test';
-import AxeBuilder from '@axe-core/playwright';
+import { test, expect } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
 
-test.describe('WF-003: Accessibility', () => {
-    test('has no automatically detectable accessibility issues', async ({ page }) => {
-        await page.goto('/characters/1');
-        
+test.describe("WF-003: Accessibility", () => {
+    test("has no automatically detectable accessibility issues", async ({
+        page,
+    }) => {
+        await page.goto("/characters/1");
+
         const accessibilityScanResults = await new AxeBuilder({ page })
-            .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+            .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
             .analyze();
-        
+
         expect(accessibilityScanResults.violations).toEqual([]);
     });
-    
-    test('announces stat changes to screen readers', async ({ page }) => {
-        await page.goto('/characters/1');
-        
+
+    test("announces stat changes to screen readers", async ({ page }) => {
+        await page.goto("/characters/1");
+
         const liveRegion = page.locator('[aria-live="polite"]');
-        
+
         // Trigger stat update
-        await page.getByTestId('training-execute-button').click();
-        
+        await page.getByTestId("training-execute-button").click();
+
         await expect(liveRegion).toContainText(/Speed.*increased/);
     });
-    
-    test('maintains focus after actions', async ({ page }) => {
-        await page.goto('/characters/1');
-        
-        const addGoalButton = page.getByTestId('add-goal-button');
+
+    test("maintains focus after actions", async ({ page }) => {
+        await page.goto("/characters/1");
+
+        const addGoalButton = page.getByTestId("add-goal-button");
         await addGoalButton.click();
-        
-        const saveButton = page.getByTestId('save-goal-button');
+
+        const saveButton = page.getByTestId("save-goal-button");
         await saveButton.click();
-        
+
         // Focus should return to add goal button
         await expect(addGoalButton).toBeFocused();
     });
@@ -1066,38 +1001,39 @@ test.describe('WF-003: Accessibility', () => {
 
 ### 9.1 Specifications
 
-| Document | Reference |
-|----------|-----------|
-| Product Requirements | [PRD-001](../prds/PRD-001_Character_Management.md) |
-| Technical Specifications | [SPEC-001](../specs/SPEC-001_Character_Management_Technical.md) |
-| System Flow | [FLOW-001](../flows/FLOW-001_Character_Management_System.md) |
-| Technical Flow | [TECH-FLOW-001](../tech-flow/TECH-FLOW-001_Character_Management_Flow.md) |
+| Document                 | Reference                                                                |
+| ------------------------ | ------------------------------------------------------------------------ |
+| Product Requirements     | [PRD-001](../prds/PRD-001_Character_Management.md)                       |
+| Technical Specifications | [SPEC-001](../specs/SPEC-001_Character_Management_Technical.md)          |
+| System Flow              | [FLOW-001](../flows/FLOW-001_Character_Management_System.md)             |
+| Technical Flow           | [TECH-FLOW-001](../tech-flow/TECH-FLOW-001_Character_Management_Flow.md) |
 
 ### 9.2 User Flows
 
-| Document | Reference |
-|----------|-----------|
+| Document             | Reference                                                   |
+| -------------------- | ----------------------------------------------------------- |
 | Dashboard Navigation | [UF-001](../user-flows/UF-001_Dashboard_Navigation_Flow.md) |
-| Career Setup | [UF-002](../user-flows/UF-002_Career_Setup_Flow.md) |
-| Training Day | [UF-003](../user-flows/UF-003_Training_Day_Flow.md) |
-| Race Day | [UF-004](../user-flows/UF-004_Race_Day_Flow.md) |
+| Career Setup         | [UF-002](../user-flows/UF-002_Career_Setup_Flow.md)         |
+| Training Day         | [UF-003](../user-flows/UF-003_Training_Day_Flow.md)         |
+| Race Day             | [UF-004](../user-flows/UF-004_Race_Day_Flow.md)             |
 
 ### 9.3 Related Wireframes
 
-| Document | Reference |
-|----------|-----------|
-| Dashboard Overview | [WF-001](WF-001_Dashboard_Overview.md) |
-| Character Creation Wizard | [WF-002](WF-002_Character_Creation_Wizard.md) |
-| Training Selection | [WF-004](WF-004_Training_Selection_Interface.md) |
+| Document                  | Reference                                        |
+| ------------------------- | ------------------------------------------------ |
+| Dashboard Overview        | [WF-001](WF-001_Dashboard_Overview.md)           |
+| Character Creation Wizard | [WF-002](WF-002_Character_Creation_Wizard.md)    |
+| Training Selection        | [WF-004](WF-004_Training_Selection_Interface.md) |
 
 ---
 
 ## 10. Version History
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 2.0.0 | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added real-time WebSocket updates, AI quick advisor, enhanced accessibility specifications, performance targets, and testing requirements |
-| 1.0.0 | 2026-01-14 | Development Team | Initial wireframe specification |
+| Version | Date       | Author           | Changes                                                                                                                                                                                            |
+| ------- | ---------- | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2.2.0   | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: corrected stat grades (no A-/B+, S is max), aptitude terminology (Nige/Senkou/Sashi/Oikomi), soft cap indicator at 1200 |
+| 2.0.0   | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added real-time WebSocket updates, AI quick advisor, enhanced accessibility specifications, performance targets, and testing requirements |
+| 1.0.0   | 2026-01-14 | Development Team | Initial wireframe specification                                                                                                                                                                    |
 
 ---
 
@@ -1118,4 +1054,4 @@ test.describe('WF-003: Accessibility', () => {
 
 ---
 
-*This wireframe specification reflects the current implementation of the Character Detail & Management screen and serves as the authoritative reference for UI/UX development and testing.*
+_This wireframe specification reflects the current implementation of the Character Detail & Management screen and serves as the authoritative reference for UI/UX development and testing._

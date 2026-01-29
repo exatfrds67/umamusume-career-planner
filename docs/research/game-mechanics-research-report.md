@@ -82,24 +82,30 @@ This report compiles authoritative information about Umamusume Pretty Derby game
 
 ### 2.2 Training Stat Gain Formula
 
-**Complete Formula** (Source: [UmaReference.com](https://www.umareference.com/guide/support-cards-in-detail/calculating-training-stat-gain)):
+**Exact Formula (Verified Jan 2026)**:
 
-```
-Final Stat Gain = (BaseValue + Sum of StatBonus)
-                  × (1 + MoodMultiplier × (Sum of MoodEffect))
-                  × (Sum of TrainingBonus)
-                  × (Product of FriendshipBonus)
-                  × (1 + 0.05 × NumberOfSupportCards)
+```math
+Stat Gain = (Base + StatBonus)
+          × (1 + GrowthRate)
+          × (1 + MoodMultiplier × (1 + MoodEffect))
+          × (1 + TrainingEffect)
+          × (1 + 0.05 × NumSupportCards)
+          × FriendshipMultiplier
 ```
 
 **Key Components**:
 
-- **BaseValue**: Determined by training facility and level
-- **StatBonus**: From support cards
-- **MoodMultiplier**: 0 at neutral, ±0.1 per mood level
-- **TrainingBonus**: From support card effects
-- **FriendshipBonus**: Only applies at orange bond (80%+) or rainbow
-- **Support Card Bonus**: +5% per support card present
+- **Base**: Facility Base Value (Level 1-5 specific).
+- **StatBonus**: Determine by "Stat Bonus" trait on support cards.
+- **GrowthRate**: Character-specific innate bonus.
+- **MoodMultiplier**: Great (+20%), Good (+10%), Normal (0%), Bad (-10%), Worst (-20%).
+- **TrainingEffect**: "Training Effect Up" trait sum.
+- **NumSupportCards**: Count of support cards in training (Max +30% at 6 cards).
+- **FriendshipMultiplier**: Product of `(1 + FriendshipBonus)` for each active rainbow card.
+
+**Caps**:
+
+- **Per Training Cap**: +100 max gain per stat (reduced to +50 if stat > 1200).
 
 ### 2.3 Energy and Failure Rates
 
@@ -290,6 +296,50 @@ Final Stat Gain = (BaseValue + Sum of StatBonus)
 
 ---
 
+## 5.5 Advanced Mechanics (Formulas Verified Jan 2026)
+
+### 5.5.1 Skill Activation Rate (Wit)
+
+**Formula**:
+
+```math
+Activation Rate (%) = 100 - (9000 / Wit)
+```
+
+- **Platform Min**: 20% (If calculation < 20%, rate is 20%).
+- **Independence**: Skills are checked individually; combined probabilities are multiplicative.
+
+### 5.5.2 Stamina / HP Consumption
+
+**Per Second Drain Formula**:
+
+```math
+HP Consumption = 20.0 × (CurrentSpeed - BaseSpeed + 12.0) / 144.0
+                 × StatusModifier
+                 × GroundModifier
+                 × StrategyCoeff
+```
+
+- **Rushing (Kakari)**: Increases consumption by **1.6x**.
+- **GroundModifier**: Heavy/Soft track adds +2% HP drain/sec.
+- **Deep Impact**: Low Wit increases inefficiency drain.
+
+### 5.5.3 Race Physics
+
+**Target Speed (Last Spurt)**:
+
+```math
+TargetSpeed = BaseSpeed
+            + (sqrt(500 × SpeedStat) × DistanceMod)
+            + (StrategyCoeff)
+```
+
+- **Stat Cap Impact**: Stats > 1200 contribute 50% value (e.g., 1500 effective = 1200 + 150 = 1350).
+- **Acceleration**: Heavily dependent on **Power**.
+  `Accel = PwrCorrection × HillCorrection × GroundCorrection`
+
+---
+
 ## 6. Race System
 
 ### 6.1 Weather and Track Conditions
@@ -374,6 +424,25 @@ Condition-specific:
     - Stays at back early race
     - Burst of Speed and Power late race
     - Requires: High Power, Guts, adequate Stamina
+
+---
+
+### 6.4 Race Classification and Fan Requirements
+
+**Class Pyramid (Verified Jan 2026)**:
+Hierarchy of ranks based on total fan count. Reaching these thresholds unlocks higher grade races and scenarios.
+
+| Class Rank   | Required Fans | Unlock Status     |
+| :----------- | :------------ | :---------------- |
+| **Legend**   | 320,000       | Maximum Rank      |
+| **Top Star** | 240,000       | -                 |
+| **Star**     | 160,000       | -                 |
+| **Platinum** | 100,000       | KEEP! (Benchmark) |
+| **Gold**     | 50,000        | -                 |
+| **Silver**   | 20,000        | -                 |
+| **Bronze**   | 5,000         | -                 |
+| **Beginner** | 1 (First Win) | -                 |
+| **Debut**    | 0             | Starting Rank     |
 
 ---
 
@@ -557,8 +626,9 @@ Condition-specific:
 
 **Actual Game Mechanics**:
 
-- 10% SP cost reduction per hint
-- Maximum 4 hints (40% total discount)
+- 10% SP cost reduction per hint (levels 1-3)
+- 5% SP cost reduction per hint (levels 4-5)
+- Maximum 5 levels (40% total discount)
 
 **Action Required**: Update skill system documentation
 
@@ -784,16 +854,18 @@ This research compiled authoritative information from 8+ primary sources to veri
 
 **Needs Correction**:
 
-- ✗ Skill hint discount rates and maximum
-- ✗ Stat range upper limit
-- ✗ Aptitude grade maximum (SS vs S)
-- ✗ Weather impact percentages
+- ✗ Stat range upper limit (update to reflect 1200+ capability)
 
 **Needs Verification**:
 
 - ? Exact weather performance modifiers
-- ? SS aptitude grade existence
 - ? Specific skill activation rate formulas
+
+**Corrected/Verified (Jan 2026)**:
+
+- ✓ Skill hint discount rates (10%/5% split, max 40%)
+- ✓ Aptitude grade maximum (S max, no SS)
+- ✓ Weather/Track condition impacts (Table added)
 
 ### 15.3 Next Steps
 

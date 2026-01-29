@@ -33,11 +33,11 @@ describe('Hint Creation', function () {
             ->and($hint->character_id)->toBe($this->character->id)
             ->and($hint->skill_id)->toBe($this->skill->id)
             ->and($hint->source_type)->toBe('support_card')
-            ->and($hint->discount_percentage)->toBe(20.0)
+            ->and($hint->discount_percentage)->toBe(10.0) // VERIFIED: 10% for first hint
             ->and($hint->is_used)->toBeFalse();
     });
 
-    it('calculates 20% discount for first hint', function () {
+    it('calculates 10% discount for first hint', function () {
         $hint = $this->service->createHint(
             character: $this->character,
             skill: $this->skill,
@@ -45,10 +45,10 @@ describe('Hint Creation', function () {
             sourceName: 'Speed Training'
         );
 
-        expect($hint->discount_percentage)->toBe(20.0);
+        expect($hint->discount_percentage)->toBe(10.0); // VERIFIED: 10% for level 1
     });
 
-    it('calculates 40% discount for second hint (max)', function () {
+    it('calculates 20% discount for second hint', function () {
         // Create first hint
         $this->service->createHint(
             character: $this->character,
@@ -65,10 +65,10 @@ describe('Hint Creation', function () {
             sourceName: 'Test Card'
         );
 
-        expect($hint->discount_percentage)->toBe(40.0);
+        expect($hint->discount_percentage)->toBe(20.0); // VERIFIED: 20% for level 2
     });
 
-    it('caps discount at 40% for third hint', function () {
+    it('calculates 30% discount for third hint', function () {
         // Create first two hints
         $this->service->createHint($this->character, $this->skill, 'training', 'Training 1');
         $this->service->createHint($this->character, $this->skill, 'training', 'Training 2');
@@ -76,7 +76,46 @@ describe('Hint Creation', function () {
         // Create third hint
         $hint = $this->service->createHint($this->character, $this->skill, 'training', 'Training 3');
 
-        expect($hint->discount_percentage)->toBe(40.0);
+        expect($hint->discount_percentage)->toBe(30.0); // VERIFIED: 30% for level 3
+    });
+
+    it('calculates 35% discount for fourth hint', function () {
+        // Create first three hints
+        $this->service->createHint($this->character, $this->skill, 'training', 'Training 1');
+        $this->service->createHint($this->character, $this->skill, 'training', 'Training 2');
+        $this->service->createHint($this->character, $this->skill, 'training', 'Training 3');
+
+        // Create fourth hint
+        $hint = $this->service->createHint($this->character, $this->skill, 'training', 'Training 4');
+
+        expect($hint->discount_percentage)->toBe(35.0); // VERIFIED: 35% for level 4
+    });
+
+    it('caps discount at 40% for fifth hint (maximum)', function () {
+        // Create first four hints
+        $this->service->createHint($this->character, $this->skill, 'training', 'Training 1');
+        $this->service->createHint($this->character, $this->skill, 'training', 'Training 2');
+        $this->service->createHint($this->character, $this->skill, 'training', 'Training 3');
+        $this->service->createHint($this->character, $this->skill, 'training', 'Training 4');
+
+        // Create fifth hint (maximum)
+        $hint = $this->service->createHint($this->character, $this->skill, 'training', 'Training 5');
+
+        expect($hint->discount_percentage)->toBe(40.0); // VERIFIED: 40% max at level 5
+    });
+
+    it('does not exceed 40% discount for sixth hint', function () {
+        // Create five hints
+        $this->service->createHint($this->character, $this->skill, 'training', 'Training 1');
+        $this->service->createHint($this->character, $this->skill, 'training', 'Training 2');
+        $this->service->createHint($this->character, $this->skill, 'training', 'Training 3');
+        $this->service->createHint($this->character, $this->skill, 'training', 'Training 4');
+        $this->service->createHint($this->character, $this->skill, 'training', 'Training 5');
+
+        // Create sixth hint (should still be 40%)
+        $hint = $this->service->createHint($this->character, $this->skill, 'training', 'Training 6');
+
+        expect($hint->discount_percentage)->toBe(40.0); // Still capped at 40%
     });
 });
 
@@ -110,19 +149,52 @@ describe('Cost Calculations', function () {
         expect($finalCost)->toBe(120); // Original cost
     });
 
-    it('calculates final cost with one hint (20% discount)', function () {
+    it('calculates final cost with one hint (10% discount)', function () {
         $this->service->createHint($this->character, $this->skill, 'training', 'Training 1');
 
         $finalCost = $this->service->calculateFinalCost($this->skill, 1);
 
-        expect($finalCost)->toBe(96); // 120 - 20% = 96
+        expect($finalCost)->toBe(108); // 120 - 10% = 108
     });
 
-    it('calculates final cost with two hints (40% discount)', function () {
+    it('calculates final cost with two hints (20% discount)', function () {
         $this->service->createHint($this->character, $this->skill, 'training', 'Training 1');
         $this->service->createHint($this->character, $this->skill, 'support_card', 'Card 1');
 
         $finalCost = $this->service->calculateFinalCost($this->skill, 2);
+
+        expect($finalCost)->toBe(96); // 120 - 20% = 96
+    });
+
+    it('calculates final cost with three hints (30% discount)', function () {
+        $this->service->createHint($this->character, $this->skill, 'training', 'Training 1');
+        $this->service->createHint($this->character, $this->skill, 'training', 'Training 2');
+        $this->service->createHint($this->character, $this->skill, 'training', 'Training 3');
+
+        $finalCost = $this->service->calculateFinalCost($this->skill, 3);
+
+        expect($finalCost)->toBe(84); // 120 - 30% = 84
+    });
+
+    it('calculates final cost with four hints (35% discount)', function () {
+        $this->service->createHint($this->character, $this->skill, 'training', 'Training 1');
+        $this->service->createHint($this->character, $this->skill, 'training', 'Training 2');
+        $this->service->createHint($this->character, $this->skill, 'training', 'Training 3');
+        $this->service->createHint($this->character, $this->skill, 'training', 'Training 4');
+
+        $finalCost = $this->service->calculateFinalCost($this->skill, 4);
+
+        expect($finalCost)->toBe(78); // 120 - 35% = 78
+    });
+
+    it('calculates final cost with five hints (40% discount maximum)', function () {
+        $this->service->createHint($this->character, $this->skill, 'training', 'Training 1');
+        $this->service->createHint($this->character, $this->skill, 'training', 'Training 2');
+        $this->service->createHint($this->character, $this->skill, 'training', 'Training 3');
+        $this->service->createHint($this->character, $this->skill, 'training', 'Training 4');
+        $this->service->createHint($this->character, $this->skill, 'training', 'Training 5');
+
+        $finalCost = $this->service->calculateFinalCost($this->skill, 5);
 
         expect($finalCost)->toBe(72); // 120 - 40% = 72
     });
@@ -132,7 +204,7 @@ describe('Cost Calculations', function () {
 
         $spSaved = $this->service->calculateSpSaved($this->skill, 1);
 
-        expect($spSaved)->toBe(24); // 20% of 120
+        expect($spSaved)->toBe(12); // 10% of 120
     });
 });
 

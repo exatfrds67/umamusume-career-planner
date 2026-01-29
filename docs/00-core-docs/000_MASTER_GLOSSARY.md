@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 3.1.0  
-**Date**: January 23, 2026  
+**Document Version**: 3.2.0  
+**Date**: January 28, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current – Aligned with v2.0.0 and Global English Server Mechanics
+**Status**: Current – Aligned with v2.2.0 and Global English Server Mechanics (January 2026)
 
 ---
 
@@ -76,15 +76,16 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 
 | Rating | Japanese | Effectiveness | Description |
 |--------|----------|---------------|-------------|
-| SS | SS | 120% | Perfect compatibility |
-| S | S | 110% | Excellent compatibility |
-| A | A | 100% | Good compatibility |
+| S | S | 105-110% | Maximum compatibility (S is the highest grade) |
+| A | A | 100% | Good compatibility (baseline) |
 | B | B | 90% | Adequate compatibility |
 | C | C | 80% | Below average |
 | D | D | 70% | Poor compatibility |
 | E | E | 60% | Very poor |
 | F | F | 50% | Minimal compatibility |
 | G | G | 40% | Incompatible |
+
+> **Note:** S is the maximum aptitude grade. SS does NOT exist in the game. Only S-rank provides positive bonuses; A-rank is the baseline with no bonus/penalty.
 
 > *Race mechanics exclusive to the Japanese server, like Charge Up, Compete Before Spurt, or Stamina Limit Break, are **not implemented** in the Global English server as of January 2026.*  
 
@@ -122,7 +123,7 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 | Term      | Japanese | Global Mechanic (EN)                                                    |
 |-----------|----------|-------------------------------------------------------------------------|
 | Skill Point (SP) | スキルポイント | Earned via races/events, spent to purchase skills                    |
-| Skill Hint       | ヒント      | Discount for skill SP cost; **each hint level reduces SP by 20% (max 3 hints = 60% total discount)**; applies when buying the skill |
+| Skill Hint       | ヒント      | Discount for skill SP cost; **5 hint levels with progressive discounts: Level 1 = 10%, Level 2 = 20%, Level 3 = 30%, Level 4 = 35%, Level 5 = 40% (maximum)**; applies when buying the skill |
 | Skill Evolution  | 進化       | Upgrade of some (not all) Normal → Rare skills under set conditions   |
 | Skill Rarity     | レアリティ    | Normal (white), Rare (gold), Unique (rainbow)                        |
 
@@ -263,7 +264,7 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 | Turn Range | 1-78 | Valid turn numbers |
 | Energy Range | 0-100 | Energy level percentage |
 | Deck Size | 6 cards | Exactly 6 cards (5 owned + 1 borrowed) |
-| Hint Level | 0-3 | Maximum 3 hints per skill (60% discount) |
+| Hint Level | 0-5 | Maximum 5 hints per skill (40% discount at level 5) |
 
 ---
 
@@ -511,6 +512,7 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 3.2.0 | 2026-01-28 | Development Team | Updated to v2.2.0; corrected aptitude grades (S is maximum, SS does NOT exist); updated hint system to 5 levels (10%/20%/30%/35%/40%); aligned with game-accurate mechanics from Global English Server |
 | 3.1.0 | 2026-01-23 | Development Team (with user corrections & source references)| Updated per Global (English) server mechanics; clarified Guts/Wit, updated running style English labels, added Training, Legacy, and Bond definitions, and explicitly excluded JP-version-only features per community and official docs |
 | 3.0.0 | 2026-01-23 | Development Team | Comprehensive expansion aligned with v2.0.0; added AI, MCP, OCR, and external integration terminology; restructured into logical categories; added tables for visual clarity |
 | 2.1 | 2026-01-23 | Development Team | Updated terms to match current codebase and configs |

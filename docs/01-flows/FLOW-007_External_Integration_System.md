@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.1.0
-**Date**: January 24, 2026
+**Document Version**: 2.2.0
+**Date**: January 28, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned with codebase v2.0.0
+**Status**: Current - Updated with verified game mechanics from Global English Server
 
 ---
 
@@ -219,10 +219,11 @@ stateDiagram-v2
 
 ## Document Control
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 2.1.0 | 2026-01-24 | Development Team | Updated to align with v2.0.0 codebase, Circuit Breaker implementation, and OCR pipeline details |
-| 1.0.0 | 2026-01-14 | Development Team | Initial flow definitions |
+| Version | Date       | Author           | Changes |
+|---------|------------|------------------|---------|
+| 2.2.0   | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: OCR parsing updated for correct stat ranges (1200 base cap with overflow), aptitude grades (G-S scale, no SS), track conditions (Firm/Good/Soft/Heavy) |
+| 2.1.0   | 2026-01-24 | Development Team | Updated to align with v2.0.0 codebase, Circuit Breaker implementation, and OCR pipeline details |
+| 1.0.0   | 2026-01-14 | Development Team | Initial flow definitions |
 
 ---
 

@@ -237,7 +237,7 @@ For GitHub Actions or similar CI:
    - Skill catalog browsing
    - Skill search functionality
    - Skill acquisition with SP cost
-   - Skill hint system (20-40% discount)
+   - Skill hint system (5 levels: 10%/20%/30%/35%/40% max)
    - Skill evolution chains
    - Skill equipping/unequipping
    - SP balance tracking

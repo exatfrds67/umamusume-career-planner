@@ -9,6 +9,7 @@ use App\Models\Race;
 use App\Models\Skill;
 use App\Neuron\Agents\RaceStrategyAgent;
 use App\Neuron\Responses\RaceStrategyResponse;
+use App\Services\RaceConditionService;
 use Illuminate\Support\Facades\Log;
 use NeuronAI\Chat\Messages\UserMessage;
 
@@ -17,6 +18,8 @@ use NeuronAI\Chat\Messages\UserMessage;
  *
  * Acts as an intermediary between controllers and the RaceStrategyAgent.
  * Handles data formatting for agent consumption and response parsing.
+ *
+ * **Phase 7**: Integrated with RaceConditionService for condition-aware strategies
  *
  * **Validates: Requirements 7.1, 7.2, 7.3, 7.4**
  */
@@ -30,7 +33,8 @@ class RaceStrategyService
     public function __construct(
         private Character $characterModel,
         private Race $raceModel,
-        private Skill $skillModel
+        private Skill $skillModel,
+        private RaceConditionService $conditionService
     ) {}
 
     /**
@@ -145,6 +149,63 @@ class RaceStrategyService
         }
 
         $context .= "\n";
+
+        // Add condition analysis if weather/track data available
+        if (isset($raceData['track_condition'], $raceData['surface'])) {
+            $trackCondition = (string) $raceData['track_condition'];
+            $surface = (string) $raceData['surface'];
+
+            if (
+                $this->conditionService->isValidTrackCondition($trackCondition) &&
+                $this->conditionService->isValidSurface($surface)
+            ) {
+                $context .= "## Track Condition Analysis\n";
+
+                // Get condition impact
+                $impactDescription = $this->conditionService->getConditionImpactDescription($trackCondition, $surface);
+                $impactScore = $this->conditionService->calculatePerformanceImpact($trackCondition, $surface);
+                $isWet = $this->conditionService->isWetCondition($trackCondition);
+                $severity = $this->conditionService->getConditionSeverity($trackCondition);
+
+                $context .= "- Impact: {$impactDescription}\n";
+                $context .= "- Performance Score: {$impactScore}/100\n";
+                $context .= '- Condition Type: '.($isWet ? 'Wet' : 'Dry')."\n";
+                $context .= "- Severity Level: {$severity}/3\n";
+
+                // Get recommended skills
+                $weather = isset($raceData['weather']) ? (string) $raceData['weather'] : null;
+                $recommendedSkills = $this->conditionService->getRecommendedSkills($weather, $trackCondition);
+
+                if (! empty($recommendedSkills)) {
+                    $context .= "- Recommended Skills for Conditions:\n";
+                    foreach ($recommendedSkills as $skill) {
+                        $context .= "  * {$skill}\n";
+                    }
+                }
+
+                // Calculate modified stats
+                $stats = [
+                    'speed' => $currentStats['speed'] ?? 0,
+                    'stamina' => $currentStats['stamina'] ?? 0,
+                    'power' => $currentStats['power'] ?? 0,
+                    'guts' => $currentStats['guts'] ?? 0,
+                    'wit' => $currentStats['wit'] ?? 0,
+                ];
+
+                $modifiedStats = $this->conditionService->applyConditionPenalties($stats, $trackCondition, $surface);
+
+                $context .= "- Effective Stats (with condition penalties):\n";
+                foreach (['speed', 'stamina', 'power', 'guts', 'wit'] as $stat) {
+                    $original = $stats[$stat];
+                    $modified = $modifiedStats[$stat];
+                    $diff = $modified - $original;
+                    $diffStr = $diff >= 0 ? "+{$diff}" : (string) $diff;
+                    $context .= '  * '.ucfirst($stat).": {$modified} (original: {$original}, {$diffStr})\n";
+                }
+
+                $context .= "\n";
+            }
+        }
 
         // Character basic info
         $context .= "## Character Information\n";

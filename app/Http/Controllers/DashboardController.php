@@ -19,12 +19,12 @@ class DashboardController extends Controller
             ->orderBy('updated_at', 'desc')
             ->get();
 
-        // Get selected character from request or default to first active character
+        // Get selected character from request parameter or default to first active character
         $selectedCharacterId = $request->query('character');
         $selectedCharacter = null;
 
         if ($selectedCharacterId) {
-            $selectedCharacter = $characters->firstWhere('id', $selectedCharacterId);
+            $selectedCharacter = $characters->firstWhere('id', (int) $selectedCharacterId);
         }
 
         if (! $selectedCharacter) {
@@ -38,6 +38,7 @@ class DashboardController extends Controller
             'characters' => $characters,
             'selectedCharacter' => $selectedCharacter,
             'hasCharacters' => $characters->isNotEmpty(),
+            'selectedCharacterId' => $selectedCharacter?->id,
             ...$dashboardData,
         ]);
     }

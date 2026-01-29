@@ -85,7 +85,7 @@ This directory contains comprehensive screenshots of all pages in the Umamusume 
 - Character creation wizard with multi-step form
 - Grid and list view layouts
 - Stat tracking (Speed, Stamina, Power, Guts, Wisdom)
-- Aptitude grades (G through SS)
+- Aptitude grades (G through S, S is maximum)
 - Avatar management
 
 ### 3. **Training System**
@@ -105,7 +105,7 @@ This directory contains comprehensive screenshots of all pages in the Umamusume 
 ### 5. **Skill System**
 
 - Comprehensive skill catalog
-- Hint tracking (20-40% SP reduction)
+- Hint tracking (5 levels: 10%/20%/30%/35%/40% max SP reduction)
 - Evolution paths (Normal → Rare)
 - SP cost optimization
 
@@ -195,7 +195,7 @@ This directory contains comprehensive screenshots of all pages in the Umamusume 
 ### Data Visualization
 
 - Stat progress bars
-- Grade badges (G through SS)
+- Grade badges (G through S, S is maximum)
 - Mood indicators
 - Energy meters
 - Progress tracking

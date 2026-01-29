@@ -50,6 +50,7 @@ Route::middleware('auth:sanctum')->prefix('v1/profile')->name('api.v1.profile.')
     Route::put('/', [App\Http\Controllers\ProfileController::class, 'updateApi'])->name('update');
     Route::put('/password', [App\Http\Controllers\ProfileController::class, 'changePasswordApi'])->name('password.change');
     Route::post('/avatar', [App\Http\Controllers\ProfileController::class, 'uploadAvatar'])->name('avatar');
+    Route::delete('/avatar', [App\Http\Controllers\ProfileController::class, 'deleteAvatar'])->name('avatar.delete');
     Route::get('/export', [App\Http\Controllers\ProfileController::class, 'exportData'])->name('export');
     Route::delete('/', [App\Http\Controllers\ProfileController::class, 'destroyApi'])->name('destroy');
 });

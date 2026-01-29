@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.1.0  
-**Date**: January 24, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.0.0  
+**Status**: Current - Aligned with codebase v2.2.0  
 **Related Documents**: [SRS-FR-07], [SDS-4.6], [DBD-4.5], [SPEC-006]
 
 **Source Specs**:
@@ -29,13 +29,7 @@
 
 - [PRD-006: AI Advisory System](#prd-006-ai-advisory-system)
   - [1. Executive Summary](#1-executive-summary)
-    - [1.1 Purpose](#11-purpose)
-    - [1.2 Problem Statement](#12-problem-statement)
-    - [1.3 Solution Overview](#13-solution-overview)
   - [2. Product Overview](#2-product-overview)
-    - [2.1 Objectives](#21-objectives)
-    - [2.2 Scope (In)](#22-scope-in)
-    - [2.3 Scope (Out)](#23-scope-out)
   - [3. User Stories](#3-user-stories)
   - [4. Functional Requirements](#4-functional-requirements)
   - [5. User Interface Requirements](#5-user-interface-requirements)
@@ -44,6 +38,7 @@
   - [8. Success Metrics](#8-success-metrics)
   - [9. Release Plan](#9-release-plan)
   - [10. Open Questions and Assumptions](#10-open-questions-and-assumptions)
+  - [Changelog](#changelog)
 
 ---
 
@@ -77,8 +72,8 @@ Game mechanics in *Uma Musume* are opaque and highly mathematical. Players strug
 
 - **Advice Domains**: Training optimization, Race preparation, Skill acquisition, Deck building.
 - **Interaction Modes**:
-  - *Reactive*: Contextual tips on dashboard (e.g., "Training Risk High").
-  - *Interactive*: Chat interface for specific questions ("Why should I rest?").
+  - *Reactive*: Contextual tips on dashboard.
+  - *Interactive*: Chat interface for specific questions.
 - **Agent Framework**: Implementation of Neuron AI agents with specific toolsets.
 - **Context Management**: Persistence of conversation history via database and MCP Memory server.
 - **Cost Control**: Token tracking and budget limits for cloud provider usage.
@@ -95,8 +90,8 @@ Game mechanics in *Uma Musume* are opaque and highly mathematical. Players strug
 | ID | Actor | Story | Acceptance Criteria |
 |----|-------|-------|---------------------|
 | US-6.1 | Player | I want to ask "What should I train next?" and get an answer based on my current stats. | AI analyzes stats/goals and suggests specific facility. |
-| US-6.2 | Player | I want to know why the AI recommends resting when I have 60% energy. | Response includes reasoning (e.g., "High failure risk on next turn"). |
-| US-6.3 | Player | I want to use a local model to avoid data leaving my network (and save cost). | System allows selecting "Local Only" or prioritizing Ollama. |
+| US-6.2 | Player | I want to know why the AI recommends resting when I have 60% energy. | Response includes reasoning. |
+| US-6.3 | Player | I want to use a local model to avoid data leaving my network. | System allows selecting "Local Only" or prioritizing Ollama. |
 | US-6.4 | Player | I want the AI to remember that I'm building a "Betweener" strategy. | Context persists across the chat session via Memory MCP. |
 | US-6.5 | Admin | I want to set a daily spending limit for AWS Bedrock. | System stops Cloud routing when budget is exceeded. |
 
@@ -118,13 +113,45 @@ Game mechanics in *Uma Musume* are opaque and highly mathematical. Players strug
 - **Skill Agent**: Uses `SkillCatalogTool` and `SPBudgetTool`.
 - **Orchestrator**: Single entry point (`AIAdvisoryService`) that dispatches to specific agents based on topic.
 
-### 4.3 Model Context Protocol (MCP) [FR-07.4]
+### 4.3 Game Mechanics Knowledge Base [FR-07.2]
+
+The AI system must be trained on accurate game mechanics including:
+
+**Skill Hint System**:
+
+- 5 hint levels with 10%/10%/10%/5%/5% discounts (40% max)
+- Additional sources: Fast Learner (+10%), Skill Sparks, Hint Books
+
+**Aptitude System**:
+
+- Grade scale: G → F → E → D → C → B → A → S (no SS)
+- A-rank is baseline (0%); only S-rank provides positive bonuses
+
+**Stat System**:
+
+- Soft cap at 1200 with diminishing returns above
+- Important breakpoints: 901, 1200, 1600
+- Stamina 1200+ activates "Stamina Contest" buff
+
+**Track Conditions**:
+
+- Firm: No penalties
+- Good: -50 Power
+- Soft: -50/-100 Power, +2%/sec stamina drain
+- Heavy: -50/-100 Power, -50 Speed, +2%/sec stamina drain
+
+**Career Structure**:
+
+- ~70-78 turns across 3 years
+- Summer Training Camp: 4 turns, all facilities Level 5
+
+### 4.4 Model Context Protocol (MCP) [FR-07.4]
 
 - **Memory Server**: Store long-term user preferences and run strategy.
 - **Filesystem Server**: (Internal) Access to static game data files for RAG.
 - **Fetch Server**: Retrieve latest meta updates from web if configured.
 
-### 4.4 Cost & Usage Tracking [FR-07.5]
+### 4.5 Cost & Usage Tracking [FR-07.5]
 
 - **Metrics**: Track input/output tokens per request.
 - **Logging**: Persist usage to `ucp_ai_conversations` and `ucp_mcp_tool_usage`.
@@ -139,12 +166,12 @@ Game mechanics in *Uma Musume* are opaque and highly mathematical. Players strug
 - **Position**: Collapsible sidebar or floating action button.
 - **State**: "Thinking..." indicator during inference.
 - **Format**: Markdown support for bolding key terms and listing steps.
-- **Context Badge**: Shows which model answered (e.g., "🤖 Local" or "☁️ Cloud").
+- **Context Badge**: Shows which model answered (e.g., "Local" or "Cloud").
 
 ### 5.2 Contextual Tips
 
 - **Location**: Embedded in Training/Race screens.
-- **Behavior**: Auto-generated short tips (1-2 sentences) appearing near decision buttons.
+- **Behavior**: Auto-generated short tips appearing near decision buttons.
 - **Action**: "Explain" button to expand the tip into a full chat session.
 
 ### 5.3 Settings Panel
@@ -180,7 +207,7 @@ Game mechanics in *Uma Musume* are opaque and highly mathematical. Players strug
 - **Latency**:
   - Local: < 800ms for simple queries.
   - Cloud: < 3s for complex strategy.
-- **Privacy**: Local requests must never leave the user's infrastructure (if self-hosted) or server (if hosted). Cloud requests must strip PII.
+- **Privacy**: Local requests must never leave the user's infrastructure. Cloud requests must strip PII.
 - **Reliability**: Circuit breaker prevents cascading failures if AI providers are down.
 
 ---
@@ -195,14 +222,19 @@ Game mechanics in *Uma Musume* are opaque and highly mathematical. Players strug
 
 ## 9. Release Plan
 
-- **v2.0.0 (Current)**:
+- **v2.0.0**:
   - Hybrid Router (Ollama/Bedrock).
   - Core Agents (Training, Race).
   - Basic Context Injection.
-- **v2.1.0 (Next)**:
+- **v2.1.0**:
   - Advanced Memory MCP (cross-run memory).
   - Fine-tuned Llama model for game-specific jargon.
   - Voice input/output support.
+- **v2.2.0 (Current)**:
+  - Updated game mechanics knowledge base with verified data.
+  - Corrected skill hint system (5 levels, 40% max).
+  - Corrected aptitude system (G-S scale, no SS).
+  - Track condition impact modeling.
 
 ---
 
@@ -211,3 +243,13 @@ Game mechanics in *Uma Musume* are opaque and highly mathematical. Players strug
 - **Assumption**: User hosting the app locally has hardware capable of running Ollama (8GB+ RAM recommended).
 - **Assumption**: Cloud API keys are managed securely via `.env`.
 - **Open Question**: How much history should be injected into the prompt context window? *Current: Last 5 turns + Current State.*
+
+---
+
+## Changelog
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 2.2.0 | January 28, 2026 | Updated with verified game mechanics from Global English Server: added game mechanics knowledge base section with accurate skill hint system (5 levels, 40% max), aptitude system (G-S, no SS), stat system (1200+ diminishing returns), track conditions, and career structure (~70-78 turns). |
+| 2.1.0 | January 24, 2026 | Aligned with codebase v2.0.0, added source specs references. |
+| 2.0.0 | January 2026 | Initial v2 release with hybrid AI architecture. |

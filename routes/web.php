@@ -73,6 +73,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/characters/{character}', [CharacterController::class, 'destroy'])->name('characters.destroy');
     Route::post('/characters/{character}/rest', [CharacterController::class, 'rest'])->name('characters.rest');
     Route::post('/characters/{character}/next-turn', [CharacterController::class, 'nextTurn'])->name('characters.next-turn');
+    Route::post('/characters/{character}/toggle-pin', [CharacterController::class, 'togglePin'])->name('characters.toggle-pin');
 
     // Factor management routes
     Route::get('/characters/{character}/factors', [CharacterController::class, 'manageFactors'])->name('characters.factors.manage');
@@ -162,6 +163,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [App\Http\Controllers\ProfileController::class, 'changePassword'])->name('profile.password.change');
     Route::post('/profile/avatar', [App\Http\Controllers\ProfileController::class, 'uploadAvatar'])->name('profile.avatar');
+    Route::delete('/profile/avatar', [App\Http\Controllers\ProfileController::class, 'deleteAvatar'])->name('profile.avatar.delete');
     Route::get('/profile/export', [App\Http\Controllers\ProfileController::class, 'exportData'])->name('profile.export');
     Route::delete('/profile', [App\Http\Controllers\ProfileController::class, 'destroy'])->name('profile.destroy');
 
@@ -244,6 +246,11 @@ Route::get('/test-layout', function () {
 Route::get('/design-system-demo', function () {
     return view('design-system-demo');
 })->name('design-system.demo');
+
+// Components demo route - showcases all Phase 1-3 components
+Route::get('/components-demo', function () {
+    return view('components-demo');
+})->name('components.demo');
 
 // Frontend foundation demo route
 Route::get('/demo', function () {

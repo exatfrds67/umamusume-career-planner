@@ -5,16 +5,33 @@
         /** @var \App\Models\Character $character */
     @endphp
     <div class="max-w-7xl mx-auto space-y-6">
-        <!-- Header / Back Navigation -->
-        <div class="flex items-center justify-between">
-            <a href="{{ route('characters.index') }}"
-                class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-colors">
-                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                </svg>
-                Back to Characters
-            </a>
+        <!-- Breadcrumb Navigation -->
+        <x-breadcrumb :items="[['label' => 'Characters', 'url' => route('characters.index')], ['label' => $character->name]]" />
+
+        <!-- Header / Action Buttons -->
+        <div class="flex items-center justify-end">
             <div class="flex space-x-3">
+                <form action="{{ route('characters.toggle-pin', $character) }}" method="POST" class="inline">
+                    @csrf
+                    <button type="submit"
+                        class="btn {{ $character->isPinnedBy(Auth::id()) ? 'btn-primary' : 'btn-secondary' }}"
+                        title="{{ $character->isPinnedBy(Auth::id()) ? 'Unpin character' : 'Pin character for quick access' }}">
+                        @if ($character->isPinnedBy(Auth::id()))
+                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M16 9V4h1c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1h1v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z" />
+                            </svg>
+                            Pinned
+                        @else
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                            </svg>
+                            Pin
+                        @endif
+                    </button>
+                </form>
+
                 <form action="{{ route('characters.rest', $character) }}" method="POST" class="inline">
                     @csrf
                     <button type="submit" class="btn btn-secondary text-green-700 dark:text-green-400">
@@ -51,47 +68,14 @@
         <section class="card overflow-visible rounded-xl" role="region" aria-labelledby="character-overview-heading">
             <div class="p-6 md:p-8 relative overflow-hidden">
                 <!-- Background Decoration -->
-                <div
-                    class="absolute top-0 right-0 -mt-16 -mr-16 w-64 h-64 bg-primary-100 dark:bg-primary-900/20 rounded-full blur-3xl opacity-50 pointer-events-none"
+                <div class="absolute top-0 right-0 -mt-16 -mr-16 w-64 h-64 bg-primary-100 dark:bg-primary-900/20 rounded-full blur-3xl opacity-50 pointer-events-none"
                     aria-hidden="true">
                 </div>
 
                 <div class="flex flex-col md:flex-row gap-8 items-start relative">
                     <!-- Avatar -->
                     <div class="shrink-0 relative">
-                        @if ($character->avatar_url)
-                            <img src="{{ $character->avatar_url }}" alt="{{ $character->name }}"
-                                class="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white dark:border-gray-800 shadow-xl object-cover"
-                                loading="lazy" decoding="async">
-                        @else
-                            @php
-                                $normalizedName = strtolower(str_replace(' ', '-', $character->name));
-                                $availableAvatars = [
-                                    'agnes-tachyon',
-                                    'gold-ship',
-                                    'narita-brian',
-                                    'tokai-teio',
-                                    'vodka',
-                                    'daiwa-scarlet',
-                                    'el-condor-pasa',
-                                    'haru-urara',
-                                    'maruzensky',
-                                    'oguri-cap',
-                                ];
-                                $avatarClass = in_array($normalizedName, $availableAvatars)
-                                    ? "character-avatar-{$normalizedName}"
-                                    : 'character-avatar-default';
-                            @endphp
-                            <div class="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white dark:border-gray-800 shadow-xl bg-cover bg-center bg-linear-to-br {{ $avatarClass }}"
-                                aria-label="{{ $character->name }} avatar" role="img">
-                            </div>
-                        @endif
-                        <span class="absolute bottom-2 right-2 flex h-5 w-5">
-                            <span
-                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                            <span
-                                class="relative inline-flex rounded-full h-5 w-5 bg-green-500 border-2 border-white dark:border-gray-800"></span>
-                        </span>
+                        <x-character-portrait :image="$character->avatar_url" :alt="$character->name" size="xl" />
                     </div>
 
                     <!-- Details -->
@@ -99,9 +83,21 @@
                         <div class="flex justify-between items-start">
                             <div>
                                 <div class="flex items-center gap-3 mb-1">
-                                    <h2 id="character-overview-heading" class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
+                                    <h2 id="character-overview-heading"
+                                        class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
                                         {{ $character->name }}</h2>
                                     <x-ui.grade-badge :grade="$character->getStatGrade($character->current_stats['speed'] ?? 0)" size="sm" />
+                                    @if ($character->isPinnedBy(Auth::id()))
+                                        <span
+                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-300"
+                                            title="Pinned character">
+                                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                                                <path
+                                                    d="M16 9V4h1c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1h1v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z" />
+                                            </svg>
+                                            Pinned
+                                        </span>
+                                    @endif
                                 </div>
                                 <div
                                     class="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-gray-600 dark:text-gray-400 font-medium">
@@ -164,141 +160,98 @@
             </div>
         </section>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Left Column: Stats -->
-            <div class="lg:col-span-2 space-y-6">
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            <!-- Left Column: Stats (Takes 2 columns) -->
+            <div class="xl:col-span-2 space-y-6">
                 <!-- Detailed Stats Card -->
                 <section class="card rounded-lg" role="region" aria-labelledby="stats-heading">
                     <header
                         class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between">
-                        <h2 id="stats-heading" class="text-lg font-bold text-gray-900 dark:text-white">Current Statistics</h2>
+                        <h2 id="stats-heading" class="text-lg font-bold text-gray-900 dark:text-white">Current Statistics
+                        </h2>
                         <span
                             class="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">Updated
                             {{ $character->updated_at->diffForHumans() }}</span>
                     </header>
                     <div class="card-body">
-                        <div class="space-y-6">
-                            @foreach (['speed' => 'blue', 'stamina' => 'orange', 'power' => 'red', 'guts' => 'pink', 'wit' => 'green'] as $stat => $color)
+                        <div class="space-y-4">
+                            @foreach (['speed', 'stamina', 'power', 'guts', 'wit'] as $stat)
                                 @php
                                     $val = $character->getStat($stat);
                                     $target = $character->goals['target_stats'][$stat] ?? 0;
-                                    $max = 1200;
-                                    $percentage = ($val / $max) * 100;
-                                    $targetPercentage = $target > 0 ? min(100, ($target / $max) * 100) : 0;
                                 @endphp
-                                <div class="group">
-                                    <div class="flex items-end justify-between mb-2">
-                                        <div class="flex items-center gap-2">
-                                            <span
-                                                class="w-16 text-sm font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">{{ ucfirst($stat) }}</span>
-                                            <x-ui.grade-badge :grade="$character->getStatGrade($val)" size="sm" />
-                                            <span
-                                                class="text-2xl font-bold text-gray-900 dark:text-white tabular-nums">{{ $val }}</span>
-                                        </div>
-                                        @if ($target > 0)
-                                            <div class="text-xs text-gray-400">Target: <span
-                                                    class="font-medium text-gray-600 dark:text-gray-300">{{ $target }}</span>
-                                            </div>
-                                        @endif
-                                    </div>
-
-                                    <div class="relative h-3 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
-                                        <!-- Target Marker -->
-                                        @if ($target > 0)
-                                            <div class="absolute top-0 bottom-0 w-0.5 bg-gray-400 dark:bg-gray-500 z-10"
-                                                @style(['left' => $targetPercentage . '%'])></div>
-                                        @endif
-
-                                        <!-- Fill -->
-                                        <div class="absolute top-0 left-0 bottom-0 rounded-full transition-all duration-500 ease-out stat-bar-{{ $stat }}"
-                                            @style(['width' => $percentage . '%'])></div>
-                                    </div>
-                                </div>
+                                <x-stat-bar :stat="$stat" :current="$val" :target="$target" />
                             @endforeach
                         </div>
                     </div>
-                </div>
-
-                <!-- Race Schedule -->
-                <section class="card rounded-lg" role="region" aria-labelledby="race-schedule-heading">
+                </section>
+                <!-- Support Deck -->
+                <section class="card rounded-lg" role="region" aria-labelledby="support-deck-heading">
                     <header
                         class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between">
-                        <h2 id="race-schedule-heading" class="text-lg font-bold text-gray-900 dark:text-white">Race Schedule</h2>
-                        <span class="text-xs text-gray-500 dark:text-gray-400">Upcoming Races</span>
-                    </header>
-                    @php
-                        $raceSchedule = $character->race_schedule ?? [];
-                        $upcomingRaces = is_array($raceSchedule) ? array_slice($raceSchedule, 0, 5) : [];
-                    @endphp
-                    @if (count($upcomingRaces) > 0)
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                <thead class="bg-gray-50 dark:bg-gray-800/50">
-                                    <tr>
-                                        <th
-                                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                            Race</th>
-                                        <th
-                                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                            Grade</th>
-                                        <th
-                                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                            Turn</th>
-                                        <th
-                                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                            Readiness</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                    @foreach ($upcomingRaces as $race)
-                                        @php
-                                            $raceName = $race['name'] ?? 'Unknown Race';
-                                            $raceGrade = $race['grade'] ?? 'G1';
-                                            $raceTurn = $race['turn'] ?? 0;
-                                            $readiness = $race['readiness'] ?? 'unknown';
-                                            $readinessColors = [
-                                                'excellent' =>
-                                                    'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-                                                'good' =>
-                                                    'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-                                                'fair' =>
-                                                    'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-                                                'poor' =>
-                                                    'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-                                                'unknown' =>
-                                                    'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-400',
-                                            ];
-                                            $readinessColor =
-                                                $readinessColors[$readiness] ?? $readinessColors['unknown'];
-                                        @endphp
-                                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                                            <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">
-                                                {{ $raceName }}</td>
-                                            <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
-                                                {{ $raceGrade }}</td>
-                                            <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">Turn
-                                                {{ $raceTurn }}</td>
-                                            <td class="px-4 py-3">
-                                                <span
-                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $readinessColor }}">
-                                                    {{ ucfirst($readiness) }}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    @else
-                        <div class="p-8 text-center text-gray-500 dark:text-gray-400">
-                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
+                        <h2 id="support-deck-heading" class="text-lg font-bold text-gray-900 dark:text-white">Support Deck
+                        </h2>
+                        <a href="{{ route('characters.deck-builder', $character) }}" class="btn btn-sm btn-primary"
+                            aria-label="Manage Support Deck">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    d="M12 4v16m8-8H4" />
                             </svg>
-                            <p class="mt-2">No races scheduled yet.</p>
-                        </div>
-                    @endif
+                            Manage Deck
+                        </a>
+                    </header>
+                    <div class="card-body">
+                        @if ($character->supportCards->count() > 0)
+                            <div class="space-y-2">
+                                @foreach ($character->supportCards as $supportCard)
+                                    @php
+                                        $card = $supportCard->supportCard;
+                                        $bondLevel = $supportCard->friendship_level ?? 0;
+                                        $bondMax = 100;
+                                        $bondPercentage = ($bondLevel / $bondMax) * 100;
+                                    @endphp
+                                    <div
+                                        class="flex items-center gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700">
+                                        <div
+                                            class="shrink-0 w-10 h-10 rounded-full bg-linear-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-sm">
+                                            {{ strtoupper(substr($card->card_type ?? 'S', 0, 1)) }}
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                                {{ $card->name ?? 'Unknown Card' }}</div>
+                                            <div class="flex items-center gap-2 mt-1">
+                                                <div
+                                                    class="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                                    <div class="h-full bg-primary-500 rounded-full transition-all"
+                                                        @style(['width' => $bondPercentage . '%'])></div>
+                                                </div>
+                                                <span
+                                                    class="text-xs text-gray-500 dark:text-gray-400 tabular-nums">{{ $bondLevel }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <div class="text-center text-sm text-gray-500 py-6">
+                                <svg class="mx-auto h-10 w-10 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                </svg>
+                                <p class="mb-3">No support cards equipped.</p>
+                                <a href="{{ route('characters.deck-builder', $character) }}"
+                                    class="inline-flex items-center text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 4v16m8-8H4" />
+                                    </svg>
+                                    Add Support Cards
+                                </a>
+                            </div>
+                        @endif
+                    </div>
                 </section>
 
                 {{-- 
@@ -343,8 +296,25 @@
                 --}}
             </div>
 
-            <!-- Right Column: Aptitudes -->
+            <!-- Right Column: Stats Overview & Aptitudes -->
             <div class="space-y-6">
+                <!-- Stats Overview -->
+                <section class="card rounded-lg" role="region" aria-labelledby="stats-visualization-heading">
+                    <header class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50">
+                        <h2 id="stats-visualization-heading" class="text-lg font-bold text-gray-900 dark:text-white">Stats
+                            Overview</h2>
+                    </header>
+                    <div class="card-body flex justify-center items-center py-4">
+                        <x-stat-radar-chart :stats="[
+                            'speed' => $character->getStat('speed'),
+                            'stamina' => $character->getStat('stamina'),
+                            'power' => $character->getStat('power'),
+                            'guts' => $character->getStat('guts'),
+                            'wit' => $character->getStat('wit'),
+                        ]" size="sm" />
+                    </div>
+                </section>
+
                 <!-- Aptitudes -->
                 <section class="card rounded-lg" role="region" aria-labelledby="aptitudes-heading">
                     <header class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50">
@@ -362,9 +332,9 @@
                         @foreach ($aptitudeGroups as $groupName => $aptitudes)
                             @if ($aptitudes->count() > 0)
                                 <div>
-                                    <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                                    <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
                                         {{ $groupName }}</h4>
-                                    <div class="grid grid-cols-2 gap-2">
+                                    <div class="space-y-2">
                                         @foreach ($aptitudes as $aptitude)
                                             @php
                                                 $name =
@@ -372,12 +342,7 @@
                                                     ($aptitude->surface_type ?? $aptitude->running_style);
                                                 $name = ucfirst(str_replace('_', ' ', $name));
                                             @endphp
-                                            <div
-                                                class="flex items-center justify-between p-2 rounded bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
-                                                <span class="text-sm dark:text-gray-300">{{ $name }}</span>
-                                                <span
-                                                    class="font-bold text-gray-900 dark:text-white">{{ $aptitude->grade }}</span>
-                                            </div>
+                                            <x-aptitude-display :type="$name" :grade="$aptitude->grade" />
                                         @endforeach
                                     </div>
                                 </div>
@@ -392,19 +357,28 @@
             </div>
         </div>
 
-        <!-- Skills, Support Deck, and Inherited Factors Row -->
+        <!-- Skills, Race Schedule, and Inherited Factors Row -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Skills -->
             <section class="card rounded-lg" role="region" aria-labelledby="skills-heading">
-                <header class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50">
+                <header
+                    class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between">
                     <h2 id="skills-heading" class="text-lg font-bold text-gray-900 dark:text-white">Skills</h2>
+                    <a href="{{ route('skills.index', ['character' => $character->id]) }}" class="btn btn-sm btn-primary"
+                        aria-label="Manage Skills">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Manage Skills
+                    </a>
                 </header>
                 <div class="p-2">
                     @if ($character->skills->count() > 0)
                         <div class="space-y-1">
                             @foreach ($character->skills->take(10) as $skill)
                                 <div
-                                    class="flex items-center justify-between p-2.5 rounded hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                    class="flex items-center justify-between p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                                     <div class="flex items-center gap-2">
                                         <div class="w-1.5 h-1.5 rounded-full bg-yellow-400"></div>
                                         <span
@@ -418,73 +392,81 @@
                             @endforeach
                         </div>
                     @else
-                        <div class="text-center text-sm text-gray-500 py-8">
-                            No skills acquired yet.
-                        </div>
-                    @endif
-                </div>
-            </section>
-
-            <!-- Support Deck -->
-            <section class="card rounded-lg" role="region" aria-labelledby="support-deck-heading">
-                <header
-                    class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between">
-                    <h2 id="support-deck-heading" class="text-lg font-bold text-gray-900 dark:text-white">Support Deck</h2>
-                    <a href="{{ route('characters.deck-builder', $character) }}" class="btn btn-sm btn-primary" aria-label="Manage Support Deck">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                        Manage Deck
-                    </a>
-                </header>
-                <div class="card-body">
-                    @if ($character->supportCards->count() > 0)
-                        <div class="space-y-3">
-                            @foreach ($character->supportCards as $supportCard)
-                                @php
-                                    $card = $supportCard->supportCard;
-                                    $bondLevel = $supportCard->friendship_level ?? 0;
-                                    $bondMax = 100;
-                                    $bondPercentage = ($bondLevel / $bondMax) * 100;
-                                @endphp
-                                <div
-                                    class="flex items-center gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700">
-                                    <div
-                                        class="shrink-0 w-10 h-10 rounded-full bg-linear-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-sm">
-                                        {{ strtoupper(substr($card->card_type ?? 'S', 0, 1)) }}
-                                    </div>
-                                    <div class="flex-1 min-w-0">
-                                        <div class="text-sm font-medium text-gray-900 dark:text-white truncate">
-                                            {{ $card->name ?? 'Unknown Card' }}</div>
-                                        <div class="flex items-center gap-2 mt-1">
-                                            <div
-                                                class="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                                                <div class="h-full bg-primary-500 rounded-full transition-all"
-                                                    @style(['width' => $bondPercentage . '%'])></div>
-                                            </div>
-                                            <span
-                                                class="text-xs text-gray-500 dark:text-gray-400 tabular-nums">{{ $bondLevel }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    @else
-                        <div class="text-center text-sm text-gray-500 py-8">
+                        <div class="text-center text-sm text-gray-500 py-6">
                             <svg class="mx-auto h-10 w-10 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                             </svg>
-                            <p class="mb-3">No support cards equipped.</p>
-                            <a href="{{ route('characters.deck-builder', $character) }}"
+                            <p class="mb-3">No skills acquired yet.</p>
+                            <a href="{{ route('skills.index', ['character' => $character->id]) }}"
                                 class="inline-flex items-center text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium">
                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M12 4v16m8-8H4" />
                                 </svg>
-                                Add Support Cards
+                                Browse Skills
                             </a>
+                        </div>
+                    @endif
+                </div>
+            </section>
+
+            <!-- Race Schedule -->
+            <section class="card rounded-lg" role="region" aria-labelledby="race-schedule-heading-bottom">
+                <header
+                    class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between">
+                    <h2 id="race-schedule-heading-bottom" class="text-lg font-bold text-gray-900 dark:text-white">Race
+                        Schedule</h2>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">Upcoming</span>
+                </header>
+                @php
+                    $raceSchedule = $character->race_schedule ?? [];
+                    $upcomingRaces = is_array($raceSchedule) ? array_slice($raceSchedule, 0, 5) : [];
+                @endphp
+                <div class="card-body">
+                    @if (count($upcomingRaces) > 0)
+                        <div class="space-y-2">
+                            @foreach ($upcomingRaces as $race)
+                                @php
+                                    $raceName = $race['name'] ?? 'Unknown Race';
+                                    $raceGrade = $race['grade'] ?? 'G1';
+                                    $raceTurn = $race['turn'] ?? 0;
+                                    $readiness = $race['readiness'] ?? 'unknown';
+                                    $readinessColors = [
+                                        'excellent' =>
+                                            'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+                                        'good' => 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+                                        'fair' =>
+                                            'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+                                        'poor' => 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+                                        'unknown' => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-400',
+                                    ];
+                                    $readinessColor = $readinessColors[$readiness] ?? $readinessColors['unknown'];
+                                @endphp
+                                <div
+                                    class="flex items-center justify-between p-2 rounded bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700">
+                                    <div class="flex-1 min-w-0">
+                                        <div class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                            {{ $raceName }}</div>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400">{{ $raceGrade }} • Turn
+                                            {{ $raceTurn }}</div>
+                                    </div>
+                                    <span
+                                        class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {{ $readinessColor }} ml-2">
+                                        {{ ucfirst($readiness) }}
+                                    </span>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="text-center text-sm text-gray-500 py-6">
+                            <svg class="mx-auto h-10 w-10 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <p class="mt-2">No races scheduled yet.</p>
                         </div>
                     @endif
                 </div>
@@ -494,11 +476,15 @@
             <section class="card rounded-lg" role="region" aria-labelledby="inherited-factors-heading">
                 <header
                     class="card-header bg-transparent border-b border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between">
-                    <h2 id="inherited-factors-heading" class="text-lg font-bold text-gray-900 dark:text-white">Inherited Factors</h2>
+                    <h2 id="inherited-factors-heading" class="text-lg font-bold text-gray-900 dark:text-white">Inherited
+                        Factors</h2>
                     @can('update', $character)
-                        <a href="{{ route('characters.factors.manage', $character) }}"
-                            class="text-xs text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium"
+                        <a href="{{ route('characters.factors.manage', $character) }}" class="btn btn-sm btn-primary"
                             aria-label="Manage Inherited Factors">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            </svg>
                             Manage
                         </a>
                     @endcan

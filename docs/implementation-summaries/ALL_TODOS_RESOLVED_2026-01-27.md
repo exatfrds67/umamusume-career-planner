@@ -172,7 +172,7 @@ This document summarizes the complete resolution of all TODO comments found in t
 - 6 tests covering:
   1. Character seeding with aptitudes
   2. Correct aptitude structure
-  3. Valid aptitude grades (G-SS)
+  3. Valid aptitude grades (G-S, S is maximum)
   4. Character-aptitude relationship integrity
   5. Querying characters by aptitude grade
   6. Aptitude type categorization (distance, surface, running style)

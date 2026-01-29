@@ -67,7 +67,7 @@ The requirements cover all aspects of the Umamusume Career Planner system:
 
 #### REQ-3.1.2: Aptitude Management (★★★★★)
 
-- **Description**: System SHALL record aptitude ratings (G through SS) for all distance categories and surfaces
+- **Description**: System SHALL record aptitude ratings (G through S, S is maximum) for all distance categories and surfaces
 - **Acceptance Criteria**:
   - Fixed aptitude ratings that cannot be changed through training
   - Visual indicators for aptitude strengths/weaknesses
@@ -211,10 +211,10 @@ The requirements cover all aspects of the Umamusume Career Planner system:
 
 #### REQ-3.4.2: Hint System and Cost Reduction (★★★★★)
 
-- **Description**: System SHALL track hint sources and calculate 20% SP cost reduction per duplicate hint with 40% maximum
+- **Description**: System SHALL track hint sources and calculate progressive SP cost reduction (5 levels: 10%/20%/30%/35%/40% max)
 - **Acceptance Criteria**:
   - Hint source tracking (support cards, events, inheritance)
-  - Cost reduction calculation (20% per duplicate, 40% max)
+  - Cost reduction calculation (5 levels: 10%/20%/30%/35%/40% max)
   - Red "!" indicator identification
   - Hint probability calculations
 - **Implements**: HintTracker, CostCalculator

@@ -3,6 +3,15 @@
 @section('title', 'Dashboard')
 
 @section('content')
+    @php
+        $topStatus = [
+            'currentTurn' => $metrics['currentTurn'] ?? null,
+            'maxTurns' => $metrics['maxTurns'] ?? null,
+            'spAvailable' => $selectedCharacter?->available_sp,
+            'storageMode' => null,
+        ];
+    @endphp
+
     <div class="space-y-6 animate-fade-in">
         <!-- Page Header with Welcome Message -->
         <div class="glass-card rounded-xl p-6 md:flex md:items-center md:justify-between">
@@ -26,8 +35,7 @@
                         <label for="character-selector" class="sr-only">Select character</label>
                         <select id="character-selector"
                             class="form-select rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm pr-10 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                            aria-label="Select character"
-                            data-url="{{ route('dashboard') }}"
+                            aria-label="Select character" data-url="{{ route('dashboard') }}"
                             onchange="window.location.href = this.dataset.url + '?character=' + this.value;">
                             @foreach ($characters as $character)
                                 <option value="{{ $character->id }}"
@@ -181,8 +189,14 @@
 
                 <!-- Left Column: Progress & Schedule (2/3 width) -->
                 <div class="lg:col-span-2 space-y-6">
+                    <!-- Turn Counter Widget -->
+                    <div class="glass-card rounded-xl p-6">
+                        <x-turn-counter :current="$metrics['currentTurn']" :total="$metrics['maxTurns']" />
+                    </div>
+
                     <!-- Goals Widget -->
-                    <x-dashboard.goals-widget :shortTermGoal="$goals['shortTerm']['goal']" :shortTermProgress="$goals['shortTerm']['progress']" :longTermGoal="$goals['longTerm']['goal']" :longTermProgress="$goals['longTerm']['progress']" :characterId="$selectedCharacter?->id" />
+                    <x-dashboard.goals-widget :shortTermGoal="$goals['shortTerm']['goal']" :shortTermProgress="$goals['shortTerm']['progress']" :longTermGoal="$goals['longTerm']['goal']" :longTermProgress="$goals['longTerm']['progress']"
+                        :characterId="$selectedCharacter?->id" />
 
                     <!-- Training Suggestions -->
                     <x-dashboard.training-suggestions :suggestions="$trainingSuggestions" />

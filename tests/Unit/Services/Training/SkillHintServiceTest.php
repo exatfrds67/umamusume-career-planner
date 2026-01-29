@@ -25,8 +25,8 @@ describe('SkillHintService', function () {
 
         expect($acquisition)->not->toBeNull()
             ->and($acquisition->hint_level)->toBe(1)
-            ->and($acquisition->sp_discount_applied)->toBe(20)
-            ->and($acquisition->final_sp_cost)->toBe(80);
+            ->and($acquisition->sp_discount_applied)->toBe(10) // VERIFIED: 10% for level 1
+            ->and($acquisition->final_sp_cost)->toBe(90); // 100 - 10% = 90
     });
 
     it('increments hint level on second hint', function () {
@@ -42,8 +42,31 @@ describe('SkillHintService', function () {
         $acquisition = $this->service->recordHint($character, $skill, $card2);
 
         expect($acquisition->hint_level)->toBe(2)
-            ->and($acquisition->sp_discount_applied)->toBe(40)
-            ->and($acquisition->final_sp_cost)->toBe(60);
+            ->and($acquisition->sp_discount_applied)->toBe(20) // VERIFIED: 20% for level 2
+            ->and($acquisition->final_sp_cost)->toBe(80); // 100 - 20% = 80
+    });
+
+    it('continues to level 5 for maximum discount', function () {
+        $character = Character::factory()->create();
+        $skill = Skill::factory()->create(['base_sp_cost' => 100]);
+        $card1 = SupportCard::factory()->create();
+        $card2 = SupportCard::factory()->create();
+        $card3 = SupportCard::factory()->create();
+        $card4 = SupportCard::factory()->create();
+        $card5 = SupportCard::factory()->create();
+
+        // First four hints
+        $this->service->recordHint($character, $skill, $card1);
+        $this->service->recordHint($character, $skill, $card2);
+        $this->service->recordHint($character, $skill, $card3);
+        $this->service->recordHint($character, $skill, $card4);
+
+        // Fifth hint should reach maximum
+        $acquisition = $this->service->recordHint($character, $skill, $card5);
+
+        expect($acquisition->hint_level)->toBe(5) // VERIFIED: Max level is 5
+            ->and($acquisition->sp_discount_applied)->toBe(40) // VERIFIED: 40% max
+            ->and($acquisition->final_sp_cost)->toBe(60); // 100 - 40% = 60
     });
 
     it('does not exceed maximum hint level', function () {
@@ -52,15 +75,21 @@ describe('SkillHintService', function () {
         $card1 = SupportCard::factory()->create();
         $card2 = SupportCard::factory()->create();
         $card3 = SupportCard::factory()->create();
+        $card4 = SupportCard::factory()->create();
+        $card5 = SupportCard::factory()->create();
+        $card6 = SupportCard::factory()->create();
 
-        // First two hints
+        // First five hints
         $this->service->recordHint($character, $skill, $card1);
         $this->service->recordHint($character, $skill, $card2);
+        $this->service->recordHint($character, $skill, $card3);
+        $this->service->recordHint($character, $skill, $card4);
+        $this->service->recordHint($character, $skill, $card5);
 
-        // Third hint should not increase level
-        $acquisition = $this->service->recordHint($character, $skill, $card3);
+        // Sixth hint should not increase level
+        $acquisition = $this->service->recordHint($character, $skill, $card6);
 
-        expect($acquisition->hint_level)->toBe(2) // Still 2
+        expect($acquisition->hint_level)->toBe(5) // Still 5
             ->and($acquisition->sp_discount_applied)->toBe(40) // Still 40%
             ->and($acquisition->final_sp_cost)->toBe(60); // No change
     });
@@ -114,18 +143,21 @@ describe('SkillHintService', function () {
         $skill2 = Skill::factory()->create(['name_en' => 'Stamina Up', 'base_sp_cost' => 120]);
         $card = SupportCard::factory()->create();
 
-        // Add 1 hint to skill1
+        // Add 1 hint to skill1 (10% discount)
         $this->service->recordHint($character, $skill1, $card);
 
-        // Add 2 hints to skill2
+        // Add 5 hints to skill2 (40% max discount)
+        $this->service->recordHint($character, $skill2, $card);
+        $this->service->recordHint($character, $skill2, $card);
+        $this->service->recordHint($character, $skill2, $card);
         $this->service->recordHint($character, $skill2, $card);
         $this->service->recordHint($character, $skill2, $card);
 
         $summary = $this->service->getHintSummary($character);
 
         expect($summary['total_skills_with_hints'])->toBe(2)
-            ->and($summary['total_hints'])->toBe(3) // 1 + 2
-            ->and($summary['total_sp_saved'])->toBe(68) // 20 + 48
-            ->and($summary['skills_with_max_hints'])->toBe(1); // skill2 has 2 hints (max)
+            ->and($summary['total_hints'])->toBe(6) // 1 + 5
+            ->and($summary['total_sp_saved'])->toBe(58) // 10 (skill1: 10%) + 48 (skill2: 40%)
+            ->and($summary['skills_with_max_hints'])->toBe(1); // skill2 has 5 hints (max)
     });
 });

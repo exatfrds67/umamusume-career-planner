@@ -1,8 +1,8 @@
 # TECH-FLOW-003: Race Strategy - Technical Flow & Task Breakdown
 
-**Document Version**: 2.1.0  
-**Date**: January 24, 2026  
-**Status**: Current - Aligned with codebase v2.0.0
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
+**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
 
 **Source Specifications**:
 
@@ -382,7 +382,26 @@ use App\Models\Character;
 class WeatherImpactCalculator
 {
     /**
-     * Calculate weather impact on race performance
+     * Calculate weather and track condition impact on race performance
+     * 
+     * Game-Accurate Track Condition System (Verified Jan 2026):
+     * 
+     * Track Conditions: Firm (良) → Good (稍重) → Soft (重) → Heavy (不良)
+     * 
+     * | Condition | Surface | Power Penalty | Speed Penalty | Stamina Drain |
+     * |-----------|---------|---------------|---------------|---------------|
+     * | Firm      | Any     | None          | None          | None          |
+     * | Good      | Turf    | -50           | None          | None          |
+     * | Good      | Dirt    | -50           | None          | None          |
+     * | Soft      | Turf    | -50           | None          | +2%/sec       |
+     * | Soft      | Dirt    | -100          | None          | +2%/sec       |
+     * | Heavy     | Turf    | -50           | -50           | +2%/sec       |
+     * | Heavy     | Dirt    | -100          | -50           | +2%/sec       |
+     * 
+     * Weather affects track condition probability (not stats directly):
+     * - Sunny/Cloudy: Higher chance of Firm
+     * - Rainy: Higher chance of Good/Soft
+     * - Snowy: Highest chance of Heavy
      * 
      * @param Race $race
      * @param Character $character
@@ -390,43 +409,61 @@ class WeatherImpactCalculator
      */
     public function calculateImpact(Race $race, Character $character): array
     {
-        $weatherModifier = $this->getWeatherModifier($race->weather, $race->surface);
-        $trackCondition = $this->getTrackConditionModifier($race->track_condition);
+        $trackCondition = $race->track_condition ?? 'firm';
+        $surface = $race->surface ?? 'turf';
+        
+        $penalties = $this->getTrackConditionPenalties($trackCondition, $surface);
+        $staminaDrainModifier = $this->getStaminaDrainModifier($trackCondition);
         
         $weatherSkills = $this->checkWeatherSkills($character, $race->weather);
+        $conditionSkills = $this->checkConditionSkills($character, $trackCondition);
         
         $recommendations = [];
-        if (!$weatherSkills) {
-            $recommendations[] = $this->getWeatherSkillRecommendation($race->weather, $race->surface);
+        if (empty($weatherSkills) && in_array($race->weather, ['rainy', 'snowy'])) {
+            $recommendations[] = $this->getWeatherSkillRecommendation($race->weather, $surface);
+        }
+        if (empty($conditionSkills) && $trackCondition !== 'firm') {
+            $recommendations[] = $this->getConditionSkillRecommendation($trackCondition);
         }
         
         return [
-            'weather_modifier' => $weatherModifier,
-            'track_condition_modifier' => $trackCondition,
+            'track_condition' => $trackCondition,
+            'power_penalty' => $penalties['power'],
+            'speed_penalty' => $penalties['speed'],
+            'stamina_drain_modifier' => $staminaDrainModifier,
             'has_weather_skills' => !empty($weatherSkills),
+            'has_condition_skills' => !empty($conditionSkills),
             'weather_skills' => $weatherSkills,
+            'condition_skills' => $conditionSkills,
             'recommendations' => $recommendations,
-            'total_impact' => $weatherModifier * $trackCondition,
+            'effective_power' => max(0, ($character->current_stats['power'] ?? 0) + $penalties['power']),
+            'effective_speed' => max(0, ($character->current_stats['speed'] ?? 0) + $penalties['speed']),
         ];
     }
     
-    private function getWeatherModifier(string $weather, string $surface): float
+    /**
+     * Get track condition penalties based on surface type
+     */
+    private function getTrackConditionPenalties(string $condition, string $surface): array
     {
-        return match([$weather, $surface]) {
-            ['rainy', 'turf'] => 0.95,
-            ['rainy', 'dirt'] => 1.02,
-            ['snowy', 'turf'] => 0.85,
-            ['snowy', 'dirt'] => 0.90,
-            default => 1.00,
+        return match([$condition, $surface]) {
+            ['firm', 'turf'], ['firm', 'dirt'] => ['power' => 0, 'speed' => 0],
+            ['good', 'turf'], ['good', 'dirt'] => ['power' => -50, 'speed' => 0],
+            ['soft', 'turf'] => ['power' => -50, 'speed' => 0],
+            ['soft', 'dirt'] => ['power' => -100, 'speed' => 0],
+            ['heavy', 'turf'] => ['power' => -50, 'speed' => -50],
+            ['heavy', 'dirt'] => ['power' => -100, 'speed' => -50],
+            default => ['power' => 0, 'speed' => 0],
         };
     }
     
-    private function getTrackConditionModifier(string $condition): float
+    /**
+     * Get stamina drain modifier for wet conditions
+     */
+    private function getStaminaDrainModifier(string $condition): float
     {
         return match($condition) {
-            'heavy' => 0.90,
-            'muddy' => 0.93,
-            'good' => 1.00,
+            'soft', 'heavy' => 1.02, // +2% stamina drain per second
             default => 1.00,
         };
     }
@@ -434,11 +471,31 @@ class WeatherImpactCalculator
     private function checkWeatherSkills(Character $character, string $weather): array
     {
         $weatherSkillMap = [
-            'rainy' => ['Rainy Day Expert', 'Mud Master'],
-            'snowy' => ['Snow Expert', 'Winter Warrior'],
+            'sunny' => ['Sunny Days ◯'],
+            'cloudy' => ['Cloudy Days ◯'],
+            'rainy' => ['Rainy Days ◯'],
+            'snowy' => ['Snowy Days ◯'],
         ];
         
         $requiredSkills = $weatherSkillMap[$weather] ?? [];
+        
+        return $character->skills()
+            ->whereIn('name', $requiredSkills)
+            ->get()
+            ->pluck('name')
+            ->toArray();
+    }
+    
+    private function checkConditionSkills(Character $character, string $condition): array
+    {
+        $conditionSkillMap = [
+            'firm' => ['Firm Conditions ◯'],
+            'good' => ['Wet Conditions ◯'],
+            'soft' => ['Wet Conditions ◯'],
+            'heavy' => ['Wet Conditions ◯'],
+        ];
+        
+        $requiredSkills = $conditionSkillMap[$condition] ?? [];
         
         return $character->skills()
             ->whereIn('name', $requiredSkills)
@@ -1299,6 +1356,7 @@ pie title Test Distribution
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: track conditions (Firm/Good/Soft/Heavy) with Power/Speed penalties and stamina drain modifiers; running style optimization aligned with game formulas |
 | 2.1.0 | 2026-01-24 | Development Team | Updated to v2.0.0 implementation standards; aligned with industry documentation guidelines; added comprehensive cross-references; enhanced code examples and diagrams |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with detailed specifications |
 | 1.0.0 | 2026-01-06 | Development Team | Initial draft |

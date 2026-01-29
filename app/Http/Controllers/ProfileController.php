@@ -20,7 +20,7 @@ class ProfileController extends Controller
     /**
      * Display the user's profile.
      */
-    public function show(Request $request): View
+    public function show(Request $request): View|JsonResponse
     {
         /** @var User $user */
         $user = $request->user();
@@ -32,6 +32,14 @@ class ProfileController extends Controller
             // Count races where finish_position is not null (completed races)
             'races_completed' => $user->races()->whereNotNull('finish_position')->count(),
         ];
+
+        // Return JSON for API requests
+        if ($request->expectsJson()) {
+            return response()->json([
+                'user' => $user,
+                'stats' => $stats,
+            ]);
+        }
 
         return view('profile.show', [
             'user' => $user,
@@ -47,8 +55,47 @@ class ProfileController extends Controller
         /** @var User $user */
         $user = $request->user();
 
+        // Get validated data
+        $validated = $request->validated();
+
+        // Only update fields that are present in the request
+        $updateData = [];
+
+        if (isset($validated['name'])) {
+            $updateData['name'] = $validated['name'];
+        }
+
+        if (isset($validated['email'])) {
+            $updateData['email'] = $validated['email'];
+        }
+
+        if (isset($validated['bio'])) {
+            $updateData['bio'] = $validated['bio'];
+        }
+
+        // Handle nested JSON fields - merge with existing data
+        if (isset($validated['preferences'])) {
+            $existingPreferences = $user->preferences->getArrayCopy();
+            $updateData['preferences'] = array_merge($existingPreferences, $validated['preferences']);
+        }
+
+        if (isset($validated['accessibility_settings'])) {
+            $existingAccessibility = $user->accessibility_settings->getArrayCopy();
+            $updateData['accessibility_settings'] = array_merge($existingAccessibility, $validated['accessibility_settings']);
+        }
+
+        if (isset($validated['ai_settings'])) {
+            $existingAiSettings = $user->ai_settings->getArrayCopy();
+            $updateData['ai_settings'] = array_merge($existingAiSettings, $validated['ai_settings']);
+        }
+
+        if (isset($validated['mcp_settings'])) {
+            $existingMcpSettings = $user->mcp_settings->getArrayCopy();
+            $updateData['mcp_settings'] = array_merge($existingMcpSettings, $validated['mcp_settings']);
+        }
+
         // Update user with validated data
-        $user->update($request->validated());
+        $user->update($updateData);
 
         return redirect()->route('profile.show')
             ->with('success', 'Profile updated successfully.');
@@ -144,6 +191,27 @@ class ProfileController extends Controller
     }
 
     /**
+     * Delete the user's avatar.
+     */
+    public function deleteAvatar(Request $request): JsonResponse
+    {
+        /** @var User $user */
+        $user = $request->user();
+
+        // Delete avatar file if exists
+        if (! empty($user->avatar_path) && Storage::disk('public')->exists($user->avatar_path)) {
+            Storage::disk('public')->delete($user->avatar_path);
+        }
+
+        // Clear avatar path from database
+        $user->update(['avatar_path' => null]);
+
+        return response()->json([
+            'message' => 'Avatar removed successfully.',
+        ]);
+    }
+
+    /**
      * Export the user's data.
      */
     public function exportData(Request $request): JsonResponse
@@ -178,15 +246,15 @@ class ProfileController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        $request->validate([
-            'password' => ['required', 'string', 'current_password'],
-            'confirmation' => ['required', 'string', 'in:DELETE'],
-        ], [
-            'confirmation.in' => 'Please type DELETE to confirm account deletion.',
-        ]);
-
         /** @var User $user */
         $user = $request->user();
+
+        $request->validate([
+            'password' => ['required', 'string', 'current_password'],
+            'confirmation' => ['required', 'string', 'in:'.$user->name],
+        ], [
+            'confirmation.in' => 'Account name does not match. Please type your account name exactly.',
+        ]);
 
         // Delete user's avatar if exists
         if (! empty($user->avatar_path) && Storage::disk('public')->exists($user->avatar_path)) {
@@ -208,15 +276,15 @@ class ProfileController extends Controller
      */
     public function destroyApi(Request $request): JsonResponse
     {
-        $request->validate([
-            'password' => ['required', 'string', 'current_password'],
-            'confirmation' => ['required', 'string', 'in:DELETE'],
-        ], [
-            'confirmation.in' => 'Please type DELETE to confirm account deletion.',
-        ]);
-
         /** @var User $user */
         $user = $request->user();
+
+        $request->validate([
+            'password' => ['required', 'string', 'current_password'],
+            'confirmation' => ['required', 'string', 'in:'.$user->name],
+        ], [
+            'confirmation.in' => 'Account name does not match. Please type your account name exactly.',
+        ]);
 
         // Delete user's avatar if exists
         if (! empty($user->avatar_path) && Storage::disk('public')->exists($user->avatar_path)) {

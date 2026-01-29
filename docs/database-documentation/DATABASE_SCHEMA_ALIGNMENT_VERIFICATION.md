@@ -40,7 +40,7 @@ The UmamusumeCareerPlanner application implements a comprehensive 18-table datab
 **Database Tables Supporting Requirement 1:**
 
 - **ucp_characters** - Primary character data with stats, energy, mood, career stage
-- **ucp_aptitudes** - Fixed talent ratings (G-SS) for all distance/surface/style combinations
+- **ucp_aptitudes** - Fixed talent ratings (G-S, S is maximum) for all distance/surface/style combinations
 - **ucp_factors** - Inheritance bonuses from 2 main parents + 4 grandparents
 - **ucp_skill_acquisitions** - Character-specific skill inventory and acquisition status
 
@@ -77,7 +77,7 @@ The UmamusumeCareerPlanner application implements a comprehensive 18-table datab
 **Database Tables Supporting Requirement 4:**
 
 - **ucp_skills** - Master skill database with evolution chains and SP costs
-- **ucp_skill_hints** - Hint tracking with 20% discount mechanics
+- **ucp_skill_hints** - Hint tracking with progressive discount mechanics (5 levels: 10%/20%/30%/35%/40% max)
 - **ucp_skill_acquisitions** - Character-specific skill acquisition and cost tracking
 - **ucp_support_cards** - Skill provision mappings
 
@@ -85,7 +85,7 @@ The UmamusumeCareerPlanner application implements a comprehensive 18-table datab
 
 - Skill evolution: `evolution_target_id`, `evolution_source_id`, `can_evolve`, `is_evolution` fields
 - SP costs: `base_sp_cost` field with rarity-based costs (Normal 120-180, Rare 180-240, Unique variable)
-- Hint discounts: `hint_count`, `discount_percentage` fields (20% per hint, 40% max)
+- Hint discounts: `hint_count`, `discount_percentage` fields (5 levels: 10%/20%/30%/35%/40% max)
 - Skill provision: `skill_hints_provided` JSON field in support_cards
 - Acquisition tracking: `is_acquired`, `acquisition_source`, `sp_cost_paid` fields
 

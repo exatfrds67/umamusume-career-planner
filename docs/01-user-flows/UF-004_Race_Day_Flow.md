@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.1.0  
-**Date**: January 24, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-003], [SPEC-003], [SRS], [BRS]
 
 **Source Specifications**:
@@ -271,6 +271,11 @@ stateDiagram-v2
 │  Weather: Sunny | Track Condition: Good                   │
 │  Days Until Race: 8 days (Turn 85)                        │
 │                                                            │
+│  ⚠️ Track Condition Effects (Good):                        │
+│  • Power: -50 (Turf penalty)                              │
+│  • Speed: No penalty                                       │
+│  • Stamina drain: Normal                                   │
+│                                                            │
 │  ┌────────────────────────────────────────────────────────┐│
 │  │ STAT REQUIREMENTS vs CURRENT                           ││
 │  ├────────────────────────────────────────────────────────┤│
@@ -281,7 +286,7 @@ stateDiagram-v2
 │  │            Rating: 🟢 Adequate                         ││
 │  │                                                        ││
 │  │ Power      Required: 400+    Current: 440  ✅ +40      ││
-│  │            Rating: 🟢 Good                             ││
+│  │            Rating: 🟢 Good (Note: -50 from track)      ││
 │  │                                                        ││
 │  │ Guts       Required: 420+    Current: 460  ✅ +40      ││
 │  │            Rating: 🟢 Good                             ││
@@ -291,11 +296,14 @@ stateDiagram-v2
 │  └────────────────────────────────────────────────────────┘│
 │                                                            │
 │  ┌────────────────────────────────────────────────────────┐│
-│  │ APTITUDE REQUIREMENTS                                  ││
+│  │ APTITUDE REQUIREMENTS (S is Maximum Grade)             ││
 │  ├────────────────────────────────────────────────────────┤│
 │  │ Distance (Medium): B  Current: A  ✅ Strong Match      ││
-│  │ Surface (Turf):    B  Current: A  ✅ Strong Match      ││
+│  │   → Speed bonus: 0% (A = baseline)                     ││
+│  │ Surface (Turf):    B  Current: S  ✅ Excellent Match   ││
+│  │   → Power bonus: +5% (S grade bonus)                   ││
 │  │ Style Preference:     Sashi (Late Surger) Recommended  ││
+│  │   → Wit bonus: 0% (A grade = baseline)                 ││
 │  └────────────────────────────────────────────────────────┘│
 │                                                            │
 │  Overall Readiness: 🟡 75% (Borderline)                    │
@@ -304,6 +312,33 @@ stateDiagram-v2
 │                          [PREPARE] [VIEW RECOMMENDATIONS]  │
 └────────────────────────────────────────────────────────────┘
 ```
+
+**Track Condition Effects (Verified Jan 2026)**:
+
+| Condition | Surface | Power Penalty | Speed Penalty | Stamina Drain |
+|-----------|---------|---------------|---------------|---------------|
+| Firm | Turf/Dirt | None | None | Normal |
+| Good | Turf | -50 | None | Normal |
+| Good | Dirt | -50 | None | Normal |
+| Soft | Turf | -50 | None | +2%/sec |
+| Soft | Dirt | -100 | None | +2%/sec |
+| Heavy | Turf | -50 | -50 | +2%/sec |
+| Heavy | Dirt | -100 | -50 | +2%/sec |
+
+**Aptitude Grade Bonuses (S is Maximum - No SS Exists)**:
+
+| Grade | Distance (Speed) | Surface (Power) | Style (Wit) |
+|-------|------------------|-----------------|-------------|
+| S | +5% | +5% | +10% |
+| A | 0% (baseline) | 0% (baseline) | 0% (baseline) |
+| B | -10% | -10% | -15% |
+| C | -20% | -20% | -25% |
+| D | -40% | -30% | -40% |
+| E | -60% | -50% | -60% |
+| F | -80% | -70% | -80% |
+| G | -90% | -90% | -90% |
+
+**Implementation Details**:
 
 **Stat Rating Criteria**:
 
@@ -315,8 +350,6 @@ stateDiagram-v2
 | Borderline | Current within 30 of Required | 🟡 |
 | Inadequate | Current < Required - 30 | 🔴 |
 
-**Implementation Details**:
-
 ```php
 // app/Services/RaceAnalysisService.php
 class RaceAnalysisService
@@ -326,11 +359,13 @@ class RaceAnalysisService
         $statGaps = $this->calculateStatGaps($career, $race);
         $aptitudeMatch = $this->calculateAptitudeMatch($career, $race);
         $skillMatch = $this->calculateSkillMatch($career, $race);
+        $trackConditionPenalties = $this->calculateTrackConditionPenalties($race);
         
         $overallScore = $this->calculateOverallReadiness([
             'stats' => $statGaps,
             'aptitudes' => $aptitudeMatch,
             'skills' => $skillMatch,
+            'trackConditions' => $trackConditionPenalties,
         ]);
         
         return new RaceReadiness(
@@ -338,8 +373,51 @@ class RaceAnalysisService
             statGaps: $statGaps,
             aptitudeMatch: $aptitudeMatch,
             skillMatch: $skillMatch,
+            trackConditionPenalties: $trackConditionPenalties,
             recommendations: $this->generateRecommendations($statGaps, $race),
         );
+    }
+    
+    /**
+     * Calculate track condition penalties (Verified Jan 2026)
+     */
+    private function calculateTrackConditionPenalties(Race $race): array
+    {
+        $condition = $race->track_condition;
+        $surface = $race->surface;
+        
+        return match([$condition, $surface]) {
+            ['firm', 'turf'], ['firm', 'dirt'] => ['power' => 0, 'speed' => 0, 'stamina_drain' => 1.0],
+            ['good', 'turf'], ['good', 'dirt'] => ['power' => -50, 'speed' => 0, 'stamina_drain' => 1.0],
+            ['soft', 'turf'] => ['power' => -50, 'speed' => 0, 'stamina_drain' => 1.02],
+            ['soft', 'dirt'] => ['power' => -100, 'speed' => 0, 'stamina_drain' => 1.02],
+            ['heavy', 'turf'] => ['power' => -50, 'speed' => -50, 'stamina_drain' => 1.02],
+            ['heavy', 'dirt'] => ['power' => -100, 'speed' => -50, 'stamina_drain' => 1.02],
+            default => ['power' => 0, 'speed' => 0, 'stamina_drain' => 1.0],
+        };
+    }
+    
+    /**
+     * Calculate aptitude bonuses (S is maximum grade - No SS exists)
+     */
+    private function calculateAptitudeBonus(string $grade, string $type): float
+    {
+        $bonusTable = [
+            'distance' => [ // Affects Speed
+                'S' => 0.05, 'A' => 0.00, 'B' => -0.10, 'C' => -0.20,
+                'D' => -0.40, 'E' => -0.60, 'F' => -0.80, 'G' => -0.90,
+            ],
+            'surface' => [ // Affects Power
+                'S' => 0.05, 'A' => 0.00, 'B' => -0.10, 'C' => -0.20,
+                'D' => -0.30, 'E' => -0.50, 'F' => -0.70, 'G' => -0.90,
+            ],
+            'style' => [ // Affects Wit
+                'S' => 0.10, 'A' => 0.00, 'B' => -0.15, 'C' => -0.25,
+                'D' => -0.40, 'E' => -0.60, 'F' => -0.80, 'G' => -0.90,
+            ],
+        ];
+        
+        return $bonusTable[$type][$grade] ?? 0.0;
     }
     
     private function calculateStatGaps(CareerRun $career, Race $race): array
@@ -1031,6 +1109,7 @@ flowchart LR
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server (Jan 2026); added track condition modifiers (Firm/Good/Soft/Heavy with Power/Speed/Stamina penalties); corrected aptitude bonuses (S=max grade with +5%/+10% bonuses, A=0% baseline); updated running style aptitude effects on Wit stat |
 | 2.1.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 architecture; added race analysis engine details, AI integration, readiness calculation, win probability formulas; comprehensive error handling and testing criteria |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with basic flow |
 | 1.0.0 | 2026-01-03 | Development Team | Initial draft |
@@ -1052,4 +1131,4 @@ flowchart LR
 
 ---
 
-*This user flow reflects the current race strategy system implementation as of version 2.1.0. For the latest updates, refer to the online documentation.*
+*This user flow reflects the current race strategy system implementation as of version 2.2.0. For the latest updates, refer to the online documentation.*

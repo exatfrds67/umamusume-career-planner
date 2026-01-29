@@ -14,16 +14,25 @@
 
 @section('content')
     <main class="container mx-auto px-4 py-8">
+        <!-- Breadcrumb -->
+        <x-breadcrumb 
+            :items="[
+                ['label' => 'Training Predictions', 'url' => route('training.predictions')],
+                ['label' => $characterName]
+            ]" 
+            class="mb-6"
+        />
+
         <!-- Back Button -->
-        <nav class="mb-6" aria-label="Breadcrumb">
-            <a href="{{ route('training.predictions') }}"
-                class="inline-flex items-center text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        <div class="mb-6">
+            <a href="{{ route('training.predictions') }}" 
+               class="inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                 </svg>
                 Back to Training Predictions
             </a>
-        </nav>
+        </div>
 
         <!-- Character Header -->
         <header class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
@@ -38,7 +47,10 @@
                     <ul class="space-y-2">
                         @foreach (['speed', 'stamina', 'power', 'guts', 'wit'] as $stat)
                             <li class="flex justify-between items-center">
-                                <span class="text-sm text-gray-600 dark:text-gray-400 capitalize">{{ $stat }}</span>
+                                <div class="flex items-center gap-2">
+                                    <x-type-icon :stat="$stat" size="sm" />
+                                    <span class="text-sm text-gray-600 dark:text-gray-400 capitalize">{{ $stat }}</span>
+                                </div>
                                 <span class="text-sm font-bold text-gray-900 dark:text-white">
                                     {{ $characterStats[$stat] ?? 0 }}
                                 </span>
@@ -52,23 +64,12 @@
                     <h2 id="status-heading" class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Status</h2>
                     <div class="space-y-4">
                         <div>
-                            <span id="energy-label" class="text-xs text-gray-600 dark:text-gray-400 block mb-1">Energy</span>
-                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2" 
-                                 role="progressbar" 
-                                 aria-labelledby="energy-label" 
-                                 aria-valuenow="{{ $energyLevel }}" 
-                                 aria-valuemin="0" 
-                                 aria-valuemax="100">
-                                <div class="bg-green-500 h-2 rounded-full"
-                                    :style="{ width: '{{ $energyLevel }}%' }"></div>
-                            </div>
-                            <span class="text-xs font-medium text-gray-900 dark:text-white mt-1 block">{{ $energyLevel }}%</span>
+                            <span class="text-xs text-gray-600 dark:text-gray-400 block mb-2">Energy</span>
+                            <x-energy-gauge :level="$energyLevel" size="sm" />
                         </div>
                         <div>
-                            <span class="text-xs text-gray-600 dark:text-gray-400 block">Mood</span>
-                            <div class="text-sm font-semibold text-gray-900 dark:text-white capitalize mt-1">
-                                {{ $moodStatus }}
-                            </div>
+                            <span class="text-xs text-gray-600 dark:text-gray-400 block mb-2">Mood</span>
+                            <x-condition-badge :condition="$moodStatus" />
                         </div>
                     </div>
                 </section>

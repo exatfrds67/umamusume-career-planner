@@ -2,13 +2,12 @@
 
 @section('content')
     <!-- Desktop Sidebar Stepper (lg+ screens, WF-002 Spec) -->
-    <aside class="hidden lg:block fixed left-0 top-16 h-[calc(100%-4rem)] w-56 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 shadow-sm z-40 overflow-y-auto"
+    <aside
+        class="hidden lg:block fixed left-0 top-16 h-[calc(100%-4rem)] w-56 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 shadow-sm z-40 overflow-y-auto"
         x-data="{ steps: ['Basic Info', 'Stats', 'Aptitudes', 'Review'], descriptions: ['Name & scenario', 'Initial stats setup', 'Distance, surface, style', 'Review & confirm'] }">
         <nav class="space-y-2 p-4" role="navigation" aria-label="Wizard steps">
             <template x-for="(step, index) in steps" :key="index">
-                <button
-                    type="button"
-                    @click="$root.goToStep && $root.goToStep(index + 1)"
+                <button type="button" @click="$root.goToStep && $root.goToStep(index + 1)"
                     class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all text-left group focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
                     :class="$root.currentStep === index + 1 ?
                         'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-300 font-semibold' :
@@ -18,15 +17,18 @@
 
                     <!-- Step number circle -->
                     <div class="shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-semibold transition-colors"
-                         :class="$root.currentStep === index + 1 ?
+                        :class="$root.currentStep === index + 1 ?
                             'bg-primary-500 text-white' :
                             $root.currentStep > index + 1 ?
                             'bg-success-500 text-white' :
                             'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300'">
 
                         <!-- Checkmark for completed steps -->
-                        <svg x-show="$root.currentStep > index + 1" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                        <svg x-show="$root.currentStep > index + 1" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
+                            aria-hidden="true">
+                            <path fill-rule="evenodd"
+                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                clip-rule="evenodd" />
                         </svg>
 
                         <!-- Step number for current/future steps -->
@@ -100,21 +102,23 @@
                         <li class="relative {{ $index < count($steps) - 1 ? 'pr-8 sm:pr-20' : '' }} flex-1">
                             @if ($index < count($steps) - 1)
                                 <div class="absolute inset-0 flex items-center" aria-hidden="true">
-                                    <div class="h-0.5 w-full" :class="currentStep > {{ $step['id'] }} ? 'bg-primary-600' :
-                                                        'bg-gray-200 dark:bg-gray-700'">
+                                    <div class="h-0.5 w-full"
+                                        :class="currentStep > {{ $step['id'] }} ? 'bg-primary-600' :
+                                            'bg-gray-200 dark:bg-gray-700'">
                                     </div>
                                 </div>
                             @endif
                             <button type="button" @click="goToStep({{ $step['id'] }})"
                                 class="relative flex items-center justify-center w-10 h-10 rounded-full transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
                                 :class="currentStep === {{ $step['id'] }} ?
-                                            'bg-primary-600 ring-4 ring-primary-100 dark:ring-primary-900/30' :
-                                            currentStep > {{ $step['id'] }} ? 'bg-primary-600' :
-                                            'bg-gray-200 dark:bg-gray-700'"
+                                    'bg-primary-600 ring-4 ring-primary-100 dark:ring-primary-900/30' :
+                                    currentStep > {{ $step['id'] }} ? 'bg-primary-600' :
+                                    'bg-gray-200 dark:bg-gray-700'"
                                 :aria-current="currentStep === {{ $step['id'] }} ? 'step' : null">
-                                <svg class="w-5 h-5" :class="currentStep >= {{ $step['id'] }} ? 'text-white' :
-                                                'text-gray-500 dark:text-gray-400'" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
+                                <svg class="w-5 h-5"
+                                    :class="currentStep >= {{ $step['id'] }} ? 'text-white' :
+                                        'text-gray-500 dark:text-gray-400'"
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="{{ $step['icon'] }}" />
                                 </svg>
@@ -122,7 +126,7 @@
                             </button>
                             <span class="absolute top-12 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs font-medium"
                                 :class="currentStep === {{ $step['id'] }} ? 'text-primary-600 dark:text-primary-400' :
-                                            'text-gray-500 dark:text-gray-400'">
+                                    'text-gray-500 dark:text-gray-400'">
                                 {{ $step['name'] }}
                             </span>
                         </li>
@@ -202,9 +206,11 @@
             @csrf
 
             <!-- Step 1: Basic Information -->
-            <section x-show="currentStep === 1" x-transition class="card rounded-xl" role="region" aria-labelledby="step-1-heading" aria-live="polite">
+            <section x-show="currentStep === 1" x-transition class="card rounded-xl" role="region"
+                aria-labelledby="step-1-heading" aria-live="polite">
                 <header class="card-header">
-                    <h2 id="step-1-heading" class="text-lg font-medium text-gray-900 dark:text-white">Basic Information</h2>
+                    <h2 id="step-1-heading" class="text-lg font-medium text-gray-900 dark:text-white">Basic Information
+                    </h2>
                     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Enter your character's name and select a
                         scenario</p>
                 </header>
@@ -213,15 +219,17 @@
                     <!-- Validation Error Display (WCAG 2.2 AA) -->
                     <template x-if="Object.keys(validationErrors).length > 0 && currentStep === 1">
                         <div class="bg-error-50 dark:bg-error-900/20 border border-error-200 dark:border-error-800 rounded-lg p-4"
-                             role="alert"
-                             aria-live="polite"
-                             aria-atomic="true">
+                            role="alert" aria-live="polite" aria-atomic="true">
                             <div class="flex items-start gap-3">
-                                <svg class="w-5 h-5 text-error-500 mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                                <svg class="w-5 h-5 text-error-500 mt-0.5 shrink-0" fill="currentColor"
+                                    viewBox="0 0 20 20" aria-hidden="true">
+                                    <path fill-rule="evenodd"
+                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                        clip-rule="evenodd" />
                                 </svg>
                                 <div class="flex-1">
-                                    <h3 class="font-medium text-error-900 dark:text-error-100 mb-2">Please fix the following errors:</h3>
+                                    <h3 class="font-medium text-error-900 dark:text-error-100 mb-2">Please fix the
+                                        following errors:</h3>
                                     <ul class="space-y-1 text-sm text-error-800 dark:text-error-200">
                                         <template x-for="(error, field) in validationErrors" :key="field">
                                             <li>• <span x-text="error"></span></li>
@@ -237,8 +245,8 @@
                         class="flex items-center justify-between p-4 bg-primary-50 dark:bg-primary-900/10 rounded-lg border border-primary-100 dark:border-primary-800">
                         <div class="flex items-center gap-3">
                             <div class="p-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-                                <svg class="w-6 h-6 text-primary-600 dark:text-primary-400" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
+                                <svg class="w-6 h-6 text-primary-600 dark:text-primary-400" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                                 </svg>
@@ -296,7 +304,8 @@
                                         </div>
                                     </div>
                                     <div class="grid grid-cols-5 gap-2">
-                                        <template x-for="(value, stat) in formData.trainee?.baseStats || {}" :key="stat">
+                                        <template x-for="(value, stat) in formData.trainee?.baseStats || {}"
+                                            :key="stat">
                                             <div class="text-center">
                                                 <div class="text-[10px] text-gray-500 dark:text-gray-400 uppercase"
                                                     x-text="stat"></div>
@@ -306,7 +315,8 @@
                                         </template>
                                     </div>
                                     <div class="flex flex-wrap gap-2 text-xs">
-                                        <template x-for="aptitude in formData.trainee?.aptitudes || []" :key="aptitude">
+                                        <template x-for="aptitude in formData.trainee?.aptitudes || []"
+                                            :key="aptitude">
                                             <span
                                                 class="px-2 py-0.5 rounded-full bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-200"
                                                 x-text="aptitude"></span>
@@ -326,8 +336,8 @@
                         class="flex items-center justify-between p-4 bg-green-50 dark:bg-green-900/10 rounded-lg border border-green-100 dark:border-green-800">
                         <div class="flex items-center gap-3">
                             <div class="p-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-                                <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
+                                <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
                                 </svg>
@@ -376,8 +386,8 @@
                                     Preview</h4>
                                 <div x-show="selectedExternalCharacter" class="space-y-3">
                                     <div class="flex items-center gap-3">
-                                        <img :src="selectedExternalCharacter?.image" :alt="selectedExternalCharacter?.name"
-                                            loading="lazy" decoding="async"
+                                        <img :src="selectedExternalCharacter?.image"
+                                            :alt="selectedExternalCharacter?.name" loading="lazy" decoding="async"
                                             x-on:error="$el.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(selectedExternalCharacter?.name || 'Char') + '&background=random&color=fff'"
                                             class="w-16 h-16 rounded-lg object-cover border border-gray-200 dark:border-gray-700">
                                         <div>
@@ -435,7 +445,8 @@
             </section>
 
             <!-- Step 2: Stats -->
-            <section x-show="currentStep === 2" x-transition class="card rounded-xl" role="region" aria-labelledby="step-2-heading" aria-live="polite">
+            <section x-show="currentStep === 2" x-transition class="card rounded-xl" role="region"
+                aria-labelledby="step-2-heading" aria-live="polite">
                 <header class="card-header">
                     <h2 id="step-2-heading" class="text-lg font-medium text-gray-900 dark:text-white">Current Stats</h2>
                     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Set initial stat values (0-1200)</p>
@@ -481,14 +492,17 @@
                                 <div class="flex items-center justify-between">
                                     <label for="stat_{{ $stat }}" class="form-label flex items-center gap-2">
                                         <span class="font-semibold">{{ $info['label'] }}</span>
-                                        <span class="text-xs text-primary-500" title="Priority">{{ $info['priority'] }}</span>
+                                        <span class="text-xs text-primary-500"
+                                            title="Priority">{{ $info['priority'] }}</span>
                                     </label>
                                     <span class="text-xs text-gray-500 dark:text-gray-400">{{ $info['desc'] }}</span>
                                 </div>
                                 <div class="relative">
-                                    <input type="number" id="stat_{{ $stat }}" name="stats[{{ $stat }}]"
-                                        x-model.number="formData.stats.{{ $stat }}" min="0" max="1200" step="10"
-                                        class="form-input pr-16 text-lg font-semibold" @input="validateStat('{{ $stat }}')">
+                                    <input type="number" id="stat_{{ $stat }}"
+                                        name="stats[{{ $stat }}]"
+                                        x-model.number="formData.stats.{{ $stat }}" min="0"
+                                        max="1200" step="10" class="form-input pr-16 text-lg font-semibold"
+                                        @input="validateStat('{{ $stat }}')">
                                     <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                                         <span class="text-sm font-medium px-2 py-1 rounded"
                                             :class="getGradeColor(formData.stats.{{ $stat }})"
@@ -536,20 +550,22 @@
             </section>
 
             <!-- Step 3: Aptitudes -->
-            <section x-show="currentStep === 3" x-transition class="card rounded-xl" role="region" aria-labelledby="step-3-heading" aria-live="polite">
+            <section x-show="currentStep === 3" x-transition class="card rounded-xl" role="region"
+                aria-labelledby="step-3-heading" aria-live="polite">
                 <header class="card-header">
                     <h2 id="step-3-heading" class="text-lg font-medium text-gray-900 dark:text-white">Aptitudes</h2>
                     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Select aptitude grades for distance, surface,
                         and running style</p>
                 </header>
                 <div class="card-body">
-                    @php $grades = ['G', 'F', 'E', 'D', 'C', 'B', 'A', 'S', 'SS']; @endphp
+                    {{-- VERIFIED (Jan 2026): S is the maximum aptitude grade. SS does NOT exist. --}}
+                    @php $grades = ['G', 'F', 'E', 'D', 'C', 'B', 'A', 'S']; @endphp
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <!-- Distance -->
                         <div class="space-y-4">
                             <div class="flex items-center gap-2 pb-2 border-b-2 border-primary-500">
-                                <svg class="w-5 h-5 text-primary-600 dark:text-primary-400" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
+                                <svg class="w-5 h-5 text-primary-600 dark:text-primary-400" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                                 </svg>
@@ -561,7 +577,8 @@
                                     <div>
                                         <label class="form-label text-xs font-semibold">{{ $label }}</label>
                                         <select name="aptitudes[distance][{{ $key }}]"
-                                            x-model="formData.aptitudes.distance.{{ $key }}" class="form-select text-sm">
+                                            x-model="formData.aptitudes.distance.{{ $key }}"
+                                            class="form-select text-sm">
                                             <option value="">Select Grade</option>
                                             @foreach ($grades as $grade)
                                                 <option value="{{ $grade }}">{{ $grade }}</option>
@@ -575,8 +592,8 @@
                         <!-- Surface -->
                         <div class="space-y-4">
                             <div class="flex items-center gap-2 pb-2 border-b-2 border-green-500">
-                                <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
+                                <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
@@ -588,7 +605,8 @@
                                     <div>
                                         <label class="form-label text-xs font-semibold">{{ $label }}</label>
                                         <select name="aptitudes[surface][{{ $key }}]"
-                                            x-model="formData.aptitudes.surface.{{ $key }}" class="form-select text-sm">
+                                            x-model="formData.aptitudes.surface.{{ $key }}"
+                                            class="form-select text-sm">
                                             <option value="">Select Grade</option>
                                             @foreach ($grades as $grade)
                                                 <option value="{{ $grade }}">{{ $grade }}</option>
@@ -602,8 +620,8 @@
                         <!-- Running Style -->
                         <div class="space-y-4">
                             <div class="flex items-center gap-2 pb-2 border-b-2 border-purple-500">
-                                <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
+                                <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M13 10V3L4 14h7v7l9-11h-7z" />
                                 </svg>
@@ -615,7 +633,8 @@
                                     <div>
                                         <label class="form-label text-xs font-semibold">{{ $label }}</label>
                                         <select name="aptitudes[style][{{ $key }}]"
-                                            x-model="formData.aptitudes.style.{{ $key }}" class="form-select text-sm">
+                                            x-model="formData.aptitudes.style.{{ $key }}"
+                                            class="form-select text-sm">
                                             <option value="">Select Grade</option>
                                             @foreach ($grades as $grade)
                                                 <option value="{{ $grade }}">{{ $grade }}</option>
@@ -645,9 +664,11 @@
             </section>
 
             <!-- Step 4: Review -->
-            <section x-show="currentStep === 4" x-transition class="card rounded-xl" role="region" aria-labelledby="step-4-heading" aria-live="polite">
+            <section x-show="currentStep === 4" x-transition class="card rounded-xl" role="region"
+                aria-labelledby="step-4-heading" aria-live="polite">
                 <header class="card-header">
-                    <h2 id="step-4-heading" class="text-lg font-medium text-gray-900 dark:text-white">Review & Confirm</h2>
+                    <h2 id="step-4-heading" class="text-lg font-medium text-gray-900 dark:text-white">Review & Confirm
+                    </h2>
                     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Review your character details before creating
                     </p>
                 </header>
@@ -752,7 +773,8 @@
                     <div class="flex gap-2">
                         <button type="button" @click="previousStep()" class="btn btn-secondary">
                             <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 19l-7-7 7-7" />
                             </svg>
                             Previous
                         </button>
@@ -896,1445 +918,1445 @@
 
                 // Trainee Database (Simulated)
                 trainees: [{
-                    id: 1,
-                    name: "Special Week",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Medium",
-                    style: "Betweener",
-                    aptitudes: ["Turf", "Medium", "Long", "Betweener", "Leader"],
-                    image: "/images/trainee_images/__special_week_umamusume_drawn_by_mikawa_ayumu__c5289136bde8f5e1cb096090308a8496.jpg",
-                    stats: {
-                        speed: 98,
-                        stamina: 93,
-                        power: 94,
-                        guts: 88,
-                        wisdom: 91
+                        id: 1,
+                        name: "Special Week",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Medium",
+                        style: "Betweener",
+                        aptitudes: ["Turf", "Medium", "Long", "Betweener", "Leader"],
+                        image: "/images/trainee_images/__special_week_umamusume_drawn_by_mikawa_ayumu__c5289136bde8f5e1cb096090308a8496.jpg",
+                        stats: {
+                            speed: 98,
+                            stamina: 93,
+                            power: 94,
+                            guts: 88,
+                            wisdom: 91
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 20,
+                            power: 0,
+                            guts: 10,
+                            wisdom: 0
+                        }
                     },
-                    growth: {
-                        speed: 0,
-                        stamina: 20,
-                        power: 0,
-                        guts: 10,
-                        wisdom: 0
-                    }
-                },
-                {
-                    id: 2,
-                    name: "Silence Suzuka",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Mile",
-                    style: "Runner",
-                    aptitudes: ["Turf", "Mile", "Medium", "Runner"],
-                    image: "/images/trainee_images/bb962aabeafaee5cbf7831e4d178ca64.jpg",
-                    stats: {
-                        speed: 105,
-                        stamina: 85,
-                        power: 88,
-                        guts: 80,
-                        wisdom: 95
+                    {
+                        id: 2,
+                        name: "Silence Suzuka",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Mile",
+                        style: "Runner",
+                        aptitudes: ["Turf", "Mile", "Medium", "Runner"],
+                        image: "/images/trainee_images/bb962aabeafaee5cbf7831e4d178ca64.jpg",
+                        stats: {
+                            speed: 105,
+                            stamina: 85,
+                            power: 88,
+                            guts: 80,
+                            wisdom: 95
+                        },
+                        growth: {
+                            speed: 20,
+                            stamina: 0,
+                            power: 0,
+                            guts: 10,
+                            wisdom: 0
+                        }
                     },
-                    growth: {
-                        speed: 20,
-                        stamina: 0,
-                        power: 0,
-                        guts: 10,
-                        wisdom: 0
-                    }
-                },
-                {
-                    id: 3,
-                    name: "Tokai Teio",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Medium",
-                    style: "Leader",
-                    aptitudes: ["Turf", "Medium", "Long", "Leader"],
-                    image: "/images/trainee_images/__tokai_teio_umamusume_drawn_by_so_on__305c01834a0c0cf3fe3593c281a0b05b.jpg",
-                    stats: {
-                        speed: 100,
-                        stamina: 90,
-                        power: 90,
-                        guts: 85,
-                        wisdom: 92
+                    {
+                        id: 3,
+                        name: "Tokai Teio",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Medium",
+                        style: "Leader",
+                        aptitudes: ["Turf", "Medium", "Long", "Leader"],
+                        image: "/images/trainee_images/__tokai_teio_umamusume_drawn_by_so_on__305c01834a0c0cf3fe3593c281a0b05b.jpg",
+                        stats: {
+                            speed: 100,
+                            stamina: 90,
+                            power: 90,
+                            guts: 85,
+                            wisdom: 92
+                        },
+                        growth: {
+                            speed: 20,
+                            stamina: 10,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 0
+                        }
                     },
-                    growth: {
-                        speed: 20,
-                        stamina: 10,
-                        power: 0,
-                        guts: 0,
-                        wisdom: 0
-                    }
-                },
-                {
-                    id: 4,
-                    name: "Maruzensky",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Mile",
-                    style: "Runner",
-                    aptitudes: ["Turf", "Mile", "Medium", "Runner"],
-                    image: "/images/trainee_images/__maruzensky_umamusume_drawn_by_kamishima_kanon__sample-297ecca0da3990374954a514f06bea2b.jpg",
-                    stats: {
-                        speed: 102,
-                        stamina: 88,
-                        power: 92,
-                        guts: 85,
-                        wisdom: 95
+                    {
+                        id: 4,
+                        name: "Maruzensky",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Mile",
+                        style: "Runner",
+                        aptitudes: ["Turf", "Mile", "Medium", "Runner"],
+                        image: "/images/trainee_images/__maruzensky_umamusume_drawn_by_kamishima_kanon__sample-297ecca0da3990374954a514f06bea2b.jpg",
+                        stats: {
+                            speed: 102,
+                            stamina: 88,
+                            power: 92,
+                            guts: 85,
+                            wisdom: 95
+                        },
+                        growth: {
+                            speed: 10,
+                            stamina: 0,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 20
+                        }
                     },
-                    growth: {
-                        speed: 10,
-                        stamina: 0,
-                        power: 0,
-                        guts: 0,
-                        wisdom: 20
-                    }
-                },
-                {
-                    id: 5,
-                    name: "Fuji Kiseki",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Mile",
-                    style: "Leader",
-                    aptitudes: ["Turf", "Mile", "Medium", "Leader", "Betweener"],
-                    image: "/images/trainee_images/__fuji_kiseki_umamusume_drawn_by_snowater__79fb8292647cf289359469f2fec0ed4a.jpg",
-                    stats: {
-                        speed: 94,
-                        stamina: 85,
-                        power: 100,
-                        guts: 88,
-                        wisdom: 90
+                    {
+                        id: 5,
+                        name: "Fuji Kiseki",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Mile",
+                        style: "Leader",
+                        aptitudes: ["Turf", "Mile", "Medium", "Leader", "Betweener"],
+                        image: "/images/trainee_images/__fuji_kiseki_umamusume_drawn_by_snowater__79fb8292647cf289359469f2fec0ed4a.jpg",
+                        stats: {
+                            speed: 94,
+                            stamina: 85,
+                            power: 100,
+                            guts: 88,
+                            wisdom: 90
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 0,
+                            power: 20,
+                            guts: 0,
+                            wisdom: 10
+                        }
                     },
-                    growth: {
-                        speed: 0,
-                        stamina: 0,
-                        power: 20,
-                        guts: 0,
-                        wisdom: 10
-                    }
-                },
-                {
-                    id: 6,
-                    name: "Oguri Cap",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Mile",
-                    style: "Leader",
-                    aptitudes: ["Turf", "Dirt", "Mile", "Medium", "Long", "Leader", "Betweener"],
-                    image: "/images/trainee_images/__oguri_cap_and_jacques_villeneuve_umamusume_and_1_more_drawn_by_holeecrab__sample-9628095fc1e0ee5bcc8c96c47d5722a1.jpg",
-                    stats: {
-                        speed: 100,
-                        stamina: 92,
-                        power: 105,
-                        guts: 90,
-                        wisdom: 85
+                    {
+                        id: 6,
+                        name: "Oguri Cap",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Mile",
+                        style: "Leader",
+                        aptitudes: ["Turf", "Dirt", "Mile", "Medium", "Long", "Leader", "Betweener"],
+                        image: "/images/trainee_images/__oguri_cap_and_jacques_villeneuve_umamusume_and_1_more_drawn_by_holeecrab__sample-9628095fc1e0ee5bcc8c96c47d5722a1.jpg",
+                        stats: {
+                            speed: 100,
+                            stamina: 92,
+                            power: 105,
+                            guts: 90,
+                            wisdom: 85
+                        },
+                        growth: {
+                            speed: 20,
+                            stamina: 0,
+                            power: 10,
+                            guts: 0,
+                            wisdom: 0
+                        }
                     },
-                    growth: {
-                        speed: 20,
-                        stamina: 0,
-                        power: 10,
-                        guts: 0,
-                        wisdom: 0
-                    }
-                },
-                {
-                    id: 7,
-                    name: "Gold Ship",
-                    rarity: 2,
-                    surface: "Turf",
-                    distance: "Long",
-                    style: "Chaser",
-                    aptitudes: ["Turf", "Medium", "Long", "Chaser"],
-                    image: "/images/trainee_images/__gold_ship_umamusume_drawn_by_advarcher__sample-2713426899554240b99dc00440e97745.jpg",
-                    stats: {
-                        speed: 90,
-                        stamina: 110,
-                        power: 100,
-                        guts: 95,
-                        wisdom: 80
+                    {
+                        id: 7,
+                        name: "Gold Ship",
+                        rarity: 2,
+                        surface: "Turf",
+                        distance: "Long",
+                        style: "Chaser",
+                        aptitudes: ["Turf", "Medium", "Long", "Chaser"],
+                        image: "/images/trainee_images/__gold_ship_umamusume_drawn_by_advarcher__sample-2713426899554240b99dc00440e97745.jpg",
+                        stats: {
+                            speed: 90,
+                            stamina: 110,
+                            power: 100,
+                            guts: 95,
+                            wisdom: 80
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 20,
+                            power: 10,
+                            guts: 0,
+                            wisdom: 0
+                        }
                     },
-                    growth: {
-                        speed: 0,
-                        stamina: 20,
-                        power: 10,
-                        guts: 0,
-                        wisdom: 0
-                    }
-                },
-                {
-                    id: 8,
-                    name: "Vodka",
-                    rarity: 2,
-                    surface: "Turf",
-                    distance: "Mile",
-                    style: "Betweener",
-                    aptitudes: ["Turf", "Mile", "Medium", "Betweener", "Leader"],
-                    image: "/images/trainee_images/__vodka_umamusume_drawn_by_mayata__41166bfaeb2670ae37c8785af4566d58.jpg",
-                    stats: {
-                        speed: 95,
-                        stamina: 80,
-                        power: 108,
-                        guts: 85,
-                        wisdom: 82
+                    {
+                        id: 8,
+                        name: "Vodka",
+                        rarity: 2,
+                        surface: "Turf",
+                        distance: "Mile",
+                        style: "Betweener",
+                        aptitudes: ["Turf", "Mile", "Medium", "Betweener", "Leader"],
+                        image: "/images/trainee_images/__vodka_umamusume_drawn_by_mayata__41166bfaeb2670ae37c8785af4566d58.jpg",
+                        stats: {
+                            speed: 95,
+                            stamina: 80,
+                            power: 108,
+                            guts: 85,
+                            wisdom: 82
+                        },
+                        growth: {
+                            speed: 10,
+                            stamina: 0,
+                            power: 20,
+                            guts: 0,
+                            wisdom: 0
+                        }
                     },
-                    growth: {
-                        speed: 10,
-                        stamina: 0,
-                        power: 20,
-                        guts: 0,
-                        wisdom: 0
-                    }
-                },
-                {
-                    id: 9,
-                    name: "Daiwa Scarlet",
-                    rarity: 2,
-                    surface: "Turf",
-                    distance: "Mile",
-                    style: "Runner",
-                    aptitudes: ["Turf", "Mile", "Medium", "Runner", "Leader"],
-                    image: "/images/trainee_images/__daiwa_scarlet_umamusume_drawn_by_kurokawa_heuy__sample-9576ae268cdddfe167c2300d5453f2cf.jpg",
-                    stats: {
-                        speed: 98,
-                        stamina: 90,
-                        power: 92,
-                        guts: 95,
-                        wisdom: 88
+                    {
+                        id: 9,
+                        name: "Daiwa Scarlet",
+                        rarity: 2,
+                        surface: "Turf",
+                        distance: "Mile",
+                        style: "Runner",
+                        aptitudes: ["Turf", "Mile", "Medium", "Runner", "Leader"],
+                        image: "/images/trainee_images/__daiwa_scarlet_umamusume_drawn_by_kurokawa_heuy__sample-9576ae268cdddfe167c2300d5453f2cf.jpg",
+                        stats: {
+                            speed: 98,
+                            stamina: 90,
+                            power: 92,
+                            guts: 95,
+                            wisdom: 88
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 0,
+                            power: 0,
+                            guts: 20,
+                            wisdom: 10
+                        }
                     },
-                    growth: {
-                        speed: 0,
-                        stamina: 0,
-                        power: 0,
-                        guts: 20,
-                        wisdom: 10
-                    }
-                },
-                {
-                    id: 10,
-                    name: "Taiki Shuttle",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Mile",
-                    style: "Leader",
-                    aptitudes: ["Turf", "Dirt", "Sprint", "Mile", "Leader", "Runner"],
-                    image: "/images/trainee_images/__taiki_shuttle_umamusume_drawn_by_kitsutsuki_dzgu4744__2923a6d9bcc13a323eda812483bd7569.jpg",
-                    stats: {
-                        speed: 105,
-                        stamina: 80,
-                        power: 95,
-                        guts: 85,
-                        wisdom: 92
+                    {
+                        id: 10,
+                        name: "Taiki Shuttle",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Mile",
+                        style: "Leader",
+                        aptitudes: ["Turf", "Dirt", "Sprint", "Mile", "Leader", "Runner"],
+                        image: "/images/trainee_images/__taiki_shuttle_umamusume_drawn_by_kitsutsuki_dzgu4744__2923a6d9bcc13a323eda812483bd7569.jpg",
+                        stats: {
+                            speed: 105,
+                            stamina: 80,
+                            power: 95,
+                            guts: 85,
+                            wisdom: 92
+                        },
+                        growth: {
+                            speed: 20,
+                            stamina: 0,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 10
+                        }
                     },
-                    growth: {
-                        speed: 20,
-                        stamina: 0,
-                        power: 0,
-                        guts: 0,
-                        wisdom: 10
-                    }
-                },
-                {
-                    id: 11,
-                    name: "Grass Wonder",
-                    rarity: 2,
-                    surface: "Turf",
-                    distance: "Medium",
-                    style: "Betweener",
-                    aptitudes: ["Turf", "Mile", "Medium", "Long", "Betweener", "Leader"],
-                    image: "/images/trainee_images/__special_week_and_grass_wonder_umamusume_drawn_by_murasaki_himuro__c5cd811241a372d775e9ba2e2d09c65f.jpg",
-                    stats: {
-                        speed: 96,
-                        stamina: 92,
-                        power: 98,
-                        guts: 90,
-                        wisdom: 90
+                    {
+                        id: 11,
+                        name: "Grass Wonder",
+                        rarity: 2,
+                        surface: "Turf",
+                        distance: "Medium",
+                        style: "Betweener",
+                        aptitudes: ["Turf", "Mile", "Medium", "Long", "Betweener", "Leader"],
+                        image: "/images/trainee_images/__special_week_and_grass_wonder_umamusume_drawn_by_murasaki_himuro__c5cd811241a372d775e9ba2e2d09c65f.jpg",
+                        stats: {
+                            speed: 96,
+                            stamina: 92,
+                            power: 98,
+                            guts: 90,
+                            wisdom: 90
+                        },
+                        growth: {
+                            speed: 20,
+                            stamina: 0,
+                            power: 10,
+                            guts: 0,
+                            wisdom: 0
+                        }
                     },
-                    growth: {
-                        speed: 20,
-                        stamina: 0,
-                        power: 10,
-                        guts: 0,
-                        wisdom: 0
-                    }
-                },
-                {
-                    id: 12,
-                    name: "Hishi Amazon",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Mile",
-                    style: "Chaser",
-                    aptitudes: ["Turf", "Mile", "Medium", "Chaser", "Betweener"],
-                    image: "/images/trainee_images/__hishi_amazon_umamusume_drawn_by_eve_on_k__a46dc4de4b4fb109f54b72bc3ae44a2c.png",
-                    stats: {
-                        speed: 92,
-                        stamina: 88,
-                        power: 102,
-                        guts: 94,
-                        wisdom: 85
+                    {
+                        id: 12,
+                        name: "Hishi Amazon",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Mile",
+                        style: "Chaser",
+                        aptitudes: ["Turf", "Mile", "Medium", "Chaser", "Betweener"],
+                        image: "/images/trainee_images/__hishi_amazon_umamusume_drawn_by_eve_on_k__a46dc4de4b4fb109f54b72bc3ae44a2c.png",
+                        stats: {
+                            speed: 92,
+                            stamina: 88,
+                            power: 102,
+                            guts: 94,
+                            wisdom: 85
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 10,
+                            power: 20,
+                            guts: 0,
+                            wisdom: 0
+                        }
                     },
-                    growth: {
-                        speed: 0,
-                        stamina: 10,
-                        power: 20,
-                        guts: 0,
-                        wisdom: 0
-                    }
-                },
-                {
-                    id: 13,
-                    name: "Mejiro McQueen",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Long",
-                    style: "Leader",
-                    aptitudes: ["Turf", "Medium", "Long", "Leader"],
-                    image: "/images/trainee_images/__mejiro_mcqueen_umamusume_drawn_by_miwerjooggetser__52537bea1d60aaa40c1532613769ce26.png",
-                    stats: {
-                        speed: 90,
-                        stamina: 105,
-                        power: 92,
-                        guts: 90,
-                        wisdom: 95
+                    {
+                        id: 13,
+                        name: "Mejiro McQueen",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Long",
+                        style: "Leader",
+                        aptitudes: ["Turf", "Medium", "Long", "Leader"],
+                        image: "/images/trainee_images/__mejiro_mcqueen_umamusume_drawn_by_miwerjooggetser__52537bea1d60aaa40c1532613769ce26.png",
+                        stats: {
+                            speed: 90,
+                            stamina: 105,
+                            power: 92,
+                            guts: 90,
+                            wisdom: 95
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 20,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 10
+                        }
                     },
-                    growth: {
-                        speed: 0,
-                        stamina: 20,
-                        power: 0,
-                        guts: 0,
-                        wisdom: 10
-                    }
-                },
-                {
-                    id: 14,
-                    name: "El Condor Pasa",
-                    rarity: 2,
-                    surface: "Turf",
-                    distance: "Medium",
-                    style: "Leader",
-                    aptitudes: ["Turf", "Dirt", "Mile", "Medium", "Leader", "Betweener"],
-                    image: "/images/trainee_images/__el_condor_pasa_umamusume_drawn_by_nekogusa_kinako__85cfefb3697093d2c40c9db031ab46a5.jpg",
-                    stats: {
-                        speed: 98,
-                        stamina: 90,
-                        power: 95,
-                        guts: 90,
-                        wisdom: 88
+                    {
+                        id: 14,
+                        name: "El Condor Pasa",
+                        rarity: 2,
+                        surface: "Turf",
+                        distance: "Medium",
+                        style: "Leader",
+                        aptitudes: ["Turf", "Dirt", "Mile", "Medium", "Leader", "Betweener"],
+                        image: "/images/trainee_images/__el_condor_pasa_umamusume_drawn_by_nekogusa_kinako__85cfefb3697093d2c40c9db031ab46a5.jpg",
+                        stats: {
+                            speed: 98,
+                            stamina: 90,
+                            power: 95,
+                            guts: 90,
+                            wisdom: 88
+                        },
+                        growth: {
+                            speed: 20,
+                            stamina: 0,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 10
+                        }
                     },
-                    growth: {
-                        speed: 20,
-                        stamina: 0,
-                        power: 0,
-                        guts: 0,
-                        wisdom: 10
-                    }
-                },
-                {
-                    id: 15,
-                    name: "T.M. Opera O",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Medium",
-                    style: "Leader",
-                    aptitudes: ["Turf", "Medium", "Long", "Leader", "Betweener"],
-                    image: "/images/trainee_images/__t_m_opera_o_umamusume_drawn_by_eriario__7e3d265d1e3e405cf79bdce81ba87adf.jpg",
-                    stats: {
-                        speed: 95,
-                        stamina: 100,
-                        power: 94,
-                        guts: 92,
-                        wisdom: 90
+                    {
+                        id: 15,
+                        name: "T.M. Opera O",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Medium",
+                        style: "Leader",
+                        aptitudes: ["Turf", "Medium", "Long", "Leader", "Betweener"],
+                        image: "/images/trainee_images/__t_m_opera_o_umamusume_drawn_by_eriario__7e3d265d1e3e405cf79bdce81ba87adf.jpg",
+                        stats: {
+                            speed: 95,
+                            stamina: 100,
+                            power: 94,
+                            guts: 92,
+                            wisdom: 90
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 20,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 10
+                        }
                     },
-                    growth: {
-                        speed: 0,
-                        stamina: 20,
-                        power: 0,
-                        guts: 0,
-                        wisdom: 10
-                    }
-                },
-                {
-                    id: 16,
-                    name: "Narita Brian",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Medium",
-                    style: "Betweener",
-                    aptitudes: ["Turf", "Medium", "Long", "Betweener", "Leader"],
-                    image: "/images/trainee_images/__narita_brian_and_biwa_hayahide_umamusume_drawn_by_hitoto__sample-e1edfe57e7e12f49d5a724698f738783.jpg",
-                    stats: {
-                        speed: 102,
-                        stamina: 98,
-                        power: 100,
-                        guts: 95,
-                        wisdom: 90
+                    {
+                        id: 16,
+                        name: "Narita Brian",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Medium",
+                        style: "Betweener",
+                        aptitudes: ["Turf", "Medium", "Long", "Betweener", "Leader"],
+                        image: "/images/trainee_images/__narita_brian_and_biwa_hayahide_umamusume_drawn_by_hitoto__sample-e1edfe57e7e12f49d5a724698f738783.jpg",
+                        stats: {
+                            speed: 102,
+                            stamina: 98,
+                            power: 100,
+                            guts: 95,
+                            wisdom: 90
+                        },
+                        growth: {
+                            speed: 10,
+                            stamina: 20,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 0
+                        }
                     },
-                    growth: {
-                        speed: 10,
-                        stamina: 20,
-                        power: 0,
-                        guts: 0,
-                        wisdom: 0
-                    }
-                },
-                {
-                    id: 17,
-                    name: "Symboli Rudolf",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Medium",
-                    style: "Betweener",
-                    aptitudes: ["Turf", "Medium", "Long", "Betweener", "Leader"],
-                    image: "/images/trainee_images/__symboli_rudolf_umamusume_drawn_by_kusanagi_kaoru__da889d95df3f77d7d1b3f7105f463d36.png",
-                    stats: {
-                        speed: 98,
-                        stamina: 100,
-                        power: 95,
-                        guts: 90,
-                        wisdom: 98
+                    {
+                        id: 17,
+                        name: "Symboli Rudolf",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Medium",
+                        style: "Betweener",
+                        aptitudes: ["Turf", "Medium", "Long", "Betweener", "Leader"],
+                        image: "/images/trainee_images/__symboli_rudolf_umamusume_drawn_by_kusanagi_kaoru__da889d95df3f77d7d1b3f7105f463d36.png",
+                        stats: {
+                            speed: 98,
+                            stamina: 100,
+                            power: 95,
+                            guts: 90,
+                            wisdom: 98
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 20,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 10
+                        }
                     },
-                    growth: {
-                        speed: 0,
-                        stamina: 20,
-                        power: 0,
-                        guts: 0,
-                        wisdom: 10
-                    }
-                },
-                {
-                    id: 18,
-                    name: "Air Groove",
-                    rarity: 2,
-                    surface: "Turf",
-                    distance: "Medium",
-                    style: "Betweener",
-                    aptitudes: ["Turf", "Mile", "Medium", "Betweener", "Leader"],
-                    image: "/images/trainee_images/__air_groove_umamusume_drawn_by_nil__9c09dc404769151d63e3ddfa37513b20.jpg",
-                    stats: {
-                        speed: 96,
-                        stamina: 88,
-                        power: 98,
-                        guts: 85,
-                        wisdom: 90
+                    {
+                        id: 18,
+                        name: "Air Groove",
+                        rarity: 2,
+                        surface: "Turf",
+                        distance: "Medium",
+                        style: "Betweener",
+                        aptitudes: ["Turf", "Mile", "Medium", "Betweener", "Leader"],
+                        image: "/images/trainee_images/__air_groove_umamusume_drawn_by_nil__9c09dc404769151d63e3ddfa37513b20.jpg",
+                        stats: {
+                            speed: 96,
+                            stamina: 88,
+                            power: 98,
+                            guts: 85,
+                            wisdom: 90
+                        },
+                        growth: {
+                            speed: 10,
+                            stamina: 0,
+                            power: 20,
+                            guts: 0,
+                            wisdom: 0
+                        }
                     },
-                    growth: {
-                        speed: 10,
-                        stamina: 0,
-                        power: 20,
-                        guts: 0,
-                        wisdom: 0
-                    }
-                },
-                {
-                    id: 19,
-                    name: "Agnes Digital",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Mile",
-                    style: "Betweener",
-                    aptitudes: ["Turf", "Dirt", "Mile", "Medium", "Betweener", "Leader"],
-                    image: "/images/trainee_images/__agnes_digital_umamusume_drawn_by_shinmai_kyata__65f32dbc74a3429009c967bb2cf5f7b7.png",
-                    stats: {
-                        speed: 95,
-                        stamina: 85,
-                        power: 95,
-                        guts: 90,
-                        wisdom: 95
+                    {
+                        id: 19,
+                        name: "Agnes Digital",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Mile",
+                        style: "Betweener",
+                        aptitudes: ["Turf", "Dirt", "Mile", "Medium", "Betweener", "Leader"],
+                        image: "/images/trainee_images/__agnes_digital_umamusume_drawn_by_shinmai_kyata__65f32dbc74a3429009c967bb2cf5f7b7.png",
+                        stats: {
+                            speed: 95,
+                            stamina: 85,
+                            power: 95,
+                            guts: 90,
+                            wisdom: 95
+                        },
+                        growth: {
+                            speed: 10,
+                            stamina: 0,
+                            power: 10,
+                            guts: 0,
+                            wisdom: 10
+                        }
                     },
-                    growth: {
-                        speed: 10,
-                        stamina: 0,
-                        power: 10,
-                        guts: 0,
-                        wisdom: 10
-                    }
-                },
-                {
-                    id: 20,
-                    name: "Seiun Sky",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Medium",
-                    style: "Runner",
-                    aptitudes: ["Turf", "Medium", "Long", "Runner"],
-                    image: "/images/trainee_images/__seiun_sky_umamusume_drawn_by_masaki_shino__65730ce77e97e0b5a2c44211de420fa3.jpg",
-                    stats: {
-                        speed: 94,
-                        stamina: 98,
-                        power: 85,
-                        guts: 90,
-                        wisdom: 105
+                    {
+                        id: 20,
+                        name: "Seiun Sky",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Medium",
+                        style: "Runner",
+                        aptitudes: ["Turf", "Medium", "Long", "Runner"],
+                        image: "/images/trainee_images/__seiun_sky_umamusume_drawn_by_masaki_shino__65730ce77e97e0b5a2c44211de420fa3.jpg",
+                        stats: {
+                            speed: 94,
+                            stamina: 98,
+                            power: 85,
+                            guts: 90,
+                            wisdom: 105
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 10,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 20
+                        }
                     },
-                    growth: {
-                        speed: 0,
-                        stamina: 10,
-                        power: 0,
-                        guts: 0,
-                        wisdom: 20
-                    }
-                },
-                {
-                    id: 21,
-                    name: "Tamamo Cross",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Medium",
-                    style: "Betweener",
-                    aptitudes: ["Turf", "Medium", "Long", "Betweener", "Chaser"],
-                    image: "/images/trainee_images/__tamamo_cross_umamusume_drawn_by_ayrw7t1__d15ea703c90277149049cb36a6d0fa62.jpg",
-                    stats: {
-                        speed: 98,
-                        stamina: 96,
-                        power: 95,
-                        guts: 92,
-                        wisdom: 88
+                    {
+                        id: 21,
+                        name: "Tamamo Cross",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Medium",
+                        style: "Betweener",
+                        aptitudes: ["Turf", "Medium", "Long", "Betweener", "Chaser"],
+                        image: "/images/trainee_images/__tamamo_cross_umamusume_drawn_by_ayrw7t1__d15ea703c90277149049cb36a6d0fa62.jpg",
+                        stats: {
+                            speed: 98,
+                            stamina: 96,
+                            power: 95,
+                            guts: 92,
+                            wisdom: 88
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 20,
+                            power: 10,
+                            guts: 0,
+                            wisdom: 0
+                        }
                     },
-                    growth: {
-                        speed: 0,
-                        stamina: 20,
-                        power: 10,
-                        guts: 0,
-                        wisdom: 0
-                    }
-                },
-                {
-                    id: 22,
-                    name: "Fine Motion",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Mile",
-                    style: "Leader",
-                    aptitudes: ["Turf", "Mile", "Medium", "Leader"],
-                    image: "/images/trainee_images/__fine_motion_umamusume_drawn_by_fuku_f2uk9u__85b37e5fc89efc667ae0f67aa20e5d73.png",
-                    stats: {
-                        speed: 92,
-                        stamina: 85,
-                        power: 90,
-                        guts: 80,
-                        wisdom: 100
+                    {
+                        id: 22,
+                        name: "Fine Motion",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Mile",
+                        style: "Leader",
+                        aptitudes: ["Turf", "Mile", "Medium", "Leader"],
+                        image: "/images/trainee_images/__fine_motion_umamusume_drawn_by_fuku_f2uk9u__85b37e5fc89efc667ae0f67aa20e5d73.png",
+                        stats: {
+                            speed: 92,
+                            stamina: 85,
+                            power: 90,
+                            guts: 80,
+                            wisdom: 100
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 0,
+                            power: 15,
+                            guts: 0,
+                            wisdom: 15
+                        }
                     },
-                    growth: {
-                        speed: 0,
-                        stamina: 0,
-                        power: 15,
-                        guts: 0,
-                        wisdom: 15
-                    }
-                },
-                {
-                    id: 23,
-                    name: "Biwa Hayahide",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Medium",
-                    style: "Leader",
-                    aptitudes: ["Turf", "Medium", "Long", "Leader"],
-                    image: "/images/trainee_images/__narita_brian_and_biwa_hayahide_umamusume_drawn_by_hitoto__sample-e1edfe57e7e12f49d5a724698f738783.jpg",
-                    stats: {
-                        speed: 95,
-                        stamina: 94,
-                        power: 90,
-                        guts: 90,
-                        wisdom: 98
+                    {
+                        id: 23,
+                        name: "Biwa Hayahide",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Medium",
+                        style: "Leader",
+                        aptitudes: ["Turf", "Medium", "Long", "Leader"],
+                        image: "/images/trainee_images/__narita_brian_and_biwa_hayahide_umamusume_drawn_by_hitoto__sample-e1edfe57e7e12f49d5a724698f738783.jpg",
+                        stats: {
+                            speed: 95,
+                            stamina: 94,
+                            power: 90,
+                            guts: 90,
+                            wisdom: 98
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 0,
+                            power: 0,
+                            guts: 10,
+                            wisdom: 20
+                        }
                     },
-                    growth: {
-                        speed: 0,
-                        stamina: 0,
-                        power: 0,
-                        guts: 10,
-                        wisdom: 20
-                    }
-                },
-                {
-                    id: 24,
-                    name: "Mayano Top Gun",
-                    rarity: 2,
-                    surface: "Turf",
-                    distance: "Long",
-                    style: "Runner",
-                    aptitudes: ["Turf", "Medium", "Long", "Runner", "Leader", "Betweener", "Chaser"],
-                    image: "/images/trainee_images/__mayano_top_gun_umamusume_drawn_by_shibuki_kamone__24fecd157b3aaa34baee37d155c51862.jpg",
-                    stats: {
-                        speed: 90,
-                        stamina: 100,
-                        power: 90,
-                        guts: 95,
-                        wisdom: 85
+                    {
+                        id: 24,
+                        name: "Mayano Top Gun",
+                        rarity: 2,
+                        surface: "Turf",
+                        distance: "Long",
+                        style: "Runner",
+                        aptitudes: ["Turf", "Medium", "Long", "Runner", "Leader", "Betweener", "Chaser"],
+                        image: "/images/trainee_images/__mayano_top_gun_umamusume_drawn_by_shibuki_kamone__24fecd157b3aaa34baee37d155c51862.jpg",
+                        stats: {
+                            speed: 90,
+                            stamina: 100,
+                            power: 90,
+                            guts: 95,
+                            wisdom: 85
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 20,
+                            power: 0,
+                            guts: 10,
+                            wisdom: 0
+                        }
                     },
-                    growth: {
-                        speed: 0,
-                        stamina: 20,
-                        power: 0,
-                        guts: 10,
-                        wisdom: 0
-                    }
-                },
-                {
-                    id: 25,
-                    name: "Manhattan Cafe",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Long",
-                    style: "Betweener",
-                    aptitudes: ["Turf", "Long", "Betweener", "Chaser"],
-                    image: "/images/trainee_images/__manhattan_cafe_umamusume_drawn_by_omotil__bcb209e6d3735c1ea79aa9b3cc4a1aae.jpg",
-                    stats: {
-                        speed: 92,
-                        stamina: 108,
-                        power: 88,
-                        guts: 95,
-                        wisdom: 85
+                    {
+                        id: 25,
+                        name: "Manhattan Cafe",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Long",
+                        style: "Betweener",
+                        aptitudes: ["Turf", "Long", "Betweener", "Chaser"],
+                        image: "/images/trainee_images/__manhattan_cafe_umamusume_drawn_by_omotil__bcb209e6d3735c1ea79aa9b3cc4a1aae.jpg",
+                        stats: {
+                            speed: 92,
+                            stamina: 108,
+                            power: 88,
+                            guts: 95,
+                            wisdom: 85
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 30,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 0
+                        }
                     },
-                    growth: {
-                        speed: 0,
-                        stamina: 30,
-                        power: 0,
-                        guts: 0,
-                        wisdom: 0
-                    }
-                },
-                {
-                    id: 26,
-                    name: "Mihono Bourbon",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Medium",
-                    style: "Runner",
-                    aptitudes: ["Turf", "Mile", "Medium", "Runner"],
-                    image: "/images/trainee_images/__mihono_bourbon_umamusume_drawn_by_yukke_jan__1e0736fa3d9611b5316f1a142ed55b93.jpg",
-                    stats: {
-                        speed: 100,
-                        stamina: 95,
-                        power: 95,
-                        guts: 85,
-                        wisdom: 88
+                    {
+                        id: 26,
+                        name: "Mihono Bourbon",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Medium",
+                        style: "Runner",
+                        aptitudes: ["Turf", "Mile", "Medium", "Runner"],
+                        image: "/images/trainee_images/__mihono_bourbon_umamusume_drawn_by_yukke_jan__1e0736fa3d9611b5316f1a142ed55b93.jpg",
+                        stats: {
+                            speed: 100,
+                            stamina: 95,
+                            power: 95,
+                            guts: 85,
+                            wisdom: 88
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 20,
+                            power: 10,
+                            guts: 0,
+                            wisdom: 0
+                        }
                     },
-                    growth: {
-                        speed: 0,
-                        stamina: 20,
-                        power: 10,
-                        guts: 0,
-                        wisdom: 0
-                    }
-                },
-                {
-                    id: 27,
-                    name: "Mejiro Ryan",
-                    rarity: 1,
-                    surface: "Turf",
-                    distance: "Medium",
-                    style: "Betweener",
-                    aptitudes: ["Turf", "Medium", "Long", "Betweener"],
-                    image: "/images/trainee_images/__mejiro_ryan_umamusume_drawn_by_otono_bkt4b__9befe399d00d71c6b9870eb0c6096245.png",
-                    stats: {
-                        speed: 85,
-                        stamina: 88,
-                        power: 95,
-                        guts: 85,
-                        wisdom: 85
+                    {
+                        id: 27,
+                        name: "Mejiro Ryan",
+                        rarity: 1,
+                        surface: "Turf",
+                        distance: "Medium",
+                        style: "Betweener",
+                        aptitudes: ["Turf", "Medium", "Long", "Betweener"],
+                        image: "/images/trainee_images/__mejiro_ryan_umamusume_drawn_by_otono_bkt4b__9befe399d00d71c6b9870eb0c6096245.png",
+                        stats: {
+                            speed: 85,
+                            stamina: 88,
+                            power: 95,
+                            guts: 85,
+                            wisdom: 85
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 0,
+                            power: 20,
+                            guts: 0,
+                            wisdom: 10
+                        }
                     },
-                    growth: {
-                        speed: 0,
-                        stamina: 0,
-                        power: 20,
-                        guts: 0,
-                        wisdom: 10
-                    }
-                },
-                {
-                    id: 28,
-                    name: "Hishi Akebono",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Sprint",
-                    style: "Front",
-                    aptitudes: ["Turf", "Sprint", "Mile", "Leader"],
-                    image: "/images/trainee_images/__hishi_akebono_umamusume_drawn_by_buta_don__09316b18d340a98b9c72115f259eefef.png",
-                    stats: {
-                        speed: 95,
-                        stamina: 80,
-                        power: 110,
-                        guts: 90,
-                        wisdom: 80
+                    {
+                        id: 28,
+                        name: "Hishi Akebono",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Sprint",
+                        style: "Front",
+                        aptitudes: ["Turf", "Sprint", "Mile", "Leader"],
+                        image: "/images/trainee_images/__hishi_akebono_umamusume_drawn_by_buta_don__09316b18d340a98b9c72115f259eefef.png",
+                        stats: {
+                            speed: 95,
+                            stamina: 80,
+                            power: 110,
+                            guts: 90,
+                            wisdom: 80
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 0,
+                            power: 20,
+                            guts: 10,
+                            wisdom: 0
+                        }
                     },
-                    growth: {
-                        speed: 0,
-                        stamina: 0,
-                        power: 20,
-                        guts: 10,
-                        wisdom: 0
-                    }
-                },
-                {
-                    id: 29,
-                    name: "Yukino Bijin",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Mile",
-                    style: "Leader",
-                    aptitudes: ["Turf", "Dirt", "Mile", "Medium", "Leader", "Betweener"],
-                    image: "/images/trainee_images/__yukino_bijin_umamusume_drawn_by_migolu__e054e36adacdaab18766d5dcf3d662a4.jpg",
-                    stats: {
-                        speed: 94,
-                        stamina: 85,
-                        power: 90,
-                        guts: 92,
-                        wisdom: 95
+                    {
+                        id: 29,
+                        name: "Yukino Bijin",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Mile",
+                        style: "Leader",
+                        aptitudes: ["Turf", "Dirt", "Mile", "Medium", "Leader", "Betweener"],
+                        image: "/images/trainee_images/__yukino_bijin_umamusume_drawn_by_migolu__e054e36adacdaab18766d5dcf3d662a4.jpg",
+                        stats: {
+                            speed: 94,
+                            stamina: 85,
+                            power: 90,
+                            guts: 92,
+                            wisdom: 95
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 0,
+                            power: 0,
+                            guts: 20,
+                            wisdom: 10
+                        }
                     },
-                    growth: {
-                        speed: 0,
-                        stamina: 0,
-                        power: 0,
-                        guts: 20,
-                        wisdom: 10
-                    }
-                },
-                {
-                    id: 30,
-                    name: "Rice Shower",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Long",
-                    style: "Leader",
-                    aptitudes: ["Turf", "Medium", "Long", "Leader", "Betweener"],
-                    image: "/images/trainee_images/__rice_shower_umamusume_drawn_by_jjjsss__ab0944b4a248893cddca61ce1ee4a1e9.jpg",
-                    stats: {
-                        speed: 88,
-                        stamina: 105,
-                        power: 85,
-                        guts: 100,
-                        wisdom: 90
+                    {
+                        id: 30,
+                        name: "Rice Shower",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Long",
+                        style: "Leader",
+                        aptitudes: ["Turf", "Medium", "Long", "Leader", "Betweener"],
+                        image: "/images/trainee_images/__rice_shower_umamusume_drawn_by_jjjsss__ab0944b4a248893cddca61ce1ee4a1e9.jpg",
+                        stats: {
+                            speed: 88,
+                            stamina: 105,
+                            power: 85,
+                            guts: 100,
+                            wisdom: 90
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 10,
+                            power: 0,
+                            guts: 20,
+                            wisdom: 0
+                        }
                     },
-                    growth: {
-                        speed: 0,
-                        stamina: 10,
-                        power: 0,
-                        guts: 20,
-                        wisdom: 0
-                    }
-                },
-                {
-                    id: 31,
-                    name: "Ines Fujin",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Medium",
-                    style: "Runner",
-                    aptitudes: ["Turf", "Dirt", "Medium", "Runner"],
-                    image: "/images/trainee_images/__ines_fujin_umamusume_drawn_by_codename47__3b98b45424e1cdbf84c1f69c9cd8baca.jpg",
-                    stats: {
-                        speed: 96,
-                        stamina: 88,
-                        power: 85,
-                        guts: 94,
-                        wisdom: 85
+                    {
+                        id: 31,
+                        name: "Ines Fujin",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Medium",
+                        style: "Runner",
+                        aptitudes: ["Turf", "Dirt", "Medium", "Runner"],
+                        image: "/images/trainee_images/__ines_fujin_umamusume_drawn_by_codename47__3b98b45424e1cdbf84c1f69c9cd8baca.jpg",
+                        stats: {
+                            speed: 96,
+                            stamina: 88,
+                            power: 85,
+                            guts: 94,
+                            wisdom: 85
+                        },
+                        growth: {
+                            speed: 10,
+                            stamina: 0,
+                            power: 0,
+                            guts: 20,
+                            wisdom: 0
+                        }
                     },
-                    growth: {
-                        speed: 10,
-                        stamina: 0,
-                        power: 0,
-                        guts: 20,
-                        wisdom: 0
-                    }
-                },
-                {
-                    id: 32,
-                    name: "Agnes Tachyon",
-                    rarity: 2,
-                    surface: "Turf",
-                    distance: "Medium",
-                    style: "Leader",
-                    aptitudes: ["Turf", "Medium", "Long", "Leader"],
-                    image: "/images/trainee_images/__agnes_tachyon_umamusume_drawn_by_welchino__sample-1db2ca428e2545fcae81fe526d7a8e96.jpg",
-                    stats: {
-                        speed: 94,
-                        stamina: 85,
-                        power: 88,
-                        guts: 85,
-                        wisdom: 98
+                    {
+                        id: 32,
+                        name: "Agnes Tachyon",
+                        rarity: 2,
+                        surface: "Turf",
+                        distance: "Medium",
+                        style: "Leader",
+                        aptitudes: ["Turf", "Medium", "Long", "Leader"],
+                        image: "/images/trainee_images/__agnes_tachyon_umamusume_drawn_by_welchino__sample-1db2ca428e2545fcae81fe526d7a8e96.jpg",
+                        stats: {
+                            speed: 94,
+                            stamina: 85,
+                            power: 88,
+                            guts: 85,
+                            wisdom: 98
+                        },
+                        growth: {
+                            speed: 10,
+                            stamina: 0,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 20
+                        }
                     },
-                    growth: {
-                        speed: 10,
-                        stamina: 0,
-                        power: 0,
-                        guts: 0,
-                        wisdom: 20
-                    }
-                },
-                {
-                    id: 33,
-                    name: "Admire Vega",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Medium",
-                    style: "Chaser",
-                    aptitudes: ["Turf", "Medium", "Long", "Chaser", "Betweener"],
-                    image: "/images/trainee_images/__admire_vega_umamusume_drawn_by_starheart__73f0bb397f0b402e876d32e31699e7f8.png",
-                    stats: {
-                        speed: 95,
-                        stamina: 90,
-                        power: 96,
-                        guts: 88,
-                        wisdom: 90
+                    {
+                        id: 33,
+                        name: "Admire Vega",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Medium",
+                        style: "Chaser",
+                        aptitudes: ["Turf", "Medium", "Long", "Chaser", "Betweener"],
+                        image: "/images/trainee_images/__admire_vega_umamusume_drawn_by_starheart__73f0bb397f0b402e876d32e31699e7f8.png",
+                        stats: {
+                            speed: 95,
+                            stamina: 90,
+                            power: 96,
+                            guts: 88,
+                            wisdom: 90
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 0,
+                            power: 20,
+                            guts: 0,
+                            wisdom: 10
+                        }
                     },
-                    growth: {
-                        speed: 0,
-                        stamina: 0,
-                        power: 20,
-                        guts: 0,
-                        wisdom: 10
-                    }
-                },
-                {
-                    id: 34,
-                    name: "Curren Chan",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Sprint",
-                    style: "Leader",
-                    aptitudes: ["Turf", "Sprint", "Mile", "Leader", "Runner"],
-                    image: "/images/trainee_images/__curren_chan_umamusume_drawn_by_motsutoko__214a9ed5e49207f8f6c3daaab732e40f.jpg",
-                    stats: {
-                        speed: 100,
-                        stamina: 80,
-                        power: 95,
-                        guts: 88,
-                        wisdom: 90
+                    {
+                        id: 34,
+                        name: "Curren Chan",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Sprint",
+                        style: "Leader",
+                        aptitudes: ["Turf", "Sprint", "Mile", "Leader", "Runner"],
+                        image: "/images/trainee_images/__curren_chan_umamusume_drawn_by_motsutoko__214a9ed5e49207f8f6c3daaab732e40f.jpg",
+                        stats: {
+                            speed: 100,
+                            stamina: 80,
+                            power: 95,
+                            guts: 88,
+                            wisdom: 90
+                        },
+                        growth: {
+                            speed: 10,
+                            stamina: 0,
+                            power: 20,
+                            guts: 0,
+                            wisdom: 0
+                        }
                     },
-                    growth: {
-                        speed: 10,
-                        stamina: 0,
-                        power: 20,
-                        guts: 0,
-                        wisdom: 0
-                    }
-                },
-                {
-                    id: 35,
-                    name: "Kawakami Princess",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Medium",
-                    style: "Betweener",
-                    aptitudes: ["Turf", "Medium", "Betweener", "Chaser"],
-                    image: "/images/trainee_images/__kawakami_princess_umamusume_drawn_by_kurokawa_heuy__f291f768b02437eb7e1db94e5560f720.jpg",
-                    stats: {
-                        speed: 92,
-                        stamina: 85,
-                        power: 105,
-                        guts: 94,
-                        wisdom: 82
+                    {
+                        id: 35,
+                        name: "Kawakami Princess",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Medium",
+                        style: "Betweener",
+                        aptitudes: ["Turf", "Medium", "Betweener", "Chaser"],
+                        image: "/images/trainee_images/__kawakami_princess_umamusume_drawn_by_kurokawa_heuy__f291f768b02437eb7e1db94e5560f720.jpg",
+                        stats: {
+                            speed: 92,
+                            stamina: 85,
+                            power: 105,
+                            guts: 94,
+                            wisdom: 82
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 0,
+                            power: 10,
+                            guts: 20,
+                            wisdom: 0
+                        }
                     },
-                    growth: {
-                        speed: 0,
-                        stamina: 0,
-                        power: 10,
-                        guts: 20,
-                        wisdom: 0
-                    }
-                },
-                {
-                    id: 36,
-                    name: "Gold City",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Mile",
-                    style: "Leader",
-                    aptitudes: ["Turf", "Mile", "Medium", "Long", "Leader", "Betweener"],
-                    image: "/images/trainee_images/__gold_city_umamusume_drawn_by_chahiro__67945e12fb1202e37bfb10604e906125.jpg",
-                    stats: {
-                        speed: 96,
-                        stamina: 88,
-                        power: 88,
-                        guts: 94,
-                        wisdom: 88
+                    {
+                        id: 36,
+                        name: "Gold City",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Mile",
+                        style: "Leader",
+                        aptitudes: ["Turf", "Mile", "Medium", "Long", "Leader", "Betweener"],
+                        image: "/images/trainee_images/__gold_city_umamusume_drawn_by_chahiro__67945e12fb1202e37bfb10604e906125.jpg",
+                        stats: {
+                            speed: 96,
+                            stamina: 88,
+                            power: 88,
+                            guts: 94,
+                            wisdom: 88
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 10,
+                            power: 0,
+                            guts: 20,
+                            wisdom: 0
+                        }
                     },
-                    growth: {
-                        speed: 0,
-                        stamina: 10,
-                        power: 0,
-                        guts: 20,
-                        wisdom: 0
-                    }
-                },
-                {
-                    id: 37,
-                    name: "Sakura Bakushin O",
-                    rarity: 1,
-                    surface: "Turf",
-                    distance: "Sprint",
-                    style: "Runner",
-                    aptitudes: ["Turf", "Sprint", "Mile", "Runner", "Leader"],
-                    image: "/images/trainee_images/__sakura_bakushin_o_umamusume_drawn_by_itou_onsoku_tassha__8b4727be2ac678c0c1cad199ce9c18e3.jpg",
-                    stats: {
-                        speed: 105,
-                        stamina: 75,
-                        power: 85,
-                        guts: 90,
-                        wisdom: 90
+                    {
+                        id: 37,
+                        name: "Sakura Bakushin O",
+                        rarity: 1,
+                        surface: "Turf",
+                        distance: "Sprint",
+                        style: "Runner",
+                        aptitudes: ["Turf", "Sprint", "Mile", "Runner", "Leader"],
+                        image: "/images/trainee_images/__sakura_bakushin_o_umamusume_drawn_by_itou_onsoku_tassha__8b4727be2ac678c0c1cad199ce9c18e3.jpg",
+                        stats: {
+                            speed: 105,
+                            stamina: 75,
+                            power: 85,
+                            guts: 90,
+                            wisdom: 90
+                        },
+                        growth: {
+                            speed: 20,
+                            stamina: 0,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 10
+                        }
                     },
-                    growth: {
-                        speed: 20,
-                        stamina: 0,
-                        power: 0,
-                        guts: 0,
-                        wisdom: 10
-                    }
-                },
-                {
-                    id: 38,
-                    name: "Shinko Windy",
-                    rarity: 2,
-                    surface: "Dirt",
-                    distance: "Mile",
-                    style: "Leader",
-                    aptitudes: ["Turf", "Dirt", "Mile", "Medium", "Leader"],
-                    image: "/images/trainee_images/__shinko_windy_umamusume_drawn_by_toriga_naku__95b4fbdeb3df9122e8131289abd13cb1.jpg",
-                    stats: {
-                        speed: 90,
-                        stamina: 85,
-                        power: 94,
-                        guts: 90,
-                        wisdom: 88
+                    {
+                        id: 38,
+                        name: "Shinko Windy",
+                        rarity: 2,
+                        surface: "Dirt",
+                        distance: "Mile",
+                        style: "Leader",
+                        aptitudes: ["Turf", "Dirt", "Mile", "Medium", "Leader"],
+                        image: "/images/trainee_images/__shinko_windy_umamusume_drawn_by_toriga_naku__95b4fbdeb3df9122e8131289abd13cb1.jpg",
+                        stats: {
+                            speed: 90,
+                            stamina: 85,
+                            power: 94,
+                            guts: 90,
+                            wisdom: 88
+                        },
+                        growth: {
+                            speed: 10,
+                            stamina: 0,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 20
+                        }
                     },
-                    growth: {
-                        speed: 10,
-                        stamina: 0,
-                        power: 0,
-                        guts: 0,
-                        wisdom: 20
-                    }
-                },
-                {
-                    id: 39,
-                    name: "Smart Falcon",
-                    rarity: 3,
-                    surface: "Dirt",
-                    distance: "Medium",
-                    style: "Runner",
-                    aptitudes: ["Dirt", "Mile", "Medium", "Runner"],
-                    image: "/images/trainee_images/__smart_falcon_umamusume_drawn_by_motsutoko__695387267327663d2f7a9eb898107126.jpg",
-                    stats: {
-                        speed: 100,
-                        stamina: 90,
-                        power: 92,
-                        guts: 88,
-                        wisdom: 88
+                    {
+                        id: 39,
+                        name: "Smart Falcon",
+                        rarity: 3,
+                        surface: "Dirt",
+                        distance: "Medium",
+                        style: "Runner",
+                        aptitudes: ["Dirt", "Mile", "Medium", "Runner"],
+                        image: "/images/trainee_images/__smart_falcon_umamusume_drawn_by_motsutoko__695387267327663d2f7a9eb898107126.jpg",
+                        stats: {
+                            speed: 100,
+                            stamina: 90,
+                            power: 92,
+                            guts: 88,
+                            wisdom: 88
+                        },
+                        growth: {
+                            speed: 20,
+                            stamina: 0,
+                            power: 10,
+                            guts: 0,
+                            wisdom: 0
+                        }
                     },
-                    growth: {
-                        speed: 20,
-                        stamina: 0,
-                        power: 10,
-                        guts: 0,
-                        wisdom: 0
-                    }
-                },
-                {
-                    id: 40,
-                    name: "Zenno Rob Roy",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Medium",
-                    style: "Leader",
-                    aptitudes: ["Turf", "Medium", "Long", "Leader", "Betweener"],
-                    image: "/images/trainee_images/__zenno_rob_roy_umamusume_drawn_by_factory314__2ea22f996f5a613b62bb354cf31c0b64.png",
-                    stats: {
-                        speed: 92,
-                        stamina: 94,
-                        power: 90,
-                        guts: 85,
-                        wisdom: 95
+                    {
+                        id: 40,
+                        name: "Zenno Rob Roy",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Medium",
+                        style: "Leader",
+                        aptitudes: ["Turf", "Medium", "Long", "Leader", "Betweener"],
+                        image: "/images/trainee_images/__zenno_rob_roy_umamusume_drawn_by_factory314__2ea22f996f5a613b62bb354cf31c0b64.png",
+                        stats: {
+                            speed: 92,
+                            stamina: 94,
+                            power: 90,
+                            guts: 85,
+                            wisdom: 95
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 10,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 20
+                        }
                     },
-                    growth: {
-                        speed: 0,
-                        stamina: 10,
-                        power: 0,
-                        guts: 0,
-                        wisdom: 20
-                    }
-                },
-                {
-                    id: 41,
-                    name: "Tosen Jordan",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Medium",
-                    style: "Leader",
-                    aptitudes: ["Turf", "Medium", "Long", "Leader", "Betweener"],
-                    image: "/images/trainee_images/__tosen_jordan_umamusume_drawn_by_hiyo_uma__a352b60dedc127b826458915c0a8b94d.jpg",
-                    stats: {
-                        speed: 94,
-                        stamina: 90,
-                        power: 92,
-                        guts: 88,
-                        wisdom: 90
+                    {
+                        id: 41,
+                        name: "Tosen Jordan",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Medium",
+                        style: "Leader",
+                        aptitudes: ["Turf", "Medium", "Long", "Leader", "Betweener"],
+                        image: "/images/trainee_images/__tosen_jordan_umamusume_drawn_by_hiyo_uma__a352b60dedc127b826458915c0a8b94d.jpg",
+                        stats: {
+                            speed: 94,
+                            stamina: 90,
+                            power: 92,
+                            guts: 88,
+                            wisdom: 90
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 10,
+                            power: 10,
+                            guts: 0,
+                            wisdom: 10
+                        }
                     },
-                    growth: {
-                        speed: 0,
-                        stamina: 10,
-                        power: 10,
-                        guts: 0,
-                        wisdom: 10
-                    }
-                },
-                {
-                    id: 42,
-                    name: "Nakayama Festa",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Medium",
-                    style: "Betweener",
-                    aptitudes: ["Turf", "Medium", "Long", "Betweener"],
-                    image: "/images/trainee_images/__nakayama_festa_and_alex_umamusume_and_2_more_drawn_by_hakuki__c80d09aab832bf5d94c91dfbe030df9f.jpg",
-                    stats: {
-                        speed: 92,
-                        stamina: 96,
-                        power: 94,
-                        guts: 92,
-                        wisdom: 85
+                    {
+                        id: 42,
+                        name: "Nakayama Festa",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Medium",
+                        style: "Betweener",
+                        aptitudes: ["Turf", "Medium", "Long", "Betweener"],
+                        image: "/images/trainee_images/__nakayama_festa_and_alex_umamusume_and_2_more_drawn_by_hakuki__c80d09aab832bf5d94c91dfbe030df9f.jpg",
+                        stats: {
+                            speed: 92,
+                            stamina: 96,
+                            power: 94,
+                            guts: 92,
+                            wisdom: 85
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 10,
+                            power: 0,
+                            guts: 20,
+                            wisdom: 0
+                        }
                     },
-                    growth: {
-                        speed: 0,
-                        stamina: 10,
-                        power: 0,
-                        guts: 20,
-                        wisdom: 0
-                    }
-                },
-                {
-                    id: 43,
-                    name: "Narita Taishin",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Medium",
-                    style: "Chaser",
-                    aptitudes: ["Turf", "Medium", "Long", "Chaser"],
-                    image: "/images/trainee_images/__narita_taishin_umamusume_drawn_by_izumi_mahiru__60b068372d0a2398231aea82bfd89de7.jpg",
-                    stats: {
-                        speed: 95,
-                        stamina: 92,
-                        power: 88,
-                        guts: 96,
-                        wisdom: 82
+                    {
+                        id: 43,
+                        name: "Narita Taishin",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Medium",
+                        style: "Chaser",
+                        aptitudes: ["Turf", "Medium", "Long", "Chaser"],
+                        image: "/images/trainee_images/__narita_taishin_umamusume_drawn_by_izumi_mahiru__60b068372d0a2398231aea82bfd89de7.jpg",
+                        stats: {
+                            speed: 95,
+                            stamina: 92,
+                            power: 88,
+                            guts: 96,
+                            wisdom: 82
+                        },
+                        growth: {
+                            speed: 10,
+                            stamina: 0,
+                            power: 0,
+                            guts: 20,
+                            wisdom: 0
+                        }
                     },
-                    growth: {
-                        speed: 10,
-                        stamina: 0,
-                        power: 0,
-                        guts: 20,
-                        wisdom: 0
-                    }
-                },
-                {
-                    id: 44,
-                    name: "Nishino Flower",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Mile",
-                    style: "Leader",
-                    aptitudes: ["Turf", "Sprint", "Mile", "Leader", "Betweener"],
-                    image: "/images/trainee_images/__nishino_flower_umamusume_drawn_by_otono_bkt4b__c4ec03e283e403171cb8dc47175b920f.png",
-                    stats: {
-                        speed: 98,
-                        stamina: 82,
-                        power: 94,
-                        guts: 85,
-                        wisdom: 95
+                    {
+                        id: 44,
+                        name: "Nishino Flower",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Mile",
+                        style: "Leader",
+                        aptitudes: ["Turf", "Sprint", "Mile", "Leader", "Betweener"],
+                        image: "/images/trainee_images/__nishino_flower_umamusume_drawn_by_otono_bkt4b__c4ec03e283e403171cb8dc47175b920f.png",
+                        stats: {
+                            speed: 98,
+                            stamina: 82,
+                            power: 94,
+                            guts: 85,
+                            wisdom: 95
+                        },
+                        growth: {
+                            speed: 10,
+                            stamina: 0,
+                            power: 20,
+                            guts: 0,
+                            wisdom: 0
+                        }
                     },
-                    growth: {
-                        speed: 10,
-                        stamina: 0,
-                        power: 20,
-                        guts: 0,
-                        wisdom: 0
-                    }
-                },
-                {
-                    id: 45,
-                    name: "Haru Urara",
-                    rarity: 1,
-                    surface: "Dirt",
-                    distance: "Sprint",
-                    style: "Betweener",
-                    aptitudes: ["Dirt", "Sprint", "Mile", "Betweener", "Chaser"],
-                    image: "/images/trainee_images/__haru_urara_umamusume_drawn_by_advarcher__sample-7d1c3c431ef193e5e061bdda73f97fd5.jpg",
-                    stats: {
-                        speed: 85,
-                        stamina: 80,
-                        power: 90,
-                        guts: 100,
-                        wisdom: 75
+                    {
+                        id: 45,
+                        name: "Haru Urara",
+                        rarity: 1,
+                        surface: "Dirt",
+                        distance: "Sprint",
+                        style: "Betweener",
+                        aptitudes: ["Dirt", "Sprint", "Mile", "Betweener", "Chaser"],
+                        image: "/images/trainee_images/__haru_urara_umamusume_drawn_by_advarcher__sample-7d1c3c431ef193e5e061bdda73f97fd5.jpg",
+                        stats: {
+                            speed: 85,
+                            stamina: 80,
+                            power: 90,
+                            guts: 100,
+                            wisdom: 75
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 0,
+                            power: 10,
+                            guts: 20,
+                            wisdom: 0
+                        }
                     },
-                    growth: {
-                        speed: 0,
-                        stamina: 0,
-                        power: 10,
-                        guts: 20,
-                        wisdom: 0
-                    }
-                },
-                {
-                    id: 46,
-                    name: "Matikanefukukitaru",
-                    rarity: 2,
-                    surface: "Turf",
-                    distance: "Long",
-                    style: "Betweener",
-                    aptitudes: ["Turf", "Medium", "Long", "Betweener"],
-                    image: "/images/trainee_images/__matikanefukukitaru_umamusume_drawn_by_kawashina_momen_silicon__00780ddf644b4efef3e7744b2b946a28.png",
-                    stats: {
-                        speed: 88,
-                        stamina: 95,
-                        power: 88,
-                        guts: 90,
-                        wisdom: 92
+                    {
+                        id: 46,
+                        name: "Matikanefukukitaru",
+                        rarity: 2,
+                        surface: "Turf",
+                        distance: "Long",
+                        style: "Betweener",
+                        aptitudes: ["Turf", "Medium", "Long", "Betweener"],
+                        image: "/images/trainee_images/__matikanefukukitaru_umamusume_drawn_by_kawashina_momen_silicon__00780ddf644b4efef3e7744b2b946a28.png",
+                        stats: {
+                            speed: 88,
+                            stamina: 95,
+                            power: 88,
+                            guts: 90,
+                            wisdom: 92
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 20,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 10
+                        }
                     },
-                    growth: {
-                        speed: 0,
-                        stamina: 20,
-                        power: 0,
-                        guts: 0,
-                        wisdom: 10
-                    }
-                },
-                {
-                    id: 47,
-                    name: "Meisho Doto",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Medium",
-                    style: "Leader",
-                    aptitudes: ["Turf", "Medium", "Long", "Leader"],
-                    image: "/images/trainee_images/__meisho_doto_umamusume_drawn_by_tukune__d3e176e31aa10898a48e01654298cc07.jpg",
-                    stats: {
-                        speed: 92,
-                        stamina: 98,
-                        power: 94,
-                        guts: 90,
-                        wisdom: 85
+                    {
+                        id: 47,
+                        name: "Meisho Doto",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Medium",
+                        style: "Leader",
+                        aptitudes: ["Turf", "Medium", "Long", "Leader"],
+                        image: "/images/trainee_images/__meisho_doto_umamusume_drawn_by_tukune__d3e176e31aa10898a48e01654298cc07.jpg",
+                        stats: {
+                            speed: 92,
+                            stamina: 98,
+                            power: 94,
+                            guts: 90,
+                            wisdom: 85
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 10,
+                            power: 0,
+                            guts: 20,
+                            wisdom: 0
+                        }
                     },
-                    growth: {
-                        speed: 0,
-                        stamina: 10,
-                        power: 0,
-                        guts: 20,
-                        wisdom: 0
-                    }
-                },
-                {
-                    id: 48,
-                    name: "Nice Nature",
-                    rarity: 1,
-                    surface: "Turf",
-                    distance: "Medium",
-                    style: "Betweener",
-                    aptitudes: ["Turf", "Medium", "Long", "Betweener"],
-                    image: "/images/trainee_images/__nice_nature_umamusume_drawn_by_sekiyu_inu__d1d0d3773cf6b911f6ac6b1f753acff0.jpg",
-                    stats: {
-                        speed: 85,
-                        stamina: 85,
-                        power: 90,
-                        guts: 88,
-                        wisdom: 92
+                    {
+                        id: 48,
+                        name: "Nice Nature",
+                        rarity: 1,
+                        surface: "Turf",
+                        distance: "Medium",
+                        style: "Betweener",
+                        aptitudes: ["Turf", "Medium", "Long", "Betweener"],
+                        image: "/images/trainee_images/__nice_nature_umamusume_drawn_by_sekiyu_inu__d1d0d3773cf6b911f6ac6b1f753acff0.jpg",
+                        stats: {
+                            speed: 85,
+                            stamina: 85,
+                            power: 90,
+                            guts: 88,
+                            wisdom: 92
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 0,
+                            power: 10,
+                            guts: 0,
+                            wisdom: 20
+                        }
                     },
-                    growth: {
-                        speed: 0,
-                        stamina: 0,
-                        power: 10,
-                        guts: 0,
-                        wisdom: 20
-                    }
-                },
-                {
-                    id: 49,
-                    name: "King Halo",
-                    rarity: 1,
-                    surface: "Turf",
-                    distance: "Sprint",
-                    style: "Betweener",
-                    aptitudes: ["Turf", "Sprint", "Mile", "Betweener", "Chaser"],
-                    image: "/images/trainee_images/__king_halo_umamusume_drawn_by_jjjsss__1d5e6f12cd1a62d961c95a210cb275b2.jpg",
-                    stats: {
-                        speed: 90,
-                        stamina: 82,
-                        power: 95,
-                        guts: 90,
-                        wisdom: 85
+                    {
+                        id: 49,
+                        name: "King Halo",
+                        rarity: 1,
+                        surface: "Turf",
+                        distance: "Sprint",
+                        style: "Betweener",
+                        aptitudes: ["Turf", "Sprint", "Mile", "Betweener", "Chaser"],
+                        image: "/images/trainee_images/__king_halo_umamusume_drawn_by_jjjsss__1d5e6f12cd1a62d961c95a210cb275b2.jpg",
+                        stats: {
+                            speed: 90,
+                            stamina: 82,
+                            power: 95,
+                            guts: 90,
+                            wisdom: 85
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 0,
+                            power: 20,
+                            guts: 10,
+                            wisdom: 0
+                        }
                     },
-                    growth: {
-                        speed: 0,
-                        stamina: 0,
-                        power: 20,
-                        guts: 10,
-                        wisdom: 0
-                    }
-                },
-                {
-                    id: 50,
-                    name: "Machikane Tannhauser",
-                    rarity: 2,
-                    surface: "Turf",
-                    distance: "Long",
-                    style: "Leader",
-                    aptitudes: ["Turf", "Medium", "Long", "Leader", "Betweener"],
-                    image: "/images/trainee_images/__matikanetannhauser_umamusume_drawn_by_funamori__d3c68aae9e0247b1c79ad830d655fe27.jpg",
-                    stats: {
-                        speed: 88,
-                        stamina: 96,
-                        power: 90,
-                        guts: 94,
-                        wisdom: 85
+                    {
+                        id: 50,
+                        name: "Machikane Tannhauser",
+                        rarity: 2,
+                        surface: "Turf",
+                        distance: "Long",
+                        style: "Leader",
+                        aptitudes: ["Turf", "Medium", "Long", "Leader", "Betweener"],
+                        image: "/images/trainee_images/__matikanetannhauser_umamusume_drawn_by_funamori__d3c68aae9e0247b1c79ad830d655fe27.jpg",
+                        stats: {
+                            speed: 88,
+                            stamina: 96,
+                            power: 90,
+                            guts: 94,
+                            wisdom: 85
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 20,
+                            power: 0,
+                            guts: 10,
+                            wisdom: 0
+                        }
                     },
-                    growth: {
-                        speed: 0,
-                        stamina: 20,
-                        power: 0,
-                        guts: 10,
-                        wisdom: 0
-                    }
-                },
-                {
-                    id: 51,
-                    name: "Ikuno Dictus",
-                    rarity: 2,
-                    surface: "Turf",
-                    distance: "Medium",
-                    style: "Betweener",
-                    aptitudes: ["Turf", "Mile", "Medium", "Betweener", "Chaser"],
-                    image: "/images/trainee_images/__ikuno_dictus_umamusume_drawn_by_zukki_bijitaru__b5bd688fe98c5379acac9ed07537db83.png",
-                    stats: {
-                        speed: 85,
-                        stamina: 94,
-                        power: 85,
-                        guts: 92,
-                        wisdom: 95
+                    {
+                        id: 51,
+                        name: "Ikuno Dictus",
+                        rarity: 2,
+                        surface: "Turf",
+                        distance: "Medium",
+                        style: "Betweener",
+                        aptitudes: ["Turf", "Mile", "Medium", "Betweener", "Chaser"],
+                        image: "/images/trainee_images/__ikuno_dictus_umamusume_drawn_by_zukki_bijitaru__b5bd688fe98c5379acac9ed07537db83.png",
+                        stats: {
+                            speed: 85,
+                            stamina: 94,
+                            power: 85,
+                            guts: 92,
+                            wisdom: 95
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 15,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 15
+                        }
                     },
-                    growth: {
-                        speed: 0,
-                        stamina: 15,
-                        power: 0,
-                        guts: 0,
-                        wisdom: 15
-                    }
-                },
-                {
-                    id: 52,
-                    name: "Twin Turbo",
-                    rarity: 1,
-                    surface: "Turf",
-                    distance: "Mile",
-                    style: "Runner",
-                    aptitudes: ["Turf", "Mile", "Medium", "Runner"],
-                    image: "/images/trainee_images/__twin_turbo_umamusume_drawn_by_urujika__718f48540797d2872f7a1d578edae44a.jpg",
-                    stats: {
-                        speed: 100,
-                        stamina: 70,
-                        power: 80,
-                        guts: 85,
-                        wisdom: 75
+                    {
+                        id: 52,
+                        name: "Twin Turbo",
+                        rarity: 1,
+                        surface: "Turf",
+                        distance: "Mile",
+                        style: "Runner",
+                        aptitudes: ["Turf", "Mile", "Medium", "Runner"],
+                        image: "/images/trainee_images/__twin_turbo_umamusume_drawn_by_urujika__718f48540797d2872f7a1d578edae44a.jpg",
+                        stats: {
+                            speed: 100,
+                            stamina: 70,
+                            power: 80,
+                            guts: 85,
+                            wisdom: 75
+                        },
+                        growth: {
+                            speed: 30,
+                            stamina: 0,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 0
+                        }
                     },
-                    growth: {
-                        speed: 30,
-                        stamina: 0,
-                        power: 0,
-                        guts: 0,
-                        wisdom: 0
-                    }
-                },
-                {
-                    id: 53,
-                    name: "Satono Diamond",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Long",
-                    style: "Betweener",
-                    aptitudes: ["Turf", "Medium", "Long", "Betweener"],
-                    image: "/images/trainee_images/__satono_diamond_umamusume_drawn_by_freely2327__80fbdecd4f5c28f8501c032031d978d0.png",
-                    stats: {
-                        speed: 94,
-                        stamina: 102,
-                        power: 90,
-                        guts: 95,
-                        wisdom: 92
+                    {
+                        id: 53,
+                        name: "Satono Diamond",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Long",
+                        style: "Betweener",
+                        aptitudes: ["Turf", "Medium", "Long", "Betweener"],
+                        image: "/images/trainee_images/__satono_diamond_umamusume_drawn_by_freely2327__80fbdecd4f5c28f8501c032031d978d0.png",
+                        stats: {
+                            speed: 94,
+                            stamina: 102,
+                            power: 90,
+                            guts: 95,
+                            wisdom: 92
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 15,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 15
+                        }
                     },
-                    growth: {
-                        speed: 0,
-                        stamina: 15,
-                        power: 0,
-                        guts: 0,
-                        wisdom: 15
-                    }
-                },
-                {
-                    id: 54,
-                    name: "Kitasan Black",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Long",
-                    style: "Runner",
-                    aptitudes: ["Turf", "Medium", "Long", "Runner", "Leader"],
-                    image: "/images/trainee_images/__kitasan_black_umamusume_drawn_by_mattya122__47e067dbb97ad9a28758789d05c28f90.jpg",
-                    stats: {
-                        speed: 100,
-                        stamina: 98,
-                        power: 92,
-                        guts: 88,
-                        wisdom: 90
+                    {
+                        id: 54,
+                        name: "Kitasan Black",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Long",
+                        style: "Runner",
+                        aptitudes: ["Turf", "Medium", "Long", "Runner", "Leader"],
+                        image: "/images/trainee_images/__kitasan_black_umamusume_drawn_by_mattya122__47e067dbb97ad9a28758789d05c28f90.jpg",
+                        stats: {
+                            speed: 100,
+                            stamina: 98,
+                            power: 92,
+                            guts: 88,
+                            wisdom: 90
+                        },
+                        growth: {
+                            speed: 20,
+                            stamina: 10,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 0
+                        }
                     },
-                    growth: {
-                        speed: 20,
-                        stamina: 10,
-                        power: 0,
-                        guts: 0,
-                        wisdom: 0
-                    }
-                },
-                {
-                    id: 55,
-                    name: "Mejiro Ardan",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Medium",
-                    style: "Leader",
-                    aptitudes: ["Turf", "Medium", "Leader"],
-                    image: "/images/trainee_images/__mejiro_ardan_umamusume_drawn_by_kentan_kingtaiki__3e95bc0615337fe4e260aaf5c73b1595.jpg",
-                    stats: {
-                        speed: 96,
-                        stamina: 88,
-                        power: 90,
-                        guts: 85,
-                        wisdom: 100
+                    {
+                        id: 55,
+                        name: "Mejiro Ardan",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Medium",
+                        style: "Leader",
+                        aptitudes: ["Turf", "Medium", "Leader"],
+                        image: "/images/trainee_images/__mejiro_ardan_umamusume_drawn_by_kentan_kingtaiki__3e95bc0615337fe4e260aaf5c73b1595.jpg",
+                        stats: {
+                            speed: 96,
+                            stamina: 88,
+                            power: 90,
+                            guts: 85,
+                            wisdom: 100
+                        },
+                        growth: {
+                            speed: 10,
+                            stamina: 0,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 20
+                        }
                     },
-                    growth: {
-                        speed: 10,
-                        stamina: 0,
-                        power: 0,
-                        guts: 0,
-                        wisdom: 20
-                    }
-                },
-                {
-                    id: 56,
-                    name: "Mejiro Dober",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Medium",
-                    style: "Betweener",
-                    aptitudes: ["Turf", "Medium", "Mile", "Betweener"],
-                    image: "/images/trainee_images/__mejiro_dober_umamusume_drawn_by_puddinghomhom__fa2912aaa50460a0804ff3253ad00be1.png",
-                    stats: {
-                        speed: 92,
-                        stamina: 90,
-                        power: 85,
-                        guts: 90,
-                        wisdom: 102
+                    {
+                        id: 56,
+                        name: "Mejiro Dober",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Medium",
+                        style: "Betweener",
+                        aptitudes: ["Turf", "Medium", "Mile", "Betweener"],
+                        image: "/images/trainee_images/__mejiro_dober_umamusume_drawn_by_puddinghomhom__fa2912aaa50460a0804ff3253ad00be1.png",
+                        stats: {
+                            speed: 92,
+                            stamina: 90,
+                            power: 85,
+                            guts: 90,
+                            wisdom: 102
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 0,
+                            power: 0,
+                            guts: 10,
+                            wisdom: 20
+                        }
                     },
-                    growth: {
-                        speed: 0,
-                        stamina: 0,
-                        power: 0,
-                        guts: 10,
-                        wisdom: 20
-                    }
-                },
-                {
-                    id: 57,
-                    name: "Mejiro Palmer",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Long",
-                    style: "Runner",
-                    aptitudes: ["Turf", "Medium", "Long", "Runner"],
-                    image: "/images/trainee_images/__mejiro_palmer_umamusume_drawn_by_fuchina__9867288e81382c6cacc9bdd33d1eb582.png",
-                    stats: {
-                        speed: 95,
-                        stamina: 94,
-                        power: 92,
-                        guts: 98,
-                        wisdom: 80
+                    {
+                        id: 57,
+                        name: "Mejiro Palmer",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Long",
+                        style: "Runner",
+                        aptitudes: ["Turf", "Medium", "Long", "Runner"],
+                        image: "/images/trainee_images/__mejiro_palmer_umamusume_drawn_by_fuchina__9867288e81382c6cacc9bdd33d1eb582.png",
+                        stats: {
+                            speed: 95,
+                            stamina: 94,
+                            power: 92,
+                            guts: 98,
+                            wisdom: 80
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 0,
+                            power: 10,
+                            guts: 20,
+                            wisdom: 0
+                        }
                     },
-                    growth: {
-                        speed: 0,
-                        stamina: 0,
-                        power: 10,
-                        guts: 20,
-                        wisdom: 0
-                    }
-                },
-                {
-                    id: 58,
-                    name: "Mr. C.B.",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Long",
-                    style: "Chaser",
-                    aptitudes: ["Turf", "Medium", "Long", "Chaser"],
-                    image: "/images/trainee_images/__mr_c_b_umamusume_drawn_by_taromarun__f18d9b885cd85cacc316047a32b2af8f.jpg",
-                    stats: {
-                        speed: 92,
-                        stamina: 100,
-                        power: 90,
-                        guts: 88,
-                        wisdom: 105
+                    {
+                        id: 58,
+                        name: "Mr. C.B.",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Long",
+                        style: "Chaser",
+                        aptitudes: ["Turf", "Medium", "Long", "Chaser"],
+                        image: "/images/trainee_images/__mr_c_b_umamusume_drawn_by_taromarun__f18d9b885cd85cacc316047a32b2af8f.jpg",
+                        stats: {
+                            speed: 92,
+                            stamina: 100,
+                            power: 90,
+                            guts: 88,
+                            wisdom: 105
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 10,
+                            power: 0,
+                            guts: 0,
+                            wisdom: 20
+                        }
                     },
-                    growth: {
-                        speed: 0,
-                        stamina: 10,
-                        power: 0,
-                        guts: 0,
-                        wisdom: 20
-                    }
-                },
-                {
-                    id: 59,
-                    name: "Yaeno Muteki",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Medium",
-                    style: "Leader",
-                    aptitudes: ["Turf", "Medium", "Mile", "Leader"],
-                    image: "/images/trainee_images/__yaeno_muteki_umamusume_drawn_by_rinka_tonariuta__4b68983d5d9e3e3243a2a2c8901047d8.png",
-                    stats: {
-                        speed: 90,
-                        stamina: 90,
-                        power: 105,
-                        guts: 95,
-                        wisdom: 85
+                    {
+                        id: 59,
+                        name: "Yaeno Muteki",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Medium",
+                        style: "Leader",
+                        aptitudes: ["Turf", "Medium", "Mile", "Leader"],
+                        image: "/images/trainee_images/__yaeno_muteki_umamusume_drawn_by_rinka_tonariuta__4b68983d5d9e3e3243a2a2c8901047d8.png",
+                        stats: {
+                            speed: 90,
+                            stamina: 90,
+                            power: 105,
+                            guts: 95,
+                            wisdom: 85
+                        },
+                        growth: {
+                            speed: 0,
+                            stamina: 0,
+                            power: 10,
+                            guts: 20,
+                            wisdom: 0
+                        }
                     },
-                    growth: {
-                        speed: 0,
-                        stamina: 0,
-                        power: 10,
-                        guts: 20,
-                        wisdom: 0
+                    {
+                        id: 60,
+                        name: "Sakura Chiyono O",
+                        rarity: 3,
+                        surface: "Turf",
+                        distance: "Medium",
+                        style: "Leader",
+                        aptitudes: ["Turf", "Medium", "Mile", "Leader"],
+                        image: "/images/trainee_images/__sakura_chiyono_o_umamusume_drawn_by_gamyuu_gamyu__cdf9c12c540c3c6222ddca538485f180.png",
+                        stats: {
+                            speed: 94,
+                            stamina: 92,
+                            power: 88,
+                            guts: 96,
+                            wisdom: 90
+                        },
+                        growth: {
+                            speed: 10,
+                            stamina: 0,
+                            power: 0,
+                            guts: 20,
+                            wisdom: 0
+                        }
                     }
-                },
-                {
-                    id: 60,
-                    name: "Sakura Chiyono O",
-                    rarity: 3,
-                    surface: "Turf",
-                    distance: "Medium",
-                    style: "Leader",
-                    aptitudes: ["Turf", "Medium", "Mile", "Leader"],
-                    image: "/images/trainee_images/__sakura_chiyono_o_umamusume_drawn_by_gamyuu_gamyu__cdf9c12c540c3c6222ddca538485f180.png",
-                    stats: {
-                        speed: 94,
-                        stamina: 92,
-                        power: 88,
-                        guts: 96,
-                        wisdom: 90
-                    },
-                    growth: {
-                        speed: 10,
-                        stamina: 0,
-                        power: 0,
-                        guts: 20,
-                        wisdom: 0
-                    }
-                }
                 ],
 
                 filteredTrainees() {

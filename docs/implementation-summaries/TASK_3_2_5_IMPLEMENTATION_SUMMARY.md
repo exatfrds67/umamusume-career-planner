@@ -60,7 +60,7 @@ function skillManagement() {
   - Skill cards with rarity and meta tier badges
   - Evolution status indicators
   - SP cost breakdown with savings display
-  - Hint progress bars (0-2 hints, 40% max discount)
+  - Hint progress bars (5 levels: 10%/20%/30%/35%/40% max discount)
   - Performance statistics (races used, effectiveness rating)
   - Quick action buttons (View Details)
 
@@ -417,7 +417,7 @@ This column tracks the character's current SP balance for skill acquisitions.
 
 - **Dual View**: Acquired skills and available skills displayed separately
 - **Advanced Filtering**: Search, type, rarity, and meta tier filters
-- **Hint Progress**: Visual progress bars showing hint collection (0-2 hints)
+- **Hint Progress**: Visual progress bars showing hint collection (5 levels: 10%/20%/30%/35%/40% max)
 - **Cost Calculations**: Real-time SP cost calculations with hint discounts
 - **Performance Tracking**: Races used and effectiveness ratings for acquired skills
 
@@ -504,7 +504,7 @@ This column tracks the character's current SP balance for skill acquisitions.
 **Implementation**:
 
 - Complete skill inventory with acquisition status
-- Hint progress tracking (20% per hint, 40% max)
+- Hint progress tracking (5 levels: 10%/20%/30%/35%/40% max)
 - Final cost calculations with discounts
 - Evolution path visualization
 - Skill source tracking (inherited, event, hint-discounted)
@@ -512,7 +512,7 @@ This column tracks the character's current SP balance for skill acquisitions.
 **Evidence**:
 
 - Skill inventory tab displays all skills with acquisition status
-- Hint progress bars show 0-2 hints with percentage discounts
+- Hint progress bars show 5 levels (10%/20%/30%/35%/40% max) with percentage discounts
 - Cost breakdown shows base cost, discounted cost, and SP saved
 - Evolution tab shows Normal → Rare upgrade paths
 
@@ -523,14 +523,14 @@ This column tracks the character's current SP balance for skill acquisitions.
 - Visual hint progress indicators
 - Real-time cost calculations
 - Hint source identification
-- Discount percentage display (20%, 40%)
+- Discount percentage display (10%/20%/30%/35%/40%)
 - SP savings projections
 
 **Evidence**:
 
 - Green highlight boxes for skills with available hints
-- Hint count badges (e.g., "2 hints available")
-- Discount percentage labels (e.g., "40% discount")
+- Hint level badges (e.g., "Level 5 hints available")
+- Discount percentage labels (e.g., "40% discount at level 5")
 - SP savings calculations (e.g., "Save 48 SP!")
 
 ### ✅ Requirement 30.3: Skill Evolution Visualization

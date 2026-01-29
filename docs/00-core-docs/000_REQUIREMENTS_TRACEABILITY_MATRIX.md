@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 3.0.0
-**Date**: January 23, 2026
+**Document Version**: 3.1.0
+**Date**: January 28, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned with codebase v2.0.0
+**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
 
 ---
 
@@ -205,7 +205,7 @@ flowchart LR
 | **BR-3.4** Race strategy | FR-04.4 | Provide race strategy recommendations | P1 | ✅ Complete |
 | **BR-3.5** Race history | FR-04.2 | Track race results and performance | P1 | ✅ Complete |
 | **BR-4.1** Skill catalog | FR-05.1 | Maintain comprehensive skill database | P0 | ✅ Complete |
-| **BR-4.2** Hint-based discount | FR-05.3 | Apply hint-based SP cost reduction (20% per hint, 60% max) | P0 | ✅ Complete |
+| **BR-4.2** Hint-based discount | FR-05.3 | Apply hint-based SP cost reduction (5 levels: 10%/20%/30%/35%/40% max) | P0 | ✅ Complete |
 | **BR-4.3** Skill evolution | FR-05.4 | Support skill evolution (Normal → Rare) | P1 | ✅ Complete |
 | **BR-4.4** SP optimization | FR-05.6 | Optimize SP budget allocation | P1 | ✅ Complete |
 | **BR-4.5** AI skill recommendations | FR-05.5 | Provide AI skill acquisition advice | P1 | ✅ Complete |

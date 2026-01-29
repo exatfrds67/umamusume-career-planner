@@ -43,7 +43,8 @@ describe('Character Seeding', function (): void {
     it('seeds characters with valid aptitude grades', function (): void {
         $this->seed(EnhancedRealUmaMusumeCharactersSeeder::class);
 
-        $validGrades = ['G', 'F', 'E', 'D', 'C', 'B', 'A', 'S', 'SS'];
+        // VERIFIED (Jan 2026): S is the maximum aptitude grade. SS does NOT exist.
+        $validGrades = ['G', 'F', 'E', 'D', 'C', 'B', 'A', 'S'];
 
         $character = Character::has('aptitudes')->first();
 
@@ -73,9 +74,10 @@ describe('Character Seeding', function (): void {
     it('can query characters by aptitude grade', function (): void {
         $this->seed(EnhancedRealUmaMusumeCharactersSeeder::class);
 
-        // Find characters with S or SS grade in any aptitude
+        // Find characters with S grade (maximum) in any aptitude
+        // VERIFIED (Jan 2026): S is the maximum aptitude grade. SS does NOT exist.
         $topGradeCharacters = Character::whereHas('aptitudes', function ($query): void {
-            $query->whereIn('grade', ['S', 'SS']);
+            $query->where('grade', 'S');
         })->get();
 
         // If seeder creates aptitudes, should have at least some characters with top grades

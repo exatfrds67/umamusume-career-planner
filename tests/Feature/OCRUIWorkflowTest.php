@@ -261,9 +261,9 @@ it('prevents unauthorized access to other users extractions', function () {
     $response->assertStatus(200);
     // The page title is always shown, but the extraction data should not be visible
     $response->assertSee('No extraction found');
-    // Should not see the extraction form or data
-    $response->assertDontSee('Import Data');
-    $response->assertDontSee('Save as Draft');
+    // Should not see the extraction form or action buttons (check for button elements, not sidebar links)
+    $response->assertDontSee('<button type="submit" name="action" value="import"', false);
+    $response->assertDontSee('<button type="submit" name="action" value="save_draft"', false);
 });
 
 it('displays raw OCR text in collapsible section', function () {

@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.1.0  
-**Date**: January 23, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current - Aligned with codebase
+**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
 
 ---
 
@@ -130,11 +130,11 @@ flowchart TD
 | ID | Requirement | Priority | Status |
 | -- | ----------- | -------- | ------ |
 | FR-02.1 | CRUD operations for characters with stat tracking | P0 | Complete |
-| FR-02.2 | Track five core stats: Speed, Stamina, Power, Guts, Wit (0-1200 range) | P0 | Complete |
+| FR-02.2 | Track five core stats: Speed, Stamina, Power, Guts, Wit (soft cap 1200, practical max ~1600) | P0 | Complete |
 | FR-02.3 | Track energy, mood, goals, and progression | P0 | Complete |
 | FR-02.4 | Manage character deck assignments (6-card support deck) | P0 | Complete |
 | FR-02.5 | Support scenario selection (URA Championship, Grand Masters, etc.) | P0 | Complete |
-| FR-02.6 | Track aptitude grades (SS through G) for distance/surface/style | P0 | Complete |
+| FR-02.6 | Track aptitude grades (S through G, S is maximum) for distance/surface/style | P0 | Complete |
 | FR-02.7 | Manage factor inheritance from parent characters | P0 | Complete |
 | FR-02.8 | Support character snapshots for versioning | P1 | Complete |
 | FR-02.9 | Track conditions (positive/negative status effects) | P1 | Complete |
@@ -250,7 +250,7 @@ flowchart LR
 | -- | ----------- | -------- | ------ |
 | FR-05.1 | Maintain skill catalog with categories (Normal, Rare, Unique) | P0 | Complete |
 | FR-05.2 | Track skill acquisitions per character | P0 | Complete |
-| FR-05.3 | Track hints and SP cost reductions (20% per hint, 40% max) | P0 | Complete |
+| FR-05.3 | Track hints and SP cost reductions (5 levels: 10%/20%/30%/35%/40% max) | P0 | Complete |
 | FR-05.4 | Support skill evolution paths (Normal → Rare) | P1 | Complete |
 | FR-05.5 | Provide skill recommendations based on race targets | P1 | Complete |
 | FR-05.6 | Calculate SP budget optimization | P1 | Complete |
@@ -684,7 +684,7 @@ erDiagram
 | plan.title | Required, max 255 chars | "Title is required and must be under 255 characters" |
 | plan.status | Enum: in_progress, completed, archived | "Invalid status value" |
 | plan.career_stage | Enum: junior, classic, senior | "Invalid career stage" |
-| stat.* | Integer, 0-1200 (hard max) | "Stat values must be between 0 and 1200" |
+| stat.* | Integer, soft cap 1200 (50% effectiveness above), practical max ~1600 | "Stat values have soft cap at 1200" |
 | skill.status | Enum: acquired, skipped, suggested | "Invalid skill status" |
 | skill.turn_acquired | Required if status=acquired, 1-78 | "Turn number required for acquired skills" |
 | energy | Integer, 0-100 | "Energy must be between 0 and 100" |

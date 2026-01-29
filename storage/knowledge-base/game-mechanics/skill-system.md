@@ -8,7 +8,7 @@
 - **Training Events**: Random bonus (+5-20 SP)
 - **Race Victories**: +15-30 SP based on race grade
 - **Support Card Events**: Variable (+10-50 SP)
-- **Skill Hints**: Reduce acquisition cost by 20-40%
+- **Skill Hints**: Reduce acquisition cost (5 levels: 10%/20%/30%/35%/40% max)
 
 ### SP Budget Planning
 
@@ -88,7 +88,7 @@
 
 - **Hint Appearance**: Random during training with appropriate cards
 - **Hint Duration**: 3-5 turns before expiration
-- **Cost Reduction**: 20-40% SP discount
+- **Cost Reduction**: 5 levels (10%/20%/30%/35%/40% max)
 - **Strategic Delay**: Wait for hints on expensive skills
 - **Multiple Hints**: Can stack multiple discounts
 

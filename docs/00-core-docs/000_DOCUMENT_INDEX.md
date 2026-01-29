@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 5.0.0
-**Date**: January 27, 2026
+**Document Version**: 5.1.0
+**Date**: January 28, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned to codebase v2.0.0
+**Status**: Current - Aligned to codebase v2.2.0
 
 ---
 
@@ -84,11 +84,11 @@ flowchart TD
 | Planning | 001_SDP | Current development plan and milestones | v2.2.0 |
 | Requirements | 002_BRS, 003_SRS | Business and software requirements (current scope) | v2.2.0 |
 | Design | 004_SDS | Current technical architecture and design | v2.2.0 |
-| Migration | 005_DMP, 006_DMS | Data migration plan and technical specs | v2.0.0 |
+| Migration | 005_DMP, 006_DMS | Data migration plan and technical specs | v2.2.0 |
 | Integration | 007_SIP, 008_SIS | Integration plan and specifications | v2.2.0 |
 | Technical | 009_DBD, 010_SCD | Database and source code documentation | v2.2.0 |
 | Verification | 000_IMPLEMENTATION_VERIFICATION_MATRIX, 000_REQUIREMENTS_TRACEABILITY_MATRIX | Implementation status and traceability | v2.2.0 |
-| User | 017_SUM | End-user manual | v2.0.0 |
+| User | 017_SUM | End-user manual | v2.2.0 |
 
 ### 1.3 Technology Stack Reference
 
@@ -628,21 +628,21 @@ Each document includes a "Document Control" section:
 
 | Document ID | Document Name | Version | Status | Last Updated |
 | --- | --- | --- | --- | --- |
-| 000 | DOCUMENT_INDEX | 4.0 | Current | 2026-01-23 |
-| 000 | MASTER_GLOSSARY | Current | Current | 2026-01-23 |
-| 001 | SDP | 2.1.0 | Current | 2026-01-23 |
-| 002 | BRS | 2.1.0 | Current | 2026-01-23 |
-| 003 | SRS | 2.1.0 | Current | 2026-01-23 |
-| 004 | SDS | 2.1.0 | Current | 2026-01-23 |
-| 005 | DMP | 2.0.0 | Current | 2026-01-23 |
-| 006 | DMS | 2.0.0 | Current | 2026-01-23 |
-| 007 | SIP | 2.1.0 | Current | 2026-01-23 |
-| 008 | SIS | 2.1.0 | Current | 2026-01-23 |
-| 009 | DBD | 2.1.0 | Current | 2026-01-23 |
-| 010 | SCD | 2.1.0 | Current | 2026-01-23 |
-| 017 | SUM | 2.0.0 | Current | 2026-01-23 |
-| 000 | IVM | 2.0.0 | Current | 2026-01-23 |
-| 000 | RTM | 2.0.0 | Current | 2026-01-23 |
+| 000 | DOCUMENT_INDEX | 5.1.0 | Current | 2026-01-28 |
+| 000 | MASTER_GLOSSARY | 3.2.0 | Current | 2026-01-28 |
+| 001 | SDP | 2.2.0 | Current | 2026-01-28 |
+| 002 | BRS | 2.2.0 | Current | 2026-01-28 |
+| 003 | SRS | 2.2.0 | Current | 2026-01-28 |
+| 004 | SDS | 2.2.0 | Current | 2026-01-28 |
+| 005 | DMP | 2.2.0 | Current | 2026-01-28 |
+| 006 | DMS | 2.2.0 | Current | 2026-01-28 |
+| 007 | SIP | 2.2.0 | Current | 2026-01-28 |
+| 008 | SIS | 2.2.0 | Current | 2026-01-28 |
+| 009 | DBD | 2.2.0 | Current | 2026-01-28 |
+| 010 | SCD | 2.2.0 | Current | 2026-01-28 |
+| 017 | SUM | 2.2.0 | Current | 2026-01-28 |
+| 000 | IVM | 4.2.0 | Current | 2026-01-28 |
+| 000 | RTM | 3.1.0 | Current | 2026-01-28 |
 
 ---
 
@@ -650,6 +650,7 @@ Each document includes a "Document Control" section:
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
+| 5.1.0 | 2026-01-28 | Development Team | Updated all documents to v2.2.0 with game-accurate mechanics; corrected aptitude grades (S is maximum, SS does NOT exist); updated hint system to 5 levels (10%/20%/30%/35%/40%); aligned with Global English Server mechanics |
 | 4.0 | 2026-01-23 | Development Team | Comprehensive update for v2.0.0 alignment; added detailed catalog entries with key content summaries; expanded dependency graph; added cross-reference matrix; enhanced quick reference by topic, role, phase, and module; added version control section; updated all document versions |
 | 3.1 | 2026-01-23 | Development Team | Updated catalog and dependency map to match current codebase |
 | 3.0 | 2026-01-12 | Development Team | Documentation consolidation and archive structure |

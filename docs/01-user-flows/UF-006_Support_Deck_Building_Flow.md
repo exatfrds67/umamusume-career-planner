@@ -2,15 +2,17 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.1.0  
-**Date**: January 24, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-005], [SPEC-005], [SRS], [BRS]
 
 **Source Specifications**:
+
 - `.kiro/specs/umamusume-career-planner-main/requirements.md` (Requirement 6: Support Card Configuration)
 - `.kiro/specs/umamusume-career-planner-main/design.md` (Support Deck Building Flow)
 
 **Related Artifacts**:
+
 - PRD: [PRD-005](../prds/PRD-005_Support_Card_Management.md)
 - SPEC: [SPEC-005](../specs/SPEC-005_Support_Card_Management_Technical.md)
 - Flow: [FLOW-005](../flows/FLOW-005_Support_Card_Management_System.md)
@@ -54,6 +56,7 @@ The Support Deck Building Flow guides users through the process of creating, opt
 **Business Goal**: Enable efficient deck building and optimization through intelligent card recommendations, synergy analysis, and meta tier integration.
 
 **Success Metrics**:
+
 - Deck creation completion rate: > 90%
 - Valid deck composition rate: > 95%
 - AI recommendation acceptance rate: > 70%
@@ -265,6 +268,8 @@ sequenceDiagram
 | Balanced | 1 | 1 | 1 | 1 | 1 | 1 |
 | Meta (Variable) | Auto-populated from meta tier list | 1 |
 
+**Note**: Support card types are Speed, Stamina, Power, Guts, Wit, and Friend. Friend cards provide versatile bonuses across all training facilities.
+
 ---
 
 ### 3.3 Step 3: Deck Composition
@@ -286,7 +291,7 @@ sequenceDiagram
 │  │ Slot 1: Speed                                          ││
 │  │ ┌────────────────────────────────────────────────┐    ││
 │  │ │ Tokai Teio (SSR)                     Meta: SS  │    ││
-│  │ │ Limit Break: ★★★★ (4/4)                        │    ││
+│  │ │ Limit Break: ★★★★★ (MLB)                       │    ││
 │  │ │ Bond Level: 75% ▓▓▓▓▓▓▓░░░                     │    ││
 │  │ │ Specialization: Speed Focus                     │    ││
 │  │ │ Training Bonus: +15% Speed gains                │    ││
@@ -296,7 +301,7 @@ sequenceDiagram
 │  │ Slot 2: Stamina                                        ││
 │  │ ┌────────────────────────────────────────────────┐    ││
 │  │ │ Kitasan Black (SSR)                  Meta: S   │    ││
-│  │ │ Limit Break: ★★★★ (4/4)                        │    ││
+│  │ │ Limit Break: ★★★★★ (MLB)                       │    ││
 │  │ │ Bond Level: 85% ▓▓▓▓▓▓▓▓░░                     │    ││
 │  │ │ Specialization: Stamina Focus                   │    ││
 │  │ │ Training Bonus: +18% Stamina gains              │    ││
@@ -306,7 +311,7 @@ sequenceDiagram
 │  │ Slot 3: Speed                                          ││
 │  │ ┌────────────────────────────────────────────────┐    ││
 │  │ │ Mejiro Dober (SSR)                   Meta: S   │    ││
-│  │ │ Limit Break: ★★★★ (4/4)                        │    ││
+│  │ │ Limit Break: ★★★★★ (MLB)                       │    ││
 │  │ │ Bond Level: 90% ▓▓▓▓▓▓▓▓▓░                     │    ││
 │  │ │ Specialization: Power Focus                     │    ││
 │  │ │ Training Bonus: +15% Power gains                │    ││
@@ -346,7 +351,7 @@ sequenceDiagram
 │  • Rarity: All SSR ✓                                       │
 │  • Meta Tier: 4 S+ tier, 1 A tier ✓                       │
 │  • Average Bond: 80% ✓                                     │
-│  • Average Limit Break: 3.4/4 ✓                           │
+│  • Average Limit Break: 4.2/4 (MLB) ✓                      │
 │                                                            │
 │  ⚠️ Recommendation: Add Friend card to complete deck       │
 │                                                            │
@@ -658,7 +663,7 @@ class DeckSynergyCalculator
 │                                                            │
 │  Strengths:                                                │
 │  ✅ Excellent meta tier distribution (4 S+ tier cards)     │
-│  ✅ High limit break levels (avg 3.4/4)                    │
+│  ✅ High limit break levels (avg MLB)                      │
 │  ✅ Strong type diversity (4 unique types)                 │
 │                                                            ��
 │  Improvement Opportunities:                                │
@@ -953,14 +958,43 @@ sequenceDiagram
 
 **Bond Threshold for Friendship Training**: 80%
 
-**Friendship Training Bonuses**:
+**Bond Gain Mechanics** (verified Global English Server Jan 2026):
 
-| Bond Level | Base Bonus | Friendship Bonus | Total |
-|------------|------------|------------------|-------|
-| 80-84% | +10 | +2 | +12 |
-| 85-89% | +10 | +3 | +13 |
-| 90-94% | +10 | +4 | +14 |
-| 95-100% | +10 | +5 | +15 |
+| Condition | Bond Gain | Notes |
+|-----------|-----------|-------|
+| Base Training | +7 | Standard bond gain per training |
+| Charming Condition | +9 | Character has Charming status |
+| Exclamation Mark (!) | +5 | Support card has event available |
+| Rainbow Training | +10 | Special training event |
+
+**Friendship Training Bonuses** (based on card rarity):
+
+| Card Rarity | Friendship Bonus Range | Notes |
+|-------------|------------------------|-------|
+| R | 10-15% | Basic bonus |
+| SR | 15-25% | Moderate bonus |
+| SSR | 25-35% | Maximum bonus |
+
+**Limit Break System**:
+
+| Stars | Limit Breaks | Bonus Multiplier | Notes |
+|-------|--------------|------------------|-------|
+| ★ | 0 | 1.0x | Base card |
+| ★★ | 1 | 1.1x | First limit break |
+| ★★★ | 2 | 1.2x | Second limit break |
+| ★★★★ | 3 | 1.3x | Third limit break |
+| ★★★★★ | 4 | 1.4x | MLB (Max Limit Break) |
+
+**Support Card Types**:
+
+| Type | Primary Stat | Training Facility |
+|------|--------------|-------------------|
+| Speed | Speed | Speed Training |
+| Stamina | Stamina | Stamina Training |
+| Power | Power | Power Training |
+| Guts | Guts | Guts Training |
+| Wit | Wisdom | Wisdom Training |
+| Friend | Variable | All Facilities |
 
 ---
 
@@ -1123,6 +1157,7 @@ flowchart LR
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: bond gain mechanics (+7 base, +9 Charming, +5 exclamation), friendship bonus by rarity (10-35%), limit break system (MLB = 4 LB = ★★★★★), six support card types |
 | 2.1.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 architecture; added deck synergy system, meta tier integration, AI optimization, comprehensive validation and error handling |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with basic flow |
 | 1.0.0 | 2026-01-03 | Development Team | Initial draft |
@@ -1144,4 +1179,4 @@ flowchart LR
 
 ---
 
-*This user flow reflects the current support deck building system implementation as of version 2.1.0. For the latest updates, refer to the online documentation.*
+*This user flow reflects the current support deck building system implementation as of version 2.2.0. For the latest updates, refer to the online documentation.*

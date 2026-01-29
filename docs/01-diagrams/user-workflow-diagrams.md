@@ -5,10 +5,10 @@
 This document presents the key user workflow diagrams for the Umamusume Pretty Derby Career Planner application, showing how users interact with the system to achieve their optimization goals through various pathways and decision points. The system is built with **Laravel 12** (released February 24, 2025) with **PHP 8.2+**, **Livewire 3**, **Alpine.js**, **TailwindCSS v4** (released January 22, 2025), and integrates with **AWS Bedrock Claude** models and **Ollama** for AI capabilities.
 
 **Document Version**: 2.2.0  
-**Date**: January 27, 2026  
+**Date**: January 28, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.2.0
+**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
 
 ---
 
@@ -410,9 +410,9 @@ flowchart TD
     StatRequirements --> GutsCheck[Guts: ○/⦾/△/×]
     StatRequirements --> WitCheck[Wit: ○/⦾/△/×]
 
-    AptitudeAnalysis --> DistanceApt[Distance Aptitude: G-SS]
-    AptitudeAnalysis --> SurfaceApt[Surface Aptitude: G-SS]
-    AptitudeAnalysis --> StyleApt[Running Style Aptitude: G-SS]
+    AptitudeAnalysis --> DistanceApt[Distance Aptitude: G-S]
+    AptitudeAnalysis --> SurfaceApt[Surface Aptitude: G-S]
+    AptitudeAnalysis --> StyleApt[Running Style Aptitude: G-S]
 
     SkillEvaluation --> WeatherSkills[Weather Skills Available]
     SkillEvaluation --> DistanceSkills[Distance-Specific Skills]
@@ -473,9 +473,8 @@ flowchart TD
 
 | Rating | Effectiveness | Description |
 |--------|---------------|-------------|
-| SS | 120% | Exceptional aptitude |
-| S | 110% | Superior aptitude |
-| A | 100% | Standard aptitude |
+| S | +5% | Maximum aptitude (provides positive bonus) |
+| A | 0% | Standard aptitude (baseline) |
 | B | 90% | Below average |
 | C | 80% | Poor aptitude |
 | D | 70% | Very poor |

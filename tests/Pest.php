@@ -123,21 +123,24 @@ pest()->extend(Tests\TestCase::class)
 |
 */
 
-// Verify a value is a valid stat value (0-1200)
+// Verify a value is a valid stat value (0-2000, with soft cap at 1200)
+// VERIFIED (Jan 2026): Stats can exceed 1200 with diminishing returns (50% value above 1200)
+// Important breakpoints: 901, 1200 (soft cap), 1600
 expect()->extend('toBeValidStat', function (): Pest\Expectation {
     /** @var Pest\Expectation $expectation */
     $expectation = $this;
 
     return $expectation->toBeInt()
         ->toBeGreaterThanOrEqual(0)
-        ->toBeLessThanOrEqual(1200);
+        ->toBeLessThanOrEqual(2000); // Practical maximum (1200 + 800 effective)
 });
 
-// Verify a value is a valid aptitude grade (G through SS)
+// Verify a value is a valid aptitude grade (G through S - S is maximum, SS does NOT exist)
+// VERIFIED (Jan 2026): S-rank is the maximum aptitude grade in current game version
 expect()->extend('toBeValidAptitudeGrade', function (): Pest\Expectation {
     /** @var Pest\Expectation $expectation */
     $expectation = $this;
-    $validGrades = ['G', 'G+', 'F', 'F+', 'E', 'E+', 'D', 'D+', 'C', 'C+', 'B', 'B+', 'A', 'A+', 'S', 'S+', 'SS'];
+    $validGrades = ['G', 'G+', 'F', 'F+', 'E', 'E+', 'D', 'D+', 'C', 'C+', 'B', 'B+', 'A', 'A+', 'S'];
 
     return $expectation->toBeIn($validGrades);
 });
@@ -322,19 +325,21 @@ function createTestSkillData(array $overrides = []): array
 }
 
 /**
- * Generate a random valid stat value (0-1200).
+ * Generate a random valid stat value (0-2000, with soft cap at 1200).
+ * VERIFIED (Jan 2026): Stats above 1200 have diminishing returns (50% value).
  */
 function randomStat(): int
 {
-    return random_int(0, 1200);
+    return random_int(0, 2000);
 }
 
 /**
  * Generate a random valid aptitude grade.
+ * VERIFIED (Jan 2026): S is maximum, SS does not exist in game
  */
 function randomAptitudeGrade(): string
 {
-    $grades = ['G', 'G+', 'F', 'F+', 'E', 'E+', 'D', 'D+', 'C', 'C+', 'B', 'B+', 'A', 'A+', 'S', 'S+', 'SS'];
+    $grades = ['G', 'G+', 'F', 'F+', 'E', 'E+', 'D', 'D+', 'C', 'C+', 'B', 'B+', 'A', 'A+', 'S'];
 
     return $grades[array_rand($grades)];
 }
@@ -345,6 +350,27 @@ function randomAptitudeGrade(): string
 function randomEnergyLevel(): int
 {
     return random_int(0, 100);
+}
+
+/**
+ * Calculate effective stat value with diminishing returns above 1200.
+ * VERIFIED (Jan 2026): Stats above 1200 count for half value.
+ *
+ * Example: 1500 actual = 1200 + (300 × 0.5) = 1350 effective
+ *
+ * @param  int  $actualStat  The actual stat value
+ * @return float The effective stat value after diminishing returns
+ */
+function calculateEffectiveStat(int $actualStat): float
+{
+    if ($actualStat <= 1200) {
+        return (float) $actualStat;
+    }
+
+    // Above 1200: base 1200 + (excess × 0.5)
+    $excess = $actualStat - 1200;
+
+    return 1200.0 + ($excess * 0.5);
 }
 
 /**
@@ -394,6 +420,10 @@ dataset('invalid_stats', fn () => [
     'way_too_high' => [9999],
 ]);
 
+/**
+ * Valid aptitude grades for characters.
+ * VERIFIED (Jan 2026): S is the maximum aptitude grade. SS does NOT exist.
+ */
 dataset('valid_aptitude_grades', fn () => [
     'G' => ['G'],
     'G+' => ['G+'],
@@ -409,9 +439,7 @@ dataset('valid_aptitude_grades', fn () => [
     'B+' => ['B+'],
     'A' => ['A'],
     'A+' => ['A+'],
-    'S' => ['S'],
-    'S+' => ['S+'],
-    'SS' => ['SS'],
+    'S' => ['S'],  // Maximum aptitude grade
 ]);
 
 dataset('scenario_types', fn () => [

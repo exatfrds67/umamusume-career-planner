@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.1.0
-**Date**: January 24, 2026
+**Document Version**: 2.2.0
+**Date**: January 28, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned with codebase v2.0.0
+**Status**: Current - Updated with verified game mechanics from Global English Server
 
 ---
 
@@ -26,14 +26,20 @@ flowchart TD
     ValidateReqs -->|Not Met| ShowError[Display Missing Requirements]
     
     ValidateReqs -->|Met| CalcCost[Calculate SP Cost]
-    CalcCost --> CheckHints[Check Hint Level (0-3)]
+    CalcCost --> CheckHints[Check Hint Level (0-5)]
     
     CheckHints -->|Level 0| NoDiscount[Cost: 100%]
-    CheckHints -->|Level 1| Discount20[Cost: 80% (-20%)]
-    CheckHints -->|Level 2+| Discount40[Cost: 60% (-40%)]
+    CheckHints -->|Level 1| Discount10[Cost: 90% (-10%)]
+    CheckHints -->|Level 2| Discount20[Cost: 80% (-20%)]
+    CheckHints -->|Level 3| Discount30[Cost: 70% (-30%)]
+    CheckHints -->|Level 4| Discount35[Cost: 65% (-35%)]
+    CheckHints -->|Level 5| Discount40[Cost: 60% (-40% max)]
     
     NoDiscount --> CompareSP
+    Discount10 --> CompareSP
     Discount20 --> CompareSP
+    Discount30 --> CompareSP
+    Discount35 --> CompareSP
     Discount40 --> CompareSP
     
     CompareSP{Enough SP?}
@@ -88,23 +94,48 @@ flowchart TD
     IdentifySource -->|Training| TrainingHandler
     IdentifySource -->|Race| RaceHandler
     IdentifySource -->|Event| EventHandler
+    IdentifySource -->|Fast Learner| FastLearnerHandler
+    IdentifySource -->|Skill Spark| SkillSparkHandler
+    IdentifySource -->|Hint Book| HintBookHandler
     
     TrainingHandler --> ExtractSkill[Extract Skill ID]
     RaceHandler --> ExtractSkill
     EventHandler --> ExtractSkill
+    FastLearnerHandler --> ApplyFastLearner[Apply +10% Bonus Discount]
+    SkillSparkHandler --> ExtractSkill
+    HintBookHandler --> ExtractSkill
     
     ExtractSkill --> CheckCurrent[Check Current Hint Level]
     
-    CheckCurrent -->|Level Max (3)| ConvertStats[Convert to Stat Bonus]
-    CheckCurrent -->|Level < 3| IncrementLevel[Increment Hint Level]
+    CheckCurrent -->|Level Max (5)| ConvertStats[Convert to Stat Bonus]
+    CheckCurrent -->|Level < 5| IncrementLevel[Increment Hint Level]
     
     IncrementLevel --> UpdateTable[Update ucp_skill_hints]
     UpdateTable --> CalcDiscount[Recalculate Discount %]
     
     ConvertStats --> ApplyStats[Apply +Stat Bonus]
+    ApplyFastLearner --> CalcDiscount
     
     CalcDiscount --> NotifyUser[Toast Notification: Hint Lv Up]
     ApplyStats --> NotifyUser
+```
+
+### 3.1 Hint Sources (Game-Accurate)
+
+| Source | Description | Effect |
+|--------|-------------|--------|
+| **Training** | Support card with "Hint Lv Up" present | +1 Hint Level (random skill from card) |
+| **Race** | Certain race rewards | +1 Hint Level |
+| **Event** | Support card events | +1 Hint Level |
+| **Fast Learner** | Character condition | +10% additional discount (stacks with hint level) |
+| **Skill Sparks** | Scenario mechanic | +1 Hint Level |
+| **Hint Books** | Consumable items | +1 Hint Level (specific skill) |
+
+### 3.2 Hint Discount Calculation
+
+```
+Final Discount = Base Hint Discount + Fast Learner Bonus (if active)
+Maximum Discount = 40% (Hint Level 5) + 10% (Fast Learner) = 50%
 ```
 
 ---
@@ -173,7 +204,7 @@ flowchart TD
     
     FilterWhite --> RollSuccess{Roll Inheritance RNG}
     
-    RollSuccess -->|Success| GrantHint[Grant Hint Level 1-3]
+    RollSuccess -->|Success| GrantHint[Grant Hint Level 1-5]
     RollSuccess -->|Failure| NoInheritance
     
     GrantHint --> CheckUnique{Is Unique Skill?}
@@ -219,10 +250,11 @@ flowchart TD
 
 ## Document Control
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 2.1.0 | 2026-01-24 | Development Team | Updated to align with v2.0.0 codebase, added SP Budget Optimization via Neuron AI, and detailed Inheritance logic |
-| 1.0.0 | 2026-01-14 | Development Team | Initial flow definitions |
+| Version | Date       | Author           | Changes |
+|---------|------------|------------------|---------|
+| 2.2.0   | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: Hint levels now 0-5 (max), discount percentages corrected (10%/20%/30%/35%/40%), added additional hint sources (Fast Learner condition +10%, Skill Sparks, Hint Books), inheritance hint levels updated |
+| 2.1.0   | 2026-01-24 | Development Team | Updated to align with v2.0.0 codebase, added SP Budget Optimization via Neuron AI, and detailed Inheritance logic |
+| 1.0.0   | 2026-01-14 | Development Team | Initial flow definitions |
 
 ---
 

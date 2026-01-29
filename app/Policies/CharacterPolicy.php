@@ -33,6 +33,12 @@ class CharacterPolicy
      */
     public function view(User $user, Character $character): bool
     {
+        // Seeded characters can be viewed by any authenticated user
+        if ($character->is_seeded) {
+            return true;
+        }
+
+        // User-created characters can only be viewed by their owner
         return $user->id === $character->user_id;
     }
 
@@ -49,6 +55,12 @@ class CharacterPolicy
      */
     public function update(User $user, Character $character): bool
     {
+        // Seeded characters can be updated by any authenticated user
+        if ($character->is_seeded) {
+            return true;
+        }
+
+        // User-created characters can only be updated by their owner
         return $user->id === $character->user_id;
     }
 
@@ -57,6 +69,12 @@ class CharacterPolicy
      */
     public function delete(User $user, Character $character): bool
     {
+        // Seeded characters cannot be deleted by regular users
+        if ($character->is_seeded) {
+            return false;
+        }
+
+        // User-created characters can only be deleted by their owner
         return $user->id === $character->user_id;
     }
 

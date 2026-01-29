@@ -81,7 +81,7 @@ Contributors must understand how to translate specs/flows into robust implementa
 - Race readiness scoring and simulation workflow (SPEC-003, SEQ-004)
 - Skill rules:
   - SP validation
-  - hint-based discount (20% per hint, max 40%)
+  - hint-based discount (5 levels: 10%/20%/30%/35%/40% max)
   - evolution paths (Normal → Rare)
 - Support card systems: deck rules, bond/limit break effects, bonuses
 
@@ -195,7 +195,136 @@ Contributors must be able to:
 
 ---
 
-## 7. Suggested Skill Levels by Contribution Area
+## 7. AI Agent Configuration Skills (Kiro)
+
+### 7.1 Agent Configuration Fundamentals
+
+Contributors working with Kiro AI agents should understand:
+
+- **Agent Configuration Files**: JSON-based configuration for custom agents
+- **File Locations**:
+  - Local agents: `.kiro/agents/` (project-specific)
+  - Global agents: `~/.kiro/agents/` (user-wide)
+- **Agent Precedence**: Local agents override global agents with the same name
+
+### 7.2 Core Configuration Fields
+
+**Required Knowledge**
+
+- **name**: Agent identification and display
+- **description**: Human-readable purpose description
+- **prompt**: High-level context (inline or file:// URI references)
+- **tools**: Available tools (built-in, MCP server tools, wildcards)
+- **allowedTools**: Auto-approved tools without user prompts
+- **resources**: Local resources (files, skills, knowledge bases)
+
+**Advanced Configuration**
+
+- **mcpServers**: Model Context Protocol server definitions
+- **toolAliases**: Tool name remapping for collision resolution
+- **toolsSettings**: Tool-specific configuration options
+- **hooks**: Lifecycle commands (agentSpawn, userPromptSubmit, preToolUse, postToolUse, stop)
+- **model**: Specific model ID selection
+- **keyboardShortcut**: Quick agent switching shortcuts
+- **welcomeMessage**: Agent activation messages
+
+### 7.3 Tool Management
+
+**Tool Reference Patterns**
+
+- Built-in tools: `"read"`, `"write"`, `"shell"`
+- MCP server tools: `"@server_name"` (all tools) or `"@server_name/tool_name"` (specific)
+- Wildcards: `"*"` (all tools), `"@builtin"` (all built-in)
+
+**Permission Patterns**
+
+- Exact matches: `"read"`, `"@git/git_status"`
+- Glob patterns: `"@server/read_*"`, `"code_*"`, `"*_bash"`
+- Server-level: `"@fetch"` (all tools from server)
+
+### 7.4 Resource Management
+
+**File Resources**
+
+- Loaded directly into context at startup
+- Support glob patterns: `"file://.kiro/steering/**/*.md"`
+- Absolute or relative paths
+
+**Skill Resources**
+
+- Progressive loading (metadata at startup, full content on demand)
+- Must include YAML frontmatter with name and description
+- Pattern: `"skill://.kiro/skills/**/SKILL.md"`
+
+**Knowledge Base Resources**
+
+- Indexed documentation with search capabilities
+- Configuration fields:
+  - `type`: "knowledgeBase"
+  - `source`: Path to index (file:// prefix)
+  - `name`: Display name
+  - `description`: Content description
+  - `indexType`: "best" (quality) or "fast" (speed)
+  - `autoUpdate`: Re-index on agent spawn
+
+### 7.5 Hook System
+
+**Hook Types and Use Cases**
+
+- `agentSpawn`: Initialization tasks (e.g., git status)
+- `userPromptSubmit`: Pre-processing user input
+- `preToolUse`: Audit logging, validation (can block execution)
+- `postToolUse`: Post-processing (e.g., code formatting)
+- `stop`: Cleanup or final validation
+
+**Hook Configuration**
+
+- `command`: Shell command to execute
+- `matcher`: Tool name pattern (for preToolUse/postToolUse)
+- Input/output via stdin/stdout
+
+### 7.6 Best Practices
+
+**Security**
+
+- Start with minimal tool access, expand as needed
+- Use specific patterns over wildcards in allowedTools
+- Configure toolsSettings for sensitive operations
+- Test agents in safe environments first
+
+**Organization**
+
+- Use descriptive agent names and descriptions
+- Keep prompt files organized and version controlled
+- Document agent purposes clearly
+- Store local agents in project repositories for team sharing
+
+**Performance**
+
+- Use skill resources for large documentation (progressive loading)
+- Configure knowledge bases with appropriate indexType
+- Enable autoUpdate only when necessary
+- Use file resources for always-needed content only
+
+### 7.7 Integration with Project
+
+**Project-Specific Agents**
+
+- Create agents for domain-specific tasks (training optimization, skill analysis)
+- Configure access to project documentation via resources
+- Set up hooks for code quality checks (Pint, PHPStan)
+- Use toolsSettings to restrict file access to relevant directories
+
+**Example Use Cases**
+
+- Laravel development agent with Pest testing integration
+- Database migration agent with schema validation hooks
+- Documentation agent with knowledge base access to PRDs/SPECs
+- Code review agent with pre-commit formatting hooks
+
+---
+
+## 8. Suggested Skill Levels by Contribution Area
 
 | Area | Minimum | Recommended |
 |---|---:|---:|
@@ -208,10 +337,12 @@ Contributors must be able to:
 | OCR pipeline | Beginner-Intermediate | Intermediate |
 | WebSocket realtime | Beginner-Intermediate | Intermediate |
 | Accessibility | Beginner-Intermediate | Intermediate |
+| Kiro agent configuration | Beginner | Intermediate |
+| Agent hook development | Intermediate | Advanced |
 
 ---
 
-## 8. Reference Pointers (Primary Docs)
+## 9. Reference Pointers (Primary Docs)
 
 - **Character Management**: PRD-001, SPEC-001, TECH-FLOW-001, SEQ-001  
 - **Training Optimization**: PRD-002, SPEC-002, TECH-FLOW-002, SEQ-002  
@@ -221,6 +352,7 @@ Contributors must be able to:
 - **AI Advisory**: PRD-006, SPEC-006, TECH-FLOW-006, SEQ-006  
 - **External Integration**: PRD-007, SPEC-007, TECH-FLOW-007, SEQ-007 / SD-006  
 - **Cross-cutting**: Telemetry (SEQ-011), Error handling (SEQ-014), Snapshot/Restore (SEQ-012), Migration (SEQ-015)
+- **Kiro Agent Configuration**: [Kiro Agent Configuration Reference](https://kiro.dev/docs/cli/custom-agents/configuration-reference/)
 
 ---
 
@@ -229,3 +361,4 @@ Contributors must be able to:
 | Version | Date | Author | Changes |
 |---|---|---|---|
 | 2.0.0 | 2026-01-23 | Development Team | Rewritten to align with v2.0.0 docs: services/events/caching, AI+external+OCR integrations, testing and accessibility expectations |
+| 2.0.1 | 2026-01-29 | Development Team | Added Section 7: AI Agent Configuration Skills (Kiro) with comprehensive coverage of agent configuration, tools, resources, hooks, and best practices |

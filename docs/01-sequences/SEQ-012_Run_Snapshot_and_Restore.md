@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.0.0  
-**Date**: January 24, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-001], [SPEC-001], [FLOW-001]
 
 ---
@@ -63,6 +63,34 @@ Career run snapshots enable:
 - Storage optimized with compression
 - Snapshot history accessible and manageable
 
+### 1.4 Game Mechanics Reference (Global English Server - Jan 2026)
+
+**Career State:**
+
+- Turn range: 1 to ~78 (varies by scenario)
+- Year/Phase: Junior → Classic → Senior
+- Stats: Speed, Stamina, Power, Guts, Wit (0-1600+ range, soft cap at 1200)
+
+**Aptitude Grades:**
+
+- Scale: G → F → E → D → C → B → A → S (S is maximum, NO SS grade)
+- Distance: Sprint, Mile, Medium, Long
+- Surface: Turf, Dirt
+- Running Style: Nige (Escape), Senkou (Leader), Sashi (Betweener), Oikomi (Chaser)
+
+**Support Card State:**
+
+- 6 cards in deck
+- Bond levels: 0-100%
+- Friendship status: ≥80% = active (unlocks special training events)
+- Limit breaks: ★ to ★★★★★
+
+**Skill State:**
+
+- Hint levels: 1-5 (each level reduces SP cost by ~10%)
+- Skill points balance tracking
+- Acquired vs equipped skills distinction
+
 ---
 
 ## 2. Participants
@@ -82,7 +110,6 @@ Career run snapshots enable:
 ### 2.2 Component Locations
 
 ```
-
 app/
 ├── Livewire/
 │   └── Career/
@@ -98,7 +125,6 @@ app/
     ├── Career.php
     ├── CareerSnapshot.php
     └── StatProgress.php
-
 ```
 
 ---
@@ -230,7 +256,7 @@ Career Event → SnapshotService → Milestone Check → Create Snapshot
 class SnapshotService
 {
     private array $autoSnapshotMilestones = [
-        'career_stage_change' => true,
+        'career_stage_change' => true,  // Junior → Classic → Senior
         'turn_30' => true,
         'turn_60' => true,
         'first_g1_race' => true,
@@ -268,7 +294,7 @@ class SnapshotService
 
 ### 4.2 State Serialization
 
-**Snapshot Data Structure:**
+**Snapshot Data Structure (Game-Accurate):**
 
 ```php
 // SnapshotService.php
@@ -276,22 +302,77 @@ private function serializeCareerState(Career $career): array
 {
     return [
         'career_data' => [
-            'current_turn' => $career->current_turn,
+            'current_turn' => $career->current_turn,  // 1 to ~78
+            'year_phase' => $career->year_phase,      // junior, classic, senior
             'career_stage' => $career->career_stage->value,
             'status' => $career->status->value,
             'scenario_type' => $career->scenario_type,
         ],
         'stats' => [
+            // Range: 0-1600+, soft cap at 1200
             'speed' => $career->speed,
             'stamina' => $career->stamina,
             'power' => $career->power,
             'guts' => $career->guts,
             'wit' => $career->wit,
         ],
+        'aptitudes' => [
+            // Grades: G → F → E → D → C → B → A → S (NO SS)
+            'distance' => [
+                'sprint' => $career->aptitude_sprint,   // G-S
+                'mile' => $career->aptitude_mile,       // G-S
+                'medium' => $career->aptitude_medium,   // G-S
+                'long' => $career->aptitude_long,       // G-S
+            ],
+            'surface' => [
+                'turf' => $career->aptitude_turf,       // G-S
+                'dirt' => $career->aptitude_dirt,       // G-S
+            ],
+            'running_style' => [
+                'nige' => $career->aptitude_nige,       // G-S (Escape)
+                'senkou' => $career->aptitude_senkou,   // G-S (Leader)
+                'sashi' => $career->aptitude_sashi,     // G-S (Betweener)
+                'oikomi' => $career->aptitude_oikomi,   // G-S (Chaser)
+            ],
+        ],
         'state' => [
             'energy' => $career->energy,
             'mood' => $career->mood->value,
             'conditions' => $career->conditions ?? [],
+        ],
+        'support_cards' => [
+            // 6 cards in deck
+            'deck' => $career->supportDeck->cards->map(fn($card) => [
+                'id' => $card->id,
+                'name' => $card->name,
+                'bond_level' => $card->pivot->bond_level,        // 0-100%
+                'friendship_active' => $card->pivot->bond_level >= 80, // ≥80% = active
+                'limit_break' => $card->pivot->limit_break,      // 1-5 stars
+            ])->toArray(),
+        ],
+        'skills' => [
+            'skill_points' => $career->skill_points,
+            'acquired_skills' => $career->acquiredSkills->map(fn($skill) => [
+                'id' => $skill->id,
+                'name' => $skill->name,
+                'hint_level' => $skill->pivot->hint_level,  // 1-5
+                'sp_cost' => $skill->calculateCost($skill->pivot->hint_level),
+                'is_equipped' => $skill->pivot->is_equipped,
+            ])->toArray(),
+            'available_hints' => $career->availableHints->map(fn($hint) => [
+                'skill_id' => $hint->skill_id,
+                'hint_level' => $hint->level,  // 1-5
+            ])->toArray(),
+        ],
+        'race_history' => [
+            'completed_races' => $career->completedRaces->map(fn($race) => [
+                'race_id' => $race->id,
+                'name' => $race->name,
+                'placement' => $race->pivot->placement,
+                'turn_completed' => $race->pivot->turn_completed,
+            ])->toArray(),
+            'fan_count' => $career->fan_count,
+            'current_class' => $career->current_class,  // Maiden, Pre-OP, OP, etc.
         ],
         'progression' => [
             'total_sp_available' => $career->total_sp_available,
@@ -341,7 +422,7 @@ public function createManualSnapshot(Career $career, ?string $label = null): Car
             'turn_number' => $career->current_turn,
             'label' => $label ?? "Turn {$career->current_turn}",
             'snapshot_data' => base64_encode($compressed),
-            'data_version' => '2.0',
+            'data_version' => '2.2',
             'metadata' => [
                 'total_stats' => array_sum([
                     $career->speed,
@@ -350,7 +431,10 @@ public function createManualSnapshot(Career $career, ?string $label = null): Car
                     $career->guts,
                     $career->wit,
                 ]),
+                'year_phase' => $career->year_phase,
                 'career_stage' => $career->career_stage->value,
+                'fan_count' => $career->fan_count,
+                'skill_points' => $career->skill_points,
                 'compressed_size' => strlen($compressed),
                 'original_size' => strlen(json_encode($state)),
             ],
@@ -369,7 +453,7 @@ public function createManualSnapshot(Career $career, ?string $label = null): Car
 public function createAutoSnapshot(Career $career, string $milestone): CareerSnapshot
 {
     $label = match ($milestone) {
-        'career_stage_change' => "Stage: {$career->career_stage->value}",
+        'career_stage_change' => "Stage: {$career->year_phase}",
         'turn_30' => "Turn 30 Checkpoint",
         'turn_60' => "Turn 60 Checkpoint",
         'first_g1_race' => "First G1 Race",
@@ -387,7 +471,7 @@ public function createAutoSnapshot(Career $career, string $milestone): CareerSna
             'turn_number' => $career->current_turn,
             'label' => $label,
             'snapshot_data' => base64_encode($compressed),
-            'data_version' => '2.0',
+            'data_version' => '2.2',
             'metadata' => [
                 'milestone' => $milestone,
                 'total_stats' => array_sum([
@@ -397,6 +481,7 @@ public function createAutoSnapshot(Career $career, string $milestone): CareerSna
                     $career->guts,
                     $career->wit,
                 ]),
+                'fan_count' => $career->fan_count,
             ],
         ]);
     });
@@ -426,7 +511,7 @@ public function restoreSnapshot(
         }
         
         // 2. Validate snapshot version compatibility
-        if ($snapshot->data_version !== '2.0') {
+        if (!in_array($snapshot->data_version, ['2.0', '2.1', '2.2'])) {
             throw new SnapshotVersionException("Snapshot version {$snapshot->data_version} not compatible");
         }
         
@@ -444,20 +529,44 @@ private function overwriteCareerState(Career $career, array $state, CareerSnapsh
     // 1. Update career fields
     $career->update([
         'current_turn' => $state['career_data']['current_turn'],
+        'year_phase' => $state['career_data']['year_phase'] ?? null,
         'career_stage' => $state['career_data']['career_stage'],
+        // Stats (0-1600+ range, soft cap 1200)
         'speed' => $state['stats']['speed'],
         'stamina' => $state['stats']['stamina'],
         'power' => $state['stats']['power'],
         'guts' => $state['stats']['guts'],
         'wit' => $state['stats']['wit'],
+        // State
         'energy' => $state['state']['energy'],
         'mood' => $state['state']['mood'],
         'conditions' => $state['state']['conditions'],
+        // Progression
         'total_sp_available' => $state['progression']['total_sp_available'],
+        'skill_points' => $state['skills']['skill_points'] ?? $state['progression']['total_sp_available'],
         'goals' => $state['progression']['goals'],
+        // Race history
+        'fan_count' => $state['race_history']['fan_count'] ?? 0,
+        'current_class' => $state['race_history']['current_class'] ?? null,
     ]);
     
-    // 2. Delete future history records
+    // 2. Restore aptitudes if present (G-S scale, NO SS)
+    if (isset($state['aptitudes'])) {
+        $career->update([
+            'aptitude_sprint' => $state['aptitudes']['distance']['sprint'],
+            'aptitude_mile' => $state['aptitudes']['distance']['mile'],
+            'aptitude_medium' => $state['aptitudes']['distance']['medium'],
+            'aptitude_long' => $state['aptitudes']['distance']['long'],
+            'aptitude_turf' => $state['aptitudes']['surface']['turf'],
+            'aptitude_dirt' => $state['aptitudes']['surface']['dirt'],
+            'aptitude_nige' => $state['aptitudes']['running_style']['nige'],
+            'aptitude_senkou' => $state['aptitudes']['running_style']['senkou'],
+            'aptitude_sashi' => $state['aptitudes']['running_style']['sashi'],
+            'aptitude_oikomi' => $state['aptitudes']['running_style']['oikomi'],
+        ]);
+    }
+    
+    // 3. Delete future history records
     StatProgress::where('career_id', $career->id)
         ->where('turn_number', '>', $snapshot->turn_number)
         ->delete();
@@ -470,7 +579,7 @@ private function overwriteCareerState(Career $career, array $state, CareerSnapsh
         ->where('turn_acquired', '>', $snapshot->turn_number)
         ->delete();
     
-    // 3. Dispatch event
+    // 4. Dispatch event
     event(new SnapshotRestored($career, $snapshot, 'overwrite'));
     
     return $career->fresh();
@@ -487,22 +596,46 @@ private function createWhatIfBranch(Career $career, array $state): Career
     // 2. Apply snapshot state
     $whatIfCareer->fill([
         'current_turn' => $state['career_data']['current_turn'],
+        'year_phase' => $state['career_data']['year_phase'] ?? null,
         'career_stage' => $state['career_data']['career_stage'],
+        // Stats (0-1600+ range, soft cap 1200)
         'speed' => $state['stats']['speed'],
         'stamina' => $state['stats']['stamina'],
         'power' => $state['stats']['power'],
         'guts' => $state['stats']['guts'],
         'wit' => $state['stats']['wit'],
+        // State
         'energy' => $state['state']['energy'],
         'mood' => $state['state']['mood'],
         'conditions' => $state['state']['conditions'],
+        // Progression
         'total_sp_available' => $state['progression']['total_sp_available'],
+        'skill_points' => $state['skills']['skill_points'] ?? $state['progression']['total_sp_available'],
         'goals' => $state['progression']['goals'],
+        // Race history
+        'fan_count' => $state['race_history']['fan_count'] ?? 0,
+        'current_class' => $state['race_history']['current_class'] ?? null,
     ]);
+    
+    // 3. Apply aptitudes if present (G-S scale, NO SS)
+    if (isset($state['aptitudes'])) {
+        $whatIfCareer->fill([
+            'aptitude_sprint' => $state['aptitudes']['distance']['sprint'],
+            'aptitude_mile' => $state['aptitudes']['distance']['mile'],
+            'aptitude_medium' => $state['aptitudes']['distance']['medium'],
+            'aptitude_long' => $state['aptitudes']['distance']['long'],
+            'aptitude_turf' => $state['aptitudes']['surface']['turf'],
+            'aptitude_dirt' => $state['aptitudes']['surface']['dirt'],
+            'aptitude_nige' => $state['aptitudes']['running_style']['nige'],
+            'aptitude_senkou' => $state['aptitudes']['running_style']['senkou'],
+            'aptitude_sashi' => $state['aptitudes']['running_style']['sashi'],
+            'aptitude_oikomi' => $state['aptitudes']['running_style']['oikomi'],
+        ]);
+    }
     
     $whatIfCareer->save();
     
-    // 3. Clone historical data up to snapshot point
+    // 4. Clone historical data up to snapshot point
     foreach ($state['history']['stat_progress'] as $progress) {
         StatProgress::create([
             'career_id' => $whatIfCareer->id,
@@ -515,7 +648,7 @@ private function createWhatIfBranch(Career $career, array $state): Career
         ]);
     }
     
-    // 4. Dispatch event
+    // 5. Dispatch event
     event(new WhatIfBranchCreated($whatIfCareer, $career, $state['career_data']['current_turn']));
     
     return $whatIfCareer;
@@ -564,6 +697,8 @@ public function getSnapshotHistory(Career $career, int $limit = 10): Collection
                 'type' => $snapshot->snapshot_type,
                 'turn' => $snapshot->turn_number,
                 'total_stats' => $snapshot->metadata['total_stats'] ?? null,
+                'fan_count' => $snapshot->metadata['fan_count'] ?? null,
+                'year_phase' => $snapshot->metadata['year_phase'] ?? null,
                 'created_at' => $snapshot->created_at->toIso8601String(),
                 'can_restore' => $this->canRestore($snapshot),
             ];
@@ -591,25 +726,29 @@ private function canRestore(CareerSnapshot $snapshot): bool
   "turn_number": 45,
   "label": "Before G1 Race",
   "snapshot_data": "<base64_encoded_compressed_json>",
-  "data_version": "2.0",
+  "data_version": "2.2",
   "metadata": {
     "total_stats": 3950,
+    "year_phase": "senior",
     "career_stage": "senior",
+    "fan_count": 125000,
+    "skill_points": 450,
     "compressed_size": 8192,
     "original_size": 24576,
     "compression_ratio": 0.33
   },
-  "created_at": "2026-01-24T10:30:00Z",
-  "updated_at": "2026-01-24T10:30:00Z"
+  "created_at": "2026-01-28T10:30:00Z",
+  "updated_at": "2026-01-28T10:30:00Z"
 }
 ```
 
-### 5.2 Snapshot Data Payload
+### 5.2 Snapshot Data Payload (Game-Accurate)
 
 ```json
 {
   "career_data": {
     "current_turn": 45,
+    "year_phase": "senior",
     "career_stage": "senior",
     "status": "in_progress",
     "scenario_type": "ura_finale"
@@ -621,16 +760,128 @@ private function canRestore(CareerSnapshot $snapshot): bool
     "guts": 550,
     "wit": 620
   },
+  "aptitudes": {
+    "distance": {
+      "sprint": "B",
+      "mile": "A",
+      "medium": "S",
+      "long": "A"
+    },
+    "surface": {
+      "turf": "A",
+      "dirt": "D"
+    },
+    "running_style": {
+      "nige": "B",
+      "senkou": "A",
+      "sashi": "C",
+      "oikomi": "D"
+    }
+  },
   "state": {
     "energy": 78,
     "mood": "good",
     "conditions": ["focused", "well_rested"]
+  },
+  "support_cards": {
+    "deck": [
+      {
+        "id": 101,
+        "name": "SSR Kitasan Black",
+        "bond_level": 95,
+        "friendship_active": true,
+        "limit_break": 4
+      },
+      {
+        "id": 102,
+        "name": "SSR Super Creek",
+        "bond_level": 82,
+        "friendship_active": true,
+        "limit_break": 3
+      },
+      {
+        "id": 103,
+        "name": "SR Sweep Tosho",
+        "bond_level": 65,
+        "friendship_active": false,
+        "limit_break": 5
+      },
+      {
+        "id": 104,
+        "name": "SSR Daiwa Scarlet",
+        "bond_level": 88,
+        "friendship_active": true,
+        "limit_break": 2
+      },
+      {
+        "id": 105,
+        "name": "SSR Mejiro McQueen",
+        "bond_level": 91,
+        "friendship_active": true,
+        "limit_break": 4
+      },
+      {
+        "id": 106,
+        "name": "SR Haru Urara",
+        "bond_level": 72,
+        "friendship_active": false,
+        "limit_break": 5
+      }
+    ]
+  },
+  "skills": {
+    "skill_points": 450,
+    "acquired_skills": [
+      {
+        "id": 201,
+        "name": "Escape Artist",
+        "hint_level": 3,
+        "sp_cost": 126,
+        "is_equipped": true
+      },
+      {
+        "id": 202,
+        "name": "Good Position",
+        "hint_level": 5,
+        "sp_cost": 90,
+        "is_equipped": true
+      }
+    ],
+    "available_hints": [
+      {
+        "skill_id": 301,
+        "hint_level": 2
+      },
+      {
+        "skill_id": 302,
+        "hint_level": 4
+      }
+    ]
+  },
+  "race_history": {
+    "completed_races": [
+      {
+        "race_id": 1001,
+        "name": "Japan Derby",
+        "placement": 1,
+        "turn_completed": 38
+      },
+      {
+        "race_id": 1002,
+        "name": "Tenno Sho (Spring)",
+        "placement": 2,
+        "turn_completed": 42
+      }
+    ],
+    "fan_count": 125000,
+    "current_class": "OP"
   },
   "progression": {
     "total_sp_available": 450,
     "goals": [
       {
         "type": "stat_target",
+        "stat": "speed",
         "target_value": 1000,
         "progress": 85
       }
@@ -641,9 +892,9 @@ private function canRestore(CareerSnapshot $snapshot): bool
     "character_id": 1
   },
   "history": {
-    "stat_progress": [...],
-    "training_sessions": [...],
-    "skill_acquisitions": [...]
+    "stat_progress": [],
+    "training_sessions": [],
+    "skill_acquisitions": []
   }
 }
 ```
@@ -673,13 +924,34 @@ private function canRestore(CareerSnapshot $snapshot): bool
     "uuid": "9a2b5c3d-4e5f-6g7h-8i9j-0k1l2m3n4o5p",
     "name": "Speed Build - Special Week (What-If from Turn 45)",
     "current_turn": 45,
+    "year_phase": "senior",
     "stats": {
       "speed": 850,
       "stamina": 720,
       "power": 680,
       "guts": 550,
       "wit": 620
-    }
+    },
+    "aptitudes": {
+      "distance": {
+        "sprint": "B",
+        "mile": "A",
+        "medium": "S",
+        "long": "A"
+      },
+      "surface": {
+        "turf": "A",
+        "dirt": "D"
+      },
+      "running_style": {
+        "nige": "B",
+        "senkou": "A",
+        "sashi": "C",
+        "oikomi": "D"
+      }
+    },
+    "fan_count": 125000,
+    "skill_points": 450
   },
   "snapshot": {
     "id": 42,
@@ -688,6 +960,20 @@ private function canRestore(CareerSnapshot $snapshot): bool
   }
 }
 ```
+
+### 5.5 Game-Accurate Data Constraints
+
+| Data Element | Valid Range | Notes |
+|--------------|-------------|-------|
+| **Turn Number** | 1-78 | Varies by scenario |
+| **Year Phase** | junior, classic, senior | Career progression |
+| **Stats** | 0-1600+ | Soft cap at 1200 |
+| **Aptitude Grades** | G, F, E, D, C, B, A, S | NO SS grade |
+| **Bond Level** | 0-100 | Percentage |
+| **Friendship Active** | true/false | ≥80% bond = active |
+| **Limit Break** | 1-5 | Stars (★ to ★★★★★) |
+| **Hint Level** | 1-5 | Each level ~10% SP reduction |
+| **Support Deck Size** | 6 | Fixed |
 
 ---
 
@@ -702,6 +988,8 @@ private function canRestore(CareerSnapshot $snapshot): bool
 | `SNAP_003` | Snapshot version incompatible | 422 | "Snapshot version is not compatible with current system" |
 | `SNAP_004` | Career state mismatch | 422 | "Snapshot does not belong to this career" |
 | `SNAP_005` | Restoration failed | 500 | "Failed to restore snapshot. Please try again." |
+| `SNAP_006` | Invalid aptitude grade | 422 | "Invalid aptitude grade (must be G-S)" |
+| `SNAP_007` | Stats out of range | 422 | "Stat value exceeds valid range" |
 
 ### 6.2 Error Recovery Flow
 
@@ -724,6 +1012,10 @@ sequenceDiagram
         Service->>Service: Check data version
         Service-->>UI: SnapshotVersionException
         UI-->>User: "Snapshot version incompatible. Update required."
+    else Invalid Game Data
+        Service->>Service: Validate aptitudes/stats
+        Service-->>UI: ValidationException
+        UI-->>User: "Snapshot contains invalid game data."
     else Database Error
         Service->>DB: BEGIN TRANSACTION
         DB-->>Service: Connection error
@@ -744,6 +1036,8 @@ sequenceDiagram
 |----------|---------|----------|
 | Data corruption | Invalid JSON after decompression | Rollback, display error |
 | Version mismatch | Snapshot from older incompatible version | Attempt migration or reject |
+| Invalid aptitude | Grade outside G-S range | Reject with validation error |
+| Stats overflow | Value exceeds 1600 | Cap or reject based on config |
 | Database error | Constraint violation during restore | Rollback entire transaction |
 | Storage error | Failed to write snapshot | Rollback, retry |
 
@@ -790,9 +1084,11 @@ CareerSnapshot::where('career_id', $career->id)
 
 | Data Size | Uncompressed | Compressed | Ratio |
 |-----------|--------------|------------|-------|
-| Small career (Turn 20) | ~15KB | ~5KB | 33% |
-| Medium career (Turn 50) | ~40KB | ~13KB | 33% |
-| Large career (Turn 72) | ~60KB | ~20KB | 33% |
+| Small career (Turn 20) | ~18KB | ~6KB | 33% |
+| Medium career (Turn 50) | ~48KB | ~16KB | 33% |
+| Large career (Turn 72) | ~72KB | ~24KB | 33% |
+
+*Note: Increased sizes reflect additional game-accurate data (aptitudes, support cards, skills, race history)*
 
 ### 7.4 Database Query Analysis
 
@@ -849,6 +1145,7 @@ CREATE INDEX idx_careers_last_snapshot ON ucp_careers(last_snapshot_at);
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server - corrected aptitude scale (G-S, no SS), stat range (soft cap 1200), hint levels (1-5), added support card bond/friendship tracking, race history with fan count |
 | 2.0.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 implementation; added detailed sequence flows, compression strategy, what-if branching, performance metrics, and aligned with current Laravel 12 architecture |
 | 1.0.0 | 2026-01-14 | Development Team | Initial draft |
 
@@ -861,7 +1158,7 @@ CREATE INDEX idx_careers_last_snapshot ON ucp_careers(last_snapshot_at);
 
 ### Review Schedule
 
-- Next Review: 2026-04-24
+- Next Review: 2026-04-28
 - Review Frequency: Quarterly or on major feature changes
 
 ---
@@ -873,7 +1170,8 @@ CREATE INDEX idx_careers_last_snapshot ON ucp_careers(last_snapshot_at);
 - Mermaid Diagram Standards
 - IEEE 830 SRS Format
 - Data Compression Best Practices
+- Umamusume Pretty Derby Global English Server (Jan 2026)
 
 ---
 
-*This sequence diagram reflects the current implementation of the career snapshot and restore workflow as of v2.0.0. For the most up-to-date information, refer to the source code in `app/Services/SnapshotService.php` and related files.*
+*This sequence diagram reflects the current implementation of the career snapshot and restore workflow as of v2.2.0, with game-accurate mechanics verified against the Global English Server (January 2026). For the most up-to-date information, refer to the source code in `app/Services/SnapshotService.php` and related files.*

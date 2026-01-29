@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.1.0  
-**Date**: January 24, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-001], [SPEC-001], [SRS], [BRS]
 
 **Source Specifications**:
@@ -251,10 +251,16 @@ stateDiagram-v2
 
 | Scenario | Turns | Difficulty | Special Features |
 |----------|-------|------------|------------------|
-| URA Finals | 78 | ★★★☆☆ | Standard championship path |
-| Grand Masters | 78 | ★★★★☆ | Enhanced training bonuses, harder races |
-| Make a New Track!! | 78 | ★★☆☆☆ | Story events, unique rewards |
-| Aoharu Cup | 78 | ★★★★★ | Team battles, special training |
+| URA Finals | 70-78 | ★★★☆☆ | Standard championship path |
+| Grand Masters | 70-78 | ★★★★☆ | Enhanced training bonuses, harder races |
+| Make a New Track!! | 70-78 | ★★☆☆☆ | Story events, unique rewards |
+| Aoharu Cup | 70-78 | ★★★★★ | Team battles, special training |
+
+**Career Structure (Verified Jan 2026)**:
+
+- Total turns: ~70-78 across 3 years (Junior, Classic, Senior)
+- Summer Training Camp: 4 turns in Early July, all facilities at Level 5
+- Important breakpoints: Turn 1 (Junior start), Turn 24 (Classic start), Turn 48 (Senior start)
 
 **Business Rules**:
 
@@ -326,7 +332,8 @@ stateDiagram-v2
 
 - Each parent can provide up to +2 grades per aptitude
 - Combined bonuses from both parents applied
-- Maximum aptitude grade: SS (cannot exceed)
+- Maximum aptitude grade: S (cannot exceed)
+- Grade scale: G→F→E→D→C→B→A→S (S is maximum)
 
 **Implementation Details**:
 
@@ -447,8 +454,15 @@ class FactorInheritanceService
 | Rarity | SSR, SR, R | Affects base bonus strength |
 | Type | Speed, Stamina, Power, Guts, Wit, Friend | Training facility alignment |
 | Limit Break (LB) | 0-4 stars | Increases bonus effectiveness |
-| Bond Level | 0-100% | Unlocks hints and friendship training |
+| Bond Level | 0-100% | Unlocks hints and friendship training (threshold: 80%) |
 | Meta Tier | SS, S, A, B, C | Community-sourced effectiveness rating |
+
+**Support Card Bond Mechanics (Verified Jan 2026)**:
+
+- Base bond gain per training: +7
+- With Charming condition: +9
+- Friendship Training threshold: 80% bond level
+- Friendship bonus by rarity: SSR 35%, SR 25%, R 10%
 
 **Synergy Calculation**:
 
@@ -1016,6 +1030,7 @@ flowchart LR
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server (Jan 2026); corrected aptitude grade system (G→F→E→D→C→B→A→S, S is maximum); updated support card bond system (80% threshold for friendship training, 10-35% bonus by rarity); added career structure details (~70-78 turns, Summer Training Camp mechanics) |
 | 2.1.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 architecture; added factor inheritance, deck synergy, validation details; integrated with current implementation |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with basic flow |
 | 1.0.0 | 2026-01-03 | Development Team | Initial draft |
@@ -1035,4 +1050,4 @@ flowchart LR
 
 ---
 
-*This user flow reflects the current career setup implementation as of version 2.1.0. For the latest updates, refer to the online documentation.*
+*This user flow reflects the current career setup implementation as of version 2.2.0. For the latest updates, refer to the online documentation.*

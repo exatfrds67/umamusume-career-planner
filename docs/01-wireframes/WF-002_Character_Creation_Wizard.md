@@ -3,8 +3,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.0.0  
-**Date**: January 24, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-001], [SPEC-001], [FLOW-001], [SEQ-001]
 
 **Source Specs**:
@@ -647,7 +647,28 @@ class FactorInheritanceService
 | 2 | ★★☆ | +12 | +10% |
 | 3 | ★★★ | +21 | +15% |
 
-### 4.6 Validation Rules
+### 4.6 Aptitude Grade System (Game-Accurate)
+
+**Grade Scale** (S is Maximum - No SS exists):
+
+| Grade | Color  | Description                    |
+|-------|--------|--------------------------------|
+| S     | Gold   | Maximum aptitude grade         |
+| A     | Purple | Excellent aptitude             |
+| B     | Blue   | Good aptitude                  |
+| C     | Green  | Average aptitude               |
+| D     | Yellow | Below average aptitude         |
+| E     | Orange | Poor aptitude                  |
+| F     | Red    | Very poor aptitude             |
+| G     | Gray   | Lowest aptitude grade          |
+
+**Aptitude Categories**:
+
+- **Distance**: Sprint, Mile, Medium, Long
+- **Surface**: Turf, Dirt
+- **Running Style**: Nige (Leader), Senkou (Betweener), Sashi (Chaser), Oikomi (Last Spurt)
+
+### 4.7 Validation Rules
 
 | Field | Rule | Error Message |
 |-------|------|---------------|
@@ -1643,6 +1664,7 @@ test.describe('WF-002: Visual Regression', () => {
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: corrected aptitude grade scale (S is max, no SS), added aptitude categories documentation |
 | 2.0.0 | 2026-01-24 | Development Team | Complete wireframe specification with testing requirements, accessibility guidelines, and performance targets aligned with v2.0.0 implementation |
 | 1.0.0 | 2026-01-14 | Development Team | Initial wireframe specification |
 

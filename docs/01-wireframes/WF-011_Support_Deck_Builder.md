@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.0.0  
-**Date**: January 24, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-005], [SPEC-005], [FLOW-005], [SEQ-005]
 
 **Source Specs**:
@@ -31,23 +31,67 @@ The Support Deck Builder enables players to construct, validate, and optimize th
 
 ### 1.2 Key Objectives
 
-| Objective | Description |
-|-----------|-------------|
-| **Deck Composition** | Build valid 6-card decks with type distribution validation |
-| **Synergy Analysis** | Real-time scoring and compatibility analysis |
-| **Meta Integration** | Leverage meta tier rankings for optimal builds |
-| **Quick Optimization** | AI-powered auto-optimize functionality |
-| **Multi-Deck Management** | Save and switch between multiple deck configurations |
+| Objective                 | Description                                                                    |
+| ------------------------- | ------------------------------------------------------------------------------ |
+| **Deck Composition**      | Build valid 6-card decks with any type combination                             |
+| **Presence Bonus**        | Track support card presence bonus (+5% per card in training, max +30%)         |
+| **Synergy Analysis**      | Real-time scoring for training concentration and skill hint coverage           |
+| **Meta Integration**      | Leverage meta tier rankings for optimal builds                                 |
+| **Quick Optimization**    | AI-powered auto-optimize functionality                                         |
+| **Multi-Deck Management** | Save and switch between multiple deck configurations                           |
 
-### 1.3 User Stories
+### 1.3 Game-Accurate Mechanics (Global English Server - Jan 2026)
 
-| ID | User Story | Priority |
-|----|------------|----------|
-| US-001 | As a player, I want to build a 6-card support deck with validation feedback | P0 |
-| US-002 | As a player, I want to see deck synergy scores and recommendations | P1 |
-| US-003 | As a player, I want to save multiple deck configurations | P1 |
-| US-004 | As a player, I want AI to auto-optimize my deck for my goals | P1 |
-| US-005 | As a player, I want to share my deck composition with others | P2 |
+#### 1.3.1 Deck Composition Rules
+
+| Rule                        | Description                                                    |
+| --------------------------- | -------------------------------------------------------------- |
+| **Total Slots**             | 6 support card slots                                           |
+| **Type Mixing**             | Can mix any combination of types (no restrictions)             |
+| **Common Strategies**       | 3 Speed + 2 Power + 1 Friend, 2 Speed + 2 Stamina + 1 Power + 1 Friend, etc. |
+| **Presence Bonus**          | +5% training bonus per card present in training (max +30%)     |
+
+#### 1.3.2 Support Card Types
+
+| Type      | Training Focus | Skill Category        | Primary Benefit                          |
+| --------- | -------------- | --------------------- | ---------------------------------------- |
+| **Speed** | Speed          | Speed-related skills  | Boosts speed training, acceleration      |
+| **Stamina** | Stamina      | Recovery skills       | Boosts stamina training, endurance       |
+| **Power** | Power          | Acceleration skills   | Boosts power training, burst speed       |
+| **Guts**  | Guts           | Positioning skills    | Boosts guts training, race positioning   |
+| **Wit**   | Wit            | Race reading skills   | Boosts wit training, skill activation    |
+| **Friend** | Special       | Unique events         | Mood management, special bonuses, unique events |
+
+#### 1.3.3 Deck Synergy Considerations
+
+| Factor                      | Impact                                                         |
+| --------------------------- | -------------------------------------------------------------- |
+| **Training Concentration**  | Multiple cards of same type = faster facility leveling         |
+| **Skill Hint Coverage**     | Diverse hints for target build optimization                    |
+| **Bond Management**         | Balance bond building across all 6 cards                       |
+| **Event Chain Optimization**| Maximize beneficial event triggers                             |
+
+#### 1.3.4 Card Selection Criteria
+
+| Criterion                   | Description                                                    |
+| --------------------------- | -------------------------------------------------------------- |
+| **Limit Break Level**       | ★ to ★★★★★ (1-5 stars, affects stat bonuses)                   |
+| **Skill Hints Provided**    | Skills available at reduced SP cost (5 levels: 10%/20%/30%/35%/40% max)|
+| **Training Bonus %**        | Percentage boost to training gains                             |
+| **Event Quality**           | Value of card-specific events                                  |
+
+### 1.4 User Stories
+
+| ID     | User Story                                                                  | Priority |
+| ------ | --------------------------------------------------------------------------- | -------- |
+| US-001 | As a player, I want to build a 6-card support deck with validation feedback | P0       |
+| US-002 | As a player, I want to see deck synergy scores and recommendations          | P1       |
+| US-003 | As a player, I want to save multiple deck configurations                    | P1       |
+| US-004 | As a player, I want AI to auto-optimize my deck for my goals                | P1       |
+| US-005 | As a player, I want to share my deck composition with others                | P2       |
+| US-006 | As a player, I want to see the presence bonus calculation for my deck       | P1       |
+| US-007 | As a player, I want to see limit break levels (★-★★★★★) for each card       | P0       |
+| US-008 | As a player, I want to see card type distribution for training focus        | P1       |
 
 ---
 
@@ -55,184 +99,137 @@ The Support Deck Builder enables players to construct, validate, and optimize th
 
 ### 2.1 Desktop Layout (≥1024px)
 
-```
-
 ┌──────────────────────────────────────────────────────────────────────┐
-│ Support Deck Builder                                            [≡]  │
+│ [≡] Menu | Deck Builder: Speed Focus Build | [?] Help │
 ├──────────────────────────────────────────────────────────────────────┤
-│                                                                      │
-│ ┌────────────┬───────────────────────────────────────────────────┐  │
-│ │ Sidebar    │ Main Content Area                                 │  │
-│ │            │                                                   │  │
-│ │ Dashboard  │ ┌──────────────────────────────────────────────┐ │  │
-│ │ Character  │ │ Deck Overview                                 │ │  │
-│ │ Training   │ │ ┌────────────────────────────────────────────┐│ │  │
-│ │ Races      │ │ │ Deck Name: "Speed Focus Build"             ││ │  │
-│ │ Skills     │ │ │ Synergy Score: 88/100 (Excellent)          ││ │  │
-│ │ Support  ●│ │ │ Meta Tier Average: S                       ││ │  │
-│ │ AI Advisor │ │ │ Total Bonds: 78% average                   ││ │  │
-│ │ Settings   │ │ │                                            ││ │  │
-│ │            │ │ │ [SAVE DECK] [AUTO-OPTIMIZE] [EXPORT]       ││ │  │
-│ │            │ │ └────────────────────────────────────────────┘│ │  │
-│ │            │ └──────────────────────────────────────────────┘ │  │
-│ │            │                                                   │  │
-│ │            │ ┌───────────────────────────────────────────────┐│  │
-│ │            │ │ Active Deck (6 cards)                         ││  │
-│ │            │ ├───────────────────────────────────────────────┤│  │
-│ │            │ │ ┌─────────────────┬─────────────────────────┐ ││  │
-│ │            │ │ │ Slot 1: Speed   │ Slot 2: Speed           │ ││  │
-│ │            │ │ ├─────────────────┼─────────────────────────┤ ││  │
-│ │            │ │ │ Mejiro Dober    │ Tokai Teio              │ ││  │
-│ │            │ │ │ [Card Portrait] │ [Card Portrait]         │ ││  │
-│ │            │ │ │ SSR · Power     │ SSR · Speed             │ ││  │
-│ │            │ │ │ Meta: S Tier    │ Meta: SS Tier           │ ││  │
-│ │            │ │ │ LB: 4/4 ★★★★   │ LB: 2/4 ★★☆☆           │ ││  │
-│ │            │ │ │ Bond: 90%       │ Bond: 75%               │ ││  │
-│ │            │ │ │ ████████░░ 90%  │ ███████░░░ 75%          │ ││  │
-│ │            │ │ │                 │                         │ ││  │
-│ │            │ │ │ Bonuses:        │ Bonuses:                │ ││  │
-│ │            │ │ │ • Power +12%    │ • Speed +15%            │ ││  │
-│ │            │ │ │ • Training +8%  │ • Training +10%         │ ││  │
-│ │            │ │ │                 │                         │ ││  │
-│ │            │ │ │ [SWAP] [REMOVE] │ [SWAP] [REMOVE]         │ ││  │
-│ │            │ │ └─────────────────┴─���───────────────────────┘ ││  │
-│ │            │ │                                               ││  │
-│ │            │ │ [Continue with Slots 3-6 in similar format]   ││  │
-│ │            │ └───────────────────────────────────────────────┘│  │
-│ │            │                                                   │  │
-│ │            │ ┌───────────────────────────────────────────────┐│  │
-│ │            │ │ Deck Analysis                                 ││  │
-│ │            │ ├───────────────────────────────────────────────┤│  │
-│ │            │ │ Type Distribution:                            ││  │
-│ │            │ │ ┌──────────────────────────────────────────┐ ││  │
-│ │            │ │ │ Speed:   2 cards ✓ (recommended 1-2)     │ ││  │
-│ │            │ │ │ Stamina: 1 card  ✓ (recommended 1-2)     │ ││  │
-│ │            │ │ │ Power:   1 card  ✓ (recommended 0-2)     │ ││  │
-│ │            │ │ │ Guts:    1 card  ✓ (recommended 0-1)     │ ││  │
-│ │            │ │ │ Wit:     0 cards ⚠️ (recommended 1-2)     │ ││  │
-│ │            │ │ │ Friend:  1 card  ✓ (recommended 1)       │ ││  │
-│ │            │ │ └──────────────────────────────────────────┘ ││  │
-│ │            │ │                                               ││  │
-│ │            │ │ Deck Quality Metrics:                         ││  │
-│ │            │ │ • Meta tier cards: 5/6 (83%)                  ││  │
-│ │            │ │ • Average limit break: 3.0 stars              ││  │
-│ │            │ │ • Average bond level: 78%                     ││  │
-│ │            │ │ • Synergy score: 88/100                       ││  │
-│ │            │ │                                               ││  │
-│ │            │ │ AI Recommendations:                           ││  │
-│ │            │ │ 💡 Add a Wit-type card to improve coverage    ││  │
-│ │            │ │ 💡 Consider replacing Symboli Rudolf with a   ││  │
-│ │            │ │    higher meta tier alternative               ││  │
-│ │            │ │                                               ││  │
-│ │            │ │ [VIEW RECOMMENDATIONS]                        ││  │
-│ │            │ └───────────────────────────────────────────────┘│  │
-│ │            │                                                   │  │
-│ │            │ ┌───────────────────────────────────────────────┐│  │
-│ │            │ │ Card Library (Filtered)                       ││  │
-│ │            │ ├───────────────────────────────────────────────┤│  │
-│ │            │ │ Filter: [All Types ▼] [All Rarity ▼]         ││  │
-│ │            │ │ Sort: [Meta Tier ▼]                           ││  │
-│ │            │ │ 🔍 Search cards...                            ││  │
-│ │            │ │                                               ││  │
-│ │            │ │ Available Cards (150):                        ││  │
-│ │            │ │ ┌──────────────────┬────���─────────────────┐  ││  │
-│ │            │ │ │ Kitasan Black    │ Narita Brian         │  ││  │
-│ │            │ │ │ [Portrait]       │ [Portrait]           │  ││  │
-│ │            │ │ │ SSR · Stamina    │ SSR · Wit            │  ││  │
-│ │            │ │ │ Meta: S          │ Meta: A              │  ││  │
-│ │            │ │ │ LB: 4★ | 85%     │ LB: 3★ | 80%         │  ││  │
-│ │            │ │ │ [ADD TO DECK]    │ [ADD TO DECK]        │  ││  │
-│ │            │ │ └──────────────────┴──────────────────────┘  ││  │
-│ │            │ │                                               ││  │
-│ │            │ │ [Load More ▼]                                 ││  │
-│ │            │ └───────────────────────────────────────────────┘│  │
-│ └────────────┴───────────────────────────────────────────────────┘  │
-└───────────────────────────────────────────────────────���──────────────┘
-
-```
+│ ┌──────────────────────────────────────────────────────────────────┐ │
+│ │ Deck Name: Speed Focus Build [✏️ Edit Name] │ │
+│ │ │ │
+│ │ ┌─────────────────────────────────────────────────────────────┐ │ │
+│ │ │ TYPE DISTRIBUTION │ │ │
+│ │ │ Speed: ███████ 3 | Stamina: ██ 1 | Power: ██ 1 | Friend: █ 1 │ │ │
+│ │ └─────────────────────────────────────────────────────────────┘ │ │
+│ │ │ │
+│ │ Synergy Score: 7,850 (S) | Presence Bonus: +30% (6 cards max) │ │
+│ │ Training Focus: Speed (+15%) | Skill Hints: 12 covered │ │
+│ │ │ │
+│ │ [Save] [Auto-Fill] [Clear] [Analysis Details] │ │
+│ └──────────────────────────────────────────────────────────────────┘ │
+├──────────────────────────────────────────────────────────────────────┤
+│ │
+│ ┌──────────────────────────────────────────────────────────────────┐ │
+│ │ Active Deck (6 Slots) - Presence Bonus: +5% per card in training │ │
+│ ├────────────┬────────────┬────────────┬────────────┬───────────┤ │
+│ │ [Speed] │ [Speed] │ [Speed] │ [Stamina] │ [Power] ││
+│ │ ┌────────┐ │ ┌────────┐ │ ┌────────┐ │ ┌────────┐ │ ┌────────┐ │ │
+│ │ │Img │ │ │Img │ │ │Img │ │ │Img │ │ │Img │ │ │
+│ │ └────────┘ │ └────────┘ │ └────────┘ │ └────────┘ │ └────────┘ │ │
+│ │ Kitasan │ Tokai │ Biko │ Super │ Oguri │ │ │
+│ │ Black │ Teio │ Pegasus │ Creek │ Cap │ │ │
+│ │ [SSR] │ [SSR] │ [SSR] │ [SSR] │ [SSR] │ │ │
+│ │ ★★★★★ │ ★★★★☆ │ ★★★★★ │ ★★★★★ │ ★★★☆☆ │ │ │
+│ │ │ │ │ │ │ │ │
+│ │ [Change] │ [Change] │ [Change] │ [Change] │ [Change] │ │ │
+│ ├────────────┴────────────┴────────────┴────────────┴───────────┤ │
+│ │ [Friend] │ │
+│ │ ┌────────┐ │ │
+│ │ │Img │ │ │
+│ │ └────────┘ │ │
+│ │ Riko │ │
+│ │ Kashimoto │ │
+│ │ [SSR] │ │
+│ │ ★★★★☆ │ │
+│ │ │ │
+│ │ [Change] │ │
+│ └────────────────────────────────────────────────────────────────┘ │
+│ │
+│ ┌──────────────────────────────────────────────────────────────────┐ │
+│ │ Card Library / Selection │ │
+│ ├──────────────────────────────────────────────────────────────────┤ │
+│ │ [Filter: Speed ▼] [Sort: Limit Break ▼] [Search...] │ │
+│ │ │ │
+│ │ ┌────────┐ ┌────────┐ ┌────────┐ ┌──────── ┌────────┐ │ │
+│ │ │ [Img] │ │ [Img] │ │ [Img] │ │ [Img] │ │ [Img] │ │ │
+│ │ │ Spd │ │ Spd │ │ Pwr │ │ Wit │ │ Guts │ │ │
+│ │ │ ★★★★★ │ │ ★★★★☆ │ │ ★★★☆☆ │ │ ★★★★★ │ │ ★★★★☆ │ │ │
+│ │ └────────┘ └────────┘ └────────┘ └────────┘ └────────┘ │ │
+│ │ King El Condor Oguri Fine Rice │ │
+│ │ Halo Pasa Cap Motion Shower │ │
+│ │ │ │
+│ └──────────────────────────────────────────────────────────────────┘ │
+│ │
+└──────────────────────────────────────────────────────────────────────┘
 
 ### 2.2 Tablet Layout (640px-1024px)
 
-```
-
 ┌────────────────────────────────────────────────────┐
-│ Support Deck Builder                           [≡] │
+│ [≡] Menu | Deck Builder [?] │
 ├────────────────────────────────────────────────────┤
-│ ☰ Menu Toggle                                      │
+│ ┌────────────────────────────────────────────────┐ │
+│ │ Deck: Spd Focus [Save] [Fill] [Clear] │ │
+│ │ Type: Spd×3 Sta×1 Pwr×1 Frd×1 │ │
+│ │ Score: 7850 (S) | Presence: +30% (max) │ │
+│ └────────────────────────────────────────────────┘ │
 ├────────────────────────────────────────────────────┤
-│                                                    │
-│ Deck: "Speed Focus Build"                          │
-│ Score: 88/100 | Meta: S | Bond: 78%                │
-│ [SAVE] [OPTIMIZE] [EXPORT]                         │
-│                                                    │
-│ Tabs: [Deck (6)] [Library (150)] [Analysis]       │
-│                                                    │
-│ ┌──────────────────┬──────────────────────────┐   │
-│ │ 1. Mejiro Dober  │ 2. Tokai Teio            │   │
-│ │ [Portrait]       │ [Portrait]               │   │
-│ │ SSR · Power      │ SSR · Speed              │   │
-�� │ Meta: S | LB: 4★ │ Meta: SS | LB: 2★        │   │
-│ │ Bond: 90%        │ Bond: 75%                │   │
-│ │ [SWAP] [REMOVE]  │ [SWAP] [REMOVE]          │   │
-│ └──────────────────┴──────────────────────────┘   │
-│                                                    │
-│ [Show 4 more slots ▼]                              │
-│                                                    │
-│ ┌──────────────────────────────────────────────┐  │
-│ │ Quick Analysis                                │  │
-│ │ • Type balance: Good ✓                        │  │
-│ │ • Meta quality: Excellent                     │  │
-│ │ • Synergy: 88/100                             │  │
-│ │ [VIEW FULL ANALYSIS]                          │  │
-│ └──────────────────────────────────────────────┘  │
+│ │
+│ ┌────────────────────────────────────────────────┐ │
+│ │ Active Deck (6 Slots) │ │
+│ ├──────────────┬──────────────┬───────────────┤ │ │
+│ │ 1. [Speed] │ 2. [Speed] │ 3. [Speed] │ │ │
+│ │ Kitasan │ Tokai │ Biko │ │ │
+│ │ [SSR] ★★★★★ │ [SSR] ★★★★☆ │ [SSR] ★★★★★ │ │ │
+│ ├──────────────┼──────────────┼───────────────┤ │ │
+│ │ 4. [Stamina] │ 5. [Power] │ 6. [Friend] │ │ │
+│ │ Super │ Oguri │ Riko │ │ │
+│ │ Creek ★★★★★ │ Cap ★★★☆☆ │ Kashimoto │ │ │
+│ │ │ │ ★★★★☆ │ │ │
+│ └──────────────┴──────────────┴───────────────┘ │ │
+│ │
+│ ┌────────────────────────────────────────────────┐ │
+│ │ Library [Filter ▼] [Sort: LB ▼] │ │
+│ │ │ │
+│ │ [King Halo] [El Condor] [Oguri Cap] ... │ │
+│ │ ★★★★★ ★★★★☆ ★★★☆☆ │ │
+│ └────────────────────────────────────────────────┘ │
+│ │
 └────────────────────────────────────────────────────┘
-
-```
 
 ### 2.3 Mobile Layout (<640px)
 
-```
-
 ┌──────────────────────────────┐
-│ Deck Builder           [≡]  │
+│ [≡] Deck Builder [?] │
 ├──────────────────────────────┤
-│                              │
-│ "Speed Focus Build"          │
-│ Score: 88/100 | S Tier       │
-│                              │
-│ [SAVE] [OPT] [EXPORT]        │
-│                              │
-│ Tabs: [Deck] [Cards] [Info]  │
-│                              │
-│ ┌──────────────────────────┐ │
-│ │ 1. Mejiro Dober          │ │
-│ │ ┌──────────────────────┐ │ │
-│ │ │    [Portrait]        │ │ │
-│ │ └──────────────────────┘ │ │
-│ │ SSR · Power              │ │
-│ │ Meta: S | LB: 4★         │ │
-│ │ Bond: ████████░░ 90%     │ │
-│ │                          │ │
-│ │ [SWAP] [REMOVE]          │ │
-│ └──────────────────────────┘ │
-│                              │
-│ ┌──────────────────────────┐ │
-│ │ 2. Tokai Teio            │ │
-│ │ [Portrait]               │ │
-│ │ SSR · Speed              │ │
-│ │ Meta: SS | LB: 2★        │ │
-│ │ Bond: ███████░░░ 75%     │ │
-│ │                          │ │
-│ │ [SWAP] [REMOVE]          │ │
-│ └──────────────────────────┘ │
-│                              │
-│ [Show 4 more ▼]              │
+│ Name: Spd Focus [Score S] │
+│ Type: Spd×3 Sta×1 Pwr×1 Frd×1│
+│ Presence Bonus: +30% (max) │
+│ [Save] [Fill] [Clear] │
+├──────────────────────────────┤
+│ │
+│ ACTIVE DECK (6) │
+│ ┌──────────────────┐ │
+│ │ 1. [Speed] │ │
+│ │ Kitasan Black │ │
+│ │ [SSR] ★★★★★ │ │
+│ └──────────────────┘ │
+│ ┌──────────────────┐ │
+│ │ 2. [Speed] │ │
+│ │ Tokai Teio │ │
+│ │ [SSR] ★★★★☆ │ │
+│ └──────────────────┘ │
+│ [Show All 6 ▼] │
+│ │
+│ LIBRARY │
+│ [Filter] [Sort: LB] [Search] │
+│ ┌────────┐ ┌────────┐ │
+│ │ [Img] │ │ [Img] │ │
+│ │ King │ │ El │ │
+│ │ Halo │ │ Condor │ │
+│ │ ★★★★★ │ │ ★★★★☆ │ │
+│ └────────┘ └────────┘ │
+│ │
 └──────────────────────────────┘
-│  Bottom Navigation Bar       │
-│ [🏠][👤][⚡][🏆][🤖][⚙️]   │
+│ [🏠] [👤] [⚡] [🏆] [🤖] │
 └──────────────────────────────┘
-
-```
 
 ---
 
@@ -246,30 +243,59 @@ The Support Deck Builder enables players to construct, validate, and optimize th
 class DeckOverview extends Component
 {
     public SupportDeck $deck;
-    
+
     public function mount(SupportDeck $deck)
     {
         $this->deck = $deck;
     }
-    
+
     public function getDeckMetricsProperty()
     {
         $cards = $this->deck->cards;
-        
+
         return [
             'synergy_score' => $this->calculateSynergyScore($cards),
             'meta_tier_avg' => $this->calculateMetaAverage($cards),
             'avg_bond' => $cards->avg('bond_level'),
             'avg_lb' => $cards->avg('limit_break_level'),
             'type_distribution' => $cards->countBy('card_type')->toArray(),
+            'presence_bonus' => $this->calculatePresenceBonus($cards),
+            'skill_hints_count' => $this->countSkillHints($cards),
         ];
     }
-    
+
+    /**
+     * Calculate presence bonus: +5% per card in training, max +30%
+     * Game-accurate mechanic from Global English Server (Jan 2026)
+     */
+    private function calculatePresenceBonus($cards): array
+    {
+        $cardCount = min($cards->count(), 6);
+        $bonusPerCard = 5; // +5% per card
+        $maxBonus = 30; // Maximum +30%
+        
+        return [
+            'per_card' => $bonusPerCard,
+            'total' => min($cardCount * $bonusPerCard, $maxBonus),
+            'max' => $maxBonus,
+            'cards_counted' => $cardCount,
+            'is_maxed' => ($cardCount * $bonusPerCard) >= $maxBonus,
+        ];
+    }
+
+    /**
+     * Count total skill hints provided by deck cards
+     */
+    private function countSkillHints($cards): int
+    {
+        return $cards->sum(fn($card) => count($card->skill_hints ?? []));
+    }
+
     private function calculateSynergyScore($cards): int
     {
         $score = 0;
-        
-        // Meta tier scoring (40% weight)
+
+        // Meta tier scoring (30% weight)
         $metaScore = $cards->sum(function ($card) {
             return match($card->meta_tier) {
                 'SS' => 25,
@@ -280,22 +306,28 @@ class DeckOverview extends Component
             };
         });
         $score += $metaScore;
-        
-        // Limit break scoring (20% weight)
-        $lbScore = $cards->sum('limit_break_level') * 2;
+
+        // Limit break scoring (25% weight) - ★ to ★★★★★
+        $lbScore = $cards->sum('limit_break_level') * 2.5;
         $score += $lbScore;
-        
-        // Bond scoring (20% weight)
+
+        // Bond scoring (15% weight)
         $bondScore = $cards->sum('bond_level') / 10;
         $score += $bondScore;
-        
-        // Type diversity (20% weight)
-        $uniqueTypes = $cards->pluck('card_type')->unique()->count();
-        $score += $uniqueTypes * 5;
-        
+
+        // Training concentration bonus (15% weight)
+        // Multiple cards of same type = faster facility leveling
+        $typeCounts = $cards->countBy('card_type');
+        $concentrationBonus = $typeCounts->filter(fn($count) => $count >= 2)->sum(fn($count) => ($count - 1) * 3);
+        $score += $concentrationBonus;
+
+        // Skill hint coverage (15% weight)
+        $hintScore = min(15, $this->countSkillHints($cards) * 1.5);
+        $score += $hintScore;
+
         return min(100, (int) $score);
     }
-    
+
     public function render()
     {
         return view('livewire.support-cards.deck-overview');
@@ -306,12 +338,22 @@ class DeckOverview extends Component
 **Visual Format**:
 
 ```
-┌───────────────────────���────────────────┐
+┌────────────────────────────────────────┐
 │ Deck Overview                          │
 ├────────────────────────────────────────┤
-│ Deck Name: "Speed Focus Build"        │
+│ Deck Name: "Speed Focus Build"         │
+│                                        │
+│ TYPE DISTRIBUTION                      │
+│ Speed: ███ 3 | Stamina: █ 1            │
+│ Power: █ 1   | Friend: █ 1             │
+│                                        │
+│ DECK METRICS                           │
+│ Synergy Score: 88/100 (Excellent)      │
 │ Synergy Score: 88/100 (Excellent)      │
 │ Meta Tier Average: S                   │
+│ Presence Bonus: +30% (6 cards, max)    │
+│ Skill Hints: 12 covered                │
+│ Avg Limit Break: ★★★★☆ (4.2)           │
 │ Total Bonds: 78% average               │
 │                                        │
 │ [SAVE DECK] [AUTO-OPTIMIZE] [EXPORT]   │
@@ -332,23 +374,23 @@ class DeckOverview extends Component
                     {{ $card->card_type }}
                 </span>
             </div>
-            
+
             <div class="deck-slot__portrait">
                 <img src="{{ $card->image_path }}" alt="{{ $card->name }}" />
-                
+
                 @if($card->meta_tier)
                     <div class="meta-tier-badge meta-tier-{{ strtolower($card->meta_tier) }}">
                         {{ $card->meta_tier }}
                     </div>
                 @endif
             </div>
-            
+
             <div class="deck-slot__info">
                 <h3 class="card-name">{{ $card->name }}</h3>
                 @if($card->name_jp)
                     <span class="card-name-jp">{{ $card->name_jp }}</span>
                 @endif
-                
+
                 <div class="card-badges">
                     <span class="badge badge-{{ strtolower($card->rarity) }}">
                         {{ $card->rarity }}
@@ -358,21 +400,22 @@ class DeckOverview extends Component
                     </span>
                 </div>
             </div>
-            
+
+            {{-- Limit Break Display: ★ to ★★★★★ (1-5 stars) --}}
+            <div class="deck-slot__limit-break">
+                <span class="lb-label">Limit Break:</span>
+                <span class="lb-stars" aria-label="Limit break level {{ $card->limit_break_level }} of 5">
+                    @for($i = 1; $i <= 5; $i++)
+                        @if($i <= $card->limit_break_level)
+                            <span class="star filled" aria-hidden="true">★</span>
+                        @else
+                            <span class="star empty" aria-hidden="true">☆</span>
+                        @endif
+                    @endfor
+                </span>
+            </div>
+
             <div class="deck-slot__stats">
-                <div class="stat-row">
-                    <span class="stat-label">LB:</span>
-                    <span class="stat-value">{{ $card->limit_break_level }}/4</span>
-                    <span class="lb-stars">
-                        @for($i = 0; $i < $card->limit_break_level; $i++)
-                            <span class="star filled">★</span>
-                        @endfor
-                        @for($i = $card->limit_break_level; $i < 4; $i++)
-                            <span class="star empty">☆</span>
-                        @endfor
-                    </span>
-                </div>
-                
                 <div class="stat-row">
                     <span class="stat-label">Bond:</span>
                     <span class="stat-value">{{ $card->bond_level }}%</span>
@@ -380,17 +423,24 @@ class DeckOverview extends Component
                         <div class="bond-fill" style="width: {{ $card->bond_level }}%"></div>
                     </div>
                 </div>
+
+                <div class="stat-row">
+                    <span class="stat-label">Training Bonus:</span>
+                    <span class="stat-value">+{{ $card->training_bonus ?? 0 }}%</span>
+                </div>
             </div>
-            
+
             <div class="deck-slot__bonuses">
-                <h4>Bonuses:</h4>
+                <h4>Skill Hints:</h4>
                 <ul>
-                    @foreach($card->bonuses as $bonus)
-                        <li>{{ $bonus['type'] }}: +{{ $bonus['value'] }}%</li>
-                    @endforeach
+                    @forelse($card->skill_hints ?? [] as $hint)
+                        <li>{{ $hint['name'] }} ({{ $hint['reduction'] ?? '20-40' }}% SP reduction)</li>
+                    @empty
+                        <li class="text-muted">No skill hints</li>
+                    @endforelse
                 </ul>
             </div>
-            
+
             <div class="deck-slot__actions">
                 <button wire:click="swapCard({{ $position }})" class="btn btn-secondary">
                     Swap
@@ -406,6 +456,7 @@ class DeckOverview extends Component
             <div class="empty-indicator">
                 <svg class="empty-icon"><!-- Empty slot icon --></svg>
                 <p>No card selected</p>
+                <p class="text-muted text-sm">+5% presence bonus when filled</p>
             </div>
             <button wire:click="selectCard({{ $position }})" class="btn btn-primary">
                 Select Card
@@ -424,62 +475,74 @@ class DeckValidator extends Component
 {
     public SupportDeck $deck;
     public array $validationResults = [];
-    
+
     public function mount(SupportDeck $deck)
     {
         $this->deck = $deck;
         $this->validate();
     }
-    
+
     public function validate(): void
     {
         $cards = $this->deck->cards;
         $this->validationResults = [];
-        
-        // Rule 1: Must have exactly 6 cards
+
+        // Rule 1: Must have exactly 6 cards for maximum presence bonus
         if ($cards->count() !== 6) {
+            $currentBonus = min($cards->count() * 5, 30);
             $this->validationResults[] = [
-                'type' => 'error',
-                'message' => 'Deck must contain exactly 6 cards',
+                'type' => 'warning',
+                'message' => "Deck has {$cards->count()}/6 cards. Current presence bonus: +{$currentBonus}% (max +30%)",
                 'current' => $cards->count(),
                 'required' => 6,
             ];
         }
-        
-        // Rule 2: Type distribution check
+
+        // Rule 2: Type distribution analysis (no hard restrictions, but recommendations)
         $typeCounts = $cards->countBy('card_type');
         
-        foreach ($typeCounts as $type => $count) {
-            if ($type !== 'friend' && $count > 2) {
+        // Check for training concentration (multiple cards of same type)
+        $concentratedTypes = $typeCounts->filter(fn($count) => $count >= 3);
+        if ($concentratedTypes->isNotEmpty()) {
+            foreach ($concentratedTypes as $type => $count) {
                 $this->validationResults[] = [
-                    'type' => 'warning',
-                    'message' => "Too many {$type} cards (recommended max: 2)",
+                    'type' => 'info',
+                    'message' => "Strong {$type} concentration ({$count} cards) - faster facility leveling",
                     'current' => $count,
-                    'recommended' => 2,
                 ];
             }
         }
-        
-        // Rule 3: Friend card recommendation
+
+        // Rule 3: Friend card recommendation for mood management
         if (!isset($typeCounts['friend']) || $typeCounts['friend'] === 0) {
             $this->validationResults[] = [
                 'type' => 'warning',
-                'message' => 'Recommended: Add 1 Friend card for friendship training bonuses',
+                'message' => 'Recommended: Add 1 Friend card for mood management and unique events',
             ];
         }
-        
-        // Rule 4: Wit card recommendation
-        if (!isset($typeCounts['wit']) || $typeCounts['wit'] === 0) {
+
+        // Rule 4: Skill hint coverage check
+        $totalHints = $cards->sum(fn($card) => count($card->skill_hints ?? []));
+        if ($totalHints < 6) {
             $this->validationResults[] = [
                 'type' => 'info',
-                'message' => 'Recommended: Add 1-2 Wit cards for skill activation rate',
+                'message' => "Low skill hint coverage ({$totalHints} hints). Consider cards with more skill hints for SP savings.",
             ];
         }
-        
-        // Rule 5: Meta quality check
+
+        // Rule 5: Limit break quality check (★ to ★★★★★)
+        $avgLB = $cards->avg('limit_break_level');
+        if ($avgLB < 3) {
+            $this->validationResults[] = [
+                'type' => 'info',
+                'message' => "Average limit break is low ({$avgLB}/5 stars). Higher LB = better stat bonuses.",
+            ];
+        }
+
+        // Rule 6: Meta quality check
         $metaCards = $cards->filter(fn($c) => in_array($c->meta_tier, ['SS', 'S']))->count();
         $metaPercentage = ($metaCards / max(1, $cards->count())) * 100;
-        
+
         if ($metaPercentage < 50) {
             $this->validationResults[] = [
                 'type' => 'info',
@@ -488,8 +551,17 @@ class DeckValidator extends Component
                 'recommended' => '≥50%',
             ];
         }
+
+        // Rule 7: Bond management check
+        $lowBondCards = $cards->filter(fn($c) => $c->bond_level < 50)->count();
+        if ($lowBondCards > 2) {
+            $this->validationResults[] = [
+                'type' => 'warning',
+                'message' => "{$lowBondCards} cards have low bond (<50%). Bond affects skill unlock thresholds.",
+            ];
+        }
     }
-    
+
     public function render()
     {
         return view('livewire.support-cards.deck-validator');
@@ -504,7 +576,25 @@ class DeckValidator extends Component
 ```blade
 <div class="deck-analysis" data-testid="deck-analysis">
     <h3>Deck Analysis</h3>
-    
+
+    {{-- Presence Bonus Section --}}
+    <div class="analysis-section">
+        <h4>Presence Bonus (Game Mechanic):</h4>
+        <div class="presence-bonus-display">
+            <div class="bonus-calculation">
+                <span class="bonus-formula">{{ $cardCount }} cards × 5% = </span>
+                <span class="bonus-total text-lg font-bold text-green-600">+{{ min($cardCount * 5, 30) }}%</span>
+                @if($cardCount >= 6)
+                    <span class="bonus-max badge badge-success">MAX</span>
+                @endif
+            </div>
+            <p class="text-sm text-muted">
+                Each support card present in training adds +5% bonus (max +30% with 6 cards)
+            </p>
+        </div>
+    </div>
+
+    {{-- Type Distribution Section --}}
     <div class="analysis-section">
         <h4>Type Distribution:</h4>
         <div class="type-distribution">
@@ -512,39 +602,75 @@ class DeckValidator extends Component
                 <div class="type-row">
                     <span class="type-label">{{ ucfirst($type) }}:</span>
                     <span class="type-count">{{ $count }} card{{ $count !== 1 ? 's' : '' }}</span>
-                    <span class="type-status">
-                        @if($this->isTypeDistributionValid($type, $count))
-                            <span class="status-icon status-success">✓</span>
-                        @else
-                            <span class="status-icon status-warning">⚠️</span>
-                        @endif
+                    <span class="type-bar">
+                        @for($i = 0; $i < $count; $i++)
+                            <span class="bar-segment bar-{{ strtolower($type) }}">█</span>
+                        @endfor
                     </span>
-                    <span class="type-recommendation">
-                        (recommended {{ $this->getRecommendedRange($type) }})
-                    </span>
+                    @if($count >= 3)
+                        <span class="concentration-badge badge badge-info">
+                            Training Focus
+                        </span>
+                    @endif
                 </div>
             @endforeach
         </div>
+        <p class="text-sm text-muted mt-2">
+            Tip: Multiple cards of same type = faster facility leveling
+        </p>
     </div>
-    
+
+    {{-- Limit Break Summary --}}
+    <div class="analysis-section">
+        <h4>Limit Break Summary (★ to ★★★★★):</h4>
+        <div class="lb-summary">
+            <div class="lb-average">
+                <span class="lb-label">Average:</span>
+                <span class="lb-stars">
+                    @for($i = 1; $i <= 5; $i++)
+                        @if($i <= round($avgLimitBreak))
+                            <span class="star filled">★</span>
+                        @else
+                            <span class="star empty">☆</span>
+                        @endif
+                    @endfor
+                </span>
+                <span class="lb-value">({{ number_format($avgLimitBreak, 1) }}/5)</span>
+            </div>
+            <div class="lb-breakdown">
+                @foreach($lbDistribution as $level => $count)
+                    <span class="lb-item">{{ str_repeat('★', $level) }}: {{ $count }}</span>
+                @endforeach
+            </div>
+        </div>
+    </div>
+
+    {{-- Skill Hint Coverage --}}
+    <div class="analysis-section">
+        <h4>Skill Hint Coverage:</h4>
+        <div class="skill-hints-summary">
+            <p><strong>Total Hints:</strong> {{ $skillHintsCount }} skills with SP reduction</p>
+            <p class="text-sm text-muted">
+                Each hint level provides progressive SP cost reduction (5 levels: 10%/20%/30%/35%/40% max)
+            </p>
+        </div>
+    </div>
+
+    {{-- Deck Quality Metrics --}}
     <div class="analysis-section">
         <h4>Deck Quality Metrics:</h4>
         <ul class="quality-metrics">
             <li>
-                <strong>Meta tier cards:</strong> 
-                {{ $metaCardCount }}/{{ $totalCards }} 
+                <strong>Meta tier cards:</strong>
+                {{ $metaCardCount }}/{{ $totalCards }}
                 ({{ $metaPercentage }}%)
             </li>
             <li>
-                <strong>Average limit break:</strong> 
-                {{ number_format($avgLimitBreak, 1) }} stars
-            </li>
-            <li>
-                <strong>Average bond level:</strong> 
+                <strong>Average bond level:</strong>
                 {{ number_format($avgBond, 0) }}%
             </li>
             <li>
-                <strong>Synergy score:</strong> 
+                <strong>Synergy score:</strong>
                 {{ $synergyScore }}/100
                 <span class="synergy-tier">
                     ({{ $this->getSynergyTier($synergyScore) }})
@@ -552,7 +678,7 @@ class DeckValidator extends Component
             </li>
         </ul>
     </div>
-    
+
     @if(count($recommendations) > 0)
         <div class="analysis-section">
             <h4>AI Recommendations:</h4>
@@ -564,7 +690,7 @@ class DeckValidator extends Component
                     </li>
                 @endforeach
             </ul>
-            
+
             <button wire:click="viewRecommendations" class="btn btn-primary">
                 View Detailed Recommendations
             </button>
@@ -580,44 +706,61 @@ class DeckValidator extends Component
 ```php
 class DeckOptimizationService
 {
+    /**
+     * Optimize deck based on game-accurate mechanics (Global English Server Jan 2026)
+     * 
+     * Key considerations:
+     * - 6 slots total, any type combination allowed
+     * - Presence bonus: +5% per card in training (max +30%)
+     * - Training concentration for facility leveling
+     * - Skill hint coverage for SP optimization
+     * - Limit break levels (★ to ★★★★★)
+     */
     public function optimize(
         Collection $availableCards,
         array $goals,
         array $preferences = []
     ): array {
         $optimizedDeck = [];
-        
-        // Step 1: Prioritize by meta tier and goal alignment
+
+        // Step 1: Prioritize by meta tier, limit break, and goal alignment
         $rankedCards = $availableCards
             ->sortByDesc(function ($card) use ($goals) {
                 return $this->calculateCardScore($card, $goals);
             });
-        
-        // Step 2: Select cards ensuring type diversity
-        $selectedTypes = [];
+
+        // Step 2: Select cards based on strategy
+        $strategy = $preferences['strategy'] ?? 'balanced';
         $friendCardAdded = false;
-        
+        $typeCount = [];
+
         foreach ($rankedCards as $card) {
-            // Ensure we don't exceed type limits
-            $typeCount = collect($optimizedDeck)
-                ->filter(fn($c) => $c->card_type === $card->card_type)
-                ->count();
-            
-            if ($card->card_type === 'friend') {
+            $type = $card->card_type;
+            $currentTypeCount = $typeCount[$type] ?? 0;
+
+            // Friend card handling (recommended 1 for mood management)
+            if ($type === 'friend') {
                 if (!$friendCardAdded) {
                     $optimizedDeck[] = $card;
                     $friendCardAdded = true;
+                    $typeCount[$type] = ($typeCount[$type] ?? 0) + 1;
                 }
-            } elseif ($typeCount < 2) {
-                $optimizedDeck[] = $card;
+            } else {
+                // For concentrated builds, allow up to 3 of focus type
+                $maxPerType = ($strategy === 'concentrated' && $type === ($goals['focus_stat'] ?? null)) ? 3 : 2;
+                
+                if ($currentTypeCount < $maxPerType) {
+                    $optimizedDeck[] = $card;
+                    $typeCount[$type] = $currentTypeCount + 1;
+                }
             }
-            
+
             if (count($optimizedDeck) >= 6) {
                 break;
             }
         }
-        
-        // Step 3: Fill remaining slots if needed
+
+        // Step 3: Fill remaining slots if needed (ensure 6 cards for max presence bonus)
         while (count($optimizedDeck) < 6) {
             $remaining = $rankedCards->diff(collect($optimizedDeck));
             if ($remaining->isEmpty()) {
@@ -625,39 +768,79 @@ class DeckOptimizationService
             }
             $optimizedDeck[] = $remaining->first();
         }
-        
+
         return [
             'cards' => $optimizedDeck,
             'score' => $this->calculateDeckScore($optimizedDeck),
+            'presence_bonus' => min(count($optimizedDeck) * 5, 30),
+            'type_distribution' => collect($optimizedDeck)->countBy('card_type')->toArray(),
             'reasoning' => $this->generateReasoning($optimizedDeck, $goals),
         ];
     }
-    
+
     private function calculateCardScore($card, $goals): float
     {
         $score = 0;
-        
-        // Meta tier scoring (40% weight)
+
+        // Meta tier scoring (30% weight)
         $score += match($card->meta_tier) {
-            'SS' => 40,
-            'S' => 30,
-            'A' => 20,
-            'B' => 10,
-            default => 0,
+            'SS' => 30,
+            'S' => 24,
+            'A' => 18,
+            'B' => 12,
+            default => 6,
         };
-        
-        // Limit break scoring (20% weight)
-        $score += $card->limit_break_level * 5;
-        
-        // Bond scoring (20% weight)
-        $score += $card->bond_level * 0.2;
-        
-        // Goal alignment scoring (20% weight)
+
+        // Limit break scoring (25% weight) - ★ to ★★★★★
+        $score += $card->limit_break_level * 5; // 5 points per star, max 25
+
+        // Bond scoring (15% weight)
+        $score += $card->bond_level * 0.15;
+
+        // Skill hint scoring (15% weight)
+        $hintCount = count($card->skill_hints ?? []);
+        $score += min(15, $hintCount * 5);
+
+        // Goal alignment scoring (15% weight)
         if (isset($goals['focus_stat']) && $card->card_type === $goals['focus_stat']) {
-            $score += 20;
+            $score += 15;
         }
-        
+
         return $score;
+    }
+
+    private function calculateDeckScore($deck): int
+    {
+        return collect($deck)->sum(fn($card) => $this->calculateCardScore($card, []));
+    }
+
+    private function generateReasoning($deck, $goals): array
+    {
+        $reasons = [];
+        $typeDistribution = collect($deck)->countBy('card_type');
+        
+        // Presence bonus reasoning
+        $cardCount = count($deck);
+        $presenceBonus = min($cardCount * 5, 30);
+        $reasons[] = "Presence bonus: +{$presenceBonus}% ({$cardCount}/6 cards)";
+
+        // Training concentration reasoning
+        $concentratedTypes = $typeDistribution->filter(fn($count) => $count >= 3);
+        if ($concentratedTypes->isNotEmpty()) {
+            foreach ($concentratedTypes as $type => $count) {
+                $reasons[] = "Strong {$type} concentration ({$count} cards) for faster facility leveling";
+            }
+        }
+
+        // Skill hint coverage
+        $totalHints = collect($deck)->sum(fn($card) => count($card->skill_hints ?? []));
+        $reasons[] = "Skill hint coverage: {$totalHints} skills with SP reduction available";
+
+        // Limit break quality
+        $avgLB = collect($deck)->avg('limit_break_level');
+        $reasons[] = "Average limit break: " . number_format($avgLB, 1) . "/5 stars";
+
+        return $reasons;
     }
 }
 ```
@@ -673,14 +856,14 @@ class CardLibrary extends Component
     public $typeFilter = 'all';
     public $rarityFilter = 'all';
     public $sortBy = 'meta_tier';
-    
+
     public $selectedSlot = null;
-    
+
     public function updatedSearch()
     {
         $this->resetPage();
     }
-    
+
     public function getCardsProperty()
     {
         return SupportCard::query()
@@ -700,12 +883,12 @@ class CardLibrary extends Component
             ->orderBy($this->getSortColumn(), $this->getSortDirection())
             ->paginate(12);
     }
-    
+
     public function addToDeck($cardId, $slot)
     {
         $card = SupportCard::findOrFail($cardId);
         $deck = auth()->user()->activeSupportDeck;
-        
+
         // Validate deck not full
         if ($deck->cards()->count() >= 6 && !$deck->cards()->where('slot_position', $slot)->exists()) {
             $this->dispatch('toast', [
@@ -714,22 +897,22 @@ class CardLibrary extends Component
             ]);
             return;
         }
-        
+
         // Remove existing card in slot if any
         $deck->cards()->wherePivot('slot_position', $slot)->detach();
-        
+
         // Add new card
         $deck->cards()->attach($cardId, [
             'slot_position' => $slot,
         ]);
-        
+
         $this->dispatch('card-added-to-deck', cardId: $cardId, slot: $slot);
         $this->dispatch('toast', [
             'type' => 'success',
             'message' => "{$card->name} added to slot {$slot}",
         ]);
     }
-    
+
     public function render()
     {
         return view('livewire.support-cards.card-library');
@@ -749,51 +932,51 @@ class CardLibrary extends Component
 class DeckBuilder extends Component
 {
     public SupportDeck $deck;
-    
+
     public $deckName;
     public $activeTab = 'deck'; // deck, library, analysis
-    
+
     protected $listeners = [
         'card-added-to-deck' => '$refresh',
         'card-removed-from-deck' => '$refresh',
         'deck-optimized' => 'loadOptimizedDeck',
     ];
-    
+
     public function mount(SupportDeck $deck)
     {
         $this->deck = $deck;
         $this->deckName = $deck->name ?? 'Unnamed Deck';
     }
-    
+
     public function saveDeck()
     {
         $this->validate([
             'deckName' => 'required|max:255',
         ]);
-        
+
         $this->deck->update([
             'name' => $this->deckName,
         ]);
-        
+
         $this->dispatch('toast', [
             'type' => 'success',
             'message' => 'Deck saved successfully',
         ]);
     }
-    
+
     public function autoOptimize()
     {
         $character = $this->deck->character;
-        
+
         $optimizationService = app(DeckOptimizationService::class);
         $result = $optimizationService->optimize(
             auth()->user()->supportCards,
             $character->goals ?? [],
         );
-        
+
         $this->dispatch('deck-optimized', result: $result);
     }
-    
+
     public function render()
     {
         return view('livewire.support-cards.deck-builder');
@@ -810,14 +993,14 @@ sequenceDiagram
     participant Validator as Deck Validator
     participant Optimizer as Optimization Service
     participant Database
-    
+
     User->>DeckBuilder: Load deck builder
     DeckBuilder->>Database: Load active deck
     Database-->>DeckBuilder: Deck + cards
     DeckBuilder->>Validator: Validate deck
     Validator-->>DeckBuilder: Validation results
     DeckBuilder->>User: Display deck
-    
+
     User->>DeckBuilder: Click Auto-Optimize
     DeckBuilder->>Optimizer: optimize(cards, goals)
     Optimizer->>Optimizer: Score cards
@@ -832,12 +1015,12 @@ sequenceDiagram
 
 ### 4.3 Cache Strategy
 
-| Data Type | Cache Key | TTL | Invalidation |
-|-----------|-----------|-----|--------------|
-| Deck cards | `deck:cards:{deck_id}` | 5 minutes | On card add/remove |
-| Synergy score | `deck:synergy:{deck_id}` | 10 minutes | On deck change |
-| Optimization results | `deck:optimize:{deck_id}` | 15 minutes | On goals change |
-| Card library | `cards:user:{user_id}` | 1 hour | On card update |
+| Data Type            | Cache Key                 | TTL        | Invalidation       |
+| -------------------- | ------------------------- | ---------- | ------------------ |
+| Deck cards           | `deck:cards:{deck_id}`    | 5 minutes  | On card add/remove |
+| Synergy score        | `deck:synergy:{deck_id}`  | 10 minutes | On deck change     |
+| Optimization results | `deck:optimize:{deck_id}` | 15 minutes | On goals change    |
+| Card library         | `cards:user:{user_id}`    | 1 hour     | On card update     |
 
 ---
 
@@ -874,7 +1057,7 @@ sequenceDiagram
     participant Service as Optimization Service
     participant AI as AI Service
     participant DB as Database
-    
+
     User->>UI: Click Auto-Optimize
     UI->>UI: Show loading state
     UI->>Service: optimize(availableCards, goals)
@@ -897,23 +1080,23 @@ flowchart TD
     Count -->|< 6| ErrorFew[Error: Need more cards]
     Count -->|= 6| CheckTypes[Check Type Distribution]
     Count -->|> 6| ErrorMany[Error: Too many cards]
-    
+
     CheckTypes --> TypeCheck{Type Count Valid?}
     TypeCheck -->|No| WarnTypes[Warning: Type imbalance]
     TypeCheck -->|Yes| CheckFriend[Check Friend Card]
-    
+
     CheckFriend --> FriendCheck{Has Friend?}
     FriendCheck -->|No| WarnFriend[Warning: No friend card]
     FriendCheck -->|Yes| CheckMeta[Check Meta Quality]
-    
+
     CheckMeta --> MetaCheck{Meta % > 50?}
     MetaCheck -->|No| InfoMeta[Info: Consider meta cards]
     MetaCheck -->|Yes| CalcScore[Calculate Synergy Score]
-    
+
     WarnTypes --> CalcScore
     WarnFriend --> CalcScore
     InfoMeta --> CalcScore
-    
+
     CalcScore --> DisplayResults[Display Validation Results]
 ```
 
@@ -923,28 +1106,28 @@ flowchart TD
 
 ### 6.1 WCAG 2.2 AA Compliance
 
-| Criterion | Implementation | Test Method |
-|-----------|----------------|-------------|
-| **1.1.1 Non-text Content** | All card images have descriptive `alt` text | Screen reader testing |
-| **1.4.3 Contrast Ratio** | 4.5:1 minimum for text | Color contrast analyzer |
-| **2.1.1 Keyboard** | All deck operations keyboard accessible | Keyboard-only testing |
-| **2.4.3 Focus Order** | Logical tab order through slots | Tab key traversal |
-| **2.4.7 Focus Visible** | Clear focus indicators on cards | Visual inspection |
-| **3.2.4 Consistent Identification** | Consistent card status badges | Manual review |
-| **4.1.2 Name, Role, Value** | Proper ARIA attributes on controls | axe-core scan |
+| Criterion                           | Implementation                              | Test Method             |
+| ----------------------------------- | ------------------------------------------- | ----------------------- |
+| **1.1.1 Non-text Content**          | All card images have descriptive `alt` text | Screen reader testing   |
+| **1.4.3 Contrast Ratio**            | 4.5:1 minimum for text                      | Color contrast analyzer |
+| **2.1.1 Keyboard**                  | All deck operations keyboard accessible     | Keyboard-only testing   |
+| **2.4.3 Focus Order**               | Logical tab order through slots             | Tab key traversal       |
+| **2.4.7 Focus Visible**             | Clear focus indicators on cards             | Visual inspection       |
+| **3.2.4 Consistent Identification** | Consistent card status badges               | Manual review           |
+| **4.1.2 Name, Role, Value**         | Proper ARIA attributes on controls          | axe-core scan           |
 
 ### 6.2 Keyboard Navigation
 
-| Action | Shortcut | Context |
-|--------|----------|---------|
-| Navigate slots | `Arrow Keys` | Deck grid |
-| Select card for slot | `Enter` | When slot focused |
+| Action                | Shortcut                | Context           |
+| --------------------- | ----------------------- | ----------------- |
+| Navigate slots        | `Arrow Keys`            | Deck grid         |
+| Select card for slot  | `Enter`                 | When slot focused |
 | Remove card from slot | `Delete` or `Backspace` | When card focused |
-| Open card library | `L` | Deck builder |
-| Auto-optimize deck | `O` | Deck builder |
-| Save deck | `Ctrl+S` | Deck builder |
-| Search cards | `/` | Card library |
-| Toggle analysis view | `A` | Deck builder |
+| Open card library     | `L`                     | Deck builder      |
+| Auto-optimize deck    | `O`                     | Deck builder      |
+| Save deck             | `Ctrl+S`                | Deck builder      |
+| Search cards          | `/`                     | Card library      |
+| Toggle analysis view  | `A`                     | Deck builder      |
 
 ### 6.3 Screen Reader Announcements
 
@@ -961,7 +1144,8 @@ flowchart TD
 
 <!-- Validation warning announcement -->
 <div aria-live="polite" aria-atomic="true" class="sr-only">
-    Deck validation warning: No Friend card included. Consider adding one for friendship training bonuses.
+    Deck validation warning: No Friend card included. Consider adding one for
+    friendship training bonuses.
 </div>
 
 <!-- Deck saved announcement -->
@@ -976,32 +1160,32 @@ flowchart TD
 
 ### 7.1 Performance Targets
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| **Page Load** | < 1.5 seconds | Time to first render |
-| **Card Selection** | < 200ms | Click to UI update |
-| **Synergy Calculation** | < 300ms | Analysis completion |
-| **Auto-Optimize** | < 2 seconds | With AI reasoning |
-| **Deck Save** | < 500ms | Database update |
+| Metric                  | Target        | Measurement          |
+| ----------------------- | ------------- | -------------------- |
+| **Page Load**           | < 1.5 seconds | Time to first render |
+| **Card Selection**      | < 200ms       | Click to UI update   |
+| **Synergy Calculation** | < 300ms       | Analysis completion  |
+| **Auto-Optimize**       | < 2 seconds   | With AI reasoning    |
+| **Deck Save**           | < 500ms       | Database update      |
 
 ### 7.2 Optimization Strategies
 
-| Strategy | Implementation | Impact |
-|----------|----------------|--------|
-| **Lazy Loading** | Virtual scrolling for card library | Handles 500+ cards |
-| **Cached Synergies** | Cache deck analysis (10min TTL) | -80% recalculations |
-| **Optimistic UI** | Show changes immediately | Perceived speed +40% |
-| **Batch Updates** | Group card operations | -60% query count |
-| **Debounced Validation** | 300ms debounce on deck changes | Reduced re-renders |
+| Strategy                 | Implementation                     | Impact               |
+| ------------------------ | ---------------------------------- | -------------------- |
+| **Lazy Loading**         | Virtual scrolling for card library | Handles 500+ cards   |
+| **Cached Synergies**     | Cache deck analysis (10min TTL)    | -80% recalculations  |
+| **Optimistic UI**        | Show changes immediately           | Perceived speed +40% |
+| **Batch Updates**        | Group card operations              | -60% query count     |
+| **Debounced Validation** | 300ms debounce on deck changes     | Reduced re-renders   |
 
 ### 7.3 Bundle Size Budget
 
-| Asset Type | Budget | Current | Status |
-|------------|--------|---------|--------|
-| JavaScript | 50 KB | 46 KB | ✅ Within budget |
-| CSS | 20 KB | 18 KB | ✅ Within budget |
-| Images | 100 KB | 92 KB | ✅ Within budget |
-| Total | 170 KB | 156 KB | ✅ Within budget |
+| Asset Type | Budget | Current | Status           |
+| ---------- | ------ | ------- | ---------------- |
+| JavaScript | 50 KB  | 46 KB   | ✅ Within budget |
+| CSS        | 20 KB  | 18 KB   | ✅ Within budget |
+| Images     | 100 KB | 92 KB   | ✅ Within budget |
+| Total      | 170 KB | 156 KB  | ✅ Within budget |
 
 ---
 
@@ -1015,31 +1199,31 @@ flowchart TD
 test('optimizes deck with correct type distribution', function () {
     $cards = SupportCard::factory()->count(20)->create();
     $goals = ['focus_stat' => 'speed'];
-    
+
     $service = app(DeckOptimizationService::class);
     $result = $service->optimize($cards, $goals);
-    
+
     expect($result['cards'])->toHaveCount(6);
-    
+
     $typeCounts = collect($result['cards'])
         ->countBy('card_type')
         ->filter(fn($count, $type) => $type !== 'friend' && $count > 2);
-    
+
     expect($typeCounts)->toBeEmpty(); // No type should exceed 2 cards
 });
 
 test('prioritizes meta tier cards in optimization', function () {
     SupportCard::factory()->create(['meta_tier' => 'SS', 'card_type' => 'speed']);
     SupportCard::factory()->create(['meta_tier' => 'B', 'card_type' => 'speed']);
-    
+
     $cards = SupportCard::all();
     $service = app(DeckOptimizationService::class);
     $result = $service->optimize($cards, []);
-    
+
     $metaCards = collect($result['cards'])
         ->filter(fn($c) => in_array($c->meta_tier, ['SS', 'S']))
         ->count();
-    
+
     expect($metaCards)->toBeGreaterThan(0);
 });
 ```
@@ -1053,33 +1237,33 @@ test('user can add card to deck slot', function () {
     $user = User::factory()->create();
     $deck = SupportDeck::factory()->for($user)->create();
     $card = SupportCard::factory()->create(['user_id' => $user->id]);
-    
+
     Livewire::actingAs($user)
         ->test(DeckBuilder::class, ['deck' => $deck])
         ->call('addCard', $card->id, 1)
         ->assertDispatched('card-added-to-deck')
         ->assertDispatched('toast');
-    
+
     expect($deck->fresh()->cards->contains($card))->toBeTrue();
 });
 
 test('user cannot add more than 6 cards', function () {
     $user = User::factory()->create();
     $deck = SupportDeck::factory()->for($user)->create();
-    
+
     // Add 6 cards
     $cards = SupportCard::factory()->count(6)->create(['user_id' => $user->id]);
     foreach ($cards as $index => $card) {
         $deck->cards()->attach($card->id, ['slot_position' => $index + 1]);
     }
-    
+
     $newCard = SupportCard::factory()->create(['user_id' => $user->id]);
-    
+
     Livewire::actingAs($user)
         ->test(DeckBuilder::class, ['deck' => $deck])
         ->call('addCard', $newCard->id, 7)
         ->assertDispatched('toast', type: 'error');
-    
+
     expect($deck->fresh()->cards->count())->toBe(6);
 });
 
@@ -1087,12 +1271,12 @@ test('auto-optimize creates valid deck', function () {
     $user = User::factory()->create();
     $deck = SupportDeck::factory()->for($user)->create();
     SupportCard::factory()->count(20)->create(['user_id' => $user->id]);
-    
+
     Livewire::actingAs($user)
         ->test(DeckBuilder::class, ['deck' => $deck])
         ->call('autoOptimize')
         ->assertDispatched('deck-optimized');
-    
+
     $deck->refresh();
     expect($deck->cards->count())->toBe(6);
 });
@@ -1103,76 +1287,82 @@ test('auto-optimize creates valid deck', function () {
 **Test File**: `tests/e2e/support-deck-builder.spec.js`
 
 ```javascript
-test.describe('WF-011: Support Deck Builder', () => {
-    test('displays deck builder interface', async ({ page }) => {
-        await page.goto('/decks/1/build');
-        
+test.describe("WF-011: Support Deck Builder", () => {
+    test("displays deck builder interface", async ({ page }) => {
+        await page.goto("/decks/1/build");
+
         // Check deck overview
-        await expect(page.getByTestId('deck-overview')).toBeVisible();
+        await expect(page.getByTestId("deck-overview")).toBeVisible();
         await expect(page.getByText(/Synergy Score:/)).toBeVisible();
-        
+
         // Check deck slots
         for (let i = 1; i <= 6; i++) {
             await expect(page.getByTestId(`deck-slot-${i}`)).toBeVisible();
         }
-        
+
         // Check deck analysis
-        await expect(page.getByTestId('deck-analysis')).toBeVisible();
+        await expect(page.getByTestId("deck-analysis")).toBeVisible();
     });
-    
-    test('allows adding card to empty slot', async ({ page }) => {
-        await page.goto('/decks/1/build');
-        
+
+    test("allows adding card to empty slot", async ({ page }) => {
+        await page.goto("/decks/1/build");
+
         // Click on empty slot
-        await page.getByTestId('deck-slot-1').getByRole('button', { name: 'Select Card' }).click();
-        
+        await page
+            .getByTestId("deck-slot-1")
+            .getByRole("button", { name: "Select Card" })
+            .click();
+
         // Card library should open
-        await expect(page.getByTestId('card-library')).toBeVisible();
-        
+        await expect(page.getByTestId("card-library")).toBeVisible();
+
         // Select a card
-        await page.getByTestId('card-1').getByRole('button', { name: 'Add to Deck' }).click();
-        
+        await page
+            .getByTestId("card-1")
+            .getByRole("button", { name: "Add to Deck" })
+            .click();
+
         // Verify success message
-        await expect(page.getByRole('alert')).toContainText('added to slot 1');
+        await expect(page.getByRole("alert")).toContainText("added to slot 1");
     });
-    
-    test('auto-optimize creates valid deck', async ({ page }) => {
-        await page.goto('/decks/1/build');
-        
+
+    test("auto-optimize creates valid deck", async ({ page }) => {
+        await page.goto("/decks/1/build");
+
         // Click auto-optimize
-        await page.getByRole('button', { name: 'AUTO-OPTIMIZE' }).click();
-        
+        await page.getByRole("button", { name: "AUTO-OPTIMIZE" }).click();
+
         // Wait for optimization
-        await expect(page.getByRole('alert')).toContainText('Deck optimized');
-        
+        await expect(page.getByRole("alert")).toContainText("Deck optimized");
+
         // Verify 6 cards are present
-        const filledSlots = page.locator('.deck-slot__filled');
+        const filledSlots = page.locator(".deck-slot__filled");
         await expect(filledSlots).toHaveCount(6);
     });
-    
-    test('displays validation warnings', async ({ page }) => {
-        await page.goto('/decks/1/build');
-        
+
+    test("displays validation warnings", async ({ page }) => {
+        await page.goto("/decks/1/build");
+
         // Navigate to analysis tab
-        await page.getByRole('tab', { name: 'Analysis' }).click();
-        
+        await page.getByRole("tab", { name: "Analysis" }).click();
+
         // Check for validation results
-        const analysis = page.getByTestId('deck-analysis');
+        const analysis = page.getByTestId("deck-analysis");
         await expect(analysis).toBeVisible();
     });
-    
-    test('supports keyboard navigation', async ({ page }) => {
-        await page.goto('/decks/1/build');
-        
+
+    test("supports keyboard navigation", async ({ page }) => {
+        await page.goto("/decks/1/build");
+
         // Tab to first slot
-        await page.keyboard.press('Tab');
-        await page.keyboard.press('Tab');
-        
+        await page.keyboard.press("Tab");
+        await page.keyboard.press("Tab");
+
         // Select card with Enter
-        await page.keyboard.press('Enter');
-        
+        await page.keyboard.press("Enter");
+
         // Card library should open
-        await expect(page.getByTestId('card-library')).toBeVisible();
+        await expect(page.getByTestId("card-library")).toBeVisible();
     });
 });
 ```
@@ -1182,57 +1372,65 @@ test.describe('WF-011: Support Deck Builder', () => {
 **Test File**: `tests/e2e/accessibility/support-deck-builder.spec.js`
 
 ```javascript
-import { test, expect } from '@playwright/test';
-import AxeBuilder from '@axe-core/playwright';
+import { test, expect } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
 
-test.describe('WF-011: Accessibility', () => {
-    test('has no automatically detectable accessibility issues', async ({ page }) => {
-        await page.goto('/decks/1/build');
-        
+test.describe("WF-011: Accessibility", () => {
+    test("has no automatically detectable accessibility issues", async ({
+        page,
+    }) => {
+        await page.goto("/decks/1/build");
+
         const accessibilityScanResults = await new AxeBuilder({ page })
-            .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+            .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
             .analyze();
-        
+
         expect(accessibilityScanResults.violations).toEqual([]);
     });
-    
-    test('announces deck changes to screen readers', async ({ page }) => {
-        await page.goto('/decks/1/build');
-        
+
+    test("announces deck changes to screen readers", async ({ page }) => {
+        await page.goto("/decks/1/build");
+
         const liveRegion = page.locator('[aria-live="assertive"]');
-        
+
         // Add a card
-        await page.getByTestId('deck-slot-1').getByRole('button', { name: 'Select Card' }).click();
-        await page.getByTestId('card-1').getByRole('button', { name: 'Add to Deck' }).click();
-        
+        await page
+            .getByTestId("deck-slot-1")
+            .getByRole("button", { name: "Select Card" })
+            .click();
+        await page
+            .getByTestId("card-1")
+            .getByRole("button", { name: "Add to Deck" })
+            .click();
+
         await expect(liveRegion).toContainText(/added to deck slot 1/);
     });
-    
-    test('deck slots have proper ARIA attributes', async ({ page }) => {
-        await page.goto('/decks/1/build');
-        
-        const slot = page.getByTestId('deck-slot-1');
-        
-        await expect(slot).toHaveAttribute('aria-label');
+
+    test("deck slots have proper ARIA attributes", async ({ page }) => {
+        await page.goto("/decks/1/build");
+
+        const slot = page.getByTestId("deck-slot-1");
+
+        await expect(slot).toHaveAttribute("aria-label");
     });
-    
-    test('supports keyboard-only workflow', async ({ page }) => {
-        await page.goto('/decks/1/build');
-        
+
+    test("supports keyboard-only workflow", async ({ page }) => {
+        await page.goto("/decks/1/build");
+
         // Navigate using keyboard only
-        await page.keyboard.press('Tab'); // Deck name
-        await page.keyboard.press('Tab'); // Save button
-        await page.keyboard.press('Tab'); // Optimize button
-        await page.keyboard.press('Tab'); // First slot
-        
+        await page.keyboard.press("Tab"); // Deck name
+        await page.keyboard.press("Tab"); // Save button
+        await page.keyboard.press("Tab"); // Optimize button
+        await page.keyboard.press("Tab"); // First slot
+
         // Verify focus on first slot
-        const firstSlot = page.getByTestId('deck-slot-1');
+        const firstSlot = page.getByTestId("deck-slot-1");
         await expect(firstSlot).toBeFocused();
-        
+
         // Select card with Enter
-        await page.keyboard.press('Enter');
-        
-        await expect(page.getByTestId('card-library')).toBeVisible();
+        await page.keyboard.press("Enter");
+
+        await expect(page.getByTestId("card-library")).toBeVisible();
     });
 });
 ```
@@ -1271,10 +1469,11 @@ test.describe('WF-011: Accessibility', () => {
 
 ## 10. Version History
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 2.0.0 | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added deck overview, auto-optimization, validation system, accessibility specifications, and testing requirements |
-| 1.0.0 | 2026-01-14 | Development Team | Initial wireframe specification |
+| Version | Date       | Author           | Changes                                                                                                                                                                    |
+| ------- | ---------- | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2.2.0   | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server - corrected support card presence bonus (+5% per card, max +30%), added deck synergy indicators, updated card type descriptions, added limit break display (★ to ★★★★★), enhanced type distribution visualization |
+| 2.0.0   | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added deck overview, auto-optimization, validation system, accessibility specifications, and testing requirements |
+| 1.0.0   | 2026-01-14 | Development Team | Initial wireframe specification                                                                                                                                            |
 
 ---
 
@@ -1295,4 +1494,4 @@ test.describe('WF-011: Accessibility', () => {
 
 ---
 
-*This wireframe specification reflects the current implementation of the Support Deck Builder and serves as the authoritative reference for UI/UX development and testing.*
+_This wireframe specification reflects the current implementation of the Support Deck Builder and serves as the authoritative reference for UI/UX development and testing._

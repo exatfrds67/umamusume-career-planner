@@ -1,8 +1,8 @@
 # TECH-FLOW-004: Skill Management - Technical Flow & Task Breakdown
 
-**Document Version**: 2.1.0  
-**Date**: January 24, 2026  
-**Status**: Current - Aligned with codebase v2.0.0
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
+**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
 
 **Source Specifications**:
 
@@ -147,7 +147,7 @@ sequenceDiagram
     HintService-->>Service: Hint data with discount
     
     Service->>SPCalc: calculateFinalCost(baseCost, hints)
-    SPCalc->>SPCalc: Apply 20% per hint (max 40%)
+    SPCalc->>SPCalc: Apply hint level discount (10%/20%/30%/35%/40% max)
     SPCalc-->>Service: Final SP cost
     
     Service->>Service: Deduct SP from character
@@ -180,12 +180,12 @@ flowchart TD
     NormalChance -->|Fail| NoHint[No Hint Acquired]
     
     HintService --> CheckExisting{Hint Exists?}
-    CheckExisting -->|Yes| IncrementCount[Increment hint_count]
-    CheckExisting -->|No| CreateNew[Create New SkillHint]
+    CheckExisting -->|Yes| IncrementCount[Increment hint_level]
+    CheckExisting -->|No| CreateNew[Create New SkillHint Level 1]
     
-    IncrementCount --> CheckMax{Count >= 2?}
-    CheckMax -->|Yes| CapAtMax[Cap at 2 hints (40% max)]
-    CheckMax -->|No| StoreCount[Store Updated Count]
+    IncrementCount --> CheckMax{Level >= 5?}
+    CheckMax -->|Yes| CapAtMax[Cap at 5 hints - 40% max]
+    CheckMax -->|No| StoreCount[Store Updated Level]
     
     CreateNew --> StoreCount
     CapAtMax --> StoreCount
@@ -200,6 +200,22 @@ flowchart TD
     style GuaranteedHint fill:#fff9c4
     style CapAtMax fill:#ffccbc
 ```
+
+**Game-Accurate Hint Discount System (Verified Jan 2026)**:
+
+| Hint Level | Discount | Cumulative | Notes |
+|------------|----------|------------|-------|
+| Level 1 | 10% | 10% | First hint from support card |
+| Level 2 | 10% | 20% | Second hint |
+| Level 3 | 10% | 30% | Third hint |
+| Level 4 | 5% | 35% | Fourth hint (reduced increment) |
+| Level 5 | 5% | 40% | **MAXIMUM** discount |
+
+**Additional Discount Sources**:
+
+- **Fast Learner Condition**: Extra 10% discount on all skill costs
+- **Skill Sparks (Inheritance)**: White sparks provide bonus discount based on star rating
+- **Hint Books**: Green (white skills), Gold (rare skills) for manual hint addition
 
 ### 2.3 Skill Evolution Flow
 
@@ -526,13 +542,13 @@ class SkillHint extends Model
         'skill_id',
         'support_card_id',
         'source_type',
-        'hint_count',
+        'hint_level',
         'discount_percentage',
         'is_used',
     ];
 
     protected $casts = [
-        'hint_count' => 'integer',
+        'hint_level' => 'integer',
         'discount_percentage' => 'integer',
         'is_used' => 'boolean',
     ];
@@ -553,15 +569,29 @@ class SkillHint extends Model
         return $this->belongsTo(SupportCard::class);
     }
 
-    // Business Logic
+    /**
+     * Calculate discount based on hint level
+     * 
+     * Game-Accurate Discount Rates (Verified Jan 2026):
+     * - Levels 1-3: 10% each (cumulative: 10%, 20%, 30%)
+     * - Levels 4-5: 5% each (cumulative: 35%, 40%)
+     * - Maximum discount: 40%
+     */
     public function calculateDiscount(): int
     {
-        return min(40, $this->hint_count * 20);
+        return match($this->hint_level) {
+            1 => 10,
+            2 => 20,
+            3 => 30,
+            4 => 35,
+            5 => 40,
+            default => 0,
+        };
     }
 
     public function canAddHint(): bool
     {
-        return $this->hint_count < 2;
+        return $this->hint_level < 5;
     }
 }
 ```
@@ -575,9 +605,9 @@ Schema::create('ucp_skill_hints', function (Blueprint $table) {
     $table->foreignId('character_id')->constrained('ucp_characters')->cascadeOnDelete();
     $table->foreignId('skill_id')->constrained('ucp_skills')->cascadeOnDelete();
     $table->foreignId('support_card_id')->nullable()->constrained('ucp_support_cards')->nullOnDelete();
-    $table->enum('source_type', ['training', 'race', 'event'])->default('training');
-    $table->integer('hint_count')->default(1);
-    $table->integer('discount_percentage')->default(20);
+    $table->enum('source_type', ['training', 'race', 'event', 'hint_book', 'inheritance'])->default('training');
+    $table->integer('hint_level')->default(1); // 1-5 levels
+    $table->integer('discount_percentage')->default(10); // 10/20/30/35/40
     $table->boolean('is_used')->default(false);
     $table->timestamps();
     
@@ -589,9 +619,10 @@ Schema::create('ucp_skill_hints', function (Blueprint $table) {
 **Deliverables**:
 
 - SkillHint model with business logic
-- Constraints: max 2 hints per skill
+- Constraints: max 5 hint levels per skill
+- Game-accurate discount calculation (10%/20%/30%/35%/40%)
 - Unique constraint: character + skill + support card
-- Unit tests: 3 tests
+- Unit tests: 5 tests
 - **Files**: `app/Models/SkillHint.php`, `database/migrations/*_create_ucp_skill_hints_table.php`
 
 ---
@@ -606,15 +637,16 @@ Schema::create('ucp_skill_hints', function (Blueprint $table) {
 // app/Services/SkillHintService.php
 namespace App\Services;
 
-use App\Models\Character;
-use App\Models\Skill;
-use App\Models\SkillHint;
-use App\Models\SupportCard;
-
 class SkillHintService
 {
     /**
      * Track hint acquisition during training
+     * 
+     * Game-Accurate Hint System (Verified Jan 2026):
+     * - 5 hint levels with progressive discounts
+     * - Levels 1-3: +10% each (10%, 20%, 30%)
+     * - Levels 4-5: +5% each (35%, 40%)
+     * - Maximum discount: 40%
      */
     public function trackHintAcquisition(
         Character $character,
@@ -628,15 +660,15 @@ class SkillHintService
             'support_card_id' => $supportCard?->id,
         ]);
 
-        if ($hint->exists && $hint->hint_count < 2) {
-            $hint->increment('hint_count');
+        if ($hint->exists && $hint->hint_level < 5) {
+            $hint->increment('hint_level');
             $hint->discount_percentage = $hint->calculateDiscount();
             $hint->save();
         } elseif (!$hint->exists) {
             $hint->fill([
                 'source_type' => $sourceType,
-                'hint_count' => 1,
-                'discount_percentage' => 20,
+                'hint_level' => 1,
+                'discount_percentage' => 10,
             ]);
             $hint->save();
         }
@@ -645,7 +677,11 @@ class SkillHintService
     }
 
     /**
-     * Calculate final SP cost with hint discount
+     * Calculate final SP cost with hint discount and additional modifiers
+     * 
+     * Additional Discount Sources:
+     * - Fast Learner condition: +10% discount
+     * - Skill Sparks (inheritance): Variable based on star rating
      */
     public function calculateFinalCost(Skill $skill, Character $character): int
     {
@@ -654,14 +690,26 @@ class SkillHintService
             ->where('is_used', false)
             ->get();
 
-        if ($hints->isEmpty()) {
-            return $skill->base_sp_cost;
+        $hintDiscount = 0;
+        if ($hints->isNotEmpty()) {
+            // Get highest hint level discount
+            $hintDiscount = $hints->max('discount_percentage');
         }
 
-        $totalDiscount = $hints->sum('discount_percentage');
-        $cappedDiscount = min(40, $totalDiscount);
+        // Check for Fast Learner condition
+        $fastLearnerBonus = $this->hasFastLearnerCondition($character) ? 10 : 0;
+        
+        // Total discount capped at reasonable maximum
+        $totalDiscount = min(50, $hintDiscount + $fastLearnerBonus);
 
-        return (int) round($skill->base_sp_cost * (1 - $cappedDiscount / 100));
+        return (int) round($skill->base_sp_cost * (1 - $totalDiscount / 100));
+    }
+    
+    private function hasFastLearnerCondition(Character $character): bool
+    {
+        return collect($character->conditions ?? [])->contains(function ($condition) {
+            return ($condition['name'] ?? '') === 'Fast Learner';
+        });
     }
 
     /**
@@ -687,25 +735,26 @@ class SkillHintService
     }
 
     /**
-     * Get hint count for specific skill
+     * Get hint level for specific skill
      */
-    public function getHintCount(Character $character, Skill $skill): int
+    public function getHintLevel(Character $character, Skill $skill): int
     {
         return SkillHint::where('character_id', $character->id)
             ->where('skill_id', $skill->id)
             ->where('is_used', false)
-            ->sum('hint_count');
+            ->max('hint_level') ?? 0;
     }
 }
 ```
 
 **Deliverables**:
 
-- Calculate discounted SP cost (20% per hint, max 40%)
-- Track hint acquisition during training
+- Calculate discounted SP cost (5 levels: 10%/20%/30%/35%/40% max)
+- Track hint acquisition during training (5 levels maximum)
+- Support additional discount sources (Fast Learner, Skill Sparks)
 - Auto-consume hints on skill purchase
 - Get unused hints for character
-- Unit tests: 6 tests
+- Unit tests: 8 tests
 - **Files**: `app/Services/SkillHintService.php`
 
 ---
@@ -934,11 +983,11 @@ test('acquires skill with hint discount', function () {
     $character = Character::factory()->create(['total_sp_available' => 500]);
     $skill = Skill::factory()->create(['base_sp_cost' => 120]);
     
-    // Add 2 hints (40% max discount)
+    // Add 5 hints (40% max discount)
     SkillHint::factory()->create([
         'character_id' => $character->id,
         'skill_id' => $skill->id,
-        'hint_count' => 2,
+        'hint_level' => 5,
         'discount_percentage' => 40,
     ]);
     
@@ -946,6 +995,31 @@ test('acquires skill with hint discount', function () {
     $finalCost = $hintService->calculateFinalCost($skill, $character);
     
     expect($finalCost)->toBe(72); // 120 - 40% = 72
+});
+
+test('hint discount levels are game-accurate', function () {
+    $character = Character::factory()->create(['total_sp_available' => 500]);
+    $skill = Skill::factory()->create(['base_sp_cost' => 100]);
+    
+    // Test each hint level
+    $expectedDiscounts = [
+        1 => 10,  // Level 1: 10%
+        2 => 20,  // Level 2: 20%
+        3 => 30,  // Level 3: 30%
+        4 => 35,  // Level 4: 35%
+        5 => 40,  // Level 5: 40% (maximum)
+    ];
+    
+    foreach ($expectedDiscounts as $level => $expectedDiscount) {
+        $hint = SkillHint::factory()->create([
+            'character_id' => $character->id,
+            'skill_id' => $skill->id,
+            'hint_level' => $level,
+        ]);
+        
+        expect($hint->calculateDiscount())->toBe($expectedDiscount);
+        $hint->delete();
+    }
 });
 
 test('skill evolution replaces normal with rare', function () {
@@ -1006,8 +1080,10 @@ test('skill search finds by name or japanese name', function () {
 - Insufficient SP handling
 - Invalid evolution attempts
 - Duplicate skill prevention
-- Hint overflow handling (> 2 hints should cap at 40%)
-- Unit tests: 6 tests
+- Hint overflow handling (> 5 hints should cap at 40%)
+- Fast Learner condition bonus stacking
+- Skill Spark inheritance discounts
+- Unit tests: 8 tests
 
 ---
 
@@ -1034,7 +1110,16 @@ public function searchSkills(string $term, int $limit = 10): Collection;
 /**
  * Calculate final SP cost with hint discounts applied
  * 
- * Formula: Base Cost × (1 - min(40%, hint_count × 20%))
+ * Game-Accurate Formula (Verified Jan 2026):
+ * - Hint Level 1: 10% discount
+ * - Hint Level 2: 20% discount
+ * - Hint Level 3: 30% discount
+ * - Hint Level 4: 35% discount
+ * - Hint Level 5: 40% discount (MAXIMUM)
+ * 
+ * Additional Discount Sources:
+ * - Fast Learner condition: +10% discount
+ * - Skill Sparks (inheritance): Variable based on star rating
  * 
  * @param Skill $skill The skill to calculate cost for
  * @param Character $character The character acquiring the skill
@@ -1125,8 +1210,8 @@ erDiagram
 |-------|------------|-------------|
 | `ucp_skills` | `name` UNIQUE | Prevent duplicate skill names |
 | `ucp_skills` | `evolution_from_id` FK | Self-referential evolution path |
-| `ucp_skill_hints` | `hint_count` <= 2 | Maximum 2 hints per skill |
-| `ucp_skill_hints` | `discount_percentage` <= 40 | Maximum 40% discount |
+| `ucp_skill_hints` | `hint_level` <= 5 | Maximum 5 hint levels per skill |
+| `ucp_skill_hints` | `discount_percentage` <= 40 | Maximum 40% discount (at level 5) |
 | `ucp_skill_hints` | UNIQUE(`character_id`, `skill_id`, `support_card_id`) | One hint per card |
 | `ucp_skill_acquisitions` | `turn_acquired` BETWEEN 1 AND 78 | Valid turn range |
 
@@ -1230,11 +1315,11 @@ pie title Test Distribution
 | Test Case | Type | Priority | Status |
 |-----------|------|----------|--------|
 | Skill acquisition with hint discount | Feature | P0 | ✅ Pass |
-| Hint discount calculation (20% per hint, 40% max) | Unit | P0 | ✅ Pass |
+| Hint discount calculation (5 levels: 10%/20%/30%/35%/40% max) | Unit | P0 | ✅ Pass |
 | Skill evolution Normal → Rare | Feature | P0 | ✅ Pass |
 | Duplicate skill prevention | Unit | P0 | ✅ Pass |
 | SP balance validation | Unit | P0 | ✅ Pass |
-| Hint count cap at 2 (40% max) | Unit | P0 | ✅ Pass |
+| Hint level cap at 5 (40% max) | Unit | P0 | ✅ Pass |
 | Skill search by English and Japanese names | Feature | P0 | ✅ Pass |
 | Evolution path lookup | Integration | P1 | ✅ Pass |
 
@@ -1267,7 +1352,7 @@ pie title Test Distribution
 - [x] 2 controllers with 7 REST endpoints
 - [x] 4 database tables with migrations
 - [x] Skill database seeded with 500+ game skills
-- [x] Complete hint discount system (20% per hint, 40% max)
+- [x] Complete hint discount system (5 levels: 10%/20%/30%/35%/40% max)
 - [x] Skill evolution path implementation
 - [x] 20+ passing tests (23 actual)
 - [x] 100% of PRD-004 requirements covered
@@ -1302,6 +1387,7 @@ pie title Test Distribution
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: 5 hint levels (10%/20%/30%/35%/40% max discount); additional discount sources (Fast Learner +10%, Skill Sparks, Hint Books) |
 | 2.1.0 | 2026-01-24 | Development Team | Updated to v2.0.0 implementation standards; aligned with industry documentation guidelines; added comprehensive cross-references; enhanced code examples and diagrams |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with detailed specifications |
 | 1.0.0 | 2026-01-06 | Development Team | Initial draft |

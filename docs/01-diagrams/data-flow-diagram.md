@@ -1,10 +1,10 @@
 # Umamusume Career Planner - Data Flow Diagram (DFD)
 
 **Document Version**: 2.2.0  
-**Date**: January 27, 2026  
+**Date**: January 28, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.0.0 + January 2026 Performance Monitoring enhancements
+**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
 
 ---
 

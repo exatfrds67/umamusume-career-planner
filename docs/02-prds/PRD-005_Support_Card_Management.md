@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.1.0  
-**Date**: January 24, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.0.0  
+**Status**: Current - Aligned with codebase v2.2.0  
 **Related Documents**: [SRS-FR-06], [SDS-4.5], [DBD-4.5], [SPEC-005]
 
 **Source Specs**:
@@ -29,13 +29,7 @@
 
 - [PRD-005: Support Card Management System](#prd-005-support-card-management-system)
   - [1. Executive Summary](#1-executive-summary)
-    - [1.1 Purpose](#11-purpose)
-    - [1.2 Problem Statement](#12-problem-statement)
-    - [1.3 Solution Overview](#13-solution-overview)
   - [2. Product Overview](#2-product-overview)
-    - [2.1 Objectives](#21-objectives)
-    - [2.2 Scope (In)](#22-scope-in)
-    - [2.3 Scope (Out)](#23-scope-out)
   - [3. User Stories](#3-user-stories)
   - [4. Functional Requirements](#4-functional-requirements)
   - [5. User Interface Requirements](#5-user-interface-requirements)
@@ -44,6 +38,7 @@
   - [8. Success Metrics](#8-success-metrics)
   - [9. Release Plan](#9-release-plan)
   - [10. Open Questions and Assumptions](#10-open-questions-and-assumptions)
+  - [Changelog](#changelog)
 
 ---
 
@@ -94,7 +89,7 @@ Players struggle to select the best combination of 6 cards from hundreds of opti
 |----|-------|-------|---------------------|
 | US-5.1 | Player | I want to register which SSR cards I own and their limit break level. | Inventory view allows adding cards and setting LB (0-4). |
 | US-5.2 | Player | I want to build a deck with 3 Speed and 2 Intelligence cards. | Deck builder validates types and counts; warns if unbalanced. |
-| US-5.3 | Player | I want to borrow a "Friend" card that I don't own. | The 6th slot allows selection from the global database, not just inventory. |
+| US-5.3 | Player | I want to borrow a "Friend" card that I don't own. | The 6th slot allows selection from the global database. |
 | US-5.4 | Player | I want to see which cards are currently "S-Tier" in the meta. | Cards display a "Meta Tier" badge synced from external sources. |
 | US-5.5 | Coach | I want to know total "Race Bonus" provided by my deck. | Summary panel sums up specific effect values across all 6 cards. |
 
@@ -104,7 +99,7 @@ Players struggle to select the best combination of 6 cards from hundreds of opti
 
 ### 4.1 Inventory Management [FR-06.1]
 
-- **Card Database**: Maintain a local cache of all available game cards (`ucp_support_cards`) synced via PRD-007.
+- **Card Database**: Maintain a local cache of all available game cards synced via PRD-007.
 - **User Ownership**: Track specific instances of cards owned by the user, including Level and Limit Break (LB) status.
 - **Filtering**: Filter by Type (Speed/Stamina/etc.), Rarity (R/SR/SSR), and Meta Tier.
 
@@ -114,24 +109,36 @@ Players struggle to select the best combination of 6 cards from hundreds of opti
   - Max 6 cards total.
   - Max 5 cards from User Inventory.
   - Max 1 card from Friend/Global pool.
-  - No duplicate character names allowed (e.g., cannot have SSR Special Week and R Special Week).
+  - No duplicate character names allowed.
 - **Synergy Scoring**: Calculate a score (0-100) based on:
-  - Alignment with Character Growth Rates (e.g., Speed cards for Speed growth char).
+  - Alignment with Character Growth Rates.
   - Coverage of needed Skills.
   - Rarity/Level power.
 
 ### 4.3 Bonus Calculation [FR-06.4]
 
 - **Effect Aggregation**: Sum effects like `training_effect_up`, `race_bonus`, `fan_bonus`, `skill_pt_bonus`.
-- **Training Integration**: Expose these aggregates to the Training Optimization Engine (PRD-002) to adjust gain predictions.
+- **Training Integration**: Expose these aggregates to the Training Optimization Engine (PRD-002).
+- **Support Card Presence Bonus**: +5% per card present at training (max +30% at 6 cards).
 
-### 4.4 Bond & Event Tracking [FR-06.3]
+### 4.4 Bond & Event Tracking (Game-Accurate) [FR-06.3]
 
-- **Bond Gauge**: Track bond points (0-100) per card during a run.
-- **Thresholds**:
-  - 80+: Enable Rainbow/Friendship Training.
-  - 60+: Enable Card Events.
-- **Event Lookup**: Provide quick access to event choices and outcomes (e.g., "Top choice gives Speed +10").
+**Bond System**:
+
+- **Bond gain per training**: +7 friendship points (base)
+- **With Charming status**: +9 friendship points
+- **With exclamation mark**: +5 bonus points
+- **Orange bond threshold**: 80% (unlocks Friendship Training)
+- **Rainbow bond**: Maximum bond level
+
+**Friendship Training**:
+
+- **Trigger**: Random event when support card at 80%+ bond
+- **Visual indicator**: Rainbow aura on training facility
+- **Bonus range**: 10% (unupgraded) to 35% (fully uncapped)
+- **Target timing**: All cards should reach 80% by first Summer Camp or second goal race
+
+**Event Lookup**: Provide quick access to event choices and outcomes.
 
 ### 4.5 Meta Synchronization [FR-06.5]
 
@@ -146,13 +153,13 @@ Players struggle to select the best combination of 6 cards from hundreds of opti
 
 - **Grid Layout**: Responsive grid of card thumbnails.
 - **Status Indicators**: Badges for "Owned", "LB Level" (e.g., 3★), and "Meta Tier".
-- **Quick Edit**: Click on a card to toggle ownership or adjust LB level without leaving the grid.
+- **Quick Edit**: Click on a card to toggle ownership or adjust LB level.
 
 ### 5.2 Deck Builder Interface
 
 - **Slot View**: 6 clear slots. Slot 6 visually distinct (Friend slot).
 - **Drag & Drop**: Ability to drag cards from inventory sidebar into slots.
-- **Stats Radar**: Real-time radar chart showing the deck's bias (e.g., heavy Speed, low Guts).
+- **Stats Radar**: Real-time radar chart showing the deck's bias.
 - **Warnings**: Visual alerts for "Duplicate Character" or "Empty Slot".
 
 ### 5.3 Card Detail Modal
@@ -191,7 +198,7 @@ Players struggle to select the best combination of 6 cards from hundreds of opti
 
 - **Responsiveness**: Drag-and-drop actions must be jank-free (60fps).
 - **Data Freshness**: Meta tiers update within 24 hours of external source changes.
-- **Validation**: Server-side validation of decks prevents illegal configurations even if client-side checks fail.
+- **Validation**: Server-side validation of decks prevents illegal configurations.
 - **Storage**: Decks are persisted to `ucp_support_decks` and linked to User ID.
 
 ---
@@ -206,20 +213,34 @@ Players struggle to select the best combination of 6 cards from hundreds of opti
 
 ## 9. Release Plan
 
-- **v2.0.0 (Current)**:
+- **v2.0.0**:
   - Inventory management (Owned/LB).
   - Basic Deck Builder (5+1 slots).
   - Bonus aggregation logic.
   - External data sync for card list.
-- **v2.1.0 (Next)**:
-  - "Auto-Fill" deck based on strategy (e.g., "Max Speed").
+- **v2.1.0**:
+  - "Auto-Fill" deck based on strategy.
   - Event choice helper during training.
   - Deck sharing via shortlink.
+- **v2.2.0 (Current)**:
+  - Game-accurate bond system (+7 base, +9 with Charming).
+  - Friendship Training mechanics (80% threshold, 10-35% bonus).
+  - Support card presence bonus (+5% per card).
 
 ---
 
 ## 10. Open Questions and Assumptions
 
-- **Assumption**: The "Friend" card pool allows selecting any card in the database, regardless of ownership.
-- **Open Question**: How to handle "Group" type cards which have different event mechanics? *Current: Treated as normal cards with specific event triggers.*
+- **Assumption**: The "Friend" card pool allows selecting any card in the database.
+- **Open Question**: How to handle "Group" type cards? *Current: Treated as normal cards with specific event triggers.*
 - **Open Question**: Should we track specific card levels (1-50)? *Current: Yes, inferred from Rarity/LB, but editable.*
+
+---
+
+## Changelog
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 2.2.0 | January 28, 2026 | Updated with verified game mechanics from Global English Server: game-accurate bond system (+7 base, +9 with Charming, +5 exclamation), Friendship Training mechanics (80% threshold, 10-35% bonus range), support card presence bonus (+5% per card, max +30%). |
+| 2.1.0 | January 24, 2026 | Aligned with codebase v2.0.0, added source specs references. |
+| 2.0.0 | January 2026 | Initial v2 release with inventory and deck builder. |

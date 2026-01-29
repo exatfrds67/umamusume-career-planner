@@ -67,16 +67,21 @@ $uniqueSkill->base_sp_cost; // 280-320 SP (variable)
 #### Hint-Based Discounts
 
 ```php
-// 20% discount per hint, 40% maximum
+// 5-level progressive discount: 10%/20%/30%/35%/40% max
 $skill->calculateFinalCost(0); // Full price
-$skill->calculateFinalCost(1); // 20% discount
-$skill->calculateFinalCost(2); // 40% discount (max)
-$skill->calculateFinalCost(3); // Still 40% (max)
+$skill->calculateFinalCost(1); // 10% discount
+$skill->calculateFinalCost(2); // 20% discount
+$skill->calculateFinalCost(3); // 30% discount
+$skill->calculateFinalCost(4); // 35% discount
+$skill->calculateFinalCost(5); // 40% discount (max)
 
 // Example: 120 SP skill
-// 0 hints: 120 SP
-// 1 hint:  96 SP (20% off)
-// 2 hints: 72 SP (40% off)
+// 0 hints: 120 SP (no discount)
+// 1 hint:  108 SP (10% off)
+// 2 hints: 96 SP (20% off)
+// 3 hints: 84 SP (30% off)
+// 4 hints: 78 SP (35% off)
+// 5 hints: 72 SP (40% off - maximum)
 ```
 
 ### 4. Skill Evolution System
@@ -327,14 +332,25 @@ $skill = Skill::where('name', 'Go with the Flow')->first();
 // No hints
 echo $skill->calculateFinalCost(0); // 120 SP
 
-// With 1 hint (20% discount)
-echo $skill->calculateFinalCost(1); // 96 SP
+// With 1 hint (10% discount)
+echo $skill->calculateFinalCost(1); // 108 SP
 
-// With 2 hints (40% discount - maximum)
-echo $skill->calculateFinalCost(2); // 72 SP
+// With 2 hints (20% discount)
+echo $skill->calculateFinalCost(2); // 96 SP
+
+// With 3 hints (30% discount)
+echo $skill->calculateFinalCost(3); // 84 SP
+
+// With 4 hints (35% discount)
+echo $skill->calculateFinalCost(4); // 78 SP
+
+// With 5 hints (40% discount - maximum)
+echo $skill->calculateFinalCost(5); // 72 SP
+```
 
 // SP saved
 echo $skill->getSpSaved(2); // 48 SP
+
 ```
 
 ### Example 2: Plan Skill Evolution

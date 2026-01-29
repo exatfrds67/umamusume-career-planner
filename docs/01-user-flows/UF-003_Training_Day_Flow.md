@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.1.0  
-**Date**: January 24, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-002], [SPEC-002], [SRS], [BRS]
 
 **Source Specifications**:
@@ -374,16 +374,21 @@ public function calculate(CareerRun $career, TrainingType $type): StatGains
 │  │ • Stamina: +5   (480 → 485)  ⭐                       ││
 │  │ • Power:   +3   (440 → 443)  ⭐                       ││
 │  │                                                        ││
+│  │ ⚠️ Stat Cap Note: Stats above 1200 gain at 50% rate    ││
+│  │                                                        ││
 │  │ Energy Cost: -25% (78% → 53%)                          ││
 │  │ Mood Impact: Good → Normal (-1 level)                  ││
 │  │                                                        ││
-│  │ Support Cards Active:                                  ││
-│  │ • Tokai Teio (Speed Spec, LB 4) → +12 bonus  🔥       ││
+│  │ Support Cards Active (Bond +7 base):                   ││
+│  │ • Tokai Teio (Speed Spec, LB 4, Bond 85%) → +12 bonus 🔥││
+│  │   Friendship Training Active (≥80% bond)              ││
 │  │ • Kitasan Black (Stamina Spec, LB 4) → +3 bonus       ││
 │  │                                                        ││
-│  │ Skill Hint Chances:                                    ││
+│  │ Skill Hint Chances (5-Level System):                   ││
 │  │ • Lane Guidance: 100% ✓ (Guaranteed - Red !)          ││
+│  │   Hint Level: 3 → 30% SP discount                     ││
 │  │ • Blazing Speed: 35%                                   ││
+│  │   Hint Level: 1 → 10% SP discount                     ││
 │  │                                                        ││
 │  │ Efficiency Rating: ★★★★★ Excellent                   ││
 │  │ Failure Risk: 🟢 Low (8%)                              ││
@@ -421,14 +426,30 @@ public function calculate(CareerRun $career, TrainingType $type): StatGains
 | Component | Description | User Value |
 |-----------|-------------|------------|
 | **Score** | Composite ranking (0-100) | Quick comparison |
-| **Stat Gains** | Expected stat increases | Decision foundation |
+| **Stat Gains** | Expected stat increases (capped at +100 per training, +50 if stat > 1200) | Decision foundation |
 | **Energy Cost** | Energy deduction | Resource management |
 | **Mood Impact** | Mood level change | Long-term planning |
-| **Support Cards** | Active bonus providers | Bonus transparency |
-| **Hint Chances** | Skill hint probabilities | Skill acquisition planning |
+| **Support Cards** | Active bonus providers (Bond +7 base, +9 with Charming) | Bonus transparency |
+| **Hint Chances** | Skill hint probabilities with 5-level discount system | Skill acquisition planning |
 | **Efficiency** | Gain-to-cost ratio | Optimization metric |
 | **Risk** | Failure probability | Risk assessment |
 | **AI Reasoning** | Contextual explanation | Decision confidence |
+
+**Skill Hint Discount System (Verified Jan 2026)**:
+
+| Hint Level | SP Discount | Cumulative Effect |
+|------------|-------------|-------------------|
+| Level 1 | 10% | Base discount |
+| Level 2 | 20% | +10% from Level 1 |
+| Level 3 | 30% | +10% from Level 2 |
+| Level 4 | 35% | +5% from Level 3 |
+| Level 5 | 40% | +5% from Level 4 (Maximum) |
+
+**Additional Hint Sources**:
+
+- Fast Learner condition: +10% additional discount
+- Skill Sparks: Instant hint acquisition
+- Hint Books: Consumable items for hints
 
 ---
 
@@ -581,12 +602,14 @@ public function executeTraining(CareerRun $career, string $facility): TrainingRe
     $multiplier = $success ? 1.0 : 0.5;
     
     DB::transaction(function () use ($career, $prediction, $multiplier) {
+        // Apply stat gains with soft cap consideration
+        // Stats can exceed 1200 but count for half value above cap
         $career->update([
-            'speed' => min(1200, $career->speed + ($prediction->gains->speed * $multiplier)),
-            'stamina' => min(1200, $career->stamina + ($prediction->gains->stamina * $multiplier)),
-            'power' => min(1200, $career->power + ($prediction->gains->power * $multiplier)),
-            'guts' => min(1200, $career->guts + ($prediction->gains->guts * $multiplier)),
-            'wit' => min(1200, $career->wit + ($prediction->gains->wit * $multiplier)),
+            'speed' => $this->applyStatGain($career->speed, $prediction->gains->speed * $multiplier),
+            'stamina' => $this->applyStatGain($career->stamina, $prediction->gains->stamina * $multiplier),
+            'power' => $this->applyStatGain($career->power, $prediction->gains->power * $multiplier),
+            'guts' => $this->applyStatGain($career->guts, $prediction->gains->guts * $multiplier),
+            'wit' => $this->applyStatGain($career->wit, $prediction->gains->wit * $multiplier),
             'energy' => max(0, $career->energy - $prediction->energyCost),
             'mood' => $this->calculateNewMood($career, $success),
             'current_turn' => $career->current_turn + 1,
@@ -607,6 +630,24 @@ public function executeTraining(CareerRun $career, string $facility): TrainingRe
     event(new TrainingCompleted($career, $prediction, $success));
     
     return new TrainingResult($career->fresh(), $prediction, $success);
+}
+
+/**
+ * Apply stat gain with soft cap mechanics (verified Jan 2026)
+ * - Stats can exceed 1200 but gains are halved above cap
+ * - Per-training cap: +100 (reduced to +50 if stat > 1200)
+ */
+private function applyStatGain(int $currentStat, float $gain): int
+{
+    if ($currentStat > 1200) {
+        // Above soft cap: gains are halved, max +50
+        $effectiveGain = min(50, $gain * 0.5);
+    } else {
+        // Below soft cap: max +100 per training
+        $effectiveGain = min(100, $gain);
+    }
+    
+    return $currentStat + (int) round($effectiveGain);
 }
 ```
 
@@ -629,6 +670,8 @@ public function executeTraining(CareerRun $career, string $facility): TrainingRe
 │  │ Speed:   520 → 568  (+48)  ⬆️ ★★★★★                  ││
 │  │ Stamina: 480 → 485  (+5)   ⬆️ ★                       ││
 │  │ Power:   440 → 443  (+3)   ⬆️ ★                       ││
+│  │                                                        ││
+│  │ ℹ️ Per-training cap: +100 (reduced to +50 if > 1200)   ││
 │  └────────────────────────────────────────────────────────┘│
 │                                                            │
 │  Character Status:                                         │
@@ -636,8 +679,10 @@ public function executeTraining(CareerRun $career, string $facility): TrainingRe
 │  • Mood: Good → Normal (-1 level)                          │
 │                                                            │
 │  Rewards Earned:                                           │
-│  ✅ Skill Hint: Lane Guidance (+1 hint, 20% discount)      │
-│  ✅ Support Bond: Tokai Teio (+3 bond, now 78%)            │
+│  ✅ Skill Hint: Lane Guidance                               │
+│     Hint Level: 2 → 3 (30% SP discount now available)      │
+│  ✅ Support Bond: Tokai Teio (+7 bond, now 85%)             │
+│     Friendship Training unlocked at 80%! 🎉               │
 │                                                            │
 │  Goal Progress:                                            │
 │  • Speed Goal (800): 568/800 (71%) ▓▓▓▓▓▓▓░░░             │
@@ -793,7 +838,20 @@ flowchart TD
 
 ### 5.2 Calculation Formulas
 
-#### 5.2.1 Base Gain Calculation
+#### 5.2.1 Base Gain Calculation (Verified Game Formula - Jan 2026)
+
+The accurate training formula from the Global English Server:
+
+```
+Stat Gain = (Base + StatBonus) × (1 + GrowthRate) × (1 + MoodMultiplier × (1 + MoodEffect)) 
+            × (1 + TrainingEffect) × (1 + 0.05 × NumSupportCards) × FriendshipMultiplier
+```
+
+**Important Stat Cap Mechanics**:
+
+- Stats can exceed 1200 but count for half value above cap
+- Per-training cap: +100 (reduced to +50 if stat > 1200)
+- Important breakpoints: 901, 1200, 1600
 
 ```php
 // app/Services/Calculators/StatGainCalculator.php
@@ -810,35 +868,73 @@ public function calculateBaseGain(
     
     $base = $baseTable[$career->career_stage->value][$facility->primaryStat()];
     
-    // Apply growth rate
+    // Apply growth rate (character-specific)
     $growthRate = $career->character->{"growth_" . $facility->primaryStat()};
-    $withGrowth = $base * ($growthRate / 100);
+    $withGrowth = $base * (1 + ($growthRate / 100));
     
-    // Apply mood modifier
-    $moodBonus = match($career->mood->value) {
-        'great' => 0.04,
-        'good' => 0.02,
-        'normal' => 0.00,
-        'bad' => -0.02,
-        'awful' => -0.04,
+    // Apply mood modifier (verified values)
+    $moodMultiplier = match($career->mood->value) {
+        'great' => 1.04,   // +4%
+        'good' => 1.02,    // +2%
+        'normal' => 1.00,  // 0%
+        'bad' => 0.98,     // -2%
+        'awful' => 0.96,   // -4%
     };
     
-    $withMood = $withGrowth * (1 + $moodBonus);
+    $withMood = $withGrowth * $moodMultiplier;
     
-    // Apply condition modifiers
-    $conditionBonus = 0;
-    if ($career->hasCondition('well_rested')) {
-        $conditionBonus += 0.05;
-    }
-    if ($career->hasCondition('overworked')) {
-        $conditionBonus -= 0.10;
+    // Apply support card bonus (5% per card present)
+    $numSupportCards = $this->countSupportCardsAtFacility($career, $facility);
+    $supportMultiplier = 1 + (0.05 * $numSupportCards);
+    
+    $withSupport = $withMood * $supportMultiplier;
+    
+    // Apply friendship training bonus (if bond >= 80%)
+    $friendshipMultiplier = $this->calculateFriendshipMultiplier($career, $facility);
+    
+    $finalGain = $withSupport * $friendshipMultiplier;
+    
+    // Apply stat cap (soft cap at 1200)
+    $currentStat = $career->{$facility->primaryStat()};
+    if ($currentStat > 1200) {
+        // Above soft cap: gains are halved, max +50
+        $finalGain = min(50, $finalGain * 0.5);
+    } else {
+        // Below soft cap: max +100 per training
+        $finalGain = min(100, $finalGain);
     }
     
-    return round($withMood * (1 + $conditionBonus));
+    return round($finalGain);
+}
+
+private function calculateFriendshipMultiplier(CareerRun $career, TrainingType $facility): float
+{
+    $friendshipBonus = 1.0;
+    
+    foreach ($career->supportDeck->cards as $card) {
+        if ($card->specialization === $facility->value && $card->bond_level >= 80) {
+            // Friendship bonus by rarity (10-35%)
+            $rarityBonus = match($card->rarity->value) {
+                'SSR' => 0.35,
+                'SR' => 0.25,
+                'R' => 0.10,
+            };
+            $friendshipBonus += $rarityBonus;
+        }
+    }
+    
+    return $friendshipBonus;
 }
 ```
 
-#### 5.2.2 Support Card Bonus Calculation
+```
+
+#### 5.2.2 Support Card Bonus Calculation (Verified Jan 2026)
+
+**Bond Gain Mechanics**:
+- Base bond gain per training: +7
+- With Charming condition: +9
+- Friendship Training threshold: 80% bond level
 
 ```php
 // app/Services/Calculators/SupportCardBonusCalculator.php
@@ -861,15 +957,21 @@ public function calculateBonus(
             'R' => 0.05,
         };
         
-        // Limit break multiplier
+        // Limit break multiplier (0-4 stars)
         $lbMultiplier = 1.0 + ($card->limit_break_level * 0.05);
         
-        // Bond multiplier
+        // Bond multiplier (scales with bond level)
         $bondMultiplier = 1.0 + ($card->bond_level / 100 * 0.20);
         
-        // Friendship training bonus
+        // Friendship training bonus (threshold: 80%)
+        // Bonus varies by rarity: SSR 35%, SR 25%, R 10%
         if ($card->bond_level >= 80) {
-            $bondMultiplier += 0.10;
+            $friendshipBonus = match($card->rarity->value) {
+                'SSR' => 0.35,
+                'SR' => 0.25,
+                'R' => 0.10,
+            };
+            $bondMultiplier += $friendshipBonus;
         }
         
         $cardBonus = $baseBonus * $lbMultiplier * $bondMultiplier;
@@ -877,6 +979,21 @@ public function calculateBonus(
     }
     
     return $totalBonus;
+}
+
+/**
+ * Calculate bond gain for a training session
+ */
+public function calculateBondGain(CareerRun $career): int
+{
+    $baseBondGain = 7;
+    
+    // Charming condition bonus
+    if ($career->hasCondition('charming')) {
+        $baseBondGain = 9;
+    }
+    
+    return $baseBondGain;
 }
 ```
 
@@ -1111,6 +1228,7 @@ flowchart LR
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server (Jan 2026); corrected training formula with accurate multipliers; added stat soft cap (1200 with +50 max above cap); updated skill hint system (5 levels: 10%/20%/30%/35%/40% + Fast Learner +10%); added support card bond mechanics (+7 base, +9 with Charming, 80% friendship threshold) |
 | 2.1.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 architecture; added training prediction engine details, AI integration, support card bonus calculations; comprehensive error handling and testing criteria |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with basic flow |
 | 1.0.0 | 2026-01-03 | Development Team | Initial draft |
@@ -1131,4 +1249,4 @@ flowchart LR
 
 ---
 
-*This user flow reflects the current training system implementation as of version 2.1.0. For the latest updates, refer to the online documentation.*
+*This user flow reflects the current training system implementation as of version 2.2.0. For the latest updates, refer to the online documentation.*

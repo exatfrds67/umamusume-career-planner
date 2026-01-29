@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.0.0  
-**Date**: January 24, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-001], [SPEC-001], [FLOW-001], [TECH-FLOW-001]
 
 ---
@@ -58,9 +58,71 @@ Character creation is the foundational workflow that:
 **Success Criteria:**
 
 - Character created with valid initial state
-- Factor bonuses correctly calculated (★☆☆=+5, ★★☆=+12, ★★★=+21)
+- Factor bonuses correctly calculated (★☆☆=+3, ★★☆=+6, ★★★=+9 per factor level)
 - Support deck validated (exactly 6 cards)
 - Database transaction committed atomically
+
+### 1.4 Game-Accurate Mechanics (Global English Server - Jan 2026)
+
+#### Aptitude System
+
+The game uses an 8-grade aptitude scale (NO SS grade exists):
+
+| Grade | Rank | Description |
+|-------|------|-------------|
+| **S** | 1 | Maximum grade - Excellent aptitude |
+| **A** | 2 | Very good aptitude |
+| **B** | 3 | Good aptitude |
+| **C** | 4 | Average aptitude |
+| **D** | 5 | Below average aptitude |
+| **E** | 6 | Poor aptitude |
+| **F** | 7 | Very poor aptitude |
+| **G** | 8 | Minimum grade - Worst aptitude |
+
+#### Aptitude Categories
+
+**Distance Aptitudes:**
+
+| Category | Range | Description |
+|----------|-------|-------------|
+| Sprint | 1000-1400m | Short distance races |
+| Mile | 1400-1800m | Medium-short distance races |
+| Medium | 1800-2400m | Medium-long distance races |
+| Long | 2400m+ | Long distance races |
+
+**Surface Aptitudes:**
+
+| Surface | Description |
+|---------|-------------|
+| Turf | Grass track racing |
+| Dirt | Dirt track racing |
+
+**Running Style Aptitudes:**
+
+| Style | Japanese | Description |
+|-------|----------|-------------|
+| Nige | 逃げ | Front runner - leads from start |
+| Senkou | 先行 | Stalker - stays near front |
+| Sashi | 差し | Mid-pack - positions in middle |
+| Oikomi | 追込 | Closer - comes from behind |
+
+#### Inheritance Factor System
+
+**Factor Types:**
+
+| Factor Color | Type | Effect |
+|--------------|------|--------|
+| **Blue** | Stat Factors | Provide stat bonuses (Speed, Stamina, Power, Guts, Wit) |
+| **Red** | Aptitude Factors | Can upgrade aptitude grades (e.g., A→S) |
+| **White** | Skill Factors | Enable skill inheritance from parents |
+
+**Factor Star Levels:**
+
+| Stars | Stat Bonus | Activation Chance |
+|-------|------------|-------------------|
+| ★☆☆ | +3 per activation | Lower |
+| ★★☆ | +6 per activation | Medium |
+| ★★★ | +9 per activation | Higher |
 
 ---
 
@@ -82,7 +144,6 @@ Character creation is the foundational workflow that:
 ### 2.2 Component Locations
 
 ```
-
 app/
 ├── Livewire/
 │   └── Character/
@@ -98,7 +159,6 @@ app/
     ├── Character.php
     ├── Factor.php
     └── SupportDeck.php
-
 ```
 
 ---
@@ -122,14 +182,16 @@ sequenceDiagram
     UI->>Controller: GET /characters/create
     Controller-->>UI: Render wizard (Step 1)
     
-    Note over UI,User: Step 1: Trainee Selection
-    User->>UI: Select trainee + scenario
+    Note over UI,User: Step 1: Uma Musume Selection
+    User->>UI: Select Uma Musume + scenario
     UI->>Controller: Validate selection
+    Controller->>Controller: Load base stats & aptitudes (G-S scale)
     Controller-->>UI: Next step enabled
     
-    Note over UI,User: Step 2: Parent Selection
-    User->>UI: Select Parent A & B
-    UI->>FactorSvc: Preview inheritance
+    Note over UI,User: Step 2: Parent Selection & Inheritance
+    User->>UI: Select Parent 1 & Parent 2
+    UI->>FactorSvc: Preview inheritance factors
+    FactorSvc->>FactorSvc: Calculate Blue/Red/White factors
     FactorSvc-->>UI: Factor bonuses preview
     
     Note over UI,User: Step 3: Support Deck
@@ -148,11 +210,14 @@ sequenceDiagram
     DB-->>CharSvc: character_id
     
     CharSvc->>FactorSvc: calculateInheritance(character, parents)
-    FactorSvc->>FactorSvc: Calculate stat bonuses
+    FactorSvc->>FactorSvc: Process Blue factors (stat bonuses)
+    FactorSvc->>FactorSvc: Process Red factors (aptitude upgrades)
+    FactorSvc->>FactorSvc: Process White factors (skill inheritance)
     FactorSvc-->>CharSvc: factor_data
     
     CharSvc->>DB: INSERT factors
-    CharSvc->>DB: INSERT aptitudes
+    CharSvc->>DB: INSERT aptitudes (G-S grades)
+    CharSvc->>DB: INSERT inherited_skills
     CharSvc->>DB: INSERT goals (if provided)
     
     CharSvc->>Events: Dispatch CharacterCreated
@@ -167,7 +232,68 @@ sequenceDiagram
     UI-->>User: Success message + redirect to Dashboard
 ```
 
-### 3.2 Timeline Breakdown
+### 3.2 Character Selection Flow
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant UI as Livewire Wizard
+    participant CharSvc as CharacterService
+    participant DB as Database
+
+    User->>UI: Browse Uma Musume list
+    UI->>DB: Query available characters
+    DB-->>UI: Character list with base stats
+    
+    User->>UI: Select Uma Musume
+    UI->>CharSvc: getCharacterDetails(uma_id)
+    
+    CharSvc->>DB: Load base stats
+    Note right of DB: Speed, Stamina, Power,<br/>Guts, Wit (base values)
+    
+    CharSvc->>DB: Load growth rates
+    Note right of DB: Character-specific<br/>training multipliers
+    
+    CharSvc->>DB: Load aptitudes
+    Note right of DB: Distance: Sprint/Mile/Medium/Long<br/>Surface: Turf/Dirt<br/>Style: Nige/Senkou/Sashi/Oikomi<br/>Grades: G→F→E→D→C→B→A→S
+    
+    CharSvc-->>UI: Complete character profile
+    UI-->>User: Display character details
+```
+
+### 3.3 Inheritance Factor Flow
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant UI as Livewire Wizard
+    participant FactorSvc as FactorService
+    participant DB as Database
+
+    User->>UI: Select Parent 1
+    UI->>DB: Load Parent 1 factors
+    DB-->>UI: Blue/Red/White factors
+    
+    User->>UI: Select Parent 2
+    UI->>DB: Load Parent 2 factors
+    DB-->>UI: Blue/Red/White factors
+    
+    UI->>FactorSvc: previewInheritance(parent1, parent2)
+    
+    Note over FactorSvc: Blue Factor Processing
+    FactorSvc->>FactorSvc: Calculate stat bonuses<br/>★☆☆=+3, ★★☆=+6, ★★★=+9
+    
+    Note over FactorSvc: Red Factor Processing
+    FactorSvc->>FactorSvc: Calculate aptitude upgrades<br/>(e.g., Mile A→S, max grade is S)
+    
+    Note over FactorSvc: White Factor Processing
+    FactorSvc->>FactorSvc: Determine inheritable skills
+    
+    FactorSvc-->>UI: Inheritance preview
+    UI-->>User: Display potential bonuses
+```
+
+### 3.4 Timeline Breakdown
 
 | Phase | Duration | Description |
 |-------|----------|-------------|
@@ -182,7 +308,7 @@ sequenceDiagram
 
 ## 4. Detailed Interactions
 
-### 4.1 Step 1: Trainee Selection
+### 4.1 Step 1: Uma Musume Selection
 
 **Request Flow:**
 
@@ -196,15 +322,15 @@ User → Livewire Component → Controller
 // CharacterController.php
 public function create()
 {
-    $trainees = Character::where('is_playable', true)
-        ->with('baseStats', 'aptitudes')
+    $umaMusumes = UmaMusume::where('is_playable', true)
+        ->with(['baseStats', 'aptitudes', 'growthRates'])
         ->orderBy('name')
         ->get();
     
     $scenarios = ScenarioType::cases();
     
     return view('livewire.character.wizard-step-1', [
-        'trainees' => $trainees,
+        'umaMusumes' => $umaMusumes,
         'scenarios' => $scenarios,
     ]);
 }
@@ -212,8 +338,10 @@ public function create()
 
 **Data Returned:**
 
-- List of playable trainees with base stats
-- Available scenario types (URA Finale, Unity Cup, etc.)
+- List of playable Uma Musume with base stats
+- Character-specific growth rates
+- Starting aptitudes (G-S scale, fixed per character)
+- Available scenario types (URA Finale, Aoharu Cup, Make a New Track, Grand Live, etc.)
 
 ### 4.2 Step 2: Parent Selection & Factor Preview
 
@@ -228,45 +356,115 @@ User → Livewire Component → FactorService
 ```php
 // FactorService.php
 public function previewInheritance(
-    Character $trainee,
-    Character $parentA,
-    Character $parentB
-): array {
-    $factors = [
-        'speed' => $this->calculateFactorBonus($trainee, $parentA, $parentB, 'speed'),
-        'stamina' => $this->calculateFactorBonus($trainee, $parentA, $parentB, 'stamina'),
-        'power' => $this->calculateFactorBonus($trainee, $parentA, $parentB, 'power'),
-        'guts' => $this->calculateFactorBonus($trainee, $parentA, $parentB, 'guts'),
-        'wit' => $this->calculateFactorBonus($trainee, $parentA, $parentB, 'wit'),
-    ];
+    UmaMusume $trainee,
+    Character $parent1,
+    Character $parent2
+): InheritanceResult {
+    $result = new InheritanceResult();
     
-    return $factors;
+    // Process Blue Factors (Stat Bonuses)
+    $result->statBonuses = $this->calculateStatFactors($parent1, $parent2);
+    
+    // Process Red Factors (Aptitude Upgrades)
+    $result->aptitudeUpgrades = $this->calculateAptitudeFactors(
+        $trainee, 
+        $parent1, 
+        $parent2
+    );
+    
+    // Process White Factors (Skill Inheritance)
+    $result->inheritableSkills = $this->calculateSkillFactors($parent1, $parent2);
+    
+    return $result;
 }
 
-private function calculateFactorBonus(
-    Character $trainee,
-    Character $parentA,
-    Character $parentB,
-    string $stat
-): int {
-    $stars = $this->determineStarLevel($trainee, $parentA, $parentB, $stat);
+private function calculateStatFactors(
+    Character $parent1,
+    Character $parent2
+): array {
+    $stats = ['speed', 'stamina', 'power', 'guts', 'wit'];
+    $bonuses = [];
     
-    return match($stars) {
-        1 => 5,   // ★☆☆
-        2 => 12,  // ★★☆
-        3 => 21,  // ★★★
+    foreach ($stats as $stat) {
+        $p1Factor = $parent1->getBlueFactorFor($stat);
+        $p2Factor = $parent2->getBlueFactorFor($stat);
+        
+        $bonuses[$stat] = [
+            'parent1' => $this->getFactorBonus($p1Factor),
+            'parent2' => $this->getFactorBonus($p2Factor),
+            'total' => $this->getFactorBonus($p1Factor) + $this->getFactorBonus($p2Factor),
+        ];
+    }
+    
+    return $bonuses;
+}
+
+private function getFactorBonus(?Factor $factor): int
+{
+    if (!$factor) return 0;
+    
+    return match($factor->star_level) {
+        1 => 3,   // ★☆☆
+        2 => 6,   // ★★☆
+        3 => 9,   // ★★★
         default => 0,
     };
 }
 ```
 
+**Aptitude Factor Processing (Red Factors):**
+
+```php
+private function calculateAptitudeFactors(
+    UmaMusume $trainee,
+    Character $parent1,
+    Character $parent2
+): array {
+    $upgrades = [];
+    $aptitudeTypes = [
+        'sprint', 'mile', 'medium', 'long',  // Distance
+        'turf', 'dirt',                       // Surface
+        'nige', 'senkou', 'sashi', 'oikomi'   // Running Style
+    ];
+    
+    foreach ($aptitudeTypes as $type) {
+        $baseGrade = $trainee->getAptitude($type);
+        $canUpgrade = $this->checkRedFactorUpgrade($parent1, $parent2, $type);
+        
+        if ($canUpgrade && $baseGrade !== 'S') {
+            $upgrades[$type] = [
+                'from' => $baseGrade,
+                'to' => $this->upgradeGrade($baseGrade),
+            ];
+        }
+    }
+    
+    return $upgrades;
+}
+
+private function upgradeGrade(string $grade): string
+{
+    // Grade scale: G→F→E→D→C→B→A→S (S is maximum, no SS exists)
+    $grades = ['G', 'F', 'E', 'D', 'C', 'B', 'A', 'S'];
+    $currentIndex = array_search($grade, $grades);
+    
+    if ($currentIndex === false || $currentIndex >= 7) {
+        return $grade; // Already S or invalid
+    }
+    
+    return $grades[$currentIndex + 1];
+}
+```
+
 **Factor Calculation Rules:**
 
-| Star Level | Bonus | Criteria |
-|------------|-------|----------|
-| ★☆☆ | +5 | Basic inheritance match |
-| ★★☆ | +12 | Strong inheritance match |
-| ★★★ | +21 | Perfect inheritance match |
+| Factor Type | Star Level | Bonus | Notes |
+|-------------|------------|-------|-------|
+| Blue (Stat) | ★☆☆ | +3 | Per activation |
+| Blue (Stat) | ★★☆ | +6 | Per activation |
+| Blue (Stat) | ★★★ | +9 | Per activation |
+| Red (Aptitude) | Any | +1 grade | Max S (no SS) |
+| White (Skill) | Any | Skill unlock | Inherits from parent |
 
 ### 4.3 Step 3: Support Deck Validation
 
@@ -323,7 +521,7 @@ public function create(array $data): Character
         // 1. Create character record
         $character = Character::create([
             'user_id' => $data['user_id'],
-            'trainee_id' => $data['trainee_id'],
+            'uma_musume_id' => $data['uma_musume_id'],
             'scenario_type' => $data['scenario_type'],
             'name' => $data['name'],
             // Initial stats from base + factors
@@ -337,31 +535,48 @@ public function create(array $data): Character
             'current_turn' => 1,
         ]);
         
-        // 2. Insert factor records
-        foreach ($data['factors'] as $stat => $bonus) {
+        // 2. Insert factor records (Blue factors)
+        foreach ($data['stat_factors'] as $stat => $bonus) {
             Factor::create([
                 'character_id' => $character->id,
+                'factor_type' => 'blue',
                 'stat_type' => $stat,
                 'bonus_value' => $bonus,
                 'source_parent' => $data["parent_{$stat}"],
             ]);
         }
         
-        // 3. Copy aptitudes from trainee
-        $this->copyAptitudes($character, $data['trainee_id']);
+        // 3. Insert aptitude upgrades (Red factors)
+        foreach ($data['aptitude_upgrades'] as $type => $upgrade) {
+            Factor::create([
+                'character_id' => $character->id,
+                'factor_type' => 'red',
+                'aptitude_type' => $type,
+                'from_grade' => $upgrade['from'],
+                'to_grade' => $upgrade['to'], // Max is S, no SS
+            ]);
+        }
         
-        // 4. Insert initial goals (if provided)
+        // 4. Copy aptitudes from Uma Musume (G-S scale)
+        $this->copyAptitudes($character, $data['uma_musume_id'], $data['aptitude_upgrades']);
+        
+        // 5. Insert inherited skills (White factors)
+        foreach ($data['inherited_skills'] as $skillId) {
+            $character->inheritedSkills()->attach($skillId);
+        }
+        
+        // 6. Insert initial goals (if provided)
         if (!empty($data['goals'])) {
             $this->createGoals($character, $data['goals']);
         }
         
-        // 5. Associate support deck
+        // 7. Associate support deck
         if (!empty($data['support_deck_id'])) {
             $character->support_deck_id = $data['support_deck_id'];
             $character->save();
         }
         
-        // 6. Dispatch event
+        // 8. Dispatch event
         event(new CharacterCreated($character));
         
         return $character;
@@ -372,12 +587,14 @@ public function create(array $data): Character
 **Database Operations:**
 
 1. `INSERT INTO ucp_characters` - Main character record
-2. `INSERT INTO ucp_factors` - Factor inheritance records (5 rows)
-3. `INSERT INTO ucp_aptitudes` - Aptitude grades (9 rows)
-4. `INSERT INTO ucp_goals` - Initial goals (optional, 0-5 rows)
-5. Event dispatch to queue listeners
+2. `INSERT INTO ucp_factors` - Blue factor records (stat bonuses)
+3. `INSERT INTO ucp_factors` - Red factor records (aptitude upgrades)
+4. `INSERT INTO ucp_aptitudes` - Aptitude grades (10 rows: 4 distance + 2 surface + 4 style)
+5. `INSERT INTO ucp_character_skills` - Inherited skills (White factors)
+6. `INSERT INTO ucp_goals` - Initial goals (optional, 0-5 rows)
+7. Event dispatch to queue listeners
 
-**Total Inserts:** 15-20 rows per character creation
+**Total Inserts:** 18-25 rows per character creation
 
 ---
 
@@ -388,11 +605,11 @@ public function create(array $data): Character
 ```json
 {
   "user_id": 1,
-  "trainee_id": 42,
+  "uma_musume_id": 42,
   "scenario_type": "ura_finale",
   "name": "Speed Build - Special Week",
-  "parent_a_id": 15,
-  "parent_b_id": 28,
+  "parent1_id": 15,
+  "parent2_id": 28,
   "support_deck_id": 3,
   "goals": [
     {
@@ -413,42 +630,92 @@ public function create(array $data): Character
 
 ```json
 {
-  "speed": {
-    "star_level": 3,
-    "bonus": 21,
-    "source_parent": "parent_a"
+  "stat_factors": {
+    "speed": {
+      "star_level": 3,
+      "bonus": 9,
+      "source_parent": "parent1"
+    },
+    "stamina": {
+      "star_level": 2,
+      "bonus": 6,
+      "source_parent": "parent2"
+    },
+    "power": {
+      "star_level": 1,
+      "bonus": 3,
+      "source_parent": "parent1"
+    },
+    "guts": {
+      "star_level": 1,
+      "bonus": 3,
+      "source_parent": "parent2"
+    },
+    "wit": {
+      "star_level": 2,
+      "bonus": 6,
+      "source_parent": "parent1"
+    }
   },
-  "stamina": {
-    "star_level": 2,
-    "bonus": 12,
-    "source_parent": "parent_b"
+  "aptitude_upgrades": {
+    "mile": {
+      "from": "A",
+      "to": "S"
+    },
+    "turf": {
+      "from": "B",
+      "to": "A"
+    }
   },
-  "power": {
-    "star_level": 1,
-    "bonus": 5,
-    "source_parent": "parent_a"
-  },
-  "guts": {
-    "star_level": 1,
-    "bonus": 5,
-    "source_parent": "parent_b"
-  },
-  "wit": {
-    "star_level": 2,
-    "bonus": 12,
-    "source_parent": "parent_a"
-  }
+  "inherited_skills": [
+    {
+      "skill_id": 101,
+      "skill_name": "Good Practice",
+      "source_parent": "parent1"
+    },
+    {
+      "skill_id": 205,
+      "skill_name": "Pace Up",
+      "source_parent": "parent2"
+    }
+  ]
 }
 ```
 
-### 5.3 Character Creation Response
+### 5.3 Aptitude Data Structure
+
+```json
+{
+  "aptitudes": {
+    "distance": {
+      "sprint": "B",
+      "mile": "S",
+      "medium": "A",
+      "long": "C"
+    },
+    "surface": {
+      "turf": "A",
+      "dirt": "G"
+    },
+    "running_style": {
+      "nige": "A",
+      "senkou": "S",
+      "sashi": "B",
+      "oikomi": "D"
+    }
+  },
+  "grade_scale": ["G", "F", "E", "D", "C", "B", "A", "S"]
+}
+```
+
+### 5.4 Character Creation Response
 
 ```json
 {
   "id": 157,
   "uuid": "9d8f4e21-7a3c-4b5d-9e2f-1c8d7a4b3e6f",
   "user_id": 1,
-  "trainee_id": 42,
+  "uma_musume_id": 42,
   "scenario_type": "ura_finale",
   "name": "Speed Build - Special Week",
   "stats": {
@@ -458,11 +725,24 @@ public function create(array $data): Character
     "guts": 205,
     "wit": 212
   },
+  "aptitudes": {
+    "sprint": "B",
+    "mile": "S",
+    "medium": "A",
+    "long": "C",
+    "turf": "A",
+    "dirt": "G",
+    "nige": "A",
+    "senkou": "S",
+    "sashi": "B",
+    "oikomi": "D"
+  },
   "energy": 100,
   "mood": "normal",
   "current_turn": 1,
   "support_deck_id": 3,
-  "created_at": "2026-01-24T10:30:00Z"
+  "inherited_skills": [101, 205],
+  "created_at": "2026-01-28T10:30:00Z"
 }
 ```
 
@@ -475,10 +755,11 @@ public function create(array $data): Character
 | Error Code | Condition | HTTP Status | User Message |
 |------------|-----------|-------------|--------------|
 | `CHAR_001` | Missing required fields | 422 | "Please complete all required fields" |
-| `CHAR_002` | Invalid trainee selection | 422 | "Selected trainee is not available" |
+| `CHAR_002` | Invalid Uma Musume selection | 422 | "Selected Uma Musume is not available" |
 | `CHAR_003` | Invalid scenario type | 422 | "Selected scenario is not valid" |
 | `CHAR_004` | Deck validation failed | 422 | "Support deck must contain exactly 6 cards" |
 | `CHAR_005` | Parent selection invalid | 422 | "Invalid parent character selection" |
+| `CHAR_006` | Invalid aptitude grade | 422 | "Aptitude grade must be G-S (no SS)" |
 
 ### 6.2 Error Recovery Flow
 
@@ -520,9 +801,10 @@ sequenceDiagram
 | Scenario | Trigger | Recovery |
 |----------|---------|----------|
 | Constraint violation | Duplicate character name | Rollback, display error |
-| Foreign key error | Invalid trainee_id reference | Rollback, re-validate form |
+| Foreign key error | Invalid uma_musume_id reference | Rollback, re-validate form |
 | Database timeout | Long-running transaction | Rollback, retry with timeout |
 | Concurrent modification | Parent character deleted | Rollback, refresh parent list |
+| Invalid aptitude grade | Grade outside G-S range | Rollback, validate grade scale |
 
 ---
 
@@ -542,7 +824,7 @@ sequenceDiagram
 
 **Implemented:**
 
-- Eager loading of trainee relationships
+- Eager loading of Uma Musume relationships
 - Factor calculation caching during preview
 - Bulk insert for aptitudes and factors
 - Database indexing on foreign keys
@@ -550,8 +832,8 @@ sequenceDiagram
 **Code Example:**
 
 ```php
-// Optimized trainee loading with eager loading
-$trainees = Character::where('is_playable', true)
+// Optimized Uma Musume loading with eager loading
+$umaMusumes = UmaMusume::where('is_playable', true)
     ->with([
         'baseStats',
         'aptitudes',
@@ -565,21 +847,22 @@ $trainees = Character::where('is_playable', true)
 
 **Query Count:**
 
-- Step 1 (Trainee list): 1 query (eager loaded)
+- Step 1 (Uma Musume list): 1 query (eager loaded)
 - Step 2 (Factor preview): 2 queries (parent data)
 - Step 3 (Deck validation): 1 query (card ownership)
-- Step 4 (Creation): 5 queries (1 character + 4 related inserts)
+- Step 4 (Creation): 6 queries (1 character + 5 related inserts)
 
-**Total Queries:** 9 queries for complete flow
+**Total Queries:** 10 queries for complete flow
 
 **Index Usage:**
 
 ```sql
 -- Critical indexes for character creation
-CREATE INDEX idx_characters_user_trainee ON ucp_characters(user_id, trainee_id);
+CREATE INDEX idx_characters_user_uma ON ucp_characters(user_id, uma_musume_id);
 CREATE INDEX idx_factors_character ON ucp_factors(character_id);
 CREATE INDEX idx_aptitudes_character ON ucp_aptitudes(character_id);
 CREATE INDEX idx_support_cards_user ON ucp_support_cards(user_id);
+CREATE INDEX idx_aptitudes_type_grade ON ucp_aptitudes(aptitude_type, grade);
 ```
 
 ---
@@ -625,6 +908,7 @@ CREATE INDEX idx_support_cards_user ON ucp_support_cards(user_id);
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server - corrected aptitude scale (G-S, no SS), added inheritance system details (Blue/Red/White factors), updated distance categories (Sprint/Mile/Medium/Long), added running style aptitudes with Japanese names |
 | 2.0.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 implementation; added detailed sequence flows, error handling, performance metrics, and aligned with current Laravel 12 architecture |
 | 1.0.0 | 2026-01-14 | Development Team | Initial draft |
 
@@ -637,7 +921,7 @@ CREATE INDEX idx_support_cards_user ON ucp_support_cards(user_id);
 
 ### Review Schedule
 
-- Next Review: 2026-04-24
+- Next Review: 2026-04-28
 - Review Frequency: Quarterly or on major feature changes
 
 ---
@@ -651,4 +935,4 @@ CREATE INDEX idx_support_cards_user ON ucp_support_cards(user_id);
 
 ---
 
-*This sequence diagram reflects the current implementation of the character creation workflow as of v2.0.0. For the most up-to-date information, refer to the source code in `app/Services/CharacterService.php` and related files.*
+*This sequence diagram reflects the current implementation of the character creation workflow as of v2.2.0, incorporating verified game mechanics from the Umamusume Pretty Derby Global English Server (January 2026). For the most up-to-date information, refer to the source code in `app/Services/CharacterService.php` and related files.*

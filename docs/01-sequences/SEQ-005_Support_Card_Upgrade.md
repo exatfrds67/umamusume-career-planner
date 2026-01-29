@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.0.0  
-**Date**: January 24, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-005], [SPEC-005], [FLOW-005], [TECH-FLOW-005]
 
 ---
@@ -321,17 +321,21 @@ public function getOwnedCards(User $user, array $filters = []): Collection
 }
 ```
 
-### 4.2 Limit Break Upgrade Logic
+### 4.2 Limit Break Upgrade Logic (Game-Accurate - Global English Server Jan 2026)
 
 **Limit Break Progression:**
 
-| Level | Stars | Bonus Multiplier | Material Cost |
-|-------|-------|------------------|---------------|
-| 0 | ☆☆☆☆ | 1.00x (Base) | N/A |
-| 1 | ★☆☆☆ | 1.10x (+10%) | 1 copy |
-| 2 | ★★☆☆ | 1.20x (+20%) | 1 copy |
-| 3 | ★★★☆ | 1.30x (+30%) | 1 copy |
-| 4 | ★★★★ | 1.40x (+40%) | 1 copy |
+The limit break system uses stars (★) to indicate progression:
+
+| Limit Breaks | Stars | Level Cap | Bonus Multiplier | Material Cost |
+|--------------|-------|-----------|------------------|---------------|
+| 0 LB | ★ | 30 | 1.00x (Base) | N/A |
+| 1 LB | ★★ | 35 | 1.05x (+5%) | 1 copy |
+| 2 LB | ★★★ | 40 | 1.10x (+10%) | 1 copy |
+| 3 LB | ★★★★ | 45 | 1.15x (+15%) | 1 copy |
+| 4 LB (MLB) | ★★★★★ | 50 | 1.20x (+20%) | 1 copy |
+
+**Note:** MLB = Max Limit Break = 4 limit breaks = 5 stars total
 
 **Upgrade Service:**
 

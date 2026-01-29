@@ -99,22 +99,36 @@
 
     <!-- Main Column of Content -->
     <div class="lg:pl-72 flex flex-col min-h-screen transition-all duration-300 relative z-10">
+        @php
+            $topStatus = $topStatus ?? [];
+        @endphp
 
         <!-- Sticky Header -->
-        <header
-            class="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
-            <button type="button" class="-m-2.5 p-2.5 text-gray-700 dark:text-gray-200 lg:hidden"
-                @click="sidebarOpen = true">
-                <span class="sr-only">Open sidebar</span>
-                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                    aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-                </svg>
-            </button>
+        <header class="sticky top-0 z-40 border-b border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md shadow-sm">
+            <div class="flex flex-col">
+                {{-- TODO: Provide storage mode and SP data from a shared context or controller-specific view data. --}}
+                <x-top-status-bar
+                    :current-turn="$topStatus['currentTurn'] ?? null"
+                    :max-turns="$topStatus['maxTurns'] ?? null"
+                    :sp-available="$topStatus['spAvailable'] ?? null"
+                    :storage-mode="$topStatus['storageMode'] ?? null"
+                />
 
-            <div class="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-                <x-app.header />
+                <div class="flex h-16 shrink-0 items-center gap-x-4 px-4 sm:gap-x-6 sm:px-6 lg:px-8">
+                    <button type="button" class="-m-2.5 p-2.5 text-gray-700 dark:text-gray-200 lg:hidden"
+                        @click="sidebarOpen = true">
+                        <span class="sr-only">Open sidebar</span>
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                            aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                        </svg>
+                    </button>
+
+                    <div class="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
+                        <x-app.header />
+                    </div>
+                </div>
             </div>
         </header>
 
@@ -128,13 +142,15 @@
         @endisset
 
         <!-- Main Content -->
-        <main class="py-10" id="main-content">
+        <main class="py-10 pb-24 lg:pb-10" id="main-content">
             <div class="px-4 sm:px-6 lg:px-8">
                 @yield('content')
                 {{ $slot ?? '' }}
             </div>
         </main>
     </div>
+
+    <x-bottom-nav-bar />
 
     <!-- Offline Indicator (Task 2.2.1) -->
     <x-offline-indicator />

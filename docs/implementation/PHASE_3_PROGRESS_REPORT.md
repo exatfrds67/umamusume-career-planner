@@ -64,7 +64,7 @@
 
 - Record skill hints from support cards during training
 - Track hint sources (which card provided which hint)
-- Calculate SP discount (20% per hint, max 2 hints = 40% discount)
+- Calculate SP discount (5 levels: 10%/20%/30%/35%/40% max)
 - Automatic SP cost calculation with discounts
 - Get hint probability based on bond level
 - Hint summary for character (total hints, SP saved, etc.)
@@ -219,17 +219,17 @@ Final Stat Gain = Base Stat Gain × (1 + Final Bonus / 100)
 
 ### Skill Hint Mechanics
 
-- Each hint provides 20% SP discount
-- Maximum 2 hints per skill (40% total discount)
+- Progressive hint discounts: Level 1=10%, Level 2=20%, Level 3=30%, Level 4=35%, Level 5=40% (maximum)
+- Maximum 5 hint levels per skill (40% total discount at level 5)
 - Hints are tracked with source card information
 - Discount is applied when skill is acquired
 
 ### Bond Progression
 
-- Base gain: +5 per training
-- Low bond bonus: +2 additional if bond < 50
+- Base gain: +7 per training (+9 with Charming status)
+- Exclamation mark bonus: +5 additional
 - Maximum bond: 100
-- Friendship threshold: 80 (enables 1.2x training multiplier)
+- Friendship threshold: 80% (enables Friendship Training)
 
 ---
 

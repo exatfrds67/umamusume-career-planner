@@ -199,8 +199,11 @@ class SkillDataTool extends Tool
         // Hint Information
         $output .= "HINT DISCOUNT INFORMATION:\n";
         $output .= "  With 0 hints: {$baseSpCost} SP (0% discount)\n";
-        $output .= '  With 1 hint: '.$skill->calculateFinalCost(1).' SP (20% discount, saves '.$skill->getSpSaved(1)." SP)\n";
-        $output .= '  With 2+ hints: '.$skill->calculateFinalCost(2).' SP (40% discount, saves '.$skill->getSpSaved(2)." SP)\n\n";
+        $output .= '  With 1 hint: '.$skill->calculateFinalCost(1).' SP (10% discount, saves '.$skill->getSpSaved(1)." SP)\n";
+        $output .= '  With 2 hints: '.$skill->calculateFinalCost(2).' SP (20% discount, saves '.$skill->getSpSaved(2)." SP)\n";
+        $output .= '  With 3 hints: '.$skill->calculateFinalCost(3).' SP (30% discount, saves '.$skill->getSpSaved(3)." SP)\n";
+        $output .= '  With 4 hints: '.$skill->calculateFinalCost(4).' SP (35% discount, saves '.$skill->getSpSaved(4)." SP)\n";
+        $output .= '  With 5+ hints: '.$skill->calculateFinalCost(5).' SP (40% discount MAX, saves '.$skill->getSpSaved(5)." SP)\n\n";
 
         // Current Hints
         $hintCount = $skill->hints()->count();

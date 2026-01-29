@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.0.0  
-**Date**: January 24, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-003], [SPEC-003], [FLOW-003], [SEQ-004]
 
 **Source Specs**:
@@ -31,23 +31,23 @@ The Race Calendar View provides a comprehensive schedule of all available races 
 
 ### 1.2 Key Objectives
 
-| Objective | Description |
-|-----------|-------------|
-| **Race Visibility** | Display all available races with grade, distance, and surface information |
-| **Readiness Assessment** | Show calculated readiness scores for upcoming races |
-| **Strategic Planning** | Enable players to plan race participation aligned with goals |
-| **Win Probability** | Display estimated win probability based on current stats |
-| **Quick Registration** | Allow direct race registration from calendar view |
+| Objective                | Description                                                               |
+| ------------------------ | ------------------------------------------------------------------------- |
+| **Race Visibility**      | Display all available races with grade, distance, and surface information |
+| **Readiness Assessment** | Show calculated readiness scores for upcoming races                       |
+| **Strategic Planning**   | Enable players to plan race participation aligned with goals              |
+| **Win Probability**      | Display estimated win probability based on current stats                  |
+| **Quick Registration**   | Allow direct race registration from calendar view                         |
 
 ### 1.3 User Stories
 
-| ID | User Story | Priority |
-|----|------------|----------|
-| US-001 | As a player, I want to see all upcoming races in a calendar format | P0 |
-| US-002 | As a player, I want to filter races by grade, distance, and surface | P0 |
-| US-003 | As a player, I want to see my readiness percentage for each race | P0 |
-| US-004 | As a player, I want to view detailed race requirements and win probability | P0 |
-| US-005 | As a player, I want AI recommendations for which races to enter | P1 |
+| ID     | User Story                                                                 | Priority |
+| ------ | -------------------------------------------------------------------------- | -------- |
+| US-001 | As a player, I want to see all upcoming races in a calendar format         | P0       |
+| US-002 | As a player, I want to filter races by grade, distance, and surface        | P0       |
+| US-003 | As a player, I want to see my readiness percentage for each race           | P0       |
+| US-004 | As a player, I want to view detailed race requirements and win probability | P0       |
+| US-005 | As a player, I want AI recommendations for which races to enter            | P1       |
 
 ---
 
@@ -55,156 +55,128 @@ The Race Calendar View provides a comprehensive schedule of all available races 
 
 ### 2.1 Desktop Layout (≥1024px)
 
-```
-
 ┌──────────────────────────────────────────────────────────────────────┐
-│ Race Calendar                                                  [≡]    │
+│ [≡] Menu | Race Calendar: Junior Year, Jan | [?] │
 ├──────────────────────────────────────────────────────────────────────┤
-��                                                                      │
-│ ┌────────────┬───────────────────────────────────────────────────┐  │
-│ │ Sidebar    │ Main Calendar View                                │  │
-│ │            │                                                   │  │
-│ │ Dashboard  │ ┌──────────────────────────────────────────────┐ │  │
-│ │ Character  │ │ Filters & View Controls                       │ │  │
-│ │ Training   │ │ ┌────────────────────────────────────────────┐│ │  │
-│ │ Races    ●│ │ │ Grade: [All ▼] [G1] [G2] [G3] [OP]        ││ │  │
-│ │ Skills     │ │ │ Distance: [All ▼] [Sprint] [Mile] [Long]  ││ │  │
-│ │ Support    │ │ │ Surface: [All ▼] [Turf] [Dirt]            ││ │  │
-│ │ AI Advisor │ │ │ View: [Calendar] [List] | Sort: [Date ▼]  ││ │  │
-│ │ Settings   │ │ └────────────────────────────────────────────┘│ │  │
-│ │            │ └──────────────────────────────────────────────┘ │  │
-│ │            │                                                   │  │
-│ │            │ ┌───────────────────────────────────────────────┐│  │
-│ │            │ │ January 2026                        [← →]     ││  │
-│ │            │ ├───────────────────────────────────────────────┤│  │
-│ │            │ │ Sun │ Mon │ Tue │ Wed │ Thu │ Fri │ Sat       ││  │
-│ │            │ ├─────┼─────┼─────┼─────┼─────┼─────┼─────┤     ││  │
-│ │            │ │     │     │     │  1  │  2  │  3  │  4        ││  │
-│ │            │ │     │     │     │     │     │     │           ││  │
-│ │            │ ├─────┼─────┼─────┼─────┼─────┼─────┼─────┤     ││  │
-│ │            │ │  5  │  6  │  7  │  8  │  9  │ 10  │ 11        ││  │
-│ │            │ │     │     │     │     │     │ G1  │           ││  │
-│ │            │ │     │     │     │     │     │🟢85%│           ││  │
-│ │            │ │     │     │     │     │     │2400m│           ││  │
-│ │            │ ├─────┼─────┼─────┼─────┼─────┼─────┼─────┤     ││  │
-│ │            │ │ 12  │ 13  │ 14  │ 15  │ 16  │ 17  │ 18        ││  │
-│ │            │ │     │     │     │ G2  │     │ G3  │           ││  │
-│ │            │ │     │     │     │🟡72%│     │🟢88%│           ││  │
-│ │            │ │     │     │     │1800m│     │2000m│           ││  │
-│ │            │ ├─────┼─────┼─────┼─────┼─────┼─────┼─────┤     ││  │
-│ │            │ │ 19  │ 20  │ 21  │ 22  │ 23  │ 24  │ 25        ││  │
-│ │            │ │     │ OP  │     │     │     │ G1  │           ││  │
-│ │            │ │     │🔴45%│     │     │     │🟡68%│           ││  │
-│ │            │ │     │1600m│     │     │     │2500m│           ││  │
-│ │            │ └─────┴─────┴─────┴─────┴─────┴─────┴─────┘     ││  │
-│ │            │                                                   │  │
-│ │            │ ┌───────────────────────────────────────────────┐│  │
-│ │            │ │ Selected: Kanto Okami Cup (G1)                ││  │
-│ │            │ ├───────────────────────────────────────────────┤│  │
-│ │            │ │ Date: January 10, 2026 (Turn 52)              ││  │
-│ │            │ │ Grade: G1 | Track: Tokyo Racecourse          ││  │
-│ │            │ │ Distance: Medium (2400m) | Surface: Turf      ││  │
-│ │            │ │ Weather: Sunny | Track Condition: Good        ││  │
-│ │            │ │                                               ││  │
-│ │            │ │ Readiness: 🟢 85% (Excellent)                 ││  │
-│ │            │ │ Win Probability: 35%                          ││  │
-│ │            │ │ Prize Money: ¥15,000,000 (1st)                ││  │
-│ │            │ │ Skill Points: 180-240 (Based on placement)    ││  │
-│ │            │ │                                               ││  │
-│ │            │ │ Stat Requirements:                            ││  │
-│ │            │ │ • Speed:   520 (Current: 568) ✓               ││  │
-│ │            │ │ • Stamina: 480 (Current: 442) ⚠️             ││  │
-│ │            │ │ • Power:   440 (Current: 443) ✓               ││  │
-│ │            │ │                                               ││  │
-│ │            │ │ Recommended Running Style: Late Surger (差し) ││  │
-│ │            │ │                                               ││  │
-│ │            │ │ [VIEW DETAILS] [ENTER RACE] [PREPARE]         ││  │
-│ │            │ └───────────────────────────────────────────────┘│  │
-│ └────────────┴───────────────────────────────────────────────────┘  │
+│ ┌──────────────────────────────────────────────────────────────────┐ │
+│ │ CURRENT STATUS: Fans: 12,450 (D Grade) | Next Goal: 20k Fans │ │
+│ │ READY FOR: [G3] Fairy Stakes │ │
+│ └──────────────────────────────────────────────────────────────────┘ │
+├──────────────────────────────────────────────────────────────────────┤
+│ ┌───────────────┐ ┌────────────────────────────────────────────────┐ │
+│ │ FILTER RACES │ │ SCHEDULE: JANUARY 2026 │ │
+│ │ │ │ [ < PREV ] JUNIOR YEAR / JAN [ NEXT > ] │ │
+│ │ [Grade] │ ├────────────────────────────────────────────────┤ │
+│ │ [x] G1 [x] G2│ │ 11 Jan (Sat) - Week 2 │ │
+│ │ [x] G3 [x] OP│ │ ┌────────────────────────────────────────────┐ │ │
+│ │ │ │ │ [G3] FAIRY STAKES 🟢 95%│ │ │
+│ │ [Distance] │ │ │ Nakayama | Turf | 1600m (Mile) | Right │ │ │
+│ │ [ ] Sprint │ │ │ Fans Req: 1,000 | 1st: +10k Fans │ │ │
+│ │ [x] Mile │ │ └────────────────────────────────────────────┘ │ │
+│ │ [ ] Medium │ │ │ │ │
+│ │ [ ] Long │ │ 25 Jan (Sat) - Week 4 │ │ │
+│ │ │ │ ┌────────────────────────────────────────────┐ │ │
+│ │ [Surface] │ │ │ [OP] WAKAGOMA STAKES 🟡 80%│ │ │
+│ │ [x] Turf │ │ │ Kyoto | Turf | 2000m (Med) | Right │ │ │
+│ │ [ ] Dirt │ │ │ Fans Req: -- | 1st: +5k Fans │ │ │
+│ │ │ │ └────────────────────────────────────────────┘ │ │
+│ │ [Rotation] │ │ │ │ │
+│ │ [ ] Clockwise │ │ ┌────────────────────────────────────────────┐ │ │
+│ │ [ ] Counter │ │ │ [OP] NANOHANA PRIZE 🔴 45%│ │ │
+│ │ │ │ │ Nakayama | Turf | 1600m (Mile) | Right │ │ │
+│ │ │ │ └────────────────────────────────────────────┘ │ │
+│ └───────────────┘ └────────────────────────────────────────────────┘ │
+│ │
+│ ┌──────────────────────────────────────────────────────────────────┐ │
+│ │ SELECTED RACE: [G3] FAIRNY STAKES │ │
+│ │ ┌──────────────────────────────────────────────────────────────┐ │ │
+│ │ │ DETAILS │ │ │
+│ │ │ • Conditions: Sunny / Good │ │ │
+│ │ │ • Rivals: [Symboli Rudolf (A)] [Oguri Cap (B+)] │ │ │
+│ │ │ • Strategy: [Leader] recommended │ │ │
+│ │ │ │ │ │
+│ │ │ [ RESERVE (Cost: 0 TP) ] [ ANALYZE ] [ CANCEL ] │ │ │
+│ │ └──────────────────────────────────────────────────────────────┘ │ │
+│ └──────────────────────────────────────────────────────────────────┘ │
 └──────────────────────────────────────────────────────────────────────┘
-
-```
 
 ### 2.2 Tablet Layout (640px-1024px)
 
-```
-
 ┌────────────────────────────────────────────────────┐
-│ Race Calendar                                [≡]   │
+│ [≡] Menu | Race Schedule: JAN [?] │
 ├────────────────────────────────────────────────────┤
-│ ☰ Menu Toggle                                      │
+│ Fans: 12.4k (D) | Goal: 20k Fans │
 ├────────────────────────────────────────────────────┤
-│                                                    │
-│ ┌──────────────────────────────────────────────┐  │
-│ │ Filters (Collapsible)                         │  │
-│ │ Grade: [All ▼] Distance: [All ▼] Surface: [] │  │
-│ └──────────────────────────────────────────────┘  │
-│                                                    │
-│ ┌──────────────────────────────────────────────┐  │
-│ │ January 2026                          [← →]  │  │
-│ ├─────────────────────────────────────���────────┤  │
-│ │ S │ M │ T │ W │ T │ F │ S                    │  │
-│ ├───┼───┼───┼───┼───┼───┼───┤                  │  │
-│ │   │   │   │ 1 │ 2 │ 3 │ 4 │                  │  │
-│ ├───┼───┼───┼───┼───┼───┼───┤                  │  │
-│ │ 5 │ 6 │ 7 │ 8 │ 9 │10 │11 │                  │  │
-│ │   │   │   │   │   │G1 │   │                  │  │
-│ │   │   │   │   │   │🟢 │   │                  │  │
-│ └──────────────────────────────────────────────┘  │
-│                                                    │
-│ ┌──────────────────────────────────────────────┐  │
-│ │ Selected Race                                 │  │
-│ │ Kanto Okami Cup (G1)                         │  │
-│ │ Date: Jan 10 | Distance: 2400m | Turf       │  │
-│ │ Readiness: 🟢 85% | Win Prob: 35%            │  │
-│ │                                              │  │
-│ │ [VIEW DETAILS] [ENTER] [PREPARE]            │  │
-│ └──────────────────────────────────────────────┘  │
+│ │
+│ [ < Prev ] Year 1 / JAN (Junior) [ Next > ] │
+│ │
+│ ┌────────────────────────────────────────────────┐ │
+│ │ 11 Jan (Sat) │ │
+│ │ ┌────────────────────────────────────────────┐ │ │
+│ │ │ [G3] FAIRY STAKES 🟢 95%│ │ │
+│ │ │ Nakayama | Turf | 1600m > │ │ │
+│ │ └────────────────────────────────────────────┘ │ │
+│ │ 1st: +10k Fans | Req: 1k Fans │ │
+│ └────────────────────────────────────────────────┘ │
+│ │
+│ ┌────────────────────────────────────────────────┐ │
+│ │ 25 Jan (Sat) │ │
+│ │ ┌────────────────────────────────────────────┐ │ │
+│ │ │ [OP] WAKAGOMA STAKES 🟡 80%│ │ │
+│ │ │ Kyoto | Turf | 2000m > │ │ │
+│ │ └────────────────────────────────────────────┘ │ │
+│ └────────────────────────────────────────────────┘ │
+│ │
+│ ┌────────────────────────────────────────────────┐ │
+│ │ [OP] NANOHANA PRIZE 🔴 45%│ │ │
+│ │ Nakayama | Turf | 1600m > │ │ │
+│ └────────────────────────────────────────────────┘ │
+│ │
+│ [ SELECTED: [G3] FAIRY STAKES ] │
+│ Conditions: Sunny / Good │
+│ Rivals: Symboli Rudolf (A) │
+│ │
+│ [ RESERVE ] [ DETAILS ] [ CANCEL ] │
 └────────────────────────────────────────────────────┘
-
-```
 
 ### 2.3 Mobile Layout (<640px)
 
-```
-
 ┌──────────────────────────────┐
-│ Race Calendar          [≡]  │
+│ [≡] Menu | Schedule [?] │
 ├──────────────────────────────┤
-│                              │
-│ Filters [Expand ▼]           │
-│                              │
+│ Fans: 12.4k (D) - Goal: 20k │
+├──────────────────────────────┤
+│ │
+│ [<] Year 1 / JAN (Jr) [>] │
+│ │
 │ ┌──────────────────────────┐ │
-│ │ Jan 2026         [← →]   │ │
-│ ├──────────────────────────┤ │
-│ │ S │M │T │W │T │F │S      │ │
-│ ├──┼──┼──┼──┼──┼──┼──┤     │ │
-│ │  │  │  │1 │2 │3 │4       │ │
-│ ├──┼──┼──┼──┼──┼──┼──┤     │ │
-│ │5 │6 │7 │8 │9 │10│11      │ │
-│ │  │  │  │  │  │G1│         │ │
-│ │  │  │  │  │  │🟢│         │ │
+│ │ 11 JAN: [G3] FAIRY S... │ │
+│ │ 🟢 95% | Turf | 1600m │ │
+│ │ 1st: +10k | Req: 1k │ │
 │ └──────────────────────────┘ │
-│                              │
-│ ─────────────────────────────│
-│                              │
+│ │
 │ ┌──────────────────────────┐ │
-│ │ Kanto Okami Cup          │ │
-│ │ G1 | Jan 10 | 2400m      │ │
-│ │ Readiness: 🟢 85%        │ │
-│ │ Win Prob: 35%            │ │
-│ │                          │ │
-│ │ [DETAILS] [ENTER] [PREP] │ │
+│ │ 25 JAN: [OP] WAKAGOM... │ │
+│ │ 🟡 80% | Turf | 2000m │ │
+│ │ 1st: +5k | Req: -- │ │
 │ └──────────────────────────┘ │
-│                              │
-│ Switch to List View          │
-│ [Calendar] [List ●]          │
+│ │
+│ ┌──────────────────────────┐ │
+│ │ 25 JAN: [OP] NANOHAN... │ │
+│ │ 🔴 45% | Turf | 1600m │ │
+│ └──────────────────────────┘ │
+│ │
+│ === SELECTED RACE === │
+│ [G3] FAIRY STAKES │
+│ Turf / 1600m (Mile) / Right │
+│ Condition: Sunny / Good │
+│ │
+│ [ RESERVE ] [ INFO ] [ X ] │
+│ │
 └──────────────────────────────┘
-│  Bottom Navigation Bar       │
-│ [🏠][👤][⚡][🏆][🤖][⚙️]   │
+│ Bottom Navigation Bar │
+│ [🏠][👤][⚡][🏆][🤖][⚙️] │
 └──────────────────────────────┘
-
-```
 
 ---
 
@@ -220,27 +192,27 @@ class RaceCalendar extends Component
     public $currentMonth;
     public $currentYear;
     public $selectedRaceId = null;
-    
+
     // Filters
     public $gradeFilter = 'all';
     public $distanceFilter = 'all';
     public $surfaceFilter = 'all';
-    
+
     // View mode
     public $viewMode = 'calendar'; // calendar or list
-    
+
     public function mount()
     {
         $this->currentMonth = now()->month;
         $this->currentYear = now()->year;
     }
-    
+
     public function selectRace($raceId)
     {
         $this->selectedRaceId = $raceId;
         $this->dispatch('race-selected', raceId: $raceId);
     }
-    
+
     public function getRacesProperty()
     {
         return Race::query()
@@ -258,7 +230,7 @@ class RaceCalendar extends Component
             ->orderBy('scheduled_date')
             ->get();
     }
-    
+
     public function render()
     {
         return view('livewire.race.race-calendar');
@@ -268,38 +240,38 @@ class RaceCalendar extends Component
 
 **Visual Elements**:
 
-| Element | Description |
-|---------|-------------|
-| Month Navigation | Previous/Next buttons to navigate months |
-| Calendar Grid | 7-column grid showing days with race indicators |
-| Race Indicator | Colored badge showing grade, readiness, and distance |
-| Filter Controls | Dropdown selectors for grade, distance, surface |
-| View Toggle | Switch between calendar and list view |
+| Element          | Description                                          |
+| ---------------- | ---------------------------------------------------- |
+| Month Navigation | Previous/Next buttons to navigate months             |
+| Calendar Grid    | 7-column grid showing days with race indicators      |
+| Race Indicator   | Colored badge showing grade, readiness, and distance |
+| Filter Controls  | Dropdown selectors for grade, distance, surface      |
+| View Toggle      | Switch between calendar and list view                |
 
 ### 3.2 Race Cell Component
 
 **Component**: `resources/views/components/race/calendar-cell.blade.php`
 
 ```blade
-<div class="race-cell" 
+<div class="race-cell"
      data-testid="race-cell-{{ $race->id }}"
      wire:click="selectRace({{ $race->id }})">
-    
+
     <div class="race-cell__date">{{ $race->day }}</div>
-    
+
     @if($race)
         <div class="race-cell__grade badge-{{ strtolower($race->grade) }}">
             {{ $race->grade }}
         </div>
-        
+
         <div class="race-cell__readiness readiness-{{ $race->readiness_tier }}">
             {{ $race->readiness_icon }} {{ $race->readiness_percentage }}%
         </div>
-        
+
         <div class="race-cell__distance">
             {{ $race->distance }}m
         </div>
-        
+
         @if($race->is_registered)
             <span class="race-cell__registered">✓ Registered</span>
         @endif
@@ -309,12 +281,12 @@ class RaceCalendar extends Component
 
 **Readiness Indicators**:
 
-| Readiness | Icon | Color | Range |
-|-----------|------|-------|-------|
-| Excellent | 🟢 | Green | ≥85% |
-| Good | 🟡 | Yellow | 70-84% |
-| Fair | 🟠 | Orange | 55-69% |
-| Poor | 🔴 | Red | <55% |
+| Readiness | Icon | Color  | Range  |
+| --------- | ---- | ------ | ------ |
+| Excellent | 🟢   | Green  | ≥85%   |
+| Good      | 🟡   | Yellow | 70-84% |
+| Fair      | 🟠   | Orange | 55-69% |
+| Poor      | 🔴   | Red    | <55%   |
 
 ### 3.3 Race Detail Panel
 
@@ -325,25 +297,25 @@ class RaceDetailPanel extends Component
 {
     public Race $race;
     public Character $character;
-    
+
     public function mount(Race $race, Character $character)
     {
         $this->race = $race;
         $this->character = $character;
     }
-    
+
     public function getReadinessProperty()
     {
         return app(RaceReadinessService::class)
             ->calculateReadiness($this->character, $this->race);
     }
-    
+
     public function getWinProbabilityProperty()
     {
         return app(RaceStrategyService::class)
             ->calculateWinProbability($this->character, $this->race);
     }
-    
+
     public function render()
     {
         return view('livewire.race.race-detail-panel', [
@@ -381,6 +353,36 @@ class RaceDetailPanel extends Component
 └───────────────────────────────────────────────────┘
 ```
 
+**Track Condition Effects (Global English Server - Jan 2026)**:
+
+| Condition | Power Penalty | Speed Penalty | Stamina Drain | Description |
+|-----------|---------------|---------------|---------------|-------------|
+| Firm | None | None | None | Optimal racing conditions |
+| Good | -50 Power | None | None | Slightly soft ground |
+| Soft | -50 to -100 Power | None | +2%/sec | Wet conditions, increased stamina drain |
+| Heavy | -50 to -100 Power | -50 Speed | +2%/sec | Very wet, significant penalties |
+
+**Weather Impact on Track Conditions**:
+
+- Weather affects track condition probability, not stats directly
+- Sunny → Higher chance of Firm/Good
+- Cloudy → Higher chance of Good/Soft
+- Rainy → Higher chance of Soft/Heavy
+
+**Class Pyramid and Fan Requirements**:
+
+| Class | Fan Requirement | Description |
+|-------|-----------------|-------------|
+| Debut | 0 | Starting class |
+| Beginner | 0 | Entry level |
+| Bronze | 5,000 | First milestone |
+| Silver | 20,000 | Intermediate |
+| Gold | 50,000 | Advanced |
+| Platinum | 100,000 | Expert |
+| Star | 160,000 | Elite |
+| Top Star | 240,000 | Top tier |
+| Legend | 320,000 | Maximum class |
+
 ### 3.4 Filter Component
 
 **Component**: `resources/views/components/race/calendar-filters.blade.php`
@@ -397,7 +399,7 @@ class RaceDetailPanel extends Component
             <option value="OP">Open</option>
         </select>
     </div>
-    
+
     <div class="filter-group">
         <label for="distance-filter">Distance</label>
         <select id="distance-filter" wire:model.live="distanceFilter">
@@ -408,7 +410,7 @@ class RaceDetailPanel extends Component
             <option value="long">Long (2401m+)</option>
         </select>
     </div>
-    
+
     <div class="filter-group">
         <label for="surface-filter">Surface</label>
         <select id="surface-filter" wire:model.live="surfaceFilter">
@@ -417,13 +419,13 @@ class RaceDetailPanel extends Component
             <option value="dirt">Dirt</option>
         </select>
     </div>
-    
+
     <div class="view-toggle">
-        <button wire:click="$set('viewMode', 'calendar')" 
+        <button wire:click="$set('viewMode', 'calendar')"
                 class="{{ $viewMode === 'calendar' ? 'active' : '' }}">
             Calendar
         </button>
-        <button wire:click="$set('viewMode', 'list')" 
+        <button wire:click="$set('viewMode', 'list')"
                 class="{{ $viewMode === 'list' ? 'active' : '' }}">
             List
         </button>
@@ -438,23 +440,23 @@ class RaceDetailPanel extends Component
 ```blade
 <div class="race-list" data-testid="race-list">
     @forelse($races as $race)
-        <div class="race-list-item" 
+        <div class="race-list-item"
              wire:click="selectRace({{ $race->id }})"
              data-testid="race-list-item-{{ $race->id }}">
-            
+
             <div class="race-list-item__header">
                 <span class="badge badge-{{ strtolower($race->grade) }}">
                     {{ $race->grade }}
                 </span>
                 <h3 class="race-name">{{ $race->name }}</h3>
             </div>
-            
+
             <div class="race-list-item__details">
                 <span class="race-date">{{ $race->formatted_date }}</span>
                 <span class="race-distance">{{ $race->distance }}m ({{ $race->distance_category }})</span>
                 <span class="race-surface">{{ $race->surface }}</span>
             </div>
-            
+
             <div class="race-list-item__metrics">
                 <div class="metric">
                     <span class="metric-label">Readiness</span>
@@ -467,7 +469,7 @@ class RaceDetailPanel extends Component
                     <span class="metric-value">{{ $race->win_probability }}%</span>
                 </div>
             </div>
-            
+
             <div class="race-list-item__actions">
                 <button wire:click.stop="viewDetails({{ $race->id }})">Details</button>
                 <button wire:click.stop="enterRace({{ $race->id }})">Enter</button>
@@ -524,7 +526,7 @@ sequenceDiagram
     participant Calendar as Calendar Component
     participant Service as Race Service
     participant Database
-    
+
     User->>Calendar: Load calendar page
     Calendar->>Service: getRaces(month, year, filters)
     Service->>Database: Query races
@@ -532,7 +534,7 @@ sequenceDiagram
     Service->>Service: Calculate readiness scores
     Service-->>Calendar: Races with readiness
     Calendar->>User: Display calendar
-    
+
     User->>Calendar: Click race cell
     Calendar->>Service: getRaceDetails(raceId)
     Service->>Database: Load race + requirements
@@ -544,11 +546,11 @@ sequenceDiagram
 
 ### 4.3 Cache Strategy
 
-| Data Type | Cache Key | TTL | Invalidation |
-|-----------|-----------|-----|--------------|
-| Race list (filtered) | `races:{month}:{year}:{filters}` | 1 hour | On race update |
-| Readiness scores | `readiness:{character_id}:{race_id}` | 5 minutes | On stat update |
-| Win probability | `win_prob:{character_id}:{race_id}` | 5 minutes | On stat/skill update |
+| Data Type            | Cache Key                            | TTL       | Invalidation         |
+| -------------------- | ------------------------------------ | --------- | -------------------- |
+| Race list (filtered) | `races:{month}:{year}:{filters}`     | 1 hour    | On race update       |
+| Readiness scores     | `readiness:{character_id}:{race_id}` | 5 minutes | On stat update       |
+| Win probability      | `win_prob:{character_id}:{race_id}`  | 5 minutes | On stat/skill update |
 
 ---
 
@@ -582,7 +584,7 @@ stateDiagram-v2
     CurrentMonth --> NextMonth: Click next
     PreviousMonth --> CurrentMonth: Click next
     NextMonth --> CurrentMonth: Click previous
-    
+
     CurrentMonth: Display current month races
     PreviousMonth: Display previous month races
     NextMonth: Display next month races
@@ -597,11 +599,11 @@ sequenceDiagram
     participant Component as Calendar Component
     participant Cache
     participant Database
-    
+
     User->>FilterUI: Change filter value
     FilterUI->>Component: Update filter property
     Component->>Cache: Check filtered results cache
-    
+
     alt Cache Hit
         Cache-->>Component: Cached races
     else Cache Miss
@@ -609,7 +611,7 @@ sequenceDiagram
         Database-->>Component: Filtered races
         Component->>Cache: Store results
     end
-    
+
     Component->>Component: Recalculate calendar grid
     Component->>User: Update calendar display
 ```
@@ -620,27 +622,27 @@ sequenceDiagram
 
 ### 6.1 WCAG 2.2 AA Compliance
 
-| Criterion | Implementation | Test Method |
-|-----------|----------------|-------------|
-| **1.1.1 Non-text Content** | All icons have `aria-label` | Screen reader testing |
-| **1.4.3 Contrast Ratio** | 4.5:1 minimum for text | Color contrast analyzer |
-| **2.1.1 Keyboard** | Full keyboard navigation support | Keyboard-only testing |
-| **2.4.3 Focus Order** | Logical tab order through calendar | Tab key traversal |
-| **2.4.7 Focus Visible** | Clear focus indicators on cells | Visual inspection |
-| **3.2.4 Consistent Identification** | Consistent race grade badges | Manual review |
-| **4.1.2 Name, Role, Value** | Proper ARIA attributes on controls | axe-core scan |
+| Criterion                           | Implementation                     | Test Method             |
+| ----------------------------------- | ---------------------------------- | ----------------------- |
+| **1.1.1 Non-text Content**          | All icons have `aria-label`        | Screen reader testing   |
+| **1.4.3 Contrast Ratio**            | 4.5:1 minimum for text             | Color contrast analyzer |
+| **2.1.1 Keyboard**                  | Full keyboard navigation support   | Keyboard-only testing   |
+| **2.4.3 Focus Order**               | Logical tab order through calendar | Tab key traversal       |
+| **2.4.7 Focus Visible**             | Clear focus indicators on cells    | Visual inspection       |
+| **3.2.4 Consistent Identification** | Consistent race grade badges       | Manual review           |
+| **4.1.2 Name, Role, Value**         | Proper ARIA attributes on controls | axe-core scan           |
 
 ### 6.2 Keyboard Navigation
 
-| Action | Shortcut | Context |
-|--------|----------|---------|
-| Navigate calendar days | `Arrow Keys` | Calendar grid |
-| Select race | `Enter` or `Space` | When race cell focused |
-| Previous month | `PageUp` or `[` | Calendar view |
-| Next month | `PageDown` or `]` | Calendar view |
-| Open filters | `F` | Calendar view |
-| Switch to list view | `L` | Calendar view |
-| Enter race | `E` | When race selected |
+| Action                 | Shortcut           | Context                |
+| ---------------------- | ------------------ | ---------------------- |
+| Navigate calendar days | `Arrow Keys`       | Calendar grid          |
+| Select race            | `Enter` or `Space` | When race cell focused |
+| Previous month         | `PageUp` or `[`    | Calendar view          |
+| Next month             | `PageDown` or `]`  | Calendar view          |
+| Open filters           | `F`                | Calendar view          |
+| Switch to list view    | `L`                | Calendar view          |
+| Enter race             | `E`                | When race selected     |
 
 ### 6.3 Screen Reader Announcements
 
@@ -659,9 +661,11 @@ sequenceDiagram
         <!-- ... -->
     </div>
     <div role="row">
-        <div role="gridcell" 
-             aria-label="January 10, Kanto Okami Cup, G1 race, 2400 meters, readiness 85 percent excellent"
-             tabindex="0">
+        <div
+            role="gridcell"
+            aria-label="January 10, Kanto Okami Cup, G1 race, 2400 meters, readiness 85 percent excellent"
+            tabindex="0"
+        >
             <!-- Cell content -->
         </div>
     </div>
@@ -669,7 +673,8 @@ sequenceDiagram
 
 <!-- Race selection announcement -->
 <div aria-live="polite" aria-atomic="true" class="sr-only">
-    Kanto Okami Cup selected. G1 race on January 10, 2400 meters turf. Readiness 85 percent, win probability 35 percent.
+    Kanto Okami Cup selected. G1 race on January 10, 2400 meters turf. Readiness
+    85 percent, win probability 35 percent.
 </div>
 ```
 
@@ -679,32 +684,32 @@ sequenceDiagram
 
 ### 7.1 Performance Targets
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| **Calendar Load** | < 1.5 seconds | Time to first render |
-| **Filter Application** | < 300ms | Filter change to UI update |
-| **Race Selection** | < 200ms | Click to detail panel display |
-| **Month Navigation** | < 400ms | Month change animation |
-| **List View Switch** | < 250ms | View mode transition |
+| Metric                 | Target        | Measurement                   |
+| ---------------------- | ------------- | ----------------------------- |
+| **Calendar Load**      | < 1.5 seconds | Time to first render          |
+| **Filter Application** | < 300ms       | Filter change to UI update    |
+| **Race Selection**     | < 200ms       | Click to detail panel display |
+| **Month Navigation**   | < 400ms       | Month change animation        |
+| **List View Switch**   | < 250ms       | View mode transition          |
 
 ### 7.2 Optimization Strategies
 
-| Strategy | Implementation | Impact |
-|----------|----------------|--------|
-| **Lazy Loading** | Defer off-screen month data | -40% initial load |
-| **Query Optimization** | Eager load race requirements | -60% query count |
-| **Response Caching** | Cache filtered race lists (1hr TTL) | -80% database queries |
-| **Debounced Filters** | 200ms debounce on filter changes | Reduced re-renders |
-| **Virtual Scrolling** | List view uses virtual scroll | Handles 500+ races |
+| Strategy               | Implementation                      | Impact                |
+| ---------------------- | ----------------------------------- | --------------------- |
+| **Lazy Loading**       | Defer off-screen month data         | -40% initial load     |
+| **Query Optimization** | Eager load race requirements        | -60% query count      |
+| **Response Caching**   | Cache filtered race lists (1hr TTL) | -80% database queries |
+| **Debounced Filters**  | 200ms debounce on filter changes    | Reduced re-renders    |
+| **Virtual Scrolling**  | List view uses virtual scroll       | Handles 500+ races    |
 
 ### 7.3 Bundle Size Budget
 
-| Asset Type | Budget | Current | Status |
-|------------|--------|---------|--------|
-| JavaScript | 45 KB | 42 KB | ✅ Within budget |
-| CSS | 18 KB | 16 KB | ✅ Within budget |
-| Images | 30 KB | 25 KB | ✅ Within budget |
-| Total | 93 KB | 83 KB | ✅ Within budget |
+| Asset Type | Budget | Current | Status           |
+| ---------- | ------ | ------- | ---------------- |
+| JavaScript | 45 KB  | 42 KB   | ✅ Within budget |
+| CSS        | 18 KB  | 16 KB   | ✅ Within budget |
+| Images     | 30 KB  | 25 KB   | ✅ Within budget |
+| Total      | 93 KB  | 83 KB   | ✅ Within budget |
 
 ---
 
@@ -721,7 +726,7 @@ test('calculates race readiness correctly', function () {
         'stamina' => 442,
         'power' => 443,
     ]);
-    
+
     $race = Race::factory()->create([
         'required_speed' => 520,
         'required_stamina' => 480,
@@ -729,10 +734,10 @@ test('calculates race readiness correctly', function () {
         'distance' => 2400,
         'surface' => 'turf',
     ]);
-    
+
     $service = app(RaceReadinessService::class);
     $readiness = $service->calculateReadiness($character, $race);
-    
+
     expect($readiness->percentage)->toBeGreaterThanOrEqual(70)
         ->and($readiness->tier)->toBe('good');
 });
@@ -742,15 +747,15 @@ test('accounts for aptitude bonuses in readiness', function () {
         'aptitude_turf' => AptitudeGrade::A,
         'aptitude_medium' => AptitudeGrade::S,
     ]);
-    
+
     $race = Race::factory()->create([
         'distance_category' => 'medium',
         'surface' => 'turf',
     ]);
-    
+
     $service = app(RaceReadinessService::class);
     $readiness = $service->calculateReadiness($character, $race);
-    
+
     expect($readiness->aptitude_bonus)->toBeGreaterThan(0);
 });
 ```
@@ -763,7 +768,7 @@ test('accounts for aptitude bonuses in readiness', function () {
 test('user can view race calendar', function () {
     $user = User::factory()->create();
     $races = Race::factory()->count(5)->create();
-    
+
     $this->actingAs($user)
         ->get(route('races.calendar'))
         ->assertOk()
@@ -775,7 +780,7 @@ test('user can filter races by grade', function () {
     $user = User::factory()->create();
     Race::factory()->create(['grade' => 'G1']);
     Race::factory()->create(['grade' => 'G2']);
-    
+
     Livewire::actingAs($user)
         ->test(RaceCalendar::class)
         ->set('gradeFilter', 'G1')
@@ -785,7 +790,7 @@ test('user can filter races by grade', function () {
 
 test('user can navigate months', function () {
     $user = User::factory()->create();
-    
+
     Livewire::actingAs($user)
         ->test(RaceCalendar::class)
         ->call('nextMonth')
@@ -798,81 +803,85 @@ test('user can navigate months', function () {
 **Test File**: `tests/e2e/race-calendar.spec.js`
 
 ```javascript
-test.describe('WF-006: Race Calendar View', () => {
-    test('displays race calendar correctly', async ({ page }) => {
-        await page.goto('/races/calendar');
-        
+test.describe("WF-006: Race Calendar View", () => {
+    test("displays race calendar correctly", async ({ page }) => {
+        await page.goto("/races/calendar");
+
         // Check calendar structure
-        await expect(page.getByTestId('calendar-grid')).toBeVisible();
-        await expect(page.getByRole('grid')).toBeVisible();
-        
+        await expect(page.getByTestId("calendar-grid")).toBeVisible();
+        await expect(page.getByRole("grid")).toBeVisible();
+
         // Check month header
-        await expect(page.getByRole('heading', { name: /January 2026/ })).toBeVisible();
-        
+        await expect(
+            page.getByRole("heading", { name: /January 2026/ }),
+        ).toBeVisible();
+
         // Check race indicators
         const raceCells = page.getByTestId(/^race-cell-/);
         await expect(raceCells.first()).toBeVisible();
     });
-    
-    test('displays race details on selection', async ({ page }) => {
-        await page.goto('/races/calendar');
-        
+
+    test("displays race details on selection", async ({ page }) => {
+        await page.goto("/races/calendar");
+
         // Click race cell
-        await page.getByTestId('race-cell-1').click();
-        
+        await page.getByTestId("race-cell-1").click();
+
         // Verify detail panel
-        const detailPanel = page.getByTestId('race-detail-panel');
+        const detailPanel = page.getByTestId("race-detail-panel");
         await expect(detailPanel).toBeVisible();
-        await expect(detailPanel).toContainText('Kanto Okami Cup');
-        await expect(detailPanel).toContainText('Readiness:');
-        await expect(detailPanel).toContainText('Win Probability:');
+        await expect(detailPanel).toContainText("Kanto Okami Cup");
+        await expect(detailPanel).toContainText("Readiness:");
+        await expect(detailPanel).toContainText("Win Probability:");
     });
-    
-    test('filters races correctly', async ({ page }) => {
-        await page.goto('/races/calendar');
-        
+
+    test("filters races correctly", async ({ page }) => {
+        await page.goto("/races/calendar");
+
         // Apply grade filter
-        await page.getByTestId('grade-filter').selectOption('G1');
-        
+        await page.getByTestId("grade-filter").selectOption("G1");
+
         // Verify filtered results
-        await expect(page.getByText('G2')).not.toBeVisible();
-        await expect(page.getByText('G1')).toBeVisible();
+        await expect(page.getByText("G2")).not.toBeVisible();
+        await expect(page.getByText("G1")).toBeVisible();
     });
-    
-    test('navigates months correctly', async ({ page }) => {
-        await page.goto('/races/calendar');
-        
+
+    test("navigates months correctly", async ({ page }) => {
+        await page.goto("/races/calendar");
+
         // Click next month
-        await page.getByLabel('Next month').click();
-        
-        await expect(page.getByRole('heading', { name: /February 2026/ })).toBeVisible();
+        await page.getByLabel("Next month").click();
+
+        await expect(
+            page.getByRole("heading", { name: /February 2026/ }),
+        ).toBeVisible();
     });
-    
-    test('switches between calendar and list view', async ({ page }) => {
-        await page.goto('/races/calendar');
-        
+
+    test("switches between calendar and list view", async ({ page }) => {
+        await page.goto("/races/calendar");
+
         // Switch to list view
-        await page.getByRole('button', { name: 'List' }).click();
-        
-        await expect(page.getByTestId('race-list')).toBeVisible();
-        await expect(page.getByTestId('calendar-grid')).not.toBeVisible();
+        await page.getByRole("button", { name: "List" }).click();
+
+        await expect(page.getByTestId("race-list")).toBeVisible();
+        await expect(page.getByTestId("calendar-grid")).not.toBeVisible();
     });
-    
-    test('supports keyboard navigation', async ({ page }) => {
-        await page.goto('/races/calendar');
-        
+
+    test("supports keyboard navigation", async ({ page }) => {
+        await page.goto("/races/calendar");
+
         // Tab to calendar grid
-        await page.keyboard.press('Tab');
-        await page.keyboard.press('Tab');
-        
+        await page.keyboard.press("Tab");
+        await page.keyboard.press("Tab");
+
         // Navigate with arrow keys
-        await page.keyboard.press('ArrowRight');
-        await page.keyboard.press('ArrowDown');
-        
+        await page.keyboard.press("ArrowRight");
+        await page.keyboard.press("ArrowDown");
+
         // Select race with Enter
-        await page.keyboard.press('Enter');
-        
-        await expect(page.getByTestId('race-detail-panel')).toBeVisible();
+        await page.keyboard.press("Enter");
+
+        await expect(page.getByTestId("race-detail-panel")).toBeVisible();
     });
 });
 ```
@@ -882,52 +891,54 @@ test.describe('WF-006: Race Calendar View', () => {
 **Test File**: `tests/e2e/accessibility/race-calendar.spec.js`
 
 ```javascript
-import { test, expect } from '@playwright/test';
-import AxeBuilder from '@axe-core/playwright';
+import { test, expect } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
 
-test.describe('WF-006: Accessibility', () => {
-    test('has no automatically detectable accessibility issues', async ({ page }) => {
-        await page.goto('/races/calendar');
-        
+test.describe("WF-006: Accessibility", () => {
+    test("has no automatically detectable accessibility issues", async ({
+        page,
+    }) => {
+        await page.goto("/races/calendar");
+
         const accessibilityScanResults = await new AxeBuilder({ page })
-            .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+            .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
             .analyze();
-        
+
         expect(accessibilityScanResults.violations).toEqual([]);
     });
-    
-    test('announces race selection to screen readers', async ({ page }) => {
-        await page.goto('/races/calendar');
-        
+
+    test("announces race selection to screen readers", async ({ page }) => {
+        await page.goto("/races/calendar");
+
         const liveRegion = page.locator('[aria-live="polite"]');
-        
-        await page.getByTestId('race-cell-1').click();
-        
+
+        await page.getByTestId("race-cell-1").click();
+
         await expect(liveRegion).toContainText(/Kanto Okami Cup selected/);
     });
-    
-    test('calendar grid has proper ARIA attributes', async ({ page }) => {
-        await page.goto('/races/calendar');
-        
-        const grid = page.getByRole('grid');
+
+    test("calendar grid has proper ARIA attributes", async ({ page }) => {
+        await page.goto("/races/calendar");
+
+        const grid = page.getByRole("grid");
         await expect(grid).toBeVisible();
-        
+
         const cells = grid.locator('[role="gridcell"]');
-        await expect(cells.first()).toHaveAttribute('aria-label');
+        await expect(cells.first()).toHaveAttribute("aria-label");
     });
-    
-    test('supports keyboard-only workflow', async ({ page }) => {
-        await page.goto('/races/calendar');
-        
+
+    test("supports keyboard-only workflow", async ({ page }) => {
+        await page.goto("/races/calendar");
+
         // Navigate using keyboard only
-        await page.keyboard.press('Tab'); // Filters
-        await page.keyboard.press('Tab'); // Previous month
-        await page.keyboard.press('Tab'); // Calendar grid
-        await page.keyboard.press('ArrowRight'); // Navigate cell
-        await page.keyboard.press('Enter'); // Select race
-        
+        await page.keyboard.press("Tab"); // Filters
+        await page.keyboard.press("Tab"); // Previous month
+        await page.keyboard.press("Tab"); // Calendar grid
+        await page.keyboard.press("ArrowRight"); // Navigate cell
+        await page.keyboard.press("Enter"); // Select race
+
         // Verify race detail visible
-        await expect(page.getByTestId('race-detail-panel')).toBeVisible();
+        await expect(page.getByTestId("race-detail-panel")).toBeVisible();
     });
 });
 ```
@@ -966,10 +977,11 @@ test.describe('WF-006: Accessibility', () => {
 
 ## 10. Version History
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 2.0.0 | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added readiness calculations, win probability, filtering, list view, accessibility specifications, and testing requirements |
-| 1.0.0 | 2026-01-14 | Development Team | Initial wireframe specification |
+| Version | Date       | Author           | Changes                                                                                                                                                                              |
+| ------- | ---------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 2.2.0   | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: track conditions (Firm/Good/Soft/Heavy), class pyramid with fan requirements, weather affects track condition probability |
+| 2.0.0   | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added readiness calculations, win probability, filtering, list view, accessibility specifications, and testing requirements |
+| 1.0.0   | 2026-01-14 | Development Team | Initial wireframe specification                                                                                                                                                      |
 
 ---
 
@@ -990,4 +1002,4 @@ test.describe('WF-006: Accessibility', () => {
 
 ---
 
-*This wireframe specification reflects the current implementation of the Race Calendar View and serves as the authoritative reference for UI/UX development and testing.*
+_This wireframe specification reflects the current implementation of the Race Calendar View and serves as the authoritative reference for UI/UX development and testing._

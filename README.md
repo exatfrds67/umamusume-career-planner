@@ -405,7 +405,7 @@ umamusume-career-planner/
 Track character progression with comprehensive stat management:
 
 - **Stats**: Speed, Stamina, Power, Guts, Wit (0-1200 range)
-- **Aptitudes**: Distance, Surface, Running Style grades (G through SS)
+- **Aptitudes**: Distance, Surface, Running Style grades (G through S, S is maximum)
 - **Factors**: Blue (stat), Red (aptitude), Green (unique skill), White (normal skill)
 - **Goals**: Training objectives with progress tracking
 - **Conditions**: Positive/negative status effects
@@ -436,7 +436,7 @@ Comprehensive race preparation:
 Complete skill lifecycle management:
 
 - Skill catalog with categories (Normal, Rare, Unique)
-- Hint-based SP cost reduction (20% per hint, 40% max)
+- Hint-based SP cost reduction (5 levels: 10%/20%/30%/35%/40% max)
 - Evolution system (Normal → Rare)
 - SP optimization strategies
 

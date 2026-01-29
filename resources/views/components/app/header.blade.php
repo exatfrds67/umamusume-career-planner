@@ -54,11 +54,18 @@
                 @click.away="open = false">
                 <span class="sr-only">Open user menu</span>
                 <img class="h-8 w-8 rounded-full bg-gray-50"
-                    src="https://ui-avatars.com/api/?name=User&background=3b82f6&color=fff"
-                    loading="lazy" decoding="async" alt="">
+                    src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? 'User') }}&background=3b82f6&color=fff"
+                    loading="lazy" decoding="async" alt="{{ Auth::user()->name ?? 'User' }}">
                 <span class="hidden lg:flex lg:items-center">
-                    <span class="ml-4 text-sm font-semibold leading-6 text-gray-900 dark:text-white"
-                        aria-hidden="true">User</span>
+                    <span class="ml-4 text-sm font-semibold leading-6 text-gray-900 dark:text-white" aria-hidden="true">
+                        {{ Auth::user()->name ?? 'User' }}
+                        @if (Auth::user()?->isAdmin())
+                            <span
+                                class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
+                                Admin
+                            </span>
+                        @endif
+                    </span>
                     <svg class="ml-2 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                         <path fill-rule="evenodd"
                             d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"

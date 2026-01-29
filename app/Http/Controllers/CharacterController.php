@@ -46,16 +46,37 @@ class CharacterController extends Controller
             }
         }
 
+        // Filter by status
+        if ($request->filled('status')) {
+            $status = $request->input('status');
+            if (is_string($status)) {
+                $query->where('status', $status);
+            }
+        }
+
         // Sorting
-        $sortField = $request->input('sort', 'created_at');
+        $sortField = $request->input('sort', 'updated_at');
         $sortDirection = $request->input('direction', 'desc');
 
         $allowedSorts = ['name', 'created_at', 'scenario_type', 'updated_at'];
         if (is_string($sortField) && in_array($sortField, $allowedSorts) && is_string($sortDirection)) {
-            $query->orderBy($sortField, $sortDirection);
+            // Always show pinned characters first, then apply the requested sort
+            $query->orderBy('is_pinned', 'desc')
+                ->orderBy($sortField, $sortDirection);
+        } else {
+            // Default: pinned first, then by updated_at desc
+            $query->orderBy('is_pinned', 'desc')
+                ->orderBy('updated_at', 'desc');
         }
 
-        $characters = $query->paginate(12);
+        $characters = $query->paginate(14)->withQueryString();
+
+        // Add progress percentage to each character
+        $characters->getCollection()->transform(function ($character) {
+            $character->progress = $character->getProgressPercentage();
+
+            return $character;
+        });
 
         return view('characters.index', compact('characters'));
     }
@@ -101,6 +122,7 @@ class CharacterController extends Controller
                 'facility_levels' => [],
                 'spirit_burst_data' => [],
                 'status' => 'active',
+                'is_seeded' => false, // User-created characters are not seeded
                 'completion_data' => [],
             ]);
 
@@ -167,10 +189,8 @@ class CharacterController extends Controller
      */
     public function edit(Character $character): View
     {
-        // Ensure user owns this character
-        if ($character->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized action.');
-        }
+        // Use policy authorization (allows admins and owners)
+        $this->authorize('update', $character);
 
         $character->load('aptitudes');
 
@@ -270,10 +290,8 @@ class CharacterController extends Controller
      */
     public function destroy(Character $character): RedirectResponse
     {
-        // Ensure user owns this character
-        if ($character->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized action.');
-        }
+        // Use policy authorization (allows admins and owners)
+        $this->authorize('delete', $character);
 
         try {
             // Delete the character (cascade deletion will handle related records)
@@ -353,13 +371,28 @@ class CharacterController extends Controller
     }
 
     /**
+     * Toggle the pinned status of a character
+     */
+    public function togglePin(Character $character): RedirectResponse
+    {
+        $this->authorize('update', $character);
+
+        $isPinned = $character->togglePin(Auth::id());
+
+        $message = $isPinned
+            ? 'Character pinned successfully!'
+            : 'Character unpinned successfully!';
+
+        return redirect()->back()->with('success', $message);
+    }
+
+    /**
      * Rest action to recover energy
      */
     public function rest(Character $character): RedirectResponse
     {
-        if ($character->user_id !== Auth::id()) {
-            abort(403);
-        }
+        // Use policy authorization (allows admins and owners)
+        $this->authorize('update', $character);
 
         $result = $this->characterStateService->rest($character);
 
@@ -378,9 +411,8 @@ class CharacterController extends Controller
      */
     public function nextTurn(Character $character): RedirectResponse
     {
-        if ($character->user_id !== Auth::id()) {
-            abort(403);
-        }
+        // Use policy authorization (allows admins and owners)
+        $this->authorize('update', $character);
 
         // Check if character has enough energy (optional logic, for now just consume a bit or none)
         // $this->characterStateService->consumeEnergy($character, 5);

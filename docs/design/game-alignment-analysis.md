@@ -1,9 +1,10 @@
 # Umamusume Game UI/UX Alignment Analysis
 
-**Document Version**: 1.0.0  
-**Date**: January 28, 2026  
+**Document Version**: 1.1.0  
+**Date**: January 28, 2026 (Revised)  
 **Purpose**: Analyze actual game UI patterns to inform Career Planner design decisions  
-**Status**: Active Planning Document
+**Status**: Active Planning Document  
+**Latest Changes**: Enhanced with Character Profile Page, In-Career Dialogue System, Condition Indicators, and Race Day States observations from comprehensive screenshot analysis (83 screenshots reviewed)
 
 ---
 
@@ -70,11 +71,11 @@ Three-tab system observed:
 **Stats Display Format:**
 
 ```
-Speed:    112/1200
-Stamina:   93/1200
-Power:     85/1200
-Guts:     111/1200
-Wit:       99/1200
+Speed:    1350/2000 [!] (Soft Cap 1200)
+Stamina:  930/2000
+Power:    850/2000
+Guts:     1110/2000
+Wit:      990/2000
 ```
 
 **Design Insights:**
@@ -98,7 +99,49 @@ Wit:       99/1200
 
 ---
 
-### 1.3 Support Card System
+### 1.3 Character Profile Page
+
+**Observed Elements:**
+
+#### Profile Layout
+
+- **Header**: Character name with dropdown indicator (top left, dark strip)
+- **Character Art**: Full-body character artwork on left side (~50% of screen width)
+- **Stats Panel** (right side):
+  - **Bond Level**: Headphone icon with numeric level
+  - **Total Fans**: Fan icon with count
+  - **Careers Completed**: Trophy icon with count
+  - **About**: Text description with character personality summary
+- **Memories Section**: 3x2 icon grid navigation
+  - `Profile` - Character stats
+  - `Album` - Gallery/images
+  - `Stories` - Story content
+  - `Videos` - Cutscenes
+  - `Voices` - Voice lines
+  - `Epithets` - Titles/achievements
+
+#### Outfit Variations
+
+- Multiple outfits visible per character (school uniform, racing outfit, seasonal)
+- Full character artwork with shadow and transparent background
+
+**Design Insights:**
+
+- Clean split layout with art emphasis
+- Icon + label navigation pattern
+- Numeric counters for progression metrics
+- Character About text for personality context
+
+**Career Planner Application:**
+
+- Adopt similar split layout for character detail pages
+- Use icon + label for navigation within character profiles
+- Include character personality/description from game data
+- Track Bond Level, Fans, and Career count per character
+
+---
+
+### 1.4 Support Card System
 
 **Observed Elements:**
 
@@ -106,9 +149,18 @@ Wit:       99/1200
 
 - Card rarity: SSR (highest visible)
 - Limit break indicators: Diamond symbols (◇◇◇◇)
-- Card level: Lvl 30, 35, 45, 50
 - Card artwork with character portraits
 - Type icons (Speed, Stamina, Power, Guts, Wit, Friend)
+
+#### Support Formation (Deck Builder)
+
+- **Layout**: 6-slot grid (upper row for main, lower for sub/friends)
+- **Card Slots**: Show Rarity (SSR/SR), Level (Lvl 30-50), Type Icon, Limit Break diamonds
+- **Controls**:
+  - `Copy` button (top right)
+  - `Reset` and `Auto-Fill` buttons (bottom)
+  - `Start Career!` and `Perks` buttons
+- **Bonuses Display**: Small icons below cards showing Type totals (e.g., Speed x3, Power x1)
 
 #### Support Card Details
 
@@ -138,9 +190,99 @@ Wit:       99/1200
 - Synergy calculator
 - Meta tier rankings (SS/S/A/B)
 
+- Meta tier rankings (SS/S/A/B)
+
 ---
 
-### 1.4 Enhancement/Upgrade Flow
+### 1.4 Career & Race Interface
+
+**Observed Screens:**
+
+#### Career Main Screen
+
+- **Calendar/Turn**: "Junior Year Pre-Debut", "Senior Year Early Apr"
+- **Turn Counter**: "7 turn(s) left"
+- **Goal**: "Place top 3 in Victoria Mile" with "Entry criteria met!" status
+- **Energy Bar**: Color-coded gauge with trend indicator (orange/green)
+- **Mood**: "NORMAL" (orange arrow), "GREAT" (pink up arrow), "GOOD"
+- **Trainee Event**: Banner notification (e.g., "Valentine's Day")
+
+#### Race Results & History
+
+- **Class Pyramid**: Hierarchy displaying Fan counts for each grade:
+  - Legend: 320,000
+  - Top Star: 240,000
+  - Star: 160,000
+  - Platinum (KEEP!): 100,000
+  - Gold: 50,000
+  - Silver: 20,000
+  - Bronze: 5,000
+  - Beginner: 1st place
+  - Debut/Maiden
+- **Career Record**: "Races: 10 Wins: 7"
+- **Major Wins**: List with G1 badges (blue/silver/gold styling)
+- **Rank Badge**: "C Rank" with Rating (e.g., 4,656)
+
+#### Complete Career
+
+- **Attributes Tab**: 5-stat pentagon radar chart (Speed, Stamina, Power, Guts, Wit)
+- **Grades**: Letters (S, A, B, C, D, E) for stats
+- **Aptitudes**:
+  - Track (Turf/Dirt)
+  - Distance (Sprint/Mile/Medium/Long)
+  - Style (Front/Pace/Late/End)
+- **Skill Pts**: Available points displayed (e.g., "7 pts")
+
+#### In-Career Dialogue System
+
+- **Dialogue Box Structure**:
+  - Character name tab (rounded, colored background matching character theme)
+  - White speech bubble with black text
+  - Character portrait (small circular thumbnail) next to name
+- **Trainee Event Banner**:
+  - Orange/amber notification bar with star icon
+  - Event title text (e.g., "Valentine's Day", "Fan Letter", "Sleep Deprived")
+  - Positioned at top of character interaction area
+- **Bottom Controls**:
+  - `Skip Off` toggle button
+  - `Quick` action button (amber highlight)
+  - `Log` button with hamburger menu icon
+
+#### Condition Indicators (Detailed)
+
+- **GREAT** (pink): Up arrow, best condition
+- **GOOD** (light blue): Slight up arrow
+- **NORMAL** (orange): Flat arrow
+- **BAD** (visibility varies): Down arrow indicator
+- Badge positioned next to energy bar with trend arrow
+
+#### Race Day States
+
+- **Race Day**: Special red badge replaces turn counter when turn(s) left = 0
+- **Finished**: Green badge for completed career
+
+**Career Planner Application:**
+
+- Implement condition indicator component with color + icon + label
+- Create event notification system for training events
+- Support all mood/condition states in planning
+- Track race day scheduling in turn timeline
+
+---
+
+### 1.5 Scout / Gacha System
+
+**Observed Elements:**
+
+- **Scout Results**: Grid of 10 characters
+- **Rarity**: 1-3 stars visible
+- **Bonuses**: Item multipliers (x1, x5, x10, x60, x90)
+- **Exchange Pts**: Progress bar (e.g., "50 > 60")
+- **New Character**: Full-screen splash art with Epithet (e.g., "[Formula R] Maruzensky")
+
+---
+
+### 1.6 Enhancement/Upgrade Flow
 
 **Observed Screens:**
 
@@ -152,13 +294,11 @@ Three primary options:
 2. **Support Cards** - Card management
 3. **Veteran Umamusume** - Legacy character features
 
-#### Trainee Sub-Menu
+#### Scenario Selection
 
-- Potential Levels
-- Raise Hint Level
-- Star Unlock
-- Trainee List
-- Star Piece Storage
+- **URA Finale**: "The Beginning" (Standard scenario)
+- **Unity Cup**: "Shine On, Team Spirit!" (Modern scenario, confirms advanced stat potential)
+- **Scenario Record**: Displays high scores (e.g., 11,303)
 
 **Design Insights:**
 
@@ -248,12 +388,12 @@ From game screenshots:
 **Career Planner Application:**
 
 - Adopt similar stat color coding for consistency
-- Use Tailwind's color system:
-  - Speed: `rose-500`
-  - Stamina: `green-500`
-  - Power: `orange-600`
-  - Guts: `amber-500`
-  - Wit: `blue-500`
+- Use Tailwind's color system (Verified Jan 2026):
+  - Speed: `rose-500` (#FB7185)
+  - Stamina: `green-500` (#22C55E)
+  - Power: `orange-500` (#F97316)
+  - Guts: `amber-400` (#FBBF24)
+  - Wit: `sky-500` (#0EA5E9)
 - Maintain high contrast for accessibility
 - Support dark mode with adjusted palette
 
@@ -368,26 +508,26 @@ From game screenshots:
 ### 5.1 Dashboard Widgets
 
 1. **Active Career Overview**
-   - Character portrait
-   - Current turn / total
-   - Current stats with progress bars
-   - Next race countdown
-   - Quick actions
+    - Character portrait
+    - Current turn / total
+    - Current stats with progress bars
+    - Next race countdown
+    - Quick actions
 
 2. **SP Budget Tracker**
-   - Available SP
-   - Planned skill acquisitions
-   - SP allocation chart
+    - Available SP
+    - Planned skill acquisitions
+    - SP allocation chart
 
 3. **Training Recommendations**
-   - AI-suggested next training
-   - Facility synergy indicators
-   - Stat gap analysis
+    - AI-suggested next training
+    - Facility synergy indicators
+    - Stat gap analysis
 
 4. **Recent Activity**
-   - Last edited plans
-   - Import history
-   - Completed careers
+    - Last edited plans
+    - Import history
+    - Completed careers
 
 ### 5.2 Character Card Component
 
@@ -396,11 +536,11 @@ From game screenshots:
 │ [Portrait]  Character Name  │
 │             ★★★★☆           │
 │                             │
-│ Speed:    755 ▓▓▓▓▓▓░░ 1200│
-│ Stamina:  493 ▓▓▓▓░░░░ 1200│
-│ Power:    777 ▓▓▓▓▓▓░░ 1200│
-│ Guts:     303 ▓▓░░░░░░ 1200│
-│ Wit:      398 ▓▓▓░░░░░ 1200│
+│ Speed:    1350 ▓▓▓▓▓▓▓▓▓▓░ 2000 [!]│
+│ Stamina:  493 ▓▓▓▓░░░░░░ 2000    │
+│ Power:    777 ▓▓▓▓▓▓░░░░ 2000    │
+│ Guts:     303 ▓▓░░░░░░░░ 2000    │
+│ Wit:      398 ▓▓▓░░░░░░░ 2000    │
 │                             │
 │ [View Details] [Edit Plan]  │
 └─────────────────────────────┘
@@ -432,12 +572,12 @@ From game screenshots:
 │─────────────────────────────│
 │ Available SP: 450 / 800     │
 │                             │
-│ ☑ Speed Star (120 SP)       │
-│   Hints: 2/2 (-80 SP)       │
-│   Final Cost: 40 SP         │
+│ ☑ Speed Star (180 SP)       │
+│   Level: 5/5 (-40%)         │
+│   Final Cost: 108 SP        │
 │                             │
 │ ☐ Stamina Keeper (180 SP)   │
-│   Hints: 0/2                │
+│   Level: 0/5                │
 │   Final Cost: 180 SP        │
 │                             │
 │ [Add to Plan] [Clear All]   │
@@ -534,21 +674,21 @@ From game screenshots:
 
 ### 9.1 Tailwind Configuration
 
-```javascript
-// tailwind.config.js additions
+// tailwind.config.js additions (Verified)
 theme: {
-  extend: {
-    colors: {
-      'uma-speed': '#FF6B9D',
-      'uma-stamina': '#4CAF50',
-      'uma-power': '#FF5722',
-      'uma-guts': '#FF9800',
-      'uma-wit': '#2196F3',
-      'uma-primary': '#8BC34A',
-      'uma-secondary': '#FFF8E1',
-    }
-  }
+extend: {
+colors: {
+'uma-speed': '#FB7185', // Rose
+'uma-stamina': '#22C55E', // Green
+'uma-power': '#F97316', // Orange
+'uma-guts': '#FBBF24', // Amber
+'uma-wit': '#0EA5E9', // Sky
+'uma-primary': '#84CC16', // Lime (Success)
+'uma-secondary': '#FFFFFF',
 }
+}
+}
+
 ```
 
 ### 9.2 Component Library
@@ -576,6 +716,7 @@ theme: {
 
 **Version History:**
 
+- v1.1.0 (2026-01-28): Enhanced with Character Profile Page, In-Career Dialogue System, Condition Indicators, and Race Day States observations from comprehensive 83-screenshot analysis
 - v1.0.0 (2026-01-28): Initial analysis based on game screenshots
 
 **Related Documents:**
@@ -586,3 +727,4 @@ theme: {
 - `docs/00-core-docs/017_SUM_Software_User_Manual.md`
 
 **Approval Status**: Draft - Pending Review
+```

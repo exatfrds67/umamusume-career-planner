@@ -48,6 +48,8 @@ class CharacterFactory extends Factory
             'facility_levels' => [],
             'spirit_burst_data' => [],
             'status' => 'active',
+            'is_pinned' => false,
+            'is_seeded' => false,
             'completion_data' => [],
             'available_sp' => 0,
         ];
@@ -90,6 +92,26 @@ class CharacterFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'goals' => $goals,
+        ]);
+    }
+
+    /**
+     * Indicate that the character is pinned.
+     */
+    public function pinned(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_pinned' => true,
+        ]);
+    }
+
+    /**
+     * Indicate that the character is from seed data.
+     */
+    public function seeded(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_seeded' => true,
         ]);
     }
 }

@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.0.0  
-**Date**: January 24, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-001], [SPEC-001], [FLOW-001], [D05_DMP]
 
 ---
@@ -156,12 +156,27 @@ sequenceDiagram
     Transform->>Transform: Convert data types
     Transform->>Transform: Normalize enums
     
+    Note over Transform: Game-Accurate Migrations (v2.2.0)
+    Transform->>Transform: Convert SS→S aptitudes (S is max)
+    Transform->>Transform: Migrate hint levels (2→5 system)
+    Transform->>Transform: Handle stat soft cap (1200)
+    Transform->>Transform: Normalize support card data
+    Transform->>Transform: Validate bond 0-100%
+    Transform->>Transform: Validate limit break 0-4
+    
     Transform-->>Migration: Transformed data
     Migration->>Validator: validateSchema(data)
     
     Validator->>Validator: Check required fields
     Validator->>Validator: Validate data types
     Validator->>Validator: Check value ranges
+    
+    Note over Validator: Game-Accurate Validation (v2.2.0)
+    Validator->>Validator: Validate aptitudes G-S (no SS)
+    Validator->>Validator: Validate hint levels 1-5
+    Validator->>Validator: Warn if stats > 1200 soft cap
+    Validator->>Validator: Validate support card types
+    Validator->>Validator: Validate bond 0-100%
     
     alt Validation Failed
         Validator-->>Migration: ValidationException
@@ -373,6 +388,17 @@ class TransformationService
         ],
     ];
     
+    /**
+     * Valid aptitude grades per game mechanics (G-S, no SS)
+     * Verified: Global English Server, January 2026
+     */
+    private const VALID_APTITUDE_GRADES = ['G', 'F', 'E', 'D', 'C', 'B', 'A', 'S'];
+    
+    /**
+     * Valid support card types
+     */
+    private const VALID_SUPPORT_CARD_TYPES = ['Speed', 'Stamina', 'Power', 'Guts', 'Wit', 'Friend'];
+    
     public function transformToCanonical(array $data, string $version): array
     {
         $mappings = $this->fieldMappings[$version] ?? [];
@@ -383,14 +409,32 @@ class TransformationService
             $transformed[$canonicalKey] = $this->transformValue($canonicalKey, $value, $version);
         }
         
+        // Apply game-accurate migrations
+        $transformed = $this->migrateHintLevels($transformed, $version);
+        $transformed = $this->migrateSupportCards($transformed, $version);
+        
         return $transformed;
     }
     
     private function transformValue(string $field, mixed $value, string $version): mixed
     {
-        // Stat value clamping
+        // Stat value handling - soft cap at 1200, allow higher values
+        // Game mechanics: Stats above 1200 have diminishing returns (50% effectiveness)
         if (in_array($field, ['speed', 'stamina', 'power', 'guts', 'wit'])) {
-            return max(0, min(1200, (int) $value));
+            $statValue = max(0, (int) $value);
+            // Log warning if stat exceeds soft cap (1200) for user awareness
+            // Do NOT clamp - game allows values above 1200
+            return $statValue;
+        }
+        
+        // Aptitude grade normalization - SS → S conversion
+        // Game mechanics: S is maximum grade, SS does NOT exist
+        if (in_array($field, ['distance_aptitude', 'surface_aptitude', 'style_aptitude',
+                              'turf_aptitude', 'dirt_aptitude', 'sprint_aptitude', 
+                              'mile_aptitude', 'medium_aptitude', 'long_aptitude',
+                              'front_runner_aptitude', 'pace_chaser_aptitude',
+                              'late_surger_aptitude', 'end_closer_aptitude'])) {
+            return $this->normalizeAptitudeGrade($value);
         }
         
         // Enum normalization
@@ -402,12 +446,119 @@ class TransformationService
             };
         }
         
-        // Turn number validation
+        // Turn number validation (career spans ~70 turns)
         if ($field === 'current_turn' || $field === 'turn_number') {
             return max(1, min(78, (int) $value));
         }
         
+        // Bond percentage normalization (0-100%)
+        if ($field === 'bond' || $field === 'bond_percentage' || $field === 'friendship') {
+            return max(0, min(100, (int) $value));
+        }
+        
         return $value;
+    }
+    
+    /**
+     * Normalize aptitude grade to valid game values
+     * Game mechanics: G → F → E → D → C → B → A → S (S is maximum)
+     * SS does NOT exist in the game - convert to S
+     */
+    private function normalizeAptitudeGrade(mixed $value): string
+    {
+        $grade = strtoupper(trim((string) $value));
+        
+        // SS → S conversion (SS does not exist in game)
+        if ($grade === 'SS') {
+            return 'S';
+        }
+        
+        // Validate grade is in valid range
+        if (in_array($grade, self::VALID_APTITUDE_GRADES)) {
+            return $grade;
+        }
+        
+        // Default to A if invalid (baseline grade with no bonus/penalty)
+        return 'A';
+    }
+    
+    /**
+     * Migrate hint levels from old system (2 levels) to new system (5 levels)
+     * Game mechanics: 
+     *   - Levels 1-3: 10% discount each
+     *   - Levels 4-5: 5% discount each
+     *   - Maximum: 40% total discount at level 5
+     */
+    private function migrateHintLevels(array $data, string $version): array
+    {
+        if (!isset($data['skills']) || !is_array($data['skills'])) {
+            return $data;
+        }
+        
+        foreach ($data['skills'] as $index => $skill) {
+            if (isset($skill['hint_level'])) {
+                $oldLevel = (int) $skill['hint_level'];
+                
+                // Legacy system used 0-2 levels, new system uses 1-5
+                if ($version === 'legacy_v1' || $version === '1.0') {
+                    // Map old 2-level system to new 5-level system
+                    // Old: 0 hints = 0%, 1 hint = 20%, 2 hints = 40%
+                    // New: 0 hints = 0%, 1 = 10%, 2 = 20%, 3 = 30%, 4 = 35%, 5 = 40%
+                    $data['skills'][$index]['hint_level'] = match ($oldLevel) {
+                        0 => 0,
+                        1 => 2,  // 20% → level 2 (20%)
+                        2 => 5,  // 40% → level 5 (40%)
+                        default => min(5, max(0, $oldLevel)),
+                    };
+                } else {
+                    // Validate hint level is in 1-5 range
+                    $data['skills'][$index]['hint_level'] = min(5, max(0, $oldLevel));
+                }
+            }
+        }
+        
+        return $data;
+    }
+    
+    /**
+     * Migrate support card data with game-accurate validation
+     * Game mechanics:
+     *   - Limit breaks: ★ to ★★★★★ (0-4 LB, displayed as 1-5 stars)
+     *   - Bond: 0-100% (80%+ triggers Friendship Training)
+     *   - Types: Speed, Stamina, Power, Guts, Wit, Friend
+     */
+    private function migrateSupportCards(array $data, string $version): array
+    {
+        if (!isset($data['support_cards']) || !is_array($data['support_cards'])) {
+            return $data;
+        }
+        
+        foreach ($data['support_cards'] as $index => $card) {
+            // Normalize limit break (0-4 range, representing ★ to ★★★★★)
+            if (isset($card['limit_break'])) {
+                $lb = (int) $card['limit_break'];
+                $data['support_cards'][$index]['limit_break'] = min(4, max(0, $lb));
+            }
+            
+            // Normalize bond percentage (0-100%)
+            if (isset($card['bond'])) {
+                $bond = (int) $card['bond'];
+                $data['support_cards'][$index]['bond'] = min(100, max(0, $bond));
+            }
+            
+            // Validate card type
+            if (isset($card['type'])) {
+                $type = ucfirst(strtolower(trim($card['type'])));
+                if (!in_array($type, self::VALID_SUPPORT_CARD_TYPES)) {
+                    // Default to Speed if invalid type
+                    $data['support_cards'][$index]['type'] = 'Speed';
+                } else {
+                    $data['support_cards'][$index]['type'] = $type;
+                }
+            }
+        }
+        
+        return $data;
     }
 }
 ```
@@ -420,6 +571,22 @@ class TransformationService
 // ValidationService.php
 class ValidationService
 {
+    /**
+     * Valid aptitude grades per game mechanics (G-S, no SS)
+     * Verified: Global English Server, January 2026
+     */
+    private const VALID_APTITUDE_GRADES = ['G', 'F', 'E', 'D', 'C', 'B', 'A', 'S'];
+    
+    /**
+     * Valid support card types
+     */
+    private const VALID_SUPPORT_CARD_TYPES = ['Speed', 'Stamina', 'Power', 'Guts', 'Wit', 'Friend'];
+    
+    /**
+     * Stat soft cap - values above this have diminishing returns (50% effectiveness)
+     */
+    private const STAT_SOFT_CAP = 1200;
+    
     public function validateSchema(array $data): ValidationResult
     {
         $errors = [];
@@ -443,9 +610,77 @@ class ValidationService
             $errors[] = "Invalid scenario_type: {$data['scenario_type']}";
         }
         
-        // Range validation
-        if (isset($data['speed']) && ($data['speed'] < 0 || $data['speed'] > 1200)) {
-            $errors[] = "Speed must be between 0 and 1200";
+        // Stat range validation (soft cap awareness)
+        // Game mechanics: Stats can exceed 1200, but have diminishing returns
+        foreach (['speed', 'stamina', 'power', 'guts', 'wit'] as $stat) {
+            if (isset($data[$stat])) {
+                if ($data[$stat] < 0) {
+                    $errors[] = ucfirst($stat) . " cannot be negative";
+                }
+                if ($data[$stat] > self::STAT_SOFT_CAP) {
+                    $warnings[] = ucfirst($stat) . " ({$data[$stat]}) exceeds soft cap of " . self::STAT_SOFT_CAP . " - diminishing returns apply";
+                }
+            }
+        }
+        
+        // Aptitude grade validation (G-S only, no SS)
+        $aptitudeFields = [
+            'distance_aptitude', 'surface_aptitude', 'style_aptitude',
+            'turf_aptitude', 'dirt_aptitude', 'sprint_aptitude',
+            'mile_aptitude', 'medium_aptitude', 'long_aptitude',
+            'front_runner_aptitude', 'pace_chaser_aptitude',
+            'late_surger_aptitude', 'end_closer_aptitude'
+        ];
+        foreach ($aptitudeFields as $field) {
+            if (isset($data[$field])) {
+                $grade = strtoupper(trim($data[$field]));
+                if ($grade === 'SS') {
+                    $warnings[] = "Aptitude grade 'SS' will be converted to 'S' (S is maximum in game)";
+                } elseif (!in_array($grade, self::VALID_APTITUDE_GRADES)) {
+                    $errors[] = "Invalid aptitude grade '{$data[$field]}' for {$field}. Valid grades: G, F, E, D, C, B, A, S";
+                }
+            }
+        }
+        
+        // Hint level validation (1-5 range per game mechanics)
+        if (isset($data['skills']) && is_array($data['skills'])) {
+            foreach ($data['skills'] as $index => $skill) {
+                if (isset($skill['hint_level'])) {
+                    $hintLevel = (int) $skill['hint_level'];
+                    if ($hintLevel < 0 || $hintLevel > 5) {
+                        $errors[] = "Skill at index {$index}: hint_level must be 0-5 (current: {$hintLevel})";
+                    }
+                }
+            }
+        }
+        
+        // Support card validation
+        if (isset($data['support_cards']) && is_array($data['support_cards'])) {
+            foreach ($data['support_cards'] as $index => $card) {
+                // Limit break validation (0-4 range)
+                if (isset($card['limit_break'])) {
+                    $lb = (int) $card['limit_break'];
+                    if ($lb < 0 || $lb > 4) {
+                        $errors[] = "Support card at index {$index}: limit_break must be 0-4 (current: {$lb})";
+                    }
+                }
+                
+                // Bond validation (0-100%)
+                if (isset($card['bond'])) {
+                    $bond = (int) $card['bond'];
+                    if ($bond < 0 || $bond > 100) {
+                        $errors[] = "Support card at index {$index}: bond must be 0-100% (current: {$bond})";
+                    }
+                }
+                
+                // Type validation
+                if (isset($card['type'])) {
+                    $type = ucfirst(strtolower(trim($card['type'])));
+                    if (!in_array($type, self::VALID_SUPPORT_CARD_TYPES)) {
+                        $errors[] = "Support card at index {$index}: invalid type '{$card['type']}'. Valid types: " . implode(', ', self::VALID_SUPPORT_CARD_TYPES);
+                    }
+                }
+            }
         }
         
         // Business rule validation
@@ -791,6 +1026,78 @@ class DataImportService
 }
 ```
 
+### 5.6 Game-Accurate Migration Rules (v2.2.0)
+
+**Verified against Global English Server, January 2026**
+
+#### Aptitude Grade Migration
+
+```json
+{
+  "migration_rule": "SS → S conversion",
+  "reason": "S is maximum aptitude grade in game; SS does not exist",
+  "valid_grades": ["G", "F", "E", "D", "C", "B", "A", "S"],
+  "example": {
+    "input": { "distance_aptitude": "SS" },
+    "output": { "distance_aptitude": "S" }
+  }
+}
+```
+
+#### Hint Level Migration (Legacy 2-Level → Current 5-Level)
+
+```json
+{
+  "migration_rule": "2-level to 5-level hint system",
+  "reason": "Game uses 5 hint levels with 10%/5% discount structure",
+  "discount_structure": {
+    "level_1": "10% discount",
+    "level_2": "20% discount (cumulative)",
+    "level_3": "30% discount (cumulative)",
+    "level_4": "35% discount (cumulative)",
+    "level_5": "40% discount (maximum)"
+  },
+  "legacy_mapping": {
+    "old_0_hints": "new_level_0 (0%)",
+    "old_1_hint": "new_level_2 (20%)",
+    "old_2_hints": "new_level_5 (40%)"
+  }
+}
+```
+
+#### Stat Soft Cap Handling
+
+```json
+{
+  "migration_rule": "Allow stats above 1200 with warning",
+  "reason": "Game allows stats above 1200 with diminishing returns (50% effectiveness)",
+  "soft_cap": 1200,
+  "behavior": {
+    "below_cap": "Full effectiveness",
+    "above_cap": "50% effectiveness for excess",
+    "example": "1500 stat = 1200 + (300 × 0.5) = 1350 effective"
+  }
+}
+```
+
+#### Support Card Migration
+
+```json
+{
+  "limit_break": {
+    "range": "0-4",
+    "display": "★ to ★★★★★",
+    "mlb": "4 limit breaks = maximum effectiveness"
+  },
+  "bond": {
+    "range": "0-100%",
+    "friendship_threshold": "80% (triggers Friendship Training)",
+    "rainbow_bond": "100% (maximum)"
+  },
+  "valid_types": ["Speed", "Stamina", "Power", "Guts", "Wit", "Friend"]
+}
+```
+
 ---
 
 ## 6. Error Handling
@@ -806,6 +1113,11 @@ class DataImportService
 | `MIG_005` | Value out of range | 422 | "Value for {field} must be between {min} and {max}" |
 | `MIG_006` | Duplicate detection failed | 500 | "Unable to check for duplicates" |
 | `MIG_007` | Import transaction failed | 500 | "Import failed. No changes were made." |
+| `MIG_008` | Invalid aptitude grade | 422 | "Invalid aptitude grade '{grade}'. Valid grades: G, F, E, D, C, B, A, S" |
+| `MIG_009` | Invalid hint level | 422 | "Hint level must be 0-5" |
+| `MIG_010` | Invalid support card type | 422 | "Invalid support card type. Valid types: Speed, Stamina, Power, Guts, Wit, Friend" |
+| `MIG_011` | Invalid limit break | 422 | "Limit break must be 0-4 (★ to ★★★★★)" |
+| `MIG_012` | Invalid bond percentage | 422 | "Bond percentage must be 0-100%" |
 
 ### 6.2 Error Recovery Flow
 
@@ -961,6 +1273,7 @@ flowchart TD
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server - added SS→S aptitude conversion rule, hint level migration (2→5 levels), stat soft cap handling, support card limit break validation, bond percentage normalization |
 | 2.0.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 implementation; added detailed sequence flows, format detection, transformation, validation, duplicate resolution, performance metrics, and aligned with current Laravel 12 architecture |
 | 1.0.0 | 2026-01-14 | Development Team | Initial draft |
 
@@ -988,4 +1301,4 @@ flowchart TD
 
 ---
 
-*This sequence diagram reflects the current implementation of the data migration workflow as of v2.0.0. For the most up-to-date information, refer to the source code in `app/Services/DataManagement/DataMigrationService.php`, `app/Services/DataManagement/DataImportService.php`, and related files.*
+*This sequence diagram reflects the current implementation of the data migration workflow as of v2.2.0. For the most up-to-date information, refer to the source code in `app/Services/DataManagement/DataMigrationService.php`, `app/Services/DataManagement/DataImportService.php`, and related files. Game mechanics verified against Global English Server (January 2026).*

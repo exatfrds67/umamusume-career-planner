@@ -24,9 +24,13 @@ class SkillController extends Controller
                 ->get();
         }
 
+        // Get pre-selected character from query parameter
+        $selectedCharacterId = $request->query('character');
+
         return view('skills.index', [
             'characters' => $characters,
             'isAdmin' => $isAdmin,
+            'selectedCharacterId' => $selectedCharacterId,
         ]);
     }
 }

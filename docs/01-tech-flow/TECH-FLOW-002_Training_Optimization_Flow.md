@@ -1,8 +1,8 @@
 # TECH-FLOW-002: Training Optimization - Technical Flow & Task Breakdown
 
-**Document Version**: 2.1.0  
-**Date**: January 24, 2026  
-**Status**: Current - Aligned with codebase v2.0.0
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
+**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
 
 **Source Specifications**:
 
@@ -293,13 +293,27 @@ class StatGainCalculator
     /**
      * Calculate base stat gains for a training facility
      * 
-     * Formula: Base Gain × Growth Rate × Mood Modifier × Condition Modifiers
+     * Game-Accurate Formula (Verified Jan 2026):
+     * Stat Gain = (Base + StatBonus)
+     *           × (1 + GrowthRate)
+     *           × (1 + MoodMultiplier × (1 + MoodEffect))
+     *           × (1 + TrainingEffect)
+     *           × (1 + 0.05 × NumSupportCards)
+     *           × FriendshipMultiplier
+     * 
+     * Key Mechanics:
+     * - Stats can exceed 1200 with diminishing returns (50% value above 1200)
+     * - Per training cap: +100 max gain (reduced to +50 if stat > 1200)
+     * - Facility upgrades: 4 trainings per level (max level 5)
+     * - Facility multipliers: L1=1.0×, L2=1.25×, L3=1.5×, L4=1.75×, L5=2.0×
      */
     public function calculateBaseGains(
         Character $character,
-        TrainingType $facility
+        TrainingType $facility,
+        int $facilityLevel = 1
     ): array {
         $baseGains = $this->getBaseGainsForFacility($facility);
+        $facilityMultiplier = $this->getFacilityMultiplier($facilityLevel);
         $growthRates = $this->getGrowthRates($character);
         $moodModifier = $this->getMoodModifier($character->mood_status);
         $conditionModifiers = $this->getConditionModifiers($character->conditions);
@@ -308,13 +322,36 @@ class StatGainCalculator
         foreach (['speed', 'stamina', 'power', 'guts', 'wit'] as $stat) {
             $base = $baseGains[$stat] ?? 0;
             $growth = $growthRates[$stat] ?? 1.0;
+            $currentStat = $character->current_stats[$stat] ?? 0;
             
-            $gains[$stat] = (int) round(
-                $base * $growth * $moodModifier * ($conditionModifiers[$stat] ?? 1.0)
+            // Calculate raw gain
+            $rawGain = (int) round(
+                $base * $facilityMultiplier * $growth * $moodModifier * ($conditionModifiers[$stat] ?? 1.0)
             );
+            
+            // Apply diminishing returns cap for stats above 1200
+            $maxGain = $currentStat > 1200 ? 50 : 100;
+            $gains[$stat] = min($rawGain, $maxGain);
         }
         
         return $gains;
+    }
+    
+    /**
+     * Get facility level multiplier
+     * 
+     * Facility upgrades require 4 trainings per level
+     */
+    private function getFacilityMultiplier(int $level): float
+    {
+        return match($level) {
+            1 => 1.00,
+            2 => 1.25,
+            3 => 1.50,
+            4 => 1.75,
+            5 => 2.00,
+            default => 1.00,
+        };
     }
     
     private function getBaseGainsForFacility(TrainingType $facility): array
@@ -359,14 +396,24 @@ class StatGainCalculator
         };
     }
     
+    /**
+     * Get mood modifier for training
+     * 
+     * Game-Accurate Mood Effects:
+     * - Great (絶好調): +20% training gains
+     * - Good (好調): +10% training gains
+     * - Normal (普通): 0% (baseline)
+     * - Bad (不調): -10% training gains
+     * - Awful (最悪): -20% training gains
+     */
     private function getMoodModifier(MoodStatus $mood): float
     {
         return match($mood) {
-            MoodStatus::Great => 1.04,
-            MoodStatus::Good => 1.02,
+            MoodStatus::Great => 1.20,
+            MoodStatus::Good => 1.10,
             MoodStatus::Normal => 1.00,
-            MoodStatus::Bad => 0.98,
-            MoodStatus::Awful => 0.96,
+            MoodStatus::Bad => 0.90,
+            MoodStatus::Awful => 0.80,
         };
     }
 }
@@ -495,7 +542,7 @@ class SkillHintProbabilityCalculator
                     'support_card_name' => $card->name,
                     'is_guaranteed' => $hintData['is_red_exclamation'],
                     'probability' => $hintData['is_red_exclamation'] ? 100 : 25,
-                    'discount_percentage' => 20, // Base discount per hint
+                    'discount_percentage' => $this->calculateHintDiscount($hintData['hint_level']), // Progressive discount per level
                 ];
             }
         }
@@ -520,7 +567,7 @@ class SkillHintProbabilityCalculator
 
 - Red exclamation identification (guaranteed hints)
 - Normal skill hint probability (25%)
-- Hint discount calculation (20% per hint, max 40%)
+- Hint discount calculation (5 levels: 10%/20%/30%/35%/40% max)
 - Support card skill mapping
 - Unit tests: 5 tests
 
@@ -1147,7 +1194,7 @@ erDiagram
 | `training_predictions` | `expires_at` INDEX | Query optimization |
 | `support_cards` | `limit_break_level` IN (0-4) | Valid LB range |
 | `support_cards` | `bond_level` BETWEEN 0 AND 100 | Percentage range |
-| `skill_hints` | `hint_count` <= 3 | Maximum hints per skill |
+| `skill_hints` | `hint_level` <= 5 | Maximum hint level per skill (40% max discount) |
 
 ---
 
@@ -1442,6 +1489,7 @@ class StatGainCalculatorTest extends TestCase
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: training formula with all multipliers, stats can exceed 1200 with diminishing returns (50% value above 1200), per-training cap +100 (reduced to +50 if stat > 1200), facility upgrades require 4 trainings per level |
 | 2.1.0 | 2026-01-24 | Development Team | Updated to v2.0.0 implementation standards; aligned with industry documentation guidelines; added comprehensive cross-references; enhanced code examples and diagrams |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with detailed specifications |
 | 1.0.0 | 2026-01-06 | Development Team | Initial draft |

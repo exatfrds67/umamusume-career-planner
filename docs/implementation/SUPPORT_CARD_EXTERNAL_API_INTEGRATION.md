@@ -242,7 +242,7 @@ Support Cards table includes:
 **Skill System:**
 
 - Skill hints from cards
-- SP cost reduction (20-40% per hint)
+- SP cost reduction (5 levels: 10%/20%/30%/35%/40% max)
 - Hint level tracking
 
 ## Card Type Inference Logic

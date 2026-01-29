@@ -14,34 +14,54 @@ use Illuminate\Support\Facades\DB;
  * Skill Management Service
  *
  * Handles skill evolution logic (Normal → Rare) and Hint Level discounts.
- * Implements 20% SP reduction per duplicate hint (40% max).
+ * Implements progressive hint discounts: Level 1=10%, 2=20%, 3=30%, 4=35%, 5=40% (max).
  *
  * Requirements: Task 3.2
  */
 class SkillService
 {
     /**
-     * Hint discount percentage per duplicate (20%)
+     * Progressive hint discount percentages by level
+     * Level 1-3: +10% each, Level 4-5: +5% each
+     *
+     * @var array<int, int>
      */
-    protected const HINT_DISCOUNT_PERCENT = 20;
+    protected const HINT_DISCOUNT_BY_LEVEL = [
+        1 => 10,  // 10% total
+        2 => 20,  // 20% total
+        3 => 30,  // 30% total
+        4 => 35,  // 35% total
+        5 => 40,  // 40% total (maximum)
+    ];
 
     /**
-     * Maximum hint discount (40% = 2 hints)
+     * Maximum hint level
+     */
+    protected const MAX_HINT_LEVEL = 5;
+
+    /**
+     * Maximum hint discount (40% at level 5)
      */
     protected const MAX_HINT_DISCOUNT = 40;
 
     /**
      * Calculate the final SP cost with hint discounts
      *
+     * Progressive discount: Level 1=10%, 2=20%, 3=30%, 4=35%, 5=40% (max)
+     *
      * @param  int  $baseCost  Base SP cost of the skill
-     * @param  int  $hintCount  Number of hint duplicates obtained
+     * @param  int  $hintCount  Number of hint levels obtained (1-5)
      * @return int Final SP cost after discount
      */
     public function calculateFinalCost(int $baseCost, int $hintCount): int
     {
-        // Maximum 2 hints effective (40% max discount)
-        $effectiveHints = min($hintCount, 2);
-        $discountPercent = $effectiveHints * self::HINT_DISCOUNT_PERCENT;
+        // Clamp hint count to valid range (0-5)
+        $effectiveHints = max(0, min($hintCount, self::MAX_HINT_LEVEL));
+
+        // Get discount percentage from lookup table
+        $discountPercent = $effectiveHints > 0
+            ? self::HINT_DISCOUNT_BY_LEVEL[$effectiveHints]
+            : 0;
 
         // Calculate discounted cost
         $discount = (int) (($baseCost * $discountPercent) / 100);
@@ -50,13 +70,18 @@ class SkillService
     }
 
     /**
-     * Get discount percentage for a given hint count
+     * Get discount percentage for a given hint level
+     *
+     * @param  int  $hintCount  Hint level (1-5)
+     * @return float Discount percentage (10-40%)
      */
     public function getDiscountPercentage(int $hintCount): float
     {
-        $effectiveHints = min($hintCount, 2);
+        $effectiveHints = max(0, min($hintCount, self::MAX_HINT_LEVEL));
 
-        return (float) ($effectiveHints * self::HINT_DISCOUNT_PERCENT);
+        return $effectiveHints > 0
+            ? (float) self::HINT_DISCOUNT_BY_LEVEL[$effectiveHints]
+            : 0.0;
     }
 
     /**

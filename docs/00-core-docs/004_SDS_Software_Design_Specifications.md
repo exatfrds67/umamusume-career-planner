@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.1.0
-**Date**: January 23, 2026
+**Document Version**: 2.2.0
+**Date**: January 28, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned to codebase
+**Status**: Current - Aligned to codebase v2.2.0 and game-accurate mechanics
 
 ---
 
@@ -408,15 +408,14 @@ classDiagram
     
     class AptitudeGrade {
         <<enumeration>>
-        SS : 120%
-        S : 110%
-        A : 100%
-        B : 90%
-        C : 80%
-        D : 70%
-        E : 60%
-        F : 50%
-        G : 40%
+        S : +5% (max)
+        A : 0% (baseline)
+        B : -10%
+        C : -20%
+        D : -30%/-40%
+        E : -50%/-60%
+        F : -70%/-80%
+        G : -90%
         +effectiveness() int
     }
     

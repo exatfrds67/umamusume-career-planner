@@ -174,7 +174,7 @@ This document breaks down all 59 requirements into specific implementation tasks
   - Character model with all attributes
   - CRUD operations for character management
   - Stat tracking (0-1200 range) with validation
-  - Aptitude management (G-SS grades)
+  - Aptitude management (G-S grades, S is maximum)
   - Goal setting and progress tracking
 - **Implementation**: Character model, CharacterController, validation rules
 
@@ -213,7 +213,7 @@ This document breaks down all 59 requirements into specific implementation tasks
 - **Requirements**: REQ-3.4.1, REQ-3.4.2, REQ-3.4.3, REQ-3.4.4
 - **Acceptance Criteria**:
   - Complete skill database (Normal/Rare/Unique)
-  - Hint system with cost reduction (20% per duplicate, 40% max)
+  - Hint system with cost reduction (5 levels: 10%/20%/30%/35%/40% max)
   - Skill evolution chains (Normal → Rare)
   - SP optimization engine
 - **Implementation**: SkillService, HintTracker, SkillEvolutionService

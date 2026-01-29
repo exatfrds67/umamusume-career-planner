@@ -1,8 +1,8 @@
 # TECH-FLOW-001: Character Management - Technical Flow & Task Breakdown
 
-**Document Version**: 2.1.0  
-**Date**: January 24, 2026  
-**Status**: Current - Aligned with codebase v2.0.0
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
+**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
 
 **Source Specifications**:
 
@@ -327,18 +327,24 @@ class Character extends Model
     }
 
     // Accessors
+    /**
+     * Get grade for a stat value
+     * 
+     * Game-accurate grades: G→F→E→D→C→B→A→S (S is maximum)
+     * Stats can exceed 1200 with diminishing returns
+     */
     public function getGradeForStat(string $stat): string
     {
         $value = $this->current_stats[$stat] ?? 0;
         return match(true) {
-            $value >= 1100 => 'SS',
-            $value >= 950 => 'S',
-            $value >= 850 => 'A',
-            $value >= 750 => 'B+',
-            $value >= 650 => 'B',
-            $value >= 550 => 'C+',
-            $value >= 450 => 'C',
-            default => 'D'
+            $value >= 1200 => 'S',   // Maximum grade (stats can exceed 1200)
+            $value >= 1000 => 'A',
+            $value >= 800 => 'B',
+            $value >= 600 => 'C',
+            $value >= 400 => 'D',
+            $value >= 200 => 'E',
+            $value >= 100 => 'F',
+            default => 'G'
         };
     }
 }
@@ -1230,7 +1236,7 @@ pie title Test Distribution
 | Test Case | Type | Priority | Status |
 |-----------|------|----------|--------|
 | Character creation with inheritance | Integration | P0 | ✅ Pass |
-| Stat validation (0-1200 range) | Unit | P0 | ✅ Pass |
+| Stat validation (0-1200+ range with diminishing returns) | Unit | P0 | ✅ Pass |
 | Factor calculation (6 factors) | Unit | P0 | ✅ Pass |
 | Goal progress tracking | Unit | P0 | ✅ Pass |
 | Aptitude grade calculation | Unit | P0 | ✅ Pass |
@@ -1300,6 +1306,7 @@ pie title Test Distribution
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.2.0 | 2026-01-28 | Development Team | Game-accurate mechanics: aptitude grades G→S (S max, no SS), stats can exceed 1200 with diminishing returns |
 | 2.1.0 | 2026-01-24 | Development Team | Updated to v2.0.0 implementation standards; aligned with industry documentation guidelines; added comprehensive cross-references |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with detailed specifications |
 | 1.0.0 | 2026-01-06 | Development Team | Initial draft |

@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.1.0
-**Date**: January 24, 2026
+**Document Version**: 2.2.0
+**Date**: January 28, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned with codebase v2.0.0
+**Status**: Current - Updated with verified game mechanics from Global English Server
 
 ---
 
@@ -87,9 +87,9 @@ flowchart TD
     RivalCompare --> CalcStatDelta[Calculate Stat Differentials]
     
     CalcStatDelta --> ApplyAptitude[Apply Aptitude Modifiers]
-    ApplyAptitude -->|Distance| DistMod
-    ApplyAptitude -->|Surface| SurfMod
-    ApplyAptitude -->|Style| StyleMod
+    ApplyAptitude -->|Distance| DistMod[Distance Aptitude (G-S)]
+    ApplyAptitude -->|Surface| SurfMod[Surface Aptitude (G-S)]
+    ApplyAptitude -->|Style| StyleMod[Running Style Aptitude (G-S)]
     
     DistMod --> BaseScore
     SurfMod --> BaseScore
@@ -144,7 +144,77 @@ flowchart TD
 
 ---
 
-## 5. Competitor Generation Flow
+## 6. Track Condition & Weather Impact Flow
+
+Logic for calculating track condition modifiers based on weather and ground state.
+
+```mermaid
+flowchart TD
+    Start([Check Track Conditions]) --> GetWeather[Get Current Weather]
+    
+    GetWeather --> DetermineGround{Ground Condition}
+    
+    DetermineGround -->|Good| NoMod[No Modifier (100%)]
+    DetermineGround -->|Slightly Heavy| SlightMod[Slight Penalty (-2%)]
+    DetermineGround -->|Heavy| HeavyMod[Heavy Penalty (-5%)]
+    DetermineGround -->|Bad| BadMod[Severe Penalty (-10%)]
+    
+    NoMod --> CheckAptitude[Check Surface Aptitude]
+    SlightMod --> CheckAptitude
+    HeavyMod --> CheckAptitude
+    BadMod --> CheckAptitude
+    
+    CheckAptitude --> ApplyAptMod{Aptitude Grade}
+    
+    ApplyAptMod -->|S| BestMod[Minimal Impact]
+    ApplyAptMod -->|A| GoodMod[Low Impact]
+    ApplyAptMod -->|B-C| MedMod[Moderate Impact]
+    ApplyAptMod -->|D-G| PoorMod[High Impact]
+    
+    BestMod --> FinalCalc[Calculate Final Performance]
+    GoodMod --> FinalCalc
+    MedMod --> FinalCalc
+    PoorMod --> FinalCalc
+```
+
+### 6.1 Track Condition Reference (Game-Accurate)
+
+| Condition | Power Penalty (Turf) | Power Penalty (Dirt) | Speed Penalty | Stamina Drain |
+|-----------|---------------------|---------------------|---------------|---------------|
+| Firm      | None                | None                | None          | Normal        |
+| Good      | -50                 | -50                 | None          | Normal        |
+| Soft      | -50                 | -100                | None          | +2%/sec       |
+| Heavy     | -50                 | -100                | -50           | +2%/sec       |
+
+### 6.2 Aptitude Grade Scale (Game-Accurate)
+
+- **S**: Maximum grade (best performance, +5% to +10% bonus)
+- **A**: Baseline (0% modifier)
+- **B**: Good (-10% to -15%)
+- **C**: Average (-20% to -25%)
+- **D**: Below Average (-30% to -40%)
+- **E**: Poor (-50% to -60%)
+- **F**: Very Poor (-70% to -80%)
+- **G**: Minimum grade (worst performance, -90%)
+
+**Note**: SS grade does not exist in the game. S is the maximum aptitude rating.
+
+### 6.3 Aptitude Modifiers by Category
+
+| Grade | Surface (Power) | Distance (Speed) | Style (Wit) |
+|-------|-----------------|------------------|-------------|
+| S     | +5%             | +5%              | +10%        |
+| A     | 0%              | 0%               | 0%          |
+| B     | -10%            | -10%             | -15%        |
+| C     | -20%            | -20%             | -25%        |
+| D     | -30%            | -40%             | -40%        |
+| E     | -50%            | -60%             | -60%        |
+| F     | -70%            | -80%             | -80%        |
+| G     | -90%            | -90%             | -90%        |
+
+---
+
+## 7. Competitor Generation Flow
 
 Logic for generating realistic rivals for race simulations based on the race grade and current scenario.
 
@@ -173,10 +243,11 @@ flowchart TD
 
 ## Document Control
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 2.1.0 | 2026-01-24 | Development Team | Updated to align with v2.0.0 codebase, Neuron AI agents, and Service layer architecture |
-| 1.0.0 | 2026-01-14 | Development Team | Initial flow definitions |
+| Version | Date       | Author           | Changes |
+|---------|------------|------------------|---------|
+| 2.2.0   | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: Added game-accurate track condition modifiers (Firm/Good/Soft/Heavy with Power/Speed/Stamina penalties), aptitude grade maximum is S (no SS), complete aptitude modifier tables by category (Surface/Distance/Style) |
+| 2.1.0   | 2026-01-24 | Development Team | Updated to align with v2.0.0 codebase, Neuron AI agents, and Service layer architecture |
+| 1.0.0   | 2026-01-14 | Development Team | Initial flow definitions |
 
 ---
 

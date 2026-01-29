@@ -55,18 +55,9 @@
             @foreach ($statConfig as $key => $config)
                 @php
                     $value = $stats[$key] ?? 0;
-                    $grade = $getGrade($value);
                 @endphp
-                <div>
-                    <div class="flex items-center justify-between mb-1">
-                        <div class="flex items-center gap-2 flex-1">
-                            <span class="text-sm text-gray-500 dark:text-gray-400 w-16">{{ $config['label'] }}</span>
-                            <x-ui.grade-badge :grade="$grade" />
-                        </div>
-                        <span class="text-sm font-semibold text-gray-900 dark:text-white">({{ $value }})</span>
-                    </div>
-                    <x-ui.stat-bar :type="$config['type']" :value="$value" :max="1200" :showValue="false" />
-                </div>
+                <x-stat-bar :stat="$key" :current="$value" :max="2000" show-icon show-percentage
+                    show-soft-cap />
             @endforeach
         </div>
 

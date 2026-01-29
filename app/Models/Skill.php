@@ -145,15 +145,17 @@ class Skill extends Model
 
     /**
      * Calculate the final SP cost with hint discounts.
+     *
+     * VERIFIED (Jan 2026): Progressive discount rates:
+     * - 1 hint: 10% discount
+     * - 2 hints: 20% discount
+     * - 3 hints: 30% discount
+     * - 4 hints: 35% discount
+     * - 5+ hints: 40% discount (MAXIMUM)
      */
     public function calculateFinalCost(int $hintCount): int
     {
-        // Maximum 40% discount (2 hints)
-        $maxHints = 2;
-        $effectiveHints = min($hintCount, $maxHints);
-
-        // 20% discount per hint
-        $discountPercentage = $effectiveHints * 20;
+        $discountPercentage = $this->getDiscountPercentage($hintCount);
 
         // Calculate final cost
         $discount = ($this->base_sp_cost * $discountPercentage) / 100;
@@ -163,13 +165,22 @@ class Skill extends Model
 
     /**
      * Get the discount percentage for a given number of hints.
+     *
+     * VERIFIED (Jan 2026): Levels 1-3 provide 10% each, levels 4-5 provide 5% each.
      */
     public function getDiscountPercentage(int $hintCount): float
     {
-        $maxHints = 2;
+        $maxHints = 5;
         $effectiveHints = min($hintCount, $maxHints);
 
-        return $effectiveHints * 20.0;
+        return match ($effectiveHints) {
+            1 => 10.0,  // 10%
+            2 => 20.0,  // 20% (cumulative)
+            3 => 30.0,  // 30% (cumulative)
+            4 => 35.0,  // 35% (cumulative, +5%)
+            5 => 40.0,  // 40% max (cumulative, +5%)
+            default => 0.0,
+        };
     }
 
     /**

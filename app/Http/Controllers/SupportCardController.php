@@ -76,7 +76,7 @@ class SupportCardController extends Controller
             }
         }
 
-        $cards = $query->paginate(24);
+        $cards = $query->paginate(24)->withQueryString();
 
         // Get filter options
         $cardTypes = ['speed', 'stamina', 'power', 'guts', 'wit', 'friend'];

@@ -32,7 +32,7 @@ return new class extends Migration
             $table->boolean('friendship_training')->default(false)->comment('Whether this was friendship training');
 
             // Hint value and usage
-            $table->decimal('discount_percentage', 5, 2)->default(20.00)->comment('SP cost discount percentage (20% per hint)');
+            $table->decimal('discount_percentage', 5, 2)->default(10.00)->comment('SP cost discount percentage (progressive: 10%/20%/30%/35%/40% max at 5 hints)');
             $table->boolean('is_used')->default(false)->comment('Whether hint has been used for skill acquisition');
             $table->timestamp('used_at')->nullable()->comment('When the hint was used');
 

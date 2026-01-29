@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.0.0  
-**Date**: January 24, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-003], [SPEC-003], [FLOW-003], [TECH-FLOW-003]
 
 ---
@@ -352,15 +352,15 @@ class ReadinessCalculator
     
     private function aptitudeToScore(string $grade): float
     {
+        // Game-accurate aptitude scale: G→F→E→D→C→B→A→S (S is maximum, NO SS)
         return match ($grade) {
-            'SS' => 100,
-            'S' => 90,
-            'A' => 80,
-            'B' => 65,
-            'C' => 50,
-            'D' => 35,
-            'E' => 20,
-            'F' => 10,
+            'S' => 100,  // Maximum grade
+            'A' => 85,
+            'B' => 70,
+            'C' => 55,
+            'D' => 40,
+            'E' => 25,
+            'F' => 15,
             'G' => 5,
             default => 0,
         };
@@ -528,16 +528,16 @@ class WinProbabilityCalculator
     
     private function aptitudeToMultiplier(string $grade): float
     {
+        // Game-accurate aptitude scale: G→F→E→D→C→B→A→S (S is maximum, NO SS)
         return match ($grade) {
-            'SS' => 1.20,
-            'S' => 1.10,
-            'A' => 1.00,
-            'B' => 0.90,
-            'C' => 0.80,
-            'D' => 0.70,
-            'E' => 0.60,
-            'F' => 0.50,
-            'G' => 0.40,
+            'S' => 1.15,   // Maximum grade
+            'A' => 1.05,
+            'B' => 0.95,
+            'C' => 0.85,
+            'D' => 0.75,
+            'E' => 0.65,
+            'F' => 0.55,
+            'G' => 0.45,
             default => 0.80,
         };
     }

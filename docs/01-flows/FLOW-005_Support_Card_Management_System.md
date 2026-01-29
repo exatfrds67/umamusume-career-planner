@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0
-**Date**: January 27, 2026
+**Document Version**: 2.2.1
+**Date**: January 28, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned with codebase v2.0.0 + January 2026 deck management enhancements
+**Status**: Current - Updated with verified game mechanics from Global English Server
 
 ---
 
@@ -74,7 +74,7 @@ flowchart TD
 
 ---
 
-## 3. Bond Progression & Training Flow
+## 3. Bond Progression & Training Flow (Game-Accurate)
 
 How support card bonds are tracked and utilized during the training loop.
 
@@ -83,9 +83,13 @@ flowchart TD
     Start([Training Session]) --> LoadDeck[Load Active Deck]
     
     LoadDeck --> Identify[Identify Participants]
-    Identify --> AddBond[Add Bond Points (+3 Base)]
+    Identify --> CheckCharming{Charming Condition?}
     
-    AddBond --> CheckMilestone{Check Milestones}
+    CheckCharming -->|Yes| AddBondCharming[Add Bond Points (+9)]
+    CheckCharming -->|No| AddBondBase[Add Bond Points (+7)]
+    
+    AddBondCharming --> CheckMilestone{Check Milestones}
+    AddBondBase --> CheckMilestone
     
     CheckMilestone -->|20%| StatBonus[Apply Small Stat Bonus]
     CheckMilestone -->|40%| HintUnlock[Unlock Skill Hint]
@@ -101,6 +105,30 @@ flowchart TD
     
     UpdateState --> Persist[Persist Bond Levels]
 ```
+
+### 3.1 Bond Gain Values (Game-Accurate)
+
+| Condition | Bond Gain per Training |
+|-----------|------------------------|
+| Normal    | +7                     |
+| Charming  | +9                     |
+
+### 3.2 Friendship Training Mechanics
+
+| Threshold | Effect |
+|-----------|--------|
+| **80%** (Friendship Threshold) | Unlocks Friendship Training bonus |
+
+### 3.3 Friendship Training Bonus by Card Rarity
+
+| Card Rarity | Friendship Bonus |
+|-------------|------------------|
+| R           | +10%             |
+| SR          | +15%             |
+| SSR (0 LB)  | +20%             |
+| SSR (1 LB)  | +25%             |
+| SSR (2 LB)  | +30%             |
+| SSR (3+ LB) | +35% (max)       |
 
 ---
 
@@ -277,11 +305,12 @@ Support cards now track external data sources:
 
 ## Document Control
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 2.2.0 | 2026-01-27 | Development Team | Added §8 Support Deck Persistence Flow with new tables and external sync |
-| 2.1.0 | 2026-01-24 | Development Team | Updated to align with v2.0.0 codebase, External API sync, and Service layer architecture |
-| 1.0.0 | 2026-01-14 | Development Team | Initial flow definitions |
+| Version | Date       | Author           | Changes |
+|---------|------------|------------------|---------|
+| 2.2.1   | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: Bond gain corrected (+7 base, +9 with Charming condition), friendship threshold confirmed at 80%, friendship bonus table by card rarity (10-35%), skill hint mechanics alignment |
+| 2.2.0   | 2026-01-27 | Development Team | Added §8 Support Deck Persistence Flow with new tables and external sync |
+| 2.1.0   | 2026-01-24 | Development Team | Updated to align with v2.0.0 codebase, External API sync, and Service layer architecture |
+| 1.0.0   | 2026-01-14 | Development Team | Initial flow definitions |
 
 ---
 

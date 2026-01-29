@@ -1,10 +1,10 @@
 # Umamusume Career Planner - Decision Tree Flow Diagrams
 
 **Document Version**: 2.2.0  
-**Date**: January 27, 2026  
+**Date**: January 28, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.2.0
+**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
 
 ---
 
@@ -47,7 +47,7 @@ The decision trees documented here represent the core optimization logic impleme
 | **Running Style** | Front, Pace, Late, End (official Global EN labels) |
 | **Guts** | Position holding and navigation stat |
 | **Wit** | Kakari avoidance and skill activation stat |
-| **Skill Hints** | 20% discount per hint, 40% maximum (not 60%) |
+| **Skill Hints** | 5 levels: 10%/20%/30%/35%/40% discount (40% maximum) |
 | **Support Deck** | Exactly 6 cards (5 owned + 1 borrowed) |
 | **Turn Range** | 1-78 (Junior 1-24, Classic 25-48, Senior 49-72, URA 73-78) |
 

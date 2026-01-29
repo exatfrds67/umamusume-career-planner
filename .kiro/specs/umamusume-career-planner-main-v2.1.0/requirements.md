@@ -252,11 +252,11 @@ For complete terminology definitions, refer to [000_MASTER_GLOSSARY.md](../../do
 | **Uma Musume** | Horse girl characters that players train in the game |
 | **Career Run / Plan** | A single career mode progression tracking a character's training |
 | **Stats** | Five core attributes: Speed (0-1200), Stamina (0-1200), Power (0-1200), Guts (0-1200), Wit (0-1200) |
-| **Aptitudes** | Fixed talent ratings (G through SS) for distance, surface, and running style |
+| **Aptitudes** | Fixed talent ratings (G through S, S is maximum) for distance, surface, and running style |
 | **Factors** | Inherited traits from parent characters providing stat/aptitude bonuses |
 | **Growth Rates** | Inherited bonuses (+10%, +20%, +30%) multiplying training effectiveness |
 | **Skill Points (SP)** | Currency earned from races/events, spent to acquire skills |
-| **Skill Hints** | Unlocked opportunities reducing SP cost by 20% per hint (40% max) |
+| **Skill Hints** | Unlocked opportunities reducing SP cost progressively (5 levels: 10%/20%/30%/35%/40% max) |
 | **Support Cards** | Cards providing bonuses and events during training (6-card deck) |
 | **Bond Level** | Friendship level with support cards (0-100%) |
 
@@ -387,7 +387,7 @@ For complete terminology definitions, refer to [000_MASTER_GLOSSARY.md](../../do
 | FR-02.3 | System SHALL track energy (0-100), mood (5 levels), and current turn (1-78) | P0 | ✅ | 90% | `Character` model fields |
 | FR-02.4 | System SHALL manage character goals with progress tracking | P1 | ✅ | 87% | JSON field + validation |
 | FR-02.5 | System SHALL support scenario selection (URA, Grand Masters, etc.) | P0 | ✅ | 88% | Enum field |
-| FR-02.6 | System SHALL track aptitude grades (SS-G) for distance/surface/style | P0 | ✅ | 90% | `AptitudeGrade` enum, SPEC-001 §4.1 |
+| FR-02.6 | System SHALL track aptitude grades (G through S, S is maximum) for distance/surface/style | P0 | ✅ | 90% | `AptitudeGrade` enum, SPEC-001 §4.1 |
 | FR-02.7 | System SHALL manage factor inheritance from parent characters | P0 | ✅ | 89% | `FactorInheritanceService`, SPEC-001 §4.3 |
 | FR-02.8 | System SHALL support character image upload with validation | P1 | ✅ | 92% | `ImageUploadService`, SPEC-001 §3.2 |
 | FR-02.9 | System SHALL track conditions (positive/negative status effects) | P1 | ✅ | 85% | JSON field |
@@ -406,14 +406,14 @@ For complete terminology definitions, refer to [000_MASTER_GLOSSARY.md](../../do
 
 - WHEN character stats are updated
 - THEN the system SHALL enforce range validation (0-1200 hard cap)
-- AND calculate stat grades (G+ through SS)
+- AND calculate stat grades (G through S)
 - AND update stat progress history
 - AND trigger any dependent calculations (race readiness, etc.)
 
 **AC-02.3: Aptitude Management**
 
 - WHEN character aptitudes are set or updated
-- THEN the system SHALL validate grade values (G through SS)
+- THEN the system SHALL validate grade values (G through S, S is maximum)
 - AND store aptitudes for all categories (distance, surface, style)
 - AND use aptitudes in race suitability calculations
 - AND display aptitudes with appropriate visual indicators
@@ -614,7 +614,7 @@ For complete terminology definitions, refer to [000_MASTER_GLOSSARY.md](../../do
 |----|-------------|----------|--------|---------------|----------|
 | FR-05.1 | System SHALL maintain skill catalog with 150+ skills (Normal, Rare, Unique) | P0 | ✅ | 93% | `Skill` model, SPEC-004 §3.1 |
 | FR-05.2 | System SHALL track skill acquisitions per character | P0 | ✅ | 92% | `SkillCareerRun` model |
-| FR-05.3 | System SHALL track hints and apply SP cost reduction (20% per hint, 40% max) | P0 | ✅ | 91% | `calculateSpCost()`, SPEC-004 §4.1 |
+| FR-05.3 | System SHALL track hints and apply SP cost reduction (5 levels: 10%/20%/30%/35%/40% max) | P0 | ✅ | 91% | `calculateSpCost()`, SPEC-004 §4.1 |
 | FR-05.4 | System SHALL support skill evolution paths (Normal → Rare) | P1 | ✅ | 88% | `SkillEvolutionService`, SPEC-004 §4.2 |
 | FR-05.5 | System SHALL provide AI skill build recommendations | P1 | ✅ | 85% | `SkillAdvisorAgent` |
 | FR-05.6 | System SHALL calculate SP budget optimization | P1 | ✅ | 87% | SP optimizer |
@@ -635,7 +635,7 @@ For complete terminology definitions, refer to [000_MASTER_GLOSSARY.md](../../do
 
 - WHEN a user acquires a skill
 - THEN the system SHALL validate SP availability
-- AND apply hint discounts (20% per hint, 40% max)
+- AND apply hint discounts (5 levels: 10%/20%/30%/35%/40% max)
 - AND deduct final SP cost from character balance
 - AND record acquisition with turn number
 - AND update skill status to "Acquired"
@@ -645,7 +645,7 @@ For complete terminology definitions, refer to [000_MASTER_GLOSSARY.md](../../do
 
 - WHEN a skill hint is obtained
 - THEN the system SHALL record hint source (training facility, event, etc.)
-- AND increment hint level (max 2 for 40% discount)
+- AND increment hint level (max 5 levels: 10%/20%/30%/35%/40% discount)
 - AND update SP cost calculation
 - AND display hint indicator in skill shop
 
@@ -1907,7 +1907,7 @@ erDiagram
 | skill.turn_acquired | Required if status=acquired, 1-78 | "Turn number required for acquired skills" | Conditional validation |
 | energy | Integer, 0-100 | "Energy must be between 0 and 100" | Range validation |
 | support_deck | Exactly 6 cards | "Deck must contain exactly 6 cards" | Custom validation |
-| aptitude | Enum: G through SS | "Invalid aptitude grade" | Enum validation |
+| aptitude | Enum: G through S (S is max) | "Invalid aptitude grade" | Enum validation |
 | mood | Enum: Awful, Bad, Normal, Good, Great | "Invalid mood value" | Enum validation |
 
 **Related Artifacts:**
@@ -2434,7 +2434,7 @@ For complete terminology, see [000_MASTER_GLOSSARY.md](../../docs/00-core-docs/0
 
 - **Career Run / Plan**: A single career mode progression
 - **Stats**: Speed, Stamina, Power, Guts, Wit (0-1200 range)
-- **Aptitudes**: Fixed talent ratings (G through SS)
+- **Aptitudes**: Fixed talent ratings (G through S, S is maximum)
 - **Factors**: Inherited traits from parent characters
 - **SP (Skill Points)**: Currency for acquiring skills
 - **Local Mode**: Browser localStorage-based storage

@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.1.0
-**Date**: January 24, 2026
+**Document Version**: 2.2.0
+**Date**: January 28, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned with codebase v2.0.0
+**Status**: Current - Updated with verified game mechanics from Global English Server
 
 ---
 
@@ -252,12 +252,66 @@ flowchart TD
 
 ---
 
+## 8. Game Mechanics Reference for AI Agents
+
+This section documents the verified game mechanics that AI agents must use when generating recommendations.
+
+### 8.1 Skill Hint Discounts
+
+| Hint Level | Discount |
+|------------|----------|
+| 0          | 0%       |
+| 1          | 10%      |
+| 2          | 20%      |
+| 3          | 30%      |
+| 4          | 35%      |
+| 5 (max)    | 40%      |
+
+**Additional**: Fast Learner condition adds +10% (stacks, max 50% total)
+
+### 8.2 Aptitude Grade Modifiers
+
+| Grade | Surface (Power) | Distance (Speed) | Style (Wit) |
+|-------|-----------------|------------------|-------------|
+| S     | +5%             | +5%              | +10%        |
+| A     | 0%              | 0%               | 0%          |
+| B     | -10%            | -10%             | -15%        |
+| C     | -20%            | -20%             | -25%        |
+| D     | -30%            | -40%             | -40%        |
+| E     | -50%            | -60%             | -60%        |
+| F     | -70%            | -80%             | -80%        |
+| G     | -90%            | -90%             | -90%        |
+
+### 8.3 Track Conditions
+
+| Condition | Power (Turf) | Power (Dirt) | Speed | Stamina Drain |
+|-----------|--------------|--------------|-------|---------------|
+| Firm      | 0            | 0            | 0     | Normal        |
+| Good      | -50          | -50          | 0     | Normal        |
+| Soft      | -50          | -100         | 0     | +2%/sec       |
+| Heavy     | -50          | -100         | -50   | +2%/sec       |
+
+### 8.4 Training Formula
+
+```
+Stat Gain = (Base + StatBonus) × (1 + GrowthRate) × (1 + MoodMultiplier × (1 + MoodEffect)) × (1 + TrainingEffect) × (1 + 0.05 × NumSupportCards) × FriendshipMultiplier
+```
+
+### 8.5 Stat Caps
+
+- **Base Cap**: 1200
+- **Per-Training Cap**: +100 (normal), +50 (above 1200)
+- **Overflow**: Stats above 1200 gain at half rate
+
+---
+
 ## Document Control
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 2.1.0 | 2026-01-24 | Development Team | Updated to align with v2.0.0 architecture: Hybrid AI, Neuron Agents, and MCP integration |
-| 1.0.0 | 2026-01-14 | Development Team | Initial flow definitions |
+| Version | Date       | Author           | Changes |
+|---------|------------|------------------|---------|
+| 2.2.0   | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: AI recommendations now use correct hint discount rates (10%/20%/30%/35%/40%), aptitude calculations use S as max grade, training formula integration, track condition modifiers (Firm/Good/Soft/Heavy) |
+| 2.1.0   | 2026-01-24 | Development Team | Updated to align with v2.0.0 architecture: Hybrid AI, Neuron Agents, and MCP integration |
+| 1.0.0   | 2026-01-14 | Development Team | Initial flow definitions |
 
 ---
 

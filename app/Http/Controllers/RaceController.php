@@ -15,6 +15,9 @@ class RaceController extends Controller
     {
         $query = \App\Models\Race::query();
 
+        // Get pre-selected character from query parameter
+        $selectedCharacterId = $request->query('character');
+
         // Filter by grade
         if ($request->filled('grade')) {
             $query->where('race_grade', $request->input('grade'));
@@ -37,7 +40,10 @@ class RaceController extends Controller
 
         $races = $query->with(['character'])->latest('turn_number')->paginate(20)->withQueryString();
 
-        return view('races.index', compact('races'));
+        return view('races.index', [
+            'races' => $races,
+            'selectedCharacterId' => $selectedCharacterId,
+        ]);
     }
 
     /**

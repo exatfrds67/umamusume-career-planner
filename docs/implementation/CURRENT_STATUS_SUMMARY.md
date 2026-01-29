@@ -144,8 +144,8 @@ GET  /api/training/{character}/deck
 
 ### Skill Hint System
 
-- ✅ 20% SP discount per hint (max 40%)
-- ✅ Hint level tracking (0-2)
+- ✅ Progressive SP discount (5 levels: 10%/20%/30%/35%/40% max)
+- ✅ Hint level tracking (0-5)
 - ✅ Hint source tracking
 - ✅ Hint probability calculation
 

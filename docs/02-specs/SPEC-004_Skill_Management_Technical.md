@@ -1,9 +1,9 @@
 # SPEC-004: Skill Management System - Technical Specification
 
 **Document Version**: 2.2.0  
-**Date**: 2026-01-27  
+**Date**: 2026-01-28  
 **Project**: Umamusume Pretty Derby Career Planner  
-**Status**: Active - Updated with January 2026 schema enhancements  
+**Status**: Active - Updated with game-accurate 5-level hint system  
 **Classification**: Internal - Development Team
 
 ---
@@ -14,9 +14,9 @@
 |-----------|-------|
 | **Document ID** | SPEC-004 |
 | **Related PRD** | [PRD-004: Skill Management](../prds/PRD-004_Skill_Management.md) |
-| **Architecture Version** | v2.0.0 |
+| **Architecture Version** | v2.2.0 |
 | **Approval Status** | Approved |
-| **Last Reviewed** | 2026-01-24 |
+| **Last Reviewed** | 2026-01-28 |
 
 ### Related Documents
 
@@ -87,8 +87,8 @@ In Umamusume Pretty Derby, skills provide conditional performance boosts during 
 
 **Skill Economics**:
 
-- SP Cost: Base cost reduced by hint levels
-- Hint Sources: Training events, support cards, race rewards
+- SP Cost: Base cost reduced by hint levels (max 40% at level 5)
+- Hint Sources: Training events, support cards, race rewards, Fast Learner condition, Skill Sparks, Hint Books
 - Evolution: Normal → Rare upgrades at discounted cost
 
 Strategic skill acquisition directly impacts race performance and career success.
@@ -98,8 +98,8 @@ Strategic skill acquisition directly impacts race performance and career success
 **In Scope**:
 
 - Skill catalog database with external sync
-- Hint tracking with 5-level progression system
-- SP cost calculation engine
+- Hint tracking with 5-level progression system (10%/20%/30%/35%/40%)
+- SP cost calculation engine with game-accurate discounts
 - Acquisition workflow with validation
 - Evolution logic with prerequisite checking
 - SP budget optimization algorithms
@@ -593,11 +593,25 @@ use Illuminate\Database\Eloquent\Model;
  * 
  * Tracks hint levels that reduce skill acquisition costs.
  * 
+ * Game-Accurate Hint System (5 levels):
+ * - Level 1: 10% discount
+ * - Level 2: 20% discount
+ * - Level 3: 30% discount
+ * - Level 4: 35% discount
+ * - Level 5: 40% discount (MAXIMUM)
+ * 
+ * Levels 1-3 provide 10% each, levels 4-5 provide 5% each.
+ * 
+ * Additional Discount Sources:
+ * - "Fast Learner" condition
+ * - Skill Sparks
+ * - Hint Books
+ * 
  * @property int $id
  * @property int $character_id
  * @property int $skill_id
  * @property int $level Hint level (1-5)
- * @property string $source_type 'training', 'event', 'race', 'support_card'
+ * @property string $source_type 'training', 'event', 'race', 'support_card', 'fast_learner', 'skill_spark', 'hint_book'
  * @property int|null $source_id
  * @property \Carbon\Carbon $created_at
  */
@@ -641,21 +655,40 @@ class SkillHint extends Model
 
     // Business Methods
 
+    /**
+     * Increase hint level (max 5)
+     */
     public function increaseLevel(int $amount = 1): void
     {
         $this->level = min(5, $this->level + $amount);
     }
 
+    /**
+     * Get discount percentage based on hint level
+     * 
+     * Game-accurate progression:
+     * - Levels 1-3: +10% each (10%, 20%, 30%)
+     * - Levels 4-5: +5% each (35%, 40%)
+     * - Maximum: 40% at level 5
+     */
     public function getDiscountPercentage(): int
     {
         return match ($this->level) {
             1 => 10,
             2 => 20,
             3 => 30,
-            4 => 40,
-            5 => 40, // Max cap
+            4 => 35,
+            5 => 40, // Maximum discount
             default => 0,
         };
+    }
+    
+    /**
+     * Check if at maximum hint level
+     */
+    public function isMaxLevel(): bool
+    {
+        return $this->level >= 5;
     }
 }
 ```
@@ -675,19 +708,27 @@ use App\Models\{Skill, SkillHint, Character};
  * SP Cost Calculator
  * 
  * Calculates final skill acquisition costs with hint discounts.
+ * 
+ * Game-Accurate Hint Discount System:
+ * - Level 1: 10% discount
+ * - Level 2: 20% discount  
+ * - Level 3: 30% discount
+ * - Level 4: 35% discount
+ * - Level 5: 40% discount (MAXIMUM)
  */
 class SPCostCalculator
 {
     /**
-     * Hint level discount percentages
+     * Game-accurate hint level discount percentages
+     * Levels 1-3 provide 10% each, levels 4-5 provide 5% each
      */
     private const DISCOUNT_MAP = [
         0 => 0,
         1 => 10,
         2 => 20,
         3 => 30,
-        4 => 40,
-        5 => 40, // Max discount
+        4 => 35,
+        5 => 40, // Maximum discount
     ];
 
     /**
@@ -2639,6 +2680,7 @@ class SkillHintFactory extends Factory
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.2.0 | 2026-01-28 | Development Team | Game-accurate 5-level hint system (10%/20%/30%/35%/40%), added Fast Learner/Skill Sparks/Hint Books as discount sources |
 | 2.0.0 | 2026-01-24 | Development Team | Full v2.0.0 alignment, complete testing strategy, AI integration, comprehensive calculators |
 | 1.0.0 | 2026-01-23 | Development Team | Initial technical specification |
 

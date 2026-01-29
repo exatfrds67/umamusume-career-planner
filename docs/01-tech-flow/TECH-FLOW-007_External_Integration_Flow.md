@@ -1,8 +1,8 @@
 # TECH-FLOW-007: External Integration - Technical Flow & Task Breakdown
 
-**Document Version**: 2.1.0  
-**Date**: January 24, 2026  
-**Status**: Current - Aligned with codebase v2.0.0
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
+**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
 
 **Source Specifications**:
 
@@ -1466,6 +1466,7 @@ pie title Test Distribution
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: aligned OCR validation with game-accurate stat ranges (0-1200+), aptitude grades (G-S), and turn numbers (1-78) |
 | 2.1.0 | 2026-01-24 | Development Team | Updated to v2.0.0 implementation standards; aligned with industry documentation guidelines; added comprehensive cross-references; enhanced code examples and diagrams; integrated Laravel Reverb WebSocket |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with detailed specifications |
 | 1.0.0 | 2026-01-06 | Development Team | Initial draft |

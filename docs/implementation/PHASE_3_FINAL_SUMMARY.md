@@ -52,7 +52,7 @@
 
 - Records skill hints from support cards
 - Tracks hint sources (which card provided which hint)
-- Calculates SP discount: 20% per hint, max 2 hints = 40% discount
+- Calculates SP discount: 5 levels (10%/20%/30%/35%/40% max)
 - Provides hint probability based on bond level
 - Generates comprehensive hint summaries
 
@@ -103,9 +103,9 @@ Final Stat Gain = Base Stat Gain × (1 + Final Bonus / 100)
 ### Skill Hint Mechanics
 
 ```php
-Hint Level: 0-2 (max 2 hints per skill)
-SP Discount: 20% per hint
-Max Discount: 40% (2 hints)
+Hint Level: 0-5 (max 5 hint levels per skill)
+SP Discount: Progressive (10%/20%/30%/35%/40%)
+Max Discount: 40% (5 hint levels)
 Final SP Cost = Base SP Cost × (1 - Discount / 100)
 ```
 

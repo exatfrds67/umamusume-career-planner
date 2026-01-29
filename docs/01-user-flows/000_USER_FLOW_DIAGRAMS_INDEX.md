@@ -1,6 +1,6 @@
 # USER FLOW DIAGRAMS: Complete Journey Maps
 
-**Document Version**: 2.2.0 | **Date**: January 27, 2026 | **Status**: Current - Aligned with v2.2.0
+**Document Version**: 2.2.0 | **Date**: January 28, 2026 | **Status**: Current - Aligned with v2.2.0 and game-accurate mechanics
 
 ## Overview
 
@@ -181,7 +181,7 @@ START: Skill Shop
     │
     ├─ [Select Skill]
     │   ├─ Check Requirements (Pt cost, Prerequisites)
-    │   ├─ Check Hint Level (Discount 0-40%)
+    │   ├─ Check Hint Level (Discount 0-40%, 5 levels)
     │   └─ Check Evolution Status (Normal → Rare)
     │
     ├─ [AI Recommendation]

@@ -5,14 +5,10 @@
         <!-- Breadcrumbs & Header -->
         <header class="flex items-center justify-between">
             <div class="flex items-center gap-4">
-                <nav aria-label="Breadcrumb">
-                    <a href="{{ route('races.index') }}" class="btn btn-secondary btn-sm">
-                        <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                        </svg>
-                        Back to Calendar
-                    </a>
-                </nav>
+                <x-breadcrumb :items="[
+                    ['label' => 'Races', 'url' => route('races.index')],
+                    ['label' => $race->race_name]
+                ]" />
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
                     {{ $race->race_name }}
                     <span class="ml-2 px-2.5 py-0.5 rounded text-sm font-bold 

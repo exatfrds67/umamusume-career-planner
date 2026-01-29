@@ -32,8 +32,9 @@ class FactorService
 
     /**
      * Aptitude grade progression.
+     * VERIFIED (Jan 2026): S is the maximum aptitude grade. SS does NOT exist.
      */
-    private const APTITUDE_GRADES = ['G', 'F', 'E', 'D', 'C', 'B', 'A', 'S', 'SS'];
+    private const APTITUDE_GRADES = ['G', 'F', 'E', 'D', 'C', 'B', 'A', 'S'];
 
     /**
      * Calculate total stat bonuses from Blue Factors.

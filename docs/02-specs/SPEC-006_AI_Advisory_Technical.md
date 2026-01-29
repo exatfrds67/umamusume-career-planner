@@ -1,9 +1,9 @@
 # SPEC-006: AI Advisory System - Technical Specification
 
-**Document Version**: 2.0.0  
-**Date**: 2026-01-24  
+**Document Version**: 2.2.0  
+**Date**: 2026-01-28  
 **Project**: Umamusume Pretty Derby Career Planner  
-**Status**: Active  
+**Status**: Active - Updated with game-accurate mechanics references  
 **Classification**: Internal - Development Team
 
 ---
@@ -14,9 +14,9 @@
 |-----------|-------|
 | **Document ID** | SPEC-006 |
 | **Related PRD** | [PRD-006: AI Advisory](../prds/PRD-006_AI_Advisory.md) |
-| **Architecture Version** | v2.0.0 |
+| **Architecture Version** | v2.2.0 |
 | **Approval Status** | Approved |
-| **Last Reviewed** | 2026-01-24 |
+| **Last Reviewed** | 2026-01-28 |
 
 ### Related Documents
 
@@ -292,10 +292,12 @@ You are an expert Umamusume training advisor. Your role is to analyze the curren
 character state and recommend optimal training decisions.
 
 **Context Understanding:**
-- Speed, Stamina, Power, Guts, and Wit are the five core stats (0-1200 range)
+- Speed, Stamina, Power, Guts, and Wit are the five core stats (0-1200+ range, soft cap at 1200)
+- Stats above 1200 have diminishing returns (50% effectiveness)
+- Per-training cap: +100 (reduced to +50 if stat > 1200)
 - Energy level affects training success rate (0-100%)
 - Mood affects stat gains: Great +4%, Good +2%, Normal 0%, Bad -2%, Awful -4%
-- Support cards provide bonuses when present at training facilities
+- Support cards provide bonuses when present at training facilities (+5% per card)
 - Friendship training activates at 80%+ bond level (1.2x multiplier)
 
 **Response Requirements:**
@@ -389,7 +391,8 @@ character capabilities to recommend optimal race strategy.
 - Distance categories: Sprint (1000-1400m), Mile (1401-1800m), Medium (1801-2400m), Long (2401m+)
 - Surface types: Turf, Dirt
 - Running styles: Front Runner (Nige), Pace Chaser (Senkou), Late Surger (Sashi), End Closer (Oikomi)
-- Aptitude grades affect performance: SS=120%, S=110%, A=100%, B=90%, C=80%, D=70%, E=60%, F=50%, G=40%
+- Aptitude grades (G-S): S=+5%, A=0% (baseline), B=-10%, C=-20%, D=-35%, E=-55%, F=-75%, G=-90%
+- Track conditions: Firm (no penalty), Good (Power -50), Soft (Power -50/-100, +2% stamina drain), Heavy (Speed -50, Power -50/-100, +2% stamina drain)
 
 **Readiness Assessment:**
 - Compare character stats against race requirements
@@ -468,7 +471,8 @@ acquisitions based on race goals, SP budget, and available hints.
 
 **Skill System Knowledge:**
 - Skills cost SP (Skill Points) to acquire
-- Hints reduce cost: 1 hint = 20% off, 2+ hints = 40% off (max)
+- Hints reduce cost: Level 1=10%, Level 2=20%, Level 3=30%, Level 4=35%, Level 5=40% (max)
+- Additional discount sources: Fast Learner condition, Skill Sparks, Hint Books
 - Skill categories: Normal, Rare, Unique
 - Some Normal skills can evolve to Rare versions
 - Skills have activation conditions (distance, position, phase)
@@ -3565,6 +3569,7 @@ class AIRecommendationFactory extends Factory
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.2.0 | 2026-01-28 | Development Team | Updated AI agent prompts with game-accurate mechanics: 5-level hint system, S max aptitude, stat soft cap, track condition penalties |
 | 2.0.0 | 2026-01-24 | Development Team | Full v2.0.0 alignment with comprehensive services, agents, API endpoints, database schema, cost tracking, security, testing strategy, and complete appendices following SPEC-005 format |
 | 1.0.0 | 2026-01-14 | Development Team | Initial technical specification |
 

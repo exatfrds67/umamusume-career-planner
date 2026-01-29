@@ -559,9 +559,8 @@ enum MoodStatus: string {
 
 ```php
 enum AptitudeGrade: string {
-    case SS = 'SS';  // 120% effectiveness
-    case S = 'S';    // 110%
-    case A = 'A';    // 100%
+    case S = 'S';    // +5% (maximum)
+    case A = 'A';    // 0% (baseline)
     case B = 'B';    // 90%
     case C = 'C';    // 80%
     case D = 'D';    // 70%

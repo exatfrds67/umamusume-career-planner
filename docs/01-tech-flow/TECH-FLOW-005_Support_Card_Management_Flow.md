@@ -1,8 +1,8 @@
 # TECH-FLOW-005: Support Card Management - Technical Flow & Task Breakdown
 
-**Document Version**: 2.1.0  
-**Date**: January 24, 2026  
-**Status**: Current - Aligned with codebase v2.0.0
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
+**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
 
 **Source Specifications**:
 
@@ -218,7 +218,7 @@ flowchart TD
     LoadDeck --> IdentifyCards[Identify Participating Cards]
     
     IdentifyCards --> ForEach{For Each Card}
-    ForEach --> AwardBond[Award Bond Points +3-5]
+    ForEach --> AwardBond[Award Bond Points +7 base, +9 with Charming]
     AwardBond --> CurrentBond[Load Current Bond Level]
     
     CurrentBond --> CheckThreshold{Milestone Reached?}
@@ -804,6 +804,11 @@ class SupportCardBonusCalculator
 
     /**
      * Calculate friendship training bonus
+     * 
+     * Game-Accurate Friendship Bonus (Verified Jan 2026):
+     * - R cards: 10% bonus
+     * - SR cards: 20% bonus
+     * - SSR cards: 35% bonus
      */
     public function calculateFriendshipBonus(
         SupportCard $card,
@@ -817,8 +822,13 @@ class SupportCardBonusCalculator
             return 0;
         }
         
-        // Friendship training provides +2 to +5 bonus
-        return rand(2, 5);
+        // Friendship training bonus based on card rarity
+        return match($card->rarity->value) {
+            'R' => 10,
+            'SR' => 20,
+            'SSR' => 35,
+            default => 10,
+        };
     }
 
     private function initializeEmptyBonuses(): array
@@ -969,11 +979,17 @@ class BondLevelService
 {
     /**
      * Award bond points after training
+     * 
+     * Game-Accurate Bond System (Verified Jan 2026):
+     * - Base bond gain: +7 per training session
+     * - With Charming condition: +9 per training session
+     * - Friendship Training threshold: 80% bond
+     * - Friendship bonus: 10-35% based on card rarity
      */
     public function awardBondPoints(
         Character $character,
         SupportCard $card,
-        int $basePoints = 3
+        int $basePoints = 7
     ): CardBond {
         $bond = CardBond::firstOrCreate([
             'character_id' => $character->id,
@@ -1499,6 +1515,7 @@ pie title Test Distribution
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: bond gain +7 base (+9 with Charming condition), friendship training threshold 80%, friendship bonus 10-35% based on card rarity |
 | 2.1.0 | 2026-01-24 | Development Team | Updated to v2.0.0 implementation standards; aligned with industry documentation guidelines; added comprehensive cross-references; enhanced code examples and diagrams |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with detailed specifications |
 | 1.0.0 | 2026-01-06 | Development Team | Initial draft |

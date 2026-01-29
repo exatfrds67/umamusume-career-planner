@@ -192,8 +192,14 @@ describe('SkillDataTool', function () {
             expect($result)->toContain('HINT DISCOUNT INFORMATION:');
             expect($result)->toContain('With 0 hints: 100 SP (0% discount)');
             expect($result)->toContain('With 1 hint:');
+            expect($result)->toContain('10% discount');
+            expect($result)->toContain('With 2 hints:');
             expect($result)->toContain('20% discount');
-            expect($result)->toContain('With 2+ hints:');
+            expect($result)->toContain('With 3 hints:');
+            expect($result)->toContain('30% discount');
+            expect($result)->toContain('With 4 hints:');
+            expect($result)->toContain('35% discount');
+            expect($result)->toContain('With 5+ hints:');
             expect($result)->toContain('40% discount');
         });
 

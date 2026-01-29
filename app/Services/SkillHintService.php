@@ -20,12 +20,14 @@ class SkillHintService
     /**
      * Maximum number of hints that provide discount (40% max = 2 hints × 20%)
      */
-    private const MAX_DISCOUNT_HINTS = 2;
+    private const MAX_DISCOUNT_HINTS = 5;
 
     /**
-     * Discount percentage per hint
+     * Discount percentage per hint (deprecated - using tiered system now)
+     *
+     * @deprecated Use calculateDiscountPercentage() instead
      */
-    private const DISCOUNT_PER_HINT = 20.0;
+    private const DISCOUNT_PER_HINT = 10.0;
 
     /**
      * Maximum discount percentage
@@ -103,12 +105,24 @@ class SkillHintService
 
     /**
      * Calculate the discount percentage based on hint count.
+     *
+     * Progressive discount tiers:
+     * 1 hint: 10%
+     * 2 hints: 20%
+     * 3 hints: 30%
+     * 4 hints: 35%
+     * 5+ hints: 40% (max)
      */
     public function calculateDiscountPercentage(int $hintCount): float
     {
-        $effectiveHints = min($hintCount, self::MAX_DISCOUNT_HINTS);
-
-        return min($effectiveHints * self::DISCOUNT_PER_HINT, self::MAX_DISCOUNT_PERCENTAGE);
+        return match (true) {
+            $hintCount >= 5 => 40.0,
+            $hintCount === 4 => 35.0,
+            $hintCount === 3 => 30.0,
+            $hintCount === 2 => 20.0,
+            $hintCount === 1 => 10.0,
+            default => 0.0,
+        };
     }
 
     /**

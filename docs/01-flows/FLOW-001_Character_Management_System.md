@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.1.0
-**Date**: January 24, 2026
+**Document Version**: 2.2.0
+**Date**: January 28, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned with codebase v2.0.0
+**Status**: Current - Updated with verified game mechanics from Global English Server
 
 ---
 
@@ -97,32 +97,60 @@ flowchart TD
 
 ## 3. Stat Grade Calculation Flow
 
-Logic for determining stat grades based on the v2.0.0 scaling (0-1200 hard cap).
+Logic for determining stat grades based on the v2.0.0 scaling. Stats can exceed 1200 with diminishing returns; maximum aptitude grade is S.
 
 ### 3.1 Diagram
 
 ```mermaid
 flowchart TD
     Start([Compute Grade]) --> GetRaw[Get Raw Stat Value]
-    GetRaw --> ClampValue[Clamp 0-1200]
+    GetRaw --> CheckCap{Value > 1200?}
     
-    ClampValue --> DetermineGrade{Grade Threshold}
+    CheckCap -->|Yes| ApplyDiminishing[Apply Diminishing Returns]
+    CheckCap -->|No| UseRaw[Use Raw Value]
     
-    DetermineGrade -->|>=1100| SS[SS Grade]
-    DetermineGrade -->|950-1099| S[S Grade]
-    DetermineGrade -->|850-949| A[A Grade]
-    DetermineGrade -->|750-849| BPlus[B+ Grade]
-    DetermineGrade -->|650-749| B[B Grade]
-    DetermineGrade -->|550-649| CPlus[C+ Grade]
-    DetermineGrade -->|450-549| C[C Grade]
-    DetermineGrade -->|350-449| DPlus[D+ Grade]
-    DetermineGrade -->|250-349| D[D Grade]
-    DetermineGrade -->|150-249| E[E Grade]
-    DetermineGrade -->|0-149| F[F Grade]
+    ApplyDiminishing --> DetermineGrade{Grade Threshold}
+    UseRaw --> DetermineGrade
     
-    SS --> UI[Update UI Badge]
-    F --> UI
+    DetermineGrade -->|>=1100| S[S Grade - Maximum]
+    DetermineGrade -->|950-1099| A[A Grade]
+    DetermineGrade -->|850-949| BPlus[B+ Grade]
+    DetermineGrade -->|750-849| B[B Grade]
+    DetermineGrade -->|650-749| CPlus[C+ Grade]
+    DetermineGrade -->|550-649| C[C Grade]
+    DetermineGrade -->|450-549| DPlus[D+ Grade]
+    DetermineGrade -->|350-449| D[D Grade]
+    DetermineGrade -->|250-349| E[E Grade]
+    DetermineGrade -->|150-249| F[F Grade]
+    DetermineGrade -->|0-149| G[G Grade]
+    
+    S --> UI[Update UI Badge]
+    G --> UI
 ```
+
+### 3.2 Stat Cap Notes
+
+- **Base Cap**: 1200 points per stat
+- **Overflow**: Stats can exceed 1200 through training, but gains above 1200 have diminishing returns (half value)
+- **Per-Training Cap**: +100 per training session (reduced to +50 if stat > 1200)
+- **Aptitude Maximum**: S grade is the highest aptitude rating (no SS grade exists in game)
+
+### 3.3 Aptitude Grade Modifiers (Game-Accurate)
+
+Aptitude grades affect performance differently by category. A-rank is the baseline (0% modifier).
+
+| Grade | Surface (Power) | Distance (Speed) | Style (Wit) |
+|-------|-----------------|------------------|-------------|
+| S     | +5%             | +5%              | +10%        |
+| A     | 0% (baseline)   | 0% (baseline)    | 0% (baseline)|
+| B     | -10%            | -10%             | -15%        |
+| C     | -20%            | -20%             | -25%        |
+| D     | -30%            | -40%             | -40%        |
+| E     | -50%            | -60%             | -60%        |
+| F     | -70%            | -80%             | -80%        |
+| G     | -90%            | -90%             | -90%        |
+
+**Grade Scale**: G → F → E → D → C → B → A → S (maximum)
 
 ---
 
@@ -265,10 +293,11 @@ flowchart TD
 
 ## Document Control
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 2.1.0 | 2026-01-24 | Development Team | Updated to align with v2.0.0 codebase, Laravel 12 architecture, and Neuron AI integration points |
-| 1.0.0 | 2026-01-14 | Development Team | Initial flow definitions |
+| Version | Date       | Author           | Changes |
+|---------|------------|------------------|---------|
+| 2.2.0   | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: Removed SS grade (max is S), stats can exceed 1200 with diminishing returns (half value above 1200), per-training cap (+100/+50), added complete aptitude modifier tables by category (Surface/Distance/Style), G grade tier added |
+| 2.1.0   | 2026-01-24 | Development Team | Updated to align with v2.0.0 codebase, Laravel 12 architecture, and Neuron AI integration points |
+| 1.0.0   | 2026-01-14 | Development Team | Initial flow definitions |
 
 ---
 

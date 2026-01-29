@@ -166,8 +166,8 @@ describe('Cost Breakdown and Statistics', function () {
                 ],
             ])
             ->assertJsonPath('data.hint_count', 2)
-            ->assertJsonPath('data.discount_percentage', 40.0)
-            ->assertJsonPath('data.max_discount_reached', true);
+            ->assertJsonPath('data.discount_percentage', 20.0)
+            ->assertJsonPath('data.max_discount_reached', false);
     });
 
     it('provides comprehensive statistics', function () {
@@ -419,7 +419,15 @@ it('returns consistent discount calculations via API', function (int $hintCount)
 
     $response = $this->getJson("/api/characters/{$this->character->id}/skill-hints/skills/{$this->skill->id}/cost-breakdown");
 
-    $expectedDiscount = min($hintCount * 20, 40);
+    // Verified discount rates: 10%/20%/30%/35%/40% at levels 1-5
+    $expectedDiscount = match ($hintCount) {
+        0 => 0,
+        1 => 10,
+        2 => 20,
+        3 => 30,
+        4 => 35,
+        default => 40, // 5+ hints
+    };
 
     $response->assertSuccessful()
         ->assertJsonPath('data.hint_count', $hintCount)
@@ -442,7 +450,15 @@ it('calculates and returns correct SP savings via API', function (int $baseCost,
 
     $response = $this->getJson("/api/characters/{$this->character->id}/skill-hints/skills/{$skill->id}/cost-breakdown");
 
-    $expectedDiscount = min($hintCount * 20, 40);
+    // Verified discount rates: 10%/20%/30%/35%/40% at levels 1-5
+    $expectedDiscount = match ($hintCount) {
+        0 => 0,
+        1 => 10,
+        2 => 20,
+        3 => 30,
+        4 => 35,
+        default => 40, // 5+ hints
+    };
     $expectedFinalCost = $baseCost - (int) (($baseCost * $expectedDiscount) / 100);
     $expectedSaved = $baseCost - $expectedFinalCost;
 

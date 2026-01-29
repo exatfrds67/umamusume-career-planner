@@ -7,10 +7,10 @@
 Tech Flow documents (TECH-FLOW-001 through TECH-FLOW-007) provide system architecture diagrams, detailed data flows, component interactions, and implementation task breakdowns for each of the seven core modules. All documents include `.kiro` source references and cross-links to related artifacts (PRDs, SPECs, FLOWs, WFs, SEQs, UFs).
 
 **Document Version**: 2.2.0  
-**Date**: January 27, 2026  
+**Date**: January 28, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.2.0
+**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
 
 ---
 
@@ -25,6 +25,7 @@ Tech Flow documents (TECH-FLOW-001 through TECH-FLOW-007) provide system archite
 - **API Endpoints**: 15+ REST endpoints
 - **Estimated Effort**: ~78 hours
 - **Test Coverage**: 35+ tests
+- **Game Mechanics**: Aptitude grades G→F→E→D→C→B→A→S (S is maximum)
 - **Related Artifacts**:
   - PRD: [PRD-001](../prds/PRD-001_Character_Management.md)
   - SPEC: [SPEC-001](../specs/SPEC-001_Character_Management_Technical.md)
@@ -45,6 +46,7 @@ Tech Flow documents (TECH-FLOW-001 through TECH-FLOW-007) provide system archite
 - **API Endpoints**: 5+ REST endpoints
 - **Estimated Effort**: ~88 hours
 - **Test Coverage**: 37+ tests
+- **Game Mechanics**: Stats can exceed 1200 with diminishing returns; facility upgrades require 4 trainings per level
 - **Related Artifacts**:
   - PRD: [PRD-002](../prds/PRD-002_Training_Optimization.md)
   - SPEC: [SPEC-002](../specs/SPEC-002_Training_Optimization_Technical.md)
@@ -61,10 +63,11 @@ Tech Flow documents (TECH-FLOW-001 through TECH-FLOW-007) provide system archite
 **Status**: Complete | **Implementation**: 100%
 
 - **Components**: 3 analysis engines, 2 services, 2 controllers
-- **Core Engines**: StatRequirement, WeatherImpact, RunningStyleOptimizer
+- **Core Engines**: StatRequirement, TrackConditionImpact, RunningStyleOptimizer
 - **API Endpoints**: 6 REST endpoints
 - **Estimated Effort**: ~60 hours
 - **Test Coverage**: 25+ tests
+- **Game Mechanics**: Track conditions (Firm/Good/Soft/Heavy) with Power/Speed penalties and stamina drain
 - **Related Artifacts**:
   - PRD: [PRD-003](../prds/PRD-003_Race_Strategy.md)
   - SPEC: [SPEC-003](../specs/SPEC-003_Race_Strategy_Technical.md)
@@ -85,6 +88,7 @@ Tech Flow documents (TECH-FLOW-001 through TECH-FLOW-007) provide system archite
 - **API Endpoints**: 7 REST endpoints
 - **Estimated Effort**: ~54 hours
 - **Test Coverage**: 20+ tests
+- **Game Mechanics**: 5 hint levels (10%/20%/30%/35%/40% discounts); additional sources: Fast Learner, Skill Sparks, Hint Books
 - **Related Artifacts**:
   - PRD: [PRD-004](../prds/PRD-004_Skill_Management.md)
   - SPEC: [SPEC-004](../specs/SPEC-004_Skill_Management_Technical.md)
@@ -168,6 +172,17 @@ Tech Flow documents (TECH-FLOW-001 through TECH-FLOW-007) provide system archite
 | **Total API Endpoints** | 52+ REST endpoints | ✅ Implemented |
 | **Total Test Coverage** | 185+ tests | ✅ Written |
 | **Estimated Total Effort** | ~502 hours | ✅ Delivered |
+
+### Game Mechanics Alignment (v2.2.0)
+
+| Mechanic | Status | Notes |
+|----------|--------|-------|
+| **Aptitude Grades** | ✅ Aligned | G→F→E→D→C→B→A→S (S is maximum) |
+| **Skill Hints** | ✅ Aligned | 5 levels: 10%/20%/30%/35%/40% max discount |
+| **Stat Ranges** | ✅ Aligned | 0-1200+ with diminishing returns above 1200 |
+| **Training Formula** | ✅ Aligned | Complete formula with all multipliers |
+| **Track Conditions** | ✅ Aligned | Firm/Good/Soft/Heavy with penalties |
+| **Running Styles** | ✅ Aligned | Front Runner/Pace Chaser/Late Surger/End Closer |
 
 ### System Architecture Overview
 
@@ -301,7 +316,7 @@ gantt
 | Technology | Version | Usage |
 |------------|---------|-------|
 | Laravel | 12+ | Backend framework |
-| PHP | 8.2+ | Runtime environment |
+| PHP | 8.4+ | Runtime environment |
 | MySQL | 8.0+ | Primary database |
 | Redis | 7+ | Cache and queue backend |
 | Livewire | 3 | Server-driven UI components |
@@ -377,6 +392,7 @@ After TECH-FLOW completion, the following documentation phases are recommended:
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.2.0 | 2026-01-28 | Development Team | Game-accurate mechanics alignment: skill hints (5 levels, 40% max), aptitudes (S max), training (1200+ stats), track conditions |
 | 2.1.0 | 2026-01-24 | Development Team | Updated to v2.0.0 implementation; added complete artifact cross-references; aligned with industry documentation standards |
 | 2.0.0 | 2026-01-14 | Development Team | Comprehensive revision with all 7 modules |
 | 1.0.0 | 2026-01-03 | Development Team | Initial index creation |
@@ -384,9 +400,9 @@ After TECH-FLOW completion, the following documentation phases are recommended:
 ---
 
 **Completion Status**: All 7 tech flow documents created and implemented ✅  
-**Last Updated**: January 24, 2026  
+**Last Updated**: January 28, 2026  
 **Next Review**: Upon major architecture changes
 
 ---
 
-*This index reflects the complete technical flow documentation aligned with the current v2.0.0 implementation of the Umamusume Pretty Derby Career Planner.*
+*This index reflects the complete technical flow documentation aligned with the current v2.2.0 implementation of the Umamusume Pretty Derby Career Planner with game-accurate mechanics.*

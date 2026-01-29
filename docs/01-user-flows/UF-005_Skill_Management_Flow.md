@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.1.0  
-**Date**: January 24, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-004], [SPEC-004], [SRS], [BRS]
 
 **Source Specifications**:
@@ -235,23 +235,23 @@ stateDiagram-v2
 │  ┌────────────────────────────────────────────────────────┐│
 │  │ 1. Going Strong [Normal] • 120 SP (96 SP w/ hints)    ││
 │  │    Speed boost • High priority for Mile races          ││
-│  │    Hints: 1/3 available (-20%) [VIEW] [ACQUIRE]       ││
+│  │    Hints: Lv.2 (-20%) [VIEW] [ACQUIRE]                ││
 │  ├────────────────────────────────────────────────────────┤│
 │  │ 2. Lane Guidance [Normal] • 100 SP (60 SP w/ hints)   ││
 │  │    Positioning • Recommended for Late Surger style     ││
-│  │    Hints: 2/3 available (-40%) [VIEW] [ACQUIRE]       ││
+│  │    Hints: Lv.5 (-40%) [VIEW] [ACQUIRE]                ││
 │  └────────────────────────────────────────────────────────┘│
 │                                                            │
 │  All Skills (156 available):                               │
 │  ┌────────────────────────────────────────────────────────┐│
 │  │ Blazing Speed [Normal]                       120 SP    ││
 │  │ Speed boost in final stretch                           ││
-│  │ Hints: 0/3 • Can evolve to: Flame Surge               ││
+│  │ Hints: Lv.0 • Can evolve to: Flame Surge [Rare]       ││
 │  │                                   [VIEW] [ACQUIRE]     ││
 │  ├────────────────────────────────────────────────────────┤│
 │  │ Stamina Master [Rare]                        180 SP    ││
 │  │ Enhanced stamina efficiency                            ││
-│  │ Hints: 1/3 (-20%) • Prerequisites: ✓ Met              ││
+│  │ Hints: Lv.1 (-10%) • Prerequisites: ✓ Met             ││
 │  │                                   [VIEW] [ACQUIRE]     ││
 │  └────────────────────────────────────────────────────────┘│
 │                                                            │
@@ -362,7 +362,7 @@ class SkillCatalog extends Component
 │  │ ACQUISITION DETAILS                                    │���
 │  ├────────────────────────────────────────────────────────┤│
 │  │ Base SP Cost:        120 SP                            ││
-│  │ Hints Collected:     1 hint (-20%)                     ││
+│  │ Hints Collected:     Lv.2 (-20%)                        ││
 │  │ Final Cost:          96 SP ✓ Affordable                ││
 │  │                                                        ││
 │  │ Current SP Balance:  850 SP                            ││
@@ -469,7 +469,7 @@ class SkillPrerequisiteService
 │  │ Cost Breakdown:                                        ││
 │  │                                                        ││
 │  │ Base SP Cost:        120 SP                            ││
-│  │ Hint Discount (1):   -24 SP (-20%)                     ││
+│  │ Hint Discount (Lv.2): -24 SP (-20%)                     ││
 │  │ ─────────────────────────────                          ││
 │  │ Final Cost:          96 SP                             ││
 │  │                                                        ││
@@ -827,21 +827,41 @@ flowchart TD
     D --> F{Success?}
     F -->|Yes| G[Award Hint]
     F -->|No| E
-    G --> H[Update Hint Count]
-    H --> I{Hint Count}
-    I -->|1| J[20% Discount]
-    I -->|2| K[40% Discount Max]
-    I -->|3+| L[Cap at 40%]
+    G --> H[Update Hint Level]
+    H --> I{Hint Level}
+    I -->|1| J[10% Discount]
+    I -->|2| K[20% Discount]
+    I -->|3| L[30% Discount]
+    I -->|4| M[35% Discount]
+    I -->|5| N[40% Discount Max]
 ```
 
 ### 5.2 Hint Discount Table
 
-| Hint Level | Discount | Example (120 SP Skill) |
-|------------|----------|------------------------|
-| 0 Hints | 0% | 120 SP (Base cost) |
-| 1 Hint | 20% | 96 SP (-24 SP) |
-| 2 Hints | 40% | 72 SP (-48 SP) |
-| 3+ Hints | 40% (capped) | 72 SP (no additional discount) |
+| Hint Level | Discount | Example (120 SP Skill) | Notes |
+|------------|----------|------------------------|-------|
+| 0 Hints | 0% | 120 SP (Base cost) | No discount |
+| 1 Hint | 10% | 108 SP (-12 SP) | First hint |
+| 2 Hints | 20% | 96 SP (-24 SP) | Second hint |
+| 3 Hints | 30% | 84 SP (-36 SP) | Third hint |
+| 4 Hints | 35% | 78 SP (-42 SP) | Fourth hint |
+| 5 Hints | 40% | 72 SP (-48 SP) | Maximum discount |
+
+### 5.2.1 Additional Discount Sources
+
+| Source | Bonus | Stacks With Hints | Notes |
+|--------|-------|-------------------|-------|
+| Fast Learner Condition | +10% | Yes | Character condition effect |
+| Skill Sparks | Variable | Yes | Event-based bonus |
+| Hint Books | +1 Hint Level | Yes | Consumable item |
+
+### 5.2.2 Skill Rarities
+
+| Rarity | Display | Description | SP Cost Range |
+|--------|---------|-------------|---------------|
+| Normal | White text | Common skills | 60-150 SP |
+| Rare | Gold text | Powerful skills | 150-300 SP |
+| Unique | Character-specific | Character-exclusive skills | 200-400 SP |
 
 ### 5.3 Hint Sources
 
@@ -874,24 +894,40 @@ mindmap
 // app/Services/Skills/SkillHintService.php
 class SkillHintService
 {
-    public function awardHint(CareerRun $career, Skill $skill, string $source): SkillHint
+    /**
+     * Hint level discount percentages (verified Global English Server Jan 2026)
+     * Level 1: 10%, Level 2: 20%, Level 3: 30%, Level 4: 35%, Level 5: 40% (max)
+     */
+    private const HINT_DISCOUNTS = [
+        1 => 10,
+        2 => 20,
+        3 => 30,
+        4 => 35,
+        5 => 40,
+    ];
+    
+    public function awardHint(CareerRun $career, Skill $skill, string $source): ?SkillHint
     {
-        $existingHints = SkillHint::where('career_run_id', $career->id)
+        $currentLevel = SkillHint::where('career_run_id', $career->id)
             ->where('skill_id', $skill->id)
             ->where('is_used', false)
             ->count();
         
-        // Cap at 3 hints (40% max discount)
-        if ($existingHints >= 3) {
+        // Cap at 5 hints (40% max discount)
+        if ($currentLevel >= 5) {
             return null;
         }
+        
+        $newLevel = $currentLevel + 1;
+        $discount = self::HINT_DISCOUNTS[$newLevel] ?? 40;
         
         $hint = SkillHint::create([
             'career_run_id' => $career->id,
             'skill_id' => $skill->id,
             'source_type' => $source,
             'source_turn' => $career->current_turn,
-            'discount_percentage' => 20,
+            'hint_level' => $newLevel,
+            'discount_percentage' => $discount,
             'is_used' => false,
         ]);
         
@@ -902,13 +938,19 @@ class SkillHintService
     
     public function calculateTotalDiscount(CareerRun $career, Skill $skill): int
     {
-        $hintCount = SkillHint::where('career_run_id', $career->id)
+        $hintLevel = SkillHint::where('career_run_id', $career->id)
             ->where('skill_id', $skill->id)
             ->where('is_used', false)
             ->count();
         
-        // 20% per hint, max 40%
-        return min(40, $hintCount * 20);
+        // Get base discount from hint level
+        $baseDiscount = self::HINT_DISCOUNTS[min($hintLevel, 5)] ?? 0;
+        
+        // Add Fast Learner condition bonus (+10%)
+        $fastLearnerBonus = $career->hasCondition('fast_learner') ? 10 : 0;
+        
+        // Cap total discount at 50% (40% hints + 10% Fast Learner)
+        return min(50, $baseDiscount + $fastLearnerBonus);
     }
 }
 ```
@@ -1082,6 +1124,7 @@ flowchart LR
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: 5-level hint system (10%/20%/30%/35%/40%), Fast Learner condition bonus, Skill Sparks, Hint Books, skill rarities (Normal/Rare/Unique) |
 | 2.1.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 architecture; added skill hint system details, evolution mechanics, loadout management; comprehensive error handling and testing criteria |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with basic flow |
 | 1.0.0 | 2026-01-03 | Development Team | Initial draft |
@@ -1103,4 +1146,4 @@ flowchart LR
 
 ---
 
-*This user flow reflects the current skill management system implementation as of version 2.1.0. For the latest updates, refer to the online documentation.*
+*This user flow reflects the current skill management system implementation as of version 2.2.0. For the latest updates, refer to the online documentation.*

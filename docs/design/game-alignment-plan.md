@@ -56,11 +56,11 @@ This document translates the game UI analysis into concrete implementation tasks
     <x-storage-mode-badge :mode="$storageMode" />
     <x-character-quick-info :character="$character" />
   </x-slot:left>
-  
+
   <x-slot:center>
     <x-turn-indicator :current="$turn" :total="$totalTurns" />
   </x-slot:center>
-  
+
   <x-slot:right>
     <x-sp-tracker :available="$sp" :total="$totalSp" />
     <x-menu-dropdown />
@@ -108,11 +108,11 @@ This document translates the game UI analysis into concrete implementation tasks
 **Stat Bar Component:**
 
 ```blade
-<x-stat-bar 
-  stat="speed" 
-  :current="755" 
-  :max="1200" 
-  :target="900"
+<x-stat-bar
+  stat="speed"
+  :current="1350"
+  :max="2000"
+  :target="1600"
   show-icon
   show-percentage
 />
@@ -120,8 +120,9 @@ This document translates the game UI analysis into concrete implementation tasks
 
 **Features:**
 
-- Color-coded by stat type
-- Progress bar visualization
+- Color-coded by stat type (Rose/Green/Orange/Amber/Sky)
+- Progress bar visualization with overflow for >1200
+- **Soft Cap Indicator**: Visual marker at 1200
 - Current/max/target display
 - Optional percentage
 - Responsive sizing
@@ -188,8 +189,8 @@ This document translates the game UI analysis into concrete implementation tasks
 
 - [ ] Create skill-card component
 - [ ] Build skill search/filter
-- [ ] Implement SP calculator
-- [ ] Add hint level tracker
+- [ ] Implement SP calculator (with 10%/5% hint discount logic)
+- [ ] Add hint level tracker (Max Level 5)
 - [ ] Create skill evolution tree
 
 ---
@@ -348,44 +349,44 @@ This document translates the game UI analysis into concrete implementation tasks
 
 ```javascript
 export default {
-  theme: {
-    extend: {
-      colors: {
-        // Stat colors (aligned with game)
-        'stat-speed': {
-          DEFAULT: '#FF6B9D',
-          light: '#FFB3D1',
-          dark: '#E5005A',
+    theme: {
+        extend: {
+            colors: {
+                // Verified Stat Colors (from game-ui-alignment-strategy.md)
+                "stat-speed": {
+                    DEFAULT: "#FB7185", // rose-500
+                    light: "#FDA4AF",
+                    dark: "#E11D48",
+                },
+                "stat-stamina": {
+                    DEFAULT: "#22C55E", // green-500
+                    light: "#4ADE80",
+                    dark: "#16A34A",
+                },
+                "stat-power": {
+                    DEFAULT: "#F97316", // orange-500
+                    light: "#FB923C",
+                    dark: "#EA580C",
+                },
+                "stat-guts": {
+                    DEFAULT: "#FBBF24", // amber-400
+                    light: "#FCD34D",
+                    dark: "#D97706",
+                },
+                "stat-wit": {
+                    DEFAULT: "#0EA5E9", // sky-500
+                    light: "#38BDF8",
+                    dark: "#0284C7",
+                },
+
+                // UI colors
+                "uma-primary": "#84CC16", // lime-500 (Success)
+                "uma-secondary": "#FFFFFF",
+                "uma-accent": "#FB7185",
+            },
         },
-        'stat-stamina': {
-          DEFAULT: '#4CAF50',
-          light: '#80E27E',
-          dark: '#087F23',
-        },
-        'stat-power': {
-          DEFAULT: '#FF5722',
-          light: '#FF8A65',
-          dark: '#C41C00',
-        },
-        'stat-guts': {
-          DEFAULT: '#FF9800',
-          light: '#FFCC80',
-          dark: '#C66900',
-        },
-        'stat-wit': {
-          DEFAULT: '#2196F3',
-          light: '#6EC6FF',
-          dark: '#0069C0',
-        },
-        
-        // UI colors
-        'uma-primary': '#8BC34A',
-        'uma-secondary': '#FFF8E1',
-        'uma-accent': '#FF4081',
-      },
     },
-  },
-}
+};
 ```
 
 **Tasks:**
@@ -596,7 +597,7 @@ xl: '1280px',  // Desktop
 ```php
 it('displays stat bar correctly', function () {
     $page = visit('/characters/1');
-    
+
     $page->assertSee('Speed')
         ->assertSee('755 / 1200')
         ->assertElementExists('.stat-bar-speed')

@@ -3,8 +3,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.0.0  
-**Date**: January 24, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-003], [SPEC-003], [FLOW-003], [SEQ-004]
 
 **Source Specs**:
@@ -557,6 +557,30 @@ class RunningStyleRecommendation extends Component
 | Stat Distribution | 30% | Power/Guts ratio for style |
 | Distance Match | 20% | Distance aptitude × style fit |
 | Surface Match | 10% | Surface aptitude × style bonus |
+
+**Aptitude Grade Scale (Global English Server - Jan 2026)**:
+
+| Grade | Rank | Effectiveness |
+|-------|------|---------------|
+| S | Maximum | 100% |
+| A | Excellent | 90% |
+| B | Good | 80% |
+| C | Average | 70% |
+| D | Below Average | 60% |
+| E | Poor | 50% |
+| F | Very Poor | 40% |
+| G | Minimum | 30% |
+
+**Note**: S is the maximum grade. There is no SS grade in the game.
+
+**Track Condition Effects on Race Performance**:
+
+| Condition | Power Penalty | Speed Penalty | Stamina Drain | Strategy Impact |
+|-----------|---------------|---------------|---------------|-----------------|
+| Firm | None | None | None | All styles viable |
+| Good | -50 Power | None | None | Slight disadvantage for power-dependent styles |
+| Soft | -50 to -100 Power | None | +2%/sec | Stamina management critical |
+| Heavy | -50 to -100 Power | -50 Speed | +2%/sec | Conservative strategies recommended |
 
 ### 3.6 Preparation Checklist
 
@@ -1237,6 +1261,7 @@ test.describe('WF-007: Accessibility', () => {
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: track condition effects (Firm/Good/Soft/Heavy with Power/Speed/Stamina penalties), S-max aptitude grades (G→F→E→D→C→B→A→S), class pyramid |
 | 2.0.0 | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added readiness assessment, win probability, AI strategy integration, preparation checklist, accessibility specifications, and testing requirements |
 | 1.0.0 | 2026-01-14 | Development Team | Initial wireframe specification |
 

@@ -12,26 +12,35 @@ describe('Skill Model', function () {
         $skill = Skill::where('internal_id', 'speed_001')->first();
 
         expect($skill->calculateFinalCost(0))->toBe(120)
-            ->and($skill->calculateFinalCost(1))->toBe(96)  // 20% discount
-            ->and($skill->calculateFinalCost(2))->toBe(72)  // 40% discount (max)
-            ->and($skill->calculateFinalCost(3))->toBe(72); // Still 40% (max)
+            ->and($skill->calculateFinalCost(1))->toBe(108)  // 10% discount
+            ->and($skill->calculateFinalCost(2))->toBe(96)   // 20% discount
+            ->and($skill->calculateFinalCost(3))->toBe(84)   // 30% discount
+            ->and($skill->calculateFinalCost(4))->toBe(78)   // 35% discount
+            ->and($skill->calculateFinalCost(5))->toBe(72)   // 40% discount (max)
+            ->and($skill->calculateFinalCost(6))->toBe(72);  // Still 40% (max)
     });
 
     it('can get discount percentage', function () {
         $skill = Skill::where('internal_id', 'speed_001')->first();
 
         expect($skill->getDiscountPercentage(0))->toBe(0.0)
-            ->and($skill->getDiscountPercentage(1))->toBe(20.0)
-            ->and($skill->getDiscountPercentage(2))->toBe(40.0)
-            ->and($skill->getDiscountPercentage(3))->toBe(40.0); // Max 40%
+            ->and($skill->getDiscountPercentage(1))->toBe(10.0)
+            ->and($skill->getDiscountPercentage(2))->toBe(20.0)
+            ->and($skill->getDiscountPercentage(3))->toBe(30.0)
+            ->and($skill->getDiscountPercentage(4))->toBe(35.0)
+            ->and($skill->getDiscountPercentage(5))->toBe(40.0)
+            ->and($skill->getDiscountPercentage(6))->toBe(40.0); // Max 40%
     });
 
     it('can calculate SP saved', function () {
         $skill = Skill::where('internal_id', 'speed_001')->first();
 
         expect($skill->getSpSaved(0))->toBe(0)
-            ->and($skill->getSpSaved(1))->toBe(24)  // 20% of 120
-            ->and($skill->getSpSaved(2))->toBe(48); // 40% of 120
+            ->and($skill->getSpSaved(1))->toBe(12)  // 10% of 120
+            ->and($skill->getSpSaved(2))->toBe(24)  // 20% of 120
+            ->and($skill->getSpSaved(3))->toBe(36)  // 30% of 120
+            ->and($skill->getSpSaved(4))->toBe(42)  // 35% of 120
+            ->and($skill->getSpSaved(5))->toBe(48); // 40% of 120
     });
 
     it('can check if skill can evolve', function () {

@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.0.0  
-**Date**: January 23, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.0.0
+**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
 
 ---
 
@@ -350,17 +350,18 @@ View and manage your character's current state:
 
 **Aptitude Ratings & Effectiveness:**
 
-| Rating | Effectiveness |
-|--------|---------------|
-| SS | 120% |
-| S | 110% |
-| A | 100% |
-| B | 90% |
-| C | 80% |
-| D | 70% |
-| E | 60% |
-| F | 50% |
-| G | 40% |
+| Rating | Effectiveness | Notes |
+|--------|---------------|-------|
+| S | +5% | Maximum grade (provides positive bonus) |
+| A | 0% | Baseline (no bonus/penalty) |
+| B | -10% | Slight penalty |
+| C | -20% | Moderate penalty |
+| D | -30%/-40% | Significant penalty (varies by category) |
+| E | -50%/-60% | Major penalty |
+| F | -70%/-80% | Severe penalty |
+| G | -90% | Minimum grade |
+
+> **Note**: S is the maximum aptitude grade. SS does NOT exist in the current game version. Only S-rank provides positive bonuses; all grades below A incur penalties.
 
 ---
 
@@ -636,14 +637,14 @@ flowchart TD
 │  │   Late Surger enhancement, inherited from legacy       ││
 │  │                                                        ││
 │  │ ✓ Go with the Flow → Lane Legerdemain [EVOLVED]       ││
-│  │   Base: 120 SP | Evolved to: 180 SP | Hint: 1 (-20%)  ││
+│  │   Base: 120 SP | Evolved to: 180 SP | Hint: 1 (-10%)  ││
 │  └────────────────────────────────────────────────────────┘│
 │                                                            │
 │  ┌────────────────────────────────────────────────────────┐│
 │  │ AVAILABLE SKILLS (128)                                 ││
 │  ├────────────────────────────────────────────────────────┤│
-│  │ ⚡ Going Strong [Normal] 120 SP (10 hints available)   ││
-│  │   Recommended for build | Cost with hints: 96 SP      ││
+│  │ ⚡ Going Strong [Normal] 120 SP (5 hints available)    ││
+│  │   Recommended for build | Cost with 5 hints: 72 SP    ││
 │  │   [ACQUIRE] [MORE INFO]                               ││
 │  └────────────────────────────────────────────────────────┘│
 └────────────────────────────────────────────────────────────┘
@@ -659,13 +660,16 @@ flowchart TD
 
 ### 8.3 Skill Hint System
 
-Hints reduce SP cost:
+Hints reduce SP cost progressively:
 
 | Hint Level | Discount |
 |------------|----------|
 | 0 Hints | 0% (Base cost) |
-| 1 Hint | 20% discount |
-| 2 Hints | 40% discount (maximum) |
+| 1 Hint | 10% discount |
+| 2 Hints | 20% discount |
+| 3 Hints | 30% discount |
+| 4 Hints | 35% discount |
+| 5 Hints | 40% discount (maximum) |
 
 **Hint Sources:**
 

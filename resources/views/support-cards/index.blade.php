@@ -20,18 +20,6 @@
                     <span x-show="!showExternalImport">Import from API</span>
                     <span x-show="showExternalImport">Close Import</span>
                 </button>
-                <button @click="viewMode = viewMode === 'grid' ? 'list' : 'grid'" class="btn btn-outline"
-                    :aria-label="viewMode === 'grid' ? 'Switch to list view' : 'Switch to grid view'">
-                    <svg x-show="viewMode === 'grid'" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                    <svg x-show="viewMode === 'list'" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                    </svg>
-                </button>
             </div>
         </header>
 
@@ -161,7 +149,7 @@
 
                     <!-- Actions -->
                     <div class="md:col-span-2 flex gap-2 h-full items-end pb-0.5">
-                        <button type="submit" class="btn btn-secondary flex-1 h-[38px] flex items-center justify-center">
+                        <button type="submit" class="btn btn-secondary flex-1 h-9.5 flex items-center justify-center">
                             <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
@@ -229,44 +217,35 @@
 
         <!-- Cards Grid -->
         <section aria-label="Support Card List">
-        @if ($cards->count() > 0)
-            <div x-show="viewMode === 'grid'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                @foreach ($cards as $card)
-                    <x-support-card-tile :card="$card" />
-                @endforeach
-            </div>
+            @if ($cards->count() > 0)
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    @foreach ($cards as $card)
+                        <x-support-card-tile :card="$card" />
+                    @endforeach
+                </div>
 
-            <!-- Cards List -->
-            <div x-show="viewMode === 'list'" class="space-y-3">
-                @foreach ($cards as $card)
-                    <x-support-card-list-item :card="$card" />
-                @endforeach
-            </div>
-
-            <!-- Pagination -->
-            <div class="mt-6">
-                {{ $cards->links() }}
-            </div>
-        @else
-            <div
-                class="text-center py-12 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                </svg>
-                <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No cards found</h3>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    Try adjusting your filters or search criteria.
-                </p>
-            </div>
-        @endif
+                <div class="mt-6">
+                    {{ $cards->links() }}
+                </div>
+            @else
+                <div
+                    class="text-center py-12 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No cards found</h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        Try adjusting your filters or search criteria.
+                    </p>
+                </div>
+            @endif
         </section>
     </div>
 
     <script>
         function supportCardManager() {
             return {
-                viewMode: localStorage.getItem('supportCardViewMode') || 'grid',
                 showExternalImport: false,
 
                 // External API state
@@ -280,10 +259,6 @@
                 importedCards: new Set(),
 
                 init() {
-                    this.$watch('viewMode', value => {
-                        localStorage.setItem('supportCardViewMode', value);
-                    });
-
                     // Load external cards when panel opens
                     this.$watch('showExternalImport', value => {
                         if (value && this.externalCards.length === 0) {

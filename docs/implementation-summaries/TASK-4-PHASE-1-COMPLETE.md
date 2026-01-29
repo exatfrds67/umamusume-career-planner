@@ -223,7 +223,7 @@ php artisan db:seed --class=EnhancedRealUmaMusumeCharactersSeeder
 
 ### Data Validation
 
-- ✅ All aptitude grades valid (G-SS range)
+- ✅ All aptitude grades valid (G-S range, S is maximum)
 - ✅ All distance/surface combinations present
 - ✅ All running styles present
 - ✅ No duplicate aptitude records

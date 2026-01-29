@@ -1,10 +1,10 @@
 # Technical Specifications Index
 
 **Document Version**: 2.2.0  
-**Last Updated**: 2026-01-27  
+**Last Updated**: 2026-01-28  
 **Status**: Active  
 **Project**: Umamusume Pretty Derby Career Planner  
-**Architecture Version**: v2.2.0
+**Architecture Version**: v2.2.0 (Game-Aligned)
 
 ---
 
@@ -18,14 +18,14 @@ This index provides a comprehensive catalog of all Technical Specifications (SPE
 
 | SPEC ID | Module | Status | PRD Reference | Last Updated |
 |---------|--------|--------|---------------|--------------|
-| [SPEC-001](#spec-001) | Character Management | Active | PRD-001 | 2026-01-24 |
-| [SPEC-002](#spec-002) | Training Optimization | Active | PRD-002 | 2026-01-24 |
-| [SPEC-003](#spec-003) | Race Strategy | Active | PRD-003 | 2026-01-24 |
-| [SPEC-004](#spec-004) | Skill Management | Active | PRD-004 | 2026-01-27 |
-| [SPEC-005](#spec-005) | Support Card Management | Active | PRD-005 | 2026-01-27 |
-| [SPEC-006](#spec-006) | AI Advisory System | Active | PRD-006 | 2026-01-24 |
-| [SPEC-007](#spec-007) | External Integration | Active | PRD-007 | 2026-01-24 |
-| [SPEC-008](#spec-008) | Performance Monitoring & APM | Active | SRS §3.9 | 2026-01-27 |
+| [SPEC-001](#spec-001) | Character Management | Active | PRD-001 | 2026-01-28 |
+| [SPEC-002](#spec-002) | Training Optimization | Active | PRD-002 | 2026-01-28 |
+| [SPEC-003](#spec-003) | Race Strategy | Active | PRD-003 | 2026-01-28 |
+| [SPEC-004](#spec-004) | Skill Management | Active | PRD-004 | 2026-01-28 |
+| [SPEC-005](#spec-005) | Support Card Management | Active | PRD-005 | 2026-01-28 |
+| [SPEC-006](#spec-006) | AI Advisory System | Active | PRD-006 | 2026-01-28 |
+| [SPEC-007](#spec-007) | External Integration | Active | PRD-007 | 2026-01-28 |
+| [SPEC-008](#spec-008) | Performance Monitoring & APM | Active | SRS §3.9 | 2026-01-28 |
 
 ---
 
@@ -40,7 +40,7 @@ This index provides a comprehensive catalog of all Technical Specifications (SPE
 **Key Components**:
 
 - Character entity with stats (Speed/Stamina/Power/Guts/Wit), Energy, Mood
-- Aptitude system with grade-based ratings (G-SS) for Distance, Surface, Strategy
+- Aptitude system with grade-based ratings (G-S) for Distance, Surface, Strategy
 - Factor inheritance with parent selection and stat/aptitude bonuses
 - Goal engine for dynamic objective tracking
 - Condition system for status effect management
@@ -109,7 +109,7 @@ This index provides a comprehensive catalog of all Technical Specifications (SPE
 **Key Components**:
 
 - Skill catalog database with Normal, Rare, and Unique classifications
-- Hint system with level-based SP discounts (10%-40%)
+- Hint system with level-based SP discounts (10%-40% across 5 levels)
 - Evolution logic for skill upgrades with prerequisite validation
 - SP optimization algorithms for budget management
 - Skill recommendation engine powered by AI
@@ -294,6 +294,7 @@ All specifications adhere to the **v2.2.0 Architecture** defined in the Software
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.2.0 | 2026-01-28 | Development Team | Game-accurate mechanics: 5-level hint system, S max aptitude, stat soft cap, track conditions |
 | 2.0.0 | 2026-01-24 | Development Team | Full alignment with v2.0.0 architecture |
 | 1.0.0 | 2026-01-14 | Development Team | Initial specification drafts |
 
@@ -339,7 +340,7 @@ All specifications adhere to the **v2.2.0 Architecture** defined in the Software
 
 | Term | Definition |
 |------|------------|
-| **Aptitude** | Character rating (G-SS) for distance, surface, or running style |
+| **Aptitude** | Character rating (G-S) for distance, surface, or running style |
 | **Factor** | Inherited trait from parent characters providing stat/skill bonuses |
 | **Neuron** | AI agent framework for providing strategic recommendations |
 | **SP** | Skill Points - currency for acquiring skills during training |

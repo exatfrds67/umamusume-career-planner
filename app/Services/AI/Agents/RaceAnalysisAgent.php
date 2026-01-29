@@ -4,6 +4,7 @@ namespace App\Services\AI\Agents;
 
 use App\Models\Character;
 use App\Services\MCP\MCPClientService;
+use App\Services\RaceConditionService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
@@ -14,11 +15,15 @@ use Illuminate\Support\Facades\Log;
  * Specialized MCP-powered agent for race preparation analysis, performance predictions,
  * strategy recommendations, and post-race analysis.
  *
+ * **Phase 6**: Integrated with RaceConditionService for weather/track condition effects
+ *
  * Requirements: 13.2, 13.3, 56.3
  */
 class RaceAnalysisAgent
 {
     protected MCPClientService $mcpClient;
+
+    protected RaceConditionService $conditionService;
 
     protected string $agentId;
 
@@ -27,9 +32,12 @@ class RaceAnalysisAgent
     /** @var array<string, mixed> */
     protected array $config;
 
-    public function __construct(MCPClientService $mcpClient)
-    {
+    public function __construct(
+        MCPClientService $mcpClient,
+        RaceConditionService $conditionService
+    ) {
         $this->mcpClient = $mcpClient;
+        $this->conditionService = $conditionService;
         $this->enabled = (bool) Config::get('ai.agents.race_analysis.enabled', true);
         $config = Config::get('ai.agents.race_analysis', []);
         $this->config = \is_array($config) ? $config : [];
@@ -128,7 +136,8 @@ class RaceAnalysisAgent
      *     win_probability: float,
      *     performance_factors: array<string, mixed>,
      *     confidence: float,
-     *     reasoning: string
+     *     reasoning: string,
+     *     condition_impact?: array<string, mixed>
      * }
      */
     public function predictRacePerformance(Character $character, array $raceDetails = [], array $strategy = []): array
@@ -136,17 +145,72 @@ class RaceAnalysisAgent
         $startTime = microtime(true);
 
         try {
+            // Apply weather/track condition effects if available
+            $conditionImpact = null;
+            $modifiedStats = null;
+
+            if (isset($raceDetails['track_condition'], $raceDetails['surface'])) {
+                $trackCondition = (string) $raceDetails['track_condition'];
+                $surface = (string) $raceDetails['surface'];
+
+                // Validate inputs
+                if (
+                    $this->conditionService->isValidTrackCondition($trackCondition) &&
+                    $this->conditionService->isValidSurface($surface)
+                ) {
+                    // Get character stats
+                    $stats = [
+                        'speed' => $character->current_stats['speed'] ?? 0,
+                        'stamina' => $character->current_stats['stamina'] ?? 0,
+                        'power' => $character->current_stats['power'] ?? 0,
+                        'guts' => $character->current_stats['guts'] ?? 0,
+                        'wit' => $character->current_stats['wit'] ?? 0,
+                    ];
+
+                    // Apply condition penalties
+                    $modifiedStats = $this->conditionService->applyConditionPenalties(
+                        $stats,
+                        $trackCondition,
+                        $surface
+                    );
+
+                    // Calculate condition impact
+                    $conditionImpact = [
+                        'impact_score' => $this->conditionService->calculatePerformanceImpact($trackCondition, $surface),
+                        'description' => $this->conditionService->getConditionImpactDescription($trackCondition, $surface),
+                        'is_wet' => $this->conditionService->isWetCondition($trackCondition),
+                        'severity' => $this->conditionService->getConditionSeverity($trackCondition),
+                        'recommended_skills' => $this->conditionService->getRecommendedSkills(
+                            isset($raceDetails['weather']) ? (string) $raceDetails['weather'] : null,
+                            $trackCondition
+                        ),
+                        'stat_penalties' => [
+                            'power' => $this->conditionService->calculatePowerPenalty($trackCondition, $surface),
+                            'speed' => $this->conditionService->calculateSpeedPenalty($trackCondition, $surface),
+                            'stamina_drain' => $this->conditionService->calculateStaminaDrain($trackCondition, $surface),
+                        ],
+                    ];
+                }
+            }
+
             $context = [
                 'character' => $this->getCharacterData($character),
                 'race' => $raceDetails,
                 'strategy' => $strategy,
                 'task' => 'predict_race_performance',
+                'modified_stats' => $modifiedStats, // Include modified stats in context
+                'condition_impact' => $conditionImpact, // Include condition analysis
             ];
 
             $response = $this->processWithMCPAgent($context);
 
             /** @var array<string, mixed> $performanceFactors */
             $performanceFactors = isset($response['performance_factors']) && is_array($response['performance_factors']) ? $response['performance_factors'] : [];
+
+            // Add condition impact to performance factors
+            if ($conditionImpact !== null) {
+                $performanceFactors['condition_impact'] = $conditionImpact;
+            }
 
             /** @var int|string $positionRaw */
             $positionRaw = $response['predicted_position'] ?? 5;
@@ -157,13 +221,20 @@ class RaceAnalysisAgent
             /** @var string $reasoningRaw */
             $reasoningRaw = $response['reasoning'] ?? 'Performance prediction completed';
 
-            return [
+            $result = [
                 'predicted_position' => (int) $positionRaw,
                 'win_probability' => (float) $winProbRaw,
                 'performance_factors' => $performanceFactors,
                 'confidence' => (float) $confidenceRaw,
                 'reasoning' => (string) $reasoningRaw,
             ];
+
+            // Include condition impact at top level if available
+            if ($conditionImpact !== null) {
+                $result['condition_impact'] = $conditionImpact;
+            }
+
+            return $result;
         } catch (\Exception $e) {
             Log::error('[RaceAnalysisAgent] Performance prediction failed', [
                 'error' => $e->getMessage(),
@@ -189,7 +260,8 @@ class RaceAnalysisAgent
      *     running_style: string,
      *     skill_recommendations: array<int, string>,
      *     confidence: float,
-     *     reasoning: string
+     *     reasoning: string,
+     *     condition_aware_skills?: array<int, string>
      * }
      */
     public function recommendRaceStrategy(Character $character, array $raceDetails = []): array
@@ -197,10 +269,22 @@ class RaceAnalysisAgent
         $startTime = microtime(true);
 
         try {
+            // Get condition-aware skill recommendations if weather/track data available
+            $conditionSkills = [];
+            if (isset($raceDetails['track_condition'])) {
+                $trackCondition = (string) $raceDetails['track_condition'];
+                $weather = isset($raceDetails['weather']) ? (string) $raceDetails['weather'] : null;
+
+                if ($this->conditionService->isValidTrackCondition($trackCondition)) {
+                    $conditionSkills = $this->conditionService->getRecommendedSkills($weather, $trackCondition);
+                }
+            }
+
             $context = [
                 'character' => $this->getCharacterData($character),
                 'race' => $raceDetails,
                 'task' => 'recommend_race_strategy',
+                'condition_aware_skills' => $conditionSkills, // Include condition skills in context
             ];
 
             $response = $this->processWithMCPAgent($context);
@@ -220,13 +304,20 @@ class RaceAnalysisAgent
             /** @var string $reasoningRaw */
             $reasoningRaw = $response['reasoning'] ?? 'Strategy recommendation completed';
 
-            return [
+            $result = [
                 'strategy' => $strategy,
                 'running_style' => (string) $runningStyleRaw,
                 'skill_recommendations' => $skillRecommendations,
                 'confidence' => (float) $confidenceRaw,
                 'reasoning' => (string) $reasoningRaw,
             ];
+
+            // Add condition-aware skills if available
+            if (! empty($conditionSkills)) {
+                $result['condition_aware_skills'] = $conditionSkills;
+            }
+
+            return $result;
         } catch (\Exception $e) {
             Log::error('[RaceAnalysisAgent] Strategy recommendation failed', [
                 'error' => $e->getMessage(),

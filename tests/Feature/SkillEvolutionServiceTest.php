@@ -159,7 +159,7 @@ describe('Skill Evolution Process', function () {
             'is_active' => true,
         ]);
 
-        // Add 2 hints for the Rare skill (40% discount)
+        // Add 2 hints for the Rare skill (20% discount at level 2)
         SkillHint::factory()->count(2)->create([
             'character_id' => $this->character->id,
             'skill_id' => $this->rareSkill->id,
@@ -170,8 +170,8 @@ describe('Skill Evolution Process', function () {
 
         expect($result['success'])->toBeTrue()
             ->and($result['hints_used'])->toBe(2)
-            ->and($result['sp_saved'])->toBe(72) // 40% of 180 SP
-            ->and($result['sp_cost'])->toBe(108); // 180 - 72
+            ->and($result['sp_saved'])->toBe(36) // 20% of 180 SP
+            ->and($result['sp_cost'])->toBe(144); // 180 - 36
     });
 
     it('fails evolution when prerequisites are not met', function () {
@@ -257,15 +257,15 @@ describe('SP Efficiency Calculations', function () {
             $this->normalSkill
         );
 
-        // Normal: 120 - 40% = 72 SP
-        // Rare: 180 - 40% = 108 SP
-        // Evolution path: 72 + 108 = 180 SP
-        // Direct: 108 SP
-        // Direct is better by 72 SP
+        // Normal: 120 - 20% = 96 SP (2 hints = 20% discount)
+        // Rare: 180 - 20% = 144 SP (2 hints = 20% discount)
+        // Evolution path: 96 + 144 = 240 SP
+        // Direct: 144 SP
+        // Direct is better by 96 SP
 
-        expect($efficiency['evolution_path']['total_cost'])->toBe(180)
-            ->and($efficiency['direct_acquisition']['total_cost'])->toBe(108)
-            ->and($efficiency['comparison']['sp_savings'])->toBe(-72);
+        expect($efficiency['evolution_path']['total_cost'])->toBe(240)
+            ->and($efficiency['direct_acquisition']['total_cost'])->toBe(144)
+            ->and($efficiency['comparison']['sp_savings'])->toBe(-96);
     });
 });
 

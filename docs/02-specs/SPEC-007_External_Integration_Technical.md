@@ -1,9 +1,9 @@
 # SPEC-007: External Integration System - Technical Specification
 
-**Document Version**: 2.0.0  
-**Date**: 2026-01-24  
+**Document Version**: 2.2.0  
+**Date**: 2026-01-28  
 **Project**: Umamusume Pretty Derby Career Planner  
-**Status**: Active  
+**Status**: Active - Updated with game-accurate data validation  
 **Classification**: Internal - Development Team
 
 ---
@@ -14,9 +14,9 @@
 |-----------|-------|
 | **Document ID** | SPEC-007 |
 | **Related PRD** | [PRD-007: External Integration](../prds/PRD-007_External_Integration.md) |
-| **Architecture Version** | v2.0.0 |
+| **Architecture Version** | v2.2.0 |
 | **Approval Status** | Approved |
-| **Last Reviewed** | 2026-01-24 |
+| **Last Reviewed** | 2026-01-28 |
 
 ### Related Documents
 
@@ -4486,6 +4486,7 @@ return [
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.2.0 | 2026-01-28 | Development Team | Updated to align with game-accurate mechanics (v2.2.0 architecture), data validation for aptitude grades (G-S) |
 | 2.0.0 | 2026-01-24 | Development Team | Full v2.0.0 alignment, complete technical specification with all services, API endpoints, database schema, testing strategy, and comprehensive appendices |
 | 1.0.0 | 2026-01-14 | Development Team | Initial technical specification |
 

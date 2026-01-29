@@ -1,6 +1,6 @@
 # SEQUENCE DIAGRAMS: Critical Interaction Flows
 
-**Document Version**: 2.2.0 | **Date**: January 27, 2026 | **Status**: Production-Aligned
+**Document Version**: 2.2.0 | **Date**: January 28, 2026 | **Status**: Production-Aligned with game-accurate mechanics
 
 ## Overview
 
@@ -319,8 +319,8 @@ sequenceDiagram
     HintService-->>SkillService: hint_count
     
     SkillService->>SkillService: calculateFinalCost()
-    Note over SkillService: base_cost × (1 - (hint_count × 20%))
-    Note over SkillService: Max discount: 40% at 2+ hints
+    Note over SkillService: base_cost × (1 - hint_discount)
+    Note over SkillService: 5 levels: 10%/20%/30%/35%/40% max
     
     SkillService->>SkillService: Validate SP budget
     

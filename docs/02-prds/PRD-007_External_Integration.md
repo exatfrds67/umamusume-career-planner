@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.1.0  
-**Date**: January 24, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.0.0  
+**Status**: Current - Aligned with codebase v2.2.0  
 **Related Documents**: [SRS-FR-08], [SDS-4.7], [DBD-2.1], [SPEC-007]
 
 **Source Specs**:
@@ -28,13 +28,7 @@
 
 - [PRD-007: External Integration System](#prd-007-external-integration-system)
   - [1. Executive Summary](#1-executive-summary)
-    - [1.1 Purpose](#11-purpose)
-    - [1.2 Problem Statement](#12-problem-statement)
-    - [1.3 Solution Overview](#13-solution-overview)
   - [2. Product Overview](#2-product-overview)
-    - [2.1 Objectives](#21-objectives)
-    - [2.2 Scope (In)](#22-scope-in)
-    - [2.3 Scope (Out)](#23-scope-out)
   - [3. User Stories](#3-user-stories)
   - [4. Functional Requirements](#4-functional-requirements)
   - [5. User Interface Requirements](#5-user-interface-requirements)
@@ -43,6 +37,7 @@
   - [8. Success Metrics](#8-success-metrics)
   - [9. Release Plan](#9-release-plan)
   - [10. Open Questions and Assumptions](#10-open-questions-and-assumptions)
+  - [Changelog](#changelog)
 
 ---
 
@@ -50,7 +45,7 @@
 
 ### 1.1 Purpose
 
-Ensure the application maintains up-to-date game data and provides robust data interchange capabilities. This includes syncing reference data (Characters, Cards, Skills) from external community APIs and enabling user data import via OCR and file upload.
+Ensure the application maintains up-to-date game data and provides robust data interchange capabilities.
 
 ### 1.2 Problem Statement
 
@@ -110,14 +105,40 @@ Game data changes frequently (new banners, balance patches). Manual updates are 
   3. If All Fail -> Use Stale Cache -> Notify Admin.
 - **Normalization**: Map external JSON schemas to internal `ucp_` database schema.
 
-### 4.2 OCR Pipeline [FR-08.4]
+### 4.2 Game Mechanics Data Sync [FR-08.2]
+
+Ensure synced data reflects accurate game mechanics:
+
+**Skill Hint System**:
+
+- 5 hint levels with 10%/10%/10%/5%/5% discounts (40% max)
+- Additional sources: Fast Learner (+10%), Skill Sparks, Hint Books
+
+**Aptitude System**:
+
+- Grade scale: G → F → E → D → C → B → A → S (no SS)
+- A-rank baseline; only S-rank provides positive bonuses
+
+**Stat System**:
+
+- Soft cap at 1200 with diminishing returns above
+- Important breakpoints: 901, 1200, 1600
+
+**Track Conditions**:
+
+- Firm: No penalties
+- Good: -50 Power
+- Soft: -50/-100 Power, +2%/sec stamina drain
+- Heavy: -50/-100 Power, -50 Speed, +2%/sec stamina drain
+
+### 4.3 OCR Pipeline [FR-08.4]
 
 - **Preprocessing**: Resize to max 2000px, Grayscale, Adaptive Thresholding (GD Library).
 - **Extraction**: Tesseract OCR engine (v5+) with Japanese/English language packs.
 - **Parsing**: Regex-based extraction for Stats (S/S/P/G/W), Skill names, and Race results.
 - **Validation**: Confidence scoring. Flag low-confidence (<80%) fields for manual user review.
 
-### 4.3 Data Management [FR-09]
+### 4.4 Data Management [FR-09]
 
 - **Import**:
   - Detect format (JSON v1/v2, CSV).
@@ -127,7 +148,7 @@ Game data changes frequently (new banners, balance patches). Manual updates are 
   - JSON (Full backup).
   - Excel/CSV (Tabular data for analysis).
 
-### 4.4 Real-time Updates [FR-08.5]
+### 4.5 Real-time Updates [FR-08.5]
 
 - **Technology**: Laravel Reverb.
 - **Events**: `DataSyncCompleted`, `OCRProcessingFinished`.
@@ -195,15 +216,18 @@ Game data changes frequently (new banners, balance patches). Manual updates are 
 
 ## 9. Release Plan
 
-- **v2.0.0 (Current)**:
+- **v2.0.0**:
   - Connectors for primary/fallback APIs.
   - Circuit Breaker logic.
   - Basic OCR (Stats only).
   - JSON Import/Export.
-- **v2.1.0 (Next)**:
+- **v2.1.0**:
   - Advanced OCR (Skill icons, Race results).
   - Community-shared deck imports via URL.
   - Auto-repair of corrupted local data.
+- **v2.2.0 (Current)**:
+  - Game mechanics data validation against verified sources.
+  - Updated schema to support accurate game mechanics.
 
 ---
 
@@ -212,3 +236,13 @@ Game data changes frequently (new banners, balance patches). Manual updates are 
 - **Assumption**: `umapyoi.net` API remains free and public.
 - **Assumption**: Tesseract language data files are installed on the server environment.
 - **Open Question**: How to handle copyright on card images fetched from external APIs? *Current: Proxy/Cache images locally.*
+
+---
+
+## Changelog
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 2.2.0 | January 28, 2026 | Updated with verified game mechanics from Global English Server: added game mechanics data sync requirements ensuring accurate skill hint system (5 levels, 40% max), aptitude system (G-S, no SS), stat system (1200+ diminishing returns), and track conditions. |
+| 2.1.0 | January 24, 2026 | Aligned with codebase v2.0.0, added source specs references. |
+| 2.0.0 | January 2026 | Initial v2 release with API sync and OCR. |

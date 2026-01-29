@@ -118,7 +118,7 @@ $evolutionAcquisition = SkillAcquisition::factory()
 
 **Features**:
 
-- Automatic hint discount calculation (20% per hint, 40% max)
+- Automatic hint discount calculation (5 levels: 10%/20%/30%/35%/40% max)
 - SP savings computation
 - Evolution state tracking
 - Priority level management
@@ -295,10 +295,10 @@ $result = $evolutionService->evolveSkill($character, $normalSkill);
 ### 2. Hint Discount Application
 
 ```php
-// With 2 hints for Rare skill (40% discount)
+// With 5 hint levels for Rare skill (40% discount at level 5)
 $result = $evolutionService->evolveSkill($character, $normalSkill);
 // Base cost: 180 SP
-// Discount: 72 SP (40%)
+// Discount: 72 SP (40% at level 5)
 // Final cost: 108 SP
 // SP saved: 72 SP
 ```
@@ -309,12 +309,12 @@ $result = $evolutionService->evolveSkill($character, $normalSkill);
 $efficiency = $evolutionService->calculateEvolutionEfficiency($character, $normalSkill);
 
 // Evolution Path:
-// 1. Acquire Normal: 72 SP (with 2 hints)
-// 2. Evolve to Rare: 108 SP (with 2 hints)
+// 1. Acquire Normal: 72 SP (with level 5 hints - 40% discount)
+// 2. Evolve to Rare: 108 SP (with level 5 hints - 40% discount)
 // Total: 180 SP
 
 // Direct Acquisition:
-// 1. Acquire Rare: 108 SP (with 2 hints)
+// 1. Acquire Rare: 108 SP (with level 5 hints - 40% discount)
 // Total: 108 SP
 
 // Recommendation: Direct acquisition saves 72 SP

@@ -7,6 +7,7 @@ use App\Services\AI\Agents\RaceAnalysisAgent;
 use App\Services\AI\Agents\SkillManagementAgent;
 use App\Services\AI\Agents\TrainingOptimizationAgent;
 use App\Services\MCP\MCPClientService;
+use App\Services\RaceConditionService;
 use Illuminate\Support\Facades\Config;
 
 beforeEach(function () {
@@ -34,10 +35,11 @@ beforeEach(function () {
 
 it('creates all agent services successfully', function () {
     $mcpClient = app(MCPClientService::class);
+    $conditionService = new RaceConditionService;
 
     $trainingAgent = new TrainingOptimizationAgent($mcpClient);
     $careerAgent = new CareerStrategyAgent($mcpClient);
-    $raceAgent = new RaceAnalysisAgent($mcpClient);
+    $raceAgent = new RaceAnalysisAgent($mcpClient, $conditionService);
     $skillAgent = new SkillManagementAgent($mcpClient);
 
     expect($trainingAgent)->toBeInstanceOf(TrainingOptimizationAgent::class)
@@ -50,7 +52,7 @@ it('creates orchestration service with all agents', function () {
     $mcpClient = app(MCPClientService::class);
     $trainingAgent = new TrainingOptimizationAgent($mcpClient);
     $careerAgent = new CareerStrategyAgent($mcpClient);
-    $raceAgent = new RaceAnalysisAgent($mcpClient);
+    $raceAgent = new RaceAnalysisAgent($mcpClient, new RaceConditionService);
     $skillAgent = new SkillManagementAgent($mcpClient);
 
     $orchestration = new AgentOrchestrationService(
@@ -103,7 +105,7 @@ it('career agent creates career plan', function () {
 
 it('race agent analyzes race preparation', function () {
     $mcpClient = app(MCPClientService::class);
-    $raceAgent = new RaceAnalysisAgent($mcpClient);
+    $raceAgent = new RaceAnalysisAgent($mcpClient, new RaceConditionService);
 
     $raceDetails = [
         'name' => 'Japan Cup',
@@ -144,7 +146,7 @@ it('orchestration service executes comprehensive analysis', function () {
     $mcpClient = app(MCPClientService::class);
     $trainingAgent = new TrainingOptimizationAgent($mcpClient);
     $careerAgent = new CareerStrategyAgent($mcpClient);
-    $raceAgent = new RaceAnalysisAgent($mcpClient);
+    $raceAgent = new RaceAnalysisAgent($mcpClient, new RaceConditionService);
     $skillAgent = new SkillManagementAgent($mcpClient);
 
     $orchestration = new AgentOrchestrationService(
@@ -177,7 +179,7 @@ it('orchestration service executes parallel workflow', function () {
     $mcpClient = app(MCPClientService::class);
     $trainingAgent = new TrainingOptimizationAgent($mcpClient);
     $careerAgent = new CareerStrategyAgent($mcpClient);
-    $raceAgent = new RaceAnalysisAgent($mcpClient);
+    $raceAgent = new RaceAnalysisAgent($mcpClient, new RaceConditionService);
     $skillAgent = new SkillManagementAgent($mcpClient);
 
     $orchestration = new AgentOrchestrationService(
@@ -215,7 +217,7 @@ it('orchestration service executes sequential workflow with context sharing', fu
     $mcpClient = app(MCPClientService::class);
     $trainingAgent = new TrainingOptimizationAgent($mcpClient);
     $careerAgent = new CareerStrategyAgent($mcpClient);
-    $raceAgent = new RaceAnalysisAgent($mcpClient);
+    $raceAgent = new RaceAnalysisAgent($mcpClient, new RaceConditionService);
     $skillAgent = new SkillManagementAgent($mcpClient);
 
     $orchestration = new AgentOrchestrationService(
@@ -251,7 +253,7 @@ it('all agents report correct status', function () {
     $mcpClient = app(MCPClientService::class);
     $trainingAgent = new TrainingOptimizationAgent($mcpClient);
     $careerAgent = new CareerStrategyAgent($mcpClient);
-    $raceAgent = new RaceAnalysisAgent($mcpClient);
+    $raceAgent = new RaceAnalysisAgent($mcpClient, new RaceConditionService);
     $skillAgent = new SkillManagementAgent($mcpClient);
 
     $trainingStatus = $trainingAgent->getStatus();

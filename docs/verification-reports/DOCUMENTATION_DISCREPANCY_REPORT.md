@@ -314,7 +314,7 @@ Both scenarios consistently mentioned:
 Skill mechanics consistently documented:
 
 - Evolution chains (Normal → Rare)
-- Hint-based SP cost reduction (20% per duplicate, 40% max)
+- Hint-based SP cost reduction (5 levels: 10%/20%/30%/35%/40% max)
 - Strategic acquisition timing
 
 **Analysis**: Skill system specifications are consistent ✅

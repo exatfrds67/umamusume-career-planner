@@ -65,7 +65,7 @@ Replace manual tracking methods with intelligent AI-powered optimization by prov
 #### 6. Skill Management
 
 - **Catalog**: 150+ skills with evolution chains
-- **Hint System**: 20-40% SP cost reduction per hint (max 2 hints)
+- **Hint System**: 5-level progressive SP cost reduction (10%/20%/30%/35%/40% max)
 - **Evolution Paths**: Normal → Rare transitions (e.g., Go with the Flow → Lane Legerdemain)
 - **SP Planning**: Real-time balance calculation
 - **Auto-Recommendations**: AI-suggested acquisition sequences

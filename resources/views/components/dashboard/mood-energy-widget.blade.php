@@ -23,41 +23,22 @@
     };
 @endphp
 
-<div {{ $attributes->merge(['class' => 'card bg-white dark:bg-gray-800 overflow-hidden rounded-lg shadow']) }}>
+<div {{ $attributes->merge(['class' => 'card bg-white dark:bg-gray-800 overflow-hidden rounded-lg shadow w-full']) }}>
     <div class="px-4 py-5 sm:p-6">
         <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white mb-4">
             Mood & Energy
         </h3>
 
-        <div class="space-y-4">
-            {{-- Mood Status --}}
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <span class="text-3xl" role="img" aria-label="{{ $currentMood['label'] }} mood">
-                        {{ $currentMood['emoji'] }}
-                    </span>
-                    <div>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">Mood</span>
-                        <p class="text-base font-medium {{ $currentMood['color'] }}">
-                            {{ $currentMood['label'] }}
-                        </p>
-                    </div>
-                </div>
+        <div class="space-y-4 w-full">
+            {{-- Mood Status using ConditionBadge --}}
+            <div class="flex items-center justify-between w-full">
+                <span class="text-sm text-gray-500 dark:text-gray-400">Mood</span>
+                <x-condition-badge :condition="strtoupper($mood)" trend="flat" :turns-active="0" />
             </div>
 
-            {{-- Energy Bar --}}
-            <div>
-                <div class="flex items-center justify-between mb-1">
-                    <span class="text-sm text-gray-500 dark:text-gray-400">Energy</span>
-                    <span class="text-sm font-semibold text-gray-900 dark:text-white">
-                        {{ $energy }}/{{ $maxEnergy }}
-                    </span>
-                </div>
-                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
-                    <div class="h-3 rounded-full transition-all duration-300 {{ $energyColor === 'success' ? 'bg-success-500' : ($energyColor === 'warning' ? 'bg-warning-500' : 'bg-error-500') }}"
-                        style="width: {{ $energyPercentage }}%" role="progressbar" aria-valuenow="{{ $energy }}"
-                        aria-valuemin="0" aria-valuemax="{{ $maxEnergy }}" aria-label="Energy level"></div>
-                </div>
+            {{-- Energy using EnergyGauge --}}
+            <div class="w-full">
+                <x-energy-gauge :value="$energyPercentage" :trend="$energyPercentage >= 70 ? 'up' : ($energyPercentage >= 40 ? 'flat' : 'down')" />
             </div>
 
             {{-- Recovery Options --}}

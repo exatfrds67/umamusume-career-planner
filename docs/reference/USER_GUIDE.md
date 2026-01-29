@@ -110,7 +110,7 @@ Aptitudes determine how well your character performs in different conditions:
 - Late Surger (差し)
 - End Closer (追込)
 
-Aptitude grades range from G (lowest) to SS (highest).
+Aptitude grades range from G (lowest) to S (highest, maximum grade).
 
 ### Managing Characters
 

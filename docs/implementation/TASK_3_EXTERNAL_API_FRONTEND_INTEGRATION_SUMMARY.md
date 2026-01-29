@@ -234,7 +234,7 @@ Implemented full external API integration for support card management at `/suppo
 
 1. **Skill Acquisition**
    - Link to support card source
-   - Apply hint discount (20-40% per hint, max 2)
+   - Apply hint discount (5 levels: 10%/20%/30%/35%/40% max)
    - Track hint_level in acquisition record
    - Skill evolution tracking
 

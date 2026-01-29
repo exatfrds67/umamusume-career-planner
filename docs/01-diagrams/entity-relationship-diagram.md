@@ -4,10 +4,10 @@
 
 **Document ID**: entity-relationship-diagram
 **Version**: 2.2.0
-**Date**: January 27, 2026
+**Date**: January 28, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned with codebase v2.0.0 + January 2026 enhancements
+**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
 
 ---
 
@@ -398,7 +398,7 @@ erDiagram
     }
 ```
 
-**Aptitude Grades**: SS, S, A, B, C, D, E, F, G (effectiveness: 120% to 40%)
+**Aptitude Grades**: S (max), A, B, C, D, E, F, G (effectiveness: +5% to -90%)
 
 **Factor Star Levels**: ★☆☆ (+5), ★★☆ (+12), ★★★ (+21)
 
@@ -470,7 +470,7 @@ erDiagram
 
 **Career Stages**: Junior (1-24), Classic (25-48), Senior (49-72), URA Finals (73-78)
 
-**Stat Range**: 0-1200 (hard cap)
+**Stat Range**: 0-1200 (soft cap, 50% effectiveness above)
 
 ### 4.4 Skill System Entities
 
@@ -525,7 +525,7 @@ erDiagram
 
 **Skill Rarity**: Normal, Rare, Unique, Inherited
 
-**Hint Discount**: 20% per hint, maximum 40% (2+ hints)
+**Hint Discount**: 5 levels (10%/20%/30%/35%/40% max)
 
 **Skill Status**: Acquired, Skipped, Suggested, Planned
 
@@ -880,13 +880,13 @@ erDiagram
 #### Business Logic Constraints
 
 ```sql
--- Stat value ranges (0-1200 hard cap)
+-- Stat value ranges (soft cap at 1200, practical max ~1600)
 ALTER TABLE ucp_careers ADD CONSTRAINT chk_stat_ranges
-    CHECK (speed BETWEEN 0 AND 1200 
-       AND stamina BETWEEN 0 AND 1200
-       AND power BETWEEN 0 AND 1200 
-       AND guts BETWEEN 0 AND 1200
-       AND wit BETWEEN 0 AND 1200);
+    CHECK (speed BETWEEN 0 AND 2000 
+       AND stamina BETWEEN 0 AND 2000
+       AND power BETWEEN 0 AND 2000 
+       AND guts BETWEEN 0 AND 2000
+       AND wit BETWEEN 0 AND 2000);
 
 -- Energy level range (0-100)
 ALTER TABLE ucp_careers ADD CONSTRAINT chk_energy_range
@@ -966,7 +966,7 @@ flowchart TD
 
 | Rule | Table | Constraint | Enforcement |
 |------|-------|------------|-------------|
-| Stat Range | `ucp_careers` | 0-1200 (hard cap) | Database CHECK |
+| Stat Range | `ucp_careers` | Soft cap 1200 (50% above), max ~1600 | Database CHECK |
 | Energy Range | `ucp_careers` | 0-100 | Database CHECK |
 | Turn Range | `ucp_careers`, `ucp_training_sessions` | 1-78 | Database CHECK |
 | Deck Size | `character_support_cards` | Position 1-6 | UNIQUE constraint |

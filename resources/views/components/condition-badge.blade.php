@@ -1,0 +1,65 @@
+@props(['condition', 'trend', 'turnsActive', 'size', 'showTrend', 'showDuration'])
+
+<div {{ $attributes->merge(['class' => 'inline-flex items-center gap-1.5']) }}>
+    {{-- Condition Badge --}}
+    <div class="condition-badge {{ $getSizeClasses() }} {{ $getConditionColor() }} rounded-full font-semibold text-white shadow-md flex items-center gap-1.5 transition-all hover:scale-105"
+        title="{{ $getConditionDescription() }}">
+        {{-- Trend Icon --}}
+        @if ($getTrendIcon())
+            <span class="text-lg leading-none">{{ $getTrendIcon() }}</span>
+        @endif
+
+        {{-- Condition Text --}}
+        <span>{{ $condition }}</span>
+
+        {{-- Duration --}}
+        @if ($showDuration && $turnsActive)
+            <span class="text-xs opacity-90">({{ $turnsActive }}T)</span>
+        @endif
+    </div>
+</div>
+
+<style>
+    /* Condition Badge Styles (Verified from game) */
+    .condition-great {
+        background: linear-gradient(135deg, #ec4899, #be185d);
+        box-shadow: 0 4px 6px -1px rgba(236, 72, 153, 0.4);
+    }
+
+    .condition-good {
+        background: linear-gradient(135deg, #60a5fa, #2563eb);
+        box-shadow: 0 4px 6px -1px rgba(96, 165, 250, 0.4);
+    }
+
+    .condition-normal {
+        background: linear-gradient(135deg, #f97316, #c2410c);
+        box-shadow: 0 4px 6px -1px rgba(249, 115, 22, 0.4);
+    }
+
+    .condition-bad {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.4);
+    }
+
+    /* Dark mode adjustments */
+    .dark .condition-badge {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Pulse animation for active conditions */
+    @keyframes pulse-glow {
+
+        0%,
+        100% {
+            box-shadow: 0 4px 6px -1px currentColor;
+        }
+
+        50% {
+            box-shadow: 0 4px 12px 0 currentColor;
+        }
+    }
+
+    .condition-great {
+        animation: pulse-glow 2s ease-in-out infinite;
+    }
+</style>

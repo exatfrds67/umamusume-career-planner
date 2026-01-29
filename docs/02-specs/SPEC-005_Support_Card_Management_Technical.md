@@ -1,10 +1,9 @@
-```markdown
 # SPEC-005: Support Card Management System - Technical Specification
 
 **Document Version**: 2.2.0  
-**Date**: 2026-01-27  
+**Date**: 2026-01-28  
 **Project**: Umamusume Pretty Derby Career Planner  
-**Status**: Active - Updated with January 2026 deck management and external sync enhancements  
+**Status**: Active - Updated with game-accurate mechanics  
 **Classification**: Internal - Development Team
 
 ---
@@ -15,9 +14,9 @@
 |-----------|-------|
 | **Document ID** | SPEC-005 |
 | **Related PRD** | [PRD-005: Support Card Management](../prds/PRD-005_Support_Card_Management.md) |
-| **Architecture Version** | v2.0.0 |
+| **Architecture Version** | v2.2.0 |
 | **Approval Status** | Approved |
-| **Last Reviewed** | 2026-01-24 |
+| **Last Reviewed** | 2026-01-28 |
 
 ### Related Documents
 
@@ -3079,6 +3078,7 @@ class SupportDeckFactory extends Factory
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.2.0 | 2026-01-28 | Development Team | Updated to align with game-accurate mechanics (v2.2.0 architecture) |
 | 2.0.0 | 2026-01-24 | Development Team | Full v2.0.0 alignment, complete testing strategy, AI integration, bond system, synergy analysis |
 | 1.0.0 | 2026-01-14 | Development Team | Initial technical specification |
 

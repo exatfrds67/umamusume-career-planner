@@ -129,7 +129,7 @@ class Character extends Model
 **Missing Details**:
 
 - Character stat validation (0-1200 range)
-- Aptitude grade validation (G-SS)
+- Aptitude grade validation (G-S, S is maximum)
 - Skill SP cost validation by category
 - Support card deck composition rules
 - File upload validation for OCR screenshots
@@ -241,7 +241,7 @@ class Character extends Model
 | **URA** | URA Finale | Primary game scenario type |
 | **Unity Cup** | Unity Cup | Team-based scenario type |
 | **SS/S/A/B** | Tier Rankings | Meta tier system for cards/skills |
-| **G-SS** | Grade System | Aptitude rating system |
+| **G-S** | Grade System | Aptitude rating system (S is maximum) |
 | **LCP/INP/CLS** | Core Web Vitals | Performance metrics |
 
 ---
@@ -398,13 +398,13 @@ class TrainingOptimizationService
 
 - `ucp_users` - User management with MCP coordination
 - `ucp_characters` - Character data with comprehensive stats
-- `ucp_aptitudes` - Fixed talent ratings (G-SS grades)
+- `ucp_aptitudes` - Fixed talent ratings (G-S grades, S is maximum)
 - `ucp_factors` - Inheritance bonuses with categorization
 
 **Skill Management**:
 
 - `ucp_skills` - Skill data with evolution chains and SP costs
-- `ucp_skill_hints` - 20% discount tracking with sources
+- `ucp_skill_hints` - Progressive discount tracking (5 levels: 10%/20%/30%/35%/40% max) with sources
 - `ucp_skill_acquisitions` - Cost tracking and performance data
 
 **Career Tracking**:

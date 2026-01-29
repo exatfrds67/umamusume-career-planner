@@ -103,7 +103,7 @@ test('cannot acquire skill with insufficient SP', function () {
 test('skill acquisition applies hint discounts', function () {
     $skill = Skill::factory()->create(['base_sp_cost' => 120]);
 
-    // Create 2 hints (40% discount)
+    // Create 2 hints (20% discount - VERIFIED: 10%/20%/30%/35%/40% at levels 1-5)
     SkillHint::factory()->count(2)->create([
         'character_id' => $this->character->id,
         'skill_id' => $skill->id,
@@ -123,9 +123,9 @@ test('skill acquisition applies hint discounts', function () {
         ->first();
 
     expect($acquisition->hints_used)->toBe(2);
-    expect((float) $acquisition->total_discount_percentage)->toBe(40.0);
-    expect($acquisition->final_sp_cost)->toBe(72); // 120 - 40% = 72
-    expect($acquisition->sp_saved)->toBe(48);
+    expect((float) $acquisition->total_discount_percentage)->toBe(20.0); // VERIFIED: 20% for 2 hints
+    expect($acquisition->final_sp_cost)->toBe(96); // 120 - 20% = 96
+    expect($acquisition->sp_saved)->toBe(24); // 20% of 120
 });
 
 test('can get evolution opportunities', function () {
@@ -345,8 +345,8 @@ test('evolution applies hint discounts to rare skill', function () {
         ->first();
 
     expect($rareAcquisition->hints_used)->toBe(2);
-    expect((float) $rareAcquisition->total_discount_percentage)->toBe(40.0);
-    expect($rareAcquisition->final_sp_cost)->toBe(108); // 180 - 40% = 108
+    expect((float) $rareAcquisition->total_discount_percentage)->toBe(20.0); // VERIFIED: 20% for 2 hints
+    expect($rareAcquisition->final_sp_cost)->toBe(144); // 180 - 20% = 144
 });
 
 test('agent performance tracks multiple agent types', function () {

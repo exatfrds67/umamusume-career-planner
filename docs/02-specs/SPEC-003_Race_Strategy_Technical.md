@@ -1,9 +1,9 @@
 # SPEC-003: Race Strategy System - Technical Specification
 
-**Document Version**: 2.0.0  
-**Date**: 2026-01-24  
+**Document Version**: 2.2.0  
+**Date**: 2026-01-28  
 **Project**: Umamusume Pretty Derby Career Planner  
-**Status**: Active  
+**Status**: Active - Updated with game-accurate track conditions and aptitude modifiers  
 **Classification**: Internal - Development Team
 
 ---
@@ -14,9 +14,9 @@
 |-----------|-------|
 | **Document ID** | SPEC-003 |
 | **Related PRD** | [PRD-003: Race Strategy](../prds/PRD-003_Race_Strategy.md) |
-| **Architecture Version** | v2.0.0 |
+| **Architecture Version** | v2.2.0 |
 | **Approval Status** | Approved |
-| **Last Reviewed** | 2026-01-24 |
+| **Last Reviewed** | 2026-01-28 |
 
 ### Related Documents
 
@@ -417,6 +417,7 @@ use App\Enums\{AptitudeGrade, MoodStatus};
  * Win Probability Calculator
  * 
  * Calculates predicted win probability using weighted stat/aptitude scoring.
+ * Uses game-accurate aptitude modifiers (G-S grades, S is maximum).
  */
 class WinProbabilityCalculator
 {
@@ -431,18 +432,21 @@ class WinProbabilityCalculator
     ];
 
     /**
-     * Aptitude grade multipliers
+     * Game-accurate aptitude grade multipliers
+     * S is maximum grade. A is baseline (1.0).
+     * 
+     * Note: Actual modifiers vary by category (Surface/Distance/Style)
+     * These are simplified averages for win probability calculation.
      */
     private const APTITUDE_MULTIPLIERS = [
-        'SS' => 1.25,
-        'S' => 1.15,
-        'A' => 1.05,
-        'B' => 1.00,
-        'C' => 0.95,
-        'D' => 0.90,
-        'E' => 0.85,
-        'F' => 0.80,
-        'G' => 0.75,
+        'S' => 1.05,   // +5% (only grade with positive bonus)
+        'A' => 1.00,   // Baseline
+        'B' => 0.90,   // -10%
+        'C' => 0.80,   // -20%
+        'D' => 0.65,   // -35% (average of category penalties)
+        'E' => 0.45,   // -55%
+        'F' => 0.25,   // -75%
+        'G' => 0.10,   // -90%
     ];
 
     /**
@@ -867,34 +871,91 @@ use App\Enums\{TrackCondition, WeatherType};
  * Weather Impact Calculator
  * 
  * Calculates performance modifiers based on track conditions and weather.
+ * Uses game-accurate track condition penalties from Global EN server.
+ * 
+ * Track Condition Penalties:
+ * - Firm: No penalties
+ * - Good: Power -50
+ * - Soft: Power -50/-100 (Turf/Dirt), Stamina +2%/sec drain
+ * - Heavy: Power -50/-100, Speed -50, Stamina +2%/sec drain
  */
 class WeatherImpactCalculator
 {
     /**
-     * Track condition modifiers
+     * Game-accurate track condition modifiers
+     * 
+     * Penalties are applied as flat stat reductions:
+     * - Power penalties vary by surface (Turf: -50, Dirt: -100)
+     * - Speed penalties apply to Heavy conditions
+     * - Stamina drain increases on Soft/Heavy
      */
-    private const CONDITION_MODIFIERS = [
-        'good' => ['speed' => 1.0, 'stamina' => 1.0],
-        'yielding' => ['speed' => 0.95, 'stamina' => 1.05],
-        'soft' => ['speed' => 0.90, 'stamina' => 1.10],
-        'heavy' => ['speed' => 0.85, 'stamina' => 1.15],
+    private const CONDITION_PENALTIES = [
+        'firm' => [
+            'power_penalty' => 0,
+            'speed_penalty' => 0,
+            'stamina_drain_modifier' => 1.0,
+        ],
+        'good' => [
+            'power_penalty' => 50,
+            'speed_penalty' => 0,
+            'stamina_drain_modifier' => 1.0,
+        ],
+        'soft' => [
+            'power_penalty_turf' => 50,
+            'power_penalty_dirt' => 100,
+            'speed_penalty' => 0,
+            'stamina_drain_modifier' => 1.02, // +2% per second
+        ],
+        'heavy' => [
+            'power_penalty_turf' => 50,
+            'power_penalty_dirt' => 100,
+            'speed_penalty' => 50,
+            'stamina_drain_modifier' => 1.02, // +2% per second
+        ],
     ];
 
     /**
-     * Calculate weather impact
+     * Calculate weather impact with game-accurate penalties
      * 
      * @param Character $character
      * @param TrackCondition $condition
-     * @return array{modifiers: array, skill_recommendations: array}
+     * @param string $surface 'turf' or 'dirt'
+     * @return array{penalties: array, effective_stats: array, skill_recommendations: array}
      */
-    public function calculate(Character $character, TrackCondition $condition): array
-    {
-        $modifiers = self::CONDITION_MODIFIERS[$condition->value] ?? ['speed' => 1.0, 'stamina' => 1.0];
+    public function calculate(
+        Character $character, 
+        TrackCondition $condition,
+        string $surface = 'turf'
+    ): array {
+        $penalties = self::CONDITION_PENALTIES[$condition->value] ?? self::CONDITION_PENALTIES['firm'];
+        
+        // Calculate power penalty based on surface
+        $powerPenalty = $surface === 'dirt' 
+            ? ($penalties['power_penalty_dirt'] ?? $penalties['power_penalty'] ?? 0)
+            : ($penalties['power_penalty_turf'] ?? $penalties['power_penalty'] ?? 0);
+        
+        $speedPenalty = $penalties['speed_penalty'] ?? 0;
+        $staminaDrainMod = $penalties['stamina_drain_modifier'] ?? 1.0;
+        
+        // Calculate effective stats after penalties
+        $currentStats = $character->current_stats;
+        $effectiveStats = [
+            'speed' => max(0, ($currentStats['speed'] ?? 0) - $speedPenalty),
+            'stamina' => $currentStats['stamina'] ?? 0, // Stamina drain is runtime, not flat
+            'power' => max(0, ($currentStats['power'] ?? 0) - $powerPenalty),
+            'guts' => $currentStats['guts'] ?? 0,
+            'wit' => $currentStats['wit'] ?? 0,
+        ];
 
         $skillRecommendations = $this->getSkillRecommendations($condition);
 
         return [
-            'modifiers' => $modifiers,
+            'penalties' => [
+                'power' => $powerPenalty,
+                'speed' => $speedPenalty,
+                'stamina_drain_modifier' => $staminaDrainMod,
+            ],
+            'effective_stats' => $effectiveStats,
             'skill_recommendations' => $skillRecommendations,
             'impact_description' => $this->getImpactDescription($condition),
         ];
@@ -909,14 +970,20 @@ class WeatherImpactCalculator
     private function getSkillRecommendations(TrackCondition $condition): array
     {
         return match ($condition) {
-            TrackCondition::Heavy, TrackCondition::Soft => [
+            TrackCondition::Heavy => [
                 'Muddy Track',
                 'Dirt Master',
                 'Stamina Boost',
+                'Heavy Ground Specialist',
             ],
-            TrackCondition::Yielding => [
+            TrackCondition::Soft => [
+                'Muddy Track',
                 'Track Adaptation',
                 'Wet Surface',
+                'Stamina Recovery',
+            ],
+            TrackCondition::Good => [
+                'Track Adaptation',
             ],
             default => [],
         };
@@ -931,10 +998,10 @@ class WeatherImpactCalculator
     private function getImpactDescription(TrackCondition $condition): string
     {
         return match ($condition) {
-            TrackCondition::Good => 'Optimal conditions for racing',
-            TrackCondition::Yielding => 'Slightly reduced speed, increased stamina requirement',
-            TrackCondition::Soft => 'Moderately reduced speed, higher stamina demand',
-            TrackCondition::Heavy => 'Significantly reduced speed, stamina-intensive',
+            TrackCondition::Firm => 'Optimal conditions - no penalties',
+            TrackCondition::Good => 'Minor Power penalty (-50)',
+            TrackCondition::Soft => 'Power penalty (-50/-100 Turf/Dirt), increased stamina drain (+2%/sec)',
+            TrackCondition::Heavy => 'Speed penalty (-50), Power penalty (-50/-100), increased stamina drain (+2%/sec)',
         };
     }
 }
@@ -2344,6 +2411,7 @@ class RaceResultFactory extends Factory
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.2.0 | 2026-01-28 | Development Team | Game-accurate track conditions (Firm/Good/Soft/Heavy with flat stat penalties), corrected aptitude modifiers (S max, A baseline), surface-specific power penalties |
 | 2.0.0 | 2026-01-24 | Development Team | Full v2.0.0 alignment, added AI integration, complete analysis engines, comprehensive testing strategy |
 | 1.0.0 | 2026-01-23 | Development Team | Initial technical specification |
 

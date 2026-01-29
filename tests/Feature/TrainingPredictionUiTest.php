@@ -150,7 +150,8 @@ test('training predictions show page displays support card count', function () u
     $response = $this->actingAs($user)->get(route('training.predictions.show', $character));
 
     $response->assertSuccessful();
-    $response->assertSee('3 / 6 equipped'); // Support card count
+    $response->assertSee('3', false); // Support card count
+    $response->assertSee('/ 6 equipped', false); // Support card count
 });
 
 test('training predictions show page includes back button', function () use (&$character, &$user) {

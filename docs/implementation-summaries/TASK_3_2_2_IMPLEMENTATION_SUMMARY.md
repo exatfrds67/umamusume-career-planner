@@ -7,7 +7,7 @@
 
 ## Overview
 
-Successfully implemented a comprehensive skill hint tracking system with 20% SP cost reduction per duplicate hint (40% maximum discount), red "!" indicator logic for guaranteed hints, hint probability calculations, and MCP-powered Hint Optimization Agent for strategic hint collection planning.
+Successfully implemented a comprehensive skill hint tracking system with progressive SP cost reduction (5 levels: 10%/20%/30%/35%/40% max), red "!" indicator logic for guaranteed hints, hint probability calculations, and MCP-powered Hint Optimization Agent for strategic hint collection planning.
 
 ## Implementation Details
 
@@ -17,8 +17,8 @@ Successfully implemented a comprehensive skill hint tracking system with 20% SP 
 
 - **Hint Creation**: Creates skill hints with automatic discount calculation
 - **Cost Calculations**:
-  - 20% discount per hint
-  - Maximum 40% discount (2 hints)
+  - Progressive discount per hint level (10%/20%/30%/35%/40%)
+  - Maximum 40% discount (5 hint levels)
   - Accurate SP savings calculations
 - **Hint Retrieval**: Get all hints or unused hints for skills
 - **Cost Breakdown**: Comprehensive cost analysis with hint details
@@ -105,7 +105,7 @@ All endpoints under `/api/characters/{characterId}/skill-hints`:
 
 #### SkillHintServiceTest (43 tests)
 
-- **Hint Creation**: Validates discount calculation (20%, 40%, capped at 40%)
+- **Hint Creation**: Validates discount calculation (10%/20%/30%/35%/40%, capped at 40% at level 5)
 - **Hint Retrieval**: Tests filtering by character, skill, usage status
 - **Cost Calculations**: Verifies discount percentages, final costs, SP savings
 - **Hint Usage**: Tests marking hints as used
@@ -136,8 +136,8 @@ All endpoints under `/api/characters/{characterId}/skill-hints`:
 
 ### Discount System
 
-- ✅ 20% SP cost reduction per duplicate hint
-- ✅ Maximum 40% discount (2 hints)
+- ✅ Progressive SP cost reduction (5 levels: 10%/20%/30%/35%/40%)
+- ✅ Maximum 40% discount at level 5
 - ✅ Accurate cost calculations
 - ✅ SP savings tracking
 
@@ -173,7 +173,7 @@ All endpoints under `/api/characters/{characterId}/skill-hints`:
 
 ## Requirements Validation
 
-✅ **Requirement 26.1**: Skill hint tracking with source identification (support cards, events, inheritance) and 20% SP cost reduction per duplicate hint with 40% maximum discount
+✅ **Requirement 26.1**: Skill hint tracking with source identification (support cards, events, inheritance) and progressive SP cost reduction (5 levels: 10%/20%/30%/35%/40% max)
 
 ✅ **Requirement 26.2**: Training with support cards predicts skill hint availability with red "!" indicators for guaranteed hints and probability calculations for non-guaranteed opportunities
 

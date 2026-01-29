@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.0.0  
-**Date**: January 24, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-004], [SPEC-004], [FLOW-004], [TECH-FLOW-004]
 
 ---
@@ -52,7 +52,7 @@ This sequence diagram documents the complete skill acquisition and upgrade workf
 Skill management is a critical resource optimization workflow that:
 
 - Enables strategic SP allocation across 78 turns
-- Provides hint-based cost reduction (20% per hint, 40% max)
+- Provides hint-based cost reduction (5 levels: 10%/20%/30%/35%/40% max)
 - Supports skill evolution for enhanced effects
 - Tracks skill acquisition history
 - Manages active skill loadouts
@@ -60,7 +60,7 @@ Skill management is a critical resource optimization workflow that:
 **Success Criteria:**
 
 - Skill acquired with correct SP deduction
-- Hint discounts applied accurately (20% per hint, max 40%)
+- Hint discounts applied accurately (5 levels: 10%/20%/30%/35%/40%)
 - Evolution paths validated before upgrade
 - SP budget enforced (total_sp_available constraint)
 - Skill status updated atomically
@@ -286,27 +286,53 @@ public function getAvailableSkills(Career $career): Collection
 }
 ```
 
-### 4.2 Hint-Based Cost Calculation
+### 4.2 Hint-Based Cost Calculation (Game-Accurate - Global English Server Jan 2026)
 
 **Calculation Rules:**
 
-| Hint Count | Discount | Multiplier | Example (120 SP base) |
-|------------|----------|------------|----------------------|
-| 0 hints | 0% | 1.00 | 120 SP |
-| 1 hint | 20% | 0.80 | 96 SP |
-| 2 hints | 40% | 0.60 | 72 SP |
-| 3+ hints | 40% (cap) | 0.60 | 72 SP |
+The hint system provides progressive SP cost discounts with 5 levels:
+
+| Hint Level | Discount | Cumulative | Multiplier | Example (160 SP base) |
+|------------|----------|------------|------------|----------------------|
+| 0 hints | 0% | 0% | 1.00 | 160 SP |
+| 1 hint | 10% | 10% | 0.90 | 144 SP |
+| 2 hints | 10% | 20% | 0.80 | 128 SP |
+| 3 hints | 10% | 30% | 0.70 | 112 SP |
+| 4 hints | 5% | 35% | 0.65 | 104 SP |
+| 5 hints | 5% | 40% (MAX) | 0.60 | 96 SP |
+
+**Additional Discount Sources:**
+
+| Source | Discount | Stacking |
+|--------|----------|----------|
+| Fast Learner Condition | +10% | Additive with hints |
+| Skill Sparks (Inheritance) | Variable | Based on star rating |
+| Hint Books | +1 hint level | Green (Normal), Gold (Rare) |
 
 **Calculation Implementation:**
 
 ```php
 // SkillService.php
-private function calculateFinalCost(int $baseCost, int $hintCount): int
+private function calculateFinalCost(int $baseCost, int $hintLevel, bool $hasFastLearner = false): int
 {
-    $discountPercentage = min($hintCount * 0.20, 0.40); // Max 40% discount
-    $multiplier = 1 - $discountPercentage;
+    // Game-accurate hint discounts: 10%/10%/10%/5%/5% = 40% max
+    $hintDiscount = match($hintLevel) {
+        0 => 0.00,
+        1 => 0.10,
+        2 => 0.20,
+        3 => 0.30,
+        4 => 0.35,
+        5 => 0.40,
+        default => 0.40, // Cap at 40%
+    };
     
-    return (int) ceil($baseCost * $multiplier);
+    // Fast Learner adds +10% additional discount
+    $fastLearnerDiscount = $hasFastLearner ? 0.10 : 0.00;
+    
+    // Discounts are additive, capped at 50%
+    $totalDiscount = min(0.50, $hintDiscount + $fastLearnerDiscount);
+    
+    return (int) ceil($baseCost * (1 - $totalDiscount));
 }
 ```
 

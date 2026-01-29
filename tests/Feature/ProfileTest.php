@@ -211,6 +211,31 @@ describe('Avatar Upload', function () {
 
         $response->assertSessionHasErrors('avatar');
     });
+
+    it('deletes avatar', function () {
+        Storage::fake('public');
+
+        // First upload an avatar
+        $file = UploadedFile::fake()->image('avatar.jpg', 200, 200);
+        $this->actingAs($this->user)
+            ->post(route('profile.avatar'), ['avatar' => $file]);
+
+        $this->user->refresh();
+        $avatarPath = $this->user->avatar_path;
+        expect($avatarPath)->not->toBeNull();
+        Storage::disk('public')->assertExists($avatarPath);
+
+        // Now delete it
+        $response = $this->actingAs($this->user)
+            ->delete(route('profile.avatar.delete'));
+
+        $response->assertSuccessful()
+            ->assertJson(['message' => 'Avatar removed successfully.']);
+
+        $this->user->refresh();
+        expect($this->user->avatar_path)->toBeNull();
+        Storage::disk('public')->assertMissing($avatarPath);
+    });
 });
 
 describe('Profile Export', function () {
@@ -240,7 +265,7 @@ describe('Account Deletion', function () {
         $response = $this->actingAs($this->user)
             ->delete(route('profile.destroy'), [
                 'password' => 'password',
-                'confirmation' => 'DELETE',
+                'confirmation' => 'Test User', // Must match user's name
             ]);
 
         $response->assertRedirect(route('welcome'));
@@ -252,7 +277,7 @@ describe('Account Deletion', function () {
         $response = $this->actingAs($this->user)
             ->delete(route('profile.destroy'), [
                 'password' => 'wrongpassword',
-                'confirmation' => 'DELETE',
+                'confirmation' => 'Test User',
             ]);
 
         $response->assertSessionHasErrors('password');
@@ -264,7 +289,7 @@ describe('Account Deletion', function () {
         $response = $this->actingAs($this->user)
             ->delete(route('profile.destroy'), [
                 'password' => 'password',
-                'confirmation' => 'delete', // lowercase should fail
+                'confirmation' => 'Wrong Name', // Wrong name should fail
             ]);
 
         $response->assertSessionHasErrors('confirmation');

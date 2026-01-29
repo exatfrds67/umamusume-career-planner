@@ -315,7 +315,7 @@ All aptitude records were successfully created with the correct character_id and
 
 ### Future Enhancements
 
-1. **Add server-side validation** for aptitude grades (only allow G, F, E, D, C, B, A, S, SS)
+1. **Add server-side validation** for aptitude grades (only allow G, F, E, D, C, B, A, S - S is maximum)
 2. **Add image upload functionality** for custom avatars
 3. **Implement image cropping** on the server side to ensure consistent avatar sizes
 4. **Add success message** after character creation

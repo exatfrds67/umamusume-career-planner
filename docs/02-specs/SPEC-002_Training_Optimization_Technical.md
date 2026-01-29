@@ -1,9 +1,9 @@
 # SPEC-002: Training Optimization System - Technical Specification
 
-**Document Version**: 2.0.0  
-**Date**: 2026-01-24  
+**Document Version**: 2.2.0  
+**Date**: 2026-01-28  
 **Project**: Umamusume Pretty Derby Career Planner  
-**Status**: Active  
+**Status**: Active - Updated with game-accurate training formula  
 **Classification**: Internal - Development Team
 
 ---
@@ -14,9 +14,9 @@
 |-----------|-------|
 | **Document ID** | SPEC-002 |
 | **Related PRD** | [PRD-002: Training Optimization](../prds/PRD-002_Training_Optimization.md) |
-| **Architecture Version** | v2.0.0 |
+| **Architecture Version** | v2.2.0 |
 | **Approval Status** | Approved |
-| **Last Reviewed** | 2026-01-24 |
+| **Last Reviewed** | 2026-01-28 |
 
 ### Related Documents
 
@@ -232,7 +232,13 @@ use App\ValueObjects\StatCollection;
 /**
  * Stat Gain Calculator
  * 
- * Calculates base stat gains for training facilities.
+ * Calculates base stat gains for training facilities using game-accurate formula.
+ * 
+ * Game-Accurate Training Formula:
+ * Stat Gain = (Base + StatBonus) × (1 + GrowthRate) × (1 + MoodMultiplier × (1 + MoodEffect)) 
+ *             × (1 + TrainingEffect) × (1 + 0.05 × NumSupportCards) × FriendshipMultiplier
+ * 
+ * Per-training cap: +100 (reduced to +50 if stat > 1200)
  */
 class StatGainCalculator
 {
@@ -257,9 +263,16 @@ class StatGainCalculator
         4 => 1.3,
         5 => 1.5,
     ];
+    
+    /**
+     * Per-training stat gain caps
+     */
+    private const PER_TRAINING_CAP = 100;
+    private const PER_TRAINING_CAP_ABOVE_SOFT = 50;
+    private const SOFT_CAP = 1200;
 
     /**
-     * Calculate base stat gains
+     * Calculate base stat gains using game-accurate formula
      * 
      * @param TrainingType $type Training facility type
      * @param Character $character Character instance
@@ -286,20 +299,31 @@ class StatGainCalculator
             // Calculate final gain
             $finalGain = $baseValue * $levelMultiplier * $growthBonus;
             
-            $gains[$stat] = (int) round($finalGain);
+            // Apply per-training cap based on current stat
+            $currentStat = $character->current_stats[$stat] ?? 0;
+            $cap = $currentStat > self::SOFT_CAP 
+                ? self::PER_TRAINING_CAP_ABOVE_SOFT 
+                : self::PER_TRAINING_CAP;
+            
+            $gains[$stat] = (int) min($cap, round($finalGain));
         }
 
         return new StatCollection($gains);
     }
 
     /**
-     * Calculate gains with all modifiers applied
+     * Calculate gains with all modifiers applied (game-accurate formula)
+     * 
+     * Formula: (Base + StatBonus) × (1 + GrowthRate) × (1 + MoodMultiplier × (1 + MoodEffect)) 
+     *          × (1 + TrainingEffect) × (1 + 0.05 × NumSupportCards) × FriendshipMultiplier
      * 
      * @param TrainingType $type
      * @param Character $character
      * @param int $facilityLevel
      * @param float $moodMultiplier
      * @param float $supportMultiplier
+     * @param int $numSupportCards Number of support cards at facility
+     * @param bool $isFriendshipTraining Whether friendship training is active
      * @return StatCollection
      */
     public function calculateWithModifiers(
@@ -307,15 +331,30 @@ class StatGainCalculator
         Character $character,
         int $facilityLevel,
         float $moodMultiplier,
-        float $supportMultiplier
+        float $supportMultiplier,
+        int $numSupportCards = 0,
+        bool $isFriendshipTraining = false
     ): StatCollection {
         $baseGains = $this->calculateBase($type, $character, $facilityLevel);
+        
+        // Support card presence bonus: +5% per card
+        $cardPresenceBonus = 1 + (0.05 * $numSupportCards);
+        
+        // Friendship training multiplier (1.2x when bond >= 80)
+        $friendshipMultiplier = $isFriendshipTraining ? 1.2 : 1.0;
         
         $modifiedGains = [];
         
         foreach ($baseGains->toArray() as $stat => $value) {
-            $modified = $value * $moodMultiplier * $supportMultiplier;
-            $modifiedGains[$stat] = (int) round($modified);
+            $modified = $value * $moodMultiplier * $supportMultiplier * $cardPresenceBonus * $friendshipMultiplier;
+            
+            // Apply per-training cap
+            $currentStat = $character->current_stats[$stat] ?? 0;
+            $cap = $currentStat > self::SOFT_CAP 
+                ? self::PER_TRAINING_CAP_ABOVE_SOFT 
+                : self::PER_TRAINING_CAP;
+            
+            $modifiedGains[$stat] = (int) min($cap, round($modified));
         }
         
         return new StatCollection($modifiedGains);
@@ -1968,6 +2007,7 @@ Base Risk (Energy):
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.2.0 | 2026-01-28 | Development Team | Game-accurate training formula with support card presence bonus (+5% per card), per-training caps (100/50 based on soft cap), friendship multiplier integration |
 | 2.0.0 | 2026-01-24 | Development Team | Full v2.0.0 alignment, added AI integration, complete calculation engines |
 | 1.0.0 | 2026-01-23 | Development Team | Initial technical specification |
 

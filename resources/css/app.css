@@ -84,16 +84,140 @@
     --color-neutral-900: #171717;
     --color-neutral-950: #0a0a0a;
 
-    /* Grade colors for character aptitudes */
-    --color-grade-ss: #fbbf24;
+    /* ============================================
+       GAME-ALIGNED STAT COLORS (Verified from game screenshots)
+       Source: docs/design/game-ui-alignment-strategy.md
+       ============================================ */
+
+    /* Speed - Pink/Rose (#FB7185) */
+    --color-stat-speed-50: #fff1f2;
+    --color-stat-speed-100: #ffe4e6;
+    --color-stat-speed-200: #fecdd3;
+    --color-stat-speed-300: #fda4af;
+    --color-stat-speed-400: #fb7185;
+    --color-stat-speed-500: #f43f5e;
+    --color-stat-speed-600: #e11d48;
+    --color-stat-speed-700: #be123c;
+    --color-stat-speed-800: #9f1239;
+    --color-stat-speed-900: #881337;
+
+    /* Stamina - Vivid Green (#22C55E) */
+    --color-stat-stamina-50: #f0fdf4;
+    --color-stat-stamina-100: #dcfce7;
+    --color-stat-stamina-200: #bbf7d0;
+    --color-stat-stamina-300: #86efac;
+    --color-stat-stamina-400: #4ade80;
+    --color-stat-stamina-500: #22c55e;
+    --color-stat-stamina-600: #16a34a;
+    --color-stat-stamina-700: #15803d;
+    --color-stat-stamina-800: #166534;
+    --color-stat-stamina-900: #14532d;
+
+    /* Power - Orange (#F97316) */
+    --color-stat-power-50: #fff7ed;
+    --color-stat-power-100: #ffedd5;
+    --color-stat-power-200: #fed7aa;
+    --color-stat-power-300: #fdba74;
+    --color-stat-power-400: #fb923c;
+    --color-stat-power-500: #f97316;
+    --color-stat-power-600: #ea580c;
+    --color-stat-power-700: #c2410c;
+    --color-stat-power-800: #9a3412;
+    --color-stat-power-900: #7c2d12;
+
+    /* Guts - Amber/Yellow (#FBBF24) */
+    --color-stat-guts-50: #fefce8;
+    --color-stat-guts-100: #fef9c3;
+    --color-stat-guts-200: #fef08a;
+    --color-stat-guts-300: #fde047;
+    --color-stat-guts-400: #fbbf24;
+    --color-stat-guts-500: #f59e0b;
+    --color-stat-guts-600: #d97706;
+    --color-stat-guts-700: #b45309;
+    --color-stat-guts-800: #92400e;
+    --color-stat-guts-900: #78350f;
+
+    /* Wit - Azure Blue (#0EA5E9) */
+    --color-stat-wit-50: #f0f9ff;
+    --color-stat-wit-100: #e0f2fe;
+    --color-stat-wit-200: #bae6fd;
+    --color-stat-wit-300: #7dd3fc;
+    --color-stat-wit-400: #38bdf8;
+    --color-stat-wit-500: #0ea5e9;
+    --color-stat-wit-600: #0284c7;
+    --color-stat-wit-700: #0369a1;
+    --color-stat-wit-800: #075985;
+    --color-stat-wit-900: #0c4a6e;
+
+    /* ============================================
+       CONDITION/MOOD COLORS (Verified from game)
+       Source: docs/design/README.md
+       ============================================ */
+
+    /* GREAT - Pink (#EC4899) */
+    --color-condition-great: #ec4899;
+    --color-condition-great-light: #f9a8d4;
+    --color-condition-great-dark: #be185d;
+
+    /* GOOD - Light Blue (#60A5FA) */
+    --color-condition-good: #60a5fa;
+    --color-condition-good-light: #93c5fd;
+    --color-condition-good-dark: #2563eb;
+
+    /* NORMAL - Orange (#F97316) */
+    --color-condition-normal: #f97316;
+    --color-condition-normal-light: #fb923c;
+    --color-condition-normal-dark: #c2410c;
+
+    /* BAD - Red (#EF4444) */
+    --color-condition-bad: #ef4444;
+    --color-condition-bad-light: #f87171;
+    --color-condition-bad-dark: #dc2626;
+
+    /* ============================================
+       GRADE COLORS (Verified - S is maximum, no SS)
+       Source: docs/research/game-mechanics-research-report.md
+       ============================================ */
+
+    /* S Grade - Purple (Maximum) */
     --color-grade-s: #a855f7;
+    --color-grade-s-light: #c084fc;
+    --color-grade-s-dark: #9333ea;
+
+    /* A Grade - Blue */
     --color-grade-a: #3b82f6;
+    --color-grade-a-light: #60a5fa;
+    --color-grade-a-dark: #2563eb;
+
+    /* B Grade - Green */
     --color-grade-b: #22c55e;
+    --color-grade-b-light: #4ade80;
+    --color-grade-b-dark: #16a34a;
+
+    /* C Grade - Teal */
     --color-grade-c: #14b8a6;
+    --color-grade-c-light: #2dd4bf;
+    --color-grade-c-dark: #0d9488;
+
+    /* D Grade - Gray */
     --color-grade-d: #6b7280;
+    --color-grade-d-light: #9ca3af;
+    --color-grade-d-dark: #4b5563;
+
+    /* E Grade - Orange */
     --color-grade-e: #f97316;
+    --color-grade-e-light: #fb923c;
+    --color-grade-e-dark: #ea580c;
+
+    /* F Grade - Red */
     --color-grade-f: #ef4444;
+    --color-grade-f-light: #f87171;
+    --color-grade-f-dark: #dc2626;
+
+    /* G Grade - Dark Gray */
     --color-grade-g: #525252;
+    --color-grade-g-light: #737373;
+    --color-grade-g-dark: #404040;
 }
 
 /* ============================================

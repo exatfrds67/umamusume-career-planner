@@ -1,7 +1,7 @@
 # SPEC-008: Performance Monitoring & APM System - Technical Specification
 
-**Document Version**: 1.0.0  
-**Date**: 2026-01-27  
+**Document Version**: 2.2.0  
+**Date**: 2026-01-28  
 **Project**: Umamusume Pretty Derby Career Planner  
 **Status**: Active  
 **Classification**: Internal - Development Team
@@ -16,7 +16,7 @@
 | **Related PRD** | Performance & Reliability Requirements (SRS §3.9) |
 | **Architecture Version** | v2.2.0 |
 | **Approval Status** | Approved |
-| **Last Reviewed** | 2026-01-27 |
+| **Last Reviewed** | 2026-01-28 |
 
 ### Related Documents
 
@@ -1365,6 +1365,7 @@ it('tracks request metrics through middleware', function () {
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.2.0 | 2026-01-28 | Development Team | Updated to v2.2.0 architecture alignment |
 | 1.0.0 | 2026-01-27 | Development Team | Initial specification for Performance Monitoring & APM System |
 
 ---

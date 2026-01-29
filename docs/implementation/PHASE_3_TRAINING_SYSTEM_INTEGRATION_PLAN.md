@@ -161,7 +161,7 @@ ADD COLUMN sp_discount_applied INT DEFAULT 0 COMMENT 'SP discount from hints (0-
 
 **Functionality**:
 
-- Track hint drops during training (20% discount per hint, max 2 hints = 40%)
+- Track hint drops during training (5 levels: 10%/20%/30%/35%/40% max discount)
 - Link hints to source support cards
 - Apply SP discount when acquiring skills
 - Display hint status in skill shop
@@ -275,7 +275,7 @@ TrainingSession::create([
 - [ ] Bond levels increase after training
 - [ ] Friendship training triggers at 80+ bond
 - [ ] Skill hints are tracked and applied
-- [ ] SP discounts work correctly (20% per hint, max 40%)
+- [ ] SP discounts work correctly (5 levels: 10%/20%/30%/35%/40% max)
 - [ ] Training sessions record all support card data
 - [ ] UI displays support card contributions
 - [ ] All tests pass

@@ -132,10 +132,11 @@ class ResponseTransformer
             return 'G';
         }
 
-        // Convert various formats to standard (G, F, E, D, C, B, A, S, SS)
+        // Convert various formats to standard (G, F, E, D, C, B, A, S)
+        // VERIFIED (Jan 2026): S is the maximum aptitude grade. SS does NOT exist.
         $aptitude = strtoupper(trim($aptitude));
 
-        $validAptitudes = ['G', 'F', 'E', 'D', 'C', 'B', 'A', 'S', 'SS'];
+        $validAptitudes = ['G', 'F', 'E', 'D', 'C', 'B', 'A', 'S'];
 
         return in_array($aptitude, $validAptitudes, true) ? $aptitude : 'G';
     }
