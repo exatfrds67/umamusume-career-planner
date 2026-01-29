@@ -6,25 +6,10 @@ use App\Services\ExternalAPI\APIAlertingService;
 use App\Services\ExternalAPI\APIPerformanceMetricsService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
-
-/**
- * Helper function to check if Redis is available
- */
-function isRedisAvailableForMonitoring(): bool
-{
-    try {
-        Redis::ping();
-
-        return true;
-    } catch (\Throwable) {
-        return false;
-    }
-}
+use Tests\Support\FakeRedis;
 
 beforeEach(function () {
-    if (! isRedisAvailableForMonitoring()) {
-        $this->markTestSkipped('Redis is not available');
-    }
+    Redis::swap(new FakeRedis);
 
     // Clear cache to ensure clean state
     Cache::flush();

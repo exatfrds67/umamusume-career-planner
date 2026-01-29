@@ -8,6 +8,7 @@ use App\Services\ExternalAPI\BackgroundSyncService;
 use App\Services\ExternalAPI\GracefulDegradationService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
+use Tests\Support\FakeRedis;
 
 /**
  * Fallback and Recovery System Tests
@@ -16,25 +17,8 @@ use Illuminate\Support\Facades\Redis;
  *
  * Requirements: 14.2, 55.3, 56.3, Task 4.4.3
  */
-
-/**
- * Helper function to check if Redis is available
- */
-function isRedisAvailableForFallback(): bool
-{
-    try {
-        Redis::ping();
-
-        return true;
-    } catch (\Throwable) {
-        return false;
-    }
-}
-
 beforeEach(function () {
-    if (! isRedisAvailableForFallback()) {
-        $this->markTestSkipped('Redis is not available');
-    }
+    Redis::swap(new FakeRedis);
 
     // Clear Redis cache before each test
     Redis::flushdb();

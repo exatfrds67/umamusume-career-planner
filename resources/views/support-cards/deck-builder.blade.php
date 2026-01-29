@@ -27,8 +27,7 @@
         window.preloadedCards = @json($availableCardsData);
     </script>
 
-    <div class="space-y-6" x-data="deckBuilder(@js($deckData), {{ $character->id }})" x-init="availableCards = window.preloadedCards || [];
-    init()">
+    <div class="space-y-6" x-data="deckBuilder(@js($deckData), {{ $character->id }})" x-init="if (window.preloadedCards) { availableCards = window.preloadedCards; }">
         <!-- Header -->
         <header class="sm:flex sm:items-center sm:justify-between">
             <div>

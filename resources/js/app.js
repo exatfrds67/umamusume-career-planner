@@ -4,6 +4,7 @@ import persist from "@alpinejs/persist";
 import connectivityMonitor from "./core/connectivity-monitor.js";
 
 import deckBuilder from "./deck-builder.js";
+import planWizard from "./components/plan-wizard.js";
 
 // Register Alpine plugins early
 Alpine.plugin(persist);
@@ -11,6 +12,7 @@ Alpine.plugin(persist);
 // Register connectivity monitor before Alpine starts
 Alpine.data("connectivityMonitor", connectivityMonitor);
 Alpine.data("deckBuilder", deckBuilder);
+Alpine.data("planWizard", planWizard);
 
 // Initialize Alpine.js immediately for faster interactivity
 window.Alpine = Alpine;

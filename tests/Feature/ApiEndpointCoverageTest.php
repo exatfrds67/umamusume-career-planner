@@ -4,31 +4,19 @@ use App\Models\Character;
 use App\Models\User;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Route;
-
-/**
- * Helper function to check if Redis is available
- */
-function isRedisAvailable(): bool
-{
-    try {
-        Redis::ping();
-
-        return true;
-    } catch (\Throwable) {
-        return false;
-    }
-}
-
-/**
- * Helper function to check if AWS Bedrock credentials are configured
- */
-function isBedrockConfigured(): bool
-{
-    return ! empty(env('AWS_ACCESS_KEY_ID')) && ! empty(env('AWS_SECRET_ACCESS_KEY'));
-}
+use Tests\Support\FakeRedis;
 
 describe('API Endpoint Coverage', function () {
     beforeEach(function () {
+        Redis::swap(new FakeRedis);
+        Redis::flushdb();
+
+        config()->set('aws.credentials.key', 'test-access-key');
+        config()->set('aws.credentials.secret', 'test-secret-key');
+        config()->set('aws.region', 'us-east-1');
+        config()->set('aws.bedrock.region', 'us-east-1');
+        config()->set('ai.bedrock.enabled', true);
+
         $this->user = User::factory()->create();
     });
 
@@ -82,10 +70,6 @@ describe('API Endpoint Coverage', function () {
     });
 
     it('has all monitoring dashboard routes accessible', function () {
-        if (! isRedisAvailable()) {
-            $this->markTestSkipped('Redis is not available');
-        }
-
         $this->getJson('/api/monitoring/dashboard')->assertSuccessful();
         $this->getJson('/api/monitoring/response-times')->assertSuccessful();
         $this->getJson('/api/monitoring/cache-performance')->assertSuccessful();
@@ -114,10 +98,6 @@ describe('API Endpoint Coverage', function () {
     });
 
     it('has all AI dashboard routes accessible', function () {
-        if (! isBedrockConfigured()) {
-            $this->markTestSkipped('AWS Bedrock credentials are not configured');
-        }
-
         // These routes may require specific setup, allow 500 errors for now
         $response = $this->getJson('/api/ai/dashboard/overview');
         expect($response->status())->toBeIn([200, 500]);
