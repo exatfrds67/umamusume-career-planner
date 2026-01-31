@@ -1,0 +1,247 @@
+/**
+ * MCP Management Dashboard
+ * Handles real-time monitoring of MCP servers, agents, costs, and performance
+ */
+
+import Alpine from "alpinejs";
+
+// Register Alpine component on initialization
+document.addEventListener("alpine:init", () => {
+    Alpine.data("mcpDashboard", () => ({
+        activeTab: "overview",
+        lastUpdated: "--",
+        performanceTimeRange: "24h",
+        loading: false,
+
+        overview: {
+            total_servers: 0,
+            healthy_servers: 0,
+            active_agents: 0,
+            active_workflows: 0,
+            cost_24h: 0,
+            requests_24h: 0,
+            avg_response_time: 0,
+            p95_response_time: 0,
+        },
+
+        servers: {},
+        agents: {},
+        costs: {
+            daily_cost: 0,
+            weekly_cost: 0,
+            monthly_cost: 0,
+            budget_status: null,
+            by_provider: {},
+            top_tools: [],
+            recommendations: [],
+        },
+
+        performance: {
+            providers: {},
+            fastest: null,
+            most_reliable: null,
+            most_cost_effective: null,
+            recommendations: [],
+        },
+
+        settings: {
+            servers: {},
+            agents: {
+                training: "auto",
+                career: "auto",
+                race: "auto",
+                skill: "auto",
+            },
+            budget: {
+                daily: 1.0,
+                monthly: 30.0,
+                alert_threshold: 90,
+            },
+            performance: {
+                auto_fallback: true,
+                parallel_processing: true,
+                cache_responses: true,
+            },
+        },
+
+        init() {
+            this.loadDashboard();
+            // Refresh every 10 seconds
+            setInterval(() => this.loadDashboard(), 10000);
+
+            // Listen for custom events
+            this.$watch("activeTab", () => this.loadTabData());
+        },
+
+        async loadDashboard() {
+            if (this.loading) return;
+            this.loading = true;
+
+            try {
+                const response = await fetch(window.pageData.routes.overview, {
+                    headers: {
+                        Accept: "application/json",
+                        "X-CSRF-TOKEN":
+                            document.querySelector('meta[name="csrf-token"]')
+                                ?.content || "",
+                    },
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    this.overview = data.data.overview;
+                    this.servers = data.data.servers;
+                    this.agents = data.data.agents;
+                    this.costs = data.data.costs;
+                    this.performance = data.data.performance;
+                    this.settings = data.data.settings;
+                    this.lastUpdated = new Date().toLocaleTimeString();
+                }
+            } catch (error) {
+                console.error("Failed to load dashboard:", error);
+
+                window.dispatchEvent(
+                    new CustomEvent("toast", {
+                        detail: {
+                            type: "error",
+                            message: "Failed to load dashboard data",
+                        },
+                    }),
+                );
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async loadTabData() {
+            // Load specific tab data when switching tabs
+            switch (this.activeTab) {
+                case "servers":
+                    await this.loadServers();
+                    break;
+                case "agents":
+                    await this.loadAgents();
+                    break;
+                case "costs":
+                    await this.loadCosts();
+                    break;
+                case "performance":
+                    await this.loadPerformance();
+                    break;
+                case "settings":
+                    await this.loadSettings();
+                    break;
+            }
+        },
+
+        async loadServers() {
+            try {
+                const response = await fetch(window.pageData.routes.servers, {
+                    headers: {
+                        Accept: "application/json",
+                        "X-CSRF-TOKEN":
+                            document.querySelector('meta[name="csrf-token"]')
+                                ?.content || "",
+                    },
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    this.servers = data.data;
+                }
+            } catch (error) {
+                console.error("Failed to load servers:", error);
+            }
+        },
+
+        async loadAgents() {
+            try {
+                const response = await fetch(window.pageData.routes.agents, {
+                    headers: {
+                        Accept: "application/json",
+                        "X-CSRF-TOKEN":
+                            document.querySelector('meta[name="csrf-token"]')
+                                ?.content || "",
+                    },
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    this.agents = data.data;
+                }
+            } catch (error) {
+                console.error("Failed to load agents:", error);
+            }
+        },
+
+        async loadCosts() {
+            try {
+                const response = await fetch(window.pageData.routes.costs, {
+                    headers: {
+                        Accept: "application/json",
+                        "X-CSRF-TOKEN":
+                            document.querySelector('meta[name="csrf-token"]')
+                                ?.content || "",
+                    },
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    this.costs = data.data;
+                }
+            } catch (error) {
+                console.error("Failed to load costs:", error);
+            }
+        },
+
+        async loadPerformance() {
+            try {
+                const response = await fetch(
+                    `${window.pageData.routes.performance}?range=${this.performanceTimeRange}`,
+                    {
+                        headers: {
+                            Accept: "application/json",
+                            "X-CSRF-TOKEN":
+                                document.querySelector(
+                                    'meta[name="csrf-token"]',
+                                )?.content || "",
+                        },
+                    },
+                );
+
+                const data = await response.json();
+                if (data.success) {
+                    this.performance = data.data;
+                }
+            } catch (error) {
+                console.error("Failed to load performance:", error);
+            }
+        },
+
+        async loadSettings() {
+            try {
+                const response = await fetch(window.pageData.routes.settings, {
+                    headers: {
+                        Accept: "application/json",
+                        "X-CSRF-TOKEN":
+                            document.querySelector('meta[name="csrf-token"]')
+                                ?.content || "",
+                    },
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    this.settings = data.data;
+                }
+            } catch (error) {
+                console.error("Failed to load settings:", error);
+            }
+        },
+
+        async refreshAll() {
+            await this.loadDashboard();
+            await this.loadTabData();
+        },
+    }));
+});

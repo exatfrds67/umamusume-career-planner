@@ -89,17 +89,17 @@
        Source: docs/design/game-ui-alignment-strategy.md
        ============================================ */
 
-    /* Speed - Pink/Rose (#FB7185) */
-    --color-stat-speed-50: #fff1f2;
-    --color-stat-speed-100: #ffe4e6;
-    --color-stat-speed-200: #fecdd3;
-    --color-stat-speed-300: #fda4af;
-    --color-stat-speed-400: #fb7185;
-    --color-stat-speed-500: #f43f5e;
-    --color-stat-speed-600: #e11d48;
-    --color-stat-speed-700: #be123c;
-    --color-stat-speed-800: #9f1239;
-    --color-stat-speed-900: #881337;
+    /* Speed - Blue (#3B82F6) */
+    --color-stat-speed-50: #eff6ff;
+    --color-stat-speed-100: #dbeafe;
+    --color-stat-speed-200: #bfdbfe;
+    --color-stat-speed-300: #93c5fd;
+    --color-stat-speed-400: #60a5fa;
+    --color-stat-speed-500: #3b82f6;
+    --color-stat-speed-600: #2563eb;
+    --color-stat-speed-700: #1d4ed8;
+    --color-stat-speed-800: #1e40af;
+    --color-stat-speed-900: #1e3a8a;
 
     /* Stamina - Vivid Green (#22C55E) */
     --color-stat-stamina-50: #f0fdf4;

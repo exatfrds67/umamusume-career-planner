@@ -1,0 +1,35 @@
+/* Stat Bar Component Styles */
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.animate-shimmer {
+    animation: shimmer 2s infinite;
+}
+
+/* Stat-specific icon colors */
+.stat-icon-stat-speed {
+    background: linear-gradient(135deg, #fb7185, #f43f5e);
+}
+
+.stat-icon-stat-stamina {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+}
+
+.stat-icon-stat-power {
+    background: linear-gradient(135deg, #f97316, #ea580c);
+}
+
+.stat-icon-stat-guts {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+}
+
+.stat-icon-stat-wit {
+    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+}

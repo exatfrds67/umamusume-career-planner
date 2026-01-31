@@ -1,6 +1,7 @@
 import "./bootstrap";
 import Alpine from "alpinejs";
 import persist from "@alpinejs/persist";
+import collapse from "@alpinejs/collapse";
 import axios from "axios";
 import connectivityMonitor from "./core/connectivity-monitor.js";
 import planWizard from "./components/plan-wizard.js";
@@ -20,8 +21,39 @@ import { analyticsPanel } from "./components/analytics-panel.js";
 import { searchFilter } from "./components/search-filter.js";
 import { keyboardShortcuts } from "./components/keyboard-shortcuts.js";
 
+// Reusable UI Components
+import activityTimeline from "./components/activity-timeline.js";
+import classPyramid from "./components/class-pyramid.js";
+import facilityManagement from "./components/facility-management.js";
+import lineChart from "./components/line-chart.js";
+import quickActions from "./components/quick-actions.js";
+import slidePanel from "./components/slide-panel.js";
+import spiritBurstGauge from "./components/spirit-burst-gauge.js";
+import teamMemberSelector from "./components/team-member-selector.js";
+
+// AI Components
+import agentProgressTracker from "./components/ai/agent-progress-tracker.js";
+import agentSelector from "./components/ai/agent-selector.js";
+import performanceMetrics from "./components/ai/performance-metrics.js";
+import providerSelector from "./components/ai/provider-selector.js";
+import serverStatusIndicator from "./components/ai/server-status-indicator.js";
+import workflowVisualization from "./components/ai/workflow-visualization.js";
+
+// Analytics Components
+import comparisonTable from "./components/analytics/comparison-table.js";
+import trendAnalysisChart from "./components/analytics/trend-analysis-chart.js";
+
+// Page-specific components
+import { supportCardManager } from "./pages/support-cards/index.js";
+import externalDataBrowser from "./pages/external-data/browse.js";
+import "./pages/characters/create.js";
+import "./pages/characters/index.js";
+import "./pages/skills/index.js";
+import "./pages/skills/partials/planner.js";
+
 // Register Alpine plugins early
 Alpine.plugin(persist);
+Alpine.plugin(collapse);
 
 // --- Deck Builder Component (Fully Consolidated) ---
 const deckBuilder = () => ({
@@ -534,6 +566,32 @@ Alpine.data("notificationManager", notificationManager);
 Alpine.data("analyticsPanel", analyticsPanel);
 Alpine.data("searchFilter", searchFilter);
 Alpine.data("keyboardShortcuts", keyboardShortcuts);
+
+// Reusable UI Components
+Alpine.data("activityTimeline", activityTimeline);
+Alpine.data("classPyramid", classPyramid);
+Alpine.data("facilityManagement", facilityManagement);
+Alpine.data("lineChart", lineChart);
+Alpine.data("quickActions", quickActions);
+Alpine.data("slidePanel", slidePanel);
+Alpine.data("spiritBurstGauge", spiritBurstGauge);
+Alpine.data("teamMemberSelector", teamMemberSelector);
+
+// AI Components
+Alpine.data("agentProgressTracker", agentProgressTracker);
+Alpine.data("agentSelector", agentSelector);
+Alpine.data("performanceMetrics", performanceMetrics);
+Alpine.data("providerSelector", providerSelector);
+Alpine.data("serverStatusIndicator", serverStatusIndicator);
+Alpine.data("workflowVisualization", workflowVisualization);
+
+// Analytics Components
+Alpine.data("comparisonTable", comparisonTable);
+Alpine.data("trendAnalysisChart", trendAnalysisChart);
+
+// Page-specific components
+Alpine.data("supportCardManager", supportCardManager);
+Alpine.data("externalDataBrowser", externalDataBrowser);
 
 // Initialize Alpine.js immediately for faster interactivity
 window.Alpine = Alpine;

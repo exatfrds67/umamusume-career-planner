@@ -1,0 +1,34 @@
+/**
+ * Support Card Component Styles
+ */
+
+.support-card {
+    background: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.95),
+        rgba(255, 255, 255, 1)
+    );
+}
+
+.dark .support-card {
+    background: linear-gradient(
+        to bottom,
+        rgba(38, 38, 38, 0.95),
+        rgba(38, 38, 38, 1)
+    );
+}
+
+.support-card:hover {
+    transform: translateY(-4px) scale(1.02);
+}
+
+/* Rainbow bond animation */
+@keyframes rainbow-pulse {
+    0%,
+    100% {
+        opacity: 0.3;
+    }
+    50% {
+        opacity: 0.6;
+    }
+}

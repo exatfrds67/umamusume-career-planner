@@ -1,0 +1,30 @@
+/**
+ * Character Card Component Styles
+ * Styling for character display cards with gradients and hover effects
+ */
+
+.character-card {
+    background: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.95),
+        rgba(255, 255, 255, 1)
+    );
+}
+
+.dark .character-card {
+    background: linear-gradient(
+        to bottom,
+        rgba(38, 38, 38, 0.95),
+        rgba(38, 38, 38, 1)
+    );
+}
+
+.character-card:hover {
+    transform: translateY(-4px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .character-card:hover {
+        transform: none;
+    }
+}

@@ -1,0 +1,613 @@
+/**
+ * Skills Management Page Script
+ * Handles skill inventory, acquisition, hints, evolution, and AI recommendations
+ */
+
+// Access data from window.skillsData (injected by Blade)
+const { isAdmin, preSelectedCharacterId } = window.skillsData || {};
+
+// Initialize Alpine component
+document.addEventListener("alpine:init", () => {
+    Alpine.data("skillManagement", (adminMode = false, characterId = "") => ({
+        // State
+        isAdmin: adminMode || isAdmin || false,
+        selectedCharacterId: characterId || preSelectedCharacterId || "",
+        character: null,
+        skills: [],
+        acquiredSkills: [],
+        hints: [],
+        evolutionOpportunities: [],
+        spStats: {},
+        agentPerformance: {},
+        loading: false,
+        activeTab: "inventory",
+
+        // AI Recommendations
+        recommendations: [],
+        aiOptimization: null,
+
+        // SP Planning
+        plannedSpending: 0,
+        skillsWithHints: 0,
+        potentialSavings: 0,
+        recentAcquisitions: [],
+        totalEvolutionSavings: 0,
+
+        // Filters
+        filters: {
+            skillType: "all",
+            rarity: "all",
+            metaTier: "all",
+            searchQuery: "",
+            hintLevel: "all", // New filter for hint levels
+        },
+
+        // Pagination
+        currentPage: 1,
+        itemsPerPage: 30,
+
+        // Modal state
+        showSkillModal: false,
+        selectedSkill: null,
+
+        // Initialize
+        init() {
+            // Load from URL params if present
+            const urlParams = new URLSearchParams(window.location.search);
+            const characterIdFromUrl =
+                urlParams.get("character") || this.selectedCharacterId;
+            if (characterIdFromUrl) {
+                this.selectedCharacterId = characterIdFromUrl;
+                this.loadCharacterData();
+            }
+        },
+
+        // Load character data
+        async loadCharacterData() {
+            if (!this.selectedCharacterId) return;
+
+            this.loading = true;
+            try {
+                // Update URL
+                const url = new URL(window.location);
+                url.searchParams.set("character", this.selectedCharacterId);
+                window.history.pushState({}, "", url);
+
+                // Load all data in parallel
+                await Promise.all([
+                    this.loadCharacter(),
+                    this.loadSkills(),
+                    this.loadHints(),
+                    this.loadEvolutionOpportunities(),
+                    this.loadSPStats(),
+                    this.loadAgentPerformance(),
+                ]);
+
+                // Calculate metrics after all data is loaded
+                this.calculateSPMetrics();
+            } catch (error) {
+                console.error("Error loading character data:", error);
+                this.showError("Failed to load character data");
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        // Load character
+        async loadCharacter() {
+            const response = await fetch(
+                `/api/characters/${this.selectedCharacterId}`,
+                {
+                    headers: {
+                        Accept: "application/json",
+                        "X-CSRF-TOKEN":
+                            document.querySelector('meta[name="csrf-token"]')
+                                ?.content || "",
+                    },
+                },
+            );
+            if (!response.ok) throw new Error("Failed to load character");
+            const data = await response.json();
+            // API returns character directly, not wrapped in data property
+            this.character = data.data || data;
+        },
+
+        // Load skills
+        async loadSkills() {
+            const response = await fetch(
+                `/api/skills?character_id=${this.selectedCharacterId}`,
+                {
+                    headers: {
+                        Accept: "application/json",
+                        "X-CSRF-TOKEN":
+                            document.querySelector('meta[name="csrf-token"]')
+                                ?.content || "",
+                    },
+                },
+            );
+            if (!response.ok) throw new Error("Failed to load skills");
+            const data = await response.json();
+            this.skills = data.data;
+
+            // Separate acquired skills
+            this.acquiredSkills = this.skills.filter((s) => s.is_acquired);
+        },
+
+        // Load hints
+        async loadHints() {
+            const response = await fetch(
+                `/api/characters/${this.selectedCharacterId}/skill-hints`,
+                {
+                    headers: {
+                        Accept: "application/json",
+                        "X-CSRF-TOKEN":
+                            document.querySelector('meta[name="csrf-token"]')
+                                ?.content || "",
+                    },
+                },
+            );
+            if (!response.ok) throw new Error("Failed to load hints");
+            const data = await response.json();
+            this.hints = data.data;
+        },
+
+        // Load evolution opportunities
+        async loadEvolutionOpportunities() {
+            const response = await fetch(
+                `/api/characters/${this.selectedCharacterId}/skill-evolution/opportunities`,
+                {
+                    headers: {
+                        Accept: "application/json",
+                        "X-CSRF-TOKEN":
+                            document.querySelector('meta[name="csrf-token"]')
+                                ?.content || "",
+                    },
+                },
+            );
+            if (!response.ok)
+                throw new Error("Failed to load evolution opportunities");
+            const data = await response.json();
+            this.evolutionOpportunities = data.data;
+        },
+
+        // Load SP statistics
+        async loadSPStats() {
+            const response = await fetch(
+                `/api/characters/${this.selectedCharacterId}/skill-hints/statistics`,
+                {
+                    headers: {
+                        Accept: "application/json",
+                        "X-CSRF-TOKEN":
+                            document.querySelector('meta[name="csrf-token"]')
+                                ?.content || "",
+                    },
+                },
+            );
+            if (!response.ok) throw new Error("Failed to load SP statistics");
+            const data = await response.json();
+            this.spStats = data.data;
+        },
+
+        // Load agent performance
+        async loadAgentPerformance() {
+            const response = await fetch(
+                `/api/characters/${this.selectedCharacterId}/agent-performance`,
+                {
+                    headers: {
+                        Accept: "application/json",
+                        "X-CSRF-TOKEN":
+                            document.querySelector('meta[name="csrf-token"]')
+                                ?.content || "",
+                    },
+                },
+            );
+            if (!response.ok)
+                throw new Error("Failed to load agent performance");
+            const data = await response.json();
+            this.agentPerformance = data.data;
+
+            // Calculate SP planning metrics
+            this.calculateSPMetrics();
+        },
+
+        // Calculate SP planning metrics
+        calculateSPMetrics() {
+            // Calculate skills with hints
+            this.skillsWithHints = this.hints.length;
+
+            // Calculate potential savings using progressive hint discounts
+            // Level 1=10%, 2=20%, 3=30%, 4=35%, 5=40% (max)
+            const hintDiscountTable = {
+                1: 0.1,
+                2: 0.2,
+                3: 0.3,
+                4: 0.35,
+                5: 0.4,
+            };
+            this.potentialSavings = this.hints.reduce((total, hint) => {
+                const skill = this.skills.find((s) => s.id === hint.skill_id);
+                if (!skill) return total;
+
+                const baseCost = skill.base_sp_cost || 0;
+                const hintLevel = Math.min(
+                    Math.max(hint.hint_count || 1, 1),
+                    5,
+                );
+                const discountPercent = hintDiscountTable[hintLevel] || 0;
+                const savings = baseCost * discountPercent;
+
+                return total + savings;
+            }, 0);
+
+            // Calculate planned spending from recommendations
+            this.plannedSpending = this.recommendations.reduce((total, rec) => {
+                return total + (rec.final_cost || 0);
+            }, 0);
+
+            // Load recent acquisitions
+            this.recentAcquisitions = this.acquiredSkills
+                .sort((a, b) => (b.turn_acquired || 0) - (a.turn_acquired || 0))
+                .slice(0, 5);
+
+            // Calculate total evolution savings
+            this.totalEvolutionSavings = this.evolutionOpportunities.reduce(
+                (total, opp) => {
+                    return total + (opp.sp_savings || 0);
+                },
+                0,
+            );
+        },
+
+        // Refresh all data
+        async refreshData() {
+            if (this.selectedCharacterId) {
+                await this.loadCharacterData();
+                this.showSuccess("Data refreshed successfully");
+            }
+        },
+
+        // Computed: Filtered skills
+        get filteredSkills() {
+            let filtered = this.skills;
+
+            // Filter by skill type
+            if (this.filters.skillType !== "all") {
+                filtered = filtered.filter(
+                    (s) => s.skill_type === this.filters.skillType,
+                );
+            }
+
+            // Filter by rarity
+            if (this.filters.rarity !== "all") {
+                filtered = filtered.filter(
+                    (s) => s.rarity === this.filters.rarity,
+                );
+            }
+
+            // Filter by meta tier
+            if (this.filters.metaTier !== "all") {
+                filtered = filtered.filter(
+                    (s) => s.meta_tier === this.filters.metaTier,
+                );
+            }
+
+            // Filter by hint level
+            if (this.filters.hintLevel !== "all") {
+                const hintLevel = parseInt(this.filters.hintLevel);
+                filtered = filtered.filter(
+                    (s) => s.available_hints === hintLevel,
+                );
+            }
+
+            // Filter by search query
+            if (this.filters.searchQuery) {
+                const query = this.filters.searchQuery.toLowerCase();
+                filtered = filtered.filter(
+                    (s) =>
+                        s.name.toLowerCase().includes(query) ||
+                        s.description?.toLowerCase().includes(query),
+                );
+            }
+
+            return filtered;
+        },
+
+        // Computed: Paginated skills
+        get paginatedSkills() {
+            const start = (this.currentPage - 1) * this.itemsPerPage;
+            const end = start + this.itemsPerPage;
+            return this.filteredSkills.slice(start, end);
+        },
+
+        // Computed: Total pages
+        get totalPages() {
+            return Math.ceil(this.filteredSkills.length / this.itemsPerPage);
+        },
+
+        // Navigate to page
+        goToPage(page) {
+            if (page >= 1 && page <= this.totalPages) {
+                this.currentPage = page;
+                // Scroll to top of skills list
+                document
+                    .getElementById("skills-list")
+                    ?.scrollIntoView({ behavior: "smooth" });
+            }
+        },
+
+        // Reset pagination when filters change
+        resetPagination() {
+            this.currentPage = 1;
+        },
+
+        // Acquire skill
+        async acquireSkill(skill) {
+            if (!this.selectedCharacterId) {
+                this.showError("Please select a character first");
+                return;
+            }
+
+            // Check SP availability (skip for admin)
+            if (!this.isAdmin) {
+                const availableSP = this.character?.available_sp || 0;
+                const finalCost = skill.discounted_cost || skill.base_sp_cost;
+
+                if (availableSP < finalCost) {
+                    this.showError(
+                        `Insufficient SP. Need ${finalCost} SP, have ${availableSP} SP`,
+                    );
+                    return;
+                }
+            }
+
+            // Confirm acquisition
+            if (
+                !confirm(
+                    `Acquire "${skill.name}" for ${skill.discounted_cost || skill.base_sp_cost} SP?`,
+                )
+            ) {
+                return;
+            }
+
+            this.loading = true;
+            try {
+                const response = await fetch("/api/skills/acquire", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                        "X-CSRF-TOKEN":
+                            document.querySelector('meta[name="csrf-token"]')
+                                ?.content || "",
+                    },
+                    body: JSON.stringify({
+                        character_id: this.selectedCharacterId,
+                        skill_id: skill.id,
+                        turn_acquired: this.character?.current_turn || 1,
+                        career_phase: this.character?.career_stage || "junior",
+                    }),
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || "Failed to acquire skill");
+                }
+
+                const data = await response.json();
+                this.showSuccess(
+                    `Successfully acquired "${skill.name}"! ${data.data.sp_saved > 0 ? `Saved ${data.data.sp_saved} SP with hints.` : ""}`,
+                );
+
+                // Reload data
+                await this.loadCharacterData();
+            } catch (error) {
+                console.error("Error acquiring skill:", error);
+                this.showError(error.message || "Failed to acquire skill");
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        // Get AI recommendations
+        async getAIRecommendations() {
+            if (!this.selectedCharacterId) return;
+
+            this.loading = true;
+            try {
+                const response = await fetch(
+                    `/api/characters/${this.selectedCharacterId}/skill-recommendations`,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Accept: "application/json",
+                            "X-CSRF-TOKEN":
+                                document.querySelector(
+                                    'meta[name="csrf-token"]',
+                                )?.content || "",
+                        },
+                    },
+                );
+
+                if (!response.ok)
+                    throw new Error("Failed to get AI recommendations");
+
+                const data = await response.json();
+                this.recommendations = data.data.recommendations || [];
+                this.aiOptimization = data.data;
+
+                this.showSuccess("AI recommendations loaded successfully");
+            } catch (error) {
+                console.error("Error getting AI recommendations:", error);
+                this.showError("Failed to get AI recommendations");
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        // Acquire skill
+        async acquireSkill(skill) {
+            if (!this.selectedCharacterId || !skill) return;
+
+            // Check if user has enough SP (bypass for admins)
+            const cost = skill.discounted_cost || skill.base_sp_cost;
+            if (!this.isAdmin && (this.character?.available_sp || 0) < cost) {
+                this.showError(
+                    `Not enough SP. Need ${cost} SP but only have ${this.character?.available_sp || 0} SP.`,
+                );
+                return;
+            }
+
+            try {
+                const response = await fetch("/api/skills/acquire", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                        "X-CSRF-TOKEN":
+                            document.querySelector('meta[name="csrf-token"]')
+                                ?.content || "",
+                    },
+                    body: JSON.stringify({
+                        character_id: this.selectedCharacterId,
+                        skill_id: skill.id,
+                    }),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(
+                        errorData.message || "Failed to acquire skill",
+                    );
+                }
+
+                // Close modal and reload data
+                this.closeSkillModal();
+                await this.loadCharacterData();
+
+                if (this.isAdmin) {
+                    this.showSuccess(
+                        `Successfully acquired ${skill.name}! (Admin: No SP deducted)`,
+                    );
+                } else {
+                    this.showSuccess(`Successfully acquired ${skill.name}!`);
+                }
+            } catch (error) {
+                console.error("Error acquiring skill:", error);
+                this.showError(error.message || "Failed to acquire skill");
+            }
+        },
+
+        // View skill details
+        viewSkillDetails(skill) {
+            this.selectedSkill = skill;
+            this.showSkillModal = true;
+        },
+
+        // Close modal
+        closeSkillModal() {
+            this.showSkillModal = false;
+            this.selectedSkill = null;
+        },
+
+        // Filter skills
+        get filteredSkills() {
+            let filtered = this.skills;
+
+            if (this.filters.skillType !== "all") {
+                filtered = filtered.filter(
+                    (s) => s.skill_type === this.filters.skillType,
+                );
+            }
+
+            if (this.filters.rarity !== "all") {
+                filtered = filtered.filter(
+                    (s) => s.rarity === this.filters.rarity,
+                );
+            }
+
+            if (this.filters.metaTier !== "all") {
+                filtered = filtered.filter(
+                    (s) => s.meta_tier === this.filters.metaTier,
+                );
+            }
+
+            if (this.filters.searchQuery) {
+                const query = this.filters.searchQuery.toLowerCase();
+                filtered = filtered.filter(
+                    (s) =>
+                        s.name.toLowerCase().includes(query) ||
+                        s.description?.toLowerCase().includes(query),
+                );
+            }
+
+            return filtered;
+        },
+
+        // Utility functions
+        showSuccess(message) {
+            window.dispatchEvent(
+                new CustomEvent("toast", {
+                    detail: { type: "success", message },
+                }),
+            );
+        },
+
+        showError(message) {
+            window.dispatchEvent(
+                new CustomEvent("toast", {
+                    detail: { type: "error", message },
+                }),
+            );
+        },
+
+        formatNumber(num) {
+            return new Intl.NumberFormat().format(num);
+        },
+
+        // Get skill grade (meta_tier to grade mapping)
+        getSkillGrade(skill) {
+            const tierMap = {
+                SS: "SS",
+                S: "S",
+                A: "A",
+                B: "B",
+                C: "C",
+                D: "D",
+            };
+            return tierMap[skill.meta_tier] || "C";
+        },
+
+        // Get skill type display name
+        getSkillTypeDisplay(skillType) {
+            const typeMap = {
+                speed: "Speed",
+                stamina: "Stamina",
+                power: "Power",
+                guts: "Guts",
+                wisdom: "Wisdom",
+                passive: "Passive",
+                recovery: "Recovery",
+                debuff: "Debuff",
+                unique: "Unique",
+            };
+            return typeMap[skillType] || skillType;
+        },
+
+        // Get skill type color
+        getSkillTypeColor(skillType) {
+            const colorMap = {
+                speed: "blue",
+                stamina: "green",
+                power: "red",
+                guts: "orange",
+                wisdom: "purple",
+                passive: "gray",
+                recovery: "teal",
+                debuff: "pink",
+                unique: "yellow",
+            };
+            return colorMap[skillType] || "gray";
+        },
+    }));
+});

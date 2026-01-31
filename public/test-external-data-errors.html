@@ -1,0 +1,823 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="csrf-token" content="test-token" />
+        <title>External Data Browser - Error Testing</title>
+        <script
+            src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+            defer
+        ></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <style>
+            .error-banner {
+                background-color: #fee2e2;
+                border: 1px solid #ef4444;
+                padding: 1rem;
+                margin: 1rem 0;
+                border-radius: 0.5rem;
+            }
+            .success-banner {
+                background-color: #d1fae5;
+                border: 1px solid #10b981;
+                padding: 1rem;
+                margin: 1rem 0;
+                border-radius: 0.5rem;
+            }
+            .loading-spinner {
+                border: 3px solid #f3f3f3;
+                border-top: 3px solid #3498db;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                animation: spin 1s linear infinite;
+            }
+            @keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+        </style>
+    </head>
+    <body class="bg-gray-100 p-8">
+        <div class="max-w-6xl mx-auto">
+            <h1 class="text-3xl font-bold mb-6">
+                External Data Browser - Error Scenario Testing
+            </h1>
+
+            <!-- Test Controls -->
+            <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+                <h2 class="text-xl font-semibold mb-4">Test Scenarios</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <button
+                        onclick="testScenario('all-fail')"
+                        class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                    >
+                        Test: All Endpoints Fail
+                    </button>
+                    <button
+                        onclick="testScenario('partial-fail')"
+                        class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
+                    >
+                        Test: Partial Failure
+                    </button>
+                    <button
+                        onclick="testScenario('network-error')"
+                        class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600"
+                    >
+                        Test: Network Error
+                    </button>
+                    <button
+                        onclick="testScenario('timeout')"
+                        class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600"
+                    >
+                        Test: Timeout
+                    </button>
+                    <button
+                        onclick="testScenario('success')"
+                        class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                    >
+                        Test: All Success
+                    </button>
+                    <button
+                        onclick="resetTest()"
+                        class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+                    >
+                        Reset
+                    </button>
+                </div>
+            </div>
+
+            <!-- Component -->
+            <div
+                x-data="externalDataBrowser()"
+                x-init="init()"
+                class="bg-white p-6 rounded-lg shadow-md"
+            >
+                <h2 class="text-2xl font-semibold mb-4">
+                    External Data Browser
+                </h2>
+
+                <!-- Global Loading State -->
+                <div
+                    x-show="loading"
+                    class="flex justify-center items-center py-8"
+                >
+                    <div class="loading-spinner"></div>
+                    <span class="ml-4">Loading data...</span>
+                </div>
+
+                <!-- API Status -->
+                <div class="mb-4">
+                    <span class="font-semibold">API Status:</span>
+                    <span
+                        x-text="apiAvailable ? 'Available' : 'Unavailable'"
+                        :class="apiAvailable ? 'text-green-600' : 'text-red-600'"
+                    ></span>
+                </div>
+
+                <!-- Retry All Button -->
+                <div x-show="!apiAvailable" class="mb-4">
+                    <button
+                        @click="retryAll()"
+                        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                    >
+                        Retry All
+                    </button>
+                </div>
+
+                <!-- Characters Section -->
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold mb-2">Characters</h3>
+
+                    <!-- Loading State -->
+                    <div
+                        x-show="loadingCharacters"
+                        class="flex items-center py-2"
+                    >
+                        <div class="loading-spinner w-6 h-6"></div>
+                        <span class="ml-2">Loading characters...</span>
+                    </div>
+
+                    <!-- Error State -->
+                    <div x-show="errors.characters" class="error-banner">
+                        <p class="font-semibold">Error loading characters:</p>
+                        <p x-text="errors.characters"></p>
+                        <button
+                            @click="retryEndpoint('characters')"
+                            class="mt-2 bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+                        >
+                            Retry Characters
+                        </button>
+                    </div>
+
+                    <!-- Success State -->
+                    <div
+                        x-show="!errors.characters && characters.length > 0"
+                        class="success-banner"
+                    >
+                        <p>
+                            <span class="font-semibold"
+                                >Characters loaded:</span
+                            >
+                            <span x-text="characters.length"></span>
+                        </p>
+                        <div x-show="dataSource.characters" class="mt-2">
+                            <span class="text-sm">Source: </span>
+                            <span
+                                x-text="dataSource.characters"
+                                class="text-sm font-mono"
+                            ></span>
+                        </div>
+                    </div>
+
+                    <!-- Data Display -->
+                    <div x-show="characters.length > 0" class="mt-2">
+                        <template
+                            x-for="char in characters.slice(0, 3)"
+                            :key="char.id"
+                        >
+                            <div class="p-2 border-b">
+                                <span x-text="char.name_en || char.name"></span>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Support Cards Section -->
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold mb-2">Support Cards</h3>
+
+                    <div
+                        x-show="loadingSupportCards"
+                        class="flex items-center py-2"
+                    >
+                        <div class="loading-spinner w-6 h-6"></div>
+                        <span class="ml-2">Loading support cards...</span>
+                    </div>
+
+                    <div x-show="errors.supportCards" class="error-banner">
+                        <p class="font-semibold">
+                            Error loading support cards:
+                        </p>
+                        <p x-text="errors.supportCards"></p>
+                        <button
+                            @click="retryEndpoint('supportCards')"
+                            class="mt-2 bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+                        >
+                            Retry Support Cards
+                        </button>
+                    </div>
+
+                    <div
+                        x-show="!errors.supportCards && supportCards.length > 0"
+                        class="success-banner"
+                    >
+                        <p>
+                            <span class="font-semibold"
+                                >Support cards loaded:</span
+                            >
+                            <span x-text="supportCards.length"></span>
+                        </p>
+                        <div x-show="dataSource.supportCards" class="mt-2">
+                            <span class="text-sm">Source: </span>
+                            <span
+                                x-text="dataSource.supportCards"
+                                class="text-sm font-mono"
+                            ></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Skills Section -->
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold mb-2">Skills</h3>
+
+                    <div x-show="loadingSkills" class="flex items-center py-2">
+                        <div class="loading-spinner w-6 h-6"></div>
+                        <span class="ml-2">Loading skills...</span>
+                    </div>
+
+                    <div x-show="errors.skills" class="error-banner">
+                        <p class="font-semibold">Error loading skills:</p>
+                        <p x-text="errors.skills"></p>
+                        <button
+                            @click="retryEndpoint('skills')"
+                            class="mt-2 bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+                        >
+                            Retry Skills
+                        </button>
+                    </div>
+
+                    <div
+                        x-show="!errors.skills && skills.length > 0"
+                        class="success-banner"
+                    >
+                        <p>
+                            <span class="font-semibold">Skills loaded:</span>
+                            <span x-text="skills.length"></span>
+                        </p>
+                        <div x-show="dataSource.skills" class="mt-2">
+                            <span class="text-sm">Source: </span>
+                            <span
+                                x-text="dataSource.skills"
+                                class="text-sm font-mono"
+                            ></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- News Section -->
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold mb-2">News</h3>
+
+                    <div x-show="loadingNews" class="flex items-center py-2">
+                        <div class="loading-spinner w-6 h-6"></div>
+                        <span class="ml-2">Loading news...</span>
+                    </div>
+
+                    <div x-show="errors.news" class="error-banner">
+                        <p class="font-semibold">Error loading news:</p>
+                        <p x-text="errors.news"></p>
+                        <button
+                            @click="retryEndpoint('news')"
+                            class="mt-2 bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+                        >
+                            Retry News
+                        </button>
+                    </div>
+
+                    <div
+                        x-show="!errors.news && news.length > 0"
+                        class="success-banner"
+                    >
+                        <p>
+                            <span class="font-semibold">News loaded:</span>
+                            <span x-text="news.length"></span>
+                        </p>
+                        <div x-show="dataSource.news" class="mt-2">
+                            <span class="text-sm">Source: </span>
+                            <span
+                                x-text="dataSource.news"
+                                class="text-sm font-mono"
+                            ></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Debug Info -->
+                <details class="mt-6">
+                    <summary class="cursor-pointer font-semibold">
+                        Debug Info
+                    </summary>
+                    <pre
+                        class="mt-2 p-4 bg-gray-100 rounded overflow-auto text-xs"
+                        x-text="JSON.stringify({
+                    loading,
+                    apiAvailable,
+                    loadingCharacters,
+                    loadingSupportCards,
+                    loadingSkills,
+                    loadingNews,
+                    errors,
+                    dataSource,
+                    counts: {
+                        characters: characters.length,
+                        supportCards: supportCards.length,
+                        skills: skills.length,
+                        news: news.length
+                    }
+                }, null, 2)"
+                    ></pre>
+                </details>
+            </div>
+
+            <!-- Test Results -->
+            <div
+                id="test-results"
+                class="mt-6 bg-white p-6 rounded-lg shadow-md"
+            >
+                <h2 class="text-xl font-semibold mb-4">Test Results</h2>
+                <div id="results-content" class="space-y-2"></div>
+            </div>
+        </div>
+
+        <script type="module">
+            // Import the component (inline for testing)
+            window.externalDataBrowser = function () {
+                return {
+                    activeTab: "characters",
+                    loading: false,
+                    loadingCharacters: false,
+                    loadingSupportCards: false,
+                    loadingSkills: false,
+                    loadingNews: false,
+                    apiAvailable: true,
+                    searchTerm: "",
+                    sortBy: "id-asc",
+                    filters: {
+                        category: "",
+                        rarity: [],
+                        importStatus: [],
+                        skillRarity: [],
+                        skillType: "",
+                    },
+                    errors: {
+                        characters: null,
+                        supportCards: null,
+                        skills: null,
+                        news: null,
+                    },
+                    characters: [],
+                    supportCards: [],
+                    skills: [],
+                    news: [],
+                    dataSource: {
+                        characters: null,
+                        supportCards: null,
+                        skills: null,
+                        news: null,
+                    },
+                    filteredCharacters: [],
+                    filteredSupportCards: [],
+                    filteredSkills: [],
+
+                    init() {
+                        // Don't auto-load in test mode
+                        console.log("Component initialized");
+                    },
+
+                    async fetchEndpoint(url) {
+                        try {
+                            const response = await fetch(url, {
+                                headers: {
+                                    Accept: "application/json",
+                                    "X-CSRF-TOKEN":
+                                        document.querySelector(
+                                            'meta[name="csrf-token"]',
+                                        )?.content || "",
+                                },
+                            });
+
+                            if (!response.ok) {
+                                return {
+                                    success: false,
+                                    data: null,
+                                    error: `HTTP ${response.status}: ${response.statusText}`,
+                                    source: null,
+                                    cached: false,
+                                    offline_mode: false,
+                                };
+                            }
+
+                            const data = await response.json();
+
+                            if (!data || typeof data !== "object") {
+                                return {
+                                    success: false,
+                                    data: null,
+                                    error: "Invalid response format: expected object",
+                                    source: null,
+                                    cached: false,
+                                    offline_mode: false,
+                                };
+                            }
+
+                            if (!("success" in data)) {
+                                return {
+                                    success: false,
+                                    data: null,
+                                    error: "Invalid response format: missing success property",
+                                    source: null,
+                                    cached: false,
+                                    offline_mode: false,
+                                };
+                            }
+
+                            return {
+                                success: data.success,
+                                data: data.data || null,
+                                error: data.success
+                                    ? null
+                                    : data.message ||
+                                      data.error ||
+                                      "Unknown error",
+                                source: data.source || null,
+                                cached: data.cached || false,
+                                offline_mode: data.offline_mode || false,
+                            };
+                        } catch (error) {
+                            return {
+                                success: false,
+                                data: null,
+                                error:
+                                    error.message || "Network error occurred",
+                                source: null,
+                                cached: false,
+                                offline_mode: false,
+                            };
+                        }
+                    },
+
+                    async loadData() {
+                        this.loading = true;
+                        this.errors = {
+                            characters: null,
+                            supportCards: null,
+                            skills: null,
+                            news: null,
+                        };
+
+                        try {
+                            const [
+                                charactersRes,
+                                supportCardsRes,
+                                skillsRes,
+                                newsRes,
+                            ] = await Promise.all([
+                                this.fetchEndpoint("/api/external/characters"),
+                                this.fetchEndpoint(
+                                    "/api/external/support-cards",
+                                ),
+                                this.fetchEndpoint("/api/external/skills"),
+                                this.fetchEndpoint("/api/external/news"),
+                            ]);
+
+                            if (charactersRes.success) {
+                                this.characters = charactersRes.data || [];
+                                this.dataSource.characters =
+                                    this.determineDataSource(charactersRes);
+                            } else {
+                                this.errors.characters = charactersRes.error;
+                                console.error(
+                                    "Characters endpoint error:",
+                                    charactersRes.error,
+                                );
+                            }
+
+                            if (supportCardsRes.success) {
+                                this.supportCards = supportCardsRes.data || [];
+                                this.dataSource.supportCards =
+                                    this.determineDataSource(supportCardsRes);
+                            } else {
+                                this.errors.supportCards =
+                                    supportCardsRes.error;
+                                console.error(
+                                    "Support cards endpoint error:",
+                                    supportCardsRes.error,
+                                );
+                            }
+
+                            if (skillsRes.success) {
+                                this.skills = skillsRes.data || [];
+                                this.dataSource.skills =
+                                    this.determineDataSource(skillsRes);
+                            } else {
+                                this.errors.skills = skillsRes.error;
+                                console.error(
+                                    "Skills endpoint error:",
+                                    skillsRes.error,
+                                );
+                            }
+
+                            if (newsRes.success) {
+                                this.news = newsRes.data || [];
+                                this.dataSource.news =
+                                    this.determineDataSource(newsRes);
+                            } else {
+                                this.errors.news = newsRes.error;
+                                console.error(
+                                    "News endpoint error:",
+                                    newsRes.error,
+                                );
+                            }
+
+                            this.apiAvailable =
+                                charactersRes.success ||
+                                supportCardsRes.success ||
+                                skillsRes.success ||
+                                newsRes.success;
+
+                            this.filterData();
+                        } catch (error) {
+                            console.error("Error loading data:", error);
+                            this.apiAvailable = false;
+                        } finally {
+                            this.loading = false;
+                        }
+                    },
+
+                    async retryEndpoint(endpointName) {
+                        const endpointUrls = {
+                            characters: "/api/external/characters",
+                            supportCards: "/api/external/support-cards",
+                            skills: "/api/external/skills",
+                            news: "/api/external/news",
+                        };
+
+                        const loadingStates = {
+                            characters: "loadingCharacters",
+                            supportCards: "loadingSupportCards",
+                            skills: "loadingSkills",
+                            news: "loadingNews",
+                        };
+
+                        if (!endpointUrls[endpointName]) {
+                            console.error(
+                                `Invalid endpoint name: ${endpointName}`,
+                            );
+                            return;
+                        }
+
+                        const loadingState = loadingStates[endpointName];
+                        this[loadingState] = true;
+                        this.errors[endpointName] = null;
+
+                        try {
+                            const response = await this.fetchEndpoint(
+                                endpointUrls[endpointName],
+                            );
+
+                            if (response.success) {
+                                this[endpointName] = response.data || [];
+                                this.dataSource[endpointName] =
+                                    this.determineDataSource(response);
+                                if (!this.apiAvailable) {
+                                    this.apiAvailable = true;
+                                }
+                                this.filterData();
+                            } else {
+                                this.errors[endpointName] = response.error;
+                                console.error(
+                                    `${endpointName} endpoint retry failed:`,
+                                    response.error,
+                                );
+                            }
+                        } catch (error) {
+                            this.errors[endpointName] = error.message;
+                            console.error(
+                                `Error retrying ${endpointName}:`,
+                                error,
+                            );
+                        } finally {
+                            this[loadingState] = false;
+                        }
+                    },
+
+                    async retryAll() {
+                        await this.loadData();
+                    },
+
+                    filterData() {
+                        // Simplified for testing
+                        this.filteredCharacters = this.characters;
+                        this.filteredSupportCards = this.supportCards;
+                        this.filteredSkills = this.skills;
+                    },
+
+                    determineDataSource(response) {
+                        if (!response || !response.success) return null;
+                        if (response.offline_mode) return "offline";
+                        if (response.cached) return "cached";
+                        if (response.source) {
+                            if (
+                                response.source.includes("database_cache") ||
+                                response.source.includes("offline")
+                            )
+                                return "offline";
+                            if (
+                                response.source.includes("cache") ||
+                                response.source.includes("redis")
+                            )
+                                return "cached";
+                            if (
+                                response.source.includes("api") ||
+                                response.source.includes("umapyoi")
+                            )
+                                return "live";
+                            if (response.source.includes("local database"))
+                                return "local";
+                        }
+                        return "live";
+                    },
+                };
+            };
+
+            // Test scenario functions
+            window.testScenario = async function (scenario) {
+                const component = Alpine.$data(
+                    document.querySelector("[x-data]"),
+                );
+                const resultsDiv = document.getElementById("results-content");
+
+                resultsDiv.innerHTML += `<div class="p-2 bg-blue-100 rounded"><strong>Testing: ${scenario}</strong></div>`;
+
+                // Mock fetch for different scenarios
+                const originalFetch = window.fetch;
+
+                switch (scenario) {
+                    case "all-fail":
+                        window.fetch = async (url) => {
+                            if (url.includes("/api/external/")) {
+                                return new Response(null, {
+                                    status: 503,
+                                    statusText: "Service Unavailable",
+                                });
+                            }
+                            return originalFetch(url);
+                        };
+                        break;
+
+                    case "partial-fail":
+                        window.fetch = async (url) => {
+                            if (url.includes("/api/external/characters")) {
+                                return new Response(
+                                    JSON.stringify({
+                                        success: true,
+                                        data: [
+                                            {
+                                                id: 1,
+                                                name_en: "Test Character",
+                                            },
+                                        ],
+                                        source: "test",
+                                    }),
+                                    {
+                                        status: 200,
+                                        headers: {
+                                            "Content-Type": "application/json",
+                                        },
+                                    },
+                                );
+                            }
+                            if (url.includes("/api/external/support-cards")) {
+                                return new Response(null, {
+                                    status: 500,
+                                    statusText: "Internal Server Error",
+                                });
+                            }
+                            if (url.includes("/api/external/skills")) {
+                                return new Response(
+                                    JSON.stringify({
+                                        success: true,
+                                        data: [
+                                            { id: 1, name_en: "Test Skill" },
+                                        ],
+                                        source: "test",
+                                    }),
+                                    {
+                                        status: 200,
+                                        headers: {
+                                            "Content-Type": "application/json",
+                                        },
+                                    },
+                                );
+                            }
+                            if (url.includes("/api/external/news")) {
+                                return new Response(null, {
+                                    status: 404,
+                                    statusText: "Not Found",
+                                });
+                            }
+                            return originalFetch(url);
+                        };
+                        break;
+
+                    case "network-error":
+                        window.fetch = async (url) => {
+                            if (url.includes("/api/external/")) {
+                                throw new Error("Network error occurred");
+                            }
+                            return originalFetch(url);
+                        };
+                        break;
+
+                    case "timeout":
+                        window.fetch = async (url) => {
+                            if (url.includes("/api/external/")) {
+                                await new Promise((resolve) =>
+                                    setTimeout(resolve, 5000),
+                                );
+                                throw new Error("Request timeout");
+                            }
+                            return originalFetch(url);
+                        };
+                        break;
+
+                    case "success":
+                        window.fetch = async (url) => {
+                            if (url.includes("/api/external/")) {
+                                const endpoint = url.split("/").pop();
+                                return new Response(
+                                    JSON.stringify({
+                                        success: true,
+                                        data: [
+                                            {
+                                                id: 1,
+                                                name_en: `Test ${endpoint}`,
+                                            },
+                                        ],
+                                        source: "umapyoi.net",
+                                        cached: false,
+                                    }),
+                                    {
+                                        status: 200,
+                                        headers: {
+                                            "Content-Type": "application/json",
+                                        },
+                                    },
+                                );
+                            }
+                            return originalFetch(url);
+                        };
+                        break;
+                }
+
+                // Run the test
+                await component.loadData();
+
+                // Log results
+                setTimeout(() => {
+                    const result = {
+                        apiAvailable: component.apiAvailable,
+                        errors: component.errors,
+                        dataCounts: {
+                            characters: component.characters.length,
+                            supportCards: component.supportCards.length,
+                            skills: component.skills.length,
+                            news: component.news.length,
+                        },
+                    };
+
+                    resultsDiv.innerHTML += `<div class="p-2 bg-gray-100 rounded text-xs"><pre>${JSON.stringify(result, null, 2)}</pre></div>`;
+
+                    // Restore original fetch
+                    window.fetch = originalFetch;
+                }, 1000);
+            };
+
+            window.resetTest = function () {
+                const component = Alpine.$data(
+                    document.querySelector("[x-data]"),
+                );
+                component.characters = [];
+                component.supportCards = [];
+                component.skills = [];
+                component.news = [];
+                component.errors = {
+                    characters: null,
+                    supportCards: null,
+                    skills: null,
+                    news: null,
+                };
+                component.apiAvailable = true;
+                component.loading = false;
+                document.getElementById("results-content").innerHTML = "";
+            };
+        </script>
+    </body>
+</html>
