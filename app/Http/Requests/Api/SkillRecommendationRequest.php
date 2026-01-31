@@ -17,6 +17,21 @@ class SkillRecommendationRequest extends FormRequest
     }
 
     /**
+     * Prepare the data for validation.
+     *
+     * Merges the characterId route parameter into the request data.
+     */
+    protected function prepareForValidation(): void
+    {
+        // If characterId is in the route, merge it as character_id (cast to int)
+        if ($this->route('characterId')) {
+            $this->merge([
+                'character_id' => (int) $this->route('characterId'),
+            ]);
+        }
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>

@@ -1,9 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Api;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
+/**
+ * Batch Training Prediction Request
+ *
+ * Validates batch training prediction requests for multiple training types
+ */
 class BatchTrainingPredictionRequest extends FormRequest
 {
     /**
@@ -11,7 +19,14 @@ class BatchTrainingPredictionRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true; // Authorization handled by middleware
+        // Verify the character belongs to the authenticated user
+        $characterId = $this->input('character_id');
+
+        if (! $characterId) {
+            return false;
+        }
+
+        return $this->user()->characters()->where('id', $characterId)->exists();
     }
 
     /**
@@ -22,24 +37,61 @@ class BatchTrainingPredictionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'character_id' => ['required', 'integer', 'exists:ucp_characters,id'],
-            'training_types' => ['required', 'array', 'min:1', 'max:6'],
-            'training_types.*' => ['required', 'string', 'in:speed,stamina,power,guts,wit,rest'],
-            'support_cards' => ['sometimes', 'array', 'max:6'],
-            'support_cards.*.id' => ['required_with:support_cards', 'integer'],
-            'support_cards.*.limit_break_level' => ['sometimes', 'integer', 'min:0', 'max:4'],
-            'support_cards.*.friendship_level' => ['sometimes', 'integer', 'min:0', 'max:100'],
-            'participants' => ['sometimes', 'integer', 'min:0', 'max:3'],
-            'teammates_present' => ['sometimes', 'array', 'max:3'],
-            'spirit_burst_gauge' => ['sometimes', 'integer', 'min:0', 'max:4'],
-            'use_mcp' => ['sometimes', 'boolean'],
-            'mcp_context' => ['sometimes', 'array'],
-            'include_recommendations' => ['sometimes', 'boolean'],
+            'character_id' => [
+                'required',
+                'integer',
+                Rule::exists('characters', 'id')->where(function ($query) {
+                    $query->where('user_id', $this->user()->id);
+                }),
+            ],
+            'training_types' => [
+                'nullable',
+                'array',
+                'min:1',
+                'max:5',
+            ],
+            'training_types.*' => [
+                'nullable',
+                'string',
+                Rule::in(['speed', 'stamina', 'power', 'guts', 'wit']),
+            ],
+            'support_cards' => [
+                'nullable',
+                'array',
+            ],
+            'support_cards.*' => [
+                'integer',
+                'exists:support_cards,id',
+            ],
+            'participants' => [
+                'nullable',
+                'integer',
+                'min:0',
+                'max:6',
+            ],
+            'teammates_present' => [
+                'nullable',
+                'array',
+            ],
+            'spirit_burst_gauge' => [
+                'nullable',
+                'integer',
+                'min:0',
+                'max:4',
+            ],
+            'team_stat_ranks' => [
+                'nullable',
+                'array',
+            ],
+            'include_recommendations' => [
+                'nullable',
+                'boolean',
+            ],
         ];
     }
 
     /**
-     * Get custom error messages for validation rules.
+     * Get custom error messages for validator errors.
      *
      * @return array<string, string>
      */
@@ -47,22 +99,24 @@ class BatchTrainingPredictionRequest extends FormRequest
     {
         return [
             'character_id.required' => 'Character ID is required for batch predictions.',
-            'character_id.exists' => 'The specified character does not exist.',
+            'character_id.exists' => 'The selected character does not exist or does not belong to you.',
             'training_types.required' => 'At least one training type is required.',
-            'training_types.min' => 'At least one training type must be specified.',
-            'training_types.max' => 'Maximum 6 training types allowed.',
-            'training_types.*.in' => 'Each training type must be one of: speed, stamina, power, guts, wit, rest.',
-            'support_cards.max' => 'Maximum 6 support cards allowed.',
-            'support_cards.*.limit_break_level.max' => 'Limit break level cannot exceed 4.',
-            'support_cards.*.friendship_level.max' => 'Friendship level cannot exceed 100.',
-            'participants.max' => 'Maximum 3 participants allowed in friendship training.',
-            'teammates_present.max' => 'Maximum 3 teammates can be present.',
-            'spirit_burst_gauge.max' => 'Spirit Burst gauge cannot exceed 4.',
+            'training_types.array' => 'Training types must be provided as an array.',
+            'training_types.min' => 'At least one training type is required.',
+            'training_types.max' => 'Maximum 5 training types allowed.',
+            'training_types.*.in' => 'Each training type must be one of: speed, stamina, power, guts, wit.',
+            'support_cards.array' => 'Support cards must be provided as an array.',
+            'support_cards.*.exists' => 'One or more support cards do not exist.',
+            'participants.integer' => 'Participants must be a number.',
+            'participants.min' => 'Participants cannot be negative.',
+            'participants.max' => 'Maximum 6 participants allowed.',
+            'spirit_burst_gauge.min' => 'Spirit Burst gauge cannot be negative.',
+            'spirit_burst_gauge.max' => 'Spirit Burst gauge maximum is 4.',
         ];
     }
 
     /**
-     * Get custom attribute names for error messages.
+     * Get custom attributes for validator errors.
      *
      * @return array<string, string>
      */
@@ -73,7 +127,6 @@ class BatchTrainingPredictionRequest extends FormRequest
             'training_types' => 'training types',
             'support_cards' => 'support cards',
             'participants' => 'participants',
-            'teammates_present' => 'teammates',
             'spirit_burst_gauge' => 'Spirit Burst gauge',
         ];
     }

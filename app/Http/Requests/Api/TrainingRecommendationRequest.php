@@ -1,9 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Api;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
+/**
+ * Training Recommendation Request
+ *
+ * Validates training recommendation requests with goal-based optimization
+ */
 class TrainingRecommendationRequest extends FormRequest
 {
     /**
@@ -11,7 +19,14 @@ class TrainingRecommendationRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true; // Authorization handled by middleware
+        // Verify the character belongs to the authenticated user
+        $characterId = $this->input('character_id');
+
+        if (! $characterId) {
+            return false;
+        }
+
+        return $this->user()->characters()->where('id', $characterId)->exists();
     }
 
     /**
@@ -22,38 +37,109 @@ class TrainingRecommendationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'character_id' => ['required', 'integer', 'exists:ucp_characters,id'],
-            'support_cards' => ['sometimes', 'array', 'max:6'],
-            'support_cards.*.id' => ['required_with:support_cards', 'integer'],
-            'support_cards.*.limit_break_level' => ['sometimes', 'integer', 'min:0', 'max:4'],
-            'support_cards.*.friendship_level' => ['sometimes', 'integer', 'min:0', 'max:100'],
-            'participants' => ['sometimes', 'integer', 'min:0', 'max:3'],
-            'teammates_present' => ['sometimes', 'array', 'max:3'],
-            'spirit_burst_gauge' => ['sometimes', 'integer', 'min:0', 'max:4'],
+            'character_id' => [
+                'required',
+                'integer',
+                Rule::exists('characters', 'id')->where(function ($query) {
+                    $query->where('user_id', $this->user()->id);
+                }),
+            ],
+            'goal_stats' => [
+                'nullable',
+                'array',
+            ],
+            'goal_stats.speed' => [
+                'nullable',
+                'integer',
+                'min:0',
+                'max:1200',
+            ],
+            'goal_stats.stamina' => [
+                'nullable',
+                'integer',
+                'min:0',
+                'max:1200',
+            ],
+            'goal_stats.power' => [
+                'nullable',
+                'integer',
+                'min:0',
+                'max:1200',
+            ],
+            'goal_stats.guts' => [
+                'nullable',
+                'integer',
+                'min:0',
+                'max:1200',
+            ],
+            'goal_stats.wit' => [
+                'nullable',
+                'integer',
+                'min:0',
+                'max:1200',
+            ],
+            'turns_remaining' => [
+                'nullable',
+                'integer',
+                'min:1',
+                'max:70',
+            ],
+            'support_cards' => [
+                'nullable',
+                'array',
+            ],
+            'support_cards.*' => [
+                'integer',
+                'exists:support_cards,id',
+            ],
+            'participants' => [
+                'nullable',
+                'integer',
+                'min:0',
+                'max:6',
+            ],
+            'teammates_present' => [
+                'nullable',
+                'array',
+            ],
+            'spirit_burst_gauge' => [
+                'nullable',
+                'integer',
+                'min:0',
+                'max:4',
+            ],
         ];
     }
 
     /**
-     * Get custom error messages for validation rules.
+     * Get custom error messages for validator errors.
      *
      * @return array<string, string>
      */
     public function messages(): array
     {
         return [
-            'character_id.required' => 'Character ID is required for training recommendations.',
-            'character_id.exists' => 'The specified character does not exist.',
-            'support_cards.max' => 'Maximum 6 support cards allowed.',
-            'support_cards.*.limit_break_level.max' => 'Limit break level cannot exceed 4.',
-            'support_cards.*.friendship_level.max' => 'Friendship level cannot exceed 100.',
-            'participants.max' => 'Maximum 3 participants allowed in friendship training.',
-            'teammates_present.max' => 'Maximum 3 teammates can be present.',
-            'spirit_burst_gauge.max' => 'Spirit Burst gauge cannot exceed 4.',
+            'character_id.required' => 'Character ID is required for recommendations.',
+            'character_id.exists' => 'The selected character does not exist or does not belong to you.',
+            'goal_stats.array' => 'Goal stats must be provided as an object.',
+            'goal_stats.*.integer' => 'Each goal stat must be a number.',
+            'goal_stats.*.min' => 'Goal stats cannot be negative.',
+            'goal_stats.*.max' => 'Goal stats cannot exceed 1200.',
+            'turns_remaining.integer' => 'Turns remaining must be a number.',
+            'turns_remaining.min' => 'At least 1 turn must remain.',
+            'turns_remaining.max' => 'Maximum 70 turns allowed.',
+            'support_cards.array' => 'Support cards must be provided as an array.',
+            'support_cards.*.exists' => 'One or more support cards do not exist.',
+            'participants.integer' => 'Participants must be a number.',
+            'participants.min' => 'Participants cannot be negative.',
+            'participants.max' => 'Maximum 6 participants allowed.',
+            'spirit_burst_gauge.min' => 'Spirit Burst gauge cannot be negative.',
+            'spirit_burst_gauge.max' => 'Spirit Burst gauge maximum is 4.',
         ];
     }
 
     /**
-     * Get custom attribute names for error messages.
+     * Get custom attributes for validator errors.
      *
      * @return array<string, string>
      */
@@ -61,9 +147,10 @@ class TrainingRecommendationRequest extends FormRequest
     {
         return [
             'character_id' => 'character',
+            'goal_stats' => 'goal stats',
+            'turns_remaining' => 'turns remaining',
             'support_cards' => 'support cards',
             'participants' => 'participants',
-            'teammates_present' => 'teammates',
             'spirit_burst_gauge' => 'Spirit Burst gauge',
         ];
     }
