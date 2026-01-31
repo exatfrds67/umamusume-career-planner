@@ -69,9 +69,10 @@ class CharacterPolicy
      */
     public function delete(User $user, Character $character): bool
     {
-        // Seeded characters cannot be deleted by regular users
+        // Admins can delete any character (handled by before() method)
+        // Seeded characters can be deleted by admins only
         if ($character->is_seeded) {
-            return false;
+            return false; // Will be overridden by before() for admins
         }
 
         // User-created characters can only be deleted by their owner
