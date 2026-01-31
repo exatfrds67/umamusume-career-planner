@@ -20,6 +20,7 @@ return new class extends Migration
 
             // Character basic information
             $table->string('name');
+            $table->string('avatar_url', 500)->nullable()->comment('Character avatar/image URL or path'); // Consolidated from 2026_01_16_230138
             $table->enum('scenario_type', ['ura_finale', 'unity_cup'])->default('ura_finale');
             $table->enum('career_stage', ['junior', 'classic', 'senior'])->default('junior');
             $table->integer('current_turn')->default(0)->comment('Current turn (0-72)');
@@ -52,6 +53,9 @@ return new class extends Migration
 
             // Status and metadata
             $table->enum('status', ['active', 'completed', 'retired', 'archived'])->default('active');
+            $table->integer('available_sp')->default(0)->comment('Available skill points'); // Consolidated from 2026_01_17_182650
+            $table->boolean('is_pinned')->default(false)->comment('Whether character is pinned for quick access'); // Consolidated from 2026_01_28_233916
+            $table->boolean('is_seeded')->default(false)->comment('Whether character is from seed data (accessible to all users)'); // Consolidated from 2026_01_28_234849
             $table->json('completion_data')->nullable()->comment('Final stats and grade when completed');
             $table->timestamps();
 

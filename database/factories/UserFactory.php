@@ -34,6 +34,7 @@ class UserFactory extends Factory
             'accessibility_settings' => [],
             'ai_settings' => ['subscription_tier' => 'free', 'budget_limit' => 10.0],
             'mcp_settings' => [],
+            'is_admin' => false,
         ];
     }
 

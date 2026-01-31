@@ -32,7 +32,7 @@ class SkillFactory extends Factory
 
         return [
             'name' => fake()->words(3, true),
-            'internal_id' => 'skill_'.fake()->unique()->numberBetween(1000, 9999),
+            'internal_id' => 'test_skill_'.fake()->unique()->numberBetween(10000, 99999),
             'skill_type' => fake()->randomElement($skillTypes),
             'rarity' => $rarity,
             'base_sp_cost' => $baseCost,

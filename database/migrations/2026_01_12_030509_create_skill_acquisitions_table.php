@@ -37,6 +37,8 @@ return new class extends Migration
             // Strategic context
             $table->json('acquisition_context')->nullable()->comment('Context and reasoning for skill acquisition');
             $table->json('hint_sources')->nullable()->comment('Sources of hints used for this acquisition');
+            $table->tinyInteger('hint_level')->unsigned()->default(0)->comment('Number of hints obtained (0-2)'); // Consolidated from 2026_01_25_103247
+            $table->tinyInteger('sp_discount_applied')->unsigned()->default(0)->comment('SP discount percentage from hints (0-40)'); // Consolidated from 2026_01_25_084803 & 2026_01_25_103247
             $table->enum('priority_level', ['high', 'medium', 'low'])->default('medium')->comment('Strategic priority of this skill acquisition');
 
             // Performance tracking
@@ -46,6 +48,7 @@ return new class extends Migration
 
             // Status and metadata
             $table->boolean('is_active')->default(true)->comment('Whether skill is currently active on character');
+            $table->boolean('is_equipped')->default(false)->comment('Whether the skill is currently equipped'); // Consolidated from 2026_01_12_040600
             $table->json('acquisition_metadata')->nullable()->comment('Additional acquisition information');
             $table->timestamps();
 
@@ -56,6 +59,7 @@ return new class extends Migration
             $table->index('acquisition_method');
             $table->index('is_evolution');
             $table->index('priority_level');
+            $table->index('is_equipped'); // Consolidated from 2026_01_12_040600
 
             // Unique constraint to prevent duplicate skill acquisitions
             $table->unique(['character_id', 'skill_id'], 'unique_character_skill_acquisition');

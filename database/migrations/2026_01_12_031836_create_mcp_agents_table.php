@@ -13,9 +13,18 @@ return new class extends Migration
     {
         Schema::create('ucp_mcp_agents', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('ucp_users')->onDelete('cascade');
-            $table->string('agent_name')->comment('Name of the MCP agent');
-            $table->string('agent_type')->comment('Type of agent (e.g., "career_optimizer", "skill_advisor", "training_planner")');
+            $table->string('agent_id')->unique()->comment('Unique agent identifier from AgentCore'); // Consolidated from 2026_01_17_211643
+            $table->string('name')->comment('Agent name'); // Consolidated from 2026_01_17_211643
+            $table->string('type')->comment('Agent type'); // Consolidated from 2026_01_17_211643
+            $table->string('model')->comment('AI model used by agent'); // Consolidated from 2026_01_17_211643
+            $table->text('instructions')->comment('Agent instructions'); // Consolidated from 2026_01_17_211643
+            $table->json('tools')->nullable()->comment('Tools available to agent'); // Consolidated from 2026_01_17_211643
+            $table->json('memory_config')->nullable()->comment('Memory configuration'); // Consolidated from 2026_01_17_211643
+            $table->json('guardrails')->nullable()->comment('Agent guardrails'); // Consolidated from 2026_01_17_211643
+            $table->json('metadata')->nullable()->comment('Additional metadata'); // Consolidated from 2026_01_17_211643
+            $table->foreignId('user_id')->nullable()->constrained('ucp_users')->onDelete('cascade');
+            $table->string('agent_name')->nullable()->comment('Name of the MCP agent');
+            $table->string('agent_type')->nullable()->comment('Type of agent (e.g., "career_optimizer", "skill_advisor", "training_planner")');
             $table->string('agent_version')->default('1.0')->comment('Version of the agent');
 
             // Agent configuration
@@ -32,7 +41,11 @@ return new class extends Migration
 
             // Agent state and lifecycle
             $table->enum('status', ['active', 'inactive', 'training', 'error', 'maintenance'])->default('inactive')->comment('Current agent status');
+            $table->string('health_status')->default('unknown')->comment('Agent health status'); // Consolidated from 2026_01_17_211643
+            $table->float('deployment_time')->default(0)->comment('Deployment time in seconds'); // Consolidated from 2026_01_17_211643
             $table->timestamp('last_active_at')->nullable()->comment('When agent was last active');
+            $table->timestamp('last_health_check')->nullable()->comment('Last health check timestamp'); // Consolidated from 2026_01_17_211643
+            $table->timestamp('terminated_at')->nullable()->comment('Agent termination timestamp'); // Consolidated from 2026_01_17_211643
             $table->timestamp('last_updated_at')->nullable()->comment('When agent configuration was last updated');
 
             // Performance and learning metrics

@@ -32,6 +32,7 @@ class AdminUserSeeder extends Seeder
             'email' => 'admin@umamusume.local',
             'name' => 'Admin',
             'password' => Hash::make('admin123'),
+            'is_admin' => true, // CRITICAL: Set admin flag
             'preferences' => [
                 'theme' => 'dark',
                 'language' => 'en',

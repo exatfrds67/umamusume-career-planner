@@ -15,10 +15,15 @@ return new class extends Migration
             $table->id();
             $table->string('name')->unique()->comment('Support card name');
             $table->string('internal_id')->unique()->comment('Internal game ID for support card');
+            $table->string('external_source_id')->nullable()->comment('External source ID'); // Consolidated from 2026_01_26_162012
+            $table->string('external_source')->nullable()->comment('External source name'); // Consolidated from 2026_01_26_162012
+            $table->string('gametora_id')->nullable()->comment('GameTora database ID'); // Consolidated from 2026_01_26_162012
+            $table->unsignedInteger('chara_id')->nullable()->comment('Character ID'); // Consolidated from 2026_01_26_162012
 
             // Card classification
             $table->enum('card_type', ['speed', 'stamina', 'power', 'guts', 'wit', 'friend'])->comment('Support card type');
             $table->enum('rarity', ['R', 'SR', 'SSR'])->comment('Support card rarity');
+            $table->tinyInteger('limit_break')->unsigned()->default(0)->comment('Limit break level (0-4 stars)'); // Consolidated from 2026_01_25_103310
             $table->integer('max_level')->default(50)->comment('Maximum level for this card');
             $table->integer('max_limit_break')->default(4)->comment('Maximum limit break level');
 
@@ -69,6 +74,7 @@ return new class extends Migration
 
             // Status and metadata
             $table->boolean('is_active')->default(true)->comment('Whether card is currently available');
+            $table->enum('server_availability', ['jp', 'global', 'both'])->default('both')->comment('Server availability'); // Consolidated from 2026_01_26_162012
             $table->json('card_metadata')->nullable()->comment('Additional card information');
             $table->timestamps();
 
@@ -80,6 +86,10 @@ return new class extends Migration
             $table->index('is_limited');
             $table->index('meta_tier');
             $table->index('is_active');
+            $table->index('external_source_id'); // Consolidated from 2026_01_26_162012
+            $table->index('gametora_id'); // Consolidated from 2026_01_26_162012
+            $table->index('chara_id'); // Consolidated from 2026_01_26_162012
+            $table->index('server_availability'); // Consolidated from 2026_01_26_162012
         });
     }
 

@@ -27,6 +27,7 @@ return new class extends Migration
             $table->enum('distance_category', ['short', 'mile', 'intermediate', 'long'])->comment('Race distance category');
             $table->integer('distance_meters')->comment('Exact race distance in meters');
             $table->enum('surface', ['turf', 'dirt'])->comment('Race surface type');
+            $table->string('track_type')->nullable()->comment('Track direction/type (e.g., right, left, straight)'); // Consolidated from 2026_01_23_011000
             $table->enum('running_style', ['escape', 'leading', 'insert', 'tracking'])->comment('Running style used in race');
 
             // Race conditions

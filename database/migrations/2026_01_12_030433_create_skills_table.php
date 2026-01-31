@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('ucp_skills', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique()->comment('Skill name (e.g., "Go with the Flow", "Lane Legerdemain")');
+            $table->string('name_en')->nullable()->comment('English name of the skill'); // Consolidated from 2026_01_25_103328
             $table->string('internal_id')->unique()->comment('Internal game ID for skill');
 
             // Skill classification
@@ -45,6 +46,7 @@ return new class extends Migration
 
             // Status and metadata
             $table->boolean('is_active')->default(true)->comment('Whether skill is currently available in game');
+            $table->string('status')->default('active')->comment('Operational status for skill availability'); // Consolidated from 2026_01_23_010000
             $table->timestamps();
 
             // Indexes for performance
@@ -55,6 +57,7 @@ return new class extends Migration
             $table->index('can_evolve');
             $table->index('is_evolution');
             $table->index('meta_tier');
+            $table->index('status'); // Consolidated from 2026_01_23_010000
         });
     }
 
