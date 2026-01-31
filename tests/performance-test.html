@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="csrf-token" content="test-token" />
+        <title>API Performance Test</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                max-width: 1200px;
+                margin: 20px auto;
+                padding: 20px;
+                background: #f5f5f5;
+            }
+            .container {
+                background: white;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            h1 {
+                color: #333;
+                margin-bottom: 20px;
+            }
+            .test-section {
+                margin: 20px 0;
+                padding: 15px;
+                background: #f9f9f9;
+                border-left: 4px solid #4caf50;
+            }
+            .test-section.warning {
+                border-left-color: #ff9800;
+            }
+            .test-section.error {
+                border-left-color: #f44336;
+            }
+            button {
+                background: #4caf50;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 16px;
+                margin: 5px;
+            }
+            button:hover {
+                background: #45a049;
+            }
+            button:disabled {
+                background: #ccc;
+                cursor: not-allowed;
+            }
+            .results {
+                margin-top: 20px;
+            }
+            .metric {
+                display: flex;
+                justify-content: space-between;
+                padding: 10px;
+                margin: 5px 0;
+                background: white;
+                border-radius: 4px;
+            }
+            .metric.success {
+                border-left: 4px solid #4caf50;
+            }
+            .metric.warning {
+                border-left: 4px solid #ff9800;
+            }
+            .metric.error {
+                border-left: 4px solid #f44336;
+            }
+            .metric-name {
+                font-weight: bold;
+            }
+            .metric-value {
+                color: #666;
+            }
+            .summary {
+                margin-top: 20px;
+                padding: 15px;
+                background: #e3f2fd;
+                border-radius: 4px;
+            }
+            .loading {
+                display: inline-block;
+                width: 20px;
+                height: 20px;
+                border: 3px solid #f3f3f3;
+                border-top: 3px solid #4caf50;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+            }
+            @keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>External API Performance Test</h1>
+            <p>
+                This page tests the performance of the external API endpoints
+                and verifies they meet the target response times.
+            </p>
+
+            <div class="test-section">
+                <h2>Performance Targets</h2>
+                <ul>
+                    <li>
+                        <strong>Cached responses:</strong> &lt; 1 second
+                        (1000ms)
+                    </li>
+                    <li>
+                        <strong>Fresh responses:</strong> &lt; 3 seconds
+                        (3000ms)
+                    </li>
+                </ul>
+            </div>
+
+            <div>
+                <button id="runTest" onclick="runPerformanceTest()">
+                    Run Performance Test
+                </button>
+                <button id="clearCache" onclick="clearCache()">
+                    Clear Cache & Test
+                </button>
+            </div>
+
+            <div id="results" class="results"></div>
+        </div>
+
+        <script>
+            const endpoints = [
+                { name: "Characters", url: "/api/external/characters" },
+                { name: "Support Cards", url: "/api/external/support-cards" },
+                { name: "Skills", url: "/api/external/skills" },
+                { name: "News", url: "/api/external/news" },
+            ];
+
+            async function fetchWithTiming(url) {
+                const startTime = performance.now();
+                try {
+                    const response = await fetch(url, {
+                        headers: {
+                            Accept: "application/json",
+                            "X-CSRF-TOKEN":
+                                document.querySelector(
+                                    'meta[name="csrf-token"]',
+                                )?.content || "",
+                        },
+                    });
+                    const endTime = performance.now();
+                    const responseTime = Math.round(endTime - startTime);
+
+                    if (!response.ok) {
+                        return {
+                            success: false,
+                            error: `HTTP ${response.status}: ${response.statusText}`,
+                            responseTime,
+                        };
+                    }
+
+                    const data = await response.json();
+                    return {
+                        success: data.success,
+                        cached: data.cached || false,
+                        offline_mode: data.offline_mode || false,
+                        source: data.source || "unknown",
+                        dataCount: data.data?.length || 0,
+                        responseTime,
+                        error: data.success ? null : data.message || data.error,
+                    };
+                } catch (error) {
+                    const endTime = performance.now();
+                    const responseTime = Math.round(endTime - startTime);
+                    return {
+                        success: false,
+                        error: error.message,
+                        responseTime,
+                    };
+                }
+            }
+
+            async function runPerformanceTest() {
+                const resultsDiv = document.getElementById("results");
+                const runButton = document.getElementById("runTest");
+                const clearButton = document.getElementById("clearCache");
+
+                runButton.disabled = true;
+                clearButton.disabled = true;
+                resultsDiv.innerHTML =
+                    '<div class="loading"></div> Running performance tests...';
+
+                const results = [];
+
+                // Test all endpoints
+                for (const endpoint of endpoints) {
+                    const result = await fetchWithTiming(endpoint.url);
+                    results.push({
+                        name: endpoint.name,
+                        ...result,
+                    });
+                }
+
+                // Calculate summary
+                const successfulResults = results.filter((r) => r.success);
+                const responseTimes = successfulResults.map(
+                    (r) => r.responseTime,
+                );
+                const avgResponseTime =
+                    responseTimes.length > 0
+                        ? Math.round(
+                              responseTimes.reduce((a, b) => a + b, 0) /
+                                  responseTimes.length,
+                          )
+                        : 0;
+                const minResponseTime =
+                    responseTimes.length > 0 ? Math.min(...responseTimes) : 0;
+                const maxResponseTime =
+                    responseTimes.length > 0 ? Math.max(...responseTimes) : 0;
+
+                // Check if targets are met
+                const allMeetTargets = successfulResults.every((r) => {
+                    const target = r.cached ? 1000 : 3000;
+                    return r.responseTime < target;
+                });
+
+                // Display results
+                let html = "<h2>Test Results</h2>";
+
+                results.forEach((result) => {
+                    const target = result.cached ? 1000 : 3000;
+                    const meetsTarget =
+                        result.success && result.responseTime < target;
+                    const statusClass = result.success
+                        ? meetsTarget
+                            ? "success"
+                            : "warning"
+                        : "error";
+
+                    const dataSource = result.offline_mode
+                        ? "offline"
+                        : result.cached
+                          ? "cached"
+                          : "live";
+
+                    html += `
+                    <div class="metric ${statusClass}">
+                        <div>
+                            <div class="metric-name">${result.name}</div>
+                            <div class="metric-value">
+                                ${result.success ? `${result.dataCount} items` : "Failed"}
+                                • ${dataSource}
+                                ${result.source ? `(${result.source})` : ""}
+                            </div>
+                        </div>
+                        <div>
+                            <div class="metric-name">${result.responseTime}ms</div>
+                            <div class="metric-value">
+                                Target: &lt;${target}ms
+                                ${meetsTarget ? "✓" : result.success ? "✗ Exceeded" : "✗ Failed"}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                });
+
+                // Add summary
+                html += `
+                <div class="summary">
+                    <h3>Performance Summary</h3>
+                    <p><strong>Endpoints tested:</strong> ${results.length}</p>
+                    <p><strong>Successful:</strong> ${successfulResults.length}</p>
+                    <p><strong>Failed:</strong> ${results.length - successfulResults.length}</p>
+                    <p><strong>Average response time:</strong> ${avgResponseTime}ms</p>
+                    <p><strong>Min response time:</strong> ${minResponseTime}ms</p>
+                    <p><strong>Max response time:</strong> ${maxResponseTime}ms</p>
+                    <p><strong>All targets met:</strong> ${allMeetTargets ? "✓ Yes" : "✗ No"}</p>
+                </div>
+            `;
+
+                resultsDiv.innerHTML = html;
+                runButton.disabled = false;
+                clearButton.disabled = false;
+
+                // Log to console
+                console.group("[Performance Test Results]");
+                console.table(results);
+                console.log("Summary:", {
+                    total: results.length,
+                    successful: successfulResults.length,
+                    avgResponseTime,
+                    minResponseTime,
+                    maxResponseTime,
+                    allMeetTargets,
+                });
+                console.groupEnd();
+            }
+
+            async function clearCache() {
+                const resultsDiv = document.getElementById("results");
+                const runButton = document.getElementById("runTest");
+                const clearButton = document.getElementById("clearCache");
+
+                runButton.disabled = true;
+                clearButton.disabled = true;
+                resultsDiv.innerHTML =
+                    '<div class="loading"></div> Clearing cache and running tests...';
+
+                try {
+                    // Clear cache
+                    const response = await fetch("/api/external/clear-cache", {
+                        method: "POST",
+                        headers: {
+                            Accept: "application/json",
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN":
+                                document.querySelector(
+                                    'meta[name="csrf-token"]',
+                                )?.content || "",
+                        },
+                    });
+
+                    if (response.ok) {
+                        console.log("Cache cleared successfully");
+                        // Wait a moment for cache to clear
+                        await new Promise((resolve) =>
+                            setTimeout(resolve, 500),
+                        );
+                        // Run the test
+                        await runPerformanceTest();
+                    } else {
+                        resultsDiv.innerHTML = `<div class="test-section error">Failed to clear cache: ${response.statusText}</div>`;
+                        runButton.disabled = false;
+                        clearButton.disabled = false;
+                    }
+                } catch (error) {
+                    resultsDiv.innerHTML = `<div class="test-section error">Error clearing cache: ${error.message}</div>`;
+                    runButton.disabled = false;
+                    clearButton.disabled = false;
+                }
+            }
+
+            // Auto-run test on page load
+            window.addEventListener("load", () => {
+                setTimeout(runPerformanceTest, 500);
+            });
+        </script>
+    </body>
+</html>

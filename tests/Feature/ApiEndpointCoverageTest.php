@@ -56,6 +56,8 @@ describe('API Endpoint Coverage', function () {
     });
 
     it('has all training prediction routes accessible', function () {
+        $this->actingAs($this->user);
+
         $this->postJson('/api/training-predictions', [])->assertStatus(422); // validation expected
         $this->postJson('/api/training-predictions/batch', [])->assertStatus(422);
         $this->postJson('/api/training-predictions/recommend', [])->assertStatus(422);
@@ -345,7 +347,7 @@ describe('API Endpoint Coverage', function () {
 
     it('counts all registered API routes', function () {
         $routes = collect(Route::getRoutes())
-            ->filter(fn ($route) => str_starts_with($route->uri(), 'api/'))
+            ->filter(fn($route) => str_starts_with($route->uri(), 'api/'))
             ->count();
 
         expect($routes)->toBeGreaterThan(200); // We have extensive API coverage
@@ -353,7 +355,7 @@ describe('API Endpoint Coverage', function () {
 
     it('ensures all routes have proper middleware', function () {
         $routes = collect(Route::getRoutes())
-            ->filter(fn ($route) => str_starts_with($route->uri(), 'api/'));
+            ->filter(fn($route) => str_starts_with($route->uri(), 'api/'));
 
         $apiMiddlewareCount = 0;
         $webMiddlewareCount = 0;

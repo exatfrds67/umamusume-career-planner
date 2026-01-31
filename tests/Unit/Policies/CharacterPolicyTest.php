@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Gate;
 
 describe('Admin User Authorization', function () {
     test('admin can view any character', function () {
-        $admin = User::factory()->create(['email' => 'admin@umamusume.local']);
+        $admin = User::factory()->create(['email' => 'admin@umamusume.local', 'is_admin' => true]);
         $otherUser = User::factory()->create();
         $character = Character::factory()->create(['user_id' => $otherUser->id]);
 
@@ -14,7 +14,7 @@ describe('Admin User Authorization', function () {
     });
 
     test('admin can update any character', function () {
-        $admin = User::factory()->create(['email' => 'admin@umamusume.local']);
+        $admin = User::factory()->create(['email' => 'admin@umamusume.local', 'is_admin' => true]);
         $otherUser = User::factory()->create();
         $character = Character::factory()->create(['user_id' => $otherUser->id]);
 
@@ -22,7 +22,7 @@ describe('Admin User Authorization', function () {
     });
 
     test('admin can delete any character', function () {
-        $admin = User::factory()->create(['email' => 'admin@umamusume.local']);
+        $admin = User::factory()->create(['email' => 'admin@umamusume.local', 'is_admin' => true]);
         $otherUser = User::factory()->create();
         $character = Character::factory()->create(['user_id' => $otherUser->id]);
 
@@ -30,7 +30,7 @@ describe('Admin User Authorization', function () {
     });
 
     test('admin can restore any character', function () {
-        $admin = User::factory()->create(['email' => 'admin@umamusume.local']);
+        $admin = User::factory()->create(['email' => 'admin@umamusume.local', 'is_admin' => true]);
         $otherUser = User::factory()->create();
         $character = Character::factory()->create(['user_id' => $otherUser->id]);
 
@@ -38,7 +38,7 @@ describe('Admin User Authorization', function () {
     });
 
     test('admin can force delete any character', function () {
-        $admin = User::factory()->create(['email' => 'admin@umamusume.local']);
+        $admin = User::factory()->create(['email' => 'admin@umamusume.local', 'is_admin' => true]);
         $otherUser = User::factory()->create();
         $character = Character::factory()->create(['user_id' => $otherUser->id]);
 
@@ -46,13 +46,13 @@ describe('Admin User Authorization', function () {
     });
 
     test('admin can view any characters', function () {
-        $admin = User::factory()->create(['email' => 'admin@umamusume.local']);
+        $admin = User::factory()->create(['email' => 'admin@umamusume.local', 'is_admin' => true]);
 
         expect(Gate::forUser($admin)->allows('viewAny', Character::class))->toBeTrue();
     });
 
     test('admin can create characters', function () {
-        $admin = User::factory()->create(['email' => 'admin@umamusume.local']);
+        $admin = User::factory()->create(['email' => 'admin@umamusume.local', 'is_admin' => true]);
 
         expect(Gate::forUser($admin)->allows('create', Character::class))->toBeTrue();
     });

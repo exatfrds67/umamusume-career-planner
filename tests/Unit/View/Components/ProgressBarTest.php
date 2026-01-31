@@ -24,7 +24,7 @@ describe('ProgressBar Component', function () {
     });
 
     it('returns correct stat color classes', function () {
-        expect((new ProgressBar(color: 'speed'))->colorClasses())->toContain('rose')
+        expect((new ProgressBar(color: 'speed'))->colorClasses())->toContain('blue')
             ->and((new ProgressBar(color: 'stamina'))->colorClasses())->toContain('green')
             ->and((new ProgressBar(color: 'power'))->colorClasses())->toContain('orange')
             ->and((new ProgressBar(color: 'guts'))->colorClasses())->toContain('amber')

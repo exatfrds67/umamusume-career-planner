@@ -182,7 +182,7 @@ test('training predictions show page includes JavaScript module', function () us
     $response = $this->actingAs($user)->get(route('training.predictions.show', $character));
 
     $response->assertSuccessful();
-    $response->assertSee('training-predictions.js', false);
+    $response->assertSee('resources/js/pages/training/show.js', false);
 });
 
 test('training predictions index with unity cup character displays correct scenario', function () use (&$user) {
@@ -195,7 +195,7 @@ test('training predictions index with unity cup character displays correct scena
     $response = $this->actingAs($user)->get(route('training.predictions', ['character_id' => $unityCupCharacter->id]));
 
     $response->assertSuccessful();
-    $response->assertSee('unity cup');
+    $response->assertSee('Unity Cup'); // Title case display format
     $response->assertSee('data-scenario-type="unity_cup"', false);
 });
 
@@ -203,7 +203,7 @@ test('training predictions controller returns correct training types', function 
     $response = $this->actingAs($user)->get(route('training.predictions'));
 
     $response->assertSuccessful();
-    $response->assertViewHas('trainingTypes', fn ($trainingTypes) => isset($trainingTypes['speed'])
+    $response->assertViewHas('trainingTypes', fn($trainingTypes) => isset($trainingTypes['speed'])
         && isset($trainingTypes['stamina'])
         && isset($trainingTypes['power'])
         && isset($trainingTypes['guts'])
@@ -225,7 +225,7 @@ test('training predictions show page loads character with relationships', functi
     $response = $this->actingAs($user)->get(route('training.predictions.show', $character));
 
     $response->assertSuccessful();
-    $response->assertViewHas('character', fn ($character) => $character->relationLoaded('aptitudes')
+    $response->assertViewHas('character', fn($character) => $character->relationLoaded('aptitudes')
         && $character->relationLoaded('supportCards')
         && $character->relationLoaded('factors'));
 });

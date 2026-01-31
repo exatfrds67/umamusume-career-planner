@@ -8,7 +8,13 @@ describe('StatRadarChart Component', function () {
     it('renders with default values', function () {
         $component = new StatRadarChart;
 
-        expect($component->stats)->toBe([]);
+        expect($component->stats)->toBe([
+            'speed' => 0,
+            'stamina' => 0,
+            'power' => 0,
+            'guts' => 0,
+            'wit' => 0,
+        ]);
         expect($component->max)->toBe(1000);
         expect($component->size)->toBe('md');
         expect($component->showLabels)->toBeTrue();
@@ -74,7 +80,7 @@ describe('StatRadarChart Component', function () {
         $component = new StatRadarChart;
 
         $colors = [
-            'speed' => 'text-rose-500 dark:text-rose-400',
+            'speed' => 'text-blue-500 dark:text-blue-400',
             'stamina' => 'text-green-500 dark:text-green-400',
             'power' => 'text-orange-500 dark:text-orange-400',
             'guts' => 'text-amber-500 dark:text-amber-400',
@@ -90,7 +96,7 @@ describe('StatRadarChart Component', function () {
         $component = new StatRadarChart;
 
         $colors = [
-            'speed' => '#fb7185',
+            'speed' => '#3b82f6',
             'stamina' => '#22c55e',
             'power' => '#f97316',
             'guts' => '#fbbf24',
