@@ -17,14 +17,13 @@ class CareerController extends Controller
 {
     /**
      * Verify that the career's character belongs to the authenticated user.
+     * Uses policy authorization which allows admins full access.
      *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
     private function verifyCareerOwnership(Career $career): void
     {
-        if ($career->character === null || $career->character->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized');
-        }
+        $this->authorize('view', $career);
     }
 
     /**

@@ -94,14 +94,8 @@ class CharacterController extends Controller
     {
         $character = Character::findOrFail($id);
 
-        $isAdmin = Auth::user()?->isAdmin() ?? false;
-
-        // Check authorization (admins can view any character)
-        if (! $isAdmin && $character->user_id !== Auth::id()) {
-            return response()->json([
-                'message' => 'Forbidden',
-            ], 403);
-        }
+        // Use policy authorization (allows admins and owners)
+        $this->authorize('view', $character);
 
         return response()->json([
             'data' => $character,
@@ -115,12 +109,8 @@ class CharacterController extends Controller
     {
         $character = Character::findOrFail($id);
 
-        // Check authorization
-        if ($character->user_id !== Auth::id()) {
-            return response()->json([
-                'message' => 'Forbidden',
-            ], 403);
-        }
+        // Use policy authorization (allows admins and owners)
+        $this->authorize('update', $character);
 
         $validated = $request->validate([
             'name' => ['sometimes', 'string', 'max:255'],
@@ -176,12 +166,8 @@ class CharacterController extends Controller
     {
         $character = Character::findOrFail($id);
 
-        // Check authorization
-        if ($character->user_id !== Auth::id()) {
-            return response()->json([
-                'message' => 'Forbidden',
-            ], 403);
-        }
+        // Use policy authorization (allows admins and owners)
+        $this->authorize('delete', $character);
 
         $character->delete();
 

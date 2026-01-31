@@ -95,15 +95,8 @@ class SkillManagementController extends Controller
             /** @var Character $character */
             $character = Character::query()->findOrFail($validated['character_id']);
 
-            $isAdmin = auth()->user()?->isAdmin() ?? false;
-
-            // Verify character ownership (admins can access any character)
-            if (! $isAdmin && $character->user_id !== auth()->id()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Character not found',
-                ], 404);
-            }
+            // Use policy authorization (allows admins and owners)
+            $this->authorize('update', $character);
 
             /** @var Skill $skill */
             $skill = Skill::query()->findOrFail($validated['skill_id']);
@@ -114,6 +107,8 @@ class SkillManagementController extends Controller
 
             // Calculate final cost
             $finalCost = $this->hintService->calculateFinalCost($skill, $hintCount);
+
+            $isAdmin = auth()->user()?->isAdmin() ?? false;
 
             // Check if character has enough SP (admins bypass this check)
             if (! $isAdmin && $character->available_sp < $finalCost) {
@@ -141,6 +136,7 @@ class SkillManagementController extends Controller
             ]);
 
             // Deduct SP from character (admins bypass this)
+            $isAdmin = auth()->user()?->isAdmin() ?? false;
             if (! $isAdmin) {
                 $character->decrement('available_sp', $finalCost);
             }
@@ -236,15 +232,8 @@ class SkillManagementController extends Controller
             /** @var Character $character */
             $character = Character::query()->findOrFail($validated['character_id']);
 
-            $isAdmin = auth()->user()?->isAdmin() ?? false;
-
-            // Verify character ownership (admins can access any character)
-            if (! $isAdmin && $character->user_id !== auth()->id()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Character not found',
-                ], 404);
-            }
+            // Use policy authorization (allows admins and owners)
+            $this->authorize('update', $character);
 
             /** @var Skill $skill */
             $skill = Skill::query()->findOrFail($validated['skill_id']);

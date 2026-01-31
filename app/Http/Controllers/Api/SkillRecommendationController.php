@@ -60,6 +60,10 @@ class SkillRecommendationController extends Controller
             /** @var array<string, mixed> $skillContext */
             $skillContext = $validated['skill_context'] ?? [];
 
+            // Load character and authorize access
+            $character = \App\Models\Character::findOrFail($characterId);
+            $this->authorize('view', $character);
+
             // Validate skill context structure
             $validationErrors = $this->skillRecommendationService->validateSkillContext($skillContext);
             if (! empty($validationErrors)) {
@@ -89,6 +93,11 @@ class SkillRecommendationController extends Controller
                 'data' => $responseData,
                 'message' => 'Skill recommendations generated successfully.',
             ]);
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to access this character.',
+            ], 403);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             Log::warning('Skill recommendation request for non-existent character', [
                 'character_id' => $request->integer('character_id'),

@@ -104,14 +104,18 @@ class ExternalDataController extends Controller
 
     /**
      * Fetch skills from local database
-     * Note: umapyoi.net API does not provide skills endpoint, using local data
+     *
+     * Skills are not available from the external umapyoi.net API,
+     * so we serve them from the local database instead.
      *
      * GET /api/external/skills
      */
     public function getSkills(): JsonResponse
     {
         try {
-            $skills = \App\Models\Skill::where('is_active', true)
+            // Skills are not available from umapyoi.net API, use local database
+            $skills = \App\Models\Skill::query()
+                ->where('is_active', true)
                 ->select([
                     'id',
                     'name',
@@ -120,8 +124,6 @@ class ExternalDataController extends Controller
                     'rarity',
                     'base_sp_cost',
                     'description',
-                    'effects',
-                    'activation_conditions',
                     'can_evolve',
                     'is_evolution',
                     'meta_tier',
@@ -132,25 +134,27 @@ class ExternalDataController extends Controller
                     return [
                         'id' => $skill->id,
                         'name' => $skill->name,
+                        'name_en' => $skill->name,
                         'internal_id' => $skill->internal_id,
                         'type' => $skill->skill_type,
                         'rarity' => $skill->rarity,
                         'sp_cost' => $skill->base_sp_cost,
                         'description' => $skill->description,
-                        'effects' => $skill->effects,
-                        'activation_conditions' => $skill->activation_conditions,
                         'can_evolve' => $skill->can_evolve,
                         'is_evolution' => $skill->is_evolution,
                         'meta_tier' => $skill->meta_tier,
                     ];
-                });
+                })
+                ->toArray();
 
             return response()->json([
                 'success' => true,
                 'data' => $skills,
                 'source' => 'local database',
                 'cached' => false,
-                'note' => 'umapyoi.net API does not provide skills endpoint',
+                'offline_mode' => false,
+                'message' => 'Skills loaded from local database',
+                'note' => 'Skills are served from local database as they are not available from external APIs',
             ]);
         } catch (\Exception $e) {
             Log::error('Failed to fetch skills from local database', [
@@ -160,7 +164,7 @@ class ExternalDataController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Internal server error',
+                'message' => 'Failed to fetch skills',
                 'error' => $e->getMessage(),
             ], 500);
         }
@@ -174,8 +178,8 @@ class ExternalDataController extends Controller
     public function getNews(Request $request): JsonResponse
     {
         try {
-            $limit = (int) $request->query('limit', 10);
-            $result = $this->umapyoiClient->getNews($limit);
+            $limit = $request->query('limit', '10');
+            $result = $this->umapyoiClient->getNews((int) $limit);
 
             if ($result['success']) {
                 return response()->json([

@@ -61,10 +61,8 @@ class CareerReportController extends Controller
      */
     public function showCareerReport(Career $career): View|RedirectResponse
     {
-        // Ensure user owns this career's character
-        if ($career->character?->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized access to this career report.');
-        }
+        // Use policy authorization (allows admins and owners)
+        $this->authorize('view', $career);
 
         $report = $this->reportingService->generateCareerSummaryReport($career);
 
@@ -76,10 +74,8 @@ class CareerReportController extends Controller
      */
     public function showCharacterReport(Character $character): View|RedirectResponse
     {
-        // Ensure user owns this character
-        if ($character->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized access to this character report.');
-        }
+        // Use policy authorization (allows admins and owners)
+        $this->authorize('view', $character);
 
         $report = $this->reportingService->generateCharacterReport($character);
 
@@ -91,10 +87,8 @@ class CareerReportController extends Controller
      */
     public function exportJson(Career $career): JsonResponse
     {
-        // Ensure user owns this career's character
-        if ($career->character?->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized access to this career report.');
-        }
+        // Use policy authorization (allows admins and owners)
+        $this->authorize('view', $career);
 
         $jsonContent = $this->reportingService->exportToJson($career);
 
@@ -112,10 +106,8 @@ class CareerReportController extends Controller
      */
     public function exportCsv(Career $career): StreamedResponse
     {
-        // Ensure user owns this career's character
-        if ($career->character?->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized access to this career report.');
-        }
+        // Use policy authorization (allows admins and owners)
+        $this->authorize('view', $career);
 
         $csvData = $this->reportingService->exportToCsv($career);
         $filename = 'career_report_'.$career->id.'_'.now()->format('Y-m-d').'.csv';
@@ -147,10 +139,8 @@ class CareerReportController extends Controller
      */
     public function exportPdf(Career $career): View
     {
-        // Ensure user owns this career's character
-        if ($career->character?->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized access to this career report.');
-        }
+        // Use policy authorization (allows admins and owners)
+        $this->authorize('view', $career);
 
         $pdfData = $this->reportingService->exportToPdfFormat($career);
 
@@ -162,10 +152,8 @@ class CareerReportController extends Controller
      */
     public function getReportData(Career $career): JsonResponse
     {
-        // Ensure user owns this career's character
-        if ($career->character?->user_id !== Auth::id()) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
+        // Use policy authorization (allows admins and owners)
+        $this->authorize('view', $career);
 
         $report = $this->reportingService->generateCareerSummaryReport($career);
 
@@ -180,10 +168,8 @@ class CareerReportController extends Controller
      */
     public function getCharacterReportData(Character $character): JsonResponse
     {
-        // Ensure user owns this character
-        if ($character->user_id !== Auth::id()) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
+        // Use policy authorization (allows admins and owners)
+        $this->authorize('view', $character);
 
         $report = $this->reportingService->generateCharacterReport($character);
 
@@ -198,10 +184,8 @@ class CareerReportController extends Controller
      */
     public function clearCache(Career $career): JsonResponse
     {
-        // Ensure user owns this career's character
-        if ($career->character?->user_id !== Auth::id()) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
+        // Use policy authorization (allows admins and owners)
+        $this->authorize('view', $career);
 
         $this->reportingService->clearCareerReportCache($career);
 
@@ -229,10 +213,9 @@ class CareerReportController extends Controller
             ->with('character')
             ->get();
 
+        // Use policy authorization for each career (allows admins and owners)
         foreach ($careers as $career) {
-            if ($career->character?->user_id !== Auth::id()) {
-                abort(403, 'Unauthorized access to one or more careers.');
-            }
+            $this->authorize('view', $career);
         }
 
         // Generate reports for each career

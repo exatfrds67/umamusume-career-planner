@@ -28,51 +28,15 @@ class CharacterController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = Character::query()->with(['aptitudes']);
-
-        // Search functionality
-        if ($request->filled('search')) {
-            $searchTerm = $request->input('search');
-            if (is_string($searchTerm)) {
-                $query->where('name', 'like', '%'.$searchTerm.'%');
-            }
-        }
-
-        // Filter by scenario type
-        if ($request->filled('scenario')) {
-            $scenario = $request->input('scenario');
-            if (is_string($scenario)) {
-                $query->where('scenario_type', $scenario);
-            }
-        }
-
-        // Filter by status
-        if ($request->filled('status')) {
-            $status = $request->input('status');
-            if (is_string($status)) {
-                $query->where('status', $status);
-            }
-        }
-
-        // Sorting
-        $sortField = $request->input('sort', 'updated_at');
-        $sortDirection = $request->input('direction', 'desc');
-
-        $allowedSorts = ['name', 'created_at', 'scenario_type', 'updated_at'];
-        if (is_string($sortField) && in_array($sortField, $allowedSorts) && is_string($sortDirection)) {
-            // Always show pinned characters first, then apply the requested sort
-            $query->orderBy('is_pinned', 'desc')
-                ->orderBy($sortField, $sortDirection);
-        } else {
-            // Default: pinned first, then by updated_at desc
-            $query->orderBy('is_pinned', 'desc')
-                ->orderBy('updated_at', 'desc');
-        }
-
-        $characters = $query->paginate(14)->withQueryString();
+        // Load all characters for client-side filtering (instant search)
+        $characters = Character::query()
+            ->with(['aptitudes'])
+            ->orderBy('is_pinned', 'desc')
+            ->orderBy('updated_at', 'desc')
+            ->get();
 
         // Add progress percentage to each character
-        $characters->getCollection()->transform(function ($character) {
+        $characters->transform(function ($character) {
             $character->progress = $character->getProgressPercentage();
 
             return $character;
@@ -86,7 +50,41 @@ class CharacterController extends Controller
      */
     public function create(): View
     {
-        return view('characters.create');
+        // Fetch trainee data from external_data table (type: 'trainee')
+        $trainees = \App\Models\ExternalData::where('data_type', 'trainee')
+            ->orWhere('data_type', 'character')
+            ->get()
+            ->map(function ($item) {
+                $data = $item->data ?? [];
+
+                return [
+                    'id' => $item->id,
+                    'name' => $data['name'] ?? $item->name,
+                    'rarity' => $data['rarity'] ?? 3,
+                    'surface' => $data['surface'] ?? 'Turf',
+                    'distance' => $data['distance'] ?? 'Medium',
+                    'style' => $data['style'] ?? 'Runner',
+                    'aptitudes' => $data['aptitudes'] ?? [],
+                    'image' => $data['image'] ?? $item->image_url,
+                    'stats' => $data['stats'] ?? [
+                        'speed' => 0,
+                        'stamina' => 0,
+                        'power' => 0,
+                        'guts' => 0,
+                        'wisdom' => 0,
+                    ],
+                    'growth' => $data['growth'] ?? [
+                        'speed' => 0,
+                        'stamina' => 0,
+                        'power' => 0,
+                        'guts' => 0,
+                        'wisdom' => 0,
+                    ],
+                ];
+            })
+            ->toArray();
+
+        return view('characters.create', compact('trainees'));
     }
 
     /**
@@ -160,6 +158,9 @@ class CharacterController extends Controller
      */
     public function show(Character $character): View
     {
+        // Use policy authorization (allows admins and owners)
+        $this->authorize('view', $character);
+
         $character->load([
             'aptitudes',
             'factors',
