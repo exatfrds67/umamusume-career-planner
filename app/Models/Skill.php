@@ -54,6 +54,7 @@ class Skill extends Model
      */
     protected $fillable = [
         'name',
+        'name_en',
         'internal_id',
         'skill_type',
         'rarity',

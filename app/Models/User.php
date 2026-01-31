@@ -21,6 +21,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @property string $password
  * @property string|null $bio
  * @property string|null $avatar_path
+ * @property bool $is_admin
  * @property \ArrayObject<string, mixed> $preferences
  * @property \ArrayObject<string, mixed> $accessibility_settings
  * @property \ArrayObject<string, mixed> $ai_settings
@@ -52,6 +53,7 @@ class User extends Authenticatable
         'password',
         'bio',
         'avatar_path',
+        'is_admin',
         'preferences',
         'accessibility_settings',
         'ai_settings',
@@ -94,6 +96,7 @@ class User extends Authenticatable
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
             'password' => 'hashed',
+            'is_admin' => 'boolean',
             'preferences' => AsArrayObject::class,
             'accessibility_settings' => AsArrayObject::class,
             'ai_settings' => AsArrayObject::class,
@@ -295,7 +298,7 @@ class User extends Authenticatable
      */
     public function isAdmin(): bool
     {
-        return $this->email === 'admin@umamusume.local';
+        return (bool) ($this->is_admin ?? false);
     }
 
     /**

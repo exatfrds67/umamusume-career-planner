@@ -255,10 +255,58 @@ class Character extends Model
         return $query->where('scenario_type', $type);
     }
 
+    // Accessor and Mutator for current_stats
+    /**
+     * Get the current_stats attribute with integer normalization.
+     *
+     * @param  mixed  $value
+     * @return array<string, int>
+     */
+    protected function getCurrentStatsAttribute($value): array
+    {
+        $stats = is_string($value) ? json_decode($value, true) : $value;
+        $stats = is_array($stats) ? $stats : [];
+
+        return [
+            'speed' => (int) ($stats['speed'] ?? 0),
+            'stamina' => (int) ($stats['stamina'] ?? 0),
+            'power' => (int) ($stats['power'] ?? 0),
+            'guts' => (int) ($stats['guts'] ?? 0),
+            'wit' => (int) ($stats['wit'] ?? 0),
+        ];
+    }
+
+    /**
+     * Set the current_stats attribute with integer normalization.
+     *
+     * @param  mixed  $value
+     */
+    protected function setCurrentStatsAttribute($value): void
+    {
+        if (! is_array($value)) {
+            $value = [];
+        }
+
+        $normalized = [
+            'speed' => (int) ($value['speed'] ?? 0),
+            'stamina' => (int) ($value['stamina'] ?? 0),
+            'power' => (int) ($value['power'] ?? 0),
+            'guts' => (int) ($value['guts'] ?? 0),
+            'wit' => (int) ($value['wit'] ?? 0),
+        ];
+
+        $this->attributes['current_stats'] = json_encode($normalized);
+    }
+
     // Helper methods for stat access
+    /**
+     * Get a specific stat value as an integer.
+     */
     public function getStat(string $stat): int
     {
-        return $this->current_stats[$stat] ?? 0;
+        $stats = $this->current_stats;
+
+        return (int) ($stats[$stat] ?? 0);
     }
 
     public function getStatGrade(int $statValue): string
