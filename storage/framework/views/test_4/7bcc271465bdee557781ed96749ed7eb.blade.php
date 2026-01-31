@@ -1,0 +1,1 @@
+<x-button size="md">Medium</x-button>

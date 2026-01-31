@@ -1,0 +1,1 @@
+<x-button href="/dashboard" disabled>Disabled Link</x-button>

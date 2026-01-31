@@ -1,0 +1,1 @@
+<x-button size="lg">Button</x-button>

@@ -1,0 +1,1126 @@
+
+
+<?php $__env->startSection('content'); ?>
+    <?php
+        $characterName = data_get($character, 'name', 'Unknown Character');
+    ?>
+
+    <main class="space-y-6" x-data="deckBuilder()" x-init="init()">
+        <!-- Header -->
+        <header class="sm:flex sm:items-center sm:justify-between">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+                    Deck Builder - <?php echo e($characterName); ?>
+
+                </h1>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                    Build and optimize your support card deck (6 cards required: 5 owned + 1 friend)
+                </p>
+                <div class="mt-2 flex flex-wrap gap-2 text-xs text-gray-600 dark:text-gray-400">
+                    <span class="inline-flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                        </svg>
+                        Click any card to auto-add
+                    </span>
+                    <span class="inline-flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                        </svg>
+                        Drag to reorder
+                    </span>
+                    <span class="inline-flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                        </svg>
+                        Arrow keys to move
+                    </span>
+                </div>
+            </div>
+            <div class="mt-4 sm:ml-4 sm:mt-0 flex gap-3">
+                <a href="<?php echo e(route('characters.show', $character)); ?>" class="btn btn-outline">
+                    <svg class="w-5 h-5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Back to Character
+                </a>
+            </div>
+        </header>
+
+        <!-- Deck Status -->
+        <?php if(isset($deckAnalysis)): ?>
+            <?php if($deckAnalysis && isset($deckAnalysis['synergy'])): ?>
+                <section aria-labelledby="status-heading"
+                    class="card bg-linear-to-r from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 p-4 rounded-lg border border-primary-200 dark:border-primary-700">
+                    <h2 id="status-heading" class="sr-only">Deck Analysis</h2>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-sm font-medium text-primary-900 dark:text-primary-100">Synergy Score</h3>
+                            <p class="mt-1 text-2xl font-bold text-primary-600 dark:text-primary-400">
+                                <?php echo e(number_format($deckAnalysis['synergy']['synergy_score'] ?? 0, 1)); ?>%
+                            </p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm text-primary-700 dark:text-primary-300">
+                                Synergy Pairs: <?php echo e(count($deckAnalysis['synergy']['synergy_pairs'] ?? [])); ?>
+
+                            </p>
+                            <p class="text-sm text-primary-700 dark:text-primary-300">
+                                Strategy: <?php echo e($deckAnalysis['synergy']['strategic_alignment']['primary_strategy'] ?? 'N/A'); ?>
+
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
+        <?php endif; ?>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Deck Slots and Statistics (Left/Top) -->
+            <div class="lg:col-span-2 space-y-4">
+                <section aria-labelledby="slots-heading"
+                    class="card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                    <h2 id="slots-heading" class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                        Deck Slots (<?php echo e($currentDeck->count()); ?>/6)
+                    </h2>
+
+                    <div class="space-y-3">
+                        <?php for($i = 1; $i <= 6; $i++): ?>
+                            <?php
+                                $slotCard = $currentDeck->firstWhere('position_slot', $i);
+                                $isFriendSlot = $i === 6;
+                            ?>
+                            <div class="deck-slot p-4 rounded-lg border-2 transition-all <?php echo e($slotCard ? 'border-primary-300 dark:border-primary-600 bg-primary-50 dark:bg-primary-900/20 cursor-move' : 'border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900/20'); ?>"
+                                data-slot="<?php echo e($i); ?>" @dragstart="handleDragStart($event, <?php echo e($i); ?>)"
+                                @dragend="handleDragEnd($event)"
+                                @dragover.prevent="handleDragOver($event, <?php echo e($i); ?>)"
+                                @drop="handleDrop($event, <?php echo e($i); ?>)"
+                                @keydown.arrow-up.prevent="moveCardUp(<?php echo e($i); ?>)"
+                                @keydown.arrow-down.prevent="moveCardDown(<?php echo e($i); ?>)"
+                                tabindex="<?php echo e($slotCard ? '0' : '-1'); ?>" draggable="<?php echo e($slotCard ? 'true' : 'false'); ?>"
+                                :class="{ 'ring-2 ring-primary-500 ring-offset-2': dragOverSlot === <?php echo e($i); ?> }">
+                                <div class="flex items-center justify-between">
+                                    <?php if($slotCard): ?>
+                                        <!-- Drag Handle -->
+                                        <div class="shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                                            title="Drag to reorder" role="button" aria-label="Drag to reorder card">
+                                            <svg class="w-5 h-5 pointer-events-none" fill="currentColor"
+                                                viewBox="0 0 20 20">
+                                                <path
+                                                    d="M7 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 2zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 14zm6-8a2 2 0 1 0-.001-4.001A2 2 0 0 0 13 6zm0 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 14z">
+                                                </path>
+                                            </svg>
+                                        </div>
+                                    <?php endif; ?>
+
+                                    <div class="flex items-center gap-4 flex-1">
+                                        <div class="shrink-0">
+                                            <span
+                                                class="inline-flex items-center justify-center w-8 h-8 rounded-full <?php echo e($isFriendSlot ? 'bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'); ?> font-semibold text-sm">
+                                                <?php echo e($i); ?>
+
+                                            </span>
+                                        </div>
+
+                                        <?php if($slotCard && $slotCard->supportCard): ?>
+                                            <div class="flex items-center gap-3 flex-1 min-w-0">
+                                                <?php if($slotCard->supportCard->artwork_url): ?>
+                                                    <img src="<?php echo e($slotCard->supportCard->artwork_url); ?>"
+                                                        alt="<?php echo e($slotCard->supportCard->name); ?>"
+                                                        class="w-12 h-12 rounded-lg object-cover border-2 border-gray-200 dark:border-gray-600 shrink-0">
+                                                <?php else: ?>
+                                                    <div
+                                                        class="w-12 h-12 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center shrink-0">
+                                                        <svg class="w-6 h-6 text-gray-400" fill="none"
+                                                            viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                        </svg>
+                                                    </div>
+                                                <?php endif; ?>
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="flex items-center gap-2">
+                                                        <h3
+                                                            class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                                            <?php echo e($slotCard->supportCard->name); ?>
+
+                                                        </h3>
+                                                        <?php if (isset($component)) { $__componentOriginal629443c8123a4db0c07e9aa117c1d5b1 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal629443c8123a4db0c07e9aa117c1d5b1 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.support-card-type-badge','data' => ['type' => $slotCard->supportCard->card_type]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('support-card-type-badge'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['type' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($slotCard->supportCard->card_type)]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal629443c8123a4db0c07e9aa117c1d5b1)): ?>
+<?php $attributes = $__attributesOriginal629443c8123a4db0c07e9aa117c1d5b1; ?>
+<?php unset($__attributesOriginal629443c8123a4db0c07e9aa117c1d5b1); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal629443c8123a4db0c07e9aa117c1d5b1)): ?>
+<?php $component = $__componentOriginal629443c8123a4db0c07e9aa117c1d5b1; ?>
+<?php unset($__componentOriginal629443c8123a4db0c07e9aa117c1d5b1); ?>
+<?php endif; ?>
+                                                        <?php if (isset($component)) { $__componentOriginal17d26a380d74b4b685794c3f9361cf57 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal17d26a380d74b4b685794c3f9361cf57 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.support-card-rarity-badge','data' => ['rarity' => $slotCard->supportCard->rarity]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('support-card-rarity-badge'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['rarity' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($slotCard->supportCard->rarity)]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal17d26a380d74b4b685794c3f9361cf57)): ?>
+<?php $attributes = $__attributesOriginal17d26a380d74b4b685794c3f9361cf57; ?>
+<?php unset($__attributesOriginal17d26a380d74b4b685794c3f9361cf57); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal17d26a380d74b4b685794c3f9361cf57)): ?>
+<?php $component = $__componentOriginal17d26a380d74b4b685794c3f9361cf57; ?>
+<?php unset($__componentOriginal17d26a380d74b4b685794c3f9361cf57); ?>
+<?php endif; ?>
+                                                        <?php if($slotCard->is_friend_card): ?>
+                                                            <span
+                                                                class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                                                                Friend
+                                                            </span>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                                        <?php echo e($slotCard->supportCard->character_name); ?> •
+                                                        LB: <?php echo e($slotCard->limit_break_level); ?>/4
+                                                        <?php for($star = 0; $star < $slotCard->limit_break_level; $star++): ?>
+                                                            <span class="text-yellow-400">★</span>
+                                                        <?php endfor; ?>
+                                                        • Bond: <?php echo e($slotCard->friendship_level); ?>%
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        <?php else: ?>
+                                            <div class="flex-1">
+                                                <p class="text-sm text-gray-500 dark:text-gray-400">
+                                                    <?php echo e($isFriendSlot ? 'Friend Card Slot (Optional)' : 'Empty Slot'); ?>
+
+                                                </p>
+                                                <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                                                    Click any card from the library to add here
+                                                </p>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+
+                                    <div class="flex items-center gap-2">
+                                        <?php if($slotCard): ?>
+                                            <button
+                                                @click="openEditModal(<?php echo e($i); ?>, <?php echo e($slotCard->limit_break_level); ?>, <?php echo e($slotCard->friendship_level); ?>)"
+                                                class="btn btn-sm btn-outline text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                                                title="Edit card details">
+                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                                                    stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                </svg>
+                                            </button>
+                                            <button @click="removeCard(<?php echo e($i); ?>)"
+                                                class="btn btn-sm btn-outline text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
+                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                                                    stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                            </button>
+                                        <?php else: ?>
+                                            <button
+                                                @click="openCardSelector(<?php echo e($i); ?>, <?php echo e($isFriendSlot ? 'true' : 'false'); ?>)"
+                                                class="btn btn-sm btn-primary">
+                                                <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24"
+                                                    stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M12 4v16m8-8H4" />
+                                                </svg>
+                                                Add Card
+                                            </button>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endfor; ?>
+                    </div>
+
+                    <!-- Deck Actions -->
+                    <div class="mt-6 flex flex-wrap gap-3">
+                        <button @click="saveDeck" class="btn btn-primary" :disabled="!isDeckValid">
+                            <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                            </svg>
+                            Save Deck
+                        </button>
+                        <button @click="clearDeck" class="btn btn-outline">
+                            <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            Clear All
+                        </button>
+                        <button @click="autoOptimize" class="btn btn-secondary">
+                            <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                            Auto-Optimize
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Deck Statistics (WF-011/SPEC-005: Enhanced with type distribution and synergy) -->
+                <section aria-labelledby="stats-heading"
+                    class="card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                    <h2 id="stats-heading" class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Deck Statistics</h2>
+                    <dl class="space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <dt class="text-gray-500 dark:text-gray-400">Cards</dt>
+                            <dd class="font-medium text-gray-900 dark:text-white" x-text="deckCount + '/6'"></dd>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <dt class="text-gray-500 dark:text-gray-400">Friend Cards</dt>
+                            <dd class="font-medium text-gray-900 dark:text-white" x-text="friendCardCount + '/1'"></dd>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <dt class="text-gray-500 dark:text-gray-400">Unique Types</dt>
+                            <dd class="font-medium text-gray-900 dark:text-white" x-text="uniqueTypes"></dd>
+                        </div>
+                    </dl>
+                    
+                    <!-- Type Distribution (WF-011) -->
+                    <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                        <h4 class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-2">Type Distribution</h4>
+                        <div class="flex flex-wrap gap-2">
+                            <template x-for="(count, type) in typeDistribution" :key="type">
+                                <span class="px-2 py-1 text-xs rounded-full" 
+                                    :class="{
+                                        'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300': type === 'speed',
+                                        'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300': type === 'stamina',
+                                        'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300': type === 'power',
+                                        'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300': type === 'guts',
+                                        'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300': type === 'wit',
+                                        'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300': type === 'friend'
+                                    }">
+                                    <span x-text="type.charAt(0).toUpperCase() + type.slice(1)"></span>: <span x-text="count"></span>
+                                </span>
+                            </template>
+                        </div>
+                    </div>
+                    
+                    <!-- Average Stats (WF-011) -->
+                    <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                        <h4 class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase mb-2">Average Stats</h4>
+                        <dl class="space-y-2">
+                            <div class="flex justify-between text-sm">
+                                <dt class="text-gray-500 dark:text-gray-400">Avg Bond Level</dt>
+                                <dd class="font-medium text-gray-900 dark:text-white">
+                                    <span x-text="averageBond"></span>%
+                                </dd>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <dt class="text-gray-500 dark:text-gray-400">Avg Limit Break</dt>
+                                <dd class="font-medium text-gray-900 dark:text-white">
+                                    <span x-text="averageLimitBreak"></span>★
+                                </dd>
+                            </div>
+                        </dl>
+                    </div>
+                    
+                    <!-- Synergy Score (WF-011) -->
+                    <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Synergy Score</h4>
+                            <div class="flex items-center gap-2">
+                                <div class="w-24 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                    <div class="h-full rounded-full transition-all duration-500"
+                                        :class="{
+                                            'bg-green-500': synergyScore >= 70,
+                                            'bg-blue-500': synergyScore >= 50 && synergyScore < 70,
+                                            'bg-yellow-500': synergyScore >= 30 && synergyScore < 50,
+                                            'bg-red-500': synergyScore < 30
+                                        }"
+                                        :style="'width: ' + synergyScore + '%'">
+                                    </div>
+                                </div>
+                                <span class="text-sm font-semibold text-gray-900 dark:text-white" x-text="synergyScore"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Validation Messages -->
+                <div x-show="validationErrors.length > 0"
+                    class="card bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-800">
+                    <h3 class="text-sm font-medium text-red-800 dark:text-red-200 mb-2">Deck Validation Errors</h3>
+                    <ul class="list-disc list-inside space-y-1">
+                        <template x-for="error in validationErrors" :key="error">
+                            <li class="text-sm text-red-700 dark:text-red-300" x-text="error"></li>
+                        </template>
+                    </ul>
+                </div>
+
+                <div x-show="validationWarnings.length > 0"
+                    class="card bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                    <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200 mb-2">Deck Warnings</h3>
+                    <ul class="list-disc list-inside space-y-1">
+                        <template x-for="warning in validationWarnings" :key="warning">
+                            <li class="text-sm text-yellow-700 dark:text-yellow-300" x-text="warning"></li>
+                        </template>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Card Library (Right/Bottom) -->
+            <aside aria-labelledby="library-heading" class="space-y-4">
+                <div
+                    class="card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col">
+                    <h2 id="library-heading" class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Available Cards</h2>
+
+                    <!-- Filters -->
+                    <div class="space-y-3 mb-4">
+                        <input type="text" x-model="searchQuery" placeholder="Search cards..."
+                            class="form-input w-full rounded-md border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm">
+
+                        <select x-model="filterType"
+                            class="form-select w-full rounded-md border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm">
+                            <option value="">All Types</option>
+                            <option value="speed">Speed</option>
+                            <option value="stamina">Stamina</option>
+                            <option value="power">Power</option>
+                            <option value="guts">Guts</option>
+                            <option value="wit">Wit</option>
+                            <option value="friend">Friend</option>
+                        </select>
+
+                        <select x-model="filterTier"
+                            class="form-select w-full rounded-md border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm">
+                            <option value="">All Tiers</option>
+                            <option value="S+">S+ Tier</option>
+                            <option value="S">S Tier</option>
+                            <option value="A">A Tier</option>
+                            <option value="B">B Tier</option>
+                            <option value="C">C Tier</option>
+                        </select>
+                    </div>
+
+                    <!-- Card List -->
+                    <div class="space-y-2 flex-1 overflow-y-auto"
+                        style="max-height: calc(100vh - 400px); min-height: 600px;">
+                        <?php $__currentLoopData = $availableCards; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $card): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <div class="p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-primary-400 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/10 hover:shadow-md transition-all cursor-pointer transform hover:scale-[1.02]"
+                                x-show="filterCard(<?php echo \Illuminate\Support\Js::from(['name' => $card->name, 'character_name' => $card->character_name, 'card_type' => $card->card_type, 'meta_tier' => $card->meta_tier])->toHtml() ?>)"
+                                @click="selectCard(<?php echo e($card->id); ?>)" tabindex="0"
+                                @keydown.enter="selectCard(<?php echo e($card->id); ?>)"
+                                @keydown.space.prevent="selectCard(<?php echo e($card->id); ?>)">
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-center gap-2 flex-1 min-w-0">
+                                        <?php if($card->artwork_url): ?>
+                                            <img src="<?php echo e($card->artwork_url); ?>" alt="<?php echo e($card->name); ?>"
+                                                class="w-10 h-10 rounded-md object-cover border border-gray-200 dark:border-gray-600 shrink-0">
+                                        <?php else: ?>
+                                            <div
+                                                class="w-10 h-10 rounded-md bg-gray-200 dark:bg-gray-700 flex items-center justify-center shrink-0">
+                                                <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                                    stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                </svg>
+                                            </div>
+                                        <?php endif; ?>
+                                        <div class="flex-1 min-w-0">
+                                            <h4 class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                                <?php echo e($card->name); ?>
+
+                                            </h4>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                                <?php echo e($card->character_name); ?>
+
+                                            </p>
+                                            <div class="flex items-center gap-1.5 mt-1.5">
+                                                <?php if (isset($component)) { $__componentOriginal629443c8123a4db0c07e9aa117c1d5b1 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal629443c8123a4db0c07e9aa117c1d5b1 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.support-card-type-badge','data' => ['type' => $card->card_type,'size' => 'xs']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('support-card-type-badge'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['type' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($card->card_type),'size' => 'xs']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal629443c8123a4db0c07e9aa117c1d5b1)): ?>
+<?php $attributes = $__attributesOriginal629443c8123a4db0c07e9aa117c1d5b1; ?>
+<?php unset($__attributesOriginal629443c8123a4db0c07e9aa117c1d5b1); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal629443c8123a4db0c07e9aa117c1d5b1)): ?>
+<?php $component = $__componentOriginal629443c8123a4db0c07e9aa117c1d5b1; ?>
+<?php unset($__componentOriginal629443c8123a4db0c07e9aa117c1d5b1); ?>
+<?php endif; ?>
+                                                <?php if (isset($component)) { $__componentOriginal17d26a380d74b4b685794c3f9361cf57 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal17d26a380d74b4b685794c3f9361cf57 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.support-card-rarity-badge','data' => ['rarity' => $card->rarity,'size' => 'xs']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('support-card-rarity-badge'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['rarity' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($card->rarity),'size' => 'xs']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal17d26a380d74b4b685794c3f9361cf57)): ?>
+<?php $attributes = $__attributesOriginal17d26a380d74b4b685794c3f9361cf57; ?>
+<?php unset($__attributesOriginal17d26a380d74b4b685794c3f9361cf57); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal17d26a380d74b4b685794c3f9361cf57)): ?>
+<?php $component = $__componentOriginal17d26a380d74b4b685794c3f9361cf57; ?>
+<?php unset($__componentOriginal17d26a380d74b4b685794c3f9361cf57); ?>
+<?php endif; ?>
+                                                <?php if (isset($component)) { $__componentOriginale360eb2d8f31536122836e386c242fd3 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginale360eb2d8f31536122836e386c242fd3 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.support-card-tier-badge','data' => ['tier' => $card->meta_tier,'size' => 'xs']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('support-card-tier-badge'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['tier' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($card->meta_tier),'size' => 'xs']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginale360eb2d8f31536122836e386c242fd3)): ?>
+<?php $attributes = $__attributesOriginale360eb2d8f31536122836e386c242fd3; ?>
+<?php unset($__attributesOriginale360eb2d8f31536122836e386c242fd3); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginale360eb2d8f31536122836e386c242fd3)): ?>
+<?php $component = $__componentOriginale360eb2d8f31536122836e386c242fd3; ?>
+<?php unset($__componentOriginale360eb2d8f31536122836e386c242fd3); ?>
+<?php endif; ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-xs btn-primary shrink-0">
+                                        Add
+                                    </button>
+                                </div>
+                            </div>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        <!-- Edit Card Details Modal -->
+        <div x-show="editModalOpen" x-cloak @keydown.escape.window="closeEditModal()"
+            class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+            <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                <!-- Background overlay -->
+                <div x-show="editModalOpen" x-transition:enter="ease-out duration-300"
+                    x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                    x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100"
+                    x-transition:leave-end="opacity-0" @click="closeEditModal()"
+                    class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75 dark:bg-gray-900 dark:bg-opacity-75">
+                </div>
+
+                <!-- Modal panel -->
+                <div x-show="editModalOpen" x-transition:enter="ease-out duration-300"
+                    x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                    x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                    x-transition:leave="ease-in duration-200"
+                    x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                    x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                    class="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-lg">
+
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                            Edit Card Details - Slot <span x-text="editingSlot"></span>
+                        </h3>
+                        <button @click="closeEditModal()"
+                            class="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300">
+                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="space-y-4">
+                        <!-- Limit Break Level -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Limit Break Level (Stars)
+                            </label>
+                            <div class="flex items-center gap-2">
+                                <input type="range" x-model.number="editLimitBreak" min="0" max="4"
+                                    step="1"
+                                    class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
+                                <span class="text-lg font-semibold text-gray-900 dark:text-white min-w-12 text-center">
+                                    <span x-text="editLimitBreak"></span>/4
+                                </span>
+                            </div>
+                            <div class="mt-2 flex gap-1">
+                                <template x-for="i in 5" :key="i">
+                                    <button @click="editLimitBreak = i - 1" class="text-2xl transition-colors"
+                                        :class="i - 1 <= editLimitBreak ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600'">
+                                        ★
+                                    </button>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Friendship Level -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Friendship Level (Bond)
+                            </label>
+                            <div class="flex items-center gap-2">
+                                <input type="range" x-model.number="editFriendship" min="0" max="100"
+                                    step="5"
+                                    class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
+                                <span class="text-lg font-semibold text-gray-900 dark:text-white min-w-16 text-center">
+                                    <span x-text="editFriendship"></span>%
+                                </span>
+                            </div>
+                            <div class="mt-2 flex gap-2">
+                                <button @click="editFriendship = 0" class="btn btn-xs btn-outline">0%</button>
+                                <button @click="editFriendship = 25" class="btn btn-xs btn-outline">25%</button>
+                                <button @click="editFriendship = 50" class="btn btn-xs btn-outline">50%</button>
+                                <button @click="editFriendship = 75" class="btn btn-xs btn-outline">75%</button>
+                                <button @click="editFriendship = 100" class="btn btn-xs btn-outline">100%</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex gap-3 justify-end">
+                        <button @click="closeEditModal()" class="btn btn-outline">
+                            Cancel
+                        </button>
+                        <button @click="saveCardDetails()" class="btn btn-primary">
+                            Save Changes
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <?php
+        $deckData = $currentDeck
+            ->map(function ($card) {
+                return [
+                    'slot' => $card->position_slot,
+                    'card_id' => $card->support_card_id,
+                    'is_friend' => $card->is_friend_card,
+                    'limit_break' => $card->limit_break_level,
+                    'friendship' => $card->friendship_level,
+                    'card' => $card->supportCard,
+                ];
+            })
+            ->values()
+            ->toArray();
+        
+        $apiRoutes = [
+            'addCard' => route('api.v1.characters.deck.add-card', $character),
+            'removeCard' => route('api.v1.characters.deck.remove-card', ['character' => $character, 'position' => '__POSITION__']),
+            'clearDeck' => route('api.v1.characters.deck.clear', $character),
+            'saveDeck' => route('api.v1.characters.deck.save', $character),
+            'swapCards' => route('api.v1.characters.deck.cards.swap', $character),
+            'updateDetails' => route('api.v1.characters.deck.cards.update-details', ['character' => $character, 'position' => '__POSITION__']),
+        ];
+    ?>
+    <div
+        id="deck-builder-data"
+        data-deck='<?php echo json_encode($deckData, 15, 512) ?>'
+        data-api-routes='<?php echo json_encode($apiRoutes, 15, 512) ?>'
+        class="hidden"
+    ></div>
+    <script>
+        window.deckBuilderData = (() => {
+            const dataEl = document.getElementById('deck-builder-data');
+            if (!dataEl) {
+                return { deck: [], apiRoutes: {} };
+            }
+
+            return {
+                deck: JSON.parse(dataEl.dataset.deck || '[]'),
+                apiRoutes: JSON.parse(dataEl.dataset.apiRoutes || '{}'),
+            };
+        })();
+    </script>
+    <script>
+        window.deckBuilder = function() {
+            const { deck: deckData, apiRoutes } = window.deckBuilderData;
+            
+            return {
+                deck: deckData,
+                selectedSlot: null,
+                isFriendSlot: false,
+                searchQuery: '',
+                filterType: '',
+                filterTier: '',
+                validationErrors: [],
+                validationWarnings: [],
+                draggedSlot: null,
+                dragOverSlot: null,
+
+                init() {
+                    // Validation on init
+                    this.validateDeck();
+                },
+
+                get deckCount() {
+                    return this.deck.length;
+                },
+
+                get friendCardCount() {
+                    return this.deck.filter(c => c.is_friend).length;
+                },
+
+                get uniqueTypes() {
+                    const types = new Set(this.deck.map(c => c.card?.card_type).filter(Boolean));
+                    return types.size;
+                },
+                
+                // Type distribution breakdown (WF-011)
+                get typeDistribution() {
+                    const dist = {};
+                    this.deck.forEach(c => {
+                        const type = c.card?.card_type;
+                        if (type) {
+                            dist[type] = (dist[type] || 0) + 1;
+                        }
+                    });
+                    return dist;
+                },
+                
+                // Average bond level (WF-011)
+                get averageBond() {
+                    if (this.deck.length === 0) return 0;
+                    const total = this.deck.reduce((sum, c) => sum + (c.friendship || 0), 0);
+                    return Math.round(total / this.deck.length);
+                },
+                
+                // Average limit break (WF-011)
+                get averageLimitBreak() {
+                    if (this.deck.length === 0) return '0.0';
+                    const total = this.deck.reduce((sum, c) => sum + (c.limit_break || 0), 0);
+                    return (total / this.deck.length).toFixed(1);
+                },
+                
+                // Synergy score calculation (WF-011)
+                get synergyScore() {
+                    if (this.deck.length < 2) return 0;
+                    let score = 0;
+                    
+                    // Type diversity bonus (up to 20 points)
+                    const typeCount = this.uniqueTypes;
+                    if (typeCount >= 4) score += 20;
+                    else if (typeCount >= 3) score += 15;
+                    else if (typeCount >= 2) score += 10;
+                    
+                    // Bond level bonus (up to 30 points)
+                    const avgBond = this.averageBond;
+                    score += Math.min(30, avgBond * 0.3);
+                    
+                    // Limit break bonus (up to 20 points)
+                    const avgLB = parseFloat(this.averageLimitBreak);
+                    score += avgLB * 5;
+                    
+                    // Card completion bonus (up to 30 points)
+                    if (this.deck.length === 6) score += 20;
+                    else score += (this.deck.length / 6) * 20;
+                    
+                    // Friend card bonus
+                    if (this.friendCardCount === 1) score += 10;
+                    
+                    return Math.min(100, Math.round(score));
+                },
+
+                get isDeckValid() {
+                    return this.deckCount === 6 && this.friendCardCount <= 1 && this.validationErrors.length === 0;
+                },
+
+                filterCard(card) {
+                    if (this.searchQuery && !card.name.toLowerCase().includes(this.searchQuery.toLowerCase()) &&
+                        !card.character_name.toLowerCase().includes(this.searchQuery.toLowerCase())) {
+                        return false;
+                    }
+                    if (this.filterType && card.card_type !== this.filterType) {
+                        return false;
+                    }
+                    if (this.filterTier && card.meta_tier !== this.filterTier) {
+                        return false;
+                    }
+                    return true;
+                },
+
+                openCardSelector(slot, isFriend) {
+                    this.selectedSlot = slot;
+                    this.isFriendSlot = isFriend;
+                },
+
+                async selectCard(cardId) {
+                    // Auto-slot: find the next available slot
+                    let targetSlot = this.selectedSlot;
+
+                    if (!targetSlot) {
+                        // Find first empty slot (1-5 for owned cards, 6 for friend cards)
+                        const occupiedSlots = this.deck.map(c => c.slot);
+                        for (let i = 1; i <= 6; i++) {
+                            if (!occupiedSlots.includes(i)) {
+                                targetSlot = i;
+                                break;
+                            }
+                        }
+
+                        if (!targetSlot) {
+                            alert('All deck slots are full. Please remove a card first.');
+                            return;
+                        }
+                    }
+
+                    // Determine if this is a friend slot
+                    const isFriend = targetSlot === 6;
+
+                    try {
+                        const response = await fetch(apiRoutes.addCard, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                                },
+                                body: JSON.stringify({
+                                    support_card_id: cardId,
+                                    position_slot: targetSlot,
+                                    is_friend_card: isFriend,
+                                    limit_break_level: 0
+                                })
+                            });
+
+                        const data = await response.json();
+
+                        if (response.ok && data.success) {
+                            // Reload page to show updated deck
+                            window.location.reload();
+                        } else {
+                            alert(data.message || 'Failed to add card to deck. Please try again.');
+                        }
+                    } catch (error) {
+                        console.error('Error adding card to deck:', error);
+                        alert('An error occurred while adding the card.');
+                    }
+                },
+
+                async removeCard(slot) {
+                    try {
+                        const response = await fetch(
+                            apiRoutes.removeCard.replace('__POSITION__', slot), {
+                                method: 'DELETE',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                                }
+                            });
+
+                        const data = await response.json();
+
+                        if (response.ok && data.success) {
+                            window.location.reload();
+                        } else {
+                            alert(data.message || 'Failed to remove card from deck.');
+                        }
+                    } catch (error) {
+                        console.error('Error removing card from deck:', error);
+                        alert('An error occurred while removing the card.');
+                    }
+                },
+
+                async clearDeck() {
+                    if (!confirm('Are you sure you want to clear the entire deck?')) {
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch(apiRoutes.clearDeck, {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                            }
+                        });
+
+                        const data = await response.json();
+
+                        if (response.ok && data.success) {
+                            window.location.reload();
+                        } else {
+                            alert(data.message || 'Failed to clear deck.');
+                        }
+                    } catch (error) {
+                        console.error('Error clearing deck:', error);
+                        alert('An error occurred while clearing the deck.');
+                    }
+                },
+
+                validateDeck() {
+                    this.validationErrors = [];
+                    this.validationWarnings = [];
+
+                    if (this.deckCount !== 6) {
+                        this.validationErrors.push('Deck must contain exactly 6 cards');
+                    }
+
+                    if (this.friendCardCount > 1) {
+                        this.validationErrors.push('Deck can only have 1 friend card');
+                    }
+
+                    // Check for duplicates
+                    const cardIds = this.deck.filter(c => !c.is_friend).map(c => c.card_id);
+                    if (cardIds.length !== new Set(cardIds).size) {
+                        this.validationErrors.push('Deck cannot contain duplicate cards');
+                    }
+
+                    // Warnings
+                    if (this.uniqueTypes < 3) {
+                        this.validationWarnings.push(
+                            'Consider using at least 3 different card types for balanced training');
+                    }
+                },
+
+                async saveDeck() {
+                    if (!this.isDeckValid) {
+                        alert('Please fix validation errors before saving');
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch(apiRoutes.saveDeck, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                            },
+                            body: JSON.stringify({
+                                cards: this.deck.map(c => ({
+                                    support_card_id: c.card_id,
+                                    is_friend_card: c.is_friend,
+                                    limit_break_level: c.limit_break || 0,
+                                    friendship_level: c.friendship || 0
+                                }))
+                            })
+                        });
+
+                        if (response.ok) {
+                            alert('Deck saved successfully!');
+                            window.location.reload();
+                        } else {
+                            alert('Failed to save deck. Please try again.');
+                        }
+                    } catch (error) {
+                        console.error('Error saving deck:', error);
+                        alert('An error occurred while saving the deck.');
+                    }
+                },
+
+                autoOptimize() {
+                    alert(
+                        'Auto-optimize feature coming soon! This will automatically select the best cards based on your character\'s goals.'
+                    );
+                },
+
+                // Drag and Drop handlers
+                handleDragStart(event, slot) {
+                    this.draggedSlot = slot;
+                    event.dataTransfer.effectAllowed = 'move';
+                    event.dataTransfer.setData('text/plain', slot);
+
+                    // Make the dragged element semi-transparent
+                    event.currentTarget.style.opacity = '0.5';
+                },
+
+                handleDragOver(event, slot) {
+                    event.preventDefault();
+
+                    // Only allow dropping on different slots when we have a dragged slot
+                    if (this.draggedSlot && this.draggedSlot !== slot) {
+                        this.dragOverSlot = slot;
+                        event.dataTransfer.dropEffect = 'move';
+                    }
+                },
+
+                async handleDrop(event, targetSlot) {
+                    event.preventDefault();
+                    this.dragOverSlot = null;
+
+                    if (!this.draggedSlot || this.draggedSlot === targetSlot) {
+                        return;
+                    }
+
+                    const sourceSlot = this.draggedSlot;
+
+                    try {
+                        const response = await fetch(apiRoutes.swapCards, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                                },
+                                body: JSON.stringify({
+                                    position1: sourceSlot,
+                                    position2: targetSlot
+                                })
+                            });
+
+                        const data = await response.json();
+
+                        if (response.ok && data.success) {
+                            window.location.reload();
+                        } else {
+                            console.error('Swap failed:', data);
+                            alert(data.message || 'Failed to swap cards.');
+                        }
+                    } catch (error) {
+                        console.error('Error swapping cards:', error);
+                        alert('An error occurred while swapping cards.');
+                    }
+                },
+
+                handleDragEnd(event) {
+                    // Restore opacity
+                    event.currentTarget.style.opacity = '1';
+
+                    this.draggedSlot = null;
+                    this.dragOverSlot = null;
+                },
+
+                // Keyboard controls
+                async moveCardUp(slot) {
+                    if (slot === 1) return;
+
+                    try {
+                        const response = await fetch(apiRoutes.swapCards, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                                },
+                                body: JSON.stringify({
+                                    position1: slot,
+                                    position2: slot - 1
+                                })
+                            });
+
+                        const data = await response.json();
+
+                        if (response.ok && data.success) {
+                            window.location.reload();
+                        } else {
+                            alert(data.message || 'Failed to move card.');
+                        }
+                    } catch (error) {
+                        console.error('Error moving card:', error);
+                        alert('An error occurred while moving the card.');
+                    }
+                },
+
+                async moveCardDown(slot) {
+                    if (slot === 6) return;
+
+                    try {
+                        const response = await fetch(apiRoutes.swapCards, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                                },
+                                body: JSON.stringify({
+                                    position1: slot,
+                                    position2: slot + 1
+                                })
+                            });
+
+                        const data = await response.json();
+
+                        if (response.ok && data.success) {
+                            window.location.reload();
+                        } else {
+                            alert(data.message || 'Failed to move card.');
+                        }
+                    } catch (error) {
+                        console.error('Error moving card:', error);
+                        alert('An error occurred while moving the card.');
+                    }
+                },
+
+                // Edit modal state
+                editModalOpen: false,
+                editingSlot: null,
+                editLimitBreak: 0,
+                editFriendship: 0,
+
+                openEditModal(slot, limitBreak, friendship) {
+                    this.editingSlot = slot;
+                    this.editLimitBreak = limitBreak;
+                    this.editFriendship = friendship;
+                    this.editModalOpen = true;
+                },
+
+                closeEditModal() {
+                    this.editModalOpen = false;
+                    this.editingSlot = null;
+                    this.editLimitBreak = 0;
+                    this.editFriendship = 0;
+                },
+
+                async saveCardDetails() {
+                    if (!this.editingSlot) return;
+
+                    try {
+                        const response = await fetch(
+                            apiRoutes.updateDetails.replace('__POSITION__', this.editingSlot), {
+                                method: 'PUT',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                                },
+                                body: JSON.stringify({
+                                    limit_break_level: this.editLimitBreak,
+                                    friendship_level: this.editFriendship
+                                })
+                            });
+
+                        const data = await response.json();
+
+                        if (response.ok && data.success) {
+                            this.closeEditModal();
+                            window.location.reload();
+                        } else {
+                            alert(data.message || 'Failed to update card details.');
+                        }
+                    } catch (error) {
+                        console.error('Error updating card details:', error);
+                        alert('An error occurred while updating card details.');
+                    }
+                }
+            }
+        }
+    </script>
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\XAMPP\htdocs\umamusume-career-planner\resources\views/support-cards/deck-builder.blade.php ENDPATH**/ ?>

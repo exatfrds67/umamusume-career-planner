@@ -1,0 +1,1 @@
+<x-button variant="primary">Button</x-button>
