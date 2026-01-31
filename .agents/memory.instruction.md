@@ -28,6 +28,7 @@ applyTo: '**'
 **5 Components Implemented (3 Alpine + 2 Blade View Components)**:
 
 ✅ **Alpine Components** (JavaScript State Management):
+
 1. **trainingTimeline.js** (130 lines)
    - Turn navigation: nextTurn(), prevTurn(), goToTurn(number)
    - Swipe gestures: 50px threshold, left/right detection
@@ -54,6 +55,7 @@ applyTo: '**'
    - Events: @skill-selected, @skill-removed, @loadout-reordered
 
 ✅ **Blade View Components**:
+
 1. **training-timeline.blade.php** (200+ lines)
    - Header: Title, completion percentage badge
    - Progress bar with gradient
@@ -76,6 +78,7 @@ applyTo: '**'
    - Full dark mode, WCAG 2.2 AA, responsive
 
 **Code Quality**:
+
 - All files pass Laravel Pint formatting (PASS)
 - WCAG 2.2 AA accessibility compliance
 - Dark mode support with game-aligned colors
@@ -84,17 +87,20 @@ applyTo: '**'
 - Semantic HTML with ARIA labels
 
 **Git Commits** (3 total):
+
 1. 80322c8 - Core components (trainingTimeline, spAllocator, SkillLoadout, app.js registration)
 2. 750b550 - View components (training-timeline.blade.php, sp-allocator-interface.blade.php)
 3. eb55584 - Documentation (PHASE_4_SUMMARY.md complete)
 
-**Testing Status**: 
+**Testing Status**:
+
 - ✅ Code structure ready for Pest unit tests
 - 🎯 Pest tests pending (allocation logic, history, validation)
 - 🎯 Playwright E2E pending (swipe gestures, undo/redo, budget validation)
 - ✅ Manual code review: structure and patterns validated
 
 **Architecture Learnings**:
+
 - Alpine.js pattern: Computed properties for derived state, event-driven communication
 - Blade component pattern: @props array, x-data binding, @click handlers
 - Gesture detection: 50px minimum threshold prevents accidental swipes
@@ -221,7 +227,7 @@ applyTo: '**'
 
 ### Key Design Principles
 
-- Game-aligned stat colors: Speed (rose-400), Stamina (green-500), Power (orange-500), Guts (amber-400), Wit (sky-500)
+- Game-aligned stat colors: Speed (blue-500), Stamina (green-500), Power (orange-500), Guts (amber-400), Wit (sky-500)
 - SVG-based visualizations for StatRadarChart with pentagon math
 - Emoji icons for visual clarity (🏁 race day, ⚠️ warnings, 🏆 achievements, etc.)
 - Dark mode support across all components
@@ -386,6 +392,7 @@ applyTo: '**'
 **6 Components Implemented (1 Alpine + 5 Blade View Components)**:
 
 ✅ **Blade Components**:
+
 1. **line-chart.blade.php** (323 lines) - Chart.js integration
    - Multi-dataset support with configurable colors
    - Data summary: Current, Average, Peak values
@@ -408,6 +415,7 @@ applyTo: '**'
    - Props: title, events[], variant, maxEvents
 
 ✅ **View Components** (Alpine + Blade combined):
+
 1. **races/calendar.blade.php** (400+ lines) - Race carousel
    - Navigation: nextRace(), prevRace(), goToRace(index)
    - Filtering: filterByType(type), filterByMonth(month)
@@ -424,17 +432,20 @@ applyTo: '**'
    - Computed: filteredRaces, totalProjectedFans, getGradeCount()
 
 ✅ **Alpine Component**:
+
 1. **race-calendar.js** (140 lines)
    - State: races[], currentRaceIndex, filterType, selectedMonth, touchStartX/End
    - Same methods as calendar view
    - Exported as `export function raceCalendar()`
 
 **Dashboard Enhancement**:
+
 - Added Analytics section with 3-column grid
 - Integrated line-chart, class-pyramid, activity-timeline
 - Updated dashboard.blade.php (+78 lines)
 
 **Code Quality**:
+
 - All files pass Pint formatting (PASS)
 - WCAG 2.2 AA accessibility throughout
 - Full dark mode support
@@ -442,6 +453,7 @@ applyTo: '**'
 - 3 comprehensive commits
 
 **Key Patterns**:
+
 - Alpine data functions with computed properties
 - Blade components with responsive grids
 - Chart.js CDN integration

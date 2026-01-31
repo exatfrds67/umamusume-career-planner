@@ -40,6 +40,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'security.headers' => \App\Http\Middleware\SecurityHeaders::class,
             'api.performance' => \App\Http\Middleware\ApiPerformanceMiddleware::class,
             'tiered.rate.limit' => \App\Http\Middleware\TieredRateLimiting::class,
+            'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
         ]);
 
         // Configure authentication redirects - redirect to welcome page instead of login

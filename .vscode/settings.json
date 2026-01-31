@@ -18,6 +18,10 @@
 
     "intelephense.diagnostics.undefinedMethods": false,
     "intelephense.diagnostics.undefinedProperties": false,
+    "intelephense.diagnostics.undefinedFunctions": false,
+    "php.problems.exclude": {
+        "**/resources/views/**": true
+    },
     "yaml.customTags": ["!environment scalar"],
     "yaml.validate": true,
     "yaml.schemas": {
