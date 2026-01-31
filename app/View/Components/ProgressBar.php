@@ -57,7 +57,7 @@ class ProgressBar extends Component
     public function colorClasses(): string
     {
         return match ($this->color) {
-            'speed' => 'bg-gradient-to-r from-rose-400 to-rose-500',
+            'speed' => 'bg-gradient-to-r from-blue-400 to-blue-500',
             'stamina' => 'bg-gradient-to-r from-green-400 to-green-500',
             'power' => 'bg-gradient-to-r from-orange-400 to-orange-500',
             'guts' => 'bg-gradient-to-r from-amber-400 to-amber-500',

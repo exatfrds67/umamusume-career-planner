@@ -33,10 +33,10 @@ class StatBar extends Component
      */
     public function __construct(
         string $stat,
-        int $current,
-        int $max = 2000,
-        ?int $target = null,
-        ?int $factorBonus = null,
+        int|string $current,
+        int|string $max = 2000,
+        int|string|null $target = null,
+        int|string|null $factorBonus = null,
         bool $showIcon = true,
         bool $showPercentage = false,
         bool $showSoftCap = true,
@@ -44,10 +44,10 @@ class StatBar extends Component
         string $size = 'md'
     ) {
         $this->stat = strtolower($stat);
-        $this->current = $current;
-        $this->max = $max;
-        $this->target = $target;
-        $this->factorBonus = $factorBonus;
+        $this->current = (int) $current;
+        $this->max = (int) $max;
+        $this->target = $target !== null ? (int) $target : null;
+        $this->factorBonus = $factorBonus !== null ? (int) $factorBonus : null;
         $this->showIcon = $showIcon;
         $this->showPercentage = $showPercentage;
         $this->showSoftCap = $showSoftCap;

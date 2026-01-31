@@ -39,7 +39,7 @@ class TypeIcon extends Component
     public function colorClasses(): string
     {
         return match ($this->type) {
-            'speed' => 'text-rose-500 dark:text-rose-400',
+            'speed' => 'text-blue-500 dark:text-blue-400',
             'stamina' => 'text-green-500 dark:text-green-400',
             'power' => 'text-orange-500 dark:text-orange-400',
             'guts' => 'text-amber-500 dark:text-amber-400',
@@ -97,7 +97,7 @@ class TypeIcon extends Component
     public function bgColor(): string
     {
         return match ($this->type) {
-            'speed' => 'bg-rose-100 dark:bg-rose-900/30',
+            'speed' => 'bg-blue-100 dark:bg-blue-900/30',
             'stamina' => 'bg-green-100 dark:bg-green-900/30',
             'power' => 'bg-orange-100 dark:bg-orange-900/30',
             'guts' => 'bg-amber-100 dark:bg-amber-900/30',

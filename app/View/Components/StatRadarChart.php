@@ -11,8 +11,8 @@ class StatRadarChart extends Component
     /**
      * Create a new component instance.
      *
-     * @param  array  $stats  Associative array of stat values (speed, stamina, power, guts, wit)
-     * @param  int  $max  Maximum value for stats (default 1000)
+     * @param  array<string, int|string>  $stats  Associative array of stat values (speed, stamina, power, guts, wit)
+     * @param  int|string  $max  Maximum value for stats (default 2000)
      * @param  string  $size  Chart size (sm, md, lg)
      * @param  bool  $showLabels  Whether to show stat labels
      * @param  bool  $showValues  Whether to show stat values
@@ -20,17 +20,27 @@ class StatRadarChart extends Component
      */
     public function __construct(
         public array $stats = [],
-        public int $max = 1000,
+        public int|string $max = 1000,
         public string $size = 'md',
         public bool $showLabels = true,
         public bool $showValues = false,
         public bool $animated = true,
     ) {
-        // Normalize stats to uppercase keys
-        $this->stats = array_combine(
-            array_map('strtolower', array_keys($this->stats)),
-            array_values($this->stats)
-        );
+        // Normalize all stat values to integers
+        $normalizedStats = [];
+        foreach ($this->stats as $key => $value) {
+            $normalizedStats[strtolower($key)] = (int) $value;
+        }
+
+        $this->stats = [
+            'speed' => $normalizedStats['speed'] ?? 0,
+            'stamina' => $normalizedStats['stamina'] ?? 0,
+            'power' => $normalizedStats['power'] ?? 0,
+            'guts' => $normalizedStats['guts'] ?? 0,
+            'wit' => $normalizedStats['wit'] ?? 0,
+        ];
+
+        $this->max = (int) $max;
     }
 
     /**
@@ -69,7 +79,7 @@ class StatRadarChart extends Component
     public function getStatColor(string $stat): string
     {
         return match (strtolower($stat)) {
-            'speed' => 'text-rose-500 dark:text-rose-400',
+            'speed' => 'text-blue-500 dark:text-blue-400',
             'stamina' => 'text-green-500 dark:text-green-400',
             'power' => 'text-orange-500 dark:text-orange-400',
             'guts' => 'text-amber-500 dark:text-amber-400',
@@ -84,7 +94,7 @@ class StatRadarChart extends Component
     public function getSvgFillColor(string $stat): string
     {
         return match (strtolower($stat)) {
-            'speed' => '#fb7185',  // rose-500
+            'speed' => '#3b82f6',  // blue-500
             'stamina' => '#22c55e', // green-500
             'power' => '#f97316',   // orange-500
             'guts' => '#fbbf24',    // amber-500
