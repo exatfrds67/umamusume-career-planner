@@ -22,7 +22,7 @@ Derived from game screenshot analysis to ensure stronger visual recognition.
 
 | Category        | Primary Color   | Tailwind Class                                   | Hex Code (Approx) | Usage                       |
 | :-------------- | :-------------- | :----------------------------------------------- | :---------------- | :-------------------------- |
-| **Speed**       | Pink/Rose       | `bg-rose-500`                                    | `#FB7185`         | Speed stat, icons           |
+| **Speed**       | Blue            | `bg-blue-500`                                    | `#3B82F6`         | Speed stat, icons           |
 | **Stamina**     | Vivid Green     | `bg-green-500`                                   | `#22C55E`         | Stamina stat, healing       |
 | **Power**       | Orange          | `bg-orange-500`                                  | `#F97316`         | Power stat, physical effort |
 | **Guts**        | Amber/Yellow    | `bg-amber-400`                                   | `#FBBF24`         | Guts stat, burning spirit   |

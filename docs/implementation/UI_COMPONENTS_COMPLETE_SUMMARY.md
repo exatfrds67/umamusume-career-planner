@@ -30,7 +30,7 @@ Successfully implemented **Phases 1-3** of the UI Foundation and Interactive Com
 
 ### Phase 3: Interactive Components ✅
 
-4. **CharacterCard** - Character display with stats
+1. **CharacterCard** - Character display with stats
 2. **SupportCard** - Support cards with bonds and limit breaks
 3. **SkillCard** - Skills with hint discounts (10%/20%/30%/35%/40%)
 
@@ -221,7 +221,7 @@ Successfully implemented **Phases 1-3** of the UI Foundation and Interactive Com
 
 | Stat | Color | Hex | Usage |
 |------|-------|-----|-------|
-| Speed | Pink/Rose | #FB7185 | Speed stat, icons |
+| Speed | Blue | #3B82F6 | Speed stat, icons |
 | Stamina | Vivid Green | #22C55E | Stamina stat, healing |
 | Power | Orange | #F97316 | Power stat, physical effort |
 | Guts | Amber/Yellow | #FBBF24 | Guts stat, burning spirit |

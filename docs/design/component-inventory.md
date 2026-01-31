@@ -52,7 +52,7 @@ This document provides a comprehensive inventory of all UI components required f
 
 ```css
 /* @theme block */
---color-uma-speed: #fb7185; /* rose-400 */
+--color-uma-speed: #3b82f6; /* blue-500 */
 --color-uma-stamina: #22c55e; /* green-500 */
 --color-uma-power: #f97316; /* orange-500 */
 --color-uma-guts: #fbbf24; /* amber-400 */

@@ -212,7 +212,7 @@ Organized by category:
 
 | Stat    | Tailwind Class | Hex Code  | Usage                       |
 | ------- | -------------- | --------- | --------------------------- |
-| Speed   | `rose-500`     | `#FB7185` | Speed stat, icons           |
+| Speed   | `blue-500`     | `#3B82F6` | Speed stat, icons           |
 | Stamina | `green-500`    | `#22C55E` | Stamina stat, healing       |
 | Power   | `orange-500`   | `#F97316` | Power stat, physical effort |
 | Guts    | `amber-400`    | `#FBBF24` | Guts stat, burning spirit   |

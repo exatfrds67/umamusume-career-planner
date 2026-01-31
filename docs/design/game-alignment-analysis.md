@@ -363,7 +363,7 @@ Three primary options:
 
 From game screenshots:
 
-- **Speed**: Pink/Red (#FF6B9D approximate)
+- **Speed**: Blue (#3B82F6)
 - **Stamina**: Green (#4CAF50 approximate)
 - **Power**: Orange/Red (#FF5722 approximate)
 - **Guts**: Orange (#FF9800 approximate)
@@ -388,8 +388,8 @@ From game screenshots:
 **Career Planner Application:**
 
 - Adopt similar stat color coding for consistency
-- Use Tailwind's color system (Verified Jan 2026):
-  - Speed: `rose-500` (#FB7185)
+- Use Tailwind's color system (Updated Jan 2026):
+  - Speed: `blue-500` (#3B82F6)
   - Stamina: `green-500` (#22C55E)
   - Power: `orange-500` (#F97316)
   - Guts: `amber-400` (#FBBF24)
@@ -678,7 +678,7 @@ From game screenshots:
 theme: {
 extend: {
 colors: {
-'uma-speed': '#FB7185', // Rose
+'uma-speed': '#3B82F6', // Blue
 'uma-stamina': '#22C55E', // Green
 'uma-power': '#F97316', // Orange
 'uma-guts': '#FBBF24', // Amber

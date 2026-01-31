@@ -132,8 +132,8 @@ All components implement verified game mechanics from `docs/research/game-mechan
 - **Soft cap at 1200**: Diminishing returns above (50% effectiveness)
 - **Maximum practical range**: 0-2000
 - **Effective value calculation**: Implemented in StatBar
-- **Stat colors**: Verified from game screenshots
-  - Speed: Pink/Rose (#FB7185)
+- **Stat colors**: Updated color scheme
+  - Speed: Blue (#3B82F6)
   - Stamina: Vivid Green (#22C55E)
   - Power: Orange (#F97316)
   - Guts: Amber/Yellow (#FBBF24)

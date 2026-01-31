@@ -407,7 +407,8 @@ php artisan test --filter=SkillAnalysisServiceTest
 ### Seed Skills Database
 
 ```bash
-php artisan db:seed --class=ComprehensiveSkillSeeder
+# Consolidated skill seeder (replaces legacy ComprehensiveSkillSeeder and RealUmaMusumeSkillsSeeder)
+php artisan db:seed --class=UcpSkillsSeeder
 ```
 
 ## Requirements Validation

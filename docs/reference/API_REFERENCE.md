@@ -442,6 +442,246 @@ GET /api/v1/skills/analysis/recommendations
 |-----------|------|-------------|
 | `character_id` | integer | Character to analyze |
 
+### Character-Specific Skill Recommendations (AI-Powered)
+
+```http
+POST /api/characters/{characterId}/skill-recommendations
+```
+
+**Authentication:** Required (`auth:sanctum`)
+
+**Description:** Get AI-powered skill recommendations for a specific character based on their current stats, aptitudes, acquired skills, available hints, and build strategy. This endpoint uses the Neuron AI service to provide intelligent skill acquisition suggestions.
+
+**Path Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `characterId` | integer | Yes | The ID of the character to get recommendations for |
+
+**Request Body:**
+
+```json
+{
+    "skill_context": {
+        "available_sp": 1500,
+        "race_preferences": {
+            "preferred_distance": "medium",
+            "preferred_surface": "turf",
+            "preferred_running_style": "leader"
+        },
+        "build_strategy": "Focus on speed and acceleration skills for early positioning",
+        "upcoming_races": [
+            {
+                "name": "Japan Cup",
+                "distance_category": "long",
+                "surface": "turf",
+                "turns_until": 5
+            }
+        ],
+        "additional_context": "Need skills for rainy weather conditions"
+    }
+}
+```
+
+**Request Body Parameters:**
+
+| Parameter | Type | Required | Description | Validation |
+|-----------|------|----------|-------------|------------|
+| `skill_context` | object | No | Context for skill recommendations | - |
+| `skill_context.available_sp` | integer | No | Available skill points | min:0 |
+| `skill_context.race_preferences` | object | No | Character's race preferences | - |
+| `skill_context.race_preferences.preferred_distance` | string | No | Preferred race distance | One of: short, mile, medium, long |
+| `skill_context.race_preferences.preferred_surface` | string | No | Preferred race surface | One of: turf, dirt |
+| `skill_context.race_preferences.preferred_running_style` | string | No | Preferred running style | One of: runner, leader, betweener, chaser |
+| `skill_context.build_strategy` | string | No | Overall build strategy description | max:1000 characters |
+| `skill_context.upcoming_races` | array | No | List of upcoming races to prepare for | - |
+| `skill_context.upcoming_races.*.name` | string | Required if races provided | Race name | max:255 characters |
+| `skill_context.upcoming_races.*.distance_category` | string | No | Race distance category | One of: short, mile, medium, long |
+| `skill_context.upcoming_races.*.surface` | string | No | Race surface type | One of: turf, dirt |
+| `skill_context.upcoming_races.*.turns_until` | integer | No | Number of turns until race | min:0 |
+| `skill_context.additional_context` | string | No | Additional context or notes | max:1000 characters |
+
+**Success Response (200 OK):**
+
+```json
+{
+    "success": true,
+    "data": {
+        "recommendations": [
+            {
+                "skill_id": 42,
+                "skill_name": "Accelerate",
+                "skill_type": "normal",
+                "base_sp_cost": 120,
+                "effective_sp_cost": 72,
+                "hint_level": 3,
+                "priority": "high",
+                "reasoning": "Excellent for leader running style and medium distance races",
+                "synergies": ["Speed Star", "Quick Start"],
+                "acquisition_timing": "immediate"
+            },
+            {
+                "skill_id": 58,
+                "skill_name": "Corner Master",
+                "skill_type": "rare",
+                "base_sp_cost": 180,
+                "effective_sp_cost": 180,
+                "hint_level": 0,
+                "priority": "medium",
+                "reasoning": "Useful for turf races with multiple corners",
+                "synergies": ["Curve Specialist"],
+                "acquisition_timing": "after_next_race"
+            }
+        ],
+        "total_recommended_sp": 252,
+        "available_sp": 1500,
+        "remaining_sp": 1248,
+        "strategy_summary": "Focus on acceleration and positioning skills for leader strategy",
+        "processing_time_ms": 1234.56,
+        "timestamp": "2026-01-31T12:00:00+00:00"
+    },
+    "message": "Skill recommendations generated successfully."
+}
+```
+
+**Response Fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `success` | boolean | Whether the request was successful |
+| `data` | object | Recommendation data |
+| `data.recommendations` | array | List of recommended skills |
+| `data.recommendations[].skill_id` | integer | Skill database ID |
+| `data.recommendations[].skill_name` | string | Skill name |
+| `data.recommendations[].skill_type` | string | Skill type (normal, rare, unique, inherited) |
+| `data.recommendations[].base_sp_cost` | integer | Base SP cost without hints |
+| `data.recommendations[].effective_sp_cost` | integer | Actual SP cost with hint discounts applied |
+| `data.recommendations[].hint_level` | integer | Current hint level (0-5) |
+| `data.recommendations[].priority` | string | Acquisition priority (high, medium, low) |
+| `data.recommendations[].reasoning` | string | AI explanation for recommendation |
+| `data.recommendations[].synergies` | array | Skills that synergize with this recommendation |
+| `data.recommendations[].acquisition_timing` | string | Suggested timing (immediate, after_next_race, late_game) |
+| `data.total_recommended_sp` | integer | Total SP needed for all recommendations |
+| `data.available_sp` | integer | Character's available SP |
+| `data.remaining_sp` | integer | SP remaining after acquiring recommendations |
+| `data.strategy_summary` | string | Overall strategy summary |
+| `data.processing_time_ms` | float | Processing time in milliseconds |
+| `data.timestamp` | string | ISO 8601 timestamp |
+| `message` | string | Success message |
+
+**Error Responses:**
+
+**401 Unauthorized:**
+
+```json
+{
+    "success": false,
+    "message": "Authentication required."
+}
+```
+
+**403 Forbidden:**
+
+```json
+{
+    "success": false,
+    "message": "You do not have permission to access this character."
+}
+```
+
+**404 Not Found:**
+
+```json
+{
+    "success": false,
+    "message": "Character not found."
+}
+```
+
+**422 Unprocessable Entity:**
+
+```json
+{
+    "success": false,
+    "message": "Invalid skill context structure.",
+    "errors": {
+        "skill_context.available_sp": ["Available SP cannot be negative."],
+        "skill_context.race_preferences.preferred_distance": ["Preferred distance must be one of: short, mile, medium, long."]
+    }
+}
+```
+
+**503 Service Unavailable:**
+
+```json
+{
+    "success": false,
+    "message": "Unable to generate skill recommendations. Please try again.",
+    "error": "AI service temporarily unavailable"
+}
+```
+
+**Rate Limiting:**
+
+This endpoint is rate-limited to prevent abuse of AI resources:
+
+- **Authenticated users:** 10 requests per minute
+- **Premium users:** 30 requests per minute
+
+**Example Usage:**
+
+```javascript
+// JavaScript/Fetch example
+const response = await fetch('/api/characters/123/skill-recommendations', {
+    method: 'POST',
+    headers: {
+        'Authorization': 'Bearer YOUR_TOKEN',
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    },
+    body: JSON.stringify({
+        skill_context: {
+            available_sp: 1500,
+            race_preferences: {
+                preferred_distance: 'medium',
+                preferred_surface: 'turf',
+                preferred_running_style: 'leader'
+            },
+            build_strategy: 'Focus on speed and acceleration'
+        }
+    })
+});
+
+const data = await response.json();
+console.log(data.data.recommendations);
+```
+
+```bash
+# cURL example
+curl -X POST "https://api.example.com/api/characters/123/skill-recommendations" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json" \
+  -d '{
+    "skill_context": {
+      "available_sp": 1500,
+      "race_preferences": {
+        "preferred_distance": "medium",
+        "preferred_surface": "turf",
+        "preferred_running_style": "leader"
+      }
+    }
+  }'
+```
+
+**Notes:**
+
+- The `skill_context` parameter is optional. If not provided, recommendations will be based solely on character stats and aptitudes.
+- AI recommendations are generated in real-time and may take 1-3 seconds to process.
+- The endpoint requires the character to belong to the authenticated user (authorization check).
+- Recommendations consider the character's current skills, available hints, and SP budget.
+- The AI analyzes skill synergies and provides strategic timing suggestions.
+
 ---
 
 ## Support Cards

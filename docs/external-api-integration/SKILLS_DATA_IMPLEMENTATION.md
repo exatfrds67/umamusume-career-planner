@@ -28,8 +28,9 @@ Since umapyoi.net does not provide skills data, the implementation uses the loca
 
 - **Model:** `app/Models/Skill.php`
 - **Table:** `ucp_skills`
-- **Seeder:** `database/seeders/ComprehensiveSkillSeeder.php`
+- **Seeder:** `database/seeders/UcpSkillsSeeder.php` (consolidated seeder)
 - **Factory:** `database/factories/SkillFactory.php`
+- **Legacy Seeders:** Archived in `database/seeders/deprecated/`
 
 ### Implementation Changes
 
@@ -132,14 +133,14 @@ it('fetches skills from local database', function () {
 To populate skills data with **real Uma Musume: Pretty Derby skills**, run:
 
 ```bash
-# Seed base 20 curated real skills
-php artisan db:seed --class=ComprehensiveSkillSeeder
-
-# Seed additional 40+ real Uma Musume skills
-php artisan db:seed --class=RealUmaMusumeSkillsSeeder
+# Consolidated skill seeder (replaces legacy ComprehensiveSkillSeeder and RealUmaMusumeSkillsSeeder)
+# Seeds curated skills + fetches 500+ skills from gametora.com API
+php artisan db:seed --class=UcpSkillsSeeder
 ```
 
-**Current Database Contains: 61 real Uma Musume skills**
+**Note:** Legacy seeders (`ComprehensiveSkillSeeder` and `RealUmaMusumeSkillsSeeder`) have been archived to `database/seeders/deprecated/` and replaced by the consolidated `UcpSkillsSeeder`.
+
+**Current Database Contains: 500+ real Uma Musume skills**
 
 **Distribution:**
 

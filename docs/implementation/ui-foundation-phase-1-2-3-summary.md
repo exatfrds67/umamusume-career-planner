@@ -26,7 +26,7 @@ Successfully implemented the foundation and core data display components for the
 
 | Stat | Color | Hex | Usage |
 |------|-------|-----|-------|
-| Speed | Pink/Rose | `#FB7185` | Speed stat, icons |
+| Speed | Blue | `#3B82F6` | Speed stat, icons |
 | Stamina | Vivid Green | `#22C55E` | Stamina stat, healing |
 | Power | Orange | `#F97316` | Power stat, physical effort |
 | Guts | Amber/Yellow | `#FBBF24` | Guts stat, burning spirit |

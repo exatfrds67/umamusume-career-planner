@@ -82,13 +82,34 @@ Added "Browse External Data" button to the characters index page:
 
 **Function:** `externalDataBrowser()`
 
+**File:** `resources/js/pages/external-data/browse.js`
+
 Capabilities:
 
-- Loads data from all 4 endpoints in parallel
+- Loads data from all 4 endpoints in parallel using `Promise.all()`
 - Implements client-side search/filtering
-- Manages loading states and error handling
+- Manages loading states and error handling (global + per-endpoint)
 - Checks API availability status
 - Provides smooth tab switching
+- Supports individual endpoint retry functionality
+- Maintains partial data on endpoint failures
+
+**Key Methods:**
+
+- `fetchEndpoint(url)` - Standardized API fetch with error handling and CSRF token
+- `loadData()` - Parallel data loading from all endpoints
+- `retryEndpoint(endpointName)` - Retry a specific failed endpoint
+- `retryAll()` - Retry all endpoints
+- `filterData()` - Client-side filtering and search
+- `sortData()` - Client-side sorting
+
+**Error Handling Strategy:**
+
+- Each endpoint has its own error state (`errors.characters`, `errors.supportCards`, etc.)
+- Failed endpoints don't block successful ones (partial failure resilience)
+- API is considered available if at least one endpoint succeeds
+- Users can retry individual failed endpoints or all endpoints at once
+- Loading states are tracked both globally and per-endpoint for better UX
 
 ---
 
@@ -133,7 +154,7 @@ php artisan test tests/Feature/ExternalAPI/UmapyoiApiClientTest.php --compact
 
 2. **Browse External Data**
    - Page loads automatically with latest data from umapyoi.net
-        - Switch between tabs: Characters / Support Cards / Skills / News
+   - Switch between tabs: Characters / Support Cards / Skills / News
    - Use search box to filter results
    - Click "Refresh Data" to get latest information
 
@@ -142,25 +163,55 @@ php artisan test tests/Feature/ExternalAPI/UmapyoiApiClientTest.php --compact
    - Page will show cached data when offline
    - Cached data includes timestamp
 
+4. **Error Handling**
+   - If an endpoint fails, an error banner appears for that section
+   - Other sections continue to work normally (partial failure resilience)
+   - Click "Retry" button on failed sections to attempt reload
+   - Click "Retry All" to reload all data
+
 ### For Developers
 
 **Accessing API Endpoints:**
 
 ```javascript
 // Fetch characters
- Users can browse characters, support cards, skills, and news directly from the community database.
+const response = await fetch('/api/external/characters', {
     headers: {
         'Accept': 'application/json',
         'X-CSRF-TOKEN': csrfToken
- - **Tabbed Interface**: Characters / Support Cards / Skills / News
+    }
 });
 const data = await response.json();
 // Returns: { success: true, data: [...], source: 'umapyoi.net', cached: false }
 
 // Check API status
 const status = await fetch('/api/external/status');
-    Route::get('/skills', [ExternalDataController::class, 'getSkills']);
 // Returns: { success: true, data: { umapyoi: { available: true, cache_status: {...} } } }
+```
+
+**Using the Component:**
+
+The `externalDataBrowser()` Alpine.js component provides:
+
+```javascript
+// Load all data in parallel
+await this.loadData();
+
+// Retry a specific endpoint
+await this.retryEndpoint('characters'); // or 'supportCards', 'skills', 'news'
+
+// Retry all endpoints
+await this.retryAll();
+
+// Access error states
+if (this.errors.characters) {
+    console.log('Characters failed:', this.errors.characters);
+}
+
+// Check loading states
+if (this.loadingCharacters) {
+    // Show loading spinner for characters section
+}
 ```
 
 **Using the Service Directly:**
@@ -293,11 +344,17 @@ if ($client->isAvailable()) {
 │  (Alpine.js)    │
 └────────┬────────┘
          │
-         │ Parallel API Calls:
+         │ Parallel API Calls (Promise.all):
          │ - /api/external/characters
          │ - /api/external/support-cards
+         │ - /api/external/skills
          │ - /api/external/news
-         │ - /api/external/status
+         │
+         │ Individual Retry:
+         │ - retryEndpoint('characters')
+         │ - retryEndpoint('supportCards')
+         │ - retryEndpoint('skills')
+         │ - retryEndpoint('news')
          ▼
 ┌─────────────────┐
 │ External Data   │
@@ -318,6 +375,29 @@ if ($client->isAvailable()) {
 │  API Endpoints  │
 │  (200 OK ✓)     │
 └─────────────────┘
+```
+
+**Error Handling Flow:**
+
+```
+┌─────────────────┐
+│  loadData()     │
+│  (Promise.all)  │
+└────────┬────────┘
+         │
+         ├─ Endpoint 1 Success ──> Store data
+         ├─ Endpoint 2 Failure ──> Store error, keep old data
+         ├─ Endpoint 3 Success ──> Store data
+         └─ Endpoint 4 Failure ──> Store error, keep old data
+         │
+         ▼
+┌─────────────────┐
+│ API Available?  │
+│ (any success)   │
+└────────┬────────┘
+         │
+         ├─ Yes ──> apiAvailable = true
+         └─ No  ──> apiAvailable = false
 ```
 
 ---

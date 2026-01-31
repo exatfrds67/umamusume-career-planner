@@ -48,15 +48,17 @@ Successfully implemented a comprehensive skill management system with 20+ skills
 
 ### 2. Comprehensive Skill Database ✅
 
-#### ComprehensiveSkillSeeder (`database/seeders/ComprehensiveSkillSeeder.php`)
+#### UcpSkillsSeeder (`database/seeders/UcpSkillsSeeder.php`)
 
-- **20+ Skills** seeded across all categories
+**Note:** This consolidated seeder replaces the legacy `ComprehensiveSkillSeeder` and `RealUmaMusumeSkillsSeeder` (now archived in `database/seeders/deprecated/`).
+
+- **500+ Skills** seeded from curated data and gametora.com API
 - **Skill Categories**:
-  - **Speed Skills** (7 skills): Go with the Flow, Lane Legerdemain, Homestretch Haste, In Body and Mind, Quick Charge, Sprint Turbo, Rocket Start
-  - **Passive Skills** (4 skills): Stamina Keeper, Stamina Master, Corner Master, Corner Expert
-  - **Recovery Skills** (3 skills): Recovery, Full Recovery, Second Wind
-  - **Debuff Skills** (3 skills): Blocking, Perfect Blocking, Intimidation
-  - **Unique Skills** (3 skills): Special Week's Determination, Silence Suzuka's Silent Step, Tokai Teio's Emperor's Dignity
+  - **Speed Skills** (7 curated + many from API): Go with the Flow, Lane Legerdemain, Homestretch Haste, In Body and Mind, Quick Charge, Sprint Turbo, Rocket Start
+  - **Passive Skills** (4 curated + many from API): Stamina Keeper, Stamina Master, Corner Master, Corner Expert
+  - **Recovery Skills** (3 curated + many from API): Recovery, Full Recovery, Second Wind
+  - **Debuff Skills** (3 curated + many from API): Blocking, Perfect Blocking, Intimidation
+  - **Unique Skills** (3 curated + many from API): Special Week's Determination, Silence Suzuka's Silent Step, Tokai Teio's Emperor's Dignity
 
 #### SP Cost Ranges
 
@@ -303,13 +305,18 @@ The following tasks are ready for implementation:
 1. `app/Models/Skill.php` - Enhanced with business logic
 2. `app/Models/SkillHint.php` - New model for hint tracking
 3. `app/Models/SkillAcquisition.php` - New model for acquisition tracking
-4. `database/seeders/ComprehensiveSkillSeeder.php` - 20+ skills seeder
+4. `database/seeders/UcpSkillsSeeder.php` - Consolidated skill seeder (500+ skills)
 5. `app/Services/SkillAnalysisService.php` - AI-powered analysis service
 6. `config/mcp-agents.php` - MCP agent configuration
 7. `tests/Feature/SkillManagementTest.php` - Skill model tests
 8. `tests/Feature/SkillAnalysisServiceTest.php` - Service tests
 9. `docs/SKILL_SYSTEM_DOCUMENTATION.md` - Comprehensive documentation
 10. `TASK_3_2_1_IMPLEMENTATION_SUMMARY.md` - This summary
+
+### Archived Files (Legacy Seeders)
+
+- `database/seeders/deprecated/ComprehensiveSkillSeeder.php` - Archived legacy seeder
+- `database/seeders/deprecated/RealUmaMusumeSkillsSeeder.php` - Archived legacy seeder
 
 ### Modified Files
 
