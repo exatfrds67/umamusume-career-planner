@@ -132,7 +132,7 @@ class UmapyoiApiClient
                         'source' => 'api',
                     ];
                 } catch (\Exception $e) {
-                    Log::warning('[UmapyoiApiClient] External API unavailable, falling back to database', [
+                    Log::warning('[UmapyoiApiClient] External API unavailable, attempting database fallback', [
                         'endpoint' => 'characters',
                         'error' => $e->getMessage(),
                     ]);
@@ -141,12 +141,20 @@ class UmapyoiApiClient
                     $databaseData = $this->getFromDatabase('characters');
 
                     if (! empty($databaseData)) {
+                        Log::info('[UmapyoiApiClient] Using database cache for characters', [
+                            'records_count' => \count($databaseData),
+                        ]);
+
                         return [
                             'success' => true,
                             'data' => $databaseData,
                             'source' => 'database_cache',
                         ];
                     }
+
+                    Log::error('[UmapyoiApiClient] No database cache available for characters', [
+                        'error' => $e->getMessage(),
+                    ]);
 
                     return [
                         'success' => false,
@@ -302,7 +310,7 @@ class UmapyoiApiClient
                 'source' => 'api',
             ];
         } catch (\Exception $e) {
-            Log::warning('[UmapyoiApiClient] External API unavailable, falling back to database', [
+            Log::warning('[UmapyoiApiClient] External API unavailable, attempting database fallback', [
                 'endpoint' => 'support_cards',
                 'error' => $e->getMessage(),
             ]);
@@ -311,12 +319,20 @@ class UmapyoiApiClient
             $databaseData = $this->getFromDatabase('support_cards');
 
             if (! empty($databaseData)) {
+                Log::info('[UmapyoiApiClient] Using database cache for support_cards', [
+                    'records_count' => \count($databaseData),
+                ]);
+
                 return [
                     'success' => true,
                     'data' => $databaseData,
                     'source' => 'database_cache',
                 ];
             }
+
+            Log::error('[UmapyoiApiClient] No database cache available for support_cards', [
+                'error' => $e->getMessage(),
+            ]);
 
             return [
                 'success' => false,
@@ -464,6 +480,25 @@ class UmapyoiApiClient
             ];
         } catch (\Exception $e) {
             Log::error('[UmapyoiApiClient] Failed to fetch skills', [
+                'error' => $e->getMessage(),
+            ]);
+
+            // Fallback to database data
+            $databaseData = $this->getFromDatabase('skills');
+
+            if (! empty($databaseData)) {
+                Log::info('[UmapyoiApiClient] Using database cache for skills', [
+                    'records_count' => \count($databaseData),
+                ]);
+
+                return [
+                    'success' => true,
+                    'data' => $databaseData,
+                    'source' => 'database_cache',
+                ];
+            }
+
+            Log::error('[UmapyoiApiClient] No database cache available for skills', [
                 'error' => $e->getMessage(),
             ]);
 
@@ -618,7 +653,7 @@ class UmapyoiApiClient
                 'source' => 'api',
             ];
         } catch (\Exception $e) {
-            Log::warning('[UmapyoiApiClient] External API unavailable, falling back to database', [
+            Log::warning('[UmapyoiApiClient] External API unavailable, attempting database fallback', [
                 'endpoint' => 'news',
                 'error' => $e->getMessage(),
             ]);
@@ -627,12 +662,20 @@ class UmapyoiApiClient
             $databaseData = $this->getFromDatabase('news');
 
             if (! empty($databaseData)) {
+                Log::info('[UmapyoiApiClient] Using database cache for news', [
+                    'records_count' => \count($databaseData),
+                ]);
+
                 return [
                     'success' => true,
                     'data' => $databaseData,
                     'source' => 'database_cache',
                 ];
             }
+
+            Log::error('[UmapyoiApiClient] No database cache available for news', [
+                'error' => $e->getMessage(),
+            ]);
 
             return [
                 'success' => false,
