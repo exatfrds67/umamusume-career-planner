@@ -126,35 +126,8 @@
     </button>
 </div>
 
-<style>
-    /* Keyboard key styling */
-    .kbd {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0.25rem 0.5rem;
-        font-family: var(--font-mono);
-        font-size: 0.75rem;
-        font-weight: 600;
-        line-height: 1;
-        color: var(--color-neutral-700);
-        background-color: var(--color-neutral-100);
-        border: 1px solid var(--color-neutral-300);
-        border-radius: 0.25rem;
-        box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-        min-width: 2rem;
-    }
-
-    @media (prefers-color-scheme: dark) {
-        .kbd {
-            color: var(--color-neutral-300);
-            background-color: var(--color-neutral-700);
-            border-color: var(--color-neutral-600);
-        }
-    }
-
-    /* Hide element with x-cloak until Alpine is ready */
-    [x-cloak] {
-        display: none !important;
-    }
-</style>
+@once
+    @push('styles')
+        @vite(['resources/css/components/keyboard-shortcuts.css'])
+    @endpush
+@endonce

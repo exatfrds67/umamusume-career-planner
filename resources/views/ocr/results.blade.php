@@ -62,8 +62,8 @@
                     class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
                     <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Screenshot Preview</h2>
                     <div class="flex justify-center">
-                        <img src="{{ Storage::url($extraction->image_path) }}" alt="Uploaded screenshot"
-                            loading="lazy" decoding="async"
+                        <img src="{{ Storage::url($extraction->image_path) }}" alt="Uploaded screenshot" loading="lazy"
+                            decoding="async"
                             class="max-w-full h-auto rounded-lg border border-gray-300 dark:border-gray-600"
                             style="max-height: 500px;">
                     </div>
@@ -151,26 +151,5 @@
         </div>
     </div>
 
-    @push('scripts')
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                // Toggle raw text visibility
-                const toggleButton = document.getElementById('toggle-raw-text');
-                const rawTextContent = document.getElementById('raw-text-content');
-
-                if (toggleButton && rawTextContent) {
-                    toggleButton.addEventListener('click', function() {
-                        const isExpanded = this.getAttribute('aria-expanded') === 'true';
-                        this.setAttribute('aria-expanded', !isExpanded);
-                        rawTextContent.classList.toggle('hidden');
-
-                        const icon = this.querySelector('svg');
-                        if (icon) {
-                            icon.classList.toggle('rotate-180');
-                        }
-                    });
-                }
-            });
-        </script>
-    @endpush
+    @vite(['resources/js/pages/ocr/results.js'])
 @endsection

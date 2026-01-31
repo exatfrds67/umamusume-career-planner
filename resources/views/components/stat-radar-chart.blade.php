@@ -1,9 +1,8 @@
 <div class="flex flex-col items-center gap-4">
     <!-- SVG Radar Chart -->
     <div class="relative {{ $getSizeClasses() }}" role="img" aria-label="Stat radar chart">
-        <svg viewBox="0 0 {{ $size === 'sm' ? 128 : ($size === 'lg' ? 384 : 256) }} {{ $size === 'sm' ? 128 : ($size === 'lg' ? 384 : 256) }}"
-            class="w-full h-full"
-            xmlns="http://www.w3.org/2000/svg">
+        <svg viewBox="0 0 {{ $size === 'sm' ? 64 : ($size === 'lg' ? 192 : 128) }} {{ $size === 'sm' ? 64 : ($size === 'lg' ? 192 : 128) }}"
+            class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
 
             <!-- Background grid -->
             <defs>
@@ -14,19 +13,29 @@
                         opacity: 0.2;
                         fill: none;
                     }
-                    
+
+                    .grid-label {
+                        fill: currentColor;
+                        opacity: 0.5;
+                        font-size: {{ $size === 'sm' ? '3px' : ($size === 'lg' ? '9px' : '6px') }};
+                        font-weight: 500;
+                        text-anchor: middle;
+                    }
+
                     .radar-fill {
                         opacity: 0.3;
-                        @if($animated)
+
+                        @if ($animated)
                             animation: radarFill 1.2s ease-out forwards;
                         @endif
                     }
-                    
-                    @if($animated)
+
+                    @if ($animated)
                         @keyframes radarFill {
                             from {
                                 opacity: 0;
                             }
+
                             to {
                                 opacity: 0.3;
                             }
@@ -36,32 +45,50 @@
             </defs>
 
             <!-- Grid circles/pentagons -->
-            @foreach($getGridPoints() as $level => $gridPointsString)
-                <polygon points="{{ $gridPointsString }}"
-                    class="grid-line dark:stroke-gray-600" />
+            @foreach ($getGridPoints() as $level => $gridPointsString)
+                <polygon points="{{ $gridPointsString }}" class="grid-line dark:stroke-gray-600" />
+            @endforeach
+
+            <!-- Grid value labels -->
+            @php
+                $svgSize = $size === 'sm' ? 64 : ($size === 'lg' ? 192 : 128);
+                $centerX = $svgSize / 2;
+                $centerY = $svgSize / 2;
+                $maxRadius = $svgSize / 2.2;
+                $labelOffset = $size === 'sm' ? 2 : ($size === 'lg' ? 6 : 4);
+            @endphp
+            @foreach ([1, 2, 3, 4, 5] as $level)
+                @php
+                    $radius = ($level / 5) * $maxRadius;
+                    $value = round(($level / 5) * $max);
+                    // Position label at top (12 o'clock position)
+                    $labelY = $centerY - $radius - $labelOffset;
+                @endphp
+                <text x="{{ $centerX }}" y="{{ $labelY }}"
+                    class="grid-label dark:fill-gray-400">{{ $value }}</text>
             @endforeach
 
             <!-- Grid radial lines from center -->
             @php
-                $size = $size === 'sm' ? 128 : ($size === 'lg' ? 384 : 256);
-                $centerX = $size / 2;
-                $centerY = $size / 2;
-                $maxRadius = $size / 2.2;
+                $svgSize = $size === 'sm' ? 64 : ($size === 'lg' ? 192 : 128);
+                $centerX = $svgSize / 2;
+                $centerY = $svgSize / 2;
+                $maxRadius = $svgSize / 2.2;
             @endphp
-            @foreach($getStatNames() as $index => $stat)
+            @foreach ($getStatNames() as $index => $stat)
                 @php
-                    $angle = (($index * 360) / 5) - 90;
+                    $angle = ($index * 360) / 5 - 90;
                     $radians = deg2rad($angle);
-                    $x = $centerX + ($maxRadius * cos($radians));
-                    $y = $centerY + ($maxRadius * sin($radians));
+                    $x = $centerX + $maxRadius * cos($radians);
+                    $y = $centerY + $maxRadius * sin($radians);
                 @endphp
-                <line x1="{{ $centerX }}" y1="{{ $centerY }}" x2="{{ $x }}" y2="{{ $y }}"
-                    class="grid-line dark:stroke-gray-600" />
+                <line x1="{{ $centerX }}" y1="{{ $centerY }}" x2="{{ $x }}"
+                    y2="{{ $y }}" class="grid-line dark:stroke-gray-600" />
             @endforeach
 
             <!-- Data polygon -->
             <polygon points="{{ implode(' ', $calculatePoints()) }}"
-                class="radar-fill {{ match($stats['speed'] ?? 0) { default => 'fill-rose-400/30' } }} dark:fill-rose-500/20"
+                class="radar-fill {{ match ($stats['speed'] ?? 0) {default => 'fill-blue-400/30'} }} dark:fill-blue-500/20"
                 style="fill: url(#radarGradient);" />
 
             <!-- Gradient for radar fill -->
@@ -73,19 +100,17 @@
             </defs>
 
             <!-- Data points -->
-            @foreach($getStatNames() as $index => $stat)
+            @foreach ($getStatNames() as $index => $stat)
                 @php
                     $percentage = $getStatPercentages()[$stat];
-                    $angle = (($index * 360) / 5) - 90;
+                    $angle = ($index * 360) / 5 - 90;
                     $radians = deg2rad($angle);
                     $radius = ($percentage / 100) * $maxRadius;
-                    $x = $centerX + ($radius * cos($radians));
-                    $y = $centerY + ($radius * sin($radians));
+                    $x = $centerX + $radius * cos($radians);
+                    $y = $centerY + $radius * sin($radians);
                 @endphp
-                <circle cx="{{ $x }}" cy="{{ $y }}" r="3"
-                    class="{{ $getStatColor($stat) }}"
-                    style="fill: {{ $getSvgFillColor($stat) }};"
-                    role="presentation">
+                <circle cx="{{ $x }}" cy="{{ $y }}" r="3" class="{{ $getStatColor($stat) }}"
+                    style="fill: {{ $getSvgFillColor($stat) }};" role="presentation">
                     <title>{{ ucfirst($stat) }}: {{ $getStatValue($stat) }}</title>
                 </circle>
             @endforeach
@@ -93,16 +118,16 @@
     </div>
 
     <!-- Legend -->
-    @if($showLabels)
-        <div class="flex flex-wrap justify-center gap-4">
-            @foreach($getStatNames() as $stat)
-                <div class="flex items-center gap-2">
-                    <span class="w-3 h-3 rounded-full {{ $getStatColor($stat) }}"
+    @if ($showLabels)
+        <div class="flex items-center justify-center gap-x-2 gap-y-1 flex-wrap max-w-full">
+            @foreach ($getStatNames() as $stat)
+                <div class="flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full flex-shrink-0"
                         style="background-color: {{ $getSvgFillColor($stat) }};"></span>
-                    <span class="text-sm font-medium {{ $getStatColor($stat) }}">
+                    <span class="text-xs font-medium whitespace-nowrap {{ $getStatColor($stat) }}">
                         {{ ucfirst($stat) }}
-                        @if($showValues)
-                            <span class="text-xs opacity-75">({{ $getStatValue($stat) }})</span>
+                        @if ($showValues)
+                            <span class="text-[10px] opacity-75">({{ $getStatValue($stat) }})</span>
                         @endif
                     </span>
                 </div>

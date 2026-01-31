@@ -47,130 +47,125 @@ Accessibility: WCAG 2.2 AA compliant
 
     {{-- Timeline Variant (Default) --}}
     @if ($variant === 'timeline')
-    <div class="space-y-0" x-data="activityTimeline({{ json_encode($events) }})">
-        {{-- Timeline Container --}}
-        <div class="relative">
-            {{-- Timeline Line --}}
-            <div class="absolute left-4 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-400 to-purple-400 dark:from-blue-500 dark:to-purple-500"></div>
+        <div class="space-y-0" x-data="activityTimeline({{ json_encode($events) }})">
+            {{-- Timeline Container --}}
+            <div class="relative">
+                {{-- Timeline Line --}}
+                <div
+                    class="absolute left-4 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-400 to-purple-400 dark:from-blue-500 dark:to-purple-500">
+                </div>
 
-            {{-- Events --}}
+                {{-- Events --}}
+                <template x-for="(event, index) in displayedEvents" :key="event.id">
+                    <div class="relative pl-16 pb-8 last:pb-0">
+                        {{-- Timeline Dot --}}
+                        <div class="absolute left-0 w-9 h-9 rounded-full flex items-center justify-center text-lg"
+                            :class="getEventColor(event.type) + ' ring-4 ring-white dark:ring-gray-800'">
+                            <span x-text="getEventIcon(event.type)"></span>
+                        </div>
+
+                        {{-- Event Card --}}
+                        <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500 transition-colors"
+                            role="article" :aria-label="`${event.title} on ${formatDate(event.timestamp)}`">
+
+                            {{-- Event Header --}}
+                            <div class="flex items-start justify-between mb-2">
+                                <h4 class="font-semibold text-gray-900 dark:text-white" x-text="event.title">
+                                </h4>
+                                <span class="text-xs font-medium text-gray-500 dark:text-gray-400"
+                                    x-text="getTimeAgo(event.timestamp)">
+                                </span>
+                            </div>
+
+                            {{-- Event Type Badge --}}
+                            <div class="inline-block mb-2">
+                                <span class="inline-block px-2 py-1 text-xs font-medium rounded-full"
+                                    :class="getEventBadgeStyle(event.type)" x-text="formatEventType(event.type)">
+                                </span>
+                            </div>
+
+                            {{-- Event Description --}}
+                            <p class="text-sm text-gray-700 dark:text-gray-300 mb-3" x-text="event.description">
+                            </p>
+
+                            {{-- Event Metadata (if available) --}}
+                            <template x-if="event.metadata && Object.keys(event.metadata).length">
+                                <div class="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                                    <template x-for="(value, key) in event.metadata" :key="key">
+                                        <div>
+                                            <span class="font-medium" x-text="key + ':'"></span>
+                                            <span x-text="formatMetadata(key, value)"></span>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            {{-- Load More Button --}}
+            <template x-if="events.length > displayedEvents.length">
+                <div class="text-center pt-4">
+                    <button @click="loadMore()"
+                        class="px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors">
+                        Show More Events
+                    </button>
+                </div>
+            </template>
+
+            {{-- Empty State --}}
+            <template x-if="events.length === 0">
+                <div class="text-center py-12">
+                    <div class="text-4xl mb-4 opacity-20">📋</div>
+                    <p class="text-gray-600 dark:text-gray-400">No events yet</p>
+                </div>
+            </template>
+        </div>
+
+        {{-- Feed Variant --}}
+    @elseif ($variant === 'feed')
+        <div class="space-y-3" x-data="activityTimeline({{ json_encode($events) }})">
             <template x-for="(event, index) in displayedEvents" :key="event.id">
-                <div class="relative pl-16 pb-8 last:pb-0">
-                    {{-- Timeline Dot --}}
-                    <div class="absolute left-0 w-9 h-9 rounded-full flex items-center justify-center text-lg"
-                        :class="getEventColor(event.type) + ' ring-4 ring-white dark:ring-gray-800'">
+                <div class="flex gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    role="article">
+
+                    {{-- Icon --}}
+                    <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-lg"
+                        :class="getEventColor(event.type)">
                         <span x-text="getEventIcon(event.type)"></span>
                     </div>
 
-                    {{-- Event Card --}}
-                    <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500 transition-colors"
-                        role="article"
-                        :aria-label="`${event.title} on ${formatDate(event.timestamp)}`">
-                        
-                        {{-- Event Header --}}
-                        <div class="flex items-start justify-between mb-2">
-                            <h4 class="font-semibold text-gray-900 dark:text-white"
-                                x-text="event.title">
-                            </h4>
-                            <span class="text-xs font-medium text-gray-500 dark:text-gray-400"
-                                x-text="getTimeAgo(event.timestamp)">
-                            </span>
-                        </div>
-
-                        {{-- Event Type Badge --}}
-                        <div class="inline-block mb-2">
-                            <span class="inline-block px-2 py-1 text-xs font-medium rounded-full"
-                                :class="getEventBadgeStyle(event.type)"
-                                x-text="formatEventType(event.type)">
-                            </span>
-                        </div>
-
-                        {{-- Event Description --}}
-                        <p class="text-sm text-gray-700 dark:text-gray-300 mb-3"
-                            x-text="event.description">
+                    {{-- Content --}}
+                    <div class="flex-1 min-w-0">
+                        <p class="font-medium text-gray-900 dark:text-white text-sm" x-text="event.title">
                         </p>
-
-                        {{-- Event Metadata (if available) --}}
-                        <template x-if="event.metadata && Object.keys(event.metadata).length">
-                            <div class="text-xs text-gray-600 dark:text-gray-400 space-y-1">
-                                <template x-for="(value, key) in event.metadata" :key="key">
-                                    <div>
-                                        <span class="font-medium" x-text="key + ':'"></span>
-                                        <span x-text="formatMetadata(key, value)"></span>
-                                    </div>
-                                </template>
-                            </div>
-                        </template>
+                        <p class="text-xs text-gray-600 dark:text-gray-400 mt-1" x-text="event.description">
+                        </p>
+                        <span class="text-xs text-gray-500 dark:text-gray-500 mt-2 block"
+                            x-text="getTimeAgo(event.timestamp)">
+                        </span>
                     </div>
                 </div>
             </template>
         </div>
 
-        {{-- Load More Button --}}
-        <template x-if="events.length > displayedEvents.length">
-            <div class="text-center pt-4">
-                <button @click="loadMore()"
-                    class="px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors">
-                    Show More Events
-                </button>
-            </div>
-        </template>
-
-        {{-- Empty State --}}
-        <template x-if="events.length === 0">
-            <div class="text-center py-12">
-                <div class="text-4xl mb-4 opacity-20">📋</div>
-                <p class="text-gray-600 dark:text-gray-400">No events yet</p>
-            </div>
-        </template>
-    </div>
-
-    {{-- Feed Variant --}}
-    @elseif ($variant === 'feed')
-    <div class="space-y-3" x-data="activityTimeline({{ json_encode($events) }})">
-        <template x-for="(event, index) in displayedEvents" :key="event.id">
-            <div class="flex gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                role="article">
-                
-                {{-- Icon --}}
-                <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-lg"
-                    :class="getEventColor(event.type)">
-                    <span x-text="getEventIcon(event.type)"></span>
-                </div>
-
-                {{-- Content --}}
-                <div class="flex-1 min-w-0">
-                    <p class="font-medium text-gray-900 dark:text-white text-sm"
-                        x-text="event.title">
-                    </p>
-                    <p class="text-xs text-gray-600 dark:text-gray-400 mt-1"
-                        x-text="event.description">
-                    </p>
-                    <span class="text-xs text-gray-500 dark:text-gray-500 mt-2 block"
-                        x-text="getTimeAgo(event.timestamp)">
-                    </span>
-                </div>
-            </div>
-        </template>
-    </div>
-
-    {{-- Compact Variant --}}
+        {{-- Compact Variant --}}
     @elseif ($variant === 'compact')
-    <div class="space-y-2" x-data="activityTimeline({{ json_encode($events) }})">
-        <template x-for="(event, index) in displayedEvents.slice(0, 5)" :key="event.id">
-            <div class="flex items-center justify-between text-xs p-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded transition-colors">
-                <div class="flex items-center gap-2 flex-1 min-w-0">
-                    <span class="text-lg flex-shrink-0" x-text="getEventIcon(event.type)"></span>
-                    <span class="text-gray-900 dark:text-white font-medium truncate"
-                        x-text="event.title">
+        <div class="space-y-2" x-data="activityTimeline({{ json_encode($events) }})">
+            <template x-for="(event, index) in displayedEvents.slice(0, 5)" :key="event.id">
+                <div
+                    class="flex items-center justify-between text-xs p-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded transition-colors">
+                    <div class="flex items-center gap-2 flex-1 min-w-0">
+                        <span class="text-lg flex-shrink-0" x-text="getEventIcon(event.type)"></span>
+                        <span class="text-gray-900 dark:text-white font-medium truncate" x-text="event.title">
+                        </span>
+                    </div>
+                    <span class="text-gray-500 dark:text-gray-400 flex-shrink-0" x-text="getTimeAgo(event.timestamp)">
                     </span>
                 </div>
-                <span class="text-gray-500 dark:text-gray-400 flex-shrink-0"
-                    x-text="getTimeAgo(event.timestamp)">
-                </span>
-            </div>
-        </template>
-    </div>
+            </template>
+        </div>
     @endif
 
     {{-- Event Type Legend --}}
@@ -197,96 +192,6 @@ Accessibility: WCAG 2.2 AA compliant
     </div>
 </div>
 
-@push('scripts')
-<script>
-window.Alpine && Alpine.data('activityTimeline', function(events) {
-    return {
-        events: events || [],
-        itemsPerPage: 10,
-        currentPage: 1,
-        
-        get displayedEvents() {
-            const end = this.currentPage * this.itemsPerPage;
-            return this.events.slice(0, end);
-        },
-        
-        loadMore() {
-            this.currentPage++;
-        },
-        
-        getEventIcon(type) {
-            const icons = {
-                'race': '🏁',
-                'skill': '⚡',
-                'milestone': '🎯',
-                'achievement': '🏆'
-            };
-            return icons[type] || '📝';
-        },
-        
-        getEventColor(type) {
-            const colors = {
-                'race': 'bg-red-400 dark:bg-red-600',
-                'skill': 'bg-purple-400 dark:bg-purple-600',
-                'milestone': 'bg-blue-400 dark:bg-blue-600',
-                'achievement': 'bg-yellow-400 dark:bg-yellow-600'
-            };
-            return colors[type] || 'bg-gray-400 dark:bg-gray-600';
-        },
-        
-        getEventBadgeStyle(type) {
-            const styles = {
-                'race': 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300',
-                'skill': 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300',
-                'milestone': 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300',
-                'achievement': 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300'
-            };
-            return styles[type] || 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300';
-        },
-        
-        formatEventType(type) {
-            return type.charAt(0).toUpperCase() + type.slice(1);
-        },
-        
-        formatDate(date) {
-            return new Date(date).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric'
-            });
-        },
-        
-        getTimeAgo(date) {
-            const now = new Date();
-            const eventDate = new Date(date);
-            const seconds = Math.floor((now - eventDate) / 1000);
-            
-            const intervals = {
-                year: 31536000,
-                month: 2592000,
-                week: 604800,
-                day: 86400,
-                hour: 3600,
-                minute: 60
-            };
-            
-            for (const [key, value] of Object.entries(intervals)) {
-                const interval = Math.floor(seconds / value);
-                if (interval >= 1) {
-                    return `${interval} ${key}${interval > 1 ? 's' : ''} ago`;
-                }
-            }
-            
-            return 'Just now';
-        },
-        
-        formatMetadata(key, value) {
-            if (typeof value === 'number') {
-                return value.toLocaleString();
-            }
-            return String(value);
-        }
-    };
-});
-</script>
-@endpush
+@once
+    @vite(['resources/js/components/activity-timeline.js'])
+@endonce

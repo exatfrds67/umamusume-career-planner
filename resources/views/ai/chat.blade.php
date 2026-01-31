@@ -3,6 +3,9 @@
 @section('title', 'AI Career Assistant')
 
 @section('content')
+    {{-- Breadcrumb Navigation --}}
+    <x-breadcrumb :items="[['label' => 'AI & Tools', 'url' => route('ai.dashboard')], ['label' => 'AI Chat']]" />
+
     <div class="min-h-screen bg-gray-100 dark:bg-gray-900 py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {{-- Page Header --}}
@@ -27,12 +30,13 @@
                             </svg>
                         </div>
                         <div class="flex-1">
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ $character->name }}</h3>
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                                {{ $character->name ?? 'Character' }}</h3>
                             <div class="flex items-center gap-4 mt-1 text-sm text-gray-600 dark:text-gray-400">
-                                <span>{{ ucfirst($character->scenario_type) }}</span>
+                                <span>{{ ucfirst($character->scenario_type ?? 'unknown') }}</span>
                                 <span>•</span>
-                                <span>{{ $character->career_stage }}</span>
-                                @if ($character->relationLoaded('currentCareer') && $character->currentCareer)
+                                <span>{{ $character->career_stage ?? 'N/A' }}</span>
+                                @if (isset($character->currentCareer) && $character->currentCareer)
                                     <span>•</span>
                                     <span>Turn {{ $character->currentCareer->current_turn ?? 0 }}</span>
                                 @endif
@@ -49,7 +53,7 @@
             {{-- Main Chat Interface --}}
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden"
                 style="height: calc(100vh - 300px); min-height: 600px;">
-                <x-ai.chat-interface :character-id="$character->id ?? null" :career-id="isset($character) && $character->relationLoaded('currentCareer') && $character->currentCareer
+                <x-ai.chat-interface :character-id="$character->id ?? null" :career-id="isset($character->currentCareer) && $character->currentCareer
                     ? $character->currentCareer->id
                     : null" />
             </div>
@@ -110,16 +114,5 @@
         </div>
     </div>
 
-    @push('scripts')
-        <script>
-            function sendQuickMessage(message) {
-                // Dispatch event to chat interface
-                window.dispatchEvent(new CustomEvent('send-quick-message', {
-                    detail: {
-                        message: message
-                    }
-                }));
-            }
-        </script>
-    @endpush
+    @vite(['resources/js/pages/ai/chat.js'])
 @endsection

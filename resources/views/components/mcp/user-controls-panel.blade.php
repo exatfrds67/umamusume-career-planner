@@ -11,7 +11,7 @@
                 <div
                     class="flex items-center justify-between rounded-lg border border-gray-200 p-3 dark:border-gray-700">
                     <div class="flex items-center space-x-3">
-                        <input type="checkbox" :id="'server-' + name" x-model="server.enabled"
+                        <input type="checkbox" :id="'server-' + name" :name="'server_' + name" x-model="server.enabled"
                             @change="$dispatch('toggle-server', { serverName: name, enabled: server.enabled })"
                             class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800">
                         <label :for="'server-' + name" class="flex-1 cursor-pointer">
@@ -101,10 +101,11 @@
         <div class="space-y-4">
             <!-- Daily Budget -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Daily Budget Limit</label>
+                <label for="daily-budget-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Daily
+                    Budget Limit</label>
                 <div class="mt-1 flex items-center space-x-2">
                     <span class="text-gray-500 dark:text-gray-400">$</span>
-                    <input type="number" x-model="settings.budget.daily"
+                    <input type="number" id="daily-budget-input" name="daily_budget" x-model="settings.budget.daily"
                         @change="$dispatch('update-budget-limit', { period: 'daily', value: settings.budget.daily })"
                         step="0.01" min="0"
                         class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
@@ -113,10 +114,12 @@
 
             <!-- Monthly Budget -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Monthly Budget Limit</label>
+                <label for="monthly-budget-input"
+                    class="block text-sm font-medium text-gray-700 dark:text-gray-300">Monthly Budget Limit</label>
                 <div class="mt-1 flex items-center space-x-2">
                     <span class="text-gray-500 dark:text-gray-400">$</span>
-                    <input type="number" x-model="settings.budget.monthly"
+                    <input type="number" id="monthly-budget-input" name="monthly_budget"
+                        x-model="settings.budget.monthly"
                         @change="$dispatch('update-budget-limit', { period: 'monthly', value: settings.budget.monthly })"
                         step="0.01" min="0"
                         class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm">
@@ -125,10 +128,11 @@
 
             <!-- Budget Alert Threshold -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label for="alert-threshold-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Alert Threshold (<span x-text="settings.budget.alert_threshold"></span>%)
                 </label>
-                <input type="range" x-model="settings.budget.alert_threshold"
+                <input type="range" id="alert-threshold-input" name="alert_threshold"
+                    x-model="settings.budget.alert_threshold"
                     @change="$dispatch('update-budget-threshold', { value: settings.budget.alert_threshold })"
                     min="50" max="100" step="5" class="mt-2 w-full">
                 <div class="mt-1 flex justify-between text-xs text-gray-500 dark:text-gray-400">
@@ -151,7 +155,8 @@
                     <p class="text-xs text-gray-500 dark:text-gray-400">Automatically use AWS Bedrock when local
                         processing is slow</p>
                 </div>
-                <input type="checkbox" x-model="settings.performance.auto_fallback"
+                <input type="checkbox" id="auto-fallback-toggle" name="auto_fallback"
+                    x-model="settings.performance.auto_fallback"
                     @change="$dispatch('update-performance-setting', { key: 'auto_fallback', value: settings.performance.auto_fallback })"
                     class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800">
             </div>
@@ -163,7 +168,8 @@
                     <p class="text-xs text-gray-500 dark:text-gray-400">Run multiple agents simultaneously for faster
                         results</p>
                 </div>
-                <input type="checkbox" x-model="settings.performance.parallel_processing"
+                <input type="checkbox" id="parallel-processing-toggle" name="parallel_processing"
+                    x-model="settings.performance.parallel_processing"
                     @change="$dispatch('update-performance-setting', { key: 'parallel_processing', value: settings.performance.parallel_processing })"
                     class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800">
             </div>
@@ -175,7 +181,8 @@
                     <p class="text-xs text-gray-500 dark:text-gray-400">Cache similar requests to reduce costs and
                         improve speed</p>
                 </div>
-                <input type="checkbox" x-model="settings.performance.cache_responses"
+                <input type="checkbox" id="cache-responses-toggle" name="cache_responses"
+                    x-model="settings.performance.cache_responses"
                     @change="$dispatch('update-performance-setting', { key: 'cache_responses', value: settings.performance.cache_responses })"
                     class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800">
             </div>

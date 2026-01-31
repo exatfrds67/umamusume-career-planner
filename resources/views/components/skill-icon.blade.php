@@ -46,7 +46,7 @@ Accessibility: WCAG 2.2 AA compliant
         'md' => 'w-6 h-6 text-base',
         'lg' => 'w-8 h-8 text-lg',
     ];
-    
+
     $typeConfig = [
         'speed' => [
             'icon' => '🔴',
@@ -85,18 +85,17 @@ Accessibility: WCAG 2.2 AA compliant
             'bgColor' => 'bg-pink-100 dark:bg-pink-900/30',
         ],
     ];
-    
+
     $config = $typeConfig[$type] ?? $typeConfig['unique'];
     $sizeClass = $sizeMap[$size] ?? $sizeMap['md'];
     $interactiveClass = $interactive ? 'cursor-pointer hover:scale-110 transition-transform duration-200' : '';
 @endphp
 
-<div class="inline-flex items-center gap-1 group"
-    :title="'{{ $name ?? $config['label'] ?? 'Skill' }}'">
-    
+<div class="inline-flex items-center gap-1 group" :title="'{{ $name ?? ($config['label'] ?? 'Skill') }}'">
+
     {{-- Icon Container --}}
     <div class="flex items-center justify-center {{ $sizeClass }} {{ $config['bgColor'] }} rounded-full {{ $interactiveClass }}"
-        :aria-label="'{{ $name ?? $config['label'] ?? 'Skill' }} skill icon'">
+        :aria-label="'{{ $name ?? ($config['label'] ?? 'Skill') }} skill icon'">
         <span class="{{ $config['color'] }} font-semibold">
             {{ $config['icon'] }}
         </span>
@@ -115,17 +114,18 @@ Accessibility: WCAG 2.2 AA compliant
 
     {{-- Tooltip on Interactive --}}
     @if ($interactive && $name)
-        <div class="absolute hidden group-hover:block bg-gray-900 dark:bg-gray-700 text-white text-xs rounded px-2 py-1 whitespace-nowrap pointer-events-none z-10 bottom-full mb-2 left-1/2 transform -translate-x-1/2">
+        <div
+            class="absolute hidden group-hover:block bg-gray-900 dark:bg-gray-700 text-white text-xs rounded px-2 py-1 whitespace-nowrap pointer-events-none z-10 bottom-full mb-2 left-1/2 transform -translate-x-1/2">
             {{ $name }}
-            <div class="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>
+            <div
+                class="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900 dark:border-t-gray-700">
+            </div>
         </div>
     @endif
 </div>
 
-<style scoped>
-    @media (prefers-reduced-motion: reduce) {
-        .group:hover {
-            transform: none !important;
-        }
-    }
-</style>
+@once
+    @push('styles')
+        @vite(['resources/css/components/animations.css'])
+    @endpush
+@endonce

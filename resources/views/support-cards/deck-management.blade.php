@@ -51,7 +51,5 @@
         </div>
     </div>
 
-    @push('scripts')
-        <script src="{{ asset('js/deck-management.js') }}"></script>
-    @endpush
+    @vite(['resources/js/pages/support-cards/deck-management.js'])
 @endsection

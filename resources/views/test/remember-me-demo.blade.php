@@ -130,7 +130,8 @@
                             <div class="flex items-start">
                                 <span class="text-primary-500 mr-2">2.</span>
                                 <div>LoginRequest converts checkbox value to boolean using
-                                    <code>$this->boolean('remember')</code></div>
+                                    <code>$this->boolean('remember')</code>
+                                </div>
                             </div>
 
                             <div class="flex items-start">
@@ -185,7 +186,10 @@
             const isChecked = checkbox.checked;
 
             alert(
-                `Demo Login Simulation:\n\nEmail: demo@example.com\nPassword: [hidden]\nRemember Me: ${isChecked ? 'YES' : 'NO'}\n\nIn a real login, this would ${isChecked ? 'create a persistent session that lasts for years' : 'create a session that expires when the browser closes'}.`);
+                `Demo Login Simulation:\n\nEmail: demo@example.com\nPassword: [hidden]\nRemember Me: ${isChecked ? 'YES' : 'NO'}\n\nIn a real login, this would ${isChecked ? 'create a persistent session that lasts for years' : 'create a session that expires when the browser closes'}.`
+                );
         }
     </script>
+
+    @vite(['resources/js/pages/test/remember-me-demo.js'])
 @endsection

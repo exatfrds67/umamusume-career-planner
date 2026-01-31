@@ -638,7 +638,7 @@
                     <h3 class="text-lg font-semibold text-neutral-800 dark:text-neutral-200 mb-4">
                         Memories Grid
                     </h3>
-                    <x-memories-grid :memories="[
+                    <x-memories-grid :items="[
                         [
                             'title' => 'First Victory',
                             'description' => 'Won first race at Nakayama',

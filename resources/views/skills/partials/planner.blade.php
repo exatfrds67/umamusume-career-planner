@@ -158,7 +158,8 @@
             </div>
 
             {{-- AI Optimization Results --}}
-                <div class="bg-linear-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-lg p-6">
+            <div
+                class="bg-linear-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-lg p-6">
                 <div class="flex items-start gap-4 mb-4">
                     <div class="shrink-0">
                         <svg class="w-10 h-10 text-purple-600 dark:text-purple-400" fill="none"
@@ -309,106 +310,3 @@
         </div>
     </div>
 </div>
-
-@push('scripts')
-    <script>
-        function buildPlanner() {
-            return {
-                buildTemplates: [],
-                selectedTemplate: null,
-                aiOptimization: null,
-                savedBuilds: [],
-                loading: false,
-
-                init() {
-                    this.loadBuildTemplates();
-                    this.loadSavedBuilds();
-                },
-
-                async loadBuildTemplates() {
-                    // Load predefined build templates
-                    this.buildTemplates = [{
-                            id: 1,
-                            name: 'Speed Specialist',
-                            category: 'Sprint/Mile',
-                            description: 'Optimized for short-distance races with maximum speed focus',
-                            meta_tier: 'S+',
-                            skill_count: 8,
-                            total_sp_cost: 1200,
-                            optimized_cost: 840,
-                            potential_savings: 360,
-                            tags: ['Speed', 'Sprint', 'Meta'],
-                            skills: []
-                        },
-                        // Add more templates...
-                    ];
-                },
-
-                async loadSavedBuilds() {
-                    // Load user's saved builds
-                    this.savedBuilds = [];
-                },
-
-                selectTemplate(template) {
-                    this.selectedTemplate = template;
-                    this.aiOptimization = null;
-                },
-
-                async getAIOptimization() {
-                    this.loading = true;
-                    try {
-                        // Call AI optimization API
-                        this.aiOptimization = {
-                            summary: 'This build is highly optimized for sprint races...',
-                            efficiency_score: 92,
-                            synergy_rating: 8.5,
-                            meta_alignment: 95,
-                            recommendations: [
-                                'Consider adding "Corner Master" for better positioning',
-                                'Collect hints for "Lane Legerdemain" before acquisition'
-                            ],
-                            acquisition_order: [
-                                'Acquire "Go with the Flow" first (120 SP)',
-                                'Collect hints for evolution',
-                                'Evolve to "Lane Legerdemain" (108 SP with hints)'
-                            ]
-                        };
-                    } finally {
-                        this.loading = false;
-                    }
-                },
-
-                async applyBuild() {
-                    // Apply the selected build
-                    console.log('Applying build:', this.selectedTemplate);
-                },
-
-                async saveBuild() {
-                    // Save the current build
-                    console.log('Saving build:', this.selectedTemplate);
-                },
-
-                async exportBuild(build = null) {
-                    // Export build as JSON
-                    const buildToExport = build || this.selectedTemplate;
-                    console.log('Exporting build:', buildToExport);
-                },
-
-                async loadBuild(build) {
-                    this.selectedTemplate = build;
-                },
-
-                async deleteBuild(buildId) {
-                    if (confirm('Are you sure you want to delete this build?')) {
-                        this.savedBuilds = this.savedBuilds.filter(b => b.id !== buildId);
-                    }
-                },
-
-                createCustomBuild() {
-                    // Open custom build creator
-                    console.log('Creating custom build');
-                }
-            }
-        }
-    </script>
-@endpush

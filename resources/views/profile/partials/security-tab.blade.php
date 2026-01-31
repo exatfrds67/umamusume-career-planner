@@ -144,14 +144,14 @@
                 <div>
                     <label for="delete_confirmation"
                         class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Type <strong class="text-red-600 dark:text-red-400">{{ $user->name }}</strong> to confirm
+                        Type <strong class="text-red-600 dark:text-red-400">{{ $user?->name ?? 'your username' }}</strong> to confirm
                     </label>
                     <input type="text" name="confirmation" id="delete_confirmation" required x-model="confirmation"
-                        placeholder="{{ $user->name }}"
+                        placeholder="{{ $user?->name ?? 'your username' }}"
                         class="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                         :class="{ 'border-red-500 focus:border-red-500 focus:ring-red-500': confirmationError }">
                     <p x-show="confirmationError" x-cloak class="mt-1 text-sm text-red-600 dark:text-red-400">
-                        Account name does not match. Please type <strong>{{ $user->name }}</strong> exactly.
+                        Account name does not match. Please type <strong>{{ $user?->name ?? 'your username' }}</strong> exactly.
                     </p>
                 </div>
 
@@ -170,50 +170,6 @@
     </div>
 </div>
 
-@push('scripts')
-    <script>
-        function deleteAccountModal() {
-            return {
-                show: false,
-                password: '',
-                confirmation: '',
-                confirmationError: false,
-                expectedName: '{{ $user->name }}',
-
-                get canSubmit() {
-                    return this.password.length > 0 && this.confirmation === this.expectedName;
-                },
-
-                openModal() {
-                    this.show = true;
-                    this.password = '';
-                    this.confirmation = '';
-                    this.confirmationError = false;
-                },
-
-                closeModal() {
-                    this.show = false;
-                    this.password = '';
-                    this.confirmation = '';
-                    this.confirmationError = false;
-                },
-
-                handleSubmit(event) {
-                    if (this.confirmation !== this.expectedName) {
-                        event.preventDefault();
-                        this.confirmationError = true;
-                        return false;
-                    }
-
-                    // Show final confirmation
-                    if (!confirm('Are you absolutely sure? This action cannot be undone.')) {
-                        event.preventDefault();
-                        return false;
-                    }
-
-                    return true;
-                }
-            };
-        }
-    </script>
-@endpush
+@once
+    @vite(['resources/js/pages/profile/partials/security-tab.js'])
+@endonce

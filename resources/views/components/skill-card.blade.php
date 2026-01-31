@@ -93,24 +93,8 @@
     @endif
 </div>
 
-<style>
-    .skill-card {
-        transition: all 0.3s ease;
-    }
-
-    .skill-card:hover {
-        transform: translateY(-2px);
-    }
-
-    .skill-card:active {
-        transform: translateY(0);
-    }
-
-    /* Line clamp utility */
-    .line-clamp-2 {
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-</style>
+@once
+    @push('styles')
+        @vite(['resources/css/components/skill-card.css'])
+    @endpush
+@endonce

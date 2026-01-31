@@ -6,6 +6,14 @@
         /** @var array<string, \Illuminate\Support\Collection<int, \App\Models\Factor>> $factorsByType */
         /** @var array<string, int> $factorCounts */
     @endphp
+
+    {{-- Breadcrumb Navigation --}}
+    <x-breadcrumb :items="[
+        ['label' => 'Characters', 'url' => route('characters.index')],
+        ['label' => $character->name, 'url' => route('characters.show', $character)],
+        ['label' => 'Manage Factors'],
+    ]" />
+
     <div class="max-w-7xl mx-auto space-y-6">
         <!-- Header / Back Navigation -->
         <div class="flex items-center justify-between">
@@ -413,48 +421,5 @@
         </div>
     </div>
 
-    @push('scripts')
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const factorTypeSelect = document.getElementById('factor_type');
-                const statTypeField = document.getElementById('stat_type_field');
-                const aptitudeTypeField = document.getElementById('aptitude_type_field');
-                const uniqueSkillField = document.getElementById('unique_skill_field');
-                const normalSkillField = document.getElementById('normal_skill_field');
-
-                function toggleFields() {
-                    const selectedType = factorTypeSelect.value;
-
-                    // Hide all conditional fields
-                    statTypeField.classList.add('hidden');
-                    aptitudeTypeField.classList.add('hidden');
-                    uniqueSkillField.classList.add('hidden');
-                    normalSkillField.classList.add('hidden');
-
-                    // Show relevant field based on selection
-                    switch (selectedType) {
-                        case 'blue_stats':
-                            statTypeField.classList.remove('hidden');
-                            document.getElementById('stat_type').required = true;
-                            break;
-                        case 'red_aptitudes':
-                            aptitudeTypeField.classList.remove('hidden');
-                            document.getElementById('aptitude_type').required = true;
-                            break;
-                        case 'green_unique_skills':
-                            uniqueSkillField.classList.remove('hidden');
-                            document.getElementById('unique_skill_name').required = true;
-                            break;
-                        case 'white_normal_skills':
-                            normalSkillField.classList.remove('hidden');
-                            document.getElementById('normal_skill_name').required = true;
-                            break;
-                    }
-                }
-
-                factorTypeSelect.addEventListener('change', toggleFields);
-                toggleFields(); // Initialize on page load
-            });
-        </script>
-    @endpush
+    @vite(['resources/js/pages/characters/factors-manage.js'])
 @endsection

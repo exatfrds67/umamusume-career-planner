@@ -50,8 +50,7 @@
                 <div
                     class="absolute inset-0 bg-linear-to-br from-pink-500/20 via-purple-500/20 to-blue-500/20 animate-pulse">
                 </div>
-                <div
-                    class="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-pink-500 via-purple-500 to-blue-500">
+                <div class="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-pink-500 via-purple-500 to-blue-500">
                 </div>
             </div>
         @endif
@@ -99,29 +98,8 @@
     </div>
 </div>
 
-<style>
-    .support-card {
-        background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 1));
-    }
-
-    .dark .support-card {
-        background: linear-gradient(to bottom, rgba(38, 38, 38, 0.95), rgba(38, 38, 38, 1));
-    }
-
-    .support-card:hover {
-        transform: translateY(-4px) scale(1.02);
-    }
-
-    /* Rainbow bond animation */
-    @keyframes rainbow-pulse {
-
-        0%,
-        100% {
-            opacity: 0.3;
-        }
-
-        50% {
-            opacity: 0.6;
-        }
-    }
-</style>
+@once
+    @push('styles')
+        @vite(['resources/css/components/support-card.css'])
+    @endpush
+@endonce

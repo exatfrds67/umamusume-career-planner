@@ -3,6 +3,9 @@
 @section('title', 'OCR Screenshot Upload')
 
 @section('content')
+    {{-- Breadcrumb Navigation --}}
+    <x-breadcrumb :items="[['label' => 'AI & Tools', 'url' => route('ai.dashboard')], ['label' => 'OCR Upload']]" />
+
     <div class="container mx-auto px-4 py-8">
         <div class="max-w-6xl mx-auto">
             <!-- Header -->
@@ -35,7 +38,8 @@
                 class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label for="character-select" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <label for="character-select"
+                            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Select Character
                         </label>
                         <select id="character-select"
@@ -52,10 +56,11 @@
                             Select the character to import extracted data into.
                         </p>
                     </div>
-                    
+
                     <!-- Data Type Selector (per OCR spec requirement) -->
                     <div>
-                        <label for="data-type-select" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <label for="data-type-select"
+                            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Data Type
                         </label>
                         <select id="data-type-select"
@@ -143,7 +148,14 @@
         </div>
     </div>
 
-    @push('scripts')
-        <script src="{{ asset('js/ocr-upload.js') }}" defer></script>
-    @endpush
+    {{-- Data injection for OCR upload --}}
+    <script>
+        window.pageData = {
+            routes: {
+                status: '/api/ocr/status',
+                upload: '/api/ocr/upload'
+            }
+        };
+    </script>
+    @vite(['resources/js/pages/ocr/upload.js'])
 @endsection

@@ -62,8 +62,7 @@
                 </div>
             </div>
             <template x-if="selectedAgent === 'training'">
-                <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" fill="currentColor"
-                    viewBox="0 0 20 20">
+                <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd"
                         d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
                         clip-rule="evenodd" />
@@ -181,54 +180,7 @@
     </div>
 </div>
 
-<script>
-    function agentSelector() {
-        return {
-            selectedAgent: {{ $selectedAgent ? "'" . $selectedAgent . "'" : 'null' }},
-
-            initialize() {
-                // Load saved preference
-                this.loadPreference();
-            },
-
-            async loadPreference() {
-                try {
-                    const response = await fetch('/api/ai/chat/preferences');
-                    const data = await response.json();
-                    if (data.selected_agent) {
-                        this.selectedAgent = data.selected_agent;
-                    }
-                } catch (error) {
-                    console.error('Failed to load agent preference:', error);
-                }
-            },
-
-            async selectAgent(agent) {
-                this.selectedAgent = agent;
-
-                // Save preference
-                try {
-                    await fetch('/api/ai/chat/preferences', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                        },
-                        body: JSON.stringify({
-                            selected_agent: agent
-                        })
-                    });
-
-                    // Dispatch event to notify chat interface
-                    window.dispatchEvent(new CustomEvent('agent-changed', {
-                        detail: {
-                            agent: agent
-                        }
-                    }));
-                } catch (error) {
-                    console.error('Failed to save agent preference:', error);
-                }
-            }
-        };
-    }
-</script>
+{{-- Alpine component logic moved to resources/js/components/ai/agent-selector.js --}}
+@once
+    @vite(['resources/js/components/ai/agent-selector.js'])
+@endonce

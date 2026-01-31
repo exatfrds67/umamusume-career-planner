@@ -27,7 +27,7 @@
         $availableCardsData = $availableCards;
     @endphp
 
-    {{-- Pass data to window for the consolidated app.js component --}}
+    {{-- Pass data to window for the deck builder component --}}
     <script>
         window.deckBuilderData = {
             deck: @json($deckData),
@@ -36,8 +36,8 @@
         };
     </script>
 
-    {{-- Load Assets (deck-builder.css removed as it is now in app.css) --}}
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    {{-- Load Assets --}}
+    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/pages/support-cards/deck-builder.js'])
 
     {{-- Initialize Alpine Component --}}
     <div class="deck-builder-container space-y-6" x-data="deckBuilder()">
@@ -230,8 +230,12 @@
                         </div>
                         <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
                             <div class="h-2.5 rounded-full transition-all duration-500"
-                                :class="{ 'bg-red-500': synergyScore < 30, 'bg-yellow-500': synergyScore >= 30 && synergyScore <
-                                        70, 'bg-green-500': synergyScore >= 70 }"
+                                :class="{
+                                    'bg-red-500': synergyScore < 30,
+                                    'bg-yellow-500': synergyScore >= 30 && synergyScore <
+                                        70,
+                                    'bg-green-500': synergyScore >= 70
+                                }"
                                 :style="'width: ' + synergyScore + '%'"></div>
                         </div>
                     </div>

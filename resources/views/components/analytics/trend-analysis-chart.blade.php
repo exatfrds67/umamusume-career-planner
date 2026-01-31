@@ -82,7 +82,8 @@
         <div class="flex items-center gap-3">
             @if ($showConfidence)
                 <label class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 cursor-pointer">
-                    <input type="checkbox" x-model="displayConfidence" @change="updateChart()"
+                    <input type="checkbox" id="display-confidence-toggle" name="display_confidence"
+                        x-model="displayConfidence" @change="updateChart()"
                         class="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500">
                     <span>Confidence Interval</span>
                 </label>
@@ -90,7 +91,8 @@
 
             @if ($showPrediction)
                 <label class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 cursor-pointer">
-                    <input type="checkbox" x-model="displayPrediction" @change="updateChart()"
+                    <input type="checkbox" id="display-prediction-toggle" name="display_prediction"
+                        x-model="displayPrediction" @change="updateChart()"
                         class="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500">
                     <span>Prediction</span>
                 </label>
@@ -310,11 +312,11 @@
                     if (this.stats.trendDirection === 'up') {
                         this.insights.push(
                             `${this.metricConfig.label} is improving by approximately ${Math.abs(this.stats.trendValue)}${this.metricConfig.unit} per career.`
-                            );
+                        );
                     } else if (this.stats.trendDirection === 'down') {
                         this.insights.push(
                             `${this.metricConfig.label} is declining by approximately ${Math.abs(this.stats.trendValue)}${this.metricConfig.unit} per career.`
-                            );
+                        );
                     } else {
                         this.insights.push(
                             `${this.metricConfig.label} has remained stable across recent careers.`);
@@ -325,12 +327,12 @@
                         const diff = Math.round((this.stats.current - this.stats.average) * 10) / 10;
                         this.insights.push(
                             `Current performance is ${diff}${this.metricConfig.unit} above your average.`
-                            );
+                        );
                     } else if (this.stats.current < this.stats.average) {
                         const diff = Math.round((this.stats.average - this.stats.current) * 10) / 10;
                         this.insights.push(
                             `Current performance is ${diff}${this.metricConfig.unit} below your average.`
-                            );
+                        );
                     }
 
                     // Consistency insight
@@ -341,7 +343,7 @@
                     } else if (variance > 100) {
                         this.insights.push(
                             'Performance varies significantly between careers. Consider identifying what factors lead to better results.'
-                            );
+                        );
                     }
                 },
 
@@ -349,7 +351,7 @@
                     if (values.length < 2) return 0;
                     const mean = values.reduce((a, b) => a + b, 0) / values.length;
                     return values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values
-                    .length;
+                        .length;
                 },
 
                 createChart() {

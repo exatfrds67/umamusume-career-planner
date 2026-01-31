@@ -3,6 +3,9 @@
 @section('title', 'Your Profile')
 
 @section('content')
+    {{-- Breadcrumb Navigation --}}
+    <x-breadcrumb :items="[['label' => 'Profile']]" />
+
     <div class="space-y-6" x-data="profileManager()">
         <!-- Page Header -->
         <div class="border-b border-gray-200 dark:border-gray-700 pb-5">

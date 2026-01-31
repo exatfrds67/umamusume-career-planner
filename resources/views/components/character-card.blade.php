@@ -76,16 +76,8 @@
     </div>
 </div>
 
-<style>
-    .character-card {
-        background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 1));
-    }
-
-    .dark .character-card {
-        background: linear-gradient(to bottom, rgba(38, 38, 38, 0.95), rgba(38, 38, 38, 1));
-    }
-
-    .character-card:hover {
-        transform: translateY(-4px);
-    }
-</style>
+@once
+    @push('styles')
+        @vite(['resources/css/components/character-card.css'])
+    @endpush
+@endonce

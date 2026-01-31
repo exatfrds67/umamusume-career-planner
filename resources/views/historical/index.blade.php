@@ -3,6 +3,12 @@
 @section('title', 'Historical Tracking & Benchmarking')
 
 @section('content')
+    {{-- Breadcrumb Navigation --}}
+    <x-breadcrumb :items="[
+        ['label' => 'Analytics & Reports', 'url' => route('reports.index')],
+        ['label' => 'Historical Tracking'],
+    ]" />
+
     <div class="container mx-auto px-4 py-8">
         {{-- Page Header --}}
         <div class="mb-8">
@@ -353,28 +359,5 @@
         </div>
     </div>
 
-    @push('scripts')
-        <script>
-            async function clearHistoricalCache() {
-                try {
-                    const response = await fetch('{{ route('historical.api.clear-cache') }}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        }
-                    });
-
-                    if (response.ok) {
-                        window.location.reload();
-                    } else {
-                        alert('Failed to clear cache. Please try again.');
-                    }
-                } catch (error) {
-                    console.error('Error clearing cache:', error);
-                    alert('An error occurred. Please try again.');
-                }
-            }
-        </script>
-    @endpush
+    @vite(['resources/js/pages/historical/index.js'])
 @endsection

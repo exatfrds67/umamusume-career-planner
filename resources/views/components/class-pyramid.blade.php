@@ -42,12 +42,12 @@ Accessibility: WCAG 2.2 AA compliant
     </div>
 
     {{-- Total Fans Summary --}}
-    <div class="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-700/50">
+    <div
+        class="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-700/50">
         <div class="flex items-center justify-between">
             <div>
                 <span class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Total Fanbase</span>
-                <span class="block text-2xl font-bold text-gray-900 dark:text-white"
-                    x-text="totalFans.toLocaleString()">
+                <span class="block text-2xl font-bold text-gray-900 dark:text-white" x-text="totalFans.toLocaleString()">
                 </span>
             </div>
             <div class="text-3xl opacity-20">👥</div>
@@ -56,107 +56,101 @@ Accessibility: WCAG 2.2 AA compliant
 
     {{-- Pyramid Variant --}}
     @if ($variant === 'pyramid')
-    <div class="{{ $height }} flex flex-col justify-center items-center space-y-2"
-        x-data="classPyramid({{ json_encode($grades) }})">
-        
-        {{-- Pyramid Layers --}}
-        <template x-for="(layer, index) in sortedGrades" :key="index">
-            <div class="w-full">
-                {{-- Layer Container --}}
-                <div class="flex items-center justify-center gap-2 mb-2">
-                    {{-- Left padding for pyramid effect --}}
-                    <div :style="`width: ${(index) * 15}px`"></div>
-                    
-                    {{-- Layer bar --}}
-                    <div class="flex-1 relative">
-                        <div :class="`${layer.color} rounded-lg transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer p-3`"
-                            :style="`opacity: 1 - (index * 0.1)`"
-                            @mouseover="hoveredLayer = index"
-                            @mouseout="hoveredLayer = null"
-                            role="button"
-                            :aria-label="`${layer.grade} tier with ${layer.fans.toLocaleString()} fans`"
-                            tabindex="0">
-                            
-                            {{-- Content --}}
-                            <div class="flex items-center justify-between text-white">
-                                <span class="font-bold text-sm" x-text="layer.grade"></span>
-                                <span class="text-xs opacity-90" x-text="`${layer.fans.toLocaleString()} fans`"></span>
-                                <span class="text-xs font-semibold" 
-                                    x-text="`${Math.round((layer.fans / totalFans) * 100)}%`">
-                                </span>
+        <div class="{{ $height }} flex flex-col justify-center items-center space-y-2" x-data="classPyramid({{ json_encode($grades) }})">
+
+            {{-- Pyramid Layers --}}
+            <template x-for="(layer, index) in sortedGrades" :key="index">
+                <div class="w-full">
+                    {{-- Layer Container --}}
+                    <div class="flex items-center justify-center gap-2 mb-2">
+                        {{-- Left padding for pyramid effect --}}
+                        <div :style="`width: ${(index) * 15}px`"></div>
+
+                        {{-- Layer bar --}}
+                        <div class="flex-1 relative">
+                            <div :class="`${layer.color} rounded-lg transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer p-3`"
+                                :style="`opacity: 1 - (index * 0.1)`" @mouseover="hoveredLayer = index"
+                                @mouseout="hoveredLayer = null" role="button"
+                                :aria-label="`${layer.grade} tier with ${layer.fans.toLocaleString()} fans`"
+                                tabindex="0">
+
+                                {{-- Content --}}
+                                <div class="flex items-center justify-between text-white">
+                                    <span class="font-bold text-sm" x-text="layer.grade"></span>
+                                    <span class="text-xs opacity-90"
+                                        x-text="`${layer.fans.toLocaleString()} fans`"></span>
+                                    <span class="text-xs font-semibold"
+                                        x-text="`${Math.round((layer.fans / totalFans) * 100)}%`">
+                                    </span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    
-                    {{-- Right padding for pyramid effect --}}
-                    <div :style="`width: ${(index) * 15}px`"></div>
-                </div>
-                
-                {{-- Tooltip on hover --}}
-                <div x-show="hoveredLayer === index" 
-                    class="text-center text-xs text-gray-600 dark:text-gray-400 mb-2"
-                    x-transition>
-                    <span x-text="`Growth potential: +${(layer.fans * 0.3).toLocaleString()} fans`"></span>
-                </div>
-            </div>
-        </template>
-    </div>
 
-    {{-- Bars Variant --}}
+                        {{-- Right padding for pyramid effect --}}
+                        <div :style="`width: ${(index) * 15}px`"></div>
+                    </div>
+
+                    {{-- Tooltip on hover --}}
+                    <div x-show="hoveredLayer === index"
+                        class="text-center text-xs text-gray-600 dark:text-gray-400 mb-2" x-transition>
+                        <span x-text="`Growth potential: +${(layer.fans * 0.3).toLocaleString()} fans`"></span>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        {{-- Bars Variant --}}
     @elseif ($variant === 'bars')
-    <div class="space-y-3" x-data="classPyramid({{ json_encode($grades) }})">
-        <template x-for="(grade, index) in sortedGrades" :key="index">
-            <div class="space-y-1">
-                {{-- Grade Label --}}
-                <div class="flex items-center justify-between">
-                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300"
-                        x-text="grade.grade">
-                    </label>
-                    <span class="text-xs font-semibold text-gray-600 dark:text-gray-400"
-                        x-text="`${grade.fans.toLocaleString()} (${Math.round((grade.fans / totalFans) * 100)}%)`">
-                    </span>
-                </div>
-                
-                {{-- Progress Bar --}}
-                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
-                    <div :class="`${grade.color} h-full rounded-full transition-all duration-500`"
-                        :style="`width: ${(grade.fans / maxFans) * 100}%`">
+        <div class="space-y-3" x-data="classPyramid({{ json_encode($grades) }})">
+            <template x-for="(grade, index) in sortedGrades" :key="index">
+                <div class="space-y-1">
+                    {{-- Grade Label --}}
+                    <div class="flex items-center justify-between">
+                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300" x-text="grade.grade">
+                        </label>
+                        <span class="text-xs font-semibold text-gray-600 dark:text-gray-400"
+                            x-text="`${grade.fans.toLocaleString()} (${Math.round((grade.fans / totalFans) * 100)}%)`">
+                        </span>
+                    </div>
+
+                    {{-- Progress Bar --}}
+                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+                        <div :class="`${grade.color} h-full rounded-full transition-all duration-500`"
+                            :style="`width: ${(grade.fans / maxFans) * 100}%`">
+                        </div>
                     </div>
                 </div>
-            </div>
-        </template>
-    </div>
+            </template>
+        </div>
 
-    {{-- Cards Variant --}}
+        {{-- Cards Variant --}}
     @elseif ($variant === 'cards')
-    <div class="grid grid-cols-2 gap-3 @lg:grid-cols-3" x-data="classPyramid({{ json_encode($grades) }})">
-        <template x-for="(grade, index) in sortedGrades" :key="index">
-            <div :class="`${grade.color} rounded-lg p-4 text-white space-y-2 hover:shadow-lg transition-shadow`"
-                role="article"
-                :aria-label="`${grade.grade} tier`">
-                
-                {{-- Tier Name --}}
-                <h4 class="font-bold text-lg" x-text="grade.grade"></h4>
-                
-                {{-- Fans Count --}}
-                <div>
-                    <span class="text-xs opacity-90 block">Fanbase</span>
-                    <span class="text-xl font-bold" x-text="grade.fans.toLocaleString()"></span>
+        <div class="grid grid-cols-2 gap-3 @lg:grid-cols-3" x-data="classPyramid({{ json_encode($grades) }})">
+            <template x-for="(grade, index) in sortedGrades" :key="index">
+                <div :class="`${grade.color} rounded-lg p-4 text-white space-y-2 hover:shadow-lg transition-shadow`"
+                    role="article" :aria-label="`${grade.grade} tier`">
+
+                    {{-- Tier Name --}}
+                    <h4 class="font-bold text-lg" x-text="grade.grade"></h4>
+
+                    {{-- Fans Count --}}
+                    <div>
+                        <span class="text-xs opacity-90 block">Fanbase</span>
+                        <span class="text-xl font-bold" x-text="grade.fans.toLocaleString()"></span>
+                    </div>
+
+                    {{-- Percentage --}}
+                    <div>
+                        <span class="text-xs opacity-90 block">Share</span>
+                        <span class="text-sm font-semibold" x-text="`${Math.round((grade.fans / totalFans) * 100)}%`">
+                        </span>
+                    </div>
                 </div>
-                
-                {{-- Percentage --}}
-                <div>
-                    <span class="text-xs opacity-90 block">Share</span>
-                    <span class="text-sm font-semibold" 
-                        x-text="`${Math.round((grade.fans / totalFans) * 100)}%`">
-                    </span>
-                </div>
-            </div>
-        </template>
-    </div>
+            </template>
+        </div>
     @endif
 
-    {{-- Legend {{-- 
+    {{-- Legend {{--
     <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
         <h4 class="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-3">Grade Information</h4>
         <div class="grid grid-cols-2 gap-2 text-xs">
@@ -172,29 +166,6 @@ Accessibility: WCAG 2.2 AA compliant
     </div>
 </div>
 
-@push('scripts')
-<script>
-window.Alpine && Alpine.data('classPyramid', function(grades) {
-    return {
-        grades: grades || [],
-        hoveredLayer: null,
-        
-        get sortedGrades() {
-            return this.grades.slice().sort((a, b) => b.fans - a.fans);
-        },
-        
-        get totalFans() {
-            return this.grades.reduce((sum, g) => sum + g.fans, 0);
-        },
-        
-        get maxFans() {
-            return Math.max(...this.grades.map(g => g.fans), 1);
-        },
-        
-        get averageFans() {
-            return Math.round(this.totalFans / this.grades.length);
-        }
-    };
-});
-</script>
-@endpush
+@once
+    @vite(['resources/js/components/class-pyramid.js'])
+@endonce

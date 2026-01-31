@@ -3,6 +3,9 @@
 @section('title', 'Career Reports')
 
 @section('content')
+    {{-- Breadcrumb Navigation --}}
+    <x-breadcrumb :items="[['label' => 'Analytics & Reports', 'url' => route('reports.index')], ['label' => 'Reports']]" />
+
     <div class="container mx-auto px-4 py-8">
         {{-- Page Header --}}
         <div class="mb-8">
@@ -58,9 +61,8 @@
                                 <div
                                     class="w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center">
                                     @if ($character->avatar_url)
-                                        <img src="{{ $character->avatar_url }}" alt="{{ $character->name }}"
-                                            loading="lazy" decoding="async"
-                                            class="w-12 h-12 rounded-full object-cover">
+                                        <img src="{{ $character->avatar_url }}" alt="{{ $character->name }}" loading="lazy"
+                                            decoding="async" class="w-12 h-12 rounded-full object-cover">
                                     @else
                                         <span class="text-xl font-bold text-primary-600 dark:text-primary-400">
                                             {{ substr($character->name, 0, 1) }}

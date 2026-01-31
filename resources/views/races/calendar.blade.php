@@ -14,9 +14,7 @@ Features:
 Accessibility: WCAG 2.2 AA compliant with keyboard navigation
 --}}
 <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4">
-    <div class="max-w-6xl mx-auto space-y-8"
-        x-data="raceCarouselView()"
-        @alpine:initialized="initRaces()">
+    <div class="max-w-6xl mx-auto space-y-8" x-data="raceCarouselView()" @alpine:initialized="initRaces()">
 
         {{-- Page Header --}}
         <div class="text-center space-y-2">
@@ -27,7 +25,7 @@ Accessibility: WCAG 2.2 AA compliant with keyboard navigation
         {{-- Filters Section --}}
         <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 space-y-4">
             <h2 class="font-semibold text-gray-900 dark:text-white">Filters</h2>
-            
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {{-- Type Filter --}}
                 <div>
@@ -36,13 +34,15 @@ Accessibility: WCAG 2.2 AA compliant with keyboard navigation
                     </label>
                     <div class="flex flex-wrap gap-2">
                         <button @click="filterByType(null)"
-                            :class="!activeTypeFilter ? 'ring-2 ring-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600'"
+                            :class="!activeTypeFilter ? 'ring-2 ring-blue-500 bg-blue-50 dark:bg-blue-900/20' :
+                                'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600'"
                             class="px-3 py-2 rounded-lg text-sm font-medium transition-colors text-gray-900 dark:text-white">
                             All
                         </button>
                         <template x-for="type in raceTypes" :key="type">
                             <button @click="filterByType(type)"
-                                :class="activeTypeFilter === type ? 'ring-2 ring-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600'"
+                                :class="activeTypeFilter === type ? 'ring-2 ring-blue-500 bg-blue-50 dark:bg-blue-900/20' :
+                                    'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600'"
                                 class="px-3 py-2 rounded-lg text-sm font-medium transition-colors text-gray-900 dark:text-white capitalize"
                                 x-text="type">
                             </button>
@@ -69,13 +69,15 @@ Accessibility: WCAG 2.2 AA compliant with keyboard navigation
             <template x-if="activeTypeFilter || activeMonthFilter">
                 <div class="flex flex-wrap gap-2 pt-2">
                     <template x-if="activeTypeFilter">
-                        <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm">
+                        <span
+                            class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm">
                             <span x-text="`Type: ${activeTypeFilter}`"></span>
                             <button @click="filterByType(null)" class="hover:opacity-70">✕</button>
                         </span>
                     </template>
                     <template x-if="activeMonthFilter">
-                        <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm">
+                        <span
+                            class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm">
                             <span x-text="`Month: ${getMonthName(activeMonthFilter)}`"></span>
                             <button @click="filterByMonth('')" class="hover:opacity-70">✕</button>
                         </span>
@@ -100,15 +102,16 @@ Accessibility: WCAG 2.2 AA compliant with keyboard navigation
 
             {{-- Main Race Card --}}
             <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden"
-                @touchstart="handleTouchStart($event)"
-                @touchend="handleTouchEnd($event)">
-                
+                @touchstart="handleTouchStart($event)" @touchend="handleTouchEnd($event)">
+
                 {{-- Race Header --}}
                 <div class="bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-white space-y-2">
                     <div class="flex items-start justify-between">
                         <div>
                             <h3 class="text-2xl font-bold" x-text="currentRace?.name || 'No races available'"></h3>
-                            <p class="text-blue-100 text-sm mt-1" x-text="currentRace ? getMonthName(currentRace.month) + ' - ' + getRaceTypeLabel(currentRace.type) : ''"></p>
+                            <p class="text-blue-100 text-sm mt-1"
+                                x-text="currentRace ? getMonthName(currentRace.month) + ' - ' + getRaceTypeLabel(currentRace.type) : ''">
+                            </p>
                         </div>
                         <div class="text-right">
                             <span class="inline-block px-3 py-1 rounded-full bg-white/20 text-sm font-semibold"
@@ -172,7 +175,8 @@ Accessibility: WCAG 2.2 AA compliant with keyboard navigation
                                 <h4 class="font-semibold text-gray-900 dark:text-white text-sm">Events</h4>
                                 <div class="space-y-1">
                                     <template x-for="event in currentRace.events.slice(0, 3)" :key="event">
-                                        <p class="text-sm text-gray-600 dark:text-gray-400">• <span x-text="event"></span></p>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400">• <span
+                                                x-text="event"></span></p>
                                     </template>
                                 </div>
                             </div>
@@ -203,8 +207,7 @@ Accessibility: WCAG 2.2 AA compliant with keyboard navigation
 
             {{-- Navigation Controls --}}
             <div class="flex items-center justify-between gap-4">
-                <button @click="prevRace()"
-                    :disabled="!canGoBackward"
+                <button @click="prevRace()" :disabled="!canGoBackward"
                     :class="!canGoBackward ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-200 dark:hover:bg-gray-700'"
                     class="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-900 dark:text-white transition-colors"
                     aria-label="Previous race">
@@ -220,15 +223,13 @@ Accessibility: WCAG 2.2 AA compliant with keyboard navigation
                             <p class="text-xs font-semibold text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white line-clamp-1"
                                 x-text="race.name">
                             </p>
-                            <p class="text-xs text-gray-500 dark:text-gray-500 mt-1"
-                                x-text="race.grade">
+                            <p class="text-xs text-gray-500 dark:text-gray-500 mt-1" x-text="race.grade">
                             </p>
                         </button>
                     </template>
                 </div>
 
-                <button @click="nextRace()"
-                    :disabled="!canGoForward"
+                <button @click="nextRace()" :disabled="!canGoForward"
                     :class="!canGoForward ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-200 dark:hover:bg-gray-700'"
                     class="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-900 dark:text-white transition-colors"
                     aria-label="Next race">
@@ -244,168 +245,11 @@ Accessibility: WCAG 2.2 AA compliant with keyboard navigation
     </div>
 </div>
 
-@push('scripts')
+{{-- Inject race data for JavaScript --}}
 <script>
-window.Alpine && Alpine.data('raceCarouselView', function() {
-    return {
-        races: [],
-        currentRaceIndex: 0,
-        activeTypeFilter: null,
-        activeMonthFilter: null,
-        touchStartX: 0,
-        touchEndX: 0,
-        
-        raceTypes: ['turf', 'dirt', 'short', 'mile', 'medium', 'long'],
-        months: [
-            { num: 1, name: 'January' },
-            { num: 2, name: 'February' },
-            { num: 3, name: 'March' },
-            { num: 4, name: 'April' },
-            { num: 5, name: 'May' },
-            { num: 6, name: 'June' },
-            { num: 7, name: 'July' },
-            { num: 8, name: 'August' },
-            { num: 9, name: 'September' },
-            { num: 10, name: 'October' },
-            { num: 11, name: 'November' },
-            { num: 12, name: 'December' }
-        ],
-        
-        get currentRace() {
-            return this.filteredRaces[this.currentRaceIndex] || null;
-        },
-        
-        get filteredRaces() {
-            let filtered = this.races;
-            if (this.activeTypeFilter) {
-                filtered = filtered.filter(r => r.type === this.activeTypeFilter);
-            }
-            if (this.activeMonthFilter) {
-                filtered = filtered.filter(r => r.month === parseInt(this.activeMonthFilter));
-            }
-            return filtered;
-        },
-        
-        get canGoForward() {
-            return this.currentRaceIndex < this.filteredRaces.length - 1;
-        },
-        
-        get canGoBackward() {
-            return this.currentRaceIndex > 0;
-        },
-        
-        get raceProgress() {
-            return this.filteredRaces.length > 0 ? ((this.currentRaceIndex + 1) / this.filteredRaces.length) * 100 : 0;
-        },
-        
-        get upcomingRaces() {
-            return this.filteredRaces.slice(this.currentRaceIndex, this.currentRaceIndex + 4);
-        },
-        
-        initRaces() {
-            // Load races from server or initialize with sample data
-            this.races = @json($races ?? []);
-        },
-        
-        nextRace() {
-            if (this.canGoForward) {
-                this.currentRaceIndex++;
-                this.$dispatch('race-changed', { race: this.currentRace });
-            }
-        },
-        
-        prevRace() {
-            if (this.canGoBackward) {
-                this.currentRaceIndex--;
-                this.$dispatch('race-changed', { race: this.currentRace });
-            }
-        },
-        
-        goToRace(index) {
-            if (index >= 0 && index < this.filteredRaces.length) {
-                this.currentRaceIndex = index;
-                this.$dispatch('race-changed', { race: this.currentRace });
-            }
-        },
-        
-        selectRace(raceId) {
-            this.$dispatch('race-selected', { raceId });
-            // Navigation to race details or planning page
-        },
-        
-        saveRaceNote(raceId) {
-            // Save race selection or note
-            alert('Race saved: ' + raceId);
-        },
-        
-        filterByType(type) {
-            this.activeTypeFilter = this.activeTypeFilter === type ? null : type;
-            this.currentRaceIndex = 0;
-            this.$dispatch('filter-changed', { type: this.activeTypeFilter });
-        },
-        
-        filterByMonth(month) {
-            this.activeMonthFilter = month;
-            this.currentRaceIndex = 0;
-            this.$dispatch('month-filter-changed', { month: this.activeMonthFilter });
-        },
-        
-        getMonthName(monthNum) {
-            return this.months.find(m => m.num === parseInt(monthNum))?.name || '';
-        },
-        
-        getRaceTypeLabel(type) {
-            const labels = {
-                'turf': 'Turf Race',
-                'dirt': 'Dirt Race',
-                'short': 'Short Distance',
-                'mile': 'Mile Race',
-                'medium': 'Medium Distance',
-                'long': 'Long Distance'
-            };
-            return labels[type] || type;
-        },
-        
-        getRaceStatusIcon(status) {
-            const icons = {
-                'completed': '✅',
-                'upcoming': '🔜',
-                'current': '🏃'
-            };
-            return icons[status] || '❓';
-        },
-        
-        getRaceStatusMessage(status) {
-            const messages = {
-                'completed': 'Already completed in career',
-                'upcoming': 'Not yet encountered',
-                'current': 'Available in current turn'
-            };
-            return messages[status] || '';
-        },
-        
-        getRaceDescription(race) {
-            if (!race) return '';
-            return `${race.grade} race on ${race.type} surface. Prize pool attracts ${race.fanCount.toLocaleString()} fans.`;
-        },
-        
-        handleTouchStart(e) {
-            this.touchStartX = e.changedTouches[0].screenX;
-        },
-        
-        handleTouchEnd(e) {
-            this.touchEndX = e.changedTouches[0].screenX;
-            const diff = this.touchStartX - this.touchEndX;
-            
-            if (Math.abs(diff) > 50) {
-                if (diff > 0) {
-                    this.nextRace();
-                } else {
-                    this.prevRace();
-                }
-            }
-        }
+    window.raceCalendarData = {
+        races: @json($races ?? [])
     };
-});
 </script>
-@endpush
+
+@vite(['resources/js/pages/races/calendar.js'])

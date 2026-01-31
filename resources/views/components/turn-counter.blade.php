@@ -95,18 +95,8 @@
     @endif
 </div>
 
-<style>
-    @keyframes shimmer {
-        0% {
-            transform: translateX(-100%);
-        }
-
-        100% {
-            transform: translateX(100%);
-        }
-    }
-
-    .animate-shimmer {
-        animation: shimmer 2s infinite;
-    }
-</style>
+@once
+    @push('styles')
+        @vite(['resources/css/components/turn-counter.css'])
+    @endpush
+@endonce

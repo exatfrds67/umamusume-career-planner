@@ -1,6 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
+    {{-- Breadcrumb Navigation --}}
+    <x-breadcrumb :items="[['label' => 'Support Cards']]" />
+
     <div class="space-y-6" x-data="supportCardManager()">
         <!-- Header -->
         <header class="sm:flex sm:items-center sm:justify-between">
@@ -30,7 +33,8 @@
         </div>
 
         <!-- Filters -->
-        <aside class="card bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700" aria-label="Filters">
+        <aside class="card bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700"
+            aria-label="Filters">
             <h2 class="sr-only">Collection Filters</h2>
             <form method="GET" action="{{ route('support-cards.index') }}" class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
@@ -100,7 +104,7 @@
                             @endforeach
                         </select>
                     </div>
-                    
+
                     <!-- Bond Level (WF-010 requirement) -->
                     <div class="md:col-span-1">
                         <label for="bond_level" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -115,7 +119,7 @@
                             <option value="low" {{ request('bond_level') === 'low' ? 'selected' : '' }}>&lt;50</option>
                         </select>
                     </div>
-                    
+
                     <!-- Limit Break (WF-010 requirement) -->
                     <div class="md:col-span-1">
                         <label for="limit_break" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -131,7 +135,7 @@
                             <option value="0" {{ request('limit_break') === '0' ? 'selected' : '' }}>0★</option>
                         </select>
                     </div>
-                    
+
                     <!-- Sort (WF-010 requirement) -->
                     <div class="md:col-span-1">
                         <label for="sort" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -169,10 +173,11 @@
                 </div>
             </form>
         </aside>
-        
+
         <!-- Collection Stats Widget (WF-010 requirement) -->
         <!-- Collection Stats Widget -->
-        <aside class="card bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700" aria-labelledby="stats-heading">
+        <aside class="card bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700"
+            aria-labelledby="stats-heading">
             <h2 id="stats-heading" class="sr-only">Collection Statistics</h2>
             <div class="flex flex-wrap items-center justify-between gap-4">
                 <div class="flex items-center gap-6">
@@ -187,7 +192,8 @@
                         @endphp
                         @foreach (['SSR' => 'text-yellow-500', 'SR' => 'text-purple-500', 'R' => 'text-blue-500'] as $r => $color)
                             <div class="text-center">
-                                <div class="text-lg font-semibold {{ $color }}">{{ $rarityCounts->get($r, 0) }}</div>
+                                <div class="text-lg font-semibold {{ $color }}">{{ $rarityCounts->get($r, 0) }}
+                                </div>
                                 <div class="text-xs text-gray-500 dark:text-gray-400">{{ $r }}</div>
                             </div>
                         @endforeach
@@ -204,13 +210,15 @@
                         @endforeach
                     </div>
                 </div>
-                @if(auth()->check())
-                <a href="{{ route('characters.index') }}" class="btn btn-primary flex items-center gap-2" title="Select a character to build a deck">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                    </svg>
-                    Build Deck
-                </a>
+                @if (auth()->check())
+                    <a href="{{ route('characters.index') }}" class="btn btn-primary flex items-center gap-2"
+                        title="Select a character to build a deck">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                            aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Build Deck
+                    </a>
                 @endif
             </div>
         </aside>
@@ -230,7 +238,8 @@
             @else
                 <div
                     class="text-center py-12 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                     </svg>
@@ -242,147 +251,4 @@
             @endif
         </section>
     </div>
-
-    <script>
-        function supportCardManager() {
-            return {
-                showExternalImport: false,
-
-                // External API state
-                externalCards: [],
-                externalLoading: false,
-                externalError: null,
-                externalFilters: {
-                    rarity: '',
-                    importStatus: ''
-                },
-                importedCards: new Set(),
-
-                init() {
-                    // Load external cards when panel opens
-                    this.$watch('showExternalImport', value => {
-                        if (value && this.externalCards.length === 0) {
-                            this.loadExternalCards();
-                        }
-                    });
-                },
-
-                async loadExternalCards() {
-                    this.externalLoading = true;
-                    this.externalError = null;
-
-                    try {
-                        const response = await fetch('/api/external/support-cards', {
-                            headers: {
-                                'Accept': 'application/json',
-                                'X-Requested-With': 'XMLHttpRequest'
-                            }
-                        });
-
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-
-                        const data = await response.json();
-
-                        if (data.success) {
-                            this.externalCards = data.data || [];
-                        } else {
-                            throw new Error(data.message || 'Failed to fetch support cards');
-                        }
-                    } catch (error) {
-                        console.error('External API error:', error);
-                        this.externalError = error.message || 'Failed to load external support cards';
-                    } finally {
-                        this.externalLoading = false;
-                    }
-                },
-
-                async importCard(card) {
-                    if (this.importedCards.has(card.id)) {
-                        return; // Already imported
-                    }
-
-                    try {
-                        // Construct image URL from card ID (gametora.com pattern)
-                        const imageUrl = card.id ?
-                            `https://gametora.com/images/umamusume/supports/tex_support_card_${card.id}.png` :
-                            null;
-
-                        const response = await fetch('/api/support-cards/import-external', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json',
-                                'X-Requested-With': 'XMLHttpRequest',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                            },
-                            body: JSON.stringify({
-                                external_id: card.id,
-                                title_en: card.title_en || card.name,
-                                chara_id: card.chara_id,
-                                gametora: card.gametora,
-                                rarity: card.rarity,
-                                image_url: imageUrl,
-                                source: 'umapyoi.net'
-                            })
-                        });
-
-                        const result = await response.json();
-
-                        if (result.success) {
-                            this.importedCards.add(card.id);
-
-                            // Show success notification
-                            this.showNotification('success', result.message || 'Card imported successfully!');
-
-                            // Reload page after a short delay to show the new card
-                            setTimeout(() => {
-                                window.location.reload();
-                            }, 1500);
-                        } else {
-                            throw new Error(result.message || 'Import failed');
-                        }
-                    } catch (error) {
-                        console.error('Import error:', error);
-                        this.showNotification('error', error.message || 'Failed to import card');
-                    }
-                },
-
-                isImported(cardId) {
-                    return this.importedCards.has(cardId);
-                },
-
-                filteredExternalCards() {
-                    let filtered = this.externalCards;
-
-                    if (this.externalFilters.rarity) {
-                        filtered = filtered.filter(card => card.rarity === this.externalFilters.rarity);
-                    }
-
-                    if (this.externalFilters.importStatus === 'imported') {
-                        filtered = filtered.filter(card => this.isImported(card.id));
-                    } else if (this.externalFilters.importStatus === 'not_imported') {
-                        filtered = filtered.filter(card => !this.isImported(card.id));
-                    }
-
-                    return filtered;
-                },
-
-                showNotification(type, message) {
-                    // Simple notification - you can enhance this with a toast library
-                    const color = type === 'success' ? 'green' : 'red';
-                    const notification = document.createElement('div');
-                    notification.className =
-                        `fixed top-4 right-4 bg-${color}-100 border border-${color}-400 text-${color}-700 px-4 py-3 rounded shadow-lg z-50`;
-                    notification.textContent = message;
-                    document.body.appendChild(notification);
-
-                    setTimeout(() => {
-                        notification.remove();
-                    }, 3000);
-                }
-            }
-        }
-    </script>
 @endsection

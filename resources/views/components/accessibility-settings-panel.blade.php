@@ -99,10 +99,10 @@
             <div class="accessibility-settings-body">
                 <!-- Text Size Control -->
                 <div class="accessibility-setting-group">
-                    <label class="accessibility-setting-label" for="text-size-control">
+                    <span id="text-size-label" class="accessibility-setting-label">
                         Text Size
-                    </label>
-                    <div class="accessibility-setting-controls">
+                    </span>
+                    <div class="accessibility-setting-controls" role="group" aria-labelledby="text-size-label">
                         <button @click="updateTextSize(-10)" class="btn btn-secondary btn-sm"
                             aria-label="Decrease text size" :disabled="textSize <= 80">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -127,12 +127,13 @@
 
                 <!-- High Contrast Mode -->
                 <div class="accessibility-setting-group">
-                    <label class="accessibility-setting-label">
+                    <span id="high-contrast-label" class="accessibility-setting-label">
                         High Contrast Mode
-                    </label>
+                    </span>
                     <label class="accessibility-toggle">
-                        <input type="checkbox" x-model="highContrast" @change="toggleHighContrast()"
-                            class="accessibility-toggle-input" aria-describedby="high-contrast-help">
+                        <input type="checkbox" id="high-contrast-toggle" name="high_contrast" x-model="highContrast"
+                            @change="toggleHighContrast()" class="accessibility-toggle-input"
+                            aria-labelledby="high-contrast-label" aria-describedby="high-contrast-help">
                         <span class="accessibility-toggle-slider"></span>
                         <span class="accessibility-toggle-label">
                             <span x-text="highContrast ? 'Enabled' : 'Disabled'"></span>
@@ -145,12 +146,13 @@
 
                 <!-- Reduced Motion -->
                 <div class="accessibility-setting-group">
-                    <label class="accessibility-setting-label">
+                    <span id="reduced-motion-label" class="accessibility-setting-label">
                         Reduced Motion
-                    </label>
+                    </span>
                     <label class="accessibility-toggle">
-                        <input type="checkbox" x-model="reducedMotion" @change="toggleReducedMotion()"
-                            class="accessibility-toggle-input" aria-describedby="reduced-motion-help">
+                        <input type="checkbox" id="reduced-motion-toggle" name="reduced_motion" x-model="reducedMotion"
+                            @change="toggleReducedMotion()" class="accessibility-toggle-input"
+                            aria-labelledby="reduced-motion-label" aria-describedby="reduced-motion-help">
                         <span class="accessibility-toggle-slider"></span>
                         <span class="accessibility-toggle-label">
                             <span x-text="reducedMotion ? 'Enabled' : 'Disabled'"></span>
@@ -163,12 +165,13 @@
 
                 <!-- Keyboard Navigation Enhancement -->
                 <div class="accessibility-setting-group">
-                    <label class="accessibility-setting-label">
+                    <span id="keyboard-nav-label" class="accessibility-setting-label">
                         Enhanced Keyboard Navigation
-                    </label>
+                    </span>
                     <label class="accessibility-toggle">
-                        <input type="checkbox" x-model="keyboardNav" @change="toggleKeyboardNav()"
-                            class="accessibility-toggle-input" aria-describedby="keyboard-nav-help">
+                        <input type="checkbox" id="keyboard-nav-toggle" name="keyboard_nav" x-model="keyboardNav"
+                            @change="toggleKeyboardNav()" class="accessibility-toggle-input"
+                            aria-labelledby="keyboard-nav-label" aria-describedby="keyboard-nav-help">
                         <span class="accessibility-toggle-slider"></span>
                         <span class="accessibility-toggle-label">
                             <span x-text="keyboardNav ? 'Enabled' : 'Disabled'"></span>
@@ -181,9 +184,9 @@
 
                 <!-- Keyboard Shortcuts Info -->
                 <div class="accessibility-setting-group">
-                    <label class="accessibility-setting-label">
+                    <span class="accessibility-setting-label">
                         Keyboard Shortcuts
-                    </label>
+                    </span>
                     <div class="accessibility-setting-help">
                         <p>Available keyboard shortcuts:</p>
                         <ul>

@@ -42,7 +42,8 @@
             {{-- Energy Fill --}}
             <div class="{{ $getProgressColorClasses() }} h-full rounded-full transition-all duration-500 ease-out relative"
                 style="width: {{ $value }}%" role="progressbar" aria-valuenow="{{ $value }}"
-                aria-valuemin="0" aria-valuemax="100" aria-label="Energy: {{ $value }}%" aria-labelledby="energy-label">
+                aria-valuemin="0" aria-valuemax="100" aria-label="Energy: {{ $value }}%"
+                aria-labelledby="energy-label">
                 {{-- Shimmer Effect for High Energy --}}
                 @if ($getStatus() === 'high')
                     <div
@@ -73,18 +74,8 @@
     </div>
 </div>
 
-<style>
-    @keyframes shimmer {
-        0% {
-            transform: translateX(-100%);
-        }
-
-        100% {
-            transform: translateX(100%);
-        }
-    }
-
-    .animate-shimmer {
-        animation: shimmer 2s infinite;
-    }
-</style>
+@once
+    @push('styles')
+        @vite(['resources/css/components/gauges.css'])
+    @endpush
+@endonce

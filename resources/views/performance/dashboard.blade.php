@@ -3,6 +3,12 @@
 @section('title', 'Performance Dashboard - APM')
 
 @section('content')
+    {{-- Breadcrumb Navigation --}}
+    <x-breadcrumb :items="[
+        ['label' => 'Analytics & Reports', 'url' => route('reports.index')],
+        ['label' => 'Performance Dashboard'],
+    ]" />
+
     <div class="min-h-screen bg-gray-100 dark:bg-gray-900" x-data="apmDashboard()">
         {{-- Header --}}
         <header class="bg-white dark:bg-gray-800 shadow">
@@ -29,11 +35,11 @@
                                 <option value="24h">24 hours</option>
                             </select>
                         </div>
-                        
+
                         <!-- Live Polling Toggle (SPEC-008) -->
                         <div class="flex items-center gap-2">
                             <span class="text-sm text-gray-500 dark:text-gray-400">Live:</span>
-                            <button @click="togglePolling()" 
+                            <button @click="togglePolling()"
                                 :class="isPolling ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'"
                                 class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                                 role="switch" :aria-checked="isPolling">
@@ -42,13 +48,14 @@
                             </button>
                             <span x-show="isPolling" class="text-xs text-green-500 flex items-center gap-1">
                                 <span class="relative flex h-2 w-2">
-                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                    <span
+                                        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                                     <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                                 </span>
                                 <span x-text="pollInterval/1000 + 's'"></span>
                             </span>
                         </div>
-                        
+
                         <!-- Polling Interval Selector -->
                         <div x-show="isPolling" class="flex items-center gap-2">
                             <label for="poll-interval" class="text-sm text-gray-500 dark:text-gray-400">Interval:</label>
@@ -60,13 +67,14 @@
                                 <option value="60000">60s</option>
                             </select>
                         </div>
-                        
+
                         <span class="text-sm text-gray-500 dark:text-gray-400">
                             Last updated: <span id="last-updated" x-text="lastUpdated">{{ now()->format('H:i:s') }}</span>
                         </span>
                         <button @click="refreshDashboard()" :disabled="isLoading"
                             class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50">
-                            <svg class="w-4 h-4 mr-2" :class="{ 'animate-spin': isLoading }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 mr-2" :class="{ 'animate-spin': isLoading }" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                             </svg>
@@ -204,7 +212,8 @@
                             </div>
                             <div class="ml-5 w-0 flex-1">
                                 <dl>
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Cache Hit Rate
+                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Cache Hit
+                                        Rate
                                     </dt>
                                     <dd
                                         class="text-lg font-semibold {{ $data['overview']['cache_hit_rate'] < 70 ? 'text-yellow-500' : 'text-gray-900 dark:text-white' }}">
@@ -467,156 +476,12 @@
         </main>
     </div>
 
-    @push('scripts')
-        <script>
-            function apmDashboard() {
-                return {
-                    isPolling: false,
-                    pollInterval: 10000,
-                    pollTimer: null,
-                    isLoading: false,
-                    lastUpdated: '{{ now()->format('H:i:s') }}',
-                    timeWindow: '15m',
-                    
-                    init() {
-                        // Update clock every second
-                        setInterval(() => {
-                            if (!this.isLoading) {
-                                // Only update if not actively refreshing
-                            }
-                        }, 1000);
-                        
-                        // Restore polling state from localStorage
-                        const savedPolling = localStorage.getItem('apm_polling');
-                        const savedInterval = localStorage.getItem('apm_poll_interval');
-                        const savedWindow = localStorage.getItem('apm_time_window');
-                        
-                        if (savedPolling === 'true') {
-                            this.isPolling = true;
-                        }
-                        if (savedInterval) {
-                            this.pollInterval = parseInt(savedInterval);
-                        }
-                        if (savedWindow) {
-                            this.timeWindow = savedWindow;
-                        }
-                        
-                        // Start polling if was enabled
-                        if (this.isPolling) {
-                            this.startPolling();
-                        }
-                    },
-                    
-                    togglePolling() {
-                        this.isPolling = !this.isPolling;
-                        localStorage.setItem('apm_polling', this.isPolling);
-                        
-                        if (this.isPolling) {
-                            this.startPolling();
-                        } else {
-                            this.stopPolling();
-                        }
-                    },
-                    
-                    startPolling() {
-                        this.stopPolling(); // Clear any existing timer
-                        this.pollTimer = setInterval(() => {
-                            this.refreshDashboard();
-                        }, this.pollInterval);
-                    },
-                    
-                    stopPolling() {
-                        if (this.pollTimer) {
-                            clearInterval(this.pollTimer);
-                            this.pollTimer = null;
-                        }
-                    },
-                    
-                    restartPolling() {
-                        localStorage.setItem('apm_poll_interval', this.pollInterval);
-                        if (this.isPolling) {
-                            this.startPolling();
-                        }
-                    },
-                    
-                    async refreshDashboard() {
-                        if (this.isLoading) return;
-                        
-                        this.isLoading = true;
-                        localStorage.setItem('apm_time_window', this.timeWindow);
-                        
-                        try {
-                            const response = await fetch(`/api/performance/apm/dashboard?window=${this.timeWindow}`, {
-                                headers: {
-                                    'Accept': 'application/json',
-                                    'X-Requested-With': 'XMLHttpRequest'
-                                }
-                            });
-                            
-                            if (!response.ok) throw new Error('Failed to fetch');
-                            
-                            const data = await response.json();
-                            
-                            // Update health score
-                            this.updateHealthScore(data.health_score);
-                            
-                            // Update last updated time
-                            this.lastUpdated = new Date().toLocaleTimeString();
-                            
-                            // Dispatch event for other components to react
-                            window.dispatchEvent(new CustomEvent('apm-refresh', { detail: data }));
-                            
-                        } catch (error) {
-                            console.error('APM refresh error:', error);
-                            window.dispatchEvent(new CustomEvent('toast', {
-                                detail: { type: 'error', message: 'Failed to refresh dashboard data' }
-                            }));
-                        } finally {
-                            this.isLoading = false;
-                        }
-                    },
-                    
-                    updateHealthScore(healthScore) {
-                        if (!healthScore) return;
-                        
-                        const scoreEl = document.getElementById('health-score');
-                        const statusEl = document.getElementById('health-status');
-                        
-                        if (scoreEl) {
-                            scoreEl.textContent = healthScore.score;
-                            scoreEl.className = `text-5xl font-bold ${this.getStatusColor(healthScore.status)}`;
-                        }
-                        
-                        if (statusEl) {
-                            statusEl.textContent = healthScore.status;
-                            statusEl.className = `text-sm font-medium uppercase ${this.getStatusColor(healthScore.status)}`;
-                        }
-                    },
-                    
-                    getStatusColor(status) {
-                        switch (status) {
-                            case 'excellent': return 'text-green-500';
-                            case 'good': return 'text-blue-500';
-                            case 'fair': return 'text-yellow-500';
-                            default: return 'text-red-500';
-                        }
-                    },
-                    
-                    destroy() {
-                        this.stopPolling();
-                    }
-                };
-            }
-            
-            // Legacy support for non-Alpine refresh button
-            window.refreshDashboard = function() {
-                const alpineComponent = document.querySelector('[x-data="apmDashboard()"]');
-                if (alpineComponent && alpineComponent.__x) {
-                    alpineComponent.__x.$data.refreshDashboard();
-                } else {
-                    window.location.reload();
-                }
-            };
-        </script>
-    @endpush
+    {{-- Inject data for JavaScript --}}
+    <script>
+        window.apmDashboardData = {
+            lastUpdated: '{{ now()->format('H:i:s') }}'
+        };
+    </script>
+
+    @vite(['resources/js/pages/performance/dashboard.js'])
 @endsection

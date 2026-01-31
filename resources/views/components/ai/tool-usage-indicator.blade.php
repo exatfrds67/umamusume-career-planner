@@ -44,29 +44,6 @@
     </div>
 </div>
 
-<script>
-    function toolUsageIndicator() {
-        return {
-            activeTools: [],
-
-            initialize() {
-                this.fetchToolUsage();
-                // Poll for updates every second
-                setInterval(() => this.fetchToolUsage(), 1000);
-            },
-
-            async fetchToolUsage() {
-                try {
-                    const response = await fetch('/api/ai/chat/tool-usage');
-                    const data = await response.json();
-
-                    if (data.tools) {
-                        this.activeTools = data.tools;
-                    }
-                } catch (error) {
-                    console.error('Failed to fetch tool usage:', error);
-                }
-            }
-        };
-    }
-</script>
+@once
+    @vite(['resources/js/components/ai/tool-usage-indicator.js'])
+@endonce
