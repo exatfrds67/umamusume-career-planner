@@ -211,6 +211,48 @@ Route::middleware('auth')->group(function () {
     Route::get('/settings', fn () => view('settings.index'))->name('settings.index');
 });
 
+// Admin routes (requires authentication and admin privileges)
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    // User management
+    Route::get('/users', [App\Http\Controllers\Admin\UserController::class, 'index'])->name('users.index');
+    Route::get('/users/{user}/edit', [App\Http\Controllers\Admin\UserController::class, 'edit'])->name('users.edit');
+    Route::put('/users/{user}', [App\Http\Controllers\Admin\UserController::class, 'update'])->name('users.update');
+    Route::post('/users/{user}/toggle-admin', [App\Http\Controllers\Admin\UserController::class, 'toggleAdmin'])->name('users.toggle-admin');
+    Route::delete('/users/{user}', [App\Http\Controllers\Admin\UserController::class, 'destroy'])->name('users.destroy');
+
+    // System settings
+    Route::get('/system-settings', [App\Http\Controllers\Admin\SystemSettingsController::class, 'index'])->name('system-settings.index');
+    Route::post('/system-settings/clear-cache', [App\Http\Controllers\Admin\SystemSettingsController::class, 'clearCache'])->name('system-settings.clear-cache');
+    Route::post('/system-settings/optimize', [App\Http\Controllers\Admin\SystemSettingsController::class, 'optimize'])->name('system-settings.optimize');
+    Route::post('/system-settings/clear-optimization', [App\Http\Controllers\Admin\SystemSettingsController::class, 'clearOptimization'])->name('system-settings.clear-optimization');
+
+    // Logs
+    Route::get('/logs', [App\Http\Controllers\Admin\LogController::class, 'index'])->name('logs.index');
+    Route::get('/logs/download', [App\Http\Controllers\Admin\LogController::class, 'download'])->name('logs.download');
+    Route::post('/logs/clear', [App\Http\Controllers\Admin\LogController::class, 'clear'])->name('logs.clear');
+
+    // Database maintenance
+    Route::get('/database/maintenance', [App\Http\Controllers\Admin\DatabaseController::class, 'maintenance'])->name('database.maintenance');
+    Route::post('/database/optimize', [App\Http\Controllers\Admin\DatabaseController::class, 'optimize'])->name('database.optimize');
+    Route::post('/database/backup', [App\Http\Controllers\Admin\DatabaseController::class, 'backup'])->name('database.backup');
+    Route::get('/database/backup/{filename}', [App\Http\Controllers\Admin\DatabaseController::class, 'downloadBackup'])->name('database.backup.download');
+    Route::post('/database/migrate', [App\Http\Controllers\Admin\DatabaseController::class, 'migrate'])->name('database.migrate');
+    Route::post('/database/fresh', [App\Http\Controllers\Admin\DatabaseController::class, 'fresh'])->name('database.fresh');
+
+    // Database seeders
+    Route::get('/database/seeders', [App\Http\Controllers\Admin\DatabaseController::class, 'seeders'])->name('database.seeders');
+    Route::post('/database/seeders/run', [App\Http\Controllers\Admin\DatabaseController::class, 'runSeeder'])->name('database.seeders.run');
+    Route::post('/database/seeders/all', [App\Http\Controllers\Admin\DatabaseController::class, 'seedAll'])->name('database.seeders.all');
+
+    // Queue monitor
+    Route::get('/queue-monitor', [App\Http\Controllers\Admin\QueueController::class, 'index'])->name('queue.index');
+    Route::post('/queue/{id}/retry', [App\Http\Controllers\Admin\QueueController::class, 'retry'])->name('queue.retry');
+    Route::post('/queue/retry-all', [App\Http\Controllers\Admin\QueueController::class, 'retryAll'])->name('queue.retry-all');
+    Route::delete('/queue/{id}', [App\Http\Controllers\Admin\QueueController::class, 'delete'])->name('queue.delete');
+    Route::post('/queue/flush', [App\Http\Controllers\Admin\QueueController::class, 'flush'])->name('queue.flush');
+    Route::post('/queue/restart', [App\Http\Controllers\Admin\QueueController::class, 'restart'])->name('queue.restart');
+});
+
 // Help routes (public)
 Route::get('/help', fn () => view('help.index'))->name('help.index');
 

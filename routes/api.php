@@ -55,9 +55,8 @@ Route::middleware('auth:sanctum')->prefix('v1/profile')->name('api.v1.profile.')
     Route::delete('/', [App\Http\Controllers\ProfileController::class, 'destroyApi'])->name('destroy');
 });
 
-// Training Prediction API Routes
-// Training Prediction API Routes
-Route::prefix('training-predictions')->name('api.training-predictions.')->group(function () {
+// Training Prediction API Routes (Protected)
+Route::middleware('auth:sanctum')->prefix('training-predictions')->name('api.training-predictions.')->group(function () {
     // Single prediction
     Route::post('/', [TrainingPredictionController::class, 'predict'])
         ->name('predict');
@@ -205,6 +204,25 @@ Route::prefix('skills')->name('api.skills.')->group(function () {
 
     Route::get('/recommendations', [App\Http\Controllers\Api\SkillManagementController::class, 'recommendations'])
         ->name('recommendations');
+
+    // Build Planner Routes
+    Route::get('/build-templates', [App\Http\Controllers\Api\SkillBuildController::class, 'templates'])
+        ->name('build-templates');
+
+    Route::get('/saved-builds', [App\Http\Controllers\Api\SkillBuildController::class, 'savedBuilds'])
+        ->name('saved-builds');
+
+    Route::post('/build-optimization', [App\Http\Controllers\Api\SkillBuildController::class, 'optimize'])
+        ->name('build-optimization');
+
+    Route::post('/apply-build', [App\Http\Controllers\Api\SkillBuildController::class, 'applyBuild'])
+        ->name('apply-build');
+
+    Route::post('/save-build', [App\Http\Controllers\Api\SkillBuildController::class, 'saveBuild'])
+        ->name('save-build');
+
+    Route::delete('/builds/{id}', [App\Http\Controllers\Api\SkillBuildController::class, 'deleteBuild'])
+        ->name('delete-build');
 });
 
 // Character-specific skill routes
@@ -214,6 +232,12 @@ Route::prefix('characters/{characterId}')->name('api.characters.')->group(functi
 
     Route::get('/agent-performance', [App\Http\Controllers\Api\SkillManagementController::class, 'agentPerformance'])
         ->name('agent-performance');
+
+    // Character-specific skill recommendations
+    // Used by Skills Management page (/skills) for AI-powered recommendations
+    Route::post('/skill-recommendations', [\App\Http\Controllers\Api\SkillRecommendationController::class, 'getRecommendations'])
+        ->middleware('auth:sanctum')
+        ->name('skill-recommendations');
 });
 
 // Skill Hint API Routes
