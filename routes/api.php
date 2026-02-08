@@ -77,6 +77,32 @@ Route::middleware('auth:sanctum')->prefix('training-predictions')->name('api.tra
         ->name('cache.stats');
 });
 
+// Advisory API Routes (AI-Powered Training Advisory System)
+Route::middleware(['auth:sanctum', 'throttle:10,1'])->prefix('advisory')->name('api.advisory.')->group(function () {
+    // Training recommendations
+    Route::post('/training/recommendations', [\App\Http\Controllers\Api\AdvisoryController::class, 'getTrainingRecommendations'])
+        ->name('training.recommendations');
+
+    // Skill purchase advice
+    Route::post('/skills/advice', [\App\Http\Controllers\Api\AdvisoryController::class, 'getSkillPurchaseAdvice'])
+        ->name('skills.advice');
+
+    // Race strategy generation
+    Route::post('/race/strategy', [\App\Http\Controllers\Api\AdvisoryController::class, 'getRaceStrategy'])
+        ->name('race.strategy');
+
+    // Critical situation detection
+    Route::post('/critical/detect', [\App\Http\Controllers\Api\AdvisoryController::class, 'detectCriticalSituations'])
+        ->name('critical.detect');
+
+    // Outcome recording for prediction accuracy tracking
+    Route::post('/training/outcome', [\App\Http\Controllers\Api\AdvisoryController::class, 'recordTrainingOutcome'])
+        ->name('training.outcome');
+
+    Route::post('/race/outcome', [\App\Http\Controllers\Api\AdvisoryController::class, 'recordRaceOutcome'])
+        ->name('race.outcome');
+});
+
 // Cache Monitoring API Routes (Task 2.1.2 - External API Cache Warming)
 Route::prefix('external-cache')->name('api.external-cache.')->group(function () {
     // Cache statistics

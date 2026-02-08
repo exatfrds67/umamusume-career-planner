@@ -84,9 +84,9 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
             <div class="lg:col-span-2 space-y-4">
-                <section class="card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+                <section class="card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm" aria-labelledby="slots-heading">
                     <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+                        <h2 id="slots-heading" class="text-lg font-semibold text-gray-900 dark:text-white">
                             Deck Slots (<span x-text="deckCount"></span>/6)
                         </h2>
                         <div class="flex gap-2">
@@ -205,8 +205,8 @@
             </div>
 
             <div class="space-y-6">
-                <section class="card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
-                    <h2 class="text-lg font-semibold mb-3">Deck Statistics</h2>
+                <section class="card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm" aria-labelledby="stats-heading">
+                    <h2 id="stats-heading" class="text-lg font-semibold mb-3">Deck Statistics</h2>
 
                     <dl class="space-y-2 mb-4">
                         <div class="flex justify-between text-sm">
@@ -267,8 +267,9 @@
                     </div>
                 </section>
 
-                <aside class="card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm flex flex-col h-[600px]">
-                    <h2 class="text-lg font-semibold mb-4">Available Cards</h2>
+                <aside class="card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm flex flex-col h-[600px]"
+                    aria-labelledby="library-heading">
+                    <h2 id="library-heading" class="text-lg font-semibold mb-4">Available Cards</h2>
 
                     <div class="space-y-3 mb-4">
                         <input type="text" x-model="searchQuery" placeholder="Search cards..."

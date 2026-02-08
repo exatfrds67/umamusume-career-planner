@@ -34,6 +34,9 @@
             </svg>
         </button>
 
+        <!-- Critical Alert Badge -->
+        <x-ai.critical-alert-badge :alert-count="0" />
+
         <!-- Notifications -->
         <button type="button"
             class="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500 dark:text-gray-300 dark:hover:text-gray-100 transition-colors duration-200">

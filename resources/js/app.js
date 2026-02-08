@@ -23,6 +23,7 @@ import { keyboardShortcuts } from "./components/keyboard-shortcuts.js";
 
 // Reusable UI Components
 import activityTimeline from "./components/activity-timeline.js";
+import advisoryPanel from "./components/advisory-panel.js";
 import classPyramid from "./components/class-pyramid.js";
 import facilityManagement from "./components/facility-management.js";
 import lineChart from "./components/line-chart.js";
@@ -569,6 +570,7 @@ Alpine.data("keyboardShortcuts", keyboardShortcuts);
 
 // Reusable UI Components
 Alpine.data("activityTimeline", activityTimeline);
+Alpine.data("advisoryPanel", advisoryPanel);
 Alpine.data("classPyramid", classPyramid);
 Alpine.data("facilityManagement", facilityManagement);
 Alpine.data("lineChart", lineChart);

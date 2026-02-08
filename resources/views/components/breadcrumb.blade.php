@@ -57,4 +57,9 @@
             </li>
         @endforeach
     </ol>
+
+    {{-- JSON-LD Structured Data --}}
+    <script type="application/ld+json">
+        {!! $jsonLd() !!}
+    </script>
 </nav>

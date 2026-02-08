@@ -26,7 +26,7 @@
 
         {{-- Acquired Badge --}}
         @if ($acquired)
-            <div class="flex-shrink-0">
+                <div class="shrink-0">
                 <div class="bg-success-500 text-white px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1">
                     <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd"

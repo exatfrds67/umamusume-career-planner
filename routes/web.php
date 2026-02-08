@@ -14,6 +14,7 @@ Route::get('/', fn () => view('welcome'))->name('welcome');
 Route::prefix('demo')->group(function () {
     Route::get('/password-toggle', fn () => view('test.password-demo'))->name('demo.password-toggle');
     Route::get('/remember-me', fn () => view('test.remember-me-demo'))->name('demo.remember-me');
+    Route::get('/critical-alert-badge', fn () => view('test.critical-alert-badge-demo'))->name('demo.critical-alert-badge');
 });
 
 // Developer demos page

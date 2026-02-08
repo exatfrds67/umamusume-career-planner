@@ -122,7 +122,7 @@
         <div class="flex items-center justify-center gap-x-2 gap-y-1 flex-wrap max-w-full">
             @foreach ($getStatNames() as $stat)
                 <div class="flex items-center gap-1">
-                    <span class="w-2 h-2 rounded-full flex-shrink-0"
+                    <span class="w-2 h-2 rounded-full shrink-0"
                         style="background-color: {{ $getSvgFillColor($stat) }};"></span>
                     <span class="text-xs font-medium whitespace-nowrap {{ $getStatColor($stat) }}">
                         {{ ucfirst($stat) }}
