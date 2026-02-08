@@ -28,24 +28,33 @@ class UpdateCharacterRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
-        if ($this->has('stats') && is_array($this->stats)) {
+        $stats = $this->input('stats');
+        if ($this->has('stats') && \is_array($stats)) {
             $sanitized = [];
-            foreach ($this->stats as $key => $value) {
+            foreach ($stats as $key => $value) {
                 // Strip non-numeric characters and convert to integer
-                $sanitized[$key] = (int) preg_replace('/[^0-9]/', '', (string) $value);
+                if (\is_string($value) || \is_numeric($value)) {
+                    $sanitized[$key] = (int) preg_replace('/[^0-9]/', '', (string) $value);
+                }
             }
             $this->merge(['stats' => $sanitized]);
         }
 
-        if ($this->has('goals.target_stats') && is_array($this->input('goals.target_stats'))) {
-            $targetStats = $this->input('goals.target_stats');
+        $targetStats = $this->input('goals.target_stats');
+        if ($this->has('goals.target_stats') && \is_array($targetStats)) {
             $sanitized = [];
             foreach ($targetStats as $key => $value) {
-                if ($value !== null) {
+                if ($value !== null && (\is_string($value) || \is_numeric($value))) {
                     $sanitized[$key] = (int) preg_replace('/[^0-9]/', '', (string) $value);
                 }
             }
-            $this->merge(['goals' => array_merge($this->input('goals', []), ['target_stats' => $sanitized])]);
+
+            $goals = $this->input('goals', []);
+            if (! \is_array($goals)) {
+                $goals = [];
+            }
+
+            $this->merge(['goals' => [...$goals, 'target_stats' => $sanitized]]);
         }
     }
 
@@ -62,13 +71,13 @@ class UpdateCharacterRequest extends FormRequest
             'career_stage' => ['sometimes', 'required', Rule::in(['junior', 'classic', 'senior'])],
             'current_turn' => ['sometimes', 'required', 'integer', 'min:1', 'max:78'],
 
-            // Stats validation (0-2000 range with integer enforcement)
+            // Stats validation (0-1200 range with integer enforcement)
             'stats' => ['sometimes', 'required', 'array'],
-            'stats.speed' => ['required_with:stats', 'integer', 'min:0', 'max:2000'],
-            'stats.stamina' => ['required_with:stats', 'integer', 'min:0', 'max:2000'],
-            'stats.power' => ['required_with:stats', 'integer', 'min:0', 'max:2000'],
-            'stats.guts' => ['required_with:stats', 'integer', 'min:0', 'max:2000'],
-            'stats.wit' => ['required_with:stats', 'integer', 'min:0', 'max:2000'],
+            'stats.speed' => ['required_with:stats', 'integer', 'min:0', 'max:1200'],
+            'stats.stamina' => ['required_with:stats', 'integer', 'min:0', 'max:1200'],
+            'stats.power' => ['required_with:stats', 'integer', 'min:0', 'max:1200'],
+            'stats.guts' => ['required_with:stats', 'integer', 'min:0', 'max:1200'],
+            'stats.wit' => ['required_with:stats', 'integer', 'min:0', 'max:1200'],
 
             // Energy and mood
             'energy_level' => ['sometimes', 'required', 'integer', 'min:0', 'max:100'],
@@ -77,11 +86,11 @@ class UpdateCharacterRequest extends FormRequest
             // Goals validation
             'goals' => ['sometimes', 'nullable', 'array'],
             'goals.target_stats' => ['sometimes', 'nullable', 'array'],
-            'goals.target_stats.speed' => ['nullable', 'integer', 'min:0', 'max:2000'],
-            'goals.target_stats.stamina' => ['nullable', 'integer', 'min:0', 'max:2000'],
-            'goals.target_stats.power' => ['nullable', 'integer', 'min:0', 'max:2000'],
-            'goals.target_stats.guts' => ['nullable', 'integer', 'min:0', 'max:2000'],
-            'goals.target_stats.wit' => ['nullable', 'integer', 'min:0', 'max:2000'],
+            'goals.target_stats.speed' => ['nullable', 'integer', 'min:0', 'max:1200'],
+            'goals.target_stats.stamina' => ['nullable', 'integer', 'min:0', 'max:1200'],
+            'goals.target_stats.power' => ['nullable', 'integer', 'min:0', 'max:1200'],
+            'goals.target_stats.guts' => ['nullable', 'integer', 'min:0', 'max:1200'],
+            'goals.target_stats.wit' => ['nullable', 'integer', 'min:0', 'max:1200'],
             'goals.race_objectives' => ['sometimes', 'nullable', 'array'],
             'goals.notes' => ['sometimes', 'nullable', 'string', 'max:5000'],
 
@@ -115,14 +124,14 @@ class UpdateCharacterRequest extends FormRequest
             'name.max' => 'Character name cannot exceed 255 characters.',
 
             'stats.*.min' => 'Stat values must be at least 0.',
-            'stats.*.max' => 'Stat values cannot exceed 2000.',
+            'stats.*.max' => 'Stat values cannot exceed 1200.',
             'stats.*.integer' => 'The :attribute field must be an integer.',
 
             'energy_level.min' => 'Energy level must be at least 0%.',
             'energy_level.max' => 'Energy level cannot exceed 100%.',
 
             'goals.target_stats.*.min' => 'Target stat values must be at least 0.',
-            'goals.target_stats.*.max' => 'Target stat values cannot exceed 2000.',
+            'goals.target_stats.*.max' => 'Target stat values cannot exceed 1200.',
 
             'growth_rates.*.in' => 'Growth rate bonuses must be 10%, 20%, or 30%.',
 

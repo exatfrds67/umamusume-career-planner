@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Services\Admin\DatabaseMaintenanceService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Response;
+use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class DatabaseController extends Controller
 {
@@ -17,7 +20,7 @@ class DatabaseController extends Controller
     /**
      * Display database maintenance page.
      */
-    public function maintenance()
+    public function maintenance(): View
     {
         $tables = $this->dbService->getTableInfo();
         $migrationStatus = $this->dbService->getMigrationStatus();
@@ -28,7 +31,7 @@ class DatabaseController extends Controller
     /**
      * Optimize database tables.
      */
-    public function optimize()
+    public function optimize(): RedirectResponse
     {
         $optimized = $this->dbService->optimizeTables();
 
@@ -38,7 +41,7 @@ class DatabaseController extends Controller
     /**
      * Create database backup.
      */
-    public function backup()
+    public function backup(): RedirectResponse
     {
         try {
             $filename = $this->dbService->createBackup();
@@ -52,7 +55,7 @@ class DatabaseController extends Controller
     /**
      * Download database backup.
      */
-    public function downloadBackup(string $filename)
+    public function downloadBackup(string $filename): RedirectResponse|BinaryFileResponse
     {
         $path = storage_path('app/backups/'.$filename);
 
@@ -66,7 +69,7 @@ class DatabaseController extends Controller
     /**
      * Run migrations.
      */
-    public function migrate()
+    public function migrate(): RedirectResponse
     {
         Artisan::call('migrate', ['--force' => true]);
 
@@ -76,7 +79,7 @@ class DatabaseController extends Controller
     /**
      * Display seeders page.
      */
-    public function seeders()
+    public function seeders(): View
     {
         $seeders = $this->dbService->getAvailableSeeders();
 
@@ -86,13 +89,14 @@ class DatabaseController extends Controller
     /**
      * Run specific seeder.
      */
-    public function runSeeder(Request $request)
+    public function runSeeder(Request $request): RedirectResponse
     {
         $request->validate([
             'seeder' => ['required', 'string'],
         ]);
 
-        $success = $this->dbService->runSeeder($request->input('seeder'));
+        $seederClass = $request->input('seeder');
+        $success = $this->dbService->runSeeder(is_string($seederClass) ? $seederClass : '');
 
         if ($success) {
             return back()->with('success', 'Seeder executed successfully.');
@@ -104,7 +108,7 @@ class DatabaseController extends Controller
     /**
      * Run all seeders.
      */
-    public function seedAll()
+    public function seedAll(): RedirectResponse
     {
         Artisan::call('db:seed', ['--force' => true]);
 
@@ -114,7 +118,7 @@ class DatabaseController extends Controller
     /**
      * Fresh migration with seeding.
      */
-    public function fresh()
+    public function fresh(): RedirectResponse
     {
         Artisan::call('migrate:fresh', ['--seed' => true, '--force' => true]);
 

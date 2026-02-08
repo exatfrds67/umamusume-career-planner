@@ -26,7 +26,13 @@ class TrainingPredictionRequest extends FormRequest
             return false;
         }
 
-        return $this->user()->characters()->where('id', $characterId)->exists();
+        $user = $this->user();
+
+        if (! $user) {
+            return false;
+        }
+
+        return method_exists($user, 'characters') && $user->characters()->where('id', $characterId)->exists();
     }
 
     /**
@@ -36,12 +42,15 @@ class TrainingPredictionRequest extends FormRequest
      */
     public function rules(): array
     {
+        $user = $this->user();
+        $userId = $user?->id;
+
         return [
             'character_id' => [
                 'required',
                 'integer',
-                Rule::exists('characters', 'id')->where(function ($query) {
-                    $query->where('user_id', $this->user()->id);
+                Rule::exists('ucp_characters', 'id')->where(function ($query) use ($userId) {
+                    $query->where('user_id', $userId);
                 }),
             ],
             'training_type' => [
@@ -55,7 +64,7 @@ class TrainingPredictionRequest extends FormRequest
             ],
             'support_cards.*' => [
                 'integer',
-                'exists:support_cards,id',
+                'exists:ucp_support_cards,id',
             ],
             'participants' => [
                 'nullable',

@@ -106,6 +106,8 @@ class User extends Authenticatable
 
     /**
      * Get the user's avatar URL.
+     *
+     * @return Attribute<string, never>
      */
     protected function avatarUrl(): Attribute
     {
@@ -115,7 +117,7 @@ class User extends Authenticatable
                 if ($this->relationLoaded('avatar') || array_key_exists('avatar_path', $this->attributes)) {
                     $avatarPath = $this->attributes['avatar_path'] ?? null;
 
-                    if ($avatarPath) {
+                    if (is_string($avatarPath) && $avatarPath !== '') {
                         return \Illuminate\Support\Facades\Storage::url($avatarPath);
                     }
                 }

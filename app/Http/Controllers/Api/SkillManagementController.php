@@ -155,6 +155,8 @@ class SkillManagementController extends Controller
                     'remaining_sp' => $freshCharacter->available_sp,
                 ],
             ], 201);
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            throw $e;
         } catch (\Exception $e) {
             Log::error('Failed to acquire skill', [
                 'error' => $e->getMessage(),

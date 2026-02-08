@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Services\Admin\SystemHealthService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\View\View;
 
 class SystemSettingsController extends Controller
 {
@@ -17,7 +19,7 @@ class SystemSettingsController extends Controller
     /**
      * Display system settings and health.
      */
-    public function index()
+    public function index(): View
     {
         $health = $this->healthService->getSystemHealth();
         $environment = $this->healthService->getEnvironmentInfo();
@@ -28,11 +30,12 @@ class SystemSettingsController extends Controller
     /**
      * Clear application cache.
      */
-    public function clearCache(Request $request)
+    public function clearCache(Request $request): RedirectResponse
     {
         $type = $request->input('type', 'all');
+        $typeString = is_string($type) ? $type : 'all';
 
-        match ($type) {
+        match ($typeString) {
             'config' => Artisan::call('config:clear'),
             'route' => Artisan::call('route:clear'),
             'view' => Artisan::call('view:clear'),
@@ -40,7 +43,7 @@ class SystemSettingsController extends Controller
             default => $this->clearAllCaches(),
         };
 
-        return back()->with('success', ucfirst($type).' cache cleared successfully.');
+        return back()->with('success', ucfirst($typeString).' cache cleared successfully.');
     }
 
     /**
@@ -57,7 +60,7 @@ class SystemSettingsController extends Controller
     /**
      * Optimize application.
      */
-    public function optimize()
+    public function optimize(): RedirectResponse
     {
         Artisan::call('optimize');
 
@@ -67,7 +70,7 @@ class SystemSettingsController extends Controller
     /**
      * Clear optimization.
      */
-    public function clearOptimization()
+    public function clearOptimization(): RedirectResponse
     {
         Artisan::call('optimize:clear');
 

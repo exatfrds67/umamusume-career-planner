@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Api;
 
+use App\Models\Character;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -26,7 +27,19 @@ class BatchTrainingPredictionRequest extends FormRequest
             return false;
         }
 
-        return $this->user()->characters()->where('id', $characterId)->exists();
+        $user = $this->user();
+
+        if (! $user) {
+            return false;
+        }
+
+        // Admins can view all characters
+        if (method_exists($user, 'isAdmin') && $user->isAdmin()) {
+            return Character::where('id', $characterId)->exists();
+        }
+
+        // Regular users can only view their own characters
+        return method_exists($user, 'characters') && $user->characters()->where('id', $characterId)->exists();
     }
 
     /**
@@ -40,9 +53,7 @@ class BatchTrainingPredictionRequest extends FormRequest
             'character_id' => [
                 'required',
                 'integer',
-                Rule::exists('characters', 'id')->where(function ($query) {
-                    $query->where('user_id', $this->user()->id);
-                }),
+                'exists:ucp_characters,id',
             ],
             'training_types' => [
                 'nullable',
@@ -61,7 +72,7 @@ class BatchTrainingPredictionRequest extends FormRequest
             ],
             'support_cards.*' => [
                 'integer',
-                'exists:support_cards,id',
+                'exists:ucp_support_cards,id',
             ],
             'participants' => [
                 'nullable',

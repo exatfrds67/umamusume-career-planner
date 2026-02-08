@@ -4,24 +4,27 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Illuminate\View\View;
 
 class UserController extends Controller
 {
     /**
      * Display a listing of users.
      */
-    public function index(Request $request)
+    public function index(Request $request): View
     {
         $query = User::query()->withCount('characters');
 
         if ($request->filled('search')) {
             $search = $request->input('search');
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%");
+            $searchString = is_string($search) ? $search : '';
+            $query->where(function ($q) use ($searchString) {
+                $q->where('name', 'like', "%{$searchString}%")
+                    ->orWhere('email', 'like', "%{$searchString}%");
             });
         }
 
@@ -37,7 +40,7 @@ class UserController extends Controller
     /**
      * Show the form for editing the specified user.
      */
-    public function edit(User $user)
+    public function edit(User $user): View
     {
         return view('admin.users.edit', compact('user'));
     }
@@ -45,7 +48,7 @@ class UserController extends Controller
     /**
      * Update the specified user.
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request, User $user): RedirectResponse
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -59,7 +62,8 @@ class UserController extends Controller
                 'password' => ['required', 'string', 'min:8', 'confirmed'],
             ]);
 
-            $validated['password'] = Hash::make($request->input('password'));
+            $password = $request->input('password');
+            $validated['password'] = Hash::make(is_string($password) ? $password : '');
         }
 
         $user->update($validated);
@@ -71,7 +75,7 @@ class UserController extends Controller
     /**
      * Toggle admin status.
      */
-    public function toggleAdmin(User $user)
+    public function toggleAdmin(User $user): RedirectResponse
     {
         if ($user->id === auth()->id()) {
             return back()->with('error', 'You cannot change your own admin status.');
@@ -85,7 +89,7 @@ class UserController extends Controller
     /**
      * Remove the specified user.
      */
-    public function destroy(User $user)
+    public function destroy(User $user): RedirectResponse
     {
         if ($user->id === auth()->id()) {
             return back()->with('error', 'You cannot delete your own account.');

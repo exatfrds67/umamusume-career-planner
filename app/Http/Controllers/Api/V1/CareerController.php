@@ -18,8 +18,6 @@ class CareerController extends Controller
     /**
      * Verify that the career's character belongs to the authenticated user.
      * Uses policy authorization which allows admins full access.
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
     private function verifyCareerOwnership(Career $career): void
     {
@@ -72,7 +70,7 @@ class CareerController extends Controller
             ->findOrFail($validated['character_id']);
 
         // Generate a default career name if not provided
-        $careerName = $validated['career_name'] ?? sprintf(
+        $careerName = $validated['career_name'] ?? \sprintf(
             '%s - %s Career #%d',
             $character->name,
             ucfirst(str_replace('_', ' ', $validated['scenario_type'])),
@@ -273,7 +271,7 @@ class CareerController extends Controller
 
         return response()->json([
             'message' => 'Training sessions created successfully',
-            'count' => count($trainingSessions),
+            'count' => \count($trainingSessions),
         ], 201);
     }
 
@@ -460,13 +458,11 @@ class CareerController extends Controller
         $this->verifyCareerOwnership($career);
 
         $totalTrainingSessions = $career->trainingSessions->count();
-        $totalStatGains = $career->trainingSessions->sum(function ($session) {
-            return ($session->speed_gain ?? 0) +
-                ($session->stamina_gain ?? 0) +
-                ($session->power_gain ?? 0) +
-                ($session->guts_gain ?? 0) +
-                ($session->wit_gain ?? 0);
-        });
+        $totalStatGains = $career->trainingSessions->sum(fn ($session) => ($session->speed_gain ?? 0) +
+            ($session->stamina_gain ?? 0) +
+            ($session->power_gain ?? 0) +
+            ($session->guts_gain ?? 0) +
+            ($session->wit_gain ?? 0));
 
         // Calculate efficiency rating (stat gains per training session)
         $efficiencyRating = $totalTrainingSessions > 0

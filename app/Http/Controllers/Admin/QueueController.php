@@ -3,16 +3,18 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\View\View;
 
 class QueueController extends Controller
 {
     /**
      * Display queue monitor.
      */
-    public function index()
+    public function index(): View
     {
         $failedJobs = DB::table('failed_jobs')
             ->orderBy('failed_at', 'desc')
@@ -29,7 +31,7 @@ class QueueController extends Controller
     /**
      * Retry a failed job.
      */
-    public function retry(string $id)
+    public function retry(string $id): RedirectResponse
     {
         Artisan::call('queue:retry', ['id' => [$id]]);
 
@@ -39,7 +41,7 @@ class QueueController extends Controller
     /**
      * Retry all failed jobs.
      */
-    public function retryAll()
+    public function retryAll(): RedirectResponse
     {
         Artisan::call('queue:retry', ['id' => ['all']]);
 
@@ -49,7 +51,7 @@ class QueueController extends Controller
     /**
      * Delete a failed job.
      */
-    public function delete(string $id)
+    public function delete(string $id): RedirectResponse
     {
         DB::table('failed_jobs')->where('id', $id)->delete();
 
@@ -59,7 +61,7 @@ class QueueController extends Controller
     /**
      * Clear all failed jobs.
      */
-    public function flush()
+    public function flush(): RedirectResponse
     {
         Artisan::call('queue:flush');
 
@@ -69,7 +71,7 @@ class QueueController extends Controller
     /**
      * Restart queue workers.
      */
-    public function restart()
+    public function restart(): RedirectResponse
     {
         Artisan::call('queue:restart');
 

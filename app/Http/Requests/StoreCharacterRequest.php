@@ -19,11 +19,17 @@ class StoreCharacterRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
-        if ($this->has('stats') && is_array($this->stats)) {
+        $stats = $this->input('stats');
+        if ($this->has('stats') && \is_array($stats)) {
             $sanitized = [];
-            foreach ($this->stats as $key => $value) {
+            foreach ($stats as $key => $value) {
                 // Strip non-numeric characters and convert to integer
-                $sanitized[$key] = (int) preg_replace('/[^0-9]/', '', (string) $value);
+                // Ensure value is scalar before casting to string
+                if (\is_scalar($value)) {
+                    $sanitized[$key] = (int) preg_replace('/[^0-9]/', '', (string) $value);
+                } else {
+                    $sanitized[$key] = 0;
+                }
             }
             $this->merge(['stats' => $sanitized]);
         }
@@ -45,13 +51,13 @@ class StoreCharacterRequest extends FormRequest
             'external_source' => ['nullable', 'string', 'max:100'],
             'avatar_url' => ['nullable', 'string', 'max:500'],
 
-            // Stats validation (0-2000 range with integer enforcement)
+            // Stats validation (0-1200 range with integer enforcement)
             'stats' => ['required', 'array'],
-            'stats.speed' => ['required', 'integer', 'min:0', 'max:2000'],
-            'stats.stamina' => ['required', 'integer', 'min:0', 'max:2000'],
-            'stats.power' => ['required', 'integer', 'min:0', 'max:2000'],
-            'stats.guts' => ['required', 'integer', 'min:0', 'max:2000'],
-            'stats.wit' => ['required', 'integer', 'min:0', 'max:2000'],
+            'stats.speed' => ['required', 'integer', 'min:0', 'max:1200'],
+            'stats.stamina' => ['required', 'integer', 'min:0', 'max:1200'],
+            'stats.power' => ['required', 'integer', 'min:0', 'max:1200'],
+            'stats.guts' => ['required', 'integer', 'min:0', 'max:1200'],
+            'stats.wit' => ['required', 'integer', 'min:0', 'max:1200'],
 
             // Aptitudes validation
             'aptitudes' => ['required', 'array'],
@@ -90,7 +96,7 @@ class StoreCharacterRequest extends FormRequest
             'stats.*.required' => 'All stat values are required.',
             'stats.*.integer' => 'The :attribute field must be an integer.',
             'stats.*.min' => 'The :attribute field must be at least 0.',
-            'stats.*.max' => 'The :attribute field cannot exceed 2000.',
+            'stats.*.max' => 'The :attribute field cannot exceed 1200.',
 
             'aptitudes.distance.*.required' => 'All distance aptitudes are required.',
             'aptitudes.distance.*.in' => 'Invalid aptitude grade selected. Must be G, F, E, D, C, B, A, S, or SS.',

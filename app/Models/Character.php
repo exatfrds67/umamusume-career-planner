@@ -268,11 +268,11 @@ class Character extends Model
         $stats = is_array($stats) ? $stats : [];
 
         return [
-            'speed' => (int) ($stats['speed'] ?? 0),
-            'stamina' => (int) ($stats['stamina'] ?? 0),
-            'power' => (int) ($stats['power'] ?? 0),
-            'guts' => (int) ($stats['guts'] ?? 0),
-            'wit' => (int) ($stats['wit'] ?? 0),
+            'speed' => is_numeric($stats['speed'] ?? 0) ? (int) $stats['speed'] : 0,
+            'stamina' => is_numeric($stats['stamina'] ?? 0) ? (int) $stats['stamina'] : 0,
+            'power' => is_numeric($stats['power'] ?? 0) ? (int) $stats['power'] : 0,
+            'guts' => is_numeric($stats['guts'] ?? 0) ? (int) $stats['guts'] : 0,
+            'wit' => is_numeric($stats['wit'] ?? 0) ? (int) $stats['wit'] : 0,
         ];
     }
 
@@ -287,12 +287,21 @@ class Character extends Model
             $value = [];
         }
 
+        // Ensure all stat keys exist with default values
+        $value = array_merge([
+            'speed' => 0,
+            'stamina' => 0,
+            'power' => 0,
+            'guts' => 0,
+            'wit' => 0,
+        ], $value);
+
         $normalized = [
-            'speed' => (int) ($value['speed'] ?? 0),
-            'stamina' => (int) ($value['stamina'] ?? 0),
-            'power' => (int) ($value['power'] ?? 0),
-            'guts' => (int) ($value['guts'] ?? 0),
-            'wit' => (int) ($value['wit'] ?? 0),
+            'speed' => is_numeric($value['speed']) ? (int) $value['speed'] : 0,
+            'stamina' => is_numeric($value['stamina']) ? (int) $value['stamina'] : 0,
+            'power' => is_numeric($value['power']) ? (int) $value['power'] : 0,
+            'guts' => is_numeric($value['guts']) ? (int) $value['guts'] : 0,
+            'wit' => is_numeric($value['wit']) ? (int) $value['wit'] : 0,
         ];
 
         $this->attributes['current_stats'] = json_encode($normalized);
@@ -336,25 +345,25 @@ class Character extends Model
     public function getProgressPercentage(): float
     {
         if (! is_array($this->goals) || ! isset($this->goals['target_stats']) || ! is_array($this->goals['target_stats'])) {
-            return 0;
+            return 0.0;
         }
 
         $stats = ['speed', 'stamina', 'power', 'guts', 'wit'];
-        $totalProgress = 0;
+        $totalProgress = 0.0;
         $statCount = 0;
 
         foreach ($stats as $stat) {
             $targetValue = $this->goals['target_stats'][$stat] ?? null;
             if (is_numeric($targetValue) && (float) $targetValue > 0) {
                 $current = $this->getStat($stat);
-                $target = (int) $targetValue;
-                $progress = min(100, ($current / $target) * 100);
+                $target = is_int($targetValue) ? $targetValue : (int) $targetValue;
+                $progress = min(100.0, ($current / $target) * 100);
                 $totalProgress += $progress;
                 $statCount += 1;
             }
         }
 
-        return $statCount > 0 ? round($totalProgress / $statCount, 1) : 0;
+        return $statCount > 0 ? round($totalProgress / $statCount, 1) : 0.0;
     }
 
     /**
@@ -400,11 +409,11 @@ class Character extends Model
      * For seeded characters, toggles the user-specific pin.
      * For user-created characters, toggles the is_pinned field.
      */
-    public function togglePin(?int $userId = null): bool
+    public function togglePin(int|string|null $userId = null): bool
     {
         if ($this->is_seeded) {
             // For seeded characters, use the pivot table
-            $userId = $userId ?? auth()->id();
+            $userId = is_int($userId) ? $userId : (is_string($userId) && is_numeric($userId) ? (int) $userId : auth()->id());
             if (! $userId) {
                 return false;
             }

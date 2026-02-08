@@ -76,22 +76,26 @@ class ProfileController extends Controller
         // Handle nested JSON fields - merge with existing data
         if (isset($validated['preferences'])) {
             $existingPreferences = $user->preferences->getArrayCopy();
-            $updateData['preferences'] = array_merge($existingPreferences, $validated['preferences']);
+            $newPreferences = is_array($validated['preferences']) ? $validated['preferences'] : [];
+            $updateData['preferences'] = array_merge($existingPreferences, $newPreferences);
         }
 
         if (isset($validated['accessibility_settings'])) {
             $existingAccessibility = $user->accessibility_settings->getArrayCopy();
-            $updateData['accessibility_settings'] = array_merge($existingAccessibility, $validated['accessibility_settings']);
+            $newAccessibility = is_array($validated['accessibility_settings']) ? $validated['accessibility_settings'] : [];
+            $updateData['accessibility_settings'] = array_merge($existingAccessibility, $newAccessibility);
         }
 
         if (isset($validated['ai_settings'])) {
             $existingAiSettings = $user->ai_settings->getArrayCopy();
-            $updateData['ai_settings'] = array_merge($existingAiSettings, $validated['ai_settings']);
+            $newAiSettings = is_array($validated['ai_settings']) ? $validated['ai_settings'] : [];
+            $updateData['ai_settings'] = array_merge($existingAiSettings, $newAiSettings);
         }
 
         if (isset($validated['mcp_settings'])) {
             $existingMcpSettings = $user->mcp_settings->getArrayCopy();
-            $updateData['mcp_settings'] = array_merge($existingMcpSettings, $validated['mcp_settings']);
+            $newMcpSettings = is_array($validated['mcp_settings']) ? $validated['mcp_settings'] : [];
+            $updateData['mcp_settings'] = array_merge($existingMcpSettings, $newMcpSettings);
         }
 
         // Update user with validated data

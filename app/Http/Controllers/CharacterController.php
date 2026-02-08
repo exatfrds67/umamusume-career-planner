@@ -6,6 +6,7 @@ use App\Http\Requests\StoreCharacterRequest;
 use App\Http\Requests\UpdateCharacterRequest;
 use App\Models\Aptitude;
 use App\Models\Character;
+use App\Models\ExternalData;
 use App\Models\Factor;
 use App\Services\CharacterStateService;
 use App\Services\FactorService;
@@ -36,8 +37,11 @@ class CharacterController extends Controller
             ->get();
 
         // Add progress percentage to each character
-        $characters->transform(function ($character) {
-            $character->progress = $character->getProgressPercentage();
+        $characters->transform(function (Character $character): Character {
+            // Calculate progress percentage
+            $progress = $character->getProgressPercentage();
+            // Add progress as a dynamic property for the view
+            $character->setAttribute('progress', $progress);
 
             return $character;
         });
@@ -51,29 +55,30 @@ class CharacterController extends Controller
     public function create(): View
     {
         // Fetch trainee data from external_data table (type: 'trainee')
-        $trainees = \App\Models\ExternalData::where('data_type', 'trainee')
+        $trainees = ExternalData::where('data_type', 'trainee')
             ->orWhere('data_type', 'character')
             ->get()
-            ->map(function ($item) {
-                $data = $item->data ?? [];
+            ->map(function (ExternalData $item): array {
+                /** @var array<string, mixed> $data */
+                $data = $item->data_content ?? [];
 
                 return [
                     'id' => $item->id,
-                    'name' => $data['name'] ?? $item->name,
-                    'rarity' => $data['rarity'] ?? 3,
-                    'surface' => $data['surface'] ?? 'Turf',
-                    'distance' => $data['distance'] ?? 'Medium',
-                    'style' => $data['style'] ?? 'Runner',
-                    'aptitudes' => $data['aptitudes'] ?? [],
-                    'image' => $data['image'] ?? $item->image_url,
-                    'stats' => $data['stats'] ?? [
+                    'name' => \is_string($data['name'] ?? null) ? $data['name'] : 'Unknown',
+                    'rarity' => \is_int($data['rarity'] ?? null) ? $data['rarity'] : 3,
+                    'surface' => \is_string($data['surface'] ?? null) ? $data['surface'] : 'Turf',
+                    'distance' => \is_string($data['distance'] ?? null) ? $data['distance'] : 'Medium',
+                    'style' => \is_string($data['style'] ?? null) ? $data['style'] : 'Runner',
+                    'aptitudes' => \is_array($data['aptitudes'] ?? null) ? $data['aptitudes'] : [],
+                    'image' => \is_string($data['image'] ?? null) ? $data['image'] : null,
+                    'stats' => \is_array($data['stats'] ?? null) ? $data['stats'] : [
                         'speed' => 0,
                         'stamina' => 0,
                         'power' => 0,
                         'guts' => 0,
                         'wisdom' => 0,
                     ],
-                    'growth' => $data['growth'] ?? [
+                    'growth' => \is_array($data['growth'] ?? null) ? $data['growth'] : [
                         'speed' => 0,
                         'stamina' => 0,
                         'power' => 0,
@@ -126,7 +131,7 @@ class CharacterController extends Controller
 
             // Create aptitude records
             $aptitudes = $request->input('aptitudes');
-            if (is_array($aptitudes) && $this->isValidAptitudesArray($aptitudes)) {
+            if (\is_array($aptitudes) && $this->isValidAptitudesArray($aptitudes)) {
                 /** @var array<string, array<string, string>> $validAptitudes */
                 $validAptitudes = $aptitudes;
                 $this->createAptitudes($character, $validAptitudes);
@@ -246,8 +251,8 @@ class CharacterController extends Controller
                 $newGoals = $request->input('goals');
 
                 // Merge with existing goals to preserve other goal data
-                if (is_array($newGoals)) {
-                    $updateData['goals'] = array_merge($currentGoals, $newGoals);
+                if (\is_array($newGoals)) {
+                    $updateData['goals'] = [...$currentGoals, ...$newGoals];
                 }
             }
 
@@ -366,9 +371,9 @@ class CharacterController extends Controller
             return false;
         }
 
-        return is_array($aptitudes['distance'])
-            && is_array($aptitudes['surface'])
-            && is_array($aptitudes['style']);
+        return \is_array($aptitudes['distance'])
+            && \is_array($aptitudes['surface'])
+            && \is_array($aptitudes['style']);
     }
 
     /**
@@ -466,18 +471,18 @@ class CharacterController extends Controller
 
             $factorType = $request->input('factor_type');
             $starLevelInput = $request->input('star_level');
-            $starLevel = is_string($starLevelInput) ? $starLevelInput : '';
+            $starLevel = \is_string($starLevelInput) ? $starLevelInput : '';
             $sourceParentInput = $request->input('source_parent');
-            $sourceParent = is_string($sourceParentInput) ? $sourceParentInput : '';
+            $sourceParent = \is_string($sourceParentInput) ? $sourceParentInput : '';
             $sourceCharacterName = $request->input('source_character_name');
-            $sourceCharacterName = is_string($sourceCharacterName) ? $sourceCharacterName : null;
+            $sourceCharacterName = \is_string($sourceCharacterName) ? $sourceCharacterName : null;
             $factorNameInput = $request->input('factor_name');
-            $factorName = is_string($factorNameInput) ? $factorNameInput : null;
+            $factorName = \is_string($factorNameInput) ? $factorNameInput : null;
 
             switch ($factorType) {
                 case 'blue_stats':
                     $statType = $request->input('stat_type');
-                    if (! $statType || ! is_string($statType)) {
+                    if (! $statType || ! \is_string($statType)) {
                         throw new \InvalidArgumentException('Stat type is required for blue factors');
                     }
                     $this->factorService->createBlueFactor(
@@ -492,7 +497,7 @@ class CharacterController extends Controller
 
                 case 'red_aptitudes':
                     $aptitudeType = $request->input('aptitude_type');
-                    if (! $aptitudeType || ! is_string($aptitudeType)) {
+                    if (! $aptitudeType || ! \is_string($aptitudeType)) {
                         throw new \InvalidArgumentException('Aptitude type is required for red factors');
                     }
                     $gradeImprovement = match ($starLevel) {
@@ -514,7 +519,7 @@ class CharacterController extends Controller
 
                 case 'green_unique_skills':
                     $skillName = $request->input('unique_skill_name');
-                    if (! $skillName || ! is_string($skillName)) {
+                    if (! $skillName || ! \is_string($skillName)) {
                         throw new \InvalidArgumentException('Unique skill name is required for green factors');
                     }
                     $this->factorService->createGreenFactor(
@@ -528,7 +533,7 @@ class CharacterController extends Controller
 
                 case 'white_normal_skills':
                     $skillName = $request->input('normal_skill_name');
-                    if (! $skillName || ! is_string($skillName)) {
+                    if (! $skillName || ! \is_string($skillName)) {
                         throw new \InvalidArgumentException('Normal skill name is required for white factors');
                     }
                     $this->factorService->createWhiteFactor(

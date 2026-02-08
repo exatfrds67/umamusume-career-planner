@@ -28,11 +28,15 @@ class TrainingPredictionController extends Controller
 
         $selectedCharacter = null;
         if ($request->has('character_id')) {
-            $selectedCharacter = Character::with([
-                'aptitudes',
-                'supportCards.supportCard',
-                'factors',
-            ])->find($request->input('character_id'));
+            $characterId = (int) $request->input('character_id');
+
+            if ($characterId > 0) {
+                $selectedCharacter = Character::with([
+                    'aptitudes',
+                    'supportCards.supportCard',
+                    'factors',
+                ])->find($characterId);
+            }
         }
 
         return view('training.predictions', [

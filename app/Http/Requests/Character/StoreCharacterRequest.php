@@ -19,11 +19,17 @@ class StoreCharacterRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
-        if ($this->has('current_stats') && is_array($this->current_stats)) {
+        $currentStats = $this->input('current_stats');
+        if ($this->has('current_stats') && \is_array($currentStats)) {
             $sanitized = [];
-            foreach ($this->current_stats as $key => $value) {
+            foreach ($currentStats as $key => $value) {
                 // Strip non-numeric characters and convert to integer
-                $sanitized[$key] = (int) preg_replace('/[^0-9]/', '', (string) $value);
+                // Ensure value is scalar before casting to string
+                if (\is_scalar($value)) {
+                    $sanitized[$key] = (int) preg_replace('/[^0-9]/', '', (string) $value);
+                } else {
+                    $sanitized[$key] = 0;
+                }
             }
             $this->merge(['current_stats' => $sanitized]);
         }

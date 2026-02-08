@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Services\Admin\LogReaderService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
+use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class LogController extends Controller
 {
@@ -16,16 +19,18 @@ class LogController extends Controller
     /**
      * Display application logs.
      */
-    public function index(Request $request)
+    public function index(Request $request): View
     {
-        $lines = $request->input('lines', 100);
+        $linesInput = $request->input('lines');
+        $lines = is_numeric($linesInput) ? (int) $linesInput : 100;
         $level = $request->input('level');
+        $levelString = is_string($level) ? $level : null;
         $search = $request->input('search');
 
-        if ($search) {
+        if (is_string($search) && $search !== '') {
             $logs = $this->logReader->searchLogs($search, $lines);
         } else {
-            $logs = $this->logReader->getLogEntries($lines, $level);
+            $logs = $this->logReader->getLogEntries($lines, $levelString);
         }
 
         $fileSize = $this->logReader->getLogFileSize();
@@ -36,7 +41,7 @@ class LogController extends Controller
     /**
      * Download log file.
      */
-    public function download()
+    public function download(): RedirectResponse|BinaryFileResponse
     {
         $logPath = storage_path('logs/laravel.log');
 
@@ -50,9 +55,10 @@ class LogController extends Controller
     /**
      * Clear old logs.
      */
-    public function clear(Request $request)
+    public function clear(Request $request): RedirectResponse
     {
-        $days = $request->input('days', 7);
+        $daysInput = $request->input('days');
+        $days = is_numeric($daysInput) ? (int) $daysInput : 7;
         $deleted = $this->logReader->clearOldLogs($days);
 
         return back()->with('success', "Cleared {$deleted} old log file(s).");

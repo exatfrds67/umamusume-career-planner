@@ -10,7 +10,6 @@ use App\Http\Resources\Api\TrainingPredictionResource;
 use App\Models\Character;
 use App\Services\TrainingCalculationService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
@@ -66,6 +65,16 @@ class TrainingPredictionController extends Controller
     {
         try {
             $startTime = microtime(true);
+
+            // Ensure user is authenticated
+            $user = $request->user();
+            if (! $user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthenticated',
+                    'error' => 'You must be authenticated to access this resource.',
+                ], 401);
+            }
 
             // Load character with relationships
             /** @var Character $character */
@@ -141,9 +150,10 @@ class TrainingPredictionController extends Controller
 
             return new TrainingPredictionResource($prediction);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            $user = $request->user();
             Log::warning('Character not found for training prediction', [
                 'character_id' => $request->input('character_id'),
-                'user_id' => $request->user()->id,
+                'user_id' => $user?->id,
             ]);
 
             return response()->json([
@@ -176,6 +186,16 @@ class TrainingPredictionController extends Controller
         try {
             $startTime = microtime(true);
 
+            // Ensure user is authenticated
+            $user = $request->user();
+            if (! $user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthenticated',
+                    'error' => 'You must be authenticated to access this resource.',
+                ], 401);
+            }
+
             // Load character with relationships
             /** @var Character $character */
             $character = Character::query()
@@ -191,7 +211,7 @@ class TrainingPredictionController extends Controller
             // Generate cache key for batch prediction
             $cacheKey = $this->generateCacheKey(
                 $character->id,
-                'batch_' . \implode('_', $trainingTypes),
+                'batch_'.\implode('_', $trainingTypes),
                 $trainingData
             );
 
@@ -345,7 +365,7 @@ class TrainingPredictionController extends Controller
         // Add random hint chance based on training type
         if (\count($activeCards) > 0) {
             $hints[] = [
-                'skill_name' => ucfirst($trainingType) . ' Skill',
+                'skill_name' => ucfirst($trainingType).' Skill',
                 'probability' => 15 + (\count($activeCards) * 5),
                 'is_guaranteed' => false,
                 'source_card' => 'Training',
@@ -368,10 +388,16 @@ class TrainingPredictionController extends Controller
             return 90 + \rand(0, 10);
         }
 
-        // Calculate score based on stat gains and risk
-        $totalGain = \array_sum($prediction['stat_gains'] ?? []);
-        $riskPenalty = ($prediction['failure_risk'] ?? 0) * 30;
-        $bonusMultiplier = ($prediction['total_bonus'] ?? 0) * 10;
+        // Calculate score based on stat gains and risk with proper type safety
+        $statGains = $prediction['stat_gains'] ?? [];
+        $statGainsArray = is_array($statGains) ? $statGains : [];
+        $totalGain = \array_sum($statGainsArray);
+
+        $failureRisk = $prediction['failure_risk'] ?? 0;
+        $riskPenalty = (is_numeric($failureRisk) ? (float) $failureRisk : 0.0) * 30;
+
+        $totalBonus = $prediction['total_bonus'] ?? 0;
+        $bonusMultiplier = (is_numeric($totalBonus) ? (float) $totalBonus : 0.0) * 10;
 
         return (int) \min(100, \max(0, $totalGain + $bonusMultiplier - $riskPenalty));
     }
@@ -383,6 +409,16 @@ class TrainingPredictionController extends Controller
     {
         try {
             $startTime = microtime(true);
+
+            // Ensure user is authenticated
+            $user = $request->user();
+            if (! $user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthenticated',
+                    'error' => 'You must be authenticated to access this resource.',
+                ], 401);
+            }
 
             // Load character with relationships
             /** @var Character $character */
@@ -405,7 +441,7 @@ class TrainingPredictionController extends Controller
             $cacheHit = $this->getCache($tags)->has($cacheKey);
 
             $recommendation = $this->getCache($tags)
-                ->remember($cacheKey, self::CACHE_TTL, fn() => $this->trainingService->getRecommendedTraining(
+                ->remember($cacheKey, self::CACHE_TTL, fn () => $this->trainingService->getRecommendedTraining(
                     $character,
                     $trainingData
                 ));
@@ -429,9 +465,10 @@ class TrainingPredictionController extends Controller
                 'message' => 'Training recommendation generated successfully',
             ]);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            $user = $request->user();
             Log::warning('Character not found for training recommendation', [
                 'character_id' => $request->input('character_id'),
-                'user_id' => $request->user()->id,
+                'user_id' => $user?->id,
             ]);
 
             return response()->json([
@@ -574,6 +611,6 @@ class TrainingPredictionController extends Controller
         // Generate hash of context
         $contextHash = md5(json_encode($context) ?: '');
 
-        return self::CACHE_PREFIX . "{$characterId}:{$trainingType}:{$contextHash}";
+        return self::CACHE_PREFIX."{$characterId}:{$trainingType}:{$contextHash}";
     }
 }
