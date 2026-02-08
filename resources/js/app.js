@@ -56,6 +56,65 @@ import "./pages/skills/partials/planner.js";
 Alpine.plugin(persist);
 Alpine.plugin(collapse);
 
+// --- Sidebar Store (Sidebar Minimize Feature) ---
+document.addEventListener("alpine:init", () => {
+    Alpine.store("sidebar", {
+        // Initialize from localStorage
+        minimized: localStorage.getItem("sidebar-minimized") === "true",
+
+        // Toggle between states
+        toggle() {
+            this.minimized = !this.minimized;
+            this.persist();
+            this.announce();
+        },
+
+        // Force expand
+        expand() {
+            if (this.minimized) {
+                this.minimized = false;
+                this.persist();
+                this.announce();
+            }
+        },
+
+        // Force minimize
+        minimize() {
+            if (!this.minimized) {
+                this.minimized = true;
+                this.persist();
+                this.announce();
+            }
+        },
+
+        // Persist to localStorage
+        persist() {
+            try {
+                localStorage.setItem("sidebar-minimized", this.minimized);
+            } catch (e) {
+                console.warn("Failed to persist sidebar state:", e);
+            }
+        },
+
+        // Announce to screen readers
+        announce() {
+            const message = this.minimized
+                ? "Sidebar minimized"
+                : "Sidebar expanded";
+
+            const announcer = document.getElementById("sidebar-announcer");
+            if (announcer) {
+                announcer.textContent = message;
+
+                // Clear after announcement
+                setTimeout(() => {
+                    announcer.textContent = "";
+                }, 1000);
+            }
+        },
+    });
+});
+
 // --- Deck Builder Component (Fully Consolidated) ---
 const deckBuilder = () => ({
     // Data Models
