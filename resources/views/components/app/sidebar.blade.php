@@ -1,20 +1,56 @@
 @props(['currentRoute' => null])
 
-<div class="flex grow flex-col gap-y-5 overflow-y-auto bg-white dark:bg-gray-800 px-6 pb-4" x-data="{
-    dataOpen: false,
-    analyticsOpen: false,
-    aiOpen: false,
-    toolsOpen: false,
-    adminOpen: false
-}">
-    <!-- Logo -->
-    <div class="flex h-16 shrink-0 items-center gap-3 border-b border-gray-200 dark:border-gray-700">
+<div class="flex grow flex-col gap-y-5 overflow-y-auto bg-white dark:bg-gray-800 px-6 pb-4" id="sidebar-navigation"
+    :aria-expanded="!$store.sidebar.minimized ? 'true' : 'false'" x-data="{
+        dataOpen: false,
+        analyticsOpen: false,
+        aiOpen: false,
+        toolsOpen: false,
+        adminOpen: false
+    }">
+    <!-- Logo Section with Hover Toggle -->
+    <div x-data="{ showToggle: false }" @mouseenter="showToggle = true" @mouseleave="showToggle = false"
+        class="relative flex h-16 shrink-0 items-center border-b border-gray-200 dark:border-gray-700"
+        :class="$store.sidebar.minimized ? 'justify-center' : 'gap-3'">
+        <!-- Logo -->
         <img src="/images/app_logo/uma_musume_race_planner_logo_128.png"
             alt="{{ config('app.name', 'Umamusume Career Planner') }} logo" class="h-10 w-10 shrink-0" width="40"
             height="40" loading="eager">
-        <span class="text-base font-bold text-primary-600 dark:text-primary-400 leading-tight">
+
+        <!-- Logo Text (Expanded Only) -->
+        <span x-show="!$store.sidebar.minimized" x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+            x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            class="text-base font-bold text-primary-600 dark:text-primary-400 leading-tight">
             Umamusume<br>Career Planner
         </span>
+
+        <!-- Toggle Button (appears on hover) -->
+        <div x-show="showToggle" x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+            x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 scale-100"
+            x-transition:leave-end="opacity-0 scale-95" class="absolute top-2 right-2" style="display: none;">
+            <button @click="$store.sidebar.toggle()" type="button"
+                class="p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500"
+                :aria-label="$store.sidebar.minimized ? 'Expand sidebar' : 'Minimize sidebar'"
+                :aria-pressed="$store.sidebar.minimized ? 'true' : 'false'" aria-controls="sidebar-navigation"
+                :title="$store.sidebar.minimized ? 'Expand sidebar' : 'Minimize sidebar'">
+                <!-- Chevron Double Left (Minimize) -->
+                <svg x-show="!$store.sidebar.minimized" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                    stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="m18.75 4.5-7.5 7.5 7.5 7.5m-6-15L5.25 12l7.5 7.5" />
+                </svg>
+
+                <!-- Chevron Double Right (Expand) -->
+                <svg x-show="$store.sidebar.minimized" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                    stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="m5.25 4.5 7.5 7.5-7.5 7.5m6-15 7.5 7.5-7.5 7.5" />
+                </svg>
+            </button>
+        </div>
     </div>
 
     <!-- Navigation -->
@@ -157,7 +193,8 @@
 
                     <!-- Analytics & Reports Group -->
                     <li>
-                        <button @click="analyticsOpen = !analyticsOpen" type="button" aria-label="Toggle Analytics & Reports menu"
+                        <button @click="analyticsOpen = !analyticsOpen" type="button"
+                            aria-label="Toggle Analytics & Reports menu"
                             class="group flex w-full items-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-700 hover:bg-gray-50 hover:text-primary-600 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-primary-400">
                             <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor">
@@ -234,7 +271,8 @@
 
                     <!-- External Resources Group -->
                     <li>
-                        <button @click="toolsOpen = !toolsOpen" type="button" aria-label="Toggle External Resources menu"
+                        <button @click="toolsOpen = !toolsOpen" type="button"
+                            aria-label="Toggle External Resources menu"
                             class="group flex w-full items-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-700 hover:bg-gray-50 hover:text-primary-600 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-primary-400">
                             <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor">
@@ -264,7 +302,8 @@
 
                             <!-- Admin Panel (Only visible to admin users) -->
                             <li>
-                                <button @click="adminOpen = !adminOpen" type="button" aria-label="Toggle Admin Panel menu"
+                                <button @click="adminOpen = !adminOpen" type="button"
+                                    aria-label="Toggle Admin Panel menu"
                                     class="group flex w-full items-center gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 bg-amber-50 text-amber-700 hover:bg-amber-100 hover:text-amber-800 dark:bg-amber-900/20 dark:text-amber-400 dark:hover:bg-amber-900/30 dark:hover:text-amber-300">
                                     <svg class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                         stroke="currentColor">
