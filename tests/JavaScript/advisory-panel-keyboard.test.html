@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Advisory Panel Keyboard Shortcut Test</title>
+        <script
+            src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+            defer
+        ></script>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                padding: 20px;
+                max-width: 800px;
+                margin: 0 auto;
+            }
+            .test-result {
+                padding: 10px;
+                margin: 10px 0;
+                border-radius: 4px;
+            }
+            .pass {
+                background-color: #d4edda;
+                border: 1px solid #c3e6cb;
+                color: #155724;
+            }
+            .fail {
+                background-color: #f8d7da;
+                border: 1px solid #f5c6cb;
+                color: #721c24;
+            }
+            .panel {
+                position: fixed;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                width: 400px;
+                background: white;
+                box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+                padding: 20px;
+                transform: translateX(100%);
+                transition: transform 0.3s;
+            }
+            .panel.open {
+                transform: translateX(0);
+            }
+            .toggle-button {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                padding: 10px 20px;
+                background: #007bff;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+            kbd {
+                background: #f4f4f4;
+                border: 1px solid #ccc;
+                border-radius: 3px;
+                padding: 2px 6px;
+                font-family: monospace;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Advisory Panel Keyboard Shortcut Test</h1>
+        <p>
+            This page tests the Alt+A keyboard shortcut functionality for the
+            advisory panel.
+        </p>
+
+        <div id="test-results">
+            <h2>Test Results</h2>
+            <div id="results-container"></div>
+        </div>
+
+        <div id="instructions">
+            <h2>Manual Test Instructions</h2>
+            <ol>
+                <li>Press <kbd>Alt</kbd> + <kbd>A</kbd> to open the panel</li>
+                <li>
+                    Press <kbd>Alt</kbd> + <kbd>A</kbd> again to close the panel
+                </li>
+                <li>Press <kbd>Escape</kbd> to close the panel when open</li>
+                <li>Click the toggle button to open/close the panel</li>
+            </ol>
+        </div>
+
+        <div x-data="testAdvisoryPanel()" x-init="runTests()">
+            <!-- Toggle Button -->
+            <button
+                x-show="!isOpen"
+                @click="togglePanel()"
+                class="toggle-button"
+                aria-label="Open AI Advisory Panel (Alt+A)"
+            >
+                Open Panel (Alt+A)
+            </button>
+
+            <!-- Advisory Panel -->
+            <div
+                x-show="isOpen"
+                class="panel"
+                :class="{ 'open': isOpen }"
+                role="dialog"
+                aria-modal="true"
+            >
+                <h2>AI Advisory Panel</h2>
+                <p>Panel is now open!</p>
+                <button @click="closePanel()">Close Panel</button>
+                <p>
+                    <small
+                        >Press <kbd>Alt</kbd> + <kbd>A</kbd> or
+                        <kbd>Escape</kbd> to close</small
+                    >
+                </p>
+            </div>
+        </div>
+
+        <script>
+            function testAdvisoryPanel() {
+                return {
+                    isOpen: false,
+                    testResults: [],
+
+                    init() {
+                        this.setupKeyboardShortcuts();
+                    },
+
+                    setupKeyboardShortcuts() {
+                        window.addEventListener("keydown", (e) => {
+                            // Alt+A: Toggle panel
+                            if (e.altKey && e.key === "a") {
+                                e.preventDefault();
+                                this.togglePanel();
+                                return;
+                            }
+
+                            // Only handle other shortcuts when panel is open
+                            if (!this.isOpen) {
+                                return;
+                            }
+
+                            // Escape: Close panel
+                            if (e.key === "Escape") {
+                                e.preventDefault();
+                                this.closePanel();
+                                return;
+                            }
+                        });
+                    },
+
+                    togglePanel() {
+                        this.isOpen = !this.isOpen;
+                        this.logTest(
+                            "Toggle Panel",
+                            this.isOpen ? "Panel opened" : "Panel closed",
+                            true,
+                        );
+                    },
+
+                    openPanel() {
+                        this.isOpen = true;
+                        this.logTest("Open Panel", "Panel opened", true);
+                    },
+
+                    closePanel() {
+                        this.isOpen = false;
+                        this.logTest("Close Panel", "Panel closed", true);
+                    },
+
+                    logTest(testName, message, passed) {
+                        this.testResults.push({ testName, message, passed });
+                        this.updateTestResults();
+                    },
+
+                    updateTestResults() {
+                        const container =
+                            document.getElementById("results-container");
+                        container.innerHTML = this.testResults
+                            .map(
+                                (result) => `
+                        <div class="test-result ${result.passed ? "pass" : "fail"}">
+                            <strong>${result.testName}:</strong> ${result.message}
+                        </div>
+                    `,
+                            )
+                            .join("");
+                    },
+
+                    runTests() {
+                        // Automated tests
+                        setTimeout(() => {
+                            // Test 1: Initial state
+                            this.logTest(
+                                "Initial State",
+                                `Panel is ${this.isOpen ? "open" : "closed"}`,
+                                !this.isOpen,
+                            );
+
+                            // Test 2: Toggle panel
+                            setTimeout(() => {
+                                this.togglePanel();
+                                this.logTest(
+                                    "Toggle Open",
+                                    `Panel is ${this.isOpen ? "open" : "closed"}`,
+                                    this.isOpen,
+                                );
+
+                                // Test 3: Toggle panel again
+                                setTimeout(() => {
+                                    this.togglePanel();
+                                    this.logTest(
+                                        "Toggle Close",
+                                        `Panel is ${this.isOpen ? "open" : "closed"}`,
+                                        !this.isOpen,
+                                    );
+                                }, 500);
+                            }, 500);
+                        }, 1000);
+                    },
+                };
+            }
+        </script>
+    </body>
+</html>
