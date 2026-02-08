@@ -1,0 +1,95 @@
+/**
+ * Critical Alert Badge Component Styles
+ * Provides pulsing animation for critical alerts with accessibility support
+ */
+
+/* Pulsing Animation for Critical Alert Icon */
+@keyframes criticalAlertPulse {
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(1.05);
+    }
+}
+
+.critical-alert-icon {
+    animation: criticalAlertPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Pulsing Animation for Badge */
+@keyframes badgePulse {
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7);
+    }
+    50% {
+        box-shadow: 0 0 0 6px rgba(220, 38, 38, 0);
+    }
+}
+
+.critical-alert-badge {
+    animation: badgePulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Dark mode adjustments */
+.dark .critical-alert-badge {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+}
+
+@keyframes badgePulseDark {
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+    }
+    50% {
+        box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+    }
+}
+
+.dark .critical-alert-badge {
+    animation: badgePulseDark 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Focus styles for accessibility */
+button:focus-visible .critical-alert-icon {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+    border-radius: 0.375rem;
+}
+
+/* Hover state enhancement */
+button:hover .critical-alert-icon {
+    animation-duration: 1.5s;
+}
+
+button:hover .critical-alert-badge {
+    animation-duration: 1.5s;
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+    .critical-alert-icon,
+    .critical-alert-badge {
+        animation: none !important;
+    }
+
+    /* Provide static visual indicator instead */
+    .critical-alert-badge {
+        box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.5);
+    }
+
+    .dark .critical-alert-badge {
+        box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.5);
+    }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+    .critical-alert-badge {
+        border: 2px solid currentColor;
+    }
+}
