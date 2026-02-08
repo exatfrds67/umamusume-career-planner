@@ -23,10 +23,12 @@ class RaceFactory extends Factory
         $distanceMeters = fake()->randomElement([1200, 1400, 1600, 1800, 2000, 2200, 2400, 2500, 3000, 3200]);
 
         // Determine distance category based on meters
+        // Database uses: 'short', 'mile', 'intermediate', 'long'
+        // NOT the RaceDistance enum values ('sprint', 'mile', 'medium', 'long')
         $distanceCategory = match (true) {
-            $distanceMeters <= 1400 => 'short',
-            $distanceMeters <= 1800 => 'mile',
-            $distanceMeters <= 2400 => 'intermediate',
+            $distanceMeters < 1400 => 'short',
+            $distanceMeters < 1800 => 'mile',
+            $distanceMeters < 2400 => 'intermediate',
             default => 'long',
         };
 
@@ -56,15 +58,15 @@ class RaceFactory extends Factory
             'surface' => fake()->randomElement(['turf', 'dirt']),
             'track_type' => fake()->randomElement(['right', 'left', 'straight']),
             'running_style' => fake()->randomElement(['escape', 'leading', 'insert', 'tracking']),
-            'weather' => fake()->randomElement(['sunny', 'cloudy', 'rainy']),
-            'track_condition' => fake()->randomElement(['firm', 'good', 'yielding', 'soft']),
+            'weather' => fake()->randomElement(['sunny', 'cloudy', 'rainy', 'snowy']),
+            'track_condition' => fake()->randomElement(['firm', 'good', 'yielding', 'soft', 'heavy']),
             'field_size' => $fieldSize,
             'race_conditions' => [
                 'weather' => fake()->randomElement(['sunny', 'cloudy', 'rainy']),
                 'track_condition' => fake()->randomElement(['good', 'slightly_heavy', 'heavy']),
             ],
-            'character_condition' => fake()->randomElement(['perfect', 'good', 'normal', 'bad']),
-            'motivation' => fake()->randomElement(['very_high', 'high', 'normal', 'low']),
+            'character_condition' => fake()->randomElement(['perfect', 'good', 'normal', 'bad', 'very_bad']),
+            'motivation' => fake()->randomElement(['very_high', 'high', 'normal', 'low', 'very_low']),
             'energy_level' => fake()->numberBetween(50, 100),
             'speed_at_race' => fake()->numberBetween(400, 1200),
             'stamina_at_race' => fake()->numberBetween(400, 1200),

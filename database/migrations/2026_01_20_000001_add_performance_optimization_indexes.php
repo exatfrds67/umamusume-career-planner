@@ -240,107 +240,107 @@ return new class extends Migration
         // Characters table
         if (Schema::hasTable('ucp_characters')) {
             Schema::table('ucp_characters', function (Blueprint $table): void {
-                $this->dropIndexIfExists($table, 'idx_characters_user_scenario');
-                $this->dropIndexIfExists($table, 'idx_characters_career_stage');
-                $this->dropIndexIfExists($table, 'idx_characters_user_active');
+                $this->dropIndexIfExists('ucp_characters', $table, 'idx_characters_user_scenario');
+                $this->dropIndexIfExists('ucp_characters', $table, 'idx_characters_career_stage');
+                $this->dropIndexIfExists('ucp_characters', $table, 'idx_characters_user_active');
             });
         }
 
         // Careers table
         if (Schema::hasTable('ucp_careers')) {
             Schema::table('ucp_careers', function (Blueprint $table): void {
-                $this->dropIndexIfExists($table, 'idx_careers_character_scenario');
-                $this->dropIndexIfExists($table, 'idx_careers_status');
-                $this->dropIndexIfExists($table, 'idx_careers_dates');
+                $this->dropIndexIfExists('ucp_careers', $table, 'idx_careers_character_scenario');
+                $this->dropIndexIfExists('ucp_careers', $table, 'idx_careers_status');
+                $this->dropIndexIfExists('ucp_careers', $table, 'idx_careers_dates');
             });
         }
 
         // Training sessions table
         if (Schema::hasTable('ucp_training_sessions')) {
             Schema::table('ucp_training_sessions', function (Blueprint $table): void {
-                $this->dropIndexIfExists($table, 'idx_training_career_turn');
-                $this->dropIndexIfExists($table, 'idx_training_type');
+                $this->dropIndexIfExists('ucp_training_sessions', $table, 'idx_training_career_turn');
+                $this->dropIndexIfExists('ucp_training_sessions', $table, 'idx_training_type');
             });
         }
 
         // Races table
         if (Schema::hasTable('ucp_races')) {
             Schema::table('ucp_races', function (Blueprint $table): void {
-                $this->dropIndexIfExists($table, 'idx_races_career_position');
-                $this->dropIndexIfExists($table, 'idx_races_grade');
-                $this->dropIndexIfExists($table, 'idx_races_distance');
-                $this->dropIndexIfExists($table, 'idx_races_surface_weather');
+                $this->dropIndexIfExists('ucp_races', $table, 'idx_races_career_position');
+                $this->dropIndexIfExists('ucp_races', $table, 'idx_races_grade');
+                $this->dropIndexIfExists('ucp_races', $table, 'idx_races_distance');
+                $this->dropIndexIfExists('ucp_races', $table, 'idx_races_surface_weather');
             });
         }
 
         // Skills table
         if (Schema::hasTable('ucp_skills')) {
             Schema::table('ucp_skills', function (Blueprint $table): void {
-                $this->dropIndexIfExists($table, 'idx_skills_type');
-                $this->dropIndexIfExists($table, 'idx_skills_meta_tier');
+                $this->dropIndexIfExists('ucp_skills', $table, 'idx_skills_type');
+                $this->dropIndexIfExists('ucp_skills', $table, 'idx_skills_meta_tier');
             });
         }
 
         // Skill acquisitions table
         if (Schema::hasTable('ucp_skill_acquisitions')) {
             Schema::table('ucp_skill_acquisitions', function (Blueprint $table): void {
-                $this->dropIndexIfExists($table, 'idx_skill_acq_char_skill');
-                $this->dropIndexIfExists($table, 'idx_skill_acq_career');
+                $this->dropIndexIfExists('ucp_skill_acquisitions', $table, 'idx_skill_acq_char_skill');
+                $this->dropIndexIfExists('ucp_skill_acquisitions', $table, 'idx_skill_acq_career');
             });
         }
 
         // Support cards table
         if (Schema::hasTable('ucp_support_cards')) {
             Schema::table('ucp_support_cards', function (Blueprint $table): void {
-                $this->dropIndexIfExists($table, 'idx_support_rarity');
-                $this->dropIndexIfExists($table, 'idx_support_card_type');
+                $this->dropIndexIfExists('ucp_support_cards', $table, 'idx_support_rarity');
+                $this->dropIndexIfExists('ucp_support_cards', $table, 'idx_support_card_type');
             });
         }
 
         // AI conversations table
         if (Schema::hasTable('ucp_ai_conversations')) {
             Schema::table('ucp_ai_conversations', function (Blueprint $table): void {
-                $this->dropIndexIfExists($table, 'idx_ai_conv_user_created');
-                $this->dropIndexIfExists($table, 'idx_ai_conv_model');
+                $this->dropIndexIfExists('ucp_ai_conversations', $table, 'idx_ai_conv_user_created');
+                $this->dropIndexIfExists('ucp_ai_conversations', $table, 'idx_ai_conv_model');
             });
         }
 
         // MCP agents table
         if (Schema::hasTable('ucp_mcp_agents')) {
             Schema::table('ucp_mcp_agents', function (Blueprint $table): void {
-                $this->dropIndexIfExists($table, 'idx_mcp_agents_status');
+                $this->dropIndexIfExists('ucp_mcp_agents', $table, 'idx_mcp_agents_status');
             });
         }
 
         // External data table
         if (Schema::hasTable('ucp_external_data')) {
             Schema::table('ucp_external_data', function (Blueprint $table): void {
-                $this->dropIndexIfExists($table, 'idx_external_type_source');
-                $this->dropIndexIfExists($table, 'idx_external_cache_expires');
-                $this->dropIndexIfExists($table, 'idx_external_is_active');
+                $this->dropIndexIfExists('ucp_external_data', $table, 'idx_external_type_source');
+                $this->dropIndexIfExists('ucp_external_data', $table, 'idx_external_cache_expires');
+                $this->dropIndexIfExists('ucp_external_data', $table, 'idx_external_is_active');
             });
         }
 
         // Factors table
         if (Schema::hasTable('ucp_factors')) {
             Schema::table('ucp_factors', function (Blueprint $table): void {
-                $this->dropIndexIfExists($table, 'idx_factors_char_type');
-                $this->dropIndexIfExists($table, 'idx_factors_star_level');
+                $this->dropIndexIfExists('ucp_factors', $table, 'idx_factors_char_type');
+                $this->dropIndexIfExists('ucp_factors', $table, 'idx_factors_star_level');
             });
         }
 
         // Events table
         if (Schema::hasTable('ucp_events')) {
             Schema::table('ucp_events', function (Blueprint $table): void {
-                $this->dropIndexIfExists($table, 'idx_events_career_turn');
-                $this->dropIndexIfExists($table, 'idx_events_type');
+                $this->dropIndexIfExists('ucp_events', $table, 'idx_events_career_turn');
+                $this->dropIndexIfExists('ucp_events', $table, 'idx_events_type');
             });
         }
 
         // User preferences table
         if (Schema::hasTable('ucp_user_preferences')) {
             Schema::table('ucp_user_preferences', function (Blueprint $table): void {
-                $this->dropIndexIfExists($table, 'idx_user_prefs_user_key');
+                $this->dropIndexIfExists('ucp_user_preferences', $table, 'idx_user_prefs_user_key');
             });
         }
     }
@@ -368,12 +368,10 @@ return new class extends Migration
     /**
      * Drop an index if it exists.
      */
-    private function dropIndexIfExists(Blueprint $table, string $indexName): void
+    private function dropIndexIfExists(string $tableName, Blueprint $table, string $indexName): void
     {
-        try {
+        if ($this->indexExists($tableName, $indexName)) {
             $table->dropIndex($indexName);
-        } catch (\Exception) {
-            // Index doesn't exist, ignore
         }
     }
 };

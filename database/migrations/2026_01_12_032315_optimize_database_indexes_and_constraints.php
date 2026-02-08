@@ -181,8 +181,12 @@ return new class extends Migration
         });
 
         Schema::table('ucp_mcp_agents', function (Blueprint $table) {
-            $table->dropIndex('idx_agent_user_type_status');
-            $table->dropIndex('idx_agent_success_activity');
+            if ($this->indexExists('ucp_mcp_agents', 'idx_agent_user_type_status')) {
+                $table->dropIndex('idx_agent_user_type_status');
+            }
+            if ($this->indexExists('ucp_mcp_agents', 'idx_agent_success_activity')) {
+                $table->dropIndex('idx_agent_success_activity');
+            }
         });
 
         Schema::table('ucp_user_preferences', function (Blueprint $table) {
@@ -194,5 +198,25 @@ return new class extends Migration
             $table->dropIndex('idx_log_user_entity');
             $table->dropIndex('idx_log_security_audit');
         });
+    }
+
+    /**
+     * Check if an index exists on a table.
+     */
+    private function indexExists(string $table, string $indexName): bool
+    {
+        $connection = Schema::getConnection();
+        $driver = $connection->getDriverName();
+
+        if ($driver === 'sqlite') {
+            $indexes = $connection->select("PRAGMA index_list('{$table}')");
+
+            return collect($indexes)->contains('name', $indexName);
+        }
+
+        // MySQL/MariaDB
+        $indexes = $connection->select("SHOW INDEX FROM `{$table}` WHERE Key_name = ?", [$indexName]);
+
+        return count($indexes) > 0;
     }
 };
