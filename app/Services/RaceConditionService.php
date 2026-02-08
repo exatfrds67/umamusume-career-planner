@@ -109,13 +109,13 @@ class RaceConditionService
      */
     public function calculatePowerPenalty(string $trackCondition, string $surface): int
     {
-        $penalties = self::CONDITION_PENALTIES[$trackCondition][$surface] ?? null;
-
-        if ($penalties === null) {
+        if (! isset(self::CONDITION_PENALTIES[$trackCondition][$surface])) {
             return 0;
         }
 
-        return (int) ($penalties['power_penalty'] ?? 0);
+        $penalties = self::CONDITION_PENALTIES[$trackCondition][$surface];
+
+        return (int) $penalties['power_penalty'];
     }
 
     /**
@@ -127,13 +127,13 @@ class RaceConditionService
      */
     public function calculateSpeedPenalty(string $trackCondition, string $surface): int
     {
-        $penalties = self::CONDITION_PENALTIES[$trackCondition][$surface] ?? null;
-
-        if ($penalties === null) {
+        if (! isset(self::CONDITION_PENALTIES[$trackCondition][$surface])) {
             return 0;
         }
 
-        return (int) ($penalties['speed_penalty'] ?? 0);
+        $penalties = self::CONDITION_PENALTIES[$trackCondition][$surface];
+
+        return (int) $penalties['speed_penalty'];
     }
 
     /**
@@ -145,13 +145,13 @@ class RaceConditionService
      */
     public function calculateStaminaDrain(string $trackCondition, string $surface): float
     {
-        $penalties = self::CONDITION_PENALTIES[$trackCondition][$surface] ?? null;
-
-        if ($penalties === null) {
+        if (! isset(self::CONDITION_PENALTIES[$trackCondition][$surface])) {
             return 0.0;
         }
 
-        return (float) ($penalties['stamina_drain'] ?? 0.0);
+        $penalties = self::CONDITION_PENALTIES[$trackCondition][$surface];
+
+        return (float) $penalties['stamina_drain'];
     }
 
     /**
@@ -169,13 +169,13 @@ class RaceConditionService
         // Apply power penalty
         $powerPenalty = $this->calculatePowerPenalty($trackCondition, $surface);
         if ($powerPenalty !== 0) {
-            $modifiedStats['power'] = max(0, ($stats['power'] ?? 0) + $powerPenalty);
+            $modifiedStats['power'] = max(0, $stats['power'] + $powerPenalty);
         }
 
         // Apply speed penalty
         $speedPenalty = $this->calculateSpeedPenalty($trackCondition, $surface);
         if ($speedPenalty !== 0) {
-            $modifiedStats['speed'] = max(0, ($stats['speed'] ?? 0) + $speedPenalty);
+            $modifiedStats['speed'] = max(0, $stats['speed'] + $speedPenalty);
         }
 
         return $modifiedStats;

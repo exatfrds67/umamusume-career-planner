@@ -120,12 +120,12 @@ class RaceStrategyService
 
         // Race information
         $context .= "## Race Information\n";
-        $raceName = isset($raceData['race_name']) && is_scalar($raceData['race_name']) ? (string) $raceData['race_name'] : 'Unknown Race';
-        $raceGrade = isset($raceData['race_grade']) && is_scalar($raceData['race_grade']) ? (string) $raceData['race_grade'] : 'Unknown';
-        $distanceMeters = isset($raceData['distance_meters']) && is_scalar($raceData['distance_meters']) ? (string) $raceData['distance_meters'] : 'Unknown';
-        $distanceCategory = isset($raceData['distance_category']) && is_scalar($raceData['distance_category']) ? (string) $raceData['distance_category'] : 'Unknown';
-        $surfaceStr = isset($raceData['surface']) && is_scalar($raceData['surface']) ? (string) $raceData['surface'] : 'Unknown';
-        $trackType = isset($raceData['track_type']) && is_scalar($raceData['track_type']) ? (string) $raceData['track_type'] : 'Unknown';
+        $raceName = isset($raceData['race_name']) && is_scalar($raceData['race_name']) ? (is_string($raceData['race_name']) ? $raceData['race_name'] : (string) $raceData['race_name']) : 'Unknown Race';
+        $raceGrade = isset($raceData['race_grade']) && is_scalar($raceData['race_grade']) ? (is_string($raceData['race_grade']) ? $raceData['race_grade'] : (string) $raceData['race_grade']) : 'Unknown';
+        $distanceMeters = isset($raceData['distance_meters']) && is_scalar($raceData['distance_meters']) ? (is_string($raceData['distance_meters']) ? $raceData['distance_meters'] : (string) $raceData['distance_meters']) : 'Unknown';
+        $distanceCategory = isset($raceData['distance_category']) && is_scalar($raceData['distance_category']) ? (is_string($raceData['distance_category']) ? $raceData['distance_category'] : (string) $raceData['distance_category']) : 'Unknown';
+        $surfaceStr = isset($raceData['surface']) && is_scalar($raceData['surface']) ? (is_string($raceData['surface']) ? $raceData['surface'] : (string) $raceData['surface']) : 'Unknown';
+        $trackType = isset($raceData['track_type']) && is_scalar($raceData['track_type']) ? (is_string($raceData['track_type']) ? $raceData['track_type'] : (string) $raceData['track_type']) : 'Unknown';
         $context .= "- Race Name: {$raceName}\n";
         $context .= "- Grade: {$raceGrade}\n";
         $context .= "- Distance: {$distanceMeters} meters\n";
@@ -134,12 +134,12 @@ class RaceStrategyService
         $context .= "- Track Type: {$trackType}\n";
 
         if (isset($raceData['weather']) && is_scalar($raceData['weather'])) {
-            $weather = (string) $raceData['weather'];
+            $weather = is_string($raceData['weather']) ? $raceData['weather'] : (string) $raceData['weather'];
             $context .= "- Weather: {$weather}\n";
         }
 
         if (isset($raceData['track_condition']) && is_scalar($raceData['track_condition'])) {
-            $trackCondition = (string) $raceData['track_condition'];
+            $trackCondition = is_string($raceData['track_condition']) ? $raceData['track_condition'] : (string) $raceData['track_condition'];
             $context .= "- Track Condition: {$trackCondition}\n";
         }
 
@@ -152,8 +152,8 @@ class RaceStrategyService
 
         // Add condition analysis if weather/track data available
         if (isset($raceData['track_condition'], $raceData['surface'])) {
-            $trackCondition = (string) $raceData['track_condition'];
-            $surface = (string) $raceData['surface'];
+            $trackCondition = is_string($raceData['track_condition']) ? $raceData['track_condition'] : (is_scalar($raceData['track_condition']) ? (string) $raceData['track_condition'] : '');
+            $surface = is_string($raceData['surface']) ? $raceData['surface'] : (is_scalar($raceData['surface']) ? (string) $raceData['surface'] : '');
 
             if (
                 $this->conditionService->isValidTrackCondition($trackCondition) &&
@@ -173,7 +173,7 @@ class RaceStrategyService
                 $context .= "- Severity Level: {$severity}/3\n";
 
                 // Get recommended skills
-                $weather = isset($raceData['weather']) ? (string) $raceData['weather'] : null;
+                $weather = isset($raceData['weather']) && is_string($raceData['weather']) ? $raceData['weather'] : null;
                 $recommendedSkills = $this->conditionService->getRecommendedSkills($weather, $trackCondition);
 
                 if (! empty($recommendedSkills)) {
@@ -183,7 +183,8 @@ class RaceStrategyService
                     }
                 }
 
-                // Calculate modified stats
+                // Calculate modified stats - define $currentStats first
+                $currentStats = $character->current_stats ?? [];
                 $stats = [
                     'speed' => $currentStats['speed'] ?? 0,
                     'stamina' => $currentStats['stamina'] ?? 0,

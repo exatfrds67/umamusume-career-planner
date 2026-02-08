@@ -9,6 +9,8 @@ class LogReaderService
 {
     /**
      * Get log entries from the Laravel log file.
+     *
+     * @return array<int, array{timestamp: string, level: string, message: string, context: string}>
      */
     public function getLogEntries(int $lines = 100, ?string $level = null): array
     {
@@ -24,9 +26,16 @@ class LogReaderService
 
         if ($fileSize > $maxBytes) {
             $handle = fopen($logPath, 'r');
+            if ($handle === false) {
+                return [];
+            }
             fseek($handle, -$maxBytes, SEEK_END);
             $content = fread($handle, $maxBytes);
             fclose($handle);
+
+            if ($content === false) {
+                return [];
+            }
         } else {
             $content = File::get($logPath);
         }
@@ -42,6 +51,8 @@ class LogReaderService
 
     /**
      * Parse log file content into structured entries.
+     *
+     * @return array<int, array{timestamp: string, level: string, message: string, context: string}>
      */
     protected function parseLogEntries(string $content): array
     {
@@ -75,6 +86,8 @@ class LogReaderService
 
     /**
      * Search log entries by query.
+     *
+     * @return array<int, array{timestamp: string, level: string, message: string, context: string}>
      */
     public function searchLogs(string $query, int $lines = 100): array
     {
@@ -97,7 +110,9 @@ class LogReaderService
 
         foreach ($files as $file) {
             if ($file->getExtension() === 'log' && $file->getFilename() !== 'laravel.log') {
-                $age = now()->diffInDays($file->getMTime());
+                $mtime = $file->getMTime();
+                // Convert timestamp to Carbon instance for diffInDays
+                $age = is_int($mtime) ? now()->diffInDays(\Carbon\Carbon::createFromTimestamp($mtime)) : 0;
 
                 if ($age > $daysToKeep) {
                     File::delete($file->getPathname());

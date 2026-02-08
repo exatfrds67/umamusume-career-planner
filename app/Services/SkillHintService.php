@@ -18,21 +18,9 @@ use Illuminate\Support\Facades\Log;
 class SkillHintService
 {
     /**
-     * Maximum number of hints that provide discount (40% max = 2 hints × 20%)
+     * Maximum number of hints that provide discount (40% max = 5 hints with tiered system)
      */
     private const MAX_DISCOUNT_HINTS = 5;
-
-    /**
-     * Discount percentage per hint (deprecated - using tiered system now)
-     *
-     * @deprecated Use calculateDiscountPercentage() instead
-     */
-    private const DISCOUNT_PER_HINT = 10.0;
-
-    /**
-     * Maximum discount percentage
-     */
-    private const MAX_DISCOUNT_PERCENTAGE = 40.0;
 
     /**
      * Create a new skill hint for a character.

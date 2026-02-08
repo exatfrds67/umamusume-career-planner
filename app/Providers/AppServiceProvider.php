@@ -18,6 +18,13 @@ class AppServiceProvider extends ServiceProvider
             \App\Repositories\CharacterRepositoryInterface::class,
             \App\Repositories\EloquentCharacterRepository::class
         );
+
+        // Register AI Training Advisory services
+        $this->app->singleton(\App\Services\TrainingAdvisoryService::class);
+        $this->app->singleton(\App\Services\GameMechanicsEngine::class);
+        $this->app->singleton(\App\Services\RuleBasedAdvisor::class);
+        $this->app->singleton(\App\Services\CriticalSituationDetector::class);
+        $this->app->singleton(\App\Services\PredictionAccuracyTracker::class);
     }
 
     /**

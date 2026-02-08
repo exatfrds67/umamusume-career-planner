@@ -10,6 +10,8 @@ class SystemHealthService
 {
     /**
      * Get system health status.
+     *
+     * @return array{database: array<string, mixed>, cache: array<string, mixed>, redis: array<string, mixed>, storage: array<string, mixed>, queue: array<string, mixed>}
      */
     public function getSystemHealth(): array
     {
@@ -24,6 +26,8 @@ class SystemHealthService
 
     /**
      * Check database connection.
+     *
+     * @return array<string, mixed>
      */
     protected function checkDatabase(): array
     {
@@ -47,6 +51,8 @@ class SystemHealthService
 
     /**
      * Check cache connection.
+     *
+     * @return array<string, mixed>
      */
     protected function checkCache(): array
     {
@@ -70,6 +76,8 @@ class SystemHealthService
 
     /**
      * Check Redis connection.
+     *
+     * @return array<string, mixed>
      */
     protected function checkRedis(): array
     {
@@ -97,26 +105,38 @@ class SystemHealthService
 
     /**
      * Check storage disk space.
+     *
+     * @return array<string, mixed>
      */
     protected function checkStorage(): array
     {
         $storagePath = storage_path();
         $totalSpace = disk_total_space($storagePath);
         $freeSpace = disk_free_space($storagePath);
+
+        if ($totalSpace === false || $freeSpace === false) {
+            return [
+                'status' => 'error',
+                'message' => 'Unable to read disk space',
+            ];
+        }
+
         $usedSpace = $totalSpace - $freeSpace;
         $usedPercentage = ($usedSpace / $totalSpace) * 100;
 
         return [
             'status' => $usedPercentage > 90 ? 'warning' : 'healthy',
-            'total' => $this->formatBytes($totalSpace),
-            'used' => $this->formatBytes($usedSpace),
-            'free' => $this->formatBytes($freeSpace),
+            'total' => $this->formatBytes((int) $totalSpace),
+            'used' => $this->formatBytes((int) $usedSpace),
+            'free' => $this->formatBytes((int) $freeSpace),
             'used_percentage' => round($usedPercentage, 2),
         ];
     }
 
     /**
      * Check queue status.
+     *
+     * @return array<string, mixed>
      */
     protected function checkQueue(): array
     {
@@ -139,6 +159,8 @@ class SystemHealthService
 
     /**
      * Get environment information.
+     *
+     * @return array<string, mixed>
      */
     public function getEnvironmentInfo(): array
     {

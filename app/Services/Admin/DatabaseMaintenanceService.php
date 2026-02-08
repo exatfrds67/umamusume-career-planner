@@ -10,6 +10,8 @@ class DatabaseMaintenanceService
 {
     /**
      * Get database table information.
+     *
+     * @return array<int, array{name: string, rows: int, size: string, engine: string}>
      */
     public function getTableInfo(): array
     {
@@ -49,6 +51,8 @@ class DatabaseMaintenanceService
 
     /**
      * Optimize database tables.
+     *
+     * @return array<int, string>
      */
     public function optimizeTables(): array
     {
@@ -87,6 +91,11 @@ class DatabaseMaintenanceService
             $password = config('database.connections.mysql.password');
             $host = config('database.connections.mysql.host');
 
+            $database = is_string($database) ? $database : '';
+            $username = is_string($username) ? $username : '';
+            $password = is_string($password) ? $password : '';
+            $host = is_string($host) ? $host : '';
+
             $command = sprintf(
                 'mysqldump -h %s -u %s -p%s %s > %s',
                 escapeshellarg($host),
@@ -107,6 +116,8 @@ class DatabaseMaintenanceService
 
     /**
      * Get list of available seeders.
+     *
+     * @return array<int, array{name: string, class: string}>
      */
     public function getAvailableSeeders(): array
     {
@@ -142,6 +153,8 @@ class DatabaseMaintenanceService
 
     /**
      * Get migration status.
+     *
+     * @return array{output: string}
      */
     public function getMigrationStatus(): array
     {

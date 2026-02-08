@@ -150,8 +150,8 @@ class RaceAnalysisAgent
             $modifiedStats = null;
 
             if (isset($raceDetails['track_condition'], $raceDetails['surface'])) {
-                $trackCondition = (string) $raceDetails['track_condition'];
-                $surface = (string) $raceDetails['surface'];
+                $trackCondition = is_string($raceDetails['track_condition']) ? $raceDetails['track_condition'] : '';
+                $surface = is_string($raceDetails['surface']) ? $raceDetails['surface'] : '';
 
                 // Validate inputs
                 if (
@@ -181,7 +181,7 @@ class RaceAnalysisAgent
                         'is_wet' => $this->conditionService->isWetCondition($trackCondition),
                         'severity' => $this->conditionService->getConditionSeverity($trackCondition),
                         'recommended_skills' => $this->conditionService->getRecommendedSkills(
-                            isset($raceDetails['weather']) ? (string) $raceDetails['weather'] : null,
+                            isset($raceDetails['weather']) && is_string($raceDetails['weather']) ? $raceDetails['weather'] : null,
                             $trackCondition
                         ),
                         'stat_penalties' => [
@@ -272,8 +272,8 @@ class RaceAnalysisAgent
             // Get condition-aware skill recommendations if weather/track data available
             $conditionSkills = [];
             if (isset($raceDetails['track_condition'])) {
-                $trackCondition = (string) $raceDetails['track_condition'];
-                $weather = isset($raceDetails['weather']) ? (string) $raceDetails['weather'] : null;
+                $trackCondition = is_string($raceDetails['track_condition']) ? $raceDetails['track_condition'] : '';
+                $weather = isset($raceDetails['weather']) && is_string($raceDetails['weather']) ? $raceDetails['weather'] : null;
 
                 if ($this->conditionService->isValidTrackCondition($trackCondition)) {
                     $conditionSkills = $this->conditionService->getRecommendedSkills($weather, $trackCondition);

@@ -24,7 +24,7 @@ class TestApiPerformance extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
     {
         $this->info('External API Performance Test');
         $this->info('============================');
@@ -45,8 +45,15 @@ class TestApiPerformance extends Command
             'news' => '/api/external/news',
         ];
 
+        /** @var array<string, array{success: bool, responseTime: int|float, cached?: bool, offlineMode?: bool, source?: string, dataCount?: int, statusCode?: int, error?: string}> */
         $results = [];
         $baseUrl = config('app.url');
+
+        if (! \is_string($baseUrl)) {
+            $this->error('Application URL is not configured properly.');
+
+            return self::FAILURE;
+        }
 
         // Test each endpoint
         foreach ($endpoints as $name => $path) {
@@ -60,12 +67,13 @@ class TestApiPerformance extends Command
                 $endTime = microtime(true);
                 $responseTime = round(($endTime - $startTime) * 1000); // Convert to milliseconds
 
-                $data = $response->json();
+                /** @var array{success?: bool, cached?: bool, offline_mode?: bool, source?: string, data?: array<mixed>} */
+                $data = $response->json() ?? [];
                 $success = $response->successful() && ($data['success'] ?? false);
-                $cached = $data['cached'] ?? false;
-                $offlineMode = $data['offline_mode'] ?? false;
-                $source = $data['source'] ?? 'unknown';
-                $dataCount = is_array($data['data'] ?? null) ? count($data['data']) : 0;
+                $cached = (bool) ($data['cached'] ?? false);
+                $offlineMode = (bool) ($data['offline_mode'] ?? false);
+                $source = (string) ($data['source'] ?? 'unknown');
+                $dataCount = \is_array($data['data'] ?? null) ? \count($data['data']) : 0;
 
                 $results[$name] = [
                     'success' => $success,
@@ -92,7 +100,7 @@ class TestApiPerformance extends Command
                     '  %s <fg=%s>%dms</> (%s, target: <%dms) - %d items from %s',
                     $status,
                     $color,
-                    $responseTime,
+                    (int) $responseTime,
                     $dataSource,
                     $target,
                     $dataCount,
@@ -110,7 +118,7 @@ class TestApiPerformance extends Command
 
                 $this->line(sprintf(
                     '  ✗ <fg=red>%dms</> - Error: %s',
-                    $responseTime,
+                    (int) $responseTime,
                     $e->getMessage()
                 ));
             }
@@ -119,14 +127,14 @@ class TestApiPerformance extends Command
         }
 
         // Calculate summary
-        $successfulResults = array_filter($results, fn ($r) => $r['success'] ?? false);
+        $successfulResults = array_filter($results, fn (array $r): bool => $r['success']);
         $responseTimes = array_column($successfulResults, 'responseTime');
 
-        $avgResponseTime = count($responseTimes) > 0
-            ? round(array_sum($responseTimes) / count($responseTimes))
+        $avgResponseTime = \count($responseTimes) > 0
+            ? round(array_sum($responseTimes) / \count($responseTimes))
             : 0;
-        $minResponseTime = count($responseTimes) > 0 ? min($responseTimes) : 0;
-        $maxResponseTime = count($responseTimes) > 0 ? max($responseTimes) : 0;
+        $minResponseTime = \count($responseTimes) > 0 ? min($responseTimes) : 0;
+        $maxResponseTime = \count($responseTimes) > 0 ? max($responseTimes) : 0;
 
         // Check if all targets are met
         $allMeetTargets = true;
@@ -144,9 +152,9 @@ class TestApiPerformance extends Command
         $this->table(
             ['Metric', 'Value'],
             [
-                ['Endpoints tested', count($results)],
-                ['Successful', count($successfulResults)],
-                ['Failed', count($results) - count($successfulResults)],
+                ['Endpoints tested', \count($results)],
+                ['Successful', \count($successfulResults)],
+                ['Failed', \count($results) - \count($successfulResults)],
                 ['Average response time', $avgResponseTime.'ms'],
                 ['Min response time', $minResponseTime.'ms'],
                 ['Max response time', $maxResponseTime.'ms'],
@@ -155,7 +163,7 @@ class TestApiPerformance extends Command
         );
 
         // Return appropriate exit code
-        if (count($successfulResults) === 0) {
+        if (\count($successfulResults) === 0) {
             $this->error('All endpoints failed!');
 
             return self::FAILURE;
