@@ -1,17 +1,215 @@
 Note: Using configuration file C:\XAMPP\htdocs\umamusume-career-planner\phpstan.neon.
-   0/505 [>---------------------------]   0%[1G[2K 505/505 [============================] 100%
+   0/685 [>---------------------------]   0%[1G[2K 685/685 [============================] 100%
 
- -- --------------------------------------------------------------------------------------------------------------------- 
-     Error                                                                                                                
- -- --------------------------------------------------------------------------------------------------------------------- 
-     Ignored error pattern #Parameter .+ of method Pest.+TestCall::with\(\) expects# was not matched in reported errors.  
-     Ignored error pattern #Parameter .+ of method Illuminate\\Filesystem\\FilesystemAdapter::assertExists\(\) expects#   
-     was not matched in reported errors.                                                                                  
-     Ignored error pattern #noEnvCallsOutsideOfConfig# in path C:\XAMPP\htdocs\umamusume-career-planner\tests was not     
-     matched in reported errors.                                                                                          
-     Ignored error pattern #Call to an undefined method App\\Services\\.+::# was not matched in reported errors.          
- -- --------------------------------------------------------------------------------------------------------------------- 
+ ------ ---------------------------------------------------------------------- 
+  Line   tests\Feature\ApiEndpointCoverageTest.php                             
+ ------ ---------------------------------------------------------------------- 
+  245    Function isRedisAvailable not found.                                  
+         ≡ƒ¬¬  function.notFound                                                 
+         ≡ƒÆí  Learn more at https://phpstan.org/user-guide/discovering-symbols  
+ ------ ---------------------------------------------------------------------- 
 
+ ------ ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+  Line   tests\Feature\Api\TrainingPredictionApiTest.php                                                                                                                              
+ ------ ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+  23     Property Tests\Feature\Api\TrainingPredictionApiTest::$user (App\Models\User) overriding property PHPUnit\Framework\TestCase::$user should not have a native type.           
+  23     Protected property Tests\Feature\Api\TrainingPredictionApiTest::$user overriding public property PHPUnit\Framework\TestCase::$user should also be public.                    
+  25     Property Tests\Feature\Api\TrainingPredictionApiTest::$character (App\Models\Character) overriding property PHPUnit\Framework\TestCase::$character should not have a native  
+         type.                                                                                                                                                                        
+  25     Protected property Tests\Feature\Api\TrainingPredictionApiTest::$character overriding public property PHPUnit\Framework\TestCase::$character should also be public.          
+ ------ ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
 
- [ERROR] Found 4 errors                                                                                                 
+ ------ --------------------------------------------------------------------------------------- 
+  Line   tests\Feature\Components\AI\RecommendationCardTest.php                                 
+ ------ --------------------------------------------------------------------------------------- 
+  53     Access to an undefined property object::$priority.                                     
+         ≡ƒ¬¬  property.notFound                                                                  
+         ≡ƒÆí  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property  
+ ------ --------------------------------------------------------------------------------------- 
+
+ ------ --------------------------------------------------------------------------------------- 
+  Line   tests\Feature\RacePreparationViewTest.php                                              
+ ------ --------------------------------------------------------------------------------------- 
+  34     Access to an undefined property App\Models\Race::$name.                                
+         ≡ƒ¬¬  property.notFound                                                                  
+         ≡ƒÆí  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property  
+ ------ --------------------------------------------------------------------------------------- 
+
+ ------ --------------------------------------------------------------------------------------- 
+  Line   tests\Feature\Services\TrainingAdvisoryIntegrationTest.php                             
+ ------ --------------------------------------------------------------------------------------- 
+  398    Access to an undefined property App\Models\Character::$acquired_skills.                
+         ≡ƒ¬¬  property.notFound                                                                  
+         ≡ƒÆí  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property  
+  402    Access to an undefined property App\Models\Character::$target_distance.                
+         ≡ƒ¬¬  property.notFound                                                                  
+         ≡ƒÆí  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property  
+  403    Access to an undefined property App\Models\Character::$running_style.                  
+         ≡ƒ¬¬  property.notFound                                                                  
+         ≡ƒÆí  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property  
+  479    Access to an undefined property App\Models\Character::$acquired_skills.                
+         ≡ƒ¬¬  property.notFound                                                                  
+         ≡ƒÆí  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property  
+  480    Access to an undefined property App\Models\Character::$target_distance.                
+         ≡ƒ¬¬  property.notFound                                                                  
+         ≡ƒÆí  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property  
+  481    Access to an undefined property App\Models\Character::$running_style.                  
+         ≡ƒ¬¬  property.notFound                                                                  
+         ≡ƒÆí  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property  
+  552    Access to an undefined property App\Models\Character::$acquired_skills.                
+         ≡ƒ¬¬  property.notFound                                                                  
+         ≡ƒÆí  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property  
+  553    Access to an undefined property App\Models\Character::$target_distance.                
+         ≡ƒ¬¬  property.notFound                                                                  
+         ≡ƒÆí  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property  
+  554    Access to an undefined property App\Models\Character::$running_style.                  
+         ≡ƒ¬¬  property.notFound                                                                  
+         ≡ƒÆí  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property  
+  607    Access to an undefined property App\Models\Character::$acquired_skills.                
+         ≡ƒ¬¬  property.notFound                                                                  
+         ≡ƒÆí  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property  
+  608    Access to an undefined property App\Models\Character::$target_distance.                
+         ≡ƒ¬¬  property.notFound                                                                  
+         ≡ƒÆí  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property  
+  609    Access to an undefined property App\Models\Character::$running_style.                  
+         ≡ƒ¬¬  property.notFound                                                                  
+         ≡ƒÆí  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-undefined-property  
+ ------ --------------------------------------------------------------------------------------- 
+
+ ------ -------------------------------------------------------------------------------------------------------------- 
+  Line   tests\Feature\Services\TrainingAdvisoryPropertyTest.php                                                       
+ ------ -------------------------------------------------------------------------------------------------------------- 
+  735    Match arm comparison between App\Enums\CareerPhase::SENIOR and App\Enums\CareerPhase::SENIOR is always true.  
+         ≡ƒ¬¬  match.alwaysTrue                                                                                          
+         ≡ƒÆí  Remove remaining cases below this one and this error will disappear too.                                  
+ ------ -------------------------------------------------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------------------------------------------------------------- 
+  Line   tests\Property\BondProgressTrackingPropertyTest.php                                                                         
+ ------ ---------------------------------------------------------------------------------------------------------------------------- 
+  164    Function generateTrainingContextWithBonds() has parameter $bondLevels with no value type specified in iterable type array.  
+         ≡ƒ¬¬  missingType.iterableValue                                                                                               
+         ≡ƒÆí  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type                                  
+ ------ ---------------------------------------------------------------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------------------------------- 
+  Line   tests\Property\EnergyBasedRestRecommendationsPropertyTest.php                                  
+ ------ ----------------------------------------------------------------------------------------------- 
+  32     Class App\Services\TrainingAdvisoryService constructor invoked with 5 parameters, 7 required.  
+         ≡ƒ¬¬  arguments.count                                                                            
+ ------ ----------------------------------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------------------------------- 
+  Line   tests\Property\FriendshipTrainingPriorityPropertyTest.php                                      
+ ------ ----------------------------------------------------------------------------------------------- 
+  31     Class App\Services\TrainingAdvisoryService constructor invoked with 5 parameters, 7 required.  
+         ≡ƒ¬¬  arguments.count                                                                            
+ ------ ----------------------------------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------------- 
+  Line   tests\Property\OfflineFallbackPropertyTest.php                           
+ ------ ------------------------------------------------------------------------- 
+  25     Function generateTrainingContext invoked with 0 parameters, 3 required.  
+         ≡ƒ¬¬  arguments.count                                                      
+  62     Function generateTrainingContext invoked with 0 parameters, 3 required.  
+         ≡ƒ¬¬  arguments.count                                                      
+  96     Function generateTrainingContext invoked with 0 parameters, 3 required.  
+         ≡ƒ¬¬  arguments.count                                                      
+ ------ ------------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------------------------------- 
+  Line   tests\Property\TrainingAdvisoryResponseTimePropertyTest.php                                    
+ ------ ----------------------------------------------------------------------------------------------- 
+  52     Class App\Services\TrainingAdvisoryService constructor invoked with 5 parameters, 7 required.  
+         ≡ƒ¬¬  arguments.count                                                                            
+ ------ ----------------------------------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------------------------------------------------------------------------- 
+  Line   tests\Property\TrainingAdvisoryStorageModePropertyTest.php                                                                               
+ ------ ----------------------------------------------------------------------------------------------------------------------------------------- 
+  30     Class App\Services\TrainingAdvisoryService constructor invoked with 5 parameters, 7 required.                                            
+         ≡ƒ¬¬  arguments.count                                                                                                                      
+  171    Cannot call method isLocalMode() on class-string|object.                                                                                 
+         ≡ƒ¬¬  method.nonObject                                                                                                                     
+  173    Cannot call method isLocalMode() on class-string|object.                                                                                 
+         ≡ƒ¬¬  method.nonObject                                                                                                                     
+  415    Function generateTrainingContextWithFacilityLevels() has parameter $facilityLevels with no value type specified in iterable type array.  
+         ≡ƒ¬¬  missingType.iterableValue                                                                                                            
+         ≡ƒÆí  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type                                               
+ ------ ----------------------------------------------------------------------------------------------------------------------------------------- 
+
+ ------ -------------------------------------------------------------------------------------------------------------------------------- 
+  Line   tests\Support\FakeRedis.php                                                                                                     
+ ------ -------------------------------------------------------------------------------------------------------------------------------- 
+  69     Method Tests\Support\FakeRedis::del() has parameter $key with no value type specified in iterable type array.                   
+         ≡ƒ¬¬  missingType.iterableValue                                                                                                   
+         ≡ƒÆí  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type                                      
+  152    Method Tests\Support\FakeRedis::lrange() return type has no value type specified in iterable type array.                        
+         ≡ƒ¬¬  missingType.iterableValue                                                                                                   
+         ≡ƒÆí  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type                                      
+  268    Method Tests\Support\FakeRedis::zpopmin() return type has no value type specified in iterable type array.                       
+         ≡ƒ¬¬  missingType.iterableValue                                                                                                   
+         ≡ƒÆí  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type                                      
+  289    Method Tests\Support\FakeRedis::zrange() return type has no value type specified in iterable type array.                        
+         ≡ƒ¬¬  missingType.iterableValue                                                                                                   
+         ≡ƒÆí  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type                                      
+  308    Method Tests\Support\FakeRedis::keys() return type has no value type specified in iterable type array.                          
+         ≡ƒ¬¬  missingType.iterableValue                                                                                                   
+         ≡ƒÆí  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type                                      
+  320    Method Tests\Support\FakeRedis::getList() return type has no value type specified in iterable type array.                       
+         ≡ƒ¬¬  missingType.iterableValue                                                                                                   
+         ≡ƒÆí  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type                                      
+  335    Method Tests\Support\FakeRedis::setList() has parameter $list with no value type specified in iterable type array.              
+         ≡ƒ¬¬  missingType.iterableValue                                                                                                   
+         ≡ƒÆí  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type                                      
+  343    Method Tests\Support\FakeRedis::getZSet() return type has no value type specified in iterable type array.                       
+         ≡ƒ¬¬  missingType.iterableValue                                                                                                   
+         ≡ƒÆí  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type                                      
+  358    Method Tests\Support\FakeRedis::setZSet() has parameter $set with no value type specified in iterable type array.               
+         ≡ƒ¬¬  missingType.iterableValue                                                                                                   
+         ≡ƒÆí  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type                                      
+  366    Method Tests\Support\FakeRedis::getSortedZSetMembers() has parameter $set with no value type specified in iterable type array.  
+         ≡ƒ¬¬  missingType.iterableValue                                                                                                   
+         ≡ƒÆí  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type                                      
+  366    Method Tests\Support\FakeRedis::getSortedZSetMembers() return type has no value type specified in iterable type array.          
+         ≡ƒ¬¬  missingType.iterableValue                                                                                                   
+         ≡ƒÆí  See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type                                      
+ ------ -------------------------------------------------------------------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+  Line   tests\Unit\Enums\RecommendationTypeTest.php                                                                                                                            
+ ------ ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+  193    Strict comparison using === between App\Enums\RecommendationType::TRAINING_FACILITY and App\Enums\RecommendationType::TRAINING_FACILITY will always evaluate to true.  
+         ≡ƒ¬¬  identical.alwaysTrue                                                                                                                                               
+         ≡ƒÆí  Use match expression instead. PHPStan will report unhandled enum cases.                                                                                            
+  194    Strict comparison using === between App\Enums\RecommendationType::TRAINING_FACILITY and App\Enums\RecommendationType::SKILL_PURCHASE will always evaluate to false.    
+         ≡ƒ¬¬  identical.alwaysFalse                                                                                                                                              
+  202    Loose comparison using == between App\Enums\RecommendationType::TRAINING_FACILITY and App\Enums\RecommendationType::TRAINING_FACILITY will always evaluate to true.    
+         ≡ƒ¬¬  equal.alwaysTrue                                                                                                                                                   
+  203    Loose comparison using == between App\Enums\RecommendationType::TRAINING_FACILITY and App\Enums\RecommendationType::SKILL_PURCHASE will always evaluate to false.      
+         ≡ƒ¬¬  equal.alwaysFalse                                                                                                                                                  
+  221    Match arm comparison between *NEVER* and App\Enums\RecommendationType::TRAINING_FACILITY is always false.                                                              
+         ≡ƒ¬¬  match.alwaysFalse                                                                                                                                                  
+  222    Match arm comparison between App\Enums\RecommendationType::SKILL_PURCHASE and App\Enums\RecommendationType::SKILL_PURCHASE is always true.                             
+         ≡ƒ¬¬  match.alwaysTrue                                                                                                                                                   
+         ≡ƒÆí  Remove remaining cases below this one and this error will disappear too.                                                                                           
+ ------ ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
+
+ ------ -------------------------------------------------------- 
+  Line   tests\Unit\Services\CriticalSituationDetectorTest.php   
+ ------ -------------------------------------------------------- 
+  39     Call to an undefined method ReflectionType::getName().  
+         ≡ƒ¬¬  method.notFound                                     
+ ------ -------------------------------------------------------- 
+
+ -- -------------------------------------------------------------------------------------------------------------------------------------------------------- 
+     Error                                                                                                                                                   
+ -- -------------------------------------------------------------------------------------------------------------------------------------------------------- 
+     Ignored error pattern #Parameter .+ of method Pest.+TestCall::with\(\) expects# was not matched in reported errors.                                     
+     Ignored error pattern #Parameter .+ of method Illuminate\\Filesystem\\FilesystemAdapter::assertExists\(\) expects# was not matched in reported errors.  
+     Ignored error pattern #noEnvCallsOutsideOfConfig# in path C:\XAMPP\htdocs\umamusume-career-planner\tests was not matched in reported errors.            
+     Ignored error pattern #Call to an undefined method App\\Services\\.+::# was not matched in reported errors.                                             
+ -- -------------------------------------------------------------------------------------------------------------------------------------------------------- 
+
+ [ERROR] Found 53 errors                                                                                                
 
