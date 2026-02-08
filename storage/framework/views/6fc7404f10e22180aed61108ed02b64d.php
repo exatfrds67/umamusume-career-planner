@@ -34,6 +34,30 @@
             </svg>
         </button>
 
+        <!-- Critical Alert Badge -->
+        <?php if (isset($component)) { $__componentOriginalb33cfa811a0213955a036b6bd5cbdc7d = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalb33cfa811a0213955a036b6bd5cbdc7d = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.ai.critical-alert-badge','data' => ['alertCount' => 0]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('ai.critical-alert-badge'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['alert-count' => 0]); ?>
+<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processComponentKey($component); ?>
+
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalb33cfa811a0213955a036b6bd5cbdc7d)): ?>
+<?php $attributes = $__attributesOriginalb33cfa811a0213955a036b6bd5cbdc7d; ?>
+<?php unset($__attributesOriginalb33cfa811a0213955a036b6bd5cbdc7d); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalb33cfa811a0213955a036b6bd5cbdc7d)): ?>
+<?php $component = $__componentOriginalb33cfa811a0213955a036b6bd5cbdc7d; ?>
+<?php unset($__componentOriginalb33cfa811a0213955a036b6bd5cbdc7d); ?>
+<?php endif; ?>
+
         <!-- Notifications -->
         <button type="button"
             class="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500 dark:text-gray-300 dark:hover:text-gray-100 transition-colors duration-200">
@@ -60,12 +84,12 @@
                     <span class="ml-4 text-sm font-semibold leading-6 text-gray-900 dark:text-white" aria-hidden="true">
                         <?php echo e(Auth::user()->name ?? 'User'); ?>
 
-                        <?php if(Auth::user()?->isAdmin()): ?>
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(Auth::user()?->isAdmin()): ?>
                             <span
                                 class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
                                 Admin
                             </span>
-                        <?php endif; ?>
+                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                     </span>
                     <svg class="ml-2 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                         <path fill-rule="evenodd"

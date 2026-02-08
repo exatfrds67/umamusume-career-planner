@@ -285,8 +285,8 @@ unset($__defined_vars, $__key, $__value); ?>
                         </ul>
                     </li>
 
-                    <?php if(auth()->guard()->check()): ?>
-                        <?php if(auth()->user()->isAdmin()): ?>
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->guard()->check()): ?>
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->user()->isAdmin()): ?>
                             <!-- Admin Divider -->
                             <li class="border-t-2 border-amber-300 dark:border-amber-700 my-3"></li>
 
@@ -384,8 +384,8 @@ unset($__defined_vars, $__key, $__value); ?>
                                     </li>
                                 </ul>
                             </li>
-                        <?php endif; ?>
-                    <?php endif; ?>
+                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                 </ul>
             </li>
 
