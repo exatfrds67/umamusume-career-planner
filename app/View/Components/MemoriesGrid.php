@@ -45,6 +45,8 @@ class MemoriesGrid extends Component
 
     /**
      * Get lock status for item.
+     *
+     * @param  array<string, mixed>  $item
      */
     public function isLocked(array $item): bool
     {
@@ -53,6 +55,8 @@ class MemoriesGrid extends Component
 
     /**
      * Get new flag for item.
+     *
+     * @param  array<string, mixed>  $item
      */
     public function isNew(array $item): bool
     {
@@ -61,9 +65,13 @@ class MemoriesGrid extends Component
 
     /**
      * Get item URL or empty string.
+     *
+     * @param  array<string, mixed>  $item
      */
     public function itemUrl(array $item): string
     {
-        return $item['url'] ?? '';
+        $url = $item['url'] ?? '';
+
+        return \is_string($url) ? $url : '';
     }
 }

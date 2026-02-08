@@ -16,7 +16,7 @@ class DeckSlot extends Component
     /**
      * Create a new component instance.
      *
-     * @param  array|null  $card  Support card data (null for empty slot)
+     * @param  array<string, mixed>|null  $card  Support card data (null for empty slot)
      * @param  int  $position  Slot position (1-6)
      * @param  bool  $clickable  Whether the slot is clickable
      * @param  string  $size  Slot size (sm, md, lg)

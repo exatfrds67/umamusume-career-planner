@@ -8,6 +8,7 @@ use Illuminate\View\Component;
 
 class SkillCard extends Component
 {
+    /** @var array<string, mixed> */
     public array $skill;
 
     public int $hintLevel;
@@ -35,6 +36,8 @@ class SkillCard extends Component
 
     /**
      * Create a new component instance.
+     *
+     * @param  array<string, mixed>  $skill
      */
     public function __construct(
         array $skill,
@@ -57,7 +60,9 @@ class SkillCard extends Component
      */
     public function getName(): string
     {
-        return $this->skill['name'] ?? 'Unknown Skill';
+        $name = $this->skill['name'] ?? 'Unknown Skill';
+
+        return \is_string($name) ? $name : 'Unknown Skill';
     }
 
     /**
@@ -65,7 +70,9 @@ class SkillCard extends Component
      */
     public function getDescription(): string
     {
-        return $this->skill['description'] ?? '';
+        $description = $this->skill['description'] ?? '';
+
+        return \is_string($description) ? $description : '';
     }
 
     /**
@@ -73,7 +80,9 @@ class SkillCard extends Component
      */
     public function getBaseCost(): int
     {
-        return $this->skill['base_sp_cost'] ?? 0;
+        $cost = $this->skill['base_sp_cost'] ?? 0;
+
+        return \is_int($cost) ? $cost : (\is_numeric($cost) ? (int) $cost : 0);
     }
 
     /**
@@ -108,7 +117,9 @@ class SkillCard extends Component
      */
     public function getRarity(): string
     {
-        return $this->skill['rarity'] ?? 'normal';
+        $rarity = $this->skill['rarity'] ?? 'normal';
+
+        return \is_string($rarity) ? $rarity : 'normal';
     }
 
     /**
@@ -116,7 +127,9 @@ class SkillCard extends Component
      */
     public function getType(): string
     {
-        return $this->skill['type'] ?? 'general';
+        $type = $this->skill['type'] ?? 'general';
+
+        return \is_string($type) ? $type : 'general';
     }
 
     /**

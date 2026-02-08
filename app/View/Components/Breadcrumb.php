@@ -67,6 +67,8 @@ class Breadcrumb extends Component
             'itemListElement' => $itemListElements,
         ];
 
-        return json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+        $encoded = \json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+
+        return $encoded !== false ? $encoded : '{}';
     }
 }

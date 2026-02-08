@@ -8,6 +8,7 @@ use Illuminate\View\Component;
 
 class CharacterCard extends Component
 {
+    /** @var array<string, mixed> */
     public array $character;
 
     public bool $showStats;
@@ -20,6 +21,8 @@ class CharacterCard extends Component
 
     /**
      * Create a new component instance.
+     *
+     * @param  array<string, mixed>  $character
      */
     public function __construct(
         array $character,
@@ -40,7 +43,9 @@ class CharacterCard extends Component
      */
     public function getName(): string
     {
-        return $this->character['name'] ?? 'Unknown';
+        $name = $this->character['name'] ?? 'Unknown';
+
+        return \is_string($name) ? $name : 'Unknown';
     }
 
     /**
@@ -48,20 +53,34 @@ class CharacterCard extends Component
      */
     public function getAvatarUrl(): ?string
     {
-        return $this->character['avatar_url'] ?? $this->character['avatar_path'] ?? null;
+        $url = $this->character['avatar_url'] ?? $this->character['avatar_path'] ?? null;
+
+        if ($url === null) {
+            return null;
+        }
+
+        return \is_string($url) ? $url : null;
     }
 
     /**
      * Get character stats
+     *
+     * @return array<string, int>
      */
     public function getStats(): array
     {
+        $speed = $this->character['speed'] ?? 0;
+        $stamina = $this->character['stamina'] ?? 0;
+        $power = $this->character['power'] ?? 0;
+        $guts = $this->character['guts'] ?? 0;
+        $wit = $this->character['wit'] ?? $this->character['wisdom'] ?? 0;
+
         return [
-            'speed' => $this->character['speed'] ?? 0,
-            'stamina' => $this->character['stamina'] ?? 0,
-            'power' => $this->character['power'] ?? 0,
-            'guts' => $this->character['guts'] ?? 0,
-            'wit' => $this->character['wit'] ?? $this->character['wisdom'] ?? 0,
+            'speed' => \is_int($speed) ? $speed : (\is_numeric($speed) ? (int) $speed : 0),
+            'stamina' => \is_int($stamina) ? $stamina : (\is_numeric($stamina) ? (int) $stamina : 0),
+            'power' => \is_int($power) ? $power : (\is_numeric($power) ? (int) $power : 0),
+            'guts' => \is_int($guts) ? $guts : (\is_numeric($guts) ? (int) $guts : 0),
+            'wit' => \is_int($wit) ? $wit : (\is_numeric($wit) ? (int) $wit : 0),
         ];
     }
 

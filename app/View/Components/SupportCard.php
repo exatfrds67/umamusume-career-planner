@@ -8,6 +8,7 @@ use Illuminate\View\Component;
 
 class SupportCard extends Component
 {
+    /** @var array<string, mixed> */
     public array $card;
 
     public int $level;
@@ -27,6 +28,8 @@ class SupportCard extends Component
 
     /**
      * Create a new component instance.
+     *
+     * @param  array<string, mixed>  $card
      */
     public function __construct(
         array $card,
@@ -49,7 +52,9 @@ class SupportCard extends Component
      */
     public function getName(): string
     {
-        return $this->card['name'] ?? 'Unknown Card';
+        $name = $this->card['name'] ?? 'Unknown Card';
+
+        return \is_string($name) ? $name : 'Unknown Card';
     }
 
     /**
@@ -58,8 +63,9 @@ class SupportCard extends Component
     public function getType(): string
     {
         $type = $this->card['type'] ?? 'Friend';
+        $typeStr = \is_string($type) ? $type : 'Friend';
 
-        return in_array($type, self::CARD_TYPES) ? $type : 'Friend';
+        return \in_array($typeStr, self::CARD_TYPES, true) ? $typeStr : 'Friend';
     }
 
     /**
@@ -67,7 +73,9 @@ class SupportCard extends Component
      */
     public function getRarity(): string
     {
-        return $this->card['rarity'] ?? 'R';
+        $rarity = $this->card['rarity'] ?? 'R';
+
+        return \is_string($rarity) ? $rarity : 'R';
     }
 
     /**
@@ -75,7 +83,13 @@ class SupportCard extends Component
      */
     public function getImageUrl(): ?string
     {
-        return $this->card['image_url'] ?? null;
+        $url = $this->card['image_url'] ?? null;
+
+        if ($url === null) {
+            return null;
+        }
+
+        return \is_string($url) ? $url : null;
     }
 
     /**
@@ -109,10 +123,14 @@ class SupportCard extends Component
 
     /**
      * Get card effects
+     *
+     * @return array<int, mixed>
      */
     public function getEffects(): array
     {
-        return $this->card['effects'] ?? [];
+        $effects = $this->card['effects'] ?? [];
+
+        return is_array($effects) ? $effects : [];
     }
 
     /**

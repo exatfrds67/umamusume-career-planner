@@ -16,7 +16,7 @@ class RaceCard extends Component
     /**
      * Create a new component instance.
      *
-     * @param  array  $race  Race data
+     * @param  array<string, mixed>  $race  Race data
      * @param  int|null  $readiness  Readiness score (0-100)
      * @param  float|null  $winProb  Win probability (0-100)
      * @param  bool  $isEntered  Whether character is entered

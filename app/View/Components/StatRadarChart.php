@@ -8,11 +8,13 @@ use Illuminate\View\Component;
 
 class StatRadarChart extends Component
 {
+    public int $max;
+
     /**
      * Create a new component instance.
      *
      * @param  array<string, int|string>  $stats  Associative array of stat values (speed, stamina, power, guts, wit)
-     * @param  int|string  $max  Maximum value for stats (default 2000)
+     * @param  int  $max  Maximum value for stats (default 2000)
      * @param  string  $size  Chart size (sm, md, lg)
      * @param  bool  $showLabels  Whether to show stat labels
      * @param  bool  $showValues  Whether to show stat values
@@ -20,7 +22,7 @@ class StatRadarChart extends Component
      */
     public function __construct(
         public array $stats = [],
-        public int|string $max = 1000,
+        int $max = 1000,
         public string $size = 'md',
         public bool $showLabels = true,
         public bool $showValues = false,
@@ -29,7 +31,7 @@ class StatRadarChart extends Component
         // Normalize all stat values to integers
         $normalizedStats = [];
         foreach ($this->stats as $key => $value) {
-            $normalizedStats[strtolower($key)] = (int) $value;
+            $normalizedStats[\strtolower($key)] = (int) $value;
         }
 
         $this->stats = [
@@ -40,7 +42,7 @@ class StatRadarChart extends Component
             'wit' => $normalizedStats['wit'] ?? 0,
         ];
 
-        $this->max = (int) $max;
+        $this->max = $max;
     }
 
     /**
@@ -56,20 +58,29 @@ class StatRadarChart extends Component
      */
     public function getStatValue(string $stat): int
     {
-        return min($this->max, max(0, $this->stats[strtolower($stat)] ?? 0));
+        $value = $this->stats[\strtolower($stat)] ?? 0;
+
+        // Ensure value is an integer
+        $intValue = \is_int($value) ? $value : (\is_numeric($value) ? (int) $value : 0);
+
+        return \min($this->max, \max(0, $intValue));
     }
 
     /**
      * Get all stat values normalized to 0-100 percentage.
+     *
+     * @return array<string, int>
      */
     public function getStatPercentages(): array
     {
+        $maxValue = $this->max > 0 ? $this->max : 1; // Prevent division by zero
+
         return [
-            'speed' => round(($this->getStatValue('speed') / $this->max) * 100),
-            'stamina' => round(($this->getStatValue('stamina') / $this->max) * 100),
-            'power' => round(($this->getStatValue('power') / $this->max) * 100),
-            'guts' => round(($this->getStatValue('guts') / $this->max) * 100),
-            'wit' => round(($this->getStatValue('wit') / $this->max) * 100),
+            'speed' => (int) \round(($this->getStatValue('speed') / $maxValue) * 100),
+            'stamina' => (int) \round(($this->getStatValue('stamina') / $maxValue) * 100),
+            'power' => (int) \round(($this->getStatValue('power') / $maxValue) * 100),
+            'guts' => (int) \round(($this->getStatValue('guts') / $maxValue) * 100),
+            'wit' => (int) \round(($this->getStatValue('wit') / $maxValue) * 100),
         ];
     }
 
@@ -78,7 +89,7 @@ class StatRadarChart extends Component
      */
     public function getStatColor(string $stat): string
     {
-        return match (strtolower($stat)) {
+        return match (\strtolower($stat)) {
             'speed' => 'text-blue-500 dark:text-blue-400',
             'stamina' => 'text-green-500 dark:text-green-400',
             'power' => 'text-orange-500 dark:text-orange-400',
@@ -93,7 +104,7 @@ class StatRadarChart extends Component
      */
     public function getSvgFillColor(string $stat): string
     {
-        return match (strtolower($stat)) {
+        return match (\strtolower($stat)) {
             'speed' => '#3b82f6',  // blue-500
             'stamina' => '#22c55e', // green-500
             'power' => '#f97316',   // orange-500
@@ -117,6 +128,8 @@ class StatRadarChart extends Component
 
     /**
      * Get stat names in order for pentagon (5 points).
+     *
+     * @return array<int, string>
      */
     public function getStatNames(): array
     {
@@ -125,6 +138,8 @@ class StatRadarChart extends Component
 
     /**
      * Calculate SVG points for pentagon.
+     *
+     * @return array<int, string>
      */
     public function calculatePoints(): array
     {
@@ -140,11 +155,11 @@ class StatRadarChart extends Component
 
         foreach ($stats as $index => $stat) {
             $angle = (($index * 360) / 5) - 90; // Start from top
-            $radians = deg2rad($angle);
+            $radians = \deg2rad($angle);
             $radius = ($percentages[$stat] / 100) * $maxRadius;
 
-            $x = $centerX + ($radius * cos($radians));
-            $y = $centerY + ($radius * sin($radians));
+            $x = $centerX + ($radius * \cos($radians));
+            $y = $centerY + ($radius * \sin($radians));
 
             $points[] = "$x,$y";
         }
@@ -154,6 +169,8 @@ class StatRadarChart extends Component
 
     /**
      * Get pentagon grid points (background reference).
+     *
+     * @return array<int, string>
      */
     public function getGridPoints(int $level = 5): array
     {
@@ -171,15 +188,15 @@ class StatRadarChart extends Component
 
             foreach ($stats as $index => $stat) {
                 $angle = (($index * 360) / 5) - 90;
-                $radians = deg2rad($angle);
+                $radians = \deg2rad($angle);
 
-                $x = $centerX + ($radius * cos($radians));
-                $y = $centerY + ($radius * sin($radians));
+                $x = $centerX + ($radius * \cos($radians));
+                $y = $centerY + ($radius * \sin($radians));
 
                 $levelPoints[] = "$x,$y";
             }
 
-            $gridPoints[$gridLevel] = implode(' ', $levelPoints);
+            $gridPoints[$gridLevel] = \implode(' ', $levelPoints);
         }
 
         return $gridPoints;
