@@ -37,11 +37,11 @@ describe('External Data Browser - Retry Functionality', function () {
         $response = get('/external-data/browse');
 
         $response->assertStatus(200);
-        // Check for retry buttons for each endpoint
-        $response->assertSee('retryEndpoint(\'characters\')');
-        $response->assertSee('retryEndpoint(\'supportCards\')');
-        $response->assertSee('retryEndpoint(\'skills\')');
-        $response->assertSee('retryEndpoint(\'news\')');
+        // Check for retry buttons for each endpoint (using false to avoid HTML escaping)
+        $response->assertSee("retryEndpoint('characters')", false);
+        $response->assertSee("retryEndpoint('supportCards')", false);
+        $response->assertSee("retryEndpoint('skills')", false);
+        $response->assertSee("retryEndpoint('news')", false);
     })->group('external-data', 'retry');
 
     it('includes error banners for each endpoint', function () {

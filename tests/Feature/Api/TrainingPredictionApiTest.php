@@ -67,6 +67,17 @@ class TrainingPredictionApiTest extends TestCase
     }
 
     /** @test */
+    public function it_requires_authentication_for_batch_predictions(): void
+    {
+        $response = $this->postJson('/api/training-predictions/batch', [
+            'character_id' => $this->character->id,
+            'training_types' => ['speed', 'stamina'],
+        ]);
+
+        $response->assertUnauthorized();
+    }
+
+    /** @test */
     public function it_validates_character_ownership(): void
     {
         // Create another user's character

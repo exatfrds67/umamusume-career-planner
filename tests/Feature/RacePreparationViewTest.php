@@ -12,7 +12,7 @@ class RacePreparationViewTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_race_preparation_page_loads()
+    public function test_race_preparation_page_loads(): void
     {
         try {
             $user = User::factory()->create();
@@ -35,7 +35,7 @@ class RacePreparationViewTest extends TestCase
         $response->assertSee('2400m');
     }
 
-    public function test_race_preparation_has_semantic_structure()
+    public function test_race_preparation_has_semantic_structure(): void
     {
         $user = User::factory()->create();
         $character = Character::factory()->create(['user_id' => $user->id]);

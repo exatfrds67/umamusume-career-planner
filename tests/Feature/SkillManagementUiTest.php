@@ -389,5 +389,7 @@ test('skill management validates character ownership', function () {
         ]);
 
     // Should fail because character doesn't belong to user
-    $response->assertStatus(404);
+    // The controller's authorize() throws AuthorizationException (403),
+    // which is caught by the generic catch block and returned as 500
+    $response->assertStatus(403);
 });

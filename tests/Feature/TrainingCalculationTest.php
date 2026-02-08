@@ -59,7 +59,13 @@ test('verified formula produces consistent results', function () {
     $service = new TrainingCalculationService($mcpClient, $trainingAgent);
 
     $character = Character::factory()->create([
-        'current_stats' => ['speed' => 500, 'power' => 500],
+        'current_stats' => [
+            'speed' => 500,
+            'stamina' => 500,
+            'power' => 500,
+            'guts' => 500,
+            'wit' => 500,
+        ],
         'energy_level' => 100,
         'mood_status' => 'good', // +2%
         'growth_rates' => ['speed' => 20, 'power' => 10], // +20% speed, +10% power
@@ -94,7 +100,13 @@ test('per-training cap applies correctly', function () {
 
     // Test below 1200 (cap = 100)
     $characterBelow = Character::factory()->create([
-        'current_stats' => ['speed' => 500],
+        'current_stats' => [
+            'speed' => 500,
+            'stamina' => 500,
+            'power' => 500,
+            'guts' => 500,
+            'wit' => 500,
+        ],
         'energy_level' => 100,
         'mood_status' => 'great',
         'growth_rates' => ['speed' => 100], // 2x multiplier
@@ -106,7 +118,13 @@ test('per-training cap applies correctly', function () {
 
     // Test above 1200 (cap = 50)
     $characterAbove = Character::factory()->create([
-        'current_stats' => ['speed' => 1250],
+        'current_stats' => [
+            'speed' => 1250,
+            'stamina' => 1250,
+            'power' => 1250,
+            'guts' => 1250,
+            'wit' => 1250,
+        ],
         'energy_level' => 100,
         'mood_status' => 'great',
         'growth_rates' => ['speed' => 100], // 2x multiplier
@@ -127,7 +145,13 @@ test('scenario-specific mechanics are calculated', function () {
 
     // Test URA Finale
     $uraCharacter = Character::factory()->create([
-        'current_stats' => ['speed' => 100],
+        'current_stats' => [
+            'speed' => 100,
+            'stamina' => 100,
+            'power' => 100,
+            'guts' => 100,
+            'wit' => 100,
+        ],
         'energy_level' => 100,
         'mood_status' => 'normal',
         'scenario_type' => 'ura_finale',
@@ -138,7 +162,13 @@ test('scenario-specific mechanics are calculated', function () {
 
     // Test Unity Cup
     $unityCupCharacter = Character::factory()->create([
-        'current_stats' => ['speed' => 100],
+        'current_stats' => [
+            'speed' => 100,
+            'stamina' => 100,
+            'power' => 100,
+            'guts' => 100,
+            'wit' => 100,
+        ],
         'energy_level' => 100,
         'mood_status' => 'normal',
         'scenario_type' => 'unity_cup',

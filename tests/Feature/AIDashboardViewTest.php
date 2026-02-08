@@ -10,7 +10,7 @@ class AIDashboardViewTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_ai_dashboard_page_loads()
+    public function test_ai_dashboard_page_loads(): void
     {
         $user = User::factory()->create();
 
@@ -20,7 +20,7 @@ class AIDashboardViewTest extends TestCase
         $response->assertSee('AI Management Dashboard');
     }
 
-    public function test_ai_dashboard_has_semantic_structure()
+    public function test_ai_dashboard_has_semantic_structure(): void
     {
         $user = User::factory()->create();
 

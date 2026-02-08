@@ -38,8 +38,17 @@ describe('WCAG 2.2 AA Accessibility Compliance', function (): void {
             preg_match_all('/<input[^>]*id=["\']([^"\']+)["\'][^>]*>/i', $content, $inputMatches);
 
             foreach ($inputMatches[1] as $inputId) {
-                // Each input should have a corresponding label
-                expect($content)->toMatch("/for=[\"']{$inputId}[\"']/");
+                // Each input should have a corresponding label (for attribute) OR be wrapped in a label OR have aria-label/aria-labelledby
+                $hasExplicitLabel = preg_match("/for=[\"']{$inputId}[\"']/", $content);
+                $hasAriaLabel = preg_match("/<input[^>]*id=[\"']{$inputId}[\"'][^>]*aria-label/i", $content);
+                $hasAriaLabelledBy = preg_match("/<input[^>]*id=[\"']{$inputId}[\"'][^>]*aria-labelledby/i", $content);
+
+                // Check if input is wrapped in a label
+                $hasWrappingLabel = preg_match("/<label[^>]*>.*?<input[^>]*id=[\"']{$inputId}[\"'][^>]*>.*?<\/label>/is", $content);
+
+                expect($hasExplicitLabel || $hasAriaLabel || $hasAriaLabelledBy || $hasWrappingLabel)->toBeTrue(
+                    "Input with id '{$inputId}' must have an associated label, aria-label, aria-labelledby, or be wrapped in a label"
+                );
             }
         });
     });
@@ -196,6 +205,7 @@ describe('WCAG 2.2 AA Accessibility Compliance', function (): void {
                 'region',
                 'complementary',
                 'search',
+                'group',
             ];
 
             foreach ($roleMatches[1] as $role) {

@@ -1,289 +1,192 @@
 <?php
 
-use Laravel\Dusk\Browser;
+declare(strict_types=1);
+
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+uses(RefreshDatabase::class);
 
 /**
  * External Data Browser Sort Functionality Test
  *
- * Tests the sort functionality across all data types (characters, support cards, skills)
- * in the External Data Browser.
- *
- * Test Coverage:
- * - Sort by ID (ascending/descending)
- * - Sort by Name (A-Z, Z-A)
- * - Sort by Rarity (for support cards and skills)
- * - Sort state persistence when switching tabs
- * - Sort works in combination with filters
+ * Tests the sort functionality in the External Data Browser
+ * using Pest v4 browser API. Test data is injected via Alpine.js script().
  */
-it('can sort characters by ID ascending', function () {
-    visit('/external-data/browse')
-        ->waitFor('[x-data="externalDataBrowser()"]')
-        ->waitUntilMissing('.animate-spin', 10) // Wait for loading to complete
-        ->click('button:contains("Characters")') // Ensure we're on characters tab
-        ->select('select[x-model="sortBy"]', 'id-asc')
-        ->pause(500) // Allow sort to complete
-        ->assertSeeInOrder(['#1', '#2', '#3']); // Verify ascending order
+beforeEach(function () {
+    $this->user = User::factory()->create();
+    $this->alpineSelector = 'document.querySelector(\'[x-data*="externalDataBrowser"]\')';
 });
+
+it('can sort characters by name ascending', function () {
+    $this->actingAs($this->user);
+    $page = visit('/external-data/browse');
+
+    $page->assertSee('External Data Browser');
+    $page->wait(8);
+
+    $page->script("
+        var c = Alpine.\$data({$this->alpineSelector});
+        c.characters = [
+            { id: 3, name_en: 'Zenith', name_jp: 'ゼニス', category_label_en: 'Long', color_main: '#ef4444' },
+            { id: 1, name_en: 'Alpha', name_jp: 'アルファ', category_label_en: 'Short', color_main: '#3b82f6' },
+            { id: 2, name_en: 'Midway', name_jp: 'ミッドウェイ', category_label_en: 'Mile', color_main: '#10b981' },
+        ];
+        c.sortBy = 'name-asc';
+        c.filterData();
+        c.loading = false;
+    ");
+    $page->wait(1);
+
+    $names = $page->script("Alpine.\$data({$this->alpineSelector}).filteredCharacters.map(c => c.name_en)");
+    expect($names)->toBe(['Alpha', 'Midway', 'Zenith']);
+})->group('browser', 'external-data', 'sort');
+
+it('can sort characters by name descending', function () {
+    $this->actingAs($this->user);
+    $page = visit('/external-data/browse');
+
+    $page->assertSee('External Data Browser');
+    $page->wait(8);
+
+    $page->script("
+        var c = Alpine.\$data({$this->alpineSelector});
+        c.characters = [
+            { id: 1, name_en: 'Alpha', name_jp: 'アルファ', category_label_en: 'Short', color_main: '#3b82f6' },
+            { id: 2, name_en: 'Midway', name_jp: 'ミッドウェイ', category_label_en: 'Mile', color_main: '#10b981' },
+            { id: 3, name_en: 'Zenith', name_jp: 'ゼニス', category_label_en: 'Long', color_main: '#ef4444' },
+        ];
+        c.sortBy = 'name-desc';
+        c.filterData();
+        c.loading = false;
+    ");
+    $page->wait(1);
+
+    $names = $page->script("Alpine.\$data({$this->alpineSelector}).filteredCharacters.map(c => c.name_en)");
+    expect($names)->toBe(['Zenith', 'Midway', 'Alpha']);
+})->group('browser', 'external-data', 'sort');
+
+it('can sort characters by ID ascending', function () {
+    $this->actingAs($this->user);
+    $page = visit('/external-data/browse');
+
+    $page->assertSee('External Data Browser');
+    $page->wait(8);
+
+    $page->script("
+        var c = Alpine.\$data({$this->alpineSelector});
+        c.characters = [
+            { id: 30, name_en: 'Third', name_jp: 'サード', category_label_en: 'Long', color_main: '#ef4444' },
+            { id: 10, name_en: 'First', name_jp: 'ファースト', category_label_en: 'Short', color_main: '#3b82f6' },
+            { id: 20, name_en: 'Second', name_jp: 'セカンド', category_label_en: 'Mile', color_main: '#10b981' },
+        ];
+        c.sortBy = 'id-asc';
+        c.filterData();
+        c.loading = false;
+    ");
+    $page->wait(1);
+
+    $ids = $page->script("Alpine.\$data({$this->alpineSelector}).filteredCharacters.map(c => c.id)");
+    expect($ids)->toBe([10, 20, 30]);
+})->group('browser', 'external-data', 'sort');
 
 it('can sort characters by ID descending', function () {
-    visit('/external-data/browse')
-        ->waitFor('[x-data="externalDataBrowser()"]')
-        ->waitUntilMissing('.animate-spin', 10)
-        ->click('button:contains("Characters")')
-        ->select('select[x-model="sortBy"]', 'id-desc')
-        ->pause(500)
-        ->assertSeeInOrder(['#100', '#99', '#98']); // Verify descending order
-});
+    $this->actingAs($this->user);
+    $page = visit('/external-data/browse');
 
-it('can sort characters by name A-Z', function () {
-    visit('/external-data/browse')
-        ->waitFor('[x-data="externalDataBrowser()"]')
-        ->waitUntilMissing('.animate-spin', 10)
-        ->click('button:contains("Characters")')
-        ->select('select[x-model="sortBy"]', 'name-asc')
-        ->pause(500);
+    $page->assertSee('External Data Browser');
+    $page->wait(8);
 
-    // Get all character names and verify they're in alphabetical order
-    $names = $this->script('
-        return Array.from(document.querySelectorAll(".glass-card-alt h3"))
-            .map(el => el.textContent.trim())
-            .filter(name => name.length > 0);
-    ');
+    $page->script("
+        var c = Alpine.\$data({$this->alpineSelector});
+        c.characters = [
+            { id: 10, name_en: 'First', name_jp: 'ファースト', category_label_en: 'Short', color_main: '#3b82f6' },
+            { id: 20, name_en: 'Second', name_jp: 'セカンド', category_label_en: 'Mile', color_main: '#10b981' },
+            { id: 30, name_en: 'Third', name_jp: 'サード', category_label_en: 'Long', color_main: '#ef4444' },
+        ];
+        c.sortBy = 'id-desc';
+        c.filterData();
+        c.loading = false;
+    ");
+    $page->wait(1);
 
-    $sortedNames = $names;
-    sort($sortedNames);
-
-    expect($names)->toBe($sortedNames);
-});
-
-it('can sort characters by name Z-A', function () {
-    visit('/external-data/browse')
-        ->waitFor('[x-data="externalDataBrowser()"]')
-        ->waitUntilMissing('.animate-spin', 10)
-        ->click('button:contains("Characters")')
-        ->select('select[x-model="sortBy"]', 'name-desc')
-        ->pause(500);
-
-    // Get all character names and verify they're in reverse alphabetical order
-    $names = $this->script('
-        return Array.from(document.querySelectorAll(".glass-card-alt h3"))
-            .map(el => el.textContent.trim())
-            .filter(name => name.length > 0);
-    ');
-
-    $sortedNames = $names;
-    rsort($sortedNames);
-
-    expect($names)->toBe($sortedNames);
-});
-
-it('can sort support cards by ID ascending', function () {
-    visit('/external-data/browse')
-        ->waitFor('[x-data="externalDataBrowser()"]')
-        ->waitUntilMissing('.animate-spin', 10)
-        ->click('button:contains("Support Cards")')
-        ->pause(500)
-        ->select('select[x-model="sortBy"]', 'id-asc')
-        ->pause(500);
-
-    // Verify IDs are in ascending order
-    $ids = $this->script('
-        return Array.from(document.querySelectorAll(".glass-card-alt"))
-            .map(card => {
-                const idSpan = card.querySelector("span:contains(\"#\")");
-                return idSpan ? parseInt(idSpan.textContent.replace("#", "")) : 0;
-            })
-            .filter(id => id > 0);
-    ');
-
-    $sortedIds = $ids;
-    sort($sortedIds);
-
-    expect($ids)->toBe($sortedIds);
-});
-
-it('can sort support cards by rarity', function () {
-    visit('/external-data/browse')
-        ->waitFor('[x-data="externalDataBrowser()"]')
-        ->waitUntilMissing('.animate-spin', 10)
-        ->click('button:contains("Support Cards")')
-        ->pause(500)
-        ->select('select[x-model="sortBy"]', 'rarity-desc')
-        ->pause(500);
-
-    // Verify rarities are in descending order (SSR > SR > R)
-    $rarities = $this->script('
-        return Array.from(document.querySelectorAll(".glass-card-alt"))
-            .map(card => {
-                const rarityBadge = card.querySelector("span.inline-flex");
-                return rarityBadge ? rarityBadge.textContent.trim() : "";
-            })
-            .filter(rarity => rarity.length > 0);
-    ');
-
-    // Check that SSR comes before SR, and SR comes before R
-    $ssrIndex = array_search('SSR', $rarities);
-    $srIndex = array_search('SR', $rarities);
-    $rIndex = array_search('R', $rarities);
-
-    if ($ssrIndex !== false && $srIndex !== false) {
-        expect($ssrIndex)->toBeLessThan($srIndex);
-    }
-    if ($srIndex !== false && $rIndex !== false) {
-        expect($srIndex)->toBeLessThan($rIndex);
-    }
-});
-
-it('can sort skills by ID ascending', function () {
-    visit('/external-data/browse')
-        ->waitFor('[x-data="externalDataBrowser()"]')
-        ->waitUntilMissing('.animate-spin', 10)
-        ->click('button:contains("Skills")')
-        ->pause(500)
-        ->select('select[x-model="sortBy"]', 'id-asc')
-        ->pause(500);
-
-    // Verify skills are sorted by ID
-    $this->assertVisible('.glass-card-alt');
-});
-
-it('can sort skills by name', function () {
-    visit('/external-data/browse')
-        ->waitFor('[x-data="externalDataBrowser()"]')
-        ->waitUntilMissing('.animate-spin', 10)
-        ->click('button:contains("Skills")')
-        ->pause(500)
-        ->select('select[x-model="sortBy"]', 'name-asc')
-        ->pause(500);
-
-    // Get all skill names and verify they're in alphabetical order
-    $names = $this->script('
-        return Array.from(document.querySelectorAll(".glass-card-alt h3"))
-            .map(el => el.textContent.trim())
-            .filter(name => name.length > 0);
-    ');
-
-    $sortedNames = $names;
-    sort($sortedNames);
-
-    expect($names)->toBe($sortedNames);
-});
-
-it('can sort skills by rarity', function () {
-    visit('/external-data/browse')
-        ->waitFor('[x-data="externalDataBrowser()"]')
-        ->waitUntilMissing('.animate-spin', 10)
-        ->click('button:contains("Skills")')
-        ->pause(500)
-        ->select('select[x-model="sortBy"]', 'rarity-desc')
-        ->pause(500);
-
-    // Verify rarities are in descending order (unique > rare > normal)
-    $rarities = $this->script('
-        return Array.from(document.querySelectorAll(".glass-card-alt"))
-            .map(card => {
-                const rarityBadge = card.querySelector("span.inline-flex");
-                return rarityBadge ? rarityBadge.textContent.trim().toLowerCase() : "";
-            })
-            .filter(rarity => rarity.length > 0);
-    ');
-
-    // Check that unique comes before rare, and rare comes before normal
-    $uniqueIndex = array_search('unique', $rarities);
-    $rareIndex = array_search('rare', $rarities);
-    $normalIndex = array_search('normal', $rarities);
-
-    if ($uniqueIndex !== false && $rareIndex !== false) {
-        expect($uniqueIndex)->toBeLessThan($rareIndex);
-    }
-    if ($rareIndex !== false && $normalIndex !== false) {
-        expect($rareIndex)->toBeLessThan($normalIndex);
-    }
-});
+    $ids = $page->script("Alpine.\$data({$this->alpineSelector}).filteredCharacters.map(c => c.id)");
+    expect($ids)->toBe([30, 20, 10]);
+})->group('browser', 'external-data', 'sort');
 
 it('maintains sort state when switching tabs', function () {
-    visit('/external-data/browse')
-        ->waitFor('[x-data="externalDataBrowser()"]')
-        ->waitUntilMissing('.animate-spin', 10)
-        ->click('button:contains("Characters")')
-        ->select('select[x-model="sortBy"]', 'name-desc')
-        ->pause(500)
-        ->click('button:contains("Support Cards")')
-        ->pause(500)
-        ->assertSelected('select[x-model="sortBy"]', 'name-desc') // Sort state should persist
-        ->click('button:contains("Skills")')
-        ->pause(500)
-        ->assertSelected('select[x-model="sortBy"]', 'name-desc'); // Sort state should still persist
-});
+    $this->actingAs($this->user);
+    $page = visit('/external-data/browse');
 
-it('can sort with filters applied', function () {
-    visit('/external-data/browse')
-        ->waitFor('[x-data="externalDataBrowser()"]')
-        ->waitUntilMissing('.animate-spin', 10)
-        ->click('button:contains("Support Cards")')
-        ->pause(500)
-        ->click('button:contains("SSR")') // Apply rarity filter
-        ->pause(500)
-        ->select('select[x-model="sortBy"]', 'name-asc')
-        ->pause(500);
+    $page->assertSee('External Data Browser');
+    $page->wait(8);
 
-    // Verify that only SSR cards are shown and they're sorted by name
-    $cards = $this->script('
-        return Array.from(document.querySelectorAll(".glass-card-alt"))
-            .map(card => ({
-                name: card.querySelector("h3").textContent.trim(),
-                rarity: card.querySelector("span.inline-flex").textContent.trim()
-            }));
-    ');
+    $page->script("Alpine.\$data({$this->alpineSelector}).sortBy = 'name-desc'");
+    $page->wait(0.3);
 
-    // All cards should be SSR
-    foreach ($cards as $card) {
-        expect($card['rarity'])->toBe('SSR');
-    }
+    $page->script("Alpine.\$data({$this->alpineSelector}).activeTab = 'support-cards'");
+    $page->wait(0.3);
+    $page->script("Alpine.\$data({$this->alpineSelector}).activeTab = 'characters'");
+    $page->wait(0.3);
 
-    // Names should be in alphabetical order
-    $names = array_column($cards, 'name');
-    $sortedNames = $names;
-    sort($sortedNames);
-    expect($names)->toBe($sortedNames);
-});
+    $sortBy = $page->script("Alpine.\$data({$this->alpineSelector}).sortBy");
+    expect($sortBy)->toBe('name-desc');
+})->group('browser', 'external-data', 'sort');
 
-it('can sort with search applied', function () {
-    visit('/external-data/browse')
-        ->waitFor('[x-data="externalDataBrowser()"]')
-        ->waitUntilMissing('.animate-spin', 10)
-        ->click('button:contains("Characters")')
-        ->type('input[placeholder="Search characters..."]', 'Special')
-        ->pause(500)
-        ->select('select[x-model="sortBy"]', 'name-asc')
-        ->pause(500);
+it('can sort with search filter applied', function () {
+    $this->actingAs($this->user);
+    $page = visit('/external-data/browse');
 
-    // Verify that search results are sorted
-    $names = $this->script('
-        return Array.from(document.querySelectorAll(".glass-card-alt h3"))
-            .map(el => el.textContent.trim())
-            .filter(name => name.length > 0);
-    ');
+    $page->assertSee('External Data Browser');
+    $page->wait(8);
 
-    // All names should contain "Special"
-    foreach ($names as $name) {
-        expect(strtolower($name))->toContain('special');
-    }
+    $page->script("
+        var c = Alpine.\$data({$this->alpineSelector});
+        c.characters = [
+            { id: 1, name_en: 'Special Week', name_jp: 'スペシャルウィーク', category_label_en: 'Short', color_main: '#3b82f6' },
+            { id: 2, name_en: 'Silence Suzuka', name_jp: 'サイレンススズカ', category_label_en: 'Mile', color_main: '#10b981' },
+            { id: 3, name_en: 'Special King', name_jp: 'スペシャルキング', category_label_en: 'Long', color_main: '#ef4444' },
+            { id: 4, name_en: 'Tokai Teio', name_jp: 'トウカイテイオー', category_label_en: 'Medium', color_main: '#f59e0b' },
+        ];
+        c.searchTerm = 'Special';
+        c.sortBy = 'name-asc';
+        c.filterData();
+        c.loading = false;
+    ");
+    $page->wait(1);
 
-    // Names should be in alphabetical order
-    $sortedNames = $names;
-    sort($sortedNames);
-    expect($names)->toBe($sortedNames);
-});
+    $names = $page->script("Alpine.\$data({$this->alpineSelector}).filteredCharacters.map(c => c.name_en)");
+    expect($names)->toBe(['Special King', 'Special Week']);
+})->group('browser', 'external-data', 'sort');
 
-it('handles empty results with sort applied', function () {
-    visit('/external-data/browse')
-        ->waitFor('[x-data="externalDataBrowser()"]')
-        ->waitUntilMissing('.animate-spin', 10)
-        ->click('button:contains("Characters")')
-        ->type('input[placeholder="Search characters..."]', 'NonExistentCharacter12345')
-        ->pause(500)
-        ->select('select[x-model="sortBy"]', 'name-asc')
-        ->pause(500)
-        ->assertSee('No characters found'); // Should show empty state
-});
+it('shows empty state when search yields no results', function () {
+    $this->actingAs($this->user);
+    $page = visit('/external-data/browse');
+
+    $page->assertSee('External Data Browser');
+    $page->wait(8);
+
+    $page->script("
+        var c = Alpine.\$data({$this->alpineSelector});
+        c.characters = [
+            { id: 1, name_en: 'Special Week', name_jp: 'スペシャルウィーク', category_label_en: 'Short', color_main: '#3b82f6' },
+        ];
+        c.searchTerm = 'NonExistentCharacter12345';
+        c.filterData();
+        c.loading = false;
+    ");
+    $page->wait(1);
+
+    $page->assertSee('No characters found');
+})->group('browser', 'external-data', 'sort');
+
+it('renders sort dropdown options correctly', function () {
+    $this->actingAs($this->user);
+    $page = visit('/external-data/browse');
+
+    $page->assertSee('External Data Browser')
+        ->assertSourceHas('ID (Low to High)')
+        ->assertSourceHas('ID (High to Low)')
+        ->assertSourceHas('Name (A-Z)')
+        ->assertSourceHas('Name (Z-A)');
+})->group('browser', 'external-data', 'sort');

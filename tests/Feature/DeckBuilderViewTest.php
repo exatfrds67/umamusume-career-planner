@@ -11,7 +11,7 @@ class DeckBuilderViewTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_deck_builder_page_loads()
+    public function test_deck_builder_page_loads(): void
     {
         $user = User::factory()->create();
         $character = Character::factory()->create(['user_id' => $user->id]);
@@ -22,7 +22,7 @@ class DeckBuilderViewTest extends TestCase
         $response->assertViewIs('support-cards.deck-builder');
     }
 
-    public function test_deck_builder_has_semantic_structure()
+    public function test_deck_builder_has_semantic_structure(): void
     {
         $user = User::factory()->create();
         $character = Character::factory()->create(['user_id' => $user->id]);

@@ -383,6 +383,49 @@ function randomMoodStatus(): string
     return $moods[array_rand($moods)];
 }
 
+/**
+ * Create a test TrainingContext with default valid values.
+ *
+ * @param  array<string, mixed>  $overrides
+ */
+function createTestTrainingContext(array $overrides = []): \App\ValueObjects\TrainingContext
+{
+    $defaults = [
+        'turn_number' => 15,
+        'phase' => 'classic_year',
+        'stats' => [
+            'speed' => 500,
+            'stamina' => 450,
+            'power' => 480,
+            'guts' => 400,
+            'wisdom' => 450,
+        ],
+        'sp_available' => 180,
+        'energy' => 75,
+        'mood' => 'normal',
+        'acquired_skills' => [],
+        'skill_hints' => [],
+        'support_deck' => [
+            'cards' => [],
+        ],
+        'facility_levels' => [
+            'speed' => 3,
+            'stamina' => 2,
+            'power' => 3,
+            'guts' => 2,
+            'wisdom' => 4,
+        ],
+        'upcoming_races' => [],
+        'scenario' => null,
+        'storage_mode' => 'account',
+        'career_run_id' => 1,
+    ];
+
+    $data = array_merge($defaults, $overrides);
+
+    return \App\ValueObjects\TrainingContext::fromArray($data);
+}
+
 /*
 |--------------------------------------------------------------------------
 | Test Groups and Tags

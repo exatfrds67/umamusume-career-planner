@@ -12,7 +12,7 @@ it('renders deck builder data payload for the Alpine bootstrap', function () {
     $response = $this->actingAs($user)->get(route('characters.deck-builder', $character));
 
     $response->assertSuccessful();
-    $response->assertSee('id="deck-builder-data"', false);
-    $response->assertSee('data-deck=', false);
-    $response->assertSee('data-api-routes=', false);
+    $response->assertSee('window.deckBuilderData', false);
+    $response->assertSee('deck:', false);
+    $response->assertSee('characterId:', false);
 });

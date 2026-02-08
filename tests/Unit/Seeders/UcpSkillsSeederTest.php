@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 use App\Models\Skill;
 use Database\Seeders\UcpSkillsSeeder;
-use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
-use ReflectionClass;
 
 uses(RefreshDatabase::class);
 

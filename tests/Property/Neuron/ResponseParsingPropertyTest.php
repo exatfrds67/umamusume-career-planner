@@ -39,7 +39,7 @@ describe('Property 8: Response Parsing', function () {
                 'stamina' => rand(5, 30),
             ],
             alternatives: [
-                ['type' => 'rest', 'reason' => 'Low energy'],
+                ['training' => 'rest', 'reason' => 'Low energy'],
             ]
         );
 
@@ -164,8 +164,8 @@ describe('Property 8: Response Parsing', function () {
     it('extracts alternatives from response', function () {
         // Create a response with random alternatives
         $alternatives = [
-            ['type' => 'rest', 'reason' => 'Low energy'],
-            ['type' => 'stamina', 'reason' => 'Alternative option'],
+            ['training' => 'rest', 'reason' => 'Low energy'],
+            ['training' => 'stamina', 'reason' => 'Alternative option'],
         ];
         $response = new TrainingAdviceResponse(
             recommendedTraining: 'speed',
@@ -297,7 +297,7 @@ describe('Property 8: Response Parsing', function () {
                 'stamina' => 10,
             ],
             alternatives: [
-                ['type' => 'rest', 'reason' => 'Low energy'],
+                ['training' => 'rest', 'reason' => 'Low energy'],
             ]
         );
 

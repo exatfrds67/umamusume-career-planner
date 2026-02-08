@@ -11,7 +11,7 @@ class TrainingDetailViewTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_training_detail_page_loads()
+    public function test_training_detail_page_loads(): void
     {
         $user = User::factory()->create();
         $character = Character::factory()->create(['user_id' => $user->id]);
@@ -22,7 +22,7 @@ class TrainingDetailViewTest extends TestCase
         $response->assertSee($character->name);
     }
 
-    public function test_training_detail_has_semantic_structure()
+    public function test_training_detail_has_semantic_structure(): void
     {
         $user = User::factory()->create();
         $character = Character::factory()->create(['user_id' => $user->id]);
