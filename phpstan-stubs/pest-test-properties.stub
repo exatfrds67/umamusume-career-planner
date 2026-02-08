@@ -142,6 +142,27 @@ namespace PHPUnit\Framework {
 
         /** @var mixed Queue for queue tests */
         public $queue;
+
+        /** @var mixed Game mechanics engine instance for game mechanics tests */
+        public $mechanicsEngine;
+
+        /** @var mixed Advisor instance for advisory tests */
+        public $advisor;
+
+        /** @var mixed Engine instance for engine tests */
+        public $engine;
+
+        /** @var mixed Rule-based advisor instance for rule-based advisory tests */
+        public $ruleBasedAdvisor;
+
+        /** @var mixed Neuron AI service instance for AI tests */
+        public $neuronAIService;
+
+        /** @var mixed Accuracy tracker instance for accuracy tracking tests */
+        public $accuracyTracker;
+
+        /** @var mixed Critical detector instance for critical situation detection tests */
+        public $criticalDetector;
     }
 }
 

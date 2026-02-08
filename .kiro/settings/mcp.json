@@ -25,7 +25,9 @@
         "database-schema",
         "browser-logs",
         "database-query",
-        "search-docs"
+        "search-docs",
+        "read-log-entries",
+        "last-error"
       ]
     },
     "memory": {

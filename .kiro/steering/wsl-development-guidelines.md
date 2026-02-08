@@ -1,11 +1,3 @@
----
-inclusion:
-  - when: executing commands in WSL or cross-platform Windows/Linux environments
-  - when: troubleshooting WSL, Redis, or service connectivity issues
-  - when: setting up Laravel Horizon or queue workers on Windows
-  - when: configuring PHP extensions (PCNTL, POSIX) or development environments
----
-
 # WSL Development Guidelines
 
 ## Overview

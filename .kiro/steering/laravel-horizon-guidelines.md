@@ -1,11 +1,3 @@
----
-inclusion:
-  - when: discussing Laravel queue management, background jobs, or Redis queues
-  - when: configuring or troubleshooting Laravel Horizon
-  - when: setting up queue workers or supervisors
-  - when: implementing job processing, monitoring, or scaling strategies
----
-
 # Laravel Horizon Guidelines
 
 ## Overview
