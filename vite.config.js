@@ -18,6 +18,7 @@ export default defineConfig({
                 "resources/css/components/stat-bar.css",
                 "resources/css/components/support-card.css",
                 "resources/css/components/turn-counter.css",
+                "resources/css/components/condition-badge.css",
                 // Page-specific scripts
                 "resources/js/pages/test-api.js",
                 "resources/js/pages/support-cards/deck-builder.js",
