@@ -546,9 +546,10 @@ class AdvisoryPanel extends Component
     {
         $sessionKey = $this->getSessionKey();
 
-        // Load and cast to proper types
-        $alerts = session()->get("{$sessionKey}.alerts", []);
-        $recommendations = session()->get("{$sessionKey}.recommendations", []);
+        // Load from combined session object for efficiency
+        $sessionData = session()->get($sessionKey, ['alerts' => [], 'recommendations' => []]);
+        $alerts = $sessionData['alerts'] ?? [];
+        $recommendations = $sessionData['recommendations'] ?? [];
 
         // Ensure we have array<int, int|string> by filtering and casting
         $this->dismissedAlerts = [];
@@ -577,8 +578,11 @@ class AdvisoryPanel extends Component
     {
         $sessionKey = $this->getSessionKey();
 
-        session()->put("{$sessionKey}.alerts", $this->dismissedAlerts);
-        session()->put("{$sessionKey}.recommendations", $this->dismissedRecommendations);
+        // Combine session writes into a single put operation for efficiency
+        session()->put($sessionKey, [
+            'alerts' => $this->dismissedAlerts,
+            'recommendations' => $this->dismissedRecommendations,
+        ]);
     }
 
     /**
@@ -638,8 +642,8 @@ class AdvisoryPanel extends Component
             'trainingRecommendationCount' => $trainingRecommendationCount,
             'hasContent' => $hasContent,
         ])->layout('layouts.app', [
-            // Disable layout caching for this component to ensure fresh data
-            'cache' => false,
+            // Enable layout caching for better performance
+            'cache' => true,
         ]);
     }
 }
