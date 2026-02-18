@@ -186,4 +186,14 @@ class Career extends Model
     {
         return $this->hasMany(SkillAcquisition::class);
     }
+
+    /**
+     * Get the run snapshots for this career.
+     *
+     * @return HasMany<RunSnapshot, $this>
+     */
+    public function runSnapshots(): HasMany
+    {
+        return $this->hasMany(RunSnapshot::class);
+    }
 }

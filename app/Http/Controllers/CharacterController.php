@@ -50,6 +50,37 @@ class CharacterController extends Controller
     }
 
     /**
+     * Select the active character for the session.
+     */
+    public function select(Request $request, Character $character): \Illuminate\Http\Response|RedirectResponse|\Illuminate\Http\JsonResponse
+    {
+        $this->authorize('view', $character);
+
+        $request->session()->put('current_character_id', $character->id);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'character' => [
+                    'id' => $character->id,
+                    'name' => $character->name,
+                ],
+                'topStatus' => [
+                    'currentTurn' => $character->current_turn,
+                    'maxTurns' => 78,
+                    'spAvailable' => $character->available_sp ?? 0,
+                    'storageMode' => 'account',
+                    'energy' => $character->energy_level,
+                    'mood' => $character->mood_status,
+                    'careerStage' => $character->career_stage,
+                ],
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Selected character updated.');
+    }
+
+    /**
      * Show the form for creating a new character
      */
     public function create(): View

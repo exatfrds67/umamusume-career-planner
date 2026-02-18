@@ -13,8 +13,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $career_id
  * @property int $character_id
  * @property string $race_name
+ * @property string|null $race_grade
+ * @property string|null $race_result
  * @property int|null $finish_position
+ * @property int|null $distance
  * @property int|null $distance_meters
+ * @property bool|null $won_race
+ * @property int|null $turn_number
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  */

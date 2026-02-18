@@ -75,6 +75,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/characters/{character}/rest', [CharacterController::class, 'rest'])->name('characters.rest');
     Route::post('/characters/{character}/next-turn', [CharacterController::class, 'nextTurn'])->name('characters.next-turn');
     Route::post('/characters/{character}/toggle-pin', [CharacterController::class, 'togglePin'])->name('characters.toggle-pin');
+    Route::post('/characters/{character}/select', [CharacterController::class, 'select'])->name('characters.select');
+    Route::post('/api/characters/{character}/select', [CharacterController::class, 'select'])->name('api.characters.select');
 
     // Factor management routes
     Route::get('/characters/{character}/factors', [CharacterController::class, 'manageFactors'])->name('characters.factors.manage');
@@ -107,6 +109,8 @@ Route::middleware('auth')->group(function () {
 
     // Skills routes
     Route::get('/skills', [App\Http\Controllers\SkillController::class, 'index'])->name('skills.index');
+
+    Route::get('/api/search', [App\Http\Controllers\Api\SearchController::class, 'search'])->name('api.search');
 
     // AI Dashboard routes
     Route::get('/ai/dashboard', fn () => view('ai.dashboard'))->name('ai.dashboard');

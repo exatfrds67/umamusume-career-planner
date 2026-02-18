@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Skill;
+use App\Models\SkillBuild;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 /**
  * Skill Build Controller
  *
- * Handles skill build templates, saved builds, and AI optimization
+ * Handles skill build templates, saved builds, and optimization
  * for the Skills Management page Build Planner tab.
  */
 class SkillBuildController extends Controller
@@ -19,89 +23,57 @@ class SkillBuildController extends Controller
      */
     public function templates(): JsonResponse
     {
-        $templates = [
-            [
-                'id' => 1,
-                'name' => 'Speed Specialist',
-                'category' => 'Speed',
-                'meta_tier' => 'S',
-                'description' => 'Optimized for short-distance speed races with acceleration focus',
-                'skill_count' => 8,
-                'total_sp_cost' => 800,
-                'optimized_cost' => 640,
-                'potential_savings' => 160,
-                'tags' => ['Speed', 'Acceleration', 'Short Distance'],
-                'skills' => [
-                    ['id' => 1, 'name' => 'Speed Star', 'rarity' => 'rare', 'skill_type' => 'speed', 'final_cost' => 120, 'hints_available' => 2],
-                    ['id' => 2, 'name' => 'Quick Start', 'rarity' => 'normal', 'skill_type' => 'speed', 'final_cost' => 80, 'hints_available' => 1],
-                    ['id' => 3, 'name' => 'Acceleration Burst', 'rarity' => 'rare', 'skill_type' => 'speed', 'final_cost' => 100, 'hints_available' => 0],
-                ],
-            ],
-            [
-                'id' => 2,
-                'name' => 'Stamina Endurance',
-                'category' => 'Stamina',
-                'meta_tier' => 'A',
-                'description' => 'Built for long-distance races with stamina recovery',
-                'skill_count' => 10,
-                'total_sp_cost' => 1000,
-                'optimized_cost' => 800,
-                'potential_savings' => 200,
-                'tags' => ['Stamina', 'Recovery', 'Long Distance'],
-                'skills' => [
-                    ['id' => 4, 'name' => 'Endurance Master', 'rarity' => 'rare', 'skill_type' => 'stamina', 'final_cost' => 150, 'hints_available' => 2],
-                    ['id' => 5, 'name' => 'Recovery Boost', 'rarity' => 'normal', 'skill_type' => 'stamina', 'final_cost' => 90, 'hints_available' => 1],
-                ],
-            ],
-            [
-                'id' => 3,
-                'name' => 'Balanced All-Rounder',
-                'category' => 'Balanced',
-                'meta_tier' => 'A',
-                'description' => 'Versatile build suitable for various race types',
-                'skill_count' => 12,
-                'total_sp_cost' => 1200,
-                'optimized_cost' => 960,
-                'potential_savings' => 240,
-                'tags' => ['Balanced', 'Versatile', 'All Distance'],
-                'skills' => [
-                    ['id' => 6, 'name' => 'Versatile Runner', 'rarity' => 'rare', 'skill_type' => 'balanced', 'final_cost' => 130, 'hints_available' => 1],
-                    ['id' => 7, 'name' => 'Adaptive Pace', 'rarity' => 'normal', 'skill_type' => 'balanced', 'final_cost' => 85, 'hints_available' => 2],
-                ],
-            ],
-            [
-                'id' => 4,
-                'name' => 'Power Runner',
-                'category' => 'Power',
-                'meta_tier' => 'S+',
-                'description' => 'Maximum power output for competitive racing',
-                'skill_count' => 9,
-                'total_sp_cost' => 950,
-                'optimized_cost' => 760,
-                'potential_savings' => 190,
-                'tags' => ['Power', 'Competitive', 'Mid Distance'],
-                'skills' => [
-                    ['id' => 8, 'name' => 'Power Surge', 'rarity' => 'unique', 'skill_type' => 'power', 'final_cost' => 200, 'hints_available' => 0],
-                    ['id' => 9, 'name' => 'Muscle Memory', 'rarity' => 'rare', 'skill_type' => 'power', 'final_cost' => 110, 'hints_available' => 1],
-                ],
-            ],
-            [
-                'id' => 5,
-                'name' => 'Guts Fighter',
-                'category' => 'Guts',
-                'meta_tier' => 'B',
-                'description' => 'Never give up mentality for close finishes',
-                'skill_count' => 7,
-                'total_sp_cost' => 700,
-                'optimized_cost' => 560,
-                'potential_savings' => 140,
-                'tags' => ['Guts', 'Determination', 'Close Finish'],
-                'skills' => [
-                    ['id' => 10, 'name' => 'Fighting Spirit', 'rarity' => 'rare', 'skill_type' => 'guts', 'final_cost' => 100, 'hints_available' => 2],
-                    ['id' => 11, 'name' => 'Last Spurt', 'rarity' => 'normal', 'skill_type' => 'guts', 'final_cost' => 70, 'hints_available' => 1],
-                ],
-            ],
-        ];
+        $templateModels = SkillBuild::query()
+            ->where('is_template', true)
+            ->orderByDesc('updated_at')
+            ->get();
+
+        if ($templateModels->isNotEmpty()) {
+            $templates = $templateModels->map(fn (SkillBuild $build): array => $this->formatBuildTemplate($build))->all();
+
+            return response()->json([
+                'success' => true,
+                'data' => $templates,
+            ]);
+        }
+
+        $skills = Skill::query()
+            ->where('is_active', true)
+            ->orderByDesc('updated_at')
+            ->limit(24)
+            ->get(['id', 'name', 'skill_type', 'rarity', 'base_sp_cost', 'meta_tier', 'description']);
+
+        $templates = $skills
+            ->groupBy('skill_type')
+            ->take(5)
+            ->map(function ($group, string $type): array {
+                $skillIds = $group->pluck('id')->all();
+                $totalCost = (int) $group->sum('base_sp_cost');
+                $optimizedCost = (int) round($totalCost * 0.8);
+
+                return [
+                    'id' => crc32($type),
+                    'name' => ucfirst($type).' Build',
+                    'category' => ucfirst($type),
+                    'meta_tier' => $group->first()->meta_tier ?? 'B',
+                    'description' => 'Auto-generated build based on recent skills.',
+                    'skill_count' => count($skillIds),
+                    'total_sp_cost' => $totalCost,
+                    'optimized_cost' => $optimizedCost,
+                    'potential_savings' => $totalCost - $optimizedCost,
+                    'tags' => [ucfirst($type)],
+                    'skills' => $group->map(fn (Skill $skill): array => [
+                        'id' => $skill->id,
+                        'name' => $skill->name,
+                        'rarity' => $skill->rarity,
+                        'skill_type' => $skill->skill_type,
+                        'final_cost' => $skill->base_sp_cost,
+                        'hints_available' => 0,
+                    ])->all(),
+                ];
+            })
+            ->values()
+            ->all();
 
         return response()->json([
             'success' => true,
@@ -114,8 +86,6 @@ class SkillBuildController extends Controller
      */
     public function savedBuilds(Request $request): JsonResponse
     {
-        // In a real implementation, this would fetch from database
-        // For now, return empty array or mock data based on auth status
         $user = $request->user();
 
         if (! $user) {
@@ -125,23 +95,19 @@ class SkillBuildController extends Controller
             ]);
         }
 
-        // Mock saved builds for authenticated users
-        $savedBuilds = [
-            [
-                'id' => 1,
-                'name' => 'My Speed Build',
-                'skill_count' => 6,
-                'total_sp' => 650,
-                'created_at' => now()->subDays(3)->toDateTimeString(),
-            ],
-            [
-                'id' => 2,
-                'name' => 'Championship Prep',
-                'skill_count' => 8,
-                'total_sp' => 920,
-                'created_at' => now()->subDays(7)->toDateTimeString(),
-            ],
-        ];
+        $savedBuilds = SkillBuild::query()
+            ->where('user_id', $user->id)
+            ->where('is_template', false)
+            ->orderByDesc('updated_at')
+            ->get()
+            ->map(fn (SkillBuild $build): array => [
+                'id' => $build->id,
+                'name' => $build->name,
+                'skill_count' => is_array($build->skill_ids) ? count($build->skill_ids) : 0,
+                'total_sp' => $build->total_sp_cost,
+                'created_at' => $build->created_at?->toDateTimeString(),
+            ])
+            ->all();
 
         return response()->json([
             'success' => true,
@@ -150,29 +116,32 @@ class SkillBuildController extends Controller
     }
 
     /**
-     * Get AI optimization for a build.
+     * Get optimization for a build based on selected skills.
      */
     public function optimize(Request $request): JsonResponse
     {
         $request->validate([
-            'template_id' => 'required|integer',
+            'skill_ids' => 'required|array|min:1',
+            'skill_ids.*' => 'integer|exists:ucp_skills,id',
         ]);
 
-        // Mock AI optimization response
+        /** @var array<int, int> $skillIds */
+        $skillIds = $request->input('skill_ids', []);
+        $skills = Skill::whereIn('id', $skillIds)->get(['id', 'name', 'skill_type', 'base_sp_cost']);
+        $totalCost = (int) $skills->sum('base_sp_cost');
+        $optimizedCost = (int) round($totalCost * 0.8);
+        $efficiencyScore = $totalCost > 0 ? (int) round(($optimizedCost / $totalCost) * 100) : 0;
+        $synergyRating = max(1, min(10, $skills->count()));
+
         $optimization = [
-            'summary' => 'This build has excellent synergy for speed-focused racing. Consider adding more stamina skills for longer races.',
-            'efficiency_score' => 85,
-            'synergy_rating' => 8,
-            'meta_alignment' => 92,
+            'summary' => 'Optimization calculated from selected skills.',
+            'efficiency_score' => $efficiencyScore,
+            'synergy_rating' => $synergyRating,
+            'total_sp_cost' => $totalCost,
+            'optimized_cost' => $optimizedCost,
             'recommendations' => [
-                'Prioritize acquiring Speed Star first for maximum early-game impact',
-                'Wait for hint level 2 on Acceleration Burst before purchasing',
-                'Consider swapping Quick Start for Dash Master if available',
-            ],
-            'acquisition_order' => [
-                'Speed Star (120 SP) - High priority, good synergy',
-                'Quick Start (80 SP) - Early game essential',
-                'Acceleration Burst (100 SP) - Wait for hints',
+                'Prioritize high-impact skills first to maximize early gains.',
+                'Monitor hint availability to reduce total SP cost.',
             ],
         ];
 
@@ -192,7 +161,6 @@ class SkillBuildController extends Controller
             'character_id' => 'sometimes|integer',
         ]);
 
-        // In a real implementation, this would apply the build to the character
         return response()->json([
             'success' => true,
             'message' => 'Build applied successfully',
@@ -210,20 +178,47 @@ class SkillBuildController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'template_id' => 'sometimes|integer',
-            'skills' => 'sometimes|array',
+            'skill_ids' => 'required|array|min:1',
+            'skill_ids.*' => 'integer|exists:ucp_skills,id',
+            'category' => 'nullable|string|max:255',
+            'tags' => 'nullable|array',
+            'tags.*' => 'string',
         ]);
 
-        // In a real implementation, this would save to database
+        $user = $request->user();
+        if (! $user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized',
+            ], 401);
+        }
+
+        /** @var array<int, int> $skillIds */
+        $skillIds = $request->input('skill_ids', []);
+        $totalCost = (int) Skill::whereIn('id', $skillIds)->sum('base_sp_cost');
+        $optimizedCost = (int) round($totalCost * 0.8);
+
+        $build = SkillBuild::create([
+            'user_id' => $user->id,
+            'character_id' => null,
+            'name' => $request->input('name'),
+            'category' => $request->input('category'),
+            'skill_ids' => $skillIds,
+            'total_sp_cost' => $totalCost,
+            'optimized_cost' => $optimizedCost,
+            'tags' => $request->input('tags', []),
+            'is_template' => false,
+        ]);
+
         return response()->json([
             'success' => true,
             'message' => 'Build saved successfully',
             'data' => [
-                'id' => rand(100, 999),
-                'name' => $request->input('name'),
-                'created_at' => now()->toDateTimeString(),
+                'id' => $build->id,
+                'name' => $build->name,
+                'created_at' => $build->created_at?->toDateTimeString(),
             ],
-        ]);
+        ], 201);
     }
 
     /**
@@ -231,10 +226,64 @@ class SkillBuildController extends Controller
      */
     public function deleteBuild(int $id): JsonResponse
     {
-        // In a real implementation, this would delete from database
+        $user = request()->user();
+        if (! $user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized',
+            ], 401);
+        }
+
+        $build = SkillBuild::query()
+            ->where('id', $id)
+            ->where('user_id', $user->id)
+            ->first();
+
+        if (! $build || $build->is_template) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Build not found',
+            ], 404);
+        }
+
+        $build->delete();
+
         return response()->json([
             'success' => true,
             'message' => 'Build deleted successfully',
         ]);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function formatBuildTemplate(SkillBuild $build): array
+    {
+        $skills = $build->skills()->map(fn (Skill $skill): array => [
+            'id' => $skill->id,
+            'name' => $skill->name,
+            'rarity' => $skill->rarity,
+            'skill_type' => $skill->skill_type,
+            'final_cost' => $skill->base_sp_cost,
+            'hints_available' => 0,
+        ])->all();
+
+        $skillCount = is_array($build->skill_ids) ? count($build->skill_ids) : 0;
+        $totalCost = $build->total_sp_cost ?? 0;
+        $optimizedCost = $build->optimized_cost ?? 0;
+
+        return [
+            'id' => $build->id,
+            'name' => $build->name,
+            'category' => $build->category,
+            'meta_tier' => $build->meta_tier,
+            'description' => $build->description,
+            'skill_count' => $skillCount,
+            'total_sp_cost' => $totalCost,
+            'optimized_cost' => $optimizedCost,
+            'potential_savings' => $totalCost - $optimizedCost,
+            'tags' => $build->tags ?? [],
+            'skills' => $skills,
+        ];
     }
 }

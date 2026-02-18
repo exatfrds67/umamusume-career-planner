@@ -28,7 +28,7 @@ class TrainingPredictionController extends Controller
 
         $selectedCharacter = null;
         if ($request->has('character_id')) {
-            $characterId = (int) $request->input('character_id');
+            $characterId = $request->integer('character_id');
 
             if ($characterId > 0) {
                 $selectedCharacter = Character::with([
