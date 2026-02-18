@@ -17,7 +17,7 @@
     };
 @endphp
 
-<div {{ $attributes->merge(['class' => 'w-full border-b border-gray-200/80 dark:border-gray-700/80 bg-white/70 dark:bg-gray-800/70 backdrop-blur-md']) }}>
+<div id="topStatusBar" {{ $attributes->merge(['class' => 'w-full border-b border-gray-200/80 dark:border-gray-700/80 bg-white/70 dark:bg-gray-800/70 backdrop-blur-md']) }}>
     <div class="flex flex-wrap items-center justify-between gap-3 px-4 py-2 text-xs sm:text-sm">
         <div class="flex items-center gap-3">
             <span class="text-gray-500 dark:text-gray-400">Turn</span>

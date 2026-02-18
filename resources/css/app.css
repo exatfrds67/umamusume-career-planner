@@ -2,6 +2,18 @@
 
 /* Component Styles */
 @import "./components/advisory-panel.css";
+@import "./components/animations.css";
+@import "./components/character-card.css";
+@import "./components/condition-badge.css";
+@import "./components/gauges.css";
+@import "./components/grade-badge.css";
+@import "./components/keyboard-shortcuts.css";
+@import "./components/skill-card.css";
+@import "./components/stat-bar.css";
+@import "./components/support-card.css";
+@import "./components/turn-counter.css";
+@import "./components/ai/critical-alert-badge.css";
+@import "./components/ai/recommendation-card.css";
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
