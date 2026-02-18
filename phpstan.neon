@@ -141,21 +141,6 @@ parameters:
     
     # Mockery methods (union type patterns - broader pattern)
     - '#Call to an undefined method Mockery.+::#'
-    
-    # TestCall with() parameter type
-    - '#Parameter .+ of method Pest.+TestCall::with\(\) expects#'
-    
-    # FilesystemAdapter assertExists type
-    - '#Parameter .+ of method Illuminate\\Filesystem\\FilesystemAdapter::assertExists\(\) expects#'
-    
-    # env() calls in tests (allowed for test configuration)
-    -
-      message: '#noEnvCallsOutsideOfConfig#'
-      paths:
-        - tests/
-    
-    # Call to undefined method on service (missing method implementations)
-    - '#Call to an undefined method App\\Services\\.+::#'
 
     # ReflectionType::getName() method (PHP 7.1+ method, PHPStan may not recognize in some contexts)
     -
