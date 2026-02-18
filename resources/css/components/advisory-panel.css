@@ -1,0 +1,229 @@
+/**
+ * Advisory Panel Component Styles
+ *
+ * Additional styles for the AI Advisory Panel component
+ * including animations, transitions, and accessibility enhancements.
+ */
+
+/* Screen reader only class */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Advisory Panel Container */
+.advisory-panel-container {
+    /* Ensure proper z-index stacking */
+    isolation: isolate;
+}
+
+/* Smooth transitions for panel */
+[role="dialog"] {
+    transition:
+        transform 0.3s ease-out,
+        opacity 0.3s ease-out;
+}
+
+/* Focus visible styles for better keyboard navigation */
+.advisory-panel-container button:focus-visible,
+.advisory-panel-container [tabindex]:focus-visible {
+    outline: 2px solid theme("colors.primary.500");
+    outline-offset: 2px;
+    border-radius: theme("borderRadius.md");
+}
+
+/* Dark mode focus styles */
+.dark .advisory-panel-container button:focus-visible,
+.dark .advisory-panel-container [tabindex]:focus-visible {
+    outline-color: theme("colors.primary.400");
+}
+
+/* Smooth expand/collapse animations */
+[x-collapse] {
+    transition:
+        height 0.3s ease-out,
+        opacity 0.2s ease-out;
+}
+
+/* Pulsing animation for critical alert badge */
+@keyframes pulse-danger {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.animate-pulse {
+    animation: pulse-danger 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Hover effects for interactive elements */
+.advisory-panel-container button:hover {
+    transition: all 0.2s ease-in-out;
+}
+
+/* Smooth scrolling for panel content */
+[role="dialog"] > div:nth-child(2) {
+    scroll-behavior: smooth;
+}
+
+/* Custom scrollbar for panel content */
+[role="dialog"] > div:nth-child(2)::-webkit-scrollbar {
+    width: 8px;
+}
+
+[role="dialog"] > div:nth-child(2)::-webkit-scrollbar-track {
+    background: theme("colors.neutral.100");
+}
+
+.dark [role="dialog"] > div:nth-child(2)::-webkit-scrollbar-track {
+    background: theme("colors.neutral.800");
+}
+
+[role="dialog"] > div:nth-child(2)::-webkit-scrollbar-thumb {
+    background: theme("colors.neutral.300");
+    border-radius: theme("borderRadius.full");
+}
+
+.dark [role="dialog"] > div:nth-child(2)::-webkit-scrollbar-thumb {
+    background: theme("colors.neutral.600");
+}
+
+[role="dialog"] > div:nth-child(2)::-webkit-scrollbar-thumb:hover {
+    background: theme("colors.neutral.400");
+}
+
+.dark [role="dialog"] > div:nth-child(2)::-webkit-scrollbar-thumb:hover {
+    background: theme("colors.neutral.500");
+}
+
+/* Keyboard shortcut badge styling */
+kbd {
+    font-family:
+        ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        "Liberation Mono", "Courier New", monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1;
+}
+
+/* Priority badge animations */
+.advisory-panel-container [class*="bg-danger-600"],
+.advisory-panel-container [class*="bg-warning-600"],
+.advisory-panel-container [class*="bg-primary-600"] {
+    transition: transform 0.2s ease-in-out;
+}
+
+.advisory-panel-container [class*="bg-danger-600"]:hover,
+.advisory-panel-container [class*="bg-warning-600"]:hover,
+.advisory-panel-container [class*="bg-primary-600"]:hover {
+    transform: scale(1.05);
+}
+
+/* Expandable item indicator */
+[data-expandable="true"] {
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Smooth rotation for expand/collapse icons */
+[data-expandable="true"] svg {
+    transition: transform 0.2s ease-in-out;
+}
+
+/* Alert and recommendation card hover effects */
+.advisory-panel-container [role="alert"],
+.advisory-panel-container .border-2 {
+    transition:
+        box-shadow 0.2s ease-in-out,
+        transform 0.2s ease-in-out;
+}
+
+.advisory-panel-container [role="alert"]:hover,
+.advisory-panel-container .border-2:hover {
+    box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.dark .advisory-panel-container [role="alert"]:hover,
+.dark .advisory-panel-container .border-2:hover {
+    box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.3),
+        0 2px 4px -1px rgba(0, 0, 0, 0.2);
+}
+
+/* Dismiss button hover effect */
+[aria-label*="Dismiss"]:hover {
+    transform: scale(1.1);
+}
+
+/* Toggle button shadow animation */
+.advisory-panel-container .fixed button {
+    transition:
+        box-shadow 0.3s ease-in-out,
+        transform 0.2s ease-in-out;
+}
+
+.advisory-panel-container .fixed button:hover {
+    transform: translateY(-2px);
+}
+
+.advisory-panel-container .fixed button:active {
+    transform: translateY(0);
+}
+
+/* Loading state for async operations */
+.advisory-panel-container [aria-busy="true"] {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .advisory-panel-container button:focus-visible {
+        outline-width: 3px;
+    }
+
+    .advisory-panel-container [role="dialog"] {
+        border: 2px solid currentColor;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .advisory-panel-container *,
+    .advisory-panel-container *::before,
+    .advisory-panel-container *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    [role="dialog"] > div:nth-child(2) {
+        scroll-behavior: auto;
+    }
+}
+
+/* Print styles */
+@media print {
+    .advisory-panel-container .fixed {
+        display: none;
+    }
+
+    [role="dialog"] {
+        position: static;
+        width: 100%;
+        box-shadow: none;
+    }
+}

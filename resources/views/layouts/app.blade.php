@@ -92,27 +92,24 @@
     </div>
 
     <!-- Desktop Sidebar (always visible on lg screens) -->
-    <div
-        class="hidden sm:hidden md:hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:flex lg:w-72 lg:flex-col lg:border-r lg:border-gray-200 dark:lg:border-gray-700 lg:bg-white dark:lg:bg-gray-800">
+    <div x-data :class="$store.sidebar.minimized ? 'lg:w-20' : 'lg:w-72'"
+        class="hidden sm:hidden md:hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:flex lg:flex-col lg:border-r lg:border-gray-200 dark:lg:border-gray-700 lg:bg-white dark:lg:bg-gray-800 transition-all duration-300 ease-in-out">
         <x-app.sidebar />
     </div>
 
     <!-- Main Column of Content -->
-    <div class="lg:pl-72 flex flex-col min-h-screen transition-all duration-300 relative z-10">
+    <div x-data :class="$store.sidebar.minimized ? 'lg:pl-20' : 'lg:pl-72'"
+        class="flex flex-col min-h-screen transition-all duration-300 ease-in-out relative z-10">
         @php
             $topStatus = $topStatus ?? [];
         @endphp
 
         <!-- Sticky Header -->
-        <header class="sticky top-0 z-40 border-b border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md shadow-sm">
+        <header
+            class="sticky top-0 z-40 border-b border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md shadow-sm">
             <div class="flex flex-col">
                 {{-- TODO: Provide storage mode and SP data from a shared context or controller-specific view data. --}}
-                <x-top-status-bar
-                    :current-turn="$topStatus['currentTurn'] ?? null"
-                    :max-turns="$topStatus['maxTurns'] ?? null"
-                    :sp-available="$topStatus['spAvailable'] ?? null"
-                    :storage-mode="$topStatus['storageMode'] ?? null"
-                />
+                <x-top-status-bar :current-turn="$topStatus['currentTurn'] ?? null" :max-turns="$topStatus['maxTurns'] ?? null" :sp-available="$topStatus['spAvailable'] ?? null" :storage-mode="$topStatus['storageMode'] ?? null" />
 
                 <div class="flex h-16 shrink-0 items-center gap-x-4 px-4 sm:gap-x-6 sm:px-6 lg:px-8">
                     <button type="button" class="-m-2.5 p-2.5 text-gray-700 dark:text-gray-200 lg:hidden"
@@ -157,6 +154,9 @@
 
     <!-- Accessibility Settings Panel (WCAG 2.2 AA) -->
     <x-accessibility-settings-panel />
+
+    <!-- Screen Reader Announcer for Sidebar State -->
+    <div id="sidebar-announcer" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
 
     @stack('scripts')
 </body>

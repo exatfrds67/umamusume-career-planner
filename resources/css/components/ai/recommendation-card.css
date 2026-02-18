@@ -1,0 +1,139 @@
+/**
+ * AI Recommendation Card Component Styles
+ * 
+ * Provides styling for AI-powered training recommendations with:
+ * - Priority-based color coding
+ * - Smooth expand/collapse animations
+ * - Accessible focus states
+ * - Dark mode support
+ */
+
+.recommendation-card {
+    transition: all 0.3s ease;
+}
+
+.recommendation-card:hover {
+    transform: translateY(-2px);
+}
+
+.recommendation-card:active {
+    transform: translateY(0);
+}
+
+/* Focus states for accessibility */
+.recommendation-card button:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+}
+
+/* Smooth expand/collapse animation */
+[x-cloak] {
+    display: none !important;
+}
+
+/* Priority color variants */
+.recommendation-card.border-red-200 {
+    border-color: rgb(254 202 202);
+}
+
+.dark .recommendation-card.border-red-700 {
+    border-color: rgb(185 28 28);
+}
+
+.recommendation-card.border-orange-200 {
+    border-color: rgb(254 215 170);
+}
+
+.dark .recommendation-card.border-orange-700 {
+    border-color: rgb(194 65 12);
+}
+
+.recommendation-card.border-blue-200 {
+    border-color: rgb(191 219 254);
+}
+
+.dark .recommendation-card.border-blue-700 {
+    border-color: rgb(29 78 216);
+}
+
+.recommendation-card.border-neutral-200 {
+    border-color: rgb(229 229 229);
+}
+
+.dark .recommendation-card.border-neutral-700 {
+    border-color: rgb(64 64 64);
+}
+
+/* Button hover effects */
+.recommendation-card button[type="button"] {
+    transition: all 0.2s ease;
+}
+
+.recommendation-card button[type="button"]:hover {
+    transform: translateY(-1px);
+    box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.recommendation-card button[type="button"]:active {
+    transform: translateY(0);
+}
+
+/* Ensure proper spacing for lists */
+.recommendation-card ul,
+.recommendation-card ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Icon animations */
+.recommendation-card svg {
+    transition: transform 0.2s ease;
+}
+
+/* Expand/collapse icon rotation */
+.recommendation-card .rotate-180 {
+    transform: rotate(180deg);
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .recommendation-card {
+        border-width: 3px;
+    }
+
+    .recommendation-card button:focus-visible {
+        outline-width: 3px;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .recommendation-card,
+    .recommendation-card button,
+    .recommendation-card svg {
+        transition: none;
+    }
+
+    .recommendation-card:hover {
+        transform: none;
+    }
+}
+
+/* Print styles */
+@media print {
+    .recommendation-card {
+        border: 1px solid #000;
+        page-break-inside: avoid;
+    }
+
+    .recommendation-card button[type="button"] {
+        display: none;
+    }
+
+    .recommendation-card [x-show] {
+        display: block !important;
+    }
+}

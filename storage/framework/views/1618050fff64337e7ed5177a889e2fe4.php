@@ -89,7 +89,7 @@ unset($__defined_vars, $__key, $__value); ?>
     <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 </button>
 
-<?php if (! $__env->hasRenderedOnce('861ad4e5-484a-4434-9f01-b6cb82760be4')): $__env->markAsRenderedOnce('861ad4e5-484a-4434-9f01-b6cb82760be4'); ?>
+<?php if (! $__env->hasRenderedOnce('24e2a9f6-e8df-4a3e-aaf2-433d87306567')): $__env->markAsRenderedOnce('24e2a9f6-e8df-4a3e-aaf2-433d87306567'); ?>
     <?php $__env->startPush('styles'); ?>
         <?php echo app('Illuminate\Foundation\Vite')(['resources/css/components/ai/critical-alert-badge.css']); ?>
     <?php $__env->stopPush(); ?>

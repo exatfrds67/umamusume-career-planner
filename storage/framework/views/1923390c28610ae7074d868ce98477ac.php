@@ -113,8 +113,8 @@
     </div>
 
     <!-- Desktop Sidebar (always visible on lg screens) -->
-    <div
-        class="hidden sm:hidden md:hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:flex lg:w-72 lg:flex-col lg:border-r lg:border-gray-200 dark:lg:border-gray-700 lg:bg-white dark:lg:bg-gray-800">
+    <div x-data :class="$store.sidebar.minimized ? 'lg:w-20' : 'lg:w-72'"
+        class="hidden sm:hidden md:hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:flex lg:flex-col lg:border-r lg:border-gray-200 dark:lg:border-gray-700 lg:bg-white dark:lg:bg-gray-800 transition-all duration-300 ease-in-out">
         <?php if (isset($component)) { $__componentOriginal790df3a3003b05a46d3e5fdd59aeab47 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal790df3a3003b05a46d3e5fdd59aeab47 = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.app.sidebar','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -140,13 +140,15 @@
     </div>
 
     <!-- Main Column of Content -->
-    <div class="lg:pl-72 flex flex-col min-h-screen transition-all duration-300 relative z-10">
+    <div x-data :class="$store.sidebar.minimized ? 'lg:pl-20' : 'lg:pl-72'"
+        class="flex flex-col min-h-screen transition-all duration-300 ease-in-out relative z-10">
         <?php
             $topStatus = $topStatus ?? [];
         ?>
 
         <!-- Sticky Header -->
-        <header class="sticky top-0 z-40 border-b border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md shadow-sm">
+        <header
+            class="sticky top-0 z-40 border-b border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md shadow-sm">
             <div class="flex flex-col">
                 
                 <?php if (isset($component)) { $__componentOriginal0aef750c747fe83eb00868ad99bfbb99 = $component; } ?>
@@ -301,6 +303,9 @@
 <?php $component = $__componentOriginaldb8cd85b4bb8d97824ed48d5b3ff8a8b; ?>
 <?php unset($__componentOriginaldb8cd85b4bb8d97824ed48d5b3ff8a8b); ?>
 <?php endif; ?>
+
+    <!-- Screen Reader Announcer for Sidebar State -->
+    <div id="sidebar-announcer" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
 
     <?php echo $__env->yieldPushContent('scripts'); ?>
 </body>

@@ -2310,3 +2310,34 @@ input[type="range"]::-moz-range-thumb:hover {
         transition-duration: 0.01ms !important;
     }
 }
+
+/* ============================================
+   Reduced Motion Support (WCAG 2.2 AA)
+   Sidebar Minimize Feature
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    /* Reduce sidebar transition duration */
+    .lg\:w-20,
+    .lg\:w-72,
+    .lg\:pl-20,
+    .lg\:pl-72 {
+        transition-duration: 0.01ms !important;
+    }
+
+    /* Reduce all sidebar-related transitions */
+    [x-data] [class*="transition"] {
+        transition-duration: 0.01ms !important;
+    }
+
+    /* Reduce logo text fade transitions */
+    [x-transition\:enter],
+    [x-transition\:leave] {
+        transition-duration: 0.01ms !important;
+    }
+
+    /* Reduce toggle button icon transitions */
+    svg[x-show] {
+        transition-duration: 0.01ms !important;
+    }
+}
