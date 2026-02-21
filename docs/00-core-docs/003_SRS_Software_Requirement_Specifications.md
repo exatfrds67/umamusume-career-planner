@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.3.0  
+**Date**: February 21, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
+**Status**: Current - Aligned with codebase v2.3.0 and game-accurate mechanics
 
 ---
 
@@ -817,15 +817,23 @@ flowchart LR
 | Layer | Technology | Version |
 | ----- | ---------- | ------- |
 | Backend Framework | Laravel | 12+ |
-| Frontend Reactivity | Livewire | 3 |
-| Client Interactivity | Alpine.js | Latest |
+| Frontend Reactivity | Livewire | 4 |
+| Client Interactivity | Alpine.js | 3 |
 | Styling | TailwindCSS | v4 |
 | Build Tool | Vite | 7 |
-| PHP Runtime | PHP | 8.2+ |
+| Charts | Chart.js | 4 |
+| PHP Runtime | PHP | 8.2+ (runtime 8.4.11) |
 | Database | MySQL/MariaDB/SQLite | - |
-| Cache | Redis | Optional |
+| Cache | Redis | Via WSL |
+| AI Framework | Neuron AI | v2.11 |
 | AI (Local) | Ollama | Latest |
 | AI (Cloud) | AWS Bedrock | Claude 4.5 |
+| Testing | Pest / PHPUnit | v4 / v12 |
+| Browser Testing | pest-plugin-browser | 4.0 |
+| E2E Testing | Playwright | 1.58 |
+| Code Quality | Larastan | v3 |
+| Code Formatting | Laravel Pint | v1 |
+| Dev Tools | Laravel Boost | v1.8 |
 
 ### 8.3 Related Documents
 
@@ -843,10 +851,12 @@ flowchart LR
 
 | Version | Date | Author | Changes |
 | ------- | ---- | ------ | ------- |
+| 2.3.0 | 2026-02-21 | Development Team | Updated tech stack versions (Livewire 4, Pest v4, PHPUnit v12, PHP 8.4.11); added Chart.js, Neuron AI, Playwright, Larastan, Pint, Laravel Boost references |
+| 2.2.0 | 2026-01-28 | Development Team | Aligned with codebase v2.2.0 |
 | 2.1.0 | 2026-01-23 | Development Team | Updated to align with current implementation, added AI and integration requirements |
 | 2.0.0 | 2026-01-14 | Development Team | Major revision with Mermaid diagrams |
 | 1.0.0 | 2026-01-03 | System | Initial draft |
 
 ---
 
-*This SRS reflects the current implementation status and serves as the authoritative reference for system requirements.*
+*This SRS reflects the current implementation status as of February 21, 2026 and serves as the authoritative reference for system requirements.*

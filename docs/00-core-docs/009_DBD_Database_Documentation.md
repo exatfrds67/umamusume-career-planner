@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0
-**Date**: January 28, 2026
+**Document Version**: 2.3.0
+**Date**: February 21, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned to codebase v2.2.0 with game-accurate mechanics
+**Status**: Current - Aligned to codebase v2.3.0 with game-accurate mechanics
 
 ---
 
@@ -42,28 +42,43 @@ mindmap
   root((UCP Database))
     User Management
       ucp_users
+      ucp_user_preferences
       sessions
     Character System
       ucp_characters
       ucp_aptitudes
       ucp_factors
+      ucp_character_support_cards
     Career Tracking
       ucp_careers
       ucp_training_sessions
+      ucp_run_snapshots
+      ucp_prediction_accuracy
     Skill System
       ucp_skills
       ucp_skill_hints
       ucp_skill_acquisitions
+      ucp_skill_builds
+    Race System
+      ucp_races
+      ucp_events
     Support Cards
       ucp_support_cards
+      ucp_support_card_definitions
       ucp_support_decks
     AI & Integration
       ucp_ai_conversations
-      ucp_ai_recommendations
+      ucp_conversation_messages
+      ucp_chat_messages
+      ucp_advisory_recommendations
       ucp_mcp_tool_usage
+      ucp_mcp_agents
+      ucp_mcp_servers
+      ucp_critical_alerts
     External Data
-      ucp_external_api_cache
+      ucp_external_data
       ucp_ocr_extractions
+      ucp_ocr_extracted_skills
 ```
 
 ---
@@ -92,9 +107,46 @@ mindmap
 | `ucp_mcp_tool_usage` | MCP tool tracking | tool_name, invocation_count, avg_latency, error_count |
 | `ucp_external_api_cache` | API response cache | api_source, endpoint, response_data, expires_at |
 | `ucp_ocr_extractions` | OCR results | user_id, image_path, extracted_data, confidence_score |
-| `ucp_ocr_extracted_skills` | OCR skill detection cache (NEW) | ocr_extraction_id, skill_id, confidence_score |
+| `ucp_ocr_extracted_skills` | OCR skill detection cache | ocr_extraction_id, skill_id, confidence_score |
 
-### 2.2 Supporting Tables
+### 2.2 Models (30 Total)
+
+The following Eloquent models map to the domain tables:
+
+| Model | Table | Purpose |
+|-------|-------|---------|
+| `AdvisoryRecommendation` | `ucp_advisory_recommendations` | AI-generated recommendations |
+| `AIConversation` | `ucp_ai_conversations` | AI chat history |
+| `Aptitude` | `ucp_aptitudes` | Aptitude grades |
+| `Career` | `ucp_careers` | Career runs |
+| `Character` | `ucp_characters` | Character state |
+| `CharacterSupportCard` | `ucp_character_support_cards` | Character-card pivot |
+| `ChatMessage` | `ucp_chat_messages` | Chat messages |
+| `ConversationMessage` | `ucp_conversation_messages` | Conversation messages |
+| `CriticalAlert` | `ucp_critical_alerts` | System critical alerts |
+| `Event` | `ucp_events` | Game events |
+| `ExternalData` | `ucp_external_data` | External API data cache |
+| `Factor` | `ucp_factors` | Inheritance factors |
+| `MCPAgent` | `ucp_mcp_agents` | MCP agent definitions |
+| `MCPServer` | `ucp_mcp_servers` | MCP server configurations |
+| `MCPToolUsage` | `ucp_mcp_tool_usage` | MCP tool tracking |
+| `OcrExtractedSkill` | `ucp_ocr_extracted_skills` | OCR skill detection |
+| `OCRExtraction` | `ucp_ocr_extractions` | OCR results |
+| `PredictionAccuracy` | `ucp_prediction_accuracy` | Prediction tracking |
+| `Race` | `ucp_races` | Race data |
+| `RunSnapshot` | `ucp_run_snapshots` | Career run snapshots |
+| `Skill` | `ucp_skills` | Skill catalog |
+| `SkillAcquisition` | `ucp_skill_acquisitions` | Acquisition history |
+| `SkillBuild` | `ucp_skill_builds` | Skill build plans |
+| `SkillHint` | `ucp_skill_hints` | Hint tracking |
+| `SupportCard` | `ucp_support_cards` | Support card inventory |
+| `SupportCardDefinition` | `ucp_support_card_definitions` | Canonical card metadata |
+| `SupportDeck` | `ucp_support_decks` | Deck configurations |
+| `TrainingSession` | `ucp_training_sessions` | Training logs |
+| `User` | `ucp_users` | Application users |
+| `UserPreference` | `ucp_user_preferences` | User preferences |
+
+### 2.3 Supporting Tables
 
 | Table | Purpose |
 |-------|---------|
@@ -484,6 +536,7 @@ flowchart LR
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.3.0 | 2026-02-21 | Development Team | Added complete 30-model catalog, updated schema mindmap with all tables, version alignment to v2.3.0 |
 | 2.1.0 | 2026-01-23 | Development Team | Updated schema to match current implementation, added AI/MCP tables |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with base schema |
 

@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.3.0  
+**Date**: February 21, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
+**Status**: Current - Aligned with codebase v2.3.0 and game-accurate mechanics
 
 ---
 
@@ -30,7 +30,7 @@
 
 ## 1. Executive Summary
 
-This Software Development Plan (SDP) describes the development strategy, milestones, and execution status for the Umamusume Pretty Derby Career Planner application. The system is built on **Laravel 12+** with **PHP 8.2+**, **Livewire 3**, **Alpine.js**, **TailwindCSS v4**, and integrates with **AWS Bedrock Claude** models and **Ollama** for AI capabilities.
+This Software Development Plan (SDP) describes the development strategy, milestones, and execution status for the Umamusume Pretty Derby Career Planner application. The system is built on **Laravel 12+** with **PHP 8.2+** (runtime 8.4.11), **Livewire 4**, **Alpine.js 3**, **TailwindCSS v4**, and integrates with **AWS Bedrock Claude** models and **Ollama** for AI capabilities via **Neuron AI v2.11**.
 
 The application consolidates features from six legacy tracking applications into a unified platform, enabling players to track character progression, manage training sessions, plan race strategies, and optimize skill builds through AI-powered recommendations.
 
@@ -115,14 +115,22 @@ The project follows an **iterative delivery model** with short milestones:
 
 | Layer | Technology | Version |
 |-------|------------|---------|| Backend Framework | Laravel | 12+ |
-| PHP Runtime | PHP | 8.2+ |
-| Frontend Reactivity | Livewire | 3 |
-| Client Interactivity | Alpine.js | Latest |
+| PHP Runtime | PHP | 8.2+ (runtime 8.4.11) |
+| Frontend Reactivity | Livewire | 4 |
+| Client Interactivity | Alpine.js | 3 |
 | Styling | TailwindCSS | v4 |
 | Build Tool | Vite | 7 |
+| Charts | Chart.js | 4 |
 | Database | MySQL/MariaDB/SQLite | - |
+| AI Framework | Neuron AI | v2.11 |
 | AI (Local) | Ollama | Latest |
 | AI (Cloud) | AWS Bedrock Claude | 4.5 |
+| Testing | Pest / PHPUnit | v4 / v12 |
+| Browser Testing | pest-plugin-browser | 4.0 |
+| E2E Testing | Playwright | 1.58 |
+| Code Quality | Larastan | v3 |
+| Code Formatting | Laravel Pint | v1 |
+| Dev Tools | Laravel Boost | v1.8 |
 
 ---
 
@@ -441,8 +449,8 @@ The project follows an **iterative delivery model** with short milestones:
 
 | Test Type | Tool | Coverage Target |
 |-----------|------|-----------------|
-| Feature Tests | Pest | 80%+ |
-| E2E Tests | Playwright | Critical paths 100% |
+| Feature Tests | Pest v4 | 80%+ |
+| E2E Tests | Playwright 1.58 / pest-plugin-browser 4.0 | Critical paths 100% |
 | Accessibility | axe-core | WCAG AA 100% |
 | Visual Regression | Playwright | Key pages |
 
@@ -467,7 +475,7 @@ Each task is complete when:
 - [ ] All interactive elements have `data-testid` attributes
 - [ ] Playwright E2E coverage exists for key actions
 - [ ] axe-core accessibility scan passes
-- [ ] Code follows Livewire 3 + Alpine.js best practices
+- [ ] Code follows Livewire 4 + Alpine.js 3 best practices
 - [ ] TailwindCSS classes use design tokens
 - [ ] Documentation is updated
 - [ ] Works in both dark and light modes
@@ -549,8 +557,8 @@ Each task is complete when:
 ### 13.1 Revision History
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 2.1.0 | 2026-01-23 | Development Team | Updated phases to match current implementation |
+|---------|------|--------|---------|| 2.3.0 | 2026-02-21 | Development Team | Updated tech stack versions (Livewire 4, Pest v4, PHPUnit v12, PHP 8.4.11); added Chart.js, Neuron AI, Playwright, Larastan, Pint, Laravel Boost references |
+| 2.2.0 | 2026-01-28 | Development Team | Aligned with codebase v2.2.0 || 2.1.0 | 2026-01-23 | Development Team | Updated phases to match current implementation |
 | 2.0.0 | 2026-01-14 | Development Team | Prior plan revision |
 | 1.0.0 | 2026-01-03 | Development Team | Initial draft |
 
@@ -571,4 +579,4 @@ Each task is complete when:
 
 ---
 
-*This SDP reflects the current implementation status and near-term priorities as of January 23, 2026. Updates are made at each phase milestone or when significant changes occur.*
+*This SDP reflects the current implementation status and near-term priorities as of February 21, 2026. Updates are made at each phase milestone or when significant changes occur.*

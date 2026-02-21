@@ -458,11 +458,15 @@ class CareerController extends Controller
         $this->verifyCareerOwnership($career);
 
         $totalTrainingSessions = $career->trainingSessions->count();
-        $totalStatGains = $career->trainingSessions->sum(fn ($session) => ($session->speed_gain ?? 0) +
-            ($session->stamina_gain ?? 0) +
-            ($session->power_gain ?? 0) +
-            ($session->guts_gain ?? 0) +
-            ($session->wit_gain ?? 0));
+        $totalStatGains = $career->trainingSessions->reduce(
+            fn (int $carry, $session): int => $carry
+                + (int) ($session->speed_gain ?? 0)
+                + (int) ($session->stamina_gain ?? 0)
+                + (int) ($session->power_gain ?? 0)
+                + (int) ($session->guts_gain ?? 0)
+                + (int) ($session->wit_gain ?? 0),
+            0,
+        );
 
         // Calculate efficiency rating (stat gains per training session)
         $efficiencyRating = $totalTrainingSessions > 0
@@ -499,6 +503,7 @@ class CareerController extends Controller
             ->get();
 
         // Verify all careers belong to characters owned by the authenticated user
+        /** @var Career $career */
         foreach ($careers as $career) {
             $this->verifyCareerOwnership($career);
         }
@@ -538,6 +543,7 @@ class CareerController extends Controller
             ->get();
 
         // Verify all careers belong to characters owned by the authenticated user
+        /** @var Career $career */
         foreach ($careers as $career) {
             $this->verifyCareerOwnership($career);
         }
@@ -573,6 +579,7 @@ class CareerController extends Controller
             ->get();
 
         // Verify all careers belong to characters owned by the authenticated user
+        /** @var Career $career */
         foreach ($careers as $career) {
             $this->verifyCareerOwnership($career);
         }

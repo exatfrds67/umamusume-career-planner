@@ -109,6 +109,25 @@ pest()->extend(Tests\TestCase::class)
 pest()->extend(Tests\TestCase::class)
     ->use(RefreshDatabase::class)
     ->use(WithFaker::class)
+    ->beforeEach(function () {
+        // Ensure browser tests use production Vite build instead of dev server.
+        // When `npm run dev` is running, a `public/hot` file exists which makes
+        // @vite generate dev server URLs (http://[::1]:5173/...). The Pest browser
+        // test server cannot reach the Vite dev server, so JS assets fail to load.
+        // Temporarily move the hot file so @vite uses the production manifest.
+        $hotFile = public_path('hot');
+        $backupFile = public_path('hot.browser-test-backup');
+        if (file_exists($hotFile) && ! file_exists($backupFile)) {
+            rename($hotFile, $backupFile);
+        }
+    })
+    ->afterEach(function () {
+        $hotFile = public_path('hot');
+        $backupFile = public_path('hot.browser-test-backup');
+        if (file_exists($backupFile) && ! file_exists($hotFile)) {
+            rename($backupFile, $hotFile);
+        }
+    })
     ->in('Browser');
 
 /*
@@ -126,8 +145,8 @@ pest()->extend(Tests\TestCase::class)
 // Verify a value is a valid stat value (0-2000, with soft cap at 1200)
 // VERIFIED (Jan 2026): Stats can exceed 1200 with diminishing returns (50% value above 1200)
 // Important breakpoints: 901, 1200 (soft cap), 1600
-expect()->extend('toBeValidStat', function (): Pest\Expectation {
-    /** @var Pest\Expectation $expectation */
+expect()->extend('toBeValidStat', function () {
+    /** @var Pest\Expectation<mixed> $expectation */
     $expectation = $this;
 
     return $expectation->toBeInt()
@@ -137,8 +156,8 @@ expect()->extend('toBeValidStat', function (): Pest\Expectation {
 
 // Verify a value is a valid aptitude grade (G through S - S is maximum, SS does NOT exist)
 // VERIFIED (Jan 2026): S-rank is the maximum aptitude grade in current game version
-expect()->extend('toBeValidAptitudeGrade', function (): Pest\Expectation {
-    /** @var Pest\Expectation $expectation */
+expect()->extend('toBeValidAptitudeGrade', function () {
+    /** @var Pest\Expectation<mixed> $expectation */
     $expectation = $this;
     $validGrades = ['G', 'G+', 'F', 'F+', 'E', 'E+', 'D', 'D+', 'C', 'C+', 'B', 'B+', 'A', 'A+', 'S'];
 
@@ -146,24 +165,24 @@ expect()->extend('toBeValidAptitudeGrade', function (): Pest\Expectation {
 });
 
 // Verify a value is a valid scenario type
-expect()->extend('toBeValidScenarioType', function (): Pest\Expectation {
-    /** @var Pest\Expectation $expectation */
+expect()->extend('toBeValidScenarioType', function () {
+    /** @var Pest\Expectation<mixed> $expectation */
     $expectation = $this;
 
     return $expectation->toBeIn(['ura_finale', 'unity_cup']);
 });
 
 // Verify a value is a valid SP cost (positive integer)
-expect()->extend('toBeValidSpCost', function (): Pest\Expectation {
-    /** @var Pest\Expectation $expectation */
+expect()->extend('toBeValidSpCost', function () {
+    /** @var Pest\Expectation<mixed> $expectation */
     $expectation = $this;
 
     return $expectation->toBeInt()->toBeGreaterThan(0);
 });
 
 // Verify a value is a valid energy level (0-100)
-expect()->extend('toBeValidEnergyLevel', function (): Pest\Expectation {
-    /** @var Pest\Expectation $expectation */
+expect()->extend('toBeValidEnergyLevel', function () {
+    /** @var Pest\Expectation<mixed> $expectation */
     $expectation = $this;
 
     return $expectation->toBeInt()
@@ -172,40 +191,40 @@ expect()->extend('toBeValidEnergyLevel', function (): Pest\Expectation {
 });
 
 // Verify a value is a valid mood status
-expect()->extend('toBeValidMoodStatus', function (): Pest\Expectation {
-    /** @var Pest\Expectation $expectation */
+expect()->extend('toBeValidMoodStatus', function () {
+    /** @var Pest\Expectation<mixed> $expectation */
     $expectation = $this;
 
     return $expectation->toBeIn(['awful', 'bad', 'normal', 'good', 'great']);
 });
 
 // Verify a value is a valid skill type
-expect()->extend('toBeValidSkillType', function (): Pest\Expectation {
-    /** @var Pest\Expectation $expectation */
+expect()->extend('toBeValidSkillType', function () {
+    /** @var Pest\Expectation<mixed> $expectation */
     $expectation = $this;
 
     return $expectation->toBeIn(['normal', 'rare', 'unique', 'inherited']);
 });
 
 // Verify a value is a valid support card rarity
-expect()->extend('toBeValidCardRarity', function (): Pest\Expectation {
-    /** @var Pest\Expectation $expectation */
+expect()->extend('toBeValidCardRarity', function () {
+    /** @var Pest\Expectation<mixed> $expectation */
     $expectation = $this;
 
     return $expectation->toBeIn(['R', 'SR', 'SSR']);
 });
 
 // Verify a value is a valid factor type
-expect()->extend('toBeValidFactorType', function (): Pest\Expectation {
-    /** @var Pest\Expectation $expectation */
+expect()->extend('toBeValidFactorType', function () {
+    /** @var Pest\Expectation<mixed> $expectation */
     $expectation = $this;
 
     return $expectation->toBeIn(['blue_stat', 'red_aptitude', 'green_unique', 'white_normal']);
 });
 
 // Verify a value is a valid factor level (1-3 stars)
-expect()->extend('toBeValidFactorLevel', function (): Pest\Expectation {
-    /** @var Pest\Expectation $expectation */
+expect()->extend('toBeValidFactorLevel', function () {
+    /** @var Pest\Expectation<mixed> $expectation */
     $expectation = $this;
 
     return $expectation->toBeInt()
@@ -214,8 +233,8 @@ expect()->extend('toBeValidFactorLevel', function (): Pest\Expectation {
 });
 
 // Verify a JSON response has the expected structure
-expect()->extend('toHaveJsonStructure', function (array $structure): Pest\Expectation {
-    /** @var Pest\Expectation $expectation */
+expect()->extend('toHaveJsonStructure', function (array $structure) {
+    /** @var Pest\Expectation<mixed> $expectation */
     $expectation = $this;
     /** @var array<array-key, mixed> $data */
     $data = (array) $expectation->value;

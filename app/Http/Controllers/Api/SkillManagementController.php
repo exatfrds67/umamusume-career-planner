@@ -40,6 +40,7 @@ class SkillManagementController extends Controller
         }])
             ->get()
             ->map(function ($skill) use ($character) {
+                /** @var Skill $skill */
                 $acquisition = $skill->acquisitions->first();
 
                 return [

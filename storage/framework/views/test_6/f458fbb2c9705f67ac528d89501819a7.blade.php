@@ -1,1 +1,0 @@
-<x-button id="my-button" data-test="value">Button</x-button>

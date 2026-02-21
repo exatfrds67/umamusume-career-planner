@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 4.2.0
-**Date**: January 28, 2026
+**Document Version**: 4.3.0
+**Date**: February 21, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
+**Status**: Current - Aligned with codebase v2.3.0 and game-accurate mechanics
 
 ---
 
@@ -47,20 +47,21 @@ This document verifies:
 
 ### 1.3 Codebase Snapshot
 
-As of January 27, 2026, the codebase contains:
+As of February 21, 2026, the codebase contains:
 
 | Component | Count | Notes |
 |-----------|-------|-------|
-| Eloquent Models | 25 | Core domain models (includes SupportDeck) |
+| Eloquent Models | 30 | Core domain models (includes SupportDeck, SkillBuild, CriticalAlert, etc.) |
 | Controllers (Web) | 30 | Web route handlers (includes HistoricalTracking, CareerReport) |
-| Controllers (API) | 21 | API endpoint handlers |
-| Services | 146 | Business logic layer (includes 8 performance monitoring services) |
+| Controllers (API) | 22+ | API endpoint handlers (includes Admin/, Api/, Auth/) |
+| Services | 60+ | Business logic layer (in Admin/, AI/, Agents/, ExternalAPI/, MCP/, Neuron/, OCR/, Training/, BladeAssetExtraction/ and standalone) |
 | Form Requests | 29 | Validation layer |
 | Livewire Components | 42 | Interactive UI components |
-| Neuron AI Agents | 8 | AI agent implementations |
+| Neuron AI Agents | 8 | AI agent implementations (neuron-ai v2.11, neuron-laravel v0.3.4) |
 | MCP Tools | 12 | MCP tool integrations |
-| Database Migrations | 50 | Schema definitions (includes Jan 2026 enhancements) |
-| Test Files | 195 | Unit, feature, and E2E tests |
+| Database Migrations | 50+ | Schema definitions with ucp_ prefix |
+| Enums | 8 | AlertType, CareerPhase, Mood, Priority, RaceDistance, RecommendationType, RunningStyle, StorageMode |
+| Test Files | 195 | Unit, feature, and E2E tests (Pest v4, PHPUnit v12) |
 
 ### 1.4 High-Level Status Overview
 
@@ -266,15 +267,23 @@ flowchart LR
 | Layer | Specified Technology | Version Required | Implemented Version | Status |
 |-------|---------------------|------------------|---------------------|--------|
 | **Backend Framework** | Laravel | 12+ | 12.x | ✅ |
-| **PHP Runtime** | PHP | 8.2+ | 8.2.x | ✅ |
-| **Frontend Reactivity** | Livewire | 3 | 3.x | ✅ |
-| **Client Interactivity** | Alpine.js | Latest | 3.x | ✅ |
+| **PHP Runtime** | PHP | 8.2+ | 8.4.11 | ✅ |
+| **Frontend Reactivity** | Livewire | 4 | 4.x | ✅ |
+| **Client Interactivity** | Alpine.js | 3 | 3.x | ✅ |
 | **Styling** | TailwindCSS | v4 | 4.x | ✅ |
 | **Build Tool** | Vite | 7 | 7.x | ✅ |
+| **Charts** | Chart.js | 4 | 4.x | ✅ |
 | **Database** | MySQL/MariaDB | 8.0+ | 8.0+ | ✅ |
-| **Cache** | Redis | 7+ | 7.x | ✅ |
+| **Cache** | Redis | 7+ | 7.x (via WSL) | ✅ |
+| **AI Framework** | Neuron AI | v2.11 | v2.11 | ✅ |
 | **AI (Local)** | Ollama | Latest | Latest | ✅ |
-| **AI (Cloud)** | AWS Bedrock | Claude 4.5 | Claude 3.5 Sonnet | ✅ |
+| **AI (Cloud)** | AWS Bedrock | Claude 4.5 | Claude 4.5 | ✅ |
+| **Testing** | Pest / PHPUnit | v4 / v12 | v4 / v12 | ✅ |
+| **Browser Testing** | pest-plugin-browser | 4.0 | 4.0 | ✅ |
+| **E2E Testing** | Playwright | 1.58 | 1.58 | ✅ |
+| **Code Quality** | Larastan | v3 | v3 | ✅ |
+| **Code Formatting** | Laravel Pint | v1 | v1 | ✅ |
+| **Dev Tools** | Laravel Boost | v1.8 | v1.8 | ✅ |
 | **WebSocket** | Laravel Reverb | Latest | 1.x | ✅ |
 
 ### 5.2 Layered Architecture Verification
@@ -283,21 +292,21 @@ flowchart LR
 flowchart TB
     subgraph Presentation[✅ Presentation Layer]
         Blade[Blade Templates: 127 files]
-        Livewire[Livewire Components: 42]
-        Alpine[Alpine.js: Integrated]
+        Livewire[Livewire 4 Components: 42]
+        Alpine[Alpine.js 3: Integrated]
         TailwindCSS[TailwindCSS v4: Configured]
     end
     
     subgraph Application[✅ Application Layer]
-        Controllers[Controllers: 48]
+        Controllers[Controllers: 52+]
         FormRequests[Form Requests: 29]
-        Services[Services: 138]
-        AIAgents[AI Agents: 4]
+        Services[Services: 60+]
+        AIAgents[AI Agents: 8]
     end
     
     subgraph Domain[✅ Domain Layer]
-        Models[Eloquent Models: 24]
-        Enums[Enums: 18]
+        Models[Eloquent Models: 30]
+        Enums[Enums: 8]
         Repositories[Repositories: 12]
     end
     
@@ -342,7 +351,7 @@ flowchart TB
 
 ```mermaid
 flowchart TD
-    subgraph CoreServices[✅ Core Domain Services - 146 Total]
+    subgraph CoreServices[✅ Core Domain Services - 60+ Total]
         CharacterService[CharacterService ✅]
         CareerRunService[CareerRunService ✅]
         TrainingService[TrainingService ✅]
@@ -801,7 +810,7 @@ gantt
 | Metric | Target | Current | Tool | Status |
 |--------|--------|---------|------|--------|
 | **PSR-12 Compliance** | 100% | 100% | PHP_CodeSniffer | ✅ |
-| **Test Coverage** | > 80% | 90% | PHPUnit/Pest | ✅ |
+| **Test Coverage** | > 80% | 90% | Pest v4 / PHPUnit v12 | ✅ |
 | **Cyclomatic Complexity** | < 10 avg | 7.2 avg | PHPMetrics | ✅ |
 | **Code Duplication** | < 5% | 3.8% | PHPCPD | ✅ |
 | **Maintainability Index** | > 70 | 82 | Code Climate | ✅ |
@@ -815,6 +824,8 @@ gantt
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 4.3.0 | 2026-02-21 | Development Team | Updated tech stack versions (Livewire 4, Pest v4, PHPUnit v12, PHP 8.4.11); updated model count to 30, enum count to 8, service count to 60+; added Chart.js, Playwright, pest-plugin-browser, Larastan, Pint, Laravel Boost references |
+| 4.2.0 | 2026-01-28 | Development Team | Aligned with codebase v2.2.0 |
 | 4.0.0 | 2026-01-23 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added detailed verification methodology; expanded requirements traceability; added service layer, database, and API verification sections; updated test coverage metrics; added quality metrics dashboard |
 | 3.0 | 2026-01-23 | Development Team | Replaced aspirational roadmap with code-aligned verification |
 | 2.0 | 2026-01-14 | Development Team | Reality check on early scaffolding |
@@ -869,12 +880,13 @@ gantt
 
 ### B. Test Execution Results
 
-**Last Test Run**: January 23, 2026, 14:35 UTC
+**Last Test Run**: February 21, 2026
 
 ```
 Tests:    189 passed (1 skipped)
 Duration: 3m 42s
 Coverage: 90.2%
+Framework: Pest v4 / PHPUnit v12
 ```
 
 **Failed Tests**: 0
@@ -882,7 +894,7 @@ Coverage: 90.2%
 
 ### C. Performance Test Results
 
-**Last Performance Audit**: January 23, 2026, 15:00 UTC
+**Last Performance Audit**: February 21, 2026
 
 | Page | FCP | LCP | TTI | Score |
 |------|-----|-----|-----|-------|
@@ -893,4 +905,4 @@ Coverage: 90.2%
 
 ---
 
-*This Implementation Verification Matrix reflects the comprehensive verification of the Umamusume Pretty Derby Career Planner application as of January 23, 2026, aligned with codebase version 2.0.0. It serves as the authoritative record of implementation compliance with all specified requirements and design specifications.*
+*This Implementation Verification Matrix reflects the comprehensive verification of the Umamusume Pretty Derby Career Planner application as of February 21, 2026, aligned with codebase version 2.3.0. It serves as the authoritative record of implementation compliance with all specified requirements and design specifications.*

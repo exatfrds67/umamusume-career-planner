@@ -1,0 +1,1 @@
+<x-ai.recommendation-card :recommendation="$recommendation" :expanded="true" />

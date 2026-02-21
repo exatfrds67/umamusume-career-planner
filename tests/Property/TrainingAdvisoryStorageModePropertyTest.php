@@ -32,7 +32,9 @@ describe('TrainingAdvisoryService - Property 1: Storage Mode Consistency', funct
             $this->ruleBasedAdvisor,
             $this->mechanicsEngine,
             $this->accuracyTracker,
-            $this->criticalDetector
+            $this->criticalDetector,
+            Mockery::mock(\App\Services\RecommendationCacheService::class),
+            Mockery::mock(\App\Services\AdvisoryPerformanceMonitor::class)
         );
     });
 
@@ -168,9 +170,9 @@ describe('TrainingAdvisoryService - Property 1: Storage Mode Consistency', funct
             foreach ($alerts as $alert) {
                 if (method_exists($alert, 'isLocalMode')) {
                     if ($storageMode === 'local') {
-                        expect($alert->isLocalMode())->toBeTrue();
+                        expect($alert->isLocalMode())->toBeTrue(); // @phpstan-ignore method.nonObject
                     } else {
-                        expect($alert->isLocalMode())->toBeFalse();
+                        expect($alert->isLocalMode())->toBeFalse(); // @phpstan-ignore method.nonObject
                     }
                 }
             }
@@ -411,6 +413,8 @@ function generateTrainingContextWithMood(string $storageMode, string $mood): Tra
 
 /**
  * Helper function to generate a training context with specific facility levels
+ *
+ * @param  array<string, int>  $facilityLevels
  */
 function generateTrainingContextWithFacilityLevels(string $storageMode, array $facilityLevels): TrainingContext
 {

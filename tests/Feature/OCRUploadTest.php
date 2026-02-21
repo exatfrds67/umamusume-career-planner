@@ -229,6 +229,7 @@ it('stores extraction record with correct data', function () {
         ]);
 
     // Verify the response contains expected data
+    /** @var array{stats: array<string, mixed>, raw_text: string, confidence: float|string} $responseData */
     $responseData = $response->json('data');
     expect($responseData['stats'])->toBe($expectedStats)
         ->and($responseData['raw_text'])->toBe($expectedRawText)
@@ -406,6 +407,7 @@ it('processes screenshot and extracts stats successfully', function () {
         ]);
 
     // Verify the response contains the expected stats
+    /** @var array{stats: array<string, mixed>, raw_text: string, confidence: float|string} $responseData */
     $responseData = $response->json('data');
     expect($responseData['stats'])->toBe($expectedStats)
         ->and($responseData['raw_text'])->toBe($expectedRawText)

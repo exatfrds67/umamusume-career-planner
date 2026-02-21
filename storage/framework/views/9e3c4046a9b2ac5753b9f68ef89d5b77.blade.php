@@ -1,0 +1,1 @@
+<x-alert-banner id="my-alert" data-test="value">Message</x-alert-banner>

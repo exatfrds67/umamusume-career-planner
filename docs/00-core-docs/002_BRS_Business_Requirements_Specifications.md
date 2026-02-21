@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0
-**Date**: January 28, 2026
+**Document Version**: 2.3.0
+**Date**: February 21, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
+**Status**: Current - Aligned with codebase v2.3.0 and game-accurate mechanics
 
 ---
 
@@ -33,7 +33,7 @@ This document defines the business objectives and current scope for the Umamusum
 
 ### 1.2 Scope
 
-The Umamusume Career Planner is a comprehensive web application built with **Laravel 12** (released February 24, 2025), **TypeScript support**, **Tailwind CSS v4** (released January 22, 2025), and integrates with **AWS Bedrock Claude 4.5** models and **AWS Bedrock Nova 2** for AI capabilities. The system enables players of Uma Musume: Pretty Derby to track, manage, and optimize their career progression through intelligent recommendations and analytics.
+The Umamusume Career Planner is a comprehensive web application built with **Laravel 12** (released February 24, 2025), **Livewire 4**, **Alpine.js 3**, **Tailwind CSS v4** (released January 22, 2025), and integrates with **AWS Bedrock Claude 4.5** models and **Ollama** for AI capabilities via **Neuron AI v2.11**. The system enables players of Uma Musume: Pretty Derby to track, manage, and optimize their career progression through intelligent recommendations and analytics.
 
 ### 1.3 Definitions and Acronyms
 
@@ -66,7 +66,7 @@ Players of Uma Musume: Pretty Derby currently lack a comprehensive, unified tool
 
 By providing a modern, AI-enhanced planning platform, we can:
 
-- Deliver superior user experience with modern web technologies (Laravel 12, Tailwind CSS v4)
+- Deliver superior user experience with modern web technologies (Laravel 12, Livewire 4, Tailwind CSS v4)
 - Enable offline-first usage for players without reliable connectivity
 - Support cross-device access for authenticated users
 - Improve accessibility for users with disabilities (WCAG AA compliance)
@@ -91,11 +91,11 @@ mindmap
   root((Umamusume Career Planner))
     Core Platform
       Laravel 12 Backend
-      TypeScript Support
+      Livewire 4 + Alpine.js 3
       Tailwind CSS v4
       PWA Capabilities
     AI Integration
-      Neuron AI Agents
+      Neuron AI v2.11 Agents
       Hybrid Ollama/Bedrock
       Training Optimization
       Race Strategy
@@ -612,10 +612,10 @@ flowchart BT
 ### 10.2 Revision History
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 2.1.0 | 2026-01-23 | Development Team | Updated scope and requirements to match implementation; added AI integration requirements; added external API integration; aligned with v2.0 architecture |
+|---------|------|--------|---------|| 2.3.0 | 2026-02-21 | Development Team | Updated tech stack references (Livewire 4, Neuron AI v2.11); replaced TypeScript with Livewire 4 + Alpine.js 3; aligned with v2.3.0 architecture |
+| 2.2.0 | 2026-01-28 | Development Team | Aligned with codebase v2.2.0 || 2.1.0 | 2026-01-23 | Development Team | Updated scope and requirements to match implementation; added AI integration requirements; added external API integration; aligned with v2.0 architecture |
 | 1.0 | 2026-01-14 | Development Team | Initial draft |
 
 ---
 
-*This BRS describes the current business scope as implemented in version 2.0.*
+*This BRS describes the current business scope as implemented in version 2.3.0.*

@@ -155,7 +155,9 @@ describe('Property 8: Response Parsing', function () {
         expect($parsed['expected_gains'])->not->toBeEmpty();
 
         // Property: Each gain value should be an integer
-        foreach ($parsed['expected_gains'] as $stat => $gain) {
+        $expectedGains = $parsed['expected_gains'];
+        assert(is_array($expectedGains));
+        foreach ($expectedGains as $stat => $gain) {
             expect($gain)->toBeInt();
             expect($gain)->toBeGreaterThan(0);
         }
@@ -318,7 +320,9 @@ describe('Property 8: Response Parsing', function () {
         expect($parsed['alternatives'])->toBeArray();
 
         // Property: Numeric values should remain numeric
-        foreach ($parsed['expected_gains'] as $gain) {
+        $expectedGains = $parsed['expected_gains'];
+        assert(is_array($expectedGains));
+        foreach ($expectedGains as $gain) {
             expect($gain)->toBeInt();
         }
     })->repeat(50);

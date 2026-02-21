@@ -175,6 +175,7 @@ describe('UmapyoiLiveApiTest - Live API Connectivity', function () {
 
     it('tests direct HTTP request to umapyoi.net base URL', function () {
         $baseUrl = config('services.umapyoi.url', 'https://api.umapyoi.net');
+        assert(is_string($baseUrl));
 
         echo "\nDirect HTTP Test to: {$baseUrl}\n";
 
@@ -196,7 +197,9 @@ describe('UmapyoiLiveApiTest - Live API Connectivity', function () {
     })->group('live', 'external');
 
     it('tests direct HTTP request to umapyoi.net /v1/characters', function () {
-        $baseUrl = (string) config('services.umapyoi.url', 'https://api.umapyoi.net');
+        $configUrl = config('services.umapyoi.url', 'https://api.umapyoi.net');
+        assert(is_string($configUrl));
+        $baseUrl = $configUrl;
         $endpoint = '/v1/characters';
         $url = $baseUrl.$endpoint;
 

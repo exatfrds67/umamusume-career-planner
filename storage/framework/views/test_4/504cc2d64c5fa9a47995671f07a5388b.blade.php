@@ -1,1 +1,0 @@
-<x-button class="custom-class">Custom</x-button>

@@ -16,9 +16,9 @@ use App\Models\CharacterSupportCard;
 use App\Models\SupportCardDefinition;
 use App\Models\User;
 
-/** @var Character $character */
+/** @var Character|null $character */
 $character = null;
-/** @var User $user */
+/** @var User|null $user */
 $user = null;
 
 beforeEach(function () use (&$character, &$user) {
@@ -203,7 +203,7 @@ test('training predictions controller returns correct training types', function 
     $response = $this->actingAs($user)->get(route('training.predictions'));
 
     $response->assertSuccessful();
-    $response->assertViewHas('trainingTypes', fn($trainingTypes) => isset($trainingTypes['speed'])
+    $response->assertViewHas('trainingTypes', fn ($trainingTypes) => isset($trainingTypes['speed'])
         && isset($trainingTypes['stamina'])
         && isset($trainingTypes['power'])
         && isset($trainingTypes['guts'])
@@ -225,7 +225,7 @@ test('training predictions show page loads character with relationships', functi
     $response = $this->actingAs($user)->get(route('training.predictions.show', $character));
 
     $response->assertSuccessful();
-    $response->assertViewHas('character', fn($character) => $character->relationLoaded('aptitudes')
+    $response->assertViewHas('character', fn ($character) => $character->relationLoaded('aptitudes')
         && $character->relationLoaded('supportCards')
         && $character->relationLoaded('factors'));
 });

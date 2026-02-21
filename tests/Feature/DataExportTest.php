@@ -302,6 +302,7 @@ describe('Export Filters', function () {
 
         $response->assertSuccessful();
         $content = json_decode($response->json('data.content'), true);
+        assert(is_array($content));
 
         foreach ($content as $character) {
             expect($character['scenario_type'])->toBe('ura_finale');

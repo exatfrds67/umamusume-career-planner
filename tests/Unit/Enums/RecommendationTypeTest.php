@@ -190,8 +190,8 @@ describe('RecommendationType Enum', function () {
             $type2 = RecommendationType::TRAINING_FACILITY;
             $type3 = RecommendationType::SKILL_PURCHASE;
 
-            expect($type1 === $type2)->toBeTrue();
-            expect($type1 === $type3)->toBeFalse();
+            expect($type1 === $type2)->toBeTrue(); // @phpstan-ignore identical.alwaysTrue
+            expect($type1 === $type3)->toBeFalse(); // @phpstan-ignore identical.alwaysFalse
         });
 
         it('can be compared with == operator', function () {
@@ -199,8 +199,8 @@ describe('RecommendationType Enum', function () {
             $type2 = RecommendationType::TRAINING_FACILITY;
             $type3 = RecommendationType::SKILL_PURCHASE;
 
-            expect($type1 == $type2)->toBeTrue();
-            expect($type1 == $type3)->toBeFalse();
+            expect($type1 == $type2)->toBeTrue(); // @phpstan-ignore equal.alwaysTrue
+            expect($type1 == $type3)->toBeFalse(); // @phpstan-ignore equal.alwaysFalse
         });
     });
 
@@ -218,8 +218,8 @@ describe('RecommendationType Enum', function () {
             $type = RecommendationType::SKILL_PURCHASE;
 
             $result = match ($type) {
-                RecommendationType::TRAINING_FACILITY => 'facility',
-                RecommendationType::SKILL_PURCHASE => 'skill',
+                RecommendationType::TRAINING_FACILITY => 'facility', // @phpstan-ignore match.alwaysFalse
+                RecommendationType::SKILL_PURCHASE => 'skill', // @phpstan-ignore match.alwaysTrue
                 RecommendationType::RACE_STRATEGY => 'race',
                 RecommendationType::REST_RECOVERY => 'rest',
                 RecommendationType::BOND_BUILDING => 'bond',

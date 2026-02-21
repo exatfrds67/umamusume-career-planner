@@ -34,7 +34,9 @@ describe('TrainingAdvisoryService - Property 4: Energy-Based Rest Recommendation
             $this->ruleBasedAdvisor,
             $this->mechanicsEngine,
             $this->accuracyTracker,
-            $this->criticalDetector
+            $this->criticalDetector,
+            Mockery::mock(\App\Services\RecommendationCacheService::class),
+            Mockery::mock(\App\Services\AdvisoryPerformanceMonitor::class)
         );
     });
 

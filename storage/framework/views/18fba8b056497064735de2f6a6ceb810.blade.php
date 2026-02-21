@@ -1,0 +1,1 @@
+<x-dashboard-grid :columns="4">Content</x-dashboard-grid>

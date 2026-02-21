@@ -143,6 +143,7 @@ describe('API Monitoring Dashboard', function () {
         // Get the alert ID
         $alerts = $alertingService->getAlertHistory(null, 1);
         $alertId = $alerts[0]['id'];
+        assert(is_string($alertId) || is_int($alertId));
 
         $response = $this->postJson("/api/monitoring/alerts/{$alertId}/acknowledge");
 

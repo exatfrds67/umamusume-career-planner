@@ -1,0 +1,1 @@
+<x-dashboard-grid gap="lg">Content</x-dashboard-grid>

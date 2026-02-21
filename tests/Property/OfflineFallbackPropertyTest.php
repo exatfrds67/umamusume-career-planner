@@ -22,7 +22,7 @@ use App\ValueObjects\TrainingContext;
  */
 describe('Property 14: Offline Fallback Behavior', function () {
     it('falls back to rule-based recommendations when AI service throws exception', function () {
-        $context = generateTrainingContext();
+        $context = generateOfflineTestContext();
 
         // Mock NeuronAIService to throw exception (simulating AI unavailability)
         $neuronMock = $this->mock(\App\Services\Neuron\NeuronAIService::class);
@@ -59,7 +59,7 @@ describe('Property 14: Offline Fallback Behavior', function () {
     })->group('property', 'offline-fallback');
 
     it('uses rule-based advisor when AI service is not available', function () {
-        $context = generateTrainingContext();
+        $context = generateOfflineTestContext();
 
         // Mock NeuronAIService to return false for isAvailable()
         $neuronMock = $this->mock(\App\Services\Neuron\NeuronAIService::class);
@@ -93,7 +93,7 @@ describe('Property 14: Offline Fallback Behavior', function () {
     })->group('property', 'offline-fallback');
 
     it('always provides recommendations regardless of AI availability', function () {
-        $context = generateTrainingContext();
+        $context = generateOfflineTestContext();
 
         // Test with AI available
         $neuronMock = $this->mock(\App\Services\Neuron\NeuronAIService::class);
@@ -128,7 +128,7 @@ describe('Property 14: Offline Fallback Behavior', function () {
 /**
  * Helper: Generate a basic TrainingContext for testing
  */
-function generateTrainingContext(): TrainingContext
+function generateOfflineTestContext(): TrainingContext
 {
     return new TrainingContext(
         turnNumber: 15,

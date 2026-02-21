@@ -69,6 +69,15 @@ return [
         ],
     ],
 
+    'tools' => [
+        'context7' => [
+            'enabled' => env('MCP_CONTEXT7_ENABLED', true),
+            'cache_ttl' => (int) env('MCP_CONTEXT7_CACHE_TTL', 600),
+            'max_context_size' => (int) env('MCP_CONTEXT7_MAX_CONTEXT_SIZE', 10000),
+            'retention_days' => (int) env('MCP_CONTEXT7_RETENTION_DAYS', 30),
+        ],
+    ],
+
     'health_check_interval' => 300,
     'connection_timeout' => 10,
     'max_concurrent_calls' => 5,

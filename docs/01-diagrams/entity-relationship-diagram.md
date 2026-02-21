@@ -3,11 +3,11 @@
 ## Document Information
 
 **Document ID**: entity-relationship-diagram
-**Version**: 2.2.0
-**Date**: January 28, 2026
+**Version**: 2.3.0
+**Date**: February 21, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
+**Status**: Current - Aligned with codebase v2.3.0 and game-accurate mechanics
 
 ---
 
@@ -58,6 +58,7 @@ mindmap
   root((UCP Database))
     Platform Tables
       users
+      ucp_user_preferences
       sessions
       cache
       jobs
@@ -67,15 +68,18 @@ mindmap
       ucp_training_sessions
       ucp_aptitudes
       ucp_factors
+      ucp_events
+      ucp_run_snapshots
     Skill System
       ucp_skills
       ucp_skill_hints
       ucp_skill_acquisitions
+      ucp_skill_builds
     Support System
       ucp_support_cards
-      ucp_support_card_definitions NEW
-      support_decks NEW
-      support_deck_cards NEW
+      ucp_support_card_definitions
+      support_decks
+      support_deck_cards
       character_support_cards
     Race System
       ucp_races
@@ -83,16 +87,21 @@ mindmap
     AI Integration
       ucp_ai_conversations
       ucp_conversation_messages
+      ucp_chat_messages
+      ucp_advisory_recommendations
       ucp_ai_metrics
       ucp_ai_costs
+      ucp_prediction_accuracy
     MCP Integration
       ucp_mcp_servers
       ucp_mcp_agents
       ucp_mcp_tool_usage
+    Monitoring
+      ucp_critical_alerts
     External Data
       ucp_external_data
       ucp_ocr_extractions
-      ocr_extracted_skills NEW
+      ocr_extracted_skills
 ```
 
 ---
@@ -153,16 +162,17 @@ flowchart TD
 
 | Group | Table Count | Primary Purpose |
 |-------|-------------|-----------------|
-| Platform | 8 | Laravel infrastructure (users, sessions, cache, jobs) |
-| Core Domain | 6 | Character, career, training tracking |
-| Skill System | 3 | Skill catalog and acquisition |
-| Support System | 2 | Support card management |
+| Platform | 9 | Laravel infrastructure (users, user_preferences, sessions, cache, jobs) |
+| Core Domain | 7 | Character, career, training, events, snapshots |
+| Skill System | 4 | Skill catalog, acquisition, and builds |
+| Support System | 5 | Support cards, definitions, decks |
 | Race System | 2 | Race calendar and results |
-| AI Integration | 5 | AI conversations and metrics |
+| AI Integration | 7 | AI conversations, recommendations, predictions |
 | MCP Integration | 4 | MCP server and tool management |
-| External Data | 4 | External API cache and OCR (includes 1 new table) |
+| Monitoring | 1 | Critical alerts and system monitoring |
+| External Data | 3 | External API cache and OCR |
 
-**Total Tables**: 37 (was 33, +4 new tables from January 2026)
+**Total Tables**: 42 (aligned with 30 Eloquent models + infrastructure tables)
 
 ---
 
@@ -1067,13 +1077,14 @@ CREATE INDEX idx_ocr_user_date ON ucp_ocr_extractions(user_id, analyzed_at);
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.3.0 | 2026-02-21 | Development Team | Updated version/date metadata; added 7 new model tables (advisory_recommendations, chat_messages, critical_alerts, events, prediction_accuracy, run_snapshots, skill_builds); updated entity counts to 42 tables aligned with 30 Eloquent models |
 | 2.1.0 | 2026-01-23 | Development Team | Updated to v2.0.0 implementation; added AI/MCP/OCR entities; aligned with 59 requirements; industry-standard formatting |
 | 2.0.0 | 2026-01-14 | Development Team | Major revision with Mermaid diagrams |
 | 1.0.0 | 2026-01-03 | Development Team | Initial draft |
 
 ### 9.3 Document Status
 
-**Status**: Current - Aligned with codebase v2.0.0
+**Status**: Current - Aligned with codebase v2.3.0
 
 **Next Review**: Upon next major schema change
 
@@ -1081,4 +1092,4 @@ CREATE INDEX idx_ocr_user_date ON ucp_ocr_extractions(user_id, analyzed_at);
 
 ---
 
-*This ERD reflects the current database schema as implemented in the Laravel 12 application, supporting all 59 system requirements with comprehensive data integrity, indexing, and relationship management.*
+*This ERD reflects the current database schema as implemented in the Laravel 12 application, with 30 Eloquent models across 42 tables, supporting all system requirements with comprehensive data integrity, indexing, and relationship management.*

@@ -1,0 +1,1 @@
+<x-ai.critical-alert-badge :alert-count="3" size="lg" />

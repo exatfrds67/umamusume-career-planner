@@ -547,6 +547,7 @@ class AdvisoryPanel extends Component
         $sessionKey = $this->getSessionKey();
 
         // Load from combined session object for efficiency
+        /** @var array{alerts: mixed, recommendations: mixed} $sessionData */
         $sessionData = session()->get($sessionKey, ['alerts' => [], 'recommendations' => []]);
         $alerts = $sessionData['alerts'] ?? [];
         $recommendations = $sessionData['recommendations'] ?? [];

@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0
-**Date**: January 28, 2026
+**Document Version**: 2.3.0
+**Date**: February 21, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned to codebase v2.2.0 and game-accurate mechanics
+**Status**: Current - Aligned to codebase v2.3.0 and game-accurate mechanics
 
 ---
 
@@ -67,7 +67,7 @@ flowchart TB
         Blade["Blade Views"]
         Tailwind["Tailwind CSS v4"]
         Alpine["Alpine.js"]
-        Livewire["Livewire 3"]
+        Livewire["Livewire 4"]
     end
     
     subgraph Application["Application Layer"]
@@ -108,7 +108,7 @@ flowchart TB
 ```text
 app/
 ├── Console/Commands/           # Artisan commands
-├── Enums/                      # PHP 8.1+ enums
+├── Enums/                      # PHP 8.2+ enums
 ├── Events/                     # Event classes
 ├── Exports/                    # Excel export classes
 ├── Http/
@@ -134,7 +134,7 @@ app/
 | Layer | Technology | Version | Purpose |
 |-------|------------|---------|---------|
 | Framework | Laravel | 12+ | Backend framework |
-| Frontend Reactivity | Livewire | 3 | Server-driven UI |
+| Frontend Reactivity | Livewire | 4 | Server-driven UI |
 | Client Interactivity | Alpine.js | Latest | Client-side interactions |
 | Styling | TailwindCSS | v4 | Utility-first CSS |
 | Build Tool | Vite | 7 | Asset compilation |

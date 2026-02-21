@@ -1,0 +1,1 @@
+<x-alert-banner type="warning">Warning message</x-alert-banner>

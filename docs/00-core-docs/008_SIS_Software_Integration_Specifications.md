@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.3.0  
+**Date**: February 21, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current - Aligned to codebase v2.2.0 and game-accurate mechanics
+**Status**: Current - Aligned to codebase v2.3.0 and game-accurate mechanics
 
 ---
 
@@ -105,15 +105,20 @@ Neuron AI provides the agent orchestration framework for specialized AI capabili
 ```
 app/Neuron/
 ├── Agents/
+│   ├── BaseAgent.php
 │   ├── TrainingAdvisorAgent.php
 │   ├── RaceStrategyAgent.php
-│   ├── SkillAdvisorAgent.php
+│   ├── SkillRecommendationAgent.php
+│   ├── CareerPlanningAgent.php
+│   ├── McpDemoAgent.php
 │   └── Tools/
 │       ├── CharacterStatsTool.php
-│       ├── RaceAnalysisTool.php
-│       └── SkillDatabaseTool.php
-└── Services/
-    └── NeuronOrchestrator.php
+│       ├── RaceDataTool.php
+│       └── SkillDataTool.php
+├── Responses/
+└── Support/
+    ├── McpConnectorFactory.php
+    └── McpToolIntegration.php
 ```
 
 ### 2.3 AI Service Architecture
@@ -143,9 +148,9 @@ app/Neuron/
 | Provider | Model | Input Cost | Output Cost | Notes |
 |----------|-------|------------|-------------|-------|
 | Ollama | llama3.2 | $0.00 | $0.00 | Local processing |
-| Bedrock | Claude 3.5 Sonnet | $3.00/1M | $15.00/1M | Recommended fallback |
-| Bedrock | Claude 3 Opus | $5.00/1M | $25.00/1M | Complex reasoning |
-| Bedrock | Claude 3 Haiku | $1.00/1M | $5.00/1M | Simple queries |
+| Bedrock | Claude Sonnet 4 | $3.00/1M | $15.00/1M | Recommended fallback |
+| Bedrock | Claude Opus 4 | $5.00/1M | $25.00/1M | Complex reasoning |
+| Bedrock | Claude Haiku 4.5 | $1.00/1M | $5.00/1M | Simple queries |
 
 ---
 
@@ -530,6 +535,7 @@ Image Upload ──► Validation ──► Storage
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.3.0 | 2026-02-21 | Development Team | Updated Neuron agent tree, Bedrock model names (Claude 4.x), version alignment to v2.3.0 |
 | 2.1.0 | 2026-01-23 | Development Team | Updated specs to match configured integrations; added architecture diagrams |
 | 2.0.0 | 2026-01-14 | Development Team | Major revision with Neuron AI and MCP integration |
 | 1.0.0 | 2026-01-03 | Development Team | Initial specification |

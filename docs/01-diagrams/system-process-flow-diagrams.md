@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.3.0  
+**Date**: February 21, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
+**Status**: Current - Aligned with codebase v2.3.0 and game-accurate mechanics
 
 ---
 
@@ -1362,7 +1362,7 @@ flowchart LR
 flowchart TB
     subgraph CoreApp[Core Application]
         Laravel[Laravel 12 Backend]
-        Livewire[Livewire 3 Components]
+        Livewire[Livewire 4 Components]
         Alpine[Alpine.js Client]
     end
     
@@ -1625,6 +1625,7 @@ flowchart TB
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.3.0 | 2026-02-21 | Development Team | Updated version/date metadata; Livewire 3→4; aligned with 30 current Eloquent models |
 | 2.2.0 | 2026-01-27 | Development Team | Added §11 Performance Monitoring & APM Flow; added 8 Performance & Monitoring services |
 | 2.1.0 | 2026-01-23 | Development Team | Comprehensive update for v2.0.0: Added MCP integration, OCR pipeline, real-time communication flows; aligned with current implementation |
 | 2.0.0 | 2026-01-14 | Development Team | Major revision with Mermaid diagrams |
@@ -1647,4 +1648,4 @@ flowchart TB
 
 ---
 
-*This document reflects the system-level process flows implemented in the Umamusume Pretty Derby Career Planner v2.0.0 and serves as the authoritative reference for system integration and data flow architecture.*
+*This document reflects the system-level process flows implemented in the Umamusume Pretty Derby Career Planner v2.3.0 and serves as the authoritative reference for system integration and data flow architecture.*

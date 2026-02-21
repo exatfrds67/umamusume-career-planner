@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.3.0  
+**Date**: February 21, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
+**Status**: Current - Aligned with codebase v2.3.0 and game-accurate mechanics
 
 ---
 
@@ -1291,6 +1291,7 @@ When reporting a bug, please include:
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.3.0 | 2026-02-21 | Development Team | Updated version alignment to v2.3.0, refreshed technology references (Livewire 4, Pest v4, PHPUnit v12), dated February 2026 |
 | 2.1.0 | 2026-01-23 | Development Team | Comprehensive update aligned with v2.0.0 codebase, integrated PRD/SPEC/Flow documentation, added AI Advisory, OCR, and detailed feature documentation |
 | 2.0.0 | 2026-01-03 | Development Team | Added Mermaid diagrams, expanded content |
 | 1.0.0 | 2026-01-03 | Development Team | Initial draft |
@@ -1312,4 +1313,4 @@ When reporting a bug, please include:
 
 ---
 
-*This manual reflects the current implementation of Umamusume Career Planner v2.0.0. For the latest updates, please refer to the online documentation.*
+*This manual reflects the current implementation of Umamusume Career Planner v2.3.0. For the latest updates, please refer to the online documentation.*

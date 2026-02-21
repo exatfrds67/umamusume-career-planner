@@ -78,16 +78,6 @@ parameters:
       message: '#Call to an undefined method Pest\\.+#'
       paths:
         - tests/
-    # PHPDoc @var tag type checks in tests
-    -
-      message: '#PHPDoc tag @var .+#'
-      paths:
-        - tests/
-    # Part of encapsed string cannot be cast in tests
-    -
-      message: '#Part .+ of encapsed string cannot be cast to string\.#'
-      paths:
-        - tests/
     # Offset access issues in tests (dynamic arrays from API responses)
     -
       message: '#Offset .+ (might not exist|does not exist) on .+#'
@@ -113,29 +103,14 @@ parameters:
       message: '#Call to an undefined method Mockery\\ExpectationInterface\|Mockery\\HigherOrderMessage::.+#'
       paths:
         - tests/
-    # Cannot cast mixed in tests
-    -
-      message: '#Cannot cast mixed to .+\.#'
-      paths:
-        - tests/
-    # Property/method access on nullable types in tests
-    -
-      message: '#Cannot (call method|access property) .+ on .+\|null\.#'
-      paths:
-        - tests/
-    # Foreach on mixed in tests
-    -
-      message: '#Argument of an invalid type mixed supplied for foreach#'
-      paths:
-        - tests/
-    # Undefined variable in test closures
+    # Pest expectation extensions rely on Pest's bound closure $this in tests/Pest.php
     -
       message: '#Undefined variable: \$this#'
       paths:
-        - tests/
-    # Return type issues in test closures
+        - tests/Pest.php
+    # Property/method access on nullable types in tests
     -
-      message: '#Anonymous function should return .+ but returns .+#'
+      message: '#Cannot (call method|access property) .+ on .+\|null\.#'
       paths:
         - tests/
     

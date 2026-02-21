@@ -425,7 +425,7 @@ class AdvisoryPanelTest extends TestCase
 
         // getCriticalAlertCount() is a method, not a Livewire property.
         // Call it directly on the component instance.
-        expect($component->instance()->getCriticalAlertCount())->toBe(2);
+        expect($component->instance()->getCriticalAlertCount())->toBe(2); // @phpstan-ignore method.notFound
     }
 
     /**
@@ -479,6 +479,6 @@ class AdvisoryPanelTest extends TestCase
 
         // hasContent() is a method, not a Livewire property.
         // Call it directly on the component instance.
-        expect($component->instance()->hasContent())->toBeTrue();
+        expect($component->instance()->hasContent())->toBeTrue(); // @phpstan-ignore method.notFound
     }
 }

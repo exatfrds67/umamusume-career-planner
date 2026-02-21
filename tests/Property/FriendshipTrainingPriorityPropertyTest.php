@@ -33,7 +33,9 @@ describe('TrainingAdvisoryService - Property 3: Friendship Training Priority', f
             $this->ruleBasedAdvisor,
             $this->mechanicsEngine,
             $this->accuracyTracker,
-            $this->criticalDetector
+            $this->criticalDetector,
+            Mockery::mock(\App\Services\RecommendationCacheService::class),
+            Mockery::mock(\App\Services\AdvisoryPerformanceMonitor::class)
         );
     });
 

@@ -224,6 +224,7 @@ describe('Neuron Configuration', function () {
 
         it('retrieves provider configuration by default provider name', function () {
             $defaultProvider = config('neuron.provider.default');
+            assert(is_string($defaultProvider));
             $providerConfig = config("neuron.provider.{$defaultProvider}");
 
             expect($providerConfig)->toBeArray();
@@ -232,6 +233,7 @@ describe('Neuron Configuration', function () {
 
         it('retrieves embedding provider configuration', function () {
             $defaultEmbedding = config('neuron.embedding.default');
+            assert(is_string($defaultEmbedding));
             $embeddingConfig = config("neuron.embedding.{$defaultEmbedding}");
 
             expect($embeddingConfig)->toBeArray();
@@ -240,6 +242,7 @@ describe('Neuron Configuration', function () {
 
         it('retrieves vector store configuration', function () {
             $defaultStore = config('neuron.store.default');
+            assert(is_string($defaultStore));
             $storeConfig = config("neuron.store.{$defaultStore}");
 
             expect($storeConfig)->toBeArray();

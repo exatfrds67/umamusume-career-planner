@@ -733,7 +733,6 @@ function generateStorageModeTestCases(string $storageMode): array
                 CareerPhase::JUNIOR => rand(1, 24),
                 CareerPhase::CLASSIC => rand(25, 48),
                 CareerPhase::SENIOR => rand(49, 72),
-                default => 20,
             };
 
             $testCases[] = [

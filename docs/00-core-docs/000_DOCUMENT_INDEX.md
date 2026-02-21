@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 5.1.0
-**Date**: January 28, 2026
+**Document Version**: 5.2.0
+**Date**: February 21, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
 **Status**: Current - Aligned to codebase v2.2.0
@@ -95,15 +95,26 @@ flowchart TD
 | Layer | Technology | Version | Documentation |
 | --- | --- | --- | --- |
 | Framework | Laravel | 12+ | 004_SDS, 010_SCD |
-| PHP Runtime | PHP | 8.2+ | 004_SDS |
-| Frontend Reactivity | Livewire | 3 | 010_SCD |
-| Client Interactivity | Alpine.js | Latest | 010_SCD |
+| PHP Runtime | PHP | ^8.2 (runtime 8.4.11) | 004_SDS |
+| Frontend Reactivity | Livewire | 4 | 010_SCD |
+| Client Interactivity | Alpine.js | 3 | 010_SCD |
 | Styling | TailwindCSS | v4 | 004_SDS, 010_SCD |
 | Build Tool | Vite | 7 | 004_SDS |
-| Database | MySQL/MariaDB/SQLite | 8.0+ | 009_DBD |
-| Cache | Redis | 7+ | 004_SDS |
+| Charting | Chart.js | 4 | 010_SCD |
+| Database | MySQL 8+ (prod) / SQLite (dev) | 8.0+ | 009_DBD |
+| Cache/Queues | Redis (via WSL) | 7+ | 004_SDS |
+| Testing | Pest | v4 | 010_SCD |
+| Testing | PHPUnit | v12 | 010_SCD |
+| Browser Testing | pest-plugin-browser / Playwright | 4.0 / 1.58 | 010_SCD |
+| Code Quality | Larastan | v3 | 010_SCD |
+| Code Formatting | Laravel Pint | v1 | 010_SCD |
+| AI Framework | Neuron AI | v2.11 (neuron-laravel v0.3.4) | 007_SIP, 008_SIS |
 | AI (Local) | Ollama | Latest | 007_SIP, 008_SIS |
 | AI (Cloud) | AWS Bedrock | Claude 4.5 | 007_SIP, 008_SIS |
+| Auth | Laravel Sanctum | v4 | 004_SDS |
+| Queue Monitoring | Laravel Horizon | v5 | 004_SDS |
+| Debugging | Laravel Telescope | Latest | 004_SDS |
+| Dev Tooling | Laravel Boost | v1.8 | 010_SCD |
 
 ---
 
@@ -236,7 +247,7 @@ flowchart TD
 - Frontend code structure (Livewire, Alpine.js)
 - API reference and endpoint catalog
 - Coding standards (PSR-12, naming conventions)
-- Testing strategy (Pest PHP, Playwright)
+- Testing strategy (Pest v4, PHPUnit v12, pest-plugin-browser 4.0, Playwright 1.58)
 
 **Related Documents**: 004_SDS, 009_DBD, 007_SIP
 
@@ -628,8 +639,8 @@ Each document includes a "Document Control" section:
 
 | Document ID | Document Name | Version | Status | Last Updated |
 | --- | --- | --- | --- | --- |
-| 000 | DOCUMENT_INDEX | 5.1.0 | Current | 2026-01-28 |
-| 000 | MASTER_GLOSSARY | 3.2.0 | Current | 2026-01-28 |
+| 000 | DOCUMENT_INDEX | 5.2.0 | Current | 2026-02-21 |
+| 000 | MASTER_GLOSSARY | 3.3.0 | Current | 2026-02-21 |
 | 001 | SDP | 2.2.0 | Current | 2026-01-28 |
 | 002 | BRS | 2.2.0 | Current | 2026-01-28 |
 | 003 | SRS | 2.2.0 | Current | 2026-01-28 |
@@ -642,7 +653,7 @@ Each document includes a "Document Control" section:
 | 010 | SCD | 2.2.0 | Current | 2026-01-28 |
 | 017 | SUM | 2.2.0 | Current | 2026-01-28 |
 | 000 | IVM | 4.2.0 | Current | 2026-01-28 |
-| 000 | RTM | 3.1.0 | Current | 2026-01-28 |
+| 000 | RTM | 3.2.0 | Current | 2026-02-21 |
 
 ---
 
@@ -650,6 +661,7 @@ Each document includes a "Document Control" section:
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
+| 5.2.0 | 2026-02-21 | Development Team | Updated technology stack references (Livewire 4, Pest v4, PHPUnit v12, Neuron AI v2.11, Chart.js 4, Larastan v3, Laravel Pint v1, Sanctum v4, Horizon v5, Telescope, Boost v1.8, pest-plugin-browser 4.0, Playwright 1.58); updated PHP runtime to 8.4.11; updated external documentation links |
 | 5.1.0 | 2026-01-28 | Development Team | Updated all documents to v2.2.0 with game-accurate mechanics; corrected aptitude grades (S is maximum, SS does NOT exist); updated hint system to 5 levels (10%/20%/30%/35%/40%); aligned with Global English Server mechanics |
 | 4.0 | 2026-01-23 | Development Team | Comprehensive update for v2.0.0 alignment; added detailed catalog entries with key content summaries; expanded dependency graph; added cross-reference matrix; enhanced quick reference by topic, role, phase, and module; added version control section; updated all document versions |
 | 3.1 | 2026-01-23 | Development Team | Updated catalog and dependency map to match current codebase |
@@ -664,7 +676,7 @@ Each document includes a "Document Control" section:
 ### External Documentation
 
 - **Laravel 12 Documentation**: <https://laravel.com/docs/12.x>
-- **Livewire 3 Documentation**: <https://livewire.laravel.com/docs/3.x>
+- **Livewire 4 Documentation**: <https://livewire.laravel.com/docs>
 - **TailwindCSS v4 Documentation**: <https://tailwindcss.com/docs>
 - **AWS Bedrock Documentation**: <https://docs.aws.amazon.com/bedrock/>
 - **Ollama Documentation**: <https://ollama.ai/docs>
@@ -681,4 +693,4 @@ Each document includes a "Document Control" section:
 
 ---
 
-*This index is the authoritative navigation guide for the Umamusume Career Planner core documentation suite, version 2.0.0. All documents are aligned with the current implementation and reflect the production system state as of January 23, 2026.*
+*This index is the authoritative navigation guide for the Umamusume Career Planner core documentation suite, version 2.2.0. All documents are aligned with the current implementation and reflect the production system state as of February 21, 2026.*

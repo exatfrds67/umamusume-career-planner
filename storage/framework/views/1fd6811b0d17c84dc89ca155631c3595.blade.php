@@ -1,0 +1,1 @@
+<x-form.text-input name="email" hint="We will not share your email" />

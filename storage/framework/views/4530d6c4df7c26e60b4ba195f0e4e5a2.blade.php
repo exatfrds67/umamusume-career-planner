@@ -1,0 +1,1 @@
+alert-{{ $alert->id ?? $alert->type->value }}

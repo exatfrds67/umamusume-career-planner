@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 3.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 3.3.0  
+**Date**: February 21, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current – Aligned with v2.2.0 and Global English Server Mechanics (January 2026)
+**Status**: Current – Aligned with v2.2.0 and Global English Server Mechanics (February 2026)
 
 ---
 
@@ -26,7 +26,7 @@
 
 ## 1. Purpose
 
-This glossary defines all core terminology used in the Umamusume Pretty Derby Career Planner project, aligned with the v2.0.0 codebase and the **Global English server** gameplay and translations (as of January 2026). Use this glossary as the authoritative reference for all documentation, code, and user interface.
+This glossary defines all core terminology used in the Umamusume Pretty Derby Career Planner project, aligned with the v2.2.0 codebase and the **Global English server** gameplay and translations (as of February 2026). Use this glossary as the authoritative reference for all documentation, code, and user interface.
 
 ---
 
@@ -87,7 +87,7 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 
 > **Note:** S is the maximum aptitude grade. SS does NOT exist in the game. Only S-rank provides positive bonuses; A-rank is the baseline with no bonus/penalty.
 
-> *Race mechanics exclusive to the Japanese server, like Charge Up, Compete Before Spurt, or Stamina Limit Break, are **not implemented** in the Global English server as of January 2026.*  
+> *Race mechanics exclusive to the Japanese server, like Charge Up, Compete Before Spurt, or Stamina Limit Break, are **not implemented** in the Global English server as of February 2026.*  
 
 ### 2.3 Running Styles
 
@@ -235,15 +235,27 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 | Technology | Version | Layer | Purpose |
 |------------|---------|-------|---------|
 | Laravel | 12+ | Backend Framework | Application foundation |
-| PHP | 8.2+ | Runtime | Server-side execution |
-| Livewire | 3 | Frontend Reactivity | Dynamic UI without JavaScript |
-| Alpine.js | Latest | Client Interactivity | Lightweight JS framework |
+| PHP | ^8.2 (runtime 8.4.11) | Runtime | Server-side execution |
+| Livewire | 4 | Frontend Reactivity | Dynamic UI without JavaScript |
+| Alpine.js | 3 | Client Interactivity | Lightweight JS framework |
 | TailwindCSS | v4 | Styling | Utility-first CSS framework |
 | Vite | 7 | Build Tool | Asset compilation and bundling |
-| MySQL | 8.0+ | Database | Primary data store |
-| MariaDB | 10.5+ | Database | MySQL-compatible alternative |
+| Chart.js | 4 | Charting | Data visualization |
+| MySQL | 8.0+ | Database | Primary data store (production) |
 | SQLite | Latest | Database | Development/testing database |
-| Redis | 7+ | Cache/Queue | Caching and background jobs |
+| Redis | 7+ (via WSL) | Cache/Queue | Caching and background jobs |
+| Pest | v4 | Testing | PHP testing framework |
+| PHPUnit | v12 | Testing | Testing engine (underlying) |
+| pest-plugin-browser | 4.0 | Browser Testing | Browser-based test automation |
+| Playwright | 1.58 | E2E Testing | End-to-end browser testing |
+| Larastan | v3 | Code Quality | Static analysis for Laravel |
+| Laravel Pint | v1 | Code Formatting | PSR-12 code style fixer |
+| Neuron AI | v2.11 | AI Framework | AI agent orchestration |
+| neuron-laravel | v0.3.4 | AI Integration | Laravel integration for Neuron |
+| Laravel Sanctum | v4 | Auth | API token authentication |
+| Laravel Horizon | v5 | Queue Monitoring | Redis queue dashboard |
+| Laravel Telescope | Latest | Debugging | Request/job/query monitoring |
+| Laravel Boost | v1.8 | Dev Tooling | MCP development server |
 
 ### 4.3 Database Conventions
 
@@ -275,7 +287,7 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 | Term | Abbreviation | Definition |
 |------|--------------|------------|
 | AI Provider | - | Backend service for AI inference (Ollama, AWS Bedrock) |
-| Neuron AI | - | AI agent orchestration framework |
+| Neuron AI | - | AI agent orchestration framework (v2.11 with neuron-laravel v0.3.4) |
 | AI Agent | - | Specialized AI for specific tasks (Training Advisor, Race Strategy) |
 | AI Conversation | - | Persisted chat session (`ucp_ai_conversations`) |
 | AI Cost | - | Per-token usage cost tracking (`ucp_ai_costs`) |
@@ -287,7 +299,7 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 | Provider | Type | Models | Use Case |
 |----------|------|--------|----------|
 | Ollama | Local | llama3.2, mistral | Primary, free inference |
-| AWS Bedrock | Cloud | Claude 3.5 Sonnet, Claude 4.5 | Complex queries, fallback |
+| AWS Bedrock | Cloud | Claude 4.5 Sonnet | Complex queries, fallback |
 
 ### 5.2 Neuron Agents
 
@@ -512,6 +524,7 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 3.3.0 | 2026-02-21 | Development Team | Updated to February 2026; updated technology stack (Livewire 4, Pest v4, PHPUnit v12, Neuron AI v2.11, Chart.js 4, Larastan v3, Laravel Pint v1, Sanctum v4, Horizon v5, Telescope, Boost v1.8, pest-plugin-browser 4.0, Playwright 1.58); updated PHP runtime to 8.4.11; updated AI provider models; removed MariaDB reference |
 | 3.2.0 | 2026-01-28 | Development Team | Updated to v2.2.0; corrected aptitude grades (S is maximum, SS does NOT exist); updated hint system to 5 levels (10%/20%/30%/35%/40%); aligned with game-accurate mechanics from Global English Server |
 | 3.1.0 | 2026-01-23 | Development Team (with user corrections & source references)| Updated per Global (English) server mechanics; clarified Guts/Wit, updated running style English labels, added Training, Legacy, and Bond definitions, and explicitly excluded JP-version-only features per community and official docs |
 | 3.0.0 | 2026-01-23 | Development Team | Comprehensive expansion aligned with v2.0.0; added AI, MCP, OCR, and external integration terminology; restructured into logical categories; added tables for visual clarity |
@@ -559,4 +572,4 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 
 ---
 
-*This glossary is the authoritative reference for both code and gameplay terminology as used in the Umamusume Career Planner, strictly aligned to the Global English server and common usage (January 2026).*
+*This glossary is the authoritative reference for both code and gameplay terminology as used in the Umamusume Career Planner, strictly aligned to the Global English server and common usage (February 2026).*

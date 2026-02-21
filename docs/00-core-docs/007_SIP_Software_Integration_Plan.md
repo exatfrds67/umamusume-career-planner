@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0
-**Date**: January 28, 2026
+**Document Version**: 2.3.0
+**Date**: February 21, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned to codebase v2.2.0 and game-accurate mechanics
+**Status**: Current - Aligned to codebase v2.3.0 and game-accurate mechanics
 
 ---
 
@@ -128,7 +128,7 @@ flowchart TB
 flowchart LR
     subgraph Core["Core Application"]
         Laravel["Laravel 12"]
-        Livewire3["Livewire 3"]
+        Livewire4["Livewire 4"]
         AlpineJS["Alpine.js"]
     end
 
@@ -148,6 +148,7 @@ flowchart LR
     Laravel --> ExternalAPI
     Laravel --> OCRService
     Laravel --> MCPService
+    Livewire4 --> Laravel
     NeuronAI --> Ollama
     NeuronAI --> Bedrock
 ```
@@ -653,8 +654,7 @@ flowchart TD
 ## Document Control
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 2.1.0 | 2026-01-23 | Development Team | Updated to reflect current AI, MCP, and external integrations |
+|---------|------|--------|---------|| 2.3.0 | 2026-02-21 | Development Team | Updated Livewire 3→4, version alignment, codebase v2.3.0 sync || 2.1.0 | 2026-01-23 | Development Team | Updated to reflect current AI, MCP, and external integrations |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with initial integration plan |
 
 ---

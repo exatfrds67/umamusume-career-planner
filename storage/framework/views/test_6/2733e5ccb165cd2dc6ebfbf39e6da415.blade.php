@@ -1,1 +1,0 @@
-<x-button size="md">Button</x-button>

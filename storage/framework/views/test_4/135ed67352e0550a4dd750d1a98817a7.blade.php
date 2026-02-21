@@ -1,1 +1,0 @@
-<x-button size="sm">Small</x-button>

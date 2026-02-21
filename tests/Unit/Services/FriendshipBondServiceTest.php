@@ -5,13 +5,13 @@ use App\Models\CharacterSupportCard;
 use App\Models\SupportCardDefinition;
 use App\Services\FriendshipBondService;
 
-/** @var FriendshipBondService $service */
+/** @var FriendshipBondService|null $service */
 $service = null;
-/** @var Character $character */
+/** @var Character|null $character */
 $character = null;
-/** @var SupportCardDefinition $supportCard */
+/** @var SupportCardDefinition|null $supportCard */
 $supportCard = null;
-/** @var CharacterSupportCard $characterSupportCard */
+/** @var CharacterSupportCard|null $characterSupportCard */
 $characterSupportCard = null;
 
 beforeEach(function () use (&$service, &$character, &$supportCard, &$characterSupportCard) {

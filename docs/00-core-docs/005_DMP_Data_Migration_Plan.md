@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0
-**Date**: January 28, 2026
+**Document Version**: 2.3.0
+**Date**: February 21, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
+**Status**: Current - Aligned with codebase v2.3.0 and game-accurate mechanics
 
 ---
 
@@ -387,8 +387,7 @@ For OCR-based data intake:
 ## Document Control
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 2.0.0 | 2026-01-23 | Development Team | Complete rewrite aligned with current implementation |
+|---------|------|--------|---------|| 2.3.0 | 2026-02-21 | Development Team | Version alignment, date update, codebase v2.3.0 sync || 2.0.0 | 2026-01-23 | Development Team | Complete rewrite aligned with current implementation |
 | 1.0.0 | 2026-01-14 | Development Team | Initial draft |
 
 ---

@@ -1,0 +1,1 @@
+<x-spinner color="white" />

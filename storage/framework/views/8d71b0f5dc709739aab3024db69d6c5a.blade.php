@@ -1,0 +1,1 @@
+<x-modal name="confirm" :closeable="true">Content</x-modal>

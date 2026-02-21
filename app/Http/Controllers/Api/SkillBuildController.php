@@ -48,7 +48,7 @@ class SkillBuildController extends Controller
             ->take(5)
             ->map(function ($group, string $type): array {
                 $skillIds = $group->pluck('id')->all();
-                $totalCost = (int) $group->sum('base_sp_cost');
+                $totalCost = (int) $group->sum(fn (Skill $skill): int => $skill->base_sp_cost);
                 $optimizedCost = (int) round($totalCost * 0.8);
 
                 return [
@@ -128,7 +128,7 @@ class SkillBuildController extends Controller
         /** @var array<int, int> $skillIds */
         $skillIds = $request->input('skill_ids', []);
         $skills = Skill::whereIn('id', $skillIds)->get(['id', 'name', 'skill_type', 'base_sp_cost']);
-        $totalCost = (int) $skills->sum('base_sp_cost');
+        $totalCost = (int) $skills->sum(fn (Skill $skill): int => $skill->base_sp_cost);
         $optimizedCost = (int) round($totalCost * 0.8);
         $efficiencyScore = $totalCost > 0 ? (int) round(($optimizedCost / $totalCost) * 100) : 0;
         $synergyRating = max(1, min(10, $skills->count()));

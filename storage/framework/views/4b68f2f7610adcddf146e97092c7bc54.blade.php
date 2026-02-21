@@ -1,0 +1,1 @@
+<x-dashboard-grid>Content here</x-dashboard-grid>

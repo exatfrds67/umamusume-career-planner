@@ -23,7 +23,6 @@ beforeEach(function () {
     // Clear all caches before each test
     Cache::flush();
 
-    /** @var RedisCacheOptimizationService $service */
     $this->service = new RedisCacheOptimizationService;
 });
 

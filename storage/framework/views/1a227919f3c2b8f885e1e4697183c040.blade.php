@@ -1,0 +1,1 @@
+<x-alert-banner type="success">Success message</x-alert-banner>

@@ -1,0 +1,1 @@
+<x-spinner id="my-spinner" data-test="value" />

@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0
-**Date**: January 28, 2026
+**Document Version**: 2.3.0
+**Date**: February 21, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned to codebase v2.2.0 and game-accurate mechanics
+**Status**: Current - Aligned to codebase v2.3.0 and game-accurate mechanics
 
 ---
 
@@ -607,8 +607,7 @@ php artisan migrate:rollback {migration_id}
 ## Document Control
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 2.1.0 | 2026-01-23 | Development Team | Updated to match current codebase implementation |
+|---------|------|--------|---------|| 2.3.0 | 2026-02-21 | Development Team | Version alignment, date update, codebase v2.3.0 sync || 2.1.0 | 2026-01-23 | Development Team | Updated to match current codebase implementation |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with canonical field names |
 | 1.0.0 | 2025-06-01 | Development Team | Initial specification |
 

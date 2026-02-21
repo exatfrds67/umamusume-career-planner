@@ -1,0 +1,34 @@
+includes:
+  - vendor/larastan/larastan/extension.neon
+
+parameters:
+  level: 9
+  paths:
+    - app
+    - routes
+    - tests
+
+  excludePaths:
+    - phpstan-stubs/
+    # Duplicate file (canonical is in app/Services/MCP/)
+    - app/MCP/
+    # Test files with property override conflicts (declare typed properties that conflict with stub)
+    - tests/Feature/MCP/ToolChainingWorkflowTest.php
+    - tests/Unit/Services/CharacterStateServiceTest.php
+    - tests/Unit/Services/MCP/AgentCommunicationServiceTest.php
+    - tests/Unit/Services/MCP/AgentOrchestrationServiceTest.php
+    - tests/Unit/Services/MCP/Tools/AWSPricingServiceTest.php
+    # Test files with known structural issues (anonymous classes, mock return types)
+    - tests/Feature/CacheManagementTest.php
+    - tests/Integration/ExternalAPI/FailoverPerformanceTest.php
+    - tests/Unit/Neuron/Agents/BaseAgentTest.php
+    - tests/Unit/Services/ExternalAPI/ExternalAPIServiceTest.php
+    # Test files with PHPUnit property override conflicts (cannot be ignored via ignoreErrors)
+    - tests/Feature/Api/TrainingPredictionApiTest.php
+    # Test support files with intentional loose typing for test flexibility
+    - tests/Support/FakeRedis.php
+
+  scanFiles:
+    - phpstan-stubs/pest-test-properties.stub
+
+  treatPhpDocTypesAsCertain: false

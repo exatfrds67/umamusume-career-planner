@@ -5,7 +5,6 @@ declare(strict_types=1);
 use App\Models\Skill;
 use Database\Seeders\UcpSkillsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
 
 uses(RefreshDatabase::class);
 
@@ -90,6 +89,7 @@ describe('UcpSkillsSeeder - Evolution Relationship Setup', function () {
         $method->setAccessible(true);
 
         $pairs = $method->invoke($seeder);
+        assert(is_array($pairs));
 
         expect($pairs)->toBeArray();
         expect($pairs)->not->toBeEmpty();
@@ -133,11 +133,6 @@ describe('UcpSkillsSeeder - Evolution Relationship Setup', function () {
 
 describe('UcpSkillsSeeder - Fresh Seeding Support', function () {
     it('truncates table with MySQL driver', function () {
-        // Skip if not using MySQL
-        if (DB::getDriverName() !== 'mysql') {
-            $this->markTestSkipped('This test requires MySQL driver');
-        }
-
         // Create some test skills
         Skill::factory()->count(5)->create();
         expect(Skill::count())->toBe(5);
@@ -155,11 +150,6 @@ describe('UcpSkillsSeeder - Fresh Seeding Support', function () {
     });
 
     it('truncates table with SQLite driver', function () {
-        // Skip if not using SQLite
-        if (DB::getDriverName() !== 'sqlite') {
-            $this->markTestSkipped('This test requires SQLite driver');
-        }
-
         // Create some test skills
         Skill::factory()->count(5)->create();
         expect(Skill::count())->toBe(5);
@@ -194,30 +184,30 @@ describe('UcpSkillsSeeder - Fresh Seeding Support', function () {
     });
 
     it('performs fresh seeding when fresh mode is enabled', function () {
-        // Create some existing skills with test prefix
+        // Create some existing skills with test prefix (unique internal_ids like test_skill_XXXXX)
         $existingSkills = Skill::factory()->count(3)->create();
         $initialCount = Skill::count();
         expect($initialCount)->toBe(3);
 
-        // Get the IDs of the existing skills
-        $existingIds = $existingSkills->pluck('id')->toArray();
+        // Get the internal_ids of the factory skills (they use test_skill_XXXXX format)
+        $existingInternalIds = $existingSkills->pluck('internal_id')->toArray();
 
-        // Run seeder with fresh mode - this will truncate and reseed
-        $this->artisan('db:seed', ['--class' => UcpSkillsSeeder::class])
-            ->assertExitCode(0);
+        // Run seeder with fresh mode - this will truncate and reseed with curated skills
+        $seeder = (new UcpSkillsSeeder)->fresh();
+        $seeder->run();
 
         // After fresh seeding, the old test skills should be gone
         // and new curated skills should be present
         $newCount = Skill::count();
 
-        // Verify the old skills no longer exist
-        foreach ($existingIds as $id) {
-            expect(Skill::find($id))->toBeNull();
+        // Verify the old factory skills no longer exist (curated skills use different internal_ids)
+        foreach ($existingInternalIds as $internalId) {
+            expect(Skill::where('internal_id', $internalId)->first())->toBeNull();
         }
 
         // Verify new skills were added (curated skills)
         expect($newCount)->toBeGreaterThan(0);
-    })->skip('Requires manual fresh() call before run()');
+    });
 
     it('defaults to non-destructive upsert behavior', function () {
         // Create some existing skills

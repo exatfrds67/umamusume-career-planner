@@ -2,13 +2,13 @@
 
 ## Overview
 
-This document presents the key user workflow diagrams for the Umamusume Pretty Derby Career Planner application, showing how users interact with the system to achieve their optimization goals through various pathways and decision points. The system is built with **Laravel 12** (released February 24, 2025) with **PHP 8.2+**, **Livewire 3**, **Alpine.js**, **TailwindCSS v4** (released January 22, 2025), and integrates with **AWS Bedrock Claude** models and **Ollama** for AI capabilities.
+This document presents the key user workflow diagrams for the Umamusume Pretty Derby Career Planner application, showing how users interact with the system to achieve their optimization goals through various pathways and decision points. The system is built with **Laravel 12** (released February 24, 2025) with **PHP 8.2+**, **Livewire 4**, **Alpine.js 3**, **TailwindCSS v4** (released January 22, 2025), and integrates with **AWS Bedrock Claude** models and **Ollama** for AI capabilities.
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.3.0  
+**Date**: February 21, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
+**Status**: Current - Aligned with codebase v2.3.0 and game-accurate mechanics
 
 ---
 
@@ -1031,6 +1031,7 @@ flowchart TD
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.3.0 | 2026-02-21 | Development Team | Updated version/date metadata; Livewire 3→4, Alpine.js→Alpine.js 3; aligned with 30 current Eloquent models |
 | 2.1.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 codebase, updated AI integration to Neuron agents, added storage mode and import/export flows, updated technical specifications |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with initial workflow diagrams |
 | 1.0.0 | 2026-01-03 | Development Team | Initial draft |
@@ -1051,4 +1052,4 @@ flowchart TD
 
 ---
 
-*This document reflects the current user workflow design aligned with the Umamusume Career Planner v2.0.0 implementation.*
+*This document reflects the current user workflow design aligned with the Umamusume Career Planner v2.3.0 implementation.*

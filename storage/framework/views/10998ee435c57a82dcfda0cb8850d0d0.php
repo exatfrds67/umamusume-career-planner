@@ -1,0 +1,1 @@
+alert-<?php echo e($alert->id ?? $alert->type->value); ?><?php /**PATH C:\XAMPP\htdocs\umamusume-career-planner\storage\framework\views/4530d6c4df7c26e60b4ba195f0e4e5a2.blade.php ENDPATH**/ ?>

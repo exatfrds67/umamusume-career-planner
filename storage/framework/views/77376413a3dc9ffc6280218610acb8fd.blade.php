@@ -1,0 +1,1 @@
+<x-modal name="test-modal">Content</x-modal>

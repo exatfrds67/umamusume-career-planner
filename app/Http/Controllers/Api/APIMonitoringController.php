@@ -178,7 +178,7 @@ class APIMonitoringController extends Controller
      */
     public function alerts(Request $request): JsonResponse
     {
-        $limitInput = $request->query('limit', 50);
+        $limitInput = $request->query('limit', '50');
         $limit = is_numeric($limitInput) ? (int) $limitInput : 50;
         $typeInput = $request->query('type');
         $type = is_string($typeInput) ? $typeInput : null;

@@ -1,10 +1,10 @@
 # Umamusume Career Planner - Data Flow Diagram (DFD)
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.3.0  
+**Date**: February 21, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
+**Status**: Current - Aligned with codebase v2.3.0 and game-accurate mechanics
 
 ---
 
@@ -34,7 +34,7 @@ This document presents the Data Flow Diagrams for the Umamusume Pretty Derby Car
 The system is built with:
 
 - **Backend**: Laravel 12 (PHP 8.2+)
-- **Frontend**: Livewire 3, Alpine.js, TailwindCSS v4
+- **Frontend**: Livewire 4, Alpine.js 3, TailwindCSS v4
 - **AI Integration**: Neuron AI agents, Ollama (local), AWS Bedrock (cloud)
 - **MCP Integration**: Model Context Protocol servers
 - **External APIs**: umapyoi.net (active), UmamusumeDB.com (pending verification)
@@ -807,6 +807,7 @@ flowchart TD
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.3.0 | 2026-02-21 | Development Team | Updated version/date metadata; Livewire 3→4, Alpine.js→Alpine.js 3; aligned with 30 current Eloquent models |
 | 2.2.0 | 2026-01-27 | Development Team | Added §8 Level 2 DFD - Performance Monitoring with 8 APM services; renumbered sections |
 | 2.0.0 | 2026-01-23 | Development Team | Complete rewrite aligned with v2.0.0 implementation; added AI, MCP, external integration, and OCR flows; updated all diagrams and specifications |
 | 1.0.0 | 2026-01-03 | Development Team | Initial draft |
@@ -828,4 +829,4 @@ flowchart TD
 
 ---
 
-*This DFD document provides comprehensive data flow analysis for the Umamusume Pretty Derby Career Planner v2.0.0, reflecting the current implementation architecture and integration patterns.*
+*This DFD document provides comprehensive data flow analysis for the Umamusume Pretty Derby Career Planner v2.3.0, reflecting the current implementation architecture and integration patterns.*

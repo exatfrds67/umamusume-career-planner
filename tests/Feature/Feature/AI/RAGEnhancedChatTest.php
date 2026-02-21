@@ -20,6 +20,20 @@ it('enriches chat context with knowledge base when RAG keywords detected', funct
         ],
     ]);
 
+    $routing = \Mockery::mock(AgentRoutingService::class);
+    $routing->shouldReceive('executeWithFallback')->once()->andReturn([
+        'response' => [
+            'content' => 'RAG test response',
+            'rag_enhanced' => true,
+            'knowledge_sources' => ['stat-system.md'],
+        ],
+        'model' => 'mock-model',
+        'provider' => 'ollama',
+        'execution_time' => 0.12,
+        'cost' => 0.0,
+    ]);
+    $this->app->instance(AgentRoutingService::class, $routing);
+
     $response = $this->actingAs($this->user)
         ->postJson('/api/ai/chat/message', [
             'message' => 'How does speed stat work?',
@@ -40,10 +54,8 @@ it('enriches chat context with knowledge base when RAG keywords detected', funct
 
     // When OpenAI API key is configured, RAG should be enhanced
     // Otherwise, it should still work but without embeddings
-    if (! empty(config('services.openai.key'))) {
-        expect($response->json('metadata.rag_enhanced'))->toBeTrue();
-    }
-})->skip('Requires Ollama service running');
+    expect($response->json('metadata.rag_enhanced'))->toBeTrue();
+});
 
 it('includes knowledge sources in response metadata', function () {
     // Verify RAG keywords trigger knowledge enhancement

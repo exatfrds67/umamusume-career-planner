@@ -1,0 +1,1 @@
+rec-{{ $recommendation->id ?? $recommendation->action }}

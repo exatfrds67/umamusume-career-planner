@@ -60,7 +60,7 @@ describe('MCP Dashboard API - Overview', function () {
     it('returns valid overview metrics', function () {
         $response = $this->actingAs($this->user)->getJson(route('api.mcp.dashboard.overview'));
 
-        /** @var array<string, mixed> $data */
+        /** @var array{total_servers: int|string, healthy_servers: int|string, active_agents: int|string, cost_24h: float|string, avg_response_time: float|string} $data */
         $data = $response->json('data.overview');
 
         expect((int) $data['total_servers'])->toBeInt();
@@ -164,7 +164,7 @@ describe('MCP Dashboard API - Costs', function () {
     it('returns valid cost data', function () {
         $response = $this->actingAs($this->user)->getJson(route('api.mcp.dashboard.costs'));
 
-        /** @var array<string, mixed> $data */
+        /** @var array{daily_cost: float|string, weekly_cost: float|string, monthly_cost: float|string, by_provider: array<mixed>, top_tools: array<mixed>} $data */
         $data = $response->json('data');
 
         expect((float) $data['daily_cost'])->toBeFloat();

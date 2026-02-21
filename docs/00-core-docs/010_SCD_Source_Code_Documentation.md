@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0
-**Date**: January 28, 2026
+**Document Version**: 2.3.0
+**Date**: February 21, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
+**Status**: Current - Aligned with codebase v2.3.0 and game-accurate mechanics
 
 ---
 
@@ -119,7 +119,7 @@ flowchart TD
 ```text
 umamusume-career-planner/
 ├── app/
-│   ├── Enums/              # PHP 8.1 Enums (Status, Types, Grades)
+│   ├── Enums/              # PHP 8.1+ Enums (8 enums: AlertType, CareerPhase, Mood, Priority, RaceDistance, RecommendationType, RunningStyle, StorageMode)
 │   ├── Http/
 │   │   ├── Controllers/    # API and Web Controllers
 │   │   ├── Middleware/     # Custom Middleware
@@ -229,55 +229,26 @@ classDiagram
     Character "*" --> "*" SupportCard
 ```
 
-### 3.2 Enums
+### 3.2 Enums (8 Total)
 
 ```mermaid
 classDiagram
-    class ScenarioType {
+    class AlertType {
         <<enumeration>>
+        Critical
+        Warning
+        Info
+    }
+    
+    class CareerPhase {
+        <<enumeration>>
+        Junior
+        Classic
+        Senior
         UraFinale
-        UnityCup
     }
     
-    class CareerStatus {
-        <<enumeration>>
-        InProgress
-        Completed
-        Abandoned
-    }
-    
-    class TrainingType {
-        <<enumeration>>
-        Speed
-        Stamina
-        Power
-        Guts
-        Wisdom
-        Rest
-    }
-    
-    class SkillRarity {
-        <<enumeration>>
-        Normal
-        Rare
-        Unique
-        Inherited
-    }
-    
-    class AptitudeGrade {
-        <<enumeration>>
-        S : +5% (max)
-        A : 0% (baseline) : 100%
-        B : 90%
-        C : 80%
-        D : 70%
-        E : 60%
-        F : 50%
-        G : 40%
-        +effectiveness() int
-    }
-    
-    class MoodStatus {
+    class Mood {
         <<enumeration>>
         Great : +4%
         Good : +2%
@@ -285,6 +256,44 @@ classDiagram
         Bad : -2%
         Awful : -4%
         +modifier() int
+    }
+    
+    class Priority {
+        <<enumeration>>
+        Low
+        Medium
+        High
+        Critical
+    }
+    
+    class RaceDistance {
+        <<enumeration>>
+        Sprint
+        Mile
+        Medium
+        Long
+    }
+    
+    class RecommendationType {
+        <<enumeration>>
+        Training
+        Race
+        Skill
+        Career
+    }
+    
+    class RunningStyle {
+        <<enumeration>>
+        FrontRunner
+        PaceChaser
+        LateSurger
+        EndCloser
+    }
+    
+    class StorageMode {
+        <<enumeration>>
+        Local
+        Account
     }
 ```
 
@@ -303,6 +312,8 @@ flowchart TD
         RaceService["RaceService"]
         SkillService["SkillService"]
         SupportCardService["SupportCardService"]
+        FactorService["FactorService"]
+        SnapshotService["SnapshotService"]
     end
     
     subgraph AIServices["AI Services"]
@@ -310,12 +321,23 @@ flowchart TD
         OllamaService["OllamaService"]
         BedrockService["BedrockService"]
         AIAdvisoryService["AIAdvisoryService"]
+        CostTrackingService["CostTrackingService"]
+        ConversationHistoryService["ConversationHistoryService"]
+    end
+    
+    subgraph NeuronServices["Neuron Services"]
+        NeuronAIService["NeuronAIService"]
+        TrainingAdvisorService["TrainingAdvisorService"]
+        RaceStrategyService["RaceStrategyService"]
+        SkillRecommendationService["SkillRecommendationService"]
+        CareerPlanningService["CareerPlanningService"]
     end
     
     subgraph MCPServices["MCP Services"]
         MCPClientService["MCPClientService"]
         MCPMonitoringService["MCPMonitoringService"]
         MCPHealthDashboardService["MCPHealthDashboardService"]
+        AgentOrchestrationService["AgentOrchestrationService"]
     end
     
     subgraph DataServices["Data Management Services"]
@@ -323,22 +345,26 @@ flowchart TD
         DataExportService["DataExportService"]
         DataMigrationService["DataMigrationService"]
         BackupService["BackupService"]
+        LocalStorageService["LocalStorageService"]
     end
     
     subgraph ExternalServices["External Integration"]
         UmapyoiApiClient["UmapyoiApiClient"]
         UmamusumeDBApiClient["UmamusumeDBApiClient"]
         TesseractService["TesseractService"]
+        ExternalDataService["ExternalDataService"]
     end
     
-    subgraph PerformanceServices["Performance & Monitoring (NEW)"]
+    subgraph PerformanceServices["Performance & Monitoring"]
         ApmService["ApmService"]
         ApiPerformanceMonitoringService["ApiPerformanceMonitoringService"]
         QueryOptimizationService["QueryOptimizationService"]
         PerformanceAlertingService["PerformanceAlertingService"]
+        RedisCacheOptimizationService["RedisCacheOptimizationService"]
     end
     
     CoreServices --> AIServices
+    CoreServices --> NeuronServices
     AIServices --> MCPServices
     CoreServices --> DataServices
     CoreServices --> ExternalServices
@@ -439,17 +465,26 @@ class TrainingPredictionService
 ```mermaid
 flowchart TD
     subgraph Agents["Neuron Agents"]
+        BaseAgent["BaseAgent"]
         TrainingAgent["TrainingAdvisorAgent"]
         RaceAgent["RaceStrategyAgent"]
         SkillAgent["SkillRecommendationAgent"]
         CareerAgent["CareerPlanningAgent"]
+        McpDemo["McpDemoAgent"]
     end
     
     subgraph Tools["Agent Tools"]
-        StatsTool["GetCharacterStatsTool"]
-        PredictionTool["GetTrainingPredictionsTool"]
-        RaceTool["GetRaceRequirementsTool"]
-        SkillTool["GetSkillCatalogTool"]
+        StatsTool["CharacterStatsTool"]
+        RaceTool["RaceDataTool"]
+        SkillTool["SkillDataTool"]
+    end
+    
+    subgraph NeuronServices["Neuron Services"]
+        NeuronAIService["NeuronAIService"]
+        TrainingAdvisorService["TrainingAdvisorService"]
+        RaceStrategyService["RaceStrategyService"]
+        SkillRecommendationService["SkillRecommendationService"]
+        CareerPlanningService["CareerPlanningService"]
     end
     
     subgraph Providers["AI Providers"]
@@ -457,11 +492,15 @@ flowchart TD
         Bedrock["AWS Bedrock (Cloud)"]
     end
     
+    BaseAgent --> TrainingAgent
+    BaseAgent --> RaceAgent
+    BaseAgent --> SkillAgent
+    BaseAgent --> CareerAgent
     TrainingAgent --> StatsTool
-    TrainingAgent --> PredictionTool
     RaceAgent --> RaceTool
     SkillAgent --> SkillTool
     
+    Agents --> NeuronServices
     Agents --> Providers
 ```
 
@@ -490,10 +529,9 @@ class TrainingAdvisorAgent extends Agent
     protected function tools(): array
     {
         return [
-            new GetCharacterStatsTool(),
-            new GetTrainingPredictionsTool(),
-            new GetSupportCardBonusTool(),
-            new GetUpcomingRacesTool(),
+            new CharacterStatsTool(),
+            new RaceDataTool(),
+            new SkillDataTool(),
         ];
     }
     
@@ -602,11 +640,11 @@ class HybridAIService
 
 ---
 
-## 5.3 Performance & Monitoring Services (NEW - January 2026)
+## 5.3 Performance & Monitoring Services
 
 ### 5.3.1 Overview
 
-Performance and monitoring services provide Application Performance Monitoring (APM), regression detection, and optimization capabilities. Implemented in January 2026 as part of Phase 5 completion.
+Performance and monitoring services provide Application Performance Monitoring (APM), regression detection, and optimization capabilities.
 
 ```mermaid
 flowchart TD
@@ -912,36 +950,10 @@ flowchart TD
 
 ```text
 app/Livewire/
-├── Dashboard/
-│   ├── Overview.php              # Main dashboard
-│   ├── CharacterSummary.php      # Character overview cards
-│   └── RecentActivity.php        # Activity feed
-├── Character/
-│   ├── CharacterList.php         # Character roster
-│   ├── CharacterEditor.php       # Character form
-│   └── StatDisplay.php           # Stat visualization
-├── Training/
-│   ├── TrainingSelector.php      # Training options
-│   ├── PredictionDisplay.php     # Training predictions
-│   └── SessionHistory.php        # Training history
-├── Race/
-│   ├── RaceCalendar.php          # Race schedule
-│   ├── RacePreparation.php       # Race prep view
-│   └── RaceResults.php           # Race outcomes
-├── Skills/
-│   ├── SkillCatalog.php          # Skill browser
-│   ├── SkillAcquisition.php      # Skill purchase
-│   └── SkillLoadout.php          # Skill management
-├── SupportCards/
-│   ├── CardCollection.php        # Card inventory
-│   └── DeckBuilder.php           # Deck composition
-├── AI/
-│   ├── AdvisorChat.php           # AI conversation
-│   └── RecommendationPanel.php   # AI suggestions
-└── Settings/
-    ├── UserPreferences.php       # User settings
-    └── AIConfiguration.php       # AI provider settings
+└── AdvisoryPanel.php         # AI advisory panel component
 ```
+
+> **Note**: The application primarily uses controller-rendered Blade views with Alpine.js for interactivity, with Livewire 4 used selectively for real-time interactive components like the AI Advisory Panel.
 
 ### 6.3 CSS Architecture
 
@@ -1097,7 +1109,13 @@ mindmap
 
 ## 9. Testing Strategy
 
-### 9.1 Test Distribution
+### 9.1 Testing Framework
+
+- **Pest v4** (with PHPUnit v12 backend)
+- **pest-plugin-browser v4.0** for browser testing via Playwright 1.58
+- Browser tests live in `tests/Browser/`
+
+### 9.2 Test Distribution
 
 ```mermaid
 pie title Test Coverage Distribution
@@ -1179,6 +1197,7 @@ test('ranks predictions by recommendation score', function () {
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.3.0 | 2026-02-21 | Development Team | Updated enums to match 8 actual enums, updated Neuron agent tree, corrected Livewire structure, added Neuron services, updated testing framework to Pest v4/PHPUnit v12, version alignment to v2.3.0 |
 | 2.1.0 | 2026-01-23 | Development Team | Updated to reflect current codebase structure including AI, MCP, and Neuron integration |
 | 2.0.0 | 2026-01-14 | Development Team | Added service layer and Livewire documentation |
 | 1.0.0 | 2026-01-03 | Development Team | Initial draft |

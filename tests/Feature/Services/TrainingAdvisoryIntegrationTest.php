@@ -395,12 +395,12 @@ describe('TrainingAdvisoryService Integration', function () {
             $character->id = 1;
             $character->name = 'Test Character';
             $character->available_sp = 220;
-            $character->acquired_skills = [
+            $character->setAttribute('acquired_skills', [
                 ['id' => 1, 'name' => 'Basic Speed'],
                 ['id' => 2, 'name' => 'Basic Stamina'],
-            ];
-            $character->target_distance = 'medium';
-            $character->running_style = 'escape';
+            ]);
+            $character->setAttribute('target_distance', 'medium');
+            $character->setAttribute('running_style', 'escape');
 
             $availableSkills = [
                 [
@@ -476,9 +476,9 @@ describe('TrainingAdvisoryService Integration', function () {
             $character->id = 1;
             $character->name = 'Test Character';
             $character->available_sp = 150;
-            $character->acquired_skills = [];
-            $character->target_distance = 'medium';
-            $character->running_style = 'escape';
+            $character->setAttribute('acquired_skills', []);
+            $character->setAttribute('target_distance', 'medium');
+            $character->setAttribute('running_style', 'escape');
 
             $availableSkills = [
                 [
@@ -549,9 +549,9 @@ describe('TrainingAdvisoryService Integration', function () {
             $character->id = 1;
             $character->name = 'Test Character';
             $character->available_sp = 200;
-            $character->acquired_skills = [];
-            $character->target_distance = 'medium';
-            $character->running_style = 'escape';
+            $character->setAttribute('acquired_skills', []);
+            $character->setAttribute('target_distance', 'medium');
+            $character->setAttribute('running_style', 'escape');
 
             $availableSkills = [
                 [
@@ -604,9 +604,9 @@ describe('TrainingAdvisoryService Integration', function () {
             $character->id = 1;
             $character->name = 'Test Character';
             $character->available_sp = 50;
-            $character->acquired_skills = [];
-            $character->target_distance = 'medium';
-            $character->running_style = 'escape';
+            $character->setAttribute('acquired_skills', []);
+            $character->setAttribute('target_distance', 'medium');
+            $character->setAttribute('running_style', 'escape');
 
             $availableSkills = [
                 [

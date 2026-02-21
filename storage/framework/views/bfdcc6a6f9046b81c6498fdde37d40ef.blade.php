@@ -1,0 +1,1 @@
+<x-skeleton-card :lines="5" />

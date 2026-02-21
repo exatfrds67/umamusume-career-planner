@@ -1,10 +1,10 @@
 # Umamusume Career Planner - Decision Tree Flow Diagrams
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.3.0  
+**Date**: February 21, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
+**Status**: Current - Aligned with codebase v2.3.0 and game-accurate mechanics
 
 ---
 
@@ -1212,6 +1212,7 @@ flowchart TD
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.3.0 | 2026-02-21 | Development Team | Updated version/date metadata; aligned with 30 current Eloquent models and 8 enums |
 | 2.0.0 | 2026-01-23 | Development Team | Complete rewrite aligned with v2.0.0 implementation; updated all decision trees with current logic; added AI provider selection and storage mode trees; aligned terminology with glossary updates; corrected stat caps, skill hints, and running style labels |
 | 1.0.0 | 2026-01-14 | Development Team | Initial draft with basic decision trees |
 
@@ -1269,4 +1270,4 @@ flowchart TD
 
 ---
 
-*This document reflects the decision logic implemented in the Umamusume Pretty Derby Career Planner v2.0.0 codebase and serves as the authoritative reference for system optimization algorithms.*
+*This document reflects the decision logic implemented in the Umamusume Pretty Derby Career Planner v2.3.0 codebase and serves as the authoritative reference for system optimization algorithms.*

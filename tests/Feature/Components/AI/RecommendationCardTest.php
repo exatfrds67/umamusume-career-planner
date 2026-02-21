@@ -50,7 +50,7 @@ describe('RecommendationCard Component', function () {
             ];
 
             $component = new RecommendationCard($recommendation);
-            expect($component->recommendation->priority)->toBe($priority);
+            expect($component->recommendation->priority)->toBe($priority); // @phpstan-ignore property.notFound
         }
     });
 

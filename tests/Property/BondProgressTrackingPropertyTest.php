@@ -160,6 +160,8 @@ function generateTrainingContextWithBond(int $bondLevel): TrainingContext
 
 /**
  * Helper: Generate TrainingContext with multiple cards at specified bond levels
+ *
+ * @param  array<int, int>  $bondLevels
  */
 function generateTrainingContextWithBonds(array $bondLevels): TrainingContext
 {

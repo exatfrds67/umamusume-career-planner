@@ -435,8 +435,9 @@ it('shows alert priority badges correctly', function () {
     $this->actingAs($this->user);
     $page = visit('/training/predictions?character_id='.$character->id);
 
-    // Verify risk badges on facility cards
-    $page->assertPresent('[data-testid="risk-badge-speed"]')
+    // Wait for page to load by verifying character name first, then check risk badges
+    $page->assertSee('Priority Test Character')
+        ->assertPresent('[data-testid="risk-badge-speed"]')
         ->assertPresent('[data-testid="risk-badge-stamina"]')
         ->assertNoJavaScriptErrors();
 })->group('browser', 'e2e', 'critical-alerts', 'priority');

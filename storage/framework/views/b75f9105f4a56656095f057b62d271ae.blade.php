@@ -1,0 +1,1 @@
+<x-form.text-input name="email" placeholder="Enter your email" />

@@ -372,7 +372,9 @@ describe('Context-Aware Agent Orchestration Integration', function () {
             ->and($workflow['config']['career_id'])->toBe($this->career->id);
 
         // Verify context was cached
-        $contextKey = "workflow_context:{$workflow['id']}";
+        $workflowId = $workflow['id'];
+        assert(is_string($workflowId) || is_int($workflowId));
+        $contextKey = "workflow_context:{$workflowId}";
         expect(Cache::has($contextKey))->toBeTrue();
     });
 });

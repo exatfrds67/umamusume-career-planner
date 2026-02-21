@@ -31,7 +31,7 @@ class RacePreparationViewTest extends TestCase
         $response = $this->actingAs($user)->get(route('races.show', $race));
 
         $response->assertOk();
-        $response->assertSee($race->name);
+        $response->assertSee($race->race_name);
         $response->assertSee('2400m');
     }
 

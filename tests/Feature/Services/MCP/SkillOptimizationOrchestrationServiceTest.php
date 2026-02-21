@@ -229,6 +229,7 @@ test('agent statuses are tracked correctly', function () {
     );
 
     $agentStatuses = $result['orchestration_metadata']['agent_statuses'];
+    assert(is_array($agentStatuses));
 
     expect($agentStatuses)->toHaveKeys([
         'sp_budget',
