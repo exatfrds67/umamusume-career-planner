@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0  
-**Date**: February 22, 2026  
+**Document Version**: 2.3.0
+**Date**: February 22, 2026
 **Related Documents**: [PRD-003], [SPEC-003], [SRS], [BRS]
 
 **Source Specifications**:
@@ -44,12 +44,10 @@ The Race Day Flow guides users through the complete race preparation, strategy o
 
 ### 1.2 Scope
 
-| Aspect | Description |
-|--------|-------------|
-| **Entry Point** | Race week notification or race calendar selection |
-| **Exit Point** | Race results recorded, stats/rewards updated, next steps displayed |
-| **Duration** | 5-10 minutes for preparation; 2-3 minutes for race execution |
-| **User Type** | All users with active career runs |
+- **Aspect**: **Entry Point**; **Description**: Race week notification or race calendar selection
+- **Aspect**: **Exit Point**; **Description**: Race results recorded, stats/rewards updated, next steps displayed
+- **Aspect**: **Duration**; **Description**: 5-10 minutes for preparation; 2-3 minutes for race execution
+- **Aspect**: **User Type**; **Description**: All users with active career runs
 
 ### 1.3 Business Context
 
@@ -71,68 +69,68 @@ The Race Day Flow guides users through the complete race preparation, strategy o
 ```mermaid
 flowchart TD
     Start([Race Week Begins]) --> CheckEntry{Race Entry Status?}
-    
+
     CheckEntry -->|Not Entered| PromptEntry[Prompt Race Entry]
     CheckEntry -->|Entered| PreRaceCheck[Pre-Race Status Check]
-    
+
     PromptEntry --> RaceCalendar[Open Race Calendar]
     RaceCalendar --> SelectRace[Select Race]
     SelectRace --> ViewDetails[View Race Details]
-    
+
     ViewDetails --> LoadRaceData[Load Race Data]
     LoadRaceData --> AnalyzeRequirements[Analyze Race Requirements]
     AnalyzeRequirements --> CalculateReadiness[Calculate Readiness Score]
-    
+
     CalculateReadiness --> DisplayAnalysis[Display Analysis Dashboard]
     DisplayAnalysis --> UserReview[User Reviews Analysis]
-    
+
     UserReview --> NeedPrep{Needs Preparation?}
     NeedPrep -->|Yes| ShowRecommendations[Show AI Recommendations]
     NeedPrep -->|No| ConfirmEntry[Confirm Race Entry]
-    
+
     ShowRecommendations --> PrepOptions{Preparation Type?}
     PrepOptions -->|Training| SuggestTraining[Suggest Training Sessions]
     PrepOptions -->|Skills| SuggestSkills[Suggest Skill Acquisitions]
     PrepOptions -->|Deck| SuggestDeckChanges[Suggest Deck Modifications]
-    
+
     SuggestTraining --> UserImplements[User Implements Changes]
     SuggestSkills --> UserImplements
     SuggestDeckChanges --> UserImplements
-    
+
     UserImplements --> RecalculateReadiness[Recalculate Readiness]
     RecalculateReadiness --> DisplayAnalysis
-    
+
     PreRaceCheck --> ConfirmEntry
     ConfirmEntry --> SelectStrategy[Select Running Style]
-    
+
     SelectStrategy --> AIStrategyAdvice[Get AI Strategy Recommendation]
     AIStrategyAdvice --> StrategyOptions[Display Strategy Options]
-    
+
     StrategyOptions --> UserSelectsStrategy{User Chooses Strategy?}
     UserSelectsStrategy -->|AI Recommended| ApplyAIStrategy[Apply AI Strategy]
     UserSelectsStrategy -->|Custom| ApplyCustomStrategy[Apply Custom Strategy]
-    
+
     ApplyAIStrategy --> FinalReview[Final Race Review]
     ApplyCustomStrategy --> FinalReview
-    
+
     FinalReview --> LockEntry[Lock Race Entry]
     LockEntry --> ExecuteRace[Execute Race Simulation]
-    
+
     ExecuteRace --> ProcessResults[Process Race Results]
     ProcessResults --> CalculateRewards[Calculate Rewards & Stats]
     CalculateRewards --> UpdateCareer[Update Career State]
-    
+
     UpdateCareer --> LogHistory[Log Race History]
     LogHistory --> DisplayResults[Display Results Screen]
-    
+
     DisplayResults --> ShowComparison[Show Predicted vs Actual]
     ShowComparison --> AwardRewards[Award Fans/SP/Items]
     AwardRewards --> UpdateMood[Update Mood/Conditions]
-    
+
     UpdateMood --> PostRaceAnalysis[Post-Race AI Analysis]
     PostRaceAnalysis --> NextSteps[Show Next Steps]
     NextSteps --> End([Race Complete])
-    
+
     style Start fill:#e3f2fd
     style End fill:#c8e6c9
     style AIStrategyAdvice fill:#fff3e0
@@ -144,45 +142,45 @@ flowchart TD
 ```mermaid
 stateDiagram-v2
     [*] --> RaceWeekStart
-    
+
     RaceWeekStart --> CalendarView: User opens race calendar
     RaceWeekStart --> AutoNotification: Race week auto-notification
-    
+
     AutoNotification --> RaceDetail: Click notification
     CalendarView --> RaceDetail: Select race
-    
+
     RaceDetail --> RequirementsAnalysis: Load race data
-    
+
     RequirementsAnalysis --> ReadinessCalculation: Analyze requirements
     ReadinessCalculation --> StrategyGeneration: Calculate readiness
     StrategyGeneration --> PreparationAdvice: Generate AI strategies
-    
+
     PreparationAdvice --> UserDecision: Display recommendations
-    
+
     UserDecision --> Training: Need training
     UserDecision --> SkillAcquisition: Need skills
     UserDecision --> DeckModification: Need deck changes
     UserDecision --> ProceedToEntry: Ready to enter
-    
+
     Training --> RecalculateReadiness: Complete training
     SkillAcquisition --> RecalculateReadiness: Acquire skills
     DeckModification --> RecalculateReadiness: Modify deck
     RecalculateReadiness --> PreparationAdvice: Re-analyze
-    
+
     ProceedToEntry --> StrategySelection: Confirm entry
-    
+
     StrategySelection --> AIRecommendation: Request AI advice
     AIRecommendation --> StrategyConfirmation: Review strategies
     StrategyConfirmation --> EntryLocked: Confirm strategy
-    
+
     EntryLocked --> RaceSimulation: Execute race
-    
+
     RaceSimulation --> ResultProcessing: Calculate outcome
     ResultProcessing --> RewardDistribution: Process results
     RewardDistribution --> StateUpdate: Award rewards
     StateUpdate --> HistoryLog: Update stats/mood
     HistoryLog --> ResultsDisplay: Log race data
-    
+
     ResultsDisplay --> PostRaceAnalysis: Display results
     PostRaceAnalysis --> NextStepsSuggestion: AI analysis
     NextStepsSuggestion --> [*]: Complete
@@ -238,20 +236,16 @@ stateDiagram-v2
 
 **User Actions**:
 
-| Action | Description | Next State |
-|--------|-------------|------------|
-| View race | Click race on calendar | Race detail screen |
-| Filter races | Apply grade/distance/surface filters | Update calendar view |
-| Enter race | Click "Enter" on race card | Race preparation screen |
-| Create schedule | Open custom race scheduler | Race planning tool |
+- **Action**: View race; **Description**: Click race on calendar; **Next State**: Race detail screen
+- **Action**: Filter races; **Description**: Apply grade/distance/surface filters; **Next State**: Update calendar view
+- **Action**: Enter race; **Description**: Click "Enter" on race card; **Next State**: Race preparation screen
+- **Action**: Create schedule; **Description**: Open custom race scheduler; **Next State**: Race planning tool
 
 **Readiness Color Coding**:
 
-| Color | Range | Meaning |
-|-------|-------|---------|
-| 🟢 Green | 80-100% | Excellent readiness |
-| 🟡 Yellow | 60-79% | Moderate readiness |
-| 🔴 Red | < 60% | Poor readiness - preparation needed |
+- **Color**: 🟢 Green; **Range**: 80-100%; **Meaning**: Excellent readiness
+- **Color**: 🟡 Yellow; **Range**: 60-79%; **Meaning**: Moderate readiness
+- **Color**: 🔴 Red; **Range**: < 60%; **Meaning**: Poor readiness - preparation needed
 
 ---
 
@@ -315,40 +309,34 @@ stateDiagram-v2
 
 **Track Condition Effects (Verified Jan 2026)**:
 
-| Condition | Surface | Power Penalty | Speed Penalty | Stamina Drain |
-|-----------|---------|---------------|---------------|---------------|
-| Firm | Turf/Dirt | None | None | Normal |
-| Good | Turf | -50 | None | Normal |
-| Good | Dirt | -50 | None | Normal |
-| Soft | Turf | -50 | None | +2%/sec |
-| Soft | Dirt | -100 | None | +2%/sec |
-| Heavy | Turf | -50 | -50 | +2%/sec |
-| Heavy | Dirt | -100 | -50 | +2%/sec |
+- **Condition**: Firm; **Surface**: Turf/Dirt; **Power Penalty**: None; **Speed Penalty**: None; **Stamina Drain**: Normal
+- **Condition**: Good; **Surface**: Turf; **Power Penalty**: -50; **Speed Penalty**: None; **Stamina Drain**: Normal
+- **Condition**: Good; **Surface**: Dirt; **Power Penalty**: -50; **Speed Penalty**: None; **Stamina Drain**: Normal
+- **Condition**: Soft; **Surface**: Turf; **Power Penalty**: -50; **Speed Penalty**: None; **Stamina Drain**: +2%/sec
+- **Condition**: Soft; **Surface**: Dirt; **Power Penalty**: -100; **Speed Penalty**: None; **Stamina Drain**: +2%/sec
+- **Condition**: Heavy; **Surface**: Turf; **Power Penalty**: -50; **Speed Penalty**: -50; **Stamina Drain**: +2%/sec
+- **Condition**: Heavy; **Surface**: Dirt; **Power Penalty**: -100; **Speed Penalty**: -50; **Stamina Drain**: +2%/sec
 
 **Aptitude Grade Bonuses (S is Maximum - No SS Exists)**:
 
-| Grade | Distance (Speed) | Surface (Power) | Style (Wit) |
-|-------|------------------|-----------------|-------------|
-| S | +5% | +5% | +10% |
-| A | 0% (baseline) | 0% (baseline) | 0% (baseline) |
-| B | -10% | -10% | -15% |
-| C | -20% | -20% | -25% |
-| D | -40% | -30% | -40% |
-| E | -60% | -50% | -60% |
-| F | -80% | -70% | -80% |
-| G | -90% | -90% | -90% |
+- **Grade**: S; **Distance (Speed)**: +5%; **Surface (Power)**: +5%; **Style (Wit)**: +10%
+- **Grade**: A; **Distance (Speed)**: 0% (baseline); **Surface (Power)**: 0% (baseline); **Style (Wit)**: 0% (baseline)
+- **Grade**: B; **Distance (Speed)**: -10%; **Surface (Power)**: -10%; **Style (Wit)**: -15%
+- **Grade**: C; **Distance (Speed)**: -20%; **Surface (Power)**: -20%; **Style (Wit)**: -25%
+- **Grade**: D; **Distance (Speed)**: -40%; **Surface (Power)**: -30%; **Style (Wit)**: -40%
+- **Grade**: E; **Distance (Speed)**: -60%; **Surface (Power)**: -50%; **Style (Wit)**: -60%
+- **Grade**: F; **Distance (Speed)**: -80%; **Surface (Power)**: -70%; **Style (Wit)**: -80%
+- **Grade**: G; **Distance (Speed)**: -90%; **Surface (Power)**: -90%; **Style (Wit)**: -90%
 
 **Implementation Details**:
 
 **Stat Rating Criteria**:
 
-| Rating | Criteria | Icon |
-|--------|----------|------|
-| Excellent | Current > Required + 50 | 🟢 |
-| Good | Current > Required + 20 | 🟢 |
-| Adequate | Current > Required | 🟢 |
-| Borderline | Current within 30 of Required | 🟡 |
-| Inadequate | Current < Required - 30 | 🔴 |
+- **Rating**: Excellent; **Criteria**: Current > Required + 50; **Icon**: 🟢
+- **Rating**: Good; **Criteria**: Current > Required + 20; **Icon**: 🟢
+- **Rating**: Adequate; **Criteria**: Current > Required; **Icon**: 🟢
+- **Rating**: Borderline; **Criteria**: Current within 30 of Required; **Icon**: 🟡
+- **Rating**: Inadequate; **Criteria**: Current < Required - 30; **Icon**: 🔴
 
 ```php
 // app/Services/RaceAnalysisService.php
@@ -360,14 +348,14 @@ class RaceAnalysisService
         $aptitudeMatch = $this->calculateAptitudeMatch($career, $race);
         $skillMatch = $this->calculateSkillMatch($career, $race);
         $trackConditionPenalties = $this->calculateTrackConditionPenalties($race);
-        
+
         $overallScore = $this->calculateOverallReadiness([
             'stats' => $statGaps,
             'aptitudes' => $aptitudeMatch,
             'skills' => $skillMatch,
             'trackConditions' => $trackConditionPenalties,
         ]);
-        
+
         return new RaceReadiness(
             score: $overallScore,
             statGaps: $statGaps,
@@ -377,7 +365,7 @@ class RaceAnalysisService
             recommendations: $this->generateRecommendations($statGaps, $race),
         );
     }
-    
+
     /**
      * Calculate track condition penalties (Verified Jan 2026)
      */
@@ -385,7 +373,7 @@ class RaceAnalysisService
     {
         $condition = $race->track_condition;
         $surface = $race->surface;
-        
+
         return match([$condition, $surface]) {
             ['firm', 'turf'], ['firm', 'dirt'] => ['power' => 0, 'speed' => 0, 'stamina_drain' => 1.0],
             ['good', 'turf'], ['good', 'dirt'] => ['power' => -50, 'speed' => 0, 'stamina_drain' => 1.0],
@@ -396,7 +384,7 @@ class RaceAnalysisService
             default => ['power' => 0, 'speed' => 0, 'stamina_drain' => 1.0],
         };
     }
-    
+
     /**
      * Calculate aptitude bonuses (S is maximum grade - No SS exists)
      */
@@ -416,14 +404,14 @@ class RaceAnalysisService
                 'D' => -0.40, 'E' => -0.60, 'F' => -0.80, 'G' => -0.90,
             ],
         ];
-        
+
         return $bonusTable[$type][$grade] ?? 0.0;
     }
-    
+
     private function calculateStatGaps(CareerRun $career, Race $race): array
     {
         $requirements = $race->stat_requirements;
-        
+
         return [
             'speed' => [
                 'required' => $requirements['speed'],
@@ -434,11 +422,11 @@ class RaceAnalysisService
             // ... other stats
         ];
     }
-    
+
     private function rateStatMatch(int $current, int $required): string
     {
         $gap = $current - $required;
-        
+
         return match(true) {
             $gap >= 50 => 'excellent',
             $gap >= 20 => 'good',
@@ -504,13 +492,11 @@ class RaceAnalysisService
 
 **Recommendation Components**:
 
-| Component | Description | User Benefit |
-|-----------|-------------|--------------|
-| Action Plan | Step-by-step improvement strategy | Clear roadmap to readiness |
-| Expected Gains | Predicted stat increases | Confidence in outcome |
-| Skill Suggestions | Beneficial skills to acquire | Performance edge |
-| Deck Optimization | Support card adjustments | Training efficiency |
-| Alternative Strategies | Risk/reward trade-offs | Strategic choice |
+- **Component**: Action Plan; **Description**: Step-by-step improvement strategy; **User Benefit**: Clear roadmap to readiness
+- **Component**: Expected Gains; **Description**: Predicted stat increases; **User Benefit**: Confidence in outcome
+- **Component**: Skill Suggestions; **Description**: Beneficial skills to acquire; **User Benefit**: Performance edge
+- **Component**: Deck Optimization; **Description**: Support card adjustments; **User Benefit**: Training efficiency
+- **Component**: Alternative Strategies; **Description**: Risk/reward trade-offs; **User Benefit**: Strategic choice
 
 **AI Recommendation Engine**:
 
@@ -519,7 +505,7 @@ class RaceAnalysisService
 class RacePreparationAgent extends Agent
 {
     protected string $name = 'Race Preparation Advisor';
-    
+
     public function generatePreparationPlan(
         CareerRun $career,
         Race $race,
@@ -527,24 +513,24 @@ class RacePreparationAgent extends Agent
     ): PreparationPlan {
         $statGaps = $this->analyzeStatGaps($career, $race);
         $availableTurns = floor($daysRemaining / 7);
-        
+
         $trainingPlan = $this->optimizeTrainingSequence(
             gaps: $statGaps,
             turns: $availableTurns,
             deck: $career->supportDeck,
         );
-        
+
         $skillSuggestions = $this->recommendSkills(
             race: $race,
             currentSkills: $career->skills,
             spAvailable: $career->total_sp_available,
         );
-        
+
         $deckOptimization = $this->analyzeDeckChanges(
             currentDeck: $career->supportDeck,
             targetStats: $statGaps->priorities(),
         );
-        
+
         return new PreparationPlan(
             trainingSequence: $trainingPlan,
             skillRecommendations: $skillSuggestions,
@@ -607,12 +593,10 @@ class RacePreparationAgent extends Agent
 
 **Running Style Analysis**:
 
-| Style | Best For | Stat Priority | Skill Synergy |
-|-------|----------|---------------|---------------|
-| Front Runner (Nige) | Short/Mile races | Speed, Stamina | Early acceleration |
-| Pace Chaser (Senkou) | Versatile | Speed, Power | Positioning |
-| Late Surger (Sashi) | Medium/Long races | Power, Guts | Final stretch |
-| End Closer (Oikomi) | Long races | Guts, Wit | Last spurt |
+- **Style**: Front Runner (Nige); **Best For**: Short/Mile races; **Stat Priority**: Speed, Stamina; **Skill Synergy**: Early acceleration
+- **Style**: Pace Chaser (Senkou); **Best For**: Versatile; **Stat Priority**: Speed, Power; **Skill Synergy**: Positioning
+- **Style**: Late Surger (Sashi); **Best For**: Medium/Long races; **Stat Priority**: Power, Guts; **Skill Synergy**: Final stretch
+- **Style**: End Closer (Oikomi); **Best For**: Long races; **Stat Priority**: Guts, Wit; **Skill Synergy**: Last spurt
 
 **Strategy Scoring Algorithm**:
 
@@ -629,27 +613,27 @@ class StrategyScoreCalculator
             $career->aptitudes->style($style),
             $race->distance,
         );
-        
+
         $statScore = $this->scoreStatAlignment($career, $style);
         $skillScore = $this->scoreSkillSynergy($career->skills, $style);
         $conditionScore = $this->scoreConditions($career, $style);
-        
+
         return ($aptitudeScore * 0.35)
             + ($statScore * 0.30)
             + ($skillScore * 0.25)
             + ($conditionScore * 0.10);
     }
-    
+
     private function scoreStatAlignment(CareerRun $career, RunningStyle $style): float
     {
         $requirements = $style->statPriorities();
         $score = 0;
-        
+
         foreach ($requirements as $stat => $weight) {
             $normalized = $career->$stat / 1200;
             $score += $normalized * $weight;
         }
-        
+
         return $score * 100;
     }
 }
@@ -671,14 +655,14 @@ sequenceDiagram
     participant Simulator as Race Simulator
     participant AI as Race AI
     participant DB as Database
-    
+
     User->>UI: Confirm Race Entry
     UI->>Service: executeRace(career, race, strategy)
     Service->>Simulator: initializeSimulation()
-    
+
     Simulator->>Simulator: Load race participants (10 competitors)
     Simulator->>Simulator: Calculate initial positions
-    
+
     loop Race Segments (Early, Mid, Final)
         Simulator->>AI: calculateSegmentPerformance(career, competitors)
         AI->>AI: Apply stat modifiers
@@ -686,17 +670,17 @@ sequenceDiagram
         AI->>AI: Calculate position changes
         AI-->>Simulator: Segment results
     end
-    
+
     Simulator->>Simulator: Determine final placement
     Simulator->>Simulator: Calculate race time
     Simulator-->>Service: Race results
-    
+
     Service->>Service: calculateRewards(placement, race)
     Service->>Service: updateCareerState(career, results)
     Service->>DB: saveRaceResult(results)
     Service->>DB: updateStatProgress(career)
     Service->>DB: awardRewards(rewards)
-    
+
     Service-->>UI: Race complete
     UI-->>User: Display results
 ```
@@ -758,13 +742,11 @@ sequenceDiagram
 
 **Reward Calculation**:
 
-| Placement | Fans | SP | Grade Points | Special Items |
-|-----------|------|----|--------------| --------------|
-| 1st | +300 | +100 | +200 | Rare item |
-| 2nd | +250 | +80 | +150 | Common item |
-| 3rd | +200 | +60 | +100 | - |
-| 4th-5th | +150 | +40 | +50 | - |
-| 6th+ | +100 | +20 | +25 | - |
+- **Placement**: 1st; **Fans**: +300; **SP**: +100; **Grade Points**: +200; **Special Items**: Rare item
+- **Placement**: 2nd; **Fans**: +250; **SP**: +80; **Grade Points**: +150; **Special Items**: Common item
+- **Placement**: 3rd; **Fans**: +200; **SP**: +60; **Grade Points**: +100; **Special Items**: -
+- **Placement**: 4th-5th; **Fans**: +150; **SP**: +40; **Grade Points**: +50; **Special Items**: -
+- **Placement**: 6th+; **Fans**: +100; **SP**: +20; **Grade Points**: +25; **Special Items**: -
 
 ---
 
@@ -777,31 +759,31 @@ flowchart TD
     D1{Enter Race?}
     D1 -->|Yes| D2{Readiness Check}
     D1 -->|No| Skip[Skip Race]
-    
+
     D2 -->|Ready 80%+| D3[Proceed to Strategy]
     D2 -->|Ready 60-79%| D4{Prepare?}
     D2 -->|Ready < 60%| D5[Strong Preparation Needed]
-    
+
     D4 -->|Yes| PrepPlan[Implement Preparation]
     D4 -->|No| RiskyEntry[Enter with Risk]
-    
+
     D5 --> PrepPlan
     PrepPlan --> Recheck[Recalculate Readiness]
     Recheck --> D2
-    
+
     D3 --> D6{Strategy Selection}
     D6 -->|AI Recommended| AIStrategy[Apply AI Strategy]
     D6 -->|Custom| CustomStrategy[Apply Custom Strategy]
-    
+
     AIStrategy --> Execute[Execute Race]
     CustomStrategy --> Execute
     RiskyEntry --> Execute
-    
+
     Execute --> D7{Result}
     D7 -->|Win| Celebrate[Award Max Rewards]
     D7 -->|Top 3| Good[Award Good Rewards]
     D7 -->|4th+| Low[Award Base Rewards]
-    
+
     Celebrate --> NextTurn
     Good --> NextTurn
     Low --> NextTurn
@@ -810,14 +792,12 @@ flowchart TD
 
 ### 4.2 Key Decision Factors
 
-| Factor | Impact on Decision | Weight |
-|--------|-------------------|--------|
-| **Readiness Score** | Determines preparation needs | Critical |
-| **Days Remaining** | Time available for preparation | High |
-| **Stat Gaps** | Specific improvements needed | High |
-| **Win Probability** | Expected outcome | Medium |
-| **Risk Tolerance** | User's strategy preference | Medium |
-| **Reward Value** | Potential gains vs. effort | Low |
+- **Factor**: **Readiness Score**; **Impact on Decision**: Determines preparation needs; **Weight**: Critical
+- **Factor**: **Days Remaining**; **Impact on Decision**: Time available for preparation; **Weight**: High
+- **Factor**: **Stat Gaps**; **Impact on Decision**: Specific improvements needed; **Weight**: High
+- **Factor**: **Win Probability**; **Impact on Decision**: Expected outcome; **Weight**: Medium
+- **Factor**: **Risk Tolerance**; **Impact on Decision**: User's strategy preference; **Weight**: Medium
+- **Factor**: **Reward Value**; **Impact on Decision**: Potential gains vs. effort; **Weight**: Low
 
 ---
 
@@ -852,22 +832,22 @@ class ReadinessCalculator
         $aptitudeScore = $this->calculateAptitudeScore($career, $race);
         $skillScore = $this->calculateSkillScore($career, $race);
         $conditionScore = $this->calculateConditionScore($career);
-        
+
         return ($statScore * 0.40)
             + ($aptitudeScore * 0.30)
             + ($skillScore * 0.20)
             + ($conditionScore * 0.10);
     }
-    
+
     private function calculateStatScore(CareerRun $career, Race $race): float
     {
         $requirements = $race->stat_requirements;
         $scores = [];
-        
+
         foreach (['speed', 'stamina', 'power', 'guts', 'wit'] as $stat) {
             $current = $career->$stat;
             $required = $requirements[$stat];
-            
+
             $scores[] = match(true) {
                 $current >= $required + 50 => 100,
                 $current >= $required + 20 => 90,
@@ -876,7 +856,7 @@ class ReadinessCalculator
                 default => 25,
             };
         }
-        
+
         return array_sum($scores) / count($scores);
     }
 }
@@ -898,22 +878,22 @@ class WinProbabilityCalculator
         $skillBonus = $this->calculateSkillBonus($career, $race);
         $aptitudeMultiplier = $this->calculateAptitudeMultiplier($career, $race);
         $competitorPenalty = $this->calculateCompetitorPenalty($race);
-        
-        $probability = ($baseProb + $styleBonus + $skillBonus) 
-            * $aptitudeMultiplier 
+
+        $probability = ($baseProb + $styleBonus + $skillBonus)
+            * $aptitudeMultiplier
             * $competitorPenalty;
-        
+
         return max(0, min(100, $probability));
     }
-    
+
     private function calculateBaseProbability(CareerRun $career, Race $race): float
     {
         $statAdvantage = $this->calculateStatAdvantage($career, $race);
         $gradeModifier = $this->getGradeModifier($race->grade);
-        
+
         return $statAdvantage * $gradeModifier;
     }
-    
+
     private function getGradeModifier(string $grade): float
     {
         return match($grade) {
@@ -944,12 +924,10 @@ class WinProbabilityCalculator
 
 ### 6.2 User Experience Success
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| Preparation completion rate | > 90% | Analytics tracking |
-| AI strategy acceptance rate | > 75% | User action tracking |
-| Win rate with preparation | +15% vs unprepared | Statistical analysis |
-| Decision time per race | < 5 minutes | User analytics |
+- **Metric**: Preparation completion rate; **Target**: > 90%; **Measurement**: Analytics tracking
+- **Metric**: AI strategy acceptance rate; **Target**: > 75%; **Measurement**: User action tracking
+- **Metric**: Win rate with preparation; **Target**: +15% vs unprepared; **Measurement**: Statistical analysis
+- **Metric**: Decision time per race; **Target**: < 5 minutes; **Measurement**: User analytics
 
 ### 6.3 Technical Success
 
@@ -965,17 +943,17 @@ test('race day flow completes successfully', function () {
         'energy' => 78,
         'mood' => Mood::Good,
     ]);
-    
+
     $race = Race::factory()->create([
         'grade' => 'G1',
         'distance' => 2400,
         'surface' => 'turf',
     ]);
-    
+
     // Analyze readiness
     $readiness = app(RaceAnalysisService::class)
         ->analyzeReadiness($career, $race);
-    
+
     expect($readiness)->toHaveKeys([
         'score',
         'statGaps',
@@ -983,13 +961,13 @@ test('race day flow completes successfully', function () {
         'skillMatch',
         'recommendations',
     ]);
-    
+
     // Execute race
     $result = app(RaceService::class)
         ->executeRace($career, $race, RunningStyle::Sashi);
-    
+
     $career->refresh();
-    
+
     expect($result->placement)->toBeGreaterThan(0)
         ->and($result->placement)->toBeLessThanOrEqual(10)
         ->and($career->energy)->toBeLessThan(78)
@@ -1006,17 +984,17 @@ test('race day flow completes successfully', function () {
 ```mermaid
 flowchart TD
     Error[Error Encountered] --> Type{Error Type}
-    
+
     Type -->|Readiness| E1[Readiness Too Low]
     Type -->|Energy| E2[Insufficient Energy]
     Type -->|Validation| E3[Invalid Strategy]
     Type -->|Database| E4[Save Failed]
-    
+
     E1 --> R1[Show Warning<br/>Suggest Preparation]
     E2 --> R2[Force Rest<br/>or Skip Race]
     E3 --> R3[Highlight Errors<br/>Show Valid Options]
     E4 --> R4[Rollback Transaction<br/>Retry or Report]
-    
+
     R1 --> Resolve[User Action]
     R2 --> Resolve
     R3 --> Resolve
@@ -1025,22 +1003,18 @@ flowchart TD
 
 ### 7.2 Error Messages
 
-| Error Code | Trigger | Message | User Action |
-|------------|---------|---------|-------------|
-| `RC-001` | Readiness < 40% | "Your readiness is very low. Preparation strongly recommended." | Prepare or skip race |
-| `RC-002` | Energy < 20% | "Insufficient energy for race. Rest recommended." | Rest or proceed at risk |
-| `RC-003` | Invalid strategy | "Selected strategy incompatible with character aptitudes." | Select valid strategy |
-| `RC-004` | Database error | "Unable to save race result. Please try again." | Retry operation |
-| `RC-005` | Simulation error | "Race simulation failed. Please contact support." | Report error |
+- **Error Code**: `RC-001`; **Trigger**: Readiness < 40%; **Message**: "Your readiness is very low. Preparation strongly recommended."; **User Action**: Prepare or skip race
+- **Error Code**: `RC-002`; **Trigger**: Energy < 20%; **Message**: "Insufficient energy for race. Rest recommended."; **User Action**: Rest or proceed at risk
+- **Error Code**: `RC-003`; **Trigger**: Invalid strategy; **Message**: "Selected strategy incompatible with character aptitudes."; **User Action**: Select valid strategy
+- **Error Code**: `RC-004`; **Trigger**: Database error; **Message**: "Unable to save race result. Please try again."; **User Action**: Retry operation
+- **Error Code**: `RC-005`; **Trigger**: Simulation error; **Message**: "Race simulation failed. Please contact support."; **User Action**: Report error
 
 ### 7.3 Recovery Strategies
 
-| Scenario | Primary Recovery | Fallback Recovery | Ultimate Fallback |
-|----------|------------------|-------------------|-------------------|
-| Low readiness | Show preparation plan | Allow risky entry | Skip race |
-| Low energy | Force rest action | Reduce race performance | Allow with warning |
-| Invalid strategy | Show valid options | Apply default strategy | Use AI recommendation |
-| Database timeout | Retry transaction (3x) | Queue for later processing | Save as draft |
+- **Scenario**: Low readiness; **Primary Recovery**: Show preparation plan; **Fallback Recovery**: Allow risky entry; **Ultimate Fallback**: Skip race
+- **Scenario**: Low energy; **Primary Recovery**: Force rest action; **Fallback Recovery**: Reduce race performance; **Ultimate Fallback**: Allow with warning
+- **Scenario**: Invalid strategy; **Primary Recovery**: Show valid options; **Fallback Recovery**: Apply default strategy; **Ultimate Fallback**: Use AI recommendation
+- **Scenario**: Database timeout; **Primary Recovery**: Retry transaction (3x); **Fallback Recovery**: Queue for later processing; **Ultimate Fallback**: Save as draft
 
 ---
 
@@ -1050,20 +1024,16 @@ flowchart TD
 
 After race execution, users may proceed to:
 
-| Flow | Document Reference | Entry Condition |
-|------|-------------------|-----------------|
-| Training Day Flow | [UF-003](UF-003_Training_Day_Flow.md) | Resume training schedule |
-| Skill Acquisition | [UF-005](UF-005_Skill_Management_Flow.md) | SP earned from race rewards |
-| Rest and Recovery | Rest action | Energy depleted from race |
-| Career Analysis | Analytics dashboard | Review performance trends |
+- **Flow**: Training Day Flow; **Document Reference**: [UF-003](UF-003_Training_Day_Flow.md); **Entry Condition**: Resume training schedule
+- **Flow**: Skill Acquisition; **Document Reference**: [UF-005](UF-005_Skill_Management_Flow.md); **Entry Condition**: SP earned from race rewards
+- **Flow**: Rest and Recovery; **Document Reference**: Rest action; **Entry Condition**: Energy depleted from race
+- **Flow**: Career Analysis; **Document Reference**: Analytics dashboard; **Entry Condition**: Review performance trends
 
 ### 8.2 Alternative Entry Points
 
-| Entry Point | Scenario | Flow Adjustment |
-|-------------|----------|-----------------|
-| Race Notification | Automatic race week alert | Skip calendar, go to race detail |
-| Training Interruption | Race week during training | Save training progress, enter race flow |
-| AI Suggestion | AI proactively suggests race | Pre-analyzed readiness displayed |
+- **Entry Point**: Race Notification; **Scenario**: Automatic race week alert; **Flow Adjustment**: Skip calendar, go to race detail
+- **Entry Point**: Training Interruption; **Scenario**: Race week during training; **Flow Adjustment**: Save training progress, enter race flow
+- **Entry Point**: AI Suggestion; **Scenario**: AI proactively suggests race; **Flow Adjustment**: Pre-analyzed readiness displayed
 
 ### 8.3 Integration Points
 
@@ -1075,31 +1045,31 @@ flowchart LR
         Strategy[Strategy Selection]
         Execution[Race Execution]
     end
-    
+
     subgraph ExternalServices[External Services]
         AIService[AI Advisory Service]
         StatService[Stat Calculation Service]
         RewardService[Reward Distribution Service]
         AnalyticsService[Analytics Service]
     end
-    
+
     subgraph DataLayer[Data Layer]
         RaceRepo[Race Repository]
         CareerRepo[Career Repository]
         HistoryRepo[Race History Repository]
     end
-    
+
     Analysis --> AIService
     Analysis --> StatService
-    
+
     Preparation --> AIService
-    
+
     Strategy --> AIService
-    
+
     Execution --> RewardService
     Execution --> CareerRepo
     Execution --> HistoryRepo
-    
+
     Execution --> AnalyticsService
 ```
 
@@ -1107,13 +1077,11 @@ flowchart LR
 
 ## Document Control
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 2.3.0 | 2026-02-22 | Development Team | Updated version and dates; no functional changes |
-| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server (Jan 2026); added track condition modifiers (Firm/Good/Soft/Heavy with Power/Speed/Stamina penalties); corrected aptitude bonuses (S=max grade with +5%/+10% bonuses, A=0% baseline); updated running style aptitude effects on Wit stat |
-| 2.1.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 architecture; added race analysis engine details, AI integration, readiness calculation, win probability formulas; comprehensive error handling and testing criteria |
-| 2.0.0 | 2026-01-14 | Development Team | Prior revision with basic flow |
-| 1.0.0 | 2026-01-03 | Development Team | Initial draft |
+- **Version**: 2.3.0; **Date**: 2026-02-22; **Author**: Development Team; **Changes**: Updated version and dates; no functional changes
+- **Version**: 2.2.0; **Date**: 2026-01-28; **Author**: Development Team; **Changes**: Updated with verified game mechanics from Global English Server (Jan 2026); added track condition modifiers (Firm/Good/Soft/Heavy with Power/Speed/Stamina penalties); corrected aptitude bonuses (S=max grade with +5%/+10% bonuses, A=0% baseline); updated running style aptitude effects on Wit stat
+- **Version**: 2.1.0; **Date**: 2026-01-24; **Author**: Development Team; **Changes**: Complete rewrite aligned with v2.0.0 architecture; added race analysis engine details, AI integration, readiness calculation, win probability formulas; comprehensive error handling and testing criteria
+- **Version**: 2.0.0; **Date**: 2026-01-14; **Author**: Development Team; **Changes**: Prior revision with basic flow
+- **Version**: 1.0.0; **Date**: 2026-01-03; **Author**: Development Team; **Changes**: Initial draft
 
 ---
 
@@ -1132,4 +1100,4 @@ flowchart LR
 
 ---
 
-*This user flow reflects the current race strategy system implementation as of version 2.3.0. For the latest updates, refer to the online documentation.*
+### This user flow reflects the current race strategy system implementation as of version 2.3.0. For the latest updates, refer to the online documentation
