@@ -26,14 +26,12 @@
 
 ### 1.1 Database Configuration
 
-| Property | Value |
-|----------|-------|
-| **Primary Database** | MySQL 8.0+ (InnoDB) |
-| **Cache/Queues** | Redis |
-| **ORM** | Laravel Eloquent |
-| **Charset** | `utf8mb4` |
-| **Collation** | `utf8mb4_unicode_ci` |
-| **Table Prefix** | `ucp_` |
+- **Property**: **Primary Database**; **Value**: MySQL 8.0+ (InnoDB)
+- **Property**: **Cache/Queues**; **Value**: Redis
+- **Property**: **ORM**; **Value**: Laravel Eloquent
+- **Property**: **Charset**; **Value**: `utf8mb4`
+- **Property**: **Collation**; **Value**: `utf8mb4_unicode_ci`
+- **Property**: **Table Prefix**; **Value**: `ucp_`
 
 ### 1.2 Schema Overview
 
@@ -87,85 +85,79 @@ mindmap
 
 ### 2.1 Domain Tables (UCP Prefix) — 30 Tables
 
-| Table | Purpose | Key Columns |
-|-------|---------|-------------|
-| `ucp_users` | Application users | uuid, name, email, preferences, accessibility_settings, ai_settings, mcp_settings |
-| `ucp_characters` | Character state | user_id, name, scenario_type, current_stats, energy_level, mood_status, goals |
-| `ucp_aptitudes` | Aptitude grades | character_id, distance_type, surface_type, running_style, grade |
-| `ucp_factors` | Inheritance factors | character_id, factor_type, star_level, source_parent |
-| `ucp_skills` | Skill catalog | skill_type, rarity, base_sp_cost, evolution_links, effects, status, name_en |
-| `ucp_skill_hints` | Hint tracking | character_id, skill_id, source_type, discount_percentage, is_used |
-| `ucp_skill_acquisitions` | Acquisition history | character_id, skill_id, career_id, final_sp_cost, is_evolution, is_active, hint_level, hint_count |
-| `ucp_skill_builds` | Skill build plans | user_id, name, skills (JSON), total_sp_cost |
-| `ucp_careers` | Career runs | character_id, scenario_type, status, current_turn, final_stats |
-| `ucp_training_sessions` | Training logs | career_id, turn_number, training_type, stat_gains, support_bonuses |
-| `ucp_races` | Race data | career_id, race_name, distance, surface, placement, rewards |
-| `ucp_events` | Game events | career_id, event_type, turn_number, choices, outcomes |
-| `ucp_support_cards` | Support card inventory | user_id, card_name, rarity, specialization, limit_break_level, external_source |
-| `ucp_support_card_definitions` | Canonical card metadata | card_name_jp, card_name_en, rarity, support_type, base_stats, skill_effects |
-| `ucp_character_support_cards` | Character-card pivot | character_id, support_card_id, bond_level |
-| `ucp_support_decks` | Deck configurations | user_id, name, description, card_ids (JSON), is_active |
-| `ucp_ai_conversations` | AI chat history | user_id, context_type, messages, model_used |
-| `ucp_conversation_messages` | Conversation messages | ai_conversation_id, role, content, token_count |
-| `ucp_chat_messages` | Chat messages | user_id, message, response, model_used |
-| `ucp_advisory_recommendations` | AI-generated recommendations | character_id, recommendation_type, content, confidence_score |
-| `ucp_mcp_servers` | MCP server configurations | name, command, args, enabled, health_status |
-| `ucp_mcp_agents` | MCP agent definitions | name, type, capabilities, configuration |
-| `ucp_mcp_tool_usages` | MCP tool tracking | tool_name, invocation_count, avg_latency, error_count |
-| `ucp_user_preferences` | User preferences | user_id, key, value, category |
-| `ucp_external_data` | External API data cache | api_source, endpoint, response_data, expires_at |
-| `ucp_ocr_extractions` | OCR results | user_id, image_path, extracted_data, confidence_score |
-| `ucp_ocr_extracted_skills` | OCR skill detection | ocr_extraction_id, skill_id, confidence_score |
-| `ucp_critical_alerts` | System critical alerts | alert_type, severity, message, resolved_at |
-| `ucp_prediction_accuracy` | Prediction tracking | prediction_type, predicted_value, actual_value, accuracy |
-| `ucp_run_snapshots` | Career run snapshots | career_id, turn_number, snapshot_data, created_at |
+- **Table**: `ucp_users`; **Purpose**: Application users; **Key Columns**: uuid, name, email, preferences, accessibility_settings, ai_settings, mcp_settings
+- **Table**: `ucp_characters`; **Purpose**: Character state; **Key Columns**: user_id, name, scenario_type, current_stats, energy_level, mood_status, goals
+- **Table**: `ucp_aptitudes`; **Purpose**: Aptitude grades; **Key Columns**: character_id, distance_type, surface_type, running_style, grade
+- **Table**: `ucp_factors`; **Purpose**: Inheritance factors; **Key Columns**: character_id, factor_type, star_level, source_parent
+- **Table**: `ucp_skills`; **Purpose**: Skill catalog; **Key Columns**: skill_type, rarity, base_sp_cost, evolution_links, effects, status, name_en
+- **Table**: `ucp_skill_hints`; **Purpose**: Hint tracking; **Key Columns**: character_id, skill_id, source_type, discount_percentage, is_used
+- **Table**: `ucp_skill_acquisitions`; **Purpose**: Acquisition history; **Key Columns**: character_id, skill_id, career_id, final_sp_cost, is_evolution, is_active, hint_level, hint_count
+- **Table**: `ucp_skill_builds`; **Purpose**: Skill build plans; **Key Columns**: user_id, name, skills (JSON), total_sp_cost
+- **Table**: `ucp_careers`; **Purpose**: Career runs; **Key Columns**: character_id, scenario_type, status, current_turn, final_stats
+- **Table**: `ucp_training_sessions`; **Purpose**: Training logs; **Key Columns**: career_id, turn_number, training_type, stat_gains, support_bonuses
+- **Table**: `ucp_races`; **Purpose**: Race data; **Key Columns**: career_id, race_name, distance, surface, placement, rewards
+- **Table**: `ucp_events`; **Purpose**: Game events; **Key Columns**: career_id, event_type, turn_number, choices, outcomes
+- **Table**: `ucp_support_cards`; **Purpose**: Support card inventory; **Key Columns**: user_id, card_name, rarity, specialization, limit_break_level, external_source
+- **Table**: `ucp_support_card_definitions`; **Purpose**: Canonical card metadata; **Key Columns**: card_name_jp, card_name_en, rarity, support_type, base_stats, skill_effects
+- **Table**: `ucp_character_support_cards`; **Purpose**: Character-card pivot; **Key Columns**: character_id, support_card_id, bond_level
+- **Table**: `ucp_support_decks`; **Purpose**: Deck configurations; **Key Columns**: user_id, name, description, card_ids (JSON), is_active
+- **Table**: `ucp_ai_conversations`; **Purpose**: AI chat history; **Key Columns**: user_id, context_type, messages, model_used
+- **Table**: `ucp_conversation_messages`; **Purpose**: Conversation messages; **Key Columns**: ai_conversation_id, role, content, token_count
+- **Table**: `ucp_chat_messages`; **Purpose**: Chat messages; **Key Columns**: user_id, message, response, model_used
+- **Table**: `ucp_advisory_recommendations`; **Purpose**: AI-generated recommendations; **Key Columns**: character_id, recommendation_type, content, confidence_score
+- **Table**: `ucp_mcp_servers`; **Purpose**: MCP server configurations; **Key Columns**: name, command, args, enabled, health_status
+- **Table**: `ucp_mcp_agents`; **Purpose**: MCP agent definitions; **Key Columns**: name, type, capabilities, configuration
+- **Table**: `ucp_mcp_tool_usages`; **Purpose**: MCP tool tracking; **Key Columns**: tool_name, invocation_count, avg_latency, error_count
+- **Table**: `ucp_user_preferences`; **Purpose**: User preferences; **Key Columns**: user_id, key, value, category
+- **Table**: `ucp_external_data`; **Purpose**: External API data cache; **Key Columns**: api_source, endpoint, response_data, expires_at
+- **Table**: `ucp_ocr_extractions`; **Purpose**: OCR results; **Key Columns**: user_id, image_path, extracted_data, confidence_score
+- **Table**: `ucp_ocr_extracted_skills`; **Purpose**: OCR skill detection; **Key Columns**: ocr_extraction_id, skill_id, confidence_score
+- **Table**: `ucp_critical_alerts`; **Purpose**: System critical alerts; **Key Columns**: alert_type, severity, message, resolved_at
+- **Table**: `ucp_prediction_accuracy`; **Purpose**: Prediction tracking; **Key Columns**: prediction_type, predicted_value, actual_value, accuracy
+- **Table**: `ucp_run_snapshots`; **Purpose**: Career run snapshots; **Key Columns**: career_id, turn_number, snapshot_data, created_at
 
 ### 2.2 Models (30 Total)
 
 The following Eloquent models map to the domain tables:
 
-| Model | Table | Purpose |
-|-------|-------|---------|
-| `AdvisoryRecommendation` | `ucp_advisory_recommendations` | AI-generated recommendations |
-| `AIConversation` | `ucp_ai_conversations` | AI chat history |
-| `Aptitude` | `ucp_aptitudes` | Aptitude grades |
-| `Career` | `ucp_careers` | Career runs |
-| `Character` | `ucp_characters` | Character state |
-| `CharacterSupportCard` | `ucp_character_support_cards` | Character-card pivot |
-| `ChatMessage` | `ucp_chat_messages` | Chat messages |
-| `ConversationMessage` | `ucp_conversation_messages` | Conversation messages |
-| `CriticalAlert` | `ucp_critical_alerts` | System critical alerts |
-| `Event` | `ucp_events` | Game events |
-| `ExternalData` | `ucp_external_data` | External API data cache |
-| `Factor` | `ucp_factors` | Inheritance factors |
-| `MCPAgent` | `ucp_mcp_agents` | MCP agent definitions |
-| `MCPServer` | `ucp_mcp_servers` | MCP server configurations |
-| `MCPToolUsage` | `ucp_mcp_tool_usages` | MCP tool tracking |
-| `OcrExtractedSkill` | `ucp_ocr_extracted_skills` | OCR skill detection |
-| `OCRExtraction` | `ucp_ocr_extractions` | OCR results |
-| `PredictionAccuracy` | `ucp_prediction_accuracy` | Prediction tracking |
-| `Race` | `ucp_races` | Race data |
-| `RunSnapshot` | `ucp_run_snapshots` | Career run snapshots |
-| `Skill` | `ucp_skills` | Skill catalog |
-| `SkillAcquisition` | `ucp_skill_acquisitions` | Acquisition history |
-| `SkillBuild` | `ucp_skill_builds` | Skill build plans |
-| `SkillHint` | `ucp_skill_hints` | Hint tracking |
-| `SupportCard` | `ucp_support_cards` | Support card inventory |
-| `SupportCardDefinition` | `ucp_support_card_definitions` | Canonical card metadata |
-| `SupportDeck` | `ucp_support_decks` | Deck configurations |
-| `TrainingSession` | `ucp_training_sessions` | Training logs |
-| `User` | `ucp_users` | Application users |
-| `UserPreference` | `ucp_user_preferences` | User preferences |
+- **Model**: `AdvisoryRecommendation`; **Table**: `ucp_advisory_recommendations`; **Purpose**: AI-generated recommendations
+- **Model**: `AIConversation`; **Table**: `ucp_ai_conversations`; **Purpose**: AI chat history
+- **Model**: `Aptitude`; **Table**: `ucp_aptitudes`; **Purpose**: Aptitude grades
+- **Model**: `Career`; **Table**: `ucp_careers`; **Purpose**: Career runs
+- **Model**: `Character`; **Table**: `ucp_characters`; **Purpose**: Character state
+- **Model**: `CharacterSupportCard`; **Table**: `ucp_character_support_cards`; **Purpose**: Character-card pivot
+- **Model**: `ChatMessage`; **Table**: `ucp_chat_messages`; **Purpose**: Chat messages
+- **Model**: `ConversationMessage`; **Table**: `ucp_conversation_messages`; **Purpose**: Conversation messages
+- **Model**: `CriticalAlert`; **Table**: `ucp_critical_alerts`; **Purpose**: System critical alerts
+- **Model**: `Event`; **Table**: `ucp_events`; **Purpose**: Game events
+- **Model**: `ExternalData`; **Table**: `ucp_external_data`; **Purpose**: External API data cache
+- **Model**: `Factor`; **Table**: `ucp_factors`; **Purpose**: Inheritance factors
+- **Model**: `MCPAgent`; **Table**: `ucp_mcp_agents`; **Purpose**: MCP agent definitions
+- **Model**: `MCPServer`; **Table**: `ucp_mcp_servers`; **Purpose**: MCP server configurations
+- **Model**: `MCPToolUsage`; **Table**: `ucp_mcp_tool_usages`; **Purpose**: MCP tool tracking
+- **Model**: `OcrExtractedSkill`; **Table**: `ucp_ocr_extracted_skills`; **Purpose**: OCR skill detection
+- **Model**: `OCRExtraction`; **Table**: `ucp_ocr_extractions`; **Purpose**: OCR results
+- **Model**: `PredictionAccuracy`; **Table**: `ucp_prediction_accuracy`; **Purpose**: Prediction tracking
+- **Model**: `Race`; **Table**: `ucp_races`; **Purpose**: Race data
+- **Model**: `RunSnapshot`; **Table**: `ucp_run_snapshots`; **Purpose**: Career run snapshots
+- **Model**: `Skill`; **Table**: `ucp_skills`; **Purpose**: Skill catalog
+- **Model**: `SkillAcquisition`; **Table**: `ucp_skill_acquisitions`; **Purpose**: Acquisition history
+- **Model**: `SkillBuild`; **Table**: `ucp_skill_builds`; **Purpose**: Skill build plans
+- **Model**: `SkillHint`; **Table**: `ucp_skill_hints`; **Purpose**: Hint tracking
+- **Model**: `SupportCard`; **Table**: `ucp_support_cards`; **Purpose**: Support card inventory
+- **Model**: `SupportCardDefinition`; **Table**: `ucp_support_card_definitions`; **Purpose**: Canonical card metadata
+- **Model**: `SupportDeck`; **Table**: `ucp_support_decks`; **Purpose**: Deck configurations
+- **Model**: `TrainingSession`; **Table**: `ucp_training_sessions`; **Purpose**: Training logs
+- **Model**: `User`; **Table**: `ucp_users`; **Purpose**: Application users
+- **Model**: `UserPreference`; **Table**: `ucp_user_preferences`; **Purpose**: User preferences
 
 ### 2.3 Supporting Tables
 
-| Table | Purpose |
-|-------|---------|
-| `sessions` | Laravel session storage |
-| `cache` | Laravel cache storage |
-| `jobs` | Queue job storage |
-| `failed_jobs` | Failed queue jobs |
-| `activity_log` | Audit trail (Spatie) |
+- **Table**: `sessions`; **Purpose**: Laravel session storage
+- **Table**: `cache`; **Purpose**: Laravel cache storage
+- **Table**: `jobs`; **Purpose**: Queue job storage
+- **Table**: `failed_jobs`; **Purpose**: Failed queue jobs
+- **Table**: `activity_log`; **Purpose**: Audit trail (Spatie)
 
 ---
 
@@ -181,11 +173,11 @@ erDiagram
     ucp_characters ||--o{ ucp_careers : runs
     ucp_characters ||--o{ ucp_skill_acquisitions : acquires
     ucp_characters ||--o{ ucp_support_decks : uses
-    
+
     ucp_careers ||--o{ ucp_training_sessions : logs
     ucp_skills ||--o{ ucp_skill_hints : provides
     ucp_skills ||--o{ ucp_skill_acquisitions : acquired_as
-    
+
     ucp_users ||--o{ ucp_support_cards : owns
     ucp_users ||--o{ ucp_ai_conversations : has
     ucp_users ||--o{ ucp_ocr_extractions : uploads
@@ -252,7 +244,7 @@ erDiagram
 erDiagram
     ucp_users ||--o{ ucp_ai_conversations : has
     ucp_characters ||--o{ ucp_advisory_recommendations : receives
-    
+
     ucp_ai_conversations {
         bigint id PK
         uuid user_id FK
@@ -303,38 +295,34 @@ erDiagram
 
 Extended user table with application-specific settings.
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | UUID | PK | Primary key |
-| `name` | String(255) | Not Null | Display name |
-| `email` | String(255) | Unique, Not Null | Login email |
-| `password` | String(255) | Not Null | Hashed password |
-| `preferences` | JSON | Nullable | UI preferences (dark_mode, language) |
-| `accessibility_settings` | JSON | Nullable | A11y settings (reduced_motion, font_size) |
-| `ai_settings` | JSON | Nullable | AI preferences (provider, model, cost_limit) |
-| `mcp_settings` | JSON | Nullable | MCP server preferences |
-| `email_verified_at` | Timestamp | Nullable | Verification timestamp |
-| `created_at` | Timestamp | - | Creation timestamp |
-| `updated_at` | Timestamp | - | Last update timestamp |
+- **Column**: `id`; **Type**: UUID; **Constraints**: PK; **Description**: Primary key
+- **Column**: `name`; **Type**: String(255); **Constraints**: Not Null; **Description**: Display name
+- **Column**: `email`; **Type**: String(255); **Constraints**: Unique, Not Null; **Description**: Login email
+- **Column**: `password`; **Type**: String(255); **Constraints**: Not Null; **Description**: Hashed password
+- **Column**: `preferences`; **Type**: JSON; **Constraints**: Nullable; **Description**: UI preferences (dark_mode, language)
+- **Column**: `accessibility_settings`; **Type**: JSON; **Constraints**: Nullable; **Description**: A11y settings (reduced_motion, font_size)
+- **Column**: `ai_settings`; **Type**: JSON; **Constraints**: Nullable; **Description**: AI preferences (provider, model, cost_limit)
+- **Column**: `mcp_settings`; **Type**: JSON; **Constraints**: Nullable; **Description**: MCP server preferences
+- **Column**: `email_verified_at`; **Type**: Timestamp; **Constraints**: Nullable; **Description**: Verification timestamp
+- **Column**: `created_at`; **Type**: Timestamp; **Constraints**: -; **Description**: Creation timestamp
+- **Column**: `updated_at`; **Type**: Timestamp; **Constraints**: -; **Description**: Last update timestamp
 
 ### 4.2 `ucp_characters`
 
 Character state tracking with stats and goals.
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | BigInt | PK, Auto | Primary key |
-| `user_id` | UUID | FK → ucp_users | Owner |
-| `name` | String(255) | Not Null | Character name |
-| `scenario_type` | Enum | Not Null | `ura_finale`, `unity_cup` |
-| `current_stats` | JSON | Not Null | {speed, stamina, power, guts, wit} |
-| `energy_level` | Int | 0-100 | Current energy |
-| `mood_status` | Enum | Not Null | `great`, `good`, `normal`, `bad`, `awful` |
-| `goals` | JSON | Nullable | Active goals array |
-| `conditions` | JSON | Nullable | Active conditions array |
-| `created_at` | Timestamp | - | Creation timestamp |
-| `updated_at` | Timestamp | - | Last update timestamp |
-| `deleted_at` | Timestamp | Nullable | Soft delete |
+- **Column**: `id`; **Type**: BigInt; **Constraints**: PK, Auto; **Description**: Primary key
+- **Column**: `user_id`; **Type**: UUID; **Constraints**: FK → ucp_users; **Description**: Owner
+- **Column**: `name`; **Type**: String(255); **Constraints**: Not Null; **Description**: Character name
+- **Column**: `scenario_type`; **Type**: Enum; **Constraints**: Not Null; **Description**: `ura_finale`, `unity_cup`
+- **Column**: `current_stats`; **Type**: JSON; **Constraints**: Not Null; **Description**: {speed, stamina, power, guts, wit}
+- **Column**: `energy_level`; **Type**: Int; **Constraints**: 0-100; **Description**: Current energy
+- **Column**: `mood_status`; **Type**: Enum; **Constraints**: Not Null; **Description**: `great`, `good`, `normal`, `bad`, `awful`
+- **Column**: `goals`; **Type**: JSON; **Constraints**: Nullable; **Description**: Active goals array
+- **Column**: `conditions`; **Type**: JSON; **Constraints**: Nullable; **Description**: Active conditions array
+- **Column**: `created_at`; **Type**: Timestamp; **Constraints**: -; **Description**: Creation timestamp
+- **Column**: `updated_at`; **Type**: Timestamp; **Constraints**: -; **Description**: Last update timestamp
+- **Column**: `deleted_at`; **Type**: Timestamp; **Constraints**: Nullable; **Description**: Soft delete
 
 **Stat Range**: 0-1200 (hard cap)
 
@@ -342,71 +330,63 @@ Character state tracking with stats and goals.
 
 Skill catalog with evolution tracking.
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | BigInt | PK, Auto | Primary key |
-| `name` | String(255) | Not Null | English name |
-| `name_jp` | String(255) | Nullable | Japanese name |
-| `skill_type` | Enum | Not Null | `speed`, `stamina`, `power`, `guts`, `wit`, `unique`, `recovery` |
-| `rarity` | Enum | Not Null | `normal`, `rare`, `unique` |
-| `base_sp_cost` | Int | Not Null | Base SP cost |
-| `evolution_from_id` | BigInt | FK → ucp_skills, Nullable | Source skill for evolution |
-| `evolution_links` | JSON | Nullable | Evolution path data |
-| `effects` | JSON | Nullable | Skill effects description |
-| `activation_conditions` | JSON | Nullable | Trigger conditions |
+- **Column**: `id`; **Type**: BigInt; **Constraints**: PK, Auto; **Description**: Primary key
+- **Column**: `name`; **Type**: String(255); **Constraints**: Not Null; **Description**: English name
+- **Column**: `name_jp`; **Type**: String(255); **Constraints**: Nullable; **Description**: Japanese name
+- **Column**: `skill_type`; **Type**: Enum; **Constraints**: Not Null; **Description**: `speed`, `stamina`, `power`, `guts`, `wit`, `unique`, `recovery`
+- **Column**: `rarity`; **Type**: Enum; **Constraints**: Not Null; **Description**: `normal`, `rare`, `unique`
+- **Column**: `base_sp_cost`; **Type**: Int; **Constraints**: Not Null; **Description**: Base SP cost
+- **Column**: `evolution_from_id`; **Type**: BigInt; **Constraints**: FK → ucp_skills, Nullable; **Description**: Source skill for evolution
+- **Column**: `evolution_links`; **Type**: JSON; **Constraints**: Nullable; **Description**: Evolution path data
+- **Column**: `effects`; **Type**: JSON; **Constraints**: Nullable; **Description**: Skill effects description
+- **Column**: `activation_conditions`; **Type**: JSON; **Constraints**: Nullable; **Description**: Trigger conditions
 
 ### 4.4 `ucp_training_sessions`
 
 Training session logs with predictions.
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | BigInt | PK, Auto | Primary key |
-| `career_id` | BigInt | FK → ucp_careers | Parent career |
-| `turn_number` | Int | 1-78 | Turn number |
-| `training_type` | Enum | Not Null | `speed`, `stamina`, `power`, `guts`, `wit`, `rest` |
-| `stat_gains` | JSON | Not Null | {speed, stamina, power, guts, wit} |
-| `support_bonuses` | JSON | Nullable | Applied support card bonuses |
-| `skill_hints_gained` | JSON | Nullable | Hints received |
-| `success_rate` | Float | 0-100 | Predicted success rate |
-| `was_successful` | Boolean | Default true | Actual outcome |
-| `energy_delta` | Int | - | Energy change |
-| `mood_change` | Enum | Nullable | Mood transition |
-| `created_at` | Timestamp | - | Session timestamp |
+- **Column**: `id`; **Type**: BigInt; **Constraints**: PK, Auto; **Description**: Primary key
+- **Column**: `career_id`; **Type**: BigInt; **Constraints**: FK → ucp_careers; **Description**: Parent career
+- **Column**: `turn_number`; **Type**: Int; **Constraints**: 1-78; **Description**: Turn number
+- **Column**: `training_type`; **Type**: Enum; **Constraints**: Not Null; **Description**: `speed`, `stamina`, `power`, `guts`, `wit`, `rest`
+- **Column**: `stat_gains`; **Type**: JSON; **Constraints**: Not Null; **Description**: {speed, stamina, power, guts, wit}
+- **Column**: `support_bonuses`; **Type**: JSON; **Constraints**: Nullable; **Description**: Applied support card bonuses
+- **Column**: `skill_hints_gained`; **Type**: JSON; **Constraints**: Nullable; **Description**: Hints received
+- **Column**: `success_rate`; **Type**: Float; **Constraints**: 0-100; **Description**: Predicted success rate
+- **Column**: `was_successful`; **Type**: Boolean; **Constraints**: Default true; **Description**: Actual outcome
+- **Column**: `energy_delta`; **Type**: Int; **Constraints**: -; **Description**: Energy change
+- **Column**: `mood_change`; **Type**: Enum; **Constraints**: Nullable; **Description**: Mood transition
+- **Column**: `created_at`; **Type**: Timestamp; **Constraints**: -; **Description**: Session timestamp
 
 ### 4.5 `ucp_ai_conversations`
 
 AI conversation history for context persistence.
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | BigInt | PK, Auto | Primary key |
-| `user_id` | UUID | FK → ucp_users | Owner |
-| `context_type` | Enum | Not Null | `training`, `race`, `skill`, `career`, `general` |
-| `context_id` | BigInt | Nullable | Related entity ID |
-| `messages` | JSON | Not Null | Conversation messages array |
-| `model_used` | String(100) | Not Null | AI model identifier |
-| `provider` | Enum | Not Null | `ollama`, `bedrock` |
-| `token_count` | Int | Default 0 | Total tokens used |
-| `cost_usd` | Decimal(10,6) | Default 0 | Estimated cost |
-| `created_at` | Timestamp | - | Start timestamp |
-| `updated_at` | Timestamp | - | Last message timestamp |
+- **Column**: `id`; **Type**: BigInt; **Constraints**: PK, Auto; **Description**: Primary key
+- **Column**: `user_id`; **Type**: UUID; **Constraints**: FK → ucp_users; **Description**: Owner
+- **Column**: `context_type`; **Type**: Enum; **Constraints**: Not Null; **Description**: `training`, `race`, `skill`, `career`, `general`
+- **Column**: `context_id`; **Type**: BigInt; **Constraints**: Nullable; **Description**: Related entity ID
+- **Column**: `messages`; **Type**: JSON; **Constraints**: Not Null; **Description**: Conversation messages array
+- **Column**: `model_used`; **Type**: String(100); **Constraints**: Not Null; **Description**: AI model identifier
+- **Column**: `provider`; **Type**: Enum; **Constraints**: Not Null; **Description**: `ollama`, `bedrock`
+- **Column**: `token_count`; **Type**: Int; **Constraints**: Default 0; **Description**: Total tokens used
+- **Column**: `cost_usd`; **Type**: Decimal(10,6); **Constraints**: Default 0; **Description**: Estimated cost
+- **Column**: `created_at`; **Type**: Timestamp; **Constraints**: -; **Description**: Start timestamp
+- **Column**: `updated_at`; **Type**: Timestamp; **Constraints**: -; **Description**: Last message timestamp
 
 ### 4.6 `ucp_mcp_tool_usages`
 
 MCP tool usage metrics for monitoring.
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | BigInt | PK, Auto | Primary key |
-| `tool_name` | String(100) | Not Null | Tool identifier |
-| `server_name` | String(100) | Not Null | MCP server name |
-| `invocation_count` | Int | Default 0 | Daily invocation count |
-| `success_count` | Int | Default 0 | Successful invocations |
-| `error_count` | Int | Default 0 | Failed invocations |
-| `avg_latency_ms` | Float | Nullable | Average response time |
-| `total_tokens` | Int | Default 0 | Tokens consumed |
-| `usage_date` | Date | Not Null | Aggregation date |
+- **Column**: `id`; **Type**: BigInt; **Constraints**: PK, Auto; **Description**: Primary key
+- **Column**: `tool_name`; **Type**: String(100); **Constraints**: Not Null; **Description**: Tool identifier
+- **Column**: `server_name`; **Type**: String(100); **Constraints**: Not Null; **Description**: MCP server name
+- **Column**: `invocation_count`; **Type**: Int; **Constraints**: Default 0; **Description**: Daily invocation count
+- **Column**: `success_count`; **Type**: Int; **Constraints**: Default 0; **Description**: Successful invocations
+- **Column**: `error_count`; **Type**: Int; **Constraints**: Default 0; **Description**: Failed invocations
+- **Column**: `avg_latency_ms`; **Type**: Float; **Constraints**: Nullable; **Description**: Average response time
+- **Column**: `total_tokens`; **Type**: Int; **Constraints**: Default 0; **Description**: Tokens consumed
+- **Column**: `usage_date`; **Type**: Date; **Constraints**: Not Null; **Description**: Aggregation date
 
 **Index**: `UNIQUE(tool_name, server_name, usage_date)`
 
@@ -421,7 +401,7 @@ flowchart TD
     subgraph Primary["Primary Indexes"]
         PK["Primary Keys<br/>(All tables)"]
     end
-    
+
     subgraph Foreign["Foreign Key Indexes"]
         FK1["characters.user_id"]
         FK2["careers.character_id"]
@@ -429,39 +409,35 @@ flowchart TD
         FK4["skill_acquisitions.character_id"]
         FK5["ai_conversations.user_id"]
     end
-    
+
     subgraph Query["Query Optimization"]
         Q1["characters(user_id, scenario_type)"]
         Q2["training_sessions(career_id, turn_number)"]
         Q3["external_api_cache(cache_key, expires_at)"]
         Q4["mcp_tool_usage(usage_date)"]
     end
-    
+
     PK --> Foreign
     Foreign --> Query
 ```
 
 ### 5.2 Index Definitions
 
-| Table | Index Name | Columns | Purpose |
-|-------|------------|---------|---------|
-| `ucp_characters` | `idx_user_scenario` | `user_id`, `scenario_type` | User character filtering |
-| `ucp_careers` | `idx_character_status` | `character_id`, `status` | Career lookup |
-| `ucp_training_sessions` | `idx_career_turn` | `career_id`, `turn_number` | Turn history |
-| `ucp_skill_acquisitions` | `idx_character_active` | `character_id`, `is_active` | Active skills |
-| `ucp_ai_conversations` | `idx_user_context` | `user_id`, `context_type` | Conversation lookup |
-| `ucp_external_data` | `idx_cache_expiry` | `cache_key`, `expires_at` | Cache retrieval |
-| `ucp_mcp_tool_usages` | `idx_tool_date` | `tool_name`, `usage_date` | Usage aggregation |
+- **Table**: `ucp_characters`; **Index Name**: `idx_user_scenario`; **Columns**: `user_id`, `scenario_type`; **Purpose**: User character filtering
+- **Table**: `ucp_careers`; **Index Name**: `idx_character_status`; **Columns**: `character_id`, `status`; **Purpose**: Career lookup
+- **Table**: `ucp_training_sessions`; **Index Name**: `idx_career_turn`; **Columns**: `career_id`, `turn_number`; **Purpose**: Turn history
+- **Table**: `ucp_skill_acquisitions`; **Index Name**: `idx_character_active`; **Columns**: `character_id`, `is_active`; **Purpose**: Active skills
+- **Table**: `ucp_ai_conversations`; **Index Name**: `idx_user_context`; **Columns**: `user_id`, `context_type`; **Purpose**: Conversation lookup
+- **Table**: `ucp_external_data`; **Index Name**: `idx_cache_expiry`; **Columns**: `cache_key`, `expires_at`; **Purpose**: Cache retrieval
+- **Table**: `ucp_mcp_tool_usages`; **Index Name**: `idx_tool_date`; **Columns**: `tool_name`, `usage_date`; **Purpose**: Usage aggregation
 
 ### 5.3 Query Performance Targets
 
-| Operation | Target | Notes |
-|-----------|--------|-------|
-| Character list (paginated) | < 100ms | User-scoped with eager loading |
-| Training prediction | < 200ms | With caching |
-| AI conversation load | < 150ms | Last 10 messages |
-| External API cache hit | < 50ms | Redis-backed |
-| MCP tool lookup | < 30ms | In-memory after first load |
+- **Operation**: Character list (paginated); **Target**: < 100ms; **Notes**: User-scoped with eager loading
+- **Operation**: Training prediction; **Target**: < 200ms; **Notes**: With caching
+- **Operation**: AI conversation load; **Target**: < 150ms; **Notes**: Last 10 messages
+- **Operation**: External API cache hit; **Target**: < 50ms; **Notes**: Redis-backed
+- **Operation**: MCP tool lookup; **Target**: < 30ms; **Notes**: In-memory after first load
 
 ---
 
@@ -472,31 +448,29 @@ flowchart TD
 ```mermaid
 flowchart TD
     ucp_users["ucp_users<br/>(Soft Delete)"]
-    
+
     ucp_users -->|"CASCADE"| ucp_characters["ucp_characters"]
     ucp_users -->|"CASCADE"| ucp_support_cards["ucp_support_cards"]
     ucp_users -->|"CASCADE"| ucp_ai_conversations["ucp_ai_conversations"]
     ucp_users -->|"SET NULL"| ucp_ocr_extractions["ucp_ocr_extractions"]
-    
+
     ucp_characters -->|"CASCADE"| ucp_careers["ucp_careers"]
     ucp_characters -->|"CASCADE"| ucp_aptitudes["ucp_aptitudes"]
     ucp_characters -->|"CASCADE"| ucp_factors["ucp_factors"]
     ucp_characters -->|"CASCADE"| ucp_skill_acquisitions["ucp_skill_acquisitions"]
-    
+
     ucp_careers -->|"CASCADE"| ucp_training_sessions["ucp_training_sessions"]
 ```
 
 ### 6.2 Relationship Summary
 
-| Parent | Child | On Delete | Notes |
-|--------|-------|-----------|-------|
-| `ucp_users` | `ucp_characters` | CASCADE | User deletion removes characters |
-| `ucp_users` | `ucp_ai_conversations` | CASCADE | Conversations tied to user |
-| `ucp_characters` | `ucp_careers` | CASCADE | Character deletion removes careers |
-| `ucp_characters` | `ucp_skill_acquisitions` | CASCADE | Skills tied to character |
-| `ucp_careers` | `ucp_training_sessions` | CASCADE | Sessions tied to career |
-| `ucp_skills` | `ucp_skill_acquisitions` | RESTRICT | Cannot delete referenced skills |
-| `ucp_support_cards` | `ucp_support_decks` | RESTRICT | Cannot delete cards in use |
+- **Parent**: `ucp_users`; **Child**: `ucp_characters`; **On Delete**: CASCADE; **Notes**: User deletion removes characters
+- **Parent**: `ucp_users`; **Child**: `ucp_ai_conversations`; **On Delete**: CASCADE; **Notes**: Conversations tied to user
+- **Parent**: `ucp_characters`; **Child**: `ucp_careers`; **On Delete**: CASCADE; **Notes**: Character deletion removes careers
+- **Parent**: `ucp_characters`; **Child**: `ucp_skill_acquisitions`; **On Delete**: CASCADE; **Notes**: Skills tied to character
+- **Parent**: `ucp_careers`; **Child**: `ucp_training_sessions`; **On Delete**: CASCADE; **Notes**: Sessions tied to career
+- **Parent**: `ucp_skills`; **Child**: `ucp_skill_acquisitions`; **On Delete**: RESTRICT; **Notes**: Cannot delete referenced skills
+- **Parent**: `ucp_support_cards`; **Child**: `ucp_support_decks`; **On Delete**: RESTRICT; **Notes**: Cannot delete cards in use
 
 ---
 
@@ -519,16 +493,16 @@ flowchart LR
     M2 --> M4["4. ucp_factors"]
     M2 --> M5["5. ucp_careers"]
     M5 --> M6["6. ucp_training_sessions"]
-    
+
     M7["7. ucp_skills"] --> M8["8. ucp_skill_hints"]
     M7 --> M9["9. ucp_skill_acquisitions"]
-    
+
     M1 --> M10["10. ucp_support_cards"]
     M2 --> M11["11. ucp_support_decks"]
-    
+
     M1 --> M12["12. ucp_ai_conversations"]
     M2 --> M13["13. ucp_ai_recommendations"]
-    
+
     M14["14. ucp_mcp_tool_usages"]
     M15["15. ucp_external_data"]
     M16["16. ucp_ocr_extractions"]
@@ -545,13 +519,11 @@ flowchart LR
 
 ## Document Control
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 2.4.0 | 2026-02-22 | Development Team | Corrected all 30 table names to match actual migrations (ucp_mcp_tool_usages, ucp_advisory_recommendations, ucp_external_data, ucp_critical_alerts, ucp_prediction_accuracy, ucp_run_snapshots), added missing tables to Section 2.1, 51 migrations total |
-| 2.3.0 | 2026-02-21 | Development Team | Added complete 30-model catalog, updated schema mindmap with all tables, version alignment to v2.3.0 |
-| 2.1.0 | 2026-01-23 | Development Team | Updated schema to match current implementation, added AI/MCP tables |
-| 2.0.0 | 2026-01-14 | Development Team | Prior revision with base schema |
+- **Version**: 2.4.0; **Date**: 2026-02-22; **Author**: Development Team; **Changes**: Corrected all 30 table names to match actual migrations (ucp_mcp_tool_usages, ucp_advisory_recommendations, ucp_external_data, ucp_critical_alerts, ucp_prediction_accuracy, ucp_run_snapshots), added missing tables to Section 2.1, 51 migrations total
+- **Version**: 2.3.0; **Date**: 2026-02-21; **Author**: Development Team; **Changes**: Added complete 30-model catalog, updated schema mindmap with all tables, version alignment to v2.3.0
+- **Version**: 2.1.0; **Date**: 2026-01-23; **Author**: Development Team; **Changes**: Updated schema to match current implementation, added AI/MCP tables
+- **Version**: 2.0.0; **Date**: 2026-01-14; **Author**: Development Team; **Changes**: Prior revision with base schema
 
 ---
 
-*This document reflects the current database schema across 51 migrations and is aligned with the 30 Eloquent models.*
+### This document reflects the current database schema across 51 migrations and is aligned with the 30 Eloquent models
