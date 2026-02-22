@@ -2,10 +2,10 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.4.0  
-**Date**: February 22, 2026  
-**Project**: UmamusumeCareerPlanner  
-**Author**: Development Team  
+**Document Version**: 2.4.0
+**Date**: February 22, 2026
+**Project**: UmamusumeCareerPlanner
+**Author**: Development Team
 **Status**: Current - Aligned with codebase v2.4.0 and game-accurate mechanics
 
 ---
@@ -82,26 +82,22 @@ mindmap
 
 ### 1.3 Key Features
 
-| Feature | Description |
-|---------|-------------|
-| **Character State Management** | Complete tracking of Speed, Stamina, Power, Guts, and Wit stats with aptitude grades and factor inheritance |
-| **Training Prediction Engine** | AI-powered predictions for stat gains, risk assessment, and optimal training recommendations |
-| **Race Preparation & Strategy** | Comprehensive race planning with readiness scores, win probability, and running style optimization |
-| **Skill Management** | Full skill catalog with hint tracking, SP cost reduction, and evolution path planning |
-| **Support Card Configuration** | 6-card deck building with synergy analysis, bond tracking, and meta tier integration |
-| **AI Advisory System** | Hybrid AI using local Ollama and AWS Bedrock Claude models for intelligent recommendations |
-| **Dual Storage Modes** | Flexible storage with Local (browser) or Account (cloud) options |
-| **External Integration** | Real-time data sync with umapyoi.net, OCR screenshot processing, and community tools |
+- **Feature**: **Character State Management**; **Description**: Complete tracking of Speed, Stamina, Power, Guts, and Wit stats with aptitude grades and factor inheritance
+- **Feature**: **Training Prediction Engine**; **Description**: AI-powered predictions for stat gains, risk assessment, and optimal training recommendations
+- **Feature**: **Race Preparation & Strategy**; **Description**: Comprehensive race planning with readiness scores, win probability, and running style optimization
+- **Feature**: **Skill Management**; **Description**: Full skill catalog with hint tracking, SP cost reduction, and evolution path planning
+- **Feature**: **Support Card Configuration**; **Description**: 6-card deck building with synergy analysis, bond tracking, and meta tier integration
+- **Feature**: **AI Advisory System**; **Description**: Hybrid AI using local Ollama and AWS Bedrock Claude models for intelligent recommendations
+- **Feature**: **Dual Storage Modes**; **Description**: Flexible storage with Local (browser) or Account (cloud) options
+- **Feature**: **External Integration**; **Description**: Real-time data sync with umapyoi.net, OCR screenshot processing, and community tools
 
 ### 1.4 System Requirements
 
-| Component | Requirement |
-|-----------|-------------|
-| **Browser** | Chrome, Firefox, Safari, or Edge (last 2 versions) |
-| **Screen Resolution** | Minimum 320px width, optimized up to 2560px |
-| **JavaScript** | Enabled |
-| **localStorage** | 5-10MB available for Local mode |
-| **Internet** | Required for Account mode; optional for Local mode |
+- **Component**: **Browser**; **Requirement**: Chrome, Firefox, Safari, or Edge (last 2 versions)
+- **Component**: **Screen Resolution**; **Requirement**: Minimum 320px width, optimized up to 2560px
+- **Component**: **JavaScript**; **Requirement**: Enabled
+- **Component**: **localStorage**; **Requirement**: 5-10MB available for Local mode
+- **Component**: **Internet**; **Requirement**: Required for Account mode; optional for Local mode
 
 ---
 
@@ -148,21 +144,19 @@ flowchart TB
         L3["Works offline"]
         L4["Risk: Browser cache clear"]
     end
-    
+
     subgraph Account["🟣 Account Mode"]
         A1["Login required"]
         A2["Cloud sync"]
         A3["Access anywhere"]
         A4["Secure backup"]
     end
-    
+
     Local -->|"Convert"| Account
 ```
 
-| Mode | Pros | Cons | Best For |
-|------|------|------|----------|
-| **Local** | Instant start, no account needed, works offline | Data stays on this browser/device only | Quick tests, anonymous usage |
-| **Account** | Cross-device sync, secure cloud backup | Requires internet connection | Long-term tracking, multi-device access |
+- **Mode**: **Local**; **Pros**: Instant start, no account needed, works offline; **Cons**: Data stays on this browser/device only; **Best For**: Quick tests, anonymous usage
+- **Mode**: **Account**; **Pros**: Cross-device sync, secure cloud backup; **Cons**: Requires internet connection; **Best For**: Long-term tracking, multi-device access
 
 > **Tip:** You can start in Local Mode and convert your plans to Account Mode later!
 
@@ -194,32 +188,28 @@ flowchart TB
 
 ### 3.2 Dashboard Components
 
-| Component | Description |
-|-----------|-------------|
-| **Stats Panel** | Current character stats with grade indicators (Speed, Stamina, Power, Guts, Wit) |
-| **Goals Progress** | Active goals with progress bars and completion status |
-| **Upcoming Races** | Next 3 races with date, grade, and readiness percentage |
-| **Training Suggestions** | Top 3 recommended training options with gains and risk |
-| **Mood/Energy Widget** | Current mood status and energy level |
-| **AI Advisor Card** | Latest AI recommendation with quick action buttons |
+- **Component**: **Stats Panel**; **Description**: Current character stats with grade indicators (Speed, Stamina, Power, Guts, Wit)
+- **Component**: **Goals Progress**; **Description**: Active goals with progress bars and completion status
+- **Component**: **Upcoming Races**; **Description**: Next 3 races with date, grade, and readiness percentage
+- **Component**: **Training Suggestions**; **Description**: Top 3 recommended training options with gains and risk
+- **Component**: **Mood/Energy Widget**; **Description**: Current mood status and energy level
+- **Component**: **AI Advisor Card**; **Description**: Latest AI recommendation with quick action buttons
 
 ### 3.3 Navigation
 
-| Navigation Item | Route | Description |
-|-----------------|-------|-------------|
-| Dashboard | `/dashboard` | Main overview and stats |
-| Character | `/characters` | Character management |
-| Training | `/characters/{id}/training` | Training selection and predictions |
-| Races | `/races` | Race calendar and strategy |
-| Skills | `/skills` | Skill catalog and management |
-| Support Cards | `/support-cards` | Card collection and deck building |
-| AI Advisor | `/ai-advisor` | AI-powered recommendations |
-| MCP Monitoring | `/mcp-monitoring` | MCP server and agent monitoring |
-| Performance | `/performance` | System performance dashboard |
-| Admin Panel | `/admin` | System administration (admin users) |
-| OCR Upload | `/ocr` | Screenshot data extraction |
-| Data Management | `/data-management` | Import, export, backup, and migration |
-| Settings | `/settings` | User preferences and configuration |
+- **Navigation Item**: Dashboard; **Route**: `/dashboard`; **Description**: Main overview and stats
+- **Navigation Item**: Character; **Route**: `/characters`; **Description**: Character management
+- **Navigation Item**: Training; **Route**: `/characters/{id}/training`; **Description**: Training selection and predictions
+- **Navigation Item**: Races; **Route**: `/races`; **Description**: Race calendar and strategy
+- **Navigation Item**: Skills; **Route**: `/skills`; **Description**: Skill catalog and management
+- **Navigation Item**: Support Cards; **Route**: `/support-cards`; **Description**: Card collection and deck building
+- **Navigation Item**: AI Advisor; **Route**: `/ai-advisor`; **Description**: AI-powered recommendations
+- **Navigation Item**: MCP Monitoring; **Route**: `/mcp-monitoring`; **Description**: MCP server and agent monitoring
+- **Navigation Item**: Performance; **Route**: `/performance`; **Description**: System performance dashboard
+- **Navigation Item**: Admin Panel; **Route**: `/admin`; **Description**: System administration (admin users)
+- **Navigation Item**: OCR Upload; **Route**: `/ocr`; **Description**: Screenshot data extraction
+- **Navigation Item**: Data Management; **Route**: `/data-management`; **Description**: Import, export, backup, and migration
+- **Navigation Item**: Settings; **Route**: `/settings`; **Description**: User preferences and configuration
 
 ---
 
@@ -267,13 +257,10 @@ flowchart LR
 - Preview inherited stat bonuses and factor ratings
 - View growth rate projections
 
-**Factor Ratings:**
-
-| Rating | Stat Bonus |
-|--------|------------|
-| ★☆☆ | +5 |
-| ★★☆ | +12 |
-| ★★★ | +21 |
+### Factor Ratings
+- **Rating**: ★☆☆; **Stat Bonus**: +5
+- **Rating**: ★★☆; **Stat Bonus**: +12
+- **Rating**: ★★★; **Stat Bonus**: +21
 
 #### Step 3: Support Deck Configuration
 
@@ -317,54 +304,42 @@ View and manage your character's current state:
 
 ### 4.3 Stat System
 
-**Stat Types and Ranges:**
+### Stat Types and Ranges
+- **Stat**: Speed; **Description**: Maximum running speed; **Range**: 0-1200; **Priority**: ★★★★★
+- **Stat**: Stamina; **Description**: HP and effective stamina; **Range**: 0-1200; **Priority**: ★★★★
+- **Stat**: Power; **Description**: Acceleration and lane-changing; **Range**: 0-1200; **Priority**: ★★★
+- **Stat**: Guts; **Description**: Last spurt and stamina consumption; **Range**: 0-1200; **Priority**: ★
+- **Stat**: Wit; **Description**: Skill activation rate; **Range**: 0-1200; **Priority**: ★★
 
-| Stat | Description | Range | Priority |
-|------|-------------|-------|----------|
-| Speed | Maximum running speed | 0-1200 | ★★★★★ |
-| Stamina | HP and effective stamina | 0-1200 | ★★★★ |
-| Power | Acceleration and lane-changing | 0-1200 | ★★★ |
-| Guts | Last spurt and stamina consumption | 0-1200 | ★ |
-| Wit | Skill activation rate | 0-1200 | ★★ |
-
-**Grade Scale:**
-
-| Grade | Value Range |
-|-------|-------------|
-| SS | 1100+ |
-| S | 950-1099 |
-| A | 850-949 |
-| B+ | 750-849 |
-| B | 650-749 |
-| C+ | 550-649 |
-| C | 450-549 |
-| D+ | 350-449 |
-| D | 250-349 |
-| E | 150-249 |
-| F | 0-149 |
+### Grade Scale
+- **Grade**: SS; **Value Range**: 1100+
+- **Grade**: S; **Value Range**: 950-1099
+- **Grade**: A; **Value Range**: 850-949
+- **Grade**: B+; **Value Range**: 750-849
+- **Grade**: B; **Value Range**: 650-749
+- **Grade**: C+; **Value Range**: 550-649
+- **Grade**: C; **Value Range**: 450-549
+- **Grade**: D+; **Value Range**: 350-449
+- **Grade**: D; **Value Range**: 250-349
+- **Grade**: E; **Value Range**: 150-249
+- **Grade**: F; **Value Range**: 0-149
 
 ### 4.4 Aptitude System
 
-**Aptitude Categories:**
+### Aptitude Categories
+- **Category**: Distance; **Types**: Sprint (1000-1400m), Mile (1401-1800m), Medium (1801-2400m), Long (2401m+)
+- **Category**: Surface; **Types**: Turf, Dirt
+- **Category**: Running Style; **Types**: Front Runner (Nige), Pace Chaser (Senkou), Late Surger (Sashi), End Closer (Oikomi)
 
-| Category | Types |
-|----------|-------|
-| Distance | Sprint (1000-1400m), Mile (1401-1800m), Medium (1801-2400m), Long (2401m+) |
-| Surface | Turf, Dirt |
-| Running Style | Front Runner (Nige), Pace Chaser (Senkou), Late Surger (Sashi), End Closer (Oikomi) |
-
-**Aptitude Ratings & Effectiveness:**
-
-| Rating | Effectiveness | Notes |
-|--------|---------------|-------|
-| S | +5% | Maximum grade (provides positive bonus) |
-| A | 0% | Baseline (no bonus/penalty) |
-| B | -10% | Slight penalty |
-| C | -20% | Moderate penalty |
-| D | -30%/-40% | Significant penalty (varies by category) |
-| E | -50%/-60% | Major penalty |
-| F | -70%/-80% | Severe penalty |
-| G | -90% | Minimum grade |
+### Aptitude Ratings & Effectiveness
+- **Rating**: S; **Effectiveness**: +5%; **Notes**: Maximum grade (provides positive bonus)
+- **Rating**: A; **Effectiveness**: 0%; **Notes**: Baseline (no bonus/penalty)
+- **Rating**: B; **Effectiveness**: -10%; **Notes**: Slight penalty
+- **Rating**: C; **Effectiveness**: -20%; **Notes**: Moderate penalty
+- **Rating**: D; **Effectiveness**: -30%/-40%; **Notes**: Significant penalty (varies by category)
+- **Rating**: E; **Effectiveness**: -50%/-60%; **Notes**: Major penalty
+- **Rating**: F; **Effectiveness**: -70%/-80%; **Notes**: Severe penalty
+- **Rating**: G; **Effectiveness**: -90%; **Notes**: Minimum grade
 
 > **Note**: S is the maximum aptitude grade. SS does NOT exist in the current game version. Only S-rank provides positive bonuses; all grades below A incur penalties.
 
@@ -381,12 +356,10 @@ flowchart LR
     C --> D[URA Finals<br/>Turns 73-78]
 ```
 
-| Stage | Turn Range | Description |
-|-------|------------|-------------|
-| Junior | 1-24 | Early training and foundation building |
-| Classic | 25-48 | Competitive racing and skill development |
-| Senior | 49-72 | Peak performance and championship preparation |
-| URA Finals | 73-78 | Final championship races |
+- **Stage**: Junior; **Turn Range**: 1-24; **Description**: Early training and foundation building
+- **Stage**: Classic; **Turn Range**: 25-48; **Description**: Competitive racing and skill development
+- **Stage**: Senior; **Turn Range**: 49-72; **Description**: Peak performance and championship preparation
+- **Stage**: URA Finals; **Turn Range**: 73-78; **Description**: Final championship races
 
 ### 5.2 Turn Progression
 
@@ -409,14 +382,11 @@ flowchart TD
 
 Set and track training objectives:
 
-| Goal Type | Description | Example |
-|-----------|-------------|---------|
-| Stat Target | Reach specific stat value | Speed ≥ 800 |
-| Race Win | Achieve placement in race | Win G1 Race |
-| Skill Acquisition | Obtain specific skills | Acquire 9 skills |
+- **Goal Type**: Stat Target; **Description**: Reach specific stat value; **Example**: Speed ≥ 800
+- **Goal Type**: Race Win; **Description**: Achieve placement in race; **Example**: Win G1 Race
+- **Goal Type**: Skill Acquisition; **Description**: Obtain specific skills; **Example**: Acquire 9 skills
 
-**Goal Status:**
-
+### Goal Status
 - ✅ **Completed** - Goal achieved
 - 🟡 **On Track** - Progress within expected range
 - 🔴 **At Risk** - Behind schedule, intervention needed
@@ -466,14 +436,12 @@ Set and track training objectives:
 
 ### 6.2 Training Types
 
-| Training | Primary Stat | Secondary Stats | Energy Cost |
-|----------|--------------|-----------------|-------------|
-| Speed | Speed | Stamina | 20-30% |
-| Stamina | Stamina | Guts | 20-30% |
-| Power | Power | Stamina | 20-30% |
-| Guts | Guts | Power | 20-30% |
-| Wisdom | Wit | Skill Points | 15-25% |
-| Rest | - | Energy Recovery | -50% |
+- **Training**: Speed; **Primary Stat**: Speed; **Secondary Stats**: Stamina; **Energy Cost**: 20-30%
+- **Training**: Stamina; **Primary Stat**: Stamina; **Secondary Stats**: Guts; **Energy Cost**: 20-30%
+- **Training**: Power; **Primary Stat**: Power; **Secondary Stats**: Stamina; **Energy Cost**: 20-30%
+- **Training**: Guts; **Primary Stat**: Guts; **Secondary Stats**: Power; **Energy Cost**: 20-30%
+- **Training**: Wisdom; **Primary Stat**: Wit; **Secondary Stats**: Skill Points; **Energy Cost**: 15-25%
+- **Training**: Rest; **Primary Stat**: -; **Secondary Stats**: Energy Recovery; **Energy Cost**: -50%
 
 ### 6.3 Training Predictions
 
@@ -490,28 +458,22 @@ flowchart TD
     G --> H[Return to UI]
 ```
 
-**Prediction Components:**
-
-| Component | Description |
-|-----------|-------------|
-| Base Gains | Raw stat increases from training type |
-| Support Bonuses | Multipliers from active support cards |
-| Failure Risk | Chance of training failure (0-90%) |
-| Hint Chance | Probability of receiving skill hints |
-| Bond Gains | Friendship points with support cards |
+### Prediction Components
+- **Component**: Base Gains; **Description**: Raw stat increases from training type
+- **Component**: Support Bonuses; **Description**: Multipliers from active support cards
+- **Component**: Failure Risk; **Description**: Chance of training failure (0-90%)
+- **Component**: Hint Chance; **Description**: Probability of receiving skill hints
+- **Component**: Bond Gains; **Description**: Friendship points with support cards
 
 ### 6.4 Risk Assessment
 
 Risk levels are color-coded:
 
-| Risk Level | Percentage | Indicator |
-|------------|------------|-----------|
-| Low | <15% | 🟢 Green |
-| Moderate | 15-40% | 🟡 Amber |
-| High | >40% | 🔴 Red |
+- **Risk Level**: Low; **Percentage**: <15%; **Indicator**: 🟢 Green
+- **Risk Level**: Moderate; **Percentage**: 15-40%; **Indicator**: 🟡 Amber
+- **Risk Level**: High; **Percentage**: >40%; **Indicator**: 🔴 Red
 
-**Risk Factors:**
-
+### Risk Factors
 - Low energy level
 - Bad/Awful mood
 - Active condition debuffs
@@ -604,22 +566,18 @@ flowchart TD
 
 ### 7.4 Running Styles
 
-| Style | Japanese | Best For |
-|-------|----------|----------|
-| Front Runner | 逃げ (Nige) | Early lead, consistent pace |
-| Pace Chaser | 先行 (Senkou) | Close pursuit, mid-race positioning |
-| Late Surger | 差し (Sashi) | Final stretch acceleration |
-| End Closer | 追込 (Oikomi) | Maximum end-game burst |
+- **Style**: Front Runner; **Japanese**: 逃げ (Nige); **Best For**: Early lead, consistent pace
+- **Style**: Pace Chaser; **Japanese**: 先行 (Senkou); **Best For**: Close pursuit, mid-race positioning
+- **Style**: Late Surger; **Japanese**: 差し (Sashi); **Best For**: Final stretch acceleration
+- **Style**: End Closer; **Japanese**: 追込 (Oikomi); **Best For**: Maximum end-game burst
 
 ### 7.5 Win Probability Factors
 
-| Factor | Impact |
-|--------|--------|
-| Race Grade | Higher grades reduce probability |
-| Aptitude Match | Better aptitude = higher probability |
-| Stat Comparison | Stat advantage increases probability |
-| Skill Synergy | Matching skills boost probability |
-| Competitor Strength | Stronger field reduces probability |
+- **Factor**: Race Grade; **Impact**: Higher grades reduce probability
+- **Factor**: Aptitude Match; **Impact**: Better aptitude = higher probability
+- **Factor**: Stat Comparison; **Impact**: Stat advantage increases probability
+- **Factor**: Skill Synergy; **Impact**: Matching skills boost probability
+- **Factor**: Competitor Strength; **Impact**: Stronger field reduces probability
 
 ---
 
@@ -657,27 +615,22 @@ flowchart TD
 
 ### 8.2 Skill Categories
 
-| Category | Description |
-|----------|-------------|
-| Normal | Standard skills, can evolve to Rare |
-| Rare | Enhanced skills with stronger effects |
-| Unique | Character-specific inherited skills |
+- **Category**: Normal; **Description**: Standard skills, can evolve to Rare
+- **Category**: Rare; **Description**: Enhanced skills with stronger effects
+- **Category**: Unique; **Description**: Character-specific inherited skills
 
 ### 8.3 Skill Hint System
 
 Hints reduce SP cost progressively:
 
-| Hint Level | Discount |
-|------------|----------|
-| 0 Hints | 0% (Base cost) |
-| 1 Hint | 10% discount |
-| 2 Hints | 20% discount |
-| 3 Hints | 30% discount |
-| 4 Hints | 35% discount |
-| 5 Hints | 40% discount (maximum) |
+- **Hint Level**: 0 Hints; **Discount**: 0% (Base cost)
+- **Hint Level**: 1 Hint; **Discount**: 10% discount
+- **Hint Level**: 2 Hints; **Discount**: 20% discount
+- **Hint Level**: 3 Hints; **Discount**: 30% discount
+- **Hint Level**: 4 Hints; **Discount**: 35% discount
+- **Hint Level**: 5 Hints; **Discount**: 40% discount (maximum)
 
-**Hint Sources:**
-
+### Hint Sources
 - Training sessions
 - Race rewards
 - Support card events
@@ -695,20 +648,15 @@ flowchart LR
     E --> F[Log History]
 ```
 
-**Example Evolution:**
-
-| Normal Skill | Rare Evolution |
-|--------------|----------------|
-| Go with the Flow | Lane Legerdemain |
-| Stamina Boost | Endurance Master |
+### Example Evolution
+- **Normal Skill**: Go with the Flow; **Rare Evolution**: Lane Legerdemain
+- **Normal Skill**: Stamina Boost; **Rare Evolution**: Endurance Master
 
 ### 8.5 Skill Status Types
 
-| Status | Icon | Description |
-|--------|------|-------------|
-| Acquired | ✅ | Skill purchased and owned |
-| Skipped | ❌ | Decided not to acquire |
-| Suggested | 💭 | Recommended by AI or planning |
+- **Status**: Acquired; **Icon**: ✅; **Description**: Skill purchased and owned
+- **Status**: Skipped; **Icon**: ❌; **Description**: Decided not to acquire
+- **Status**: Suggested; **Icon**: 💭; **Description**: Recommended by AI or planning
 
 ---
 
@@ -770,23 +718,19 @@ Build your 6-card support deck:
 
 ### 9.3 Deck Rules
 
-| Rule | Description |
-|------|-------------|
-| Deck Size | Exactly 6 cards |
-| Ownership | 5 owned + 1 borrowed allowed |
-| Type Balance | Recommended mix of stat types |
-| Synergy | Cards should complement training goals |
+- **Rule**: Deck Size; **Description**: Exactly 6 cards
+- **Rule**: Ownership; **Description**: 5 owned + 1 borrowed allowed
+- **Rule**: Type Balance; **Description**: Recommended mix of stat types
+- **Rule**: Synergy; **Description**: Cards should complement training goals
 
 ### 9.4 Meta Tiers
 
 Cards are rated by the community:
 
-| Tier | Description |
-|------|-------------|
-| SS | Top-tier, essential for meta builds |
-| S | Excellent choice, highly recommended |
-| A | Good card, situationally valuable |
-| B | Average card, viable in specific builds |
+- **Tier**: SS; **Description**: Top-tier, essential for meta builds
+- **Tier**: S; **Description**: Excellent choice, highly recommended
+- **Tier**: A; **Description**: Good card, situationally valuable
+- **Tier**: B; **Description**: Average card, viable in specific builds
 
 ### 9.5 Bond Progression
 
@@ -801,14 +745,11 @@ flowchart TD
     G --> F
 ```
 
-**Bond Milestones:**
-
-| Level | Reward |
-|-------|--------|
-| 20% | Small stat bonus |
-| 40% | Skill hint |
-| 60% | Special event |
-| 80% | Friendship Training unlocked |
+### Bond Milestones
+- **Level**: 20%; **Reward**: Small stat bonus
+- **Level**: 40%; **Reward**: Skill hint
+- **Level**: 60%; **Reward**: Special event
+- **Level**: 80%; **Reward**: Friendship Training unlocked
 
 ---
 
@@ -864,29 +805,23 @@ flowchart TD
 
 ### 10.3 Advisory Topics
 
-| Topic | Description | Example Questions |
-|-------|-------------|-------------------|
-| Training | Optimal training selection | "What should I train next?" |
-| Race Strategy | Pre-race preparation | "Am I ready for the upcoming G1?" |
-| Skill Build | Skill acquisition planning | "Which skills should I prioritize?" |
-| Career Planning | Long-term strategy | "How can I reach A+ grade by turn 60?" |
+- **Topic**: Training; **Description**: Optimal training selection; **Example Questions**: "What should I train next?"
+- **Topic**: Race Strategy; **Description**: Pre-race preparation; **Example Questions**: "Am I ready for the upcoming G1?"
+- **Topic**: Skill Build; **Description**: Skill acquisition planning; **Example Questions**: "Which skills should I prioritize?"
+- **Topic**: Career Planning; **Description**: Long-term strategy; **Example Questions**: "How can I reach A+ grade by turn 60?"
 
 ### 10.4 AI Response Components
 
-| Component | Description |
-|-----------|-------------|
-| Recommendation | Clear action to take |
-| Reasoning | Explanation of why |
-| Confidence | AI's certainty level (0-100%) |
-| Risks | Potential downsides |
-| Alternatives | Other options to consider |
+- **Component**: Recommendation; **Description**: Clear action to take
+- **Component**: Reasoning; **Description**: Explanation of why
+- **Component**: Confidence; **Description**: AI's certainty level (0-100%)
+- **Component**: Risks; **Description**: Potential downsides
+- **Component**: Alternatives; **Description**: Other options to consider
 
 ### 10.5 AI Providers
 
-| Provider | Usage | Best For |
-|----------|-------|----------|
-| Ollama (Local) | Primary | Quick responses, privacy |
-| AWS Bedrock Claude | Fallback | Complex analysis, detailed planning |
+- **Provider**: Ollama (Local); **Usage**: Primary; **Best For**: Quick responses, privacy
+- **Provider**: AWS Bedrock Claude; **Usage**: Fallback; **Best For**: Complex analysis, detailed planning
 
 ---
 
@@ -894,12 +829,10 @@ flowchart TD
 
 ### 11.1 Export Formats
 
-| Format | Extension | Use Case |
-|--------|-----------|----------|
-| JSON | .json | Full data backup, import/export |
-| Excel | .xlsx | Spreadsheet analysis |
-| Markdown | .md | Documentation, sharing |
-| CSV | .csv | Data processing |
+- **Format**: JSON; **Extension**: .json; **Use Case**: Full data backup, import/export
+- **Format**: Excel; **Extension**: .xlsx; **Use Case**: Spreadsheet analysis
+- **Format**: Markdown; **Extension**: .md; **Use Case**: Documentation, sharing
+- **Format**: CSV; **Extension**: .csv; **Use Case**: Data processing
 
 ### 11.2 Export Process
 
@@ -952,12 +885,10 @@ flowchart LR
 
 ### 11.4 Import Conflict Resolution
 
-| Option | Description |
-|--------|-------------|
-| Skip | Don't import if duplicate exists |
-| Overwrite | Replace existing with imported data |
-| Import as Copy | Create new entry with modified title |
-| Merge | Combine data (future feature) |
+- **Option**: Skip; **Description**: Don't import if duplicate exists
+- **Option**: Overwrite; **Description**: Replace existing with imported data
+- **Option**: Import as Copy; **Description**: Create new entry with modified title
+- **Option**: Merge; **Description**: Combine data (future feature)
 
 ### 11.5 OCR Screenshot Import
 
@@ -976,8 +907,7 @@ flowchart TD
     I --> H
 ```
 
-**Supported Data:**
-
+### Supported Data
 - Current stats
 - Skill inventory
 - Aptitude grades
@@ -989,40 +919,34 @@ flowchart TD
 
 ### 12.1 Local Mode
 
-**Features:**
-
+### Features
 - No login required
 - Data stored in browser localStorage
 - Works completely offline
 - UUID-based identification
 
-**Routes:**
-
+### Routes
 - View: `/plans/local/{uuid}`
 - Edit: `/plans/local/{uuid}/edit`
 
-**Limitations:**
-
+### Limitations
 - Data tied to single browser/device
 - Risk of data loss if browser cache cleared
 - Limited storage (5-10MB typical)
 
 ### 12.2 Account Mode
 
-**Features:**
-
+### Features
 - Cloud-synced data
 - Access from any device
 - Secure backup
 - Integer ID identification
 
-**Routes:**
-
+### Routes
 - View: `/plans/{id}`
 - Edit: `/plans/{id}/edit`
 
-**Requirements:**
-
+### Requirements
 - User account
 - Internet connection for sync
 
@@ -1035,7 +959,7 @@ sequenceDiagram
     participant Server
     participant Database
     participant LocalStorage
-    
+
     User->>User: Log in
     User->>LocalData: Find local plan
     User->>LocalData: Click "Convert to Account"
@@ -1047,8 +971,7 @@ sequenceDiagram
     LocalData-->>User: Redirect to /plans/{id}
 ```
 
-**Steps:**
-
+### Steps
 1. Log in to your account
 2. Go to **Local Data** management
 3. Select plans to convert
@@ -1060,12 +983,10 @@ sequenceDiagram
 
 Unsaved work is automatically preserved:
 
-| Feature | Behavior |
-|---------|----------|
-| Auto-save interval | Every 30 seconds |
-| Draft versions | Last 3 versions kept |
-| Draft expiration | Prompt after 7 days |
-| Clear on save | Drafts removed after successful save |
+- **Feature**: Auto-save interval; **Behavior**: Every 30 seconds
+- **Feature**: Draft versions; **Behavior**: Last 3 versions kept
+- **Feature**: Draft expiration; **Behavior**: Prompt after 7 days
+- **Feature**: Clear on save; **Behavior**: Drafts removed after successful save
 
 ---
 
@@ -1073,37 +994,29 @@ Unsaved work is automatically preserved:
 
 ### 13.1 Display Settings
 
-| Setting | Options | Default |
-|---------|---------|---------|
-| Theme | Light / Dark / System | System |
-| Language | English / Japanese | English |
-| Stat Display | Numeric / Circular / Bars | Circular |
-| Compact View | On / Off | Off |
+- **Setting**: Theme; **Options**: Light / Dark / System; **Default**: System
+- **Setting**: Language; **Options**: English / Japanese; **Default**: English
+- **Setting**: Stat Display; **Options**: Numeric / Circular / Bars; **Default**: Circular
+- **Setting**: Compact View; **Options**: On / Off; **Default**: Off
 
 ### 13.2 Accessibility Settings
 
-| Setting | Description |
-|---------|-------------|
-| Reduced Motion | Minimize animations |
-| High Contrast | Enhanced visibility |
-| Screen Reader | ARIA optimizations |
-| Keyboard Navigation | Tab order and shortcuts |
+- **Setting**: Reduced Motion; **Description**: Minimize animations
+- **Setting**: High Contrast; **Description**: Enhanced visibility
+- **Setting**: Screen Reader; **Description**: ARIA optimizations
+- **Setting**: Keyboard Navigation; **Description**: Tab order and shortcuts
 
 ### 13.3 AI Settings
 
-| Setting | Options | Default |
-|---------|---------|---------|
-| AI Provider | Local Only / Cloud / Hybrid | Hybrid |
-| Auto-suggest | On / Off | On |
-| Suggestion Frequency | Always / Important / Never | Important |
+- **Setting**: AI Provider; **Options**: Local Only / Cloud / Hybrid; **Default**: Hybrid
+- **Setting**: Auto-suggest; **Options**: On / Off; **Default**: On
+- **Setting**: Suggestion Frequency; **Options**: Always / Important / Never; **Default**: Important
 
 ### 13.4 Notification Settings
 
-| Setting | Options | Default |
-|---------|---------|---------|
-| Race Reminders | On / Off | On |
-| Training Suggestions | On / Off | On |
-| Goal Alerts | On / Off | On |
+- **Setting**: Race Reminders; **Options**: On / Off; **Default**: On
+- **Setting**: Training Suggestions; **Options**: On / Off; **Default**: On
+- **Setting**: Goal Alerts; **Options**: On / Off; **Default**: On
 
 ---
 
@@ -1114,14 +1027,14 @@ Unsaved work is automatically preserved:
 ```mermaid
 flowchart TD
     Issue[Issue Encountered]
-    
+
     Issue --> Type{What type?}
-    
+
     Type -->|Connection| Conn[Connection Lost]
     Type -->|Data| Data[Missing Data]
     Type -->|Search| Search[Skill Not Found]
     Type -->|Performance| Perf[Slow Loading]
-    
+
     Conn --> ConnFix[Wait for reconnect<br/>Draft auto-saved]
     Data --> DataFix[Check browser<br/>Same browser?<br/>Incognito?]
     Search --> SearchFix[Try Japanese name<br/>Check spelling]
@@ -1130,15 +1043,13 @@ flowchart TD
 
 ### 14.2 Issue Solutions
 
-| Issue | Cause | Solution |
-|-------|-------|----------|
-| **Connection Lost** | Internet dropped | App enters Offline Mode. Changes saved as draft. Reconnect to sync. |
-| **Missing Local Data** | Different browser or cleared cache | Ensure same browser. Incognito mode deletes data when closed. |
-| **Skill Not Found** | Name mismatch | Try Japanese name. Check spelling. |
-| **Stats Not Saving** | Form not submitted | Click "Save" after changes. Check for validation errors. |
-| **Slow Performance** | Too many plans | Archive old completed plans. Clear browser cache. |
-| **AI Not Responding** | Local AI unavailable | System falls back to cloud AI. Check Ollama installation. |
-| **Export Failed** | Large data set | Try exporting fewer plans. Check browser memory. |
+- **Issue**: **Connection Lost**; **Cause**: Internet dropped; **Solution**: App enters Offline Mode. Changes saved as draft. Reconnect to sync.
+- **Issue**: **Missing Local Data**; **Cause**: Different browser or cleared cache; **Solution**: Ensure same browser. Incognito mode deletes data when closed.
+- **Issue**: **Skill Not Found**; **Cause**: Name mismatch; **Solution**: Try Japanese name. Check spelling.
+- **Issue**: **Stats Not Saving**; **Cause**: Form not submitted; **Solution**: Click "Save" after changes. Check for validation errors.
+- **Issue**: **Slow Performance**; **Cause**: Too many plans; **Solution**: Archive old completed plans. Clear browser cache.
+- **Issue**: **AI Not Responding**; **Cause**: Local AI unavailable; **Solution**: System falls back to cloud AI. Check Ollama installation.
+- **Issue**: **Export Failed**; **Cause**: Large data set; **Solution**: Try exporting fewer plans. Check browser memory.
 
 ### 14.3 Connection State Management
 
@@ -1156,13 +1067,11 @@ stateDiagram-v2
 
 ### 14.4 Error Messages
 
-| Error Code | Message | Action |
-|------------|---------|--------|
-| E001 | Validation failed | Check required fields |
-| E002 | Stat out of range | Values must be 0-1200 |
-| E003 | Network timeout | Check internet connection |
-| E004 | Storage quota exceeded | Clear old data or use Account mode |
-| E005 | Import format invalid | Check file format and version |
+- **Error Code**: E001; **Message**: Validation failed; **Action**: Check required fields
+- **Error Code**: E002; **Message**: Stat out of range; **Action**: Values must be 0-1200
+- **Error Code**: E003; **Message**: Network timeout; **Action**: Check internet connection
+- **Error Code**: E004; **Message**: Storage quota exceeded; **Action**: Clear old data or use Account mode
+- **Error Code**: E005; **Message**: Import format invalid; **Action**: Check file format and version
 
 ---
 
@@ -1170,35 +1079,29 @@ stateDiagram-v2
 
 ### 15.1 Global Shortcuts
 
-| Shortcut | Action |
-|----------|--------|
-| `Ctrl + S` | Save current plan |
-| `Ctrl + N` | Create new plan |
-| `Ctrl + D` | Toggle dark mode |
-| `Esc` | Close modal/dialog |
-| `/` | Focus search |
-| `?` | Show keyboard shortcuts |
+- **Shortcut**: `Ctrl + S`; **Action**: Save current plan
+- **Shortcut**: `Ctrl + N`; **Action**: Create new plan
+- **Shortcut**: `Ctrl + D`; **Action**: Toggle dark mode
+- **Shortcut**: `Esc`; **Action**: Close modal/dialog
+- **Shortcut**: `/`; **Action**: Focus search
+- **Shortcut**: `?`; **Action**: Show keyboard shortcuts
 
 ### 15.2 Navigation Shortcuts
 
-| Shortcut | Action |
-|----------|--------|
-| `G then D` | Go to Dashboard |
-| `G then C` | Go to Characters |
-| `G then T` | Go to Training |
-| `G then R` | Go to Races |
-| `G then S` | Go to Skills |
-| `G then A` | Go to AI Advisor |
+- **Shortcut**: `G then D`; **Action**: Go to Dashboard
+- **Shortcut**: `G then C`; **Action**: Go to Characters
+- **Shortcut**: `G then T`; **Action**: Go to Training
+- **Shortcut**: `G then R`; **Action**: Go to Races
+- **Shortcut**: `G then S`; **Action**: Go to Skills
+- **Shortcut**: `G then A`; **Action**: Go to AI Advisor
 
 ### 15.3 Editor Shortcuts
 
-| Shortcut | Action |
-|----------|--------|
-| `Tab` | Next field |
-| `Shift + Tab` | Previous field |
-| `Enter` | Confirm selection |
-| `↑ / ↓` | Navigate dropdown options |
-| `Ctrl + Z` | Undo last change |
+- **Shortcut**: `Tab`; **Action**: Next field
+- **Shortcut**: `Shift + Tab`; **Action**: Previous field
+- **Shortcut**: `Enter`; **Action**: Confirm selection
+- **Shortcut**: `↑ / ↓`; **Action**: Navigate dropdown options
+- **Shortcut**: `Ctrl + Z`; **Action**: Undo last change
 
 ---
 
@@ -1206,45 +1109,39 @@ stateDiagram-v2
 
 ### 16.1 Game Terms
 
-| Term | Japanese | Definition |
-|------|----------|------------|
-| Speed | スピード | Determines maximum running speed |
-| Stamina | スタミナ | Determines HP/effective stamina |
-| Power | パワー | Affects acceleration and lane-changing |
-| Guts | 根性 | Affects last spurt and stamina consumption |
-| Wit | 賢さ | Affects skill activation rate |
-| Nige | 逃げ | Front Runner running style |
-| Senkou | 先行 | Pace Chaser running style |
-| Sashi | 差し | Late Surger running style |
-| Oikomi | 追込 | End Closer running style |
-| SP | スキルポイント | Skill Points for purchasing skills |
-| URA | URAファイナルズ | Final race series |
+- **Term**: Speed; **Japanese**: スピード; **Definition**: Determines maximum running speed
+- **Term**: Stamina; **Japanese**: スタミナ; **Definition**: Determines HP/effective stamina
+- **Term**: Power; **Japanese**: パワー; **Definition**: Affects acceleration and lane-changing
+- **Term**: Guts; **Japanese**: 根性; **Definition**: Affects last spurt and stamina consumption
+- **Term**: Wit; **Japanese**: 賢さ; **Definition**: Affects skill activation rate
+- **Term**: Nige; **Japanese**: 逃げ; **Definition**: Front Runner running style
+- **Term**: Senkou; **Japanese**: 先行; **Definition**: Pace Chaser running style
+- **Term**: Sashi; **Japanese**: 差し; **Definition**: Late Surger running style
+- **Term**: Oikomi; **Japanese**: 追込; **Definition**: End Closer running style
+- **Term**: SP; **Japanese**: スキルポイント; **Definition**: Skill Points for purchasing skills
+- **Term**: URA; **Japanese**: URAファイナルズ; **Definition**: Final race series
 
 ### 16.2 Application Terms
 
-| Term | Definition |
-|------|------------|
-| Career Run | A complete training progression from Junior to URA Finals |
-| Turn | A single training/action period in the game |
-| Factor | Inherited stat bonus from parent characters |
-| Hint | Discount on skill SP cost from training/events |
-| Bond | Friendship level with support card characters |
-| Meta Tier | Community ranking of support card effectiveness |
-| Draft | Auto-saved unsaved work |
+- **Term**: Career Run; **Definition**: A complete training progression from Junior to URA Finals
+- **Term**: Turn; **Definition**: A single training/action period in the game
+- **Term**: Factor; **Definition**: Inherited stat bonus from parent characters
+- **Term**: Hint; **Definition**: Discount on skill SP cost from training/events
+- **Term**: Bond; **Definition**: Friendship level with support card characters
+- **Term**: Meta Tier; **Definition**: Community ranking of support card effectiveness
+- **Term**: Draft; **Definition**: Auto-saved unsaved work
 
 ### 16.3 Status Icons
 
-| Icon | Meaning |
-|------|---------|
-| 🟠 | Local Mode |
-| 🟣 | Account Mode |
-| 🟢 | In Progress / Good |
-| ✅ | Completed / Acquired |
-| 📦 | Archived |
-| ⚠️ | Warning / Unsaved Changes |
-| 🔴 | At Risk / High Risk |
-| 💭 | Suggested |
-| ❌ | Skipped |
+- **Icon**: 🟠; **Meaning**: Local Mode
+- **Icon**: 🟣; **Meaning**: Account Mode
+- **Icon**: 🟢; **Meaning**: In Progress / Good
+- **Icon**: ✅; **Meaning**: Completed / Acquired
+- **Icon**: 📦; **Meaning**: Archived
+- **Icon**: ⚠️; **Meaning**: Warning / Unsaved Changes
+- **Icon**: 🔴; **Meaning**: At Risk / High Risk
+- **Icon**: 💭; **Meaning**: Suggested
+- **Icon**: ❌; **Meaning**: Skipped
 
 ---
 
@@ -1255,7 +1152,7 @@ stateDiagram-v2
 ```mermaid
 flowchart LR
     Help[Need Help?]
-    
+
     Help --> Docs[📚 Documentation<br/>Read the docs]
     Help --> FAQ[❓ FAQ<br/>Common questions]
     Help --> GitHub[🐙 GitHub<br/>Report bugs]
@@ -1264,12 +1161,10 @@ flowchart LR
 
 ### 17.2 Resources
 
-| Resource | Description | Location |
-|----------|-------------|----------|
-| **Documentation** | Full system documentation | `/docs` folder |
-| **FAQ** | Frequently asked questions | Help page |
-| **GitHub** | Bug reports and feature requests | Repository Issues |
-| **Community** | User discussions and tips | Community forums |
+- **Resource**: **Documentation**; **Description**: Full system documentation; **Location**: `/docs` folder
+- **Resource**: **FAQ**; **Description**: Frequently asked questions; **Location**: Help page
+- **Resource**: **GitHub**; **Description**: Bug reports and feature requests; **Location**: Repository Issues
+- **Resource**: **Community**; **Description**: User discussions and tips; **Location**: Community forums
 
 ### 17.3 Reporting Bugs
 
@@ -1284,22 +1179,18 @@ When reporting a bug, please include:
 
 ### 17.4 External Data Sources
 
-| Source | Data Provided | Status |
-|--------|---------------|--------|
-| umapyoi.net | Characters, support cards, news | Active |
-| UmamusumeDB.com | Skill data, race info | Verification pending |
-| Community Tools | Meta rankings, strategies | Active |
+- **Source**: umapyoi.net; **Data Provided**: Characters, support cards, news; **Status**: Active
+- **Source**: UmamusumeDB.com; **Data Provided**: Skill data, race info; **Status**: Verification pending
+- **Source**: Community Tools; **Data Provided**: Meta rankings, strategies; **Status**: Active
 
 ---
 
 ## Document History
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 2.3.0 | 2026-02-21 | Development Team | Updated version alignment to v2.3.0, refreshed technology references (Livewire 4, Pest v4, PHPUnit v12), dated February 2026 |
-| 2.1.0 | 2026-01-23 | Development Team | Comprehensive update aligned with v2.0.0 codebase, integrated PRD/SPEC/Flow documentation, added AI Advisory, OCR, and detailed feature documentation |
-| 2.0.0 | 2026-01-03 | Development Team | Added Mermaid diagrams, expanded content |
-| 1.0.0 | 2026-01-03 | Development Team | Initial draft |
+- **Version**: 2.3.0; **Date**: 2026-02-21; **Author**: Development Team; **Changes**: Updated version alignment to v2.3.0, refreshed technology references (Livewire 4, Pest v4, PHPUnit v12), dated February 2026
+- **Version**: 2.1.0; **Date**: 2026-01-23; **Author**: Development Team; **Changes**: Comprehensive update aligned with v2.0.0 codebase, integrated PRD/SPEC/Flow documentation, added AI Advisory, OCR, and detailed feature documentation
+- **Version**: 2.0.0; **Date**: 2026-01-03; **Author**: Development Team; **Changes**: Added Mermaid diagrams, expanded content
+- **Version**: 1.0.0; **Date**: 2026-01-03; **Author**: Development Team; **Changes**: Initial draft
 
 ---
 
@@ -1318,4 +1209,4 @@ When reporting a bug, please include:
 
 ---
 
-*This manual reflects the current implementation of Umamusume Career Planner v2.4.0. For the latest updates, please refer to the online documentation.*
+### This manual reflects the current implementation of Umamusume Career Planner v2.4.0. For the latest updates, please refer to the online documentation
