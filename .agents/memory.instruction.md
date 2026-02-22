@@ -8,7 +8,7 @@ applyTo: '**'
 - Use PHP 8.3+ strict types and type declarations
 - Implement WCAG 2.2 AA accessibility compliance
 - Prefer Pest testing framework over PHPUnit
-- Use Laravel Pint for code formatting
+- Use Laravel Pint for code formatting- **Markdownlint Compliance**: All markdown (`.md`) files MUST adhere to markdownlint standards (see section below)
 
 ## Project Architecture
 
@@ -517,3 +517,167 @@ Resources: sp, energy, mood, bond, hint
   - AIChatController now derives `rag_enhanced` and `knowledge_sources` from context **or** execution response and includes them in streaming metadata and conversation logs; added reflection-based test `RAGEnhancedChatTest::propagates rag metadata from execution response`
 Next time, group git commits instead of one large commit.
 Commands execute in PowerShell/Command Prompt on Windows 10; use WSL2 for Linux commands.
+
+---
+
+## Markdownlint Standards (MANDATORY)
+
+**CRITICAL**: All markdown files in the `docs/` directory and content updates MUST maintain 100% markdownlint compliance.
+
+### Why Markdownlint?
+
+- Ensures consistent markdown formatting across 477 documentation files
+- Prevents table alignment issues, broken links, duplicate headings
+- Maintains professional documentation quality
+- Enables automated documentation validation and CI/CD integration
+
+### Key Rules (Most Common)
+
+**MD060/table-column-style** (Most Critical)
+
+- **Requirement**: All markdown tables must have consistent pipe spacing
+- **Fix**: Ensure spaces around ALL pipes: `| cell |` not `|cell|`
+- **Separator rows**: `| --- | --- |` not `|---|---|`
+- **Empty cells**: `| |` (single space between pipes)
+- **All rows**: Must have same number of columns
+- **Emoji handling**: For emoji cells (✅, ❌, ⚠️), use compact style to avoid alignment issues
+
+#### MD024/no-duplicate-heading
+
+- Two or more headings with identical text in same document
+- Fix: Make each heading unique by appending context (e.g., `## Overview - Character` vs `## Overview - Training`)
+- Do not remove headings; disambiguate instead
+
+#### MD036/no-emphasis-as-heading
+
+- Bold or italic text appearing alone on a line used as heading
+- Bad: Line with just `**Bold Text**`
+- Fix: Convert to proper heading: `### Bold Text` (use appropriate level)
+
+#### MD051/link-fragments
+
+- Links reference non-existent anchor fragments
+- Bad: `[Click here](#invalid-anchor)` when no matching `## Invalid Anchor` exists
+- Fix: Use correct fragment slugs matching actual headings
+
+#### MD056/table-column-count
+
+- Table rows have inconsistent number of columns
+- Fix: Ensure all rows (header, separator, data) have same pipe/column count
+
+#### MD003/heading-style
+
+- Inconsistent heading style (ATX vs setext)
+- Fix: Use ATX style consistently (`## Heading` not `Heading\n-------`)
+
+#### MD031/blanks-around-fences
+
+- Code blocks not surrounded by blank lines
+- Fix: Add blank line before `\`\`\`code` and after closing `\`\`\``
+
+#### MD047/single-trailing-newline
+
+- File doesn't end with exactly one newline
+- Fix: Ensure file ends with single `\n`
+
+### When Updating Existing Documents
+
+**ESPECIALLY IMPORTANT** - When modifying existing markdown files:
+
+1. **Always run markdownlint first**
+
+   ```bash
+   npx markdownlint-cli2 path/to/file.md
+   ```
+
+2. **Fix any pre-existing issues in modified section** before adding new content
+
+3. **Verify new content follows standards** - ALL tables, headings, links must be valid
+
+4. **Use markdownlint auto-fix for simple issues**
+
+   ```bash
+   npx markdownlint-cli2 --fix path/to/file.md
+   ```
+
+5. **Test comprehensively after edits**
+
+   ```bash
+   npx markdownlint-cli2 "docs/**/*.md"
+   ```
+
+### Creating New Documentation
+
+When creating new `.md` files:
+
+1. **Start with template structure** following existing docs (e.g., `docs/02-specs/` for specs)
+2. **Use only valid markdown**:
+   - ATX-style headings: `## Heading Level 2`
+   - Fenced code blocks (not indented): Use ` ```language`
+   - Compact-style tables: `| value | value |` with `| --- |` separators
+3. **No duplicate headings** in same document
+4. **No emphasis-as-heading** - use proper `###` syntax
+5. **All links must be valid** - test anchors exist
+6. **One newline at end of file**
+7. **No trailing spaces** in any line
+
+### Common Fixes
+
+#### Table pipes missing spaces
+
+```markdown
+# BEFORE (WRONG - 3 MD060 errors)
+|Column1|Column2|
+|---|---|
+|val1|val2|
+
+# AFTER (CORRECT - 0 errors)
+| Column1 | Column2 |
+| --- | --- |
+| val1 | val2 |
+```
+
+#### Duplicate headings
+
+```markdown
+# BEFORE (WRONG - 2 MD024 errors)
+## Overview
+...
+## Overview
+
+# AFTER (CORRECT - 0 errors)
+## Overview - Part A
+...
+## Overview - Part B
+```
+
+#### Emphasis as heading
+
+```markdown
+# BEFORE (WRONG - MD036 error)
+**Important Section Title**
+Content here...
+
+# AFTER (CORRECT - 0 errors)
+### Important Section Title
+Content here...
+```
+
+### Automated Validation
+
+- **Local**: Run `npx markdownlint-cli2 "docs/**/*.md"` before committing
+- **Pre-commit**: Git hook can validate on `git commit`
+- **CI/CD**: Can be integrated into GitHub Actions for automated checking
+- **Results JSON**: `docs/lint-results.json` contains structured validation results
+
+### Parser Script
+
+- **Location**: `scripts/parse-markdownlint.cjs`
+- **Purpose**: Converts raw markdownlint output to structured JSON grouped by directory
+- **Usage**: `node scripts/parse-markdownlint.cjs input.txt output.json`
+
+### Zero-Error Target
+
+- **Current Status (2026-02-22)**: 477 files, 0 markdownlint errors ✅
+- **Maintenance**: Every documentation update MUST maintain zero-error status
+- **Non-negotiable**: Do not commit markdown files with markdownlint errors
