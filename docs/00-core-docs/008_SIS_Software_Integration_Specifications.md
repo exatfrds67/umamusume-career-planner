@@ -2,10 +2,10 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.4.0  
-**Date**: February 22, 2026  
-**Project**: UmamusumeCareerPlanner  
-**Author**: Development Team  
+**Document Version**: 2.4.0
+**Date**: February 22, 2026
+**Project**: UmamusumeCareerPlanner
+**Author**: Development Team
 **Status**: Current - Aligned to codebase v2.4.0, 30 models, 51 migrations, 42 MCP tools
 
 ---
@@ -40,14 +40,12 @@ This specification covers:
 
 ### 1.2 Related Documents
 
-| Document | Reference |
-|----------|-----------|
-| Software Integration Plan | [SIP - 007_SIP](007_SIP_Software_Integration_Plan.md) |
-| Software Design Specifications | [SDS - 004_SDS](004_SDS_Software_Design_Specifications.md) |
-| AI Advisory System Flow | [FLOW-006](../flows/FLOW-006_AI_Advisory_System.md) |
-| External Integration Flow | [FLOW-007](../flows/FLOW-007_External_Integration_System.md) |
-| AI Advisory Technical Spec | [SPEC-006](../specs/SPEC-006_AI_Advisory_Technical.md) |
-| External Integration Tech Flow | [TECH-FLOW-007](../tech-flow/TECH-FLOW-007_External_Integration_Flow.md) |
+- **Document**: Software Integration Plan; **Reference**: [SIP - 007_SIP](007_SIP_Software_Integration_Plan.md)
+- **Document**: Software Design Specifications; **Reference**: [SDS - 004_SDS](004_SDS_Software_Design_Specifications.md)
+- **Document**: AI Advisory System Flow; **Reference**: [FLOW-006](../flows/FLOW-006_AI_Advisory_System.md)
+- **Document**: External Integration Flow; **Reference**: [FLOW-007](../flows/FLOW-007_External_Integration_System.md)
+- **Document**: AI Advisory Technical Spec; **Reference**: [SPEC-006](../specs/SPEC-006_AI_Advisory_Technical.md)
+- **Document**: External Integration Tech Flow; **Reference**: [TECH-FLOW-007](../tech-flow/TECH-FLOW-007_External_Integration_Flow.md)
 
 ---
 
@@ -62,7 +60,7 @@ The application implements a hybrid AI architecture with local-first processing 
 ```php
 return [
     'default_provider' => env('AI_DEFAULT_PROVIDER', 'ollama'),
-    
+
     'providers' => [
         'ollama' => [
             'enabled' => env('OLLAMA_ENABLED', true),
@@ -78,7 +76,7 @@ return [
             'max_tokens' => env('BEDROCK_MAX_TOKENS', 4096),
         ],
     ],
-    
+
     'routing' => [
         'cost_threshold' => env('AI_COST_THRESHOLD', 0.10),
         'fallback_enabled' => env('AI_FALLBACK_ENABLED', true),
@@ -93,13 +91,11 @@ Neuron AI provides the agent orchestration framework for specialized AI capabili
 
 **Configuration File**: `config/neuron.php`
 
-| Setting | Description | Default |
-|---------|-------------|---------|
-| `agents.training` | Training recommendation agent | Enabled |
-| `agents.race_strategy` | Race strategy optimization agent | Enabled |
-| `agents.skill_advisor` | Skill acquisition advisor agent | Enabled |
-| `memory.driver` | Memory persistence driver | `database` |
-| `tools.enabled` | Tool integration toggle | `true` |
+- **Setting**: `agents.training`; **Description**: Training recommendation agent; **Default**: Enabled
+- **Setting**: `agents.race_strategy`; **Description**: Race strategy optimization agent; **Default**: Enabled
+- **Setting**: `agents.skill_advisor`; **Description**: Skill acquisition advisor agent; **Default**: Enabled
+- **Setting**: `memory.driver`; **Description**: Memory persistence driver; **Default**: `database`
+- **Setting**: `tools.enabled`; **Description**: Tool integration toggle; **Default**: `true`
 
 **Agent Classes Location**: `app/Neuron/Agents/`
 
@@ -157,12 +153,10 @@ app/Services/Neuron/
 
 ### 2.4 Provider Cost Tracking
 
-| Provider | Model | Input Cost | Output Cost | Notes |
-|----------|-------|------------|-------------|-------|
-| Ollama | llama3.2 | $0.00 | $0.00 | Local processing |
-| Bedrock | Claude Sonnet 4 | $3.00/1M | $15.00/1M | Recommended fallback |
-| Bedrock | Claude Opus 4 | $5.00/1M | $25.00/1M | Complex reasoning |
-| Bedrock | Claude Haiku 4.5 | $1.00/1M | $5.00/1M | Simple queries |
+- **Provider**: Ollama; **Model**: llama3.2; **Input Cost**: $0.00; **Output Cost**: $0.00; **Notes**: Local processing
+- **Provider**: Bedrock; **Model**: Claude Sonnet 4; **Input Cost**: $3.00/1M; **Output Cost**: $15.00/1M; **Notes**: Recommended fallback
+- **Provider**: Bedrock; **Model**: Claude Opus 4; **Input Cost**: $5.00/1M; **Output Cost**: $25.00/1M; **Notes**: Complex reasoning
+- **Provider**: Bedrock; **Model**: Claude Haiku 4.5; **Input Cost**: $1.00/1M; **Output Cost**: $5.00/1M; **Notes**: Simple queries
 
 ---
 
@@ -180,17 +174,15 @@ The Model Context Protocol (MCP) integration enables tool-based AI interactions.
 
 ### 3.2 MCP Server Types
 
-| Server Type | Location | Purpose |
-|-------------|----------|---------|
-| Memory | Local | Conversation context persistence |
-| Filesystem | Local | Document and file access |
-| Fetch | Local | HTTP resource retrieval |
-| AWS API | Remote | AWS service API integration |
-| AWS Knowledge | Remote | AWS knowledge base queries |
-| AWS Pricing | Remote | AWS cost/pricing lookups |
-| Context7 | Remote | Context-aware tool services |
-| Tool Chaining | Local | Multi-step tool orchestration |
-| Umapyoi | Remote (optional) | Game data API integration |
+- **Server Type**: Memory; **Location**: Local; **Purpose**: Conversation context persistence
+- **Server Type**: Filesystem; **Location**: Local; **Purpose**: Document and file access
+- **Server Type**: Fetch; **Location**: Local; **Purpose**: HTTP resource retrieval
+- **Server Type**: AWS API; **Location**: Remote; **Purpose**: AWS service API integration
+- **Server Type**: AWS Knowledge; **Location**: Remote; **Purpose**: AWS knowledge base queries
+- **Server Type**: AWS Pricing; **Location**: Remote; **Purpose**: AWS cost/pricing lookups
+- **Server Type**: Context7; **Location**: Remote; **Purpose**: Context-aware tool services
+- **Server Type**: Tool Chaining; **Location**: Local; **Purpose**: Multi-step tool orchestration
+- **Server Type**: Umapyoi; **Location**: Remote (optional); **Purpose**: Game data API integration
 
 ### 3.3 MCP Service Architecture
 
@@ -219,12 +211,10 @@ The Model Context Protocol (MCP) integration enables tool-based AI interactions.
 
 **Service**: `MCPMonitoringService`
 
-| Metric | Description | Storage |
-|--------|-------------|---------|
-| Tool invocations | Count per tool per session | `mcp_tool_usage` table |
-| Response times | Latency per server | Redis cache |
-| Error rates | Failures by server/tool | Database |
-| Token usage | Input/output token counts | Database |
+- **Metric**: Tool invocations; **Description**: Count per tool per session; **Storage**: `mcp_tool_usage` table
+- **Metric**: Response times; **Description**: Latency per server; **Storage**: Redis cache
+- **Metric**: Error rates; **Description**: Failures by server/tool; **Storage**: Database
+- **Metric**: Token usage; **Description**: Input/output token counts; **Storage**: Database
 
 ---
 
@@ -236,10 +226,8 @@ The application integrates with external game data sources for character, skill,
 
 **Configuration File**: `config/external-apis.php`
 
-| API | Client Class | Purpose | Cache TTL |
-|-----|--------------|---------|-----------|
-| umapyoi.net | `UmapyoiApiClient` | Primary game data source (characters, support cards) | 24 hours |
-| GameTora | `GameToraScraperService` | Skill, race data via web scraping | 24 hours |
+- **API**: umapyoi.net; **Client Class**: `UmapyoiApiClient`; **Purpose**: Primary game data source (characters, support cards); **Cache TTL**: 24 hours
+- **API**: GameTora; **Client Class**: `GameToraScraperService`; **Purpose**: Skill, race data via web scraping; **Cache TTL**: 24 hours
 
 ```
 app/Services/ExternalAPI/
@@ -272,11 +260,9 @@ app/Services/ExternalAPI/
 
 **Circuit Breaker States**:
 
-| State | Description | Behavior |
-|-------|-------------|----------|
-| CLOSED | Normal operation | Requests pass through |
-| OPEN | Failure threshold exceeded | Return cached/fallback immediately |
-| HALF_OPEN | Recovery check period | Allow limited test requests |
+- **State**: CLOSED; **Description**: Normal operation; **Behavior**: Requests pass through
+- **State**: OPEN; **Description**: Failure threshold exceeded; **Behavior**: Return cached/fallback immediately
+- **State**: HALF_OPEN; **Description**: Recovery check period; **Behavior**: Allow limited test requests
 
 **Configuration**:
 
@@ -292,7 +278,7 @@ app/Services/ExternalAPI/
 
 ```
 External API Request Flow:
-                                                                    
+
  Request ──► Circuit ──► Rate ──► API ──► Response ──► Cache
             Breaker    Limiter   Call     Parser      Store
                │                            │
@@ -350,22 +336,18 @@ The OCR integration enables screenshot-based data import for character stats and
 
 ### 5.3 Preprocessing Operations
 
-| Operation | Purpose | Configuration |
-|-----------|---------|---------------|
-| Resize | Normalize dimensions | Max 2000px width |
-| Grayscale | Improve contrast | GD `imagefilter()` |
-| Threshold | Binary conversion | Adaptive threshold |
-| Deskew | Correct rotation | Angle detection |
-| Denoise | Remove artifacts | Median filter |
+- **Operation**: Resize; **Purpose**: Normalize dimensions; **Configuration**: Max 2000px width
+- **Operation**: Grayscale; **Purpose**: Improve contrast; **Configuration**: GD `imagefilter()`
+- **Operation**: Threshold; **Purpose**: Binary conversion; **Configuration**: Adaptive threshold
+- **Operation**: Deskew; **Purpose**: Correct rotation; **Configuration**: Angle detection
+- **Operation**: Denoise; **Purpose**: Remove artifacts; **Configuration**: Median filter
 
 ### 5.4 Supported Data Types
 
-| Data Type | Detection Pattern | Confidence Threshold |
-|-----------|-------------------|---------------------|
-| Character stats | Stat labels + numeric values | 85% |
-| Skill names | Japanese/English text regions | 80% |
-| Race results | Placement + time format | 90% |
-| Support cards | Card frame detection | 75% |
+- **Data Type**: Character stats; **Detection Pattern**: Stat labels + numeric values; **Confidence Threshold**: 85%
+- **Data Type**: Skill names; **Detection Pattern**: Japanese/English text regions; **Confidence Threshold**: 80%
+- **Data Type**: Race results; **Detection Pattern**: Placement + time format; **Confidence Threshold**: 90%
+- **Data Type**: Support cards; **Detection Pattern**: Card frame detection; **Confidence Threshold**: 75%
 
 ---
 
@@ -375,11 +357,9 @@ The OCR integration enables screenshot-based data import for character stats and
 
 **Method**: Laravel Sanctum token-based authentication
 
-| Route Type | Authentication | Rate Limit |
-|------------|----------------|------------|
-| Web routes | Session-based | 60/minute |
-| API routes | Sanctum tokens | 100/minute |
-| AI endpoints | Authenticated + cost tracking | 30/minute |
+- **Route Type**: Web routes; **Authentication**: Session-based; **Rate Limit**: 60/minute
+- **Route Type**: API routes; **Authentication**: Sanctum tokens; **Rate Limit**: 100/minute
+- **Route Type**: AI endpoints; **Authentication**: Authenticated + cost tracking; **Rate Limit**: 30/minute
 
 ### 6.2 Request Validation
 
@@ -405,21 +385,17 @@ class AIAdvisoryRequest extends FormRequest
 
 **Middleware Definition**: `app/Http/Middleware/`
 
-| Limiter | Limit | Window | Applied To |
-|---------|-------|--------|------------|
-| `api` | 100 | 1 minute | All API routes |
-| `ai` | 30 | 1 minute | AI advisory endpoints |
-| `ocr` | 10 | 1 minute | OCR upload endpoints |
-| `external` | 60 | 1 minute | External API proxies |
+- **Limiter**: `api`; **Limit**: 100; **Window**: 1 minute; **Applied To**: All API routes
+- **Limiter**: `ai`; **Limit**: 30; **Window**: 1 minute; **Applied To**: AI advisory endpoints
+- **Limiter**: `ocr`; **Limit**: 10; **Window**: 1 minute; **Applied To**: OCR upload endpoints
+- **Limiter**: `external`; **Limit**: 60; **Window**: 1 minute; **Applied To**: External API proxies
 
 ### 6.4 Data Sanitization
 
-| Input Source | Sanitization Method | Notes |
-|--------------|---------------------|-------|
-| Form inputs | Laravel validation + Eloquent escaping | Automatic |
-| File uploads | MIME validation + virus scan | Strict type checking |
-| API responses | JSON schema validation | External data |
-| OCR output | Pattern matching + range validation | Manual review option |
+- **Input Source**: Form inputs; **Sanitization Method**: Laravel validation + Eloquent escaping; **Notes**: Automatic
+- **Input Source**: File uploads; **Sanitization Method**: MIME validation + virus scan; **Notes**: Strict type checking
+- **Input Source**: API responses; **Sanitization Method**: JSON schema validation; **Notes**: External data
+- **Input Source**: OCR output; **Sanitization Method**: Pattern matching + range validation; **Notes**: Manual review option
 
 ---
 
@@ -507,12 +483,10 @@ public function register(): void
 
 ### 7.3 Configuration Priority
 
-| Priority | Source | Override Capability |
-|----------|--------|---------------------|
-| 1 (Highest) | Environment variables | Runtime |
-| 2 | Config files | Deployment |
-| 3 | Database settings | User-configurable |
-| 4 (Lowest) | Code defaults | Static |
+- **Priority**: 1 (Highest); **Source**: Environment variables; **Override Capability**: Runtime
+- **Priority**: 2; **Source**: Config files; **Override Capability**: Deployment
+- **Priority**: 3; **Source**: Database settings; **Override Capability**: User-configurable
+- **Priority**: 4 (Lowest); **Source**: Code defaults; **Override Capability**: Static
 
 ---
 
@@ -598,13 +572,11 @@ Image Upload ──► Validation ──► Storage
 
 ## Document Control
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 2.4.0 | 2026-02-22 | Development Team | Updated service layer (AI/MCP/ExternalAPI/OCR/Admin/Neuron), 42 MCP tools, 9 agents, GameTora scraper, Admin Panel services |
-| 2.3.0 | 2026-02-21 | Development Team | Updated Neuron agent tree, Bedrock model names (Claude 4.x), version alignment to v2.3.0 |
-| 2.1.0 | 2026-01-23 | Development Team | Updated specs to match configured integrations; added architecture diagrams |
-| 2.0.0 | 2026-01-14 | Development Team | Major revision with Neuron AI and MCP integration |
-| 1.0.0 | 2026-01-03 | Development Team | Initial specification |
+- **Version**: 2.4.0; **Date**: 2026-02-22; **Author**: Development Team; **Changes**: Updated service layer (AI/MCP/ExternalAPI/OCR/Admin/Neuron), 42 MCP tools, 9 agents, GameTora scraper, Admin Panel services
+- **Version**: 2.3.0; **Date**: 2026-02-21; **Author**: Development Team; **Changes**: Updated Neuron agent tree, Bedrock model names (Claude 4.x), version alignment to v2.3.0
+- **Version**: 2.1.0; **Date**: 2026-01-23; **Author**: Development Team; **Changes**: Updated specs to match configured integrations; added architecture diagrams
+- **Version**: 2.0.0; **Date**: 2026-01-14; **Author**: Development Team; **Changes**: Major revision with Neuron AI and MCP integration
+- **Version**: 1.0.0; **Date**: 2026-01-03; **Author**: Development Team; **Changes**: Initial specification
 
 ---
 
@@ -612,29 +584,25 @@ Image Upload ──► Validation ──► Storage
 
 ### A. Environment Variables Reference
 
-| Variable | Service | Default | Description |
-|----------|---------|---------|-------------|
-| `AI_DEFAULT_PROVIDER` | AI | `ollama` | Primary AI provider |
-| `OLLAMA_BASE_URL` | AI | `http://localhost:11434` | Ollama API endpoint |
-| `BEDROCK_ENABLED` | AI | `false` | Enable AWS Bedrock fallback |
-| `MCP_ENABLED` | MCP | `true` | Enable MCP integration |
-| `EXTERNAL_API_CACHE_TTL` | External | `86400` | Cache duration in seconds |
-| `OCR_CONFIDENCE_THRESHOLD` | OCR | `80` | Minimum confidence percentage |
+- **Variable**: `AI_DEFAULT_PROVIDER`; **Service**: AI; **Default**: `ollama`; **Description**: Primary AI provider
+- **Variable**: `OLLAMA_BASE_URL`; **Service**: AI; **Default**: `http://localhost:11434`; **Description**: Ollama API endpoint
+- **Variable**: `BEDROCK_ENABLED`; **Service**: AI; **Default**: `false`; **Description**: Enable AWS Bedrock fallback
+- **Variable**: `MCP_ENABLED`; **Service**: MCP; **Default**: `true`; **Description**: Enable MCP integration
+- **Variable**: `EXTERNAL_API_CACHE_TTL`; **Service**: External; **Default**: `86400`; **Description**: Cache duration in seconds
+- **Variable**: `OCR_CONFIDENCE_THRESHOLD`; **Service**: OCR; **Default**: `80`; **Description**: Minimum confidence percentage
 
 ### B. Error Codes
 
-| Code | Service | Description |
-|------|---------|-------------|
-| `AI_001` | AI | Provider unavailable |
-| `AI_002` | AI | Rate limit exceeded |
-| `AI_003` | AI | Cost threshold exceeded |
-| `MCP_001` | MCP | Server connection failed |
-| `MCP_002` | MCP | Tool execution error |
-| `EXT_001` | External | API request timeout |
-| `EXT_002` | External | Circuit breaker open |
-| `OCR_001` | OCR | Invalid image format |
-| `OCR_002` | OCR | Extraction confidence too low |
+- **Code**: `AI_001`; **Service**: AI; **Description**: Provider unavailable
+- **Code**: `AI_002`; **Service**: AI; **Description**: Rate limit exceeded
+- **Code**: `AI_003`; **Service**: AI; **Description**: Cost threshold exceeded
+- **Code**: `MCP_001`; **Service**: MCP; **Description**: Server connection failed
+- **Code**: `MCP_002`; **Service**: MCP; **Description**: Tool execution error
+- **Code**: `EXT_001`; **Service**: External; **Description**: API request timeout
+- **Code**: `EXT_002`; **Service**: External; **Description**: Circuit breaker open
+- **Code**: `OCR_001`; **Service**: OCR; **Description**: Invalid image format
+- **Code**: `OCR_002`; **Service**: OCR; **Description**: Extraction confidence too low
 
 ---
 
-*This specification reflects the integration details of the current implementation and serves as the authoritative reference for all integration-related development.*
+### This specification reflects the integration details of the current implementation and serves as the authoritative reference for all integration-related development
