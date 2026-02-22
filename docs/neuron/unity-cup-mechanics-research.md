@@ -1,10 +1,10 @@
 # Unity Cup Scenario Mechanics - Comprehensive Research
 
-**Document Type**: Research Documentation  
-**Version**: 1.0.0  
-**Date**: January 29, 2026  
-**Status**: Complete  
-**Sources**: Game8, GameTora, UmaReference, LDPlayer, VortexGaming  
+**Document Type**: Research Documentation
+**Version**: 1.0.0
+**Date**: January 29, 2026
+**Status**: Complete
+**Sources**: Game8, GameTora, UmaReference, LDPlayer, VortexGaming
 
 ---
 
@@ -12,8 +12,7 @@
 
 Unity Cup (known as "Aoharu Hai" in JP) is the second permanent career scenario in Umamusume: Pretty Derby, released November 6, 2025 on Global. Unlike URA Finale which focuses on a single character, Unity Cup emphasizes **team-based progression** where your trainee develops alongside teammates through special training mechanics and team races.
 
-**Key Differentiators from URA Finale:**
-
+### Key Differentiators from URA Finale
 - Training facility levels tied to **team stat rank** (not usage frequency)
 - **Spirit Burst** mechanic for massive stat gains
 - **Unity Training** (white flame indicators) for team progression
@@ -28,13 +27,11 @@ Unity Cup (known as "Aoharu Hai" in JP) is the second permanent career scenario 
 
 Team races occur **every 6 months** throughout the career:
 
-| Round | Timing |
-|-------|--------|
-| Round 1 | After Junior Year Late December |
-| Round 2 | After Classic Year Late June |
-| Round 3 | After Classic Year Late December |
-| Round 4 | After Senior Year Late June |
-| Finals | After Senior Year Late December |
+- **Round**: Round 1; **Timing**: After Junior Year Late December
+- **Round**: Round 2; **Timing**: After Classic Year Late June
+- **Round**: Round 3; **Timing**: After Classic Year Late December
+- **Round**: Round 4; **Timing**: After Senior Year Late June
+- **Round**: Finals; **Timing**: After Senior Year Late December
 
 ### 1.2 Team Composition
 
@@ -56,7 +53,7 @@ Each team race consists of **5 races** across all distances:
 - Long
 - Dirt
 
-**Victory Condition**: Win at least **3 out of 5 races**
+### Victory Condition**: Win at least **3 out of 5 races
 
 ### 1.4 Opponent Selection
 
@@ -99,13 +96,11 @@ Before each team race, choose from **3 NPC teams**:
 
 Team Rank determines **training facility levels**:
 
-| Team Rank | Facility Level | Multiplier |
-|-----------|----------------|------------|
-| F / G | Level 1 | 1.0x |
-| D / E | Level 2 | 1.2x |
-| B / C | Level 3 | 1.4x |
-| A | Level 4 | 1.6x |
-| S | Level 5 | 2.0x |
+- **Team Rank**: F / G; **Facility Level**: Level 1; **Multiplier**: 1.0x
+- **Team Rank**: D / E; **Facility Level**: Level 2; **Multiplier**: 1.2x
+- **Team Rank**: B / C; **Facility Level**: Level 3; **Multiplier**: 1.4x
+- **Team Rank**: A; **Facility Level**: Level 4; **Multiplier**: 1.6x
+- **Team Rank**: S; **Facility Level**: Level 5; **Multiplier**: 2.0x
 
 **Critical Difference from URA Finale**:
 
@@ -162,13 +157,11 @@ Stat gains based on **training facility type** and **support card type**:
 
 **Standard Spirit Burst Values**:
 
-| Explosion Type | Speed | Stamina | Power | Guts | Wit |
-|----------------|-------|---------|-------|------|-----|
-| Speed | +150 | +80 | +110 | +80 | +70 |
-| Stamina | +80 | +150 | +80 | +110 | +70 |
-| Power | +80 | +110 | +150 | +80 | +70 |
-| Guts | +90 | +80 | +90 | +150 | +70 |
-| Wit | +110 | +80 | +80 | +80 | +150 |
+- **Explosion Type**: Speed; **Speed**: +150; **Stamina**: +80; **Power**: +110; **Guts**: +80; **Wit**: +70
+- **Explosion Type**: Stamina; **Speed**: +80; **Stamina**: +150; **Power**: +80; **Guts**: +110; **Wit**: +70
+- **Explosion Type**: Power; **Speed**: +80; **Stamina**: +110; **Power**: +150; **Guts**: +80; **Wit**: +70
+- **Explosion Type**: Guts; **Speed**: +90; **Stamina**: +80; **Power**: +90; **Guts**: +150; **Wit**: +70
+- **Explosion Type**: Wit; **Speed**: +110; **Stamina**: +80; **Power**: +80; **Guts**: +80; **Wit**: +150
 
 **Growth Rate Modifier**: These values are affected by uma's growth bonuses.
 
@@ -178,13 +171,11 @@ Stat gains based on **training facility type** and **support card type**:
 
 **Trainee Stat Gains from Spirit Burst**:
 
-| Training Type | Speed | Stamina | Power | Guts | Wit | SP |
-|---------------|-------|---------|-------|------|-----|----|
-| Speed | +15 | - | - | - | - | +7 |
-| Stamina | - | +15 | - | - | - | +7 |
-| Power | - | - | +7 | - | - | +15 |
-| Guts | - | - | - | +33 | - | +15 |
-| Wit | - | - | - | - | +21 | +5 |
+- **Training Type**: Speed; **Speed**: +15; **Stamina**: -; **Power**: -; **Guts**: -; **Wit**: -; **SP**: +7
+- **Training Type**: Stamina; **Speed**: -; **Stamina**: +15; **Power**: -; **Guts**: -; **Wit**: -; **SP**: +7
+- **Training Type**: Power; **Speed**: -; **Stamina**: -; **Power**: +7; **Guts**: -; **Wit**: -; **SP**: +15
+- **Training Type**: Guts; **Speed**: -; **Stamina**: -; **Power**: -; **Guts**: +33; **Wit**: -; **SP**: +15
+- **Training Type**: Wit; **Speed**: -; **Stamina**: -; **Power**: -; **Guts**: -; **Wit**: +21; **SP**: +5
 
 **Stat Cap**: Trainee gains capped at **+50 per stat** per Spirit Burst
 
@@ -193,13 +184,11 @@ Stat gains based on **training facility type** and **support card type**:
 
 **Scenario-Linked Support Cards** (Enhanced Values):
 
-| Training Type | Speed | Stamina | Power | Guts | Wit | SP |
-|---------------|-------|---------|-------|------|-----|----|
-| Speed | +20 | - | - | - | - | +10 |
-| Stamina | - | +20 | - | - | - | +10 |
-| Power | - | - | +10 | - | - | +20 |
-| Guts | - | - | - | +55 | - | +20 |
-| Wit | - | - | - | - | +51 | +5 |
+- **Training Type**: Speed; **Speed**: +20; **Stamina**: -; **Power**: -; **Guts**: -; **Wit**: -; **SP**: +10
+- **Training Type**: Stamina; **Speed**: -; **Stamina**: +20; **Power**: -; **Guts**: -; **Wit**: -; **SP**: +10
+- **Training Type**: Power; **Speed**: -; **Stamina**: -; **Power**: +10; **Guts**: -; **Wit**: -; **SP**: +20
+- **Training Type**: Guts; **Speed**: -; **Stamina**: -; **Power**: -; **Guts**: +55; **Wit**: -; **SP**: +20
+- **Training Type**: Wit; **Speed**: -; **Stamina**: -; **Power**: -; **Guts**: -; **Wit**: +51; **SP**: +5
 
 #### C. Skill Hints
 
@@ -208,7 +197,7 @@ Stat gains based on **training facility type** and **support card type**:
 - Standard Spirit Burst: **Level 2** skill hint
 - Scenario-linked support card: **Level 3** skill hint
 
-**Skill Selection**: Random based on trainee's **A aptitudes**
+### Skill Selection**: Random based on trainee's **A aptitudes
 
 ### 2.4 Energy Cost Impact
 
@@ -218,7 +207,7 @@ Spirit Burst **increases energy consumption** of that training:
 - Pal cards (e.g., Riko Kashimoto) **do not reduce** this additional cost
 - They only reduce base training cost
 
-**Exception**: Wit training Spirit Burst **increases energy recovery**
+### Exception**: Wit training Spirit Burst **increases energy recovery
 
 ### 2.5 Multiple Spirit Bursts
 
@@ -269,27 +258,21 @@ Spirit Burst **increases energy consumption** of that training:
 
 #### Speed/Stamina/Power Training
 
-| # Flames | Primary Stat | Secondary Stat | Skill Points |
-|----------|--------------|----------------|--------------|
-| 2 | +2 | 0 | 0 |
-| 3 | +3 | +1 | +1 |
-| 4+ | +5 | +2 | +2 |
+- **# Flames**: 2; **Primary Stat**: +2; **Secondary Stat**: 0; **Skill Points**: 0
+- **# Flames**: 3; **Primary Stat**: +3; **Secondary Stat**: +1; **Skill Points**: +1
+- **# Flames**: 4+; **Primary Stat**: +5; **Secondary Stat**: +2; **Skill Points**: +2
 
 #### Guts Training
 
-| # Flames | Guts | Speed | Power | Skill Points |
-|----------|------|-------|-------|--------------|
-| 2 | +2 | 0 | 0 | 0 |
-| 3 | +2 | +1 | +1 | +1 |
-| 4+ | +4 | +2 | +1 | +2 |
+- **# Flames**: 2; **Guts**: +2; **Speed**: 0; **Power**: 0; **Skill Points**: 0
+- **# Flames**: 3; **Guts**: +2; **Speed**: +1; **Power**: +1; **Skill Points**: +1
+- **# Flames**: 4+; **Guts**: +4; **Speed**: +2; **Power**: +1; **Skill Points**: +2
 
 #### Wit Training
 
-| # Flames | Wit | Speed | Skill Points |
-|----------|-----|-------|--------------|
-| 2 | +1 | 0 | 0 |
-| 3 | +2 | 0 | +1 |
-| 4+ | +3 | +1 | +2 |
+- **# Flames**: 2; **Wit**: +1; **Speed**: 0; **Skill Points**: 0
+- **# Flames**: 3; **Wit**: +2; **Speed**: 0; **Skill Points**: +1
+- **# Flames**: 4+; **Wit**: +3; **Speed**: +1; **Skill Points**: +2
 
 **Scenario-Linked Support Card Bonus**:
 
@@ -406,13 +389,11 @@ Unity Training costs **more energy** than normal training:
 
 ### 5.2 Facility Level Multipliers
 
-| Level | Team Rank | Stat Multiplier | Training Effectiveness |
-|-------|-----------|-----------------|------------------------|
-| 1 | F / G | 1.0x | Base |
-| 2 | D / E | 1.2x | +20% |
-| 3 | B / C | 1.4x | +40% |
-| 4 | A | 1.6x | +60% |
-| 5 | S | 2.0x | +100% (Double) |
+- **Level**: 1; **Team Rank**: F / G; **Stat Multiplier**: 1.0x; **Training Effectiveness**: Base
+- **Level**: 2; **Team Rank**: D / E; **Stat Multiplier**: 1.2x; **Training Effectiveness**: +20%
+- **Level**: 3; **Team Rank**: B / C; **Stat Multiplier**: 1.4x; **Training Effectiveness**: +40%
+- **Level**: 4; **Team Rank**: A; **Stat Multiplier**: 1.6x; **Training Effectiveness**: +60%
+- **Level**: 5; **Team Rank**: S; **Stat Multiplier**: 2.0x; **Training Effectiveness**: +100% (Double)
 
 ### 5.3 Team Stat Rank Calculation
 
@@ -426,13 +407,11 @@ Unity Training costs **more energy** than normal training:
 
 **Team Average Stat Thresholds**:
 
-| Team Average | Training Level |
-|--------------|----------------|
-| 0-199 | Level 1 |
-| 200-339 | Level 2 |
-| 340-509 | Level 3 |
-| 510-609 | Level 4 |
-| 610+ | Level 5 |
+- **Team Average**: 0-199; **Training Level**: Level 1
+- **Team Average**: 200-339; **Training Level**: Level 2
+- **Team Average**: 340-509; **Training Level**: Level 3
+- **Team Average**: 510-609; **Training Level**: Level 4
+- **Team Average**: 610+; **Training Level**: Level 5
 
 **Stat Cap per Team Member**: ~750-800 (varies by support card type)
 
@@ -477,25 +456,21 @@ Unity Training costs **more energy** than normal training:
 
 **Level 1 Facility Base Stats** (no support cards, no growth bonuses):
 
-| Facility | Stat Gains | Energy Cost |
-|----------|------------|-------------|
-| Speed | +8 Speed, +4 Power, +2 SP | -19 |
-| Stamina | +7 Stamina, +3 Guts, +2 SP | -17 |
-| Power | +4 Stamina, +6 Power, +2 SP | -18 |
-| Guts | +3 Speed, +3 Power, +6 Guts, +2 SP | -20 |
-| Wit | +2 Speed, +6 Wit, +3 SP | +5 |
+- **Facility**: Speed; **Stat Gains**: +8 Speed, +4 Power, +2 SP; **Energy Cost**: -19
+- **Facility**: Stamina; **Stat Gains**: +7 Stamina, +3 Guts, +2 SP; **Energy Cost**: -17
+- **Facility**: Power; **Stat Gains**: +4 Stamina, +6 Power, +2 SP; **Energy Cost**: -18
+- **Facility**: Guts; **Stat Gains**: +3 Speed, +3 Power, +6 Guts, +2 SP; **Energy Cost**: -20
+- **Facility**: Wit; **Stat Gains**: +2 Speed, +6 Wit, +3 SP; **Energy Cost**: +5
 
 ### 6.2 Japanese Server Values (2023 Update)
 
 **Note**: Global will likely receive these values in future update
 
-| Facility | Stat Gains | Energy Cost |
-|----------|------------|-------------|
-| Speed | +8 Speed, +4 Power, +4 SP | -19 |
-| Stamina | +8 Stamina, +6 Guts, +4 SP | -20 |
-| Power | +4 Stamina, +9 Power, +4 SP | -20 |
-| Guts | +3 Speed, +3 Power, +6 Guts, +4 SP | -20 |
-| Wit | +2 Speed, +6 Wit, +5 SP | +5 |
+- **Facility**: Speed; **Stat Gains**: +8 Speed, +4 Power, +4 SP; **Energy Cost**: -19
+- **Facility**: Stamina; **Stat Gains**: +8 Stamina, +6 Guts, +4 SP; **Energy Cost**: -20
+- **Facility**: Power; **Stat Gains**: +4 Stamina, +9 Power, +4 SP; **Energy Cost**: -20
+- **Facility**: Guts; **Stat Gains**: +3 Speed, +3 Power, +6 Guts, +4 SP; **Energy Cost**: -20
+- **Facility**: Wit; **Stat Gains**: +2 Speed, +6 Wit, +5 SP; **Energy Cost**: +5
 
 **Key Changes**:
 
@@ -531,15 +506,13 @@ Unity Training costs **more energy** than normal training:
 
 **Requirement**: Character must be your trainee OR one of your support cards
 
-**Gold Skill Reward**: Awarded if you **win Unity Cup Finals**
+### Gold Skill Reward**: Awarded if you **win Unity Cup Finals
 
-| Character | Team Name (EN) | Gold Skill |
-|-----------|----------------|------------|
-| Taiki Shuttle | Happy Hoppers | (Gold skill) |
-| Matikanefukukitaru | Sunny Runners | (Gold skill) |
-| Haru Urara | Carrot Pudding | (Gold skill) |
-| Rice Shower | Blue Bloom | (Gold skill) |
-| None of above | Team Carrot | (Gold skill) |
+- **Character**: Taiki Shuttle; **Team Name (EN)**: Happy Hoppers; **Gold Skill**: (Gold skill)
+- **Character**: Matikanefukukitaru; **Team Name (EN)**: Sunny Runners; **Gold Skill**: (Gold skill)
+- **Character**: Haru Urara; **Team Name (EN)**: Carrot Pudding; **Gold Skill**: (Gold skill)
+- **Character**: Rice Shower; **Team Name (EN)**: Blue Bloom; **Gold Skill**: (Gold skill)
+- **Character**: None of above; **Team Name (EN)**: Team Carrot; **Gold Skill**: (Gold skill)
 
 ### 7.3 S+ Team Rank Bonus
 
@@ -561,23 +534,19 @@ Unity Training costs **more energy** than normal training:
 
 ### 8.1 Global Server (Launch)
 
-| Stat | Cap |
-|------|-----|
-| Speed | 1200 |
-| Stamina | 1200 |
-| Power | 1200 |
-| Guts | 1200 |
-| Wit | 1200 |
+- **Stat**: Speed; **Cap**: 1200
+- **Stat**: Stamina; **Cap**: 1200
+- **Stat**: Power; **Cap**: 1200
+- **Stat**: Guts; **Cap**: 1200
+- **Stat**: Wit; **Cap**: 1200
 
 ### 8.2 Japanese Server (Current)
 
-| Stat | Cap |
-|------|-----|
-| Speed | 1300 |
-| Stamina | 1300 |
-| Power | 1300 |
-| Guts | 1300 |
-| Wit | **1800** |
+- **Stat**: Speed; **Cap**: 1300
+- **Stat**: Stamina; **Cap**: 1300
+- **Stat**: Power; **Cap**: 1300
+- **Stat**: Guts; **Cap**: 1300
+- **Stat**: Wit; **Cap**: **1800**
 
 **Note**: Global will likely receive these increased caps in future updates
 
@@ -764,17 +733,15 @@ Unity Training costs **more energy** than normal training:
 
 ## 14. Comparison: Unity Cup vs URA Finale
 
-| Aspect | URA Finale | Unity Cup |
-|--------|------------|-----------|
-| **Focus** | Single character | Team progression |
-| **Facility Levels** | Usage frequency | Team stat rank |
-| **Stat Caps** | 1200 all stats | 1200-1300 (1800 Wit JP) |
-| **Special Mechanic** | None | Spirit Burst |
-| **Team Races** | None | Every 6 months |
-| **Inheritance Spark** | Speed + Stamina | Power + Wisdom |
-| **Run Duration** | Faster | Slightly longer |
-| **Optimal For** | Fan farming, debuff umas | Ace characters, high stats |
-| **Complexity** | Lower | Higher |
+- **Aspect**: **Focus**; **URA Finale**: Single character; **Unity Cup**: Team progression
+- **Aspect**: **Facility Levels**; **URA Finale**: Usage frequency; **Unity Cup**: Team stat rank
+- **Aspect**: **Stat Caps**; **URA Finale**: 1200 all stats; **Unity Cup**: 1200-1300 (1800 Wit JP)
+- **Aspect**: **Special Mechanic**; **URA Finale**: None; **Unity Cup**: Spirit Burst
+- **Aspect**: **Team Races**; **URA Finale**: None; **Unity Cup**: Every 6 months
+- **Aspect**: **Inheritance Spark**; **URA Finale**: Speed + Stamina; **Unity Cup**: Power + Wisdom
+- **Aspect**: **Run Duration**; **URA Finale**: Faster; **Unity Cup**: Slightly longer
+- **Aspect**: **Optimal For**; **URA Finale**: Fan farming, debuff umas; **Unity Cup**: Ace characters, high stats
+- **Aspect**: **Complexity**; **URA Finale**: Lower; **Unity Cup**: Higher
 
 ---
 
@@ -968,4 +935,4 @@ All content has been paraphrased and summarized from the above sources to comply
 
 ---
 
-**End of Document**
+### End of Document
