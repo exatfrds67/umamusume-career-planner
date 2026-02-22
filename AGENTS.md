@@ -309,9 +309,7 @@ When updating implementation or docs, ensure alignment with:
 
 #### Markdownlint Compliance (MANDATORY)
 
-**ESPECIALLY WHEN UPDATING EXISTING DOCUMENTS, MUST ADHERE TO MARKDOWNLINT RULES**
-
-All markdown (`.md`) files must pass `markdownlint-cli2` validation with zero errors:
+Especially when updating existing documents, you must adhere to markdownlint rules. All markdown (`.md`) files must pass `markdownlint-cli2` validation with zero errors:
 
 - **Before committing**: Run `npx markdownlint-cli2 "docs/**/*.md"` to verify compliance
 - **When updating existing documents**: MUST also fix any pre-existing markdownlint violations in the modified file
