@@ -37,26 +37,26 @@ flowchart LR
     subgraph Business[Business Layer]
         BR[Business Requirements<br/>BR-1 to BR-12]
     end
-    
+
     subgraph Functional[Functional Layer]
         FR[Functional Requirements<br/>FR-01 to FR-12]
     end
-    
+
     subgraph Technical[Technical Layer]
         SPEC[Technical Specifications<br/>SPEC-001 to SPEC-007]
         PRD[Product Requirements<br/>PRD-001 to PRD-007]
     end
-    
+
     subgraph Implementation[Implementation Layer]
         Code[Source Code<br/>Models, Services, Controllers]
         Tests[Test Cases<br/>Unit, Feature, E2E]
     end
-    
+
     Business --> Functional
     Functional --> Technical
     Technical --> Implementation
     Implementation -.verification.-> Functional
-    
+
     style Business fill:#e3f2fd
     style Functional fill:#f3e5f5
     style Technical fill:#fff3e0
@@ -65,14 +65,12 @@ flowchart LR
 
 ### 1.3 Coverage Summary
 
-| Layer | Total Items | Traced | Coverage % |
-|-------|-------------|--------|------------|
-| Business Requirements | 52 | 50 | 96% |
-| Functional Requirements | 67 | 65 | 97% |
-| Technical Specifications | 89 | 87 | 98% |
-| Implementation Artifacts | 280 | 272 | 97% |
-| Test Cases | 3,316 | 3,200+ | 97% |
-| **Overall** | **3,804** | **3,674+** | **97%** |
+- **Layer**: Business Requirements; **Total Items**: 52; **Traced**: 50; **Coverage %**: 96%
+- **Layer**: Functional Requirements; **Total Items**: 67; **Traced**: 65; **Coverage %**: 97%
+- **Layer**: Technical Specifications; **Total Items**: 89; **Traced**: 87; **Coverage %**: 98%
+- **Layer**: Implementation Artifacts; **Total Items**: 280; **Traced**: 272; **Coverage %**: 97%
+- **Layer**: Test Cases; **Total Items**: 3,316; **Traced**: 3,200+; **Coverage %**: 97%
+- **Layer**: **Overall**; **Total Items**: **3,804**; **Traced**: **3,674+**; **Coverage %**: **97%**
 
 ### 1.4 Requirements Status Dashboard
 
@@ -96,7 +94,7 @@ flowchart TD
     L3[Level 3: Technical to Implementation]
     L4[Level 4: Implementation to Tests]
     L5[Level 5: Bidirectional Verification]
-    
+
     L1 --> L2
     L2 --> L3
     L3 --> L4
@@ -104,25 +102,21 @@ flowchart TD
     L5 -.feedback.-> L1
 ```
 
-| Level | From | To | Purpose |
-|-------|------|-----|---------|
-| **Level 1** | Business Requirements (BRS) | Functional Requirements (SRS) | Ensure business needs are captured |
-| **Level 2** | Functional Requirements (SRS) | Technical Specs (SPEC/PRD) | Map requirements to design |
-| **Level 3** | Technical Specs | Implementation (Code) | Verify implementation completeness |
-| **Level 4** | Implementation | Test Cases | Ensure test coverage |
-| **Level 5** | Test Results | Functional Requirements | Validate requirements met |
+- **Level**: **Level 1**; **From**: Business Requirements (BRS); **To**: Functional Requirements (SRS); **Purpose**: Ensure business needs are captured
+- **Level**: **Level 2**; **From**: Functional Requirements (SRS); **To**: Technical Specs (SPEC/PRD); **Purpose**: Map requirements to design
+- **Level**: **Level 3**; **From**: Technical Specs; **To**: Implementation (Code); **Purpose**: Verify implementation completeness
+- **Level**: **Level 4**; **From**: Implementation; **To**: Test Cases; **Purpose**: Ensure test coverage
+- **Level**: **Level 5**; **From**: Test Results; **To**: Functional Requirements; **Purpose**: Validate requirements met
 
 ### 2.2 Traceability Matrix Structure
 
-| Column | Description |
-|--------|-------------|
-| **Requirement ID** | Unique identifier (BR-x.y, FR-xx.y) |
-| **Requirement Text** | Brief description |
-| **Priority** | P0 (Critical), P1 (High), P2 (Medium) |
-| **Technical Spec** | Reference to SPEC/PRD document |
-| **Implementation** | Code artifact reference |
-| **Test ID** | Test case reference |
-| **Status** | ✅ Complete, 🔄 In Progress, ⏳ Pending |
+- **Column**: **Requirement ID**; **Description**: Unique identifier (BR-x.y, FR-xx.y)
+- **Column**: **Requirement Text**; **Description**: Brief description
+- **Column**: **Priority**; **Description**: P0 (Critical), P1 (High), P2 (Medium)
+- **Column**: **Technical Spec**; **Description**: Reference to SPEC/PRD document
+- **Column**: **Implementation**; **Description**: Code artifact reference
+- **Column**: **Test ID**; **Description**: Test case reference
+- **Column**: **Status**; **Description**: ✅ Complete, 🔄 In Progress, ⏳ Pending
 
 ### 2.3 Traceability Rules
 
@@ -154,7 +148,7 @@ flowchart LR
         BR11[BR-11: UX & A11y]
         BR12[BR-12: Analytics]
     end
-    
+
     subgraph SRS[Functional Requirements]
         FR01[FR-01: Auth]
         FR02[FR-02: Character]
@@ -169,7 +163,7 @@ flowchart LR
         FR11[FR-11: Dashboard]
         FR12[FR-12: Analytics]
     end
-    
+
     BR1 --> FR02
     BR2 --> FR03
     BR3 --> FR04
@@ -186,63 +180,61 @@ flowchart LR
 
 ### 3.2 Detailed Business to Functional Mapping
 
-| Business Req | Functional Req | Description | Priority | Status |
-|--------------|----------------|-------------|----------|--------|
-| **BR-1.1** Character CRUD | FR-02.1 | Create, view, update, delete character records | P0 | ✅ Complete |
-| **BR-1.2** Image storage | FR-02.2 | Store and display character images | P1 | ✅ Complete |
-| **BR-1.3** Aptitude tracking | FR-02.6 | Track aptitude grades (distance, surface, style) | P0 | ✅ Complete |
-| **BR-1.4** Growth rates | FR-02.4 | Track stat growth rate bonuses | P0 | ✅ Complete |
-| **BR-1.5** Factor inheritance | FR-02.7 | Calculate and apply factor bonuses from parents | P0 | ✅ Complete |
-| **BR-1.6** Goal management | FR-02.3 | Define and track training goals | P1 | ✅ Complete |
-| **BR-2.1** Training predictions | FR-03.2 | Predict stat gains for training options | P0 | ✅ Complete |
-| **BR-2.2** Support bonuses | FR-03.4 | Calculate support card bonuses | P0 | ✅ Complete |
-| **BR-2.3** Skill hints | FR-03.6 | Track skill hints from training | P0 | ✅ Complete |
-| **BR-2.4** AI recommendations | FR-03.8 | Provide AI-powered training advice | P1 | ✅ Complete |
-| **BR-2.5** Training history | FR-03.1 | Record training session logs | P1 | ✅ Complete |
-| **BR-3.1** Race calendar | FR-04.3 | Display races with requirements | P0 | ✅ Complete |
-| **BR-3.2** Running styles | FR-04.7 | Support all 4 running styles | P0 | ✅ Complete |
-| **BR-3.3** Win probability | FR-04.6 | Calculate race win probability | P1 | ✅ Complete |
-| **BR-3.4** Race strategy | FR-04.4 | Provide race strategy recommendations | P1 | ✅ Complete |
-| **BR-3.5** Race history | FR-04.2 | Track race results and performance | P1 | ✅ Complete |
-| **BR-4.1** Skill catalog | FR-05.1 | Maintain comprehensive skill database | P0 | ✅ Complete |
-| **BR-4.2** Hint-based discount | FR-05.3 | Apply hint-based SP cost reduction (5 levels: 10%/20%/30%/35%/40% max) | P0 | ✅ Complete |
-| **BR-4.3** Skill evolution | FR-05.4 | Support skill evolution (Normal → Rare) | P1 | ✅ Complete |
-| **BR-4.4** SP optimization | FR-05.6 | Optimize SP budget allocation | P1 | ✅ Complete |
-| **BR-4.5** AI skill recommendations | FR-05.5 | Provide AI skill acquisition advice | P1 | ✅ Complete |
-| **BR-5.1** Support card database | FR-06.1 | Maintain support card inventory (200+ cards) | P0 | ✅ Complete |
-| **BR-5.2** Deck validation | FR-06.2 | Validate 6-card deck composition | P0 | ✅ Complete |
-| **BR-5.3** Bond tracking | FR-06.3 | Track bond levels and friendship training | P0 | ✅ Complete |
-| **BR-5.4** Deck synergy | FR-06.4 | Calculate and display deck synergy score | P1 | ✅ Complete |
-| **BR-5.5** Meta tiers | FR-06.5 | Sync meta tier rankings from external sources | P1 | ✅ Complete |
-| **BR-6.1** Hybrid AI | FR-07.6 | Support Ollama (local) + AWS Bedrock (cloud) | P0 | ✅ Complete |
-| **BR-6.2** Advisory capabilities | FR-07.1-3 | Training, race, and skill advisory | P0 | ✅ Complete |
-| **BR-6.3** Conversation history | FR-07.4 | Persist AI conversation context | P1 | ✅ Complete |
-| **BR-6.4** Cost tracking | FR-07.5 | Track AI token usage and costs | P1 | ✅ Complete |
-| **BR-6.5** Confidence scoring | FR-07.7 | Provide confidence scores for recommendations | P2 | ✅ Complete |
-| **BR-7.1** External APIs | FR-08.1 | Integrate with umapyoi.net and UmamusumeDB | P0 | ✅ Complete |
-| **BR-7.2** Circuit breaker | FR-08.2 | Implement resilience patterns | P0 | ✅ Complete |
-| **BR-7.3** OCR processing | FR-08.4 | Process screenshots via Tesseract + GD | P1 | ✅ Complete |
-| **BR-7.4** WebSocket updates | FR-08.5 | Real-time updates via Laravel Reverb | P1 | ✅ Complete |
-| **BR-7.5** Community data | FR-08.6 | Support community data sharing | P2 | ✅ Complete |
-| **BR-8.1** JSON import/export | FR-09.1 | JSON format with schema versioning | P0 | ✅ Complete |
-| **BR-8.2** Excel export | FR-09.2 | Export to .xlsx format | P1 | ✅ Complete |
-| **BR-8.3** Backup/restore | FR-09.6 | Complete backup and restore workflows | P1 | ✅ Complete |
-| **BR-8.4** Storage migration | FR-09.4 | Migrate between storage modes | P1 | ✅ Complete |
-| **BR-8.5** OCR data capture | FR-08.4 | Import data from screenshots | P1 | ✅ Complete |
-| **BR-9.1** Local mode | FR-10.1 | Browser localStorage-based storage | P0 | ✅ Complete |
-| **BR-9.2** Account mode | FR-10.2 | Database-backed cloud storage | P0 | ✅ Complete |
-| **BR-9.3** Storage indicator | FR-10.3 | Visual storage mode badge | P0 | ✅ Complete |
-| **BR-9.4** Offline functionality | FR-10.4 | Full offline support for Local mode | P0 | ✅ Complete |
-| **BR-9.5** Mode conversion | FR-10.5 | Convert Local runs to Account mode | P0 | ✅ Complete |
-| **BR-10.1** APM dashboards | NFR-07.1 | Application performance monitoring | P1 | 🔄 In Progress |
-| **BR-10.2** Cache monitoring | NFR-07.4 | Cache hit/miss tracking | P1 | 🔄 In Progress |
-| **BR-10.3** Fallback workflows | NFR-07.5 | Graceful degradation patterns | P1 | 🔄 In Progress |
-| **BR-11.1** PWA offline | FR-10.4 | Offline route coverage | P1 | 🔄 In Progress |
-| **BR-11.2** Accessibility | NFR-03 | WCAG AA compliance | P0 | 🔄 In Progress |
-| **BR-11.3** Dark mode | NFR-06.4 | Theme toggle with persistence | P0 | ✅ Complete |
-| **BR-11.4** Responsive design | NFR-06 | 320px to 2560px support | P0 | ✅ Complete |
-| **BR-12.1** Analytics dashboard | FR-12.1 | Career performance analytics | P1 | ✅ Complete |
-| **BR-12.2** Performance comparison | FR-12.2 | Compare career runs | P1 | ✅ Complete |
+- **Business Req**: **BR-1.1** Character CRUD; **Functional Req**: FR-02.1; **Description**: Create, view, update, delete character records; **Priority**: P0; **Status**: ✅ Complete
+- **Business Req**: **BR-1.2** Image storage; **Functional Req**: FR-02.2; **Description**: Store and display character images; **Priority**: P1; **Status**: ✅ Complete
+- **Business Req**: **BR-1.3** Aptitude tracking; **Functional Req**: FR-02.6; **Description**: Track aptitude grades (distance, surface, style); **Priority**: P0; **Status**: ✅ Complete
+- **Business Req**: **BR-1.4** Growth rates; **Functional Req**: FR-02.4; **Description**: Track stat growth rate bonuses; **Priority**: P0; **Status**: ✅ Complete
+- **Business Req**: **BR-1.5** Factor inheritance; **Functional Req**: FR-02.7; **Description**: Calculate and apply factor bonuses from parents; **Priority**: P0; **Status**: ✅ Complete
+- **Business Req**: **BR-1.6** Goal management; **Functional Req**: FR-02.3; **Description**: Define and track training goals; **Priority**: P1; **Status**: ✅ Complete
+- **Business Req**: **BR-2.1** Training predictions; **Functional Req**: FR-03.2; **Description**: Predict stat gains for training options; **Priority**: P0; **Status**: ✅ Complete
+- **Business Req**: **BR-2.2** Support bonuses; **Functional Req**: FR-03.4; **Description**: Calculate support card bonuses; **Priority**: P0; **Status**: ✅ Complete
+- **Business Req**: **BR-2.3** Skill hints; **Functional Req**: FR-03.6; **Description**: Track skill hints from training; **Priority**: P0; **Status**: ✅ Complete
+- **Business Req**: **BR-2.4** AI recommendations; **Functional Req**: FR-03.8; **Description**: Provide AI-powered training advice; **Priority**: P1; **Status**: ✅ Complete
+- **Business Req**: **BR-2.5** Training history; **Functional Req**: FR-03.1; **Description**: Record training session logs; **Priority**: P1; **Status**: ✅ Complete
+- **Business Req**: **BR-3.1** Race calendar; **Functional Req**: FR-04.3; **Description**: Display races with requirements; **Priority**: P0; **Status**: ✅ Complete
+- **Business Req**: **BR-3.2** Running styles; **Functional Req**: FR-04.7; **Description**: Support all 4 running styles; **Priority**: P0; **Status**: ✅ Complete
+- **Business Req**: **BR-3.3** Win probability; **Functional Req**: FR-04.6; **Description**: Calculate race win probability; **Priority**: P1; **Status**: ✅ Complete
+- **Business Req**: **BR-3.4** Race strategy; **Functional Req**: FR-04.4; **Description**: Provide race strategy recommendations; **Priority**: P1; **Status**: ✅ Complete
+- **Business Req**: **BR-3.5** Race history; **Functional Req**: FR-04.2; **Description**: Track race results and performance; **Priority**: P1; **Status**: ✅ Complete
+- **Business Req**: **BR-4.1** Skill catalog; **Functional Req**: FR-05.1; **Description**: Maintain comprehensive skill database; **Priority**: P0; **Status**: ✅ Complete
+- **Business Req**: **BR-4.2** Hint-based discount; **Functional Req**: FR-05.3; **Description**: Apply hint-based SP cost reduction (5 levels: 10%/20%/30%/35%/40% max); **Priority**: P0; **Status**: ✅ Complete
+- **Business Req**: **BR-4.3** Skill evolution; **Functional Req**: FR-05.4; **Description**: Support skill evolution (Normal → Rare); **Priority**: P1; **Status**: ✅ Complete
+- **Business Req**: **BR-4.4** SP optimization; **Functional Req**: FR-05.6; **Description**: Optimize SP budget allocation; **Priority**: P1; **Status**: ✅ Complete
+- **Business Req**: **BR-4.5** AI skill recommendations; **Functional Req**: FR-05.5; **Description**: Provide AI skill acquisition advice; **Priority**: P1; **Status**: ✅ Complete
+- **Business Req**: **BR-5.1** Support card database; **Functional Req**: FR-06.1; **Description**: Maintain support card inventory (200+ cards); **Priority**: P0; **Status**: ✅ Complete
+- **Business Req**: **BR-5.2** Deck validation; **Functional Req**: FR-06.2; **Description**: Validate 6-card deck composition; **Priority**: P0; **Status**: ✅ Complete
+- **Business Req**: **BR-5.3** Bond tracking; **Functional Req**: FR-06.3; **Description**: Track bond levels and friendship training; **Priority**: P0; **Status**: ✅ Complete
+- **Business Req**: **BR-5.4** Deck synergy; **Functional Req**: FR-06.4; **Description**: Calculate and display deck synergy score; **Priority**: P1; **Status**: ✅ Complete
+- **Business Req**: **BR-5.5** Meta tiers; **Functional Req**: FR-06.5; **Description**: Sync meta tier rankings from external sources; **Priority**: P1; **Status**: ✅ Complete
+- **Business Req**: **BR-6.1** Hybrid AI; **Functional Req**: FR-07.6; **Description**: Support Ollama (local) + AWS Bedrock (cloud); **Priority**: P0; **Status**: ✅ Complete
+- **Business Req**: **BR-6.2** Advisory capabilities; **Functional Req**: FR-07.1-3; **Description**: Training, race, and skill advisory; **Priority**: P0; **Status**: ✅ Complete
+- **Business Req**: **BR-6.3** Conversation history; **Functional Req**: FR-07.4; **Description**: Persist AI conversation context; **Priority**: P1; **Status**: ✅ Complete
+- **Business Req**: **BR-6.4** Cost tracking; **Functional Req**: FR-07.5; **Description**: Track AI token usage and costs; **Priority**: P1; **Status**: ✅ Complete
+- **Business Req**: **BR-6.5** Confidence scoring; **Functional Req**: FR-07.7; **Description**: Provide confidence scores for recommendations; **Priority**: P2; **Status**: ✅ Complete
+- **Business Req**: **BR-7.1** External APIs; **Functional Req**: FR-08.1; **Description**: Integrate with umapyoi.net and UmamusumeDB; **Priority**: P0; **Status**: ✅ Complete
+- **Business Req**: **BR-7.2** Circuit breaker; **Functional Req**: FR-08.2; **Description**: Implement resilience patterns; **Priority**: P0; **Status**: ✅ Complete
+- **Business Req**: **BR-7.3** OCR processing; **Functional Req**: FR-08.4; **Description**: Process screenshots via Tesseract + GD; **Priority**: P1; **Status**: ✅ Complete
+- **Business Req**: **BR-7.4** WebSocket updates; **Functional Req**: FR-08.5; **Description**: Real-time updates via Laravel Reverb; **Priority**: P1; **Status**: ✅ Complete
+- **Business Req**: **BR-7.5** Community data; **Functional Req**: FR-08.6; **Description**: Support community data sharing; **Priority**: P2; **Status**: ✅ Complete
+- **Business Req**: **BR-8.1** JSON import/export; **Functional Req**: FR-09.1; **Description**: JSON format with schema versioning; **Priority**: P0; **Status**: ✅ Complete
+- **Business Req**: **BR-8.2** Excel export; **Functional Req**: FR-09.2; **Description**: Export to .xlsx format; **Priority**: P1; **Status**: ✅ Complete
+- **Business Req**: **BR-8.3** Backup/restore; **Functional Req**: FR-09.6; **Description**: Complete backup and restore workflows; **Priority**: P1; **Status**: ✅ Complete
+- **Business Req**: **BR-8.4** Storage migration; **Functional Req**: FR-09.4; **Description**: Migrate between storage modes; **Priority**: P1; **Status**: ✅ Complete
+- **Business Req**: **BR-8.5** OCR data capture; **Functional Req**: FR-08.4; **Description**: Import data from screenshots; **Priority**: P1; **Status**: ✅ Complete
+- **Business Req**: **BR-9.1** Local mode; **Functional Req**: FR-10.1; **Description**: Browser localStorage-based storage; **Priority**: P0; **Status**: ✅ Complete
+- **Business Req**: **BR-9.2** Account mode; **Functional Req**: FR-10.2; **Description**: Database-backed cloud storage; **Priority**: P0; **Status**: ✅ Complete
+- **Business Req**: **BR-9.3** Storage indicator; **Functional Req**: FR-10.3; **Description**: Visual storage mode badge; **Priority**: P0; **Status**: ✅ Complete
+- **Business Req**: **BR-9.4** Offline functionality; **Functional Req**: FR-10.4; **Description**: Full offline support for Local mode; **Priority**: P0; **Status**: ✅ Complete
+- **Business Req**: **BR-9.5** Mode conversion; **Functional Req**: FR-10.5; **Description**: Convert Local runs to Account mode; **Priority**: P0; **Status**: ✅ Complete
+- **Business Req**: **BR-10.1** APM dashboards; **Functional Req**: NFR-07.1; **Description**: Application performance monitoring; **Priority**: P1; **Status**: 🔄 In Progress
+- **Business Req**: **BR-10.2** Cache monitoring; **Functional Req**: NFR-07.4; **Description**: Cache hit/miss tracking; **Priority**: P1; **Status**: 🔄 In Progress
+- **Business Req**: **BR-10.3** Fallback workflows; **Functional Req**: NFR-07.5; **Description**: Graceful degradation patterns; **Priority**: P1; **Status**: 🔄 In Progress
+- **Business Req**: **BR-11.1** PWA offline; **Functional Req**: FR-10.4; **Description**: Offline route coverage; **Priority**: P1; **Status**: 🔄 In Progress
+- **Business Req**: **BR-11.2** Accessibility; **Functional Req**: NFR-03; **Description**: WCAG AA compliance; **Priority**: P0; **Status**: 🔄 In Progress
+- **Business Req**: **BR-11.3** Dark mode; **Functional Req**: NFR-06.4; **Description**: Theme toggle with persistence; **Priority**: P0; **Status**: ✅ Complete
+- **Business Req**: **BR-11.4** Responsive design; **Functional Req**: NFR-06; **Description**: 320px to 2560px support; **Priority**: P0; **Status**: ✅ Complete
+- **Business Req**: **BR-12.1** Analytics dashboard; **Functional Req**: FR-12.1; **Description**: Career performance analytics; **Priority**: P1; **Status**: ✅ Complete
+- **Business Req**: **BR-12.2** Performance comparison; **Functional Req**: FR-12.2; **Description**: Compare career runs; **Priority**: P1; **Status**: ✅ Complete
 
 ---
 
@@ -261,7 +253,7 @@ flowchart LR
         FR07[FR-07: AI]
         FR08[FR-08: External]
     end
-    
+
     subgraph SPEC[Technical Specifications]
         SPEC001[SPEC-001]
         SPEC002[SPEC-002]
@@ -271,7 +263,7 @@ flowchart LR
         SPEC006[SPEC-006]
         SPEC007[SPEC-007]
     end
-    
+
     subgraph PRD[Product Requirements]
         PRD001[PRD-001]
         PRD002[PRD-002]
@@ -281,7 +273,7 @@ flowchart LR
         PRD006[PRD-006]
         PRD007[PRD-007]
     end
-    
+
     FR02 --> SPEC001
     FR02 --> PRD001
     FR03 --> SPEC002
@@ -300,31 +292,29 @@ flowchart LR
 
 ### 4.2 Detailed Functional to Technical Mapping
 
-| Functional Req | Technical Spec | PRD | Flow Diagram | Description | Status |
-|----------------|----------------|-----|--------------|-------------|--------|
-| **FR-02.1** Character CRUD | SPEC-001 §3.1 | PRD-001 §3 | FLOW-001 | Character management operations | ✅ Complete |
-| **FR-02.2** Image storage | SPEC-001 §3.2 | PRD-001 §3.2 | SEQ-001 | Image upload and validation | ✅ Complete |
-| **FR-02.6** Aptitude grades | SPEC-001 §4.1 | PRD-001 §4 | FLOW-001 | Aptitude tracking system | ✅ Complete |
-| **FR-02.7** Factor inheritance | SPEC-001 §4.3 | PRD-001 §4.3 | TECH-FLOW-001 | Factor calculation logic | ✅ Complete |
-| **FR-03.2** Training predictions | SPEC-002 §3.1 | PRD-002 §3 | FLOW-002 | Prediction engine | ✅ Complete |
-| **FR-03.4** Support bonuses | SPEC-002 §3.2 | PRD-002 §3.2 | TECH-FLOW-002 | Bonus calculation | ✅ Complete |
-| **FR-03.6** Skill hints | SPEC-002 §4.1 | PRD-002 §4 | FLOW-002 | Hint tracking | ✅ Complete |
-| **FR-03.8** AI training advice | SPEC-002 §5.1 | PRD-002 §5 | FLOW-006 | Training advisor agent | ✅ Complete |
-| **FR-04.3** Race calendar | SPEC-003 §3.1 | PRD-003 §3 | FLOW-003 | Race schedule display | ✅ Complete |
-| **FR-04.6** Win probability | SPEC-003 §4.2 | PRD-003 §4.2 | TECH-FLOW-003 | Win calculation | ✅ Complete |
-| **FR-04.7** Running styles | SPEC-003 §4.1 | PRD-003 §4 | FLOW-003 | Style optimization | ✅ Complete |
-| **FR-05.1** Skill catalog | SPEC-004 §3.1 | PRD-004 §3 | FLOW-004 | Skill database | ✅ Complete |
-| **FR-05.3** Hint discount | SPEC-004 §4.1 | PRD-004 §4 | TECH-FLOW-004 | SP cost reduction | ✅ Complete |
-| **FR-05.4** Skill evolution | SPEC-004 §4.2 | PRD-004 §4.2 | FLOW-004 | Evolution system | ✅ Complete |
-| **FR-06.1** Support card DB | SPEC-005 §3.1 | PRD-005 §3 | FLOW-005 | Card inventory | ✅ Complete |
-| **FR-06.2** Deck validation | SPEC-005 §3.2 | PRD-005 §3.2 | TECH-FLOW-005 | 6-card validation | ✅ Complete |
-| **FR-06.3** Bond tracking | SPEC-005 §4.1 | PRD-005 §4 | FLOW-005 | Bond progression | ✅ Complete |
-| **FR-07.1-3** AI advisory | SPEC-006 §4.1 | PRD-006 §4 | FLOW-006 | Multi-topic advisory | ✅ Complete |
-| **FR-07.6** Hybrid AI | SPEC-006 §3.1 | PRD-006 §3 | TECH-FLOW-006 | Provider routing | ✅ Complete |
-| **FR-07.5** Cost tracking | SPEC-006 §5.1 | PRD-006 §5 | FLOW-006 | Token usage tracking | ✅ Complete |
-| **FR-08.1** External APIs | SPEC-007 §3.1 | PRD-007 §3 | FLOW-007 | API integration | ✅ Complete |
-| **FR-08.2** Circuit breaker | SPEC-007 §3.2 | PRD-007 §3.2 | TECH-FLOW-007 | Resilience pattern | ✅ Complete |
-| **FR-08.4** OCR processing | SPEC-007 §4.1 | PRD-007 §4 | FLOW-007 | Screenshot processing | ✅ Complete |
+- **Functional Req**: **FR-02.1** Character CRUD; **Technical Spec**: SPEC-001 §3.1; **PRD**: PRD-001 §3; **Flow Diagram**: FLOW-001; **Description**: Character management operations; **Status**: ✅ Complete
+- **Functional Req**: **FR-02.2** Image storage; **Technical Spec**: SPEC-001 §3.2; **PRD**: PRD-001 §3.2; **Flow Diagram**: SEQ-001; **Description**: Image upload and validation; **Status**: ✅ Complete
+- **Functional Req**: **FR-02.6** Aptitude grades; **Technical Spec**: SPEC-001 §4.1; **PRD**: PRD-001 §4; **Flow Diagram**: FLOW-001; **Description**: Aptitude tracking system; **Status**: ✅ Complete
+- **Functional Req**: **FR-02.7** Factor inheritance; **Technical Spec**: SPEC-001 §4.3; **PRD**: PRD-001 §4.3; **Flow Diagram**: TECH-FLOW-001; **Description**: Factor calculation logic; **Status**: ✅ Complete
+- **Functional Req**: **FR-03.2** Training predictions; **Technical Spec**: SPEC-002 §3.1; **PRD**: PRD-002 §3; **Flow Diagram**: FLOW-002; **Description**: Prediction engine; **Status**: ✅ Complete
+- **Functional Req**: **FR-03.4** Support bonuses; **Technical Spec**: SPEC-002 §3.2; **PRD**: PRD-002 §3.2; **Flow Diagram**: TECH-FLOW-002; **Description**: Bonus calculation; **Status**: ✅ Complete
+- **Functional Req**: **FR-03.6** Skill hints; **Technical Spec**: SPEC-002 §4.1; **PRD**: PRD-002 §4; **Flow Diagram**: FLOW-002; **Description**: Hint tracking; **Status**: ✅ Complete
+- **Functional Req**: **FR-03.8** AI training advice; **Technical Spec**: SPEC-002 §5.1; **PRD**: PRD-002 §5; **Flow Diagram**: FLOW-006; **Description**: Training advisor agent; **Status**: ✅ Complete
+- **Functional Req**: **FR-04.3** Race calendar; **Technical Spec**: SPEC-003 §3.1; **PRD**: PRD-003 §3; **Flow Diagram**: FLOW-003; **Description**: Race schedule display; **Status**: ✅ Complete
+- **Functional Req**: **FR-04.6** Win probability; **Technical Spec**: SPEC-003 §4.2; **PRD**: PRD-003 §4.2; **Flow Diagram**: TECH-FLOW-003; **Description**: Win calculation; **Status**: ✅ Complete
+- **Functional Req**: **FR-04.7** Running styles; **Technical Spec**: SPEC-003 §4.1; **PRD**: PRD-003 §4; **Flow Diagram**: FLOW-003; **Description**: Style optimization; **Status**: ✅ Complete
+- **Functional Req**: **FR-05.1** Skill catalog; **Technical Spec**: SPEC-004 §3.1; **PRD**: PRD-004 §3; **Flow Diagram**: FLOW-004; **Description**: Skill database; **Status**: ✅ Complete
+- **Functional Req**: **FR-05.3** Hint discount; **Technical Spec**: SPEC-004 §4.1; **PRD**: PRD-004 §4; **Flow Diagram**: TECH-FLOW-004; **Description**: SP cost reduction; **Status**: ✅ Complete
+- **Functional Req**: **FR-05.4** Skill evolution; **Technical Spec**: SPEC-004 §4.2; **PRD**: PRD-004 §4.2; **Flow Diagram**: FLOW-004; **Description**: Evolution system; **Status**: ✅ Complete
+- **Functional Req**: **FR-06.1** Support card DB; **Technical Spec**: SPEC-005 §3.1; **PRD**: PRD-005 §3; **Flow Diagram**: FLOW-005; **Description**: Card inventory; **Status**: ✅ Complete
+- **Functional Req**: **FR-06.2** Deck validation; **Technical Spec**: SPEC-005 §3.2; **PRD**: PRD-005 §3.2; **Flow Diagram**: TECH-FLOW-005; **Description**: 6-card validation; **Status**: ✅ Complete
+- **Functional Req**: **FR-06.3** Bond tracking; **Technical Spec**: SPEC-005 §4.1; **PRD**: PRD-005 §4; **Flow Diagram**: FLOW-005; **Description**: Bond progression; **Status**: ✅ Complete
+- **Functional Req**: **FR-07.1-3** AI advisory; **Technical Spec**: SPEC-006 §4.1; **PRD**: PRD-006 §4; **Flow Diagram**: FLOW-006; **Description**: Multi-topic advisory; **Status**: ✅ Complete
+- **Functional Req**: **FR-07.6** Hybrid AI; **Technical Spec**: SPEC-006 §3.1; **PRD**: PRD-006 §3; **Flow Diagram**: TECH-FLOW-006; **Description**: Provider routing; **Status**: ✅ Complete
+- **Functional Req**: **FR-07.5** Cost tracking; **Technical Spec**: SPEC-006 §5.1; **PRD**: PRD-006 §5; **Flow Diagram**: FLOW-006; **Description**: Token usage tracking; **Status**: ✅ Complete
+- **Functional Req**: **FR-08.1** External APIs; **Technical Spec**: SPEC-007 §3.1; **PRD**: PRD-007 §3; **Flow Diagram**: FLOW-007; **Description**: API integration; **Status**: ✅ Complete
+- **Functional Req**: **FR-08.2** Circuit breaker; **Technical Spec**: SPEC-007 §3.2; **PRD**: PRD-007 §3.2; **Flow Diagram**: TECH-FLOW-007; **Description**: Resilience pattern; **Status**: ✅ Complete
+- **Functional Req**: **FR-08.4** OCR processing; **Technical Spec**: SPEC-007 §4.1; **PRD**: PRD-007 §4; **Flow Diagram**: FLOW-007; **Description**: Screenshot processing; **Status**: ✅ Complete
 
 ---
 
@@ -337,7 +327,7 @@ flowchart TD
     subgraph Requirements[Requirements]
         FR[Functional Requirements]
     end
-    
+
     subgraph Models[Domain Models - 30 Models]
         Character[Character.php]
         Career[Career.php]
@@ -345,7 +335,7 @@ flowchart TD
         SupportCard[SupportCard.php]
         RunSnapshot[RunSnapshot.php]
     end
-    
+
     subgraph Services[Services - 70+ Services]
         CharSvc[CharacterService]
         TrainSvc[TrainingService]
@@ -354,7 +344,7 @@ flowchart TD
         AISvc[AIAdvisoryService]
         NeuronSvc[NeuronAIService]
     end
-    
+
     subgraph Controllers[Controllers - Web + API + Admin]
         CharCtrl[CharacterController]
         TrainCtrl[TrainingController]
@@ -362,13 +352,13 @@ flowchart TD
         AICtrl[AIAdvisoryController]
         AdminCtrl[Admin Controllers]
     end
-    
+
     subgraph Tests[Test Suite - 3,316+ Tests]
         UnitTests[Unit Tests]
         FeatureTests[Feature Tests]
         E2ETests[E2E Tests]
     end
-    
+
     FR --> Models
     Models --> Services
     Services --> Controllers
@@ -378,37 +368,35 @@ flowchart TD
 
 ### 5.2 Detailed Implementation Mapping
 
-| Req ID | Requirement | Model | Service | Controller | Test | Status |
-|--------|-------------|-------|---------|------------|------|--------|
-| **FR-02.1** | Character CRUD | `Character.php` | `CharacterService` | `CharacterController` | `CharacterCrudTest` | ✅ Complete |
-| **FR-02.2** | Image storage | `Character` | `ImageUploadService` | `CharacterController@uploadImage` | `ImageUploadTest` | ✅ Complete |
-| **FR-02.6** | Aptitude tracking | `Aptitude` | `CharacterService` | `CharacterController@updateAptitudes` | `AptitudeTest` | ✅ Complete |
-| **FR-02.7** | Factor inheritance | `Factor` | `FactorInheritanceService` | `CharacterController@calculateFactors` | `FactorInheritanceTest` | ✅ Complete |
-| **FR-03.2** | Training predictions | `TrainingSession` | `TrainingPredictionService` | `API\TrainingController@predict` | `TrainingPredictionTest` | ✅ Complete |
-| **FR-03.4** | Support bonuses | `SupportCard` | `BonusCalculator` | `API\TrainingController` | `BonusCalculatorTest` | ✅ Complete |
-| **FR-03.6** | Skill hints | `SkillHint` | `SkillHintService` | `API\TrainingController` | `SkillHintTest` | ✅ Complete |
-| **FR-03.8** | AI recommendations | - | `AIAdvisoryService` | `API\AIAdvisoryController` | `AIAdvisoryTest` | ✅ Complete |
-| **FR-04.3** | Race calendar | `Race` | `RaceService` | `RaceController@calendar` | `RaceCalendarTest` | ✅ Complete |
-| **FR-04.6** | Win probability | `Race` | `WinProbabilityCalculator` | `API\RaceController@analyze` | `WinProbabilityTest` | ✅ Complete |
-| **FR-04.7** | Running styles | `Character` | `RaceService` | `API\RaceController@recommendStyle` | `RunningStyleTest` | ✅ Complete |
-| **FR-05.1** | Skill catalog | `Skill` | `SkillService` | `API\SkillController@index` | `SkillCatalogTest` | ✅ Complete |
-| **FR-05.3** | Hint discount | `SkillHint` | `SkillService@calculateSpCost` | `API\SkillController@acquire` | `HintDiscountTest` | ✅ Complete |
-| **FR-05.4** | Skill evolution | `Skill` | `SkillEvolutionService` | `API\SkillController@evolve` | `SkillEvolutionTest` | ✅ Complete |
-| **FR-06.1** | Support card DB | `SupportCard` | `SupportCardService` | `SupportCardController@index` | `SupportCardTest` | ✅ Complete |
-| **FR-06.2** | Deck validation | `SupportDeck` | `SupportDeckService` | `API\SupportDeckController@validate` | `DeckValidationTest` | ✅ Complete |
-| **FR-06.3** | Bond tracking | `CharacterSupportCard` | `SupportDeckService` | `API\SupportDeckController` | `BondTrackingTest` | ✅ Complete |
-| **FR-07.1** | Training advice | - | `TrainingAdvisorAgent` | `API\AIAdvisoryController` | `TrainingAdvisorTest` | ✅ Complete |
-| **FR-07.2** | Race strategy | - | `RaceStrategyAgent` | `API\AIAdvisoryController` | `RaceStrategyTest` | ✅ Complete |
-| **FR-07.3** | Skill advice | - | `SkillAdvisorAgent` | `API\AIAdvisoryController` | `SkillAdvisorTest` | ✅ Complete |
-| **FR-07.6** | Hybrid AI | - | `HybridAIService` | `API\AIAdvisoryController` | `HybridAITest` | ✅ Complete |
-| **FR-07.5** | Cost tracking | `AICost` | `AICostTracker` | `Admin\AIController` | `CostTrackerTest` | ✅ Complete |
-| **FR-08.1** | External APIs | - | `ExternalAPIService` | `API\SyncController` | `ExternalAPITest` | ✅ Complete |
-| **FR-08.2** | Circuit breaker | - | `CircuitBreaker` | `API\SyncController` | `CircuitBreakerTest` | ✅ Complete |
-| **FR-08.4** | OCR processing | `OCRExtraction` | `OCRService` | `OCRUploadController` | `OCRProcessingTest` | ✅ Complete |
-| **FR-09.1** | JSON export | - | `DataExportService` | `API\ExportController` | `JSONExportTest` | ✅ Complete |
-| **FR-09.6** | Backup/restore | - | `BackupService` | `Admin\BackupController` | `BackupRestoreTest` | ✅ Complete |
-| **FR-10.1** | Local storage | - | `LocalStorageService` | JS: `stores/characters.js` | `LocalStorageTest` | ✅ Complete |
-| **FR-10.5** | Mode conversion | - | `StorageConversionService` | `ConversionController` | `ConversionTest` | ✅ Complete |
+- **Req ID**: **FR-02.1**; **Requirement**: Character CRUD; **Model**: `Character.php`; **Service**: `CharacterService`; **Controller**: `CharacterController`; **Test**: `CharacterCrudTest`; **Status**: ✅ Complete
+- **Req ID**: **FR-02.2**; **Requirement**: Image storage; **Model**: `Character`; **Service**: `ImageUploadService`; **Controller**: `CharacterController@uploadImage`; **Test**: `ImageUploadTest`; **Status**: ✅ Complete
+- **Req ID**: **FR-02.6**; **Requirement**: Aptitude tracking; **Model**: `Aptitude`; **Service**: `CharacterService`; **Controller**: `CharacterController@updateAptitudes`; **Test**: `AptitudeTest`; **Status**: ✅ Complete
+- **Req ID**: **FR-02.7**; **Requirement**: Factor inheritance; **Model**: `Factor`; **Service**: `FactorInheritanceService`; **Controller**: `CharacterController@calculateFactors`; **Test**: `FactorInheritanceTest`; **Status**: ✅ Complete
+- **Req ID**: **FR-03.2**; **Requirement**: Training predictions; **Model**: `TrainingSession`; **Service**: `TrainingPredictionService`; **Controller**: `API\TrainingController@predict`; **Test**: `TrainingPredictionTest`; **Status**: ✅ Complete
+- **Req ID**: **FR-03.4**; **Requirement**: Support bonuses; **Model**: `SupportCard`; **Service**: `BonusCalculator`; **Controller**: `API\TrainingController`; **Test**: `BonusCalculatorTest`; **Status**: ✅ Complete
+- **Req ID**: **FR-03.6**; **Requirement**: Skill hints; **Model**: `SkillHint`; **Service**: `SkillHintService`; **Controller**: `API\TrainingController`; **Test**: `SkillHintTest`; **Status**: ✅ Complete
+- **Req ID**: **FR-03.8**; **Requirement**: AI recommendations; **Model**: -; **Service**: `AIAdvisoryService`; **Controller**: `API\AIAdvisoryController`; **Test**: `AIAdvisoryTest`; **Status**: ✅ Complete
+- **Req ID**: **FR-04.3**; **Requirement**: Race calendar; **Model**: `Race`; **Service**: `RaceService`; **Controller**: `RaceController@calendar`; **Test**: `RaceCalendarTest`; **Status**: ✅ Complete
+- **Req ID**: **FR-04.6**; **Requirement**: Win probability; **Model**: `Race`; **Service**: `WinProbabilityCalculator`; **Controller**: `API\RaceController@analyze`; **Test**: `WinProbabilityTest`; **Status**: ✅ Complete
+- **Req ID**: **FR-04.7**; **Requirement**: Running styles; **Model**: `Character`; **Service**: `RaceService`; **Controller**: `API\RaceController@recommendStyle`; **Test**: `RunningStyleTest`; **Status**: ✅ Complete
+- **Req ID**: **FR-05.1**; **Requirement**: Skill catalog; **Model**: `Skill`; **Service**: `SkillService`; **Controller**: `API\SkillController@index`; **Test**: `SkillCatalogTest`; **Status**: ✅ Complete
+- **Req ID**: **FR-05.3**; **Requirement**: Hint discount; **Model**: `SkillHint`; **Service**: `SkillService@calculateSpCost`; **Controller**: `API\SkillController@acquire`; **Test**: `HintDiscountTest`; **Status**: ✅ Complete
+- **Req ID**: **FR-05.4**; **Requirement**: Skill evolution; **Model**: `Skill`; **Service**: `SkillEvolutionService`; **Controller**: `API\SkillController@evolve`; **Test**: `SkillEvolutionTest`; **Status**: ✅ Complete
+- **Req ID**: **FR-06.1**; **Requirement**: Support card DB; **Model**: `SupportCard`; **Service**: `SupportCardService`; **Controller**: `SupportCardController@index`; **Test**: `SupportCardTest`; **Status**: ✅ Complete
+- **Req ID**: **FR-06.2**; **Requirement**: Deck validation; **Model**: `SupportDeck`; **Service**: `SupportDeckService`; **Controller**: `API\SupportDeckController@validate`; **Test**: `DeckValidationTest`; **Status**: ✅ Complete
+- **Req ID**: **FR-06.3**; **Requirement**: Bond tracking; **Model**: `CharacterSupportCard`; **Service**: `SupportDeckService`; **Controller**: `API\SupportDeckController`; **Test**: `BondTrackingTest`; **Status**: ✅ Complete
+- **Req ID**: **FR-07.1**; **Requirement**: Training advice; **Model**: -; **Service**: `TrainingAdvisorAgent`; **Controller**: `API\AIAdvisoryController`; **Test**: `TrainingAdvisorTest`; **Status**: ✅ Complete
+- **Req ID**: **FR-07.2**; **Requirement**: Race strategy; **Model**: -; **Service**: `RaceStrategyAgent`; **Controller**: `API\AIAdvisoryController`; **Test**: `RaceStrategyTest`; **Status**: ✅ Complete
+- **Req ID**: **FR-07.3**; **Requirement**: Skill advice; **Model**: -; **Service**: `SkillAdvisorAgent`; **Controller**: `API\AIAdvisoryController`; **Test**: `SkillAdvisorTest`; **Status**: ✅ Complete
+- **Req ID**: **FR-07.6**; **Requirement**: Hybrid AI; **Model**: -; **Service**: `HybridAIService`; **Controller**: `API\AIAdvisoryController`; **Test**: `HybridAITest`; **Status**: ✅ Complete
+- **Req ID**: **FR-07.5**; **Requirement**: Cost tracking; **Model**: `AICost`; **Service**: `AICostTracker`; **Controller**: `Admin\AIController`; **Test**: `CostTrackerTest`; **Status**: ✅ Complete
+- **Req ID**: **FR-08.1**; **Requirement**: External APIs; **Model**: -; **Service**: `ExternalAPIService`; **Controller**: `API\SyncController`; **Test**: `ExternalAPITest`; **Status**: ✅ Complete
+- **Req ID**: **FR-08.2**; **Requirement**: Circuit breaker; **Model**: -; **Service**: `CircuitBreaker`; **Controller**: `API\SyncController`; **Test**: `CircuitBreakerTest`; **Status**: ✅ Complete
+- **Req ID**: **FR-08.4**; **Requirement**: OCR processing; **Model**: `OCRExtraction`; **Service**: `OCRService`; **Controller**: `OCRUploadController`; **Test**: `OCRProcessingTest`; **Status**: ✅ Complete
+- **Req ID**: **FR-09.1**; **Requirement**: JSON export; **Model**: -; **Service**: `DataExportService`; **Controller**: `API\ExportController`; **Test**: `JSONExportTest`; **Status**: ✅ Complete
+- **Req ID**: **FR-09.6**; **Requirement**: Backup/restore; **Model**: -; **Service**: `BackupService`; **Controller**: `Admin\BackupController`; **Test**: `BackupRestoreTest`; **Status**: ✅ Complete
+- **Req ID**: **FR-10.1**; **Requirement**: Local storage; **Model**: -; **Service**: `LocalStorageService`; **Controller**: JS: `stores/characters.js`; **Test**: `LocalStorageTest`; **Status**: ✅ Complete
+- **Req ID**: **FR-10.5**; **Requirement**: Mode conversion; **Model**: -; **Service**: `StorageConversionService`; **Controller**: `ConversionController`; **Test**: `ConversionTest`; **Status**: ✅ Complete
 
 ---
 
@@ -421,7 +409,7 @@ flowchart LR
     subgraph Requirements[Requirements]
         FR[67 Functional Requirements]
     end
-    
+
     subgraph Tests[Test Suite - 3,316+ Tests / 11,563+ Assertions]
         Unit[Unit Tests]
         Feature[Feature Tests]
@@ -429,50 +417,48 @@ flowchart LR
         AI[AI Integration Tests]
         Browser[Browser Tests]
     end
-    
+
     subgraph Coverage[Coverage Types]
         Direct[Direct Coverage: 85%]
         Indirect[Indirect Coverage: 95%]
         Total[Total Coverage: 97%]
     end
-    
+
     Requirements --> Tests
     Tests --> Coverage
 ```
 
 ### 6.2 Test Case Mapping
 
-| Req ID | Test Type | Test File | Test Cases | Coverage % | Status |
-|--------|-----------|-----------|------------|------------|--------|
-| **FR-02.1** | Feature | `CharacterCrudTest.php` | 12 | 95% | ✅ Complete |
-| **FR-02.2** | Feature | `ImageUploadTest.php` | 8 | 92% | ✅ Complete |
-| **FR-02.6** | Unit | `AptitudeTest.php` | 6 | 90% | ✅ Complete |
-| **FR-02.7** | Unit | `FactorInheritanceTest.php` | 10 | 89% | ✅ Complete |
-| **FR-03.2** | Unit | `TrainingPredictionServiceTest.php` | 22 | 94% | ✅ Complete |
-| **FR-03.4** | Unit | `BonusCalculatorTest.php` | 15 | 92% | ✅ Complete |
-| **FR-03.6** | Feature | `SkillHintTest.php` | 8 | 90% | ✅ Complete |
-| **FR-03.8** | Integration | `AIAdvisoryTest.php` | 14 | 88% | ✅ Complete |
-| **FR-04.3** | Feature | `RaceCalendarTest.php` | 10 | 91% | ✅ Complete |
-| **FR-04.6** | Unit | `WinProbabilityTest.php` | 12 | 87% | ✅ Complete |
-| **FR-04.7** | Feature | `RunningStyleTest.php` | 8 | 89% | ✅ Complete |
-| **FR-05.1** | Feature | `SkillCatalogTest.php` | 11 | 93% | ✅ Complete |
-| **FR-05.3** | Unit | `HintDiscountTest.php` | 9 | 91% | ✅ Complete |
-| **FR-05.4** | Feature | `SkillEvolutionTest.php` | 7 | 88% | ✅ Complete |
-| **FR-06.1** | Feature | `SupportCardTest.php` | 9 | 92% | ✅ Complete |
-| **FR-06.2** | Unit | `DeckValidationTest.php` | 14 | 94% | ✅ Complete |
-| **FR-06.3** | Feature | `BondTrackingTest.php` | 10 | 90% | ✅ Complete |
-| **FR-07.1** | Integration | `TrainingAdvisorTest.php` | 8 | 88% | ✅ Complete |
-| **FR-07.2** | Integration | `RaceStrategyTest.php` | 7 | 87% | ✅ Complete |
-| **FR-07.3** | Integration | `SkillAdvisorTest.php` | 6 | 85% | ✅ Complete |
-| **FR-07.6** | Integration | `HybridAITest.php` | 12 | 89% | ✅ Complete |
-| **FR-07.5** | Unit | `CostTrackerTest.php` | 8 | 85% | ✅ Complete |
-| **FR-08.1** | Integration | `ExternalAPITest.php` | 10 | 88% | ✅ Complete |
-| **FR-08.2** | Unit | `CircuitBreakerTest.php` | 15 | 90% | ✅ Complete |
-| **FR-08.4** | Integration | `OCRProcessingTest.php` | 12 | 86% | ✅ Complete |
-| **FR-09.1** | Feature | `JSONExportTest.php` | 9 | 91% | ✅ Complete |
-| **FR-09.6** | Feature | `BackupRestoreTest.php` | 11 | 87% | ✅ Complete |
-| **FR-10.1** | E2E | `LocalStorageTest.js` | 8 | 86% | ✅ Complete |
-| **FR-10.5** | Feature | `ConversionTest.php` | 7 | 85% | ✅ Complete |
+- **Req ID**: **FR-02.1**; **Test Type**: Feature; **Test File**: `CharacterCrudTest.php`; **Test Cases**: 12; **Coverage %**: 95%; **Status**: ✅ Complete
+- **Req ID**: **FR-02.2**; **Test Type**: Feature; **Test File**: `ImageUploadTest.php`; **Test Cases**: 8; **Coverage %**: 92%; **Status**: ✅ Complete
+- **Req ID**: **FR-02.6**; **Test Type**: Unit; **Test File**: `AptitudeTest.php`; **Test Cases**: 6; **Coverage %**: 90%; **Status**: ✅ Complete
+- **Req ID**: **FR-02.7**; **Test Type**: Unit; **Test File**: `FactorInheritanceTest.php`; **Test Cases**: 10; **Coverage %**: 89%; **Status**: ✅ Complete
+- **Req ID**: **FR-03.2**; **Test Type**: Unit; **Test File**: `TrainingPredictionServiceTest.php`; **Test Cases**: 22; **Coverage %**: 94%; **Status**: ✅ Complete
+- **Req ID**: **FR-03.4**; **Test Type**: Unit; **Test File**: `BonusCalculatorTest.php`; **Test Cases**: 15; **Coverage %**: 92%; **Status**: ✅ Complete
+- **Req ID**: **FR-03.6**; **Test Type**: Feature; **Test File**: `SkillHintTest.php`; **Test Cases**: 8; **Coverage %**: 90%; **Status**: ✅ Complete
+- **Req ID**: **FR-03.8**; **Test Type**: Integration; **Test File**: `AIAdvisoryTest.php`; **Test Cases**: 14; **Coverage %**: 88%; **Status**: ✅ Complete
+- **Req ID**: **FR-04.3**; **Test Type**: Feature; **Test File**: `RaceCalendarTest.php`; **Test Cases**: 10; **Coverage %**: 91%; **Status**: ✅ Complete
+- **Req ID**: **FR-04.6**; **Test Type**: Unit; **Test File**: `WinProbabilityTest.php`; **Test Cases**: 12; **Coverage %**: 87%; **Status**: ✅ Complete
+- **Req ID**: **FR-04.7**; **Test Type**: Feature; **Test File**: `RunningStyleTest.php`; **Test Cases**: 8; **Coverage %**: 89%; **Status**: ✅ Complete
+- **Req ID**: **FR-05.1**; **Test Type**: Feature; **Test File**: `SkillCatalogTest.php`; **Test Cases**: 11; **Coverage %**: 93%; **Status**: ✅ Complete
+- **Req ID**: **FR-05.3**; **Test Type**: Unit; **Test File**: `HintDiscountTest.php`; **Test Cases**: 9; **Coverage %**: 91%; **Status**: ✅ Complete
+- **Req ID**: **FR-05.4**; **Test Type**: Feature; **Test File**: `SkillEvolutionTest.php`; **Test Cases**: 7; **Coverage %**: 88%; **Status**: ✅ Complete
+- **Req ID**: **FR-06.1**; **Test Type**: Feature; **Test File**: `SupportCardTest.php`; **Test Cases**: 9; **Coverage %**: 92%; **Status**: ✅ Complete
+- **Req ID**: **FR-06.2**; **Test Type**: Unit; **Test File**: `DeckValidationTest.php`; **Test Cases**: 14; **Coverage %**: 94%; **Status**: ✅ Complete
+- **Req ID**: **FR-06.3**; **Test Type**: Feature; **Test File**: `BondTrackingTest.php`; **Test Cases**: 10; **Coverage %**: 90%; **Status**: ✅ Complete
+- **Req ID**: **FR-07.1**; **Test Type**: Integration; **Test File**: `TrainingAdvisorTest.php`; **Test Cases**: 8; **Coverage %**: 88%; **Status**: ✅ Complete
+- **Req ID**: **FR-07.2**; **Test Type**: Integration; **Test File**: `RaceStrategyTest.php`; **Test Cases**: 7; **Coverage %**: 87%; **Status**: ✅ Complete
+- **Req ID**: **FR-07.3**; **Test Type**: Integration; **Test File**: `SkillAdvisorTest.php`; **Test Cases**: 6; **Coverage %**: 85%; **Status**: ✅ Complete
+- **Req ID**: **FR-07.6**; **Test Type**: Integration; **Test File**: `HybridAITest.php`; **Test Cases**: 12; **Coverage %**: 89%; **Status**: ✅ Complete
+- **Req ID**: **FR-07.5**; **Test Type**: Unit; **Test File**: `CostTrackerTest.php`; **Test Cases**: 8; **Coverage %**: 85%; **Status**: ✅ Complete
+- **Req ID**: **FR-08.1**; **Test Type**: Integration; **Test File**: `ExternalAPITest.php`; **Test Cases**: 10; **Coverage %**: 88%; **Status**: ✅ Complete
+- **Req ID**: **FR-08.2**; **Test Type**: Unit; **Test File**: `CircuitBreakerTest.php`; **Test Cases**: 15; **Coverage %**: 90%; **Status**: ✅ Complete
+- **Req ID**: **FR-08.4**; **Test Type**: Integration; **Test File**: `OCRProcessingTest.php`; **Test Cases**: 12; **Coverage %**: 86%; **Status**: ✅ Complete
+- **Req ID**: **FR-09.1**; **Test Type**: Feature; **Test File**: `JSONExportTest.php`; **Test Cases**: 9; **Coverage %**: 91%; **Status**: ✅ Complete
+- **Req ID**: **FR-09.6**; **Test Type**: Feature; **Test File**: `BackupRestoreTest.php`; **Test Cases**: 11; **Coverage %**: 87%; **Status**: ✅ Complete
+- **Req ID**: **FR-10.1**; **Test Type**: E2E; **Test File**: `LocalStorageTest.js`; **Test Cases**: 8; **Coverage %**: 86%; **Status**: ✅ Complete
+- **Req ID**: **FR-10.5**; **Test Type**: Feature; **Test File**: `ConversionTest.php`; **Test Cases**: 7; **Coverage %**: 85%; **Status**: ✅ Complete
 
 ### 6.3 Critical Path Test Coverage
 
@@ -488,7 +474,7 @@ flowchart TD
         UF007[UF-007: AI Advisor]
         UF008[UF-008: OCR Import]
     end
-    
+
     subgraph TestCoverage[Test Coverage]
         T001[100% E2E Coverage]
         T002[100% E2E Coverage]
@@ -499,7 +485,7 @@ flowchart TD
         T007[88% E2E Coverage]
         T008[86% E2E Coverage]
     end
-    
+
     UF001 --> T001
     UF002 --> T002
     UF003 --> T003
@@ -510,16 +496,14 @@ flowchart TD
     UF008 --> T008
 ```
 
-| User Flow | Req ID | Test Coverage | E2E Tests | Status |
-|-----------|--------|---------------|-----------|--------|
-| **Character Creation** | FR-02.1, FR-02.6, FR-02.7 | 100% | ✅ 5 scenarios | ✅ Complete |
-| **Career Setup** | FR-02.3, FR-06.2 | 100% | ✅ 4 scenarios | ✅ Complete |
-| **Training Day** | FR-03.2, FR-03.4, FR-03.6 | 95% | ✅ 6 scenarios | ✅ Complete |
-| **Race Day** | FR-04.3, FR-04.6, FR-04.7 | 92% | ✅ 5 scenarios | ✅ Complete |
-| **Skill Acquisition** | FR-05.1, FR-05.3, FR-05.4 | 96% | ✅ 4 scenarios | ✅ Complete |
-| **Deck Building** | FR-06.1, FR-06.2, FR-06.3 | 94% | ✅ 5 scenarios | ✅ Complete |
-| **AI Advisor Journey** | FR-07.1, FR-07.2, FR-07.3 | 88% | 🔄 3 scenarios | 🔄 In Progress |
-| **OCR Data Import** | FR-08.4, FR-09.1 | 86% | 🔄 3 scenarios | 🔄 In Progress |
+- **User Flow**: **Character Creation**; **Req ID**: FR-02.1, FR-02.6, FR-02.7; **Test Coverage**: 100%; **E2E Tests**: ✅ 5 scenarios; **Status**: ✅ Complete
+- **User Flow**: **Career Setup**; **Req ID**: FR-02.3, FR-06.2; **Test Coverage**: 100%; **E2E Tests**: ✅ 4 scenarios; **Status**: ✅ Complete
+- **User Flow**: **Training Day**; **Req ID**: FR-03.2, FR-03.4, FR-03.6; **Test Coverage**: 95%; **E2E Tests**: ✅ 6 scenarios; **Status**: ✅ Complete
+- **User Flow**: **Race Day**; **Req ID**: FR-04.3, FR-04.6, FR-04.7; **Test Coverage**: 92%; **E2E Tests**: ✅ 5 scenarios; **Status**: ✅ Complete
+- **User Flow**: **Skill Acquisition**; **Req ID**: FR-05.1, FR-05.3, FR-05.4; **Test Coverage**: 96%; **E2E Tests**: ✅ 4 scenarios; **Status**: ✅ Complete
+- **User Flow**: **Deck Building**; **Req ID**: FR-06.1, FR-06.2, FR-06.3; **Test Coverage**: 94%; **E2E Tests**: ✅ 5 scenarios; **Status**: ✅ Complete
+- **User Flow**: **AI Advisor Journey**; **Req ID**: FR-07.1, FR-07.2, FR-07.3; **Test Coverage**: 88%; **E2E Tests**: 🔄 3 scenarios; **Status**: 🔄 In Progress
+- **User Flow**: **OCR Data Import**; **Req ID**: FR-08.4, FR-09.1; **Test Coverage**: 86%; **E2E Tests**: 🔄 3 scenarios; **Status**: 🔄 In Progress
 
 ---
 
@@ -535,21 +519,21 @@ flowchart TD
         G3[Accessibility Pages<br/>Missing Tests]
         G4[Background Sync<br/>Not Implemented]
     end
-    
+
     subgraph Impact[Impact Assessment]
         I1[Medium Impact<br/>Performance Monitoring]
         I2[Medium Impact<br/>Offline UX]
         I3[Medium Impact<br/>A11y Compliance]
         I4[Low Impact<br/>Nice-to-Have]
     end
-    
+
     subgraph Mitigation[Mitigation Plan]
         M1[Add APM Tests<br/>Week 19]
         M2[Complete PWA Tests<br/>Week 22]
         M3[A11y Test Suite<br/>Week 23]
         M4[IndexedDB Sync<br/>Week 22]
     end
-    
+
     G1 --> I1 --> M1
     G2 --> I2 --> M2
     G3 --> I3 --> M3
@@ -558,23 +542,19 @@ flowchart TD
 
 ### 7.2 Gap Analysis Table
 
-| Gap ID | Requirement | Missing Element | Impact | Priority | Mitigation | Target |
-|--------|-------------|-----------------|--------|----------|------------|--------|
-| **GAP-001** | NFR-07.1 APM Monitoring | Integration tests for APM dashboards | Medium | P1 | Add APM integration tests | Week 19 |
-| **GAP-002** | FR-10.4 PWA Offline | Offline route coverage incomplete | Medium | P1 | Complete offline route tests | Week 22 |
-| **GAP-003** | NFR-03 Accessibility | Accessibility test suite missing | Medium | P1 | Create A11y test suite | Week 23 |
-| **GAP-004** | FR-10.1 Local Storage | Background sync for large datasets | Low | P2 | Implement IndexedDB sync | Week 22 |
-| **GAP-005** | NFR-01.2 FCP | First Contentful Paint optimization | Low | P1 | Asset optimization | Week 20 |
+- **Gap ID**: **GAP-001**; **Requirement**: NFR-07.1 APM Monitoring; **Missing Element**: Integration tests for APM dashboards; **Impact**: Medium; **Priority**: P1; **Mitigation**: Add APM integration tests; **Target**: Week 19
+- **Gap ID**: **GAP-002**; **Requirement**: FR-10.4 PWA Offline; **Missing Element**: Offline route coverage incomplete; **Impact**: Medium; **Priority**: P1; **Mitigation**: Complete offline route tests; **Target**: Week 22
+- **Gap ID**: **GAP-003**; **Requirement**: NFR-03 Accessibility; **Missing Element**: Accessibility test suite missing; **Impact**: Medium; **Priority**: P1; **Mitigation**: Create A11y test suite; **Target**: Week 23
+- **Gap ID**: **GAP-004**; **Requirement**: FR-10.1 Local Storage; **Missing Element**: Background sync for large datasets; **Impact**: Low; **Priority**: P2; **Mitigation**: Implement IndexedDB sync; **Target**: Week 22
+- **Gap ID**: **GAP-005**; **Requirement**: NFR-01.2 FCP; **Missing Element**: First Contentful Paint optimization; **Impact**: Low; **Priority**: P1; **Mitigation**: Asset optimization; **Target**: Week 20
 
 ### 7.3 Risk Assessment
 
-| Risk ID | Description | Probability | Impact | Mitigation Strategy |
-|---------|-------------|-------------|--------|---------------------|
-| **RISK-001** | Test coverage gaps for new AI features | Low | Medium | Continuous test development |
-| **RISK-002** | External API dependency changes | Medium | Medium | Circuit breaker + fallback APIs |
-| **RISK-003** | Performance degradation under load | Low | High | Performance testing in CI/CD |
-| **RISK-004** | Accessibility regression | Low | High | Automated axe-core tests |
-| **RISK-005** | OCR accuracy variance | Medium | Low | Confidence scoring + manual review |
+- **Risk ID**: **RISK-001**; **Description**: Test coverage gaps for new AI features; **Probability**: Low; **Impact**: Medium; **Mitigation Strategy**: Continuous test development
+- **Risk ID**: **RISK-002**; **Description**: External API dependency changes; **Probability**: Medium; **Impact**: Medium; **Mitigation Strategy**: Circuit breaker + fallback APIs
+- **Risk ID**: **RISK-003**; **Description**: Performance degradation under load; **Probability**: Low; **Impact**: High; **Mitigation Strategy**: Performance testing in CI/CD
+- **Risk ID**: **RISK-004**; **Description**: Accessibility regression; **Probability**: Low; **Impact**: High; **Mitigation Strategy**: Automated axe-core tests
+- **Risk ID**: **RISK-005**; **Description**: OCR accuracy variance; **Probability**: Medium; **Impact**: Low; **Mitigation Strategy**: Confidence scoring + manual review
 
 ---
 
@@ -591,20 +571,18 @@ pie title Requirements Coverage Distribution
 
 ### 8.2 Coverage by Module
 
-| Module | Total Req | Implemented | Tested | Coverage % |
-|--------|-----------|-------------|--------|------------|
-| **Character Management** | 9 | 9 | 9 | 100% |
-| **Training Optimization** | 8 | 8 | 8 | 100% |
-| **Race Strategy** | 7 | 7 | 7 | 100% |
-| **Skill Management** | 7 | 7 | 7 | 100% |
-| **Support Card Management** | 6 | 6 | 6 | 100% |
-| **AI Advisory** | 7 | 7 | 6 | 86% |
-| **External Integration** | 6 | 6 | 5 | 83% |
-| **Data Management** | 6 | 6 | 6 | 100% |
-| **Storage Modes** | 6 | 6 | 5 | 83% |
-| **Performance & Monitoring** | 5 | 3 | 2 | 40% |
-| **Accessibility** | 10 | 9 | 8 | 80% |
-| **Overall** | **67** | **65** | **63** | **94%** |
+- **Module**: **Character Management**; **Total Req**: 9; **Implemented**: 9; **Tested**: 9; **Coverage %**: 100%
+- **Module**: **Training Optimization**; **Total Req**: 8; **Implemented**: 8; **Tested**: 8; **Coverage %**: 100%
+- **Module**: **Race Strategy**; **Total Req**: 7; **Implemented**: 7; **Tested**: 7; **Coverage %**: 100%
+- **Module**: **Skill Management**; **Total Req**: 7; **Implemented**: 7; **Tested**: 7; **Coverage %**: 100%
+- **Module**: **Support Card Management**; **Total Req**: 6; **Implemented**: 6; **Tested**: 6; **Coverage %**: 100%
+- **Module**: **AI Advisory**; **Total Req**: 7; **Implemented**: 7; **Tested**: 6; **Coverage %**: 86%
+- **Module**: **External Integration**; **Total Req**: 6; **Implemented**: 6; **Tested**: 5; **Coverage %**: 83%
+- **Module**: **Data Management**; **Total Req**: 6; **Implemented**: 6; **Tested**: 6; **Coverage %**: 100%
+- **Module**: **Storage Modes**; **Total Req**: 6; **Implemented**: 6; **Tested**: 5; **Coverage %**: 83%
+- **Module**: **Performance & Monitoring**; **Total Req**: 5; **Implemented**: 3; **Tested**: 2; **Coverage %**: 40%
+- **Module**: **Accessibility**; **Total Req**: 10; **Implemented**: 9; **Tested**: 8; **Coverage %**: 80%
+- **Module**: **Overall**; **Total Req**: **67**; **Implemented**: **65**; **Tested**: **63**; **Coverage %**: **94%**
 
 ### 8.3 Coverage Trends
 
@@ -618,14 +596,12 @@ xychart-beta
 
 ### 8.4 Test Distribution by Type
 
-| Test Type | Count | Coverage Target | Actual Coverage | Status |
-|-----------|-------|-----------------|-----------------|--------|
-| **Unit Tests** | 1,200+ | 80%+ per service | 90% | ✅ Exceeds Target |
-| **Feature Tests** | 1,400+ | 80%+ per feature | 86% | ✅ Exceeds Target |
-| **Livewire Tests** | 350+ | 80%+ per component | 85% | ✅ Exceeds Target |
-| **AI Integration Tests** | 250+ | 70%+ per agent | 87% | ✅ Exceeds Target |
-| **Browser/E2E Tests** | 100+ | 100% critical paths | 92% | 🔄 Near Target |
-| **Total** | **3,316+** | **80%+ overall** | **90%** | **✅ Exceeds Target** |
+- **Test Type**: **Unit Tests**; **Count**: 1,200+; **Coverage Target**: 80%+ per service; **Actual Coverage**: 90%; **Status**: ✅ Exceeds Target
+- **Test Type**: **Feature Tests**; **Count**: 1,400+; **Coverage Target**: 80%+ per feature; **Actual Coverage**: 86%; **Status**: ✅ Exceeds Target
+- **Test Type**: **Livewire Tests**; **Count**: 350+; **Coverage Target**: 80%+ per component; **Actual Coverage**: 85%; **Status**: ✅ Exceeds Target
+- **Test Type**: **AI Integration Tests**; **Count**: 250+; **Coverage Target**: 70%+ per agent; **Actual Coverage**: 87%; **Status**: ✅ Exceeds Target
+- **Test Type**: **Browser/E2E Tests**; **Count**: 100+; **Coverage Target**: 100% critical paths; **Actual Coverage**: 92%; **Status**: 🔄 Near Target
+- **Test Type**: **Total**; **Count**: **3,316+**; **Coverage Target**: **80%+ overall**; **Actual Coverage**: **90%**; **Status**: **✅ Exceeds Target**
 
 > **Note**: Test suite produces 11,563+ assertions across 571 registered routes (396+ API routes).
 
@@ -635,43 +611,35 @@ xychart-beta
 
 ### 9.1 Version History
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 3.3.0 | 2026-02-22 | Development Team | Updated to February 22, 2026; updated test counts to 3,316+ tests with 11,563+ assertions; updated implementation artifact count to 280 (30 models, 70+ services, 571 routes); updated test distribution breakdown; updated implementation traceability map with Neuron services and Admin controllers; added Browser/E2E test category; added route count statistics |
-| 3.2.0 | 2026-02-21 | Development Team | Updated document version and dates to February 2026; aligned with current technology stack (Livewire 4, Pest v4, PHPUnit v12, Neuron AI v2.11, 30 models, 8 enums, 70+ services) |
-| 3.0.0 | 2026-01-23 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added detailed traceability matrices; expanded coverage analysis; integrated test coverage data; added gap analysis and risk assessment |
-| 2.0 | 2026-01-23 | Development Team | Replaced aspirational roadmap with code-aligned verification |
-| 1.1 | 2026-01-13 | System Analysis Agent | Prior traceability mapping |
-| 1.0 | 2026-01-03 | Development Team | Initial draft |
+- **Version**: 3.3.0; **Date**: 2026-02-22; **Author**: Development Team; **Changes**: Updated to February 22, 2026; updated test counts to 3,316+ tests with 11,563+ assertions; updated implementation artifact count to 280 (30 models, 70+ services, 571 routes); updated test distribution breakdown; updated implementation traceability map with Neuron services and Admin controllers; added Browser/E2E test category; added route count statistics
+- **Version**: 3.2.0; **Date**: 2026-02-21; **Author**: Development Team; **Changes**: Updated document version and dates to February 2026; aligned with current technology stack (Livewire 4, Pest v4, PHPUnit v12, Neuron AI v2.11, 30 models, 8 enums, 70+ services)
+- **Version**: 3.0.0; **Date**: 2026-01-23; **Author**: Development Team; **Changes**: Comprehensive update aligned with v2.0.0 implementation; added detailed traceability matrices; expanded coverage analysis; integrated test coverage data; added gap analysis and risk assessment
+- **Version**: 2.0; **Date**: 2026-01-23; **Author**: Development Team; **Changes**: Replaced aspirational roadmap with code-aligned verification
+- **Version**: 1.1; **Date**: 2026-01-13; **Author**: System Analysis Agent; **Changes**: Prior traceability mapping
+- **Version**: 1.0; **Date**: 2026-01-03; **Author**: Development Team; **Changes**: Initial draft
 
 ### 9.2 Related Documents
 
-| Document | Reference | Purpose |
-|----------|-----------|---------|
-| **Business Requirements Specifications** | [002_BRS](002_BRS_Business_Requirements_Specifications.md) | Source business requirements |
-| **Software Requirements Specifications** | [003_SRS](003_SRS_Software_Requirement_Specifications.md) | Source functional requirements |
-| **Software Design Specifications** | [004_SDS](004_SDS_Software_Design_Specifications.md) | Technical design reference |
-| **Implementation Verification Matrix** | [000_IVM](000_IMPLEMENTATION_VERIFICATION_MATRIX.md) | Implementation status |
-| **Software Development Plan** | [001_SDP](001_SDP_Software_Development_Plan.md) | Project timeline and milestones |
-| **Technical Specifications** | SPEC-001 through SPEC-007 | Detailed technical specs |
-| **Product Requirements** | PRD-001 through PRD-007 | Product feature details |
+- **Document**: **Business Requirements Specifications**; **Reference**: [002_BRS](002_BRS_Business_Requirements_Specifications.md); **Purpose**: Source business requirements
+- **Document**: **Software Requirements Specifications**; **Reference**: [003_SRS](003_SRS_Software_Requirement_Specifications.md); **Purpose**: Source functional requirements
+- **Document**: **Software Design Specifications**; **Reference**: [004_SDS](004_SDS_Software_Design_Specifications.md); **Purpose**: Technical design reference
+- **Document**: **Implementation Verification Matrix**; **Reference**: [000_IVM](000_IMPLEMENTATION_VERIFICATION_MATRIX.md); **Purpose**: Implementation status
+- **Document**: **Software Development Plan**; **Reference**: [001_SDP](001_SDP_Software_Development_Plan.md); **Purpose**: Project timeline and milestones
+- **Document**: **Technical Specifications**; **Reference**: SPEC-001 through SPEC-007; **Purpose**: Detailed technical specs
+- **Document**: **Product Requirements**; **Reference**: PRD-001 through PRD-007; **Purpose**: Product feature details
 
 ### 9.3 Approval
 
-| Role | Name | Signature | Date |
-|------|------|-----------|------|
-| **Technical Lead** | | | |
-| **QA Lead** | | | |
-| **Project Manager** | | | |
+- **Role**: **Technical Lead**; **Name**: ; **Signature**: ; **Date**: 
+- **Role**: **QA Lead**; **Name**: ; **Signature**: ; **Date**: 
+- **Role**: **Project Manager**; **Name**: ; **Signature**: ; **Date**: 
 
 ### 9.4 Distribution
 
-| Recipient | Purpose |
-|-----------|---------|
-| Development Team | Implementation reference |
-| QA Team | Testing verification |
-| Project Stakeholders | Status reporting |
-| Documentation Team | Cross-reference |
+- **Recipient**: Development Team; **Purpose**: Implementation reference
+- **Recipient**: QA Team; **Purpose**: Testing verification
+- **Recipient**: Project Stakeholders; **Purpose**: Status reporting
+- **Recipient**: Documentation Team; **Purpose**: Cross-reference
 
 ---
 
@@ -679,12 +647,10 @@ xychart-beta
 
 ### A. Traceability Tools and Techniques
 
-| Tool/Technique | Purpose | Status |
-|----------------|---------|--------|
-| **GitHub Issues** | Requirement tracking | Active |
-| **Test Annotations** | Link tests to requirements | Active |
-| **Mermaid Diagrams** | Visual traceability | Active |
-| **Coverage Reports** | Automated coverage tracking | Active |
+- **Tool/Technique**: **GitHub Issues**; **Purpose**: Requirement tracking; **Status**: Active
+- **Tool/Technique**: **Test Annotations**; **Purpose**: Link tests to requirements; **Status**: Active
+- **Tool/Technique**: **Mermaid Diagrams**; **Purpose**: Visual traceability; **Status**: Active
+- **Tool/Technique**: **Coverage Reports**; **Purpose**: Automated coverage tracking; **Status**: Active
 
 ### B. Maintenance Guidelines
 
@@ -695,16 +661,14 @@ xychart-beta
 
 ### C. Traceability Abbreviations
 
-| Abbreviation | Full Term |
-|--------------|-----------|
-| **RTM** | Requirements Traceability Matrix |
-| **BRS** | Business Requirements Specifications |
-| **SRS** | Software Requirements Specifications |
-| **IVM** | Implementation Verification Matrix |
-| **E2E** | End-to-End |
-| **A11y** | Accessibility |
-| **APM** | Application Performance Monitoring |
+- **Abbreviation**: **RTM**; **Full Term**: Requirements Traceability Matrix
+- **Abbreviation**: **BRS**; **Full Term**: Business Requirements Specifications
+- **Abbreviation**: **SRS**; **Full Term**: Software Requirements Specifications
+- **Abbreviation**: **IVM**; **Full Term**: Implementation Verification Matrix
+- **Abbreviation**: **E2E**; **Full Term**: End-to-End
+- **Abbreviation**: **A11y**; **Full Term**: Accessibility
+- **Abbreviation**: **APM**; **Full Term**: Application Performance Monitoring
 
 ---
 
-*This Requirements Traceability Matrix reflects the comprehensive traceability of the Umamusume Pretty Derby Career Planner application as of February 22, 2026, aligned with codebase version 2.2.0. It serves as the authoritative record of requirement coverage and implementation status.*
+### This Requirements Traceability Matrix reflects the comprehensive traceability of the Umamusume Pretty Derby Career Planner application as of February 22, 2026, aligned with codebase version 2.2.0. It serves as the authoritative record of requirement coverage and implementation status
