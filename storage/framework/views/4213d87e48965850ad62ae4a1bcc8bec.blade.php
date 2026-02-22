@@ -1,1 +1,0 @@
-<x-modal name="confirm" title="Confirm Action">Content</x-modal>

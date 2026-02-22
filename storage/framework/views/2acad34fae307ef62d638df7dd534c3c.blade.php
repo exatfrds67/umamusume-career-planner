@@ -1,1 +1,0 @@
-<x-form.toggle name="notifications" label="Notifications" hint="Receive email updates" />

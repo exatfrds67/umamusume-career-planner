@@ -1,1 +1,0 @@
-<x-form.toggle name="notifications" label="Notifications" :checked="true" />

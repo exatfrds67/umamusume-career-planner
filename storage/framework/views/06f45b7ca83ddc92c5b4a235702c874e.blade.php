@@ -1,1 +1,0 @@
-<x-ai.recommendation-card :recommendation="$recommendation" class="custom-class" />

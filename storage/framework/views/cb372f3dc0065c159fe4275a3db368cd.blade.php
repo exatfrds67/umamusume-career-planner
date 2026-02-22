@@ -1,1 +1,0 @@
-<x-form.text-input name="email" error="Email is required" />

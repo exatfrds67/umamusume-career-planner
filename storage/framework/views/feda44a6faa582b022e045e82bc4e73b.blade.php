@@ -1,1 +1,0 @@
-<x-alert-banner type="warning">Msg</x-alert-banner>

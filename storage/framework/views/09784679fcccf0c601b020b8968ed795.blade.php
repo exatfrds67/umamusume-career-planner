@@ -1,1 +1,0 @@
-<x-spinner size="sm" />

@@ -1,1 +1,0 @@
-<x-alert-banner :dismissible="true">Message</x-alert-banner>

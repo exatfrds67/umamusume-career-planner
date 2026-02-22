@@ -1,1 +1,0 @@
-<x-modal name="confirm" size="lg">Content</x-modal>

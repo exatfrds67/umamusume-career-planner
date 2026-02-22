@@ -1,1 +1,0 @@
-<x-button href="/dashboard" loading>Loading Link</x-button>

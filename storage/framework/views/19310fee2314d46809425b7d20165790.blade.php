@@ -1,1 +1,0 @@
-<x-skeleton-card id="loading-card" data-test="value" />

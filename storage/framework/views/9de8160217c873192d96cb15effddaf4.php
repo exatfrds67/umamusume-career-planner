@@ -1,1 +1,0 @@
-rec-<?php echo e($recommendation->id ?? $recommendation->action); ?><?php /**PATH C:\XAMPP\htdocs\umamusume-career-planner\storage\framework\views/c80f746e7e6dd046774ea3e4147e6269.blade.php ENDPATH**/ ?>

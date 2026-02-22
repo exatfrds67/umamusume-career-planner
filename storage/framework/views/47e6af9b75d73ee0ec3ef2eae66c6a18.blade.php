@@ -1,1 +1,0 @@
-<x-alert-banner title="Important Notice">Details here</x-alert-banner>

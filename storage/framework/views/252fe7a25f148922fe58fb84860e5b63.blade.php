@@ -1,1 +1,0 @@
-<x-dashboard-grid id="my-grid" data-test="value">Content</x-dashboard-grid>

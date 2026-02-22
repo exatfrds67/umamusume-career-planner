@@ -1,1 +1,0 @@
-<x-button href="/dashboard">Go to Dashboard</x-button>

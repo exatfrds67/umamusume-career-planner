@@ -1,1 +1,0 @@
-<x-alert-banner type="error">Error message</x-alert-banner>

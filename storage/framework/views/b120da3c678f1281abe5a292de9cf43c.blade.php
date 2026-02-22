@@ -1,1 +1,0 @@
-<x-button loading>Loading</x-button>

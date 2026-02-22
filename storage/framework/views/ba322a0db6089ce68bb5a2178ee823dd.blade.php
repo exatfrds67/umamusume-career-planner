@@ -1,1 +1,0 @@
-<x-alert-banner>Message</x-alert-banner>

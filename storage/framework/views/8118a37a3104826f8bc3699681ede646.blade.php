@@ -1,1 +1,0 @@
-<x-skeleton-card :lines="2" :show-image="true" :show-avatar="true" :show-actions="true" />

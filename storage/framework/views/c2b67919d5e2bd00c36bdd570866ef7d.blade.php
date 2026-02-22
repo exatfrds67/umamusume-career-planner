@@ -1,1 +1,0 @@
-<x-form.text-input name="password" type="password" />

@@ -1,1 +1,0 @@
-<x-button size="lg">Large</x-button>

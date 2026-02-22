@@ -1,1 +1,0 @@
-<x-ai.critical-alert-badge :alert-count="2" id="custom-badge" data-test="value" />
