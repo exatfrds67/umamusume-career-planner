@@ -515,3 +515,5 @@ Resources: sp, energy, mood, bond, hint
   - All 10 tests now passing (previously failed with ArgumentCountError)
   - Total: 78 AI tests passing, 314 assertions
   - AIChatController now derives `rag_enhanced` and `knowledge_sources` from context **or** execution response and includes them in streaming metadata and conversation logs; added reflection-based test `RAGEnhancedChatTest::propagates rag metadata from execution response`
+Next time, group git commits instead of one large commit.
+Commands execute in PowerShell/Command Prompt on Windows 10; use WSL2 for Linux commands.

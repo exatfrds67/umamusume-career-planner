@@ -9,14 +9,16 @@
         "-y",
         "@modelcontextprotocol/server-filesystem",
         "c:\\XAMPP\\htdocs\\umamusume-career-planner"
-      ]
+      ],
+      "disabled": false
     },
     "sequential-thinking": {
       "command": "npx",
       "args": [
         "-y",
         "@modelcontextprotocol/server-sequential-thinking"
-      ]
+      ],
+      "disabled": false
     },
     "memory": {
       "command": "npx",
@@ -31,7 +33,22 @@
     "execute_bash",
     "fs_write",
     "report_issue",
-    "use_aws"
+    "use_aws",
+    "@sequential-thinking/sequentialthinking",
+    "@filesystem/read_file",
+    "@filesystem/read_text_file",
+    "@filesystem/read_media_file",
+    "@filesystem/read_multiple_files",
+    "@filesystem/write_file",
+    "@filesystem/edit_file",
+    "@filesystem/create_directory",
+    "@filesystem/list_directory",
+    "@filesystem/list_directory_with_sizes",
+    "@filesystem/directory_tree",
+    "@filesystem/move_file",
+    "@filesystem/search_files",
+    "@filesystem/get_file_info",
+    "@filesystem/list_allowed_directories"
   ],
   "toolAliases": {},
   "allowedTools": [
@@ -39,7 +56,22 @@
     "report_issue",
     "use_aws",
     "execute_bash",
-    "fs_write"
+    "fs_write",
+    "@sequential-thinking/sequentialthinking",
+    "@filesystem/read_file",
+    "@filesystem/read_text_file",
+    "@filesystem/read_media_file",
+    "@filesystem/read_multiple_files",
+    "@filesystem/write_file",
+    "@filesystem/edit_file",
+    "@filesystem/create_directory",
+    "@filesystem/list_directory",
+    "@filesystem/list_directory_with_sizes",
+    "@filesystem/directory_tree",
+    "@filesystem/move_file",
+    "@filesystem/search_files",
+    "@filesystem/get_file_info",
+    "@filesystem/list_allowed_directories"
   ],
   "toolsSettings": {
     "use_aws": {
