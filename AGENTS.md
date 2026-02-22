@@ -697,6 +697,36 @@ This application is a Laravel application and its main Laravel ecosystems packag
 
 - If the user doesn't see a frontend change reflected in the UI, it could mean they need to run `npm run build`, `npm run dev`, or `composer run dev`. Ask them.
 
+## Platform-Specific Notes (Windows 10)
+
+### Unix Command Limitations
+
+When developing on Windows 10 with PowerShell or Command Prompt, many Unix/Linux commands are not available:
+
+- **`tail` command**: Not available on Windows. Use PowerShell alternative:
+
+  ```powershell
+  # Instead of: command | tail -5
+  # Use PowerShell:
+  command | Select-Object -Last 5
+  ```
+  
+- **`grep` command**: Not available on Windows. Use PowerShell alternative:
+
+  ```powershell
+  # Instead of: command | grep pattern
+  # Use PowerShell:
+  command | Select-String "pattern"
+  ```
+
+- **`ls` command**: Works in PowerShell but not Command Prompt. Use `dir` in Command Prompt or `Get-ChildItem` in PowerShell for consistent behavior.
+
+### Recommended Approach
+
+- **Prefer PowerShell** for complex command chains and scripting on Windows
+- Use PowerShell cmdlets (`Select-Object`, `Where-Object`, `Get-ChildItem`) instead of Unix equivalents
+- When running validation commands (like `markdownlint-cli2`), avoid piping to Unix utilities
+
 ## Replies
 
 - Be concise in your explanations - focus on what's important rather than explaining obvious details.
