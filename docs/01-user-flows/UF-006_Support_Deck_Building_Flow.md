@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0  
-**Date**: February 22, 2026  
+**Document Version**: 2.3.0
+**Date**: February 22, 2026
 **Related Documents**: [PRD-005], [SPEC-005], [SRS], [BRS]
 
 **Source Specifications**:
@@ -44,12 +44,10 @@ The Support Deck Building Flow guides users through the process of creating, opt
 
 ### 1.2 Scope
 
-| Aspect | Description |
-|--------|-------------|
-| **Entry Point** | Support deck builder from character setup, training screen, or card collection |
-| **Exit Point** | Optimized deck saved and applied to career run |
-| **Duration** | 5-10 minutes for deck creation; 2-3 minutes for deck editing |
-| **User Type** | All users with active career runs |
+- **Aspect**: **Entry Point**; **Description**: Support deck builder from character setup, training screen, or card collection
+- **Aspect**: **Exit Point**; **Description**: Optimized deck saved and applied to career run
+- **Aspect**: **Duration**; **Description**: 5-10 minutes for deck creation; 2-3 minutes for deck editing
+- **Aspect**: **User Type**; **Description**: All users with active career runs
 
 ### 1.3 Business Context
 
@@ -71,46 +69,46 @@ The Support Deck Building Flow guides users through the process of creating, opt
 ```mermaid
 flowchart TD
     Start([Access Deck Builder]) --> CheckContext{Entry Context?}
-    
+
     CheckContext -->|New Career| CreateDeck[Create New Deck]
     CheckContext -->|Edit Existing| LoadDeck[Load Existing Deck]
     CheckContext -->|Collection Browse| ViewCards[View Card Collection]
-    
+
     CreateDeck --> SelectTemplate[Select Deck Template]
     LoadDeck --> DisplayCurrent[Display Current Deck]
     ViewCards --> ManageCards[Manage Card Inventory]
-    
+
     SelectTemplate --> DeckBuilder[Deck Builder Interface]
     DisplayCurrent --> DeckBuilder
     ManageCards --> DeckBuilder
-    
+
     DeckBuilder --> AddCards[Add/Remove Cards]
     AddCards --> ValidateDeck{Deck Valid?}
-    
+
     ValidateDeck -->|No| ShowErrors[Show Validation Errors]
     ShowErrors --> AdjustDeck[Adjust Deck]
     AdjustDeck --> ValidateDeck
-    
+
     ValidateDeck -->|Yes| CalculateSynergy[Calculate Synergy Score]
     CalculateSynergy --> DisplayAnalysis[Display Deck Analysis]
-    
+
     DisplayAnalysis --> OptimizePrompt{Optimize Deck?}
     OptimizePrompt -->|Yes| AIOptimize[Run AI Optimization]
     OptimizePrompt -->|No| ReviewDeck[Review Deck]
-    
+
     AIOptimize --> ApplyChanges[Apply Recommended Changes]
     ApplyChanges --> RecalculateSynergy[Recalculate Synergy]
     RecalculateSynergy --> DisplayAnalysis
-    
+
     ReviewDeck --> UserConfirm{Confirm Save?}
     UserConfirm -->|No| DeckBuilder
     UserConfirm -->|Yes| SaveDeck[Save Deck Configuration]
-    
+
     SaveDeck --> UpdateCareer[Update Career Run]
     UpdateCareer --> InvalidateCache[Invalidate Training Predictions]
     InvalidateCache --> ShowSuccess[Show Success Message]
     ShowSuccess --> End([Deck Saved])
-    
+
     style Start fill:#e3f2fd
     style End fill:#c8e6c9
     style AIOptimize fill:#fff3e0
@@ -122,51 +120,51 @@ flowchart TD
 ```mermaid
 stateDiagram-v2
     [*] --> DeckBuilderEntry
-    
+
     DeckBuilderEntry --> ContextCheck: Load interface
-    
+
     ContextCheck --> NewDeck: New career setup
     ContextCheck --> EditDeck: Edit existing
     ContextCheck --> CollectionView: Browse cards
-    
+
     NewDeck --> TemplateSelection: Show templates
     TemplateSelection --> DeckComposition: Apply template
-    
+
     EditDeck --> DeckComposition: Load current deck
     CollectionView --> CardManagement: Manage inventory
     CardManagement --> DeckComposition: Return to builder
-    
+
     DeckComposition --> SlotManagement: Add/remove cards
-    
+
     SlotManagement --> ValidationCheck: Validate deck
-    
+
     ValidationCheck --> ValidationErrors: Invalid
     ValidationCheck --> SynergyCalculation: Valid
-    
+
     ValidationErrors --> SlotManagement: Fix errors
-    
+
     SynergyCalculation --> AnalysisDisplay: Display results
-    
+
     AnalysisDisplay --> OptimizationPrompt: Show analysis
-    
+
     OptimizationPrompt --> AIOptimization: Request optimization
     OptimizationPrompt --> UserReview: Skip optimization
-    
+
     AIOptimization --> RecommendationDisplay: Show suggestions
     RecommendationDisplay --> ApplyRecommendations: Accept
     RecommendationDisplay --> UserReview: Reject
-    
+
     ApplyRecommendations --> SynergyCalculation: Recalculate
-    
+
     UserReview --> ConfirmationDialog: Ready to save
-    
+
     ConfirmationDialog --> SaveExecution: Confirm
     ConfirmationDialog --> SlotManagement: Cancel
-    
+
     SaveExecution --> DatabaseUpdate: Persist deck
     DatabaseUpdate --> CacheInvalidation: Clear predictions
     CacheInvalidation --> SuccessNotification: Notify user
-    
+
     SuccessNotification --> [*]: Complete
 ```
 
@@ -180,12 +178,10 @@ stateDiagram-v2
 
 #### 3.1.1 Entry Points
 
-| Entry Point | Trigger | Initial State |
-|-------------|---------|---------------|
-| **New Career Setup** | Character creation wizard Step 3 | Empty 6-slot deck |
-| **Edit from Training** | "Change Deck" button on training screen | Current active deck |
-| **Card Collection** | "Build Deck" button in collection | Card library view |
-| **Career Dashboard** | "Manage Support Deck" action | Current active deck |
+- **Entry Point**: **New Career Setup**; **Trigger**: Character creation wizard Step 3; **Initial State**: Empty 6-slot deck
+- **Entry Point**: **Edit from Training**; **Trigger**: "Change Deck" button on training screen; **Initial State**: Current active deck
+- **Entry Point**: **Card Collection**; **Trigger**: "Build Deck" button in collection; **Initial State**: Card library view
+- **Entry Point**: **Career Dashboard**; **Trigger**: "Manage Support Deck" action; **Initial State**: Current active deck
 
 #### 3.1.2 Context Loading
 
@@ -197,7 +193,7 @@ sequenceDiagram
     participant CardRepo as Card Repository
     participant MetaSync as Meta Tier Service
     participant Cache
-    
+
     User->>UI: Access deck builder
     UI->>Service: loadDeckContext(careerId)
     Service->>CardRepo: getUserCards(userId)
@@ -260,13 +256,11 @@ sequenceDiagram
 
 **Template Composition Rules**:
 
-| Template | Speed | Stamina | Power | Guts | Wit | Friend |
-|----------|-------|---------|-------|------|-----|--------|
-| Speed Focus | 3 | 1 | 0 | 1 | 0 | 1 |
-| Stamina Focus | 1 | 3 | 0 | 1 | 0 | 1 |
-| Power Focus | 1 | 1 | 3 | 0 | 0 | 1 |
-| Balanced | 1 | 1 | 1 | 1 | 1 | 1 |
-| Meta (Variable) | Auto-populated from meta tier list | 1 |
+- **Template**: Speed Focus; **Speed**: 3; **Stamina**: 1; **Power**: 0; **Guts**: 1; **Wit**: 0; **Friend**: 1
+- **Template**: Stamina Focus; **Speed**: 1; **Stamina**: 3; **Power**: 0; **Guts**: 1; **Wit**: 0; **Friend**: 1
+- **Template**: Power Focus; **Speed**: 1; **Stamina**: 1; **Power**: 3; **Guts**: 0; **Wit**: 0; **Friend**: 1
+- **Template**: Balanced; **Speed**: 1; **Stamina**: 1; **Power**: 1; **Guts**: 1; **Wit**: 1; **Friend**: 1
+- **Template**: Meta (Variable); **Speed**: Auto-populated from meta tier list; **Stamina**: 1
 
 **Note**: Support card types are Speed, Stamina, Power, Guts, Wit, and Friend. Friend cards provide versatile bonuses across all training facilities.
 
@@ -361,11 +355,9 @@ sequenceDiagram
 
 **Slot Management Actions**:
 
-| Action | Button | Behavior |
-|--------|--------|----------|
-| Add card | [ADD CARD] | Open card selector for empty slot |
-| Change card | [CHANGE] | Replace card in occupied slot |
-| Remove card | [×] | Clear slot and return to empty state |
+- **Action**: Add card; **Button**: [ADD CARD]; **Behavior**: Open card selector for empty slot
+- **Action**: Change card; **Button**: [CHANGE]; **Behavior**: Replace card in occupied slot
+- **Action**: Remove card; **Button**: [×]; **Behavior**: Clear slot and return to empty state
 
 #### 3.3.2 Card Selector Interface
 
@@ -405,13 +397,11 @@ sequenceDiagram
 
 **Card Selection Criteria**:
 
-| Criterion | Weight | Description |
-|-----------|--------|-------------|
-| Meta Tier | High | SS/S tier preferred for competitive builds |
-| Limit Break Level | High | Higher LB = stronger bonuses |
-| Bond Level | Medium | Higher bond = better training benefits |
-| Specialization Match | Medium | Align with training goals |
-| Synergy Impact | High | Predicted impact on overall deck score |
+- **Criterion**: Meta Tier; **Weight**: High; **Description**: SS/S tier preferred for competitive builds
+- **Criterion**: Limit Break Level; **Weight**: High; **Description**: Higher LB = stronger bonuses
+- **Criterion**: Bond Level; **Weight**: Medium; **Description**: Higher bond = better training benefits
+- **Criterion**: Specialization Match; **Weight**: Medium; **Description**: Align with training goals
+- **Criterion**: Synergy Impact; **Weight**: High; **Description**: Predicted impact on overall deck score
 
 ---
 
@@ -424,33 +414,33 @@ sequenceDiagram
 ```mermaid
 flowchart TD
     Start([Validate Deck]) --> CheckCount{Card Count?}
-    
+
     CheckCount -->|< 6| ErrorCount[Error: Deck incomplete]
     CheckCount -->|= 6| CheckOwned{Owned vs Borrowed?}
     CheckCount -->|> 6| ErrorOverflow[Error: Too many cards]
-    
+
     CheckOwned -->|> 5 owned| ErrorOwned[Error: Max 5 owned cards]
     CheckOwned -->|<= 5 owned| CheckFriend{Has Friend Card?}
-    
+
     CheckFriend -->|No| WarningFriend[Warning: Friend card recommended]
     CheckFriend -->|Yes| CheckDuplicates{Duplicate Cards?}
-    
+
     WarningFriend --> CheckDuplicates
-    
+
     CheckDuplicates -->|Yes| ErrorDupe[Error: Duplicate cards not allowed]
     CheckDuplicates -->|No| CheckTypes{Type Distribution?}
-    
+
     CheckTypes -->|Imbalanced| WarningTypes[Warning: Unbalanced types]
     CheckTypes -->|Balanced| ValidationPass[✓ Validation Passed]
-    
+
     WarningTypes --> ValidationWarnings[Return Warnings]
     ValidationPass --> CalculateSynergy[Calculate Synergy]
-    
+
     ErrorCount --> ValidationFailed
     ErrorOverflow --> ValidationFailed
     ErrorOwned --> ValidationFailed
     ErrorDupe --> ValidationFailed
-    
+
     ValidationFailed([Return Errors])
     ValidationWarnings([Return Warnings])
     CalculateSynergy --> Success([Validation Success])
@@ -458,21 +448,17 @@ flowchart TD
 
 #### 3.4.2 Validation Error Messages
 
-| Error Code | Condition | Message | User Action |
-|------------|-----------|---------|-------------|
-| `VD-001` | Card count ≠ 6 | "Deck must contain exactly 6 cards" | Add/remove cards |
-| `VD-002` | > 5 owned cards | "Maximum 5 owned cards allowed (slot 6 is friend card)" | Replace with friend card |
-| `VD-003` | Duplicate cards | "Each card can only be used once in a deck" | Remove duplicate |
-| `VD-004` | Invalid card type | "Selected card is not valid for this slot" | Choose valid card |
+- **Error Code**: `VD-001`; **Condition**: Card count ≠ 6; **Message**: "Deck must contain exactly 6 cards"; **User Action**: Add/remove cards
+- **Error Code**: `VD-002`; **Condition**: > 5 owned cards; **Message**: "Maximum 5 owned cards allowed (slot 6 is friend card)"; **User Action**: Replace with friend card
+- **Error Code**: `VD-003`; **Condition**: Duplicate cards; **Message**: "Each card can only be used once in a deck"; **User Action**: Remove duplicate
+- **Error Code**: `VD-004`; **Condition**: Invalid card type; **Message**: "Selected card is not valid for this slot"; **User Action**: Choose valid card
 
 #### 3.4.3 Validation Warnings (Non-Blocking)
 
-| Warning Code | Condition | Message | Recommendation |
-|--------------|-----------|---------|----------------|
-| `VW-001` | No friend card | "Friend card not selected" | Consider adding friend card |
-| `VW-002` | Type imbalance | "Deck has {X} Speed cards and no {Y} cards" | Balance type distribution |
-| `VW-003` | Low synergy | "Deck synergy score is {X}/100 (below 60)" | Run auto-optimize |
-| `VW-004` | Low meta tier | "{X} cards are below A tier" | Consider upgrading cards |
+- **Warning Code**: `VW-001`; **Condition**: No friend card; **Message**: "Friend card not selected"; **Recommendation**: Consider adding friend card
+- **Warning Code**: `VW-002`; **Condition**: Type imbalance; **Message**: "Deck has {X} Speed cards and no {Y} cards"; **Recommendation**: Balance type distribution
+- **Warning Code**: `VW-003`; **Condition**: Low synergy; **Message**: "Deck synergy score is {X}/100 (below 60)"; **Recommendation**: Run auto-optimize
+- **Warning Code**: `VW-004`; **Condition**: Low meta tier; **Message**: "{X} cards are below A tier"; **Recommendation**: Consider upgrading cards
 
 **Validation Service Implementation**:
 
@@ -484,7 +470,7 @@ class DeckValidationService
     {
         $errors = [];
         $warnings = [];
-        
+
         // Rule 1: Exactly 6 cards
         if (count($cards) !== 6) {
             $errors[] = new ValidationError(
@@ -493,7 +479,7 @@ class DeckValidationService
                 field: 'deck_composition',
             );
         }
-        
+
         // Rule 2: Maximum 5 owned cards
         $ownedCount = collect($cards)->where('is_borrowed', false)->count();
         if ($ownedCount > 5) {
@@ -503,7 +489,7 @@ class DeckValidationService
                 field: 'slot_ownership',
             );
         }
-        
+
         // Rule 3: No duplicates
         $uniqueCards = collect($cards)->pluck('card_id')->unique()->count();
         if ($uniqueCards !== count($cards)) {
@@ -513,7 +499,7 @@ class DeckValidationService
                 field: 'card_uniqueness',
             );
         }
-        
+
         // Warning 1: Friend card recommendation
         if (!$this->hasFriendCard($cards)) {
             $warnings[] = new ValidationWarning(
@@ -522,7 +508,7 @@ class DeckValidationService
                 recommendation: 'Consider adding a friend card for additional bonuses',
             );
         }
-        
+
         // Warning 2: Type balance
         $typeDistribution = $this->analyzeTypeDistribution($cards);
         if ($this->isImbalanced($typeDistribution)) {
@@ -532,7 +518,7 @@ class DeckValidationService
                 recommendation: 'Balance type distribution for versatile training',
             );
         }
-        
+
         return new ValidationResult(
             valid: empty($errors),
             errors: $errors,
@@ -562,12 +548,12 @@ flowchart TD
     SpecializationMatch --> WeightedSum[Calculate Weighted Sum]
     WeightedSum --> NormalizeScore[Normalize to 0-100]
     NormalizeScore --> ClassifyTier{Score Range}
-    
+
     ClassifyTier -->|90-100| Excellent[Excellent 🟢]
     ClassifyTier -->|75-89| Good[Good 🟡]
     ClassifyTier -->|60-74| Fair[Fair 🟠]
     ClassifyTier -->|< 60| Poor[Poor 🔴]
-    
+
     Excellent --> ReturnScore
     Good --> ReturnScore
     Fair --> ReturnScore
@@ -577,14 +563,12 @@ flowchart TD
 
 **Scoring Components**:
 
-| Component | Weight | Max Points | Calculation |
-|-----------|--------|------------|-------------|
-| Type Diversity | 20% | 20 | Unique types / 5 × 20 |
-| Rarity Distribution | 15% | 15 | (SSR×3 + SR×2 + R×1) / 18 × 15 |
-| Limit Break Average | 20% | 20 | Avg LB / 4 × 20 |
-| Bond Level Average | 15% | 15 | Avg Bond / 100 × 15 |
-| Meta Tier Score | 20% | 20 | (SS×4 + S×3 + A×2 + B×1) / 24 × 20 |
-| Specialization Match | 10% | 10 | Matching specs / 6 × 10 |
+- **Component**: Type Diversity; **Weight**: 20%; **Max Points**: 20; **Calculation**: Unique types / 5 × 20
+- **Component**: Rarity Distribution; **Weight**: 15%; **Max Points**: 15; **Calculation**: (SSR×3 + SR×2 + R×1) / 18 × 15
+- **Component**: Limit Break Average; **Weight**: 20%; **Max Points**: 20; **Calculation**: Avg LB / 4 × 20
+- **Component**: Bond Level Average; **Weight**: 15%; **Max Points**: 15; **Calculation**: Avg Bond / 100 × 15
+- **Component**: Meta Tier Score; **Weight**: 20%; **Max Points**: 20; **Calculation**: (SS×4 + S×3 + A×2 + B×1) / 24 × 20
+- **Component**: Specialization Match; **Weight**: 10%; **Max Points**: 10; **Calculation**: Matching specs / 6 × 10
 
 **Synergy Service Implementation**:
 
@@ -602,14 +586,14 @@ class DeckSynergyCalculator
             'meta_tier' => $this->calculateMetaTierScore($cards),
             'specialization' => $this->calculateSpecializationMatch($cards, $career),
         ];
-        
+
         $totalScore = ($scores['type_diversity'] * 0.20)
             + ($scores['rarity'] * 0.15)
             + ($scores['limit_break'] * 0.20)
             + ($scores['bond'] * 0.15)
             + ($scores['meta_tier'] * 0.20)
             + ($scores['specialization'] * 0.10);
-        
+
         return new SynergyScore(
             total: round($totalScore),
             components: $scores,
@@ -617,13 +601,13 @@ class DeckSynergyCalculator
             recommendations: $this->generateRecommendations($scores, $cards),
         );
     }
-    
+
     private function calculateTypeDiversity(array $cards): float
     {
         $uniqueTypes = collect($cards)->pluck('card_type')->unique()->count();
         return ($uniqueTypes / 5) * 20;
     }
-    
+
     private function calculateMetaTierScore(array $cards): float
     {
         $tierPoints = [
@@ -632,11 +616,11 @@ class DeckSynergyCalculator
             'A' => 2,
             'B' => 1,
         ];
-        
+
         $totalPoints = collect($cards)->sum(function ($card) use ($tierPoints) {
             return $tierPoints[$card['meta_tier']] ?? 0;
         });
-        
+
         $maxPoints = 6 * 4; // 6 cards × SS tier
         return ($totalPoints / $maxPoints) * 20;
     }
@@ -736,12 +720,12 @@ class DeckOptimizationService
     ): OptimizationResult {
         $goals = $this->analyzeTrainingGoals($career);
         $currentScore = app(DeckSynergyCalculator::class)->calculate($currentDeck, $career);
-        
+
         $recommendations = [];
-        
+
         // Identify weak spots
         $weakSpots = $this->identifyWeakSpots($currentDeck, $currentScore);
-        
+
         // Generate replacement suggestions
         foreach ($weakSpots as $slot => $weakness) {
             $betterCards = $this->findBetterCards(
@@ -750,7 +734,7 @@ class DeckOptimizationService
                 goals: $goals,
                 weakness: $weakness,
             );
-            
+
             if (!empty($betterCards)) {
                 $recommendations[] = new CardRecommendation(
                     slot: $slot,
@@ -761,7 +745,7 @@ class DeckOptimizationService
                 );
             }
         }
-        
+
         return new OptimizationResult(
             recommendations: $recommendations,
             currentScore: $currentScore->total,
@@ -769,7 +753,7 @@ class DeckOptimizationService
             confidence: $this->calculateConfidence($recommendations),
         );
     }
-    
+
     private function findBetterCards(
         array $currentCard,
         array $userCards,
@@ -836,23 +820,23 @@ sequenceDiagram
     participant CareerRepo as Career Repository
     participant Cache as Prediction Cache
     participant DB as Database
-    
+
     User->>UI: Click "Save Deck"
     UI->>Service: saveDeck(deckData, careerId)
     Service->>DB: Begin transaction
-    
+
     Service->>DB: Insert/Update support_decks
     DB-->>Service: Deck ID
-    
+
     Service->>DB: Update career_run.support_deck_id
     DB-->>Service: Updated
-    
+
     Service->>Cache: invalidate("predictions.{careerId}")
     Cache-->>Service: Cache cleared
-    
+
     Service->>DB: Commit transaction
     Service->>Service: Log activity
-    
+
     Service-->>UI: Save successful
     UI-->>User: Show success message
     UI-->>User: Redirect to career dashboard
@@ -869,47 +853,45 @@ flowchart TD
     D1{New or Edit?}
     D1 -->|New| D2{Use Template?}
     D1 -->|Edit| D3[Load Current Deck]
-    
+
     D2 -->|Yes| SelectTemplate[Select Template]
     D2 -->|No| EmptyDeck[Start Empty]
-    
+
     SelectTemplate --> BuildDeck
     EmptyDeck --> BuildDeck
     D3 --> BuildDeck[Build/Edit Deck]
-    
+
     BuildDeck --> D4{Deck Valid?}
     D4 -->|No| FixErrors[Fix Validation Errors]
     FixErrors --> BuildDeck
     D4 -->|Yes| D5{Optimize?}
-    
+
     D5 -->|Yes| RunOptimize[AI Optimization]
     D5 -->|No| Review[Review Deck]
-    
+
     RunOptimize --> D6{Accept Recommendations?}
     D6 -->|Yes| ApplyChanges[Apply Changes]
     D6 -->|No| Review
-    
+
     ApplyChanges --> Recalculate[Recalculate Synergy]
     Recalculate --> Review
-    
+
     Review --> D7{Save?}
     D7 -->|Yes| Save[Save Deck]
     D7 -->|No| BuildDeck
-    
+
     Save --> Complete[Deck Applied]
 ```
 
 ### 4.2 Key Decision Factors
 
-| Factor | Impact on Decision | Weight |
-|--------|-------------------|--------|
-| **Training Goals** | Determines card type priority | Critical |
-| **Meta Tier** | Influences card selection | High |
-| **Limit Break Level** | Affects bonus strength | High |
-| **Bond Level** | Enables Friendship Training | Medium |
-| **Type Diversity** | Ensures versatile training | Medium |
-| **Specialization Match** | Optimizes for specific stats | Medium |
-| **Synergy Score** | Overall deck effectiveness | High |
+- **Factor**: **Training Goals**; **Impact on Decision**: Determines card type priority; **Weight**: Critical
+- **Factor**: **Meta Tier**; **Impact on Decision**: Influences card selection; **Weight**: High
+- **Factor**: **Limit Break Level**; **Impact on Decision**: Affects bonus strength; **Weight**: High
+- **Factor**: **Bond Level**; **Impact on Decision**: Enables Friendship Training; **Weight**: Medium
+- **Factor**: **Type Diversity**; **Impact on Decision**: Ensures versatile training; **Weight**: Medium
+- **Factor**: **Specialization Match**; **Impact on Decision**: Optimizes for specific stats; **Weight**: Medium
+- **Factor**: **Synergy Score**; **Impact on Decision**: Overall deck effectiveness; **Weight**: High
 
 ---
 
@@ -917,22 +899,18 @@ flowchart TD
 
 ### 5.1 Synergy Score Ranges
 
-| Score Range | Tier | Icon | Description |
-|-------------|------|------|-------------|
-| 90-100 | Excellent | 🟢 | Optimal deck for goals |
-| 75-89 | Good | 🟡 | Competitive deck |
-| 60-74 | Fair | 🟠 | Functional but improvable |
-| < 60 | Poor | 🔴 | Significant optimization needed |
+- **Score Range**: 90-100; **Tier**: Excellent; **Icon**: 🟢; **Description**: Optimal deck for goals
+- **Score Range**: 75-89; **Tier**: Good; **Icon**: 🟡; **Description**: Competitive deck
+- **Score Range**: 60-74; **Tier**: Fair; **Icon**: 🟠; **Description**: Functional but improvable
+- **Score Range**: < 60; **Tier**: Poor; **Icon**: 🔴; **Description**: Significant optimization needed
 
 ### 5.2 Meta Tier Integration
 
 **External Meta Tier Sources**:
 
-| Source | Update Frequency | Priority |
-|--------|------------------|----------|
-| umapyoi.net | Daily | Primary |
-| Community Tier Lists | Weekly | Secondary |
-| Tournament Data | Per Event | Tertiary |
+- **Source**: umapyoi.net; **Update Frequency**: Daily; **Priority**: Primary
+- **Source**: Community Tier Lists; **Update Frequency**: Weekly; **Priority**: Secondary
+- **Source**: Tournament Data; **Update Frequency**: Per Event; **Priority**: Tertiary
 
 **Meta Tier Sync Flow**:
 
@@ -943,7 +921,7 @@ sequenceDiagram
     participant API as umapyoi.net API
     participant Cache as Redis Cache
     participant DB as Database
-    
+
     Scheduler->>Service: Trigger daily sync
     Service->>API: GET /meta-tiers/current
     API-->>Service: Meta tier data
@@ -960,41 +938,33 @@ sequenceDiagram
 
 **Bond Gain Mechanics** (verified Global English Server Jan 2026):
 
-| Condition | Bond Gain | Notes |
-|-----------|-----------|-------|
-| Base Training | +7 | Standard bond gain per training |
-| Charming Condition | +9 | Character has Charming status |
-| Exclamation Mark (!) | +5 | Support card has event available |
-| Rainbow Training | +10 | Special training event |
+- **Condition**: Base Training; **Bond Gain**: +7; **Notes**: Standard bond gain per training
+- **Condition**: Charming Condition; **Bond Gain**: +9; **Notes**: Character has Charming status
+- **Condition**: Exclamation Mark (!); **Bond Gain**: +5; **Notes**: Support card has event available
+- **Condition**: Rainbow Training; **Bond Gain**: +10; **Notes**: Special training event
 
 **Friendship Training Bonuses** (based on card rarity):
 
-| Card Rarity | Friendship Bonus Range | Notes |
-|-------------|------------------------|-------|
-| R | 10-15% | Basic bonus |
-| SR | 15-25% | Moderate bonus |
-| SSR | 25-35% | Maximum bonus |
+- **Card Rarity**: R; **Friendship Bonus Range**: 10-15%; **Notes**: Basic bonus
+- **Card Rarity**: SR; **Friendship Bonus Range**: 15-25%; **Notes**: Moderate bonus
+- **Card Rarity**: SSR; **Friendship Bonus Range**: 25-35%; **Notes**: Maximum bonus
 
 **Limit Break System**:
 
-| Stars | Limit Breaks | Bonus Multiplier | Notes |
-|-------|--------------|------------------|-------|
-| ★ | 0 | 1.0x | Base card |
-| ★★ | 1 | 1.1x | First limit break |
-| ★★★ | 2 | 1.2x | Second limit break |
-| ★★★★ | 3 | 1.3x | Third limit break |
-| ★★★★★ | 4 | 1.4x | MLB (Max Limit Break) |
+- **Stars**: ★; **Limit Breaks**: 0; **Bonus Multiplier**: 1.0x; **Notes**: Base card
+- **Stars**: ★★; **Limit Breaks**: 1; **Bonus Multiplier**: 1.1x; **Notes**: First limit break
+- **Stars**: ★★★; **Limit Breaks**: 2; **Bonus Multiplier**: 1.2x; **Notes**: Second limit break
+- **Stars**: ★★★★; **Limit Breaks**: 3; **Bonus Multiplier**: 1.3x; **Notes**: Third limit break
+- **Stars**: ★★★★★; **Limit Breaks**: 4; **Bonus Multiplier**: 1.4x; **Notes**: MLB (Max Limit Break)
 
 **Support Card Types**:
 
-| Type | Primary Stat | Training Facility |
-|------|--------------|-------------------|
-| Speed | Speed | Speed Training |
-| Stamina | Stamina | Stamina Training |
-| Power | Power | Power Training |
-| Guts | Guts | Guts Training |
-| Wit | Wisdom | Wisdom Training |
-| Friend | Variable | All Facilities |
+- **Type**: Speed; **Primary Stat**: Speed; **Training Facility**: Speed Training
+- **Type**: Stamina; **Primary Stat**: Stamina; **Training Facility**: Stamina Training
+- **Type**: Power; **Primary Stat**: Power; **Training Facility**: Power Training
+- **Type**: Guts; **Primary Stat**: Guts; **Training Facility**: Guts Training
+- **Type**: Wit; **Primary Stat**: Wisdom; **Training Facility**: Wisdom Training
+- **Type**: Friend; **Primary Stat**: Variable; **Training Facility**: All Facilities
 
 ---
 
@@ -1011,12 +981,10 @@ sequenceDiagram
 
 ### 6.2 User Experience Success
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| Deck creation completion rate | > 90% | Analytics tracking |
-| Validation error rate | < 15% | Error logs |
-| AI recommendation acceptance | > 70% | User action tracking |
-| Time to build deck | < 7 minutes | User analytics |
+- **Metric**: Deck creation completion rate; **Target**: > 90%; **Measurement**: Analytics tracking
+- **Metric**: Validation error rate; **Target**: < 15%; **Measurement**: Error logs
+- **Metric**: AI recommendation acceptance; **Target**: > 70%; **Measurement**: User action tracking
+- **Metric**: Time to build deck; **Target**: < 7 minutes; **Measurement**: User analytics
 
 ### 6.3 Technical Success
 
@@ -1026,7 +994,7 @@ test('deck building flow completes successfully', function () {
     $user = User::factory()->create();
     $career = CareerRun::factory()->create(['user_id' => $user->id]);
     $cards = SupportCard::factory()->count(6)->create();
-    
+
     actingAs($user)
         ->post('/support-decks', [
             'career_id' => $career->id,
@@ -1034,14 +1002,14 @@ test('deck building flow completes successfully', function () {
             'cards' => $cards->pluck('id')->toArray(),
         ])
         ->assertRedirect();
-    
+
     $deck = SupportDeck::where('career_run_id', $career->id)->latest()->first();
-    
+
     expect($deck)->not->toBeNull()
         ->and($deck->cards)->toHaveCount(6)
         ->and($deck->synergy_score)->toBeGreaterThan(0)
         ->and($career->fresh()->support_deck_id)->toBe($deck->id);
-    
+
     // Verify cache invalidation
     expect(Cache::has("predictions.{$career->id}"))->toBeFalse();
 });
@@ -1056,17 +1024,17 @@ test('deck building flow completes successfully', function () {
 ```mermaid
 flowchart TD
     Error[Error Encountered] --> Type{Error Type}
-    
+
     Type -->|Validation| E1[Validation Error]
     Type -->|Synergy| E2[Synergy Calculation Error]
     Type -->|Database| E3[Save Error]
     Type -->|External| E4[Meta Tier Sync Error]
-    
+
     E1 --> R1[Show Field Errors<br/>Highlight Invalid Slots]
     E2 --> R2[Fallback to Default Scoring<br/>Log Error]
     E3 --> R3[Rollback Transaction<br/>Show Error Message]
     E4 --> R4[Use Cached Tiers<br/>Retry Later]
-    
+
     R1 --> Resolve[User Action]
     R2 --> Resolve
     R3 --> Resolve
@@ -1075,22 +1043,18 @@ flowchart TD
 
 ### 7.2 Error Messages
 
-| Error Code | Trigger | Message | User Action |
-|------------|---------|---------|-------------|
-| `DK-001` | Card count ≠ 6 | "Deck must contain exactly 6 cards" | Add/remove cards |
-| `DK-002` | > 5 owned cards | "Maximum 5 owned cards allowed (slot 6 is friend card)" | Replace with friend card |
-| `DK-003` | Duplicate cards | "Each card can only be used once" | Remove duplicate |
-| `DK-004` | Database timeout | "Unable to save deck. Please try again." | Retry save |
-| `DK-005` | Synergy calculation failed | "Unable to calculate synergy. Using estimated score." | Continue with caution |
+- **Error Code**: `DK-001`; **Trigger**: Card count ≠ 6; **Message**: "Deck must contain exactly 6 cards"; **User Action**: Add/remove cards
+- **Error Code**: `DK-002`; **Trigger**: > 5 owned cards; **Message**: "Maximum 5 owned cards allowed (slot 6 is friend card)"; **User Action**: Replace with friend card
+- **Error Code**: `DK-003`; **Trigger**: Duplicate cards; **Message**: "Each card can only be used once"; **User Action**: Remove duplicate
+- **Error Code**: `DK-004`; **Trigger**: Database timeout; **Message**: "Unable to save deck. Please try again."; **User Action**: Retry save
+- **Error Code**: `DK-005`; **Trigger**: Synergy calculation failed; **Message**: "Unable to calculate synergy. Using estimated score."; **User Action**: Continue with caution
 
 ### 7.3 Recovery Strategies
 
-| Scenario | Primary Recovery | Fallback Recovery | Ultimate Fallback |
-|----------|------------------|-------------------|-------------------|
-| Validation failure | Show inline errors | Provide fix suggestions | Reset to template |
-| Save error | Retry transaction (3x) | Save as draft | Export deck JSON |
-| Synergy error | Use default scoring | Skip optimization | Manual composition |
-| Meta tier unavailable | Use cached data | Use default tiers | Manual tier entry |
+- **Scenario**: Validation failure; **Primary Recovery**: Show inline errors; **Fallback Recovery**: Provide fix suggestions; **Ultimate Fallback**: Reset to template
+- **Scenario**: Save error; **Primary Recovery**: Retry transaction (3x); **Fallback Recovery**: Save as draft; **Ultimate Fallback**: Export deck JSON
+- **Scenario**: Synergy error; **Primary Recovery**: Use default scoring; **Fallback Recovery**: Skip optimization; **Ultimate Fallback**: Manual composition
+- **Scenario**: Meta tier unavailable; **Primary Recovery**: Use cached data; **Fallback Recovery**: Use default tiers; **Ultimate Fallback**: Manual tier entry
 
 ---
 
@@ -1100,21 +1064,17 @@ flowchart TD
 
 After deck building, users may proceed to:
 
-| Flow | Document Reference | Entry Condition |
-|------|-------------------|-----------------|
-| Training Day Flow | [UF-003](UF-003_Training_Day_Flow.md) | Deck applied, begin training |
-| Race Preparation | [UF-004](UF-004_Race_Day_Flow.md) | Deck optimized for race |
-| Career Setup | [UF-002](UF-002_Career_Setup_Flow.md) | New career with deck |
-| Card Management | Card collection | Manage owned cards |
+- **Flow**: Training Day Flow; **Document Reference**: [UF-003](UF-003_Training_Day_Flow.md); **Entry Condition**: Deck applied, begin training
+- **Flow**: Race Preparation; **Document Reference**: [UF-004](UF-004_Race_Day_Flow.md); **Entry Condition**: Deck optimized for race
+- **Flow**: Career Setup; **Document Reference**: [UF-002](UF-002_Career_Setup_Flow.md); **Entry Condition**: New career with deck
+- **Flow**: Card Management; **Document Reference**: Card collection; **Entry Condition**: Manage owned cards
 
 ### 8.2 Alternative Entry Points
 
-| Entry Point | Scenario | Flow Adjustment |
-|-------------|----------|-----------------|
-| Character Creation Wizard | Step 3 of character setup | Pre-populated with template |
-| Training Screen | "Change Deck" button | Quick edit mode |
-| Card Collection | "Build Deck" action | Card library browsing |
-| AI Recommendation | Proactive deck suggestion | Pre-optimized recommendations |
+- **Entry Point**: Character Creation Wizard; **Scenario**: Step 3 of character setup; **Flow Adjustment**: Pre-populated with template
+- **Entry Point**: Training Screen; **Scenario**: "Change Deck" button; **Flow Adjustment**: Quick edit mode
+- **Entry Point**: Card Collection; **Scenario**: "Build Deck" action; **Flow Adjustment**: Card library browsing
+- **Entry Point**: AI Recommendation; **Scenario**: Proactive deck suggestion; **Flow Adjustment**: Pre-optimized recommendations
 
 ### 8.3 Integration Points
 
@@ -1126,28 +1086,28 @@ flowchart LR
         Synergy[Synergy Calculation]
         Optimization[AI Optimization]
     end
-    
+
     subgraph ExternalServices[External Services]
         MetaSync[Meta Tier Sync]
         AIService[AI Advisory Service]
         AnalyticsService[Analytics Service]
     end
-    
+
     subgraph DataLayer[Data Layer]
         CardRepo[Card Repository]
         DeckRepo[Deck Repository]
         CareerRepo[Career Repository]
         Cache[Cache Manager]
     end
-    
+
     Composition --> CardRepo
     Validation --> DeckRepo
     Synergy --> MetaSync
     Optimization --> AIService
-    
+
     Composition --> Cache
     Optimization --> AnalyticsService
-    
+
     DeckRepo --> CareerRepo
 ```
 
@@ -1155,13 +1115,11 @@ flowchart LR
 
 ## Document Control
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 2.3.0 | 2026-02-22 | Development Team | Updated version and dates; no functional changes |
-| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: bond gain mechanics (+7 base, +9 Charming, +5 exclamation), friendship bonus by rarity (10-35%), limit break system (MLB = 4 LB = ★★★★★), six support card types |
-| 2.1.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 architecture; added deck synergy system, meta tier integration, AI optimization, comprehensive validation and error handling |
-| 2.0.0 | 2026-01-14 | Development Team | Prior revision with basic flow |
-| 1.0.0 | 2026-01-03 | Development Team | Initial draft |
+- **Version**: 2.3.0; **Date**: 2026-02-22; **Author**: Development Team; **Changes**: Updated version and dates; no functional changes
+- **Version**: 2.2.0; **Date**: 2026-01-28; **Author**: Development Team; **Changes**: Updated with verified game mechanics from Global English Server: bond gain mechanics (+7 base, +9 Charming, +5 exclamation), friendship bonus by rarity (10-35%), limit break system (MLB = 4 LB = ★★★★★), six support card types
+- **Version**: 2.1.0; **Date**: 2026-01-24; **Author**: Development Team; **Changes**: Complete rewrite aligned with v2.0.0 architecture; added deck synergy system, meta tier integration, AI optimization, comprehensive validation and error handling
+- **Version**: 2.0.0; **Date**: 2026-01-14; **Author**: Development Team; **Changes**: Prior revision with basic flow
+- **Version**: 1.0.0; **Date**: 2026-01-03; **Author**: Development Team; **Changes**: Initial draft
 
 ---
 
@@ -1180,4 +1138,4 @@ flowchart LR
 
 ---
 
-*This user flow reflects the current support deck building system implementation as of version 2.3.0. For the latest updates, refer to the online documentation.*
+### This user flow reflects the current support deck building system implementation as of version 2.3.0. For the latest updates, refer to the online documentation
