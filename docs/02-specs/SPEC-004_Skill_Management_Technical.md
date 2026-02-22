@@ -11,7 +11,7 @@
 ## Document Information
 
 | Attribute | Value |
-|-----------|-------|
+| --- | --- |
 | **Document ID** | SPEC-004 |
 | **Related PRD** | [PRD-004: Skill Management](../prds/PRD-004_Skill_Management.md) |
 | **Architecture Version** | v2.3.0 |
@@ -116,7 +116,7 @@ Strategic skill acquisition directly impacts race performance and career success
 ### 1.4 Technology Stack
 
 | Component | Technology | Version | Purpose |
-|-----------|-----------|---------|---------|
+| --- | --- | --- | --- |
 | **Framework** | Laravel | 12.x | Application foundation |
 | **Language** | PHP | 8.2+ | Server-side logic |
 | **Database** | MySQL | 8.0+ | Data persistence |
@@ -213,7 +213,7 @@ graph TB
 ### 2.3 Design Patterns
 
 | Pattern | Implementation | Purpose |
-|---------|---------------|---------|
+| --- | --- | --- |
 | **Repository** | `SkillRepository` | Abstract data access |
 | **Strategy** | Cost calculators | Pluggable discount strategies |
 | **Factory** | `SkillAcquisitionFactory` | Acquisition object creation |
@@ -1351,7 +1351,7 @@ class SkillService
 ### 7.1 Endpoint Overview
 
 | Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
+| --- | --- | --- | --- |
 | GET | `/api/v1/skills` | List/search skills | Yes |
 | GET | `/api/v1/skills/{id}` | Get skill details | Yes |
 | GET | `/api/v1/characters/{id}/skills` | Get acquired skills | Yes |
@@ -1787,7 +1787,7 @@ class SkillRecommendationService
 ### 10.1 Hint Discount Table
 
 | Level | Discount % | SP Cost Reduction (Base 120) |
-|-------|-----------|------------------------------|
+| --- | --- | --- |
 | 0 | 0% | 120 SP |
 | 1 | 10% | 108 SP |
 | 2 | 20% | 96 SP |
@@ -1798,7 +1798,7 @@ class SkillRecommendationService
 ### 10.2 Skill Rarity Cost Multipliers
 
 | Rarity | Base Cost Range | Typical Examples |
-|--------|----------------|------------------|
+| --- | --- | --- |
 | Normal | 100-180 SP | Lane Guidance, Speed Boost |
 | Rare | 150-270 SP | Arc Maestro, Last Spurt |
 | Unique | 200-360 SP | Character signatures |
@@ -1806,7 +1806,7 @@ class SkillRecommendationService
 ### 10.3 Scenario SP Cost Modifiers
 
 | Scenario | Modifier | Effect on 120 SP Skill |
-|----------|---------|------------------------|
+| --- | --- | --- |
 | URA Finale | 1.0x | 120 SP |
 | Aoharu Cup | 0.95x | 114 SP |
 | Make Cup Debut | 0.90x | 108 SP |
@@ -1895,7 +1895,7 @@ App\Exceptions\SkillException (Base)
 ### 12.2 Error Codes
 
 | Code | HTTP Status | Description | Resolution |
-|------|-------------|-------------|------------|
+| --- | --- | --- | --- |
 | `SKILL_INSUFFICIENT_SP` | 422 | Not enough SP to acquire | Earn more SP or choose cheaper skill |
 | `SKILL_ALREADY_OWNED` | 422 | Skill already acquired | Choose different skill |
 | `SKILL_NOT_FOUND` | 404 | Skill ID invalid | Verify skill ID |
@@ -1966,7 +1966,7 @@ $character = Character::with([
 ### 13.3 Performance Targets
 
 | Operation | Target | Measurement |
-|-----------|--------|-------------|
+| --- | --- | --- |
 | Skill search | < 50ms | p95 |
 | Cost calculation (bulk) | < 30ms | p95 |
 | Skill acquisition | < 150ms | p95 |
@@ -2620,7 +2620,7 @@ class SkillHintFactory extends Factory
 ### Appendix B: Skill Effectiveness by Race Type
 
 | Skill Category | Sprint | Mile | Medium | Long |
-|---------------|--------|------|--------|------|
+| --- | --- | --- | --- | --- |
 | Start Dash | ★★★ | ★★☆ | ★☆☆ | ☆☆☆ |
 | Speed Boost | ★★★ | ★★★ | ★★☆ | ★☆☆ |
 | Stamina Recovery | ★☆☆ | ★★☆ | ★★★ | ★★★ |
@@ -2669,7 +2669,7 @@ class SkillHintFactory extends Factory
 ### Appendix E: Hint Acquisition Methods
 
 | Source | Frequency | Typical Level | Notes |
-|--------|-----------|---------------|-------|
+| --- | --- | --- | --- |
 | Training Events | Common | 1-2 | Based on support cards present |
 | Support Card Bond | Guaranteed | 1 | At specific bond milestones |
 | Race Rewards | Uncommon | 1-3 | G1/G2 races |
@@ -2679,7 +2679,7 @@ class SkillHintFactory extends Factory
 ### Appendix F: Change Log
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
+| --- | --- | --- | --- |
 | 2.3.0 | 2026-02-22 | Development Team | Updated service names (SkillAnalysisService, SkillEvolutionService, Neuron\SkillRecommendationService, ExternalDataService), Neuron AI v2.11, PHP 8.2+, marked implementation complete |
 | 2.2.0 | 2026-01-28 | Development Team | Game-accurate 5-level hint system (10%/20%/30%/35%/40%), added Fast Learner/Skill Sparks/Hint Books as discount sources |
 | 2.0.0 | 2026-01-24 | Development Team | Full v2.0.0 alignment, complete testing strategy, AI integration, comprehensive calculators |
@@ -2687,10 +2687,10 @@ class SkillHintFactory extends Factory
 
 ---
 
-**Document Approval**
+### Document Approval
 
 | Role | Name | Signature | Date |
-|------|------|-----------|------|
+| --- | --- | --- | --- |
 | Tech Lead | [Name] | _________ | 2026-01-24 |
 | Product Owner | [Name] | _________ | 2026-01-24 |
 | QA Lead | [Name] | _________ | 2026-01-24 |
@@ -2706,4 +2706,4 @@ class SkillHintFactory extends Factory
 
 ---
 
-**End of Document**
+### End of Document

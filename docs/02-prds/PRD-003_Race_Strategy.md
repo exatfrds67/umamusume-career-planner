@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0  
-**Date**: February 22, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Implemented - All features operational  
+**Status**: Current - Aligned with codebase v2.2.0  
 **Related Documents**: [SRS-FR-04], [SDS-4.3], [DBD-4.2], [SPEC-003]
 
 **Source Specs**:
@@ -87,7 +87,7 @@ Players often enter races underprepared or with the wrong strategy, leading to u
 ## 3. User Stories
 
 | ID | Actor | Story | Acceptance Criteria |
-|----|-------|-------|---------------------|
+| --- | --- | --- | --- |
 | US-3.1 | Player | I want to see which races are available on the current turn. | Calendar view shows G1/G2/G3/OP races eligible for entry. |
 | US-3.2 | Player | I want to know if my stats are high enough to win a G1 race. | "Readiness" score displayed with specific warnings. |
 | US-3.3 | Player | I want the system to tell me which running style gives the highest win chance. | Recommended strategy highlighted with reasoning. |
@@ -124,7 +124,7 @@ Players often enter races underprepared or with the wrong strategy, leading to u
 **Aptitude Performance Modifiers**:
 
 | Rank | Surface (Power) | Distance (Speed) | Style (Wit) |
-|------|-----------------|------------------|-------------|
+| --- | --- | --- | --- |
 | S | +5% | +5% | +10% |
 | A | 0% (baseline) | 0% (baseline) | 0% (baseline) |
 | B | -10% | -10% | -15% |
@@ -147,7 +147,7 @@ Players often enter races underprepared or with the wrong strategy, leading to u
 **Track Condition Effects**:
 
 | Condition | Surface | Power Penalty | Speed Penalty | Stamina Drain |
-|-----------|---------|---------------|---------------|---------------|
+| --- | --- | --- | --- | --- |
 | Firm | Turf/Dirt | None | None | None |
 | Good | Turf | -50 | None | None |
 | Good | Dirt | -50 | None | None |
@@ -169,7 +169,7 @@ Players often enter races underprepared or with the wrong strategy, leading to u
 
 - **Style Analysis**: Evaluate all 4 running styles against character Aptitudes and Stats.
 - **Recommendations**: Suggest the style with the highest win probability.
-- **AI Integration**: Use **RaceStrategyAgent** (Neuron AI) to explain *why* a strategy is preferred.
+- **AI Integration**: Use **Race Strategy Agent** to explain *why* a strategy is preferred.
 
 ### 4.6 Outcome Simulation [FR-04.6]
 
@@ -229,7 +229,7 @@ Players often enter races underprepared or with the wrong strategy, leading to u
 
 ### 6.3 AI Services
 
-- **Race Strategy Agent**: `RaceStrategyAgent` Neuron AI agent providing qualitative advice.
+- **Race Strategy Agent**: Neuron AI agent providing qualitative advice.
 - **Win Probability Model**: Statistical model for complex scenarios.
 
 ---
@@ -264,10 +264,6 @@ Players often enter races underprepared or with the wrong strategy, leading to u
   - Game-accurate aptitude modifiers (G-S scale, no SS).
   - Track condition system with stat penalties.
   - Weather impact on track conditions.
-- **v2.3.0 (Current)**:
-  - All race strategy features fully implemented and operational.
-  - RaceStrategyAgent (Neuron AI) integrated and functional.
-  - RaceStrategyService orchestration complete.
 
 ---
 
@@ -282,8 +278,7 @@ Players often enter races underprepared or with the wrong strategy, leading to u
 ## Changelog
 
 | Version | Date | Changes |
-|---------|------|---------|
-| 2.3.0 | February 22, 2026 | Module fully implemented. Updated Race Strategy Agent reference to RaceStrategyAgent. All race strategy features operational with Neuron AI integration. |
+| --- | --- | --- |
 | 2.2.0 | January 28, 2026 | Updated with verified game mechanics from Global English Server: corrected aptitude scale (G-S, no SS), added aptitude modifier table, added track condition system with stat penalties (Firm/Good/Soft/Heavy), weather impact on track conditions. |
 | 2.1.0 | January 24, 2026 | Aligned with codebase v2.0.0, added source specs references. |
 | 2.0.0 | January 2026 | Initial v2 release with race calendar and readiness scoring. |

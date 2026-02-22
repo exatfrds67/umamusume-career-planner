@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0  
-**Date**: February 22, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Implemented - All features operational  
+**Status**: Current - Aligned with codebase v2.2.0  
 **Related Documents**: [SRS-FR-08], [SDS-4.7], [DBD-2.1], [SPEC-007]
 
 **Source Specs**:
@@ -53,7 +53,7 @@ Game data changes frequently (new banners, balance patches). Manual updates are 
 
 ### 1.3 Solution Overview
 
-- **API Sync**: Automated background jobs to fetch data from `umapyoi.net` (Primary) and `GameTora` (gametora.com scraping via `GameToraScraperService`).
+- **API Sync**: Automated background jobs to fetch data from `umapyoi.net` (Primary) and `umamusumedb.com` (Fallback).
 - **OCR Pipeline**: Automated extraction of game stats from screenshots using **Tesseract** with **GD** image preprocessing.
 - **Resilience**: Implementation of **Circuit Breaker** patterns to handle external API downtime gracefully.
 - **Real-time**: **WebSocket (Laravel Reverb)** integration to push updates to connected clients.
@@ -70,8 +70,8 @@ Game data changes frequently (new banners, balance patches). Manual updates are 
 
 ### 2.2 Scope (In)
 
-- **External APIs**: Connectors for `umapyoi.net` and `GameTora` (gametora.com scraping).
-- **OCR Service**: Image upload, preprocessing, text extraction, and parsing logic (12 OCR service classes).
+- **External APIs**: Connectors for `umapyoi.net` and `umamusumedb.com`.
+- **OCR Service**: Image upload, preprocessing, text extraction, and parsing logic.
 - **Data Management**: Import/Export of user plans (JSON/CSV/Excel).
 - **Caching**: Redis-backed caching for external responses (24h TTL).
 - **Real-time**: Broadcasting sync completion events via WebSockets.
@@ -86,7 +86,7 @@ Game data changes frequently (new banners, balance patches). Manual updates are 
 ## 3. User Stories
 
 | ID | Actor | Story | Acceptance Criteria |
-|----|-------|-------|---------------------|
+| --- | --- | --- | --- |
 | US-7.1 | Admin | I want the card database to update automatically when a new banner drops. | Scheduled job runs daily; fetches new cards; updates DB. |
 | US-7.2 | Player | I want to upload a screenshot of my character's end-of-run stats to save time. | Upload image -> System fills in Speed/Stamina/etc. fields. |
 | US-7.3 | Player | I want to export my race plans to Excel to share with my circle. | "Export" button generates a valid .xlsx file. |
@@ -101,7 +101,7 @@ Game data changes frequently (new banners, balance patches). Manual updates are 
 - **Sources**: Support multiple upstream providers.
 - **Strategy**:
   1. Attempt Primary (`umapyoi.net`).
-  2. If Fail/Timeout -> Log Error -> Attempt Fallback (`GameTora` via `GameToraScraperService`).
+  2. If Fail/Timeout -> Log Error -> Attempt Fallback (`umamusumedb.com`).
   3. If All Fail -> Use Stale Cache -> Notify Admin.
 - **Normalization**: Map external JSON schemas to internal `ucp_` database schema.
 
@@ -132,8 +132,6 @@ Ensure synced data reflects accurate game mechanics:
 - Heavy: -50/-100 Power, -50 Speed, +2%/sec stamina drain
 
 ### 4.3 OCR Pipeline [FR-08.4]
-
-- **Architecture**: 12 OCR service classes including `ScreenTypeDetector`, `ParserFactory`, `DataExtractionService`, `DataValidationService`, `DataTransformationService`, `DataIntegrationService`, and specialized parsers (`CharacterStatsParser`, `TrainingSessionParser`, `SkillListParser`, `RaceResultParser`).
 
 - **Preprocessing**: Resize to max 2000px, Grayscale, Adaptive Thresholding (GD Library).
 - **Extraction**: Tesseract OCR engine (v5+) with Japanese/English language packs.
@@ -190,10 +188,9 @@ Ensure synced data reflects accurate game mechanics:
 
 ### 6.2 Service Architecture
 
-- **ExternalAPIService**: Abstract base facade for API clients (with 17+ concrete service implementations including `BackgroundSyncService`, `CacheManagerService`, `CircuitBreaker`, `ConnectivityMonitorService`, `GracefulDegradationService`).
+- **ExternalAPIService**: Facade for API clients.
 - **CircuitBreaker**: Middleware state machine (Closed -> Open -> Half-Open).
-- **OCRService**: Orchestrator for ImageProc -> Tesseract -> Parser (12 classes across `app/Services/OCR/`).
-- **GameToraScraperService**: Web scraping service for gametora.com data extraction.
+- **OCRService**: Orchestrator for ImageProc -> Tesseract -> Parser.
 
 ---
 
@@ -231,12 +228,6 @@ Ensure synced data reflects accurate game mechanics:
 - **v2.2.0 (Current)**:
   - Game mechanics data validation against verified sources.
   - Updated schema to support accurate game mechanics.
-- **v2.3.0 (Current)**:
-  - All external integration features fully implemented and operational.
-  - GameTora scraping replaces UmamusumeDB as fallback data source.
-  - 17+ ExternalAPI services implemented.
-  - 12 OCR service classes with specialized parsers.
-  - Full circuit breaker and graceful degradation patterns.
 
 ---
 
@@ -251,8 +242,7 @@ Ensure synced data reflects accurate game mechanics:
 ## Changelog
 
 | Version | Date | Changes |
-|---------|------|---------|
-| 2.3.0 | February 22, 2026 | Module fully implemented. Replaced UmamusumeDB fallback with GameTora scraping (GameToraScraperService). Documented 17+ ExternalAPI services and 12 OCR service classes. All external integration features operational. |
+| --- | --- | --- |
 | 2.2.0 | January 28, 2026 | Updated with verified game mechanics from Global English Server: added game mechanics data sync requirements ensuring accurate skill hint system (5 levels, 40% max), aptitude system (G-S, no SS), stat system (1200+ diminishing returns), and track conditions. |
 | 2.1.0 | January 24, 2026 | Aligned with codebase v2.0.0, added source specs references. |
 | 2.0.0 | January 2026 | Initial v2 release with API sync and OCR. |

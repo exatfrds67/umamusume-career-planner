@@ -1,9 +1,9 @@
 # SPEC-008: Performance Monitoring & APM System - Technical Specification
 
-**Document Version**: 2.3.0  
-**Date**: 2026-02-22  
+**Document Version**: 2.2.0  
+**Date**: 2026-01-28  
 **Project**: Umamusume Pretty Derby Career Planner  
-**Status**: Complete - Implementation verified  
+**Status**: Active  
 **Classification**: Internal - Development Team
 
 ---
@@ -11,12 +11,12 @@
 ## Document Information
 
 | Attribute | Value |
-|-----------|-------|
+| --- | --- |
 | **Document ID** | SPEC-008 |
 | **Related PRD** | Performance & Reliability Requirements (SRS §3.9) |
-| **Architecture Version** | v2.3.0 |
+| **Architecture Version** | v2.2.0 |
 | **Approval Status** | Approved |
-| **Last Reviewed** | 2026-02-22 |
+| **Last Reviewed** | 2026-01-28 |
 
 ### Related Documents
 
@@ -70,7 +70,7 @@ The Performance Monitoring & APM (Application Performance Monitoring) System pro
 ### 1.2 Technology Stack
 
 | Component | Technology | Purpose |
-|-----------|------------|---------|
+| --- | --- | --- |
 | Metrics Collection | Laravel Middleware | Request-level instrumentation |
 | Real-time Storage | Redis | Hot metrics with 1-hour retention |
 | Historical Storage | MySQL | Cold storage with tiered retention |
@@ -81,7 +81,7 @@ The Performance Monitoring & APM (Application Performance Monitoring) System pro
 ### 1.3 Service Components
 
 | Service | Location | Primary Function |
-|---------|----------|------------------|
+| --- | --- | --- |
 | `ApmService` | `app/Services/ApmService.php` | Core APM coordination |
 | `ApiPerformanceMonitoringService` | `app/Services/ApiPerformanceMonitoringService.php` | API endpoint tracking |
 | `QueryOptimizationService` | `app/Services/QueryOptimizationService.php` | Query analysis |
@@ -983,7 +983,7 @@ class PerformanceAlertingService
 Every HTTP request is instrumented to collect:
 
 | Metric | Type | Description |
-|--------|------|-------------|
+| --- | --- | --- |
 | `duration_ms` | float | Total request duration |
 | `status_code` | int | HTTP response status |
 | `query_count` | int | Number of database queries |
@@ -1081,7 +1081,7 @@ The `RedisCacheOptimizationService` provides:
 ### 7.1 Alert Types
 
 | Alert Type | Severity | Threshold |
-|------------|----------|-----------|
+| --- | --- | --- |
 | `high_response_time` | critical | P95 > 500ms |
 | `high_error_rate` | critical | > 5% |
 | `low_cache_hit_rate` | warning | < 80% |
@@ -1123,7 +1123,7 @@ After each deployment, the system:
 ### 9.1 Retention Policy
 
 | Data Type | Retention | Storage |
-|-----------|-----------|---------|
+| --- | --- | --- |
 | Raw metrics | 7 days | MySQL |
 | Minute aggregates | 30 days | MySQL |
 | Hour aggregates | 90 days | MySQL |
@@ -1147,7 +1147,7 @@ Schedule::job(new AggregateDayMetrics)->daily();
 ### 10.1 Dashboard API Endpoints
 
 | Endpoint | Method | Description |
-|----------|--------|-------------|
+| --- | --- | --- |
 | `/api/v2/apm/summary` | GET | Overall system performance |
 | `/api/v2/apm/endpoints` | GET | Per-endpoint metrics |
 | `/api/v2/apm/queries/slow` | GET | Slow query list |
@@ -1347,7 +1347,7 @@ it('tracks request metrics through middleware', function () {
 ### 14.1 Glossary
 
 | Term | Definition |
-|------|------------|
+| --- | --- |
 | APM | Application Performance Monitoring |
 | P50/P95/P99 | Percentile response times |
 | TTL | Time To Live (cache expiration) |
@@ -1364,8 +1364,7 @@ it('tracks request metrics through middleware', function () {
 ## Document Control
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 2.3.0 | 2026-02-22 | Development Team | Updated to v2.3.0 architecture alignment, status complete |
+| --- | --- | --- | --- |
 | 2.2.0 | 2026-01-28 | Development Team | Updated to v2.2.0 architecture alignment |
 | 1.0.0 | 2026-01-27 | Development Team | Initial specification for Performance Monitoring & APM System |
 

@@ -11,7 +11,7 @@
 ## Document Information
 
 | Attribute | Value |
-|-----------|-------|
+| --- | --- |
 | **Document ID** | SPEC-001 |
 | **Related PRD** | [PRD-001: Character Management](../prds/PRD-001_Character_Management.md) |
 | **Architecture Version** | v2.3.0 |
@@ -105,7 +105,7 @@ In Umamusume Pretty Derby, each trainee character represents a single career run
 ### 1.4 Technology Stack
 
 | Component | Technology | Version | Purpose |
-|-----------|-----------|---------|---------|
+| --- | --- | --- | --- |
 | **Framework** | Laravel | 12.x | Application foundation |
 | **Language** | PHP | 8.3+ | Server-side logic |
 | **Database** | MySQL | 8.0+ | Data persistence |
@@ -199,7 +199,7 @@ graph TB
 ### 2.3 Design Patterns
 
 | Pattern | Implementation | Purpose |
-|---------|---------------|---------|
+| --- | --- | --- |
 | **Repository** | `CharacterRepository` | Abstract data access logic |
 | **Service Layer** | `CharacterStateService` | Encapsulate business operations |
 | **Factory** | `CharacterFactory` | Streamline object creation |
@@ -1180,7 +1180,7 @@ class FactorService
 ### 5.1 Endpoint Overview
 
 | Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
+| --- | --- | --- | --- |
 | GET | `/api/v1/characters` | List user's characters | Yes |
 | POST | `/api/v1/characters` | Create new character | Yes |
 | GET | `/api/v1/characters/{id}` | Get character details | Yes |
@@ -1534,7 +1534,7 @@ Energy governs training risk and recovery:
 Mood status affects training outcomes:
 
 | Status | Multiplier | Training Gain Impact |
-|--------|-----------|---------------------|
+| --- | --- | --- |
 | Awful | 0.90x | -10% effectiveness |
 | Bad | 0.95x | -5% effectiveness |
 | Normal | 1.00x | Baseline |
@@ -1675,7 +1675,7 @@ App\Exceptions\CharacterException (Base)
 ### 9.2 Error Codes
 
 | Code | HTTP Status | Description | Resolution |
-|------|-------------|-------------|------------|
+| --- | --- | --- | --- |
 | `CHAR_NOT_FOUND` | 404 | Character ID does not exist | Verify ID |
 | `CHAR_INVALID_STAT` | 422 | Stat value outside 0-1200 | Validate input |
 | `CHAR_PARENT_INCOMPATIBLE` | 422 | Parent selection invalid | Choose different parents |
@@ -1738,7 +1738,7 @@ Character::select(['id', 'name', 'current_stats'])->get();
 ### 10.3 Performance Targets
 
 | Operation | Target | Measurement |
-|-----------|--------|-------------|
+| --- | --- | --- |
 | Character list (10 items) | < 50ms | p95 |
 | Character detail with relations | < 100ms | p95 |
 | Character creation | < 300ms | p95 |
@@ -1961,7 +1961,7 @@ class CharacterFactory extends Factory
 ### Appendix A: Stat Grade Mapping
 
 | Grade | Stat Range | Training Difficulty |
-|-------|-----------|---------------------|
+| --- | --- | --- |
 | SS | 1100-1200 | Extremely Hard |
 | S | 950-1099 | Very Hard |
 | A | 850-949 | Hard |
@@ -1977,7 +1977,7 @@ class CharacterFactory extends Factory
 ### Appendix B: Scenario Comparison
 
 | Scenario | Difficulty | Unique Mechanics | Best For |
-|----------|-----------|------------------|----------|
+| --- | --- | --- | --- |
 | URA Finale | Standard | Classic structure | Beginners |
 | Aoharu Cup | Hard | Team battles | Advanced players |
 | Make Cup Debut | Moderate | Skill focus | Skill farming |
@@ -2025,7 +2025,7 @@ class CharacterFactory extends Factory
 ### Appendix D: Change Log
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
+| --- | --- | --- | --- |
 | 2.3.0 | 2026-02-22 | Development Team | Updated to v2.3.0: CharacterStateService, FactorService, ExternalDataService, GameTora fallback, PHP 8.2+, status complete |
 | 2.2.0 | 2026-01-28 | Development Team | Game-accurate mechanics: S max aptitude grade (removed SS), category-specific aptitude modifiers, stat soft cap with diminishing returns above 1200, per-training caps |
 | 2.0.0 | 2026-01-24 | Development Team | Full v2.0.0 alignment, added enums, value objects |
@@ -2033,10 +2033,10 @@ class CharacterFactory extends Factory
 
 ---
 
-**Document Approval**
+### Document Approval
 
 | Role | Name | Signature | Date |
-|------|------|-----------|------|
+| --- | --- | --- | --- |
 | Tech Lead | [Name] | _________ | 2026-01-24 |
 | Product Owner | [Name] | _________ | 2026-01-24 |
 | QA Lead | [Name] | _________ | 2026-01-24 |
@@ -2051,4 +2051,4 @@ class CharacterFactory extends Factory
 
 ---
 
-**End of Document**
+### End of Document

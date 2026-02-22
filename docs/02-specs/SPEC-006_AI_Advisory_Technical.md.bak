@@ -1,9 +1,9 @@
 # SPEC-006: AI Advisory System - Technical Specification
 
-**Document Version**: 2.2.0  
-**Date**: 2026-01-28  
+**Document Version**: 2.3.0  
+**Date**: 2026-02-22  
 **Project**: Umamusume Pretty Derby Career Planner  
-**Status**: Active - Updated with game-accurate mechanics references  
+**Status**: Complete - Implementation verified  
 **Classification**: Internal - Development Team
 
 ---
@@ -11,12 +11,12 @@
 ## Document Information
 
 | Attribute | Value |
-| --- | --- |
+|-----------|-------|
 | **Document ID** | SPEC-006 |
 | **Related PRD** | [PRD-006: AI Advisory](../prds/PRD-006_AI_Advisory.md) |
-| **Architecture Version** | v2.2.0 |
+| **Architecture Version** | v2.3.0 |
 | **Approval Status** | Approved |
-| **Last Reviewed** | 2026-01-28 |
+| **Last Reviewed** | 2026-02-22 |
 
 ### Related Documents
 
@@ -112,13 +112,13 @@ The AI Advisory System provides intelligent guidance across all these domains, r
 ### 1.4 Technology Stack
 
 | Component | Technology | Version | Purpose |
-| --- | --- | --- | --- |
-| **AI Framework** | Neuron AI | Latest | Agent orchestration |
+|-----------|-----------|---------|---------|
+| **AI Framework** | Neuron AI | v2.11 | Agent orchestration |
 | **Local AI** | Ollama | Latest | Primary local inference |
 | **Cloud AI** | AWS Bedrock | Claude 3.5/4.5 | Cloud fallback |
 | **MCP** | Model Context Protocol | Latest | Tool execution |
 | **Framework** | Laravel | 12.x | Application foundation |
-| **Language** | PHP | 8.3+ | Server-side logic |
+| **Language** | PHP | 8.2+ | Server-side logic |
 | **Database** | MySQL | 8.0+ | Conversation persistence |
 | **Cache** | Redis | 7.x | Response caching |
 
@@ -137,16 +137,16 @@ graph TB
     end
 
     subgraph "Application Layer"
-        AdvisorySvc[AIAdvisoryService]
+        AdvisorySvc[AdviceService]
         ContextBuilder[ContextBuilder]
         RouterSvc[HybridAIService]
-        CostSvc[CostTrackingService]
+        CostSvc[AI\CostTrackingService]
     end
 
     subgraph "Agent Layer"
         TrainingAgent[TrainingAdvisorAgent]
         RaceAgent[RaceStrategyAgent]
-        SkillAgent[SkillAdvisorAgent]
+        SkillAgent[SkillRecommendationAgent]
         CareerAgent[CareerPlanningAgent]
     end
 
@@ -239,7 +239,7 @@ graph TB
 ### 2.3 Design Patterns
 
 | Pattern | Implementation | Purpose |
-| --- | --- | --- |
+|---------|---------------|---------|
 | **Strategy** | Provider selection | Pluggable AI backends |
 | **Factory** | Agent creation | Dynamic agent instantiation |
 | **Chain of Responsibility** | Fallback handling | Graceful degradation |
@@ -452,7 +452,7 @@ use App\Neuron\Tools\{
  * 
  * Provides skill acquisition recommendations and SP optimization.
  */
-class SkillAdvisorAgent extends Agent
+class SkillRecommendationAgent extends Agent
 {
     protected string $name = 'Skill Advisor';
     
@@ -547,7 +547,7 @@ return [
             'complexity_threshold' => 60,
         ],
         'skill_advisor' => [
-            'class' => \App\Neuron\Agents\SkillAdvisorAgent::class,
+            'class' => \App\Neuron\Agents\SkillRecommendationAgent::class,
             'enabled' => true,
             'description' => 'Recommends skill acquisitions',
             'complexity_threshold' => 55,
@@ -1449,7 +1449,7 @@ return [
             'timeout' => 60,
             'allowed_domains' => [
                 'umapyoi.net',
-                'umamusumedb.com',
+                'gametora.com',
             ],
         ],
     ],
@@ -1791,7 +1791,7 @@ class MCPMonitoringService
 
 ### 6.1 AI Advisory Service
 
-````php
+```php
 <?php
 
 namespace App\Services\AI;
@@ -1800,7 +1800,7 @@ use App\Models\{Character, AIConversation, AIRecommendation};
 use App\Neuron\Agents\{
     TrainingAdvisorAgent,
     RaceStrategyAgent,
-    SkillAdvisorAgent,
+    SkillRecommendationAgent,
     CareerPlanningAgent
 };
 use App\DTOs\AI\{AIResponse, AIAdvice};
@@ -1811,7 +1811,7 @@ use Illuminate\Support\Facades\{DB, Log};
  * 
  * Orchestrates AI advisory operations across all domains.
  */
-class AIAdvisoryService
+class AdviceService
 {
     public function __construct(
         private HybridAIService $aiService,
@@ -1890,7 +1890,7 @@ class AIAdvisoryService
     ): AIAdvice {
         $context = $this->contextBuilder->buildSkillContext($character);
         
-        $agent = new SkillAdvisorAgent();
+        $agent = new SkillRecommendationAgent();
         $agent->withContext($context);
 
         $response = $this->executeAgent($agent, $query, $options);
@@ -2149,7 +2149,7 @@ PROMPT;
         return match ($contextType) {
             'training' => new TrainingAdvisorAgent(),
             'race' => new RaceStrategyAgent(),
-            'skills' => new SkillAdvisorAgent(),
+            'skills' => new SkillRecommendationAgent(),
             'career' => new CareerPlanningAgent(),
             default => new TrainingAdvisorAgent(),
         };
@@ -2169,7 +2169,7 @@ PROMPT;
     }
 }
 
-````
+```
 
 ### 6.2 Context Builder
 
@@ -2408,7 +2408,7 @@ readonly class AIAdvice
 ### 7.1 Endpoint Overview
 
 | Method | Endpoint | Description | Auth Required |
-| --- | --- | --- | --- |
+|--------|----------|-------------|---------------|
 | POST | `/api/ai/training` | Get training advice | Yes |
 | POST | `/api/ai/race` | Get race strategy advice | Yes |
 | POST | `/api/ai/skills` | Get skill recommendations | Yes |
@@ -2970,7 +2970,7 @@ class CostTrackingService
 ### 9.2 Pricing Reference
 
 | Provider | Model | Input Cost (per 1M tokens) | Output Cost (per 1M tokens) |
-| --- | --- | --- | --- |
+|----------|-------|---------------------------|----------------------------|
 | Ollama | llama3.2 | $0.00 | $0.00 |
 | Ollama | mistral | $0.00 | $0.00 |
 | Bedrock | Claude 3.5 Sonnet | $3.00 | $15.00 |
@@ -2993,7 +2993,7 @@ Budget enforcement occurs at the routing layer:
 ### 10.1 Routing Decision Matrix
 
 | Query Complexity | Ollama Available | Bedrock Enabled | Budget OK | Provider Selected |
-| --- | --- | --- | --- | --- |
+|-----------------|------------------|-----------------|-----------|-------------------|
 | Simple (< 50) | Yes | - | - | Ollama |
 | Simple (< 50) | No | Yes | Yes | Bedrock |
 | Simple (< 50) | No | Yes | No | Error (AI_003) |
@@ -3007,7 +3007,7 @@ Budget enforcement occurs at the routing layer:
 ### 10.2 Complexity Scoring
 
 | Factor | Score Range | Description |
-| --- | --- | --- |
+|--------|-------------|-------------|
 | Prompt length | 0-40 | > 2000 chars: +20, > 4000 chars: +40 |
 | Topic | 30-70 | training: 40, race: 50, skills: 45, career: 70 |
 | Context sections | 0-20 | 4 points per section, max 20 |
@@ -3016,7 +3016,7 @@ Budget enforcement occurs at the routing layer:
 ### 10.3 Confidence Scoring Guidelines
 
 | Confidence Level | Range | Interpretation |
-| --- | --- | --- |
+|-----------------|-------|----------------|
 | Very High | 0.90 - 1.00 | Clear-cut recommendation |
 | High | 0.75 - 0.89 | Strong recommendation |
 | Moderate | 0.60 - 0.74 | Good recommendation with caveats |
@@ -3057,7 +3057,7 @@ $context['win_probability'] = $winProbability;
 Skill recommendations use hint tracking:
 
 ```php
-// In SkillAdvisorAgent tool
+// In SkillRecommendationAgent tool
 $availableHints = app(SkillService::class)->getAvailableHints($character);
 $spBudget = app(SkillService::class)->getRemainingSP($character);
 
@@ -3084,7 +3084,7 @@ App\Exceptions\AI\AIException (Base)
 ### 12.2 Error Codes
 
 | Code | HTTP Status | Description | Resolution |
-| --- | --- | --- | --- |
+|------|-------------|-------------|------------|
 | `AI_001` | 503 | Provider unavailable | Retry later or use fallback |
 | `AI_002` | 429 | Rate limit exceeded | Wait and retry |
 | `AI_003` | 402 | Cost threshold exceeded | Increase budget or use local |
@@ -3112,7 +3112,7 @@ App\Exceptions\AI\AIException (Base)
 ### 13.1 Performance Targets
 
 | Metric | Target | Notes |
-| --- | --- | --- |
+|--------|--------|-------|
 | AI response time (local) | < 2.5s (p95) | Includes context building |
 | AI response time (cloud) | < 5.0s (p95) | Network latency included |
 | Context build time | < 200ms | Use eager loading |
@@ -3531,7 +3531,7 @@ class AIRecommendationFactory extends Factory
 ### Appendix A: Environment Variables
 
 | Variable | Default | Description |
-| --- | --- | --- |
+|----------|---------|-------------|
 | `AI_DEFAULT_PROVIDER` | `ollama` | Primary AI provider |
 | `OLLAMA_ENABLED` | `true` | Enable Ollama |
 | `OLLAMA_BASE_URL` | `http://localhost:11434` | Ollama endpoint |
@@ -3551,9 +3551,9 @@ class AIRecommendationFactory extends Factory
 ### Appendix B: Requirements Traceability
 
 | Requirement | Source | Implementation |
-| --- | --- | --- |
+|-------------|--------|----------------|
 | BR-6.1 | BRS §4.6 | `HybridAIService`, `config/ai.php` |
-| BR-6.2 | BRS §4.6 | `TrainingAdvisorAgent`, `RaceStrategyAgent`, `SkillAdvisorAgent` |
+| BR-6.2 | BRS §4.6 | `TrainingAdvisorAgent`, `RaceStrategyAgent`, `SkillRecommendationAgent` |
 | BR-6.3 | BRS §4.6 | `AIConversation` model, `handleConversation()` |
 | BR-6.4 | BRS §4.6 | `CostTrackingService`, `ucp_ai_usage_daily` |
 | BR-6.5 | BRS §4.6 | Confidence scoring in all responses |
@@ -3568,17 +3568,18 @@ class AIRecommendationFactory extends Factory
 ### Appendix C: Change Log
 
 | Version | Date | Author | Changes |
-| --- | --- | --- | --- |
+|---------|------|--------|---------|
+| 2.3.0 | 2026-02-22 | Development Team | Updated service names (AdviceService, HybridAIService, AI\CostTrackingService), SkillAdvisorAgent renamed to SkillRecommendationAgent, Neuron AI v2.11, PHP 8.2+, replaced UmamusumeDB with GameTora, marked implementation complete |
 | 2.2.0 | 2026-01-28 | Development Team | Updated AI agent prompts with game-accurate mechanics: 5-level hint system, S max aptitude, stat soft cap, track condition penalties |
 | 2.0.0 | 2026-01-24 | Development Team | Full v2.0.0 alignment with comprehensive services, agents, API endpoints, database schema, cost tracking, security, testing strategy, and complete appendices following SPEC-005 format |
 | 1.0.0 | 2026-01-14 | Development Team | Initial technical specification |
 
 ---
 
-### Document Approval
+**Document Approval**
 
 | Role | Name | Signature | Date |
-| --- | --- | --- | --- |
+|------|------|-----------|------|
 | Tech Lead | [Name] | _________ | 2026-01-24 |
 | Product Owner | [Name] | _________ | 2026-01-24 |
 | QA Lead | [Name] | _________ | 2026-01-24 |
@@ -3589,9 +3590,9 @@ class AIRecommendationFactory extends Factory
 **Document Control**  
 **Maintained By**: Backend Development Team  
 **Review Frequency**: Bi-weekly during active development  
-**Next Review Date**: 2026-02-07  
+**Next Review Date**: 2026-03-07  
 **Distribution**: Development Team, QA Team, Product Management, AI Team
 
 ---
 
-### End of Document
+**End of Document**

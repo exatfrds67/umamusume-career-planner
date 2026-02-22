@@ -1,9 +1,9 @@
 # SPEC-002: Training Optimization System - Technical Specification
 
-**Document Version**: 2.2.0  
-**Date**: 2026-01-28  
+**Document Version**: 2.3.0  
+**Date**: 2026-02-22  
 **Project**: Umamusume Pretty Derby Career Planner  
-**Status**: Active - Updated with game-accurate training formula  
+**Status**: Complete - Implementation verified  
 **Classification**: Internal - Development Team
 
 ---
@@ -11,12 +11,12 @@
 ## Document Information
 
 | Attribute | Value |
-| --- | --- |
+|-----------|-------|
 | **Document ID** | SPEC-002 |
 | **Related PRD** | [PRD-002: Training Optimization](../prds/PRD-002_Training_Optimization.md) |
-| **Architecture Version** | v2.2.0 |
+| **Architecture Version** | v2.3.0 |
 | **Approval Status** | Approved |
-| **Last Reviewed** | 2026-01-28 |
+| **Last Reviewed** | 2026-02-22 |
 
 ### Related Documents
 
@@ -114,12 +114,12 @@ This module provides deterministic predictions to enable informed decision-makin
 ### 1.4 Technology Stack
 
 | Component | Technology | Version | Purpose |
-| --- | --- | --- | --- |
+|-----------|-----------|---------|---------|
 | **Framework** | Laravel | 12.x | Application foundation |
 | **Language** | PHP | 8.3+ | Server-side logic |
 | **Database** | MySQL | 8.0+ | Data persistence |
 | **Cache** | Redis | 7.x | Prediction caching |
-| **AI** | Neuron Framework | 1.x | Advisory agents |
+| **AI** | Neuron AI | v2.11 | Advisory agents |
 | **AI Provider (Local)** | Ollama | Latest | Local recommendations |
 | **AI Provider (Cloud)** | AWS Bedrock Claude | 4.5 | Complex analysis |
 
@@ -140,7 +140,7 @@ graph TB
     subgraph "Application Layer"
         TrainingSvc[TrainingService]
         PredictionSvc[TrainingPredictionService]
-        AdvisorySvc[AIAdvisoryService]
+        AdvisorySvc[AdviceService]
     end
 
     subgraph "Domain Layer"
@@ -152,7 +152,7 @@ graph TB
     subgraph "Infrastructure Layer"
         DB[(MySQL)]
         Cache[(Redis)]
-        NeuronAI[Neuron AI Agent]
+        NeuronAI[Neuron AI v2.11 Agent]
     end
 
     API --> FormRequest
@@ -203,7 +203,7 @@ graph TB
 ### 2.3 Design Patterns
 
 | Pattern | Implementation | Purpose |
-| --- | --- | --- |
+|---------|---------------|---------|
 | **Strategy** | Calculator interfaces | Pluggable calculation algorithms |
 | **DTO** | `TrainingPrediction` | Immutable prediction data |
 | **Repository** | `TrainingSessionRepository` | Data access abstraction |
@@ -1294,7 +1294,7 @@ class TrainingService
 ### 5.1 Endpoint Overview
 
 | Method | Endpoint | Description | Auth Required |
-| --- | --- | --- | --- |
+|--------|----------|-------------|---------------|
 | POST | `/api/v1/training/predict` | Get predictions for current turn | Yes |
 | POST | `/api/v1/training/execute` | Execute training action | Yes |
 | GET | `/api/v1/training/history/{career_id}` | Get training history | Yes |
@@ -1633,7 +1633,7 @@ try {
 ### 8.1 Training Type Effects
 
 | Type | Primary Stat | Secondary Stat | Energy Cost | Base Risk |
-| --- | --- | --- | --- | --- |
+|------|-------------|----------------|-------------|-----------|
 | Speed | Speed +10 | Power +5 | 20 | Normal |
 | Stamina | Stamina +10 | Guts +5 | 22 | Normal |
 | Power | Power +10 | Stamina +5 | 24 | Normal |
@@ -1657,7 +1657,7 @@ try {
 ### 8.3 Energy Management Thresholds
 
 | Energy Range | Training Impact | Recommended Action |
-| --- | --- | --- |
+|-------------|----------------|-------------------|
 | 80-100 | Optimal performance | Train freely |
 | 50-79 | Normal performance | Monitor carefully |
 | 30-49 | Reduced gains, risk starts | Consider rest soon |
@@ -1666,7 +1666,7 @@ try {
 ### 8.4 Mood Effects on Training
 
 | Mood | Stat Multiplier | Risk Modifier | Duration |
-| --- | --- | --- | --- |
+|------|----------------|---------------|----------|
 | Awful | 0.90x | +10% | 3-5 turns |
 | Bad | 0.95x | +5% | 2-3 turns |
 | Normal | 1.00x | 0% | Baseline |
@@ -1756,7 +1756,7 @@ App\Exceptions\TrainingException (Base)
 ### 10.2 Error Codes
 
 | Code | HTTP Status | Description | Resolution |
-| --- | --- | --- | --- |
+|------|-------------|-------------|------------|
 | `TRAIN_INVALID_TYPE` | 422 | Invalid training facility type | Use valid type |
 | `TRAIN_TURN_LIMIT` | 422 | Career reached max turns | Start new career |
 | `TRAIN_INSUFFICIENT_ENERGY` | 422 | Energy below minimum threshold | Rest first |
@@ -1837,7 +1837,7 @@ TrainingSession::select([
 ### 11.3 Performance Targets
 
 | Operation | Target | Measurement |
-| --- | --- | --- |
+|-----------|--------|-------------|
 | Prediction generation | < 100ms | p95 |
 | Training execution | < 200ms | p95 |
 | History retrieval (50 turns) | < 50ms | p95 |
@@ -1990,7 +1990,7 @@ Base Risk (Energy):
 ### Appendix B: Support Card Bonuses
 
 | Rarity | Base Bonus | LB0 | LB1 | LB2 | LB3 | LB4 |
-| --- | --- | --- | --- | --- | --- | --- |
+|--------|-----------|-----|-----|-----|-----|-----|
 | SSR | 10% | 10% | 12% | 14% | 16% | 18% |
 | SR | 7% | 7% | 9% | 11% | 13% | 15% |
 | R | 5% | 5% | 7% | 9% | 11% | 13% |
@@ -1998,7 +1998,7 @@ Base Risk (Energy):
 ### Appendix C: Energy Recovery
 
 | Action | Base Recovery | Mood Bonus | Final Recovery |
-| --- | --- | --- | --- |
+|--------|--------------|------------|----------------|
 | Rest (Normal) | 50 | 0 | 50 |
 | Rest (Good) | 50 | +10 | 60 |
 | Rest (Great) | 50 | +20 | 70 |
@@ -2006,17 +2006,18 @@ Base Risk (Energy):
 ### Appendix D: Change Log
 
 | Version | Date | Author | Changes |
-| --- | --- | --- | --- |
+|---------|------|--------|---------|
+| 2.3.0 | 2026-02-22 | Development Team | Updated to v2.3.0: AdviceService replaces AIAdvisoryService, Neuron AI v2.11, status complete |
 | 2.2.0 | 2026-01-28 | Development Team | Game-accurate training formula with support card presence bonus (+5% per card), per-training caps (100/50 based on soft cap), friendship multiplier integration |
 | 2.0.0 | 2026-01-24 | Development Team | Full v2.0.0 alignment, added AI integration, complete calculation engines |
 | 1.0.0 | 2026-01-23 | Development Team | Initial technical specification |
 
 ---
 
-### Document Approval
+**Document Approval**
 
 | Role | Name | Signature | Date |
-| --- | --- | --- | --- |
+|------|------|-----------|------|
 | Tech Lead | [Name] | _________ | 2026-01-24 |
 | Product Owner | [Name] | _________ | 2026-01-24 |
 | QA Lead | [Name] | _________ | 2026-01-24 |
@@ -2026,9 +2027,9 @@ Base Risk (Energy):
 **Document Control**  
 **Maintained By**: Backend Development Team  
 **Review Frequency**: Bi-weekly during active development  
-**Next Review Date**: 2026-02-07  
+**Next Review Date**: 2026-03-07  
 **Distribution**: Development Team, QA Team, Product Management
 
 ---
 
-### End of Document
+**End of Document**

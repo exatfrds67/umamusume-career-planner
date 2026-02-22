@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0  
-**Date**: February 22, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Implemented - All features operational  
+**Status**: Current - Aligned with codebase v2.2.0  
 **Related Documents**: [SRS-FR-06], [SDS-4.5], [DBD-4.5], [SPEC-005]
 
 **Source Specs**:
@@ -86,7 +86,7 @@ Players struggle to select the best combination of 6 cards from hundreds of opti
 ## 3. User Stories
 
 | ID | Actor | Story | Acceptance Criteria |
-|----|-------|-------|---------------------|
+| --- | --- | --- | --- |
 | US-5.1 | Player | I want to register which SSR cards I own and their limit break level. | Inventory view allows adding cards and setting LB (0-4). |
 | US-5.2 | Player | I want to build a deck with 3 Speed and 2 Intelligence cards. | Deck builder validates types and counts; warns if unbalanced. |
 | US-5.3 | Player | I want to borrow a "Friend" card that I don't own. | The 6th slot allows selection from the global database. |
@@ -226,9 +226,6 @@ Players struggle to select the best combination of 6 cards from hundreds of opti
   - Game-accurate bond system (+7 base, +9 with Charming).
   - Friendship Training mechanics (80% threshold, 10-35% bonus).
   - Support card presence bonus (+5% per card).
-- **v2.3.0 (Current)**:
-  - All support card management features fully implemented and operational.
-  - External data sync from umapyoi.net integrated.
 
 ---
 
@@ -243,8 +240,7 @@ Players struggle to select the best combination of 6 cards from hundreds of opti
 ## Changelog
 
 | Version | Date | Changes |
-|---------|------|---------|
-| 2.3.0 | February 22, 2026 | Module fully implemented. All support card management features operational with external data sync. |
+| --- | --- | --- |
 | 2.2.0 | January 28, 2026 | Updated with verified game mechanics from Global English Server: game-accurate bond system (+7 base, +9 with Charming, +5 exclamation), Friendship Training mechanics (80% threshold, 10-35% bonus range), support card presence bonus (+5% per card, max +30%). |
 | 2.1.0 | January 24, 2026 | Aligned with codebase v2.0.0, added source specs references. |
 | 2.0.0 | January 2026 | Initial v2 release with inventory and deck builder. |

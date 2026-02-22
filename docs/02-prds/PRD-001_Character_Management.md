@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0  
-**Date**: February 22, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Implemented - All features operational  
+**Status**: Current - Aligned with codebase v2.2.0  
 **Related Documents**: [SRS-FR-02], [SRS-FR-10], [SDS-4.2], [DBD-4.2], [SPEC-001]
 
 **Source Specs**:
@@ -62,7 +62,7 @@ Players struggle to manually track complex character states—including factor i
 
 - **Unified Wizard**: A guided 4-step process for character initialization (Trainee, Scenario, Parents/Inheritance, Support Deck).
 - **Dual Storage Architecture**: Seamless support for Local Mode (browser localStorage) and Account Mode (MySQL database) with conversion capabilities.
-- **Real-time Dashboard**: Centralized view of stats, aptitudes, goals, and conditions powered by Livewire 4 reactivity.
+- **Real-time Dashboard**: Centralized view of stats, aptitudes, goals, and conditions powered by Livewire 3 reactivity.
 
 ---
 
@@ -94,7 +94,7 @@ Players struggle to manually track complex character states—including factor i
 ## 3. User Stories
 
 | ID | Actor | Story | Acceptance Criteria |
-|----|-------|-------|---------------------|
+| --- | --- | --- | --- |
 | US-1.1 | Guest User | I want to create a character without logging in so I can test the app quickly. | Character saved to localStorage; "Local Mode" badge visible. |
 | US-1.2 | Player | I want to select parent characters to automatically calculate inheritance bonuses. | Initial stats reflect factor bonuses (e.g., +21 for 3-star). |
 | US-1.3 | Player | I want to see my current stats and aptitude grades on a dashboard to plan my next move. | Stats shown with 0-1200+ bars (with diminishing returns indicator); Aptitudes shown as letter grades (G-S). |
@@ -136,15 +136,15 @@ Players struggle to manually track complex character states—including factor i
 - **Aptitude Modifiers**:
 
 | Rank | Surface (Power) | Distance (Speed) | Style (Wit) |
-|------|-----------------|------------------|-------------|
-| S    | +5%             | +5%              | +10%        |
-| A    | 0% (baseline)   | 0% (baseline)    | 0% (baseline) |
-| B    | -10%            | -10%             | -15%        |
-| C    | -20%            | -20%             | -25%        |
-| D    | -30%            | -40%             | -40%        |
-| E    | -50%            | -60%             | -60%        |
-| F    | -70%            | -80%             | -80%        |
-| G    | -90%            | -90%             | -90%        |
+| --- | --- | --- | --- |
+| S | +5% | +5% | +10% |
+| A | 0% (baseline) | 0% (baseline) | 0% (baseline) |
+| B | -10% | -10% | -15% |
+| C | -20% | -20% | -25% |
+| D | -30% | -40% | -40% |
+| E | -50% | -60% | -60% |
+| F | -70% | -80% | -80% |
+| G | -90% | -90% | -90% |
 
 - **Inheritance Modifiers**: Ability to modify initial grades based on parent factors (3★ aptitude sparks raise grade by 1 level).
 
@@ -243,10 +243,6 @@ Players struggle to manually track complex character states—including factor i
   - Updated stat system with diminishing returns above 1200.
   - Corrected aptitude scale (G-S, no SS).
   - Game-accurate aptitude modifiers.
-- **v2.3.0 (Current)**:
-  - All character management features fully implemented and operational.
-  - Livewire 4 reactivity for dashboard.
-  - External data sourced from umapyoi.net (primary) and GameTora scraping.
 
 ---
 
@@ -262,8 +258,7 @@ Players struggle to manually track complex character states—including factor i
 ## Changelog
 
 | Version | Date | Changes |
-|---------|------|---------|
-| 2.3.0 | February 22, 2026 | Module fully implemented. Updated Livewire 3→4, external data source to GameTora scraping. All character management features operational. |
+| --- | --- | --- |
 | 2.2.0 | January 28, 2026 | Updated with verified game mechanics from Global English Server: corrected aptitude scale (G-S, no SS), added aptitude modifier table, updated stat system to reflect 1200+ capability with diminishing returns, added important stat breakpoints (901, 1200, 1600). |
 | 2.1.0 | January 24, 2026 | Aligned with codebase v2.0.0, added source specs references. |
 | 2.0.0 | January 2026 | Initial v2 release with dual storage architecture. |

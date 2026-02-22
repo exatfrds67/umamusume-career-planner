@@ -17,15 +17,15 @@ This index provides a comprehensive catalog of all Technical Specifications (SPE
 ## 2. Specifications Overview
 
 | SPEC ID | Module | Status | PRD Reference | Last Updated |
-|---------|--------|--------|---------------|--------------|
-| [SPEC-001](#spec-001) | Character Management | Complete | PRD-001 | 2026-02-22 |
-| [SPEC-002](#spec-002) | Training Optimization | Complete | PRD-002 | 2026-02-22 |
-| [SPEC-003](#spec-003) | Race Strategy | Complete | PRD-003 | 2026-02-22 |
-| [SPEC-004](#spec-004) | Skill Management | Complete | PRD-004 | 2026-02-22 |
-| [SPEC-005](#spec-005) | Support Card Management | Complete | PRD-005 | 2026-02-22 |
-| [SPEC-006](#spec-006) | AI Advisory System | Complete | PRD-006 | 2026-02-22 |
-| [SPEC-007](#spec-007) | External Integration | Complete | PRD-007 | 2026-02-22 |
-| [SPEC-008](#spec-008) | Performance Monitoring & APM | Complete | SRS §3.9 | 2026-02-22 |
+| --- | --- | --- | --- | --- |
+| [SPEC-001](#spec-001-character-management-system) | Character Management | Complete | PRD-001 | 2026-02-22 |
+| [SPEC-002](#spec-002-training-optimization-system) | Training Optimization | Complete | PRD-002 | 2026-02-22 |
+| [SPEC-003](#spec-003-race-strategy-system) | Race Strategy | Complete | PRD-003 | 2026-02-22 |
+| [SPEC-004](#spec-004-skill-management-system) | Skill Management | Complete | PRD-004 | 2026-02-22 |
+| [SPEC-005](#spec-005-support-card-management-system) | Support Card Management | Complete | PRD-005 | 2026-02-22 |
+| [SPEC-006](#spec-006-ai-advisory-system) | AI Advisory System | Complete | PRD-006 | 2026-02-22 |
+| [SPEC-007](#spec-007-external-integration-system) | External Integration | Complete | PRD-007 | 2026-02-22 |
+| [SPEC-008](#spec-008-performance-monitoring--apm-system) | Performance Monitoring & APM | Complete | SRS §3.9 | 2026-02-22 |
 
 ---
 
@@ -293,7 +293,7 @@ All specifications adhere to the **v2.3.0 Architecture** defined in the Software
 ### Version History
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
+| --- | --- | --- | --- |
 | 2.3.0 | 2026-02-22 | Development Team | Updated all specs to v2.3.0: corrected service names to match codebase, PHP 8.2+, Livewire 4, Neuron AI v2.11, GameTora replaces UmamusumeDB, all modules marked complete |
 | 2.2.0 | 2026-01-28 | Development Team | Game-accurate mechanics: 5-level hint system, S max aptitude, stat soft cap, track conditions |
 | 2.0.0 | 2026-01-24 | Development Team | Full alignment with v2.0.0 architecture |
@@ -340,7 +340,7 @@ All specifications adhere to the **v2.3.0 Architecture** defined in the Software
 ## 8. Glossary
 
 | Term | Definition |
-|------|------------|
+| --- | --- |
 | **Aptitude** | Character rating (G-S) for distance, surface, or running style |
 | **Factor** | Inherited trait from parent characters providing stat/skill bonuses |
 | **Neuron** | AI agent framework for providing strategic recommendations |
@@ -358,4 +358,4 @@ All specifications adhere to the **v2.3.0 Architecture** defined in the Software
 
 ---
 
-**End of Document**
+### End of Document

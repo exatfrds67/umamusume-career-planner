@@ -11,7 +11,7 @@
 ## Document Information
 
 | Attribute | Value |
-|-----------|-------|
+| --- | --- |
 | **Document ID** | SPEC-005 |
 | **Related PRD** | [PRD-005: Support Card Management](../prds/PRD-005_Support_Card_Management.md) |
 | **Architecture Version** | v2.3.0 |
@@ -119,7 +119,7 @@ Strategic deck composition and bond management are critical for achieving optima
 ### 1.4 Technology Stack
 
 | Component | Technology | Version | Purpose |
-|-----------|-----------|---------|---------|
+| --- | --- | --- | --- |
 | **Framework** | Laravel | 12.x | Application foundation |
 | **Language** | PHP | 8.2+ | Server-side logic |
 | **Database** | MySQL | 8.0+ | Data persistence |
@@ -218,7 +218,7 @@ graph TB
 ### 2.3 Design Patterns
 
 | Pattern | Implementation | Purpose |
-|---------|---------------|---------|
+| --- | --- | --- |
 | **Repository** | `SupportCardRepository` | Abstract data access |
 | **Factory** | `DeckFactory` | Deck object creation |
 | **Strategy** | Bonus calculators | Pluggable bonus algorithms |
@@ -1806,7 +1806,7 @@ class DeckSynergyService
 ### 7.1 Endpoint Overview
 
 | Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
+| --- | --- | --- | --- |
 | GET | `/api/v1/support-cards` | List card catalog | Yes |
 | GET | `/api/v1/support-cards/{id}` | Get card details | Yes |
 | GET | `/api/v1/users/inventory` | Get user's card inventory | Yes |
@@ -2359,7 +2359,7 @@ Increment = (18 - 10) / 4 = 2
 ### 10.3 Bond Progression
 
 | Bond Level | Status | Training Gain | Notes |
-|-----------|--------|---------------|-------|
+| --- | --- | --- | --- |
 | 0-19 | Low | 7/session | Initial phase |
 | 20-39 | Building | 6/session | Regular interaction |
 | 40-59 | Familiar | 6/session | Event unlock threshold |
@@ -2369,7 +2369,7 @@ Increment = (18 - 10) / 4 = 2
 ### 10.4 Deck Meta Tiers
 
 | Tier | Description | Characteristics |
-|------|-------------|----------------|
+| --- | --- | --- |
 | SS | Optimal | 4+ SS tier cards, avg score 8.5+ |
 | S+ | Excellent | 2+ SS cards, 3+ S cards |
 | S | Strong | 3+ S tier cards, avg score 7.5+ |
@@ -2452,7 +2452,7 @@ App\Exceptions\SupportCardException (Base)
 ### 12.2 Error Codes
 
 | Code | HTTP Status | Description | Resolution |
-|------|-------------|-------------|------------|
+| --- | --- | --- | --- |
 | `DECK_INVALID_SIZE` | 422 | Deck must have 6 cards | Add/remove cards |
 | `DECK_INVALID_BORROWED` | 422 | Must have exactly 1 borrowed | Adjust borrowed flag |
 | `CARD_NOT_OWNED` | 422 | User doesn't own card | Choose owned card |
@@ -2520,7 +2520,7 @@ SupportCard::select(['id', 'name', 'specialization', 'meta_tier'])
 ### 13.3 Performance Targets
 
 | Operation | Target | Measurement |
-|-----------|--------|-------------|
+| --- | --- | --- |
 | Card catalog search | < 50ms | p95 |
 | Deck validation | < 30ms | p95 |
 | Synergy analysis | < 100ms | p95 |
@@ -3003,7 +3003,7 @@ class SupportDeckFactory extends Factory
 ### Appendix B: Limit Break Progression
 
 | Stars | Speed Bonus Example | Stamina Bonus Example | Hint Rate Example |
-|-------|-------------------|---------------------|------------------|
+| --- | --- | --- | --- |
 | 0★ | 10 | 8 | 3 |
 | 1★ | 12 | 10 | 4 |
 | 2★ | 14 | 12 | 5 |
@@ -3042,7 +3042,7 @@ class SupportDeckFactory extends Factory
 ### Appendix D: Bond Milestone Rewards
 
 | Bond Level | Reward | Effect |
-|-----------|--------|--------|
+| --- | --- | --- |
 | 20 | Hint Event Unlock | First skill hint available |
 | 40 | Bonus Event | Special character event |
 | 60 | Enhanced Training | +10% bonus effectiveness |
@@ -3077,7 +3077,7 @@ class SupportDeckFactory extends Factory
 ### Appendix F: Change Log
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
+| --- | --- | --- | --- |
 | 2.3.0 | 2026-02-22 | Development Team | Updated service names (SupportCardDeckService, DeckManagementService, FriendshipBondService, DeckOptimizationService, ExternalDataService), Neuron AI v2.11, PHP 8.2+, marked implementation complete |
 | 2.2.0 | 2026-01-28 | Development Team | Updated to align with game-accurate mechanics (v2.2.0 architecture) |
 | 2.0.0 | 2026-01-24 | Development Team | Full v2.0.0 alignment, complete testing strategy, AI integration, bond system, synergy analysis |
@@ -3085,10 +3085,10 @@ class SupportDeckFactory extends Factory
 
 ---
 
-**Document Approval**
+### Document Approval
 
 | Role | Name | Signature | Date |
-|------|------|-----------|------|
+| --- | --- | --- | --- |
 | Tech Lead | [Name] | _________ | 2026-01-24 |
 | Product Owner | [Name] | _________ | 2026-01-24 |
 | QA Lead | [Name] | _________ | 2026-01-24 |
@@ -3104,4 +3104,4 @@ class SupportDeckFactory extends Factory
 
 ---
 
-**End of Document**
+### End of Document

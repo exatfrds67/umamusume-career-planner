@@ -11,7 +11,7 @@
 ## Document Information
 
 | Attribute | Value |
-|-----------|-------|
+| --- | --- |
 | **Document ID** | SPEC-003 |
 | **Related PRD** | [PRD-003: Race Strategy](../prds/PRD-003_Race_Strategy.md) |
 | **Architecture Version** | v2.3.0 |
@@ -112,7 +112,7 @@ Strategic race selection and preparation directly impact career outcomes.
 ### 1.4 Technology Stack
 
 | Component | Technology | Version | Purpose |
-|-----------|-----------|---------|---------|
+| --- | --- | --- | --- |
 | **Framework** | Laravel | 12.x | Application foundation |
 | **Language** | PHP | 8.3+ | Server-side logic |
 | **Database** | MySQL | 8.0+ | Data persistence |
@@ -207,7 +207,7 @@ graph TB
 ### 2.3 Design Patterns
 
 | Pattern | Implementation | Purpose |
-|---------|---------------|---------|
+| --- | --- | --- |
 | **Repository** | `RaceDefinitionRepository` | Abstract data access |
 | **Strategy** | Analysis calculators | Pluggable analysis algorithms |
 | **Factory** | `RaceResultFactory` | Result object creation |
@@ -1445,7 +1445,7 @@ class RaceStrategyService
 ### 5.1 Endpoint Overview
 
 | Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
+| --- | --- | --- | --- |
 | GET | `/api/v1/races` | List/search race calendar | Yes |
 | GET | `/api/v1/races/{id}` | Get race details | Yes |
 | GET | `/api/v1/races/{id}/analysis` | Get race analysis for character | Yes |
@@ -1741,7 +1741,7 @@ Determine the optimal running style and provide actionable preparation advice.
 ### 8.1 Race Grade System
 
 | Grade | Difficulty | Fan Reward Range | Stat Requirements |
-|-------|-----------|------------------|-------------------|
+| --- | --- | --- | --- |
 | G1 | Highest | 10,000-25,000 | 900-1100+ |
 | G2 | High | 5,000-15,000 | 800-950 |
 | G3 | Medium | 2,000-8,000 | 700-850 |
@@ -1751,7 +1751,7 @@ Determine the optimal running style and provide actionable preparation advice.
 ### 8.2 Distance Categories
 
 | Type | Range (meters) | Primary Stats | Suitable Styles |
-|------|---------------|---------------|-----------------|
+| --- | --- | --- | --- |
 | Sprint | < 1400 | Speed, Power | Front Runner, Pace Chaser |
 | Mile | 1400-1799 | Speed, Stamina | Pace Chaser, Late Surger |
 | Medium | 1800-2399 | Stamina, Speed | Late Surger, End Closer |
@@ -1862,7 +1862,7 @@ App\Exceptions\RaceException (Base)
 ### 10.2 Error Codes
 
 | Code | HTTP Status | Description | Resolution |
-|------|-------------|-------------|------------|
+| --- | --- | --- | --- |
 | `RACE_NOT_FOUND` | 404 | Race definition not found | Verify race ID |
 | `RACE_INVALID_PLACEMENT` | 422 | Invalid placement value | Use 1-18 |
 | `RACE_SYNC_FAILED` | 503 | External API unavailable | Retry later |
@@ -1885,7 +1885,7 @@ Cache::tags(['race-analysis'])->remember('race:analysis:' . $key, now()->addHour
 ### 11.2 Performance Targets
 
 | Operation | Target | Measurement |
-|-----------|--------|-------------|
+| --- | --- | --- |
 | Calendar retrieval | < 50ms | p95 |
 | Race analysis | < 200ms | p95 |
 | AI strategy generation | < 3s | p95 |
@@ -2318,7 +2318,7 @@ class RaceResultFactory extends Factory
 ### Appendix A: Race Grade Fan Rewards
 
 | Grade | Position | Min Fans | Max Fans | SP Reward |
-|-------|----------|----------|----------|-----------|
+| --- | --- | --- | --- | --- |
 | **G1** | 1st | 15,000 | 25,000 | 50 |
 | | 2nd | 8,000 | 15,000 | 30 |
 | | 3rd | 4,000 | 8,000 | 20 |
@@ -2357,7 +2357,7 @@ class RaceResultFactory extends Factory
 ### Appendix C: Win Probability Interpretation
 
 | Probability Range | Interpretation | Recommendation |
-|------------------|----------------|----------------|
+| --- | --- | --- |
 | 0.70 - 1.00 | Very High | Highly recommended |
 | 0.50 - 0.69 | High | Recommended |
 | 0.35 - 0.49 | Moderate | Possible, prepare well |
@@ -2401,7 +2401,7 @@ class RaceResultFactory extends Factory
 ### Appendix E: Weather Condition Effects
 
 | Condition | Speed Modifier | Stamina Modifier | Recommended Skills |
-|-----------|---------------|------------------|-------------------|
+| --- | --- | --- | --- |
 | Good | 1.00x | 1.00x | Standard loadout |
 | Yielding | 0.95x | 1.05x | Track Adaptation |
 | Soft | 0.90x | 1.10x | Wet Surface, Muddy Track |
@@ -2410,7 +2410,7 @@ class RaceResultFactory extends Factory
 ### Appendix F: Change Log
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
+| --- | --- | --- | --- |
 | 2.3.0 | 2026-02-22 | Development Team | Updated to v2.3.0: RaceConditionService, Neuron\RaceStrategyService, ExternalDataService, AdviceService, GameTora fallback, Neuron AI v2.11, status complete |
 | 2.2.0 | 2026-01-28 | Development Team | Game-accurate track conditions (Firm/Good/Soft/Heavy with flat stat penalties), corrected aptitude modifiers (S max, A baseline), surface-specific power penalties |
 | 2.0.0 | 2026-01-24 | Development Team | Full v2.0.0 alignment, added AI integration, complete analysis engines, comprehensive testing strategy |
@@ -2418,10 +2418,10 @@ class RaceResultFactory extends Factory
 
 ---
 
-**Document Approval**
+### Document Approval
 
 | Role | Name | Signature | Date |
-|------|------|-----------|------|
+| --- | --- | --- | --- |
 | Tech Lead | [Name] | _________ | 2026-01-24 |
 | Product Owner | [Name] | _________ | 2026-01-24 |
 | QA Lead | [Name] | _________ | 2026-01-24 |
@@ -2429,7 +2429,8 @@ class RaceResultFactory extends Factory
 
 ---
 
-**Document Control**  
+### Document Control  
+
 **Maintained By**: Backend Development Team  
 **Review Frequency**: Bi-weekly during active development  
 **Next Review Date**: 2026-03-07  
@@ -2437,4 +2438,4 @@ class RaceResultFactory extends Factory
 
 ---
 
-**End of Document**
+End of Document

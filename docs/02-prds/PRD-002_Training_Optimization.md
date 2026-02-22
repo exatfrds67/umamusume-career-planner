@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0  
-**Date**: February 22, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Implemented - All features operational  
+**Status**: Current - Aligned with codebase v2.2.0  
 **Related Documents**: [SRS-FR-03], [SDS-4.2], [DBD-4.4], [SPEC-002]
 
 **Source Specs**:
@@ -88,7 +88,7 @@ Players often rely on intuition for training decisions, leading to suboptimal st
 ## 3. User Stories
 
 | ID | Actor | Story | Acceptance Criteria |
-|----|-------|-------|---------------------|
+| --- | --- | --- | --- |
 | US-2.1 | Player | I want to see exactly how much Speed/Power I will gain before clicking a button. | UI shows predicted +Value for all stats per facility. |
 | US-2.2 | Player | I want to know the risk of failure so I don't waste a turn. | Risk % displayed (Green/Yellow/Red) based on energy. |
 | US-2.3 | Player | I want the system to tell me if a support card is offering a skill hint. | "Hint" icon appears next to the facility. |
@@ -129,7 +129,7 @@ Stat Gain = (Base + StatBonus)
 **Facility Level Multipliers**:
 
 | Level | Multiplier |
-|-------|------------|
+| --- | --- |
 | 1 | 1.0× (base) |
 | 2 | 1.25× |
 | 3 | 1.5× |
@@ -216,7 +216,7 @@ Stat Gain = (Base + StatBonus)
 ### 6.3 Internal Services
 
 - **TrainingService**: Orchestrates the prediction and execution logic.
-- **AIAdvisoryService**: Routes complex decision requests to Neuron/Bedrock (implemented as `AIDashboardService`).
+- **AIAdvisoryService**: Routes complex decision requests to Neuron/Bedrock.
 - **Redis Cache**: Caches predictions for 5 minutes (`training_prediction:{run_id}`).
 
 ---
@@ -255,10 +255,6 @@ Stat Gain = (Base + StatBonus)
   - Facility level multipliers (1.0× to 2.0×).
   - Summer Training Camp mechanics (4 turns, all Level 5).
   - Career structure (~70-78 turns across 3 years).
-- **v2.3.0 (Current)**:
-  - All training optimization features fully implemented and operational.
-  - TrainingAdvisorAgent (Neuron AI) integrated and functional.
-  - TrainingAdvisoryService and TrainingAdvisorService orchestration complete.
 
 ---
 
@@ -273,8 +269,7 @@ Stat Gain = (Base + StatBonus)
 ## Changelog
 
 | Version | Date | Changes |
-|---------|------|---------|
-| 2.3.0 | February 22, 2026 | Module fully implemented. Corrected AIAdvisoryService reference to AIDashboardService. All training optimization features operational with Neuron AI integration. |
+| --- | --- | --- |
 | 2.2.0 | January 28, 2026 | Updated with verified game mechanics from Global English Server: added complete training formula, facility level multipliers (1.0×-2.0×), Summer Training Camp mechanics (4 turns, all Level 5), career structure (~70-78 turns), stat gain caps (+100 normal, +50 above 1200). |
 | 2.1.0 | January 24, 2026 | Aligned with codebase v2.0.0, added source specs references. |
 | 2.0.0 | January 2026 | Initial v2 release with prediction engine. |

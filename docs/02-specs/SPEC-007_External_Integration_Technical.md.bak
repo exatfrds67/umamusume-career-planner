@@ -1,22 +1,20 @@
 # SPEC-007: External Integration System - Technical Specification
 
-**Document Version**: 2.2.0  
-**Date**: 2026-01-28  
-**Project**: Umamusume Pretty Derby Career Planner  
-**Status**: Active - Updated with game-accurate data validation  
+**Document Version**: 2.3.0
+**Date**: 2026-02-22
+**Project**: Umamusume Pretty Derby Career Planner
+**Status**: Complete - Implementation verified
 **Classification**: Internal - Development Team
 
 ---
 
 ## Document Information
 
-| Attribute | Value |
-| --- | --- |
-| **Document ID** | SPEC-007 |
-| **Related PRD** | [PRD-007: External Integration](../prds/PRD-007_External_Integration.md) |
-| **Architecture Version** | v2.2.0 |
-| **Approval Status** | Approved |
-| **Last Reviewed** | 2026-01-28 |
+- **Attribute**: **Document ID**; **Value**: SPEC-007
+- **Attribute**: **Related PRD**; **Value**: [PRD-007: External Integration](../prds/PRD-007_External_Integration.md)
+- **Attribute**: **Architecture Version**; **Value**: v2.3.0
+- **Attribute**: **Approval Status**; **Value**: Approved
+- **Attribute**: **Last Reviewed**; **Value**: 2026-02-22
 
 ### Related Documents
 
@@ -71,7 +69,7 @@ The External Integration System manages synchronization with game APIs, communit
 **Core Responsibilities**:
 
 - External API client management with circuit breaker pattern
-- Game data synchronization from umapyoi.net and UmamusumeDB
+- Game data synchronization from umapyoi.net and GameTora
 - OCR screenshot processing for data extraction
 - WebSocket real-time updates via Laravel Reverb
 - Community tool integration and data sharing
@@ -94,7 +92,7 @@ The system must handle API unavailability gracefully while ensuring users always
 
 **In Scope**:
 
-- External API clients (umapyoi.net, UmamusumeDB)
+- External API clients (umapyoi.net, GameTora)
 - Circuit breaker pattern implementation
 - Response caching and invalidation
 - OCR processing with Tesseract and GD
@@ -112,16 +110,14 @@ The system must handle API unavailability gracefully while ensuring users always
 
 ### 1.4 Technology Stack
 
-| Component | Technology | Version | Purpose |
-| --- | --- | --- | --- |
-| **Framework** | Laravel | 12.x | Application foundation |
-| **Language** | PHP | 8.3+ | Server-side logic |
-| **HTTP Client** | Guzzle/Laravel HTTP | Latest | API requests |
-| **OCR Engine** | Tesseract | 5.x | Text extraction |
-| **Image Processing** | GD Library | 2.x | Image preprocessing |
-| **WebSocket** | Laravel Reverb | 1.x | Real-time updates |
-| **Cache** | Redis | 7.x | Response caching |
-| **Queue** | Laravel Queue | 12.x | Background jobs |
+- **Component**: **Framework**; **Technology**: Laravel; **Version**: 12.x; **Purpose**: Application foundation
+- **Component**: **Language**; **Technology**: PHP; **Version**: 8.2+; **Purpose**: Server-side logic
+- **Component**: **HTTP Client**; **Technology**: Guzzle/Laravel HTTP; **Version**: Latest; **Purpose**: API requests
+- **Component**: **OCR Engine**; **Technology**: Tesseract; **Version**: 5.x; **Purpose**: Text extraction
+- **Component**: **Image Processing**; **Technology**: GD Library; **Version**: 2.x; **Purpose**: Image preprocessing
+- **Component**: **WebSocket**; **Technology**: Laravel Reverb; **Version**: 1.x; **Purpose**: Real-time updates
+- **Component**: **Cache**; **Technology**: Redis; **Version**: 7.x; **Purpose**: Response caching
+- **Component**: **Queue**; **Technology**: Laravel Queue; **Version**: 12.x; **Purpose**: Background jobs
 
 ---
 
@@ -138,7 +134,7 @@ graph TB
     end
 
     subgraph "Application Layer"
-        ExternalSvc[ExternalAPIService]
+        ExternalSvc[ExternalDataService]
         OCRSvc[OCRProcessingService]
         SyncSvc[DataSyncService]
         BroadcastSvc[BroadcastService]
@@ -146,7 +142,7 @@ graph TB
 
     subgraph "Integration Layer"
         UmapyoiClient[UmapyoiApiClient]
-        UmaDBClient[UmamusumeDBApiClient]
+        UmaDBClient[GameToraScraperService]
         CircuitBreaker[CircuitBreaker]
         RateLimiter[RateLimiter]
     end
@@ -168,21 +164,21 @@ graph TB
     API --> ExternalSvc
     OCRController --> OCRSvc
     WebSocketHandler --> BroadcastSvc
-    
+
     ExternalSvc --> UmapyoiClient
     ExternalSvc --> UmaDBClient
     ExternalSvc --> CircuitBreaker
     ExternalSvc --> RateLimiter
-    
+
     OCRSvc --> ImageProcessor
     OCRSvc --> TesseractSvc
     OCRSvc --> DataParser
     DataParser --> Validator
-    
+
     UmapyoiClient --> Cache
     UmaDBClient --> Cache
     CircuitBreaker --> DB
-    
+
     BroadcastSvc --> Reverb
     ImageProcessor --> FileStorage
 ```
@@ -222,15 +218,13 @@ graph TB
 
 ### 2.3 Design Patterns
 
-| Pattern | Implementation | Purpose |
-| --- | --- | --- |
-| **Circuit Breaker** | `CircuitBreaker` class | Prevent cascade failures |
-| **Adapter** | API client classes | Abstract external APIs |
-| **Strategy** | Parser implementations | Pluggable parsing logic |
-| **Observer** | Event listeners | React to sync events |
-| **Cache-Aside** | Response caching | Performance optimization |
-| **Retry** | HTTP client config | Transient failure handling |
-| **Factory** | Client factory | API client instantiation |
+- **Pattern**: **Circuit Breaker**; **Implementation**: `CircuitBreaker` class; **Purpose**: Prevent cascade failures
+- **Pattern**: **Adapter**; **Implementation**: API client classes; **Purpose**: Abstract external APIs
+- **Pattern**: **Strategy**; **Implementation**: Parser implementations; **Purpose**: Pluggable parsing logic
+- **Pattern**: **Observer**; **Implementation**: Event listeners; **Purpose**: React to sync events
+- **Pattern**: **Cache-Aside**; **Implementation**: Response caching; **Purpose**: Performance optimization
+- **Pattern**: **Retry**; **Implementation**: HTTP client config; **Purpose**: Transient failure handling
+- **Pattern**: **Factory**; **Implementation**: Client factory; **Purpose**: API client instantiation
 
 ---
 
@@ -245,14 +239,14 @@ namespace App\Contracts;
 
 /**
  * External API Client Interface
- * 
+ *
  * Defines the contract for all external API clients.
  */
 interface ExternalApiClientInterface
 {
     /**
      * Get characters/trainees data
-     * 
+     *
      * @param array $filters Optional filters
      * @return array
      */
@@ -260,7 +254,7 @@ interface ExternalApiClientInterface
 
     /**
      * Get single character by ID
-     * 
+     *
      * @param int $traineeId External trainee ID
      * @return array
      */
@@ -268,7 +262,7 @@ interface ExternalApiClientInterface
 
     /**
      * Get support cards data
-     * 
+     *
      * @param array $filters Optional filters
      * @return array
      */
@@ -276,7 +270,7 @@ interface ExternalApiClientInterface
 
     /**
      * Get skills data
-     * 
+     *
      * @param array $filters Optional filters
      * @return array
      */
@@ -284,7 +278,7 @@ interface ExternalApiClientInterface
 
     /**
      * Get races data
-     * 
+     *
      * @param array $filters Optional filters
      * @return array
      */
@@ -292,14 +286,14 @@ interface ExternalApiClientInterface
 
     /**
      * Check API health status
-     * 
+     *
      * @return bool
      */
     public function isHealthy(): bool;
 
     /**
      * Get API source identifier
-     * 
+     *
      * @return string
      */
     public function getSourceIdentifier(): string;
@@ -320,7 +314,7 @@ use App\Exceptions\ExternalAPIException;
 
 /**
  * Umapyoi.net API Client
- * 
+ *
  * Primary external data source for game information.
  */
 class UmapyoiApiClient implements ExternalApiClientInterface
@@ -339,7 +333,7 @@ class UmapyoiApiClient implements ExternalApiClientInterface
 
     /**
      * Get characters/trainees data
-     * 
+     *
      * @param array $filters Optional filters
      * @return array
      */
@@ -355,7 +349,7 @@ class UmapyoiApiClient implements ExternalApiClientInterface
 
     /**
      * Get single character by ID
-     * 
+     *
      * @param int $traineeId External trainee ID
      * @return array
      */
@@ -370,7 +364,7 @@ class UmapyoiApiClient implements ExternalApiClientInterface
 
     /**
      * Get support cards data
-     * 
+     *
      * @param array $filters Optional filters
      * @return array
      */
@@ -386,7 +380,7 @@ class UmapyoiApiClient implements ExternalApiClientInterface
 
     /**
      * Get skills data
-     * 
+     *
      * @param array $filters Optional filters
      * @return array
      */
@@ -402,7 +396,7 @@ class UmapyoiApiClient implements ExternalApiClientInterface
 
     /**
      * Get races data
-     * 
+     *
      * @param array $filters Optional filters
      * @return array
      */
@@ -418,14 +412,14 @@ class UmapyoiApiClient implements ExternalApiClientInterface
 
     /**
      * Get meta tier rankings
-     * 
+     *
      * @param string|null $type Card type filter
      * @return array
      */
     public function getMetaTiers(?string $type = null): array
     {
         $params = $type ? ['type' => $type] : [];
-        
+
         return $this->cachedRequest(
             endpoint: '/meta/tiers',
             cacheKey: $this->buildCacheKey('meta-tiers', $params),
@@ -436,7 +430,7 @@ class UmapyoiApiClient implements ExternalApiClientInterface
 
     /**
      * Check API health status
-     * 
+     *
      * @return bool
      */
     public function isHealthy(): bool
@@ -444,7 +438,7 @@ class UmapyoiApiClient implements ExternalApiClientInterface
         try {
             $response = Http::timeout(5)
                 ->get(self::BASE_URL . '/health');
-            
+
             return $response->successful();
         } catch (\Exception $e) {
             Log::warning('Umapyoi health check failed', [
@@ -456,7 +450,7 @@ class UmapyoiApiClient implements ExternalApiClientInterface
 
     /**
      * Get API source identifier
-     * 
+     *
      * @return string
      */
     public function getSourceIdentifier(): string
@@ -466,7 +460,7 @@ class UmapyoiApiClient implements ExternalApiClientInterface
 
     /**
      * Execute cached API request
-     * 
+     *
      * @param string $endpoint API endpoint
      * @param string $cacheKey Cache key
      * @param int $cacheTtl Cache TTL in seconds
@@ -502,7 +496,7 @@ class UmapyoiApiClient implements ExternalApiClientInterface
 
     /**
      * Execute HTTP request
-     * 
+     *
      * @param string $endpoint API endpoint
      * @param array $params Query parameters
      * @return array
@@ -527,7 +521,7 @@ class UmapyoiApiClient implements ExternalApiClientInterface
 
     /**
      * Build request headers
-     * 
+     *
      * @return array
      */
     private function buildHeaders(): array
@@ -546,7 +540,7 @@ class UmapyoiApiClient implements ExternalApiClientInterface
 
     /**
      * Build cache key
-     * 
+     *
      * @param string $type Data type
      * @param array $params Parameters
      * @return string
@@ -559,7 +553,7 @@ class UmapyoiApiClient implements ExternalApiClientInterface
 
     /**
      * Get fallback data when API unavailable
-     * 
+     *
      * @param string $endpoint Requested endpoint
      * @return array
      */
@@ -567,7 +561,7 @@ class UmapyoiApiClient implements ExternalApiClientInterface
     {
         // Try to return stale cached data
         $staleKey = self::CACHE_PREFIX . ":stale:{$endpoint}";
-        
+
         if ($stale = Cache::get($staleKey)) {
             Log::info('Returning stale data for endpoint', [
                 'endpoint' => $endpoint,
@@ -578,13 +572,13 @@ class UmapyoiApiClient implements ExternalApiClientInterface
         Log::warning('No fallback data available', [
             'endpoint' => $endpoint,
         ]);
-        
+
         return [];
     }
 }
 ```
 
-### 3.3 UmamusumeDB API Client
+### 3.3 GameTora API Client
 
 ```php
 <?php
@@ -596,14 +590,14 @@ use App\Services\ExternalAPI\CircuitBreaker;
 use Illuminate\Support\Facades\{Http, Cache, Log};
 
 /**
- * UmamusumeDB API Client
- * 
+ * GameTora Scraper Service
+ *
  * Fallback external data source for game information.
  */
-class UmamusumeDBApiClient implements ExternalApiClientInterface
+class GameToraScraperService implements ExternalApiClientInterface
 {
-    private const BASE_URL = 'https://umamusumedb.com/api';
-    private const CACHE_PREFIX = 'umadb';
+    private const BASE_URL = 'https://gametora.com/api';
+    private const CACHE_PREFIX = 'gametora';
 
     public function __construct(
         private CircuitBreaker $circuitBreaker
@@ -611,7 +605,7 @@ class UmamusumeDBApiClient implements ExternalApiClientInterface
 
     /**
      * Get characters/trainees data
-     * 
+     *
      * @param array $filters Optional filters
      * @return array
      */
@@ -622,7 +616,7 @@ class UmamusumeDBApiClient implements ExternalApiClientInterface
 
     /**
      * Get single character by ID
-     * 
+     *
      * @param int $traineeId External trainee ID
      * @return array
      */
@@ -633,7 +627,7 @@ class UmamusumeDBApiClient implements ExternalApiClientInterface
 
     /**
      * Get support cards data
-     * 
+     *
      * @param array $filters Optional filters
      * @return array
      */
@@ -644,7 +638,7 @@ class UmamusumeDBApiClient implements ExternalApiClientInterface
 
     /**
      * Get skills data
-     * 
+     *
      * @param array $filters Optional filters
      * @return array
      */
@@ -655,7 +649,7 @@ class UmamusumeDBApiClient implements ExternalApiClientInterface
 
     /**
      * Get races data
-     * 
+     *
      * @param array $filters Optional filters
      * @return array
      */
@@ -666,7 +660,7 @@ class UmamusumeDBApiClient implements ExternalApiClientInterface
 
     /**
      * Check API health status
-     * 
+     *
      * @return bool
      */
     public function isHealthy(): bool
@@ -681,17 +675,17 @@ class UmamusumeDBApiClient implements ExternalApiClientInterface
 
     /**
      * Get API source identifier
-     * 
+     *
      * @return string
      */
     public function getSourceIdentifier(): string
     {
-        return 'umamusumedb';
+        return 'gametora';
     }
 
     /**
      * Execute cached API request
-     * 
+     *
      * @param string $endpoint API endpoint
      * @param array $params Query parameters
      * @return array
@@ -699,10 +693,10 @@ class UmamusumeDBApiClient implements ExternalApiClientInterface
     private function cachedRequest(string $endpoint, array $params = []): array
     {
         $cacheKey = $this->buildCacheKey($endpoint, $params);
-        
+
         return Cache::remember($cacheKey, 86400, function () use ($endpoint, $params) {
             return $this->circuitBreaker->call(
-                key: 'umamusumedb',
+                key: 'gametora',
                 callback: fn() => $this->executeRequest($endpoint, $params),
                 fallback: fn() => []
             );
@@ -711,7 +705,7 @@ class UmamusumeDBApiClient implements ExternalApiClientInterface
 
     /**
      * Execute HTTP request
-     * 
+     *
      * @param string $endpoint API endpoint
      * @param array $params Query parameters
      * @return array
@@ -727,7 +721,7 @@ class UmamusumeDBApiClient implements ExternalApiClientInterface
 
     /**
      * Build cache key
-     * 
+     *
      * @param string $endpoint Endpoint
      * @param array $params Parameters
      * @return string
@@ -753,15 +747,15 @@ stateDiagram-v2
     Open --> HalfOpen: Recovery Timeout Elapsed
     HalfOpen --> Closed: Probe Success
     HalfOpen --> Open: Probe Failure
-    
+
     Closed: Normal Operation
     Closed: Requests pass through
     Closed: Track failures
-    
+
     Open: Circuit Tripped
     Open: Return fallback immediately
     Open: Wait for recovery timeout
-    
+
     HalfOpen: Testing Recovery
     HalfOpen: Allow limited probe requests
     HalfOpen: Evaluate success/failure
@@ -779,13 +773,13 @@ use App\Enums\CircuitState;
 
 /**
  * Circuit Breaker Implementation
- * 
+ *
  * Prevents cascade failures by tracking external service health.
  */
 class CircuitBreaker
 {
     private const CACHE_PREFIX = 'circuit_breaker';
-    
+
     private int $failureThreshold;
     private int $recoveryTimeout;
     private int $sampleWindow;
@@ -799,7 +793,7 @@ class CircuitBreaker
 
     /**
      * Execute callback through circuit breaker
-     * 
+     *
      * @param string $key Circuit identifier
      * @param callable $callback Main operation
      * @param callable $fallback Fallback operation
@@ -818,7 +812,7 @@ class CircuitBreaker
 
     /**
      * Get current circuit state
-     * 
+     *
      * @param string $key Circuit identifier
      * @return CircuitState
      */
@@ -839,7 +833,7 @@ class CircuitBreaker
 
     /**
      * Handle closed state (normal operation)
-     * 
+     *
      * @param string $key Circuit identifier
      * @param callable $callback Main operation
      * @param callable $fallback Fallback operation
@@ -853,7 +847,7 @@ class CircuitBreaker
             return $result;
         } catch (\Exception $e) {
             $this->recordFailure($key);
-            
+
             if ($this->shouldTrip($key)) {
                 $this->trip($key);
             }
@@ -869,7 +863,7 @@ class CircuitBreaker
 
     /**
      * Handle open state (circuit tripped)
-     * 
+     *
      * @param string $key Circuit identifier
      * @param callable $fallback Fallback operation
      * @return mixed
@@ -885,7 +879,7 @@ class CircuitBreaker
 
     /**
      * Handle half-open state (testing recovery)
-     * 
+     *
      * @param string $key Circuit identifier
      * @param callable $callback Main operation
      * @param callable $fallback Fallback operation
@@ -896,15 +890,15 @@ class CircuitBreaker
         try {
             $result = $callback();
             $this->reset($key);
-            
+
             Log::info('Circuit breaker recovered', [
                 'key' => $key,
             ]);
-            
+
             return $result;
         } catch (\Exception $e) {
             $this->trip($key);
-            
+
             Log::warning('Circuit breaker probe failed', [
                 'key' => $key,
                 'error' => $e->getMessage(),
@@ -916,7 +910,7 @@ class CircuitBreaker
 
     /**
      * Record successful operation
-     * 
+     *
      * @param string $key Circuit identifier
      * @return void
      */
@@ -929,7 +923,7 @@ class CircuitBreaker
 
     /**
      * Record failed operation
-     * 
+     *
      * @param string $key Circuit identifier
      * @return void
      */
@@ -943,24 +937,24 @@ class CircuitBreaker
 
     /**
      * Check if circuit should trip
-     * 
+     *
      * @param string $key Circuit identifier
      * @return bool
      */
     private function shouldTrip(string $key): bool
     {
         $data = $this->getCircuitData($key);
-        
+
         // Check if failures within sample window exceed threshold
         $windowStart = time() - $this->sampleWindow;
-        
+
         return $data['failures'] >= $this->failureThreshold
             && $data['last_failure'] >= $windowStart;
     }
 
     /**
      * Trip the circuit (open it)
-     * 
+     *
      * @param string $key Circuit identifier
      * @return void
      */
@@ -981,7 +975,7 @@ class CircuitBreaker
 
     /**
      * Reset circuit to closed state
-     * 
+     *
      * @param string $key Circuit identifier
      * @return void
      */
@@ -994,7 +988,7 @@ class CircuitBreaker
 
     /**
      * Get circuit data from cache
-     * 
+     *
      * @param string $key Circuit identifier
      * @return array
      */
@@ -1008,7 +1002,7 @@ class CircuitBreaker
 
     /**
      * Save circuit data to cache
-     * 
+     *
      * @param string $key Circuit identifier
      * @param array $data Circuit data
      * @return void
@@ -1024,7 +1018,7 @@ class CircuitBreaker
 
     /**
      * Get default circuit data
-     * 
+     *
      * @return array
      */
     private function getDefaultData(): array
@@ -1040,14 +1034,14 @@ class CircuitBreaker
 
     /**
      * Force reset circuit (admin operation)
-     * 
+     *
      * @param string $key Circuit identifier
      * @return void
      */
     public function forceReset(string $key): void
     {
         $this->reset($key);
-        
+
         Log::info('Circuit breaker force reset', [
             'key' => $key,
         ]);
@@ -1055,12 +1049,12 @@ class CircuitBreaker
 
     /**
      * Get all circuit states
-     * 
+     *
      * @return array
      */
     public function getAllStates(): array
     {
-        $keys = ['umapyoi', 'umamusumedb'];
+        $keys = ['umapyoi', 'gametora'];
         $states = [];
 
         foreach ($keys as $key) {
@@ -1090,7 +1084,7 @@ enum CircuitState: string
 
     /**
      * Check if requests should pass through
-     * 
+     *
      * @return bool
      */
     public function allowsRequests(): bool
@@ -1104,7 +1098,7 @@ enum CircuitState: string
 
     /**
      * Get display label
-     * 
+     *
      * @return string
      */
     public function label(): string
@@ -1118,7 +1112,7 @@ enum CircuitState: string
 
     /**
      * Get status color
-     * 
+     *
      * @return string
      */
     public function color(): string
@@ -1193,7 +1187,7 @@ use App\Exceptions\OCRProcessingException;
 
 /**
  * Image Processing Service
- * 
+ *
  * Preprocesses images for optimal OCR extraction using GD library.
  */
 class ImageProcessingService
@@ -1204,7 +1198,7 @@ class ImageProcessingService
 
     /**
      * Preprocess image for OCR
-     * 
+     *
      * @param UploadedFile $file Uploaded image file
      * @return string Path to processed image
      * @throws OCRProcessingException
@@ -1224,7 +1218,7 @@ class ImageProcessingService
 
         // Save processed image
         $outputPath = $this->saveProcessedImage($image);
-        
+
         imagedestroy($image);
 
         return $outputPath;
@@ -1232,7 +1226,7 @@ class ImageProcessingService
 
     /**
      * Validate uploaded image
-     * 
+     *
      * @param UploadedFile $file Uploaded file
      * @return void
      * @throws OCRProcessingException
@@ -1240,7 +1234,7 @@ class ImageProcessingService
     private function validateImage(UploadedFile $file): void
     {
         $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-        
+
         if (!in_array($file->getMimeType(), $allowedMimes)) {
             throw new OCRProcessingException(
                 'Invalid image format. Allowed: JPEG, PNG, GIF, WebP'
@@ -1248,7 +1242,7 @@ class ImageProcessingService
         }
 
         $maxSize = config('ocr.max_file_size', 10 * 1024 * 1024); // 10MB
-        
+
         if ($file->getSize() > $maxSize) {
             throw new OCRProcessingException(
                 'Image file too large. Maximum size: ' . ($maxSize / 1024 / 1024) . 'MB'
@@ -1258,7 +1252,7 @@ class ImageProcessingService
 
     /**
      * Load image from file
-     * 
+     *
      * @param string $path File path
      * @param string $mimeType MIME type
      * @return \GdImage
@@ -1283,7 +1277,7 @@ class ImageProcessingService
 
     /**
      * Resize image to standard dimensions
-     * 
+     *
      * @param \GdImage $image Source image
      * @return \GdImage
      */
@@ -1294,7 +1288,7 @@ class ImageProcessingService
 
         // Calculate new dimensions maintaining aspect ratio
         $ratio = min(self::MAX_WIDTH / $width, self::MAX_HEIGHT / $height, 1);
-        
+
         if ($ratio >= 1) {
             return $image; // No resize needed
         }
@@ -1310,13 +1304,13 @@ class ImageProcessingService
         );
 
         imagedestroy($image);
-        
+
         return $resized;
     }
 
     /**
      * Convert image to grayscale
-     * 
+     *
      * @param \GdImage $image Source image
      * @return \GdImage
      */
@@ -1328,7 +1322,7 @@ class ImageProcessingService
 
     /**
      * Apply binary threshold
-     * 
+     *
      * @param \GdImage $image Source image
      * @return \GdImage
      */
@@ -1341,7 +1335,7 @@ class ImageProcessingService
             for ($y = 0; $y < $height; $y++) {
                 $rgb = imagecolorat($image, $x, $y);
                 $gray = ($rgb >> 16) & 0xFF; // Get red channel (grayscale)
-                
+
                 $newColor = $gray > self::THRESHOLD_VALUE ? 255 : 0;
                 $color = imagecolorallocate($image, $newColor, $newColor, $newColor);
                 imagesetpixel($image, $x, $y, $color);
@@ -1353,7 +1347,7 @@ class ImageProcessingService
 
     /**
      * Apply denoise filter
-     * 
+     *
      * @param \GdImage $image Source image
      * @return \GdImage
      */
@@ -1361,16 +1355,16 @@ class ImageProcessingService
     {
         // Apply median filter effect using smooth filter
         imagefilter($image, IMG_FILTER_SMOOTH, 1);
-        
+
         // Increase contrast to sharpen text
         imagefilter($image, IMG_FILTER_CONTRAST, -10);
-        
+
         return $image;
     }
 
     /**
      * Save processed image
-     * 
+     *
      * @param \GdImage $image Processed image
      * @return string Output path
      */
@@ -1378,14 +1372,14 @@ class ImageProcessingService
     {
         $filename = 'ocr_processed_' . uniqid() . '.png';
         $path = storage_path("app/temp/{$filename}");
-        
+
         // Ensure directory exists
         if (!is_dir(dirname($path))) {
             mkdir(dirname($path), 0755, true);
         }
 
         imagepng($image, $path);
-        
+
         return $path;
     }
 }
@@ -1403,7 +1397,7 @@ use App\Exceptions\OCRProcessingException;
 
 /**
  * Tesseract OCR Service
- * 
+ *
  * Extracts text from preprocessed images using Tesseract OCR engine.
  */
 class TesseractService
@@ -1421,7 +1415,7 @@ class TesseractService
 
     /**
      * Extract text from image
-     * 
+     *
      * @param string $imagePath Path to preprocessed image
      * @return string Extracted text
      * @throws OCRProcessingException
@@ -1455,7 +1449,7 @@ class TesseractService
             }
 
             $text = file_get_contents($outputFile);
-            
+
             return $this->cleanText($text);
         } finally {
             // Cleanup temporary files
@@ -1466,7 +1460,7 @@ class TesseractService
 
     /**
      * Extract text with confidence scores
-     * 
+     *
      * @param string $imagePath Path to preprocessed image
      * @return array{text: string, confidence: float, words: array}
      * @throws OCRProcessingException
@@ -1505,7 +1499,7 @@ class TesseractService
 
     /**
      * Validate Tesseract installation
-     * 
+     *
      * @return void
      * @throws OCRProcessingException
      */
@@ -1520,7 +1514,7 @@ class TesseractService
 
     /**
      * Validate image path exists
-     * 
+     *
      * @param string $imagePath Image path
      * @return void
      * @throws OCRProcessingException
@@ -1536,7 +1530,7 @@ class TesseractService
 
     /**
      * Clean extracted text
-     * 
+     *
      * @param string $text Raw text
      * @return string Cleaned text
      */
@@ -1544,16 +1538,16 @@ class TesseractService
     {
         // Remove excessive whitespace
         $text = preg_replace('/\s+/', ' ', $text);
-        
+
         // Trim leading/trailing whitespace
         $text = trim($text);
-        
+
         return $text;
     }
 
     /**
      * Parse TSV output with confidence scores
-     * 
+     *
      * @param string $tsvPath TSV file path
      * @return array
      */
@@ -1565,7 +1559,7 @@ class TesseractService
 
         $content = file_get_contents($tsvPath);
         $lines = explode("\n", trim($content));
-        
+
         $words = [];
         $totalConfidence = 0;
         $wordCount = 0;
@@ -1573,11 +1567,11 @@ class TesseractService
 
         foreach (array_slice($lines, 1) as $line) { // Skip header
             $parts = explode("\t", $line);
-            
+
             if (count($parts) >= 12 && !empty(trim($parts[11]))) {
                 $word = trim($parts[11]);
                 $confidence = (float) ($parts[10] ?? 0);
-                
+
                 $words[] = [
                     'text' => $word,
                     'confidence' => $confidence,
@@ -1586,7 +1580,7 @@ class TesseractService
                     'width' => (int) $parts[8],
                     'height' => (int) $parts[9],
                 ];
-                
+
                 $fullText .= $word . ' ';
                 $totalConfidence += $confidence;
                 $wordCount++;
@@ -1602,7 +1596,7 @@ class TesseractService
 
     /**
      * Check if Tesseract is available
-     * 
+     *
      * @return bool
      */
     public function isAvailable(): bool
@@ -1612,7 +1606,7 @@ class TesseractService
                 $this->tesseractPath,
                 '--version',
             ]);
-            
+
             return $result->successful();
         } catch (\Exception $e) {
             return false;
@@ -1621,7 +1615,7 @@ class TesseractService
 
     /**
      * Get available languages
-     * 
+     *
      * @return array
      */
     public function getAvailableLanguages(): array
@@ -1631,7 +1625,7 @@ class TesseractService
                 $this->tesseractPath,
                 '--list-langs',
             ]);
-            
+
             if ($result->successful()) {
                 $lines = explode("\n", $result->output());
                 return array_filter(array_slice($lines, 1)); // Skip header
@@ -1658,7 +1652,7 @@ use Illuminate\Support\Facades\Log;
 
 /**
  * OCR Parser Service
- * 
+ *
  * Parses raw OCR text into structured game data.
  */
 class OCRParserService
@@ -1708,7 +1702,7 @@ class OCRParserService
 
     /**
      * Parse OCR text into structured data
-     * 
+     *
      * @param string $text Raw OCR text
      * @return array Parsed data
      */
@@ -1725,7 +1719,7 @@ class OCRParserService
 
     /**
      * Parse with confidence scoring
-     * 
+     *
      * @param array $ocrResult OCR result with confidence
      * @return array{data: array, confidence: float, fields: array}
      */
@@ -1751,7 +1745,7 @@ class OCRParserService
 
     /**
      * Extract stats from text
-     * 
+     *
      * @param string $text Raw text
      * @return array
      */
@@ -1762,7 +1756,7 @@ class OCRParserService
         foreach (self::STAT_PATTERNS as $stat => $pattern) {
             if (preg_match($pattern, $text, $matches)) {
                 $value = (int) $matches[1];
-                
+
                 // Validate range (0-1200)
                 if ($value >= 0 && $value <= 1200) {
                     $stats[$stat] = $value;
@@ -1775,7 +1769,7 @@ class OCRParserService
 
     /**
      * Extract aptitudes from text
-     * 
+     *
      * @param string $text Raw text
      * @return array
      */
@@ -1785,11 +1779,11 @@ class OCRParserService
 
         foreach (self::APTITUDE_PATTERNS as $category => $patterns) {
             $aptitudes[$category] = [];
-            
+
             foreach ($patterns as $type => $pattern) {
                 if (preg_match($pattern, $text, $matches)) {
                     $grade = strtoupper($matches[1]);
-                    
+
                     // Validate grade
                     if ($this->isValidGrade($grade)) {
                         $aptitudes[$category][$type] = $grade;
@@ -1803,7 +1797,7 @@ class OCRParserService
 
     /**
      * Extract mood from text
-     * 
+     *
      * @param string $text Raw text
      * @return string|null
      */
@@ -1818,7 +1812,7 @@ class OCRParserService
 
     /**
      * Extract energy from text
-     * 
+     *
      * @param string $text Raw text
      * @return int|null
      */
@@ -1826,7 +1820,7 @@ class OCRParserService
     {
         if (preg_match(self::ENERGY_PATTERN, $text, $matches)) {
             $value = (int) $matches[1];
-            
+
             // Validate range (0-100)
             if ($value >= 0 && $value <= 100) {
                 return $value;
@@ -1838,7 +1832,7 @@ class OCRParserService
 
     /**
      * Validate aptitude grade
-     * 
+     *
      * @param string $grade Grade string
      * @return bool
      */
@@ -1849,7 +1843,7 @@ class OCRParserService
 
     /**
      * Normalize mood string
-     * 
+     *
      * @param string $mood Raw mood string
      * @return string
      */
@@ -1873,7 +1867,7 @@ class OCRParserService
 
     /**
      * Calculate field-level confidences
-     * 
+     *
      * @param array $data Parsed data
      * @return array
      */
@@ -1901,7 +1895,7 @@ class OCRParserService
 
     /**
      * Calculate overall confidence score
-     * 
+     *
      * @param float $baseConfidence OCR base confidence
      * @param array $fieldConfidences Field-level confidences
      * @return float
@@ -1912,7 +1906,7 @@ class OCRParserService
     ): float {
         // Weight OCR confidence at 60%, field extraction at 40%
         $fieldAvg = array_sum($fieldConfidences) / count($fieldConfidences);
-        
+
         return ($baseConfidence * 0.6) + ($fieldAvg * 0.4);
     }
 }
@@ -1929,7 +1923,7 @@ use Illuminate\Support\Facades\Validator;
 
 /**
  * OCR Validation Service
- * 
+ *
  * Validates extracted OCR data against business rules.
  */
 class OCRValidationService
@@ -1938,7 +1932,7 @@ class OCRValidationService
 
     /**
      * Validate extracted data
-     * 
+     *
      * @param array $data Parsed OCR data
      * @param float $confidence Confidence score
      * @return array{valid: bool, errors: array, warnings: array, requires_review: bool}
@@ -1972,7 +1966,7 @@ class OCRValidationService
 
         // Check confidence threshold
         $requiresReview = $confidence < self::CONFIDENCE_THRESHOLD;
-        
+
         if ($requiresReview) {
             $warnings[] = "Confidence score ({$confidence}%) below threshold. Manual review recommended.";
         }
@@ -1987,7 +1981,7 @@ class OCRValidationService
 
     /**
      * Validate stats
-     * 
+     *
      * @param array $stats Stats array
      * @return array{errors: array, warnings: array}
      */
@@ -2021,7 +2015,7 @@ class OCRValidationService
 
     /**
      * Validate aptitudes
-     * 
+     *
      * @param array $aptitudes Aptitudes array
      * @return array{errors: array, warnings: array}
      */
@@ -2053,7 +2047,7 @@ class OCRValidationService
 
     /**
      * Validate mood value
-     * 
+     *
      * @param string $mood Mood string
      * @return array{errors: array}
      */
@@ -2071,7 +2065,7 @@ class OCRValidationService
 
     /**
      * Validate energy value
-     * 
+     *
      * @param int $energy Energy value
      * @return array{errors: array}
      */
@@ -2102,7 +2096,7 @@ use App\Exceptions\OCRProcessingException;
 
 /**
  * OCR Processing Service
- * 
+ *
  * Orchestrates the complete OCR processing pipeline.
  */
 class OCRProcessingService
@@ -2116,7 +2110,7 @@ class OCRProcessingService
 
     /**
      * Process screenshot and extract game data
-     * 
+     *
      * @param UploadedFile $file Uploaded screenshot
      * @param string|null $userId User ID for tracking
      * @return OCRResult
@@ -2185,7 +2179,7 @@ class OCRProcessingService
 
     /**
      * Store extraction record
-     * 
+     *
      * @param string|null $userId User ID
      * @param string $filename Original filename
      * @param array $parsedResult Parsed OCR result
@@ -2211,7 +2205,7 @@ class OCRProcessingService
 
     /**
      * Verify and update extraction
-     * 
+     *
      * @param int $extractionId Extraction ID
      * @param array $correctedData User-corrected data
      * @return OCRExtraction
@@ -2253,7 +2247,7 @@ readonly class OCRResult
 
     /**
      * Check if result requires manual review
-     * 
+     *
      * @return bool
      */
     public function requiresReview(): bool
@@ -2263,7 +2257,7 @@ readonly class OCRResult
 
     /**
      * Check if result is valid
-     * 
+     *
      * @return bool
      */
     public function isValid(): bool
@@ -2273,7 +2267,7 @@ readonly class OCRResult
 
     /**
      * Get validation errors
-     * 
+     *
      * @return array
      */
     public function getErrors(): array
@@ -2283,7 +2277,7 @@ readonly class OCRResult
 
     /**
      * Get validation warnings
-     * 
+     *
      * @return array
      */
     public function getWarnings(): array
@@ -2293,7 +2287,7 @@ readonly class OCRResult
 
     /**
      * Convert to array
-     * 
+     *
      * @return array
      */
     public function toArray(): array
@@ -2341,7 +2335,7 @@ flowchart TD
     Reverb --> CharChannel
     Reverb --> UserChannel
     Reverb --> GlobalChannel
-    
+
     CharChannel --> Client1
     UserChannel --> Client2
     GlobalChannel --> Client1
@@ -2366,7 +2360,7 @@ use Illuminate\Queue\SerializesModels;
 
 /**
  * Character Updated Event
- * 
+ *
  * Broadcasts when character data changes.
  */
 class CharacterUpdated implements ShouldBroadcast
@@ -2380,7 +2374,7 @@ class CharacterUpdated implements ShouldBroadcast
 
     /**
      * Get broadcast channels
-     * 
+     *
      * @return array<int, Channel>
      */
     public function broadcastOn(): array
@@ -2393,7 +2387,7 @@ class CharacterUpdated implements ShouldBroadcast
 
     /**
      * Get broadcast event name
-     * 
+     *
      * @return string
      */
     public function broadcastAs(): string
@@ -2403,7 +2397,7 @@ class CharacterUpdated implements ShouldBroadcast
 
     /**
      * Get broadcast data
-     * 
+     *
      * @return array
      */
     public function broadcastWith(): array
@@ -2435,7 +2429,7 @@ use Illuminate\Queue\SerializesModels;
 
 /**
  * Training Completed Event
- * 
+ *
  * Broadcasts when a training session completes.
  */
 class TrainingCompleted implements ShouldBroadcast
@@ -2448,7 +2442,7 @@ class TrainingCompleted implements ShouldBroadcast
 
     /**
      * Get broadcast channels
-     * 
+     *
      * @return array<int, Channel>
      */
     public function broadcastOn(): array
@@ -2460,7 +2454,7 @@ class TrainingCompleted implements ShouldBroadcast
 
     /**
      * Get broadcast event name
-     * 
+     *
      * @return string
      */
     public function broadcastAs(): string
@@ -2470,7 +2464,7 @@ class TrainingCompleted implements ShouldBroadcast
 
     /**
      * Get broadcast data
-     * 
+     *
      * @return array
      */
     public function broadcastWith(): array
@@ -2498,14 +2492,14 @@ use Illuminate\Support\Facades\{Broadcast, Log};
 
 /**
  * WebSocket Broadcasting Service
- * 
+ *
  * Manages real-time updates via Laravel Reverb.
  */
 class WebSocketBroadcastingService
 {
     /**
      * Broadcast character update
-     * 
+     *
      * @param int $characterId Character ID
      * @param array $data Update data
      * @return void
@@ -2523,7 +2517,7 @@ class WebSocketBroadcastingService
 
     /**
      * Broadcast training completion
-     * 
+     *
      * @param int $characterId Character ID
      * @param array $sessionData Session data
      * @return void
@@ -2539,7 +2533,7 @@ class WebSocketBroadcastingService
 
     /**
      * Broadcast external data sync
-     * 
+     *
      * @param string $dataType Data type synced
      * @param int $recordCount Number of records
      * @return void
@@ -2559,7 +2553,7 @@ class WebSocketBroadcastingService
 
     /**
      * Generic broadcast method
-     * 
+     *
      * @param string $channel Channel name
      * @param string $event Event name
      * @param array $data Event data
@@ -2569,7 +2563,7 @@ class WebSocketBroadcastingService
     {
         try {
             Broadcast::channel($channel)->broadcast($event, $data);
-            
+
             Log::debug('WebSocket broadcast sent', [
                 'channel' => $channel,
                 'event' => $event,
@@ -2635,20 +2629,20 @@ use Illuminate\Support\Str;
 
 /**
  * Community Integration Service
- * 
+ *
  * Handles integration with community tools and data sharing.
  */
 class CommunityIntegrationService
 {
     private const COMMUNITY_TOOLS = [
-        'UmamusumeDB' => 'https://umamusumedb.com',
+        'GameTora' => 'https://gametora.com',
         'UmaPyoi' => 'https://umapyoi.net',
         'Uel' => 'https://uel.ink',
     ];
 
     /**
      * Share career results to community
-     * 
+     *
      * @param Career $career Career to share
      * @return ShareResult
      */
@@ -2656,7 +2650,7 @@ class CommunityIntegrationService
     {
         $shareData = $this->buildShareData($career);
         $shareToken = $this->generateShareToken();
-        
+
         // Store share data
         $share = $career->shares()->create([
             'share_token' => $shareToken,
@@ -2673,7 +2667,7 @@ class CommunityIntegrationService
 
     /**
      * Build share data from career
-     * 
+     *
      * @param Career $career Career instance
      * @return array
      */
@@ -2693,7 +2687,7 @@ class CommunityIntegrationService
 
     /**
      * Generate unique share token
-     * 
+     *
      * @return string
      */
     private function generateShareToken(): string
@@ -2703,7 +2697,7 @@ class CommunityIntegrationService
 
     /**
      * Build shareable URL
-     * 
+     *
      * @param string $token Share token
      * @return string
      */
@@ -2714,14 +2708,14 @@ class CommunityIntegrationService
 
     /**
      * Calculate final grade from stats
-     * 
+     *
      * @param array $stats Final stats
      * @return string
      */
     private function calculateFinalGrade(array $stats): string
     {
         $total = array_sum($stats);
-        
+
         return match (true) {
             $total >= 5500 => 'SS',
             $total >= 5000 => 'S',
@@ -2735,7 +2729,7 @@ class CommunityIntegrationService
 
     /**
      * Import community tips for character
-     * 
+     *
      * @param Character $character Character instance
      * @return array
      */
@@ -2764,7 +2758,7 @@ class CommunityIntegrationService
 
     /**
      * Get community meta rankings
-     * 
+     *
      * @param string $type Ranking type (characters, support_cards)
      * @return array
      */
@@ -2775,7 +2769,7 @@ class CommunityIntegrationService
         return Cache::remember($cacheKey, now()->addDay(), function () use ($type) {
             try {
                 $response = Http::timeout(10)
-                    ->get(self::COMMUNITY_TOOLS['UmamusumeDB'] . "/api/meta/{$type}");
+                    ->get(self::COMMUNITY_TOOLS['GameTora'] . "/api/meta/{$type}");
 
                 if ($response->successful()) {
                     return $response->json('rankings', []);
@@ -2813,7 +2807,7 @@ readonly class ShareResult
 
     /**
      * Convert to array
-     * 
+     *
      * @return array
      */
     public function toArray(): array
@@ -2838,22 +2832,22 @@ readonly class ShareResult
 
 namespace App\Services\ExternalAPI;
 
-use App\Services\ExternalAPI\Clients\{UmapyoiApiClient, UmamusumeDBApiClient};
+use App\Services\ExternalAPI\Clients\{UmapyoiApiClient, GameToraScraperService};
 use App\Contracts\ExternalApiClientInterface;
 use Illuminate\Support\Facades\{Cache, Log};
 
 /**
  * External API Service
- * 
+ *
  * Orchestrates external API calls with fallback support.
  */
-class ExternalAPIService
+class ExternalDataService
 {
     private array $clients = [];
 
     public function __construct(
         private UmapyoiApiClient $primaryClient,
-        private UmamusumeDBApiClient $fallbackClient,
+        private GameToraScraperService $fallbackClient,
         private CircuitBreaker $circuitBreaker
     ) {
         $this->clients = [
@@ -2864,7 +2858,7 @@ class ExternalAPIService
 
     /**
      * Fetch character data with fallback
-     * 
+     *
      * @param int $traineeId Trainee ID
      * @return array
      */
@@ -2878,7 +2872,7 @@ class ExternalAPIService
 
     /**
      * Fetch support cards with fallback
-     * 
+     *
      * @param array $filters Optional filters
      * @return array
      */
@@ -2892,7 +2886,7 @@ class ExternalAPIService
 
     /**
      * Fetch skills with fallback
-     * 
+     *
      * @param array $filters Optional filters
      * @return array
      */
@@ -2906,7 +2900,7 @@ class ExternalAPIService
 
     /**
      * Fetch races with fallback
-     * 
+     *
      * @param array $filters Optional filters
      * @return array
      */
@@ -2920,7 +2914,7 @@ class ExternalAPIService
 
     /**
      * Execute API call with fallback support
-     * 
+     *
      * @param callable $operation Operation to execute
      * @param string $cacheKey Cache key for stale data
      * @return array
@@ -2929,7 +2923,7 @@ class ExternalAPIService
     {
         // Try primary client
         $primaryState = $this->circuitBreaker->getState('umapyoi');
-        
+
         if ($primaryState->allowsRequests()) {
             try {
                 $result = $operation($this->primaryClient);
@@ -2943,8 +2937,8 @@ class ExternalAPIService
         }
 
         // Try fallback client
-        $fallbackState = $this->circuitBreaker->getState('umamusumedb');
-        
+        $fallbackState = $this->circuitBreaker->getState('gametora');
+
         if ($fallbackState->allowsRequests()) {
             try {
                 $result = $operation($this->fallbackClient);
@@ -2963,7 +2957,7 @@ class ExternalAPIService
 
     /**
      * Cache data for stale fallback
-     * 
+     *
      * @param string $key Cache key
      * @param array $data Data to cache
      * @return void
@@ -2975,7 +2969,7 @@ class ExternalAPIService
 
     /**
      * Get stale cached data
-     * 
+     *
      * @param string $key Cache key
      * @return array
      */
@@ -2992,7 +2986,7 @@ class ExternalAPIService
 
     /**
      * Get health status of all APIs
-     * 
+     *
      * @return array
      */
     public function getHealthStatus(): array
@@ -3006,14 +3000,14 @@ class ExternalAPIService
             'fallback' => [
                 'name' => $this->fallbackClient->getSourceIdentifier(),
                 'healthy' => $this->fallbackClient->isHealthy(),
-                'circuit_state' => $this->circuitBreaker->getState('umamusumedb')->value,
+                'circuit_state' => $this->circuitBreaker->getState('gametora')->value,
             ],
         ];
     }
 
     /**
      * Force sync all external data
-     * 
+     *
      * @return array Sync results
      */
     public function syncAll(): array
@@ -3056,19 +3050,19 @@ use Illuminate\Support\Facades\{DB, Log};
 
 /**
  * Data Sync Service
- * 
+ *
  * Synchronizes external API data with local database.
  */
 class DataSyncService
 {
     public function __construct(
-        private ExternalAPIService $externalApi,
+        private ExternalDataService $externalApi,
         private WebSocketBroadcastingService $broadcaster
     ) {}
 
     /**
      * Sync support cards from external API
-     * 
+     *
      * @return SyncResult
      */
     public function syncSupportCards(): SyncResult
@@ -3107,7 +3101,7 @@ class DataSyncService
 
     /**
      * Sync skills from external API
-     * 
+     *
      * @return SyncResult
      */
     public function syncSkills(): SyncResult
@@ -3146,7 +3140,7 @@ class DataSyncService
 
     /**
      * Map external support card data to model
-     * 
+     *
      * @param array $data External data
      * @return array
      */
@@ -3170,7 +3164,7 @@ class DataSyncService
 
     /**
      * Map external skill data to model
-     * 
+     *
      * @param array $data External data
      * @return array
      */
@@ -3223,20 +3217,18 @@ readonly class SyncResult
 
 ### 9.1 Endpoint Overview
 
-| Method | Endpoint | Description | Auth Required |
-| --- | --- | --- | --- |
-| GET | `/api/v1/external/characters/{traineeId}` | Fetch character data from external API | Yes |
-| GET | `/api/v1/external/support-cards` | Fetch support card database | Yes |
-| GET | `/api/v1/external/skills` | Fetch skill catalog | Yes |
-| GET | `/api/v1/external/races` | Fetch race definitions | Yes |
-| GET | `/api/v1/external/health` | Get external API health status | Yes |
-| POST | `/api/v1/external/sync` | Trigger data synchronization | Yes |
-| POST | `/api/v1/ocr/process` | Process screenshot via OCR | Yes |
-| GET | `/api/v1/ocr/extractions/{id}` | Get OCR extraction result | Yes |
-| PATCH | `/api/v1/ocr/extractions/{id}/verify` | Verify and correct OCR data | Yes |
-| GET | `/api/v1/community/tips/{traineeId}` | Get community tips for character | Yes |
-| POST | `/api/v1/community/share` | Share career results to community | Yes |
-| GET | `/api/v1/community/share/{token}` | Get shared career data | No |
+- **Method**: GET; **Endpoint**: `/api/v1/external/characters/{traineeId}`; **Description**: Fetch character data from external API; **Auth Required**: Yes
+- **Method**: GET; **Endpoint**: `/api/v1/external/support-cards`; **Description**: Fetch support card database; **Auth Required**: Yes
+- **Method**: GET; **Endpoint**: `/api/v1/external/skills`; **Description**: Fetch skill catalog; **Auth Required**: Yes
+- **Method**: GET; **Endpoint**: `/api/v1/external/races`; **Description**: Fetch race definitions; **Auth Required**: Yes
+- **Method**: GET; **Endpoint**: `/api/v1/external/health`; **Description**: Get external API health status; **Auth Required**: Yes
+- **Method**: POST; **Endpoint**: `/api/v1/external/sync`; **Description**: Trigger data synchronization; **Auth Required**: Yes
+- **Method**: POST; **Endpoint**: `/api/v1/ocr/process`; **Description**: Process screenshot via OCR; **Auth Required**: Yes
+- **Method**: GET; **Endpoint**: `/api/v1/ocr/extractions/{id}`; **Description**: Get OCR extraction result; **Auth Required**: Yes
+- **Method**: PATCH; **Endpoint**: `/api/v1/ocr/extractions/{id}/verify`; **Description**: Verify and correct OCR data; **Auth Required**: Yes
+- **Method**: GET; **Endpoint**: `/api/v1/community/tips/{traineeId}`; **Description**: Get community tips for character; **Auth Required**: Yes
+- **Method**: POST; **Endpoint**: `/api/v1/community/share`; **Description**: Share career results to community; **Auth Required**: Yes
+- **Method**: GET; **Endpoint**: `/api/v1/community/share/{token}`; **Description**: Get shared career data; **Auth Required**: No
 
 ### 9.2 External Data Endpoints
 
@@ -3313,7 +3305,7 @@ Get health status of external APIs.
             "response_time_ms": 145
         },
         "fallback": {
-            "name": "umamusumedb",
+            "name": "gametora",
             "healthy": true,
             "circuit_state": "closed",
             "response_time_ms": 220
@@ -3518,7 +3510,7 @@ CREATE TABLE ucp_external_api_cache (
     expires_at TIMESTAMP NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     UNIQUE KEY unique_cache_key (cache_key),
     INDEX idx_api_source (api_source),
     INDEX idx_resource_type (resource_type),
@@ -3543,7 +3535,7 @@ CREATE TABLE ucp_ocr_extractions (
     verified_at TIMESTAMP NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     FOREIGN KEY (user_id) REFERENCES ucp_users(id) ON DELETE SET NULL,
     FOREIGN KEY (character_id) REFERENCES ucp_characters(id) ON DELETE SET NULL,
     INDEX idx_user_id (user_id),
@@ -3569,7 +3561,7 @@ CREATE TABLE ucp_community_shares (
     shared_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     FOREIGN KEY (career_id) REFERENCES ucp_careers(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES ucp_users(id) ON DELETE CASCADE,
     UNIQUE KEY unique_share_token (share_token),
@@ -3593,7 +3585,7 @@ CREATE TABLE ucp_circuit_breaker_states (
     last_checked_at TIMESTAMP NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     UNIQUE KEY unique_service (service_key),
     INDEX idx_state (state)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -3605,13 +3597,11 @@ CREATE TABLE ucp_circuit_breaker_states (
 
 ### 11.1 Cache Layers
 
-| Layer | Technology | TTL | Purpose |
-| --- | --- | --- | --- |
-| **Response Cache** | Redis | 24 hours | External API responses |
-| **Stale Cache** | Redis | 7 days | Fallback when APIs unavailable |
-| **OCR Results** | Database | Permanent | Extraction history |
-| **Circuit State** | Redis | 24 hours | Circuit breaker state |
-| **Meta Rankings** | Redis | 12 hours | Community tier lists |
+- **Layer**: **Response Cache**; **Technology**: Redis; **TTL**: 24 hours; **Purpose**: External API responses
+- **Layer**: **Stale Cache**; **Technology**: Redis; **TTL**: 7 days; **Purpose**: Fallback when APIs unavailable
+- **Layer**: **OCR Results**; **Technology**: Database; **TTL**: Permanent; **Purpose**: Extraction history
+- **Layer**: **Circuit State**; **Technology**: Redis; **TTL**: 24 hours; **Purpose**: Circuit breaker state
+- **Layer**: **Meta Rankings**; **Technology**: Redis; **TTL**: 12 hours; **Purpose**: Community tier lists
 
 ### 11.2 Cache Key Patterns
 
@@ -3629,7 +3619,7 @@ Stale Data Cache:
 
 Circuit Breaker:
 - circuit_breaker:umapyoi
-- circuit_breaker:umamusumedb
+- circuit_breaker:gametora
 
 Community:
 - community:tips:{traineeId}
@@ -3652,7 +3642,7 @@ class CacheInvalidationService
 {
     /**
      * Invalidate all external API cache
-     * 
+     *
      * @return void
      */
     public function invalidateAll(): void
@@ -3662,7 +3652,7 @@ class CacheInvalidationService
 
     /**
      * Invalidate specific resource type
-     * 
+     *
      * @param string $type Resource type
      * @return void
      */
@@ -3673,7 +3663,7 @@ class CacheInvalidationService
 
     /**
      * Invalidate specific character
-     * 
+     *
      * @param int $traineeId Trainee ID
      * @return void
      */
@@ -3711,17 +3701,15 @@ App\Exceptions\ExternalIntegrationException (Base)
 
 ### 12.2 Error Codes
 
-| Code | HTTP Status | Description | Resolution |
-| --- | --- | --- | --- |
-| `EXT_API_TIMEOUT` | 504 | External API request timeout | Retry or use cached data |
-| `EXT_API_UNAVAILABLE` | 503 | All external APIs unavailable | Use stale cached data |
-| `EXT_RATE_LIMITED` | 429 | Rate limit exceeded | Wait and retry |
-| `CIRCUIT_OPEN` | 503 | Circuit breaker is open | Use cached data |
-| `OCR_INVALID_IMAGE` | 422 | Invalid image format | Upload valid image |
-| `OCR_ENGINE_ERROR` | 500 | Tesseract processing failed | Retry or manual entry |
-| `OCR_PARSE_FAILED` | 422 | Could not parse OCR text | Manual data entry |
-| `OCR_LOW_CONFIDENCE` | 422 | Confidence below threshold | Manual review required |
-| `SHARE_FAILED` | 500 | Could not create share | Retry later |
+- **Code**: `EXT_API_TIMEOUT`; **HTTP Status**: 504; **Description**: External API request timeout; **Resolution**: Retry or use cached data
+- **Code**: `EXT_API_UNAVAILABLE`; **HTTP Status**: 503; **Description**: All external APIs unavailable; **Resolution**: Use stale cached data
+- **Code**: `EXT_RATE_LIMITED`; **HTTP Status**: 429; **Description**: Rate limit exceeded; **Resolution**: Wait and retry
+- **Code**: `CIRCUIT_OPEN`; **HTTP Status**: 503; **Description**: Circuit breaker is open; **Resolution**: Use cached data
+- **Code**: `OCR_INVALID_IMAGE`; **HTTP Status**: 422; **Description**: Invalid image format; **Resolution**: Upload valid image
+- **Code**: `OCR_ENGINE_ERROR`; **HTTP Status**: 500; **Description**: Tesseract processing failed; **Resolution**: Retry or manual entry
+- **Code**: `OCR_PARSE_FAILED`; **HTTP Status**: 422; **Description**: Could not parse OCR text; **Resolution**: Manual data entry
+- **Code**: `OCR_LOW_CONFIDENCE`; **HTTP Status**: 422; **Description**: Confidence below threshold; **Resolution**: Manual review required
+- **Code**: `SHARE_FAILED`; **HTTP Status**: 500; **Description**: Could not create share; **Resolution**: Retry later
 
 ### 12.3 Error Response Format
 
@@ -3732,7 +3720,7 @@ App\Exceptions\ExternalIntegrationException (Base)
         "message": "External APIs are currently unavailable",
         "details": {
             "primary_api": "umapyoi - circuit open",
-            "fallback_api": "umamusumedb - timeout"
+            "fallback_api": "gametora - timeout"
         },
         "fallback_used": true,
         "data_freshness": "2026-01-23T10:00:00Z"
@@ -3749,31 +3737,25 @@ App\Exceptions\ExternalIntegrationException (Base)
 
 ### 13.1 API Security
 
-| Security Measure | Implementation |
-| --- | --- |
-| **Authentication** | All endpoints require Sanctum token |
-| **Rate Limiting** | 100 requests/minute per user |
-| **Input Validation** | Form Request validation on all inputs |
-| **Output Sanitization** | JSON encoding with proper escaping |
-| **CORS** | Configured for allowed origins only |
+- **Security Measure**: **Authentication**; **Implementation**: All endpoints require Sanctum token
+- **Security Measure**: **Rate Limiting**; **Implementation**: 100 requests/minute per user
+- **Security Measure**: **Input Validation**; **Implementation**: Form Request validation on all inputs
+- **Security Measure**: **Output Sanitization**; **Implementation**: JSON encoding with proper escaping
+- **Security Measure**: **CORS**; **Implementation**: Configured for allowed origins only
 
 ### 13.2 External API Security
 
-| Security Measure | Implementation |
-| --- | --- |
-| **API Keys** | Stored in environment variables, never in code |
-| **HTTPS Only** | All external API calls use HTTPS |
-| **Response Validation** | JSON schema validation on responses |
-| **Data Sanitization** | All external data sanitized before storage |
+- **Security Measure**: **API Keys**; **Implementation**: Stored in environment variables, never in code
+- **Security Measure**: **HTTPS Only**; **Implementation**: All external API calls use HTTPS
+- **Security Measure**: **Response Validation**; **Implementation**: JSON schema validation on responses
+- **Security Measure**: **Data Sanitization**; **Implementation**: All external data sanitized before storage
 
 ### 13.3 OCR Security
 
-| Security Measure | Implementation |
-| --- | --- |
-| **File Validation** | MIME type sniffing, extension validation |
-| **Size Limits** | Maximum 10MB file size |
-| **Temporary Storage** | Processed images deleted after extraction |
-| **Content Scanning** | Validate image contains expected content |
+- **Security Measure**: **File Validation**; **Implementation**: MIME type sniffing, extension validation
+- **Security Measure**: **Size Limits**; **Implementation**: Maximum 10MB file size
+- **Security Measure**: **Temporary Storage**; **Implementation**: Processed images deleted after extraction
+- **Security Measure**: **Content Scanning**; **Implementation**: Validate image contains expected content
 
 ### 13.4 Data Protection
 
@@ -3784,10 +3766,10 @@ return [
         'api_key' => env('UMAPYOI_API_KEY'),  // Never commit actual keys
         'base_url' => env('UMAPYOI_BASE_URL', 'https://umapyoi.net/api/v1'),
     ],
-    
-    'umamusumedb' => [
-        'api_key' => env('UMAMUSUMEDB_API_KEY'),
-        'base_url' => env('UMAMUSUMEDB_BASE_URL', 'https://umamusumedb.com/api'),
+
+    'gametora' => [
+        'api_key' => env('GAMETORA_API_KEY'),
+        'base_url' => env('GAMETORA_BASE_URL', 'https://gametora.com/api'),
     ],
 ];
 ```
@@ -3798,14 +3780,12 @@ return [
 
 ### 14.1 Performance Targets
 
-| Operation | Target | Measurement |
-| --- | --- | --- |
-| External API call (cached) | < 50ms | p95 |
-| External API call (fresh) | < 2s | p95 |
-| OCR processing | < 5s | p95 |
-| Circuit breaker check | < 5ms | p95 |
-| WebSocket broadcast | < 100ms | p95 |
-| Community share creation | < 500ms | p95 |
+- **Operation**: External API call (cached); **Target**: < 50ms; **Measurement**: p95
+- **Operation**: External API call (fresh); **Target**: < 2s; **Measurement**: p95
+- **Operation**: OCR processing; **Target**: < 5s; **Measurement**: p95
+- **Operation**: Circuit breaker check; **Target**: < 5ms; **Measurement**: p95
+- **Operation**: WebSocket broadcast; **Target**: < 100ms; **Measurement**: p95
+- **Operation**: Community share creation; **Target**: < 500ms; **Measurement**: p95
 
 ### 14.2 Optimization Strategies
 
@@ -3846,7 +3826,7 @@ class PerformanceMonitoringService
 {
     /**
      * Log API performance metrics
-     * 
+     *
      * @param string $api API identifier
      * @param float $responseTime Response time in ms
      * @param bool $cached Whether response was cached
@@ -3864,7 +3844,7 @@ class PerformanceMonitoringService
 
     /**
      * Log OCR performance metrics
-     * 
+     *
      * @param float $processingTime Processing time in ms
      * @param float $confidence Confidence score
      * @param int $imageSize Image size in bytes
@@ -3896,13 +3876,13 @@ use App\Enums\CircuitState;
 
 test('circuit breaker starts in closed state', function () {
     $breaker = app(CircuitBreaker::class);
-    
+
     expect($breaker->getState('test-api'))->toBe(CircuitState::Closed);
 });
 
 test('circuit opens after failure threshold exceeded', function () {
     $breaker = app(CircuitBreaker::class);
-    
+
     // Simulate failures
     for ($i = 0; $i < 5; $i++) {
         $breaker->call(
@@ -3911,23 +3891,23 @@ test('circuit opens after failure threshold exceeded', function () {
             fallback: fn() => []
         );
     }
-    
+
     expect($breaker->getState('test-api'))->toBe(CircuitState::Open);
 });
 
 test('circuit transitions to half-open after recovery timeout', function () {
     $breaker = app(CircuitBreaker::class);
-    
+
     // Trip the circuit
     $breaker->forceReset('test-api');
-    
+
     // Simulate passing of recovery timeout
     Cache::put('circuit_breaker:test-api', [
         'state' => CircuitState::Open->value,
         'opened_at' => time() - 120, // 2 minutes ago
         'failures' => 5,
     ], 86400);
-    
+
     expect($breaker->getState('test-api'))->toBe(CircuitState::HalfOpen);
 });
 ```
@@ -3937,7 +3917,7 @@ test('circuit transitions to half-open after recovery timeout', function () {
 ```php
 // tests/Feature/ExternalAPI/ExternalAPITest.php
 
-use App\Services\ExternalAPI\ExternalAPIService;
+use App\Services\ExternalAPI\ExternalDataService;
 use Illuminate\Support\Facades\Http;
 
 test('fetches character data from primary API', function () {
@@ -3949,27 +3929,27 @@ test('fetches character data from primary API', function () {
             ]
         ], 200),
     ]);
-    
-    $service = app(ExternalAPIService::class);
+
+    $service = app(ExternalDataService::class);
     $result = $service->fetchCharacterData(1001);
-    
+
     expect($result)->toHaveKey('name', 'Special Week');
 });
 
 test('falls back to secondary API when primary fails', function () {
     Http::fake([
         'umapyoi.net/*' => Http::response([], 500),
-        'umamusumedb.com/api/characters/1001' => Http::response([
+        'gametora.com/api/characters/1001' => Http::response([
             'data' => [
                 'id' => 1001,
                 'name' => 'Special Week',
             ]
         ], 200),
     ]);
-    
-    $service = app(ExternalAPIService::class);
+
+    $service = app(ExternalDataService::class);
     $result = $service->fetchCharacterData(1001);
-    
+
     expect($result)->toHaveKey('name', 'Special Week');
 });
 
@@ -3979,14 +3959,14 @@ test('returns cached data when all APIs fail', function () {
         'id' => 1001,
         'name' => 'Special Week (Cached)',
     ], now()->addDays(7));
-    
+
     Http::fake([
         '*' => Http::response([], 500),
     ]);
-    
-    $service = app(ExternalAPIService::class);
+
+    $service = app(ExternalDataService::class);
     $result = $service->fetchCharacterData(1001);
-    
+
     expect($result)->toHaveKey('name', 'Special Week (Cached)');
 });
 ```
@@ -4001,7 +3981,7 @@ use Illuminate\Http\UploadedFile;
 
 test('processes screenshot and extracts stats', function () {
     $file = UploadedFile::fake()->image('screenshot.png', 1920, 1080);
-    
+
     // Mock Tesseract output
     $this->mock(\App\Services\OCR\TesseractService::class, function ($mock) {
         $mock->shouldReceive('extractWithConfidence')
@@ -4011,17 +3991,17 @@ test('processes screenshot and extracts stats', function () {
                 'words' => [],
             ]);
     });
-    
+
     $service = app(OCRProcessingService::class);
     $result = $service->process($file);
-    
+
     expect($result->confidence)->toBeGreaterThan(80)
         ->and($result->data['stats'])->toHaveKey('speed', 850);
 });
 
 test('flags low confidence extractions for review', function () {
     $file = UploadedFile::fake()->image('blurry.png', 800, 600);
-    
+
     $this->mock(\App\Services\OCR\TesseractService::class, function ($mock) {
         $mock->shouldReceive('extractWithConfidence')
             ->andReturn([
@@ -4030,10 +4010,10 @@ test('flags low confidence extractions for review', function () {
                 'words' => [],
             ]);
     });
-    
+
     $service = app(OCRProcessingService::class);
     $result = $service->process($file);
-    
+
     expect($result->requiresReview())->toBeTrue();
 });
 ```
@@ -4052,13 +4032,13 @@ test('full external data sync workflow', function () {
             ]
         ], 200),
     ]);
-    
+
     $syncService = app(\App\Services\ExternalAPI\DataSyncService::class);
     $result = $syncService->syncSupportCards();
-    
+
     expect($result->syncedCount)->toBe(2)
         ->and($result->hasErrors())->toBeFalse();
-    
+
     $this->assertDatabaseHas('ucp_support_cards', [
         'external_id' => 1,
         'name' => 'Card 1',
@@ -4067,14 +4047,14 @@ test('full external data sync workflow', function () {
 
 test('WebSocket broadcasts on data sync', function () {
     Event::fake();
-    
+
     Http::fake([
         'umapyoi.net/*' => Http::response(['data' => []], 200),
     ]);
-    
+
     $syncService = app(\App\Services\ExternalAPI\DataSyncService::class);
     $syncService->syncSupportCards();
-    
+
     Event::assertDispatched(\App\Events\DataSynced::class);
 });
 ```
@@ -4232,7 +4212,7 @@ class ExternalApiCacheFactory extends Factory
         $resourceType = $this->faker->randomElement(['characters', 'support_cards', 'skills', 'races']);
 
         return [
-            'api_source' => $this->faker->randomElement(['umapyoi', 'umamusumedb']),
+            'api_source' => $this->faker->randomElement(['umapyoi', 'gametora']),
             'resource_type' => $resourceType,
             'resource_id' => $this->faker->optional()->numberBetween(1, 1000),
             'cache_key' => "external:{$resourceType}:" . $this->faker->uuid(),
@@ -4297,93 +4277,75 @@ class ExternalApiCacheFactory extends Factory
 
 **umapyoi.net API**:
 
-| Endpoint | Method | Description | Rate Limit |
-| --- | --- | --- | --- |
-| `/api/v1/characters` | GET | List all characters | 60/min |
-| `/api/v1/characters/{id}` | GET | Get character by ID | 60/min |
-| `/api/v1/support-cards` | GET | List support cards | 60/min |
-| `/api/v1/skills` | GET | List skills | 60/min |
-| `/api/v1/races` | GET | List races | 60/min |
-| `/api/v1/meta/tiers` | GET | Get meta tier rankings | 30/min |
-| `/api/v1/health` | GET | Health check | 120/min |
+- **Endpoint**: `/api/v1/characters`; **Method**: GET; **Description**: List all characters; **Rate Limit**: 60/min
+- **Endpoint**: `/api/v1/characters/{id}`; **Method**: GET; **Description**: Get character by ID; **Rate Limit**: 60/min
+- **Endpoint**: `/api/v1/support-cards`; **Method**: GET; **Description**: List support cards; **Rate Limit**: 60/min
+- **Endpoint**: `/api/v1/skills`; **Method**: GET; **Description**: List skills; **Rate Limit**: 60/min
+- **Endpoint**: `/api/v1/races`; **Method**: GET; **Description**: List races; **Rate Limit**: 60/min
+- **Endpoint**: `/api/v1/meta/tiers`; **Method**: GET; **Description**: Get meta tier rankings; **Rate Limit**: 30/min
+- **Endpoint**: `/api/v1/health`; **Method**: GET; **Description**: Health check; **Rate Limit**: 120/min
 
-**UmamusumeDB API**:
+**GameTora API**:
 
-| Endpoint | Method | Description | Rate Limit |
-| --- | --- | --- | --- |
-| `/api/characters` | GET | List all characters | 30/min |
-| `/api/characters/{id}` | GET | Get character by ID | 30/min |
-| `/api/support-cards` | GET | List support cards | 30/min |
-| `/api/skills` | GET | List skills | 30/min |
-| `/api/status` | GET | Health check | 60/min |
+- **Endpoint**: `/api/characters`; **Method**: GET; **Description**: List all characters; **Rate Limit**: 30/min
+- **Endpoint**: `/api/characters/{id}`; **Method**: GET; **Description**: Get character by ID; **Rate Limit**: 30/min
+- **Endpoint**: `/api/support-cards`; **Method**: GET; **Description**: List support cards; **Rate Limit**: 30/min
+- **Endpoint**: `/api/skills`; **Method**: GET; **Description**: List skills; **Rate Limit**: 30/min
+- **Endpoint**: `/api/status`; **Method**: GET; **Description**: Health check; **Rate Limit**: 60/min
 
 ### Appendix B: OCR Pattern Reference
 
 **Stat Patterns**:
 
-| Pattern | Language | Example Match |
-| --- | --- | --- |
-| `/Speed[:\s]*(\d{1,4})/i` | English | "Speed: 850" |
-| `/スピード[:\s]*(\d{1,4})/` | Japanese | "スピード: 850" |
-| `/Stamina[:\s]*(\d{1,4})/i` | English | "Stamina: 720" |
-| `/スタミナ[:\s]*(\d{1,4})/` | Japanese | "スタミナ: 720" |
-| `/Power[:\s]*(\d{1,4})/i` | English | "Power: 680" |
-| `/パワー[:\s]*(\d{1,4})/` | Japanese | "パワー: 680" |
-| `/Guts[:\s]*(\d{1,4})/i` | English | "Guts: 550" |
-| `/根性[:\s]*(\d{1,4})/` | Japanese | "根性: 550" |
-| `/[?:Wit\ | Wisdom](:\s)*(\d{1,4})/i` | English |
-| `/賢さ[:\s]*(\d{1,4})/` | Japanese | "賢さ: 620" |
+- **Pattern**: `/Speed[:\s]*(\d{1,4})/i`; **Language**: English; **Example Match**: "Speed: 850"
+- **Pattern**: `/スピード[:\s]*(\d{1,4})/`; **Language**: Japanese; **Example Match**: "スピード: 850"
+- **Pattern**: `/Stamina[:\s]*(\d{1,4})/i`; **Language**: English; **Example Match**: "Stamina: 720"
+- **Pattern**: `/スタミナ[:\s]*(\d{1,4})/`; **Language**: Japanese; **Example Match**: "スタミナ: 720"
+- **Pattern**: `/Power[:\s]*(\d{1,4})/i`; **Language**: English; **Example Match**: "Power: 680"
+- **Pattern**: `/パワー[:\s]*(\d{1,4})/`; **Language**: Japanese; **Example Match**: "パワー: 680"
+- **Pattern**: `/Guts[:\s]*(\d{1,4})/i`; **Language**: English; **Example Match**: "Guts: 550"
+- **Pattern**: `/根性[:\s]*(\d{1,4})/`; **Language**: Japanese; **Example Match**: "根性: 550"
+- **Pattern**: `/(?:Wit\; **Language**: Wisdom)[:\s]*(\d{1,4})/i`; **Example Match**: English; **Col4**: "Wit: 620"
+- **Pattern**: `/賢さ[:\s]*(\d{1,4})/`; **Language**: Japanese; **Example Match**: "賢さ: 620"
 
 **Mood Patterns**:
 
-| Pattern | Normalized Value |
-| --- | --- |
-| `Great`, `絶好調` | `great` |
-| `Good`, `好調` | `good` |
-| `Normal`, `普通` | `normal` |
-| `Bad`, `不調` | `bad` |
-| `Awful`, `絶不調` | `awful` |
+- **Pattern**: `Great`, `絶好調`; **Normalized Value**: `great`
+- **Pattern**: `Good`, `好調`; **Normalized Value**: `good`
+- **Pattern**: `Normal`, `普通`; **Normalized Value**: `normal`
+- **Pattern**: `Bad`, `不調`; **Normalized Value**: `bad`
+- **Pattern**: `Awful`, `絶不調`; **Normalized Value**: `awful`
 
 **Aptitude Patterns**:
 
-| Pattern | Valid Values |
-| --- | --- |
-| `/([A-G]\ | S{1,2})/i` |
+- **Pattern**: `/([A-G]\; **Valid Values**: S{1,2})/i`; **Col3**: SS, S, A, B, C, D, E, F, G
 
 ### Appendix C: Circuit Breaker Configuration
 
 **Default Settings**:
 
-| Parameter | Value | Description |
-| --- | --- | --- |
-| `failure_threshold` | 5 | Failures before opening circuit |
-| `recovery_timeout` | 60 seconds | Time before testing recovery |
-| `sample_window` | 120 seconds | Window for counting failures |
-| `half_open_requests` | 1 | Probe requests in half-open state |
+- **Parameter**: `failure_threshold`; **Value**: 5; **Description**: Failures before opening circuit
+- **Parameter**: `recovery_timeout`; **Value**: 60 seconds; **Description**: Time before testing recovery
+- **Parameter**: `sample_window`; **Value**: 120 seconds; **Description**: Window for counting failures
+- **Parameter**: `half_open_requests`; **Value**: 1; **Description**: Probe requests in half-open state
 
 **State Transitions**:
 
-| From State | Condition | To State |
-| --- | --- | --- |
-| Closed | Failures >= threshold | Open |
-| Open | Recovery timeout elapsed | Half-Open |
-| Half-Open | Probe succeeds | Closed |
-| Half-Open | Probe fails | Open |
+- **From State**: Closed; **Condition**: Failures >= threshold; **To State**: Open
+- **From State**: Open; **Condition**: Recovery timeout elapsed; **To State**: Half-Open
+- **From State**: Half-Open; **Condition**: Probe succeeds; **To State**: Closed
+- **From State**: Half-Open; **Condition**: Probe fails; **To State**: Open
 
 ### Appendix D: WebSocket Channel Reference
 
 **Private Channels**:
 
-| Channel Pattern | Authorization | Events |
-| --- | --- | --- |
-| `character.{id}` | Owner only | `character.updated`, `training.completed` |
-| `user.{id}` | User only | `notification`, `sync.complete` |
+- **Channel Pattern**: `character.{id}`; **Authorization**: Owner only; **Events**: `character.updated`, `training.completed`
+- **Channel Pattern**: `user.{id}`; **Authorization**: User only; **Events**: `notification`, `sync.complete`
 
 **Public Channels**:
 
-| Channel | Events |
-| --- | --- |
-| `global.updates` | `data.synced`, `maintenance.scheduled` |
+- **Channel**: `global.updates`; **Events**: `data.synced`, `maintenance.scheduled`
 
 **Event Payloads**:
 
@@ -4414,20 +4376,18 @@ class ExternalApiCacheFactory extends Factory
 
 ### Appendix E: Error Code Reference
 
-| Code | HTTP Status | Category | Description |
-| --- | --- | --- | --- |
-| `EXT_API_TIMEOUT` | 504 | External API | Request timed out |
-| `EXT_API_UNAVAILABLE` | 503 | External API | All APIs unavailable |
-| `EXT_RATE_LIMITED` | 429 | External API | Rate limit exceeded |
-| `CIRCUIT_OPEN` | 503 | Circuit Breaker | Circuit is open |
-| `CIRCUIT_HALF_OPEN` | 503 | Circuit Breaker | Limited requests allowed |
-| `OCR_INVALID_IMAGE` | 422 | OCR | Invalid image format |
-| `OCR_ENGINE_ERROR` | 500 | OCR | Tesseract processing failed |
-| `OCR_PARSE_FAILED` | 422 | OCR | Could not parse extracted text |
-| `OCR_LOW_CONFIDENCE` | 422 | OCR | Confidence below threshold |
-| `SHARE_FAILED` | 500 | Community | Share creation failed |
-| `SHARE_NOT_FOUND` | 404 | Community | Share token invalid |
-| `SHARE_EXPIRED` | 410 | Community | Share has expired |
+- **Code**: `EXT_API_TIMEOUT`; **HTTP Status**: 504; **Category**: External API; **Description**: Request timed out
+- **Code**: `EXT_API_UNAVAILABLE`; **HTTP Status**: 503; **Category**: External API; **Description**: All APIs unavailable
+- **Code**: `EXT_RATE_LIMITED`; **HTTP Status**: 429; **Category**: External API; **Description**: Rate limit exceeded
+- **Code**: `CIRCUIT_OPEN`; **HTTP Status**: 503; **Category**: Circuit Breaker; **Description**: Circuit is open
+- **Code**: `CIRCUIT_HALF_OPEN`; **HTTP Status**: 503; **Category**: Circuit Breaker; **Description**: Limited requests allowed
+- **Code**: `OCR_INVALID_IMAGE`; **HTTP Status**: 422; **Category**: OCR; **Description**: Invalid image format
+- **Code**: `OCR_ENGINE_ERROR`; **HTTP Status**: 500; **Category**: OCR; **Description**: Tesseract processing failed
+- **Code**: `OCR_PARSE_FAILED`; **HTTP Status**: 422; **Category**: OCR; **Description**: Could not parse extracted text
+- **Code**: `OCR_LOW_CONFIDENCE`; **HTTP Status**: 422; **Category**: OCR; **Description**: Confidence below threshold
+- **Code**: `SHARE_FAILED`; **HTTP Status**: 500; **Category**: Community; **Description**: Share creation failed
+- **Code**: `SHARE_NOT_FOUND`; **HTTP Status**: 404; **Category**: Community; **Description**: Share token invalid
+- **Code**: `SHARE_EXPIRED`; **HTTP Status**: 410; **Category**: Community; **Description**: Share has expired
 
 ### Appendix F: Configuration Reference
 
@@ -4442,9 +4402,9 @@ return [
         'retry_times' => env('UMAPYOI_RETRY_TIMES', 3),
     ],
 
-    'umamusumedb' => [
-        'base_url' => env('UMAMUSUMEDB_BASE_URL', 'https://umamusumedb.com/api'),
-        'timeout' => env('UMAMUSUMEDB_TIMEOUT', 10),
+    'gametora' => [
+        'base_url' => env('GAMETORA_BASE_URL', 'https://gametora.com/api'),
+        'timeout' => env('GAMETORA_TIMEOUT', 10),
     ],
 
     'cache_ttl' => [
@@ -4484,29 +4444,27 @@ return [
 
 ### Appendix G: Change Log
 
-| Version | Date | Author | Changes |
-| --- | --- | --- | --- |
-| 2.2.0 | 2026-01-28 | Development Team | Updated to align with game-accurate mechanics (v2.2.0 architecture), data validation for aptitude grades (G-S) |
-| 2.0.0 | 2026-01-24 | Development Team | Full v2.0.0 alignment, complete technical specification with all services, API endpoints, database schema, testing strategy, and comprehensive appendices |
-| 1.0.0 | 2026-01-14 | Development Team | Initial technical specification |
+- **Version**: 2.3.0; **Date**: 2026-02-22; **Author**: Development Team; **Changes**: Updated to v2.3.0 architecture: GameTora replaces UmamusumeDB, ExternalDataService replaces ExternalAPIService, GameToraScraperService replaces UmamusumeDBApiClient, PHP 8.2+, status complete
+- **Version**: 2.2.0; **Date**: 2026-01-28; **Author**: Development Team; **Changes**: Updated to align with game-accurate mechanics (v2.2.0 architecture), data validation for aptitude grades (G-S)
+- **Version**: 2.0.0; **Date**: 2026-01-24; **Author**: Development Team; **Changes**: Full v2.0.0 alignment, complete technical specification with all services, API endpoints, database schema, testing strategy, and comprehensive appendices
+- **Version**: 1.0.0; **Date**: 2026-01-14; **Author**: Development Team; **Changes**: Initial technical specification
 
 ---
 
 ### Document Approval
 
-| Role | Name | Signature | Date |
-| --- | --- | --- | --- |
-| Tech Lead | [Name] | _________ | 2026-01-24 |
-| Product Owner | [Name] | _________ | 2026-01-24 |
-| QA Lead | [Name] | _________ | 2026-01-24 |
-| DevOps Lead | [Name] | _________ | 2026-01-24 |
+- **Role**: Tech Lead; **Name**: [Name]; **Signature**: _________; **Date**: 2026-01-24
+- **Role**: Product Owner; **Name**: [Name]; **Signature**: _________; **Date**: 2026-01-24
+- **Role**: QA Lead; **Name**: [Name]; **Signature**: _________; **Date**: 2026-01-24
+- **Role**: DevOps Lead; **Name**: [Name]; **Signature**: _________; **Date**: 2026-01-24
 
 ---
 
-**Document Control**  
-**Maintained By**: Backend Development Team  
-**Review Frequency**: Bi-weekly during active development  
-**Next Review Date**: 2026-02-07  
+### Document Control
+
+**Maintained By**: Backend Development Team
+**Review Frequency**: Bi-weekly during active development
+**Next Review Date**: 2026-03-07
 **Distribution**: Development Team, QA Team, DevOps Team, Product Management
 
 ---
