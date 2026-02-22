@@ -37,15 +37,13 @@ The Umamusume Career Planner is a comprehensive web application built with **Lar
 
 ### 1.3 Definitions and Acronyms
 
-| Term | Definition |
-|------|------------|
-| Plan/Career Run | A career run record tracking an Uma Musume character's training progression |
-| Uma Musume | A horse girl character from the Uma Musume: Pretty Derby game |
-| SP (Skill Points) | Points earned from races and events, spent to purchase skills |
-| Stat Soft Cap | Soft cap at 1200 - stats above 1200 count for 50% value (diminishing returns) |
-| URA Finale | The final race series at the end of Senior Year |
-| OCR | Optical Character Recognition for screenshot data extraction |
-| MCP | Model Context Protocol for AI integration |
+- **Term**: Plan/Career Run; **Definition**: A career run record tracking an Uma Musume character's training progression
+- **Term**: Uma Musume; **Definition**: A horse girl character from the Uma Musume: Pretty Derby game
+- **Term**: SP (Skill Points); **Definition**: Points earned from races and events, spent to purchase skills
+- **Term**: Stat Soft Cap; **Definition**: Soft cap at 1200 - stats above 1200 count for 50% value (diminishing returns)
+- **Term**: URA Finale; **Definition**: The final race series at the end of Senior Year
+- **Term**: OCR; **Definition**: Optical Character Recognition for screenshot data extraction
+- **Term**: MCP; **Definition**: Model Context Protocol for AI integration
 
 ---
 
@@ -75,14 +73,12 @@ By providing a modern, AI-enhanced planning platform, we can:
 
 ### 2.3 Business Objectives
 
-| Objective | Success Metric |
-|-----------|----------------|
-| User Adoption | Active users tracking plans |
-| Data Migration | Successful import of legacy data |
-| Accessibility | WCAG AA compliance |
-| Performance | Page load < 2 seconds |
-| Reliability | 99% uptime for Account mode |
-| AI Advisory | Response times within configured timeouts |
+- **Objective**: User Adoption; **Success Metric**: Active users tracking plans
+- **Objective**: Data Migration; **Success Metric**: Successful import of legacy data
+- **Objective**: Accessibility; **Success Metric**: WCAG AA compliance
+- **Objective**: Performance; **Success Metric**: Page load < 2 seconds
+- **Objective**: Reliability; **Success Metric**: 99% uptime for Account mode
+- **Objective**: AI Advisory; **Success Metric**: Response times within configured timeouts
 
 ### 2.4 Value Proposition
 
@@ -119,8 +115,7 @@ mindmap
 
 #### 3.1.1 Players (End Users)
 
-**Needs:**
-
+### Needs
 - Quick and easy plan creation with AI recommendations
 - Offline access to data via PWA
 - Cross-device synchronization
@@ -128,8 +123,7 @@ mindmap
 - Accessible interface (WCAG AA compliant)
 - Intelligent training and race strategy guidance
 
-**Pain Points:**
-
+### Pain Points
 - Current tools are fragmented
 - No AI-powered optimization
 - Poor mobile experience
@@ -137,8 +131,7 @@ mindmap
 
 #### 3.1.2 Developers/Maintainers
 
-**Needs:**
-
+### Needs
 - Single codebase to maintain
 - Modern, well-documented architecture
 - Comprehensive test coverage
@@ -170,17 +163,14 @@ quadrantChart
 
 **Business Need:** Players need to manage their Uma Musume character roster with complete information.
 
-| ID | Requirement | Priority | Status |
-|----|-------------|----------|--------|
-| BR-1.1 | Create, view, update, and delete character records | P0 | Implemented |
-| BR-1.2 | Store character images with visual preview | P1 | Implemented |
-| BR-1.3 | Track aptitude grades for terrain, distance, and style | P0 | Implemented |
-| BR-1.4 | Track growth rate bonuses for all five stats | P0 | Implemented |
-| BR-1.5 | Factor inheritance system with stat/aptitude bonuses | P0 | Implemented |
-| BR-1.6 | Goal management and progress tracking | P1 | Implemented |
+- **ID**: BR-1.1; **Requirement**: Create, view, update, and delete character records; **Priority**: P0; **Status**: Implemented
+- **ID**: BR-1.2; **Requirement**: Store character images with visual preview; **Priority**: P1; **Status**: Implemented
+- **ID**: BR-1.3; **Requirement**: Track aptitude grades for terrain, distance, and style; **Priority**: P0; **Status**: Implemented
+- **ID**: BR-1.4; **Requirement**: Track growth rate bonuses for all five stats; **Priority**: P0; **Status**: Implemented
+- **ID**: BR-1.5; **Requirement**: Factor inheritance system with stat/aptitude bonuses; **Priority**: P0; **Status**: Implemented
+- **ID**: BR-1.6; **Requirement**: Goal management and progress tracking; **Priority**: P1; **Status**: Implemented
 
-**Related Artifacts:**
-
+### Related Artifacts
 - PRD: [PRD-001](prds/PRD-001_Character_Management.md)
 - SPEC: [SPEC-001](specs/SPEC-001_Character_Management_Technical.md)
 - Flow: [FLOW-001](flows/FLOW-001_Character_Management_System.md)
@@ -190,16 +180,13 @@ quadrantChart
 
 **Business Need:** Players need intelligent training recommendations and predictions.
 
-| ID | Requirement | Priority | Status |
-|----|-------------|----------|--------|
-| BR-2.1 | Training prediction engine with stat gain calculations | P0 | Implemented |
-| BR-2.2 | Support card bonus integration | P0 | Implemented |
-| BR-2.3 | Skill hint tracking and SP cost reduction | P0 | Implemented |
-| BR-2.4 | AI-powered training recommendations | P0 | Implemented |
-| BR-2.5 | Training session history and analytics | P1 | Implemented |
+- **ID**: BR-2.1; **Requirement**: Training prediction engine with stat gain calculations; **Priority**: P0; **Status**: Implemented
+- **ID**: BR-2.2; **Requirement**: Support card bonus integration; **Priority**: P0; **Status**: Implemented
+- **ID**: BR-2.3; **Requirement**: Skill hint tracking and SP cost reduction; **Priority**: P0; **Status**: Implemented
+- **ID**: BR-2.4; **Requirement**: AI-powered training recommendations; **Priority**: P0; **Status**: Implemented
+- **ID**: BR-2.5; **Requirement**: Training session history and analytics; **Priority**: P1; **Status**: Implemented
 
-**Related Artifacts:**
-
+### Related Artifacts
 - PRD: [PRD-002](prds/PRD-002_Training_Optimization.md)
 - SPEC: [SPEC-002](specs/SPEC-002_Training_Optimization_Technical.md)
 - Flow: [FLOW-002](flows/FLOW-002_Training_Optimization_System.md)
@@ -209,16 +196,13 @@ quadrantChart
 
 **Business Need:** Players need race preparation guidance and strategy optimization.
 
-| ID | Requirement | Priority | Status |
-|----|-------------|----------|--------|
-| BR-3.1 | Race calendar with requirements and readiness scoring | P0 | Implemented |
-| BR-3.2 | Running style optimization (4 styles) | P0 | Implemented |
-| BR-3.3 | Win probability calculation | P1 | Implemented |
-| BR-3.4 | AI-powered race strategy recommendations | P0 | Implemented |
-| BR-3.5 | Race history and performance analytics | P1 | Implemented |
+- **ID**: BR-3.1; **Requirement**: Race calendar with requirements and readiness scoring; **Priority**: P0; **Status**: Implemented
+- **ID**: BR-3.2; **Requirement**: Running style optimization (4 styles); **Priority**: P0; **Status**: Implemented
+- **ID**: BR-3.3; **Requirement**: Win probability calculation; **Priority**: P1; **Status**: Implemented
+- **ID**: BR-3.4; **Requirement**: AI-powered race strategy recommendations; **Priority**: P0; **Status**: Implemented
+- **ID**: BR-3.5; **Requirement**: Race history and performance analytics; **Priority**: P1; **Status**: Implemented
 
-**Related Artifacts:**
-
+### Related Artifacts
 - PRD: [PRD-003](prds/PRD-003_Race_Strategy.md)
 - SPEC: [SPEC-003](specs/SPEC-003_Race_Strategy_Technical.md)
 - Flow: [FLOW-003](flows/FLOW-003_Race_Strategy_System.md)
@@ -228,16 +212,13 @@ quadrantChart
 
 **Business Need:** Players need to plan and track skill acquisitions efficiently.
 
-| ID | Requirement | Priority | Status |
-|----|-------------|----------|--------|
-| BR-4.1 | Skill catalog with search (English and Japanese) | P0 | Implemented |
-| BR-4.2 | Hint-based SP cost reduction (5 levels: 10%/20%/30%/35%/40% max) | P0 | Implemented |
-| BR-4.3 | Skill evolution system (Normal → Rare) | P0 | Implemented |
-| BR-4.4 | SP budget optimization | P1 | Implemented |
-| BR-4.5 | AI skill build recommendations | P1 | Implemented |
+- **ID**: BR-4.1; **Requirement**: Skill catalog with search (English and Japanese); **Priority**: P0; **Status**: Implemented
+- **ID**: BR-4.2; **Requirement**: Hint-based SP cost reduction (5 levels: 10%/20%/30%/35%/40% max); **Priority**: P0; **Status**: Implemented
+- **ID**: BR-4.3; **Requirement**: Skill evolution system (Normal → Rare); **Priority**: P0; **Status**: Implemented
+- **ID**: BR-4.4; **Requirement**: SP budget optimization; **Priority**: P1; **Status**: Implemented
+- **ID**: BR-4.5; **Requirement**: AI skill build recommendations; **Priority**: P1; **Status**: Implemented
 
-**Related Artifacts:**
-
+### Related Artifacts
 - PRD: [PRD-004](prds/PRD-004_Skill_Management.md)
 - SPEC: [SPEC-004](specs/SPEC-004_Skill_Management_Technical.md)
 - Flow: [FLOW-004](flows/FLOW-004_Skill_Management_System.md)
@@ -247,16 +228,13 @@ quadrantChart
 
 **Business Need:** Players need to optimize support card decks for training.
 
-| ID | Requirement | Priority | Status |
-|----|-------------|----------|--------|
-| BR-5.1 | Support card database (200+ cards with meta tiers) | P0 | Implemented |
-| BR-5.2 | Deck composition validator (6-card deck) | P0 | Implemented |
-| BR-5.3 | Bond level and limit break tracking | P0 | Implemented |
-| BR-5.4 | Deck synergy scoring and recommendations | P1 | Implemented |
-| BR-5.5 | Meta tier synchronization from external sources | P1 | Implemented |
+- **ID**: BR-5.1; **Requirement**: Support card database (200+ cards with meta tiers); **Priority**: P0; **Status**: Implemented
+- **ID**: BR-5.2; **Requirement**: Deck composition validator (6-card deck); **Priority**: P0; **Status**: Implemented
+- **ID**: BR-5.3; **Requirement**: Bond level and limit break tracking; **Priority**: P0; **Status**: Implemented
+- **ID**: BR-5.4; **Requirement**: Deck synergy scoring and recommendations; **Priority**: P1; **Status**: Implemented
+- **ID**: BR-5.5; **Requirement**: Meta tier synchronization from external sources; **Priority**: P1; **Status**: Implemented
 
-**Related Artifacts:**
-
+### Related Artifacts
 - PRD: [PRD-005](prds/PRD-005_Support_Card_Management.md)
 - SPEC: [SPEC-005](specs/SPEC-005_Support_Card_Management_Technical.md)
 - Flow: [FLOW-005](flows/FLOW-005_Support_Card_Management_System.md)
@@ -266,16 +244,13 @@ quadrantChart
 
 **Business Need:** Players need intelligent recommendations across all planning aspects.
 
-| ID | Requirement | Priority | Status |
-|----|-------------|----------|--------|
-| BR-6.1 | Hybrid AI architecture (Ollama local + AWS Bedrock fallback) | P0 | Implemented |
-| BR-6.2 | Training, race, and skill advisory capabilities | P0 | Implemented |
-| BR-6.3 | Conversation history management | P1 | Implemented |
-| BR-6.4 | Cost tracking and budget management for cloud AI | P1 | Implemented |
-| BR-6.5 | Confidence scoring for recommendations | P1 | Implemented |
+- **ID**: BR-6.1; **Requirement**: Hybrid AI architecture (Ollama local + AWS Bedrock fallback); **Priority**: P0; **Status**: Implemented
+- **ID**: BR-6.2; **Requirement**: Training, race, and skill advisory capabilities; **Priority**: P0; **Status**: Implemented
+- **ID**: BR-6.3; **Requirement**: Conversation history management; **Priority**: P1; **Status**: Implemented
+- **ID**: BR-6.4; **Requirement**: Cost tracking and budget management for cloud AI; **Priority**: P1; **Status**: Implemented
+- **ID**: BR-6.5; **Requirement**: Confidence scoring for recommendations; **Priority**: P1; **Status**: Implemented
 
-**Related Artifacts:**
-
+### Related Artifacts
 - PRD: [PRD-006](prds/PRD-006_AI_Advisory.md)
 - SPEC: [SPEC-006](specs/SPEC-006_AI_Advisory_Technical.md)
 - Flow: [FLOW-006](flows/FLOW-006_AI_Advisory_System.md)
@@ -285,16 +260,13 @@ quadrantChart
 
 **Business Need:** Players need accurate, up-to-date game data from external sources.
 
-| ID | Requirement | Priority | Status |
-|----|-------------|----------|--------|
-| BR-7.1 | External API integration (umapyoi.net, UmamusumeDB) | P0 | Implemented |
-| BR-7.2 | Circuit breaker pattern for resilience | P0 | Implemented |
-| BR-7.3 | OCR screenshot processing | P1 | Implemented |
-| BR-7.4 | WebSocket real-time updates (Laravel Reverb) | P1 | Implemented |
-| BR-7.5 | Community data sharing | P2 | Implemented |
+- **ID**: BR-7.1; **Requirement**: External API integration (umapyoi.net, UmamusumeDB); **Priority**: P0; **Status**: Implemented
+- **ID**: BR-7.2; **Requirement**: Circuit breaker pattern for resilience; **Priority**: P0; **Status**: Implemented
+- **ID**: BR-7.3; **Requirement**: OCR screenshot processing; **Priority**: P1; **Status**: Implemented
+- **ID**: BR-7.4; **Requirement**: WebSocket real-time updates (Laravel Reverb); **Priority**: P1; **Status**: Implemented
+- **ID**: BR-7.5; **Requirement**: Community data sharing; **Priority**: P2; **Status**: Implemented
 
-**Related Artifacts:**
-
+### Related Artifacts
 - PRD: [PRD-007](prds/PRD-007_External_Integration.md)
 - SPEC: [SPEC-007](specs/SPEC-007_External_Integration_Technical.md)
 - Flow: [FLOW-007](flows/FLOW-007_External_Integration_System.md)
@@ -303,72 +275,60 @@ quadrantChart
 
 **Business Need:** Players need reliable data import, export, and backup capabilities.
 
-| ID | Requirement | Priority | Status |
-|----|-------------|----------|--------|
-| BR-8.1 | JSON import/export with schema versioning | P0 | Implemented |
-| BR-8.2 | Excel export (.xlsx) | P1 | Implemented |
-| BR-8.3 | Backup and restore workflows | P0 | Implemented |
-| BR-8.4 | Data migration between storage modes | P1 | Implemented |
-| BR-8.5 | OCR-based data capture and validation | P1 | Implemented |
+- **ID**: BR-8.1; **Requirement**: JSON import/export with schema versioning; **Priority**: P0; **Status**: Implemented
+- **ID**: BR-8.2; **Requirement**: Excel export (.xlsx); **Priority**: P1; **Status**: Implemented
+- **ID**: BR-8.3; **Requirement**: Backup and restore workflows; **Priority**: P0; **Status**: Implemented
+- **ID**: BR-8.4; **Requirement**: Data migration between storage modes; **Priority**: P1; **Status**: Implemented
+- **ID**: BR-8.5; **Requirement**: OCR-based data capture and validation; **Priority**: P1; **Status**: Implemented
 
 ### 4.9 Dual Storage Mode [BR-9]
 
 **Business Need:** Players need flexibility in how their data is stored and accessed.
 
-| ID | Requirement | Priority | Status |
-|----|-------------|----------|--------|
-| BR-9.1 | Local storage mode (browser localStorage) | P0 | Implemented |
-| BR-9.2 | Account storage mode (database) | P0 | Implemented |
-| BR-9.3 | Clear visual indication of storage mode | P0 | Implemented |
-| BR-9.4 | Full offline functionality for Local runs | P0 | Implemented |
-| BR-9.5 | Convert Local runs to Account runs | P0 | Implemented |
-| BR-9.6 | Local data management interface | P1 | Implemented |
+- **ID**: BR-9.1; **Requirement**: Local storage mode (browser localStorage); **Priority**: P0; **Status**: Implemented
+- **ID**: BR-9.2; **Requirement**: Account storage mode (database); **Priority**: P0; **Status**: Implemented
+- **ID**: BR-9.3; **Requirement**: Clear visual indication of storage mode; **Priority**: P0; **Status**: Implemented
+- **ID**: BR-9.4; **Requirement**: Full offline functionality for Local runs; **Priority**: P0; **Status**: Implemented
+- **ID**: BR-9.5; **Requirement**: Convert Local runs to Account runs; **Priority**: P0; **Status**: Implemented
+- **ID**: BR-9.6; **Requirement**: Local data management interface; **Priority**: P1; **Status**: Implemented
 
 ### 4.10 Performance and Reliability [BR-10]
 
 **Business Need:** System must be performant and reliable for power users.
 
-| ID | Requirement | Priority | Status |
-|----|-------------|----------|--------|
-| BR-10.1 | APM and performance dashboards | P1 | In Progress |
-| BR-10.2 | Cache monitoring and invalidation | P1 | In Progress |
-| BR-10.3 | Fallback and degradation workflows | P1 | In Progress |
-| BR-10.4 | Page load < 2 seconds | P0 | Implemented |
+- **ID**: BR-10.1; **Requirement**: APM and performance dashboards; **Priority**: P1; **Status**: In Progress
+- **ID**: BR-10.2; **Requirement**: Cache monitoring and invalidation; **Priority**: P1; **Status**: In Progress
+- **ID**: BR-10.3; **Requirement**: Fallback and degradation workflows; **Priority**: P1; **Status**: In Progress
+- **ID**: BR-10.4; **Requirement**: Page load < 2 seconds; **Priority**: P0; **Status**: Implemented
 
 ### 4.11 User Experience and Accessibility [BR-11]
 
 **Business Need:** Application must be accessible and provide excellent UX.
 
-| ID | Requirement | Priority | Status |
-|----|-------------|----------|--------|
-| BR-11.1 | PWA offline route coverage | P1 | In Progress |
-| BR-11.2 | Accessibility pages and keyboard shortcuts | P1 | In Progress |
-| BR-11.3 | Dark/Light mode toggle with persistence | P0 | Implemented |
-| BR-11.4 | Responsive design (320px to 2560px) | P0 | Implemented |
-| BR-11.5 | WCAG AA accessibility compliance | P0 | Implemented |
+- **ID**: BR-11.1; **Requirement**: PWA offline route coverage; **Priority**: P1; **Status**: In Progress
+- **ID**: BR-11.2; **Requirement**: Accessibility pages and keyboard shortcuts; **Priority**: P1; **Status**: In Progress
+- **ID**: BR-11.3; **Requirement**: Dark/Light mode toggle with persistence; **Priority**: P0; **Status**: Implemented
+- **ID**: BR-11.4; **Requirement**: Responsive design (320px to 2560px); **Priority**: P0; **Status**: Implemented
+- **ID**: BR-11.5; **Requirement**: WCAG AA accessibility compliance; **Priority**: P0; **Status**: Implemented
 
 ### 4.12 MCP Integration [BR-12]
 
 **Business Need:** Development team needs AI orchestration, tool management, and monitoring capabilities.
 
-| ID | Requirement | Priority | Status |
-|----|-------------|----------|--------|
-| BR-12.1 | Laravel MCP server with custom tools | P1 | Implemented |
-| BR-12.2 | MCP agent configuration and orchestration | P1 | Implemented |
-| BR-12.3 | MCP tool usage monitoring and dashboards | P1 | Implemented |
-| BR-12.4 | MCP server management interface | P2 | Implemented |
+- **ID**: BR-12.1; **Requirement**: Laravel MCP server with custom tools; **Priority**: P1; **Status**: Implemented
+- **ID**: BR-12.2; **Requirement**: MCP agent configuration and orchestration; **Priority**: P1; **Status**: Implemented
+- **ID**: BR-12.3; **Requirement**: MCP tool usage monitoring and dashboards; **Priority**: P1; **Status**: Implemented
+- **ID**: BR-12.4; **Requirement**: MCP server management interface; **Priority**: P2; **Status**: Implemented
 
 ### 4.13 Admin Panel [BR-13]
 
 **Business Need:** Administrators need system management and monitoring capabilities.
 
-| ID | Requirement | Priority | Status |
-|----|-------------|----------|--------|
-| BR-13.1 | Database management interface | P1 | Implemented |
-| BR-13.2 | Application log viewer | P1 | Implemented |
-| BR-13.3 | Queue monitor dashboard | P1 | Implemented |
-| BR-13.4 | User management | P1 | Implemented |
-| BR-13.5 | System settings configuration | P2 | Implemented |
+- **ID**: BR-13.1; **Requirement**: Database management interface; **Priority**: P1; **Status**: Implemented
+- **ID**: BR-13.2; **Requirement**: Application log viewer; **Priority**: P1; **Status**: Implemented
+- **ID**: BR-13.3; **Requirement**: Queue monitor dashboard; **Priority**: P1; **Status**: Implemented
+- **ID**: BR-13.4; **Requirement**: User management; **Priority**: P1; **Status**: Implemented
+- **ID**: BR-13.5; **Requirement**: System settings configuration; **Priority**: P2; **Status**: Implemented
 
 ### 4.14 Requirements Priority Matrix
 
@@ -385,48 +345,40 @@ pie title Requirements by Priority
 
 ### 5.1 Data Validation Rules
 
-| Rule ID | Rule Description |
-|---------|------------------|
-| BV-1 | Plan title is required and cannot be empty |
-| BV-2 | Stat values have soft cap at 1200 (50% effectiveness above), practical max ~1600 |
-| BV-3 | Turn numbers must be between 1 and 78 |
-| BV-4 | Skill status "Acquired" requires turn_acquired value |
-| BV-5 | Energy level must be between 0 and 100 |
-| BV-6 | Support deck must contain exactly 6 cards (5 owned + 1 borrowed) |
-| BV-7 | Skill hint levels cap at 5 (40% maximum discount: 10%/20%/30%/35%/40%) |
+- **Rule ID**: BV-1; **Rule Description**: Plan title is required and cannot be empty
+- **Rule ID**: BV-2; **Rule Description**: Stat values have soft cap at 1200 (50% effectiveness above), practical max ~1600
+- **Rule ID**: BV-3; **Rule Description**: Turn numbers must be between 1 and 78
+- **Rule ID**: BV-4; **Rule Description**: Skill status "Acquired" requires turn_acquired value
+- **Rule ID**: BV-5; **Rule Description**: Energy level must be between 0 and 100
+- **Rule ID**: BV-6; **Rule Description**: Support deck must contain exactly 6 cards (5 owned + 1 borrowed)
+- **Rule ID**: BV-7; **Rule Description**: Skill hint levels cap at 5 (40% maximum discount: 10%/20%/30%/35%/40%)
 
 ### 5.2 Calculation Rules
 
-| Rule ID | Rule Description |
-|---------|------------------|
-| BC-1 | Stat soft cap at 1200 (values above count for 50%, practical max ~1600) |
-| BC-2 | Acquired SP = sum of sp_cost where status = acquired |
-| BC-3 | Mood modifiers: Great +4%, Good +2%, Normal 0%, Bad -2%, Awful -4% |
-| BC-4 | Aptitude effectiveness: S=+5% (max), A=0% (baseline), B=-10%, C=-20%, D=-30%/-40%, E=-50%/-60%, F=-70%/-80%, G=-90% |
-| BC-5 | Skill hint discount: Level 1=10%, Level 2=20%, Level 3=30%, Level 4=35%, Level 5=40% (max) |
-| BC-6 | Factor inheritance: ★☆☆=+5, ★★☆=+12, ★★★=+21 bonus |
+- **Rule ID**: BC-1; **Rule Description**: Stat soft cap at 1200 (values above count for 50%, practical max ~1600)
+- **Rule ID**: BC-2; **Rule Description**: Acquired SP = sum of sp_cost where status = acquired
+- **Rule ID**: BC-3; **Rule Description**: Mood modifiers: Great +4%, Good +2%, Normal 0%, Bad -2%, Awful -4%
+- **Rule ID**: BC-4; **Rule Description**: Aptitude effectiveness: S=+5% (max), A=0% (baseline), B=-10%, C=-20%, D=-30%/-40%, E=-50%/-60%, F=-70%/-80%, G=-90%
+- **Rule ID**: BC-5; **Rule Description**: Skill hint discount: Level 1=10%, Level 2=20%, Level 3=30%, Level 4=35%, Level 5=40% (max)
+- **Rule ID**: BC-6; **Rule Description**: Factor inheritance: ★☆☆=+5, ★★☆=+12, ★★★=+21 bonus
 
 ### 5.3 Storage Rules
 
-| Rule ID | Rule Description |
-|---------|------------------|
-| BS-1 | Local runs use UUID identifiers |
-| BS-2 | Account runs use database integer IDs |
-| BS-3 | Local runs are fully functional offline |
-| BS-4 | Account runs require network connectivity to save |
-| BS-5 | Drafts are always saved to localStorage regardless of storage mode |
-| BS-6 | External API data cached for 24 hours |
-| BS-7 | Training predictions cached for 5 minutes |
+- **Rule ID**: BS-1; **Rule Description**: Local runs use UUID identifiers
+- **Rule ID**: BS-2; **Rule Description**: Account runs use database integer IDs
+- **Rule ID**: BS-3; **Rule Description**: Local runs are fully functional offline
+- **Rule ID**: BS-4; **Rule Description**: Account runs require network connectivity to save
+- **Rule ID**: BS-5; **Rule Description**: Drafts are always saved to localStorage regardless of storage mode
+- **Rule ID**: BS-6; **Rule Description**: External API data cached for 24 hours
+- **Rule ID**: BS-7; **Rule Description**: Training predictions cached for 5 minutes
 
 ### 5.4 AI Advisory Rules
 
-| Rule ID | Rule Description |
-|---------|------------------|
-| BA-1 | Local Ollama model used as primary for simple queries |
-| BA-2 | AWS Bedrock used as fallback for complex decisions or local unavailability |
-| BA-3 | AI responses include confidence scores |
-| BA-4 | Token usage tracked for cost management |
-| BA-5 | Conversation context maintained per session |
+- **Rule ID**: BA-1; **Rule Description**: Local Ollama model used as primary for simple queries
+- **Rule ID**: BA-2; **Rule Description**: AWS Bedrock used as fallback for complex decisions or local unavailability
+- **Rule ID**: BA-3; **Rule Description**: AI responses include confidence scores
+- **Rule ID**: BA-4; **Rule Description**: Token usage tracked for cost management
+- **Rule ID**: BA-5; **Rule Description**: Conversation context maintained per session
 
 ---
 
@@ -522,32 +474,26 @@ flowchart TD
 
 ### 7.1 User Experience Metrics
 
-| Metric | Target | Measurement Method |
-|--------|--------|-------------------|
-| Time to create first plan | < 30 seconds | User testing |
-| Task completion rate | > 95% | Analytics |
-| User satisfaction | > 4/5 stars | Surveys |
-| AI recommendation acceptance rate | > 70% | Analytics |
+- **Metric**: Time to create first plan; **Target**: < 30 seconds; **Measurement Method**: User testing
+- **Metric**: Task completion rate; **Target**: > 95%; **Measurement Method**: Analytics
+- **Metric**: User satisfaction; **Target**: > 4/5 stars; **Measurement Method**: Surveys
+- **Metric**: AI recommendation acceptance rate; **Target**: > 70%; **Measurement Method**: Analytics
 
 ### 7.2 Technical Metrics
 
-| Metric | Target | Measurement Method |
-|--------|--------|-------------------|
-| Page load time | < 2 seconds | Performance monitoring |
-| First Contentful Paint | < 1.5 seconds | Lighthouse |
-| Accessibility score | 100% AA | axe-core |
-| Error rate | < 1% | Error logging |
-| AI response time | < 3 seconds | APM monitoring |
-| API fallback success rate | > 95% | Circuit breaker metrics |
+- **Metric**: Page load time; **Target**: < 2 seconds; **Measurement Method**: Performance monitoring
+- **Metric**: First Contentful Paint; **Target**: < 1.5 seconds; **Measurement Method**: Lighthouse
+- **Metric**: Accessibility score; **Target**: 100% AA; **Measurement Method**: axe-core
+- **Metric**: Error rate; **Target**: < 1%; **Measurement Method**: Error logging
+- **Metric**: AI response time; **Target**: < 3 seconds; **Measurement Method**: APM monitoring
+- **Metric**: API fallback success rate; **Target**: > 95%; **Measurement Method**: Circuit breaker metrics
 
 ### 7.3 Data Quality Metrics
 
-| Metric | Target | Measurement Method |
-|--------|--------|-------------------|
-| Successful data imports | > 90% | Import logs |
-| OCR accuracy rate | > 85% | Validation logs |
-| External API sync success | > 95% | Sync logs |
-| Backup completion rate | 100% | Backup logs |
+- **Metric**: Successful data imports; **Target**: > 90%; **Measurement Method**: Import logs
+- **Metric**: OCR accuracy rate; **Target**: > 85%; **Measurement Method**: Validation logs
+- **Metric**: External API sync success; **Target**: > 95%; **Measurement Method**: Sync logs
+- **Metric**: Backup completion rate; **Target**: 100%; **Measurement Method**: Backup logs
 
 ---
 
@@ -576,25 +522,21 @@ flowchart TD
 
 ### 9.1 External Dependencies
 
-| Dependency | Description | Risk Level |
-|------------|-------------|------------|
-| Browser localStorage API | Local run storage | Low |
-| Livewire connection | Account run operations | Medium |
-| Database availability | Account data persistence | Medium |
-| umapyoi.net API | Primary external game data | Medium |
-| UmamusumeDB API | Fallback external game data | Low |
-| AWS Bedrock | Cloud AI fallback | Medium |
-| Ollama | Local AI primary | Low |
+- **Dependency**: Browser localStorage API; **Description**: Local run storage; **Risk Level**: Low
+- **Dependency**: Livewire connection; **Description**: Account run operations; **Risk Level**: Medium
+- **Dependency**: Database availability; **Description**: Account data persistence; **Risk Level**: Medium
+- **Dependency**: umapyoi.net API; **Description**: Primary external game data; **Risk Level**: Medium
+- **Dependency**: UmamusumeDB API; **Description**: Fallback external game data; **Risk Level**: Low
+- **Dependency**: AWS Bedrock; **Description**: Cloud AI fallback; **Risk Level**: Medium
+- **Dependency**: Ollama; **Description**: Local AI primary; **Risk Level**: Low
 
 ### 9.2 Internal Dependencies
 
-| Dependency | Description |
-|------------|-------------|
-| Character data | Required before creating career runs |
-| Skill reference database | Required for skill autocomplete and management |
-| Support card database | Required for deck building |
-| Authentication (optional) | Required for Account mode |
-| AI services | Required for training/race recommendations |
+- **Dependency**: Character data; **Description**: Required before creating career runs
+- **Dependency**: Skill reference database; **Description**: Required for skill autocomplete and management
+- **Dependency**: Support card database; **Description**: Required for deck building
+- **Dependency**: Authentication (optional); **Description**: Required for Account mode
+- **Dependency**: AI services; **Description**: Required for training/race recommendations
 
 ### 9.3 Dependency Graph
 
@@ -634,14 +576,12 @@ flowchart BT
 
 ### 10.2 Revision History
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 2.4.0 | 2026-02-22 | Development Team | Added MCP Integration (BR-12) and Admin Panel (BR-13) business requirements; updated priority matrix counts |
-| 2.3.0 | 2026-02-21 | Development Team | Updated tech stack references (Livewire 4, Neuron AI v2.11); replaced TypeScript with Livewire 4 + Alpine.js 3; aligned with v2.3.0 architecture |
-| 2.2.0 | 2026-01-28 | Development Team | Aligned with codebase v2.2.0 |
-| 2.1.0 | 2026-01-23 | Development Team | Updated scope and requirements to match implementation; added AI integration requirements; added external API integration; aligned with v2.0 architecture |
-| 1.0 | 2026-01-14 | Development Team | Initial draft |
+- **Version**: 2.4.0; **Date**: 2026-02-22; **Author**: Development Team; **Changes**: Added MCP Integration (BR-12) and Admin Panel (BR-13) business requirements; updated priority matrix counts
+- **Version**: 2.3.0; **Date**: 2026-02-21; **Author**: Development Team; **Changes**: Updated tech stack references (Livewire 4, Neuron AI v2.11); replaced TypeScript with Livewire 4 + Alpine.js 3; aligned with v2.3.0 architecture
+- **Version**: 2.2.0; **Date**: 2026-01-28; **Author**: Development Team; **Changes**: Aligned with codebase v2.2.0
+- **Version**: 2.1.0; **Date**: 2026-01-23; **Author**: Development Team; **Changes**: Updated scope and requirements to match implementation; added AI integration requirements; added external API integration; aligned with v2.0 architecture
+- **Version**: 1.0; **Date**: 2026-01-14; **Author**: Development Team; **Changes**: Initial draft
 
 ---
 
-*This BRS describes the current business scope as implemented in version 2.4.0.*
+### This BRS describes the current business scope as implemented in version 2.4.0
