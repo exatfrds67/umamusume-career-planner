@@ -1,17 +1,17 @@
 # Updated Entity Relationship Diagram
 
-**Database Schema**: 18-Table Implementation
-**Updated**: January 12, 2026
+**Database Schema**: 30-Model Implementation (56 Migrations)
+**Updated**: February 22, 2026
 **Status**: ✅ **VERIFIED AGAINST ACTUAL IMPLEMENTATION**
 
 ## Complete Entity Relationship Diagram
 
-This diagram reflects the actual implemented database structure with all 18 tables and their relationships.
+This diagram reflects the actual implemented database structure with all 30 models (core tables shown) and their relationships.
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────────────┐
 │                           UMAMUSUME CAREER PLANNER DATABASE SCHEMA                  │
-│                                    18 Tables (ucp_ prefix)                          │
+│                          30 Models, 56 Migrations (ucp_ prefix)                     │
 └─────────────────────────────────────────────────────────────────────────────────────┘
 
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
@@ -231,7 +231,7 @@ This diagram reflects the actual implemented database structure with all 18 tabl
 
 ---
 
-**Diagram Updated**: January 12, 2026
+**Diagram Updated**: February 22, 2026
 **Verification Status**: ✅ **MATCHES ACTUAL IMPLEMENTATION**
 **Relationship Count**: 25+ properly defined relationships
 **Integrity Status**: ✅ **FULL REFERENTIAL INTEGRITY**

@@ -1,7 +1,7 @@
 # Umamusume Career Planner - Game Alignment Implementation Plan
 
 **Document Version**: 1.0.0  
-**Date**: January 28, 2026  
+**Date**: February 22, 2026  
 **Purpose**: Actionable implementation plan for game-aligned UI/UX  
 **Status**: Active Planning Document
 
@@ -345,7 +345,7 @@ This document translates the game UI analysis into concrete implementation tasks
 
 ### 4.1 Tailwind Configuration
 
-**File:** `tailwind.config.js`
+**File:** Tailwind CSS v4 `@theme` directive in CSS
 
 ```javascript
 export default {

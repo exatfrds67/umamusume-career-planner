@@ -53,7 +53,7 @@ Comprehensive breadcrumb navigation has been implemented across the Umamusume Ca
 
 #### Character Subpages
 
-6. **Create Character** (`/characters/create`)
+1. **Create Character** (`/characters/create`)
    - Breadcrumb: `Home > Characters > Create Character`
 
 2. **Manage Factors** (`/characters/{id}/factors`)
@@ -61,12 +61,12 @@ Comprehensive breadcrumb navigation has been implemented across the Umamusume Ca
 
 #### Training Pages
 
-8. **Training Predictions** (`/training/predictions`)
+1. **Training Predictions** (`/training/predictions`)
    - Breadcrumb: `Home > Training > Predictions`
 
 #### Data Management Group
 
-9. **Data Management Hub** (`/data-management`)
+1. **Data Management Hub** (`/data-management`)
    - Breadcrumb: `Home > Data Management`
 
 2. **Import Data** (`/import`)
@@ -80,7 +80,7 @@ Comprehensive breadcrumb navigation has been implemented across the Umamusume Ca
 
 #### Analytics & Reports Group
 
-13. **Reports** (`/reports`)
+1. **Reports** (`/reports`)
     - Breadcrumb: `Home > Analytics & Reports > Reports`
 
 2. **Historical Tracking** (`/historical`)
@@ -91,7 +91,7 @@ Comprehensive breadcrumb navigation has been implemented across the Umamusume Ca
 
 #### AI & Tools Group
 
-16. **AI Chat** (`/ai/chat`)
+1. **AI Chat** (`/ai/chat`)
     - Breadcrumb: `Home > AI & Tools > AI Chat`
 
 2. **OCR Upload** (`/ocr/upload`)
@@ -99,12 +99,12 @@ Comprehensive breadcrumb navigation has been implemented across the Umamusume Ca
 
 #### External Resources
 
-18. **Browse External Data** (`/external-data/browse`)
+1. **Browse External Data** (`/external-data/browse`)
     - Breadcrumb: `Home > External Resources > Browse Data`
 
 #### Profile & Settings
 
-19. **Profile** (`/profile`)
+1. **Profile** (`/profile`)
     - Breadcrumb: `Home > Profile`
 
 2. **Settings** (`/settings`)

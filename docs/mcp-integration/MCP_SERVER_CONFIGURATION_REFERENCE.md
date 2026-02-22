@@ -78,7 +78,35 @@ This document provides the authoritative reference for all Model Context Protoco
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### 2.2 MCP Server Categories
+### 2.2 Current Laravel Service Implementation
+
+The application implements 19 MCP service classes in `app/Services/MCP/`:
+
+| Service | Purpose |
+|---------|--------|
+| `AgentOrchestrationService` | Multi-agent workflow coordination and result aggregation |
+| `AgentCommunicationService` | Inter-agent messaging and event dispatching |
+| `AgentContextService` | Cross-session context management for agents |
+| `AgentLifecycleManager` | Agent lifecycle (start, stop, restart, health) |
+| `AgentMemoryService` | Persistent knowledge graph memory for agents |
+| `AgentRoutingService` | Intelligent routing of requests to appropriate agents |
+| `APIPerformanceAnalyticsService` | API response time tracking and analytics |
+| `CareerStateSyncService` | Career run state synchronization across agents |
+| `CostManagementService` | AWS cost tracking and budget management |
+| `CostOptimizationService` | Cost reduction strategies and recommendations |
+| `FailureRateTrackingService` | Error rate monitoring and circuit breaker support |
+| `MCPClientService` | Core MCP protocol client for server communication |
+| `MCPHealthDashboardService` | Aggregated health dashboard data |
+| `MCPMonitoringService` | Server health checks and alerting |
+| `RealTimeMonitoringService` | Real-time metrics and performance monitoring |
+| `SkillOptimizationOrchestrationService` | Multi-agent skill analysis orchestration |
+| `SubagentCoordinationService` | Subagent task delegation and result merging |
+| `TrainingOptimizationAgent` | Training decision analysis agent |
+| `WorkflowTemplateService` | Predefined workflow template management |
+
+Additionally, `app/MCP/SubagentCoordinationService.php` provides top-level subagent coordination.
+
+### 2.3 MCP Server Categories
 
 | Category | Servers | Purpose |
 |----------|---------|---------|

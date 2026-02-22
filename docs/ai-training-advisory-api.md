@@ -6,7 +6,7 @@ The AI Training Advisory System provides RESTful API endpoints for generating in
 
 **Base URL**: `/api/advisory`
 
-**Authentication**: Required for Account Mode operations
+**Authentication**: Required (Sanctum token-based) for all operations
 
 **Content-Type**: `application/json`
 
@@ -321,8 +321,8 @@ Record actual race outcome for prediction accuracy tracking.
 
 ## Rate Limiting
 
-- **Authenticated Users**: 60 requests per minute
-- **Anonymous Users** (Local Mode): 30 requests per minute
+- **Authenticated Users**: 10 requests per minute (throttle: `10,1`)
+- All advisory endpoints require `auth:sanctum` middleware
 
 ---
 
@@ -363,7 +363,7 @@ The API implements intelligent caching:
 
 Current API Version: **v1**
 
-Version is specified in the URL: `/api/v1/advisory/...`
+Advisory endpoints are accessed at: `/api/advisory/...`
 
 ---
 

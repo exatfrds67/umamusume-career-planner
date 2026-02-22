@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 1.0
-**Date**: January 12, 2026
+**Document Version**: 2.0
+**Date**: February 22, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Complete
+**Status**: Current (Revised)
 **Task**: 1.3.5 - Documentation Gap Analysis and Enhancement
 
 ---
@@ -33,24 +33,27 @@
 
 ## Executive Summary
 
-This documentation gap analysis identifies and addresses inconsistencies, missing implementation details, and technical inaccuracies across all specification documents (001-017) for the UmamusumeCareerPlanner project. The analysis ensures all documentation aligns with the implemented 18-table database schema, current technology versions, and MCP server integration architecture.
+This documentation gap analysis identifies and addresses inconsistencies, missing implementation details, and technical inaccuracies across all specification documents (001-017) for the UmamusumeCareerPlanner project. The analysis ensures all documentation aligns with the implemented 30-model database schema (56 migrations, `ucp_` prefix), current technology versions, and MCP server integration architecture.
 
 ### Key Findings
 
-- **Technology References**: All deprecated API references updated (SimpleSandman → umapyoi.net)
-- **Database Alignment**: All documentation reflects the actual implemented 18-table schema
+- **Technology References**: All deprecated API references updated (SimpleSandman → umapyoi.net, UmamusumeDB → GameTora)
+- **Database Alignment**: All documentation reflects the actual implemented 30-model schema (56 migrations) with `ucp_` prefix
 - **MCP Integration**: Comprehensive MCP server configurations documented and standardized
 - **Laravel 12 Compliance**: All code examples updated to use Laravel 12 syntax and features
-- **Testing Framework**: Pest PHP framework integration documented with Laravel-optimized patterns
+- **Testing Framework**: Pest v4 PHP framework integration documented with Laravel-optimized patterns (3,316+ tests, 11,563+ assertions)
 - **Accessibility Standards**: WCAG 2.2 AA compliance requirements clarified and standardized
+- **AI Integration**: Neuron AI v2.11 with Ollama + AWS Bedrock documented
 
 ### Critical Updates Made
 
-1. **API Integration**: Replaced deprecated SimpleSandman/UmaMusumeAPI with umapyoi.net as primary data source
+1. **API Integration**: Replaced deprecated SimpleSandman/UmaMusumeAPI with umapyoi.net as primary data source; UmamusumeDB replaced with GameTora as secondary
 2. **Framework Versions**: Confirmed Laravel 12 and Tailwind CSS v4 release dates and features
 3. **MCP Architecture**: Added comprehensive MCP server integration for AI services and infrastructure management
-4. **Testing Strategy**: Replaced PHPUnit with Pest PHP testing framework for Laravel-optimized testing
-5. **Database Schema**: Aligned all documentation with implemented 18-table structure
+4. **Testing Strategy**: Uses Pest v4 PHP testing framework with browser testing, PHPUnit v12 (3,316+ tests, 11,563+ assertions)
+5. **Database Schema**: Aligned all documentation with implemented 30-model structure (56 migrations)
+6. **AI Framework**: Added Neuron AI v2.11 integration with multi-provider support (Ollama + AWS Bedrock)
+7. **Frontend Stack**: Livewire 4 + Alpine.js 3 + TailwindCSS v4 documented
 
 ---
 
@@ -163,7 +166,7 @@ class Character extends Model
 
 **Corrections Applied**:
 
-- Verified all 18 tables match implementation
+- Verified all 30 models match implementation
 - Standardized foreign key naming conventions
 - Added comprehensive index documentation
 - Updated entity relationship diagrams
@@ -198,6 +201,8 @@ class Character extends Model
 | Laravel 12 | Framework version | Laravel v12, Laravel 12.x |
 | Pest PHP | Testing framework | Pest, PestPHP |
 | Tailwind CSS v4 | CSS framework version | Tailwind v4, TailwindCSS 4 |
+| GameTora | External game data reference | Game Tora, Gametora |
+| Neuron AI | AI agent framework | NeuronAI, Neuron |
 
 ### Naming Conventions
 
@@ -253,7 +258,7 @@ class Character extends Model
 | API Service | Status | Usage | Documentation |
 |-------------|--------|-------|---------------|
 | **umapyoi.net** | ✅ Active | Primary data source | Character, support card, news data |
-| **UmamusumeDB.com** | ⚠️ Verification needed | Training calculations | Meta data and optimization |
+| **GameTora** | ✅ Active | Secondary data source | Meta data, training calculations, game reference |
 | **SimpleSandman/UmaMusumeAPI** | ❌ Deprecated (EOL Oct 2024) | Replaced by umapyoi.net | Archived repository |
 
 ### API Integration Patterns
@@ -392,7 +397,7 @@ class TrainingOptimizationService
 
 ## Database Schema Alignment
 
-### Implemented Schema (18 Tables)
+### Implemented Schema (30 Models, 56 Migrations)
 
 **Core Entities**:
 

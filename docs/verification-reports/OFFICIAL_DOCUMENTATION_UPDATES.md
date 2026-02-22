@@ -1,8 +1,8 @@
-# Official Documentation Updates (January 14, 2026)
+# Official Documentation Updates (February 22, 2026)
 
 ## Overview
 
-This document consolidates official documentation findings for all major technology components used in the Umamusume Career Planner. All information sourced from official vendor documentation and verified as current as of January 14, 2026.
+This document consolidates official documentation findings for all major technology components used in the Umamusume Career Planner. All information sourced from official vendor documentation and verified as current as of February 22, 2026.
 
 ---
 
@@ -17,10 +17,10 @@ This document consolidates official documentation findings for all major technol
 
 #### PHP Version Requirements
 
-- **Official**: PHP 8.1 or higher (Laravel Boost compatible)
+- **Official**: PHP 8.2 or higher (Laravel Boost compatible)
 - **Official Installer Default**: PHP 8.4
-- **Current Specification Error**: Design doc claims PHP 8.3+ (overconstrained)
-- **Correction**: Update to "PHP 8.1 or higher"
+- **Current Runtime**: PHP 8.4.11
+- **Correction**: Update to "PHP 8.2 or higher"
 
 #### Laravel 12 Key Architecture Changes
 
@@ -149,7 +149,7 @@ This document consolidates official documentation findings for all major technol
 ### Official Source
 
 - **Site**: <https://pestphp.com>
-- **Latest Version**: 4.0 (includes browser testing)
+- **Latest Version**: 4.0 (includes browser testing, smoke testing)
 - **Status**: March 2025 features stable and released
 
 ### Verified Information
@@ -305,11 +305,10 @@ From official documentation and package repositories:
 
 ### Priority 1 (Critical - Incorrect in Current Specs)
 
-1. **Frontend Stack**: Specs list React/Vue which aren't installed
-   - **Actual**: Tailwind CSS v4 + Vite v7 + plain Blade templates
+1. **Frontend Stack**: Specs now correctly list Livewire 4 + Alpine.js 3 + Tailwind CSS v4 + Vite
+   - **Actual**: Livewire 4, Alpine.js 3, Tailwind CSS v4, Vite
 
-2. **PHP Version**: Specs require 8.3+ but Laravel only requires 8.1+
-   - **Impact**: Unnecessary constraint
+2. **PHP Version**: Specs updated to PHP 8.2+ (runtime 8.4.11)
 
 3. **Database Default**: Specs show MySQL config but default is SQLite
    - **Impact**: Developers may expect MySQL configuration
@@ -336,8 +335,8 @@ From official documentation and package repositories:
 ### Immediate (Next Development Phase)
 
 1. Update design.md database section to show SQLite default
-2. Correct PHP version requirement in design.md (8.1+ not 8.3+)
-3. Remove React/Vue component examples (use Blade instead)
+2. PHP version requirement is PHP 8.2+ (runtime 8.4.11)
+3. Frontend stack: Livewire 4 + Alpine.js 3 + Blade templates
 4. Clarify queue default is database driver, not Redis
 
 ### Short-term (This Month)
@@ -365,6 +364,6 @@ From official documentation and package repositories:
 - AWS Bedrock Pricing: <https://aws.amazon.com/bedrock/pricing>
 - AWS Documentation: <https://docs.aws.amazon.com/bedrock>
 
-**Last Updated**: January 14, 2026
+**Last Updated**: February 22, 2026
 **Verified Against**: Official vendor documentation
 **Status**: All information current and verified

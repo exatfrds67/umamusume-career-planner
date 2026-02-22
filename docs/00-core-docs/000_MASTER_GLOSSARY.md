@@ -40,7 +40,7 @@ This glossary defines all core terminology used in the Umamusume Pretty Derby Ca
 - **Stat**: Guts; **Japanese**: 根性; **Definition**: Affects race **position holding**, resistance to position loss in navigation battles; contributes to final sprint and recovers stamina under force-out conditions (not just "last spurt strength").; **Range**: 0-1200; **Priority**: ★★
 - **Stat**: Wit; **Japanese**: 賢さ; **Definition**: Influences **skill activation rate**, likelihood to **avoid "kakari" status** (stamina penalty), and general race event triggers; good Wit is more important than pure stat for race stability.; **Range**: 0-1200; **Priority**: ★★★
 
-### Stat Grade Scale:
+### Stat Grade Scale
 
 - **Grade**: SS; **Value Range**: 1100-1200; **Effectiveness**: Elite tier
 - **Grade**: S; **Value Range**: 950-1099; **Effectiveness**: Excellent
@@ -63,10 +63,11 @@ This glossary defines all core terminology used in the Umamusume Pretty Derby Ca
 - **Term**: Surface Aptitude; **Japanese**: バ場適性; **In-Game Label (EN)**: Surface; **Description**: Preferred ground: Turf or Dirt; **Categories**: Turf, Dirt
 - **Term**: Running Style Aptitude; **Japanese**: 脚質適性; **In-Game Label (EN)**: Style; **Description**: Preferred position in races (see below); **Categories**: Front, Pace, Late, End
 
-### Clarification:
+### Clarification
+
 Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance and placement** when mismatched. Optimal aptitude is strongly recommended.
 
-### Aptitude Ratings & Effectiveness:
+### Aptitude Ratings & Effectiveness
 
 - **Rating**: S; **Japanese**: S; **Effectiveness**: 105-110%; **Description**: Maximum compatibility (S is the highest grade)
 - **Rating**: A; **Japanese**: A; **Effectiveness**: 100%; **Description**: Good compatibility (baseline)
@@ -78,7 +79,6 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 - **Rating**: G; **Japanese**: G; **Effectiveness**: 40%; **Description**: Incompatible
 
 > **Note:** S is the maximum aptitude grade. SS does NOT exist in the game. Only S-rank provides positive bonuses; A-rank is the baseline with no bonus/penalty.
-
 > *Race mechanics exclusive to the Japanese server, like Charge Up, Compete Before Spurt, or Stamina Limit Break, are **not implemented** in the Global English server as of February 2026.*
 
 ### 2.3 Running Styles
@@ -111,7 +111,7 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 - **Term**: Skill Evolution; **Japanese**: 進化; **Global Mechanic (EN)**: Upgrade of some (not all) Normal → Rare skills under set conditions
 - **Term**: Skill Rarity; **Japanese**: レアリティ; **Global Mechanic (EN)**: Normal (white), Rare (gold), Unique (rainbow)
 
-### Skill Types (Community):
+### Skill Types (Community)
 
 - Speed, Stamina, Power, Recovery, Unique, "Effect on Opponent" (often referred to as "debuffs" in guides, but not in-game as a formal type)
 
@@ -120,7 +120,7 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 
 ### 2.7 Training Actions
 
-### Available at each turn (Career Mode):
+### Available at each turn (Career Mode)
 
 - **Train**: Increase specific stat (Speed/Stamina/Power/Guts/Wit)
 - **Race**: Compete to earn fans and SP, progress story
@@ -142,7 +142,7 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 - **Legacy Effect**: Bonuses granted to new trainees when selecting two legacy Uma Musume in setup (after retiring a career run). These grant bonus stats and sometimes skills to new runs.
 - **Bond/Bonding**: Represents support card "friendship" (bond) level; higher bond unlocks improved training bonuses and special events. Distinct from raw support card stats.
 
-### Bond Milestones:
+### Bond Milestones
 
 - **Level**: 20%; **Reward**: Small stat bonus
 - **Level**: 40%; **Reward**: Skill hint
@@ -174,7 +174,7 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 - **Term**: Prediction Accuracy; **Canonical Field**: `ucp_prediction_accuracy`; **Definition**: Tracking of AI prediction vs actual outcome; **Storage**: Database
 - **Term**: Legacy; **Canonical Field**: `legacy_*`; **Definition**: Data from completed runs used to boost new trainees; **Storage**: Database
 
-### See also: Factor, Bond, Skill Hint under Game Terminology.
+### See also: Factor, Bond, Skill Hint under Game Terminology
 
 ### 3.2 Data Tracking
 
@@ -281,7 +281,7 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 - **Term**: AI Metrics; **Abbreviation**: -; **Definition**: Performance and usage analytics (`ucp_ai_metrics`)
 - **Term**: Hybrid AI; **Abbreviation**: -; **Definition**: Architecture using local (Ollama) + cloud (Bedrock) fallback
 
-### AI Providers:
+### AI Providers
 
 - **Provider**: Ollama; **Type**: Local; **Models**: llama3.2, mistral; **Use Case**: Primary, free inference
 - **Provider**: AWS Bedrock; **Type**: Cloud; **Models**: Claude 4.5 Sonnet; **Use Case**: Complex queries, fallback
@@ -297,12 +297,12 @@ Neuron agents live in `app/Neuron/Agents/` with response types in `app/Neuron/Re
 - **Agent**: Career Planning Agent; **Class**: `CareerPlanningAgent`; **Purpose**: Provides long-term strategic guidance; **Response Type**: `CareerPlanningResponse`
 - **Agent**: MCP Demo Agent; **Class**: `McpDemoAgent`; **Purpose**: Demonstration agent for MCP tool integration; **Response Type**: -
 
-### Neuron Support Classes:
+### Neuron Support Classes
 
 - **Class**: `McpConnectorFactory`; **Purpose**: Creates MCP connector instances for agent tool access
 - **Class**: `McpToolIntegration`; **Purpose**: Integrates MCP tools with Neuron agent capabilities
 
-### Neuron Service Layer (`app/Services/Neuron/`):
+### Neuron Service Layer (`app/Services/Neuron/`)
 
 - **Service**: `NeuronAIService`; **Purpose**: Core Neuron AI orchestration and provider management
 - **Service**: `TrainingAdvisorService`; **Purpose**: Wrapper for training advisor agent interactions
@@ -321,7 +321,7 @@ Neuron agents live in `app/Neuron/Agents/` with response types in `app/Neuron/Re
 - **Term**: Laravel MCP; **Abbreviation**: -; **Definition**: Official Laravel MCP package (`laravel/mcp v0`) for server-side tool exposure
 - **Term**: MCP Monitoring; **Abbreviation**: -; **Definition**: Service for tracking MCP server health, tool usage, and agent performance
 
-### MCP Server Types:
+### MCP Server Types
 
 - **Server**: Memory; **Type**: Local; **Purpose**: Conversation context persistence
 - **Server**: Filesystem; **Type**: Local; **Purpose**: Document and file access
@@ -335,7 +335,7 @@ Neuron agents live in `app/Neuron/Agents/` with response types in `app/Neuron/Re
 - **Term**: Fallback API; **Definition**: Secondary API used when primary fails
 - **Term**: Cache TTL; **Definition**: Time-to-live for cached API responses (24 hours)
 
-### External API Sources:
+### External API Sources
 
 - **API**: umapyoi.net; **Purpose**: Primary game data (characters, support cards, news); **Client Class**: `UmapyoiApiClient`; **Status**: Active
 - **API**: UmamusumeDB.com; **Purpose**: Fallback data (skills, races); **Client Class**: `UmamusumeDBApiClient`; **Status**: Active
@@ -350,7 +350,7 @@ Neuron agents live in `app/Neuron/Agents/` with response types in `app/Neuron/Re
 - **Term**: Confidence Score; **Abbreviation**: -; **Definition**: OCR accuracy metric (0-100%)
 - **Term**: Preprocessing; **Abbreviation**: -; **Definition**: Image enhancement before OCR (resize, grayscale, threshold)
 
-### OCR Data Types:
+### OCR Data Types
 
 - **Data Type**: Character Stats; **Detection Pattern**: Stat labels + numeric values; **Confidence Threshold**: 85%
 - **Data Type**: Skill Names; **Detection Pattern**: Japanese/English text regions; **Confidence Threshold**: 80%
@@ -377,7 +377,7 @@ Neuron agents live in `app/Neuron/Agents/` with response types in `app/Neuron/Re
 - **Term**: Format Detection; **Definition**: Automatic identification of import file structure
 - **Term**: Schema Version; **Definition**: Version identifier in exported data for compatibility
 
-### Export Formats:
+### Export Formats
 
 - **Format**: JSON; **Extension**: .json; **Use Case**: Full data backup, cross-app import
 - **Format**: Excel; **Extension**: .xlsx; **Use Case**: Spreadsheet analysis, sharing
@@ -517,19 +517,19 @@ Neuron agents live in `app/Neuron/Agents/` with response types in `app/Neuron/Re
 
 ### 9.5 Usage Guidelines
 
-### For Developers:
+### For Developers
 
 - Use canonical field names in code and database queries
 - Follow enum definitions for type-safe constants
 - Reference this glossary when naming new entities or fields
 
-### For Documentation Writers:
+### For Documentation Writers
 
 - Use standardized terms consistently across all documents
 - Link to this glossary when introducing new terminology
 - Update glossary when introducing new concepts
 
-### For Users:
+### For Users
 
 - Refer to this glossary for clarification of in-app terminology
 - Use game terminology sections for Uma Musume-specific terms
@@ -537,4 +537,4 @@ Neuron agents live in `app/Neuron/Agents/` with response types in `app/Neuron/Re
 
 ---
 
-### This glossary is the authoritative reference for both code and gameplay terminology as used in the Umamusume Career Planner, strictly aligned to the Global English server and common usage (February 22, 2026).
+### This glossary is the authoritative reference for both code and gameplay terminology as used in the Umamusume Career Planner, strictly aligned to the Global English server and common usage (February 22, 2026)

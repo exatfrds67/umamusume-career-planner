@@ -24,12 +24,12 @@ This guide provides comprehensive documentation for developers working on the Um
 | Layer | Technology |
 |-------|------------|
 | Backend | Laravel 12 (PHP 8.4) |
-| Frontend | Blade, Alpine.js, Tailwind CSS v4 |
+| Frontend | Livewire 4, Blade, Alpine.js 3, Tailwind CSS v4 |
 | Database | SQLite (dev), MySQL/PostgreSQL (prod) |
 | Cache | Redis |
 | Queue | Laravel Horizon |
-| Testing | Pest PHP |
-| AI | AWS Bedrock, Neuron AI |
+| Testing | Pest v4 / PHPUnit v12 |
+| AI | Ollama, AWS Bedrock, Neuron AI v2.11 |
 
 ### System Architecture
 
@@ -149,15 +149,18 @@ AWS_DEFAULT_REGION=us-east-1
 │   │   ├── Middleware/       # Request middleware
 │   │   ├── Requests/         # Form request validation
 │   │   └── Resources/        # API resources
-│   ├── Models/               # Eloquent models
+│   ├── Enums/                # PHP enums (8 enums)
+│   ├── Livewire/             # Livewire 4 components (AdvisoryPanel, etc.)
+│   ├── Models/               # Eloquent models (~30 models)
+│   ├── Neuron/               # Neuron AI agents & tools
 │   ├── Policies/             # Authorization policies
 │   ├── Providers/            # Service providers
 │   ├── Repositories/         # Data repositories
-│   └── Services/             # Business logic services
-│       ├── AI/               # AI-related services
-│       ├── Agents/           # AI agents
-│       ├── MCP/              # MCP integration
-│       └── OCR/              # OCR services
+│   ├── Services/             # Business logic services (70+)
+│   │   ├── Neuron/           # Neuron AI services
+│   │   ├── MCP/              # MCP integration (42 tools)
+│   │   └── ...               # Domain services
+│   └── ValueObjects/         # Domain value objects
 ├── bootstrap/                # Application bootstrap
 ├── config/                   # Configuration files
 ├── database/
@@ -257,7 +260,7 @@ php artisan test --testsuite=Architecture
 
 ### Writing Tests
 
-Use Pest PHP for all tests:
+Use Pest v4 for all tests:
 
 ```php
 <?php
@@ -458,7 +461,18 @@ npm run build
 
 ## AI Integration
 
-### AWS Bedrock
+### Ollama (Local AI)
+
+Configure in `config/neuron.php` for local AI inference:
+
+```php
+'ollama' => [
+    'host' => env('OLLAMA_HOST', 'http://localhost:11434'),
+    'model' => env('OLLAMA_MODEL', 'llama3'),
+],
+```
+
+### AWS Bedrock (Cloud AI)
 
 Configure in `config/ai.php`:
 
@@ -472,9 +486,9 @@ Configure in `config/ai.php`:
 ### Using AI Services
 
 ```php
-use App\Services\AI\HybridAIService;
+use App\Services\Neuron\NeuronAIService;
 
-$aiService = app(HybridAIService::class);
+$aiService = app(NeuronAIService::class);
 $response = $aiService->generateResponse($prompt, $context);
 ```
 
@@ -560,4 +574,4 @@ SESSION_DRIVER=redis
 
 ---
 
-*Last updated: January 2026*
+*Last updated: February 2026*

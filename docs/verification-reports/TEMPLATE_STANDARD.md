@@ -3,7 +3,7 @@
 ## Umamusume Pretty Derby Career Planner
 
 **Document Version**: 1.0
-**Date**: January 11, 2026
+**Date**: February 22, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
 
@@ -49,7 +49,7 @@ Content for section three.
 
 | Version | Date             | Author           | Changes                    |
 |---------|------------------|------------------|----------------------------|
-| 1.0     | January 11, 2026 | Development Team | Initial document creation  |
+| 1.0     | February 22, 2026 | Development Team | Initial document creation  |
 
 ### Approval
 

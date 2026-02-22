@@ -98,7 +98,7 @@ Comprehensive update to project documentation including Kiro AI agent configurat
 - Form request validation
 - Event-driven architecture
 - Model design and Eloquent
-- Enum usage (PHP 8.1+)
+- Enum usage (PHP 8.2+)
 - Caching strategy
 - API resource transformers
 

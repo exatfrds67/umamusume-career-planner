@@ -468,4 +468,4 @@ When reporting issues, include:
 
 ---
 
-*Last updated: January 2026*
+*Last updated: February 2026*

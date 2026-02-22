@@ -470,8 +470,8 @@ return [
     'umapyoi' => [
         'url' => env('UMAPYOI_API_URL', 'https://api.umapyoi.net'),
     ],
-    'umamusumedb' => [
-        'url' => env('UMAMUSUMEDB_API_URL', 'https://umamusumedb.com/api'),
+    'gametora' => [
+        'url' => env('GAMETORA_API_URL', 'https://gametora.com/api'),
     ],
 ];
 ```
@@ -480,7 +480,7 @@ Add to `.env`:
 
 ```env
 UMAPYOI_API_URL=https://api.umapyoi.net
-UMAMUSUMEDB_API_URL=https://umamusumedb.com/api
+GAMETORA_API_URL=https://gametora.com/api
 ```
 
 ## Troubleshooting

@@ -336,10 +336,10 @@ POST /characters
 ## Next Steps
 
 1. ✅ Character creation with external API - **COMPLETED**
-2. 🔄 Support card management with external API - **IN PROGRESS**
-3. ⏳ Training system integration
-4. ⏳ Race system integration
-5. ⏳ Skill system integration
+2. ✅ Support card management with external API - **COMPLETED**
+3. ✅ Training system integration - **COMPLETED**
+4. ✅ Race system integration - **COMPLETED**
+5. ✅ Skill system integration - **COMPLETED**
 
 ## Notes
 

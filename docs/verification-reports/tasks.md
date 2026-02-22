@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 1.0
-**Date**: January 12, 2026
+**Document Version**: 2.0
+**Date**: February 22, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
 **Status**: Implementation Task Reference
@@ -58,7 +58,7 @@ This document breaks down all 59 requirements into specific implementation tasks
 - **Requirements**: REQ-5.1.1
 - **Acceptance Criteria**:
   - Laravel 12 project created with strict mode enabled
-  - PHP 8.3+ configured with required extensions
+  - PHP 8.2+ configured with required extensions (runtime 8.4.11)
   - Composer dependencies installed and optimized
   - Environment configuration completed
 - **Implementation**:
@@ -322,7 +322,7 @@ This document breaks down all 59 requirements into specific implementation tasks
 - **Dependencies**: TASK-3.6
 - **Requirements**: REQ-4.1.2, REQ-4.1.3
 - **Acceptance Criteria**:
-  - UmamusumeDB.com integration
+  - GameTora integration
   - Community data synchronization
   - Data validation and conflict resolution
   - Privacy-preserving data sharing

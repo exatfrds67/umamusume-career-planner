@@ -1,8 +1,8 @@
-# CacheManagerService Documentation
+# CacheManagementService Documentation
 
 ## Overview
 
-The `CacheManagerService` provides intelligent caching capabilities for external API data with staleness indicators, configurable TTL by data type, and comprehensive cache statistics tracking.
+The `CacheManagementService` provides intelligent caching capabilities for external API data with staleness indicators, configurable TTL by data type, and comprehensive cache statistics tracking.
 
 ## Features
 
@@ -23,12 +23,12 @@ This service implements **Requirement 14.2: Intelligent Caching and Offline Func
 The service is automatically registered in the Laravel service container and can be injected via dependency injection:
 
 ```php
-use App\Services\ExternalAPI\CacheManagerService;
+use App\Services\ExternalAPI\CacheManagementService;
 
 class MyController extends Controller
 {
     public function __construct(
-        private CacheManagerService $cacheManager
+        private CacheManagementService $cacheManager
     ) {}
 }
 ```
@@ -206,17 +206,17 @@ $cacheManager->flush();
 
 ## Integration with External API Service
 
-The `CacheManagerService` is designed to work seamlessly with the `ExternalAPIService`:
+The `CacheManagementService` is designed to work seamlessly with the `ExternalAPIService`:
 
 ```php
 use App\Services\ExternalAPI\ExternalAPIService;
-use App\Services\ExternalAPI\CacheManagerService;
+use App\Services\ExternalAPI\CacheManagementService;
 
 class UmapyoiApiClient extends ExternalAPIService
 {
     public function __construct(
         MCPClientService $mcpClient,
-        private CacheManagerService $cacheManager
+        private CacheManagementService $cacheManager
     ) {
         parent::__construct($mcpClient);
     }

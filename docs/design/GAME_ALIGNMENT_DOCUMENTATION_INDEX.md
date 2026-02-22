@@ -1,7 +1,7 @@
 # Game Alignment Documentation Index
 
 **Document Version**: 1.0.0  
-**Date**: January 29, 2026  
+**Date**: February 22, 2026  
 **Status**: Master Index & Navigation Guide  
 **Purpose**: Unified entry point for all game-alignment research and planning documents
 
@@ -11,7 +11,7 @@
 
 This project maintains comprehensive documentation aligned with actual Umamusume Pretty Derby game mechanics, visual patterns, and UX flows. This index provides navigation and document relationships.
 
-**Documentation Scope**: 120+ game screenshots analyzed (July 2025 - January 2026)  
+**Documentation Scope**: 120+ game screenshots analyzed (July 2025 - February 2026)  
 **Total Documents**: 8 primary design/research files + this index  
 **Status**: Active planning (implementing Phase 1-2, planning Phase 3-6)
 
@@ -247,7 +247,7 @@ component-inventory.md (STATUS)
 - **Document**: Strategic Plan § 4.1 + Visual Patterns § 1.1
 - **Decision**: Use game-aligned stat colors (Red=Speed, Blue=Stamina, etc.)
 - **Status**: ✅ Planned for Phase 1
-- **Implementation**: Tailwind color tokens in tailwind.config.js
+- **Implementation**: Tailwind color tokens via CSS `@theme` directive (Tailwind v4)
 
 ### Navigation
 
