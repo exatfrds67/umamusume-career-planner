@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0  
-**Date**: February 22, 2026  
+**Document Version**: 2.3.0
+**Date**: February 22, 2026
 **Related Documents**: [PRD-001], [SPEC-001], [SRS], [BRS]
 
 **Source Specifications**:
@@ -44,12 +44,10 @@ The Career Setup Flow guides users through the complete process of creating a ne
 
 ### 1.2 Scope
 
-| Aspect | Description |
-|--------|-------------|
-| **Entry Point** | Dashboard "Create Career" button or character list "New Career" action |
-| **Exit Point** | Character dashboard with initialized career run (Day 1, Junior Year) |
-| **Duration** | 5-10 minutes for experienced users, 15+ minutes for first-time users |
-| **User Type** | All authenticated users (Account mode) or guest users (Local mode) |
+- **Aspect**: **Entry Point**; **Description**: Dashboard "Create Career" button or character list "New Career" action
+- **Aspect**: **Exit Point**; **Description**: Character dashboard with initialized career run (Day 1, Junior Year)
+- **Aspect**: **Duration**; **Description**: 5-10 minutes for experienced users, 15+ minutes for first-time users
+- **Aspect**: **User Type**; **Description**: All authenticated users (Account mode) or guest users (Local mode)
 
 ### 1.3 Business Context
 
@@ -71,47 +69,47 @@ The Career Setup Flow guides users through the complete process of creating a ne
 ```mermaid
 flowchart TD
     Start([Start New Career]) --> CheckAuth{Storage Mode?}
-    
+
     CheckAuth -->|Account| AccountFlow[Account Mode Setup]
     CheckAuth -->|Local| LocalFlow[Local Mode Setup]
-    
+
     AccountFlow --> SelectTrainee[Step 1: Select Trainee]
     LocalFlow --> SelectTrainee
-    
+
     SelectTrainee --> SelectScenario[Step 2: Select Scenario]
     SelectScenario --> PickParents[Step 3: Pick Parents]
     PickParents --> PreviewFactors[Preview Factor Bonuses]
     PreviewFactors --> BuildDeck[Step 4: Build Support Deck]
-    
+
     BuildDeck --> ValidateDeck{Deck Valid?}
     ValidateDeck -->|No| ShowErrors[Show Validation Errors]
     ShowErrors --> FixDeck[User Adjusts Deck]
     FixDeck --> ValidateDeck
-    
+
     ValidateDeck -->|Yes| ReviewSummary[Step 5: Review Summary]
     ReviewSummary --> UserConfirm{User Confirms?}
-    
+
     UserConfirm -->|No| BackToStep{Which Step?}
     BackToStep --> SelectTrainee
     BackToStep --> SelectScenario
     BackToStep --> PickParents
     BackToStep --> BuildDeck
-    
+
     UserConfirm -->|Yes| CreateCareer[Create Career Record]
     CreateCareer --> InitializeStats[Initialize Stats/Mood/Energy]
     InitializeStats --> SaveRun[Persist Career Run]
-    
+
     SaveRun --> StorageCheck{Storage Mode?}
     StorageCheck -->|Account| SaveDB[Save to Database]
     StorageCheck -->|Local| SaveLocalStorage[Save to localStorage]
-    
+
     SaveDB --> CareerReady[Career Ready: Day 1]
     SaveLocalStorage --> CareerReady
-    
+
     CareerReady --> ShowDashboard[Display Career Dashboard]
     ShowDashboard --> NextSteps[Show Next Steps Tutorial]
     NextSteps --> End([Setup Complete])
-    
+
     style Start fill:#e3f2fd
     style End fill:#c8e6c9
     style ValidateDeck fill:#fff3e0
@@ -123,42 +121,42 @@ flowchart TD
 ```mermaid
 stateDiagram-v2
     [*] --> InitialState
-    
+
     InitialState --> TraineeSelection: User clicks "Create Career"
-    
+
     TraineeSelection --> ScenarioSelection: Trainee selected
     TraineeSelection --> TraineeSelection: Change filters/search
-    
+
     ScenarioSelection --> ParentSelection: Scenario selected
     ScenarioSelection --> TraineeSelection: Back button
-    
+
     ParentSelection --> FactorPreview: Both parents selected
     ParentSelection --> ParentSelection: Change parent A/B
     ParentSelection --> ScenarioSelection: Back button
-    
+
     FactorPreview --> DeckBuilding: Preview reviewed
     FactorPreview --> ParentSelection: Change parents
-    
+
     DeckBuilding --> DeckValidation: User completes deck
     DeckBuilding --> DeckBuilding: Add/remove cards
     DeckBuilding --> FactorPreview: Back button
-    
+
     DeckValidation --> DeckBuilding: Validation failed
     DeckValidation --> ReviewSummary: Validation passed
-    
+
     ReviewSummary --> Confirmation: User reviews all settings
     ReviewSummary --> TraineeSelection: Edit trainee
     ReviewSummary --> ScenarioSelection: Edit scenario
     ReviewSummary --> ParentSelection: Edit parents
     ReviewSummary --> DeckBuilding: Edit deck
-    
+
     Confirmation --> CareerCreation: User confirms
     Confirmation --> ReviewSummary: User cancels
-    
+
     CareerCreation --> Initialization: Create database record
     Initialization --> Persistence: Initialize stats/mood/energy
     Persistence --> Dashboard: Save to storage
-    
+
     Dashboard --> [*]: Setup complete
 ```
 
@@ -205,12 +203,10 @@ stateDiagram-v2
 
 **User Actions**:
 
-| Action | Description | Next State |
-|--------|-------------|------------|
-| Select Trainee | Click on character card | Enable "Next" button |
-| Search | Type in search box | Filter trainee list |
-| Filter | Apply rarity/distance/aptitude filters | Update trainee list |
-| Load More | Pagination | Display additional trainees |
+- **Action**: Select Trainee; **Description**: Click on character card; **Next State**: Enable "Next" button
+- **Action**: Search; **Description**: Type in search box; **Next State**: Filter trainee list
+- **Action**: Filter; **Description**: Apply rarity/distance/aptitude filters; **Next State**: Update trainee list
+- **Action**: Load More; **Description**: Pagination; **Next State**: Display additional trainees
 
 **Implementation Details**:
 
@@ -249,12 +245,10 @@ stateDiagram-v2
 
 **Scenario Types**:
 
-| Scenario | Turns | Difficulty | Special Features |
-|----------|-------|------------|------------------|
-| URA Finals | 70-78 | ★★★☆☆ | Standard championship path |
-| Grand Masters | 70-78 | ★★★★☆ | Enhanced training bonuses, harder races |
-| Make a New Track!! | 70-78 | ★★☆☆☆ | Story events, unique rewards |
-| Aoharu Cup | 70-78 | ★★★★★ | Team battles, special training |
+- **Scenario**: URA Finals; **Turns**: 70-78; **Difficulty**: ★★★☆☆; **Special Features**: Standard championship path
+- **Scenario**: Grand Masters; **Turns**: 70-78; **Difficulty**: ★★★★☆; **Special Features**: Enhanced training bonuses, harder races
+- **Scenario**: Make a New Track!!; **Turns**: 70-78; **Difficulty**: ★★☆☆☆; **Special Features**: Story events, unique rewards
+- **Scenario**: Aoharu Cup; **Turns**: 70-78; **Difficulty**: ★★★★★; **Special Features**: Team battles, special training
 
 **Career Structure (Verified Jan 2026)**:
 
@@ -322,11 +316,9 @@ stateDiagram-v2
 
 **Factor Star Levels**:
 
-| Stars | Stat Bonus | Description |
-|-------|------------|-------------|
-| ★☆☆ | +5 | Single star factor |
-| ★★☆ | +12 | Double star factor |
-| ★★★ | +21 | Triple star factor (maximum) |
+- **Stars**: ★☆☆; **Stat Bonus**: +5; **Description**: Single star factor
+- **Stars**: ★★☆; **Stat Bonus**: +12; **Description**: Double star factor
+- **Stars**: ★★★; **Stat Bonus**: +21; **Description**: Triple star factor (maximum)
 
 **Aptitude Grade Inheritance**:
 
@@ -352,18 +344,18 @@ class FactorInheritanceService
             'guts' => 0,
             'wit' => 0,
         ];
-        
+
         foreach ($parentA->factors as $factor) {
             $bonuses[$factor->stat_type] += $this->getStarBonus($factor->star_level);
         }
-        
+
         foreach ($parentB->factors as $factor) {
             $bonuses[$factor->stat_type] += $this->getStarBonus($factor->star_level);
         }
-        
+
         return $bonuses;
     }
-    
+
     private function getStarBonus(int $stars): int
     {
         return match($stars) {
@@ -439,23 +431,19 @@ class FactorInheritanceService
 
 **Deck Composition Rules**:
 
-| Rule | Description | Validation |
-|------|-------------|------------|
-| Total Cards | Exactly 6 cards | Required |
-| Owned Cards | Up to 5 owned cards | Optional |
-| Borrowed Card | 1 friend/rental card (slot 6) | Optional |
-| Type Balance | Recommended mix of stat types | Advisory only |
-| Rarity | No restrictions | - |
+- **Rule**: Total Cards; **Description**: Exactly 6 cards; **Validation**: Required
+- **Rule**: Owned Cards; **Description**: Up to 5 owned cards; **Validation**: Optional
+- **Rule**: Borrowed Card; **Description**: 1 friend/rental card (slot 6); **Validation**: Optional
+- **Rule**: Type Balance; **Description**: Recommended mix of stat types; **Validation**: Advisory only
+- **Rule**: Rarity; **Description**: No restrictions; **Validation**: -
 
 **Card Properties**:
 
-| Property | Description | Impact |
-|----------|-------------|--------|
-| Rarity | SSR, SR, R | Affects base bonus strength |
-| Type | Speed, Stamina, Power, Guts, Wit, Friend | Training facility alignment |
-| Limit Break (LB) | 0-4 stars | Increases bonus effectiveness |
-| Bond Level | 0-100% | Unlocks hints and friendship training (threshold: 80%) |
-| Meta Tier | SS, S, A, B, C | Community-sourced effectiveness rating |
+- **Property**: Rarity; **Description**: SSR, SR, R; **Impact**: Affects base bonus strength
+- **Property**: Type; **Description**: Speed, Stamina, Power, Guts, Wit, Friend; **Impact**: Training facility alignment
+- **Property**: Limit Break (LB); **Description**: 0-4 stars; **Impact**: Increases bonus effectiveness
+- **Property**: Bond Level; **Description**: 0-100%; **Impact**: Unlocks hints and friendship training (threshold: 80%)
+- **Property**: Meta Tier; **Description**: SS, S, A, B, C; **Impact**: Community-sourced effectiveness rating
 
 **Support Card Bond Mechanics (Verified Jan 2026)**:
 
@@ -473,23 +461,23 @@ class DeckSynergyCalculator
     public function calculateSynergy(array $cards): int
     {
         $score = 0;
-        
+
         // Type diversity (0-30 points)
         $uniqueTypes = collect($cards)->pluck('card_type')->unique()->count();
         $score += min(30, $uniqueTypes * 6);
-        
+
         // Rarity distribution (0-25 points)
         $ssrCount = collect($cards)->where('rarity', 'SSR')->count();
         $score += min(25, $ssrCount * 5);
-        
+
         // Limit break levels (0-25 points)
         $avgLB = collect($cards)->avg('limit_break_level');
         $score += min(25, $avgLB * 6.25);
-        
+
         // Bond levels (0-20 points)
         $avgBond = collect($cards)->avg('bond_level');
         $score += min(20, $avgBond * 0.2);
-        
+
         return (int) $score;
     }
 }
@@ -575,14 +563,12 @@ class DeckSynergyCalculator
 
 **User Actions**:
 
-| Action | Behavior | Next State |
-|--------|----------|------------|
-| Edit Trainee | Navigate to Step 1 | Trainee selection |
-| Edit Scenario | Navigate to Step 1 | Scenario selection |
-| Edit Parents | Navigate to Step 2 | Parent selection |
-| Edit Deck | Navigate to Step 3 | Deck builder |
-| Create Career | Submit configuration | Career creation |
-| Back | Return to previous step | Step 3 (deck) |
+- **Action**: Edit Trainee; **Behavior**: Navigate to Step 1; **Next State**: Trainee selection
+- **Action**: Edit Scenario; **Behavior**: Navigate to Step 1; **Next State**: Scenario selection
+- **Action**: Edit Parents; **Behavior**: Navigate to Step 2; **Next State**: Parent selection
+- **Action**: Edit Deck; **Behavior**: Navigate to Step 3; **Next State**: Deck builder
+- **Action**: Create Career; **Behavior**: Submit configuration; **Next State**: Career creation
+- **Action**: Back; **Behavior**: Return to previous step; **Next State**: Step 3 (deck)
 
 ---
 
@@ -602,30 +588,30 @@ sequenceDiagram
     participant Repository as CareerRepository
     participant Database
     participant Cache
-    
+
     User->>UI: Click "Create Career"
     UI->>Controller: POST /careers/create
     Controller->>Service: createCareer(data)
-    
+
     Service->>FactorService: calculateInheritedStats(parentA, parentB)
     FactorService-->>Service: inherited stats array
-    
+
     Service->>Service: initializeStartingStats(base, inherited)
     Service->>Service: setInitialMood(Normal)
     Service->>Service: setInitialEnergy(100)
-    
+
     Service->>Repository: create(careerData)
     Repository->>Database: INSERT INTO careers
     Database-->>Repository: career_id
-    
+
     Repository->>Database: INSERT INTO stat_progress (turn 1)
     Database-->>Repository: success
-    
+
     Repository-->>Service: Career model
-    
+
     Service->>Cache: forget("user.{userId}.careers")
     Service->>Cache: put("career.{id}.predictions", null, 300)
-    
+
     Service-->>Controller: Created career
     Controller-->>UI: Redirect to /careers/{id}/dashboard
     UI-->>User: Display career dashboard
@@ -699,20 +685,18 @@ INSERT INTO ucp_stat_progress (
 
 **Initial State Configuration**:
 
-| Property | Value | Source |
-|----------|-------|--------|
-| UUID | Generated | `Str::uuid()` |
-| Status | `in_progress` | Default |
-| Career Stage | `junior` | Default |
-| Current Turn | 1 | Default |
-| Speed | Base + Inheritance | Calculated |
-| Stamina | Base + Inheritance | Calculated |
-| Power | Base + Inheritance | Calculated |
-| Guts | Base + Inheritance | Calculated |
-| Wit | Base + Inheritance | Calculated |
-| Energy | 100 | Default |
-| Mood | `normal` | Default |
-| SP Available | 0 | Default |
+- **Property**: UUID; **Value**: Generated; **Source**: `Str::uuid()`
+- **Property**: Status; **Value**: `in_progress`; **Source**: Default
+- **Property**: Career Stage; **Value**: `junior`; **Source**: Default
+- **Property**: Current Turn; **Value**: 1; **Source**: Default
+- **Property**: Speed; **Value**: Base + Inheritance; **Source**: Calculated
+- **Property**: Stamina; **Value**: Base + Inheritance; **Source**: Calculated
+- **Property**: Power; **Value**: Base + Inheritance; **Source**: Calculated
+- **Property**: Guts; **Value**: Base + Inheritance; **Source**: Calculated
+- **Property**: Wit; **Value**: Base + Inheritance; **Source**: Calculated
+- **Property**: Energy; **Value**: 100; **Source**: Default
+- **Property**: Mood; **Value**: `normal`; **Source**: Default
+- **Property**: SP Available; **Value**: 0; **Source**: Default
 
 ---
 
@@ -725,48 +709,46 @@ flowchart TD
     D1{Storage Mode?}
     D1 -->|Account| D2{New or Existing Character?}
     D1 -->|Local| D3[Generate UUID]
-    
+
     D2 -->|New| CreateChar[Create Character First]
     D2 -->|Existing| SelectChar[Select Existing]
-    
+
     CreateChar --> D4{Scenario Complexity?}
     SelectChar --> D4
     D3 --> D4
-    
+
     D4 -->|Standard| StandardFlow[URA Finals]
     D4 -->|Advanced| AdvancedFlow[Grand Masters]
     D4 -->|Story| StoryFlow[Make a New Track]
-    
+
     StandardFlow --> D5{Parent Strategy?}
     AdvancedFlow --> D5
     StoryFlow --> D5
-    
+
     D5 -->|Balanced| BalancedParents[Mixed Stat Parents]
     D5 -->|Specialized| SpecializedParents[Same Type Parents]
-    
+
     BalancedParents --> D6{Deck Focus?}
     SpecializedParents --> D6
-    
+
     D6 -->|Speed Build| SpeedDeck[Speed-Heavy Deck]
     D6 -->|Stamina Build| StaminaDeck[Stamina-Heavy Deck]
     D6 -->|Balanced| BalancedDeck[Mixed Deck]
-    
+
     SpeedDeck --> Confirm[Review & Confirm]
     StaminaDeck --> Confirm
     BalancedDeck --> Confirm
-    
+
     Confirm --> Create[Create Career]
 ```
 
 ### 4.2 Key Decision Points
 
-| Decision | Options | Impact | Recommendation |
-|----------|---------|--------|----------------|
-| **Storage Mode** | Local, Account | Data persistence and sync | Account for long-term use |
-| **Trainee Selection** | 52+ characters | Base stats and aptitudes | Align with desired playstyle |
-| **Scenario** | URA Finals, Grand Masters, etc. | Race schedule and difficulty | URA Finals for beginners |
-| **Parent Strategy** | Balanced, Specialized | Initial stat distribution | Balanced for flexibility |
-| **Deck Focus** | Speed, Stamina, Balanced | Training bonus distribution | Align with trainee strengths |
+- **Decision**: **Storage Mode**; **Options**: Local, Account; **Impact**: Data persistence and sync; **Recommendation**: Account for long-term use
+- **Decision**: **Trainee Selection**; **Options**: 52+ characters; **Impact**: Base stats and aptitudes; **Recommendation**: Align with desired playstyle
+- **Decision**: **Scenario**; **Options**: URA Finals, Grand Masters, etc.; **Impact**: Race schedule and difficulty; **Recommendation**: URA Finals for beginners
+- **Decision**: **Parent Strategy**; **Options**: Balanced, Specialized; **Impact**: Initial stat distribution; **Recommendation**: Balanced for flexibility
+- **Decision**: **Deck Focus**; **Options**: Speed, Stamina, Balanced; **Impact**: Training bonus distribution; **Recommendation**: Align with trainee strengths
 
 ---
 
@@ -774,14 +756,12 @@ flowchart TD
 
 ### 5.1 Field Validation
 
-| Field | Rule | Error Message |
-|-------|------|---------------|
-| `trainee_id` | Required, exists in `characters` table | "Trainee selection is required" |
-| `scenario_type` | Required, valid enum value | "Invalid scenario type" |
-| `parent_a_id` | Required, exists in `characters` table | "Parent A selection is required" |
-| `parent_b_id` | Required, exists in `characters` table, ≠ parent_a_id | "Parent B must be different from Parent A" |
-| `support_deck` | Required, array, exactly 6 cards | "Support deck must contain exactly 6 cards" |
-| `support_deck.*.card_id` | Exists in `support_cards` table | "Invalid support card selected" |
+- **Field**: `trainee_id`; **Rule**: Required, exists in `characters` table; **Error Message**: "Trainee selection is required"
+- **Field**: `scenario_type`; **Rule**: Required, valid enum value; **Error Message**: "Invalid scenario type"
+- **Field**: `parent_a_id`; **Rule**: Required, exists in `characters` table; **Error Message**: "Parent A selection is required"
+- **Field**: `parent_b_id`; **Rule**: Required, exists in `characters` table, ≠ parent_a_id; **Error Message**: "Parent B must be different from Parent A"
+- **Field**: `support_deck`; **Rule**: Required, array, exactly 6 cards; **Error Message**: "Support deck must contain exactly 6 cards"
+- **Field**: `support_deck.*.card_id`; **Rule**: Exists in `support_cards` table; **Error Message**: "Invalid support card selected"
 
 ### 5.2 Business Rule Validation
 
@@ -800,7 +780,7 @@ class CreateCareerRequest extends FormRequest
             'support_deck.*.card_id' => 'required|exists:support_cards,id',
         ];
     }
-    
+
     public function messages(): array
     {
         return [
@@ -822,47 +802,47 @@ class DeckValidationService
     public function validate(array $cards): ValidationResult
     {
         $errors = [];
-        
+
         // Rule 1: Exactly 6 cards
         if (count($cards) !== 6) {
             $errors[] = 'Deck must contain exactly 6 cards';
         }
-        
+
         // Rule 2: Maximum 5 owned cards (slot 6 is friend/rental)
         $ownedCards = collect($cards)->filter(fn($c) => !$c['is_borrowed'])->count();
         if ($ownedCards > 5) {
             $errors[] = 'Maximum 5 owned cards allowed (slot 6 is friend card)';
         }
-        
+
         // Rule 3: No duplicate cards
         $uniqueCards = collect($cards)->pluck('card_id')->unique()->count();
         if ($uniqueCards !== count($cards)) {
             $errors[] = 'Duplicate cards are not allowed';
         }
-        
+
         return new ValidationResult(
             valid: empty($errors),
             errors: $errors,
             warnings: $this->generateWarnings($cards)
         );
     }
-    
+
     private function generateWarnings(array $cards): array
     {
         $warnings = [];
-        
+
         // Warning: Type diversity
         $types = collect($cards)->pluck('card_type')->unique();
         if ($types->count() < 4) {
             $warnings[] = 'Consider adding more type diversity for balanced training';
         }
-        
+
         // Warning: Low synergy
         $synergy = app(DeckSynergyCalculator::class)->calculateSynergy($cards);
         if ($synergy < 60) {
             $warnings[] = 'Deck synergy is low. Consider better card alignment.';
         }
-        
+
         return $warnings;
     }
 }
@@ -883,12 +863,10 @@ class DeckValidationService
 
 ### 6.2 User Experience Success
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| Completion rate | > 85% | Analytics tracking |
-| Time to complete | < 10 minutes | Session duration |
-| Error encounter rate | < 15% | Validation error logs |
-| Tutorial engagement | > 60% | User interaction tracking |
+- **Metric**: Completion rate; **Target**: > 85%; **Measurement**: Analytics tracking
+- **Metric**: Time to complete; **Target**: < 10 minutes; **Measurement**: Session duration
+- **Metric**: Error encounter rate; **Target**: < 15%; **Measurement**: Validation error logs
+- **Metric**: Tutorial engagement; **Target**: > 60%; **Measurement**: User interaction tracking
 
 ### 6.3 Data Integrity Success
 
@@ -900,7 +878,7 @@ test('career setup creates valid record', function () {
     $parentA = Character::factory()->create();
     $parentB = Character::factory()->create();
     $cards = SupportCard::factory()->count(6)->create();
-    
+
     actingAs($user)
         ->post('/careers/create', [
             'trainee_id' => $trainee->id,
@@ -910,9 +888,9 @@ test('career setup creates valid record', function () {
             'support_deck' => $cards->pluck('id')->toArray(),
         ])
         ->assertRedirect();
-    
+
     $career = Career::where('user_id', $user->id)->latest()->first();
-    
+
     expect($career)->not->toBeNull()
         ->and($career->character_id)->toBe($trainee->id)
         ->and($career->current_turn)->toBe(1)
@@ -931,17 +909,17 @@ test('career setup creates valid record', function () {
 ```mermaid
 flowchart TD
     Error[Error Encountered] --> Type{Error Type}
-    
+
     Type -->|Validation| E1[Validation Error]
     Type -->|Database| E2[Database Error]
     Type -->|Network| E3[Network Error]
     Type -->|Storage| E4[Storage Error]
-    
+
     E1 --> R1[Show Field Errors<br/>Highlight Invalid Fields]
     E2 --> R2[Rollback Transaction<br/>Show Error Message]
     E3 --> R3[Enable Offline Mode<br/>Save as Draft]
     E4 --> R4[localStorage Full<br/>Suggest Account Mode]
-    
+
     R1 --> Resolve[User Action]
     R2 --> Resolve
     R3 --> Resolve
@@ -950,22 +928,18 @@ flowchart TD
 
 ### 7.2 Error Messages
 
-| Error Code | Trigger | Message | User Action |
-|------------|---------|---------|-------------|
-| `CS-001` | Validation failed | "Please fix the highlighted errors before proceeding" | Correct invalid fields |
-| `CS-002` | Database error | "Unable to create career. Please try again." | Retry or contact support |
-| `CS-003` | Network timeout | "Connection lost. Your progress has been saved as a draft." | Wait for reconnection |
-| `CS-004` | localStorage full | "Browser storage is full. Please use Account mode or clear data." | Switch to Account mode |
-| `CS-005` | Deck validation failed | "Support deck configuration is invalid. Please review your selections." | Fix deck composition |
+- **Error Code**: `CS-001`; **Trigger**: Validation failed; **Message**: "Please fix the highlighted errors before proceeding"; **User Action**: Correct invalid fields
+- **Error Code**: `CS-002`; **Trigger**: Database error; **Message**: "Unable to create career. Please try again."; **User Action**: Retry or contact support
+- **Error Code**: `CS-003`; **Trigger**: Network timeout; **Message**: "Connection lost. Your progress has been saved as a draft."; **User Action**: Wait for reconnection
+- **Error Code**: `CS-004`; **Trigger**: localStorage full; **Message**: "Browser storage is full. Please use Account mode or clear data."; **User Action**: Switch to Account mode
+- **Error Code**: `CS-005`; **Trigger**: Deck validation failed; **Message**: "Support deck configuration is invalid. Please review your selections."; **User Action**: Fix deck composition
 
 ### 7.3 Recovery Strategies
 
-| Scenario | Primary Recovery | Fallback Recovery | Ultimate Fallback |
-|----------|------------------|-------------------|-------------------|
-| Validation error | Show errors inline | Provide help tooltips | Link to documentation |
-| Database error | Retry transaction | Roll back changes | Save as draft |
-| Network error | Queue for sync | Save to localStorage | Offline mode |
-| Storage quota | Compress data | Suggest Account mode | Export and reset |
+- **Scenario**: Validation error; **Primary Recovery**: Show errors inline; **Fallback Recovery**: Provide help tooltips; **Ultimate Fallback**: Link to documentation
+- **Scenario**: Database error; **Primary Recovery**: Retry transaction; **Fallback Recovery**: Roll back changes; **Ultimate Fallback**: Save as draft
+- **Scenario**: Network error; **Primary Recovery**: Queue for sync; **Fallback Recovery**: Save to localStorage; **Ultimate Fallback**: Offline mode
+- **Scenario**: Storage quota; **Primary Recovery**: Compress data; **Fallback Recovery**: Suggest Account mode; **Ultimate Fallback**: Export and reset
 
 ---
 
@@ -975,19 +949,15 @@ flowchart TD
 
 After career setup completion, users proceed to:
 
-| Flow | Document Reference | Entry Condition |
-|------|-------------------|-----------------|
-| Training Day Flow | [UF-003](UF-003_Training_Day_Flow.md) | User starts first training session |
-| Career Dashboard | [WF-001](../wireframes/WF-001_Dashboard_Overview.md) | Career successfully created |
-| Support Deck Management | [UF-006](UF-006_Support_Deck_Building_Flow.md) | User wants to modify deck |
+- **Flow**: Training Day Flow; **Document Reference**: [UF-003](UF-003_Training_Day_Flow.md); **Entry Condition**: User starts first training session
+- **Flow**: Career Dashboard; **Document Reference**: [WF-001](../wireframes/WF-001_Dashboard_Overview.md); **Entry Condition**: Career successfully created
+- **Flow**: Support Deck Management; **Document Reference**: [UF-006](UF-006_Support_Deck_Building_Flow.md); **Entry Condition**: User wants to modify deck
 
 ### 8.2 Alternative Entry Points
 
-| Entry Point | Scenario | Flow Adjustment |
-|-------------|----------|-----------------|
-| Character List | User clicks "New Career" on character | Pre-select trainee, skip to scenario |
-| Import Wizard | User imports career data | Auto-populate all fields, skip to review |
-| Copy Existing Career | User duplicates previous career | Pre-populate with previous configuration |
+- **Entry Point**: Character List; **Scenario**: User clicks "New Career" on character; **Flow Adjustment**: Pre-select trainee, skip to scenario
+- **Entry Point**: Import Wizard; **Scenario**: User imports career data; **Flow Adjustment**: Auto-populate all fields, skip to review
+- **Entry Point**: Copy Existing Career; **Scenario**: User duplicates previous career; **Flow Adjustment**: Pre-populate with previous configuration
 
 ### 8.3 Integration Points
 
@@ -999,25 +969,25 @@ flowchart LR
         Deck[Deck Building]
         Create[Career Creation]
     end
-    
+
     subgraph ExternalServices[External Services]
         CharacterService[Character Service]
         FactorService[Factor Inheritance Service]
         DeckService[Deck Validation Service]
         AIService[AI Recommendation Service]
     end
-    
+
     subgraph DataLayer[Data Layer]
         CharacterRepo[Character Repository]
         CareerRepo[Career Repository]
         Cache[Cache Manager]
     end
-    
+
     Select --> CharacterService
     Parents --> FactorService
     Deck --> DeckService
     Create --> CareerRepo
-    
+
     CharacterService --> CharacterRepo
     FactorService --> CharacterRepo
     DeckService --> AIService
@@ -1028,13 +998,11 @@ flowchart LR
 
 ## Document Control
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 2.3.0 | 2026-02-22 | Development Team | Updated version and dates; no functional changes |
-| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server (Jan 2026); corrected aptitude grade system (G→F→E→D→C→B→A→S, S is maximum); updated support card bond system (80% threshold for friendship training, 10-35% bonus by rarity); added career structure details (~70-78 turns, Summer Training Camp mechanics) |
-| 2.1.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 architecture; added factor inheritance, deck synergy, validation details; integrated with current implementation |
-| 2.0.0 | 2026-01-14 | Development Team | Prior revision with basic flow |
-| 1.0.0 | 2026-01-03 | Development Team | Initial draft |
+- **Version**: 2.3.0; **Date**: 2026-02-22; **Author**: Development Team; **Changes**: Updated version and dates; no functional changes
+- **Version**: 2.2.0; **Date**: 2026-01-28; **Author**: Development Team; **Changes**: Updated with verified game mechanics from Global English Server (Jan 2026); corrected aptitude grade system (G→F→E→D→C→B→A→S, S is maximum); updated support card bond system (80% threshold for friendship training, 10-35% bonus by rarity); added career structure details (~70-78 turns, Summer Training Camp mechanics)
+- **Version**: 2.1.0; **Date**: 2026-01-24; **Author**: Development Team; **Changes**: Complete rewrite aligned with v2.0.0 architecture; added factor inheritance, deck synergy, validation details; integrated with current implementation
+- **Version**: 2.0.0; **Date**: 2026-01-14; **Author**: Development Team; **Changes**: Prior revision with basic flow
+- **Version**: 1.0.0; **Date**: 2026-01-03; **Author**: Development Team; **Changes**: Initial draft
 
 ---
 
@@ -1051,4 +1019,4 @@ flowchart LR
 
 ---
 
-*This user flow reflects the current career setup implementation as of version 2.3.0. For the latest updates, refer to the online documentation.*
+### This user flow reflects the current career setup implementation as of version 2.3.0. For the latest updates, refer to the online documentation
