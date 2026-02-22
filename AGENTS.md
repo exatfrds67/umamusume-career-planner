@@ -573,7 +573,7 @@ description: Laravel testing best practices with Pest
 - Document agent purposes clearly
 - Store local agents in `.kiro/agents/` for team sharing
 
-**Performance**
+#### Performance
 
 - Use skill resources for large documentation (progressive loading)
 - Configure knowledge bases with appropriate indexType
@@ -582,14 +582,14 @@ description: Laravel testing best practices with Pest
 
 ### Integration with This Project
 
-**Recommended Agents**
+#### Recommended Agents
 
 1. **Training Optimization Agent**: Domain-specific for training calculations
 2. **Skill Analysis Agent**: Specialized in skill SP calculations and evolution
 3. **Database Migration Agent**: Schema validation and migration assistance
 4. **Code Review Agent**: Pre-commit formatting and quality checks
 
-**Resource Configuration**
+#### Resource Configuration
 
 ```json
 {
