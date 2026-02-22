@@ -34,56 +34,48 @@ This glossary defines all core terminology used in the Umamusume Pretty Derby Ca
 
 ### 2.1 Core Stats
 
-| Stat     | Japanese   | Definition                                                                                                                                                                                          | Range    | Priority   |
-| -------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---------- |
-| Speed    | スピード       | Maximum running speed; determines overall race velocity.                                                                                                                                            | 0-1200   | ★★★★★      |
-| Stamina  | スタミナ       | HP & effective stamina; enables staying power over longer distances and through race events.                                                                                                        | 0-1200   | ★★★★       |
-| Power    | パワー        | Acceleration and ability to navigate around opponents, especially during race transitions and late bursts.                                                                                          | 0-1200   | ★★★        |
-| Guts     | 根性         | Affects race **position holding**, resistance to position loss in navigation battles; contributes to final sprint and recovers stamina under force-out conditions (not just "last spurt strength"). | 0-1200   | ★★         |
-| Wit      | 賢さ         | Influences **skill activation rate**, likelihood to **avoid "kakari" status** (stamina penalty), and general race event triggers; good Wit is more important than pure stat for race stability.     | 0-1200   | ★★★        |
+- **Stat**: Speed; **Japanese**: スピード; **Definition**: Maximum running speed; determines overall race velocity.; **Range**: 0-1200; **Priority**: ★★★★★
+- **Stat**: Stamina; **Japanese**: スタミナ; **Definition**: HP & effective stamina; enables staying power over longer distances and through race events.; **Range**: 0-1200; **Priority**: ★★★★
+- **Stat**: Power; **Japanese**: パワー; **Definition**: Acceleration and ability to navigate around opponents, especially during race transitions and late bursts.; **Range**: 0-1200; **Priority**: ★★★
+- **Stat**: Guts; **Japanese**: 根性; **Definition**: Affects race **position holding**, resistance to position loss in navigation battles; contributes to final sprint and recovers stamina under force-out conditions (not just "last spurt strength").; **Range**: 0-1200; **Priority**: ★★
+- **Stat**: Wit; **Japanese**: 賢さ; **Definition**: Influences **skill activation rate**, likelihood to **avoid "kakari" status** (stamina penalty), and general race event triggers; good Wit is more important than pure stat for race stability.; **Range**: 0-1200; **Priority**: ★★★
 
-**Stat Grade Scale:**
+### Stat Grade Scale:
 
-| Grade   | Value Range   | Effectiveness   |
-| ------- | ------------- | --------------- |
-| SS      | 1100-1200     | Elite tier      |
-| S       | 950-1099      | Excellent       |
-| A       | 850-949       | Good            |
-| B+      | 750-849       | Above average   |
-| B       | 650-749       | Average         |
-| C+      | 550-649       | Below average   |
-| C       | 450-549       | Poor            |
-| D+      | 350-449       | Very poor       |
-| D       | 250-349       | Minimal         |
-| E       | 150-249       | Negligible      |
-| F       | 0-149         | None            |
+- **Grade**: SS; **Value Range**: 1100-1200; **Effectiveness**: Elite tier
+- **Grade**: S; **Value Range**: 950-1099; **Effectiveness**: Excellent
+- **Grade**: A; **Value Range**: 850-949; **Effectiveness**: Good
+- **Grade**: B+; **Value Range**: 750-849; **Effectiveness**: Above average
+- **Grade**: B; **Value Range**: 650-749; **Effectiveness**: Average
+- **Grade**: C+; **Value Range**: 550-649; **Effectiveness**: Below average
+- **Grade**: C; **Value Range**: 450-549; **Effectiveness**: Poor
+- **Grade**: D+; **Value Range**: 350-449; **Effectiveness**: Very poor
+- **Grade**: D; **Value Range**: 250-349; **Effectiveness**: Minimal
+- **Grade**: E; **Value Range**: 150-249; **Effectiveness**: Negligible
+- **Grade**: F; **Value Range**: 0-149; **Effectiveness**: None
 
 > **Note:** Wit (Wisdom/Intelligence) not only increases skill activation chance, it directly affects the chance to avoid the "kakari" mishap (which increases stamina drain and prevents skill use during it).
 
 ### 2.2 Aptitudes
 
-| Term                    | Japanese   | In-Game Label (EN)   | Description                                                              | Categories                                                         |
-| ----------------------- | ---------- | -------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------ |
-| Aptitude                | 適性         | Aptitude             | Character compatibility for **distance, surface, and running style**.    | Distance, Surface, Style                                           |
-| Distance Aptitude       | 距離適性       | Distance             | Preferred race lengths: Sprint, Mile, Medium, Long as per JP/EN global.  | Sprint: <1400m, Mile: 1401-1800m, Medium: 1801-2400m, Long: 2401m+ |
-| Surface Aptitude        | バ場適性       | Surface              | Preferred ground: Turf or Dirt                                           | Turf, Dirt                                                         |
-| Running Style Aptitude  | 脚質適性       | Style                | Preferred position in races (see below)                                  | Front, Pace, Late, End                                             |
+- **Term**: Aptitude; **Japanese**: 適性; **In-Game Label (EN)**: Aptitude; **Description**: Character compatibility for **distance, surface, and running style**.; **Categories**: Distance, Surface, Style
+- **Term**: Distance Aptitude; **Japanese**: 距離適性; **In-Game Label (EN)**: Distance; **Description**: Preferred race lengths: Sprint, Mile, Medium, Long as per JP/EN global.; **Categories**: Sprint: <1400m, Mile: 1401-1800m, Medium: 1801-2400m, Long: 2401m+
+- **Term**: Surface Aptitude; **Japanese**: バ場適性; **In-Game Label (EN)**: Surface; **Description**: Preferred ground: Turf or Dirt; **Categories**: Turf, Dirt
+- **Term**: Running Style Aptitude; **Japanese**: 脚質適性; **In-Game Label (EN)**: Style; **Description**: Preferred position in races (see below); **Categories**: Front, Pace, Late, End
 
-**Clarification:**
+### Clarification:
 Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance and placement** when mismatched. Optimal aptitude is strongly recommended.
 
-**Aptitude Ratings & Effectiveness:**
+### Aptitude Ratings & Effectiveness:
 
-| Rating   | Japanese   | Effectiveness   | Description                                    |
-| -------- | ---------- | --------------- | ---------------------------------------------- |
-| S        | S          | 105-110%        | Maximum compatibility (S is the highest grade) |
-| A        | A          | 100%            | Good compatibility (baseline)                  |
-| B        | B          | 90%             | Adequate compatibility                         |
-| C        | C          | 80%             | Below average                                  |
-| D        | D          | 70%             | Poor compatibility                             |
-| E        | E          | 60%             | Very poor                                      |
-| F        | F          | 50%             | Minimal compatibility                          |
-| G        | G          | 40%             | Incompatible                                   |
+- **Rating**: S; **Japanese**: S; **Effectiveness**: 105-110%; **Description**: Maximum compatibility (S is the highest grade)
+- **Rating**: A; **Japanese**: A; **Effectiveness**: 100%; **Description**: Good compatibility (baseline)
+- **Rating**: B; **Japanese**: B; **Effectiveness**: 90%; **Description**: Adequate compatibility
+- **Rating**: C; **Japanese**: C; **Effectiveness**: 80%; **Description**: Below average
+- **Rating**: D; **Japanese**: D; **Effectiveness**: 70%; **Description**: Poor compatibility
+- **Rating**: E; **Japanese**: E; **Effectiveness**: 60%; **Description**: Very poor
+- **Rating**: F; **Japanese**: F; **Effectiveness**: 50%; **Description**: Minimal compatibility
+- **Rating**: G; **Japanese**: G; **Effectiveness**: 40%; **Description**: Incompatible
 
 > **Note:** S is the maximum aptitude grade. SS does NOT exist in the game. Only S-rank provides positive bonuses; A-rank is the baseline with no bonus/penalty.
 
@@ -91,43 +83,35 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 
 ### 2.3 Running Styles
 
-| Term (JP)   | Label (EN)   | Standard Community Naming  | In-Game Behaviour                     |
-| ----------- | ------------ | -------------------------- | ------------------------------------- |
-| 逃げ          | Front        | "Front"                    | Lead early, stay in front             |
-| 先行          | Pace         | "Pace"                     | Stay near leaders, chase from front   |
-| 差し          | Late         | "Late"                     | Travel mid-pack, surge near end       |
-| 追込          | End          | "End"                      | Linger far back, sprint at finish     |
+- **Term (JP)**: 逃げ; **Label (EN)**: Front; **Standard Community Naming**: "Front"; **In-Game Behaviour**: Lead early, stay in front
+- **Term (JP)**: 先行; **Label (EN)**: Pace; **Standard Community Naming**: "Pace"; **In-Game Behaviour**: Stay near leaders, chase from front
+- **Term (JP)**: 差し; **Label (EN)**: Late; **Standard Community Naming**: "Late"; **In-Game Behaviour**: Travel mid-pack, surge near end
+- **Term (JP)**: 追込; **Label (EN)**: End; **Standard Community Naming**: "End"; **In-Game Behaviour**: Linger far back, sprint at finish
 
 > **Note:** "Runaway" is a rare passive, not a base style.
 
 ### 2.4 Race Categories
 
-| Term               | Definition                                                           |
-| ------------------ | -------------------------------------------------------------------- |
-| Race Grade         | G1/G2/G3/Open/Pre-Open/Maiden (same as JP server for Global)         |
-| Distance           | Sprint: <1400m, Mile: 1401-1800m, Medium: 1801-2400m, Long: 2401+    |
-| Track Surface      | Turf (grass) or Dirt                                                 |
-| Race Condition     | Real-time weather/track status, affecting mood and performance       |
+- **Term**: Race Grade; **Definition**: G1/G2/G3/Open/Pre-Open/Maiden (same as JP server for Global)
+- **Term**: Distance; **Definition**: Sprint: <1400m, Mile: 1401-1800m, Medium: 1801-2400m, Long: 2401+
+- **Term**: Track Surface; **Definition**: Turf (grass) or Dirt
+- **Term**: Race Condition; **Definition**: Real-time weather/track status, affecting mood and performance
 
 ### 2.5 Career Stages
 
-| Stage           | Japanese   | Turn Range   | Description                              |
-| --------------- | ---------- | ------------ | ---------------------------------------- |
-| Junior Year     | ジュニア級      | 1–24         | Basic training foundation                |
-| Classic Year    | クラシック級     | 25–48        | Competitive growth and new races         |
-| Senior Year     | シニア級       | 49–72        | Peak and high-level racing               |
-| URA Finals      | URAファイナルズ  | 73–78        | Finals series                            |
+- **Stage**: Junior Year; **Japanese**: ジュニア級; **Turn Range**: 1–24; **Description**: Basic training foundation
+- **Stage**: Classic Year; **Japanese**: クラシック級; **Turn Range**: 25–48; **Description**: Competitive growth and new races
+- **Stage**: Senior Year; **Japanese**: シニア級; **Turn Range**: 49–72; **Description**: Peak and high-level racing
+- **Stage**: URA Finals; **Japanese**: URAファイナルズ; **Turn Range**: 73–78; **Description**: Finals series
 
 ### 2.6 Skill System
 
-| Term             | Japanese   | Global Mechanic (EN)                                                                                                                                                                         |
-| ---------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Skill Point (SP) | スキルポイント    | Earned via races/events, spent to purchase skills                                                                                                                                            |
-| Skill Hint       | ヒント        | Discount for skill SP cost; **5 hint levels with progressive discounts: Level 1 = 10%, Level 2 = 20%, Level 3 = 30%, Level 4 = 35%, Level 5 = 40% (maximum)**; applies when buying the skill |
-| Skill Evolution  | 進化         | Upgrade of some (not all) Normal → Rare skills under set conditions                                                                                                                          |
-| Skill Rarity     | レアリティ      | Normal (white), Rare (gold), Unique (rainbow)                                                                                                                                                |
+- **Term**: Skill Point (SP); **Japanese**: スキルポイント; **Global Mechanic (EN)**: Earned via races/events, spent to purchase skills
+- **Term**: Skill Hint; **Japanese**: ヒント; **Global Mechanic (EN)**: Discount for skill SP cost; **5 hint levels with progressive discounts: Level 1 = 10%, Level 2 = 20%, Level 3 = 30%, Level 4 = 35%, Level 5 = 40% (maximum)**; applies when buying the skill
+- **Term**: Skill Evolution; **Japanese**: 進化; **Global Mechanic (EN)**: Upgrade of some (not all) Normal → Rare skills under set conditions
+- **Term**: Skill Rarity; **Japanese**: レアリティ; **Global Mechanic (EN)**: Normal (white), Rare (gold), Unique (rainbow)
 
-**Skill Types (Community):**
+### Skill Types (Community):
 
 - Speed, Stamina, Power, Recovery, Unique, "Effect on Opponent" (often referred to as "debuffs" in guides, but not in-game as a formal type)
 
@@ -136,7 +120,7 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 
 ### 2.7 Training Actions
 
-**Available at each turn (Career Mode):**
+### Available at each turn (Career Mode):
 
 - **Train**: Increase specific stat (Speed/Stamina/Power/Guts/Wit)
 - **Race**: Compete to earn fans and SP, progress story
@@ -145,13 +129,11 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 
 ### 2.8 Mood System
 
-| Mood     | Japanese       | Effect                                                                                 |
-| -------- | -------------- | -------------------------------------------------------------------------------------- |
-| Great    | 絶好調            | +4% stat gains, best event/mood chance, reduces failure rate                           |
-| Good     | 好調             | +2% stat gains, good events more likely                                                |
-| Normal   | 普通             | Baseline effect                                                                        |
-| Bad      | 不調             | -2% stat gains, more failures, worse event odds                                        |
-| Awful    | 絶不調            | -4% stat gains, highest failure rate, bad events more likely                           |
+- **Mood**: Great; **Japanese**: 絶好調; **Effect**: +4% stat gains, best event/mood chance, reduces failure rate
+- **Mood**: Good; **Japanese**: 好調; **Effect**: +2% stat gains, good events more likely
+- **Mood**: Normal; **Japanese**: 普通; **Effect**: Baseline effect
+- **Mood**: Bad; **Japanese**: 不調; **Effect**: -2% stat gains, more failures, worse event odds
+- **Mood**: Awful; **Japanese**: 絶不調; **Effect**: -4% stat gains, highest failure rate, bad events more likely
 
 > **Note:** Better mood increases both training gains and chance for favorable events; also impacts likelihood of positive results under some race events.
 
@@ -160,23 +142,19 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 - **Legacy Effect**: Bonuses granted to new trainees when selecting two legacy Uma Musume in setup (after retiring a career run). These grant bonus stats and sometimes skills to new runs.
 - **Bond/Bonding**: Represents support card "friendship" (bond) level; higher bond unlocks improved training bonuses and special events. Distinct from raw support card stats.
 
-**Bond Milestones:**
+### Bond Milestones:
 
-| Level   | Reward                       |
-| ------- | ---------------------------- |
-| 20%     | Small stat bonus             |
-| 40%     | Skill hint                   |
-| 60%     | Special event                |
-| 80%     | Friendship Training unlocked |
+- **Level**: 20%; **Reward**: Small stat bonus
+- **Level**: 40%; **Reward**: Skill hint
+- **Level**: 60%; **Reward**: Special event
+- **Level**: 80%; **Reward**: Friendship Training unlocked
 
 ### 2.10 Conditions
 
-| Term               | Definition                                                                                                                       |
-| ------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
-| Condition          | Temporary status effect (positive or negative) affecting stats or training                                                       |
-| Positive Condition | Beneficial effect (e.g., "Focused", "Energized")                                                                                 |
-| Negative Condition | Detrimental effect (e.g., "Fatigued", "Injured")                                                                                 |
-| Kakari             | Negative condition that increases stamina consumption and prevents skill activation; higher Wit reduces chance of this occurring |
+- **Term**: Condition; **Definition**: Temporary status effect (positive or negative) affecting stats or training
+- **Term**: Positive Condition; **Definition**: Beneficial effect (e.g., "Focused", "Energized")
+- **Term**: Negative Condition; **Definition**: Detrimental effect (e.g., "Fatigued", "Injured")
+- **Term**: Kakari; **Definition**: Negative condition that increases stamina consumption and prevents skill activation; higher Wit reduces chance of this occurring
 
 ---
 
@@ -184,57 +162,49 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 
 ### 3.1 Core Entities
 
-| Term                    | Canonical Field                | Definition                                              | Storage         |
-| ----------------------- | ------------------------------ | ------------------------------------------------------- | --------------- |
-| Character               | `ucp_characters`               | Uma Musume trainee (player-controlled)                  | Database        |
-| Career Run / Plan       | `ucp_careers`                  | A single "career mode" progression                      | DB/localStore   |
-| Turn                    | `turn_number`                  | One in-game week; each runs a selection round           | DB/localStore   |
-| Support Deck            | `ucp_support_decks`            | Set of 6 support cards for training                     | Database        |
-| Support Card Definition | `ucp_support_card_definitions` | Canonical support card definition from external sources | Database        |
-| Skill Build             | `ucp_skill_builds`             | Saved skill loadout configuration for a career          | Database        |
-| Run Snapshot            | `ucp_run_snapshots`            | Point-in-time career state snapshot for undo/restore    | Database        |
-| Advisory Recommendation | `ucp_advisory_recommendations` | AI-generated training/race/skill recommendation         | Database        |
-| Critical Alert          | `ucp_critical_alerts`          | System-generated alert for critical career situations   | Database        |
-| Prediction Accuracy     | `ucp_prediction_accuracy`      | Tracking of AI prediction vs actual outcome             | Database        |
-| Legacy                  | `legacy_*`                     | Data from completed runs used to boost new trainees     | Database        |
+- **Term**: Character; **Canonical Field**: `ucp_characters`; **Definition**: Uma Musume trainee (player-controlled); **Storage**: Database
+- **Term**: Career Run / Plan; **Canonical Field**: `ucp_careers`; **Definition**: A single "career mode" progression; **Storage**: DB/localStore
+- **Term**: Turn; **Canonical Field**: `turn_number`; **Definition**: One in-game week; each runs a selection round; **Storage**: DB/localStore
+- **Term**: Support Deck; **Canonical Field**: `ucp_support_decks`; **Definition**: Set of 6 support cards for training; **Storage**: Database
+- **Term**: Support Card Definition; **Canonical Field**: `ucp_support_card_definitions`; **Definition**: Canonical support card definition from external sources; **Storage**: Database
+- **Term**: Skill Build; **Canonical Field**: `ucp_skill_builds`; **Definition**: Saved skill loadout configuration for a career; **Storage**: Database
+- **Term**: Run Snapshot; **Canonical Field**: `ucp_run_snapshots`; **Definition**: Point-in-time career state snapshot for undo/restore; **Storage**: Database
+- **Term**: Advisory Recommendation; **Canonical Field**: `ucp_advisory_recommendations`; **Definition**: AI-generated training/race/skill recommendation; **Storage**: Database
+- **Term**: Critical Alert; **Canonical Field**: `ucp_critical_alerts`; **Definition**: System-generated alert for critical career situations; **Storage**: Database
+- **Term**: Prediction Accuracy; **Canonical Field**: `ucp_prediction_accuracy`; **Definition**: Tracking of AI prediction vs actual outcome; **Storage**: Database
+- **Term**: Legacy; **Canonical Field**: `legacy_*`; **Definition**: Data from completed runs used to boost new trainees; **Storage**: Database
 
-*See also: Factor, Bond, Skill Hint under Game Terminology.*
+### See also: Factor, Bond, Skill Hint under Game Terminology.
 
 ### 3.2 Data Tracking
 
-| Term              | Definition                                                          |
-| ----------------- | ------------------------------------------------------------------- |
-| Stat Progress     | Historical record of stat values per turn (`ucp_training_sessions`) |
-| Training Session  | Record of a training action with gains and outcomes                 |
-| Race Result       | Record of race participation and placement                          |
-| Skill Acquisition | Record of when and how a skill was obtained                         |
-| Goal              | User-defined target (stat threshold, race win, skill count)         |
-| Bond Progress     | Friendship level progression with support card characters           |
+- **Term**: Stat Progress; **Definition**: Historical record of stat values per turn (`ucp_training_sessions`)
+- **Term**: Training Session; **Definition**: Record of a training action with gains and outcomes
+- **Term**: Race Result; **Definition**: Record of race participation and placement
+- **Term**: Skill Acquisition; **Definition**: Record of when and how a skill was obtained
+- **Term**: Goal; **Definition**: User-defined target (stat threshold, race win, skill count)
+- **Term**: Bond Progress; **Definition**: Friendship level progression with support card characters
 
 ### 3.3 User Interface
 
-| Term           | Definition                                                                  |
-| -------------- | --------------------------------------------------------------------------- |
-| Dashboard      | Main overview page with stats, goals, and quick actions                     |
-| Wizard         | Multi-step guided interface (e.g., Character Creation Wizard)               |
-| Preview        | Read-only view of data before confirmation                                  |
-| Toast          | Temporary notification message                                              |
-| Modal          | Overlay dialog for focused interactions                                     |
-| Advisory Panel | Livewire component (`AdvisoryPanel`) providing real-time AI recommendations |
-| Breadcrumb     | Hierarchical navigation trail shown at the top of pages                     |
-| Radar Chart    | Chart.js radar visualization for character stat display                     |
+- **Term**: Dashboard; **Definition**: Main overview page with stats, goals, and quick actions
+- **Term**: Wizard; **Definition**: Multi-step guided interface (e.g., Character Creation Wizard)
+- **Term**: Preview; **Definition**: Read-only view of data before confirmation
+- **Term**: Toast; **Definition**: Temporary notification message
+- **Term**: Modal; **Definition**: Overlay dialog for focused interactions
+- **Term**: Advisory Panel; **Definition**: Livewire component (`AdvisoryPanel`) providing real-time AI recommendations
+- **Term**: Breadcrumb; **Definition**: Hierarchical navigation trail shown at the top of pages
+- **Term**: Radar Chart; **Definition**: Chart.js radar visualization for character stat display
 
 ### 3.4 Admin Panel
 
-| Term                 | Definition                                                                      |
-| -------------------- | ------------------------------------------------------------------------------- |
-| Admin Panel          | Protected administrative interface for system management (`Admin/` controllers) |
-| Database Maintenance | Admin tool for database optimization and cleanup (`DatabaseMaintenanceService`) |
-| Log Reader           | Admin tool for viewing application logs (`LogReaderService`)                    |
-| System Health        | Admin dashboard showing system status (`SystemHealthService`)                   |
-| Queue Monitor        | Admin interface for monitoring background job processing (via Horizon)          |
-| User Management      | Admin interface for managing user accounts and roles                            |
-| System Settings      | Admin interface for application-wide configuration                              |
+- **Term**: Admin Panel; **Definition**: Protected administrative interface for system management (`Admin/` controllers)
+- **Term**: Database Maintenance; **Definition**: Admin tool for database optimization and cleanup (`DatabaseMaintenanceService`)
+- **Term**: Log Reader; **Definition**: Admin tool for viewing application logs (`LogReaderService`)
+- **Term**: System Health; **Definition**: Admin dashboard showing system status (`SystemHealthService`)
+- **Term**: Queue Monitor; **Definition**: Admin interface for monitoring background job processing (via Horizon)
+- **Term**: User Management; **Definition**: Admin interface for managing user accounts and roles
+- **Term**: System Settings; **Definition**: Admin interface for application-wide configuration
 
 ---
 
@@ -242,68 +212,60 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 
 ### 4.1 Architecture Components
 
-| Term               | Abbreviation   | Definition                                                                                                                                                                  |
-| ------------------ | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Eloquent Model     | -              | Laravel ORM model representing database table (30 models in system)                                                                                                         |
-| Livewire Component | -              | Server-driven reactive UI component (e.g., `AdvisoryPanel`)                                                                                                                 |
-| Service Layer      | -              | Business logic abstraction (70+ services in `app/Services/`)                                                                                                                |
-| Form Request       | -              | Laravel validation class for HTTP requests                                                                                                                                  |
-| Repository         | -              | Data access pattern abstracting database queries (e.g., `CharacterRepositoryInterface`, `EloquentCharacterRepository`)                                                      |
-| Enum               | -              | PHP 8.1+ enumeration for type-safe constants (8 enums: `AlertType`, `CareerPhase`, `Mood`, `Priority`, `RaceDistance`, `RecommendationType`, `RunningStyle`, `StorageMode`) |
-| Value Object       | -              | Immutable object representing a domain concept (in `app/ValueObjects/`)                                                                                                     |
-| Collection         | -              | Custom Laravel collection class (in `app/Collections/`)                                                                                                                     |
-| Event/Listener     | -              | Laravel event system for decoupled processing (in `app/Events/`, `app/Listeners/`)                                                                                          |
-| Job                | -              | Queued background task (in `app/Jobs/`)                                                                                                                                     |
-| Policy             | -              | Laravel authorization policy (in `app/Policies/`)                                                                                                                           |
-| Notification       | -              | Laravel notification class (in `app/Notifications/`)                                                                                                                        |
+- **Term**: Eloquent Model; **Abbreviation**: -; **Definition**: Laravel ORM model representing database table (30 models in system)
+- **Term**: Livewire Component; **Abbreviation**: -; **Definition**: Server-driven reactive UI component (e.g., `AdvisoryPanel`)
+- **Term**: Service Layer; **Abbreviation**: -; **Definition**: Business logic abstraction (70+ services in `app/Services/`)
+- **Term**: Form Request; **Abbreviation**: -; **Definition**: Laravel validation class for HTTP requests
+- **Term**: Repository; **Abbreviation**: -; **Definition**: Data access pattern abstracting database queries (e.g., `CharacterRepositoryInterface`, `EloquentCharacterRepository`)
+- **Term**: Enum; **Abbreviation**: -; **Definition**: PHP 8.1+ enumeration for type-safe constants (8 enums: `AlertType`, `CareerPhase`, `Mood`, `Priority`, `RaceDistance`, `RecommendationType`, `RunningStyle`, `StorageMode`)
+- **Term**: Value Object; **Abbreviation**: -; **Definition**: Immutable object representing a domain concept (in `app/ValueObjects/`)
+- **Term**: Collection; **Abbreviation**: -; **Definition**: Custom Laravel collection class (in `app/Collections/`)
+- **Term**: Event/Listener; **Abbreviation**: -; **Definition**: Laravel event system for decoupled processing (in `app/Events/`, `app/Listeners/`)
+- **Term**: Job; **Abbreviation**: -; **Definition**: Queued background task (in `app/Jobs/`)
+- **Term**: Policy; **Abbreviation**: -; **Definition**: Laravel authorization policy (in `app/Policies/`)
+- **Term**: Notification; **Abbreviation**: -; **Definition**: Laravel notification class (in `app/Notifications/`)
 
 ### 4.2 Technology Stack
 
-| Technology          | Version               | Layer                | Purpose                         |
-| ------------------- | --------------------- | -------------------- | ------------------------------- |
-| Laravel             | 12+                   | Backend Framework    | Application foundation          |
-| PHP                 | ^8.2 (runtime 8.4.11) | Runtime              | Server-side execution           |
-| Livewire            | 4                     | Frontend Reactivity  | Dynamic UI without JavaScript   |
-| Alpine.js           | 3                     | Client Interactivity | Lightweight JS framework        |
-| TailwindCSS         | v4                    | Styling              | Utility-first CSS framework     |
-| Vite                | 7                     | Build Tool           | Asset compilation and bundling  |
-| Chart.js            | 4                     | Charting             | Data visualization              |
-| MySQL               | 8.0+                  | Database             | Primary data store (production) |
-| SQLite              | Latest                | Database             | Development/testing database    |
-| Redis               | 7+ (via WSL)          | Cache/Queue          | Caching and background jobs     |
-| Pest                | v4                    | Testing              | PHP testing framework           |
-| PHPUnit             | v12                   | Testing              | Testing engine (underlying)     |
-| pest-plugin-browser | 4.0                   | Browser Testing      | Browser-based test automation   |
-| Playwright          | 1.58                  | E2E Testing          | End-to-end browser testing      |
-| Larastan            | v3                    | Code Quality         | Static analysis for Laravel     |
-| Laravel Pint        | v1                    | Code Formatting      | PSR-12 code style fixer         |
-| Neuron AI           | v2.11                 | AI Framework         | AI agent orchestration          |
-| neuron-laravel      | v0.3.4                | AI Integration       | Laravel integration for Neuron  |
-| Laravel Sanctum     | v4                    | Auth                 | API token authentication        |
-| Laravel Horizon     | v5                    | Queue Monitoring     | Redis queue dashboard           |
-| Laravel Telescope   | Latest                | Debugging            | Request/job/query monitoring    |
-| Laravel Boost       | v1.8                  | Dev Tooling          | MCP development server          |
+- **Technology**: Laravel; **Version**: 12+; **Layer**: Backend Framework; **Purpose**: Application foundation
+- **Technology**: PHP; **Version**: ^8.2 (runtime 8.4.11); **Layer**: Runtime; **Purpose**: Server-side execution
+- **Technology**: Livewire; **Version**: 4; **Layer**: Frontend Reactivity; **Purpose**: Dynamic UI without JavaScript
+- **Technology**: Alpine.js; **Version**: 3; **Layer**: Client Interactivity; **Purpose**: Lightweight JS framework
+- **Technology**: TailwindCSS; **Version**: v4; **Layer**: Styling; **Purpose**: Utility-first CSS framework
+- **Technology**: Vite; **Version**: 7; **Layer**: Build Tool; **Purpose**: Asset compilation and bundling
+- **Technology**: Chart.js; **Version**: 4; **Layer**: Charting; **Purpose**: Data visualization
+- **Technology**: MySQL; **Version**: 8.0+; **Layer**: Database; **Purpose**: Primary data store (production)
+- **Technology**: SQLite; **Version**: Latest; **Layer**: Database; **Purpose**: Development/testing database
+- **Technology**: Redis; **Version**: 7+ (via WSL); **Layer**: Cache/Queue; **Purpose**: Caching and background jobs
+- **Technology**: Pest; **Version**: v4; **Layer**: Testing; **Purpose**: PHP testing framework
+- **Technology**: PHPUnit; **Version**: v12; **Layer**: Testing; **Purpose**: Testing engine (underlying)
+- **Technology**: pest-plugin-browser; **Version**: 4.0; **Layer**: Browser Testing; **Purpose**: Browser-based test automation
+- **Technology**: Playwright; **Version**: 1.58; **Layer**: E2E Testing; **Purpose**: End-to-end browser testing
+- **Technology**: Larastan; **Version**: v3; **Layer**: Code Quality; **Purpose**: Static analysis for Laravel
+- **Technology**: Laravel Pint; **Version**: v1; **Layer**: Code Formatting; **Purpose**: PSR-12 code style fixer
+- **Technology**: Neuron AI; **Version**: v2.11; **Layer**: AI Framework; **Purpose**: AI agent orchestration
+- **Technology**: neuron-laravel; **Version**: v0.3.4; **Layer**: AI Integration; **Purpose**: Laravel integration for Neuron
+- **Technology**: Laravel Sanctum; **Version**: v4; **Layer**: Auth; **Purpose**: API token authentication
+- **Technology**: Laravel Horizon; **Version**: v5; **Layer**: Queue Monitoring; **Purpose**: Redis queue dashboard
+- **Technology**: Laravel Telescope; **Version**: Latest; **Layer**: Debugging; **Purpose**: Request/job/query monitoring
+- **Technology**: Laravel Boost; **Version**: v1.8; **Layer**: Dev Tooling; **Purpose**: MCP development server
 
 ### 4.3 Database Conventions
 
-| Convention   | Pattern                    | Example                         |
-| ------------ | -------------------------- | ------------------------------- |
-| Table Prefix | `ucp_`                     | `ucp_characters`, `ucp_careers` |
-| Primary Key  | `id`                       | Integer auto-increment          |
-| UUID Field   | `uuid`                     | For Local storage mode          |
-| Foreign Key  | `{table}_id`               | `character_id`, `user_id`       |
-| Timestamps   | `created_at`, `updated_at` | Laravel standard                |
-| Soft Deletes | `deleted_at`               | For recoverable deletions       |
+- **Convention**: Table Prefix; **Pattern**: `ucp_`; **Example**: `ucp_characters`, `ucp_careers`
+- **Convention**: Primary Key; **Pattern**: `id`; **Example**: Integer auto-increment
+- **Convention**: UUID Field; **Pattern**: `uuid`; **Example**: For Local storage mode
+- **Convention**: Foreign Key; **Pattern**: `{table}_id`; **Example**: `character_id`, `user_id`
+- **Convention**: Timestamps; **Pattern**: `created_at`, `updated_at`; **Example**: Laravel standard
+- **Convention**: Soft Deletes; **Pattern**: `deleted_at`; **Example**: For recoverable deletions
 
 ### 4.4 Validation Rules
 
-| Rule Type    | Example   | Description                                         |
-| ------------ | --------- | --------------------------------------------------- |
-| Stat Range   | 0-1200    | Hard max, no values above 1200 allowed              |
-| Turn Range   | 1-78      | Valid turn numbers                                  |
-| Energy Range | 0-100     | Energy level percentage                             |
-| Deck Size    | 6 cards   | Exactly 6 cards (5 owned + 1 borrowed)              |
-| Hint Level   | 0-5       | Maximum 5 hints per skill (40% discount at level 5) |
+- **Rule Type**: Stat Range; **Example**: 0-1200; **Description**: Hard max, no values above 1200 allowed
+- **Rule Type**: Turn Range; **Example**: 1-78; **Description**: Valid turn numbers
+- **Rule Type**: Energy Range; **Example**: 0-100; **Description**: Energy level percentage
+- **Rule Type**: Deck Size; **Example**: 6 cards; **Description**: Exactly 6 cards (5 owned + 1 borrowed)
+- **Rule Type**: Hint Level; **Example**: 0-5; **Description**: Maximum 5 hints per skill (40% discount at level 5)
 
 ---
 
@@ -311,111 +273,89 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 
 ### 5.1 AI System
 
-| Term            | Abbreviation   | Definition                                                          |
-| --------------- | -------------- | ------------------------------------------------------------------- |
-| AI Provider     | -              | Backend service for AI inference (Ollama, AWS Bedrock)              |
-| Neuron AI       | -              | AI agent orchestration framework (v2.11 with neuron-laravel v0.3.4) |
-| AI Agent        | -              | Specialized AI for specific tasks (Training Advisor, Race Strategy) |
-| AI Conversation | -              | Persisted chat session (`ucp_ai_conversations`)                     |
-| AI Cost         | -              | Per-token usage cost tracking (`ucp_ai_costs`)                      |
-| AI Metrics      | -              | Performance and usage analytics (`ucp_ai_metrics`)                  |
-| Hybrid AI       | -              | Architecture using local (Ollama) + cloud (Bedrock) fallback        |
+- **Term**: AI Provider; **Abbreviation**: -; **Definition**: Backend service for AI inference (Ollama, AWS Bedrock)
+- **Term**: Neuron AI; **Abbreviation**: -; **Definition**: AI agent orchestration framework (v2.11 with neuron-laravel v0.3.4)
+- **Term**: AI Agent; **Abbreviation**: -; **Definition**: Specialized AI for specific tasks (Training Advisor, Race Strategy)
+- **Term**: AI Conversation; **Abbreviation**: -; **Definition**: Persisted chat session (`ucp_ai_conversations`)
+- **Term**: AI Cost; **Abbreviation**: -; **Definition**: Per-token usage cost tracking (`ucp_ai_costs`)
+- **Term**: AI Metrics; **Abbreviation**: -; **Definition**: Performance and usage analytics (`ucp_ai_metrics`)
+- **Term**: Hybrid AI; **Abbreviation**: -; **Definition**: Architecture using local (Ollama) + cloud (Bedrock) fallback
 
-**AI Providers:**
+### AI Providers:
 
-| Provider    | Type   | Models            | Use Case                  |
-| ----------- | ------ | ----------------- | ------------------------- |
-| Ollama      | Local  | llama3.2, mistral | Primary, free inference   |
-| AWS Bedrock | Cloud  | Claude 4.5 Sonnet | Complex queries, fallback |
+- **Provider**: Ollama; **Type**: Local; **Models**: llama3.2, mistral; **Use Case**: Primary, free inference
+- **Provider**: AWS Bedrock; **Type**: Cloud; **Models**: Claude 4.5 Sonnet; **Use Case**: Complex queries, fallback
 
 ### 5.2 Neuron Agents
 
 Neuron agents live in `app/Neuron/Agents/` with response types in `app/Neuron/Responses/` and support classes in `app/Neuron/Support/`. Service layer wrappers are in `app/Services/Neuron/`.
 
-| Agent                      | Class                      | Purpose                                      | Response Type                 |
-| -------------------------- | -------------------------- | -------------------------------------------- | ----------------------------- |
-| Base Agent                 | `BaseAgent`                | Abstract base class for all Neuron agents    | -                             |
-| Training Advisor Agent     | `TrainingAdvisorAgent`     | Recommends optimal training selections       | `TrainingAdviceResponse`      |
-| Race Strategy Agent        | `RaceStrategyAgent`        | Analyzes race requirements and strategy      | `RaceStrategyResponse`        |
-| Skill Recommendation Agent | `SkillRecommendationAgent` | Suggests skill acquisition priorities        | `SkillRecommendationResponse` |
-| Career Planning Agent      | `CareerPlanningAgent`      | Provides long-term strategic guidance        | `CareerPlanningResponse`      |
-| MCP Demo Agent             | `McpDemoAgent`             | Demonstration agent for MCP tool integration | -                             |
+- **Agent**: Base Agent; **Class**: `BaseAgent`; **Purpose**: Abstract base class for all Neuron agents; **Response Type**: -
+- **Agent**: Training Advisor Agent; **Class**: `TrainingAdvisorAgent`; **Purpose**: Recommends optimal training selections; **Response Type**: `TrainingAdviceResponse`
+- **Agent**: Race Strategy Agent; **Class**: `RaceStrategyAgent`; **Purpose**: Analyzes race requirements and strategy; **Response Type**: `RaceStrategyResponse`
+- **Agent**: Skill Recommendation Agent; **Class**: `SkillRecommendationAgent`; **Purpose**: Suggests skill acquisition priorities; **Response Type**: `SkillRecommendationResponse`
+- **Agent**: Career Planning Agent; **Class**: `CareerPlanningAgent`; **Purpose**: Provides long-term strategic guidance; **Response Type**: `CareerPlanningResponse`
+- **Agent**: MCP Demo Agent; **Class**: `McpDemoAgent`; **Purpose**: Demonstration agent for MCP tool integration; **Response Type**: -
 
-**Neuron Support Classes:**
+### Neuron Support Classes:
 
-| Class                 | Purpose                                               |
-| --------------------- | ----------------------------------------------------- |
-| `McpConnectorFactory` | Creates MCP connector instances for agent tool access |
-| `McpToolIntegration`  | Integrates MCP tools with Neuron agent capabilities   |
+- **Class**: `McpConnectorFactory`; **Purpose**: Creates MCP connector instances for agent tool access
+- **Class**: `McpToolIntegration`; **Purpose**: Integrates MCP tools with Neuron agent capabilities
 
-**Neuron Service Layer (`app/Services/Neuron/`):**
+### Neuron Service Layer (`app/Services/Neuron/`):
 
-| Service                      | Purpose                                              |
-| ---------------------------- | ---------------------------------------------------- |
-| `NeuronAIService`            | Core Neuron AI orchestration and provider management |
-| `TrainingAdvisorService`     | Wrapper for training advisor agent interactions      |
-| `RaceStrategyService`        | Wrapper for race strategy agent interactions         |
-| `SkillRecommendationService` | Wrapper for skill recommendation agent interactions  |
-| `CareerPlanningService`      | Wrapper for career planning agent interactions       |
+- **Service**: `NeuronAIService`; **Purpose**: Core Neuron AI orchestration and provider management
+- **Service**: `TrainingAdvisorService`; **Purpose**: Wrapper for training advisor agent interactions
+- **Service**: `RaceStrategyService`; **Purpose**: Wrapper for race strategy agent interactions
+- **Service**: `SkillRecommendationService`; **Purpose**: Wrapper for skill recommendation agent interactions
+- **Service**: `CareerPlanningService`; **Purpose**: Wrapper for career planning agent interactions
 
 ### 5.3 MCP (Model Context Protocol)
 
-| Term           | Abbreviation           | Definition                                                                    |
-| -------------- | ---------------------- | ----------------------------------------------------------------------------- |
-| MCP            | Model Context Protocol | Standard for AI tool/agent integration                                        |
-| MCP Server     | -                      | Tool provider service (Memory, Filesystem, Fetch)                             |
-| MCP Agent      | -                      | AI agent configuration (`ucp_mcp_agents`)                                     |
-| MCP Tool       | -                      | Executable function exposed to AI agents                                      |
-| MCP Tool Usage | -                      | Tracking of tool invocations (`ucp_mcp_tool_usage`)                           |
-| MCP Health     | -                      | Server availability monitoring (`ucp_mcp_server_health`)                      |
-| Laravel MCP    | -                      | Official Laravel MCP package (`laravel/mcp v0`) for server-side tool exposure |
-| MCP Monitoring | -                      | Service for tracking MCP server health, tool usage, and agent performance     |
+- **Term**: MCP; **Abbreviation**: Model Context Protocol; **Definition**: Standard for AI tool/agent integration
+- **Term**: MCP Server; **Abbreviation**: -; **Definition**: Tool provider service (Memory, Filesystem, Fetch)
+- **Term**: MCP Agent; **Abbreviation**: -; **Definition**: AI agent configuration (`ucp_mcp_agents`)
+- **Term**: MCP Tool; **Abbreviation**: -; **Definition**: Executable function exposed to AI agents
+- **Term**: MCP Tool Usage; **Abbreviation**: -; **Definition**: Tracking of tool invocations (`ucp_mcp_tool_usage`)
+- **Term**: MCP Health; **Abbreviation**: -; **Definition**: Server availability monitoring (`ucp_mcp_server_health`)
+- **Term**: Laravel MCP; **Abbreviation**: -; **Definition**: Official Laravel MCP package (`laravel/mcp v0`) for server-side tool exposure
+- **Term**: MCP Monitoring; **Abbreviation**: -; **Definition**: Service for tracking MCP server health, tool usage, and agent performance
 
-**MCP Server Types:**
+### MCP Server Types:
 
-| Server     | Type   | Purpose                          |
-| ---------- | ------ | -------------------------------- |
-| Memory     | Local  | Conversation context persistence |
-| Filesystem | Local  | Document and file access         |
-| Fetch      | Local  | HTTP resource retrieval          |
-| Custom     | Remote | Domain-specific tools (optional) |
+- **Server**: Memory; **Type**: Local; **Purpose**: Conversation context persistence
+- **Server**: Filesystem; **Type**: Local; **Purpose**: Document and file access
+- **Server**: Fetch; **Type**: Local; **Purpose**: HTTP resource retrieval
+- **Server**: Custom; **Type**: Remote; **Purpose**: Domain-specific tools (optional)
 
 ### 5.4 External APIs
 
-| Term            | Definition                                                   |
-| --------------- | ------------------------------------------------------------ |
-| External Data   | Cached records from external APIs (`ucp_external_api_cache`) |
-| Circuit Breaker | Resilience pattern preventing cascading failures             |
-| Fallback API    | Secondary API used when primary fails                        |
-| Cache TTL       | Time-to-live for cached API responses (24 hours)             |
+- **Term**: External Data; **Definition**: Cached records from external APIs (`ucp_external_api_cache`)
+- **Term**: Circuit Breaker; **Definition**: Resilience pattern preventing cascading failures
+- **Term**: Fallback API; **Definition**: Secondary API used when primary fails
+- **Term**: Cache TTL; **Definition**: Time-to-live for cached API responses (24 hours)
 
-**External API Sources:**
+### External API Sources:
 
-| API             | Purpose                                             | Client Class             | Status   |
-| --------------- | --------------------------------------------------- | ------------------------ | -------- |
-| umapyoi.net     | Primary game data (characters, support cards, news) | `UmapyoiApiClient`       | Active   |
-| UmamusumeDB.com | Fallback data (skills, races)                       | `UmamusumeDBApiClient`   | Active   |
-| GameTora        | Supplementary data via web scraping                 | `GameToraScraperService` | Active   |
+- **API**: umapyoi.net; **Purpose**: Primary game data (characters, support cards, news); **Client Class**: `UmapyoiApiClient`; **Status**: Active
+- **API**: UmamusumeDB.com; **Purpose**: Fallback data (skills, races); **Client Class**: `UmamusumeDBApiClient`; **Status**: Active
+- **API**: GameTora; **Purpose**: Supplementary data via web scraping; **Client Class**: `GameToraScraperService`; **Status**: Active
 
 ### 5.5 OCR System
 
-| Term             | Abbreviation                  | Definition                                                  |
-| ---------------- | ----------------------------- | ----------------------------------------------------------- |
-| OCR              | Optical Character Recognition | Technology for extracting text from images                  |
-| OCR Extraction   | -                             | Result of OCR processing (`ucp_ocr_extractions`)            |
-| GD Library       | GD                            | PHP image processing library for preprocessing              |
-| Tesseract        | -                             | Open-source OCR engine                                      |
-| Confidence Score | -                             | OCR accuracy metric (0-100%)                                |
-| Preprocessing    | -                             | Image enhancement before OCR (resize, grayscale, threshold) |
+- **Term**: OCR; **Abbreviation**: Optical Character Recognition; **Definition**: Technology for extracting text from images
+- **Term**: OCR Extraction; **Abbreviation**: -; **Definition**: Result of OCR processing (`ucp_ocr_extractions`)
+- **Term**: GD Library; **Abbreviation**: GD; **Definition**: PHP image processing library for preprocessing
+- **Term**: Tesseract; **Abbreviation**: -; **Definition**: Open-source OCR engine
+- **Term**: Confidence Score; **Abbreviation**: -; **Definition**: OCR accuracy metric (0-100%)
+- **Term**: Preprocessing; **Abbreviation**: -; **Definition**: Image enhancement before OCR (resize, grayscale, threshold)
 
-**OCR Data Types:**
+### OCR Data Types:
 
-| Data Type       | Detection Pattern             | Confidence Threshold  |
-| --------------- | ----------------------------- | --------------------- |
-| Character Stats | Stat labels + numeric values  | 85%                   |
-| Skill Names     | Japanese/English text regions | 80%                   |
-| Race Results    | Placement + time format       | 90%                   |
-| Support Cards   | Card frame detection          | 75%                   |
+- **Data Type**: Character Stats; **Detection Pattern**: Stat labels + numeric values; **Confidence Threshold**: 85%
+- **Data Type**: Skill Names; **Detection Pattern**: Japanese/English text regions; **Confidence Threshold**: 80%
+- **Data Type**: Race Results; **Detection Pattern**: Placement + time format; **Confidence Threshold**: 90%
+- **Data Type**: Support Cards; **Detection Pattern**: Card frame detection; **Confidence Threshold**: 75%
 
 ---
 
@@ -423,42 +363,34 @@ Neuron agents live in `app/Neuron/Agents/` with response types in `app/Neuron/Re
 
 ### 6.1 Storage Modes
 
-| Term             | Definition                                                             | Identifier                 | Offline Support                |
-| ---------------- | ---------------------------------------------------------------------- | -------------------------- | ------------------------------ |
-| Local Mode       | Browser localStorage-based storage                                     | UUID                       | Full                           |
-| Account Mode     | Database-backed cloud storage                                          | Integer ID                 | Requires connectivity for save |
-| Storage Badge    | Visual indicator of current mode                                       | Icon + label               | N/A                            |
-| StorageMode Enum | PHP enum (`App\Enums\StorageMode`) for type-safe storage mode handling | `Local` / `Account` values | N/A                            |
+- **Term**: Local Mode; **Definition**: Browser localStorage-based storage; **Identifier**: UUID; **Offline Support**: Full
+- **Term**: Account Mode; **Definition**: Database-backed cloud storage; **Identifier**: Integer ID; **Offline Support**: Requires connectivity for save
+- **Term**: Storage Badge; **Definition**: Visual indicator of current mode; **Identifier**: Icon + label; **Offline Support**: N/A
+- **Term**: StorageMode Enum; **Definition**: PHP enum (`App\Enums\StorageMode`) for type-safe storage mode handling; **Identifier**: `Local` / `Account` values; **Offline Support**: N/A
 
 ### 6.2 Import/Export
 
-| Term             | Definition                                            |
-| ---------------- | ----------------------------------------------------- |
-| Backup           | Exportable archive of user data via `BackupService`   |
-| Data Import      | Process of loading external data into the system      |
-| Data Export      | Process of extracting data for external use           |
-| Data Migration   | Conversion between storage formats or schema versions |
-| Format Detection | Automatic identification of import file structure     |
-| Schema Version   | Version identifier in exported data for compatibility |
+- **Term**: Backup; **Definition**: Exportable archive of user data via `BackupService`
+- **Term**: Data Import; **Definition**: Process of loading external data into the system
+- **Term**: Data Export; **Definition**: Process of extracting data for external use
+- **Term**: Data Migration; **Definition**: Conversion between storage formats or schema versions
+- **Term**: Format Detection; **Definition**: Automatic identification of import file structure
+- **Term**: Schema Version; **Definition**: Version identifier in exported data for compatibility
 
-**Export Formats:**
+### Export Formats:
 
-| Format   | Extension   | Use Case                              |
-| -------- | ----------- | ------------------------------------- |
-| JSON     | .json       | Full data backup, cross-app import    |
-| Excel    | .xlsx       | Spreadsheet analysis, sharing         |
-| CSV      | .csv        | Data processing, simple imports       |
-| Markdown | .md         | Documentation, human-readable exports |
+- **Format**: JSON; **Extension**: .json; **Use Case**: Full data backup, cross-app import
+- **Format**: Excel; **Extension**: .xlsx; **Use Case**: Spreadsheet analysis, sharing
+- **Format**: CSV; **Extension**: .csv; **Use Case**: Data processing, simple imports
+- **Format**: Markdown; **Extension**: .md; **Use Case**: Documentation, human-readable exports
 
 ### 6.3 Migration and Validation
 
-| Term                | Definition                                                               |
-| ------------------- | ------------------------------------------------------------------------ |
-| Legacy Format       | Data structure from previous application versions                        |
-| Field Mapping       | Translation between legacy and canonical field names                     |
-| Conflict Resolution | Strategy for handling duplicate records (skip, overwrite, merge, rename) |
-| Validation Layer    | Three-tier validation (schema, business rules, integrity)                |
-| Rollback            | Reverting to previous state after failed migration                       |
+- **Term**: Legacy Format; **Definition**: Data structure from previous application versions
+- **Term**: Field Mapping; **Definition**: Translation between legacy and canonical field names
+- **Term**: Conflict Resolution; **Definition**: Strategy for handling duplicate records (skip, overwrite, merge, rename)
+- **Term**: Validation Layer; **Definition**: Three-tier validation (schema, business rules, integrity)
+- **Term**: Rollback; **Definition**: Reverting to previous state after failed migration
 
 ---
 
@@ -466,47 +398,37 @@ Neuron agents live in `app/Neuron/Agents/` with response types in `app/Neuron/Re
 
 ### 7.1 Career Run Status
 
-| Status      | Icon   | Definition                                  |
-| ----------- | ------ | ------------------------------------------- |
-| In Progress | 🟢      | Career is actively being played             |
-| Completed   | ✅      | Career has finished (URA Finals complete)   |
-| Archived    | 📦      | Career is saved but hidden from active view |
-| Abandoned   | ❌      | Career was discontinued                     |
+- **Status**: In Progress; **Icon**: 🟢; **Definition**: Career is actively being played
+- **Status**: Completed; **Icon**: ✅; **Definition**: Career has finished (URA Finals complete)
+- **Status**: Archived; **Icon**: 📦; **Definition**: Career is saved but hidden from active view
+- **Status**: Abandoned; **Icon**: ❌; **Definition**: Career was discontinued
 
 ### 7.2 Skill Status
 
-| Status    | Icon   | Definition                    |
-| --------- | ------ | ----------------------------- |
-| Acquired  | ✅      | Skill purchased and owned     |
-| Skipped   | ❌      | Deliberately not acquired     |
-| Suggested | 💭      | Recommended by AI or planning |
-| Planned   | 📋      | Marked for future acquisition |
+- **Status**: Acquired; **Icon**: ✅; **Definition**: Skill purchased and owned
+- **Status**: Skipped; **Icon**: ❌; **Definition**: Deliberately not acquired
+- **Status**: Suggested; **Icon**: 💭; **Definition**: Recommended by AI or planning
+- **Status**: Planned; **Icon**: 📋; **Definition**: Marked for future acquisition
 
 ### 7.3 Storage Mode Indicators
 
-| Indicator        | Icon   | Color   | Description                 |
-| ---------------- | ------ | ------- | --------------------------- |
-| Local Mode       | 🟠      | Orange  | Data stored in browser only |
-| Account Mode     | 🟣      | Purple  | Data synced to cloud        |
-| Unsaved Changes  | ⚠️     | Amber   | Draft exists, not yet saved |
-| Draft Auto-Saved | 💾      | Gray    | Draft saved to localStorage |
+- **Indicator**: Local Mode; **Icon**: 🟠; **Color**: Orange; **Description**: Data stored in browser only
+- **Indicator**: Account Mode; **Icon**: 🟣; **Color**: Purple; **Description**: Data synced to cloud
+- **Indicator**: Unsaved Changes; **Icon**: ⚠️; **Color**: Amber; **Description**: Draft exists, not yet saved
+- **Indicator**: Draft Auto-Saved; **Icon**: 💾; **Color**: Gray; **Description**: Draft saved to localStorage
 
 ### 7.4 Risk Indicators
 
-| Risk Level    | Icon   | Color   | Percentage   | Description     |
-| ------------- | ------ | ------- | ------------ | --------------- |
-| Low Risk      | 🟢      | Green   | < 15%        | Safe to proceed |
-| Moderate Risk | 🟡      | Amber   | 15-40%       | Caution advised |
-| High Risk     | 🔴      | Red     | > 40%        | Risky action    |
+- **Risk Level**: Low Risk; **Icon**: 🟢; **Color**: Green; **Percentage**: < 15%; **Description**: Safe to proceed
+- **Risk Level**: Moderate Risk; **Icon**: 🟡; **Color**: Amber; **Percentage**: 15-40%; **Description**: Caution advised
+- **Risk Level**: High Risk; **Icon**: 🔴; **Color**: Red; **Percentage**: > 40%; **Description**: Risky action
 
 ### 7.5 Goal Status
 
-| Status    | Icon   | Definition                           |
-| --------- | ------ | ------------------------------------ |
-| Completed | ✅      | Goal achieved                        |
-| On Track  | 🟡      | Progress within expected range       |
-| At Risk   | 🔴      | Behind schedule, intervention needed |
-| Failed    | ❌      | Goal not met within timeframe        |
+- **Status**: Completed; **Icon**: ✅; **Definition**: Goal achieved
+- **Status**: On Track; **Icon**: 🟡; **Definition**: Progress within expected range
+- **Status**: At Risk; **Icon**: 🔴; **Definition**: Behind schedule, intervention needed
+- **Status**: Failed; **Icon**: ❌; **Definition**: Goal not met within timeframe
 
 ---
 
@@ -514,50 +436,44 @@ Neuron agents live in `app/Neuron/Agents/` with response types in `app/Neuron/Re
 
 ### 8.1 General Acronyms
 
-| Acronym   | Full Term                          | Context                         |
-| --------- | ---------------------------------- | ------------------------------- |
-| AI        | Artificial Intelligence            | AI advisory system              |
-| API       | Application Programming Interface  | External data sources           |
-| APM       | Application Performance Monitoring | Performance dashboards          |
-| CRUD      | Create, Read, Update, Delete       | Database operations             |
-| CSV       | Comma-Separated Values             | Data export format              |
-| JSON      | JavaScript Object Notation         | Data interchange format         |
-| MCP       | Model Context Protocol             | AI tool integration             |
-| OCR       | Optical Character Recognition      | Screenshot data extraction      |
-| ORM       | Object-Relational Mapping          | Eloquent database abstraction   |
-| PWA       | Progressive Web App                | Offline-capable web application |
-| SP        | Skill Point                        | In-game currency for skills     |
-| TTL       | Time To Live                       | Cache expiration duration       |
-| UI        | User Interface                     | Visual application layer        |
-| UUID      | Universally Unique Identifier      | Local mode identifier           |
-| UX        | User Experience                    | User interaction design         |
+- **Acronym**: AI; **Full Term**: Artificial Intelligence; **Context**: AI advisory system
+- **Acronym**: API; **Full Term**: Application Programming Interface; **Context**: External data sources
+- **Acronym**: APM; **Full Term**: Application Performance Monitoring; **Context**: Performance dashboards
+- **Acronym**: CRUD; **Full Term**: Create, Read, Update, Delete; **Context**: Database operations
+- **Acronym**: CSV; **Full Term**: Comma-Separated Values; **Context**: Data export format
+- **Acronym**: JSON; **Full Term**: JavaScript Object Notation; **Context**: Data interchange format
+- **Acronym**: MCP; **Full Term**: Model Context Protocol; **Context**: AI tool integration
+- **Acronym**: OCR; **Full Term**: Optical Character Recognition; **Context**: Screenshot data extraction
+- **Acronym**: ORM; **Full Term**: Object-Relational Mapping; **Context**: Eloquent database abstraction
+- **Acronym**: PWA; **Full Term**: Progressive Web App; **Context**: Offline-capable web application
+- **Acronym**: SP; **Full Term**: Skill Point; **Context**: In-game currency for skills
+- **Acronym**: TTL; **Full Term**: Time To Live; **Context**: Cache expiration duration
+- **Acronym**: UI; **Full Term**: User Interface; **Context**: Visual application layer
+- **Acronym**: UUID; **Full Term**: Universally Unique Identifier; **Context**: Local mode identifier
+- **Acronym**: UX; **Full Term**: User Experience; **Context**: User interaction design
 
 ### 8.2 Technical Acronyms
 
-| Acronym   | Full Term                             | Context                       |
-| --------- | ------------------------------------- | ----------------------------- |
-| CSS       | Cascading Style Sheets                | Styling technology            |
-| DB        | Database                              | Data persistence layer        |
-| ERD       | Entity Relationship Diagram           | Database schema visualization |
-| FK        | Foreign Key                           | Database relationship         |
-| HTTP      | Hypertext Transfer Protocol           | Web communication             |
-| JS        | JavaScript                            | Client-side programming       |
-| MIME      | Multipurpose Internet Mail Extensions | File type identification      |
-| PK        | Primary Key                           | Database unique identifier    |
-| PSR       | PHP Standards Recommendation          | Coding standards              |
-| SRS       | Software Requirements Specifications  | Requirements document         |
-| SDS       | Software Design Specifications        | Design document               |
-| UCP       | Umamusume Career Planner              | Application prefix            |
-| WCAG      | Web Content Accessibility Guidelines  | Accessibility standards       |
+- **Acronym**: CSS; **Full Term**: Cascading Style Sheets; **Context**: Styling technology
+- **Acronym**: DB; **Full Term**: Database; **Context**: Data persistence layer
+- **Acronym**: ERD; **Full Term**: Entity Relationship Diagram; **Context**: Database schema visualization
+- **Acronym**: FK; **Full Term**: Foreign Key; **Context**: Database relationship
+- **Acronym**: HTTP; **Full Term**: Hypertext Transfer Protocol; **Context**: Web communication
+- **Acronym**: JS; **Full Term**: JavaScript; **Context**: Client-side programming
+- **Acronym**: MIME; **Full Term**: Multipurpose Internet Mail Extensions; **Context**: File type identification
+- **Acronym**: PK; **Full Term**: Primary Key; **Context**: Database unique identifier
+- **Acronym**: PSR; **Full Term**: PHP Standards Recommendation; **Context**: Coding standards
+- **Acronym**: SRS; **Full Term**: Software Requirements Specifications; **Context**: Requirements document
+- **Acronym**: SDS; **Full Term**: Software Design Specifications; **Context**: Design document
+- **Acronym**: UCP; **Full Term**: Umamusume Career Planner; **Context**: Application prefix
+- **Acronym**: WCAG; **Full Term**: Web Content Accessibility Guidelines; **Context**: Accessibility standards
 
 ### 8.3 Game-Specific Acronyms
 
-| Acronym    | Full Term                     | Japanese   | Context                    |
-| ---------- | ----------------------------- | ---------- | -------------------------- |
-| URA        | Uma Musume Racing Association | ウマ娘競走協会    | Final championship series  |
-| G1, G2, G3 | Grade 1, 2, 3                 | -          | Race classification tiers  |
-| HP         | Hit Points                    | -          | Stamina/health in-game     |
-| LB         | Limit Break                   | 凸          | Support card upgrade level |
+- **Acronym**: URA; **Full Term**: Uma Musume Racing Association; **Japanese**: ウマ娘競走協会; **Context**: Final championship series
+- **Acronym**: G1, G2, G3; **Full Term**: Grade 1, 2, 3; **Japanese**: -; **Context**: Race classification tiers
+- **Acronym**: HP; **Full Term**: Hit Points; **Japanese**: -; **Context**: Stamina/health in-game
+- **Acronym**: LB; **Full Term**: Limit Break; **Japanese**: 凸; **Context**: Support card upgrade level
 
 ---
 
@@ -565,25 +481,21 @@ Neuron agents live in `app/Neuron/Agents/` with response types in `app/Neuron/Re
 
 ### 9.1 Terminology Standards
 
-| Standard                  | Description                                                         |
-| ------------------------- | ------------------------------------------------------------------- |
-| **Canonical Field Names** | Official database column names take precedence over UI labels       |
-| **Consistency**           | Same term used consistently across docs, code, and UI               |
-| **Case Sensitivity**      | Follow codebase conventions (camelCase for code, Title Case for UI) |
-| **Deprecation**           | Deprecated terms marked explicitly with replacement                 |
+- **Standard**: **Canonical Field Names**; **Description**: Official database column names take precedence over UI labels
+- **Standard**: **Consistency**; **Description**: Same term used consistently across docs, code, and UI
+- **Standard**: **Case Sensitivity**; **Description**: Follow codebase conventions (camelCase for code, Title Case for UI)
+- **Standard**: **Deprecation**; **Description**: Deprecated terms marked explicitly with replacement
 
 ### 9.2 Version History
 
-| Version   | Date       | Author                                                       | Changes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| --------- | ---------- | ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 3.4.0     | 2026-02-22 | Development Team                                             | Updated to February 22, 2026; expanded core entities table with 6 new model references (SupportCardDefinition, SkillBuild, RunSnapshot, AdvisoryRecommendation, CriticalAlert, PredictionAccuracy); expanded architecture components with Repository, Enum, ValueObject, Collection, Event/Listener, Job, Policy, Notification entries; updated Neuron Agents section with actual codebase classes (BaseAgent, McpDemoAgent, response types, support classes, service layer); added GameTora to external API sources; added StorageMode enum reference; added Laravel MCP and MCP Monitoring terms; updated codebase stats (30 models, 8 enums, 70+ services, 571 routes, 3,316+ tests) |
-| 3.3.0     | 2026-02-21 | Development Team                                             | Updated to February 2026; updated technology stack (Livewire 4, Pest v4, PHPUnit v12, Neuron AI v2.11, Chart.js 4, Larastan v3, Laravel Pint v1, Sanctum v4, Horizon v5, Telescope, Boost v1.8, pest-plugin-browser 4.0, Playwright 1.58); updated PHP runtime to 8.4.11; updated AI provider models; removed MariaDB reference                                                                                                                                                                                                                                                                                                                                                         |
-| 3.2.0     | 2026-01-28 | Development Team                                             | Updated to v2.2.0; corrected aptitude grades (S is maximum, SS does NOT exist); updated hint system to 5 levels (10%/20%/30%/35%/40%); aligned with game-accurate mechanics from Global English Server                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| 3.1.0     | 2026-01-23 | Development Team (with user corrections & source references) | Updated per Global (English) server mechanics; clarified Guts/Wit, updated running style English labels, added Training, Legacy, and Bond definitions, and explicitly excluded JP-version-only features per community and official docs                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| 3.0.0     | 2026-01-23 | Development Team                                             | Comprehensive expansion aligned with v2.0.0; added AI, MCP, OCR, and external integration terminology; restructured into logical categories; added tables for visual clarity                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| 2.1       | 2026-01-23 | Development Team                                             | Updated terms to match current codebase and configs                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| 2.0       | 2026-01-12 | Development Team                                             | Consolidated glossary                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| 1.0       | 2026-01-03 | Development Team                                             | Initial glossary                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+- **Version**: 3.4.0; **Date**: 2026-02-22; **Author**: Development Team; **Changes**: Updated to February 22, 2026; expanded core entities table with 6 new model references (SupportCardDefinition, SkillBuild, RunSnapshot, AdvisoryRecommendation, CriticalAlert, PredictionAccuracy); expanded architecture components with Repository, Enum, ValueObject, Collection, Event/Listener, Job, Policy, Notification entries; updated Neuron Agents section with actual codebase classes (BaseAgent, McpDemoAgent, response types, support classes, service layer); added GameTora to external API sources; added StorageMode enum reference; added Laravel MCP and MCP Monitoring terms; updated codebase stats (30 models, 8 enums, 70+ services, 571 routes, 3,316+ tests)
+- **Version**: 3.3.0; **Date**: 2026-02-21; **Author**: Development Team; **Changes**: Updated to February 2026; updated technology stack (Livewire 4, Pest v4, PHPUnit v12, Neuron AI v2.11, Chart.js 4, Larastan v3, Laravel Pint v1, Sanctum v4, Horizon v5, Telescope, Boost v1.8, pest-plugin-browser 4.0, Playwright 1.58); updated PHP runtime to 8.4.11; updated AI provider models; removed MariaDB reference
+- **Version**: 3.2.0; **Date**: 2026-01-28; **Author**: Development Team; **Changes**: Updated to v2.2.0; corrected aptitude grades (S is maximum, SS does NOT exist); updated hint system to 5 levels (10%/20%/30%/35%/40%); aligned with game-accurate mechanics from Global English Server
+- **Version**: 3.1.0; **Date**: 2026-01-23; **Author**: Development Team (with user corrections & source references); **Changes**: Updated per Global (English) server mechanics; clarified Guts/Wit, updated running style English labels, added Training, Legacy, and Bond definitions, and explicitly excluded JP-version-only features per community and official docs
+- **Version**: 3.0.0; **Date**: 2026-01-23; **Author**: Development Team; **Changes**: Comprehensive expansion aligned with v2.0.0; added AI, MCP, OCR, and external integration terminology; restructured into logical categories; added tables for visual clarity
+- **Version**: 2.1; **Date**: 2026-01-23; **Author**: Development Team; **Changes**: Updated terms to match current codebase and configs
+- **Version**: 2.0; **Date**: 2026-01-12; **Author**: Development Team; **Changes**: Consolidated glossary
+- **Version**: 1.0; **Date**: 2026-01-03; **Author**: Development Team; **Changes**: Initial glossary
 
 ### 9.3 Related Documents
 
@@ -605,19 +517,19 @@ Neuron agents live in `app/Neuron/Agents/` with response types in `app/Neuron/Re
 
 ### 9.5 Usage Guidelines
 
-**For Developers:**
+### For Developers:
 
 - Use canonical field names in code and database queries
 - Follow enum definitions for type-safe constants
 - Reference this glossary when naming new entities or fields
 
-**For Documentation Writers:**
+### For Documentation Writers:
 
 - Use standardized terms consistently across all documents
 - Link to this glossary when introducing new terminology
 - Update glossary when introducing new concepts
 
-**For Users:**
+### For Users:
 
 - Refer to this glossary for clarification of in-app terminology
 - Use game terminology sections for Uma Musume-specific terms
@@ -625,4 +537,4 @@ Neuron agents live in `app/Neuron/Agents/` with response types in `app/Neuron/Re
 
 ---
 
-*This glossary is the authoritative reference for both code and gameplay terminology as used in the Umamusume Career Planner, strictly aligned to the Global English server and common usage (February 22, 2026).*
+### This glossary is the authoritative reference for both code and gameplay terminology as used in the Umamusume Career Planner, strictly aligned to the Global English server and common usage (February 22, 2026).
