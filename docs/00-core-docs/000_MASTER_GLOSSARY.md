@@ -2,10 +2,10 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 3.4.0  
-**Date**: February 22, 2026  
-**Project**: UmamusumeCareerPlanner  
-**Author**: Development Team  
+**Document Version**: 3.4.0
+**Date**: February 22, 2026
+**Project**: UmamusumeCareerPlanner
+**Author**: Development Team
 **Status**: Current – Aligned with v2.2.0 and Global English Server Mechanics (February 2026)
 
 ---
@@ -69,7 +69,7 @@ This glossary defines all core terminology used in the Umamusume Pretty Derby Ca
 | Surface Aptitude      | バ場適性 | Surface            | Preferred ground: Turf or Dirt                                          | Turf, Dirt                             |
 | Running Style Aptitude| 脚質適性 | Style              | Preferred position in races (see below)                                 | Front, Pace, Late, End                 |
 
-**Clarification:**  
+**Clarification:**
 Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance and placement** when mismatched. Optimal aptitude is strongly recommended.
 
 **Aptitude Ratings & Effectiveness:**
@@ -87,7 +87,7 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 
 > **Note:** S is the maximum aptitude grade. SS does NOT exist in the game. Only S-rank provides positive bonuses; A-rank is the baseline with no bonus/penalty.
 
-> *Race mechanics exclusive to the Japanese server, like Charge Up, Compete Before Spurt, or Stamina Limit Break, are **not implemented** in the Global English server as of February 2026.*  
+> *Race mechanics exclusive to the Japanese server, like Charge Up, Compete Before Spurt, or Stamina Limit Break, are **not implemented** in the Global English server as of February 2026.*
 
 ### 2.3 Running Styles
 
@@ -131,7 +131,7 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 
 - Speed, Stamina, Power, Recovery, Unique, "Effect on Opponent" (often referred to as "debuffs" in guides, but not in-game as a formal type)
 
-> **Note:** The game lacks a formal "Debuff" skill category; many skills can apply negative effects to rivals.  
+> **Note:** The game lacks a formal "Debuff" skill category; many skills can apply negative effects to rivals.
 > Skill hints only affect the initial SP purchase price, not ongoing effects.
 
 ### 2.7 Training Actions
@@ -594,13 +594,13 @@ Neuron agents live in `app/Neuron/Agents/` with response types in `app/Neuron/Re
 
 ### 9.4 Related Sources
 
-- [Umamusume: Pretty Derby (mobile game) - Umamusume Wiki](https://umamusu.wiki/Umamusume%3A_Pretty_Derby_%28mobile_game%29)  
-- [Stats Guide (Game8)](https://game8.co/games/Umamusume-Pretty-Derby/archives/535820)  
-- [Frontline Gaming Japan](https://www.frontlinejp.net/2024/07/24/a-quick-look-at-umamusume-pretty-derby/)  
-- [PCGamesN stats guide](https://www.pcgamesn.com/umamusume-pretty-derby/stats)  
-- [Polygon Basics Guide](https://www.polygon.com/guides/611183/uma-musume-tips-tricks-beginner-before-you-start)  
-- [Reddit: Global vs. JP mechanics](https://www.reddit.com//r/UmamusumeGame/comments/1q5qjze/any_accurate_resources_for_the_game_mechanics_in/)  
-- [Game:Career Mode - Umamusume Wiki](https://umamusu.wiki/Game%3ACareer_Mode)  
+- [Umamusume: Pretty Derby (mobile game) - Umamusume Wiki](https://umamusu.wiki/Umamusume%3A_Pretty_Derby_%28mobile_game%29)
+- [Stats Guide (Game8)](https://game8.co/games/Umamusume-Pretty-Derby/archives/535820)
+- [Frontline Gaming Japan](https://www.frontlinejp.net/2024/07/24/a-quick-look-at-umamusume-pretty-derby/)
+- [PCGamesN stats guide](https://www.pcgamesn.com/umamusume-pretty-derby/stats)
+- [Polygon Basics Guide](https://www.polygon.com/guides/611183/uma-musume-tips-tricks-beginner-before-you-start)
+- [Reddit: Global vs. JP mechanics](https://www.reddit.com//r/UmamusumeGame/comments/1q5qjze/any_accurate_resources_for_the_game_mechanics_in/)
+- [Game:Career Mode - Umamusume Wiki](https://umamusu.wiki/Game%3ACareer_Mode)
 - [Fandom Game page](https://umamusume.fandom.com/wiki/Game)
 
 ### 9.5 Usage Guidelines
