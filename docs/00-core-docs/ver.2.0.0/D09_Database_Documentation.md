@@ -2,8 +2,8 @@
 
 ## Uma Musume Career Planner
 
-**Document Version:** 2.0  
-**Date:** 2026-01-03  
+**Document Version:** 2.0
+**Date:** 2026-01-03
 **Status:** Draft
 
 ---
@@ -25,11 +25,9 @@ This document details the database schema for the Uma Musume Career Planner. The
 
 ### 1.1 Database Configuration
 
-| Property | Value |
-|----------|-------|
-| **Database Engine** | MySQL 8.0 / MariaDB 10.5+ / SQLite (Dev) |
-| **Charset** | `utf8mb4` |
-| **Collation** | `utf8mb4_unicode_ci` |
+- **Property**: **Database Engine**; **Value**: MySQL 8.0 / MariaDB 10.5+ / SQLite (Dev)
+- **Property**: **Charset**; **Value**: `utf8mb4`
+- **Property**: **Collation**; **Value**: `utf8mb4_unicode_ci`
 
 ### 1.2 Schema Overview
 
@@ -68,7 +66,7 @@ erDiagram
     career_runs ||--o{ goals : defines
     skills ||--o{ skill_career_runs : referenced_by
     users ||--o{ activity_logs : generates
-    
+
     users {
         bigint id PK
         string name
@@ -76,7 +74,7 @@ erDiagram
         string password
         timestamp created_at
     }
-    
+
     uma_musumes {
         bigint id PK
         string name
@@ -89,7 +87,7 @@ erDiagram
         enum aptitude_turf
         enum aptitude_dirt
     }
-    
+
     career_runs {
         bigint id PK
         uuid uuid UK
@@ -107,7 +105,7 @@ erDiagram
         int total_sp_available
         int stamina_percentage
     }
-    
+
     skills {
         bigint id PK
         string name UK
@@ -117,7 +115,7 @@ erDiagram
         enum tier
         int sp_cost
     }
-    
+
     stat_progress {
         bigint id PK
         bigint career_run_id FK
@@ -128,7 +126,7 @@ erDiagram
         int guts
         int wit
     }
-    
+
     skill_career_runs {
         bigint id PK
         bigint career_run_id FK
@@ -170,16 +168,14 @@ classDiagram
     }
 ```
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | BigInt | PK, Auto | Primary key |
-| `name` | String(255) | Not Null | User display name |
-| `email` | String(255) | Unique, Not Null | Login email |
-| `password` | String(255) | Not Null | Hashed password |
-| `email_verified_at` | Timestamp | Nullable | Verification timestamp |
-| `remember_token` | String(100) | Nullable | Session token |
-| `created_at` | Timestamp | - | Creation timestamp |
-| `updated_at` | Timestamp | - | Last update timestamp |
+- **Column**: `id`; **Type**: BigInt; **Constraints**: PK, Auto; **Description**: Primary key
+- **Column**: `name`; **Type**: String(255); **Constraints**: Not Null; **Description**: User display name
+- **Column**: `email`; **Type**: String(255); **Constraints**: Unique, Not Null; **Description**: Login email
+- **Column**: `password`; **Type**: String(255); **Constraints**: Not Null; **Description**: Hashed password
+- **Column**: `email_verified_at`; **Type**: Timestamp; **Constraints**: Nullable; **Description**: Verification timestamp
+- **Column**: `remember_token`; **Type**: String(100); **Constraints**: Nullable; **Description**: Session token
+- **Column**: `created_at`; **Type**: Timestamp; **Constraints**: -; **Description**: Creation timestamp
+- **Column**: `updated_at`; **Type**: Timestamp; **Constraints**: -; **Description**: Last update timestamp
 
 ### 3.2 `uma_musumes` (Reference Data)
 
@@ -211,19 +207,17 @@ classDiagram
     }
 ```
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | BigInt | PK | Primary key |
-| `name` | String(255) | Not Null | English name (e.g., "Special Week") |
-| `name_jp` | String(255) | Nullable | Japanese name |
-| `image_path` | String(255) | Nullable | Path to full artwork |
-| `thumbnail_path` | String(255) | Nullable | Path to icon |
-| `growth_speed` | Int | Default 0 | Speed growth rate (e.g., 20) |
-| `growth_stamina` | Int | Default 0 | Stamina growth rate |
-| `growth_power` | Int | Default 0 | Power growth rate |
-| `growth_guts` | Int | Default 0 | Guts growth rate |
-| `growth_wit` | Int | Default 0 | Wit growth rate |
-| `aptitude_*` | Enum | SS-G | Various aptitude grades |
+- **Column**: `id`; **Type**: BigInt; **Constraints**: PK; **Description**: Primary key
+- **Column**: `name`; **Type**: String(255); **Constraints**: Not Null; **Description**: English name (e.g., "Special Week")
+- **Column**: `name_jp`; **Type**: String(255); **Constraints**: Nullable; **Description**: Japanese name
+- **Column**: `image_path`; **Type**: String(255); **Constraints**: Nullable; **Description**: Path to full artwork
+- **Column**: `thumbnail_path`; **Type**: String(255); **Constraints**: Nullable; **Description**: Path to icon
+- **Column**: `growth_speed`; **Type**: Int; **Constraints**: Default 0; **Description**: Speed growth rate (e.g., 20)
+- **Column**: `growth_stamina`; **Type**: Int; **Constraints**: Default 0; **Description**: Stamina growth rate
+- **Column**: `growth_power`; **Type**: Int; **Constraints**: Default 0; **Description**: Power growth rate
+- **Column**: `growth_guts`; **Type**: Int; **Constraints**: Default 0; **Description**: Guts growth rate
+- **Column**: `growth_wit`; **Type**: Int; **Constraints**: Default 0; **Description**: Wit growth rate
+- **Column**: `aptitude_*`; **Type**: Enum; **Constraints**: SS-G; **Description**: Various aptitude grades
 
 **Aptitude Enum Values:** `SS`, `S`, `A`, `B`, `C`, `D`, `E`, `F`, `G`
 
@@ -247,16 +241,14 @@ classDiagram
     }
 ```
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | BigInt | PK | Primary key |
-| `name` | String(255) | Unique, Not Null | English skill name |
-| `name_jp` | String(255) | Nullable | Japanese skill name |
-| `description` | Text | Nullable | Skill effect description |
-| `type` | Enum | Not Null | Skill category |
-| `tier` | Enum | Not Null | Skill rarity tier |
-| `sp_cost` | Int | Not Null | SP cost to acquire |
-| `icon_path` | String(255) | Nullable | Path to skill icon |
+- **Column**: `id`; **Type**: BigInt; **Constraints**: PK; **Description**: Primary key
+- **Column**: `name`; **Type**: String(255); **Constraints**: Unique, Not Null; **Description**: English skill name
+- **Column**: `name_jp`; **Type**: String(255); **Constraints**: Nullable; **Description**: Japanese skill name
+- **Column**: `description`; **Type**: Text; **Constraints**: Nullable; **Description**: Skill effect description
+- **Column**: `type`; **Type**: Enum; **Constraints**: Not Null; **Description**: Skill category
+- **Column**: `tier`; **Type**: Enum; **Constraints**: Not Null; **Description**: Skill rarity tier
+- **Column**: `sp_cost`; **Type**: Int; **Constraints**: Not Null; **Description**: SP cost to acquire
+- **Column**: `icon_path`; **Type**: String(255); **Constraints**: Nullable; **Description**: Path to skill icon
 
 **Type Enum:** `speed`, `stamina`, `power`, `guts`, `wit`, `debuff`
 
@@ -292,28 +284,26 @@ classDiagram
     }
 ```
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | BigInt | PK | Primary key |
-| `uuid` | UUID | Unique | Global identifier (aligns with localStorage) |
-| `user_id` | BigInt | FK → users, Nullable | Owner user |
-| `uma_musume_id` | BigInt | FK → uma_musumes | Selected character |
-| `storage_mode` | Enum | Default 'account' | Storage type |
-| `title` | String(255) | Not Null | Plan title |
-| `status` | Enum | Not Null | Current status |
-| `career_stage` | Enum | Not Null | Current career stage |
-| `current_turn` | Int | 1-78 | Current turn number |
-| `speed` | Int | Default 0 | Current speed stat |
-| `stamina` | Int | Default 0 | Current stamina stat |
-| `power` | Int | Default 0 | Current power stat |
-| `guts` | Int | Default 0 | Current guts stat |
-| `wit` | Int | Default 0 | Current wit stat |
-| `energy` | Int | 0-100 | Current energy level |
-| `mood` | Enum | Default 'normal' | Current mood |
-| `total_sp_available` | Int | Default 0 | **Canonical:** Available SP |
-| `stamina_percentage` | Int | 0-100 | **Canonical:** Stamina % |
-| `notes` | Text | Nullable | User notes |
-| `deleted_at` | Timestamp | Nullable | Soft delete timestamp |
+- **Column**: `id`; **Type**: BigInt; **Constraints**: PK; **Description**: Primary key
+- **Column**: `uuid`; **Type**: UUID; **Constraints**: Unique; **Description**: Global identifier (aligns with localStorage)
+- **Column**: `user_id`; **Type**: BigInt; **Constraints**: FK → users, Nullable; **Description**: Owner user
+- **Column**: `uma_musume_id`; **Type**: BigInt; **Constraints**: FK → uma_musumes; **Description**: Selected character
+- **Column**: `storage_mode`; **Type**: Enum; **Constraints**: Default 'account'; **Description**: Storage type
+- **Column**: `title`; **Type**: String(255); **Constraints**: Not Null; **Description**: Plan title
+- **Column**: `status`; **Type**: Enum; **Constraints**: Not Null; **Description**: Current status
+- **Column**: `career_stage`; **Type**: Enum; **Constraints**: Not Null; **Description**: Current career stage
+- **Column**: `current_turn`; **Type**: Int; **Constraints**: 1-78; **Description**: Current turn number
+- **Column**: `speed`; **Type**: Int; **Constraints**: Default 0; **Description**: Current speed stat
+- **Column**: `stamina`; **Type**: Int; **Constraints**: Default 0; **Description**: Current stamina stat
+- **Column**: `power`; **Type**: Int; **Constraints**: Default 0; **Description**: Current power stat
+- **Column**: `guts`; **Type**: Int; **Constraints**: Default 0; **Description**: Current guts stat
+- **Column**: `wit`; **Type**: Int; **Constraints**: Default 0; **Description**: Current wit stat
+- **Column**: `energy`; **Type**: Int; **Constraints**: 0-100; **Description**: Current energy level
+- **Column**: `mood`; **Type**: Enum; **Constraints**: Default 'normal'; **Description**: Current mood
+- **Column**: `total_sp_available`; **Type**: Int; **Constraints**: Default 0; **Description**: **Canonical:** Available SP
+- **Column**: `stamina_percentage`; **Type**: Int; **Constraints**: 0-100; **Description**: **Canonical:** Stamina %
+- **Column**: `notes`; **Type**: Text; **Constraints**: Nullable; **Description**: User notes
+- **Column**: `deleted_at`; **Type**: Timestamp; **Constraints**: Nullable; **Description**: Soft delete timestamp
 
 **Status Enum:** `in_progress`, `completed`, `archived`
 
@@ -341,16 +331,14 @@ classDiagram
     }
 ```
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | BigInt | PK | Primary key |
-| `career_run_id` | BigInt | FK → career_runs | Parent plan |
-| `turn_number` | Int | **Canonical** | Turn number (1-78) |
-| `speed` | Int | Not Null | Speed at this turn |
-| `stamina` | Int | Not Null | Stamina at this turn |
-| `power` | Int | Not Null | Power at this turn |
-| `guts` | Int | Not Null | Guts at this turn |
-| `wit` | Int | Not Null | Wit at this turn |
+- **Column**: `id`; **Type**: BigInt; **Constraints**: PK; **Description**: Primary key
+- **Column**: `career_run_id`; **Type**: BigInt; **Constraints**: FK → career_runs; **Description**: Parent plan
+- **Column**: `turn_number`; **Type**: Int; **Constraints**: **Canonical**; **Description**: Turn number (1-78)
+- **Column**: `speed`; **Type**: Int; **Constraints**: Not Null; **Description**: Speed at this turn
+- **Column**: `stamina`; **Type**: Int; **Constraints**: Not Null; **Description**: Stamina at this turn
+- **Column**: `power`; **Type**: Int; **Constraints**: Not Null; **Description**: Power at this turn
+- **Column**: `guts`; **Type**: Int; **Constraints**: Not Null; **Description**: Guts at this turn
+- **Column**: `wit`; **Type**: Int; **Constraints**: Not Null; **Description**: Wit at this turn
 
 **Constraint:** `UNIQUE(career_run_id, turn_number)`
 
@@ -372,14 +360,12 @@ classDiagram
     }
 ```
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | BigInt | PK | Primary key |
-| `career_run_id` | BigInt | FK → career_runs | Parent plan |
-| `skill_id` | BigInt | FK → skills | Referenced skill |
-| `status` | Enum | Not Null | Skill status |
-| `turn_acquired` | Int | Nullable | Turn when acquired (required if status='acquired') |
-| `notes` | String(255) | Nullable | User notes |
+- **Column**: `id`; **Type**: BigInt; **Constraints**: PK; **Description**: Primary key
+- **Column**: `career_run_id`; **Type**: BigInt; **Constraints**: FK → career_runs; **Description**: Parent plan
+- **Column**: `skill_id`; **Type**: BigInt; **Constraints**: FK → skills; **Description**: Referenced skill
+- **Column**: `status`; **Type**: Enum; **Constraints**: Not Null; **Description**: Skill status
+- **Column**: `turn_acquired`; **Type**: Int; **Constraints**: Nullable; **Description**: Turn when acquired (required if status='acquired')
+- **Column**: `notes`; **Type**: String(255); **Constraints**: Nullable; **Description**: User notes
 
 **Status Enum:** `acquired`, `skipped`, `suggested`
 
@@ -400,17 +386,15 @@ classDiagram
     }
 ```
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | BigInt | PK | Primary key |
-| `career_run_id` | BigInt | FK → career_runs | Parent plan |
-| `race_name` | String(255) | Not Null | Race name |
-| `venue` | String(255) | Nullable | Race venue |
-| `distance_category` | Enum | Not Null | Distance type |
-| `track_type` | Enum | Not Null | Track surface |
-| `predicted_pos` | Int | Nullable | Predicted placement |
-| `actual_pos` | Int | Nullable | Actual placement |
-| `sort_order` | Int | Default 0 | Display order |
+- **Column**: `id`; **Type**: BigInt; **Constraints**: PK; **Description**: Primary key
+- **Column**: `career_run_id`; **Type**: BigInt; **Constraints**: FK → career_runs; **Description**: Parent plan
+- **Column**: `race_name`; **Type**: String(255); **Constraints**: Not Null; **Description**: Race name
+- **Column**: `venue`; **Type**: String(255); **Constraints**: Nullable; **Description**: Race venue
+- **Column**: `distance_category`; **Type**: Enum; **Constraints**: Not Null; **Description**: Distance type
+- **Column**: `track_type`; **Type**: Enum; **Constraints**: Not Null; **Description**: Track surface
+- **Column**: `predicted_pos`; **Type**: Int; **Constraints**: Nullable; **Description**: Predicted placement
+- **Column**: `actual_pos`; **Type**: Int; **Constraints**: Nullable; **Description**: Actual placement
+- **Column**: `sort_order`; **Type**: Int; **Constraints**: Default 0; **Description**: Display order
 
 **Distance Category Enum:** `sprint`, `mile`, `medium`, `long`
 
@@ -429,13 +413,11 @@ classDiagram
     }
 ```
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | BigInt | PK | Primary key |
-| `career_run_id` | BigInt | FK → career_runs | Parent plan |
-| `description` | String(255) | Not Null | Goal description |
-| `completed` | Boolean | Default false | Completion status |
-| `sort_order` | Int | Default 0 | Display order |
+- **Column**: `id`; **Type**: BigInt; **Constraints**: PK; **Description**: Primary key
+- **Column**: `career_run_id`; **Type**: BigInt; **Constraints**: FK → career_runs; **Description**: Parent plan
+- **Column**: `description`; **Type**: String(255); **Constraints**: Not Null; **Description**: Goal description
+- **Column**: `completed`; **Type**: Boolean; **Constraints**: Default false; **Description**: Completion status
+- **Column**: `sort_order`; **Type**: Int; **Constraints**: Default 0; **Description**: Display order
 
 ### 3.9 `activity_logs`
 
@@ -452,15 +434,13 @@ classDiagram
     }
 ```
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | BigInt | PK | Primary key |
-| `user_id` | BigInt | FK → users, Nullable | Acting user |
-| `action` | String(50) | Not Null | Action type (create, update, delete) |
-| `model_type` | String(100) | Not Null | Model class name |
-| `model_id` | BigInt | Not Null | Affected model ID |
-| `metadata` | JSON | Nullable | Change details |
-| `created_at` | Timestamp | Not Null | Action timestamp |
+- **Column**: `id`; **Type**: BigInt; **Constraints**: PK; **Description**: Primary key
+- **Column**: `user_id`; **Type**: BigInt; **Constraints**: FK → users, Nullable; **Description**: Acting user
+- **Column**: `action`; **Type**: String(50); **Constraints**: Not Null; **Description**: Action type (create, update, delete)
+- **Column**: `model_type`; **Type**: String(100); **Constraints**: Not Null; **Description**: Model class name
+- **Column**: `model_id`; **Type**: BigInt; **Constraints**: Not Null; **Description**: Affected model ID
+- **Column**: `metadata`; **Type**: JSON; **Constraints**: Nullable; **Description**: Change details
+- **Column**: `created_at`; **Type**: Timestamp; **Constraints**: Not Null; **Description**: Action timestamp
 
 ---
 
@@ -473,7 +453,7 @@ flowchart TD
     subgraph Primary["Primary Indexes"]
         PK["Primary Keys<br/>(All tables)"]
     end
-    
+
     subgraph Foreign["Foreign Key Indexes"]
         FK1["career_runs.user_id"]
         FK2["career_runs.uma_musume_id"]
@@ -481,13 +461,13 @@ flowchart TD
         FK4["skill_career_runs.career_run_id"]
         FK5["skill_career_runs.skill_id"]
     end
-    
+
     subgraph Query["Query Optimization"]
         Q1["career_runs.status"]
         Q2["skills.name"]
         Q3["stat_progress(career_run_id, turn_number)"]
     end
-    
+
     PK --> FK1
     PK --> FK2
     FK1 --> Q1
@@ -496,16 +476,14 @@ flowchart TD
 
 ### 4.2 Index Definitions
 
-| Table | Index | Columns | Purpose |
-|-------|-------|---------|---------|
-| `career_runs` | `idx_user_id` | `user_id` | Filtering plans by user |
-| `career_runs` | `idx_status` | `status` | Dashboard filtering |
-| `career_runs` | `idx_uuid` | `uuid` | UUID lookups |
-| `stat_progress` | `idx_run_turn` | `career_run_id`, `turn_number` | Chart data retrieval |
-| `skill_career_runs` | `idx_career_run` | `career_run_id` | Skill list retrieval |
-| `skills` | `idx_name` | `name` | Autocomplete performance |
-| `skills` | `idx_type` | `type` | Type filtering |
-| `activity_logs` | `idx_model` | `model_type`, `model_id` | Audit trail lookup |
+- **Table**: `career_runs`; **Index**: `idx_user_id`; **Columns**: `user_id`; **Purpose**: Filtering plans by user
+- **Table**: `career_runs`; **Index**: `idx_status`; **Columns**: `status`; **Purpose**: Dashboard filtering
+- **Table**: `career_runs`; **Index**: `idx_uuid`; **Columns**: `uuid`; **Purpose**: UUID lookups
+- **Table**: `stat_progress`; **Index**: `idx_run_turn`; **Columns**: `career_run_id`, `turn_number`; **Purpose**: Chart data retrieval
+- **Table**: `skill_career_runs`; **Index**: `idx_career_run`; **Columns**: `career_run_id`; **Purpose**: Skill list retrieval
+- **Table**: `skills`; **Index**: `idx_name`; **Columns**: `name`; **Purpose**: Autocomplete performance
+- **Table**: `skills`; **Index**: `idx_type`; **Columns**: `type`; **Purpose**: Type filtering
+- **Table**: `activity_logs`; **Index**: `idx_model`; **Columns**: `model_type`, `model_id`; **Purpose**: Audit trail lookup
 
 ### 4.3 Query Performance Targets
 
@@ -514,13 +492,13 @@ gantt
     title Query Performance Targets
     dateFormat X
     axisFormat %L ms
-    
+
     section Read Operations
     Plan List (paginated)    :0, 100
     Plan Detail              :0, 50
     Skill Search             :0, 30
     Turn History             :0, 80
-    
+
     section Write Operations
     Create Plan              :0, 150
     Update Plan              :0, 100
@@ -543,29 +521,27 @@ flowchart LR
         L3["sp / total_sp"]
         L4["stamina_pct"]
     end
-    
+
     subgraph Canonical["Canonical Names (USE THESE)"]
         C1["career_run_id"]
         C2["turn_number"]
         C3["total_sp_available"]
         C4["stamina_percentage"]
     end
-    
+
     L1 -->|"Replace with"| C1
     L2 -->|"Replace with"| C2
     L3 -->|"Replace with"| C3
     L4 -->|"Replace with"| C4
-    
+
     style Legacy fill:#ffcdd2
     style Canonical fill:#c8e6c9
 ```
 
-| Legacy Name | Canonical Name | Context |
-|-------------|----------------|---------|
-| `run_id`, `plan_id` | `career_run_id` | Foreign key references |
-| `turn`, `current_turn` | `turn_number` | In history/progress tables |
-| `sp`, `total_sp` | `total_sp_available` | SP tracking |
-| `stamina_pct` | `stamina_percentage` | Stamina tracking |
+- **Legacy Name**: `run_id`, `plan_id`; **Canonical Name**: `career_run_id`; **Context**: Foreign key references
+- **Legacy Name**: `turn`, `current_turn`; **Canonical Name**: `turn_number`; **Context**: In history/progress tables
+- **Legacy Name**: `sp`, `total_sp`; **Canonical Name**: `total_sp_available`; **Context**: SP tracking
+- **Legacy Name**: `stamina_pct`; **Canonical Name**: `stamina_percentage`; **Context**: Stamina tracking
 
 ### 5.2 Naming Convention Rules
 
@@ -586,24 +562,24 @@ flowchart TD
     subgraph Auth["Authentication"]
         Users["users"]
     end
-    
+
     subgraph Reference["Reference Data"]
         UmaMusumes["uma_musumes"]
         Skills["skills"]
     end
-    
+
     subgraph Core["Core Data"]
         CareerRuns["career_runs"]
         StatProgress["stat_progress"]
         SkillCareerRuns["skill_career_runs"]
     end
-    
+
     subgraph Supporting["Supporting Data"]
         RacePredictions["race_predictions"]
         Goals["goals"]
         ActivityLogs["activity_logs"]
     end
-    
+
     Users -->|"1:N"| CareerRuns
     UmaMusumes -->|"1:N"| CareerRuns
     CareerRuns -->|"1:N"| StatProgress
@@ -616,48 +592,42 @@ flowchart TD
 
 ### 6.2 Relationship Summary
 
-| Relationship | Type | Description |
-|--------------|------|-------------|
-| User → CareerRuns | One-to-Many | User owns multiple plans |
-| UmaMusume → CareerRuns | One-to-Many | Character featured in plans |
-| CareerRun → StatProgress | One-to-Many | Turn-by-turn history |
-| CareerRun ↔ Skills | Many-to-Many | Skills attached to plans |
-| CareerRun → RacePredictions | One-to-Many | Race predictions per plan |
-| CareerRun → Goals | One-to-Many | Goals per plan |
-| User → ActivityLogs | One-to-Many | User activity audit |
+- **Relationship**: User → CareerRuns; **Type**: One-to-Many; **Description**: User owns multiple plans
+- **Relationship**: UmaMusume → CareerRuns; **Type**: One-to-Many; **Description**: Character featured in plans
+- **Relationship**: CareerRun → StatProgress; **Type**: One-to-Many; **Description**: Turn-by-turn history
+- **Relationship**: CareerRun ↔ Skills; **Type**: Many-to-Many; **Description**: Skills attached to plans
+- **Relationship**: CareerRun → RacePredictions; **Type**: One-to-Many; **Description**: Race predictions per plan
+- **Relationship**: CareerRun → Goals; **Type**: One-to-Many; **Description**: Goals per plan
+- **Relationship**: User → ActivityLogs; **Type**: One-to-Many; **Description**: User activity audit
 
 ### 6.3 Cascade Rules
 
 ```mermaid
 flowchart TD
     CareerRun["career_runs<br/>(Soft Delete)"]
-    
+
     CareerRun -->|"CASCADE"| StatProgress["stat_progress"]
     CareerRun -->|"CASCADE"| SkillCareerRuns["skill_career_runs"]
     CareerRun -->|"CASCADE"| RacePredictions["race_predictions"]
     CareerRun -->|"CASCADE"| Goals["goals"]
-    
+
     User["users<br/>(Soft Delete)"]
     User -->|"SET NULL"| CareerRun
     User -->|"SET NULL"| ActivityLogs["activity_logs"]
 ```
 
-| Parent | Child | On Delete |
-|--------|-------|-----------|
-| `career_runs` | `stat_progress` | CASCADE |
-| `career_runs` | `skill_career_runs` | CASCADE |
-| `career_runs` | `race_predictions` | CASCADE |
-| `career_runs` | `goals` | CASCADE |
-| `users` | `career_runs` | SET NULL |
-| `users` | `activity_logs` | SET NULL |
-| `uma_musumes` | `career_runs` | RESTRICT |
-| `skills` | `skill_career_runs` | RESTRICT |
+- **Parent**: `career_runs`; **Child**: `stat_progress`; **On Delete**: CASCADE
+- **Parent**: `career_runs`; **Child**: `skill_career_runs`; **On Delete**: CASCADE
+- **Parent**: `career_runs`; **Child**: `race_predictions`; **On Delete**: CASCADE
+- **Parent**: `career_runs`; **Child**: `goals`; **On Delete**: CASCADE
+- **Parent**: `users`; **Child**: `career_runs`; **On Delete**: SET NULL
+- **Parent**: `users`; **Child**: `activity_logs`; **On Delete**: SET NULL
+- **Parent**: `uma_musumes`; **Child**: `career_runs`; **On Delete**: RESTRICT
+- **Parent**: `skills`; **Child**: `skill_career_runs`; **On Delete**: RESTRICT
 
 ---
 
 ## Document History
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2026-01-03 | Development Team | Initial draft |
-| 2.0 | 2026-01-03 | Development Team | Added Mermaid diagrams, expanded documentation |
+- **Version**: 1.0; **Date**: 2026-01-03; **Author**: Development Team; **Changes**: Initial draft
+- **Version**: 2.0; **Date**: 2026-01-03; **Author**: Development Team; **Changes**: Added Mermaid diagrams, expanded documentation
