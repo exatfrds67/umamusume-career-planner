@@ -2,9 +2,9 @@
 
 ## Comprehensive Research Document
 
-**Document Version**: 1.0  
-**Research Date**: January 2026  
-**Sources**: GameTora, UmamusumeDB, Game8, Community Wikis  
+**Document Version**: 1.0
+**Research Date**: January 2026
+**Sources**: GameTora, UmamusumeDB, Game8, Community Wikis
 **Status**: Game-Accurate Mechanics & Formulas
 
 ---
@@ -30,13 +30,11 @@
 
 ### 1.2 Differences from Unity Cup
 
-| Feature | URA Finale | Unity Cup |
-|---------|-----------|-----------|
-| **Facility Progression** | Usage-based (every 4 uses = +1 level) | Different system |
-| **Stat Caps** | 1400 (JP), 1200 (Global pre-buff) | Higher caps |
-| **Final Structure** | 3 races (Qualifier → Semi → Final) | Different format |
-| **Scenario Link** | Aoi Kiryuin | Different character |
-| **Base Training** | Lower base values | Higher base values |
+- **Feature**: **Facility Progression**; **URA Finale**: Usage-based (every 4 uses = +1 level); **Unity Cup**: Different system
+- **Feature**: **Stat Caps**; **URA Finale**: 1400 (JP), 1200 (Global pre-buff); **Unity Cup**: Higher caps
+- **Feature**: **Final Structure**; **URA Finale**: 3 races (Qualifier → Semi → Final); **Unity Cup**: Different format
+- **Feature**: **Scenario Link**; **URA Finale**: Aoi Kiryuin; **Unity Cup**: Different character
+- **Feature**: **Base Training**; **URA Finale**: Lower base values; **Unity Cup**: Higher base values
 
 ### 1.3 Facility Level Progression
 
@@ -74,7 +72,7 @@
 **URA Finale Progression**:
 
 1. **Qualifiers**: Must win to advance
-2. **Semi-Finals**: Must win to advance  
+2. **Semi-Finals**: Must win to advance
 3. **Grand Finals**: Championship race
 
 **Distance Determination**: Based on most-won race distance during career
@@ -175,14 +173,12 @@
 
 **Hint Levels & SP Discounts**:
 
-| Hint Level | SP Discount | Effective Cost |
-|------------|-------------|----------------|
-| Level 0 (No hint) | 0% | 100% |
-| Level 1 | 10% | 90% |
-| Level 2 | 20% | 80% |
-| Level 3 | 30% | 70% |
-| Level 4 | 35% | 65% |
-| Level 5 | 40% | 60% (MAX) |
+- **Hint Level**: Level 0 (No hint); **SP Discount**: 0%; **Effective Cost**: 100%
+- **Hint Level**: Level 1; **SP Discount**: 10%; **Effective Cost**: 90%
+- **Hint Level**: Level 2; **SP Discount**: 20%; **Effective Cost**: 80%
+- **Hint Level**: Level 3; **SP Discount**: 30%; **Effective Cost**: 70%
+- **Hint Level**: Level 4; **SP Discount**: 35%; **Effective Cost**: 65%
+- **Hint Level**: Level 5; **SP Discount**: 40%; **Effective Cost**: 60% (MAX)
 
 **Hint Acquisition**:
 
@@ -197,12 +193,10 @@
 
 **Common Evolution Examples**:
 
-| Normal Skill | → | Rare Skill | Effect Improvement |
-|--------------|---|------------|-------------------|
-| Go with the Flow | → | Lane Legerdemain | Better positioning |
-| Rushing Gale | → | Rushing Gale! | Stronger acceleration |
-| Relax | → | Swinging Maestro | Better stamina recovery |
-| Adrenaline Rush | → | Adrenaline Rush! | Longer duration |
+- **Normal Skill**: Go with the Flow; **→**: →; **Rare Skill**: Lane Legerdemain; **Effect Improvement**: Better positioning
+- **Normal Skill**: Rushing Gale; **→**: →; **Rare Skill**: Rushing Gale!; **Effect Improvement**: Stronger acceleration
+- **Normal Skill**: Relax; **→**: →; **Rare Skill**: Swinging Maestro; **Effect Improvement**: Better stamina recovery
+- **Normal Skill**: Adrenaline Rush; **→**: →; **Rare Skill**: Adrenaline Rush!; **Effect Improvement**: Longer duration
 
 **Evolution Requirements**:
 
@@ -234,7 +228,7 @@
 - **Swinging Maestro** (コーナー巧者◎): Recovers stamina on corners with efficient turning
   - Best for: Long/Medium distance, any running style
   - SP Cost: ~180 (with hints: ~108-126)
-  
+
 - **In Body and Mind** (心身一体): Recovers stamina after exhausting strength
   - Best for: Long distance, End Closer
   - SP Cost: ~160
@@ -265,21 +259,17 @@
 
 **Base Stamina Targets** (without recovery skills):
 
-| Distance | Meters | Escape | Lead | Pace | Chase |
-|----------|--------|--------|------|------|-------|
-| **Sprint** | 1000-1400m | 350-400 | 330-380 | 310-360 | 290-340 |
-| **Mile** | 1400-1800m | 450-500 | 430-480 | 410-460 | 390-440 |
-| **Medium** | 1800-2400m | 600-700 | 580-680 | 560-660 | 540-640 |
-| **Long** | 2400-3600m | 850-1000 | 830-980 | 810-960 | 790-940 |
+- **Distance**: **Sprint**; **Meters**: 1000-1400m; **Escape**: 350-400; **Lead**: 330-380; **Pace**: 310-360; **Chase**: 290-340
+- **Distance**: **Mile**; **Meters**: 1400-1800m; **Escape**: 450-500; **Lead**: 430-480; **Pace**: 410-460; **Chase**: 390-440
+- **Distance**: **Medium**; **Meters**: 1800-2400m; **Escape**: 600-700; **Lead**: 580-680; **Pace**: 560-660; **Chase**: 540-640
+- **Distance**: **Long**; **Meters**: 2400-3600m; **Escape**: 850-1000; **Lead**: 830-980; **Pace**: 810-960; **Chase**: 790-940
 
 **With Gold Recovery Skills** (reduce requirements by ~150-200):
 
-| Distance | With 1 Gold Skill | With 2 Gold Skills |
-|----------|-------------------|-------------------|
-| Sprint | 300-350 | 250-300 |
-| Mile | 400-450 | 350-400 |
-| Medium | 500-600 | 450-550 |
-| Long | 700-850 | 600-750 |
+- **Distance**: Sprint; **With 1 Gold Skill**: 300-350; **With 2 Gold Skills**: 250-300
+- **Distance**: Mile; **With 1 Gold Skill**: 400-450; **With 2 Gold Skills**: 350-400
+- **Distance**: Medium; **With 1 Gold Skill**: 500-600; **With 2 Gold Skills**: 450-550
+- **Distance**: Long; **With 1 Gold Skill**: 700-850; **With 2 Gold Skills**: 600-750
 
 ### 3.2 Stamina Crisis Scenarios
 
@@ -486,13 +476,11 @@ Final Stat Gain = Base × Training Level × Growth Rate × Mood × Support Cards
 
 **Approximate Failure Rates**:
 
-| Energy | Base Failure Rate | With Support Cards |
-|--------|-------------------|-------------------|
-| 80-100 | 0-5% | 0-2% |
-| 60-79 | 5-15% | 2-8% |
-| 40-59 | 15-30% | 8-20% |
-| 20-39 | 30-50% | 20-35% |
-| 0-19 | 50-80% | 35-60% |
+- **Energy**: 80-100; **Base Failure Rate**: 0-5%; **With Support Cards**: 0-2%
+- **Energy**: 60-79; **Base Failure Rate**: 5-15%; **With Support Cards**: 2-8%
+- **Energy**: 40-59; **Base Failure Rate**: 15-30%; **With Support Cards**: 8-20%
+- **Energy**: 20-39; **Base Failure Rate**: 30-50%; **With Support Cards**: 20-35%
+- **Energy**: 0-19; **Base Failure Rate**: 50-80%; **With Support Cards**: 35-60%
 
 **Failure Mitigation**:
 
@@ -548,13 +536,11 @@ Final Stat Gain = Base × Training Level × Growth Rate × Mood × Support Cards
 
 **Bond Levels** (visual gauge):
 
-| Bond Range | Gauge Color | Friendship Training |
-|------------|-------------|-------------------|
-| 0-20 | Red | Not available |
-| 21-40 | Yellow | Not available |
-| 41-60 | Green | Not available |
-| 61-79 | Light Orange | Not available |
-| 80-100 | Orange | **AVAILABLE** |
+- **Bond Range**: 0-20; **Gauge Color**: Red; **Friendship Training**: Not available
+- **Bond Range**: 21-40; **Gauge Color**: Yellow; **Friendship Training**: Not available
+- **Bond Range**: 41-60; **Gauge Color**: Green; **Friendship Training**: Not available
+- **Bond Range**: 61-79; **Gauge Color**: Light Orange; **Friendship Training**: Not available
+- **Bond Range**: 80-100; **Gauge Color**: Orange; **Friendship Training**: **AVAILABLE**
 
 **Bond Level Milestones**:
 
@@ -620,13 +606,11 @@ Final Stat Gain = Base × Training Level × Growth Rate × Mood × Support Cards
 
 ### 6.1 Distance Categories
 
-| Category | Distance Range | Typical Races |
-|----------|---------------|---------------|
-| **Sprint** | 1000-1400m | Short, explosive races |
-| **Mile** | 1400-1800m | Balanced speed/stamina |
-| **Medium** | 1800-2400m | Moderate stamina needs |
-| **Long** | 2400-3600m | High stamina requirement |
-| **Dirt** | Varies | Dirt track (not turf) |
+- **Category**: **Sprint**; **Distance Range**: 1000-1400m; **Typical Races**: Short, explosive races
+- **Category**: **Mile**; **Distance Range**: 1400-1800m; **Typical Races**: Balanced speed/stamina
+- **Category**: **Medium**; **Distance Range**: 1800-2400m; **Typical Races**: Moderate stamina needs
+- **Category**: **Long**; **Distance Range**: 2400-3600m; **Typical Races**: High stamina requirement
+- **Category**: **Dirt**; **Distance Range**: Varies; **Typical Races**: Dirt track (not turf)
 
 ### 6.2 Running Styles
 
@@ -668,17 +652,15 @@ Final Stat Gain = Base × Training Level × Growth Rate × Mood × Support Cards
 
 **Grade Effects on Stats**:
 
-| Grade | Stat Modifier | Wit Effectiveness |
-|-------|---------------|-------------------|
-| SS | +15% | +20% |
-| S | +10% | +10% |
-| A | +5% | 0% (baseline) |
-| B | 0% | -10% |
-| C | -5% | -20% |
-| D | -10% | -40% |
-| E | -15% | -60% |
-| F | -20% | -80% |
-| G | -30% | -90% |
+- **Grade**: SS; **Stat Modifier**: +15%; **Wit Effectiveness**: +20%
+- **Grade**: S; **Stat Modifier**: +10%; **Wit Effectiveness**: +10%
+- **Grade**: A; **Stat Modifier**: +5%; **Wit Effectiveness**: 0% (baseline)
+- **Grade**: B; **Stat Modifier**: 0%; **Wit Effectiveness**: -10%
+- **Grade**: C; **Stat Modifier**: -5%; **Wit Effectiveness**: -20%
+- **Grade**: D; **Stat Modifier**: -10%; **Wit Effectiveness**: -40%
+- **Grade**: E; **Stat Modifier**: -15%; **Wit Effectiveness**: -60%
+- **Grade**: F; **Stat Modifier**: -20%; **Wit Effectiveness**: -80%
+- **Grade**: G; **Stat Modifier**: -30%; **Wit Effectiveness**: -90%
 
 **Strategic Importance**:
 
@@ -690,13 +672,11 @@ Final Stat Gain = Base × Training Level × Growth Rate × Mood × Support Cards
 
 **Weather Types & Track Conditions**:
 
-| Weather | Track Condition | Speed Modifier | Power Modifier | Stamina Modifier |
-|---------|----------------|----------------|----------------|------------------|
-| Sunny | Firm (良) | 0% | 0% | 0% |
-| Cloudy | Good (稍重) | -2% | -2% | +2% |
-| Rainy | Soft (重) | -5% | -5% | +5% |
-| Heavy Rain | Heavy (不良) | -10% | -10% | +10% |
-| Snowy | Heavy (不良) | -15% | -15% | +15% |
+- **Weather**: Sunny; **Track Condition**: Firm (良); **Speed Modifier**: 0%; **Power Modifier**: 0%; **Stamina Modifier**: 0%
+- **Weather**: Cloudy; **Track Condition**: Good (稍重); **Speed Modifier**: -2%; **Power Modifier**: -2%; **Stamina Modifier**: +2%
+- **Weather**: Rainy; **Track Condition**: Soft (重); **Speed Modifier**: -5%; **Power Modifier**: -5%; **Stamina Modifier**: +5%
+- **Weather**: Heavy Rain; **Track Condition**: Heavy (不良); **Speed Modifier**: -10%; **Power Modifier**: -10%; **Stamina Modifier**: +10%
+- **Weather**: Snowy; **Track Condition**: Heavy (不良); **Speed Modifier**: -15%; **Power Modifier**: -15%; **Stamina Modifier**: +15%
 
 **Weather Skills**:
 
@@ -714,13 +694,11 @@ Final Stat Gain = Base × Training Level × Growth Rate × Mood × Support Cards
 
 **Race Placement Rewards**:
 
-| Placement | SP Reward | Fan Gain | Skill Hints |
-|-----------|-----------|----------|-------------|
-| 1st | 45-60 | High | Possible |
-| 2nd | 35-50 | Medium-High | Possible |
-| 3rd | 25-40 | Medium | Rare |
-| 4th-6th | 15-30 | Low-Medium | Very Rare |
-| 7th+ | 5-15 | Low | None |
+- **Placement**: 1st; **SP Reward**: 45-60; **Fan Gain**: High; **Skill Hints**: Possible
+- **Placement**: 2nd; **SP Reward**: 35-50; **Fan Gain**: Medium-High; **Skill Hints**: Possible
+- **Placement**: 3rd; **SP Reward**: 25-40; **Fan Gain**: Medium; **Skill Hints**: Rare
+- **Placement**: 4th-6th; **SP Reward**: 15-30; **Fan Gain**: Low-Medium; **Skill Hints**: Very Rare
+- **Placement**: 7th+; **SP Reward**: 5-15; **Fan Gain**: Low; **Skill Hints**: None
 
 **Race Grade Multipliers**:
 
@@ -829,32 +807,26 @@ Final Stat Gain = Base × Training Level × Growth Rate × Mood × Support Cards
 
 ### Training Facility Comparison
 
-| Facility | Best For | Energy Cost | SP Gain |
-|----------|----------|-------------|---------|
-| Speed | Sprint/Mile builds | -21 | +4 |
-| Stamina | Long distance builds | -19 | +4 |
-| Power | Acceleration needs | -20 | +4 |
-| Guts | Last spurt power | -22 | +4 |
-| Wisdom | Energy recovery, skills | +5 | +5 |
+- **Facility**: Speed; **Best For**: Sprint/Mile builds; **Energy Cost**: -21; **SP Gain**: +4
+- **Facility**: Stamina; **Best For**: Long distance builds; **Energy Cost**: -19; **SP Gain**: +4
+- **Facility**: Power; **Best For**: Acceleration needs; **Energy Cost**: -20; **SP Gain**: +4
+- **Facility**: Guts; **Best For**: Last spurt power; **Energy Cost**: -22; **SP Gain**: +4
+- **Facility**: Wisdom; **Best For**: Energy recovery, skills; **Energy Cost**: +5; **SP Gain**: +5
 
 ### Stat Soft Cap Reference
 
-| Stat Value | Effective Value | Calculation |
-|------------|-----------------|-------------|
-| 1200 | 1200 | No reduction |
-| 1300 | 1250 | 1200 + (100/2) |
-| 1400 | 1300 | 1200 + (200/2) |
-| 1500 | 1350 | 1200 + (300/2) |
-| 1600 | 1400 | 1200 + (400/2) |
+- **Stat Value**: 1200; **Effective Value**: 1200; **Calculation**: No reduction
+- **Stat Value**: 1300; **Effective Value**: 1250; **Calculation**: 1200 + (100/2)
+- **Stat Value**: 1400; **Effective Value**: 1300; **Calculation**: 1200 + (200/2)
+- **Stat Value**: 1500; **Effective Value**: 1350; **Calculation**: 1200 + (300/2)
+- **Stat Value**: 1600; **Effective Value**: 1400; **Calculation**: 1200 + (400/2)
 
 ### Race Phase Breakdown (2400m Example)
 
-| Phase | Start | End | Duration | Key Mechanics |
-|-------|-------|-----|----------|---------------|
-| Early-Race | 0m | 400m | 1/6 | Position Keep, Start Delay |
-| Mid-Race | 400m | 1600m | 3/6 | Rushing, Repositioning |
-| Late-Race | 1600m | 2000m | 1/6 | Last Spurt begins |
-| Last Spurt | 2000m | 2400m | 1/6 | Maximum speed, final push |
+- **Phase**: Early-Race; **Start**: 0m; **End**: 400m; **Duration**: 1/6; **Key Mechanics**: Position Keep, Start Delay
+- **Phase**: Mid-Race; **Start**: 400m; **End**: 1600m; **Duration**: 3/6; **Key Mechanics**: Rushing, Repositioning
+- **Phase**: Late-Race; **Start**: 1600m; **End**: 2000m; **Duration**: 1/6; **Key Mechanics**: Last Spurt begins
+- **Phase**: Last Spurt; **Start**: 2000m; **End**: 2400m; **Duration**: 1/6; **Key Mechanics**: Maximum speed, final push
 
 ---
 
@@ -899,4 +871,4 @@ Final Stat Gain = Base × Training Level × Growth Rate × Mood × Support Cards
 
 ---
 
-**End of Document**
+### End of Document
