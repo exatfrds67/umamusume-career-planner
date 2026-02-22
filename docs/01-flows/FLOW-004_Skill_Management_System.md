@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0
-**Date**: February 22, 2026
+**Document Version**: 2.2.0
+**Date**: January 28, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Updated with verified codebase references (SkillRecommendationAgent, SkillHintService, OcrExtractedSkill)
+**Status**: Current - Updated with verified game mechanics from Global English Server
 
 ---
 
@@ -123,7 +123,7 @@ flowchart TD
 ### 3.1 Hint Sources (Game-Accurate)
 
 | Source | Description | Effect |
-|--------|-------------|--------|
+| --- | --- | --- |
 | **Training** | Support card with "Hint Lv Up" present | +1 Hint Level (random skill from card) |
 | **Race** | Certain race rewards | +1 Hint Level |
 | **Event** | Support card events | +1 Hint Level |
@@ -168,7 +168,7 @@ flowchart TD
 
 ## 5. SP Budget Optimization Flow
 
-The logic used by the **Skill Recommendation Agent** (`SkillRecommendationAgent` via Neuron AI v2.11) to recommend optimal skill purchases.
+The logic used by the **Skill Advisor Agent** (Neuron AI) to recommend optimal skill purchases.
 
 ```mermaid
 flowchart TD
@@ -250,12 +250,11 @@ flowchart TD
 
 ## Document Control
 
-| Version | Date       | Author           | Changes |
-|---------|------------|------------------|---------|
-| 2.3.0   | 2026-02-22 | Development Team | Updated service references: SkillRecommendationAgent (actual Neuron agent name), SkillHintService, SkillAnalysisService; added Neuron AI v2.11 and OcrExtractedSkill references |
-| 2.2.0   | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: Hint levels now 0-5 (max), discount percentages corrected (10%/20%/30%/35%/40%), added additional hint sources (Fast Learner condition +10%, Skill Sparks, Hint Books), inheritance hint levels updated |
-| 2.1.0   | 2026-01-24 | Development Team | Updated to align with v2.0.0 codebase, added SP Budget Optimization via Neuron AI, and detailed Inheritance logic |
-| 1.0.0   | 2026-01-14 | Development Team | Initial flow definitions |
+| Version | Date | Author | Changes |
+| --- | --- | --- | --- |
+| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: Hint levels now 0-5 (max), discount percentages corrected (10%/20%/30%/35%/40%), added additional hint sources (Fast Learner condition +10%, Skill Sparks, Hint Books), inheritance hint levels updated |
+| 2.1.0 | 2026-01-24 | Development Team | Updated to align with v2.0.0 codebase, added SP Budget Optimization via Neuron AI, and detailed Inheritance logic |
+| 1.0.0 | 2026-01-14 | Development Team | Initial flow definitions |
 
 ---
 

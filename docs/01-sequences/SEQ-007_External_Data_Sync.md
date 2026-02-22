@@ -3,7 +3,7 @@
 ## Umamusume Pretty Derby Career Planner
 
 **Document Version**: 2.2.0  
-**Date**: February 22, 2026  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-007], [SPEC-007], [FLOW-007], [TECH-FLOW-007]
 
 ---
@@ -25,13 +25,13 @@
 
 ### 1.1 Purpose
 
-This sequence diagram documents the external data synchronization workflow in the Umamusume Career Planner application, covering API integration with umapyoi.net and GameTora (gametora.com), circuit breaker resilience patterns, and cache management strategies.
+This sequence diagram documents the external data synchronization workflow in the Umamusume Career Planner application, covering API integration with umapyoi.net and UmamusumeDB.com, circuit breaker resilience patterns, and cache management strategies.
 
 ### 1.2 Scope
 
 **Covers:**
 
-- External API data synchronization (umapyoi.net, GameTora)
+- External API data synchronization (umapyoi.net, UmamusumeDB.com)
 - Circuit breaker pattern for fault tolerance
 - Response caching with 24-hour TTL
 - Fallback API mechanisms
@@ -72,12 +72,12 @@ External data synchronization enables the application to:
 ### 2.1 System Components
 
 | Component | Type | Responsibility |
-|-----------|------|----------------|
+| --- | --- | --- |
 | **Scheduler** | Infrastructure | Laravel task scheduler triggering sync jobs |
 | **SyncController** | Application | Manual sync trigger endpoint |
-| **ExternalDataService** | Domain Service | Unified external API interface |
+| **ExternalAPIService** | Domain Service | Unified external API interface |
 | **UmapyoiApiClient** | Infrastructure | Primary data source client |
-| **GameToraScraperService** | Infrastructure | Fallback data source client |
+| **UmamusumeDBApiClient** | Infrastructure | Fallback data source client |
 | **CircuitBreaker** | Infrastructure | Fault tolerance and state management |
 | **CacheManager** | Infrastructure | Redis-based response caching |
 | **Database** | Infrastructure | MySQL/MariaDB persistence layer |
@@ -98,9 +98,9 @@ app/
 │           └── ExternalSyncController.php
 ├── Services/
 │   └── ExternalAPI/
-│       ├── ExternalDataService.php
+│       ├── ExternalAPIService.php
 │       ├── UmapyoiApiClient.php
-│       ├── GameToraScraperService.php
+│       ├── UmamusumeDBApiClient.php
 │       ├── CircuitBreaker.php
 │       └── CacheManager.php
 └── Events/
@@ -119,10 +119,10 @@ sequenceDiagram
     actor Admin
     participant Scheduler as Laravel Scheduler
     participant Controller as SyncController
-    participant Service as ExternalDataService
+    participant Service as ExternalAPIService
     participant Circuit as CircuitBreaker
     participant Primary as UmapyoiApiClient
-    participant Fallback as GameToraScraperService
+    participant Fallback as UmamusumeDBApiClient
     participant Cache as Redis Cache
     participant DB as Database
     participant Events as EventDispatcher
@@ -206,7 +206,7 @@ sequenceDiagram
 ### 3.2 Timeline Breakdown
 
 | Phase | Duration | Description |
-|-------|----------|-------------|
+| --- | --- | --- |
 | **Scheduler Trigger** | ~10ms | Cron job execution |
 | **Configuration Load** | ~20ms | Load sync targets and settings |
 | **Circuit Check** | ~5ms | Evaluate circuit breaker state |
@@ -228,18 +228,18 @@ sequenceDiagram
 **Request Flow:**
 
 ```
-Scheduler/Manual Trigger → ExternalDataService → CircuitBreaker → API Client
+Scheduler/Manual Trigger → ExternalAPIService → CircuitBreaker → API Client
 ```
 
 **Service Implementation:**
 
 ```php
-// ExternalDataService.php
-class ExternalDataService
+// ExternalAPIService.php
+class ExternalAPIService
 {
     public function __construct(
         private UmapyoiApiClient $primary,
-        private GameToraScraperService $fallback,
+        private UmamusumeDBApiClient $fallback,
         private CircuitBreaker $circuitBreaker,
         private CacheManager $cache,
     ) {}
@@ -333,7 +333,7 @@ class ExternalDataService
 **Circuit Breaker States:**
 
 | State | Description | Behavior |
-|-------|-------------|----------|
+| --- | --- | --- |
 | CLOSED | Normal operation | All requests pass through |
 | OPEN | Fault state | All requests blocked, return cached data |
 | HALF-OPEN | Recovery testing | Limited requests allowed for probing |
@@ -498,19 +498,19 @@ class UmapyoiApiClient
 }
 ```
 
-#### Fallback API Client (GameTora)
+#### Fallback API Client (UmamusumeDB.com)
 
 ```php
-// GameToraScraperService.php
-class GameToraScraperService
+// UmamusumeDBApiClient.php
+class UmamusumeDBApiClient
 {
     private string $baseUrl;
     private int $timeout;
     
     public function __construct()
     {
-        $this->baseUrl = config('external-apis.gametora.base_url');
-        $this->timeout = config('external-apis.gametora.timeout', 10);
+        $this->baseUrl = config('external-apis.umamusumedb.base_url');
+        $this->timeout = config('external-apis.umamusumedb.timeout', 10);
     }
     
     public function fetch(string $resource): array
@@ -548,7 +548,7 @@ class GameToraScraperService
 ### 4.4 Data Validation and Transformation
 
 ```php
-// ExternalDataService.php (continued)
+// ExternalAPIService.php (continued)
 private function validateResponse(array $response, string $resource): array
 {
     $validator = match ($resource) {
@@ -751,19 +751,19 @@ class ExternalDataSynced implements ShouldBroadcast
 ### 6.1 Error Types
 
 | Error Code | Condition | HTTP Status | Recovery Strategy |
-|------------|-----------|-------------|-------------------|
+| --- | --- | --- | --- |
 | `EXT_001` | Primary API timeout | 504 | Fallback to secondary API |
 | `EXT_002` | Primary API error | 500/503 | Fallback to secondary API |
-| `EXT_003` | Both APIs failed | - | Use stale cache |
-| `EXT_004` | Circuit breaker open | - | Return cached data |
+| `EXT_003` | Both APIs failed | --- | Use stale cache |
+| `EXT_004` | Circuit breaker open | --- | Return cached data |
 | `EXT_005` | Data validation failed | 422 | Log error, skip record |
-| `EXT_006` | No cached data available | - | Return empty result |
+| `EXT_006` | No cached data available | --- | Return empty result |
 
 ### 6.2 Error Recovery Flow
 
 ```mermaid
 sequenceDiagram
-    participant Service as ExternalDataService
+    participant Service as ExternalAPIService
     participant Primary as Primary API
     participant Fallback as Fallback API
     participant Cache
@@ -799,7 +799,7 @@ sequenceDiagram
 ### 6.3 Retry Strategy
 
 ```php
-// ExternalDataService.php
+// ExternalAPIService.php
 private function fetchWithRetry(callable $fetcher, int $maxRetries = 3): array
 {
     $attempt = 0;
@@ -834,7 +834,7 @@ private function fetchWithRetry(callable $fetcher, int $maxRetries = 3): array
 ### 7.1 Performance Metrics
 
 | Operation | Target | Current | Status |
-|-----------|--------|---------|--------|
+| --- | --- | --- | --- |
 | Primary API response | <2s | ~1.5s | ✅ Met |
 | Fallback API response | <3s | ~2.2s | ✅ Met |
 | Cache retrieval | <50ms | ~30ms | ✅ Met |
@@ -908,7 +908,7 @@ CREATE INDEX idx_external_api_cache ON ucp_cache(key, expires_at);
 ### 8.1 System Documentation
 
 | Document | Description |
-|----------|-------------|
+| --- | --- |
 | [PRD-007](../prds/PRD-007_External_Integration.md) | Product requirements for external integration |
 | [SPEC-007](../specs/SPEC-007_External_Integration_Technical.md) | Technical specification for integration system |
 | [FLOW-007](../flows/FLOW-007_External_Integration_System.md) | System flow for external operations |
@@ -917,7 +917,7 @@ CREATE INDEX idx_external_api_cache ON ucp_cache(key, expires_at);
 ### 8.2 Related Sequences
 
 | Sequence | Description |
-|----------|-------------|
+| --- | --- |
 | [SEQ-001](SEQ-001_Character_Creation_Sequence.md) | Character creation (uses synced data) |
 | [SEQ-004](SEQ-004_Race_Registration_and_Outcome.md) | Race system (uses synced race data) |
 | [SEQ-005](SEQ-005_Support_Card_Upgrade.md) | Support cards (uses synced meta tiers) |
@@ -925,13 +925,13 @@ CREATE INDEX idx_external_api_cache ON ucp_cache(key, expires_at);
 ### 8.3 UI Documentation
 
 | Document | Description |
-|----------|-------------|
+| --- | --- |
 | [UF-008](../user-flows/UF-008_OCR_and_Data_Import_Flow.md) | User flow for OCR and data import |
 
 ### 8.4 Configuration Documentation
 
 | Config File | Description |
-|-------------|-------------|
+| --- | --- |
 | `config/external-apis.php` | External API configuration |
 | `config/cache.php` | Cache driver configuration |
 | `config/broadcasting.php` | WebSocket configuration |
@@ -943,14 +943,14 @@ CREATE INDEX idx_external_api_cache ON ucp_cache(key, expires_at);
 ### Version History
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
+| --- | --- | --- | --- |
 | 2.0.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 implementation; added circuit breaker pattern, fallback mechanisms, detailed sequence flows, performance metrics, and aligned with current Laravel 12 architecture |
 | 1.0.0 | 2026-01-14 | Development Team | Initial draft |
 
 ### Approval
 
 | Role | Name | Signature | Date |
-|------|------|-----------|------|
+| --- | --- | --- | --- |
 | Technical Lead | | | |
 | QA Lead | | | |
 
@@ -971,4 +971,4 @@ CREATE INDEX idx_external_api_cache ON ucp_cache(key, expires_at);
 
 ---
 
-*This sequence diagram reflects the current implementation of the external data synchronization workflow as of v2.0.0. For the most up-to-date information, refer to the source code in `app/Services/ExternalDataService.php`, `app/Services/ExternalAPI/CircuitBreaker.php`, and related files.*
+*This sequence diagram reflects the current implementation of the external data synchronization workflow as of v2.0.0. For the most up-to-date information, refer to the source code in `app/Services/ExternalAPI/ExternalAPIService.php`, `app/Services/ExternalAPI/CircuitBreaker.php`, and related files.*

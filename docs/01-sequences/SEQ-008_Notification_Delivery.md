@@ -3,7 +3,7 @@
 ## Umamusume Pretty Derby Career Planner
 
 **Document Version**: 2.2.0  
-**Date**: February 22, 2026  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-007], [SPEC-007], [FLOW-007], [TECH-FLOW-007]
 
 ---
@@ -71,7 +71,7 @@ The notification system enables users to:
 ### 2.1 System Components
 
 | Component | Type | Responsibility |
-|-----------|------|----------------|
+| --- | --- | --- |
 | **Event Trigger** | Application | System events that generate notifications |
 | **NotificationService** | Domain Service | Notification orchestration and routing |
 | **NotificationRepository** | Infrastructure | Notification persistence |
@@ -179,7 +179,7 @@ sequenceDiagram
 ### 3.2 Timeline Breakdown
 
 | Phase | Duration | Description |
-|-------|----------|-------------|
+| --- | --- | --- |
 | **Event Dispatch** | ~10ms | System event triggered |
 | **Preference Loading** | ~50ms | Load user notification settings |
 | **Channel Routing** | ~20ms | Determine delivery channels |
@@ -590,8 +590,8 @@ class RaceReminderEvent extends NotificationEvent
     
     private function calculateReadiness(): int
     {
-        // Implementation from RaceConditionService
-        return app(RaceConditionService::class)
+        // Implementation from RaceAnalysisService
+        return app(RaceAnalysisService::class)
             ->calculateReadiness($this->career, $this->race);
     }
 }
@@ -703,7 +703,7 @@ class RaceReminderEvent extends NotificationEvent
 ### 6.1 Validation Errors
 
 | Error Code | Condition | HTTP Status | User Message |
-|------------|-----------|-------------|--------------|
+| --- | --- | --- | --- |
 | `NOTIF_001` | Invalid notification type | 422 | "Invalid notification type" |
 | `NOTIF_002` | User not found | 404 | "User not found" |
 | `NOTIF_003` | Notification not found | 404 | "Notification not found" |
@@ -749,7 +749,7 @@ sequenceDiagram
 ### 6.3 Delivery Retry Strategy
 
 | Channel | Retry Attempts | Backoff | Max Age |
-|---------|----------------|---------|---------|
+| --- | --- | --- | --- |
 | WebSocket | 0 (real-time only) | N/A | Immediate |
 | In-App | 0 (persistent) | N/A | Indefinite |
 | Email | 3 | Exponential (1min, 5min, 15min) | 1 hour |
@@ -761,7 +761,7 @@ sequenceDiagram
 ### 7.1 Performance Metrics
 
 | Operation | Target | Current | Status |
-|-----------|--------|---------|--------|
+| --- | --- | --- | --- |
 | WebSocket broadcast | <100ms | ~80ms | ✅ Met |
 | In-app notification save | <50ms | ~40ms | ✅ Met |
 | Email queue | <30ms | ~25ms | ✅ Met |
@@ -844,7 +844,7 @@ Cache::forget("notifications.user.{$user->id}.unread_count");
 ### 8.1 System Documentation
 
 | Document | Description |
-|----------|-------------|
+| --- | --- |
 | [PRD-007](../prds/PRD-007_External_Integration.md) | Product requirements for external integration |
 | [SPEC-007](../specs/SPEC-007_External_Integration_Technical.md) | Technical specification for integration system |
 | [FLOW-007](../flows/FLOW-007_External_Integration_System.md) | System flow for external operations |
@@ -853,7 +853,7 @@ Cache::forget("notifications.user.{$user->id}.unread_count");
 ### 8.2 Related Sequences
 
 | Sequence | Description |
-|----------|-------------|
+| --- | --- |
 | [SEQ-002](SEQ-002_Training_Block_Resolution.md) | Training completion triggers notifications |
 | [SEQ-004](SEQ-004_Race_Registration_and_Outcome.md) | Race events trigger reminders and results |
 | [SEQ-007](SEQ-007_External_Data_Sync.md) | External sync triggers update notifications |
@@ -861,7 +861,7 @@ Cache::forget("notifications.user.{$user->id}.unread_count");
 ### 8.3 Configuration Documentation
 
 | Config File | Description |
-|-------------|-------------|
+| --- | --- |
 | `config/broadcasting.php` | Laravel Reverb WebSocket configuration |
 | `config/mail.php` | Email delivery configuration |
 | `config/queue.php` | Queue driver configuration |
@@ -873,14 +873,14 @@ Cache::forget("notifications.user.{$user->id}.unread_count");
 ### Version History
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
+| --- | --- | --- | --- |
 | 2.0.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 implementation; added WebSocket broadcasting, email delivery, user preferences, quiet hours, detailed sequence flows, performance metrics, and aligned with current Laravel 12 architecture |
 | 1.0.0 | 2026-01-14 | Development Team | Initial draft |
 
 ### Approval
 
 | Role | Name | Signature | Date |
-|------|------|-----------|------|
+| --- | --- | --- | --- |
 | Technical Lead | | | |
 | QA Lead | | | |
 

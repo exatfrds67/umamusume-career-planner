@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0  
-**Date**: February 22, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-001], [SPEC-001], [FLOW-001], [SEQ-015]
 
 **Source Specs**:
@@ -30,23 +30,23 @@ The Dashboard serves as the primary landing page and command center for the Umam
 
 ### 1.2 Key Objectives
 
-| Objective                | Description                                                            |
-| ------------------------ | ---------------------------------------------------------------------- |
-| **Information Density**  | Display maximum relevant information without overwhelming the user     |
-| **Quick Navigation**     | Enable 1-2 click access to all major features                          |
+| Objective | Description |
+| --- | --- |
+| **Information Density** | Display maximum relevant information without overwhelming the user |
+| **Quick Navigation** | Enable 1-2 click access to all major features |
 | **Contextual Awareness** | Show current character state, upcoming events, and recommended actions |
-| **Performance Insights** | Highlight stat progression and goal tracking                           |
-| **AI Integration**       | Surface intelligent recommendations and insights                       |
+| **Performance Insights** | Highlight stat progression and goal tracking |
+| **AI Integration** | Surface intelligent recommendations and insights |
 
 ### 1.3 User Stories
 
-| ID     | User Story                                                         | Priority |
-| ------ | ------------------------------------------------------------------ | -------- |
-| US-001 | As a player, I want to see all my active career runs at a glance   | P0       |
-| US-002 | As a player, I want to quickly access my most recent character     | P0       |
-| US-003 | As a player, I want to see upcoming races and training suggestions | P0       |
-| US-004 | As a player, I want AI recommendations visible on the dashboard    | P1       |
-| US-005 | As a player, I want to see my goal progress without drilling down  | P1       |
+| ID | User Story | Priority |
+| --- | --- | --- |
+| US-001 | As a player, I want to see all my active career runs at a glance | P0 |
+| US-002 | As a player, I want to quickly access my most recent character | P0 |
+| US-003 | As a player, I want to see upcoming races and training suggestions | P0 |
+| US-004 | As a player, I want AI recommendations visible on the dashboard | P1 |
+| US-005 | As a player, I want to see my goal progress without drilling down | P1 |
 
 ---
 
@@ -198,12 +198,12 @@ The Dashboard serves as the primary landing page and command center for the Umam
 
 **Component**: `resources/views/components/app-header.blade.php`
 
-| Element           | Description                                   | Interactions                           |
-| ----------------- | --------------------------------------------- | -------------------------------------- |
-| **Logo**          | Application branding, home link               | Click → Navigate to dashboard          |
-| **Run Selector**  | Dropdown to switch between active career runs | Select → Load selected run context     |
-| **Notifications** | Bell icon with badge count                    | Click → Open notifications panel       |
-| **User Menu**     | Avatar/name with dropdown                     | Click → Show profile, settings, logout |
+| Element | Description | Interactions |
+| --- | --- | --- |
+| **Logo** | Application branding, home link | Click → Navigate to dashboard |
+| **Run Selector** | Dropdown to switch between active career runs | Select → Load selected run context |
+| **Notifications** | Bell icon with badge count | Click → Open notifications panel |
+| **User Menu** | Avatar/name with dropdown | Click → Show profile, settings, logout |
 
 **States**:
 
@@ -222,16 +222,16 @@ The Dashboard serves as the primary landing page and command center for the Umam
 
 **Component**: `resources/views/components/sidebar.blade.php`
 
-| Item          | Icon | Route            | Active Indicator         |
-| ------------- | ---- | ---------------- | ------------------------ |
-| Dashboard     | 🏠   | `/dashboard`     | Left border + background |
-| Character     | 👤   | `/characters`    | Left border + background |
-| Training      | ⚡   | `/training`      | Left border + background |
-| Races         | 🏆   | `/races`         | Left border + background |
-| Skills        | ✨   | `/skills`        | Left border + background |
-| Support Cards | 🎴   | `/support-cards` | Left border + background |
-| AI Advisor    | 🤖   | `/ai-advisor`    | Left border + background |
-| Settings      | ⚙️   | `/settings`      | Left border + background |
+| Item | Icon | Route | Active Indicator |
+| --- | --- | --- | --- |
+| Dashboard | 🏠 | `/dashboard` | Left border + background |
+| Character | 👤 | `/characters` | Left border + background |
+| Training | ⚡ | `/training` | Left border + background |
+| Races | 🏆 | `/races` | Left border + background |
+| Skills | ✨ | `/skills` | Left border + background |
+| Support Cards | 🎴 | `/support-cards` | Left border + background |
+| AI Advisor | 🤖 | `/ai-advisor` | Left border + background |
+| Settings | ⚙️ | `/settings` | Left border + background |
 
 **Responsive Behavior**:
 
@@ -295,16 +295,16 @@ Wit      A  (890)  █████████████████░░░ 
 
 **Grade Scale** (Game-Accurate - S is Maximum):
 
-| Grade | Range     | Color      | Notes                                    |
-| ----- | --------- | ---------- | ---------------------------------------- |
-| S     | 1100+     | Gold       | Maximum grade (no SS exists in game)     |
-| A     | 901-1099  | Purple     | Key breakpoint at 901                    |
-| B     | 701-900   | Red        |                                          |
-| C     | 501-700   | Orange     |                                          |
-| D     | 301-500   | Yellow     |                                          |
-| E     | 101-300   | Green      |                                          |
-| F     | 51-100    | Blue       |                                          |
-| G     | 0-50      | Gray       | Lowest grade                             |
+| Grade | Range | Color | Notes |
+| --- | --- | --- | --- |
+| S | 1100+ | Gold | Maximum grade (no SS exists in game) |
+| A | 901-1099 | Purple | Key breakpoint at 901 |
+| B | 701-900 | Red | |
+| C | 501-700 | Orange | |
+| D | 301-500 | Yellow | |
+| E | 101-300 | Green | |
+| F | 51-100 | Blue | |
+| G | 0-50 | Gray | Lowest grade |
 
 **Stat Cap System**:
 
@@ -355,12 +355,12 @@ Wit      A  (890)  █████████████████░░░ 
 
 **Readiness Color Coding**:
 
-| Range  | Color  | Status    |
-| ------ | ------ | --------- |
-| ≥85%   | Green  | Excellent |
-| 70-84% | Yellow | Good      |
-| 55-69% | Orange | Fair      |
-| <55%   | Red    | Poor      |
+| Range | Color | Status |
+| --- | --- | --- |
+| ≥85% | Green | Excellent |
+| 70-84% | Yellow | Good |
+| 55-69% | Orange | Fair |
+| <55% | Red | Poor |
 
 **Interactions**:
 
@@ -427,13 +427,13 @@ Wit      A  (890)  █████████████████░░░ 
 
 **Mood States** (Game-Accurate):
 
-| Mood      | Modifier | Icon | Color       |
-| --------- | -------- | ---- | ----------- |
-| Great     | +20%     | 😊   | Green       |
-| Good      | +10%     | 🙂   | Light Green |
-| Normal    | 0%       | 😐   | Gray        |
-| Bad       | -10%     | 🙁   | Orange      |
-| Very Bad  | -20%     | 😞   | Red         |
+| Mood | Modifier | Icon | Color |
+| --- | --- | --- | --- |
+| Great | +20% | 😊 | Green |
+| Good | +10% | 🙂 | Light Green |
+| Normal | 0% | 😐 | Gray |
+| Bad | -10% | 🙁 | Orange |
+| Very Bad | -20% | 😞 | Red |
 
 **Energy Bar**:
 
@@ -506,13 +506,13 @@ Wit      A  (890)  █████████████████░░░ 
 
 **Event Types**:
 
-| Type     | Icon | Format                                    |
-| -------- | ---- | ----------------------------------------- |
-| Training | ⚡   | "Turn X: [Type] Training (+Y [Stat])"     |
-| Race     | 🏆   | "Turn X: Race [Result] ([Name], [Grade])" |
-| Skill    | ✨   | "Turn X: Skill Acquired ([Name])"         |
-| Goal     | 🎯   | "Turn X: Goal Completed ([Name])"         |
-| Event    | 📅   | "Turn X: Event Triggered ([Name])"        |
+| Type | Icon | Format |
+| --- | --- | --- |
+| Training | ⚡ | "Turn X: [Type] Training (+Y [Stat])" |
+| Race | 🏆 | "Turn X: Race [Result] ([Name], [Grade])" |
+| Skill | ✨ | "Turn X: Skill Acquired ([Name])" |
+| Goal | 🎯 | "Turn X: Goal Completed ([Name])" |
+| Event | 📅 | "Turn X: Event Triggered ([Name])" |
 
 **Visual Design**:
 
@@ -573,13 +573,13 @@ public function getTrainingSuggestionsProperty()
 
 ### 4.2 Cache Strategy
 
-| Data Type            | Cache Key                    | TTL        | Invalidation                   |
-| -------------------- | ---------------------------- | ---------- | ------------------------------ |
-| Training predictions | `predictions:{run_id}`       | 5 minutes  | On training execution          |
-| Upcoming races       | `races:upcoming:{run_id}`    | 1 hour     | On race entry/result           |
-| AI recommendations   | `ai:recommendation:{run_id}` | 10 minutes | On new query or context change |
-| Stat snapshot        | `stats:{run_id}`             | 1 minute   | On stat update                 |
-| Activity timeline    | `activity:{run_id}`          | 30 seconds | On new activity                |
+| Data Type | Cache Key | TTL | Invalidation |
+| --- | --- | --- | --- |
+| Training predictions | `predictions:{run_id}` | 5 minutes | On training execution |
+| Upcoming races | `races:upcoming:{run_id}` | 1 hour | On race entry/result |
+| AI recommendations | `ai:recommendation:{run_id}` | 10 minutes | On new query or context change |
+| Stat snapshot | `stats:{run_id}` | 1 minute | On stat update |
+| Activity timeline | `activity:{run_id}` | 30 seconds | On new activity |
 
 ### 4.3 Real-time Updates (WebSocket)
 
@@ -677,25 +677,25 @@ sequenceDiagram
 
 ### 6.1 WCAG 2.2 AA Compliance
 
-| Criterion                   | Implementation                     | Test Method              |
-| --------------------------- | ---------------------------------- | ------------------------ |
-| **1.1.1 Non-text Content**  | All icons have `aria-label`        | Screen reader testing    |
-| **1.4.3 Contrast Ratio**    | 4.5:1 minimum for text             | Color contrast analyzer  |
-| **2.1.1 Keyboard**          | All interactive elements focusable | Keyboard-only navigation |
-| **2.4.3 Focus Order**       | Logical focus sequence             | Tab key traversal        |
-| **2.4.7 Focus Visible**     | Clear focus indicators             | Visual inspection        |
-| **4.1.2 Name, Role, Value** | Proper ARIA attributes             | axe-core automated scan  |
+| Criterion | Implementation | Test Method |
+| --- | --- | --- |
+| **1.1.1 Non-text Content** | All icons have `aria-label` | Screen reader testing |
+| **1.4.3 Contrast Ratio** | 4.5:1 minimum for text | Color contrast analyzer |
+| **2.1.1 Keyboard** | All interactive elements focusable | Keyboard-only navigation |
+| **2.4.3 Focus Order** | Logical focus sequence | Tab key traversal |
+| **2.4.7 Focus Visible** | Clear focus indicators | Visual inspection |
+| **4.1.2 Name, Role, Value** | Proper ARIA attributes | axe-core automated scan |
 
 ### 6.2 Keyboard Navigation
 
-| Action            | Shortcut            | Context   |
-| ----------------- | ------------------- | --------- |
-| Navigate panels   | `Tab` / `Shift+Tab` | Global    |
-| Open run selector | `Alt+R`             | Header    |
-| Open user menu    | `Alt+U`             | Header    |
-| Focus sidebar     | `Alt+S`             | Global    |
-| Refresh dashboard | `F5` or `Ctrl+R`    | Dashboard |
-| Open AI advisor   | `Alt+A`             | Dashboard |
+| Action | Shortcut | Context |
+| --- | --- | --- |
+| Navigate panels | `Tab` / `Shift+Tab` | Global |
+| Open run selector | `Alt+R` | Header |
+| Open user menu | `Alt+U` | Header |
+| Focus sidebar | `Alt+S` | Global |
+| Refresh dashboard | `F5` or `Ctrl+R` | Dashboard |
+| Open AI advisor | `Alt+A` | Dashboard |
 
 ### 6.3 Screen Reader Announcements
 
@@ -724,33 +724,33 @@ sequenceDiagram
 
 ### 7.1 Performance Targets
 
-| Metric                       | Target | Measurement         |
-| ---------------------------- | ------ | ------------------- |
-| **Initial Load**             | < 2.0s | Time to Interactive |
-| **First Contentful Paint**   | < 1.5s | Lighthouse          |
-| **Largest Contentful Paint** | < 2.5s | Lighthouse          |
-| **Time to Interactive**      | < 3.0s | Lighthouse          |
-| **Cumulative Layout Shift**  | < 0.1  | Lighthouse          |
+| Metric | Target | Measurement |
+| --- | --- | --- |
+| **Initial Load** | < 2.0s | Time to Interactive |
+| **First Contentful Paint** | < 1.5s | Lighthouse |
+| **Largest Contentful Paint** | < 2.5s | Lighthouse |
+| **Time to Interactive** | < 3.0s | Lighthouse |
+| **Cumulative Layout Shift** | < 0.1 | Lighthouse |
 
 ### 7.2 Optimization Strategies
 
-| Strategy               | Implementation                     | Impact                |
-| ---------------------- | ---------------------------------- | --------------------- |
-| **Lazy Loading**       | Defer non-critical components      | -40% initial bundle   |
-| **Code Splitting**     | Separate vendor and app bundles    | -30% main bundle      |
-| **Image Optimization** | WebP format, responsive images     | -50% image size       |
-| **Cache First**        | Service worker caching             | -70% repeat load time |
-| **Database Indexing**  | Indexed queries for dashboard data | -60% query time       |
+| Strategy | Implementation | Impact |
+| --- | --- | --- |
+| **Lazy Loading** | Defer non-critical components | -40% initial bundle |
+| **Code Splitting** | Separate vendor and app bundles | -30% main bundle |
+| **Image Optimization** | WebP format, responsive images | -50% image size |
+| **Cache First** | Service worker caching | -70% repeat load time |
+| **Database Indexing** | Indexed queries for dashboard data | -60% query time |
 
 ### 7.3 Bundle Size Budget
 
-| Asset Type | Budget | Current | Status           |
-| ---------- | ------ | ------- | ---------------- |
-| JavaScript | 150 KB | 142 KB  | ✅ Within budget |
-| CSS        | 50 KB  | 48 KB   | ✅ Within budget |
-| Fonts      | 30 KB  | 28 KB   | ✅ Within budget |
-| Images     | 200 KB | 185 KB  | ✅ Within budget |
-| Total      | 430 KB | 403 KB  | ✅ Within budget |
+| Asset Type | Budget | Current | Status |
+| --- | --- | --- | --- |
+| JavaScript | 150 KB | 142 KB | ✅ Within budget |
+| CSS | 50 KB | 48 KB | ✅ Within budget |
+| Fonts | 30 KB | 28 KB | ✅ Within budget |
+| Images | 200 KB | 185 KB | ✅ Within budget |
+| Total | 430 KB | 403 KB | ✅ Within budget |
 
 ---
 
@@ -877,26 +877,26 @@ test.describe("Dashboard Accessibility", () => {
 
 ### 9.1 Specifications
 
-| Document                  | Reference                                                    |
-| ------------------------- | ------------------------------------------------------------ |
-| System Requirements       | [003_SRS](../003_SRS_Software_Requirement_Specifications.md) |
-| System Design             | [004_SDS](../004_SDS_Software_Design_Specifications.md)      |
-| Source Code Documentation | [010_SCD](../010_SCD_Source_Code_Documentation.md)           |
-| Database Documentation    | [009_DBD](../009_DBD_Database_Documentation.md)              |
+| Document | Reference |
+| --- | --- |
+| System Requirements | [003_SRS](../003_SRS_Software_Requirement_Specifications.md) |
+| System Design | [004_SDS](../004_SDS_Software_Design_Specifications.md) |
+| Source Code Documentation | [010_SCD](../010_SCD_Source_Code_Documentation.md) |
+| Database Documentation | [009_DBD](../009_DBD_Database_Documentation.md) |
 
 ### 9.2 User Documentation
 
-| Document           | Reference                                                   |
-| ------------------ | ----------------------------------------------------------- |
-| User Manual        | [017_SUM](../017_SUM_Software_User_Manual.md)               |
+| Document | Reference |
+| --- | --- |
+| User Manual | [017_SUM](../017_SUM_Software_User_Manual.md) |
 | User Flow Diagrams | [UF-001](../user-flows/UF-001_Dashboard_Navigation_Flow.md) |
 
 ### 9.3 Development Planning
 
-| Document                  | Reference                                          |
-| ------------------------- | -------------------------------------------------- |
+| Document | Reference |
+| --- | --- |
 | Software Development Plan | [001_SDP](../001_SDP_Software_Development_Plan.md) |
-| Integration Plan          | [007_SIP](../007_SIP_Software_Integration_Plan.md) |
+| Integration Plan | [007_SIP](../007_SIP_Software_Integration_Plan.md) |
 
 ---
 
@@ -904,7 +904,6 @@ test.describe("Dashboard Accessibility", () => {
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
-| 2.3.0 | 2026-02-22 | Development Team | Updated version/dates, aligned technology references with current stack (Livewire 4, Neuron AI v2.11, GameTora/umapyoi.net) |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: corrected stat grade scale (S is max, no SS), mood system (+20%/-20% range), soft cap at 1200, career structure ~70-78 turns |
 | 2.0.0 | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added AI integration, real-time updates, accessibility specifications, performance targets, and testing requirements |
 | 1.0.0 | 2026-01-14 | Development Team | Initial wireframe specification |

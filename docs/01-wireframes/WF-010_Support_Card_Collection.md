@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0  
-**Date**: February 22, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-005], [SPEC-005], [FLOW-005], [SEQ-005]
 
 **Source Specs**:
@@ -31,65 +31,65 @@ The Support Card Collection interface provides a comprehensive catalog of all av
 
 ### 1.2 Key Objectives
 
-| Objective                  | Description                                                      |
-| -------------------------- | ---------------------------------------------------------------- |
-| **Card Discovery**         | Browse 200+ support cards with advanced filtering                |
-| **Meta Integration**       | Display community meta tier rankings (SS, S, A, B)               |
-| **Bond Tracking**          | Monitor bond gauge (0-100%) with friendship threshold at 80%     |
-| **Limit Break Management** | Track limit break levels (★ to ★★★★★, MLB = 4 LB / 5 stars)      |
-| **Quick Deck Actions**     | Add cards directly to active decks                               |
+| Objective | Description |
+| --- | --- |
+| **Card Discovery** | Browse 200+ support cards with advanced filtering |
+| **Meta Integration** | Display community meta tier rankings (SS, S, A, B) |
+| **Bond Tracking** | Monitor bond gauge (0-100%) with friendship threshold at 80% |
+| **Limit Break Management** | Track limit break levels (★ to ★★★★★, MLB = 4 LB / 5 stars) |
+| **Quick Deck Actions** | Add cards directly to active decks |
 
-### 1.3 Game-Accurate Mechanics (Global English Server - Feb 2026)
+### 1.3 Game-Accurate Mechanics (Global English Server - Jan 2026)
 
 #### Support Card Types
 
-| Type     | Icon | Primary Stat | Training Facility |
-| -------- | ---- | ------------ | ----------------- |
-| Speed    | 🏃   | Speed        | Speed Training    |
-| Stamina  | 💪   | Stamina      | Stamina Training  |
-| Power    | ⚡   | Power        | Power Training    |
-| Guts     | 🔥   | Guts         | Guts Training     |
-| Wit      | 🧠   | Wit          | Wit Training      |
-| Friend   | 💖   | Variable     | Any Training      |
+| Type | Icon | Primary Stat | Training Facility |
+| --- | --- | --- | --- |
+| Speed | 🏃 | Speed | Speed Training |
+| Stamina | 💪 | Stamina | Stamina Training |
+| Power | ⚡ | Power | Power Training |
+| Guts | 🔥 | Guts | Guts Training |
+| Wit | 🧠 | Wit | Wit Training |
+| Friend | 💖 | Variable | Any Training |
 
 #### Card Rarities
 
 | Rarity | Base Level Cap | Max Level (MLB) | Friendship Bonus Range |
-| ------ | -------------- | --------------- | ---------------------- |
-| R      | 25             | 45              | 10-15%                 |
-| SR     | 30             | 50              | 15-25%                 |
-| SSR    | 35             | 50              | 25-35%                 |
+| --- | --- | --- | --- |
+| R | 25 | 45 | 10-15% |
+| SR | 30 | 50 | 15-25% |
+| SSR | 35 | 50 | 25-35% |
 
 #### Limit Break System
 
-| Stars | Limit Breaks | Level Cap Increase | Status      |
-| ----- | ------------ | ------------------ | ----------- |
-| ★     | 0 LB         | Base               | Initial     |
-| ★★    | 1 LB         | +3-5 levels        | 1st Break   |
-| ★★★   | 2 LB         | +3-5 levels        | 2nd Break   |
-| ★★★★  | 3 LB         | +3-5 levels        | 3rd Break   |
-| ★★★★★ | 4 LB (MLB)   | Max level          | Max LB      |
+| Stars | Limit Breaks | Level Cap Increase | Status |
+| --- | --- | --- | --- |
+| ★ | 0 LB | Base | Initial |
+| ★★ | 1 LB | +3-5 levels | 1st Break |
+| ★★★ | 2 LB | +3-5 levels | 2nd Break |
+| ★★★★ | 3 LB | +3-5 levels | 3rd Break |
+| ★★★★★ | 4 LB (MLB) | Max level | Max LB |
 
 #### Bond Mechanics
 
-| Condition           | Bond Gain | Notes                              |
-| ------------------- | --------- | ---------------------------------- |
-| Base Training       | +7        | Card present in training           |
-| Charming Active     | +9        | +2 bonus from Charming condition   |
-| Exclamation Mark    | +5        | Event available indicator          |
-| Friendship Threshold| 80%       | Enables Friendship Training bonus  |
+| Condition | Bond Gain | Notes |
+| --- | --- | --- |
+| Base Training | +7 | Card present in training |
+| Charming Active | +9 | +2 bonus from Charming condition |
+| Exclamation Mark | +5 | Event available indicator |
+| Friendship Threshold | 80% | Enables Friendship Training bonus |
 
 ### 1.4 User Stories
 
-| ID     | User Story                                                                | Priority |
-| ------ | ------------------------------------------------------------------------- | -------- |
-| US-001 | As a player, I want to see all my support cards with meta tier rankings   | P0       |
-| US-002 | As a player, I want to filter cards by type, rarity, and meta tier        | P0       |
-| US-003 | As a player, I want to see bond levels and limit break status at a glance | P0       |
-| US-004 | As a player, I want to quickly add cards to my active deck                | P1       |
-| US-005 | As a player, I want to sync meta tier data from external sources          | P1       |
-| US-006 | As a player, I want to see friendship bonus percentages by rarity         | P1       |
-| US-007 | As a player, I want to track which cards have reached 80% bond threshold  | P1       |
+| ID | User Story | Priority |
+| --- | --- | --- |
+| US-001 | As a player, I want to see all my support cards with meta tier rankings | P0 |
+| US-002 | As a player, I want to filter cards by type, rarity, and meta tier | P0 |
+| US-003 | As a player, I want to see bond levels and limit break status at a glance | P0 |
+| US-004 | As a player, I want to quickly add cards to my active deck | P1 |
+| US-005 | As a player, I want to sync meta tier data from external sources | P1 |
+| US-006 | As a player, I want to see friendship bonus percentages by rarity | P1 |
+| US-007 | As a player, I want to track which cards have reached 80% bond threshold | P1 |
 
 ---
 
@@ -478,26 +478,26 @@ class CardSearch extends Component
 
 **Card States**:
 
-| State                    | Visual Indicator                    | Actions Available              |
-| ------------------------ | ----------------------------------- | ------------------------------ |
-| In Deck                  | Blue border, checkmark icon         | View Details, Remove from Deck |
-| Not in Deck              | Standard border                     | View Details, Add to Deck      |
-| Friendship Ready (≥80%)  | 🤝 icon, green highlight            | View Details, Add to Deck      |
-| Below Threshold (<80%)   | ⏳ icon, progress indicator         | View Details, Add to Deck      |
-| Max Bond (100%)          | Gold glow, special icon             | View Details, Add to Deck      |
-| MLB (★★★★★)              | Rainbow shimmer, MLB badge          | View Details, Add to Deck      |
+| State | Visual Indicator | Actions Available |
+| --- | --- | --- |
+| In Deck | Blue border, checkmark icon | View Details, Remove from Deck |
+| Not in Deck | Standard border | View Details, Add to Deck |
+| Friendship Ready (≥80%) | 🤝 icon, green highlight | View Details, Add to Deck |
+| Below Threshold (<80%) | ⏳ icon, progress indicator | View Details, Add to Deck |
+| Max Bond (100%) | Gold glow, special icon | View Details, Add to Deck |
+| MLB (★★★★★) | Rainbow shimmer, MLB badge | View Details, Add to Deck |
 
 ### 3.4 Meta Tier System
 
 **Meta Tier Definitions**:
 
-| Tier     | Description                         | Color  | Usage                            |
-| -------- | ----------------------------------- | ------ | -------------------------------- |
-| SS       | Top-tier meta defining cards        | Gold   | Essential for competitive builds |
-| S        | Excellent cards, highly recommended | Purple | Strong choice for most builds    |
-| A        | Good cards, situationally valuable  | Blue   | Viable in specific strategies    |
-| B        | Average cards, budget options       | Green  | Functional but suboptimal        |
-| Unranked | New or unrated cards                | Gray   | Awaiting community consensus     |
+| Tier | Description | Color | Usage |
+| --- | --- | --- | --- |
+| SS | Top-tier meta defining cards | Gold | Essential for competitive builds |
+| S | Excellent cards, highly recommended | Purple | Strong choice for most builds |
+| A | Good cards, situationally valuable | Blue | Viable in specific strategies |
+| B | Average cards, budget options | Green | Functional but suboptimal |
+| Unranked | New or unrated cards | Gray | Awaiting community consensus |
 
 **Service**: `app/Services/SupportCards/MetaTierService.php`
 
@@ -769,7 +769,7 @@ class MetaTierService
 ```php
 class BondProgressionService
 {
-    // Game-accurate bond mechanics (Global English Server - Feb 2026)
+    // Game-accurate bond mechanics (Global English Server - Jan 2026)
     public const BASE_BOND_GAIN = 7;           // Base training together
     public const CHARMING_BOND_GAIN = 9;       // With Charming condition (+2)
     public const EXCLAMATION_BOND_GAIN = 5;    // Event available indicator
@@ -852,20 +852,20 @@ class BondProgressionService
 
 **Bond Milestones (Game-Accurate)**:
 
-| Level | Milestone              | Description                                    |
-| ----- | ---------------------- | ---------------------------------------------- |
-| 0%    | Initial                | Card acquired, no bond                         |
-| 80%   | Friendship Threshold   | Enables Friendship Training bonus              |
-| 100%  | Max Bond               | Maximum bond achieved                          |
+| Level | Milestone | Description |
+| --- | --- | --- |
+| 0% | Initial | Card acquired, no bond |
+| 80% | Friendship Threshold | Enables Friendship Training bonus |
+| 100% | Max Bond | Maximum bond achieved |
 
 **Bond Gain Sources**:
 
-| Source              | Bond Gain | Notes                                          |
-| ------------------- | --------- | ---------------------------------------------- |
-| Training Together   | +7        | Base gain when card is in training             |
-| Charming Condition  | +9        | Replaces base (+2 bonus from condition)        |
-| Exclamation Event   | +5        | Additional gain when event is available        |
-| Card Events         | Variable  | Depends on event choices                       |
+| Source | Bond Gain | Notes |
+| --- | --- | --- |
+| Training Together | +7 | Base gain when card is in training |
+| Charming Condition | +9 | Replaces base (+2 bonus from condition) |
+| Exclamation Event | +5 | Additional gain when event is available |
+| Card Events | Variable | Depends on event choices |
 
 ---
 
@@ -982,13 +982,13 @@ sequenceDiagram
 
 ### 4.3 Cache Strategy
 
-| Data Type              | Cache Key                      | TTL        | Invalidation             |
-| ---------------------- | ------------------------------ | ---------- | ------------------------ |
-| Card collection        | `cards:user:{user_id}`         | 10 minutes | On card update           |
-| Meta tiers             | `meta_tiers:all`               | 24 hours   | On manual sync           |
-| Meta distribution      | `meta_tiers:distribution`      | 1 hour     | On tier update           |
-| Friendship ready count | `friendship:ready:{user_id}`   | 5 minutes  | On bond update           |
-| MLB count              | `mlb:count:{user_id}`          | 5 minutes  | On limit break update    |
+| Data Type | Cache Key | TTL | Invalidation |
+| --- | --- | --- | --- |
+| Card collection | `cards:user:{user_id}` | 10 minutes | On card update |
+| Meta tiers | `meta_tiers:all` | 24 hours | On manual sync |
+| Meta distribution | `meta_tiers:distribution` | 1 hour | On tier update |
+| Friendship ready count | `friendship:ready:{user_id}` | 5 minutes | On bond update |
+| MLB count | `mlb:count:{user_id}` | 5 minutes | On limit break update |
 
 ---
 
@@ -1077,29 +1077,29 @@ flowchart TD
 
 ### 6.1 WCAG 2.2 AA Compliance
 
-| Criterion                           | Implementation                              | Test Method             |
-| ----------------------------------- | ------------------------------------------- | ----------------------- |
-| **1.1.1 Non-text Content**          | All card images have descriptive `alt` text | Screen reader testing   |
-| **1.4.3 Contrast Ratio**            | 4.5:1 minimum for text                      | Color contrast analyzer |
-| **2.1.1 Keyboard**                  | All cards keyboard accessible               | Keyboard-only testing   |
-| **2.4.3 Focus Order**               | Logical tab order through cards             | Tab key traversal       |
-| **2.4.7 Focus Visible**             | Clear focus indicators on cards             | Visual inspection       |
-| **3.2.4 Consistent Identification** | Consistent meta tier badges                 | Manual review           |
-| **4.1.2 Name, Role, Value**         | Proper ARIA attributes on controls          | axe-core scan           |
+| Criterion | Implementation | Test Method |
+| --- | --- | --- |
+| **1.1.1 Non-text Content** | All card images have descriptive `alt` text | Screen reader testing |
+| **1.4.3 Contrast Ratio** | 4.5:1 minimum for text | Color contrast analyzer |
+| **2.1.1 Keyboard** | All cards keyboard accessible | Keyboard-only testing |
+| **2.4.3 Focus Order** | Logical tab order through cards | Tab key traversal |
+| **2.4.7 Focus Visible** | Clear focus indicators on cards | Visual inspection |
+| **3.2.4 Consistent Identification** | Consistent meta tier badges | Manual review |
+| **4.1.2 Name, Role, Value** | Proper ARIA attributes on controls | axe-core scan |
 
 ### 6.2 Keyboard Navigation
 
-| Action                   | Shortcut       | Context                |
-| ------------------------ | -------------- | ---------------------- |
-| Search cards             | `/`            | When collection loaded |
-| Add focused card to deck | `Enter` or `A` | When card focused      |
-| View card details        | `I` or `Space` | When card focused      |
-| Navigate cards           | `Arrow Keys`   | Card grid              |
-| Reset filters            | `Ctrl+R`       | Collection view        |
-| Toggle view mode         | `V`            | Collection view        |
-| Sync meta data           | `Ctrl+M`       | Collection view        |
-| Filter by type           | `T`            | Collection view        |
-| Filter by bond status    | `B`            | Collection view        |
+| Action | Shortcut | Context |
+| --- | --- | --- |
+| Search cards | `/` | When collection loaded |
+| Add focused card to deck | `Enter` or `A` | When card focused |
+| View card details | `I` or `Space` | When card focused |
+| Navigate cards | `Arrow Keys` | Card grid |
+| Reset filters | `Ctrl+R` | Collection view |
+| Toggle view mode | `V` | Collection view |
+| Sync meta data | `Ctrl+M` | Collection view |
+| Filter by type | `T` | Collection view |
+| Filter by bond status | `B` | Collection view |
 
 ### 6.3 Screen Reader Announcements
 
@@ -1138,34 +1138,34 @@ flowchart TD
 
 ### 7.1 Performance Targets
 
-| Metric                 | Target        | Measurement                |
-| ---------------------- | ------------- | -------------------------- |
-| **Page Load**          | < 1.5 seconds | Time to first render       |
-| **Filter Application** | < 200ms       | Filter change to UI update |
-| **Search Response**    | < 300ms       | Keystroke to results       |
-| **Card Modal Load**    | < 400ms       | Click to modal display     |
-| **Meta Sync**          | < 3 seconds   | Sync completion            |
-| **Bond Update**        | < 100ms       | Bond change to UI update   |
+| Metric | Target | Measurement |
+| --- | --- | --- |
+| **Page Load** | < 1.5 seconds | Time to first render |
+| **Filter Application** | < 200ms | Filter change to UI update |
+| **Search Response** | < 300ms | Keystroke to results |
+| **Card Modal Load** | < 400ms | Click to modal display |
+| **Meta Sync** | < 3 seconds | Sync completion |
+| **Bond Update** | < 100ms | Bond change to UI update |
 
 ### 7.2 Optimization Strategies
 
-| Strategy               | Implementation                        | Impact                |
-| ---------------------- | ------------------------------------- | --------------------- |
-| **Lazy Loading**       | Virtual scrolling for card grid       | Handles 500+ cards    |
-| **Image Optimization** | WebP format, lazy image loading       | -60% image size       |
-| **Query Optimization** | Eager load bonuses and events         | -50% query count      |
-| **Response Caching**   | Cache filtered card lists (10min TTL) | -70% database queries |
-| **Debounced Search**   | 300ms debounce on search input        | Reduced re-renders    |
-| **Bond Calculation**   | Client-side threshold checks          | Instant UI feedback   |
+| Strategy | Implementation | Impact |
+| --- | --- | --- |
+| **Lazy Loading** | Virtual scrolling for card grid | Handles 500+ cards |
+| **Image Optimization** | WebP format, lazy image loading | -60% image size |
+| **Query Optimization** | Eager load bonuses and events | -50% query count |
+| **Response Caching** | Cache filtered card lists (10min TTL) | -70% database queries |
+| **Debounced Search** | 300ms debounce on search input | Reduced re-renders |
+| **Bond Calculation** | Client-side threshold checks | Instant UI feedback |
 
 ### 7.3 Bundle Size Budget
 
-| Asset Type | Budget | Current | Status           |
-| ---------- | ------ | ------- | ---------------- |
-| JavaScript | 60 KB  | 56 KB   | ✅ Within budget |
-| CSS        | 25 KB  | 22 KB   | ✅ Within budget |
-| Images     | 150 KB | 135 KB  | ✅ Within budget |
-| Total      | 235 KB | 213 KB  | ✅ Within budget |
+| Asset Type | Budget | Current | Status |
+| --- | --- | --- | --- |
+| JavaScript | 60 KB | 56 KB | ✅ Within budget |
+| CSS | 25 KB | 22 KB | ✅ Within budget |
+| Images | 150 KB | 135 KB | ✅ Within budget |
+| Total | 235 KB | 213 KB | ✅ Within budget |
 
 ---
 
@@ -1633,52 +1633,51 @@ test.describe("WF-010: Accessibility", () => {
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
-| 2.3.0 | 2026-02-22 | Development Team | Updated version/dates, aligned technology references with current stack (Livewire 4, Neuron AI v2.11, GameTora/umapyoi.net) |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server - corrected bond mechanics (+7 base, +9 Charming, +5 exclamation), friendship threshold 80%, limit break system (MLB = 4 LB), card type icons, rarity-based friendship bonus ranges (R: 10-15%, SR: 15-25%, SSR: 25-35%), skill hint unlock system |
 | 2.0.0 | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added collection overview, meta tier system, bond progression, accessibility specifications, and testing requirements |
 | 1.0.0 | 2026-01-14 | Development Team | Initial wireframe specification |
 
 ---
 
-## 11. Game Mechanics Reference (Global English Server - Feb 2026)
+## 11. Game Mechanics Reference (Global English Server - Jan 2026)
 
 ### 11.1 Support Card Types Summary
 
-| Type    | Icon | Primary Training | Typical Bonuses                    |
-| ------- | ---- | ---------------- | ---------------------------------- |
-| Speed   | 🏃   | Speed            | Speed bonus, Training effect up    |
-| Stamina | 💪   | Stamina          | Stamina bonus, Stamina recovery    |
-| Power   | ⚡   | Power            | Power bonus, Race bonus            |
-| Guts    | 🔥   | Guts             | Guts bonus, Motivation recovery    |
-| Wit     | 🧠   | Wit              | Wit bonus, Skill point bonus       |
-| Friend  | 💖   | Any              | Motivation up, Event rate up       |
+| Type | Icon | Primary Training | Typical Bonuses |
+| --- | --- | --- | --- |
+| Speed | 🏃 | Speed | Speed bonus, Training effect up |
+| Stamina | 💪 | Stamina | Stamina bonus, Stamina recovery |
+| Power | ⚡ | Power | Power bonus, Race bonus |
+| Guts | 🔥 | Guts | Guts bonus, Motivation recovery |
+| Wit | 🧠 | Wit | Wit bonus, Skill point bonus |
+| Friend | 💖 | Any | Motivation up, Event rate up |
 
 ### 11.2 Limit Break System Summary
 
-| LB Count | Stars   | Status | Level Cap Effect        |
-| -------- | ------- | ------ | ----------------------- |
-| 0        | ★☆☆☆☆   | Base   | Base level cap          |
-| 1        | ★★☆☆☆   | 1 LB   | +3-5 levels             |
-| 2        | ★★★☆☆   | 2 LB   | +3-5 levels             |
-| 3        | ★★★★☆   | 3 LB   | +3-5 levels             |
-| 4        | ★★★★★   | MLB    | Maximum level cap       |
+| LB Count | Stars | Status | Level Cap Effect |
+| --- | --- | --- | --- |
+| 0 | ★☆☆☆☆ | Base | Base level cap |
+| 1 | ★★☆☆☆ | 1 LB | +3-5 levels |
+| 2 | ★★★☆☆ | 2 LB | +3-5 levels |
+| 3 | ★★★★☆ | 3 LB | +3-5 levels |
+| 4 | ★★★★★ | MLB | Maximum level cap |
 
 ### 11.3 Bond Mechanics Summary
 
-| Condition            | Bond Gain | Notes                              |
-| -------------------- | --------- | ---------------------------------- |
-| Base Training        | +7        | Card present in training           |
-| Charming Active      | +9        | Replaces base (+2 from condition)  |
-| Exclamation (!)      | +5        | Event available, additive          |
-| Friendship Threshold | 80%       | Enables Friendship Training bonus  |
+| Condition | Bond Gain | Notes |
+| --- | --- | --- |
+| Base Training | +7 | Card present in training |
+| Charming Active | +9 | Replaces base (+2 from condition) |
+| Exclamation (!) | +5 | Event available, additive |
+| Friendship Threshold | 80% | Enables Friendship Training bonus |
 
 ### 11.4 Friendship Bonus by Rarity
 
 | Rarity | Bonus Range | Typical Value |
-| ------ | ----------- | ------------- |
-| R      | 10-15%      | ~12%          |
-| SR     | 15-25%      | ~20%          |
-| SSR    | 25-35%      | ~30%          |
+| --- | --- | --- |
+| R | 10-15% | ~12% |
+| SR | 15-25% | ~20% |
+| SSR | 25-35% | ~30% |
 
 ---
 
@@ -1701,4 +1700,4 @@ test.describe("WF-010: Accessibility", () => {
 
 ---
 
-_This wireframe specification reflects the current implementation of the Support Card Collection with game-accurate mechanics from Umamusume Pretty Derby (Global English Server, verified February 2026) and serves as the authoritative reference for UI/UX development and testing._
+_This wireframe specification reflects the current implementation of the Support Card Collection with game-accurate mechanics from Umamusume Pretty Derby (Global English Server, verified January 2026) and serves as the authoritative reference for UI/UX development and testing._

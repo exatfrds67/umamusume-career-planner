@@ -3,7 +3,7 @@
 ## Umamusume Pretty Derby Career Planner
 
 **Document Version**: 2.2.0  
-**Date**: February 22, 2026  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-001], [SPEC-001], [FLOW-001]
 
 ---
@@ -70,10 +70,10 @@ User profile management enables:
 ### 2.1 System Components
 
 | Component | Type | Responsibility |
-|-----------|------|----------------|
+| --- | --- | --- |
 | **User** | Actor | Initiates profile and preference updates |
 | **Livewire Component** | Presentation | `UserProfileSettings.php`, `PreferencesManager.php` - Settings UI |
-| **ProfileController** | Application | Orchestrates profile operations |
+| **UserController** | Application | Orchestrates profile operations |
 | **UserService** | Domain Service | Profile update business logic |
 | **PreferenceService** | Domain Service | Preference management |
 | **AccessibilityService** | Domain Service | A11y settings validation and application |
@@ -95,7 +95,7 @@ app/
 │       └── AIConfiguration.php
 ├── Http/
 │   └── Controllers/
-│       └── ProfileController.php
+│       └── UserController.php
 ├── Services/
 │   ├── UserService.php
 │   ├── PreferenceService.php
@@ -117,7 +117,7 @@ app/
 sequenceDiagram
     actor User
     participant UI as Livewire Settings
-    participant Controller as ProfileController
+    participant Controller as UserController
     participant UserSvc as UserService
     participant PrefSvc as PreferenceService
     participant A11ySvc as AccessibilityService
@@ -220,7 +220,7 @@ sequenceDiagram
 ### 3.2 Timeline Breakdown
 
 | Phase | Duration | Description |
-|-------|----------|-------------|
+| --- | --- | --- |
 | **Settings Load** | ~150ms | Load user and preferences |
 | **User Validation** | ~50ms | Client-side field validation |
 | **Profile Update** | ~150ms | Database update + validation |
@@ -243,7 +243,7 @@ sequenceDiagram
 **Request Flow:**
 
 ```
-User → Livewire Component → ProfileController → UserService
+User → Livewire Component → UserController → UserService
 ```
 
 **Service Implementation:**
@@ -593,7 +593,7 @@ class AuthService
 ### 6.1 Validation Errors
 
 | Error Code | Condition | HTTP Status | User Message |
-|------------|-----------|-------------|--------------|
+| --- | --- | --- | --- |
 | `USER_001` | Invalid email format | 422 | "Please enter a valid email address" |
 | `USER_002` | Email already taken | 422 | "This email is already in use" |
 | `USER_003` | Name too long | 422 | "Name must be 255 characters or less" |
@@ -645,7 +645,7 @@ sequenceDiagram
 ### 6.3 Transaction Rollback Scenarios
 
 | Scenario | Trigger | Recovery |
-|----------|---------|----------|
+| --- | --- | --- |
 | Constraint violation | Duplicate email | Rollback, display error |
 | File upload failure | Storage error | Rollback, retain old avatar |
 | Cache invalidation failure | Redis unavailable | Log warning, continue |
@@ -658,7 +658,7 @@ sequenceDiagram
 ### 7.1 Performance Metrics
 
 | Operation | Target | Current | Status |
-|-----------|--------|---------|--------|
+| --- | --- | --- | --- |
 | Settings page load | <500ms | ~350ms | ✅ Met |
 | Profile update | <200ms | ~180ms | ✅ Met |
 | Preferences update | <150ms | ~120ms | ✅ Met |
@@ -733,7 +733,7 @@ $this->cache->forget("user.email.{$user->email}");
 ### 8.1 System Documentation
 
 | Document | Description |
-|----------|-------------|
+| --- | --- |
 | [PRD-001](../prds/PRD-001_Character_Management.md) | Product requirements for user management |
 | [SPEC-001](../specs/SPEC-001_Character_Management_Technical.md) | Technical specification for user system |
 | [FLOW-001](../flows/FLOW-001_Character_Management_System.md) | System flow for user operations |
@@ -741,14 +741,14 @@ $this->cache->forget("user.email.{$user->email}");
 ### 8.2 Related Sequences
 
 | Sequence | Description |
-|----------|-------------|
+| --- | --- |
 | [SEQ-001](SEQ-001_Character_Creation_Sequence.md) | Character creation (requires authenticated user) |
 | [SEQ-008](SEQ-008_Notification_Delivery.md) | Notifications (uses user preferences) |
 
 ### 8.3 Configuration Documentation
 
 | Config File | Description |
-|-------------|-------------|
+| --- | --- |
 | `config/sanctum.php` | Authentication configuration |
 | `config/filesystems.php` | Avatar storage configuration |
 
@@ -759,14 +759,14 @@ $this->cache->forget("user.email.{$user->email}");
 ### Version History
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
+| --- | --- | --- | --- |
 | 2.0.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 implementation; added detailed sequence flows, preference management, accessibility settings, performance metrics, and aligned with current Laravel 12 architecture |
 | 1.0.0 | 2026-01-14 | Development Team | Initial draft |
 
 ### Approval
 
 | Role | Name | Signature | Date |
-|------|------|-----------|------|
+| --- | --- | --- | --- |
 | Technical Lead | | | |
 | QA Lead | | | |
 

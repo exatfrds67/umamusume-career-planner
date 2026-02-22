@@ -3,7 +3,7 @@
 ## Umamusume Pretty Derby Career Planner
 
 **Document Version**: 2.2.0  
-**Date**: February 22, 2026  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-006], [SPEC-006], [FLOW-006], [TECH-FLOW-006]
 
 ---
@@ -73,18 +73,18 @@ The AI advisory system provides intelligent recommendations across all planning 
 ### 2.1 System Components
 
 | Component | Type | Responsibility |
-|-----------|------|----------------|
+| --- | --- | --- |
 | **User** | Actor | Submits AI queries and reviews recommendations |
 | **Livewire Component** | Presentation | `AIAdvisorChat.php` - Chat interface |
-| **AIChatController** | Application | Orchestrates AI request workflow |
-| **AdviceService** | Domain Service | Main AI orchestration service |
-| **HybridAIService** | Domain Service | Provider selection logic |
+| **AIAdvisoryController** | Application | Orchestrates AI request workflow |
+| **AIAdvisoryService** | Domain Service | Main AI orchestration service |
+| **AIRouterService** | Domain Service | Provider selection logic |
 | **OllamaService** | Infrastructure | Local AI inference |
 | **BedrockService** | Infrastructure | Cloud AI fallback |
 | **NeuronOrchestrator** | AI Framework | Agent execution and coordination |
 | **MCPClientService** | Integration | MCP server communication |
 | **ContextBuilder** | Domain Service | Prompt context preparation |
-| **CostTrackingService** | Domain Service | Usage and cost monitoring |
+| **CostTracker** | Domain Service | Usage and cost monitoring |
 | **Database** | Infrastructure | MySQL/MariaDB persistence |
 | **Cache** | Infrastructure | Redis conversation cache |
 
@@ -99,15 +99,15 @@ app/
 │       └── RecommendationPanel.php
 ├── Http/
 │   └── Controllers/
-│       └── AIChatController.php
+│       └── AIAdvisoryController.php
 ├── Services/
 │   ├── AI/
-│   │   ├── AdviceService.php
-│   │   ├── HybridAIService.php
+│   │   ├── AIAdvisoryService.php
+│   │   ├── AIRouterService.php
 │   │   ├── OllamaService.php
 │   │   ├── BedrockService.php
 │   │   ├── ContextBuilder.php
-│   │   └── CostTrackingService.php
+│   │   └── CostTracker.php
 │   └── MCP/
 │       ├── MCPClientService.php
 │       └── MCPMonitoringService.php
@@ -139,15 +139,15 @@ app/
 sequenceDiagram
     actor User
     participant UI as Livewire Chat
-    participant Controller as AIChatController
-    participant AdvisorySvc as AdviceService
-    participant Router as HybridAIService
+    participant Controller as AIAdvisoryController
+    participant AdvisorySvc as AIAdvisoryService
+    participant Router as AIRouterService
     participant ContextBuilder
     participant Ollama as OllamaService
     participant Bedrock as BedrockService
     participant Neuron as NeuronOrchestrator
     participant MCP as MCPClientService
-    participant CostTracker as CostTrackingService
+    participant CostTracker
     participant DB as Database
     participant Cache as Redis Cache
 
@@ -217,7 +217,7 @@ sequenceDiagram
 ### 3.2 Timeline Breakdown
 
 | Phase | Duration | Description |
-|-------|----------|-------------|
+| --- | --- | --- |
 | **User Input** | Variable | User types query |
 | **Context Loading** | ~100ms | Load conversation history and character data |
 | **Context Building** | ~200ms | Prepare prompt with full context |
@@ -241,7 +241,7 @@ sequenceDiagram
 **Request Flow:**
 
 ```
-User Query → Controller → AdviceService → ContextBuilder
+User Query → Controller → AIAdvisoryService → ContextBuilder
 ```
 
 **Context Builder Implementation:**
@@ -314,8 +314,8 @@ class ContextBuilder
 **Router Service:**
 
 ```php
-// HybridAIService.php
-class HybridAIService
+// AIRouterService.php
+class AIRouterService
 {
     public function selectProvider(string $query, AIContext $context): string
     {
@@ -783,7 +783,7 @@ class MCPClientService
 ### 6.1 Validation Errors
 
 | Error Code | Condition | HTTP Status | User Message |
-|------------|-----------|-------------|--------------|
+| --- | --- | --- | --- |
 | `AI_001` | Empty query | 422 | "Please provide a question or request" |
 | `AI_002` | Query too long | 422 | "Query exceeds maximum length (2000 characters)" |
 | `AI_003` | Invalid context | 422 | "Invalid context provided" |
@@ -794,7 +794,7 @@ class MCPClientService
 
 ```mermaid
 sequenceDiagram
-    participant Service as AdviceService
+    participant Service as AIAdvisoryService
     participant Ollama
     participant Bedrock
     participant Cache
@@ -828,7 +828,7 @@ sequenceDiagram
 ### 6.3 Error Recovery Strategies
 
 | Error Type | Recovery Strategy |
-|------------|-------------------|
+| --- | --- |
 | Ollama unavailable | Automatic fallback to Bedrock |
 | Bedrock API error | Return cached response if available |
 | MCP tool failure | Skip tool, continue with available data |
@@ -842,7 +842,7 @@ sequenceDiagram
 ### 7.1 Performance Metrics
 
 | Operation | Target | Current | Status |
-|-----------|--------|---------|--------|
+| --- | --- | --- | --- |
 | Context building | <200ms | ~150ms | ✅ Met |
 | Ollama response | <2.5s | ~2.2s | ✅ Met |
 | Bedrock response | <4s | ~3.8s | ✅ Met |
@@ -890,7 +890,7 @@ if ($this->getUserCostLimit() !== null) {
 **Cost Tracking:**
 
 | Provider | Input Cost/1M | Output Cost/1M | Avg Query Cost |
-|----------|---------------|----------------|----------------|
+| --- | --- | --- | --- |
 | Ollama | $0.00 | $0.00 | $0.00 |
 | Claude 3.5 Sonnet | $3.00 | $15.00 | $0.003-$0.015 |
 | Claude 3 Haiku | $1.00 | $5.00 | $0.001-$0.005 |
@@ -921,7 +921,7 @@ event(new StatsUpdated($career));
 ### 8.1 System Documentation
 
 | Document | Description |
-|----------|-------------|
+| --- | --- |
 | [PRD-006](../prds/PRD-006_AI_Advisory.md) | Product requirements for AI advisory |
 | [SPEC-006](../specs/SPEC-006_AI_Advisory_Technical.md) | Technical specification for AI system |
 | [FLOW-006](../flows/FLOW-006_AI_Advisory_System.md) | System flow for AI operations |
@@ -930,7 +930,7 @@ event(new StatsUpdated($career));
 ### 8.2 Related Sequences
 
 | Sequence | Description |
-|----------|-------------|
+| --- | --- |
 | [SEQ-002](SEQ-002_Training_Block_Resolution.md) | Training predictions (AI-enhanced) |
 | [SEQ-004](SEQ-004_Race_Registration_and_Outcome.md) | Race strategy (AI recommendations) |
 | [SEQ-003](SEQ-003_Skill_Acquisition_and_Upgrade.md) | Skill planning (AI advisory) |
@@ -938,14 +938,14 @@ event(new StatsUpdated($career));
 ### 8.3 UI Documentation
 
 | Document | Description |
-|----------|-------------|
+| --- | --- |
 | [WF-012](../wireframes/WF-012_AI_Advisor_Interface.md) | Wireframe specification for AI advisor |
 | [UF-007](../user-flows/UF-007_AI_Advisor_Journey.md) | User flow for AI interaction |
 
 ### 8.4 Configuration Documentation
 
 | Config File | Description |
-|-------------|-------------|
+| --- | --- |
 | `config/ai.php` | AI provider configuration |
 | `config/neuron.php` | Neuron agent configuration |
 | `config/mcp.php` | MCP server configuration |
@@ -958,14 +958,14 @@ event(new StatsUpdated($career));
 ### Version History
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
+| --- | --- | --- | --- |
 | 2.0.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 implementation; added hybrid AI architecture, Neuron agents, MCP integration, detailed sequence flows, cost tracking, performance metrics, and aligned with current Laravel 12 architecture |
 | 1.0.0 | 2026-01-14 | Development Team | Initial draft |
 
 ### Approval
 
 | Role | Name | Signature | Date |
-|------|------|-----------|------|
+| --- | --- | --- | --- |
 | Technical Lead | | | |
 | QA Lead | | | |
 
@@ -987,4 +987,4 @@ event(new StatsUpdated($career));
 
 ---
 
-*This sequence diagram reflects the current implementation of the AI advice generation workflow as of v2.0.0. For the most up-to-date information, refer to the source code in `app/Services/AI/AdviceService.php`, `app/Neuron/`, and related files.*
+*This sequence diagram reflects the current implementation of the AI advice generation workflow as of v2.0.0. For the most up-to-date information, refer to the source code in `app/Services/AI/AIAdvisoryService.php`, `app/Neuron/`, and related files.*

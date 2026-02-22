@@ -1,4 +1,3 @@
-```markdown
 # WF-007: Race Preparation Screen
 
 ## Umamusume Pretty Derby Career Planner
@@ -33,7 +32,7 @@ The Race Preparation Screen provides comprehensive analysis and recommendations 
 ### 1.2 Key Objectives
 
 | Objective | Description |
-|-----------|-------------|
+| --- | --- |
 | **Readiness Assessment** | Calculate and display multi-factor readiness score |
 | **Win Probability** | Predict placement probability based on stats and competition |
 | **Strategy Optimization** | Recommend optimal running style and tactical approach |
@@ -43,7 +42,7 @@ The Race Preparation Screen provides comprehensive analysis and recommendations 
 ### 1.3 User Stories
 
 | ID | User Story | Priority |
-|----|------------|----------|
+| --- | --- | --- |
 | US-001 | As a player, I want to see my race readiness score with factor breakdown | P0 |
 | US-002 | As a player, I want to know my win probability and placement forecast | P0 |
 | US-003 | As a player, I want running style recommendations with reasoning | P0 |
@@ -282,7 +281,7 @@ The Race Preparation Screen provides comprehensive analysis and recommendations 
 │ [ASK AI]                     │
 └──────────────────────────────┘
 │  Bottom Navigation Bar       │
-│ [🏠][👤][⚡][🏆][🤖][⚙️]   │
+│ [🏠][👤][⚡][🏆][🤖]\[⚙️]   │
 └──────────────────────────────┘
 
 ```
@@ -391,7 +390,7 @@ class ReadinessAssessment extends Component
 **Readiness Tier Classification**:
 
 | Score | Tier | Color | Icon |
-|-------|------|-------|------|
+| --- | --- | --- | --- |
 | ≥85% | Excellent | Green | 🟢 |
 | 70-84% | Good | Yellow | 🟡 |
 | 55-69% | Fair | Orange | 🟠 |
@@ -486,7 +485,7 @@ class WinProbability extends Component
 **Status Classification**:
 
 | Status | Threshold | Icon | Action |
-|--------|-----------|------|--------|
+| --- | --- | --- | --- |
 | Excellent | ≥110% of required | ✅ | None needed |
 | Adequate | 100-109% of required | ✅ | Optional improvement |
 | Borderline | 90-99% of required | ⚠️ | Training recommended |
@@ -552,7 +551,7 @@ class RunningStyleRecommendation extends Component
 **Running Style Match Scoring**:
 
 | Factor | Weight | Calculation |
-|--------|--------|-------------|
+| --- | --- | --- |
 | Style Aptitude | 40% | Aptitude grade × effectiveness |
 | Stat Distribution | 30% | Power/Guts ratio for style |
 | Distance Match | 20% | Distance aptitude × style fit |
@@ -561,7 +560,7 @@ class RunningStyleRecommendation extends Component
 **Aptitude Grade Scale (Global English Server - Feb 2026)**:
 
 | Grade | Rank | Effectiveness |
-|-------|------|---------------|
+| --- | --- | --- |
 | S | Maximum | 100% |
 | A | Excellent | 90% |
 | B | Good | 80% |
@@ -576,7 +575,7 @@ class RunningStyleRecommendation extends Component
 **Track Condition Effects on Race Performance**:
 
 | Condition | Power Penalty | Speed Penalty | Stamina Drain | Strategy Impact |
-|-----------|---------------|---------------|---------------|-----------------|
+| --- | --- | --- | --- | --- |
 | Firm | None | None | None | All styles viable |
 | Good | -50 Power | None | None | Slight disadvantage for power-dependent styles |
 | Soft | -50 to -100 Power | None | +2%/sec | Stamina management critical |
@@ -640,7 +639,7 @@ class PreparationChecklist extends Component
 **Checklist Item Types**:
 
 | Type | Icon | Description |
-|------|------|-------------|
+| --- | --- | --- |
 | Complete | ☑ | Requirement met |
 | Warning | ⚠️ | Close to threshold, improvement recommended |
 | Incomplete | ☐ | Requirement not met, action required |
@@ -808,7 +807,7 @@ sequenceDiagram
 ### 4.3 Cache Strategy
 
 | Data Type | Cache Key | TTL | Invalidation |
-|-----------|-----------|-----|--------------|
+| --- | --- | --- | --- |
 | Readiness score | `readiness:{character_id}:{race_id}` | 5 minutes | On stat update |
 | Win probability | `win_prob:{character_id}:{race_id}` | 5 minutes | On stat/skill update |
 | Running style rec | `style_rec:{character_id}:{race_id}` | 10 minutes | On aptitude update |
@@ -889,7 +888,7 @@ sequenceDiagram
 ### 6.1 WCAG 2.2 AA Compliance
 
 | Criterion | Implementation | Test Method |
-|-----------|----------------|-------------|
+| --- | --- | --- |
 | **1.1.1 Non-text Content** | All icons have `aria-label` | Screen reader testing |
 | **1.4.3 Contrast Ratio** | 4.5:1 minimum for text | Color contrast analyzer |
 | **2.1.1 Keyboard** | All interactive elements keyboard accessible | Keyboard-only testing |
@@ -901,7 +900,7 @@ sequenceDiagram
 ### 6.2 Keyboard Navigation
 
 | Action | Shortcut | Context |
-|--------|----------|---------|
+| --- | --- | --- |
 | Enter Race | `Enter` or `E` | When preparation screen loaded |
 | Run Simulation | `S` | Preparation screen |
 | Ask AI | `A` | Preparation screen |
@@ -945,7 +944,7 @@ sequenceDiagram
 ### 7.1 Performance Targets
 
 | Metric | Target | Measurement |
-|--------|--------|-------------|
+| --- | --- | --- |
 | **Page Load** | < 1.5 seconds | Time to first render |
 | **Readiness Calculation** | < 300ms | Service execution time |
 | **Win Probability** | < 400ms | Service execution time |
@@ -955,7 +954,7 @@ sequenceDiagram
 ### 7.2 Optimization Strategies
 
 | Strategy | Implementation | Impact |
-|----------|----------------|--------|
+| --- | --- | --- |
 | **Eager Loading** | Preload race + character data with relationships | -50% query count |
 | **Calculation Caching** | Cache readiness/probability scores (5min TTL) | -70% repeated calculations |
 | **Lazy Loading** | Defer AI strategy until section expanded | -30% initial load time |
@@ -964,7 +963,7 @@ sequenceDiagram
 ### 7.3 Bundle Size Budget
 
 | Asset Type | Budget | Current | Status |
-|------------|--------|---------|--------|
+| --- | --- | --- | --- |
 | JavaScript | 50 KB | 45 KB | ✅ Within budget |
 | CSS | 22 KB | 20 KB | ✅ Within budget |
 | Images | 40 KB | 35 KB | ✅ Within budget |
@@ -1260,7 +1259,7 @@ test.describe('WF-007: Accessibility', () => {
 ## 10. Version History
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
+| --- | --- | --- | --- |
 | 2.3.0 | 2026-02-22 | Development Team | Updated version/dates, aligned technology references with current stack (Livewire 4, Neuron AI v2.11, GameTora/umapyoi.net) |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: track condition effects (Firm/Good/Soft/Heavy with Power/Speed/Stamina penalties), S-max aptitude grades (G→F→E→D→C→B→A→S), class pyramid |
 | 2.0.0 | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added readiness assessment, win probability, AI strategy integration, preparation checklist, accessibility specifications, and testing requirements |

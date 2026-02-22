@@ -2,13 +2,13 @@
 
 ## Overview
 
-This document presents the key user workflow diagrams for the Umamusume Pretty Derby Career Planner application, showing how users interact with the system to achieve their optimization goals through various pathways and decision points. The system is built with **Laravel 12** (released February 24, 2025) with **PHP 8.2+**, **Livewire 4**, **Alpine.js 3**, **TailwindCSS v4** (released January 22, 2025), and integrates with **AWS Bedrock Claude** models and **Ollama** for AI capabilities.
+This document presents the key user workflow diagrams for the Umamusume Pretty Derby Career Planner application, showing how users interact with the system to achieve their optimization goals through various pathways and decision points. The system is built with **Laravel 12** (released February 24, 2025) with **PHP 8.2+**, **Livewire 4**, **Alpine.js 3**, **TailwindCSS v4** (released January 22, 2025), **Neuron AI v2.11**, and integrates with **AWS Bedrock** models and **Ollama** for AI capabilities.
 
-**Document Version**: 2.3.0  
-**Date**: February 21, 2026  
-**Project**: UmamusumeCareerPlanner  
-**Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.3.0 and game-accurate mechanics
+**Document Version**: 2.4.0
+**Date**: February 22, 2026
+**Project**: UmamusumeCareerPlanner
+**Author**: Development Team
+**Status**: Current - Aligned with codebase v2.4.0 (571 routes, 3,316+ tests, 11,563+ assertions)
 
 ---
 
@@ -31,7 +31,7 @@ This document presents the key user workflow diagrams for the Umamusume Pretty D
 
 The career setup flow guides users through the initial configuration of a new career run, including character selection, support card deck composition, legacy character inheritance, and goal setting. This foundational workflow determines the optimization strategy for the entire career and supports all core requirements including training optimization, race strategy, and skill planning.
 
-**Related Documents:**
+### Related Documents
 
 - PRD: [PRD-001](prds/PRD-001_Character_Management.md)
 - SPEC: [SPEC-001](specs/SPEC-001_Character_Management_Technical.md)
@@ -111,14 +111,12 @@ flowchart TD
 
 ### 1.4 Step Details
 
-| Step | Description | Validation Rules |
-| --- | --- | --- |
-| Select Character | Choose trainee from character database | Required selection |
-| Set Character Goals | Define target stats (0-1200 range) | Stat values within valid range |
-| Configure Support Deck | Build 6-card deck (5 owned + 1 borrowed) | Exactly 6 cards required |
-| Configure Legacy Team | Select inheritance parents | 2 parents + 4 grandparents |
-| Calculate Inheritance | Apply factor bonuses (★☆☆=+5, ★★☆=+12, ★★★=+21) | Valid factor ratings |
-| Review Setup Summary | Verify all selections | All required fields complete |
+- **Step**: Select Character; **Description**: Choose trainee from character database; **Validation Rules**: Required selection
+- **Step**: Set Character Goals; **Description**: Define target stats (0-1200 range); **Validation Rules**: Stat values within valid range
+- **Step**: Configure Support Deck; **Description**: Build 6-card deck (5 owned + 1 borrowed); **Validation Rules**: Exactly 6 cards required
+- **Step**: Configure Legacy Team; **Description**: Select inheritance parents; **Validation Rules**: 2 parents + 4 grandparents
+- **Step**: Calculate Inheritance; **Description**: Apply factor bonuses (★☆☆=+5, ★★☆=+12, ★★★=+21); **Validation Rules**: Valid factor ratings
+- **Step**: Review Setup Summary; **Description**: Verify all selections; **Validation Rules**: All required fields complete
 
 ---
 
@@ -126,9 +124,9 @@ flowchart TD
 
 ### 2.1 Text Description
 
-The core optimization flow occurs every turn (1-78), analyzing current character state, available training options, support card participation, and providing AI-powered recommendations based on goals, energy management, and long-term strategy. Enhanced by **Neuron AI agents** for intelligent decision making and **Laravel 12** backend for robust processing.
+The core optimization flow occurs every turn (1-78), analyzing current character state, available training options, support card participation, and providing AI-powered recommendations based on goals, energy management, and long-term strategy. Enhanced by **Neuron AI v2.11 agents** for intelligent decision making and **Laravel 12** backend for robust processing.
 
-**Related Documents:**
+### Related Documents
 
 - PRD: [PRD-002](prds/PRD-002_Training_Optimization.md)
 - SPEC: [SPEC-002](specs/SPEC-002_Training_Optimization_Technical.md)
@@ -269,21 +267,17 @@ flowchart TD
 
 ### 2.4 Training Prediction Components
 
-| Component | Description | Cache TTL |
-| --- | --- | --- |
-| Base Gains | Raw stat increases from training type | 5 minutes |
-| Support Bonuses | Multipliers from active support cards | 5 minutes |
-| Failure Risk | Chance of training failure (0-90%) | Real-time |
-| Hint Chance | Probability of receiving skill hints | 5 minutes |
-| Bond Gains | Friendship points with support cards | 5 minutes |
+- **Component**: Base Gains; **Description**: Raw stat increases from training type; **Cache TTL**: 5 minutes
+- **Component**: Support Bonuses; **Description**: Multipliers from active support cards; **Cache TTL**: 5 minutes
+- **Component**: Failure Risk; **Description**: Chance of training failure (0-90%); **Cache TTL**: Real-time
+- **Component**: Hint Chance; **Description**: Probability of receiving skill hints; **Cache TTL**: 5 minutes
+- **Component**: Bond Gains; **Description**: Friendship points with support cards; **Cache TTL**: 5 minutes
 
 ### 2.5 Risk Level Indicators
 
-| Risk Level | Percentage | Indicator | Action |
-| --- | --- | --- | --- |
-| Low | <15% | 🟢 Green | Safe to proceed |
-| Moderate | 15-40% | 🟡 Amber | Consider alternatives |
-| High | >40% | 🔴 Red | Rest recommended |
+- **Risk Level**: Low; **Percentage**: <15%; **Indicator**: 🟢 Green; **Action**: Safe to proceed
+- **Risk Level**: Moderate; **Percentage**: 15-40%; **Indicator**: 🟡 Amber; **Action**: Consider alternatives
+- **Risk Level**: High; **Percentage**: >40%; **Indicator**: 🔴 Red; **Action**: Rest recommended
 
 ---
 
@@ -293,7 +287,7 @@ flowchart TD
 
 The race preparation workflow activates when races approach, analyzing race requirements, character readiness, strategy selection, and providing comprehensive preparation recommendations powered by the Race Strategy Agent.
 
-**Related Documents:**
+### Related Documents
 
 - PRD: [PRD-003](prds/PRD-003_Race_Strategy.md)
 - SPEC: [SPEC-003](specs/SPEC-003_Race_Strategy_Technical.md)
@@ -462,25 +456,21 @@ flowchart TD
 
 ### 3.4 Readiness Classification
 
-| Readiness Score | Classification | Indicator |
-| --- | --- | --- |
-| ≥85% | Excellent | 🟢 Ready |
-| 70-84% | Good | 🟡 Prepared |
-| 55-69% | Fair | 🟠 Borderline |
-| <55% | Poor | 🔴 Not Ready |
+- **Readiness Score**: ≥85%; **Classification**: Excellent; **Indicator**: 🟢 Ready
+- **Readiness Score**: 70-84%; **Classification**: Good; **Indicator**: 🟡 Prepared
+- **Readiness Score**: 55-69%; **Classification**: Fair; **Indicator**: 🟠 Borderline
+- **Readiness Score**: <55%; **Classification**: Poor; **Indicator**: 🔴 Not Ready
 
 ### 3.5 Aptitude Effectiveness
 
-| Rating | Effectiveness | Description |
-| --- | --- | --- |
-| S | +5% | Maximum aptitude (provides positive bonus) |
-| A | 0% | Standard aptitude (baseline) |
-| B | 90% | Below average |
-| C | 80% | Poor aptitude |
-| D | 70% | Very poor |
-| E | 60% | Extremely poor |
-| F | 50% | Minimal |
-| G | 40% | Worst possible |
+- **Rating**: S; **Effectiveness**: +5%; **Description**: Maximum aptitude (provides positive bonus)
+- **Rating**: A; **Effectiveness**: 0%; **Description**: Standard aptitude (baseline)
+- **Rating**: B; **Effectiveness**: 90%; **Description**: Below average
+- **Rating**: C; **Effectiveness**: 80%; **Description**: Poor aptitude
+- **Rating**: D; **Effectiveness**: 70%; **Description**: Very poor
+- **Rating**: E; **Effectiveness**: 60%; **Description**: Extremely poor
+- **Rating**: F; **Effectiveness**: 50%; **Description**: Minimal
+- **Rating**: G; **Effectiveness**: 40%; **Description**: Worst possible
 
 ---
 
@@ -490,7 +480,7 @@ flowchart TD
 
 The AI advisory system workflow shows how users interact with the chatbot for strategic advice, the system's decision process for using local **Ollama** vs cloud **AWS Bedrock** models, and how contextual recommendations are generated via **Neuron AI agents**. The system intelligently routes based on query complexity and local model availability.
 
-**Related Documents:**
+### Related Documents
 
 - PRD: [PRD-006](prds/PRD-006_AI_Advisory.md)
 - SPEC: [SPEC-006](specs/SPEC-006_AI_Advisory_Technical.md)
@@ -625,21 +615,17 @@ flowchart TD
 
 ### 4.4 AI Provider Configuration
 
-| Provider | Model | Use Case | Cost |
-| --- | --- | --- | --- |
-| Ollama | Local Models (llama3.2) | Simple queries, high volume | Free |
-| AWS Bedrock | Claude 3.5 Haiku | Standard recommendations | $0.25/1M input |
-| AWS Bedrock | Claude 3.5 Sonnet | Complex strategy analysis | $3/1M input |
-| AWS Bedrock | Claude 4.5 | Advanced reasoning (fallback) | $5/1M input |
+- **Provider**: Ollama; **Model**: Local Models (llama3.2); **Use Case**: Simple queries, high volume; **Cost**: Free
+- **Provider**: AWS Bedrock; **Model**: Claude Haiku; **Use Case**: Standard recommendations; **Cost**: $0.25/1M input
+- **Provider**: AWS Bedrock; **Model**: Claude Sonnet; **Use Case**: Complex strategy analysis; **Cost**: $3/1M input
+- **Provider**: AWS Bedrock; **Model**: Claude Opus; **Use Case**: Advanced reasoning (fallback); **Cost**: $5/1M input
 
 ### 4.5 Neuron Agent Tools
 
-| Agent | Primary Tools | Purpose |
-| --- | --- | --- |
-| Training Advisor | GetCharacterStatsTool, GetTrainingPredictionsTool | Training recommendations |
-| Race Strategy | GetRaceRequirementsTool, GetAptitudeAnalysisTool | Race preparation |
-| Skill Advisor | GetSkillCatalogTool, GetSkillHintsTool | Skill acquisition planning |
-| Career Planning | GetGoalProgressTool, GetCareerTimelineTool | Long-term strategy |
+- **Agent**: Training Advisor; **Primary Tools**: GetCharacterStatsTool, GetTrainingPredictionsTool; **Purpose**: Training recommendations
+- **Agent**: Race Strategy; **Primary Tools**: GetRaceRequirementsTool, GetAptitudeAnalysisTool; **Purpose**: Race preparation
+- **Agent**: Skill Advisor; **Primary Tools**: GetSkillCatalogTool, GetSkillHintsTool; **Purpose**: Skill acquisition planning
+- **Agent**: Career Planning; **Primary Tools**: GetGoalProgressTool, GetCareerTimelineTool; **Purpose**: Long-term strategy
 
 ---
 
@@ -649,7 +635,7 @@ flowchart TD
 
 The screenshot processing workflow handles image uploads, performs OCR analysis using Tesseract with GD preprocessing, extracts game state information, and provides contextual recommendations based on the captured data.
 
-**Related Documents:**
+### Related Documents
 
 - SPEC: [SPEC-007](specs/SPEC-007_External_Integration_Technical.md)
 - Flow: [FLOW-007](flows/FLOW-007_External_Integration_System.md)
@@ -795,22 +781,18 @@ flowchart TD
 
 ### 5.4 OCR Confidence Thresholds
 
-| Data Type | Detection Pattern | Minimum Confidence |
-| --- | --- | --- |
-| Character stats | Stat labels + numeric values | 85% |
-| Skill names | Japanese/English text regions | 80% |
-| Race results | Placement + time format | 90% |
-| Support cards | Card frame detection | 75% |
+- **Data Type**: Character stats; **Detection Pattern**: Stat labels + numeric values; **Minimum Confidence**: 85%
+- **Data Type**: Skill names; **Detection Pattern**: Japanese/English text regions; **Minimum Confidence**: 80%
+- **Data Type**: Race results; **Detection Pattern**: Placement + time format; **Minimum Confidence**: 90%
+- **Data Type**: Support cards; **Detection Pattern**: Card frame detection; **Minimum Confidence**: 75%
 
 ### 5.5 Preprocessing Operations
 
-| Operation | Purpose | Implementation |
-| --- | --- | --- |
-| Resize | Normalize dimensions | Max 2000px width |
-| Grayscale | Improve contrast | GD `imagefilter()` |
-| Threshold | Binary conversion | Adaptive threshold |
-| Deskew | Correct rotation | Angle detection |
-| Denoise | Remove artifacts | Median filter |
+- **Operation**: Resize; **Purpose**: Normalize dimensions; **Implementation**: Max 2000px width
+- **Operation**: Grayscale; **Purpose**: Improve contrast; **Implementation**: GD `imagefilter()`
+- **Operation**: Threshold; **Purpose**: Binary conversion; **Implementation**: Adaptive threshold
+- **Operation**: Deskew; **Purpose**: Correct rotation; **Implementation**: Angle detection
+- **Operation**: Denoise; **Purpose**: Remove artifacts; **Implementation**: Median filter
 
 ---
 
@@ -820,7 +802,7 @@ flowchart TD
 
 The data import/export workflow enables users to backup, restore, and migrate their career data across devices and storage modes. Supports JSON, Excel, and CSV formats with schema versioning and conflict resolution.
 
-**Related Documents:**
+### Related Documents
 
 - D05: [Data Migration Plan](005_DMP_Data_Migration_Plan.md)
 - D06: Data Migration Specifications
@@ -834,15 +816,15 @@ flowchart TD
         SelectFormat -->|JSON| JSONExport[Generate JSON]
         SelectFormat -->|Excel| ExcelExport[Generate XLSX]
         SelectFormat -->|CSV| CSVExport[Generate CSV]
-        
+
         JSONExport --> AddSchema[Add Schema Version]
         ExcelExport --> FormatTables[Format Worksheets]
         CSVExport --> FlattenData[Flatten Nested Data]
-        
+
         AddSchema --> Preview[Preview Export]
         FormatTables --> Preview
         FlattenData --> Preview
-        
+
         Preview --> DownloadAction{Action}
         DownloadAction -->|Download| DownloadFile[Download File]
         DownloadAction -->|Copy| CopyClipboard[Copy to Clipboard]
@@ -853,19 +835,19 @@ flowchart TD
         DetectFormat --> ValidateSchema[Validate Schema]
         ValidateSchema --> ParseData[Parse Data]
         ParseData --> DetectConflicts{Conflicts?}
-        
+
         DetectConflicts -->|Yes| ConflictUI[Show Conflict Resolution]
         DetectConflicts -->|No| PreviewImport[Preview Import]
-        
+
         ConflictUI --> ResolveStrategy{Resolution Strategy}
         ResolveStrategy -->|Skip| SkipDuplicates[Skip Existing]
         ResolveStrategy -->|Overwrite| OverwriteExisting[Replace Existing]
         ResolveStrategy -->|Rename| RenameImport[Import as Copy]
-        
+
         SkipDuplicates --> PreviewImport
         OverwriteExisting --> PreviewImport
         RenameImport --> PreviewImport
-        
+
         PreviewImport --> ConfirmImport[User Confirms]
         ConfirmImport --> ExecuteImport[Execute Import]
         ExecuteImport --> ImportComplete([Import Complete])
@@ -874,19 +856,15 @@ flowchart TD
 
 ### 6.3 Export Formats
 
-| Format | Extension | Use Case | Size Limit |
-| --- | --- | --- | --- |
-| JSON | .json | Full backup with schema | No limit |
-| Excel | .xlsx | Spreadsheet analysis | 50k rows |
-| CSV | .csv | Data processing | No limit |
+- **Format**: JSON; **Extension**: .json; **Use Case**: Full backup with schema; **Size Limit**: No limit
+- **Format**: Excel; **Extension**: .xlsx; **Use Case**: Spreadsheet analysis; **Size Limit**: 50k rows
+- **Format**: CSV; **Extension**: .csv; **Use Case**: Data processing; **Size Limit**: No limit
 
 ### 6.4 Conflict Resolution Strategies
 
-| Strategy | Behavior | Use Case |
-| --- | --- | --- |
-| Skip | Keep existing, ignore imported | Preserve user modifications |
-| Overwrite | Replace existing with imported | Fresh data sync |
-| Rename | Create new with modified identifier | Keep both versions |
+- **Strategy**: Skip; **Behavior**: Keep existing, ignore imported; **Use Case**: Preserve user modifications
+- **Strategy**: Overwrite; **Behavior**: Replace existing with imported; **Use Case**: Fresh data sync
+- **Strategy**: Rename; **Behavior**: Create new with modified identifier; **Use Case**: Keep both versions
 
 ---
 
@@ -896,7 +874,7 @@ flowchart TD
 
 The storage mode workflow manages data persistence across Local (browser localStorage) and Account (database) modes, with seamless offline functionality and automatic draft saving.
 
-**Related Documents:**
+### Related Documents
 
 - SRS: [FR-10 Local Storage Mode](003_SRS_Software_Requirement_Specifications.md#210-local-storage-mode-fr-10)
 - User Manual: [Storage Modes](017_SUM_Software_User_Manual.md#12-storage-modes)
@@ -909,7 +887,7 @@ flowchart TD
         NewUser([New User]) --> ModeChoice{Choose Storage Mode}
         ModeChoice -->|No Account| LocalMode[🟠 Local Mode]
         ModeChoice -->|Has Account| AccountMode[🟣 Account Mode]
-        
+
         LocalMode --> LocalStorage[(Browser localStorage)]
         AccountMode --> DatabaseStorage[(MySQL Database)]
     end
@@ -960,24 +938,20 @@ flowchart TD
 
 ### 7.3 Storage Mode Comparison
 
-| Feature | Local Mode 🟠 | Account Mode 🟣 |
-| --- | --- | --- |
-| Login Required | No | Yes |
-| Data Location | Browser localStorage | MySQL Database |
-| Offline Support | Full | Draft only |
-| Cross-Device | No | Yes |
-| Identifier | UUID | Integer ID |
-| Storage Limit | 5-10MB | Unlimited |
-| Data Risk | Browser cache clear | Server backup |
+- **Feature**: Login Required; **Local Mode 🟠**: No; **Account Mode 🟣**: Yes
+- **Feature**: Data Location; **Local Mode 🟠**: Browser localStorage; **Account Mode 🟣**: MySQL Database
+- **Feature**: Offline Support; **Local Mode 🟠**: Full; **Account Mode 🟣**: Draft only
+- **Feature**: Cross-Device; **Local Mode 🟠**: No; **Account Mode 🟣**: Yes
+- **Feature**: Identifier; **Local Mode 🟠**: UUID; **Account Mode 🟣**: Integer ID
+- **Feature**: Storage Limit; **Local Mode 🟠**: 5-10MB; **Account Mode 🟣**: Unlimited
+- **Feature**: Data Risk; **Local Mode 🟠**: Browser cache clear; **Account Mode 🟣**: Server backup
 
 ### 7.4 Draft Auto-Save Configuration
 
-| Setting | Value | Description |
-| --- | --- | --- |
-| Auto-save Interval | 30 seconds | Time between saves |
-| Draft Versions | 3 | Maximum versions kept |
-| Draft Expiration | 7 days | Prompt after this period |
-| Clear on Save | Yes | Remove drafts after successful save |
+- **Setting**: Auto-save Interval; **Value**: 30 seconds; **Description**: Time between saves
+- **Setting**: Draft Versions; **Value**: 3; **Description**: Maximum versions kept
+- **Setting**: Draft Expiration; **Value**: 7 days; **Description**: Prompt after this period
+- **Setting**: Clear on Save; **Value**: Yes; **Description**: Remove drafts after successful save
 
 ---
 
@@ -985,56 +959,47 @@ flowchart TD
 
 ### 8.1 Key User Workflows
 
-| Workflow | Description | Primary Documents |
-| --- | --- | --- |
-| Career Setup | Character, deck, and goal configuration | PRD-001, SPEC-001, FLOW-001 |
-| Turn-by-Turn Training | Core gameplay with AI recommendations | PRD-002, SPEC-002, FLOW-002 |
-| Race Preparation | Strategy and readiness optimization | PRD-003, SPEC-003, FLOW-003 |
-| AI Advisory | Intelligent recommendations via Neuron agents | PRD-006, SPEC-006, FLOW-006 |
-| Screenshot Analysis | OCR-based data extraction | SPEC-007, FLOW-007 |
-| Data Import/Export | Backup, restore, and migration | D05, D06 |
-| Storage Modes | Local/Account mode management | SRS FR-10, User Manual |
+- **Workflow**: Career Setup; **Description**: Character, deck, and goal configuration; **Primary Documents**: PRD-001, SPEC-001, FLOW-001
+- **Workflow**: Turn-by-Turn Training; **Description**: Core gameplay with AI recommendations; **Primary Documents**: PRD-002, SPEC-002, FLOW-002
+- **Workflow**: Race Preparation; **Description**: Strategy and readiness optimization; **Primary Documents**: PRD-003, SPEC-003, FLOW-003
+- **Workflow**: AI Advisory; **Description**: Intelligent recommendations via Neuron agents; **Primary Documents**: PRD-006, SPEC-006, FLOW-006
+- **Workflow**: Screenshot Analysis; **Description**: OCR-based data extraction; **Primary Documents**: SPEC-007, FLOW-007
+- **Workflow**: Data Import/Export; **Description**: Backup, restore, and migration; **Primary Documents**: D05, D06
+- **Workflow**: Storage Modes; **Description**: Local/Account mode management; **Primary Documents**: SRS FR-10, User Manual
 
 ### 8.2 Critical Decision Points
 
-| Decision Point | Options | Impact |
-| --- | --- | --- |
-| AI Model Selection | Ollama local vs AWS Bedrock | Cost, response time, availability |
-| Training Selection | 5 training types + rest | Stat development, energy management |
-| Race Strategy | 4 running styles | Win probability, skill activation |
-| Storage Mode | Local vs Account | Offline capability, data persistence |
-| Data Validation | Accept/Review/Reject | Data accuracy, user intervention |
+- **Decision Point**: AI Model Selection; **Options**: Ollama local vs AWS Bedrock; **Impact**: Cost, response time, availability
+- **Decision Point**: Training Selection; **Options**: 5 training types + rest; **Impact**: Stat development, energy management
+- **Decision Point**: Race Strategy; **Options**: 4 running styles; **Impact**: Win probability, skill activation
+- **Decision Point**: Storage Mode; **Options**: Local vs Account; **Impact**: Offline capability, data persistence
+- **Decision Point**: Data Validation; **Options**: Accept/Review/Reject; **Impact**: Data accuracy, user intervention
 
 ### 8.3 Integration Points
 
-| Integration | Service | Purpose |
-| --- | --- | --- |
-| AI Chatbot | Neuron AI Agents | Contextual advice across all workflows |
-| OCR Pipeline | Tesseract + GD | Automated data input from screenshots |
-| External APIs | umapyoi.net, UmamusumeDB | Game data synchronization |
-| WebSocket | Laravel Reverb | Real-time updates |
-| Caching | Redis | Performance optimization |
+- **Integration**: AI Chatbot; **Service**: Neuron AI Agents; **Purpose**: Contextual advice across all workflows
+- **Integration**: OCR Pipeline; **Service**: Tesseract + GD; **Purpose**: Automated data input from screenshots
+- **Integration**: External APIs; **Service**: umapyoi.net, GameTora; **Purpose**: Game data synchronization
+- **Integration**: WebSocket; **Service**: Laravel Reverb; **Purpose**: Real-time updates
+- **Integration**: Caching; **Service**: Redis; **Purpose**: Performance optimization
 
 ### 8.4 Performance Targets
 
-| Metric | Target | Workflow |
-| --- | --- | --- |
-| Training Prediction | < 1.2s (p95) | Turn-by-Turn Training |
-| AI Advisory Response | < 2.5s | AI Chatbot Interaction |
-| OCR Processing | < 5s | Screenshot Analysis |
-| Export (50k rows) | < 60s | Data Export |
-| Page Load | < 2s | All workflows |
+- **Metric**: Training Prediction; **Target**: < 1.2s (p95); **Workflow**: Turn-by-Turn Training
+- **Metric**: AI Advisory Response; **Target**: < 2.5s; **Workflow**: AI Chatbot Interaction
+- **Metric**: OCR Processing; **Target**: < 5s; **Workflow**: Screenshot Analysis
+- **Metric**: Export (50k rows); **Target**: < 60s; **Workflow**: Data Export
+- **Metric**: Page Load; **Target**: < 2s; **Workflow**: All workflows
 
 ---
 
 ## Document Control
 
-| Version | Date | Author | Changes |
-| --- | --- | --- | --- |
-| 2.3.0 | 2026-02-21 | Development Team | Updated version/date metadata; Livewire 3→4, Alpine.js→Alpine.js 3; aligned with 30 current Eloquent models |
-| 2.1.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 codebase, updated AI integration to Neuron agents, added storage mode and import/export flows, updated technical specifications |
-| 2.0.0 | 2026-01-14 | Development Team | Prior revision with initial workflow diagrams |
-| 1.0.0 | 2026-01-03 | Development Team | Initial draft |
+- **Version**: 2.4.0; **Date**: 2026-02-22; **Author**: Development Team; **Changes**: Added Neuron AI v2.11 version; updated model names (Claude Haiku/Sonnet/Opus); updated external API references (GameTora); updated stats
+- **Version**: 2.3.0; **Date**: 2026-02-21; **Author**: Development Team; **Changes**: Updated version/date metadata; Livewire 3→4, Alpine.js→Alpine.js 3; aligned with 30 current Eloquent models
+- **Version**: 2.1.0; **Date**: 2026-01-24; **Author**: Development Team; **Changes**: Complete rewrite aligned with v2.0.0 codebase, updated AI integration to Neuron agents, added storage mode and import/export flows, updated technical specifications
+- **Version**: 2.0.0; **Date**: 2026-01-14; **Author**: Development Team; **Changes**: Prior revision with initial workflow diagrams
+- **Version**: 1.0.0; **Date**: 2026-01-03; **Author**: Development Team; **Changes**: Initial draft
 
 ---
 
@@ -1052,4 +1017,4 @@ flowchart TD
 
 ---
 
-*This document reflects the current user workflow design aligned with the Umamusume Career Planner v2.3.0 implementation.*
+### This document reflects the current user workflow design aligned with the Umamusume Career Planner v2.4.0 implementation

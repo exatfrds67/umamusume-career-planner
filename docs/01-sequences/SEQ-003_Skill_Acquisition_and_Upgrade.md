@@ -3,7 +3,7 @@
 ## Umamusume Pretty Derby Career Planner
 
 **Document Version**: 2.2.0  
-**Date**: February 22, 2026  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-004], [SPEC-004], [FLOW-004], [TECH-FLOW-004]
 
 ---
@@ -72,7 +72,7 @@ Skill management is a critical resource optimization workflow that:
 ### 2.1 System Components
 
 | Component | Type | Responsibility |
-|-----------|------|----------------|
+| --- | --- | --- |
 | **User** | Actor | Initiates skill acquisition and management |
 | **Livewire Component** | Presentation | `SkillCatalog.php`, `SkillAcquisition.php` - Skill browsing and purchase |
 | **SkillController** | Application | Orchestrates skill operations |
@@ -210,7 +210,7 @@ sequenceDiagram
 ### 3.2 Timeline Breakdown
 
 | Phase | Duration | Description |
-|-------|----------|-------------|
+| --- | --- | --- |
 | **Catalog Load** | ~150ms | Load skills with hints and costs |
 | **User Selection** | Variable | User browses and selects skill |
 | **Cost Calculation** | ~50ms | Calculate hint-based discount |
@@ -293,7 +293,7 @@ public function getAvailableSkills(Career $career): Collection
 The hint system provides progressive SP cost discounts with 5 levels:
 
 | Hint Level | Discount | Cumulative | Multiplier | Example (160 SP base) |
-|------------|----------|------------|------------|----------------------|
+| --- | --- | --- | --- | --- |
 | 0 hints | 0% | 0% | 1.00 | 160 SP |
 | 1 hint | 10% | 10% | 0.90 | 144 SP |
 | 2 hints | 10% | 20% | 0.80 | 128 SP |
@@ -304,7 +304,7 @@ The hint system provides progressive SP cost discounts with 5 levels:
 **Additional Discount Sources:**
 
 | Source | Discount | Stacking |
-|--------|----------|----------|
+| --- | --- | --- |
 | Fast Learner Condition | +10% | Additive with hints |
 | Skill Sparks (Inheritance) | Variable | Based on star rating |
 | Hint Books | +1 hint level | Green (Normal), Gold (Rare) |
@@ -471,7 +471,7 @@ public function checkEvolutionRequirements(Career $career, Skill $skill): bool
 **Evolution Example:**
 
 | Base Skill (Normal) | Evolved Skill (Rare) |
-|---------------------|---------------------|
+| --- | --- |
 | Go with the Flow | Lane Legerdemain |
 | Stamina Boost | Endurance Master |
 | Acceleration | Explosive Speed |
@@ -617,7 +617,7 @@ public function checkEvolutionRequirements(Career $career, Skill $skill): bool
 ### 6.1 Validation Errors
 
 | Error Code | Condition | HTTP Status | User Message |
-|------------|-----------|-------------|--------------|
+| --- | --- | --- | --- |
 | `SKILL_001` | Career not found | 404 | "Career run not found" |
 | `SKILL_002` | Skill not found | 404 | "Skill not found in catalog" |
 | `SKILL_003` | Insufficient SP | 422 | "Insufficient SP. Required: {cost}, Available: {balance}" |
@@ -668,7 +668,7 @@ sequenceDiagram
 ### 6.3 Transaction Rollback Scenarios
 
 | Scenario | Trigger | Recovery |
-|----------|---------|----------|
+| --- | --- | --- |
 | Constraint violation | Duplicate skill acquisition | Rollback, display error |
 | Foreign key error | Invalid skill_id reference | Rollback, re-validate catalog |
 | SP budget violation | Concurrent SP deduction | Rollback, refresh SP balance |
@@ -681,7 +681,7 @@ sequenceDiagram
 ### 7.1 Performance Metrics
 
 | Operation | Target | Current | Status |
-|-----------|--------|---------|--------|
+| --- | --- | --- | --- |
 | Catalog load (100 skills) | <500ms | ~350ms | ✅ Met |
 | Skill search/filter | <200ms | ~150ms | ✅ Met |
 | Skill acquisition | <350ms | ~280ms | ✅ Met |
@@ -756,7 +756,7 @@ $this->cache->forget("skill.hints.career.{$career->id}.*");
 ### 8.1 System Documentation
 
 | Document | Description |
-|----------|-------------|
+| --- | --- |
 | [PRD-004](../prds/PRD-004_Skill_Management.md) | Product requirements for skill management |
 | [SPEC-004](../specs/SPEC-004_Skill_Management_Technical.md) | Technical specification for skill system |
 | [FLOW-004](../flows/FLOW-004_Skill_Management_System.md) | System flow for skill operations |
@@ -765,7 +765,7 @@ $this->cache->forget("skill.hints.career.{$career->id}.*");
 ### 8.2 Related Sequences
 
 | Sequence | Description |
-|----------|-------------|
+| --- | --- |
 | [SEQ-001](SEQ-001_Character_Creation_Sequence.md) | Character creation (initializes skill budget) |
 | [SEQ-002](SEQ-002_Training_Block_Resolution.md) | Training execution (generates skill hints) |
 | [SEQ-004](SEQ-004_Race_Registration_and_Outcome.md) | Race completion (awards SP) |
@@ -773,7 +773,7 @@ $this->cache->forget("skill.hints.career.{$career->id}.*");
 ### 8.3 UI Documentation
 
 | Document | Description |
-|----------|-------------|
+| --- | --- |
 | [WF-008](../wireframes/WF-008_Skill_Shop_Interface.md) | Wireframe specification for skill catalog |
 | [WF-009](../wireframes/WF-009_Skill_Loadout_Manager.md) | Skill loadout management wireframe |
 | [UF-005](../user-flows/UF-005_Skill_Management_Flow.md) | User flow for skill management |
@@ -781,7 +781,7 @@ $this->cache->forget("skill.hints.career.{$career->id}.*");
 ### 8.4 Database Documentation
 
 | Document | Description |
-|----------|-------------|
+| --- | --- |
 | [DBD-009](../009_DBD_Database_Documentation.md) | Complete database schema documentation |
 
 ---
@@ -791,14 +791,14 @@ $this->cache->forget("skill.hints.career.{$career->id}.*");
 ### Version History
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
+| --- | --- | --- | --- |
 | 2.0.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 implementation; added detailed sequence flows, hint calculation logic, evolution system, performance metrics, and aligned with current Laravel 12 architecture |
 | 1.0.0 | 2026-01-14 | Development Team | Initial draft |
 
 ### Approval
 
 | Role | Name | Signature | Date |
-|------|------|-----------|------|
+| --- | --- | --- | --- |
 | Technical Lead | | | |
 | QA Lead | | | |
 

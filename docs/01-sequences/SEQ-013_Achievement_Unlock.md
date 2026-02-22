@@ -3,7 +3,7 @@
 ## Umamusume Pretty Derby Career Planner
 
 **Document Version**: 2.2.0  
-**Date**: February 22, 2026  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-001], [SPEC-001], [FLOW-001]
 
 ---
@@ -68,7 +68,7 @@ The achievement system enables:
 ### 2.1 System Components
 
 | Component | Type | Responsibility |
-|-----------|------|----------------|
+| --- | --- | --- |
 | **Event System** | Infrastructure | Dispatches career/training/race events |
 | **AchievementEngine** | Domain Service | Evaluates triggers and criteria |
 | **AchievementRepository** | Infrastructure | Achievement persistence |
@@ -109,7 +109,7 @@ app/
 Based on verified game mechanics from Global English Server (January 2026):
 
 | Achievement | Threshold | Description |
-|-------------|-----------|-------------|
+| --- | --- | --- |
 | **A-Grade Stat** | 901+ | Reach A grade in any single stat |
 | **Soft Cap Reached** | 1200 | Reach soft cap in any stat |
 | **Exceptional Stat** | 1600+ | Reach exceptional level (diminishing returns zone) |
@@ -124,7 +124,7 @@ Based on verified game mechanics from Global English Server (January 2026):
 ### 3.2 Race Achievements
 
 | Achievement | Criteria | Description |
-|-------------|----------|-------------|
+| --- | --- | --- |
 | **First Victory** | Win 1 race | Complete first race win |
 | **G1 Champion** | Win G1 race | Win a Grade 1 race |
 | **Triple Crown** | Win 3 specific G1s | Complete Triple Crown series |
@@ -135,7 +135,7 @@ Based on verified game mechanics from Global English Server (January 2026):
 Based on verified class pyramid from Global English Server:
 
 | Class Rank | Required Fans | Achievement Name |
-|------------|---------------|------------------|
+| --- | --- | --- |
 | **Debut** | 0 | Starting Rank |
 | **Beginner** | 1 (First Win) | First Steps |
 | **Bronze** | 5,000 | Bronze Class |
@@ -149,7 +149,7 @@ Based on verified class pyramid from Global English Server:
 ### 3.4 Skill Achievements
 
 | Achievement | Criteria | Description |
-|-------------|----------|-------------|
+| --- | --- | --- |
 | **First Skill** | Acquire 1 skill | First skill acquisition |
 | **Skill Collector** | Acquire 10 skills | Skill count milestone |
 | **Rare Skill** | Acquire rare (gold) skill | Acquire a rare skill |
@@ -160,7 +160,7 @@ Based on verified class pyramid from Global English Server:
 ### 3.5 Career Achievements
 
 | Achievement | Criteria | Description |
-|-------------|----------|-------------|
+| --- | --- | --- |
 | **Junior Complete** | Complete Junior Year | Finish first year (~24 turns) |
 | **Classic Complete** | Complete Classic Year | Finish second year |
 | **Senior Complete** | Complete Senior Year | Finish third year |
@@ -172,7 +172,7 @@ Based on verified class pyramid from Global English Server:
 ### 3.6 Support Card Achievements
 
 | Achievement | Criteria | Description |
-|-------------|----------|-------------|
+| --- | --- | --- |
 | **First Bond** | Reach 80% bond | First orange bond threshold |
 | **Max Bond** | Reach 100% bond | Maximum bond with one card |
 | **Friendship Training** | Trigger rainbow training | Activate Friendship Training |
@@ -327,7 +327,7 @@ sequenceDiagram
 ### 4.4 Timeline Breakdown
 
 | Phase | Duration | Description |
-|-------|----------|-------------|
+| --- | --- | --- |
 | **Event Dispatch** | ~10ms | System event triggered |
 | **Cache Check** | ~20ms | Check cached achievement state |
 | **Trigger Evaluation** | ~50ms | Evaluate achievement criteria |
@@ -967,7 +967,7 @@ private function calculateClassRank(int $totalFans): string
 ### 7.1 Validation Errors
 
 | Error Code | Condition | HTTP Status | User Message |
-|------------|-----------|-------------|--------------|
+| --- | --- | --- | --- |
 | `ACH_001` | Achievement not found | 404 | "Achievement not found" |
 | `ACH_002` | Already unlocked | 409 | "Achievement already unlocked" |
 | `ACH_003` | Invalid trigger criteria | 422 | "Invalid achievement criteria" |
@@ -1030,7 +1030,7 @@ if ($existingUnlock) {
 ### 8.1 Performance Metrics
 
 | Operation | Target | Current | Status |
-|-----------|--------|---------|--------|
+| --- | --- | --- | --- |
 | Trigger evaluation | <50ms | ~40ms | ✅ Met |
 | Unlock creation (batch) | <100ms | ~85ms | ✅ Met |
 | Reward granting | <100ms | ~80ms | ✅ Met |
@@ -1108,7 +1108,7 @@ Cache::forget('achievements.all');
 ### 9.1 System Documentation
 
 | Document | Description |
-|----------|-------------|
+| --- | --- |
 | [PRD-001](../prds/PRD-001_Character_Management.md) | Product requirements for character management |
 | [SPEC-001](../specs/SPEC-001_Character_Management_Technical.md) | Technical specification for character system |
 | [FLOW-001](../flows/FLOW-001_Character_Management_System.md) | System flow for character operations |
@@ -1117,7 +1117,7 @@ Cache::forget('achievements.all');
 ### 9.2 Related Sequences
 
 | Sequence | Description |
-|----------|-------------|
+| --- | --- |
 | [SEQ-001](SEQ-001_Character_Creation_Sequence.md) | Character creation (initial achievements) |
 | [SEQ-002](SEQ-002_Training_Block_Resolution.md) | Training completion (stat achievements) |
 | [SEQ-004](SEQ-004_Race_Registration_and_Outcome.md) | Race completion (race/class achievements) |
@@ -1125,7 +1125,7 @@ Cache::forget('achievements.all');
 ### 9.3 Database Documentation
 
 | Document | Description |
-|----------|-------------|
+| --- | --- |
 | [DBD-009](../009_DBD_Database_Documentation.md) | Complete database schema documentation |
 
 ---
@@ -1135,15 +1135,15 @@ Cache::forget('achievements.all');
 ### Version History
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 2.2.0 | 2026-02-22 | Development Team | Updated with verified game mechanics from Global English Server - corrected stat thresholds (901/1200/1600), class pyramid with fan requirements (5K/20K/50K/100K/160K/240K/320K), career structure (Junior/Classic/Senior/URA), support card bond mechanics (80%/100%), skill rarity system |
+| --- | --- | --- | --- |
+| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server - corrected stat thresholds (901/1200/1600), class pyramid with fan requirements (5K/20K/50K/100K/160K/240K/320K), career structure (Junior/Classic/Senior/URA), support card bond mechanics (80%/100%), skill rarity system |
 | 2.0.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 implementation; added detailed sequence flows, trigger evaluation, reward granting, performance metrics, and aligned with current Laravel 12 architecture |
 | 1.0.0 | 2026-01-14 | Development Team | Initial draft |
 
 ### Approval
 
 | Role | Name | Signature | Date |
-|------|------|-----------|------|
+| --- | --- | --- | --- |
 | Technical Lead | | | |
 | QA Lead | | | |
 

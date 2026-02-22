@@ -3,7 +3,7 @@
 ## Umamusume Pretty Derby Career Planner
 
 **Document Version**: 2.2.0  
-**Date**: February 22, 2026  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-005], [SPEC-005], [FLOW-005], [TECH-FLOW-005]
 
 ---
@@ -70,13 +70,13 @@ Support card management is critical for training optimization:
 ### 2.1 System Components
 
 | Component | Type | Responsibility |
-|-----------|------|----------------|
+| --- | --- | --- |
 | **User** | Actor | Initiates card upgrades and deck building |
 | **Livewire Component** | Presentation | `SupportCardManager.php`, `DeckBuilder.php` - Card and deck UI |
 | **SupportCardController** | Application | Orchestrates card operations |
 | **SupportCardService** | Domain Service | Card upgrade and management logic |
-| **SupportCardDeckService** | Domain Service | Deck composition validation |
-| **SynergyScorer** | Domain Service | Deck synergy scoring |
+| **DeckValidationService** | Domain Service | Deck composition validation |
+| **SynergyCalculator** | Domain Service | Deck synergy scoring |
 | **BondProgressionService** | Domain Service | Bond level tracking |
 | **Database** | Infrastructure | MySQL/MariaDB persistence layer |
 | **EventDispatcher** | Infrastructure | Laravel event broadcasting |
@@ -96,8 +96,8 @@ app/
 │       └── SupportCardController.php
 ├── Services/
 │   ├── SupportCardService.php
-│   ├── SupportCardDeckService.php
-│   ├── SynergyScorer.php
+│   ├── DeckValidationService.php
+│   ├── SynergyCalculator.php
 │   └── BondProgressionService.php
 └── Models/
     ├── SupportCard.php
@@ -118,8 +118,8 @@ sequenceDiagram
     participant UI as Livewire Card Manager
     participant Controller as SupportCardController
     participant CardSvc as SupportCardService
-    participant DeckSvc as SupportCardDeckService
-    participant SynergySvc as SynergyScorer
+    participant DeckSvc as DeckValidationService
+    participant SynergySvc as SynergyCalculator
     participant BondSvc as BondProgressionService
     participant DB as Database
     participant Events as EventDispatcher
@@ -231,7 +231,7 @@ sequenceDiagram
 ### 3.2 Timeline Breakdown
 
 | Phase | Duration | Description |
-|-------|----------|-------------|
+| --- | --- | --- |
 | **Collection Load** | ~200ms | Load user's card collection |
 | **Card Details** | ~150ms | Load single card with upgrade paths |
 | **User Selection** | Variable | User reviews upgrade options |
@@ -328,7 +328,7 @@ public function getOwnedCards(User $user, array $filters = []): Collection
 The limit break system uses stars (★) to indicate progression:
 
 | Limit Breaks | Stars | Level Cap | Bonus Multiplier | Material Cost |
-|--------------|-------|-----------|------------------|---------------|
+| --- | --- | --- | --- | --- |
 | 0 LB | ★ | 30 | 1.00x (Base) | N/A |
 | 1 LB | ★★ | 35 | 1.05x (+5%) | 1 copy |
 | 2 LB | ★★★ | 40 | 1.10x (+10%) | 1 copy |
@@ -459,7 +459,7 @@ class BondProgressionService
 **Bond Milestones:**
 
 | Level | Reward |
-|-------|--------|
+| --- | --- |
 | 20% | Small stat bonus (+5) |
 | 40% | Skill hint (1x) |
 | 60% | Special event unlock |
@@ -471,8 +471,8 @@ class BondProgressionService
 **Validation Rules:**
 
 ```php
-// SupportCardDeckService.php
-class SupportCardDeckService
+// DeckValidationService.php
+class DeckValidationService
 {
     public function validate(array $cardIds, int $userId): ValidationResult
     {
@@ -540,8 +540,8 @@ class SupportCardDeckService
 **Synergy Scoring:**
 
 ```php
-// SynergyScorer.php
-class SynergyScorer
+// SynergyCalculator.php
+class SynergyCalculator
 {
     public function calculateSynergy(Collection $cards): float
     {
@@ -786,7 +786,7 @@ class SynergyScorer
 ### 6.1 Validation Errors
 
 | Error Code | Condition | HTTP Status | User Message |
-|------------|-----------|-------------|--------------|
+| --- | --- | --- | --- |
 | `CARD_001` | Card not found | 404 | "Support card not found" |
 | `CARD_002` | Insufficient materials | 422 | "No duplicate cards or upgrade items available" |
 | `CARD_003` | Max limit break reached | 422 | "Card is already at maximum limit break (4★)" |
@@ -837,7 +837,7 @@ sequenceDiagram
 ### 6.3 Transaction Rollback Scenarios
 
 | Scenario | Trigger | Recovery |
-|----------|---------|----------|
+| --- | --- | --- |
 | Constraint violation | Invalid card reference | Rollback, re-validate input |
 | Material consumption failure | Inventory update error | Rollback, verify materials |
 | Bonus recalculation error | Invalid bonus data | Rollback, log error |
@@ -850,7 +850,7 @@ sequenceDiagram
 ### 7.1 Performance Metrics
 
 | Operation | Target | Current | Status |
-|-----------|--------|---------|--------|
+| --- | --- | --- | --- |
 | Collection load (200 cards) | <500ms | ~350ms | ✅ Met |
 | Card upgrade | <350ms | ~280ms | ✅ Met |
 | Deck validation | <200ms | ~150ms | ✅ Met |
@@ -926,7 +926,7 @@ $this->cache->forget("support_deck.career.{$career->id}");
 ### 8.1 System Documentation
 
 | Document | Description |
-|----------|-------------|
+| --- | --- |
 | [PRD-005](../prds/PRD-005_Support_Card_Management.md) | Product requirements for support card management |
 | [SPEC-005](../specs/SPEC-005_Support_Card_Management_Technical.md) | Technical specification for support card system |
 | [FLOW-005](../flows/FLOW-005_Support_Card_Management_System.md) | System flow for support card operations |
@@ -935,7 +935,7 @@ $this->cache->forget("support_deck.career.{$career->id}");
 ### 8.2 Related Sequences
 
 | Sequence | Description |
-|----------|-------------|
+| --- | --- |
 | [SEQ-001](SEQ-001_Character_Creation_Sequence.md) | Character creation (selects initial deck) |
 | [SEQ-002](SEQ-002_Training_Block_Resolution.md) | Training execution (uses support deck bonuses) |
 | [SEQ-007](SEQ-007_External_Data_Sync.md) | External data sync (updates meta tiers) |
@@ -943,7 +943,7 @@ $this->cache->forget("support_deck.career.{$career->id}");
 ### 8.3 UI Documentation
 
 | Document | Description |
-|----------|-------------|
+| --- | --- |
 | [WF-010](../wireframes/WF-010_Support_Card_Collection.md) | Wireframe specification for card collection |
 | [WF-011](../wireframes/WF-011_Support_Deck_Builder.md) | Deck builder interface wireframe |
 | [UF-006](../user-flows/UF-006_Support_Deck_Building_Flow.md) | User flow for deck building |
@@ -951,7 +951,7 @@ $this->cache->forget("support_deck.career.{$career->id}");
 ### 8.4 Database Documentation
 
 | Document | Description |
-|----------|-------------|
+| --- | --- |
 | [DBD-009](../009_DBD_Database_Documentation.md) | Complete database schema documentation |
 
 ---
@@ -961,14 +961,14 @@ $this->cache->forget("support_deck.career.{$career->id}");
 ### Version History
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
+| --- | --- | --- | --- |
 | 2.0.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 implementation; added detailed sequence flows, limit break system, bond progression, deck validation, synergy calculation, performance metrics, and aligned with current Laravel 12 architecture |
 | 1.0.0 | 2026-01-14 | Development Team | Initial draft |
 
 ### Approval
 
 | Role | Name | Signature | Date |
-|------|------|-----------|------|
+| --- | --- | --- | --- |
 | Technical Lead | | | |
 | QA Lead | | | |
 
@@ -988,4 +988,4 @@ $this->cache->forget("support_deck.career.{$career->id}");
 
 ---
 
-*This sequence diagram reflects the current implementation of the support card upgrade and deck building workflow as of v2.0.0. For the most up-to-date information, refer to the source code in `app/Services/SupportCardService.php`, `app/Services/SupportCardDeckService.php`, and related files.*
+*This sequence diagram reflects the current implementation of the support card upgrade and deck building workflow as of v2.0.0. For the most up-to-date information, refer to the source code in `app/Services/SupportCardService.php`, `app/Services/DeckValidationService.php`, and related files.*

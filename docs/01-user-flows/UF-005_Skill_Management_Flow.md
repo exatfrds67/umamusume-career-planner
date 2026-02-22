@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0  
-**Date**: February 22, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-004], [SPEC-004], [SRS], [BRS]
 
 **Source Specifications**:
@@ -45,7 +45,7 @@ The Skill Management Flow guides users through the complete process of browsing,
 ### 1.2 Scope
 
 | Aspect | Description |
-|--------|-------------|
+| --- | --- |
 | **Entry Point** | Skill shop access from dashboard, training results, or race preparation |
 | **Exit Point** | Skill acquired and added to active loadout, or skill build plan saved |
 | **Duration** | 2-5 minutes per skill acquisition; 10-15 minutes for full build planning |
@@ -262,7 +262,7 @@ stateDiagram-v2
 **User Actions**:
 
 | Action | Description | Next State |
-|--------|-------------|------------|
+| --- | --- | --- |
 | Search | Type skill name (English/Japanese) | Filter catalog |
 | Filter by type | Check stat category checkboxes | Update results |
 | Filter by rarity | Select Normal/Rare/Unique | Update results |
@@ -274,7 +274,7 @@ stateDiagram-v2
 **Catalog Features**:
 
 | Feature | Description |
-|---------|-------------|
+| --- | --- |
 | Real-time search | Instant filtering as user types |
 | Bilingual support | Search in English or Japanese (kanji/kana) |
 | Hint indicators | Visual badges showing available hint discounts |
@@ -402,7 +402,7 @@ class SkillCatalog extends Component
 **Detail Components**:
 
 | Component | Description |
-|-----------|-------------|
+| --- | --- |
 | Skill Information | Name (EN/JP), type, category, description |
 | Effects | Numeric bonuses, activation conditions, duration |
 | Best Use Cases | Recommended race types and running styles |
@@ -755,7 +755,7 @@ class SkillEvolutionService
 **Loadout Features**:
 
 | Feature | Description |
-|---------|-------------|
+| --- | --- |
 | Active/Inactive Toggle | Enable/disable skills without losing acquisition |
 | Synergy Scoring | Calculate loadout effectiveness for current build |
 | AI Optimization | Suggest optimal skill combinations |
@@ -803,7 +803,7 @@ flowchart TD
 ### 4.2 Key Decision Factors
 
 | Factor | Impact on Decision | Weight |
-|--------|-------------------|--------|
+| --- | --- | --- |
 | **SP Balance** | Determines affordability | Critical |
 | **Hint Availability** | Reduces cost significantly (up to 40%) | High |
 | **Goal Alignment** | Matches active training goals | High |
@@ -839,7 +839,7 @@ flowchart TD
 ### 5.2 Hint Discount Table
 
 | Hint Level | Discount | Example (120 SP Skill) | Notes |
-|------------|----------|------------------------|-------|
+| --- | --- | --- | --- |
 | 0 Hints | 0% | 120 SP (Base cost) | No discount |
 | 1 Hint | 10% | 108 SP (-12 SP) | First hint |
 | 2 Hints | 20% | 96 SP (-24 SP) | Second hint |
@@ -850,7 +850,7 @@ flowchart TD
 ### 5.2.1 Additional Discount Sources
 
 | Source | Bonus | Stacks With Hints | Notes |
-|--------|-------|-------------------|-------|
+| --- | --- | --- | --- |
 | Fast Learner Condition | +10% | Yes | Character condition effect |
 | Skill Sparks | Variable | Yes | Event-based bonus |
 | Hint Books | +1 Hint Level | Yes | Consumable item |
@@ -858,7 +858,7 @@ flowchart TD
 ### 5.2.2 Skill Rarities
 
 | Rarity | Display | Description | SP Cost Range |
-|--------|---------|-------------|---------------|
+| --- | --- | --- | --- |
 | Normal | White text | Common skills | 60-150 SP |
 | Rare | Gold text | Powerful skills | 150-300 SP |
 | Unique | Character-specific | Character-exclusive skills | 200-400 SP |
@@ -972,7 +972,7 @@ class SkillHintService
 ### 6.2 User Experience Success
 
 | Metric | Target | Measurement |
-|--------|--------|-------------|
+| --- | --- | --- |
 | Skill acquisition completion rate | > 90% | Analytics tracking |
 | Hint utilization rate | > 75% | Hint usage vs. available |
 | AI recommendation acceptance | > 65% | User action tracking |
@@ -1039,7 +1039,7 @@ flowchart TD
 ### 7.2 Error Messages
 
 | Error Code | Trigger | Message | User Action |
-|------------|---------|---------|-------------|
+| --- | --- | --- | --- |
 | `SK-001` | SP < Skill Cost | "Insufficient SP. Need {X} SP, have {Y} SP." | Farm SP or defer acquisition |
 | `SK-002` | Prerequisites not met | "Prerequisites not met: {list}. Complete these first." | Work on prerequisites |
 | `SK-003` | Evolution conditions | "Evolution unavailable. Missing: {conditions}." | Continue career progression |
@@ -1049,7 +1049,7 @@ flowchart TD
 ### 7.3 Recovery Strategies
 
 | Scenario | Primary Recovery | Fallback Recovery | Ultimate Fallback |
-|----------|------------------|-------------------|-------------------|
+| --- | --- | --- | --- |
 | Insufficient SP | Show SP farming tips | Add to acquisition plan | Defer indefinitely |
 | Prerequisites missing | Show prerequisite roadmap | Track progress automatically | Notify when conditions met |
 | Evolution failure | Check conditions display | Allow later evolution | Skip evolution |
@@ -1064,7 +1064,7 @@ flowchart TD
 After skill acquisition, users may proceed to:
 
 | Flow | Document Reference | Entry Condition |
-|------|-------------------|-----------------|
+| --- | --- | --- |
 | Training Day Flow | [UF-003](UF-003_Training_Day_Flow.md) | Resume training with new skill |
 | Race Preparation | [UF-004](UF-004_Race_Day_Flow.md) | Optimize loadout for upcoming race |
 | Loadout Optimization | Internal | Fine-tune active skill configuration |
@@ -1073,7 +1073,7 @@ After skill acquisition, users may proceed to:
 ### 8.2 Alternative Entry Points
 
 | Entry Point | Scenario | Flow Adjustment |
-|-------------|----------|-----------------|
+| --- | --- | --- |
 | Training Results | Hint gained from training | Skip catalog, go to updated skill |
 | Race Prep | Race-specific skill needs | Pre-filter by race requirements |
 | AI Recommendation | Proactive skill suggestion | Direct to recommended skill detail |
@@ -1123,8 +1123,7 @@ flowchart LR
 ## Document Control
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 2.3.0 | 2026-02-22 | Development Team | Updated version and dates; no functional changes |
+| --- | --- | --- | --- |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: 5-level hint system (10%/20%/30%/35%/40%), Fast Learner condition bonus, Skill Sparks, Hint Books, skill rarities (Normal/Rare/Unique) |
 | 2.1.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 architecture; added skill hint system details, evolution mechanics, loadout management; comprehensive error handling and testing criteria |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with basic flow |
@@ -1147,4 +1146,4 @@ flowchart LR
 
 ---
 
-*This user flow reflects the current skill management system implementation as of version 2.3.0. For the latest updates, refer to the online documentation.*
+*This user flow reflects the current skill management system implementation as of version 2.2.0. For the latest updates, refer to the online documentation.*

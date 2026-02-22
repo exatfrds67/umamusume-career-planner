@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0  
-**Date**: February 22, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-007], [SPEC-007], [SRS], [BRS]
 
 **Source Specifications**:
@@ -45,7 +45,7 @@ The OCR and Data Import Flow enables users to efficiently import character data 
 ### 1.2 Scope
 
 | Aspect | Description |
-|--------|-------------|
+| --- | --- |
 | **Entry Point** | Data import interface, screenshot upload, file import wizard |
 | **Exit Point** | Data validated and imported to active career or saved as new entry |
 | **Duration** | 2-5 minutes for OCR processing; 1-3 minutes for file import |
@@ -238,7 +238,7 @@ stateDiagram-v2
 │  │                                        [UPLOAD FILE]   ││
 │  ├────────────────────────────────────────────────────────┤│
 │  │ 🔄 External API Sync                                   ││
-│  │ Sync data from umapyoi.net or GameTora               ││
+│  │ Sync data from umapyoi.net or UmamusumeDB             ││
 │  │                                                        ││
 │  │ Data Sources:                                          ││
 │  │ • Character database (50+ trainees)                   ││
@@ -257,7 +257,7 @@ stateDiagram-v2
 **User Actions**:
 
 | Action | Description | Next State |
-|--------|-------------|------------|
+| --- | --- | --- |
 | Upload Screenshot | Select image file from device | Image validation |
 | Upload File | Select JSON/CSV/XLSX file | Format detection |
 | Sync External API | Trigger API data fetch | Connection check |
@@ -377,7 +377,7 @@ stateDiagram-v2
 **Confidence Score Ranges**:
 
 | Range | Label | Icon | Action Required |
-|-------|-------|------|-----------------|
+| --- | --- | --- | --- |
 | 85-100% | High | 🟢 | Auto-approved, user review optional |
 | 70-84% | Medium | 🟡 | User review recommended |
 | < 70% | Low | 🔴 | Manual correction required |
@@ -385,7 +385,7 @@ stateDiagram-v2
 **Game Data Validation Rules** (verified Global English Server Jan 2026):
 
 | Data Type | Valid Range | Notes |
-|-----------|-------------|-------|
+| --- | --- | --- |
 | Stats (Speed, Stamina, Power, Guts, Wit) | 0-2000+ | Soft cap at 1200, diminishing returns above |
 | Aptitude Grades | G, F, E, D, C, B, A, S | S is maximum (no SS grade exists) |
 | Turn Number | 1-78 | Career spans ~70-78 turns across 3 years |
@@ -538,7 +538,7 @@ stateDiagram-v2
 │  └────────────────────────────────────────────────────────┘│
 │                                                            │
 │  ┌───────────────────────────────────────────────────��────┐│
-│  │ GameTora (gametora.com)                  Fallback Source ││
+│  │ UmamusumeDB.com                        Fallback Source ││
 │  ├────────────────────────────────────────────────────────┤│
 │  │ Status: ✓ Standby                                      ││
 │  │ Last Used: Never (primary active)                      ││
@@ -640,7 +640,7 @@ flowchart TD
 ### 4.2 Key Decision Factors
 
 | Factor | Impact on Decision | Weight |
-|--------|-------------------|--------|
+| --- | --- | --- |
 | **Image Quality** | Determines OCR accuracy | Critical |
 | **File Format** | Determines parsing method | Critical |
 | **Confidence Score** | Triggers auto-map vs manual review | High |
@@ -667,7 +667,7 @@ flowchart TD
 **Preprocessing Operations**:
 
 | Operation | Purpose | Implementation |
-|-----------|---------|----------------|
+| --- | --- | --- |
 | Resize | Normalize dimensions | Max 2000px width |
 | Grayscale | Reduce noise | GD `imagefilter()` |
 | Threshold | Binary conversion | Adaptive threshold |
@@ -774,7 +774,7 @@ class OCRParserService
 ### 5.4 Confidence Scoring
 
 | Factor | Weight | Description |
-|--------|--------|-------------|
+| --- | --- | --- |
 | OCR Text Confidence | 40% | Tesseract's internal confidence |
 | Pattern Match Quality | 30% | Regex match strength |
 | Context Validation | 20% | Value within expected ranges |
@@ -797,7 +797,7 @@ class OCRParserService
 ### 6.2 User Experience Success
 
 | Metric | Target | Measurement |
-|--------|--------|-------------|
+| --- | --- | --- |
 | OCR accuracy rate | > 85% | Validation logs |
 | File import success rate | > 95% | Import completion |
 | User correction rate | < 20% | Manual edit tracking |
@@ -888,7 +888,7 @@ flowchart TD
 ### 7.2 Error Messages
 
 | Error Code | Trigger | Message | User Action |
-|------------|---------|---------|-------------|
+| --- | --- | --- | --- |
 | `OCR-001` | Invalid image format | "Unsupported image format. Please upload PNG, JPG, or JPEG." | Upload valid format |
 | `OCR-002` | Image too large | "Image exceeds 10MB limit. Please compress or resize." | Reduce file size |
 | `OCR-003` | OCR extraction failed | "Unable to extract text from image. Try manual entry." | Manual entry |
@@ -901,7 +901,7 @@ flowchart TD
 ### 7.3 Recovery Strategies
 
 | Scenario | Primary Recovery | Fallback Recovery | Ultimate Fallback |
-|----------|------------------|-------------------|-------------------|
+| --- | --- | --- | --- |
 | Image upload fails | Retry upload | Manual data entry | Skip import |
 | OCR extraction fails | Re-process with different settings | Manual entry | Save screenshot for later |
 | Low confidence | User review and correction | Manual entry | Discard import |
@@ -918,7 +918,7 @@ flowchart TD
 After data import, users may proceed to:
 
 | Flow | Document Reference | Entry Condition |
-|------|-------------------|-----------------|
+| --- | --- | --- |
 | Character Management | [UF-001](UF-001_Onboarding_Flow.md) | Character data imported |
 | Training Day Flow | [UF-003](UF-003_Training_Day_Flow.md) | Career stats updated |
 | Skill Management | [UF-005](UF-005_Skill_Management_Flow.md) | Skills imported |
@@ -927,7 +927,7 @@ After data import, users may proceed to:
 ### 8.2 Alternative Entry Points
 
 | Entry Point | Scenario | Flow Adjustment |
-|-------------|----------|-----------------|
+| --- | --- | --- |
 | Dashboard Quick Import | User clicks "Import Data" | Direct to method selection |
 | Character Detail Page | User clicks "Import Stats" | Pre-select active career |
 | File Drag-and-Drop | User drops file on page | Auto-detect format |
@@ -947,7 +947,7 @@ flowchart LR
     subgraph ExternalServices[External Services]
         Tesseract[Tesseract OCR]
         UmapyoiAPI[umapyoi.net API]
-        FallbackAPI[GameTora Scraping]
+        FallbackAPI[UmamusumeDB API]
     end
     
     subgraph InternalServices[Internal Services]
@@ -985,8 +985,7 @@ flowchart LR
 ## Document Control
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 2.3.0 | 2026-02-22 | Development Team | Replaced UmamusumeDB references with GameTora (gametora.com) as fallback data source to match actual codebase; updated version and dates |
+| --- | --- | --- | --- |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: stat validation allows values above 1200 (soft cap with diminishing returns), aptitude grade validation (G→S scale, no SS), effective stat calculation for soft cap |
 | 2.1.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 architecture; added OCR pipeline details, file import workflows, external API sync, comprehensive error handling and testing criteria |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with basic flow |
@@ -1008,4 +1007,4 @@ flowchart LR
 
 ---
 
-*This user flow reflects the current OCR and data import system implementation as of version 2.3.0. For the latest updates, refer to the online documentation.*
+*This user flow reflects the current OCR and data import system implementation as of version 2.2.0. For the latest updates, refer to the online documentation.*

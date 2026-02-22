@@ -31,23 +31,23 @@ The Training Selection Interface provides users with AI-powered training predict
 
 ### 1.2 Key Objectives
 
-| Objective               | Description                                                  |
-| ----------------------- | ------------------------------------------------------------ |
-| **Prediction Display**  | Show predicted stat gains for all 6 training facilities      |
-| **Risk Assessment**     | Visual risk indicators with color-coded badges               |
-| **AI Recommendations**  | Highlight optimal training choice based on goals             |
-| **Support Integration** | Display active support cards and friendship bonuses          |
-| **Quick Actions**       | One-click training execution with confirmation for high-risk |
+| Objective | Description |
+| --- | --- |
+| **Prediction Display** | Show predicted stat gains for all 6 training facilities |
+| **Risk Assessment** | Visual risk indicators with color-coded badges |
+| **AI Recommendations** | Highlight optimal training choice based on goals |
+| **Support Integration** | Display active support cards and friendship bonuses |
+| **Quick Actions** | One-click training execution with confirmation for high-risk |
 
 ### 1.3 User Stories
 
-| ID     | User Story                                                                 | Priority |
-| ------ | -------------------------------------------------------------------------- | -------- |
-| US-001 | As a player, I want to see predicted stat gains for all training options   | P0       |
-| US-002 | As a player, I want AI-powered recommendations based on my goals           | P0       |
-| US-003 | As a player, I want clear risk indicators to avoid training failures       | P0       |
-| US-004 | As a player, I want to see which support cards are active in each training | P0       |
-| US-005 | As a player, I want quick access to my current stats and upcoming races    | P1       |
+| ID | User Story | Priority |
+| --- | --- | --- |
+| US-001 | As a player, I want to see predicted stat gains for all training options | P0 |
+| US-002 | As a player, I want AI-powered recommendations based on my goals | P0 |
+| US-003 | As a player, I want clear risk indicators to avoid training failures | P0 |
+| US-004 | As a player, I want to see which support cards are active in each training | P0 |
+| US-005 | As a player, I want quick access to my current stats and upcoming races | P1 |
 
 ---
 
@@ -217,7 +217,7 @@ The Training Selection Interface provides users with AI-powered training predict
 │ [Skip] [Rest] [AI] │
 └──────────────────────────────┘
 │ Bottom Navigation Bar │
-│ [🏠][👤][⚡][🏆][🤖][⚙️] │
+│ \[🏠]\[👤]\[⚡]\[🏆]\[🤖]\[⚙️] │
 └──────────────────────────────┘
 
 ````
@@ -287,10 +287,10 @@ class PredictionCard extends Component
 **Risk Level Badges**:
 
 | Risk Level | Percentage | Badge Color | Icon |
-| ---------- | ---------- | ----------- | ---- |
-| Low        | <15%       | Green       | 🟢   |
-| Medium     | 15-40%     | Amber       | 🟡   |
-| High       | >40%       | Red         | 🔴   |
+| --- | --- | --- | --- |
+| Low | <15% | Green | 🟢 |
+| Medium | 15-40% | Amber | 🟡 |
+| High | >40% | Red | 🔴 |
 
 **AI Recommendation Badge**:
 
@@ -400,13 +400,13 @@ Skill Hints:
 
 **Stat Colors**:
 
-| Stat    | CSS Variable     | Color     |
-| ------- | ---------------- | --------- |
-| Speed   | `--stat-speed`   | `#3399ff` |
+| Stat | CSS Variable | Color |
+| --- | --- | --- |
+| Speed | `--stat-speed` | `#3399ff` |
 | Stamina | `--stat-stamina` | `#33cc99` |
-| Power   | `--stat-power`   | `#ff4d4d` |
-| Guts    | `--stat-guts`    | `#ffa500` |
-| Wit     | `--stat-wit`     | `#9933ff` |
+| Power | `--stat-power` | `#ff4d4d` |
+| Guts | `--stat-guts` | `#ffa500` |
+| Wit | `--stat-wit` | `#9933ff` |
 
 ### 3.5 Training Formula (Game-Accurate)
 
@@ -420,7 +420,7 @@ Stat Gain = (Base + StatBonus) × (1 + GrowthRate) × (1 + MoodMultiplier × (1 
 **Formula Components**:
 
 | Component | Description | Values |
-|-----------|-------------|--------|
+| --- | --- | --- |
 | Base | Facility base stat gain | Varies by facility and level |
 | StatBonus | Support card stat bonuses | Sum of active card bonuses |
 | GrowthRate | Character's growth rate for stat | 0-30% typically |
@@ -433,12 +433,12 @@ Stat Gain = (Base + StatBonus) × (1 + GrowthRate) × (1 + MoodMultiplier × (1 
 **Facility Level Multipliers**:
 
 | Level | Multiplier | Description |
-|-------|------------|-------------|
-| 1     | 1.00×      | Base facility |
-| 2     | 1.25×      | +25% gains |
-| 3     | 1.50×      | +50% gains |
-| 4     | 1.75×      | +75% gains |
-| 5     | 2.00×      | Maximum (+100% gains) |
+| --- | --- | --- |
+| 1 | 1.00× | Base facility |
+| 2 | 1.25× | +25% gains |
+| 3 | 1.50× | +50% gains |
+| 4 | 1.75× | +75% gains |
+| 5 | 2.00× | Maximum (+100% gains) |
 
 **Support Card Presence Bonus**:
 
@@ -456,13 +456,13 @@ Stat Gain = (Base + StatBonus) × (1 + GrowthRate) × (1 + MoodMultiplier × (1 
 
 **Rating Scale**:
 
-| Stars | Score Range | Label         |
-| ----- | ----------- | ------------- |
-| ★★★★★ | 90-100      | Excellent     |
-| ★★★★☆ | 75-89       | Good          |
-| ★★★☆☆ | 60-74       | Average       |
-| ★★☆☆☆ | 45-59       | Below Average |
-| ★☆☆☆☆ | <45         | Poor          |
+| Stars | Score Range | Label |
+| --- | --- | --- |
+| ★★★★★ | 90-100 | Excellent |
+| ★★★★☆ | 75-89 | Good |
+| ★★★☆☆ | 60-74 | Average |
+| ★★☆☆☆ | 45-59 | Below Average |
+| ★☆☆☆☆ | <45 | Poor |
 
 **Calculation**:
 
@@ -541,11 +541,11 @@ class TrainingSelector extends Component
 
 ### 4.2 Cache Strategy
 
-| Data Type            | Cache Key                   | TTL        | Invalidation          |
-| -------------------- | --------------------------- | ---------- | --------------------- |
-| Training predictions | `predictions:{run_id}`      | 5 minutes  | On training execution |
-| Support card bonuses | `support_bonuses:{deck_id}` | 1 hour     | On deck modification  |
-| AI recommendations   | `ai_training:{run_id}`      | 10 minutes | On stat/goal change   |
+| Data Type | Cache Key | TTL | Invalidation |
+| --- | --- | --- | --- |
+| Training predictions | `predictions:{run_id}` | 5 minutes | On training execution |
+| Support card bonuses | `support_bonuses:{deck_id}` | 1 hour | On deck modification |
+| AI recommendations | `ai_training:{run_id}` | 10 minutes | On stat/goal change |
 
 ### 4.3 Real-time Updates
 
@@ -635,25 +635,25 @@ flowchart TD
 
 ### 6.1 WCAG 2.2 AA Compliance
 
-| Criterion                      | Implementation                           | Test Method             |
-| ------------------------------ | ---------------------------------------- | ----------------------- |
-| **1.1.1 Non-text Content**     | All icons have `aria-label`              | Screen reader testing   |
-| **1.4.3 Contrast Ratio**       | 4.5:1 minimum for text                   | Color contrast analyzer |
-| **2.1.1 Keyboard**             | All training options keyboard accessible | Keyboard-only testing   |
-| **2.4.3 Focus Order**          | Logical tab order through predictions    | Tab key traversal       |
-| **2.4.7 Focus Visible**        | Clear focus indicators on cards          | Visual inspection       |
-| **3.3.1 Error Identification** | Risk warnings clearly identified         | Screen reader + visual  |
-| **4.1.2 Name, Role, Value**    | Proper ARIA attributes on controls       | axe-core scan           |
+| Criterion | Implementation | Test Method |
+| --- | --- | --- |
+| **1.1.1 Non-text Content** | All icons have `aria-label` | Screen reader testing |
+| **1.4.3 Contrast Ratio** | 4.5:1 minimum for text | Color contrast analyzer |
+| **2.1.1 Keyboard** | All training options keyboard accessible | Keyboard-only testing |
+| **2.4.3 Focus Order** | Logical tab order through predictions | Tab key traversal |
+| **2.4.7 Focus Visible** | Clear focus indicators on cards | Visual inspection |
+| **3.3.1 Error Identification** | Risk warnings clearly identified | Screen reader + visual |
+| **4.1.2 Name, Role, Value** | Proper ARIA attributes on controls | axe-core scan |
 
 ### 6.2 Keyboard Navigation
 
-| Action               | Shortcut            | Context                     |
-| -------------------- | ------------------- | --------------------------- |
-| Navigate predictions | `Tab` / `Shift+Tab` | Training selection          |
-| Expand prediction    | `Enter` or `Space`  | When card focused           |
-| Select training      | `Enter`             | When [TRAIN] button focused |
-| Collapse all         | `Esc`               | Expanded predictions        |
-| Refresh predictions  | `F5` or `Ctrl+R`    | Training page               |
+| Action | Shortcut | Context |
+| --- | --- | --- |
+| Navigate predictions | `Tab` / `Shift+Tab` | Training selection |
+| Expand prediction | `Enter` or `Space` | When card focused |
+| Select training | `Enter` | When [TRAIN] button focused |
+| Collapse all | `Esc` | Expanded predictions |
+| Refresh predictions | `F5` or `Ctrl+R` | Training page |
 
 ### 6.3 Screen Reader Announcements
 
@@ -706,33 +706,33 @@ flowchart TD
 
 ### 7.1 Performance Targets
 
-| Metric                 | Target        | Measurement          |
-| ---------------------- | ------------- | -------------------- |
-| **Prediction Load**    | < 1.2 seconds | API response time    |
-| **Card Expansion**     | < 100ms       | Animation duration   |
-| **Training Execution** | < 800ms       | Database transaction |
-| **AI Recommendation**  | < 500ms       | With cache hit       |
-| **Page Load**          | < 2.0 seconds | Time to Interactive  |
+| Metric | Target | Measurement |
+| --- | --- | --- |
+| **Prediction Load** | < 1.2 seconds | API response time |
+| **Card Expansion** | < 100ms | Animation duration |
+| **Training Execution** | < 800ms | Database transaction |
+| **AI Recommendation** | < 500ms | With cache hit |
+| **Page Load** | < 2.0 seconds | Time to Interactive |
 
 ### 7.2 Optimization Strategies
 
-| Strategy               | Implementation                  | Impact                     |
-| ---------------------- | ------------------------------- | -------------------------- |
-| **Prediction Caching** | 5-minute Redis cache            | -70% API calls             |
-| **Lazy Expansion**     | Defer detail rendering          | -30% initial render        |
-| **Debounced Refresh**  | 300ms debounce on actions       | Reduced server load        |
-| **Optimistic UI**      | Show loading states immediately | Perceived performance +40% |
-| **Database Indexing**  | Indexed queries on predictions  | -60% query time            |
+| Strategy | Implementation | Impact |
+| --- | --- | --- |
+| **Prediction Caching** | 5-minute Redis cache | -70% API calls |
+| **Lazy Expansion** | Defer detail rendering | -30% initial render |
+| **Debounced Refresh** | 300ms debounce on actions | Reduced server load |
+| **Optimistic UI** | Show loading states immediately | Perceived performance +40% |
+| **Database Indexing** | Indexed queries on predictions | -60% query time |
 
 ### 7.3 Bundle Size Budget
 
-| Asset Type | Budget | Current | Status           |
-| ---------- | ------ | ------- | ---------------- |
-| JavaScript | 60 KB  | 55 KB   | ✅ Within budget |
-| CSS        | 25 KB  | 22 KB   | ✅ Within budget |
-| Fonts      | 15 KB  | 14 KB   | ✅ Within budget |
-| Images     | 80 KB  | 72 KB   | ✅ Within budget |
-| Total      | 180 KB | 163 KB  | ✅ Within budget |
+| Asset Type | Budget | Current | Status |
+| --- | --- | --- | --- |
+| JavaScript | 60 KB | 55 KB | ✅ Within budget |
+| CSS | 25 KB | 22 KB | ✅ Within budget |
+| Fonts | 15 KB | 14 KB | ✅ Within budget |
+| Images | 80 KB | 72 KB | ✅ Within budget |
+| Total | 180 KB | 163 KB | ✅ Within budget |
 
 ---
 
@@ -1044,12 +1044,12 @@ test.describe("WF-004: Accessibility", () => {
 
 ## 10. Version History
 
-| Version | Date       | Author           | Changes                                                                                                                                                                                                        |
-| ------- | ---------- | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2.3.0   | 2026-02-22 | Development Team | Updated version/dates, aligned technology references with current stack (Livewire 4, Neuron AI v2.11, GameTora/umapyoi.net) |
-| 2.2.0   | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: added complete training formula, facility level multipliers (1.0×-2.0×), support card presence bonus (+5% per card), stat soft cap at 1200, mood effects (+20%/-20% range) |
-| 2.0.0   | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added AI recommendations, red exclamation indicators, friendship training, risk confirmations, accessibility specifications, and testing requirements |
-| 1.0.0   | 2026-01-14 | Development Team | Initial wireframe specification                                                                                                                                                                                |
+| Version | Date | Author | Changes |
+| --- | --- | --- | --- |
+| 2.3.0 | 2026-02-22 | Development Team | Updated version/dates, aligned technology references with current stack (Livewire 4, Neuron AI v2.11, GameTora/umapyoi.net) |
+| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: added complete training formula, facility level multipliers (1.0×-2.0×), support card presence bonus (+5% per card), stat soft cap at 1200, mood effects (+20%/-20% range) |
+| 2.0.0 | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added AI recommendations, red exclamation indicators, friendship training, risk confirmations, accessibility specifications, and testing requirements |
+| 1.0.0 | 2026-01-14 | Development Team | Initial wireframe specification |
 
 ---
 

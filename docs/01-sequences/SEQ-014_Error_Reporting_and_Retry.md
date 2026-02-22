@@ -3,7 +3,7 @@
 ## Umamusume Pretty Derby Career Planner
 
 **Document Version**: 2.2.0  
-**Date**: February 22, 2026  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-007], [SPEC-007], [FLOW-007], [TECH-FLOW-007]
 
 ---
@@ -80,7 +80,7 @@ Error reporting and retry mechanisms ensure:
 ### 2.1 System Components
 
 | Component | Type | Responsibility |
-| --------- | ---- | -------------- |
+| --- | --- | --- |
 | **Application** | Core | Executes business logic |
 | **Exception Handler** | Infrastructure | Global exception handling |
 | **Game Validator** | Domain | Game-specific validation rules |
@@ -233,7 +233,7 @@ sequenceDiagram
 ### 3.2 Timeline Breakdown
 
 | Phase | Duration | Description |
-| ----- | -------- | ----------- |
+| --- | --- | --- |
 | **Game Validation** | ~5ms | Game-specific rule checks |
 | **Auto-Correction** | ~2ms | Apply known fixes |
 | **Exception Thrown** | ~1ms | Error detection |
@@ -497,7 +497,7 @@ class AIProviderException extends Exception
 #### 5.1.1 Aptitude Grade Validation
 
 | Field | Valid Values | Invalid Values | Auto-Correction |
-| ----- | ------------ | -------------- | --------------- |
+| --- | --- | --- | --- |
 | Distance Aptitude | G, F, E, D, C, B, A, S | SS, SSS, or numeric | SS → S |
 | Surface Aptitude | G, F, E, D, C, B, A, S | SS, SSS, or numeric | SS → S |
 | Running Style Aptitude | G, F, E, D, C, B, A, S | SS, SSS, or numeric | SS → S |
@@ -507,7 +507,7 @@ class AIProviderException extends Exception
 #### 5.1.2 Stat Range Validation
 
 | Stat | Valid Range | Warning Range | Error Threshold |
-| ---- | ----------- | ------------- | --------------- |
+| --- | --- | --- | --- |
 | Speed | 0-1200 | 1201-1600 | >1600 |
 | Stamina | 0-1200 | 1201-1600 | >1600 |
 | Power | 0-1200 | 1201-1600 | >1600 |
@@ -519,7 +519,7 @@ class AIProviderException extends Exception
 #### 5.1.3 Hint Level Validation
 
 | Field | Valid Values | Description |
-| ----- | ------------ | ----------- |
+| --- | --- | --- |
 | Hint Level | 1, 2, 3, 4, 5 | Number of hints obtained for a skill |
 
 **Discount Calculation:**
@@ -533,7 +533,7 @@ class AIProviderException extends Exception
 #### 5.1.4 Support Card Validation
 
 | Field | Valid Values | Description |
-| ----- | ------------ | ----------- |
+| --- | --- | --- |
 | Card Type | Speed, Stamina, Power, Guts, Wit, Friend, Group | Support card specialization |
 | Limit Break | 0, 1, 2, 3, 4 | Number of limit breaks (0-4 stars) |
 | Bond Level | 0-100 | Bond percentage with support card |
@@ -541,7 +541,7 @@ class AIProviderException extends Exception
 #### 5.1.5 Turn and Career Validation
 
 | Field | Valid Range | Description |
-| ----- | ----------- | ----------- |
+| --- | --- | --- |
 | Turn Number | 1-78 | Career run turn (Junior Year 1 to Senior Year end) |
 | Bond Percentage | 0-100 | Support card bond level |
 | SP Balance | ≥0 | Skill points cannot be negative |
@@ -1087,7 +1087,7 @@ class CalculationValidator
 ### 7.1 Error Categories
 
 | Category | Retry Strategy | Alert Level | Examples |
-| -------- | -------------- | ----------- | -------- |
+| --- | --- | --- | --- |
 | Game Validation | No retry (user fix) | Info | Invalid aptitude, stat out of range |
 | Auto-Correctable | Auto-correct + warn | Debug | SS → S aptitude correction |
 | Data Integrity | No retry | Warning | Negative SP, invalid turn number |
@@ -1100,7 +1100,7 @@ class CalculationValidator
 ### 7.2 Game-Specific Error Codes
 
 | Code | Description | Recovery Action |
-| ---- | ----------- | --------------- |
+| --- | --- | --- |
 | `APTITUDE_INVALID` | Invalid aptitude grade | Auto-correct if SS, else prompt user |
 | `APTITUDE_SS_REJECTED` | SS grade not valid | Auto-correct to S |
 | `STAT_OUT_OF_RANGE` | Stat exceeds 1600 | Reject, prompt user |
@@ -1157,7 +1157,7 @@ flowchart TD
 ### 7.4 Backoff Strategies
 
 | Strategy | Formula | Example (attempts 1-5) |
-| -------- | ------- | ---------------------- |
+| --- | --- | --- |
 | Exponential | `base^attempt * initial` | 10s, 20s, 40s, 80s, 160s |
 | Linear | `attempt * increment` | 30s, 60s, 90s, 120s, 150s |
 | Fibonacci | `fib(attempt) * base` | 10s, 10s, 20s, 30s, 50s |
@@ -1170,7 +1170,7 @@ flowchart TD
 ### 8.1 Auto-Correction Rules
 
 | Issue | Detection | Auto-Correction | User Notification |
-| ----- | --------- | --------------- | ----------------- |
+| --- | --- | --- | --- |
 | SS Aptitude | Grade = "SS" or "SSS" | Convert to "S" | Warning toast |
 | Lowercase Aptitude | Grade is lowercase | Convert to uppercase | Silent |
 | Whitespace in Grade | Grade has spaces | Trim whitespace | Silent |
@@ -1426,7 +1426,7 @@ class ErrorLoggingService
 ### 9.1 Performance Metrics
 
 | Operation | Target | Current | Status |
-| --------- | ------ | ------- | ------ |
+| --- | --- | --- | --- |
 | Game validation | <5ms | ~3ms | ✅ Met |
 | Auto-correction | <2ms | ~1ms | ✅ Met |
 | Exception handling | <10ms | ~8ms | ✅ Met |
@@ -1495,7 +1495,7 @@ CREATE INDEX idx_snapshots_career_run ON career_run_snapshots(career_run_id, is_
 ### 9.4 Log Retention
 
 | Log Type | Retention | Cleanup Strategy |
-| -------- | --------- | ---------------- |
+| --- | --- | --- |
 | Error logs | 30 days | Daily rotation |
 | Validation errors | 7 days | Aggregated to metrics |
 | Auto-corrections | 14 days | Archived for analysis |
@@ -1510,7 +1510,7 @@ CREATE INDEX idx_snapshots_career_run ON career_run_snapshots(career_run_id, is_
 ### 10.1 System Documentation
 
 | Document | Description |
-| -------- | ----------- |
+| --- | --- |
 | [PRD-007](../prds/PRD-007_External_Integration.md) | Product requirements for external integration |
 | [SPEC-007](../specs/SPEC-007_External_Integration_Technical.md) | Technical specification for integration system |
 | [FLOW-007](../flows/FLOW-007_External_Integration_System.md) | System flow for external operations |
@@ -1519,7 +1519,7 @@ CREATE INDEX idx_snapshots_career_run ON career_run_snapshots(career_run_id, is_
 ### 10.2 Related Sequences
 
 | Sequence | Description |
-| -------- | ----------- |
+| --- | --- |
 | [SEQ-006](SEQ-006_AI_Advice_Generation.md) | AI advice (error handling) |
 | [SEQ-007](SEQ-007_External_Data_Sync.md) | External sync (retry logic) |
 | [SEQ-008](SEQ-008_Notification_Delivery.md) | Notifications (alert delivery) |
@@ -1527,7 +1527,7 @@ CREATE INDEX idx_snapshots_career_run ON career_run_snapshots(career_run_id, is_
 ### 10.3 Configuration Documentation
 
 | Config File | Description |
-| ----------- | ----------- |
+| --- | --- |
 | `config/logging.php` | Laravel logging configuration |
 | `config/queue.php` | Queue and retry configuration |
 | `config/app.php` | Error reporting settings |
@@ -1536,7 +1536,7 @@ CREATE INDEX idx_snapshots_career_run ON career_run_snapshots(career_run_id, is_
 ### 10.4 Game Mechanics Reference
 
 | Reference | Description |
-| --------- | ----------- |
+| --- | --- |
 | Global English Server | Primary game server for validation rules |
 | Aptitude System | G-S grades (no SS in Global) |
 | Stat Caps | 1200 soft cap, 1600 hard limit |
@@ -1550,15 +1550,15 @@ CREATE INDEX idx_snapshots_career_run ON career_run_snapshots(career_run_id, is_
 ### Version History
 
 | Version | Date | Author | Changes |
-| ------- | ---- | ------ | ------- |
-| 2.2.0 | 2026-02-22 | Development Team | Updated with verified game mechanics from Global English Server - added aptitude validation (G-S only), hint level validation (1-5), stat range validation, support card validation, calculation error handling, auto-correction strategies, and recovery workflows |
+| --- | --- | --- | --- |
+| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server - added aptitude validation (G-S only), hint level validation (1-5), stat range validation, support card validation, calculation error handling, auto-correction strategies, and recovery workflows |
 | 2.0.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 implementation; added detailed sequence flows, retry strategies, APM integration, performance metrics, and aligned with current Laravel 12 architecture |
 | 1.0.0 | 2026-01-14 | Development Team | Initial draft |
 
 ### Approval
 
 | Role | Name | Signature | Date |
-| ---- | ---- | --------- | ---- |
+| --- | --- | --- | --- |
 | Technical Lead | | | |
 | QA Lead | | | |
 

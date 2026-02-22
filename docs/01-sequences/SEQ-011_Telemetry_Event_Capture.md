@@ -3,7 +3,7 @@
 ## Umamusume Pretty Derby Career Planner
 
 **Document Version**: 2.2.0  
-**Date**: February 22, 2026  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-007], [SPEC-007], [FLOW-007], [TECH-FLOW-007]
 
 ---
@@ -78,13 +78,13 @@ Telemetry enables:
 ### 2.1 System Components
 
 | Component | Type | Responsibility |
-|-----------|------|----------------|
+| --- | --- | --- |
 | **User** | Actor | Performs actions that generate events |
 | **Frontend** | Presentation | Alpine.js event listeners and collectors |
 | **TelemetryService** | Domain Service | Event collection and batching |
 | **GameEventTracker** | Domain Service | Game-specific event tracking |
 | **PerformanceMonitor** | Infrastructure | Performance metrics tracking |
-| **CostTrackingService** | Domain Service | AI usage and cost logging |
+| **AICostTracker** | Domain Service | AI usage and cost logging |
 | **MCPMonitoringService** | Domain Service | MCP tool usage tracking |
 | **AuditLogger** | Infrastructure | Security and compliance logging |
 | **Database** | Infrastructure | MySQL/MariaDB event storage |
@@ -102,7 +102,7 @@ app/
 │   │   ├── EventBatcher.php
 │   │   └── GameEventTracker.php
 │   ├── AI/
-│   └── CostTrackingService.php
+│   │   └── AICostTracker.php
 │   ├── MCP/
 │   │   └── MCPMonitoringService.php
 │   └── Security/
@@ -132,7 +132,7 @@ sequenceDiagram
     participant Controller
     participant TelemetrySvc as TelemetryService
     participant GameTracker as GameEventTracker
-    participant AITracker as CostTrackingService
+    participant AITracker as AICostTracker
     participant MCPMonitor as MCPMonitoringService
     participant Audit as AuditLogger
     participant Queue as Redis Queue
@@ -190,7 +190,7 @@ sequenceDiagram
 ### 3.2 Timeline Breakdown
 
 | Phase | Duration | Description |
-|-------|----------|-------------|
+| --- | --- | --- |
 | **User Action** | Variable | User performs action |
 | **Event Capture** | ~10ms | Frontend tracks event |
 | **Buffer Management** | ~5ms | Add to local buffer |
@@ -428,8 +428,8 @@ class ProcessTelemetryBatch implements ShouldQueue
 **Cost Tracker Service:**
 
 ```php
-// CostTrackingService.php
-class CostTrackingService
+// AICostTracker.php
+class AICostTracker
 {
     public function track(
         string $provider,
@@ -1207,7 +1207,7 @@ sequenceDiagram
 ### 7.1 Validation Errors
 
 | Error Code | Condition | HTTP Status | User Message |
-|------------|-----------|-------------|--------------|
+| --- | --- | --- | --- |
 | `TEL_001` | Invalid event name | 422 | "Unknown event type" |
 | `TEL_002` | Missing required field | 422 | "Event missing required field: {field}" |
 | `TEL_003` | Stale event | 422 | "Event timestamp too old" |
@@ -1253,7 +1253,7 @@ sequenceDiagram
 ### 7.3 Retry Strategy
 
 | Error Type | Retry Attempts | Backoff | Max Age |
-|------------|----------------|---------|---------|
+| --- | --- | --- | --- |
 | Network error | 3 | Exponential (1s, 2s, 4s) | 1 hour |
 | Queue full | 5 | Linear (30s intervals) | 5 minutes |
 | Processing error | 3 | Exponential (1min, 5min, 15min) | 1 hour |
@@ -1266,7 +1266,7 @@ sequenceDiagram
 ### 8.1 Performance Metrics
 
 | Operation | Target | Current | Status |
-|-----------|--------|---------|--------|
+| --- | --- | --- | --- |
 | Event capture (client) | <10ms | ~8ms | ✅ Met |
 | Batch API response | <100ms | ~75ms | ✅ Met |
 | Queue job processing | <500ms | ~350ms | ✅ Met |
@@ -1301,7 +1301,7 @@ TelemetryEvent::insert($records->toArray());
 ### 8.3 Data Retention
 
 | Data Type | Retention | Cleanup Strategy |
-|-----------|-----------|------------------|
+| --- | --- | --- |
 | Telemetry events | 90 days | Scheduled job |
 | Game events | 1 year | Scheduled job |
 | AI usage logs | 1 year | Scheduled job |
@@ -1331,7 +1331,7 @@ class CleanupTelemetryData extends Command
 ### 8.4 Privacy Compliance
 
 | Requirement | Implementation |
-|-------------|----------------|
+| --- | --- |
 | User consent | Telemetry opt-out in settings |
 | Data anonymization | Remove PII from events |
 | Right to erasure | Delete user's telemetry on request |
@@ -1344,7 +1344,7 @@ class CleanupTelemetryData extends Command
 ### 9.1 System Documentation
 
 | Document | Description |
-|----------|-------------|
+| --- | --- |
 | [PRD-007](../prds/PRD-007_External_Integration.md) | Product requirements for external integration |
 | [SPEC-007](../specs/SPEC-007_External_Integration_Technical.md) | Technical specification for integration system |
 | [FLOW-007](../flows/FLOW-007_External_Integration_System.md) | System flow for external operations |
@@ -1353,7 +1353,7 @@ class CleanupTelemetryData extends Command
 ### 9.2 Related Sequences
 
 | Sequence | Description |
-|----------|-------------|
+| --- | --- |
 | [SEQ-006](SEQ-006_AI_Advice_Generation.md) | AI advice (cost tracking) |
 | [SEQ-007](SEQ-007_External_Data_Sync.md) | External APIs (metrics tracking) |
 | [SEQ-009](SEQ-009_User_Profile_Update.md) | Profile updates (audit logging) |
@@ -1361,7 +1361,7 @@ class CleanupTelemetryData extends Command
 ### 9.3 Configuration Documentation
 
 | Config File | Description |
-|-------------|-------------|
+| --- | --- |
 | `config/telemetry.php` | Telemetry configuration |
 | `config/queue.php` | Queue configuration |
 | `config/logging.php` | Logging configuration |
@@ -1369,7 +1369,7 @@ class CleanupTelemetryData extends Command
 ### 9.4 Game Mechanics Reference
 
 | Source | Description |
-|--------|-------------|
+| --- | --- |
 | [Game8.co](https://game8.co/games/Umamusume-Pretty-Derby/) | Comprehensive English guides |
 | [UmaReference.com](https://www.umareference.com/) | Technical mechanics documentation |
 | [GameTora.com](https://gametora.com/umamusume/) | Community tools and calculators |
@@ -1381,15 +1381,15 @@ class CleanupTelemetryData extends Command
 ### Version History
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 2.2.0 | 2026-02-22 | Development Team | Updated with verified game mechanics from Global English Server - added correct stat breakpoints (901/1200/1600), hint level tracking (1-5 with 10%/20%/30%/35%/40% discounts), bond mechanics (+7 base, +9 with Charming), track condition penalties, class promotion thresholds, and comprehensive game event tracking |
+| --- | --- | --- | --- |
+| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server - added correct stat breakpoints (901/1200/1600), hint level tracking (1-5 with 10%/20%/30%/35%/40% discounts), bond mechanics (+7 base, +9 with Charming), track condition penalties, class promotion thresholds, and comprehensive game event tracking |
 | 2.0.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 implementation; added detailed sequence flows, AI cost tracking, MCP monitoring, audit logging, performance metrics, and aligned with current Laravel 12 architecture |
 | 1.0.0 | 2026-01-14 | Development Team | Initial draft |
 
 ### Approval
 
 | Role | Name | Signature | Date |
-|------|------|-----------|------|
+| --- | --- | --- | --- |
 | Technical Lead | | | |
 | QA Lead | | | |
 

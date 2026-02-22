@@ -3,7 +3,7 @@
 ## Umamusume Pretty Derby Career Planner
 
 **Document Version**: 2.2.0  
-**Date**: February 22, 2026  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-001], [SPEC-001], [FLOW-001]
 
 ---
@@ -67,7 +67,7 @@ Inventory management is critical for:
 ### 2.1 System Components
 
 | Component | Type | Responsibility |
-|-----------|------|----------------|
+| --- | --- | --- |
 | **User** | Actor | Initiates inventory transactions |
 | **Livewire Component** | Presentation | `SupportCardManager.php`, `SkillShop.php` - Inventory UI |
 | **InventoryController** | Application | Orchestrates inventory operations |
@@ -175,7 +175,7 @@ sequenceDiagram
 ### 3.2 Timeline Breakdown
 
 | Phase | Duration | Description |
-|-------|----------|-------------|
+| --- | --- | --- |
 | **User Action** | Variable | User initiates transaction |
 | **Authorization** | ~20ms | Verify user permissions |
 | **Validation** | ~50ms | Check balances and rules |
@@ -195,7 +195,7 @@ sequenceDiagram
 **Supported Transaction Types:**
 
 | Type | Description | Example |
-|------|-------------|---------|
+| --- | --- | --- |
 | `sp_earn` | Earn skill points from races | Race reward: +75 SP |
 | `sp_spend` | Purchase skills | Skill acquisition: -120 SP |
 | `material_add` | Acquire support card duplicates | Gacha: +1 duplicate |
@@ -573,7 +573,7 @@ class AuditLogger
 ### 6.1 Validation Errors
 
 | Error Code | Condition | HTTP Status | User Message |
-|------------|-----------|-------------|--------------|
+| --- | --- | --- | --- |
 | `INV_001` | Invalid transaction type | 422 | "Invalid transaction type" |
 | `INV_002` | Invalid amount | 422 | "Amount must be positive for add transactions" |
 | `INV_003` | Empty items array | 422 | "Items cannot be empty for material/item transactions" |
@@ -618,7 +618,7 @@ sequenceDiagram
 ### 6.3 Transaction Rollback Scenarios
 
 | Scenario | Trigger | Recovery |
-|----------|---------|----------|
+| --- | --- | --- |
 | Constraint violation | Invalid foreign key | Rollback, display error |
 | Negative balance | Insufficient funds | Rollback, display error |
 | Deadlock | Concurrent transaction | Rollback, retry with delay |
@@ -631,7 +631,7 @@ sequenceDiagram
 ### 7.1 Performance Metrics
 
 | Operation | Target | Current | Status |
-|-----------|--------|---------|--------|
+| --- | --- | --- | --- |
 | Transaction validation | <50ms | ~40ms | ✅ Met |
 | Database lock acquisition | <30ms | ~25ms | ✅ Met |
 | Balance calculation | <20ms | ~15ms | ✅ Met |
@@ -710,7 +710,7 @@ DB::transaction(function () use ($career) {
 ### 8.1 System Documentation
 
 | Document | Description |
-|----------|-------------|
+| --- | --- |
 | [PRD-001](../prds/PRD-001_Character_Management.md) | Product requirements for character management |
 | [SPEC-001](../specs/SPEC-001_Character_Management_Technical.md) | Technical specification for character system |
 | [FLOW-001](../flows/FLOW-001_Character_Management_System.md) | System flow for character operations |
@@ -718,14 +718,14 @@ DB::transaction(function () use ($career) {
 ### 8.2 Related Sequences
 
 | Sequence | Description |
-|----------|-------------|
+| --- | --- |
 | [SEQ-003](SEQ-003_Skill_Acquisition_and_Upgrade.md) | Skill acquisition (uses SP from inventory) |
 | [SEQ-005](SEQ-005_Support_Card_Upgrade.md) | Support card upgrade (uses materials from inventory) |
 
 ### 8.3 Database Documentation
 
 | Document | Description |
-|----------|-------------|
+| --- | --- |
 | [DBD-009](../009_DBD_Database_Documentation.md) | Complete database schema documentation |
 
 ---
@@ -735,14 +735,14 @@ DB::transaction(function () use ($career) {
 ### Version History
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
+| --- | --- | --- | --- |
 | 2.0.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 implementation; added detailed sequence flows, transaction atomicity, audit logging, performance metrics, and aligned with current Laravel 12 architecture |
 | 1.0.0 | 2026-01-14 | Development Team | Initial draft |
 
 ### Approval
 
 | Role | Name | Signature | Date |
-|------|------|-----------|------|
+| --- | --- | --- | --- |
 | Technical Lead | | | |
 | QA Lead | | | |
 

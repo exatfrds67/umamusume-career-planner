@@ -2,17 +2,17 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0
-**Date**: February 22, 2026
+**Document Version**: 2.2.1
+**Date**: January 28, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Updated with verified codebase references (SupportCardDeckService, SupportCardMetaService, DeckManagementService)
+**Status**: Current - Updated with verified game mechanics from Global English Server
 
 ---
 
 ## 1. Support Card Collection Management Flow
 
-This flow details how `SupportCardDeckService` and `SupportCardMetaService` manage the user's inventory, including synchronization with external game data sources.
+This flow details how `SupportCardService` manages the user's inventory, including synchronization with external game data sources.
 
 ```mermaid
 flowchart TD
@@ -45,7 +45,7 @@ flowchart TD
 
 ## 2. Deck Building & Optimization Flow
 
-The process for creating valid support decks via `SupportDeckService` and `DeckManagementService`, enforcing game rules (5 owned + 1 borrowed).
+The process for creating valid support decks via `SupportDeckService`, enforcing game rules (5 owned + 1 borrowed).
 
 ```mermaid
 flowchart TD
@@ -76,7 +76,7 @@ flowchart TD
 
 ## 3. Bond Progression & Training Flow (Game-Accurate)
 
-How support card bonds are tracked and utilized during the training loop, managed by `BondProgressionService` (in `Training/`).
+How support card bonds are tracked and utilized during the training loop.
 
 ```mermaid
 flowchart TD
@@ -109,32 +109,32 @@ flowchart TD
 ### 3.1 Bond Gain Values (Game-Accurate)
 
 | Condition | Bond Gain per Training |
-|-----------|------------------------|
-| Normal    | +7                     |
-| Charming  | +9                     |
+| --- | --- |
+| Normal | +7 |
+| Charming | +9 |
 
 ### 3.2 Friendship Training Mechanics
 
 | Threshold | Effect |
-|-----------|--------|
+| --- | --- |
 | **80%** (Friendship Threshold) | Unlocks Friendship Training bonus |
 
 ### 3.3 Friendship Training Bonus by Card Rarity
 
 | Card Rarity | Friendship Bonus |
-|-------------|------------------|
-| R           | +10%             |
-| SR          | +15%             |
-| SSR (0 LB)  | +20%             |
-| SSR (1 LB)  | +25%             |
-| SSR (2 LB)  | +30%             |
-| SSR (3+ LB) | +35% (max)       |
+| --- | --- |
+| R | +10% |
+| SR | +15% |
+| SSR (0 LB) | +20% |
+| SSR (1 LB) | +25% |
+| SSR (2 LB) | +30% |
+| SSR (3+ LB) | +35% (max) |
 
 ---
 
 ## 4. Meta Tier Synchronization Flow
 
-The integration flow for keeping support card meta rankings up to date via `ExternalAPIService` and `SupportCardEnrichmentService`.
+The integration flow for keeping support card meta rankings up to date via `ExternalAPIService`.
 
 ```mermaid
 flowchart TD
@@ -288,7 +288,7 @@ flowchart TD
 ### 8.1 Data Model (NEW Tables)
 
 | Table | Purpose |
-|-------|---------|
+| --- | --- |
 | `ucp_support_decks` | Deck metadata (name, description, is_active, synergy_score) |
 | `ucp_support_deck_cards` | Card-to-deck relationships (slot_position, limit_break_level, is_borrowed) |
 | `ucp_support_card_definitions` | Master card templates for borrowed cards |
@@ -305,13 +305,12 @@ Support cards now track external data sources:
 
 ## Document Control
 
-| Version | Date       | Author           | Changes |
-|---------|------------|------------------|---------|
-| 2.3.0   | 2026-02-22 | Development Team | Updated service references: SupportCardDeckService, SupportCardMetaService, SupportCardEnrichmentService, DeckManagementService, BondProgressionService (Training/); aligned with actual codebase structure |
-| 2.2.1   | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: Bond gain corrected (+7 base, +9 with Charming condition), friendship threshold confirmed at 80%, friendship bonus table by card rarity (10-35%), skill hint mechanics alignment |
-| 2.2.0   | 2026-01-27 | Development Team | Added §8 Support Deck Persistence Flow with new tables and external sync |
-| 2.1.0   | 2026-01-24 | Development Team | Updated to align with v2.0.0 codebase, External API sync, and Service layer architecture |
-| 1.0.0   | 2026-01-14 | Development Team | Initial flow definitions |
+| Version | Date | Author | Changes |
+| --- | --- | --- | --- |
+| 2.2.1 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: Bond gain corrected (+7 base, +9 with Charming condition), friendship threshold confirmed at 80%, friendship bonus table by card rarity (10-35%), skill hint mechanics alignment |
+| 2.2.0 | 2026-01-27 | Development Team | Added §8 Support Deck Persistence Flow with new tables and external sync |
+| 2.1.0 | 2026-01-24 | Development Team | Updated to align with v2.0.0 codebase, External API sync, and Service layer architecture |
+| 1.0.0 | 2026-01-14 | Development Team | Initial flow definitions |
 
 ---
 

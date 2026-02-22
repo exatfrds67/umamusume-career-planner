@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0  
-**Date**: February 22, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-005], [SPEC-005], [FLOW-005], [SEQ-005]
 
 **Source Specs**:
@@ -31,16 +31,16 @@ The Support Deck Builder enables players to construct, validate, and optimize th
 
 ### 1.2 Key Objectives
 
-| Objective                 | Description                                                                    |
-| ------------------------- | ------------------------------------------------------------------------------ |
-| **Deck Composition**      | Build valid 6-card decks with any type combination                             |
-| **Presence Bonus**        | Track support card presence bonus (+5% per card in training, max +30%)         |
-| **Synergy Analysis**      | Real-time scoring for training concentration and skill hint coverage           |
-| **Meta Integration**      | Leverage meta tier rankings for optimal builds                                 |
-| **Quick Optimization**    | AI-powered auto-optimize functionality                                         |
-| **Multi-Deck Management** | Save and switch between multiple deck configurations                           |
+| Objective | Description |
+| --- | --- |
+| **Deck Composition** | Build valid 6-card decks with any type combination |
+| **Presence Bonus** | Track support card presence bonus (+5% per card in training, max +30%) |
+| **Synergy Analysis** | Real-time scoring for training concentration and skill hint coverage |
+| **Meta Integration** | Leverage meta tier rankings for optimal builds |
+| **Quick Optimization** | AI-powered auto-optimize functionality |
+| **Multi-Deck Management** | Save and switch between multiple deck configurations |
 
-### 1.3 Game-Accurate Mechanics (Global English Server - Feb 2026)
+### 1.3 Game-Accurate Mechanics (Global English Server - Jan 2026)
 
 #### 1.3.1 Deck Composition Rules
 
@@ -64,12 +64,12 @@ The Support Deck Builder enables players to construct, validate, and optimize th
 
 #### 1.3.3 Deck Synergy Considerations
 
-| Factor                      | Impact                                                         |
-| --------------------------- | -------------------------------------------------------------- |
-| **Training Concentration**  | Multiple cards of same type = faster facility leveling         |
-| **Skill Hint Coverage**     | Diverse hints for target build optimization                    |
-| **Bond Management**         | Balance bond building across all 6 cards                       |
-| **Event Chain Optimization**| Maximize beneficial event triggers                             |
+| Factor | Impact |
+| --- | --- |
+| **Training Concentration** | Multiple cards of same type = faster facility leveling |
+| **Skill Hint Coverage** | Diverse hints for target build optimization |
+| **Bond Management** | Balance bond building across all 6 cards |
+| **Event Chain Optimization** | Maximize beneficial event triggers |
 
 #### 1.3.4 Card Selection Criteria
 
@@ -82,16 +82,16 @@ The Support Deck Builder enables players to construct, validate, and optimize th
 
 ### 1.4 User Stories
 
-| ID     | User Story                                                                  | Priority |
-| ------ | --------------------------------------------------------------------------- | -------- |
-| US-001 | As a player, I want to build a 6-card support deck with validation feedback | P0       |
-| US-002 | As a player, I want to see deck synergy scores and recommendations          | P1       |
-| US-003 | As a player, I want to save multiple deck configurations                    | P1       |
-| US-004 | As a player, I want AI to auto-optimize my deck for my goals                | P1       |
-| US-005 | As a player, I want to share my deck composition with others                | P2       |
-| US-006 | As a player, I want to see the presence bonus calculation for my deck       | P1       |
-| US-007 | As a player, I want to see limit break levels (★-★★★★★) for each card       | P0       |
-| US-008 | As a player, I want to see card type distribution for training focus        | P1       |
+| ID | User Story | Priority |
+| --- | --- | --- |
+| US-001 | As a player, I want to build a 6-card support deck with validation feedback | P0 |
+| US-002 | As a player, I want to see deck synergy scores and recommendations | P1 |
+| US-003 | As a player, I want to save multiple deck configurations | P1 |
+| US-004 | As a player, I want AI to auto-optimize my deck for my goals | P1 |
+| US-005 | As a player, I want to share my deck composition with others | P2 |
+| US-006 | As a player, I want to see the presence bonus calculation for my deck | P1 |
+| US-007 | As a player, I want to see limit break levels (★-★★★★★) for each card | P0 |
+| US-008 | As a player, I want to see card type distribution for training focus | P1 |
 
 ---
 
@@ -266,7 +266,7 @@ class DeckOverview extends Component
 
     /**
      * Calculate presence bonus: +5% per card in training, max +30%
-     * Game-accurate mechanic from Global English Server (Feb 2026)
+     * Game-accurate mechanic from Global English Server (Jan 2026)
      */
     private function calculatePresenceBonus($cards): array
     {
@@ -707,7 +707,7 @@ class DeckValidator extends Component
 class DeckOptimizationService
 {
     /**
-     * Optimize deck based on game-accurate mechanics (Global English Server Feb 2026)
+     * Optimize deck based on game-accurate mechanics (Global English Server Jan 2026)
      * 
      * Key considerations:
      * - 6 slots total, any type combination allowed
@@ -1015,12 +1015,12 @@ sequenceDiagram
 
 ### 4.3 Cache Strategy
 
-| Data Type            | Cache Key                 | TTL        | Invalidation       |
-| -------------------- | ------------------------- | ---------- | ------------------ |
-| Deck cards           | `deck:cards:{deck_id}`    | 5 minutes  | On card add/remove |
-| Synergy score        | `deck:synergy:{deck_id}`  | 10 minutes | On deck change     |
-| Optimization results | `deck:optimize:{deck_id}` | 15 minutes | On goals change    |
-| Card library         | `cards:user:{user_id}`    | 1 hour     | On card update     |
+| Data Type | Cache Key | TTL | Invalidation |
+| --- | --- | --- | --- |
+| Deck cards | `deck:cards:{deck_id}` | 5 minutes | On card add/remove |
+| Synergy score | `deck:synergy:{deck_id}` | 10 minutes | On deck change |
+| Optimization results | `deck:optimize:{deck_id}` | 15 minutes | On goals change |
+| Card library | `cards:user:{user_id}` | 1 hour | On card update |
 
 ---
 
@@ -1106,28 +1106,28 @@ flowchart TD
 
 ### 6.1 WCAG 2.2 AA Compliance
 
-| Criterion                           | Implementation                              | Test Method             |
-| ----------------------------------- | ------------------------------------------- | ----------------------- |
-| **1.1.1 Non-text Content**          | All card images have descriptive `alt` text | Screen reader testing   |
-| **1.4.3 Contrast Ratio**            | 4.5:1 minimum for text                      | Color contrast analyzer |
-| **2.1.1 Keyboard**                  | All deck operations keyboard accessible     | Keyboard-only testing   |
-| **2.4.3 Focus Order**               | Logical tab order through slots             | Tab key traversal       |
-| **2.4.7 Focus Visible**             | Clear focus indicators on cards             | Visual inspection       |
-| **3.2.4 Consistent Identification** | Consistent card status badges               | Manual review           |
-| **4.1.2 Name, Role, Value**         | Proper ARIA attributes on controls          | axe-core scan           |
+| Criterion | Implementation | Test Method |
+| --- | --- | --- |
+| **1.1.1 Non-text Content** | All card images have descriptive `alt` text | Screen reader testing |
+| **1.4.3 Contrast Ratio** | 4.5:1 minimum for text | Color contrast analyzer |
+| **2.1.1 Keyboard** | All deck operations keyboard accessible | Keyboard-only testing |
+| **2.4.3 Focus Order** | Logical tab order through slots | Tab key traversal |
+| **2.4.7 Focus Visible** | Clear focus indicators on cards | Visual inspection |
+| **3.2.4 Consistent Identification** | Consistent card status badges | Manual review |
+| **4.1.2 Name, Role, Value** | Proper ARIA attributes on controls | axe-core scan |
 
 ### 6.2 Keyboard Navigation
 
-| Action                | Shortcut                | Context           |
-| --------------------- | ----------------------- | ----------------- |
-| Navigate slots        | `Arrow Keys`            | Deck grid         |
-| Select card for slot  | `Enter`                 | When slot focused |
+| Action | Shortcut | Context |
+| --- | --- | --- |
+| Navigate slots | `Arrow Keys` | Deck grid |
+| Select card for slot | `Enter` | When slot focused |
 | Remove card from slot | `Delete` or `Backspace` | When card focused |
-| Open card library     | `L`                     | Deck builder      |
-| Auto-optimize deck    | `O`                     | Deck builder      |
-| Save deck             | `Ctrl+S`                | Deck builder      |
-| Search cards          | `/`                     | Card library      |
-| Toggle analysis view  | `A`                     | Deck builder      |
+| Open card library | `L` | Deck builder |
+| Auto-optimize deck | `O` | Deck builder |
+| Save deck | `Ctrl+S` | Deck builder |
+| Search cards | `/` | Card library |
+| Toggle analysis view | `A` | Deck builder |
 
 ### 6.3 Screen Reader Announcements
 
@@ -1160,32 +1160,32 @@ flowchart TD
 
 ### 7.1 Performance Targets
 
-| Metric                  | Target        | Measurement          |
-| ----------------------- | ------------- | -------------------- |
-| **Page Load**           | < 1.5 seconds | Time to first render |
-| **Card Selection**      | < 200ms       | Click to UI update   |
-| **Synergy Calculation** | < 300ms       | Analysis completion  |
-| **Auto-Optimize**       | < 2 seconds   | With AI reasoning    |
-| **Deck Save**           | < 500ms       | Database update      |
+| Metric | Target | Measurement |
+| --- | --- | --- |
+| **Page Load** | < 1.5 seconds | Time to first render |
+| **Card Selection** | < 200ms | Click to UI update |
+| **Synergy Calculation** | < 300ms | Analysis completion |
+| **Auto-Optimize** | < 2 seconds | With AI reasoning |
+| **Deck Save** | < 500ms | Database update |
 
 ### 7.2 Optimization Strategies
 
-| Strategy                 | Implementation                     | Impact               |
-| ------------------------ | ---------------------------------- | -------------------- |
-| **Lazy Loading**         | Virtual scrolling for card library | Handles 500+ cards   |
-| **Cached Synergies**     | Cache deck analysis (10min TTL)    | -80% recalculations  |
-| **Optimistic UI**        | Show changes immediately           | Perceived speed +40% |
-| **Batch Updates**        | Group card operations              | -60% query count     |
-| **Debounced Validation** | 300ms debounce on deck changes     | Reduced re-renders   |
+| Strategy | Implementation | Impact |
+| --- | --- | --- |
+| **Lazy Loading** | Virtual scrolling for card library | Handles 500+ cards |
+| **Cached Synergies** | Cache deck analysis (10min TTL) | -80% recalculations |
+| **Optimistic UI** | Show changes immediately | Perceived speed +40% |
+| **Batch Updates** | Group card operations | -60% query count |
+| **Debounced Validation** | 300ms debounce on deck changes | Reduced re-renders |
 
 ### 7.3 Bundle Size Budget
 
-| Asset Type | Budget | Current | Status           |
-| ---------- | ------ | ------- | ---------------- |
-| JavaScript | 50 KB  | 46 KB   | ✅ Within budget |
-| CSS        | 20 KB  | 18 KB   | ✅ Within budget |
-| Images     | 100 KB | 92 KB   | ✅ Within budget |
-| Total      | 170 KB | 156 KB  | ✅ Within budget |
+| Asset Type | Budget | Current | Status |
+| --- | --- | --- | --- |
+| JavaScript | 50 KB | 46 KB | ✅ Within budget |
+| CSS | 20 KB | 18 KB | ✅ Within budget |
+| Images | 100 KB | 92 KB | ✅ Within budget |
+| Total | 170 KB | 156 KB | ✅ Within budget |
 
 ---
 
@@ -1471,7 +1471,6 @@ test.describe("WF-011: Accessibility", () => {
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
-| 2.3.0 | 2026-02-22 | Development Team | Updated version/dates, aligned technology references with current stack (Livewire 4, Neuron AI v2.11, GameTora/umapyoi.net) |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server - corrected support card presence bonus (+5% per card, max +30%), added deck synergy indicators, updated card type descriptions, added limit break display (★ to ★★★★★), enhanced type distribution visualization |
 | 2.0.0 | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added deck overview, auto-optimization, validation system, accessibility specifications, and testing requirements |
 | 1.0.0 | 2026-01-14 | Development Team | Initial wireframe specification |

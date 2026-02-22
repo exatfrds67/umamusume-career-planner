@@ -996,7 +996,7 @@ sequenceDiagram
 ## Performance Benchmarks
 
 | Sequence | Target Duration | p95 Duration | Status |
-|----------|----------------|--------------|--------|
+| --- | --- | --- | --- |
 | SD-001 (Character Creation) | <500ms | 450ms | ✅ Met |
 | SD-002 (Training Prediction) | <1.2s | 1.1s | ✅ Met |
 | SD-003 (Training Execution) | <300ms | 280ms | ✅ Met |
@@ -1019,10 +1019,10 @@ sequenceDiagram
 
 ---
 
-**Document Control**
+### Document Control
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
+| --- | --- | --- | --- |
 | 2.0.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 implementation; added AI/MCP sequences; updated all flows to reflect Laravel 12 architecture |
 | 1.0.0 | 2026-01-14 | Development Team | Initial draft |
 

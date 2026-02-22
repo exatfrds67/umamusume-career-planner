@@ -1,4 +1,3 @@
-```markdown
 # UF-001: Onboarding Flow
 
 ## Umamusume Pretty Derby Career Planner
@@ -8,10 +7,12 @@
 **Related Documents**: [PRD-001], [SPEC-001], [SRS], [BRS]
 
 **Source Specifications**:
+
 - `.kiro/specs/umamusume-career-planner-main/requirements.md` (Onboarding Requirements)
 - `.kiro/specs/umamusume-career-planner-main/design.md` (Onboarding Flow)
 
 **Related Artifacts**:
+
 - PRD: [PRD-001](../prds/PRD-001_Character_Management.md)
 - SPEC: [SPEC-001](../specs/SPEC-001_Character_Management_Technical.md)
 - Flow: [FLOW-001](../flows/FLOW-001_Character_Management_System.md)
@@ -42,7 +43,7 @@ The onboarding flow introduces new users to the Umamusume Career Planner applica
 ### 1.2 Scope
 
 | Aspect | Description |
-|--------|-------------|
+| --- | --- |
 | **Entry Point** | First-time application launch or post-registration landing |
 | **Exit Point** | Dashboard with active career run or tutorial completion |
 | **Duration** | 5-15 minutes (depending on tutorial engagement) |
@@ -53,6 +54,7 @@ The onboarding flow introduces new users to the Umamusume Career Planner applica
 **Business Goal**: Minimize friction to first meaningful action (creating a career run) while educating users on key features.
 
 **Success Metrics**:
+
 - Time to first career creation: < 5 minutes
 - Tutorial completion rate: > 60%
 - Conversion from Local to Account mode: > 40%
@@ -173,7 +175,7 @@ stateDiagram-v2
 **User Actions**:
 
 | Action | Description | Next Step |
-|--------|-------------|-----------|
+| --- | --- | --- |
 | Enable Tutorial | Check tutorial toggle | Storage Mode Selection |
 | Disable Tutorial | Uncheck tutorial toggle | Storage Mode Selection |
 | Click "Get Started" | Proceed to next step | Storage Mode Selection |
@@ -217,7 +219,7 @@ stateDiagram-v2
 **Decision Matrix**:
 
 | User Scenario | Recommended Mode | Reason |
-|---------------|------------------|--------|
+| --- | --- | --- |
 | Quick testing | Local | No setup required |
 | Long-term tracking | Account | Data persistence |
 | Multi-device access | Account | Cloud sync |
@@ -301,7 +303,7 @@ class LocalStorageManager {
 **Form Fields**:
 
 | Field | Type | Validation | Required |
-|-------|------|------------|----------|
+| --- | --- | --- | --- |
 | Name | Text | Max 255 chars | Yes |
 | Email | Email | Valid format, unique | Yes |
 | Password | Password | Min 8 chars, 1 uppercase, 1 number | Yes |
@@ -452,7 +454,7 @@ sequenceDiagram
 **Preferences Configuration**:
 
 | Preference | Options | Default |
-|------------|---------|---------|
+| --- | --- | --- |
 | Theme | Light, Dark, System | System |
 | Language | English, Japanese | English |
 | Stat Display | Numeric, Circular, Bars | Circular |
@@ -535,7 +537,7 @@ protected $fillable = [
 **Tour Stops**:
 
 | Stop | Component | Description | Duration |
-|------|-----------|-------------|----------|
+| --- | --- | --- | --- |
 | 1 | Stats Panel | "Here you'll see your character's current stats" | 10s |
 | 2 | Goals Progress | "Track your training goals and milestones" | 10s |
 | 3 | Upcoming Races | "View and prepare for scheduled races" | 10s |
@@ -633,7 +635,7 @@ flowchart TD
 ### 4.2 Decision Point Details
 
 | Decision Point | Criteria | Outcomes | Default |
-|----------------|----------|----------|---------|
+| --- | --- | --- | --- |
 | **Enable Tutorial** | User preference | Tutorial On/Off | On |
 | **Storage Mode** | User selection | Local/Account | Local |
 | **Email Verification** | Email confirmation | Verified/Pending | Pending |
@@ -646,7 +648,7 @@ flowchart TD
 ### 5.1 Completion Metrics
 
 | Metric | Target | Measurement |
-|--------|--------|-------------|
+| --- | --- | --- |
 | Onboarding Completion Rate | > 85% | Users reaching dashboard / total new users |
 | Time to First Career | < 5 minutes | From welcome screen to first career creation |
 | Tutorial Engagement | > 60% | Users completing dashboard tour |
@@ -655,7 +657,7 @@ flowchart TD
 ### 5.2 User Experience Metrics
 
 | Metric | Target | Measurement |
-|--------|--------|-------------|
+| --- | --- | --- |
 | Setup Abandonment Rate | < 15% | Users exiting during setup |
 | Email Verification Rate | > 70% | Verified emails / total registrations |
 | Preference Customization | > 50% | Users changing default preferences |
@@ -698,7 +700,7 @@ flowchart TD
 ### 6.2 Error Messages
 
 | Error Code | Message | User Action | System Action |
-|------------|---------|-------------|---------------|
+| --- | --- | --- | --- |
 | `ON-001` | "Browser storage is full. Please clear data or use Account mode." | Clear data or switch mode | Redirect to storage mode selection |
 | `ON-002` | "Connection lost. Changes saved as draft." | Wait for reconnection | Auto-save to localStorage |
 | `ON-003` | "Email already registered. Please login or use a different email." | Login or change email | Show login link |
@@ -708,7 +710,7 @@ flowchart TD
 ### 6.3 Fallback Strategies
 
 | Scenario | Primary Path | Fallback Path | Ultimate Fallback |
-|----------|--------------|---------------|-------------------|
+| --- | --- | --- | --- |
 | localStorage unavailable | Use localStorage | Use sessionStorage | Account mode only |
 | Email sending fails | Send via SMTP | Queue for retry | Show manual verification code |
 | Avatar upload fails | Upload to server | Use preset avatar | Default avatar |
@@ -723,7 +725,7 @@ flowchart TD
 After onboarding completion, users proceed to:
 
 | Flow | Document Reference | Entry Condition |
-|------|-------------------|-----------------|
+| --- | --- | --- |
 | Career Setup | [UF-002](UF-002_Career_Setup_Flow.md) | User clicks "Create Career" from dashboard |
 | Dashboard Tour | [UF-001](UF-001_Onboarding_Flow.md#36-step-6-interactive-dashboard-tour-optional) | User chooses to view tour |
 | Settings Configuration | [D17](../D17_SUM_Software_User_Manual.md#13-settings--preferences) | User accesses settings |
@@ -731,7 +733,7 @@ After onboarding completion, users proceed to:
 ### 7.2 Alternative Entry Points
 
 | Entry Point | Scenario | Flow Adjustment |
-|-------------|----------|-----------------|
+| --- | --- | --- |
 | Direct Dashboard Access | Returning user with session | Skip onboarding entirely |
 | Local Data Exists | User has localStorage data | Skip welcome, show local dashboard |
 | OAuth Registration | User registers via Google/GitHub | Skip email verification step |
@@ -760,7 +762,7 @@ flowchart LR
 ## Document Control
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
+| --- | --- | --- | --- |
 | 2.3.0 | 2026-02-22 | Development Team | Updated Livewire namespace to Livewire 4 conventions (`App\Livewire` not `App\Http\Livewire`); updated version and dates |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server (Jan 2026); corrected aptitude grade system (S is maximum, no SS); updated skill hint discount system (5 levels: 10%/20%/30%/35%/40%); added stat soft cap mechanics (1200 with diminishing returns above) |
 | 2.1.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 architecture; added storage mode selection; updated technical implementation details; added comprehensive error handling |
@@ -782,5 +784,3 @@ flowchart LR
 ---
 
 *This user flow reflects the current onboarding implementation as of version 2.3.0. For the latest updates, refer to the online documentation.*
-
-```

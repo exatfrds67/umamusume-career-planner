@@ -3,11 +3,11 @@
 ## Document Information
 
 **Document ID**: entity-relationship-diagram
-**Version**: 2.4.0
-**Date**: February 22, 2026
+**Version**: 2.3.0
+**Date**: February 21, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned with codebase v2.4.0 (30 models, 42 tables, 56 migrations)
+**Status**: Current - Aligned with codebase v2.3.0 and game-accurate mechanics
 
 ---
 
@@ -32,7 +32,7 @@ This document presents the comprehensive Entity Relationship Diagrams for the Um
 ### 1.1 Technology Stack
 
 | Component | Technology | Version | Purpose |
-|-----------|------------|---------|---------|
+| --- | --- | --- | --- |
 | Framework | Laravel | 12+ | Backend framework |
 | Database | MySQL/MariaDB | 8.0+ | Primary data store |
 | Cache | Redis | 7+ | Caching and queues |
@@ -43,7 +43,7 @@ This document presents the comprehensive Entity Relationship Diagrams for the Um
 ### 1.2 Schema Naming Conventions
 
 | Convention | Pattern | Example |
-|------------|---------|---------|
+| --- | --- | --- |
 | Table Prefix | `ucp_` | `ucp_characters`, `ucp_careers` |
 | Table Names | snake_case, plural | `ucp_training_sessions` |
 | Column Names | snake_case | `turn_number`, `base_sp_cost` |
@@ -161,7 +161,7 @@ flowchart TD
 ### 2.2 Entity Count Summary
 
 | Group | Table Count | Primary Purpose |
-|-------|-------------|-----------------|
+| --- | --- | --- |
 | Platform | 9 | Laravel infrastructure (users, user_preferences, sessions, cache, jobs) |
 | Core Domain | 7 | Character, career, training, events, snapshots |
 | Skill System | 4 | Skill catalog, acquisition, and builds |
@@ -279,7 +279,7 @@ erDiagram
 ### 3.2 Relationship Cardinality
 
 | Relationship | Cardinality | Description |
-|--------------|-------------|-------------|
+| --- | --- | --- |
 | users → ucp_characters | 1:N | One user owns many characters |
 | users → ucp_careers | 1:N | One user tracks many career runs |
 | ucp_characters → ucp_careers | 1:N | One character used in many careers |
@@ -785,7 +785,7 @@ erDiagram
     }
 ```
 
-**External APIs**: umapyoi.net, GameTora (scraping)
+**External APIs**: umapyoi.net, umamusumedb.com
 
 **Cache TTL**: 24 hours (86400 seconds)
 
@@ -800,7 +800,7 @@ erDiagram
 #### users
 
 | Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
+| --- | --- | --- | --- |
 | `id` | UUID | PK | Primary key |
 | `name` | VARCHAR(255) | NOT NULL | Display name |
 | `email` | VARCHAR(255) | UNIQUE, NOT NULL | Login email |
@@ -816,7 +816,7 @@ erDiagram
 #### ucp_characters
 
 | Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
+| --- | --- | --- | --- |
 | `id` | BIGINT | PK, AUTO_INCREMENT | Primary key |
 | `user_id` | UUID | FK → users | Owner |
 | `name` | VARCHAR(255) | NOT NULL | Character name |
@@ -842,7 +842,7 @@ erDiagram
 #### ucp_careers
 
 | Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
+| --- | --- | --- | --- |
 | `id` | BIGINT | PK, AUTO_INCREMENT | Primary key |
 | `uuid` | UUID | UNIQUE | Universal identifier |
 | `character_id` | BIGINT | FK → ucp_characters | Character reference |
@@ -871,7 +871,7 @@ erDiagram
 #### ucp_skills
 
 | Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
+| --- | --- | --- | --- |
 | `id` | BIGINT | PK, AUTO_INCREMENT | Primary key |
 | `name` | VARCHAR(255) | UNIQUE, NOT NULL | English name |
 | `name_jp` | VARCHAR(255) | NULLABLE | Japanese name |
@@ -975,7 +975,7 @@ flowchart TD
 ### 7.1 Data Validation Rules
 
 | Rule | Table | Constraint | Enforcement |
-|------|-------|------------|-------------|
+| --- | --- | --- | --- |
 | Stat Range | `ucp_careers` | Soft cap 1200 (50% above), max ~1600 | Database CHECK |
 | Energy Range | `ucp_careers` | 0-100 | Database CHECK |
 | Turn Range | `ucp_careers`, `ucp_training_sessions` | 1-78 | Database CHECK |
@@ -997,7 +997,7 @@ Recovery window: 30 days before permanent deletion (application-level policy)
 ### 7.3 Data Retention Policies
 
 | Data Type | Retention | Cleanup Method |
-|-----------|-----------|----------------|
+| --- | --- | --- |
 | Active careers | Indefinite | User-initiated delete |
 | Soft-deleted records | 30 days | Scheduled job |
 | AI conversations | 90 days | Scheduled job |
@@ -1045,7 +1045,7 @@ CREATE INDEX idx_ocr_user_date ON ucp_ocr_extractions(user_id, analyzed_at);
 ### 8.3 Query Performance Targets
 
 | Query Type | Target | Index Used |
-|------------|--------|------------|
+| --- | --- | --- |
 | User character list | &lt; 100ms | `idx_characters_user_scenario` |
 | Career list (paginated) | &lt; 100ms | `idx_careers_user_status` |
 | Training history | &lt; 150ms | `idx_training_career_turn` |
@@ -1066,7 +1066,7 @@ CREATE INDEX idx_ocr_user_date ON ucp_ocr_extractions(user_id, analyzed_at);
 ### 9.1 Related Documents
 
 | Document | Description |
-|----------|-------------|
+| --- | --- |
 | [DBD - Database Documentation](009_DBD_Database_Documentation.md) | Detailed table schemas |
 | [SDS - Software Design Specifications](004_SDS_Software_Design_Specifications.md) | System architecture |
 | [DMP - Data Migration Plan](005_DMP_Data_Migration_Plan.md) | Migration strategies |
@@ -1076,8 +1076,7 @@ CREATE INDEX idx_ocr_user_date ON ucp_ocr_extractions(user_id, analyzed_at);
 ### 9.2 Revision History
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 2.4.0 | 2026-02-22 | Development Team | Updated version/date; added Livewire 4/Alpine.js 3/Neuron AI v2.11 to tech stack; confirmed 30 models, 42 tables, 56 migrations alignment |
+| --- | --- | --- | --- |
 | 2.3.0 | 2026-02-21 | Development Team | Updated version/date metadata; added 7 new model tables (advisory_recommendations, chat_messages, critical_alerts, events, prediction_accuracy, run_snapshots, skill_builds); updated entity counts to 42 tables aligned with 30 Eloquent models |
 | 2.1.0 | 2026-01-23 | Development Team | Updated to v2.0.0 implementation; added AI/MCP/OCR entities; aligned with 59 requirements; industry-standard formatting |
 | 2.0.0 | 2026-01-14 | Development Team | Major revision with Mermaid diagrams |
@@ -1085,7 +1084,7 @@ CREATE INDEX idx_ocr_user_date ON ucp_ocr_extractions(user_id, analyzed_at);
 
 ### 9.3 Document Status
 
-**Status**: Current - Aligned with codebase v2.4.0
+**Status**: Current - Aligned with codebase v2.3.0
 
 **Next Review**: Upon next major schema change
 
@@ -1093,4 +1092,4 @@ CREATE INDEX idx_ocr_user_date ON ucp_ocr_extractions(user_id, analyzed_at);
 
 ---
 
-*This ERD reflects the current database schema as implemented in the Laravel 12 application, with 30 Eloquent models across 42 tables (56 migrations), supporting all system requirements with comprehensive data integrity, indexing, and relationship management.*
+*This ERD reflects the current database schema as implemented in the Laravel 12 application, with 30 Eloquent models across 42 tables, supporting all system requirements with comprehensive data integrity, indexing, and relationship management.*

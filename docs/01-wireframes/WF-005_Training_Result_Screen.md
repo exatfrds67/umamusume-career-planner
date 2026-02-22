@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0  
-**Date**: February 22, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-002], [SPEC-002], [FLOW-002], [SEQ-002]
 
 **Source Specs**:
@@ -31,23 +31,23 @@ The Training Result Screen displays the outcome of a training session, showing a
 
 ### 1.2 Key Objectives
 
-| Objective              | Description                                                  |
-| ---------------------- | ------------------------------------------------------------ |
-| **Clear Feedback**     | Display all training outcomes in an easily digestible format |
-| **Comparison Display** | Show predicted vs. actual results where applicable           |
-| **Progress Tracking**  | Update stat progression and turn advancement                 |
-| **Event Handling**     | Display triggered events and choice outcomes                 |
-| **Quick Navigation**   | Enable smooth transition to next training turn or dashboard  |
+| Objective | Description |
+| --- | --- |
+| **Clear Feedback** | Display all training outcomes in an easily digestible format |
+| **Comparison Display** | Show predicted vs. actual results where applicable |
+| **Progress Tracking** | Update stat progression and turn advancement |
+| **Event Handling** | Display triggered events and choice outcomes |
+| **Quick Navigation** | Enable smooth transition to next training turn or dashboard |
 
 ### 1.3 User Stories
 
-| ID     | User Story                                                          | Priority |
-| ------ | ------------------------------------------------------------------- | -------- |
-| US-001 | As a player, I want to see my stat gains immediately after training | P0       |
-| US-002 | As a player, I want to know if I received skill hints               | P0       |
-| US-003 | As a player, I want to see bond changes with support cards          | P0       |
-| US-004 | As a player, I want to understand mood and energy changes           | P0       |
-| US-005 | As a player, I want to quickly proceed to the next turn             | P0       |
+| ID | User Story | Priority |
+| --- | --- | --- |
+| US-001 | As a player, I want to see my stat gains immediately after training | P0 |
+| US-002 | As a player, I want to know if I received skill hints | P0 |
+| US-003 | As a player, I want to see bond changes with support cards | P0 |
+| US-004 | As a player, I want to understand mood and energy changes | P0 |
+| US-005 | As a player, I want to quickly proceed to the next turn | P0 |
 
 ---
 
@@ -176,7 +176,7 @@ The Training Result Screen displays the outcome of a training session, showing a
 │ [NEXT] [CHAR] [RACE] │
 └──────────────────────────────┘
 │ Bottom Navigation Bar │
-│ \[🏠]\[👤]\[⚡]\[🏆]\[🤖]\[⚙️] │
+│ [🏠]\[👤]\[⚡]\[🏆]\[🤖]\[⚙️] │
 └──────────────────────────────┘
 
 ---
@@ -221,11 +221,11 @@ class ResultBanner extends Component
 
 **States**:
 
-| State   | Icon | Color | Message                          |
-| ------- | ---- | ----- | -------------------------------- |
-| Success | ✅   | Green | "Training Success!"              |
-| Failure | ❌   | Red   | "Training Failed"                |
-| Partial | ⚠️   | Amber | "Training Completed with Issues" |
+| State | Icon | Color | Message |
+| --- | --- | --- | --- |
+| Success | ✅ | Green | "Training Success!" |
+| Failure | ❌ | Red | "Training Failed" |
+| Partial | ⚠️ | Amber | "Training Completed with Issues" |
 
 ### 3.2 Stat Gains Display
 
@@ -290,7 +290,7 @@ class ResultBanner extends Component
 ]
 ```
 
-**Game-Accurate Training Mechanics (Global English Server - Feb 2026)**:
+**Game-Accurate Training Mechanics (Global English Server - Jan 2026)**:
 
 | Mechanic | Value | Description |
 | --- | --- | --- |
@@ -370,13 +370,13 @@ Bond: 82% → 85% (+3)
 
 **Milestone Indicators**:
 
-| Milestone | Reward                     | Icon |
-| --------- | -------------------------- | ---- |
-| 20%       | Small stat bonus           | ⭐   |
-| 40%       | Skill hint                 | 💡   |
-| 60%       | Special event unlock       | 📅   |
-| 80%       | Friendship Training active | 🎉   |
-| 100%      | Maximum bond bonus         | 👑   |
+| Milestone | Reward | Icon |
+| --- | --- | --- |
+| 20% | Small stat bonus | ⭐ |
+| 40% | Skill hint | 💡 |
+| 60% | Special event unlock | 📅 |
+| 80% | Friendship Training active | 🎉 |
+| 100% | Maximum bond bonus | 👑 |
 
 ### 3.4 Skill Hints Panel
 
@@ -419,10 +419,10 @@ Bond: 82% → 85% (+3)
 
 **Hint Types**:
 
-| Type       | Indicator | Description                          |
-| ---------- | --------- | ------------------------------------ |
-| Guaranteed | ✨        | Support card red exclamation hint    |
-| Random     | 💡        | Probability-based hint from training |
+| Type | Indicator | Description |
+| --- | --- | --- |
+| Guaranteed | ✨ | Support card red exclamation hint |
+| Random | 💡 | Probability-based hint from training |
 
 **Cost Calculation Display**:
 
@@ -489,12 +489,12 @@ class EnergyMoodChanges extends Component
 
 **Energy Bar Colors**:
 
-| Range   | Color  | Status    |
-| ------- | ------ | --------- |
-| 70-100% | Green  | Excellent |
-| 40-69%  | Yellow | Good      |
-| 20-39%  | Orange | Low       |
-| 0-19%   | Red    | Critical  |
+| Range | Color | Status |
+| --- | --- | --- |
+| 70-100% | Green | Excellent |
+| 40-69% | Yellow | Good |
+| 20-39% | Orange | Low |
+| 0-19% | Red | Critical |
 
 ### 3.6 Events Panel
 
@@ -545,12 +545,12 @@ class EventsPanel extends Component
 
 **Event Types**:
 
-| Type            | Icon | Description                  |
-| --------------- | ---- | ---------------------------- |
-| Support Event   | 📅   | Support card character event |
-| Story Event     | 📖   | Scenario-based story event   |
-| Random Event    | 🎲   | Random encounter             |
-| Condition Event | ⚠️   | Condition-triggered event    |
+| Type | Icon | Description |
+| --- | --- | --- |
+| Support Event | 📅 | Support card character event |
+| Story Event | 📖 | Scenario-based story event |
+| Random Event | 🎲 | Random encounter |
+| Condition Event | ⚠️ | Condition-triggered event |
 
 ### 3.7 Turn Summary Panel
 
@@ -682,11 +682,11 @@ sequenceDiagram
 
 ### 4.3 Cache Strategy
 
-| Data Type       | Cache Key                      | TTL       | Invalidation     |
-| --------------- | ------------------------------ | --------- | ---------------- |
+| Data Type | Cache Key | TTL | Invalidation |
+| --- | --- | --- | --- |
 | Training result | `training_result:{session_id}` | 5 minutes | On next training |
-| Updated stats   | `stats:{run_id}`               | 1 minute  | On stat update   |
-| Bond changes    | `bond_changes:{session_id}`    | 5 minutes | On next training |
+| Updated stats | `stats:{run_id}` | 1 minute | On stat update |
+| Bond changes | `bond_changes:{session_id}` | 5 minutes | On next training |
 
 ---
 
@@ -749,25 +749,25 @@ flowchart LR
 
 ### 6.1 WCAG 2.2 AA Compliance
 
-| Criterion                      | Implementation                               | Test Method             |
-| ------------------------------ | -------------------------------------------- | ----------------------- |
-| **1.1.1 Non-text Content**     | All icons have `aria-label`                  | Screen reader testing   |
-| **1.4.3 Contrast Ratio**       | 4.5:1 minimum for text                       | Color contrast analyzer |
-| **2.1.1 Keyboard**             | All interactive elements keyboard accessible | Keyboard-only testing   |
-| **2.4.3 Focus Order**          | Logical tab order through result components  | Tab key traversal       |
-| **2.4.7 Focus Visible**        | Clear focus indicators                       | Visual inspection       |
-| **3.3.1 Error Identification** | Training failures clearly identified         | Screen reader + visual  |
-| **4.1.2 Name, Role, Value**    | Proper ARIA attributes                       | axe-core scan           |
+| Criterion | Implementation | Test Method |
+| --- | --- | --- |
+| **1.1.1 Non-text Content** | All icons have `aria-label` | Screen reader testing |
+| **1.4.3 Contrast Ratio** | 4.5:1 minimum for text | Color contrast analyzer |
+| **2.1.1 Keyboard** | All interactive elements keyboard accessible | Keyboard-only testing |
+| **2.4.3 Focus Order** | Logical tab order through result components | Tab key traversal |
+| **2.4.7 Focus Visible** | Clear focus indicators | Visual inspection |
+| **3.3.1 Error Identification** | Training failures clearly identified | Screen reader + visual |
+| **4.1.2 Name, Role, Value** | Proper ARIA attributes | axe-core scan |
 
 ### 6.2 Keyboard Navigation
 
-| Action                  | Shortcut            | Context               |
-| ----------------------- | ------------------- | --------------------- |
-| Next Training           | `Enter` or `N`      | When result displayed |
-| View Character          | `C`                 | Result screen         |
-| Ask AI                  | `A`                 | Result screen         |
-| Expand/Collapse Section | `Space`             | When section focused  |
-| Navigate Sections       | `Tab` / `Shift+Tab` | Result screen         |
+| Action | Shortcut | Context |
+| --- | --- | --- |
+| Next Training | `Enter` or `N` | When result displayed |
+| View Character | `C` | Result screen |
+| Ask AI | `A` | Result screen |
+| Expand/Collapse Section | `Space` | When section focused |
+| Navigate Sections | `Tab` / `Shift+Tab` | Result screen |
 
 ### 6.3 Screen Reader Announcements
 
@@ -808,31 +808,31 @@ flowchart LR
 
 ### 7.1 Performance Targets
 
-| Metric                 | Target        | Measurement                        |
-| ---------------------- | ------------- | ---------------------------------- |
-| **Page Load**          | < 1.5 seconds | Time to first result display       |
-| **Component Render**   | < 300ms       | All result panels rendered         |
-| **Event Processing**   | < 500ms       | Event choice applied and displayed |
-| **Animation Duration** | < 500ms       | Stat increase animations           |
-| **Navigation**         | < 200ms       | Redirect to next screen            |
+| Metric | Target | Measurement |
+| --- | --- | --- |
+| **Page Load** | < 1.5 seconds | Time to first result display |
+| **Component Render** | < 300ms | All result panels rendered |
+| **Event Processing** | < 500ms | Event choice applied and displayed |
+| **Animation Duration** | < 500ms | Stat increase animations |
+| **Navigation** | < 200ms | Redirect to next screen |
 
 ### 7.2 Optimization Strategies
 
-| Strategy                | Implementation                         | Impact                         |
-| ----------------------- | -------------------------------------- | ------------------------------ |
-| **Eager Loading**       | Preload result data with relationships | -50% query count               |
-| **Partial Rendering**   | Render visible sections first          | -40% initial render time       |
-| **Lazy Animations**     | Defer animations until scroll          | Improved perceived performance |
-| **Cached Calculations** | Cache stat totals and grade changes    | -30% processing time           |
+| Strategy | Implementation | Impact |
+| --- | --- | --- |
+| **Eager Loading** | Preload result data with relationships | -50% query count |
+| **Partial Rendering** | Render visible sections first | -40% initial render time |
+| **Lazy Animations** | Defer animations until scroll | Improved perceived performance |
+| **Cached Calculations** | Cache stat totals and grade changes | -30% processing time |
 
 ### 7.3 Bundle Size Budget
 
-| Asset Type | Budget | Current | Status           |
-| ---------- | ------ | ------- | ---------------- |
-| JavaScript | 40 KB  | 35 KB   | ✅ Within budget |
-| CSS        | 20 KB  | 18 KB   | ✅ Within budget |
-| Images     | 50 KB  | 42 KB   | ✅ Within budget |
-| Total      | 110 KB | 95 KB   | ✅ Within budget |
+| Asset Type | Budget | Current | Status |
+| --- | --- | --- | --- |
+| JavaScript | 40 KB | 35 KB | ✅ Within budget |
+| CSS | 20 KB | 18 KB | ✅ Within budget |
+| Images | 50 KB | 42 KB | ✅ Within budget |
+| Total | 110 KB | 95 KB | ✅ Within budget |
 
 ---
 
@@ -1096,7 +1096,6 @@ test.describe("WF-005: Accessibility", () => {
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
-| 2.3.0 | 2026-02-22 | Development Team | Updated version/dates, aligned technology references with current stack (Livewire 4, Neuron AI v2.11, GameTora/umapyoi.net) |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: per-training cap (+100, reduced to +50 if stat > 1200), support card bonuses (+5% per card), predicted vs actual comparison display |
 | 2.0.0 | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added friendship bonuses, guaranteed hint indicators, event handling, accessibility specifications, and testing requirements |
 | 1.0.0 | 2026-01-14 | Development Team | Initial wireframe specification |

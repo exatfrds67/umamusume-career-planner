@@ -3,7 +3,7 @@
 ## Umamusume Pretty Derby Career Planner
 
 **Document Version**: 2.2.0  
-**Date**: February 22, 2026  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-005], [SPEC-005], [FLOW-005], [TECH-FLOW-005]
 
 ---
@@ -84,12 +84,12 @@ Support deck management enables:
 ### 2.1 System Components
 
 | Component | Type | Responsibility |
-|-----------|------|----------------|
+| --- | --- | --- |
 | **User** | Actor | Initiates deck configuration actions |
 | **Livewire Component** | Presentation | `DeckBuilder.php` - Deck configuration UI |
 | **SupportDeckController** | Application | Orchestrates deck CRUD operations |
 | **SupportDeckService** | Domain Service | Deck management business logic |
-| **SynergyScorer** | Domain Service | Deck synergy analysis and scoring |
+| **SynergyCalculator** | Domain Service | Deck synergy analysis and scoring |
 | **FriendshipBonusCalculator** | Domain Service | Bond and friendship bonus calculations |
 | **ExternalSyncService** | Infrastructure | Card metadata synchronization |
 | **SupportDeck Model** | Data | Eloquent model for `ucp_support_decks` |
@@ -100,9 +100,9 @@ Support deck management enables:
 ### 2.2 External Systems
 
 | System | Integration | Purpose |
-|--------|-------------|---------|
+| --- | --- | --- |
 | **umapyoi.net** | REST API | Card metadata and meta tiers |
-| **GameTora** | REST API (fallback) | Alternative card data source |
+| **UmamusumeDB** | REST API (fallback) | Alternative card data source |
 
 ---
 
@@ -111,7 +111,7 @@ Support deck management enables:
 ### 3.1 Deck Structure (Verified Jan 2026)
 
 | Property | Value | Notes |
-|----------|-------|-------|
+| --- | --- | --- |
 | Total Slots | 6 | 5 owned + 1 borrowed |
 | Type Restriction | None | Any combination allowed |
 | Common Strategies | Various | 3 Speed + 2 Power + 1 Friend, etc. |
@@ -119,7 +119,7 @@ Support deck management enables:
 ### 3.2 Support Card Types
 
 | Type | Training Boost | Primary Benefit |
-|------|----------------|-----------------|
+| --- | --- | --- |
 | **Speed** | Speed training | Speed stat gains |
 | **Stamina** | Stamina training | Stamina stat gains |
 | **Power** | Power training | Power stat gains |
@@ -130,7 +130,7 @@ Support deck management enables:
 ### 3.3 Card Properties
 
 | Property | Range | Description |
-|----------|-------|-------------|
+| --- | --- | --- |
 | **Rarity** | R, SR, SSR | Card rarity tier |
 | **Limit Breaks** | 0-4 (★ to ★★★★★) | MLB = 4 limit breaks |
 | **Max Level** | 30/35/40/45/50 | Based on limit break count |
@@ -140,7 +140,7 @@ Support deck management enables:
 ### 3.4 Limit Break Level Caps
 
 | Limit Breaks | Stars | Max Level |
-|--------------|-------|-----------|
+| --- | --- | --- |
 | 0 LB | ★ | 30 |
 | 1 LB | ★★ | 35 |
 | 2 LB | ★★★ | 40 |
@@ -150,7 +150,7 @@ Support deck management enables:
 ### 3.5 Friendship Bonus by Rarity
 
 | Rarity | Bonus Range | Activation |
-|--------|-------------|------------|
+| --- | --- | --- |
 | **R** | 10-15% | Bond ≥ 80% |
 | **SR** | 15-25% | Bond ≥ 80% |
 | **SSR** | 25-35% | Bond ≥ 80% |
@@ -175,7 +175,7 @@ sequenceDiagram
     participant LW as DeckBuilder<br/>Livewire
     participant C as SupportDeckController
     participant DS as SupportDeckService
-    participant SC as SynergyScorer
+    participant SC as SynergyCalculator
     participant FB as FriendshipBonusCalculator
     participant DB as MySQL Database
     participant R as Redis Cache
@@ -477,7 +477,7 @@ public function calculateFriendshipBonus(SupportCard $card, int $bondLevel): flo
 **Factors Analyzed:**
 
 | Factor | Weight | Description |
-|--------|--------|-------------|
+| --- | --- | --- |
 | Type Concentration | 30% | Training type focus (Speed/Stamina/Power/Guts/Wit/Friend) |
 | Skill Hint Coverage | 25% | Unique skill hints across all cards |
 | Meta Tier Average | 20% | Average meta score of cards |
@@ -698,7 +698,7 @@ readonly class DeckSynergyResult
 ### 7.1 Error Scenarios
 
 | Scenario | Error Code | User Message | Recovery |
-|----------|------------|--------------|----------|
+| --- | --- | --- | --- |
 | Deck limit exceeded | DECK_LIMIT | "Maximum 10 decks reached" | Delete unused deck |
 | Duplicate name | DECK_NAME_EXISTS | "A deck with this name exists" | Choose different name |
 | Card not owned | CARD_NOT_OWNED | "You don't own this card" | Check inventory |
@@ -743,7 +743,7 @@ DB::transaction(function () use ($deckId, $cardId, $slot, $limitBreak) {
 ### 8.1 Caching Strategy
 
 | Data | Cache Key | TTL | Invalidation |
-|------|-----------|-----|--------------|
+| --- | --- | --- | --- |
 | Deck list | `deck:list:{userId}` | 1 hour | On deck CRUD |
 | Deck synergy | `deck:synergy:{deckId}` | Until card change | On card assignment |
 | Active deck | `user:active_deck:{userId}` | 24 hours | On activation |
@@ -773,7 +773,7 @@ $decks = SupportDeck::where('user_id', $userId)
 ### 8.3 Performance Targets
 
 | Operation | Target | P95 |
-|-----------|--------|-----|
+| --- | --- | --- |
 | Deck creation | < 50ms | < 100ms |
 | Card assignment | < 30ms | < 80ms |
 | Synergy calculation | < 100ms | < 200ms |
@@ -806,10 +806,10 @@ $decks = SupportDeck::where('user_id', $userId)
 ## Document Control
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
+| --- | --- | --- | --- |
 | 1.0.0 | 2026-01-27 | Development Team | Initial specification for Support Deck Configuration sequence |
 | 2.0.0 | 2026-01-27 | Development Team | Added game mechanics reference section |
-| 2.2.0 | 2026-02-22 | Development Team | Updated with verified game mechanics from Global English Server - corrected limit break system (MLB = 4 LB), friendship threshold (80%), friendship bonus ranges by rarity |
+| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server - corrected limit break system (MLB = 4 LB), friendship threshold (80%), friendship bonus ranges by rarity |
 
 ---
 

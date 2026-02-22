@@ -1,8 +1,8 @@
 # TECH-FLOW-004: Skill Management - Technical Flow & Task Breakdown
 
-**Document Version**: 2.3.0  
-**Date**: February 22, 2026  
-**Status**: Current - Aligned with codebase v2.3.0 and game-accurate mechanics
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
+**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
 
 **Source Specifications**:
 
@@ -46,7 +46,7 @@
 flowchart TB
     subgraph Presentation["Presentation Layer"]
         Blade["Blade Templates"]
-        Livewire["Livewire 4 Components"]
+        Livewire["Livewire 3 Components"]
         Alpine["Alpine.js Interactions"]
     end
     
@@ -97,10 +97,10 @@ Skill Management System
 │   └── SkillEvolutionController
 │
 ├── Services
-│   ├── SkillAnalysisService
+│   ├── SkillCatalogService
 │   ├── SkillHintService
 │   ├── SkillEvolutionService
-│   └── Neuron\SkillRecommendationService
+│   └── AISkillAdvisorService
 │
 ├── Calculators
 │   ├── SPCostCalculator
@@ -204,7 +204,7 @@ flowchart TD
 **Game-Accurate Hint Discount System (Verified Jan 2026)**:
 
 | Hint Level | Discount | Cumulative | Notes |
-|------------|----------|------------|-------|
+| --- | --- | --- | --- |
 | Level 1 | 10% | 10% | First hint from support card |
 | Level 2 | 10% | 20% | Second hint |
 | Level 3 | 10% | 30% | Third hint |
@@ -386,21 +386,21 @@ Schema::create('ucp_skills', function (Blueprint $table) {
 
 ---
 
-#### Task 4.1.2: Create SkillAnalysisService
+#### Task 4.1.2: Create SkillCatalogService
 
 **Priority**: P0  
 **Effort**: 6 hours  
 **Status**: ✅ Complete
 
 ```php
-// app/Services/SkillAnalysisService.php
+// app/Services/SkillCatalogService.php
 namespace App\Services;
 
 use App\Models\Skill;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
-class SkillAnalysisService
+class SkillCatalogService
 {
     /**
      * Get all skills with optional filters
@@ -500,7 +500,7 @@ class SkillAnalysisService
 - Evolution path lookup
 - Skill recommendations
 - Unit tests: 5 tests
-- **Files**: `app/Services/SkillAnalysisService.php`
+- **Files**: `app/Services/SkillCatalogService.php`
 
 ---
 
@@ -975,7 +975,7 @@ class SkillEvolutionService
 use Tests\TestCase;
 use App\Models\Character;
 use App\Models\Skill;
-use App\Services\SkillAnalysisService;
+use App\Services\SkillCatalogService;
 use App\Services\SkillHintService;
 use App\Services\SkillEvolutionService;
 
@@ -1048,7 +1048,7 @@ test('skill evolution replaces normal with rare', function () {
 test('skill search finds by name or japanese name', function () {
     Skill::factory()->create(['name' => 'Lane Guidance', 'name_jp' => 'レーンガイダンス']);
     
-    $service = app(SkillAnalysisService::class);
+    $service = app(SkillCatalogService::class);
     
     $resultsEnglish = $service->searchSkills('Lane');
     $resultsJapanese = $service->searchSkills('レーン');
@@ -1089,7 +1089,7 @@ test('skill search finds by name or japanese name', function () {
 
 ## 4. Component Specifications
 
-### 4.1 SkillAnalysisService::searchSkills()
+### 4.1 SkillCatalogService::searchSkills()
 
 ```php
 /**
@@ -1207,7 +1207,7 @@ erDiagram
 ### 5.2 Table Constraints
 
 | Table | Constraint | Description |
-|-------|------------|-------------|
+| --- | --- | --- |
 | `ucp_skills` | `name` UNIQUE | Prevent duplicate skill names |
 | `ucp_skills` | `evolution_from_id` FK | Self-referential evolution path |
 | `ucp_skill_hints` | `hint_level` <= 5 | Maximum 5 hint levels per skill |
@@ -1223,8 +1223,8 @@ erDiagram
 
 ```mermaid
 flowchart TD
-    SkillAnalysisService --> SkillRepository
-    SkillAnalysisService --> CacheManager
+    SkillCatalogService --> SkillRepository
+    SkillCatalogService --> CacheManager
     
     SkillHintService --> SkillRepository
     SkillHintService --> SkillHintRepository
@@ -1233,8 +1233,8 @@ flowchart TD
     SkillEvolutionService --> SkillAcquisitionRepository
     SkillEvolutionService --> EventDispatcher
     
-    NeuronSkillRecommendationService --> SkillAnalysisService
-    NeuronSkillRecommendationService --> HybridAIService
+    AISkillAdvisorService --> SkillCatalogService
+    AISkillAdvisorService --> HybridAIService
 ```
 
 ---
@@ -1244,7 +1244,7 @@ flowchart TD
 ### 7.1 REST API Endpoints
 
 | Endpoint | Method | Description | Auth | Rate Limit | Cache TTL |
-|----------|--------|-------------|------|------------|-----------|
+| --- | --- | --- | --- | --- | --- |
 | `/api/v1/skills` | GET | List skills with filters | Optional | 100/min | 1 hour |
 | `/api/v1/skills/{id}` | GET | Get skill details | Optional | 100/min | 1 hour |
 | `/api/v1/characters/{id}/skills` | GET | Get owned skills | Required | 100/min | 5 min |
@@ -1313,7 +1313,7 @@ pie title Test Distribution
 ### 8.2 Critical Test Cases
 
 | Test Case | Type | Priority | Status |
-|-----------|------|----------|--------|
+| --- | --- | --- | --- |
 | Skill acquisition with hint discount | Feature | P0 | ✅ Pass |
 | Hint discount calculation (5 levels: 10%/20%/30%/35%/40% max) | Unit | P0 | ✅ Pass |
 | Skill evolution Normal → Rare | Feature | P0 | ✅ Pass |
@@ -1330,7 +1330,7 @@ pie title Test Distribution
 ### 9.1 Effort Breakdown
 
 | Phase | Tasks | Estimated Hours | Actual Hours | Status |
-|-------|-------|-----------------|--------------|--------|
+| --- | --- | --- | --- | --- |
 | Skill Catalog Service | 3 tasks | 12 | 13 | ✅ Complete |
 | Skill Hint Management | 3 tasks | 14 | 15 | ✅ Complete |
 | Skill Evolution | 2 tasks | 8 | 9 | ✅ Complete |
@@ -1348,7 +1348,7 @@ pie title Test Distribution
 
 ### 10.1 Functional Completeness
 
-- [x] 3 services implemented (SkillAnalysisService, SkillHintService, SkillEvolutionService)
+- [x] 3 services implemented (SkillCatalogService, SkillHintService, SkillEvolutionService)
 - [x] 2 controllers with 7 REST endpoints
 - [x] 4 database tables with migrations
 - [x] Skill database seeded with 500+ game skills
@@ -1363,7 +1363,7 @@ pie title Test Distribution
 ### 10.2 Performance Metrics
 
 | Metric | Target | Actual | Status |
-|--------|--------|--------|--------|
+| --- | --- | --- | --- |
 | Skill search response | < 100ms | ~85ms | ✅ Met |
 | Skill acquisition | < 200ms | ~175ms | ✅ Met |
 | Evolution processing | < 300ms | ~280ms | ✅ Met |
@@ -1375,7 +1375,7 @@ pie title Test Distribution
 ### 10.3 Quality Metrics
 
 | Metric | Target | Actual | Status |
-|--------|--------|--------|--------|
+| --- | --- | --- | --- |
 | Test coverage | > 80% | 86% | ✅ Met |
 | Code style compliance (PSR-12) | 100% | 100% | ✅ Met |
 | Documentation coverage | 100% | 100% | ✅ Met |
@@ -1386,8 +1386,7 @@ pie title Test Distribution
 ## Document Control
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 2.3.0 | 2026-02-22 | Development Team | Updated service names to match codebase (SkillAnalysisService, Neuron\SkillRecommendationService); Livewire 4 |
+| --- | --- | --- | --- |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: 5 hint levels (10%/20%/30%/35%/40% max discount); additional discount sources (Fast Learner +10%, Skill Sparks, Hint Books) |
 | 2.1.0 | 2026-01-24 | Development Team | Updated to v2.0.0 implementation standards; aligned with industry documentation guidelines; added comprehensive cross-references; enhanced code examples and diagrams |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with detailed specifications |
@@ -1408,4 +1407,4 @@ pie title Test Distribution
 
 ---
 
-*This technical flow document reflects the current implementation as of version 2.3.0 and follows industry-standard documentation practices for software development lifecycle (SDLC) artifacts.*
+*This technical flow document reflects the current implementation as of version 2.0.0 and follows industry-standard documentation practices for software development lifecycle (SDLC) artifacts.*

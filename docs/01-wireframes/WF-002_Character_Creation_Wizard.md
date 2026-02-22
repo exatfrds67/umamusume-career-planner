@@ -1,4 +1,3 @@
-```markdown
 # WF-002: Character Creation Wizard
 
 ## Umamusume Pretty Derby Career Planner
@@ -33,7 +32,7 @@ The Character Creation Wizard guides users through a multi-step process to creat
 ### 1.2 Key Objectives
 
 | Objective | Description |
-|-----------|-------------|
+| --- | --- |
 | **Guided Configuration** | Step-by-step wizard reduces complexity of character setup |
 | **Parent Inheritance** | Visual factor preview shows stat bonuses before confirmation |
 | **Deck Validation** | Real-time validation ensures valid 6-card support deck |
@@ -43,7 +42,7 @@ The Character Creation Wizard guides users through a multi-step process to creat
 ### 1.3 User Stories
 
 | ID | User Story | Priority |
-|----|------------|----------|
+| --- | --- | --- |
 | US-001 | As a player, I want to select my trainee character with clear stat/aptitude information | P0 |
 | US-002 | As a player, I want to choose parent characters and see inherited factor bonuses | P0 |
 | US-003 | As a player, I want to build my support deck with validation feedback | P0 |
@@ -112,7 +111,7 @@ sequenceDiagram
 ### 2.3 State Management
 
 | State Property | Type | Description |
-|----------------|------|-------------|
+| --- | --- | --- |
 | `currentStep` | `int` | Current wizard step (1-4) |
 | `traineeId` | `int` | Selected trainee character ID |
 | `scenarioType` | `enum` | Scenario type (URA, Grand Masters, etc.) |
@@ -400,14 +399,14 @@ class TraineeSelector extends Component
 ### 3.5 Validation Rules
 
 | Field | Rule | Error Message |
-|-------|------|---------------|
+| --- | --- | --- |
 | `trainee_id` | Required, exists | "Please select a trainee character" |
 | `scenario_type` | Required, valid enum | "Please select a valid scenario" |
 
 ### 3.6 Accessibility
 
 | Element | ARIA Attribute | Purpose |
-|---------|----------------|---------|
+| --- | --- | --- |
 | Search input | `aria-label="Search trainee characters"` | Screen reader description |
 | Filter checkboxes | `aria-checked` | Checkbox state |
 | Trainee cards | `role="button"` | Interactive card |
@@ -641,7 +640,7 @@ class FactorInheritanceService
 ### 4.5 Factor Rating System
 
 | Stars | Symbol | Stat Bonus | Growth Bonus |
-|-------|--------|------------|--------------|
+| --- | --- | --- | --- |
 | 0 | ☆☆☆ | +0 | +0% |
 | 1 | ★☆☆ | +5 | +5% |
 | 2 | ★★☆ | +12 | +10% |
@@ -651,16 +650,16 @@ class FactorInheritanceService
 
 **Grade Scale** (S is Maximum - No SS exists):
 
-| Grade | Color  | Description                    |
-|-------|--------|--------------------------------|
-| S     | Gold   | Maximum aptitude grade         |
-| A     | Purple | Excellent aptitude             |
-| B     | Blue   | Good aptitude                  |
-| C     | Green  | Average aptitude               |
-| D     | Yellow | Below average aptitude         |
-| E     | Orange | Poor aptitude                  |
-| F     | Red    | Very poor aptitude             |
-| G     | Gray   | Lowest aptitude grade          |
+| Grade | Color | Description |
+| --- | --- | --- |
+| S | Gold | Maximum aptitude grade |
+| A | Purple | Excellent aptitude |
+| B | Blue | Good aptitude |
+| C | Green | Average aptitude |
+| D | Yellow | Below average aptitude |
+| E | Orange | Poor aptitude |
+| F | Red | Very poor aptitude |
+| G | Gray | Lowest aptitude grade |
 
 **Aptitude Categories**:
 
@@ -671,7 +670,7 @@ class FactorInheritanceService
 ### 4.7 Validation Rules
 
 | Field | Rule | Error Message |
-|-------|------|---------------|
+| --- | --- | --- |
 | `parent_a_id` | Required, exists, different from parent_b | "Please select Parent A" |
 | `parent_b_id` | Required, exists, different from parent_a | "Please select Parent B" |
 
@@ -844,7 +843,7 @@ class DeckBuilder extends Component
 ### 5.4 Deck Rules
 
 | Rule | Description | Validation |
-|------|-------------|------------|
+| --- | --- | --- |
 | Deck Size | Exactly 6 cards | Hard requirement |
 | Type Limit | Max 3 of same type (excluding Friend) | Hard requirement |
 | Friend Recommendation | At least 1 Friend card recommended | Soft warning |
@@ -1028,7 +1027,7 @@ class CreateCharacterRequest extends FormRequest
 ### 7.1 Reusable Components
 
 | Component | Location | Usage |
-|-----------|----------|-------|
+| --- | --- | --- |
 | Trainee Card | `resources/views/components/trainee-card.blade.php` | Step 1 trainee selection |
 | Parent Selector | `resources/views/components/parent-selector.blade.php` | Step 2 parent selection |
 | Factor Preview | `resources/views/components/factor-preview.blade.php` | Step 2 inheritance display |
@@ -1071,7 +1070,7 @@ flowchart TD
 ### 8.1 Performance Targets
 
 | Metric | Target | Measurement |
-|--------|--------|-------------|
+| --- | --- | --- |
 | **Initial Load** | < 2.0s | Time to first step render |
 | **Step Transition** | < 300ms | Navigation between steps |
 | **Factor Calculation** | < 100ms | Parent inheritance preview |
@@ -1081,7 +1080,7 @@ flowchart TD
 ### 8.2 Optimization Strategies
 
 | Strategy | Implementation | Impact |
-|----------|----------------|--------|
+| --- | --- | --- |
 | **Lazy Loading** | Defer step content until navigated | -40% initial bundle |
 | **Debounced Search** | 300ms debounce on search inputs | Reduced API calls |
 | **Cached Card Data** | Support card data cached (5 min TTL) | -60% repeated queries |
@@ -1116,7 +1115,7 @@ flowchart LR
 ### 9.1 WCAG 2.2 AA Compliance
 
 | Criterion | Implementation | Test Method |
-|-----------|----------------|-------------|
+| --- | --- | --- |
 | **1.1.1 Non-text Content** | All portraits have descriptive `alt` text | Screen reader testing |
 | **1.4.3 Contrast Ratio** | 4.5:1 minimum for all text | Color contrast analyzer |
 | **2.1.1 Keyboard** | All wizard steps navigable via keyboard | Keyboard-only testing |
@@ -1129,7 +1128,7 @@ flowchart LR
 ### 9.2 Keyboard Navigation
 
 | Action | Shortcut | Context |
-|--------|----------|---------|
+| --- | --- | --- |
 | Next Step | `Enter` or `Ctrl+→` | When current step valid |
 | Previous Step | `Ctrl+←` | Any step except first |
 | Cancel Wizard | `Esc` | Any step |
@@ -1663,7 +1662,7 @@ test.describe('WF-002: Visual Regression', () => {
 ## 12. Version History
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
+| --- | --- | --- | --- |
 | 2.3.0 | 2026-02-22 | Development Team | Updated version/dates, aligned technology references with current stack (Livewire 4, Neuron AI v2.11, GameTora/umapyoi.net) |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: corrected aptitude grade scale (S is max, no SS), added aptitude categories documentation |
 | 2.0.0 | 2026-01-24 | Development Team | Complete wireframe specification with testing requirements, accessibility guidelines, and performance targets aligned with v2.0.0 implementation |

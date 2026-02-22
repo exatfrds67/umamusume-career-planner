@@ -1,8 +1,8 @@
 # TECH-FLOW-005: Support Card Management - Technical Flow & Task Breakdown
 
-**Document Version**: 2.3.0  
-**Date**: February 22, 2026  
-**Status**: Current - Aligned with codebase v2.3.0 and game-accurate mechanics
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
+**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
 
 **Source Specifications**:
 
@@ -46,7 +46,7 @@
 flowchart TB
     subgraph Presentation["Presentation Layer"]
         Blade["Blade Templates"]
-        Livewire["Livewire 4 Components"]
+        Livewire["Livewire 3 Components"]
         Alpine["Alpine.js Interactions"]
     end
     
@@ -99,7 +99,7 @@ Support Card Management System
 │
 ├── Services
 │   ├── SupportCardCatalogService
-│   ├── DeckManagementService
+│   ├── DeckCompositionService
 │   ├── BonusCalculatorService
 │   ├── BondLevelService
 │   ├── LimitBreakService
@@ -132,7 +132,7 @@ sequenceDiagram
     participant User
     participant UI as Livewire Component
     participant Controller
-    participant Service as DeckManagementService
+    participant Service as DeckCompositionService
     participant Validator as DeckValidator
     participant Calculator as BonusCalculator
     participant DB as Database
@@ -619,14 +619,14 @@ Schema::create('ucp_card_bonds', function (Blueprint $table) {
 
 ### 3.2 Phase 2: Deck Composition Service (Week 1-2, ~14 hours)
 
-#### Task 5.2.1: Create DeckManagementService
+#### Task 5.2.1: Create DeckCompositionService
 
 **Priority**: P0  
 **Effort**: 6 hours  
 **Status**: ✅ Complete
 
 ```php
-// app/Services/DeckManagementService.php
+// app/Services/DeckCompositionService.php
 namespace App\Services;
 
 use App\Models\Character;
@@ -634,7 +634,7 @@ use App\Models\SupportDeck;
 use App\Models\SupportCard;
 use Illuminate\Support\Collection;
 
-class DeckManagementService
+class DeckCompositionService
 {
     /**
      * Compose a new support deck for a character
@@ -734,7 +734,7 @@ class DeckManagementService
 - Save deck configuration
 - Calculate synergy score
 - Unit tests: 6 tests
-- **Files**: `app/Services/DeckManagementService.php`
+- **Files**: `app/Services/DeckCompositionService.php`
 
 ---
 
@@ -1125,13 +1125,13 @@ use Tests\TestCase;
 use App\Models\Character;
 use App\Models\SupportCard;
 use App\Models\SupportDeck;
-use App\Services\DeckManagementService;
+use App\Services\DeckCompositionService;
 
 test('creates valid 6-card deck', function () {
     $character = Character::factory()->create();
     $cards = SupportCard::factory()->count(6)->create(['user_id' => $character->user_id]);
     
-    $service = app(DeckManagementService::class);
+    $service = app(DeckCompositionService::class);
     $deck = $service->composeDeck($character, $cards->pluck('id')->toArray());
     
     expect($deck->cards)->toHaveCount(6)
@@ -1143,7 +1143,7 @@ test('rejects deck with duplicate cards', function () {
     $character = Character::factory()->create();
     $card = SupportCard::factory()->create();
     
-    $service = app(DeckManagementService::class);
+    $service = app(DeckCompositionService::class);
     
     expect(fn() => $service->composeDeck($character, array_fill(0, 6, $card->id)))
         ->toThrow(\InvalidArgumentException::class);
@@ -1209,7 +1209,7 @@ test('friendship unlocks at 80% bond', function () {
 
 ## 4. Component Specifications
 
-### 4.1 DeckManagementService::composeDeck()
+### 4.1 DeckCompositionService::composeDeck()
 
 ```php
 /**
@@ -1326,7 +1326,7 @@ erDiagram
 ### 5.2 Table Constraints
 
 | Table | Constraint | Description |
-|-------|------------|-------------|
+| --- | --- | --- |
 | `ucp_support_cards` | `limit_break_level` IN (0-4) | Valid LB range |
 | `ucp_support_decks` | `synergy_score` BETWEEN 0 AND 100 | Percentage range |
 | `ucp_deck_cards` | UNIQUE(`deck_id`, `slot_position`) | No duplicate slots |
@@ -1343,9 +1343,9 @@ erDiagram
 
 ```mermaid
 flowchart TD
-    DeckManagementService --> SupportCardRepository
-    DeckManagementService --> SynergyCalculator
-    DeckManagementService --> DeckValidator
+    DeckCompositionService --> SupportCardRepository
+    DeckCompositionService --> SynergyCalculator
+    DeckCompositionService --> DeckValidator
     
     SupportCardBonusCalculator --> BondLevelService
     SupportCardBonusCalculator --> LimitBreakService
@@ -1356,7 +1356,7 @@ flowchart TD
     BondLevelService --> RewardService
     BondLevelService --> EventDispatcher
     
-    MetaSyncService --> ExternalDataService
+    MetaSyncService --> ExternalAPIService
     MetaSyncService --> SupportCardRepository
 ```
 
@@ -1367,7 +1367,7 @@ flowchart TD
 ### 7.1 REST API Endpoints
 
 | Endpoint | Method | Description | Auth | Rate Limit | Cache TTL |
-|----------|--------|-------------|------|------------|-----------|
+| --- | --- | --- | --- | --- | --- |
 | `/api/v1/support-cards` | GET | List all cards | Required | 100/min | 1 hour |
 | `/api/v1/support-cards/{id}` | GET | Get card details | Required | 100/min | 1 hour |
 | `/api/v1/support-cards/{id}/limit-break` | PATCH | Upgrade card | Required | 30/min | None |
@@ -1439,7 +1439,7 @@ pie title Test Distribution
 ### 8.2 Critical Test Cases
 
 | Test Case | Type | Priority | Status |
-|-----------|------|----------|--------|
+| --- | --- | --- | --- |
 | Deck composition with 6 valid cards | Feature | P0 | ✅ Pass |
 | Duplicate card prevention | Unit | P0 | ✅ Pass |
 | Limit break level progression (LB0-LB4) | Feature | P0 | ✅ Pass |
@@ -1456,7 +1456,7 @@ pie title Test Distribution
 ### 9.1 Effort Breakdown
 
 | Phase | Tasks | Estimated Hours | Actual Hours | Status |
-|-------|-------|-----------------|--------------|--------|
+| --- | --- | --- | --- | --- |
 | Support Card Models | 3 tasks | 10 | 11 | ✅ Complete |
 | Deck Composition Service | 2 tasks | 14 | 15 | ✅ Complete |
 | Limit Break System | 1 task | 10 | 9 | ✅ Complete |
@@ -1476,7 +1476,7 @@ pie title Test Distribution
 ### 10.1 Functional Completeness
 
 - [x] 3 models implemented (SupportCard, SupportDeck, CardBond)
-- [x] 4 services implemented (DeckManagementService, BonusCalculator, LimitBreakService, BondLevelService)
+- [x] 4 services implemented (DeckCompositionService, BonusCalculator, LimitBreakService, BondLevelService)
 - [x] 2 controllers with 8 REST endpoints
 - [x] 3 database tables with migrations
 - [x] Complete limit break system (LB0-LB4)
@@ -1491,7 +1491,7 @@ pie title Test Distribution
 ### 10.2 Performance Metrics
 
 | Metric | Target | Actual | Status |
-|--------|--------|--------|--------|
+| --- | --- | --- | --- |
 | Deck composition time | < 300ms | ~275ms | ✅ Met |
 | Bonus calculation time | < 150ms | ~130ms | ✅ Met |
 | Limit break processing | < 500ms | ~450ms | ✅ Met |
@@ -1503,7 +1503,7 @@ pie title Test Distribution
 ### 10.3 Quality Metrics
 
 | Metric | Target | Actual | Status |
-|--------|--------|--------|--------|
+| --- | --- | --- | --- |
 | Test coverage | > 80% | 86% | ✅ Met |
 | Code style compliance (PSR-12) | 100% | 100% | ✅ Met |
 | Documentation coverage | 100% | 100% | ✅ Met |
@@ -1514,8 +1514,7 @@ pie title Test Distribution
 ## Document Control
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 2.3.0 | 2026-02-22 | Development Team | Updated service names to match codebase (DeckManagementService); Livewire 4 |
+| --- | --- | --- | --- |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: bond gain +7 base (+9 with Charming condition), friendship training threshold 80%, friendship bonus 10-35% based on card rarity |
 | 2.1.0 | 2026-01-24 | Development Team | Updated to v2.0.0 implementation standards; aligned with industry documentation guidelines; added comprehensive cross-references; enhanced code examples and diagrams |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with detailed specifications |
@@ -1536,4 +1535,4 @@ pie title Test Distribution
 
 ---
 
-*This technical flow document reflects the current implementation as of version 2.3.0 and follows industry-standard documentation practices for software development lifecycle (SDLC) artifacts.*
+*This technical flow document reflects the current implementation as of version 2.0.0 and follows industry-standard documentation practices for software development lifecycle (SDLC) artifacts.*

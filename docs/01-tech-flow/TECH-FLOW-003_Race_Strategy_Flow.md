@@ -1,8 +1,8 @@
 # TECH-FLOW-003: Race Strategy - Technical Flow & Task Breakdown
 
-**Document Version**: 2.3.0  
-**Date**: February 22, 2026  
-**Status**: Current - Aligned with codebase v2.3.0 and game-accurate mechanics
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
+**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
 
 **Source Specifications**:
 
@@ -46,7 +46,7 @@
 flowchart TB
     subgraph Presentation["Presentation Layer"]
         Blade["Blade Templates"]
-        Livewire["Livewire 4 Components"]
+        Livewire["Livewire 3 Components"]
         Alpine["Alpine.js Interactions"]
     end
     
@@ -99,10 +99,10 @@ Race Strategy System
 │
 ├── Services
 │   ├── RaceRequirementAnalyzer
-│   ├── RaceConditionService
+│   ├── WeatherImpactCalculator
 │   ├── RunningStyleOptimizer
 │   ├── RaceStrategyService
-│   └── Neuron\RaceStrategyService
+│   └── AIRaceAdvisorService
 │
 ├── Analysis Engines
 │   ├── StatRequirementEngine
@@ -366,20 +366,20 @@ class RaceRequirementAnalyzer
 
 ---
 
-#### Task 3.1.2: Create RaceConditionService
+#### Task 3.1.2: Create WeatherImpactCalculator Service
 
 **Priority**: P0  
 **Effort**: 6 hours  
 **Status**: ✅ Complete
 
 ```php
-// app/Services/RaceConditionService.php
-namespace App\Services;
+// app/Services/Race/WeatherImpactCalculator.php
+namespace App\Services\Race;
 
 use App\Models\Race;
 use App\Models\Character;
 
-class RaceConditionService
+class WeatherImpactCalculator
 {
     /**
      * Calculate weather and track condition impact on race performance
@@ -512,7 +512,7 @@ class RaceConditionService
 - Track condition impacts
 - Weather-specific skill detection
 - Unit tests: 5 tests
-- **Files**: `app/Services/RaceConditionService.php`
+- **Files**: `app/Services/Race/WeatherImpactCalculator.php`
 
 ---
 
@@ -658,7 +658,7 @@ namespace App\Services;
 use App\Models\Race;
 use App\Models\Character;
 use App\Services\Race\RaceRequirementAnalyzer;
-use App\Services\RaceConditionService;
+use App\Services\Race\WeatherImpactCalculator;
 use App\Services\Race\RunningStyleOptimizer;
 use Illuminate\Support\Facades\Cache;
 
@@ -666,7 +666,7 @@ class RaceStrategyService
 {
     public function __construct(
         private RaceRequirementAnalyzer $requirementAnalyzer,
-        private RaceConditionService $weatherCalculator,
+        private WeatherImpactCalculator $weatherCalculator,
         private RunningStyleOptimizer $styleOptimizer,
     ) {}
     
@@ -1187,16 +1187,16 @@ erDiagram
 ```mermaid
 flowchart TD
     RaceStrategyService --> RaceRequirementAnalyzer
-    RaceStrategyService --> RaceConditionService
+    RaceStrategyService --> WeatherImpactCalculator
     RaceStrategyService --> RunningStyleOptimizer
     RaceStrategyService --> CacheManager
     
     RaceRequirementAnalyzer --> RaceRepository
-    RaceConditionService --> SkillRepository
+    WeatherImpactCalculator --> SkillRepository
     RunningStyleOptimizer --> AptitudeRepository
     
-    NeuronRaceStrategyService --> RaceStrategyService
-    NeuronRaceStrategyService --> HybridAIService
+    AIRaceAdvisorService --> RaceStrategyService
+    AIRaceAdvisorService --> HybridAIService
 ```
 
 ---
@@ -1206,7 +1206,7 @@ flowchart TD
 ### 7.1 REST API Endpoints
 
 | Endpoint | Method | Description | Auth | Rate Limit | Cache TTL |
-|----------|--------|-------------|------|------------|-----------|
+| --- | --- | --- | --- | --- | --- |
 | `/api/v1/races` | GET | List available races | Required | 100/min | 1 hour |
 | `/api/v1/races/{id}` | GET | Get race details | Required | 100/min | 1 hour |
 | `/api/v1/races/{id}/strategy` | GET | Generate race strategy | Required | 60/min | 5 min |
@@ -1283,7 +1283,7 @@ pie title Test Distribution
 ### 8.2 Critical Test Cases
 
 | Test Case | Type | Priority | Status |
-|-----------|------|----------|--------|
+| --- | --- | --- | --- |
 | Stat requirement evaluation with all indicators | Unit | P0 | ✅ Pass |
 | Weather impact calculation (all conditions) | Unit | P0 | ✅ Pass |
 | Running style optimization (all 4 styles) | Unit | P0 | ✅ Pass |
@@ -1300,7 +1300,7 @@ pie title Test Distribution
 ### 9.1 Effort Breakdown
 
 | Phase | Tasks | Estimated Hours | Actual Hours | Status |
-|-------|-------|-----------------|--------------|--------|
+| --- | --- | --- | --- | --- |
 | Race Analysis Engine | 3 tasks | 24 | 25 | ✅ Complete |
 | Race Strategy Service | 2 tasks | 16 | 17 | ✅ Complete |
 | Repository Layer | 2 tasks | 8 | 7 | ✅ Complete |
@@ -1333,7 +1333,7 @@ pie title Test Distribution
 ### 10.2 Performance Metrics
 
 | Metric | Target | Actual | Status |
-|--------|--------|--------|--------|
+| --- | --- | --- | --- |
 | Strategy generation time | < 200ms | ~175ms | ✅ Met |
 | Race list load time | < 100ms | ~85ms | ✅ Met |
 | Strategy API response | < 250ms | ~220ms | ✅ Met |
@@ -1344,7 +1344,7 @@ pie title Test Distribution
 ### 10.3 Quality Metrics
 
 | Metric | Target | Actual | Status |
-|--------|--------|--------|--------|
+| --- | --- | --- | --- |
 | Test coverage | > 80% | 88% | ✅ Met |
 | Code style compliance (PSR-12) | 100% | 100% | ✅ Met |
 | Documentation coverage | 100% | 100% | ✅ Met |
@@ -1355,8 +1355,7 @@ pie title Test Distribution
 ## Document Control
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 2.3.0 | 2026-02-22 | Development Team | Updated service names to match codebase (RaceConditionService, Neuron\RaceStrategyService); Livewire 4 |
+| --- | --- | --- | --- |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: track conditions (Firm/Good/Soft/Heavy) with Power/Speed penalties and stamina drain modifiers; running style optimization aligned with game formulas |
 | 2.1.0 | 2026-01-24 | Development Team | Updated to v2.0.0 implementation standards; aligned with industry documentation guidelines; added comprehensive cross-references; enhanced code examples and diagrams |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with detailed specifications |
@@ -1377,4 +1376,4 @@ pie title Test Distribution
 
 ---
 
-*This technical flow document reflects the current implementation as of version 2.3.0 and follows industry-standard documentation practices for software development lifecycle (SDLC) artifacts.*
+*This technical flow document reflects the current implementation as of version 2.0.0 and follows industry-standard documentation practices for software development lifecycle (SDLC) artifacts.*

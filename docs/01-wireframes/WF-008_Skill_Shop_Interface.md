@@ -1,4 +1,3 @@
-````markdown
 # WF-008: Skill Shop Interface
 
 ## Umamusume Pretty Derby Career Planner
@@ -95,7 +94,6 @@ The Skill Shop Interface provides a comprehensive catalog of available skills, e
 │ └──────────────────────┘ └──────────────────────┘ └────────────────┘ │
 └──────────────────────────────────────────────────────────────────────┘
 ```
-````
 
 ### 2.2 Tablet Layout (640px-1024px)
 
@@ -402,37 +400,37 @@ class SkillSearch extends Component
 
 **Skill Card States**:
 
-| State           | Visual Indicator              | Actions Available        |
-| --------------- | ----------------------------- | ------------------------ |
-| Owned           | ✓ Owned badge, green border   | None (disabled)          |
-| Planned         | 📋 Planned badge, blue border | Unplan, More Info        |
-| Available       | Standard border               | Acquire, Plan, More Info |
-| Insufficient SP | Red border, dimmed            | Plan only, More Info     |
+| State | Visual Indicator | Actions Available |
+| --- | --- | --- |
+| Owned | ✓ Owned badge, green border | None (disabled) |
+| Planned | 📋 Planned badge, blue border | Unplan, More Info |
+| Available | Standard border | Acquire, Plan, More Info |
+| Insufficient SP | Red border, dimmed | Plan only, More Info |
 
 ### 3.4 Hint Tracking System
 
 **5-Level Hint Discount System (Global English Server - Feb 2026)**:
 
 | Hint Level | Discount Percentage | Example (120 SP Base) |
-| ---------- | ------------------- | --------------------- |
-| Level 0    | 0%                  | 120 SP                |
-| Level 1    | 10%                 | 108 SP (-12)          |
-| Level 2    | 20%                 | 96 SP (-24)           |
-| Level 3    | 30%                 | 84 SP (-36)           |
-| Level 4    | 35%                 | 78 SP (-42)           |
-| Level 5    | 40% (max)           | 72 SP (-48)           |
+| --- | --- | --- |
+| Level 0 | 0% | 120 SP |
+| Level 1 | 10% | 108 SP (-12) |
+| Level 2 | 20% | 96 SP (-24) |
+| Level 3 | 30% | 84 SP (-36) |
+| Level 4 | 35% | 78 SP (-42) |
+| Level 5 | 40% (max) | 72 SP (-48) |
 
 **Additional Discount Sources**:
 
 | Source | Discount | Stacks With Hints |
-|--------|----------|-------------------|
+| --- | --- | --- |
 | Fast Learner Condition | +10% | Yes |
 | Skill Sparks | Variable | Yes |
 
 **Skill Rarities**:
 
 | Rarity | Color | Description |
-|--------|-------|-------------|
+| --- | --- | --- |
 | Normal | White | Common skills |
 | Rare | Gold | Evolved/premium skills |
 | Unique | Character-specific | Character-exclusive skills |
@@ -565,12 +563,12 @@ class AIRecommendations extends Component
 
 **Recommendation Scoring**:
 
-| Factor           | Weight | Description                 |
-| ---------------- | ------ | --------------------------- |
-| Goal Alignment   | 40%    | Matches current build goals |
-| Race Suitability | 30%    | Useful for upcoming races   |
-| SP Efficiency    | 20%    | Best value with hints       |
-| Synergy          | 10%    | Complements owned skills    |
+| Factor | Weight | Description |
+| --- | --- | --- |
+| Goal Alignment | 40% | Matches current build goals |
+| Race Suitability | 30% | Useful for upcoming races |
+| SP Efficiency | 20% | Best value with hints |
+| Synergy | 10% | Complements owned skills |
 
 ### 3.6 Skill Detail Modal
 
@@ -826,12 +824,12 @@ sequenceDiagram
 
 ### 4.3 Cache Strategy
 
-| Data Type          | Cache Key                              | TTL        | Invalidation        |
-| ------------------ | -------------------------------------- | ---------- | ------------------- |
-| Skill catalog      | `skills:catalog:{filters}`             | 1 hour     | On skill update     |
-| Hint counts        | `hints:{character_id}:{skill_id}`      | 5 minutes  | On hint acquisition |
-| AI recommendations | `ai:skill_rec:{character_id}`          | 10 minutes | On goal/stat update |
-| Final costs        | `skill_cost:{character_id}:{skill_id}` | 5 minutes  | On hint update      |
+| Data Type | Cache Key | TTL | Invalidation |
+| --- | --- | --- | --- |
+| Skill catalog | `skills:catalog:{filters}` | 1 hour | On skill update |
+| Hint counts | `hints:{character_id}:{skill_id}` | 5 minutes | On hint acquisition |
+| AI recommendations | `ai:skill_rec:{character_id}` | 10 minutes | On goal/stat update |
+| Final costs | `skill_cost:{character_id}:{skill_id}` | 5 minutes | On hint update |
 
 ---
 
@@ -917,27 +915,27 @@ sequenceDiagram
 
 ### 6.1 WCAG 2.2 AA Compliance
 
-| Criterion                           | Implementation                               | Test Method             |
-| ----------------------------------- | -------------------------------------------- | ----------------------- |
-| **1.1.1 Non-text Content**          | All icons have `aria-label`                  | Screen reader testing   |
-| **1.4.3 Contrast Ratio**            | 4.5:1 minimum for text                       | Color contrast analyzer |
-| **2.1.1 Keyboard**                  | All interactive elements keyboard accessible | Keyboard-only testing   |
-| **2.4.3 Focus Order**               | Logical tab order through filters and skills | Tab key traversal       |
-| **2.4.7 Focus Visible**             | Clear focus indicators on cards and buttons  | Visual inspection       |
-| **3.2.4 Consistent Identification** | Consistent skill status badges               | Manual review           |
-| **4.1.2 Name, Role, Value**         | Proper ARIA attributes on controls           | axe-core scan           |
+| Criterion | Implementation | Test Method |
+| --- | --- | --- |
+| **1.1.1 Non-text Content** | All icons have `aria-label` | Screen reader testing |
+| **1.4.3 Contrast Ratio** | 4.5:1 minimum for text | Color contrast analyzer |
+| **2.1.1 Keyboard** | All interactive elements keyboard accessible | Keyboard-only testing |
+| **2.4.3 Focus Order** | Logical tab order through filters and skills | Tab key traversal |
+| **2.4.7 Focus Visible** | Clear focus indicators on cards and buttons | Visual inspection |
+| **3.2.4 Consistent Identification** | Consistent skill status badges | Manual review |
+| **4.1.2 Name, Role, Value** | Proper ARIA attributes on controls | axe-core scan |
 
 ### 6.2 Keyboard Navigation
 
-| Action                | Shortcut       | Context                 |
-| --------------------- | -------------- | ----------------------- |
-| Search skills         | `/`            | When skill shop loaded  |
+| Action | Shortcut | Context |
+| --- | --- | --- |
+| Search skills | `/` | When skill shop loaded |
 | Acquire focused skill | `Enter` or `A` | When skill card focused |
-| Plan focused skill    | `P`            | When skill card focused |
-| Show skill details    | `I` or `Space` | When skill card focused |
-| Navigate skills       | `Arrow Keys`   | Skill grid              |
-| Reset filters         | `Ctrl+R`       | Skill shop              |
-| Toggle view mode      | `V`            | Skill shop              |
+| Plan focused skill | `P` | When skill card focused |
+| Show skill details | `I` or `Space` | When skill card focused |
+| Navigate skills | `Arrow Keys` | Skill grid |
+| Reset filters | `Ctrl+R` | Skill shop |
+| Toggle view mode | `V` | Skill shop |
 
 ### 6.3 Screen Reader Announcements
 
@@ -970,32 +968,32 @@ sequenceDiagram
 
 ### 7.1 Performance Targets
 
-| Metric                 | Target        | Measurement                |
-| ---------------------- | ------------- | -------------------------- |
-| **Page Load**          | < 1.5 seconds | Time to first render       |
-| **Filter Application** | < 200ms       | Filter change to UI update |
-| **Search Response**    | < 300ms       | Keystroke to results       |
-| **Skill Acquisition**  | < 500ms       | Click to confirmation      |
-| **AI Recommendations** | < 2 seconds   | With AI provider           |
+| Metric | Target | Measurement |
+| --- | --- | --- |
+| **Page Load** | < 1.5 seconds | Time to first render |
+| **Filter Application** | < 200ms | Filter change to UI update |
+| **Search Response** | < 300ms | Keystroke to results |
+| **Skill Acquisition** | < 500ms | Click to confirmation |
+| **AI Recommendations** | < 2 seconds | With AI provider |
 
 ### 7.2 Optimization Strategies
 
-| Strategy                   | Implementation                       | Impact                |
-| -------------------------- | ------------------------------------ | --------------------- |
-| **Lazy Loading**           | Virtual scrolling for skill grid     | Handles 500+ skills   |
-| **Query Optimization**     | Eager load hints and requirements    | -60% query count      |
-| **Response Caching**       | Cache filtered skill lists (1hr TTL) | -80% database queries |
-| **Debounced Search**       | 300ms debounce on search input       | Reduced re-renders    |
-| **Cost Calculation Cache** | Cache final costs with hints         | -70% calculations     |
+| Strategy | Implementation | Impact |
+| --- | --- | --- |
+| **Lazy Loading** | Virtual scrolling for skill grid | Handles 500+ skills |
+| **Query Optimization** | Eager load hints and requirements | -60% query count |
+| **Response Caching** | Cache filtered skill lists (1hr TTL) | -80% database queries |
+| **Debounced Search** | 300ms debounce on search input | Reduced re-renders |
+| **Cost Calculation Cache** | Cache final costs with hints | -70% calculations |
 
 ### 7.3 Bundle Size Budget
 
-| Asset Type | Budget | Current | Status           |
-| ---------- | ------ | ------- | ---------------- |
-| JavaScript | 55 KB  | 52 KB   | ✅ Within budget |
-| CSS        | 20 KB  | 18 KB   | ✅ Within budget |
-| Images     | 30 KB  | 25 KB   | ✅ Within budget |
-| Total      | 105 KB | 95 KB   | ✅ Within budget |
+| Asset Type | Budget | Current | Status |
+| --- | --- | --- | --- |
+| JavaScript | 55 KB | 52 KB | ✅ Within budget |
+| CSS | 20 KB | 18 KB | ✅ Within budget |
+| Images | 30 KB | 25 KB | ✅ Within budget |
+| Total | 105 KB | 95 KB | ✅ Within budget |
 
 ---
 
@@ -1309,12 +1307,12 @@ test.describe("WF-008: Accessibility", () => {
 
 ## 10. Version History
 
-| Version | Date       | Author           | Changes                                                                                                                                                                                                   |
-| ------- | ---------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2.3.0   | 2026-02-22 | Development Team | Updated version/dates, aligned technology references with current stack (Livewire 4, Neuron AI v2.11, GameTora/umapyoi.net) |
-| 2.2.0   | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: 5-level hint system (10%/20%/30%/35%/40%), Fast Learner condition (+10%), skill rarities (Normal/Rare/Unique), Skill Sparks support |
-| 2.0.0   | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added SP balance widget, hint tracking system, AI recommendations, skill evolution paths, accessibility specifications, and testing requirements |
-| 1.0.0   | 2026-01-14 | Development Team | Initial wireframe specification                                                                                                                                                                           |
+| Version | Date | Author | Changes |
+| --- | --- | --- | --- |
+| 2.3.0 | 2026-02-22 | Development Team | Updated version/dates, aligned technology references with current stack (Livewire 4, Neuron AI v2.11, GameTora/umapyoi.net) |
+| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: 5-level hint system (10%/20%/30%/35%/40%), Fast Learner condition (+10%), skill rarities (Normal/Rare/Unique), Skill Sparks support |
+| 2.0.0 | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added SP balance widget, hint tracking system, AI recommendations, skill evolution paths, accessibility specifications, and testing requirements |
+| 1.0.0 | 2026-01-14 | Development Team | Initial wireframe specification |
 
 ---
 

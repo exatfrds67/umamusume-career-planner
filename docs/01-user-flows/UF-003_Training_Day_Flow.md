@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0  
-**Date**: February 22, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-002], [SPEC-002], [SRS], [BRS]
 
 **Source Specifications**:
@@ -45,7 +45,7 @@ The Training Day Flow guides users through the process of selecting and executin
 ### 1.2 Scope
 
 | Aspect | Description |
-|--------|-------------|
+| --- | --- |
 | **Entry Point** | Beginning of turn (Junior/Classic/Senior years) |
 | **Exit Point** | Training executed, stats updated, turn advanced |
 | **Duration** | 1-3 minutes per training decision |
@@ -251,7 +251,7 @@ stateDiagram-v2
 **User Actions**:
 
 | Action | Description | Next State |
-|--------|-------------|------------|
+| --- | --- | --- |
 | View status | Automatic on page load | Display predictions |
 | Change deck | Navigate to deck editor | Invalidate cache, recalculate |
 | View full stats | Open detailed stats modal | Return to training |
@@ -324,7 +324,7 @@ sequenceDiagram
 #### 3.2.2 Prediction Calculation Components
 
 | Component | Service | Purpose |
-|-----------|---------|---------|
+| --- | --- | --- |
 | Base Gains | `StatGainCalculator` | Calculate raw stat increases |
 | Support Bonuses | `SupportCardBonusCalculator` | Apply deck multipliers |
 | Failure Risk | `RiskCalculator` | Assess training success probability |
@@ -424,7 +424,7 @@ public function calculate(CareerRun $career, TrainingType $type): StatGains
 **Prediction Components Explained**:
 
 | Component | Description | User Value |
-|-----------|-------------|------------|
+| --- | --- | --- |
 | **Score** | Composite ranking (0-100) | Quick comparison |
 | **Stat Gains** | Expected stat increases (capped at +100 per training, +50 if stat > 1200) | Decision foundation |
 | **Energy Cost** | Energy deduction | Resource management |
@@ -438,7 +438,7 @@ public function calculate(CareerRun $career, TrainingType $type): StatGains
 **Skill Hint Discount System (Verified Jan 2026)**:
 
 | Hint Level | SP Discount | Cumulative Effect |
-|------------|-------------|-------------------|
+| --- | --- | --- |
 | Level 1 | 10% | Base discount |
 | Level 2 | 20% | +10% from Level 1 |
 | Level 3 | 30% | +10% from Level 2 |
@@ -481,7 +481,7 @@ public function calculate(CareerRun $career, TrainingType $type): StatGains
 **User Actions**:
 
 | Action | Behavior | Next State |
-|--------|----------|------------|
+| --- | --- | --- |
 | Confirm | Proceed with training | Execute training |
 | Cancel | Return to selection | Training options |
 | Request AI advice | Show detailed analysis | AI advisor modal |
@@ -756,7 +756,7 @@ flowchart TD
 ### 4.2 Key Decision Factors
 
 | Factor | Impact on Decision | Weight |
-|--------|-------------------|--------|
+| --- | --- | --- |
 | **Goal Alignment** | Training matches active goals | High |
 | **Support Bonus** | Active cards provide bonuses | High |
 | **Energy Level** | Sufficient energy available | Critical |
@@ -1079,7 +1079,7 @@ public function invalidatePredictions(CareerRun $career): void
 ### 6.2 User Experience Success
 
 | Metric | Target | Measurement |
-|--------|--------|-------------|
+| --- | --- | --- |
 | Decision time | < 2 minutes | User analytics |
 | Prediction accuracy | > 85% | Predicted vs actual comparison |
 | AI recommendation acceptance | > 70% | User action tracking |
@@ -1148,7 +1148,7 @@ flowchart TD
 ### 7.2 Error Messages
 
 | Error Code | Trigger | Message | User Action |
-|------------|---------|---------|-------------|
+| --- | --- | --- | --- |
 | `TR-001` | Energy < 20% | "Insufficient energy for training. Rest recommended." | Select rest or proceed at risk |
 | `TR-002` | Invalid facility | "Invalid training selection. Please choose a valid option." | Reselect training |
 | `TR-003` | Database error | "Unable to save training result. Please try again." | Retry operation |
@@ -1158,7 +1158,7 @@ flowchart TD
 ### 7.3 Recovery Strategies
 
 | Scenario | Primary Recovery | Fallback Recovery | Ultimate Fallback |
-|----------|------------------|-------------------|-------------------|
+| --- | --- | --- | --- |
 | Prediction failure | Use cached predictions | Calculate on-demand | Show basic estimates |
 | Database timeout | Retry transaction (3x) | Queue for later processing | Save as draft |
 | Validation error | Show inline errors | Provide default values | Reset to safe state |
@@ -1173,7 +1173,7 @@ flowchart TD
 After training execution, users may proceed to:
 
 | Flow | Document Reference | Entry Condition |
-|------|-------------------|-----------------|
+| --- | --- | --- |
 | Skill Acquisition | [UF-005](UF-005_Skill_Management_Flow.md) | Skill hints gained during training |
 | Race Preparation | [UF-004](UF-004_Race_Day_Flow.md) | Race week begins |
 | Rest and Recovery | Rest action selected | Energy/mood restoration needed |
@@ -1182,7 +1182,7 @@ After training execution, users may proceed to:
 ### 8.2 Alternative Entry Points
 
 | Entry Point | Scenario | Flow Adjustment |
-|-------------|----------|-----------------|
+| --- | --- | --- |
 | AI Auto-Pilot | User enables AI auto-training | Skip user selection, use AI recommendation |
 | Scheduled Training | Batch training execution | Execute multiple turns sequentially |
 | Training History | User reviews past training | Read-only view, no execution |
@@ -1227,8 +1227,7 @@ flowchart LR
 ## Document Control
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 2.3.0 | 2026-02-22 | Development Team | Updated version and dates; no functional changes |
+| --- | --- | --- | --- |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server (Jan 2026); corrected training formula with accurate multipliers; added stat soft cap (1200 with +50 max above cap); updated skill hint system (5 levels: 10%/20%/30%/35%/40% + Fast Learner +10%); added support card bond mechanics (+7 base, +9 with Charming, 80% friendship threshold) |
 | 2.1.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 architecture; added training prediction engine details, AI integration, support card bonus calculations; comprehensive error handling and testing criteria |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with basic flow |
@@ -1250,4 +1249,4 @@ flowchart LR
 
 ---
 
-*This user flow reflects the current training system implementation as of version 2.3.0. For the latest updates, refer to the online documentation.*
+*This user flow reflects the current training system implementation as of version 2.2.0. For the latest updates, refer to the online documentation.*

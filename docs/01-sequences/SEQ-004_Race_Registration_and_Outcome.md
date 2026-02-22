@@ -3,7 +3,7 @@
 ## Umamusume Pretty Derby Career Planner
 
 **Document Version**: 2.2.0  
-**Date**: February 22, 2026  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-003], [SPEC-003], [FLOW-003], [TECH-FLOW-003]
 
 ---
@@ -73,11 +73,11 @@ Race strategy management is a critical planning workflow that:
 ### 2.1 System Components
 
 | Component | Type | Responsibility |
-|-----------|------|----------------|
+| --- | --- | --- |
 | **User** | Actor | Initiates race analysis, registration, and result submission |
 | **Livewire Component** | Presentation | `RaceCalendar.php`, `RacePreparation.php` - Race browsing and analysis |
 | **RaceController** | Application | Orchestrates race workflow |
-| **RaceConditionService** | Domain Service | Readiness scoring and strategy recommendations |
+| **RaceAnalysisService** | Domain Service | Readiness scoring and strategy recommendations |
 | **ReadinessCalculator** | Domain Service | Multi-factor readiness calculation |
 | **StrategyOptimizer** | Domain Service | Running style optimization |
 | **WinProbabilityCalculator** | Domain Service | Win probability estimation |
@@ -99,7 +99,7 @@ app/
 │   └── Controllers/
 │       └── RaceController.php
 ├── Services/
-│   ├── RaceConditionService.php
+│   ├── RaceAnalysisService.php
 │   ├── RaceResultService.php
 │   ├── ReadinessCalculator.php
 │   ├── StrategyOptimizer.php
@@ -122,7 +122,7 @@ sequenceDiagram
     actor User
     participant UI as Livewire Calendar
     participant Controller as RaceController
-    participant AnalysisSvc as RaceConditionService
+    participant AnalysisSvc as RaceAnalysisService
     participant ReadinessCalc as ReadinessCalculator
     participant StrategyOpt as StrategyOptimizer
     participant WinProbCalc as WinProbabilityCalculator
@@ -227,7 +227,7 @@ sequenceDiagram
 ### 3.2 Timeline Breakdown
 
 | Phase | Duration | Description |
-|-------|----------|-------------|
+| --- | --- | --- |
 | **Calendar Load** | ~150ms | Load race list with filters |
 | **User Selection** | Variable | User browses and selects race |
 | **Readiness Calculation** | ~300ms | Multi-factor analysis |
@@ -793,7 +793,7 @@ private function getNextGrade(string $currentGrade): string
 ### 6.1 Validation Errors
 
 | Error Code | Condition | HTTP Status | User Message |
-|------------|-----------|-------------|--------------|
+| --- | --- | --- | --- |
 | `RACE_001` | Race not found | 404 | "Race not found" |
 | `RACE_002` | Career not found | 404 | "Career run not found" |
 | `RACE_003` | Race already completed | 422 | "Race already completed for this career" |
@@ -839,7 +839,7 @@ sequenceDiagram
 ### 6.3 Transaction Rollback Scenarios
 
 | Scenario | Trigger | Recovery |
-|----------|---------|----------|
+| --- | --- | --- |
 | Constraint violation | Duplicate race result | Rollback, display error |
 | Foreign key error | Invalid race_id reference | Rollback, re-validate input |
 | Deadlock | Concurrent result submission | Rollback, retry with delay |
@@ -852,7 +852,7 @@ sequenceDiagram
 ### 7.1 Performance Metrics
 
 | Operation | Target | Current | Status |
-|-----------|--------|---------|--------|
+| --- | --- | --- | --- |
 | Race calendar load | <500ms | ~350ms | ✅ Met |
 | Race analysis | <400ms | ~380ms | ✅ Met |
 | Registration | <200ms | ~150ms | ✅ Met |
@@ -926,7 +926,7 @@ $this->cache->tags(['race_catalog'])->flush();
 ### 8.1 System Documentation
 
 | Document | Description |
-|----------|-------------|
+| --- | --- |
 | [PRD-003](../prds/PRD-003_Race_Strategy.md) | Product requirements for race strategy |
 | [SPEC-003](../specs/SPEC-003_Race_Strategy_Technical.md) | Technical specification for race system |
 | [FLOW-003](../flows/FLOW-003_Race_Strategy_System.md) | System flow for race operations |
@@ -935,7 +935,7 @@ $this->cache->tags(['race_catalog'])->flush();
 ### 8.2 Related Sequences
 
 | Sequence | Description |
-|----------|-------------|
+| --- | --- |
 | [SEQ-001](SEQ-001_Character_Creation_Sequence.md) | Character creation (sets base aptitudes) |
 | [SEQ-002](SEQ-002_Training_Block_Resolution.md) | Training execution (improves stats for races) |
 | [SEQ-003](SEQ-003_Skill_Acquisition_and_Upgrade.md) | Skill acquisition (uses SP from races) |
@@ -943,7 +943,7 @@ $this->cache->tags(['race_catalog'])->flush();
 ### 8.3 UI Documentation
 
 | Document | Description |
-|----------|-------------|
+| --- | --- |
 | [WF-006](../wireframes/WF-006_Race_Calendar_View.md) | Wireframe specification for race calendar |
 | [WF-007](../wireframes/WF-007_Race_Preparation_Screen.md) | Race preparation interface wireframe |
 | [UF-004](../user-flows/UF-004_Race_Day_Flow.md) | User flow for race day |
@@ -951,7 +951,7 @@ $this->cache->tags(['race_catalog'])->flush();
 ### 8.4 Database Documentation
 
 | Document | Description |
-|----------|-------------|
+| --- | --- |
 | [DBD-009](../009_DBD_Database_Documentation.md) | Complete database schema documentation |
 
 ---
@@ -961,14 +961,14 @@ $this->cache->tags(['race_catalog'])->flush();
 ### Version History
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
+| --- | --- | --- | --- |
 | 2.0.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 implementation; added detailed sequence flows, readiness calculation, running style optimization, performance metrics, and aligned with current Laravel 12 architecture |
 | 1.0.0 | 2026-01-14 | Development Team | Initial draft |
 
 ### Approval
 
 | Role | Name | Signature | Date |
-|------|------|-----------|------|
+| --- | --- | --- | --- |
 | Technical Lead | | | |
 | QA Lead | | | |
 
@@ -988,4 +988,4 @@ $this->cache->tags(['race_catalog'])->flush();
 
 ---
 
-*This sequence diagram reflects the current implementation of the race registration and outcome workflow as of v2.0.0. For the most up-to-date information, refer to the source code in `app/Services/RaceConditionService.php`, `app/Services/RaceResultService.php`, and related files.*
+*This sequence diagram reflects the current implementation of the race registration and outcome workflow as of v2.0.0. For the most up-to-date information, refer to the source code in `app/Services/RaceAnalysisService.php`, `app/Services/RaceResultService.php`, and related files.*

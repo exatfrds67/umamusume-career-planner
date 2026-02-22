@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0  
-**Date**: February 22, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-001], [SPEC-001], [FLOW-001], [SEQ-001]
 
 **Source Specs**:
@@ -31,23 +31,23 @@ The Character Detail & Management screen provides a comprehensive view and manag
 
 ### 1.2 Key Objectives
 
-| Objective             | Description                                                 |
-| --------------------- | ----------------------------------------------------------- |
-| **State Overview**    | Complete view of current character state and progression    |
-| **Goal Tracking**     | Visual progress toward short-term and long-term objectives  |
-| **Quick Actions**     | One-click access to training, races, skills, and AI advisor |
-| **Analytics Display** | Stat trends, race history, and performance metrics          |
-| **Real-time Updates** | Live stat updates via WebSocket connections                 |
+| Objective | Description |
+| --- | --- |
+| **State Overview** | Complete view of current character state and progression |
+| **Goal Tracking** | Visual progress toward short-term and long-term objectives |
+| **Quick Actions** | One-click access to training, races, skills, and AI advisor |
+| **Analytics Display** | Stat trends, race history, and performance metrics |
+| **Real-time Updates** | Live stat updates via WebSocket connections |
 
 ### 1.3 User Stories
 
-| ID     | User Story                                                     | Priority |
-| ------ | -------------------------------------------------------------- | -------- |
-| US-001 | As a player, I want to see all my character stats at a glance  | P0       |
-| US-002 | As a player, I want to track my progress toward goals visually | P0       |
-| US-003 | As a player, I want quick access to training and race actions  | P0       |
-| US-004 | As a player, I want to see my upcoming race schedule           | P0       |
-| US-005 | As a player, I want to manage my support deck from this view   | P1       |
+| ID | User Story | Priority |
+| --- | --- | --- |
+| US-001 | As a player, I want to see all my character stats at a glance | P0 |
+| US-002 | As a player, I want to track my progress toward goals visually | P0 |
+| US-003 | As a player, I want quick access to training and race actions | P0 |
+| US-004 | As a player, I want to see my upcoming race schedule | P0 |
+| US-005 | As a player, I want to manage my support deck from this view | P1 |
 
 ---
 
@@ -284,12 +284,12 @@ class OverviewCard extends Component
 
 **Component**: `app/Livewire/Character/StatsPanel.php`
 
-| Element               | Description                                | Interactions                      |
-| --------------------- | ------------------------------------------ | --------------------------------- |
-| **Stat Bars**         | Visual representation with grade indicator | Hover → Show exact value and rank |
-| **Grade Badges**      | Letter grade based on value                | Click → Show grade boundaries     |
-| **Factor Indicators** | Star ratings for inherited bonuses         | Hover → Show source parent        |
-| **Stat History**      | Link to progression chart                  | Click → Open modal with chart     |
+| Element | Description | Interactions |
+| --- | --- | --- |
+| **Stat Bars** | Visual representation with grade indicator | Hover → Show exact value and rank |
+| **Grade Badges** | Letter grade based on value | Click → Show grade boundaries |
+| **Factor Indicators** | Star ratings for inherited bonuses | Hover → Show source parent |
+| **Stat History** | Link to progression chart | Click → Open modal with chart |
 
 **Stat Display Format**:
 
@@ -301,13 +301,13 @@ Factor Bonus: ★★☆ (+12 from Parent A)
 
 **Color Coding**:
 
-| Stat    | Color  | CSS Variable              |
-| ------- | ------ | ------------------------- |
-| Speed   | Blue   | `--stat-speed: #3399ff`   |
-| Stamina | Green  | `--stat-stamina: #33cc99` |
-| Power   | Red    | `--stat-power: #ff4d4d`   |
-| Guts    | Orange | `--stat-guts: #ffa500`    |
-| Wit     | Purple | `--stat-wisdom: #9933ff`  |
+| Stat | Color | CSS Variable |
+| --- | --- | --- |
+| Speed | Blue | `--stat-speed: #3399ff` |
+| Stamina | Green | `--stat-stamina: #33cc99` |
+| Power | Red | `--stat-power: #ff4d4d` |
+| Guts | Orange | `--stat-guts: #ffa500` |
+| Wit | Purple | `--stat-wisdom: #9933ff` |
 
 ### 3.3 Goals Progress Panel
 
@@ -345,21 +345,21 @@ class GoalsPanel extends Component
 
 **Goal Types**:
 
-| Type              | Format                   | Example            |
-| ----------------- | ------------------------ | ------------------ |
-| Stat Target       | `{stat} ≥ {value}`       | "Speed ≥ 800"      |
-| Race Win          | `Win {grade} race`       | "Win G1 race"      |
+| Type | Format | Example |
+| --- | --- | --- |
+| Stat Target | `{stat} ≥ {value}` | "Speed ≥ 800" |
+| Race Win | `Win {grade} race` | "Win G1 race" |
 | Skill Acquisition | `Acquire {count} skills` | "Acquire 9 skills" |
-| Turn Deadline     | `By turn {turn}`         | "By turn 60"       |
+| Turn Deadline | `By turn {turn}` | "By turn 60" |
 
 **Goal Status Indicators**:
 
-| Status    | Icon | Color | Criteria             |
-| --------- | ---- | ----- | -------------------- |
-| Completed | ✅   | Green | Target achieved      |
-| On Track  | 🟢   | Green | Progress ≥ expected  |
-| At Risk   | 🟡   | Amber | Progress < expected  |
-| Behind    | 🔴   | Red   | Unlikely to complete |
+| Status | Icon | Color | Criteria |
+| --- | --- | --- | --- |
+| Completed | ✅ | Green | Target achieved |
+| On Track | 🟢 | Green | Progress ≥ expected |
+| At Risk | 🟡 | Amber | Progress < expected |
+| Behind | 🔴 | Red | Unlikely to complete |
 
 ### 3.4 Upcoming Races Panel
 
@@ -434,12 +434,12 @@ Deck Score: 92/100 (Excellent)
 
 **Bond Level Colors**:
 
-| Range   | Color  | Status                     |
-| ------- | ------ | -------------------------- |
-| 80-100% | Gold   | Friendship Training Active |
-| 60-79%  | Silver | High bond                  |
-| 40-59%  | Bronze | Medium bond                |
-| 0-39%   | Gray   | Low bond                   |
+| Range | Color | Status |
+| --- | --- | --- |
+| 80-100% | Gold | Friendship Training Active |
+| 60-79% | Silver | High bond |
+| 40-59% | Bronze | Medium bond |
+| 0-39% | Gray | Low bond |
 
 ### 3.6 Skills Summary Panel
 
@@ -536,13 +536,13 @@ class AIQuickAdvisor extends Component
 
 **Event Types**:
 
-| Type     | Icon | Format                                    |
-| -------- | ---- | ----------------------------------------- |
-| Training | ⚡   | "Turn X: [Type] Training (+Y [Stat])"     |
-| Race     | 🏆   | "Turn X: Race [Result] ([Name], [Grade])" |
-| Skill    | ✨   | "Turn X: Skill Acquired ([Name])"         |
-| Goal     | 🎯   | "Turn X: Goal Completed ([Name])"         |
-| Event    | 📅   | "Turn X: Event Triggered ([Name])"        |
+| Type | Icon | Format |
+| --- | --- | --- |
+| Training | ⚡ | "Turn X: [Type] Training (+Y [Stat])" |
+| Race | 🏆 | "Turn X: Race [Result] ([Name], [Grade])" |
+| Skill | ✨ | "Turn X: Skill Acquired ([Name])" |
+| Goal | 🎯 | "Turn X: Goal Completed ([Name])" |
+| Event | 📅 | "Turn X: Event Triggered ([Name])" |
 
 **Visual Design**:
 
@@ -631,13 +631,13 @@ Echo.private(`character.${characterId}`)
 
 ### 4.3 Cache Strategy
 
-| Data Type         | Cache Key                 | TTL        | Invalidation         |
-| ----------------- | ------------------------- | ---------- | -------------------- |
-| Character stats   | `character:{id}:stats`    | 1 minute   | On stat update       |
-| Goals progress    | `character:{id}:goals`    | 5 minutes  | On goal change       |
-| Upcoming races    | `character:{id}:races`    | 1 hour     | On race entry/result |
-| Support deck      | `character:{id}:deck`     | 1 hour     | On deck modification |
-| Activity timeline | `character:{id}:activity` | 30 seconds | On new activity      |
+| Data Type | Cache Key | TTL | Invalidation |
+| --- | --- | --- | --- |
+| Character stats | `character:{id}:stats` | 1 minute | On stat update |
+| Goals progress | `character:{id}:goals` | 5 minutes | On goal change |
+| Upcoming races | `character:{id}:races` | 1 hour | On race entry/result |
+| Support deck | `character:{id}:deck` | 1 hour | On deck modification |
+| Activity timeline | `character:{id}:activity` | 30 seconds | On new activity |
 
 ---
 
@@ -718,27 +718,27 @@ sequenceDiagram
 
 ### 6.1 WCAG 2.2 AA Compliance
 
-| Criterion                      | Implementation                               | Test Method             |
-| ------------------------------ | -------------------------------------------- | ----------------------- |
-| **1.1.1 Non-text Content**     | All images and icons have `alt` text         | Screen reader testing   |
-| **1.4.3 Contrast Ratio**       | 4.5:1 minimum for text                       | Color contrast analyzer |
-| **2.1.1 Keyboard**             | All interactive elements keyboard accessible | Keyboard-only testing   |
-| **2.4.3 Focus Order**          | Logical tab order through panels             | Tab key traversal       |
-| **2.4.7 Focus Visible**        | Clear focus indicators                       | Visual inspection       |
-| **3.3.1 Error Identification** | Validation errors clearly announced          | Screen reader + visual  |
-| **4.1.2 Name, Role, Value**    | Proper ARIA attributes                       | axe-core scan           |
+| Criterion | Implementation | Test Method |
+| --- | --- | --- |
+| **1.1.1 Non-text Content** | All images and icons have `alt` text | Screen reader testing |
+| **1.4.3 Contrast Ratio** | 4.5:1 minimum for text | Color contrast analyzer |
+| **2.1.1 Keyboard** | All interactive elements keyboard accessible | Keyboard-only testing |
+| **2.4.3 Focus Order** | Logical tab order through panels | Tab key traversal |
+| **2.4.7 Focus Visible** | Clear focus indicators | Visual inspection |
+| **3.3.1 Error Identification** | Validation errors clearly announced | Screen reader + visual |
+| **4.1.2 Name, Role, Value** | Proper ARIA attributes | axe-core scan |
 
 ### 6.2 Keyboard Navigation
 
-| Action             | Shortcut            | Context                  |
-| ------------------ | ------------------- | ------------------------ |
-| Navigate panels    | `Tab` / `Shift+Tab` | Global                   |
-| Edit character     | `E`                 | When focused on overview |
-| Add goal           | `G`                 | When in goals panel      |
-| View race calendar | `R`                 | When in races panel      |
-| Manage skills      | `S`                 | When in skills panel     |
-| Open AI advisor    | `A`                 | Global                   |
-| Save changes       | `Ctrl+S`            | When editing             |
+| Action | Shortcut | Context |
+| --- | --- | --- |
+| Navigate panels | `Tab` / `Shift+Tab` | Global |
+| Edit character | `E` | When focused on overview |
+| Add goal | `G` | When in goals panel |
+| View race calendar | `R` | When in races panel |
+| Manage skills | `S` | When in skills panel |
+| Open AI advisor | `A` | Global |
+| Save changes | `Ctrl+S` | When editing |
 
 ### 6.3 Screen Reader Announcements
 
@@ -770,33 +770,33 @@ sequenceDiagram
 
 ### 7.1 Performance Targets
 
-| Metric                    | Target  | Measurement             |
-| ------------------------- | ------- | ----------------------- |
-| **Page Load**             | < 2.0s  | Time to Interactive     |
-| **Component Render**      | < 300ms | Stats panel render time |
-| **Stat Update Animation** | < 500ms | Smooth transition       |
-| **API Response**          | < 200ms | Character data fetch    |
-| **WebSocket Latency**     | < 100ms | Real-time update delay  |
+| Metric | Target | Measurement |
+| --- | --- | --- |
+| **Page Load** | < 2.0s | Time to Interactive |
+| **Component Render** | < 300ms | Stats panel render time |
+| **Stat Update Animation** | < 500ms | Smooth transition |
+| **API Response** | < 200ms | Character data fetch |
+| **WebSocket Latency** | < 100ms | Real-time update delay |
 
 ### 7.2 Optimization Strategies
 
-| Strategy               | Implementation                       | Impact               |
-| ---------------------- | ------------------------------------ | -------------------- |
-| **Lazy Loading**       | Defer activity timeline until scroll | -30% initial load    |
-| **Component Caching**  | Cache rendered components (1 min)    | -50% repeat renders  |
-| **Debounced Updates**  | 300ms debounce on stat changes       | Reduced API calls    |
-| **Virtual Scrolling**  | Activity timeline pagination         | Handles 1000+ events |
-| **Image Optimization** | WebP format, responsive sizes        | -60% image bandwidth |
+| Strategy | Implementation | Impact |
+| --- | --- | --- |
+| **Lazy Loading** | Defer activity timeline until scroll | -30% initial load |
+| **Component Caching** | Cache rendered components (1 min) | -50% repeat renders |
+| **Debounced Updates** | 300ms debounce on stat changes | Reduced API calls |
+| **Virtual Scrolling** | Activity timeline pagination | Handles 1000+ events |
+| **Image Optimization** | WebP format, responsive sizes | -60% image bandwidth |
 
 ### 7.3 Bundle Size Budget
 
-| Asset Type | Budget | Current | Status           |
-| ---------- | ------ | ------- | ---------------- |
-| JavaScript | 80 KB  | 72 KB   | ✅ Within budget |
-| CSS        | 30 KB  | 28 KB   | ✅ Within budget |
-| Fonts      | 20 KB  | 18 KB   | ✅ Within budget |
-| Images     | 150 KB | 142 KB  | ✅ Within budget |
-| Total      | 280 KB | 260 KB  | ✅ Within budget |
+| Asset Type | Budget | Current | Status |
+| --- | --- | --- | --- |
+| JavaScript | 80 KB | 72 KB | ✅ Within budget |
+| CSS | 30 KB | 28 KB | ✅ Within budget |
+| Fonts | 20 KB | 18 KB | ✅ Within budget |
+| Images | 150 KB | 142 KB | ✅ Within budget |
+| Total | 280 KB | 260 KB | ✅ Within budget |
 
 ---
 
@@ -1001,29 +1001,29 @@ test.describe("WF-003: Accessibility", () => {
 
 ### 9.1 Specifications
 
-| Document                 | Reference                                                                |
-| ------------------------ | ------------------------------------------------------------------------ |
-| Product Requirements     | [PRD-001](../prds/PRD-001_Character_Management.md)                       |
-| Technical Specifications | [SPEC-001](../specs/SPEC-001_Character_Management_Technical.md)          |
-| System Flow              | [FLOW-001](../flows/FLOW-001_Character_Management_System.md)             |
-| Technical Flow           | [TECH-FLOW-001](../tech-flow/TECH-FLOW-001_Character_Management_Flow.md) |
+| Document | Reference |
+| --- | --- |
+| Product Requirements | [PRD-001](../prds/PRD-001_Character_Management.md) |
+| Technical Specifications | [SPEC-001](../specs/SPEC-001_Character_Management_Technical.md) |
+| System Flow | [FLOW-001](../flows/FLOW-001_Character_Management_System.md) |
+| Technical Flow | [TECH-FLOW-001](../tech-flow/TECH-FLOW-001_Character_Management_Flow.md) |
 
 ### 9.2 User Flows
 
-| Document             | Reference                                                   |
-| -------------------- | ----------------------------------------------------------- |
+| Document | Reference |
+| --- | --- |
 | Dashboard Navigation | [UF-001](../user-flows/UF-001_Dashboard_Navigation_Flow.md) |
-| Career Setup         | [UF-002](../user-flows/UF-002_Career_Setup_Flow.md)         |
-| Training Day         | [UF-003](../user-flows/UF-003_Training_Day_Flow.md)         |
-| Race Day             | [UF-004](../user-flows/UF-004_Race_Day_Flow.md)             |
+| Career Setup | [UF-002](../user-flows/UF-002_Career_Setup_Flow.md) |
+| Training Day | [UF-003](../user-flows/UF-003_Training_Day_Flow.md) |
+| Race Day | [UF-004](../user-flows/UF-004_Race_Day_Flow.md) |
 
 ### 9.3 Related Wireframes
 
-| Document                  | Reference                                        |
-| ------------------------- | ------------------------------------------------ |
-| Dashboard Overview        | [WF-001](WF-001_Dashboard_Overview.md)           |
-| Character Creation Wizard | [WF-002](WF-002_Character_Creation_Wizard.md)    |
-| Training Selection        | [WF-004](WF-004_Training_Selection_Interface.md) |
+| Document | Reference |
+| --- | --- |
+| Dashboard Overview | [WF-001](WF-001_Dashboard_Overview.md) |
+| Character Creation Wizard | [WF-002](WF-002_Character_Creation_Wizard.md) |
+| Training Selection | [WF-004](WF-004_Training_Selection_Interface.md) |
 
 ---
 
@@ -1031,7 +1031,6 @@ test.describe("WF-003: Accessibility", () => {
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
-| 2.3.0 | 2026-02-22 | Development Team | Updated version/dates, aligned technology references with current stack (Livewire 4, Neuron AI v2.11, GameTora/umapyoi.net) |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: corrected stat grades (no A-/B+, S is max), aptitude terminology (Nige/Senkou/Sashi/Oikomi), soft cap indicator at 1200 |
 | 2.0.0 | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added real-time WebSocket updates, AI quick advisor, enhanced accessibility specifications, performance targets, and testing requirements |
 | 1.0.0 | 2026-01-14 | Development Team | Initial wireframe specification |

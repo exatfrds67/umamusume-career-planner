@@ -3,7 +3,7 @@
 ## Umamusume Pretty Derby Career Planner
 
 **Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Date**: February 22, 2026  
 **Related Documents**: [PRD-001], [SPEC-001], [FLOW-001], [TECH-FLOW-001]
 
 ---
@@ -69,7 +69,7 @@ Character creation is the foundational workflow that:
 The game uses an 8-grade aptitude scale (NO SS grade exists):
 
 | Grade | Rank | Description |
-| --- | --- | --- |
+|-------|------|-------------|
 | **S** | 1 | Maximum grade - Excellent aptitude |
 | **A** | 2 | Very good aptitude |
 | **B** | 3 | Good aptitude |
@@ -84,7 +84,7 @@ The game uses an 8-grade aptitude scale (NO SS grade exists):
 **Distance Aptitudes:**
 
 | Category | Range | Description |
-| --- | --- | --- |
+|----------|-------|-------------|
 | Sprint | 1000-1400m | Short distance races |
 | Mile | 1400-1800m | Medium-short distance races |
 | Medium | 1800-2400m | Medium-long distance races |
@@ -93,14 +93,14 @@ The game uses an 8-grade aptitude scale (NO SS grade exists):
 **Surface Aptitudes:**
 
 | Surface | Description |
-| --- | --- |
+|---------|-------------|
 | Turf | Grass track racing |
 | Dirt | Dirt track racing |
 
 **Running Style Aptitudes:**
 
 | Style | Japanese | Description |
-| --- | --- | --- |
+|-------|----------|-------------|
 | Nige | 逃げ | Front runner - leads from start |
 | Senkou | 先行 | Stalker - stays near front |
 | Sashi | 差し | Mid-pack - positions in middle |
@@ -111,7 +111,7 @@ The game uses an 8-grade aptitude scale (NO SS grade exists):
 **Factor Types:**
 
 | Factor Color | Type | Effect |
-| --- | --- | --- |
+|--------------|------|--------|
 | **Blue** | Stat Factors | Provide stat bonuses (Speed, Stamina, Power, Guts, Wit) |
 | **Red** | Aptitude Factors | Can upgrade aptitude grades (e.g., A→S) |
 | **White** | Skill Factors | Enable skill inheritance from parents |
@@ -119,7 +119,7 @@ The game uses an 8-grade aptitude scale (NO SS grade exists):
 **Factor Star Levels:**
 
 | Stars | Stat Bonus | Activation Chance |
-| --- | --- | --- |
+|-------|------------|-------------------|
 | ★☆☆ | +3 per activation | Lower |
 | ★★☆ | +6 per activation | Medium |
 | ★★★ | +9 per activation | Higher |
@@ -131,11 +131,11 @@ The game uses an 8-grade aptitude scale (NO SS grade exists):
 ### 2.1 System Components
 
 | Component | Type | Responsibility |
-| --- | --- | --- |
+|-----------|------|----------------|
 | **User** | Actor | Initiates character creation workflow |
 | **Livewire Component** | Presentation | `CharacterCreationWizard.php` - Multi-step form management |
 | **CharacterController** | Application | Orchestrates creation workflow |
-| **CharacterService** | Domain Service | Character creation business logic |
+| **CharacterStateService** | Domain Service | Character creation business logic |
 | **FactorService** | Domain Service | Factor inheritance calculations |
 | **SupportDeckService** | Domain Service | Deck validation and composition |
 | **Database** | Infrastructure | MySQL/MariaDB persistence layer |
@@ -152,7 +152,7 @@ app/
 │   └── Controllers/
 │       └── CharacterController.php
 ├── Services/
-│   ├── CharacterService.php
+│   ├── CharacterStateService.php
 │   ├── FactorService.php
 │   └── SupportDeckService.php
 └── Models/
@@ -172,7 +172,7 @@ sequenceDiagram
     actor User
     participant UI as Livewire Wizard
     participant Controller as CharacterController
-    participant CharSvc as CharacterService
+    participant CharSvc as CharacterStateService
     participant FactorSvc as FactorService
     participant DeckSvc as SupportDeckService
     participant DB as Database
@@ -238,7 +238,7 @@ sequenceDiagram
 sequenceDiagram
     actor User
     participant UI as Livewire Wizard
-    participant CharSvc as CharacterService
+    participant CharSvc as CharacterStateService
     participant DB as Database
 
     User->>UI: Browse Uma Musume list
@@ -296,7 +296,7 @@ sequenceDiagram
 ### 3.4 Timeline Breakdown
 
 | Phase | Duration | Description |
-| --- | --- | --- |
+|-------|----------|-------------|
 | **Step 1-3** | ~30s | User input and selection |
 | **Validation** | ~100ms | Form validation and preview |
 | **Database Operations** | ~300ms | Transaction, inserts, factor calculations |
@@ -459,7 +459,7 @@ private function upgradeGrade(string $grade): string
 **Factor Calculation Rules:**
 
 | Factor Type | Star Level | Bonus | Notes |
-| --- | --- | --- | --- |
+|-------------|------------|-------|-------|
 | Blue (Stat) | ★☆☆ | +3 | Per activation |
 | Blue (Stat) | ★★☆ | +6 | Per activation |
 | Blue (Stat) | ★★★ | +9 | Per activation |
@@ -514,7 +514,7 @@ public function validate(array $cardIds, int $userId): ValidationResult
 **Transaction Scope:**
 
 ```php
-// CharacterService.php
+// CharacterStateService.php
 public function create(array $data): Character
 {
     return DB::transaction(function () use ($data) {
@@ -753,7 +753,7 @@ public function create(array $data): Character
 ### 6.1 Validation Errors
 
 | Error Code | Condition | HTTP Status | User Message |
-| --- | --- | --- | --- |
+|------------|-----------|-------------|--------------|
 | `CHAR_001` | Missing required fields | 422 | "Please complete all required fields" |
 | `CHAR_002` | Invalid Uma Musume selection | 422 | "Selected Uma Musume is not available" |
 | `CHAR_003` | Invalid scenario type | 422 | "Selected scenario is not valid" |
@@ -799,7 +799,7 @@ sequenceDiagram
 ### 6.3 Transaction Rollback Scenarios
 
 | Scenario | Trigger | Recovery |
-| --- | --- | --- |
+|----------|---------|----------|
 | Constraint violation | Duplicate character name | Rollback, display error |
 | Foreign key error | Invalid uma_musume_id reference | Rollback, re-validate form |
 | Database timeout | Long-running transaction | Rollback, retry with timeout |
@@ -813,7 +813,7 @@ sequenceDiagram
 ### 7.1 Performance Metrics
 
 | Operation | Target | Current | Status |
-| --- | --- | --- | --- |
+|-----------|--------|---------|--------|
 | Form render (Step 1) | <500ms | ~350ms | ✅ Met |
 | Factor preview | <200ms | ~150ms | ✅ Met |
 | Deck validation | <300ms | ~250ms | ✅ Met |
@@ -872,7 +872,7 @@ CREATE INDEX idx_aptitudes_type_grade ON ucp_aptitudes(aptitude_type, grade);
 ### 8.1 System Documentation
 
 | Document | Description |
-| --- | --- |
+|----------|-------------|
 | [PRD-001](../prds/PRD-001_Character_Management.md) | Product requirements for character management |
 | [SPEC-001](../specs/SPEC-001_Character_Management_Technical.md) | Technical specification for character system |
 | [FLOW-001](../flows/FLOW-001_Character_Management_System.md) | System flow for character operations |
@@ -881,7 +881,7 @@ CREATE INDEX idx_aptitudes_type_grade ON ucp_aptitudes(aptitude_type, grade);
 ### 8.2 Related Sequences
 
 | Sequence | Description |
-| --- | --- |
+|----------|-------------|
 | [SEQ-002](SEQ-002_Training_Block_Resolution.md) | Training session execution |
 | [SEQ-012](SEQ-012_Run_Snapshot_and_Restore.md) | Character state snapshots |
 | [SEQ-015](SEQ-015_Data_Migration_Snapshot_to_Live.md) | Data migration for characters |
@@ -889,7 +889,7 @@ CREATE INDEX idx_aptitudes_type_grade ON ucp_aptitudes(aptitude_type, grade);
 ### 8.3 UI Documentation
 
 | Document | Description |
-| --- | --- |
+|----------|-------------|
 | [WF-002](../wireframes/WF-002_Character_Creation_Wizard.md) | Wireframe specification for creation wizard |
 | [WF-003](../wireframes/WF-003_Character_Detail_Management.md) | Character detail page wireframe |
 | [UF-002](../user-flows/UF-002_Career_Setup_Flow.md) | User flow for career setup |
@@ -897,7 +897,7 @@ CREATE INDEX idx_aptitudes_type_grade ON ucp_aptitudes(aptitude_type, grade);
 ### 8.4 Database Documentation
 
 | Document | Description |
-| --- | --- |
+|----------|-------------|
 | [DBD-009](../009_DBD_Database_Documentation.md) | Complete database schema documentation |
 
 ---
@@ -907,15 +907,15 @@ CREATE INDEX idx_aptitudes_type_grade ON ucp_aptitudes(aptitude_type, grade);
 ### Version History
 
 | Version | Date | Author | Changes |
-| --- | --- | --- | --- |
-| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server - corrected aptitude scale (G-S, no SS), added inheritance system details (Blue/Red/White factors), updated distance categories (Sprint/Mile/Medium/Long), added running style aptitudes with Japanese names |
+|---------|------|--------|---------|
+| 2.2.0 | 2026-02-22 | Development Team | Updated with verified game mechanics from Global English Server - corrected aptitude scale (G-S, no SS), added inheritance system details (Blue/Red/White factors), updated distance categories (Sprint/Mile/Medium/Long), added running style aptitudes with Japanese names |
 | 2.0.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 implementation; added detailed sequence flows, error handling, performance metrics, and aligned with current Laravel 12 architecture |
 | 1.0.0 | 2026-01-14 | Development Team | Initial draft |
 
 ### Approval
 
 | Role | Name | Signature | Date |
-| --- | --- | --- | --- |
+|------|------|-----------|------|
 | Technical Lead | | | |
 | QA Lead | | | |
 
@@ -935,4 +935,4 @@ CREATE INDEX idx_aptitudes_type_grade ON ucp_aptitudes(aptitude_type, grade);
 
 ---
 
-*This sequence diagram reflects the current implementation of the character creation workflow as of v2.2.0, incorporating verified game mechanics from the Umamusume Pretty Derby Global English Server (January 2026). For the most up-to-date information, refer to the source code in `app/Services/CharacterService.php` and related files.*
+*This sequence diagram reflects the current implementation of the character creation workflow as of v2.2.0, incorporating verified game mechanics from the Umamusume Pretty Derby Global English Server (January 2026). For the most up-to-date information, refer to the source code in `app/Services/CharacterStateService.php` and related files.*

@@ -1,8 +1,8 @@
 # TECH-FLOW-007: External Integration - Technical Flow & Task Breakdown
 
-**Document Version**: 2.3.0  
-**Date**: February 22, 2026  
-**Status**: Current - Aligned with codebase v2.3.0 and game-accurate mechanics
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
+**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
 
 **Source Specifications**:
 
@@ -48,7 +48,7 @@
 flowchart TB
     subgraph Presentation["Presentation Layer"]
         Blade["Blade Templates"]
-        Livewire["Livewire 4 Components"]
+        Livewire["Livewire 3 Components"]
         Alpine["Alpine.js Interactions"]
     end
     
@@ -61,7 +61,7 @@ flowchart TB
     
     subgraph ExternalAPIs["External API Layer"]
         UmapyoiClient["UmapyoiApiClient"]
-        GameToraClient["GameToraScraperService"]
+        UmamusumeDBClient["UmamusumeDBApiClient"]
         FallbackHandler["Fallback Handler"]
     end
     
@@ -117,9 +117,9 @@ External Integration System
 │   └── WebhookController (API)
 │
 ├── Services
-│   ├── ExternalDataService
+│   ├── ExternalAPIService
 │   ├── UmapyoiApiClient
-│   ├── GameToraScraperService
+│   ├── UmamusumeDBApiClient
 │   ├── CircuitBreakerService
 │   ├── OCRProcessingService
 │   ├── ImagePreprocessorService
@@ -153,10 +153,10 @@ sequenceDiagram
     participant User
     participant UI as Livewire Component
     participant Controller
-    participant Service as ExternalDataService
+    participant Service as ExternalAPIService
     participant Circuit as Circuit Breaker
     participant Primary as UmapyoiApiClient
-    participant Fallback as GameToraScraperService
+    participant Fallback as UmamusumeDBApiClient
     participant Cache as Redis Cache
     participant DB as Database
     participant WS as WebSocket
@@ -367,26 +367,26 @@ flowchart TD
 
 ### 3.1 Phase 1: External API Integration (Week 1-2, ~20 hours)
 
-#### Task 7.1.1: Create ExternalDataService
+#### Task 7.1.1: Create ExternalAPIService
 
 **Priority**: P0  
 **Effort**: 10 hours  
 **Status**: ✅ Complete
 
 ```php
-// app/Services/ExternalAPI/ExternalDataService.php
+// app/Services/ExternalAPI/ExternalAPIService.php
 namespace App\Services\ExternalAPI;
 
 use App\Services\ExternalAPI\Clients\UmapyoiApiClient;
-use App\Services\ExternalAPI\Clients\GameToraScraperService;
+use App\Services\ExternalAPI\Clients\UmamusumeDBApiClient;
 use App\Services\CircuitBreakerService;
 use Illuminate\Support\Facades\Cache;
 
-class ExternalDataService
+class ExternalAPIService
 {
     public function __construct(
         private UmapyoiApiClient $umapyoi,
-        private GameToraScraperService $gameTora,
+        private UmamusumeDBApiClient $umamusumeDB,
         private CircuitBreakerService $circuitBreaker,
     ) {}
     
@@ -420,9 +420,9 @@ class ExternalDataService
                 'character_id' => $characterId,
             ]);
             
-            // Try fallback API (GameTora scraping)
+            // Try fallback API (umamusumedb.com)
             try {
-                $data = $this->gameTora->getCharacter($characterId);
+                $data = $this->umamusumeDB->getCharacter($characterId);
                 Cache::put($cacheKey, $data, now()->addHours(24));
                 
                 return $data;
@@ -451,11 +451,11 @@ class ExternalDataService
 **Deliverables**:
 
 - HTTP client for umapyoi.net API
-- Fallback logic to GameTora scraping
+- Fallback logic to umamusumedb.com
 - Response parsing and normalization
 - Rate limiting (60 requests/minute)
 - Unit tests: 8 tests
-- **Files**: `app/Services/ExternalAPI/ExternalDataService.php`
+- **Files**: `app/Services/ExternalAPI/ExternalAPIService.php`
 
 ---
 
@@ -553,10 +553,10 @@ class SyncConflictResolver
 **Deliverables**:
 
 - UmapyoiAdapter (primary)
-- GameToraAdapter (fallback)
+- UmamusumeDBAdapter (fallback)
 - Common interface `ExternalApiClientInterface`
 - Unit tests: 4 tests
-- **Files**: `app/Services/ExternalAPI/Clients/UmapyoiApiClient.php`, `GameToraScraperService.php`
+- **Files**: `app/Services/ExternalAPI/Clients/UmapyoiApiClient.php`, `UmamusumeDBApiClient.php`
 
 ---
 
@@ -959,7 +959,7 @@ export function subscribeToTraining(trainingId, callback) {
 Schema::create('ucp_external_sync_logs', function (Blueprint $table) {
     $table->id();
     $table->foreignId('character_id')->nullable()->constrained('ucp_characters')->nullOnDelete();
-    $table->string('api_provider'); // 'umapyoi', 'gametora'
+    $table->string('api_provider'); // 'umapyoi', 'umamusumedb'
     $table->string('sync_type'); // 'character', 'skill', 'support_card'
     $table->integer('conflicts_detected')->default(0);
     $table->enum('status', ['success', 'partial', 'failed']);
@@ -1094,10 +1094,10 @@ Schema::create('ucp_sync_conflicts', function (Blueprint $table) {
 ```php
 // tests/Feature/ExternalIntegrationTest.php
 use Tests\TestCase;
-use App\Services\ExternalAPI\ExternalDataService;
+use App\Services\ExternalAPI\ExternalAPIService;
 
 test('syncs character data from external API', function () {
-    $service = app(ExternalDataService::class);
+    $service = app(ExternalAPIService::class);
     
     $result = $service->syncCharacterData(1);
     
@@ -1109,10 +1109,10 @@ test('falls back to secondary API when primary fails', function () {
     // Mock primary API failure
     Http::fake([
         'umapyoi.net/*' => Http::response(null, 500),
-        'gametora.com/*' => Http::response(['name' => 'Special Week'], 200),
+        'umamusumedb.com/*' => Http::response(['name' => 'Special Week'], 200),
     ]);
     
-    $service = app(ExternalDataService::class);
+    $service = app(ExternalAPIService::class);
     $result = $service->syncCharacterData(1);
     
     expect($result)->toHaveKey('name');
@@ -1149,7 +1149,7 @@ test('processes OCR screenshot with high confidence', function () {
 **Deliverables**:
 
 - Mock umapyoi.net responses
-- Mock gametora.com responses
+- Mock umamusumedb.com responses
 - Simulate API failures for fallback testing
 - Unit tests: 6 tests
 
@@ -1157,7 +1157,7 @@ test('processes OCR screenshot with high confidence', function () {
 
 ## 4. Component Specifications
 
-### 4.1 ExternalDataService::syncCharacterData()
+### 4.1 ExternalAPIService::syncCharacterData()
 
 ```php
 /**
@@ -1170,7 +1170,7 @@ test('processes OCR screenshot with high confidence', function () {
  * 
  * Fallback Chain:
  * 1. Primary API (umapyoi.net)
- * 2. Secondary API (GameTora scraping)
+ * 2. Secondary API (umamusumedb.com)
  * 3. Cached data (24-hour TTL)
  * 
  * @param int $characterId Character to sync
@@ -1303,10 +1303,10 @@ erDiagram
 
 ```mermaid
 flowchart TD
-    ExternalDataService --> UmapyoiApiClient
-    ExternalDataService --> GameToraScraperService
-    ExternalDataService --> CircuitBreakerService
-    ExternalDataService --> CacheManager
+    ExternalAPIService --> UmapyoiApiClient
+    ExternalAPIService --> UmamusumeDBApiClient
+    ExternalAPIService --> CircuitBreakerService
+    ExternalAPIService --> CacheManager
     
     OCRProcessingService --> ImagePreprocessorService
     OCRProcessingService --> TesseractService
@@ -1327,7 +1327,7 @@ flowchart TD
 ### 7.1 REST API Endpoints
 
 | Endpoint | Method | Description | Auth | Rate Limit | Cache TTL |
-|----------|--------|-------------|------|------------|-----------|
+| --- | --- | --- | --- | --- | --- |
 | `/api/sync/external` | POST | Trigger external sync | Required | 60/min | None |
 | `/api/sync/status` | GET | Get sync history | Required | 100/min | 5 min |
 | `/api/sync/conflicts` | GET | List unresolved conflicts | Required | 100/min | None |
@@ -1388,7 +1388,7 @@ pie title Test Distribution
 ### 8.2 Critical Test Cases
 
 | Test Case | Type | Priority | Status |
-|-----------|------|----------|--------|
+| --- | --- | --- | --- |
 | External sync with primary API | Feature | P0 | ✅ Pass |
 | Fallback to secondary API | Integration | P0 | ✅ Pass |
 | Circuit breaker state transitions | Unit | P0 | ✅ Pass |
@@ -1405,7 +1405,7 @@ pie title Test Distribution
 ### 9.1 Effort Breakdown
 
 | Phase | Tasks | Estimated Hours | Actual Hours | Status |
-|-------|-------|-----------------|--------------|--------|
+| --- | --- | --- | --- | --- |
 | External API Integration | 3 tasks | 20 | 22 | ✅ Complete |
 | OCR Processing | 3 tasks | 18 | 19 | ✅ Complete |
 | WebSocket Real-time | 4 tasks | 16 | 17 | ✅ Complete |
@@ -1424,7 +1424,7 @@ pie title Test Distribution
 
 ### 10.1 Functional Completeness
 
-- [x] External API integration with fallback (umapyoi.net → GameTora scraping)
+- [x] External API integration with fallback (umapyoi.net → umamusumedb.com)
 - [x] Circuit breaker pattern implemented
 - [x] OCR processing with Tesseract (Japanese + English)
 - [x] Real-time WebSocket updates via Laravel Reverb
@@ -1441,7 +1441,7 @@ pie title Test Distribution
 ### 10.2 Performance Metrics
 
 | Metric | Target | Actual | Status |
-|--------|--------|--------|--------|
+| --- | --- | --- | --- |
 | External API response time | < 2 seconds | ~1.8s | ✅ Met |
 | OCR processing time | < 5 seconds | ~4.2s | ✅ Met |
 | WebSocket latency | < 100ms | ~75ms | ✅ Met |
@@ -1453,7 +1453,7 @@ pie title Test Distribution
 ### 10.3 Quality Metrics
 
 | Metric | Target | Actual | Status |
-|--------|--------|--------|--------|
+| --- | --- | --- | --- |
 | Test coverage | > 80% | 88% | ✅ Met |
 | Code style compliance (PSR-12) | 100% | 100% | ✅ Met |
 | Documentation coverage | 100% | 100% | ✅ Met |
@@ -1465,8 +1465,7 @@ pie title Test Distribution
 ## Document Control
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 2.3.0 | 2026-02-22 | Development Team | Updated service names to match codebase (ExternalDataService, GameToraScraperService); replaced deprecated UmamusumeDB references with GameTora; updated to Livewire 4 |
+| --- | --- | --- | --- |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: aligned OCR validation with game-accurate stat ranges (0-1200+), aptitude grades (G-S), and turn numbers (1-78) |
 | 2.1.0 | 2026-01-24 | Development Team | Updated to v2.0.0 implementation standards; aligned with industry documentation guidelines; added comprehensive cross-references; enhanced code examples and diagrams; integrated Laravel Reverb WebSocket |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with detailed specifications |
@@ -1488,4 +1487,4 @@ pie title Test Distribution
 
 ---
 
-*This technical flow document reflects the current implementation as of version 2.3.0 and follows industry-standard documentation practices for software development lifecycle (SDLC) artifacts.*
+*This technical flow document reflects the current implementation as of version 2.0.0 and follows industry-standard documentation practices for software development lifecycle (SDLC) artifacts.*

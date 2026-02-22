@@ -31,23 +31,23 @@ The Race Calendar View provides a comprehensive schedule of all available races 
 
 ### 1.2 Key Objectives
 
-| Objective                | Description                                                               |
-| ------------------------ | ------------------------------------------------------------------------- |
-| **Race Visibility**      | Display all available races with grade, distance, and surface information |
-| **Readiness Assessment** | Show calculated readiness scores for upcoming races                       |
-| **Strategic Planning**   | Enable players to plan race participation aligned with goals              |
-| **Win Probability**      | Display estimated win probability based on current stats                  |
-| **Quick Registration**   | Allow direct race registration from calendar view                         |
+| Objective | Description |
+| --- | --- |
+| **Race Visibility** | Display all available races with grade, distance, and surface information |
+| **Readiness Assessment** | Show calculated readiness scores for upcoming races |
+| **Strategic Planning** | Enable players to plan race participation aligned with goals |
+| **Win Probability** | Display estimated win probability based on current stats |
+| **Quick Registration** | Allow direct race registration from calendar view |
 
 ### 1.3 User Stories
 
-| ID     | User Story                                                                 | Priority |
-| ------ | -------------------------------------------------------------------------- | -------- |
-| US-001 | As a player, I want to see all upcoming races in a calendar format         | P0       |
-| US-002 | As a player, I want to filter races by grade, distance, and surface        | P0       |
-| US-003 | As a player, I want to see my readiness percentage for each race           | P0       |
-| US-004 | As a player, I want to view detailed race requirements and win probability | P0       |
-| US-005 | As a player, I want AI recommendations for which races to enter            | P1       |
+| ID | User Story | Priority |
+| --- | --- | --- |
+| US-001 | As a player, I want to see all upcoming races in a calendar format | P0 |
+| US-002 | As a player, I want to filter races by grade, distance, and surface | P0 |
+| US-003 | As a player, I want to see my readiness percentage for each race | P0 |
+| US-004 | As a player, I want to view detailed race requirements and win probability | P0 |
+| US-005 | As a player, I want AI recommendations for which races to enter | P1 |
 
 ---
 
@@ -175,7 +175,7 @@ The Race Calendar View provides a comprehensive schedule of all available races 
 │ │
 └──────────────────────────────┘
 │ Bottom Navigation Bar │
-│ [🏠][👤][⚡][🏆][🤖][⚙️] │
+│ [🏠]\[👤]\[⚡]\[🏆]\[🤖]\[⚙️] │
 └──────────────────────────────┘
 
 ---
@@ -240,13 +240,13 @@ class RaceCalendar extends Component
 
 **Visual Elements**:
 
-| Element          | Description                                          |
-| ---------------- | ---------------------------------------------------- |
-| Month Navigation | Previous/Next buttons to navigate months             |
-| Calendar Grid    | 7-column grid showing days with race indicators      |
-| Race Indicator   | Colored badge showing grade, readiness, and distance |
-| Filter Controls  | Dropdown selectors for grade, distance, surface      |
-| View Toggle      | Switch between calendar and list view                |
+| Element | Description |
+| --- | --- |
+| Month Navigation | Previous/Next buttons to navigate months |
+| Calendar Grid | 7-column grid showing days with race indicators |
+| Race Indicator | Colored badge showing grade, readiness, and distance |
+| Filter Controls | Dropdown selectors for grade, distance, surface |
+| View Toggle | Switch between calendar and list view |
 
 ### 3.2 Race Cell Component
 
@@ -281,12 +281,12 @@ class RaceCalendar extends Component
 
 **Readiness Indicators**:
 
-| Readiness | Icon | Color  | Range  |
-| --------- | ---- | ------ | ------ |
-| Excellent | 🟢   | Green  | ≥85%   |
-| Good      | 🟡   | Yellow | 70-84% |
-| Fair      | 🟠   | Orange | 55-69% |
-| Poor      | 🔴   | Red    | <55%   |
+| Readiness | Icon | Color | Range |
+| --- | --- | --- | --- |
+| Excellent | 🟢 | Green | ≥85% |
+| Good | 🟡 | Yellow | 70-84% |
+| Fair | 🟠 | Orange | 55-69% |
+| Poor | 🔴 | Red | <55% |
 
 ### 3.3 Race Detail Panel
 
@@ -356,7 +356,7 @@ class RaceDetailPanel extends Component
 **Track Condition Effects (Global English Server - Feb 2026)**:
 
 | Condition | Power Penalty | Speed Penalty | Stamina Drain | Description |
-|-----------|---------------|---------------|---------------|-------------|
+| --- | --- | --- | --- | --- |
 | Firm | None | None | None | Optimal racing conditions |
 | Good | -50 Power | None | None | Slightly soft ground |
 | Soft | -50 to -100 Power | None | +2%/sec | Wet conditions, increased stamina drain |
@@ -372,7 +372,7 @@ class RaceDetailPanel extends Component
 **Class Pyramid and Fan Requirements**:
 
 | Class | Fan Requirement | Description |
-|-------|-----------------|-------------|
+| --- | --- | --- |
 | Debut | 0 | Starting class |
 | Beginner | 0 | Entry level |
 | Bronze | 5,000 | First milestone |
@@ -546,11 +546,11 @@ sequenceDiagram
 
 ### 4.3 Cache Strategy
 
-| Data Type            | Cache Key                            | TTL       | Invalidation         |
-| -------------------- | ------------------------------------ | --------- | -------------------- |
-| Race list (filtered) | `races:{month}:{year}:{filters}`     | 1 hour    | On race update       |
-| Readiness scores     | `readiness:{character_id}:{race_id}` | 5 minutes | On stat update       |
-| Win probability      | `win_prob:{character_id}:{race_id}`  | 5 minutes | On stat/skill update |
+| Data Type | Cache Key | TTL | Invalidation |
+| --- | --- | --- | --- |
+| Race list (filtered) | `races:{month}:{year}:{filters}` | 1 hour | On race update |
+| Readiness scores | `readiness:{character_id}:{race_id}` | 5 minutes | On stat update |
+| Win probability | `win_prob:{character_id}:{race_id}` | 5 minutes | On stat/skill update |
 
 ---
 
@@ -622,27 +622,27 @@ sequenceDiagram
 
 ### 6.1 WCAG 2.2 AA Compliance
 
-| Criterion                           | Implementation                     | Test Method             |
-| ----------------------------------- | ---------------------------------- | ----------------------- |
-| **1.1.1 Non-text Content**          | All icons have `aria-label`        | Screen reader testing   |
-| **1.4.3 Contrast Ratio**            | 4.5:1 minimum for text             | Color contrast analyzer |
-| **2.1.1 Keyboard**                  | Full keyboard navigation support   | Keyboard-only testing   |
-| **2.4.3 Focus Order**               | Logical tab order through calendar | Tab key traversal       |
-| **2.4.7 Focus Visible**             | Clear focus indicators on cells    | Visual inspection       |
-| **3.2.4 Consistent Identification** | Consistent race grade badges       | Manual review           |
-| **4.1.2 Name, Role, Value**         | Proper ARIA attributes on controls | axe-core scan           |
+| Criterion | Implementation | Test Method |
+| --- | --- | --- |
+| **1.1.1 Non-text Content** | All icons have `aria-label` | Screen reader testing |
+| **1.4.3 Contrast Ratio** | 4.5:1 minimum for text | Color contrast analyzer |
+| **2.1.1 Keyboard** | Full keyboard navigation support | Keyboard-only testing |
+| **2.4.3 Focus Order** | Logical tab order through calendar | Tab key traversal |
+| **2.4.7 Focus Visible** | Clear focus indicators on cells | Visual inspection |
+| **3.2.4 Consistent Identification** | Consistent race grade badges | Manual review |
+| **4.1.2 Name, Role, Value** | Proper ARIA attributes on controls | axe-core scan |
 
 ### 6.2 Keyboard Navigation
 
-| Action                 | Shortcut           | Context                |
-| ---------------------- | ------------------ | ---------------------- |
-| Navigate calendar days | `Arrow Keys`       | Calendar grid          |
-| Select race            | `Enter` or `Space` | When race cell focused |
-| Previous month         | `PageUp` or `[`    | Calendar view          |
-| Next month             | `PageDown` or `]`  | Calendar view          |
-| Open filters           | `F`                | Calendar view          |
-| Switch to list view    | `L`                | Calendar view          |
-| Enter race             | `E`                | When race selected     |
+| Action | Shortcut | Context |
+| --- | --- | --- |
+| Navigate calendar days | `Arrow Keys` | Calendar grid |
+| Select race | `Enter` or `Space` | When race cell focused |
+| Previous month | `PageUp` or `[` | Calendar view |
+| Next month | `PageDown` or `]` | Calendar view |
+| Open filters | `F` | Calendar view |
+| Switch to list view | `L` | Calendar view |
+| Enter race | `E` | When race selected |
 
 ### 6.3 Screen Reader Announcements
 
@@ -684,32 +684,32 @@ sequenceDiagram
 
 ### 7.1 Performance Targets
 
-| Metric                 | Target        | Measurement                   |
-| ---------------------- | ------------- | ----------------------------- |
-| **Calendar Load**      | < 1.5 seconds | Time to first render          |
-| **Filter Application** | < 300ms       | Filter change to UI update    |
-| **Race Selection**     | < 200ms       | Click to detail panel display |
-| **Month Navigation**   | < 400ms       | Month change animation        |
-| **List View Switch**   | < 250ms       | View mode transition          |
+| Metric | Target | Measurement |
+| --- | --- | --- |
+| **Calendar Load** | < 1.5 seconds | Time to first render |
+| **Filter Application** | < 300ms | Filter change to UI update |
+| **Race Selection** | < 200ms | Click to detail panel display |
+| **Month Navigation** | < 400ms | Month change animation |
+| **List View Switch** | < 250ms | View mode transition |
 
 ### 7.2 Optimization Strategies
 
-| Strategy               | Implementation                      | Impact                |
-| ---------------------- | ----------------------------------- | --------------------- |
-| **Lazy Loading**       | Defer off-screen month data         | -40% initial load     |
-| **Query Optimization** | Eager load race requirements        | -60% query count      |
-| **Response Caching**   | Cache filtered race lists (1hr TTL) | -80% database queries |
-| **Debounced Filters**  | 200ms debounce on filter changes    | Reduced re-renders    |
-| **Virtual Scrolling**  | List view uses virtual scroll       | Handles 500+ races    |
+| Strategy | Implementation | Impact |
+| --- | --- | --- |
+| **Lazy Loading** | Defer off-screen month data | -40% initial load |
+| **Query Optimization** | Eager load race requirements | -60% query count |
+| **Response Caching** | Cache filtered race lists (1hr TTL) | -80% database queries |
+| **Debounced Filters** | 200ms debounce on filter changes | Reduced re-renders |
+| **Virtual Scrolling** | List view uses virtual scroll | Handles 500+ races |
 
 ### 7.3 Bundle Size Budget
 
-| Asset Type | Budget | Current | Status           |
-| ---------- | ------ | ------- | ---------------- |
-| JavaScript | 45 KB  | 42 KB   | ✅ Within budget |
-| CSS        | 18 KB  | 16 KB   | ✅ Within budget |
-| Images     | 30 KB  | 25 KB   | ✅ Within budget |
-| Total      | 93 KB  | 83 KB   | ✅ Within budget |
+| Asset Type | Budget | Current | Status |
+| --- | --- | --- | --- |
+| JavaScript | 45 KB | 42 KB | ✅ Within budget |
+| CSS | 18 KB | 16 KB | ✅ Within budget |
+| Images | 30 KB | 25 KB | ✅ Within budget |
+| Total | 93 KB | 83 KB | ✅ Within budget |
 
 ---
 
@@ -977,12 +977,12 @@ test.describe("WF-006: Accessibility", () => {
 
 ## 10. Version History
 
-| Version | Date       | Author           | Changes                                                                                                                                                                              |
-| ------- | ---------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 2.3.0   | 2026-02-22 | Development Team | Updated version/dates, aligned technology references with current stack (Livewire 4, Neuron AI v2.11, GameTora/umapyoi.net) |
-| 2.2.0   | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: track conditions (Firm/Good/Soft/Heavy), class pyramid with fan requirements, weather affects track condition probability |
-| 2.0.0   | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added readiness calculations, win probability, filtering, list view, accessibility specifications, and testing requirements |
-| 1.0.0   | 2026-01-14 | Development Team | Initial wireframe specification                                                                                                                                                      |
+| Version | Date | Author | Changes |
+| --- | --- | --- | --- |
+| 2.3.0 | 2026-02-22 | Development Team | Updated version/dates, aligned technology references with current stack (Livewire 4, Neuron AI v2.11, GameTora/umapyoi.net) |
+| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: track conditions (Firm/Good/Soft/Heavy), class pyramid with fan requirements, weather affects track condition probability |
+| 2.0.0 | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added readiness calculations, win probability, filtering, list view, accessibility specifications, and testing requirements |
+| 1.0.0 | 2026-01-14 | Development Team | Initial wireframe specification |
 
 ---
 

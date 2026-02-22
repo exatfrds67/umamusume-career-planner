@@ -98,7 +98,7 @@ Career run snapshots enable:
 ### 2.1 System Components
 
 | Component | Type | Responsibility |
-|-----------|------|----------------|
+| --- | --- | --- |
 | **User** | Actor | Initiates snapshot creation and restoration |
 | **Livewire Component** | Presentation | `CareerSnapshotManager.php` - Snapshot UI |
 | **CareerController** | Application | Orchestrates snapshot operations |
@@ -225,7 +225,7 @@ sequenceDiagram
 ### 3.2 Timeline Breakdown
 
 | Phase | Duration | Description |
-|-------|----------|-------------|
+| --- | --- | --- |
 | **User Action** | Variable | User initiates snapshot or restore |
 | **State Serialization** | ~100ms | Capture current career state |
 | **Data Compression** | ~50ms | Compress snapshot payload |
@@ -964,7 +964,7 @@ private function canRestore(CareerSnapshot $snapshot): bool
 ### 5.5 Game-Accurate Data Constraints
 
 | Data Element | Valid Range | Notes |
-|--------------|-------------|-------|
+| --- | --- | --- |
 | **Turn Number** | 1-78 | Varies by scenario |
 | **Year Phase** | junior, classic, senior | Career progression |
 | **Stats** | 0-1600+ | Soft cap at 1200 |
@@ -982,7 +982,7 @@ private function canRestore(CareerSnapshot $snapshot): bool
 ### 6.1 Validation Errors
 
 | Error Code | Condition | HTTP Status | User Message |
-|------------|-----------|-------------|--------------|
+| --- | --- | --- | --- |
 | `SNAP_001` | Snapshot not found | 404 | "Snapshot not found" |
 | `SNAP_002` | Snapshot data corrupted | 422 | "Snapshot data is corrupted or invalid" |
 | `SNAP_003` | Snapshot version incompatible | 422 | "Snapshot version is not compatible with current system" |
@@ -1033,7 +1033,7 @@ sequenceDiagram
 ### 6.3 Transaction Rollback Scenarios
 
 | Scenario | Trigger | Recovery |
-|----------|---------|----------|
+| --- | --- | --- |
 | Data corruption | Invalid JSON after decompression | Rollback, display error |
 | Version mismatch | Snapshot from older incompatible version | Attempt migration or reject |
 | Invalid aptitude | Grade outside G-S range | Reject with validation error |
@@ -1048,7 +1048,7 @@ sequenceDiagram
 ### 7.1 Performance Metrics
 
 | Operation | Target | Current | Status |
-|-----------|--------|---------|--------|
+| --- | --- | --- | --- |
 | Snapshot creation | <350ms | ~300ms | ✅ Met |
 | State serialization | <100ms | ~80ms | ✅ Met |
 | Data compression | <50ms | ~40ms | ✅ Met |
@@ -1083,12 +1083,12 @@ CareerSnapshot::where('career_id', $career->id)
 **Compression Ratios:**
 
 | Data Size | Uncompressed | Compressed | Ratio |
-|-----------|--------------|------------|-------|
+| --- | --- | --- | --- |
 | Small career (Turn 20) | ~18KB | ~6KB | 33% |
 | Medium career (Turn 50) | ~48KB | ~16KB | 33% |
 | Large career (Turn 72) | ~72KB | ~24KB | 33% |
 
-*Note: Increased sizes reflect additional game-accurate data (aptitudes, support cards, skills, race history)*
+Note: Increased sizes reflect additional game-accurate data (aptitudes, support cards, skills, race history)
 
 ### 7.4 Database Query Analysis
 
@@ -1117,7 +1117,7 @@ CREATE INDEX idx_careers_last_snapshot ON ucp_careers(last_snapshot_at);
 ### 8.1 System Documentation
 
 | Document | Description |
-|----------|-------------|
+| --- | --- |
 | [PRD-001](../prds/PRD-001_Character_Management.md) | Product requirements for character management |
 | [SPEC-001](../specs/SPEC-001_Character_Management_Technical.md) | Technical specification for character system |
 | [FLOW-001](../flows/FLOW-001_Character_Management_System.md) | System flow for character operations |
@@ -1126,7 +1126,7 @@ CREATE INDEX idx_careers_last_snapshot ON ucp_careers(last_snapshot_at);
 ### 8.2 Related Sequences
 
 | Sequence | Description |
-|----------|-------------|
+| --- | --- |
 | [SEQ-001](SEQ-001_Character_Creation_Sequence.md) | Character creation (initial state) |
 | [SEQ-002](SEQ-002_Training_Block_Resolution.md) | Training execution (state changes) |
 | [SEQ-011](SEQ-011_Telemetry_Event_Capture.md) | Event tracking (snapshot events) |
@@ -1134,7 +1134,7 @@ CREATE INDEX idx_careers_last_snapshot ON ucp_careers(last_snapshot_at);
 ### 8.3 Database Documentation
 
 | Document | Description |
-|----------|-------------|
+| --- | --- |
 | [DBD-009](../009_DBD_Database_Documentation.md) | Complete database schema documentation |
 
 ---
@@ -1144,7 +1144,7 @@ CREATE INDEX idx_careers_last_snapshot ON ucp_careers(last_snapshot_at);
 ### Version History
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
+| --- | --- | --- | --- |
 | 2.2.0 | 2026-02-22 | Development Team | Updated with verified game mechanics from Global English Server - corrected aptitude scale (G-S, no SS), stat range (soft cap 1200), hint levels (1-5), added support card bond/friendship tracking, race history with fan count |
 | 2.0.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 implementation; added detailed sequence flows, compression strategy, what-if branching, performance metrics, and aligned with current Laravel 12 architecture |
 | 1.0.0 | 2026-01-14 | Development Team | Initial draft |
@@ -1152,7 +1152,7 @@ CREATE INDEX idx_careers_last_snapshot ON ucp_careers(last_snapshot_at);
 ### Approval
 
 | Role | Name | Signature | Date |
-|------|------|-----------|------|
+| --- | --- | --- | --- |
 | Technical Lead | | | |
 | QA Lead | | | |
 
@@ -1163,7 +1163,7 @@ CREATE INDEX idx_careers_last_snapshot ON ucp_careers(last_snapshot_at);
 
 ---
 
-**Related Standards:**
+### Related Standards
 
 - Laravel 12 Best Practices
 - PSR-12 Coding Standards

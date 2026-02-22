@@ -72,7 +72,7 @@ Data migration enables:
 ### 2.1 System Components
 
 | Component | Type | Responsibility |
-|-----------|------|----------------|
+| --- | --- | --- |
 | **User** | Actor | Initiates import and resolves conflicts |
 | **ImportController** | Application | Orchestrates import workflow |
 | **DataMigrationService** | Domain Service | Format detection and transformation |
@@ -259,7 +259,7 @@ sequenceDiagram
 ### 3.2 Timeline Breakdown
 
 | Phase | Duration | Description |
-|-------|----------|-------------|
+| --- | --- | --- |
 | **File Upload** | ~200ms | Upload and validation |
 | **Format Detection** | ~100ms | Analyze file structure |
 | **Data Parsing** | ~500ms | Extract and transform data |
@@ -1028,7 +1028,7 @@ class DataImportService
 
 ### 5.6 Game-Accurate Migration Rules (v2.2.0)
 
-**Verified against Global English Server, January 2026**
+#### Verified Against Global English Server, January 2026
 
 #### Aptitude Grade Migration
 
@@ -1105,7 +1105,7 @@ class DataImportService
 ### 6.1 Validation Errors
 
 | Error Code | Condition | HTTP Status | User Message |
-|------------|-----------|-------------|--------------|
+| --- | --- | --- | --- |
 | `MIG_001` | Unsupported file format | 422 | "File format not supported. Please upload JSON, CSV, or Excel." |
 | `MIG_002` | Invalid schema version | 422 | "Incompatible data version. Please check the file." |
 | `MIG_003` | Missing required fields | 422 | "Required fields missing: {fields}" |
@@ -1153,7 +1153,7 @@ sequenceDiagram
 ### 6.3 Rollback Scenarios
 
 | Scenario | Trigger | Recovery |
-|----------|---------|----------|
+| --- | --- | --- |
 | Constraint violation | Foreign key or unique constraint | Rollback entire transaction |
 | Validation error | Business rule violation | Rollback, display errors |
 | Partial import failure | Error mid-batch | Rollback, user can retry |
@@ -1166,7 +1166,7 @@ sequenceDiagram
 ### 7.1 Performance Metrics
 
 | Operation | Target | Current | Status |
-|-----------|--------|---------|--------|
+| --- | --- | --- | --- |
 | Format detection | <100ms | ~80ms | ✅ Met |
 | Data parsing (100 records) | <500ms | ~420ms | ✅ Met |
 | Schema validation | <300ms | ~250ms | ✅ Met |
@@ -1245,7 +1245,7 @@ flowchart TD
 ### 8.1 System Documentation
 
 | Document | Description |
-|----------|-------------|
+| --- | --- |
 | [PRD-001](../prds/PRD-001_Character_Management.md) | Product requirements for character management |
 | [SPEC-001](../specs/SPEC-001_Character_Management_Technical.md) | Technical specification for character system |
 | [FLOW-001](../flows/FLOW-001_Character_Management_System.md) | System flow for character operations |
@@ -1254,7 +1254,7 @@ flowchart TD
 ### 8.2 Related Sequences
 
 | Sequence | Description |
-|----------|-------------|
+| --- | --- |
 | [SEQ-001](SEQ-001_Character_Creation_Sequence.md) | Character creation (target of import) |
 | [SEQ-007](SEQ-007_External_Data_Sync.md) | External data sync (similar workflow) |
 | [SEQ-012](SEQ-012_Run_Snapshot_and_Restore.md) | Snapshot restoration (related to migration) |
@@ -1262,7 +1262,7 @@ flowchart TD
 ### 8.3 Database Documentation
 
 | Document | Description |
-|----------|-------------|
+| --- | --- |
 | [DBD-009](../009_DBD_Database_Documentation.md) | Complete database schema documentation |
 
 ---
@@ -1272,7 +1272,7 @@ flowchart TD
 ### Version History
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
+| --- | --- | --- | --- |
 | 2.2.0 | 2026-02-22 | Development Team | Updated with verified game mechanics from Global English Server - added SS→S aptitude conversion rule, hint level migration (2→5 levels), stat soft cap handling, support card limit break validation, bond percentage normalization |
 | 2.0.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 implementation; added detailed sequence flows, format detection, transformation, validation, duplicate resolution, performance metrics, and aligned with current Laravel 12 architecture |
 | 1.0.0 | 2026-01-14 | Development Team | Initial draft |
@@ -1280,7 +1280,7 @@ flowchart TD
 ### Approval
 
 | Role | Name | Signature | Date |
-|------|------|-----------|------|
+| --- | --- | --- | --- |
 | Technical Lead | | | |
 | QA Lead | | | |
 

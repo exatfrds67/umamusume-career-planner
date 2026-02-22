@@ -2,17 +2,17 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0
-**Date**: February 22, 2026
+**Document Version**: 2.2.0
+**Date**: January 28, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Updated with verified codebase references (Livewire 4, 30 models, 70+ services)
+**Status**: Current - Updated with verified game mechanics from Global English Server
 
 ---
 
 ## 1. Character Creation Wizard Flow
 
-This flow details the initialization process for a new character, utilizing the **Laravel 12** backend services and **Livewire 4** components. It integrates `CharacterStateService` for persistence and `FactorService` for stat calculations.
+This flow details the initialization process for a new character, utilizing the **Laravel 12** backend services and **Livewire 3** wizard components. It integrates `CharacterService` for persistence and `FactorInheritanceService` for stat calculations.
 
 ### 1.1 Diagram
 
@@ -50,10 +50,10 @@ flowchart TD
 
 | Step | Service/Component | Description |
 | --- | --- | --- |
-| **Select Trainee** | `CharacterStateService` | Fetches base stats (0-1200) and growth rates from `ucp_game_data`. |
-| **Calculate Inheritance** | `FactorService` | Applies factor bonuses: ★ (+5), ★★ (+12), ★★★ (+21). |
+| **Select Trainee** | `CharacterService` | Fetches base stats (0-1200) and growth rates from `ucp_game_data`. |
+| **Calculate Inheritance** | `FactorInheritanceService` | Applies factor bonuses: ★ (+5), ★★ (+12), ★★★ (+21). |
 | **Validate Deck** | `SupportDeckService` | Ensures exactly 6 cards with type balance checks. |
-| **Initialize State** | `CareerAnalyticsService` | Sets Energy (100), Mood (Normal), Turn (1). |
+| **Initialize State** | `CareerRunService` | Sets Energy (100), Mood (Normal), Turn (1). |
 
 ---
 
@@ -141,14 +141,14 @@ Aptitude grades affect performance differently by category. A-rank is the baseli
 
 | Grade | Surface (Power) | Distance (Speed) | Style (Wit) |
 | --- | --- | --- | --- |
-| S     | +5%             | +5%              | +10%        |
-| A     | 0% (baseline)   | 0% (baseline)    | 0% (baseline) |
-| B     | -10%            | -10%             | -15%        |
-| C     | -20%            | -20%             | -25%        |
-| D     | -30%            | -40%             | -40%        |
-| E     | -50%            | -60%             | -60%        |
-| F     | -70%            | -80%             | -80%        |
-| G     | -90%            | -90%             | -90%        |
+| S | +5% | +5% | +10% |
+| A | 0% (baseline) | 0% (baseline) | 0% (baseline) |
+| B | -10% | -10% | -15% |
+| C | -20% | -20% | -25% |
+| D | -30% | -40% | -40% |
+| E | -50% | -60% | -60% |
+| F | -70% | -80% | -80% |
+| G | -90% | -90% | -90% |
 
 **Grade Scale**: G → F → E → D → C → B → A → S (maximum)
 
@@ -156,7 +156,7 @@ Aptitude grades affect performance differently by category. A-rank is the baseli
 
 ## 4. Factor Inheritance Calculation Flow
 
-Detailed logic for `FactorService` processing parent and grandparent factors.
+Detailed logic for `FactorInheritanceService` processing parent and grandparent factors.
 
 ### 4.1 Diagram
 
@@ -221,7 +221,7 @@ flowchart TD
 
 ## 6. Race Readiness Calculation Flow
 
-The algorithm used by `RaceConditionService` and `RaceStrategyService` (Neuron) to determine the Readiness Score (Excellent/Good/Fair/Poor).
+The algorithm used by `RaceService` to determine the Readiness Score (Excellent/Good/Fair/Poor).
 
 ### 6.1 Diagram
 
@@ -295,7 +295,6 @@ flowchart TD
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
-| 2.3.0 | 2026-02-22 | Development Team | Updated service references to match actual codebase: CharacterStateService, FactorService, CareerAnalyticsService, RaceConditionService; Livewire 3→4; added Neuron AI agent references |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: Removed SS grade (max is S), stats can exceed 1200 with diminishing returns (half value above 1200), per-training cap (+100/+50), added complete aptitude modifier tables by category (Surface/Distance/Style), G grade tier added |
 | 2.1.0 | 2026-01-24 | Development Team | Updated to align with v2.0.0 codebase, Laravel 12 architecture, and Neuron AI integration points |
 | 1.0.0 | 2026-01-14 | Development Team | Initial flow definitions |

@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0  
-**Date**: February 22, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-006], [SPEC-006], [FLOW-006], [SEQ-006]
 
 **Source Specs**:
@@ -30,35 +30,35 @@
 
 The AI Advisor Interface provides an intelligent conversational interface for training optimization, race strategy, skill recommendations, and career planning. It leverages a hybrid AI architecture combining local Ollama models with AWS Bedrock Claude fallback for optimal performance and cost efficiency.
 
-**The AI Advisor is built on verified game mechanics from Umamusume Pretty Derby (Global English Server, February 2026)** to provide accurate, actionable advice based on the actual training formula and game systems.
+**The AI Advisor is built on verified game mechanics from Umamusume Pretty Derby (Global English Server, January 2026)** to provide accurate, actionable advice based on the actual training formula and game systems.
 
 ### 1.2 Key Objectives
 
-| Objective                       | Description                                                     |
-| ------------------------------- | --------------------------------------------------------------- |
+| Objective | Description |
+| --- | --- |
 | **Intelligent Recommendations** | Context-aware advice for training, racing, and skill management |
-| **Hybrid AI Architecture**      | Local-first processing with cloud fallback                      |
-| **Cost Optimization**           | Track and manage AI usage costs                                 |
-| **Conversation Context**        | Maintain context across multiple interactions                   |
-| **MCP Integration**             | Leverage Model Context Protocol for enhanced capabilities       |
-| **Game-Accurate Mechanics**     | Advice based on verified training formulas and breakpoints      |
+| **Hybrid AI Architecture** | Local-first processing with cloud fallback |
+| **Cost Optimization** | Track and manage AI usage costs |
+| **Conversation Context** | Maintain context across multiple interactions |
+| **MCP Integration** | Leverage Model Context Protocol for enhanced capabilities |
+| **Game-Accurate Mechanics** | Advice based on verified training formulas and breakpoints |
 
 ### 1.3 User Stories
 
-| ID     | User Story                                                                        | Priority |
-| ------ | --------------------------------------------------------------------------------- | -------- |
-| US-001 | As a player, I want AI-powered training recommendations based on my current goals | P0       |
-| US-002 | As a player, I want race strategy advice for upcoming competitions                | P0       |
-| US-003 | As a player, I want skill build recommendations optimized for my character        | P1       |
-| US-004 | As a player, I want to see AI confidence scores and reasoning                     | P1       |
-| US-005 | As a player, I want to track AI usage costs and stay within budget                | P1       |
-| US-006 | As a player, I want advice that accounts for stat soft caps and breakpoints       | P1       |
+| ID | User Story | Priority |
+| --- | --- | --- |
+| US-001 | As a player, I want AI-powered training recommendations based on my current goals | P0 |
+| US-002 | As a player, I want race strategy advice for upcoming competitions | P0 |
+| US-003 | As a player, I want skill build recommendations optimized for my character | P1 |
+| US-004 | As a player, I want to see AI confidence scores and reasoning | P1 |
+| US-005 | As a player, I want to track AI usage costs and stay within budget | P1 |
+| US-006 | As a player, I want advice that accounts for stat soft caps and breakpoints | P1 |
 
 ---
 
 ## 2. Game Mechanics Reference (AI Knowledge Base)
 
-### 2.1 Training Formula (Verified Feb 2026 - Global English Server)
+### 2.1 Training Formula (Verified Jan 2026 - Global English Server)
 
 The AI Advisor uses the following verified training formula for stat gain predictions:
 
@@ -70,7 +70,7 @@ Stat Gain = (Base + StatBonus) × (1 + GrowthRate) × (1 + MoodMultiplier × (1 
 **Formula Components**:
 
 | Component | Description | Values |
-|-----------|-------------|--------|
+| --- | --- | --- |
 | **Base** | Base stat gain from facility | Varies by facility level |
 | **StatBonus** | Bonus from support cards | Sum of card bonuses |
 | **GrowthRate** | Character-specific multiplier | 0-30% typical range |
@@ -85,7 +85,7 @@ Stat Gain = (Base + StatBonus) × (1 + GrowthRate) × (1 + MoodMultiplier × (1 
 The AI Advisor tracks and advises based on critical stat breakpoints:
 
 | Breakpoint | Significance | AI Advice Trigger |
-|------------|--------------|-------------------|
+| --- | --- | --- |
 | **400** | C Grade threshold | "Consider boosting for B grade" |
 | **600** | B Grade threshold | "On track for competitive stats" |
 | **800** | A Grade threshold (lower) | "Approaching A grade territory" |
@@ -98,7 +98,7 @@ The AI Advisor tracks and advises based on critical stat breakpoints:
 ### 2.3 Facility Levels & Multipliers
 
 | Level | Multiplier | Unlock Condition |
-|-------|------------|------------------|
+| --- | --- | --- |
 | 1 | 1.00× | Default |
 | 2 | 1.25× | Training count threshold |
 | 3 | 1.50× | Training count threshold |
@@ -110,7 +110,7 @@ The AI Advisor tracks and advises based on critical stat breakpoints:
 ### 2.4 Career Structure (~70-78 Turns)
 
 | Year | Phase | Turns | Key Events |
-|------|-------|-------|------------|
+| --- | --- | --- | --- |
 | **Year 1** | Junior | ~24 | Foundation building, debut races |
 | **Year 2** | Classic | ~24 | Major races, stat development |
 | **Year 3** | Senior | ~24-30 | Final optimization, championship |
@@ -124,7 +124,7 @@ The AI Advisor tracks and advises based on critical stat breakpoints:
 ### 2.5 Bond/Friendship System
 
 | Bond Level | Effect | AI Recommendation |
-|------------|--------|-------------------|
+| --- | --- | --- |
 | 0-39% | No bonus | "Build bond with support cards" |
 | 40-59% | Minor hints | "Continue bond building" |
 | 60-79% | Skill hints available | "Approaching friendship threshold" |
@@ -1006,12 +1006,12 @@ class AICostTracker
 
 **Cost Calculation**:
 
-| Provider | Model             | Input Cost | Output Cost |
-| -------- | ----------------- | ---------- | ----------- |
-| Ollama   | llama3.2          | $0.00      | $0.00       |
-| Bedrock  | Claude 3.5 Haiku  | $0.25/1M   | $1.25/1M    |
-| Bedrock  | Claude 3.5 Sonnet | $3.00/1M   | $15.00/1M   |
-| Bedrock  | Claude 4.5        | $5.00/1M   | $25.00/1M   |
+| Provider | Model | Input Cost | Output Cost |
+| --- | --- | --- | --- |
+| Ollama | llama3.2 | $0.00 | $0.00 |
+| Bedrock | Claude 3.5 Haiku | $0.25/1M | $1.25/1M |
+| Bedrock | Claude 3.5 Sonnet | $3.00/1M | $15.00/1M |
+| Bedrock | Claude 4.5 | $5.00/1M | $25.00/1M |
 
 ---
 
@@ -1022,7 +1022,7 @@ class AICostTracker
 The AI provides training advice based on:
 
 | Factor | Consideration |
-|--------|---------------|
+| --- | --- |
 | **Current Stats** | Distance to soft cap (1200) for each stat |
 | **Growth Rates** | Character-specific multipliers |
 | **Support Cards** | Card positions and bond levels |
@@ -1050,7 +1050,7 @@ Confidence: 87% | Risk: Low
 ### 5.2 Race Timing Suggestions
 
 | Advice Type | Trigger Condition |
-|-------------|-------------------|
+| --- | --- |
 | **Stat Gap Warning** | Required stats not met 5 turns before race |
 | **Optimal Training Window** | Identify best turns for stat building |
 | **Rest Recommendation** | Energy too low before important race |
@@ -1059,7 +1059,7 @@ Confidence: 87% | Risk: Low
 ### 5.3 Skill Acquisition Priorities
 
 | Priority | Criteria |
-|----------|----------|
+| --- | --- |
 | **P0 - Critical** | Required for upcoming mandatory race |
 | **P1 - High** | Strong synergy with character aptitudes |
 | **P2 - Medium** | Good SP efficiency with hints available |
@@ -1068,7 +1068,7 @@ Confidence: 87% | Risk: Low
 ### 5.4 Rest/Recovery Timing
 
 | Condition | AI Recommendation |
-|-----------|-------------------|
+| --- | --- |
 | Energy < 30% | "Rest recommended - training gains reduced" |
 | Energy < 50% + Race in 3 turns | "Consider resting to prepare for race" |
 | Energy > 70% + Good training | "Continue training - energy sufficient" |
@@ -1163,14 +1163,14 @@ sequenceDiagram
 
 ### 6.3 Cache Strategy
 
-| Data Type            | Cache Key                        | TTL        | Invalidation        |
-| -------------------- | -------------------------------- | ---------- | ------------------- |
-| Conversation history | `ai:chat:{character_id}:history` | 10 minutes | On new message      |
-| Context data         | `ai:chat:{character_id}:context` | 5 minutes  | On character update |
-| Provider status      | `ai:provider:status`             | 1 minute   | On provider check   |
-| Monthly usage        | `ai:usage:{user_id}:{month}`     | 5 minutes  | On new request      |
-| Game mechanics       | `ai:mechanics:global`            | 24 hours   | On version update   |
-| Breakpoint calc      | `ai:breakpoints:{character_id}`  | 1 minute   | On stat change      |
+| Data Type | Cache Key | TTL | Invalidation |
+| --- | --- | --- | --- |
+| Conversation history | `ai:chat:{character_id}:history` | 10 minutes | On new message |
+| Context data | `ai:chat:{character_id}:context` | 5 minutes | On character update |
+| Provider status | `ai:provider:status` | 1 minute | On provider check |
+| Monthly usage | `ai:usage:{user_id}:{month}` | 5 minutes | On new request |
+| Game mechanics | `ai:mechanics:global` | 24 hours | On version update |
+| Breakpoint calc | `ai:breakpoints:{character_id}` | 1 minute | On stat change |
 
 ---
 
@@ -1245,28 +1245,28 @@ flowchart TD
 
 ### 8.1 WCAG 2.2 AA Compliance
 
-| Criterion                           | Implementation                               | Test Method             |
-| ----------------------------------- | -------------------------------------------- | ----------------------- |
-| **1.1.1 Non-text Content**          | All icons have `aria-label` attributes       | Screen reader testing   |
-| **1.4.3 Contrast Ratio**            | 4.5:1 minimum for text                       | Color contrast analyzer |
-| **2.1.1 Keyboard**                  | All interactive elements keyboard accessible | Keyboard-only testing   |
-| **2.4.3 Focus Order**               | Logical tab order through messages           | Tab key traversal       |
-| **2.4.7 Focus Visible**             | Clear focus indicators on inputs             | Visual inspection       |
-| **3.2.4 Consistent Identification** | Consistent message formatting                | Manual review           |
-| **4.1.2 Name, Role, Value**         | Proper ARIA attributes on controls           | axe-core scan           |
+| Criterion | Implementation | Test Method |
+| --- | --- | --- |
+| **1.1.1 Non-text Content** | All icons have `aria-label` attributes | Screen reader testing |
+| **1.4.3 Contrast Ratio** | 4.5:1 minimum for text | Color contrast analyzer |
+| **2.1.1 Keyboard** | All interactive elements keyboard accessible | Keyboard-only testing |
+| **2.4.3 Focus Order** | Logical tab order through messages | Tab key traversal |
+| **2.4.7 Focus Visible** | Clear focus indicators on inputs | Visual inspection |
+| **3.2.4 Consistent Identification** | Consistent message formatting | Manual review |
+| **4.1.2 Name, Role, Value** | Proper ARIA attributes on controls | axe-core scan |
 
 ### 8.2 Keyboard Navigation
 
-| Action              | Shortcut       | Context               |
-| ------------------- | -------------- | --------------------- |
-| Focus message input | `Alt+/`        | AI Advisor            |
-| Send message        | `Ctrl+Enter`   | Message input focused |
-| Apply suggestion    | `Alt+A`        | AI message focused    |
-| Ask follow-up       | `Alt+F`        | AI message focused    |
-| Regenerate response | `Alt+R`        | AI message focused    |
-| Select topic        | `1-5`          | Quick topics focused  |
-| Clear conversation  | `Ctrl+Shift+C` | AI Advisor            |
-| Toggle formula      | `Alt+T`        | AI message focused    |
+| Action | Shortcut | Context |
+| --- | --- | --- |
+| Focus message input | `Alt+/` | AI Advisor |
+| Send message | `Ctrl+Enter` | Message input focused |
+| Apply suggestion | `Alt+A` | AI message focused |
+| Ask follow-up | `Alt+F` | AI message focused |
+| Regenerate response | `Alt+R` | AI message focused |
+| Select topic | `1-5` | Quick topics focused |
+| Clear conversation | `Ctrl+Shift+C` | AI Advisor |
+| Toggle formula | `Alt+T` | AI message focused |
 
 ### 8.3 Screen Reader Announcements
 
@@ -1304,35 +1304,35 @@ flowchart TD
 
 ### 9.1 Performance Targets
 
-| Metric                    | Target        | Measurement          |
-| ------------------------- | ------------- | -------------------- |
-| **Page Load**             | < 1.5 seconds | Time to first render |
-| **Message Send**          | < 300ms       | Click to UI update   |
-| **AI Response (Ollama)**  | < 2 seconds   | Local processing     |
-| **AI Response (Bedrock)** | < 5 seconds   | Cloud processing     |
-| **Context Refresh**       | < 500ms       | Data reload          |
-| **Formula Calculation**   | < 50ms        | Client-side compute  |
-| **Breakpoint Check**      | < 100ms       | Server-side check    |
+| Metric | Target | Measurement |
+| --- | --- | --- |
+| **Page Load** | < 1.5 seconds | Time to first render |
+| **Message Send** | < 300ms | Click to UI update |
+| **AI Response (Ollama)** | < 2 seconds | Local processing |
+| **AI Response (Bedrock)** | < 5 seconds | Cloud processing |
+| **Context Refresh** | < 500ms | Data reload |
+| **Formula Calculation** | < 50ms | Client-side compute |
+| **Breakpoint Check** | < 100ms | Server-side check |
 
 ### 9.2 Optimization Strategies
 
-| Strategy              | Implementation                          | Impact                     |
-| --------------------- | --------------------------------------- | -------------------------- |
+| Strategy | Implementation | Impact |
+| --- | --- | --- |
 | **Message Streaming** | Stream AI responses for perceived speed | +40% perceived performance |
-| **Context Caching**   | Cache character context (5min TTL)      | -60% data fetching         |
-| **Lazy Loading**      | Load older messages on scroll           | Handles 1000+ messages     |
-| **Debounced Input**   | 300ms debounce on typing indicators     | Reduced re-renders         |
-| **Optimistic UI**     | Show user message immediately           | Instant feedback           |
-| **Mechanics Cache**   | Cache game mechanics (24hr TTL)         | -95% mechanics lookups     |
-| **Breakpoint Memo**   | Memoize breakpoint calculations         | -80% recalculations        |
+| **Context Caching** | Cache character context (5min TTL) | -60% data fetching |
+| **Lazy Loading** | Load older messages on scroll | Handles 1000+ messages |
+| **Debounced Input** | 300ms debounce on typing indicators | Reduced re-renders |
+| **Optimistic UI** | Show user message immediately | Instant feedback |
+| **Mechanics Cache** | Cache game mechanics (24hr TTL) | -95% mechanics lookups |
+| **Breakpoint Memo** | Memoize breakpoint calculations | -80% recalculations |
 
 ### 9.3 Bundle Size Budget
 
-| Asset Type | Budget | Current | Status           |
-| ---------- | ------ | ------- | ---------------- |
-| JavaScript | 45 KB  | 41 KB   | ✅ Within budget |
-| CSS        | 18 KB  | 15 KB   | ✅ Within budget |
-| Total      | 63 KB  | 56 KB   | ✅ Within budget |
+| Asset Type | Budget | Current | Status |
+| --- | --- | --- | --- |
+| JavaScript | 45 KB | 41 KB | ✅ Within budget |
+| CSS | 18 KB | 15 KB | ✅ Within budget |
+| Total | 63 KB | 56 KB | ✅ Within budget |
 
 ---
 
@@ -1713,24 +1713,23 @@ test.describe("WF-012: Accessibility", () => {
 
 ## 12. Version History
 
-| Version | Date       | Author           | Changes                                                                                                                                                                                                |
-| ------- | ---------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 2.3.0   | 2026-02-22 | Development Team | Updated version/dates, aligned technology references with current stack (Livewire 4, Neuron AI v2.11, GameTora/umapyoi.net) |
-| 2.2.0   | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server - added complete training formula, corrected stat breakpoints (901/1200/1600), updated career structure (~70-78 turns), added formula display component, breakpoint warnings, enhanced context panel with bond tracking and facility levels |
-| 2.0.0   | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added hybrid AI architecture, MCP integration, cost tracking, conversation management, accessibility specifications, and testing requirements |
-| 1.0.0   | 2026-01-14 | Development Team | Initial wireframe specification                                                                                                                                                                        |
+| Version | Date | Author | Changes |
+| --- | --- | --- | --- |
+| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server - added complete training formula, corrected stat breakpoints (901/1200/1600), updated career structure (~70-78 turns), added formula display component, breakpoint warnings, enhanced context panel with bond tracking and facility levels |
+| 2.0.0 | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added hybrid AI architecture, MCP integration, cost tracking, conversation management, accessibility specifications, and testing requirements |
+| 1.0.0 | 2026-01-14 | Development Team | Initial wireframe specification |
 
 ---
 
 ## 13. Notes
 
-**Implementation Status**: ✅ Complete (v2.3.0 Game Mechanics Update)
+**Implementation Status**: ✅ Complete (v2.2.0 Game Mechanics Update)
 
 **Known Issues**: None
 
 **Game Mechanics Verification**:
 
-- Training formula verified against Global English Server (February 2026)
+- Training formula verified against Global English Server (January 2026)
 - Stat breakpoints confirmed: 901 (A grade), 1200 (soft cap), 1600 (practical max)
 - Career structure: ~70-78 turns across 3 years
 - Summer Training Camp: 4 turns, all facilities Level 5

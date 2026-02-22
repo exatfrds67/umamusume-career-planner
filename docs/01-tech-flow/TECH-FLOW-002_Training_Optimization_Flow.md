@@ -1,8 +1,8 @@
 # TECH-FLOW-002: Training Optimization - Technical Flow & Task Breakdown
 
-**Document Version**: 2.3.0  
-**Date**: February 22, 2026  
-**Status**: Current - Aligned with codebase v2.3.0 and game-accurate mechanics
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
+**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
 
 **Source Specifications**:
 
@@ -46,7 +46,7 @@
 flowchart TB
     subgraph Presentation["Presentation Layer"]
         Blade["Blade Templates"]
-        Livewire["Livewire 4 Components"]
+        Livewire["Livewire 3 Components"]
         Alpine["Alpine.js Interactions"]
     end
     
@@ -104,7 +104,7 @@ Training Optimization System
 │   ├── TrainingExecutionService
 │   ├── SupportCardBonusService
 │   ├── SkillHintService
-│   └── TrainingAdvisoryService
+│   └── AITrainingAdvisorService
 │
 ├── Calculation Engines
 │   ├── StatGainCalculator
@@ -829,7 +829,7 @@ class TrainingPredictionService
 - **TrainingExecutionService**: Handles training session execution and state updates
 - **SupportCardBonusService**: Aggregates support card bonuses
 - **SkillHintService**: Manages skill hint acquisition and tracking
-- **TrainingAdvisoryService**: Integrates with Neuron AI for recommendations
+- **AITrainingAdvisorService**: Integrates with Neuron AI for recommendations
 
 ---
 
@@ -1188,7 +1188,7 @@ erDiagram
 ### 5.2 Table Constraints
 
 | Table | Constraint | Description |
-|-------|------------|-------------|
+| --- | --- | --- |
 | `training_sessions` | `turn_number` IN (1-78) | Valid turn range |
 | `training_sessions` | `success_rate` BETWEEN 0 AND 100 | Percentage range |
 | `training_predictions` | `expires_at` INDEX | Query optimization |
@@ -1214,8 +1214,8 @@ flowchart TD
     TrainingExecutionService --> CharacterStateService
     TrainingExecutionService --> GoalManagementService
     
-    TrainingAdvisoryService --> HybridAIService
-    TrainingAdvisoryService --> ContextBuilder
+    AITrainingAdvisorService --> HybridAIService
+    AITrainingAdvisorService --> ContextBuilder
     
     HybridAIService --> OllamaService
     HybridAIService --> BedrockService
@@ -1242,7 +1242,7 @@ interface TrainingPredictionInterface
 ### 7.1 REST API Endpoints
 
 | Endpoint | Method | Description | Auth | Rate Limit | Cache TTL |
-|----------|--------|-------------|------|------------|-----------|
+| --- | --- | --- | --- | --- | --- |
 | `/api/v1/characters/{id}/training-predictions` | GET | Get all training predictions | Required | 100/min | 5 min |
 | `/api/v1/characters/{id}/training-recommendation` | GET | Get AI-powered recommendation | Required | 30/min | None |
 | `/api/v1/training-sessions` | POST | Execute training session | Required | 60/min | None |
@@ -1343,7 +1343,7 @@ pie title Test Distribution
 ### 8.2 Critical Test Cases
 
 | Test Case | Type | Priority | Status |
-|-----------|------|----------|--------|
+| --- | --- | --- | --- |
 | Stat gain calculation with all modifiers | Unit | P0 | ✅ Pass |
 | Support card bonus aggregation | Unit | P0 | ✅ Pass |
 | Skill hint probability (guaranteed vs normal) | Unit | P0 | ✅ Pass |
@@ -1432,7 +1432,7 @@ class StatGainCalculatorTest extends TestCase
 ### 9.1 Effort Breakdown
 
 | Phase | Tasks | Estimated Hours | Actual Hours | Status |
-|-------|-------|-----------------|--------------|--------|
+| --- | --- | --- | --- | --- |
 | Calculation Engines | 4 tasks | 20 | 22 | ✅ Complete |
 | Services | 5 tasks | 20 | 21 | ✅ Complete |
 | Database | 4 tasks | 6 | 5 | ✅ Complete |
@@ -1465,7 +1465,7 @@ class StatGainCalculatorTest extends TestCase
 ### 10.2 Performance Metrics
 
 | Metric | Target | Actual | Status |
-|--------|--------|--------|--------|
+| --- | --- | --- | --- |
 | Prediction generation time | < 200ms | ~180ms | ✅ Met |
 | Prediction ranking time | < 100ms | ~85ms | ✅ Met |
 | AI recommendation time | < 2.5s | ~2.1s | ✅ Met |
@@ -1477,7 +1477,7 @@ class StatGainCalculatorTest extends TestCase
 ### 10.3 Quality Metrics
 
 | Metric | Target | Actual | Status |
-|--------|--------|--------|--------|
+| --- | --- | --- | --- |
 | Test coverage | > 80% | 89% | ✅ Met |
 | Code style compliance (PSR-12) | 100% | 100% | ✅ Met |
 | Documentation coverage | 100% | 100% | ✅ Met |
@@ -1488,8 +1488,7 @@ class StatGainCalculatorTest extends TestCase
 ## Document Control
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 2.3.0 | 2026-02-22 | Development Team | Updated service names to match codebase (TrainingAdvisoryService); Livewire 4 |
+| --- | --- | --- | --- |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: training formula with all multipliers, stats can exceed 1200 with diminishing returns (50% value above 1200), per-training cap +100 (reduced to +50 if stat > 1200), facility upgrades require 4 trainings per level |
 | 2.1.0 | 2026-01-24 | Development Team | Updated to v2.0.0 implementation standards; aligned with industry documentation guidelines; added comprehensive cross-references; enhanced code examples and diagrams |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with detailed specifications |
@@ -1510,4 +1509,4 @@ class StatGainCalculatorTest extends TestCase
 
 ---
 
-*This technical flow document reflects the current implementation as of version 2.3.0 and follows industry-standard documentation practices for software development lifecycle (SDLC) artifacts.*
+*This technical flow document reflects the current implementation as of version 2.0.0 and follows industry-standard documentation practices for software development lifecycle (SDLC) artifacts.*

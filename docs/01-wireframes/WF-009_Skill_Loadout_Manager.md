@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0  
-**Date**: February 22, 2026  
+**Document Version**: 2.2.0  
+**Date**: January 28, 2026  
 **Related Documents**: [PRD-004], [SPEC-004], [FLOW-004], [SEQ-003]
 
 **Source Specs**:
@@ -31,30 +31,30 @@ The Skill Loadout Manager enables players to organize, optimize, and manage thei
 
 ### 1.2 Key Objectives
 
-| Objective                   | Description                                           |
-| --------------------------- | ----------------------------------------------------- |
-| **Active Skill Management** | Manage which skills are actively equipped for races   |
-| **Loadout Optimization**    | AI-powered suggestions for optimal skill combinations |
-| **Synergy Analysis**        | Visual indicators for skill interactions and coverage |
-| **Build Planning**          | Save and compare multiple loadout configurations      |
-| **Performance Prediction**  | Estimate race performance impact of loadout changes   |
-| **Hint Level Tracking**     | Display hint levels (1-5) with progressive discounts  |
-| **Skill Rarity Display**    | Show Normal/Rare/Unique skill classifications         |
+| Objective | Description |
+| --- | --- |
+| **Active Skill Management** | Manage which skills are actively equipped for races |
+| **Loadout Optimization** | AI-powered suggestions for optimal skill combinations |
+| **Synergy Analysis** | Visual indicators for skill interactions and coverage |
+| **Build Planning** | Save and compare multiple loadout configurations |
+| **Performance Prediction** | Estimate race performance impact of loadout changes |
+| **Hint Level Tracking** | Display hint levels (1-5) with progressive discounts |
+| **Skill Rarity Display** | Show Normal/Rare/Unique skill classifications |
 
-### 1.3 Game-Accurate Skill Mechanics (Global English Server - Feb 2026)
+### 1.3 Game-Accurate Skill Mechanics (Global English Server - Jan 2026)
 
 #### Skill Hint System
 
 The hint system provides progressive SP cost discounts:
 
 | Hint Level | Discount | Cumulative | Visual Indicator |
-| ---------- | -------- | ---------- | ---------------- |
-| 0 hints    | 0%       | 0%         | ☆☆☆☆☆            |
-| 1 hint     | 10%      | 10%        | ★☆☆☆☆            |
-| 2 hints    | 10%      | 20%        | ★★☆☆☆            |
-| 3 hints    | 10%      | 30%        | ★★★☆☆            |
-| 4 hints    | 5%       | 35%        | ★★★★☆            |
-| 5 hints    | 5%       | 40%        | ★★★★★ (MAX)      |
+| --- | --- | --- | --- |
+| 0 hints | 0% | 0% | ☆☆☆☆☆ |
+| 1 hint | 10% | 10% | ★☆☆☆☆ |
+| 2 hints | 10% | 20% | ★★☆☆☆ |
+| 3 hints | 10% | 30% | ★★★☆☆ |
+| 4 hints | 5% | 35% | ★★★★☆ |
+| 5 hints | 5% | 40% | ★★★★★ (MAX) |
 
 **Additional Discount Sources**:
 
@@ -64,21 +64,21 @@ The hint system provides progressive SP cost discounts:
 
 #### Skill Rarities
 
-| Rarity   | Display    | Color  | Description                              |
-| -------- | ---------- | ------ | ---------------------------------------- |
-| Normal   | [N] / 白   | White  | Standard skills, lower SP cost           |
-| Rare     | [R] / 金   | Gold   | Enhanced effects, higher SP cost         |
-| Unique   | [U] / 固有 | Purple | Character-specific powerful abilities    |
+| Rarity | Display | Color | Description |
+| --- | --- | --- | --- |
+| Normal | [N] / 白 | White | Standard skills, lower SP cost |
+| Rare | [R] / 金 | Gold | Enhanced effects, higher SP cost |
+| Unique | [U] / 固有 | Purple | Character-specific powerful abilities |
 
 #### Skill Categories
 
-| Category     | Effect                                    | Activation Conditions           |
-| ------------ | ----------------------------------------- | ------------------------------- |
-| Speed        | Increase speed during specific phases     | Race phase, position, distance  |
-| Stamina      | Restore stamina or reduce consumption     | HP threshold, race phase        |
-| Acceleration | Boost acceleration at key moments         | Corner entry, final spurt       |
-| Debuff       | Affect nearby competitors                 | Proximity, position             |
-| Unique       | Character-specific powerful abilities     | Character-specific triggers     |
+| Category | Effect | Activation Conditions |
+| --- | --- | --- |
+| Speed | Increase speed during specific phases | Race phase, position, distance |
+| Stamina | Restore stamina or reduce consumption | HP threshold, race phase |
+| Acceleration | Boost acceleration at key moments | Corner entry, final spurt |
+| Debuff | Affect nearby competitors | Proximity, position |
+| Unique | Character-specific powerful abilities | Character-specific triggers |
 
 #### Skill Activation Conditions
 
@@ -93,16 +93,16 @@ Skills activate based on various race conditions:
 
 ### 1.4 User Stories
 
-| ID     | User Story                                                               | Priority |
-| ------ | ------------------------------------------------------------------------ | -------- |
-| US-001 | As a player, I want to see all my acquired skills in one place           | P0       |
-| US-002 | As a player, I want to activate/deactivate skills for my loadout         | P0       |
-| US-003 | As a player, I want to see which skills work well together               | P1       |
-| US-004 | As a player, I want AI recommendations for optimal loadouts              | P1       |
-| US-005 | As a player, I want to save and switch between different loadout presets | P1       |
-| US-006 | As a player, I want to see hint levels and discounts for each skill      | P0       |
-| US-007 | As a player, I want to see skill rarity (Normal/Rare/Unique) clearly     | P0       |
-| US-008 | As a player, I want to see skill activation conditions                   | P1       |
+| ID | User Story | Priority |
+| --- | --- | --- |
+| US-001 | As a player, I want to see all my acquired skills in one place | P0 |
+| US-002 | As a player, I want to activate/deactivate skills for my loadout | P0 |
+| US-003 | As a player, I want to see which skills work well together | P1 |
+| US-004 | As a player, I want AI recommendations for optimal loadouts | P1 |
+| US-005 | As a player, I want to save and switch between different loadout presets | P1 |
+| US-006 | As a player, I want to see hint levels and discounts for each skill | P0 |
+| US-007 | As a player, I want to see skill rarity (Normal/Rare/Unique) clearly | P0 |
+| US-008 | As a player, I want to see skill activation conditions | P1 |
 
 ---
 
@@ -355,23 +355,23 @@ class LoadoutStatusWidget extends Component
 
 **Hint Level Display**:
 
-| Hint Level | Stars     | Discount | Color  |
-| ---------- | --------- | -------- | ------ |
-| 0          | ☆☆☆☆☆     | 0%       | Gray   |
-| 1          | ★☆☆☆☆     | 10%      | Bronze |
-| 2          | ★★☆☆☆     | 20%      | Silver |
-| 3          | ★★★☆☆     | 30%      | Gold   |
-| 4          | ★★★★☆     | 35%      | Gold   |
-| 5          | ★★★★★     | 40%      | Purple |
+| Hint Level | Stars | Discount | Color |
+| --- | --- | --- | --- |
+| 0 | ☆☆☆☆☆ | 0% | Gray |
+| 1 | ★☆☆☆☆ | 10% | Bronze |
+| 2 | ★★☆☆☆ | 20% | Silver |
+| 3 | ★★★☆☆ | 30% | Gold |
+| 4 | ★★★★☆ | 35% | Gold |
+| 5 | ★★★★★ | 40% | Purple |
 
 **Loadout Score Classification**:
 
-| Score  | Tier      | Color  | Description                   |
-| ------ | --------- | ------ | ----------------------------- |
-| 90-100 | Excellent | Green  | Optimal loadout               |
-| 75-89  | Good      | Yellow | Well-balanced loadout         |
-| 60-74  | Fair      | Orange | Functional but improvable     |
-| <60    | Poor      | Red    | Needs significant improvement |
+| Score | Tier | Color | Description |
+| --- | --- | --- | --- |
+| 90-100 | Excellent | Green | Optimal loadout |
+| 75-89 | Good | Yellow | Well-balanced loadout |
+| 60-74 | Fair | Orange | Functional but improvable |
+| <60 | Poor | Red | Needs significant improvement |
 
 ### 3.2 Active Skills List
 
@@ -522,22 +522,22 @@ class ActiveSkillsList extends Component
 **Rarity Badge Styles**:
 
 | Rarity | Badge | Background | Text Color | Border |
-| ------ | ----- | ---------- | ---------- | ------ |
-| Normal | [N]   | White/Gray | Dark Gray  | Gray   |
-| Rare   | [R]   | Gold       | Dark Brown | Gold   |
-| Unique | [U]   | Purple     | White      | Purple |
+| --- | --- | --- | --- | --- |
+| Normal | [N] | White/Gray | Dark Gray | Gray |
+| Rare | [R] | Gold | Dark Brown | Gold |
+| Unique | [U] | Purple | White | Purple |
 
 **Activation Condition Examples**:
 
-| Condition Type | Display Text                    |
-| -------------- | ------------------------------- |
-| Phase          | "Final Spurt Phase"             |
-| Position       | "When in 3rd place or better"   |
-| Distance       | "Long distance races only"      |
-| Style          | "Front Runner only"             |
-| Track          | "Turf tracks only"              |
-| Weather        | "Rainy weather"                 |
-| Combined       | "Final spurt, middle of pack"   |
+| Condition Type | Display Text |
+| --- | --- |
+| Phase | "Final Spurt Phase" |
+| Position | "When in 3rd place or better" |
+| Distance | "Long distance races only" |
+| Style | "Front Runner only" |
+| Track | "Turf tracks only" |
+| Weather | "Rainy weather" |
+| Combined | "Final spurt, middle of pack" |
 
 ### 3.3 Available Skills List
 
@@ -646,12 +646,12 @@ class AvailableSkillsList extends Component
 
 **Filter Options**:
 
-| Filter Type | Options                                           |
-| ----------- | ------------------------------------------------- |
-| Type        | All, Speed, Stamina, Power, Guts, Wit             |
-| Rarity      | All, Normal, Rare, Unique                         |
-| Category    | All, Speed, Stamina/Recovery, Acceleration, Debuff|
-| Sort        | Recommended, Cost (Low→High), Hints, Rarity       |
+| Filter Type | Options |
+| --- | --- |
+| Type | All, Speed, Stamina, Power, Guts, Wit |
+| Rarity | All, Normal, Rare, Unique |
+| Category | All, Speed, Stamina/Recovery, Acceleration, Debuff |
+| Sort | Recommended, Cost (Low→High), Hints, Rarity |
 
 ### 3.4 Loadout Presets
 
@@ -823,12 +823,12 @@ class AILoadoutRecommendations extends Component
 
 **Recommendation Scoring**:
 
-| Factor           | Weight | Description                   |
-| ---------------- | ------ | ----------------------------- |
-| Goal Alignment   | 40%    | Matches character build goals |
-| Race Suitability | 30%    | Useful for upcoming races     |
-| SP Efficiency    | 20%    | Best value per SP spent       |
-| Synergy Bonus    | 10%    | Complements existing skills   |
+| Factor | Weight | Description |
+| --- | --- | --- |
+| Goal Alignment | 40% | Matches character build goals |
+| Race Suitability | 30% | Useful for upcoming races |
+| SP Efficiency | 20% | Best value per SP spent |
+| Synergy Bonus | 10% | Complements existing skills |
 
 ### 3.6 Synergy Analysis
 
@@ -903,12 +903,12 @@ class SkillSynergyAnalyzer
 
 **Synergy Rating Display**:
 
-| Stars | Score  | Description                                 |
-| ----- | ------ | ------------------------------------------- |
-| ★★★   | High   | Strong synergy, highly recommended together |
-| ★★☆   | Medium | Moderate synergy, good pairing              |
-| ★☆☆   | Low    | Minimal synergy, still compatible           |
-| ☆☆☆   | None   | No special synergy                          |
+| Stars | Score | Description |
+| --- | --- | --- |
+| ★★★ | High | Strong synergy, highly recommended together |
+| ★★☆ | Medium | Moderate synergy, good pairing |
+| ★☆☆ | Low | Minimal synergy, still compatible |
+| ☆☆☆ | None | No special synergy |
 
 ---
 
@@ -979,12 +979,12 @@ sequenceDiagram
 
 ### 4.3 Cache Strategy
 
-| Data Type          | Cache Key                        | TTL        | Invalidation                |
-| ------------------ | -------------------------------- | ---------- | --------------------------- |
-| Active skills      | `loadout:active:{character_id}`  | 5 minutes  | On skill activation change  |
-| Synergy analysis   | `loadout:synergy:{character_id}` | 10 minutes | On loadout change           |
-| AI recommendations | `loadout:ai_rec:{character_id}`  | 15 minutes | On goal/loadout change      |
-| Presets            | `loadout:presets:{character_id}` | 1 hour     | On preset creation/deletion |
+| Data Type | Cache Key | TTL | Invalidation |
+| --- | --- | --- | --- |
+| Active skills | `loadout:active:{character_id}` | 5 minutes | On skill activation change |
+| Synergy analysis | `loadout:synergy:{character_id}` | 10 minutes | On loadout change |
+| AI recommendations | `loadout:ai_rec:{character_id}` | 15 minutes | On goal/loadout change |
+| Presets | `loadout:presets:{character_id}` | 1 hour | On preset creation/deletion |
 
 ---
 
@@ -1052,27 +1052,27 @@ sequenceDiagram
 
 ### 6.1 WCAG 2.2 AA Compliance
 
-| Criterion                           | Implementation                        | Test Method             |
-| ----------------------------------- | ------------------------------------- | ----------------------- |
-| **1.1.1 Non-text Content**          | All icons have `aria-label`           | Screen reader testing   |
-| **1.4.3 Contrast Ratio**            | 4.5:1 minimum for text                | Color contrast analyzer |
-| **2.1.1 Keyboard**                  | All skills keyboard accessible        | Keyboard-only testing   |
-| **2.4.3 Focus Order**               | Logical tab order through skills      | Tab key traversal       |
-| **2.4.7 Focus Visible**             | Clear focus indicators on skill cards | Visual inspection       |
-| **3.2.4 Consistent Identification** | Consistent skill status badges        | Manual review           |
-| **4.1.2 Name, Role, Value**         | Proper ARIA attributes on controls    | axe-core scan           |
+| Criterion | Implementation | Test Method |
+| --- | --- | --- |
+| **1.1.1 Non-text Content** | All icons have `aria-label` | Screen reader testing |
+| **1.4.3 Contrast Ratio** | 4.5:1 minimum for text | Color contrast analyzer |
+| **2.1.1 Keyboard** | All skills keyboard accessible | Keyboard-only testing |
+| **2.4.3 Focus Order** | Logical tab order through skills | Tab key traversal |
+| **2.4.7 Focus Visible** | Clear focus indicators on skill cards | Visual inspection |
+| **3.2.4 Consistent Identification** | Consistent skill status badges | Manual review |
+| **4.1.2 Name, Role, Value** | Proper ARIA attributes on controls | axe-core scan |
 
 ### 6.2 Keyboard Navigation
 
-| Action                   | Shortcut       | Context                       |
-| ------------------------ | -------------- | ----------------------------- |
-| Search skills            | `/`            | When loadout manager loaded   |
-| Activate focused skill   | `Enter` or `A` | When skill card focused       |
-| Deactivate focused skill | `D`            | When active skill focused     |
-| Show skill details       | `I` or `Space` | When skill card focused       |
-| Navigate skills          | `Arrow Keys`   | Skill grid                    |
-| Switch tabs              | `1-3`          | Active/Available/Presets tabs |
-| Apply preset             | `P` then `1-9` | Preset selection              |
+| Action | Shortcut | Context |
+| --- | --- | --- |
+| Search skills | `/` | When loadout manager loaded |
+| Activate focused skill | `Enter` or `A` | When skill card focused |
+| Deactivate focused skill | `D` | When active skill focused |
+| Show skill details | `I` or `Space` | When skill card focused |
+| Navigate skills | `Arrow Keys` | Skill grid |
+| Switch tabs | `1-3` | Active/Available/Presets tabs |
+| Apply preset | `P` then `1-9` | Preset selection |
 
 ### 6.3 Screen Reader Announcements
 
@@ -1104,32 +1104,32 @@ sequenceDiagram
 
 ### 7.1 Performance Targets
 
-| Metric                  | Target        | Measurement          |
-| ----------------------- | ------------- | -------------------- |
-| **Page Load**           | < 1.5 seconds | Time to first render |
-| **Skill Activation**    | < 200ms       | Click to UI update   |
-| **Synergy Calculation** | < 300ms       | Analysis completion  |
-| **AI Recommendations**  | < 2 seconds   | With AI provider     |
-| **Preset Application**  | < 500ms       | Full loadout switch  |
+| Metric | Target | Measurement |
+| --- | --- | --- |
+| **Page Load** | < 1.5 seconds | Time to first render |
+| **Skill Activation** | < 200ms | Click to UI update |
+| **Synergy Calculation** | < 300ms | Analysis completion |
+| **AI Recommendations** | < 2 seconds | With AI provider |
+| **Preset Application** | < 500ms | Full loadout switch |
 
 ### 7.2 Optimization Strategies
 
-| Strategy             | Implementation                     | Impact               |
-| -------------------- | ---------------------------------- | -------------------- |
-| **Lazy Loading**     | Virtual scrolling for skill lists  | Handles 500+ skills  |
-| **Cached Synergies** | Cache analysis results (10min TTL) | -80% recalculations  |
-| **Optimistic UI**    | Show changes immediately           | Perceived speed +40% |
-| **Batch Updates**    | Group database operations          | -60% query count     |
-| **Debounced Search** | 300ms debounce on skill search     | Reduced re-renders   |
+| Strategy | Implementation | Impact |
+| --- | --- | --- |
+| **Lazy Loading** | Virtual scrolling for skill lists | Handles 500+ skills |
+| **Cached Synergies** | Cache analysis results (10min TTL) | -80% recalculations |
+| **Optimistic UI** | Show changes immediately | Perceived speed +40% |
+| **Batch Updates** | Group database operations | -60% query count |
+| **Debounced Search** | 300ms debounce on skill search | Reduced re-renders |
 
 ### 7.3 Bundle Size Budget
 
-| Asset Type | Budget | Current | Status           |
-| ---------- | ------ | ------- | ---------------- |
-| JavaScript | 45 KB  | 42 KB   | ✅ Within budget |
-| CSS        | 18 KB  | 16 KB   | ✅ Within budget |
-| Images     | 25 KB  | 22 KB   | ✅ Within budget |
-| Total      | 88 KB  | 80 KB   | ✅ Within budget |
+| Asset Type | Budget | Current | Status |
+| --- | --- | --- | --- |
+| JavaScript | 45 KB | 42 KB | ✅ Within budget |
+| CSS | 18 KB | 16 KB | ✅ Within budget |
+| Images | 25 KB | 22 KB | ✅ Within budget |
+| Total | 88 KB | 80 KB | ✅ Within budget |
 
 ---
 
@@ -1395,7 +1395,6 @@ test.describe("WF-009: Accessibility", () => {
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
-| 2.3.0 | 2026-02-22 | Development Team | Updated version/dates, aligned technology references with current stack (Livewire 4, Neuron AI v2.11, GameTora/umapyoi.net) |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server - corrected hint system to 5 levels (10%/20%/30%/35%/40%), added skill rarity display (Normal/Rare/Unique), updated skill point mechanics, added activation condition display, added Fast Learner condition support |
 | 2.0.0 | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added loadout status widget, synergy analysis, AI recommendations, preset management, accessibility specifications, and testing requirements |
 | 1.0.0 | 2026-01-14 | Development Team | Initial wireframe specification |
@@ -1408,7 +1407,7 @@ test.describe("WF-009: Accessibility", () => {
 
 **Known Issues**: None
 
-**Game Mechanics Alignment (v2.3.0)**:
+**Game Mechanics Alignment (v2.2.0)**:
 
 - ✅ Hint system: 5 levels with progressive discounts (10%/10%/10%/5%/5% = 40% max)
 - ✅ Skill rarities: Normal (white), Rare (gold), Unique (purple)
