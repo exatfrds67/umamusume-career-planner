@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.3.0  
+**Date**: February 22, 2026  
 **Related Documents**: [PRD-006], [SPEC-006], [SRS], [BRS]
 
 **Source Specifications**:
@@ -203,7 +203,7 @@ stateDiagram-v2
 ├────────────────────────────────────────────────────────────┤
 │                                                            │
 │  1. AI Advisor Page (Main Interface)                       │
-│     Route: /ai-advisor                                     │
+│     Route: /ai/chat                                       │
 │     Access: Navigation menu, quick actions                 │
 │                                                            │
 │  2. Contextual Help Buttons                                │
@@ -1025,6 +1025,7 @@ flowchart LR
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.3.0 | 2026-02-22 | Development Team | Updated AI Advisor route from `/ai-advisor` to `/ai/chat` to match actual codebase routes; updated version and dates |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: stat soft cap (1200 with diminishing returns above), important breakpoints (901, 1200, 1600), aptitude grade scale (G→S, no SS), career structure (~70-78 turns) |
 | 2.1.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 architecture; added hybrid AI routing, Neuron agents, MCP integration, cost tracking, comprehensive error handling and testing criteria |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with basic flow |
@@ -1046,4 +1047,4 @@ flowchart LR
 
 ---
 
-*This user flow reflects the current AI advisory system implementation as of version 2.2.0. For the latest updates, refer to the online documentation.*
+*This user flow reflects the current AI advisory system implementation as of version 2.3.0. For the latest updates, refer to the online documentation.*

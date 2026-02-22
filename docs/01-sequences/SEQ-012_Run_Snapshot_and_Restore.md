@@ -3,7 +3,7 @@
 ## Umamusume Pretty Derby Career Planner
 
 **Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Date**: February 22, 2026  
 **Related Documents**: [PRD-001], [SPEC-001], [FLOW-001]
 
 ---
@@ -1145,7 +1145,7 @@ CREATE INDEX idx_careers_last_snapshot ON ucp_careers(last_snapshot_at);
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
-| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server - corrected aptitude scale (G-S, no SS), stat range (soft cap 1200), hint levels (1-5), added support card bond/friendship tracking, race history with fan count |
+| 2.2.0 | 2026-02-22 | Development Team | Updated with verified game mechanics from Global English Server - corrected aptitude scale (G-S, no SS), stat range (soft cap 1200), hint levels (1-5), added support card bond/friendship tracking, race history with fan count |
 | 2.0.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 implementation; added detailed sequence flows, compression strategy, what-if branching, performance metrics, and aligned with current Laravel 12 architecture |
 | 1.0.0 | 2026-01-14 | Development Team | Initial draft |
 

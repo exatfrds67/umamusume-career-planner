@@ -34,12 +34,14 @@
 **Purpose**: Visual progress indicator for multi-step wizards
 
 **Props**:
+
 - `steps` (array): Step labels - `['Character', 'Goals', 'Skills', 'Races', 'Review']`
 - `current` (int): Current step index (0-based)
 - `completed` (array): Array of completed step indices
 - `variant` (string): `'default'` | `'compact'` | `'numbered'`
 
 **Features**:
+
 - ✅ Three visual states: Current (blue ring), Completed (green checkmark), Pending (gray)
 - ✅ Connector lines between steps (green for completed segments)
 - ✅ Responsive: Compact variant hides labels on mobile
@@ -49,6 +51,7 @@
 - ✅ Dark mode: Full support with appropriate color variants
 
 **Usage**:
+
 ```blade
 <x-stepper 
     :steps="['Character', 'Goals', 'Skills', 'Races', 'Review']"
@@ -65,12 +68,14 @@
 **Purpose**: Tabbed navigation for detail views with optional count badges
 
 **Props**:
+
 - `tabs` (array): Tab objects with `key`, `label`, optional `count` and `icon`
 - `active` (string): Currently active tab key
 - `variant` (string): `'default'` | `'pills'` | `'underline'`
 - `size` (string): `'sm'` | `'md'` | `'lg'`
 
 **Features**:
+
 - ✅ Three visual variants: Default (border-bottom), Pills (rounded with bg), Underline (minimal)
 - ✅ Count badges: Optional numeric badges on tabs (e.g., "Skills (12)")
 - ✅ Icon support: Optional SVG icons before tab labels
@@ -81,6 +86,7 @@
 - ✅ Dark mode: Full support
 
 **Usage**:
+
 ```blade
 <x-tab-bar 
     :tabs="[
@@ -100,12 +106,14 @@
 **Purpose**: Contextual information on hover/focus
 
 **Props**:
+
 - `content` (string): Tooltip text content
 - `position` (string): `'top'` | `'bottom'` | `'left'` | `'right'`
 - `delay` (int): Hover delay in milliseconds (default: 300)
 - `maxWidth` (string): `'xs'` | `'sm'` | `'md'` | `'lg'` | `'none'`
 
 **Features**:
+
 - ✅ Four position options with automatic arrow placement
 - ✅ Delay before showing (prevents accidental triggers)
 - ✅ Alpine.js state management with `setTimeout` for delay
@@ -117,6 +125,7 @@
 - ✅ Accessibility: `role="tooltip"`, visually hidden but screen-reader accessible
 
 **Usage**:
+
 ```blade
 <x-tooltip content="This is helpful information" position="top" :delay="500">
     <button>Hover me</button>
@@ -130,6 +139,7 @@
 **Purpose**: Modal confirmation dialogs for destructive/important actions
 
 **Props**:
+
 - `show` (boolean): Controls visibility (use Livewire `@entangle` or Alpine binding)
 - `title` (string): Dialog title (default: "Confirm Action")
 - `message` (string): Confirmation message
@@ -140,6 +150,7 @@
 - `cancelAction` (string): Alpine.js method to call on cancel
 
 **Features**:
+
 - ✅ Four visual variants with appropriate icons and colors
 - ✅ Backdrop with blur effect (50% black + backdrop-blur)
 - ✅ Click outside to cancel (with `@click.away`)
@@ -152,6 +163,7 @@
 - ✅ Accessibility: `role="dialog"`, `aria-modal="true"`, focus trap
 
 **Usage**:
+
 ```blade
 <div x-data="{ showConfirm: false, deleteItem() { /* logic */ } }">
     <button @click="showConfirm = true">Delete</button>
@@ -177,10 +189,12 @@
 **File**: `resources/js/components/plan-wizard.js` (318 lines)
 
 **Configuration**:
+
 - `mode`: `'create'` | `'edit'`
 - `plan`: Initial plan data (for edit mode)
 
 **State**:
+
 - `currentStep`: Current step index (0-4)
 - `steps`: Array of 5 step definitions with `key`, `label`, `required` flags
 - `completedSteps`: Array of completed step indices
@@ -191,29 +205,34 @@
 **Methods**:
 
 **Navigation**:
+
 - `nextStep()`: Advance to next step if validation passes
 - `prevStep()`: Go back to previous step
 - `goToStep(index)`: Jump to specific step (if completed or previous)
 - `scrollToTop()`: Smooth scroll to top on step change
 
 **Validation**:
+
 - `validateStep(index)`: Validate specific step data
 - `canProceed`: Computed - true if current step is valid
 - `currentStepErrors`: Computed - errors for current step
 
 **Data Management**:
+
 - `selectCharacter(character)`: Select character and auto-advance
 - `updateGoal(stat, value)`: Update stat goal
 - `addSkill(skill)` / `removeSkill(id)`: Manage skill list
 - `addRace(race)` / `removeRace(id)`: Manage race list
 
 **Submission**:
+
 - `submit()`: Validate all steps and submit to API (POST or PUT)
 - `saveDraft()`: Save current state to localStorage
 - `loadDraft()`: Load saved draft from localStorage
 - `clearDraft()`: Remove draft from localStorage
 
 **Events Dispatched**:
+
 - `wizard-success`: On successful submission with plan data
 - `wizard-error`: On validation or API error with message
 - `draft-saved`: On draft save
@@ -221,10 +240,12 @@
 - `draft-cleared`: On draft clear
 
 **Events Listened**:
+
 - `skills-selected`: From SkillShopList component
 - `races-selected`: From race planning component
 
 **Usage**:
+
 ```blade
 <div x-data="planWizard({ mode: 'create' })" x-init="init()">
     <x-stepper :steps="steps.map(s => s.label)" :current="currentStep" :completed="completedSteps" />
@@ -246,9 +267,10 @@
 
 ## Remaining Work
 
-### ✅ All Complete!
+### ✅ All Complete
 
 Phase 3 is fully implemented:
+
 - ✅ All 4 wizard components created and tested
 - ✅ All 3 plan CRUD views created and integrated
 - ✅ Code formatted with Laravel Pint
@@ -261,18 +283,21 @@ Phase 3 is fully implemented:
 ## Testing Strategy
 
 **Component Tests** (Pest):
+
 - Stepper rendering with different variants
 - TabBar tab switching and event dispatch
 - Tooltip positioning and delay behavior
 - ConfirmDialog actions and keyboard handling
 
 **Integration Tests** (Playwright):
+
 - Create plan flow: Navigate all 5 steps
 - Edit plan flow: Load existing, modify, save
 - Validation: Attempt to proceed without required data
 - Draft saving: Refresh page and resume
 
 **Accessibility Tests**:
+
 - Keyboard navigation: Tab through wizard, activate buttons
 - Screen reader: Verify ARIA labels and roles
 - Focus management: Proper focus on step transitions
@@ -297,12 +322,15 @@ Phase 3 is fully implemented:
 ## Dependencies
 
 **PHP Packages**:
+
 - Laravel 12, Livewire 3
 
 **JS Packages**:
+
 - Alpine.js 3.15.5, @alpinejs/persist
 
 **Components Used**:
+
 - CharacterList (Phase 2)
 - SkillShopList (Phase 2)
 - SearchInput, SortDropdown, FilterBadge (Phase 2)
@@ -312,10 +340,12 @@ Phase 3 is fully implemented:
 ## Performance Considerations
 
 **Bundle Size**:
+
 - planWizard.js: ~10 KB (within 50 KB limit for component)
 - All Blade components: Inline, no additional JS overhead
 
 **Runtime**:
+
 - Alpine reactivity: Sub-16ms for step transitions
 - Stepper animations: 300ms (smooth, not jarring)
 - Tooltip delay: 300ms (prevents accidental triggers)

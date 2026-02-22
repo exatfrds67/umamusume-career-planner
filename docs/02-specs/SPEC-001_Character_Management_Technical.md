@@ -1,9 +1,9 @@
 # SPEC-001: Character Management System - Technical Specification
 
-**Document Version**: 2.2.0  
-**Date**: 2026-01-28  
+**Document Version**: 2.3.0  
+**Date**: 2026-02-22  
 **Project**: Umamusume Pretty Derby Career Planner  
-**Status**: Active - Updated with game-accurate mechanics  
+**Status**: Complete - Implementation verified  
 **Classification**: Internal - Development Team
 
 ---
@@ -14,9 +14,9 @@
 |-----------|-------|
 | **Document ID** | SPEC-001 |
 | **Related PRD** | [PRD-001: Character Management](../prds/PRD-001_Character_Management.md) |
-| **Architecture Version** | v2.2.0 |
+| **Architecture Version** | v2.3.0 |
 | **Approval Status** | Approved |
-| **Last Reviewed** | 2026-01-28 |
+| **Last Reviewed** | 2026-02-22 |
 
 ### Related Documents
 
@@ -128,9 +128,9 @@ graph TB
     end
 
     subgraph "Application Layer"
-        CharService[CharacterService]
+        CharService[CharacterStateService]
         StateService[CharacterStateService]
-        FactorService[FactorInheritanceService]
+        FactorService[FactorService]
     end
 
     subgraph "Domain Layer"
@@ -145,7 +145,7 @@ graph TB
         Repository[CharacterRepository]
         Cache[Redis Cache]
         DB[(MySQL Database)]
-        External[ExternalAPIService]
+        External[ExternalDataService]
     end
 
     API --> FormRequest
@@ -201,7 +201,7 @@ graph TB
 | Pattern | Implementation | Purpose |
 |---------|---------------|---------|
 | **Repository** | `CharacterRepository` | Abstract data access logic |
-| **Service Layer** | `CharacterService` | Encapsulate business operations |
+| **Service Layer** | `CharacterStateService` | Encapsulate business operations |
 | **Factory** | `CharacterFactory` | Streamline object creation |
 | **Value Object** | `StatCollection` | Encapsulate stat logic |
 | **Observer** | Event Listeners | React to domain events |
@@ -737,7 +737,7 @@ class StatCollection
 
 ## 4. Service Layer
 
-### 4.1 CharacterService
+### 4.1 CharacterStateService
 
 Main orchestration service for character operations.
 
@@ -748,7 +748,7 @@ namespace App\Services;
 
 use App\Models\Character;
 use App\Repositories\CharacterRepository;
-use App\Services\External\ExternalAPIService;
+use App\Services\External\ExternalDataService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
@@ -757,13 +757,13 @@ use Illuminate\Support\Facades\Cache;
  * 
  * Handles business logic for character lifecycle management.
  */
-class CharacterService
+class CharacterStateService
 {
     public function __construct(
         private CharacterRepository $repository,
-        private FactorInheritanceService $factorService,
+        private FactorService $factorService,
         private CharacterStateService $stateService,
-        private ExternalAPIService $externalApi
+        private ExternalDataService $externalApi
     ) {}
 
     /**
@@ -1044,7 +1044,7 @@ class CharacterStateService
 }
 ```
 
-### 4.3 FactorInheritanceService
+### 4.3 FactorService
 
 Calculates stat and aptitude bonuses from parent characters.
 
@@ -1061,7 +1061,7 @@ use App\Enums\FactorType;
  * 
  * Handles calculation of inherited bonuses from parent characters.
  */
-class FactorInheritanceService
+class FactorService
 {
     private const BLUE_FACTOR_VALUES = [
         1 => 10,  // 1-star
@@ -1589,7 +1589,7 @@ Goals are stored as JSON arrays with the following structure:
 ### 8.1 External API Integration
 
 **Primary Source**: `umapyoi.net`  
-**Fallback**: `umamusumedb.com`
+**Fallback**: `gametora.com`
 
 **Data Synced**:
 
@@ -1827,7 +1827,7 @@ protected $guarded = [
 **Coverage Targets**: 80% minimum
 
 ```php
-// tests/Unit/Services/CharacterServiceTest.php
+// tests/Unit/Services/CharacterStateServiceTest.php
 
 test('creates character with inheritance from parents', function () {
     $parent1 = Character::factory()->create();
@@ -1840,7 +1840,7 @@ test('creates character with inheritance from parents', function () {
         'parent_ids' => [$parent1->id, $parent2->id],
     ];
     
-    $character = app(CharacterService::class)->create($data);
+    $character = app(CharacterStateService::class)->create($data);
     
     expect($character->current_stats['speed'])->toBeGreaterThan(0)
         ->and($character->factors)->toHaveCount(2);
@@ -1905,7 +1905,7 @@ test('blue factors correctly apply stat bonuses', function () {
         'bonus_value' => 20,
     ]);
     
-    $service = app(FactorInheritanceService::class);
+    $service = app(FactorService::class);
     $inheritance = $service->calculateInheritance([$parent->id]);
     
     expect($inheritance['stat_bonuses']['speed'])->toBe(20);
@@ -2026,6 +2026,7 @@ class CharacterFactory extends Factory
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.3.0 | 2026-02-22 | Development Team | Updated to v2.3.0: CharacterStateService, FactorService, ExternalDataService, GameTora fallback, PHP 8.2+, status complete |
 | 2.2.0 | 2026-01-28 | Development Team | Game-accurate mechanics: S max aptitude grade (removed SS), category-specific aptitude modifiers, stat soft cap with diminishing returns above 1200, per-training caps |
 | 2.0.0 | 2026-01-24 | Development Team | Full v2.0.0 alignment, added enums, value objects |
 | 1.0.0 | 2026-01-23 | Development Team | Initial technical specification |
@@ -2045,7 +2046,7 @@ class CharacterFactory extends Factory
 **Document Control**  
 **Maintained By**: Backend Development Team  
 **Review Frequency**: Bi-weekly during active development  
-**Next Review Date**: 2026-02-07  
+**Next Review Date**: 2026-03-07  
 **Distribution**: Development Team, QA Team, Product Management
 
 ---

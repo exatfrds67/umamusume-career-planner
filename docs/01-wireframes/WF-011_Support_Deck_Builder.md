@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.3.0  
+**Date**: February 22, 2026  
 **Related Documents**: [PRD-005], [SPEC-005], [FLOW-005], [SEQ-005]
 
 **Source Specs**:
@@ -40,7 +40,7 @@ The Support Deck Builder enables players to construct, validate, and optimize th
 | **Quick Optimization**    | AI-powered auto-optimize functionality                                         |
 | **Multi-Deck Management** | Save and switch between multiple deck configurations                           |
 
-### 1.3 Game-Accurate Mechanics (Global English Server - Jan 2026)
+### 1.3 Game-Accurate Mechanics (Global English Server - Feb 2026)
 
 #### 1.3.1 Deck Composition Rules
 
@@ -266,7 +266,7 @@ class DeckOverview extends Component
 
     /**
      * Calculate presence bonus: +5% per card in training, max +30%
-     * Game-accurate mechanic from Global English Server (Jan 2026)
+     * Game-accurate mechanic from Global English Server (Feb 2026)
      */
     private function calculatePresenceBonus($cards): array
     {
@@ -707,7 +707,7 @@ class DeckValidator extends Component
 class DeckOptimizationService
 {
     /**
-     * Optimize deck based on game-accurate mechanics (Global English Server Jan 2026)
+     * Optimize deck based on game-accurate mechanics (Global English Server Feb 2026)
      * 
      * Key considerations:
      * - 6 slots total, any type combination allowed
@@ -1471,6 +1471,7 @@ test.describe("WF-011: Accessibility", () => {
 
 | Version | Date       | Author           | Changes                                                                                                                                                                    |
 | ------- | ---------- | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2.3.0   | 2026-02-22 | Development Team | Updated version/dates, aligned technology references with current stack (Livewire 4, Neuron AI v2.11, GameTora/umapyoi.net) |
 | 2.2.0   | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server - corrected support card presence bonus (+5% per card, max +30%), added deck synergy indicators, updated card type descriptions, added limit break display (★ to ★★★★★), enhanced type distribution visualization |
 | 2.0.0   | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added deck overview, auto-optimization, validation system, accessibility specifications, and testing requirements |
 | 1.0.0   | 2026-01-14 | Development Team | Initial wireframe specification                                                                                                                                            |

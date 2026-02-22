@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0  
-**Date**: February 21, 2026  
+**Document Version**: 2.4.0  
+**Date**: February 22, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.3.0 and game-accurate mechanics
+**Status**: Current - Aligned with codebase v2.4.0 and game-accurate mechanics
 
 ---
 
@@ -34,12 +34,28 @@ This Software Development Plan (SDP) describes the development strategy, milesto
 
 The application consolidates features from six legacy tracking applications into a unified platform, enabling players to track character progression, manage training sessions, plan race strategies, and optimize skill builds through AI-powered recommendations.
 
-### 1.1 Project Objectives
+### 1.2 Current Codebase Metrics
+
+| Metric | Value |
+|--------|-------|
+| Registered Routes | 571 |
+| Test Cases | 3,316+ |
+| Assertions | 11,563+ |
+| Eloquent Models | 30 |
+| Services | 70+ |
+| Enums | 8 |
+| Livewire Components | AdvisoryPanel |
+| Neuron AI Services | 5 (CareerPlanning, NeuronAI, RaceStrategy, SkillRecommendation, TrainingAdvisor) |
+
+### 1.3 Project Objectives
 
 | Objective | Status | Target |
-|-----------|--------|--------|| Consolidate 6 legacy applications | Complete | Single unified platform |
+|-----------|--------|--------|
+| Consolidate 6 legacy applications | Complete | Single unified platform |
 | Dual storage modes (Local/Account) | Complete | Full offline support |
-| AI advisory system integration | Complete | Hybrid Ollama + Bedrock |
+| AI advisory system integration | Complete | Hybrid Ollama + Bedrock via Neuron AI |
+| MCP integration and orchestration | Complete | Laravel MCP with tools, agents, monitoring |
+| Admin panel | Complete | Database, logs, queues, users, settings |
 | WCAG AA accessibility compliance | In Progress | 100% compliance |
 | Performance targets (FCP < 1.5s) | In Progress | All pages optimized |
 
@@ -171,13 +187,16 @@ The project follows an **iterative delivery model** with short milestones:
 ### 4.2 Core Modules
 
 | Module | Description | Related Specs |
-|--------|-------------|---------------|| Character Management | Character lifecycle, stats, aptitudes | SPEC-001, FLOW-001 |
+|--------|-------------|---------------|
+| Character Management | Character lifecycle, stats, aptitudes | SPEC-001, FLOW-001 |
 | Training Optimization | Predictions, support cards, hints | SPEC-002, FLOW-002 |
 | Race Strategy | Preparation, strategy, predictions | SPEC-003, FLOW-003 |
 | Skill Management | Acquisition, hints, evolution | SPEC-004, FLOW-004 |
 | Support Card Management | Deck composition, bonuses | SPEC-005, FLOW-005 |
-| AI Advisory | Intelligent recommendations | SPEC-006, FLOW-006 |
+| AI Advisory | Intelligent recommendations via Neuron AI | SPEC-006, FLOW-006 |
 | External Integration | APIs, OCR, WebSocket | SPEC-007, FLOW-007 |
+| MCP Integration | Laravel MCP tools, agents, orchestration, monitoring | - |
+| Admin Panel | Database management, logs, queue monitor, user management, system settings | - |
 
 ---
 
@@ -557,8 +576,11 @@ Each task is complete when:
 ### 13.1 Revision History
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|| 2.3.0 | 2026-02-21 | Development Team | Updated tech stack versions (Livewire 4, Pest v4, PHPUnit v12, PHP 8.4.11); added Chart.js, Neuron AI, Playwright, Larastan, Pint, Laravel Boost references |
-| 2.2.0 | 2026-01-28 | Development Team | Aligned with codebase v2.2.0 || 2.1.0 | 2026-01-23 | Development Team | Updated phases to match current implementation |
+|---------|------|--------|---------|
+| 2.4.0 | 2026-02-22 | Development Team | Added codebase metrics (571 routes, 3,316+ tests, 30 models, 70+ services); added MCP Integration and Admin Panel modules; updated Neuron AI service details (5 services) |
+| 2.3.0 | 2026-02-21 | Development Team | Updated tech stack versions (Livewire 4, Pest v4, PHPUnit v12, PHP 8.4.11); added Chart.js, Neuron AI, Playwright, Larastan, Pint, Laravel Boost references |
+| 2.2.0 | 2026-01-28 | Development Team | Aligned with codebase v2.2.0 |
+| 2.1.0 | 2026-01-23 | Development Team | Updated phases to match current implementation |
 | 2.0.0 | 2026-01-14 | Development Team | Prior plan revision |
 | 1.0.0 | 2026-01-03 | Development Team | Initial draft |
 
@@ -579,4 +601,4 @@ Each task is complete when:
 
 ---
 
-*This SDP reflects the current implementation status and near-term priorities as of February 21, 2026. Updates are made at each phase milestone or when significant changes occur.*
+*This SDP reflects the current implementation status and near-term priorities as of February 22, 2026. Updates are made at each phase milestone or when significant changes occur.*

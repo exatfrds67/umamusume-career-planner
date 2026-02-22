@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.3.0  
+**Date**: February 22, 2026  
 **Related Documents**: [PRD-002], [SPEC-002], [SRS], [BRS]
 
 **Source Specifications**:
@@ -1228,6 +1228,7 @@ flowchart LR
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.3.0 | 2026-02-22 | Development Team | Updated version and dates; no functional changes |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server (Jan 2026); corrected training formula with accurate multipliers; added stat soft cap (1200 with +50 max above cap); updated skill hint system (5 levels: 10%/20%/30%/35%/40% + Fast Learner +10%); added support card bond mechanics (+7 base, +9 with Charming, 80% friendship threshold) |
 | 2.1.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 architecture; added training prediction engine details, AI integration, support card bonus calculations; comprehensive error handling and testing criteria |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with basic flow |
@@ -1249,4 +1250,4 @@ flowchart LR
 
 ---
 
-*This user flow reflects the current training system implementation as of version 2.2.0. For the latest updates, refer to the online documentation.*
+*This user flow reflects the current training system implementation as of version 2.3.0. For the latest updates, refer to the online documentation.*

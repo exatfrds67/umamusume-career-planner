@@ -1,10 +1,17 @@
 # USER FLOW DIAGRAMS: Complete Journey Maps
 
-**Document Version**: 2.2.0 | **Date**: January 28, 2026 | **Status**: Current - Aligned with v2.2.0 and game-accurate mechanics
+**Document Version**: 2.3.0 | **Date**: February 22, 2026 | **Status**: Current - Aligned with v2.3.0 and game-accurate mechanics
 
 ## Overview
 
 User flow diagrams document the complete journeys users take through the system. These maps show decision points, alternate paths, error recovery, and system states at each stage.
+
+**Changes in v2.3.0**:
+
+- Updated external API references (GameTora replaces UmamusumeDB as fallback source)
+- Updated AI Advisor route to `/ai/chat`
+- Aligned Livewire component namespaces with Livewire 4 conventions
+- Updated version and dates to February 2026
 
 **Changes in v2.2.0**:
 
@@ -314,5 +321,5 @@ START: Import Action
 | UF-008 | 2 min | 2 | No | OCR Confidence scoring |
 
 **Total Flows**: 8 major user journeys  
-**System Version**: 2.1.0  
+**System Version**: 2.3.0  
 **Related**: [TECH-FLOW Index](../tech-flow/000_TECH_FLOW_INDEX.md), [SPEC Index](../specs/000_SPECS_INDEX.md)

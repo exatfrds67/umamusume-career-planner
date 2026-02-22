@@ -1,9 +1,9 @@
 # SPEC-002: Training Optimization System - Technical Specification
 
-**Document Version**: 2.2.0  
-**Date**: 2026-01-28  
+**Document Version**: 2.3.0  
+**Date**: 2026-02-22  
 **Project**: Umamusume Pretty Derby Career Planner  
-**Status**: Active - Updated with game-accurate training formula  
+**Status**: Complete - Implementation verified  
 **Classification**: Internal - Development Team
 
 ---
@@ -14,9 +14,9 @@
 |-----------|-------|
 | **Document ID** | SPEC-002 |
 | **Related PRD** | [PRD-002: Training Optimization](../prds/PRD-002_Training_Optimization.md) |
-| **Architecture Version** | v2.2.0 |
+| **Architecture Version** | v2.3.0 |
 | **Approval Status** | Approved |
-| **Last Reviewed** | 2026-01-28 |
+| **Last Reviewed** | 2026-02-22 |
 
 ### Related Documents
 
@@ -119,7 +119,7 @@ This module provides deterministic predictions to enable informed decision-makin
 | **Language** | PHP | 8.3+ | Server-side logic |
 | **Database** | MySQL | 8.0+ | Data persistence |
 | **Cache** | Redis | 7.x | Prediction caching |
-| **AI** | Neuron Framework | 1.x | Advisory agents |
+| **AI** | Neuron AI | v2.11 | Advisory agents |
 | **AI Provider (Local)** | Ollama | Latest | Local recommendations |
 | **AI Provider (Cloud)** | AWS Bedrock Claude | 4.5 | Complex analysis |
 
@@ -140,7 +140,7 @@ graph TB
     subgraph "Application Layer"
         TrainingSvc[TrainingService]
         PredictionSvc[TrainingPredictionService]
-        AdvisorySvc[AIAdvisoryService]
+        AdvisorySvc[AdviceService]
     end
 
     subgraph "Domain Layer"
@@ -152,7 +152,7 @@ graph TB
     subgraph "Infrastructure Layer"
         DB[(MySQL)]
         Cache[(Redis)]
-        NeuronAI[Neuron AI Agent]
+        NeuronAI[Neuron AI v2.11 Agent]
     end
 
     API --> FormRequest
@@ -2007,6 +2007,7 @@ Base Risk (Energy):
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.3.0 | 2026-02-22 | Development Team | Updated to v2.3.0: AdviceService replaces AIAdvisoryService, Neuron AI v2.11, status complete |
 | 2.2.0 | 2026-01-28 | Development Team | Game-accurate training formula with support card presence bonus (+5% per card), per-training caps (100/50 based on soft cap), friendship multiplier integration |
 | 2.0.0 | 2026-01-24 | Development Team | Full v2.0.0 alignment, added AI integration, complete calculation engines |
 | 1.0.0 | 2026-01-23 | Development Team | Initial technical specification |
@@ -2026,7 +2027,7 @@ Base Risk (Energy):
 **Document Control**  
 **Maintained By**: Backend Development Team  
 **Review Frequency**: Bi-weekly during active development  
-**Next Review Date**: 2026-02-07  
+**Next Review Date**: 2026-03-07  
 **Distribution**: Development Team, QA Team, Product Management
 
 ---

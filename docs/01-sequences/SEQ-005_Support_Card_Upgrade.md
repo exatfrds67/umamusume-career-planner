@@ -3,7 +3,7 @@
 ## Umamusume Pretty Derby Career Planner
 
 **Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Date**: February 22, 2026  
 **Related Documents**: [PRD-005], [SPEC-005], [FLOW-005], [TECH-FLOW-005]
 
 ---
@@ -75,8 +75,8 @@ Support card management is critical for training optimization:
 | **Livewire Component** | Presentation | `SupportCardManager.php`, `DeckBuilder.php` - Card and deck UI |
 | **SupportCardController** | Application | Orchestrates card operations |
 | **SupportCardService** | Domain Service | Card upgrade and management logic |
-| **DeckValidationService** | Domain Service | Deck composition validation |
-| **SynergyCalculator** | Domain Service | Deck synergy scoring |
+| **SupportCardDeckService** | Domain Service | Deck composition validation |
+| **SynergyScorer** | Domain Service | Deck synergy scoring |
 | **BondProgressionService** | Domain Service | Bond level tracking |
 | **Database** | Infrastructure | MySQL/MariaDB persistence layer |
 | **EventDispatcher** | Infrastructure | Laravel event broadcasting |
@@ -96,8 +96,8 @@ app/
 │       └── SupportCardController.php
 ├── Services/
 │   ├── SupportCardService.php
-│   ├── DeckValidationService.php
-│   ├── SynergyCalculator.php
+│   ├── SupportCardDeckService.php
+│   ├── SynergyScorer.php
 │   └── BondProgressionService.php
 └── Models/
     ├── SupportCard.php
@@ -118,8 +118,8 @@ sequenceDiagram
     participant UI as Livewire Card Manager
     participant Controller as SupportCardController
     participant CardSvc as SupportCardService
-    participant DeckSvc as DeckValidationService
-    participant SynergySvc as SynergyCalculator
+    participant DeckSvc as SupportCardDeckService
+    participant SynergySvc as SynergyScorer
     participant BondSvc as BondProgressionService
     participant DB as Database
     participant Events as EventDispatcher
@@ -471,8 +471,8 @@ class BondProgressionService
 **Validation Rules:**
 
 ```php
-// DeckValidationService.php
-class DeckValidationService
+// SupportCardDeckService.php
+class SupportCardDeckService
 {
     public function validate(array $cardIds, int $userId): ValidationResult
     {
@@ -540,8 +540,8 @@ class DeckValidationService
 **Synergy Scoring:**
 
 ```php
-// SynergyCalculator.php
-class SynergyCalculator
+// SynergyScorer.php
+class SynergyScorer
 {
     public function calculateSynergy(Collection $cards): float
     {
@@ -988,4 +988,4 @@ $this->cache->forget("support_deck.career.{$career->id}");
 
 ---
 
-*This sequence diagram reflects the current implementation of the support card upgrade and deck building workflow as of v2.0.0. For the most up-to-date information, refer to the source code in `app/Services/SupportCardService.php`, `app/Services/DeckValidationService.php`, and related files.*
+*This sequence diagram reflects the current implementation of the support card upgrade and deck building workflow as of v2.0.0. For the most up-to-date information, refer to the source code in `app/Services/SupportCardService.php`, `app/Services/SupportCardDeckService.php`, and related files.*

@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.3.0  
+**Date**: February 22, 2026  
 **Related Documents**: [PRD-004], [SPEC-004], [SRS], [BRS]
 
 **Source Specifications**:
@@ -1124,6 +1124,7 @@ flowchart LR
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.3.0 | 2026-02-22 | Development Team | Updated version and dates; no functional changes |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: 5-level hint system (10%/20%/30%/35%/40%), Fast Learner condition bonus, Skill Sparks, Hint Books, skill rarities (Normal/Rare/Unique) |
 | 2.1.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 architecture; added skill hint system details, evolution mechanics, loadout management; comprehensive error handling and testing criteria |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with basic flow |
@@ -1146,4 +1147,4 @@ flowchart LR
 
 ---
 
-*This user flow reflects the current skill management system implementation as of version 2.2.0. For the latest updates, refer to the online documentation.*
+*This user flow reflects the current skill management system implementation as of version 2.3.0. For the latest updates, refer to the online documentation.*

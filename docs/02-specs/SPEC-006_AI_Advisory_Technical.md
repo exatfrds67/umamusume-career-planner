@@ -1,9 +1,9 @@
 # SPEC-006: AI Advisory System - Technical Specification
 
-**Document Version**: 2.2.0  
-**Date**: 2026-01-28  
+**Document Version**: 2.3.0  
+**Date**: 2026-02-22  
 **Project**: Umamusume Pretty Derby Career Planner  
-**Status**: Active - Updated with game-accurate mechanics references  
+**Status**: Complete - Implementation verified  
 **Classification**: Internal - Development Team
 
 ---
@@ -14,9 +14,9 @@
 |-----------|-------|
 | **Document ID** | SPEC-006 |
 | **Related PRD** | [PRD-006: AI Advisory](../prds/PRD-006_AI_Advisory.md) |
-| **Architecture Version** | v2.2.0 |
+| **Architecture Version** | v2.3.0 |
 | **Approval Status** | Approved |
-| **Last Reviewed** | 2026-01-28 |
+| **Last Reviewed** | 2026-02-22 |
 
 ### Related Documents
 
@@ -113,12 +113,12 @@ The AI Advisory System provides intelligent guidance across all these domains, r
 
 | Component | Technology | Version | Purpose |
 |-----------|-----------|---------|---------|
-| **AI Framework** | Neuron AI | Latest | Agent orchestration |
+| **AI Framework** | Neuron AI | v2.11 | Agent orchestration |
 | **Local AI** | Ollama | Latest | Primary local inference |
 | **Cloud AI** | AWS Bedrock | Claude 3.5/4.5 | Cloud fallback |
 | **MCP** | Model Context Protocol | Latest | Tool execution |
 | **Framework** | Laravel | 12.x | Application foundation |
-| **Language** | PHP | 8.3+ | Server-side logic |
+| **Language** | PHP | 8.2+ | Server-side logic |
 | **Database** | MySQL | 8.0+ | Conversation persistence |
 | **Cache** | Redis | 7.x | Response caching |
 
@@ -137,16 +137,16 @@ graph TB
     end
 
     subgraph "Application Layer"
-        AdvisorySvc[AIAdvisoryService]
+        AdvisorySvc[AdviceService]
         ContextBuilder[ContextBuilder]
         RouterSvc[HybridAIService]
-        CostSvc[CostTrackingService]
+        CostSvc[AI\CostTrackingService]
     end
 
     subgraph "Agent Layer"
         TrainingAgent[TrainingAdvisorAgent]
         RaceAgent[RaceStrategyAgent]
-        SkillAgent[SkillAdvisorAgent]
+        SkillAgent[SkillRecommendationAgent]
         CareerAgent[CareerPlanningAgent]
     end
 
@@ -452,7 +452,7 @@ use App\Neuron\Tools\{
  * 
  * Provides skill acquisition recommendations and SP optimization.
  */
-class SkillAdvisorAgent extends Agent
+class SkillRecommendationAgent extends Agent
 {
     protected string $name = 'Skill Advisor';
     
@@ -547,7 +547,7 @@ return [
             'complexity_threshold' => 60,
         ],
         'skill_advisor' => [
-            'class' => \App\Neuron\Agents\SkillAdvisorAgent::class,
+            'class' => \App\Neuron\Agents\SkillRecommendationAgent::class,
             'enabled' => true,
             'description' => 'Recommends skill acquisitions',
             'complexity_threshold' => 55,
@@ -1449,7 +1449,7 @@ return [
             'timeout' => 60,
             'allowed_domains' => [
                 'umapyoi.net',
-                'umamusumedb.com',
+                'gametora.com',
             ],
         ],
     ],
@@ -1800,7 +1800,7 @@ use App\Models\{Character, AIConversation, AIRecommendation};
 use App\Neuron\Agents\{
     TrainingAdvisorAgent,
     RaceStrategyAgent,
-    SkillAdvisorAgent,
+    SkillRecommendationAgent,
     CareerPlanningAgent
 };
 use App\DTOs\AI\{AIResponse, AIAdvice};
@@ -1811,7 +1811,7 @@ use Illuminate\Support\Facades\{DB, Log};
  * 
  * Orchestrates AI advisory operations across all domains.
  */
-class AIAdvisoryService
+class AdviceService
 {
     public function __construct(
         private HybridAIService $aiService,
@@ -1890,7 +1890,7 @@ class AIAdvisoryService
     ): AIAdvice {
         $context = $this->contextBuilder->buildSkillContext($character);
         
-        $agent = new SkillAdvisorAgent();
+        $agent = new SkillRecommendationAgent();
         $agent->withContext($context);
 
         $response = $this->executeAgent($agent, $query, $options);
@@ -2149,7 +2149,7 @@ PROMPT;
         return match ($contextType) {
             'training' => new TrainingAdvisorAgent(),
             'race' => new RaceStrategyAgent(),
-            'skills' => new SkillAdvisorAgent(),
+            'skills' => new SkillRecommendationAgent(),
             'career' => new CareerPlanningAgent(),
             default => new TrainingAdvisorAgent(),
         };
@@ -3057,7 +3057,7 @@ $context['win_probability'] = $winProbability;
 Skill recommendations use hint tracking:
 
 ```php
-// In SkillAdvisorAgent tool
+// In SkillRecommendationAgent tool
 $availableHints = app(SkillService::class)->getAvailableHints($character);
 $spBudget = app(SkillService::class)->getRemainingSP($character);
 
@@ -3553,7 +3553,7 @@ class AIRecommendationFactory extends Factory
 | Requirement | Source | Implementation |
 |-------------|--------|----------------|
 | BR-6.1 | BRS §4.6 | `HybridAIService`, `config/ai.php` |
-| BR-6.2 | BRS §4.6 | `TrainingAdvisorAgent`, `RaceStrategyAgent`, `SkillAdvisorAgent` |
+| BR-6.2 | BRS §4.6 | `TrainingAdvisorAgent`, `RaceStrategyAgent`, `SkillRecommendationAgent` |
 | BR-6.3 | BRS §4.6 | `AIConversation` model, `handleConversation()` |
 | BR-6.4 | BRS §4.6 | `CostTrackingService`, `ucp_ai_usage_daily` |
 | BR-6.5 | BRS §4.6 | Confidence scoring in all responses |
@@ -3569,6 +3569,7 @@ class AIRecommendationFactory extends Factory
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.3.0 | 2026-02-22 | Development Team | Updated service names (AdviceService, HybridAIService, AI\CostTrackingService), SkillAdvisorAgent renamed to SkillRecommendationAgent, Neuron AI v2.11, PHP 8.2+, replaced UmamusumeDB with GameTora, marked implementation complete |
 | 2.2.0 | 2026-01-28 | Development Team | Updated AI agent prompts with game-accurate mechanics: 5-level hint system, S max aptitude, stat soft cap, track condition penalties |
 | 2.0.0 | 2026-01-24 | Development Team | Full v2.0.0 alignment with comprehensive services, agents, API endpoints, database schema, cost tracking, security, testing strategy, and complete appendices following SPEC-005 format |
 | 1.0.0 | 2026-01-14 | Development Team | Initial technical specification |
@@ -3589,7 +3590,7 @@ class AIRecommendationFactory extends Factory
 **Document Control**  
 **Maintained By**: Backend Development Team  
 **Review Frequency**: Bi-weekly during active development  
-**Next Review Date**: 2026-02-07  
+**Next Review Date**: 2026-03-07  
 **Distribution**: Development Team, QA Team, Product Management, AI Team
 
 ---

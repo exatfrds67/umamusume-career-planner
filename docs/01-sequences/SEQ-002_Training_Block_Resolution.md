@@ -3,7 +3,7 @@
 ## Umamusume Pretty Derby Career Planner
 
 **Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Date**: February 22, 2026  
 **Related Documents**: [PRD-002], [SPEC-002], [FLOW-002], [TECH-FLOW-002]
 
 ---
@@ -203,8 +203,8 @@ Each training type affects multiple stats:
 | **TrainingPredictionService** | Domain Service | Generates training predictions |
 | **TrainingExecutionService** | Domain Service | Executes training and updates state |
 | **StatCalculator** | Domain Service | Calculates base stat gains with game formula |
-| **BonusCalculator** | Domain Service | Applies support card bonuses |
-| **BondCalculator** | Domain Service | Calculates bond gains and friendship status |
+| **SupportBonusCalculator** | Domain Service | Applies support card bonuses |
+| **BondProgressionService** | Domain Service | Calculates bond gains and friendship status |
 | **SoftCapCalculator** | Domain Service | Applies stat soft cap rules |
 | **RiskCalculator** | Domain Service | Determines failure probability |
 | **Database** | Infrastructure | MySQL/MariaDB persistence layer |
@@ -227,8 +227,8 @@ app/
 │   ├── TrainingPredictionService.php
 │   ├── TrainingExecutionService.php
 │   ├── StatCalculator.php
-│   ├── BonusCalculator.php
-│   ├── BondCalculator.php
+│   ├── SupportBonusCalculator.php
+│   ├── BondProgressionService.php
 │   ├── SoftCapCalculator.php
 │   └── RiskCalculator.php
 ├── Models/
@@ -254,8 +254,8 @@ sequenceDiagram
     participant PredictSvc as TrainingPredictionService
     participant ExecSvc as TrainingExecutionService
     participant StatCalc as StatCalculator
-    participant BonusCalc as BonusCalculator
-    participant BondCalc as BondCalculator
+    participant BonusCalc as SupportBonusCalculator
+    participant BondCalc as BondProgressionService
     participant SoftCapCalc as SoftCapCalculator
     participant RiskCalc as RiskCalculator
     participant Cache as Redis Cache
@@ -429,7 +429,7 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Caller
-    participant BondCalc as BondCalculator
+    participant BondCalc as BondProgressionService
     participant ConditionChecker as ConditionChecker
     participant FriendshipCalc as FriendshipCalculator
     participant DB as Database
@@ -509,8 +509,8 @@ class TrainingPredictionService
 {
     public function __construct(
         private StatCalculator $statCalculator,
-        private BonusCalculator $bonusCalculator,
-        private BondCalculator $bondCalculator,
+        private SupportBonusCalculator $bonusCalculator,
+        private BondProgressionService $bondCalculator,
         private SoftCapCalculator $softCapCalculator,
         private RiskCalculator $riskCalculator,
         private CacheManager $cache,
@@ -814,8 +814,8 @@ class SoftCapCalculator
 ### 5.4 Bond Calculator
 
 ```php
-// app/Services/BondCalculator.php
-class BondCalculator
+// app/Services/Training/BondProgressionService.php
+class BondProgressionService
 {
     private const BASE_BOND_GAIN = 7;
     private const CHARMING_BOND_GAIN = 9;
@@ -1417,7 +1417,7 @@ $this->cache->remember("training_predictions:{$career->id}", 300, fn() => $this-
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
-| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server - added complete training formula, corrected facility multipliers (1.0×-2.0×), updated bond mechanics (+7 base, +9 Charming), soft cap at 1200 with 50% reduction, friendship training threshold at 80% bond, support card presence bonus (+5% per card), Summer Training Camp mechanics |
+| 2.2.0 | 2026-02-22 | Development Team | Updated with verified game mechanics from Global English Server - added complete training formula, corrected facility multipliers (1.0×-2.0×), updated bond mechanics (+7 base, +9 Charming), soft cap at 1200 with 50% reduction, friendship training threshold at 80% bond, support card presence bonus (+5% per card), Summer Training Camp mechanics |
 | 2.0.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 implementation; added detailed sequence flows, caching strategy, WebSocket integration, performance metrics, and aligned with current Laravel 12 architecture |
 | 1.0.0 | 2026-01-14 | Development Team | Initial draft |
 
@@ -1445,4 +1445,4 @@ $this->cache->remember("training_predictions:{$career->id}", 300, fn() => $this-
 
 ---
 
-*This sequence diagram reflects the game-accurate training mechanics verified from the Global English Server as of January 2026. The complete training formula, soft cap system, bond mechanics, and friendship training thresholds have been validated against in-game behavior. For the most up-to-date information, refer to the source code in `app/Services/TrainingPredictionService.php`, `app/Services/StatCalculator.php`, `app/Services/SoftCapCalculator.php`, `app/Services/BondCalculator.php`, and related files.*
+*This sequence diagram reflects the game-accurate training mechanics verified from the Global English Server as of January 2026. The complete training formula, soft cap system, bond mechanics, and friendship training thresholds have been validated against in-game behavior. For the most up-to-date information, refer to the source code in `app/Services/TrainingPredictionService.php`, `app/Services/StatCalculator.php`, `app/Services/SoftCapCalculator.php`, `app/Services/Training/BondProgressionService.php`, and related files.*

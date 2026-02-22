@@ -1,8 +1,8 @@
 # WIREFRAMES & UI SPECIFICATIONS INDEX
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
-**Status**: Current - Aligned with v2.2.0 Implementation and game-accurate mechanics
+**Document Version**: 2.3.0  
+**Date**: February 22, 2026  
+**Status**: Current - Aligned with v2.3.0 Implementation and game-accurate mechanics
 
 ---
 
@@ -331,7 +331,7 @@ flowchart LR
 | Layer | Technology | Version | Purpose |
 |-------|------------|---------|---------|
 | **Framework** | Laravel | 12+ | Backend framework |
-| **Frontend Reactivity** | Livewire | 3 | Server-driven UI |
+| **Frontend Reactivity** | Livewire | 4 | Server-driven UI |
 | **Client Interactivity** | Alpine.js | Latest | Client-side interactions |
 | **Styling** | TailwindCSS | v4 | Utility-first CSS |
 | **Build Tool** | Vite | 7 | Asset compilation |
@@ -578,6 +578,8 @@ flowchart LR
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.3.0 | 2026-02-22 | Development Team | Updated version/dates, corrected Livewire version to v4, aligned technology references with current stack |
+| 2.2.0 | 2026-01-28 | Development Team | Game-accurate mechanics update aligned with v2.2.0 |
 | 2.0.0 | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation, added design system specifications, accessibility guidelines, and testing requirements |
 | 1.0.0 | 2026-01-14 | Development Team | Initial wireframe specifications |
 
@@ -601,4 +603,4 @@ For wireframe-related questions or contributions:
 
 ---
 
-*This index reflects the current wireframe specifications for Umamusume Career Planner v2.0.0. All wireframes are aligned with implemented features and design system guidelines.*
+*This index reflects the current wireframe specifications for Umamusume Career Planner v2.3.0. All wireframes are aligned with implemented features and design system guidelines.*

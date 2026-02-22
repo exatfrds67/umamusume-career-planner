@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0
-**Date**: February 21, 2026
+**Document Version**: 2.4.0
+**Date**: February 22, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned with codebase v2.3.0 and game-accurate mechanics
+**Status**: Current - Aligned with codebase v2.4.0 and game-accurate mechanics
 
 ---
 
@@ -119,23 +119,38 @@ flowchart TD
 ```text
 umamusume-career-planner/
 ├── app/
+│   ├── Collections/        # Custom Collection Classes
 │   ├── Enums/              # PHP 8.1+ Enums (8 enums: AlertType, CareerPhase, Mood, Priority, RaceDistance, RecommendationType, RunningStyle, StorageMode)
+│   ├── Events/             # Domain Events
+│   ├── Helpers/            # Helper Utilities
 │   ├── Http/
-│   │   ├── Controllers/    # API and Web Controllers
+│   │   ├── Controllers/    # Web (22+), Api (36+), Admin (5), Auth (2) Controllers — 63+ total
 │   │   ├── Middleware/     # Custom Middleware
 │   │   └── Requests/       # Form Request Validation
-│   ├── Livewire/           # Livewire Components
-│   ├── Models/             # Eloquent Models
+│   ├── Jobs/               # Queue Jobs
+│   ├── Listeners/          # Event Listeners
+│   ├── Livewire/           # Livewire Components (AdvisoryPanel)
+│   ├── MCP/                # MCP Server Definitions
+│   ├── Models/             # Eloquent Models (30 models)
 │   ├── Neuron/             # Neuron AI Agents
-│   │   ├── Agents/         # Agent Implementations
-│   │   └── Tools/          # Agent Tools
+│   │   ├── Agents/         # Agent Implementations (6 agents)
+│   │   ├── Responses/      # Typed Agent Responses (4 response classes)
+│   │   ├── Support/        # MCP Connector & Tool Integration
+│   │   └── Tools/          # Agent Tools (3 tools)
+│   ├── Notifications/      # Notification Classes
+│   ├── Policies/           # Authorization Policies
 │   ├── Repositories/       # Data Access Layer
-│   ├── Services/           # Business Logic Layer
-│   │   ├── AI/             # AI Provider Services
+│   ├── Services/           # Business Logic Layer — 160+ service classes
+│   │   ├── Admin/          # Admin Panel Services (3)
+│   │   ├── Agents/         # Agent Services (1)
+│   │   ├── AI/             # AI Provider Services (20: Hybrid, Bedrock, Ollama, Agents, Cost, Conversation, Dashboard)
 │   │   ├── Data/           # Data Management Services
-│   │   ├── ExternalAPI/    # External API Clients
-│   │   ├── MCP/            # MCP Server Services
-│   │   └── OCR/            # OCR Processing Services
+│   │   ├── ExternalAPI/    # External API Clients & Sync (25)
+│   │   ├── MCP/            # MCP Server, Agent, Tool Services (42: Core, AgentCore, Agents, AWS, Tools)
+│   │   ├── Neuron/         # Neuron Service Layer (5)
+│   │   ├── OCR/            # OCR Processing & Parsers (12)
+│   │   └── Training/       # Training Domain Services (3)
+│   ├── ValueObjects/       # Value Objects
 │   └── View/               # Blade View Components
 ├── config/
 │   ├── ai.php              # AI Provider Configuration
@@ -145,8 +160,8 @@ umamusume-career-planner/
 │   ├── neuron.php          # Neuron AI Configuration
 │   └── external-apis.php   # External API Configuration
 ├── database/
-│   ├── factories/          # Model Factories
-│   ├── migrations/         # Schema Definitions
+│   ├── factories/          # Model Factories (30)
+│   ├── migrations/         # Schema Definitions (51 migrations)
 │   └── seeders/            # Data Seeders
 ├── resources/
 │   ├── css/                # Tailwind CSS
@@ -154,10 +169,11 @@ umamusume-career-planner/
 │   └── views/              # Blade Templates
 ├── routes/
 │   ├── api.php             # API Routes
-│   └── web.php             # Web Routes
+│   └── web.php             # Web Routes (571 total routes)
 └── tests/
     ├── Feature/            # Feature Tests
     └── Unit/               # Unit Tests
+    (3,316+ tests, 11,563+ assertions across 300+ test files)
 ```
 
 ---
@@ -305,7 +321,7 @@ classDiagram
 
 ```mermaid
 flowchart TD
-    subgraph CoreServices["Core Domain Services"]
+    subgraph CoreServices["Core Domain Services (55+)"]
         CharacterService["CharacterService"]
         CareerService["CareerService"]
         TrainingService["TrainingService"]
@@ -314,18 +330,22 @@ flowchart TD
         SupportCardService["SupportCardService"]
         FactorService["FactorService"]
         SnapshotService["SnapshotService"]
+        GameMechanicsEngine["GameMechanicsEngine"]
+        DeckManagementService["DeckManagementService"]
     end
     
-    subgraph AIServices["AI Services"]
+    subgraph AIServices["AI Services (20)"]
         HybridAIService["HybridAIService"]
         OllamaService["OllamaService"]
         BedrockService["BedrockService"]
         AIAdvisoryService["AIAdvisoryService"]
         CostTrackingService["CostTrackingService"]
         ConversationHistoryService["ConversationHistoryService"]
+        AIDashboardService["AIDashboardService"]
+        VectorStoreService["VectorStoreService"]
     end
     
-    subgraph NeuronServices["Neuron Services"]
+    subgraph NeuronServices["Neuron Services (5)"]
         NeuronAIService["NeuronAIService"]
         TrainingAdvisorService["TrainingAdvisorService"]
         RaceStrategyService["RaceStrategyService"]
@@ -333,11 +353,13 @@ flowchart TD
         CareerPlanningService["CareerPlanningService"]
     end
     
-    subgraph MCPServices["MCP Services"]
+    subgraph MCPServices["MCP Services (42)"]
         MCPClientService["MCPClientService"]
         MCPMonitoringService["MCPMonitoringService"]
         MCPHealthDashboardService["MCPHealthDashboardService"]
         AgentOrchestrationService["AgentOrchestrationService"]
+        AgentCoreService["AgentCoreService"]
+        SubagentCoordinationService["SubagentCoordinationService"]
     end
     
     subgraph DataServices["Data Management Services"]
@@ -348,14 +370,21 @@ flowchart TD
         LocalStorageService["LocalStorageService"]
     end
     
-    subgraph ExternalServices["External Integration"]
+    subgraph ExternalServices["External Integration (25)"]
         UmapyoiApiClient["UmapyoiApiClient"]
         UmamusumeDBApiClient["UmamusumeDBApiClient"]
         TesseractService["TesseractService"]
         ExternalDataService["ExternalDataService"]
+        GracefulDegradationService["GracefulDegradationService"]
     end
     
-    subgraph PerformanceServices["Performance & Monitoring"]
+    subgraph AdminServices["Admin Services (3)"]
+        SystemHealthService["SystemHealthService"]
+        DatabaseMaintenanceService["DatabaseMaintenanceService"]
+        LogReaderService["LogReaderService"]
+    end
+    
+    subgraph PerformanceServices["Performance & Monitoring (8)"]
         ApmService["ApmService"]
         ApiPerformanceMonitoringService["ApiPerformanceMonitoringService"]
         QueryOptimizationService["QueryOptimizationService"]
@@ -369,6 +398,7 @@ flowchart TD
     CoreServices --> DataServices
     CoreServices --> ExternalServices
     CoreServices --> PerformanceServices
+    CoreServices --> AdminServices
 ```
 
 ### 4.2 Core Service Implementations
@@ -464,7 +494,7 @@ class TrainingPredictionService
 
 ```mermaid
 flowchart TD
-    subgraph Agents["Neuron Agents"]
+    subgraph Agents["Neuron Agents (6)"]
         BaseAgent["BaseAgent"]
         TrainingAgent["TrainingAdvisorAgent"]
         RaceAgent["RaceStrategyAgent"]
@@ -473,13 +503,13 @@ flowchart TD
         McpDemo["McpDemoAgent"]
     end
     
-    subgraph Tools["Agent Tools"]
+    subgraph Tools["Agent Tools (3)"]
         StatsTool["CharacterStatsTool"]
         RaceTool["RaceDataTool"]
         SkillTool["SkillDataTool"]
     end
     
-    subgraph NeuronServices["Neuron Services"]
+    subgraph NeuronServices["Neuron Services (5)"]
         NeuronAIService["NeuronAIService"]
         TrainingAdvisorService["TrainingAdvisorService"]
         RaceStrategyService["RaceStrategyService"]
@@ -492,6 +522,13 @@ flowchart TD
         Bedrock["AWS Bedrock (Cloud)"]
     end
     
+    subgraph Responses["Typed Responses (4)"]
+        TrainingAdvResp["TrainingAdviceResponse"]
+        RaceStratResp["RaceStrategyResponse"]
+        SkillRecResp["SkillRecommendationResponse"]
+        CareerPlanResp["CareerPlanningResponse"]
+    end
+    
     BaseAgent --> TrainingAgent
     BaseAgent --> RaceAgent
     BaseAgent --> SkillAgent
@@ -502,6 +539,7 @@ flowchart TD
     
     Agents --> NeuronServices
     Agents --> Providers
+    Agents --> Responses
 ```
 
 #### Agent Implementation
@@ -950,10 +988,10 @@ flowchart TD
 
 ```text
 app/Livewire/
-└── AdvisoryPanel.php         # AI advisory panel component
+└── AdvisoryPanel.php         # AI advisory panel component (real-time interactive)
 ```
 
-> **Note**: The application primarily uses controller-rendered Blade views with Alpine.js for interactivity, with Livewire 4 used selectively for real-time interactive components like the AI Advisory Panel.
+> **Note**: The application primarily uses controller-rendered Blade views (32+ view directories) with Alpine.js for interactivity, with Livewire 4 used selectively for real-time interactive components like the AI Advisory Panel.
 
 ### 6.3 CSS Architecture
 
@@ -1025,13 +1063,23 @@ flowchart LR
 | `/api/characters/{id}` | GET | CharacterController | Get character |
 | `/api/characters/{id}` | PUT | CharacterController | Update character |
 | `/api/characters/{id}/stats` | PATCH | CharacterController | Update stats |
-| `/api/predictions/{characterId}` | GET | PredictionController | Get training predictions |
-| `/api/predictions/batch` | POST | PredictionController | Batch predictions |
-| `/api/skills/search` | GET | SkillController | Search skills |
-| `/api/skills/{id}/acquire` | POST | SkillController | Acquire skill |
+| `/api/predictions/{characterId}` | GET | TrainingPredictionController | Get training predictions |
+| `/api/predictions/batch` | POST | TrainingPredictionController | Batch predictions |
+| `/api/skills/search` | GET | SkillManagementController | Search skills |
+| `/api/skills/{id}/acquire` | POST | SkillManagementController | Acquire skill |
+| `/api/skill-builds` | GET/POST | SkillBuildController | Manage skill builds |
+| `/api/skill-hints` | GET | SkillHintController | Get skill hints |
 | `/api/ocr/upload` | POST | OCRController | Process screenshot |
-| `/api/export/{type}` | GET | ExportController | Export data |
-| `/api/ai/advice` | POST | AIController | Get AI advice |
+| `/api/export/{type}` | GET | CareerExportController | Export data |
+| `/api/ai/advice` | POST | AdvisoryController | Get AI advice |
+| `/api/ai/dashboard` | GET | AIDashboardController | AI dashboard data |
+| `/api/mcp/dashboard` | GET | MCPDashboardController | MCP monitoring |
+| `/api/race-strategy` | POST | RaceStrategyController | Race analysis |
+| `/api/snapshots` | GET/POST | SnapshotController | Career snapshots |
+| `/api/support-decks` | GET/POST | SupportDeckController | Deck management |
+| `/api/career-comparison` | GET | CareerComparisonController | Compare careers |
+| `/api/notifications` | GET | NotificationController | User notifications |
+| `/api/connectivity` | GET | ConnectivityController | Check connectivity |
 
 ### 7.3 Service Method Reference
 
@@ -1101,8 +1149,9 @@ mindmap
 | Services | `app/Services/` | `{Domain}Service.php` |
 | Controllers | `app/Http/Controllers/` | `{Entity}Controller.php` |
 | Form Requests | `app/Http/Requests/` | `{Action}{Entity}Request.php` |
-| Livewire | `app/Livewire/` | `{Feature}/{Component}.php` |
+| Livewire | `app/Livewire/` | `{Component}.php` |
 | Neuron Agents | `app/Neuron/Agents/` | `{Purpose}Agent.php` |
+| Neuron Responses | `app/Neuron/Responses/` | `{Purpose}Response.php` |
 | Tests | `tests/{Type}/` | `{Subject}Test.php` |
 
 ---
@@ -1114,6 +1163,8 @@ mindmap
 - **Pest v4** (with PHPUnit v12 backend)
 - **pest-plugin-browser v4.0** for browser testing via Playwright 1.58
 - Browser tests live in `tests/Browser/`
+- **3,316+ tests** with **11,563+ assertions** across **300+ test files**
+- **571 total routes** covered by feature and integration tests
 
 ### 9.2 Test Distribution
 
@@ -1204,4 +1255,4 @@ test('ranks predictions by recommendation score', function () {
 
 ---
 
-*This documentation reflects the current implementation of the Umamusume Pretty Derby Career Planner codebase.*
+*This documentation reflects the current implementation of the Umamusume Pretty Derby Career Planner codebase (v2.4.0).*

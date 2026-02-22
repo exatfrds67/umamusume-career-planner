@@ -2,13 +2,13 @@
 
 ## Overview
 
-This document presents the key user workflow diagrams for the Umamusume Pretty Derby Career Planner application, showing how users interact with the system to achieve their optimization goals through various pathways and decision points. The system is built with **Laravel 12** (released February 24, 2025) with **PHP 8.2+**, **Livewire 4**, **Alpine.js 3**, **TailwindCSS v4** (released January 22, 2025), and integrates with **AWS Bedrock Claude** models and **Ollama** for AI capabilities.
+This document presents the key user workflow diagrams for the Umamusume Pretty Derby Career Planner application, showing how users interact with the system to achieve their optimization goals through various pathways and decision points. The system is built with **Laravel 12** (released February 24, 2025) with **PHP 8.2+**, **Livewire 4**, **Alpine.js 3**, **TailwindCSS v4** (released January 22, 2025), **Neuron AI v2.11**, and integrates with **AWS Bedrock** models and **Ollama** for AI capabilities.
 
-**Document Version**: 2.3.0  
-**Date**: February 21, 2026  
+**Document Version**: 2.4.0  
+**Date**: February 22, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.3.0 and game-accurate mechanics
+**Status**: Current - Aligned with codebase v2.4.0 (571 routes, 3,316+ tests, 11,563+ assertions)
 
 ---
 
@@ -126,7 +126,7 @@ flowchart TD
 
 ### 2.1 Text Description
 
-The core optimization flow occurs every turn (1-78), analyzing current character state, available training options, support card participation, and providing AI-powered recommendations based on goals, energy management, and long-term strategy. Enhanced by **Neuron AI agents** for intelligent decision making and **Laravel 12** backend for robust processing.
+The core optimization flow occurs every turn (1-78), analyzing current character state, available training options, support card participation, and providing AI-powered recommendations based on goals, energy management, and long-term strategy. Enhanced by **Neuron AI v2.11 agents** for intelligent decision making and **Laravel 12** backend for robust processing.
 
 **Related Documents:**
 
@@ -628,9 +628,9 @@ flowchart TD
 | Provider | Model | Use Case | Cost |
 |----------|-------|----------|------|
 | Ollama | Local Models (llama3.2) | Simple queries, high volume | Free |
-| AWS Bedrock | Claude 3.5 Haiku | Standard recommendations | $0.25/1M input |
-| AWS Bedrock | Claude 3.5 Sonnet | Complex strategy analysis | $3/1M input |
-| AWS Bedrock | Claude 4.5 | Advanced reasoning (fallback) | $5/1M input |
+| AWS Bedrock | Claude Haiku | Standard recommendations | $0.25/1M input |
+| AWS Bedrock | Claude Sonnet | Complex strategy analysis | $3/1M input |
+| AWS Bedrock | Claude Opus | Advanced reasoning (fallback) | $5/1M input |
 
 ### 4.5 Neuron Agent Tools
 
@@ -1011,7 +1011,7 @@ flowchart TD
 |-------------|---------|---------|
 | AI Chatbot | Neuron AI Agents | Contextual advice across all workflows |
 | OCR Pipeline | Tesseract + GD | Automated data input from screenshots |
-| External APIs | umapyoi.net, UmamusumeDB | Game data synchronization |
+| External APIs | umapyoi.net, GameTora | Game data synchronization |
 | WebSocket | Laravel Reverb | Real-time updates |
 | Caching | Redis | Performance optimization |
 
@@ -1031,6 +1031,7 @@ flowchart TD
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.4.0 | 2026-02-22 | Development Team | Added Neuron AI v2.11 version; updated model names (Claude Haiku/Sonnet/Opus); updated external API references (GameTora); updated stats |
 | 2.3.0 | 2026-02-21 | Development Team | Updated version/date metadata; Livewire 3→4, Alpine.js→Alpine.js 3; aligned with 30 current Eloquent models |
 | 2.1.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 codebase, updated AI integration to Neuron agents, added storage mode and import/export flows, updated technical specifications |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with initial workflow diagrams |
@@ -1052,4 +1053,4 @@ flowchart TD
 
 ---
 
-*This document reflects the current user workflow design aligned with the Umamusume Career Planner v2.3.0 implementation.*
+*This document reflects the current user workflow design aligned with the Umamusume Career Planner v2.4.0 implementation.*

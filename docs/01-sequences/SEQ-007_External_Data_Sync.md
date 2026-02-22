@@ -3,7 +3,7 @@
 ## Umamusume Pretty Derby Career Planner
 
 **Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Date**: February 22, 2026  
 **Related Documents**: [PRD-007], [SPEC-007], [FLOW-007], [TECH-FLOW-007]
 
 ---
@@ -25,13 +25,13 @@
 
 ### 1.1 Purpose
 
-This sequence diagram documents the external data synchronization workflow in the Umamusume Career Planner application, covering API integration with umapyoi.net and UmamusumeDB.com, circuit breaker resilience patterns, and cache management strategies.
+This sequence diagram documents the external data synchronization workflow in the Umamusume Career Planner application, covering API integration with umapyoi.net and GameTora (gametora.com), circuit breaker resilience patterns, and cache management strategies.
 
 ### 1.2 Scope
 
 **Covers:**
 
-- External API data synchronization (umapyoi.net, UmamusumeDB.com)
+- External API data synchronization (umapyoi.net, GameTora)
 - Circuit breaker pattern for fault tolerance
 - Response caching with 24-hour TTL
 - Fallback API mechanisms
@@ -75,9 +75,9 @@ External data synchronization enables the application to:
 |-----------|------|----------------|
 | **Scheduler** | Infrastructure | Laravel task scheduler triggering sync jobs |
 | **SyncController** | Application | Manual sync trigger endpoint |
-| **ExternalAPIService** | Domain Service | Unified external API interface |
+| **ExternalDataService** | Domain Service | Unified external API interface |
 | **UmapyoiApiClient** | Infrastructure | Primary data source client |
-| **UmamusumeDBApiClient** | Infrastructure | Fallback data source client |
+| **GameToraScraperService** | Infrastructure | Fallback data source client |
 | **CircuitBreaker** | Infrastructure | Fault tolerance and state management |
 | **CacheManager** | Infrastructure | Redis-based response caching |
 | **Database** | Infrastructure | MySQL/MariaDB persistence layer |
@@ -98,9 +98,9 @@ app/
 │           └── ExternalSyncController.php
 ├── Services/
 │   └── ExternalAPI/
-│       ├── ExternalAPIService.php
+│       ├── ExternalDataService.php
 │       ├── UmapyoiApiClient.php
-│       ├── UmamusumeDBApiClient.php
+│       ├── GameToraScraperService.php
 │       ├── CircuitBreaker.php
 │       └── CacheManager.php
 └── Events/
@@ -119,10 +119,10 @@ sequenceDiagram
     actor Admin
     participant Scheduler as Laravel Scheduler
     participant Controller as SyncController
-    participant Service as ExternalAPIService
+    participant Service as ExternalDataService
     participant Circuit as CircuitBreaker
     participant Primary as UmapyoiApiClient
-    participant Fallback as UmamusumeDBApiClient
+    participant Fallback as GameToraScraperService
     participant Cache as Redis Cache
     participant DB as Database
     participant Events as EventDispatcher
@@ -228,18 +228,18 @@ sequenceDiagram
 **Request Flow:**
 
 ```
-Scheduler/Manual Trigger → ExternalAPIService → CircuitBreaker → API Client
+Scheduler/Manual Trigger → ExternalDataService → CircuitBreaker → API Client
 ```
 
 **Service Implementation:**
 
 ```php
-// ExternalAPIService.php
-class ExternalAPIService
+// ExternalDataService.php
+class ExternalDataService
 {
     public function __construct(
         private UmapyoiApiClient $primary,
-        private UmamusumeDBApiClient $fallback,
+        private GameToraScraperService $fallback,
         private CircuitBreaker $circuitBreaker,
         private CacheManager $cache,
     ) {}
@@ -498,19 +498,19 @@ class UmapyoiApiClient
 }
 ```
 
-#### Fallback API Client (UmamusumeDB.com)
+#### Fallback API Client (GameTora)
 
 ```php
-// UmamusumeDBApiClient.php
-class UmamusumeDBApiClient
+// GameToraScraperService.php
+class GameToraScraperService
 {
     private string $baseUrl;
     private int $timeout;
     
     public function __construct()
     {
-        $this->baseUrl = config('external-apis.umamusumedb.base_url');
-        $this->timeout = config('external-apis.umamusumedb.timeout', 10);
+        $this->baseUrl = config('external-apis.gametora.base_url');
+        $this->timeout = config('external-apis.gametora.timeout', 10);
     }
     
     public function fetch(string $resource): array
@@ -548,7 +548,7 @@ class UmamusumeDBApiClient
 ### 4.4 Data Validation and Transformation
 
 ```php
-// ExternalAPIService.php (continued)
+// ExternalDataService.php (continued)
 private function validateResponse(array $response, string $resource): array
 {
     $validator = match ($resource) {
@@ -763,7 +763,7 @@ class ExternalDataSynced implements ShouldBroadcast
 
 ```mermaid
 sequenceDiagram
-    participant Service as ExternalAPIService
+    participant Service as ExternalDataService
     participant Primary as Primary API
     participant Fallback as Fallback API
     participant Cache
@@ -799,7 +799,7 @@ sequenceDiagram
 ### 6.3 Retry Strategy
 
 ```php
-// ExternalAPIService.php
+// ExternalDataService.php
 private function fetchWithRetry(callable $fetcher, int $maxRetries = 3): array
 {
     $attempt = 0;
@@ -971,4 +971,4 @@ CREATE INDEX idx_external_api_cache ON ucp_cache(key, expires_at);
 
 ---
 
-*This sequence diagram reflects the current implementation of the external data synchronization workflow as of v2.0.0. For the most up-to-date information, refer to the source code in `app/Services/ExternalAPI/ExternalAPIService.php`, `app/Services/ExternalAPI/CircuitBreaker.php`, and related files.*
+*This sequence diagram reflects the current implementation of the external data synchronization workflow as of v2.0.0. For the most up-to-date information, refer to the source code in `app/Services/ExternalDataService.php`, `app/Services/ExternalAPI/CircuitBreaker.php`, and related files.*

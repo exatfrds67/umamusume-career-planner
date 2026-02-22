@@ -1,10 +1,10 @@
 # Umamusume Career Planner - Data Flow Diagram (DFD)
 
-**Document Version**: 2.3.0  
-**Date**: February 21, 2026  
+**Document Version**: 2.4.0  
+**Date**: February 22, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.3.0 and game-accurate mechanics
+**Status**: Current - Aligned with codebase v2.4.0 (571 routes, 3,316+ tests, 11,563+ assertions)
 
 ---
 
@@ -35,9 +35,10 @@ The system is built with:
 
 - **Backend**: Laravel 12 (PHP 8.2+)
 - **Frontend**: Livewire 4, Alpine.js 3, TailwindCSS v4
-- **AI Integration**: Neuron AI agents, Ollama (local), AWS Bedrock (cloud)
-- **MCP Integration**: Model Context Protocol servers
-- **External APIs**: umapyoi.net (active), UmamusumeDB.com (pending verification)
+- **AI Integration**: Neuron AI v2.11 agents, Ollama (local), AWS Bedrock (cloud)
+- **MCP Integration**: Model Context Protocol servers (30+ services)
+- **Admin Panel**: Database, Log, Queue, SystemSettings, User controllers
+- **External APIs**: umapyoi.net (primary), GameTora (scraping)
 - **OCR Processing**: Tesseract with GD preprocessing
 
 ### 1.3 DFD Notation
@@ -73,8 +74,9 @@ flowchart LR
 flowchart TB
     subgraph External[External Entities]
         Player[Player<br/>Manual Input, Screenshots]
+        Admin[Admin User<br/>System Management]
         UmapyoiAPI[umapyoi.net API<br/>Game Data]
-        UmamusumeDBAPI[UmamusumeDB.com API<br/>Verification Pending]
+        GameToraAPI[GameTora<br/>Scraping Source]
         Community[Community Sources<br/>Meta Data, Tiers]
         OllamaServer[Ollama Server<br/>Local AI]
         BedrockAPI[AWS Bedrock API<br/>Cloud AI]
@@ -91,8 +93,9 @@ flowchart TB
     end
     
     Player -->|Character data, Goals, Actions| Core
+    Admin -->|System config, User mgmt| Core
     UmapyoiAPI -->|Characters, Skills, Cards| Core
-    UmamusumeDBAPI -->|Fallback data| Core
+    GameToraAPI -->|Scraped game data| Core
     Community -->|Meta rankings, Strategies| Core
     
     Core -->|AI queries| OllamaServer
@@ -107,6 +110,7 @@ flowchart TB
     Recommendations -->|Display| Player
     Analytics -->|Display| Player
     Exports -->|Download| Player
+    Core -->|Logs, Metrics, Alerts| Admin
     
     style Core fill:#f3e5f5
     style External fill:#fff3e0
@@ -118,8 +122,9 @@ flowchart TB
 | Entity | Type | Description | Data Flow |
 |--------|------|-------------|-----------|
 | **Player** | Human | End user interacting with system | Input: Manual data, Screenshots, Goals<br/>Output: Recommendations, Analytics |
+| **Admin** | Human | System administrator managing application | Input: Config changes, User management<br/>Output: Logs, Metrics, Alerts |
 | **umapyoi.net API** | System | Primary external game data source | Input: Character catalog, Skills, Support cards |
-| **UmamusumeDB.com API** | System | Secondary data source (verification pending) | Input: Fallback game data |
+| **GameTora** | System | Secondary data source (scraping) | Input: Scraped game data |
 | **Community Sources** | System | Meta rankings and strategies | Input: Tier lists, Meta data |
 | **Ollama Server** | System | Local AI inference engine | Input: AI queries<br/>Output: Recommendations |
 | **AWS Bedrock API** | System | Cloud AI fallback | Input: Complex queries<br/>Output: Recommendations |
@@ -134,7 +139,8 @@ flowchart TB
 flowchart TB
     subgraph External[External Entities]
         Player[Player]
-        ExternalAPIs[External APIs<br/>umapyoi.net<br/>UmamusumeDB]
+        Admin[Admin User]
+        ExternalAPIs[External APIs<br/>umapyoi.net<br/>GameTora]
         AIProviders[AI Providers<br/>Ollama/Bedrock]
     end
     
@@ -147,6 +153,7 @@ flowchart TB
         P6[6.0<br/>Support Card<br/>Management]
         P7[7.0<br/>AI Advisory<br/>System]
         P8[8.0<br/>Data Management<br/>& Export]
+        P9[9.0<br/>Admin Panel<br/>& Monitoring]
     end
     
     subgraph DataStores[Data Stores]
@@ -165,6 +172,8 @@ flowchart TB
     Player -->|Deck configurations| P6
     Player -->|AI queries| P7
     Player -->|Import/Export requests| P8
+    Admin -->|System config| P9
+    Admin -->|User management| P9
     
     ExternalAPIs -->|Game data| P1
     P1 -->|Validated data| D5
@@ -207,6 +216,9 @@ flowchart TB
     P5 -->|Skill builds| Player
     P7 -->|Advice| Player
     
+    P9 -->|Logs, Alerts| Admin
+    P9 -->|System metrics| Admin
+    
     style Processes fill:#e3f2fd
     style DataStores fill:#e8f5e9
     style External fill:#fff3e0
@@ -224,6 +236,7 @@ flowchart TB
 | **6.0** | Support Card Management | Manages card inventory, builds decks, calculates synergy | Card collection, deck configs | Optimized decks, synergy scores |
 | **7.0** | AI Advisory System | Provides intelligent recommendations via hybrid AI | User queries, context data | AI-powered advice, confidence scores |
 | **8.0** | Data Management & Export | Handles import, export, backup, migration | User files, system data | Exported files, imported records |
+| **9.0** | Admin Panel & Monitoring | System administration, user management, log viewing, queue monitoring | Admin requests, system metrics | Dashboard views, alerts, system config |
 
 ---
 
@@ -388,7 +401,7 @@ flowchart TB
 | **7.2 Context Builder** | Enriches query with character and career context | Data aggregation from multiple stores |
 | **7.3 Provider Router** | Routes query to appropriate AI provider based on complexity | Ollama (simple) vs Bedrock (complex) |
 | **7.4 Ollama Service** | Processes queries using local Ollama models | HTTP API client, timeout 30s |
-| **7.5 Bedrock Service** | Processes queries using AWS Bedrock Claude models | AWS SDK, Claude 4.5 Sonnet/Haiku |
+| **7.5 Bedrock Service** | Processes queries using AWS Bedrock Claude models | AWS SDK, Claude Sonnet/Haiku |
 | **7.6 Response Synthesizer** | Formats and enriches AI responses with confidence scores | JSON formatting, confidence calculation |
 | **7.7 Cost Tracker** | Tracks token usage and calculates costs for cloud AI | Database persistence, budget monitoring |
 
@@ -807,6 +820,7 @@ flowchart TD
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.4.0 | 2026-02-22 | Development Team | Added Admin Panel data paths; updated external API references (GameTora); added Neuron AI v2.11 version; updated stats (571 routes, 3,316+ tests) |
 | 2.3.0 | 2026-02-21 | Development Team | Updated version/date metadata; Livewire 3→4, Alpine.js→Alpine.js 3; aligned with 30 current Eloquent models |
 | 2.2.0 | 2026-01-27 | Development Team | Added §8 Level 2 DFD - Performance Monitoring with 8 APM services; renumbered sections |
 | 2.0.0 | 2026-01-23 | Development Team | Complete rewrite aligned with v2.0.0 implementation; added AI, MCP, external integration, and OCR flows; updated all diagrams and specifications |
@@ -829,4 +843,4 @@ flowchart TD
 
 ---
 
-*This DFD document provides comprehensive data flow analysis for the Umamusume Pretty Derby Career Planner v2.3.0, reflecting the current implementation architecture and integration patterns.*
+*This DFD document provides comprehensive data flow analysis for the Umamusume Pretty Derby Career Planner v2.4.0, reflecting the current implementation architecture and integration patterns.*

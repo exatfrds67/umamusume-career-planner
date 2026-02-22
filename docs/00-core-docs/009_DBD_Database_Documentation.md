@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0
-**Date**: February 21, 2026
+**Document Version**: 2.4.0
+**Date**: February 22, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned to codebase v2.3.0 with game-accurate mechanics
+**Status**: Current - Aligned to codebase v2.4.0 with game-accurate mechanics
 
 ---
 
@@ -71,7 +71,7 @@ mindmap
       ucp_conversation_messages
       ucp_chat_messages
       ucp_advisory_recommendations
-      ucp_mcp_tool_usage
+      ucp_mcp_tool_usages
       ucp_mcp_agents
       ucp_mcp_servers
       ucp_critical_alerts
@@ -85,7 +85,7 @@ mindmap
 
 ## 2. Schema Catalog
 
-### 2.1 Domain Tables (UCP Prefix)
+### 2.1 Domain Tables (UCP Prefix) — 30 Tables
 
 | Table | Purpose | Key Columns |
 |-------|---------|-------------|
@@ -93,21 +93,32 @@ mindmap
 | `ucp_characters` | Character state | user_id, name, scenario_type, current_stats, energy_level, mood_status, goals |
 | `ucp_aptitudes` | Aptitude grades | character_id, distance_type, surface_type, running_style, grade |
 | `ucp_factors` | Inheritance factors | character_id, factor_type, star_level, source_parent |
-| `ucp_skills` | Skill catalog | skill_type, rarity, base_sp_cost, evolution_links, effects, **status** (NEW), **name_en** (NEW) |
+| `ucp_skills` | Skill catalog | skill_type, rarity, base_sp_cost, evolution_links, effects, status, name_en |
 | `ucp_skill_hints` | Hint tracking | character_id, skill_id, source_type, discount_percentage, is_used |
-| `ucp_skill_acquisitions` | Acquisition history | character_id, skill_id, career_id, final_sp_cost, is_evolution, is_active, **hint_level** (NEW), **hint_count** (NEW), **first_hint_at** (NEW), **last_hint_at** (NEW) |
+| `ucp_skill_acquisitions` | Acquisition history | character_id, skill_id, career_id, final_sp_cost, is_evolution, is_active, hint_level, hint_count |
+| `ucp_skill_builds` | Skill build plans | user_id, name, skills (JSON), total_sp_cost |
 | `ucp_careers` | Career runs | character_id, scenario_type, status, current_turn, final_stats |
 | `ucp_training_sessions` | Training logs | career_id, turn_number, training_type, stat_gains, support_bonuses |
-| `ucp_support_cards` | Support card inventory | user_id, card_name, rarity, specialization, **limit_break_level** (NEW), **external_source** (NEW), **external_id** (NEW), **last_synced_at** (NEW) |
-| `ucp_support_card_definitions` | Canonical card metadata (NEW) | card_name_jp, card_name_en, rarity, support_type, base_stats, skill_effects |
-| `ucp_support_decks` | Deck configurations (NEW) | user_id, name, description, card_ids (JSON), is_active |
-| `ucp_support_deck_cards` | Deck-card pivot (NEW) | support_deck_id, support_card_id |
+| `ucp_races` | Race data | career_id, race_name, distance, surface, placement, rewards |
+| `ucp_events` | Game events | career_id, event_type, turn_number, choices, outcomes |
+| `ucp_support_cards` | Support card inventory | user_id, card_name, rarity, specialization, limit_break_level, external_source |
+| `ucp_support_card_definitions` | Canonical card metadata | card_name_jp, card_name_en, rarity, support_type, base_stats, skill_effects |
+| `ucp_character_support_cards` | Character-card pivot | character_id, support_card_id, bond_level |
+| `ucp_support_decks` | Deck configurations | user_id, name, description, card_ids (JSON), is_active |
 | `ucp_ai_conversations` | AI chat history | user_id, context_type, messages, model_used |
-| `ucp_ai_recommendations` | AI recommendations | character_id, recommendation_type, content, confidence_score |
-| `ucp_mcp_tool_usage` | MCP tool tracking | tool_name, invocation_count, avg_latency, error_count |
-| `ucp_external_api_cache` | API response cache | api_source, endpoint, response_data, expires_at |
+| `ucp_conversation_messages` | Conversation messages | ai_conversation_id, role, content, token_count |
+| `ucp_chat_messages` | Chat messages | user_id, message, response, model_used |
+| `ucp_advisory_recommendations` | AI-generated recommendations | character_id, recommendation_type, content, confidence_score |
+| `ucp_mcp_servers` | MCP server configurations | name, command, args, enabled, health_status |
+| `ucp_mcp_agents` | MCP agent definitions | name, type, capabilities, configuration |
+| `ucp_mcp_tool_usages` | MCP tool tracking | tool_name, invocation_count, avg_latency, error_count |
+| `ucp_user_preferences` | User preferences | user_id, key, value, category |
+| `ucp_external_data` | External API data cache | api_source, endpoint, response_data, expires_at |
 | `ucp_ocr_extractions` | OCR results | user_id, image_path, extracted_data, confidence_score |
-| `ucp_ocr_extracted_skills` | OCR skill detection cache | ocr_extraction_id, skill_id, confidence_score |
+| `ucp_ocr_extracted_skills` | OCR skill detection | ocr_extraction_id, skill_id, confidence_score |
+| `ucp_critical_alerts` | System critical alerts | alert_type, severity, message, resolved_at |
+| `ucp_prediction_accuracy` | Prediction tracking | prediction_type, predicted_value, actual_value, accuracy |
+| `ucp_run_snapshots` | Career run snapshots | career_id, turn_number, snapshot_data, created_at |
 
 ### 2.2 Models (30 Total)
 
@@ -129,7 +140,7 @@ The following Eloquent models map to the domain tables:
 | `Factor` | `ucp_factors` | Inheritance factors |
 | `MCPAgent` | `ucp_mcp_agents` | MCP agent definitions |
 | `MCPServer` | `ucp_mcp_servers` | MCP server configurations |
-| `MCPToolUsage` | `ucp_mcp_tool_usage` | MCP tool tracking |
+| `MCPToolUsage` | `ucp_mcp_tool_usages` | MCP tool tracking |
 | `OcrExtractedSkill` | `ucp_ocr_extracted_skills` | OCR skill detection |
 | `OCRExtraction` | `ucp_ocr_extractions` | OCR results |
 | `PredictionAccuracy` | `ucp_prediction_accuracy` | Prediction tracking |
@@ -240,7 +251,7 @@ erDiagram
 ```mermaid
 erDiagram
     ucp_users ||--o{ ucp_ai_conversations : has
-    ucp_characters ||--o{ ucp_ai_recommendations : receives
+    ucp_characters ||--o{ ucp_advisory_recommendations : receives
     
     ucp_ai_conversations {
         bigint id PK
@@ -253,7 +264,7 @@ erDiagram
         timestamp created_at
     }
 
-    ucp_ai_recommendations {
+    ucp_advisory_recommendations {
         bigint id PK
         bigint character_id FK
         enum recommendation_type
@@ -263,7 +274,7 @@ erDiagram
         timestamp created_at
     }
 
-    ucp_mcp_tool_usage {
+    ucp_mcp_tool_usages {
         bigint id PK
         string tool_name
         string server_name
@@ -273,7 +284,7 @@ erDiagram
         date usage_date
     }
 
-    ucp_external_api_cache {
+    ucp_external_data {
         bigint id PK
         string api_source
         string endpoint
@@ -381,7 +392,7 @@ AI conversation history for context persistence.
 | `created_at` | Timestamp | - | Start timestamp |
 | `updated_at` | Timestamp | - | Last message timestamp |
 
-### 4.6 `ucp_mcp_tool_usage`
+### 4.6 `ucp_mcp_tool_usages`
 
 MCP tool usage metrics for monitoring.
 
@@ -439,8 +450,8 @@ flowchart TD
 | `ucp_training_sessions` | `idx_career_turn` | `career_id`, `turn_number` | Turn history |
 | `ucp_skill_acquisitions` | `idx_character_active` | `character_id`, `is_active` | Active skills |
 | `ucp_ai_conversations` | `idx_user_context` | `user_id`, `context_type` | Conversation lookup |
-| `ucp_external_api_cache` | `idx_cache_expiry` | `cache_key`, `expires_at` | Cache retrieval |
-| `ucp_mcp_tool_usage` | `idx_tool_date` | `tool_name`, `usage_date` | Usage aggregation |
+| `ucp_external_data` | `idx_cache_expiry` | `cache_key`, `expires_at` | Cache retrieval |
+| `ucp_mcp_tool_usages` | `idx_tool_date` | `tool_name`, `usage_date` | Usage aggregation |
 
 ### 5.3 Query Performance Targets
 
@@ -518,8 +529,8 @@ flowchart LR
     M1 --> M12["12. ucp_ai_conversations"]
     M2 --> M13["13. ucp_ai_recommendations"]
     
-    M14["14. ucp_mcp_tool_usage"]
-    M15["15. ucp_external_api_cache"]
+    M14["14. ucp_mcp_tool_usages"]
+    M15["15. ucp_external_data"]
     M16["16. ucp_ocr_extractions"]
 ```
 
@@ -536,10 +547,11 @@ flowchart LR
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.4.0 | 2026-02-22 | Development Team | Corrected all 30 table names to match actual migrations (ucp_mcp_tool_usages, ucp_advisory_recommendations, ucp_external_data, ucp_critical_alerts, ucp_prediction_accuracy, ucp_run_snapshots), added missing tables to Section 2.1, 51 migrations total |
 | 2.3.0 | 2026-02-21 | Development Team | Added complete 30-model catalog, updated schema mindmap with all tables, version alignment to v2.3.0 |
 | 2.1.0 | 2026-01-23 | Development Team | Updated schema to match current implementation, added AI/MCP tables |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with base schema |
 
 ---
 
-*This document reflects the current database schema and is aligned with the implemented Laravel migrations.*
+*This document reflects the current database schema across 51 migrations and is aligned with the 30 Eloquent models.*

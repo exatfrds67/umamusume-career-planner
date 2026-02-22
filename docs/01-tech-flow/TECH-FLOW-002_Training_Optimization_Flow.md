@@ -1,8 +1,8 @@
 # TECH-FLOW-002: Training Optimization - Technical Flow & Task Breakdown
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
-**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
+**Document Version**: 2.3.0  
+**Date**: February 22, 2026  
+**Status**: Current - Aligned with codebase v2.3.0 and game-accurate mechanics
 
 **Source Specifications**:
 
@@ -46,7 +46,7 @@
 flowchart TB
     subgraph Presentation["Presentation Layer"]
         Blade["Blade Templates"]
-        Livewire["Livewire 3 Components"]
+        Livewire["Livewire 4 Components"]
         Alpine["Alpine.js Interactions"]
     end
     
@@ -104,7 +104,7 @@ Training Optimization System
 │   ├── TrainingExecutionService
 │   ├── SupportCardBonusService
 │   ├── SkillHintService
-│   └── AITrainingAdvisorService
+│   └── TrainingAdvisoryService
 │
 ├── Calculation Engines
 │   ├── StatGainCalculator
@@ -829,7 +829,7 @@ class TrainingPredictionService
 - **TrainingExecutionService**: Handles training session execution and state updates
 - **SupportCardBonusService**: Aggregates support card bonuses
 - **SkillHintService**: Manages skill hint acquisition and tracking
-- **AITrainingAdvisorService**: Integrates with Neuron AI for recommendations
+- **TrainingAdvisoryService**: Integrates with Neuron AI for recommendations
 
 ---
 
@@ -1214,8 +1214,8 @@ flowchart TD
     TrainingExecutionService --> CharacterStateService
     TrainingExecutionService --> GoalManagementService
     
-    AITrainingAdvisorService --> HybridAIService
-    AITrainingAdvisorService --> ContextBuilder
+    TrainingAdvisoryService --> HybridAIService
+    TrainingAdvisoryService --> ContextBuilder
     
     HybridAIService --> OllamaService
     HybridAIService --> BedrockService
@@ -1489,6 +1489,7 @@ class StatGainCalculatorTest extends TestCase
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.3.0 | 2026-02-22 | Development Team | Updated service names to match codebase (TrainingAdvisoryService); Livewire 4 |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: training formula with all multipliers, stats can exceed 1200 with diminishing returns (50% value above 1200), per-training cap +100 (reduced to +50 if stat > 1200), facility upgrades require 4 trainings per level |
 | 2.1.0 | 2026-01-24 | Development Team | Updated to v2.0.0 implementation standards; aligned with industry documentation guidelines; added comprehensive cross-references; enhanced code examples and diagrams |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with detailed specifications |
@@ -1509,4 +1510,4 @@ class StatGainCalculatorTest extends TestCase
 
 ---
 
-*This technical flow document reflects the current implementation as of version 2.0.0 and follows industry-standard documentation practices for software development lifecycle (SDLC) artifacts.*
+*This technical flow document reflects the current implementation as of version 2.3.0 and follows industry-standard documentation practices for software development lifecycle (SDLC) artifacts.*

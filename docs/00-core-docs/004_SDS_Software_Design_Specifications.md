@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0
-**Date**: February 21, 2026
+**Document Version**: 2.4.0
+**Date**: February 22, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned to codebase v2.3.0 and game-accurate mechanics
+**Status**: Current - Aligned to codebase v2.4.0 and game-accurate mechanics
 
 ---
 
@@ -107,25 +107,35 @@ flowchart TB
 
 ```text
 app/
+├── Collections/                # Custom collection classes
 ├── Console/Commands/           # Artisan commands
-├── Enums/                      # PHP 8.2+ enums
+├── Enums/                      # PHP 8.2+ enums (8 enums)
 ├── Events/                     # Event classes
-├── Exports/                    # Excel export classes
+├── Helpers/                    # Helper utilities
 ├── Http/
-│   ├── Controllers/            # Web and API controllers
+│   ├── Controllers/            # Web (20+), API (29+), Admin (5), Auth (2)
 │   ├── Middleware/             # Request middleware
 │   └── Requests/               # Form request validation
-├── Livewire/                   # Livewire components
+├── Jobs/                       # Queue jobs
+├── Listeners/                  # Event listeners
+├── Livewire/                   # Livewire components (AdvisoryPanel)
 ├── MCP/                        # MCP tools and handlers
-├── Models/                     # Eloquent models
-├── Neuron/                     # AI agent definitions
+├── Models/                     # Eloquent models (30 models)
+├── Neuron/                     # AI agent definitions (6 agents, 3 tools, 4 responses)
+├── Notifications/              # Notification classes
+├── Policies/                   # Authorization policies
 ├── Providers/                  # Service providers
 ├── Repositories/               # Data access layer
-├── Services/                   # Business logic
-│   ├── AI/                     # AI services (Ollama, Bedrock)
-│   ├── ExternalAPI/            # External API integrations
-│   ├── OCR/                    # OCR processing
-│   └── DataManagement/         # Import/export/migration
+├── Services/                   # Business logic (166 service files)
+│   ├── Admin/                  # Admin panel services (3)
+│   ├── Agents/                 # Agent services (1)
+│   ├── AI/                     # AI services - Ollama, Bedrock, Dashboard (20)
+│   ├── ExternalAPI/            # External API integrations (25)
+│   ├── MCP/                    # MCP orchestration, monitoring, tools (42)
+│   ├── Neuron/                 # Neuron AI agent services (5)
+│   ├── OCR/                    # OCR processing (12)
+│   └── Training/               # Training prediction services (3)
+├── ValueObjects/               # Value objects
 └── View/                       # View composers and components
 ```
 
@@ -135,14 +145,19 @@ app/
 |-------|------------|---------|---------|
 | Framework | Laravel | 12+ | Backend framework |
 | Frontend Reactivity | Livewire | 4 | Server-driven UI |
-| Client Interactivity | Alpine.js | Latest | Client-side interactions |
+| Client Interactivity | Alpine.js | 3 | Client-side interactions |
 | Styling | TailwindCSS | v4 | Utility-first CSS |
 | Build Tool | Vite | 7 | Asset compilation |
-| PHP Runtime | PHP | 8.2+ | Server runtime |
-| Database | MySQL/MariaDB | 8.0+ | Primary data store |
-| Cache | Redis | 7+ | Caching and queues |
+| PHP Runtime | PHP | 8.2+ (runtime 8.4.11) | Server runtime |
+| Database | MySQL/MariaDB | 8.0+ | Primary data store (30 models, 52 migrations) |
+| Cache | Redis | 7+ (via WSL) | Caching and queues |
+| AI Framework | Neuron AI / neuron-laravel | v2.11 / v0.3.4 | AI agent framework |
 | AI (Local) | Ollama | Latest | Local AI inference |
 | AI (Cloud) | AWS Bedrock | Claude 4.5 | Cloud AI fallback |
+| MCP | Laravel MCP | v0 | Agent orchestration |
+| Testing | Pest / PHPUnit | v4 / v12 | 3,316+ tests, 11,563+ assertions |
+| Browser Testing | pest-plugin-browser | 4.0 | Browser testing |
+| Code Quality | Larastan | v3 | Static analysis |
 
 ---
 
@@ -152,7 +167,7 @@ app/
 
 ```mermaid
 flowchart TD
-    subgraph WebControllers["Web Controllers"]
+    subgraph WebControllers["Web Controllers (20+)"]
         Dashboard["DashboardController"]
         Character["CharacterController"]
         Career["CareerController"]
@@ -162,17 +177,19 @@ flowchart TD
         SupportCard["SupportCardController"]
     end
     
-    subgraph APIControllers["API Controllers"]
+    subgraph APIControllers["API Controllers (29+)"]
         APICharacter["API/CharacterController"]
         APITraining["API/TrainingController"]
         APIRace["API/RaceController"]
         AIAI["API/AIAdvisoryController"]
     end
     
-    subgraph AdminControllers["Admin Controllers"]
-        APM["Admin/APMController"]
-        Cache["Admin/CacheController"]
-        DataMgmt["Admin/DataManagementController"]
+    subgraph AdminControllers["Admin Controllers (5)"]
+        APM["Admin/DatabaseController"]
+        Cache["Admin/LogController"]
+        DataMgmt["Admin/QueueController"]
+        SysSettings["Admin/SystemSettingsController"]
+        UserMgmt["Admin/UserController"]
     end
     
     WebControllers --> Services
@@ -184,14 +201,7 @@ flowchart TD
 
 | Component | Namespace | Description |
 |-----------|-----------|-------------|
-| `Dashboard` | `App\Livewire` | Main dashboard with stats overview |
-| `CharacterManager` | `App\Livewire\Character` | Character CRUD operations |
-| `CareerTracker` | `App\Livewire\Career` | Career run management |
-| `TrainingOptimizer` | `App\Livewire\Training` | Training predictions and recommendations |
-| `RaceAnalyzer` | `App\Livewire\Race` | Race preparation and analysis |
-| `SkillPlanner` | `App\Livewire\Skill` | Skill acquisition planning |
-| `DeckBuilder` | `App\Livewire\SupportCard` | Support deck composition |
-| `AIAdvisor` | `App\Livewire\AI` | AI chat interface |
+| `AdvisoryPanel` | `App\Livewire` | AI advisory chat panel with real-time recommendations |
 
 ### 3.3 Component Hierarchy
 
@@ -438,6 +448,21 @@ classDiagram
     }
 ```
 
+#### 4.3.1 Implemented Enum Files (8)
+
+| Enum | File | Description |
+|------|------|-------------|
+| `AlertType` | `app/Enums/AlertType.php` | Alert/notification type classification |
+| `CareerPhase` | `app/Enums/CareerPhase.php` | Career progression phases |
+| `Mood` | `app/Enums/Mood.php` | Character mood states with stat modifiers |
+| `Priority` | `app/Enums/Priority.php` | Task/requirement priority levels |
+| `RaceDistance` | `app/Enums/RaceDistance.php` | Race distance categories |
+| `RecommendationType` | `app/Enums/RecommendationType.php` | AI recommendation type classification |
+| `RunningStyle` | `app/Enums/RunningStyle.php` | Running style aptitudes (Nige, Senkou, Sashi, Oikomi) |
+| `StorageMode` | `app/Enums/StorageMode.php` | Storage mode (Local vs Account) |
+
+> **Note**: The domain model diagram above shows conceptual enums (RunStatus, CareerStage, AptitudeGrade, SkillStatus) used across the domain. The actual PHP enum files listed here implement the core typed enumerations.
+
 ---
 
 ## 5. Service Layer Design
@@ -446,7 +471,7 @@ classDiagram
 
 ```mermaid
 flowchart TD
-    subgraph CoreServices["Core Services"]
+    subgraph CoreServices["Core Services (55 top-level)"]
         CharacterService["CharacterService"]
         CareerRunService["CareerRunService"]
         TrainingService["TrainingService"]
@@ -455,29 +480,44 @@ flowchart TD
         SupportDeckService["SupportDeckService"]
     end
     
-    subgraph AIServices["AI Services"]
-        AIAdvisoryService["AIAdvisoryService"]
+    subgraph AIServices["AI Services (20)"]
+        AIDashboardService["AIDashboardService"]
+        HybridAIService["HybridAIService"]
         OllamaService["OllamaService"]
         BedrockService["BedrockService"]
         AIRouterService["AIRouterService"]
     end
     
-    subgraph IntegrationServices["Integration Services"]
-        ExternalAPIService["ExternalAPIService"]
-        OCRService["OCRService"]
-        WebSocketService["WebSocketService"]
+    subgraph NeuronServices["Neuron Services (5)"]
+        NeuronAgentService["NeuronAgentService"]
+        NeuronConfigService["NeuronConfigService"]
     end
     
-    subgraph DataServices["Data Management Services"]
-        ImportService["ImportService"]
-        ExportService["ExportService"]
-        MigrationService["MigrationService"]
-        BackupService["BackupService"]
+    subgraph MCPServices["MCP Services (42)"]
+        AgentOrchestration["AgentOrchestrationService"]
+        MCPMonitoring["MCPMonitoringService"]
+        MCPTools["MCP Tool Services"]
+    end
+    
+    subgraph IntegrationServices["Integration Services (25)"]
+        ExternalAPIService["ExternalAPIService"]
+        OCRService["OCRService (12)"]
+    end
+    
+    subgraph TrainingServices["Training Services (3)"]
+        TrainingPrediction["TrainingPredictionService"]
+    end
+    
+    subgraph AdminServices["Admin Services (3)"]
+        AdminService["Admin Management"]
     end
     
     CoreServices --> AIServices
+    CoreServices --> NeuronServices
+    CoreServices --> MCPServices
     CoreServices --> IntegrationServices
-    CoreServices --> DataServices
+    CoreServices --> TrainingServices
+    AdminServices --> CoreServices
 ```
 
 ### 5.2 Core Service Implementations
@@ -634,6 +674,23 @@ flowchart TD
 
 ### 6.2 Neuron Agent Configuration
 
+The application defines 6 Neuron agents in `app/Neuron/Agents/`:
+
+| Agent | Description |
+|-------|-------------|
+| `BaseAgent` | Abstract base agent with shared configuration |
+| `TrainingAdvisorAgent` | Training recommendations based on career state |
+| `RaceStrategyAgent` | Race preparation and strategy advice |
+| `SkillRecommendationAgent` | Skill acquisition and SP optimization advice |
+| `CareerPlanningAgent` | Overall career planning and goal setting |
+| `McpDemoAgent` | MCP integration demonstration agent |
+
+Supporting infrastructure:
+
+- **3 Agent Tools**: `CharacterStatsTool`, `RaceDataTool`, `SkillDataTool`
+- **4 Response Types**: `CareerPlanningResponse`, `RaceStrategyResponse`, `SkillRecommendationResponse`, `TrainingAdviceResponse`
+- **1 Support Class**: `McpConnectorFactory`
+
 ```php
 // app/Neuron/TrainingAdvisorAgent.php
 class TrainingAdvisorAgent extends Agent
@@ -663,6 +720,12 @@ class TrainingAdvisorAgent extends Agent
 ```
 
 ### 6.3 MCP Tools Integration
+
+The MCP subsystem includes 42 service files in `app/Services/MCP/` and 1 handler in `app/MCP/`, providing:
+
+- Full agent orchestration with `AgentOrchestrationService`
+- Monitoring and health dashboards via `MCPMonitoringService`
+- Tool registration and execution
 
 ```mermaid
 flowchart LR
@@ -991,10 +1054,12 @@ flowchart LR
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.4.0 | 2026-02-22 | Development Team | Updated directory structure to match codebase (166 services, 30 models, 52 migrations, 585 routes); corrected Livewire to single AdvisoryPanel component; expanded service architecture with Neuron (5), MCP (42), Training (3), Admin (3) breakdowns; updated admin controllers to actual 5 (Database, Log, Queue, SystemSettings, User); added Neuron agent inventory; updated tech stack with test metrics (3,316+ tests) |
+| 2.3.0 | 2026-02-21 | Development Team | Prior version aligned to v2.3.0 |
 | 2.1.0 | 2026-01-23 | Development Team | Updated to reflect current implementation including AI, MCP, OCR, and data management systems |
 | 2.0.0 | 2026-01-14 | Development Team | Prior comprehensive revision |
 | 1.0.0 | 2026-01-03 | Development Team | Initial draft |
 
 ---
 
-*This SDS reflects the current system architecture and design patterns implemented in the production codebase.*
+*This SDS reflects the current system architecture and design patterns implemented in the production codebase as of February 22, 2026.*

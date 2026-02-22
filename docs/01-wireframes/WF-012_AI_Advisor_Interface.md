@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.3.0  
+**Date**: February 22, 2026  
 **Related Documents**: [PRD-006], [SPEC-006], [FLOW-006], [SEQ-006]
 
 **Source Specs**:
@@ -30,7 +30,7 @@
 
 The AI Advisor Interface provides an intelligent conversational interface for training optimization, race strategy, skill recommendations, and career planning. It leverages a hybrid AI architecture combining local Ollama models with AWS Bedrock Claude fallback for optimal performance and cost efficiency.
 
-**The AI Advisor is built on verified game mechanics from Umamusume Pretty Derby (Global English Server, January 2026)** to provide accurate, actionable advice based on the actual training formula and game systems.
+**The AI Advisor is built on verified game mechanics from Umamusume Pretty Derby (Global English Server, February 2026)** to provide accurate, actionable advice based on the actual training formula and game systems.
 
 ### 1.2 Key Objectives
 
@@ -58,7 +58,7 @@ The AI Advisor Interface provides an intelligent conversational interface for tr
 
 ## 2. Game Mechanics Reference (AI Knowledge Base)
 
-### 2.1 Training Formula (Verified Jan 2026 - Global English Server)
+### 2.1 Training Formula (Verified Feb 2026 - Global English Server)
 
 The AI Advisor uses the following verified training formula for stat gain predictions:
 
@@ -1715,6 +1715,7 @@ test.describe("WF-012: Accessibility", () => {
 
 | Version | Date       | Author           | Changes                                                                                                                                                                                                |
 | ------- | ---------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 2.3.0   | 2026-02-22 | Development Team | Updated version/dates, aligned technology references with current stack (Livewire 4, Neuron AI v2.11, GameTora/umapyoi.net) |
 | 2.2.0   | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server - added complete training formula, corrected stat breakpoints (901/1200/1600), updated career structure (~70-78 turns), added formula display component, breakpoint warnings, enhanced context panel with bond tracking and facility levels |
 | 2.0.0   | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added hybrid AI architecture, MCP integration, cost tracking, conversation management, accessibility specifications, and testing requirements |
 | 1.0.0   | 2026-01-14 | Development Team | Initial wireframe specification                                                                                                                                                                        |
@@ -1723,13 +1724,13 @@ test.describe("WF-012: Accessibility", () => {
 
 ## 13. Notes
 
-**Implementation Status**: ✅ Complete (v2.2.0 Game Mechanics Update)
+**Implementation Status**: ✅ Complete (v2.3.0 Game Mechanics Update)
 
 **Known Issues**: None
 
 **Game Mechanics Verification**:
 
-- Training formula verified against Global English Server (January 2026)
+- Training formula verified against Global English Server (February 2026)
 - Stat breakpoints confirmed: 901 (A grade), 1200 (soft cap), 1600 (practical max)
 - Career structure: ~70-78 turns across 3 years
 - Summer Training Camp: 4 turns, all facilities Level 5

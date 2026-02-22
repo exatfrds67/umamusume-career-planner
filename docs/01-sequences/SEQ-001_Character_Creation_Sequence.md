@@ -3,7 +3,7 @@
 ## Umamusume Pretty Derby Career Planner
 
 **Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Date**: February 22, 2026  
 **Related Documents**: [PRD-001], [SPEC-001], [FLOW-001], [TECH-FLOW-001]
 
 ---
@@ -135,7 +135,7 @@ The game uses an 8-grade aptitude scale (NO SS grade exists):
 | **User** | Actor | Initiates character creation workflow |
 | **Livewire Component** | Presentation | `CharacterCreationWizard.php` - Multi-step form management |
 | **CharacterController** | Application | Orchestrates creation workflow |
-| **CharacterService** | Domain Service | Character creation business logic |
+| **CharacterStateService** | Domain Service | Character creation business logic |
 | **FactorService** | Domain Service | Factor inheritance calculations |
 | **SupportDeckService** | Domain Service | Deck validation and composition |
 | **Database** | Infrastructure | MySQL/MariaDB persistence layer |
@@ -152,7 +152,7 @@ app/
 │   └── Controllers/
 │       └── CharacterController.php
 ├── Services/
-│   ├── CharacterService.php
+│   ├── CharacterStateService.php
 │   ├── FactorService.php
 │   └── SupportDeckService.php
 └── Models/
@@ -172,7 +172,7 @@ sequenceDiagram
     actor User
     participant UI as Livewire Wizard
     participant Controller as CharacterController
-    participant CharSvc as CharacterService
+    participant CharSvc as CharacterStateService
     participant FactorSvc as FactorService
     participant DeckSvc as SupportDeckService
     participant DB as Database
@@ -238,7 +238,7 @@ sequenceDiagram
 sequenceDiagram
     actor User
     participant UI as Livewire Wizard
-    participant CharSvc as CharacterService
+    participant CharSvc as CharacterStateService
     participant DB as Database
 
     User->>UI: Browse Uma Musume list
@@ -514,7 +514,7 @@ public function validate(array $cardIds, int $userId): ValidationResult
 **Transaction Scope:**
 
 ```php
-// CharacterService.php
+// CharacterStateService.php
 public function create(array $data): Character
 {
     return DB::transaction(function () use ($data) {
@@ -908,7 +908,7 @@ CREATE INDEX idx_aptitudes_type_grade ON ucp_aptitudes(aptitude_type, grade);
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
-| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server - corrected aptitude scale (G-S, no SS), added inheritance system details (Blue/Red/White factors), updated distance categories (Sprint/Mile/Medium/Long), added running style aptitudes with Japanese names |
+| 2.2.0 | 2026-02-22 | Development Team | Updated with verified game mechanics from Global English Server - corrected aptitude scale (G-S, no SS), added inheritance system details (Blue/Red/White factors), updated distance categories (Sprint/Mile/Medium/Long), added running style aptitudes with Japanese names |
 | 2.0.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 implementation; added detailed sequence flows, error handling, performance metrics, and aligned with current Laravel 12 architecture |
 | 1.0.0 | 2026-01-14 | Development Team | Initial draft |
 
@@ -935,4 +935,4 @@ CREATE INDEX idx_aptitudes_type_grade ON ucp_aptitudes(aptitude_type, grade);
 
 ---
 
-*This sequence diagram reflects the current implementation of the character creation workflow as of v2.2.0, incorporating verified game mechanics from the Umamusume Pretty Derby Global English Server (January 2026). For the most up-to-date information, refer to the source code in `app/Services/CharacterService.php` and related files.*
+*This sequence diagram reflects the current implementation of the character creation workflow as of v2.2.0, incorporating verified game mechanics from the Umamusume Pretty Derby Global English Server (January 2026). For the most up-to-date information, refer to the source code in `app/Services/CharacterStateService.php` and related files.*

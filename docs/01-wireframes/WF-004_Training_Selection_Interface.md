@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.3.0  
+**Date**: February 22, 2026  
 **Related Documents**: [PRD-002], [SPEC-002], [FLOW-002], [SEQ-002]
 
 **Source Specs**:
@@ -1046,6 +1046,7 @@ test.describe("WF-004: Accessibility", () => {
 
 | Version | Date       | Author           | Changes                                                                                                                                                                                                        |
 | ------- | ---------- | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2.3.0   | 2026-02-22 | Development Team | Updated version/dates, aligned technology references with current stack (Livewire 4, Neuron AI v2.11, GameTora/umapyoi.net) |
 | 2.2.0   | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: added complete training formula, facility level multipliers (1.0×-2.0×), support card presence bonus (+5% per card), stat soft cap at 1200, mood effects (+20%/-20% range) |
 | 2.0.0   | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added AI recommendations, red exclamation indicators, friendship training, risk confirmations, accessibility specifications, and testing requirements |
 | 1.0.0   | 2026-01-14 | Development Team | Initial wireframe specification                                                                                                                                                                                |

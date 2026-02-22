@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 5.2.0
-**Date**: February 21, 2026
+**Document Version**: 5.3.0
+**Date**: February 22, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
 **Status**: Current - Aligned to codebase v2.2.0
@@ -224,7 +224,7 @@ flowchart TD
 **Key Content**:
 
 - Database configuration (MySQL 8.0+, utf8mb4, `ucp_` prefix)
-- Schema catalog with 15+ domain tables
+- Schema catalog with 30 domain tables across 53 migrations
 - Entity relationship diagrams (ERD)
 - Table definitions with field specifications
 - Index strategy and performance optimization
@@ -248,6 +248,7 @@ flowchart TD
 - API reference and endpoint catalog
 - Coding standards (PSR-12, naming conventions)
 - Testing strategy (Pest v4, PHPUnit v12, pest-plugin-browser 4.0, Playwright 1.58)
+- Current stats: 3,316+ tests, 11,563+ assertions, 571 routes
 
 **Related Documents**: 004_SDS, 009_DBD, 007_SIP
 
@@ -449,7 +450,7 @@ flowchart TB
     
     subgraph Supporting
         PRDs[PRD-001 to PRD-007]
-        SPECs[SPEC-001 to SPEC-007]
+        SPECs[SPEC-001 to SPEC-008]
         FLOWs[FLOW-001 to FLOW-007]
     end
     
@@ -487,7 +488,7 @@ flowchart TB
 | 000_MASTER_GLOSSARY | None | All documents |
 | 001_SDP | 002_BRS, 003_SRS, 004_SDS, All PRDs | None |
 | 002_BRS | 000_MASTER_GLOSSARY | 003_SRS, PRD-001 to PRD-007 |
-| 003_SRS | 002_BRS | 004_SDS, SPEC-001 to SPEC-007, 000_RTM |
+| 003_SRS | 002_BRS | 004_SDS, SPEC-001 to SPEC-008, 000_RTM |
 | 004_SDS | 003_SRS | 009_DBD, 010_SCD, 007_SIP |
 | 005_DMP | 003_SRS, 009_DBD | 006_DMS |
 | 006_DMS | 005_DMP, 009_DBD | None |
@@ -525,8 +526,8 @@ flowchart TB
 | --- | --- | --- |
 | **Project Manager** | 001_SDP, 002_BRS, 000_IVM | 000_RTM, 003_SRS |
 | **System Architect** | 004_SDS, 007_SIP | 009_DBD, 010_SCD, 008_SIS |
-| **Backend Developer** | 010_SCD, 009_DBD, 003_SRS | 004_SDS, SPEC-001 to SPEC-007 |
-| **Frontend Developer** | 010_SCD, 017_SUM | 004_SDS, WF-001 to WF-011 |
+| **Backend Developer** | 010_SCD, 009_DBD, 003_SRS | 004_SDS, SPEC-001 to SPEC-008 |
+| **Frontend Developer** | 010_SCD, 017_SUM | 004_SDS, WF-001 to WF-012 |
 | **QA Engineer** | 003_SRS, 000_RTM | 000_IVM, All SPECs, All FLOWs |
 | **Support/Training** | 017_SUM | 000_MASTER_GLOSSARY, PRD-001 to PRD-007 |
 | **Data Engineer** | 009_DBD, 005_DMP | 006_DMS, 004_SDS |
@@ -541,7 +542,7 @@ flowchart TB
 | **Phase 3: AI Integration** (Complete) | 007_SIP, 008_SIS, SPEC-006, FLOW-006 |
 | **Phase 4: Data Management** (Complete) | 005_DMP, 006_DMS, SPEC-007, FLOW-007 |
 | **Phase 5: Performance** (In Progress) | 001_SDP, 004_SDS, 000_IVM |
-| **Phase 6: UX & Accessibility** (In Progress) | 017_SUM, 003_SRS (NFR-03), WF-001 to WF-011 |
+| **Phase 6: UX & Accessibility** (In Progress) | 017_SUM, 003_SRS (NFR-03), WF-001 to WF-012 |
 
 ### 4.4 By Feature Module
 
@@ -639,8 +640,8 @@ Each document includes a "Document Control" section:
 
 | Document ID | Document Name | Version | Status | Last Updated |
 | --- | --- | --- | --- | --- |
-| 000 | DOCUMENT_INDEX | 5.2.0 | Current | 2026-02-21 |
-| 000 | MASTER_GLOSSARY | 3.3.0 | Current | 2026-02-21 |
+| 000 | DOCUMENT_INDEX | 5.3.0 | Current | 2026-02-22 |
+| 000 | MASTER_GLOSSARY | 3.4.0 | Current | 2026-02-22 |
 | 001 | SDP | 2.2.0 | Current | 2026-01-28 |
 | 002 | BRS | 2.2.0 | Current | 2026-01-28 |
 | 003 | SRS | 2.2.0 | Current | 2026-01-28 |
@@ -653,7 +654,7 @@ Each document includes a "Document Control" section:
 | 010 | SCD | 2.2.0 | Current | 2026-01-28 |
 | 017 | SUM | 2.2.0 | Current | 2026-01-28 |
 | 000 | IVM | 4.2.0 | Current | 2026-01-28 |
-| 000 | RTM | 3.2.0 | Current | 2026-02-21 |
+| 000 | RTM | 3.3.0 | Current | 2026-02-22 |
 
 ---
 
@@ -661,6 +662,7 @@ Each document includes a "Document Control" section:
 
 | Version | Date | Author | Changes |
 | --- | --- | --- | --- |
+| 5.3.0 | 2026-02-22 | Development Team | Updated document index to February 22, 2026; expanded supporting documentation directory listing (added Diagrams, Neuron, MCP Integration, Testing, Feature Documentation, Design, Accessibility, Performance, Database Documentation sections); updated SPEC references to SPEC-001 through SPEC-008; updated wireframes to WF-001 through WF-012; updated sequences to SEQ-001 through SEQ-016; updated DB schema count to 30 domain tables across 53 migrations; added test count stats (3,316+ tests, 11,563+ assertions, 571 routes) |
 | 5.2.0 | 2026-02-21 | Development Team | Updated technology stack references (Livewire 4, Pest v4, PHPUnit v12, Neuron AI v2.11, Chart.js 4, Larastan v3, Laravel Pint v1, Sanctum v4, Horizon v5, Telescope, Boost v1.8, pest-plugin-browser 4.0, Playwright 1.58); updated PHP runtime to 8.4.11; updated external documentation links |
 | 5.1.0 | 2026-01-28 | Development Team | Updated all documents to v2.2.0 with game-accurate mechanics; corrected aptitude grades (S is maximum, SS does NOT exist); updated hint system to 5 levels (10%/20%/30%/35%/40%); aligned with Global English Server mechanics |
 | 4.0 | 2026-01-23 | Development Team | Comprehensive update for v2.0.0 alignment; added detailed catalog entries with key content summaries; expanded dependency graph; added cross-reference matrix; enhanced quick reference by topic, role, phase, and module; added version control section; updated all document versions |
@@ -684,13 +686,23 @@ Each document includes a "Document Control" section:
 ### Supporting Documentation Directories
 
 - **PRDs**: `docs/02-prds/` - Product Requirement Documents (PRD-001 to PRD-007)
-- **Technical Specs**: `docs/02-specs/` - Technical Specifications (SPEC-001 to SPEC-007)
+- **Technical Specs**: `docs/02-specs/` - Technical Specifications (SPEC-001 to SPEC-008)
 - **System Flows**: `docs/01-flows/` - System Flow Diagrams (FLOW-001 to FLOW-007)
 - **Technical Flows**: `docs/01-tech-flow/` - Technical Flow Diagrams (TECH-FLOW-001 to TECH-FLOW-007)
-- **Sequences**: `docs/01-sequences/` - Sequence Diagrams (SEQ-001 to SEQ-015)
-- **Wireframes**: `docs/03-wireframes/` - UI Wireframes (WF-001 to WF-011)
-- **User Flows**: `docs/04-user-flows/` - User Flow Diagrams (UF-001 to UF-008)
+- **Sequences**: `docs/01-sequences/` - Sequence Diagrams (SEQ-001 to SEQ-016)
+- **Wireframes**: `docs/01-wireframes/` - UI Wireframes (WF-001 to WF-012)
+- **User Flows**: `docs/01-user-flows/` - User Flow Diagrams (UF-001 to UF-008)
+- **Diagrams**: `docs/01-diagrams/` - ERD, Data Flow, Decision Trees, System Process Flows
+- **Neuron**: `docs/neuron/` - AI agent documentation, MCP connector guides, RAG, workflows
+- **MCP Integration**: `docs/mcp-integration/` - MCP server configuration and recommendations
+- **Testing**: `docs/testing/` - API testing, production testing, coverage reports
+- **Implementation Summaries**: `docs/implementation-summaries/` - Task completion and feature summaries
+- **Feature Documentation**: `docs/feature-documentation/` - OCR, Skill System, External API, Lazy Loading
+- **Design**: `docs/design/` - Game alignment strategy, component inventory, prototypes
+- **Accessibility**: `docs/accessibility/` - Focus management, WCAG compliance
+- **Performance**: `docs/performance/` - Critical detection optimization
+- **Database Documentation**: `docs/database-documentation/` - Schema alignment, ERD, requirement mapping
 
 ---
 
-*This index is the authoritative navigation guide for the Umamusume Career Planner core documentation suite, version 2.2.0. All documents are aligned with the current implementation and reflect the production system state as of February 21, 2026.*
+*This index is the authoritative navigation guide for the Umamusume Career Planner core documentation suite, version 2.2.0. All documents are aligned with the current implementation and reflect the production system state as of February 22, 2026.*

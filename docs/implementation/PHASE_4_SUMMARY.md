@@ -24,12 +24,14 @@ Phase 4 focuses on **Training Timeline Navigation** and **SP Budget Allocation**
 ## Components Created (5/5) ✅
 
 ### 1. trainingTimeline Alpine Component ✅
+
 **File**: `resources/js/components/training-timeline.js` (130+ lines)
 
 **Purpose**: Manage turn-by-turn training progression with swipe navigation
 
 **Key Features**:
-- **Navigation**: 
+
+- **Navigation**:
   - `nextTurn()` - Advance to next turn
   - `prevTurn()` - Go back to previous turn  
   - `goToTurn(number)` - Jump to specific turn
@@ -51,6 +53,7 @@ Phase 4 focuses on **Training Timeline Navigation** and **SP Budget Allocation**
   - Computed `progressPercentage` for UI feedback
 
 - **Turn Data Structure**:
+
   ```javascript
   {
     turn: 1,
@@ -68,6 +71,7 @@ Phase 4 focuses on **Training Timeline Navigation** and **SP Budget Allocation**
   - `getStatChangeColor()` - Green (+) / Red (-) / Gray (0)
 
 **Integration Pattern**:
+
 ```blade
 <div x-data="trainingTimeline()" x-init="init()">
     <button @click="nextTurn()" :disabled="!canGoForward">Next Turn</button>
@@ -78,11 +82,13 @@ Phase 4 focuses on **Training Timeline Navigation** and **SP Budget Allocation**
 ---
 
 ### 2. spAllocator Alpine Component ✅
+
 **File**: `resources/js/components/sp-allocator.js` (250+ lines)
 
 **Purpose**: Budget allocation with drag-and-drop, validation, and undo/redo
 
 **Key Features**:
+
 - **Budget Management**:
   - `totalBudget` - Total SP available
   - `allocations` - Object mapping skillId → SP amount
@@ -133,6 +139,7 @@ Phase 4 focuses on **Training Timeline Navigation** and **SP Budget Allocation**
   - `unallocatedSkills` - Filtered to zero allocations
 
 **Integration Pattern**:
+
 ```blade
 <div x-data="spAllocator()" x-init="init()">
     <div :class="budgetColor">
@@ -145,11 +152,13 @@ Phase 4 focuses on **Training Timeline Navigation** and **SP Budget Allocation**
 ---
 
 ### 3. SkillLoadout Blade Component ✅
+
 **File**: `resources/views/components/skill-loadout.blade.php` (280+ lines)
 
 **Purpose**: Display equipped skills with tier badges and SP costs
 
 **Props**:
+
 - `skills` (array) - Equipped skill objects
 - `editable` (bool) - Allow removal/modification
 - `columns` (int) - Grid columns (default: 3)
@@ -188,6 +197,7 @@ Phase 4 focuses on **Training Timeline Navigation** and **SP Budget Allocation**
    - Minimal footprint
 
 **Features**:
+
 - **Tier Colors**:
   - S: Yellow/gold (bg-yellow-100)
   - A: Purple (bg-purple-100)
@@ -218,6 +228,7 @@ Phase 4 focuses on **Training Timeline Navigation** and **SP Budget Allocation**
   - Responsive text truncation
 
 **Integration Pattern**:
+
 ```blade
 <x-skill-loadout 
     :skills="$character->equippedSkills" 
@@ -234,11 +245,13 @@ Phase 4 focuses on **Training Timeline Navigation** and **SP Budget Allocation**
 ## Views Created (2/2) ✅
 
 ### training-timeline.blade.php ✅
+
 **File**: `resources/views/components/training-timeline.blade.php` (200+ lines)
 
 **Purpose**: Turn-by-turn training progress visualization
 
 **Features**:
+
 - **Header**: Training progress title and completion percentage badge
 - **Progress Bar**: Visual percentage completion with gradient fill
 - **Navigation Controls**:
@@ -258,6 +271,7 @@ Phase 4 focuses on **Training Timeline Navigation** and **SP Budget Allocation**
 - **Accessibility**: Keyboard navigation (Tab, Enter), ARIA labels
 
 **Integration Pattern**:
+
 ```blade
 <x-training-timeline 
     :character="$character" 
@@ -269,11 +283,13 @@ Phase 4 focuses on **Training Timeline Navigation** and **SP Budget Allocation**
 ---
 
 ### sp-allocator-interface.blade.php ✅
+
 **File**: `resources/views/components/sp-allocator-interface.blade.php` (320+ lines)
 
 **Purpose**: SP budget allocation interface with skill management
 
 **Features**:
+
 - **Header**: Title, description, Undo/Redo buttons
 - **Budget Status Card**:
   - Total budget display with SP count
@@ -305,6 +321,7 @@ Phase 4 focuses on **Training Timeline Navigation** and **SP Budget Allocation**
 - **Accessibility**: ARIA labels, keyboard navigation, focus indicators
 
 **Integration Pattern**:
+
 ```blade
 <x-sp-allocator-interface 
     :character="$character" 

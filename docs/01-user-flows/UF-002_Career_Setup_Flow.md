@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.3.0  
+**Date**: February 22, 2026  
 **Related Documents**: [PRD-001], [SPEC-001], [SRS], [BRS]
 
 **Source Specifications**:
@@ -1030,6 +1030,7 @@ flowchart LR
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.3.0 | 2026-02-22 | Development Team | Updated version and dates; no functional changes |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server (Jan 2026); corrected aptitude grade system (G→F→E→D→C→B→A→S, S is maximum); updated support card bond system (80% threshold for friendship training, 10-35% bonus by rarity); added career structure details (~70-78 turns, Summer Training Camp mechanics) |
 | 2.1.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 architecture; added factor inheritance, deck synergy, validation details; integrated with current implementation |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with basic flow |
@@ -1050,4 +1051,4 @@ flowchart LR
 
 ---
 
-*This user flow reflects the current career setup implementation as of version 2.2.0. For the latest updates, refer to the online documentation.*
+*This user flow reflects the current career setup implementation as of version 2.3.0. For the latest updates, refer to the online documentation.*

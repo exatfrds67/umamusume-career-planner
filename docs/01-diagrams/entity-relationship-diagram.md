@@ -3,11 +3,11 @@
 ## Document Information
 
 **Document ID**: entity-relationship-diagram
-**Version**: 2.3.0
-**Date**: February 21, 2026
+**Version**: 2.4.0
+**Date**: February 22, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned with codebase v2.3.0 and game-accurate mechanics
+**Status**: Current - Aligned with codebase v2.4.0 (30 models, 42 tables, 56 migrations)
 
 ---
 
@@ -785,7 +785,7 @@ erDiagram
     }
 ```
 
-**External APIs**: umapyoi.net, umamusumedb.com
+**External APIs**: umapyoi.net, GameTora (scraping)
 
 **Cache TTL**: 24 hours (86400 seconds)
 
@@ -1077,6 +1077,7 @@ CREATE INDEX idx_ocr_user_date ON ucp_ocr_extractions(user_id, analyzed_at);
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.4.0 | 2026-02-22 | Development Team | Updated version/date; added Livewire 4/Alpine.js 3/Neuron AI v2.11 to tech stack; confirmed 30 models, 42 tables, 56 migrations alignment |
 | 2.3.0 | 2026-02-21 | Development Team | Updated version/date metadata; added 7 new model tables (advisory_recommendations, chat_messages, critical_alerts, events, prediction_accuracy, run_snapshots, skill_builds); updated entity counts to 42 tables aligned with 30 Eloquent models |
 | 2.1.0 | 2026-01-23 | Development Team | Updated to v2.0.0 implementation; added AI/MCP/OCR entities; aligned with 59 requirements; industry-standard formatting |
 | 2.0.0 | 2026-01-14 | Development Team | Major revision with Mermaid diagrams |
@@ -1084,7 +1085,7 @@ CREATE INDEX idx_ocr_user_date ON ucp_ocr_extractions(user_id, analyzed_at);
 
 ### 9.3 Document Status
 
-**Status**: Current - Aligned with codebase v2.3.0
+**Status**: Current - Aligned with codebase v2.4.0
 
 **Next Review**: Upon next major schema change
 
@@ -1092,4 +1093,4 @@ CREATE INDEX idx_ocr_user_date ON ucp_ocr_extractions(user_id, analyzed_at);
 
 ---
 
-*This ERD reflects the current database schema as implemented in the Laravel 12 application, with 30 Eloquent models across 42 tables, supporting all system requirements with comprehensive data integrity, indexing, and relationship management.*
+*This ERD reflects the current database schema as implemented in the Laravel 12 application, with 30 Eloquent models across 42 tables (56 migrations), supporting all system requirements with comprehensive data integrity, indexing, and relationship management.*

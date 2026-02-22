@@ -94,7 +94,7 @@ stdout_logfile=/path/to/project/storage/logs/worker.log
 ## 6. Maintenance
 
 - **Backup**: Schedule daily backups of MySQL and `.env` file.
-    - **Updates**:
+  - **Updates**:
 
         ```bash
         git pull

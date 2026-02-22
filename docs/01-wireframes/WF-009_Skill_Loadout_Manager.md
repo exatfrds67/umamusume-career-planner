@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.3.0  
+**Date**: February 22, 2026  
 **Related Documents**: [PRD-004], [SPEC-004], [FLOW-004], [SEQ-003]
 
 **Source Specs**:
@@ -41,7 +41,7 @@ The Skill Loadout Manager enables players to organize, optimize, and manage thei
 | **Hint Level Tracking**     | Display hint levels (1-5) with progressive discounts  |
 | **Skill Rarity Display**    | Show Normal/Rare/Unique skill classifications         |
 
-### 1.3 Game-Accurate Skill Mechanics (Global English Server - Jan 2026)
+### 1.3 Game-Accurate Skill Mechanics (Global English Server - Feb 2026)
 
 #### Skill Hint System
 
@@ -1395,6 +1395,7 @@ test.describe("WF-009: Accessibility", () => {
 
 | Version | Date       | Author           | Changes                                                                                                                                                                                               |
 | ------- | ---------- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2.3.0   | 2026-02-22 | Development Team | Updated version/dates, aligned technology references with current stack (Livewire 4, Neuron AI v2.11, GameTora/umapyoi.net) |
 | 2.2.0   | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server - corrected hint system to 5 levels (10%/20%/30%/35%/40%), added skill rarity display (Normal/Rare/Unique), updated skill point mechanics, added activation condition display, added Fast Learner condition support |
 | 2.0.0   | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added loadout status widget, synergy analysis, AI recommendations, preset management, accessibility specifications, and testing requirements |
 | 1.0.0   | 2026-01-14 | Development Team | Initial wireframe specification                                                                                                                                                                       |
@@ -1407,7 +1408,7 @@ test.describe("WF-009: Accessibility", () => {
 
 **Known Issues**: None
 
-**Game Mechanics Alignment (v2.2.0)**:
+**Game Mechanics Alignment (v2.3.0)**:
 
 - ✅ Hint system: 5 levels with progressive discounts (10%/10%/10%/5%/5% = 40% max)
 - ✅ Skill rarities: Normal (white), Rare (gold), Unique (purple)

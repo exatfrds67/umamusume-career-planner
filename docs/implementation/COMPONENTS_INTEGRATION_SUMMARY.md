@@ -96,7 +96,7 @@ The new game-aligned components from Phases 1-3 have been integrated into the ac
 
 ### Available for Use (9 components)
 
-5. **GradeBadge** - Aptitude grades (ready to integrate)
+1. **GradeBadge** - Aptitude grades (ready to integrate)
 2. **CharacterCard** - Character display (ready to integrate)
 3. **SupportCard** - Support cards (ready to integrate)
 4. **SkillCard** - Skills (ready to integrate)
@@ -145,13 +145,13 @@ Visit: `http://127.0.0.1:8000/components-demo`
 
 ### Short-term (Medium Priority)
 
-5. **Character Index** - Use CharacterCard for grid display
+1. **Character Index** - Use CharacterCard for grid display
 2. **Training Page** - Add TurnCounter and stat predictions
 3. **Profile Page** - Use stat displays and grade badges
 
 ### Future Enhancements
 
-8. Create Livewire components wrapping these for interactivity
+1. Create Livewire components wrapping these for interactivity
 2. Add Alpine.js for client-side interactions
 3. Build complete page layouts using component library
 

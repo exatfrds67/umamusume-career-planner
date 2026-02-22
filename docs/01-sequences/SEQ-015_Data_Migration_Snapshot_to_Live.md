@@ -3,7 +3,7 @@
 ## Umamusume Pretty Derby Career Planner
 
 **Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Date**: February 22, 2026  
 **Related Documents**: [PRD-001], [SPEC-001], [FLOW-001], [D05_DMP]
 
 ---
@@ -1273,7 +1273,7 @@ flowchart TD
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
-| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server - added SS→S aptitude conversion rule, hint level migration (2→5 levels), stat soft cap handling, support card limit break validation, bond percentage normalization |
+| 2.2.0 | 2026-02-22 | Development Team | Updated with verified game mechanics from Global English Server - added SS→S aptitude conversion rule, hint level migration (2→5 levels), stat soft cap handling, support card limit break validation, bond percentage normalization |
 | 2.0.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 implementation; added detailed sequence flows, format detection, transformation, validation, duplicate resolution, performance metrics, and aligned with current Laravel 12 architecture |
 | 1.0.0 | 2026-01-14 | Development Team | Initial draft |
 

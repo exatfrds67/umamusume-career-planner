@@ -3,7 +3,7 @@
 ## Umamusume Pretty Derby Career Planner
 
 **Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Date**: February 22, 2026  
 **Related Documents**: [PRD-007], [SPEC-007], [FLOW-007], [TECH-FLOW-007]
 
 ---
@@ -1551,7 +1551,7 @@ CREATE INDEX idx_snapshots_career_run ON career_run_snapshots(career_run_id, is_
 
 | Version | Date | Author | Changes |
 | ------- | ---- | ------ | ------- |
-| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server - added aptitude validation (G-S only), hint level validation (1-5), stat range validation, support card validation, calculation error handling, auto-correction strategies, and recovery workflows |
+| 2.2.0 | 2026-02-22 | Development Team | Updated with verified game mechanics from Global English Server - added aptitude validation (G-S only), hint level validation (1-5), stat range validation, support card validation, calculation error handling, auto-correction strategies, and recovery workflows |
 | 2.0.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 implementation; added detailed sequence flows, retry strategies, APM integration, performance metrics, and aligned with current Laravel 12 architecture |
 | 1.0.0 | 2026-01-14 | Development Team | Initial draft |
 

@@ -1,8 +1,8 @@
 # TECH-FLOW-004: Skill Management - Technical Flow & Task Breakdown
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
-**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
+**Document Version**: 2.3.0  
+**Date**: February 22, 2026  
+**Status**: Current - Aligned with codebase v2.3.0 and game-accurate mechanics
 
 **Source Specifications**:
 
@@ -46,7 +46,7 @@
 flowchart TB
     subgraph Presentation["Presentation Layer"]
         Blade["Blade Templates"]
-        Livewire["Livewire 3 Components"]
+        Livewire["Livewire 4 Components"]
         Alpine["Alpine.js Interactions"]
     end
     
@@ -97,10 +97,10 @@ Skill Management System
 │   └── SkillEvolutionController
 │
 ├── Services
-│   ├── SkillCatalogService
+│   ├── SkillAnalysisService
 │   ├── SkillHintService
 │   ├── SkillEvolutionService
-│   └── AISkillAdvisorService
+│   └── Neuron\SkillRecommendationService
 │
 ├── Calculators
 │   ├── SPCostCalculator
@@ -386,21 +386,21 @@ Schema::create('ucp_skills', function (Blueprint $table) {
 
 ---
 
-#### Task 4.1.2: Create SkillCatalogService
+#### Task 4.1.2: Create SkillAnalysisService
 
 **Priority**: P0  
 **Effort**: 6 hours  
 **Status**: ✅ Complete
 
 ```php
-// app/Services/SkillCatalogService.php
+// app/Services/SkillAnalysisService.php
 namespace App\Services;
 
 use App\Models\Skill;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
-class SkillCatalogService
+class SkillAnalysisService
 {
     /**
      * Get all skills with optional filters
@@ -500,7 +500,7 @@ class SkillCatalogService
 - Evolution path lookup
 - Skill recommendations
 - Unit tests: 5 tests
-- **Files**: `app/Services/SkillCatalogService.php`
+- **Files**: `app/Services/SkillAnalysisService.php`
 
 ---
 
@@ -975,7 +975,7 @@ class SkillEvolutionService
 use Tests\TestCase;
 use App\Models\Character;
 use App\Models\Skill;
-use App\Services\SkillCatalogService;
+use App\Services\SkillAnalysisService;
 use App\Services\SkillHintService;
 use App\Services\SkillEvolutionService;
 
@@ -1048,7 +1048,7 @@ test('skill evolution replaces normal with rare', function () {
 test('skill search finds by name or japanese name', function () {
     Skill::factory()->create(['name' => 'Lane Guidance', 'name_jp' => 'レーンガイダンス']);
     
-    $service = app(SkillCatalogService::class);
+    $service = app(SkillAnalysisService::class);
     
     $resultsEnglish = $service->searchSkills('Lane');
     $resultsJapanese = $service->searchSkills('レーン');
@@ -1089,7 +1089,7 @@ test('skill search finds by name or japanese name', function () {
 
 ## 4. Component Specifications
 
-### 4.1 SkillCatalogService::searchSkills()
+### 4.1 SkillAnalysisService::searchSkills()
 
 ```php
 /**
@@ -1223,8 +1223,8 @@ erDiagram
 
 ```mermaid
 flowchart TD
-    SkillCatalogService --> SkillRepository
-    SkillCatalogService --> CacheManager
+    SkillAnalysisService --> SkillRepository
+    SkillAnalysisService --> CacheManager
     
     SkillHintService --> SkillRepository
     SkillHintService --> SkillHintRepository
@@ -1233,8 +1233,8 @@ flowchart TD
     SkillEvolutionService --> SkillAcquisitionRepository
     SkillEvolutionService --> EventDispatcher
     
-    AISkillAdvisorService --> SkillCatalogService
-    AISkillAdvisorService --> HybridAIService
+    NeuronSkillRecommendationService --> SkillAnalysisService
+    NeuronSkillRecommendationService --> HybridAIService
 ```
 
 ---
@@ -1348,7 +1348,7 @@ pie title Test Distribution
 
 ### 10.1 Functional Completeness
 
-- [x] 3 services implemented (SkillCatalogService, SkillHintService, SkillEvolutionService)
+- [x] 3 services implemented (SkillAnalysisService, SkillHintService, SkillEvolutionService)
 - [x] 2 controllers with 7 REST endpoints
 - [x] 4 database tables with migrations
 - [x] Skill database seeded with 500+ game skills
@@ -1387,6 +1387,7 @@ pie title Test Distribution
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.3.0 | 2026-02-22 | Development Team | Updated service names to match codebase (SkillAnalysisService, Neuron\SkillRecommendationService); Livewire 4 |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: 5 hint levels (10%/20%/30%/35%/40% max discount); additional discount sources (Fast Learner +10%, Skill Sparks, Hint Books) |
 | 2.1.0 | 2026-01-24 | Development Team | Updated to v2.0.0 implementation standards; aligned with industry documentation guidelines; added comprehensive cross-references; enhanced code examples and diagrams |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with detailed specifications |
@@ -1407,4 +1408,4 @@ pie title Test Distribution
 
 ---
 
-*This technical flow document reflects the current implementation as of version 2.0.0 and follows industry-standard documentation practices for software development lifecycle (SDLC) artifacts.*
+*This technical flow document reflects the current implementation as of version 2.3.0 and follows industry-standard documentation practices for software development lifecycle (SDLC) artifacts.*

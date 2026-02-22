@@ -2,17 +2,17 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0
-**Date**: January 28, 2026
+**Document Version**: 2.3.0
+**Date**: February 22, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Updated with verified game mechanics from Global English Server
+**Status**: Current - Updated with verified codebase references (RaceConditionService, Neuron RaceStrategyAgent)
 
 ---
 
 ## 1. Race Preparation & Strategy Analysis Flow
 
-This flow details how `RaceService` and the **Race Strategy Agent** (Neuron AI) analyze upcoming races to provide readiness assessments and strategy recommendations.
+This flow details how `RaceConditionService` and the **Race Strategy Agent** (`RaceStrategyAgent` via Neuron AI v2.11) analyze upcoming races to provide readiness assessments and strategy recommendations.
 
 ```mermaid
 flowchart TD
@@ -77,7 +77,7 @@ flowchart TD
 
 ## 3. Win Probability Calculation Flow
 
-The algorithmic logic used by `RaceService` to estimate victory chances based on current character state against generated rivals.
+The algorithmic logic used by `RaceConditionService` and `RaceStrategyService` (Neuron) to estimate victory chances based on current character state against generated rivals.
 
 ```mermaid
 flowchart TD
@@ -114,7 +114,7 @@ flowchart TD
 
 ## 4. Race Schedule Planning Flow
 
-How the **Race Strategy Agent** assists users in building a race rotation to meet fan count objectives and skill point targets.
+How the **Race Strategy Agent** (`RaceStrategyAgent`) assists users in building a race rotation to meet fan count objectives and skill point targets.
 
 ```mermaid
 flowchart TD
@@ -245,6 +245,7 @@ flowchart TD
 
 | Version | Date       | Author           | Changes |
 |---------|------------|------------------|---------|
+| 2.3.0   | 2026-02-22 | Development Team | Updated service references: RaceConditionService, RaceStrategyService (Neuron), RaceStrategyAgent; added Neuron AI v2.11 references |
 | 2.2.0   | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: Added game-accurate track condition modifiers (Firm/Good/Soft/Heavy with Power/Speed/Stamina penalties), aptitude grade maximum is S (no SS), complete aptitude modifier tables by category (Surface/Distance/Style) |
 | 2.1.0   | 2026-01-24 | Development Team | Updated to align with v2.0.0 codebase, Neuron AI agents, and Service layer architecture |
 | 1.0.0   | 2026-01-14 | Development Team | Initial flow definitions |

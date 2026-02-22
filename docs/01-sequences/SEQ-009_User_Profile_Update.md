@@ -3,7 +3,7 @@
 ## Umamusume Pretty Derby Career Planner
 
 **Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Date**: February 22, 2026  
 **Related Documents**: [PRD-001], [SPEC-001], [FLOW-001]
 
 ---
@@ -73,7 +73,7 @@ User profile management enables:
 |-----------|------|----------------|
 | **User** | Actor | Initiates profile and preference updates |
 | **Livewire Component** | Presentation | `UserProfileSettings.php`, `PreferencesManager.php` - Settings UI |
-| **UserController** | Application | Orchestrates profile operations |
+| **ProfileController** | Application | Orchestrates profile operations |
 | **UserService** | Domain Service | Profile update business logic |
 | **PreferenceService** | Domain Service | Preference management |
 | **AccessibilityService** | Domain Service | A11y settings validation and application |
@@ -95,7 +95,7 @@ app/
 │       └── AIConfiguration.php
 ├── Http/
 │   └── Controllers/
-│       └── UserController.php
+│       └── ProfileController.php
 ├── Services/
 │   ├── UserService.php
 │   ├── PreferenceService.php
@@ -117,7 +117,7 @@ app/
 sequenceDiagram
     actor User
     participant UI as Livewire Settings
-    participant Controller as UserController
+    participant Controller as ProfileController
     participant UserSvc as UserService
     participant PrefSvc as PreferenceService
     participant A11ySvc as AccessibilityService
@@ -243,7 +243,7 @@ sequenceDiagram
 **Request Flow:**
 
 ```
-User → Livewire Component → UserController → UserService
+User → Livewire Component → ProfileController → UserService
 ```
 
 **Service Implementation:**

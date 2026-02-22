@@ -155,13 +155,13 @@
 
 ### Medium Priority
 
-4. **Repositories** - Add interface type hints
+1. **Repositories** - Add interface type hints
 2. **Providers** - Fix service container bindings
 3. **Jobs** - Add proper type hints for job properties
 
 ### Low Priority
 
-7. **Tests** - Continue improving test type safety (already 40% complete)
+1. **Tests** - Continue improving test type safety (already 40% complete)
 2. **Migrations** - Add type hints where applicable
 3. **Seeders** - Improve type safety in data generation
 

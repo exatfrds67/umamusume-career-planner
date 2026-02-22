@@ -74,13 +74,13 @@ Testing umapyoi.net API endpoints:
 
 ### Test Suite
 
-2. **tests/Feature/ExternalAPI/UmapyoiApiClientTest.php**
+1. **tests/Feature/ExternalAPI/UmapyoiApiClientTest.php**
    - Updated all HTTP::fake() endpoint paths
    - All 12 tests passing with new endpoints
 
 ### Documentation
 
-3. **docs/external-api-integration/UMAPYOI_NET_API_STATUS.md**
+1. **docs/external-api-integration/UMAPYOI_NET_API_STATUS.md**
    - Updated endpoint table with working paths
    - Marked all endpoints as "✅ WORKING 200 OK"
 

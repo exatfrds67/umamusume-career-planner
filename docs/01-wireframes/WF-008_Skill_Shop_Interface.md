@@ -3,8 +3,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.3.0  
+**Date**: February 22, 2026  
 **Related Documents**: [PRD-004], [SPEC-004], [FLOW-004], [SEQ-003]
 
 **Source Specs**:
@@ -411,7 +411,7 @@ class SkillSearch extends Component
 
 ### 3.4 Hint Tracking System
 
-**5-Level Hint Discount System (Global English Server - Jan 2026)**:
+**5-Level Hint Discount System (Global English Server - Feb 2026)**:
 
 | Hint Level | Discount Percentage | Example (120 SP Base) |
 | ---------- | ------------------- | --------------------- |
@@ -1311,6 +1311,7 @@ test.describe("WF-008: Accessibility", () => {
 
 | Version | Date       | Author           | Changes                                                                                                                                                                                                   |
 | ------- | ---------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2.3.0   | 2026-02-22 | Development Team | Updated version/dates, aligned technology references with current stack (Livewire 4, Neuron AI v2.11, GameTora/umapyoi.net) |
 | 2.2.0   | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: 5-level hint system (10%/20%/30%/35%/40%), Fast Learner condition (+10%), skill rarities (Normal/Rare/Unique), Skill Sparks support |
 | 2.0.0   | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added SP balance widget, hint tracking system, AI recommendations, skill evolution paths, accessibility specifications, and testing requirements |
 | 1.0.0   | 2026-01-14 | Development Team | Initial wireframe specification                                                                                                                                                                           |

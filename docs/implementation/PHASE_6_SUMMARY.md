@@ -47,12 +47,14 @@ Phase 6 Components (10 Total)
 ### Design Patterns
 
 **Alpine.js Components**:
+
 - Export as named functions returning object with state + methods
 - Use `@dispatch` for cross-component communication
 - Debouncing for expensive operations (search, autosave)
 - localStorage for offline persistence
 
 **Blade Components**:
+
 - Use `@props` for configuration
 - Alpine directives for reactivity
 - Dark mode support with `dark:` classes
@@ -70,6 +72,7 @@ Phase 6 Components (10 Total)
 **Purpose**: Persistent plan storage with intelligent caching
 
 **Key Features**:
+
 - Debounced autosave (2000ms default)
 - Data integrity via SHA-like checksums
 - Schema versioning with migration
@@ -78,6 +81,7 @@ Phase 6 Components (10 Total)
 - JSON export for backup
 
 **Critical Methods**:
+
 ```javascript
 autosavePlan(planData, debounceMs = 2000)  // Auto-save with debounce
 savePlan(planData)                          // Immediate save with checksum
@@ -89,6 +93,7 @@ exportPlanAsJSON(uuid, filename)            // Download backup
 ```
 
 **Data Structure**:
+
 ```javascript
 {
   uuid: unique_id,
@@ -100,6 +105,7 @@ exportPlanAsJSON(uuid, filename)            // Download backup
 ```
 
 **Events Dispatched**:
+
 - `plan-saved` - Plan persisted successfully
 - `plan-corrupted` - Data integrity check failed
 - `draft-cleared` - Draft removed
@@ -114,11 +120,13 @@ exportPlanAsJSON(uuid, filename)            // Download backup
 **Purpose**: Multi-format import/export with validation
 
 **Supported Formats**:
+
 - JSON v1/v2 (native format with schema versioning)
 - CSV (legacy format with header detection)
 - Legacy JSON (auto-migrated to v2)
 
 **Key Methods**:
+
 ```javascript
 handleFileUpload(event)              // File selection handler
 detectFormat(filename, content)      // Auto-detect format
@@ -130,12 +138,14 @@ exportPlansAsCSV(plans, filename)    // Export as CSV
 ```
 
 **Validation Rules**:
+
 - Required: characterName, turns[]
 - Optional: stats, skills, notes
 - Type checking for all arrays
 - Skill ID/name validation
 
 **Import Strategies**:
+
 - `skip` - Skip duplicate plans
 - `overwrite` - Update existing plans
 - `merge` - Future enhancement
@@ -149,6 +159,7 @@ exportPlansAsCSV(plans, filename)    // Export as CSV
 **Purpose**: Centralized toast/notification display with queue
 
 **Features**:
+
 - 5 notification limit (prevents spam)
 - Type variants: success, error, warning, info
 - Auto-dismiss with configurable duration (default: 3000ms)
@@ -157,6 +168,7 @@ exportPlansAsCSV(plans, filename)    // Export as CSV
 - Color-coded by type
 
 **Key Methods**:
+
 ```javascript
 addNotification(config)           // Add to queue
 removeNotification(id)            // Remove from queue
@@ -165,6 +177,7 @@ executeAction(notification)       // Run notification action
 ```
 
 **Configuration**:
+
 ```javascript
 {
   id: unique_id,
@@ -183,6 +196,7 @@ executeAction(notification)       // Run notification action
 **Purpose**: Reusable table component with search, sort, pagination
 
 **Features**:
+
 - Full-text search across all columns
 - Sortable columns (ascending/descending)
 - Pagination with configurable page size
@@ -191,6 +205,7 @@ executeAction(notification)       // Run notification action
 - Responsive horizontal scroll on mobile
 
 **Props**:
+
 ```php
 @props([
   'columns' => [{key, label, sortable, width}, ...],
@@ -209,6 +224,7 @@ executeAction(notification)       // Run notification action
 **Purpose**: Plan statistics and insights
 
 **Computed Metrics**:
+
 - Total plans, wins, win rate (%)
 - Character statistics (by count/wins)
 - Scenario statistics (by count/wins)
@@ -217,6 +233,7 @@ executeAction(notification)       // Run notification action
 **Export**: CSV with summary metrics
 
 **Methods**:
+
 ```javascript
 setDateRange(range)    // Filter by time period
 exportAnalytics()      // CSV export
@@ -232,6 +249,7 @@ convertToCSV(data)     // Format data as CSV
 **Purpose**: Advanced search with multi-faceted filtering
 
 **Filter Types**:
+
 - Character multi-select
 - Scenario multi-select
 - Status (active/archived/favorite)
@@ -239,16 +257,19 @@ convertToCSV(data)     // Format data as CSV
 - Date range filter
 
 **Search Features**:
+
 - Debounced full-text search (300ms)
 - Search history (max 10)
 - Saved filter management
 - CSV export of results
 
 **Persistent State**:
+
 - searchHistory (localStorage)
 - savedFilters (localStorage)
 
 **Methods**:
+
 ```javascript
 toggleFilter(type, value)        // Add/remove filter
 clearAllFilters()                // Reset all
@@ -265,6 +286,7 @@ exportResults()                  // CSV export
 **Purpose**: Global keyboard shortcut management
 
 **Default Shortcuts**:
+
 ```
 Ctrl+K / ⌘K       → Search Plans
 Ctrl+N / ⌘N       → New Plan
@@ -277,6 +299,7 @@ Escape            → Close Dialog
 ```
 
 **Features**:
+
 - Mac (⌘) / Windows (Ctrl) awareness
 - Customizable shortcuts (via UI)
 - Help dialog with shortcut reference
@@ -284,6 +307,7 @@ Escape            → Close Dialog
 - Event dispatch for actions
 
 **Methods**:
+
 ```javascript
 registerKeyboardListener()     // Global listener
 handleKeyDown(event)           // Detect shortcut
@@ -302,6 +326,7 @@ formatShortcut(shortcut)       // Display format
 **Purpose**: Reusable side drawer/modal
 
 **Features**:
+
 - Position variants (left/right)
 - Size variants (sm/md/lg/xl/2xl)
 - Backdrop click to close (configurable)
@@ -311,6 +336,7 @@ formatShortcut(shortcut)       // Display format
 - ARIA support (role="dialog", aria-modal)
 
 **Props**:
+
 ```php
 @props([
   'title' => 'Panel Title',
@@ -328,6 +354,7 @@ formatShortcut(shortcut)       // Display format
 **Purpose**: Floating action button (FAB) with menu
 
 **Features**:
+
 - 4 position variants (bottom-right, bottom-left, top-right, top-left)
 - Expandable menu with staggered animations
 - Color-coded by action type (training, race, skill, plan, settings)
@@ -335,6 +362,7 @@ formatShortcut(shortcut)       // Display format
 - Touch-friendly sizing
 
 **Action Structure**:
+
 ```javascript
 {
   icon: '📋',
@@ -352,6 +380,7 @@ formatShortcut(shortcut)       // Display format
 **Purpose**: Compact support card for grid layouts
 
 **Features**:
+
 - Image with backdrop overlay
 - Rarity color coding (★★★★★ = yellow through ★ = gray)
 - Selection state with visual ring
@@ -361,6 +390,7 @@ formatShortcut(shortcut)       // Display format
 - Keyboard support (Enter/Space to select)
 
 **Props**:
+
 ```php
 @props([
   'card' => {name, character, rarity, bondLevel, limitBreaks, imageUrl},
@@ -379,6 +409,7 @@ formatShortcut(shortcut)       // Display format
 **Purpose**: Skill type indicator with emoji
 
 **Features**:
+
 - Emoji per skill type (🔴 Speed, 💚 Stamina, etc.)
 - Game-aligned colors
 - Size variants (xs/sm/md/lg)
@@ -387,6 +418,7 @@ formatShortcut(shortcut)       // Display format
 - Dark mode support
 
 **Skill Types & Colors**:
+
 ```
 speed    → 🔴 Red (#EF4444)
 stamina  → 💚 Green (#10B981)
@@ -401,11 +433,13 @@ unique   → 💗 Pink (#EC4899)
 ## Code Quality & Standards
 
 ### Formatting
+
 - ✅ All Phase 6 files Pint-formatted (PASS)
 - ✅ PHP 8.4 style compliance
 - ✅ Laravel 12 conventions
 
 ### Accessibility
+
 - ✅ ARIA roles (dialog, button, region, etc.)
 - ✅ Keyboard navigation (Tab, Enter, Space, Escape)
 - ✅ Focus management
@@ -414,11 +448,13 @@ unique   → 💗 Pink (#EC4899)
 - ✅ `aria-live="polite"` for dynamic content
 
 ### Dark Mode
+
 - ✅ All components have `dark:` variants
 - ✅ Consistent dark color palette
 - ✅ Readable in both modes
 
 ### Performance
+
 - ✅ Debounced search (300ms)
 - ✅ Debounced autosave (2000ms)
 - ✅ Lazy-loaded components
@@ -430,12 +466,14 @@ unique   → 💗 Pink (#EC4899)
 ## Integration Points
 
 ### With Dashboard
+
 - Analytics panel displays on dashboard
 - Quick actions FAB always visible
 - Notifications for all events
 - Keyboard shortcuts work globally
 
 ### With Plan Management
+
 - autosave to localStorage during edit
 - Import from file dialog
 - Export to JSON/CSV
@@ -443,6 +481,7 @@ unique   → 💗 Pink (#EC4899)
 - Filter by character/scenario
 
 ### With Settings
+
 - Customize keyboard shortcuts
 - Configure notification behavior
 - Save filter preferences
@@ -453,6 +492,7 @@ unique   → 💗 Pink (#EC4899)
 ## Events Ecosystem
 
 ### Public Events (Dispatch)
+
 ```
 // Data Management
 plan-saved                    → localStorage persist complete
@@ -499,6 +539,7 @@ card-removed                 → Card remove clicked
 ## Data Flow Diagrams
 
 ### Plan Save Flow
+
 ```
 User Edits Plan
     ↓
@@ -520,6 +561,7 @@ Toast: "Plan saved to draft"
 ```
 
 ### Import Flow
+
 ```
 User Selects File
     ↓
@@ -539,6 +581,7 @@ Report Results [Successes/Errors/Warnings]
 ```
 
 ### Search Flow
+
 ```
 User Types in Search Box
     ↓
@@ -689,6 +732,7 @@ Display Results + Count
 ## Files Created (Phase 6)
 
 ### Alpine.js Components (6)
+
 1. `local-storage-manager.js` - 280 lines
 2. `import-export-handler.js` - 220 lines
 3. `notification-manager.js` - 120 lines
@@ -697,6 +741,7 @@ Display Results + Count
 6. `keyboard-shortcuts.js` - 190 lines
 
 ### Blade Components (10)
+
 1. `local-storage-manager.blade.php` - 50 lines
 2. `import-export-handler.blade.php` - 120 lines
 3. `notification-manager.blade.php` - 80 lines
@@ -709,6 +754,7 @@ Display Results + Count
 10. `support-card-mini.blade.php` - 140 lines
 
 ### Additional Components (2)
+
 1. `skill-icon.blade.php` - 120 lines
 
 ### Total Code: 2,500+ lines across 18 files

@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0
-**Date**: February 21, 2026
+**Document Version**: 2.4.0
+**Date**: February 22, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned with codebase v2.3.0 and game-accurate mechanics
+**Status**: Current - Aligned with codebase v2.4.0, 30 Eloquent models, 51 migrations
 
 ---
 
@@ -75,13 +75,26 @@ Legacy Applications
 | `ucp_skills` | Skill catalog | Unique skill identifiers |
 | `ucp_skill_hints` | Hint tracking for SP reduction | Max 5 hint levels per skill (40% max discount) |
 | `ucp_skill_acquisitions` | Skills acquired per career | Turn number validation |
+| `ucp_skill_builds` | Skill build templates | Named skill set combinations |
 | `ucp_support_cards` | Support card inventory | Valid rarity and type |
+| `ucp_support_card_definitions` | Support card master data | External data reference |
+| `ucp_support_decks` | Support deck configurations | Max 6 cards per deck |
+| `ucp_aptitudes` | Character aptitude grades | Valid grade enum (SS-G) |
+| `ucp_factors` | Inherited factors per career | Factor type validation |
+| `ucp_races` | Race catalog and results | Distance/surface constraints |
+| `ucp_events` | In-game event tracking | Event type enum |
+| `ucp_ocr_extractions` | OCR processing results | Confidence thresholds |
+| `ucp_run_snapshots` | Career state snapshots | Point-in-time captures |
+| `ucp_ai_conversations` | AI advisory sessions | Provider tracking |
+| `ucp_mcp_servers` | MCP server configurations | Connection state |
+| `ucp_mcp_tool_usages` | MCP tool invocation logs | Performance metrics |
+| `ucp_user_preferences` | User settings and preferences | Per-user configuration |
 
 ### 3.2 Schema Version
 
-Current target schema version: `2.0`
+Current target schema version: `2.4`
 
-All imports include `schema_version` field for forward compatibility and migration tracking.
+All imports include `schema_version` field for forward compatibility and migration tracking. The database currently has **51 migrations** managing **30 Eloquent models** across the `ucp_` prefixed tables.
 
 ---
 
@@ -140,7 +153,7 @@ All imports include `schema_version` field for forward compatibility and migrati
 
 ```
 
-app/Services/DataManagement/
+app/Services/
 ├── DataMigrationService.php
 │   ├─ detectLegacyFormat(array $data): string
 │   ├─ migrateFromLegacy(array $data): array
@@ -153,10 +166,24 @@ app/Services/DataManagement/
 │   ├─ resolveConflict(array $record, string $strategy): array
 │   └─ executeImport(array $records, callable $progress): void
 │
-└── DataExportService.php
-    ├─ export(array $ids, string $format): string
-    ├─ generateBackup(): string
-    └─ getExportFormats(): array
+├── DataExportService.php
+│   ├─ export(array $ids, string $format): string
+│   ├─ generateBackup(): string
+│   └─ getExportFormats(): array
+│
+├── DataOperationHistoryService.php
+│   ├─ recordOperation(string $type, array $details): void
+│   └─ getHistory(int $limit): array
+│
+├── BackupService.php
+│   ├─ createBackup(): string
+│   ├─ restoreBackup(string $path): void
+│   └─ listBackups(): array
+│
+└── SnapshotService.php
+    ├─ createSnapshot(Career $career): RunSnapshot
+    ├─ restoreSnapshot(RunSnapshot $snapshot): void
+    └─ compareSnapshots(): array
 
 ```
 
@@ -387,7 +414,8 @@ For OCR-based data intake:
 ## Document Control
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|| 2.3.0 | 2026-02-21 | Development Team | Version alignment, date update, codebase v2.3.0 sync || 2.0.0 | 2026-01-23 | Development Team | Complete rewrite aligned with current implementation |
+|---------|------|--------|---------|| 2.4.0 | 2026-02-22 | Development Team | Updated table counts (20 target tables), schema v2.4, 51 migrations, 30 models, added DataOperationHistoryService/BackupService/SnapshotService |
+| 2.3.0 | 2026-02-21 | Development Team | Version alignment, date update, codebase v2.3.0 sync || 2.0.0 | 2026-01-23 | Development Team | Complete rewrite aligned with current implementation |
 | 1.0.0 | 2026-01-14 | Development Team | Initial draft |
 
 ---

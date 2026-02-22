@@ -1,9 +1,9 @@
 # SPEC-004: Skill Management System - Technical Specification
 
-**Document Version**: 2.2.0  
-**Date**: 2026-01-28  
+**Document Version**: 2.3.0  
+**Date**: 2026-02-22  
 **Project**: Umamusume Pretty Derby Career Planner  
-**Status**: Active - Updated with game-accurate 5-level hint system  
+**Status**: Complete - Implementation verified  
 **Classification**: Internal - Development Team
 
 ---
@@ -14,9 +14,9 @@
 |-----------|-------|
 | **Document ID** | SPEC-004 |
 | **Related PRD** | [PRD-004: Skill Management](../prds/PRD-004_Skill_Management.md) |
-| **Architecture Version** | v2.2.0 |
+| **Architecture Version** | v2.3.0 |
 | **Approval Status** | Approved |
-| **Last Reviewed** | 2026-01-28 |
+| **Last Reviewed** | 2026-02-22 |
 
 ### Related Documents
 
@@ -118,10 +118,10 @@ Strategic skill acquisition directly impacts race performance and career success
 | Component | Technology | Version | Purpose |
 |-----------|-----------|---------|---------|
 | **Framework** | Laravel | 12.x | Application foundation |
-| **Language** | PHP | 8.3+ | Server-side logic |
+| **Language** | PHP | 8.2+ | Server-side logic |
 | **Database** | MySQL | 8.0+ | Data persistence |
 | **Cache** | Redis | 7.x | Skill metadata caching |
-| **AI** | Neuron Framework | 1.x | Recommendation agents |
+| **AI** | Neuron AI | v2.11 | Recommendation agents |
 | **AI Provider (Local)** | Ollama | Latest | Quick recommendations |
 | **AI Provider (Cloud)** | AWS Bedrock Claude | 4.5 | Complex optimization |
 
@@ -141,9 +141,9 @@ graph TB
 
     subgraph "Application Layer"
         SkillSvc[SkillService]
-        CostCalc[SPCostCalculator]
+        CostCalc[SkillAnalysisService]
         EvolutionSvc[SkillEvolutionService]
-        RecommendSvc[SkillRecommendationService]
+        RecommendSvc[Neuron\SkillRecommendationService]
     end
 
     subgraph "Domain Layer"
@@ -156,7 +156,7 @@ graph TB
     subgraph "Infrastructure Layer"
         DB[(MySQL)]
         Cache[(Redis)]
-        External[ExternalAPIService]
+        External[ExternalDataService]
         NeuronAI[SkillRecommendationAgent]
     end
 
@@ -716,7 +716,7 @@ use App\Models\{Skill, SkillHint, Character};
  * - Level 4: 35% discount
  * - Level 5: 40% discount (MAXIMUM)
  */
-class SPCostCalculator
+class SkillAnalysisService
 {
     /**
      * Game-accurate hint level discount percentages
@@ -938,7 +938,7 @@ use Illuminate\Support\Facades\DB;
 class SkillEvolutionService
 {
     public function __construct(
-        private SPCostCalculator $costCalculator
+        private SkillAnalysisService $costCalculator
     ) {}
 
     /**
@@ -1128,7 +1128,7 @@ namespace App\Services\Skill;
 
 use App\Models\{Skill, Character, SkillHint, SkillAcquisition, CareerRun};
 use App\Repositories\SkillRepository;
-use App\Services\External\ExternalAPIService;
+use App\Services\External\ExternalDataService;
 use App\Exceptions\{InsufficientSPException, SkillAlreadyOwnedException};
 use Illuminate\Support\Facades\{DB, Cache};
 
@@ -1141,9 +1141,9 @@ class SkillService
 {
     public function __construct(
         private SkillRepository $repository,
-        private SPCostCalculator $costCalculator,
+        private SkillAnalysisService $costCalculator,
         private SkillEvolutionService $evolutionService,
-        private ExternalAPIService $externalApi
+        private ExternalDataService $externalApi
     ) {}
 
     /**
@@ -1675,7 +1675,7 @@ Recommend top 5 skills to acquire, prioritizing race relevance and cost efficien
 namespace App\Services\Skill;
 
 use App\Models\{Character, RaceDefinition};
-use App\Services\AI\AIAdvisoryService;
+use App\Services\AI\AdviceService;
 use App\Neuron\Agents\SkillRecommendationAgent;
 
 /**
@@ -1685,9 +1685,9 @@ class SkillRecommendationService
 {
     public function __construct(
         private SkillRecommendationAgent $agent,
-        private AIAdvisoryService $aiService,
+        private AdviceService $aiService,
         private SkillSearchService $searchService,
-        private SPCostCalculator $costCalculator
+        private SkillAnalysisService $costCalculator
     ) {}
 
     /**
@@ -2068,9 +2068,9 @@ protected $guarded = [
 ### 15.1 Unit Tests
 
 ```php
-// tests/Unit/Services/SPCostCalculatorTest.php
+// tests/Unit/Services/SkillAnalysisServiceTest.php
 
-use App\Services\Skill\SPCostCalculator;
+use App\Services\Skill\SkillAnalysisService;
 use App\Models\{Skill, Character, SkillHint};
 
 test('calculates cost with hint discount correctly', function () {
@@ -2078,7 +2078,7 @@ test('calculates cost with hint discount correctly', function () {
     $character = Character::factory()->make(['scenario_type' => 'ura_finale']);
     $hint = new SkillHint(['level' => 2]); // 20% discount
     
-    $calculator = app(SPCostCalculator::class);
+    $calculator = app(SkillAnalysisService::class);
     $cost = $calculator->calculateFinalCost($skill, $character, $hint);
     
     expect($cost)->toBe(96); // 120 * 0.8
@@ -2088,7 +2088,7 @@ test('applies scenario modifiers correctly', function () {
     $skill = Skill::factory()->make(['base_sp_cost' => 100]);
     $character = Character::factory()->make(['scenario_type' => 'make_cup_debut']);
     
-    $calculator = app(SPCostCalculator::class);
+    $calculator = app(SkillAnalysisService::class);
     $cost = $calculator->calculateFinalCost($skill, $character, null);
     
     expect($cost)->toBe(90); // 100 * 0.9 (10% discount)
@@ -2099,7 +2099,7 @@ test('hint level 5 caps at 40 percent discount', function () {
     $character = Character::factory()->make();
     $hint = new SkillHint(['level' => 5]);
     
-    $calculator = app(SPCostCalculator::class);
+    $calculator = app(SkillAnalysisService::class);
     $cost = $calculator->calculateFinalCost($skill, $character, $hint);
     
     expect($cost)->toBe(60); // 100 * 0.6 (40% max discount)
@@ -2110,7 +2110,7 @@ test('minimum cost is 1 SP', function () {
     $character = Character::factory()->make(['scenario_type' => 'project_larc']);
     $hint = new SkillHint(['level' => 5]);
     
-    $calculator = app(SPCostCalculator::class);
+    $calculator = app(SkillAnalysisService::class);
     $cost = $calculator->calculateFinalCost($skill, $character, $hint);
     
     expect($cost)->toBeGreaterThanOrEqual(1);
@@ -2475,7 +2475,7 @@ test('bulk cost calculation is performant', function () {
     $character = Character::factory()->create();
     $skillIds = Skill::factory()->count(100)->create()->pluck('id')->toArray();
     
-    $calculator = app(SPCostCalculator::class);
+    $calculator = app(SkillAnalysisService::class);
     
     $startTime = microtime(true);
     $calculator->calculateBulkCosts($skillIds, $character);
@@ -2680,6 +2680,7 @@ class SkillHintFactory extends Factory
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.3.0 | 2026-02-22 | Development Team | Updated service names (SkillAnalysisService, SkillEvolutionService, Neuron\SkillRecommendationService, ExternalDataService), Neuron AI v2.11, PHP 8.2+, marked implementation complete |
 | 2.2.0 | 2026-01-28 | Development Team | Game-accurate 5-level hint system (10%/20%/30%/35%/40%), added Fast Learner/Skill Sparks/Hint Books as discount sources |
 | 2.0.0 | 2026-01-24 | Development Team | Full v2.0.0 alignment, complete testing strategy, AI integration, comprehensive calculators |
 | 1.0.0 | 2026-01-23 | Development Team | Initial technical specification |
@@ -2700,7 +2701,7 @@ class SkillHintFactory extends Factory
 **Document Control**  
 **Maintained By**: Backend Development Team  
 **Review Frequency**: Bi-weekly during active development  
-**Next Review Date**: 2026-02-07  
+**Next Review Date**: 2026-03-07  
 **Distribution**: Development Team, QA Team, Product Management, Game Design Team
 
 ---

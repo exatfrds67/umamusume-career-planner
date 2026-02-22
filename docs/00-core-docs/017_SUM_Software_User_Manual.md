@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0  
-**Date**: February 21, 2026  
+**Document Version**: 2.4.0  
+**Date**: February 22, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.3.0 and game-accurate mechanics
+**Status**: Current - Aligned with codebase v2.4.0 and game-accurate mechanics
 
 ---
 
@@ -184,10 +184,10 @@ flowchart TB
 │ - Skills             │ │ Progress bars   │ Power  B (780)  │   │
 │ - Support Cards      │ ├─────────────────┼─────────────────┤   │
 │ - AI Advisor         │ │ Upcoming Races  │ Mood/Energy     │   │
-│ - Settings           │ │ [Date][Race]    │ Good | 72/100   │   │
-│                      │ ├─────────────────┼─────────────────┤   │
-│                      │ │ Training Suggest│ AI Advisor Card │   │
-│                      │ │ [Action][Gains] │ Last tip + CTA  │   │
+│ - MCP Monitoring     │ │ [Date][Race]    │ Good | 72/100   │   │
+│ - Performance        │ ├─────────────────┼─────────────────┤   │
+│ - Admin Panel        │ │ Training Suggest│ AI Advisor Card │   │
+│ - Settings           │ │ [Action][Gains] │ Last tip + CTA  │   │
 │                      │ └─────────────────┴─────────────────┘   │
 └────────────────────────────────────────────────────────────────┘
 ```
@@ -214,6 +214,11 @@ flowchart TB
 | Skills | `/skills` | Skill catalog and management |
 | Support Cards | `/support-cards` | Card collection and deck building |
 | AI Advisor | `/ai-advisor` | AI-powered recommendations |
+| MCP Monitoring | `/mcp-monitoring` | MCP server and agent monitoring |
+| Performance | `/performance` | System performance dashboard |
+| Admin Panel | `/admin` | System administration (admin users) |
+| OCR Upload | `/ocr` | Screenshot data extraction |
+| Data Management | `/data-management` | Import, export, backup, and migration |
 | Settings | `/settings` | User preferences and configuration |
 
 ---
@@ -1313,4 +1318,4 @@ When reporting a bug, please include:
 
 ---
 
-*This manual reflects the current implementation of Umamusume Career Planner v2.3.0. For the latest updates, please refer to the online documentation.*
+*This manual reflects the current implementation of Umamusume Career Planner v2.4.0. For the latest updates, please refer to the online documentation.*

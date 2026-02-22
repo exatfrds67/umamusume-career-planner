@@ -2,17 +2,17 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0
-**Date**: January 28, 2026
+**Document Version**: 2.3.0
+**Date**: February 22, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Updated with verified game mechanics from Global English Server
+**Status**: Current - Updated with verified codebase references (ExternalAPIService, OCR pipeline, GameTora scraping, MCP integration)
 
 ---
 
 ## 1. External API Data Retrieval Flow
 
-This flow illustrates how `ExternalAPIService` handles data requests using a Circuit Breaker pattern to ensure resilience when communicating with `umapyoi.net` and `umamusumedb.com`.
+This flow illustrates how `ExternalAPIService` handles data requests using a Circuit Breaker pattern to ensure resilience when communicating with `umapyoi.net` (primary) and GameTora scraping via `GameToraScraperService` (fallback, replaced UmamusumeDB).
 
 ```mermaid
 flowchart TD
@@ -55,7 +55,7 @@ flowchart TD
 
 ## 2. OCR Screenshot Analysis Flow
 
-The workflow for processing user-uploaded screenshots via `OCRService`, converting image data into structured game statistics.
+The workflow for processing user-uploaded screenshots via the OCR pipeline (`OCR/DataExtractionService`, `OCR/DataValidationService`), converting image data into structured game statistics. Supports `OcrExtractedSkill` model for skill recognition.
 
 ```mermaid
 flowchart TD
@@ -68,13 +68,13 @@ flowchart TD
     Resize --> Grayscale[Grayscale Conversion]
     Grayscale --> Threshold[Adaptive Thresholding]
     
-    Threshold --> OCR[Tesseract Engine]
+    Threshold --> OCR[TesseractService Engine]
     OCR --> ExtractText[Raw Text Extraction]
     
-    ExtractText --> Parse[OCRParserService]
+    ExtractText --> Parse[ParserFactory + Parsers]
     Parse --> PatternMatch[Regex Pattern Matching]
     
-    PatternMatch --> ValidateContent[OCRValidationService]
+    PatternMatch --> ValidateContent[OCR DataValidationService]
     ValidateContent --> ScoreConf[Calculate Confidence Score]
     
     ScoreConf --> CheckConf{Confidence > 80%?}
@@ -97,7 +97,7 @@ flowchart TD
 
 ## 3. Data Synchronization Flow
 
-Background synchronization process managed by Laravel Scheduler and Event system to keep local databases in sync with external sources.
+Background synchronization process managed by Laravel Scheduler and Event system to keep local databases in sync with external sources. Includes `BackgroundSyncService`, `AutomatedUpdateDetectionService`, and `DataSynchronizationAgentService`.
 
 ```mermaid
 flowchart TD
@@ -127,6 +127,23 @@ flowchart TD
     Broadcast --> WebSocket[Laravel Reverb]
     WebSocket --> ClientUpdate[Update Client UI]
 ```
+
+---
+
+## 3.1 External API Service Architecture
+
+| Service | Purpose |
+|---------|--------|
+| `ExternalAPIService` | Primary API communication and circuit breaker |
+| `UmapyoiApiClient` | umapyoi.net API client |
+| `GameToraScraperService` | GameTora scraping (replaced UmamusumeDB) |
+| `BackgroundSyncService` | Scheduled data synchronization |
+| `AutomatedUpdateDetectionService` | Detects external data updates |
+| `DataSynchronizationAgentService` | Agent-driven sync orchestration |
+| `DataValidationService` | Schema validation for external data |
+| `CacheManagerService` | Cache lifecycle for external data |
+| `ConnectivityMonitorService` | API availability monitoring |
+| `GracefulDegradationService` | Fallback strategies when APIs unavailable |
 
 ---
 
@@ -221,6 +238,7 @@ stateDiagram-v2
 
 | Version | Date       | Author           | Changes |
 |---------|------------|------------------|---------|
+| 2.3.0   | 2026-02-22 | Development Team | Updated service references: ExternalAPIService, UmapyoiApiClient, GameToraScraperService (replaced UmamusumeDB); OCR pipeline: TesseractService, ParserFactory, DataValidationService, OcrExtractedSkill; added external API service architecture table; added BackgroundSyncService and related services |
 | 2.2.0   | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: OCR parsing updated for correct stat ranges (1200 base cap with overflow), aptitude grades (G-S scale, no SS), track conditions (Firm/Good/Soft/Heavy) |
 | 2.1.0   | 2026-01-24 | Development Team | Updated to align with v2.0.0 codebase, Circuit Breaker implementation, and OCR pipeline details |
 | 1.0.0   | 2026-01-14 | Development Team | Initial flow definitions |

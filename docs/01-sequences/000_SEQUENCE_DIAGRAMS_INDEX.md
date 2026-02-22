@@ -1,6 +1,6 @@
 # SEQUENCE DIAGRAMS: Critical Interaction Flows
 
-**Document Version**: 2.2.0 | **Date**: January 28, 2026 | **Status**: Production-Aligned with game-accurate mechanics
+**Document Version**: 2.2.0 | **Date**: February 22, 2026 | **Status**: Production-Aligned with game-accurate mechanics
 
 ## Overview
 
@@ -34,7 +34,7 @@ sequenceDiagram
     participant User
     participant UI as Livewire Component
     participant Controller
-    participant CharacterService
+    participant CharacterStateService
     participant FactorService
     participant Database
     participant EventDispatcher
@@ -44,23 +44,23 @@ sequenceDiagram
     User->>UI: Submit Form
     UI->>Controller: POST /characters
     Controller->>Controller: Validate Request
-    Controller->>CharacterService: create(data)
+    Controller->>CharacterStateService: create(data)
     
-    CharacterService->>Database: INSERT characters
-    Database-->>CharacterService: character_id
+    CharacterStateService->>Database: INSERT characters
+    Database-->>CharacterStateService: character_id
     
-    CharacterService->>FactorService: calculateInheritance(character)
+    CharacterStateService->>FactorService: calculateInheritance(character)
     FactorService->>FactorService: Calculate bonuses
-    FactorService-->>CharacterService: factor_data
+    FactorService-->>CharacterStateService: factor_data
     
-    CharacterService->>Database: INSERT factors
-    CharacterService->>Database: INSERT aptitudes
-    CharacterService->>Database: INSERT goals
+    CharacterStateService->>Database: INSERT factors
+    CharacterStateService->>Database: INSERT aptitudes
+    CharacterStateService->>Database: INSERT goals
     
-    CharacterService->>EventDispatcher: Dispatch CharacterCreated
+    CharacterStateService->>EventDispatcher: Dispatch CharacterCreated
     EventDispatcher->>EventDispatcher: Queue listeners
     
-    CharacterService-->>Controller: Character object
+    CharacterStateService-->>Controller: Character object
     Controller-->>UI: 201 Created + character data
     UI->>UI: Update component state
     UI-->>User: Display Success + Redirect
@@ -90,7 +90,7 @@ sequenceDiagram
     participant Controller
     participant TrainingService
     participant PredictionEngine
-    participant BonusCalculator
+    participant SupportBonusCalculator
     participant Cache
     participant Database
 
@@ -113,8 +113,8 @@ sequenceDiagram
             TrainingService->>PredictionEngine: predictWit()
         end
         
-        PredictionEngine->>BonusCalculator: applyDeckBonuses()
-        BonusCalculator-->>PredictionEngine: Modified gains
+        PredictionEngine->>SupportBonusCalculator: applyDeckBonuses()
+        SupportBonusCalculator-->>PredictionEngine: Modified gains
         PredictionEngine->>PredictionEngine: calculateRisk()
         PredictionEngine->>PredictionEngine: calculateHints()
         PredictionEngine-->>TrainingService: Prediction results
@@ -253,7 +253,7 @@ sequenceDiagram
     participant Livewire
     participant Controller
     participant RaceService
-    participant CharacterService
+    participant CharacterStateService
     participant Database
     participant EventBus
 
@@ -267,13 +267,13 @@ sequenceDiagram
     RaceService->>Database: BEGIN TRANSACTION
     
     RaceService->>Database: INSERT race_results
-    RaceService->>CharacterService: updateFromRace(character, rewards)
+    RaceService->>CharacterStateService: updateFromRace(character, rewards)
     
-    CharacterService->>Database: UPDATE characters (fans, grade)
-    CharacterService->>Database: UPDATE careers (sp_earned)
+    CharacterStateService->>Database: UPDATE characters (fans, grade)
+    CharacterStateService->>Database: UPDATE careers (sp_earned)
     
     alt Milestone Achieved
-        CharacterService->>Database: INSERT achievements
+        CharacterStateService->>Database: INSERT achievements
     end
     
     RaceService->>Database: COMMIT TRANSACTION
@@ -481,42 +481,42 @@ sequenceDiagram
     participant User
     participant Livewire
     participant Controller
-    participant AIAdvisoryService
-    participant AIRouter
+    participant AdviceService
+    participant AIRouter as HybridAIService
     participant OllamaService
     participant BedrockService
-    participant CostTracker
+    participant CostTracker as CostTrackingService
     participant Database
 
     User->>Livewire: Request Training Advice
     Livewire->>Controller: POST /ai/advice
-    Controller->>AIAdvisoryService: getAdvice(career, topic)
+    Controller->>AdviceService: getAdvice(career, topic)
     
-    AIAdvisoryService->>Database: Load career context
-    Database-->>AIAdvisoryService: Career + Stats + Goals
+    AdviceService->>Database: Load career context
+    Database-->>AdviceService: Career + Stats + Goals
     
-    AIAdvisoryService->>AIRouter: selectProvider(topic, complexity)
+    AdviceService->>AIRouter: selectProvider(topic, complexity)
     AIRouter->>AIRouter: Analyze complexity
     
     alt Simple Query & Ollama Available
-        AIRouter-->>AIAdvisoryService: Use Ollama
-        AIAdvisoryService->>OllamaService: generate(prompt)
+        AIRouter-->>AdviceService: Use Ollama
+        AdviceService->>OllamaService: generate(prompt)
         OllamaService->>OllamaService: Call local model
-        OllamaService-->>AIAdvisoryService: Response
-        Note over AIAdvisoryService: Cost: $0.00
+        OllamaService-->>AdviceService: Response
+        Note over AdviceService: Cost: $0.00
     else Complex Query OR Ollama Unavailable
-        AIRouter-->>AIAdvisoryService: Use Bedrock
-        AIAdvisoryService->>BedrockService: generate(prompt)
+        AIRouter-->>AdviceService: Use Bedrock
+        AdviceService->>BedrockService: generate(prompt)
         BedrockService->>BedrockService: Call Claude 3.5 Sonnet
-        BedrockService-->>AIAdvisoryService: Response
-        AIAdvisoryService->>CostTracker: record(tokens, cost)
+        BedrockService-->>AdviceService: Response
+        AdviceService->>CostTracker: record(tokens, cost)
         CostTracker->>Database: INSERT ai_usage_logs
     end
     
-    AIAdvisoryService->>AIAdvisoryService: Format response
-    AIAdvisoryService->>Database: INSERT ai_conversations
+    AdviceService->>AdviceService: Format response
+    AdviceService->>Database: INSERT ai_conversations
     
-    AIAdvisoryService-->>Controller: Advice object
+    AdviceService-->>Controller: Advice object
     Controller-->>Livewire: JSON response
     Livewire-->>User: Display recommendation
 ```
@@ -583,15 +583,15 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant Scheduler
-    participant ExternalAPIService
+    participant ExternalDataService
     participant CircuitBreaker
     participant PrimaryAPI as umapyoi.net
-    participant FallbackAPI as UmamusumeDB
+    participant FallbackAPI as GameTora
     participant Cache
     participant Database
 
-    Scheduler->>ExternalAPIService: Trigger sync job
-    ExternalAPIService->>CircuitBreaker: checkState()
+    Scheduler->>ExternalDataService: Trigger sync job
+    ExternalDataService->>CircuitBreaker: checkState()
     
     alt Circuit CLOSED (Normal)
         CircuitBreaker->>PrimaryAPI: Fetch game data
@@ -599,9 +599,9 @@ sequenceDiagram
         alt Success
             PrimaryAPI-->>CircuitBreaker: 200 OK + data
             CircuitBreaker->>CircuitBreaker: Reset failure count
-            CircuitBreaker-->>ExternalAPIService: Data
-            ExternalAPIService->>Cache: Update cache (24hr TTL)
-            ExternalAPIService->>Database: Sync records
+            CircuitBreaker-->>ExternalDataService: Data
+            ExternalDataService->>Cache: Update cache (24hr TTL)
+            ExternalDataService->>Database: Sync records
         else Failure
             PrimaryAPI-->>CircuitBreaker: Timeout/Error
             CircuitBreaker->>CircuitBreaker: Increment failure count
@@ -628,7 +628,7 @@ sequenceDiagram
         end
     end
     
-    ExternalAPIService-->>Scheduler: Sync complete
+    ExternalDataService-->>Scheduler: Sync complete
 ```
 
 **Related Documents:**
@@ -899,7 +899,7 @@ sequenceDiagram
     participant Client2
     participant WebSocketServer as Laravel Reverb
     participant EventDispatcher
-    participant CharacterService
+    participant CharacterStateService
     participant Database
 
     Client1->>WebSocketServer: Connect & Subscribe
@@ -907,10 +907,10 @@ sequenceDiagram
     Client2->>WebSocketServer: Connect & Subscribe
     Note over Client2,WebSocketServer: Channel: character.{id}
     
-    CharacterService->>Database: UPDATE character stats
-    Database-->>CharacterService: Success
+    CharacterStateService->>Database: UPDATE character stats
+    Database-->>CharacterStateService: Success
     
-    CharacterService->>EventDispatcher: Dispatch CharacterUpdated
+    CharacterStateService->>EventDispatcher: Dispatch CharacterUpdated
     EventDispatcher->>WebSocketServer: Broadcast event
     
     par Broadcast to All Subscribers

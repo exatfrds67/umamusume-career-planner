@@ -1,8 +1,8 @@
 # TECH-FLOW-005: Support Card Management - Technical Flow & Task Breakdown
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
-**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
+**Document Version**: 2.3.0  
+**Date**: February 22, 2026  
+**Status**: Current - Aligned with codebase v2.3.0 and game-accurate mechanics
 
 **Source Specifications**:
 
@@ -46,7 +46,7 @@
 flowchart TB
     subgraph Presentation["Presentation Layer"]
         Blade["Blade Templates"]
-        Livewire["Livewire 3 Components"]
+        Livewire["Livewire 4 Components"]
         Alpine["Alpine.js Interactions"]
     end
     
@@ -99,7 +99,7 @@ Support Card Management System
 │
 ├── Services
 │   ├── SupportCardCatalogService
-│   ├── DeckCompositionService
+│   ├── DeckManagementService
 │   ├── BonusCalculatorService
 │   ├── BondLevelService
 │   ├── LimitBreakService
@@ -132,7 +132,7 @@ sequenceDiagram
     participant User
     participant UI as Livewire Component
     participant Controller
-    participant Service as DeckCompositionService
+    participant Service as DeckManagementService
     participant Validator as DeckValidator
     participant Calculator as BonusCalculator
     participant DB as Database
@@ -619,14 +619,14 @@ Schema::create('ucp_card_bonds', function (Blueprint $table) {
 
 ### 3.2 Phase 2: Deck Composition Service (Week 1-2, ~14 hours)
 
-#### Task 5.2.1: Create DeckCompositionService
+#### Task 5.2.1: Create DeckManagementService
 
 **Priority**: P0  
 **Effort**: 6 hours  
 **Status**: ✅ Complete
 
 ```php
-// app/Services/DeckCompositionService.php
+// app/Services/DeckManagementService.php
 namespace App\Services;
 
 use App\Models\Character;
@@ -634,7 +634,7 @@ use App\Models\SupportDeck;
 use App\Models\SupportCard;
 use Illuminate\Support\Collection;
 
-class DeckCompositionService
+class DeckManagementService
 {
     /**
      * Compose a new support deck for a character
@@ -734,7 +734,7 @@ class DeckCompositionService
 - Save deck configuration
 - Calculate synergy score
 - Unit tests: 6 tests
-- **Files**: `app/Services/DeckCompositionService.php`
+- **Files**: `app/Services/DeckManagementService.php`
 
 ---
 
@@ -1125,13 +1125,13 @@ use Tests\TestCase;
 use App\Models\Character;
 use App\Models\SupportCard;
 use App\Models\SupportDeck;
-use App\Services\DeckCompositionService;
+use App\Services\DeckManagementService;
 
 test('creates valid 6-card deck', function () {
     $character = Character::factory()->create();
     $cards = SupportCard::factory()->count(6)->create(['user_id' => $character->user_id]);
     
-    $service = app(DeckCompositionService::class);
+    $service = app(DeckManagementService::class);
     $deck = $service->composeDeck($character, $cards->pluck('id')->toArray());
     
     expect($deck->cards)->toHaveCount(6)
@@ -1143,7 +1143,7 @@ test('rejects deck with duplicate cards', function () {
     $character = Character::factory()->create();
     $card = SupportCard::factory()->create();
     
-    $service = app(DeckCompositionService::class);
+    $service = app(DeckManagementService::class);
     
     expect(fn() => $service->composeDeck($character, array_fill(0, 6, $card->id)))
         ->toThrow(\InvalidArgumentException::class);
@@ -1209,7 +1209,7 @@ test('friendship unlocks at 80% bond', function () {
 
 ## 4. Component Specifications
 
-### 4.1 DeckCompositionService::composeDeck()
+### 4.1 DeckManagementService::composeDeck()
 
 ```php
 /**
@@ -1343,9 +1343,9 @@ erDiagram
 
 ```mermaid
 flowchart TD
-    DeckCompositionService --> SupportCardRepository
-    DeckCompositionService --> SynergyCalculator
-    DeckCompositionService --> DeckValidator
+    DeckManagementService --> SupportCardRepository
+    DeckManagementService --> SynergyCalculator
+    DeckManagementService --> DeckValidator
     
     SupportCardBonusCalculator --> BondLevelService
     SupportCardBonusCalculator --> LimitBreakService
@@ -1356,7 +1356,7 @@ flowchart TD
     BondLevelService --> RewardService
     BondLevelService --> EventDispatcher
     
-    MetaSyncService --> ExternalAPIService
+    MetaSyncService --> ExternalDataService
     MetaSyncService --> SupportCardRepository
 ```
 
@@ -1476,7 +1476,7 @@ pie title Test Distribution
 ### 10.1 Functional Completeness
 
 - [x] 3 models implemented (SupportCard, SupportDeck, CardBond)
-- [x] 4 services implemented (DeckCompositionService, BonusCalculator, LimitBreakService, BondLevelService)
+- [x] 4 services implemented (DeckManagementService, BonusCalculator, LimitBreakService, BondLevelService)
 - [x] 2 controllers with 8 REST endpoints
 - [x] 3 database tables with migrations
 - [x] Complete limit break system (LB0-LB4)
@@ -1515,6 +1515,7 @@ pie title Test Distribution
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.3.0 | 2026-02-22 | Development Team | Updated service names to match codebase (DeckManagementService); Livewire 4 |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: bond gain +7 base (+9 with Charming condition), friendship training threshold 80%, friendship bonus 10-35% based on card rarity |
 | 2.1.0 | 2026-01-24 | Development Team | Updated to v2.0.0 implementation standards; aligned with industry documentation guidelines; added comprehensive cross-references; enhanced code examples and diagrams |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with detailed specifications |
@@ -1535,4 +1536,4 @@ pie title Test Distribution
 
 ---
 
-*This technical flow document reflects the current implementation as of version 2.0.0 and follows industry-standard documentation practices for software development lifecycle (SDLC) artifacts.*
+*This technical flow document reflects the current implementation as of version 2.3.0 and follows industry-standard documentation practices for software development lifecycle (SDLC) artifacts.*

@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.3.0  
+**Date**: February 22, 2026  
 **Related Documents**: [PRD-005], [SPEC-005], [SRS], [BRS]
 
 **Source Specifications**:
@@ -1157,6 +1157,7 @@ flowchart LR
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.3.0 | 2026-02-22 | Development Team | Updated version and dates; no functional changes |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: bond gain mechanics (+7 base, +9 Charming, +5 exclamation), friendship bonus by rarity (10-35%), limit break system (MLB = 4 LB = ★★★★★), six support card types |
 | 2.1.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 architecture; added deck synergy system, meta tier integration, AI optimization, comprehensive validation and error handling |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with basic flow |
@@ -1179,4 +1180,4 @@ flowchart LR
 
 ---
 
-*This user flow reflects the current support deck building system implementation as of version 2.2.0. For the latest updates, refer to the online documentation.*
+*This user flow reflects the current support deck building system implementation as of version 2.3.0. For the latest updates, refer to the online documentation.*

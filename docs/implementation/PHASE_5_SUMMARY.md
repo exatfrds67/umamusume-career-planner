@@ -14,6 +14,7 @@
 Phase 5 implements **Race Planning & Analytics** - a comprehensive system for visualizing race progression, planning target races, and tracking career performance through analytics dashboards.
 
 The phase builds on Phase 4's training foundation by adding:
+
 - **Analytics Components**: Real-time stat progression charts and fan hierarchy visualization
 - **Timeline Components**: Activity tracking and historical event display
 - **Race Planning**: Race carousel with filtering, race targets interface, and scheduling
@@ -24,9 +25,11 @@ The phase builds on Phase 4's training foundation by adding:
 ## Components Created
 
 ### 1. **line-chart.blade.php** (323 lines)
+
 **Purpose**: Chart.js integration for trend visualization
 
 **Features**:
+
 - Multi-dataset line chart support with configurable colors
 - Responsive canvas with automatic aspect ratio management
 - Dark mode support with dynamic grid/label colors
@@ -36,6 +39,7 @@ The phase builds on Phase 4's training foundation by adding:
 - Accessibility: ARIA labels, semantic HTML
 
 **Props**:
+
 ```blade
 <x-line-chart 
     title="Stat Progression"
@@ -49,6 +53,7 @@ The phase builds on Phase 4's training foundation by adding:
 ```
 
 **Alpine Data Context**:
+
 - `chart`: Chart.js instance
 - `lastDataPoint`: Current value (computed)
 - `averageValue`: Mean of dataset (computed)
@@ -61,9 +66,11 @@ The phase builds on Phase 4's training foundation by adding:
 ---
 
 ### 2. **class-pyramid.blade.php** (320 lines)
+
 **Purpose**: Fan count hierarchy and grade distribution visualization
 
 **Features**:
+
 - 3 display variants: pyramid, bars, cards
 - Color-coded grade tiers (G1/G2/G3/Listed/Open)
 - Total fanbase summary with percentage breakdown
@@ -73,6 +80,7 @@ The phase builds on Phase 4's training foundation by adding:
 - Accessibility: Keyboard navigation, ARIA labels, semantic structure
 
 **Props**:
+
 ```blade
 <x-class-pyramid 
     title="Fan Hierarchy"
@@ -87,6 +95,7 @@ The phase builds on Phase 4's training foundation by adding:
 ```
 
 **Alpine Data Context**:
+
 - `sortedGrades`: Grades sorted by fan count
 - `totalFans`: Sum of all fans (computed)
 - `maxFans`: Highest fan count (computed)
@@ -94,6 +103,7 @@ The phase builds on Phase 4's training foundation by adding:
 - `hoveredLayer`: Track hover state (pyramid variant)
 
 **Variants**:
+
 - **pyramid**: Layered pyramid visualization with hover effects
 - **bars**: Horizontal progress bars with percentages
 - **cards**: Grid of tier cards with icon and stats
@@ -101,9 +111,11 @@ The phase builds on Phase 4's training foundation by adding:
 ---
 
 ### 3. **activity-timeline.blade.php** (380 lines)
+
 **Purpose**: Historical event and milestone tracking
 
 **Features**:
+
 - 3 display variants: timeline, feed, compact
 - Event type filtering (race, skill, milestone, achievement)
 - Time-ago calculation for relative dates
@@ -114,6 +126,7 @@ The phase builds on Phase 4's training foundation by adding:
 - Accessibility: ARIA labels, semantic structure, keyboard nav
 
 **Props**:
+
 ```blade
 <x-activity-timeline 
     title="Recent Activity"
@@ -135,6 +148,7 @@ The phase builds on Phase 4's training foundation by adding:
 ```
 
 **Alpine Data Context**:
+
 - `displayedEvents`: Current page of events (computed)
 - `itemsPerPage`: Items per page (default: 10)
 - `currentPage`: Pagination state
@@ -143,6 +157,7 @@ The phase builds on Phase 4's training foundation by adding:
 - `loadMore()`: Pagination action
 
 **Variants**:
+
 - **timeline**: Vertical timeline with dots and cards
 - **feed**: Social feed-style list view
 - **compact**: Minimal inline list (5 items max)
@@ -150,9 +165,11 @@ The phase builds on Phase 4's training foundation by adding:
 ---
 
 ### 4. **races/calendar.blade.php** (400+ lines)
+
 **Purpose**: Full-page race carousel with filtering and scheduling
 
 **Features**:
+
 - Horizontal carousel navigation with swipe support
 - Race type filtering (turf/dirt/short/mile/medium/long)
 - Month-based filtering
@@ -165,6 +182,7 @@ The phase builds on Phase 4's training foundation by adding:
 - Accessibility: ARIA labels, keyboard nav, semantic structure
 
 **Alpine Data Context**:
+
 - `races`: All available races array
 - `currentRaceIndex`: Current carousel position
 - `activeTypeFilter`: Selected race type filter
@@ -176,6 +194,7 @@ The phase builds on Phase 4's training foundation by adding:
 - `handleTouchStart/End()`: Swipe gesture support
 
 **Touch Gestures**:
+
 - Swipe left: Next race
 - Swipe right: Previous race
 - Threshold: 50px minimum
@@ -183,9 +202,11 @@ The phase builds on Phase 4's training foundation by adding:
 ---
 
 ### 5. **races/targets.blade.php** (290 lines)
+
 **Purpose**: Race targeting and planning interface
 
 **Features**:
+
 - Multi-select race targeting system
 - Grade-based filtering and selection
 - Race timeline with turn assignment
@@ -197,6 +218,7 @@ The phase builds on Phase 4's training foundation by adding:
 - Accessibility: Full keyboard support, ARIA labels, semantic HTML
 
 **Alpine Data Context**:
+
 - `races`: All available races
 - `selectedRaces`: Array of selected race IDs
 - `selectedRaceDetails`: Mapping of race details
@@ -212,9 +234,11 @@ The phase builds on Phase 4's training foundation by adding:
 ---
 
 ### 6. **race-calendar.js** (140 lines)
+
 **Purpose**: Alpine.js data component for race carousel state management
 
 **Features**:
+
 - Carousel navigation state management
 - Race filtering (type and month)
 - Gesture detection setup
@@ -222,6 +246,7 @@ The phase builds on Phase 4's training foundation by adding:
 - Event dispatching
 
 **State**:
+
 ```javascript
 {
     races: [],
@@ -237,6 +262,7 @@ The phase builds on Phase 4's training foundation by adding:
 ```
 
 **Computed Properties**:
+
 - `currentRace`: Currently displayed race
 - `filteredRaces`: Type/month filtered races
 - `totalRaces`: Count of filtered races
@@ -246,6 +272,7 @@ The phase builds on Phase 4's training foundation by adding:
 - `monthsWithRaces`: Map of months to races
 
 **Methods**:
+
 - `nextRace()`, `prevRace()`, `goToRace(index)`: Navigation
 - `filterByType(type)`, `filterByMonth(month)`: Filtering
 - `setupGestureListeners()`, `handleSwipe()`: Touch support
@@ -266,6 +293,7 @@ The phase builds on Phase 4's training foundation by adding:
    - Activity timeline showing recent events
 
 2. **Component Props**:
+
 ```blade
 {{-- Stat Progression --}}
 <x-line-chart 
@@ -288,8 +316,8 @@ The phase builds on Phase 4's training foundation by adding:
 />
 ```
 
-3. **Layout**: Responsive 2-column grid on desktop, stacked on mobile
-4. **Theming**: Matches existing dashboard style with dark mode support
+1. **Layout**: Responsive 2-column grid on desktop, stacked on mobile
+2. **Theming**: Matches existing dashboard style with dark mode support
 
 ---
 
@@ -324,6 +352,7 @@ Total: 1,100+ lines of production code
 ## Architecture & Design Patterns
 
 ### Alpine.js Component Pattern
+
 ```javascript
 export function componentName() {
     return {
@@ -347,6 +376,7 @@ export function componentName() {
 ```
 
 ### Blade Component Pattern
+
 ```blade
 @props([
     'prop1' => 'default',
@@ -367,7 +397,9 @@ window.Alpine && Alpine.data('componentName', function(data) {
 ```
 
 ### Color System
+
 **Game-Aligned Stat Colors**:
+
 - Speed: Red (#EF4444)
 - Stamina: Green (#10B981)
 - Power: Yellow (#F59E0B)
@@ -375,6 +407,7 @@ window.Alpine && Alpine.data('componentName', function(data) {
 - Wit: Blue (#3B82F6)
 
 **Grade Colors**:
+
 - G1: Red (#EF4444)
 - G2: Orange (#F97316)
 - G3: Yellow (#FBBF24)
@@ -382,12 +415,14 @@ window.Alpine && Alpine.data('componentName', function(data) {
 - Open: Blue (#3B82F6)
 
 ### Responsive Design
+
 - Mobile: Single column, stacked layout
 - Tablet (768px+): 2-column grid
 - Desktop (1024px+): Full layout with sidebars
 - Touch-friendly: 48px minimum touch targets
 
 ### Dark Mode
+
 - All components support `dark:` prefixes
 - Automatic color inversion for charts
 - Contrast maintained at WCAG 2.2 AA level
@@ -397,6 +432,7 @@ window.Alpine && Alpine.data('componentName', function(data) {
 ## Testing Recommendations
 
 ### Unit Tests (Pest)
+
 ```php
 // Components/LineChartTest.php
 it('renders chart with correct data points')
@@ -415,6 +451,7 @@ it('paginates events properly')
 ```
 
 ### E2E Tests (Playwright)
+
 ```javascript
 // race-calendar.spec.ts
 test('navigates carousel with buttons')
@@ -437,12 +474,14 @@ test('renders analytics section')
 ## Performance Metrics
 
 ### Load Times (Target p95)
+
 - Dashboard load: <1s (including all components)
 - Chart rendering: <500ms
 - Race carousel initialization: <300ms
 - Timeline pagination: <200ms
 
 ### Optimizations
+
 - Chart.js lazy-loaded via CDN
 - Alpine.js components initialized on-demand
 - Pagination limits to 10 events per page
@@ -453,6 +492,7 @@ test('renders analytics section')
 ## Accessibility Compliance
 
 ### WCAG 2.2 AA Compliance
+
 - ✅ Keyboard navigation (Tab, Enter, Arrow keys)
 - ✅ ARIA labels and descriptions
 - ✅ Color contrast ratios ≥4.5:1
@@ -462,6 +502,7 @@ test('renders analytics section')
 - ✅ Error messages descriptive
 
 ### Screen Reader Support
+
 - Component titles announced
 - Data point descriptions provided
 - Interactive elements labeled
@@ -474,6 +515,7 @@ test('renders analytics section')
 ### Expected Controllers/Actions
 
 **RaceController** (already exists):
+
 ```php
 // routes/web.php
 Route::get('/races', 'RaceController@index')->name('races.index');
@@ -484,6 +526,7 @@ Route::post('/races/targets', 'RaceController@saveTargets')->name('races.save-ta
 ```
 
 **DashboardController** (enhancement):
+
 ```php
 // Dashboard data injection
 $statProgression = [];  // Array of stat values per turn
@@ -507,12 +550,14 @@ $recentActivity = [];  // Event timeline data
 ## Future Enhancements
 
 ### Phase 6 (Planned)
+
 - AI-powered race recommendations
 - Advanced analytics with ML predictions
 - Race result simulation engine
 - Team optimization suggestions
 
 ### Possible Features
+
 - Export race plans to PDF
 - Race strategy saved templates
 - Comparison tools (character vs character)
@@ -524,11 +569,13 @@ $recentActivity = [];  // Event timeline data
 ## Code Quality
 
 ### Formatting
+
 - ✅ Pint formatting PASS
 - ✅ Consistent indentation (4 spaces)
 - ✅ Proper naming conventions
 
 ### Best Practices
+
 - ✅ No hardcoded colors (Tailwind classes)
 - ✅ Responsive design mobile-first
 - ✅ Dark mode support throughout
@@ -543,6 +590,7 @@ $recentActivity = [];  // Event timeline data
 ### Phase 5 Commits
 
 **Commit bddcd93** (Part 1 - Components):
+
 ```
 feat: Phase 5 - Race Planning & Analytics components (Part 1)
 - line-chart.blade.php: Chart.js integration
@@ -552,6 +600,7 @@ feat: Phase 5 - Race Planning & Analytics components (Part 1)
 ```
 
 **Commit d6dd457** (Part 2 - Integration):
+
 ```
 feat: Phase 5 - Dashboard integration & Alpine registration (Part 2)
 - Dashboard analytics section
@@ -560,6 +609,7 @@ feat: Phase 5 - Dashboard integration & Alpine registration (Part 2)
 ```
 
 **Commit adf4a21** (Part 3 - Views):
+
 ```
 feat: Phase 5 - Race targets planning view (Part 3)
 - races/targets.blade.php: Race targeting interface

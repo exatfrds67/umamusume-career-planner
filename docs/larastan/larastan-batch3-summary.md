@@ -12,7 +12,7 @@
 
 ### MCP & Skill Services (3 files)
 
-6. `app/Services/MCP/SkillOptimizationOrchestrationService.php`
+1. `app/Services/MCP/SkillOptimizationOrchestrationService.php`
 2. `app/Services/SkillAnalysisService.php`
 3. `app/Services/SkillService.php`
 

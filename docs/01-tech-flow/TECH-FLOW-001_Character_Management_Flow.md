@@ -1,8 +1,8 @@
 # TECH-FLOW-001: Character Management - Technical Flow & Task Breakdown
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
-**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
+**Document Version**: 2.3.0  
+**Date**: February 22, 2026  
+**Status**: Current - Aligned with codebase v2.3.0 and game-accurate mechanics
 
 **Source Specifications**:
 
@@ -46,7 +46,7 @@
 flowchart TB
     subgraph Presentation["Presentation Layer"]
         Blade["Blade Templates"]
-        Livewire["Livewire 3 Components"]
+        Livewire["Livewire 4 Components"]
         Alpine["Alpine.js"]
     end
     
@@ -95,7 +95,7 @@ Character Management System
 │   └── CharacterGoalController
 │
 ├── Services
-│   ├── CharacterService
+│   ├── CharacterMappingService
 │   ├── CharacterStateService
 │   ├── FactorInheritanceService
 │   └── GoalManagementService
@@ -126,7 +126,7 @@ sequenceDiagram
     participant User
     participant UI as Livewire Component
     participant Controller
-    participant Service as CharacterService
+    participant Service as CharacterStateService
     participant FactorService as FactorInheritanceService
     participant Repository
     participant DB as Database
@@ -742,14 +742,14 @@ class CharacterRepository
 
 ### 3.3 Phase 3: Services (Week 2-3, ~16 hours)
 
-#### Task 1.3.1: Create CharacterService
+#### Task 1.3.1: Create CharacterStateService
 
 **Priority**: P0  
 **Effort**: 8 hours  
 **Status**: ✅ Complete
 
 ```php
-// app/Services/CharacterService.php
+// app/Services/CharacterStateService.php
 namespace App\Services;
 
 use App\Models\Character;
@@ -760,7 +760,7 @@ use Illuminate\Support\Facades\Event;
 use App\Events\CharacterCreated;
 use App\Events\CharacterUpdated;
 
-class CharacterService
+class CharacterStateService
 {
     public function __construct(
         private CharacterRepository $repository,
@@ -1047,7 +1047,7 @@ class FactorInheritanceService
 
 ## 4. Component Specifications
 
-### 4.1 CharacterService::createCharacter()
+### 4.1 CharacterStateService::createCharacter()
 
 ```php
 /**
@@ -1186,10 +1186,10 @@ erDiagram
 
 ```mermaid
 flowchart TD
-    CharacterService --> CharacterRepository
-    CharacterService --> FactorInheritanceService
-    CharacterService --> CacheManager
-    CharacterService --> EventDispatcher
+    CharacterStateService --> CharacterRepository
+    CharacterStateService --> FactorInheritanceService
+    CharacterStateService --> CacheManager
+    CharacterStateService --> EventDispatcher
     
     CharacterStateService --> CharacterRepository
     CharacterStateService --> GoalManagementService
@@ -1306,6 +1306,7 @@ pie title Test Distribution
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.3.0 | 2026-02-22 | Development Team | Updated service names to match codebase (CharacterStateService, CharacterMappingService); Livewire 4 |
 | 2.2.0 | 2026-01-28 | Development Team | Game-accurate mechanics: aptitude grades G→S (S max, no SS), stats can exceed 1200 with diminishing returns |
 | 2.1.0 | 2026-01-24 | Development Team | Updated to v2.0.0 implementation standards; aligned with industry documentation guidelines; added comprehensive cross-references |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with detailed specifications |
@@ -1325,4 +1326,4 @@ pie title Test Distribution
 
 ---
 
-*This technical flow document reflects the current implementation as of version 2.0.0 and follows industry-standard documentation practices for software development lifecycle (SDLC) artifacts.*
+*This technical flow document reflects the current implementation as of version 2.3.0 and follows industry-standard documentation practices for software development lifecycle (SDLC) artifacts.*

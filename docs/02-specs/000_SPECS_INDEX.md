@@ -1,10 +1,10 @@
 # Technical Specifications Index
 
-**Document Version**: 2.2.0  
-**Last Updated**: 2026-01-28  
-**Status**: Active  
+**Document Version**: 2.3.0  
+**Last Updated**: 2026-02-22  
+**Status**: Complete  
 **Project**: Umamusume Pretty Derby Career Planner  
-**Architecture Version**: v2.2.0 (Game-Aligned)
+**Architecture Version**: v2.3.0 (Game-Aligned)
 
 ---
 
@@ -18,14 +18,14 @@ This index provides a comprehensive catalog of all Technical Specifications (SPE
 
 | SPEC ID | Module | Status | PRD Reference | Last Updated |
 |---------|--------|--------|---------------|--------------|
-| [SPEC-001](#spec-001) | Character Management | Active | PRD-001 | 2026-01-28 |
-| [SPEC-002](#spec-002) | Training Optimization | Active | PRD-002 | 2026-01-28 |
-| [SPEC-003](#spec-003) | Race Strategy | Active | PRD-003 | 2026-01-28 |
-| [SPEC-004](#spec-004) | Skill Management | Active | PRD-004 | 2026-01-28 |
-| [SPEC-005](#spec-005) | Support Card Management | Active | PRD-005 | 2026-01-28 |
-| [SPEC-006](#spec-006) | AI Advisory System | Active | PRD-006 | 2026-01-28 |
-| [SPEC-007](#spec-007) | External Integration | Active | PRD-007 | 2026-01-28 |
-| [SPEC-008](#spec-008) | Performance Monitoring & APM | Active | SRS §3.9 | 2026-01-28 |
+| [SPEC-001](#spec-001) | Character Management | Complete | PRD-001 | 2026-02-22 |
+| [SPEC-002](#spec-002) | Training Optimization | Complete | PRD-002 | 2026-02-22 |
+| [SPEC-003](#spec-003) | Race Strategy | Complete | PRD-003 | 2026-02-22 |
+| [SPEC-004](#spec-004) | Skill Management | Complete | PRD-004 | 2026-02-22 |
+| [SPEC-005](#spec-005) | Support Card Management | Complete | PRD-005 | 2026-02-22 |
+| [SPEC-006](#spec-006) | AI Advisory System | Complete | PRD-006 | 2026-02-22 |
+| [SPEC-007](#spec-007) | External Integration | Complete | PRD-007 | 2026-02-22 |
+| [SPEC-008](#spec-008) | Performance Monitoring & APM | Complete | SRS §3.9 | 2026-02-22 |
 
 ---
 
@@ -48,7 +48,7 @@ This index provides a comprehensive catalog of all Technical Specifications (SPE
 **Technology Stack**:
 
 - Laravel 12 Eloquent Models
-- Service Layer: `CharacterService`, `FactorInheritanceService`
+- Service Layer: `CharacterStateService`, `FactorService`
 - Database: MySQL 8.0+ with `ucp_characters` table
 - Cache: Redis for character state snapshots
 
@@ -71,7 +71,7 @@ This index provides a comprehensive catalog of all Technical Specifications (SPE
 **Technology Stack**:
 
 - Service Layer: `TrainingService`, `TrainingPredictionService`
-- AI: `NeuronAI` with `TrainingAdvisorAgent`
+- AI: `NeuronAIService` with `TrainingAdvisorAgent`
 - Cache: Redis predictions with 5-minute TTL
 - Database: `ucp_training_sessions` for execution history
 
@@ -93,8 +93,8 @@ This index provides a comprehensive catalog of all Technical Specifications (SPE
 
 **Technology Stack**:
 
-- Service Layer: `RaceService`, `RaceStrategyService`
-- AI: `RaceStrategyAgent` via Neuron framework
+- Service Layer: `RaceConditionService`, `Neuron\RaceStrategyService`
+- AI: `RaceStrategyAgent` via Neuron AI v2.11
 - External: API integration with `umapyoi.net`
 - Database: `ucp_race_definitions`, `ucp_race_results`
 
@@ -116,7 +116,7 @@ This index provides a comprehensive catalog of all Technical Specifications (SPE
 
 **Technology Stack**:
 
-- Service Layer: `SkillService`, `SPCostCalculator`
+- Service Layer: `SkillService`, `SkillAnalysisService`
 - AI: `SkillRecommendationAgent`
 - Database: `ucp_skills`, `ucp_skill_hints`, `ucp_skill_acquisitions`
 - Cache: Skill metadata and cost calculations
@@ -139,7 +139,7 @@ This index provides a comprehensive catalog of all Technical Specifications (SPE
 
 **Technology Stack**:
 
-- Service Layer: `SupportDeckService`, `DeckCompositionValidator`
+- Service Layer: `SupportCardDeckService`, `DeckManagementService`
 - External: Sync from community databases
 - Database: `ucp_support_cards`, `ucp_support_decks`
 - Cache: Card metadata and deck analysis results
@@ -162,7 +162,7 @@ This index provides a comprehensive catalog of all Technical Specifications (SPE
 
 **Technology Stack**:
 
-- AI Services: `NeuronAI`, `OllamaService`, `BedrockService`
+- AI Services: `NeuronAIService`, `OllamaService`, `BedrockService`
 - MCP Servers: Database query, file system, calculation tools
 - Database: `ucp_ai_conversations`, `ucp_ai_recommendations`
 - Models: Claude 4.5, Mistral Large 2, Ollama local models
@@ -185,7 +185,7 @@ This index provides a comprehensive catalog of all Technical Specifications (SPE
 
 **Technology Stack**:
 
-- Service Layer: `ExternalAPIService`, `OCRService`
+- Service Layer: `ExternalDataService`, `GameToraScraperService`
 - OCR: Tesseract 5.x, OpenCV 4.x
 - WebSocket: Laravel Reverb
 - Database: `ucp_external_api_cache`, `ucp_ocr_extractions`
@@ -220,16 +220,16 @@ This index provides a comprehensive catalog of all Technical Specifications (SPE
 
 ## 4. Architecture Alignment
 
-All specifications adhere to the **v2.2.0 Architecture** defined in the Software Development Plan:
+All specifications adhere to the **v2.3.0 Architecture** defined in the Software Development Plan:
 
 **Backend Framework**:
 
-- Laravel 12.x (PHP 8.3+)
+- Laravel 12.x (PHP 8.2+)
 - Domain-Driven Design with Service Layer pattern
 
 **Frontend Stack**:
 
-- Livewire 3 for reactive components
+- Livewire 4 for reactive components
 - Alpine.js 3 for client-side interactivity
 - Tailwind CSS v4 for styling
 
@@ -242,7 +242,7 @@ All specifications adhere to the **v2.2.0 Architecture** defined in the Software
 **AI Integration**:
 
 - Hybrid: Ollama (local) + AWS Bedrock Claude 4.5 (cloud)
-- Neuron framework for agent orchestration
+- Neuron AI v2.11 framework for agent orchestration
 - MCP protocol for tool integration
 
 **Caching & Performance**:
@@ -294,6 +294,7 @@ All specifications adhere to the **v2.2.0 Architecture** defined in the Software
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.3.0 | 2026-02-22 | Development Team | Updated all specs to v2.3.0: corrected service names to match codebase, PHP 8.2+, Livewire 4, Neuron AI v2.11, GameTora replaces UmamusumeDB, all modules marked complete |
 | 2.2.0 | 2026-01-28 | Development Team | Game-accurate mechanics: 5-level hint system, S max aptitude, stat soft cap, track conditions |
 | 2.0.0 | 2026-01-24 | Development Team | Full alignment with v2.0.0 architecture |
 | 1.0.0 | 2026-01-14 | Development Team | Initial specification drafts |
@@ -352,7 +353,7 @@ All specifications adhere to the **v2.2.0 Architecture** defined in the Software
 
 **Document Control**  
 **Maintained By**: Technical Architecture Team  
-**Next Review**: 2026-02-07  
+**Next Review**: 2026-03-07  
 **Distribution**: Development Team, Product Managers, QA Team
 
 ---

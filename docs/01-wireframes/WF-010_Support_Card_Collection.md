@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.3.0  
+**Date**: February 22, 2026  
 **Related Documents**: [PRD-005], [SPEC-005], [FLOW-005], [SEQ-005]
 
 **Source Specs**:
@@ -39,7 +39,7 @@ The Support Card Collection interface provides a comprehensive catalog of all av
 | **Limit Break Management** | Track limit break levels (★ to ★★★★★, MLB = 4 LB / 5 stars)      |
 | **Quick Deck Actions**     | Add cards directly to active decks                               |
 
-### 1.3 Game-Accurate Mechanics (Global English Server - Jan 2026)
+### 1.3 Game-Accurate Mechanics (Global English Server - Feb 2026)
 
 #### Support Card Types
 
@@ -769,7 +769,7 @@ class MetaTierService
 ```php
 class BondProgressionService
 {
-    // Game-accurate bond mechanics (Global English Server - Jan 2026)
+    // Game-accurate bond mechanics (Global English Server - Feb 2026)
     public const BASE_BOND_GAIN = 7;           // Base training together
     public const CHARMING_BOND_GAIN = 9;       // With Charming condition (+2)
     public const EXCLAMATION_BOND_GAIN = 5;    // Event available indicator
@@ -1633,13 +1633,14 @@ test.describe("WF-010: Accessibility", () => {
 
 | Version | Date       | Author           | Changes                                                                                                                                                                        |
 | ------- | ---------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 2.3.0   | 2026-02-22 | Development Team | Updated version/dates, aligned technology references with current stack (Livewire 4, Neuron AI v2.11, GameTora/umapyoi.net) |
 | 2.2.0   | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server - corrected bond mechanics (+7 base, +9 Charming, +5 exclamation), friendship threshold 80%, limit break system (MLB = 4 LB), card type icons, rarity-based friendship bonus ranges (R: 10-15%, SR: 15-25%, SSR: 25-35%), skill hint unlock system |
 | 2.0.0   | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added collection overview, meta tier system, bond progression, accessibility specifications, and testing requirements |
 | 1.0.0   | 2026-01-14 | Development Team | Initial wireframe specification                                                                                                                                                |
 
 ---
 
-## 11. Game Mechanics Reference (Global English Server - Jan 2026)
+## 11. Game Mechanics Reference (Global English Server - Feb 2026)
 
 ### 11.1 Support Card Types Summary
 
@@ -1700,4 +1701,4 @@ test.describe("WF-010: Accessibility", () => {
 
 ---
 
-_This wireframe specification reflects the current implementation of the Support Card Collection with game-accurate mechanics from Umamusume Pretty Derby (Global English Server, verified January 2026) and serves as the authoritative reference for UI/UX development and testing._
+_This wireframe specification reflects the current implementation of the Support Card Collection with game-accurate mechanics from Umamusume Pretty Derby (Global English Server, verified February 2026) and serves as the authoritative reference for UI/UX development and testing._

@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0
-**Date**: February 21, 2026
+**Document Version**: 2.4.0
+**Date**: February 22, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned with codebase v2.3.0 and game-accurate mechanics
+**Status**: Current - Aligned with codebase v2.4.0 and game-accurate mechanics
 
 ---
 
@@ -347,13 +347,36 @@ quadrantChart
 | BR-11.4 | Responsive design (320px to 2560px) | P0 | Implemented |
 | BR-11.5 | WCAG AA accessibility compliance | P0 | Implemented |
 
-### 4.12 Requirements Priority Matrix
+### 4.12 MCP Integration [BR-12]
+
+**Business Need:** Development team needs AI orchestration, tool management, and monitoring capabilities.
+
+| ID | Requirement | Priority | Status |
+|----|-------------|----------|--------|
+| BR-12.1 | Laravel MCP server with custom tools | P1 | Implemented |
+| BR-12.2 | MCP agent configuration and orchestration | P1 | Implemented |
+| BR-12.3 | MCP tool usage monitoring and dashboards | P1 | Implemented |
+| BR-12.4 | MCP server management interface | P2 | Implemented |
+
+### 4.13 Admin Panel [BR-13]
+
+**Business Need:** Administrators need system management and monitoring capabilities.
+
+| ID | Requirement | Priority | Status |
+|----|-------------|----------|--------|
+| BR-13.1 | Database management interface | P1 | Implemented |
+| BR-13.2 | Application log viewer | P1 | Implemented |
+| BR-13.3 | Queue monitor dashboard | P1 | Implemented |
+| BR-13.4 | User management | P1 | Implemented |
+| BR-13.5 | System settings configuration | P2 | Implemented |
+
+### 4.14 Requirements Priority Matrix
 
 ```mermaid
 pie title Requirements by Priority
     "P0 - Critical" : 32
-    "P1 - High" : 24
-    "P2 - Medium" : 8
+    "P1 - High" : 33
+    "P2 - Medium" : 11
 ```
 
 ---
@@ -612,10 +635,13 @@ flowchart BT
 ### 10.2 Revision History
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|| 2.3.0 | 2026-02-21 | Development Team | Updated tech stack references (Livewire 4, Neuron AI v2.11); replaced TypeScript with Livewire 4 + Alpine.js 3; aligned with v2.3.0 architecture |
-| 2.2.0 | 2026-01-28 | Development Team | Aligned with codebase v2.2.0 || 2.1.0 | 2026-01-23 | Development Team | Updated scope and requirements to match implementation; added AI integration requirements; added external API integration; aligned with v2.0 architecture |
+|---------|------|--------|---------|
+| 2.4.0 | 2026-02-22 | Development Team | Added MCP Integration (BR-12) and Admin Panel (BR-13) business requirements; updated priority matrix counts |
+| 2.3.0 | 2026-02-21 | Development Team | Updated tech stack references (Livewire 4, Neuron AI v2.11); replaced TypeScript with Livewire 4 + Alpine.js 3; aligned with v2.3.0 architecture |
+| 2.2.0 | 2026-01-28 | Development Team | Aligned with codebase v2.2.0 |
+| 2.1.0 | 2026-01-23 | Development Team | Updated scope and requirements to match implementation; added AI integration requirements; added external API integration; aligned with v2.0 architecture |
 | 1.0 | 2026-01-14 | Development Team | Initial draft |
 
 ---
 
-*This BRS describes the current business scope as implemented in version 2.3.0.*
+*This BRS describes the current business scope as implemented in version 2.4.0.*

@@ -1,9 +1,9 @@
 # SPEC-003: Race Strategy System - Technical Specification
 
-**Document Version**: 2.2.0  
-**Date**: 2026-01-28  
+**Document Version**: 2.3.0  
+**Date**: 2026-02-22  
 **Project**: Umamusume Pretty Derby Career Planner  
-**Status**: Active - Updated with game-accurate track conditions and aptitude modifiers  
+**Status**: Complete - Implementation verified  
 **Classification**: Internal - Development Team
 
 ---
@@ -14,9 +14,9 @@
 |-----------|-------|
 | **Document ID** | SPEC-003 |
 | **Related PRD** | [PRD-003: Race Strategy](../prds/PRD-003_Race_Strategy.md) |
-| **Architecture Version** | v2.2.0 |
+| **Architecture Version** | v2.3.0 |
 | **Approval Status** | Approved |
-| **Last Reviewed** | 2026-01-28 |
+| **Last Reviewed** | 2026-02-22 |
 
 ### Related Documents
 
@@ -117,7 +117,7 @@ Strategic race selection and preparation directly impact career outcomes.
 | **Language** | PHP | 8.3+ | Server-side logic |
 | **Database** | MySQL | 8.0+ | Data persistence |
 | **Cache** | Redis | 7.x | Race data caching |
-| **AI** | Neuron Framework | 1.x | Strategy agents |
+| **AI** | Neuron AI | v2.11 | Strategy agents |
 | **AI Provider (Local)** | Ollama | Latest | Quick analysis |
 | **AI Provider (Cloud)** | AWS Bedrock Claude | 4.5 | Complex strategy |
 | **External API** | umapyoi.net | - | Race definitions |
@@ -137,9 +137,9 @@ graph TB
     end
 
     subgraph "Application Layer"
-        RaceSvc[RaceService]
-        StrategySvc[RaceStrategyService]
-        AnalysisSvc[RaceAnalysisService]
+        RaceSvc[RaceConditionService]
+        StrategySvc[Neuron\RaceStrategyService]
+        AnalysisSvc[RaceConditionService]
     end
 
     subgraph "Domain Layer"
@@ -151,7 +151,7 @@ graph TB
     subgraph "Infrastructure Layer"
         DB[(MySQL)]
         Cache[(Redis)]
-        External[ExternalAPIService]
+        External[ExternalDataService]
         NeuronAI[RaceStrategyAgent]
     end
 
@@ -1022,7 +1022,7 @@ namespace App\Services\Race;
 
 use App\Models\{RaceDefinition, RaceResult, CareerRun};
 use App\Repositories\RaceDefinitionRepository;
-use App\Services\External\ExternalAPIService;
+use App\Services\External\ExternalDataService;
 use Illuminate\Support\Facades\{DB, Cache};
 
 /**
@@ -1030,12 +1030,12 @@ use Illuminate\Support\Facades\{DB, Cache};
  * 
  * Handles race-related business operations.
  */
-class RaceService
+class RaceConditionService
 {
     public function __construct(
         private RaceDefinitionRepository $repository,
-        private RaceAnalysisService $analysisService,
-        private ExternalAPIService $externalApi
+        private RaceConditionService $conditionService,
+        private ExternalDataService $externalApi
     ) {}
 
     /**
@@ -1187,9 +1187,9 @@ class RaceService
 }
 ```
 
-### 4.2 RaceAnalysisService
+### 4.2 RaceConditionService (Analysis Aggregation)
 
-Aggregates analysis from multiple analyzers.
+Aggregates analysis from multiple analyzers within RaceConditionService.
 
 ```php
 <?php
@@ -1210,7 +1210,7 @@ use App\Enums\TrackCondition;
  * 
  * Combines multiple analysis engines into comprehensive race analysis.
  */
-class RaceAnalysisService
+class RaceConditionService
 {
     public function __construct(
         private RaceRequirementAnalyzer $requirementAnalyzer,
@@ -1336,7 +1336,7 @@ class RaceAnalysisService
 }
 ```
 
-### 4.3 RaceStrategyService
+### 4.3 Neuron\RaceStrategyService
 
 AI-powered strategy recommendation service.
 
@@ -1346,7 +1346,7 @@ AI-powered strategy recommendation service.
 namespace App\Services\Race;
 
 use App\Models\{Character, RaceDefinition};
-use App\Services\AI\AIAdvisoryService;
+use App\Services\AI\AdviceService;
 use App\Neuron\Agents\RaceStrategyAgent;
 
 /**
@@ -1358,8 +1358,8 @@ class RaceStrategyService
 {
     public function __construct(
         private RaceStrategyAgent $agent,
-        private AIAdvisoryService $aiService,
-        private RaceAnalysisService $analysisService
+        private AdviceService $aiService,
+        private RaceConditionService $conditionService
     ) {}
 
     /**
@@ -1808,7 +1808,7 @@ Bonuses:
 ### 9.1 External API Integration
 
 **Primary Source**: `umapyoi.net/api/races`  
-**Fallback**: `umamusumedb.com/api/races`
+**Fallback**: `gametora.com/api/races`
 
 **Sync Schedule**: Daily at 00:00 UTC  
 **Data Cached**: 24 hours
@@ -1816,7 +1816,7 @@ Bonuses:
 ```php
 // Sync job
 Schedule::call(function () {
-    app(RaceService::class)->syncRaceDefinitions();
+    app(RaceConditionService::class)->syncRaceDefinitions();
 })->daily();
 ```
 
@@ -1975,7 +1975,7 @@ test('weather impact calculator applies correct modifiers', function () {
 });
 
 test('distance type determination is accurate', function () {
-    $service = app(RaceService::class);
+    $service = app(RaceConditionService::class);
     
     expect($service->determineDistanceType(1200))->toBe('sprint')
         ->and($service->determineDistanceType(1600))->toBe('mile')
@@ -2119,7 +2119,7 @@ test('external race sync creates or updates definitions', function () {
         ], 200),
     ]);
     
-    $service = app(RaceService::class);
+    $service = app(RaceConditionService::class);
     $syncedCount = $service->syncRaceDefinitions();
     
     expect($syncedCount)->toBe(1);
@@ -2144,7 +2144,7 @@ test('race analysis aggregates all components correctly', function () {
         'surface' => 'Turf',
     ]);
     
-    $service = app(RaceAnalysisService::class);
+    $service = app(RaceConditionService::class);
     $analysis = $service->analyze($character, $race);
     
     expect($analysis)->toHaveKeys([
@@ -2169,7 +2169,7 @@ test('race analysis completes within performance target', function () {
     $character = Character::factory()->create();
     $race = RaceDefinition::factory()->create();
     
-    $service = app(RaceAnalysisService::class);
+    $service = app(RaceConditionService::class);
     
     $startTime = microtime(true);
     $service->analyze($character, $race);
@@ -2183,7 +2183,7 @@ test('race analysis completes within performance target', function () {
 test('race calendar query is performant with 100 races', function () {
     RaceDefinition::factory()->count(100)->create(['month' => 6]);
     
-    $service = app(RaceService::class);
+    $service = app(RaceConditionService::class);
     
     $startTime = microtime(true);
     $service->getCalendar(6);
@@ -2411,6 +2411,7 @@ class RaceResultFactory extends Factory
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.3.0 | 2026-02-22 | Development Team | Updated to v2.3.0: RaceConditionService, Neuron\RaceStrategyService, ExternalDataService, AdviceService, GameTora fallback, Neuron AI v2.11, status complete |
 | 2.2.0 | 2026-01-28 | Development Team | Game-accurate track conditions (Firm/Good/Soft/Heavy with flat stat penalties), corrected aptitude modifiers (S max, A baseline), surface-specific power penalties |
 | 2.0.0 | 2026-01-24 | Development Team | Full v2.0.0 alignment, added AI integration, complete analysis engines, comprehensive testing strategy |
 | 1.0.0 | 2026-01-23 | Development Team | Initial technical specification |
@@ -2431,7 +2432,7 @@ class RaceResultFactory extends Factory
 **Document Control**  
 **Maintained By**: Backend Development Team  
 **Review Frequency**: Bi-weekly during active development  
-**Next Review Date**: 2026-02-07  
+**Next Review Date**: 2026-03-07  
 **Distribution**: Development Team, QA Team, Product Management, Data Science Team
 
 ---

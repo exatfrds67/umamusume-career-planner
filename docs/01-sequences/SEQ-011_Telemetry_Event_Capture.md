@@ -3,7 +3,7 @@
 ## Umamusume Pretty Derby Career Planner
 
 **Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Date**: February 22, 2026  
 **Related Documents**: [PRD-007], [SPEC-007], [FLOW-007], [TECH-FLOW-007]
 
 ---
@@ -84,7 +84,7 @@ Telemetry enables:
 | **TelemetryService** | Domain Service | Event collection and batching |
 | **GameEventTracker** | Domain Service | Game-specific event tracking |
 | **PerformanceMonitor** | Infrastructure | Performance metrics tracking |
-| **AICostTracker** | Domain Service | AI usage and cost logging |
+| **CostTrackingService** | Domain Service | AI usage and cost logging |
 | **MCPMonitoringService** | Domain Service | MCP tool usage tracking |
 | **AuditLogger** | Infrastructure | Security and compliance logging |
 | **Database** | Infrastructure | MySQL/MariaDB event storage |
@@ -102,7 +102,7 @@ app/
 │   │   ├── EventBatcher.php
 │   │   └── GameEventTracker.php
 │   ├── AI/
-│   │   └── AICostTracker.php
+│   └── CostTrackingService.php
 │   ├── MCP/
 │   │   └── MCPMonitoringService.php
 │   └── Security/
@@ -132,7 +132,7 @@ sequenceDiagram
     participant Controller
     participant TelemetrySvc as TelemetryService
     participant GameTracker as GameEventTracker
-    participant AITracker as AICostTracker
+    participant AITracker as CostTrackingService
     participant MCPMonitor as MCPMonitoringService
     participant Audit as AuditLogger
     participant Queue as Redis Queue
@@ -428,8 +428,8 @@ class ProcessTelemetryBatch implements ShouldQueue
 **Cost Tracker Service:**
 
 ```php
-// AICostTracker.php
-class AICostTracker
+// CostTrackingService.php
+class CostTrackingService
 {
     public function track(
         string $provider,
@@ -1382,7 +1382,7 @@ class CleanupTelemetryData extends Command
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
-| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server - added correct stat breakpoints (901/1200/1600), hint level tracking (1-5 with 10%/20%/30%/35%/40% discounts), bond mechanics (+7 base, +9 with Charming), track condition penalties, class promotion thresholds, and comprehensive game event tracking |
+| 2.2.0 | 2026-02-22 | Development Team | Updated with verified game mechanics from Global English Server - added correct stat breakpoints (901/1200/1600), hint level tracking (1-5 with 10%/20%/30%/35%/40% discounts), bond mechanics (+7 base, +9 with Charming), track condition penalties, class promotion thresholds, and comprehensive game event tracking |
 | 2.0.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 implementation; added detailed sequence flows, AI cost tracking, MCP monitoring, audit logging, performance metrics, and aligned with current Laravel 12 architecture |
 | 1.0.0 | 2026-01-14 | Development Team | Initial draft |
 

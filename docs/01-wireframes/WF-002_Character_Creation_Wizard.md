@@ -3,8 +3,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.3.0  
+**Date**: February 22, 2026  
 **Related Documents**: [PRD-001], [SPEC-001], [FLOW-001], [SEQ-001]
 
 **Source Specs**:
@@ -1664,6 +1664,7 @@ test.describe('WF-002: Visual Regression', () => {
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.3.0 | 2026-02-22 | Development Team | Updated version/dates, aligned technology references with current stack (Livewire 4, Neuron AI v2.11, GameTora/umapyoi.net) |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: corrected aptitude grade scale (S is max, no SS), added aptitude categories documentation |
 | 2.0.0 | 2026-01-24 | Development Team | Complete wireframe specification with testing requirements, accessibility guidelines, and performance targets aligned with v2.0.0 implementation |
 | 1.0.0 | 2026-01-14 | Development Team | Initial wireframe specification |

@@ -6,11 +6,11 @@
 
 Tech Flow documents (TECH-FLOW-001 through TECH-FLOW-007) provide system architecture diagrams, detailed data flows, component interactions, and implementation task breakdowns for each of the seven core modules. All documents include `.kiro` source references and cross-links to related artifacts (PRDs, SPECs, FLOWs, WFs, SEQs, UFs).
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.3.0  
+**Date**: February 22, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
+**Status**: Current - Aligned with codebase v2.3.0 and game-accurate mechanics
 
 ---
 
@@ -84,7 +84,7 @@ Tech Flow documents (TECH-FLOW-001 through TECH-FLOW-007) provide system archite
 **Status**: Complete | **Implementation**: 100%
 
 - **Components**: 3 services, 2 controllers
-- **Core Services**: SkillCatalog, SkillHint, SkillEvolution
+- **Core Services**: SkillAnalysis, SkillHint, SkillEvolution
 - **API Endpoints**: 7 REST endpoints
 - **Estimated Effort**: ~54 hours
 - **Test Coverage**: 20+ tests
@@ -105,7 +105,7 @@ Tech Flow documents (TECH-FLOW-001 through TECH-FLOW-007) provide system archite
 **Status**: Complete | **Implementation**: 100%
 
 - **Components**: 4 services, 2 controllers
-- **Core Services**: DeckComposition, SupportCardBonusCalculator, BondLevel, LimitBreak
+- **Core Services**: DeckManagement, SupportCardBonusCalculator, BondLevel, LimitBreak
 - **API Endpoints**: 8 REST endpoints
 - **Estimated Effort**: ~64 hours
 - **Test Coverage**: 23+ tests
@@ -125,7 +125,7 @@ Tech Flow documents (TECH-FLOW-001 through TECH-FLOW-007) provide system archite
 **Status**: Complete | **Implementation**: 100%
 
 - **Components**: 3 services, 2 controllers, health monitoring
-- **Core Services**: AIAdvisory, Ollama (local), Bedrock (cloud fallback)
+- **Core Services**: AdviceService, Ollama (local), Bedrock (cloud fallback)
 - **API Endpoints**: 4 REST endpoints
 - **Estimated Effort**: ~74 hours
 - **Test Coverage**: 20+ tests
@@ -146,7 +146,7 @@ Tech Flow documents (TECH-FLOW-001 through TECH-FLOW-007) provide system archite
 **Status**: Complete | **Implementation**: 100%
 
 - **Components**: 4 services, 2 controllers, WebSocket
-- **Core Services**: ExternalAPI, OCRProcessing, WebSocketBroadcast, SyncConflictResolver
+- **Core Services**: ExternalData, OCRProcessing, WebSocketBroadcast, SyncConflictResolver
 - **API Endpoints**: 7 REST endpoints + WebSocket
 - **Estimated Effort**: ~84 hours
 - **Test Coverage**: 25+ tests
@@ -173,7 +173,7 @@ Tech Flow documents (TECH-FLOW-001 through TECH-FLOW-007) provide system archite
 | **Total Test Coverage** | 185+ tests | ✅ Written |
 | **Estimated Total Effort** | ~502 hours | ✅ Delivered |
 
-### Game Mechanics Alignment (v2.2.0)
+### Game Mechanics Alignment (v2.3.0)
 
 | Mechanic | Status | Notes |
 |----------|--------|-------|
@@ -316,10 +316,10 @@ gantt
 | Technology | Version | Usage |
 |------------|---------|-------|
 | Laravel | 12+ | Backend framework |
-| PHP | 8.4+ | Runtime environment |
+| PHP | 8.2+ | Runtime environment |
 | MySQL | 8.0+ | Primary database |
 | Redis | 7+ | Cache and queue backend |
-| Livewire | 3 | Server-driven UI components |
+| Livewire | 4 | Server-driven UI components |
 
 ### AI Technologies
 
@@ -392,6 +392,7 @@ After TECH-FLOW completion, the following documentation phases are recommended:
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.3.0 | 2026-02-22 | Development Team | Updated service names to match codebase (SkillAnalysis, DeckManagement, AdviceService, ExternalData); Livewire 4; PHP 8.2+ |
 | 2.2.0 | 2026-01-28 | Development Team | Game-accurate mechanics alignment: skill hints (5 levels, 40% max), aptitudes (S max), training (1200+ stats), track conditions |
 | 2.1.0 | 2026-01-24 | Development Team | Updated to v2.0.0 implementation; added complete artifact cross-references; aligned with industry documentation standards |
 | 2.0.0 | 2026-01-14 | Development Team | Comprehensive revision with all 7 modules |
@@ -400,9 +401,9 @@ After TECH-FLOW completion, the following documentation phases are recommended:
 ---
 
 **Completion Status**: All 7 tech flow documents created and implemented ✅  
-**Last Updated**: January 28, 2026  
+**Last Updated**: February 22, 2026  
 **Next Review**: Upon major architecture changes
 
 ---
 
-*This index reflects the complete technical flow documentation aligned with the current v2.2.0 implementation of the Umamusume Pretty Derby Career Planner with game-accurate mechanics.*
+*This index reflects the complete technical flow documentation aligned with the current v2.3.0 implementation of the Umamusume Pretty Derby Career Planner with game-accurate mechanics.*

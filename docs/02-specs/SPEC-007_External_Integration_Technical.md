@@ -1,9 +1,9 @@
 # SPEC-007: External Integration System - Technical Specification
 
-**Document Version**: 2.2.0  
-**Date**: 2026-01-28  
+**Document Version**: 2.3.0  
+**Date**: 2026-02-22  
 **Project**: Umamusume Pretty Derby Career Planner  
-**Status**: Active - Updated with game-accurate data validation  
+**Status**: Complete - Implementation verified  
 **Classification**: Internal - Development Team
 
 ---
@@ -14,9 +14,9 @@
 |-----------|-------|
 | **Document ID** | SPEC-007 |
 | **Related PRD** | [PRD-007: External Integration](../prds/PRD-007_External_Integration.md) |
-| **Architecture Version** | v2.2.0 |
+| **Architecture Version** | v2.3.0 |
 | **Approval Status** | Approved |
-| **Last Reviewed** | 2026-01-28 |
+| **Last Reviewed** | 2026-02-22 |
 
 ### Related Documents
 
@@ -71,7 +71,7 @@ The External Integration System manages synchronization with game APIs, communit
 **Core Responsibilities**:
 
 - External API client management with circuit breaker pattern
-- Game data synchronization from umapyoi.net and UmamusumeDB
+- Game data synchronization from umapyoi.net and GameTora
 - OCR screenshot processing for data extraction
 - WebSocket real-time updates via Laravel Reverb
 - Community tool integration and data sharing
@@ -94,7 +94,7 @@ The system must handle API unavailability gracefully while ensuring users always
 
 **In Scope**:
 
-- External API clients (umapyoi.net, UmamusumeDB)
+- External API clients (umapyoi.net, GameTora)
 - Circuit breaker pattern implementation
 - Response caching and invalidation
 - OCR processing with Tesseract and GD
@@ -115,7 +115,7 @@ The system must handle API unavailability gracefully while ensuring users always
 | Component | Technology | Version | Purpose |
 |-----------|-----------|---------|---------|
 | **Framework** | Laravel | 12.x | Application foundation |
-| **Language** | PHP | 8.3+ | Server-side logic |
+| **Language** | PHP | 8.2+ | Server-side logic |
 | **HTTP Client** | Guzzle/Laravel HTTP | Latest | API requests |
 | **OCR Engine** | Tesseract | 5.x | Text extraction |
 | **Image Processing** | GD Library | 2.x | Image preprocessing |
@@ -138,7 +138,7 @@ graph TB
     end
 
     subgraph "Application Layer"
-        ExternalSvc[ExternalAPIService]
+        ExternalSvc[ExternalDataService]
         OCRSvc[OCRProcessingService]
         SyncSvc[DataSyncService]
         BroadcastSvc[BroadcastService]
@@ -146,7 +146,7 @@ graph TB
 
     subgraph "Integration Layer"
         UmapyoiClient[UmapyoiApiClient]
-        UmaDBClient[UmamusumeDBApiClient]
+        UmaDBClient[GameToraScraperService]
         CircuitBreaker[CircuitBreaker]
         RateLimiter[RateLimiter]
     end
@@ -584,7 +584,7 @@ class UmapyoiApiClient implements ExternalApiClientInterface
 }
 ```
 
-### 3.3 UmamusumeDB API Client
+### 3.3 GameTora API Client
 
 ```php
 <?php
@@ -596,14 +596,14 @@ use App\Services\ExternalAPI\CircuitBreaker;
 use Illuminate\Support\Facades\{Http, Cache, Log};
 
 /**
- * UmamusumeDB API Client
+ * GameTora Scraper Service
  * 
  * Fallback external data source for game information.
  */
-class UmamusumeDBApiClient implements ExternalApiClientInterface
+class GameToraScraperService implements ExternalApiClientInterface
 {
-    private const BASE_URL = 'https://umamusumedb.com/api';
-    private const CACHE_PREFIX = 'umadb';
+    private const BASE_URL = 'https://gametora.com/api';
+    private const CACHE_PREFIX = 'gametora';
 
     public function __construct(
         private CircuitBreaker $circuitBreaker
@@ -686,7 +686,7 @@ class UmamusumeDBApiClient implements ExternalApiClientInterface
      */
     public function getSourceIdentifier(): string
     {
-        return 'umamusumedb';
+        return 'gametora';
     }
 
     /**
@@ -702,7 +702,7 @@ class UmamusumeDBApiClient implements ExternalApiClientInterface
         
         return Cache::remember($cacheKey, 86400, function () use ($endpoint, $params) {
             return $this->circuitBreaker->call(
-                key: 'umamusumedb',
+                key: 'gametora',
                 callback: fn() => $this->executeRequest($endpoint, $params),
                 fallback: fn() => []
             );
@@ -1060,7 +1060,7 @@ class CircuitBreaker
      */
     public function getAllStates(): array
     {
-        $keys = ['umapyoi', 'umamusumedb'];
+        $keys = ['umapyoi', 'gametora'];
         $states = [];
 
         foreach ($keys as $key) {
@@ -2641,7 +2641,7 @@ use Illuminate\Support\Str;
 class CommunityIntegrationService
 {
     private const COMMUNITY_TOOLS = [
-        'UmamusumeDB' => 'https://umamusumedb.com',
+        'GameTora' => 'https://gametora.com',
         'UmaPyoi' => 'https://umapyoi.net',
         'Uel' => 'https://uel.ink',
     ];
@@ -2775,7 +2775,7 @@ class CommunityIntegrationService
         return Cache::remember($cacheKey, now()->addDay(), function () use ($type) {
             try {
                 $response = Http::timeout(10)
-                    ->get(self::COMMUNITY_TOOLS['UmamusumeDB'] . "/api/meta/{$type}");
+                    ->get(self::COMMUNITY_TOOLS['GameTora'] . "/api/meta/{$type}");
 
                 if ($response->successful()) {
                     return $response->json('rankings', []);
@@ -2838,7 +2838,7 @@ readonly class ShareResult
 
 namespace App\Services\ExternalAPI;
 
-use App\Services\ExternalAPI\Clients\{UmapyoiApiClient, UmamusumeDBApiClient};
+use App\Services\ExternalAPI\Clients\{UmapyoiApiClient, GameToraScraperService};
 use App\Contracts\ExternalApiClientInterface;
 use Illuminate\Support\Facades\{Cache, Log};
 
@@ -2847,13 +2847,13 @@ use Illuminate\Support\Facades\{Cache, Log};
  * 
  * Orchestrates external API calls with fallback support.
  */
-class ExternalAPIService
+class ExternalDataService
 {
     private array $clients = [];
 
     public function __construct(
         private UmapyoiApiClient $primaryClient,
-        private UmamusumeDBApiClient $fallbackClient,
+        private GameToraScraperService $fallbackClient,
         private CircuitBreaker $circuitBreaker
     ) {
         $this->clients = [
@@ -2943,7 +2943,7 @@ class ExternalAPIService
         }
 
         // Try fallback client
-        $fallbackState = $this->circuitBreaker->getState('umamusumedb');
+        $fallbackState = $this->circuitBreaker->getState('gametora');
         
         if ($fallbackState->allowsRequests()) {
             try {
@@ -3006,7 +3006,7 @@ class ExternalAPIService
             'fallback' => [
                 'name' => $this->fallbackClient->getSourceIdentifier(),
                 'healthy' => $this->fallbackClient->isHealthy(),
-                'circuit_state' => $this->circuitBreaker->getState('umamusumedb')->value,
+                'circuit_state' => $this->circuitBreaker->getState('gametora')->value,
             ],
         ];
     }
@@ -3062,7 +3062,7 @@ use Illuminate\Support\Facades\{DB, Log};
 class DataSyncService
 {
     public function __construct(
-        private ExternalAPIService $externalApi,
+        private ExternalDataService $externalApi,
         private WebSocketBroadcastingService $broadcaster
     ) {}
 
@@ -3313,7 +3313,7 @@ Get health status of external APIs.
             "response_time_ms": 145
         },
         "fallback": {
-            "name": "umamusumedb",
+            "name": "gametora",
             "healthy": true,
             "circuit_state": "closed",
             "response_time_ms": 220
@@ -3629,7 +3629,7 @@ Stale Data Cache:
 
 Circuit Breaker:
 - circuit_breaker:umapyoi
-- circuit_breaker:umamusumedb
+- circuit_breaker:gametora
 
 Community:
 - community:tips:{traineeId}
@@ -3732,7 +3732,7 @@ App\Exceptions\ExternalIntegrationException (Base)
         "message": "External APIs are currently unavailable",
         "details": {
             "primary_api": "umapyoi - circuit open",
-            "fallback_api": "umamusumedb - timeout"
+            "fallback_api": "gametora - timeout"
         },
         "fallback_used": true,
         "data_freshness": "2026-01-23T10:00:00Z"
@@ -3785,9 +3785,9 @@ return [
         'base_url' => env('UMAPYOI_BASE_URL', 'https://umapyoi.net/api/v1'),
     ],
     
-    'umamusumedb' => [
-        'api_key' => env('UMAMUSUMEDB_API_KEY'),
-        'base_url' => env('UMAMUSUMEDB_BASE_URL', 'https://umamusumedb.com/api'),
+    'gametora' => [
+        'api_key' => env('GAMETORA_API_KEY'),
+        'base_url' => env('GAMETORA_BASE_URL', 'https://gametora.com/api'),
     ],
 ];
 ```
@@ -3937,7 +3937,7 @@ test('circuit transitions to half-open after recovery timeout', function () {
 ```php
 // tests/Feature/ExternalAPI/ExternalAPITest.php
 
-use App\Services\ExternalAPI\ExternalAPIService;
+use App\Services\ExternalAPI\ExternalDataService;
 use Illuminate\Support\Facades\Http;
 
 test('fetches character data from primary API', function () {
@@ -3950,7 +3950,7 @@ test('fetches character data from primary API', function () {
         ], 200),
     ]);
     
-    $service = app(ExternalAPIService::class);
+    $service = app(ExternalDataService::class);
     $result = $service->fetchCharacterData(1001);
     
     expect($result)->toHaveKey('name', 'Special Week');
@@ -3959,7 +3959,7 @@ test('fetches character data from primary API', function () {
 test('falls back to secondary API when primary fails', function () {
     Http::fake([
         'umapyoi.net/*' => Http::response([], 500),
-        'umamusumedb.com/api/characters/1001' => Http::response([
+        'gametora.com/api/characters/1001' => Http::response([
             'data' => [
                 'id' => 1001,
                 'name' => 'Special Week',
@@ -3967,7 +3967,7 @@ test('falls back to secondary API when primary fails', function () {
         ], 200),
     ]);
     
-    $service = app(ExternalAPIService::class);
+    $service = app(ExternalDataService::class);
     $result = $service->fetchCharacterData(1001);
     
     expect($result)->toHaveKey('name', 'Special Week');
@@ -3984,7 +3984,7 @@ test('returns cached data when all APIs fail', function () {
         '*' => Http::response([], 500),
     ]);
     
-    $service = app(ExternalAPIService::class);
+    $service = app(ExternalDataService::class);
     $result = $service->fetchCharacterData(1001);
     
     expect($result)->toHaveKey('name', 'Special Week (Cached)');
@@ -4232,7 +4232,7 @@ class ExternalApiCacheFactory extends Factory
         $resourceType = $this->faker->randomElement(['characters', 'support_cards', 'skills', 'races']);
 
         return [
-            'api_source' => $this->faker->randomElement(['umapyoi', 'umamusumedb']),
+            'api_source' => $this->faker->randomElement(['umapyoi', 'gametora']),
             'resource_type' => $resourceType,
             'resource_id' => $this->faker->optional()->numberBetween(1, 1000),
             'cache_key' => "external:{$resourceType}:" . $this->faker->uuid(),
@@ -4307,7 +4307,7 @@ class ExternalApiCacheFactory extends Factory
 | `/api/v1/meta/tiers` | GET | Get meta tier rankings | 30/min |
 | `/api/v1/health` | GET | Health check | 120/min |
 
-**UmamusumeDB API**:
+**GameTora API**:
 
 | Endpoint | Method | Description | Rate Limit |
 |----------|--------|-------------|------------|
@@ -4442,9 +4442,9 @@ return [
         'retry_times' => env('UMAPYOI_RETRY_TIMES', 3),
     ],
 
-    'umamusumedb' => [
-        'base_url' => env('UMAMUSUMEDB_BASE_URL', 'https://umamusumedb.com/api'),
-        'timeout' => env('UMAMUSUMEDB_TIMEOUT', 10),
+    'gametora' => [
+        'base_url' => env('GAMETORA_BASE_URL', 'https://gametora.com/api'),
+        'timeout' => env('GAMETORA_TIMEOUT', 10),
     ],
 
     'cache_ttl' => [
@@ -4486,6 +4486,7 @@ return [
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.3.0 | 2026-02-22 | Development Team | Updated to v2.3.0 architecture: GameTora replaces UmamusumeDB, ExternalDataService replaces ExternalAPIService, GameToraScraperService replaces UmamusumeDBApiClient, PHP 8.2+, status complete |
 | 2.2.0 | 2026-01-28 | Development Team | Updated to align with game-accurate mechanics (v2.2.0 architecture), data validation for aptitude grades (G-S) |
 | 2.0.0 | 2026-01-24 | Development Team | Full v2.0.0 alignment, complete technical specification with all services, API endpoints, database schema, testing strategy, and comprehensive appendices |
 | 1.0.0 | 2026-01-14 | Development Team | Initial technical specification |
@@ -4506,7 +4507,7 @@ return [
 **Document Control**  
 **Maintained By**: Backend Development Team  
 **Review Frequency**: Bi-weekly during active development  
-**Next Review Date**: 2026-02-07  
+**Next Review Date**: 2026-03-07  
 **Distribution**: Development Team, QA Team, DevOps Team, Product Management
 
 ---

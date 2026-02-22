@@ -268,7 +268,7 @@ Successfully completed **Phase 3: Interactive Components** of the UI implementat
 
 ### Phase 3: Interactive Components ✅
 
-4. CharacterCard
+1. CharacterCard
 2. SupportCard
 3. SkillCard
 4. **DeckSlot** (NEW)

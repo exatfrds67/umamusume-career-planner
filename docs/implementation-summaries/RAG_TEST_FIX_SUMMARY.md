@@ -21,6 +21,7 @@ ArgumentCountError: Too few arguments to function App\Services\AI\HybridAIServic
 HybridAIService constructor was updated to include VectorStoreService:
 
 **Before (4 parameters):**
+
 ```php
 public function __construct(
     MCPClientService $mcpClient,
@@ -31,6 +32,7 @@ public function __construct(
 ```
 
 **After (5 parameters):**
+
 ```php
 public function __construct(
     MCPClientService $mcpClient,
@@ -80,12 +82,14 @@ $this->hybridService = new HybridAIService(
 ### Test Results
 
 **Before Fix:**
+
 ```
 Tests:    10 failed, 1 skipped, 68 passed (283 assertions)
 Duration: ~6s
 ```
 
 **After Fix:**
+
 ```
 Tests:    1 skipped, 78 passed (314 assertions)
 Duration: 6.58s
@@ -120,12 +124,14 @@ PASS   121 files
 ## Impact
 
 ### Files Modified
+
 - **tests/Unit/Services/AI/HybridAIServiceTest.php**
   - Added VectorStoreService import
   - Created VectorStoreService mock in beforeEach()
   - Updated HybridAIService constructor call with 5th parameter
 
 ### Files Documented
+
 - **.agents/memory.instruction.md**
   - Updated RAG implementation section
   - Added constructor signature warning
@@ -150,6 +156,7 @@ Success Rate:    99.97%
 ### 1. Constructor Dependency Changes Require Test Updates
 
 When adding new dependencies to a service constructor:
+
 1. ✅ Update service implementation
 2. ✅ Update service provider bindings
 3. ✅ **Update ALL test mocks** (critical step)
@@ -158,6 +165,7 @@ When adding new dependencies to a service constructor:
 ### 2. Test-Driven Development Best Practice
 
 Ideal flow:
+
 1. Write failing tests first
 2. Implement feature to pass tests
 3. Update existing tests that break due to refactoring
@@ -180,17 +188,20 @@ grep -r "Mockery::mock(HybridAIService" tests/
 ## Future Prevention
 
 ### Documentation
+
 - [x] Updated memory.instruction.md with constructor signature warning
 - [x] Added example code for proper mocking
 - [x] Documented test fix history
 
 ### Development Workflow
+
 1. When adding constructor dependencies, immediately search for test usages
 2. Use IDE refactoring tools to update all constructor calls
 3. Run affected test suites before committing
 4. Add comments to complex constructors indicating test impact
 
 ### Code Review Checklist
+
 - [ ] Constructor changes include test updates
 - [ ] All test suites pass locally
 - [ ] CI/CD pipeline green
@@ -208,6 +219,7 @@ grep -r "Mockery::mock(HybridAIService" tests/
 ✅ Frontend UI (knowledge badges, source display)  
 
 **Next Steps:**
+
 1. ~~Fix HybridAIServiceTest constructor~~ ✅ Complete
 2. Consider adding more knowledge base documents (races, support cards, scenarios)
 3. Monitor RAG performance in production (embedding latency, cache hit rate)
@@ -216,11 +228,13 @@ grep -r "Mockery::mock(HybridAIService" tests/
 ---
 
 **Related Documentation:**
+
 - [RAG Implementation Summary](./RAG_IMPLEMENTATION_SUMMARY.md)
 - [Neuron RAG Guide](../neuron/rag.md)
 - [Memory File](./.agents/memory.instruction.md)
 
 **Test Files:**
+
 - `tests/Unit/Services/AI/HybridAIServiceTest.php`
 - `tests/Unit/Services/AI/VectorStoreServiceTest.php`
 - `tests/Feature/Feature/AI/RAGEnhancedChatTest.php`

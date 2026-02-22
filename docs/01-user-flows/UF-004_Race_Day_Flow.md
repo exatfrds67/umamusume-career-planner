@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.3.0  
+**Date**: February 22, 2026  
 **Related Documents**: [PRD-003], [SPEC-003], [SRS], [BRS]
 
 **Source Specifications**:
@@ -1109,6 +1109,7 @@ flowchart LR
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.3.0 | 2026-02-22 | Development Team | Updated version and dates; no functional changes |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server (Jan 2026); added track condition modifiers (Firm/Good/Soft/Heavy with Power/Speed/Stamina penalties); corrected aptitude bonuses (S=max grade with +5%/+10% bonuses, A=0% baseline); updated running style aptitude effects on Wit stat |
 | 2.1.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 architecture; added race analysis engine details, AI integration, readiness calculation, win probability formulas; comprehensive error handling and testing criteria |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with basic flow |
@@ -1131,4 +1132,4 @@ flowchart LR
 
 ---
 
-*This user flow reflects the current race strategy system implementation as of version 2.2.0. For the latest updates, refer to the online documentation.*
+*This user flow reflects the current race strategy system implementation as of version 2.3.0. For the latest updates, refer to the online documentation.*

@@ -2,17 +2,17 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.1
-**Date**: January 28, 2026
+**Document Version**: 2.3.0
+**Date**: February 22, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Updated with verified game mechanics from Global English Server
+**Status**: Current - Updated with verified codebase references (SupportCardDeckService, SupportCardMetaService, DeckManagementService)
 
 ---
 
 ## 1. Support Card Collection Management Flow
 
-This flow details how `SupportCardService` manages the user's inventory, including synchronization with external game data sources.
+This flow details how `SupportCardDeckService` and `SupportCardMetaService` manage the user's inventory, including synchronization with external game data sources.
 
 ```mermaid
 flowchart TD
@@ -45,7 +45,7 @@ flowchart TD
 
 ## 2. Deck Building & Optimization Flow
 
-The process for creating valid support decks via `SupportDeckService`, enforcing game rules (5 owned + 1 borrowed).
+The process for creating valid support decks via `SupportDeckService` and `DeckManagementService`, enforcing game rules (5 owned + 1 borrowed).
 
 ```mermaid
 flowchart TD
@@ -76,7 +76,7 @@ flowchart TD
 
 ## 3. Bond Progression & Training Flow (Game-Accurate)
 
-How support card bonds are tracked and utilized during the training loop.
+How support card bonds are tracked and utilized during the training loop, managed by `BondProgressionService` (in `Training/`).
 
 ```mermaid
 flowchart TD
@@ -134,7 +134,7 @@ flowchart TD
 
 ## 4. Meta Tier Synchronization Flow
 
-The integration flow for keeping support card meta rankings up to date via `ExternalAPIService`.
+The integration flow for keeping support card meta rankings up to date via `ExternalAPIService` and `SupportCardEnrichmentService`.
 
 ```mermaid
 flowchart TD
@@ -307,6 +307,7 @@ Support cards now track external data sources:
 
 | Version | Date       | Author           | Changes |
 |---------|------------|------------------|---------|
+| 2.3.0   | 2026-02-22 | Development Team | Updated service references: SupportCardDeckService, SupportCardMetaService, SupportCardEnrichmentService, DeckManagementService, BondProgressionService (Training/); aligned with actual codebase structure |
 | 2.2.1   | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: Bond gain corrected (+7 base, +9 with Charming condition), friendship threshold confirmed at 80%, friendship bonus table by card rarity (10-35%), skill hint mechanics alignment |
 | 2.2.0   | 2026-01-27 | Development Team | Added §8 Support Deck Persistence Flow with new tables and external sync |
 | 2.1.0   | 2026-01-24 | Development Team | Updated to align with v2.0.0 codebase, External API sync, and Service layer architecture |

@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0
-**Date**: February 21, 2026
+**Document Version**: 2.4.0
+**Date**: February 22, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned to codebase v2.3.0 and game-accurate mechanics
+**Status**: Current - Aligned to codebase v2.4.0, 571 routes, 3,316+ tests, 11,563+ assertions
 
 ---
 
@@ -27,7 +27,7 @@
 
 ## 1. Purpose
 
-This Software Integration Plan defines the integration strategy for external services, internal subsystems, and AI components within the Umamusume Pretty Derby Career Planner. It ensures seamless coordination between the Laravel 12 backend, Neuron AI agents, MCP servers, external APIs, and the OCR pipeline.
+This Software Integration Plan defines the integration strategy for external services, internal subsystems, and AI components within the Umamusume Pretty Derby Career Planner. It ensures seamless coordination between the Laravel 12 backend, Neuron AI agents, MCP servers (42 tool services), external APIs, the OCR pipeline, and the Admin Panel.
 
 ---
 
@@ -48,14 +48,39 @@ This Software Integration Plan defines the integration strategy for external ser
 | Memory MCP | Local | Conversation context | Implemented |
 | Filesystem MCP | Local | File operations | Implemented |
 | Fetch MCP | Local | HTTP requests | Implemented |
+| AWS MCP | Remote | AWS API/Knowledge/Pricing tools | Implemented |
+| Context7 MCP | Remote | Context-aware tool services | Implemented |
+| Tool Chaining MCP | Local | Multi-step tool orchestration | Implemented |
 | Custom MCP | Remote | Domain-specific tools | Optional |
+
+### 2.3 MCP Agent Orchestration
+
+| Agent | Purpose | Status |
+|-------|---------|--------|
+| CareerStrategyAgent | Career path optimization | Implemented |
+| HintFarmingStrategyAgent | Hint acquisition planning | Implemented |
+| LongTermDevelopmentAgent | Multi-career progression | Implemented |
+| PerformanceAnalyticsAgent | Stats analysis and trending | Implemented |
+| ResourceManagementAgent | SP/energy budget optimization | Implemented |
+| SkillBuildPlanningAgent | Skill set composition | Implemented |
+| SPBudgetManagementAgent | SP allocation strategy | Implemented |
+| SummerCampOptimizationAgent | Summer camp event strategy | Implemented |
+| TrainingOptimizationAgent | Training session optimization | Implemented |
 
 ### 2.3 External APIs
 
 | API | Purpose | Status |
 |-----|---------|--------|
 | umapyoi.net | Character and support card data | Implemented |
-| umamusumedb.com | Skill and race data | Implemented |
+| GameTora | Skill and race data (web scraping) | Implemented |
+
+### 2.4 Admin Panel
+
+| Component | Purpose | Status |
+|-----------|---------|--------|
+| DatabaseMaintenanceService | Database backups, migrations, seeding | Implemented |
+| SystemHealthService | System optimization and health checks | Implemented |
+| LogReaderService | Log viewing and analysis | Implemented |
 
 ### 2.4 OCR Engine
 
@@ -63,7 +88,9 @@ This Software Integration Plan defines the integration strategy for external ser
 |-----------|------------|---------|--------|
 | OCR Service | Tesseract + GD | Screenshot parsing | Implemented |
 | Preprocessing | GD Library | Image enhancement | Implemented |
-| Parser | Custom | Data extraction | Implemented |
+| Parser | Custom (ParserFactory + Parsers/) | Data extraction | Implemented |
+| Screen Type Detector | Custom | Auto-detect screenshot type | Implemented |
+| Data Integration | Custom | Import OCR results to models | Implemented |
 
 ---
 
@@ -100,7 +127,7 @@ flowchart TB
 
     subgraph External["External Services"]
         Umapyoi["umapyoi.net API"]
-        UmamusumeDB["umamusumedb.com API"]
+        GameTora["GameTora Scraper"]
         OCR["Tesseract OCR"]
     end
 
@@ -110,11 +137,18 @@ flowchart TB
         FileStorage["File Storage"]
     end
 
+    subgraph Admin["Admin Panel"]
+        DBMaintenance["Database Maintenance"]
+        SystemHealth["System Health"]
+        LogReader["Log Reader"]
+    end
+
     Frontend --> Backend
     Backend --> AI
     Backend --> MCP
     Backend --> External
     Backend --> Storage
+    Backend --> Admin
     AI --> Neuron
     MCP --> MCPClient
     MCPClient --> MemoryServer
@@ -176,9 +210,13 @@ gantt
     section Phase 4: MCP Integration
     MCP Server Setup           :done, p4a, after p3b, 5d
     MCP Client Integration     :done, p4b, after p4a, 5d
-    section Phase 5: Testing
-    Integration Testing        :active, p5a, after p4b, 7d
-    Performance Testing        :p5b, after p5a, 5d
+    MCP Agent Orchestration    :done, p4c, after p4b, 7d
+    section Phase 5: Admin Panel
+    Admin Services             :done, p5a, after p4c, 5d
+    Database Maintenance       :done, p5b, after p5a, 3d
+    section Phase 6: Testing
+    Integration Testing        :done, p6a, after p5b, 7d
+    Performance Testing        :active, p6b, after p6a, 5d
 ```
 
 ### 4.2 Integration Approach
@@ -187,9 +225,10 @@ gantt
 |-------|-------|--------------|
 | Phase 1 | Foundation | Database, models, repositories |
 | Phase 2 | AI Integration | Ollama, Bedrock, Neuron agents |
-| Phase 3 | External Services | API clients, OCR pipeline |
-| Phase 4 | MCP Integration | MCP servers, client integration |
-| Phase 5 | Testing | Integration and performance tests |
+| Phase 3 | External Services | API clients, OCR pipeline, GameTora scraper |
+| Phase 4 | MCP Integration | MCP servers, client integration, 9 orchestration agents |
+| Phase 5 | Admin Panel | Database maintenance, system health, log reader |
+| Phase 6 | Testing | Integration and performance tests (3,316+ tests) |
 
 ---
 
@@ -283,7 +322,7 @@ flowchart TD
 
     subgraph APIs["External APIs"]
         Umapyoi["umapyoi.net"]
-        UmamusumeDB["umamusumedb.com"]
+        GameTora["GameTora (scraping)"]
     end
 
     subgraph Data["Data Processing"]
@@ -569,10 +608,18 @@ flowchart LR
 | Configuration | Location | Purpose |
 |---------------|----------|---------|
 | AI Settings | `config/ai.php` | Provider selection, model config |
+| AI Agents | `config/ai_agents.php` | Agent-specific configurations |
+| Advisory Prompts | `config/advisory_prompts.php` | AI prompt templates |
 | Neuron Config | `config/neuron.php` | Agent definitions, tools |
 | MCP Config | `config/mcp.php` | Server definitions, connections |
-| External APIs | `config/external-api.php` | API endpoints, credentials |
-| OCR Settings | `config/ocr.php` | Tesseract paths, options |
+| MCP Tools | `config/mcp_tools.php` | Tool controls and settings |
+| MCP Agents | `config/mcp-agents.php` | Agent-specific MCP settings |
+| External APIs | `config/external-apis.php` | API endpoints, credentials |
+| API Performance | `config/api-performance.php` | Performance thresholds |
+| APM Config | `config/apm.php` | Application performance monitoring |
+| Cache Mgmt | `config/cache-management.php` | Cache strategy and TTLs |
+| Query Optimization | `config/query-optimization.php` | Query tuning settings |
+| AWS Config | `config/aws.php` | AWS/Bedrock credentials and regions |
 
 ### 9.3 Monitoring and Observability
 
@@ -612,17 +659,22 @@ flowchart TD
 | AI Integration | Ollama service operational | ✅ Complete |
 | AI Integration | Bedrock fallback functional | ✅ Complete |
 | AI Integration | Neuron agents responding | ✅ Complete |
+| AI Integration | AI Dashboard service | ✅ Complete |
 | MCP Integration | Memory server connected | ✅ Complete |
 | MCP Integration | Filesystem server connected | ✅ Complete |
 | MCP Integration | Fetch server connected | ✅ Complete |
+| MCP Integration | 9 orchestration agents deployed | ✅ Complete |
+| MCP Integration | 42 MCP tool services registered | ✅ Complete |
 | External APIs | umapyoi.net integration | ✅ Complete |
-| External APIs | umamusumedb.com integration | ✅ Complete |
+| External APIs | GameTora scraper integration | ✅ Complete |
 | External APIs | Circuit breaker functional | ✅ Complete |
 | OCR Pipeline | Image upload working | ✅ Complete |
 | OCR Pipeline | Text extraction accurate | ✅ Complete |
 | OCR Pipeline | Data parsing validated | ✅ Complete |
-| Testing | Unit tests passing | ✅ Complete |
-| Testing | Integration tests passing | 🔄 In Progress |
+| Admin Panel | Database maintenance service | ✅ Complete |
+| Admin Panel | System health monitoring | ✅ Complete |
+| Testing | Unit tests passing (3,316+ tests) | ✅ Complete |
+| Testing | Integration tests passing | ✅ Complete |
 | Testing | E2E tests passing | 🔄 In Progress |
 
 ### 10.2 Acceptance Criteria
@@ -631,10 +683,10 @@ flowchart TD
 flowchart TD
     subgraph Criteria["Sign-off Criteria"]
         C1["✅ All AI providers operational with fallback"]
-        C2["✅ MCP servers connected and tools functional"]
+        C2["✅ MCP servers connected and 42 tools functional"]
         C3["✅ External APIs integrated with caching"]
         C4["✅ OCR pipeline processing screenshots"]
-        C5["🔄 Integration tests >80% coverage"]
+        C5["✅ Integration tests >80% coverage"]
         C6["🔄 Performance benchmarks met"]
     end
 
@@ -642,8 +694,8 @@ flowchart TD
     C2 --> Complete
     C3 --> Complete
     C4 --> Complete
-    C5 --> InProgress["In Progress"]
-    C6 --> InProgress
+    C5 --> Complete
+    C6 --> InProgress["In Progress"]
 
     Complete["Integration Complete"]
     InProgress --> Complete
@@ -654,7 +706,8 @@ flowchart TD
 ## Document Control
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|| 2.3.0 | 2026-02-21 | Development Team | Updated Livewire 3→4, version alignment, codebase v2.3.0 sync || 2.1.0 | 2026-01-23 | Development Team | Updated to reflect current AI, MCP, and external integrations |
+|---------|------|--------|---------|| 2.4.0 | 2026-02-22 | Development Team | Added 9 MCP agents, Admin Panel integration, GameTora scraper, 42 MCP tools, updated sign-off criteria, 3,316+ tests |
+| 2.3.0 | 2026-02-21 | Development Team | Updated Livewire 3→4, version alignment, codebase v2.3.0 sync || 2.1.0 | 2026-01-23 | Development Team | Updated to reflect current AI, MCP, and external integrations |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with initial integration plan |
 
 ---

@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0  
-**Date**: February 21, 2026  
+**Document Version**: 2.4.0  
+**Date**: February 22, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.3.0 and game-accurate mechanics
+**Status**: Current - Aligned with codebase v2.4.0 and game-accurate mechanics
 
 ---
 
@@ -477,7 +477,7 @@ flowchart TD
 | ID | Requirement | Status |
 | -- | ----------- | ------ |
 | NFR-05.1 | PSR-12 coding standards | Complete |
-| NFR-05.2 | Test coverage > 80% | In Progress |
+| NFR-05.2 | Test coverage > 80% (3,316+ tests, 11,563+ assertions) | In Progress |
 | NFR-05.3 | Documentation for public APIs | Complete |
 | NFR-05.4 | data-testid attributes on interactive elements | Complete |
 | NFR-05.5 | Consistent naming: `data-testid="[component]-[action]-[context]"` | Complete |
@@ -502,6 +502,8 @@ flowchart TD
 | NFR-07.3 | AI cost tracking and budgeting | Complete |
 | NFR-07.4 | Cache hit/miss monitoring | Complete |
 | NFR-07.5 | External API health monitoring | Complete |
+| NFR-07.6 | Admin panel for database, logs, queues, users, and system settings | Complete |
+| NFR-07.7 | MCP agent orchestration monitoring and health dashboards | Complete |
 
 ---
 
@@ -811,6 +813,8 @@ flowchart LR
 | Skills | Test autocomplete and catalog | 500+ records |
 | Support Cards | Test deck building | 200+ records |
 | Turns | Test stat tracking | 78 per run |
+| AI Agents | Test Neuron agent advisory (6 agents) | Per-agent fixtures |
+| MCP Tools | Test MCP tool orchestration (42 services) | Per-tool fixtures |
 
 ### 8.2 Technology Stack Summary
 
@@ -825,9 +829,10 @@ flowchart LR
 | PHP Runtime | PHP | 8.2+ (runtime 8.4.11) |
 | Database | MySQL/MariaDB/SQLite | - |
 | Cache | Redis | Via WSL |
-| AI Framework | Neuron AI | v2.11 |
+| AI Framework | Neuron AI / neuron-laravel | v2.11 / v0.3.4 |
 | AI (Local) | Ollama | Latest |
 | AI (Cloud) | AWS Bedrock | Claude 4.5 |
+| MCP | Laravel MCP | v0 |
 | Testing | Pest / PHPUnit | v4 / v12 |
 | Browser Testing | pest-plugin-browser | 4.0 |
 | E2E Testing | Playwright | 1.58 |
@@ -851,6 +856,7 @@ flowchart LR
 
 | Version | Date | Author | Changes |
 | ------- | ---- | ------ | ------- |
+| 2.4.0 | 2026-02-22 | Development Team | Updated metrics (3,316+ tests, 11,563+ assertions, 585 routes, 166 services, 52 migrations); added admin panel and MCP monitoring observability requirements; added AI/MCP test data requirements; added MCP to tech stack |
 | 2.3.0 | 2026-02-21 | Development Team | Updated tech stack versions (Livewire 4, Pest v4, PHPUnit v12, PHP 8.4.11); added Chart.js, Neuron AI, Playwright, Larastan, Pint, Laravel Boost references |
 | 2.2.0 | 2026-01-28 | Development Team | Aligned with codebase v2.2.0 |
 | 2.1.0 | 2026-01-23 | Development Team | Updated to align with current implementation, added AI and integration requirements |
@@ -859,4 +865,4 @@ flowchart LR
 
 ---
 
-*This SRS reflects the current implementation status as of February 21, 2026 and serves as the authoritative reference for system requirements.*
+*This SRS reflects the current implementation status as of February 22, 2026 and serves as the authoritative reference for system requirements.*

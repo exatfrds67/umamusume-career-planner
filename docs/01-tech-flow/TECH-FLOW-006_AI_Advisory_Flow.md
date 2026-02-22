@@ -1,8 +1,8 @@
 # TECH-FLOW-006: AI Advisory - Technical Flow & Task Breakdown
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
-**Status**: Current - Aligned with codebase v2.2.0 and game-accurate mechanics
+**Document Version**: 2.3.0  
+**Date**: February 22, 2026  
+**Status**: Current - Aligned with codebase v2.3.0 and game-accurate mechanics
 
 **Source Specifications**:
 
@@ -48,7 +48,7 @@
 flowchart TB
     subgraph Presentation["Presentation Layer"]
         Blade["Blade Templates"]
-        Livewire["Livewire 3 Components"]
+        Livewire["Livewire 4 Components"]
         Alpine["Alpine.js Interactions"]
     end
     
@@ -60,7 +60,7 @@ flowchart TB
     end
     
     subgraph AIOrchestration["AI Orchestration Layer"]
-        AIAdvisory["AIAdvisoryService"]
+        AIAdvisory["AdviceService"]
         HybridRouter["Hybrid AI Router"]
         ContextBuilder["Context Builder"]
         CostTracker["Cost Tracker"]
@@ -72,7 +72,7 @@ flowchart TB
     end
     
     subgraph MCPLayer["MCP Integration Layer"]
-        MCPOrchestrator["MCP Orchestrator"]
+        MCPOrchestrator["Agent Orchestration Service"]
         MemoryServer["Memory Server"]
         FilesystemServer["Filesystem Server"]
         FetchServer["Fetch Server"]
@@ -111,8 +111,8 @@ AI Advisory System
 │   └── CostMonitor (Blade Component)
 │
 ├── Controllers
-│   ├── AIAdvisoryController (Web)
-│   ├── API/AIAdvisoryController (API)
+│   ├── AIChatController (Web)
+│   ├── API/AdvisoryController (API)
 │   └── Admin/MCPDashboardController
 │
 ├── Neuron AI Agents
@@ -122,14 +122,14 @@ AI Advisory System
 │   └── CareerStrategyAgent
 │
 ├── AI Services
-│   ├── AIAdvisoryService (Orchestrator)
+│   ├── AdviceService (Orchestrator)
 │   ├── HybridAIService (Router)
 │   ├── OllamaService (Local Provider)
 │   ├── BedrockService (Cloud Provider)
 │   └── CostTrackingService
 │
 ├── MCP Services
-│   ├── MCPOrchestrator
+│   ├── AgentOrchestrationService
 │   ├── MCPMonitoringService
 │   └── MCPHealthDashboardService
 │
@@ -156,7 +156,7 @@ sequenceDiagram
     participant User
     participant UI as Livewire Component
     participant Controller
-    participant Advisory as AIAdvisoryService
+    participant Advisory as AdviceService
     participant Router as Hybrid AI Router
     participant Context as Context Builder
     participant Ollama as Ollama Service
@@ -721,19 +721,19 @@ class CostTrackingService
 
 ### 3.3 Phase 3: AI Advisory Orchestration (Week 2, ~16 hours)
 
-#### Task 6.3.1: Create AIAdvisoryService
+#### Task 6.3.1: Create AdviceService
 
 **Priority**: P0  
 **Effort**: 12 hours  
 **Status**: ✅ Complete
 
 ```php
-// app/Services/AIAdvisoryService.php
-namespace App\Services;
+// app/Services/AI/AdviceService.php
+namespace App\Services\AI;
 
 use App\Services\AI\HybridAIService;
 
-class AIAdvisoryService
+class AdviceService
 {
     public function __construct(
         private HybridAIService $aiService,
@@ -822,7 +822,7 @@ PROMPT;
 - Prompt engineering for training/race/skill advice
 - Response parsing and formatting
 - Unit tests: 8 tests
-- **Files**: `app/Services/AIAdvisoryService.php`
+- **Files**: `app/Services/AI/AdviceService.php`
 
 ---
 
@@ -1014,7 +1014,7 @@ class AIContextSnapshot extends Model
 
 ### 3.5 Phase 5: API Layer (Week 3, ~10 hours)
 
-#### Task 6.5.1: Create AIAdvisoryController
+#### Task 6.5.1: Create AIChatController
 
 **Priority**: P0  
 **Effort**: 6 hours  
@@ -1029,7 +1029,7 @@ class AIContextSnapshot extends Model
 
 **Deliverables**:
 
-- **Files**: `app/Http/Controllers/API/AIAdvisoryController.php`
+- **Files**: `app/Http/Controllers/AIChatController.php`
 
 ---
 
@@ -1076,11 +1076,11 @@ class AIAdviceRequest extends FormRequest
 ```php
 // tests/Feature/AIAdvisoryTest.php
 use Tests\TestCase;
-use App\Services\AIAdvisoryService;
+use App\Services\AI\AdviceService;
 
 test('generates AI advice for training', function () {
     $character = Character::factory()->create();
-    $service = app(AIAdvisoryService::class);
+    $service = app(AdviceService::class);
     
     $advice = $service->getAdvice(
         query: 'What training should I do next?',
@@ -1096,7 +1096,7 @@ test('falls back to Bedrock when Ollama unavailable', function () {
     // Mock Ollama unavailability
     config(['ai.providers.ollama.enabled' => false]);
     
-    $service = app(AIAdvisoryService::class);
+    $service = app(AdviceService::class);
     $advice = $service->getAdvice('Give me race strategy');
     
     expect($advice->provider)->toBe('bedrock');
@@ -1130,7 +1130,7 @@ test('falls back to Bedrock when Ollama unavailable', function () {
 
 ## 4. Component Specifications
 
-### 4.1 AIAdvisoryService::getAdvice()
+### 4.1 AdviceService::getAdvice()
 
 ```php
 /**
@@ -1240,9 +1240,9 @@ erDiagram
 
 ```mermaid
 flowchart TD
-    AIAdvisoryService --> HybridAIService
-    AIAdvisoryService --> ContextBuilderService
-    AIAdvisoryService --> CostTrackingService
+    AdviceService --> HybridAIService
+    AdviceService --> ContextBuilderService
+    AdviceService --> CostTrackingService
     
     HybridAIService --> OllamaService
     HybridAIService --> BedrockService
@@ -1357,7 +1357,7 @@ pie title Test Distribution
 ### 10.1 Functional Completeness
 
 - [x] Hybrid AI architecture (Local Ollama + Cloud Bedrock fallback)
-- [x] 3 AI services implemented (AIAdvisoryService, OllamaService, BedrockService)
+- [x] 3 AI services implemented (AdviceService, OllamaService, BedrockService)
 - [x] Health monitoring and automatic fallback
 - [x] Context-aware advice generation
 - [x] Cost tracking and budget management
@@ -1396,6 +1396,7 @@ pie title Test Distribution
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.3.0 | 2026-02-22 | Development Team | Updated service names to match codebase (AdviceService, AgentOrchestrationService, AIChatController); Livewire 4 |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: aligned AI context with game-accurate stat ranges, aptitude grades, and training formulas |
 | 2.1.0 | 2026-01-24 | Development Team | Updated to v2.0.0 implementation standards; aligned with industry documentation guidelines; added comprehensive cross-references; enhanced code examples and diagrams; added Neuron AI and MCP integration |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with detailed specifications |
@@ -1418,4 +1419,4 @@ pie title Test Distribution
 
 ---
 
-*This technical flow document reflects the current implementation as of version 2.0.0 and follows industry-standard documentation practices for software development lifecycle (SDLC) artifacts.*
+*This technical flow document reflects the current implementation as of version 2.3.0 and follows industry-standard documentation practices for software development lifecycle (SDLC) artifacts.*

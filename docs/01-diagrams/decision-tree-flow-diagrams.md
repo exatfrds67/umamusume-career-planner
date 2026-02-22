@@ -1,10 +1,10 @@
 # Umamusume Career Planner - Decision Tree Flow Diagrams
 
-**Document Version**: 2.3.0  
-**Date**: February 21, 2026  
+**Document Version**: 2.4.0  
+**Date**: February 22, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.3.0 and game-accurate mechanics
+**Status**: Current - Aligned with codebase v2.4.0 (571 routes, 3,316+ tests, 11,563+ assertions)
 
 ---
 
@@ -26,7 +26,7 @@
 
 ### 1.1 Purpose
 
-This document presents decision tree flow diagrams for the Umamusume Pretty Derby Career Planner application, showing the logical decision-making processes, conditional flows, and branching logic used throughout the system for optimal recommendations. The system leverages **Laravel 12** with **TypeScript support**, **AWS Bedrock Claude 4.5** models (Opus, Sonnet, Haiku), **AWS Bedrock Nova 2** (Lite, Pro), and **Ollama** for local AI processing.
+This document presents decision tree flow diagrams for the Umamusume Pretty Derby Career Planner application, showing the logical decision-making processes, conditional flows, and branching logic used throughout the system for optimal recommendations. The system leverages **Laravel 12** with **Livewire 4**, **Alpine.js 3**, **TailwindCSS v4**, **Neuron AI v2.11** agents, **AWS Bedrock** models, and **Ollama** for local AI processing.
 
 ### 1.2 System Context
 
@@ -37,7 +37,8 @@ The decision trees documented here represent the core optimization logic impleme
 - `app/Services/SkillService.php` - Skill acquisition planning
 - `app/Services/SupportDeckService.php` - Support card optimization
 - `app/Services/AI/HybridAIService.php` - AI provider routing
-- `app/Neuron/Agents/` - AI agent decision logic
+- `app/Neuron/Agents/` - Neuron AI v2.11 agent decision logic
+- `app/Http/Controllers/Admin/` - Admin Panel decision logic (5 controllers)
 
 ### 1.3 Key Terminology
 
@@ -986,10 +987,10 @@ flowchart TD
     SelectCloudModel --> QuickResponse{Quick Response?}
     SelectCloudModel --> GeneralQuery{General Query?}
     
-    StrategyAnalysis -->|Yes| ClaudeSonnet[AWS Bedrock<br/>Claude 3.5 Sonnet<br/>$3/$15 per 1M tokens]
-    ComplexCalc -->|Yes| NovaPro[AWS Bedrock<br/>Nova 2 Pro<br/>Preview pricing]
-    QuickResponse -->|Yes| ClaudeHaiku[AWS Bedrock<br/>Claude 3.5 Haiku<br/>$1/$5 per 1M tokens]
-    GeneralQuery -->|Yes| NovaLite[AWS Bedrock<br/>Nova 2 Lite<br/>$0.00125 per 1K tokens]
+    StrategyAnalysis -->|Yes| ClaudeSonnet[AWS Bedrock<br/>Claude Sonnet<br/>$3/$15 per 1M tokens]
+    ComplexCalc -->|Yes| NovaPro[AWS Bedrock<br/>Nova Pro<br/>Preview pricing]
+    QuickResponse -->|Yes| ClaudeHaiku[AWS Bedrock<br/>Claude Haiku<br/>$1/$5 per 1M tokens]
+    GeneralQuery -->|Yes| NovaLite[AWS Bedrock<br/>Nova Lite<br/>$0.00125 per 1K tokens]
     
     %% Process Responses
     OllamaSimple --> FormatResponse[Format Response]
@@ -1031,11 +1032,11 @@ flowchart TD
 | Provider | Model | Input Cost | Output Cost | Best Use Case |
 |----------|-------|------------|-------------|---------------|
 | **Ollama** | Local Models | $0.00 | $0.00 | Simple queries, high volume, privacy |
-| **Bedrock** | Nova 2 Lite | $0.00125/1K | $0.00125/1K | General queries, cost-effective |
-| **Bedrock** | Claude 3.5 Haiku | $1.00/1M | $5.00/1M | Quick responses, moderate complexity |
-| **Bedrock** | Claude 3.5 Sonnet | $3.00/1M | $15.00/1M | Strategic analysis, standard recommendation |
-| **Bedrock** | Nova 2 Pro | Preview | Preview | Complex calculations, advanced reasoning |
-| **Bedrock** | Claude 4.5 | $5.00/1M | $25.00/1M | Most complex reasoning (rare fallback) |
+| **Bedrock** | Nova Lite | $0.00125/1K | $0.00125/1K | General queries, cost-effective |
+| **Bedrock** | Claude Haiku | $1.00/1M | $5.00/1M | Quick responses, moderate complexity |
+| **Bedrock** | Claude Sonnet | $3.00/1M | $15.00/1M | Strategic analysis, standard recommendation |
+| **Bedrock** | Nova Pro | Preview | Preview | Complex calculations, advanced reasoning |
+| **Bedrock** | Claude Opus | $5.00/1M | $25.00/1M | Most complex reasoning (rare fallback) |
 
 ### 7.4 Quality Assessment Criteria
 
@@ -1212,6 +1213,7 @@ flowchart TD
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.4.0 | 2026-02-22 | Development Team | Fixed TypeScript→Livewire 4/Alpine.js 3 references; added Neuron AI v2.11 version; added Admin Panel controller references; updated stats |
 | 2.3.0 | 2026-02-21 | Development Team | Updated version/date metadata; aligned with 30 current Eloquent models and 8 enums |
 | 2.0.0 | 2026-01-23 | Development Team | Complete rewrite aligned with v2.0.0 implementation; updated all decision trees with current logic; added AI provider selection and storage mode trees; aligned terminology with glossary updates; corrected stat caps, skill hints, and running style labels |
 | 1.0.0 | 2026-01-14 | Development Team | Initial draft with basic decision trees |
@@ -1270,4 +1272,4 @@ flowchart TD
 
 ---
 
-*This document reflects the decision logic implemented in the Umamusume Pretty Derby Career Planner v2.3.0 codebase and serves as the authoritative reference for system optimization algorithms.*
+*This document reflects the decision logic implemented in the Umamusume Pretty Derby Career Planner v2.4.0 codebase and serves as the authoritative reference for system optimization algorithms.*

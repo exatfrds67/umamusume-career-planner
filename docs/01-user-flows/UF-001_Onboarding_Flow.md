@@ -3,8 +3,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.3.0  
+**Date**: February 22, 2026  
 **Related Documents**: [PRD-001], [SPEC-001], [SRS], [BRS]
 
 **Source Specifications**:
@@ -310,7 +310,7 @@ class LocalStorageManager {
 **Laravel Implementation**:
 
 ```php
-// app/Http/Livewire/Onboarding/AccountRegistration.php
+// app/Livewire/Onboarding/AccountRegistration.php
 use App\Services\Auth\RegistrationService;
 
 class AccountRegistration extends Component
@@ -761,6 +761,7 @@ flowchart LR
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.3.0 | 2026-02-22 | Development Team | Updated Livewire namespace to Livewire 4 conventions (`App\Livewire` not `App\Http\Livewire`); updated version and dates |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server (Jan 2026); corrected aptitude grade system (S is maximum, no SS); updated skill hint discount system (5 levels: 10%/20%/30%/35%/40%); added stat soft cap mechanics (1200 with diminishing returns above) |
 | 2.1.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 architecture; added storage mode selection; updated technical implementation details; added comprehensive error handling |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with basic flow |
@@ -780,6 +781,6 @@ flowchart LR
 
 ---
 
-*This user flow reflects the current onboarding implementation as of version 2.2.0. For the latest updates, refer to the online documentation.*
+*This user flow reflects the current onboarding implementation as of version 2.3.0. For the latest updates, refer to the online documentation.*
 
 ```

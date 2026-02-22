@@ -3,7 +3,7 @@
 ## Umamusume Pretty Derby Career Planner
 
 **Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Date**: February 22, 2026  
 **Related Documents**: [PRD-006], [SPEC-006], [FLOW-006], [TECH-FLOW-006]
 
 ---
@@ -76,15 +76,15 @@ The AI advisory system provides intelligent recommendations across all planning 
 |-----------|------|----------------|
 | **User** | Actor | Submits AI queries and reviews recommendations |
 | **Livewire Component** | Presentation | `AIAdvisorChat.php` - Chat interface |
-| **AIAdvisoryController** | Application | Orchestrates AI request workflow |
-| **AIAdvisoryService** | Domain Service | Main AI orchestration service |
-| **AIRouterService** | Domain Service | Provider selection logic |
+| **AIChatController** | Application | Orchestrates AI request workflow |
+| **AdviceService** | Domain Service | Main AI orchestration service |
+| **HybridAIService** | Domain Service | Provider selection logic |
 | **OllamaService** | Infrastructure | Local AI inference |
 | **BedrockService** | Infrastructure | Cloud AI fallback |
 | **NeuronOrchestrator** | AI Framework | Agent execution and coordination |
 | **MCPClientService** | Integration | MCP server communication |
 | **ContextBuilder** | Domain Service | Prompt context preparation |
-| **CostTracker** | Domain Service | Usage and cost monitoring |
+| **CostTrackingService** | Domain Service | Usage and cost monitoring |
 | **Database** | Infrastructure | MySQL/MariaDB persistence |
 | **Cache** | Infrastructure | Redis conversation cache |
 
@@ -99,15 +99,15 @@ app/
 │       └── RecommendationPanel.php
 ├── Http/
 │   └── Controllers/
-│       └── AIAdvisoryController.php
+│       └── AIChatController.php
 ├── Services/
 │   ├── AI/
-│   │   ├── AIAdvisoryService.php
-│   │   ├── AIRouterService.php
+│   │   ├── AdviceService.php
+│   │   ├── HybridAIService.php
 │   │   ├── OllamaService.php
 │   │   ├── BedrockService.php
 │   │   ├── ContextBuilder.php
-│   │   └── CostTracker.php
+│   │   └── CostTrackingService.php
 │   └── MCP/
 │       ├── MCPClientService.php
 │       └── MCPMonitoringService.php
@@ -139,15 +139,15 @@ app/
 sequenceDiagram
     actor User
     participant UI as Livewire Chat
-    participant Controller as AIAdvisoryController
-    participant AdvisorySvc as AIAdvisoryService
-    participant Router as AIRouterService
+    participant Controller as AIChatController
+    participant AdvisorySvc as AdviceService
+    participant Router as HybridAIService
     participant ContextBuilder
     participant Ollama as OllamaService
     participant Bedrock as BedrockService
     participant Neuron as NeuronOrchestrator
     participant MCP as MCPClientService
-    participant CostTracker
+    participant CostTracker as CostTrackingService
     participant DB as Database
     participant Cache as Redis Cache
 
@@ -241,7 +241,7 @@ sequenceDiagram
 **Request Flow:**
 
 ```
-User Query → Controller → AIAdvisoryService → ContextBuilder
+User Query → Controller → AdviceService → ContextBuilder
 ```
 
 **Context Builder Implementation:**
@@ -314,8 +314,8 @@ class ContextBuilder
 **Router Service:**
 
 ```php
-// AIRouterService.php
-class AIRouterService
+// HybridAIService.php
+class HybridAIService
 {
     public function selectProvider(string $query, AIContext $context): string
     {
@@ -794,7 +794,7 @@ class MCPClientService
 
 ```mermaid
 sequenceDiagram
-    participant Service as AIAdvisoryService
+    participant Service as AdviceService
     participant Ollama
     participant Bedrock
     participant Cache
@@ -987,4 +987,4 @@ event(new StatsUpdated($career));
 
 ---
 
-*This sequence diagram reflects the current implementation of the AI advice generation workflow as of v2.0.0. For the most up-to-date information, refer to the source code in `app/Services/AI/AIAdvisoryService.php`, `app/Neuron/`, and related files.*
+*This sequence diagram reflects the current implementation of the AI advice generation workflow as of v2.0.0. For the most up-to-date information, refer to the source code in `app/Services/AI/AdviceService.php`, `app/Neuron/`, and related files.*

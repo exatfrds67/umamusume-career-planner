@@ -3,7 +3,7 @@
 ## Umamusume Pretty Derby Career Planner
 
 **Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Date**: February 22, 2026  
 **Related Documents**: [PRD-007], [SPEC-007], [FLOW-007], [TECH-FLOW-007]
 
 ---
@@ -590,8 +590,8 @@ class RaceReminderEvent extends NotificationEvent
     
     private function calculateReadiness(): int
     {
-        // Implementation from RaceAnalysisService
-        return app(RaceAnalysisService::class)
+        // Implementation from RaceConditionService
+        return app(RaceConditionService::class)
             ->calculateReadiness($this->career, $this->race);
     }
 }

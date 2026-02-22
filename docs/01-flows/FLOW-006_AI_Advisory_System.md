@@ -2,17 +2,17 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0
-**Date**: January 28, 2026
+**Document Version**: 2.3.0
+**Date**: February 22, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Updated with verified game mechanics from Global English Server
+**Status**: Current - Updated with verified codebase references (HybridAIService, Neuron AI v2.11, 42 MCP tools, AgentOrchestrationService)
 
 ---
 
 ## 1. AI Query Routing & Hybrid Processing Flow
 
-This flow illustrates the decision-making process within `AIAdvisoryService` and `AIRouterService` to select the appropriate AI provider (Local Ollama vs. Cloud AWS Bedrock) based on query complexity, availability, and cost constraints.
+This flow illustrates the decision-making process within `AdviceService` and `HybridAIService` to select the appropriate AI provider (Local Ollama vs. Cloud AWS Bedrock) based on query complexity, availability, and cost constraints.
 
 ```mermaid
 flowchart TD
@@ -30,7 +30,7 @@ flowchart TD
     ForceCloud --> RouteCloud
     
     RouteCloud --> CheckBudget{Check Budget}
-    CheckBudget -->|Within Limit| SelectModel[Select Claude 3.5 Sonnet]
+    CheckBudget -->|Within Limit| SelectModel[Select Claude Sonnet 4.5]
     CheckBudget -->|Exceeded| ErrorQuota[Return Quota Error]
     
     RouteLocal --> ExecuteRequest[Execute Inference]
@@ -51,7 +51,13 @@ flowchart TD
 
 ## 2. Neuron Agent Execution Flow
 
-This flow details how specific **Neuron AI Agents** (Training, Race, Skill, Career) orchestrate tool usage to generate grounded recommendations.
+This flow details how specific **Neuron AI Agents** (Training, Race, Skill, Career) orchestrate tool usage to generate grounded recommendations. The application uses Neuron AI v2.11 with `neuron-laravel` v0.3.4, providing 5 Neuron services:
+
+- `CareerPlanningService` → `CareerPlanningAgent`
+- `TrainingAdvisorService` → `TrainingAdvisorAgent`
+- `RaceStrategyService` → `RaceStrategyAgent`
+- `SkillRecommendationService` → `SkillRecommendationAgent`
+- `NeuronAIService` (core orchestration)
 
 ```mermaid
 flowchart TD
@@ -95,7 +101,7 @@ flowchart TD
 
 ## 3. Context Management Flow
 
-Manages conversation history and game state context using the database and Memory MCP server.
+Manages conversation history and game state context using the database and MCP server integration via `MCPClientService`.
 
 ```mermaid
 flowchart TD
@@ -173,8 +179,8 @@ flowchart TD
     
     ExtractUsage --> IdentifyModel{Identify Model}
     
-    IdentifyModel -->|Claude 3.5 Sonnet| CalcSonnet[Apply Sonnet Rates]
-    IdentifyModel -->|Claude 3 Haiku| CalcHaiku[Apply Haiku Rates]
+    IdentifyModel -->|Claude Sonnet 4.5| CalcSonnet[Apply Sonnet Rates]
+    IdentifyModel -->|Claude Haiku 4.5| CalcHaiku[Apply Haiku Rates]
     IdentifyModel -->|Ollama| CalcLocal[Cost = 0]
     
     CalcSonnet --> TotalCost[Calculate Total Request Cost]
@@ -193,9 +199,9 @@ flowchart TD
 
 ---
 
-## 6. MCP Server Integration Flow
+## 6. MCP Agent Orchestration & Tool Integration Flow
 
-Details the interaction between the Laravel backend and external Model Context Protocol servers.
+Details the interaction between the Laravel backend and MCP infrastructure. The system includes `AgentOrchestrationService` coordinating 42 MCP tools, with `MCPMonitoringService` providing health monitoring.
 
 ```mermaid
 flowchart TD
@@ -204,16 +210,19 @@ flowchart TD
     MCPClient --> ResolveServer{Resolve Server}
     
     ResolveServer -->|Memory| MemoryServer[Memory MCP]
-    ResolveServer -->|Filesystem| FileServer[Filesystem MCP]
-    ResolveServer -->|Fetch| FetchServer[Fetch MCP]
+    ResolveServer -->|Fetch| FetchServer[FetchService]
+    ResolveServer -->|AWS| AWSServer[AWSAPIService / AWSKnowledgeService]
+    ResolveServer -->|Context7| Context7Server[Context7Service]
     
     MemoryServer -->|Read/Write| GraphStore[Knowledge Graph]
-    FileServer -->|Read| LocalFiles[Local Configs/Logs]
     FetchServer -->|GET/POST| ExternalWeb[External Web Resources]
+    AWSServer -->|Query| AWSResources[AWS Bedrock / Pricing]
+    Context7Server -->|Lookup| DocResources[Documentation Context]
     
     GraphStore --> ReturnResult[Return Tool Result]
-    LocalFiles --> ReturnResult
     ExternalWeb --> ReturnResult
+    AWSResources --> ReturnResult
+    DocResources --> ReturnResult
     
     ReturnResult --> ValidateResult[Validate Output]
     ValidateResult --> ReturnAgent[Return to Agent]
@@ -223,7 +232,7 @@ flowchart TD
 
 ## 7. Conversational Interface Flow
 
-The user interaction loop within the Livewire `AdvisorChat` component.
+The user interaction loop within the Livewire `AdvisoryPanel` component.
 
 ```mermaid
 flowchart TD
@@ -252,11 +261,38 @@ flowchart TD
 
 ---
 
-## 8. Game Mechanics Reference for AI Agents
+## 8. AI Infrastructure Summary
+
+### 8.1 AI Service Layer (app/Services/AI/)
+
+| Service | Purpose |
+|---------|--------|
+| `AdviceService` | Domain-specific advisory logic |
+| `HybridAIService` | Provider routing (Ollama ↔ Bedrock) |
+| `OllamaService` | Local Ollama inference (llama3.2) |
+| `BedrockService` | AWS Bedrock inference (Claude Sonnet 4.5) |
+| `CostTrackingService` | Token usage and budget management |
+| `ConversationHistoryService` | Conversation state persistence |
+| `AIDashboardService` | AI metrics and dashboard data |
+| `AgentFeedbackService` | Agent feedback collection |
+| `VectorStoreService` | Embedding storage and retrieval |
+
+### 8.2 MCP Infrastructure (app/Services/MCP/)
+
+| Component | Purpose |
+|-----------|--------|
+| `AgentOrchestrationService` | Multi-agent coordination (42 tools) |
+| `MCPClientService` | MCP protocol client |
+| `MCPMonitoringService` | Health monitoring and dashboards |
+| `AgentMemoryService` | Agent memory persistence |
+| `AgentRoutingService` | Query-to-agent routing |
+| `Tools/` | FetchService, AWSAPIService, AWSKnowledgeService, Context7Service, ToolChainingService |
+
+### 8.3 Game Mechanics Reference for AI Agents
 
 This section documents the verified game mechanics that AI agents must use when generating recommendations.
 
-### 8.1 Skill Hint Discounts
+#### 8.3.1 Skill Hint Discounts
 
 | Hint Level | Discount |
 |------------|----------|
@@ -269,7 +305,7 @@ This section documents the verified game mechanics that AI agents must use when 
 
 **Additional**: Fast Learner condition adds +10% (stacks, max 50% total)
 
-### 8.2 Aptitude Grade Modifiers
+#### 8.3.2 Aptitude Grade Modifiers
 
 | Grade | Surface (Power) | Distance (Speed) | Style (Wit) |
 |-------|-----------------|------------------|-------------|
@@ -282,7 +318,7 @@ This section documents the verified game mechanics that AI agents must use when 
 | F     | -70%            | -80%             | -80%        |
 | G     | -90%            | -90%             | -90%        |
 
-### 8.3 Track Conditions
+#### 8.3.3 Track Conditions
 
 | Condition | Power (Turf) | Power (Dirt) | Speed | Stamina Drain |
 |-----------|--------------|--------------|-------|---------------|
@@ -291,13 +327,13 @@ This section documents the verified game mechanics that AI agents must use when 
 | Soft      | -50          | -100         | 0     | +2%/sec       |
 | Heavy     | -50          | -100         | -50   | +2%/sec       |
 
-### 8.4 Training Formula
+#### 8.3.4 Training Formula
 
 ```
 Stat Gain = (Base + StatBonus) × (1 + GrowthRate) × (1 + MoodMultiplier × (1 + MoodEffect)) × (1 + TrainingEffect) × (1 + 0.05 × NumSupportCards) × FriendshipMultiplier
 ```
 
-### 8.5 Stat Caps
+#### 8.3.5 Stat Caps
 
 - **Base Cap**: 1200
 - **Per-Training Cap**: +100 (normal), +50 (above 1200)
@@ -309,6 +345,7 @@ Stat Gain = (Base + StatBonus) × (1 + GrowthRate) × (1 + MoodMultiplier × (1 
 
 | Version | Date       | Author           | Changes |
 |---------|------------|------------------|---------|
+| 2.3.0   | 2026-02-22 | Development Team | Updated service references: AdviceService, HybridAIService, AdvisoryPanel (Livewire); Claude 3.5→Sonnet 4.5, Claude 3→Haiku 4.5; added Neuron AI v2.11 agent/service mapping; expanded MCP section with 42 tools and AgentOrchestrationService; added AI infrastructure summary (§8.1-8.2) |
 | 2.2.0   | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: AI recommendations now use correct hint discount rates (10%/20%/30%/35%/40%), aptitude calculations use S as max grade, training formula integration, track condition modifiers (Firm/Good/Soft/Heavy) |
 | 2.1.0   | 2026-01-24 | Development Team | Updated to align with v2.0.0 architecture: Hybrid AI, Neuron Agents, and MCP integration |
 | 1.0.0   | 2026-01-14 | Development Team | Initial flow definitions |

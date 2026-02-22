@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0
-**Date**: January 28, 2026
+**Document Version**: 2.3.0
+**Date**: February 22, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Updated with verified game mechanics from Global English Server
+**Status**: Current - Updated with verified codebase references (70+ services, Neuron AI v2.11)
 
 ---
 
@@ -47,7 +47,7 @@ flowchart TD
 
 ## 2. Neuron AI Recommendation Flow
 
-This flow details how the **Training Advisor Agent** analyzes raw predictions to provide actionable advice.
+This flow details how the **Training Advisor Agent** (`TrainingAdvisorAgent` via Neuron AI v2.11) analyzes raw predictions to provide actionable advice.
 
 ```mermaid
 flowchart TD
@@ -107,7 +107,7 @@ flowchart TD
 
 ## 4. Support Card Bonus Calculation Flow
 
-Logic handled by `SupportBonusCalculator` to determine effective stat multipliers.
+Logic handled by `SupportBonusCalculator` (in `Training/`) to determine effective stat multipliers.
 
 ```mermaid
 flowchart TD
@@ -133,7 +133,7 @@ flowchart TD
 
 ## 5. Failure Risk Assessment Flow
 
-Logic handled by `RiskCalculator` to determine the probability of training failure.
+Logic handled by `TrainingPredictionService` to determine the probability of training failure.
 
 ```mermaid
 flowchart TD
@@ -159,7 +159,7 @@ flowchart TD
 
 ## 6. Skill Hint Acquisition Flow
 
-Logic handled by `SkillService` during training execution.
+Logic handled by `SkillHintService` (in `Training/`) during training execution.
 
 ```mermaid
 flowchart TD
@@ -279,6 +279,7 @@ flowchart TD
 
 | Version | Date       | Author           | Changes |
 |---------|------------|------------------|---------|
+| 2.3.0   | 2026-02-22 | Development Team | Updated service references: SupportBonusCalculator (Training/), SkillHintService (Training/), TrainingPredictionService for risk assessment; added Neuron AI v2.11 reference |
 | 2.2.0   | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: Added complete training formula, stat cap rules (1200 base, +100/+50 per-training caps, half value above 1200), hint levels max at 5, added hint discount table, added Summer Training Camp flow (4 turns, all facilities Level 5) |
 | 2.1.0   | 2026-01-24 | Development Team | Updated to include caching, Neuron AI agents, and Service layer architecture |
 | 1.0.0   | 2026-01-14 | Development Team | Initial flow definitions |

@@ -1,9 +1,9 @@
 # SPEC-005: Support Card Management System - Technical Specification
 
-**Document Version**: 2.2.0  
-**Date**: 2026-01-28  
+**Document Version**: 2.3.0  
+**Date**: 2026-02-22  
 **Project**: Umamusume Pretty Derby Career Planner  
-**Status**: Active - Updated with game-accurate mechanics  
+**Status**: Complete - Implementation verified  
 **Classification**: Internal - Development Team
 
 ---
@@ -14,9 +14,9 @@
 |-----------|-------|
 | **Document ID** | SPEC-005 |
 | **Related PRD** | [PRD-005: Support Card Management](../prds/PRD-005_Support_Card_Management.md) |
-| **Architecture Version** | v2.2.0 |
+| **Architecture Version** | v2.3.0 |
 | **Approval Status** | Approved |
-| **Last Reviewed** | 2026-01-28 |
+| **Last Reviewed** | 2026-02-22 |
 
 ### Related Documents
 
@@ -121,10 +121,10 @@ Strategic deck composition and bond management are critical for achieving optima
 | Component | Technology | Version | Purpose |
 |-----------|-----------|---------|---------|
 | **Framework** | Laravel | 12.x | Application foundation |
-| **Language** | PHP | 8.3+ | Server-side logic |
+| **Language** | PHP | 8.2+ | Server-side logic |
 | **Database** | MySQL | 8.0+ | Data persistence |
 | **Cache** | Redis | 7.x | Card metadata caching |
-| **AI** | Neuron Framework | 1.x | Deck recommendation agents |
+| **AI** | Neuron AI | v2.11 | Deck recommendation agents |
 | **AI Provider (Local)** | Ollama | Latest | Quick recommendations |
 | **AI Provider (Cloud)** | AWS Bedrock Claude | 4.5 | Complex optimization |
 
@@ -143,10 +143,10 @@ graph TB
     end
 
     subgraph "Application Layer"
-        CardSvc[SupportCardService]
+        CardSvc[SupportCardDeckService]
         DeckSvc[DeckManagementService]
-        BondSvc[BondProgressionService]
-        SynergySvc[DeckSynergyService]
+        BondSvc[FriendshipBondService]
+        SynergySvc[DeckOptimizationService]
         RecommendSvc[DeckRecommendationService]
     end
 
@@ -160,7 +160,7 @@ graph TB
     subgraph "Infrastructure Layer"
         DB[(MySQL)]
         Cache[(Redis)]
-        External[ExternalAPIService]
+        External[ExternalDataService]
         NeuronAI[DeckOptimizationAgent]
     end
 
@@ -796,7 +796,7 @@ use App\Models\{SupportDeck, SupportCard, UserCardInventory};
  * 
  * Validates deck composition rules and constraints.
  */
-class DeckCompositionValidator
+class DeckManagementValidator
 {
     private const DECK_SIZE = 6;
     private const OWNED_CARDS = 5;
@@ -1165,7 +1165,7 @@ namespace App\Services\SupportCard;
 
 use App\Models\{SupportCard, UserCardInventory};
 use App\Repositories\SupportCardRepository;
-use App\Services\External\ExternalAPIService;
+use App\Services\External\ExternalDataService;
 use Illuminate\Support\Facades\{DB, Cache};
 
 /**
@@ -1173,11 +1173,11 @@ use Illuminate\Support\Facades\{DB, Cache};
  * 
  * Handles support card-related business operations.
  */
-class SupportCardService
+class SupportCardDeckService
 {
     public function __construct(
         private SupportCardRepository $repository,
-        private ExternalAPIService $externalApi
+        private ExternalDataService $externalApi
     ) {}
 
     /**
@@ -1388,7 +1388,7 @@ use Illuminate\Support\Facades\DB;
 class DeckManagementService
 {
     public function __construct(
-        private DeckCompositionValidator $validator
+        private DeckManagementValidator $validator
     ) {}
 
     /**
@@ -2214,7 +2214,7 @@ Recommend optimal 6-card deck composition (5 owned + 1 borrowed).
 namespace App\Services\SupportCard;
 
 use App\Models\{User, SupportDeck, Character};
-use App\Services\AI\AIAdvisoryService;
+use App\Services\AI\AdviceService;
 use App\Neuron\Agents\DeckOptimizationAgent;
 
 /**
@@ -2224,8 +2224,8 @@ class DeckRecommendationService
 {
     public function __construct(
         private DeckOptimizationAgent $agent,
-        private AIAdvisoryService $aiService,
-        private SupportCardService $cardService
+        private AdviceService $aiService,
+        private SupportCardDeckService $cardService
     ) {}
 
     /**
@@ -2846,7 +2846,7 @@ test('external card sync updates database', function () {
         ], 200),
     ]);
     
-    $service = app(SupportCardService::class);
+    $service = app(SupportCardDeckService::class);
     $syncedCount = $service->syncCardDefinitions();
     
     expect($syncedCount)->toBe(1);
@@ -3078,6 +3078,7 @@ class SupportDeckFactory extends Factory
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.3.0 | 2026-02-22 | Development Team | Updated service names (SupportCardDeckService, DeckManagementService, FriendshipBondService, DeckOptimizationService, ExternalDataService), Neuron AI v2.11, PHP 8.2+, marked implementation complete |
 | 2.2.0 | 2026-01-28 | Development Team | Updated to align with game-accurate mechanics (v2.2.0 architecture) |
 | 2.0.0 | 2026-01-24 | Development Team | Full v2.0.0 alignment, complete testing strategy, AI integration, bond system, synergy analysis |
 | 1.0.0 | 2026-01-14 | Development Team | Initial technical specification |
@@ -3098,7 +3099,7 @@ class SupportDeckFactory extends Factory
 **Document Control**  
 **Maintained By**: Backend Development Team  
 **Review Frequency**: Bi-weekly during active development  
-**Next Review Date**: 2026-02-07  
+**Next Review Date**: 2026-03-07  
 **Distribution**: Development Team, QA Team, Product Management, Game Design Team
 
 ---

@@ -3,7 +3,7 @@
 ## Umamusume Pretty Derby Career Planner
 
 **Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Date**: February 22, 2026  
 **Related Documents**: [PRD-003], [SPEC-003], [FLOW-003], [TECH-FLOW-003]
 
 ---
@@ -77,7 +77,7 @@ Race strategy management is a critical planning workflow that:
 | **User** | Actor | Initiates race analysis, registration, and result submission |
 | **Livewire Component** | Presentation | `RaceCalendar.php`, `RacePreparation.php` - Race browsing and analysis |
 | **RaceController** | Application | Orchestrates race workflow |
-| **RaceAnalysisService** | Domain Service | Readiness scoring and strategy recommendations |
+| **RaceConditionService** | Domain Service | Readiness scoring and strategy recommendations |
 | **ReadinessCalculator** | Domain Service | Multi-factor readiness calculation |
 | **StrategyOptimizer** | Domain Service | Running style optimization |
 | **WinProbabilityCalculator** | Domain Service | Win probability estimation |
@@ -99,7 +99,7 @@ app/
 │   └── Controllers/
 │       └── RaceController.php
 ├── Services/
-│   ├── RaceAnalysisService.php
+│   ├── RaceConditionService.php
 │   ├── RaceResultService.php
 │   ├── ReadinessCalculator.php
 │   ├── StrategyOptimizer.php
@@ -122,7 +122,7 @@ sequenceDiagram
     actor User
     participant UI as Livewire Calendar
     participant Controller as RaceController
-    participant AnalysisSvc as RaceAnalysisService
+    participant AnalysisSvc as RaceConditionService
     participant ReadinessCalc as ReadinessCalculator
     participant StrategyOpt as StrategyOptimizer
     participant WinProbCalc as WinProbabilityCalculator
@@ -988,4 +988,4 @@ $this->cache->tags(['race_catalog'])->flush();
 
 ---
 
-*This sequence diagram reflects the current implementation of the race registration and outcome workflow as of v2.0.0. For the most up-to-date information, refer to the source code in `app/Services/RaceAnalysisService.php`, `app/Services/RaceResultService.php`, and related files.*
+*This sequence diagram reflects the current implementation of the race registration and outcome workflow as of v2.0.0. For the most up-to-date information, refer to the source code in `app/Services/RaceConditionService.php`, `app/Services/RaceResultService.php`, and related files.*

@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0
-**Date**: February 21, 2026
+**Document Version**: 2.4.0
+**Date**: February 22, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
-**Status**: Current - Aligned to codebase v2.3.0 and game-accurate mechanics
+**Status**: Current - Aligned to codebase v2.4.0, 30 models, 51 migrations
 
 ---
 
@@ -58,7 +58,7 @@ mindmap
 
 ### 1.2 Source References
 
-- **Service Layer**: `app/Services/DataMigrationService.php`, `app/Services/DataImportService.php`
+- **Service Layer**: `app/Services/DataMigrationService.php`, `app/Services/DataImportService.php`, `app/Services/DataExportService.php`, `app/Services/DataOperationHistoryService.php`, `app/Services/BackupService.php`, `app/Services/SnapshotService.php`
 - **Related PRDs**: [PRD-001](../prds/PRD-001_Character_Management.md), [PRD-007](../prds/PRD-007_External_Integration.md)
 - **Related Specs**: [SPEC-001](../specs/SPEC-001_Character_Management_Technical.md), [SPEC-007](../specs/SPEC-007_External_Integration_Technical.md)
 - **Related Flows**: [FLOW-001](../flows/FLOW-001_Character_Management_System.md), [SEQ-015](../sequences/SEQ-015_Data_Migration_Snapshot_to_Live.md)
@@ -188,7 +188,19 @@ erDiagram
 | career | `ucp_careers` | career_name, scenario_type, status, final_stats | character_id FK |
 | training_session | `ucp_training_sessions` | turn_number, training_type, stat_gains | career_id FK, turn 1-78 |
 | skill | `ucp_skills` | name, skill_type, rarity, base_sp_cost | name unique |
+| skill_hint | `ucp_skill_hints` | skill_id, hint_level, sp_discount | Max 5 levels, 40% max |
+| skill_acquisition | `ucp_skill_acquisitions` | career_id, skill_id, turn_acquired | career_id FK |
+| skill_build | `ucp_skill_builds` | name, skills list, total_sp | Named template |
 | support_card | `ucp_support_cards` | name, rarity, specialization | name required |
+| support_card_definition | `ucp_support_card_definitions` | external_id, card_data | External ref |
+| support_deck | `ucp_support_decks` | deck_name, card_ids | Max 6 cards |
+| aptitude | `ucp_aptitudes` | character_id, aptitude_type, grade | Valid grade enum |
+| factor | `ucp_factors` | career_id, factor_type, star_level | factor_type enum |
+| race | `ucp_races` | name, distance, surface | distance > 0 |
+| event | `ucp_events` | event_type, career_id | event_type enum |
+| ocr_extraction | `ucp_ocr_extractions` | image_path, confidence | confidence 0-100 |
+| run_snapshot | `ucp_run_snapshots` | career_id, snapshot_data | Point-in-time |
+| external_data | `ucp_external_data` | source, data_type, payload | source enum |
 
 ---
 
@@ -287,6 +299,7 @@ flowchart TD
 | 1.0 | 2025-01-01 | Initial schema |
 | 1.1 | 2025-06-01 | Added scenario_type enum |
 | 2.0 | 2026-01-14 | Unified canonical field names |
+| 2.4 | 2026-02-22 | 30 models, 51 migrations, extended target entities |
 
 ### 5.3 Migration Rules by Version
 
@@ -607,7 +620,8 @@ php artisan migrate:rollback {migration_id}
 ## Document Control
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|| 2.3.0 | 2026-02-21 | Development Team | Version alignment, date update, codebase v2.3.0 sync || 2.1.0 | 2026-01-23 | Development Team | Updated to match current codebase implementation |
+|---------|------|--------|---------|| 2.4.0 | 2026-02-22 | Development Team | Extended target entities (17 types), schema v2.4, added BackupService/SnapshotService refs, 30 models |
+| 2.3.0 | 2026-02-21 | Development Team | Version alignment, date update, codebase v2.3.0 sync || 2.1.0 | 2026-01-23 | Development Team | Updated to match current codebase implementation |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with canonical field names |
 | 1.0.0 | 2025-06-01 | Development Team | Initial specification |
 

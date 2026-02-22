@@ -126,13 +126,13 @@ This is the most important file right now - it tells you exactly what to do next
 
 ### For Reference
 
-4. **REDIS_SETUP_CHECKLIST.md** - Track your progress
+1. **REDIS_SETUP_CHECKLIST.md** - Track your progress
 2. **REDIS_SETUP_SUMMARY.md** - Overview
 3. **REDIS_CURRENT_STATUS.md** - Detailed status
 
 ### Already Completed
 
-7. **UPDATE_REDIS_TESTS.md** - Test updates (done)
+1. **UPDATE_REDIS_TESTS.md** - Test updates (done)
 2. **REDIS_SETUP_INSTRUCTIONS.md** - Original guide
 3. **START_HERE.md** - Quick start
 

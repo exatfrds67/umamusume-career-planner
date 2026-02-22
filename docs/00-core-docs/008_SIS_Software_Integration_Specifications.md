@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0  
-**Date**: February 21, 2026  
+**Document Version**: 2.4.0  
+**Date**: February 22, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current - Aligned to codebase v2.3.0 and game-accurate mechanics
+**Status**: Current - Aligned to codebase v2.4.0, 30 models, 51 migrations, 42 MCP tools
 
 ---
 
@@ -32,9 +32,10 @@ This document provides detailed technical specifications for all integration poi
 This specification covers:
 
 - AI provider integrations (Ollama, AWS Bedrock, Neuron AI)
-- MCP (Model Context Protocol) server integrations
-- External API integrations (umapyoi.net, umamusumedb.com)
+- MCP (Model Context Protocol) server integrations (42 tool services, 9 orchestration agents)
+- External API integrations (umapyoi.net, GameTora web scraping)
 - OCR processing pipeline (Tesseract with GD preprocessing)
+- Admin Panel services (database maintenance, system health, log reader)
 - Security, authentication, and access control patterns
 
 ### 1.2 Related Documents
@@ -121,6 +122,17 @@ app/Neuron/
     └── McpToolIntegration.php
 ```
 
+**Neuron Service Layer**: `app/Services/Neuron/`
+
+```
+app/Services/Neuron/
+├── NeuronAIService.php
+├── TrainingAdvisorService.php
+├── RaceStrategyService.php
+├── SkillRecommendationService.php
+└── CareerPlanningService.php
+```
+
 ### 2.3 AI Service Architecture
 
 ```
@@ -173,6 +185,11 @@ The Model Context Protocol (MCP) integration enables tool-based AI interactions.
 | Memory | Local | Conversation context persistence |
 | Filesystem | Local | Document and file access |
 | Fetch | Local | HTTP resource retrieval |
+| AWS API | Remote | AWS service API integration |
+| AWS Knowledge | Remote | AWS knowledge base queries |
+| AWS Pricing | Remote | AWS cost/pricing lookups |
+| Context7 | Remote | Context-aware tool services |
+| Tool Chaining | Local | Multi-step tool orchestration |
 | Umapyoi | Remote (optional) | Game data API integration |
 
 ### 3.3 MCP Service Architecture
@@ -185,8 +202,9 @@ The Model Context Protocol (MCP) integration enables tool-based AI interactions.
 │  ┌──────────────────────────────────────────────────────────┐   │
 │  │  MCPOrchestrator                                          │   │
 │  │  • Server lifecycle management                            │   │
-│  │  • Tool routing and execution                             │   │
+│  │  • Tool routing and execution (42 tools)                  │   │
 │  │  • Response aggregation                                   │   │
+│  │  • 9 orchestration agents                                 │   │
 │  └──────────────────────────────────────────────────────────┘   │
 │                           ↓                                      │
 │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐  │
@@ -220,21 +238,34 @@ The application integrates with external game data sources for character, skill,
 
 | API | Client Class | Purpose | Cache TTL |
 |-----|--------------|---------|-----------|
-| umapyoi.net | `UmapyoiApiClient` | Primary game data source | 24 hours |
-| umamusumedb.com | `UmamusumeDBApiClient` | Fallback/verification | 24 hours |
-
-### 4.2 API Client Architecture
+| umapyoi.net | `UmapyoiApiClient` | Primary game data source (characters, support cards) | 24 hours |
+| GameTora | `GameToraScraperService` | Skill, race data via web scraping | 24 hours |
 
 ```
 app/Services/ExternalAPI/
 ├── Contracts/
-│   └── ExternalApiClientInterface.php
+│   └── (interfaces)
 ├── Clients/
 │   ├── UmapyoiApiClient.php
 │   └── UmamusumeDBApiClient.php
 ├── ExternalAPIService.php
-├── CircuitBreaker.php
-└── CacheManager.php
+├── ExternalAPIFacade.php
+├── CircuitBreaker (pattern - via services)
+├── CacheManagerService.php
+├── APIHealthMonitorService.php
+├── APIAlertingService.php
+├── APIPerformanceMetricsService.php
+├── AutomatedUpdateDetectionService.php
+├── BackgroundSyncService.php
+├── ConflictDetectionService.php
+├── ConflictResolutionService.php
+├── ConnectivityMonitorService.php
+├── DataQualityScoringService.php
+├── DataValidationService.php
+├── GracefulDegradationService.php
+├── PerformanceOptimizationService.php
+├── ResponseTransformer.php
+└── ResponseValidator.php
 ```
 
 ### 4.3 Resilience Patterns
@@ -282,9 +313,13 @@ The OCR integration enables screenshot-based data import for character stats and
 **Service Classes**:
 
 - `ImageProcessingService` - Preprocessing with GD library
-- `TesseractService` - OCR text extraction
-- `OCRParserService` - Structured data extraction
-- `OCRValidationService` - Data validation and correction
+- `TesseractService` / `TesseractServiceEnhanced` - OCR text extraction
+- `OCR/DataExtractionService` - Structured data extraction
+- `OCR/DataValidationService` - Data validation and correction
+- `OCR/DataTransformationService` - Data transformation pipeline
+- `OCR/DataIntegrationService` - Import OCR results to models
+- `OCR/ScreenTypeDetector` - Auto-detect screenshot type
+- `OCR/ParserFactory` + `OCR/Parsers/` - Modular parsing system
 
 ### 5.2 Pipeline Architecture
 
@@ -400,26 +435,56 @@ class AIAdvisoryRequest extends FormRequest
 │  app/Services/                                                  │
 │  ├── AI/                                                        │
 │  │   ├── AIAdvisoryService.php      (Orchestration)            │
+│  │   ├── AIDashboardService.php     (Dashboard analytics)      │
+│  │   ├── HybridAIService.php        (Provider routing)         │
 │  │   ├── OllamaService.php          (Local AI)                 │
 │  │   ├── BedrockService.php         (Cloud AI)                 │
-│  │   └── CostTrackingService.php    (Usage metrics)            │
+│  │   ├── BedrockConfigurationService.php (Config)              │
+│  │   ├── CostTrackingService.php    (Usage metrics)            │
+│  │   ├── ConversationManagementService.php (Chat history)     │
+│  │   ├── ConversationAnalyticsService.php (Analytics)         │
+│  │   ├── VectorStoreService.php     (Embeddings)              │
+│  │   └── WorkflowExportService.php  (Export workflows)         │
 │  │                                                              │
 │  ├── MCP/                                                       │
-│  │   ├── MCPOrchestrator.php        (Server management)        │
+│  │   ├── MCPClientService.php       (Client integration)       │
+│  │   ├── AgentOrchestrationService.php (Agent management)     │
 │  │   ├── MCPMonitoringService.php   (Health tracking)          │
-│  │   └── MCPHealthDashboardService.php (Dashboard data)        │
+│  │   ├── MCPHealthDashboardService.php (Dashboard data)        │
+│  │   ├── AgentLifecycleManager.php  (Lifecycle)                │
+│  │   ├── AgentRoutingService.php    (Routing)                  │
+│  │   ├── AgentMemoryService.php     (Memory)                   │
+│  │   ├── CostManagementService.php  (Cost tracking)            │
+│  │   ├── RealTimeMonitoringService.php (Real-time)            │
+│  │   ├── Tools/ (6 tool services)                                │
+│  │   └── Agents/ (9 orchestration agents)                        │
 │  │                                                              │
 │  ├── ExternalAPI/                                               │
 │  │   ├── ExternalAPIService.php     (Unified interface)        │
 │  │   ├── UmapyoiApiClient.php       (Primary source)           │
 │  │   ├── UmamusumeDBApiClient.php   (Fallback source)          │
-│  │   └── CircuitBreaker.php         (Resilience)               │
+│  │   ├── APIHealthMonitorService.php                             │
+│  │   └── GracefulDegradationService.php (Resilience)           │
 │  │                                                              │
-│  └── OCR/                                                       │
-│      ├── ImageProcessingService.php (Preprocessing)            │
-│      ├── TesseractService.php       (Text extraction)          │
-│      ├── OCRParserService.php       (Data parsing)             │
-│      └── OCRValidationService.php   (Quality control)          │
+│  ├── OCR/                                                       │
+│  │   ├── DataExtractionService.php  (Text extraction)          │
+│  │   ├── DataValidationService.php  (Quality control)          │
+│  │   ├── DataTransformationService.php (Transform)             │
+│  │   ├── DataIntegrationService.php (Import)                   │
+│  │   ├── ScreenTypeDetector.php     (Auto-detect)              │
+│  │   └── ParserFactory.php + Parsers/ (Modular parsing)        │
+│  │                                                              │
+│  ├── Admin/                                                     │
+│  │   ├── DatabaseMaintenanceService.php (Backups, migrations)  │
+│  │   ├── SystemHealthService.php    (System optimization)      │
+│  │   └── LogReaderService.php       (Log viewing)              │
+│  │                                                              │
+│  └── Neuron/                                                    │
+│      ├── NeuronAIService.php        (Core Neuron integration) │
+│      ├── TrainingAdvisorService.php                              │
+│      ├── RaceStrategyService.php                                 │
+│      ├── SkillRecommendationService.php                          │
+│      └── CareerPlanningService.php                               │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -535,6 +600,7 @@ Image Upload ──► Validation ──► Storage
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.4.0 | 2026-02-22 | Development Team | Updated service layer (AI/MCP/ExternalAPI/OCR/Admin/Neuron), 42 MCP tools, 9 agents, GameTora scraper, Admin Panel services |
 | 2.3.0 | 2026-02-21 | Development Team | Updated Neuron agent tree, Bedrock model names (Claude 4.x), version alignment to v2.3.0 |
 | 2.1.0 | 2026-01-23 | Development Team | Updated specs to match configured integrations; added architecture diagrams |
 | 2.0.0 | 2026-01-14 | Development Team | Major revision with Neuron AI and MCP integration |

@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.3.0  
-**Date**: February 21, 2026  
+**Document Version**: 2.4.0  
+**Date**: February 22, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.3.0 and game-accurate mechanics
+**Status**: Current - Aligned with codebase v2.4.0 (571 routes, 3,316+ tests, 11,563+ assertions)
 
 ---
 
@@ -30,7 +30,7 @@
 
 ### 1.1 Purpose
 
-This document presents the system-level process flow diagrams for the Umamusume Pretty Derby Career Planner application, showing how internal processes interact, data flows between components, and system-level decision making. The system is built with **Laravel 12** (released February 24, 2025) with **TypeScript support**, **Tailwind CSS v4** (released January 22, 2025), and integrates with **AWS Bedrock Claude 4.5** models, **AWS Bedrock Nova 2**, **Ollama** for AI capabilities, and **MCP (Model Context Protocol)** for tool integration.
+This document presents the system-level process flow diagrams for the Umamusume Pretty Derby Career Planner application, showing how internal processes interact, data flows between components, and system-level decision making. The system is built with **Laravel 12** (released February 24, 2025) with **Livewire 4**, **Alpine.js 3**, **Tailwind CSS v4** (released January 22, 2025), **Neuron AI v2.11**, and integrates with **AWS Bedrock** models, **Ollama** for local AI capabilities, and **MCP (Model Context Protocol)** for tool integration.
 
 ### 1.2 Scope
 
@@ -40,6 +40,7 @@ This specification covers the following system-level processes:
 - Training prediction and optimization engine
 - Hybrid AI model routing (Ollama + AWS Bedrock)
 - MCP server integration and tool execution
+- Admin Panel system management
 - Career progression tracking and analytics
 - OCR screenshot processing pipeline
 - Error handling and recovery mechanisms
@@ -51,19 +52,19 @@ This specification covers the following system-level processes:
 flowchart TB
     subgraph External[External Systems]
         Umapyoi[umapyoi.net API]
-        UmamusumeDB[umamusumedb.com API]
+        GameTora[GameTora Scraping]
         Community[Community Sources]
     end
     
     subgraph Application[Laravel 12 Application]
-        Controllers[Controllers]
-        Services[Service Layer]
-        Models[Eloquent Models]
+        Controllers[Controllers<br/>Web + API + Admin]
+        Services[Service Layer<br/>70+ Services]
+        Models[Eloquent Models<br/>30 Models]
         Jobs[Background Jobs]
     end
     
     subgraph AI[AI Integration Layer]
-        Neuron[Neuron AI Agents]
+        Neuron[Neuron AI v2.11 Agents]
         Ollama[Ollama Local]
         Bedrock[AWS Bedrock]
         MCP[MCP Servers]
@@ -100,7 +101,7 @@ The external data integration process manages connections to multiple community 
 **Primary APIs:**
 
 - **umapyoi.net** - Primary game data source (character, support card, skill data)
-- **umamusumedb.com** - Fallback source for calculator tools and meta information
+- **GameTora** - Secondary source (scraping for calculator tools and meta information)
 - **Community sources** - Meta tier lists, strategy guides, community data
 
 ### 2.2 Integration Architecture
@@ -110,7 +111,7 @@ flowchart TD
     Trigger([Sync Trigger]) --> HealthCheck{API Health Check}
     
     HealthCheck -->|All Healthy| Primary[Primary API: umapyoi.net]
-    HealthCheck -->|Primary Down| Fallback[Fallback API: umamusumedb.com]
+    HealthCheck -->|Primary Down| Fallback[Fallback API: GameTora]
     HealthCheck -->|All Down| CachedData[Use Cached Data]
     
     Primary --> CircuitBreaker{Circuit Breaker State?}
@@ -216,7 +217,7 @@ public function syncGameData(string $dataType): SyncResult
 
 ### 3.1 Process Overview
 
-The core optimization engine processes character state, analyzes training options, calculates predictions, and generates recommendations using multiple algorithms and data sources. Built with **Laravel 12** backend and enhanced by **AWS Bedrock** AI models for intelligent decision making.
+The core optimization engine processes character state, analyzes training options, calculates predictions, and generates recommendations using multiple algorithms and data sources. Built with **Laravel 12** backend and enhanced by **Neuron AI v2.11** agents and **AWS Bedrock** AI models for intelligent decision making.
 
 ### 3.2 Training Prediction Flow
 
@@ -391,8 +392,8 @@ The intelligent AI system manages model selection between local **Ollama** and c
 **AI Providers:**
 
 - **Ollama (Local)** - Primary for simple queries, free, privacy-focused
-- **AWS Bedrock Claude 3.5** - Fallback for complex reasoning
-- **AWS Bedrock Nova 2** - Cost-effective cloud option
+- **AWS Bedrock Claude** - Fallback for complex reasoning
+- **AWS Bedrock Nova** - Cost-effective cloud option
 
 ### 4.2 AI Routing Flow
 
@@ -455,9 +456,9 @@ flowchart TD
     
     AnalyzeQueryType --> ModelSelection{Model Selection}
     
-    ModelSelection -->|Strategic| ClaudeSonnet[Claude 3.5 Sonnet]
+    ModelSelection -->|Strategic| ClaudeSonnet[Claude Sonnet]
     ModelSelection -->|Complex Calc| NovaPro[Nova Pro]
-    ModelSelection -->|Quick| ClaudeHaiku[Claude 3.5 Haiku]
+    ModelSelection -->|Quick| ClaudeHaiku[Claude Haiku]
     ModelSelection -->|General| NovaLite[Nova Lite]
     
     ClaudeSonnet --> InvokeBedrock[Invoke Bedrock Model]
@@ -495,11 +496,11 @@ flowchart TD
 | Provider | Model | Input Cost | Output Cost | Use Case |
 |----------|-------|------------|-------------|----------|
 | Ollama | llama3.2 | $0.00 | $0.00 | Local, privacy-first |
-| Bedrock | Claude 3.5 Haiku | $1.00/1M | $5.00/1M | Quick responses |
-| Bedrock | Claude 3.5 Sonnet | $3.00/1M | $15.00/1M | Strategic advice |
-| Bedrock | Claude 4.5 Opus | $5.00/1M | $25.00/1M | Complex reasoning |
-| Bedrock | Nova 2 Lite | $0.00125/1K | $0.00125/1K | Budget-friendly |
-| Bedrock | Nova 2 Pro | Preview | Preview | Advanced capabilities |
+| Bedrock | Claude Haiku | $1.00/1M | $5.00/1M | Quick responses |
+| Bedrock | Claude Sonnet | $3.00/1M | $15.00/1M | Strategic advice |
+| Bedrock | Claude Opus | $5.00/1M | $25.00/1M | Complex reasoning |
+| Bedrock | Nova Lite | $0.00125/1K | $0.00125/1K | Budget-friendly |
+| Bedrock | Nova Pro | Preview | Preview | Advanced capabilities |
 
 ### 4.4 Service Implementation
 
@@ -1363,19 +1364,20 @@ flowchart TB
     subgraph CoreApp[Core Application]
         Laravel[Laravel 12 Backend]
         Livewire[Livewire 4 Components]
-        Alpine[Alpine.js Client]
+        Alpine[Alpine.js 3 Client]
+        Admin[Admin Panel<br/>5 Controllers]
     end
     
     subgraph AILayer[AI Integration]
         Ollama[Ollama Local]
         Bedrock[AWS Bedrock]
-        Neuron[Neuron Agents]
-        MCP[MCP Servers]
+        Neuron[Neuron AI v2.11 Agents]
+        MCP[MCP Servers<br/>30+ Services]
     end
     
     subgraph ExternalSystems[External Systems]
         UmapyoiAPI[umapyoi.net]
-        UmamusumeDBAPI[umamusumedb.com]
+        GameToraAPI[GameTora]
         CommunityAPI[Community Sources]
     end
     
@@ -1625,6 +1627,7 @@ flowchart TB
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.4.0 | 2026-02-22 | Development Team | Fixed TypeScript→Livewire 4/Alpine.js 3 references; added Neuron AI v2.11; updated external API references (GameTora); added Admin Panel to architecture; updated stats |
 | 2.3.0 | 2026-02-21 | Development Team | Updated version/date metadata; Livewire 3→4; aligned with 30 current Eloquent models |
 | 2.2.0 | 2026-01-27 | Development Team | Added §11 Performance Monitoring & APM Flow; added 8 Performance & Monitoring services |
 | 2.1.0 | 2026-01-23 | Development Team | Comprehensive update for v2.0.0: Added MCP integration, OCR pipeline, real-time communication flows; aligned with current implementation |
@@ -1648,4 +1651,4 @@ flowchart TB
 
 ---
 
-*This document reflects the system-level process flows implemented in the Umamusume Pretty Derby Career Planner v2.3.0 and serves as the authoritative reference for system integration and data flow architecture.*
+*This document reflects the system-level process flows implemented in the Umamusume Pretty Derby Career Planner v2.4.0 and serves as the authoritative reference for system integration and data flow architecture.*

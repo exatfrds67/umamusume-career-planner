@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.3.0  
+**Date**: February 22, 2026  
 **Related Documents**: [PRD-007], [SPEC-007], [SRS], [BRS]
 
 **Source Specifications**:
@@ -238,7 +238,7 @@ stateDiagram-v2
 │  │                                        [UPLOAD FILE]   ││
 │  ├────────────────────────────────────────────────────────┤│
 │  │ 🔄 External API Sync                                   ││
-│  │ Sync data from umapyoi.net or UmamusumeDB             ││
+│  │ Sync data from umapyoi.net or GameTora               ││
 │  │                                                        ││
 │  │ Data Sources:                                          ││
 │  │ • Character database (50+ trainees)                   ││
@@ -538,7 +538,7 @@ stateDiagram-v2
 │  └────────────────────────────────────────────────────────┘│
 │                                                            │
 │  ┌───────────────────────────────────────────────────��────┐│
-│  │ UmamusumeDB.com                        Fallback Source ││
+│  │ GameTora (gametora.com)                  Fallback Source ││
 │  ├────────────────────────────────────────────────────────┤│
 │  │ Status: ✓ Standby                                      ││
 │  │ Last Used: Never (primary active)                      ││
@@ -947,7 +947,7 @@ flowchart LR
     subgraph ExternalServices[External Services]
         Tesseract[Tesseract OCR]
         UmapyoiAPI[umapyoi.net API]
-        FallbackAPI[UmamusumeDB API]
+        FallbackAPI[GameTora Scraping]
     end
     
     subgraph InternalServices[Internal Services]
@@ -986,6 +986,7 @@ flowchart LR
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.3.0 | 2026-02-22 | Development Team | Replaced UmamusumeDB references with GameTora (gametora.com) as fallback data source to match actual codebase; updated version and dates |
 | 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: stat validation allows values above 1200 (soft cap with diminishing returns), aptitude grade validation (G→S scale, no SS), effective stat calculation for soft cap |
 | 2.1.0 | 2026-01-24 | Development Team | Complete rewrite aligned with v2.0.0 architecture; added OCR pipeline details, file import workflows, external API sync, comprehensive error handling and testing criteria |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with basic flow |
@@ -1007,4 +1008,4 @@ flowchart LR
 
 ---
 
-*This user flow reflects the current OCR and data import system implementation as of version 2.2.0. For the latest updates, refer to the online documentation.*
+*This user flow reflects the current OCR and data import system implementation as of version 2.3.0. For the latest updates, refer to the online documentation.*

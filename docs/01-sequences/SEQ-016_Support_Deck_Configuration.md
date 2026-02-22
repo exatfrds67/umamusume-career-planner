@@ -3,7 +3,7 @@
 ## Umamusume Pretty Derby Career Planner
 
 **Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Date**: February 22, 2026  
 **Related Documents**: [PRD-005], [SPEC-005], [FLOW-005], [TECH-FLOW-005]
 
 ---
@@ -89,7 +89,7 @@ Support deck management enables:
 | **Livewire Component** | Presentation | `DeckBuilder.php` - Deck configuration UI |
 | **SupportDeckController** | Application | Orchestrates deck CRUD operations |
 | **SupportDeckService** | Domain Service | Deck management business logic |
-| **SynergyCalculator** | Domain Service | Deck synergy analysis and scoring |
+| **SynergyScorer** | Domain Service | Deck synergy analysis and scoring |
 | **FriendshipBonusCalculator** | Domain Service | Bond and friendship bonus calculations |
 | **ExternalSyncService** | Infrastructure | Card metadata synchronization |
 | **SupportDeck Model** | Data | Eloquent model for `ucp_support_decks` |
@@ -102,7 +102,7 @@ Support deck management enables:
 | System | Integration | Purpose |
 |--------|-------------|---------|
 | **umapyoi.net** | REST API | Card metadata and meta tiers |
-| **UmamusumeDB** | REST API (fallback) | Alternative card data source |
+| **GameTora** | REST API (fallback) | Alternative card data source |
 
 ---
 
@@ -175,7 +175,7 @@ sequenceDiagram
     participant LW as DeckBuilder<br/>Livewire
     participant C as SupportDeckController
     participant DS as SupportDeckService
-    participant SC as SynergyCalculator
+    participant SC as SynergyScorer
     participant FB as FriendshipBonusCalculator
     participant DB as MySQL Database
     participant R as Redis Cache
@@ -809,7 +809,7 @@ $decks = SupportDeck::where('user_id', $userId)
 |---------|------|--------|---------|
 | 1.0.0 | 2026-01-27 | Development Team | Initial specification for Support Deck Configuration sequence |
 | 2.0.0 | 2026-01-27 | Development Team | Added game mechanics reference section |
-| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server - corrected limit break system (MLB = 4 LB), friendship threshold (80%), friendship bonus ranges by rarity |
+| 2.2.0 | 2026-02-22 | Development Team | Updated with verified game mechanics from Global English Server - corrected limit break system (MLB = 4 LB), friendship threshold (80%), friendship bonus ranges by rarity |
 
 ---
 

@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 3.3.0  
-**Date**: February 21, 2026  
+**Document Version**: 3.4.0  
+**Date**: February 22, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
 **Status**: Current – Aligned with v2.2.0 and Global English Server Mechanics (February 2026)
@@ -26,7 +26,7 @@
 
 ## 1. Purpose
 
-This glossary defines all core terminology used in the Umamusume Pretty Derby Career Planner project, aligned with the v2.2.0 codebase and the **Global English server** gameplay and translations (as of February 2026). Use this glossary as the authoritative reference for all documentation, code, and user interface.
+This glossary defines all core terminology used in the Umamusume Pretty Derby Career Planner project, aligned with the v2.2.0 codebase (30 models, 8 enums, 70+ services, 571 routes, 3,316+ tests) and the **Global English server** gameplay and translations (as of February 2026). Use this glossary as the authoritative reference for all documentation, code, and user interface.
 
 ---
 
@@ -190,6 +190,12 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 | Career Run / Plan  | `ucp_careers`       | A single "career mode" progression            | DB/localStore |
 | Turn               | `turn_number`       | One in-game week; each runs a selection round | DB/localStore |
 | Support Deck       | `ucp_support_decks` | Set of 6 support cards for training           | Database      |
+| Support Card Definition | `ucp_support_card_definitions` | Canonical support card definition from external sources | Database |
+| Skill Build        | `ucp_skill_builds`  | Saved skill loadout configuration for a career | Database |
+| Run Snapshot       | `ucp_run_snapshots` | Point-in-time career state snapshot for undo/restore | Database |
+| Advisory Recommendation | `ucp_advisory_recommendations` | AI-generated training/race/skill recommendation | Database |
+| Critical Alert     | `ucp_critical_alerts` | System-generated alert for critical career situations | Database |
+| Prediction Accuracy | `ucp_prediction_accuracy` | Tracking of AI prediction vs actual outcome | Database |
 | Legacy             | `legacy_*`          | Data from completed runs used to boost new trainees | Database      |
 
 *See also: Factor, Bond, Skill Hint under Game Terminology.*
@@ -214,6 +220,21 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 | Preview | Read-only view of data before confirmation |
 | Toast | Temporary notification message |
 | Modal | Overlay dialog for focused interactions |
+| Advisory Panel | Livewire component (`AdvisoryPanel`) providing real-time AI recommendations |
+| Breadcrumb | Hierarchical navigation trail shown at the top of pages |
+| Radar Chart | Chart.js radar visualization for character stat display |
+
+### 3.4 Admin Panel
+
+| Term | Definition |
+|------|------------|
+| Admin Panel | Protected administrative interface for system management (`Admin/` controllers) |
+| Database Maintenance | Admin tool for database optimization and cleanup (`DatabaseMaintenanceService`) |
+| Log Reader | Admin tool for viewing application logs (`LogReaderService`) |
+| System Health | Admin dashboard showing system status (`SystemHealthService`) |
+| Queue Monitor | Admin interface for monitoring background job processing (via Horizon) |
+| User Management | Admin interface for managing user accounts and roles |
+| System Settings | Admin interface for application-wide configuration |
 
 ---
 
@@ -223,12 +244,18 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 
 | Term | Abbreviation | Definition |
 |------|--------------|------------|
-| Eloquent Model | - | Laravel ORM model representing database table |
-| Livewire Component | - | Server-driven reactive UI component |
-| Service Layer | - | Business logic abstraction (e.g., `CharacterService`) |
+| Eloquent Model | - | Laravel ORM model representing database table (30 models in system) |
+| Livewire Component | - | Server-driven reactive UI component (e.g., `AdvisoryPanel`) |
+| Service Layer | - | Business logic abstraction (70+ services in `app/Services/`) |
 | Form Request | - | Laravel validation class for HTTP requests |
-| Repository | - | Data access pattern abstracting database queries |
-| Enum | - | PHP 8.1+ enumeration for type-safe constants |
+| Repository | - | Data access pattern abstracting database queries (e.g., `CharacterRepositoryInterface`, `EloquentCharacterRepository`) |
+| Enum | - | PHP 8.1+ enumeration for type-safe constants (8 enums: `AlertType`, `CareerPhase`, `Mood`, `Priority`, `RaceDistance`, `RecommendationType`, `RunningStyle`, `StorageMode`) |
+| Value Object | - | Immutable object representing a domain concept (in `app/ValueObjects/`) |
+| Collection | - | Custom Laravel collection class (in `app/Collections/`) |
+| Event/Listener | - | Laravel event system for decoupled processing (in `app/Events/`, `app/Listeners/`) |
+| Job | - | Queued background task (in `app/Jobs/`) |
+| Policy | - | Laravel authorization policy (in `app/Policies/`) |
+| Notification | - | Laravel notification class (in `app/Notifications/`) |
 
 ### 4.2 Technology Stack
 
@@ -303,12 +330,33 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 
 ### 5.2 Neuron Agents
 
-| Agent | Purpose | Tools |
-|-------|---------|-------|
-| Training Advisor Agent | Recommends optimal training selections | Character stats, training predictions, support bonuses |
-| Race Strategy Agent | Analyzes race requirements and strategy | Race requirements, aptitude analysis, win probability |
-| Skill Advisor Agent | Suggests skill acquisition priorities | Skill catalog, SP budget, hints, evolution paths |
-| Career Planning Agent | Provides long-term strategic guidance | Goal analysis, stat progression, timeline optimization |
+Neuron agents live in `app/Neuron/Agents/` with response types in `app/Neuron/Responses/` and support classes in `app/Neuron/Support/`. Service layer wrappers are in `app/Services/Neuron/`.
+
+| Agent | Class | Purpose | Response Type |
+|-------|-------|---------|---------------|
+| Base Agent | `BaseAgent` | Abstract base class for all Neuron agents | - |
+| Training Advisor Agent | `TrainingAdvisorAgent` | Recommends optimal training selections | `TrainingAdviceResponse` |
+| Race Strategy Agent | `RaceStrategyAgent` | Analyzes race requirements and strategy | `RaceStrategyResponse` |
+| Skill Recommendation Agent | `SkillRecommendationAgent` | Suggests skill acquisition priorities | `SkillRecommendationResponse` |
+| Career Planning Agent | `CareerPlanningAgent` | Provides long-term strategic guidance | `CareerPlanningResponse` |
+| MCP Demo Agent | `McpDemoAgent` | Demonstration agent for MCP tool integration | - |
+
+**Neuron Support Classes:**
+
+| Class | Purpose |
+|-------|---------|
+| `McpConnectorFactory` | Creates MCP connector instances for agent tool access |
+| `McpToolIntegration` | Integrates MCP tools with Neuron agent capabilities |
+
+**Neuron Service Layer (`app/Services/Neuron/`):**
+
+| Service | Purpose |
+|---------|---------|
+| `NeuronAIService` | Core Neuron AI orchestration and provider management |
+| `TrainingAdvisorService` | Wrapper for training advisor agent interactions |
+| `RaceStrategyService` | Wrapper for race strategy agent interactions |
+| `SkillRecommendationService` | Wrapper for skill recommendation agent interactions |
+| `CareerPlanningService` | Wrapper for career planning agent interactions |
 
 ### 5.3 MCP (Model Context Protocol)
 
@@ -320,6 +368,8 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 | MCP Tool | - | Executable function exposed to AI agents |
 | MCP Tool Usage | - | Tracking of tool invocations (`ucp_mcp_tool_usage`) |
 | MCP Health | - | Server availability monitoring (`ucp_mcp_server_health`) |
+| Laravel MCP | - | Official Laravel MCP package (`laravel/mcp v0`) for server-side tool exposure |
+| MCP Monitoring | - | Service for tracking MCP server health, tool usage, and agent performance |
 
 **MCP Server Types:**
 
@@ -341,10 +391,11 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 
 **External API Sources:**
 
-| API | Purpose | Status |
-|-----|---------|--------|
-| umapyoi.net | Primary game data (characters, support cards, news) | Active |
-| UmamusumeDB.com | Fallback data (skills, races) | Active |
+| API | Purpose | Client Class | Status |
+|-----|---------|--------------|--------|
+| umapyoi.net | Primary game data (characters, support cards, news) | `UmapyoiApiClient` | Active |
+| UmamusumeDB.com | Fallback data (skills, races) | `UmamusumeDBApiClient` | Active |
+| GameTora | Supplementary data via web scraping | `GameToraScraperService` | Active |
 
 ### 5.5 OCR System
 
@@ -377,6 +428,7 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 | Local Mode | Browser localStorage-based storage | UUID | Full |
 | Account Mode | Database-backed cloud storage | Integer ID | Requires connectivity for save |
 | Storage Badge | Visual indicator of current mode | Icon + label | N/A |
+| StorageMode Enum | PHP enum (`App\Enums\StorageMode`) for type-safe storage mode handling | `Local` / `Account` values | N/A |
 
 ### 6.2 Import/Export
 
@@ -524,6 +576,7 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 3.4.0 | 2026-02-22 | Development Team | Updated to February 22, 2026; expanded core entities table with 6 new model references (SupportCardDefinition, SkillBuild, RunSnapshot, AdvisoryRecommendation, CriticalAlert, PredictionAccuracy); expanded architecture components with Repository, Enum, ValueObject, Collection, Event/Listener, Job, Policy, Notification entries; updated Neuron Agents section with actual codebase classes (BaseAgent, McpDemoAgent, response types, support classes, service layer); added GameTora to external API sources; added StorageMode enum reference; added Laravel MCP and MCP Monitoring terms; updated codebase stats (30 models, 8 enums, 70+ services, 571 routes, 3,316+ tests) |
 | 3.3.0 | 2026-02-21 | Development Team | Updated to February 2026; updated technology stack (Livewire 4, Pest v4, PHPUnit v12, Neuron AI v2.11, Chart.js 4, Larastan v3, Laravel Pint v1, Sanctum v4, Horizon v5, Telescope, Boost v1.8, pest-plugin-browser 4.0, Playwright 1.58); updated PHP runtime to 8.4.11; updated AI provider models; removed MariaDB reference |
 | 3.2.0 | 2026-01-28 | Development Team | Updated to v2.2.0; corrected aptitude grades (S is maximum, SS does NOT exist); updated hint system to 5 levels (10%/20%/30%/35%/40%); aligned with game-accurate mechanics from Global English Server |
 | 3.1.0 | 2026-01-23 | Development Team (with user corrections & source references)| Updated per Global (English) server mechanics; clarified Guts/Wit, updated running style English labels, added Training, Legacy, and Bond definitions, and explicitly excluded JP-version-only features per community and official docs |
@@ -572,4 +625,4 @@ Lower Aptitude doesn't "cap" stats, but **significantly reduces race performance
 
 ---
 
-*This glossary is the authoritative reference for both code and gameplay terminology as used in the Umamusume Career Planner, strictly aligned to the Global English server and common usage (February 2026).*
+*This glossary is the authoritative reference for both code and gameplay terminology as used in the Umamusume Career Planner, strictly aligned to the Global English server and common usage (February 22, 2026).*

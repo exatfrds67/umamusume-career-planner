@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.2.0  
-**Date**: January 28, 2026  
+**Document Version**: 2.3.0  
+**Date**: February 22, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current - Aligned with codebase v2.2.0  
+**Status**: Implemented - All features operational  
 **Related Documents**: [SRS-FR-07], [SDS-4.6], [DBD-4.5], [SPEC-006]
 
 **Source Specs**:
@@ -55,8 +55,8 @@ Game mechanics in *Uma Musume* are opaque and highly mathematical. Players strug
 ### 1.3 Solution Overview
 
 - **Hybrid Architecture**: **Ollama** (Llama 3.2) handles routine queries locally; **AWS Bedrock** (Claude 3.5/4.5) handles complex strategy.
-- **Neuron Agents**: Specialized agents (`TrainingAdvisor`, `RaceStrategy`, `SkillAdvisor`) use tools to analyze game state.
-- **MCP Integration**: Uses Model Context Protocol to persist conversation memory and access external tools securely.
+- **Neuron Agents**: Specialized agents (`TrainingAdvisorAgent`, `RaceStrategyAgent`, `SkillRecommendationAgent`, `CareerPlanningAgent`) use tools to analyze game state.
+- **MCP Integration**: Uses Model Context Protocol with 42 tools to persist conversation memory and access external tools securely.
 
 ---
 
@@ -108,10 +108,11 @@ Game mechanics in *Uma Musume* are opaque and highly mathematical. Players strug
 
 ### 4.2 Neuron Agent Orchestration [FR-07.1]
 
-- **Training Agent**: Uses `GetTrainingPredictionsTool` to evaluate options.
-- **Race Agent**: Uses `GetRaceCalendarTool` and `WinProbCalculator`.
-- **Skill Agent**: Uses `SkillCatalogTool` and `SPBudgetTool`.
-- **Orchestrator**: Single entry point (`AIAdvisoryService`) that dispatches to specific agents based on topic.
+- **Training Agent**: `TrainingAdvisorAgent` uses `GetTrainingPredictionsTool` to evaluate options.
+- **Race Agent**: `RaceStrategyAgent` uses `GetRaceCalendarTool` and `WinProbCalculator`.
+- **Skill Agent**: `SkillRecommendationAgent` uses `SkillCatalogTool` and `SPBudgetTool`.
+- **Career Agent**: `CareerPlanningAgent` provides holistic career planning advice.
+- **Orchestrator**: Single entry point (`AIDashboardService`) that dispatches to specific agents based on topic.
 
 ### 4.3 Game Mechanics Knowledge Base [FR-07.2]
 
@@ -161,8 +162,9 @@ The AI system must be trained on accurate game mechanics including:
 
 ## 5. User Interface Requirements
 
-### 5.1 Advisor Chat Widget
+### 5.1 Advisor Chat Widget (AdvisoryPanel Livewire Component)
 
+- **Implementation**: `AdvisoryPanel` Livewire 4 component.
 - **Position**: Collapsible sidebar or floating action button.
 - **State**: "Thinking..." indicator during inference.
 - **Format**: Markdown support for bolding key terms and listing steps.
@@ -235,6 +237,12 @@ The AI system must be trained on accurate game mechanics including:
   - Corrected skill hint system (5 levels, 40% max).
   - Corrected aptitude system (G-S scale, no SS).
   - Track condition impact modeling.
+- **v2.3.0 (Current)**:
+  - All AI advisory features fully implemented and operational.
+  - 5 Neuron AI agents: TrainingAdvisorAgent, RaceStrategyAgent, SkillRecommendationAgent, CareerPlanningAgent, McpDemoAgent.
+  - AIDashboardService orchestration complete.
+  - AdvisoryPanel Livewire 4 component integrated.
+  - MCP full agent orchestration with 42 tools.
 
 ---
 
@@ -250,6 +258,7 @@ The AI system must be trained on accurate game mechanics including:
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 2.3.0 | February 22, 2026 | Module fully implemented. Corrected agent names: SkillAdvisor→SkillRecommendationAgent, added CareerPlanningAgent. Corrected AIAdvisoryService→AIDashboardService. Added AdvisoryPanel Livewire 4 component. MCP integration with 42 tools. |
 | 2.2.0 | January 28, 2026 | Updated with verified game mechanics from Global English Server: added game mechanics knowledge base section with accurate skill hint system (5 levels, 40% max), aptitude system (G-S, no SS), stat system (1200+ diminishing returns), track conditions, and career structure (~70-78 turns). |
 | 2.1.0 | January 24, 2026 | Aligned with codebase v2.0.0, added source specs references. |
 | 2.0.0 | January 2026 | Initial v2 release with hybrid AI architecture. |
