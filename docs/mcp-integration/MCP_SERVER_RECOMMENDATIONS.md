@@ -31,7 +31,7 @@ Before configuring MCP servers, ensure you have:
 
 - **Node.js** (v18+) - Required for npx-based servers
 - **Python** (v3.8+) - Required for uvx-based servers (install via `pip install uv`)
-- **PHP** (v8.2+) - Required for Laravel Boost
+- **PHP** (v8.1+) - Required for Laravel Boost
 - **GitKraken Desktop** - Required for GitKraken MCP server
 
 **Note**: All file paths in configuration examples (e.g., `C:\XAMPP\htdocs\umamusume-career-planner\`) are examples. Replace them with your actual project paths.

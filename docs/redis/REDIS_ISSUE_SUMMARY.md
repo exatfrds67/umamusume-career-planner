@@ -18,17 +18,19 @@ Tests fail to connect to Redis running in WSL, resulting in skipped tests and ti
 
 ### 2. WSL2 Networking Issue (PRIMARY ISSUE) ❌
 
-**Problem**: Windows cannot directly connect to WSL's IP address (`172.18.205.249:6379`) due to WSL2's virtualized networking.
+**Problem**: Windows cannot directly connect to WSL's IP address (`172.18.205.249:6379`) due to WSL2's virtualized
+networking.
 
 **Evidence**:
 
-```
+```text
 ✅ Redis running in WSL: wsl redis-cli ping → PONG
 ❌ Windows to WSL: Test-NetConnection 172.18.205.249:6379 → Timeout
 ❌ PHP to WSL: new Redis()->connect('172.18.205.249', 6379) → Timeout
 ```
 
-**Root Cause**: WSL2 uses Hyper-V virtualization with a separate network namespace. The WSL IP is only accessible from within WSL, not from Windows.
+**Root Cause**: WSL2 uses Hyper-V virtualization with a separate network namespace. The WSL IP is only accessible from
+within WSL, not from Windows.
 
 ## Solutions
 
@@ -41,7 +43,7 @@ Tests fail to connect to Redis running in WSL, resulting in skipped tests and ti
 ```powershell
 # Run the setup script
 .\setup-wsl-redis.ps1
-```
+```text
 
 **Manual steps**:
 
@@ -52,28 +54,28 @@ Tests fail to connect to Redis running in WSL, resulting in skipped tests and ti
    networkingMode=mirrored
    ```
 
-2. Restart WSL:
+1. Restart WSL:
 
    ```powershell
    wsl --shutdown
    # Wait 8 seconds
    wsl
-   ```
+   ```text
 
-3. Update `.env` and `.env.testing`:
+2. Update `.env` and `.env.testing`:
 
    ```env
    REDIS_HOST=127.0.0.1
    ```
 
-4. Test:
+3. Test:
 
    ```bash
    php test-redis.php
    php artisan test --filter=FallbackRecoveryTest
-   ```
+   ```text
 
-### Alternative: Windows Port Forwarding
+## Alternative: Windows Port Forwarding
 
 If mirrored networking doesn't work:
 
@@ -102,7 +104,7 @@ netsh interface portproxy add v4tov4 listenport=6379 listenaddress=127.0.0.1 con
 # 2. Restart WSL: wsl --shutdown
 # 3. Update .env files to use 127.0.0.1
 # 4. Test: php test-redis.php
-```
+```text
 
 ## Testing Verification
 

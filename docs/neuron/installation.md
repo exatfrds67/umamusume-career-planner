@@ -12,7 +12,7 @@ Run the composer command below to install the latest version:
 
 ```bash
 composer require neuron-core/neuron-ai
-```
+```text
 
 ## Create an Agent
 
@@ -28,7 +28,7 @@ php vendor/bin/neuron make:agent App\\Neuron\\MyAgent
 
 ```bash
 php .\vendor\bin\neuron make:agent App\Neuron\MyAgent
-```
+```text
 
 This will generate a basic agent class:
 
@@ -74,15 +74,18 @@ $response = MyAgent::make()->chat(
 echo $response->getContent();
 
 // I'm a friendly AI Agent built with Neuron, how can I help you today?
-```
+```text
 
 ## Monitoring & Debugging
 
-Many of the applications you build with Neuron will contain multiple steps with multiple invocations of LLM calls, tools, external memory systems, etc. As these applications get more and more complex, it becomes crucial to be able to inspect what exactly is going on inside your agentic system.
+Many of the applications you build with Neuron will contain multiple steps with multiple invocations of LLM calls,
+tools, external memory systems, etc. As these applications get more and more complex, it becomes crucial to be able to
+inspect what exactly is going on inside your agentic system.
 
 The best way to do this is with [Inspector](https://inspector.dev).
 
-After you sign up at the link above, make sure to set the `INSPECTOR_INGESTION_KEY` variable in the application environment file to start monitoring:
+After you sign up at the link above, make sure to set the `INSPECTOR_INGESTION_KEY` variable in the application
+environment file to start monitoring:
 
 ```env
 INSPECTOR_INGESTION_KEY=nwse877auxxxxxxxxxxxxxxxxxxxxxxxxxxxx

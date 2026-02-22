@@ -8,12 +8,13 @@
 
 ## Executive Summary
 
-Successfully completed all 5 phases of game mechanics corrections, implementing verified mechanics from the research report. All changes align with actual game behavior and maintain backward compatibility.
+Successfully completed all 5 phases of game mechanics corrections, implementing verified mechanics from the research
+report. All changes align with actual game behavior and maintain backward compatibility.
 
 ## Phase Completion Status
 
 | Phase | Priority | Status | Tests | Description |
-|-------|----------|--------|-------|-------------|
+| ----- | -------------- | ---------- | ---------- | ------------------------------------------------ |
 | 1 | P0 Critical | ✅ Complete | 81 tests | Skill Hint System (5 levels, verified discounts) |
 | 2 | P0 Critical | ✅ Complete | Migration | Aptitude Grades (S max, no SS) |
 | 3 | P1 Important | ✅ Complete | Integrated | Stat Range (0-2000 with diminishing returns) |
@@ -51,23 +52,23 @@ Successfully completed all 5 phases of game mechanics corrections, implementing 
 
 ## Phase 2: Aptitude Grades ✅
 
-### What Changed
+### What Changed (Aptitude Grades)
 
 - **Before**: Included SS and S+ grades
 - **After**: S is maximum (verified, no SS exists)
 
-### Impact
+### Impact (Aptitude Grades)
 
 - Correct aptitude grade validation
 - Matches actual game limits
 - Prevents invalid data entry
 
-### Files Modified
+### Files Modified (Aptitude Grades)
 
 - `tests/Pest.php`
 - `database/migrations/2026_01_28_083304_remove_ss_rank_from_aptitudes_table.php`
 
-### Tests
+### Tests (Aptitude Grades)
 
 ✅ Migration executed successfully
 
@@ -75,22 +76,22 @@ Successfully completed all 5 phases of game mechanics corrections, implementing 
 
 ## Phase 3: Stat Range System ✅
 
-### What Changed
+### What Changed (Stat Range)
 
 - **Before**: Hard cap at 1200
 - **After**: 0-2000 with diminishing returns above 1200 (verified)
 
-### Impact
+### Impact (Stat Range)
 
 - Supports high-stat builds
 - Implements soft cap mechanics
 - Matches actual game behavior
 
-### Files Modified
+### Files Modified (Stat Range)
 
 - `tests/Pest.php` (helper functions)
 
-### Tests
+### Tests (Stat Range)
 
 ✅ Integrated into existing tests
 
@@ -98,7 +99,7 @@ Successfully completed all 5 phases of game mechanics corrections, implementing 
 
 ## Phase 4: Training Formula ✅
 
-### What Changed
+### What Changed (Training Formula)
 
 - **Before**: Simplified additive formula
 - **After**: Complex multiplicative formula with 7 components (verified)
@@ -113,17 +114,17 @@ Successfully completed all 5 phases of game mechanics corrections, implementing 
 6. Friendship Multiplier (product-based)
 7. Per-Training Cap (+100 max, +50 if stat > 1200)
 
-### Impact
+### Impact (Training Formula)
 
 - Accurate training predictions
 - Matches actual game calculations
 - Better AI recommendations
 
-### Files Modified
+### Files Modified (Training Formula)
 
 - `app/Services/TrainingCalculationService.php` (complete rewrite)
 
-### Tests
+### Tests (Training Formula)
 
 ✅ 27 tests passing (103 assertions)
 
@@ -131,7 +132,7 @@ Successfully completed all 5 phases of game mechanics corrections, implementing 
 
 ## Phase 5: Weather/Track Conditions ✅
 
-### What Changed
+### What Changed (Weather/Track)
 
 - **Before**: No weather/track penalty calculations
 - **After**: Complete penalty system with verified values
@@ -139,7 +140,7 @@ Successfully completed all 5 phases of game mechanics corrections, implementing 
 ### Verified Penalties
 
 | Condition | Surface | Power | Speed | Stamina Drain |
-|-----------|---------|-------|-------|---------------|
+| --------- | --------- | ----- | ----- | ------------- |
 | Firm | Turf/Dirt | 0 | 0 | 0%/sec |
 | Good | Turf/Dirt | -50 | 0 | 0%/sec |
 | Soft | Turf | -50 | 0 | +2%/sec |
@@ -156,7 +157,7 @@ Successfully completed all 5 phases of game mechanics corrections, implementing 
 - Human-readable impact descriptions
 - Validation methods
 
-### Impact
+### Impact (Weather/Track)
 
 - Condition-aware race predictions
 - Accurate performance modeling
@@ -167,7 +168,7 @@ Successfully completed all 5 phases of game mechanics corrections, implementing 
 - `app/Services/RaceConditionService.php`
 - `tests/Unit/Services/RaceConditionServiceTest.php`
 
-### Tests
+### Tests (Weather/Track)
 
 ✅ 51 tests passing (78 assertions)
 
@@ -273,7 +274,7 @@ All implementations verified against:
    // Include condition impact in performance factors
    ```
 
-2. **Update RaceStrategyService**:
+1. **Update RaceStrategyService**:
 
    ```php
    // Use RaceConditionService to calculate modified stats
@@ -281,7 +282,7 @@ All implementations verified against:
    // Add skill recommendations to strategy response
    ```
 
-3. **Update UI Components**:
+1. **Update UI Components**:
    - Display condition impact descriptions
    - Show performance impact scores
    - Highlight recommended skills for conditions
@@ -379,7 +380,8 @@ All 5 phases of game mechanics corrections are complete and tested. The implemen
 4. **Verified training formula** (7-component multiplicative)
 5. **Complete weather/track system** (verified penalties and effects)
 
-The codebase now accurately reflects actual game mechanics, providing users with reliable predictions and recommendations. All changes are backward compatible and maintain existing functionality.
+The codebase now accurately reflects actual game mechanics, providing users with reliable predictions and
+recommendations. All changes are backward compatible and maintain existing functionality.
 
 **Status**: Ready for production ✅
 

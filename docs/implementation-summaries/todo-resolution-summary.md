@@ -6,7 +6,8 @@
 
 ## Overview
 
-This document summarizes the resolution of all TODO comments found in the codebase. All TODOs have been implemented with proper functionality, following Laravel 12 conventions and project guidelines.
+This document summarizes the resolution of all TODO comments found in the codebase. All TODOs have been implemented with
+proper functionality, following Laravel 12 conventions and project guidelines.
 
 ## TODOs Resolved
 
@@ -38,7 +39,7 @@ return view('races.index', [
     'races' => $races,
     'topStatus' => $topStatus,
 ]);
-```
+```text
 
 ### 2. Race Plan Server Submission (targets.js)
 
@@ -171,7 +172,8 @@ savePlan() {
 - Race card component accepts `readiness` and `win-prob` parameters
 - Controllers can now calculate and pass these values when needed
 
-**Note**: The race analytics functionality is available through the `GameMechanicsEngine` service. Controllers can calculate win probability and readiness scores using:
+**Note**: The race analytics functionality is available through the `GameMechanicsEngine` service. Controllers can
+calculate win probability and readiness scores using:
 
 ```php
 $winProbability = app(GameMechanicsEngine::class)->calculateWinProbability(
@@ -179,7 +181,7 @@ $winProbability = app(GameMechanicsEngine::class)->calculateWinProbability(
     $race,
     $acquiredSkills
 );
-```
+```text
 
 ## Supporting Changes
 
@@ -243,7 +245,7 @@ The following API endpoint should be implemented to support the race plan submis
   ],
   "total_projected_fans": 150000
 }
-```
+```text
 
 **Response**:
 
@@ -267,7 +269,8 @@ While all TODOs are resolved, the following enhancements could be considered:
 
 ## Conclusion
 
-All TODO items have been successfully resolved with production-ready implementations. The code follows project standards, includes comprehensive documentation, and has been validated through automated testing.
+All TODO items have been successfully resolved with production-ready implementations. The code follows project
+standards, includes comprehensive documentation, and has been validated through automated testing.
 
 **Total TODOs Resolved**: 7 (across 4 files)  
 **Lines of Code Added**: ~450  
@@ -301,7 +304,7 @@ $race = new class($nextRace) extends Race {
         }
     }
 };
-```
+```text
 
 **Validation**:
 
@@ -312,3 +315,4 @@ $race = new class($nextRace) extends Race {
 - ✅ PHP static analysis warnings resolved
 
 These fixes ensure proper type safety and eliminate IDE warnings while maintaining full functionality.
+

@@ -471,7 +471,7 @@ Touch Target Sizes Observed:
 **Design Implications**:
 
 - Never make buttons smaller than 40px
-- Card click area: Full card (use <button> or role="button")
+- Card click area: Full card (use `<button>` or role="button")
 - Icon button padding: 8px (44px total)
 - Increase touch targets on mobile (data shows users prefer 48px+)
 
@@ -640,7 +640,7 @@ Add to Strategic Plan § 3.3:
 - Appearance: White background, stat-color checkmark
 - Hover: Slight scale increase, shadow
 - Disabled: Gray, 50% opacity
-- Accessibility: Hidden <input type="checkbox">, styled custom
+- Accessibility: Hidden `<input type="checkbox">`, styled custom
 
 ### 9.2 Progress Indicator Component
 
@@ -673,7 +673,7 @@ Add to Strategic Plan § 3.3:
 ## Summary of Additional Findings
 
 | Category | Pattern Type | Count | Status |
-|----------|--------------|-------|--------|
+| ---------- | -------------- | ------- | -------- |
 | **UI Components** | New patterns | 8 | Needs documentation |
 | **Animations** | Transition specs | 5 | Needs timing values |
 | **Responsive** | Breakpoint changes | 3 | Needs grid formulas |

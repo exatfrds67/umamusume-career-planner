@@ -4,7 +4,7 @@
 
 ### Pentagon Structure
 
-```
+```text
                     1000 (top label)
                        *
                       / \
@@ -63,7 +63,7 @@ Starting from top and going clockwise:
 
 ### ASCII Visualization
 
-```
+```text
                     Speed (500)
                         •
                        /|\
@@ -125,7 +125,7 @@ Starting from top and going clockwise:
 
 ### Legend Layout
 
-```
+```text
 [•] Speed  [•] Stamina  [•] Power  [•] Guts  [•] Wit
 ```
 
@@ -139,7 +139,7 @@ Compact, single line (wraps if needed), with:
 
 Labels appear at the top (12 o'clock position) of each grid level:
 
-```
+```text
                     1000  ← Level 5 label
                      800  ← Level 4 label
                      600  ← Level 3 label
@@ -189,7 +189,7 @@ Open DevTools (F12) and inspect the SVG element:
   <!-- For small size, viewBox should be 64x64 -->
   <!-- For large size, viewBox should be 192x192 -->
 </svg>
-```
+```text
 
 ### Check Polygon Points
 
@@ -212,7 +212,7 @@ Inspect the text elements:
 <text x="64" y="16.0" class="grid-label">600</text>
 <text x="64" y="6.4" class="grid-label">800</text>
 <text x="64" y="-3.2" class="grid-label">1000</text>
-```
+```text
 
 ## Responsive Behavior
 
@@ -255,3 +255,4 @@ In dark mode:
 **Reference Date**: January 31, 2026  
 **Test URL**: <http://127.0.0.1:8000/characters/162>  
 **Test Character**: ID 162 (Speed=500, Stamina=450, Power=400, Guts=350, Wit=300)
+

@@ -20,9 +20,9 @@ php artisan queue:work redis          # Start queue worker
 php artisan queue:listen redis        # Start queue listener
 php artisan queue:failed              # List failed jobs
 php artisan queue:retry all           # Retry all failed jobs
-```
+```text
 
-### Redis CLI Commands
+## Redis CLI Commands
 
 ```bash
 # Connection
@@ -54,7 +54,7 @@ INFO stats                            # Get statistics
 SLOWLOG GET 10                        # Get slow queries
 ```
 
-### PHP/Laravel Cache Operations
+## PHP/Laravel Cache Operations
 
 ```php
 // Basic Operations
@@ -79,15 +79,15 @@ Cache::tags(['tag1'])->flush();      // Clear all keys with tag1
 Cache::increment('counter');
 Cache::decrement('counter');
 Cache::increment('counter', 5);      // Increment by 5
-```
+```text
 
 ## Database Allocation
 
-| Database | Purpose | Prefix | Connection |
-|----------|---------|--------|------------|
-| DB 0 | Default/Queue | `umamusume-career-planner:` | `default` |
-| DB 1 | Cache | `umamusume-career-planner-cache-` | `cache` |
-| DB 2 | Sessions | `umamusume-career-planner:session:` | `session` |
+| Database | Purpose       | Prefix                              | Connection |
+| -------- | ------------- | ----------------------------------- | ---------- |
+| DB 0     | Default/Queue | `umamusume-career-planner:`         | `default`  |
+| DB 1     | Cache         | `umamusume-career-planner-cache-`   | `cache`    |
+| DB 2     | Sessions      | `umamusume-career-planner:session:` | `session`  |
 
 ## Cache Tag Groups
 
@@ -116,15 +116,15 @@ Cache::tags(['mcp'])->put('key', 'value', 60);
 
 ## TTL Strategies
 
-| Strategy | TTL | Use Case |
-|----------|-----|----------|
-| `training_predictions` | 5 min | Training predictions |
-| `character_data` | 1 hour | Character information |
-| `external_api` | 2 hours | External API responses |
-| `static_game_data` | 24 hours | Game reference data |
-| `user_preferences` | 1 week | User settings |
-| `ai_conversations` | 30 min | AI chat history |
-| `mcp_server_status` | 1 min | MCP server health |
+| Strategy               | TTL      | Use Case               |
+| ---------------------- | -------- | ---------------------- |
+| `training_predictions` | 5 min    | Training predictions   |
+| `character_data`       | 1 hour   | Character information  |
+| `external_api`         | 2 hours  | External API responses |
+| `static_game_data`     | 24 hours | Game reference data    |
+| `user_preferences`     | 1 week   | User settings          |
+| `ai_conversations`     | 30 min   | AI chat history        |
+| `mcp_server_status`    | 1 min    | MCP server health      |
 
 ## Common Patterns
 
@@ -149,7 +149,7 @@ $data = $service->rememberWithTags(
         return expensive_calculation();
     }
 );
-```
+```text
 
 ### Invalidate Cache
 
@@ -175,7 +175,7 @@ $isConnected = $service->testConnection();
 
 // Optimize memory
 $results = $service->optimizeMemory();
-```
+```text
 
 ## Troubleshooting Quick Fixes
 
@@ -192,7 +192,7 @@ sudo service redis-server start
 sudo netstat -tulpn | grep 6379
 ```
 
-### High Memory Usage
+## High Memory Usage
 
 ```bash
 # Check memory
@@ -203,9 +203,9 @@ redis-cli -n 1 FLUSHDB
 
 # Restart Redis
 sudo service redis-server restart
-```
+```text
 
-### Slow Performance
+## Slow Performance
 
 ```bash
 # Check slow log
@@ -218,7 +218,7 @@ redis-cli monitor
 redis-cli info memory | grep fragmentation
 ```
 
-### phpredis Not Working
+## phpredis Not Working
 
 ```bash
 # Check extension
@@ -229,7 +229,7 @@ php --ini
 
 # Restart Apache
 # (via XAMPP Control Panel)
-```
+```text
 
 ## Monitoring Commands
 
@@ -258,13 +258,13 @@ redis-cli -n 1 keys "umamusume-career-planner-cache-*" | wc -l
 
 ## Performance Benchmarks
 
-| Operation | Expected Time |
-|-----------|---------------|
-| Cache Read | < 1ms |
-| Cache Write | < 2ms |
-| Session Read | < 0.5ms |
-| Queue Job | < 10ms |
-| Cache Hit Rate | > 80% |
+| Operation      | Expected Time |
+| -------------- | ------------- |
+| Cache Read     | < 1ms         |
+| Cache Write    | < 2ms         |
+| Session Read   | < 0.5ms       |
+| Queue Job      | < 10ms        |
+| Cache Hit Rate | > 80%         |
 
 ## Environment Variables
 
@@ -292,7 +292,7 @@ CACHE_PREFIX=umamusume-career-planner-cache-
 # Queue
 REDIS_QUEUE_CONNECTION=default
 REDIS_QUEUE=default
-```
+```text
 
 ## Testing Checklist
 
@@ -314,3 +314,4 @@ REDIS_QUEUE=default
 ---
 
 **Print this page for quick reference during development!**
+

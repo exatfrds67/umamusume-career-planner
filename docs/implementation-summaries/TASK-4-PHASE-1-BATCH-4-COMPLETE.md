@@ -6,7 +6,8 @@
 
 ## Summary
 
-Successfully added aptitude data for 20 more Uma Musume characters, bringing total coverage from 52 characters (32.3%) to 72 characters (44.7%). This represents a 12.4 percentage point increase and crosses the 40% milestone.
+Successfully added aptitude data for 20 more Uma Musume characters, bringing total coverage from 52 characters (32.3%)
+to 72 characters (44.7%). This represents a 12.4 percentage point increase and crosses the 40% milestone.
 
 ## Characters Added (Batch 4 - 20 characters)
 
@@ -93,7 +94,7 @@ php artisan db:seed --class=EnhancedRealUmaMusumeCharactersSeeder
 # Using local images for 0 characters
 # Created aptitudes for 20 characters  # ← New aptitudes added
 # Skipped 161 existing characters
-```
+```text
 
 **Verification**:
 
@@ -172,17 +173,17 @@ Expands the roster of characters who excel at closing from behind in long races.
 
 ### Batch History
 
-| Batch | Characters | Total | Coverage | Increase |
-|-------|-----------|-------|----------|----------|
-| Original | 10 | 10 | 6.2% | - |
-| Batch 1 | +19 | 29 | 18.0% | +11.8% |
-| Batch 2 | +7 | 36 | 22.4% | +4.4% |
-| Batch 3 | +20 | 56 | 34.8% | +12.4% |
-| **Batch 4** | **+20** | **72** | **44.7%** | **+9.9%** |
+| Batch       | Characters | Total  | Coverage  | Increase  |
+| ----------- | ---------- | ------ | --------- | --------- |
+| Original    | 10         | 10     | 6.2%      | -         |
+| Batch 1     | +19        | 29     | 18.0%     | +11.8%    |
+| Batch 2     | +7         | 36     | 22.4%     | +4.4%     |
+| Batch 3     | +20        | 56     | 34.8%     | +12.4%    |
+| **Batch 4** | **+20**    | **72** | **44.7%** | **+9.9%** |
 
 ### Cumulative Progress
 
-```
+```text
 ✅ 72/161 characters (44.7%)
 ✅ 864 aptitude records
 ✅ 89 characters remaining (55.3%)
@@ -215,7 +216,8 @@ Priority characters for next batch to reach 50%+ coverage:
 
 ### Phase 3 Preparation
 
-With 44.7% coverage achieved, we're approaching the threshold to begin Phase 3 (Factor Inheritance System). Target is 50%+ coverage before starting Phase 3 implementation.
+With 44.7% coverage achieved, we're approaching the threshold to begin Phase 3 (Factor Inheritance System). Target is
+50%+ coverage before starting Phase 3 implementation.
 
 ## Files Modified
 
@@ -225,7 +227,7 @@ With 44.7% coverage achieved, we're approaching the threshold to begin Phase 3 (
 
 ## Commit Message
 
-```
+```text
 feat: add aptitude data for 20 more characters (Batch 4)
 
 - Added official aptitude grades for 20 characters
@@ -243,9 +245,12 @@ feat: add aptitude data for 20 more characters (Batch 4)
 
 ## Conclusion
 
-Successfully completed Batch 4, adding 20 more characters and crossing the 40% coverage milestone. The implementation now provides 72 fully-configured characters with diverse specializations including a second dirt specialist (Hokko Tarumae), expanding strategic options for players.
+Successfully completed Batch 4, adding 20 more characters and crossing the 40% coverage milestone. The implementation
+now provides 72 fully-configured characters with diverse specializations including a second dirt specialist (Hokko
+Tarumae), expanding strategic options for players.
 
-With 44.7% coverage achieved, we're on track to reach 50%+ coverage in the next batch, at which point we can begin implementing Phase 3 (Factor Inheritance System) while continuing to expand aptitude coverage.
+With 44.7% coverage achieved, we're on track to reach 50%+ coverage in the next batch, at which point we can begin
+implementing Phase 3 (Factor Inheritance System) while continuing to expand aptitude coverage.
 
 ---
 

@@ -10,9 +10,10 @@ This guide documents the installation and configuration of the Pest Browser plug
 
 ```bash
 composer require pestphp/pest-plugin-browser:^4.0 --dev --ignore-platform-reqs
-```
+```text
 
-**Note**: The `--ignore-platform-reqs` flag is needed on Windows because Laravel Horizon requires `ext-pcntl` and `ext-posix` which are Unix-only extensions.
+**Note**: The `--ignore-platform-reqs` flag is needed on Windows because Laravel Horizon requires `ext-pcntl` and
+`ext-posix` which are Unix-only extensions.
 
 ### 2. Install Playwright
 
@@ -24,7 +25,7 @@ npm install playwright@latest
 
 ```bash
 npx playwright install
-```
+```text
 
 This downloads the browser binaries (Chromium, Firefox, WebKit) needed for testing.
 
@@ -82,7 +83,7 @@ test('works on all browsers', function () {
     visit('/')
         ->assertSee('Welcome');
 })->browsers(['chrome', 'firefox', 'safari']);
-```
+```text
 
 ### Headless Mode
 
@@ -115,11 +116,12 @@ test('slow page', function () {
     visit('/slow-page')
         ->assertSee('Content');
 })->timeout(30); // 30 seconds
-```
+```text
 
 ## Best Practices
 
-1. **Use Browser Tests Sparingly**: Browser tests are slower than unit/feature tests. Use them for critical user flows only.
+1. **Use Browser Tests Sparingly**: Browser tests are slower than unit/feature tests. Use them for critical user flows
+only.
 
 2. **Test User Journeys**: Focus on complete user workflows rather than individual page loads.
 
@@ -131,15 +133,15 @@ test('slow page', function () {
        ->assertSee('Loaded');
    ```
 
-4. **Clean Up After Tests**: Use database transactions or refresh database:
+1. **Clean Up After Tests**: Use database transactions or refresh database:
 
    ```php
    use Illuminate\Foundation\Testing\RefreshDatabase;
    
    uses(RefreshDatabase::class);
-   ```
+   ```text
 
-5. **Take Screenshots on Failure**: Helpful for debugging:
+2. **Take Screenshots on Failure**: Helpful for debugging:
 
    ```php
    test('important flow', function () {
@@ -160,7 +162,7 @@ test('slow page', function () {
 
 ```bash
 php artisan test --group=browser
-```
+```text
 
 ### Run Specific Browser Test
 
@@ -172,7 +174,7 @@ php artisan test --filter="test name"
 
 ```bash
 PEST_BROWSER=firefox php artisan test
-```
+```text
 
 ### Run with Visible Browser
 
@@ -188,7 +190,7 @@ PEST_BROWSER_HEADLESS=false php artisan test
 
   ```bash
   php artisan test --parallel
-  ```
+  ```text
 
 ## Integration with CI/CD
 
@@ -209,7 +211,7 @@ test:browser:
   script:
     - npx playwright install --with-deps
     - php artisan test --group=browser
-```
+```text
 
 ## Resources
 
@@ -227,3 +229,4 @@ test:browser:
 ## Date
 
 Installed: February 5, 2026
+

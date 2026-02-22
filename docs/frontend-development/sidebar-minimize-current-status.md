@@ -9,7 +9,8 @@ The sidebar minimize feature has been partially implemented with the following p
 
 ### ✅ Completed
 
-1. **Tooltip Component Fixed**: Updated `sidebar-tooltip.blade.php` to use proper Alpine.js syntax (`tooltipShow` instead of nested functions)
+1. **Tooltip Component Fixed**: Updated `sidebar-tooltip.blade.php` to use proper Alpine.js syntax (`tooltipShow`
+instead of nested functions)
 2. **Duplicate Navigation Removed**: Removed duplicate Profile/Settings/Help section from bottom of sidebar
 3. **Navigation Positioning**: Profile, Settings, Help moved higher in sidebar (after primary navigation)
 4. **Build Successful**: Assets compiled successfully with `npm run build`
@@ -28,7 +29,8 @@ The sidebar minimize feature has been partially implemented with the following p
 
 ### 🔍 Root Cause Analysis
 
-The issue appears to be that the `x-show` directives on the `<span>` elements containing navigation text are not responding to the `$store.sidebar.minimized` state change. Possible causes:
+The issue appears to be that the `x-show` directives on the `<span>` elements containing navigation text are not
+responding to the `$store.sidebar.minimized` state change. Possible causes:
 
 1. Alpine.js reactivity issue with nested components
 2. CSS conflicts preventing `display: none` from being applied
@@ -62,7 +64,7 @@ The issue appears to be that the `x-show` directives on the `<span>` elements co
 
 ```javascript
 Alpine.store('sidebar').minimized === true // Confirmed working
-```
+```text
 
 ### Expected Behavior
 
@@ -78,3 +80,4 @@ When `minimized: true`:
 - Text is still visible
 - Sidebar appears expanded
 - Cannot test tooltips until text is hidden
+

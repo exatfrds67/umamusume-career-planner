@@ -18,7 +18,7 @@ $value = (int) $mixedValue;
 
 // ✅ Good
 $value = is_numeric($mixedValue) ? (int) $mixedValue : 0;
-```
+```text
 
 ### 2. Array Shape Return Types
 
@@ -45,7 +45,7 @@ $value = $data['key'];
 
 // ✅ Good
 $value = is_array($data) && isset($data['key']) ? $data['key'] : null;
-```
+```text
 
 ### 4. Binary Operations on Mixed
 
@@ -74,7 +74,7 @@ class AIConversation extends Model { }
 
 // Option 2: Use getAttribute
 $model->getAttribute('ai_model_used')
-```
+```text
 
 ## Priority Files (Most Errors)
 
@@ -115,3 +115,4 @@ $model->getAttribute('ai_model_used')
 - Reduce from 4422 to under 100 errors
 - Focus on application code quality
 - Maintain test coverage
+

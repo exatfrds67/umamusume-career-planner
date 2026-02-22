@@ -2,11 +2,13 @@
 
 ## Problem
 
-PHPStan Level 9 analysis was reporting numerous "Access to an undefined property" errors for properties used in Pest tests. These properties are dynamically assigned in `beforeEach()` hooks but PHPStan cannot detect them through static analysis.
+PHPStan Level 9 analysis was reporting numerous "Access to an undefined property" errors for properties used in Pest
+tests. These properties are dynamically assigned in `beforeEach()` hooks but PHPStan cannot detect them through static
+analysis.
 
 Example errors:
 
-```
+```text
 Access to an undefined property PHPUnit\Framework\TestCase::$user.
 Access to an undefined property PHPUnit\Framework\TestCase::$character.
 Access to an undefined property PHPUnit\Framework\TestCase::$parser.
@@ -22,9 +24,10 @@ beforeEach(function () {
     $this->character = Character::factory()->create();
     $this->parser = new SomeParser();
 });
-```
+```text
 
-PHPStan performs static analysis and cannot detect these runtime property assignments, resulting in false positive errors.
+PHPStan performs static analysis and cannot detect these runtime property assignments, resulting in false positive
+errors.
 
 ## Solution
 
@@ -66,9 +69,9 @@ parameters:
     # Laravel testing methods available through traits but not recognized by PHPStan
     - message: '#Call to an undefined method PHPUnit\\Framework\\TestCase::mock\(\)\.#'
       path: tests/*
-```
+```text
 
-### 3. Updated Tests\TestCase
+## 3. Updated Tests\TestCase
 
 Added @property annotations to `tests/TestCase.php` to document common test properties:
 
@@ -102,7 +105,8 @@ abstract class TestCase extends BaseTestCase
 
 ## Alternative Approaches Considered
 
-1. **Declaring properties in TestCase**: Would require listing all possible properties, which is impractical given the variety across different test files
+1. **Declaring properties in TestCase**: Would require listing all possible properties, which is impractical given the
+variety across different test files
 2. **Using @var annotations in each test**: Would add significant boilerplate to every test file
 3. **Disabling property checks for tests**: Too broad and would miss legitimate errors
 

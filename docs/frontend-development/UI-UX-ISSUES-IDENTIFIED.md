@@ -4,42 +4,42 @@
 
 ### Part 1: Character Creation Form Structure Issues
 
-**Problem 1: Incorrect Use of Custom CSS Classes**
+#### Problem 1: Incorrect Use of Custom CSS Classes
 
 - Current: Using `.glass-card` with `.card-header` and `.card-body` for the wizard steps
 - Issue: `.glass-card` is a design-system card with gradient backgrounds and backdrop filters (meant for hero panels)
 - Should Be: Use semantic `.card` + `.card-header` + `.card-body` structure instead
 - Impact: Visual inconsistency, wrong styling intent, breaks component encapsulation
 
-**Problem 2: Missing Semantic HTML Structure**
+#### Problem 2: Missing Semantic HTML Structure
 
 - Current: `<div x-show="currentStep === 1" x-transition class="glass-card rounded-xl">`
 - Issue: No semantic role or ARIA attributes for accessibility
 - Should Be: Add `role="region"`, `aria-labelledby`, proper semantic sectioning
 - Impact: Screen reader users can't understand step context, poor accessibility (WCAG 2.2 AA violation)
 
-**Problem 3: Form Labels Not Associated with Inputs**
+#### Problem 3: Form Labels Not Associated with Inputs
 
 - Current: `<label class="form-label text-xs">Search</label>` (no `for` attribute)
 - Issue: Labels floating in the DOM without explicit associations
 - Should Be: `<label for="search" class="form-label">Search</label>` + add `id="search"` to input
 - Impact: WCAG 2.2 AA violation, screen readers can't associate labels with inputs
 
-**Problem 4: Missing Required Field Indicators**
+#### Problem 4: Missing Required Field Indicators
 
 - Current: Steps claim required fields but no clear visual/semantic indication
 - Issue: Asterisks used but not screen-reader accessible
 - Should Be: Use `<span aria-label="required">*</span>` or use `required` attribute with HTML
 - Impact: Users don't know which fields are required, form errors unclear
 
-**Problem 5: Color-Only Validation**
+#### Problem 5: Color-Only Validation
 
 - Current: Border color changes to indicate selection state
 - Issue: Color-only feedback violates WCAG (color contrast insufficient for deuteranopia users)
 - Should Be: Add text labels + icons + border styles (not just color)
 - Impact: 8% of males can't distinguish the selection state colors
 
-**Problem 6: Focus Indicators Missing**
+#### Problem 6: Focus Indicators Missing
 
 - Current: No visible `:focus-visible` states on interactive elements
 - Issue: Keyboard users can't see where they are in the form
@@ -48,28 +48,28 @@
 
 ### Part 4: UI/UX Layout Problems
 
-**Problem 1: Desktop Sidebar Not Following Spec**
+#### Problem 1: Desktop Sidebar Not Following Spec
 
 - Current: Sidebar mentioned in code but implementation is incomplete
 - Issue: WF-002 specifies sidebar stepper for desktop layout
 - Should Be: Implement responsive sidebar with step indicators on lg+ screens
 - Impact: Desktop layout doesn't match wireframe specification
 
-**Problem 2: Mobile Progress Bar Missing**
+#### Problem 2: Mobile Progress Bar Missing
 
 - Current: Step counter in header only
 - Issue: WF-002 specifies progress bar with visual indicator
 - Should Be: Add progress bar component showing "Step X of 4: [Step Name]"
 - Impact: Mobile users don't have clear progress indication
 
-**Problem 3: Step Validation Not Visually Clear**
+#### Problem 3: Step Validation Not Visually Clear
 
 - Current: `nextStep()` method exists but no visual feedback while validating
 - Issue: Users don't know if they can proceed or why they're blocked
 - Should Be: Show validation error messages with text explanations
 - Impact: User confusion, poor UX, abandonment risk
 
-**Problem 4: Missing Data Binding for Form Inputs**
+#### Problem 4: Missing Data Binding for Form Inputs
 
 - Current: Various form elements use x-model but not all are properly synced
 - Issue: Some form inputs might not persist data to Alpine formData object

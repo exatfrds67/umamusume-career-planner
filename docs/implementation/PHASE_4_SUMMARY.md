@@ -8,7 +8,8 @@
 
 ## Overview
 
-Phase 4 focuses on **Training Timeline Navigation** and **SP Budget Allocation**, enabling users to navigate training turn-by-turn and strategically allocate skill points across their character's available skill pool.
+Phase 4 focuses on **Training Timeline Navigation** and **SP Budget Allocation**, enabling users to navigate training
+turn-by-turn and strategically allocate skill points across their character's available skill pool.
 
 ### Phase 4 Goals
 
@@ -147,7 +148,7 @@ Phase 4 focuses on **Training Timeline Navigation** and **SP Budget Allocation**
     </div>
     <button @click="allocateSP(skillId, 10)">+10 SP</button>
 </div>
-```
+```text
 
 ---
 
@@ -278,7 +279,7 @@ Phase 4 focuses on **Training Timeline Navigation** and **SP Budget Allocation**
     :totalTurns="$plan->total_turns" 
     :currentTurn="$plan->current_turn" 
 />
-```
+```text
 
 ---
 
@@ -345,7 +346,7 @@ Phase 4 focuses on **Training Timeline Navigation** and **SP Budget Allocation**
 
 ## Files Created
 
-```
+```text
 resources/js/components/
   ├── training-timeline.js (130 lines)
   └── sp-allocator.js (250 lines)

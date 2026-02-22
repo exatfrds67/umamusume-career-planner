@@ -373,7 +373,7 @@ class TrainingAdvisorAgent extends BaseAgent
 
 ## Creating Tools
 
-### Using the Tool Artisan Command
+### Using the Artisan Command for Tools
 
 Create a new tool using the Artisan command:
 
@@ -1465,7 +1465,7 @@ class TrainingAdvisorAgent extends BaseAgent
 }
 ```
 
-#### MCP Environment Configuration
+#### MCP Configuration
 
 Enable MCP in your `.env` file:
 
@@ -1712,7 +1712,7 @@ If Inspector doesn't fit your needs, consider:
 
 However, Inspector is specifically designed for AI agent monitoring and provides the most relevant insights for Neuron AI applications.
 
-### MCP Connector Direct Integration (Optional)
+### MCP Connector Integration (Reference)
 
 Connect to Model Context Protocol servers:
 
@@ -1907,13 +1907,6 @@ INSPECTOR_INGESTION_KEY=...
 
 ## Changelog
 
-### Version 1.1.0 (2026-02-22)
-
-- Updated service references (NeuronAIService replaces HybridAIService)
-- Updated technology stack references (Pest v4, PHPUnit v12, Livewire 4)
-- Updated external data source references (GameTora replaces UmamusumeDB)
-- Aligned with Neuron AI v2.11 and neuron-laravel v0.3.4
-
 ### Version 1.0.0 (2026-01-12)
 
 - Initial integration guide
@@ -1937,6 +1930,6 @@ This documentation is part of the Uma Musume Career Planner project and is licen
 
 ---
 
-**Last Updated**: February 22, 2026  
-**Neuron AI Version**: v2.11 / neuron-laravel v0.3.4  
+**Last Updated**: January 12, 2026  
+**Neuron AI Version**: Latest  
 **Laravel Version**: 12.x

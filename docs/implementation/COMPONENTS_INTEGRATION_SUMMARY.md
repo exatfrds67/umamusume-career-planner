@@ -9,7 +9,8 @@
 
 ## Integration Complete
 
-The new game-aligned components from Phases 1-3 have been integrated into the actual working application pages, not just demo pages.
+The new game-aligned components from Phases 1-3 have been integrated into the actual working application pages, not just
+demo pages.
 
 ---
 
@@ -170,7 +171,7 @@ Visit: `http://127.0.0.1:8000/components-demo`
     show-percentage
     show-soft-cap
 />
-```
+```text
 
 ### ConditionBadge
 
@@ -189,7 +190,7 @@ Visit: `http://127.0.0.1:8000/components-demo`
     :value="85" 
     trend="up"
 />
-```
+```text
 
 ### TurnCounter
 
@@ -213,7 +214,7 @@ Visit: `http://127.0.0.1:8000/components-demo`
     :hint-level="5"
     :acquired="false"
 />
-```
+```text
 
 ### DeckSlot (Ready to use)
 
@@ -271,7 +272,7 @@ Visit: `http://127.0.0.1:8000/components-demo`
 
 ```bash
 php artisan test --filter=Component
-```
+```text
 
 **Result**: 83 tests passed (283 assertions)
 
@@ -310,7 +311,8 @@ None currently. All components working as expected.
 
 ## Conclusion
 
-Successfully integrated 4 of 13 components into the live application. The dashboard now uses game-aligned components that match the actual game's visual design and implement verified game mechanics.
+Successfully integrated 4 of 13 components into the live application. The dashboard now uses game-aligned components
+that match the actual game's visual design and implement verified game mechanics.
 
 **Status**: ✅ Working in production  
 **Next**: Integrate remaining components into other pages  
@@ -323,3 +325,4 @@ Successfully integrated 4 of 13 components into the live application. The dashbo
 **Components Live**: 4/13 (31%)  
 **Pages Updated**: 3  
 **Quality**: Production-ready ✅
+

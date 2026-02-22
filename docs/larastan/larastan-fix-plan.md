@@ -23,7 +23,8 @@ Based on the initial analysis, the main error types are:
 
 ### Phase 1: Test File Property Issues (Highest Volume)
 
-Most errors are in test files where properties like `$this->parser`, `$this->service`, etc. are accessed but not defined. These need PHPDoc `@property` annotations or stub files.
+Most errors are in test files where properties like `$this->parser`, `$this->service`, etc. are accessed but not
+defined. These need PHPDoc `@property` annotations or stub files.
 
 **Files to Fix**:
 

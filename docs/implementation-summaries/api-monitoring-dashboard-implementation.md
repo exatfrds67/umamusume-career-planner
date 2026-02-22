@@ -7,7 +7,8 @@
 
 ## Overview
 
-Implemented a comprehensive monitoring dashboard for external API integration with real-time performance tracking, cache monitoring, error rate analysis, and alerting capabilities.
+Implemented a comprehensive monitoring dashboard for external API integration with real-time performance tracking, cache
+monitoring, error rate analysis, and alerting capabilities.
 
 ## Components Created
 
@@ -185,7 +186,7 @@ Added comprehensive monitoring routes under `/api/monitoring` prefix with proper
 
 ```bash
 curl http://localhost/api/monitoring/dashboard
-```
+```text
 
 ### Get Response Time Statistics
 
@@ -197,7 +198,7 @@ curl http://localhost/api/monitoring/response-times?source=umapyoi
 
 ```bash
 curl http://localhost/api/monitoring/cache-performance
-```
+```text
 
 ### Get Error Rates
 
@@ -209,7 +210,7 @@ curl http://localhost/api/monitoring/error-rates
 
 ```bash
 curl http://localhost/api/monitoring/realtime
-```
+```text
 
 ### Acknowledge Alert
 
@@ -223,7 +224,7 @@ curl -X POST http://localhost/api/monitoring/alerts/{alertId}/acknowledge
 curl -X POST http://localhost/api/monitoring/circuit-breakers/reset \
   -H "Content-Type: application/json" \
   -d '{"source": "umapyoi"}'
-```
+```text
 
 ## Monitoring Thresholds
 
@@ -312,6 +313,10 @@ curl -X POST http://localhost/api/monitoring/circuit-breakers/reset \
 
 ## Conclusion
 
-The API monitoring dashboard has been successfully implemented with comprehensive tracking of response times, cache performance, error rates, and real-time alerting. The system provides actionable insights and recommendations for maintaining optimal API performance and reliability.
+The API monitoring dashboard has been successfully implemented with comprehensive tracking of response times, cache
+performance, error rates, and real-time alerting. The system provides actionable insights and recommendations for
+maintaining optimal API performance and reliability.
 
-All requirements for Task 5.1.1 have been met, and the implementation is production-ready with full test coverage and proper integration with existing services.
+All requirements for Task 5.1.1 have been met, and the implementation is production-ready with full test coverage and
+proper integration with existing services.
+

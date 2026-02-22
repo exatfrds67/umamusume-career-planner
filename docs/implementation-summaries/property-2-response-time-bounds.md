@@ -11,7 +11,7 @@ Implemented comprehensive property-based tests to validate that the Training Adv
 
 ## Property Definition
 
-**Property 2: Response Time Bounds**
+### Property 2: Response Time Bounds
 
 All recommendations must be generated within specified time bounds based on AI provider:
 
@@ -202,7 +202,7 @@ The fallback mechanism is extremely fast and reliable:
 ## Validation Against Requirements
 
 | Requirement | Status | Evidence |
-|-------------|--------|----------|
+| --- | --- | --- |
 | 3.1: Real-time training recommendations | ✅ Pass | All tests complete within time bounds |
 | 4.1: Performance - Local AI ≤2s | ✅ Pass | Average 0.6-0.8s, max 1.5s |
 | 4.1: Performance - Cloud AI ≤5s | ✅ Pass | Average 1.5-2.5s, max 4s |

@@ -133,7 +133,7 @@ php artisan test --filter=Tesseract --compact
 
 **Solutions:**
 
-**Option A: Add to PATH manually**
+#### Option A: Add to PATH manually
 
 1. Open System Properties → Environment Variables
 2. Edit "Path" in System Variables
@@ -141,7 +141,7 @@ php artisan test --filter=Tesseract --compact
 4. Click OK
 5. **Restart PowerShell** (important!)
 
-**Option B: Use full path in .env**
+#### Option B: Use full path in .env
 
 ```env
 TESSERACT_PATH=C:\Program Files\Tesseract-OCR\tesseract.exe

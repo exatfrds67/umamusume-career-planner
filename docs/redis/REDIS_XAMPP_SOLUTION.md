@@ -10,14 +10,14 @@
 
 **XAMPP uses PHP 8.2.12:**
 
-```
+```text
 C:\XAMPP\php\php.exe -v
 PHP 8.2.12 (cli) (built: Oct 24 2023 21:15:15)
 ```
 
 **Your CLI uses PHP 8.4.11:**
 
-```
+```text
 php -v
 PHP 8.4.11 (cli) (built: Jul 29 2025 18:02:29)
 ```
@@ -41,13 +41,15 @@ PHP 8.4.11 (cli) (built: Jul 29 2025 18:02:29)
 
 ```powershell
 php artisan serve
-```
+```text
 
 ### Step 3: Access Application
 
 ```
-http://127.0.0.1:8000
-```
+
+<http://127.0.0.1:8000>
+
+```text
 
 **Done!** ✅ Application will work perfectly.
 
@@ -55,12 +57,12 @@ http://127.0.0.1:8000
 
 ## Why This Works
 
-| Component | XAMPP | PHP Server |
-|-----------|-------|------------|
-| PHP Version | 8.2.12 | 8.4.11 ✅ |
+| Component       | XAMPP           | PHP Server  |
+| --------------- | --------------- | ----------- |
+| PHP Version     | 8.2.12          | 8.4.11 ✅    |
 | Redis Extension | ❌ Not installed | ✅ Installed |
-| Tests | ❌ Different PHP | ✅ Same PHP |
-| Configuration | Complex | Simple |
+| Tests           | ❌ Different PHP | ✅ Same PHP  |
+| Configuration   | Complex         | Simple      |
 
 **PHP 8.4.11 server uses the same PHP as your CLI:**
 
@@ -105,7 +107,7 @@ If you really want to use XAMPP:
 ```powershell
 # Use PHP 8.4.11 built-in server
 php artisan serve
-```
+```text
 
 **Benefits:**
 
@@ -136,7 +138,7 @@ php artisan serve
 
 ```powershell
 php artisan serve --port=8080
-```
+```text
 
 ### Start on Different Host
 
@@ -146,7 +148,7 @@ php artisan serve --host=0.0.0.0 --port=8000
 
 ### Access Application
 
-```
+```text
 http://127.0.0.1:8000
 ```
 
@@ -194,4 +196,5 @@ After starting PHP server:
 
 ---
 
-**Recommendation:** Always use `php artisan serve` for Laravel development. It's simpler, faster, and uses the correct PHP version.
+**Recommendation:** Always use `php artisan serve` for Laravel development. It's simpler, faster, and uses the correct
+PHP version.

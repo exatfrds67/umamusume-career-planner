@@ -183,7 +183,7 @@ parameters:
   ignoreErrors:
     - message: '#Access to an undefined property PHPUnit\\Framework\\TestCase::\$\w+\.#'
       path: tests/*
-```
+```text
 
 ### Commands Used
 
@@ -234,6 +234,9 @@ To continue reducing errors:
 
 ## Conclusion
 
-Successfully reduced Larastan level 9 errors by 41.3% (4,223 errors fixed) through systematic improvements to type safety, null checks, and documentation. The remaining 5,999 errors are primarily in the Services layer and can be addressed using the same methodical approach.
+Successfully reduced Larastan level 9 errors by 41.3% (4,223 errors fixed) through systematic improvements to type
+safety, null checks, and documentation. The remaining 5,999 errors are primarily in the Services layer and can be
+addressed using the same methodical approach.
 
-All changes maintain backward compatibility and follow Laravel best practices. The codebase is now significantly more type-safe and maintainable.
+All changes maintain backward compatibility and follow Laravel best practices. The codebase is now significantly more
+type-safe and maintainable.

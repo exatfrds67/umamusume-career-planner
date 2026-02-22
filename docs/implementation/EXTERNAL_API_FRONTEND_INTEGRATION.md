@@ -2,7 +2,7 @@
 
 **Document Version**: 1.0.0  
 **Date**: 2026-01-25  
-**Status**: ✅ Complete  
+**Status**: In Progress  
 
 ## Overview
 
@@ -27,7 +27,7 @@ This document outlines the complete implementation of external API integration w
   - 20001-29999: SR (89 cards)
   - 30001-39999: SSR (264 cards)
 
-### ✅ Phase 2: Frontend Integration (COMPLETE)
+### 🔄 Phase 2: Frontend Integration (IN PROGRESS)
 
 #### Character Creation Flow
 
@@ -402,7 +402,7 @@ foreach ($request->input('aptitudes.distance') as $distance => $grade) {
 // ... similar for surface and style aptitudes
 ```
 
-### Support Card Database Import
+### Support Card Import Process
 
 When a support card is imported:
 
@@ -511,6 +511,7 @@ $skillAcquisition = SkillAcquisition::create([
 
 #### Support Card Import Testing
 
+- [ ] Browse external support cards
 - [ ] Filter by rarity (R/SR/SSR)
 - [ ] Import a card
 - [ ] Verify card appears in collection

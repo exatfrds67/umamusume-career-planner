@@ -12,16 +12,16 @@
 ### ✅ Completed Components (4/8)
 
 | Component | File | Lines | Purpose | Dependencies |
-|-----------|------|-------|---------|--------------|
+| ----------- | ------ | ------- | --------- | -------------- |
 | **Stepper** | `stepper.blade.php` | 105 | Multi-step wizard progress indicator | - |
 | **TabBar** | `tab-bar.blade.php` | 98 | Tabbed navigation with count badges | - |
 | **Tooltip** | `tooltip.blade.php` | 91 | Hover/focus information tooltips | Alpine.js |
 | **ConfirmDialog** | `confirm-dialog.blade.php` | 134 | Modal confirmation dialogs | Alpine.js |
 
-### ✅ Completed (continued)
+### ⏳ In Progress
 
 | Component | Status | Next Actions |
-|-----------|--------|--------------|
+| ----------- | -------- | -------------- |
 | **planWizard** | ✅ Complete | - Integrated in create/edit views |
 | **plans/create.blade.php** | ✅ Complete | - 5-step wizard fully functional |
 | **plans/show.blade.php** | ✅ Complete | - Tabbed detail view with 4 tabs |

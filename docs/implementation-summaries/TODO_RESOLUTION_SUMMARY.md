@@ -5,7 +5,8 @@
 
 ## Overview
 
-This document summarizes the resolution of all TODO comments found in the codebase. All items have been addressed with proper implementations or clarifying comments.
+This document summarizes the resolution of all TODO comments found in the codebase. All items have been addressed with
+proper implementations or clarifying comments.
 
 ## Resolved TODOs
 
@@ -18,7 +19,7 @@ This document summarizes the resolution of all TODO comments found in the codeba
 
 ```php
 // TODO: Implement proper RNG logic like the game (Success/Failure/Great Success)
-```
+```text
 
 **Resolution:**
 
@@ -58,7 +59,7 @@ This document summarizes the resolution of all TODO comments found in the codeba
 
 ```php
 'estimated_cost' => 0.0, // TODO: Lookup cost
-```
+```text
 
 **Resolution:**
 
@@ -99,7 +100,7 @@ This document summarizes the resolution of all TODO comments found in the codeba
 ```php
 'input_cost' => 0.0, // TODO: Calculate separately
 'output_cost' => 0.0, // TODO: Calculate separately
-```
+```text
 
 **Resolution:**
 
@@ -139,7 +140,7 @@ This document summarizes the resolution of all TODO comments found in the codeba
 
 ```php
 // TODO: Implement actual MCP agent call
-```
+```text
 
 **Resolution:**
 
@@ -179,7 +180,7 @@ This document summarizes the resolution of all TODO comments found in the codeba
 
 ```php
 // TODO: Implement actual MCP agent call
-```
+```text
 
 **Resolution:**
 
@@ -219,7 +220,7 @@ This document summarizes the resolution of all TODO comments found in the codeba
 
 ```php
 'response_time' => null, // TODO: Implement actual response time measurement
-```
+```text
 
 **Resolution:**
 
@@ -260,7 +261,7 @@ This document summarizes the resolution of all TODO comments found in the codeba
 
 ```php
 // TODO: Implement actual agent tracking from database
-```
+```text
 
 **Resolution:**
 
@@ -300,7 +301,7 @@ This document summarizes the resolution of all TODO comments found in the codeba
 
 ```php
 'avg_confidence' => 0.0, // TODO: Track confidence scores
-```
+```text
 
 **Resolution:**
 
@@ -340,7 +341,7 @@ This document summarizes the resolution of all TODO comments found in the codeba
 
 ```php
 // TODO: Implement actual agent tracking
-```
+```text
 
 **Resolution:**
 
@@ -395,4 +396,7 @@ All changes have been:
 
 ## Conclusion
 
-All TODO items in the codebase have been successfully resolved. The implementations follow Laravel best practices, include proper error handling, and integrate seamlessly with existing systems. The codebase is now free of TODO comments and ready for production use.
+All TODO items in the codebase have been successfully resolved. The implementations follow Laravel best practices,
+include proper error handling, and integrate seamlessly with existing systems. The codebase is now free of TODO comments
+and ready for production use.
+

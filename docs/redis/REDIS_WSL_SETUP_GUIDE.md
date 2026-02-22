@@ -2,11 +2,12 @@
 
 ## Overview
 
-This guide provides comprehensive instructions for setting up Redis on Windows Subsystem for Linux (WSL) for the UmamusumeCareerPlanner application. Redis is used for caching, session management, and queue processing.
+This guide provides comprehensive instructions for setting up Redis on Windows Subsystem for Linux (WSL) for the
+UmamusumeCareerPlanner application. Redis is used for caching, session management, and queue processing.
 
 ## Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                    Windows (XAMPP)                          │
 │  ┌──────────────────────────────────────────────────────┐   │
@@ -43,7 +44,7 @@ This guide provides comprehensive instructions for setting up Redis on Windows S
 ```bash
 sudo apt update
 sudo apt upgrade -y
-```
+```text
 
 ### 1.2 Install Redis Server
 
@@ -55,7 +56,7 @@ sudo apt install redis-server -y
 
 ```bash
 redis-server --version
-```
+```text
 
 Expected output: `Redis server v=7.0.x` or higher
 
@@ -93,9 +94,9 @@ logfile /var/log/redis/redis-server.log
 
 # Database count (we use 0, 1, 2)
 databases 16
-```
+```text
 
-### 2.3 Save and Exit
+## 2.3 Save and Exit
 
 Press `Ctrl+X`, then `Y`, then `Enter`
 
@@ -111,7 +112,7 @@ sudo service redis-server start
 
 ```bash
 sudo service redis-server status
-```
+```text
 
 Expected output: `redis-server is running`
 
@@ -132,7 +133,7 @@ Create a file in your Windows startup folder or use Task Scheduler:
 ```bash
 # In WSL, create a startup script
 sudo nano /usr/local/bin/start-redis.sh
-```
+```text
 
 Add the following content:
 
@@ -145,9 +146,9 @@ Make it executable:
 
 ```bash
 sudo chmod +x /usr/local/bin/start-redis.sh
-```
+```text
 
-### 4.2 Windows Task Scheduler (Optional)
+## 4.2 Windows Task Scheduler (Optional)
 
 1. Open Task Scheduler
 2. Create Basic Task
@@ -184,7 +185,7 @@ Create a test file `C:\xampp\htdocs\redis-test.php`:
 ```php
 <?php
 phpinfo();
-```
+```text
 
 Search for "redis" in the output. You should see the Redis extension loaded.
 
@@ -219,12 +220,12 @@ SESSION_DRIVER=redis
 SESSION_CONNECTION=session
 ```
 
-### 6.2 Clear Configuration Cache
+## 6.2 Clear Configuration Cache
 
 ```bash
 php artisan config:clear
 php artisan cache:clear
-```
+```text
 
 ## Step 7: Test Redis Integration
 
@@ -237,7 +238,7 @@ php artisan tinker
 ```php
 Cache::put('test', 'Hello Redis!', 60);
 Cache::get('test'); // Should return "Hello Redis!"
-```
+```text
 
 ### 7.2 Test Queue
 
@@ -250,7 +251,7 @@ In another terminal:
 
 ```bash
 php artisan tinker
-```
+```text
 
 ```php
 dispatch(function () {
@@ -258,7 +259,7 @@ dispatch(function () {
 });
 ```
 
-### 7.3 Test Session
+## 7.3 Test Session
 
 Create a test route in `routes/web.php`:
 
@@ -267,7 +268,7 @@ Route::get('/test-session', function () {
     session(['test' => 'Redis session working!']);
     return session('test');
 });
-```
+```text
 
 Visit: `http://localhost/test-session`
 
@@ -285,7 +286,7 @@ This shows all commands being executed in real-time.
 
 ```bash
 redis-cli info
-```
+```text
 
 ### 8.3 Check Database Keys
 
@@ -302,11 +303,11 @@ redis-cli -n 0 keys "*"
 
 ## Database Allocation
 
-| Database | Purpose | Prefix |
-|----------|---------|--------|
-| DB 0 | Default/Queue | `umamusume-career-planner:` |
-| DB 1 | Cache | `umamusume-career-planner-cache-` |
-| DB 2 | Sessions | `umamusume-career-planner:session:` |
+| Database | Purpose       | Prefix                              |
+| -------- | ------------- | ----------------------------------- |
+| DB 0     | Default/Queue | `umamusume-career-planner:`         |
+| DB 1     | Cache         | `umamusume-career-planner-cache-`   |
+| DB 2     | Sessions      | `umamusume-career-planner:session:` |
 
 ## Performance Optimization
 
@@ -319,9 +320,9 @@ redis-cli info memory
 # Set max memory (in redis.conf)
 maxmemory 256mb
 maxmemory-policy allkeys-lru
-```
+```text
 
-### Persistence Configuration
+## Persistence Configuration
 
 ```bash
 # RDB snapshots (in redis.conf)
@@ -343,9 +344,9 @@ sudo netstat -tulpn | grep 6379
 
 # Restart Redis
 sudo service redis-server restart
-```
+```text
 
-### Connection Refused from Windows
+## Connection Refused from Windows
 
 ```bash
 # Verify Redis is listening on all interfaces
@@ -358,7 +359,7 @@ sudo ufw status
 sudo ufw allow 6379/tcp
 ```
 
-### phpredis Not Working
+## phpredis Not Working
 
 ```bash
 # Verify extension is loaded
@@ -369,9 +370,9 @@ php --ini
 
 # Verify extension path
 php -i | grep extension_dir
-```
+```text
 
-### Performance Issues
+## Performance Issues
 
 ```bash
 # Check slow log
@@ -392,7 +393,7 @@ redis-cli info memory | grep fragmentation
 
    ```conf
    requirepass your_strong_password_here
-   ```
+   ```text
 
 2. **Bind to Specific IP**:
 
@@ -404,7 +405,7 @@ redis-cli info memory | grep fragmentation
 
    ```conf
    protected-mode yes
-   ```
+   ```text
 
 4. **Disable Dangerous Commands**:
 
@@ -420,7 +421,7 @@ redis-cli info memory | grep fragmentation
    tls-port 6380
    tls-cert-file /path/to/redis.crt
    tls-key-file /path/to/redis.key
-   ```
+   ```text
 
 ## Maintenance
 
@@ -434,7 +435,7 @@ sudo service redis-server status
 redis-cli info memory | grep used_memory_human
 ```
 
-### Weekly Tasks
+## Weekly Tasks
 
 ```bash
 # Backup Redis data
@@ -442,9 +443,9 @@ sudo cp /var/lib/redis/dump.rdb /backup/redis-backup-$(date +%Y%m%d).rdb
 
 # Check slow queries
 redis-cli slowlog get 100
-```
+```text
 
-### Monthly Tasks
+## Monthly Tasks
 
 ```bash
 # Analyze key distribution
@@ -467,7 +468,7 @@ php artisan horizon:install
 
 # Start Horizon
 php artisan horizon
-```
+```text
 
 Access Horizon dashboard at: `http://localhost/horizon`
 
@@ -504,7 +505,7 @@ TTL key_name
 SETEX key_name 3600 "value"
 ```
 
-### Laravel Artisan Commands
+## Laravel Artisan Commands
 
 ```bash
 # Clear cache
@@ -528,7 +529,7 @@ php artisan queue:listen redis
 # Failed jobs
 php artisan queue:failed
 php artisan queue:retry all
-```
+```text
 
 ## References
 
@@ -544,3 +545,4 @@ For issues specific to this project, refer to:
 - Project documentation: `docs/`
 - Spec document: `.kiro/specs/umamusume-career-planner-main/`
 - Task list: `.kiro/specs/umamusume-career-planner-main/tasks.md`
+

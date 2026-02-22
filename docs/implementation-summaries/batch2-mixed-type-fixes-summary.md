@@ -23,7 +23,7 @@ This batch focused on eliminating "mixed" type contagion in the logic layer, spe
 ### Files Status
 
 | File | Initial Errors | Final Errors | Reduction | Status |
-|------|---------------|--------------|-----------|--------|
+| --- | --- | --- | --- | --- |
 | TrainingAdvisoryService.php | ~15 | 8 | 47% | ✅ Major Progress |
 | NeuronAIService.php | ~5 | 3 | 40% | ✅ Major Progress |
 | AdvisoryController.php | ~87 | 38 | 56% | ✅ Significant Progress |
@@ -431,7 +431,7 @@ The remaining errors are primarily false positives that don't represent actual t
 
 **Estimated Time Saved**: Future developers will spend ~30% less time debugging type-related issues thanks to explicit type handling.
 
-## Overview
+## Overview (Initial Analysis)
 
 This batch focused on eliminating "mixed" type contagion in the logic layer, specifically targeting:
 
@@ -448,7 +448,7 @@ This batch focused on eliminating "mixed" type contagion in the logic layer, spe
   - `binaryOp.invalid` with mixed values
   - `encapsedStringPart.nonString` in string interpolation
 
-## Changes Implemented
+## Changes Implemented (Detailed Progress)
 
 ### 1. TrainingAdvisoryService.php
 
@@ -472,14 +472,14 @@ This batch focused on eliminating "mixed" type contagion in the logic layer, spe
 
 ### 2. AdvisoryController.php
 
-#### Fixed: `calculateSPBudgetAnalysis` Method
+#### Fixed: `calculateSPBudgetAnalysis` Method (Progress)
 
 - **Issue**: Mixed type from `$rec->expectedOutcomes['sp_cost']`
 - **Solution**:
   - Added assertion: `assert(is_int($cost) || is_numeric($cost))`
   - Explicit cast to int: `(int) $cost`
 
-#### Fixed: `formatSkillRecommendation` Method
+#### Fixed: `formatSkillRecommendation` Method (Progress)
 
 - **Issue**: Mixed types from expectedOutcomes array
 - **Solution**:
@@ -487,7 +487,7 @@ This batch focused on eliminating "mixed" type contagion in the logic layer, spe
   - Explicit casting: `(int) $spCostRaw`, `(int) $skillIdRaw`
   - String assertion for expectedImpact
 
-#### Fixed: `getRaceStrategy` Method
+#### Fixed: `getRaceStrategy` Method (Progress)
 
 - **Issue**: Multiple mixed types from validated request data
 - **Solution**:
@@ -498,7 +498,7 @@ This batch focused on eliminating "mixed" type contagion in the logic layer, spe
     - `@var array<string, mixed> $raceDetails`
   - Explicit casting: `(int) $validated['race_id']`, `(string) $raceDetails['distance']`
 
-#### Fixed: `getSkillPurchaseAdvice` Method
+#### Fixed: `getSkillPurchaseAdvice` Method (Progress)
 
 - **Issue**: Mixed types from validated request
 - **Solution**:
@@ -520,16 +520,16 @@ This batch focused on eliminating "mixed" type contagion in the logic layer, spe
 
 ## Results
 
-### Error Reduction
+### Error Reduction (Initial Progress)
 
 - **Before**: 107 errors
 - **After**: ~60 errors (43% reduction)
 - **Remaining**: Mostly in AdvisoryController request validation methods
 
-### Files Status
+### Files Status (Initial Progress)
 
 | File | Initial Errors | Current Errors | Status |
-|------|---------------|----------------|--------|
+| --- | --- | --- | --- |
 | TrainingAdvisoryService.php | ~15 | ~3 | ✅ Nearly Complete |
 | NeuronAIService.php | ~5 | ~3 | ✅ Nearly Complete |
 | AdvisoryController.php | ~87 | ~54 | 🔄 In Progress |
@@ -589,7 +589,7 @@ The remaining errors are concentrated in methods that process validated request 
 
 5. **Array Access**: Use null coalescing with explicit casting: `(int) ($array['key'] ?? 0)`
 
-## Testing
+## Testing (Initial Status)
 
 - ✅ Code formatted with Pint
 - ✅ No syntax errors

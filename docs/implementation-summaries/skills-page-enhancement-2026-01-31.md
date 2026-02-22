@@ -2,7 +2,8 @@
 
 ## Overview
 
-Enhanced the skills management page (`/skills?character=3`) to provide better filtering, pagination, and display of skill information with proper hint level calculations and SP cost deductions.
+Enhanced the skills management page (`/skills?character=3`) to provide better filtering, pagination, and display of
+skill information with proper hint level calculations and SP cost deductions.
 
 ## Changes Implemented
 
@@ -20,7 +21,8 @@ Added comprehensive filtering options:
   - Level 4: 35% discount
   - Level 5: 40% discount (maximum)
 - **Grade Filter**: Filter by skill meta tier (SS, S, A, B, C, D)
-- **Skill Type Filter**: Enhanced with all types (Speed, Stamina, Power, Guts, Wisdom, Passive, Recovery, Debuff, Unique)
+- **Skill Type Filter**: Enhanced with all types (Speed, Stamina, Power, Guts, Wisdom, Passive, Recovery, Debuff,
+Unique)
 - **Rarity Filter**: Normal, Rare, Unique
 - **Search**: Text search by skill name or description
 
@@ -105,7 +107,7 @@ The system properly calculates SP costs based on character's current hint levels
 
 **Progressive Discount System** (verified in `SkillHintService.php`):
 
-```
+```text
 1 hint  = 10% discount
 2 hints = 20% discount
 3 hints = 30% discount
@@ -237,4 +239,6 @@ Admin users can:
 
 ## Conclusion
 
-The skills page now provides a comprehensive, user-friendly interface for managing character skills with proper filtering, pagination, and detailed information display. Users can quickly find skills by hint level, grade, or type, and acquire them with accurate SP cost calculations including hint deductions.
+The skills page now provides a comprehensive, user-friendly interface for managing character skills with proper
+filtering, pagination, and detailed information display. Users can quickly find skills by hint level, grade, or type,
+and acquire them with accurate SP cost calculations including hint deductions.

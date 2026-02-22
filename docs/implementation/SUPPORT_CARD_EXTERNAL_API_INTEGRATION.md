@@ -6,7 +6,9 @@
 
 ## Overview
 
-Implemented full integration of external API (umapyoi.net) data into the support card management system at `/support-cards`. Users can now browse and import real support card data directly from the external API, which automatically saves to the database and becomes available for deck building, training, and races.
+Implemented full integration of external API (umapyoi.net) data into the support card management system at
+`/support-cards`. Users can now browse and import real support card data directly from the external API, which
+automatically saves to the database and becomes available for deck building, training, and races.
 
 ## Implementation Summary
 
@@ -93,7 +95,7 @@ Implemented full integration of external API (umapyoi.net) data into the support
 
 ## Data Flow
 
-```
+```text
 User Opens /support-cards
     ↓
 User Clicks "Import from API"
@@ -143,7 +145,7 @@ Card Appears in Collection
 
 ### Get External Support Cards
 
-```
+```text
 GET /api/external/support-cards
 Response: {
   success: true,
@@ -163,7 +165,7 @@ Response: {
 
 ### Import Support Card
 
-```
+```text
 POST /api/support-cards/import-external
 Body: {
   external_id: 30001,
@@ -268,7 +270,7 @@ Support Cards table includes:
 'グループ' => 'friend'
 
 // Default: 'speed'
-```
+```text
 
 ## Rarity Inference Logic
 
@@ -295,7 +297,7 @@ Support Cards table includes:
 // 2. Remove ID part (first element)
 // 3. Capitalize each word
 // 4. Join with spaces
-```
+```text
 
 ## Testing Checklist
 

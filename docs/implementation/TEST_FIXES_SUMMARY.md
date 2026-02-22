@@ -55,7 +55,7 @@ The tests were using old/incorrect field names that don't match the actual API r
 
 **Solution**: Updated all test cases in `ResponseValidatorTest` to use correct field names:
 
-**Test 1: Valid character array response**
+#### Test 1: Valid character array response
 
 ```php
 // Before
@@ -76,7 +76,7 @@ The tests were using old/incorrect field names that don't match the actual API r
 ]
 ```
 
-**Test 2: Validates each item in array**
+#### Test 2: Validates each item in array
 
 ```php
 // Before
@@ -92,7 +92,7 @@ The tests were using old/incorrect field names that don't match the actual API r
 ]
 ```
 
-**Test 3: Complex nested structures**
+#### Test 3: Complex nested structures
 
 ```php
 // Before

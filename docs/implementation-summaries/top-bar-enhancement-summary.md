@@ -9,7 +9,9 @@
 
 ## Overview
 
-Enhanced the application's top bar navigation to align with documentation requirements from WF-001 (Dashboard Overview wireframe) and PRD-001 (Character Management). The top bar now provides comprehensive status information and improved navigation capabilities.
+Enhanced the application's top bar navigation to align with documentation requirements from WF-001 (Dashboard Overview
+wireframe) and PRD-001 (Character Management). The top bar now provides comprehensive status information and improved
+navigation capabilities.
 
 ## Changes Implemented
 
@@ -90,7 +92,7 @@ Enhanced the application's top bar navigation to align with documentation requir
 :energy="$topStatus['energy'] ?? null"
 :mood="$topStatus['mood'] ?? null"
 :career-stage="$topStatus['careerStage'] ?? null"
-```
+```text
 
 ## Technical Details
 
@@ -151,7 +153,7 @@ $topStatus = [
 ];
 
 return view('your.view', compact('topStatus'));
-```
+```text
 
 ### Run Selector Integration
 
@@ -238,4 +240,5 @@ This implementation aligns with:
 
 ---
 
-**Implementation Complete**: The top bar now provides comprehensive status information aligned with documentation requirements while maintaining excellent UX and accessibility standards.
+**Implementation Complete**: The top bar now provides comprehensive status information aligned with documentation
+requirements while maintaining excellent UX and accessibility standards.

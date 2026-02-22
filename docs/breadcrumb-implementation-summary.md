@@ -2,7 +2,8 @@
 
 ## Overview
 
-Comprehensive breadcrumb navigation has been implemented across the Umamusume Career Planner application to improve user navigation and provide clear context about the current page location within the site hierarchy.
+Comprehensive breadcrumb navigation has been implemented across the Umamusume Career Planner application to improve user
+navigation and provide clear context about the current page location within the site hierarchy.
 
 ## Component Created
 
@@ -28,7 +29,7 @@ Comprehensive breadcrumb navigation has been implemented across the Umamusume Ca
     ['label' => $character->name, 'url' => route('characters.show', $character)],
     ['label' => 'Edit']
 ]" />
-```
+```text
 
 ## Implementation Status
 
@@ -173,7 +174,7 @@ Then in the view:
     ['label' => 'Characters', 'url' => route('characters.index')],
     ['label' => $character->name]
 ]" />
-```
+```text
 
 ## Design Specifications
 
@@ -301,3 +302,4 @@ To complete the breadcrumb implementation:
 - Update this documentation when adding new breadcrumb patterns
 - Test breadcrumbs in both light and dark modes
 - Ensure mobile responsiveness for all new breadcrumbs
+

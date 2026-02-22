@@ -8,7 +8,8 @@
 
 ## Overview
 
-This document tracks the systematic refactoring of inline CSS and JavaScript from Blade templates into dedicated external resource files, following Laravel and Vite best practices.
+This document tracks the systematic refactoring of inline CSS and JavaScript from Blade templates into dedicated
+external resource files, following Laravel and Vite best practices.
 
 ## Objectives
 
@@ -29,7 +30,7 @@ This document tracks the systematic refactoring of inline CSS and JavaScript fro
 
 ### File Structure Convention
 
-```
+```text
 Source View: resources/views/pages/dashboard.blade.php
 Target CSS:  resources/css/pages/dashboard.css
 Target JS:   resources/js/pages/dashboard.js
@@ -52,7 +53,7 @@ Target CSS:       resources/css/components/skill-card.css
 
 <!-- External JS -->
 const userId = document.getElementById('dashboard').dataset.userId;
-```
+```text
 
 #### Method B: Window Object
 
@@ -173,7 +174,7 @@ input: [
     "resources/css/components/stat-bar.css",
     "resources/css/components/turn-counter.css",
 ],
-```
+```text
 
 ## Remaining Work
 
@@ -296,12 +297,12 @@ For each file to be refactored:
    export function componentName() { return { ... } }
    ```
 
-3. **Import Pattern**: Import and register in app.js
+1. **Import Pattern**: Import and register in app.js
 
    ```javascript
    import { componentName } from './path/to/component.js';
    Alpine.data('componentName', componentName);
-   ```
+   ```text
 
 ### CSS Organization
 

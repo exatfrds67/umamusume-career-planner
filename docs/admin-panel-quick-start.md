@@ -2,7 +2,8 @@
 
 ## Issue Resolution
 
-The `is_admin` column was successfully added to the `ucp_users` table and your user (ID: 1) has been granted admin privileges.
+The `is_admin` column was successfully added to the `ucp_users` table and your user (ID: 1) has been granted admin
+privileges.
 
 ## Accessing the Admin Panel
 
@@ -27,7 +28,7 @@ The `is_admin` column was successfully added to the `ucp_users` table and your u
 
 ```sql
 UPDATE ucp_users SET is_admin = 1 WHERE email = 'user@example.com';
-```
+```text
 
 ### Option 3: Via Tinker
 
@@ -39,7 +40,7 @@ php artisan tinker
 $user = User::where('email', 'user@example.com')->first();
 $user->is_admin = true;
 $user->save();
-```
+```text
 
 ## What Was Fixed
 
@@ -79,7 +80,7 @@ If you still get the "attribute does not exist" error:
    ```bash
    php artisan cache:clear
    php artisan config:clear
-   ```
+   ```text
 
 2. **Verify column exists**:
 
@@ -91,7 +92,7 @@ If you still get the "attribute does not exist" error:
 
    ```bash
    php artisan tinker --execute="print_r(User::find(1)->toArray());"
-   ```
+   ```text
 
 4. **Restart development server** if using `php artisan serve`
 

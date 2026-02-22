@@ -6,7 +6,8 @@
 
 ## Overview
 
-This document summarizes the resolution of TODO comments in the ProfileController. Both TODOs related to user statistics tracking have been successfully implemented.
+This document summarizes the resolution of TODO comments in the ProfileController. Both TODOs related to user statistics
+tracking have been successfully implemented.
 
 ## Resolved TODOs
 
@@ -20,7 +21,7 @@ This document summarizes the resolution of TODO comments in the ProfileControlle
 
 ```php
 'training_sessions' => 0, // TODO: Implement when training sessions are tracked
-```
+```text
 
 **Resolution:**
 
@@ -47,7 +48,7 @@ This document summarizes the resolution of TODO comments in the ProfileControlle
 
 ```php
 'races_completed' => 0, // TODO: Implement when races are tracked
-```
+```text
 
 **Resolution:**
 
@@ -86,7 +87,7 @@ public function trainingSessions(): \Illuminate\Database\Eloquent\Relations\HasM
 {
     return $this->hasManyThrough(TrainingSession::class, Character::class);
 }
-```
+```text
 
 **Benefits:**
 
@@ -131,7 +132,7 @@ All necessary tables and relationships already exist:
 
 ### Relationship Chain
 
-```
+```text
 User (id) 
   → Character (user_id) 
     → TrainingSession (character_id)
@@ -153,7 +154,7 @@ $stats = [
     'training_sessions' => $user->trainingSessions()->count(),
     'races_completed' => $user->races()->where('finish_position', '!=', null)->count(),
 ];
-```
+```text
 
 ### Additional Queries (Now Possible)
 
@@ -206,7 +207,7 @@ FROM ucp_races
 INNER JOIN ucp_characters ON ucp_races.character_id = ucp_characters.id 
 WHERE ucp_characters.user_id = ? 
   AND ucp_races.finish_position IS NOT NULL
-```
+```text
 
 ### Caching Recommendations
 
@@ -249,7 +250,7 @@ test('user can count completed races', function () {
     
     expect($user->races()->whereNotNull('finish_position')->count())->toBe(3);
 });
-```
+```text
 
 ### Feature Tests
 
@@ -318,7 +319,8 @@ Both TODO items in ProfileController have been successfully resolved by:
 3. Filtering races to count only completed ones
 4. Following Laravel best practices and conventions
 
-The implementation is production-ready, well-documented, and follows all coding standards. Users can now see accurate statistics for their training sessions and completed races on their profile page.
+The implementation is production-ready, well-documented, and follows all coding standards. Users can now see accurate
+statistics for their training sessions and completed races on their profile page.
 
 ---
 

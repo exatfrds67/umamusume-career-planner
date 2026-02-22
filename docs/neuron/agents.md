@@ -4,13 +4,16 @@ Easily implement LLM interactions by extending the basic Agent class.
 
 ## Overview
 
-You can create your agent by extending the `NeuronAI\Agent` class to inherit the main features of the framework and create fully functional agents. This class automatically manages advanced mechanisms for you such as:
+You can create your agent by extending the `NeuronAI\Agent` class to inherit the main features of the framework and
+create fully functional agents. This class automatically manages advanced mechanisms for you such as:
 
 - Chat history
 - Tools and function calls
 - RAG systems
 
-Extending the base class makes it easier to add custom methods and behavior to the agent, and also promotes portability, because all the moving parts are encapsulated into a single entity that you can run wherever you want in your application, or even release as a standalone composer package.
+Extending the base class makes it easier to add custom methods and behavior to the agent, and also promotes portability,
+because all the moving parts are encapsulated into a single entity that you can run wherever you want in your
+application, or even release as a standalone composer package.
 
 ## Example: YouTube Video Summarizer
 
@@ -20,13 +23,14 @@ Let's create an AI Agent that summarizes YouTube videos.
 
 ```bash
 php vendor/bin/neuron make:agent App\\Neuron\\YouTubeAgent
-```
+```text
 
 This creates a basic agent structure that you'll customize.
 
 ### Implement the Provider
 
-The minimum implementation requires assigning an AI Provider that will be the language and reasoning engine of your agent.
+The minimum implementation requires assigning an AI Provider that will be the language and reasoning engine of your
+agent.
 
 The only required method to implement is `provider()` returning the instance of the provider you want to use:
 
@@ -49,11 +53,13 @@ class YouTubeAgent extends Agent
 }
 ```
 
-You can also use other providers like OpenAI, Gemini, or Ollama if you want to run the model locally. Check out the [AI Providers](ai-providers.md) documentation.
+You can also use other providers like OpenAI, Gemini, or Ollama if you want to run the model locally. Check out the [AI
+Providers](ai-providers.md) documentation.
 
 ### Add System Instructions
 
-System instructions provide directions for making the AI act according to the task we want to achieve. They are fixed instructions that will be sent to the LLM on every interaction.
+System instructions provide directions for making the AI act according to the task we want to achieve. They are fixed
+instructions that will be sent to the LLM on every interaction.
 
 Implement the `instructions()` method:
 
@@ -73,17 +79,19 @@ public function instructions(): string
         ]
     );
 }
-```
+```text
 
 #### SystemPrompt Properties
 
-The `SystemPrompt` class is designed to take your base instructions and build a consistent prompt for the underlying model, reducing the effort for prompt engineering:
+The `SystemPrompt` class is designed to take your base instructions and build a consistent prompt for the underlying
+model, reducing the effort for prompt engineering:
 
 - **background**: Context about the agent's role and expertise
 - **steps**: Step-by-step instructions for task completion
 - **output**: Format and structure requirements for responses
 
-We highly recommend using the `SystemPrompt` class to increase the quality of results. Alternatively, you can return a simple string:
+We highly recommend using the `SystemPrompt` class to increase the quality of results. Alternatively, you can return a
+simple string:
 
 ```php
 public function instructions(): string
@@ -104,13 +112,15 @@ $response = YouTubeAgent::make()->chat(
 );
 
 echo $response->getContent();
-```
+```text
 
-As you saw in the example above, we sent a `UserMessage` instance to the agent and it responded with an `AssistantMessage` instance. A list of assistant messages and user messages creates a chat.
+As you saw in the example above, we sent a `UserMessage` instance to the agent and it responded with an
+`AssistantMessage` instance. A list of assistant messages and user messages creates a chat.
 
 ## Inline Configuration
 
-In alternative to the single class encapsulation, you can also instruct the agent inline using a fluent chain of methods:
+In alternative to the single class encapsulation, you can also instruct the agent inline using a fluent chain of
+methods:
 
 ```php
 use NeuronAI\Agent;
@@ -128,14 +138,16 @@ $response = $agent->chat(new UserMessage("Hello!"));
 
 ## Monitoring
 
-To watch inside the agent workflow, connect your Agent to the [Inspector monitoring dashboard](https://inspector.dev) to see the execution flow in real-time.
+To watch inside the agent workflow, connect your Agent to the [Inspector monitoring dashboard](https://inspector.dev) to
+see the execution flow in real-time.
 
 After you sign up, set the `INSPECTOR_INGESTION_KEY` variable in your environment file:
 
 ```env
 INSPECTOR_INGESTION_KEY=your_key_here
-```
+```text
 
 ---
 
 **Source:** <https://docs.neuron-ai.dev/getting-started/agent>
+

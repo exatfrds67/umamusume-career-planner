@@ -297,7 +297,9 @@ if (! $this->service->isAvailable()) {
 
 ---
 
-**Resolution completed on January 20, 2026**
+## Resolution Summary
+
+Completed on January 20, 2026
 
 **Files modified:** 2  
 **Tests fixed:** All  

@@ -7,11 +7,12 @@
 
 ## Problem Summary
 
-The training predictions page had 7 console warnings about form field elements missing `id` or `name` attributes. This prevented browser autofill from working correctly and violated HTML best practices and accessibility standards.
+The training predictions page had 7 console warnings about form field elements missing `id` or `name` attributes. This
+prevented browser autofill from working correctly and violated HTML best practices and accessibility standards.
 
 ## Console Warning
 
-```
+```text
 A form field element should have an id or name attribute
 
 A form field element has neither an `id` nor a `name` attribute. 
@@ -22,7 +23,8 @@ This might prevent the browser from correctly autofilling the form.
 
 ## Root Cause
 
-Multiple form input elements across several Blade components used on the training predictions page were missing proper `id` and `name` attributes:
+Multiple form input elements across several Blade components used on the training predictions page were missing proper
+`id` and `name` attributes:
 
 1. **Accessibility Settings Panel** - 3 checkbox inputs
 2. **MCP User Controls Panel** - 7 inputs (4 checkboxes, 2 number inputs, 1 range input)
@@ -45,7 +47,7 @@ Multiple form input elements across several Blade components used on the trainin
 ```blade
 <input type="checkbox" x-model="highContrast" @change="toggleHighContrast()" 
     class="accessibility-toggle-input">
-```
+```text
 
 **After**:
 
@@ -73,7 +75,7 @@ Multiple form input elements across several Blade components used on the trainin
 ```blade
 <input type="checkbox" x-model="settings.performance.auto_fallback" 
     @change="$dispatch('update-performance-setting', {...})">
-```
+```text
 
 **After**:
 
@@ -94,7 +96,7 @@ Multiple form input elements across several Blade components used on the trainin
 
 ```blade
 <input type="checkbox" x-model="displayConfidence" @change="updateChart()">
-```
+```text
 
 **After**:
 
@@ -164,7 +166,7 @@ All new `id` and `name` attributes follow these conventions:
 
 ### Console Output (After Fix)
 
-```
+```text
 [vite] connecting...
 [vite] connected.
 [SW] Found old service workers, unregistering...
@@ -222,7 +224,8 @@ This fix improves accessibility in several ways:
 
 ## Related Standards
 
-- [WCAG 2.2 Success Criterion 1.3.1 - Info and Relationships](https://www.w3.org/WAI/WCAG22/Understanding/info-and-relationships.html)
+- [WCAG 2.2 Success Criterion 1.3.1 - Info and
+Relationships](https://www.w3.org/WAI/WCAG22/Understanding/info-and-relationships.html)
 - [MDN: The Input Element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input)
 - [HTML Standard: Form Controls](https://html.spec.whatwg.org/multipage/form-control-infrastructure.html)
 - [W3C: Labeling Controls](https://www.w3.org/WAI/tutorials/forms/labels/)
@@ -237,7 +240,8 @@ This fix improves accessibility in several ways:
 
 ## Conclusion
 
-All 7 form field elements on the training predictions page now have proper `id` and `name` attributes, resolving the console warnings and significantly improving:
+All 7 form field elements on the training predictions page now have proper `id` and `name` attributes, resolving the
+console warnings and significantly improving:
 
 - ✅ Accessibility (WCAG 2.2 AA compliant)
 - ✅ Browser autofill support
@@ -246,4 +250,5 @@ All 7 form field elements on the training predictions page now have proper `id` 
 - ✅ Code quality and maintainability
 - ✅ Standards compliance
 
-The page is now error-free and provides a better user experience for all users, including those using assistive technologies.
+The page is now error-free and provides a better user experience for all users, including those using assistive
+technologies.

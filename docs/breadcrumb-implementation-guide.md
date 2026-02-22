@@ -14,7 +14,7 @@ Usage:
     ['label' => 'Characters', 'url' => route('characters.index')],
     ['label' => 'Edit']
 ]" />
-```
+```text
 
 ## Implementation Status
 
@@ -128,7 +128,7 @@ Usage:
     ['label' => 'Parent', 'url' => route('parent.index')],
     ['label' => 'Current Page']
 ]" />
-```
+```text
 
 ### Pattern 3: Three-Level with Dynamic Name
 
@@ -147,7 +147,7 @@ Usage:
     ['label' => 'Data Management', 'url' => route('data-management.index')],
     ['label' => 'Import Data']
 ]" />
-```
+```text
 
 ## Controller Updates Required
 

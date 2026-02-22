@@ -8,7 +8,9 @@
 
 ### Root Cause
 
-The external data browser at `http://127.0.0.1:8000/external-data/browse` is failing because **Redis is not running**. The application's health monitoring and caching systems depend on Redis, and when Redis is unavailable, it causes the entire external API system to fail.
+The external data browser at `http://127.0.0.1:8000/external-data/browse` is failing because **Redis is not running**.
+The application's health monitoring and caching systems depend on Redis, and when Redis is unavailable, it causes the
+entire external API system to fail.
 
 ### Error Chain
 
@@ -41,9 +43,9 @@ wsl bash -c "sudo service redis-server status"
 
 # Test connection
 php artisan redis:health --detailed
-```
+```text
 
-#### For Windows with Redis for Windows
+## For Windows with Redis for Windows
 
 ```powershell
 # If you have Redis for Windows installed
@@ -53,7 +55,7 @@ redis-server
 net start Redis
 ```
 
-### Option 2: Temporarily Disable Redis Dependency
+## Option 2: Temporarily Disable Redis Dependency
 
 If Redis is not available, you can temporarily modify the cache configuration to use array driver:
 
@@ -69,9 +71,9 @@ CACHE_DRIVER=array
 # REDIS_HOST=127.0.0.1
 # REDIS_PASSWORD=null  
 # REDIS_PORT=6379
-```
+```text
 
-### Option 3: Configure Fallback Cache Driver
+## Option 3: Configure Fallback Cache Driver
 
 Update the cache configuration to gracefully handle Redis failures:
 
@@ -97,7 +99,7 @@ After implementing the solution:
 
    ```bash
    php artisan redis:health --detailed
-   ```
+   ```text
 
 2. **Test External API Endpoint**:
 
@@ -116,7 +118,7 @@ After implementing the solution:
 
    ```bash
    php artisan pail --timeout=0
-   ```
+   ```text
 
 ## Expected Results
 
@@ -172,4 +174,6 @@ To prevent this issue in the future:
 
 ## Conclusion
 
-The external data browser functionality is working correctly - the issue was simply that Redis was not running. Once Redis is started, the umapyoi.net API integration will work as expected, providing access to 161+ characters, 487+ support cards, and other game data for the career planning application.
+The external data browser functionality is working correctly - the issue was simply that Redis was not running. Once
+Redis is started, the umapyoi.net API integration will work as expected, providing access to 161+ characters, 487+
+support cards, and other game data for the career planning application.

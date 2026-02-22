@@ -192,7 +192,7 @@ Stat Gain = (Base + StatBonus)
 ### Priority Tier 1 (Immediate - Week 1)
 
 | Task | Impact | Effort | Risk | Order |
-|------|--------|--------|------|-------|
+| ------ | -------- | -------- | ------ | ------- |
 | **1.1 Skill Hint System** | Critical | 3-4d | Medium | 1st |
 | **1.2 Aptitude SS Rank** | High | 1d | Low | 2nd |
 
@@ -203,7 +203,7 @@ Stat Gain = (Base + StatBonus)
 ### Priority Tier 2 (High Priority - Week 2-3)
 
 | Task | Impact | Effort | Risk | Order |
-|------|--------|--------|------|-------|
+| ------ | -------- | -------- | ------ | ------- |
 | **1.3 Stat Range & Soft Cap** | Medium | 2-3d | Medium | 3rd |
 | **1.4 Training Formula** | High | 5-7d | High | 4th |
 
@@ -214,7 +214,7 @@ Stat Gain = (Base + StatBonus)
 ### Priority Tier 3 (Enhancement - Week 4+)
 
 | Task | Impact | Effort | Risk | Order |
-|------|--------|--------|------|-------|
+| ------ | -------- | -------- | ------ | ------- |
 | Weather/Track Conditions | Medium | 3-4d | Medium | 5th |
 | Advanced Race Physics | Low | 4-5d | High | 6th |
 | UI Component Library | Medium | 8-10d | Low | 7th |
@@ -361,7 +361,7 @@ Spec: training-calculation-formula-alignment
 - ✅ Property-based tests for formula validation
 - ✅ Regression tests for existing functionality
 
-**Example: Skill Hint System Tests**
+#### Example: Skill Hint System Tests
 
 ```php
 // Unit Tests
@@ -492,7 +492,7 @@ public function up(): void
 ### 6.1 Technical Risks
 
 | Risk | Probability | Impact | Mitigation |
-|------|-------------|--------|------------|
+| ------ | ------------- | -------- | ------------ |
 | Test suite failures | High | Medium | Update tests incrementally, maintain CI |
 | Breaking changes in API | Medium | High | Version API endpoints, deprecation notices |
 | Data migration issues | Low | High | Dry-run migrations, backup strategy |
@@ -502,7 +502,7 @@ public function up(): void
 ### 6.2 Business Risks
 
 | Risk | Probability | Impact | Mitigation |
-|------|-------------|--------|------------|
+| ------ | ------------- | -------- | ------------ |
 | User confusion (changed calculations) | High | Medium | Release notes, migration guide, FAQ |
 | Existing plans become invalid | Medium | High | Provide recalculation tool, explain changes |
 | Loss of user trust | Low | High | Transparent communication, accuracy validation |
@@ -556,7 +556,7 @@ public function up(): void
 **Total Duration**: 3-4 weeks (15-20 working days)
 
 | Phase | Duration | Parallel? | Dependencies |
-|-------|----------|-----------|--------------|
+| ------- | ---------- | ----------- | -------------- |
 | Phase 1: Skill Hints | 3-4 days | No | None |
 | Phase 2: Aptitude Grades | 1 day | Yes (with Phase 1) | None |
 | Phase 3: Stat Range | 2-3 days | No | Phase 1 complete |
@@ -810,4 +810,4 @@ return new class extends Migration
 
 ---
 
-**END OF ANALYSIS**
+## END OF ANALYSIS

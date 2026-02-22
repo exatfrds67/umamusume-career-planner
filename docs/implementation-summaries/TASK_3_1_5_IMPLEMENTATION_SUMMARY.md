@@ -10,7 +10,8 @@
 
 ## Overview
 
-Successfully implemented the advanced training prediction UI with comprehensive agent visualization, stat gains display, Spirit Burst indicators, and recommendation rankings as specified in Task 3.1.5.
+Successfully implemented the advanced training prediction UI with comprehensive agent visualization, stat gains display,
+Spirit Burst indicators, and recommendation rankings as specified in Task 3.1.5.
 
 ---
 
@@ -183,7 +184,7 @@ Successfully implemented the advanced training prediction UI with comprehensive 
   "include_recommendations": true,
   "use_mcp": true
 }
-```
+```text
 
 **Response Structure**:
 
@@ -453,7 +454,8 @@ Task 3.1.5 has been successfully completed with all required features implemente
 ✅ **Spirit Burst Indicators** - Unity Cup team synergy visualization
 ✅ **Agent Performance Metrics** - Prediction quality and confidence indicators
 
-The implementation follows Laravel 12 best practices, maintains WCAG 2.2 AA accessibility compliance, and integrates seamlessly with the existing API infrastructure from Task 3.1.4.
+The implementation follows Laravel 12 best practices, maintains WCAG 2.2 AA accessibility compliance, and integrates
+seamlessly with the existing API infrastructure from Task 3.1.4.
 
 ---
 

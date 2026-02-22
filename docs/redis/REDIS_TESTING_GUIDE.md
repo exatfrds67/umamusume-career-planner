@@ -19,11 +19,12 @@ Before testing, ensure:
 
 ```bash
 php artisan redis:health
-```
+```text
 
 Expected output:
 
 ```
+
 ✅ Redis connection successful!
 
 📊 Cache Statistics:
@@ -38,7 +39,8 @@ Expected output:
 | Connected Clients   | 3        |
 | Uptime (days)       | 5.23     |
 +---------------------+----------+
-```
+
+```text
 
 ### 2. Warm Cache
 
@@ -48,7 +50,7 @@ php artisan cache:warm
 
 Expected output:
 
-```
+```text
 Starting cache warming process...
 Redis connection successful.
 Cache warming completed successfully!
@@ -58,7 +60,7 @@ Cache warming completed successfully!
 
 ```bash
 php artisan tinker
-```
+```text
 
 ```php
 // Test basic cache operations
@@ -86,7 +88,7 @@ Cache::tags(['training', 'character'])->get('test_tagged'); // Should return nul
 
    ```env
    CACHE_STORE=redis
-   ```
+   ```text
 
 2. Verify configuration:
 
@@ -110,7 +112,7 @@ Cache::tags(['training', 'character'])->get('test_tagged'); // Should return nul
 
    ```env
    QUEUE_CONNECTION=redis
-   ```
+   ```text
 
 2. Verify configuration:
 
@@ -134,7 +136,7 @@ Cache::tags(['training', 'character'])->get('test_tagged'); // Should return nul
 
    ```env
    SESSION_DRIVER=redis
-   ```
+   ```text
 
 2. Verify configuration:
 
@@ -158,7 +160,7 @@ Cache::tags(['training', 'character'])->get('test_tagged'); // Should return nul
 
    ```bash
    php artisan tinker
-   ```
+   ```text
 
    ```php
    Redis::connection('default')->ping(); // Should return "PONG" or true
@@ -168,7 +170,7 @@ Cache::tags(['training', 'character'])->get('test_tagged'); // Should return nul
 
    ```php
    Redis::connection('cache')->ping(); // Should return "PONG" or true
-   ```
+   ```text
 
 3. Test session connection:
 
@@ -190,7 +192,7 @@ Cache::tags(['training', 'character'])->get('test_tagged'); // Should return nul
 
    ```php
    Cache::put('test_write', 'Test data', 60);
-   ```
+   ```text
 
 2. Read from cache:
 
@@ -203,7 +205,7 @@ Cache::tags(['training', 'character'])->get('test_tagged'); // Should return nul
 
    ```php
    Cache::has('test_write'); // Should return true
-   ```
+   ```text
 
 4. Delete from cache:
 
@@ -226,7 +228,7 @@ Cache::tags(['training', 'character'])->get('test_tagged'); // Should return nul
 
    ```php
    Cache::put('test_ttl', 'Expires soon', 5);
-   ```
+   ```text
 
 2. Immediately check:
 
@@ -239,7 +241,7 @@ Cache::tags(['training', 'character'])->get('test_tagged'); // Should return nul
    ```php
    sleep(6);
    Cache::get('test_ttl'); // Should return null
-   ```
+   ```text
 
 **Pass Criteria**: ✅ Cache expires after TTL
 
@@ -264,7 +266,7 @@ Cache::tags(['training', 'character'])->get('test_tagged'); // Should return nul
    ```php
    Cache::tags(['training'])->get('training_1'); // Should return "Data 1"
    Cache::tags(['character'])->get('character_1'); // Should return "Data 3"
-   ```
+   ```text
 
 3. Flush specific tag:
 
@@ -277,7 +279,7 @@ Cache::tags(['training', 'character'])->get('test_tagged'); // Should return nul
    ```php
    Cache::tags(['training'])->get('training_1'); // Should return null
    Cache::tags(['character'])->get('character_1'); // Should still return "Data 3"
-   ```
+   ```text
 
 **Pass Criteria**: ✅ Tagged cache invalidation works correctly
 
@@ -299,7 +301,7 @@ Cache::tags(['training', 'character'])->get('test_tagged'); // Should return nul
 
    ```php
    dispatch(new \App\Jobs\TestRedisJob());
-   ```
+   ```text
 
 3. Start queue worker:
 
@@ -311,7 +313,7 @@ Cache::tags(['training', 'character'])->get('test_tagged'); // Should return nul
 
    ```bash
    php artisan queue:failed
-   ```
+   ```text
 
 **Pass Criteria**: ✅ Job is processed successfully without errors
 
@@ -334,7 +336,7 @@ Cache::tags(['training', 'character'])->get('test_tagged'); // Should return nul
 
 2. Visit the route:
 
-   ```
+   ```text
    http://localhost/test-session
    ```
 
@@ -342,7 +344,7 @@ Cache::tags(['training', 'character'])->get('test_tagged'); // Should return nul
 
    ```bash
    redis-cli -n 2 keys "*"
-   ```
+   ```text
 
 **Pass Criteria**: ✅ Session data is stored in Redis DB 2
 
@@ -366,7 +368,7 @@ Cache::tags(['training', 'character'])->get('test_tagged'); // Should return nul
    ```php
    $stats = $service->getStatistics();
    print_r($stats);
-   ```
+   ```text
 
 3. Test cache warming:
 
@@ -391,7 +393,7 @@ Cache::tags(['training', 'character'])->get('test_tagged'); // Should return nul
    $data = range(1, 10000);
    $end = microtime(true);
    echo "Without cache: " . ($end - $start) . " seconds\n";
-   ```
+   ```text
 
 2. Test with cache:
 
@@ -423,7 +425,7 @@ Cache::tags(['training', 'character'])->get('test_tagged'); // Should return nul
 
    ```bash
    redis-cli info memory | grep used_memory_human
-   ```
+   ```text
 
 2. Add large dataset:
 
@@ -437,7 +439,7 @@ Cache::tags(['training', 'character'])->get('test_tagged'); // Should return nul
 
    ```bash
    redis-cli info memory | grep used_memory_human
-   ```
+   ```text
 
 4. Clean up:
 
@@ -461,7 +463,7 @@ Cache::tags(['training', 'character'])->get('test_tagged'); // Should return nul
 
    ```bash
    sudo service redis-server stop
-   ```
+   ```text
 
 2. Try cache operation:
 
@@ -477,7 +479,7 @@ Cache::tags(['training', 'character'])->get('test_tagged'); // Should return nul
 
    ```bash
    sudo service redis-server start
-   ```
+   ```text
 
 4. Verify recovery:
 
@@ -508,7 +510,7 @@ Cache::tags(['training', 'character'])->get('test_tagged'); // Should return nul
    $value = Cache::get($key, 0);
    Cache::put($key, $value + 1, 60);
    echo "Count: " . Cache::get($key) . "\n";
-   ```
+   ```text
 
 2. Run multiple instances:
 
@@ -520,7 +522,7 @@ Cache::tags(['training', 'character'])->get('test_tagged'); // Should return nul
 
    ```bash
    php artisan tinker
-   ```
+   ```text
 
    ```php
    Cache::get('concurrent_test'); // Should be 3
@@ -589,7 +591,7 @@ class RedisIntegrationTest extends TestCase
         $this->assertArrayHasKey('used_memory', $stats);
     }
 }
-```
+```text
 
 Run the test suite:
 
@@ -609,7 +611,7 @@ php artisan test --filter=RedisIntegrationTest
 
    ```bash
    sudo service redis-server status
-   ```
+   ```text
 
 2. Start Redis if stopped:
 
@@ -621,7 +623,7 @@ php artisan test --filter=RedisIntegrationTest
 
    ```bash
    sudo netstat -tulpn | grep 6379
-   ```
+   ```text
 
 ---
 
@@ -641,7 +643,7 @@ php artisan test --filter=RedisIntegrationTest
 
    ```bash
    php --ini
-   ```
+   ```text
 
 3. Add extension if missing:
 
@@ -663,7 +665,7 @@ php artisan test --filter=RedisIntegrationTest
 
    ```bash
    ls -la /var/run/redis/
-   ```
+   ```text
 
 2. Fix permissions:
 
@@ -683,7 +685,7 @@ php artisan test --filter=RedisIntegrationTest
 
    ```bash
    redis-cli info memory
-   ```
+   ```text
 
 2. Set max memory in redis.conf:
 
@@ -696,7 +698,7 @@ php artisan test --filter=RedisIntegrationTest
 
    ```bash
    sudo service redis-server restart
-   ```
+   ```text
 
 ---
 
@@ -704,12 +706,12 @@ php artisan test --filter=RedisIntegrationTest
 
 Expected performance metrics:
 
-| Operation | Without Redis | With Redis | Improvement |
-|-----------|--------------|------------|-------------|
-| Cache Read | 50ms | 1ms | 50x faster |
-| Cache Write | 30ms | 2ms | 15x faster |
-| Session Read | 20ms | 0.5ms | 40x faster |
-| Queue Job | 100ms | 10ms | 10x faster |
+| Operation    | Without Redis | With Redis | Improvement |
+| ------------ | ------------- | ---------- | ----------- |
+| Cache Read   | 50ms          | 1ms        | 50x faster  |
+| Cache Write  | 30ms          | 2ms        | 15x faster  |
+| Session Read | 20ms          | 0.5ms      | 40x faster  |
+| Queue Job    | 100ms         | 10ms       | 10x faster  |
 
 ## Monitoring Commands
 
@@ -726,7 +728,7 @@ redis-cli -n 1 monitor
 redis-cli monitor | grep "GET"
 ```
 
-### Statistics
+## Statistics
 
 ```bash
 # Get all info
@@ -739,9 +741,9 @@ redis-cli info clients
 
 # Get slow log
 redis-cli slowlog get 10
-```
+```text
 
-### Key Analysis
+## Key Analysis
 
 ```bash
 # Count keys by pattern
@@ -756,7 +758,8 @@ redis-cli --scan --pattern "*training*"
 
 ## Conclusion
 
-This testing guide ensures comprehensive validation of Redis integration. All tests should pass before deploying to production.
+This testing guide ensures comprehensive validation of Redis integration. All tests should pass before deploying to
+production.
 
 For additional support, refer to:
 

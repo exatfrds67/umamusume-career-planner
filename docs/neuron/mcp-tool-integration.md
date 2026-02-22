@@ -2,11 +2,14 @@
 
 ## Overview
 
-This document explains how to integrate Model Context Protocol (MCP) tools with Neuron AI agents in the Uma Musume Career Planner application. MCP allows agents to automatically discover and use tools from external servers without implementing them manually.
+This document explains how to integrate Model Context Protocol (MCP) tools with Neuron AI agents in the Uma Musume
+Career Planner application. MCP allows agents to automatically discover and use tools from external servers without
+implementing them manually.
 
 ## What is MCP?
 
-Model Context Protocol (MCP) is an open standard designed by Anthropic to connect AI agents to external service providers. It enables:
+Model Context Protocol (MCP) is an open standard designed by Anthropic to connect AI agents to external service
+providers. It enables:
 
 - **Automatic Tool Discovery**: Agents automatically discover tools exposed by MCP servers
 - **Standardized Integration**: Connect to any MCP-compliant server using a standard protocol
@@ -24,7 +27,7 @@ MCP integration is configured in `config/neuron.php`:
     'enabled' => env('NEURON_MCP_ENABLED', false),
     // ...
 ]
-```
+```text
 
 Set `NEURON_MCP_ENABLED=true` in your `.env` file to enable MCP integration.
 
@@ -70,7 +73,7 @@ Remote MCP servers are accessed via HTTP/HTTPS URLs:
         ],
     ],
 ],
-```
+```text
 
 ## Using MCP Tools in Agents
 
@@ -111,9 +114,10 @@ protected function mcpServers(): array
         ],
     ];
 }
-```
+```text
 
-This configuration will only include the specified tools from the memory server, reducing token consumption and preventing unwanted tool usage.
+This configuration will only include the specified tools from the memory server, reducing token consumption and
+preventing unwanted tool usage.
 
 ### Tool Filtering with `exclude()`
 
@@ -167,7 +171,7 @@ class TrainingAdvisorAgent extends BaseAgent
         ];
     }
 }
-```
+```text
 
 The agent will have access to both the custom `CharacterStatsTool` and the filtered tools from the memory MCP server.
 
@@ -190,7 +194,7 @@ if (McpToolIntegration::isEnabled()) {
 ```php
 $servers = McpToolIntegration::getAvailableServers();
 // Returns: ['memory', 'filesystem', 'fetch', 'umapyoi', ...]
-```
+```text
 
 ### Get Server Information
 
@@ -216,7 +220,7 @@ $tools = McpToolIntegration::getTools([
         'exclude' => ['delete_file'],
     ],
 ]);
-```
+```text
 
 ### Get All Tools from Enabled Servers
 
@@ -253,7 +257,7 @@ class McpDemoAgent extends BaseAgent
         ];
     }
 }
-```
+```text
 
 ## Available MCP Servers
 
@@ -343,7 +347,7 @@ MCP connections may fail. The integration handles errors gracefully:
 // Errors are logged but don't crash the application
 $tools = McpToolIntegration::getAllTools();
 // Returns empty array if all connections fail
-```
+```text
 
 ### 4. Test with MCP Disabled
 
@@ -362,7 +366,7 @@ Use Inspector to monitor MCP tool usage:
 
 ```env
 INSPECTOR_INGESTION_KEY=your_key_here
-```
+```text
 
 This allows you to see which tools agents are using and optimize accordingly.
 
@@ -376,13 +380,13 @@ This allows you to see which tools agents are using and optimize accordingly.
    config('neuron.mcp.local_servers.memory.enabled')
    ```
 
-2. Verify the command and args are correct:
+1. Verify the command and args are correct:
 
    ```bash
    npx -y @modelcontextprotocol/server-memory
-   ```
+   ```text
 
-3. Check logs for connection errors:
+2. Check logs for connection errors:
 
    ```bash
    tail -f storage/logs/laravel.log
@@ -394,7 +398,7 @@ This allows you to see which tools agents are using and optimize accordingly.
 
    ```env
    NEURON_MCP_ENABLED=true
-   ```
+   ```text
 
 2. Check tool filtering configuration:
 
@@ -416,7 +420,8 @@ This allows you to see which tools agents are using and optimize accordingly.
 
 This implementation validates the following requirements:
 
-- **Requirement 17.5**: When MCP servers expose tools THEN the system SHALL automatically discover and register them with agents
+- **Requirement 17.5**: When MCP servers expose tools THEN the system SHALL automatically discover and register them
+with agents
 - **Requirement 17.6**: The System SHALL support filtering MCP tools using `exclude()` and `only()` methods
 
 ## Related Documentation

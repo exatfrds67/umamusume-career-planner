@@ -20,7 +20,7 @@ protected function calculateSupportCardBonus(
     string $trainingType,
     array $supportCards = []
 ): float {
-```
+```text
 
 **After:**
 
@@ -41,7 +41,7 @@ protected function calculateSupportCardBonus(
 
 ```php
 return $this->availableModels[$model]['version'] ?? 'unknown';
-```
+```text
 
 **After:**
 
@@ -61,7 +61,7 @@ return 'unknown';
 
 ```php
 return array_key_first($distanceAptitudes) ?? 'mile';
-```
+```text
 
 **After:**
 
@@ -78,7 +78,7 @@ if (isset($context['character'])) {
     $char = $context['character'];
     $contextStr .= "Character: {$char['name']}\n";
 }
-```
+```text
 
 **After:**
 
@@ -98,7 +98,7 @@ if (isset($context['character']) && is_array($context['character'])) {
 if (isset($response['content'][0]['text'])) {
     return (string) $response['content'][0]['text'];
 }
-```
+```text
 
 **After:**
 
@@ -117,7 +117,7 @@ if (isset($response['content'][0]['text'])) {
 
 ```php
 $inputCost = ($pricing['input'] ?? 0.0) * ($tokenCount / 1000000);
-```
+```text
 
 **After:**
 
@@ -136,7 +136,7 @@ return [
     'content' => $result['response'] ?? '',
     'model' => $result['model'] ?? 'claude-3-5-sonnet',
 ];
-```
+```text
 
 **After:**
 
@@ -160,7 +160,7 @@ return [
  * Calculate evolution priority score.
  */
 private function calculateEvolutionPriority(Skill $skill, array $efficiency, bool $canEvolve): int
-```
+```text
 
 **After:**
 
@@ -232,7 +232,7 @@ All files were formatted with Laravel Pint after fixes:
 
 ```bash
 vendor/bin/pint app/Services/TrainingCalculationService.php app/Services/SkillEvolutionService.php app/Services/AI/BedrockService.php app/Services/AI/OllamaService.php app/Services/AI/HybridAIService.php
-```
+```text
 
 Result: **5 files, 5 style issues fixed**
 
@@ -252,3 +252,4 @@ To achieve full Larastan level 9 compliance:
 2. Create type stubs for third-party packages
 3. Refactor complex array structures to use DTOs
 4. Add more granular type specifications for nested arrays
+

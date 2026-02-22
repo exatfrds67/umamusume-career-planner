@@ -2,24 +2,25 @@
 
 ## Overview
 
-The character creation wizard (Part 1) and UI/UX implementation (Part 4) violate **WCAG 2.2 AA accessibility standards** and **diverge from WF-002 wireframe specifications**. This document outlines all issues and their fixes.
+The character creation wizard (Part 1) and UI/UX implementation (Part 4) violate **WCAG 2.2 AA accessibility standards**
+and **diverge from WF-002 wireframe specifications**. This document outlines all issues and their fixes.
 
 ---
 
 ## Quick Issue Reference
 
-| Issue | Severity | Type | Location | Impact |
-|-------|----------|------|----------|--------|
-| Using `.glass-card` instead of `.card` | HIGH | Design System | All steps | Wrong component styling |
-| Missing form label associations | CRITICAL | Accessibility | All form inputs | Screen readers can't connect labels |
-| No focus indicators | CRITICAL | Accessibility | All inputs/buttons | Keyboard users lost |
-| Color-only selection feedback | CRITICAL | Accessibility | Trainee cards | 8% of males can't see selection |
-| No required field indicators | HIGH | Accessibility | Required fields | Users don't know what's needed |
-| No semantic HTML structure | HIGH | Accessibility | Step containers | Screen readers confused |
-| Desktop sidebar missing | MEDIUM | Design | Layout | Doesn't match WF-002 spec |
-| Mobile progress bar missing | MEDIUM | Design | Layout | Mobile users have poor progress indication |
-| No validation error messages | MEDIUM | UX | Form validation | Users blocked without explanation |
-| No visible aria-current states | MEDIUM | Accessibility | Step indicators | Can't announce current step |
+| Issue                                  | Severity | Type          | Location           | Impact                                     |
+| -------------------------------------- | -------- | ------------- | ------------------ | ------------------------------------------ |
+| Using `.glass-card` instead of `.card` | HIGH     | Design System | All steps          | Wrong component styling                    |
+| Missing form label associations        | CRITICAL | Accessibility | All form inputs    | Screen readers can't connect labels        |
+| No focus indicators                    | CRITICAL | Accessibility | All inputs/buttons | Keyboard users lost                        |
+| Color-only selection feedback          | CRITICAL | Accessibility | Trainee cards      | 8% of males can't see selection            |
+| No required field indicators           | HIGH     | Accessibility | Required fields    | Users don't know what's needed             |
+| No semantic HTML structure             | HIGH     | Accessibility | Step containers    | Screen readers confused                    |
+| Desktop sidebar missing                | MEDIUM   | Design        | Layout             | Doesn't match WF-002 spec                  |
+| Mobile progress bar missing            | MEDIUM   | Design        | Layout             | Mobile users have poor progress indication |
+| No validation error messages           | MEDIUM   | UX            | Form validation    | Users blocked without explanation          |
+| No visible aria-current states         | MEDIUM   | Accessibility | Step indicators    | Can't announce current step                |
 
 ---
 
@@ -34,7 +35,7 @@ The character creation wizard (Part 1) and UI/UX implementation (Part 4) violate
 ```blade
 <label class="form-label">Search</label>
 <input type="text" x-model="filters.query">
-```
+```text
 
 **Fixed**: Explicit label-input association
 
@@ -51,7 +52,7 @@ The character creation wizard (Part 1) and UI/UX implementation (Part 4) violate
 
 ```blade
 <input class="form-input">
-```
+```text
 
 **Fixed**: Visible focus with 3:1 contrast
 
@@ -67,7 +68,7 @@ The character creation wizard (Part 1) and UI/UX implementation (Part 4) violate
 
 ```blade
 :class="selected ? 'border-blue-500' : 'border-gray-200'"
-```
+```text
 
 **Fixed**: Color + text + icon + border multi-modal feedback
 
@@ -84,7 +85,7 @@ The character creation wizard (Part 1) and UI/UX implementation (Part 4) violate
 
 ```blade
 <label>Field Name <span class="text-red-500">*</span></label>
-```
+```text
 
 **Fixed**: Asterisk + text + aria-required
 
@@ -108,7 +109,7 @@ The character creation wizard (Part 1) and UI/UX implementation (Part 4) violate
     <div class="card-header">...</div>
     <div class="card-body">...</div>
 </div>
-```
+```text
 
 **Fixed**: Semantic HTML with ARIA
 
@@ -164,7 +165,7 @@ The character creation wizard (Part 1) and UI/UX implementation (Part 4) violate
     backdrop-filter: blur(24px);
     border: 1px solid rgba(255, 255, 255, 0.4);
 }
-```
+```text
 
 **Current Misuse**: Applied to form steps
 
@@ -182,7 +183,7 @@ The character creation wizard (Part 1) and UI/UX implementation (Part 4) violate
     border-radius: 0.75rem;
     box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 }
-```
+```text
 
 **Fix**: Replace all step containers from `.glass-card` to `.card`
 
@@ -240,11 +241,11 @@ The character creation wizard (Part 1) and UI/UX implementation (Part 4) violate
 
 ## Files to Modify
 
-| File | Changes | Priority |
-|------|---------|----------|
+| File                                        | Changes                                                 | Priority |
+| ------------------------------------------- | ------------------------------------------------------- | -------- |
 | resources/views/characters/create.blade.php | All semantic HTML, label associations, sidebar/progress | CRITICAL |
-| resources/css/app.css | Add focus-visible, update focus states | CRITICAL |
-| (Alpine data in template) | Add validation logic, error messages | HIGH |
+| resources/css/app.css                       | Add focus-visible, update focus states                  | CRITICAL |
+| (Alpine data in template)                   | Add validation logic, error messages                    | HIGH     |
 
 ---
 
@@ -316,3 +317,4 @@ The character creation wizard (Part 1) and UI/UX implementation (Part 4) violate
 3. Update resources/css/app.css for accessibility
 4. Test with accessibility tools
 5. Browser verify end-to-end
+

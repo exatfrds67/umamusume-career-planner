@@ -2,7 +2,8 @@
 
 ## Overview
 
-This document describes the comprehensive monitoring, logging, error tracking, and disaster recovery setup for the UmamusumeCareerPlanner application.
+This document describes the comprehensive monitoring, logging, error tracking, and disaster recovery setup for the
+UmamusumeCareerPlanner application.
 
 ## Table of Contents
 
@@ -56,7 +57,7 @@ return [
         Watchers\ScheduleWatcher::class => env('TELESCOPE_SCHEDULE_WATCHER', true),
     ],
 ];
-```
+```text
 
 #### Accessing Telescope
 
@@ -91,7 +92,7 @@ Custom exception handling is configured in `bootstrap/app.php`:
 ### Error Notification Channels
 
 | Severity | Channel | Response Time |
-|----------|---------|---------------|
+| --- | --- | --- |
 | Critical | Slack + Email + PagerDuty | Immediate |
 | Error | Slack + Email | 15 minutes |
 | Warning | Slack | 1 hour |
@@ -117,7 +118,7 @@ Horizon provides real-time monitoring for Redis queues.
 - **Failed Jobs**: Jobs that failed and require attention
 - **Wait Time**: Time jobs spend in queue before processing
 
-#### Configuration
+#### Horizon Configuration
 
 ```php
 // config/horizon.php
@@ -144,7 +145,7 @@ return [
         ],
     ],
 ];
-```
+```text
 
 ### Database Query Monitoring
 
@@ -184,13 +185,15 @@ use App\Services\ApiPerformanceMonitoringService;
 
 $metrics = app(ApiPerformanceMonitoringService::class);
 $report = $metrics->getPerformanceReport('last_24_hours');
-```
+```text
 
 ### Health Check Endpoint
 
 ```
+
 GET /api/health
-```
+
+```text
 
 Response:
 
@@ -230,7 +233,7 @@ All analytics are collected in compliance with GDPR and privacy regulations.
 #### Data Retention
 
 | Data Type | Retention Period |
-|-----------|------------------|
+| --- | --- |
 | Session data | 24 hours |
 | Aggregated analytics | 90 days |
 | Error logs | 30 days |
@@ -344,7 +347,7 @@ aws s3 cp "$BACKUP_DIR/" s3://ucp-backups/database/ --recursive --exclude "*" --
 find $BACKUP_DIR -type f -mtime +7 -delete
 ```
 
-#### File Backups
+## File Backups
 
 ```bash
 # Storage backup
@@ -352,12 +355,12 @@ tar -czf /backups/storage/storage_$(date +%Y%m%d).tar.gz /var/www/storage/app
 
 # Upload to S3
 aws s3 sync /backups/storage/ s3://ucp-backups/storage/
-```
+```text
 
-### Backup Schedule
+## Backup Schedule
 
 | Backup Type | Frequency | Retention |
-|-------------|-----------|-----------|
+| --- | --- | --- |
 | Database (full) | Daily | 30 days |
 | Database (incremental) | Hourly | 24 hours |
 | File storage | Daily | 14 days |
@@ -368,7 +371,7 @@ aws s3 sync /backups/storage/ s3://ucp-backups/storage/
 #### Recovery Time Objectives (RTO)
 
 | Scenario | RTO | RPO |
-|----------|-----|-----|
+| --- | --- | --- |
 | Database corruption | 1 hour | 1 hour |
 | Server failure | 2 hours | 1 hour |
 | Data center outage | 4 hours | 1 hour |
@@ -393,27 +396,27 @@ aws s3 sync /backups/storage/ s3://ucp-backups/storage/
    mysql -u $DB_USER -p$DB_PASS $DB_NAME < /tmp/restore.sql
    ```
 
-3. **Verify data integrity**
+1. **Verify data integrity**
 
    ```bash
    php artisan db:verify-integrity
-   ```
+   ```text
 
-4. **Run migrations if needed**
+2. **Run migrations if needed**
 
    ```bash
    php artisan migrate --force
    ```
 
-5. **Clear caches**
+3. **Clear caches**
 
    ```bash
    php artisan cache:clear
    php artisan config:clear
    php artisan route:clear
-   ```
+   ```text
 
-6. **Verify application health**
+4. **Verify application health**
 
    ```bash
    curl https://example.com/api/health
@@ -453,11 +456,11 @@ groups:
           severity: warning
         annotations:
           summary: Queue backlog growing
-```
+```text
 
-### Notification Channels
+## Notification Channels
 
-#### Slack Integration
+### Slack Integration
 
 ```php
 // app/Notifications/SystemAlert.php
@@ -483,18 +486,18 @@ class SystemAlert extends Notification
 ### On-Call Rotation
 
 | Day | Primary | Secondary |
-|-----|---------|-----------|
+| --- | --- | --- |
 | Mon-Fri | DevOps Team | Backend Team |
 | Sat-Sun | On-call Engineer | DevOps Lead |
 
 ---
 
-## Dashboard Access
+## Dashboard and Monitoring Access
 
 ### Available Dashboards
 
 | Dashboard | URL | Access Level |
-|-----------|-----|--------------|
+| --- | --- | --- |
 | Telescope | `/telescope` | Admin |
 | Horizon | `/horizon` | Admin |
 | Health Check | `/api/health` | Public |

@@ -13,7 +13,7 @@ The AI Training Advisory System has been analyzed for performance optimization. 
 
 ### ✅ Caching Implementation
 
-**RecommendationCacheService**
+#### RecommendationCacheService
 
 - **Cache Key Strategy**: Context-aware hashing based on turn, stats (rounded to nearest 10), energy (rounded to nearest 5), mood, facility levels, and bond status
 - **TTL**: 5 minutes (appropriate for turn-specific recommendations)
@@ -21,14 +21,14 @@ The AI Training Advisory System has been analyzed for performance optimization. 
 - **Invalidation**: Career-level and turn-level invalidation supported
 - **Storage**: Redis-optimized with pattern-based deletion support
 
-**RaceRequirementsCacheService**
+#### RaceRequirementsCacheService
 
 - **Cache Key Strategy**: Race ID-based with stamina calculations for all running styles
 - **TTL**: 1 hour (appropriate for static race data)
 - **Features**: Bulk caching, distance/grade filtering, stamina requirement calculations
 - **Performance**: Eliminates repeated database queries for race requirements
 
-**SkillCatalogCacheService**
+#### SkillCatalogCacheService
 
 - **Cache Key Strategy**: Version-based catalog caching
 - **TTL**: 24 hours (appropriate for static skill data)
@@ -37,19 +37,19 @@ The AI Training Advisory System has been analyzed for performance optimization. 
 
 ### ✅ Database Indexing
 
-**advisory_recommendations table**
+#### advisory_recommendations table
 
 - `idx_career_type_time`: Composite index on (career_id, recommendation_type, created_at)
 - `idx_career_followed`: Index on (career_id, was_followed)
 - `idx_confidence`: Index on confidence_score
 
-**critical_alerts table**
+#### critical_alerts table
 
 - `idx_career_type_dismissed`: Composite index on (career_id, alert_type, was_dismissed)
 - `idx_urgency`: Index on turns_until_critical
 - `idx_dismissed_time`: Composite index on (was_dismissed, dismissed_at)
 
-**prediction_accuracy table**
+#### prediction_accuracy table
 
 - `idx_career_pred_type`: Composite index on (career_id, prediction_type)
 - `idx_model_time_score`: Composite index on (model_version, created_at, accuracy_score)
@@ -57,13 +57,13 @@ The AI Training Advisory System has been analyzed for performance optimization. 
 
 ### ✅ Query Optimization
 
-**Eager Loading**
+#### Eager Loading
 
 - Race model loads relationships efficiently
 - Skill model loads evolution chains (evolutionTarget, evolutionSource)
 - No N+1 query issues identified
 
-**Query Patterns**
+#### Query Patterns
 
 - All common queries are covered by composite indexes
 - Cache::remember() pattern used consistently
@@ -74,7 +74,7 @@ The AI Training Advisory System has been analyzed for performance optimization. 
 ### Response Time Analysis
 
 | Operation | Target | Current | Status |
-|-----------|--------|---------|--------|
+| --------- | ------ | ------- | ------ |
 | Cache Hit | <50ms | ~10-30ms | ✅ Exceeds target |
 | Local AI (Ollama) | <2s | ~1.5-1.9s | ✅ Meets target |
 | Cloud AI (Bedrock) | <5s | ~3-4.5s | ✅ Meets target |
@@ -84,7 +84,7 @@ The AI Training Advisory System has been analyzed for performance optimization. 
 ### Cache Hit Rates (Expected)
 
 | Cache Type | Expected Hit Rate | Benefit |
-|------------|------------------|---------|
+| ---------- | ---------------- | ------- |
 | Recommendations | 60-80% | Eliminates AI inference on repeated contexts |
 | Race Requirements | 90-95% | Eliminates database queries for race data |
 | Skill Catalog | 95-99% | Eliminates skill database queries |

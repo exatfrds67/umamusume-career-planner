@@ -3,13 +3,16 @@
 **Document Version**: 1.0.0  
 **Date**: February 8, 2026  
 **Status**: Planning Phase  
-**Related Documents**: [component-inventory.md](../design/component-inventory.md), [000_WIREFRAMES_INDEX.md](../01-wireframes/000_WIREFRAMES_INDEX.md)
+**Related Documents**: [component-inventory.md](../design/component-inventory.md),
+[000_WIREFRAMES_INDEX.md](../01-wireframes/000_WIREFRAMES_INDEX.md)
 
 ---
 
 ## Overview
 
-This document outlines the implementation plan for adding a sidebar minimize/collapse feature to the Umamusume Career Planner application. The feature will allow users to toggle between a full-width sidebar and a minimized icon-only sidebar on desktop screens, improving screen real estate management.
+This document outlines the implementation plan for adding a sidebar minimize/collapse feature to the Umamusume Career
+Planner application. The feature will allow users to toggle between a full-width sidebar and a minimized icon-only
+sidebar on desktop screens, improving screen real estate management.
 
 ---
 
@@ -40,7 +43,7 @@ This document outlines the implementation plan for adding a sidebar minimize/col
 ```blade
 <!-- Desktop Sidebar -->
 <div class="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:flex lg:w-72 lg:flex-col ...">
-```
+```text
 
 **Main Content Offset**:
 
@@ -115,7 +118,7 @@ export default {
         localStorage.setItem('sidebar-minimized', true);
     }
 };
-```
+```text
 
 **Registration**: `resources/js/app.js`
 
@@ -137,7 +140,7 @@ Alpine.store('sidebar', sidebarStore);
 <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-white dark:bg-gray-800 px-6 pb-4"
      :class="$store.sidebar.minimized ? 'items-center px-2' : 'px-6'"
      x-data="{ ... }">
-```
+```text
 
 1. **Add toggle button** (after logo section):
 
@@ -188,7 +191,7 @@ Alpine.store('sidebar', sidebarStore);
         <span x-show="!$store.sidebar.minimized" x-transition>Dashboard</span>
     </a>
 </li>
-```
+```text
 
 1. **Handle collapsible groups** (hide when minimized):
 
@@ -236,7 +239,7 @@ Alpine.store('sidebar', sidebarStore);
      x-transition:all.duration.300ms>
     <x-app.sidebar />
 </div>
-```
+```text
 
 1. **Update main content offset**:
 
@@ -287,7 +290,7 @@ Alpine.store('sidebar', sidebarStore);
         ])></div>
     </div>
 </div>
-```
+```text
 
 **Usage Example**:
 
@@ -314,7 +317,7 @@ document.addEventListener('keydown', (e) => {
         Alpine.store('sidebar').toggle();
     }
 });
-```
+```text
 
 **Update Accessibility Settings Panel**:
 Add keyboard shortcut documentation to the help modal.
@@ -374,11 +377,11 @@ Add keyboard shortcut documentation to the help modal.
 
 ### Breakpoint Strategy
 
-| Breakpoint | Behavior |
-|------------|----------|
-| **Mobile (<640px)** | Bottom nav bar (no sidebar) |
-| **Tablet (640-1024px)** | Overlay sidebar (existing behavior) |
-| **Desktop (≥1024px)** | Fixed sidebar with minimize/expand toggle |
+| Breakpoint              | Behavior                                  |
+| ----------------------- | ----------------------------------------- |
+| **Mobile (<640px)**     | Bottom nav bar (no sidebar)               |
+| **Tablet (640-1024px)** | Overlay sidebar (existing behavior)       |
+| **Desktop (≥1024px)**   | Fixed sidebar with minimize/expand toggle |
 
 ### CSS Transitions
 
@@ -391,7 +394,7 @@ Add keyboard shortcut documentation to the help modal.
 .content-transition {
     transition: padding-left 300ms cubic-bezier(0.4, 0, 0.2, 1);
 }
-```
+```text
 
 ---
 
@@ -491,7 +494,7 @@ test.describe('Sidebar Minimize Accessibility', () => {
         await expect(tooltip).toBeVisible();
     });
 });
-```
+```text
 
 ### Visual Regression Tests
 
@@ -541,12 +544,12 @@ test.describe('Sidebar Visual States', () => {
 
 ### Performance Metrics
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
+| Metric               | Target | Measurement                      |
+| -------------------- | ------ | -------------------------------- |
 | Toggle Response Time | <100ms | Time from click to visual change |
-| Transition Duration | 300ms | CSS transition duration |
-| LocalStorage Write | <10ms | Time to persist state |
-| Tooltip Render | <50ms | Time to show tooltip on hover |
+| Transition Duration  | 300ms  | CSS transition duration          |
+| LocalStorage Write   | <10ms  | Time to persist state            |
+| Tooltip Render       | <50ms  | Time to show tooltip on hover    |
 
 ---
 
@@ -681,9 +684,9 @@ test.describe('Sidebar Visual States', () => {
 
 **Version History**:
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0.0 | 2026-02-08 | Development Team | Initial implementation plan |
+| Version | Date       | Author           | Changes                     |
+| ------- | ---------- | ---------------- | --------------------------- |
+| 1.0.0   | 2026-02-08 | Development Team | Initial implementation plan |
 
 **Approval**:
 
@@ -694,4 +697,5 @@ test.describe('Sidebar Visual States', () => {
 
 ---
 
-*This implementation plan follows the project's dual storage architecture, Laravel 12 conventions, and WCAG 2.2 AA accessibility standards as outlined in AGENTS.md.*
+*This implementation plan follows the project's dual storage architecture, Laravel 12 conventions, and WCAG 2.2 AA
+accessibility standards as outlined in AGENTS.md.*

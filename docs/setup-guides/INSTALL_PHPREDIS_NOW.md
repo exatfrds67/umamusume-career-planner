@@ -32,7 +32,7 @@
 
 2. **Copy the DLL**
 
-   ```
+   ```text
    From: [extracted folder]\php_redis.dll
    To: C:\Users\exatf\tools\php-8.4.11\ext\php_redis.dll
    ```
@@ -41,7 +41,7 @@
 
 1. **Open php.ini**
 
-   ```
+   ```text
    C:\Users\exatf\tools\php-8.4.11\php.ini
    ```
 
@@ -52,7 +52,7 @@
 
    ```ini
    extension=redis
-   ```
+   ```text
 
    Note: Use `extension=redis` NOT `extension=php_redis.dll`
 
@@ -74,7 +74,7 @@ If you see "redis", the extension is installed correctly!
 
 ```powershell
 php artisan redis:health --detailed
-```
+```text
 
 **Expected:** Connection successful with Redis details
 
@@ -114,7 +114,7 @@ php artisan test --compact
 
 # Warm cache
 php artisan cache:warm
-```
+```text
 
 ## Troubleshooting
 
@@ -161,7 +161,7 @@ Should return: `PONG`
 
 ```powershell
 wsl bash -c "sudo service redis-server restart"
-```
+```text
 
 ## Download Links
 
@@ -206,3 +206,4 @@ wsl bash -c "sudo service redis-server restart"
 Start with downloading from: <https://pecl.php.net/package/redis/6.1.0/windows>
 
 Look for the PHP 8.4 NTS x64 VS16 version! 🚀
+

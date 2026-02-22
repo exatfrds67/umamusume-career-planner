@@ -6,7 +6,8 @@
 
 ## Overview
 
-Phase 2 focused on extracting inline JavaScript from high-priority views with complex logic, including race planning, performance monitoring, and skill management systems.
+Phase 2 focused on extracting inline JavaScript from high-priority views with complex logic, including race planning,
+performance monitoring, and skill management systems.
 
 ## Files Refactored (Phase 2)
 
@@ -39,7 +40,7 @@ Phase 2 focused on extracting inline JavaScript from high-priority views with co
 window.raceCalendarData = {
     races: @json($races ?? [])
 };
-```
+```text
 
 ---
 
@@ -116,7 +117,7 @@ window.skillsData = {
     isAdmin: @json($isAdmin ?? false),
     preSelectedCharacterId: '{{ $preSelectedCharacterId ?? '' }}'
 };
-```
+```text
 
 ---
 
@@ -145,7 +146,7 @@ await Promise.all([
     this.loadSPStats(),
     this.loadAgentPerformance()
 ]);
-```
+```text
 
 ### 2. **LocalStorage Persistence**
 
@@ -179,7 +180,7 @@ handleTouchEnd(e) {
         }
     }
 }
-```
+```text
 
 ### 4. **URL State Management**
 
@@ -207,18 +208,18 @@ startPolling() {
 destroy() {
     this.stopPolling(); // Cleanup on component destroy
 }
-```
+```text
 
 ---
 
 ## Code Statistics (Phase 2)
 
-| File | Lines Extracted | Complexity | API Calls |
-|------|----------------|------------|-----------|
-| races/calendar.js | 200+ | Medium | 0 (client-side only) |
-| performance/dashboard.js | 180+ | Medium | 1 (polling) |
-| skills/index.js | 400+ | High | 6 (parallel) |
-| **Total** | **780+** | - | **7** |
+| File                     | Lines Extracted | Complexity | API Calls            |
+| ------------------------ | --------------- | ---------- | -------------------- |
+| races/calendar.js        | 200+            | Medium     | 0 (client-side only) |
+| performance/dashboard.js | 180+            | Medium     | 1 (polling)          |
+| skills/index.js          | 400+            | High       | 6 (parallel)         |
+| **Total**                | **780+**        | -          | **7**                |
 
 ---
 
@@ -325,13 +326,16 @@ npm run build 2>&1 | grep -i error
 
 ## Notes
 
-1. **Toast Notifications**: Skills management now uses the global toast event system instead of creating DOM elements directly.
+1. **Toast Notifications**: Skills management now uses the global toast event system instead of creating DOM elements
+directly.
 
 2. **Admin Mode**: Skills management includes admin bypass for SP checks, useful for testing and development.
 
-3. **Polling Cleanup**: Performance dashboard properly cleans up polling timers on component destroy to prevent memory leaks.
+3. **Polling Cleanup**: Performance dashboard properly cleans up polling timers on component destroy to prevent memory
+leaks.
 
-4. **Touch Gestures**: Race calendar implements proper touch gesture detection with 50px threshold for swipe recognition.
+4. **Touch Gestures**: Race calendar implements proper touch gesture detection with 50px threshold for swipe
+recognition.
 
 5. **URL State**: Skills management persists character selection in URL for shareable links and browser history.
 
@@ -350,6 +354,8 @@ Phase 2 refactoring maintains compliance with:
 
 ## Conclusion
 
-Phase 2 successfully extracted **780+ lines** of complex JavaScript from 3 high-priority views. The refactoring maintains full functionality while improving code organization, testability, and performance. All established patterns from Phase 1 were followed consistently.
+Phase 2 successfully extracted **780+ lines** of complex JavaScript from 3 high-priority views. The refactoring
+maintains full functionality while improving code organization, testability, and performance. All established patterns
+from Phase 1 were followed consistently.
 
 **Next Steps**: Proceed with Phase 3 to handle remaining views and component-level scripts.

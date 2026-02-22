@@ -140,7 +140,7 @@
 - Multiple controllers accessing `Auth::user()->id` without null check
 - Files: `CareerReportController.php`, `DataManagementController.php`, `ExportController.php`, etc.
 
-#### Fix Approach
+#### Fix Approach - Undefined Properties
 
 1. **Add missing properties** to models:
 
@@ -193,7 +193,7 @@
 - **cast.double** (~70): TrainingPredictionResource, AI Dashboard, Performance services
 - **cast.string** (~20): ProfileController, BedrockService, MemoryGuardServiceProvider
 
-#### Fix Approach
+#### Fix Approach - Mixed Types
 
 1. **Add config validation** with proper types:
 
@@ -234,7 +234,7 @@
 **Impact**: Function call failures  
 **Error Types**: `argument.type`
 
-#### Files Affected (120+ instances)
+#### Files Affected - Argument Mismatches (120+ instances)
 
 **Service Method Calls** (80+ instances):
 
@@ -249,7 +249,7 @@
 - `array_*` functions with mixed parameters (20+ instances)
 - `sprintf()` with mixed values (ConversationHistoryService, lines 330-338)
 
-#### Fix Approach
+#### Fix Approach - Argument Mismatches
 
 1. **Validate input early**:
 
@@ -294,7 +294,7 @@
 
 - `app/Models/Skill.php` (Line: 298, array shape mismatch)
 
-#### Fix Approach
+#### Fix Approach - Return Types
 
 1. **Ensure return matches declaration**:
 
@@ -340,7 +340,7 @@
 
 - `app/Http/Requests/StoreSupportDeckRequest.php` (Lines: 60, 66)
 
-#### Fix Approach
+#### Fix Approach - Generic Types
 
 1. **Add Factory generics**:
 
@@ -379,13 +379,13 @@
 **Impact**: Mathematical operations  
 **Error Types**: `binaryOp.invalid`, `assignOp.invalid`
 
-#### Files Affected (80+ instances)
+#### Files Affected - Binary Operations (80+ instances)
 
 - Division/multiplication with mixed operands
 - String concatenation with mixed
 - Compound assignments (+=, *=, /=) with mixed
 
-#### Fix Approach
+#### Fix Approach - Binary Operations
 
 Ensure both operands are typed before operations:
 
@@ -400,13 +400,13 @@ $validated = (float)$value1 / (float)$value2;
 **Impact**: Null pointer exceptions  
 **Error Types**: `property.nonObject`, `method.nonObject`
 
-#### Files Affected (80+ instances)
+#### Files Affected - Null Safety (80+ instances)
 
 - User authentication checks (30+)
 - Carbon date operations (10+)
 - Relationship access (40+)
 
-#### Fix Approach
+#### Fix Approach - Null Safety
 
 ```php
 $user = Auth::user();
@@ -422,13 +422,13 @@ $userId = $user->id;
 
 **Error Types**: `foreach.nonIterable`, `foreach.emptyArray`
 
-#### Files Affected (25+ instances)
+#### Files Affected - Iteration Errors (25+ instances)
 
 - `app/Neuron/Agents/Tools/RaceDataTool.php` (Lines: 202-366, string treated as array)
 - `app/Jobs/SyncExternalDataJob.php` (Line: 540)
 - Config iteration issues
 
-#### Fix Approach
+#### Fix Approach - Iteration Errors
 
 ```php
 $items = is_array($data) ? $data : [];
@@ -443,12 +443,12 @@ foreach ($items as $item) {
 
 **Error Types**: `property.onlyWritten`
 
-#### Files Affected
+#### Files Affected - Unused Properties
 
 - `app/Http/Controllers/DataManagementController.php` (Lines: 29-32, 4 properties)
 - `app/Http/Controllers/MigrationController.php` (Line: 30, 1 property)
 
-#### Fix Approach
+#### Fix Approach - Unused Properties
 
 Remove unused properties or actually use them in methods.
 
@@ -458,13 +458,13 @@ Remove unused properties or actually use them in methods.
 
 **Error Types**: `method.notFound`
 
-#### Files Affected
+#### Files Affected - Method Not Found
 
 - `app/Jobs/SyncExternalDataJob.php` (Lines: 268-274, 7 undefined ExternalDataService methods)
 - `app/Http/Controllers/Api/V1/SkillController.php` (Line: 139, skillAcquisitions on Collection)
 - `app/Http/Controllers/PerformanceController.php` (Line: 335, getRedis on Repository)
 
-#### Fix Approach
+#### Fix Approach - Method Not Found
 
 1. Add missing methods to services
 2. Fix collection/model confusion
@@ -476,11 +476,11 @@ Remove unused properties or actually use them in methods.
 
 **Error Types**: `property.phpDocType`
 
-#### Files Affected
+#### Files Affected - PHPDoc Covariance
 
 - Multiple models with `array<int, string>` vs `list<string>` for $fillable
 
-#### Fix Approach
+#### Fix Approach - PHPDoc Covariance
 
 Change PHPDoc to `@var list<string>` or suppress with stubs.
 
@@ -727,4 +727,4 @@ Change PHPDoc to `@var list<string>` or suppress with stubs.
 
 ---
 
-**END OF STRATEGY DOCUMENT**
+## End of Strategy Document

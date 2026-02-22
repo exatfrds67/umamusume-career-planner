@@ -37,7 +37,7 @@ This guide provides step-by-step instructions for updating the Blade templates t
         }
     </script>
 @endsection
-```
+```text
 
 **Replace with**:
 
@@ -59,7 +59,8 @@ This guide provides step-by-step instructions for updating the Blade templates t
 @endsection
 ```
 
-**Note**: The trainee data array is massive. If `$trainees` is not passed from the controller, you may need to add it. Check the controller method that renders this view.
+**Note**: The trainee data array is massive. If `$trainees` is not passed from the controller, you may need to add it.
+Check the controller method that renders this view.
 
 ---
 
@@ -109,7 +110,7 @@ This guide provides step-by-step instructions for updating the Blade templates t
         });
     </script>
 @endsection
-```
+```text
 
 **Replace with**:
 
@@ -120,7 +121,9 @@ This guide provides step-by-step instructions for updating the Blade templates t
 @endsection
 ```
 
-**Note**: The `enforceStatMax` function is still called inline from the Blade template (`oninput="enforceStatMax(this)"`). The extracted JS file makes this function globally available via `window.enforceStatMax`.
+**Note**: The `enforceStatMax` function is still called inline from the Blade template
+(`oninput="enforceStatMax(this)"`). The extracted JS file makes this function globally available via
+`window.enforceStatMax`.
 
 ---
 
@@ -162,7 +165,7 @@ This guide provides step-by-step instructions for updating the Blade templates t
         </script>
     @endpush
 @endsection
-```
+```text
 
 **Replace with**:
 
@@ -210,7 +213,7 @@ This guide provides step-by-step instructions for updating the Blade templates t
         </script>
     @endpush
 </x-app-layout>
-```
+```text
 
 **Replace with**:
 
@@ -232,7 +235,8 @@ This guide provides step-by-step instructions for updating the Blade templates t
 </x-app-layout>
 ```
 
-**Note**: Remove the entire `@push('scripts')` section and replace with the data injection + @vite directive before the closing `</x-app-layout>` tag.
+**Note**: Remove the entire `@push('scripts')` section and replace with the data injection + @vite directive before the
+closing `</x-app-layout>` tag.
 
 ---
 
@@ -242,7 +246,7 @@ After updating all Blade files, build the assets:
 
 ```bash
 npm run build
-```
+```text
 
 Or for development with hot reload:
 
@@ -258,18 +262,20 @@ npm run dev
 
 ```bash
 npm run build
-```
+```text
 
 Expected output should include:
 
 ```
+
 ✓ built in XXXms
 ✓ 15 modules transformed.
 dist/assets/create-[hash].js
 dist/assets/edit-[hash].js
 dist/assets/show-[hash].js
 dist/assets/dashboard-[hash].js
-```
+
+```text
 
 ### 2. Check Browser Console
 
@@ -351,7 +357,7 @@ If issues occur, you can quickly rollback by:
    git checkout resources/views/characters/edit.blade.php
    git checkout resources/views/profile/show.blade.php
    git checkout resources/views/mcp/dashboard.blade.php
-   ```
+   ```text
 
 2. Remove the new entries from `vite.config.js`
 
@@ -381,7 +387,7 @@ public function create()
         'externalPrefill' => session('external_character_prefill')
     ]);
 }
-```
+```text
 
 ### Route Verification
 
@@ -419,3 +425,4 @@ If you encounter issues:
 2. Verify network tab for 404s
 3. Review the Phase 3 summary document
 4. Check the quick reference guide from Phase 1 & 2
+

@@ -230,7 +230,7 @@ This audit identified **47+ files** with incorrect skill hint system information
 
 ---
 
-**Document Control**
+## Document Control
 
 - **Version**: 1.0
 - **Date**: January 28, 2026

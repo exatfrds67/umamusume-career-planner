@@ -6,7 +6,8 @@
 
 ## Overview
 
-This document summarizes the resolution of PHP language server false positive errors in ProfileController. These were not actual code errors, but rather limitations in the language server's understanding of Laravel's Eloquent ORM methods.
+This document summarizes the resolution of PHP language server false positive errors in ProfileController. These were
+not actual code errors, but rather limitations in the language server's understanding of Laravel's Eloquent ORM methods.
 
 ## Issues Resolved
 
@@ -20,7 +21,7 @@ This document summarizes the resolution of PHP language server false positive er
 
 ```php
 'races_completed' => $user->races()->where('finish_position', '!=', null)->count(),
-```
+```text
 
 **Resolution:**
 
@@ -44,7 +45,8 @@ This document summarizes the resolution of PHP language server false positive er
 **Status:** ✅ Resolved
 
 **Issue:**
-The PHP language server doesn't understand that Eloquent's `update()` method accepts an array of attributes. This is a false positive.
+The PHP language server doesn't understand that Eloquent's `update()` method accepts an array of attributes. This is a
+false positive.
 
 **Resolution:**
 Added `@phpstan-ignore-next-line` annotations to suppress the warnings:
@@ -53,7 +55,7 @@ Added `@phpstan-ignore-next-line` annotations to suppress the warnings:
 // Update user with validated data
 /** @phpstan-ignore-next-line */
 $user->update($request->validated());
-```
+```text
 
 **Why This Is Correct:**
 
@@ -105,7 +107,7 @@ Added comprehensive PHPDoc blocks to all methods:
  * @return RedirectResponse
  */
 public function update(UpdateProfileRequest $request): RedirectResponse
-```
+```text
 
 **Benefits:**
 
@@ -127,7 +129,7 @@ $user->update($request->validated());
 ```php
 // Count races where finish_position is not null (completed races)
 'races_completed' => $user->races()->whereNotNull('finish_position')->count(),
-```
+```text
 
 ---
 
@@ -198,15 +200,15 @@ Instead of suppressing, you could:
    // Use: whereNotNull('column')
    ```
 
-2. **Add Type Hints:**
+1. **Add Type Hints:**
 
    ```php
    /** @var array<string, mixed> $data */
    $data = $request->validated();
    $user->update($data);
-   ```
+   ```text
 
-3. **Use IDE Helper:**
+2. **Use IDE Helper:**
 
    ```bash
    composer require --dev barryvdh/laravel-ide-helper
@@ -234,7 +236,7 @@ Run existing tests to verify:
 
 ```bash
 php artisan test --filter=ProfileTest
-```
+```text
 
 Expected results:
 
@@ -287,7 +289,8 @@ All PHP language server errors in ProfileController have been resolved through:
    - Improved inline comments
    - Better code readability
 
-The code is functionally correct, follows Laravel best practices, and all tests pass. The language server errors were false positives caused by limitations in static analysis of Laravel's dynamic Eloquent methods.
+The code is functionally correct, follows Laravel best practices, and all tests pass. The language server errors were
+false positives caused by limitations in static analysis of Laravel's dynamic Eloquent methods.
 
 ---
 
@@ -297,3 +300,4 @@ The code is functionally correct, follows Laravel best practices, and all tests 
 - [Laravel Query Builder](https://laravel.com/docs/12.x/queries)
 - [PHPStan Ignore Comments](https://phpstan.org/user-guide/ignoring-errors)
 - [Laravel IDE Helper](https://github.com/barryvdh/laravel-ide-helper)
+

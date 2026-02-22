@@ -6,7 +6,7 @@ The radar chart component was not displaying character stats correctly. Stats we
 
 ## Root Cause
 
-**SVG ViewBox and Calculation Size Mismatch**
+### SVG ViewBox and Calculation Size Mismatch
 
 In `resources/views/components/stat-radar-chart.blade.php`, there was a critical inconsistency between:
 

@@ -2,11 +2,14 @@
 
 ## Issue Summary
 
-The external data browser at `http://127.0.0.1:8000/external-data/browse` was showing "No characters found" despite the umapyoi.net API being functional. The root cause was Redis connection failures throughout the application that were causing the entire external API system to fail.
+The external data browser at `http://127.0.0.1:8000/external-data/browse` was showing "No characters found" despite the
+umapyoi.net API being functional. The root cause was Redis connection failures throughout the application that were
+causing the entire external API system to fail.
 
 ## Root Cause Analysis
 
-The issue was not with Redis being down (Redis was actually working), but with multiple services trying to connect to Redis without proper error handling:
+The issue was not with Redis being down (Redis was actually working), but with multiple services trying to connect to
+Redis without proper error handling:
 
 1. **RedisCacheOptimizationServiceProvider** - Failed during application boot when Redis was unavailable
 2. **APIHealthMonitorService** - Circuit breaker system failed when checking Redis for failure counts
@@ -26,7 +29,7 @@ Route::middleware(['web', 'auth', 'throttle:api'])->prefix('external')
 
 // After  
 Route::middleware(['throttle:api'])->prefix('external')
-```
+```text
 
 ### 2. Redis Error Handling in APIHealthMonitorService
 
@@ -46,7 +49,8 @@ Route::middleware(['throttle:api'])->prefix('external')
 ### 4. Service Provider Boot Protection
 
 **File**: `app/Providers/RedisCacheOptimizationServiceProvider.php`
-**Change**: Wrapped entire `boot()` method in try-catch to prevent Redis connection failures from breaking application startup
+**Change**: Wrapped entire `boot()` method in try-catch to prevent Redis connection failures from breaking application
+startup
 
 ## Solution Strategy
 
@@ -93,4 +97,6 @@ All tests pass, confirming the fix works correctly.
 
 ## Related Issues
 
-This fix resolves the external data browser issue and improves overall application stability when Redis is unavailable, which is common in development environments.
+This fix resolves the external data browser issue and improves overall application stability when Redis is unavailable,
+which is common in development environments.
+

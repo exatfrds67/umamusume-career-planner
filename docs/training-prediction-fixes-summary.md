@@ -6,7 +6,8 @@
 
 ## Overview
 
-This document summarizes the comprehensive fixes applied to the Training Prediction system based on the investigation report. The fixes address authentication, validation, error handling, and calculation completeness issues.
+This document summarizes the comprehensive fixes applied to the Training Prediction system based on the investigation
+report. The fixes address authentication, validation, error handling, and calculation completeness issues.
 
 ## Priority 1: Critical Fixes (COMPLETED)
 
@@ -28,7 +29,7 @@ Route::prefix('training-predictions')->name('api.training-predictions.')->group(
 Route::middleware('auth:sanctum')->prefix('training-predictions')->name('api.training-predictions.')->group(function () {
     // Routes...
 });
-```
+```text
 
 **Impact**:
 
@@ -183,7 +184,7 @@ Created three comprehensive Form Request classes with validation rules and custo
     "message": "Human-readable error message",
     "error": "Detailed error description"
 }
-```
+```text
 
 **Logging**:
 
@@ -287,7 +288,7 @@ protected static function booted()
         Cache::tags(['training_predictions', "character_{$characterCard->character_id}"])->flush();
     });
 }
-```
+```text
 
 ### 8. Add Comprehensive Tests
 

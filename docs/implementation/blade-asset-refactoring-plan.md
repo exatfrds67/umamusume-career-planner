@@ -1,7 +1,7 @@
 # Blade Asset Refactoring Plan
 
 **Date**: 2026-01-29  
-**Status**: ✅ Complete  
+**Status**: In Progress  
 **Goal**: Separate inline CSS and JavaScript from Blade templates into dedicated external resource files
 
 ## Overview
@@ -184,7 +184,7 @@ export function dashboardManager() {
 ### Components (CSS)
 
 | Component | Status | CSS File | Notes |
-|-----------|--------|----------|-------|
+| ----------- | -------- | ---------- | ------- |
 | turn-counter | ✅ Complete | `components/turn-counter.css` | Shimmer animation |
 | stat-bar | ✅ Complete | `components/stat-bar.css` | Shimmer + stat icons |
 | energy-gauge | ✅ Complete | `components/gauges.css` | Shared with bond-meter |
@@ -204,7 +204,7 @@ export function dashboardManager() {
 ### Components (JavaScript)
 
 | Component | Status | JS File | Data Injection Method |
-|-----------|--------|---------|----------------------|
+| ----------- | -------- | --------- | ---------------------- |
 | quick-actions | ⏳ Pending | `components/quick-actions.js` | Alpine data |
 | slide-panel | ⏳ Pending | `components/slide-panel.js` | Alpine data |
 | line-chart | ⏳ Pending | `components/line-chart.js` | Props via Alpine |
@@ -225,7 +225,7 @@ export function dashboardManager() {
 ### Pages (JavaScript)
 
 | Page | Status | JS File | Data Injection Method | Notes |
-|------|--------|---------|----------------------|-------|
+| ------ | -------- | --------- | ---------------------- | ------- |
 | support-cards/index | ⏳ Pending | `pages/support-cards/index.js` | Alpine data | Complex API calls |
 | skills/index | ⏳ Pending | `pages/skills/index.js` | Data attributes | Admin flag |
 | skills/planner | ⏳ Pending | `pages/skills/planner.js` | Alpine data | - |
@@ -248,7 +248,7 @@ export function dashboardManager() {
 ### Special Cases
 
 | File | Status | Notes |
-|------|--------|-------|
+| ------ | -------- | ------- |
 | layouts/guest.blade.php | ⏳ Pending | Theme initialization - keep inline (critical path) |
 | layouts/app.blade.php | ⏳ Pending | Theme initialization - keep inline (critical path) |
 | test-api.blade.php | ⏳ Pending | Standalone test file - low priority |

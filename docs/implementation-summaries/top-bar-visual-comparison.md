@@ -12,7 +12,7 @@
 
 **BEFORE**:
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────────────┐
 │ [≡]  [Search...]                    [🌙] [🔔] [👤 Admin ▼]          │
 ├──────────────────────────────────────────────────────────────────────┤
@@ -22,7 +22,7 @@
 
 **AFTER**:
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────────────┐
 │ 📅 Senior 15/70 (55 left)  ⚡ 78/100  😊 Good  SP 0  Storage [Account]│
 ├──────────────────────────────────────────────────────────────────────┤
@@ -34,7 +34,7 @@
 
 **BEFORE**:
 
-```
+```text
 ┌────────────────────────────────────────────────────────┐
 │ [≡]  [Search...]           [🌙] [🔔] [👤 ▼]          │
 ├────────────────────────────────────────────────────────┤
@@ -44,7 +44,7 @@
 
 **AFTER**:
 
-```
+```text
 ┌────────────────────────────────────────────────────────┐
 │ 📅 15/70 (55 left)  ⚡ 78/100  😊  SP 0  Storage [Acc] │
 ├────────────────────────────────────────────────────────┤
@@ -56,7 +56,7 @@
 
 **BEFORE**:
 
-```
+```text
 ┌────────────────────────────────┐
 │ [≡]  [Search...]      [👤 ▼]  │
 ├────────────────────────────────┤
@@ -66,7 +66,7 @@
 
 **AFTER**:
 
-```
+```text
 ┌────────────────────────────────┐
 │ 📅 15/70  ⚡ 78  😊  SP 0  [Acc]│
 ├────────────────────────────────┤
@@ -81,7 +81,7 @@
 ### 1. Status Bar Enhancements
 
 | Element | Before | After | Notes |
-|---------|--------|-------|-------|
+| --- | --- | --- | --- |
 | **Turn Counter** | `Turn 15 / 70` | `📅 Senior 15/70 (55 left)` | Added emoji, career stage, turns remaining |
 | **Energy** | ❌ Not shown | `⚡ 78/100` | New indicator with color coding |
 | **Mood** | ❌ Not shown | `😊 Good` | New indicator with emoji |
@@ -91,7 +91,7 @@
 ### 2. Header Navigation Enhancements
 
 | Element | Before | After | Notes |
-|---------|--------|-------|-------|
+| --- | --- | --- | --- |
 | **Run Selector** | ❌ Not present | `Run: Mejiro Ardan ▼` | New dropdown for switching runs |
 | **Search** | Present | Present | Unchanged |
 | **Help Icon** | ❌ Not present | `[?]` | New help/documentation link |
@@ -106,7 +106,7 @@
 ### Energy Indicator
 
 | Range | Color | Example |
-|-------|-------|---------|
+| --- | --- | --- |
 | 70-100 | 🟢 Green | `⚡ 85/100` |
 | 40-69 | 🟡 Yellow | `⚡ 55/100` |
 | 0-39 | 🔴 Red | `⚡ 25/100` |
@@ -114,7 +114,7 @@
 ### Storage Mode Badge
 
 | Mode | Color | Badge |
-|------|-------|-------|
+| --- | --- | --- |
 | Local | 🟡 Warning (Amber) | `[Local]` |
 | Account | 🟢 Success (Green) | `[Account]` |
 | Unknown | ⚪ Secondary (Gray) | `[—]` |
@@ -122,7 +122,7 @@
 ### Mood Indicator
 
 | Mood | Emoji | Modifier | Display |
-|------|-------|----------|---------|
+| --- | --- | --- | --- |
 | Great/Excellent | 😊 | +20% | `😊 Great` |
 | Good | 🙂 | +10% | `🙂 Good` |
 | Normal/Neutral | 😐 | 0% | `😐 Normal` |
@@ -164,7 +164,7 @@
 
 **Closed State**:
 
-```
+```text
 ┌─────────────────────────┐
 │ Run: Mejiro Ardan ▼     │
 └─────────────────────────┘
@@ -172,7 +172,7 @@
 
 **Open State**:
 
-```
+```text
 ┌─────────────────────────────────┐
 │ Run: Mejiro Ardan ▼             │
 ├─────────────────────────────────┤
@@ -227,7 +227,7 @@
 
 ### Data Flow
 
-```
+```text
 Controller/Livewire
     ↓
 $topStatus = [
@@ -249,7 +249,7 @@ Rendered Status Bar
 
 ### Component Structure
 
-```
+```text
 <header> (sticky)
   ├── <top-status-bar> (status indicators)
   │   ├── Turn Counter (with stage & remaining)
@@ -303,4 +303,5 @@ Rendered Status Bar
 
 ---
 
-**Summary**: The enhanced top bar provides significantly more information at a glance while maintaining excellent UX and accessibility. The responsive design ensures optimal display across all device sizes.
+**Summary**: The enhanced top bar provides significantly more information at a glance while maintaining excellent UX and
+accessibility. The responsive design ensures optimal display across all device sizes.

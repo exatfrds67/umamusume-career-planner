@@ -8,15 +8,19 @@
 
 ## Problem Summary
 
-After enhancing the top bar with new status indicators (energy, mood, career stage), three browser test suites began failing with timeout errors:
+After enhancing the top bar with new status indicators (energy, mood, career stage), three browser test suites began
+failing with timeout errors:
 
 1. `Tests\Browser\AdvisoryWorkflowTest` - "it handles no recommendations gracefully"
-2. `Tests\Browser\CriticalAlertHandlingTest` - "it shows alert badge with count in navigation" & "it updates alerts when character state changes"
+2. `Tests\Browser\CriticalAlertHandlingTest` - "it shows alert badge with count in navigation" & "it updates alerts when
+character state changes"
 3. `Tests\Browser\RecommendationCardInteractivityTest` - "it handles multiple recommendation cards independently"
 
 ### Root Cause
 
-The `TrainingPredictionController` was not passing the `$topStatus` array to views, causing the top bar to display "—" for all values instead of actual character data. This caused browser tests to timeout waiting for elements that never appeared with expected content.
+The `TrainingPredictionController` was not passing the `$topStatus` array to views, causing the top bar to display "—"
+for all values instead of actual character data. This caused browser tests to timeout waiting for elements that never
+appeared with expected content.
 
 ---
 
@@ -72,7 +76,7 @@ public function index(Request $request): View
         'topStatus' => $topStatus,
     ]);
 }
-```
+```text
 
 #### show() Method
 
@@ -119,7 +123,7 @@ public function show(Character $character): View
    # Navigate to /training/predictions
    # Select a character
    # Verify top bar shows: Turn, Energy, Mood, SP, Storage mode
-   ```
+   ```text
 
 2. **Browser Tests** (when Playwright is available):
 
@@ -133,9 +137,9 @@ public function show(Character $character): View
 
    ```bash
    php artisan test --filter="TrainingPredictionController"
-   ```
+   ```text
 
-### Expected Results
+## Expected Results
 
 - ✅ Top bar displays actual character data (not "—")
 - ✅ Energy indicator shows color-coded value
@@ -237,7 +241,7 @@ public function yourMethod(Request $request): View
         'topStatus' => $topStatus,
     ]);
 }
-```
+```text
 
 ---
 
@@ -307,3 +311,4 @@ When adding or modifying controllers that return character-related views:
 **Last Updated**: 2026-02-09  
 **Status**: Complete  
 **Verified**: Code formatting passed, manual testing pending browser test execution
+

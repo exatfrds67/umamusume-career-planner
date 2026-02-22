@@ -1,12 +1,14 @@
 # Blade Template Asset Refactoring Summary
 
 **Date**: January 29, 2026  
-**Task**: Systematic refactoring of inline CSS and JavaScript from Blade templates into dedicated Vite-compatible asset files  
+**Task**: Systematic refactoring of inline CSS and JavaScript from Blade templates into dedicated Vite-compatible asset
+files
 **Status**: Phase 1 & 2 Complete
 
 ## Overview
 
-This refactoring modernizes the application architecture by extracting inline `<style>` and `<script>` blocks from Blade views into dedicated asset files in `resources/css/pages/` and `resources/js/pages/`, utilizing Vite for compilation.
+This refactoring modernizes the application architecture by extracting inline `<style>` and `<script>` blocks from Blade
+views into dedicated asset files in `resources/css/pages/` and `resources/js/pages/`, utilizing Vite for compilation.
 
 ## Phases Completed
 
@@ -59,7 +61,7 @@ window.pageData = {
 };
 </script>
 @vite(['resources/js/pages/support-cards/deck-builder.js'])
-```
+```text
 
 In JS file:
 
@@ -95,7 +97,7 @@ window.deckBuilderData = {
     availableCards: @json($availableCardsData),
     characterId: {{ $character->id }}
 };
-```
+```text
 
 **Vite Entry**: Added to `vite.config.js`
 
@@ -287,19 +289,22 @@ vendor/bin/pint
 
 # Run tests
 php artisan test --compact
-```
+```text
 
 ---
 
 ## Notes
 
-1. **Data Injection Pattern**: All Blade variables are injected via `window.pageData` or similar global objects before loading the JS module.
+1. **Data Injection Pattern**: All Blade variables are injected via `window.pageData` or similar global objects before
+loading the JS module.
 
-2. **Alpine.js Integration**: The deck builder uses Alpine.js `Alpine.data()` registration, which requires the script to run after Alpine is initialized.
+2. **Alpine.js Integration**: The deck builder uses Alpine.js `Alpine.data()` registration, which requires the script to
+run after Alpine is initialized.
 
 3. **Module Exports**: Training predictions uses ES6 exports for better testability and potential reuse.
 
-4. **Global Functions**: Some functions (like `refreshPredictions()`) are exposed globally for onclick handlers in Blade templates.
+4. **Global Functions**: Some functions (like `refreshPredictions()`) are exposed globally for onclick handlers in Blade
+templates.
 
 5. **Error Handling**: All API calls include proper error handling with user-friendly messages.
 
@@ -318,6 +323,9 @@ This refactoring aligns with:
 
 ## Conclusion
 
-Phase 1 of the Blade asset refactoring is complete. Four high-priority views have been successfully refactored, extracting 700+ lines of inline JavaScript into dedicated, maintainable, Vite-compiled modules. The application architecture is now more modern, performant, and developer-friendly.
+Phase 1 of the Blade asset refactoring is complete. Four high-priority views have been successfully refactored,
+extracting 700+ lines of inline JavaScript into dedicated, maintainable, Vite-compiled modules. The application
+architecture is now more modern, performant, and developer-friendly.
 
 **Next Steps**: Run the testing checklist and proceed with Phase 2 if additional views require refactoring.
+

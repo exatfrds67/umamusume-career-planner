@@ -10,7 +10,9 @@
 
 ## Executive Summary
 
-This research document catalogs visual design patterns, interaction conventions, and UX flows observed in Umamusume Pretty Derby game interface screenshots. The goal is to understand *why* certain patterns work for game UX and how they can inform (not copy) the Career Planner web application.
+This research document catalogs visual design patterns, interaction conventions, and UX flows observed in Umamusume
+Pretty Derby game interface screenshots. The goal is to understand *why* certain patterns work for game UX and how they
+can inform (not copy) the Career Planner web application.
 
 **Key Findings**:
 
@@ -32,7 +34,7 @@ This research document catalogs visual design patterns, interaction conventions,
 
 From character stat displays and training progression:
 
-```
+```text
 SPEED:      #EF4444 or similar bright red
             └─ Represents top-speed capability
             └─ Always red regardless of context
@@ -68,7 +70,7 @@ WIT:        #A855F7 or similar bright purple
 
 #### Resource Indicator Colors
 
-```
+```text
 TP (Training Points):
 ├─ Display Color: Orange/Amber (#F59E0B)
 ├─ Format: "100/100" gauge with orange bar
@@ -105,7 +107,7 @@ Item Count:
 
 From trainee status screens and race predictions:
 
-```
+```text
 GREAT (↑):
 ├─ Display Color: Bright Green (#10B981) or Lime (#84CC16)
 ├─ Icon: Upward arrow or sparkle
@@ -131,13 +133,14 @@ BAD (↓):
 ├─ Context: Fatigue or low morale
 ```
 
-**Why This Matters**: Traffic light system is universally understood. Users instantly recognize good/bad states without reading text.
+**Why This Matters**: Traffic light system is universally understood. Users instantly recognize good/bad states without
+reading text.
 
 ### 1.2 Typography & Information Hierarchy
 
 #### Header Hierarchy (from screenshots)
 
-```
+```text
 Page Title:
 ├─ Font Size: ~28-32px
 ├─ Weight: Bold (700)
@@ -167,7 +170,7 @@ Label/Tag Text:
 
 #### Information Density Pattern (observed from multiple screens)
 
-```
+```text
 Visual Rule: 20/30/50 Split
 
 Top 20% of Screen: CRITICAL STATUS
@@ -192,13 +195,14 @@ Remaining 50% of Screen: DETAILED CONTENT
 └─────────────────────────────────────────────┘
 ```
 
-**Why This Matters**: Users don't need to scroll to see critical info. Primary actions are visible. Detailed content can scroll.
+**Why This Matters**: Users don't need to scroll to see critical info. Primary actions are visible. Detailed content can
+scroll.
 
 ### 1.3 Component Visual Conventions
 
 #### Stat Bar Component (observed pattern)
 
-```
+```text
 Visual Structure:
 
 ┌─ Label "Speed:" (12px gray)
@@ -225,7 +229,7 @@ Interactive State:
 
 **Game Example**: Character detail screen shows stats as:
 
-```
+```text
 Speed:    1350/2000  ████████░░
 Stamina:  930/2000   ███░░░░░░░
 Power:    850/2000   ██░░░░░░░░
@@ -235,7 +239,7 @@ Wit:      990/2000   ███░░░░░░░
 
 #### Card Component Pattern (from character grid)
 
-```
+```text
 Visual Structure:
 
 ┌──────────────────────────┐
@@ -266,7 +270,7 @@ Interactive States:
 
 #### Button Component Pattern
 
-```
+```text
 Visual Style:
 
 Primary Action (Training, Confirm):
@@ -306,7 +310,7 @@ Disabled State (all buttons):
 
 #### Desktop Layout (lg breakpoint, 1024px+)
 
-```
+```text
 Width breakdown:
 ├─ Sidebar: 240-280px (16-17% width) - Fixed, sticky
 ├─ Main content: remaining width
@@ -326,7 +330,7 @@ Sidebar contents:
 
 #### Mobile Layout (sm breakpoint, 320px-640px)
 
-```
+```text
 Width breakdown:
 ├─ No sidebar on mobile (hidden)
 ├─ Header: Full width, sticky (56px height typical)
@@ -346,7 +350,7 @@ Scrollable area:
 
 #### Tablet Layout (md breakpoint, 768px)
 
-```
+```text
 Hybrid approach:
 ├─ Sidebar can be: Fixed (if screen >900px) or Hidden (if <900px)
 ├─ Toggle button in header to show/hide sidebar
@@ -365,7 +369,7 @@ Hybrid approach:
 
 **Observed on**: Character detail, Stat breakdown, Skill list
 
-```
+```text
 UI Structure:
 ┌─────────────────────────────────────────────────────┐
 │ [Potential] [Hints] [Star Unlock] [History] [Stats] │ ← Tab buttons
@@ -393,7 +397,7 @@ Interaction:
 
 **Observed on**: Character selection, Race schedule, Skill shop
 
-```
+```text
 UI Structure:
 
 Filter & Sort Bar (sticky):
@@ -417,7 +421,7 @@ Interaction:
 
 **Observed on**: Skill confirmation, Race selection, Team setup
 
-```
+```text
 UI Structure:
 
 Dark overlay (semi-transparent, tappable to dismiss):
@@ -452,7 +456,7 @@ Characteristics:
 
 **Observed**: Tab switching, card carousel in some screens
 
-```
+```text
 Interaction:
 ├─ Swipe left: Next tab / next card
 ├─ Swipe right: Previous tab / previous card
@@ -470,7 +474,7 @@ Visual feedback:
 
 **Observed**: Character card selection, Skill preview
 
-```
+```text
 Interaction:
 ├─ Press & hold for 500-800ms
 ├─ Haptic feedback (if supported): Slight vibration
@@ -483,7 +487,7 @@ Interaction:
 
 **Observed**: Some screens (race schedule, news)
 
-```
+```text
 Interaction:
 ├─ User pulls down from top
 ├─ Threshold: ~60px down
@@ -497,7 +501,7 @@ Interaction:
 
 #### Input Fields
 
-```
+```text
 Visual Style:
 
 Focused state (what we want):
@@ -535,7 +539,7 @@ Mobile-specific:
 
 **Observed**: Stat allocation, training intensity
 
-```
+```text
 Visual Components:
 
 ┌─ Label "Speed Training Allocation:" (12px gray)
@@ -564,7 +568,7 @@ Mobile consideration:
 
 **Observed**: Stat type selection, filter options
 
-```
+```text
 Visual Style:
 
 Closed state:
@@ -602,7 +606,7 @@ Option styling:
 
 **Observed conventions**:
 
-```
+```text
 Micro-interactions:
 ├─ Button hover: 150-200ms color change
 ├─ Icon hover: 200-300ms scale or rotate
@@ -623,7 +627,7 @@ Gesture animations:
 
 **Observed uses**:
 
-```
+```text
 Ease-in-out (default, most transitions):
 ├─ Tab switches
 ├─ Modal open/close
@@ -662,7 +666,7 @@ Linear (for continuous processes):
     transition-duration: 0.01ms !important;
   }
 }
-```
+```text
 
 ---
 
@@ -671,6 +675,7 @@ Linear (for continuous processes):
 ### 4.1 Minimum Touch Targets (WCAG AAA)
 
 ```
+
 Primary actions: 44×44px minimum
 ├─ Submit buttons
 ├─ Navigation tabs
@@ -686,11 +691,13 @@ Text links: 44×44px padding around
 ├─ Underline text as links
 ├─ Add padding or increase hit area with invisible extend
 └─ Ensure spacing between adjacent links (8px minimum)
-```
+
+```text
 
 ### 4.2 Spacing Guidelines
 
 ```
+
 Component padding:
 ├─ Cards: 16px internal padding
 ├─ Forms: 12px between fields
@@ -702,7 +709,8 @@ Margin/gap between components:
 ├─ Element spacing: 16px
 ├─ Tight spacing: 8px
 └─ Always use consistent multiples of 4px
-```
+
+```text
 
 ---
 
@@ -719,15 +727,18 @@ Margin/gap between components:
 **Tested combinations**:
 
 ```
+
 Red (#EF4444) on white: ~6.5:1 ✅ Pass
 Blue (#3B82F6) on white: ~5.2:1 ✅ Pass
 Yellow (#EAB308) on white: ~4.2:1 ⚠️  Marginal (small text only)
 Gray (#6B7280) on white: ~5.3:1 ✅ Pass
-```
+
+```text
 
 ### 5.2 Text Readability
 
 ```
+
 Font choices (observed):
 ├─ Headings: Bold sans-serif (appears to be system font)
 ├─ Body: Regular sans-serif, line-height 1.5-1.6
@@ -750,7 +761,8 @@ Line height:
 ├─ Headings: 1.2-1.3
 ├─ Body text: 1.5-1.6
 └─ Contributes significantly to readability
-```
+
+```text
 
 ---
 
@@ -761,6 +773,7 @@ Line height:
 **Observed in recent screenshots**:
 
 ```
+
 Stat colors (remain high contrast):
 ├─ Speed red: Brightens slightly in dark mode
 ├─ Stamina blue: Darkens slightly to avoid eye strain
@@ -782,7 +795,8 @@ Borders:
 ├─ Light mode: Light gray (#E5E7EB)
 ├─ Dark mode: Dark gray (#374151)
 └─ No pure black/white borders (too harsh)
-```
+
+```text
 
 ### 6.2 Implementation Strategy
 
@@ -843,7 +857,8 @@ Game design patterns work because they're:
 4. **Accessible**: Icons + text, high contrast, sufficient sizing
 5. **Responsive**: Adapts to screen size without losing clarity
 
-The Career Planner should adopt these principles while creating its own distinct interface optimized for planning workflows.
+The Career Planner should adopt these principles while creating its own distinct interface optimized for planning
+workflows.
 
 ---
 

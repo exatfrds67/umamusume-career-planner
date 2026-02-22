@@ -6,7 +6,9 @@
 
 ## Overview
 
-Implemented instant client-side filtering for the characters index page, removing the need for form submission and "Apply" button. Users can now search and filter characters in real-time as they type, matching the user experience of the skills page.
+Implemented instant client-side filtering for the characters index page, removing the need for form submission and
+"Apply" button. Users can now search and filter characters in real-time as they type, matching the user experience of
+the skills page.
 
 ## Changes Made
 
@@ -58,7 +60,7 @@ Implemented instant client-side filtering for the characters index page, removin
 
 ```php
 $characters = $query->paginate(14)->withQueryString();
-```
+```text
 
 **After**:
 
@@ -123,7 +125,7 @@ character.scenario_type === this.filters.scenario
 character.status === this.filters.status
 
 // Sort: pinned first, then by selected field
-```
+```text
 
 ## Testing
 
@@ -177,6 +179,10 @@ Possible improvements for future iterations:
 
 ## Conclusion
 
-Successfully implemented instant search and filtering for the characters page, matching the user experience of the skills page. Users can now search for characters like "Vodka" without clicking an "Apply" button, with results updating in real-time as they type.
+Successfully implemented instant search and filtering for the characters page, matching the user experience of the
+skills page. Users can now search for characters like "Vodka" without clicking an "Apply" button, with results updating
+in real-time as they type.
 
-The implementation follows the same pattern as the skills page, ensuring consistency across the application and providing a smooth, responsive user experience.
+The implementation follows the same pattern as the skills page, ensuring consistency across the application and
+providing a smooth, responsive user experience.
+

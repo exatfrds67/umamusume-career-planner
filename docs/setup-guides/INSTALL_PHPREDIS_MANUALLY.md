@@ -24,7 +24,7 @@ I cannot automatically install the phpredis extension because it requires:
 
 #### Step 1: Download phpredis DLL
 
-**Option A: PECL (Recommended)**
+##### Option A: PECL (Recommended)
 
 1. Visit: <https://pecl.php.net/package/redis>
 2. Click on "DLL" link for Windows
@@ -34,7 +34,7 @@ I cannot automatically install the phpredis extension because it requires:
    - x64
    - VS16 (Visual Studio 2019/2022)
 
-**Option B: Windows PHP Downloads**
+##### Option B: Windows PHP Downloads
 
 1. Visit: <https://windows.php.net/downloads/pecl/releases/redis/>
 2. Download latest version matching:

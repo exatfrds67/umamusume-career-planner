@@ -1,8 +1,8 @@
-# CacheManagementService Documentation
+# CacheManagerService Documentation
 
 ## Overview
 
-The `CacheManagementService` provides intelligent caching capabilities for external API data with staleness indicators, configurable TTL by data type, and comprehensive cache statistics tracking.
+The `CacheManagerService` provides intelligent caching capabilities for external API data with staleness indicators, configurable TTL by data type, and comprehensive cache statistics tracking.
 
 ## Features
 
@@ -23,12 +23,12 @@ This service implements **Requirement 14.2: Intelligent Caching and Offline Func
 The service is automatically registered in the Laravel service container and can be injected via dependency injection:
 
 ```php
-use App\Services\ExternalAPI\CacheManagementService;
+use App\Services\ExternalAPI\CacheManagerService;
 
 class MyController extends Controller
 {
     public function __construct(
-        private CacheManagementService $cacheManager
+        private CacheManagerService $cacheManager
     ) {}
 }
 ```
@@ -40,7 +40,7 @@ class MyController extends Controller
 The service uses predefined TTL values for different data types:
 
 | Data Type | TTL | Duration |
-|-----------|-----|----------|
+| --------- | --- | -------- |
 | `character_data` | 86400 seconds | 24 hours |
 | `support_cards` | 43200 seconds | 12 hours |
 | `meta_rankings` | 21600 seconds | 6 hours |
@@ -206,17 +206,17 @@ $cacheManager->flush();
 
 ## Integration with External API Service
 
-The `CacheManagementService` is designed to work seamlessly with the `ExternalAPIService`:
+The `CacheManagerService` is designed to work seamlessly with the `ExternalAPIService`:
 
 ```php
 use App\Services\ExternalAPI\ExternalAPIService;
-use App\Services\ExternalAPI\CacheManagementService;
+use App\Services\ExternalAPI\CacheManagerService;
 
 class UmapyoiApiClient extends ExternalAPIService
 {
     public function __construct(
         MCPClientService $mcpClient,
-        private CacheManagementService $cacheManager
+        private CacheManagerService $cacheManager
     ) {
         parent::__construct($mcpClient);
     }

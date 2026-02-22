@@ -16,7 +16,7 @@ Route name conflict between web and API logout routes:
    Route::post('/logout', [LoginController::class, 'destroy'])
        ->middleware('auth')
        ->name('logout');  // ❌ Conflicting name
-   ```
+   ```text
 
 2. **API logout route** (`routes/api.php`):
 
@@ -42,7 +42,7 @@ Changed API logout route name to avoid conflict:
 // routes/api.php
 Route::post('/logout', [\App\Http\Controllers\Api\Auth\AuthController::class, 'logout'])
     ->name('api.logout');  // ✅ Unique name
-```
+```text
 
 ### 2. Route Resolution Verification
 
@@ -149,4 +149,6 @@ API logout route name changed from `'logout'` to `'api.logout'`:
 
 ## Conclusion
 
-The logout route issue has been successfully resolved by fixing the route name conflict. Users can now properly log out from the web interface, and the API logout functionality remains intact with a properly namespaced route name. The fix is minimal, focused, and maintains backward compatibility while resolving the core issue.
+The logout route issue has been successfully resolved by fixing the route name conflict. Users can now properly log out
+from the web interface, and the API logout functionality remains intact with a properly namespaced route name. The fix
+is minimal, focused, and maintains backward compatibility while resolving the core issue.

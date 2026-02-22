@@ -6,7 +6,8 @@
 
 ## Overview
 
-Replaced factory-generated test characters with real Uma Musume character data from the umapyoi.net API, providing authentic English global server characters as the default "My Characters" data.
+Replaced factory-generated test characters with real Uma Musume character data from the umapyoi.net API, providing
+authentic English global server characters as the default "My Characters" data.
 
 ## Changes Made
 
@@ -137,7 +138,7 @@ Sample characters now in database:
 $englishCharacters = collect($characters)->filter(function ($char) {
     return !empty($char['name_en']);
 });
-```
+```text
 
 ## Verification
 
@@ -148,7 +149,7 @@ php artisan tinker --execute="echo App\Models\Character::count() . ' characters 
 # Output: 161 characters total
 ```
 
-### Web Interface Verification
+## Web Interface Verification
 
 - ✅ Characters list page shows real Uma Musume names
 - ✅ Character avatars display correctly
@@ -188,22 +189,22 @@ php artisan tinker --execute="echo App\Models\Character::count() . ' characters 
 ```bash
 # Run all seeders (includes real characters)
 php artisan migrate:fresh --seed
-```
+```text
 
-### Add Characters to Existing Database
+## Add Characters to Existing Database
 
 ```bash
 # Run only the character seeder
 php artisan db:seed --class=RealUmaMusumeCharactersSeeder
 ```
 
-### Reset Characters
+## Reset Characters
 
 ```bash
 # Delete all characters and re-seed
 php artisan tinker --execute="App\Models\Character::query()->delete();"
 php artisan db:seed --class=RealUmaMusumeCharactersSeeder
-```
+```text
 
 ## Benefits
 
@@ -407,13 +408,16 @@ Characters with local images include:
 ### Console Output
 
 ```
+
 Found 161 English global server characters
 Found 64 local character images
 Successfully created 161 characters
 Using local images for 51 characters
-```
+
+```text
 
 ---
 
 **Enhancement Completed**: January 26, 2026  
 **Impact**: Improved user experience with faster-loading, higher-quality character avatars
+

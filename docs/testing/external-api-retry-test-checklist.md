@@ -41,8 +41,9 @@
 - ✅ Data updates on success
 - ✅ Error state updates appropriately
 
-**Actual Results**:
-_____________________________________________________________________
+**Actual Results:**
+
+---
 
 **Status**: ☐ Pass | ☐ Fail | ☐ N/A (no error to test)
 
@@ -65,8 +66,9 @@ _____________________________________________________________________
 - ✅ `loadingSupportCards` state activates
 - ✅ Other tabs unaffected
 
-**Actual Results**:
-_____________________________________________________________________
+**Actual Results:**
+
+---
 
 **Status**: ☐ Pass | ☐ Fail | ☐ N/A
 
@@ -88,8 +90,9 @@ _____________________________________________________________________
 - ✅ Same behavior as previous retries
 - ✅ `loadingSkills` state activates
 
-**Actual Results**:
-_____________________________________________________________________
+**Actual Results:**
+
+---
 
 **Status**: ☐ Pass | ☐ Fail | ☐ N/A
 
@@ -111,8 +114,9 @@ _____________________________________________________________________
 - ✅ Same behavior as previous retries
 - ✅ `loadingNews` state activates
 
-**Actual Results**:
-_____________________________________________________________________
+**Actual Results:**
+
+---
 
 **Status**: ☐ Pass | ☐ Fail | ☐ N/A
 
@@ -148,8 +152,9 @@ _____________________________________________________________________
 - ✅ Individual errors clear before retry
 - ✅ API availability updates based on results
 
-**Actual Results**:
-_____________________________________________________________________
+**Actual Results:**
+
+---
 
 **Status**: ☐ Pass | ☐ Fail | ☐ N/A
 
@@ -169,8 +174,9 @@ _____________________________________________________________________
 - ✅ "Retry All Failed" button only shows when errors exist
 - ✅ Conditional rendering: `x-show="errors.characters || errors.supportCards || errors.skills || errors.news"`
 
-**Actual Results**:
-_____________________________________________________________________
+**Actual Results:**
+
+---
 
 **Status**: ☐ Pass | ☐ Fail
 
@@ -205,8 +211,9 @@ _____________________________________________________________________
 - ✅ Errors clear appropriately on retry
 - ✅ Partial data maintained during failures
 
-**Actual Results**:
-_____________________________________________________________________
+**Actual Results:**
+
+---
 
 **Status**: ☐ Pass | ☐ Fail
 
@@ -234,8 +241,9 @@ _____________________________________________________________________
 - ✅ UI feedback is clear and immediate
 - ✅ States clean up properly after completion
 
-**Actual Results**:
-_____________________________________________________________________
+**Actual Results:**
+
+---
 
 **Status**: ☐ Pass | ☐ Fail
 
@@ -263,8 +271,9 @@ _____________________________________________________________________
 - ✅ API availability determined correctly
 - ✅ Logic: `apiAvailable = charactersRes.success || supportCardsRes.success || skillsRes.success || newsRes.success`
 
-**Actual Results**:
-_____________________________________________________________________
+**Actual Results:**
+
+---
 
 **Status**: ☐ Pass | ☐ Fail
 
@@ -288,8 +297,9 @@ _____________________________________________________________________
 - ✅ `determineDataSource()` method works correctly
 - ✅ Badges update after retry
 
-**Actual Results**:
-_____________________________________________________________________
+**Actual Results:**
+
+---
 
 **Status**: ☐ Pass | ☐ Fail
 
@@ -458,8 +468,9 @@ _____________________________________________________________________
    - [ ] No unhandled promise rejections
    - [ ] No warning messages (except expected ones)
 
-**Errors Found**:
-_____________________________________________________________________
+**Errors Found:**
+
+---
 
 **Status**: ☐ Pass | ☐ Fail
 
@@ -477,15 +488,15 @@ _____________________________________________________________________
 
 ### Critical Issues Found
 
-1. _____________________________________________________________________
-2. _____________________________________________________________________
-3. _____________________________________________________________________
+1. ---
+2. ---
+3. ---
 
 ### Recommendations
 
-_____________________________________________________________________
-_____________________________________________________________________
-_____________________________________________________________________
+---
+---
+---
 
 ### Sign-off
 

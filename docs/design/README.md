@@ -15,7 +15,7 @@ This directory contains comprehensive design documentation for the Umamusume Car
 
 ### 1. [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md)
 
-**Comprehensive 15-week implementation roadmap**
+#### Comprehensive 15-week implementation roadmap
 
 - 8 phases covering foundation to launch
 - 150+ specific tasks with checkboxes
@@ -35,7 +35,7 @@ This directory contains comprehensive design documentation for the Umamusume Car
 
 ### 2. [IMPLEMENTATION_PLAN_UPDATES.md](IMPLEMENTATION_PLAN_UPDATES.md)
 
-**Critical updates from research and wireframes**
+#### Critical updates from research and wireframes
 
 - Game mechanics corrections (skill hints, aptitudes, stat caps)
 - Wireframe-specific requirements
@@ -54,7 +54,7 @@ This directory contains comprehensive design documentation for the Umamusume Car
 
 ### 3. [game-alignment-analysis.md](game-alignment-analysis.md)
 
-**Comprehensive game UI/UX analysis from 83 screenshots**
+#### Comprehensive game UI/UX analysis from 83 screenshots
 
 - Top status bar patterns
 - Character management UI
@@ -75,7 +75,7 @@ This directory contains comprehensive design documentation for the Umamusume Car
 
 ### 4. [component-inventory.md](component-inventory.md)
 
-**Complete inventory of 60+ UI components**
+#### Complete inventory of 60+ UI components
 
 Organized by category:
 
@@ -99,7 +99,7 @@ Organized by category:
 
 ### 5. [data-flow-mapping.md](data-flow-mapping.md)
 
-**Data requirements and flow patterns**
+#### Data requirements and flow patterns
 
 - Component data requirements
 - Real-time data flows (WebSocket)
@@ -121,7 +121,7 @@ Organized by category:
 
 ### 6. [game-alignment-plan.md](game-alignment-plan.md)
 
-**Actionable implementation plan for game-aligned UI/UX**
+#### Actionable implementation plan for game-aligned UI/UX
 
 - UI component roadmap
 - Page-level implementation
@@ -135,7 +135,7 @@ Organized by category:
 
 ### 7. [prototype-plan.md](prototype-plan.md)
 
-**Interactive prototype specifications**
+#### Interactive prototype specifications
 
 **P0 Prototypes** (Critical):
 
@@ -161,7 +161,7 @@ Organized by category:
 
 ### 8. [game-ui-alignment-strategy.md](game-ui-alignment-strategy.md)
 
-**Design philosophy and visual identity**
+#### Design philosophy and visual identity
 
 - Game-aligned, web-optimized approach
 - Color palette (verified from game)

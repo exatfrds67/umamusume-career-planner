@@ -7,7 +7,8 @@
 
 ## Overview
 
-Implemented a comprehensive Blade component for displaying AI-powered training recommendations with full accessibility compliance, priority-based styling, and interactive expand/collapse functionality.
+Implemented a comprehensive Blade component for displaying AI-powered training recommendations with full accessibility
+compliance, priority-based styling, and interactive expand/collapse functionality.
 
 ## Files Created
 
@@ -178,7 +179,7 @@ x-data="{
     expanded: false,
     dismissed: false
 }"
-```
+```text
 
 **Features**:
 
@@ -234,7 +235,7 @@ The recommendation card is designed to be used within the advisory panel compone
         class="mb-3"
     />
 @endforeach
-```
+```text
 
 ### With Livewire Components
 
@@ -282,7 +283,7 @@ All tests passing with comprehensive coverage:
 
 ```bash
 php artisan test --filter=RecommendationCardTest --compact
-```
+```text
 
 **Result**: 19 passed (54 assertions) in 6.25s
 
@@ -305,6 +306,9 @@ php artisan test --filter=RecommendationCardTest --compact
 
 ## Conclusion
 
-The AI Recommendation Card component is fully implemented, tested, and ready for integration into the AI-Powered Training Advisory System. It meets all design specifications, accessibility requirements, and follows Laravel 12 and project coding standards.
+The AI Recommendation Card component is fully implemented, tested, and ready for integration into the AI-Powered
+Training Advisory System. It meets all design specifications, accessibility requirements, and follows Laravel 12 and
+project coding standards.
 
 **Status**: ✅ Ready for Production
+

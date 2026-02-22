@@ -1,10 +1,14 @@
 # Neuron AI Framework Documentation
 
-Welcome to the Neuron AI Framework documentation. This directory contains comprehensive documentation for building AI agents in PHP.
+Welcome to the Neuron AI Framework documentation. This directory contains comprehensive documentation for building AI
+agents in PHP.
 
 ## What is Neuron?
 
-Neuron is a PHP framework for creating and orchestrating AI Agents. It allows you to integrate AI entities in your existing PHP applications with a powerful and flexible architecture. The framework provides tools for the entire agentic application development lifecycle, from LLM interfaces to data loading, multi-agent orchestration, monitoring, and debugging.
+Neuron is a PHP framework for creating and orchestrating AI Agents. It allows you to integrate AI entities in your
+existing PHP applications with a powerful and flexible architecture. The framework provides tools for the entire agentic
+application development lifecycle, from LLM interfaces to data loading, multi-agent orchestration, monitoring, and
+debugging.
 
 ## Key Features
 
@@ -76,7 +80,7 @@ $response = MyAgent::make()->chat(
 );
 
 echo $response->getContent();
-```
+```text
 
 ## Requirements
 
@@ -102,10 +106,11 @@ Neuron integrates with Inspector for comprehensive monitoring and debugging. Set
 
 ```env
 INSPECTOR_INGESTION_KEY=your_key_here
-```
+```text
 
 This enables real-time monitoring of agent execution, tool calls, and workflow steps.
 
 ---
 
 *Documentation source: <https://docs.neuron-ai.dev/>*
+

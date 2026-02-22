@@ -8,7 +8,8 @@
 
 ## Executive Summary
 
-Fixed browser test timeouts caused by missing `$topStatus` data in controllers after top bar enhancement. Updated `TrainingPredictionController` and `DashboardController` to properly pass character status data to views.
+Fixed browser test timeouts caused by missing `$topStatus` data in controllers after top bar enhancement. Updated
+`TrainingPredictionController` and `DashboardController` to properly pass character status data to views.
 
 ---
 
@@ -21,7 +22,8 @@ Three browser test suites were failing with 5-second timeouts:
 3. ✅ `Tests\Browser\CriticalAlertHandlingTest::it updates alerts when character state changes`
 4. ✅ `Tests\Browser\RecommendationCardInteractivityTest::it handles multiple recommendation cards independently`
 
-**Root Cause**: Controllers were not passing `$topStatus` array to views, causing top bar to display "—" instead of actual character data. Tests waited for specific values that never appeared.
+**Root Cause**: Controllers were not passing `$topStatus` array to views, causing top bar to display "—" instead of
+actual character data. Tests waited for specific values that never appeared.
 
 ---
 
@@ -73,7 +75,7 @@ return view('training.predictions', [
     'trainingTypes' => $this->getTrainingTypes(),
     'topStatus' => $topStatus, // ← Added
 ]);
-```
+```text
 
 #### TrainingPredictionController::show()
 
@@ -119,7 +121,7 @@ return view('dashboard', [
     'topStatus' => $topStatus, // ← Added
     ...$dashboardData,
 ]);
-```
+```text
 
 ---
 
@@ -138,25 +140,30 @@ Due to browser test execution time, manual verification is recommended:
 1. **Training Predictions Page**
 
    ```
+
    Visit: /training/predictions
    Select a character
    Verify top bar shows:
-   - Turn counter (e.g., "15/78")
-   - Energy indicator (e.g., "⚡ 75/100" in green)
-   - Mood indicator (e.g., "🙂 Good")
-   - SP counter (e.g., "SP 450")
-   - Storage badge ("Account" in green)
+
+- Turn counter (e.g., "15/78")
+- Energy indicator (e.g., "⚡ 75/100" in green)
+- Mood indicator (e.g., "🙂 Good")
+- SP counter (e.g., "SP 450")
+- Storage badge ("Account" in green)
+
+   ```text
+
+1. **Dashboard Page**
+
    ```
 
-2. **Dashboard Page**
-
-   ```
    Visit: /dashboard
    Select a character
    Verify same top bar indicators
-   ```
 
-3. **Browser Tests** (when Playwright available)
+   ```text
+
+2. **Browser Tests** (when Playwright available)
 
    ```bash
    php artisan test --filter="AdvisoryWorkflowTest"
@@ -217,7 +224,7 @@ public function yourMethod(Character $character): View
         'topStatus' => $topStatus,
     ]);
 }
-```
+```text
 
 ---
 
@@ -322,3 +329,4 @@ public function yourMethod(Character $character): View
 **Last Updated**: 2026-02-09  
 **Verified By**: Code formatting, manual code review  
 **Approved For**: Manual testing and browser test execution
+

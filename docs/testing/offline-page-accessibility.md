@@ -67,7 +67,8 @@ All text colors meet WCAG AAA standards (7:1+ contrast ratio) on white backgroun
 
 ## Recommendations
 
-No accessibility issues found. The page exceeds WCAG AAA standards for color contrast and follows best practices for semantic HTML and keyboard navigation.
+No accessibility issues found. The page exceeds WCAG AAA standards for color contrast and follows best practices for
+semantic HTML and keyboard navigation.
 
 ## Test Environment
 

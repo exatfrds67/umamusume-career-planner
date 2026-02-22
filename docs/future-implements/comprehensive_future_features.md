@@ -1,7 +1,5 @@
 # Comprehensive Future Features Analysis for Umamusume Career Planner
 
-> **Implementation Status Note (February 2026):** Since this analysis was written, several supporting systems have been implemented: Data Import/Export services (`DataExportService`, `DataImportService`) with JSON/CSV support and tests; AI Advisory system (`AdvisoryPanel` Livewire component, `RuleBasedAdvisor`, `AdvisoryController`, MCP integration, Neuron AI); Career Reporting (`CareerReportingService` with JSON/CSV/PDF export); and Backup/Restore (`BackupService`). The core F1–F5 future features listed below remain unimplemented.
-
 ## Executive Summary
 
 Based on the complete analysis of **60 comprehensive requirements** and verified technology stack (**Laravel 12**, **AWS Bedrock Claude 4.5**, **AWS Bedrock Nova 2**, **Ollama**, **Tailwind CSS v4**), this document outlines future implementation opportunities that extend beyond the core single-user career optimization system. These features represent the next evolution of the career planner into a comprehensive Umamusume ecosystem tool, addressing the remaining **5%** of optimization opportunities.
@@ -40,11 +38,11 @@ Comprehensive Champions Meeting tournament management and optimization for compe
 **Implementation Phase**: Phase 3
 **Estimated Effort**: 30-40 hours
 
-#### Overview
+#### Overview (F2)
 
 Community integration features for strategy sharing, collaboration, and distributed knowledge building.
 
-#### Key Features
+#### Key Features (F2)
 
 - **Strategy Sharing**: Standardized export/import for career builds and training sequences
 - **Community Database**: Anonymized performance data contribution (with user consent)
@@ -53,7 +51,7 @@ Community integration features for strategy sharing, collaboration, and distribu
 - **Mentorship System**: Connect experienced players with newcomers
 - **Build Comparison**: Statistical analysis of shared strategies
 
-#### Technical Implementation
+#### Technical Implementation (F2)
 
 - API endpoints for community data exchange built on **Laravel 12**
 - Standardized data formats for strategy sharing
@@ -67,11 +65,11 @@ Community integration features for strategy sharing, collaboration, and distribu
 **Implementation Phase**: Phase 3
 **Estimated Effort**: 25-35 hours
 
-#### Overview
+#### Overview (F3)
 
 Club management and social optimization tools for maximizing monthly ranking rewards and resource sharing.
 
-#### Key Features
+#### Key Features (F3)
 
 - **Club Ranking Management**: Monthly fan count contribution tracking and optimization
 - **Resource Sharing**: Shoe request/donation system with Club Point optimization
@@ -79,7 +77,7 @@ Club management and social optimization tools for maximizing monthly ranking rew
 - **Activity Coordination**: Member contribution monitoring and leadership tools
 - **Social Network Analysis**: Friend/clubmate relationship optimization
 
-#### Technical Implementation
+#### Technical Implementation (F3)
 
 - Club management interface with member tracking built on **Laravel 12**
 - Resource sharing optimization algorithms enhanced by **AWS Bedrock Claude 4.5**
@@ -92,11 +90,11 @@ Club management and social optimization tools for maximizing monthly ranking rew
 **Implementation Phase**: Phase 4
 **Estimated Effort**: 50-60 hours
 
-#### Overview
+#### Overview (F4)
 
 Real-time collaboration capabilities for strategy development and shared insights.
 
-#### Key Features
+#### Key Features (F4)
 
 - **Laravel Reverb Integration**: WebSocket server for real-time communication
 - **Collaborative Workspaces**: Shared career planning with permission controls
@@ -104,7 +102,7 @@ Real-time collaboration capabilities for strategy development and shared insight
 - **Cross-Device Sync**: Seamless collaboration across multiple devices
 - **Version Control**: Collaborative change tracking and conflict resolution
 
-#### Technical Implementation
+#### Technical Implementation (F4)
 
 - **Laravel Reverb** WebSocket server setup (integrated with Laravel 12)
 - Real-time collaboration infrastructure with **TypeScript** support
@@ -118,11 +116,11 @@ Real-time collaboration capabilities for strategy development and shared insight
 **Implementation Phase**: Phase 2
 **Estimated Effort**: 60-80 hours
 
-#### Overview
+#### Overview (F5)
 
 Advanced machine learning integration for predictive analytics and personalized optimization.
 
-#### Key Features
+#### Key Features (F5)
 
 - **Reinforcement Learning**: Models that learn from career outcomes and improve recommendations
 - **Predictive Analytics**: Race outcome forecasting with confidence intervals
@@ -130,7 +128,7 @@ Advanced machine learning integration for predictive analytics and personalized 
 - **Statistical Analysis**: Correlation analysis, regression models, anomaly detection
 - **Time Series Forecasting**: Career progression prediction and Monte Carlo simulations
 
-#### Technical Implementation
+#### Technical Implementation (F5)
 
 - Machine learning model integration (TensorFlow/PyTorch) with **AWS Bedrock** integration
 - Statistical analysis engine with advanced algorithms powered by **Nova 2** models

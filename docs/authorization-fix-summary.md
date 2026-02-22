@@ -10,26 +10,26 @@
 
 ### 1. Policies
 
-| File | Action | Description |
-|------|--------|-------------|
-| `app/Policies/CharacterPolicy.php` | ✅ Already Correct | Had admin bypass via `before()` method |
-| `app/Policies/CareerPolicy.php` | ✅ Created | New policy with admin bypass |
+| File                               | Action          | Description                            |
+| ---------------------------------- | --------------- | -------------------------------------- |
+| `app/Policies/CharacterPolicy.php` | Already Correct | Had admin bypass via `before()` method |
+| `app/Policies/CareerPolicy.php`    | Created         | New policy with admin bypass           |
 
 ### 2. Controllers
 
-| File | Methods Fixed | Description |
-|------|---------------|-------------|
-| `app/Http/Controllers/CareerReportController.php` | 9 methods | Replaced manual checks with policy authorization |
-| `app/Http/Controllers/Api/SkillManagementController.php` | 2 methods | Replaced manual checks with policy authorization |
-| `app/Http/Controllers/Api/V1/CharacterController.php` | 3 methods | Replaced manual checks with policy authorization |
-| `app/Http/Controllers/Api/V1/CareerController.php` | 17 methods | Fixed via helper method using policy |
+| File                                                     | Methods Fixed | Description                                      |
+| -------------------------------------------------------- | ------------- | ------------------------------------------------ |
+| `app/Http/Controllers/CareerReportController.php`        | 9 methods     | Replaced manual checks with policy authorization |
+| `app/Http/Controllers/Api/SkillManagementController.php` | 2 methods     | Replaced manual checks with policy authorization |
+| `app/Http/Controllers/Api/V1/CharacterController.php`    | 3 methods     | Replaced manual checks with policy authorization |
+| `app/Http/Controllers/Api/V1/CareerController.php`       | 17 methods    | Fixed via helper method using policy             |
 
 ### 3. Service Providers
 
-| File | Gates Fixed | Description |
-|------|-------------|-------------|
-| `app/Providers/TelescopeServiceProvider.php` | 1 gate | Added admin bypass to `viewTelescope` |
-| `app/Providers/HorizonServiceProvider.php` | 1 gate | Added admin bypass to `viewHorizon` |
+| File                                         | Gates Fixed | Description                           |
+| -------------------------------------------- | ----------- | ------------------------------------- |
+| `app/Providers/TelescopeServiceProvider.php` | 1 gate      | Added admin bypass to `viewTelescope` |
+| `app/Providers/HorizonServiceProvider.php`   | 1 gate      | Added admin bypass to `viewHorizon`   |
 
 ---
 
@@ -42,7 +42,7 @@
 if ($character->user_id !== Auth::id()) {
     abort(403, 'Unauthorized');
 }
-```
+```text
 
 ### After (Policy-Based)
 
@@ -65,7 +65,7 @@ public function before(User $user, string $ability): ?bool
     }
     return null;  // Continue to specific check
 }
-```
+```text
 
 ---
 
@@ -98,3 +98,4 @@ public function before(User $user, string $ability): ?bool
 ---
 
 For detailed information, see: `docs/authorization-audit-2026-01-29.md`
+

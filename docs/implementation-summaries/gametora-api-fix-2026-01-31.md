@@ -8,7 +8,7 @@
 
 The `UcpSkillsSeeder` was attempting to fetch additional skills from the gametora.com API endpoint:
 
-```
+```text
 https://gametora.com/data/umamusume/skills.2174f78e.json
 ```
 
@@ -22,7 +22,8 @@ The gametora.com website has either:
 2. Removed public API access
 3. Updated the hash in the JSON filename
 
-Investigation via web search and direct page inspection confirmed that the skills JSON endpoint is no longer publicly accessible.
+Investigation via web search and direct page inspection confirmed that the skills JSON endpoint is no longer publicly
+accessible.
 
 ## Solution
 
@@ -46,7 +47,7 @@ Updated `database/seeders/UcpSkillsSeeder.php` to:
 
 ### Before Fix
 
-```
+```text
 Fetching additional skills from gametora.com...
 Failed to fetch skills from gametora: HTTP 404
 Continuing with curated skills only.
@@ -54,7 +55,7 @@ Continuing with curated skills only.
 
 ### After Fix
 
-```
+```text
 Gametora API fetch disabled - using curated skills only
 ```
 
@@ -62,7 +63,7 @@ Gametora API fetch disabled - using curated skills only
 
 The seeder now relies entirely on curated skills from:
 
-```
+```text
 database/seeders/data/curated_skills.php
 ```
 
@@ -94,10 +95,13 @@ Verified the fix by running:
 
 ```bash
 php artisan db:seed --class=UcpSkillsSeeder
-```
+```text
 
 Result: ✅ No errors, 61 skills seeded successfully with 20 evolution pairs.
 
 ## Conclusion
 
-The error has been resolved by disabling the unavailable gametora API fetch. The application continues to function normally with the comprehensive curated skills dataset. The seeder is designed to easily re-enable external API fetching if a valid endpoint becomes available in the future.
+The error has been resolved by disabling the unavailable gametora API fetch. The application continues to function
+normally with the comprehensive curated skills dataset. The seeder is designed to easily re-enable external API fetching
+if a valid endpoint becomes available in the future.
+

@@ -24,7 +24,7 @@ use App\Enums\RecommendationType;
 
 $parser = new RecommendationParser();
 
-// AI response from NeuronAIService
+// AI response from HybridAIService
 $aiResponse = [
     'content' => json_encode([
         'type' => 'training_facility',
@@ -215,13 +215,13 @@ try {
 ## Integration with TrainingAdvisoryService
 
 ```php
-use App\Services\Neuron\NeuronAIService;
+use App\Services\AI\HybridAIService;
 use App\Services\AI\RecommendationParser;
 
 class TrainingAdvisoryService
 {
     public function __construct(
-        protected NeuronAIService $aiService,
+        protected HybridAIService $aiService,
         protected RecommendationParser $parser
     ) {}
 
@@ -293,5 +293,5 @@ php artisan test --filter=RecommendationParserTest
 
 - [AI Training Advisory System Design](.kiro/specs/ai-training-advisory/design.md)
 - [Recommendation Value Object](../app/ValueObjects/Recommendation.php)
-- [NeuronAIService](../app/Services/Neuron/NeuronAIService.php)
+- [HybridAIService](../app/Services/AI/HybridAIService.php)
 - [TrainingAdvisoryService](../app/Services/TrainingAdvisoryService.php)

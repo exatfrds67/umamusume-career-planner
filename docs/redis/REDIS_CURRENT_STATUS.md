@@ -67,7 +67,7 @@
   CACHE_STORE=redis
   QUEUE_CONNECTION=redis
   SESSION_DRIVER=redis
-  ```
+  ```text
 
 - **Commands:**
 
@@ -95,7 +95,7 @@
   php artisan test --filter=FallbackRecovery --compact
   php artisan test --filter=CacheManagement --compact
   php artisan test --compact
-  ```
+  ```text
 
 ### 5. Warm Cache
 
@@ -155,7 +155,7 @@
 
 ✅ wsl bash -c "redis-cli info server"
    Result: Redis 7.0.15 on Linux
-```
+```text
 
 ### PHP Extension Tests
 
@@ -174,7 +174,7 @@
 ✅ Redis configuration present
 ✅ Redis prefix configured
 ✅ Database separation configured
-```
+```text
 
 ---
 
@@ -227,20 +227,20 @@
 
    ```powershell
    php artisan cache:warm
-   ```
+   ```text
 
 ---
 
 ## 📚 Documentation Reference
 
-| Document | Purpose | When to Use |
-|----------|---------|-------------|
-| `REDIS_SETUP_INSTRUCTIONS.md` | Installation guide | Installing phpredis |
-| `UPDATE_REDIS_TESTS.md` | Test updates | After phpredis installed |
-| `REDIS_SETUP_CHECKLIST.md` | Step-by-step checklist | Throughout process |
-| `REDIS_COMMANDS_REFERENCE.md` | Command reference | Debugging/monitoring |
-| `REDIS_SETUP_SUMMARY.md` | Overview | Quick reference |
-| `REDIS_CURRENT_STATUS.md` | Status report | Current state |
+| Document                      | Purpose                | When to Use              |
+| ----------------------------- | ---------------------- | ------------------------ |
+| `REDIS_SETUP_INSTRUCTIONS.md` | Installation guide     | Installing phpredis      |
+| `UPDATE_REDIS_TESTS.md`       | Test updates           | After phpredis installed |
+| `REDIS_SETUP_CHECKLIST.md`    | Step-by-step checklist | Throughout process       |
+| `REDIS_COMMANDS_REFERENCE.md` | Command reference      | Debugging/monitoring     |
+| `REDIS_SETUP_SUMMARY.md`      | Overview               | Quick reference          |
+| `REDIS_CURRENT_STATUS.md`     | Status report          | Current state            |
 
 ---
 

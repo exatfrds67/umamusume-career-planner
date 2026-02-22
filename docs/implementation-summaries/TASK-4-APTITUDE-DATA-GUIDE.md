@@ -6,7 +6,7 @@
 
 ### Aptitude Grade Scale
 
-```
+```text
 SS - Exceptional (best possible)
 S  - Excellent
 A  - Very Good
@@ -94,7 +94,7 @@ G  - Unsuitable (worst)
 
 ```bash
 database/seeders/EnhancedRealUmaMusumeCharactersSeeder.php
-```
+```text
 
 ### Step 2: Find the loadAptitudeData() Method
 
@@ -132,7 +132,7 @@ private function loadAptitudeData(): void
     'betweener' => 'A',
     'chaser' => 'B',
 ],
-```
+```text
 
 **Example - Adding Grass Wonder**:
 
@@ -165,7 +165,7 @@ php artisan tinker --execute="
     \$char = collect(\$chars)->firstWhere('name_en', 'Grass Wonder');
     echo \$char['name_en'];
 "
-```
+```text
 
 ### Step 5: Test the Addition
 
@@ -213,7 +213,7 @@ php artisan tinker --execute="
        echo "    'runner' => '{$row[9]}', 'leader' => '{$row[10]}', 'betweener' => '{$row[11]}', 'chaser' => '{$row[12]}',\n";
        echo "],\n";
    }
-   ```
+   ```text
 
 4. **Paste into seeder** and test
 
@@ -239,7 +239,7 @@ php artisan tinker --execute="
 'turf_long' => 'S',
 'betweener' => 'A',
 'chaser' => 'S',
-```
+```text
 
 ### Dirt Specialists (Rare)
 
@@ -261,7 +261,7 @@ php artisan tinker --execute="
 'leader' => 'A',
 'betweener' => 'A',
 'chaser' => 'B',
-```
+```text
 
 ## Validation Checklist
 
@@ -315,6 +315,7 @@ Before committing aptitude data:
 ## Example Commit Message
 
 ```
+
 feat: add aptitude data for 20 characters
 
 - Added official aptitude grades for:
@@ -324,7 +325,8 @@ feat: add aptitude data for 20 characters
 - Data verified from gametora.com and GameWith
 - Tested with seeder, all aptitudes created correctly
 - Total characters with aptitudes: 30/161 (18.6%)
-```
+
+```text
 
 ## Need Help?
 
@@ -338,3 +340,4 @@ feat: add aptitude data for 20 characters
 **Document Version**: 1.0  
 **Last Updated**: January 26, 2026  
 **Related**: [Task 4 Implementation Summary](./TASK-4-ENHANCED-CHARACTER-BASELINE-DATA.md)
+

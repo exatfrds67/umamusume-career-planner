@@ -6,7 +6,8 @@
 
 ## Test Summary
 
-The retry functionality for the External Data Browser has been implemented and tested. All core retry features are working as designed.
+The retry functionality for the External Data Browser has been implemented and tested. All core retry features are
+working as designed.
 
 ## Implementation Verification
 
@@ -65,7 +66,7 @@ async retryEndpoint(endpointName) {
     // Retries specific failed endpoint
     // Updates state on success/failure
 }
-```
+```text
 
 **Validation**:
 
@@ -247,13 +248,15 @@ None identified during testing.
 
 ## Conclusion
 
-The retry functionality for the External Data Browser has been successfully implemented and tested. All requirements from task 4.1.3 have been met:
+The retry functionality for the External Data Browser has been successfully implemented and tested. All requirements
+from task 4.1.3 have been met:
 
 ✅ **4.1.3.1**: Individual endpoint retry functionality works correctly  
 ✅ **4.1.3.2**: "Retry All" button functions as expected  
 ✅ **4.1.3.3**: State updates correctly after retry operations
 
-The implementation follows best practices for error handling, state management, and user experience. The code is well-documented, maintainable, and ready for production deployment pending final browser compatibility testing.
+The implementation follows best practices for error handling, state management, and user experience. The code is
+well-documented, maintainable, and ready for production deployment pending final browser compatibility testing.
 
 ### Sign-off
 

@@ -40,9 +40,9 @@ icacls storage /grant Users:F /T
 
 # Or check if storage/app/public exists
 php artisan storage:link
-```
+```text
 
-### 4. Assets Not Updated
+## 4. Assets Not Updated
 
 If you made changes but don't see them:
 
@@ -54,7 +54,7 @@ npm run build
 npm run dev
 ```
 
-### 5. Cache Issues
+## 5. Cache Issues
 
 Clear browser and Laravel cache:
 
@@ -65,7 +65,7 @@ php artisan view:clear
 php artisan config:clear
 
 # Browser: Hard refresh (Ctrl+Shift+R or Cmd+Shift+R)
-```
+```text
 
 ## Testing the Feature
 
@@ -125,7 +125,7 @@ Open browser console and type:
 
 ```javascript
 window.Alpine
-```
+```text
 
 Should return an object. If undefined, Alpine.js isn't loading.
 
@@ -145,20 +145,20 @@ curl -X POST http://127.0.0.1:8000/profile/avatar \
   -H "Accept: application/json" \
   -H "X-CSRF-TOKEN: YOUR_TOKEN_HERE" \
   -F "avatar=@/path/to/image.jpg"
-```
+```text
 
-### 4. Check Laravel logs
+## 4. Check Laravel logs
 
 ```bash
 # View last 50 lines of log
 Get-Content storage/logs/laravel.log -Tail 50
 ```
 
-### 5. Verify routes are registered
+## 5. Verify routes are registered
 
 ```bash
 php artisan route:list --name=profile.avatar
-```
+```text
 
 Should show:
 
@@ -213,3 +213,4 @@ If none of the above works, provide:
 ---
 
 **Last Updated**: January 29, 2026
+

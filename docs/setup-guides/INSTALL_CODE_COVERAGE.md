@@ -7,11 +7,12 @@
 
 ## The Warning
 
-```
+```text
 WARN  No code coverage driver available
 ```
 
-This warning appears because PHPUnit is configured to generate code coverage reports, but PHP doesn't have a coverage driver installed.
+This warning appears because PHPUnit is configured to generate code coverage reports, but PHP doesn't have a coverage
+driver installed.
 
 ---
 
@@ -89,7 +90,7 @@ Remove code coverage configuration from `phpunit.xml`.
 1. **Extract the ZIP file**
 2. **Copy `php_pcov.dll` to:**
 
-   ```
+   ```text
    C:\Users\exatf\tools\php-8.4.11\ext\
    ```
 
@@ -97,7 +98,7 @@ Remove code coverage configuration from `phpunit.xml`.
 
 1. **Open php.ini:**
 
-   ```
+   ```text
    C:\Users\exatf\tools\php-8.4.11\php.ini
    ```
 
@@ -105,7 +106,7 @@ Remove code coverage configuration from `phpunit.xml`.
 
    ```ini
    extension=pcov
-   ```
+   ```text
 
 3. **Optional PCOV Configuration:**
 
@@ -119,13 +120,15 @@ Remove code coverage configuration from `phpunit.xml`.
 
 ```powershell
 php -m | Select-String pcov
-```
+```text
 
 **Expected Output:**
 
 ```
+
 pcov
-```
+
+```text
 
 ### Step 5: Test Code Coverage
 
@@ -155,19 +158,19 @@ php artisan test --coverage
 
 - File: `php_xdebug-X.X.X-8.4-nts-vs16-x64.dll`
 
-### Step 2: Install Extension
+### Step 2: Install Xdebug Extension
 
 1. **Copy `php_xdebug.dll` to:**
 
-   ```
+   ```text
    C:\Users\exatf\tools\php-8.4.11\ext\
    ```
 
-### Step 3: Update php.ini
+### Step 3: Update Xdebug php.ini
 
 1. **Open php.ini:**
 
-   ```
+   ```text
    C:\Users\exatf\tools\php-8.4.11\php.ini
    ```
 
@@ -180,7 +183,7 @@ php artisan test --coverage
    xdebug.start_with_request=trigger
    ```
 
-### Step 4: Verify Installation
+### Step 4: Verify Xdebug Installation
 
 ```powershell
 php -v
@@ -188,7 +191,7 @@ php -v
 
 **Expected Output:**
 
-```
+```text
 PHP 8.4.11 (cli) (built: Jul 29 2025 18:02:29) (NTS Visual C++ 2022 x64)
 ...
     with Xdebug v3.x.x, Copyright (c) 2002-2024, by Derick Rethans
@@ -198,7 +201,7 @@ PHP 8.4.11 (cli) (built: Jul 29 2025 18:02:29) (NTS Visual C++ 2022 x64)
 
 ```powershell
 php artisan test --coverage
-```
+```text
 
 ---
 
@@ -225,7 +228,7 @@ Remove or comment out the `<coverage>` section:
 
 ```powershell
 php artisan test --compact
-```
+```text
 
 **Expected:** No warning about code coverage driver
 
@@ -283,7 +286,7 @@ Update `phpunit.xml` to disable code coverage:
 
 ```powershell
 php artisan test --compact
-```
+```text
 
 **Expected:** No warnings
 
@@ -297,7 +300,7 @@ php artisan test --filter=Tesseract --compact
 
 ```powershell
 php artisan test
-```
+```text
 
 ---
 
@@ -321,11 +324,11 @@ php artisan test
 
 ## Summary
 
-| Option | Speed | Effort | Features |
-|--------|-------|--------|----------|
-| PCOV | ⚡⚡⚡ Fast | 🔧 Medium | Coverage only |
-| Xdebug | ⚡ Slow | 🔧🔧 High | Coverage + Debug |
-| Disable | ⚡⚡⚡ Fastest | ✅ Easy | No coverage |
+| Option  | Speed       | Effort   | Features         |
+| ------- | ----------- | -------- | ---------------- |
+| PCOV    | ⚡⚡⚡ Fast    | 🔧 Medium | Coverage only    |
+| Xdebug  | ⚡ Slow      | 🔧🔧 High  | Coverage + Debug |
+| Disable | ⚡⚡⚡ Fastest | ✅ Easy   | No coverage      |
 
 **Recommended:** Disable coverage for now, install PCOV later if needed.
 
@@ -359,3 +362,4 @@ php artisan test
 - ✅ No warnings
 - ✅ Clean test output
 - ✅ Optional: Coverage reports available
+

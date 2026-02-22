@@ -1,6 +1,6 @@
 # Top Bar Developer Guide
 
-**Quick Reference for Using the Enhanced Top Bar**
+Quick Reference for Using the Enhanced Top Bar
 
 ---
 
@@ -52,7 +52,7 @@ public function index()
 ### Required Fields
 
 | Field | Type | Example | Description |
-|-------|------|---------|-------------|
+| --- | --- | --- | --- |
 | `currentTurn` | int\|null | `15` | Current turn number (1-70) |
 | `maxTurns` | int\|null | `70` | Maximum turns in career |
 | `spAvailable` | int\|null | `450` | Available skill points |
@@ -61,7 +61,7 @@ public function index()
 ### Optional Fields (New)
 
 | Field | Type | Example | Valid Values | Description |
-|-------|------|---------|--------------|-------------|
+| --- | --- | --- | --- | --- |
 | `energy` | int\|null | `78` | 0-100 | Character energy level |
 | `mood` | string\|null | `'good'` | See below | Character mood state |
 | `careerStage` | string\|null | `'senior'` | 'junior', 'classic', 'senior' | Current career phase |
@@ -69,7 +69,7 @@ public function index()
 ### Mood Values
 
 | Value | Emoji | Modifier | Display |
-|-------|-------|----------|---------|
+| --- | --- | --- | --- |
 | `'great'` or `'excellent'` | 😊 | +20% | "Great" |
 | `'good'` | 🙂 | +10% | "Good" |
 | `'normal'` or `'neutral'` | 😐 | 0% | "Normal" |

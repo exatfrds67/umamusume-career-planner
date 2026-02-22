@@ -40,4 +40,5 @@
 
 ## Conclusion
 
-Memory MCP server setup is COMPLETE. The server is properly configured and documented. The JSON parsing error is a runtime issue that can be resolved with server restart or memory file cleanup.
+Memory MCP server setup is COMPLETE. The server is properly configured and documented. The JSON parsing error is a
+runtime issue that can be resolved with server restart or memory file cleanup.

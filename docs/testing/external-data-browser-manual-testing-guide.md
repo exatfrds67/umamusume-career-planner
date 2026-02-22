@@ -18,7 +18,7 @@ Before beginning testing, ensure:
    # npm run dev
    # php artisan queue:listen --tries=1
    # php artisan pail --timeout=0
-   ```
+   ```text
 
 2. **Assets are built**: If not using dev mode:
 
@@ -127,7 +127,7 @@ If you want to test error handling:
 - [ ] Look for any red (failed) requests to `/api/external/*`
 - [ ] If found, verify corresponding error banner appears
 
-### Expected Results
+### Expected Results - Error Handling
 
 ✅ **PASS Criteria:**
 
@@ -174,7 +174,7 @@ If you want to test error handling:
    - [ ] All tabs show loading state
    - [ ] Data refreshes after retry completes
 
-### Expected Results
+### Expected Results - Retry Functionality
 
 ✅ **PASS Criteria:**
 
@@ -273,7 +273,7 @@ If you want to test error handling:
    - [ ] Click "Clear Filters"
    - [ ] Verify summary disappears
 
-### Expected Results
+### Expected Results - Existing Features
 
 ✅ **PASS Criteria:**
 
@@ -302,7 +302,7 @@ If you want to test error handling:
 
 **Notes**:
 
-```
+```text
 [Record any issues, console errors, or observations]
 ```
 
@@ -314,7 +314,7 @@ If you want to test error handling:
 
 **Notes**:
 
-```
+```text
 [Record error messages, behavior]
 ```
 
@@ -326,7 +326,7 @@ If you want to test error handling:
 
 **Notes**:
 
-```
+```text
 [Record retry behavior]
 ```
 
@@ -344,19 +344,19 @@ If you want to test error handling:
 
 **Notes**:
 
-```
+```text
 [Record any issues with existing features]
 ```
 
 ### Console Errors
 
-```
+```text
 [Copy/paste any console errors here]
 ```
 
 ### Network Errors
 
-```
+```text
 [Copy/paste any failed network requests here]
 ```
 

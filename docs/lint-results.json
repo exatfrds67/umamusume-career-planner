@@ -1,0 +1,12 @@
+{
+  "meta": {
+    "generatedAt": "2026-02-22T10:32:53.973Z",
+    "tool": "markdownlint-cli2 v0.21.0",
+    "totalFilesLinted": 477,
+    "totalErrors": 0,
+    "filesWithIssues": 0,
+    "directoriesWithIssues": 0,
+    "ruleFrequency": []
+  },
+  "directories": []
+}

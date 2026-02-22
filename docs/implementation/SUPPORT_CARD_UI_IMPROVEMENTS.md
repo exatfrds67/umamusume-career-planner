@@ -39,7 +39,7 @@
 ### Responsive Breakpoints
 
 | Viewport | Columns | Card Width (approx) |
-|----------|---------|---------------------|
+| ---------------- | ------- | ------------------- |
 | Mobile (< 640px) | 2 | ~170px |
 | Small (640px+) | 3 | ~200px |
 | Medium (768px+) | 4 | ~180px |
@@ -81,7 +81,7 @@
 
 ### Before
 
-```
+```text
 ┌─────────────────────┐
 │                     │
 │      Card Image     │
@@ -95,7 +95,7 @@
 
 ### After
 
-```
+```text
 ┌──────────────┐
 │  [SSR] [✓]   │  ← Badges
 │              │
@@ -155,7 +155,7 @@ On Hover:
 
 ```html
 class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-3"
-```
+```text
 
 ### Hover Overlay
 
@@ -167,7 +167,7 @@ class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-col
 
 ```html
 class="hover:scale-105 transition-all"
-```
+```text
 
 ### Responsive Badge Text
 

@@ -16,7 +16,7 @@ This document provides visual representations of the sidebar minimize feature in
 
 ### Expanded State (Default)
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────────┐
 │                        Application Layout                            │
 ├──────────────────┬──────────────────────────────────────────────────┤
@@ -58,7 +58,7 @@ This document provides visual representations of the sidebar minimize feature in
 
 ### Minimized State
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────────┐
 │                        Application Layout                            │
 ├────┬────────────────────────────────────────────────────────────────┤
@@ -98,7 +98,7 @@ This document provides visual representations of the sidebar minimize feature in
 
 #### Expanded State
 
-```
+```text
 ┌──────────────────────────────────────┐
 │  ┌────────────────────────────────┐  │
 │  │ [Logo] Umamusume Career Planner│◄─┤  ← Toggle Button
@@ -106,9 +106,9 @@ This document provides visual representations of the sidebar minimize feature in
 └──────────────────────────────────────┘
 ```
 
-#### Minimized State
+#### Minimized Toggle State
 
-```
+```text
 ┌──────┐
 │ ┌──┐ │
 │ │🏇│►│  ← Toggle Button
@@ -120,7 +120,7 @@ This document provides visual representations of the sidebar minimize feature in
 
 #### Expanded Navigation Item
 
-```
+```text
 ┌────────────────────────────────┐
 │  📊  Dashboard                 │  ← Icon + Label
 └────────────────────────────────┘
@@ -128,7 +128,7 @@ This document provides visual representations of the sidebar minimize feature in
 
 #### Minimized Navigation Item (with Tooltip)
 
-```
+```text
 ┌────┐     ┌──────────────┐
 │ 📊 │────►│  Dashboard   │  ← Tooltip appears on hover
 └────┘     └──────────────┘
@@ -138,7 +138,7 @@ This document provides visual representations of the sidebar minimize feature in
 
 #### Expanded - Group Closed
 
-```
+```text
 ┌────────────────────────────────┐
 │  💾  Data Management        ▶  │  ← Chevron indicates closed
 └────────────────────────────────┘
@@ -146,7 +146,7 @@ This document provides visual representations of the sidebar minimize feature in
 
 #### Expanded - Group Open
 
-```
+```text
 ┌────────────────────────────────┐
 │  💾  Data Management        ▼  │  ← Chevron indicates open
 ├────────────────────────────────┤
@@ -160,7 +160,7 @@ This document provides visual representations of the sidebar minimize feature in
 
 #### Minimized - Group Hidden
 
-```
+```text
 ┌────┐     ┌──────────────────┐
 │ 💾 │────►│ Data Management  │  ← Tooltip shows group name
 └────┘     │  • Data Hub      │     (no submenu in tooltip)
@@ -175,7 +175,7 @@ This document provides visual representations of the sidebar minimize feature in
 
 ### Mobile (<640px) - Bottom Navigation
 
-```
+```text
 ┌─────────────────────────────────┐
 │                                 │
 │                                 │
@@ -191,7 +191,7 @@ This document provides visual representations of the sidebar minimize feature in
 
 ### Tablet (640-1024px) - Overlay Sidebar
 
-```
+```text
 ┌─────────────────────────────────┐
 │  ☰  Header                      │  ← Hamburger menu
 ├─────────────────────────────────┤
@@ -215,7 +215,7 @@ When menu opened:
 
 ### Desktop (≥1024px) - Fixed Sidebar with Minimize
 
-```
+```text
 See "Desktop Layout States" section above
 ```
 
@@ -225,7 +225,7 @@ See "Desktop Layout States" section above
 
 ### Collapse Animation (300ms)
 
-```
+```text
 Frame 1 (0ms):     Frame 2 (150ms):   Frame 3 (300ms):
 ┌──────────┐       ┌────────┐         ┌────┐
 │ 📊 Dash  │  ───► │ 📊 Da  │  ───►   │ 📊 │
@@ -235,7 +235,7 @@ Frame 1 (0ms):     Frame 2 (150ms):   Frame 3 (300ms):
 
 ### Expand Animation (300ms)
 
-```
+```text
 Frame 1 (0ms):     Frame 2 (150ms):   Frame 3 (300ms):
 ┌────┐             ┌────────┐         ┌──────────┐
 │ 📊 │  ───►       │ 📊 Da  │  ───►   │ 📊 Dash  │
@@ -249,7 +249,7 @@ Frame 1 (0ms):     Frame 2 (150ms):   Frame 3 (300ms):
 
 ### Right-Positioned Tooltip (Default)
 
-```
+```text
 ┌────┐
 │ 📊 │────►┌──────────────┐
 └────┘     │  Dashboard   │
@@ -258,7 +258,7 @@ Frame 1 (0ms):     Frame 2 (150ms):   Frame 3 (300ms):
 
 ### Tooltip with Arrow
 
-```
+```text
 ┌────┐
 │ 📊 │◄───┌──────────────┐
 └────┘    │  Dashboard   │
@@ -271,7 +271,7 @@ Frame 1 (0ms):     Frame 2 (150ms):   Frame 3 (300ms):
 
 ### Light Mode
 
-```
+```text
 ┌────────────────────────────────┐
 │  Background: #FFFFFF           │
 │  Text: #111827                 │
@@ -283,7 +283,7 @@ Frame 1 (0ms):     Frame 2 (150ms):   Frame 3 (300ms):
 
 ### Dark Mode
 
-```
+```text
 ┌────────────────────────────────┐
 │  Background: #1F2937           │
 │  Text: #F9FAFB                 │
@@ -299,7 +299,7 @@ Frame 1 (0ms):     Frame 2 (150ms):   Frame 3 (300ms):
 
 ### Focus Indicators
 
-```
+```text
 ┌────────────────────────────────┐
 │  ┌──────────────────────────┐  │
 │  │ 📊  Dashboard            │  │  ← 2px blue outline
@@ -309,7 +309,7 @@ Frame 1 (0ms):     Frame 2 (150ms):   Frame 3 (300ms):
 
 ### Screen Reader Announcements
 
-```
+```text
 User Action:          Screen Reader Says:
 ─────────────────────────────────────────
 Click minimize    →   "Sidebar minimized"
@@ -324,14 +324,14 @@ Press Alt+B       →   "Sidebar toggled"
 
 ### CSS Classes
 
-#### Expanded State
+#### Expanded CSS State
 
 - Sidebar: `lg:w-72` (288px)
 - Content: `lg:pl-72` (288px padding-left)
 - Logo: Full text visible
 - Labels: All visible
 
-#### Minimized State
+#### Minimized CSS State
 
 - Sidebar: `lg:w-20` (80px)
 - Content: `lg:pl-20` (80px padding-left)
@@ -350,7 +350,7 @@ x-show="!$store.sidebar.minimized"
 <!-- Toggle button icon -->
 x-show="$store.sidebar.minimized"  <!-- Expand icon -->
 x-show="!$store.sidebar.minimized" <!-- Collapse icon -->
-```
+```text
 
 ---
 
@@ -362,4 +362,6 @@ x-show="!$store.sidebar.minimized" <!-- Collapse icon -->
 
 ---
 
-*This visual reference complements the implementation plan and provides clear visual guidance for developers and designers.*
+*This visual reference complements the implementation plan and provides clear visual guidance for developers and
+designers.*
+

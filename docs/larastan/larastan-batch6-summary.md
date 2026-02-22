@@ -47,7 +47,7 @@ if (!\is_string($output)) {
     throw new \RuntimeException('Command execution failed');
 }
 $lines = explode("\n", $output);
-```
+```text
 
 ### 2. ImageProcessingService.php
 
@@ -101,7 +101,7 @@ if (!\is_array($cached)) {
     return null;
 }
 return $cached['value'] ?? null;
-```
+```text
 
 ### 4. CacheManagementService.php
 
@@ -171,7 +171,7 @@ if (!\is_array($data)) {
 ```php
 // Line 903 in DataMigrationService
 $batchData['errors'] // $batchData is mixed from Cache::get()
-```
+```text
 
 **Solution Needed:**
 
@@ -192,7 +192,7 @@ if (!\is_array($batchData)) {
 ```php
 // Line 293 in ExternalDataService
 public function logSync(array $errors): void
-```
+```text
 
 **Solution Needed:**
 
@@ -218,7 +218,7 @@ if (!\is_string($output)) {
     throw new \RuntimeException('Command execution failed');
 }
 $lines = explode("\n", $output);
-```
+```text
 
 ### 2. GdImage Type Handling
 
@@ -251,7 +251,7 @@ if (!\is_array($cached)) {
     return null;
 }
 return $cached['value'] ?? null;
-```
+```text
 
 ### 4. Global Namespace Functions
 
@@ -292,7 +292,7 @@ if (\count($items) > 0 && \in_array($value, $items, true)) {
     * @param array<int, string> $errors
     * @return array<string, mixed>
     */
-   ```
+   ```text
 
 2. **Add array shape annotations:**
 
@@ -324,7 +324,7 @@ class Cache
      */
     public static function get(string $key, mixed $default = null): mixed;
 }
-```
+```text
 
 ## Verification Commands
 

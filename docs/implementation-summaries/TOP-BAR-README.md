@@ -8,7 +8,8 @@
 
 ## 📋 Overview
 
-The application's top bar has been enhanced to provide comprehensive status information and improved navigation, aligning with the specifications in WF-001 (Dashboard Overview) and PRD-001 (Character Management).
+The application's top bar has been enhanced to provide comprehensive status information and improved navigation,
+aligning with the specifications in WF-001 (Dashboard Overview) and PRD-001 (Character Management).
 
 ---
 
@@ -87,7 +88,7 @@ public function index()
     
     return view('your.view', compact('topStatus'));
 }
-```
+```text
 
 ### Full Implementation
 
@@ -118,7 +119,7 @@ public function index()
 ### Status Bar Enhancements
 
 | Feature | Description | Status |
-|---------|-------------|--------|
+| --- | --- | --- |
 | **Turn Counter** | Shows current turn, max turns, and turns remaining | ✅ Complete |
 | **Career Stage** | Displays Junior/Classic/Senior phase | ✅ Complete |
 | **Energy Indicator** | Color-coded energy level (0-100) | ✅ Complete |
@@ -129,7 +130,7 @@ public function index()
 ### Navigation Enhancements
 
 | Feature | Description | Status |
-|---------|-------------|--------|
+| --- | --- | --- |
 | **Run Selector** | Dropdown to switch between career runs | ✅ Complete (UI) |
 | **Help Icon** | Link to help/documentation | ✅ Complete |
 | **Search Field** | Global search (existing) | ✅ Unchanged |
@@ -348,7 +349,9 @@ public function index()
 
 ## ✅ Summary
 
-The top bar enhancement is **complete and production-ready**. All tests pass, documentation is comprehensive, and the implementation is backward compatible. The new features provide significantly more information at a glance while maintaining excellent UX and accessibility.
+The top bar enhancement is **complete and production-ready**. All tests pass, documentation is comprehensive, and the
+implementation is backward compatible. The new features provide significantly more information at a glance while
+maintaining excellent UX and accessibility.
 
 **Key Achievements**:
 

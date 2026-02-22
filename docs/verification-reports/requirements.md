@@ -2,8 +2,8 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.0
-**Date**: February 22, 2026
+**Document Version**: 1.0
+**Date**: January 12, 2026
 **Project**: UmamusumeCareerPlanner
 **Author**: Development Team
 **Status**: Consolidated Requirements Reference
@@ -577,7 +577,7 @@ The requirements cover all aspects of the Umamusume Career Planner system:
 
 #### REQ-4.1.2: Secondary API Integration (★★★★)
 
-- **Description**: System SHALL integrate with GameTora for additional data
+- **Description**: System SHALL integrate with UmamusumeDB.com for additional data
 - **Acceptance Criteria**:
   - Secondary data source integration
   - Data validation and conflict resolution

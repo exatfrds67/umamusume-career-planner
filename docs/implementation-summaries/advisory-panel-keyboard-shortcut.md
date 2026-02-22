@@ -10,7 +10,9 @@
 
 ## Overview
 
-Implemented keyboard shortcut functionality for the AI Advisory Panel, allowing users to toggle the panel open/closed using the **Alt+A** keyboard combination. This enhances accessibility and provides a quick way to access AI recommendations without using the mouse.
+Implemented keyboard shortcut functionality for the AI Advisory Panel, allowing users to toggle the panel open/closed
+using the **Alt+A** keyboard combination. This enhances accessibility and provides a quick way to access AI
+recommendations without using the mouse.
 
 ---
 
@@ -65,7 +67,7 @@ setupKeyboardShortcuts() {
         }
     });
 }
-```
+```text
 
 **Key Features**:
 
@@ -93,7 +95,7 @@ The Blade view includes visual hints for the keyboard shortcut:
 ```blade
 <span>Press <kbd class="px-1.5 py-0.5 bg-neutral-200 dark:bg-neutral-700 
       rounded text-xs font-mono">Alt+A</kbd> to toggle</span>
-```
+```text
 
 **ARIA Label**:
 
@@ -128,7 +130,7 @@ public function test_panel_toggles_with_alt_a_shortcut(): void
             ->assertMissing('[role="dialog"]');
     });
 }
-```
+```text
 
 Additional tests cover:
 
@@ -166,12 +168,12 @@ Additional tests cover:
 
 The implementation has been tested across major browsers:
 
-| Browser | Version | Status |
-|---------|---------|--------|
-| Chrome | 120+ | ✅ Working |
-| Firefox | 121+ | ✅ Working |
-| Safari | 17+ | ✅ Working |
-| Edge | 120+ | ✅ Working |
+| Browser | Version | Status    |
+| ------- | ------- | --------- |
+| Chrome  | 120+    | ✅ Working |
+| Firefox | 121+    | ✅ Working |
+| Safari  | 17+     | ✅ Working |
+| Edge    | 120+    | ✅ Working |
 
 **Note**: Alt key behavior:
 
@@ -203,15 +205,17 @@ Run all advisory panel tests:
 
 ```bash
 php artisan dusk --filter=AdvisoryPanelInteractivityTest
-```
+```text
 
 ### Interactive Test Page
 
 A standalone test page is available at:
 
 ```
+
 tests/JavaScript/advisory-panel-keyboard.test.html
-```
+
+```text
 
 Open this file in a browser to manually test the keyboard shortcut functionality in isolation.
 
@@ -270,6 +274,9 @@ Potential improvements for future versions:
 
 ## Conclusion
 
-The Alt+A keyboard shortcut has been successfully implemented for the advisory panel, providing users with a quick and accessible way to toggle the panel. The implementation follows best practices for keyboard accessibility, includes comprehensive tests, and is fully documented.
+The Alt+A keyboard shortcut has been successfully implemented for the advisory panel, providing users with a quick and
+accessible way to toggle the panel. The implementation follows best practices for keyboard accessibility, includes
+comprehensive tests, and is fully documented.
 
 **Status**: ✅ **COMPLETE**
+

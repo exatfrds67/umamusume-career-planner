@@ -6,7 +6,8 @@
 
 ## Overview
 
-Implemented a complete avatar upload and management system for user profiles with real-time preview, validation, and seamless UX using Alpine.js.
+Implemented a complete avatar upload and management system for user profiles with real-time preview, validation, and
+seamless UX using Alpine.js.
 
 ## Features Implemented
 
@@ -57,7 +58,7 @@ public function deleteAvatar(Request $request): JsonResponse
         'message' => 'Avatar removed successfully.',
     ]);
 }
-```
+```text
 
 #### User Model
 
@@ -83,7 +84,7 @@ protected function avatarUrl(): Attribute
 
 ```php
 Route::delete('/profile/avatar', [ProfileController::class, 'deleteAvatar'])->name('profile.avatar.delete');
-```
+```text
 
 #### API Routes (routes/api.php)
 
@@ -122,7 +123,7 @@ function avatarUploader() {
         }
     };
 }
-```
+```text
 
 #### UI Component (profile/partials/account-tab.blade.php)
 
@@ -168,19 +169,23 @@ function avatarUploader() {
 ### Test Results
 
 ```
+
 Tests:    29 passed (77 assertions)
 Duration: 5.10s
-```
+
+```text
 
 ## API Endpoints
 
 ### Upload Avatar
 
 ```
+
 POST /profile/avatar
 POST /api/v1/profile/avatar
 
 Request: multipart/form-data
+
 - avatar: file (required, image, max:2MB)
 
 Response: 200 OK
@@ -188,11 +193,13 @@ Response: 200 OK
     "message": "Avatar uploaded successfully.",
     "avatar_url": "/storage/avatars/xyz.jpg"
 }
-```
+
+```text
 
 ### Delete Avatar
 
 ```
+
 DELETE /profile/avatar
 DELETE /api/v1/profile/avatar
 
@@ -200,7 +207,8 @@ Response: 200 OK
 {
     "message": "Avatar removed successfully."
 }
-```
+
+```text
 
 ## User Interface
 
@@ -275,3 +283,4 @@ Response: 200 OK
 
 **Implementation Complete** ✅  
 All tests passing, code formatted, ready for production.
+

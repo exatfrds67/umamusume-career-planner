@@ -55,13 +55,13 @@ This document consolidates official documentation findings for all major technol
 
 ## Vite Build Tool
 
-### Official Source
+### Vite Official Source
 
 - **Site**: <https://vite.dev> (formerly vitejs.dev)
 - **Latest Version**: 7.x (Current stable)
 - **Status**: Trusted by OpenAI, Shopify, Stripe, Linear, ClickUp
 
-### Verified Information
+### Vite Verified Information
 
 #### Key Features
 
@@ -92,13 +92,13 @@ This document consolidates official documentation findings for all major technol
 
 ## Tailwind CSS
 
-### Official Source
+### Tailwind Official Source
 
 - **Site**: <https://tailwindcss.com>
 - **Latest Version**: 4.x (Released January 22, 2025)
 - **Status**: Version 4.1 current
 
-### Verified Information
+### Tailwind Verified Information
 
 #### Tailwind CSS v4 Key Changes
 
@@ -146,15 +146,15 @@ This document consolidates official documentation findings for all major technol
 
 ## Pest Testing Framework
 
-### Official Source
+### Pest Official Source
 
 - **Site**: <https://pestphp.com>
 - **Latest Version**: 4.0 (includes browser testing, smoke testing)
 - **Status**: March 2025 features stable and released
 
-### Verified Information
+### Pest Verified Information
 
-#### Key Features
+#### Pest Key Features
 
 1. **Modern Testing Syntax**
    - Inspired by Ruby's RSpec and Jest
@@ -192,12 +192,12 @@ This document consolidates official documentation findings for all major technol
 
 ## AWS Bedrock
 
-### Official Source
+### Bedrock Official Source
 
 - **Site**: <https://aws.amazon.com/bedrock/pricing>
 - **Date**: Current pricing and models verified January 2026
 
-### Verified Information
+### Bedrock Verified Information
 
 #### Claude Models (by Anthropic) - Correct Pricing
 
@@ -227,13 +227,13 @@ This document consolidates official documentation findings for all major technol
 
 #### Other Available Models
 
-**Mistral AI Models**
+##### Mistral AI Models
 
 - Mistral 7B: $0.00015/$0.0002 per 1K tokens
 - Mixtral 8x7B: $0.00045/$0.0007 per 1K tokens
 - Mistral Large: $0.008/$0.024 per 1K tokens
 
-**Meta Llama Models**
+##### Meta Llama Models
 
 - Llama 2 13B: $0.00075/$0.001 per 1K tokens
 - Llama 2 70B: $0.00195/$0.00256 per 1K tokens

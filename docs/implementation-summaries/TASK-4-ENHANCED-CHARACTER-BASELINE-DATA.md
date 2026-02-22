@@ -6,7 +6,8 @@
 
 ## Overview
 
-Enhanced the character seeding system to populate official baseline data for all 161 English global server Uma Musume characters, including aptitude grades, growth rates, and proper data structure for user customization.
+Enhanced the character seeding system to populate official baseline data for all 161 English global server Uma Musume
+characters, including aptitude grades, growth rates, and proper data structure for user customization.
 
 ## Objectives
 
@@ -65,7 +66,7 @@ Aptitudes (12 per character) {
     {running_style: "betweener", grade: "A"},
     {running_style: "chaser", grade: "B"}
 }
-```
+```text
 
 ### 2. Official Aptitude Data
 
@@ -140,7 +141,7 @@ Aptitudes (12 per character) {
 
 ### Seeding Statistics
 
-```
+```text
 ✅ Total characters created: 161
 ✅ Characters with local images: 51
 ✅ Characters with API images: 110
@@ -204,7 +205,7 @@ $this->aptitudeData = [
     'Silence Suzuka' => [...],
     // ... add 151 more characters
 ];
-```
+```text
 
 **Estimated Effort**: 4-6 hours (data collection + validation)
 
@@ -264,7 +265,7 @@ Factor::create([
     'source_parent' => 'parent_1',
     'is_active' => true,
 ]);
-```
+```text
 
 **Estimated Effort**: 12-16 hours (full system implementation)
 
@@ -309,17 +310,19 @@ php artisan tinker --execute="
         ->whereIn('id', DB::table('ucp_aptitudes')->select('character_id')->distinct())
         ->count();
 "
-```
+```text
 
 **Expected Output**:
 
 ```
+
 Characters: 161
 Aptitudes: 120
 Characters with aptitudes: 10
-```
 
-### Automated Testing
+```text
+
+## Automated Testing
 
 **✅ COMPLETED**: Feature tests created for:
 
@@ -360,7 +363,7 @@ php artisan db:seed --class=EnhancedRealUmaMusumeCharactersSeeder
 php artisan db:seed
 ```
 
-### For Users
+## For Users
 
 1. Navigate to <http://127.0.0.1:8000/characters>
 2. View all 161 characters with proper images
@@ -407,7 +410,8 @@ php artisan db:seed
 
 ## Conclusion
 
-Successfully enhanced the character seeding system with official baseline data for all 161 English global server Uma Musume characters. The foundation is now in place for:
+Successfully enhanced the character seeding system with official baseline data for all 161 English global server Uma
+Musume characters. The foundation is now in place for:
 
 - ✅ Complete character roster with images
 - ✅ Official aptitude data (10 characters, expandable to 161)

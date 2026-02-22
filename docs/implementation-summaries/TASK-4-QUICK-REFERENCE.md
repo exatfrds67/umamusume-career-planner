@@ -6,7 +6,7 @@
 ## Phase Status at a Glance
 
 | Phase | Status | Progress | Next Action |
-|-------|--------|----------|-------------|
+| --- | --- | --- | --- |
 | **Phase 1** | ✅ Complete | 100% (161/161) | - |
 | **Phase 2** | ✅ Complete | 100% (161/161) | - |
 | **Phase 3** | ✅ Foundation | 100% | UI Integration |
@@ -14,7 +14,7 @@
 
 ## Quick Stats
 
-```
+```text
 Characters Total: 161
 ├─ With Aptitudes: 161 (100%) ✅
 ├─ With Growth Rates: 161 (100%) ✅
@@ -48,7 +48,7 @@ Tests Passing: 20/20 ✅
 
 ### Core Files
 
-```
+```text
 app/Services/FactorService.php          - Factor calculations
 app/Models/Factor.php                   - Factor model
 app/Models/Character.php                - Character model
@@ -60,14 +60,14 @@ tests/Unit/Services/FactorServiceTest.php - Unit tests
 
 ### Seeders
 
-```
+```text
 database/seeders/EnhancedRealUmaMusumeCharactersSeeder.php - Main seeder
 database/seeders/FactorSeeder.php                          - Factor seeder
 ```
 
 ### Documentation
 
-```
+```text
 docs/implementation-summaries/
 ├─ TASK-4-OVERALL-PROGRESS.md              - Overall progress
 ├─ TASK-4-PHASE-1-COMPLETE.md              - Phase 1 complete
@@ -89,9 +89,9 @@ php artisan db:seed --class=EnhancedRealUmaMusumeCharactersSeeder
 
 # Seed sample factors
 php artisan db:seed --class=FactorSeeder
-```
+```text
 
-### Run Tests
+## Run Tests
 
 ```bash
 # Run all Factor tests
@@ -101,7 +101,7 @@ php artisan test --filter=FactorServiceTest --compact
 php artisan test --compact
 ```
 
-### Code Formatting
+## Code Formatting
 
 ```bash
 # Format modified files
@@ -109,69 +109,81 @@ vendor/bin/pint --dirty
 
 # Format all files
 vendor/bin/pint
-```
+```text
 
 ## Factor System Quick Reference
 
 ### Blue Factors (Stat Bonuses)
 
 ```
+
 1★: +5 to stat
 2★: +12 to stat
 3★: +21 to stat
-```
+
+```text
 
 ### Red Factors (Aptitude Upgrades)
 
 ```
+
 1★: +1 grade
 Additional grades: 3★ per grade
 Grades: G → F → E → D → C → B → A → S → SS
-```
+
+```text
 
 ### Green Factors (Unique Skills)
 
 ```
+
 Always 3★
 Character-specific
 Powerful race bonuses
-```
+
+```text
 
 ### White Factors (Normal Skills)
 
 ```
+
 1★, 2★, or 3★
 Common racing skills
 Distance/condition-specific
-```
+
+```text
 
 ## Base Stats Quick Reference
 
 ### Stat Ranges
 
 ```
+
 Speed: 30-65 (specialists: 60-65, balanced: 45-50, stamina: 40-45)
 Stamina: 30-60 (specialists: 60, balanced: 45-50, speed: 30-45)
 Power: 40-60 (specialists: 60, balanced: 45-50)
 Guts: 30-60 (specialists: 50-60, balanced: 45)
 Wit: 30-60 (specialists: 50-60, balanced: 45)
 Total: 225-250 per character
-```
+
+```text
 
 ### Specialization Categories
 
 ```
+
 Speed Specialists: 9 characters (high speed, low stamina)
 Stamina Specialists: 14 characters (high stamina, high guts)
 Power Specialists: 4 characters (high power, high guts)
 Balanced All-Rounders: 13 characters (even distribution)
 Default Balanced: 121 characters (all stats 45)
-```
+
+```text
 
 ## Batch Progress Tracker
 
 | Batch | Characters | Cumulative | Coverage | Status |
-|-------|-----------|------------|----------|--------|
+| --- | --- | --- | --- | --- |
 | Original | 10 | 10 | 6.2% | ✅ |
 | Batch 1 | +19 | 29 | 18.0% | ✅ |
 | Batch 2 | +7 | 36 | 22.4% | ✅ |
@@ -185,7 +197,7 @@ Default Balanced: 121 characters (all stats 45)
 ## Time Estimates
 
 | Task | Estimated Time | Priority |
-|------|---------------|----------|
+| --- | --- | --- |
 | Factor Display | 4-6 hours | 🔴 High |
 | Factor Management UI | 6-8 hours | 🔴 High |
 | System Integration | 4-6 hours | 🟡 Medium |
@@ -243,3 +255,4 @@ Default Balanced: 121 characters (all stats 45)
 **Quick Status**: ✅ All Phases Complete  
 **Next Action**: Implement Factor Display UI  
 **Last Updated**: January 26, 2026
+

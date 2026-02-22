@@ -2,7 +2,8 @@
 
 ## Overview
 
-This guide explains how to set up the deployment pipeline for the UmamusumeCareerPlanner application using GitHub Actions.
+This guide explains how to set up the deployment pipeline for the UmamusumeCareerPlanner application using GitHub
+Actions.
 
 ---
 
@@ -51,12 +52,12 @@ Navigate to **Settings** → **Environments** → **staging** → **Add secret**
 
 Add the following secrets:
 
-| Secret Name | Description | Example |
-|-------------|-------------|---------|
-| `STAGING_SSH_KEY` | Private SSH key for staging server | `-----BEGIN OPENSSH PRIVATE KEY-----...` |
-| `STAGING_SSH_HOST` | Staging server hostname or IP | `staging.example.com` or `192.168.1.100` |
-| `STAGING_SSH_USER` | SSH username | `deploy` or `www-data` |
-| `STAGING_DEPLOY_PATH` | Deployment directory path | `/var/www/staging` |
+| Secret Name           | Description                        | Example                                  |
+| --------------------- | ---------------------------------- | ---------------------------------------- |
+| `STAGING_SSH_KEY`     | Private SSH key for staging server | `-----BEGIN OPENSSH PRIVATE KEY-----...` |
+| `STAGING_SSH_HOST`    | Staging server hostname or IP      | `staging.example.com` or `192.168.1.100` |
+| `STAGING_SSH_USER`    | SSH username                       | `deploy` or `www-data`                   |
+| `STAGING_DEPLOY_PATH` | Deployment directory path          | `/var/www/staging`                       |
 
 ### Production Secrets
 
@@ -64,12 +65,12 @@ Navigate to **Settings** → **Environments** → **production** → **Add secre
 
 Add the following secrets:
 
-| Secret Name | Description | Example |
-|-------------|-------------|---------|
-| `PRODUCTION_SSH_KEY` | Private SSH key for production server | `-----BEGIN OPENSSH PRIVATE KEY-----...` |
-| `PRODUCTION_SSH_HOST` | Production server hostname or IP | `example.com` or `192.168.1.200` |
-| `PRODUCTION_SSH_USER` | SSH username | `deploy` or `www-data` |
-| `PRODUCTION_DEPLOY_PATH` | Deployment directory path | `/var/www/production` |
+| Secret Name              | Description                           | Example                                  |
+| ------------------------ | ------------------------------------- | ---------------------------------------- |
+| `PRODUCTION_SSH_KEY`     | Private SSH key for production server | `-----BEGIN OPENSSH PRIVATE KEY-----...` |
+| `PRODUCTION_SSH_HOST`    | Production server hostname or IP      | `example.com` or `192.168.1.200`         |
+| `PRODUCTION_SSH_USER`    | SSH username                          | `deploy` or `www-data`                   |
+| `PRODUCTION_DEPLOY_PATH` | Deployment directory path             | `/var/www/production`                    |
 
 ---
 
@@ -86,11 +87,11 @@ ssh-keygen -t ed25519 -C "deployment@example.com" -f ~/.ssh/deploy_key
 # This creates:
 # - ~/.ssh/deploy_key (private key - add to GitHub secrets)
 # - ~/.ssh/deploy_key.pub (public key - add to server)
-```
+```text
 
-### Add Public Key to Servers
+## Add Public Key to Servers
 
-#### Staging Server
+### Staging Server
 
 ```bash
 # Copy public key to staging server
@@ -100,7 +101,7 @@ ssh-copy-id -i ~/.ssh/deploy_key.pub user@staging.example.com
 cat ~/.ssh/deploy_key.pub | ssh user@staging.example.com "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
 ```
 
-#### Production Server
+## Production Server
 
 ```bash
 # Copy public key to production server
@@ -108,9 +109,9 @@ ssh-copy-id -i ~/.ssh/deploy_key.pub user@example.com
 
 # Or manually:
 cat ~/.ssh/deploy_key.pub | ssh user@example.com "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
-```
+```text
 
-### Add Private Key to GitHub Secrets
+## Add Private Key to GitHub Secrets
 
 ```bash
 # Display private key (copy this to GitHub secret)
@@ -128,7 +129,7 @@ cat ~/.ssh/deploy_key
 
 ### Directory Structure
 
-```
+```text
 /var/www/
 ├── staging/          # Staging deployment
 │   ├── .env
@@ -158,9 +159,9 @@ sudo chown -R www-data:www-data /var/www/backups/staging
 
 # Set permissions
 sudo chmod -R 755 /var/www/staging
-```
+```text
 
-#### Production
+## Production
 
 ```bash
 ssh user@example.com
@@ -175,9 +176,9 @@ sudo chown -R www-data:www-data /var/www/backups/production
 sudo chmod -R 755 /var/www/production
 ```
 
-### Configure Environment Files
+## Configure Environment Files
 
-#### Staging `.env`
+### Staging `.env`
 
 ```bash
 ssh user@staging.example.com
@@ -208,9 +209,9 @@ EOF
 
 # Generate application key
 php artisan key:generate
-```
+```text
 
-#### Production `.env`
+## Production `.env`
 
 ```bash
 ssh user@example.com
@@ -285,7 +286,7 @@ php artisan key:generate
     ErrorLog ${APACHE_LOG_DIR}/staging-ssl-error.log
     CustomLog ${APACHE_LOG_DIR}/staging-ssl-access.log combined
 </VirtualHost>
-```
+```text
 
 #### Production Virtual Host
 
@@ -323,7 +324,7 @@ sudo systemctl reload apache2
 # Enable production
 sudo a2ensite production.conf
 sudo systemctl reload apache2
-```
+```text
 
 ---
 
@@ -364,7 +365,7 @@ php artisan route:cache
 php artisan view:cache
 ```
 
-#### Production
+## Production
 
 ```bash
 ssh user@example.com
@@ -394,7 +395,7 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 php artisan event:cache
-```
+```text
 
 ---
 
@@ -436,7 +437,7 @@ chmod 644 ~/.ssh/deploy_key.pub
 ssh user@staging.example.com "cat ~/.ssh/authorized_keys"
 ```
 
-### Permission Issues
+## Permission Issues
 
 ```bash
 # Fix storage permissions
@@ -445,9 +446,9 @@ sudo chmod -R 775 storage bootstrap/cache
 
 # Fix .env permissions
 sudo chmod 644 .env
-```
+```text
 
-### Deployment Failures
+## Deployment Failures
 
 1. Check GitHub Actions logs
 2. Verify secrets are correctly set

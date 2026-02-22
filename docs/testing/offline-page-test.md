@@ -2,7 +2,8 @@
 
 ## Overview
 
-The application now includes a styled offline page that displays when users lose their internet connection. This page provides a better user experience than the default blank page with plain text.
+The application now includes a styled offline page that displays when users lose their internet connection. This page
+provides a better user experience than the default blank page with plain text.
 
 ## Features
 

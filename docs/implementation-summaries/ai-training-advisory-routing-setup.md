@@ -6,7 +6,8 @@
 
 ## Overview
 
-Configured API routing for the AI-Powered Training Advisory System according to the spec documentation. All advisory endpoints are now properly registered in `routes/api.php` with appropriate middleware and rate limiting.
+Configured API routing for the AI-Powered Training Advisory System according to the spec documentation. All advisory
+endpoints are now properly registered in `routes/api.php` with appropriate middleware and rate limiting.
 
 ## Routes Configured
 
@@ -19,7 +20,7 @@ Configured API routing for the AI-Powered Training Advisory System according to 
 ### Endpoints
 
 | Method | Endpoint | Controller Method | Spec Reference | Status |
-|--------|----------|-------------------|----------------|--------|
+| --- | --- | --- | --- | --- |
 | POST | `/api/advisory/training/recommendations` | `getTrainingRecommendations()` | Requirements 3.1 | ⏳ Stub |
 | POST | `/api/advisory/skills/advice` | `getSkillPurchaseAdvice()` | Requirements 3.2 | ⏳ Stub |
 | POST | `/api/advisory/race/strategy` | `getRaceStrategy()` | Requirements 3.3 | ⏳ Stub |
@@ -97,7 +98,7 @@ Per the design document (Section: Security Considerations):
 
 ```bash
 php artisan route:list --path=api/advisory
-```
+```text
 
 ### Test Endpoint (Example)
 

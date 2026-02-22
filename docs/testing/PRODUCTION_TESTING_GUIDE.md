@@ -2,7 +2,8 @@
 
 ## Overview
 
-This guide outlines the comprehensive testing procedures for validating the UmamusumeCareerPlanner application before production deployment.
+This guide outlines the comprehensive testing procedures for validating the UmamusumeCareerPlanner application before
+production deployment.
 
 ---
 
@@ -22,9 +23,9 @@ php artisan db:show
 
 # Verify cache connection
 php artisan cache:clear && php artisan cache:get test
-```
+```text
 
-### Smoke Tests
+## Smoke Tests
 
 Quick validation of core functionality:
 
@@ -37,14 +38,14 @@ curl -s https://staging.example.com/api/health | jq .
 curl -s https://staging.example.com/api/v1/characters | jq .
 ```
 
-### Expected Results
+## Expected Results
 
-| Endpoint | Expected Status | Response Time |
-|----------|-----------------|---------------|
-| `/api/health` | 200 | < 100ms |
-| `/api/v1/characters` | 200/401 | < 200ms |
-| `/api/v1/careers` | 200/401 | < 200ms |
-| `/api/v1/skills` | 200 | < 150ms |
+| Endpoint             | Expected Status | Response Time |
+| -------------------- | --------------- | ------------- |
+| `/api/health`        | 200             | < 100ms       |
+| `/api/v1/characters` | 200/401         | < 200ms       |
+| `/api/v1/careers`    | 200/401         | < 200ms       |
+| `/api/v1/skills`     | 200             | < 150ms       |
 
 ---
 
@@ -136,7 +137,7 @@ curl -s https://staging.example.com/api/v1/characters | jq .
 [ ] Major issues - delay deployment
 
 **Signature**: ________________
-```
+```text
 
 ---
 
@@ -155,14 +156,14 @@ ab -n 500 -c 25 -H "Authorization: Bearer $TOKEN" \
    https://staging.example.com/api/v1/characters
 ```
 
-### Expected Performance Metrics
+## Expected Performance Metrics
 
-| Metric | Target | Acceptable |
-|--------|--------|------------|
-| Response Time (avg) | < 100ms | < 200ms |
-| Response Time (95th) | < 200ms | < 500ms |
-| Requests/sec | > 100 | > 50 |
-| Error Rate | 0% | < 1% |
+| Metric               | Target  | Acceptable |
+| -------------------- | ------- | ---------- |
+| Response Time (avg)  | < 100ms | < 200ms    |
+| Response Time (95th) | < 200ms | < 500ms    |
+| Requests/sec         | > 100   | > 50       |
+| Error Rate           | 0%      | < 1%       |
 
 ### Database Performance
 
@@ -174,7 +175,7 @@ LIMIT 20;
 
 -- Check query execution plans
 EXPLAIN ANALYZE SELECT * FROM characters WHERE user_id = 1;
-```
+```text
 
 ### Memory and Resource Usage
 
@@ -207,9 +208,9 @@ for i in {1..20}; do
     -d '{"email":"test@test.com","password":"wrong"}'
 done
 # Expected: 429 after threshold
-```
+```text
 
-### Authorization Tests
+## Authorization Tests
 
 ```bash
 # Test accessing other user's data
@@ -223,7 +224,7 @@ curl -H "Authorization: Bearer $REGULAR_USER_TOKEN" \
 # Expected: 403 Forbidden
 ```
 
-### Input Validation Tests
+## Input Validation Tests
 
 ```bash
 # Test XSS prevention
@@ -236,7 +237,7 @@ curl -X POST https://staging.example.com/api/v1/characters \
 # Test SQL injection prevention
 curl "https://staging.example.com/api/v1/characters?search='; DROP TABLE users;--"
 # Expected: No SQL error, safe handling
-```
+```text
 
 ---
 
@@ -252,7 +253,7 @@ npm run test:accessibility
 npx axe https://staging.example.com/
 ```
 
-### Manual Testing Checklist
+## Manual Testing Checklist
 
 - [ ] All images have alt text
 - [ ] Form fields have labels
@@ -269,13 +270,13 @@ npx axe https://staging.example.com/
 
 ### Supported Browsers
 
-| Browser | Version | Status |
-|---------|---------|--------|
-| Chrome | Latest 2 | Required |
-| Firefox | Latest 2 | Required |
-| Safari | Latest 2 | Required |
-| Edge | Latest 2 | Required |
-| Mobile Safari | iOS 15+ | Required |
+| Browser       | Version     | Status   |
+| ------------- | ----------- | -------- |
+| Chrome        | Latest 2    | Required |
+| Firefox       | Latest 2    | Required |
+| Safari        | Latest 2    | Required |
+| Edge          | Latest 2    | Required |
+| Mobile Safari | iOS 15+     | Required |
 | Chrome Mobile | Android 10+ | Required |
 
 ### Testing Checklist
@@ -295,12 +296,12 @@ For each browser:
 
 ### Device Testing
 
-| Device | OS Version | Screen Size |
-|--------|------------|-------------|
-| iPhone 14 | iOS 17 | 390x844 |
-| iPhone SE | iOS 17 | 375x667 |
-| Pixel 7 | Android 14 | 412x915 |
-| Galaxy S23 | Android 14 | 360x780 |
+| Device     | OS Version | Screen Size |
+| ---------- | ---------- | ----------- |
+| iPhone 14  | iOS 17     | 390x844     |
+| iPhone SE  | iOS 17     | 375x667     |
+| Pixel 7    | Android 14 | 412x915     |
+| Galaxy S23 | Android 14 | 360x780     |
 
 ### Mobile-Specific Tests
 
@@ -323,9 +324,9 @@ php artisan tinker --execute="
   \$response = Http::get('https://api.umapyoi.net/characters');
   echo \$response->status();
 "
-```
+```text
 
-### Queue Processing
+## Queue Processing
 
 ```bash
 # Dispatch test job
@@ -337,7 +338,7 @@ php artisan tinker --execute="
 php artisan queue:work --once
 ```
 
-### Cache Operations
+## Cache Operations
 
 ```bash
 # Test cache operations
@@ -346,7 +347,7 @@ php artisan tinker --execute="
   echo Cache::get('test');
   Cache::forget('test');
 "
-```
+```text
 
 ---
 
@@ -364,7 +365,7 @@ php artisan test --compact
 php artisan test --coverage --min=80
 ```
 
-### Specific Regression Areas
+## Specific Regression Areas
 
 After any changes, verify:
 
@@ -395,9 +396,9 @@ php artisan view:cache
 
 # Check for pending migrations
 php artisan migrate:status
-```
+```text
 
-### Health Check
+## Health Check
 
 ```bash
 # Comprehensive health check
@@ -465,4 +466,5 @@ curl https://staging.example.com/api/health | jq .
 | QA Lead | | |
 | Dev Lead | | |
 | Product Owner | | |
-```
+```text
+

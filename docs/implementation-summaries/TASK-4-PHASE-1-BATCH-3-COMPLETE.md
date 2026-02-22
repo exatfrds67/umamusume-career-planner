@@ -6,7 +6,8 @@
 
 ## Summary
 
-Successfully added aptitude data for 20 more popular Uma Musume characters, bringing total coverage from 34 characters (21.1%) to 52 characters (32.3%). This represents an 11.2 percentage point increase in Phase 1 completion.
+Successfully added aptitude data for 20 more popular Uma Musume characters, bringing total coverage from 34 characters
+(21.1%) to 52 characters (32.3%). This represents an 11.2 percentage point increase in Phase 1 completion.
 
 ## Characters Added (Batch 3 - 20 characters)
 
@@ -93,7 +94,7 @@ php artisan db:seed --class=EnhancedRealUmaMusumeCharactersSeeder
 # Using local images for 0 characters
 # Created aptitudes for 18 characters  # ← New aptitudes added
 # Skipped 161 existing characters
-```
+```text
 
 **Verification**:
 
@@ -181,7 +182,7 @@ After reaching 50%+ aptitude coverage (80+ characters), begin Phase 3:
 
 ## Commit Message
 
-```
+```text
 feat: add aptitude data for 20 more characters (Batch 3)
 
 - Added official aptitude grades for 20 popular characters
@@ -198,9 +199,12 @@ feat: add aptitude data for 20 more characters (Batch 3)
 
 ## Conclusion
 
-Successfully expanded Phase 1 aptitude coverage by 11.2 percentage points, bringing total coverage to 32.3%. The implementation includes diverse character types (sprint, mile, medium, long distance) and running styles (runner, leader, betweener, chaser), providing users with a wide variety of fully-configured characters to choose from.
+Successfully expanded Phase 1 aptitude coverage by 11.2 percentage points, bringing total coverage to 32.3%. The
+implementation includes diverse character types (sprint, mile, medium, long distance) and running styles (runner,
+leader, betweener, chaser), providing users with a wide variety of fully-configured characters to choose from.
 
-The seeder enhancement ensures that future batches can be added incrementally without recreating existing data, making the development process more efficient.
+The seeder enhancement ensures that future batches can be added incrementally without recreating existing data, making
+the development process more efficient.
 
 ---
 

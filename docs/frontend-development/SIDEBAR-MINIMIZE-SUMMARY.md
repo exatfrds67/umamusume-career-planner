@@ -412,7 +412,7 @@ toggle() {
 ### Technical Risks
 
 | Risk | Impact | Likelihood | Mitigation |
-|------|--------|------------|------------|
+| ------ | -------- | ------------ | ------------ |
 | Layout shift during animation | Medium | Low | Use transform instead of width |
 | localStorage quota exceeded | Low | Very Low | Minimal data storage |
 | Alpine.js store conflicts | Medium | Low | Namespace store properly |
@@ -421,7 +421,7 @@ toggle() {
 ### UX Risks
 
 | Risk | Impact | Likelihood | Mitigation |
-|------|--------|------------|------------|
+| ------ | -------- | ------------ | ------------ |
 | Users can't find navigation | High | Low | Clear tooltips and icons |
 | Confusion about toggle button | Medium | Low | Clear icon and label |
 | Mobile overlay conflicts | Medium | Low | Thorough mobile testing |
@@ -577,7 +577,7 @@ document.addEventListener('alpine:init', () => {
 
 ---
 
-**Document Control**
+Document Control
 
 - **Created**: February 8, 2026
 - **Last Updated**: February 8, 2026

@@ -2,7 +2,8 @@
 
 **Document Version**: 1.0.0  
 **Date**: February 8, 2026  
-**Related**: [Implementation Plan](./sidebar-minimize-implementation-plan.md) | [Visual Reference](./sidebar-minimize-visual-reference.md)
+**Related**: [Implementation Plan](./sidebar-minimize-implementation-plan.md) | [Visual
+Reference](./sidebar-minimize-visual-reference.md)
 
 ---
 
@@ -24,7 +25,7 @@ export default {
         }));
     }
 };
-```
+```text
 
 **Register in**: `resources/js/app.js`
 
@@ -43,7 +44,7 @@ Alpine.store('sidebar', sidebarStore);
 
 ```blade
 <div class="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:flex lg:w-72 lg:flex-col ...">
-```
+```text
 
 **Replace with**:
 
@@ -56,7 +57,7 @@ Alpine.store('sidebar', sidebarStore);
 
 ```blade
 <div class="lg:pl-72 flex flex-col min-h-screen ...">
-```
+```text
 
 **Replace with**:
 
@@ -75,7 +76,7 @@ Alpine.store('sidebar', sidebarStore);
 
 ```blade
 <div class="flex h-16 shrink-0 items-center gap-3 border-b ...">
-```
+```text
 
 **Replace with**:
 
@@ -130,7 +131,7 @@ Alpine.store('sidebar', sidebarStore);
         Dashboard
     </a>
 </li>
-```
+```text
 
 **After**:
 
@@ -194,7 +195,7 @@ Alpine.store('sidebar', sidebarStore);
         </div>
     </div>
 </li>
-```
+```text
 
 ---
 
@@ -228,7 +229,7 @@ document.addEventListener('keydown', (e) => {
      class="sr-only">
     <span x-text="$store.sidebar.minimized ? 'Sidebar minimized' : 'Sidebar expanded'"></span>
 </div>
-```
+```text
 
 ---
 
@@ -313,4 +314,6 @@ For questions or issues:
 
 ---
 
-*This quick start guide provides the essential steps to implement the sidebar minimize feature. For detailed specifications, refer to the full implementation plan.*
+*This quick start guide provides the essential steps to implement the sidebar minimize feature. For detailed
+specifications, refer to the full implementation plan.*
+

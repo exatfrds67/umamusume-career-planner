@@ -23,13 +23,13 @@ Comprehensive service implementing all skill evolution mechanics with 600+ lines
 
 #### Core Features
 
-**Evolution Capability Checking**
+#### Evolution Capability Checking
 
 - `canEvolve()`: Validates if a character can evolve a specific skill
 - `checkEvolutionPrerequisites()`: Verifies stat requirements and prerequisite skills
 - `getEvolutionBlockReason()`: Provides detailed feedback on why evolution is blocked
 
-**Automatic Skill Evolution**
+#### Automatic Skill Evolution
 
 - `evolveSkill()`: Performs complete Normal → Rare skill replacement
 - Deactivates Normal skill acquisition
@@ -38,33 +38,33 @@ Comprehensive service implementing all skill evolution mechanics with 600+ lines
 - Marks hints as used
 - Records complete evolution context
 
-**SP Efficiency Analysis**
+#### SP Efficiency Analysis
 
 - `calculateEvolutionEfficiency()`: Compares evolution path vs direct acquisition
 - Calculates total costs for both approaches
 - Provides SP savings recommendations
 - Considers hints for both Normal and Rare skills
 
-**Evolution Opportunities**
+#### Evolution Opportunities
 
 - `getEvolutionOpportunities()`: Identifies all available evolution paths
 - Prioritizes opportunities by readiness and SP savings
 - Provides block reasons for unavailable evolutions
 
-**Evolution Planning**
+#### Evolution Planning
 
 - `planEvolutionTiming()`: Optimal timing recommendations for target skills
 - Separates immediate vs delayed opportunities
 - Provides actionable recommendations
 
-**Evolution Roadmap**
+#### Evolution Roadmap
 
 - `getEvolutionRoadmap()`: Comprehensive long-term evolution strategy
 - Calculates total potential SP savings
 - Separates ready and pending opportunities
 - Generates prioritized recommendations
 
-**Evolution Chain Tracking**
+#### Evolution Chain Tracking
 
 - `getEvolutionChain()`: Retrieves complete evolution relationships
 - Tracks source (Normal) and target (Rare) skills
@@ -130,7 +130,7 @@ $evolutionAcquisition = SkillAcquisition::factory()
 
 #### SkillEvolutionServiceTest (`tests/Feature/SkillEvolutionServiceTest.php`)
 
-**25 tests, 80 assertions, 100% passing**
+#### Test Results: 25 tests, 80 assertions, 100% passing
 
 **Test Coverage**:
 

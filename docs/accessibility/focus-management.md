@@ -2,7 +2,8 @@
 
 ## Overview
 
-The focus management system ensures that keyboard users can navigate the application efficiently and that focus indicators are always visible with sufficient contrast (3:1 minimum as per WCAG 2.2 AA).
+The focus management system ensures that keyboard users can navigate the application efficiently and that focus
+indicators are always visible with sufficient contrast (3:1 minimum as per WCAG 2.2 AA).
 
 ## Features
 
@@ -15,7 +16,7 @@ All interactive elements have visible focus indicators with 3:1 contrast ratio:
     outline: 2px solid var(--color-primary-500);
     outline-offset: 2px;
 }
-```
+```text
 
 Enhanced focus indicators for keyboard navigation mode:
 
@@ -39,7 +40,7 @@ Skip links allow keyboard users to jump directly to main content areas:
 ```html
 <a href="#main-content" class="skip-link">Skip to main content</a>
 <a href="#navigation" class="skip-link">Skip to navigation</a>
-```
+```text
 
 Skip links are visually hidden until focused:
 
@@ -90,7 +91,8 @@ The application supports the following keyboard shortcuts:
 
 ### 4. Focus Trap for Modals
 
-When a modal is opened, focus is trapped within the modal to prevent keyboard users from accidentally navigating outside:
+When a modal is opened, focus is trapped within the modal to prevent keyboard users from accidentally navigating
+outside:
 
 ```javascript
 // Trap focus in a modal
@@ -98,7 +100,7 @@ accessibilitySystem.trapFocus('#modal-container');
 
 // Release focus trap when modal closes
 accessibilitySystem.releaseFocus();
-```
+```text
 
 Or use the event bus:
 
@@ -117,7 +119,7 @@ When form validation errors occur, focus is automatically moved to the first inv
 ```javascript
 // Focus first error in form
 accessibilitySystem.focusFirstError('#my-form');
-```
+```text
 
 This also announces the error to screen readers:
 
@@ -135,7 +137,7 @@ document.body.classList.add('using-keyboard');
 
 // Mouse navigation detected
 document.body.classList.remove('using-keyboard');
-```
+```text
 
 ## Usage Examples
 
@@ -163,7 +165,7 @@ accessibilitySystem.registerShortcut('Ctrl+K', (e) => {
 
 // Unregister a shortcut
 accessibilitySystem.unregisterShortcut('Ctrl+K');
-```
+```text
 
 ### Focus Trap Example
 
@@ -213,7 +215,7 @@ function handleSubmit() {
     // Submit form
 }
 </script>
-```
+```text
 
 ## Accessibility Compliance
 
@@ -326,21 +328,25 @@ test('focus trap works in modals', () => {
 
 ## Best Practices
 
-1. **Always provide visible focus indicators**: Never use `outline: none` without providing an alternative focus indicator.
+1. **Always provide visible focus indicators**: Never use `outline: none` without providing an alternative focus
+indicator.
 
 2. **Maintain logical focus order**: Ensure that the tab order follows the visual layout and reading order.
 
-3. **Trap focus in modals**: When a modal is open, trap focus within the modal to prevent users from accidentally navigating outside.
+3. **Trap focus in modals**: When a modal is open, trap focus within the modal to prevent users from accidentally
+navigating outside.
 
 4. **Restore focus after modal closes**: When a modal closes, restore focus to the element that opened it.
 
-5. **Focus first error in forms**: When form validation fails, move focus to the first invalid field and announce the error.
+5. **Focus first error in forms**: When form validation fails, move focus to the first invalid field and announce the
+error.
 
 6. **Provide skip links**: Allow users to skip repetitive navigation and jump directly to main content.
 
 7. **Document keyboard shortcuts**: Provide a help modal that lists all available keyboard shortcuts.
 
-8. **Test with keyboard only**: Regularly test the application using only the keyboard to ensure all functionality is accessible.
+8. **Test with keyboard only**: Regularly test the application using only the keyboard to ensure all functionality is
+accessible.
 
 9. **Use semantic HTML**: Use proper HTML elements (button, a, input, etc.) to ensure they are focusable by default.
 

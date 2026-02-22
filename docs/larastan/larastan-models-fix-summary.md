@@ -57,7 +57,7 @@
 
 #### 1. Generic Trait Types (Low Priority - 17 occurrences)
 
-```
+```text
 Class uses generic trait HasFactory but does not specify its types: TFactory
 ```
 
@@ -66,7 +66,7 @@ Class uses generic trait HasFactory but does not specify its types: TFactory
 
 #### 2. Scope Method Return Types (High Priority - ~80 occurrences)
 
-```
+```text
 Method scopeActive() has no return type specified.
 Method scopeActive() has parameter $query with no type specified.
 ```
@@ -83,20 +83,22 @@ public function scopeActive(Builder $query): Builder
 {
     return $query->where('is_active', true);
 }
-```
+```text
 
 #### 3. Array Type Specifications (Medium Priority - ~40 occurrences)
 
 ```
+
 PHPDoc tag @property for property $metadata with no value type specified in iterable type array.
-```
+
+```text
 
 **Solution**: Change `array` to `array<string, mixed>` in PHPDoc
 **Status**: Fixed in priority models, remains in MCPServer, MCPAgent, MCPToolUsage, UserPreference
 
 #### 4. Fillable Property Type (Low Priority - 5 occurrences)
 
-```
+```text
 PHPDoc type array<int, string> of property $fillable is not covariant with PHPDoc type list<string>
 ```
 
@@ -182,10 +184,12 @@ PHPDoc type array<int, string> of property $fillable is not covariant with PHPDo
 
 ## Conclusion
 
-Successfully fixed the priority models layer with comprehensive type annotations and casts. The remaining 176 errors are mostly:
+Successfully fixed the priority models layer with comprehensive type annotations and casts. The remaining 176 errors are
+mostly:
 
 - Scope method signatures (repetitive, easy to fix)
 - Array type specifications (straightforward)
 - Generic trait types (low priority)
 
-The foundation is now solid for fixing Services and Controllers layers, as the "undefined property" errors that were cascading from Models have been resolved.
+The foundation is now solid for fixing Services and Controllers layers, as the "undefined property" errors that were
+cascading from Models have been resolved.

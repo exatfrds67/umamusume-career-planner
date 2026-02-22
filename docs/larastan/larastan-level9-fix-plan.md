@@ -6,7 +6,8 @@
 
 ## Executive Summary
 
-This document outlines a systematic approach to resolve all 306 remaining Larastan level 9 static analysis errors. The errors have been categorized by type and file, with a risk-based implementation order.
+This document outlines a systematic approach to resolve all 306 remaining Larastan level 9 static analysis errors. The
+errors have been categorized by type and file, with a risk-based implementation order.
 
 ## Error Categories
 
@@ -51,15 +52,15 @@ This document outlines a systematic approach to resolve all 306 remaining Larast
 
 ## Files by Error Count
 
-| File | Errors | Risk Level |
-|------|--------|------------|
-| HybridAIService.php | 73 | HIGH |
-| BenchmarkingService.php | 67 | MEDIUM |
-| BackupService.php | 56 | LOW |
-| MCP Services (combined) | 45 | MEDIUM |
-| Skill Services (combined) | 47 | MEDIUM |
-| Training Services (combined) | 20 | MEDIUM |
-| Tests & Controllers | 10 | LOW |
+| File                         | Errors | Risk Level |
+| ---------------------------- | ------ | ---------- |
+| HybridAIService.php          | 73     | HIGH       |
+| BenchmarkingService.php      | 67     | MEDIUM     |
+| BackupService.php            | 56     | LOW        |
+| MCP Services (combined)      | 45     | MEDIUM     |
+| Skill Services (combined)    | 47     | MEDIUM     |
+| Training Services (combined) | 20     | MEDIUM     |
+| Tests & Controllers          | 10     | LOW        |
 
 ## Implementation Order (Risk-Based)
 
@@ -71,7 +72,8 @@ This document outlines a systematic approach to resolve all 306 remaining Larast
 
 **Fixes**:
 
-- Remove 22 redundant `is_array()` checks (lines 394, 404, 406, 589, 777, 812, 837, 992, 993, 1122, 1138, 1139, 1170, 1212, 1217, 1232, 1233, 1239, 1240, 1276, 1300, 1308)
+- Remove 22 redundant `is_array()` checks (lines 394, 404, 406, 589, 777, 812, 837, 992, 993, 1122, 1138, 1139, 1170,
+1212, 1217, 1232, 1233, 1239, 1240, 1276, 1300, 1308)
 - Remove 8 unused `@phpstan-ignore` comments (lines 781, 793, 841, 861, 897, 915, 951, 967)
 - Remove 6 unnecessary `??` operators (lines 810, 866, 920, 972, 1448, 1530)
 - Cast 8 mixed values before string interpolation (lines 786, 813, 846, 869, 900, 923, 954, 975)
@@ -122,7 +124,8 @@ This document outlines a systematic approach to resolve all 306 remaining Larast
 **Fixes**:
 
 - Add array shape documentation to 12 return types (lines 72×3, 107, 166×3, 274×4, 331, 409, 662×2, 709, 730, 783)
-- Add type guards before 25 offset accesses on mixed (lines 411×3, 412×3, 413×3, 417×2, 418×2, 432, 438, 444, 559, 566, 573, 622, 628, 633, 634, 635, 856×3, 863-867)
+- Add type guards before 25 offset accesses on mixed (lines 411×3, 412×3, 413×3, 417×2, 418×2, 432, 438, 444, 559, 566,
+573, 622, 628, 633, 634, 635, 856×3, 863-867)
 - Cast values before 15 binary operations
 - Fix 10 return type mismatches (float|int vs int)
 - Add type assertions before 5 function calls (lines 472, 477, 482, 622, 628, 634, 635)
@@ -166,7 +169,8 @@ This document outlines a systematic approach to resolve all 306 remaining Larast
 
 **Fixes**:
 
-- Add type validation for external data before offset access (lines 110, 113, 116, 119, 127×2, 139, 141×2, 142, 150, 155×2, 157, 158)
+- Add type validation for external data before offset access (lines 110, 113, 116, 119, 127×2, 139, 141×2, 142, 150,
+155×2, 157, 158)
 
 #### 3.5 TrainingPredictionService.php (6 errors)
 
@@ -217,7 +221,8 @@ This document outlines a systematic approach to resolve all 306 remaining Larast
 
 1. **Config Casting** (lines 54-57): Add proper validation/casting for config values
 2. **Method Signatures** (lines 93-94, 311): Fix parameter counts
-3. **Undefined Variables** (lines 357, 360×3, 366×3, 406, 409×3, 415×3, 530, 531, 594, 595): **CRITICAL** - Fix logic bugs
+3. **Undefined Variables** (lines 357, 360×3, 366×3, 406, 409×3, 415×3, 530, 531, 594, 595): **CRITICAL** - Fix logic
+bugs
 4. **PHPDoc Mismatches** (lines 351×2, 400×2, 526, 590): Update PHPDoc to match actual parameters
 5. **Return Types** (lines 110, 130, 132, 187, 188, 504, 568, 791×3, 794): Fix return type declarations
 6. **Redundant Checks** (lines 331, 535, 544, 599, 608): Remove redundant is_array()
@@ -237,7 +242,7 @@ if (is_array($data)) {
 
 // After (when $data is already typed as array)
 foreach ($data as $item) { ... }
-```
+```text
 
 ### Pattern 2: Mixed in String Interpolation
 
@@ -259,7 +264,7 @@ $value = $definitelySetVar ?? 'default';
 
 // After
 $value = $definitelySetVar;
-```
+```text
 
 ### Pattern 4: Missing Array Value Types
 
@@ -284,7 +289,7 @@ $value = $mixedData['key'];
 if (is_array($mixedData) && isset($mixedData['key'])) {
     $value = $mixedData['key'];
 }
-```
+```text
 
 ### Pattern 6: Binary Operation on Mixed
 
@@ -354,7 +359,7 @@ if (((is_array($backupRecord) && isset($backupRecord['user_id']) ? $backupRecord
 
 // Should be:
 if (($backupRecord['user_id'] ?? null) !== $userId)
-```
+```text
 
 1. **Complex nested type checks** (lines 404, 406):
 
@@ -374,7 +379,7 @@ $restored = ($restored ?? 0) + 1;
 
 // Should be:
 $restored = $restored + 1;
-```
+```text
 
 1. **Mixed in string interpolation** (lines 786, 813, 846, etc.):
 
@@ -390,26 +395,26 @@ $warnings[] = "Character '" . $charName . "' already exists, skipped";
 
 ## Progress Tracking
 
-| Phase | Files | Errors | Status | Time |
-|-------|-------|--------|--------|------|
-| 1.1 | BackupService | 56 | ✅ Complete (0 errors) | 30min |
-| 1.2 | Tests | 2 | ✅ Complete (0 errors) | 5min |
-| 2.1 | AgentCommunicationService | 27 | ✅ Complete (0 errors) | 15min |
-| 2.2 | AgentOrchestrationService | 1 | ✅ Complete (0 errors) | 5min |
-| 2.3 | Context7Service | 1 | ✅ Complete (0 errors) | 5min |
-| 2.4 | FetchService | 18 | ✅ Complete (0 errors) | 10min |
-| 2.5 | BenchmarkingService | 70 | ✅ Complete | 45min |
-| 3.1 | SkillEvolutionService | 18 | ✅ Complete | 20min |
-| 3.2 | SkillHintService | 10 | ✅ Complete | 15min |
-| 3.3 | SkillService | 5 | ✅ No errors found | - |
-| 3.4 | SupportCardEnrichmentService | 14 | ✅ Complete | 10min |
-| 3.5 | TrainingPredictionService | 6 | ✅ Complete | 10min |
-| 3.6 | TrainingService | 7 | ✅ Complete | 10min |
-| 3.7 | BondProgressionService | 3 | ✅ Complete | 5min |
-| 3.8 | Training/SkillHintService | 1 | ✅ Complete | 5min |
-| 3.9 | SupportBonusCalculator | 2 | ✅ Complete | 5min |
-| 4.1 | HybridAIService | 73 | ✅ Complete | 45min |
-| **TOTAL** | **16 files** | **306** | **✅ 100% Complete** | **~4h** |
+| Phase     | Files                        | Errors  | Status                | Time    |
+| --------- | ---------------------------- | ------- | --------------------- | ------- |
+| 1.1       | BackupService                | 56      | ✅ Complete (0 errors)| 30min   |
+| 1.2       | Tests                        | 2       | ✅ Complete (0 errors)| 5min    |
+| 2.1       | AgentCommunicationService    | 27      | ✅ Complete (0 errors)| 15min   |
+| 2.2       | AgentOrchestrationService    | 1       | ✅ Complete (0 errors)| 5min    |
+| 2.3       | Context7Service              | 1       | ✅ Complete (0 errors)| 5min    |
+| 2.4       | FetchService                 | 18      | ✅ Complete (0 errors)| 10min   |
+| 2.5       | BenchmarkingService          | 70      | ✅ Complete           | 45min   |
+| 3.1       | SkillEvolutionService        | 18      | ✅ Complete           | 20min   |
+| 3.2       | SkillHintService             | 10      | ✅ Complete           | 15min   |
+| 3.3       | SkillService                 | 5       | ✅ No errors found    | -       |
+| 3.4       | SupportCardEnrichmentService | 14      | ✅ Complete           | 10min   |
+| 3.5       | TrainingPredictionService    | 6       | ✅ Complete           | 10min   |
+| 3.6       | TrainingService              | 7       | ✅ Complete           | 10min   |
+| 3.7       | BondProgressionService       | 3       | ✅ Complete           | 5min    |
+| 3.8       | Training/SkillHintService    | 1       | ✅ Complete           | 5min    |
+| 3.9       | SupportBonusCalculator       | 2       | ✅ Complete           | 5min    |
+| 4.1       | HybridAIService              | 73      | ✅ Complete           | 45min   |
+| **TOTAL** | **16 files**                 | **306** | **✅ 100% Complete**  | **~4h** |
 
 ## Completed Fixes Summary
 
@@ -478,7 +483,8 @@ $warnings[] = "Character '" . $charName . "' already exists, skipped";
 ### Phase 4.1: HybridAIService.php ✅
 
 - Fixed all 73 errors
-- **Critical bug fixes**: Fixed undefined variables ($context, $prompt, $complexity) in processWithMCPStrands() and processWithMCPAgentCore() - these methods were missing their parameters
+- **Critical bug fixes**: Fixed undefined variables ($context, $prompt, $complexity) in processWithMCPStrands() and
+processWithMCPAgentCore() - these methods were missing their parameters
 - Extracted anonymous classes to named wrapper classes (StrandsAgentWrapper, AgentCoreWrapper) to fix return type issues
 - Fixed config value casting with proper type guards
 - Fixed method invocations (processWithMCPStrands/processWithMCPAgentCore now accept proper parameters)

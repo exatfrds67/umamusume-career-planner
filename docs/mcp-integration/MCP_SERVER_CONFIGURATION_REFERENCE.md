@@ -78,38 +78,10 @@ This document provides the authoritative reference for all Model Context Protoco
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### 2.2 Current Laravel Service Implementation
-
-The application implements 19 MCP service classes in `app/Services/MCP/`:
-
-| Service | Purpose |
-|---------|--------|
-| `AgentOrchestrationService` | Multi-agent workflow coordination and result aggregation |
-| `AgentCommunicationService` | Inter-agent messaging and event dispatching |
-| `AgentContextService` | Cross-session context management for agents |
-| `AgentLifecycleManager` | Agent lifecycle (start, stop, restart, health) |
-| `AgentMemoryService` | Persistent knowledge graph memory for agents |
-| `AgentRoutingService` | Intelligent routing of requests to appropriate agents |
-| `APIPerformanceAnalyticsService` | API response time tracking and analytics |
-| `CareerStateSyncService` | Career run state synchronization across agents |
-| `CostManagementService` | AWS cost tracking and budget management |
-| `CostOptimizationService` | Cost reduction strategies and recommendations |
-| `FailureRateTrackingService` | Error rate monitoring and circuit breaker support |
-| `MCPClientService` | Core MCP protocol client for server communication |
-| `MCPHealthDashboardService` | Aggregated health dashboard data |
-| `MCPMonitoringService` | Server health checks and alerting |
-| `RealTimeMonitoringService` | Real-time metrics and performance monitoring |
-| `SkillOptimizationOrchestrationService` | Multi-agent skill analysis orchestration |
-| `SubagentCoordinationService` | Subagent task delegation and result merging |
-| `TrainingOptimizationAgent` | Training decision analysis agent |
-| `WorkflowTemplateService` | Predefined workflow template management |
-
-Additionally, `app/MCP/SubagentCoordinationService.php` provides top-level subagent coordination.
-
-### 2.3 MCP Server Categories
+### 2.2 MCP Server Categories
 
 | Category | Servers | Purpose |
-|----------|---------|---------|
+| -------- | ------- | ------- |
 | **AI & Agents** | strands-agents, agentcore-mcp-server | AI agent creation, orchestration, and management |
 | **AWS Infrastructure** | awspricing, awsknowledge, awsapi, awslabs.aws-iac-mcp-server | Cost optimization, documentation, service management, IaC validation |
 | **Data & Context** | context7, fetch, memory | Context management, HTTP operations, persistent memory |
@@ -490,7 +462,7 @@ The MCP server integration enables sophisticated subagent coordination through m
 #### 5.1.1 Primary Agent Types
 
 | Agent Type | MCP Server | Purpose | Coordination Role |
-|------------|------------|---------|-------------------|
+| ---------- | ---------- | ------- | ----------------- |
 | **Training Optimization Agent** | strands-agents | Complex training sequence planning | Primary coordinator for training decisions |
 | **Career Strategy Agent** | strands-agents | Long-term career planning | Strategic oversight and goal alignment |
 | **Race Analysis Agent** | strands-agents | Race preparation and analysis | Specialized race strategy coordination |
@@ -824,7 +796,7 @@ class MCPCircuitBreaker
 #### 7.2.1 Common Issues
 
 | Issue | Symptoms | Solution |
-|-------|----------|----------|
+| ----- | -------- | -------- |
 | **Server Unavailable** | Connection timeouts, server not responding | Check server status, restart if needed |
 | **Authentication Failure** | 401/403 errors | Verify credentials and permissions |
 | **Rate Limiting** | 429 errors | Implement backoff strategy, check rate limits |
@@ -851,9 +823,9 @@ php artisan mcp:logs --server=memory --lines=100
 
 ## Document Control
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2026-01-12 | Development Team | Initial MCP server configuration reference |
+| Version | Date       | Author           | Changes                                    |
+| ------- | ---------- | ---------------- | ------------------------------------------ |
+| 1.0     | 2026-01-12 | Development Team | Initial MCP server configuration reference |
 
 ---
 

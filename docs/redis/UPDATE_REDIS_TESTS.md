@@ -23,7 +23,7 @@ beforeEach(function () {
     // Clear cache before each test
     Cache::flush();
 });
-```
+```text
 
 1. Remove the `->skip()` calls from these tests:
    - "queues sync job"
@@ -79,7 +79,7 @@ php artisan test --filter=CacheManagement
 
 # Step 5: Run full test suite
 php artisan test
-```
+```text
 
 ## Manual Test File Updates
 
@@ -103,7 +103,7 @@ beforeEach(function () {
 ```php
 // Remove: })->skip('Requires Redis which is not available in test environment');
 // Replace with: });
-```
+```text
 
 **Line 285:** Remove skip
 
@@ -117,7 +117,7 @@ beforeEach(function () {
 ```php
 // Remove: })->skip('Requires Redis which is not available in test environment');
 // Replace with: });
-```
+```text
 
 **Line 315:** Remove skip
 
@@ -134,7 +134,7 @@ beforeEach(function () {
 if (! extension_loaded('redis') || config('cache.default') !== 'redis') {
     $this->markTestSkipped('Redis required for API response time tracking');
 }
-```
+```text
 
 **Line 197-199:** Update condition
 
@@ -150,7 +150,7 @@ if (! extension_loaded('redis') || config('cache.default') !== 'redis') {
 if (! extension_loaded('redis') || config('cache.default') !== 'redis') {
     $this->markTestSkipped('Redis required for pattern-based cache clearing');
 }
-```
+```text
 
 ## Verification Steps
 
@@ -163,27 +163,27 @@ After making changes:
    # Should return: PONG
    ```
 
-2. **Verify phpredis is loaded:**
+1. **Verify phpredis is loaded:**
 
    ```powershell
    php -m | Select-String -Pattern "redis"
    # Should show: redis
-   ```
+   ```text
 
-3. **Test Redis connection from Laravel:**
+2. **Test Redis connection from Laravel:**
 
    ```powershell
    php artisan redis:health --detailed
    ```
 
-4. **Run updated tests:**
+3. **Run updated tests:**
 
    ```powershell
    php artisan test --filter=FallbackRecovery --compact
    php artisan test --filter=CacheManagement --compact
    ```
 
-5. **Check for any failures:**
+4. **Check for any failures:**
    - If tests fail, check Redis connection
    - Verify .env has correct Redis configuration
    - Check Laravel logs for errors

@@ -6,7 +6,8 @@
 
 ## Overview
 
-Comprehensive breadcrumb navigation has been implemented across the Umamusume Career Planner application to improve user navigation, provide clear context about page location, and enhance overall user experience.
+Comprehensive breadcrumb navigation has been implemented across the Umamusume Career Planner application to improve user
+navigation, provide clear context about page location, and enhance overall user experience.
 
 ## What Was Implemented
 
@@ -35,7 +36,7 @@ Comprehensive breadcrumb navigation has been implemented across the Umamusume Ca
     ['label' => $character->name, 'url' => route('characters.show', $character)],
     ['label' => 'Edit']
 ]" />
-```
+```text
 
 ### 2. Pages with Breadcrumbs (20+ Pages)
 
@@ -247,7 +248,7 @@ The following pages require controller updates to pass dynamic breadcrumb data:
     ['label' => 'Characters', 'url' => route('characters.index')],
     ['label' => 'Create Character']
 ]" />
-```
+```text
 
 ### Pattern 3: Three-Level with Dynamic Name
 
@@ -266,7 +267,7 @@ The following pages require controller updates to pass dynamic breadcrumb data:
     ['label' => 'Data Management', 'url' => route('data-management.index')],
     ['label' => 'Import Data']
 ]" />
-```
+```text
 
 ## Controller Update Pattern (For Phase 2)
 
@@ -289,7 +290,7 @@ Then in the view:
     ['label' => 'Characters', 'url' => route('characters.index')],
     ['label' => $character->name]
 ]" />
-```
+```text
 
 ## Testing
 
@@ -380,7 +381,8 @@ To complete the breadcrumb implementation:
 
 ## Implementation Method
 
-This implementation was completed using a subagent for comprehensive coverage across multiple page categories. The subagent:
+This implementation was completed using a subagent for comprehensive coverage across multiple page categories. The
+subagent:
 
 - Created the reusable breadcrumb component
 - Added breadcrumbs to 20+ pages across 7 major categories
@@ -390,6 +392,10 @@ This implementation was completed using a subagent for comprehensive coverage ac
 
 ## Conclusion
 
-Phase 1 of the breadcrumb navigation implementation is complete with 20+ pages now featuring breadcrumbs. The foundation is solid and ready for Phase 2, which will add breadcrumbs to the remaining dynamic pages that require controller updates.
+Phase 1 of the breadcrumb navigation implementation is complete with 20+ pages now featuring breadcrumbs. The foundation
+is solid and ready for Phase 2, which will add breadcrumbs to the remaining dynamic pages that require controller
+updates.
 
-The implementation follows best practices for accessibility, performance, and maintainability, providing a consistent and professional navigation experience across the entire application.
+The implementation follows best practices for accessibility, performance, and maintainability, providing a consistent
+and professional navigation experience across the entire application.
+

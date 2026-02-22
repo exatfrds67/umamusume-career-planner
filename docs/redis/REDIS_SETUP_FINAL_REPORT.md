@@ -40,7 +40,7 @@
 
 ### Redis Health Check
 
-```
+```text
 ✅ Redis connection successful!
 
 Cache Statistics:
@@ -61,20 +61,25 @@ Connections:
 ```powershell
 PS> php -m | Select-String redis
 redis ✅
-```
+```text
 
 ### Test Results
 
 ```
+
 CacheManagementTest:
+
 - 11 tests passed ✅
 - 3 tests skipped (Redis-specific, correctly skipped in test environment)
 
 FallbackRecoveryTest:
-- 26 tests skipped (correctly using array cache in test environment)
-```
 
-**Note:** Tests are configured to use array cache in the test environment (phpunit.xml), which is correct. Production uses Redis, tests use array cache for speed and isolation.
+- 26 tests skipped (correctly using array cache in test environment)
+
+```text
+
+**Note:** Tests are configured to use array cache in the test environment (phpunit.xml), which is correct. Production
+uses Redis, tests use array cache for speed and isolation.
 
 ---
 
@@ -225,7 +230,7 @@ dispatch(new ProcessJob($data));
 
 // Start queue worker
 php artisan queue:work
-```
+```text
 
 ### Session Operations
 
@@ -243,7 +248,7 @@ $value = session('key');
 
 ```powershell
 php artisan redis:health --detailed
-```
+```text
 
 ### Check Keys
 
@@ -255,7 +260,7 @@ wsl bash -c "redis-cli keys 'umamusume-career-planner:*'"
 
 ```powershell
 wsl bash -c "redis-cli monitor"
-```
+```text
 
 ### Memory Usage
 
@@ -295,9 +300,9 @@ php artisan redis:health --detailed
 
 # Check memory usage
 wsl bash -c "redis-cli info memory"
-```
+```text
 
-### Troubleshooting
+## Troubleshooting
 
 **If Redis stops responding:**
 
@@ -311,7 +316,7 @@ php artisan config:clear
 ```powershell
 php artisan cache:clear
 php artisan cache:warm
-```
+```text
 
 **If tests fail:**
 

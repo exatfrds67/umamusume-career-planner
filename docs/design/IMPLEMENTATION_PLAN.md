@@ -1,7 +1,7 @@
 # Umamusume Career Planner - Comprehensive Implementation Plan
 
 **Document Version**: 1.0.0  
-**Date**: February 22, 2026  
+**Date**: January 28, 2026  
 **Status**: Active Implementation Roadmap  
 **Based On**: Game Alignment Analysis, Component Inventory, Data Flow Mapping, Prototype Plan
 
@@ -32,7 +32,7 @@ This document provides a comprehensive, actionable implementation plan for align
 
 **Tasks**:
 
-- [x] Update Tailwind CSS `@theme` directive with game-aligned color tokens
+- [ ] Update `tailwind.config.js` with game-aligned color tokens
 - [ ] Add stat-specific color classes (speed/stamina/power/guts/wit)
 - [ ] Configure dark mode color variants
 - [ ] Add condition badge colors (GREAT/GOOD/NORMAL/BAD)
@@ -41,7 +41,7 @@ This document provides a comprehensive, actionable implementation plan for align
 
 **Deliverables**:
 
-- Updated Tailwind CSS `@theme` directive with custom color palette
+- Updated `tailwind.config.js` with custom color palette
 - Color documentation in `docs/design/style-guide.md`
 - Contrast ratio test results
 
@@ -966,22 +966,22 @@ Desktop (3 columns):
 
 ### Technical Risks
 
-| Risk                                  | Impact | Probability | Mitigation                                |
-| ------------------------------------- | ------ | ----------- | ----------------------------------------- |
-| Performance degradation with large data | High   | Medium      | Implement pagination, lazy loading, caching |
-| Browser compatibility issues          | Medium | Low         | Test early and often on target browsers  |
-| Accessibility gaps                    | High   | Medium      | Regular audits, automated testing        |
-| Complex state management              | Medium | Medium      | Use Livewire best practices, minimize state |
-| External API failures                 | Medium | Low         | Implement fallbacks, caching, error handling |
+| Risk                                    | Impact | Probability | Mitigation                                   |
+| --------------------------------------- | ------ | ----------- | -------------------------------------------- |
+| Performance degradation with large data | High   | Medium      | Implement pagination, lazy loading, caching  |
+| Browser compatibility issues            | Medium | Low         | Test early and often on target browsers      |
+| Accessibility gaps                      | High   | Medium      | Regular audits, automated testing            |
+| Complex state management                | Medium | Medium      | Use Livewire best practices, minimize state  |
+| External API failures                   | Medium | Low         | Implement fallbacks, caching, error handling |
 
 ### Schedule Risks
 
-| Risk                          | Impact | Probability | Mitigation                           |
-| ----------------------------- | ------ | ----------- | ------------------------------------ |
-| Scope creep                   | High   | High        | Strict phase boundaries, defer P2 items |
-| Underestimated complexity     | Medium | Medium      | Add 20% buffer to estimates          |
-| Dependency delays             | Medium | Low         | Identify critical path, parallel work |
-| Testing reveals major issues  | High   | Medium      | Test early, iterate quickly          |
+| Risk                          | Impact | Probability | Mitigation                                |
+| ----------------------------- | ------ | ----------- | ----------------------------------------- |
+| Scope creep                   | High   | High        | Strict phase boundaries, defer P2 items   |
+| Underestimated complexity     | Medium | Medium      | Add 20% buffer to estimates               |
+| Dependency delays             | Medium | Low         | Identify critical path, parallel work     |
+| Testing reveals major issues  | High   | Medium      | Test early, iterate quickly               |
 
 ---
 
@@ -1158,8 +1158,8 @@ Desktop (3 columns):
 
 **Version History**:
 
-| Version | Date       | Changes                                  |
-| ------- | ---------- | ---------------------------------------- |
+| Version | Date       | Changes                                   |
+| ------- | ---------- | ----------------------------------------- |
 | 1.0.0   | 2026-01-28 | Initial comprehensive implementation plan |
 
 **Related Documents**:

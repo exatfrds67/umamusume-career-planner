@@ -230,7 +230,7 @@
 
 ### Commit 1: Semantic HTML & Accessibility
 
-```
+```text
 Message: "fix: Add semantic HTML and accessibility to character wizard
 
 - Add role='region' and aria-labelledby to step containers
@@ -245,7 +245,7 @@ Fixes WCAG 2.2 AA violations per UI-UX-FIXES-SUMMARY.md"
 
 ### Commit 2: Layout Implementation
 
-```
+```text
 Message: "feat: Implement desktop sidebar and mobile progress bar
 
 - Add fixed sidebar with step indicators (lg+ screens)
@@ -258,7 +258,7 @@ Addresses UI/UX issues Part 4"
 
 ### Commit 3: Validation & Error Messages
 
-```
+```text
 Message: "feat: Add form validation and error messaging
 
 - Add step-specific validation logic
@@ -293,7 +293,7 @@ git revert [commit-hash]
 
 # Or reset to specific commit
 git reset --hard [commit-hash]
-```
+```text
 
 Keep current version backed up in case of issues:
 
@@ -305,14 +305,14 @@ cp resources/views/characters/create.blade.php resources/views/characters/create
 
 ## Time Estimates
 
-| Phase | Estimated Time | Actual Time | Notes |
-|-------|-----------------|-------------|-------|
-| Phase 1: HTML/Accessibility | 30 min | | Complex but straightforward |
-| Phase 2: CSS Updates | 20 min | | Focus indicators + styling |
-| Phase 3: Layout | 60 min | | Sidebar + progress bar |
-| Phase 4: Validation | 30 min | | Error handling logic |
-| Phase 5: Testing | 60 min | | Most time-consuming |
-| **Total** | **200 min** | | **~3.5 hours** |
+| Phase                       | Estimated Time | Actual Time | Notes                       |
+| --------------------------- | -------------- | ----------- | --------------------------- |
+| Phase 1: HTML/Accessibility | 30 min         |             | Complex but straightforward |
+| Phase 2: CSS Updates        | 20 min         |             | Focus indicators + styling  |
+| Phase 3: Layout             | 60 min         |             | Sidebar + progress bar      |
+| Phase 4: Validation         | 30 min         |             | Error handling logic        |
+| Phase 5: Testing            | 60 min         |             | Most time-consuming         |
+| **Total**                   | **200 min**    |             | **~3.5 hours**              |
 
 ---
 

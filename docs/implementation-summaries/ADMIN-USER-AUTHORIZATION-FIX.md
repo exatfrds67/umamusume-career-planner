@@ -6,7 +6,9 @@
 
 ## Problem Description
 
-The admin user (`admin@umamusume.local`) was receiving 403 Forbidden errors when attempting to edit characters from the character detail page. This was because the `CharacterPolicy` only allowed users to edit their own characters, with no special handling for admin users.
+The admin user (`admin@umamusume.local`) was receiving 403 Forbidden errors when attempting to edit characters from the
+character detail page. This was because the `CharacterPolicy` only allowed users to edit their own characters, with no
+special handling for admin users.
 
 ## Root Cause
 
@@ -17,9 +19,10 @@ public function update(User $user, Character $character): bool
 {
     return $user->id === $character->user_id;
 }
-```
+```text
 
-This meant that even the admin user could not edit characters created by other users (including the test user from the seeder).
+This meant that even the admin user could not edit characters created by other users (including the test user from the
+seeder).
 
 ## Solution
 
@@ -59,7 +62,7 @@ public function before(User $user, string $ability): ?bool
 
     return null;
 }
-```
+```text
 
 **Location**: `app/Policies/CharacterPolicy.php`
 
@@ -69,11 +72,13 @@ Also updated the policy methods to be more permissive:
 
 - `viewAny()`: Changed from `false` to `true` (all users can view character lists)
 - `restore()`: Changed from `false` to `$user->id === $character->user_id` (users can restore their own characters)
-- `forceDelete()`: Changed from `false` to `$user->id === $character->user_id` (users can force delete their own characters)
+- `forceDelete()`: Changed from `false` to `$user->id === $character->user_id` (users can force delete their own
+characters)
 
 ## How It Works
 
-Laravel's authorization system calls the `before()` method before checking individual policy methods. If `before()` returns:
+Laravel's authorization system calls the `before()` method before checking individual policy methods. If `before()`
+returns:
 
 - `true`: Authorization passes immediately (admin bypass)
 - `false`: Authorization fails immediately
@@ -166,7 +171,7 @@ POST /login
     "email": "admin@umamusume.local",
     "password": "admin123"
 }
-```
+```text
 
 ### Check if User is Admin
 
@@ -191,7 +196,7 @@ Gate::authorize('update', $character);
 if (Gate::allows('update', $character)) {
     // User can update this character
 }
-```
+```text
 
 ## Benefits
 
@@ -230,7 +235,7 @@ Use a package like Spatie Permission for comprehensive role and permission manag
 
 ```bash
 composer require spatie/laravel-permission
-```
+```text
 
 ### Option 3: Multiple Admin Emails
 
@@ -258,7 +263,9 @@ public function isAdmin(): bool
 
 ## Conclusion
 
-Successfully fixed the 403 error issue for admin users by implementing a clean, testable admin authorization system. The admin user can now perform all CRUD/BREAD operations on any character in the application, while regular users are still restricted to their own characters.
+Successfully fixed the 403 error issue for admin users by implementing a clean, testable admin authorization system. The
+admin user can now perform all CRUD/BREAD operations on any character in the application, while regular users are still
+restricted to their own characters.
 
 ---
 

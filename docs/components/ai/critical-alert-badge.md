@@ -2,7 +2,9 @@
 
 ## Overview
 
-The Critical Alert Badge is a visual indicator component that displays the count of critical alerts in the AI-Powered Training Advisory System. It features a pulsing animation to draw attention when critical alerts are present and integrates seamlessly with the advisory panel.
+The Critical Alert Badge is a visual indicator component that displays the count of critical alerts in the AI-Powered
+Training Advisory System. It features a pulsing animation to draw attention when critical alerts are present and
+integrates seamlessly with the advisory panel.
 
 ## Location
 
@@ -45,7 +47,7 @@ The Critical Alert Badge is a visual indicator component that displays the count
 
 {{-- With alerts --}}
 <x-ai.critical-alert-badge :alert-count="3" />
-```
+```text
 
 ### Size Variations
 
@@ -75,7 +77,7 @@ The Critical Alert Badge is a visual indicator component that displays the count
     :alert-count="2" 
     class="custom-spacing"
 />
-```
+```text
 
 ### Integration with Header
 
@@ -110,7 +112,7 @@ document.addEventListener('alpine:init', () => {
         }
     }));
 });
-```
+```text
 
 Or use Alpine's `@open-advisory-panel` directive:
 
@@ -123,10 +125,10 @@ Or use Alpine's `@open-advisory-panel` directive:
 
 ## Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `alertCount` | `int` | `0` | Number of critical alerts to display |
-| `size` | `string` | `'md'` | Size variant: `'sm'`, `'md'`, or `'lg'` |
+| Prop         | Type     | Default | Description                             |
+| ------------ | -------- | ------- | --------------------------------------- |
+| `alertCount` | `int`    | `0`     | Number of critical alerts to display    |
+| `size`       | `string` | `'md'`  | Size variant: `'sm'`, `'md'`, or `'lg'` |
 
 ## Styling
 
@@ -174,9 +176,9 @@ php artisan test --filter=CriticalAlertBadgeTest
 
 # Run specific test
 php artisan test --filter="it renders with single alert"
-```
+```text
 
-### Test Coverage
+## Test Coverage
 
 The component has comprehensive test coverage including:
 
@@ -197,8 +199,10 @@ The component has comprehensive test coverage including:
 Visit the demo page to see all variations:
 
 ```
+
 /demo/critical-alert-badge
-```
+
+```text
 
 ## Accessibility Checklist
 
@@ -259,3 +263,4 @@ For issues or questions about this component:
 1. Check the demo page: `/demo/critical-alert-badge`
 2. Review the test file for usage examples
 3. Consult the AI Training Advisory System spec: `.kiro/specs/ai-training-advisory/`
+

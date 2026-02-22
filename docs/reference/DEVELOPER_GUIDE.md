@@ -22,7 +22,7 @@ This guide provides comprehensive documentation for developers working on the Um
 ### Technology Stack
 
 | Layer | Technology |
-|-------|------------|
+| --- | --- |
 | Backend | Laravel 12 (PHP 8.4) |
 | Frontend | Livewire 4, Blade, Alpine.js 3, Tailwind CSS v4 |
 | Database | SQLite (dev), MySQL/PostgreSQL (prod) |
@@ -574,4 +574,4 @@ SESSION_DRIVER=redis
 
 ---
 
-*Last updated: February 2026*
+Last updated: February 2026

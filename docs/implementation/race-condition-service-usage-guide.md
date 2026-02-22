@@ -12,7 +12,7 @@
 use App\Services\RaceConditionService;
 
 $service = new RaceConditionService();
-```
+```text
 
 ---
 
@@ -59,7 +59,7 @@ $modifiedStats = $service->applyConditionPenalties(
 //     'guts' => 700,    // no change
 //     'wit' => 600,     // no change
 // ]
-```
+```text
 
 ---
 
@@ -80,7 +80,7 @@ $isWet = $service->isWetCondition('firm');
 ```php
 $severity = $service->getConditionSeverity('heavy');
 // Returns: 3 (0=firm, 1=good, 2=soft, 3=heavy)
-```
+```text
 
 ### Get Human-Readable Impact Description
 
@@ -100,7 +100,7 @@ $score = $service->calculatePerformanceImpact('heavy', 'dirt');
 
 $score = $service->calculatePerformanceImpact('firm', 'turf');
 // Returns: 100.0 (optimal)
-```
+```text
 
 ---
 
@@ -146,7 +146,7 @@ $isValid = $service->isValidWeather('rainy');
 
 $isValid = $service->isValidWeather('stormy');
 // Returns: false
-```
+```text
 
 ---
 
@@ -274,7 +274,7 @@ class RaceStrategyService
         return $advice;
     }
 }
-```
+```text
 
 ### Example 3: UI Display Component
 
@@ -320,7 +320,7 @@ RaceConditionService::WEATHER_SUNNY   // 'sunny'
 RaceConditionService::WEATHER_CLOUDY  // 'cloudy'
 RaceConditionService::WEATHER_RAINY   // 'rainy'
 RaceConditionService::WEATHER_SNOWY   // 'snowy'
-```
+```text
 
 ### Track Conditions
 
@@ -336,22 +336,22 @@ RaceConditionService::CONDITION_HEAVY  // 'heavy'
 ```php
 RaceConditionService::SURFACE_TURF  // 'turf'
 RaceConditionService::SURFACE_DIRT  // 'dirt'
-```
+```text
 
 ---
 
 ## Penalty Reference Table
 
 | Condition | Surface | Power Penalty | Speed Penalty | Stamina Drain |
-|-----------|---------|---------------|---------------|---------------|
-| Firm      | Turf    | 0             | 0             | 0%/sec        |
-| Firm      | Dirt    | 0             | 0             | 0%/sec        |
-| Good      | Turf    | -50           | 0             | 0%/sec        |
-| Good      | Dirt    | -50           | 0             | 0%/sec        |
-| Soft      | Turf    | -50           | 0             | +2%/sec       |
-| Soft      | Dirt    | -100          | 0             | +2%/sec       |
-| Heavy     | Turf    | -50           | -50           | +2%/sec       |
-| Heavy     | Dirt    | -100          | -50           | +2%/sec       |
+| --------- | ------- | ------------- | ------------- | ------------- |
+| Firm | Turf | 0 | 0 | 0%/sec |
+| Firm | Dirt | 0 | 0 | 0%/sec |
+| Good | Turf | -50 | 0 | 0%/sec |
+| Good | Dirt | -50 | 0 | 0%/sec |
+| Soft | Turf | -50 | 0 | +2%/sec |
+| Soft | Dirt | -100 | 0 | +2%/sec |
+| Heavy | Turf | -50 | -50 | +2%/sec |
+| Heavy | Dirt | -100 | -50 | +2%/sec |
 
 **Source**: Research Report Section 6.1 (verified game mechanics)
 
@@ -362,13 +362,16 @@ RaceConditionService::SURFACE_DIRT  // 'dirt'
 The performance impact score is calculated as:
 
 ```
+
 Base Score: 100 (optimal)
+
 - Power penalty × 0.04 (max -4.0 for -100 penalty)
 - Speed penalty × 0.04 (max -2.0 for -50 penalty)
 - Stamina drain × 1.0 (max -2.0 for 2%/sec drain)
 
 Result: 0-100 (higher = better conditions)
-```
+
+```text
 
 ### Score Interpretation
 
@@ -405,7 +408,7 @@ $conditionData = Cache::remember($cacheKey, 3600, function () use ($service, $tr
         'is_wet' => $service->isWetCondition($trackCondition),
     ];
 });
-```
+```text
 
 ### 3. Apply Penalties Before Race Calculations
 
@@ -430,7 +433,7 @@ $analysis = [
         'recommended_skills' => $service->getRecommendedSkills($weather, $condition),
     ],
 ];
-```
+```text
 
 ---
 

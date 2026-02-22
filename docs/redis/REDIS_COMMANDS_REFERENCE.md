@@ -16,9 +16,9 @@ wsl bash -c "sudo service redis-server restart"
 
 # Check Status
 wsl bash -c "sudo service redis-server status"
-```
+```text
 
-### Basic Connection Tests
+## Basic Connection Tests
 
 ```powershell
 # Ping Redis
@@ -42,9 +42,9 @@ php artisan redis:health
 
 # Detailed health information
 php artisan redis:health --detailed
-```
+```text
 
-### Cache Management
+## Cache Management
 
 ```powershell
 # Warm cache
@@ -65,7 +65,7 @@ php artisan cache:clear
 php artisan config:clear
 ```
 
-### Queue Management (Redis-based)
+## Queue Management (Redis-based)
 
 ```powershell
 # Start queue worker
@@ -76,7 +76,7 @@ php artisan horizon
 
 # Check queue status
 php artisan queue:monitor
-```
+```text
 
 ## Redis CLI Commands (from WSL)
 
@@ -105,7 +105,7 @@ redis-cli ttl 'umamusume-career-planner:key_name'
 redis-cli setex 'test_key' 60 'test_value'
 ```
 
-### Database Operations
+## Database Operations
 
 ```bash
 # Select database
@@ -121,9 +121,9 @@ redis-cli flushall
 
 # Get database size
 redis-cli dbsize
-```
+```text
 
-### Monitoring & Stats
+## Monitoring & Stats
 
 ```bash
 # Monitor all commands in real-time
@@ -149,7 +149,7 @@ redis-cli slowlog get 10
 redis-cli client list
 ```
 
-### Performance Analysis
+## Performance Analysis
 
 ```bash
 # Check memory usage by key pattern
@@ -166,7 +166,7 @@ redis-cli --latency
 
 # Latency history
 redis-cli --latency-history
-```
+```text
 
 ## PHP Redis Commands (via Tinker)
 
@@ -189,7 +189,7 @@ php artisan tinker --execute="Cache::forget('test'); echo 'deleted';"
 php artisan tinker --execute="print_r(Redis::keys('umamusume-career-planner:*'));"
 ```
 
-### Advanced Operations
+## Advanced Operations
 
 ```powershell
 # Get Redis info
@@ -209,7 +209,7 @@ php artisan tinker --execute="echo Redis::incr('counter');"
 
 # Get TTL
 php artisan tinker --execute="echo Redis::ttl('test');"
-```
+```text
 
 ## Common Workflows
 
@@ -229,7 +229,7 @@ php artisan redis:health --detailed
 php artisan tinker --execute="Cache::put('test', 'ok', 60); echo Cache::get('test');"
 ```
 
-### Debug Cache Issues
+## Debug Cache Issues
 
 ```powershell
 # 1. Check what's cached
@@ -244,9 +244,9 @@ wsl bash -c "redis-cli ttl 'umamusume-career-planner:key_name'"
 # 4. Clear and rebuild
 php artisan cache:clear
 php artisan cache:warm
-```
+```text
 
-### Monitor Performance
+## Monitor Performance
 
 ```powershell
 # 1. Check memory usage
@@ -262,7 +262,7 @@ wsl bash -c "redis-cli slowlog get 10"
 wsl bash -c "redis-cli dbsize"
 ```
 
-### Clear Everything (Nuclear Option)
+## Clear Everything (Nuclear Option)
 
 ```powershell
 # WARNING: This deletes ALL cached data!
@@ -278,7 +278,7 @@ wsl bash -c "redis-cli flushdb"
 
 # 4. Rebuild cache
 php artisan cache:warm
-```
+```text
 
 ## Testing Commands
 
@@ -298,7 +298,7 @@ php artisan test --filter=CacheManagement --compact
 php artisan test --filter="test name" --compact
 ```
 
-### Debug Test Failures
+## Debug Test Failures
 
 ```powershell
 # 1. Check Redis is running
@@ -313,7 +313,7 @@ php -m | Select-String -Pattern "redis"
 
 # 4. Run test with verbose output
 php artisan test --filter=TestName
-```
+```text
 
 ## Environment-Specific Commands
 
@@ -327,7 +327,7 @@ QUEUE_CONNECTION=database
 SESSION_DRIVER=database
 ```
 
-### Production (with Redis)
+## Production (with Redis)
 
 ```powershell
 # Use Redis for everything
@@ -341,7 +341,7 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 php artisan cache:warm
-```
+```text
 
 ## Troubleshooting Commands
 
@@ -361,7 +361,7 @@ wsl bash -c "cat /etc/redis/redis.conf | grep bind"
 wsl bash -c "netstat -tlnp | grep 6379"
 ```
 
-### Extension Issues
+## Extension Issues
 
 ```powershell
 # Check if loaded
@@ -372,9 +372,9 @@ php -i | Select-String -Pattern "redis"
 
 # Test connection
 php -r "try { $r = new Redis(); $r->connect('127.0.0.1', 6379); echo 'OK'; } catch (Exception $e) { echo $e->getMessage(); }"
-```
+```text
 
-### Performance Issues
+## Performance Issues
 
 ```powershell
 # Check memory
@@ -409,14 +409,14 @@ wsl bash -c "redis-cli info stats | grep keyspace"
 
 ## Quick Reference Card
 
-| Task | Command |
-|------|---------|
-| Start Redis | `wsl bash -c "sudo service redis-server start"` |
-| Test Connection | `wsl bash -c "redis-cli ping"` |
-| Laravel Health | `php artisan redis:health` |
-| Warm Cache | `php artisan cache:warm` |
-| Clear Cache | `php artisan cache:clear` |
-| List Keys | `wsl bash -c "redis-cli keys 'umamusume-career-planner:*'"` |
-| Monitor | `wsl bash -c "redis-cli monitor"` |
-| Memory Info | `wsl bash -c "redis-cli info memory"` |
-| Run Tests | `php artisan test --filter=Redis --compact` |
+| Task            | Command                                                     |
+| --------------- | ----------------------------------------------------------- |
+| Start Redis     | `wsl bash -c "sudo service redis-server start"`             |
+| Test Connection | `wsl bash -c "redis-cli ping"`                              |
+| Laravel Health  | `php artisan redis:health`                                  |
+| Warm Cache      | `php artisan cache:warm`                                    |
+| Clear Cache     | `php artisan cache:clear`                                   |
+| List Keys       | `wsl bash -c "redis-cli keys 'umamusume-career-planner:*'"` |
+| Monitor         | `wsl bash -c "redis-cli monitor"`                           |
+| Memory Info     | `wsl bash -c "redis-cli info memory"`                       |
+| Run Tests       | `php artisan test --filter=Redis --compact`                 |

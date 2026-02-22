@@ -13,7 +13,7 @@ Route::post('/characters/{characterId}/skill-recommendations',
     [SkillRecommendationController::class, 'getRecommendations'])
     ->middleware('auth:sanctum')
     ->name('api.characters.skill-recommendations');
-```
+```text
 
 ### Tests Created (tests/Feature/Api/SkillRecommendationTest.php)
 

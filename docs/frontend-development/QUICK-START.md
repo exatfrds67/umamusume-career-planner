@@ -62,12 +62,12 @@
 
 ## 📁 Documentation Files
 
-| File | Purpose |
-|------|---------|
-| `.agents/PHASE2-PLANNING-SUMMARY.md` | 📄 **You are here** - Quick overview |
-| `.agents/phase-backend-integration-plan.md` | 📖 Detailed 22-item plan (read this for full context) |
-| `.agents/memory.instruction.md` | 💾 Project memory + wizard completion status |
-| `docs/prds/PRD-001.md` | 📋 Character Management requirements |
+| File                                        | Purpose                                              |
+| ------------------------------------------- | ---------------------------------------------------- |
+| `.agents/PHASE2-PLANNING-SUMMARY.md`        | 📄 **You are here** - Quick overview                 |
+| `.agents/phase-backend-integration-plan.md` | 📖 Detailed 22-item plan (read this for full context)|
+| `.agents/memory.instruction.md`             | 💾 Project memory + wizard completion status         |
+| `docs/prds/PRD-001.md`                      | 📋 Character Management requirements                 |
 
 ---
 
@@ -95,7 +95,7 @@
 
 **Step 1**: Read detailed plan
 
-```
+```text
 Open: .agents/phase-backend-integration-plan.md
 Time: 10 minutes
 Goal: Understand full scope + dependencies
@@ -103,7 +103,7 @@ Goal: Understand full scope + dependencies
 
 **Step 2**: Start Phase 1
 
-```
+```text
 Task 1.1: Review app/Http/Controllers/CharacterController.php
 Time: 15 minutes
 Action: Check existing store() implementation
@@ -111,7 +111,7 @@ Action: Check existing store() implementation
 
 **Step 3**: Continue sequentially
 
-```
+```text
 Complete phases in order: 1→2→3→5→4
 (Test during 5, build UI in 4)
 ```
@@ -135,26 +135,27 @@ php artisan test --compact
 
 # Seed if needed
 php artisan db:seed --class=FactorInheritanceSeeder
-```
+```text
 
 ---
 
 ## 📊 Expected Timeline
 
-| Phase | Time | Status |
-|-------|------|--------|
-| 1 (Prep) | 15 min | ⏳ Ready |
-| 2 (Persistence) | 60 min | ⏳ Blocked by Phase 1 |
-| 3 (Integration) | 45 min | ⏳ Blocked by Phase 2 |
-| 5 (Testing) | 60 min | ⏳ Parallel with Phases 2-3 |
-| 4 (Detail View) | 45 min | ⏳ Blocked by Phase 3 |
-| **Total** | **4-5 hours** | ⏳ Starting now |
+| Phase           | Time          | Status                     |
+| --------------- | ------------- | -------------------------- |
+| 1 (Prep)        | 15 min        | ⏳ Ready                    |
+| 2 (Persistence) | 60 min        | ⏳ Blocked by Phase 1       |
+| 3 (Integration) | 45 min        | ⏳ Blocked by Phase 2       |
+| 5 (Testing)     | 60 min        | ⏳ Parallel with Phases 2-3 |
+| 4 (Detail View) | 45 min        | ⏳ Blocked by Phase 3       |
+| **Total**       | **4-5 hours** | ⏳ Starting now             |
 
 ---
 
 ## 🎓 Data Flow Reminder
 
 ```
+
 Alpine.js Form Data (4 steps)
         ↓
     POST /characters
@@ -168,7 +169,8 @@ Database (Run + Factors + Deck)
 Redirect to /characters/{id}
         ↓
 Detail View (Read & Display)
-```
+
+```text
 
 ---
 
@@ -206,3 +208,4 @@ Detail View (Read & Display)
 **Next Action**: Open `.agents/phase-backend-integration-plan.md` for detailed planning
 
 ✅ Planning Complete | 🚀 Ready to Implement
+

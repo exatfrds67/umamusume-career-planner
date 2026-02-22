@@ -11,7 +11,8 @@
 
 ## Overview
 
-Phase 6 implements advanced polish features and user-facing capabilities that enhance the application experience. These components focus on:
+Phase 6 implements advanced polish features and user-facing capabilities that enhance the application experience. These
+components focus on:
 
 - **Data Persistence**: Automatic plan saving with conflict detection
 - **Data Migration**: Import/export with format detection and validation
@@ -24,7 +25,7 @@ Phase 6 implements advanced polish features and user-facing capabilities that en
 
 ### Component Hierarchy
 
-```
+```text
 Phase 6 Components (10 Total)
 ├── Data Management (2)
 │   ├── localStorageManager.js - Plan persistence & autosave
@@ -90,7 +91,7 @@ detectConflicts(uuid)                       // Timestamp-based conflict detectio
 resolveConflict(uuid, strategy)             // KEEP_LOCAL or KEEP_SERVER
 checkQuota()                                // Storage % calculation
 exportPlanAsJSON(uuid, filename)            // Download backup
-```
+```text
 
 **Data Structure**:
 
@@ -135,7 +136,7 @@ validatePlan(plan)                   // Validate business rules
 processPlanImport(plans, strategy)   // Batch import with conflict handling
 exportPlansAsJSON(plans, filename)   // Export as JSON
 exportPlansAsCSV(plans, filename)    // Export as CSV
-```
+```text
 
 **Validation Rules**:
 
@@ -187,7 +188,7 @@ executeAction(notification)       // Run notification action
   action: {label: '...', callback: fn},
   dismissible: true
 }
-```
+```text
 
 ---
 
@@ -238,7 +239,7 @@ executeAction(notification)       // Run notification action
 setDateRange(range)    // Filter by time period
 exportAnalytics()      // CSV export
 convertToCSV(data)     // Format data as CSV
-```
+```text
 
 ---
 
@@ -287,7 +288,7 @@ exportResults()                  // CSV export
 
 **Default Shortcuts**:
 
-```
+```text
 Ctrl+K / ⌘K       → Search Plans
 Ctrl+N / ⌘N       → New Plan
 Ctrl+S / ⌘S       → Save Plan
@@ -315,7 +316,7 @@ executeAction(action)          // Run action
 customizeShortcut(id, newKey)  // Save custom
 resetShortcuts()               // Back to defaults
 formatShortcut(shortcut)       // Display format
-```
+```text
 
 ---
 
@@ -371,7 +372,7 @@ formatShortcut(shortcut)       // Display format
   type: 'plan',
   color: 'blue'
 }
-```
+```text
 
 ---
 
@@ -419,7 +420,7 @@ formatShortcut(shortcut)       // Display format
 
 **Skill Types & Colors**:
 
-```
+```text
 speed    → 🔴 Red (#EF4444)
 stamina  → 💚 Green (#10B981)
 power    → 💛 Yellow (#FBBF24)
@@ -493,7 +494,7 @@ unique   → 💗 Pink (#EC4899)
 
 ### Public Events (Dispatch)
 
-```
+```text
 // Data Management
 plan-saved                    → localStorage persist complete
 draft-cleared                 → Draft removed
@@ -540,7 +541,7 @@ card-removed                 → Card remove clicked
 
 ### Plan Save Flow
 
-```
+```text
 User Edits Plan
     ↓
 Alpine Detects Change
@@ -562,7 +563,7 @@ Toast: "Plan saved to draft"
 
 ### Import Flow
 
-```
+```text
 User Selects File
     ↓
 handleFileUpload() Triggered
@@ -582,7 +583,7 @@ Report Results [Successes/Errors/Warnings]
 
 ### Search Flow
 
-```
+```text
 User Types in Search Box
     ↓
 handleSearch() Triggered
@@ -637,7 +638,7 @@ Display Results + Count
 - Test metric calculations
 - Test date range filtering
 - Test character/scenario stats
-```
+```text
 
 ### Feature Tests (Pest Browser)
 
@@ -671,7 +672,7 @@ Display Results + Count
 - Search plans → Filter → Save filter → Reuse
 - Browse analytics → Export → Download CSV
 - Keyboard navigation → All shortcuts work
-```
+```text
 
 ---
 
@@ -764,7 +765,7 @@ Display Results + Count
 ## Git Commits
 
 | Commit | Message | Components |
-|--------|---------|-----------|
+| ------- | ---------------------------------- | ---------------------------------------- |
 | 74dc48f | Phase 6 Part 1: Data Management | localStorageManager, importExportHandler |
 | e4b669c | Phase 6 Part 2: UI Utilities | data-table, notification-manager |
 | f5e1821 | Phase 6 Part 3: Analytics | analytics-panel |
@@ -775,7 +776,9 @@ Display Results + Count
 
 ## Conclusion
 
-Phase 6 successfully implements all advanced Polish & Feature components, creating a mature, professional-grade application experience. The architecture is extensible for future enhancements while maintaining code quality and accessibility standards.
+Phase 6 successfully implements all advanced Polish & Feature components, creating a mature, professional-grade
+application experience. The architecture is extensible for future enhancements while maintaining code quality and
+accessibility standards.
 
 All 10 major features are production-ready and fully integrated with the existing Phase 1-5 architecture.
 
@@ -786,3 +789,4 @@ All 10 major features are production-ready and fully integrated with the existin
 *Documentation Version: 1.0*  
 *Last Updated: 2025-01-29*  
 *Phase 6 Completion Date: 2025-01-29*
+

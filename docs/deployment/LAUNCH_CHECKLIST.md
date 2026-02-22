@@ -270,7 +270,7 @@ This checklist ensures all requirements are met before deploying to production.
 - [ ] Resource usage stable
 - [ ] No security alerts
 
-### Communication
+### Post-Launch Communication
 
 - [ ] Launch announced
 - [ ] Status page updated
@@ -303,9 +303,9 @@ php artisan route:clear
 
 # 5. Bring application back up
 php artisan up
-```
+```text
 
-### Planned Rollback (> 5 minutes)
+## Planned Rollback (> 5 minutes)
 
 For non-critical issues that require investigation:
 
@@ -333,28 +333,29 @@ For non-critical issues that require investigation:
 
 ## Emergency Contacts
 
-| Role | Name | Contact |
-|------|------|---------|
-| Technical Lead | [Name] | [Email/Phone] |
-| DevOps Lead | [Name] | [Email/Phone] |
-| Product Owner | [Name] | [Email/Phone] |
-| On-Call Engineer | [Rotation] | [PagerDuty] |
+| Role             | Name       | Contact       |
+| ---------------- | ---------- | ------------- |
+| Technical Lead   | [Name]     | [Email/Phone] |
+| DevOps Lead      | [Name]     | [Email/Phone] |
+| Product Owner    | [Name]     | [Email/Phone] |
+| On-Call Engineer | [Rotation] | [PagerDuty]   |
 
 ---
 
 ## Sign-Off
 
-| Role | Name | Date | Signature |
-|------|------|------|-----------|
-| Development Lead | | | |
-| QA Lead | | | |
-| DevOps Lead | | | |
-| Product Owner | | | |
+| Role             | Name | Date | Signature |
+| ---------------- | ---- | ---- | --------- |
+| Development Lead |      |      |           |
+| QA Lead          |      |      |           |
+| DevOps Lead      |      |      |           |
+| Product Owner    |      |      |           |
 
 ---
 
 ## Version History
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2026-01-20 | System | Initial checklist |
+| Version | Date       | Author | Changes           |
+| ------- | ---------- | ------ | ----------------- |
+| 1.0     | 2026-01-20 | System | Initial checklist |
+

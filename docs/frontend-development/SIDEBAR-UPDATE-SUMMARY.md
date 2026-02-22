@@ -43,7 +43,7 @@
 x-data="{ showToggle: false }"
 @mouseenter="showToggle = true"
 @mouseleave="showToggle = false"
-```
+```text
 
 **Toggle Button**:
 
@@ -144,7 +144,7 @@ x-data="{ showToggle: false }"
     aria-controls="sidebar-navigation"
     title="Minimize sidebar" / "Expand sidebar"
 >
-```
+```text
 
 ### Keyboard Navigation
 
@@ -167,6 +167,7 @@ x-data="{ showToggle: false }"
 ### Expanded State
 
 ```
+
 ┌────────────────────────────────┐
 │  [Logo] Umamusume         [<<] │ ← Toggle on hover
 │         Career Planner          │
@@ -175,11 +176,13 @@ x-data="{ showToggle: false }"
 │  ⭐  Characters                │
 │  ...                           │
 └────────────────────────────────┘
-```
+
+```text
 
 ### Minimized State
 
 ```
+
 ┌────┐
 │[🏇]│ ← Logo always visible
 │[>>]│ ← Toggle on hover
@@ -188,7 +191,8 @@ x-data="{ showToggle: false }"
 │ ⭐ │
 │ ... │
 └────┘
-```
+
+```text
 
 ---
 
@@ -273,3 +277,4 @@ x-data="{ showToggle: false }"
 
 **Implementation Status**: ✅ Phase 1 Complete  
 **Ready for**: Phase 2 (Navigation Enhancement)
+

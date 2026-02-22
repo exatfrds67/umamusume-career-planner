@@ -28,7 +28,7 @@ Redis is installed in WSL and ready. You need to install the phpredis extension 
 
 2. **Install:**
 
-   ```
+   ```text
    - Extract php_redis.dll
    - Copy to: C:\xampp\php\ext\php_redis.dll
    - Edit: C:\xampp\php\php.ini
@@ -40,7 +40,7 @@ Redis is installed in WSL and ready. You need to install the phpredis extension 
 
    ```powershell
    php -m | Select-String -Pattern "redis"
-   ```
+   ```text
 
    Should show: `redis`
 
@@ -60,7 +60,7 @@ Edit `.env` file and change these lines:
 CACHE_STORE=redis
 QUEUE_CONNECTION=redis
 SESSION_DRIVER=redis
-```
+```text
 
 Then run:
 
@@ -83,7 +83,7 @@ Update these files:
 php artisan test --filter=FallbackRecovery --compact
 php artisan test --filter=CacheManagement --compact
 php artisan test --compact
-```
+```text
 
 All tests should pass.
 
@@ -97,15 +97,15 @@ php artisan cache:warm
 
 ## 📚 Documentation Guide
 
-| File | When to Use |
-|------|-------------|
-| **START_HERE.md** | Right now! |
-| **REDIS_SETUP_INSTRUCTIONS.md** | Installing phpredis |
-| **REDIS_SETUP_CHECKLIST.md** | Step-by-step checklist |
-| **UPDATE_REDIS_TESTS.md** | Updating test files |
-| **REDIS_COMMANDS_REFERENCE.md** | Need Redis commands |
-| **REDIS_SETUP_SUMMARY.md** | Overview/reference |
-| **REDIS_CURRENT_STATUS.md** | Current state |
+| File                            | When to Use            |
+| ------------------------------- | ---------------------- |
+| **START_HERE.md**               | Right now!             |
+| **REDIS_SETUP_INSTRUCTIONS.md** | Installing phpredis    |
+| **REDIS_SETUP_CHECKLIST.md**    | Step-by-step checklist |
+| **UPDATE_REDIS_TESTS.md**       | Updating test files    |
+| **REDIS_COMMANDS_REFERENCE.md** | Need Redis commands    |
+| **REDIS_SETUP_SUMMARY.md**      | Overview/reference     |
+| **REDIS_CURRENT_STATUS.md**     | Current state          |
 
 ---
 
@@ -128,7 +128,7 @@ You're done when:
 
 ```powershell
 wsl bash -c "redis-cli ping"
-```
+```text
 
 ### After phpredis Installation
 

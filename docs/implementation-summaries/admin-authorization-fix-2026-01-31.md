@@ -6,7 +6,9 @@
 
 ## Problem Statement
 
-The admin user was receiving "unauthorized" errors when trying to perform CRUD operations on seeded characters, despite having the `is_admin` flag set to true. The admin should have FULL access to ALL data in the application, including seeded characters.
+The admin user was receiving "unauthorized" errors when trying to perform CRUD operations on seeded characters, despite
+having the `is_admin` flag set to true. The admin should have FULL access to ALL data in the application, including
+seeded characters.
 
 ## Root Cause Analysis
 
@@ -15,7 +17,8 @@ The admin user was receiving "unauthorized" errors when trying to perform CRUD o
 **File**: `app/Policies/CharacterPolicy.php`  
 **Lines**: 72-76
 
-The `delete()` method explicitly returned `false` for seeded characters BEFORE the admin check in the `before()` method could apply:
+The `delete()` method explicitly returned `false` for seeded characters BEFORE the admin check in the `before()` method
+could apply:
 
 ```php
 public function delete(User $user, Character $character): bool
@@ -26,9 +29,10 @@ public function delete(User $user, Character $character): bool
     }
     return $user->id === $character->user_id;
 }
-```
+```text
 
-**Problem**: Even though the `before()` method grants admins full access by returning `true`, the `delete()` method's explicit `false` return for seeded characters prevented admin deletion.
+**Problem**: Even though the `before()` method grants admins full access by returning `true`, the `delete()` method's
+explicit `false` return for seeded characters prevented admin deletion.
 
 ### Issue #2: Missing Authorization Check in Show Method
 
@@ -45,7 +49,8 @@ public function show(Character $character): View
 }
 ```
 
-**Problem**: While the policy allowed viewing seeded characters, there was no explicit `$this->authorize('view', $character)` call for consistency and proper authorization flow.
+**Problem**: While the policy allowed viewing seeded characters, there was no explicit `$this->authorize('view',
+$character)` call for consistency and proper authorization flow.
 
 ## Solution Implemented
 
@@ -70,7 +75,7 @@ public function delete(User $user, Character $character): bool
     // User-created characters can only be deleted by their owner
     return $user->id === $character->user_id;
 }
-```
+```text
 
 **How It Works**:
 
@@ -117,7 +122,7 @@ public function show(Character $character): View
 ### CharacterPolicy Authorization Matrix
 
 | Action | Regular User (Own) | Regular User (Other) | Regular User (Seeded) | Admin (Any) |
-|--------|-------------------|---------------------|----------------------|-------------|
+| --- | --- | --- | --- | --- |
 | viewAny | ✅ | ✅ | ✅ | ✅ |
 | view | ✅ | ❌ | ✅ | ✅ |
 | create | ✅ | ✅ | ✅ | ✅ |
@@ -137,7 +142,7 @@ public function isAdmin(): bool
 {
     return $this->is_admin;
 }
-```
+```text
 
 **Admin User Seeded**:
 
@@ -152,6 +157,7 @@ public function isAdmin(): bool
 All 15 CharacterPolicy tests passing:
 
 ```
+
 ✓ Regular User Authorization → user can view their own character
 ✓ Regular User Authorization → user can delete their own character
 ✓ Regular User Authorization → user cannot delete other users character
@@ -167,7 +173,8 @@ All 15 CharacterPolicy tests passing:
 ✓ Admin User Authorization → admin can create characters
 ✓ Regular User Authorization → user can view any characters
 ✓ Regular User Authorization → user can create characters
-```
+
+```text
 
 ### Manual Testing Checklist
 
@@ -247,3 +254,4 @@ The authorization logic itself doesn't need rollback as it was already working c
 **Completed By**: AI Assistant  
 **Verified By**: Automated Tests (15/15 passing)  
 **Status**: Production Ready
+

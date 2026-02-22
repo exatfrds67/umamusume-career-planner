@@ -49,7 +49,8 @@
    - Supports multiple Claude and Nova models
    - Error handling and logging
 
-2. **BedrockConfigurationService** ([app/Services/AI/BedrockConfigurationService.php](app/Services/AI/BedrockConfigurationService.php))
+2. **BedrockConfigurationService**
+([app/Services/AI/BedrockConfigurationService.php](app/Services/AI/BedrockConfigurationService.php))
    - Validates AWS credentials
    - Manages model selection and preferences
    - Provides health monitoring
@@ -102,7 +103,8 @@
 
 ### Conclusion
 
-The skip is **expected behavior** for this test scenario. The AWS credentials and SDK are properly configured, but the actual API call would require:
+The skip is **expected behavior** for this test scenario. The AWS credentials and SDK are properly configured, but the
+actual API call would require:
 
 - Direct internet connectivity to AWS Bedrock
 - Valid AWS credentials with active permissions
@@ -150,7 +152,7 @@ The skip is **expected behavior** for this test scenario. The AWS credentials an
 
 ### Request Flow
 
-```
+```text
 User Request
     ↓
 HybridAIService.processRequest()
@@ -191,7 +193,7 @@ $response = $bedrockService->generate(
 //     'model_version' => '20241022-v2',
 //     'request_id' => 'aws-request-id'
 // ]
-```
+```text
 
 ### Hybrid Mode
 
@@ -215,7 +217,7 @@ $response = $hybridService->processRequest(
 
 ### .env Settings
 
-```
+```text
 AWS_ACCESS_KEY_ID=AKIAR5RCBVDCQX45JBVE
 AWS_SECRET_ACCESS_KEY=[configured]
 AWS_DEFAULT_REGION=us-east-1
@@ -273,7 +275,7 @@ Bedrock models have configured pricing:
 
 ```bash
 php artisan test tests/Feature/BedrockHealthCheckTest.php --compact
-```
+```text
 
 ### Test with API
 
@@ -287,7 +289,7 @@ php test-bedrock-api.php
 php artisan tinker
 > $service = app(\App\Services\AI\BedrockService::class)
 > $response = $service->generate('test')
-```
+```text
 
 ---
 
@@ -300,10 +302,12 @@ php artisan tinker
 - Passes configuration validation tests
 - Is ready for production use with actual AWS connectivity
 
-**The test skip is expected** and indicates the test environment may not have direct AWS access, but the implementation is complete and correct.
+**The test skip is expected** and indicates the test environment may not have direct AWS access, but the implementation
+is complete and correct.
 
 ---
 
 **Last Updated**: January 22, 2026
 **Status**: ✅ Production Ready
 **Test Coverage**: 5/5 tests passing
+

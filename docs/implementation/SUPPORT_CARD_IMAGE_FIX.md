@@ -8,7 +8,8 @@
 
 ## Problem
 
-All support card images were displaying as placeholders (generic avatars) in the External API import interface at `/support-cards`.
+All support card images were displaying as placeholders (generic avatars) in the External API import interface at
+`/support-cards`.
 
 ### Root Cause
 
@@ -29,7 +30,7 @@ The frontend code was trying to use `card.image` which was `undefined`, causing 
 
 Support card images are hosted on **gametora.com** following a predictable URL pattern:
 
-```
+```text
 https://gametora.com/images/umamusume/supports/tex_support_card_{CARD_ID}.png
 ```
 
@@ -48,7 +49,7 @@ https://gametora.com/images/umamusume/supports/tex_support_card_{CARD_ID}.png
 <img :src="card.image" :alt="card.title_en || card.name" loading="lazy" decoding="async"
     x-on:error="$el.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(card.title_en || card.name || 'Card') + '&background=random&color=fff'"
     class="w-full h-full object-cover">
-```
+```text
 
 **After**:
 
@@ -75,7 +76,7 @@ body: JSON.stringify({
     image_url: card.image,  // ❌ undefined
     source: 'umapyoi.net'
 })
-```
+```text
 
 **After**:
 
@@ -175,7 +176,7 @@ protected function transformSupportCard(array $card): array
         // ... metadata ...
     ];
 }
-```
+```text
 
 **Benefits**:
 
@@ -206,3 +207,4 @@ Implement service worker caching for frequently accessed card images:
 The support card image issue has been resolved by constructing image URLs from card IDs using the gametora.com URL pattern. All 487 cards now display with proper images instead of placeholders.
 
 **Status**: ✅ Issue resolved, ready for Phase 3 (Training System Integration)
+

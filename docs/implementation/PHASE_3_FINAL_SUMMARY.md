@@ -98,7 +98,7 @@ Base Bonus = Sum of (Card Rarity Bonus × Limit Break Multiplier)
 Friendship Multiplier = 1.2 if (cards with bond >= 80) >= 3, else 1.0
 Final Bonus = Base Bonus × Friendship Multiplier
 Final Stat Gain = Base Stat Gain × (1 + Final Bonus / 100)
-```
+```text
 
 ### Skill Hint Mechanics
 
@@ -116,7 +116,7 @@ Base Gain: +5 per training
 Low Bond Bonus: +2 if bond < 50
 Max Bond: 100
 Friendship Threshold: 80 (enables 1.2x training multiplier)
-```
+```text
 
 ---
 
@@ -231,7 +231,7 @@ Friendship Threshold: 80 (enables 1.2x training multiplier)
 **Overall Phase 3 Progress**: 50%
 
 | Task | Status | Time Spent | Time Remaining |
-|------|--------|------------|----------------|
+| ---------------------- | ---------- | ---------- | -------------- |
 | Database Setup | ✅ Complete | 30 min | - |
 | Models & Relationships | ✅ Complete | 30 min | - |
 | Service Layer | ✅ Complete | 2 hours | - |

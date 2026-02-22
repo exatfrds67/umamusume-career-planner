@@ -4,7 +4,8 @@ Extend agent capabilities with custom tools and pre-built toolkits.
 
 ## Overview
 
-Tools allow your AI agents to interact with external systems, perform calculations, query databases, call APIs, and execute custom logic. Neuron provides a flexible tool system that integrates seamlessly with agent workflows.
+Tools allow your AI agents to interact with external systems, perform calculations, query databases, call APIs, and
+execute custom logic. Neuron provides a flexible tool system that integrates seamlessly with agent workflows.
 
 ## Creating Custom Tools
 
@@ -31,7 +32,7 @@ protected function tools(): array
             })
     ];
 }
-```
+```text
 
 ## Tool Properties
 
@@ -90,7 +91,7 @@ protected function tools(): array
         CalculatorToolkit::make(),
     ];
 }
-```
+```text
 
 ## Using Tools in Agents
 
@@ -158,7 +159,7 @@ Tool::make('query_users', 'Query user database')
         
         return $query->get()->toArray();
     })
-```
+```text
 
 ### API Call Tool
 
@@ -190,7 +191,7 @@ Connect to Inspector to monitor tool calls in real-time:
 
 ```env
 INSPECTOR_INGESTION_KEY=your_key_here
-```
+```text
 
 This shows:
 
@@ -203,3 +204,4 @@ This shows:
 ---
 
 **Source:** <https://docs.neuron-ai.dev/components/tools>
+

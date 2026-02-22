@@ -120,7 +120,7 @@ Comprehensive test suite with 11 tests:
 
 Comprehensive installation and configuration guide:
 
-- **Prerequisites**: PHP 8.2+, GD extension, Windows/WSL/macOS
+- **Prerequisites**: PHP 8.1+, GD extension, Windows/WSL/macOS
 - **Tesseract Installation**: Step-by-step for Windows, WSL, Linux, macOS
 - **Japanese Language Data**: Manual and automatic installation
 - **Configuration**: Environment variables, platform-specific settings

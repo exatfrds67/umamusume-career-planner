@@ -16,7 +16,8 @@
 
 - **Error**: `characterWizard is not defined`, `formData is not defined`, `currentStep is not defined`, etc.
 - **Impact**: The entire character creation wizard was non-functional
-- **Root Cause**: The `resources/js/pages/characters/create.js` file existed but was not imported in `resources/js/app.js`
+- **Root Cause**: The `resources/js/pages/characters/create.js` file existed but was not imported in
+`resources/js/app.js`
 
 ### 3. Missing filteredTrainees Function
 
@@ -30,7 +31,7 @@
 
 ```bash
 npm install @alpinejs/collapse
-```
+```text
 
 Added to `package.json`:
 
@@ -49,7 +50,7 @@ import "./pages/characters/create.js";
 // Register Alpine plugins early
 Alpine.plugin(persist);
 Alpine.plugin(collapse);
-```
+```text
 
 ### 3. Added filteredTrainees Function
 
@@ -118,7 +119,7 @@ selectTrainee(trainee) {
 
 ```bash
 npm run build
-```
+```text
 
 ## Verification
 
@@ -179,3 +180,4 @@ npm run build
 - Alpine.js Collapse Plugin: <https://alpinejs.dev/plugins/collapse>
 - Character Creation Wizard: `resources/views/characters/create.blade.php`
 - Character Controller: `app/Http/Controllers/CharacterController.php`
+

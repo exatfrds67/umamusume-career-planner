@@ -476,7 +476,7 @@ if ($this->mcpClient->isStrandsAgentsAvailable()) {
 
 The MCP-Powered Subagent System has been successfully implemented with comprehensive functionality, robust error handling, and extensive test coverage. The system provides a solid foundation for advanced AI-powered career planning assistance and is ready for integration with actual MCP agent implementations.
 
-The implementation follows Laravel 12 best practices, uses Pest v4 for testing, and maintains consistency with the existing codebase architecture. All acceptance criteria have been met, and the system is production-ready with proper fallback mechanisms for scenarios where MCP servers are unavailable.
+The implementation follows Laravel 12 best practices, uses Pest v3 for testing, and maintains consistency with the existing codebase architecture. All acceptance criteria have been met, and the system is production-ready with proper fallback mechanisms for scenarios where MCP servers are unavailable.
 
 ---
 

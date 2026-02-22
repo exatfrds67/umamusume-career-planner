@@ -157,7 +157,7 @@ If the page still doesn't load:
 
 3. **Console Errors**: Still seeing `dragOverSlot is not defined` errors, which suggests some HTML elements are trying to access properties before Alpine has fully initialized them.
 
-## Files Modified
+## Files Modified (Detailed Changes)
 
 1. `resources/views/support-cards/deck-builder.blade.php`
    - Removed inline `window.deckBuilder` function (300+ lines)
@@ -168,7 +168,7 @@ If the page still doesn't load:
 2. `DECK_BUILDER_FIX_SUMMARY.md`
    - Documented the complete fix process
 
-## Next Steps
+## Next Steps (Remaining Work)
 
 ### High Priority
 

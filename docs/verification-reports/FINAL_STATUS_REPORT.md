@@ -280,7 +280,7 @@ php artisan test --filter=SupportDeck
 ### Internal IDs for Remaining Cards
 
 | Card | Internal ID |
-|------|-------------|
+| ------ | ------------- |
 | Biko Pegasus | `GLOBAL_SC_BIKOPEGASUS_CARROT` |
 | Rice Shower | `GLOBAL_SC_RICESHOWER_HAPPINESS` |
 | Riko Kashimoto | `GLOBAL_SC_RIKOKASHIMOTO_PLANNED` |
@@ -372,7 +372,7 @@ of their respective owners.
 ## 📈 Performance Metrics
 
 | Metric | Target | Actual | Status |
-|--------|--------|--------|--------|
+| -------- | -------- | -------- | -------- |
 | Page Load | < 500ms | ~300ms | ✅ |
 | Deck Validation | < 100ms | ~50ms | ✅ |
 | Synergy Calc | < 200ms | ~100ms | ✅ |
@@ -438,7 +438,7 @@ of their respective owners.
 ## 🏆 Success Criteria
 
 | Criteria | Target | Actual | Status |
-|----------|--------|--------|--------|
+| ---------- | -------- | -------- | -------- |
 | Verified Cards | 15 | 15 | ✅ |
 | Test Coverage | > 80% | 100% | ✅ |
 | Page Load | < 500ms | ~300ms | ✅ |
@@ -484,4 +484,4 @@ For questions or issues:
 
 **Project Status**: ✅ **COMPLETE & OPERATIONAL**
 
-**End of Report**
+End of Report

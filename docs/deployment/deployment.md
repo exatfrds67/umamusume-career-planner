@@ -94,12 +94,12 @@ stdout_logfile=/path/to/project/storage/logs/worker.log
 ## 6. Maintenance
 
 - **Backup**: Schedule daily backups of MySQL and `.env` file.
-  - **Updates**:
+- **Updates**:
 
-        ```bash
-        git pull
-        composer install --no-dev
-        php artisan migrate --force
-        npm run build
-        php artisan queue:restart
-        ```
+    ```bash
+    git pull
+    composer install --no-dev
+    php artisan migrate --force
+    npm run build
+    php artisan queue:restart
+    ```

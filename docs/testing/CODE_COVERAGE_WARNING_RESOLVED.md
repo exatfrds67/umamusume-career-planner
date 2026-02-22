@@ -10,7 +10,7 @@
 
 When running tests, PHPUnit displayed this warning:
 
-```
+```text
 WARN  No code coverage driver available
 ```
 
@@ -53,7 +53,7 @@ WARN  No code coverage driver available
         <text outputFile="coverage/coverage.txt" showUncoveredFiles="true" showOnlySummary="false"/>
     </report>
 </coverage>
-```
+```text
 
 **After:**
 
@@ -82,15 +82,17 @@ WARN  No code coverage driver available
 
 ```powershell
 php artisan test --filter=Tesseract --compact
-```
+```text
 
 **Result:**
 
 ```
+
    PASS  Tests\Unit\Services\TesseractServiceTest
   ✓ 11 tests passed (33 assertions)
   Duration: 10.60s
-```
+
+```text
 
 **No warnings!** ✅
 
@@ -102,7 +104,7 @@ php artisan test tests/Unit/Services/TesseractServiceTest.php tests/Feature/Serv
 
 **Result:**
 
-```
+```text
    PASS  Tests\Unit\Services\TesseractServiceTest
   ✓ 11 tests passed
 
@@ -270,7 +272,7 @@ If you need code coverage in the future, you have two options:
 
 ```powershell
 php artisan test --compact
-```
+```text
 
 ### Run Specific Test File
 
@@ -282,7 +284,7 @@ php artisan test tests/Unit/Services/TesseractServiceTest.php --compact
 
 ```powershell
 php artisan test --filter=Tesseract --compact
-```
+```text
 
 ### Run Tests with Coverage (requires PCOV/Xdebug)
 
@@ -294,7 +296,8 @@ php artisan test --coverage
 
 ## Conclusion
 
-The code coverage warning has been successfully resolved by disabling the coverage configuration in `phpunit.xml`. Tests now run cleanly without warnings, and the system is fully operational.
+The code coverage warning has been successfully resolved by disabling the coverage configuration in `phpunit.xml`. Tests
+now run cleanly without warnings, and the system is fully operational.
 
 **Resolution Time:** ~5 minutes  
 **Test Verification:** Successful  

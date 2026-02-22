@@ -229,7 +229,7 @@ Stat Gain = (Base + StatBonus)
 
 **Grade Scale** (Source: [Game8 Aptitude Guide](https://game8.co/games/Umamusume-Pretty-Derby/archives/537119), [Steam Community](https://steamcommunity.com), [umamusume.gg](https://umamusume.gg)):
 
-**G → F → E → D → C → B → A → S**
+#### Grade Progression: G → F → E → D → C → B → A → S
 
 > **VERIFIED (Jan 2026)**: S-rank is the maximum aptitude grade. SS does NOT exist in the current game version. A-rank is the baseline with no bonus/penalty. Only S-rank provides positive bonuses; all grades below A incur penalties.
 
@@ -768,21 +768,21 @@ Hierarchy of ranks based on total fan count. Reaching these thresholds unlocks h
 
 ### 14.1 Tier 1 Sources (Highly Authoritative)
 
-**UmaReference.com**
+#### UmaReference.com
 
 - Technical formulas with exact calculations
 - Precise percentage modifiers
 - Mathematical breakdowns
 - **Reliability**: Excellent for mechanics
 
-**Game8.co**
+#### Game8.co
 
 - Comprehensive English guides
 - Regular updates (January 2026)
 - Detailed mechanics explanations
 - **Reliability**: Excellent for general mechanics
 
-**GameTora.com**
+#### GameTora.com
 
 - Community-maintained tools
 - Race mechanics handbook
@@ -791,14 +791,14 @@ Hierarchy of ranks based on total fan count. Reaching these thresholds unlocks h
 
 ### 14.2 Tier 2 Sources (Reliable)
 
-**Deltia's Gaming**
+#### Deltia's Gaming
 
 - Detailed guides and walkthroughs
 - Condition lists and effects
 - Strategy recommendations
 - **Reliability**: Good for gameplay strategies
 
-**OfZenAndComputing.com**
+#### OfZenAndComputing.com
 
 - Recent guides (November 2025)
 - Practical advice
@@ -807,14 +807,14 @@ Hierarchy of ranks based on total fan count. Reaching these thresholds unlocks h
 
 ### 14.3 Tier 3 Sources (Reference Only)
 
-**umapyoi.net**
+#### umapyoi.net
 
 - API provider, not mechanics guide
 - Character data and news
 - Under construction
 - **Reliability**: Good for character data, limited for mechanics
 
-**UmamusumeDB.com**
+#### UmamusumeDB.com
 
 - Tools and calculators
 - Limited documentation visible
@@ -903,7 +903,7 @@ This research compiled authoritative information from 8+ primary sources to veri
 
 ---
 
-**Document Control**
+## Document Control
 
 - **Version**: 1.0
 - **Date**: January 2026

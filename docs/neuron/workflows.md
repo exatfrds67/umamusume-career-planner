@@ -4,11 +4,14 @@ Build complex multi-agent systems with event-driven orchestration.
 
 ## Overview
 
-Workflows provide an event-driven, node-based way to control execution flow in complex AI applications. They enable you to build sophisticated multi-agent systems with human-in-the-loop capabilities, streaming updates, and resumable execution.
+Workflows provide an event-driven, node-based way to control execution flow in complex AI applications. They enable you
+to build sophisticated multi-agent systems with human-in-the-loop capabilities, streaming updates, and resumable
+execution.
 
 ## What is a Workflow?
 
-A workflow divides your application into **Nodes** triggered by **Events**. Nodes can be anything from a single line of code to a complex agent. By combining nodes and events, you create maintainable flows that encapsulate logic clearly.
+A workflow divides your application into **Nodes** triggered by **Events**. Nodes can be anything from a single line of
+code to a complex agent. By combining nodes and events, you create maintainable flows that encapsulate logic clearly.
 
 Think of it as n8n or Zapier, but at the code level with full programmatic control.
 
@@ -86,7 +89,7 @@ class MyWorkflow extends Workflow
         ];
     }
 }
-```
+```text
 
 ## Nodes
 
@@ -127,7 +130,7 @@ $event = new Event('node_name', [
 // Access event data
 $value = $event->getData('key');
 $allData = $event->getAllData();
-```
+```text
 
 ## Human-in-the-Loop
 
@@ -170,7 +173,7 @@ $state = $workflow->resume([
     'approved' => true,
     'comments' => 'Looks good'
 ]);
-```
+```text
 
 ## Streaming Updates
 
@@ -226,7 +229,7 @@ Node::make('summarize')
             'summary' => $summary->getContent()
         ]);
     })
-```
+```text
 
 ## Conditional Branching
 
@@ -271,7 +274,7 @@ Node::make('iterate')
             'processed' => $processed
         ]);
     })
-```
+```text
 
 ## Monitoring Workflows
 
@@ -335,8 +338,9 @@ class DocumentWorkflow extends Workflow
         ];
     }
 }
-```
+```text
 
 ---
 
 **Source:** <https://docs.neuron-ai.dev/workflow/getting-started>
+

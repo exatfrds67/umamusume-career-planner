@@ -1,6 +1,7 @@
 # Detailed Fix Plan: Character Creation Wizard UI/UX Corrections
 
-**Document Purpose**: Specific code changes needed to resolve character creation wizard UI/UX issues per WF-002 spec and WCAG 2.2 AA compliance.
+**Document Purpose**: Specific code changes needed to resolve character creation wizard UI/UX issues per WF-002 spec and
+WCAG 2.2 AA compliance.
 
 ---
 
@@ -18,7 +19,7 @@
         <!-- content -->
     </div>
 </div>
-```
+```text
 
 ### Fixed Code (CORRECT)
 
@@ -58,7 +59,7 @@
 
 ## Fix 2: Add Proper Label Associations
 
-### Current Code (INCORRECT)
+### Current Code - Label Associations
 
 ```blade
 <div class="flex-1">
@@ -66,7 +67,7 @@
     <input type="text" x-model="filters.query" placeholder="Search trainee"
         class="form-input">
 </div>
-```
+```text
 
 ### Fixed Code (CORRECT)
 
@@ -90,7 +91,7 @@
 </div>
 ```
 
-### Changes Made
+### Changes Made - Label Associations
 
 - Added `id="trainee-search"` to input
 - Added `for="trainee-search"` to label (explicit association)
@@ -104,12 +105,12 @@
 
 ## Fix 3: Add Required Field Indicators (Accessible)
 
-### Current Code (INCORRECT)
+### Current Code - Required Fields
 
 ```blade
 <label for="name" class="form-label">Character Name <span class="text-red-500">*</span></label>
 <input id="name" x-model="formData.name" class="form-input" required>
-```
+```text
 
 ### Fixed Code (CORRECT)
 
@@ -129,7 +130,7 @@
     @invalid="onFieldInvalid($event)">
 ```
 
-### Changes Made
+### Changes Made - Required Fields
 
 - Added `aria-label="required"` to asterisk (screen reader reads it)
 - Added text "(required)" for visual redundancy
@@ -175,7 +176,7 @@ button:focus,
     outline: 3px solid var(--color-primary-500);
     outline-offset: 2px;
 }
-```
+```text
 
 ### Update Trainee Selection Buttons
 
@@ -193,7 +194,7 @@ button:focus,
 </button>
 ```
 
-### Changes Made
+### Changes Made - Focus Indicators
 
 - Added explicit focus-visible outline (3px for visibility)
 - Added outline-offset (visual separation)
@@ -205,13 +206,13 @@ button:focus,
 
 ## Fix 5: Replace Color-Only Indicators with Multi-Modal Feedback
 
-### Current Code (INCORRECT)
+### Current Code - Color Indicators
 
 ```blade
 :class="formData.trainee && formData.trainee.id === trainee.id ?
     'border-primary-500 bg-primary-50 dark:bg-primary-900/20' :
     'border-gray-200 dark:border-gray-700'"
-```
+```text
 
 ### Fixed Code (CORRECT)
 
@@ -244,7 +245,7 @@ button:focus,
 </div>
 ```
 
-### Changes Made
+### Changes Made - Multi-Modal Feedback
 
 - Added checkmark icon + "Selected" text label (not just color)
 - Added ring around selected state (multiple visual cues)
@@ -314,7 +315,7 @@ button:focus,
 <main class="lg:ml-56">
     <!-- Existing wizard content -->
 </main>
-```
+```text
 
 ### Changes Made
 
@@ -358,7 +359,7 @@ button:focus,
 </div>
 ```
 
-### Changes Made
+### Changes Made - Mobile Progress Bar
 
 - Added progress bar visual on mobile
 - Used proper `<div role="progressbar">` semantics
@@ -421,7 +422,7 @@ nextStep() {
         }, 0);
     }
 }
-```
+```text
 
 ### Add Error Display Component
 
@@ -449,7 +450,7 @@ nextStep() {
 </template>
 ```
 
-### Changes Made
+### Changes Made - Step Validation
 
 - Added step-specific validation logic
 - Added validation error messages (not just blocking)

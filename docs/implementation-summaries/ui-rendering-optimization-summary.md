@@ -7,7 +7,8 @@
 
 ## Overview
 
-Optimized the Advisory Panel component for smooth interactions and fast rendering. Implemented performance improvements across Alpine.js reactivity, Livewire hydration, and DOM manipulation patterns.
+Optimized the Advisory Panel component for smooth interactions and fast rendering. Implemented performance improvements
+across Alpine.js reactivity, Livewire hydration, and DOM manipulation patterns.
 
 ## Optimizations Implemented
 
@@ -31,7 +32,7 @@ this.$watch("activeSection", () => {
 this.$watch("activeSection", () => {
     this.debouncedUpdateFocusable();
 });
-```
+```text
 
 #### Optimized DOM Queries
 
@@ -74,7 +75,7 @@ requestAnimationFrame(() => {
         item.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
 });
-```
+```text
 
 #### Memory Management
 
@@ -140,7 +141,7 @@ public function render(): View
 {{-- After: With wire:key --}}
 @foreach ($criticalAlerts as $alert)
     <div wire:key="alert-{{ $alert->id ?? $alert->type->value }}" class="...">
-```
+```text
 
 #### Loading States
 
@@ -173,18 +174,18 @@ public function render(): View
 
 ### Measured Performance Gains
 
-| Operation | Before | After | Improvement |
-|-----------|--------|-------|-------------|
-| Panel Toggle | ~100ms | <50ms | 50%+ faster |
-| Section Toggle | ~500ms | <300ms | 40%+ faster |
-| Dismissal | ~150ms | <100ms | 33%+ faster |
+| Operation               | Before        | After    | Improvement    |
+| ----------------------- | ------------- | -------- | -------------- |
+| Panel Toggle            | ~100ms        | <50ms    | 50%+ faster    |
+| Section Toggle          | ~500ms        | <300ms   | 40%+ faster    |
+| Dismissal               | ~150ms        | <100ms   | 33%+ faster    |
 | Initial Render (closed) | Service calls | No calls | 100% reduction |
 
 ### Test Results
 
 All performance tests passing:
 
-```
+```text
 ✓ panel does not fetch data when closed
 ✓ dismissal updates are efficient
 ✓ toggle operations are fast
@@ -262,11 +263,13 @@ Optimizations tested and working in:
 
 ## Conclusion
 
-Successfully optimized UI rendering for the Advisory Panel component. All interactions are now smooth and responsive, meeting the performance targets specified in the design document:
+Successfully optimized UI rendering for the Advisory Panel component. All interactions are now smooth and responsive,
+meeting the performance targets specified in the design document:
 
 - ✅ Panel opens within 500ms
 - ✅ Interactions complete within 300ms
 - ✅ No unnecessary re-renders
 - ✅ Memory efficient
 
-The optimizations provide a solid foundation for future enhancements while maintaining code quality and accessibility standards.
+The optimizations provide a solid foundation for future enhancements while maintaining code quality and accessibility
+standards.

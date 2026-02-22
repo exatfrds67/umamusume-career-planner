@@ -9,7 +9,8 @@
 
 ## Executive Summary
 
-Conducted a comprehensive authorization audit across the entire application and fixed all authorization checks to ensure admin users have full access to all resources. The fix involved:
+Conducted a comprehensive authorization audit across the entire application and fixed all authorization checks to ensure
+admin users have full access to all resources. The fix involved:
 
 1. Adding admin bypass logic to all policies
 2. Replacing manual authorization checks with policy-based authorization
@@ -59,7 +60,7 @@ Conducted a comprehensive authorization audit across the entire application and 
 if ($career->character?->user_id !== Auth::id()) {
     abort(403, 'Unauthorized access to this career report.');
 }
-```
+```text
 
 **After**:
 
@@ -87,7 +88,7 @@ if (! $isAdmin && $character->user_id !== auth()->id()) {
         'message' => 'Character not found',
     ], 404);
 }
-```
+```text
 
 **After**:
 
@@ -114,7 +115,7 @@ if (! $isAdmin && $character->user_id !== Auth::id()) {
         'message' => 'Forbidden',
     ], 403);
 }
-```
+```text
 
 **After**:
 
@@ -155,7 +156,7 @@ private function verifyCareerOwnership(Career $career): void
         abort(403, 'Unauthorized');
     }
 }
-```
+```text
 
 **After**:
 
@@ -182,7 +183,7 @@ Gate::define('viewTelescope', function ($user) {
         //
     ]);
 });
-```
+```text
 
 **After**:
 
@@ -213,7 +214,7 @@ Gate::define('viewHorizon', function ($user = null) {
         //
     ]);
 });
-```
+```text
 
 **After**:
 
@@ -236,16 +237,16 @@ Gate::define('viewHorizon', function ($user = null) {
 
 ### Total Authorization Points Found: 8 Controllers/Providers
 
-| File | Authorization Points | Status |
-|------|---------------------|--------|
-| CharacterPolicy | 7 methods | ✅ Already had admin bypass |
-| CareerPolicy | 7 methods | ✅ Created with admin bypass |
-| CareerReportController | 9 methods | ✅ Fixed all manual checks |
-| SkillManagementController | 2 methods | ✅ Fixed all manual checks |
-| Api/V1/CharacterController | 3 methods | ✅ Fixed all manual checks |
-| Api/V1/CareerController | 17 methods | ✅ Fixed via helper method |
-| TelescopeServiceProvider | 1 gate | ✅ Added admin bypass |
-| HorizonServiceProvider | 1 gate | ✅ Added admin bypass |
+| File                       | Authorization Points | Status                        |
+| -------------------------- | -------------------- | ----------------------------- |
+| CharacterPolicy            | 7 methods            | Already had admin bypass      |
+| CareerPolicy               | 7 methods            | Created with admin bypass     |
+| CareerReportController     | 9 methods            | Fixed all manual checks       |
+| SkillManagementController  | 2 methods            | Fixed all manual checks       |
+| Api/V1/CharacterController | 3 methods            | Fixed all manual checks       |
+| Api/V1/CareerController    | 17 methods           | Fixed via helper method       |
+| TelescopeServiceProvider   | 1 gate               | Added admin bypass            |
+| HorizonServiceProvider     | 1 gate               | Added admin bypass            |
 
 **Total Methods Fixed**: 47 authorization points
 
@@ -257,7 +258,7 @@ Gate::define('viewHorizon', function ($user = null) {
 
 ```bash
 php artisan test --filter=Policy --compact
-```
+```text
 
 **Results**: ✅ ALL TESTS PASSED
 
@@ -337,7 +338,7 @@ public function before(User $user, string $ability): ?bool
 
     return null;  // Continue to specific authorization check
 }
-```
+```text
 
 **Flow**:
 
@@ -375,7 +376,7 @@ To verify admin access is working:
    ```php
    $admin = User::factory()->create(['is_admin' => true]);
    Auth::login($admin);
-   ```
+   ```text
 
 2. **Test Character Access**:
 
@@ -395,7 +396,7 @@ To verify admin access is working:
    $response = $this->post(route('characters.toggle-pin', $otherUserCharacter));
    $response->assertRedirect();
    $response->assertSessionHas('success');
-   ```
+   ```text
 
 4. **Test Career Access**:
 
@@ -436,7 +437,7 @@ public function isAdmin(): bool
 {
     return (bool) ($this->is_admin ?? false);
 }
-```
+```text
 
 ---
 
@@ -488,4 +489,6 @@ If these changes need to be reverted:
 ✅ **All tests passing**  
 ✅ **Code properly formatted**
 
-The application now has a consistent, policy-based authorization system that properly handles admin users while maintaining security for regular users.
+The application now has a consistent, policy-based authorization system that properly handles admin users while
+maintaining security for regular users.
+

@@ -2,7 +2,8 @@
 
 ## Overview
 
-The Model Context Protocol (MCP) allows Neuron AI agents to connect to pre-built tools and integrations without implementing them manually. This guide explains how to configure and use MCP connectors with your agents.
+The Model Context Protocol (MCP) allows Neuron AI agents to connect to pre-built tools and integrations without
+implementing them manually. This guide explains how to configure and use MCP connectors with your agents.
 
 ## Table of Contents
 
@@ -16,7 +17,8 @@ The Model Context Protocol (MCP) allows Neuron AI agents to connect to pre-built
 
 ## What is MCP?
 
-Model Context Protocol (MCP) is a standard protocol that allows AI agents to access external tools and data sources. Instead of implementing custom tools for every data source, you can connect to MCP servers that provide pre-built tools.
+Model Context Protocol (MCP) is a standard protocol that allows AI agents to access external tools and data sources.
+Instead of implementing custom tools for every data source, you can connect to MCP servers that provide pre-built tools.
 
 ### Benefits
 
@@ -42,7 +44,7 @@ Set the following environment variable in your `.env` file:
 
 ```env
 NEURON_MCP_ENABLED=true
-```
+```text
 
 ### Configuration Structure
 
@@ -58,7 +60,8 @@ NEURON_MCP_ENABLED=true
 
 ## Local MCP Servers
 
-Local MCP servers run as command-line processes on the same machine. They use standard input/output (stdio) for communication.
+Local MCP servers run as command-line processes on the same machine. They use standard input/output (stdio) for
+communication.
 
 ### Configuration Example
 
@@ -77,7 +80,7 @@ Local MCP servers run as command-line processes on the same machine. They use st
         ],
     ],
 ],
-```
+```text
 
 ### Environment Variables
 
@@ -92,9 +95,9 @@ NEURON_MCP_FILESYSTEM_ENABLED=true
 NEURON_MCP_FETCH_ENABLED=true
 ```
 
-### Available Local Servers
+## Available Local Servers
 
-#### Memory Server
+### Memory Server
 
 Provides knowledge graph and persistent memory capabilities.
 
@@ -134,9 +137,10 @@ Provides HTTP client for fetching external data.
 
 ## Remote MCP Servers
 
-Remote MCP servers are accessed via HTTP/HTTPS URLs. They support Server-Sent Events (SSE) for asynchronous communication.
+Remote MCP servers are accessed via HTTP/HTTPS URLs. They support Server-Sent Events (SSE) for asynchronous
+communication.
 
-### Configuration Example
+### Remote Configuration Example
 
 ```php
 'remote_servers' => [
@@ -153,7 +157,7 @@ Remote MCP servers are accessed via HTTP/HTTPS URLs. They support Server-Sent Ev
         ],
     ],
 ],
-```
+```text
 
 ### Environment Variables
 
@@ -168,7 +172,7 @@ NEURON_MCP_UMAPYOI_URL=https://api.umapyoi.net/mcp
 NEURON_MCP_UMAPYOI_TOKEN=your-api-token-here
 ```
 
-### Transport Options
+## Transport Options
 
 - **stdio**: Standard input/output (local servers only)
 - **sse**: Server-Sent Events (recommended for remote servers)
@@ -209,7 +213,7 @@ class TrainingAdvisorAgent extends Agent
         return $connectors;
     }
 }
-```
+```text
 
 ### Manual Connector Creation
 
@@ -270,7 +274,7 @@ Control which tools from MCP servers are available to your agents.
     'exclude' => [],
     'only' => ['get_character_data', 'get_skill_data'],
 ],
-```
+```text
 
 ### Programmatic Filtering
 
@@ -338,7 +342,7 @@ NEURON_MCP_RETRY_DELAY=1000
 
    ```env
    NEURON_MCP_MEMORY_ENABLED=true
-   ```
+   ```text
 
 3. Check server configuration:
 
@@ -350,7 +354,7 @@ NEURON_MCP_RETRY_DELAY=1000
 
    ```php
    $enabled = McpConnectorFactory::isServerEnabled('memory');
-   ```
+   ```text
 
 ### Command Not Found (Local Servers)
 
@@ -368,7 +372,7 @@ NEURON_MCP_RETRY_DELAY=1000
 
    ```bash
    which npx
-   ```
+   ```text
 
 3. Update command in configuration:
 
@@ -386,7 +390,7 @@ NEURON_MCP_RETRY_DELAY=1000
 
    ```env
    NEURON_MCP_UMAPYOI_TOKEN=your-token-here
-   ```
+   ```text
 
 2. Check token validity:
 
@@ -409,7 +413,7 @@ NEURON_MCP_RETRY_DELAY=1000
        'exclude' => [],
        'only' => [], // Empty = all tools
    ],
-   ```
+   ```text
 
 2. Verify tool name:
 
@@ -423,7 +427,7 @@ NEURON_MCP_RETRY_DELAY=1000
 
    ```php
    dd(config('neuron.mcp.global_tools'));
-   ```
+   ```text
 
 ### Connection Timeout
 
@@ -441,7 +445,7 @@ NEURON_MCP_RETRY_DELAY=1000
 
    ```bash
    ping api.umapyoi.net
-   ```
+   ```text
 
 3. Verify server is running:
 
@@ -506,7 +510,7 @@ class TrainingAdvisorAgent extends Agent
             . "Use the umapyoi server to get current character and skill data.";
     }
 }
-```
+```text
 
 ### Custom MCP Server Configuration
 

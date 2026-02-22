@@ -2,7 +2,8 @@
 
 ## Overview
 
-Implemented fresh seeding support for the `UcpSkillsSeeder` class with proper database driver handling for both MySQL and SQLite. This allows developers to perform a clean reset of the skills table before seeding.
+Implemented fresh seeding support for the `UcpSkillsSeeder` class with proper database driver handling for both MySQL
+and SQLite. This allows developers to perform a clean reset of the skills table before seeding.
 
 ## Changes Made
 
@@ -103,7 +104,7 @@ $seeder->fresh()->run();
 // Normal seeding - upserts without truncation
 $seeder = new UcpSkillsSeeder();
 $seeder->run();
-```
+```text
 
 ### Artisan Command Usage
 
@@ -124,12 +125,12 @@ php artisan db:seed --class=UcpSkillsSeeder
 
 ## Database Driver Compatibility
 
-| Driver | Method | Foreign Key Handling |
-|--------|--------|---------------------|
-| MySQL | `TRUNCATE` | `SET FOREIGN_KEY_CHECKS=0/1` |
-| SQLite | `DELETE` + sequence reset | `PRAGMA foreign_keys = OFF/ON` |
-| PostgreSQL | `DELETE` (fallback) | Standard delete |
-| SQL Server | `DELETE` (fallback) | Standard delete |
+| Driver     | Method                    | Foreign Key Handling           |
+| ---------- | ------------------------- | ------------------------------ |
+| MySQL      | `TRUNCATE`                | `SET FOREIGN_KEY_CHECKS=0/1`   |
+| SQLite     | `DELETE` + sequence reset | `PRAGMA foreign_keys = OFF/ON` |
+| PostgreSQL | `DELETE` (fallback)       | Standard delete                |
+| SQL Server | `DELETE` (fallback)       | Standard delete                |
 
 ## Error Handling
 

@@ -11,13 +11,13 @@
 
 ## Table of Contents
 
-1. [URA Finale Scenario Overview](#ura-finale-scenario-overview)
-2. [Skill System Deep Dive](#skill-system-deep-dive)
-3. [Stamina Management](#stamina-management)
-4. [Training Mechanics & Formulas](#training-mechanics--formulas)
-5. [Support Card System](#support-card-system)
-6. [Race System & Mechanics](#race-system--mechanics)
-7. [Inheritance & Factor System](#inheritance--factor-system)
+1. [URA Finale Scenario Overview](#1-ura-finale-scenario-overview)
+2. [Skill System Deep Dive](#2-skill-system-deep-dive)
+3. [Stamina Management](#3-stamina-management)
+4. [Training Mechanics & Formulas](#4-training-mechanics--formulas)
+5. [Support Card System](#5-support-card-system)
+6. [Race System & Mechanics](#6-race-system--mechanics)
+7. [Inheritance & Factor System](#7-inheritance--factor-system)
 
 ---
 
@@ -57,8 +57,7 @@
 **At Facility Level 1** (without support cards or growth bonuses):
 
 | Facility | Primary Stat | Secondary Stats | SP | Energy Cost |
-|----------|-------------|-----------------|----|-----------
-|
+| ---------- | ------------- | ----------------- | ---- | ----------- |
 | Speed | +11 Speed | +6 Power | +4 | -21 |
 | Stamina | +10 Stamina | +6 Guts | +4 | -19 |
 | Power | +9 Power | +6 Stamina | +4 | -20 |

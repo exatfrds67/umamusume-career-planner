@@ -2,7 +2,8 @@
 
 ## Overview
 
-Implemented a comprehensive RAG system to enhance AI chat responses with game-specific knowledge from a curated knowledge base.
+Implemented a comprehensive RAG system to enhance AI chat responses with game-specific knowledge from a curated
+knowledge base.
 
 **Implementation Date**: January 27, 2026  
 **Status**: Complete - All tests passing  
@@ -88,7 +89,7 @@ Created structured markdown documentation for game mechanics:
 
 **Visual Design**:
 
-```
+```text
 [Provider] [Agent] [Knowledge 📚]
 ─────────────────────────────────
 Knowledge sources used:
@@ -137,9 +138,9 @@ OPENAI_API_KEY=sk-...
 
 # Knowledge base path (default: storage/knowledge-base)
 KNOWLEDGE_BASE_PATH=storage/knowledge-base
-```
+```text
 
-### Cache Configuration
+## Cache Configuration
 
 Leverages Laravel's cache system (Redis recommended):
 
@@ -174,7 +175,7 @@ Leverages Laravel's cache system (Redis recommended):
 
 ### Test Results
 
-```
+```text
 Tests:    12 passed (29 assertions)
 Duration: 5.85s
 ```
@@ -220,7 +221,7 @@ Duration: 5.85s
 
    ```bash
    storage/knowledge-base/game-mechanics/new-mechanic.md
-   ```
+   ```text
 
 2. Follow structure:
 
@@ -238,7 +239,7 @@ Duration: 5.85s
 
    ```php
    app(VectorStoreService::class)->clearCache();
-   ```
+   ```text
 
 ### Document Best Practices
 
@@ -303,7 +304,7 @@ $vectorStore->clearCache();
         "training-system.md"
     ]
 }
-```
+```text
 
 ## Next Steps
 
@@ -375,7 +376,9 @@ Log::info('[HybridAI] RAG enrichment', [
 
 ## Conclusion
 
-The RAG system successfully enhances AI responses with curated game knowledge, providing users with accurate, contextual advice grounded in documented mechanics. The implementation is production-ready with comprehensive test coverage, graceful fallbacks, and cost-effective caching.
+The RAG system successfully enhances AI responses with curated game knowledge, providing users with accurate, contextual
+advice grounded in documented mechanics. The implementation is production-ready with comprehensive test coverage,
+graceful fallbacks, and cost-effective caching.
 
 **Key Achievements**:
 

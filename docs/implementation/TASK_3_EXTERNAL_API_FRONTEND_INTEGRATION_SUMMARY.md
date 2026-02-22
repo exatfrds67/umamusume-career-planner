@@ -109,7 +109,7 @@ Implemented full external API integration for character creation at `/characters
 
 Implemented full external API integration for support card management at `/support-cards`.
 
-#### What Was Implemented
+#### What Was Implemented (Phase 2)
 
 1. **Backend Enhancements**
    - Enhanced `ExternalImportController@importSupportCard`
@@ -149,7 +149,7 @@ Implemented full external API integration for support card management at `/suppo
    - **Implementation**: Updated both external-import partial and index page
    - **Result**: All 487 cards now display with proper images
 
-#### Files Modified
+#### Files Modified (Phase 2)
 
 **Backend:**
 
@@ -168,7 +168,7 @@ Implemented full external API integration for support card management at `/suppo
 - `docs/implementation/PHASE_2_COMPLETE_SUMMARY.md` ✅ Created
 - `docs/implementation/SUPPORT_CARD_IMAGE_FIX.md` ✅ Created
 
-#### Features Delivered
+#### Features Delivered (Phase 2)
 
 ✅ Browse all 487 support cards from external API  
 ✅ Filter by rarity (SSR/SR/R)  
@@ -183,7 +183,7 @@ Implemented full external API integration for support card management at `/suppo
 ✅ Success notifications  
 ✅ Immediate availability in deck builder  
 
-#### User Flow
+#### User Flow (Phase 2)
 
 1. User opens `/support-cards`
 2. User clicks "Import from API" toggle
@@ -247,7 +247,7 @@ Implemented full external API integration for support card management at `/suppo
 
 ### API Endpoints
 
-```
+```text
 GET /api/characters/prefill/search?q={query}&category={category}
 Response: { success: true, data: [...], total: N }
 
@@ -267,7 +267,7 @@ avatar_url VARCHAR(500) NULL
 external_id VARCHAR(50) NULL
 external_source VARCHAR(100) NULL
 imported_at TIMESTAMP NULL
-```
+```text
 
 ### Data Transformation
 

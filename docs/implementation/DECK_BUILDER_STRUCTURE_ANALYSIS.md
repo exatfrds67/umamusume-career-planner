@@ -2,7 +2,7 @@
 
 ## Current Structure (Verified)
 
-```
+```text
 Line 30: <div class="space-y-6" x-data="deckBuilder(@js($deckData), {{ $character->id }})" x-init="...">
     ↓ ALPINE COMPONENT STARTS HERE
     
@@ -74,6 +74,7 @@ The browser is caching the old version of the page. User needs to:
 
 ## Additional Notes
 
-- The Edit Modal was moved from OUTSIDE the Alpine component (after line 451 in old version) to INSIDE (between lines 450-539)
+- The Edit Modal was moved from OUTSIDE the Alpine component (after line 451 in old version) to INSIDE (between lines
+450-539)
 - The grid closing tag was properly placed after the modal
 - All Alpine directives should now work correctly

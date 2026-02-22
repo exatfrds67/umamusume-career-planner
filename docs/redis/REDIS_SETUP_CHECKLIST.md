@@ -32,7 +32,7 @@
   ```powershell
   C:\xampp\apache\bin\httpd.exe -k stop
   C:\xampp\apache\bin\httpd.exe -k start
-  ```
+  ```text
 
 - [ ] Verify installation
 
@@ -50,7 +50,7 @@
   CACHE_STORE=redis
   QUEUE_CONNECTION=redis
   SESSION_DRIVER=redis
-  ```
+  ```text
 
 - [ ] Clear configuration cache:
 
@@ -63,7 +63,7 @@
 
   ```powershell
   php artisan redis:health
-  ```
+  ```text
 
   Expected: Connection successful message
 
@@ -93,7 +93,7 @@
 
   ```powershell
   php artisan test --filter=Redis --compact
-  ```
+  ```text
 
 - [ ] Run FallbackRecovery tests:
 
@@ -105,7 +105,7 @@
 
   ```powershell
   php artisan test --filter=CacheManagement --compact
-  ```
+  ```text
 
 - [ ] Run full test suite:
 
@@ -119,7 +119,7 @@
 
   ```powershell
   php artisan cache:warm
-  ```
+  ```text
 
 - [ ] Verify cache is working:
 
@@ -135,7 +135,7 @@
 
   ```powershell
   wsl bash -c "redis-cli info memory"
-  ```
+  ```text
 
 - [ ] Monitor Redis in real-time:
 
@@ -149,7 +149,7 @@
 
   ```powershell
   wsl bash -c "redis-cli info stats"
-  ```
+  ```text
 
 ## Verification Checklist
 
@@ -167,7 +167,7 @@
 
   ```powershell
   wsl bash -c "redis-cli -h 127.0.0.1 -p 6379 ping"
-  ```
+  ```text
 
   Expected: `PONG`
 
@@ -185,7 +185,7 @@
 
   ```powershell
   php -r "try { $redis = new Redis(); $redis->connect('127.0.0.1', 6379); echo 'Connected'; } catch (Exception $e) { echo 'Failed: ' . $e->getMessage(); }"
-  ```
+  ```text
 
   Expected: `Connected`
 
@@ -203,7 +203,7 @@
 
   ```powershell
   php artisan tinker --execute="echo config('queue.default');"
-  ```
+  ```text
 
   Expected: `redis`
 
@@ -221,7 +221,7 @@
 
   ```powershell
   php artisan redis:health
-  ```
+  ```text
 
 - [ ] Cache operations work
 
@@ -235,7 +235,7 @@
 
   ```powershell
   php artisan test --compact
-  ```
+  ```text
 
 ## Troubleshooting
 

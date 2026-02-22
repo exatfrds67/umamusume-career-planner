@@ -8,7 +8,9 @@
 
 ## Phase Overview
 
-Complete the character creation flow by implementing backend validation, database persistence, and character detail view. This phase bridges the UI wizard (currently complete with 4 steps, all tests passing) with database storage and read views.
+Complete the character creation flow by implementing backend validation, database persistence, and character detail
+view. This phase bridges the UI wizard (currently complete with 4 steps, all tests passing) with database storage and
+read views.
 
 ### Phase Goals
 
@@ -40,9 +42,11 @@ Complete the character creation flow by implementing backend validation, databas
   - Run seeder if needed
   
 - [ ] **1.4**: Verify database schema correctness
-  - runs table: trainee_id (FK), scenario_type (string/enum), starting_stats (JSON), aptitudes (JSON), created_at, updated_at
+  - runs table: trainee_id (FK), scenario_type (string/enum), starting_stats (JSON), aptitudes (JSON), created_at,
+  updated_at
   - factor_inheritances table: id, run_id (FK), factor_id (FK), created_at
-  - support_deck_slots table: id, run_id (FK), support_card_id (FK), slot_type (string: Speed/Stamina/Power/Guts/Wit/Friend), created_at
+  - support_deck_slots table: id, run_id (FK), support_card_id (FK), slot_type (string:
+  Speed/Stamina/Power/Guts/Wit/Friend), created_at
 
 ---
 
@@ -94,7 +98,8 @@ Complete the character creation flow by implementing backend validation, databas
   - Verify all 6 slots are created (error if < 6)
   
 - [ ] **3.4**: Return success response with 201 Created
-  - Response structure: `{ success: true, run_id: 123, character: { name, avatar_url }, redirect_url: '/characters/123' }`
+  - Response structure: `{ success: true, run_id: 123, character: { name, avatar_url }, redirect_url: '/characters/123'
+  }`
   - Status code: 201 Created
   - Include run ID for frontend to redirect to character detail view
 
@@ -203,16 +208,16 @@ Complete the character creation flow by implementing backend validation, databas
 
 ## Key Files to Modify/Create
 
-| File | Status | Purpose |
-|------|--------|---------|
-| app/Http/Requests/StoreCharacterRequest.php | Create | Form validation rules |
-| app/Http/Controllers/CharacterController.php | Modify | store() method implementation |
-| resources/views/characters/show.blade.php | Create | Character detail view template |
-| routes/web.php | Verify | Ensure characters.show route exists |
-| tests/Feature/CharacterCreationTest.php | Modify | Add 5+ new test cases |
-| database/factories/FactorInheritanceFactory.php | Verify/Create | Factory for factor inheritance |
-| database/seeders/FactorInheritanceSeeder.php | Verify | Seed 8 inheritance factors |
-| database/migrations/create_*_table.php | Verify | Schema validation |
+| File                                            | Status        | Purpose                             |
+| ----------------------------------------------- | ------------- | ----------------------------------- |
+| app/Http/Requests/StoreCharacterRequest.php     | Create        | Form validation rules               |
+| app/Http/Controllers/CharacterController.php    | Modify        | store() method implementation       |
+| resources/views/characters/show.blade.php       | Create        | Character detail view template      |
+| routes/web.php                                  | Verify        | Ensure characters.show route exists |
+| tests/Feature/CharacterCreationTest.php         | Modify        | Add 5+ new test cases               |
+| database/factories/FactorInheritanceFactory.php | Verify/Create | Factory for factor inheritance      |
+| database/seeders/FactorInheritanceSeeder.php    | Verify        | Seed 8 inheritance factors          |
+| database/migrations/create_*_table.php          | Verify        | Schema validation                   |
 
 ---
 
@@ -236,7 +241,8 @@ Complete the character creation flow by implementing backend validation, databas
 ## Technical Constraints & Notes
 
 1. **Alpine.js Form Data Structure**
-   - formData object passed to POST contains: name, scenario_type, trainee, parents, factors, stats, aptitudes, supportDeck
+   - formData object passed to POST contains: name, scenario_type, trainee, parents, factors, stats, aptitudes,
+   supportDeck
    - trainee field contains either trainee ID or full trainee object (verify in create.blade.php)
    - Need to handle both cases in controller
 

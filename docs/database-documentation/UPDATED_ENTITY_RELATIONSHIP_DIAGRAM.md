@@ -1,17 +1,17 @@
 # Updated Entity Relationship Diagram
 
-**Database Schema**: 30-Model Implementation (56 Migrations)
-**Updated**: February 22, 2026
+**Database Schema**: 18-Table Implementation
+**Updated**: January 12, 2026
 **Status**: ✅ **VERIFIED AGAINST ACTUAL IMPLEMENTATION**
 
 ## Complete Entity Relationship Diagram
 
-This diagram reflects the actual implemented database structure with all 30 models (core tables shown) and their relationships.
+This diagram reflects the actual implemented database structure with all 18 tables and their relationships.
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────────────┐
 │                           UMAMUSUME CAREER PLANNER DATABASE SCHEMA                  │
-│                          30 Models, 56 Migrations (ucp_ prefix)                     │
+│                                    18 Tables (ucp_ prefix)                          │
 └─────────────────────────────────────────────────────────────────────────────────────┘
 
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
@@ -143,7 +143,7 @@ This diagram reflects the actual implemented database structure with all 30 mode
 ### Primary Relationships
 
 | Parent Table | Child Table | Relationship Type | Foreign Key | Cascade Rule |
-|--------------|-------------|-------------------|-------------|--------------|
+| -------------- | ------------- | ------------------- | ------------- | -------------- |
 | ucp_users | ucp_characters | One-to-Many | user_id | CASCADE |
 | ucp_users | ucp_careers | One-to-Many | user_id | CASCADE |
 | ucp_users | ucp_ai_conversations | One-to-Many | user_id | CASCADE |
@@ -187,7 +187,7 @@ This diagram reflects the actual implemented database structure with all 30 mode
 ### Primary Indexes ✅ **IMPLEMENTED**
 
 | Table | Index Type | Columns | Purpose |
-|-------|------------|---------|---------|
+| ------- | ------------ | --------- | --------- |
 | ucp_characters | Composite | user_id, scenario_type | User character filtering |
 | ucp_characters | Single | uuid | UUID lookups |
 | ucp_careers | Composite | user_id, status | Active career queries |
@@ -211,7 +211,7 @@ This diagram reflects the actual implemented database structure with all 30 mode
 ### Constraint Types ✅ **IMPLEMENTED**
 
 | Constraint Type | Implementation | Coverage |
-|-----------------|----------------|----------|
+| ----------------- | ---------------- | ---------- |
 | **Primary Keys** | Auto-incrementing integers | 100% of tables |
 | **Foreign Keys** | Proper references with cascade rules | 100% of relationships |
 | **Unique Constraints** | Character aptitudes, skill names, UUIDs | Critical uniqueness |
@@ -231,7 +231,7 @@ This diagram reflects the actual implemented database structure with all 30 mode
 
 ---
 
-**Diagram Updated**: February 22, 2026
+**Diagram Updated**: January 12, 2026
 **Verification Status**: ✅ **MATCHES ACTUAL IMPLEMENTATION**
 **Relationship Count**: 25+ properly defined relationships
 **Integrity Status**: ✅ **FULL REFERENTIAL INTEGRITY**

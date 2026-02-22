@@ -6,7 +6,9 @@
 
 ## Overview
 
-Successfully integrated the RaceConditionService into the Neuron RaceStrategyService, completing the condition-aware race strategy system across both AI frameworks (MCP and Neuron). This ensures consistent condition analysis regardless of which AI system is used.
+Successfully integrated the RaceConditionService into the Neuron RaceStrategyService, completing the condition-aware
+race strategy system across both AI frameworks (MCP and Neuron). This ensures consistent condition analysis regardless
+of which AI system is used.
 
 ## Implementation Details
 
@@ -31,7 +33,7 @@ public function __construct(
     private Race $raceModel,
     private Skill $skillModel
 ) {}
-```
+```text
 
 **After:**
 
@@ -63,7 +65,7 @@ public function __construct(
   * Power: 800 (original: 900, -100)
   * Guts: 700 (original: 700, +0)
   * Wit: 600 (original: 600, +0)
-```
+```text
 
 ### Integration Logic
 
@@ -166,7 +168,7 @@ $strategy = $service->getStrategy($characterId, $raceData, $userId);
 // - Performance Score: 92/100
 // - Recommended Skills: ['Rainy Days ◯', 'Wet Conditions ◯']
 // - Effective Stats with penalties applied
-```
+```text
 
 ### Example 2: Strategy with Optimal Conditions
 
@@ -202,7 +204,7 @@ $strategy = $service->getStrategy($characterId, $raceData, $userId);
 
 // Works as before - no condition analysis section in context
 // Backward compatible with existing usage
-```
+```text
 
 ## Agent Context Example
 
@@ -314,9 +316,12 @@ All changes verified against:
 
 ## Conclusion
 
-Phase 7 successfully integrates the RaceConditionService into the Neuron RaceStrategyService, completing the condition-aware race strategy system across both AI frameworks. The integration is seamless, backward compatible, and provides consistent condition analysis regardless of which AI system is used.
+Phase 7 successfully integrates the RaceConditionService into the Neuron RaceStrategyService, completing the
+condition-aware race strategy system across both AI frameworks. The integration is seamless, backward compatible, and
+provides consistent condition analysis regardless of which AI system is used.
 
-Both MCP and Neuron AI systems now provide condition-aware race strategies, ensuring users receive accurate and consistent recommendations.
+Both MCP and Neuron AI systems now provide condition-aware race strategies, ensuring users receive accurate and
+consistent recommendations.
 
 **Status**: Production-ready ✅
 

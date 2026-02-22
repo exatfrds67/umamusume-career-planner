@@ -4,7 +4,9 @@ Interact with LLM providers or extend the framework to implement new ones.
 
 ## Overview
 
-With Neuron you can switch between LLM providers with just one line of code, without any impact on your agent implementation. All providers implement the `AIProviderInterface`, ensuring consistent behavior across different LLM services.
+With Neuron you can switch between LLM providers with just one line of code, without any impact on your agent
+implementation. All providers implement the `AIProviderInterface`, ensuring consistent behavior across different LLM
+services.
 
 ## Supported Providers
 
@@ -23,7 +25,7 @@ protected function provider(): AIProviderInterface
         httpOptions: new HttpClientOptions(timeout: 30),
     );
 }
-```
+```text
 
 ### OpenAI (Responses API)
 
@@ -59,7 +61,7 @@ protected function provider(): AIProviderInterface
         httpOptions: new HttpClientOptions(timeout: 30),
     );
 }
-```
+```text
 
 ### Azure OpenAI
 
@@ -97,7 +99,7 @@ protected function provider(): AIProviderInterface
         httpOptions: new HttpClientOptions(timeout: 30),
     );
 }
-```
+```text
 
 ### Ollama (Local Models)
 
@@ -129,7 +131,7 @@ protected function provider(): AIProviderInterface
         httpOptions: new HttpClientOptions(timeout: 30),
     );
 }
-```
+```text
 
 ### Gemini Vertex AI
 
@@ -153,7 +155,7 @@ protected function provider(): AIProviderInterface
         httpOptions: new HttpClientOptions(timeout: 30),
     );
 }
-```
+```text
 
 ### Mistral
 
@@ -190,7 +192,7 @@ protected function provider(): AIProviderInterface
         ]
     );
 }
-```
+```text
 
 ### Deepseek
 
@@ -224,7 +226,7 @@ protected function provider(): AIProviderInterface
         httpOptions: new HttpClientOptions(timeout: 30),
     );
 }
-```
+```text
 
 ### AWS Bedrock Runtime
 
@@ -255,7 +257,7 @@ protected function provider(): AIProviderInterface
         inferenceConfig: []
     );
 }
-```
+```text
 
 ## Custom HTTP Options
 
@@ -328,7 +330,7 @@ interface AIProviderInterface
      */
     public function structured(string $class, Message|array $messages, int $maxRetry = 1): mixed;
 }
-```
+```text
 
 ### Basic Template
 

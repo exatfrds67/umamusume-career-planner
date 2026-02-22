@@ -70,9 +70,9 @@ REDIS_SESSION_DB=2
 REDIS_QUEUE_CONNECTION=default
 REDIS_QUEUE=default
 REDIS_CACHE_CONNECTION=cache
-```
+```text
 
-### Redis Service Status
+## Redis Service Status
 
 - **Status:** Running
 - **Host:** 127.0.0.1
@@ -114,11 +114,11 @@ REDIS_CACHE_CONNECTION=cache
    php -m | Select-String -Pattern "redis"
    ```
 
-3. **Test Connection**
+1. **Test Connection**
 
    ```powershell
    php artisan redis:health
-   ```
+   ```text
 
 ### After phpredis Installation
 
@@ -142,7 +142,7 @@ REDIS_CACHE_CONNECTION=cache
 
    ```powershell
    php artisan cache:warm
-   ```
+   ```text
 
 ## Quick Start Commands
 
@@ -152,7 +152,7 @@ REDIS_CACHE_CONNECTION=cache
 wsl bash -c "redis-cli ping"
 ```
 
-### After phpredis Installation
+### After phpredis Installation (Quick Commands)
 
 ```powershell
 # Verify extension
@@ -170,7 +170,7 @@ php artisan cache:warm
 
 # Run tests
 php artisan test --compact
-```
+```text
 
 ## Documentation Files
 
@@ -287,3 +287,4 @@ Before considering setup complete:
 - [ ] Redis monitoring shows activity
 
 Good luck with the installation! 🚀
+

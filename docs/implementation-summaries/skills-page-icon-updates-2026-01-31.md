@@ -30,7 +30,7 @@ Updated the skills inventory page to align with official game design patterns by
 Implemented official emoji icons as defined in project documentation:
 
 | Stat | Icon | Color |
-|------|------|-------|
+| --- | --- | --- |
 | Speed | 🏃 | Blue (#3B82F6) |
 | Stamina | 💪 | Green (#22C55E) |
 | Power | ⚡ | Orange (#F97316) |
@@ -45,7 +45,7 @@ Implemented official emoji icons as defined in project documentation:
 <span x-show="skill.skill_type === 'power'">⚡</span>
 <span x-show="skill.skill_type === 'guts'">🔥</span>
 <span x-show="skill.skill_type === 'wisdom'">🧠</span>
-```
+```text
 
 ### 3. Abbreviated Stat Names
 
@@ -54,7 +54,7 @@ Implemented official emoji icons as defined in project documentation:
 Updated `getSkillTypeDisplay()` method to return 3-letter abbreviations:
 
 | Full Name | Abbreviation |
-|-----------|--------------|
+| --- | --- |
 | Speed | SPD |
 | Stamina | STA |
 | Power | POW |
@@ -90,13 +90,13 @@ Aligned stat badge colors with official game design:
 
 ### Before
 
-```
+```text
 [S Grade] [Speed] 💡 120 SP
 ```
 
 ### After
 
-```
+```text
 [S] [🏃 SPD] 120 SP
 ```
 
@@ -175,7 +175,8 @@ Remains unchanged - shows hint levels 0-5 with discount percentages:
 - Level 4 (35% off)
 - Level 5 (40% off)
 
-**Important**: Hint levels are character-specific and depend on the selected Uma Musume's career run progress. The filter only shows skills with hints that the current character has received during their training.
+**Important**: Hint levels are character-specific and depend on the selected Uma Musume's career run progress. The
+filter only shows skills with hints that the current character has received during their training.
 
 #### Rarity Filter
 

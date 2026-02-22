@@ -6,11 +6,15 @@
 
 ## Overview
 
-Fixed the frontend character list and detail pages to properly display character avatar images instead of text initials. The views now correctly check for and display the `avatar_url` field from the database, showing both local images and API images.
+Fixed the frontend character list and detail pages to properly display character avatar images instead of text initials.
+The views now correctly check for and display the `avatar_url` field from the database, showing both local images and
+API images.
 
 ## Problem
 
-The character list and detail pages were displaying text initials (e.g., "SI", "SP", "SM") instead of the actual character images stored in the database. The views were not checking the `avatar_url` field and were only showing placeholder initials.
+The character list and detail pages were displaying text initials (e.g., "SI", "SP", "SM") instead of the actual
+character images stored in the database. The views were not checking the `avatar_url` field and were only showing
+placeholder initials.
 
 ## Solution
 
@@ -30,7 +34,7 @@ Updated the Blade templates to:
 <div class="h-12 w-12 rounded-full bg-linear-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white text-lg font-bold shadow-sm ring-2 ring-white dark:ring-gray-800">
     {{ strtoupper(substr($character->name, 0, 2)) }}
 </div>
-```
+```text
 
 **Grid View - After**:
 
@@ -52,7 +56,7 @@ Updated the Blade templates to:
 <div class="h-16 w-16 rounded-full bg-linear-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white text-xl font-bold shadow-sm ring-2 ring-white dark:ring-gray-800">
     {{ strtoupper(substr($character->name, 0, 2)) }}
 </div>
-```
+```text
 
 **List View - After**:
 
@@ -76,7 +80,7 @@ Updated the Blade templates to:
 <div class="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white dark:border-gray-800 shadow-xl bg-cover bg-center bg-linear-to-br {{ $avatarClass }}"
     aria-label="{{ $character->name }} avatar" role="img">
 </div>
-```
+```text
 
 **After**:
 

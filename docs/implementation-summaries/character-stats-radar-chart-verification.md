@@ -134,7 +134,7 @@ Chrome DevTools MCP has been added to `.kiro/settings/mcp.json` for future autom
     "evaluate_script"
   ]
 }
-```
+```text
 
 **Note**: A browser instance is currently running. To use Chrome DevTools MCP:
 

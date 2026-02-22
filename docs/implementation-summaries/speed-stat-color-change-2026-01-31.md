@@ -6,7 +6,8 @@
 
 ## Overview
 
-Changed the speed stat color from rose/pink to blue across the entire application to improve visual distinction and user experience.
+Changed the speed stat color from rose/pink to blue across the entire application to improve visual distinction and user
+experience.
 
 ## Changes Summary
 

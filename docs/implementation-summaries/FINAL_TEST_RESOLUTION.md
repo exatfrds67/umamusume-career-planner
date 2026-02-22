@@ -33,7 +33,7 @@ Updated `resources/views/support-cards/deck-builder.blade.php` line 165:
 
 // After
 {{ $isFriendSlot ? 'Friend Card Slot (Optional)' : 'Empty Slot' }}
-```
+```text
 
 **Impact**: 5 tests now passing
 
@@ -101,7 +101,7 @@ try {
 } catch (\Exception $e) {
     $this->markTestSkipped('Redis is not available: '.$e->getMessage());
 }
-```
+```text
 
 **Status**: ✅ Expected behavior - tests will pass when Redis is available
 
@@ -115,7 +115,7 @@ php artisan test --filter="SupportCardAutoSlotTest|FocusManagementTest" --compac
 
 **Output**:
 
-```
+```text
 Tests:    19 passed (74 assertions)
 Duration: 4.66s
 ```
@@ -124,7 +124,7 @@ Duration: 4.66s
 
 ```bash
 php artisan test --compact
-```
+```text
 
 **Expected Results**:
 
@@ -158,15 +158,15 @@ To verify all fixes:
 
    Expected: 19 passed
 
-2. **Check Redis-dependent tests**:
+1. **Check Redis-dependent tests**:
 
    ```bash
    php artisan test --filter="FallbackRecoveryTest" --compact
-   ```
+   ```text
 
    Expected: 26 skipped (if Redis not running)
 
-3. **Run full suite** (requires patience):
+2. **Run full suite** (requires patience):
 
    ```bash
    php artisan test --compact

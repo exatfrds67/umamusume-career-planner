@@ -4,7 +4,8 @@ Enforce the Agent output based on the provided schema.
 
 ## Overview
 
-There are many use cases where we need Agents to understand natural language but output in a structured format. One common use-case is extracting data from text to insert into a database or use with some downstream system.
+There are many use cases where we need Agents to understand natural language but output in a structured format. One
+common use-case is extracting data from text to insert into a database or use with some downstream system.
 
 Neuron allows you to enforce structured outputs from agents using PHP type hints and validation attributes.
 
@@ -27,9 +28,10 @@ class Person
         public int $age,
     ) {}
 }
-```
+```text
 
-Neuron generates the corresponding JSON schema from the PHP object to instruct the underlying model about your required data format.
+Neuron generates the corresponding JSON schema from the PHP object to instruct the underlying model about your required
+data format.
 
 ### Using with Agent
 
@@ -64,7 +66,7 @@ class PersonExtractorAgent extends Agent
 $person = PersonExtractorAgent::make()->extract(
     "John Doe is 30 years old"
 );
-```
+```text
 
 ## Two-Layer Validation System
 
@@ -99,7 +101,7 @@ use NeuronAI\StructuredOutput\Validation\StringLength;
 #[NotBlank]
 #[StringLength(min: 2, max: 100)]
 public string $name;
-```
+```text
 
 ## Complex Structures
 
@@ -152,7 +154,7 @@ class Person
         public array $tags = [],
     ) {}
 }
-```
+```text
 
 ### Arrays of Objects
 
@@ -206,13 +208,14 @@ public array $items = [];
  */
 #[ArrayOf([Tag::class, Category::class])]
 public array $items = [];
-```
+```text
 
 ## Retry Mechanism
 
 Since LLMs are not perfectly deterministic, Neuron includes a retry mechanism for validation failures.
 
-By default, Neuron extracts and validates data from the LLM response. If validation errors occur, it automatically retries once, informing the LLM about what went wrong.
+By default, Neuron extracts and validates data from the LLM response. If validation errors occur, it automatically
+retries once, informing the LLM about what went wrong.
 
 ### Customize Retry Count
 
@@ -243,7 +246,7 @@ Property cannot be blank. Accepts `allowNull` flag:
 ```php
 #[NotBlank(allowNull: false)]
 public string $name;
-```
+```text
 
 ### StringLength
 
@@ -261,7 +264,7 @@ Validate number of words in a string:
 ```php
 #[WordsCount(min: 10, max: 500)]
 public string $description;
-```
+```text
 
 ### ArraySize
 
@@ -282,7 +285,7 @@ public int $rating;
 
 #[NotEqualTo(0)]
 public int $quantity;
-```
+```text
 
 **GreaterThan / GreaterThanEqual:**
 
@@ -302,7 +305,7 @@ public int $percentage;
 
 #[LowerThanEqual(5)]
 public int $rating;
-```
+```text
 
 ### InRange
 
@@ -321,7 +324,7 @@ public bool $accepted;
 
 #[IsFalse]
 public bool $rejected;
-```
+```text
 
 ### Nullable
 
@@ -337,7 +340,7 @@ public ?string $middleName;
 ```php
 #[IsJson]
 public string $metadata;
-```
+```text
 
 **URL:**
 
@@ -351,7 +354,7 @@ public string $website;
 ```php
 #[IsEmail]
 public string $email;
-```
+```text
 
 **IP Address:**
 
@@ -370,11 +373,12 @@ Validate array contains specific object types:
  */
 #[ArrayOf([Tag::class, Category::class])]
 public array $items;
-```
+```text
 
 ## Monitoring
 
-Connect your Agent to the [Inspector monitoring dashboard](https://inspector.dev) to see structured output execution flow in real-time, including validation attempts and retries.
+Connect your Agent to the [Inspector monitoring dashboard](https://inspector.dev) to see structured output execution
+flow in real-time, including validation attempts and retries.
 
 ```env
 INSPECTOR_INGESTION_KEY=your_key_here

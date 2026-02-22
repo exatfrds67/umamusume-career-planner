@@ -10,7 +10,9 @@
 
 ## Overview
 
-Implemented a fully accessible, animated critical alert badge component for the AI-Powered Training Advisory System. The badge displays in the navigation header and training screen, showing the count of critical alerts with a pulsing animation to draw user attention.
+Implemented a fully accessible, animated critical alert badge component for the AI-Powered Training Advisory System. The
+badge displays in the navigation header and training screen, showing the count of critical alerts with a pulsing
+animation to draw user attention.
 
 ## Files Created
 
@@ -110,7 +112,7 @@ Implemented a fully accessible, animated critical alert badge component for the 
         <span class="critical-alert-badge">{{ $alertCount > 99 ? '99+' : $alertCount }}</span>
     @endif
 </button>
-```
+```text
 
 ### Animation System
 
@@ -169,14 +171,16 @@ The component integrates with the advisory panel through Alpine.js events:
      @open-advisory-panel.window="panelOpen = true; activeSection = $event.detail.section">
     <!-- Advisory Panel Content -->
 </div>
-```
+```text
 
 ## Testing Results
 
 ```
+
 Tests:    21 passed (62 assertions)
 Duration: 6.11s
-```
+
+```text
 
 ### Test Coverage
 
@@ -210,7 +214,7 @@ Duration: 6.11s
 <x-ai.critical-alert-badge :alert-count="5" size="sm" />
 <x-ai.critical-alert-badge :alert-count="5" size="md" />
 <x-ai.critical-alert-badge :alert-count="5" size="lg" />
-```
+```text
 
 ### Custom Attributes
 
@@ -282,7 +286,8 @@ This component is ready for integration with:
 
 ## Conclusion
 
-The Critical Alert Badge component is fully implemented, tested, and documented. It meets all requirements from the spec including:
+The Critical Alert Badge component is fully implemented, tested, and documented. It meets all requirements from the spec
+including:
 
 - ✅ Pulsing animation for visual attention
 - ✅ Alert count display

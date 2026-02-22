@@ -2,7 +2,8 @@
 
 ## Overview
 
-This document summarizes the Redis integration implementation for the UmamusumeCareerPlanner application, following the specifications in `.kiro/specs/umamusume-career-planner-main/`.
+This document summarizes the Redis integration implementation for the UmamusumeCareerPlanner application, following the
+specifications in `.kiro/specs/umamusume-career-planner-main/`.
 
 ## Implementation Date
 
@@ -109,7 +110,7 @@ January 20, 2026
 
 ## Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                    Windows (XAMPP)                          │
 │  ┌──────────────────────────────────────────────────────┐   │
@@ -137,15 +138,15 @@ January 20, 2026
 
 The following cache tags are configured for efficient invalidation:
 
-| Tag Group | Tags | Purpose |
-|-----------|------|---------|
-| training | training_predictions, training_sessions, training_options | Training-related data |
-| character | character_data, character_stats, character_aptitudes | Character information |
-| skills | skill_data, skill_hints, skill_costs | Skill management |
-| support_cards | support_card_data, support_card_bonuses, deck_compositions | Support card data |
-| external_api | umapyoi_data, umamusumedb_data, meta_data | External API responses |
-| ai | ai_conversations, ai_predictions, ai_recommendations | AI service data |
-| mcp | mcp_servers, mcp_agents, mcp_tools | MCP integration data |
+| Tag Group     | Tags                                                       | Purpose                |
+| ------------- | ---------------------------------------------------------- | ---------------------- |
+| training      | training_predictions, training_sessions, training_options  | Training-related data  |
+| character     | character_data, character_stats, character_aptitudes       | Character information  |
+| skills        | skill_data, skill_hints, skill_costs                       | Skill management       |
+| support_cards | support_card_data, support_card_bonuses, deck_compositions | Support card data      |
+| external_api  | umapyoi_data, umamusumedb_data, meta_data                  | External API responses |
+| ai            | ai_conversations, ai_predictions, ai_recommendations       | AI service data        |
+| mcp           | mcp_servers, mcp_agents, mcp_tools                         | MCP integration data   |
 
 ## Next Steps
 
@@ -158,9 +159,9 @@ Follow the instructions in `docs/REDIS_WSL_SETUP_GUIDE.md`:
 sudo apt update
 sudo apt install redis-server -y
 sudo service redis-server start
-```
+```text
 
-### 2. Install phpredis Extension
+## 2. Install phpredis Extension
 
 1. Download phpredis DLL for PHP 8.4
 2. Copy to `C:\xampp\php\ext\`
@@ -191,7 +192,7 @@ REDIS_SESSION_DB=2
 ```bash
 php artisan config:clear
 php artisan cache:clear
-```
+```text
 
 ### 5. Test Redis Integration
 
@@ -206,7 +207,7 @@ php artisan cache:warm
 php artisan test --filter=RedisIntegrationTest
 ```
 
-### 6. Monitor Redis
+## 6. Monitor Redis
 
 ```bash
 # Real-time monitoring
@@ -217,7 +218,7 @@ redis-cli info
 
 # Check keys
 redis-cli -n 1 keys "*"
-```
+```text
 
 ## Verification Checklist
 
@@ -336,6 +337,7 @@ php artisan tinker
 
 ## Conclusion
 
-The Redis integration is now fully implemented and ready for use. Follow the Next Steps section to complete the setup, and use the Verification Checklist to ensure everything is working correctly.
+The Redis integration is now fully implemented and ready for use. Follow the Next Steps section to complete the setup,
+and use the Verification Checklist to ensure everything is working correctly.
 
 For any issues, refer to the troubleshooting sections in the setup and testing guides.

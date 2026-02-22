@@ -2,7 +2,9 @@
 
 ## Executive Summary
 
-**Root Cause Identified**: The `phpunit.xml` file hardcodes `REDIS_HOST=127.0.0.1` in the `<php>` section, which overrides the `.env` file configuration. Tests are attempting to connect to `127.0.0.1:6379` instead of the WSL IP `172.18.205.249:6379`.
+**Root Cause Identified**: The `phpunit.xml` file hardcodes `REDIS_HOST=127.0.0.1` in the `<php>` section, which
+overrides the `.env` file configuration. Tests are attempting to connect to `127.0.0.1:6379` instead of the WSL IP
+`172.18.205.249:6379`.
 
 **Status**: ✅ Redis is running correctly in WSL and accessible from Windows  
 **Issue**: ❌ Test configuration prevents tests from using the correct Redis host
@@ -18,7 +20,7 @@
 ```bash
 wsl bash -c "redis-cli -h 172.18.205.249 ping"
 # Output: PONG
-```
+```text
 
 **Configuration**:
 
@@ -31,7 +33,7 @@ wsl bash -c "redis-cli -h 172.18.205.249 ping"
 
 ---
 
-### 2. Application Configuration ✅
+## 2. Application Configuration ✅
 
 **`.env` file** (correct):
 
@@ -53,7 +55,7 @@ REDIS_SESSION_DB=2
     'database' => env('REDIS_DB', '0'),
     // ...
 ]
-```
+```text
 
 **Verification**:
 
@@ -76,9 +78,10 @@ config('database.redis.default.host')
 <env name="REDIS_HOST" value="127.0.0.1"/>  <!-- ❌ HARDCODED -->
 <env name="REDIS_PORT" value="6379"/>
 <env name="REDIS_DB" value="15"/>
-```
+```text
 
-**Problem**: PHPUnit's `<env>` directives override environment variables, including those from `.env` files. When tests run:
+**Problem**: PHPUnit's `<env>` directives override environment variables, including those from `.env` files. When tests
+run:
 
 1. PHPUnit loads `phpunit.xml`
 2. Sets `REDIS_HOST=127.0.0.1` (hardcoded value)
@@ -137,7 +140,7 @@ The test correctly tries to connect but fails because it's using `127.0.0.1` ins
 
 <!-- After -->
 <env name="REDIS_HOST" value="172.18.205.249"/>
-```
+```text
 
 **Pros**:
 
@@ -184,7 +187,7 @@ The test correctly tries to connect but fails because it's using `127.0.0.1` ins
 
 <!-- After -->
 <env name="REDIS_HOST" value="${REDIS_HOST}"/>
-```
+```text
 
 **Note**: PHPUnit doesn't support variable substitution in `<env>` tags, so this won't work. Use Option 2 instead.
 
@@ -211,7 +214,7 @@ REDIS_SESSION_DB=15
 <env name="REDIS_DB" value="15"/>
 <env name="REDIS_CACHE_DB" value="15"/>
 <env name="REDIS_SESSION_DB" value="15"/>
-```
+```text
 
 **Pros**:
 
@@ -249,7 +252,7 @@ REDIS_PORT=6379
 REDIS_DB=15
 REDIS_CACHE_DB=15
 REDIS_SESSION_DB=15
-```
+```text
 
 1. **Update `phpunit.xml`** - Remove Redis env overrides:
 
@@ -267,7 +270,7 @@ REDIS_SESSION_DB=15
 
 ```bash
 php artisan config:clear
-```
+```text
 
 1. **Run tests**:
 
@@ -285,7 +288,7 @@ If you just want to run tests immediately without creating `.env.testing`:
 
 ```xml
 <env name="REDIS_HOST" value="172.18.205.249"/>
-```
+```text
 
 **Run tests**:
 
@@ -326,7 +329,7 @@ php artisan test --filter=FallbackRecoveryTest
 
 ```bash
 wsl hostname -I
-```
+```text
 
 **To make WSL IP more stable**, consider:
 
@@ -354,7 +357,7 @@ php artisan test --compact
 
 **Expected Output**:
 
-```
+```text
 PASS  Tests\Feature\FallbackRecoveryTest
 ✓ checks health status of all APIs
 ✓ tracks failure count for APIs
@@ -377,15 +380,16 @@ After implementing the fix, update:
 
 ## Summary
 
-| Component | Status | Issue | Fix |
-|-----------|--------|-------|-----|
-| Redis Server | ✅ Working | None | None |
-| WSL Networking | ✅ Working | Port forwarding limitation | Use WSL IP directly |
-| .env Configuration | ✅ Working | None | None |
-| phpunit.xml | ❌ Broken | Hardcoded 127.0.0.1 | Update to WSL IP or remove |
-| Tests | ❌ Skipped | Can't connect to Redis | Fix phpunit.xml |
+| Component          | Status     | Issue                      | Fix                        |
+| ------------------ | ---------- | -------------------------- | -------------------------- |
+| Redis Server       | ✅ Working | None                       | None                       |
+| WSL Networking     | ✅ Working | Port forwarding limitation | Use WSL IP directly        |
+| .env Configuration | ✅ Working | None                       | None                       |
+| phpunit.xml        | ❌ Broken  | Hardcoded 127.0.0.1        | Update to WSL IP or remove |
+| Tests              | ❌ Skipped | Can't connect to Redis     | Fix phpunit.xml            |
 
-**Action Required**: Update `phpunit.xml` to use WSL IP (`172.18.205.249`) or create `.env.testing` with correct Redis configuration.
+**Action Required**: Update `phpunit.xml` to use WSL IP (`172.18.205.249`) or create `.env.testing` with correct Redis
+configuration.
 
 ---
 
@@ -397,7 +401,7 @@ The project uses `phpredis` extension (correct):
 
 ```env
 REDIS_CLIENT=phpredis
-```
+```text
 
 This is the recommended Redis client for Laravel and provides better performance than `predis`.
 
@@ -419,7 +423,7 @@ Tests use array cache driver (correct):
 
 ```xml
 <env name="CACHE_STORE" value="array"/>
-```
+```text
 
 This is appropriate for testing and doesn't require Redis for cache operations.
 
@@ -427,6 +431,9 @@ This is appropriate for testing and doesn't require Redis for cache operations.
 
 ## Conclusion
 
-The issue is **not** with Redis, WSL, or networking. It's a **configuration issue** in `phpunit.xml` that hardcodes the wrong Redis host. The fix is simple: either update the hardcoded IP or remove it to use `.env` configuration.
+The issue is **not** with Redis, WSL, or networking. It's a **configuration issue** in `phpunit.xml` that hardcodes the
+wrong Redis host. The fix is simple: either update the hardcoded IP or remove it to use `.env` configuration.
 
-**Recommended Action**: Create `.env.testing` with WSL Redis configuration and remove Redis env overrides from `phpunit.xml`.
+**Recommended Action**: Create `.env.testing` with WSL Redis configuration and remove Redis env overrides from
+`phpunit.xml`.
+

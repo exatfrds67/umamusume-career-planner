@@ -10,7 +10,8 @@
 
 **Problem**: Character stats were showing as NULL on the characters index page.
 
-**Root Cause**: The Blade template was trying to access stats directly on the character object (`character.speed`) instead of accessing them through the `current_stats` JSON field (`character.current_stats.speed`).
+**Root Cause**: The Blade template was trying to access stats directly on the character object (`character.speed`)
+instead of accessing them through the `current_stats` JSON field (`character.current_stats.speed`).
 
 **Solution**: Updated the Blade template to correctly access stats from the `current_stats` JSON field.
 
@@ -24,7 +25,7 @@
     "guts": 45,
     "wit": 45
 }
-```
+```text
 
 ### 2. Sorting Issues (Y-names Before A-names)
 
@@ -174,7 +175,7 @@ sorted.sort((a, b) => {
 
 ```bash
 php artisan test --filter=CharacterPolicyTest --compact
-```
+```text
 
 **Result**: 15 passed (15 assertions)
 
@@ -223,3 +224,4 @@ None required - all issues resolved.
 - `docs/implementation-summaries/admin-authorization-complete-fix-2026-01-31.md`
 - `docs/implementation-summaries/speed-stat-color-change-2026-01-31.md`
 - `docs/implementation-summaries/skills-page-comprehensive-improvements-2026-01-31.md`
+

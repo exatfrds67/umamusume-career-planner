@@ -9,7 +9,9 @@
 
 ## Executive Summary
 
-Successfully completed a comprehensive refactoring of all Blade templates containing inline JavaScript and CSS assets. All inline code has been extracted into dedicated Vite-compatible modules following modern best practices and Laravel 12 conventions.
+Successfully completed a comprehensive refactoring of all Blade templates containing inline JavaScript and CSS assets.
+All inline code has been extracted into dedicated Vite-compatible modules following modern best practices and Laravel 12
+conventions.
 
 ### Key Achievements
 
@@ -27,12 +29,12 @@ Successfully completed a comprehensive refactoring of all Blade templates contai
 
 **Completed**: Early January 2026
 
-| File | Lines | Complexity | Features |
-| ---- | ----- | ---------- | -------- |
-| `support-cards/deck-builder.blade.php` | ~300 | High | Deck validation, card selection, synergy scoring |
-| `training/predictions.blade.php` | ~200 | High | Stat predictions, facility selection, AI recommendations |
-| `characters/factors/manage.blade.php` | ~150 | Medium | Factor inheritance, multi-generation tracking |
-| `ai/chat.blade.php` | ~80 | Medium | Real-time chat, message streaming, markdown rendering |
+| File                                   | Lines | Complexity | Features                                                 |
+| -------------------------------------- | ----- | ---------- | -------------------------------------------------------- |
+| `support-cards/deck-builder.blade.php` | ~300  | High       | Deck validation, card selection, synergy scoring         |
+| `training/predictions.blade.php`       | ~200  | High       | Stat predictions, facility selection, AI recommendations |
+| `characters/factors/manage.blade.php`  | ~150  | Medium     | Factor inheritance, multi-generation tracking            |
+| `ai/chat.blade.php`                    | ~80   | Medium     | Real-time chat, message streaming, markdown rendering    |
 
 **Key Patterns Established**:
 
@@ -45,11 +47,11 @@ Successfully completed a comprehensive refactoring of all Blade templates contai
 
 **Completed**: Mid-January 2026
 
-| File | Lines | Complexity | Features |
-| ---- | ----- | ---------- | -------- |
-| `races/calendar.blade.php` | ~350 | High | Calendar navigation, race filtering, weather display |
-| `performance/dashboard.blade.php` | ~300 | High | Chart rendering, metric calculations, real-time updates |
-| `skills/index.blade.php` | ~130 | Medium | Skill filtering, search, SP calculations |
+| File                              | Lines | Complexity | Features                                                |
+| --------------------------------- | ----- | ---------- | ------------------------------------------------------- |
+| `races/calendar.blade.php`        | ~350  | High       | Calendar navigation, race filtering, weather display    |
+| `performance/dashboard.blade.php` | ~300  | High       | Chart rendering, metric calculations, real-time updates |
+| `skills/index.blade.php`          | ~130  | Medium     | Skill filtering, search, SP calculations                |
 
 **Improvements**:
 
@@ -62,12 +64,12 @@ Successfully completed a comprehensive refactoring of all Blade templates contai
 
 **Completed**: Late January 2026
 
-| File | Lines | Complexity | Features |
-| ---- | ----- | ---------- | -------- |
-| `characters/create.blade.php` | ~800 | Very High | Multi-step wizard, validation, factor inheritance |
-| `characters/edit.blade.php` | ~700 | Very High | Complex form state, real-time validation, auto-save |
-| `profile/show.blade.php` | ~300 | Medium | Profile editing, avatar upload, preferences |
-| `mcp/dashboard.blade.php` | ~190 | Medium | MCP server monitoring, agent management, metrics |
+| File                          | Lines | Complexity | Features                                            |
+| ----------------------------- | ----- | ---------- | --------------------------------------------------- |
+| `characters/create.blade.php` | ~800  | Very High  | Multi-step wizard, validation, factor inheritance   |
+| `characters/edit.blade.php`   | ~700  | Very High  | Complex form state, real-time validation, auto-save |
+| `profile/show.blade.php`      | ~300  | Medium     | Profile editing, avatar upload, preferences         |
+| `mcp/dashboard.blade.php`     | ~190  | Medium     | MCP server monitoring, agent management, metrics    |
 
 **Advanced Features**:
 
@@ -80,12 +82,12 @@ Successfully completed a comprehensive refactoring of all Blade templates contai
 
 **Completed**: January 29, 2026
 
-| File | Lines | Complexity | Features |
-| ---- | ----- | ---------- | -------- |
-| `ocr/upload.blade.php` | ~500 | High | Drag-drop upload, queue management, batch processing |
-| `data-management/index.blade.php` | ~150 | High | Tab navigation, polling, operation history |
-| `ocr/partials/skill-list-form.blade.php` | ~80 | Medium | Dynamic form fields, skill management |
-| `ocr/results.blade.php` | ~25 | Low | Collapsible sections, animations |
+| File                                     | Lines | Complexity | Features                                             |
+| ---------------------------------------- | ----- | ---------- | ---------------------------------------------------- |
+| `ocr/upload.blade.php`                   | ~500  | High       | Drag-drop upload, queue management, batch processing |
+| `data-management/index.blade.php`        | ~150  | High       | Tab navigation, polling, operation history           |
+| `ocr/partials/skill-list-form.blade.php` | ~80   | Medium     | Dynamic form fields, skill management                |
+| `ocr/results.blade.php`                  | ~25   | Low        | Collapsible sections, animations                     |
 
 **Final Touches**:
 
@@ -100,7 +102,7 @@ Successfully completed a comprehensive refactoring of all Blade templates contai
 
 ### Directory Structure
 
-```
+```text
 resources/
 ├── js/
 │   ├── app.js                          # Global entry point
@@ -165,7 +167,7 @@ resources/
     const apiUrl = "{{ route('api.endpoint') }}";
 </script>
 @endpush
-```
+```text
 
 **After** (Extracted - ✅ Do this):
 
@@ -185,7 +187,7 @@ window.pageData = {
 ```javascript
 // In resources/js/pages/my-page.js
 const { userId, routes } = window.pageData || {};
-```
+```text
 
 ### Alpine.js Component Pattern
 
@@ -212,7 +214,7 @@ document.addEventListener('alpine:init', () => {
         // component logic
     }));
 });
-```
+```text
 
 ---
 
@@ -220,25 +222,25 @@ document.addEventListener('alpine:init', () => {
 
 ### Overall Project Metrics
 
-| Metric | Value |
-| ------ | ----- |
-| **Total Files Refactored** | 15 |
-| **Total Lines Extracted** | 4,255+ |
-| **JavaScript Files Created** | 15 |
-| **Vite Entries Added** | 15 |
-| **Files Analyzed** | 30+ |
-| **Files Skipped (No Assets)** | 15+ |
-| **Project Duration** | ~4 weeks |
+| Metric                        | Value    |
+| ----------------------------- | -------- |
+| **Total Files Refactored**    | 15       |
+| **Total Lines Extracted**     | 4,255+   |
+| **JavaScript Files Created**  | 15       |
+| **Vite Entries Added**        | 15       |
+| **Files Analyzed**            | 30+      |
+| **Files Skipped (No Assets)** | 15+      |
+| **Project Duration**          | ~4 weeks |
 
 ### Phase Breakdown
 
-| Phase | Files | Lines | Complexity |
-| ----- | ----- | ----- | ---------- |
-| Phase 1 | 4 | 730+ | High |
-| Phase 2 | 3 | 780+ | High |
-| Phase 3 | 4 | 1,990+ | Very High |
-| Phase 4 | 4 | 755+ | High |
-| **Total** | **15** | **4,255+** | **High** |
+| Phase     | Files  | Lines      | Complexity |
+| --------- | ------ | ---------- | ---------- |
+| Phase 1   | 4      | 730+       | High       |
+| Phase 2   | 3      | 780+       | High       |
+| Phase 3   | 4      | 1,990+     | Very High  |
+| Phase 4   | 4      | 755+       | High       |
+| **Total** | **15** | **4,255+** | **High**   |
 
 ### Complexity Distribution
 
@@ -281,7 +283,7 @@ try {
         detail: { type: 'error', message: 'Operation failed' }
     }));
 }
-```
+```text
 
 ### Null Safety
 
@@ -298,7 +300,7 @@ const element = document.getElementById('element');
 if (element) {
     element.addEventListener('click', handler);
 }
-```
+```text
 
 ### Event Cleanup
 
@@ -317,7 +319,7 @@ element.addEventListener('click', handler, { signal: controller.signal });
 
 // Cleanup when needed
 controller.abort();
-```
+```text
 
 ---
 
@@ -387,7 +389,7 @@ npm run build 2>&1 | grep -i error
 npm run build -- --mode production
 ```
 
-### Code Quality
+## Code Quality
 
 ```bash
 # Format PHP code
@@ -398,7 +400,7 @@ vendor/bin/phpstan analyse
 
 # Run tests
 php artisan test --compact
-```
+```text
 
 ---
 
@@ -406,11 +408,11 @@ php artisan test --compact
 
 ### Bundle Sizes (Estimated)
 
-| Bundle | Size | Description |
-| ------ | ---- | ----------- |
-| `vendor-alpine.js` | ~50 KB | Alpine.js + plugins |
-| `core-utils.js` | ~30 KB | Core utilities |
-| `accessibility.js` | ~20 KB | Accessibility features |
+| Bundle                | Size     | Description             |
+| --------------------- | -------- | ----------------------- |
+| `vendor-alpine.js`    | ~50 KB   | Alpine.js + plugins     |
+| `core-utils.js`       | ~30 KB   | Core utilities          |
+| `accessibility.js`    | ~20 KB   | Accessibility features  |
 | Page-specific bundles | 10-80 KB | Individual page scripts |
 
 ### Load Time Improvements
@@ -475,16 +477,16 @@ php artisan test --compact
    # JS: resources/js/pages/my-feature/index.js
    ```
 
-2. **Add to vite.config.js**:
+1. **Add to vite.config.js**:
 
    ```javascript
    input: [
        // ... existing entries
        "resources/js/pages/my-feature/index.js",
    ]
-   ```
+   ```text
 
-3. **Inject data in Blade** (if needed):
+2. **Inject data in Blade** (if needed):
 
    ```blade
    <script>
@@ -494,19 +496,19 @@ php artisan test --compact
    </script>
    ```
 
-4. **Load the script**:
+3. **Load the script**:
 
    ```blade
    @vite(['resources/js/pages/my-feature/index.js'])
-   ```
+   ```text
 
-5. **Build and test**:
+4. **Build and test**:
 
    ```bash
    npm run build
    ```
 
-### Converting Existing Inline Scripts
+## Converting Existing Inline Scripts
 
 1. Identify inline `<script>` blocks
 2. Extract to dedicated file in `resources/js/pages/`
@@ -590,7 +592,9 @@ php artisan test --compact
 
 ## Conclusion
 
-The Blade Asset Refactoring project has been successfully completed. All inline JavaScript has been extracted into well-organized, maintainable Vite-compatible modules. The codebase now follows modern best practices and is positioned for future growth.
+The Blade Asset Refactoring project has been successfully completed. All inline JavaScript has been extracted into
+well-organized, maintainable Vite-compatible modules. The codebase now follows modern best practices and is positioned
+for future growth.
 
 **Key Benefits**:
 

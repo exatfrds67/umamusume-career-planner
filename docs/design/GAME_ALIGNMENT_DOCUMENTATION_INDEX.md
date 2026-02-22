@@ -1,7 +1,7 @@
 # Game Alignment Documentation Index
 
 **Document Version**: 1.0.0  
-**Date**: February 22, 2026  
+**Date**: January 29, 2026  
 **Status**: Master Index & Navigation Guide  
 **Purpose**: Unified entry point for all game-alignment research and planning documents
 
@@ -11,7 +11,7 @@
 
 This project maintains comprehensive documentation aligned with actual Umamusume Pretty Derby game mechanics, visual patterns, and UX flows. This index provides navigation and document relationships.
 
-**Documentation Scope**: 120+ game screenshots analyzed (July 2025 - February 2026)  
+**Documentation Scope**: 120+ game screenshots analyzed (July 2025 - January 2026)  
 **Total Documents**: 8 primary design/research files + this index  
 **Status**: Active planning (implementing Phase 1-2, planning Phase 3-6)
 
@@ -148,7 +148,7 @@ This project maintains comprehensive documentation aligned with actual Umamusume
 ### Game-to-App Pattern Mapping
 
 | Game System | App Feature | Plan Doc | Strategy |
-|-------------|-----------|----------|----------|
+| ----------- | --------- | -------- | -------- |
 | Training Facilities (6) | Training Focus Areas (5 stats) | Strategic Plan § 2.1 | Task-oriented interface, not facility-based |
 | Character Selection | Plan Character Selection | Strategic Plan § 2.2 | Same grid layout, similar filtering |
 | Stat Display | Stat Bars & Progress | Strategic Plan § 2.3 | Identical color coding, add soft cap indicator |
@@ -247,7 +247,7 @@ component-inventory.md (STATUS)
 - **Document**: Strategic Plan § 4.1 + Visual Patterns § 1.1
 - **Decision**: Use game-aligned stat colors (Red=Speed, Blue=Stamina, etc.)
 - **Status**: ✅ Planned for Phase 1
-- **Implementation**: Tailwind color tokens via CSS `@theme` directive (Tailwind v4)
+- **Implementation**: Tailwind color tokens in tailwind.config.js
 
 ### Navigation
 
@@ -281,7 +281,7 @@ component-inventory.md (STATUS)
 ## Phase Status Overview
 
 | Phase | Duration | Focus | Status |
-|-------|----------|-------|--------|
+| ----- | -------- | ----- | ------ |
 | **1** | Weeks 1-2 | Foundation & Colors | 🟡 In Progress |
 | **2** | Weeks 3-4 | Components | 🟡 Started |
 | **3** | Weeks 5-6 | Plan Management | 🔵 Planned |
@@ -383,7 +383,7 @@ component-inventory.md (STATUS)
 
 ## Quick Links to Key Content
 
-### Color System
+### Color System References
 
 - Game colors: Strategic Plan § 4.1, page reference [Appendix B]
 - Color palette CSS: Visual Patterns § 6.1-6.2

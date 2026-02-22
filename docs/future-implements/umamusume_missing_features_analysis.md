@@ -1,12 +1,5 @@
 # Comprehensive Analysis: Missing Aspects of Umamusume Pretty Derby for Career Planner App
 
-> **Implementation Status Note (February 2026):** Since this analysis was written, the following areas have progressed beyond their original status:
->
-> - **Section 14 (AI and Automation)**: Now significantly beyond BASIC — includes `AdvisoryPanel` Livewire component, `RuleBasedAdvisor` service, `AdvisoryController` with race strategy, MCP tool integration, and Neuron AI agents.
-> - **Section 15 (Data Export/Import)**: Now fully implemented — `DataExportService` and `DataImportService` support JSON, CSV, and key-value formats with validation; `CareerReportingService` supports JSON/CSV/PDF export; `BackupService` integrates with export.
-> - **Accessibility**: Form field ID/name attributes fixed across components, WCAG 2.2 AA compliance improvements applied.
-> - **Note**: The bottom summary lists all 60 requirements as covered — this refers to the requirements being documented, not all features being implemented in code. Core features (Champions Meeting PvP, Club Systems, Gacha Management, Achievement Tracking) remain as documented requirements without full codebase implementation.
-
 ## Executive Summary
 
 Based on extensive research of community resources, official documentation, and advanced player strategies, this analysis identifies 15 critical areas that were missing or underrepresented in the original career planner app requirements. However, with the implementation of **60 comprehensive requirements** using **Laravel 12** (released February 24, 2025), **AWS Bedrock Claude 4.5**, **AWS Bedrock Nova 2**, **Ollama**, and **Tailwind CSS v4**, the system now covers approximately **95%** of the Umamusume Pretty Derby optimization landscape.
@@ -44,14 +37,14 @@ The current system utilizes cutting-edge, verified technologies:
 
 ### Current Status in Requirements: **IMPLEMENTED** (Covered in Requirements 7-12)
 
-### Research Findings
+### Research Findings (Scenarios)
 
 - **Make a New Track Scenario**: Grade Points system (60/300 point objectives), Special Shop with items, Rival races, Twinkle Star Climax finals
 - **Aoharu Cup (Unity Cup)**: Already covered but missing advanced mechanics
 - **Grand Masters Scenario**: Not yet released globally but exists in JP
 - **Project L'Arc**: Advanced scenario with unique mechanics
 
-### Implementation Status
+### Implementation Status (Scenarios)
 
 ✅ **COVERED**: The **60 comprehensive requirements** now include multi-scenario support with Make a New Track integration, Grade Points tracking, and scenario-specific mechanics.
 
@@ -59,7 +52,7 @@ The current system utilizes cutting-edge, verified technologies:
 
 ### Current Status in Requirements: **IMPLEMENTED** (Covered in Requirements 37-42)
 
-### Research Findings
+### Research Findings (Items)
 
 - **Training Items**: Speed/Stamina/Power/Guts/Wit boosters (+3/+7/+15 variants)
 - **Energy Management**: Vital drinks (Energy +20/+40/+65/+100), Max Energy boosters
@@ -68,7 +61,7 @@ The current system utilizes cutting-edge, verified technologies:
 - **Race Items**: Performance boosters, fan gain multipliers
 - **Bond Items**: Support card relationship boosters
 
-### Implementation Status
+### Implementation Status (Items)
 
 ✅ **COVERED**: The **60 comprehensive requirements** now include complete item and consumable system with inventory management, strategic usage recommendations, and cost-benefit analysis.
 
@@ -76,7 +69,7 @@ The current system utilizes cutting-edge, verified technologies:
 
 ### Current Status in Requirements: **ENHANCED** (Covered in Requirements 25-30)
 
-### Research Findings
+### Research Findings (Breeding)
 
 - **Advanced Factor Stacking**: Complex inheritance calculations beyond basic factors
 - **Affinity Optimization**: Compatibility scoring between parents (◎ symbol system)
@@ -85,7 +78,7 @@ The current system utilizes cutting-edge, verified technologies:
 - **Genetic Diversity Management**: Avoiding inbreeding penalties
 - **Factor Evolution Tracking**: How factors improve through successive generations
 
-### Implementation Status
+### Implementation Status (Breeding)
 
 ✅ **ENHANCED**: The **60 comprehensive requirements** now include advanced breeding mechanics with affinity optimization, generational planning, and sophisticated inheritance algorithms powered by **AWS Bedrock Claude 4.5**.
 
@@ -93,7 +86,7 @@ The current system utilizes cutting-edge, verified technologies:
 
 ### Current Status in Requirements: **IMPLEMENTED** (Covered in Requirements 43-48)
 
-### Research Findings
+### Research Findings (Daily Systems)
 
 - **Daily Missions**: 6 specific tasks with Carat rewards (30 total daily)
 - **Daily Races**: Moonlight Sho (Monies) and Jupiter Cup (Support Points)
@@ -102,7 +95,7 @@ The current system utilizes cutting-edge, verified technologies:
 - **Club Activities**: Shoe requests/donations, monthly ranking rewards
 - **Login Bonuses**: Streak-based rewards with special campaigns
 
-### Implementation Status
+### Implementation Status (Daily Systems)
 
 ✅ **COVERED**: The **60 comprehensive requirements** now include comprehensive daily/weekly/monthly systems with task planning, event calendars, and resource optimization built on **Laravel 12** backend.
 
@@ -110,7 +103,7 @@ The current system utilizes cutting-edge, verified technologies:
 
 ### Current Status in Requirements: **IMPLEMENTED** (Covered in Requirements 49-54)
 
-### Research Findings
+### Research Findings (Gacha)
 
 - **Pity System**: 200 Exchange Points for guaranteed SSR (0.75% base rate)
 - **Banner Types**: Character vs Support Card banners with different strategies
@@ -119,7 +112,7 @@ The current system utilizes cutting-edge, verified technologies:
 - **Collection Completion**: Star Piece management for character upgrades
 - **Reroll Strategies**: Optimal starting account setup
 
-### Implementation Status
+### Implementation Status (Gacha)
 
 ✅ **COVERED**: The **60 comprehensive requirements** now include comprehensive gacha and collection management with pity tracking, resource budgeting, and pull optimization strategies.
 
@@ -127,7 +120,7 @@ The current system utilizes cutting-edge, verified technologies:
 
 ### Current Status in Requirements: **MISSING**
 
-### Research Findings
+### Research Findings (Club)
 
 - **Club Ranking System**: Monthly rewards based on collective fan count (SS rank: 3000 Carats)
 - **Shoe Trading**: Request/donation system with Club Point rewards
@@ -149,7 +142,7 @@ The current system utilizes cutting-edge, verified technologies:
 
 ### Current Status in Requirements: **BASIC** (Standard training covered)
 
-### Research Findings
+### Research Findings (Training)
 
 - **Friendship Training Formulas**: Complex calculations for multi-participant bonuses
 - **Training Failure Mechanics**: Energy-based failure rates and recovery strategies
@@ -158,7 +151,7 @@ The current system utilizes cutting-edge, verified technologies:
 - **Weather-Specific Training**: Adaptation strategies for different conditions
 - **Advanced Energy Management**: Sustainable training progression techniques
 
-### Missing Requirements
+### Missing Requirements (Training)
 
 1. **Advanced Training Calculator**: Precise stat gain predictions with all modifiers
 2. **Failure Risk Assessment**: Real-time failure probability calculations
@@ -171,7 +164,7 @@ The current system utilizes cutting-edge, verified technologies:
 
 ### Current Status in Requirements: **NOT APPLICABLE**
 
-### Research Findings
+### Research Findings (Race Betting)
 
 - **No Betting Mechanics**: Umamusume Pretty Derby does not include gambling or betting systems
 - **Prediction Focus**: Game focuses on training optimization rather than race outcome betting
@@ -181,9 +174,9 @@ The current system utilizes cutting-edge, verified technologies:
 
 ## 10. Achievement and Trophy Systems (Missing)
 
-### Current Status in Requirements: **MISSING**
+### Current Status in Requirements: **MISSING** (Achievements)
 
-### Research Findings
+### Research Findings (Achievements)
 
 - **Career Milestones**: Triple Crown achievements, G1 victories, fan thresholds
 - **Training Achievements**: Perfect training streaks, friendship milestones
@@ -192,7 +185,7 @@ The current system utilizes cutting-edge, verified technologies:
 - **Social Achievements**: Club contributions, friend interactions
 - **Long-term Progression**: Account-wide achievement tracking
 
-### Missing Requirements
+### Missing Requirements (Achievements)
 
 1. **Achievement Tracking System**: Comprehensive progress monitoring across all categories
 2. **Trophy Hunter Interface**: Achievement discovery and completion guidance
@@ -203,21 +196,21 @@ The current system utilizes cutting-edge, verified technologies:
 
 ## 11. Equipment and Gear Systems (Not Applicable)
 
-### Current Status in Requirements: **NOT APPLICABLE**
+### Current Status in Requirements: **NOT APPLICABLE** (Equipment)
 
-### Research Findings
+### Research Findings (Equipment)
 
 - **No Equipment System**: Umamusume Pretty Derby does not feature traditional equipment or gear
 - **Customization Focus**: Character development through training and skills rather than equipment
 - **Cosmetic Elements**: Racewear and outfits are cosmetic only
 
-### Conclusion: This area is not relevant to Umamusume Pretty Derby gameplay
+### Conclusion (Equipment): This area is not relevant to Umamusume Pretty Derby gameplay
 
 ## 12. Advanced Statistics and Analytics (Partially Covered)
 
 ### Current Status in Requirements: **BASIC** (Some analytics mentioned)
 
-### Research Findings
+### Research Findings (Analytics)
 
 - **Performance Metrics**: Win rates, stat efficiency, training effectiveness
 - **Comparative Analysis**: Multi-career comparison and pattern recognition
@@ -226,7 +219,7 @@ The current system utilizes cutting-edge, verified technologies:
 - **Resource Efficiency**: ROI analysis for different strategies
 - **Community Benchmarking**: Performance comparison against community standards
 
-### Missing Requirements
+### Missing Requirements (Analytics)
 
 1. **Advanced Analytics Dashboard**: Comprehensive performance visualization
 2. **Predictive Modeling**: Machine learning for outcome prediction
@@ -237,9 +230,9 @@ The current system utilizes cutting-edge, verified technologies:
 
 ## 13. Seasonal Events and Limited Content (Missing)
 
-### Current Status in Requirements: **MISSING**
+### Current Status in Requirements: **MISSING** (Events)
 
-### Research Findings
+### Research Findings (Events)
 
 - **Monthly Event Cycles**: Champions Meeting rotations, seasonal celebrations
 - **Anniversary Events**: Half-anniversary and full anniversary celebrations with major rewards
@@ -248,7 +241,7 @@ The current system utilizes cutting-edge, verified technologies:
 - **Event-Specific Content**: Unique races, challenges, and rewards
 - **Community Events**: Collaborative goals and server-wide objectives
 
-### Missing Requirements
+### Missing Requirements (Events)
 
 1. **Event Calendar Integration**: Comprehensive event scheduling and preparation
 2. **Limited Content Tracker**: Time-sensitive opportunity monitoring
@@ -261,7 +254,7 @@ The current system utilizes cutting-edge, verified technologies:
 
 ### Current Status in Requirements: **BASIC** (AI chatbot mentioned)
 
-### Research Findings
+### Research Findings (AI)
 
 - **Community Tools**: UmamusumeCalculator.com, umamusume.run with AI-powered optimization
 - **Training Calculators**: Advanced stat prediction and optimization tools
@@ -270,7 +263,7 @@ The current system utilizes cutting-edge, verified technologies:
 - **Performance Analysis**: AI-driven pattern recognition and recommendations
 - **Integration Opportunities**: API connections to existing community tools
 
-### Missing Requirements
+### Missing Requirements (AI)
 
 1. **Advanced AI Integration**: Machine learning for personalized optimization
 2. **Community Tool APIs**: Integration with existing calculator platforms
@@ -283,7 +276,7 @@ The current system utilizes cutting-edge, verified technologies:
 
 ### Current Status in Requirements: **BASIC** (Local storage mentioned)
 
-### Research Findings
+### Research Findings (Export/Import)
 
 - **Community Sharing**: Players share builds and strategies through external platforms
 - **Calculator Integration**: Data exchange with community tools and calculators
@@ -292,7 +285,7 @@ The current system utilizes cutting-edge, verified technologies:
 - **Backup Systems**: Comprehensive data preservation and recovery
 - **Community Databases**: Integration with shared knowledge repositories
 
-### Missing Requirements
+### Missing Requirements (Export/Import)
 
 1. **Universal Data Export**: Standardized format for career and character data
 2. **Community Integration APIs**: Direct connection to popular community tools

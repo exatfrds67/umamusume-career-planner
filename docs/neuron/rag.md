@@ -4,12 +4,15 @@ Build AI agents that can access and reason over your private data.
 
 ## Overview
 
-Retrieval-Augmented Generation (RAG) extends LLM capabilities to work with your organization's internal knowledge base without retraining the model. RAG systems retrieve relevant information from external sources and provide it as context to the LLM for generating accurate, informed responses.
+Retrieval-Augmented Generation (RAG) extends LLM capabilities to work with your organization's internal knowledge base
+without retraining the model. RAG systems retrieve relevant information from external sources and provide it as context
+to the LLM for generating accurate, informed responses.
 
 ## Why RAG?
 
 **Without RAG:** LLM responds based only on training data
-**With RAG:** LLM retrieves relevant information from your data sources first, then generates responses using both retrieved context and training data
+**With RAG:** LLM retrieves relevant information from your data sources first, then generates responses using both
+retrieved context and training data
 
 ### Use Cases
 
@@ -70,7 +73,7 @@ class DocumentRAG extends RAG
         return "You are a helpful assistant that answers questions based on the provided documents.";
     }
 }
-```
+```text
 
 ## Using the RAG Agent
 
@@ -110,7 +113,7 @@ $chunks = $splitter->split($documents);
 
 // Store in vector database
 $rag->loadDocuments($chunks);
-```
+```text
 
 ## RAG with Tools
 
@@ -204,7 +207,7 @@ Enable Inspector monitoring to track:
 
 ```env
 INSPECTOR_INGESTION_KEY=your_key_here
-```
+```text
 
 ## Best Practices
 
@@ -217,3 +220,4 @@ INSPECTOR_INGESTION_KEY=your_key_here
 ---
 
 **Source:** <https://docs.neuron-ai.dev/rag>
+

@@ -6,7 +6,8 @@
 
 ## Executive Summary
 
-All skill-related tests pass successfully after the skill seeder consolidation. The new `UcpSkillsSeeder` maintains full backward compatibility with existing code, including:
+All skill-related tests pass successfully after the skill seeder consolidation. The new `UcpSkillsSeeder` maintains full
+backward compatibility with existing code, including:
 
 - Skill model methods and relationships
 - SkillFactory usage in tests
@@ -215,7 +216,7 @@ it('normal skills have SP cost between 120-180', function () {
             ->and($skill->base_sp_cost)->toBeLessThanOrEqual(180);
     }
 });
-```
+```text
 
 **After**:
 
@@ -241,12 +242,14 @@ it('rare skills have higher SP costs than normal skills on average', function ()
 });
 ```
 
-**Reason**: The curated skills data contains some skills with costs outside the strict 120-180 range (e.g., 110 SP for some normal skills, 170 SP for some rare skills). The updated tests validate that:
+**Reason**: The curated skills data contains some skills with costs outside the strict 120-180 range (e.g., 110 SP for
+some normal skills, 170 SP for some rare skills). The updated tests validate that:
 
 1. All skills have positive SP costs within reasonable bounds
 2. Rare skills cost more than normal skills on average (which is the important business rule)
 
-This change makes the tests more robust and aligned with the actual game data while still validating the core business logic.
+This change makes the tests more robust and aligned with the actual game data while still validating the core business
+logic.
 
 ## Known Issues
 

@@ -8,7 +8,9 @@
 
 ## Executive Summary
 
-Redis is fully configured and running in WSL. Due to Windows 10 limitations, **port forwarding** is required to make Redis accessible from Windows PHP. This guide consolidates all Redis documentation and provides the current working solution.
+Redis is fully configured and running in WSL. Due to Windows 10 limitations, **port forwarding** is required to make
+Redis accessible from Windows PHP. This guide consolidates all Redis documentation and provides the current working
+solution.
 
 ---
 
@@ -62,7 +64,7 @@ cd C:\XAMPP\htdocs\umamusume-career-planner
 
 # Run the setup script
 .\scripts\setup-redis-portforward.ps1
-```
+```text
 
 This script will:
 
@@ -71,7 +73,7 @@ This script will:
 - Add Windows Firewall rule
 - Test the connection
 
-### Step 2: Test Connection
+## Step 2: Test Connection
 
 ```bash
 # Test Redis connection
@@ -83,7 +85,7 @@ php scripts/test-redis.php
 # Ping response: PONG
 ```
 
-### Step 3: Run Tests
+## Step 3: Run Tests
 
 ```bash
 # Clear config cache
@@ -94,7 +96,7 @@ php artisan test --filter=FallbackRecoveryTest --compact
 
 # Run all tests
 php artisan test --compact
-```
+```text
 
 ---
 
@@ -107,9 +109,11 @@ Your Windows version (19045.6466) **does not support WSL mirrored networking**, 
 **Error when trying mirrored networking**:
 
 ```
-wsl: Mirrored networking mode is not supported: Windows version 19045.6466 
+
+wsl: Mirrored networking mode is not supported: Windows version 19045.6466
 does not have the required features. Falling back to NAT networking.
-```
+
+```text
 
 ### WSL2 NAT Networking
 
@@ -124,6 +128,7 @@ does not have the required features. Falling back to NAT networking.
 ## Architecture
 
 ```
+
 ┌─────────────────────────────────────────────────────────────┐
 │                    Windows 10 (XAMPP)                       │
 │  ┌──────────────────────────────────────────────────────┐   │
@@ -148,7 +153,8 @@ does not have the required features. Falling back to NAT networking.
 │  │  └─ DB 15: Testing                                  │   │
 │  └──────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────┘
-```
+
+```text
 
 ---
 
@@ -168,7 +174,7 @@ REDIS_CACHE_DB=1
 REDIS_SESSION_DB=2
 ```
 
-### .env.testing
+## .env.testing
 
 ```env
 # Redis Configuration for Testing
@@ -179,9 +185,9 @@ REDIS_DB=15
 REDIS_CACHE_DB=15
 REDIS_SESSION_DB=15
 REDIS_PREFIX=umamusume-career-planner-test:
-```
+```text
 
-### phpunit.xml
+## phpunit.xml
 
 Redis configuration has been **removed** from `phpunit.xml` to allow tests to read from `.env.testing`.
 
@@ -240,7 +246,7 @@ php artisan redis:health
 php artisan redis:health --detailed
 ```
 
-#### cache:warm
+## cache:warm
 
 Warm Redis cache with frequently accessed data.
 
@@ -250,21 +256,21 @@ php artisan cache:warm
 
 # Force cache warming (clear first)
 php artisan cache:warm --force
-```
+```text
 
-### Cache Tags
+## Cache Tags
 
 Configured for efficient invalidation:
 
-| Tag Group | Tags | Purpose |
-|-----------|------|---------|
-| training | training_predictions, training_sessions, training_options | Training data |
-| character | character_data, character_stats, character_aptitudes | Character info |
-| skills | skill_data, skill_hints, skill_costs | Skill management |
-| support_cards | support_card_data, support_card_bonuses, deck_compositions | Support cards |
-| external_api | umapyoi_data, umamusumedb_data, meta_data | External APIs |
-| ai | ai_conversations, ai_predictions, ai_recommendations | AI services |
-| mcp | mcp_servers, mcp_agents, mcp_tools | MCP integration |
+| Tag Group     | Tags                                                       | Purpose          |
+| ------------- | ---------------------------------------------------------- | ---------------- |
+| training      | training_predictions, training_sessions, training_options  | Training data    |
+| character     | character_data, character_stats, character_aptitudes       | Character info   |
+| skills        | skill_data, skill_hints, skill_costs                       | Skill management |
+| support_cards | support_card_data, support_card_bonuses, deck_compositions | Support cards    |
+| external_api  | umapyoi_data, umamusumedb_data, meta_data                  | External APIs    |
+| ai            | ai_conversations, ai_predictions, ai_recommendations       | AI services      |
+| mcp           | mcp_servers, mcp_agents, mcp_tools                         | MCP integration  |
 
 ---
 
@@ -287,7 +293,7 @@ php artisan test --filter=APIMonitoringDashboardTest --compact
 php artisan test --compact
 ```
 
-### Expected Results
+## Expected Results
 
 After port forwarding setup:
 
@@ -314,9 +320,9 @@ wsl redis-cli monitor
 
 # Check cache statistics
 php artisan redis:health --detailed
-```
+```text
 
-### After WSL Restart
+## After WSL Restart
 
 **Important**: WSL IP addresses can change after restart. If Redis becomes inaccessible:
 
@@ -325,9 +331,9 @@ php artisan redis:health --detailed
 .\scripts\setup-redis-portforward.ps1
 ```
 
-### Troubleshooting
+## Troubleshooting
 
-#### Connection Refused
+### Connection Refused
 
 ```bash
 # Check Redis is running
@@ -338,9 +344,9 @@ wsl sudo service redis-server start
 
 # Test from WSL
 wsl redis-cli ping
-```
+```text
 
-#### Port Forwarding Not Working
+## Port Forwarding Not Working
 
 ```powershell
 # Check current port forwarding
@@ -351,7 +357,7 @@ netsh interface portproxy delete v4tov4 listenport=6379 listenaddress=127.0.0.1
 .\scripts\setup-redis-portforward.ps1
 ```
 
-#### Tests Still Failing
+## Tests Still Failing
 
 ```bash
 # Clear all caches
@@ -363,7 +369,7 @@ php scripts/test-redis.php
 
 # Check .env.testing configuration
 cat .env.testing | grep REDIS
-```
+```text
 
 ---
 
@@ -382,7 +388,7 @@ wsl redis-cli info stats | grep fragmentation
 wsl sudo service redis-server restart
 ```
 
-### Cache Hit Rate
+## Cache Hit Rate
 
 ```bash
 # Monitor cache performance
@@ -391,9 +397,9 @@ php artisan redis:health --detailed
 # Look for:
 # - Hit rate > 80% (good)
 # - Hit rate < 50% (needs optimization)
-```
+```text
 
-### Connection Pooling
+## Connection Pooling
 
 Redis connections are pooled by Laravel. Monitor with:
 
@@ -425,7 +431,7 @@ For production deployment:
 ```bash
 # In redis.conf
 requirepass your-strong-password
-```
+```text
 
 1. **Bind to Specific IP**:
 
@@ -438,7 +444,7 @@ bind 127.0.0.1 ::1
 
 ```bash
 # Use stunnel or Redis 6+ TLS support
-```
+```text
 
 1. **Limit Memory**:
 
@@ -478,7 +484,7 @@ All Redis documentation is located in `docs/redis/`:
 - `REDIS_QUICK_REFERENCE.md` - Quick reference card
 - `REDIS_DOCUMENTATION_INDEX.md` - Documentation index
 
-### Troubleshooting
+### Troubleshooting Resources
 
 - `REDIS_DIAGNOSIS.md` - Detailed diagnosis
 - `REDIS_ISSUE_SUMMARY.md` - Issue summary
@@ -510,7 +516,7 @@ networkingMode=mirrored
 
 # Restart WSL
 wsl --shutdown
-```
+```text
 
 1. **Remove Port Forwarding**:
 
@@ -523,9 +529,9 @@ Remove-NetFirewallRule -DisplayName "WSL Redis"
 
 ```bash
 php scripts/test-redis.php
-```
+```text
 
-### To Native Windows Redis
+## To Native Windows Redis
 
 If you prefer running Redis on Windows:
 

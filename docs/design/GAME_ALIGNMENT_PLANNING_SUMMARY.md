@@ -10,7 +10,7 @@
 
 A comprehensive 500+ line strategic framework covering:
 
-**Section 1: Game Interface Patterns & Principles**
+#### Section 1: Game Interface Patterns & Principles
 
 - Information architecture (task-oriented navigation, 5-tier pattern)
 - Data display hierarchy (20/30/50 rule for screen space)
@@ -18,7 +18,7 @@ A comprehensive 500+ line strategic framework covering:
 - Navigation patterns (tab nav, grid/list views, modals)
 - Gesture patterns (swipe, long-press, pull-to-refresh)
 
-**Section 2: Feature Mapping**
+#### Section 2: Feature Mapping
 
 - Training system alignment (game facilities → app training focus areas)
 - Character management (grid layout, profile tabs, skill preview)
@@ -26,38 +26,38 @@ A comprehensive 500+ line strategic framework covering:
 - Skill & SP management (drag-drop allocation vs game purchase)
 - Race planning (stat requirement matching, training path recommendations)
 
-**Section 3: App Layout & Component Architecture**
+#### Section 3: App Layout & Component Architecture
 
 - Proposed layout structure (header, sidebar/nav, content area, bottom nav)
 - Component hierarchy (Pages → Sections → UI Components → Atomic)
 - Responsive breakpoints (sm/md/lg/xl with specific use cases)
 
-**Section 4: Design System & Visual Language**
+#### Section 4: Design System & Visual Language
 
 - Color palette (stat colors, condition colors, semantic colors, all with hex codes)
 - Typography scale (h1-h4, body, small, mono with px/rem sizing)
 - Spacing system (xs-3xl, all 4px-based multiples)
 - Component sizing (buttons, cards, inputs)
 
-**Section 5: User Workflows & Information Flows**
+#### Section 5: User Workflows & Information Flows
 
 - Plan creation wizard (5-card progression, similar to game's facility selection)
 - Plan execution (timeline view, SP budget, facility groups)
 - Race planning (modal with stat requirements, targeting)
 
-**Section 6: Data Visualization & Analytics**
+#### Section 6: Data Visualization & Analytics
 
 - Stat progression charts (radar chart 5-point polygon)
 - Training progress tracker (facility group progress bars)
 - Skill impact analysis (acquisition timeline table)
 
-**Section 7: Accessibility & Performance**
+#### Section 7: Accessibility & Performance
 
 - WCAG 2.2 AA compliance (contrast ratios, touch targets)
 - Core Web Vitals targets (LCP <2.5s, FID <100ms, CLS <0.1)
 - Mobile optimization (responsive images, lazy loading, bottom nav)
 
-**Section 8: Implementation Roadmap**
+#### Section 8: Implementation Roadmap
 
 - Phase 1 (Weeks 1-2): Foundation & colors
 - Phase 2 (Weeks 3-4): Core components
@@ -66,7 +66,7 @@ A comprehensive 500+ line strategic framework covering:
 - Phase 5 (Weeks 9-10): Analytics
 - Phase 6 (Weeks 11-12): Polish & testing
 
-**Section 9: Design Patterns to Avoid**
+#### Section 9: Design Patterns to Avoid
 
 - Anti-patterns: Exact game UI copy, feature bloat, over-animation, accessibility afterthought, mobile unfriendly, offline incompatible
 - Go-to patterns: Task-oriented navigation, progressive disclosure, consistent mental models, responsive-first, accessibility-first
@@ -77,7 +77,7 @@ A comprehensive 500+ line strategic framework covering:
 
 A detailed 400+ line research document with exact implementation specifications:
 
-**Part 1: Visual Design Patterns**
+#### Part 1: Visual Design Patterns
 
 - Stat type colors (Speed red, Stamina blue, Power yellow, Guts green, Wit purple)
 - Resource colors (TP orange, RP blue, Currency yellow, Items green)
@@ -90,7 +90,7 @@ A detailed 400+ line research document with exact implementation specifications:
   - Button styles (primary, secondary, icon, disabled states)
 - Layout grids (desktop sidebar width, mobile padding, tablet hybrid)
 
-**Part 2: Interaction Patterns**
+#### Part 2: Interaction Patterns
 
 - Tab navigation (active/inactive states, badge counts, scroll-snap)
 - Grid/list navigation (filter bar, sorting, pagination, pull-to-refresh)
@@ -103,27 +103,27 @@ A detailed 400+ line research document with exact implementation specifications:
   - Slider input (track, thumb, value display, keyboard support)
   - Select/dropdown (closed/open states, option styling, groups)
 
-**Part 3: Animation & Transition Patterns**
+#### Part 3: Animation & Transition Patterns
 
 - Durations (micro-interactions 150-300ms, page transitions 300-400ms, gestures 400-500ms)
 - Easing functions (ease-in-out default, ease-out for arrivals, linear for progress)
 - Motion accessibility (respect prefers-reduced-motion, optional animations)
 
-**Part 4: Component Sizing & Touch Targets**
+#### Part 4: Component Sizing & Touch Targets
 
 - Primary actions: 44×44px minimum
 - Secondary actions: 32×32px acceptable
 - Text links: 44×44px padding around
 - Spacing multiples: 8px, 16px, 24px sections
 
-**Part 5: Contrast & Readability**
+#### Part 5: Contrast & Readability
 
 - WCAG AA minimum: 3:1 for large text, 4.5:1 for normal text
 - Font choices (sans-serif body, line-height 1.5-1.6)
 - Line length (45-75 characters optimal)
 - Font sizes (h1 32px, h2 24px, h3 20px, h4 16px, body 14-16px, small 12px)
 
-**Part 6: Dark Mode Patterns**
+#### Part 6: Dark Mode Patterns
 
 - Color adjustments (stat colors brightened/darkened, backgrounds near-black)
 - CSS custom properties implementation
@@ -210,22 +210,22 @@ Type C: Execution Flow
 
 ### 4. Component Architecture (4 Levels)
 
-**Level 1: Page Templates**
+#### Level 1: Page Templates
 
 - DashboardPage, PlanDetailPage, CharacterDetailPage, etc.
 - Container layouts with breadcrumbs and action bars
 
-**Level 2: Section Components**
+#### Level 2: Section Components
 
 - StatsSummary, SkillAllocator, TrainingTimeline, RaceSchedule, CharacterGrid
 - Content areas combining multiple UI components
 
-**Level 3: UI Components**
+#### Level 3: UI Components
 
 - StatBar, GradeBadge, ConditionIndicator, SkillCard, RaceCard, Tab, Modal
 - Reusable across pages, consistent styling
 
-**Level 4: Atomic Components**
+#### Level 4: Atomic Components
 
 - Button, Card, Badge, Gauge, Chart, Input, Slider, Select
 - Design system foundations

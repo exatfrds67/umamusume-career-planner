@@ -220,19 +220,19 @@ Implemented a sophisticated base stats system that assigns realistic starting va
 
 ### Why These Ranges?
 
-**Total Stats: 225-250**
+#### Total Stats: 225-250
 
 - Represents "untrained" characters at career start
 - Equivalent to F-E grade (100-200) to D-C grade (300-400) in game terms
 - Leaves room for significant growth through training (target: 1000-1200 per stat)
 
-**Specialization Emphasis**
+#### Specialization Emphasis
 
 - Reflects character's natural strengths and weaknesses
 - Guides optimal training strategies
 - Matches official game character profiles
 
-**User-Editable**
+#### User-Editable
 
 - Base stats are starting points, not restrictions
 - Users can modify during character creation
@@ -242,13 +242,13 @@ Implemented a sophisticated base stats system that assigns realistic starting va
 
 Base stats and growth rates work together:
 
-**Example: Silence Suzuka**
+#### Example: Silence Suzuka
 
 - Base Speed: 60 (high starting point)
 - Speed Growth Rate: 1.2x (20% faster speed training)
 - Result: Naturally excels at speed-focused builds
 
-**Example: Maruzensky**
+#### Example: Maruzensky
 
 - Base Stamina: 60 (high starting point)
 - Stamina Growth Rate: 1.2x (20% faster stamina training)

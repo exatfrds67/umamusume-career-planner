@@ -24,7 +24,8 @@
 
 - `TrainingOptimizationAgent::getDefaultStatGainPrediction()` - Added complete return type shape
 - `TrainingOptimizationAgent::parseRecommendations()` - Added return type with proper array shapes
-- `TrainingOptimizationAgent::getDefaultRecommendations()` - Fixed return type and ensured array_values() for proper indexing
+- `TrainingOptimizationAgent::getDefaultRecommendations()` - Fixed return type and ensured array_values() for proper
+indexing
 - `CareerStrategyAgent::getDefaultCareerPlan()` - Added complete return type shape
 - `RaceAnalysisAgent::getDefaultRaceAnalysis()` - Added complete return type shape
 - `SkillManagementAgent::getDefaultSPAllocation()` - Added complete return type shape
@@ -47,7 +48,7 @@ Changed from:
 if ($cached = Cache::get($cacheKey)) {
     return $cached; // Returns mixed
 }
-```
+```text
 
 To:
 
@@ -63,13 +64,15 @@ if ($cached !== null) {
 
 **Added Generic Types:**
 
-- `SkillOptimizationOrchestrationService::executeComprehensiveOptimization()` - Added `Collection<int, \App\Models\Skill>` and `Collection<int, \App\Models\SupportCard>`
+- `SkillOptimizationOrchestrationService::executeComprehensiveOptimization()` - Added `Collection<int,
+\App\Models\Skill>` and `Collection<int, \App\Models\SupportCard>`
 - `SkillOptimizationOrchestrationService::executeSPBudgetAgent()` - Added `Collection<int, \App\Models\Skill>`
 - `SkillOptimizationOrchestrationService::executeHintFarmingAgent()` - Added generic types for both Collections
 - `SkillOptimizationOrchestrationService::executeSkillBuildAgent()` - Added generic types for both Collections
 - `SkillOptimizationOrchestrationService::executeLongTermAgent()` - Added `Collection<int, \App\Models\Skill>`
 - `SkillOptimizationOrchestrationService::optimizeSkillAcquisition()` - Added `Collection<int, \App\Models\Skill>`
-- `SkillOptimizationOrchestrationService::getQuickOptimizationRecommendation()` - Added `Collection<int, \App\Models\Skill>`
+- `SkillOptimizationOrchestrationService::getQuickOptimizationRecommendation()` - Added `Collection<int,
+\App\Models\Skill>`
 
 ### 4. Type Guards for Mixed Values
 
@@ -154,7 +157,7 @@ protected function extractArray(array $response, string $key): array
 {
     return is_array($response[$key] ?? null) ? $response[$key] : [];
 }
-```
+```text
 
 ### Priority 2: Task Config Validation
 
@@ -191,7 +194,7 @@ protected function safeArrayAccess(array $data, string $path, mixed $default = n
     
     return $value;
 }
-```
+```text
 
 ## Impact Assessment
 
@@ -229,3 +232,4 @@ However, significant work remains to achieve full Larastan level 9 compliance, p
 
 **Estimated Additional Effort**: 4-6 hours to resolve remaining 139 errors
 **Recommended Approach**: Create helper methods for type-safe array access and response parsing
+

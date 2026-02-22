@@ -1,10 +1,10 @@
 # Umamusume Career Planner: Game Alignment Strategic Plan
 
 **Document Version**: 1.0.0  
-**Date**: February 22, 2026  
+**Date**: January 29, 2026  
 **Status**: Strategic Planning & Design Reference  
 **Purpose**: Comprehensive game-to-app alignment planning without 1:1 copying  
-**Based On**: 120+ game screenshots (July 2025 - February 2026), game mechanics research, existing design analysis
+**Based On**: 120+ game screenshots (July 2025 - January 2026), game mechanics research, existing design analysis
 
 ---
 
@@ -77,7 +77,7 @@ Level 3 (Remaining 50%):      DETAILED DATA
 **Observed Pattern**: Colors serve functional purposes, not decoration:
 
 | Element | Color | Meaning | Example |
-|---------|-------|---------|---------|
+| --------- | ------- | --------- | --------- |
 | **TP/Training Points** | Orange/Amber | Primary resource | 100/100 gauge |
 | **RP/Race Points** | Blue | Secondary resource | 2/5 indicator |
 | **Currency** | Yellow/Gold | Spending resource | 1.4M displayed |
@@ -424,7 +424,7 @@ Race Planning Tab:
 Align with Tailwind default breakpoints:
 
 | Breakpoint | Width | Device | Layout |
-|-----------|-------|--------|--------|
+| ----------- | ------- | -------- | -------- |
 | sm | 640px | Phablet | 1-column, bottom nav |
 | md | 768px | Tablet | 1-column, side nav toggle |
 | lg | 1024px | Desktop | 2-column, side nav |

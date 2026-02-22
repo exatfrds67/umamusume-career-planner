@@ -8,7 +8,8 @@
 
 ## Executive Summary
 
-Redis is now **fully operational** and all tests are passing. The setup used **port forwarding** to bridge Windows 10 and WSL2, as Windows 10 does not support WSL mirrored networking.
+Redis is now **fully operational** and all tests are passing. The setup used **port forwarding** to bridge Windows 10
+and WSL2, as Windows 10 does not support WSL mirrored networking.
 
 ---
 
@@ -48,7 +49,7 @@ Redis is now **fully operational** and all tests are passing. The setup used **p
 
 Windows 10 (version 19045.6466) does not support WSL mirrored networking:
 
-```
+```text
 wsl: Mirrored networking mode is not supported: Windows version 19045.6466 
 does not have the required features. Falling back to NAT networking.
 ```
@@ -70,7 +71,7 @@ REDIS_PREFIX=umamusume-career-planner:
 REDIS_DB=0
 REDIS_CACHE_DB=1
 REDIS_SESSION_DB=2
-```
+```text
 
 ### .env.testing
 
@@ -114,7 +115,7 @@ php artisan test --filter=FallbackRecoveryTest --compact
 
 php artisan test --filter=APIMonitoringDashboardTest --compact
 # ✅ 24 passed (117 assertions)
-```
+```text
 
 ---
 
@@ -145,6 +146,7 @@ php artisan test --filter=APIMonitoringDashboardTest --compact
 ## Architecture
 
 ```
+
 ┌─────────────────────────────────────────────────────────────┐
 │                    Windows 10 (XAMPP)                       │
 │  ┌──────────────────────────────────────────────────────┐   │
@@ -170,7 +172,8 @@ php artisan test --filter=APIMonitoringDashboardTest --compact
 │  │  └─ DB 15: Testing                                  │   │
 │  └──────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────┘
-```
+
+```text
 
 ---
 
@@ -189,7 +192,7 @@ php artisan redis:health
 wsl redis-cli monitor
 ```
 
-### After WSL Restart
+## After WSL Restart
 
 ⚠️ **Important**: WSL IP addresses can change after restart.
 
@@ -198,9 +201,9 @@ If Redis becomes inaccessible after WSL restart:
 ```powershell
 # Re-run port forwarding setup (as Administrator)
 .\scripts\setup-redis-portforward.ps1
-```
+```text
 
-### Troubleshooting
+## Troubleshooting
 
 ```bash
 # Test Redis in WSL
@@ -223,11 +226,11 @@ php artisan cache:clear
 
 ### Test Execution Times
 
-| Test Suite | Duration | Tests | Assertions |
-|------------|----------|-------|------------|
-| FallbackRecoveryTest | 34.04s | 26 | 108 |
-| APIMonitoringDashboardTest | 8.74s | 24 | 117 |
-| **Total** | **42.78s** | **50** | **225** |
+| Test Suite                 | Duration   | Tests  | Assertions |
+| -------------------------- | ---------- | ------ | ---------- |
+| FallbackRecoveryTest       | 34.04s     | 26     | 108        |
+| APIMonitoringDashboardTest | 8.74s      | 24     | 117        |
+| **Total**                  | **42.78s** | **50** | **225**    |
 
 ### Redis Performance
 
@@ -379,7 +382,8 @@ All Redis documentation in `docs/redis/`:
 
 ## Conclusion
 
-Redis setup is **complete and fully operational**. The port forwarding solution works reliably on Windows 10, and all tests are passing. No Windows restart was required.
+Redis setup is **complete and fully operational**. The port forwarding solution works reliably on Windows 10, and all
+tests are passing. No Windows restart was required.
 
 **Status**: ✅ Production Ready  
 **Confidence**: High  

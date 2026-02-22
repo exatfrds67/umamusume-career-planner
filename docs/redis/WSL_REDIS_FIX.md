@@ -16,7 +16,7 @@
 
 Forward port 6379 from Windows localhost to WSL Redis.
 
-**Step 1: Create port forwarding script**
+#### Step 1: Create port forwarding script
 
 Create `setup-redis-forwarding.ps1`:
 
@@ -38,13 +38,13 @@ Write-Host "Port forwarding configured: 127.0.0.1:$port -> $wslIP:$port"
 Write-Host "Verify with: netsh interface portproxy show all"
 ```
 
-**Step 2: Run the script as Administrator**
+#### Step 2: Run the script as Administrator
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File setup-redis-forwarding.ps1
 ```
 
-**Step 3: Update configuration**
+#### Step 3: Update configuration (Option 1)
 
 Update `.env`:
 
@@ -58,20 +58,20 @@ Update `.env.testing`:
 REDIS_HOST=127.0.0.1
 ```
 
-**Step 4: Test**
+#### Step 4: Test (Option 1)
 
 ```bash
 php test-redis.php
 php artisan test --filter=FallbackRecoveryTest
 ```
 
-**Pros**:
+#### Pros (Option 1)
 
 - Works reliably
 - Uses standard localhost address
 - Survives WSL restarts (but needs to be re-run if WSL IP changes)
 
-**Cons**:
+#### Cons (Option 1)
 
 - Requires Administrator privileges
 - Needs to be re-run if WSL IP changes
@@ -83,14 +83,14 @@ php artisan test --filter=FallbackRecoveryTest
 
 Use `socat` inside WSL to forward connections.
 
-**Step 1: Install socat in WSL**
+#### Step 1: Install socat in WSL
 
 ```bash
 wsl sudo apt-get update
 wsl sudo apt-get install -y socat
 ```
 
-**Step 2: Create forwarding service**
+#### Step 2: Create forwarding service
 
 Create `/etc/systemd/system/redis-forward.service` in WSL:
 
@@ -108,26 +108,26 @@ Restart=always
 WantedBy=multi-user.target
 ```
 
-**Step 3: Enable service**
+#### Step 3: Enable service (Option 2)
 
 ```bash
 wsl sudo systemctl enable redis-forward
 wsl sudo systemctl start redis-forward
 ```
 
-**Step 4: Update configuration**
+#### Step 4: Update configuration (Option 2)
 
 ```env
 REDIS_HOST=127.0.0.1
 REDIS_PORT=6380
 ```
 
-**Pros**:
+#### Pros (Option 2)
 
 - Automatic on WSL start
 - No Windows configuration needed
 
-**Cons**:
+#### Cons (Option 2)
 
 - Requires systemd in WSL
 - Uses different port (6380)
@@ -139,12 +139,12 @@ REDIS_PORT=6380
 
 Install Redis directly on Windows instead of using WSL.
 
-**Step 1: Download Redis for Windows**
+#### Step 1: Download Redis for Windows
 
 - Download from: <https://github.com/tporadowski/redis/releases>
 - Or use Chocolatey: `choco install redis-64`
 
-**Step 2: Install and start Redis**
+#### Step 2: Install and start Redis
 
 ```powershell
 # If using installer, Redis will start automatically
@@ -152,20 +152,20 @@ Install Redis directly on Windows instead of using WSL.
 redis-server
 ```
 
-**Step 3: Update configuration**
+#### Step 3: Update configuration (Option 3)
 
 ```env
 REDIS_HOST=127.0.0.1
 REDIS_PORT=6379
 ```
 
-**Pros**:
+#### Pros (Option 3)
 
 - No WSL networking issues
 - Simple configuration
 - Reliable
 
-**Cons**:
+#### Cons (Option 3)
 
 - Requires Windows Redis installation
 - Different Redis version than WSL
@@ -176,7 +176,7 @@ REDIS_PORT=6379
 
 Configure WSL to use mirrored networking mode.
 
-**Step 1: Create/edit `.wslconfig`**
+#### Step 1: Create/edit `.wslconfig`
 
 Create `C:\Users\<YourUsername>\.wslconfig`:
 
@@ -185,26 +185,26 @@ Create `C:\Users\<YourUsername>\.wslconfig`:
 networkingMode=mirrored
 ```
 
-**Step 2: Restart WSL**
+#### Step 2: Restart WSL
 
 ```powershell
 wsl --shutdown
 wsl
 ```
 
-**Step 3: Update configuration**
+#### Step 3: Update configuration (Option 4)
 
 ```env
 REDIS_HOST=127.0.0.1
 ```
 
-**Pros**:
+#### Pros (Option 4)
 
 - Native WSL solution
 - Works for all services
 - No port forwarding needed
 
-**Cons**:
+#### Cons (Option 4)
 
 - Requires WSL 2.0+ (you have 2.6.1.0, so this works!)
 - Experimental feature
@@ -363,13 +363,13 @@ This is different from WSL1, which used a shared network stack.
 ## Summary
 
 | Solution | Complexity | Reliability | Recommended |
-|----------|-----------|-------------|-------------|
+| -------- | --------- | ----------- | ----------- |
 | Mirrored Networking | Low | High | ✅ Yes (WSL 2.0+) |
 | Port Forwarding | Medium | Medium | If mirrored fails |
 | Windows Redis | Low | High | Alternative |
 | socat | High | Medium | Not recommended |
 
-**Next Steps**:
+Next Steps:
 
 1. Implement mirrored networking (Option 4)
 2. Update `.env` and `.env.testing` to use `127.0.0.1`

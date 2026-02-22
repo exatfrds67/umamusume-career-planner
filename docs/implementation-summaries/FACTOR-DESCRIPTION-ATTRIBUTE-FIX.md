@@ -8,11 +8,12 @@
 
 ### Problem
 
-The character show view (`/characters/{id}`) was throwing a `MissingAttributeException` when trying to access a `description` attribute on the `Factor` model that doesn't exist in the database schema.
+The character show view (`/characters/{id}`) was throwing a `MissingAttributeException` when trying to access a
+`description` attribute on the `Factor` model that doesn't exist in the database schema.
 
 **Error Details**:
 
-```
+```text
 Illuminate\Database\Eloquent\MissingAttributeException
 The attribute [description] either does not exist or was not retrieved for model [App\Models\Factor].
 ```
@@ -41,9 +42,10 @@ The Blade template was attempting to access `$factor->description` but the Facto
 -         {{ $factor->description }}
 -     </span>
 - @endif
-```
+```text
 
-**Result**: Removed the non-existent `description` attribute reference. The factor name (`factor_name`) is still displayed correctly.
+**Result**: Removed the non-existent `description` attribute reference. The factor name (`factor_name`) is still
+displayed correctly.
 
 ### Testing
 
@@ -98,3 +100,4 @@ This type of error can be prevented by:
 **Resolution Time**: ~15 minutes  
 **Testing Time**: ~10 minutes  
 **Total Impact**: Critical production error resolved with zero data loss
+

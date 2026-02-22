@@ -6,16 +6,18 @@
 
 ## Problem Summary
 
-The admin user created by `AdminUserSeeder` was not able to perform actions on characters, including toggling the pin status. The error was:
+The admin user created by `AdminUserSeeder` was not able to perform actions on characters, including toggling the pin
+status. The error was:
 
-```
+```text
 POST http://127.0.0.1:8000/characters/4/toggle-pin
 403 This action is unauthorized
 ```
 
 ## Root Cause
 
-The `AdminUserSeeder` was creating the admin user WITHOUT setting the `is_admin` flag to `true`. This meant that the `CharacterPolicy::before()` method's admin bypass was never triggered:
+The `AdminUserSeeder` was creating the admin user WITHOUT setting the `is_admin` flag to `true`. This meant that the
+`CharacterPolicy::before()` method's admin bypass was never triggered:
 
 ```php
 public function before(User $user, string $ability): ?bool
@@ -25,7 +27,7 @@ public function before(User $user, string $ability): ?bool
     }
     return null;
 }
-```
+```text
 
 The `User::isAdmin()` method checks:
 
@@ -57,7 +59,7 @@ User::create([
     ],
     // ... other fields
 ]);
-```
+```text
 
 ### 2. Updated Existing Admin User
 
@@ -83,7 +85,8 @@ All 15 CharacterPolicy tests pass, including:
 
 ### Admin Bypass Logic
 
-The `CharacterPolicy::before()` method now correctly returns `true` for admin users, bypassing all other authorization checks in the policy.
+The `CharacterPolicy::before()` method now correctly returns `true` for admin users, bypassing all other authorization
+checks in the policy.
 
 ## Files Modified
 
@@ -97,7 +100,7 @@ The `CharacterPolicy::before()` method now correctly returns `true` for admin us
 
 ```bash
 php artisan test --filter=CharacterPolicyTest --compact
-```
+```text
 
 **Result**: 15 passed (15 assertions)
 
@@ -128,3 +131,4 @@ php artisan test --filter=CharacterPolicyTest --compact
 - The policy logic was already correct with the `before()` method
 - The only issue was the missing flag in the seeder
 - Future admin users created via the seeder will have the flag set correctly
+

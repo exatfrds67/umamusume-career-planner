@@ -11,7 +11,8 @@
 
 ## Overview
 
-Phase 5 implements **Race Planning & Analytics** - a comprehensive system for visualizing race progression, planning target races, and tracking career performance through analytics dashboards.
+Phase 5 implements **Race Planning & Analytics** - a comprehensive system for visualizing race progression, planning
+target races, and tracking career performance through analytics dashboards.
 
 The phase builds on Phase 4's training foundation by adding:
 
@@ -50,7 +51,7 @@ The phase builds on Phase 4's training foundation by adding:
     :animated="true"
     :responsive="true"
 />
-```
+```text
 
 **Alpine Data Context**:
 
@@ -145,7 +146,7 @@ The phase builds on Phase 4's training foundation by adding:
     variant="timeline"
     maxEvents="10"
 />
-```
+```text
 
 **Alpine Data Context**:
 
@@ -314,7 +315,7 @@ The phase builds on Phase 4's training foundation by adding:
     :events="$recentActivity ?? []"
     variant="timeline"
 />
-```
+```text
 
 1. **Layout**: Responsive 2-column grid on desktop, stacked on mobile
 2. **Theming**: Matches existing dashboard style with dark mode support
@@ -324,6 +325,7 @@ The phase builds on Phase 4's training foundation by adding:
 ## File Structure
 
 ```
+
 Phase 5 Files Created:
 
 resources/views/components/
@@ -345,7 +347,8 @@ App Registration:
   └── resources/js/app.js (imports + registrations)
 
 Total: 1,100+ lines of production code
-```
+
+```text
 
 ---
 
@@ -394,7 +397,7 @@ window.Alpine && Alpine.data('componentName', function(data) {
 });
 </script>
 @endpush
-```
+```text
 
 ### Color System
 
@@ -467,7 +470,7 @@ test('assigns turn numbers')
 test('displays charts with data')
 test('shows activity timeline')
 test('renders analytics section')
-```
+```text
 
 ---
 
@@ -533,7 +536,7 @@ $statProgression = [];  // Array of stat values per turn
 $progressionLabels = [];  // Turn labels
 $raceGrades = [];  // Grade distribution
 $recentActivity = [];  // Event timeline data
-```
+```text
 
 ---
 
@@ -592,37 +595,46 @@ $recentActivity = [];  // Event timeline data
 **Commit bddcd93** (Part 1 - Components):
 
 ```
+
 feat: Phase 5 - Race Planning & Analytics components (Part 1)
+
 - line-chart.blade.php: Chart.js integration
 - class-pyramid.blade.php: Fan hierarchy visualization
 - activity-timeline.blade.php: Event timeline display
 - races/calendar.blade.php: Full-page race carousel
-```
+
+```text
 
 **Commit d6dd457** (Part 2 - Integration):
 
 ```
+
 feat: Phase 5 - Dashboard integration & Alpine registration (Part 2)
+
 - Dashboard analytics section
 - Component registration in app.js
 - Import statements for Phase 4/5 components
-```
+
+```text
 
 **Commit adf4a21** (Part 3 - Views):
 
 ```
+
 feat: Phase 5 - Race targets planning view (Part 3)
+
 - races/targets.blade.php: Race targeting interface
 - Plan summary statistics
 - Grade distribution breakdown
-```
+
+```text
 
 ---
 
 ## Summary Statistics
 
 | Metric | Value |
-|--------|-------|
+| ---------------------- | --------------------- |
 | **Components Created** | 5 Blade, 1 Alpine |
 | **Views Created** | 2 (calendar, targets) |
 | **Lines of Code** | 1,100+ |
@@ -658,3 +670,4 @@ feat: Phase 5 - Race targets planning view (Part 3)
 **Phase 5 Status**: ✅ COMPLETE  
 **Implemented By**: Claudette Coder (AI Agent)  
 **Date**: January 29, 2026
+

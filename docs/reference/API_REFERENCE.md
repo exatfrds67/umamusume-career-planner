@@ -61,7 +61,7 @@ GET /api/v1/characters
 **Query Parameters:**
 
 | Parameter | Type | Description |
-|-----------|------|-------------|
+| --- | --- | --- |
 | `per_page` | integer | Items per page (default: 15) |
 | `page` | integer | Page number |
 | `search` | string | Search by name |
@@ -184,7 +184,7 @@ GET /api/v1/careers
 **Query Parameters:**
 
 | Parameter | Type | Description |
-|-----------|------|-------------|
+| --- | --- | --- |
 | `character_id` | integer | Filter by character |
 | `status` | string | Filter by status (active, completed, abandoned) |
 
@@ -386,7 +386,7 @@ GET /api/v1/skills
 **Query Parameters:**
 
 | Parameter | Type | Description |
-|-----------|------|-------------|
+| --- | --- | --- |
 | `skill_type` | string | Filter by type (normal, rare, unique, inherited) |
 | `search` | string | Search by name |
 | `min_sp_cost` | integer | Minimum SP cost |
@@ -439,7 +439,7 @@ GET /api/v1/skills/analysis/recommendations
 **Query Parameters:**
 
 | Parameter | Type | Description |
-|-----------|------|-------------|
+| --- | --- | --- |
 | `character_id` | integer | Character to analyze |
 
 ### Character-Specific Skill Recommendations (AI-Powered)
@@ -455,7 +455,7 @@ POST /api/characters/{characterId}/skill-recommendations
 **Path Parameters:**
 
 | Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
+| --- | --- | --- | --- |
 | `characterId` | integer | Yes | The ID of the character to get recommendations for |
 
 **Request Body:**
@@ -486,7 +486,7 @@ POST /api/characters/{characterId}/skill-recommendations
 **Request Body Parameters:**
 
 | Parameter | Type | Required | Description | Validation |
-|-----------|------|----------|-------------|------------|
+| --- | --- | --- | --- | --- |
 | `skill_context` | object | No | Context for skill recommendations | - |
 | `skill_context.available_sp` | integer | No | Available skill points | min:0 |
 | `skill_context.race_preferences` | object | No | Character's race preferences | - |
@@ -547,7 +547,7 @@ POST /api/characters/{characterId}/skill-recommendations
 **Response Fields:**
 
 | Field | Type | Description |
-|-------|------|-------------|
+| --- | --- | --- |
 | `success` | boolean | Whether the request was successful |
 | `data` | object | Recommendation data |
 | `data.recommendations` | array | List of recommended skills |
@@ -695,7 +695,7 @@ GET /api/v1/support-cards
 **Query Parameters:**
 
 | Parameter | Type | Description |
-|-----------|------|-------------|
+| --- | --- | --- |
 | `card_type` | string | Filter by type (speed, stamina, power, guts, wit, friend) |
 | `rarity` | string | Filter by rarity (R, SR, SSR) |
 | `meta_tier` | string | Filter by tier (S+, S, A, B, C) |
@@ -805,7 +805,7 @@ POST /api/v1/ocr/upload
 **Request Body:** `multipart/form-data`
 
 | Field | Type | Description |
-|-------|------|-------------|
+| --- | --- | --- |
 | `image` | file | Image file (PNG, JPG) |
 | `type` | string | Extraction type (character, stats, skills) |
 
@@ -839,7 +839,7 @@ GET /api/v1/export
 **Query Parameters:**
 
 | Parameter | Type | Description |
-|-----------|------|-------------|
+| --- | --- | --- |
 | `format` | string | Export format (json, csv) |
 | `type` | string | Data type (characters, careers, all) |
 
@@ -852,7 +852,7 @@ POST /api/v1/import
 **Request Body:** `multipart/form-data`
 
 | Field | Type | Description |
-|-------|------|-------------|
+| --- | --- | --- |
 | `file` | file | Import file |
 | `type` | string | Data type |
 
@@ -861,7 +861,7 @@ POST /api/v1/import
 ## Error Codes
 
 | Code | Description |
-|------|-------------|
+| --- | --- |
 | 400 | Bad Request - Invalid parameters |
 | 401 | Unauthorized - Invalid or missing token |
 | 403 | Forbidden - Insufficient permissions |
@@ -888,7 +888,7 @@ POST /api/v1/import
 API requests are rate limited based on user tier:
 
 | Tier | Requests/Minute |
-|------|-----------------|
+| --- | --- |
 | Public | 60 |
 | Authenticated | 120 |
 | Premium | 300 |
@@ -904,4 +904,4 @@ X-RateLimit-Reset: 1706000000
 
 ---
 
-*Last updated: February 2026*
+Last updated: February 2026

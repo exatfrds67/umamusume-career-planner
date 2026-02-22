@@ -16,7 +16,7 @@
     });
 </script>
 @endpush
-```
+```text
 
 ### After (Extracted to JS file)
 
@@ -53,7 +53,7 @@ function myFunction() {
 document.addEventListener('DOMContentLoaded', () => {
     myFunction();
 });
-```
+```text
 
 **Vite config** (`vite.config.js`):
 
@@ -85,7 +85,7 @@ input: [
     });
 </script>
 @endpush
-```
+```text
 
 ### After
 
@@ -119,7 +119,7 @@ document.addEventListener('alpine:init', () => {
         }
     }));
 });
-```
+```text
 
 ---
 
@@ -179,7 +179,7 @@ function myGlobalFunction() {
 
 // Expose globally
 window.myGlobalFunction = myGlobalFunction;
-```
+```text
 
 **Blade file**:
 
@@ -213,7 +213,7 @@ document.addEventListener('DOMContentLoaded', function() {
     selectElement.addEventListener('change', toggleFields);
     toggleFields(); // Initialize
 });
-```
+```text
 
 ---
 
@@ -233,7 +233,7 @@ window.dispatchEvent(new CustomEvent('my-event', {
 window.addEventListener('my-event', (event) => {
     console.log(event.detail.message);
 });
-```
+```text
 
 ---
 
@@ -261,7 +261,7 @@ window.dispatchEvent(new CustomEvent('toast', {
 
 ## Directory Structure
 
-```
+```text
 resources/
 ├── js/
 │   ├── app.js                          # Global JS entry point
@@ -315,7 +315,7 @@ resources/
 ```javascript
 // WRONG - This won't work in .js files
 const userId = {{ $user->id }};
-```
+```text
 
 ### ✅ Do: Inject data via window object
 
@@ -329,7 +329,7 @@ window.userData = { id: @json($user->id) };
 ```javascript
 // In JS file
 const { id } = window.userData || {};
-```
+```text
 
 ---
 
@@ -350,7 +350,7 @@ fetch('/api/endpoint', {
         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
     }
 });
-```
+```text
 
 ---
 
@@ -367,7 +367,7 @@ input: [
     // ... existing
     "resources/js/pages/my-new-page.js",
 ],
-```
+```text
 
 ---
 

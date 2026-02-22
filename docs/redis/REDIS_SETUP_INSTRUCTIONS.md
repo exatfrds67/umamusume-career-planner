@@ -18,7 +18,7 @@
 
 2. Extract and copy `php_redis.dll` to:
 
-   ```
+   ```text
    C:\xampp\php\ext\php_redis.dll
    ```
 
@@ -26,7 +26,7 @@
 
    ```ini
    extension=redis
-   ```
+   ```text
 
 4. Restart Apache:
 
@@ -38,7 +38,7 @@
    C:\xampp\apache\bin\httpd.exe -k start
    ```
 
-### Option B: Manual Download
+## Option B: Manual Download
 
 1. Download from: <https://github.com/phpredis/phpredis/releases>
 2. Look for `php_redis-X.X.X-8.4-nts-vs16-x64.zip`
@@ -50,7 +50,7 @@ After installing phpredis, run:
 
 ```powershell
 php -m | Select-String -Pattern "redis"
-```
+```text
 
 You should see `redis` in the output.
 
@@ -73,7 +73,7 @@ Once phpredis is installed and working, update your `.env` file:
 CACHE_STORE=redis
 QUEUE_CONNECTION=redis
 SESSION_DRIVER=redis
-```
+```text
 
 ## Step 5: Warm the Cache
 
@@ -89,7 +89,7 @@ After Redis is fully configured, run the tests:
 php artisan test --filter=Redis
 php artisan test --filter=Cache
 php artisan test --filter=FallbackRecovery
-```
+```text
 
 ## Troubleshooting
 
@@ -105,13 +105,13 @@ If you get "Connection refused" errors:
 
    Should return: `PONG`
 
-2. Check Redis is listening on 127.0.0.1:
+1. Check Redis is listening on 127.0.0.1:
 
    ```powershell
    wsl bash -c "redis-cli -h 127.0.0.1 -p 6379 ping"
-   ```
+   ```text
 
-3. Restart Redis in WSL:
+2. Restart Redis in WSL:
 
    ```powershell
    wsl bash -c "sudo service redis-server restart"

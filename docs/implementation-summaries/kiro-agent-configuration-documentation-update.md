@@ -98,7 +98,7 @@ Comprehensive update to project documentation including Kiro AI agent configurat
 - Form request validation
 - Event-driven architecture
 - Model design and Eloquent
-- Enum usage (PHP 8.2+)
+- Enum usage (PHP 8.1+)
 - Caching strategy
 - API resource transformers
 
@@ -318,7 +318,7 @@ description: Specific description of when to use this skill. Include key use cas
 ## Changelog
 
 | Version | Date | Changes |
-|---------|------|---------|
+| --- | --- | --- |
 | 1.0.0 | 2026-01-29 | Initial documentation update with Kiro agent configuration |
 | 1.1.0 | 2026-01-29 | Added skill resources directory with 3 comprehensive skills |
 

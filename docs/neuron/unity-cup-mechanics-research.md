@@ -13,6 +13,7 @@
 Unity Cup (known as "Aoharu Hai" in JP) is the second permanent career scenario in Umamusume: Pretty Derby, released November 6, 2025 on Global. Unlike URA Finale which focuses on a single character, Unity Cup emphasizes **team-based progression** where your trainee develops alongside teammates through special training mechanics and team races.
 
 ### Key Differentiators from URA Finale
+
 - Training facility levels tied to **team stat rank** (not usage frequency)
 - **Spirit Burst** mechanic for massive stat gains
 - **Unity Training** (white flame indicators) for team progression
@@ -53,7 +54,7 @@ Each team race consists of **5 races** across all distances:
 - Long
 - Dirt
 
-### Victory Condition**: Win at least **3 out of 5 races
+### Victory Condition**: Win at least**3 out of 5 races
 
 ### 1.4 Opponent Selection
 
@@ -197,7 +198,7 @@ Stat gains based on **training facility type** and **support card type**:
 - Standard Spirit Burst: **Level 2** skill hint
 - Scenario-linked support card: **Level 3** skill hint
 
-### Skill Selection**: Random based on trainee's **A aptitudes
+### Skill Selection**: Random based on trainee's**A aptitudes
 
 ### 2.4 Energy Cost Impact
 
@@ -207,7 +208,7 @@ Spirit Burst **increases energy consumption** of that training:
 - Pal cards (e.g., Riko Kashimoto) **do not reduce** this additional cost
 - They only reduce base training cost
 
-### Exception**: Wit training Spirit Burst **increases energy recovery
+### Exception**: Wit training Spirit Burst**increases energy recovery
 
 ### 2.5 Multiple Spirit Bursts
 
@@ -506,7 +507,7 @@ Unity Training costs **more energy** than normal training:
 
 **Requirement**: Character must be your trainee OR one of your support cards
 
-### Gold Skill Reward**: Awarded if you **win Unity Cup Finals
+### Gold Skill Reward**: Awarded if you**win Unity Cup Finals
 
 - **Character**: Taiki Shuttle; **Team Name (EN)**: Happy Hoppers; **Gold Skill**: (Gold skill)
 - **Character**: Matikanefukukitaru; **Team Name (EN)**: Sunny Runners; **Gold Skill**: (Gold skill)

@@ -173,7 +173,7 @@ vendor/bin/pint
 
 # Run tests
 php artisan test --compact
-```
+```text
 
 ## Notes
 
@@ -182,3 +182,4 @@ php artisan test --compact
 - Using proper type safety throughout
 - No spec files created (as per user request)
 - Systematic approach: Controllers → Services → Tests → Models → Other
+

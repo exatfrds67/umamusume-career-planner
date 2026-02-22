@@ -107,7 +107,7 @@ This directory contains comprehensive research documentation on Umamusume Pretty
 ### Stat Targets (A+ Grade)
 
 | Stat | Target | Notes |
-|------|--------|-------|
+| ------ | -------- | ------- |
 | Speed | 1200+ | Soft cap at 1200 (50% effectiveness above) |
 | Stamina | 600-1000 | Distance-dependent |
 | Power | 800-1000 | Acceleration and positioning |
@@ -117,7 +117,7 @@ This directory contains comprehensive research documentation on Umamusume Pretty
 ### Training Facility Multipliers
 
 | Level | Multiplier | How to Reach |
-|-------|------------|--------------|
+| ------- | ------------ | -------------- |
 | 1 | 1.00× | Starting level |
 | 2 | 1.25× | URA: 4 uses / Unity: Team Rank D-E |
 | 3 | 1.50× | URA: 8 uses / Unity: Team Rank B-C |
@@ -127,7 +127,7 @@ This directory contains comprehensive research documentation on Umamusume Pretty
 ### Skill Hint Discounts
 
 | Hint Level | Discount | Example (120 SP base) |
-|------------|----------|----------------------|
+| ------------ | ---------- | ---------------------- |
 | 0 | 0% | 120 SP |
 | 1 | 10% | 108 SP |
 | 2 | 20% | 96 SP |
@@ -138,7 +138,7 @@ This directory contains comprehensive research documentation on Umamusume Pretty
 ### Stamina Requirements by Distance
 
 | Distance | No Recovery Skills | With 1 Gold Skill | With 2 Gold Skills |
-|----------|-------------------|-------------------|-------------------|
+| ---------- | ------------------- | ------------------- | ------------------- |
 | Sprint (1000-1400m) | 290-400 | 250-350 | 200-300 |
 | Mile (1400-1800m) | 390-500 | 350-450 | 300-400 |
 | Medium (1800-2400m) | 540-700 | 450-600 | 400-550 |
@@ -331,4 +331,4 @@ All research content has been:
 
 ---
 
-**End of Document**
+End of Document

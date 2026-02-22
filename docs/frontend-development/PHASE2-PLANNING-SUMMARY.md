@@ -56,7 +56,7 @@ The wizard UI successfully collects character creation data. Now we need to:
 - Added Backend Integration Planning section with goals and file references
 - Preserved all existing solutions repository items
 
-**3. TODO List (Managed via manage_todo_list)**
+### TODO List (Managed via manage_todo_list)
 
 - 22 actionable items with descriptions
 - All set to "not-started" status

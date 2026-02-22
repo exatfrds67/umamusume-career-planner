@@ -220,7 +220,7 @@ Successfully implemented **Phases 1-3** of the UI Foundation and Interactive Com
 #### Stat Colors (from game screenshots)
 
 | Stat | Color | Hex | Usage |
-|------|-------|-----|-------|
+| ------ | ------- | ----- | ------- |
 | Speed | Blue | #3B82F6 | Speed stat, icons |
 | Stamina | Vivid Green | #22C55E | Stamina stat, healing |
 | Power | Orange | #F97316 | Power stat, physical effort |
@@ -230,7 +230,7 @@ Successfully implemented **Phases 1-3** of the UI Foundation and Interactive Com
 #### Condition Colors (from game)
 
 | Condition | Color | Hex | Effect |
-|-----------|-------|-----|--------|
+| ----------- | ------- | ----- | -------- |
 | GREAT | Pink | #EC4899 | +20% training effectiveness |
 | GOOD | Light Blue | #60A5FA | +10% training effectiveness |
 | NORMAL | Orange | #F97316 | Baseline |
@@ -240,12 +240,12 @@ Successfully implemented **Phases 1-3** of the UI Foundation and Interactive Com
 
 G → F → E → D → C → B → A → S
 
-**No SS grade exists in the game**
+No SS grade exists in the game
 
 #### Skill Hint Discounts (verified from research)
 
 | Hint Level | Discount | Example (120 SP) |
-|------------|----------|------------------|
+| ------------ | ---------- | ------------------ |
 | 0 hints | 0% | 120 SP |
 | 1 hint | 10% | 108 SP (-12) |
 | 2 hints | 20% | 96 SP (-24) |

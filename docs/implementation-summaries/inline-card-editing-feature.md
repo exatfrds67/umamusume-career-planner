@@ -8,7 +8,9 @@
 
 ## Overview
 
-This feature allows users to edit the details (Limit Break level and Friendship level) of support cards that are already slotted in their deck, directly from the Deck Builder page. This is essential for accurate deck building and planning, as different card progression levels significantly impact training effectiveness.
+This feature allows users to edit the details (Limit Break level and Friendship level) of support cards that are already
+slotted in their deck, directly from the Deck Builder page. This is essential for accurate deck building and planning,
+as different card progression levels significantly impact training effectiveness.
 
 ---
 
@@ -68,7 +70,7 @@ editFriendship: 0,
 openEditModal(slot, limitBreak, friendship)
 closeEditModal()
 saveCardDetails()
-```
+```text
 
 ### 2. Backend Changes
 
@@ -92,7 +94,7 @@ public function updateCardDetails(Request $request, Character $character, int $p
 ```php
 'limit_break_level' => 'required|integer|min:0|max:4',
 'friendship_level' => 'required|integer|min:0|max:100',
-```
+```text
 
 #### File: `app/Services/DeckManagementService.php`
 
@@ -123,13 +125,15 @@ public function updateCardDetails(
 ```php
 Route::put('/cards/{position}/details', [DeckManagementController::class, 'updateCardDetails'])
     ->name('cards.update-details');
-```
+```text
 
 **Full Route Path:**
 
 ```
+
 PUT /api/v1/characters/{character}/deck/cards/{position}/details
-```
+
+```text
 
 ### 3. Database Schema
 
@@ -194,7 +198,7 @@ No schema changes required - feature uses existing columns.
     "statistics": { ... }
   }
 }
-```
+```text
 
 **Error Response (404):**
 
@@ -215,7 +219,7 @@ No schema changes required - feature uses existing columns.
     "friendship_level": ["The friendship level must be between 0 and 100."]
   }
 }
-```
+```text
 
 ---
 
@@ -403,7 +407,8 @@ The inline card details editing feature is **fully implemented and tested**. Use
 5. ✅ Save changes that persist to the database
 6. ✅ View updated values immediately after saving
 
-The feature follows Laravel best practices, includes proper validation and security measures, and provides an excellent user experience with clear visual feedback.
+The feature follows Laravel best practices, includes proper validation and security measures, and provides an excellent
+user experience with clear visual feedback.
 
 ---
 
@@ -411,3 +416,4 @@ The feature follows Laravel best practices, includes proper validation and secur
 **Testing Status**: ✅ Verified  
 **Documentation Status**: ✅ Complete  
 **Ready for Production**: ✅ Yes
+

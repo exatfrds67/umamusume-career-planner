@@ -80,7 +80,7 @@ Shows your latest training sessions, race results, and skill acquisitions.
 Each character has five main stats:
 
 | Stat | Description | Impact |
-|------|-------------|--------|
+| --- | --- | --- |
 | **Speed** | Running speed | Final stretch performance |
 | **Stamina** | Endurance | Ability to maintain pace |
 | **Power** | Acceleration | Position changes, hill climbing |
@@ -164,7 +164,7 @@ Set goals to track your progress:
 ### Training Types
 
 | Type | Primary Stat | Secondary Stats |
-|------|--------------|-----------------|
+| --- | --- | --- |
 | Speed | Speed | Power |
 | Stamina | Stamina | Guts |
 | Power | Power | Stamina |
@@ -248,7 +248,7 @@ Consider these factors:
 ### Skill Types
 
 | Type | Description | Rarity |
-|------|-------------|--------|
+| --- | --- | --- |
 | **Normal** | Common skills | White |
 | **Rare** | Powerful skills | Gold |
 | **Unique** | Character-specific | Rainbow |
@@ -291,7 +291,7 @@ Your deck consists of 6 support cards:
 ### Card Types
 
 | Type | Primary Bonus | Best For |
-|------|---------------|----------|
+| --- | --- | --- |
 | Speed | Speed training | Speed-focused builds |
 | Stamina | Stamina training | Long-distance runners |
 | Power | Power training | Acceleration builds |
@@ -447,7 +447,7 @@ When reporting issues, include:
 ## Keyboard Shortcuts
 
 | Shortcut | Action |
-|----------|--------|
+| --- | --- |
 | `Ctrl + N` | New character |
 | `Ctrl + S` | Save changes |
 | `Ctrl + /` | Open AI Advisor |
@@ -459,7 +459,7 @@ When reporting issues, include:
 ## Glossary
 
 | Term | Definition |
-|------|------------|
+| --- | --- |
 | **SP** | Skill Points - Currency for learning skills |
 | **Aptitude** | Character's affinity for race conditions |
 | **Meta Tier** | Ranking of support card effectiveness |
@@ -468,4 +468,4 @@ When reporting issues, include:
 
 ---
 
-*Last updated: February 2026*
+Last updated: February 2026

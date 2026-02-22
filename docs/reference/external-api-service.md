@@ -120,7 +120,7 @@ if ($result['success']) {
 Each API source requires the following configuration:
 
 | Field | Type | Description | Required |
-|-------|------|-------------|----------|
+| --- | --- | --- | --- |
 | `priority` | int | Priority order (1 = highest) | Yes |
 | `base_url` | string | Base URL for the API | Yes |
 | `timeout` | int | Request timeout in seconds | Yes |
@@ -470,8 +470,8 @@ return [
     'umapyoi' => [
         'url' => env('UMAPYOI_API_URL', 'https://api.umapyoi.net'),
     ],
-    'gametora' => [
-        'url' => env('GAMETORA_API_URL', 'https://gametora.com/api'),
+    'umamusumedb' => [
+        'url' => env('UMAMUSUMEDB_API_URL', 'https://umamusumedb.com/api'),
     ],
 ];
 ```
@@ -480,7 +480,7 @@ Add to `.env`:
 
 ```env
 UMAPYOI_API_URL=https://api.umapyoi.net
-GAMETORA_API_URL=https://gametora.com/api
+UMAMUSUMEDB_API_URL=https://umamusumedb.com/api
 ```
 
 ## Troubleshooting
@@ -506,7 +506,7 @@ GAMETORA_API_URL=https://gametora.com/api
 - Wait for automatic reset (60 seconds)
 - Manually reset: `$service->resetCircuitBreaker('source')`
 
-### All Sources Failed
+### All Sources Failed (Troubleshooting)
 
 **Symptom**: All API sources return errors
 

@@ -10,7 +10,8 @@
 
 ## Test Summary
 
-The sidebar minimize feature has been successfully tested in the browser using Chrome DevTools. All core functionality is working as expected.
+The sidebar minimize feature has been successfully tested in the browser using Chrome DevTools. All core functionality
+is working as expected.
 
 ## Test Environment
 
@@ -181,7 +182,7 @@ The following items could not be fully tested via Chrome DevTools automation and
   "minimized": false,  // Initial state
   "storeExists": true
 }
-```
+```text
 
 After toggle:
 
@@ -249,7 +250,8 @@ Complete the manual testing checklist to verify:
 
 ## Conclusion
 
-The sidebar minimize feature implementation is **functionally complete** and working correctly. The automated tests confirm:
+The sidebar minimize feature implementation is **functionally complete** and working correctly. The automated tests
+confirm:
 
 ✅ Alpine.js store is properly configured  
 ✅ Toggle functionality works correctly  
@@ -259,7 +261,8 @@ The sidebar minimize feature implementation is **functionally complete** and wor
 ✅ Bottom navigation items work in both states  
 ✅ Tooltip component is implemented  
 
-The feature is ready for manual testing to verify visual appearance, animations, tooltips, and user experience across different browsers and devices.
+The feature is ready for manual testing to verify visual appearance, animations, tooltips, and user experience across
+different browsers and devices.
 
 ---
 

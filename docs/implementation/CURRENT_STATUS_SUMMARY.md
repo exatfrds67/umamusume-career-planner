@@ -1,14 +1,15 @@
 # Current Status Summary
 
-**Date**: 2026-01-25 (historical; all phases now complete through Phase 7)  
-**Overall Progress**: ✅ All phases (1-7) complete  
+**Date**: 2026-01-25  
+**Overall Progress**: Phase 3 is 75% complete  
 
 ## Test Status
 
-✅ **3,316+ tests passing** (all passing)  
-✅ **11,563+ assertions**  
+✅ **3276 tests passing** (99.5% pass rate)  
+⚠️ **15 tests failing** (all from new Phase 3 training tests - schema issues only)  
+⚠️ **1 risky test** (unrelated to Phase 3)  
 
-**Total Assertions**: 11,563+ passing
+**Total Assertions**: 11,533 passing
 
 ## What's Working
 
@@ -27,7 +28,7 @@
 - Rarity inference from card ID ranges
 - All tests passing
 
-### ✅ Phase 3 - Training System Integration (100%)
+### ✅ Phase 3 - Training System Integration (75%)
 
 #### Backend (100% Complete)
 
@@ -43,19 +44,19 @@
 - ✅ Routes (API routes for training)
 - ✅ Factories (SupportDeckFactory)
 
-#### Testing (100% Complete)
+#### Testing (50% Complete)
 
 - ✅ Unit tests created (21 tests)
-- ✅ Unit tests passing
-- ✅ Feature tests created and passing
+- ⏳ Unit tests passing (0/21 - schema issues)
+- ⏳ Feature tests (not created yet)
 
-#### Frontend (100% Complete)
+#### Frontend (0% Complete)
 
-- ✅ Deck builder UI
-- ✅ Training prediction display
-- ✅ Skill hint notifications
-- ✅ Bond level progress bars
-- ✅ Friendship training indicator
+- ⏳ Deck builder UI
+- ⏳ Training prediction display
+- ⏳ Skill hint notifications
+- ⏳ Bond level progress bars
+- ⏳ Friendship training indicator
 
 ## What Needs to Be Done
 
@@ -255,4 +256,4 @@ Phase 3 will be considered complete when:
 - ✅ User can execute training and see results
 - ✅ User can track bond levels and skill hints
 
-**Current Status**: ✅ All phases complete (1-7). 3,316+ tests, 11,563+ assertions.
+**Current Status**: 75% complete (backend done, tests created, frontend pending)

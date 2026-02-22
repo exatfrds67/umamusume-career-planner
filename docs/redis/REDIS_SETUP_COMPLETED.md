@@ -18,7 +18,7 @@ CACHE_STORE=redis
 QUEUE_CONNECTION=redis
 SESSION_DRIVER=redis
 CACHE_PREFIX=umamusume-career-planner-cache-
-```
+```text
 
 **Verification:**
 
@@ -111,7 +111,7 @@ Comprehensive guide for manual phpredis installation including:
 
    ```powershell
    php -m | Select-String -Pattern "redis"
-   ```
+   ```text
 
    Should show: `redis`
 
@@ -133,7 +133,7 @@ php artisan config:clear
 
 ```powershell
 php artisan redis:health --detailed
-```
+```text
 
 **Expected Output:**
 
@@ -155,11 +155,11 @@ php artisan test --compact
 
 **Expected:** All tests should pass
 
-### 4. Warm Cache
+## 4. Warm Cache
 
 ```powershell
 php artisan cache:warm
-```
+```text
 
 **Expected:** Cache warming successful
 
@@ -177,12 +177,12 @@ wsl bash -c "redis-cli keys 'umamusume-career-planner:*'"
 
 ### System Configuration
 
-| Component | Status | Details |
-|-----------|--------|---------|
-| Redis Service (WSL) | ✅ Running | v7.0.15 on 127.0.0.1:6379 |
-| .env Configuration | ✅ Updated | Using Redis for cache/queue/session |
-| Test Files | ✅ Updated | 8 changes across 2 files |
-| phpredis Extension | ⏳ Pending | Requires manual installation |
+| Component           | Status     | Details                             |
+| ------------------- | ---------- | ----------------------------------- |
+| Redis Service (WSL) | ✅ Running | v7.0.15 on 127.0.0.1:6379           |
+| .env Configuration  | ✅ Updated | Using Redis for cache/queue/session |
+| Test Files          | ✅ Updated | 8 changes across 2 files            |
+| phpredis Extension  | ⏳ Pending | Requires manual installation        |
 
 ### Files Modified
 
@@ -210,9 +210,9 @@ wsl bash -c "redis-cli ping"
 
 # Check PHP extensions (after phpredis installation)
 php -m | Select-String redis
-```
+```text
 
-### After phpredis Installation
+## After phpredis Installation
 
 ```powershell
 # Test connection
@@ -247,29 +247,29 @@ Setup is complete when:
 
 ## 📚 Documentation Reference
 
-| Document | Purpose |
-|----------|---------|
+| Document                       | Purpose                             |
+| ------------------------------ | ----------------------------------- |
 | `INSTALL_PHPREDIS_MANUALLY.md` | **START HERE** - Installation guide |
-| `REDIS_SETUP_INSTRUCTIONS.md` | Complete setup guide |
-| `REDIS_SETUP_CHECKLIST.md` | Step-by-step checklist |
-| `REDIS_COMMANDS_REFERENCE.md` | Command reference |
-| `REDIS_SETUP_SUMMARY.md` | Overview |
-| `REDIS_CURRENT_STATUS.md` | Status report |
-| `START_HERE.md` | Quick start |
-| `REDIS_SETUP_COMPLETED.md` | This report |
+| `REDIS_SETUP_INSTRUCTIONS.md`  | Complete setup guide                |
+| `REDIS_SETUP_CHECKLIST.md`     | Step-by-step checklist              |
+| `REDIS_COMMANDS_REFERENCE.md`  | Command reference                   |
+| `REDIS_SETUP_SUMMARY.md`       | Overview                            |
+| `REDIS_CURRENT_STATUS.md`      | Status report                       |
+| `START_HERE.md`                | Quick start                         |
+| `REDIS_SETUP_COMPLETED.md`     | This report                         |
 
 ---
 
 ## ⏱️ Time Estimate
 
-| Task | Time | Status |
-|------|------|--------|
-| .env Update | 2 min | ✅ Done |
-| Test Updates | 10 min | ✅ Done |
-| phpredis Installation | 10 min | ⏳ Pending |
-| Testing | 10 min | ⏳ Pending |
-| Cache Warming | 5 min | ⏳ Pending |
-| **Total** | **37 min** | **60% Complete** |
+| Task                  | Time       | Status            |
+| --------------------- | ---------- | ----------------- |
+| .env Update           | 2 min      | ✅ Done           |
+| Test Updates          | 10 min     | ✅ Done           |
+| phpredis Installation | 10 min     | ⏳ Pending        |
+| Testing               | 10 min     | ⏳ Pending        |
+| Cache Warming         | 5 min      | ⏳ Pending        |
+| **Total**             | **37 min** | **60% Complete**  |
 
 **Remaining:** ~27 minutes (after phpredis installation)
 

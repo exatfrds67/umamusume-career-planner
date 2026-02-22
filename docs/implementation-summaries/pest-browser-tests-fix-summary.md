@@ -34,7 +34,7 @@ $page = visit('/dashboard')
 
 // WRONG: pause() method doesn't exist
 $page->pause(2000);
-```
+```text
 
 #### ✅ **Correct Patterns** (What Works)
 
@@ -49,13 +49,13 @@ $page->wait(2); // Wait 2 seconds
 
 ### Available Wait Methods
 
-| Method | Purpose | Example |
-|--------|---------|---------|
-| `wait(seconds)` | Fixed time wait | `$page->wait(2)` |
-| `waitFor(selector, timeout)` | Wait for element | `$page->waitFor('.loaded', 10)` |
-| `waitForText(text, timeout)` | Wait for text | `$page->waitForText('Success')` |
-| `waitForKey()` | Debug pause (manual) | `$page->waitForKey()` |
-| `debug()` | Interactive debugging | `$page->debug()` |
+| Method                       | Purpose               | Example                         |
+| ---------------------------- | --------------------- | ------------------------------- |
+| `wait(seconds)`              | Fixed time wait       | `$page->wait(2)`                |
+| `waitFor(selector, timeout)` | Wait for element      | `$page->waitFor('.loaded', 10)` |
+| `waitForText(text, timeout)` | Wait for text         | `$page->waitForText('Success')` |
+| `waitForKey()`               | Debug pause (manual)  | `$page->waitForKey()`           |
+| `debug()`                    | Interactive debugging | `$page->debug()`                |
 
 ### Automatic Waiting
 
@@ -79,7 +79,7 @@ $page = visit('/training/predictions')
 // After
 $this->actingAs($this->user);
 $page = visit('/training/predictions');
-```
+```text
 
 **Files Modified**: Lines 56, 116, 149, 286, 321, 398, 442
 
@@ -89,13 +89,13 @@ $page = visit('/training/predictions');
 
 Automated replacement of all `pause()` calls with `wait()`:
 
-| Old Pattern | New Pattern | Occurrences |
-|-------------|-------------|-------------|
-| `->pause(200)` | `->wait(0.2)` | 4 |
-| `->pause(500)` | `->wait(0.5)` | 2 |
-| `->pause(1000)` | `->wait(1)` | 12 |
-| `->pause(2000)` | `->wait(2)` | 18 |
-| `->pause(3000)` | `->wait(3)` | 1 |
+| Old Pattern     | New Pattern   | Occurrences |
+| --------------- | ------------- | ----------- |
+| `->pause(200)`  | `->wait(0.2)` | 4           |
+| `->pause(500)`  | `->wait(0.5)` | 2           |
+| `->pause(1000)` | `->wait(1)`   | 12          |
+| `->pause(2000)` | `->wait(2)`   | 18          |
+| `->pause(3000)` | `->wait(3)`   | 1           |
 
 **Total replacements**: 37 instances
 
@@ -122,9 +122,9 @@ if (env('SKIP_BROWSER_TESTS', false)) {
 # Browser Testing Configuration
 SKIP_BROWSER_TESTS=true
 SKIP_EXTERNAL_API_TESTS=true
-```
+```text
 
-### 4. Updated Documentation
+## 4. Updated Documentation
 
 Added comprehensive comments explaining:
 
@@ -137,21 +137,26 @@ Added comprehensive comments explaining:
 ### Before Fixes
 
 ```
+
 Tests:    8 failed, 379 passed
+
 - 1 Livewire test (case sensitivity - fixed separately)
 - 7 Browser tests (actingAs + pause issues)
-```
+
+```text
 
 ### After Fixes
 
 ```
+
 Tests:    7 skipped, 380 passed (1478 assertions)
 Duration: 33.95s
 
 ✓ All non-browser tests passing
 ✓ Browser tests properly skipped with clear message
 ✓ No errors or failures
-```
+
+```text
 
 ## Running Browser Tests
 
@@ -165,13 +170,13 @@ Duration: 33.95s
    npx playwright install
    ```
 
-2. **Start Application Server**:
+1. **Start Application Server**:
 
    ```bash
    php artisan serve
-   ```
+   ```text
 
-3. **Configure Environment**:
+2. **Configure Environment**:
 
    ```env
    # In .env.testing
@@ -179,7 +184,7 @@ Duration: 33.95s
    APP_URL=http://localhost:8000
    ```
 
-### Execution Commands
+## Execution Commands
 
 ```bash
 # Run only browser tests
@@ -193,7 +198,7 @@ php artisan test --group=browser --debug
 
 # Skip browser tests (default)
 php artisan test --exclude-group=browser
-```
+```text
 
 ## Best Practices Learned
 
@@ -217,7 +222,7 @@ $page->click('Submit')
 
 // Manual inspection
 $page->waitForKey(); // Opens browser, waits for key press
-```
+```text
 
 ### 3. Leverage Laravel Integration
 
@@ -250,7 +255,7 @@ pest()->browser()
     ->timeout(10000)  // 10 seconds default
     ->headed()        // Show browser
     ->inFirefox();    // Use Firefox
-```
+```text
 
 ## Files Modified
 
@@ -293,4 +298,6 @@ All Pest v4 browser testing issues have been resolved:
 ✅ Clear documentation for running browser tests  
 ✅ Best practices documented for future development  
 
-The browser tests are now properly configured and ready to use when needed, with appropriate skip logic for environments where they're not required.
+The browser tests are now properly configured and ready to use when needed, with appropriate skip logic for environments
+where they're not required.
+

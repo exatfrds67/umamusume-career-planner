@@ -7,7 +7,8 @@
 
 ## Test Objective
 
-Validate the complete character creation flow from the welcome page through all form steps to the review page, using actual data input to ensure all form fields work correctly and data is properly saved to the database.
+Validate the complete character creation flow from the welcome page through all form steps to the review page, using
+actual data input to ensure all form fields work correctly and data is properly saved to the database.
 
 ## Test Environment
 
@@ -50,13 +51,13 @@ Validate the complete character creation flow from the welcome page through all 
 
 **Fields Tested:**
 
-| Stat | Value | Grade | Status |
-|------|-------|-------|--------|
-| Speed | 92 | F | ✅ |
-| Stamina | 85 | F | ✅ |
-| Power | 85 | F | ✅ |
-| Guts | 88 | F | ✅ |
-| Wit | 100 | E | ✅ |
+| Stat    | Value | Grade | Status |
+| ------- | ----- | ----- | ------ |
+| Speed   | 92    | F     | ✅     |
+| Stamina | 85    | F     | ✅     |
+| Power   | 85    | F     | ✅     |
+| Guts    | 88    | F     | ✅     |
+| Wit     | 100   | E     | ✅     |
 
 **Validation:**
 
@@ -173,7 +174,7 @@ Validate the complete character creation flow from the welcome page through all 
 
 **Error Message:**
 
-```
+```text
 Illuminate\Database\Eloquent\RelationNotFoundException
 Call to undefined relationship [skills] on model [App\Models\Character].
 ```
@@ -192,7 +193,7 @@ $character->load([
     },
     'supportCards.supportCard',
 ]);
-```
+```text
 
 **Impact**: Character detail page cannot be displayed after creation.
 
@@ -206,9 +207,11 @@ $character->load([
 **Error Message:**
 
 ```
-SQLSTATE[42S02]: Base table or view not found: 1146 
+
+SQLSTATE[42S02]: Base table or view not found: 1146
 Table 'umamusume-career-planner.careers' doesn't exist
-```
+
+```text
 
 **Location**: `app/Http/Controllers/CharacterController.php:141`
 
@@ -223,7 +226,8 @@ Table 'umamusume-career-planner.careers' doesn't exist
 
 **Evidence:**
 
-- Form data: `avatar_url: "/images/trainee_images/__agnes_tachyon_umamusume_drawn_by_welchino__sample-1db2ca428e2545fcae81fe526d7a8e96.jpg"`
+- Form data: `avatar_url:
+"/images/trainee_images/__agnes_tachyon_umamusume_drawn_by_welchino__sample-1db2ca428e2545fcae81fe526d7a8e96.jpg"`
 - Database: `avatar_url: null`
 
 **Impact**: Character avatar not displayed after creation.
@@ -285,7 +289,7 @@ All aptitude records were successfully created with the correct character_id and
    
    // Model
    protected $fillable = [..., 'title'];
-   ```
+   ```text
 
 2. **Fix Character relationships**
 
@@ -311,7 +315,7 @@ All aptitude records were successfully created with the correct character_id and
    ```php
    // Ensure in StoreCharacterRequest or Controller
    'avatar_url' => $request->input('avatar_url'),
-   ```
+   ```text
 
 ### Future Enhancements
 
@@ -323,20 +327,23 @@ All aptitude records were successfully created with the correct character_id and
 
 ## Test Coverage
 
-| Feature | Coverage | Status |
-|---------|----------|--------|
-| Form Navigation | 100% | ✅ Pass |
-| Field Validation | 100% | ✅ Pass |
-| Data Input | 100% | ✅ Pass |
-| Data Persistence | 100% | ✅ Pass |
-| Database Creation | 80% | ⚠️ Partial (missing title, avatar_url) |
-| Post-Creation Flow | 0% | ❌ Fail (errors prevent display) |
+| Feature            | Coverage | Status                                 |
+| ------------------ | -------- | -------------------------------------- |
+| Form Navigation    | 100%     | ✅ Pass                                |
+| Field Validation   | 100%     | ✅ Pass                                |
+| Data Input         | 100%     | ✅ Pass                                |
+| Data Persistence   | 100%     | ✅ Pass                                |
+| Database Creation  | 80%      | ⚠️ Partial (missing title, avatar_url) |
+| Post-Creation Flow | 0%       | ❌ Fail (errors prevent display)       |
 
 ## Conclusion
 
-The character creation form itself is **fully functional** and works as designed. All form steps, validations, and data input mechanisms work correctly. The form successfully creates character records in the database with stats and aptitudes.
+The character creation form itself is **fully functional** and works as designed. All form steps, validations, and data
+input mechanisms work correctly. The form successfully creates character records in the database with stats and
+aptitudes.
 
-However, **post-creation functionality is broken** due to missing database relationships and tables. The application cannot display created characters due to these structural issues.
+However, **post-creation functionality is broken** due to missing database relationships and tables. The application
+cannot display created characters due to these structural issues.
 
 **Overall Assessment**: Form UI/UX = ✅ Excellent | Backend Integration = ⚠️ Needs Fixes
 

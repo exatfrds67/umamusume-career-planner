@@ -42,14 +42,14 @@ Select-String -Path "C:\xampp\php\php.ini" -Pattern "extension=redis"
 
 ### Step 3: Restart Apache
 
-**Option A: Using XAMPP Control Panel**
+#### Option A: Using XAMPP Control Panel
 
 1. Open XAMPP Control Panel
 2. Click "Stop" next to Apache
 3. Wait for it to stop
 4. Click "Start" next to Apache
 
-**Option B: Using Command Line**
+#### Option B: Using Command Line
 
 ```powershell
 # Stop Apache
@@ -59,7 +59,7 @@ net stop Apache2.4
 net start Apache2.4
 ```
 
-**Option C: Using Services**
+#### Option C: Using Services
 
 1. Press Win + R
 2. Type: `services.msc`

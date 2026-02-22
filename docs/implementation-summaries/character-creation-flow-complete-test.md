@@ -6,7 +6,8 @@
 
 ## Summary
 
-Successfully tested the complete character creation wizard flow from start to finish, including form submission, database persistence, and display of the created character.
+Successfully tested the complete character creation wizard flow from start to finish, including form submission,
+database persistence, and display of the created character.
 
 ## Test Execution
 
@@ -61,7 +62,8 @@ Successfully tested the complete character creation wizard flow from start to fi
 
 **Error**: `App\Models\Character::getStat(): Return value must be of type int, string returned`
 
-**Root Cause**: The `current_stats` JSON field was cast as `array`, which returns string values from JSON. The `getStat()` method had a return type of `int` but wasn't casting the value.
+**Root Cause**: The `current_stats` JSON field was cast as `array`, which returns string values from JSON. The
+`getStat()` method had a return type of `int` but wasn't casting the value.
 
 **Fix**: Updated `app/Models/Character.php` line 261:
 
@@ -71,7 +73,7 @@ return $this->current_stats[$stat] ?? 0;
 
 // After
 return (int) ($this->current_stats[$stat] ?? 0);
-```
+```text
 
 **Result**: Character detail page now displays correctly without errors.
 
@@ -167,3 +169,4 @@ Recommended follow-up testing:
 5. Test factor management for the character
 6. Test support deck building for the character
 7. Test skill acquisition for the character
+

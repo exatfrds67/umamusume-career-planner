@@ -6,7 +6,8 @@
 
 ### 1. Alpine.js Scope Issues
 
-**Problem**: Edit Modal was placed outside the Alpine.js component scope, causing all modal-related variables to be undefined.
+**Problem**: Edit Modal was placed outside the Alpine.js component scope, causing all modal-related variables to be
+undefined.
 
 **Symptoms**:
 
@@ -43,7 +44,7 @@
 
 <!-- Edit Modal HERE - OUTSIDE Alpine scope! -->
 <div x-show="showEditModal">...</div>
-```
+```text
 
 **Structure After**:
 
@@ -68,7 +69,7 @@
 ```html
 <div x-data="deckBuilder(@js($deckData), {{ $character->id }})" 
      x-init="availableCards = window.preloadedCards || []; init()">
-```
+```text
 
 **After**:
 
@@ -86,7 +87,7 @@ Added HTML comments to mark the closing tags for better maintainability:
 ```html
 </div><!-- End grid -->
 </div><!-- End Alpine component -->
-```
+```text
 
 ## Files Modified
 
@@ -152,8 +153,10 @@ After fixes, you should see:
 These warnings appear in console but are from the navigation menu (not deck builder):
 
 ```
+
 Alpine Warning: You can't use [x-collapse] without first installing the "Collapse" plugin
-```
+
+```text
 
 **Impact**: None on deck builder functionality
 **Location**: Layout navigation (not this page)
@@ -259,3 +262,4 @@ If issues persist:
 3. Verify `npm run build` completed successfully
 4. Check that `resources/js/deck-builder.js` is loaded
 5. Verify Alpine.js is initialized (`window.Alpine` exists)
+

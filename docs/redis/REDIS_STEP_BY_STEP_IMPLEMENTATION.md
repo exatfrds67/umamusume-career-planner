@@ -492,4 +492,6 @@ If you encounter issues not covered in this guide:
 
 ---
 
-**Congratulations! You have successfully implemented Redis in your UmamusumeCareerPlanner application! 🎉**
+## Congratulations
+
+You have successfully implemented Redis in your UmamusumeCareerPlanner application! 🎉

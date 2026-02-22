@@ -2,7 +2,8 @@
 
 ## Problem Summary
 
-Your Windows 10 version (19045.6466) **does not support WSL mirrored networking**, which requires Windows 11. Therefore, we need to use **port forwarding** to make Redis accessible from Windows.
+Your Windows 10 version (19045.6466) **does not support WSL mirrored networking**, which requires Windows 11. Therefore,
+we need to use **port forwarding** to make Redis accessible from Windows.
 
 ## Solution: Port Forwarding
 
@@ -14,7 +15,7 @@ Run the automated setup script as Administrator:
 # Right-click PowerShell -> Run as Administrator
 cd C:\XAMPP\htdocs\umamusume-career-planner
 .\scripts\setup-redis-portforward.ps1
-```
+```text
 
 This script will:
 
@@ -23,7 +24,7 @@ This script will:
 3. Add Windows Firewall rule
 4. Test the connection
 
-### Manual Setup
+## Manual Setup
 
 If you prefer to set up manually:
 
@@ -39,7 +40,7 @@ wsl hostname -I
 ```powershell
 $wslIP = "172.18.205.249"  # Replace with your WSL IP
 netsh interface portproxy add v4tov4 listenport=6379 listenaddress=127.0.0.1 connectport=6379 connectaddress=$wslIP
-```
+```text
 
 1. **Add firewall rule** (as Administrator):
 
@@ -51,7 +52,7 @@ New-NetFirewallRule -DisplayName "WSL Redis" -Direction Inbound -LocalPort 6379 
 
 ```powershell
 netsh interface portproxy show all
-```
+```text
 
 ## Configuration Files
 
@@ -76,7 +77,7 @@ php scripts/test-redis.php
 # Ping response: PONG
 # Set test_key
 # Get test_key: Hello from Windows with mirrored networking!
-```
+```text
 
 ## Running Tests
 
@@ -104,7 +105,7 @@ php artisan test --compact
 
 ```powershell
 wsl hostname -I
-```
+```text
 
 - If IP changed, run the setup script again
 
@@ -118,7 +119,7 @@ netsh interface portproxy show all
 
 ```powershell
 Test-NetConnection -ComputerName 127.0.0.1 -Port 6379
-```
+```text
 
 ### Redis not running in WSL
 
@@ -133,7 +134,7 @@ wsl sudo service redis-server start
 wsl redis-cli ping
 ```
 
-### Firewall blocking connection
+## Firewall blocking connection
 
 ```powershell
 # Check firewall rule
@@ -142,7 +143,7 @@ Get-NetFirewallRule -DisplayName "WSL Redis"
 # Recreate firewall rule
 Remove-NetFirewallRule -DisplayName "WSL Redis"
 New-NetFirewallRule -DisplayName "WSL Redis" -Direction Inbound -LocalPort 6379 -Protocol TCP -Action Allow
-```
+```text
 
 ## Important Notes
 
@@ -177,7 +178,7 @@ Register-ScheduledTask -TaskName "WSL Redis Port Forward" -Action $action -Trigg
 
 **Error message**:
 
-```
+```text
 wsl: Mirrored networking mode is not supported: Windows version 19045.6466 does not have the required features.
 Falling back to NAT networking.
 ```
@@ -207,17 +208,17 @@ If port forwarding is problematic, you can run Redis natively on Windows:
 ```powershell
 # Redis will start automatically after installation
 redis-server
-```
+```text
 
 1. **No configuration changes needed** - already set to `127.0.0.1:6379`
 
 ## Summary
 
-| Solution | Complexity | Reliability | Recommended |
-|----------|-----------|-------------|-------------|
-| Port Forwarding | Medium | Medium | ✅ Yes (Windows 10) |
-| Mirrored Networking | Low | High | ❌ Requires Windows 11 |
-| Windows Redis | Low | High | Alternative |
+| Solution            | Complexity | Reliability | Recommended           |
+| ------------------- | ---------- | ----------- | --------------------- |
+| Port Forwarding     | Medium     | Medium      | ✅ Yes (Windows 10)    |
+| Mirrored Networking | Low        | High        | ❌ Requires Windows 11 |
+| Windows Redis       | Low        | High        | Alternative           |
 
 ## Files Created
 
@@ -238,7 +239,7 @@ redis-server
 
 ```bash
 php scripts/test-redis.php
-```
+```text
 
 1. **Run the tests**:
 

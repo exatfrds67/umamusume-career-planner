@@ -16,7 +16,7 @@ net stop Apache2.4
 
 # Start PHP server (no admin needed)
 php artisan serve
-```
+```text
 
 **Access application at:** <http://127.0.0.1:8000>
 
@@ -48,7 +48,7 @@ net stop Apache2.4
 net start Apache2.4
 ```
 
-### Method C: Windows Services
+## Method C: Windows Services
 
 1. Press `Win + R`
 2. Type: `services.msc` and press Enter
@@ -64,7 +64,7 @@ After restarting Apache or switching to PHP server:
 
 1. **Access application:**
 
-   ```
+   ```text
    http://127.0.0.1:8000
    ```
 
@@ -96,7 +96,7 @@ For development, PHP's built-in server is simpler:
 # Stop Apache (if running)
 # Then start PHP server:
 php artisan serve
-```
+```text
 
 **Benefits:**
 
@@ -119,13 +119,15 @@ net stop Apache2.4
 
 ```powershell
 php artisan serve
-```
+```text
 
 ### Access Application
 
 ```
-http://127.0.0.1:8000
-```
+
+<http://127.0.0.1:8000>
+
+```text
 
 ---
 
@@ -153,8 +155,8 @@ http://127.0.0.1:8000
    php artisan serve
    ```
 
-2. **Or restart Apache** using XAMPP Control Panel
+1. **Or restart Apache** using XAMPP Control Panel
 
-3. **Test application** at <http://127.0.0.1:8000>
+2. **Test application** at <http://127.0.0.1:8000>
 
-4. **Verify no errors** ✅
+3. **Verify no errors** ✅
