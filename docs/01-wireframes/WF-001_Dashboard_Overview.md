@@ -902,12 +902,12 @@ test.describe("Dashboard Accessibility", () => {
 
 ## 10. Version History
 
-| Version | Date       | Author           | Changes                                                                                                                                                                       |
-| ------- | ---------- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2.3.0   | 2026-02-22 | Development Team | Updated version/dates, aligned technology references with current stack (Livewire 4, Neuron AI v2.11, GameTora/umapyoi.net) |
-| 2.2.0   | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: corrected stat grade scale (S is max, no SS), mood system (+20%/-20% range), soft cap at 1200, career structure ~70-78 turns |
-| 2.0.0   | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added AI integration, real-time updates, accessibility specifications, performance targets, and testing requirements |
-| 1.0.0   | 2026-01-14 | Development Team | Initial wireframe specification                                                                                                                                               |
+| Version | Date | Author | Changes |
+| --- | --- | --- | --- |
+| 2.3.0 | 2026-02-22 | Development Team | Updated version/dates, aligned technology references with current stack (Livewire 4, Neuron AI v2.11, GameTora/umapyoi.net) |
+| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: corrected stat grade scale (S is max, no SS), mood system (+20%/-20% range), soft cap at 1200, career structure ~70-78 turns |
+| 2.0.0 | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added AI integration, real-time updates, accessibility specifications, performance targets, and testing requirements |
+| 1.0.0 | 2026-01-14 | Development Team | Initial wireframe specification |
 
 ---
 

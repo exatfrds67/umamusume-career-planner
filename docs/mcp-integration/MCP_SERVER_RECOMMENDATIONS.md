@@ -2,9 +2,9 @@
 
 ## Table of Contents
 
-- [Important: 50 Tool Limit](#️-important-50-tool-limit)
+- [Important: 50 Tool Limit](#important-50-tool-limit)
 - [Configuration Strategy](#configuration-strategy)
-- [User Config](#user-config-ckirosetttingsmcpjson)
+- [User Config](#user-config-kirosettingsmcpjson)
 - [Workspace Config](#workspace-config-kirosettingsmcpjson)
 - [Complete Configuration Files](#complete-configuration-files)
 - [Additional Recommended MCP Servers](#additional-recommended-mcp-servers-optional)
@@ -14,7 +14,7 @@
 
 ---
 
-## ⚠️ Important: 50 Tool Limit
+## Important: 50 Tool Limit
 
 Kiro has a limit of 50 MCP tools total. To avoid warnings, we split tools strategically:
 

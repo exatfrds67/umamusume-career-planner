@@ -381,28 +381,28 @@ prototypes/
 
 ### 6.2 Test Tasks
 
-**PT-001: Training Decision**
+#### PT-001: Training Decision
 
 1. Find the training most likely to improve Speed
 2. Identify which training the AI recommends
 3. Find the training with highest risk
 4. Select a training and confirm
 
-**PT-002: Stats Dashboard**
+#### PT-002: Stats Dashboard
 
 1. Find your character's current Speed stat
 2. Identify your character's condition/mood
 3. Locate the next scheduled race
 4. Navigate to the training screen
 
-**PT-003: Deck Builder**
+#### PT-003: Deck Builder
 
 1. Add a Speed-type support card to slot 1
 2. Find all SSR cards in your collection
 3. Build a complete 6-card deck
 4. Check the deck's total score
 
-**PT-004: Race Entry**
+#### PT-004: Race Entry
 
 1. Find the next G1 race on the calendar
 2. Check your readiness score for that race

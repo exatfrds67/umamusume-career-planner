@@ -233,7 +233,7 @@ Stat Gain = (Base + StatBonus) × (1 + GrowthRate) × (1 + MoodMultiplier × (1 
 ### 8.2 Formula Components
 
 | Component | Description | Typical Values |
-|-----------|-------------|----------------|
+| --- | --- | --- |
 | **Base** | Facility base stat gain | 10-25 depending on facility level |
 | **StatBonus** | Support card stat bonuses | Sum of participating card bonuses |
 | **GrowthRate** | Character's innate growth rate | 0-20% per stat |
@@ -277,12 +277,12 @@ flowchart TD
 
 ## Document Control
 
-| Version | Date       | Author           | Changes |
-|---------|------------|------------------|---------|
-| 2.3.0   | 2026-02-22 | Development Team | Updated service references: SupportBonusCalculator (Training/), SkillHintService (Training/), TrainingPredictionService for risk assessment; added Neuron AI v2.11 reference |
-| 2.2.0   | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: Added complete training formula, stat cap rules (1200 base, +100/+50 per-training caps, half value above 1200), hint levels max at 5, added hint discount table, added Summer Training Camp flow (4 turns, all facilities Level 5) |
-| 2.1.0   | 2026-01-24 | Development Team | Updated to include caching, Neuron AI agents, and Service layer architecture |
-| 1.0.0   | 2026-01-14 | Development Team | Initial flow definitions |
+| Version | Date | Author | Changes |
+| --- | --- | --- | --- |
+| 2.3.0 | 2026-02-22 | Development Team | Updated service references: SupportBonusCalculator (Training/), SkillHintService (Training/), TrainingPredictionService for risk assessment; added Neuron AI v2.11 reference |
+| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: Added complete training formula, stat cap rules (1200 base, +100/+50 per-training caps, half value above 1200), hint levels max at 5, added hint discount table, added Summer Training Camp flow (4 turns, all facilities Level 5) |
+| 2.1.0 | 2026-01-24 | Development Team | Updated to include caching, Neuron AI agents, and Service layer architecture |
+| 1.0.0 | 2026-01-14 | Development Team | Initial flow definitions |
 
 ---
 

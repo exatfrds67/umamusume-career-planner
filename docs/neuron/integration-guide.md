@@ -373,7 +373,7 @@ class TrainingAdvisorAgent extends BaseAgent
 
 ## Creating Tools
 
-### Using the Artisan Command
+### Using the Tool Artisan Command
 
 Create a new tool using the Artisan command:
 
@@ -1465,7 +1465,7 @@ class TrainingAdvisorAgent extends BaseAgent
 }
 ```
 
-#### Configuration
+#### MCP Environment Configuration
 
 Enable MCP in your `.env` file:
 
@@ -1712,7 +1712,7 @@ If Inspector doesn't fit your needs, consider:
 
 However, Inspector is specifically designed for AI agent monitoring and provides the most relevant insights for Neuron AI applications.
 
-### MCP Connector Integration (Optional)
+### MCP Connector Direct Integration (Optional)
 
 Connect to Model Context Protocol servers:
 

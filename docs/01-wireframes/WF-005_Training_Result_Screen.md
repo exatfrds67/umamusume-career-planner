@@ -176,7 +176,7 @@ The Training Result Screen displays the outcome of a training session, showing a
 │ [NEXT] [CHAR] [RACE] │
 └──────────────────────────────┘
 │ Bottom Navigation Bar │
-│ [🏠][👤][⚡][🏆][🤖][⚙️] │
+│ \[🏠]\[👤]\[⚡]\[🏆]\[🤖]\[⚙️] │
 └──────────────────────────────┘
 
 ---
@@ -293,7 +293,7 @@ class ResultBanner extends Component
 **Game-Accurate Training Mechanics (Global English Server - Feb 2026)**:
 
 | Mechanic | Value | Description |
-|----------|-------|-------------|
+| --- | --- | --- |
 | Per-Training Cap | +100 | Maximum stat gain per training session |
 | Reduced Cap | +50 | Applied when stat exceeds 1200 |
 | Support Card Bonus | +5% per card | Bonus for each support card present at training |
@@ -1094,12 +1094,12 @@ test.describe("WF-005: Accessibility", () => {
 
 ## 10. Version History
 
-| Version | Date       | Author           | Changes                                                                                                                                                                               |
-| ------- | ---------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2.3.0   | 2026-02-22 | Development Team | Updated version/dates, aligned technology references with current stack (Livewire 4, Neuron AI v2.11, GameTora/umapyoi.net) |
-| 2.2.0   | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: per-training cap (+100, reduced to +50 if stat > 1200), support card bonuses (+5% per card), predicted vs actual comparison display |
-| 2.0.0   | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added friendship bonuses, guaranteed hint indicators, event handling, accessibility specifications, and testing requirements |
-| 1.0.0   | 2026-01-14 | Development Team | Initial wireframe specification                                                                                                                                                       |
+| Version | Date | Author | Changes |
+| --- | --- | --- | --- |
+| 2.3.0 | 2026-02-22 | Development Team | Updated version/dates, aligned technology references with current stack (Livewire 4, Neuron AI v2.11, GameTora/umapyoi.net) |
+| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: per-training cap (+100, reduced to +50 if stat > 1200), support card bonuses (+5% per card), predicted vs actual comparison display |
+| 2.0.0 | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added friendship bonuses, guaranteed hint indicators, event handling, accessibility specifications, and testing requirements |
+| 1.0.0 | 2026-01-14 | Development Team | Initial wireframe specification |
 
 ---
 

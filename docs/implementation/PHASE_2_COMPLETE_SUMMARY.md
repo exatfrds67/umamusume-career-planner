@@ -212,9 +212,7 @@ All tests passing:
 
 **Total Progress**: 40% Complete (2 of 5 phases)
 
-## Documentation
-
-All documentation available in `docs/implementation/`:
+## Related Documentation
 
 - `CHARACTER_EXTERNAL_API_INTEGRATION.md` - Phase 1 details
 - `SUPPORT_CARD_EXTERNAL_API_INTEGRATION.md` - Phase 2 details

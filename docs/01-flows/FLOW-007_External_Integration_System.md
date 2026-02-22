@@ -133,7 +133,7 @@ flowchart TD
 ## 3.1 External API Service Architecture
 
 | Service | Purpose |
-|---------|--------|
+| --- | --- |
 | `ExternalAPIService` | Primary API communication and circuit breaker |
 | `UmapyoiApiClient` | umapyoi.net API client |
 | `GameToraScraperService` | GameTora scraping (replaced UmamusumeDB) |
@@ -236,12 +236,12 @@ stateDiagram-v2
 
 ## Document Control
 
-| Version | Date       | Author           | Changes |
-|---------|------------|------------------|---------|
-| 2.3.0   | 2026-02-22 | Development Team | Updated service references: ExternalAPIService, UmapyoiApiClient, GameToraScraperService (replaced UmamusumeDB); OCR pipeline: TesseractService, ParserFactory, DataValidationService, OcrExtractedSkill; added external API service architecture table; added BackgroundSyncService and related services |
-| 2.2.0   | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: OCR parsing updated for correct stat ranges (1200 base cap with overflow), aptitude grades (G-S scale, no SS), track conditions (Firm/Good/Soft/Heavy) |
-| 2.1.0   | 2026-01-24 | Development Team | Updated to align with v2.0.0 codebase, Circuit Breaker implementation, and OCR pipeline details |
-| 1.0.0   | 2026-01-14 | Development Team | Initial flow definitions |
+| Version | Date | Author | Changes |
+| --- | --- | --- | --- |
+| 2.3.0 | 2026-02-22 | Development Team | Updated service references: ExternalAPIService, UmapyoiApiClient, GameToraScraperService (replaced UmamusumeDB); OCR pipeline: TesseractService, ParserFactory, DataValidationService, OcrExtractedSkill; added external API service architecture table; added BackgroundSyncService and related services |
+| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: OCR parsing updated for correct stat ranges (1200 base cap with overflow), aptitude grades (G-S scale, no SS), track conditions (Firm/Good/Soft/Heavy) |
+| 2.1.0 | 2026-01-24 | Development Team | Updated to align with v2.0.0 codebase, Circuit Breaker implementation, and OCR pipeline details |
+| 1.0.0 | 2026-01-14 | Development Team | Initial flow definitions |
 
 ---
 

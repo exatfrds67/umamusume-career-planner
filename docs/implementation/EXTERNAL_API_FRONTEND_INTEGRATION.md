@@ -402,7 +402,7 @@ foreach ($request->input('aptitudes.distance') as $distance => $grade) {
 // ... similar for surface and style aptitudes
 ```
 
-### Support Card Import
+### Support Card Database Import
 
 When a support card is imported:
 
@@ -509,9 +509,8 @@ $skillAcquisition = SkillAcquisition::create([
 - [ ] Check external_source_id is stored
 - [ ] Verify aptitudes are created correctly
 
-#### Support Card Import
+#### Support Card Import Testing
 
-- [ ] Browse external support cards
 - [ ] Filter by rarity (R/SR/SSR)
 - [ ] Import a card
 - [ ] Verify card appears in collection

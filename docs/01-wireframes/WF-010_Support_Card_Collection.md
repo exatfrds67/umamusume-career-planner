@@ -1631,12 +1631,12 @@ test.describe("WF-010: Accessibility", () => {
 
 ## 10. Version History
 
-| Version | Date       | Author           | Changes                                                                                                                                                                        |
-| ------- | ---------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 2.3.0   | 2026-02-22 | Development Team | Updated version/dates, aligned technology references with current stack (Livewire 4, Neuron AI v2.11, GameTora/umapyoi.net) |
-| 2.2.0   | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server - corrected bond mechanics (+7 base, +9 Charming, +5 exclamation), friendship threshold 80%, limit break system (MLB = 4 LB), card type icons, rarity-based friendship bonus ranges (R: 10-15%, SR: 15-25%, SSR: 25-35%), skill hint unlock system |
-| 2.0.0   | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added collection overview, meta tier system, bond progression, accessibility specifications, and testing requirements |
-| 1.0.0   | 2026-01-14 | Development Team | Initial wireframe specification                                                                                                                                                |
+| Version | Date | Author | Changes |
+| --- | --- | --- | --- |
+| 2.3.0 | 2026-02-22 | Development Team | Updated version/dates, aligned technology references with current stack (Livewire 4, Neuron AI v2.11, GameTora/umapyoi.net) |
+| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server - corrected bond mechanics (+7 base, +9 Charming, +5 exclamation), friendship threshold 80%, limit break system (MLB = 4 LB), card type icons, rarity-based friendship bonus ranges (R: 10-15%, SR: 15-25%, SSR: 25-35%), skill hint unlock system |
+| 2.0.0 | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added collection overview, meta tier system, bond progression, accessibility specifications, and testing requirements |
+| 1.0.0 | 2026-01-14 | Development Team | Initial wireframe specification |
 
 ---
 
@@ -1665,12 +1665,12 @@ test.describe("WF-010: Accessibility", () => {
 
 ### 11.3 Bond Mechanics Summary
 
-| Condition         | Bond Gain | Notes                              |
-| ----------------- | --------- | ---------------------------------- |
-| Base Training     | +7        | Card present in training           |
-| Charming Active   | +9        | Replaces base (+2 from condition)  |
-| Exclamation (!)   | +5        | Event available, additive          |
-| Friendship Threshold | 80%    | Enables Friendship Training bonus  |
+| Condition            | Bond Gain | Notes                              |
+| -------------------- | --------- | ---------------------------------- |
+| Base Training        | +7        | Card present in training           |
+| Charming Active      | +9        | Replaces base (+2 from condition)  |
+| Exclamation (!)      | +5        | Event available, additive          |
+| Friendship Threshold | 80%       | Enables Friendship Training bonus  |
 
 ### 11.4 Friendship Bonus by Rarity
 

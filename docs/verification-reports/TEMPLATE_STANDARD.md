@@ -47,9 +47,9 @@ Content for section three.
 
 ### Document Control
 
-| Version | Date             | Author           | Changes                    |
-|---------|------------------|------------------|----------------------------|
-| 1.0     | February 22, 2026 | Development Team | Initial document creation  |
+| Version | Date              | Author           | Changes                   |
+|---------|-------------------|------------------|---------------------------|
+| 1.0     | February 22, 2026 | Development Team | Initial document creation |
 
 ### Approval
 

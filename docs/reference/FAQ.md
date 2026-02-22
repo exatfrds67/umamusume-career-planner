@@ -319,4 +319,4 @@ Response time: Usually within 24-48 hours
 
 ---
 
-*Last updated: February 2026*
+Last updated: February 2026

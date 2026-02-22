@@ -329,7 +329,7 @@ Record actual race outcome for prediction accuracy tracking.
 ## Error Codes
 
 | Code | Description |
-|------|-------------|
+| ---- | ----------- |
 | 400 | Bad Request - Invalid request format |
 | 401 | Unauthorized - Authentication required |
 | 403 | Forbidden - Insufficient permissions |

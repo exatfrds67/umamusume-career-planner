@@ -381,8 +381,8 @@
 
 **Version History**:
 
-| Version | Date       | Changes                                                |
-| ------- | ---------- | ------------------------------------------------------ |
+| Version | Date       | Changes                                               |
+| ------- | ---------- | ----------------------------------------------------- |
 | 1.0.0   | 2026-01-28 | Initial updates from research and wireframe documents |
 
 **Related Documents**:

@@ -44,23 +44,23 @@ The Support Deck Builder enables players to construct, validate, and optimize th
 
 #### 1.3.1 Deck Composition Rules
 
-| Rule                        | Description                                                    |
-| --------------------------- | -------------------------------------------------------------- |
-| **Total Slots**             | 6 support card slots                                           |
-| **Type Mixing**             | Can mix any combination of types (no restrictions)             |
-| **Common Strategies**       | 3 Speed + 2 Power + 1 Friend, 2 Speed + 2 Stamina + 1 Power + 1 Friend, etc. |
-| **Presence Bonus**          | +5% training bonus per card present in training (max +30%)     |
+| Rule | Description |
+| --- | --- |
+| **Total Slots** | 6 support card slots |
+| **Type Mixing** | Can mix any combination of types (no restrictions) |
+| **Common Strategies** | 3 Speed + 2 Power + 1 Friend, 2 Speed + 2 Stamina + 1 Power + 1 Friend, etc. |
+| **Presence Bonus** | +5% training bonus per card present in training (max +30%) |
 
 #### 1.3.2 Support Card Types
 
-| Type      | Training Focus | Skill Category        | Primary Benefit                          |
-| --------- | -------------- | --------------------- | ---------------------------------------- |
-| **Speed** | Speed          | Speed-related skills  | Boosts speed training, acceleration      |
-| **Stamina** | Stamina      | Recovery skills       | Boosts stamina training, endurance       |
-| **Power** | Power          | Acceleration skills   | Boosts power training, burst speed       |
-| **Guts**  | Guts           | Positioning skills    | Boosts guts training, race positioning   |
-| **Wit**   | Wit            | Race reading skills   | Boosts wit training, skill activation    |
-| **Friend** | Special       | Unique events         | Mood management, special bonuses, unique events |
+| Type | Training Focus | Skill Category | Primary Benefit |
+| --- | --- | --- | --- |
+| **Speed** | Speed | Speed-related skills | Boosts speed training, acceleration |
+| **Stamina** | Stamina | Recovery skills | Boosts stamina training, endurance |
+| **Power** | Power | Acceleration skills | Boosts power training, burst speed |
+| **Guts** | Guts | Positioning skills | Boosts guts training, race positioning |
+| **Wit** | Wit | Race reading skills | Boosts wit training, skill activation |
+| **Friend** | Special | Unique events | Mood management, special bonuses, unique events |
 
 #### 1.3.3 Deck Synergy Considerations
 
@@ -73,12 +73,12 @@ The Support Deck Builder enables players to construct, validate, and optimize th
 
 #### 1.3.4 Card Selection Criteria
 
-| Criterion                   | Description                                                    |
-| --------------------------- | -------------------------------------------------------------- |
-| **Limit Break Level**       | ★ to ★★★★★ (1-5 stars, affects stat bonuses)                   |
-| **Skill Hints Provided**    | Skills available at reduced SP cost (5 levels: 10%/20%/30%/35%/40% max)|
-| **Training Bonus %**        | Percentage boost to training gains                             |
-| **Event Quality**           | Value of card-specific events                                  |
+| Criterion | Description |
+| --- | --- |
+| **Limit Break Level** | ★ to ★★★★★ (1-5 stars, affects stat bonuses) |
+| **Skill Hints Provided** | Skills available at reduced SP cost (5 levels: 10%/20%/30%/35%/40% max) |
+| **Training Bonus %** | Percentage boost to training gains |
+| **Event Quality** | Value of card-specific events |
 
 ### 1.4 User Stories
 
@@ -1469,12 +1469,12 @@ test.describe("WF-011: Accessibility", () => {
 
 ## 10. Version History
 
-| Version | Date       | Author           | Changes                                                                                                                                                                    |
-| ------- | ---------- | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2.3.0   | 2026-02-22 | Development Team | Updated version/dates, aligned technology references with current stack (Livewire 4, Neuron AI v2.11, GameTora/umapyoi.net) |
-| 2.2.0   | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server - corrected support card presence bonus (+5% per card, max +30%), added deck synergy indicators, updated card type descriptions, added limit break display (★ to ★★★★★), enhanced type distribution visualization |
-| 2.0.0   | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added deck overview, auto-optimization, validation system, accessibility specifications, and testing requirements |
-| 1.0.0   | 2026-01-14 | Development Team | Initial wireframe specification                                                                                                                                            |
+| Version | Date | Author | Changes |
+| --- | --- | --- | --- |
+| 2.3.0 | 2026-02-22 | Development Team | Updated version/dates, aligned technology references with current stack (Livewire 4, Neuron AI v2.11, GameTora/umapyoi.net) |
+| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server - corrected support card presence bonus (+5% per card, max +30%), added deck synergy indicators, updated card type descriptions, added limit break display (★ to ★★★★★), enhanced type distribution visualization |
+| 2.0.0 | 2026-01-24 | Development Team | Comprehensive update aligned with v2.0.0 implementation; added deck overview, auto-optimization, validation system, accessibility specifications, and testing requirements |
+| 1.0.0 | 2026-01-14 | Development Team | Initial wireframe specification |
 
 ---
 

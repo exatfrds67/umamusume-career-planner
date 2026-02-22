@@ -49,7 +49,7 @@ flowchart TD
 ### 1.2 Step Details
 
 | Step | Service/Component | Description |
-|------|-------------------|-------------|
+| --- | --- | --- |
 | **Select Trainee** | `CharacterStateService` | Fetches base stats (0-1200) and growth rates from `ucp_game_data`. |
 | **Calculate Inheritance** | `FactorService` | Applies factor bonuses: ★ (+5), ★★ (+12), ★★★ (+21). |
 | **Validate Deck** | `SupportDeckService` | Ensures exactly 6 cards with type balance checks. |
@@ -140,9 +140,9 @@ flowchart TD
 Aptitude grades affect performance differently by category. A-rank is the baseline (0% modifier).
 
 | Grade | Surface (Power) | Distance (Speed) | Style (Wit) |
-|-------|-----------------|------------------|-------------|
+| --- | --- | --- | --- |
 | S     | +5%             | +5%              | +10%        |
-| A     | 0% (baseline)   | 0% (baseline)    | 0% (baseline)|
+| A     | 0% (baseline)   | 0% (baseline)    | 0% (baseline) |
 | B     | -10%            | -10%             | -15%        |
 | C     | -20%            | -20%             | -25%        |
 | D     | -30%            | -40%             | -40%        |
@@ -293,12 +293,12 @@ flowchart TD
 
 ## Document Control
 
-| Version | Date       | Author           | Changes |
-|---------|------------|------------------|---------|
-| 2.3.0   | 2026-02-22 | Development Team | Updated service references to match actual codebase: CharacterStateService, FactorService, CareerAnalyticsService, RaceConditionService; Livewire 3→4; added Neuron AI agent references |
-| 2.2.0   | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: Removed SS grade (max is S), stats can exceed 1200 with diminishing returns (half value above 1200), per-training cap (+100/+50), added complete aptitude modifier tables by category (Surface/Distance/Style), G grade tier added |
-| 2.1.0   | 2026-01-24 | Development Team | Updated to align with v2.0.0 codebase, Laravel 12 architecture, and Neuron AI integration points |
-| 1.0.0   | 2026-01-14 | Development Team | Initial flow definitions |
+| Version | Date | Author | Changes |
+| --- | --- | --- | --- |
+| 2.3.0 | 2026-02-22 | Development Team | Updated service references to match actual codebase: CharacterStateService, FactorService, CareerAnalyticsService, RaceConditionService; Livewire 3→4; added Neuron AI agent references |
+| 2.2.0 | 2026-01-28 | Development Team | Updated with verified game mechanics from Global English Server: Removed SS grade (max is S), stats can exceed 1200 with diminishing returns (half value above 1200), per-training cap (+100/+50), added complete aptitude modifier tables by category (Surface/Distance/Style), G grade tier added |
+| 2.1.0 | 2026-01-24 | Development Team | Updated to align with v2.0.0 codebase, Laravel 12 architecture, and Neuron AI integration points |
+| 1.0.0 | 2026-01-14 | Development Team | Initial flow definitions |
 
 ---
 
