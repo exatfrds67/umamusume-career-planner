@@ -33,6 +33,8 @@ parameters:
 
   treatPhpDocTypesAsCertain: false
 
+  reportUnmatchedIgnoredErrors: false
+
   ignoreErrors:
     # ============================================================
     # TEST FILE IGNORES
