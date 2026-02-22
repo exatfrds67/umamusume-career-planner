@@ -2,7 +2,9 @@
 
 ## Overview
 
-The OCR Upload System provides secure screenshot upload and management capabilities for the Umamusume Career Planner application. It implements comprehensive validation, image preprocessing, duplicate detection, and automatic cleanup of temporary files.
+The OCR Upload System provides secure screenshot upload and management capabilities for the Umamusume Career Planner
+application. It implements comprehensive validation, image preprocessing, duplicate detection, and automatic cleanup of
+temporary files.
 
 **Task**: 5.1.2 - Create screenshot upload and management system  
 **Requirements**: Requirement 23.2
@@ -57,7 +59,7 @@ Upload and process a screenshot for OCR extraction.
   "character_id": "integer (optional, must exist in database)",
   "data_type": "string (optional, enum: character_stats|training_session|race_result|skill_list|support_cards)"
 }
-```
+```text
 
 **Success Response** (200):
 
@@ -88,7 +90,7 @@ Upload and process a screenshot for OCR extraction.
   "message": "Image validation failed",
   "error": "File size exceeds maximum allowed size of 10 MB"
 }
-```
+```text
 
 **Error Response** (500):
 
@@ -127,7 +129,7 @@ Get OCR system status and configuration.
     }
   }
 }
-```
+```text
 
 ## Configuration
 
@@ -169,7 +171,7 @@ All configuration is stored in `config/services.php`:
         'denoise_strength' => env('OPENCV_DENOISE_STRENGTH', 10),
     ],
 ],
-```
+```text
 
 ## Environment Variables
 
@@ -211,7 +213,7 @@ php artisan ocr:cleanup --days=30
 
 # Dry run (show what would be deleted without deleting)
 php artisan ocr:cleanup --dry-run
-```
+```text
 
 **Options**:
 
@@ -299,7 +301,7 @@ Run tests:
 
 ```bash
 php artisan test --filter=OCRUploadTest
-```
+```text
 
 ## Performance Considerations
 

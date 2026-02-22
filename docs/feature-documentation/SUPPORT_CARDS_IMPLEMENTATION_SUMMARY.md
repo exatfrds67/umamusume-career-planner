@@ -101,7 +101,7 @@ Successfully implemented a complete support card management system for the Umamu
 **Base Path**: `/api/v1/characters/{character}`
 
 | Method | Endpoint | Description |
-|--------|----------|-------------|
+| ------ | -------- | ----------- |
 | POST | `/deck` | Save deck configuration |
 | GET | `/deck` | Get current deck |
 | DELETE | `/deck` | Clear deck |
@@ -435,4 +435,4 @@ For questions or issues:
 
 ---
 
-**End of Summary**
+End of Summary

@@ -19,7 +19,7 @@ Fixed 157 failing tests across Unit, Feature, and Integration test suites. The m
 ```php
 public $timestamps = true;
 const UPDATED_AT = null;
-```
+```text
 
 **Issue**: Test was using wrong table name in `assertDatabaseHas`.
 
@@ -32,7 +32,8 @@ const UPDATED_AT = null;
 
 ### 2. User Model Tests (2 tests fixed)
 
-**Issue**: Tests expected users with email `admin@umamusume.local` to automatically be admins, but `is_admin` field wasn't being set.
+**Issue**: Tests expected users with email `admin@umamusume.local` to automatically be admins, but `is_admin` field
+wasn't being set.
 
 **Fix**: Explicitly set `is_admin => true` when creating admin users in tests.
 
@@ -42,7 +43,8 @@ const UPDATED_AT = null;
 
 ### 3. RuleBasedAdvisor Tests (30 tests fixed)
 
-**Issue**: Test helper function `createCharacterWithSP()` was using `'wisdom'` as a stat field name, but the Character model expects `'wit'`.
+**Issue**: Test helper function `createCharacterWithSP()` was using `'wisdom'` as a stat field name, but the Character
+model expects `'wit'`.
 
 **Fix**: Changed `'wisdom' => 450` to `'wit' => 450` in the helper function.
 
@@ -52,7 +54,8 @@ const UPDATED_AT = null;
 
 ### 4. TrainingCalculation Tests (3 tests fixed)
 
-**Issue**: Tests were creating characters with incomplete `current_stats` arrays (missing some of the 5 required stats: speed, stamina, power, guts, wit).
+**Issue**: Tests were creating characters with incomplete `current_stats` arrays (missing some of the 5 required stats:
+speed, stamina, power, guts, wit).
 
 **Fix**: Updated all test cases to provide complete stat arrays with all 5 stats.
 
@@ -74,9 +77,11 @@ The codebase has an inconsistency between "wisdom" and "wit" for the intelligenc
 
 ### Incomplete Data Validation
 
-The Character model's `setCurrentStatsAttribute` method expects all 5 stats but tests were providing partial data. While the method has null coalescing operators (`??`), PHP still throws warnings for undefined array keys.
+The Character model's `setCurrentStatsAttribute` method expects all 5 stats but tests were providing partial data. While
+the method has null coalescing operators (`??`), PHP still throws warnings for undefined array keys.
 
-**Recommendation**: Consider adding a helper method or factory state that ensures complete stat arrays are always provided.
+**Recommendation**: Consider adding a helper method or factory state that ensures complete stat arrays are always
+provided.
 
 ## Test Results
 
@@ -117,7 +122,8 @@ These should be addressed in a follow-up session.
 
 ## Pest Browser Plugin Installation
 
-**Issue**: Tests using `visit()` function were failing with message "Using the visit() function requires the Pest Plugin Browser to be installed."
+**Issue**: Tests using `visit()` function were failing with message "Using the visit() function requires the Pest Plugin
+Browser to be installed."
 
 **Resolution**: Installed Pest Browser plugin and Playwright:
 
@@ -127,6 +133,7 @@ npm install playwright@latest
 npx playwright install
 ```
 
-**Note**: The `--ignore-platform-reqs` flag is required on Windows because Laravel Horizon requires Unix-only extensions (`ext-pcntl`, `ext-posix`).
+**Note**: The `--ignore-platform-reqs` flag is required on Windows because Laravel Horizon requires Unix-only extensions
+(`ext-pcntl`, `ext-posix`).
 
 **Documentation**: See `docs/setup-guides/pest-browser-setup.md` for complete setup guide and usage examples.

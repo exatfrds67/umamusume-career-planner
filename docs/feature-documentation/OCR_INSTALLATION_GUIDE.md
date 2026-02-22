@@ -13,7 +13,7 @@ This guide covers the installation and configuration of Tesseract OCR with Japan
 
 ## Prerequisites
 
-- PHP 8.2+ with GD extension enabled
+- PHP 8.1+ with GD extension enabled
 - Windows 10/11 or WSL2 (Ubuntu 20.04+)
 - Composer installed
 - Laravel 12 application set up

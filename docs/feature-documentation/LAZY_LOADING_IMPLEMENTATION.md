@@ -7,7 +7,8 @@
 
 ## Overview
 
-Implemented native browser lazy loading for all images across the application to improve performance, reduce initial page load time, and save bandwidth.
+Implemented native browser lazy loading for all images across the application to improve performance, reduce initial
+page load time, and save bandwidth.
 
 ## What is Lazy Loading?
 
@@ -46,7 +47,7 @@ Added `decoding="async"` attribute to allow browser to decode images asynchronou
     loading="lazy"
     decoding="async"
     class="w-full h-full object-cover">
-```
+```text
 
 **Usage**: Card grid view on support cards index page
 
@@ -74,7 +75,7 @@ Added `decoding="async"` attribute to allow browser to decode images asynchronou
     loading="lazy"
     decoding="async"
     class="w-full h-full object-cover">
-```
+```text
 
 **Usage**: Large card image on detail page
 
@@ -105,7 +106,7 @@ Added `decoding="async"` attribute to allow browser to decode images asynchronou
     loading="eager"
     width="96" height="96"
     class="h-20 w-20 sm:h-24 sm:w-24 mx-auto mb-4">
-```
+```text
 
 **Usage**: Hero logo on welcome page (above-the-fold, needs immediate load)
 
@@ -200,13 +201,13 @@ Images use CSS classes for responsive sizing while maintaining aspect ratios.
 
 1. **Open DevTools Network Tab**
 
-   ```
+   ```text
    F12 → Network → Filter: Img
    ```
 
 2. **Visit Support Cards Page**
 
-   ```
+   ```text
    http://127.0.0.1:8000/support-cards
    ```
 
@@ -219,7 +220,7 @@ Images use CSS classes for responsive sizing while maintaining aspect ratios.
 
 1. **Lighthouse Audit**
 
-   ```
+   ```text
    DevTools → Lighthouse → Run Audit
    ```
 
@@ -232,13 +233,13 @@ Images use CSS classes for responsive sizing while maintaining aspect ratios.
 
 1. **Enable Device Emulation**
 
-   ```
+   ```text
    DevTools → Toggle Device Toolbar (Ctrl+Shift+M)
    ```
 
 2. **Throttle Network**
 
-   ```
+   ```text
    Network → Throttling → Fast 3G
    ```
 
@@ -261,7 +262,7 @@ Images use CSS classes for responsive sizing while maintaining aspect ratios.
     loading="lazy"
     decoding="async"
     alt="{{ $card->name }}">
-```
+```text
 
 **Benefits**: Serve appropriately sized images for different screen sizes
 
@@ -307,7 +308,7 @@ Show low-quality placeholder while loading:
         class="relative w-full h-full object-cover"
         alt="{{ $card->name }}">
 </div>
-```
+```text
 
 ---
 
@@ -373,7 +374,7 @@ Show low-quality placeholder while loading:
     loading="lazy"
     alt="{{ $card->name }}"
     class="w-full h-auto">
-```
+```text
 
 ---
 

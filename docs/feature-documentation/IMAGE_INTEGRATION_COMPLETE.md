@@ -71,7 +71,7 @@ Successfully integrated all 7 support card images that you added to `public/imag
 
 Visit the support cards page to see your actual card images:
 
-```
+```text
 http://127.0.0.1:8000/support-cards
 ```
 
@@ -98,7 +98,7 @@ Or use Tinker for quick updates:
 
 ```bash
 php artisan tinker --execute="DB::table('ucp_support_cards')->where('internal_id', 'GLOBAL_SC_BIKOPEGASUS_CARROT')->update(['artwork_url' => '/images/support_cards/Biko_Pegasus_Double_Carrot_Punch.png']);"
-```
+```text
 
 ---
 
@@ -123,3 +123,4 @@ php artisan tinker --execute="DB::table('ucp_support_cards')->where('internal_id
 **Integration Complete!** 🎉
 
 Your support card images are now live in the application.
+

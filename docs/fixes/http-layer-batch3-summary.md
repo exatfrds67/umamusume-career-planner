@@ -24,7 +24,8 @@ Successfully resolved all type safety issues in the primary HTTP layer files:
 **Issues Fixed:**
 
 - ✅ Cannot cast mixed to int (lines 317, 318, 325, 469, 552, 1097, 1105, 1106, 1262, 1263, 1305)
-- ✅ Cannot cast mixed to string (lines 571, 825, 831, 852, 864, 892, 940, 948, 956, 963, 1099, 1102, 1107, 1272-1275, 1296, 1341)
+- ✅ Cannot cast mixed to string (lines 571, 825, 831, 852, 864, 892, 940, 948, 956, 963, 1099, 1102, 1107, 1272-1275,
+1296, 1341)
 - ✅ Cannot cast mixed to float (line 1281)
 - ✅ Cannot access offset on mixed (lines 1428-1448)
 - ✅ Access to undefined properties on Character model (lines 319-321)
@@ -35,9 +36,10 @@ Successfully resolved all type safety issues in the primary HTTP layer files:
 
   ```php
   $value = is_int($raw) ? $raw : (is_numeric($raw) ? (int) $raw : 0);
-  ```
+  ```text
 
 - Used `setAttribute()` for dynamic Character properties instead of direct assignment
+
 - Added proper type validation before array offset access
 - Validated array types before using `array_merge()`
 
@@ -74,7 +76,7 @@ Successfully resolved all type safety issues in the primary HTTP layer files:
   ```php
   $newPreferences = is_array($validated['preferences']) ? $validated['preferences'] : [];
   $updateData['preferences'] = array_merge($existingPreferences, $newPreferences);
-  ```
+  ```text
 
 ### 4. Request Files (4 errors)
 
@@ -108,7 +110,7 @@ $value = (int) $mixed;
 
 // After (safe)
 $value = is_int($raw) ? $raw : (is_numeric($raw) ? (int) $raw : 0);
-```
+```text
 
 ### 2. Safe String Casting
 
@@ -130,7 +132,7 @@ $result = array_merge($default, $this->input('key', []));
 $input = $this->input('key');
 $inputArray = is_array($input) ? $input : [];
 $result = array_merge($default, $inputArray);
-```
+```text
 
 ### 4. Null Safety for User
 
@@ -160,7 +162,7 @@ vendor/bin/phpstan analyse app/Http/Controllers/Api/AdvisoryController.php \
   --level=9
 
 [OK] No errors
-```
+```text
 
 ## Remaining HTTP Layer Issues (63 errors)
 
@@ -202,3 +204,4 @@ All fixes maintain backward compatibility:
 - ✅ Default values provided for missing/invalid data
 - ✅ Proper error responses for authentication failures
 - ✅ Existing tests continue to pass
+

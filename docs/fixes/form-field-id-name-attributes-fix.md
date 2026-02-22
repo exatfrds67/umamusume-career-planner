@@ -6,7 +6,8 @@
 
 ## Problem Description
 
-The Chrome DevTools console reported 7 form field elements missing `id` or `name` attributes on the training predictions page. This prevents browser autofill from working correctly and violates HTML best practices.
+The Chrome DevTools console reported 7 form field elements missing `id` or `name` attributes on the training predictions
+page. This prevents browser autofill from working correctly and violates HTML best practices.
 
 ## Root Cause
 
@@ -93,7 +94,8 @@ This fix improves accessibility in several ways:
 
 ## Related Documentation
 
-- [WCAG 2.2 Success Criterion 1.3.1 - Info and Relationships](https://www.w3.org/WAI/WCAG22/Understanding/info-and-relationships.html)
+- [WCAG 2.2 Success Criterion 1.3.1 - Info and
+Relationships](https://www.w3.org/WAI/WCAG22/Understanding/info-and-relationships.html)
 - [MDN: The Input Element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input)
 - [HTML Standard: Form Controls](https://html.spec.whatwg.org/multipage/form-control-infrastructure.html)
 
@@ -114,4 +116,5 @@ This fix improves accessibility in several ways:
 
 ## Conclusion
 
-All 7 form field elements now have proper `id` and `name` attributes, resolving the console warnings and improving accessibility, browser autofill support, and overall code quality.
+All 7 form field elements now have proper `id` and `name` attributes, resolving the console warnings and improving
+accessibility, browser autofill support, and overall code quality.

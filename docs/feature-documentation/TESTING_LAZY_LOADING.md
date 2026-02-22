@@ -28,13 +28,13 @@ Navigate to: **<http://127.0.0.1:8000/support-cards>**
 
 **Before Lazy Loading**:
 
-```
+```text
 15 images × ~200KB = ~3MB loaded immediately
 ```
 
 **After Lazy Loading**:
 
-```
+```text
 ~6 images × ~200KB = ~1.2MB loaded initially
 Remaining 9 images load as you scroll
 ```
@@ -99,7 +99,7 @@ Remaining 9 images load as you scroll
 
 ```javascript
 document.querySelectorAll('img[loading="lazy"]').length
-```
+```text
 
 **Expected Result**: Should show number of lazy-loaded images (e.g., 15+ on support cards page)
 
@@ -181,7 +181,7 @@ document.querySelectorAll('img[loading="lazy"]').forEach(img => {
 ```javascript
 // Normal page load with lazy loading
 // Compare Network tab waterfall
-```
+```text
 
 ### Check Intersection Observer
 
@@ -200,20 +200,20 @@ if ('loading' in HTMLImageElement.prototype) {
 
 ### Support Cards Page (15 cards)
 
-| Metric | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| Initial Images | 15 | ~6 | 60% reduction |
-| Initial Payload | ~3MB | ~1.2MB | 60% reduction |
-| Time to Interactive | ~2.5s | ~1s | 60% faster |
-| LCP | ~2.8s | ~1.8s | 36% faster |
+| Metric              | Before | After  | Improvement   |
+| ------------------- | ------ | ------ | ------------- |
+| Initial Images      | 15     | ~6     | 60% reduction |
+| Initial Payload     | ~3MB   | ~1.2MB | 60% reduction |
+| Time to Interactive | ~2.5s  | ~1s    | 60% faster    |
+| LCP                 | ~2.8s  | ~1.8s  | 36% faster    |
 
 ### Character Creation Gallery (~20 images)
 
-| Metric | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| Initial Images | 20 | 0 | 100% reduction |
-| Initial Payload | ~4MB | ~0MB | 100% reduction |
-| Load on Scroll | N/A | ~6 at a time | Progressive |
+| Metric          | Before | After        | Improvement    |
+| --------------- | ------ | ------------ | -------------- |
+| Initial Images  | 20     | 0            | 100% reduction |
+| Initial Payload | ~4MB   | ~0MB         | 100% reduction |
+| Load on Scroll  | N/A    | ~6 at a time | Progressive    |
 
 ---
 
@@ -232,9 +232,9 @@ if ('loading' in HTMLImageElement.prototype) {
 ```bash
 # Verify images exist
 ls -la public/images/support_cards/
-```
+```text
 
-### All Images Load at Once
+## All Images Load at Once
 
 **Check**:
 
@@ -258,7 +258,7 @@ document.querySelector('img').loading
     width="400" height="600"
     loading="lazy"
     alt="Card">
-```
+```text
 
 ---
 
@@ -291,3 +291,4 @@ document.querySelector('img').loading
 **Happy Testing!** 🚀
 
 Your images are now loading efficiently with native browser lazy loading.
+

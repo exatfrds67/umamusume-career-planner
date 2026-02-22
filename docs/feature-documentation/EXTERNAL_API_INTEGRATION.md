@@ -2,7 +2,9 @@
 
 ## Overview
 
-The UmamusumeCareerPlanner integrates with multiple external APIs to provide comprehensive game data, training calculations, and meta information. This document describes the MCP-powered external API client services implemented in Task 4.4.1.
+The UmamusumeCareerPlanner integrates with multiple external APIs to provide comprehensive game data, training
+calculations, and meta information. This document describes the MCP-powered external API client services implemented in
+Task 4.4.1.
 
 ## Architecture
 
@@ -65,7 +67,7 @@ $available = $client->isAvailable();
 
 // Clear cache
 $client->clearCache();
-```
+```text
 
 #### Endpoints
 
@@ -133,7 +135,7 @@ $result = $client->getRaceStrategy([
 
 Intelligent context management using the context7 MCP server.
 
-#### Features
+#### Context7 Features
 
 - API call context tracking
 - Character-specific context storage
@@ -142,7 +144,7 @@ Intelligent context management using the context7 MCP server.
 - Context pattern analysis
 - Intelligent caching recommendations
 
-#### Usage
+#### Context7 Usage
 
 ```php
 use App\Services\ExternalAPI\Context7Service;
@@ -178,7 +180,7 @@ $summary = $service->getContextSummary();
 
 // Clear context
 $service->clearContext('character', $characterId);
-```
+```text
 
 ### ExternalAPIFacade
 
@@ -278,9 +280,9 @@ API_HEALTH_ALERT_ENABLED=true
 API_RATE_LIMIT_ENABLED=true
 API_RATE_LIMIT_PER_MINUTE=60
 API_RATE_LIMIT_PER_HOUR=1000
-```
+```text
 
-### Configuration File
+## Configuration File
 
 The `config/external-apis.php` file contains all configuration options with sensible defaults.
 
@@ -360,7 +362,7 @@ $facade->clearAllCaches();
 
 // Force refresh (bypass cache)
 $result = $client->getCharacters(forceRefresh: true);
-```
+```text
 
 ## Health Monitoring
 
@@ -402,9 +404,9 @@ php artisan test tests/Feature/ExternalAPI/UmapyoiApiClientTest.php
 
 # Run with coverage
 php artisan test --filter=ExternalAPI --coverage
-```
+```text
 
-### Test Coverage
+## Test Coverage
 
 - ✅ 32 tests passing
 - ✅ 95 assertions
@@ -440,7 +442,7 @@ if (!$result['success']) {
         'message' => 'Unable to fetch character data. Please try again later.',
     ], 503);
 }
-```
+```text
 
 ### 3. Use Force Refresh Sparingly
 
@@ -458,7 +460,7 @@ $health = $facade->getHealthStatus();
 if (!$health['umapyoi']['available']) {
     // Use fallback or notify user
 }
-```
+```text
 
 ### 5. Leverage Context Management
 

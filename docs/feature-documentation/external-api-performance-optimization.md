@@ -2,7 +2,9 @@
 
 ## Overview
 
-The Performance Optimization Service provides advanced features to improve the efficiency and speed of external API integration. It implements request batching, connection pooling, response compression, and parallel fetching to minimize API calls, reduce bandwidth usage, and improve response times.
+The Performance Optimization Service provides advanced features to improve the efficiency and speed of external API
+integration. It implements request batching, connection pooling, response compression, and parallel fetching to minimize
+API calls, reduce bandwidth usage, and improve response times.
 
 **Requirements**: 14.5 (Performance Optimization and Monitoring)  
 **Task**: 5.1.2  
@@ -12,7 +14,8 @@ The Performance Optimization Service provides advanced features to improve the e
 
 ### 1. Request Batching
 
-Request batching groups multiple API requests together to minimize the number of API calls. Requests are automatically grouped by endpoint and method, and can be executed manually or automatically when the batch reaches its maximum size.
+Request batching groups multiple API requests together to minimize the number of API calls. Requests are automatically
+grouped by endpoint and method, and can be executed manually or automatically when the batch reaches its maximum size.
 
 #### Configuration
 
@@ -40,7 +43,7 @@ $allResults = $service->executeAllBatches();
 
 // Check batch queue status
 $status = $service->getBatchQueueStatus();
-```
+```text
 
 #### Response Format
 
@@ -64,15 +67,16 @@ $status = $service->getBatchQueueStatus();
 
 ### 2. Connection Pooling
 
-Connection pooling reuses HTTP connections to improve efficiency and reduce connection overhead. The service maintains a pool of active connections that can be reused for subsequent requests to the same host.
+Connection pooling reuses HTTP connections to improve efficiency and reduce connection overhead. The service maintains a
+pool of active connections that can be reused for subsequent requests to the same host.
 
-#### Configuration
+#### Pool Configuration
 
 - **Pool Size**: 5 connections maximum
 - **Connection Reuse**: Connections are automatically reused for the same host
 - **LRU Eviction**: Least recently used connections are evicted when pool is full
 
-#### Usage
+#### Pool Usage
 
 Connection pooling is automatically used when making parallel requests:
 
@@ -87,7 +91,7 @@ $result = $service->fetchParallel($requests);
 
 // Check connection pool status
 $poolStatus = $service->getConnectionPoolStatus();
-```
+```text
 
 #### Pool Status
 
@@ -111,15 +115,16 @@ $poolStatus = $service->getConnectionPoolStatus();
 
 ### 3. Response Compression
 
-Response compression uses gzip to reduce bandwidth usage for large API responses. Compression is automatically applied to responses larger than 1KB.
+Response compression uses gzip to reduce bandwidth usage for large API responses. Compression is automatically applied
+to responses larger than 1KB.
 
-#### Configuration
+#### Compression Configuration
 
 - **Compression Threshold**: 1024 bytes (1KB)
 - **Compression Level**: 6 (balanced between speed and compression ratio)
 - **Algorithm**: gzip
 
-#### Usage
+#### Compression Usage
 
 ```php
 // Compress response data
@@ -141,7 +146,7 @@ $compressed = $service->compressResponse($data);
 
 // Decompress when needed
 $decompressed = $service->decompressResponse($compressed['data']);
-```
+```text
 
 #### Compression Statistics
 
@@ -155,7 +160,8 @@ The service tracks compression metrics:
 
 ### 4. Parallel Fetching
 
-Parallel fetching executes multiple HTTP requests concurrently to improve performance. Requests are automatically chunked to respect the maximum parallel request limit.
+Parallel fetching executes multiple HTTP requests concurrently to improve performance. Requests are automatically
+chunked to respect the maximum parallel request limit.
 
 #### Configuration
 
@@ -212,7 +218,7 @@ $result = $service->fetchParallel($requests);
     'duration_ms' => 234.56,
     'parallel_count' => 3
 ]
-```
+```text
 
 ## Performance Metrics
 
@@ -239,7 +245,7 @@ $batchStats = $metrics->getBatchExecutionStats();
 
 ```php
 $parallelStats = $metrics->getParallelFetchStats();
-```
+```text
 
 ### Compression Metrics
 
@@ -360,7 +366,7 @@ class CharacterDataService
         return basename(parse_url($url, PHP_URL_PATH));
     }
 }
-```
+```text
 
 ## Monitoring and Debugging
 
@@ -412,7 +418,7 @@ $metrics = app(APIPerformanceMetricsService::class);
 $dashboard = $metrics->getDashboardMetrics();
 
 // Includes batch, parallel, and compression statistics
-```
+```text
 
 ## Testing
 
@@ -426,7 +432,7 @@ Run tests:
 php artisan test --filter=PerformanceOptimizationServiceTest
 ```
 
-## Configuration
+## Configuration Reference
 
 Performance optimization settings can be adjusted in the service constants:
 
@@ -436,7 +442,7 @@ private const MAX_BATCH_SIZE = 10;
 private const CONNECTION_POOL_SIZE = 5;
 private const COMPRESSION_THRESHOLD = 1024;
 private const MAX_PARALLEL_REQUESTS = 5;
-```
+```text
 
 ## Performance Impact
 
@@ -479,3 +485,4 @@ Expected performance improvements:
 - [API Performance Monitoring](./api-performance-monitoring.md)
 - [Cache Management](./cache-management.md)
 - [MCP Integration](./mcp-integration.md)
+

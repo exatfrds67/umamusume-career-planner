@@ -109,13 +109,13 @@ public/images/support_cards/
 
 ### Step 4: Update Database
 
-**Option A: Using Tinker**
+#### Option A: Using Tinker
 
 ```bash
 php artisan tinker --execute="DB::table('ucp_support_cards')->where('internal_id', 'GLOBAL_SC_BIKOPEGASUS_CARROT')->update(['artwork_url' => '/images/support_cards/Biko_Pegasus_Double_Carrot_Punch.png']);"
 ```
 
-**Option B: Using SQL**
+#### Option B: Using SQL
 
 ```sql
 UPDATE ucp_support_cards 
@@ -123,7 +123,8 @@ SET artwork_url = '/images/support_cards/Biko_Pegasus_Double_Carrot_Punch.png'
 WHERE internal_id = 'GLOBAL_SC_BIKOPEGASUS_CARROT';
 ```
 
-**Option C: Re-run Seeder**
+#### Option C: Re-run Seeder
+
 Update `database/seeders/SupportCardSeeder.php` with the new artwork_url, then:
 
 ```bash
@@ -145,7 +146,7 @@ Or visit: <http://127.0.0.1:8000/support-cards>
 For database updates, use these internal IDs:
 
 | Card Name | Internal ID |
-|-----------|-------------|
+| --------- | ----------- |
 | Biko Pegasus [Double Carrot Punch!] | `GLOBAL_SC_BIKOPEGASUS_CARROT` |
 | Rice Shower [Happiness Just around the Bend] | `GLOBAL_SC_RICESHOWER_HAPPINESS` |
 | Riko Kashimoto [Planned Perfection] | `GLOBAL_SC_RIKOKASHIMOTO_PLANNED` |
@@ -190,7 +191,7 @@ See `public/images/support_cards/README.md` for full copyright information.
 - [x] Mejiro McQueen [Your Team Ace]
 - [ ] Twin Turbo [Turbo Booooost!]
 
-**Progress**: 7/15 (47%)
+Progress: 7/15 (47%)
 
 ---
 
@@ -204,4 +205,4 @@ See `public/images/support_cards/README.md` for full copyright information.
 
 ---
 
-**End of Status Report**
+End of Status Report

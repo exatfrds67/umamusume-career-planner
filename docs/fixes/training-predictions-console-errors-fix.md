@@ -34,7 +34,7 @@ After thorough analysis using Chrome DevTools, all remaining console messages ha
 
 **Error Message**:
 
-```
+```text
 SQLSTATE[42S02]: Base table or view not found: 1146 
 Table 'umamusume-career-planner.characters' doesn't exist
 ```
@@ -57,7 +57,7 @@ Rule::exists('characters', 'id')->where(function ($query) {
 
 // AFTER (correct):
 'exists:ucp_characters,id'
-```
+```text
 
 **Result**: Database query succeeds, no more 500 errors.
 
@@ -100,7 +100,7 @@ public function rules(): array
         // ... rest of rules
     ];
 }
-```
+```text
 
 **Rationale**:
 
@@ -164,7 +164,7 @@ Using Chrome DevTools, we identified the exact source of these warnings:
 5. phpdebugbar "Auto show Ajax" <input type="checkbox">
 6. phpdebugbar datasets autoshow <input type="checkbox">
 7. phpdebugbar datasets search <input type="search">
-```
+```text
 
 **Conclusion**:
 
@@ -187,11 +187,13 @@ Using Chrome DevTools, we identified the exact source of these warnings:
 **Warning Messages**:
 
 ```
+
 [PerformanceMonitor] LCP is poor: 5252.00
 [PerformanceMonitor] FCP is poor: 5252.00
 [PerformanceMonitor] LCP is poor: 8560.00
 [PerformanceMonitor] LCP is poor: 8944.00
-```
+
+```text
 
 **Status**: Informational metrics from application's PerformanceMonitor - NOT errors
 
@@ -208,13 +210,13 @@ if (rating === "poor" && process.env.NODE_ENV === "development") {
 
 **Metrics Observed**:
 
-| Metric | Value | Rating | Target | Notes |
-|--------|-------|--------|--------|-------|
-| **LCP** | 5252-8944ms | Poor | <2500ms | Development server overhead |
-| **FCP** | 5252ms | Poor | <1800ms | Development server overhead |
-| **TTFB** | 1159ms | Needs Improvement | <800ms | Local XAMPP server |
-| **INP** | 48-72ms | ✅ Good | <200ms | Excellent responsiveness |
-| **CLS** | 0.04 | ✅ Good | <0.1 | Excellent layout stability |
+| Metric   | Value       | Rating            | Target  | Notes                       |
+| -------- | ----------- | ----------------- | ------- | --------------------------- |
+| **LCP**  | 5252-8944ms | Poor              | <2500ms | Development server overhead |
+| **FCP**  | 5252ms      | Poor              | <1800ms | Development server overhead |
+| **TTFB** | 1159ms      | Needs Improvement | <800ms  | Local XAMPP server          |
+| **INP**  | 48-72ms     | ✅ Good           | <200ms  | Excellent responsiveness    |
+| **CLS**  | 0.04        | ✅ Good           | <0.1    | Excellent layout stability  |
 
 **Why Performance is Slower in Development**:
 
@@ -246,21 +248,21 @@ if (rating === "poor" && process.env.NODE_ENV === "development") {
 
 ### Initial State
 
-```
+```text
 POST /api/training-predictions/batch → 500 Internal Server Error
 Error: Table 'characters' doesn't exist
 ```
 
 ### After Table Name Fix
 
-```
+```text
 POST /api/training-predictions/batch → 422 Unprocessable Content  
 Error: Character does not belong to you
 ```
 
 ### After Validation Fix (Final State)
 
-```
+```text
 POST /api/training-predictions/batch → 200 OK ✅
 Response: Training predictions data with AI recommendations
 ```
@@ -335,7 +337,7 @@ public function rules(): array
         // ... rest of rules
     ];
 }
-```
+```text
 
 ---
 
@@ -356,8 +358,9 @@ public function rules(): array
 ### Network Request Verification
 
 ```
+
 Request:
-  POST http://127.0.0.1:8000/api/training-predictions/batch
+  POST <http://127.0.0.1:8000/api/training-predictions/batch>
   Body: {"character_id":"3"}
 
 Response:
@@ -373,7 +376,8 @@ Response:
     },
     "recommendation": { ... }
   }
-```
+
+```text
 
 ---
 
@@ -453,16 +457,17 @@ All critical console errors have been resolved. The Training Predictions page no
 
 All remaining console messages have been fully analyzed:
 
-| Message Type | Count | Source | Status |
-|--------------|-------|--------|--------|
-| Form field warnings | 7 | Laravel Debugbar | ✅ Dev tool only, not in production |
-| Performance warnings | 4 | PerformanceMonitor.js | ✅ Informational metrics, expected |
-| Service Worker logs | ~5 | sw.js | ✅ Normal operation |
-| ConnectivityMonitor logs | ~15 | connectivity-monitor.js | ✅ Normal operation |
-| Vite HMR logs | ~3 | Vite dev server | ✅ Development only |
+| Message Type             | Count | Source                  | Status                             |
+| ------------------------ | ----- | ----------------------- | ---------------------------------- |
+| Form field warnings      | 7     | Laravel Debugbar        | ✅ Dev tool only, not in production |
+| Performance warnings     | 4     | PerformanceMonitor.js   | ✅ Informational metrics, expected  |
+| Service Worker logs      | ~5    | sw.js                   | ✅ Normal operation                 |
+| ConnectivityMonitor logs | ~15   | connectivity-monitor.js | ✅ Normal operation                 |
+| Vite HMR logs            | ~3    | Vite dev server         | ✅ Development only                 |
 
 **Final Status**: ✅ **NO ACTION REQUIRED** - All console messages are either:
 
 1. From development tools (not in production)
 2. Informational logs (expected behavior)
 3. Performance metrics (monitoring working correctly)
+

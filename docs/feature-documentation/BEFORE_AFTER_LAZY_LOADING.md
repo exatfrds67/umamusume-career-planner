@@ -10,7 +10,7 @@
 
 #### BEFORE Lazy Loading ❌
 
-```
+```text
 Page Load Sequence:
 ┌─────────────────────────────────────────┐
 │ 1. HTML loads                           │
@@ -42,7 +42,7 @@ User Experience: Slow, waiting...
 
 #### AFTER Lazy Loading ✅
 
-```
+```text
 Page Load Sequence:
 ┌─────────────────────────────────────────┐
 │ 1. HTML loads                           │
@@ -85,7 +85,7 @@ User Experience: Fast, responsive!
 
 ### BEFORE Lazy Loading
 
-```
+```text
 Time →
 0s    1s    2s    3s    4s
 │─────│─────│─────│─────│
@@ -114,7 +114,7 @@ IMG15                ████████
 
 ### AFTER Lazy Loading
 
-```
+```text
 Time →
 0s    1s    2s    3s    4s
 │─────│─────│─────│─────│
@@ -151,9 +151,9 @@ IMG15                          ████
 
 ## Bandwidth Usage Comparison
 
-### BEFORE Lazy Loading
+### BEFORE Lazy Loading (Bandwidth)
 
-```
+```text
 Initial Page Load:
 ┌──────────────────────────────────┐
 │ HTML/CSS/JS:     500KB           │
@@ -171,9 +171,9 @@ User Views 6 Cards:
 └──────────────────────────────────┘
 ```
 
-### AFTER Lazy Loading
+### AFTER Lazy Loading (Bandwidth)
 
-```
+```text
 Initial Page Load:
 ┌──────────────────────────────────┐
 │ HTML/CSS/JS:     500KB           │
@@ -206,7 +206,7 @@ If User Scrolls to View All:
 
 ### BEFORE Lazy Loading (3G Connection)
 
-```
+```text
 User Journey:
 ┌─────────────────────────────────────────┐
 │ 0s:  User clicks "Support Cards"        │
@@ -223,7 +223,7 @@ User Journey:
 
 ### AFTER Lazy Loading (3G Connection)
 
-```
+```text
 User Journey:
 ┌─────────────────────────────────────────┐
 │ 0s:  User clicks "Support Cards"        │
@@ -244,22 +244,22 @@ User Journey:
 
 ### Core Web Vitals
 
-| Metric | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| **LCP** (Largest Contentful Paint) | 2.8s | 1.8s | 36% faster ⚡ |
-| **FID** (First Input Delay) | 150ms | 80ms | 47% faster ⚡ |
-| **CLS** (Cumulative Layout Shift) | 0.05 | 0.05 | Same ✓ |
-| **TTI** (Time to Interactive) | 2.5s | 1.0s | 60% faster ⚡⚡ |
-| **Speed Index** | 2.9s | 1.5s | 48% faster ⚡ |
+| Metric                             | Before | After | Improvement     |
+| ---------------------------------- | ------ | ----- | --------------- |
+| **LCP** (Largest Contentful Paint) | 2.8s   | 1.8s  | 36% faster ⚡   |
+| **FID** (First Input Delay)        | 150ms  | 80ms  | 47% faster ⚡   |
+| **CLS** (Cumulative Layout Shift)  | 0.05   | 0.05  | Same ✓          |
+| **TTI** (Time to Interactive)      | 2.5s   | 1.0s  | 60% faster ⚡⚡ |
+| **Speed Index**                    | 2.9s   | 1.5s  | 48% faster ⚡   |
 
 ### Lighthouse Scores
 
-| Category | Before | After | Change |
-|----------|--------|-------|--------|
-| **Performance** | 72 | 94 | +22 points 📈 |
-| **Accessibility** | 95 | 95 | No change ✓ |
-| **Best Practices** | 92 | 92 | No change ✓ |
-| **SEO** | 100 | 100 | No change ✓ |
+| Category           | Before | After | Change        |
+| ------------------ | ------ | ----- | ------------- |
+| **Performance**    | 72     | 94    | +22 points 📈 |
+| **Accessibility**  | 95     | 95    | No change ✓   |
+| **Best Practices** | 92     | 92    | No change ✓   |
+| **SEO**            | 100    | 100   | No change ✓   |
 
 ---
 
@@ -329,7 +329,7 @@ User Journey:
 <img src="{{ $card->artwork_url }}" 
     alt="{{ $card->name }}" 
     class="w-full h-full object-cover">
-```
+```text
 
 **Result**: All images load immediately
 

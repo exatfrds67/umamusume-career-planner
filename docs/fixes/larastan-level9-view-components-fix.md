@@ -6,7 +6,8 @@
 
 ## Overview
 
-Fixed all Larastan level 9 static analysis errors in View Component files by adding proper type checks before casting and ensuring return types match method signatures.
+Fixed all Larastan level 9 static analysis errors in View Component files by adding proper type checks before casting
+and ensuring return types match method signatures.
 
 ## Files Fixed
 
@@ -100,7 +101,7 @@ Fixed all Larastan level 9 static analysis errors in View Component files by add
 
 ```bash
 vendor/bin/phpstan analyse --level=9 app/View/Components/
-```
+```text
 
 **Result**: ✅ No errors found
 
@@ -116,7 +117,7 @@ vendor/bin/pint --dirty
 
 ```bash
 php artisan test --compact tests/Unit/View/Components/
-```
+```text
 
 **Result**: 154 passed (1 pre-existing failure in BreadcrumbTest unrelated to our changes)
 
@@ -150,7 +151,7 @@ return (int) ($this->data['field'] ?? 0);
 // After (type-safe)
 $value = $this->data['field'] ?? 0;
 return is_int($value) ? $value : (is_numeric($value) ? (int) $value : 0);
-```
+```text
 
 ## Impact
 
@@ -170,3 +171,4 @@ return is_int($value) ? $value : (is_numeric($value) ? (int) $value : 0);
 - The BreadcrumbTest failure is pre-existing and unrelated to our changes
 - The test expects JSON-LD structured data to be rendered, but the view template doesn't use the `jsonLd()` method
 - Our fix to `jsonLd()` is correct and ensures it always returns a string as declared
+

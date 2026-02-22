@@ -2,7 +2,8 @@
 
 ## Overview
 
-The Skill System is a comprehensive implementation of the Umamusume skill management system, including skill categorization, SP cost calculation, hint-based discounts, skill evolution chains, and MCP-powered AI analysis.
+The Skill System is a comprehensive implementation of the Umamusume skill management system, including skill
+categorization, SP cost calculation, hint-based discounts, skill evolution chains, and MCP-powered AI analysis.
 
 ## Features
 
@@ -62,7 +63,7 @@ $rareSkill->base_sp_cost; // 180-240 SP
 
 // Unique Skills
 $uniqueSkill->base_sp_cost; // 280-320 SP (variable)
-```
+```text
 
 #### Hint-Based Discounts
 
@@ -99,7 +100,7 @@ $rareSkill->evolutionSource; // Normal version
 
 // Get full evolution chain
 $skill->getEvolutionChain(); // [Normal, Rare]
-```
+```text
 
 #### Evolution Examples
 
@@ -152,7 +153,7 @@ $hint = SkillHint::create([
 $unusedHints = SkillHint::unused()->get();
 $guaranteedHints = SkillHint::guaranteed()->get();
 $cardHints = SkillHint::fromSource('support_card')->get();
-```
+```text
 
 #### SkillAcquisition Model
 
@@ -199,7 +200,7 @@ $synergyMap = $service->analyzeSynergies($skills);
 //         'synergy_strength' => float (0-10),
 //     ]
 // ]
-```
+```text
 
 #### Acquisition Recommendations
 
@@ -259,7 +260,7 @@ $analysis = $service->analyzeSkillBuild($character, $skills);
 //     ],
 //     'recommendations' => array,
 // ]
-```
+```text
 
 ### 7. MCP Agent Integration
 
@@ -320,7 +321,7 @@ CREATE TABLE ucp_skills (
     created_at TIMESTAMP,
     updated_at TIMESTAMP
 );
-```
+```text
 
 ## Usage Examples
 
@@ -351,7 +352,7 @@ echo $skill->calculateFinalCost(5); // 72 SP
 // SP saved
 echo $skill->getSpSaved(2); // 48 SP
 
-```
+```text
 
 ### Example 2: Plan Skill Evolution
 
@@ -393,7 +394,7 @@ echo "Evolvable Skills: {$analysis['evolution_potential']['evolvable_count']}\n"
 foreach ($analysis['recommendations'] as $rec) {
     echo "- {$rec['message']} (Priority: {$rec['priority']})\n";
 }
-```
+```text
 
 ## Testing
 
@@ -409,7 +410,7 @@ php artisan test --filter=SkillAnalysisServiceTest
 ```bash
 # Consolidated skill seeder (replaces legacy ComprehensiveSkillSeeder and RealUmaMusumeSkillsSeeder)
 php artisan db:seed --class=UcpSkillsSeeder
-```
+```text
 
 ## Requirements Validation
 
@@ -425,3 +426,4 @@ php artisan db:seed --class=UcpSkillsSeeder
 3. Integrate with training system for hint acquisition
 4. Implement skill acquisition workflow
 5. Add skill performance tracking
+

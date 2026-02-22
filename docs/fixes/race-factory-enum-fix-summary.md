@@ -6,16 +6,17 @@
 
 ## Problem
 
-The Race factory was generating enum values that didn't match the database migration schema, causing CHECK constraint violations in tests:
+The Race factory was generating enum values that didn't match the database migration schema, causing CHECK constraint
+violations in tests:
 
 ### Mismatches Found
 
-| Factory/Test Value | Database Expected | Status |
-|-------------------|-------------------|---------|
-| `'sprint'` | `'short'` | ❌ Invalid |
-| `'medium'` | `'intermediate'` | ❌ Invalid |
-| `'mile'` | `'mile'` | ✅ Valid |
-| `'long'` | `'long'` | ✅ Valid |
+| Factory/Test Value | Database Expected | Status     |
+| ------------------ | ----------------- | ---------- |
+| `'sprint'`         | `'short'`         | ❌ Invalid |
+| `'medium'`         | `'intermediate'`  | ❌ Invalid |
+| `'mile'`           | `'mile'`          | ✅ Valid   |
+| `'long'`           | `'long'`          | ✅ Valid   |
 
 ### Root Cause
 
@@ -51,7 +52,7 @@ $distanceCategory = match (true) {
     $distanceMeters < 2400 => 'intermediate',
     default => 'long',
 };
-```
+```text
 
 ### 2. Fixed GameMechanicsEngineTest (`tests/Unit/Services/GameMechanicsEngineTest.php`)
 
@@ -139,4 +140,7 @@ Other test files that may have similar issues:
 
 ## Conclusion
 
-The Race factory enum constraint violations have been completely resolved. The factory now generates valid enum values that match the database schema exactly. All 15 constraint violation test failures are fixed, leaving only 2 pre-existing logic test failures to address.
+The Race factory enum constraint violations have been completely resolved. The factory now generates valid enum values
+that match the database schema exactly. All 15 constraint violation test failures are fixed, leaving only 2 pre-existing
+logic test failures to address.
+
