@@ -1,22 +1,20 @@
 # SPEC-006: AI Advisory System - Technical Specification
 
-**Document Version**: 2.3.0  
-**Date**: 2026-02-22  
-**Project**: Umamusume Pretty Derby Career Planner  
-**Status**: Complete - Implementation verified  
+**Document Version**: 2.3.0
+**Date**: 2026-02-22
+**Project**: Umamusume Pretty Derby Career Planner
+**Status**: Complete - Implementation verified
 **Classification**: Internal - Development Team
 
 ---
 
 ## Document Information
 
-| Attribute | Value |
-|-----------|-------|
-| **Document ID** | SPEC-006 |
-| **Related PRD** | [PRD-006: AI Advisory](../prds/PRD-006_AI_Advisory.md) |
-| **Architecture Version** | v2.3.0 |
-| **Approval Status** | Approved |
-| **Last Reviewed** | 2026-02-22 |
+- **Attribute**: **Document ID**; **Value**: SPEC-006
+- **Attribute**: **Related PRD**; **Value**: [PRD-006: AI Advisory](../prds/PRD-006_AI_Advisory.md)
+- **Attribute**: **Architecture Version**; **Value**: v2.3.0
+- **Attribute**: **Approval Status**; **Value**: Approved
+- **Attribute**: **Last Reviewed**; **Value**: 2026-02-22
 
 ### Related Documents
 
@@ -111,16 +109,14 @@ The AI Advisory System provides intelligent guidance across all these domains, r
 
 ### 1.4 Technology Stack
 
-| Component | Technology | Version | Purpose |
-|-----------|-----------|---------|---------|
-| **AI Framework** | Neuron AI | v2.11 | Agent orchestration |
-| **Local AI** | Ollama | Latest | Primary local inference |
-| **Cloud AI** | AWS Bedrock | Claude 3.5/4.5 | Cloud fallback |
-| **MCP** | Model Context Protocol | Latest | Tool execution |
-| **Framework** | Laravel | 12.x | Application foundation |
-| **Language** | PHP | 8.2+ | Server-side logic |
-| **Database** | MySQL | 8.0+ | Conversation persistence |
-| **Cache** | Redis | 7.x | Response caching |
+- **Component**: **AI Framework**; **Technology**: Neuron AI; **Version**: v2.11; **Purpose**: Agent orchestration
+- **Component**: **Local AI**; **Technology**: Ollama; **Version**: Latest; **Purpose**: Primary local inference
+- **Component**: **Cloud AI**; **Technology**: AWS Bedrock; **Version**: Claude 3.5/4.5; **Purpose**: Cloud fallback
+- **Component**: **MCP**; **Technology**: Model Context Protocol; **Version**: Latest; **Purpose**: Tool execution
+- **Component**: **Framework**; **Technology**: Laravel; **Version**: 12.x; **Purpose**: Application foundation
+- **Component**: **Language**; **Technology**: PHP; **Version**: 8.2+; **Purpose**: Server-side logic
+- **Component**: **Database**; **Technology**: MySQL; **Version**: 8.0+; **Purpose**: Conversation persistence
+- **Component**: **Cache**; **Technology**: Redis; **Version**: 7.x; **Purpose**: Response caching
 
 ---
 
@@ -170,28 +166,28 @@ graph TB
     API --> FormRequest
     FormRequest --> AdvisorySvc
     Livewire --> AdvisorySvc
-    
+
     AdvisorySvc --> ContextBuilder
     AdvisorySvc --> RouterSvc
     AdvisorySvc --> CostSvc
-    
+
     RouterSvc --> OllamaSvc
     RouterSvc --> BedrockSvc
-    
+
     AdvisorySvc --> TrainingAgent
     AdvisorySvc --> RaceAgent
     AdvisorySvc --> SkillAgent
     AdvisorySvc --> CareerAgent
-    
+
     TrainingAgent --> MCPClient
     RaceAgent --> MCPClient
     SkillAgent --> MCPClient
     CareerAgent --> MCPClient
-    
+
     MCPClient --> MemoryServer
     MCPClient --> FilesystemServer
     MCPClient --> FetchServer
-    
+
     AdvisorySvc --> DB
     RouterSvc --> Cache
     CostSvc --> DB
@@ -238,14 +234,12 @@ graph TB
 
 ### 2.3 Design Patterns
 
-| Pattern | Implementation | Purpose |
-|---------|---------------|---------|
-| **Strategy** | Provider selection | Pluggable AI backends |
-| **Factory** | Agent creation | Dynamic agent instantiation |
-| **Chain of Responsibility** | Fallback handling | Graceful degradation |
-| **Observer** | Cost tracking | React to AI completions |
-| **Decorator** | Context enrichment | Layer context onto prompts |
-| **Repository** | Conversation storage | Abstract data access |
+- **Pattern**: **Strategy**; **Implementation**: Provider selection; **Purpose**: Pluggable AI backends
+- **Pattern**: **Factory**; **Implementation**: Agent creation; **Purpose**: Dynamic agent instantiation
+- **Pattern**: **Chain of Responsibility**; **Implementation**: Fallback handling; **Purpose**: Graceful degradation
+- **Pattern**: **Observer**; **Implementation**: Cost tracking; **Purpose**: React to AI completions
+- **Pattern**: **Decorator**; **Implementation**: Context enrichment; **Purpose**: Layer context onto prompts
+- **Pattern**: **Repository**; **Implementation**: Conversation storage; **Purpose**: Abstract data access
 
 ---
 
@@ -270,28 +264,28 @@ use App\Neuron\Tools\{
 
 /**
  * Training Advisor Agent
- * 
+ *
  * Provides intelligent training recommendations based on
  * current character state, goals, and game mechanics.
  */
 class TrainingAdvisorAgent extends Agent
 {
     protected string $name = 'Training Advisor';
-    
+
     protected string $description = 'Provides training recommendations based on current career state';
 
     /**
      * Get system instructions
-     * 
+     *
      * @return string
      */
     public function instructions(): string
     {
         return <<<PROMPT
-You are an expert Umamusume training advisor. Your role is to analyze the current 
+You are an expert Umamusume training advisor. Your role is to analyze the current
 character state and recommend optimal training decisions.
 
-**Context Understanding:**
+### Context Understanding
 - Speed, Stamina, Power, Guts, and Wit are the five core stats (0-1200+ range, soft cap at 1200)
 - Stats above 1200 have diminishing returns (50% effectiveness)
 - Per-training cap: +100 (reduced to +50 if stat > 1200)
@@ -300,14 +294,14 @@ character state and recommend optimal training decisions.
 - Support cards provide bonuses when present at training facilities (+5% per card)
 - Friendship training activates at 80%+ bond level (1.2x multiplier)
 
-**Response Requirements:**
+### Response Requirements
 1. Always provide a clear, actionable recommendation
 2. Explain your reasoning based on the data
 3. Identify risks and potential issues
 4. Suggest alternatives when appropriate
 5. Include a confidence score (0.0-1.0)
 
-**Output Format (JSON):**
+### Output Format (JSON)
 {
     "recommendation": {
         "action": "training_type",
@@ -326,7 +320,7 @@ PROMPT;
 
     /**
      * Get available tools
-     * 
+     *
      * @return array
      */
     public function tools(): array
@@ -340,7 +334,7 @@ PROMPT;
 
     /**
      * Get the AI provider for this agent
-     * 
+     *
      * @return \NeuronAI\Provider
      */
     public function provider(): \NeuronAI\Provider
@@ -367,40 +361,40 @@ use App\Neuron\Tools\{
 
 /**
  * Race Strategy Agent
- * 
+ *
  * Provides race preparation and strategy recommendations.
  */
 class RaceStrategyAgent extends Agent
 {
     protected string $name = 'Race Strategy Advisor';
-    
+
     protected string $description = 'Optimizes race preparation and running style selection';
 
     /**
      * Get system instructions
-     * 
+     *
      * @return string
      */
     public function instructions(): string
     {
         return <<<PROMPT
-You are an expert Umamusume race strategist. Analyze race requirements and 
+You are an expert Umamusume race strategist. Analyze race requirements and
 character capabilities to recommend optimal race strategy.
 
-**Race Analysis Factors:**
+### Race Analysis Factors
 - Distance categories: Sprint (1000-1400m), Mile (1401-1800m), Medium (1801-2400m), Long (2401m+)
 - Surface types: Turf, Dirt
 - Running styles: Front Runner (Nige), Pace Chaser (Senkou), Late Surger (Sashi), End Closer (Oikomi)
 - Aptitude grades (G-S): S=+5%, A=0% (baseline), B=-10%, C=-20%, D=-35%, E=-55%, F=-75%, G=-90%
 - Track conditions: Firm (no penalty), Good (Power -50), Soft (Power -50/-100, +2% stamina drain), Heavy (Speed -50, Power -50/-100, +2% stamina drain)
 
-**Readiness Assessment:**
+### Readiness Assessment
 - Compare character stats against race requirements
 - Evaluate aptitude match for distance, surface, and style
 - Consider active skills and their synergy with race conditions
 - Factor in current mood and condition status
 
-**Output Format (JSON):**
+### Output Format (JSON)
 {
     "readiness_score": 85,
     "recommended_style": "sashi",
@@ -417,7 +411,7 @@ PROMPT;
 
     /**
      * Get available tools
-     * 
+     *
      * @return array
      */
     public function tools(): array
@@ -449,27 +443,27 @@ use App\Neuron\Tools\{
 
 /**
  * Skill Advisor Agent
- * 
+ *
  * Provides skill acquisition recommendations and SP optimization.
  */
 class SkillRecommendationAgent extends Agent
 {
     protected string $name = 'Skill Advisor';
-    
+
     protected string $description = 'Recommends skill acquisitions and optimizes SP budget';
 
     /**
      * Get system instructions
-     * 
+     *
      * @return string
      */
     public function instructions(): string
     {
         return <<<PROMPT
-You are an expert Umamusume skill build advisor. Recommend optimal skill 
+You are an expert Umamusume skill build advisor. Recommend optimal skill
 acquisitions based on race goals, SP budget, and available hints.
 
-**Skill System Knowledge:**
+### Skill System Knowledge
 - Skills cost SP (Skill Points) to acquire
 - Hints reduce cost: Level 1=10%, Level 2=20%, Level 3=30%, Level 4=35%, Level 5=40% (max)
 - Additional discount sources: Fast Learner condition, Skill Sparks, Hint Books
@@ -477,14 +471,14 @@ acquisitions based on race goals, SP budget, and available hints.
 - Some Normal skills can evolve to Rare versions
 - Skills have activation conditions (distance, position, phase)
 
-**Optimization Factors:**
+### Optimization Factors
 - Match skills to target race conditions
 - Prioritize skills with hint discounts
 - Consider skill synergies and combinations
 - Balance immediate needs vs long-term build
 - Account for evolution opportunities
 
-**Output Format (JSON):**
+### Output Format (JSON)
 {
     "recommended_skills": [
         {
@@ -510,7 +504,7 @@ PROMPT;
 
     /**
      * Get available tools
-     * 
+     *
      * @return array
      */
     public function tools(): array
@@ -593,18 +587,18 @@ use App\Services\TrainingPredictionService;
 
 /**
  * Get Training Predictions Tool
- * 
+ *
  * Retrieves training predictions for all facilities.
  */
 class GetTrainingPredictionsTool extends Tool
 {
     protected string $name = 'get_training_predictions';
-    
+
     protected string $description = 'Get predicted stat gains for all training options';
 
     /**
      * Define tool parameters
-     * 
+     *
      * @return array
      */
     public function parameters(): array
@@ -620,7 +614,7 @@ class GetTrainingPredictionsTool extends Tool
 
     /**
      * Execute the tool
-     * 
+     *
      * @param array $params
      * @return array
      */
@@ -628,7 +622,7 @@ class GetTrainingPredictionsTool extends Tool
     {
         $character = Character::findOrFail($params['character_id']);
         $service = app(TrainingPredictionService::class);
-        
+
         return $service->getPredictions($character);
     }
 }
@@ -644,18 +638,18 @@ use App\Models\Character;
 
 /**
  * Get Character Stats Tool
- * 
+ *
  * Retrieves current character state including stats, mood, and energy.
  */
 class GetCharacterStatsTool extends Tool
 {
     protected string $name = 'get_character_stats';
-    
+
     protected string $description = 'Get current character stats, mood, energy, and conditions';
 
     /**
      * Define tool parameters
-     * 
+     *
      * @return array
      */
     public function parameters(): array
@@ -671,7 +665,7 @@ class GetCharacterStatsTool extends Tool
 
     /**
      * Execute the tool
-     * 
+     *
      * @param array $params
      * @return array
      */
@@ -679,7 +673,7 @@ class GetCharacterStatsTool extends Tool
     {
         $character = Character::with(['aptitudes', 'activeCareer'])
             ->findOrFail($params['character_id']);
-        
+
         return [
             'id' => $character->id,
             'name' => $character->name,
@@ -770,7 +764,7 @@ use App\DTOs\AI\AIResponse;
 
 /**
  * Ollama Local AI Service
- * 
+ *
  * Handles communication with local Ollama instance.
  */
 class OllamaService
@@ -790,18 +784,18 @@ class OllamaService
 
     /**
      * Check if Ollama is available
-     * 
+     *
      * @return bool
      */
     public function isAvailable(): bool
     {
         $cacheKey = 'ollama:health:status';
-        
+
         return Cache::remember($cacheKey, 30, function () {
             try {
                 $response = Http::timeout(5)
                     ->get("{$this->baseUrl}/api/tags");
-                    
+
                 return $response->successful();
             } catch (\Exception $e) {
                 Log::warning('Ollama health check failed', [
@@ -814,7 +808,7 @@ class OllamaService
 
     /**
      * Generate AI response
-     * 
+     *
      * @param string $prompt
      * @param string|null $systemPrompt
      * @param array $options
@@ -876,7 +870,7 @@ class OllamaService
             Log::error('Ollama generation failed', [
                 'error' => $e->getMessage(),
             ]);
-            
+
             throw new OllamaUnavailableException(
                 "Ollama generation failed: {$e->getMessage()}",
                 previous: $e
@@ -886,7 +880,7 @@ class OllamaService
 
     /**
      * Get provider name
-     * 
+     *
      * @return string
      */
     public function getName(): string
@@ -896,7 +890,7 @@ class OllamaService
 
     /**
      * Get current model
-     * 
+     *
      * @return string
      */
     public function getModel(): string
@@ -920,7 +914,7 @@ use App\DTOs\AI\AIResponse;
 
 /**
  * AWS Bedrock AI Service
- * 
+ *
  * Handles communication with AWS Bedrock Claude models.
  */
 class BedrockService
@@ -936,7 +930,7 @@ class BedrockService
             'region' => config('ai.providers.bedrock.region'),
             'version' => 'latest',
         ]);
-        
+
         $this->modelId = config('ai.providers.bedrock.model');
         $this->maxTokens = config('ai.providers.bedrock.max_tokens');
         $this->temperature = config('ai.providers.bedrock.temperature');
@@ -944,7 +938,7 @@ class BedrockService
 
     /**
      * Check if Bedrock is enabled
-     * 
+     *
      * @return bool
      */
     public function isEnabled(): bool
@@ -954,7 +948,7 @@ class BedrockService
 
     /**
      * Generate AI response
-     * 
+     *
      * @param string $prompt
      * @param string|null $systemPrompt
      * @param array $options
@@ -1025,7 +1019,7 @@ class BedrockService
                 'error' => $e->getMessage(),
                 'model' => $this->modelId,
             ]);
-            
+
             throw new BedrockException(
                 "Bedrock generation failed: {$e->getMessage()}",
                 previous: $e
@@ -1035,7 +1029,7 @@ class BedrockService
 
     /**
      * Calculate cost based on token usage
-     * 
+     *
      * @param int $inputTokens
      * @param int $outputTokens
      * @return float
@@ -1043,16 +1037,16 @@ class BedrockService
     private function calculateCost(int $inputTokens, int $outputTokens): float
     {
         $pricing = $this->getPricing();
-        
+
         $inputCost = ($inputTokens / 1_000_000) * $pricing['input'];
         $outputCost = ($outputTokens / 1_000_000) * $pricing['output'];
-        
+
         return round($inputCost + $outputCost, 6);
     }
 
     /**
      * Get pricing for current model
-     * 
+     *
      * @return array
      */
     private function getPricing(): array
@@ -1076,7 +1070,7 @@ class BedrockService
 
     /**
      * Get provider name
-     * 
+     *
      * @return string
      */
     public function getName(): string
@@ -1086,7 +1080,7 @@ class BedrockService
 
     /**
      * Get current model
-     * 
+     *
      * @return string
      */
     public function getModel(): string
@@ -1109,7 +1103,7 @@ use App\Exceptions\AI\{AIProviderException, AIBudgetExceededException};
 
 /**
  * Hybrid AI Service
- * 
+ *
  * Routes requests to appropriate AI provider based on complexity,
  * availability, and cost constraints.
  */
@@ -1123,7 +1117,7 @@ class HybridAIService
 
     /**
      * Generate AI response with automatic provider selection
-     * 
+     *
      * @param string $prompt
      * @param string|null $systemPrompt
      * @param array $options
@@ -1160,7 +1154,7 @@ class HybridAIService
 
     /**
      * Try local provider with cloud fallback
-     * 
+     *
      * @param string $prompt
      * @param string|null $systemPrompt
      * @param array $options
@@ -1191,7 +1185,7 @@ class HybridAIService
 
     /**
      * Try cloud provider with local fallback
-     * 
+     *
      * @param string $prompt
      * @param string|null $systemPrompt
      * @param array $options
@@ -1222,7 +1216,7 @@ class HybridAIService
 
     /**
      * Try cloud provider with budget check
-     * 
+     *
      * @param string $prompt
      * @param string|null $systemPrompt
      * @param array $options
@@ -1254,7 +1248,7 @@ class HybridAIService
 
     /**
      * Determine if cloud should be used based on complexity
-     * 
+     *
      * @param int $complexity
      * @param array $options
      * @return bool
@@ -1273,13 +1267,13 @@ class HybridAIService
 
         // Check complexity threshold
         $threshold = config('ai.routing.local_complexity_threshold');
-        
+
         return $complexity > $threshold;
     }
 
     /**
      * Assess query complexity
-     * 
+     *
      * @param string $prompt
      * @param array $options
      * @return int 0-100 complexity score
@@ -1318,7 +1312,7 @@ class HybridAIService
 
     /**
      * Get the current provider for direct access
-     * 
+     *
      * @return OllamaService|BedrockService
      */
     public function getProvider(): OllamaService|BedrockService
@@ -1357,7 +1351,7 @@ readonly class AIResponse
 
     /**
      * Parse JSON content from response
-     * 
+     *
      * @return array|null
      */
     public function parseJson(): ?array
@@ -1375,7 +1369,7 @@ readonly class AIResponse
 
     /**
      * Check if response was from local provider
-     * 
+     *
      * @return bool
      */
     public function isLocal(): bool
@@ -1385,7 +1379,7 @@ readonly class AIResponse
 
     /**
      * Check if response was from cloud provider
-     * 
+     *
      * @return bool
      */
     public function isCloud(): bool
@@ -1395,7 +1389,7 @@ readonly class AIResponse
 
     /**
      * Convert to array
-     * 
+     *
      * @return array
      */
     public function toArray(): array
@@ -1481,7 +1475,7 @@ use App\Models\MCPToolUsage;
 
 /**
  * MCP Client Service
- * 
+ *
  * Manages MCP server connections and tool execution.
  */
 class MCPClientService
@@ -1491,7 +1485,7 @@ class MCPClientService
 
     /**
      * Initialize MCP servers
-     * 
+     *
      * @return void
      */
     public function initialize(): void
@@ -1507,7 +1501,7 @@ class MCPClientService
 
     /**
      * Start an MCP server
-     * 
+     *
      * @param string $name
      * @param array $settings
      * @return void
@@ -1542,7 +1536,7 @@ class MCPClientService
 
     /**
      * Execute a tool on an MCP server
-     * 
+     *
      * @param string $serverName
      * @param string $toolName
      * @param array $params
@@ -1585,7 +1579,7 @@ class MCPClientService
 
     /**
      * Send tool request to MCP server
-     * 
+     *
      * @param string $serverName
      * @param string $toolName
      * @param array $params
@@ -1606,13 +1600,13 @@ class MCPClientService
 
         // Send to server process and await response
         // Implementation depends on MCP SDK being used
-        
+
         return [];
     }
 
     /**
      * Track tool usage
-     * 
+     *
      * @param string $serverName
      * @param string $toolName
      * @param bool $success
@@ -1648,7 +1642,7 @@ class MCPClientService
 
     /**
      * Get server health status
-     * 
+     *
      * @return array
      */
     public function getHealthStatus(): array
@@ -1658,8 +1652,8 @@ class MCPClientService
         foreach ($this->servers as $name => $server) {
             $status[$name] = [
                 'status' => $server['status'],
-                'uptime' => $server['started_at'] 
-                    ? now()->diffInSeconds($server['started_at']) 
+                'uptime' => $server['started_at']
+                    ? now()->diffInSeconds($server['started_at'])
                     : null,
                 'error' => $server['error'] ?? null,
             ];
@@ -1670,7 +1664,7 @@ class MCPClientService
 
     /**
      * Shutdown all MCP servers
-     * 
+     *
      * @return void
      */
     public function shutdown(): void
@@ -1704,14 +1698,14 @@ use Illuminate\Support\Facades\Cache;
 
 /**
  * MCP Monitoring Service
- * 
+ *
  * Provides monitoring and analytics for MCP tool usage.
  */
 class MCPMonitoringService
 {
     /**
      * Get usage summary for date range
-     * 
+     *
      * @param \Carbon\Carbon $startDate
      * @param \Carbon\Carbon $endDate
      * @return array
@@ -1748,7 +1742,7 @@ class MCPMonitoringService
 
     /**
      * Get today's tool usage
-     * 
+     *
      * @return array
      */
     public function getTodayUsage(): array
@@ -1762,7 +1756,7 @@ class MCPMonitoringService
 
     /**
      * Get error rates by server
-     * 
+     *
      * @return array
      */
     public function getErrorRatesByServer(): array
@@ -1808,7 +1802,7 @@ use Illuminate\Support\Facades\{DB, Log};
 
 /**
  * AI Advisory Service
- * 
+ *
  * Orchestrates AI advisory operations across all domains.
  */
 class AdviceService
@@ -1821,7 +1815,7 @@ class AdviceService
 
     /**
      * Get training advice
-     * 
+     *
      * @param Character $character
      * @param string $query
      * @param array $options
@@ -1833,14 +1827,14 @@ class AdviceService
         array $options = []
     ): AIAdvice {
         $context = $this->contextBuilder->buildTrainingContext($character);
-        
+
         $agent = new TrainingAdvisorAgent();
         $agent->withContext($context);
 
         $response = $this->executeAgent($agent, $query, $options);
 
         $advice = $this->parseAdvice($response, 'training');
-        
+
         $this->persistRecommendation($character, $advice, 'training');
 
         return $advice;
@@ -1848,7 +1842,7 @@ class AdviceService
 
     /**
      * Get race strategy advice
-     * 
+     *
      * @param Character $character
      * @param int $raceId
      * @param string $query
@@ -1862,14 +1856,14 @@ class AdviceService
         array $options = []
     ): AIAdvice {
         $context = $this->contextBuilder->buildRaceContext($character, $raceId);
-        
+
         $agent = new RaceStrategyAgent();
         $agent->withContext($context);
 
         $response = $this->executeAgent($agent, $query, $options);
 
         $advice = $this->parseAdvice($response, 'race');
-        
+
         $this->persistRecommendation($character, $advice, 'race');
 
         return $advice;
@@ -1877,7 +1871,7 @@ class AdviceService
 
     /**
      * Get skill advice
-     * 
+     *
      * @param Character $character
      * @param string $query
      * @param array $options
@@ -1889,14 +1883,14 @@ class AdviceService
         array $options = []
     ): AIAdvice {
         $context = $this->contextBuilder->buildSkillContext($character);
-        
+
         $agent = new SkillRecommendationAgent();
         $agent->withContext($context);
 
         $response = $this->executeAgent($agent, $query, $options);
 
         $advice = $this->parseAdvice($response, 'skill');
-        
+
         $this->persistRecommendation($character, $advice, 'skill');
 
         return $advice;
@@ -1904,7 +1898,7 @@ class AdviceService
 
     /**
      * Handle interactive conversation
-     * 
+     *
      * @param Character $character
      * @param string $message
      * @param string $contextType
@@ -1961,7 +1955,7 @@ class AdviceService
 
     /**
      * Execute agent with query
-     * 
+     *
      * @param mixed $agent
      * @param string $query
      * @param array $options
@@ -1977,7 +1971,7 @@ class AdviceService
 
     /**
      * Build prompt with context
-     * 
+     *
      * @param string $query
      * @param array $context
      * @return string
@@ -1987,12 +1981,12 @@ class AdviceService
         $contextJson = json_encode($context, JSON_PRETTY_PRINT);
 
         return <<<PROMPT
-**Current Context:**
+### Current Context
 ```json
 {$contextJson}
 ```
 
-**User Query:**
+### User Query
 {$query}
 
 Please analyze the context and provide your recommendation in the specified JSON format.
@@ -2001,7 +1995,7 @@ PROMPT;
 
     /**
      * Parse AI response into advice structure
-     * 
+     *
      * @param AIResponse $response
      * @param string $type
      * @return AIAdvice
@@ -2042,7 +2036,7 @@ PROMPT;
 
     /**
      * Persist recommendation to database
-     * 
+     *
      * @param Character $character
      * @param AIAdvice $advice
      * @param string $type
@@ -2073,7 +2067,7 @@ PROMPT;
 
     /**
      * Create new conversation
-     * 
+     *
      * @param Character $character
      * @param string $contextType
      * @return AIConversation
@@ -2096,7 +2090,7 @@ PROMPT;
 
     /**
      * Update conversation with new message
-     * 
+     *
      * @param AIConversation $conversation
      * @param string $userMessage
      * @param AIResponse $response
@@ -2140,7 +2134,7 @@ PROMPT;
 
     /**
      * Get agent for context type
-     * 
+     *
      * @param string $contextType
      * @return mixed
      */
@@ -2157,14 +2151,14 @@ PROMPT;
 
     /**
      * Extract confidence from response
-     * 
+     *
      * @param AIResponse $response
      * @return float
      */
     private function extractConfidence(AIResponse $response): float
     {
         $parsed = $response->parseJson();
-        
+
         return $parsed['confidence'] ?? 0.7;
     }
 }
@@ -2183,7 +2177,7 @@ use App\Services\{TrainingPredictionService, RaceService, SkillService};
 
 /**
  * Context Builder Service
- * 
+ *
  * Builds domain context for AI prompts.
  */
 class ContextBuilder
@@ -2196,7 +2190,7 @@ class ContextBuilder
 
     /**
      * Build training context
-     * 
+     *
      * @param Character $character
      * @return array
      */
@@ -2230,7 +2224,7 @@ class ContextBuilder
 
     /**
      * Build race context
-     * 
+     *
      * @param Character $character
      * @param int $raceId
      * @return array
@@ -2263,7 +2257,7 @@ class ContextBuilder
 
     /**
      * Build skill context
-     * 
+     *
      * @param Character $character
      * @return array
      */
@@ -2292,7 +2286,7 @@ class ContextBuilder
 
     /**
      * Build conversation context with history
-     * 
+     *
      * @param Character $character
      * @param string $contextType
      * @param array $conversationHistory
@@ -2320,7 +2314,7 @@ class ContextBuilder
 
     /**
      * Get support deck summary
-     * 
+     *
      * @param Character $character
      * @return array
      */
@@ -2369,7 +2363,7 @@ readonly class AIAdvice
 
     /**
      * Convert to array for API response
-     * 
+     *
      * @return array
      */
     public function toArray(): array
@@ -2385,7 +2379,7 @@ readonly class AIAdvice
 
     /**
      * Get metadata for API response
-     * 
+     *
      * @return array
      */
     public function getMeta(): array
@@ -2407,16 +2401,14 @@ readonly class AIAdvice
 
 ### 7.1 Endpoint Overview
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/api/ai/training` | Get training advice | Yes |
-| POST | `/api/ai/race` | Get race strategy advice | Yes |
-| POST | `/api/ai/skills` | Get skill recommendations | Yes |
-| POST | `/api/ai/conversation` | Interactive AI conversation | Yes |
-| GET | `/api/ai/conversations` | List user conversations | Yes |
-| GET | `/api/ai/conversations/{id}` | Get conversation details | Yes |
-| DELETE | `/api/ai/conversations/{id}` | Delete conversation | Yes |
-| GET | `/api/ai/usage` | Get AI usage statistics | Yes |
+- **Method**: POST; **Endpoint**: `/api/ai/training`; **Description**: Get training advice; **Auth Required**: Yes
+- **Method**: POST; **Endpoint**: `/api/ai/race`; **Description**: Get race strategy advice; **Auth Required**: Yes
+- **Method**: POST; **Endpoint**: `/api/ai/skills`; **Description**: Get skill recommendations; **Auth Required**: Yes
+- **Method**: POST; **Endpoint**: `/api/ai/conversation`; **Description**: Interactive AI conversation; **Auth Required**: Yes
+- **Method**: GET; **Endpoint**: `/api/ai/conversations`; **Description**: List user conversations; **Auth Required**: Yes
+- **Method**: GET; **Endpoint**: `/api/ai/conversations/{id}`; **Description**: Get conversation details; **Auth Required**: Yes
+- **Method**: DELETE; **Endpoint**: `/api/ai/conversations/{id}`; **Description**: Delete conversation; **Auth Required**: Yes
+- **Method**: GET; **Endpoint**: `/api/ai/usage`; **Description**: Get AI usage statistics; **Auth Required**: Yes
 
 ### 7.2 Training Advice
 
@@ -2728,7 +2720,7 @@ CREATE TABLE ucp_ai_conversations (
     cost_usd DECIMAL(10, 6) NOT NULL DEFAULT 0,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     FOREIGN KEY (user_id) REFERENCES ucp_users(id) ON DELETE CASCADE,
     INDEX idx_user_context (user_id, context_type),
     INDEX idx_created_at (created_at)
@@ -2752,7 +2744,7 @@ CREATE TABLE ucp_ai_recommendations (
     cost_usd DECIMAL(10, 6) NOT NULL DEFAULT 0,
     was_accepted BOOLEAN NULL COMMENT 'NULL = pending, TRUE = accepted, FALSE = rejected',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    
+
     FOREIGN KEY (character_id) REFERENCES ucp_characters(id) ON DELETE CASCADE,
     INDEX idx_character_type (character_id, recommendation_type),
     INDEX idx_created_at (created_at),
@@ -2779,7 +2771,7 @@ CREATE TABLE ucp_ai_usage_daily (
     error_count INT UNSIGNED NOT NULL DEFAULT 0,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+
     FOREIGN KEY (user_id) REFERENCES ucp_users(id) ON DELETE CASCADE,
     UNIQUE KEY unique_user_date_provider (user_id, usage_date, provider),
     INDEX idx_usage_date (usage_date)
@@ -2803,7 +2795,7 @@ use Illuminate\Support\Facades\{DB, Cache, Log};
 
 /**
  * Cost Tracking Service
- * 
+ *
  * Tracks AI usage and costs for budget management.
  */
 class CostTrackingService
@@ -2812,7 +2804,7 @@ class CostTrackingService
 
     /**
      * Track AI usage from response
-     * 
+     *
      * @param AIResponse $response
      * @param string|null $userId
      * @return void
@@ -2856,7 +2848,7 @@ class CostTrackingService
 
     /**
      * Get today's spend for user
-     * 
+     *
      * @param string|null $userId
      * @return float
      */
@@ -2874,7 +2866,7 @@ class CostTrackingService
 
     /**
      * Get usage summary for period
-     * 
+     *
      * @param string $userId
      * @param \Carbon\Carbon $startDate
      * @param \Carbon\Carbon $endDate
@@ -2912,7 +2904,7 @@ class CostTrackingService
 
     /**
      * Check if budget exceeded
-     * 
+     *
      * @param string|null $userId
      * @return bool
      */
@@ -2926,7 +2918,7 @@ class CostTrackingService
 
     /**
      * Update cached spend
-     * 
+     *
      * @param string $userId
      * @param float $additionalCost
      * @return void
@@ -2940,7 +2932,7 @@ class CostTrackingService
 
     /**
      * Track error
-     * 
+     *
      * @param string $provider
      * @param string|null $userId
      * @return void
@@ -2969,14 +2961,12 @@ class CostTrackingService
 
 ### 9.2 Pricing Reference
 
-| Provider | Model | Input Cost (per 1M tokens) | Output Cost (per 1M tokens) |
-|----------|-------|---------------------------|----------------------------|
-| Ollama | llama3.2 | $0.00 | $0.00 |
-| Ollama | mistral | $0.00 | $0.00 |
-| Bedrock | Claude 3.5 Sonnet | $3.00 | $15.00 |
-| Bedrock | Claude 3.5 Haiku | $1.00 | $5.00 |
-| Bedrock | Claude 3 Opus | $15.00 | $75.00 |
-| Bedrock | Claude 4.5 | $5.00 | $25.00 |
+- **Provider**: Ollama; **Model**: llama3.2; **Input Cost (per 1M tokens)**: $0.00; **Output Cost (per 1M tokens)**: $0.00
+- **Provider**: Ollama; **Model**: mistral; **Input Cost (per 1M tokens)**: $0.00; **Output Cost (per 1M tokens)**: $0.00
+- **Provider**: Bedrock; **Model**: Claude 3.5 Sonnet; **Input Cost (per 1M tokens)**: $3.00; **Output Cost (per 1M tokens)**: $15.00
+- **Provider**: Bedrock; **Model**: Claude 3.5 Haiku; **Input Cost (per 1M tokens)**: $1.00; **Output Cost (per 1M tokens)**: $5.00
+- **Provider**: Bedrock; **Model**: Claude 3 Opus; **Input Cost (per 1M tokens)**: $15.00; **Output Cost (per 1M tokens)**: $75.00
+- **Provider**: Bedrock; **Model**: Claude 4.5; **Input Cost (per 1M tokens)**: $5.00; **Output Cost (per 1M tokens)**: $25.00
 
 ### 9.3 Budget Enforcement
 
@@ -2992,36 +2982,30 @@ Budget enforcement occurs at the routing layer:
 
 ### 10.1 Routing Decision Matrix
 
-| Query Complexity | Ollama Available | Bedrock Enabled | Budget OK | Provider Selected |
-|-----------------|------------------|-----------------|-----------|-------------------|
-| Simple (< 50) | Yes | - | - | Ollama |
-| Simple (< 50) | No | Yes | Yes | Bedrock |
-| Simple (< 50) | No | Yes | No | Error (AI_003) |
-| Simple (< 50) | No | No | - | Error (AI_001) |
-| Complex (≥ 50) | Yes | Yes | Yes | Bedrock |
-| Complex (≥ 50) | Yes | Yes | No | Ollama |
-| Complex (≥ 50) | Yes | No | - | Ollama |
-| Complex (≥ 50) | No | Yes | Yes | Bedrock |
-| Complex (≥ 50) | No | Yes | No | Error (AI_003) |
+- **Query Complexity**: Simple (< 50); **Ollama Available**: Yes; **Bedrock Enabled**: -; **Budget OK**: -; **Provider Selected**: Ollama
+- **Query Complexity**: Simple (< 50); **Ollama Available**: No; **Bedrock Enabled**: Yes; **Budget OK**: Yes; **Provider Selected**: Bedrock
+- **Query Complexity**: Simple (< 50); **Ollama Available**: No; **Bedrock Enabled**: Yes; **Budget OK**: No; **Provider Selected**: Error (AI_003)
+- **Query Complexity**: Simple (< 50); **Ollama Available**: No; **Bedrock Enabled**: No; **Budget OK**: -; **Provider Selected**: Error (AI_001)
+- **Query Complexity**: Complex (≥ 50); **Ollama Available**: Yes; **Bedrock Enabled**: Yes; **Budget OK**: Yes; **Provider Selected**: Bedrock
+- **Query Complexity**: Complex (≥ 50); **Ollama Available**: Yes; **Bedrock Enabled**: Yes; **Budget OK**: No; **Provider Selected**: Ollama
+- **Query Complexity**: Complex (≥ 50); **Ollama Available**: Yes; **Bedrock Enabled**: No; **Budget OK**: -; **Provider Selected**: Ollama
+- **Query Complexity**: Complex (≥ 50); **Ollama Available**: No; **Bedrock Enabled**: Yes; **Budget OK**: Yes; **Provider Selected**: Bedrock
+- **Query Complexity**: Complex (≥ 50); **Ollama Available**: No; **Bedrock Enabled**: Yes; **Budget OK**: No; **Provider Selected**: Error (AI_003)
 
 ### 10.2 Complexity Scoring
 
-| Factor | Score Range | Description |
-|--------|-------------|-------------|
-| Prompt length | 0-40 | > 2000 chars: +20, > 4000 chars: +40 |
-| Topic | 30-70 | training: 40, race: 50, skills: 45, career: 70 |
-| Context sections | 0-20 | 4 points per section, max 20 |
-| Conversation history | 0-10 | 2 points per message, max 10 |
+- **Factor**: Prompt length; **Score Range**: 0-40; **Description**: > 2000 chars: +20, > 4000 chars: +40
+- **Factor**: Topic; **Score Range**: 30-70; **Description**: training: 40, race: 50, skills: 45, career: 70
+- **Factor**: Context sections; **Score Range**: 0-20; **Description**: 4 points per section, max 20
+- **Factor**: Conversation history; **Score Range**: 0-10; **Description**: 2 points per message, max 10
 
 ### 10.3 Confidence Scoring Guidelines
 
-| Confidence Level | Range | Interpretation |
-|-----------------|-------|----------------|
-| Very High | 0.90 - 1.00 | Clear-cut recommendation |
-| High | 0.75 - 0.89 | Strong recommendation |
-| Moderate | 0.60 - 0.74 | Good recommendation with caveats |
-| Low | 0.40 - 0.59 | Uncertain, consider alternatives |
-| Very Low | 0.00 - 0.39 | Insufficient data or conflicting factors |
+- **Confidence Level**: Very High; **Range**: 0.90 - 1.00; **Interpretation**: Clear-cut recommendation
+- **Confidence Level**: High; **Range**: 0.75 - 0.89; **Interpretation**: Strong recommendation
+- **Confidence Level**: Moderate; **Range**: 0.60 - 0.74; **Interpretation**: Good recommendation with caveats
+- **Confidence Level**: Low; **Range**: 0.40 - 0.59; **Interpretation**: Uncertain, consider alternatives
+- **Confidence Level**: Very Low; **Range**: 0.00 - 0.39; **Interpretation**: Insufficient data or conflicting factors
 
 ---
 
@@ -3083,13 +3067,11 @@ App\Exceptions\AI\AIException (Base)
 
 ### 12.2 Error Codes
 
-| Code | HTTP Status | Description | Resolution |
-|------|-------------|-------------|------------|
-| `AI_001` | 503 | Provider unavailable | Retry later or use fallback |
-| `AI_002` | 429 | Rate limit exceeded | Wait and retry |
-| `AI_003` | 402 | Cost threshold exceeded | Increase budget or use local |
-| `AI_004` | 422 | Invalid request | Check request parameters |
-| `AI_005` | 500 | Generation failed | Retry or contact support |
+- **Code**: `AI_001`; **HTTP Status**: 503; **Description**: Provider unavailable; **Resolution**: Retry later or use fallback
+- **Code**: `AI_002`; **HTTP Status**: 429; **Description**: Rate limit exceeded; **Resolution**: Wait and retry
+- **Code**: `AI_003`; **HTTP Status**: 402; **Description**: Cost threshold exceeded; **Resolution**: Increase budget or use local
+- **Code**: `AI_004`; **HTTP Status**: 422; **Description**: Invalid request; **Resolution**: Check request parameters
+- **Code**: `AI_005`; **HTTP Status**: 500; **Description**: Generation failed; **Resolution**: Retry or contact support
 
 ### 12.3 Error Response Format
 
@@ -3111,12 +3093,10 @@ App\Exceptions\AI\AIException (Base)
 
 ### 13.1 Performance Targets
 
-| Metric | Target | Notes |
-|--------|--------|-------|
-| AI response time (local) | < 2.5s (p95) | Includes context building |
-| AI response time (cloud) | < 5.0s (p95) | Network latency included |
-| Context build time | < 200ms | Use eager loading |
-| Cache hit rate | > 80% | For repeated queries |
+- **Metric**: AI response time (local); **Target**: < 2.5s (p95); **Notes**: Includes context building
+- **Metric**: AI response time (cloud); **Target**: < 5.0s (p95); **Notes**: Network latency included
+- **Metric**: Context build time; **Target**: < 200ms; **Notes**: Use eager loading
+- **Metric**: Cache hit rate; **Target**: > 80%; **Notes**: For repeated queries
 
 ### 13.2 Caching Strategy
 
@@ -3162,7 +3142,7 @@ Users can only access AI for their own characters:
 public function authorize(): bool
 {
     $character = Character::find($this->character_id);
-    
+
     return $character && $character->user_id === auth()->id();
 }
 ```
@@ -3200,24 +3180,24 @@ RateLimiter::for('ai', function (Request $request) {
 
 test('routes simple queries to local provider', function () {
     $service = app(HybridAIService::class);
-    
+
     Http::fake([
         'localhost:11434/*' => Http::response(['response' => 'test'], 200),
     ]);
-    
+
     $response = $service->generate('Simple question', null, ['topic' => 'training']);
-    
+
     expect($response->provider)->toBe('ollama');
 });
 
 test('falls back to cloud when local unavailable', function () {
     $service = app(HybridAIService::class);
-    
+
     // Mock Ollama as unavailable
     Http::fake([
         'localhost:11434/*' => Http::response(null, 500),
     ]);
-    
+
     // Mock Bedrock response
     $this->mock(BedrockService::class)
         ->shouldReceive('generate')
@@ -3232,9 +3212,9 @@ test('falls back to cloud when local unavailable', function () {
             durationMs: 1000,
             costUsd: 0.001
         ));
-    
+
     $response = $service->generate('Test query');
-    
+
     expect($response->provider)->toBe('bedrock');
 });
 
@@ -3242,13 +3222,13 @@ test('respects budget threshold', function () {
     $costTracker = $this->mock(CostTrackingService::class);
     $costTracker->shouldReceive('isBudgetExceeded')->andReturn(true);
     $costTracker->shouldReceive('getTodaySpend')->andReturn(0.15);
-    
+
     $service = new HybridAIService(
         app(OllamaService::class),
         app(BedrockService::class),
         $costTracker
     );
-    
+
     // Force cloud should fail due to budget
     expect(fn() => $service->generate('Test', null, ['force_cloud' => true]))
         ->toThrow(AIBudgetExceededException::class);
@@ -3263,7 +3243,7 @@ test('respects budget threshold', function () {
 test('authenticated user can get training advice', function () {
     $user = User::factory()->create();
     $character = Character::factory()->for($user)->create();
-    
+
     // Mock AI response
     Http::fake([
         'localhost:11434/*' => Http::response([
@@ -3277,13 +3257,13 @@ test('authenticated user can get training advice', function () {
             'eval_count' => 100,
         ], 200),
     ]);
-    
+
     $response = $this->actingAs($user)
         ->postJson('/api/ai/training', [
             'character_id' => $character->id,
             'query' => 'What should I train?',
         ]);
-    
+
     $response->assertStatus(200)
         ->assertJsonPath('success', true)
         ->assertJsonStructure([
@@ -3307,7 +3287,7 @@ test('unauthenticated user cannot access AI endpoints', function () {
         'character_id' => 1,
         'query' => 'Test',
     ]);
-    
+
     $response->assertStatus(401);
 });
 
@@ -3315,22 +3295,22 @@ test('user cannot access other users characters', function () {
     $user1 = User::factory()->create();
     $user2 = User::factory()->create();
     $character = Character::factory()->for($user1)->create();
-    
+
     $response = $this->actingAs($user2)
         ->postJson('/api/ai/training', [
             'character_id' => $character->id,
             'query' => 'Test',
         ]);
-    
+
     $response->assertStatus(403);
 });
 
 test('rate limiting is enforced', function () {
     $user = User::factory()->create();
     $character = Character::factory()->for($user)->create();
-    
+
     Http::fake(['*' => Http::response(['response' => 'test'], 200)]);
-    
+
     // Make 30 requests (limit)
     for ($i = 0; $i < 30; $i++) {
         $this->actingAs($user)
@@ -3339,14 +3319,14 @@ test('rate limiting is enforced', function () {
                 'query' => 'Test',
             ]);
     }
-    
+
     // 31st request should be rate limited
     $response = $this->actingAs($user)
         ->postJson('/api/ai/training', [
             'character_id' => $character->id,
             'query' => 'Test',
         ]);
-    
+
     $response->assertStatus(429);
 });
 ```
@@ -3360,7 +3340,7 @@ test('training advisor agent provides structured recommendations', function () {
     $character = Character::factory()
         ->has(Career::factory()->state(['current_turn' => 30]))
         ->create();
-    
+
     $agent = new TrainingAdvisorAgent();
     $agent->withContext([
         'character' => $character->toArray(),
@@ -3370,13 +3350,13 @@ test('training advisor agent provides structured recommendations', function () {
             'mood' => 'good',
         ],
     ]);
-    
+
     // This would require actual AI model in integration environment
     // For CI, we mock the provider
     $response = $agent->run('What should I train?');
-    
+
     $parsed = json_decode($response, true);
-    
+
     expect($parsed)->toHaveKeys([
         'recommendation',
         'reasoning',
@@ -3453,7 +3433,7 @@ class AIRecommendationFactory extends Factory
     public function definition(): array
     {
         $type = $this->faker->randomElement(['training', 'race', 'skill']);
-        
+
         return [
             'character_id' => \App\Models\Character::factory(),
             'recommendation_type' => $type,
@@ -3530,69 +3510,61 @@ class AIRecommendationFactory extends Factory
 
 ### Appendix A: Environment Variables
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `AI_DEFAULT_PROVIDER` | `ollama` | Primary AI provider |
-| `OLLAMA_ENABLED` | `true` | Enable Ollama |
-| `OLLAMA_BASE_URL` | `http://localhost:11434` | Ollama endpoint |
-| `OLLAMA_MODEL` | `llama3.2` | Ollama model |
-| `OLLAMA_TIMEOUT` | `30` | Request timeout (seconds) |
-| `OLLAMA_TEMPERATURE` | `0.7` | Generation temperature |
-| `BEDROCK_ENABLED` | `false` | Enable Bedrock fallback |
-| `AWS_DEFAULT_REGION` | `us-east-1` | AWS region |
-| `BEDROCK_MODEL` | `anthropic.claude-3-5-sonnet` | Bedrock model ID |
-| `BEDROCK_MAX_TOKENS` | `4096` | Max output tokens |
-| `AI_COST_THRESHOLD` | `0.10` | Daily budget (USD) |
-| `AI_FALLBACK_ENABLED` | `true` | Enable provider fallback |
-| `AI_RETRY_ATTEMPTS` | `3` | Retry count on failure |
-| `AI_LOCAL_THRESHOLD` | `70` | Local complexity threshold |
-| `AI_CACHE_TTL` | `300` | Response cache TTL (seconds) |
+- **Variable**: `AI_DEFAULT_PROVIDER`; **Default**: `ollama`; **Description**: Primary AI provider
+- **Variable**: `OLLAMA_ENABLED`; **Default**: `true`; **Description**: Enable Ollama
+- **Variable**: `OLLAMA_BASE_URL`; **Default**: `http://localhost:11434`; **Description**: Ollama endpoint
+- **Variable**: `OLLAMA_MODEL`; **Default**: `llama3.2`; **Description**: Ollama model
+- **Variable**: `OLLAMA_TIMEOUT`; **Default**: `30`; **Description**: Request timeout (seconds)
+- **Variable**: `OLLAMA_TEMPERATURE`; **Default**: `0.7`; **Description**: Generation temperature
+- **Variable**: `BEDROCK_ENABLED`; **Default**: `false`; **Description**: Enable Bedrock fallback
+- **Variable**: `AWS_DEFAULT_REGION`; **Default**: `us-east-1`; **Description**: AWS region
+- **Variable**: `BEDROCK_MODEL`; **Default**: `anthropic.claude-3-5-sonnet`; **Description**: Bedrock model ID
+- **Variable**: `BEDROCK_MAX_TOKENS`; **Default**: `4096`; **Description**: Max output tokens
+- **Variable**: `AI_COST_THRESHOLD`; **Default**: `0.10`; **Description**: Daily budget (USD)
+- **Variable**: `AI_FALLBACK_ENABLED`; **Default**: `true`; **Description**: Enable provider fallback
+- **Variable**: `AI_RETRY_ATTEMPTS`; **Default**: `3`; **Description**: Retry count on failure
+- **Variable**: `AI_LOCAL_THRESHOLD`; **Default**: `70`; **Description**: Local complexity threshold
+- **Variable**: `AI_CACHE_TTL`; **Default**: `300`; **Description**: Response cache TTL (seconds)
 
 ### Appendix B: Requirements Traceability
 
-| Requirement | Source | Implementation |
-|-------------|--------|----------------|
-| BR-6.1 | BRS §4.6 | `HybridAIService`, `config/ai.php` |
-| BR-6.2 | BRS §4.6 | `TrainingAdvisorAgent`, `RaceStrategyAgent`, `SkillRecommendationAgent` |
-| BR-6.3 | BRS §4.6 | `AIConversation` model, `handleConversation()` |
-| BR-6.4 | BRS §4.6 | `CostTrackingService`, `ucp_ai_usage_daily` |
-| BR-6.5 | BRS §4.6 | Confidence scoring in all responses |
-| FR-07.1 | SRS §2.7 | `getTrainingAdvice()` |
-| FR-07.2 | SRS §2.7 | `getRaceAdvice()` |
-| FR-07.3 | SRS §2.7 | `getSkillAdvice()` |
-| FR-07.4 | SRS §2.7 | `AIConversation` persistence |
-| FR-07.5 | SRS §2.7 | `CostTrackingService`, usage endpoints |
-| FR-07.6 | SRS §2.7 | `HybridAIService` routing |
-| FR-07.7 | SRS §2.7 | `confidence` field in all responses |
+- **Requirement**: BR-6.1; **Source**: BRS §4.6; **Implementation**: `HybridAIService`, `config/ai.php`
+- **Requirement**: BR-6.2; **Source**: BRS §4.6; **Implementation**: `TrainingAdvisorAgent`, `RaceStrategyAgent`, `SkillRecommendationAgent`
+- **Requirement**: BR-6.3; **Source**: BRS §4.6; **Implementation**: `AIConversation` model, `handleConversation()`
+- **Requirement**: BR-6.4; **Source**: BRS §4.6; **Implementation**: `CostTrackingService`, `ucp_ai_usage_daily`
+- **Requirement**: BR-6.5; **Source**: BRS §4.6; **Implementation**: Confidence scoring in all responses
+- **Requirement**: FR-07.1; **Source**: SRS §2.7; **Implementation**: `getTrainingAdvice()`
+- **Requirement**: FR-07.2; **Source**: SRS §2.7; **Implementation**: `getRaceAdvice()`
+- **Requirement**: FR-07.3; **Source**: SRS §2.7; **Implementation**: `getSkillAdvice()`
+- **Requirement**: FR-07.4; **Source**: SRS §2.7; **Implementation**: `AIConversation` persistence
+- **Requirement**: FR-07.5; **Source**: SRS §2.7; **Implementation**: `CostTrackingService`, usage endpoints
+- **Requirement**: FR-07.6; **Source**: SRS §2.7; **Implementation**: `HybridAIService` routing
+- **Requirement**: FR-07.7; **Source**: SRS §2.7; **Implementation**: `confidence` field in all responses
 
 ### Appendix C: Change Log
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 2.3.0 | 2026-02-22 | Development Team | Updated service names (AdviceService, HybridAIService, AI\CostTrackingService), SkillAdvisorAgent renamed to SkillRecommendationAgent, Neuron AI v2.11, PHP 8.2+, replaced UmamusumeDB with GameTora, marked implementation complete |
-| 2.2.0 | 2026-01-28 | Development Team | Updated AI agent prompts with game-accurate mechanics: 5-level hint system, S max aptitude, stat soft cap, track condition penalties |
-| 2.0.0 | 2026-01-24 | Development Team | Full v2.0.0 alignment with comprehensive services, agents, API endpoints, database schema, cost tracking, security, testing strategy, and complete appendices following SPEC-005 format |
-| 1.0.0 | 2026-01-14 | Development Team | Initial technical specification |
+- **Version**: 2.3.0; **Date**: 2026-02-22; **Author**: Development Team; **Changes**: Updated service names (AdviceService, HybridAIService, AI\CostTrackingService), SkillAdvisorAgent renamed to SkillRecommendationAgent, Neuron AI v2.11, PHP 8.2+, replaced UmamusumeDB with GameTora, marked implementation complete
+- **Version**: 2.2.0; **Date**: 2026-01-28; **Author**: Development Team; **Changes**: Updated AI agent prompts with game-accurate mechanics: 5-level hint system, S max aptitude, stat soft cap, track condition penalties
+- **Version**: 2.0.0; **Date**: 2026-01-24; **Author**: Development Team; **Changes**: Full v2.0.0 alignment with comprehensive services, agents, API endpoints, database schema, cost tracking, security, testing strategy, and complete appendices following SPEC-005 format
+- **Version**: 1.0.0; **Date**: 2026-01-14; **Author**: Development Team; **Changes**: Initial technical specification
 
 ---
 
-**Document Approval**
+### Document Approval
 
-| Role | Name | Signature | Date |
-|------|------|-----------|------|
-| Tech Lead | [Name] | _________ | 2026-01-24 |
-| Product Owner | [Name] | _________ | 2026-01-24 |
-| QA Lead | [Name] | _________ | 2026-01-24 |
-| AI/ML Lead | [Name] | _________ | 2026-01-24 |
+- **Role**: Tech Lead; **Name**: [Name]; **Signature**: _________; **Date**: 2026-01-24
+- **Role**: Product Owner; **Name**: [Name]; **Signature**: _________; **Date**: 2026-01-24
+- **Role**: QA Lead; **Name**: [Name]; **Signature**: _________; **Date**: 2026-01-24
+- **Role**: AI/ML Lead; **Name**: [Name]; **Signature**: _________; **Date**: 2026-01-24
 
 ---
 
-**Document Control**  
-**Maintained By**: Backend Development Team  
-**Review Frequency**: Bi-weekly during active development  
-**Next Review Date**: 2026-03-07  
+### Document Control
+**Maintained By**: Backend Development Team
+**Review Frequency**: Bi-weekly during active development
+**Next Review Date**: 2026-03-07
 **Distribution**: Development Team, QA Team, Product Management, AI Team
 
 ---
 
-**End of Document**
+### End of Document
