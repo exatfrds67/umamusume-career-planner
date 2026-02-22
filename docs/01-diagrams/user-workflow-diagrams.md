@@ -32,6 +32,7 @@ This document presents the key user workflow diagrams for the Umamusume Pretty D
 The career setup flow guides users through the initial configuration of a new career run, including character selection, support card deck composition, legacy character inheritance, and goal setting. This foundational workflow determines the optimization strategy for the entire career and supports all core requirements including training optimization, race strategy, and skill planning.
 
 ### Related Documents
+
 - PRD: [PRD-001](prds/PRD-001_Character_Management.md)
 - SPEC: [SPEC-001](specs/SPEC-001_Character_Management_Technical.md)
 - Flow: [FLOW-001](flows/FLOW-001_Character_Management_System.md)
@@ -126,6 +127,7 @@ flowchart TD
 The core optimization flow occurs every turn (1-78), analyzing current character state, available training options, support card participation, and providing AI-powered recommendations based on goals, energy management, and long-term strategy. Enhanced by **Neuron AI v2.11 agents** for intelligent decision making and **Laravel 12** backend for robust processing.
 
 ### Related Documents
+
 - PRD: [PRD-002](prds/PRD-002_Training_Optimization.md)
 - SPEC: [SPEC-002](specs/SPEC-002_Training_Optimization_Technical.md)
 - Flow: [FLOW-002](flows/FLOW-002_Training_Optimization_System.md)
@@ -286,6 +288,7 @@ flowchart TD
 The race preparation workflow activates when races approach, analyzing race requirements, character readiness, strategy selection, and providing comprehensive preparation recommendations powered by the Race Strategy Agent.
 
 ### Related Documents
+
 - PRD: [PRD-003](prds/PRD-003_Race_Strategy.md)
 - SPEC: [SPEC-003](specs/SPEC-003_Race_Strategy_Technical.md)
 - Flow: [FLOW-003](flows/FLOW-003_Race_Strategy_System.md)
@@ -478,6 +481,7 @@ flowchart TD
 The AI advisory system workflow shows how users interact with the chatbot for strategic advice, the system's decision process for using local **Ollama** vs cloud **AWS Bedrock** models, and how contextual recommendations are generated via **Neuron AI agents**. The system intelligently routes based on query complexity and local model availability.
 
 ### Related Documents
+
 - PRD: [PRD-006](prds/PRD-006_AI_Advisory.md)
 - SPEC: [SPEC-006](specs/SPEC-006_AI_Advisory_Technical.md)
 - Flow: [FLOW-006](flows/FLOW-006_AI_Advisory_System.md)
@@ -632,6 +636,7 @@ flowchart TD
 The screenshot processing workflow handles image uploads, performs OCR analysis using Tesseract with GD preprocessing, extracts game state information, and provides contextual recommendations based on the captured data.
 
 ### Related Documents
+
 - SPEC: [SPEC-007](specs/SPEC-007_External_Integration_Technical.md)
 - Flow: [FLOW-007](flows/FLOW-007_External_Integration_System.md)
 - Tech Flow: [TECH-FLOW-007](tech-flow/TECH-FLOW-007_External_Integration_Flow.md)
@@ -798,6 +803,7 @@ flowchart TD
 The data import/export workflow enables users to backup, restore, and migrate their career data across devices and storage modes. Supports JSON, Excel, and CSV formats with schema versioning and conflict resolution.
 
 ### Related Documents
+
 - D05: [Data Migration Plan](005_DMP_Data_Migration_Plan.md)
 - D06: Data Migration Specifications
 
@@ -869,6 +875,7 @@ flowchart TD
 The storage mode workflow manages data persistence across Local (browser localStorage) and Account (database) modes, with seamless offline functionality and automatic draft saving.
 
 ### Related Documents
+
 - SRS: [FR-10 Local Storage Mode](003_SRS_Software_Requirement_Specifications.md#210-local-storage-mode-fr-10)
 - User Manual: [Storage Modes](017_SUM_Software_User_Manual.md#12-storage-modes)
 
