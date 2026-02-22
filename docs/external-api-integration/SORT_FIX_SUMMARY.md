@@ -6,7 +6,8 @@
 
 ## Issue Discovered
 
-During testing of the External Data Browser sort functionality, it was discovered that **rarity sorting was not implemented** despite being available as an option in the UI.
+During testing of the External Data Browser sort functionality, it was discovered that **rarity sorting was not
+implemented** despite being available as an option in the UI.
 
 ### Affected Components
 
@@ -51,7 +52,7 @@ sortData() {
         });
     });
 }
-```
+```text
 
 **After**:
 
@@ -128,7 +129,7 @@ sortData() {
 ### Before Fix
 
 | Sort Type | Status | Notes |
-|-----------|--------|-------|
+| --- | --- | --- |
 | ID Ascending | ✅ PASS | Working correctly |
 | ID Descending | ✅ PASS | Working correctly |
 | Name A-Z | ✅ PASS | Working correctly |
@@ -139,7 +140,7 @@ sortData() {
 ### After Fix
 
 | Sort Type | Status | Notes |
-|-----------|--------|-------|
+| --- | --- | --- |
 | ID Ascending | ✅ PASS | Working correctly |
 | ID Descending | ✅ PASS | Working correctly |
 | Name A-Z | ✅ PASS | Working correctly |
@@ -160,7 +161,7 @@ To verify the fix works correctly:
 
 1. **Navigate to External Data Browser**:
 
-   ```
+   ```text
    http://127.0.0.1:8000/external-data/browse
    ```
 
@@ -194,7 +195,7 @@ To verify the fix works correctly:
 
 ```bash
 npm run build
-```
+```text
 
 - No errors or warnings
 - Assets compiled successfully
@@ -225,7 +226,9 @@ npm run build
 
 ## Conclusion
 
-The rarity sorting functionality has been successfully implemented and tested. All sort options now work as expected across all data types (characters, support cards, skills). The fix is minimal, performant, and maintains backward compatibility with existing functionality.
+The rarity sorting functionality has been successfully implemented and tested. All sort options now work as expected
+across all data types (characters, support cards, skills). The fix is minimal, performant, and maintains backward
+compatibility with existing functionality.
 
 ### Status
 
@@ -244,3 +247,4 @@ The rarity sorting functionality has been successfully implemented and tested. A
 **Fixed By**: AI Agent  
 **Reviewed By**: Pending  
 **Approved By**: Pending
+

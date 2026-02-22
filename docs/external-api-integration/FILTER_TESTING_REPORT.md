@@ -40,7 +40,7 @@ this.filteredCharacters = this.characters.filter((char) => {
     }
     return true;
 });
-```
+```text
 
 **UI Elements:**
 
@@ -102,9 +102,10 @@ this.filteredSkills = this.skills.filter((skill) => {
     }
     return true;
 });
-```
+```text
 
-**Note**: The skills filter implementation appears incomplete - it only filters by search term, not by rarity or type filters despite having UI controls for them.
+**Note**: The skills filter implementation appears incomplete - it only filters by search term, not by rarity or type
+filters despite having UI controls for them.
 
 **UI Elements:**
 
@@ -352,9 +353,10 @@ this.filteredSkills = this.skills.filter((skill) => {
     }
     return true;
 });
-```
+```text
 
-**Impact**: Users can see and interact with rarity and type filter controls, but they have no effect on the displayed results.
+**Impact**: Users can see and interact with rarity and type filter controls, but they have no effect on the displayed
+results.
 
 **Recommendation**: Fix the filterData() method to include rarity and type filtering for skills.
 
@@ -365,7 +367,8 @@ this.filteredSkills = this.skills.filter((skill) => {
 **Severity**: Medium  
 **Location**: `resources/js/pages/external-data/browse.js` - `filterData()` method
 
-**Problem**: The support cards tab has "Imported" and "Not Imported" toggle buttons, but the filter logic doesn't check `filters.importStatus`.
+**Problem**: The support cards tab has "Imported" and "Not Imported" toggle buttons, but the filter logic doesn't check
+`filters.importStatus`.
 
 **Current Code**: No check for `filters.importStatus` in support cards filtering
 

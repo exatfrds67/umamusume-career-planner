@@ -5,7 +5,9 @@
 
 ## Executive Summary
 
-The External Data Browser is now fully functional with all critical issues resolved. The frontend has been updated to use the correct individual API endpoints instead of the non-existent `/api/external-data/all` endpoint. The page loads successfully and displays data from umapyoi.net without errors.
+The External Data Browser is now fully functional with all critical issues resolved. The frontend has been updated to
+use the correct individual API endpoints instead of the non-existent `/api/external-data/all` endpoint. The page loads
+successfully and displays data from umapyoi.net without errors.
 
 ## Latest Update (January 29, 2026)
 
@@ -98,7 +100,7 @@ The External Data Browser is now fully functional with all critical issues resol
 
 **Problem**: Alpine.js errors due to duplicate IDs in news data
 
-```
+```text
 Alpine Warning: Duplicate key on x-for
 Alpine Expression Error: Cannot read properties of undefined (reading 'after')
 ```
@@ -107,7 +109,7 @@ Alpine Expression Error: Cannot read properties of undefined (reading 'after')
 
 ```php
 $uniqueId = 'news_' . md5(($item['title'] ?? '') . $index);
-```
+```text
 
 **Result**:
 
@@ -149,7 +151,7 @@ const [charactersRes, supportCardsRes, skillsRes, newsRes] = await Promise.all([
 
 ### Console Output (Latest)
 
-```
+```text
 [PerformanceMonitor] Initialized
 [ConnectivityMonitor] Initialized
 [FCP] 1028.00 (good)
@@ -180,11 +182,12 @@ const [charactersRes, supportCardsRes, skillsRes, newsRes] = await Promise.all([
   "source": "umapyoi.net",
   "cached": false
 }
-```
+```text
 
 ## Architecture Overview
 
 ```
+
 ┌─────────────────────────────────────────────────────────────┐
 │                    Frontend (Alpine.js)                      │
 │  /external-data/browse                                       │
@@ -220,7 +223,8 @@ const [charactersRes, supportCardsRes, skillsRes, newsRes] = await Promise.all([
 │                    umapyoi.net API                           │
 │  External data source                                        │
 └─────────────────────────────────────────────────────────────┘
-```
+
+```text
 
 ## Files Modified
 
@@ -303,7 +307,8 @@ All critical functionality works correctly:
 - Retry functionality for failed endpoints
 - Partial failure resilience (successful data displays even if some endpoints fail)
 
-The duplicate ID issue has been completely resolved, and the frontend API endpoint mismatch has been fixed. The system is performing well with excellent Core Web Vitals scores and robust error handling.
+The duplicate ID issue has been completely resolved, and the frontend API endpoint mismatch has been fixed. The system
+is performing well with excellent Core Web Vitals scores and robust error handling.
 
 ---
 
@@ -313,3 +318,4 @@ The duplicate ID issue has been completely resolved, and the frontend API endpoi
 **Environment**: Local Development (XAMPP + WSL Redis)  
 **Browser**: Chrome/Edge  
 **Last Verified**: January 29, 2026
+

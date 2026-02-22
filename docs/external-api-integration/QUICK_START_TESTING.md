@@ -262,7 +262,7 @@ Disallow: /api/
 
 ### Common Errors
 
-**404 Not Found**
+#### 404 Not Found
 
 ```
 ❌ Status: 404
@@ -270,7 +270,7 @@ Disallow: /api/
 ❌ Action: Verify URL structure
 ```
 
-**CORS Error**
+#### CORS Error
 
 ```
 ❌ Error: Blocked by CORS policy
@@ -278,7 +278,7 @@ Disallow: /api/
 ❌ Action: Check Network tab for actual response
 ```
 
-**Network Error**
+#### Network Error
 
 ```
 ❌ Error: Failed to fetch
@@ -286,7 +286,7 @@ Disallow: /api/
 ❌ Action: Check internet connection
 ```
 
-**Timeout**
+#### Timeout
 
 ```
 ❌ Error: Request timeout

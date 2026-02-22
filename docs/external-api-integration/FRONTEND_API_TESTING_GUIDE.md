@@ -7,7 +7,8 @@
 
 ## Overview
 
-This guide explains how to test external APIs directly in the browser without writing backend code. This approach allows you to:
+This guide explains how to test external APIs directly in the browser without writing backend code. This approach allows
+you to:
 
 - See real HTTP requests and responses in Chrome DevTools
 - Inspect headers, status codes, and response bodies
@@ -23,13 +24,13 @@ This guide explains how to test external APIs directly in the browser without wr
 
    ```bash
    php artisan serve
-   ```
+   ```text
 
 2. Navigate to the test page:
 
    ```
    http://localhost:8000/test-api
-   ```
+   ```text
 
 ---
 
@@ -131,7 +132,7 @@ Press `F12` or right-click anywhere on the page and select "Inspect"
   "source": "error",
   "error": "HTTP 404: Not Found"
 }
-```
+```text
 
 ---
 
@@ -142,8 +143,10 @@ Press `F12` or right-click anywhere on the page and select "Inspect"
 ⚠️ **UmamusumeDB.com does NOT have a public API**. The site explicitly blocks API access via `robots.txt`:
 
 ```
+
 Disallow: /api/
-```
+
+```text
 
 ### Available Tests
 
@@ -168,9 +171,11 @@ Disallow: /api/
 When testing UmamusumeDB.com, you'll see:
 
 ```
+
 Note: no-cors mode - limited response info available
 CORS prevents reading response. Check Network tab in DevTools.
-```
+
+```text
 
 This is because:
 
@@ -187,9 +192,11 @@ This is because:
 **Symptom:**
 
 ```
-Access to fetch at 'https://api.example.com' from origin 'http://localhost:8000' 
+
+Access to fetch at '<https://api.example.com>' from origin '<http://localhost:8000>'
 has been blocked by CORS policy
-```
+
+```text
 
 **Solution:**
 
@@ -202,8 +209,10 @@ has been blocked by CORS policy
 **Symptom:**
 
 ```
+
 HTTP 404: Not Found
-```
+
+```text
 
 **Possible Causes:**
 
@@ -223,9 +232,11 @@ HTTP 404: Not Found
 **Symptom:**
 
 ```
+
 Failed to fetch
 TypeError: Failed to fetch
-```
+
+```text
 
 **Possible Causes:**
 
@@ -388,7 +399,7 @@ async function testWithHeaders() {
     });
     console.log(await response.json());
 }
-```
+```text
 
 ### Testing Rate Limits
 

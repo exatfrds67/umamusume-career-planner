@@ -28,7 +28,7 @@ $result = $client->getCharacters(true);
 // Support cards endpoint
 $result = $client->getSupportCards(true);
 // Result: success=true, data_count=487
-```
+```text
 
 ### Frontend Integration
 
@@ -46,6 +46,7 @@ The frontend correctly calls:
 ### Architecture
 
 ```
+
 Frontend (Alpine.js)
     ↓ fetch()
 Backend API Routes (/api/external/*)
@@ -61,7 +62,8 @@ ResponseValidator → ResponseTransformer
 Cache (24 hours)
     ↓
 JSON Response to Frontend
-```
+
+```text
 
 ## Key Components
 
@@ -190,7 +192,7 @@ JSON Response to Frontend
   "source": "umapyoi.net",
   "cached": false
 }
-```
+```text
 
 ```
 
@@ -215,7 +217,7 @@ The system includes comprehensive error handling:
 
 ### Test via Browser
 
-```
+```text
 
 <http://localhost/external-data/browse>
 
@@ -245,7 +247,7 @@ $available = $client->isAvailable();
 
 // Clear cache
 $client->clearCache();
-```
+```text
 
 ### Test via API
 
@@ -298,7 +300,7 @@ The system successfully:
 
 **Issue**: News items from the API had duplicate IDs (all items had `id: 1`), causing Alpine.js x-for rendering errors:
 
-```
+```text
 Alpine Warning: Duplicate key on x-for
 Alpine Expression Error: Cannot read properties of undefined (reading 'after')
 ```
@@ -310,7 +312,7 @@ Alpine Expression Error: Cannot read properties of undefined (reading 'after')
 ```php
 // Generate unique ID using title hash and index
 $uniqueId = 'news_' . md5(($item['title'] ?? '') . $index);
-```
+```text
 
 **Result**:
 

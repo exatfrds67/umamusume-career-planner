@@ -6,7 +6,8 @@
 
 ## Overview
 
-This document summarizes the implementation and results of API performance measurement for the External Data Browser feature.
+This document summarizes the implementation and results of API performance measurement for the External Data Browser
+feature.
 
 ## Implementation
 
@@ -85,7 +86,7 @@ Created a standalone HTML test page for browser-based testing:
 
 **File**: `tests/performance-test.html`
 
-#### Features
+#### Features (HTML Test Page)
 
 - Visual performance testing interface
 - Real-time performance measurement
@@ -99,10 +100,10 @@ Created a standalone HTML test page for browser-based testing:
 
 ### Defined Targets
 
-| Response Type | Target | Rationale |
-|--------------|--------|-----------|
-| Cached | < 1 second (1000ms) | Data served from Redis/memory cache |
-| Fresh | < 3 seconds (3000ms) | Data fetched from external API |
+| Response Type | Target               | Rationale                           |
+| ------------- | -------------------- | ----------------------------------- |
+| Cached        | < 1 second (1000ms)  | Data served from Redis/memory cache |
+| Fresh         | < 3 seconds (3000ms) | Data fetched from external API      |
 
 ### Target Compliance
 
@@ -116,7 +117,7 @@ Both targets are based on the design document requirements and align with:
 
 ### Test Run 1: Mixed Cache State
 
-```
+```text
 Testing characters...
   ✓ 358ms (live, target: <3000ms) - 161 items from umapyoi.net
 
@@ -142,7 +143,7 @@ All targets met:       ✓ Yes
 
 ### Test Run 2: Fresh Data (Cache Cleared)
 
-```
+```text
 Testing support-cards...
   ✓ 2054ms (live, target: <3000ms) - 487 items from umapyoi.net
 
@@ -225,7 +226,7 @@ All targets met:       ✓ Yes
     ✓ supportCards: 199ms (cached, target: <1000ms)
     ✓ skills: 127ms (live, target: <3000ms)
     ✓ news: 139ms (cached, target: <1000ms)
-```
+```text
 
 ## Recommendations
 
@@ -272,7 +273,7 @@ php artisan test:api-performance
 
 ```bash
 php artisan test:api-performance --clear-cache
-```
+```text
 
 **View frontend metrics:**
 
@@ -316,8 +317,9 @@ The implementation provides:
 
 ## Change Log
 
-| Date | Change | Author |
-|------|--------|--------|
+| Date       | Change                             | Author       |
+| ---------- | ---------------------------------- | ------------ |
 | 2026-01-29 | Initial implementation and testing | AI Assistant |
-| 2026-01-29 | Performance targets validated | AI Assistant |
-| 2026-01-29 | Documentation completed | AI Assistant |
+| 2026-01-29 | Performance targets validated      | AI Assistant |
+| 2026-01-29 | Documentation completed            | AI Assistant |
+

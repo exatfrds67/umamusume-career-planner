@@ -49,7 +49,7 @@
     {"game_id":1003,"web_id":4550},
     {"game_id":1001,"web_id":4737}
   ]
-  ```
+  ```text
 
 #### 4.2 Character Detail Endpoint
 
@@ -178,7 +178,9 @@
 
 ✅ **Task 1.1.1 COMPLETED SUCCESSFULLY**
 
-The MCP fetch server has been successfully installed, configured, and tested. All basic fetch operations work correctly, and the umapyoi.net API is accessible and functional. The system is ready for the next phase of implementation (Task 1.1.2: Create MCP client wrapper service).
+The MCP fetch server has been successfully installed, configured, and tested. All basic fetch operations work correctly,
+and the umapyoi.net API is accessible and functional. The system is ready for the next phase of implementation (Task
+1.1.2: Create MCP client wrapper service).
 
 ## Next Task
 

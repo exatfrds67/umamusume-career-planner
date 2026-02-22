@@ -7,9 +7,10 @@
 
 ### Symptoms
 
-When loading the External Data Browser page (`/external-data/browse`), the following errors appeared in the browser console:
+When loading the External Data Browser page (`/external-data/browse`), the following errors appeared in the browser
+console:
 
-```
+```text
 Alpine Warning: Duplicate key on x-for
 Alpine Expression Error: Cannot read properties of undefined (reading 'after')
 Expression: "news"
@@ -37,7 +38,8 @@ The page loaded but the news section failed to render properly.
 
 ### Root Cause
 
-The umapyoi.net API returns news items with non-unique IDs. All news items had `id: 1`, causing Alpine.js to fail when trying to render the list with `x-for` and `:key="item.id"`.
+The umapyoi.net API returns news items with non-unique IDs. All news items had `id: 1`, causing Alpine.js to fail when
+trying to render the list with `x-for` and `:key="item.id"`.
 
 ```json
 {
@@ -47,7 +49,7 @@ The umapyoi.net API returns news items with non-unique IDs. All news items had `
     {"id": 1, "title": "Event C"}   // Duplicate!
   ]
 }
-```
+```text
 
 ## Solution Implemented
 
@@ -101,7 +103,7 @@ $result = $client->getNews(10);
 $ids = array_column($result['data'], 'id');
 // Result: [1, 1, 1, 1, 1, 3, 1, 1, 1, 1]
 // has_duplicates: true
-```
+```text
 
 ### After Fix
 
@@ -124,7 +126,7 @@ $ids = array_column($result['data'], 'id');
 ```bash
 GET /api/external/news?limit=3
 Status: 200 OK
-```
+```text
 
 Response:
 

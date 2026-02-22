@@ -7,10 +7,10 @@
 
 ## Quick Navigation
 
-| Document                                                                             | Purpose                                                                                           | Audience   |
-|--------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------|------------|
-| [UMAPYOI_NET_API_CHECK_SUMMARY.md](./UMAPYOI_NET_API_CHECK_SUMMARY.md)              | **Quick Overview** - Executive summary of integration status and test results                    | Everyone   |
-| [UMAPYOI_NET_API_STATUS.md](./UMAPYOI_NET_API_STATUS.md)                            | **Complete Technical Reference** - Detailed API documentation, usage examples, and troubleshooting | Developers |
+| Document | Purpose | Audience |
+| --- | --- | --- |
+| [UMAPYOI_NET_API_CHECK_SUMMARY.md](./UMAPYOI_NET_API_CHECK_SUMMARY.md) | **Quick Overview** - Executive summary of integration status and test results | Everyone |
+| [UMAPYOI_NET_API_STATUS.md](./UMAPYOI_NET_API_STATUS.md) | **Complete Technical Reference** - Detailed API documentation, usage examples, and troubleshooting | Developers |
 
 ---
 
@@ -110,7 +110,7 @@ php artisan test tests/Feature/ExternalAPI/UmapyoiLiveApiTest.php
 ## API Endpoints Supported
 
 | Endpoint                      | Method | Purpose                     | Cache TTL | Status          |
-|-------------------------------|--------|-----------------------------|-----------|----------------|
+| ----------------------------- | ------ | --------------------------- | --------- | --------------- |
 | `/api/v1/character/list`      | GET    | List all characters         | 24 hours  | ✅ 200 OK       |
 | `/api/v1/character/{id}`      | GET    | Get specific character      | 24 hours  | ✅ 200 OK       |
 | `/api/v1/support`             | GET    | List all support cards      | 24 hours  | ✅ 200 OK       |
@@ -118,7 +118,7 @@ php artisan test tests/Feature/ExternalAPI/UmapyoiLiveApiTest.php
 | `/api/v1/skill`               | GET    | List all skills             | 24 hours  | ✅ Configured   |
 | `/api/v1/skill/{id}`          | GET    | Get specific skill          | 24 hours  | ✅ Configured   |
 | `/api/v1/news/latest/{limit}` | GET    | Get latest news articles    | 1 hour    | ✅ 200 OK       |
-| `/health` | GET | Health check | No cache |
+| `/health`                     | GET    | Health check                | No cache  | ✅ Configured   |
 
 ---
 
@@ -174,7 +174,7 @@ php artisan test tests/Feature/ExternalAPI/UmapyoiLiveApiTest.php
 ## Document Changelog
 
 | Date       | Change                                      | Author       |
-|------------|---------------------------------------------|-------------|
+| ---------- | ------------------------------------------- | ------------ |
 | 2026-01-25 | Initial documentation created               | Claudette AI |
 | 2026-01-25 | Added configuration to config/services.php  | Claudette AI |
 | 2026-01-25 | Created live integration tests              | Claudette AI |

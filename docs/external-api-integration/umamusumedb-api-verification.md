@@ -8,7 +8,9 @@
 
 ## Executive Summary
 
-UmamusumeDB.com is a fan-created database website for Uma Musume Pretty Derby game data. After comprehensive testing, **no public API is available** for programmatic access. The site explicitly blocks API access via robots.txt and serves data only through static HTML pages built with Astro framework.
+UmamusumeDB.com is a fan-created database website for Uma Musume Pretty Derby game data. After comprehensive testing,
+**no public API is available** for programmatic access. The site explicitly blocks API access via robots.txt and serves
+data only through static HTML pages built with Astro framework.
 
 ---
 
@@ -17,7 +19,7 @@ UmamusumeDB.com is a fan-created database website for Uma Musume Pretty Derby ga
 ### 1. API Endpoint Testing
 
 | Endpoint Tested | Result | Notes |
-|-----------------|--------|-------|
+| --- | --- | --- |
 | `https://umamusumedb.com/api` | ❌ Blocked | Redirects to homepage |
 | `https://umamusumedb.com/api/v1` | ❌ Blocked | robots.txt disallows |
 | `https://umamusumedb.com/api/characters` | ❌ Blocked | robots.txt disallows |
@@ -34,7 +36,7 @@ Disallow: /api/
 Disallow: /admin/
 
 Crawl-delay: 1
-```
+```text
 
 **Key Findings**:
 
@@ -64,12 +66,12 @@ Crawl-delay: 1
 
 The site is built with **Astro** (static site generator) and provides:
 
-| Content Type | URL Pattern | Data Available |
-|--------------|-------------|----------------|
-| Characters | `/characters/{slug}/` | Stats, aptitudes, skills, training tips |
-| Support Cards | `/cards/{slug}/` | Effects, skills, usage tips |
-| Tools | `/tools/` | Factor Calculator, Training Calculator, Deck Builder |
-| Skills | `/skills/` | Skill database |
+| Content Type  | URL Pattern           | Data Available                                       |
+| ------------- | --------------------- | ---------------------------------------------------- |
+| Characters    | `/characters/{slug}/` | Stats, aptitudes, skills, training tips              |
+| Support Cards | `/cards/{slug}/`      | Effects, skills, usage tips                          |
+| Tools         | `/tools/`             | Factor Calculator, Training Calculator, Deck Builder |
+| Skills        | `/skills/`            | Skill database                                       |
 
 ### Character Data Structure
 
@@ -131,7 +133,7 @@ From `/cards/kitasan_black_ssr/`:
   },
   "skills": ["Arc Maestro", "Curve Specialist", "Speed Star"]
 }
-```
+```text
 
 ### Content Statistics (from homepage)
 
@@ -279,7 +281,7 @@ private const API_SOURCES = [
         'status' => 'requires_verification',
     ],
 ];
-```
+```text
 
 ---
 
@@ -308,7 +310,8 @@ Available pages from `sitemap-0.xml`:
 
 ## Conclusion
 
-**UmamusumeDB.com cannot be used as a secondary API source** for the External API Integration feature. The site explicitly blocks API access and provides data only through static web pages.
+**UmamusumeDB.com cannot be used as a secondary API source** for the External API Integration feature. The site
+explicitly blocks API access and provides data only through static web pages.
 
 ### Recommended Actions
 
@@ -328,3 +331,4 @@ Available pages from `sitemap-0.xml`:
 - **GitHub Issues**: Available for feedback (mentioned in site footer)
 - **Framework**: Astro (static site generator)
 - **Last Updated**: December 31, 2025 (per sitemap)
+

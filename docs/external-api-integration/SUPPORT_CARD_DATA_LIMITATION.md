@@ -6,7 +6,8 @@
 
 ## Issue Summary
 
-The umapyoi.net API `/api/v1/support` endpoint returns **minimal support card information** in the list view. Detailed card statistics, effects, skills, and bonuses are **not provided** by the external API.
+The umapyoi.net API `/api/v1/support` endpoint returns **minimal support card information** in the list view. Detailed
+card statistics, effects, skills, and bonuses are **not provided** by the external API.
 
 ## What Data IS Available
 
@@ -20,7 +21,7 @@ From the umapyoi.net API, we receive:
   "title_en": "[Tracen Academy]",
   "rarity": "R"
 }
-```
+```text
 
 ### Available Fields
 
@@ -45,7 +46,8 @@ From the umapyoi.net API, we receive:
 
 ### ResponseTransformer Behavior
 
-The `ResponseTransformer::transformSupportCard()` method attempts to extract these fields but they return empty/zero values:
+The `ResponseTransformer::transformSupportCard()` method attempts to extract these fields but they return empty/zero
+values:
 
 ```php
 'stats' => [
@@ -166,7 +168,7 @@ Users can click "View Full Details on GameTora" to see complete card information
 
 ### Modal Notice (Implemented)
 
-```
+```text
 ℹ️ Detailed Stats Available After Import
 
 Import this card to your collection to track stats, effects, 
@@ -183,7 +185,7 @@ and skills. Or view complete details on GameTora.
 
 ### API Endpoint
 
-```
+```text
 GET https://api.umapyoi.net/api/v1/support
 ```
 
@@ -200,13 +202,15 @@ GET https://api.umapyoi.net/api/v1/support
   },
   // ... 486 more cards
 ]
-```
+```text
 
 ### Individual Card Endpoint
 
 ```
-GET https://api.umapyoi.net/api/v1/support/{id}
-```
+
+GET <https://api.umapyoi.net/api/v1/support/{id}>
+
+```text
 
 **Status**: Returns validation error - endpoint may not be fully implemented or requires different schema.
 
@@ -237,7 +241,8 @@ GET https://api.umapyoi.net/api/v1/support/{id}
 
 ## Conclusion
 
-The limitation is **inherent to the external API design** and not a bug in our implementation. The current approach of linking to GameTora for detailed information is the most practical solution given the constraints.
+The limitation is **inherent to the external API design** and not a bug in our implementation. The current approach of
+linking to GameTora for detailed information is the most practical solution given the constraints.
 
 Users who need detailed card tracking should:
 
@@ -254,3 +259,4 @@ Users who need detailed card tracking should:
 - Identified available vs. unavailable data fields
 - Proposed short/medium/long term solutions
 - Documented current workaround (GameTora linking)
+

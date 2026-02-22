@@ -9,7 +9,8 @@
 
 ## Overview
 
-Implemented a comprehensive cache warming system for the External API Integration feature. The system preloads frequently accessed data into the cache to improve performance and reduce API calls during normal operation.
+Implemented a comprehensive cache warming system for the External API Integration feature. The system preloads
+frequently accessed data into the cache to improve performance and reduce API calls during normal operation.
 
 ## Implementation Details
 
@@ -40,7 +41,7 @@ Main cache warming method that orchestrates the warming process based on priorit
     'duration_ms' => float,
     'items' => array<string, string>
 ]
-```
+```text
 
 #### Protected Warming Methods
 
@@ -98,7 +99,7 @@ php artisan cache:warm
     {--priority=all : Priority level: high, medium, low, or all}
     {--async : Run cache warming in background job}
     {--stats : Show warming statistics after completion}
-```
+```text
 
 **Examples**:
 
@@ -120,7 +121,7 @@ php artisan cache:warm --priority=medium --stats
 - Performance metrics
 - Cache statistics (when --stats flag is used)
 
-### 4. API Endpoints
+## 4. API Endpoints
 
 **File**: `app/Http/Controllers/Api/CacheMonitoringController.php`
 
@@ -128,14 +129,14 @@ Created a new controller with monitoring endpoints:
 
 **Routes** (prefix: `/api/external-cache`):
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/statistics` | Get cache hit/miss statistics |
-| GET | `/warming/statistics` | Get warming run statistics |
-| POST | `/warm` | Trigger cache warming |
-| GET | `/info` | Get comprehensive cache information |
-| GET | `/size` | Get cache size information |
-| GET | `/keys` | Get list of cached keys |
+| Method | Endpoint              | Description                         |
+| ------ | --------------------- | ----------------------------------- |
+| GET    | `/statistics`         | Get cache hit/miss statistics       |
+| GET    | `/warming/statistics` | Get warming run statistics          |
+| POST   | `/warm`               | Trigger cache warming               |
+| GET    | `/info`               | Get comprehensive cache information |
+| GET    | `/size`               | Get cache size information          |
+| GET    | `/keys`               | Get list of cached keys             |
 
 **Example API Usage**:
 
@@ -150,9 +151,9 @@ curl -X POST http://localhost/api/external-cache/warm \
 
 # Get warming statistics
 curl http://localhost/api/external-cache/warming/statistics
-```
+```text
 
-### 5. Comprehensive Test Suite
+## 5. Comprehensive Test Suite
 
 **Files**:
 
@@ -201,11 +202,11 @@ curl http://localhost/api/external-cache/warming/statistics
 Based on test runs:
 
 | Priority | Items Warmed | Duration | Success Rate |
-|----------|--------------|----------|--------------|
-| High | 150 | ~1.2s | 100% |
-| Medium | 209 | ~1.5s | 100% |
-| Low | 219 | ~1.8s | 100% |
-| All | 219 | ~0.8s | 100% |
+| -------- | ------------ | -------- | ------------ |
+| High     | 150          | ~1.2s    | 100%         |
+| Medium   | 209          | ~1.5s    | 100%         |
+| Low      | 219          | ~1.8s    | 100%         |
+| All      | 219          | ~0.8s    | 100%         |
 
 ## Key Features
 
@@ -244,7 +245,8 @@ Based on test runs:
 
 ### Application Startup
 
-The cache warming can be triggered on application startup by adding to `bootstrap/app.php` or creating a service provider:
+The cache warming can be triggered on application startup by adding to `bootstrap/app.php` or creating a service
+provider:
 
 ```php
 // In AppServiceProvider or custom provider
@@ -265,7 +267,7 @@ Schedule::job(new WarmCacheJob('all'))
     ->daily()
     ->at('02:00')
     ->name('daily-cache-warming');
-```
+```text
 
 ### Manual Warming
 
@@ -339,9 +341,9 @@ php artisan test --filter=WarmCacheJobTest
 
 # Run with coverage
 php artisan test --coverage --filter=CacheManagerServiceTest
-```
+```text
 
-### Manual Testing
+## Manual Testing
 
 ```bash
 # Test synchronous warming
@@ -403,4 +405,5 @@ The cache warming implementation successfully addresses all requirements from Ta
 ✅ **Implement priority-based warming** - High, medium, low, and all priorities  
 ✅ **Add monitoring for warming process** - Statistics, API endpoints, and logging
 
-The implementation provides a robust, scalable, and well-tested cache warming system that integrates seamlessly with the existing External API Integration architecture.
+The implementation provides a robust, scalable, and well-tested cache warming system that integrates seamlessly with the
+existing External API Integration architecture.

@@ -16,7 +16,7 @@
 
 2. **Open the test page**:
 
-   ```
+   ```text
    http://127.0.0.1:8000/test-external-data-errors.html
    ```
 
@@ -32,7 +32,7 @@
 
 1. **Navigate to the actual page**:
 
-   ```
+   ```text
    http://127.0.0.1:8000/external-data/browse
    ```
 
@@ -209,7 +209,7 @@ php artisan test --filter="External Data Browser - Error Scenarios"
 
 ```bash
 php artisan test --filter="Property"
-```
+```text
 
 ## Troubleshooting
 

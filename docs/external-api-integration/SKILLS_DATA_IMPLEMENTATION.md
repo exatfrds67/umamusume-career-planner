@@ -140,7 +140,7 @@ php artisan db:seed --class=UcpSkillsSeeder
 
 **Note:** Legacy seeders (`ComprehensiveSkillSeeder` and `RealUmaMusumeSkillsSeeder`) have been archived to `database/seeders/deprecated/` and replaced by the consolidated `UcpSkillsSeeder`.
 
-**Current Database Contains: 500+ real Uma Musume skills**
+### Current Database Contents: 500+ Real Uma Musume Skills
 
 **Distribution:**
 

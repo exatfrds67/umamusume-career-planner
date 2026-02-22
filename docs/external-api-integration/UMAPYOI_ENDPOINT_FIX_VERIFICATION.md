@@ -8,7 +8,8 @@
 
 ## Summary
 
-The umapyoi.net API integration was using incorrect endpoint paths that resulted in **404 errors**. After investigating the actual API structure, all endpoints have been corrected and now return **200 OK**.
+The umapyoi.net API integration was using incorrect endpoint paths that resulted in **404 errors**. After investigating
+the actual API structure, all endpoints have been corrected and now return **200 OK**.
 
 ---
 
@@ -16,15 +17,15 @@ The umapyoi.net API integration was using incorrect endpoint paths that resulted
 
 ### ✅ Corrected Endpoint Paths
 
-| Old (404 Error)          | New (200 OK)                  | Status      |
-|--------------------------|-------------------------------|-------------|
-| `/v1/characters`         | `/api/v1/character/list`      | ✅ FIXED    |
-| `/v1/characters/{id}`    | `/api/v1/character/{id}`      | ✅ FIXED    |
-| `/v1/support-cards`      | `/api/v1/support`             | ✅ FIXED    |
-| `/v1/support-cards/{id}` | `/api/v1/support/{id}`        | ✅ FIXED    |
-| `/v1/skills`             | `/api/v1/skill`               | ✅ FIXED    |
-| `/v1/skills/{id}`        | `/api/v1/skill/{id}`          | ✅ FIXED    |
-| `/v1/news?limit={n}`     | `/api/v1/news/latest/{n}`     | ✅ FIXED    |
+| Old (404 Error) | New (200 OK) | Status |
+| --- | --- | --- |
+| `/v1/characters` | `/api/v1/character/list` | ✅ FIXED |
+| `/v1/characters/{id}` | `/api/v1/character/{id}` | ✅ FIXED |
+| `/v1/support-cards` | `/api/v1/support` | ✅ FIXED |
+| `/v1/support-cards/{id}` | `/api/v1/support/{id}` | ✅ FIXED |
+| `/v1/skills` | `/api/v1/skill` | ✅ FIXED |
+| `/v1/skills/{id}` | `/api/v1/skill/{id}` | ✅ FIXED |
+| `/v1/news?limit={n}` | `/api/v1/news/latest/{n}` | ✅ FIXED |
 
 ---
 
@@ -37,7 +38,7 @@ Testing umapyoi.net API endpoints:
 ✓ /api/v1/character/list   - HTTP/1.1 200 OK
 ✓ /api/v1/support          - HTTP/1.1 200 OK  
 ✓ /api/v1/news/latest/10   - HTTP/1.1 200 OK
-```
+```text
 
 ### Sample Response Data
 
@@ -94,7 +95,7 @@ Testing umapyoi.net API endpoints:
 
 ### Unit Tests: ✅ ALL PASSING
 
-```
+```text
 PASS  Tests\Feature\ExternalAPI\UmapyoiApiClientTest
 ✓ it fetches characters successfully
 ✓ it caches character data
@@ -180,7 +181,7 @@ curl -I https://api.umapyoi.net/api/v1/news/latest/10
 
 # Get sample data
 curl -s https://api.umapyoi.net/api/v1/character/list | jq '.[0]'
-```
+```text
 
 ---
 
@@ -191,10 +192,12 @@ curl -s https://api.umapyoi.net/api/v1/character/list | jq '.[0]'
 **Solution:** Updated all endpoints to use correct `/api/v1/` structure  
 **Result:** ✅ ALL ENDPOINTS NOW RETURN 200 OK  
 
-The umapyoi.net API integration is **fully functional** and **production-ready**. All endpoints have been verified to work correctly with the live API, returning 200 OK status codes and valid JSON data.
+The umapyoi.net API integration is **fully functional** and **production-ready**. All endpoints have been verified to
+work correctly with the live API, returning 200 OK status codes and valid JSON data.
 
 ---
 
 **Report Generated:** 2026-01-25  
 **Verification Method:** Live API testing via curl  
 **Status:** ✅ COMPLETE - All endpoints working correctly
+

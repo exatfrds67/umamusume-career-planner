@@ -8,12 +8,14 @@
 
 ## Executive Summary
 
-Both **Umalator.com** and **umamusumecalculator.com** are community-created web applications for Uma Musume Pretty Derby. After comprehensive testing, **neither site provides a public API** for programmatic access. Both sites are JavaScript-based web applications that serve data only through their interactive web interfaces.
+Both **Umalator.com** and **umamusumecalculator.com** are community-created web applications for Uma Musume Pretty
+Derby. After comprehensive testing, **neither site provides a public API** for programmatic access. Both sites are
+JavaScript-based web applications that serve data only through their interactive web interfaces.
 
 ### Key Findings
 
 | Site | API Available | Web Scraping | Recommendation |
-|------|---------------|--------------|----------------|
+| --- | --- | --- | --- |
 | Umalator.com | ❌ No | ⚠️ Allowed (robots.txt) | Not viable as API source |
 | umamusumecalculator.com | ❌ No | ⚠️ Allowed (robots.txt) | Not viable as API source |
 
@@ -44,7 +46,7 @@ Disallow: /private/
 
 # Allow search engines to crawl all content
 Crawl-delay: 1
-```
+```text
 
 **Key Findings**:
 
@@ -53,33 +55,33 @@ Crawl-delay: 1
 - 1-second crawl delay recommended
 - Admin and private areas blocked
 
-### API Endpoint Testing
+## API Endpoint Testing
 
-| Endpoint Tested | HTTP Status | Result |
-|-----------------|-------------|--------|
-| `https://umalator.com/api` | 404 | Not Found |
-| `https://umalator.com/api/v1` | 404 | Not Found |
-| `https://umalator.com/api/characters` | 404 | Not Found |
-| `https://umalator.com/data` | 404 | Not Found |
-| `https://umalator.com/data.json` | 404 | Not Found |
-| `https://umalator.com/static/data.json` | 404 | Not Found |
-| `https://umalator.com/assets/data.json` | 404 | Not Found |
-| `https://umalator.com/docs` | 404 | Not Found |
-| `https://umalator.com/api-docs` | 404 | Not Found |
+| Endpoint Tested                         | HTTP Status | Result    |
+| --------------------------------------- | ----------- | --------- |
+| `https://umalator.com/api`              | 404         | Not Found |
+| `https://umalator.com/api/v1`           | 404         | Not Found |
+| `https://umalator.com/api/characters`   | 404         | Not Found |
+| `https://umalator.com/data`             | 404         | Not Found |
+| `https://umalator.com/data.json`        | 404         | Not Found |
+| `https://umalator.com/static/data.json` | 404         | Not Found |
+| `https://umalator.com/assets/data.json` | 404         | Not Found |
+| `https://umalator.com/docs`             | 404         | Not Found |
+| `https://umalator.com/api-docs`         | 404         | Not Found |
 
 ### Available Tools (Web-Only)
 
 From sitemap.xml analysis:
 
-| Tool | URL | Description |
-|------|-----|-------------|
-| Race Simulator | `/tools/race-simulator-jp` | JP server race simulation |
-| Build Planner | `/tools/build-planner` | Training build optimization |
-| Skill Visualizer | `/tools/skill-visualizer-global` | Skill effect visualization |
-| Support Card Tier List | `/tools/support-card-tier-list` | Card rankings and analysis |
-| Course Images | `/tools/course-images` | Race course layouts |
-| Roguelike Helper | `/tools/roguelike-helper` | Roguelike mode tools |
-| Umadle | `/tools/umadle` | Daily guessing game |
+| Tool                   | URL                              | Description                 |
+| ---------------------- | -------------------------------- | --------------------------- |
+| Race Simulator         | `/tools/race-simulator-jp`       | JP server race simulation   |
+| Build Planner          | `/tools/build-planner`           | Training build optimization |
+| Skill Visualizer       | `/tools/skill-visualizer-global` | Skill effect visualization  |
+| Support Card Tier List | `/tools/support-card-tier-list`  | Card rankings and analysis  |
+| Course Images          | `/tools/course-images`           | Race course layouts         |
+| Roguelike Helper       | `/tools/roguelike-helper`        | Roguelike mode tools        |
+| Umadle                 | `/tools/umadle`                  | Daily guessing game         |
 
 ### Site Characteristics
 
@@ -130,31 +132,32 @@ Sitemap: https://www.umamusumecalculator.com/sitemap.xml
 - No API restrictions mentioned (no API exists)
 - Multi-language support (EN, JA, KO, ZH-CN, ZH-TW)
 
-### API Endpoint Testing
+## API Endpoint Testing
 
-| Endpoint Tested | HTTP Status | Result |
-|-----------------|-------------|--------|
-| `https://umamusumecalculator.com/api` | 500 | Server Error |
-| `https://www.umamusumecalculator.com/api` | 500 | Server Error |
-| `https://umamusumecalculator.com/data` | 500 | Server Error |
-| `https://www.umamusumecalculator.com/data.json` | 500 | Server Error |
+| Endpoint Tested                                 | HTTP Status | Result       |
+| ----------------------------------------------- | ----------- | ------------ |
+| `https://umamusumecalculator.com/api`           | 500         | Server Error |
+| `https://www.umamusumecalculator.com/api`       | 500         | Server Error |
+| `https://umamusumecalculator.com/data`          | 500         | Server Error |
+| `https://www.umamusumecalculator.com/data.json` | 500         | Server Error |
 
-**Note**: The 500 errors suggest the site is a JavaScript SPA that doesn't handle non-existent routes gracefully, rather than having a disabled API.
+**Note**: The 500 errors suggest the site is a JavaScript SPA that doesn't handle non-existent routes gracefully, rather
+than having a disabled API.
 
 ### Available Calculators (Web-Only)
 
 From sitemap.xml analysis:
 
-| Calculator | URL Pattern | Languages |
-|------------|-------------|-----------|
-| Affinity Calculator | `/{lang}/affinity-calculator` | EN, JA, KO, ZH-CN, ZH-TW |
-| Training Calculator | (mentioned in about page) | Multi-language |
-| Support Card Analysis | (mentioned in about page) | Multi-language |
-| Race Performance Prediction | (mentioned in about page) | Multi-language |
-| Legacy Calculator | (mentioned in about page) | Multi-language |
-| Gacha Calculator | (mentioned in about page) | Multi-language |
-| Rank Calculator | (mentioned in about page) | Multi-language |
-| Deck Calculator | (mentioned in about page) | Multi-language |
+| Calculator                  | URL Pattern                   | Languages                |
+| --------------------------- | ----------------------------- | ------------------------ |
+| Affinity Calculator         | `/{lang}/affinity-calculator` | EN, JA, KO, ZH-CN, ZH-TW |
+| Training Calculator         | (mentioned in about page)     | Multi-language           |
+| Support Card Analysis       | (mentioned in about page)     | Multi-language           |
+| Race Performance Prediction | (mentioned in about page)     | Multi-language           |
+| Legacy Calculator           | (mentioned in about page)     | Multi-language           |
+| Gacha Calculator            | (mentioned in about page)     | Multi-language           |
+| Rank Calculator             | (mentioned in about page)     | Multi-language           |
+| Deck Calculator             | (mentioned in about page)     | Multi-language           |
 
 ### Site Characteristics
 
@@ -190,7 +193,7 @@ The requirements document assumed:
 ### Revised Reality
 
 | Assumption | Reality |
-|------------|---------|
+| --- | --- |
 | Umalator.com has API | ❌ No API - web tools only |
 | umamusumecalculator.com has API | ❌ No API - web calculators only |
 | Multiple fallback sources available | ❌ Only umapyoi.net has public API |
@@ -210,7 +213,7 @@ private const API_SOURCES = [
     // Umalator.com - No API (404 on all API endpoints)
     // umamusumecalculator.com - No API (500 errors, SPA only)
 ];
-```
+```text
 
 ---
 
@@ -267,12 +270,12 @@ This ensures the application functions even when umapyoi.net is unavailable.
 
 Consider alternative approaches for future enhancement:
 
-| Approach | Feasibility | Notes |
-|----------|-------------|-------|
-| GameWith API | Unknown | Japanese gaming database |
-| Gamerch API | Unknown | Japanese wiki platform |
-| Community Discord bots | Low | Informal, unreliable |
-| Direct game data mining | Complex | Requires reverse engineering |
+| Approach                | Feasibility | Notes                        |
+| ----------------------- | ----------- | ---------------------------- |
+| GameWith API            | Unknown     | Japanese gaming database     |
+| Gamerch API             | Unknown     | Japanese wiki platform       |
+| Community Discord bots  | Low         | Informal, unreliable         |
+| Direct game data mining | Complex     | Requires reverse engineering |
 
 ### 5. Web Scraping (Not Recommended)
 
@@ -354,7 +357,7 @@ return [
     'cache_extension_on_failure' => true,
     'staleness_warning_threshold' => 86400, // 24 hours
 ];
-```
+```text
 
 ---
 
@@ -382,7 +385,8 @@ return [
 
 ## Conclusion
 
-**Neither Umalator.com nor umamusumecalculator.com can be used as secondary API sources** for the External API Integration feature. Both sites are web-only applications without public APIs.
+**Neither Umalator.com nor umamusumecalculator.com can be used as secondary API sources** for the External API
+Integration feature. Both sites are web-only applications without public APIs.
 
 ### Final Recommendations
 
@@ -397,13 +401,13 @@ return [
 
 The lack of secondary APIs actually simplifies the architecture:
 
-| Original Design | Simplified Design |
-|-----------------|-------------------|
-| Multi-source fallback | Single source + cache |
-| Data reconciliation | Not needed |
-| Conflict resolution | Not needed |
-| Source priority management | Not needed |
-| Multiple client implementations | Single client |
+| Original Design                 | Simplified Design     |
+| ------------------------------- | --------------------- |
+| Multi-source fallback           | Single source + cache |
+| Data reconciliation             | Not needed            |
+| Conflict resolution             | Not needed            |
+| Source priority management      | Not needed            |
+| Multiple client implementations | Single client         |
 
 This reduces complexity while maintaining reliability through robust caching.
 
@@ -432,3 +436,4 @@ This reduces complexity while maintaining reliability through robust caching.
 - UmamusumeDB API Verification: `.kiro/specs/external-api-integration/umamusumedb-api-verification.md`
 - Requirements: `.kiro/specs/external-api-integration/requirements.md`
 - Design: `.kiro/specs/external-api-integration/design.md`
+

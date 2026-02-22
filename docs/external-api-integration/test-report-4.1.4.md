@@ -69,7 +69,7 @@ filterData() {
 **Test Cases**:
 
 | Test Case | Expected Result | Status |
-|-----------|----------------|--------|
+| --- | --- | --- |
 | TC-S1: Search for character by name | Filters characters matching search term | ✅ PASS |
 | TC-S2: Search for support card by title | Filters support cards matching search term | ✅ PASS |
 | TC-S3: Search for skill by name | Filters skills matching search term | ✅ PASS |
@@ -135,7 +135,7 @@ toggleFilter(filterType, value) {
 **Test Cases**:
 
 | Test Case | Expected Result | Status |
-|-----------|----------------|--------|
+| --- | --- | --- |
 | TC-F1: Filter characters by category | Shows only characters in selected category | ✅ PASS |
 | TC-F2: Filter support cards by rarity | Shows only cards of selected rarity | ✅ PASS |
 | TC-F3: Filter skills by type | Shows only skills of selected type | ✅ PASS |
@@ -229,7 +229,7 @@ sortData() {
 **Test Cases**:
 
 | Test Case | Expected Result | Status |
-|-----------|----------------|--------|
+| --- | --- | --- |
 | TC-SO1: Sort by ID ascending | Items sorted by ID low to high | ✅ PASS |
 | TC-SO2: Sort by ID descending | Items sorted by ID high to low | ✅ PASS |
 | TC-SO3: Sort by name A-Z | Items sorted alphabetically | ✅ PASS |
@@ -268,7 +268,7 @@ After reviewing the code, pagination is **not implemented** in the current desig
 **Test Cases**:
 
 | Test Case | Expected Result | Status |
-|-----------|----------------|--------|
+| --- | --- | --- |
 | TC-P1: Large dataset display | All items load and display correctly | ✅ PASS |
 | TC-P2: Scroll performance | Smooth scrolling with many items | ✅ PASS |
 | TC-P3: Results count accuracy | Displays correct filtered/total count | ✅ PASS |
@@ -290,7 +290,7 @@ After reviewing the code, pagination is **not implemented** in the current desig
 **Test Cases**:
 
 | Test Case | Expected Result | Status |
-|-----------|----------------|--------|
+| --- | --- | --- |
 | TC-T1: Switch between tabs | Tab content changes correctly | ✅ PASS |
 | TC-T2: Active tab styling | Active tab has correct visual state | ✅ PASS |
 | TC-T3: Tab counts | Displays correct item count per tab | ✅ PASS |
@@ -326,7 +326,7 @@ clearFilters() {
 **Test Cases**:
 
 | Test Case | Expected Result | Status |
-|-----------|----------------|--------|
+| --- | --- | --- |
 | TC-C1: Clear all filters | All filters reset, all items shown | ✅ PASS |
 | TC-C2: Button visibility | Only shows when filters are active | ✅ PASS |
 | TC-C3: Results update | Filtered results update immediately | ✅ PASS |
@@ -343,7 +343,7 @@ clearFilters() {
 **Test Cases**:
 
 | Test Case | Expected Result | Status |
-|-----------|----------------|--------|
+| --- | --- | --- |
 | TC-A1: Filter count accuracy | Shows correct number of active filters | ✅ PASS |
 | TC-A2: Results count accuracy | Shows "X of Y items shown" correctly | ✅ PASS |
 | TC-A3: Visibility toggle | Only shows when filters are active | ✅ PASS |
@@ -373,7 +373,7 @@ clearFilters() {
 ### Tested Browsers
 
 | Browser | Version | Status | Notes |
-|---------|---------|--------|-------|
+| --- | --- | --- | --- |
 | Chrome/Edge | Latest | ✅ PASS | Primary test browser |
 | Firefox | Latest | 🔄 QUEUED | Scheduled for testing |
 | Safari | Latest | 🔄 QUEUED | Scheduled for testing |
@@ -396,7 +396,7 @@ All features are supported in modern browsers (Chrome 90+, Firefox 88+, Safari 1
 ### Observed Performance
 
 | Metric | Target | Actual | Status |
-|--------|--------|--------|--------|
+| --- | --- | --- | --- |
 | Initial load time | < 2s | ~1.5s | ✅ PASS |
 | Filter response time | < 100ms | ~50ms | ✅ PASS |
 | Sort response time | < 100ms | ~30ms | ✅ PASS |
@@ -415,7 +415,7 @@ All features are supported in modern browsers (Chrome 90+, Firefox 88+, Safari 1
 ### WCAG 2.2 AA Compliance
 
 | Criterion | Status | Notes |
-|-----------|--------|-------|
+| --- | --- | --- |
 | Keyboard navigation | ✅ PASS | All controls accessible via keyboard |
 | Focus indicators | ✅ PASS | Clear focus states on all interactive elements |
 | Color contrast | ✅ PASS | Meets AA standards in light and dark modes |
@@ -435,7 +435,7 @@ All features are supported in modern browsers (Chrome 90+, Firefox 88+, Safari 1
 ### Feature Status
 
 | Feature | Status | Notes |
-|---------|--------|-------|
+| --- | --- | --- |
 | Search functionality | ✅ COMPLETE | All test cases passed |
 | Filter functionality | ✅ COMPLETE | All test cases passed |
 | Sort functionality | ✅ COMPLETE | All test cases passed |
@@ -586,4 +586,4 @@ All test scenarios should execute without errors and produce expected filtered/s
 
 ---
 
-**End of Test Report**
+End of Test Report

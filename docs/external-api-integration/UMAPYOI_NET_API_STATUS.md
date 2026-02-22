@@ -9,7 +9,10 @@
 
 ## Executive Summary
 
-The Uma Musume Career Planner application is configured to integrate with the **umapyoi.net** external API for retrieving character data, support cards, skills, and news updates. The integration code is complete and thoroughly tested with mocked responses, but the live API endpoints appear to be under development or using a different structure than expected.
+The Uma Musume Career Planner application is configured to integrate with the **umapyoi.net** external API for
+retrieving character data, support cards, skills, and news updates. The integration code is complete and thoroughly
+tested with mocked responses, but the live API endpoints appear to be under development or using a different structure
+than expected.
 
 ---
 
@@ -23,13 +26,13 @@ The Uma Musume Career Planner application is configured to integrate with the **
 
 ### Expected Endpoints (from code)
 
-| Endpoint                      | Method | Purpose                       | Implementation Status |
-|-------------------------------|--------|-------------------------------|----------------------|
-| `/api/v1/character/list`      | GET    | Fetch all characters          | ✅ Implemented & ✅ WORKING 200 OK |
-| `/api/v1/character/{id}`      | GET    | Fetch specific character      | ✅ Implemented & ✅ WORKING 200 OK |
-| `/api/v1/support`             | GET    | Fetch all support cards       | ✅ Implemented & ✅ WORKING 200 OK |
-| `/api/v1/support/{id}`        | GET    | Fetch specific support card   | ✅ Implemented & ✅ WORKING 200 OK |
-| `/api/v1/skill`               | GET    | Fetch all skills              | ✅ Implemented        |
+| Endpoint | Method | Purpose | Implementation Status |
+| --- | --- | --- | --- |
+| `/api/v1/character/list` | GET | Fetch all characters | ✅ Implemented & ✅ WORKING 200 OK |
+| `/api/v1/character/{id}` | GET | Fetch specific character | ✅ Implemented & ✅ WORKING 200 OK |
+| `/api/v1/support` | GET | Fetch all support cards | ✅ Implemented & ✅ WORKING 200 OK |
+| `/api/v1/support/{id}` | GET | Fetch specific support card | ✅ Implemented & ✅ WORKING 200 OK |
+| `/api/v1/skill` | GET | Fetch all skills | ✅ Implemented |
 | `/api/v1/skill/{id}` | GET | Fetch specific skill | ✅ Implemented |
 | `/api/v1/news/latest/{limit}` | GET | Fetch news (with limit param) | ✅ Implemented |
 | `/health` | GET | Health check endpoint | ✅ Implemented |
@@ -47,7 +50,7 @@ The Uma Musume Career Planner application is configured to integrate with the **
         'delay_ms' => 1000,
     ],
 ],
-```
+```text
 
 ---
 
@@ -169,7 +172,8 @@ Tests include:
 - Direct HTTP requests to verify endpoint structure
 - Configuration validation
 
-**Purpose:** These tests are designed to be run manually or in a dedicated CI environment to verify actual API connectivity without impacting regular test runs.
+**Purpose:** These tests are designed to be run manually or in a dedicated CI environment to verify actual API
+connectivity without impacting regular test runs.
 
 **To Run:**
 
@@ -285,7 +289,7 @@ if ($result['success']) {
 
 // Force refresh (bypass cache)
 $freshResult = $client->getCharacters(true);
-```
+```text
 
 ### Example: Check API Availability
 
@@ -310,7 +314,7 @@ $client->clearCache();
 // Check cache status
 $status = $client->getCacheStatus();
 // Returns: ['characters' => bool, 'support_cards' => bool, 'news' => bool]
-```
+```text
 
 ---
 
@@ -370,7 +374,8 @@ All cache keys use the prefix `umapyoi:`:
 
 ## Conclusion
 
-The **umapyoi.net API integration is fully implemented and tested** within the Uma Musume Career Planner application. The code is production-ready with:
+The **umapyoi.net API integration is fully implemented and tested** within the Uma Musume Career Planner application.
+The code is production-ready with:
 
 - ✅ Complete endpoint coverage
 - ✅ Robust error handling
@@ -378,7 +383,8 @@ The **umapyoi.net API integration is fully implemented and tested** within the U
 - ✅ Comprehensive test suite
 - ✅ Resilience patterns
 
-**However**, the **live API endpoint structure requires verification** before the integration can be used in production. The next step is to contact the API provider to confirm:
+**However**, the **live API endpoint structure requires verification** before the integration can be used in production.
+The next step is to contact the API provider to confirm:
 
 1. Current endpoint paths
 2. Authentication requirements (if any)

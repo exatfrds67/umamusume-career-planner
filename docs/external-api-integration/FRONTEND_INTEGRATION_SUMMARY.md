@@ -8,7 +8,8 @@
 
 ## Summary
 
-The frontend has been successfully connected to the umapyoi.net API and local database. Users can browse characters, support cards, skills, and news directly from external and internal data sources.
+The frontend has been successfully connected to the umapyoi.net API and local database. Users can browse characters,
+support cards, skills, and news directly from external and internal data sources.
 
 **Data Sources:**
 
@@ -62,7 +63,7 @@ Route::middleware(['web', 'auth', 'throttle:api'])->prefix('external')->group(fu
     Route::get('/status', [ExternalDataController::class, 'getStatus']);
     Route::post('/clear-cache', [ExternalDataController::class, 'clearCache']);
 });
-```
+```text
 
 **Web Route** (`routes/web.php`):
 
@@ -140,7 +141,7 @@ php artisan test tests/Feature/Api/ExternalDataControllerTest.php --compact
 
 # Run original umapyoi client tests
 php artisan test tests/Feature/ExternalAPI/UmapyoiApiClientTest.php --compact
-```
+```text
 
 ---
 
@@ -212,7 +213,7 @@ if (this.errors.characters) {
 if (this.loadingCharacters) {
     // Show loading spinner for characters section
 }
-```
+```text
 
 **Using the Service Directly:**
 
@@ -252,7 +253,7 @@ if ($client->isAvailable()) {
     "source": "umapyoi.net",
     "cached": false
 }
-```
+```text
 
 ## API Response Format
 
@@ -297,7 +298,7 @@ if ($client->isAvailable()) {
     "source": "umapyoi.net",
     "cached": false
 }
-```
+```text
 
 ### News Response
 
@@ -332,7 +333,7 @@ if ($client->isAvailable()) {
 
 ## Architecture Diagram
 
-```
+```text
 ┌─────────────────┐
 │  User Browser   │
 └────────┬────────┘
@@ -379,7 +380,7 @@ if ($client->isAvailable()) {
 
 **Error Handling Flow:**
 
-```
+```text
 ┌─────────────────┐
 │  loadData()     │
 │  (Promise.all)  │
@@ -461,7 +462,8 @@ if ($client->isAvailable()) {
 ✅ **Tests cover main functionality (6/7 passing)**  
 ✅ **Ready for production use**
 
-The integration provides a solid foundation for importing and syncing data from the community database. Future enhancements can add import/export functionality and user preference management.
+The integration provides a solid foundation for importing and syncing data from the community database. Future
+enhancements can add import/export functionality and user preference management.
 
 ---
 

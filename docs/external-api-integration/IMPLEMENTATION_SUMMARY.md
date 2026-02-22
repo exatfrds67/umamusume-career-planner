@@ -2,7 +2,8 @@
 
 ## Overview
 
-This specification implements **Requirement 14: Advanced External Data Integration and API Management** from the main UmamusumeCareerPlanner spec using MCP servers and intelligent subagents.
+This specification implements **Requirement 14: Advanced External Data Integration and API Management** from the main
+UmamusumeCareerPlanner spec using MCP servers and intelligent subagents.
 
 ## Key Features
 
@@ -64,7 +65,7 @@ DataReconciliationService
 ├── detectConflicts()
 ├── calculateConfidence()
 └── resolveConflicts()
-```
+```text
 
 ### MCP Integration
 
@@ -84,7 +85,7 @@ SyncExternalDataJob
 ├── Conflict resolution
 ├── Progress tracking
 └── Error handling
-```
+```text
 
 ## Implementation Phases
 
@@ -125,7 +126,8 @@ SyncExternalDataJob
 ### umapyoi.net (Primary - Verified Active)
 
 ```
-Base URL: https://api.umapyoi.net/api/v1
+
+Base URL: <https://api.umapyoi.net/api/v1>
 
 GET /characters - List all characters
 GET /characters/{name} - Get character details
@@ -136,37 +138,44 @@ GET /news - Get game updates
 
 Rate Limit: 100 requests/minute
 Authentication: None (public API)
-```
+
+```text
 
 ### UmamusumeDB.com (Secondary - Requires Verification)
 
 ```
-Base URL: https://umamusumedb.com/api
+
+Base URL: <https://umamusumedb.com/api>
 
 Endpoints: To be verified
 Rate Limit: Unknown
 Authentication: Unknown
-```
+
+```text
 
 ### Umalator.com (Race Data - Requires Verification)
 
 ```
+
 Base URL: To be verified
 
 Endpoints: To be verified
 Rate Limit: Unknown
 Authentication: Unknown
-```
+
+```text
 
 ### umamusumecalculator.com (Calculations - Requires Verification)
 
 ```
+
 Base URL: To be verified
 
 Endpoints: To be verified
 Rate Limit: Unknown
 Authentication: Unknown
-```
+
+```text
 
 ## Testing Strategy
 
@@ -252,3 +261,4 @@ This spec satisfies:
 - MCP integration provides enhanced reliability and coordination
 - Comprehensive offline functionality ensures high availability
 - Performance monitoring is critical for optimization
+

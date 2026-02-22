@@ -7,7 +7,8 @@
 
 ## Summary
 
-After thorough investigation of the External Data Browser feature, **pagination is NOT currently implemented** in either the frontend or backend components.
+After thorough investigation of the External Data Browser feature, **pagination is NOT currently implemented** in either
+the frontend or backend components.
 
 ## Investigation Details
 
@@ -32,7 +33,7 @@ After thorough investigation of the External Data Browser feature, **pagination 
 <template x-for="character in filteredCharacters" :key="character.id">
     <!-- Character card -->
 </template>
-```
+```text
 
 ### Backend Analysis
 
@@ -157,7 +158,8 @@ If datasets grow significantly (>500 items per category), consider implementing:
 
 **Finding**: Pagination is **NOT implemented** and is **NOT currently needed** for the External Data Browser feature.
 
-**Recommendation**: Mark this as a **future enhancement** if dataset sizes grow beyond 500 items per category. Current implementation with search and filtering is sufficient for the expected data volumes.
+**Recommendation**: Mark this as a **future enhancement** if dataset sizes grow beyond 500 items per category. Current
+implementation with search and filtering is sufficient for the expected data volumes.
 
 ## Related Documentation
 

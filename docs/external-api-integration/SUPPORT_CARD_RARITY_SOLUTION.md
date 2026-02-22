@@ -66,15 +66,15 @@ After implementation, the 487 support cards are now correctly distributed:
 
 ### Sample Cards by Rarity
 
-**R (Rare)**
+#### R (Rare)
 
 - ID: 10001 - [Tracen Academy]
 
-**SR (Super Rare)**
+#### SR (Super Rare)
 
 - ID: 20001 - [Good Grief, Welcome Back]
 
-**SSR (Super Super Rare)**
+#### SSR (Super Super Rare)
 
 - ID: 30001 - [Japan's Number 1 Stage]
 

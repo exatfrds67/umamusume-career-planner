@@ -237,7 +237,7 @@ sortData() {
         });
     });
 }
-```
+```text
 
 **Recommended Fix**:
 
@@ -577,16 +577,16 @@ sortData() {
 
 ### Overall Test Results
 
-| Category | Total Tests | Passed | Failed | Partial |
-|----------|-------------|--------|--------|---------|
-| ID Sort | 6 | 6 | 0 | 0 |
-| Name Sort | 6 | 6 | 0 | 0 |
-| Rarity Sort | 4 | 0 | 0 | 4 |
-| State Persistence | 1 | 1 | 0 | 0 |
-| Sort with Filters | 3 | 3 | 0 | 0 |
-| Sort with Search | 2 | 2 | 0 | 0 |
-| Edge Cases | 2 | 2 | 0 | 0 |
-| **TOTAL** | **24** | **20** | **0** | **4** |
+| Category          | Total Tests | Passed | Failed | Partial |
+| ----------------- | ----------- | ------ | ------ | ------- |
+| ID Sort           | 6           | 6      | 0      | 0       |
+| Name Sort         | 6           | 6      | 0      | 0       |
+| Rarity Sort       | 4           | 0      | 0      | 4       |
+| State Persistence | 1           | 1      | 0      | 0       |
+| Sort with Filters | 3           | 3      | 0      | 0       |
+| Sort with Search  | 2           | 2      | 0      | 0       |
+| Edge Cases        | 2           | 2      | 0      | 0       |
+| **TOTAL**         | **24**      | **20** | **0**  | **4**   |
 
 ### Pass Rate
 
@@ -606,7 +606,8 @@ sortData() {
 - Skills tab (rarity-asc, rarity-desc options)
 
 **Root Cause**:
-The `sortData()` function in `resources/js/pages/external-data/browse.js` only implements sorting for `id` and `name` fields. The `rarity` field case is missing.
+The `sortData()` function in `resources/js/pages/external-data/browse.js` only implements sorting for `id` and `name`
+fields. The `rarity` field case is missing.
 
 **Recommended Fix**:
 Add rarity sorting logic to the `sortData()` function as shown in section 3.5 above.
@@ -723,11 +724,13 @@ sortData() {
         });
     });
 }
-```
+```text
 
 ## Conclusion
 
-The sort functionality in the External Data Browser is **mostly functional** with excellent implementation for ID and name sorting. However, **rarity sorting is not implemented** despite being available in the UI, which represents a gap between user expectations and actual functionality.
+The sort functionality in the External Data Browser is **mostly functional** with excellent implementation for ID and
+name sorting. However, **rarity sorting is not implemented** despite being available in the UI, which represents a gap
+between user expectations and actual functionality.
 
 ### Action Items
 
@@ -741,9 +744,11 @@ The sort functionality in the External Data Browser is **mostly functional** wit
 
 **Task 4.1.4.3**: Test sort functionality - **COMPLETED WITH ISSUES**
 
-**Recommendation**: Implement rarity sorting before marking this feature as fully complete. The implementation is straightforward and should take less than 30 minutes.
+**Recommendation**: Implement rarity sorting before marking this feature as fully complete. The implementation is
+straightforward and should take less than 30 minutes.
 
 ---
 
 **Report Generated**: January 29, 2026  
 **Next Steps**: Implement rarity sorting fix and re-test
+

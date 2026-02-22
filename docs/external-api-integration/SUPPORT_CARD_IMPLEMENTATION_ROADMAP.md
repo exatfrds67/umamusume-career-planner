@@ -6,7 +6,8 @@
 
 ## Executive Summary
 
-This document outlines the roadmap for implementing comprehensive support card information in the Uma Musume Career Planner, addressing the current data limitations from the umapyoi.net API.
+This document outlines the roadmap for implementing comprehensive support card information in the Uma Musume Career
+Planner, addressing the current data limitations from the umapyoi.net API.
 
 ## Current Status
 
@@ -225,7 +226,7 @@ This document outlines the roadmap for implementing comprehensive support card i
     }
   ]
 }
-```
+```text
 
 ## Priority Cards for Phase 1
 
@@ -368,7 +369,9 @@ Focus on most-used cards first:
 
 ## Conclusion
 
-The infrastructure for comprehensive support card data is **already in place**. The primary task is **data population**, which can be accomplished through manual seeding in the short term, with automation and community contributions in the long term.
+The infrastructure for comprehensive support card data is **already in place**. The primary task is **data population**,
+which can be accomplished through manual seeding in the short term, with automation and community contributions in the
+long term.
 
 **Recommended Action**: Start Phase 1 immediately with focus on top 100 most-used cards.
 
@@ -387,3 +390,4 @@ The infrastructure for comprehensive support card data is **already in place**. 
 - Estimated effort and resources
 - Identified data sources and structure
 - Prioritized cards for initial seeding
+

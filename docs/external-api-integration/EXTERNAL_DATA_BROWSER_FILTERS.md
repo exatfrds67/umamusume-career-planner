@@ -6,7 +6,9 @@
 
 ## Overview
 
-The External Data Browser now includes comprehensive filtering and sorting capabilities to help users efficiently browse and find characters, support cards, and skills. Characters and support cards are sourced from the umapyoi.net API, while skills are sourced from the local database (umapyoi.net does not provide a skills endpoint).
+The External Data Browser now includes comprehensive filtering and sorting capabilities to help users efficiently browse
+and find characters, support cards, and skills. Characters and support cards are sourced from the umapyoi.net API, while
+skills are sourced from the local database (umapyoi.net does not provide a skills endpoint).
 
 ## Data Sources
 
@@ -44,12 +46,12 @@ The External Data Browser now includes comprehensive filtering and sorting capab
 
 ### Support Cards Tab
 
-#### Search
+#### Search (Support Cards)
 
 - **Text Search**: Search by card title, character name, or GameTora ID
 - Real-time filtering as you type
 
-#### Filters
+#### Filters (Support Cards)
 
 - **Rarity Filter**: Toggle buttons for SSR, SR, and R rarities
   - Multiple rarities can be selected simultaneously
@@ -62,7 +64,7 @@ The External Data Browser now includes comprehensive filtering and sorting capab
   - Multiple statuses can be selected simultaneously
   - Visual indicators (colored badges with ring highlight when active)
 
-#### Sorting
+#### Sorting (Support Cards)
 
 - **ID (Low to High)**: Sort by card ID ascending
 - **ID (High to Low)**: Sort by card ID descending
@@ -71,19 +73,19 @@ The External Data Browser now includes comprehensive filtering and sorting capab
 - **Rarity (High to Low)**: Sort by rarity (SSR → SR → R)
 - **Rarity (Low to High)**: Sort by rarity (R → SR → SSR)
 
-#### Active Filters Summary
+#### Active Filters Summary (Support Cards)
 
 - Shows count of active filters
 - Displays "X of Y cards shown" when filters are applied
 
 ### Skills Tab
 
-#### Search
+#### Search (Skills)
 
 - **Text Search**: Search by skill name, description, or effect text
 - Real-time filtering as you type
 
-#### Filters
+#### Filters (Skills)
 
 - **Rarity Filter**: Toggle buttons for Unique, Rare, and Normal
   - Multiple rarities can be selected simultaneously
@@ -93,7 +95,7 @@ The External Data Browser now includes comprehensive filtering and sorting capab
 - **Type Filter**: Dropdown to filter skills by type (from loaded data)
   - "All Types" option to clear filter
 
-#### Sorting
+#### Sorting (Skills)
 
 - **ID (Low to High)**: Sort by skill ID ascending
 - **ID (High to Low)**: Sort by skill ID descending
@@ -102,7 +104,7 @@ The External Data Browser now includes comprehensive filtering and sorting capab
 - **Rarity (High to Low)**: Sort by rarity (Unique → Rare → Normal)
 - **Rarity (Low to High)**: Sort by rarity (Normal → Rare → Unique)
 
-#### Active Filters Summary
+#### Active Filters Summary (Skills)
 
 - Shows count of active filters
 - Displays "X of Y skills shown" when filters are applied
@@ -111,7 +113,7 @@ The External Data Browser now includes comprehensive filtering and sorting capab
 
 ### Filter Controls Layout
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │ Search Bar                                                   │
 ├─────────────────────────────────────────────────────────────┤
@@ -146,7 +148,7 @@ The External Data Browser now includes comprehensive filtering and sorting capab
     skillSortBy: 'id-asc',
     searchTerm: ''
 }
-```
+```text
 
 ### Key Functions
 
@@ -188,7 +190,8 @@ The External Data Browser now includes comprehensive filtering and sorting capab
 
 ## Filter Persistence
 
-Currently, filters are **not persisted** across page reloads. This is intentional to ensure users always start with a clean view of all data.
+Currently, filters are **not persisted** across page reloads. This is intentional to ensure users always start with a
+clean view of all data.
 
 ### Future Enhancement Options
 
@@ -281,3 +284,4 @@ Currently, filters are **not persisted** across page reloads. This is intentiona
 - Added sorting options for both tabs
 - Added active filters summary
 - Added clear filters functionality
+

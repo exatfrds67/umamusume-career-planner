@@ -8,7 +8,8 @@
 
 ## Overview
 
-This report summarizes the complete check of all umapyoi.net API integration code in the Uma Musume Career Planner application.
+This report summarizes the complete check of all umapyoi.net API integration code in the Uma Musume Career Planner
+application.
 
 ---
 
@@ -70,7 +71,7 @@ This report summarizes the complete check of all umapyoi.net API integration cod
         'delay_ms' => 1000,
     ],
 ],
-```
+```text
 
 **Configuration Tests**: ✅ Passing (2/2)
 
@@ -81,6 +82,7 @@ This report summarizes the complete check of all umapyoi.net API integration cod
 ### Unit/Feature Tests (Mocked)
 
 ```
+
 File: tests/Feature/ExternalAPI/UmapyoiApiClientTest.php
 Status: ✅ ALL PASSING
 Tests: 12 passed (26 assertions)
@@ -98,26 +100,31 @@ Duration: ~1.64s
 ✅ Clears cache successfully
 ✅ Provides cache status
 ✅ Forces refresh when requested
-```
+
+```text
 
 ### Configuration Tests
 
 ```
+
 File: tests/Feature/ExternalAPI/UmapyoiLiveApiTest.php
 Status: ✅ PASSING
 Tests: 2 risky (6 assertions) - risky due to echo output only
 Duration: ~1.1s
 
 ✅ Umapyoi configuration loaded correctly
-   - URL: https://api.umapyoi.net
-   - Timeout: 30s
-   - Enabled: YES
+
+- URL: <https://api.umapyoi.net>
+- Timeout: 30s
+- Enabled: YES
 
 ✅ Cache & retry configuration verified
-   - Cache TTL: 86400s (24h)
-   - Max Retries: 3
-   - Retry Delay: 1000ms
-```
+
+- Cache TTL: 86400s (24h)
+- Max Retries: 3
+- Retry Delay: 1000ms
+
+```text
 
 ---
 
@@ -151,7 +158,7 @@ Fetches a specific character by ID.
     'source' => string,
     'error' => string
 ]
-```
+```text
 
 ### 3. `getSupportCards(bool $forceRefresh = false): array`
 
@@ -337,7 +344,8 @@ All code is production-ready with:
 - ✅ Performance optimization (caching, batch requests ready)
 - ✅ MCP integration ready
 
-**The only remaining step is to verify the live API endpoint structure** by contacting the API provider. Once confirmed, the integration can be used in production immediately.
+**The only remaining step is to verify the live API endpoint structure** by contacting the API provider. Once confirmed,
+the integration can be used in production immediately.
 
 **Fallback options are already in place** should the primary API be unavailable:
 

@@ -23,7 +23,7 @@ Press F12 → Network + Console tabs
 ## 📊 Umapyoi.net API Endpoints
 
 | Button | Endpoint | Expected |
-|--------|----------|----------|
+| ------ | -------- | -------- |
 | Characters List | `/api/v1/character/list` | ✅ 200 OK |
 | Single Character | `/api/v1/character/1` | ✅ 200 OK |
 | Support Cards | `/api/v1/support` | ✅ 200 OK |
@@ -38,7 +38,7 @@ Press F12 → Network + Console tabs
 ## 🔍 UmamusumeDB.com Tests
 
 | Button | Endpoint | Expected |
-|--------|----------|----------|
+| ------ | -------- | -------- |
 | Character Page | `/characters/special_week_2025/` | ℹ️ CORS |
 | Card Page | `/cards/kitasan_black_ssr/` | ℹ️ CORS |
 | robots.txt | `/robots.txt` | ✅ 200 OK |
@@ -103,7 +103,7 @@ Press F12 → Network + Console tabs
 ## 🐛 Common Issues
 
 | Issue | Solution |
-|-------|----------|
+| ----- | -------- |
 | CORS Error | Expected for UmamusumeDB |
 | 404 Error | Check endpoint URL |
 | Network Error | Check internet connection |
@@ -113,12 +113,12 @@ Press F12 → Network + Console tabs
 
 ## 📞 Support
 
-**Umapyoi.net**
+### Umapyoi.net
 
 - Discord: <https://discord.gg/wvGHW65C6A>
 - Developer: @kevinvg207
 
-**UmamusumeDB.com**
+### UmamusumeDB.com
 
 - GitHub Issues (see site footer)
 - No public API

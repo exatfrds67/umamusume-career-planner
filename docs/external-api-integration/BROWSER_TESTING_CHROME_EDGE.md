@@ -63,7 +63,7 @@
 
 ### 4. Support Cards Tab
 
-#### Display
+#### Display (Support Cards)
 
 - [ ] Support cards grid renders correctly
 - [ ] Card images load (with fallback)
@@ -71,7 +71,7 @@
 - [ ] Rarity badges show correct colors (SSR/SR/R)
 - [ ] Card count badge accurate
 
-#### Search & Filter
+#### Search & Filter (Support Cards)
 
 - [ ] Search bar filters cards by title
 - [ ] Rarity filter buttons work (SSR/SR/R)
@@ -81,7 +81,7 @@
 - [ ] Sort by Rarity works
 - [ ] Clear filters button works
 
-#### Interactions
+#### Interactions (Support Cards)
 
 - [ ] Card hover effects work
 - [ ] "Import" button appears on hover
@@ -90,7 +90,7 @@
 
 ### 5. Skills Tab
 
-#### Display
+#### Display (Skills)
 
 - [ ] Skills grid renders correctly
 - [ ] Skill names display
@@ -99,7 +99,7 @@
 - [ ] Info banner displays (local database note)
 - [ ] Skill count badge accurate
 
-#### Search & Filter
+#### Search & Filter (Skills)
 
 - [ ] Search bar filters skills by name
 - [ ] Rarity filter buttons work (Unique/Rare/Normal)
@@ -111,7 +111,7 @@
 
 ### 6. News Tab
 
-#### Display
+#### Display (News)
 
 - [ ] News items render correctly
 - [ ] News thumbnails load
@@ -236,7 +236,7 @@ To complete manual testing in Chrome/Edge:
 
 1. **Open Browser**:
 
-   ```
+   ```text
    Navigate to: http://127.0.0.1:8000/external-data/browse
    ```
 
