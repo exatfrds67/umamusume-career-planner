@@ -50,7 +50,7 @@ mindmap
 ### 1.2 Canonical Field Names Reference
 
 | Canonical Name | Description | Type |
-|----------------|-------------|------|
+| --- | --- | --- |
 | `career_run_id` | Primary identifier for career runs | integer |
 | `turn_number` | Current turn in the career | integer (1-78) |
 | `total_sp_available` | Available skill points | integer |
@@ -209,7 +209,7 @@ title,character_name,status,career_stage,current_turn,speed,stamina,power,guts,w
 ```
 
 | Column | Type | Required | Description |
-|--------|------|----------|-------------|
+| --- | --- | --- | --- |
 | title | string | Yes | Plan title |
 | character_name | string | Yes | Uma Musume character name |
 | status | enum | Yes | draft, in_progress, completed, abandoned |
@@ -273,7 +273,7 @@ pie title Import Source Distribution
 ```
 
 | Source | Format | Supported Features |
-|--------|--------|-------------------|
+| --- | --- | --- |
 | JSON File | .json | Full data with relationships |
 | CSV File | .csv | Basic plan data only |
 | Legacy Export | .json | Requires transformation |
@@ -383,7 +383,7 @@ flowchart LR
 ### 4.2 Legacy Field Mapping Table
 
 | Legacy Field | Canonical Field | Transformation |
-|--------------|-----------------|----------------|
+| --- | --- | --- |
 | `spd` | `speed` | Direct mapping |
 | `sta` | `stamina` | Direct mapping |
 | `pow` | `power` | Direct mapping |
@@ -430,7 +430,7 @@ flowchart TD
 ### 4.4 Enum Normalization
 
 | Field | Valid Values | Default |
-|-------|--------------|---------|
+| --- | --- | --- |
 | status | draft, in_progress, completed, abandoned | draft |
 | career_stage | junior, classic, senior | junior |
 | mood | very_bad, bad, normal, good, very_good | normal |
@@ -498,7 +498,7 @@ flowchart TD
 ### 5.2 Schema Validation Rules
 
 | Field | Rule | Error Message |
-|-------|------|---------------|
+| --- | --- | --- |
 | title | Required, max 255 chars | "Title is required and must be under 255 characters" |
 | character_name | Required | "Character name is required" |
 | current_turn | Integer, 1-78 | "Turn must be between 1 and 78" |
@@ -600,7 +600,7 @@ flowchart TD
 ### 6.3 Recovery Strategies
 
 | Error Type | Recovery Strategy |
-|------------|-------------------|
+| --- | --- |
 | Missing optional field | Use default value |
 | Invalid enum value | Map to closest valid value or default |
 | Out of range number | Clamp to valid range |
@@ -804,6 +804,6 @@ sequenceDiagram
 ## Document History
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
+| --- | --- | --- | --- |
 | 1.0 | 2026-01-03 | Development Team | Initial draft |
 | 2.0 | 2026-01-03 | Development Team | Added Mermaid diagrams, expanded specifications |

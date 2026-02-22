@@ -94,7 +94,7 @@ flowchart TD
 ### 2.2 Format Specifications
 
 | Format | Identifier | Detection Criteria | Notes |
-|--------|------------|-------------------|-------|
+| --- | --- | --- | --- |
 | Legacy JSON v1 | `v1_json` | Contains `trainee_name`, `stat_speed`, or `career_run` fields | Primary legacy format |
 | Legacy CSV | `v1_csv` | CSV with recognized headers | Header-driven field mapping |
 | Google Sheets | `google_sheets` | TSV content structure | Parsed as CSV variant |
@@ -183,7 +183,7 @@ erDiagram
 ### 3.2 Target Table Specifications
 
 | Import Type | Target Table | Key Fields | Constraints |
-|-------------|--------------|------------|-------------|
+| --- | --- | --- | --- |
 | character | `ucp_characters` | name, stats, scenario_type, energy_level, mood_status | name required |
 | career | `ucp_careers` | career_name, scenario_type, status, final_stats | character_id FK |
 | training_session | `ucp_training_sessions` | turn_number, training_type, stat_gains | career_id FK, turn 1-78 |
@@ -242,7 +242,7 @@ flowchart LR
 ### 4.2 Stat Value Normalization
 
 | Rule | Description | Implementation |
-|------|-------------|----------------|
+| --- | --- | --- |
 | Range Clamping | Stats clamped to 0-1200 | `max(0, min(1200, $value))` |
 | Type Coercion | String to integer conversion | `(int) $value` |
 | Null Handling | Null values default to 0 | `$value ?? 0` |
@@ -251,7 +251,7 @@ flowchart LR
 ### 4.3 Scenario Type Normalization
 
 | Legacy Value | Canonical Value |
-|--------------|-----------------|
+| --- | --- |
 | `ura`, `URA`, `ura_finale` | `ura_finale` |
 | `unity`, `UNITY`, `unity_cup` | `unity_cup` |
 | `climax`, `CLIMAX` | `climax` |
@@ -261,7 +261,7 @@ flowchart LR
 ### 4.4 Status Normalization
 
 | Legacy Value | Canonical Value |
-|--------------|-----------------|
+| --- | --- |
 | `ongoing`, `active`, `in_progress` | `in_progress` |
 | `done`, `finished`, `completed` | `completed` |
 | `archived`, `old` | `archived` |
@@ -295,7 +295,7 @@ flowchart TD
 ### 5.2 Schema Versions
 
 | Version | Date | Changes |
-|---------|------|---------|
+| --- | --- | --- |
 | 1.0 | 2025-01-01 | Initial schema |
 | 1.1 | 2025-06-01 | Added scenario_type enum |
 | 2.0 | 2026-01-14 | Unified canonical field names |
@@ -344,7 +344,7 @@ flowchart LR
 ### 6.2 Stage Specifications
 
 | Stage | Purpose | Implementation |
-|-------|---------|----------------|
+| --- | --- | --- |
 | Format Detection | Identify source format | `detectLegacyFormat()` |
 | Schema Migration | Apply version upgrades | `migrateSchema()` |
 | Field Mapping | Rename legacy fields | `applyCanonicalFieldNames()` |
@@ -420,7 +420,7 @@ flowchart TD
 ### 7.2 Schema Validation Rules
 
 | Field | Rule | Error Message |
-|-------|------|---------------|
+| --- | --- | --- |
 | name | Required, max 255 chars | "Name is required and must be under 255 characters" |
 | scenario_type | Enum: ura_finale, unity_cup, climax, grand_live | "Invalid scenario type" |
 | status | Enum: in_progress, completed, archived | "Invalid status value" |
@@ -430,7 +430,7 @@ flowchart TD
 ### 7.3 Business Rule Validation
 
 | Rule | Description | Implementation |
-|------|-------------|----------------|
+| --- | --- | --- |
 | Turn-Stage Consistency | Turn number matches career stage | Junior: 1-24, Classic: 25-48, Senior: 49-78 |
 | Skill Prerequisites | Required skills acquired first | Check acquisition order |
 | SP Budget | Total SP spent ≤ available | Sum validation |
@@ -493,7 +493,7 @@ pie title Error Distribution by Category
 ### 8.2 Recovery Strategies
 
 | Error Type | Strategy | Action |
-|------------|----------|--------|
+| --- | --- | --- |
 | Missing optional field | Use default | Apply default value, log warning |
 | Invalid enum value | Map to default | Use default enum, log warning |
 | Out of range number | Clamp | Clamp to valid range, log warning |
@@ -572,7 +572,7 @@ sequenceDiagram
 ### 9.2 Batch Processing
 
 | Configuration | Value | Notes |
-|---------------|-------|-------|
+| --- | --- | --- |
 | Default batch size | 50 | Configurable per migration |
 | Transaction scope | Per batch | Rollback on batch failure |
 | Progress tracking | Per record | Stored in cache |
@@ -620,8 +620,10 @@ php artisan migrate:rollback {migration_id}
 ## Document Control
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|| 2.4.0 | 2026-02-22 | Development Team | Extended target entities (17 types), schema v2.4, added BackupService/SnapshotService refs, 30 models |
-| 2.3.0 | 2026-02-21 | Development Team | Version alignment, date update, codebase v2.3.0 sync || 2.1.0 | 2026-01-23 | Development Team | Updated to match current codebase implementation |
+| --- | --- | --- | --- |
+| 2.4.0 | 2026-02-22 | Development Team | Extended target entities (17 types), schema v2.4, added BackupService/SnapshotService refs, 30 models |
+| 2.3.0 | 2026-02-21 | Development Team | Version alignment, date update, codebase v2.3.0 sync |
+| 2.1.0 | 2026-01-23 | Development Team | Updated to match current codebase implementation |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with canonical field names |
 | 1.0.0 | 2025-06-01 | Development Team | Initial specification |
 

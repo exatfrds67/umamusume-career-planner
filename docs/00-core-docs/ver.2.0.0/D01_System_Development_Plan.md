@@ -23,7 +23,7 @@ This System Development Plan outlines the approach for consolidating five legacy
 ### 1.2 Source Applications
 
 | Application | Stack | Key Features |
-|-------------|-------|--------------|
+| --- | --- | --- |
 | uma_musume_race_planner | PHP + MySQL + Bootstrap | Most feature-complete |
 | umamusume-tracker | Laravel 12 + React | Best API design |
 | uma-tracker | Laravel 11 + Blade | Closest to target stack |
@@ -72,7 +72,7 @@ Requirements 80-87 are tracked separately:
 ### 3.1 Backend
 
 | Component | Technology | Version |
-|-----------|------------|---------|
+| --- | --- | --- |
 | Framework | Laravel | 12+ |
 | Frontend Reactivity | Livewire | 3 |
 | PHP Version | PHP | 8.2+ |
@@ -81,7 +81,7 @@ Requirements 80-87 are tracked separately:
 ### 3.2 Frontend
 
 | Component | Technology | Version |
-|-----------|------------|---------|
+| --- | --- | --- |
 | Client Interactivity | Alpine.js | Latest |
 | Styling | TailwindCSS | v4 |
 | Build Tool | Vite | Latest |
@@ -89,7 +89,7 @@ Requirements 80-87 are tracked separately:
 ### 3.3 Testing
 
 | Type | Tool |
-|------|------|
+| --- | --- |
 | Backend Unit/Feature | Pest |
 | JavaScript Unit | Vitest |
 | E2E | Playwright |
@@ -98,7 +98,7 @@ Requirements 80-87 are tracked separately:
 ### 3.4 Storage
 
 | Mode | Technology |
-|------|------------|
+| --- | --- |
 | Local Runs (MVP) | localStorage |
 | Local Runs (Target) | IndexedDB via localforage |
 | Account Runs | MySQL/MariaDB/SQLite |
@@ -280,7 +280,7 @@ gantt
 ### 6.1 Roles
 
 | Role | Responsibilities |
-|------|------------------|
+| --- | --- |
 | Project Lead | Overall coordination, stakeholder communication |
 | Backend Developer | Laravel, Livewire, database, services |
 | Frontend Developer | Alpine.js, TailwindCSS, Blade components |
@@ -326,7 +326,7 @@ Each task is complete when:
 ### 8.1 Identified Risks
 
 | Risk | Probability | Impact | Mitigation |
-|------|-------------|--------|------------|
+| --- | --- | --- | --- |
 | localStorage quota limits | Medium | High | Implement quota warnings, plan IndexedDB migration |
 | Legacy data incompatibility | Medium | Medium | Version exports, implement migration adapters |
 | Accessibility regression | Low | High | Automated axe-core tests in CI |

@@ -36,7 +36,7 @@ This Software Integration Plan defines the integration strategy for external ser
 ### 2.1 AI Providers
 
 | Provider | Type | Purpose | Status |
-|----------|------|---------|--------|
+| --- | --- | --- | --- |
 | Ollama | Local | Primary AI recommendations | Implemented |
 | AWS Bedrock | Cloud | Fallback AI (Claude models) | Implemented |
 | Neuron AI | Framework | Agent orchestration | Implemented |
@@ -44,7 +44,7 @@ This Software Integration Plan defines the integration strategy for external ser
 ### 2.2 MCP Servers
 
 | Server | Type | Purpose | Status |
-|--------|------|---------|--------|
+| --- | --- | --- | --- |
 | Memory MCP | Local | Conversation context | Implemented |
 | Filesystem MCP | Local | File operations | Implemented |
 | Fetch MCP | Local | HTTP requests | Implemented |
@@ -56,7 +56,7 @@ This Software Integration Plan defines the integration strategy for external ser
 ### 2.3 MCP Agent Orchestration
 
 | Agent | Purpose | Status |
-|-------|---------|--------|
+| --- | --- | --- |
 | CareerStrategyAgent | Career path optimization | Implemented |
 | HintFarmingStrategyAgent | Hint acquisition planning | Implemented |
 | LongTermDevelopmentAgent | Multi-career progression | Implemented |
@@ -70,14 +70,14 @@ This Software Integration Plan defines the integration strategy for external ser
 ### 2.3 External APIs
 
 | API | Purpose | Status |
-|-----|---------|--------|
+| --- | --- | --- |
 | umapyoi.net | Character and support card data | Implemented |
 | GameTora | Skill and race data (web scraping) | Implemented |
 
 ### 2.4 Admin Panel
 
 | Component | Purpose | Status |
-|-----------|---------|--------|
+| --- | --- | --- |
 | DatabaseMaintenanceService | Database backups, migrations, seeding | Implemented |
 | SystemHealthService | System optimization and health checks | Implemented |
 | LogReaderService | Log viewing and analysis | Implemented |
@@ -85,7 +85,7 @@ This Software Integration Plan defines the integration strategy for external ser
 ### 2.4 OCR Engine
 
 | Component | Technology | Purpose | Status |
-|-----------|------------|---------|--------|
+| --- | --- | --- | --- |
 | OCR Service | Tesseract + GD | Screenshot parsing | Implemented |
 | Preprocessing | GD Library | Image enhancement | Implemented |
 | Parser | Custom (ParserFactory + Parsers/) | Data extraction | Implemented |
@@ -222,7 +222,7 @@ gantt
 ### 4.2 Integration Approach
 
 | Phase | Focus | Deliverables |
-|-------|-------|--------------|
+| --- | --- | --- |
 | Phase 1 | Foundation | Database, models, repositories |
 | Phase 2 | AI Integration | Ollama, Bedrock, Neuron agents |
 | Phase 3 | External Services | API clients, OCR pipeline, GameTora scraper |
@@ -457,7 +457,7 @@ sequenceDiagram
 ### 7.1 Environment Configuration
 
 | Environment | Database | Cache | AI Provider | Purpose |
-|-------------|----------|-------|-------------|---------|
+| --- | --- | --- | --- | --- |
 | Local Dev | SQLite | Array | Ollama Mock | Developer testing |
 | CI/CD | MySQL 8.0 | Redis | Mocked | Automated testing |
 | Staging | MySQL 8.0 | Redis | Ollama | UAT testing |
@@ -494,7 +494,7 @@ flowchart TD
 ### 7.3 Mock Strategy
 
 | Service | Mock Approach | Test Data |
-|---------|---------------|-----------|
+| --- | --- | --- |
 | Ollama | Response fixtures | Predefined recommendations |
 | Bedrock | AWS SDK mock | Sample completions |
 | External APIs | HTTP mock | Golden file responses |
@@ -606,7 +606,7 @@ flowchart LR
 ### 9.2 Configuration Management
 
 | Configuration | Location | Purpose |
-|---------------|----------|---------|
+| --- | --- | --- |
 | AI Settings | `config/ai.php` | Provider selection, model config |
 | AI Agents | `config/ai_agents.php` | Agent-specific configurations |
 | Advisory Prompts | `config/advisory_prompts.php` | AI prompt templates |
@@ -655,7 +655,7 @@ flowchart TD
 ### 10.1 Integration Checklist
 
 | Category | Criterion | Status |
-|----------|-----------|--------|
+| --- | --- | --- |
 | AI Integration | Ollama service operational | ✅ Complete |
 | AI Integration | Bedrock fallback functional | ✅ Complete |
 | AI Integration | Neuron agents responding | ✅ Complete |
@@ -706,8 +706,10 @@ flowchart TD
 ## Document Control
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|| 2.4.0 | 2026-02-22 | Development Team | Added 9 MCP agents, Admin Panel integration, GameTora scraper, 42 MCP tools, updated sign-off criteria, 3,316+ tests |
-| 2.3.0 | 2026-02-21 | Development Team | Updated Livewire 3→4, version alignment, codebase v2.3.0 sync || 2.1.0 | 2026-01-23 | Development Team | Updated to reflect current AI, MCP, and external integrations |
+| --- | --- | --- | --- |
+| 2.4.0 | 2026-02-22 | Development Team | Added 9 MCP agents, Admin Panel integration, GameTora scraper, 42 MCP tools, updated sign-off criteria, 3,316+ tests |
+| 2.3.0 | 2026-02-21 | Development Team | Updated Livewire 3→4, version alignment, codebase v2.3.0 sync |
+| 2.1.0 | 2026-01-23 | Development Team | Updated to reflect current AI, MCP, and external integrations |
 | 2.0.0 | 2026-01-14 | Development Team | Prior revision with initial integration plan |
 
 ---

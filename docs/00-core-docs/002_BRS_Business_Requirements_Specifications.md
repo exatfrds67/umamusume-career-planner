@@ -116,6 +116,7 @@ mindmap
 #### 3.1.1 Players (End Users)
 
 ### Needs
+
 - Quick and easy plan creation with AI recommendations
 - Offline access to data via PWA
 - Cross-device synchronization
@@ -124,6 +125,7 @@ mindmap
 - Intelligent training and race strategy guidance
 
 ### Pain Points
+
 - Current tools are fragmented
 - No AI-powered optimization
 - Poor mobile experience
@@ -131,7 +133,8 @@ mindmap
 
 #### 3.1.2 Developers/Maintainers
 
-### Needs
+### Needs - Developers
+
 - Single codebase to maintain
 - Modern, well-documented architecture
 - Comprehensive test coverage
@@ -171,6 +174,7 @@ quadrantChart
 - **ID**: BR-1.6; **Requirement**: Goal management and progress tracking; **Priority**: P1; **Status**: Implemented
 
 ### Related Artifacts
+
 - PRD: [PRD-001](prds/PRD-001_Character_Management.md)
 - SPEC: [SPEC-001](specs/SPEC-001_Character_Management_Technical.md)
 - Flow: [FLOW-001](flows/FLOW-001_Character_Management_System.md)
@@ -186,7 +190,8 @@ quadrantChart
 - **ID**: BR-2.4; **Requirement**: AI-powered training recommendations; **Priority**: P0; **Status**: Implemented
 - **ID**: BR-2.5; **Requirement**: Training session history and analytics; **Priority**: P1; **Status**: Implemented
 
-### Related Artifacts
+### Related Artifacts - Training Optimization
+
 - PRD: [PRD-002](prds/PRD-002_Training_Optimization.md)
 - SPEC: [SPEC-002](specs/SPEC-002_Training_Optimization_Technical.md)
 - Flow: [FLOW-002](flows/FLOW-002_Training_Optimization_System.md)
@@ -202,7 +207,8 @@ quadrantChart
 - **ID**: BR-3.4; **Requirement**: AI-powered race strategy recommendations; **Priority**: P0; **Status**: Implemented
 - **ID**: BR-3.5; **Requirement**: Race history and performance analytics; **Priority**: P1; **Status**: Implemented
 
-### Related Artifacts
+### Related Artifacts - Race Strategy
+
 - PRD: [PRD-003](prds/PRD-003_Race_Strategy.md)
 - SPEC: [SPEC-003](specs/SPEC-003_Race_Strategy_Technical.md)
 - Flow: [FLOW-003](flows/FLOW-003_Race_Strategy_System.md)
@@ -218,7 +224,8 @@ quadrantChart
 - **ID**: BR-4.4; **Requirement**: SP budget optimization; **Priority**: P1; **Status**: Implemented
 - **ID**: BR-4.5; **Requirement**: AI skill build recommendations; **Priority**: P1; **Status**: Implemented
 
-### Related Artifacts
+### Related Artifacts - Skill Management
+
 - PRD: [PRD-004](prds/PRD-004_Skill_Management.md)
 - SPEC: [SPEC-004](specs/SPEC-004_Skill_Management_Technical.md)
 - Flow: [FLOW-004](flows/FLOW-004_Skill_Management_System.md)
@@ -234,7 +241,8 @@ quadrantChart
 - **ID**: BR-5.4; **Requirement**: Deck synergy scoring and recommendations; **Priority**: P1; **Status**: Implemented
 - **ID**: BR-5.5; **Requirement**: Meta tier synchronization from external sources; **Priority**: P1; **Status**: Implemented
 
-### Related Artifacts
+### Related Artifacts - Support Card Management
+
 - PRD: [PRD-005](prds/PRD-005_Support_Card_Management.md)
 - SPEC: [SPEC-005](specs/SPEC-005_Support_Card_Management_Technical.md)
 - Flow: [FLOW-005](flows/FLOW-005_Support_Card_Management_System.md)
@@ -250,7 +258,8 @@ quadrantChart
 - **ID**: BR-6.4; **Requirement**: Cost tracking and budget management for cloud AI; **Priority**: P1; **Status**: Implemented
 - **ID**: BR-6.5; **Requirement**: Confidence scoring for recommendations; **Priority**: P1; **Status**: Implemented
 
-### Related Artifacts
+### Related Artifacts - AI Advisory
+
 - PRD: [PRD-006](prds/PRD-006_AI_Advisory.md)
 - SPEC: [SPEC-006](specs/SPEC-006_AI_Advisory_Technical.md)
 - Flow: [FLOW-006](flows/FLOW-006_AI_Advisory_System.md)
@@ -266,7 +275,8 @@ quadrantChart
 - **ID**: BR-7.4; **Requirement**: WebSocket real-time updates (Laravel Reverb); **Priority**: P1; **Status**: Implemented
 - **ID**: BR-7.5; **Requirement**: Community data sharing; **Priority**: P2; **Status**: Implemented
 
-### Related Artifacts
+### Related Artifacts - External Integration
+
 - PRD: [PRD-007](prds/PRD-007_External_Integration.md)
 - SPEC: [SPEC-007](specs/SPEC-007_External_Integration_Technical.md)
 - Flow: [FLOW-007](flows/FLOW-007_External_Integration_System.md)

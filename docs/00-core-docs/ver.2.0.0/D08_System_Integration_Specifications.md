@@ -125,10 +125,10 @@ classDiagram
 ```
 
 | Property | Type | Description |
-|----------|------|-------------|
-| `id` | int\|string | Plan ID (numeric for Account, UUID for Local) |
+| --- | --- | --- |
+| `id` | `int\|string` | Plan ID (numeric for Account, UUID for Local) |
 | `mode` | string | 'edit' or 'view' |
-| `plan` | CareerRun\|Array | Model or array for Local mode |
+| `plan` | `CareerRun\|Array` | Model or array for Local mode |
 | `skills` | Collection | Skill models collection |
 | `form` | array | Input field mirror |
 | `isDirty` | bool | Unsaved changes flag |
@@ -167,7 +167,7 @@ flowchart LR
 #### 2.3.1 Skill Search Endpoint
 
 | Property | Value |
-|----------|-------|
+| --- | --- |
 | **Endpoint** | `/internal/skills/search` |
 | **Method** | `GET` |
 | **Cache** | 1 hour |
@@ -175,7 +175,7 @@ flowchart LR
 **Parameters:**
 
 | Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
+| --- | --- | --- | --- | --- |
 | `q` | string | Yes | - | Search query |
 | `limit` | int | No | 10 | Max results |
 | `type` | string | No | - | Filter by skill type |
@@ -427,7 +427,7 @@ sequenceDiagram
 ```
 
 | Event Name | Payload | Source | Target | Description |
-|------------|---------|--------|--------|-------------|
+| --- | --- | --- | --- | --- |
 | `toast` | `{ type, message }` | Livewire/JS | Alpine Toast | Triggers a popup notification |
 | `plan-saved` | `{ id, mode }` | Livewire | Alpine | Signals form save success, clears dirty state |
 | `plan-deleted` | `{ id }` | Livewire | Alpine | Signals plan deletion |
@@ -452,7 +452,7 @@ flowchart LR
 ```
 
 | Event Name | Payload | Listener | Description |
-|------------|---------|----------|-------------|
+| --- | --- | --- | --- |
 | `refreshPlanList` | `null` | PlanList | Reloads the list (e.g., after Quick Create) |
 | `skillAdded` | `{ skill_id, sp_cost }` | SkillsEditor | Updates SP totals |
 | `skillRemoved` | `{ skill_id, sp_cost }` | SkillsEditor | Updates SP totals |
@@ -583,7 +583,7 @@ flowchart LR
 ```
 
 | Directive | Value | Reason |
-|-----------|-------|--------|
+| --- | --- | --- |
 | `script-src` | 'self', 'unsafe-eval', 'unsafe-inline' | Required for Alpine/Livewire |
 | `connect-src` | 'self' | No external API calls allowed |
 | `style-src` | 'self', 'unsafe-inline' | TailwindCSS inline styles |
@@ -618,7 +618,7 @@ flowchart TD
 ```
 
 | Source | Sanitization Method | Notes |
-|--------|---------------------|-------|
+| --- | --- | --- |
 | Livewire | Automatic via Eloquent | Built-in protection |
 | localStorage | Manual sanitization required | Treat as untrusted |
 | File Upload | Validation + virus scan | Strict file type checking |
@@ -692,6 +692,6 @@ flowchart TB
 ## Document History
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
+| --- | --- | --- | --- |
 | 1.0 | 2026-01-03 | Development Team | Initial draft |
 | 2.0 | 2026-01-03 | Development Team | Added Mermaid diagrams, expanded specifications |

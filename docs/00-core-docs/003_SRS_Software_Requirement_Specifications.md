@@ -43,7 +43,7 @@ This specification covers:
 ### 1.3 Requirement Priorities
 
 | Priority | Description |
-| -------- | ----------- |
+| --- | --- |
 | P0 (Critical) | Core functionality required for MVP launch |
 | P1 (High) | Important features for complete user experience |
 | P2 (Medium) | Enhanced features for power users |
@@ -95,7 +95,7 @@ mindmap
 **Description:** User authentication and profile management capabilities.
 
 | ID | Requirement | Priority | Status |
-| -- | ----------- | -------- | ------ |
+| --- | --- | --- | --- |
 | FR-01.1 | Support registration, login, logout, and session management | P0 | Complete |
 | FR-01.2 | Provide profile editing and password change functionality | P0 | Complete |
 | FR-01.3 | Support avatar upload with image validation | P1 | Complete |
@@ -128,7 +128,7 @@ flowchart TD
 - Wireframe: [WF-002](../wireframes/WF-002_Character_Creation_Wizard.md)
 
 | ID | Requirement | Priority | Status |
-| -- | ----------- | -------- | ------ |
+| --- | --- | --- | --- |
 | FR-02.1 | CRUD operations for characters with stat tracking | P0 | Complete |
 | FR-02.2 | Track five core stats: Speed, Stamina, Power, Guts, Wit (soft cap 1200, practical max ~1600) | P0 | Complete |
 | FR-02.3 | Track energy, mood, goals, and progression | P0 | Complete |
@@ -174,7 +174,7 @@ erDiagram
 - Tech Flow: [TECH-FLOW-002](../tech-flow/TECH-FLOW-002_Training_Optimization_Flow.md)
 
 | ID | Requirement | Priority | Status |
-| -- | ----------- | -------- | ------ |
+| --- | --- | --- | --- |
 | FR-03.1 | Record training sessions and compute stat gains | P0 | Complete |
 | FR-03.2 | Provide training predictions with stat gain forecasts | P0 | Complete |
 | FR-03.3 | Support batch predictions for multiple training options | P0 | Complete |
@@ -208,7 +208,7 @@ flowchart TD
 - Sequence: [SEQ-004](../sequences/SEQ-004_Race_Registration_and_Outcome.md)
 
 | ID | Requirement | Priority | Status |
-| -- | ----------- | -------- | ------ |
+| --- | --- | --- | --- |
 | FR-04.1 | Store race definitions with grade, distance, surface, and requirements | P0 | Complete |
 | FR-04.2 | Track race results with placement and rewards | P0 | Complete |
 | FR-04.3 | Provide race detail views and analytics | P0 | Complete |
@@ -247,7 +247,7 @@ flowchart LR
 - Wireframe: [WF-008](../wireframes/WF-008_Skill_Shop_Interface.md)
 
 | ID | Requirement | Priority | Status |
-| -- | ----------- | -------- | ------ |
+| --- | --- | --- | --- |
 | FR-05.1 | Maintain skill catalog with categories (Normal, Rare, Unique) | P0 | Complete |
 | FR-05.2 | Track skill acquisitions per character | P0 | Complete |
 | FR-05.3 | Track hints and SP cost reductions (5 levels: 10%/20%/30%/35%/40% max) | P0 | Complete |
@@ -268,7 +268,7 @@ flowchart LR
 - Wireframe: [WF-011](../wireframes/WF-011_Support_Deck_Builder.md)
 
 | ID | Requirement | Priority | Status |
-| -- | ----------- | -------- | ------ |
+| --- | --- | --- | --- |
 | FR-06.1 | Maintain support card inventory (200+ cards) | P0 | Complete |
 | FR-06.2 | Build and validate 6-card decks (5 owned + 1 borrowed) | P0 | Complete |
 | FR-06.3 | Track limit break levels and bond progression | P0 | Complete |
@@ -288,7 +288,7 @@ flowchart LR
 - Sequence: [SEQ-006](../sequences/SEQ-006_AI_Advice_Generation.md)
 
 | ID | Requirement | Priority | Status |
-| -- | ----------- | -------- | ------ |
+| --- | --- | --- | --- |
 | FR-07.1 | Provide training advice via Neuron agents | P0 | Complete |
 | FR-07.2 | Provide race strategy recommendations | P0 | Complete |
 | FR-07.3 | Provide skill build recommendations | P0 | Complete |
@@ -321,7 +321,7 @@ flowchart TD
 - Sequence: [SEQ-007](../sequences/SEQ-007_External_Data_Sync.md)
 
 | ID | Requirement | Priority | Status |
-| -- | ----------- | -------- | ------ |
+| --- | --- | --- | --- |
 | FR-08.1 | Integrate with umapyoi.net API for game data | P0 | Complete |
 | FR-08.2 | Implement circuit breaker pattern for API resilience | P0 | Complete |
 | FR-08.3 | Support fallback to UmamusumeDB.com | P1 | Complete |
@@ -334,7 +334,7 @@ flowchart TD
 **Description:** Import/export workflows with format detection and migration.
 
 | ID | Requirement | Priority | Status |
-| -- | ----------- | -------- | ------ |
+| --- | --- | --- | --- |
 | FR-09.1 | Export plans to JSON format with schema versioning | P0 | Complete |
 | FR-09.2 | Export plans to Excel format (.xlsx) | P1 | Complete |
 | FR-09.3 | Import from JSON with format detection | P0 | Complete |
@@ -347,7 +347,7 @@ flowchart TD
 **Description:** Browser-based storage for offline functionality.
 
 | ID | Requirement | Priority | Status |
-| -- | ----------- | -------- | ------ |
+| --- | --- | --- | --- |
 | FR-10.1 | Support Local storage mode using browser localStorage | P0 | Complete |
 | FR-10.2 | Support Account storage mode using database | P0 | Complete |
 | FR-10.3 | Display clear storage mode indicator (badge) | P0 | Complete |
@@ -373,7 +373,7 @@ stateDiagram-v2
 **Description:** Main landing page with overview and quick access.
 
 | ID | Requirement | Priority | Status |
-| -- | ----------- | -------- | ------ |
+| --- | --- | --- | --- |
 | FR-11.1 | Display aggregate statistics (total, active, completed plans) | P0 | Complete |
 | FR-11.2 | Display all plans with filtering and sorting | P0 | Complete |
 | FR-11.3 | Display recent activity log | P0 | Complete |
@@ -386,7 +386,7 @@ stateDiagram-v2
 **Description:** Performance analysis and statistical insights.
 
 | ID | Requirement | Priority | Status |
-| -- | ----------- | -------- | ------ |
+| --- | --- | --- | --- |
 | FR-12.1 | Provide career analytics dashboard | P1 | Complete |
 | FR-12.2 | Generate performance comparison charts | P1 | Complete |
 | FR-12.3 | Track training efficiency metrics | P1 | Complete |
@@ -409,7 +409,7 @@ pie title Performance Budget Allocation
 ```
 
 | ID | Requirement | Target | Status |
-| -- | ----------- | ------ | ------ |
+| --- | --- | --- | --- |
 | NFR-01.1 | Page load time | < 2 seconds | Monitored |
 | NFR-01.2 | First Contentful Paint | < 1.5 seconds | Monitored |
 | NFR-01.3 | Time to Interactive | < 3 seconds | Monitored |
@@ -435,7 +435,7 @@ flowchart TD
 ```
 
 | ID | Requirement | Status |
-| -- | ----------- | ------ |
+| --- | --- | --- |
 | NFR-02.1 | CSRF protection on all form submissions | Complete |
 | NFR-02.2 | Image upload content-type sniffing validation | Complete |
 | NFR-02.3 | Image upload size limit (2MB max) | Complete |
@@ -447,7 +447,7 @@ flowchart TD
 ### 3.3 Accessibility Requirements [NFR-03]
 
 | ID | Requirement | WCAG Reference | Status |
-| -- | ----------- | -------------- | ------ |
+| --- | --- | --- | --- |
 | NFR-03.1 | Alt text for all images | 1.1.1 | Complete |
 | NFR-03.2 | Color info available via text | 1.4.1 | Complete |
 | NFR-03.3 | Skip-to-main link | 2.4.1 | Complete |
@@ -462,7 +462,7 @@ flowchart TD
 ### 3.4 Compatibility Requirements [NFR-04]
 
 | ID | Requirement | Status |
-| -- | ----------- | ------ |
+| --- | --- | --- |
 | NFR-04.1 | PHP 8.2+ support | Complete |
 | NFR-04.2 | MySQL/MariaDB/SQLite database support | Complete |
 | NFR-04.3 | Chrome (last 2 versions) | Complete |
@@ -475,7 +475,7 @@ flowchart TD
 ### 3.5 Maintainability Requirements [NFR-05]
 
 | ID | Requirement | Status |
-| -- | ----------- | ------ |
+| --- | --- | --- |
 | NFR-05.1 | PSR-12 coding standards | Complete |
 | NFR-05.2 | Test coverage > 80% (3,316+ tests, 11,563+ assertions) | In Progress |
 | NFR-05.3 | Documentation for public APIs | Complete |
@@ -486,7 +486,7 @@ flowchart TD
 ### 3.6 Responsive Design Requirements [NFR-06]
 
 | ID | Requirement | Breakpoint | Status |
-| -- | ----------- | ---------- | ------ |
+| --- | --- | --- | --- |
 | NFR-06.1 | Mobile layout | < 640px | Complete |
 | NFR-06.2 | Tablet layout | 640px - 1024px | Complete |
 | NFR-06.3 | Desktop layout | > 1024px | Complete |
@@ -496,7 +496,7 @@ flowchart TD
 ### 3.7 Observability Requirements [NFR-07]
 
 | ID | Requirement | Status |
-| -- | ----------- | ------ |
+| --- | --- | --- |
 | NFR-07.1 | APM integration for performance monitoring | Complete |
 | NFR-07.2 | Error logging with trace IDs | Complete |
 | NFR-07.3 | AI cost tracking and budgeting | Complete |
@@ -542,7 +542,7 @@ flowchart TD
 #### 4.1.1 Navigation Components
 
 | Component | Description | Status |
-| --------- | ----------- | ------ |
+| --- | --- | --- |
 | Navbar | App branding, navigation links, dark mode toggle, user menu | Complete |
 | Sidebar | Secondary navigation for desktop | Complete |
 | Breadcrumbs | Context navigation path | Complete |
@@ -551,7 +551,7 @@ flowchart TD
 #### 4.1.2 Form Components
 
 | Component | Description | Status |
-| --------- | ----------- | ------ |
+| --- | --- | --- |
 | Input | Text input with label and validation | Complete |
 | Select | Dropdown selector with search | Complete |
 | Textarea | Multi-line text input | Complete |
@@ -562,7 +562,7 @@ flowchart TD
 #### 4.1.3 Display Components
 
 | Component | Description | Status |
-| --------- | ----------- | ------ |
+| --- | --- | --- |
 | Plan Card | Plan summary with actions | Complete |
 | Stat Bar | Visual stat indicator with color | Complete |
 | Circular Progress | Game-inspired stat display | Complete |
@@ -598,7 +598,7 @@ flowchart LR
 #### 4.2.1 Core API Endpoints
 
 | Endpoint | Method | Description | Status |
-| -------- | ------ | ----------- | ------ |
+| --- | --- | --- | --- |
 | `/api/v1/plans` | GET/POST | List/Create plans | Complete |
 | `/api/v1/plans/{id}` | GET/PUT/DELETE | Plan CRUD | Complete |
 | `/api/v1/characters` | GET/POST | List/Create characters | Complete |
@@ -610,7 +610,7 @@ flowchart LR
 #### 4.2.2 AI Advisory Endpoints
 
 | Endpoint | Method | Description | Status |
-| -------- | ------ | ----------- | ------ |
+| --- | --- | --- | --- |
 | `/api/ai/training` | POST | Training advice | Complete |
 | `/api/ai/race` | POST | Race strategy | Complete |
 | `/api/ai/skills` | POST | Skill recommendations | Complete |
@@ -619,7 +619,7 @@ flowchart LR
 #### 4.2.3 Integration Endpoints
 
 | Endpoint | Method | Description | Status |
-| -------- | ------ | ----------- | ------ |
+| --- | --- | --- | --- |
 | `/api/external/sync` | POST | Sync external data | Complete |
 | `/api/ocr/process` | POST | OCR screenshot | Complete |
 | `/api/plans/import` | POST | Import plans | Complete |
@@ -682,7 +682,7 @@ erDiagram
 ### 5.2 Data Validation Rules
 
 | Field | Rule | Error Message |
-| ----- | ---- | ------------- |
+| --- | --- | --- |
 | plan.title | Required, max 255 chars | "Title is required and must be under 255 characters" |
 | plan.status | Enum: in_progress, completed, archived | "Invalid status value" |
 | plan.career_stage | Enum: junior, classic, senior | "Invalid career stage" |
@@ -695,7 +695,7 @@ erDiagram
 ### 5.3 Data Retention
 
 | Data Type | Retention | Notes |
-| --------- | --------- | ----- |
+| --- | --- | --- |
 | Local runs | Until user clears or browser storage cleared | localStorage |
 | Account runs | Until user deletes (30-day soft delete recovery) | Database |
 | Drafts | 7 days | Auto-cleanup |
@@ -707,7 +707,7 @@ erDiagram
 ### 5.4 Canonical Field Names
 
 | UI Label | Canonical Field | Table | Notes |
-| -------- | --------------- | ----- | ----- |
+| --- | --- | --- | --- |
 | SP Balance | `total_sp_available` | career_runs | Use canonical in code |
 | Stamina % | `stamina_percentage` | career_runs | |
 | Turn | `turn_number` | stat_progress | In history tables |
@@ -788,7 +788,7 @@ flowchart LR
 ### 7.1 Requirements to Specifications Mapping
 
 | Business Req | Functional Req | SPEC | PRD | Priority |
-| ------------ | -------------- | ---- | --- | -------- |
+| --- | --- | --- | --- | --- |
 | BR-1 Character Management | FR-02 | SPEC-001 | PRD-001 | P0 |
 | BR-2 Training Optimization | FR-03 | SPEC-002 | PRD-002 | P0 |
 | BR-3 Race Strategy | FR-04 | SPEC-003 | PRD-003 | P0 |
@@ -807,7 +807,7 @@ flowchart LR
 ### 8.1 Test Data Requirements
 
 | Data Set | Purpose | Volume |
-| -------- | ------- | ------ |
+| --- | --- | --- |
 | Characters | Test character CRUD | 50+ records |
 | Career Runs | Test plan operations | 100+ records |
 | Skills | Test autocomplete and catalog | 500+ records |
@@ -819,7 +819,7 @@ flowchart LR
 ### 8.2 Technology Stack Summary
 
 | Layer | Technology | Version |
-| ----- | ---------- | ------- |
+| --- | --- | --- |
 | Backend Framework | Laravel | 12+ |
 | Frontend Reactivity | Livewire | 4 |
 | Client Interactivity | Alpine.js | 3 |
@@ -855,7 +855,7 @@ flowchart LR
 ## Document Control
 
 | Version | Date | Author | Changes |
-| ------- | ---- | ------ | ------- |
+| --- | --- | --- | --- |
 | 2.4.0 | 2026-02-22 | Development Team | Updated metrics (3,316+ tests, 11,563+ assertions, 585 routes, 166 services, 52 migrations); added admin panel and MCP monitoring observability requirements; added AI/MCP test data requirements; added MCP to tech stack |
 | 2.3.0 | 2026-02-21 | Development Team | Updated tech stack versions (Livewire 4, Pest v4, PHPUnit v12, PHP 8.4.11); added Chart.js, Neuron AI, Playwright, Larastan, Pint, Laravel Boost references |
 | 2.2.0 | 2026-01-28 | Development Team | Aligned with codebase v2.2.0 |

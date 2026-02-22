@@ -258,6 +258,7 @@ flowchart LR
 - View growth rate projections
 
 ### Factor Ratings
+
 - **Rating**: ★☆☆; **Stat Bonus**: +5
 - **Rating**: ★★☆; **Stat Bonus**: +12
 - **Rating**: ★★★; **Stat Bonus**: +21
@@ -305,6 +306,7 @@ View and manage your character's current state:
 ### 4.3 Stat System
 
 ### Stat Types and Ranges
+
 - **Stat**: Speed; **Description**: Maximum running speed; **Range**: 0-1200; **Priority**: ★★★★★
 - **Stat**: Stamina; **Description**: HP and effective stamina; **Range**: 0-1200; **Priority**: ★★★★
 - **Stat**: Power; **Description**: Acceleration and lane-changing; **Range**: 0-1200; **Priority**: ★★★
@@ -312,6 +314,7 @@ View and manage your character's current state:
 - **Stat**: Wit; **Description**: Skill activation rate; **Range**: 0-1200; **Priority**: ★★
 
 ### Grade Scale
+
 - **Grade**: SS; **Value Range**: 1100+
 - **Grade**: S; **Value Range**: 950-1099
 - **Grade**: A; **Value Range**: 850-949
@@ -327,11 +330,13 @@ View and manage your character's current state:
 ### 4.4 Aptitude System
 
 ### Aptitude Categories
+
 - **Category**: Distance; **Types**: Sprint (1000-1400m), Mile (1401-1800m), Medium (1801-2400m), Long (2401m+)
 - **Category**: Surface; **Types**: Turf, Dirt
 - **Category**: Running Style; **Types**: Front Runner (Nige), Pace Chaser (Senkou), Late Surger (Sashi), End Closer (Oikomi)
 
 ### Aptitude Ratings & Effectiveness
+
 - **Rating**: S; **Effectiveness**: +5%; **Notes**: Maximum grade (provides positive bonus)
 - **Rating**: A; **Effectiveness**: 0%; **Notes**: Baseline (no bonus/penalty)
 - **Rating**: B; **Effectiveness**: -10%; **Notes**: Slight penalty
@@ -387,6 +392,7 @@ Set and track training objectives:
 - **Goal Type**: Skill Acquisition; **Description**: Obtain specific skills; **Example**: Acquire 9 skills
 
 ### Goal Status
+
 - ✅ **Completed** - Goal achieved
 - 🟡 **On Track** - Progress within expected range
 - 🔴 **At Risk** - Behind schedule, intervention needed
@@ -459,6 +465,7 @@ flowchart TD
 ```
 
 ### Prediction Components
+
 - **Component**: Base Gains; **Description**: Raw stat increases from training type
 - **Component**: Support Bonuses; **Description**: Multipliers from active support cards
 - **Component**: Failure Risk; **Description**: Chance of training failure (0-90%)
@@ -474,6 +481,7 @@ Risk levels are color-coded:
 - **Risk Level**: High; **Percentage**: >40%; **Indicator**: 🔴 Red
 
 ### Risk Factors
+
 - Low energy level
 - Bad/Awful mood
 - Active condition debuffs
@@ -631,6 +639,7 @@ Hints reduce SP cost progressively:
 - **Hint Level**: 5 Hints; **Discount**: 40% discount (maximum)
 
 ### Hint Sources
+
 - Training sessions
 - Race rewards
 - Support card events
@@ -649,6 +658,7 @@ flowchart LR
 ```
 
 ### Example Evolution
+
 - **Normal Skill**: Go with the Flow; **Rare Evolution**: Lane Legerdemain
 - **Normal Skill**: Stamina Boost; **Rare Evolution**: Endurance Master
 
@@ -746,6 +756,7 @@ flowchart TD
 ```
 
 ### Bond Milestones
+
 - **Level**: 20%; **Reward**: Small stat bonus
 - **Level**: 40%; **Reward**: Skill hint
 - **Level**: 60%; **Reward**: Special event
@@ -908,6 +919,7 @@ flowchart TD
 ```
 
 ### Supported Data
+
 - Current stats
 - Skill inventory
 - Aptitude grades
@@ -920,33 +932,39 @@ flowchart TD
 ### 12.1 Local Mode
 
 ### Features
+
 - No login required
 - Data stored in browser localStorage
 - Works completely offline
 - UUID-based identification
 
 ### Routes
+
 - View: `/plans/local/{uuid}`
 - Edit: `/plans/local/{uuid}/edit`
 
 ### Limitations
+
 - Data tied to single browser/device
 - Risk of data loss if browser cache cleared
 - Limited storage (5-10MB typical)
 
 ### 12.2 Account Mode
 
-### Features
+### Features - Account Mode
+
 - Cloud-synced data
 - Access from any device
 - Secure backup
 - Integer ID identification
 
-### Routes
+### Routes - Account Mode
+
 - View: `/plans/{id}`
 - Edit: `/plans/{id}/edit`
 
 ### Requirements
+
 - User account
 - Internet connection for sync
 
@@ -972,6 +990,7 @@ sequenceDiagram
 ```
 
 ### Steps
+
 1. Log in to your account
 2. Go to **Local Data** management
 3. Select plans to convert

@@ -39,7 +39,8 @@ pie title Data Volume by Source Application
     "uma-tracker" : 150
     "uma-run-tracker" : 100
     "uma-tracker-form" : 50
-```text
+```
+
 | Source Application | Data Volume (Est.) | Priority |
 | ------------------ | ------------------ | -------- |
 | uma_musume_race_planner | ~500 plans | High |
@@ -81,7 +82,8 @@ flowchart LR
     C -->|MySQL dump| F
     D -->|localStorage JSON| F
     E -->|CSV/JSON| F
-```text
+```
+
 ### 2.2 uma_musume_race_planner (PHP + MySQL)
 
 **Data Structures:**
@@ -204,7 +206,8 @@ gantt
     Generate migration reports   :p4b, after p4a, 1d
     Archive source data          :p4c, after p4b, 1d
     Decommission legacy systems  :p4d, after p4c, 2d
-```text
+```
+
 **ASCII Diagram:**
 
 ```text
@@ -231,7 +234,8 @@ Phase 4: Validation & Cleanup
 ├── Generate migration reports
 ├── Archive source data
 └── Decommission legacy systems
-```text
+```
+
 ### 4.2 Migration Methods
 
 ```mermaid
@@ -259,7 +263,8 @@ flowchart TD
         C2[CSV Bulk Import]
         C3[Manual Verification]
     end
-```text
+```
+
 ---
 
 ## 5. Import Adapters
@@ -300,7 +305,8 @@ classDiagram
     ImportAdapterInterface <|.. CsvImportAdapter
     ImportAdapterInterface <|.. MySqlDumpAdapter
     ImportAdapterInterface <|.. LegacyJsonAdapter
-```text
+```
+
 ### 5.2 Adapter Implementations
 
 | Adapter | Source | Format | Priority |
@@ -349,7 +355,8 @@ class FormatDetector
         return ImportFormat::JsonGeneric;
     }
 }
-```text
+```
+
 ---
 
 ## 6. Data Transformation Rules
@@ -379,7 +386,8 @@ flowchart LR
     S3 -->|Direct copy| T3
     S4 -->|Enum mapping| T4
     S5 -->|Enum mapping| T5
-```text
+```
+
 #### 6.1.1 CareerRun Transformations
 
 | Source Pattern | Target | Rule |
@@ -432,7 +440,8 @@ class MigrationValidator
         return Validator::make($plan, $rules);
     }
 }
-```text
+```
+
 ---
 
 ## 7. Conflict Resolution
@@ -454,7 +463,8 @@ flowchart TD
     B -->|Overwrite| D[Replace existing with imported]
     B -->|Import as Copy| E[Create new with modified title]
     B -->|Merge| F[Combine data - P2 feature]
-```text
+```
+
 | Option | Description |
 | ------ | ----------- |
 | Skip | Do not import, keep existing |
@@ -479,7 +489,8 @@ flowchart TD
 │ [Skip] [Overwrite] [Import as Copy]             │
 │                                                 │
 └─────────────────────────────────────────────────┘
-```text
+```
+
 ---
 
 ## 8. Migration Execution Plan
@@ -507,7 +518,8 @@ flowchart TD
     H --> I[7. Monitor for issues]
     G --> J[Investigate & fix]
     J --> C
-```text
+```
+
 ### 8.3 Post-Migration Verification
 
 | Check | Query/Action |
@@ -539,7 +551,8 @@ flowchart TD
     D --> E[Verify data integrity]
     E --> F[Notify stakeholders]
     F --> G[Root cause analysis]
-```text
+```
+
 ### 9.3 Rollback Window
 
 - Full rollback: Within 24 hours of migration
@@ -577,7 +590,8 @@ flowchart TD
 pie title Success Metrics Targets
     "Data Migration Success (>99%)" : 99
     "Downtime (<2 hours)" : 1
-```text
+```
+
 | Metric | Target |
 | ------ | ------ |
 | Data migration success rate | > 99% |

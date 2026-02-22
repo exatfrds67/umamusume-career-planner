@@ -21,7 +21,7 @@ The Uma Musume Career Planner is a web application that enables players of Uma M
 ### 1.3 Definitions and Acronyms
 
 | Term | Definition |
-|------|------------|
+| --- | --- |
 | Plan/Career Run | A career run record tracking an Uma Musume character's training progression |
 | Uma Musume | A horse girl character from the Uma Musume: Pretty Derby game |
 | SP (Skill Points) | Points earned from races and events, spent to purchase skills |
@@ -55,7 +55,7 @@ By consolidating five legacy tracking applications into one modern platform, we 
 ### 2.3 Business Objectives
 
 | Objective | Success Metric |
-|-----------|----------------|
+| --- | --- |
 | User Adoption | Active users tracking plans |
 | Data Migration | Successful import of legacy data |
 | Accessibility | WCAG AA compliance |
@@ -282,7 +282,7 @@ pie title Requirements by Priority
 ### 5.1 Data Validation Rules
 
 | Rule ID | Rule Description |
-|---------|------------------|
+| --- | --- |
 | BV-1 | Plan title is required and cannot be empty |
 | BV-2 | Stat values must be between 1 and 2000 |
 | BV-3 | Turn numbers must be between 1 and 78 |
@@ -292,7 +292,7 @@ pie title Requirements by Priority
 ### 5.2 Calculation Rules
 
 | Rule ID | Rule Description |
-|---------|------------------|
+| --- | --- |
 | BC-1 | Effective stat = raw if ≤1200, else 1200 + (raw-1200)*0.5 |
 | BC-2 | Acquired SP = sum of sp_cost where status = acquired |
 | BC-3 | Mood modifiers: Great +4%, Good +2%, Normal 0%, Bad -2%, Awful -4% |
@@ -301,7 +301,7 @@ pie title Requirements by Priority
 ### 5.3 Storage Rules
 
 | Rule ID | Rule Description |
-|---------|------------------|
+| --- | --- |
 | BS-1 | Local runs use UUID identifiers |
 | BS-2 | Account runs use database integer IDs |
 | BS-3 | Local runs are fully functional offline |

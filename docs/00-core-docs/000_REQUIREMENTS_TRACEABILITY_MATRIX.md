@@ -630,9 +630,9 @@ xychart-beta
 
 ### 9.3 Approval
 
-- **Role**: **Technical Lead**; **Name**: ; **Signature**: ; **Date**: 
-- **Role**: **QA Lead**; **Name**: ; **Signature**: ; **Date**: 
-- **Role**: **Project Manager**; **Name**: ; **Signature**: ; **Date**: 
+- **Role**: **Technical Lead**; **Name**: ; **Signature**: ; **Date**:
+- **Role**: **QA Lead**; **Name**: ; **Signature**: ; **Date**:
+- **Role**: **Project Manager**; **Name**: ; **Signature**: ; **Date**:
 
 ### 9.4 Distribution
 

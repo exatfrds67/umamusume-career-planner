@@ -23,7 +23,7 @@
 ### 1.1 Migration Overview
 
 | Field | Value |
-|-------|-------|
+| --- | --- |
 | **Migration Date** | [YYYY-MM-DD] |
 | **Source System(s)** | [List Sources, e.g., uma-run-tracker, legacy-mysql] |
 | **Target System** | Uma Musume Career Planner (Account Mode DB) |
@@ -77,7 +77,7 @@ pie title Migration Status
 ### 2.1 Summary Metrics
 
 | Metric | Count | Notes |
-|--------|-------|-------|
+| --- | --- | --- |
 | **Total Source Records** | 0 | Plans identified for import |
 | **Successfully Migrated** | 0 | Created in new DB |
 | **Duplicates Skipped** | 0 | Based on Title/Char/Date match |
@@ -109,7 +109,7 @@ gantt
 ### 2.3 Records by Source
 
 | Source System | Records | Migrated | Skipped | Failed |
-|---------------|---------|----------|---------|--------|
+| --- | --- | --- | --- | --- |
 | [Source 1] | 0 | 0 | 0 | 0 |
 | [Source 2] | 0 | 0 | 0 | 0 |
 | **Total** | **0** | **0** | **0** | **0** |
@@ -148,14 +148,14 @@ flowchart TD
 ### 3.2 Critical Failures (Records Not Migrated)
 
 | Source ID | Title | Error Message | Remediation Action |
-|-----------|-------|---------------|--------------------|
+| --- | --- | --- | --- |
 | [ID] | [Title] | [Error] | [Manual Fix / Ignore] |
 | ... | ... | ... | ... |
 
 ### 3.3 Data Warnings (Records Migrated with Modifications)
 
 | Source ID | Title | Field | Original | Modified | Reason |
-|-----------|-------|-------|----------|----------|--------|
+| --- | --- | --- | --- | --- | --- |
 | [ID] | Run A | Status | "Ongoing" | "in_progress" | Enum Mapping |
 | [ID] | Run B | Turn | 0 | 1 | Min Value constraint |
 
@@ -208,7 +208,7 @@ flowchart TD
 ### 4.2 Checklist
 
 | # | Check | Status | Notes |
-|---|-------|--------|-------|
+| --- | --- | --- | --- |
 | 1 | **Record Count:** Source count minus Skipped equals Target count | ⬜ | |
 | 2 | **Data Integrity:** Checked 5 random records; Stats and Skills match source | ⬜ | |
 | 3 | **Relationships:** Skills are correctly linked to Plans | ⬜ | |
@@ -220,7 +220,7 @@ flowchart TD
 ### 4.3 Sample Record Verification
 
 | Source ID | Target ID | Title | Stats Match | Skills Match | Verified |
-|-----------|-----------|-------|-------------|--------------|----------|
+| --- | --- | --- | --- | --- | --- |
 | [SRC_1] | [TGT_1] | [Title] | ⬜ | ⬜ | ⬜ |
 | [SRC_2] | [TGT_2] | [Title] | ⬜ | ⬜ | ⬜ |
 | [SRC_3] | [TGT_3] | [Title] | ⬜ | ⬜ | ⬜ |
@@ -247,7 +247,7 @@ flowchart LR
 ### 5.2 Signatures
 
 | Role | Name | Signature | Date |
-|------|------|-----------|------|
+| --- | --- | --- | --- |
 | **Migration Engineer** | | | |
 | **QA Lead** | | | |
 | **Project Manager** | | | |
@@ -257,6 +257,6 @@ flowchart LR
 ## Document History
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
+| --- | --- | --- | --- |
 | 1.0 | 2026-01-03 | Development Team | Initial template |
 | 2.0 | 2026-01-03 | Development Team | Added Mermaid diagrams |

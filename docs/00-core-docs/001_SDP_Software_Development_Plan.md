@@ -240,13 +240,13 @@ The project follows an **iterative delivery model** with short milestones:
 
 ### 6.2 Phase 2: Core Gameplay (Complete)
 
-### Objectives
+### Objectives - Phase 2
 
 - Implement character and career run management
 - Build training session and prediction systems
 - Create race, skill, and support card modules
 
-### Deliverables
+### Deliverables - Phase 2
 
 - **Deliverable**: Training sessions and predictions; **Status**: ✅ Complete; **Related Spec**: SPEC-002
 - **Deliverable**: Race strategy system; **Status**: ✅ Complete; **Related Spec**: SPEC-003
@@ -256,13 +256,13 @@ The project follows an **iterative delivery model** with short milestones:
 
 ### 6.3 Phase 3: AI and Integration (Complete)
 
-### Objectives
+### Objectives - Phase 3
 
 - Implement AI advisory system with hybrid architecture
 - Integrate external data sources
 - Build MCP dashboards for AI management
 
-### Deliverables
+### Deliverables - Phase 3
 
 - **Deliverable**: Hybrid AI services (Ollama + Bedrock); **Status**: ✅ Complete; **Related Spec**: SPEC-006
 - **Deliverable**: MCP integration and dashboards; **Status**: ✅ Complete; **Related Spec**: FLOW-006
@@ -271,13 +271,13 @@ The project follows an **iterative delivery model** with short milestones:
 
 ### 6.4 Phase 4: Data Management (Complete)
 
-### Objectives
+### Objectives - Phase 4
 
 - Build comprehensive import/export workflows
 - Implement backup and restore functionality
 - Create OCR processing pipeline
 
-### Deliverables
+### Deliverables - Phase 4
 
 - **Deliverable**: Export to JSON/CSV/Excel; **Status**: ✅ Complete; **Related Doc**: D06
 - **Deliverable**: Data migration workflows; **Status**: ✅ Complete; **Related Doc**: D05
@@ -286,13 +286,13 @@ The project follows an **iterative delivery model** with short milestones:
 
 ### 6.5 Phase 5: Performance and Reliability (In Progress)
 
-### Objectives
+### Objectives - Phase 5
 
 - Implement APM and performance monitoring
 - Optimize caching strategies
 - Build fallback and degradation workflows
 
-### Deliverables
+### Deliverables - Phase 5
 
 - **Deliverable**: Cache monitoring and invalidation; **Status**: 🔄 In Progress; **Target**: Week 19
 - **Deliverable**: Fallback and degradation workflows; **Status**: 🔄 In Progress; **Target**: Week 20
@@ -306,13 +306,13 @@ The project follows an **iterative delivery model** with short milestones:
 
 ### 6.6 Phase 6: UX and Accessibility (In Progress)
 
-### Objectives
+### Objectives - Phase 6
 
 - Complete PWA offline functionality
 - Achieve WCAG AA compliance
 - Polish UI and user experience
 
-### Deliverables
+### Deliverables - Phase 6
 
 - **Deliverable**: Accessibility pages and keyboard shortcuts; **Status**: 🔄 In Progress; **Target**: Week 23
 - **Deliverable**: UI polish and refinement; **Status**: ⏳ Pending; **Target**: Week 24

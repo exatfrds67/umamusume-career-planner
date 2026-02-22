@@ -51,7 +51,7 @@ mindmap
 ### 1.2 Key Features
 
 | Feature | Description |
-|---------|-------------|
+| --- | --- |
 | **Dual Storage Modes** | Choose between Local (browser) or Account (cloud) storage |
 | **Skill Management** | Search, track, and manage skills with SP calculations |
 | **Turn Tracking** | Log stats turn-by-turn with visual progress charts |
@@ -88,7 +88,7 @@ flowchart TB
 #### Local Mode (No Login Required)
 
 | Aspect | Details |
-|--------|---------|
+| --- | --- |
 | **Pros** | Instant start, no account needed, works offline |
 | **Cons** | Data stays on this browser/device only. If you clear browser cache, data is lost |
 | **Best for** | Quick tests, anonymous usage |
@@ -97,7 +97,7 @@ flowchart TB
 #### Account Mode (Login Required)
 
 | Aspect | Details |
-|--------|---------|
+| --- | --- |
 | **Pros** | Data syncs across devices, secure cloud backup, never lost |
 | **Cons** | Requires internet connection |
 | **Best for** | Long-term tracking, accessing data on phone and PC |
@@ -124,7 +124,7 @@ flowchart TD
 The **Dashboard** is your home base:
 
 | Section | Description |
-|---------|-------------|
+| --- | --- |
 | **Stats Panel** | Shows how many active and completed plans you have |
 | **Recent Activity** | Shows your latest edits |
 | **Plan List** | Your training logs with filtering options |
@@ -178,7 +178,7 @@ flowchart LR
 ```
 
 | Tab | Purpose |
-|-----|---------|
+| --- | --- |
 | **General** | Update status (Junior/Classic/Senior), Mood, and Energy |
 | **Attributes** | Enter your current Speed, Stamina, Power, Guts, and Wit. The circle fills up to 1200 (max) |
 | **Skills** | Search and add skills. Mark them as "Acquired" when you buy them in-game |
@@ -205,7 +205,7 @@ flowchart TD
 **How to manage skills:**
 
 | Action | Steps |
-|--------|-------|
+| --- | --- |
 | **Add Skill** | Type the skill name (English or Japanese). Select from the list |
 | **Set Status** | Choose Suggested, Acquired, or Skipped |
 | **Track Acquisition** | When marking as "Acquired", enter the turn number |
@@ -213,7 +213,7 @@ flowchart TD
 **Skill Status Types:**
 
 | Status | Meaning |
-|--------|---------|
+| --- | --- |
 | 💭 **Suggested** | You plan to get this skill |
 | ✅ **Acquired** | You bought it (enter the turn number!) |
 | ❌ **Skipped** | You decided against it |
@@ -320,7 +320,7 @@ flowchart TD
 ### 5.2 Issue Solutions
 
 | Issue | Cause | Solution |
-|-------|-------|----------|
+| --- | --- | --- |
 | **"Connection Lost"** | Internet dropped while editing Account plan | App enters Offline Mode. Changes saved as "Draft" on device. When internet returns, you'll be asked to save the draft |
 | **Missing Local Data** | Different browser or cleared cache | Ensure you're using the same browser. Incognito mode deletes data when closed |
 | **Skill Not Found** | Name mismatch | Try typing part of the Japanese name if the English name isn't working |
@@ -365,7 +365,7 @@ flowchart LR
 ```
 
 | Resource | Description |
-|----------|-------------|
+| --- | --- |
 | **Documentation** | Full system documentation in the `/docs` folder |
 | **FAQ** | Frequently asked questions on the Help page |
 | **GitHub** | Report bugs or request features |
@@ -387,7 +387,7 @@ When reporting a bug, please include:
 ### Keyboard Shortcuts
 
 | Shortcut | Action |
-|----------|--------|
+| --- | --- |
 | `Ctrl + S` | Save current plan |
 | `Ctrl + N` | Create new plan |
 | `Esc` | Close modal/dialog |
@@ -395,7 +395,7 @@ When reporting a bug, please include:
 ### Status Icons
 
 | Icon | Meaning |
-|------|---------|
+| --- | --- |
 | 🟠 | Local Mode |
 | 🟣 | Account Mode |
 | 🟢 | In Progress |
@@ -408,6 +408,6 @@ When reporting a bug, please include:
 ## Document History
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
+| --- | --- | --- | --- |
 | 1.0 | 2026-01-03 | Development Team | Initial draft |
 | 2.0 | 2026-01-03 | Development Team | Added Mermaid diagrams, expanded content |

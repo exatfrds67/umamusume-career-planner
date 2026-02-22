@@ -63,7 +63,8 @@ flowchart TB
     style Application fill:#f3e5f5
     style Domain fill:#e8f5e9
     style Infrastructure fill:#fff3e0
-```text
+```
+
 ---
 
 ## 2. Directory Structure
@@ -124,7 +125,8 @@ flowchart TD
 └── tests/
     ├── Feature/        # Feature Tests
     └── Unit/           # Unit Tests
-```text
+```
+
 ---
 
 ## 3. Key Namespaces & Classes
@@ -174,9 +176,10 @@ classDiagram
         F
         G
     }
-```text
+```
+
 | Enum | Values | Usage |
-|------|--------|-------|
+| --- | --- | --- |
 | `StorageMode` | Local, Account | Determines data storage location |
 | `RunStatus` | InProgress, Completed, Archived | Plan lifecycle status |
 | `CareerStage` | Junior, Classic, Senior | Training phase |
@@ -218,11 +221,12 @@ classDiagram
     CareerRunService --> SkillService : uses
     ImportService --> LocalRunStorageService : uses
     ImportService --> CareerRunService : uses
-```text
+```
+
 #### Service Descriptions
 
 | Service | Responsibility |
-|---------|----------------|
+| --- | --- |
 | `CareerRunService` | Handles creation, updates, and soft-deletes of plans. Calculates aggregates. |
 | `SkillService` | Manages skill catalog and search functionality. |
 | `LocalRunStorageService` | Handles logic for LocalStorage data structures (Schema validation, UUID generation). Used for Import/Convert logic. |
@@ -255,9 +259,10 @@ flowchart TD
     PlanEditor --> StatsDisplay
     PlanEditor --> StatsChart
     PlanList --> QuickCreate
-```text
+```
+
 | Component | Namespace | Description |
-|-----------|-----------|-------------|
+| --- | --- | --- |
 | `PlanList` | `App\Livewire\CareerRun` | Filterable list of plans with pagination |
 | `PlanForm` | `App\Livewire\CareerRun` | Shared form logic for create/edit |
 | `PlanEditor` | `App\Livewire\CareerRun` | Main monolithic editor managing tabs |
@@ -318,7 +323,8 @@ classDiagram
     CareerRun "1" --> "*" StatProgress
     CareerRun "*" --> "*" Skill
     UmaMusume "1" --> "*" CareerRun
-```text
+```
+
 ---
 
 ## 4. Frontend Code Structure
@@ -353,7 +359,8 @@ flowchart TD
     Init --> Stores
     Init --> Components
     Init --> Events
-```text
+```
+
 ### 4.2 `resources/js/app.js`
 
 Entry point for JavaScript.
@@ -372,7 +379,8 @@ window.addEventListener('toast', (e) => { /* ... */ });
 window.addEventListener('connection-lost', () => { /* ... */ });
 
 Alpine.start();
-```text
+```
+
 ### 4.3 `resources/css/app.css`
 
 ```mermaid
@@ -389,9 +397,10 @@ flowchart LR
     end
     
     Tailwind --> Custom
-```text
+```
+
 | Custom Class | Purpose |
-|--------------|---------|
+| --- | --- |
 | `.text-stat-speed` | Speed stat color (blue) |
 | `.text-stat-stamina` | Stamina stat color (orange) |
 | `.text-stat-power` | Power stat color (red) |
@@ -417,9 +426,10 @@ flowchart TD
     Check -->|"No"| Return1["Return raw value"]
     Check -->|"Yes"| Calculate["1200 + floor((raw - 1200) / 2)"]
     Calculate --> Return2["Return calculated value"]
-```text
+```
+
 | Property | Value |
-|----------|-------|
+| --- | --- |
 | **Description** | Validates stat value is within 0-1200 range (hard max) |
 | **Signature** | `public function validateStat(int $rawValue): bool` |
 | **Logic** | `return $raw >= 0 && $raw <= 1200;` |
@@ -438,9 +448,10 @@ flowchart TD
     JSON --> Schema{"Has schema_version?"}
     Schema -->|"Yes"| Standard["Return Standard JSON"]
     Schema -->|"No"| Legacy["Return Legacy JSON"]
-```text
+```
+
 | Property | Value |
-|----------|-------|
+| --- | --- |
 | **Description** | Analyzes an uploaded file to determine if it is a JSON export, CSV, or legacy format |
 | **Signature** | `public function detectFormat(UploadedFile $file): ImportFormat` |
 | **Returns** | `ImportFormat` enum (StandardJson, LegacyJson, Csv, Unknown) |
@@ -461,9 +472,10 @@ flowchart LR
         Import["/api/plans/import"]
         Export["/api/plans/export"]
     end
-```text
+```
+
 | Route | Method | Controller/Component | Description |
-|-------|--------|---------------------|-------------|
+| --- | --- | --- | --- |
 | `/` | GET | `HomeController` | Dashboard |
 | `/plans` | GET | `PlanList` (Livewire) | Plan listing |
 | `/plans/{id}` | GET | `PlanEditor` (Livewire) | Edit account plan |
@@ -494,7 +506,8 @@ mindmap
     Testing
       Pest PHP
       Vitest
-```text
+```
+
 ### 6.2 Naming Conventions
 
 ```mermaid
@@ -515,9 +528,10 @@ flowchart LR
         Tables["Tables: snake_case plural<br/>career_runs"]
         Columns["Columns: snake_case<br/>turn_number"]
     end
-```text
+```
+
 | Context | Convention | Example |
-|---------|------------|---------|
+| --- | --- | --- |
 | PHP Classes | PascalCase | `CareerRun`, `SkillService` |
 | PHP Methods/Variables | camelCase | `calculateStats`, `$currentTurn` |
 | JavaScript Functions | camelCase | `handleSubmit`, `fetchData` |
@@ -529,7 +543,7 @@ flowchart LR
 ### 6.3 File Organization
 
 | File Type | Location | Naming |
-|-----------|----------|--------|
+| --- | --- | --- |
 | Livewire Components | `app/Livewire/` | PascalCase (e.g., `PlanEditor.php`) |
 | Services | `app/Services/` | PascalCase + Service (e.g., `CareerRunService.php`) |
 | Models | `app/Models/` | PascalCase singular (e.g., `CareerRun.php`) |
@@ -545,9 +559,10 @@ pie title Test Distribution
     "Feature Tests" : 35
     "Browser Tests" : 15
     "E2E Tests" : 10
-```text
+```
+
 | Test Type | Framework | Location | Purpose |
-|-----------|-----------|----------|---------|
+| --- | --- | --- | --- |
 | Unit | Pest PHP | `tests/Unit/` | Service methods, helpers |
 | Feature | Pest PHP | `tests/Feature/` | HTTP endpoints, Livewire |
 | Browser | Laravel Dusk | `tests/Browser/` | UI interactions |
@@ -558,6 +573,6 @@ pie title Test Distribution
 ## Document History
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
+| --- | --- | --- | --- |
 | 1.0 | 2026-01-03 | Development Team | Initial draft |
 | 2.0 | 2026-01-03 | Development Team | Added Mermaid diagrams, expanded documentation |

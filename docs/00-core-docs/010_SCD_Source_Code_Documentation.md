@@ -1057,7 +1057,7 @@ flowchart LR
 ### 7.2 API Endpoints
 
 | Route | Method | Controller | Description |
-|-------|--------|------------|-------------|
+| --- | --- | --- | --- |
 | `/api/characters` | GET | CharacterController | List characters |
 | `/api/characters` | POST | CharacterController | Create character |
 | `/api/characters/{id}` | GET | CharacterController | Get character |
@@ -1083,19 +1083,19 @@ flowchart LR
 
 ### 7.3 Service Method Reference
 
-#### CharacterService
+#### CharacterService - Method Reference
 
 | Method | Parameters | Returns | Description |
-|--------|------------|---------|-------------|
+| --- | --- | --- | --- |
 | `create` | `array $data` | `Character` | Create new character |
 | `update` | `Character $char, array $data` | `Character` | Update character |
 | `updateStats` | `Character $char, array $stats` | `Character` | Update stats |
 | `delete` | `Character $char` | `bool` | Soft delete |
 
-#### TrainingPredictionService
+#### TrainingPredictionService - Method Reference
 
 | Method | Parameters | Returns | Description |
-|--------|------------|---------|-------------|
+| --- | --- | --- | --- |
 | `getPredictions` | `Character $char` | `array` | Get all predictions |
 | `getRecommendation` | `Character $char` | `Prediction` | Get best option |
 | `calculateRisk` | `Character $char` | `float` | Calculate failure risk |
@@ -1131,7 +1131,7 @@ mindmap
 ### 8.2 Naming Conventions
 
 | Context | Convention | Example |
-|---------|------------|---------|
+| --- | --- | --- |
 | PHP Classes | PascalCase | `CharacterService`, `TrainingAdvisorAgent` |
 | PHP Methods | camelCase | `getPredictions`, `calculateBonus` |
 | PHP Constants | UPPER_SNAKE | `MAX_STAT_VALUE`, `API_TIMEOUT` |
@@ -1144,7 +1144,7 @@ mindmap
 ### 8.3 File Organization
 
 | File Type | Location | Naming Pattern |
-|-----------|----------|----------------|
+| --- | --- | --- |
 | Models | `app/Models/` | `{Entity}.php` |
 | Services | `app/Services/` | `{Domain}Service.php` |
 | Controllers | `app/Http/Controllers/` | `{Entity}Controller.php` |
@@ -1247,7 +1247,7 @@ test('ranks predictions by recommendation score', function () {
 ## Document Control
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
+| --- | --- | --- | --- |
 | 2.3.0 | 2026-02-21 | Development Team | Updated enums to match 8 actual enums, updated Neuron agent tree, corrected Livewire structure, added Neuron services, updated testing framework to Pest v4/PHPUnit v12, version alignment to v2.3.0 |
 | 2.1.0 | 2026-01-23 | Development Team | Updated to reflect current codebase structure including AI, MCP, and Neuron integration |
 | 2.0.0 | 2026-01-14 | Development Team | Added service layer and Livewire documentation |

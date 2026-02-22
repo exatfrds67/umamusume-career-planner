@@ -57,7 +57,8 @@ mindmap
       Vite
       NPM
       Composer
-```text
+```
+
 ---
 
 ## 2. System Components & Boundaries
@@ -65,7 +66,7 @@ mindmap
 ### 2.1 Component Architecture
 
 | Component | Type | Responsibility | Integration Point |
-|-----------|------|----------------|-------------------|
+| --- | --- | --- | --- |
 | **Laravel Framework** | Backend | Routing, Auth, DB Access | `web.php`, Service Classes |
 | **Service Layer** | Business Logic | Calculations, Data Persistence | Controllers, Livewire Components |
 | **Livewire** | Full-Stack | Server-driven UI updates | Blade Templates, Alpine `x-data` |
@@ -101,7 +102,8 @@ flowchart TB
     
     style Browser fill:#e1f5fe
     style Server fill:#f3e5f5
-```text
+```
+
 **ASCII Diagram:**
 
 ```text
@@ -129,7 +131,8 @@ flowchart TB
 │  └─────────────┘    └─────────────┘    └─────────────┘         │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
-```text
+```
+
 ### 2.3 Critical Integration Interfaces
 
 ```mermaid
@@ -145,7 +148,8 @@ flowchart LR
     IEA --> |"File Format Translation"| Models
     
     style Interfaces fill:#fff3e0
-```text
+```
+
 1. **Wire Protocol:** The communication channel between the browser and Laravel/Livewire
 2. **LocalRunStorage Interface:** The contract allowing the frontend to read/write complex object graphs to browser storage
 3. **Import/Export Adapters:** The translation layer between external file formats (JSON/CSV) and internal models
@@ -173,7 +177,8 @@ flowchart TB
     style P3 fill:#f8bbd9
     style P4 fill:#ffe0b2
     style P5 fill:#e1bee7
-```text
+```
+
 **ASCII Diagram:**
 
 ```text
@@ -193,7 +198,8 @@ Week 5-6: Cross-cutting Concerns (Auth, Storage Modes)
     │
     ▼
 Week 6-7: E2E Testing + Polish
-```text
+```
+
 ### 3.2 Phase Details
 
 #### Phase 1: Data & Service Integration (Week 1-2)
@@ -250,7 +256,8 @@ gantt
     section Phase 5
     E2E Testing                :p5a, after p4b, 5d
     Polish & Documentation     :p5b, after p5a, 5d
-```text
+```
+
 ---
 
 ## 4. Integration Points
@@ -281,9 +288,10 @@ sequenceDiagram
     SVC-->>LW: Success response
     
     Note over LW,DB: Model Persistence Flow
-```text
+```
+
 | Integration Point | Direction | Description |
-|------------------|-----------|-------------|
+| --- | --- | --- |
 | Model Loading | DB → Livewire | Load plans, characters, skills |
 | Model Persistence | Livewire → DB | Save plan changes |
 | Relationship Hydration | DB → Livewire | Load related data |
@@ -310,7 +318,8 @@ class PlanEdit extends Component
         $this->dispatch('plan-saved');
     }
 }
-```text
+```
+
 ### 4.2 Livewire ↔ Alpine.js
 
 ```mermaid
@@ -329,9 +338,10 @@ sequenceDiagram
     Alpine->>User: UI Update
     
     Note over Alpine,LW: State flows both directions
-```text
+```
+
 | Integration Point | Direction | Description |
-|------------------|-----------|-------------|
+| --- | --- | --- |
 | State Sharing | Livewire → Alpine | Pass data via entangle/wire |
 | Event Dispatch | Alpine → Livewire | Trigger server actions |
 | DOM Updates | Livewire → Alpine | Morphdom reconciliation |
@@ -362,7 +372,8 @@ sequenceDiagram
         </form>
     </div>
 </div>
-```text
+```
+
 ### 4.3 Livewire ↔ localStorage
 
 ```mermaid
@@ -390,9 +401,10 @@ flowchart LR
     
     Drafts -->|"Recovery"| LWDraft
     LocalRuns -->|"Load"| Store
-```text
+```
+
 | Integration Point | Direction | Description |
-|------------------|-----------|-------------|
+| --- | --- | --- |
 | Draft Auto-save | Livewire → Storage | Save form state periodically |
 | Draft Recovery | Storage → Livewire | Restore on page load |
 | Local Runs | Both | Full CRUD for local storage mode |
@@ -425,11 +437,12 @@ document.addEventListener('alpine:init', () => {
         },
     });
 });
-```text
+```
+
 ### 4.4 Alpine.js ↔ localStorage
 
 | Integration Point | Direction | Description |
-|------------------|-----------|-------------|
+| --- | --- | --- |
 | Dark Mode | Both | Read/write preference |
 | Draft State | Both | Temporary form data |
 | Local Runs | Both | Full plan data |
@@ -460,7 +473,8 @@ sequenceDiagram
     LW->>LW: $this->redirect()
     LW->>Alpine: dispatch('toast')
     Alpine->>User: Show success toast
-```text
+```
+
 **ASCII Diagram:**
 
 ```text
@@ -507,7 +521,8 @@ User clicks "Create Plan"
 │ Alpine: toast       │
 │ dispatch('toast')   │
 └─────────────────────┘
-```text
+```
+
 ### 5.2 Plan Creation Flow (Local Mode)
 
 ```mermaid
@@ -528,7 +543,8 @@ sequenceDiagram
     Store-->>Alpine: Success
     Alpine->>Alpine: window.location = /plans/local/{uuid}
     Alpine->>User: Navigate to plan
-```text
+```
+
 **ASCII Diagram:**
 
 ```text
@@ -569,7 +585,8 @@ User clicks "Create Plan"
 │ Alpine: Navigate    │
 │ window.location     │
 └─────────────────────┘
-```text
+```
+
 ### 5.3 Storage Mode Comparison
 
 ```mermaid
@@ -590,7 +607,8 @@ flowchart TB
     
     style Account fill:#e8f5e9
     style Local fill:#fff3e0
-```text
+```
+
 ---
 
 ## 6. Integration Test Environment
@@ -598,7 +616,7 @@ flowchart TB
 ### 6.1 Environment Setup
 
 | Environment | Database | Cache | Queue | Purpose |
-|-------------|----------|-------|-------|---------|
+| --- | --- | --- | --- | --- |
 | **Local Dev** | SQLite/MySQL | Array | Sync | Developer integration testing |
 | **CI (GitHub)** | MySQL 8.0 | Redis | Redis | Automated regression testing |
 | **Staging** | MySQL 8.0 | Redis | Redis | UAT and E2E testing |
@@ -631,7 +649,8 @@ flowchart TB
     style Dev fill:#e3f2fd
     style CI fill:#f3e5f5
     style Staging fill:#e8f5e9
-```text
+```
+
 ### 6.3 Test Data Strategy
 
 - **Seeding:** Use Laravel Seeders to populate `uma_musumes` and `skills` reference tables
@@ -643,7 +662,8 @@ pie title Test Data Distribution
     "Reference Data (Seeds)" : 30
     "Synthetic Data (Factories)" : 50
     "Golden Files (Legacy)" : 20
-```text
+```
+
 ---
 
 ## 7. Specific Integration Scenarios
@@ -668,7 +688,8 @@ flowchart TD
     
     style Account fill:#e8f5e9
     style Local fill:#fff3e0
-```text
+```
+
 **Integration Logic:**
 
 - The `PlanEditor` component accepts an ID
@@ -700,7 +721,8 @@ sequenceDiagram
     LW-->>Alpine: Update entangled state
     
     Note over Alpine,LW: Server only contacted on data changes
-```text
+```
+
 **Integration Logic:**
 
 - Use `x-data="{ activeTab: @entangle('tab') }"` for tab state
@@ -732,7 +754,8 @@ sequenceDiagram
     LW->>User: Show recovered data
     
     Note over User,LW: Data preserved!
-```text
+```
+
 **Integration Logic:**
 
 - Alpine.js watcher observes form data
@@ -759,7 +782,8 @@ sequenceDiagram
     SVC-->>LW: Skill collection
     LW-->>Alpine: Update suggestions
     Alpine->>User: Show dropdown
-```text
+```
+
 ---
 
 ## 8. Integration Management
@@ -793,7 +817,8 @@ flowchart LR
     NPM --> Vite
     
     Git --> GitHub --> CI
-```text
+```
+
 - **Composer:** Manage PHP dependencies (Laravel, Livewire)
 - **NPM:** Manage JS dependencies (Alpine, Tailwind)
 - **Version Control:** Git feature branches merged to `main` only after passing CI integration tests
@@ -819,9 +844,10 @@ flowchart TD
     style Sev1 fill:#ffcdd2
     style Sev2 fill:#ffe0b2
     style Sev3 fill:#fff9c4
-```text
+```
+
 | Severity | Description | Response Time |
-|----------|-------------|---------------|
+| --- | --- | --- |
 | **Severity 1** | Data corruption or loss (Local/Account mismatch) | Immediate |
 | **Severity 2** | UI State desync (Alpine shows X, Server has Y) | Within 24 hours |
 | **Severity 3** | Visual glitches | Next sprint |
@@ -844,7 +870,8 @@ flowchart LR
     Review -->|"Approved"| Main
     Review -->|"Changes"| Dev
     Main --> Deploy
-```text
+```
+
 ---
 
 ## 9. Sign-off Criteria
@@ -868,11 +895,12 @@ flowchart TD
     Complete["🎉 Integration Complete"]
     
     style Complete fill:#c8e6c9
-```text
+```
+
 ### 9.1 Acceptance Checklist
 
 | # | Criterion | Status |
-|---|-----------|--------|
+| --- | --- | --- |
 | 1 | All P0 User Flows (Create, Edit, Save) pass E2E tests in both Storage Modes | ⬜ Pending |
 | 2 | Import/Export works seamlessly between JSON format and Database | ⬜ Pending |
 | 3 | Connection loss does not result in data loss (Draft system verified) | ⬜ Pending |
@@ -885,6 +913,6 @@ flowchart TD
 ## Document History
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
+| --- | --- | --- | --- |
 | 1.0 | 2026-01-03 | Development Team | Initial draft |
 | 2.0 | 2026-01-03 | Development Team | Added Mermaid diagrams, standardized formatting |

@@ -35,7 +35,7 @@ This Data Migration Plan defines the strategy for migrating data from legacy sou
 ### 2.1 Supported Source Formats
 
 | Source Type | Format | Detection Method | Priority |
-|-------------|--------|------------------|----------|
+| --- | --- | --- | --- |
 | Legacy JSON exports (v1) | JSON | `detectLegacyFormat()` | High |
 | Google Sheets exports | CSV | File extension + header detection | Medium |
 | Excel exports | XLSX | MIME type detection | Medium |
@@ -68,7 +68,7 @@ Legacy Applications
 ### 3.1 Target Tables
 
 | Target Table | Description | Key Constraints |
-|--------------|-------------|-----------------|
+| --- | --- | --- |
 | `ucp_characters` | Character records with stats and scenarios | Stat values 0-1200 |
 | `ucp_careers` | Career run tracking | Valid scenario types |
 | `ucp_training_sessions` | Training session history | Foreign key to careers |
@@ -194,7 +194,7 @@ app/Services/
 ### 5.1 Field Mapping (Legacy to Canonical)
 
 | Legacy Field | Canonical Field | Transformation |
-|--------------|-----------------|----------------|
+| --- | --- | --- |
 | `spd`, `speed` | `speed` | Direct mapping |
 | `sta`, `stam` | `stamina` | Direct mapping |
 | `pow`, `power` | `power` | Direct mapping |
@@ -208,7 +208,7 @@ app/Services/
 ### 5.2 Enum Normalization
 
 | Field | Valid Values | Default |
-|-------|--------------|---------|
+| --- | --- | --- |
 | `scenario_type` | `ura_finale`, `unity_cup` | `ura_finale` |
 | `career_stage` | `junior`, `classic`, `senior` | `junior` |
 | `mood` | `very_bad`, `bad`, `normal`, `good`, `very_good` | `normal` |
@@ -218,7 +218,7 @@ app/Services/
 ### 5.3 Value Constraints
 
 | Field | Constraint | Handling |
-|-------|------------|----------|
+| --- | --- | --- |
 | Stat values | 0-1200 | Clamp to valid range |
 | Turn number | 1-78 | Validate against career stage |
 | SP cost | > 0 | Reject invalid values |
@@ -239,7 +239,7 @@ Duplicates are detected by:
 ### 6.2 Resolution Strategies
 
 | Strategy | Behavior | Use Case |
-|----------|----------|----------|
+| --- | --- | --- |
 | `skip` | Keep existing, ignore imported | Preserve user modifications |
 | `overwrite` | Replace existing with imported | Fresh data sync |
 | `merge` | Combine data, prefer newer values | Incremental updates |
@@ -308,7 +308,7 @@ Input Data
 ### 7.2 Validation Rules
 
 | Field | Rule | Error Message |
-|-------|------|---------------|
+| --- | --- | --- |
 | `character_name` | Required | "Character name is required" |
 | `scenario_type` | Valid enum | "Invalid scenario type" |
 | `speed`, `stamina`, etc. | 0-1200 | "Stat must be between 0 and 1200" |
@@ -322,7 +322,7 @@ Input Data
 ### 8.1 Rollback Mechanisms
 
 | Mechanism | Description | Scope |
-|-----------|-------------|-------|
+| --- | --- | --- |
 | Batch tracking | Each import batch assigned unique ID | Per-import |
 | Transaction wrapping | Database transactions for atomicity | Per-batch |
 | Soft deletes | Mark records for deletion, not hard delete | Per-record |
@@ -371,7 +371,7 @@ Rollback Triggered
 ### 8.3 Rollback Windows
 
 | Window | Duration | Capability |
-|--------|----------|------------|
+| --- | --- | --- |
 | Immediate | During migration | Full rollback via transaction |
 | Short-term | Within 24 hours | Batch-based rollback |
 | Long-term | Within 7 days | Backup restoration |
@@ -383,7 +383,7 @@ Rollback Triggered
 ### 9.1 Performance Settings
 
 | Setting | Default Value | Description |
-|---------|---------------|-------------|
+| --- | --- | --- |
 | Batch size | 50 records | Records processed per batch |
 | Transaction timeout | 300 seconds | Maximum transaction duration |
 | Memory limit | 256MB | PHP memory limit during import |
@@ -392,7 +392,7 @@ Rollback Triggered
 ### 9.2 Monitoring and Logging
 
 | Event | Log Level | Details Captured |
-|-------|-----------|------------------|
+| --- | --- | --- |
 | Migration started | INFO | Source, target, record count |
 | Batch completed | DEBUG | Batch ID, success count, duration |
 | Validation error | WARNING | Record ID, field, error message |
@@ -414,8 +414,10 @@ For OCR-based data intake:
 ## Document Control
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|| 2.4.0 | 2026-02-22 | Development Team | Updated table counts (20 target tables), schema v2.4, 51 migrations, 30 models, added DataOperationHistoryService/BackupService/SnapshotService |
-| 2.3.0 | 2026-02-21 | Development Team | Version alignment, date update, codebase v2.3.0 sync || 2.0.0 | 2026-01-23 | Development Team | Complete rewrite aligned with current implementation |
+| --- | --- | --- | --- |
+| 2.4.0 | 2026-02-22 | Development Team | Updated table counts (20 target tables), schema v2.4, 51 migrations, 30 models, added DataOperationHistoryService/BackupService/SnapshotService |
+| 2.3.0 | 2026-02-21 | Development Team | Version alignment, date update, codebase v2.3.0 sync |
+| 2.0.0 | 2026-01-23 | Development Team | Complete rewrite aligned with current implementation |
 | 1.0.0 | 2026-01-14 | Development Team | Initial draft |
 
 ---

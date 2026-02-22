@@ -49,7 +49,7 @@ This specification covers:
 ### 1.3 Referenced Documents
 
 | Document | Description |
-|----------|-------------|
+| --- | --- |
 | PRD-001 through PRD-007 | Product Requirement Documents |
 | SPEC-001 through SPEC-007 | Technical Specifications |
 | FLOW-001 through FLOW-007 | System Flow Documents |
@@ -142,7 +142,7 @@ app/
 ### 2.3 Technology Stack
 
 | Layer | Technology | Version | Purpose |
-|-------|------------|---------|---------|
+| --- | --- | --- | --- |
 | Framework | Laravel | 12+ | Backend framework |
 | Frontend Reactivity | Livewire | 4 | Server-driven UI |
 | Client Interactivity | Alpine.js | 3 | Client-side interactions |
@@ -200,7 +200,7 @@ flowchart TD
 ### 3.2 Livewire Components
 
 | Component | Namespace | Description |
-|-----------|-----------|-------------|
+| --- | --- | --- |
 | `AdvisoryPanel` | `App\Livewire` | AI advisory chat panel with real-time recommendations |
 
 ### 3.3 Component Hierarchy
@@ -451,7 +451,7 @@ classDiagram
 #### 4.3.1 Implemented Enum Files (8)
 
 | Enum | File | Description |
-|------|------|-------------|
+| --- | --- | --- |
 | `AlertType` | `app/Enums/AlertType.php` | Alert/notification type classification |
 | `CareerPhase` | `app/Enums/CareerPhase.php` | Career progression phases |
 | `Mood` | `app/Enums/Mood.php` | Character mood states with stat modifiers |
@@ -677,7 +677,7 @@ flowchart TD
 The application defines 6 Neuron agents in `app/Neuron/Agents/`:
 
 | Agent | Description |
-|-------|-------------|
+| --- | --- |
 | `BaseAgent` | Abstract base agent with shared configuration |
 | `TrainingAdvisorAgent` | Training recommendations based on career state |
 | `RaceStrategyAgent` | Race preparation and strategy advice |
@@ -750,7 +750,7 @@ flowchart LR
 ### 6.4 AI Cost Management
 
 | Provider | Model | Input Cost | Output Cost | Use Case |
-|----------|-------|------------|-------------|----------|
+| --- | --- | --- | --- | --- |
 | Ollama | Local Models | Free | Free | Simple queries, high volume |
 | Bedrock | Claude 3.5 Haiku | $0.25/1M | $1.25/1M | Standard recommendations |
 | Bedrock | Claude 3.5 Sonnet | $3/1M | $15/1M | Complex strategy analysis |
@@ -862,7 +862,7 @@ flowchart LR
 ### 8.2 API Endpoints
 
 | Endpoint | Method | Description | Auth |
-|----------|--------|-------------|------|
+| --- | --- | --- | --- |
 | `/api/v1/characters` | GET | List characters | Required |
 | `/api/v1/characters/{id}` | GET | Get character details | Required |
 | `/api/v1/careers` | GET | List career runs | Required |
@@ -1021,7 +1021,7 @@ flowchart LR
 ### 10.1 Design System
 
 | Token | Light Mode | Dark Mode | Usage |
-|-------|------------|-----------|-------|
+| --- | --- | --- | --- |
 | `--color-primary` | `#3b82f6` | `#60a5fa` | Primary actions |
 | `--color-stat-speed` | `#3399ff` | `#66b3ff` | Speed indicators |
 | `--color-stat-stamina` | `#33cc99` | `#66d9b8` | Stamina indicators |
@@ -1032,7 +1032,7 @@ flowchart LR
 ### 10.2 Responsive Breakpoints
 
 | Breakpoint | Width | Layout |
-|------------|-------|--------|
+| --- | --- | --- |
 | Mobile | < 640px | Single column, bottom nav |
 | Tablet | 640px - 1024px | Two column where appropriate |
 | Desktop | > 1024px | Full layout with sidebar |
@@ -1041,7 +1041,7 @@ flowchart LR
 ### 10.3 Accessibility Standards
 
 | Requirement | Implementation | WCAG Reference |
-|-------------|----------------|----------------|
+| --- | --- | --- |
 | Color contrast | 4.5:1 minimum for text | 1.4.3 |
 | Keyboard navigation | All interactive elements focusable | 2.1.1 |
 | Screen reader support | ARIA labels on all controls | 4.1.2 |
@@ -1053,7 +1053,7 @@ flowchart LR
 ## Document Control
 
 | Version | Date | Author | Changes |
-|---------|------|--------|---------|
+| --- | --- | --- | --- |
 | 2.4.0 | 2026-02-22 | Development Team | Updated directory structure to match codebase (166 services, 30 models, 52 migrations, 585 routes); corrected Livewire to single AdvisoryPanel component; expanded service architecture with Neuron (5), MCP (42), Training (3), Admin (3) breakdowns; updated admin controllers to actual 5 (Database, Log, Queue, SystemSettings, User); added Neuron agent inventory; updated tech stack with test metrics (3,316+ tests) |
 | 2.3.0 | 2026-02-21 | Development Team | Prior version aligned to v2.3.0 |
 | 2.1.0 | 2026-01-23 | Development Team | Updated to reflect current implementation including AI, MCP, OCR, and data management systems |

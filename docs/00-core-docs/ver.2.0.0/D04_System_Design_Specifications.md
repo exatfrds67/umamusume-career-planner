@@ -74,7 +74,8 @@ flowchart TB
     LWServer --> Services
     Services --> Models
     Models --> DB
-```text
+```
+
 **ASCII Diagram:**
 
 ```text
@@ -104,7 +105,8 @@ flowchart TB
 │  - Account_Runs (career_runs table)                             │
 │  - Reference data (characters, skills)                          │
 └─────────────────────────────────────────────────────────────────┘
-```text
+```
+
 ### 2.2 Technology Stack
 
 | Layer | Technology | Version |
@@ -129,7 +131,8 @@ flowchart TD
     D -->|Account| F[(Database)]
     E --> G[UUID Routes<br/>/plans/local/uuid]
     F --> H[ID Routes<br/>/plans/id]
-```text
+```
+
 **ASCII Diagram:**
 
 ```text
@@ -152,7 +155,8 @@ flowchart TD
 │              ▼     ▼                                             │
 │         localStorage  Database                                   │
 └─────────────────────────────────────────────────────────────────┘
-```text
+```
+
 ### 2.4 Request Flow Architecture
 
 ```mermaid
@@ -168,7 +172,8 @@ sequenceDiagram
     D-->>S: Return Data
     S-->>L: Return Result
     L-->>U: DOM Update
-```text
+```
+
 **ASCII Diagram:**
 
 ```text
@@ -187,7 +192,8 @@ sequenceDiagram
       │               │◀──────────────│  Return Data  │
       │◀──────────────│  Update View  │               │
       │  DOM Update   │               │               │
-```text
+```
+
 ---
 
 ## 3. Component Design
@@ -271,7 +277,8 @@ flowchart TD
     Navbar --> NavbarComponents
     MainContent --> DashboardPage
     MainContent --> PlanEditorPage
-```text
+```
+
 **ASCII Diagram:**
 
 ```text
@@ -313,7 +320,8 @@ Plan Editor
 │       └── Turns Editor (Livewire)
 ├── Action Bar (Save, Export, Duplicate)
 └── Unsaved Changes Indicator
-```text
+```
+
 ### 3.5 Blade Component Library
 
 ```text
@@ -348,7 +356,8 @@ resources/views/components/
     ├── badge.blade.php           # Status badge
     ├── toast.blade.php           # Notification toast
     └── empty-state.blade.php     # Empty state display
-```text
+```
+
 ---
 
 ## 4. Data Models
@@ -442,7 +451,8 @@ erDiagram
         json stats
         json skills_snapshot
     }
-```text
+```
+
 **ASCII Diagram:**
 
 ```text
@@ -489,7 +499,8 @@ erDiagram
 │ guts      │
 │ wit       │
 └───────────┘
-```text
+```
+
 ### 4.2 Model Definitions
 
 #### 4.2.1 UmaMusume Model
@@ -523,7 +534,8 @@ class UmaMusume extends Model
         return $this->hasMany(CareerRun::class);
     }
 }
-```text
+```
+
 #### 4.2.2 CareerRun Model
 
 ```php
@@ -566,7 +578,8 @@ class CareerRun extends Model
             : "/plans/{$this->id}{$suffix}";
     }
 }
-```text
+```
+
 #### 4.2.3 SkillCareerRun Pivot Model
 
 ```php
@@ -597,7 +610,8 @@ class SkillCareerRun extends Pivot
         ];
     }
 }
-```text
+```
+
 ### 4.3 Enum Definitions
 
 ```mermaid
@@ -653,7 +667,8 @@ classDiagram
         Awful : -4%
         +modifier() int
     }
-```text
+```
+
 ```php
 enum StorageMode: string {
     case Local = 'local';
@@ -711,7 +726,8 @@ enum Mood: string {
         };
     }
 }
-```text
+```
+
 ### 4.4 TypeScript Interfaces (Frontend)
 
 ```typescript
@@ -802,7 +818,8 @@ interface LocalRunsStore {
 }
 
 type RunKey = `local:${string}` | `account:${number}`;
-```text
+```
+
 ---
 
 ## 5. Service Layer Design
@@ -832,7 +849,8 @@ flowchart TD
     IS --> DDS
     CLS --> DDS
     CLS --> CRS
-```text
+```
+
 **Directory Structure:**
 
 ```text
@@ -850,7 +868,8 @@ app/Services/
 ├── ActivityLogService.php        # Activity logging
 ├── ImageProcessingService.php    # Image upload handling
 └── ChartDataService.php          # Chart data preparation
-```text
+```
+
 ### 5.2 Core Service Implementations
 
 #### 5.2.1 CareerRunService
@@ -900,7 +919,8 @@ class CareerRunService
             ->sum('sp_cost');
     }
 }
-```text
+```
+
 #### 5.2.2 LocalRunStorageService
 
 ```php
@@ -946,7 +966,8 @@ class LocalRunStorageService
         return $data;
     }
 }
-```text
+```
+
 #### 5.2.3 ImportService
 
 ```php
@@ -996,7 +1017,8 @@ class ImportService
         };
     }
 }
-```text
+```
+
 ---
 
 ## 6. UI/UX Design Specifications
@@ -1010,7 +1032,8 @@ pie title Stat Color Distribution
     "Power (Red)" : 20
     "Guts (Orange)" : 20
     "Wit (Purple)" : 20
-```text
+```
+
 ```javascript
 // tailwind.config.js
 module.exports = {
@@ -1054,7 +1077,8 @@ module.exports = {
     },
   },
 };
-```text
+```
+
 ### 6.2 Dark Mode Implementation
 
 ```css
@@ -1077,7 +1101,8 @@ module.exports = {
   --text-secondary: #a0a0a0;
   --border-color: #334155;
 }
-```text
+```
+
 ### 6.3 Responsive Breakpoints
 
 | Breakpoint | Width | Layout |
@@ -1115,7 +1140,8 @@ module.exports = {
     <span class="text-xs text-gray-500">{{ $label }}</span>
   </div>
 </div>
-```text
+```
+
 #### 6.4.2 Storage Badge Component
 
 ```html
@@ -1131,7 +1157,8 @@ module.exports = {
     {{ __('Account') }}
   @endif
 </span>
-```text
+```
+
 #### 6.4.3 Skill Status Badge
 
 ```html
@@ -1147,7 +1174,8 @@ $styles = [
   data-testid="skill-status-{{ $status }}">
   {{ ucfirst($status) }}
 </span>
-```text
+```
+
 ---
 
 ## 7. Data Flow Specifications
@@ -1167,7 +1195,8 @@ flowchart TD
     G --> I[Save to localStorage]
     I --> J[Navigate to /plans/local/uuid/edit]
     H --> K[Navigate to /plans/id/edit]
-```text
+```
+
 **ASCII Diagram:**
 
 ```text
@@ -1202,7 +1231,8 @@ Only        (Local/Account)
      ▼             ▼
 /plans/local/   /plans/{id}
 {uuid}/edit     /edit
-```text
+```
+
 ### 7.2 Local to Account Conversion Flow
 
 ```mermaid
@@ -1223,7 +1253,8 @@ flowchart TD
     M --> O[Results Report]
     N --> O
     I --> O
-```text
+```
+
 **ASCII Diagram:**
 
 ```text
@@ -1257,7 +1288,8 @@ For each selected plan:
 │ - Failed: M         │
 │ - Kept local: K     │
 └─────────────────────┘
-```text
+```
+
 ### 7.3 Skill Autocomplete Flow
 
 ```mermaid
@@ -1284,7 +1316,8 @@ sequenceDiagram
     S-->>L: Return results
     L-->>A: Update dropdown
     A-->>U: Display matches with keyboard nav
-```text
+```
+
 **ASCII Diagram:**
 
 ```text
@@ -1317,7 +1350,8 @@ Return matches:
 └────────┬────────┘
          │
 User selects skill
-```text
+```
+
 ---
 
 ## 8. Appendices

@@ -40,7 +40,7 @@ This specification covers:
 ### 1.3 Requirement Priorities
 
 | Priority | Description |
-| -------- | ----------- |
+| --- | --- |
 | P0 (Critical) | Core functionality required for MVP launch |
 | P1 (High) | Important features for complete user experience |
 | P2 (Medium) | Enhanced features for power users |
@@ -71,7 +71,7 @@ mindmap
       Entities
       Validation
       Retention
-```text
+```
 
 **ASCII Diagram:**
 
@@ -93,7 +93,7 @@ mindmap
     │• Import/Exp │ │• Maintain   │       │             │ │             │
     │• Storage    │ │             │       │             │ │             │
     └─────────────┘ └─────────────┘       └─────────────┘ └─────────────┘
-```text
+```
 
 ---
 
@@ -126,7 +126,7 @@ flowchart LR
     F --> C
     E --> G[Redirect to Plan]
     G --> H[Show Success Toast]
-```text
+```
 
 **ASCII Diagram:**
 
@@ -164,7 +164,7 @@ User clicks "Create Plan"
 │ Redirect to Plan    │
 │ Show Success Toast  │
 └─────────────────────┘
-```text
+```
 
 | ID | Requirement | Acceptance Criteria |
 | -- | ----------- | ------------------- |
@@ -236,7 +236,7 @@ flowchart TD
     F --> M[Confirm Delete]
     M --> N[Remove from Table]
     K --> O[Update SP Totals]
-```text
+```
 
 | ID | Requirement | Acceptance Criteria |
 | -- | ----------- | ------------------- |
@@ -339,7 +339,7 @@ flowchart LR
     H -->|Download| I[Download File]
     H -->|Copy| J[Copy to Clipboard]
     J --> K[Show Toast]
-```text
+```
 
 | ID | Requirement | Acceptance Criteria |
 | -- | ----------- | ------------------- |
@@ -369,7 +369,7 @@ flowchart TD
     K -->|No| M[Execute Import]
     L --> M
     M --> N[Show Results Report]
-```text
+```
 
 | ID | Requirement | Acceptance Criteria |
 | -- | ----------- | ------------------- |
@@ -398,7 +398,7 @@ flowchart TD
     F --> H[ID-based Routes]
     G --> I[/plans/local/uuid]
     H --> J[/plans/id]
-```text
+```
 
 **ASCII Diagram:**
 
@@ -422,7 +422,7 @@ flowchart TD
 │              ▼     ▼                                             │
 │         localStorage  Database                                   │
 └─────────────────────────────────────────────────────────────────┘
-```text
+```
 
 | ID | Requirement | Acceptance Criteria |
 | -- | ----------- | ------------------- |
@@ -493,7 +493,7 @@ pie title Performance Budget Allocation
     "Time to Interactive" : 25
     "API Response" : 15
     "Export Operations" : 10
-```text
+```
 
 | ID | Requirement | Target |
 | -- | ----------- | ------ |
@@ -518,7 +518,7 @@ flowchart TD
     H --> I{User Authorized?}
     I -->|No| J[Reject 401/403]
     I -->|Yes| K[Execute Action]
-```text
+```
 
 | ID | Requirement |
 | -- | ----------- |
@@ -632,7 +632,7 @@ flowchart LR
     B --> E
     C --> E
     D --> E
-```text
+```
 
 | Endpoint | Method | Description |
 | -------- | ------ | ----------- |
@@ -697,7 +697,7 @@ erDiagram
         int sp_cost
         enum tier
     }
-```text
+```
 
 **ASCII Diagram:**
 
@@ -735,7 +735,7 @@ erDiagram
 ┌───────────┐ ┌─────────────┐ ┌─────────┐
 │StatProgress│ │SkillCareerRun│ │  Goal   │
 └───────────┘ └─────────────┘ └─────────┘
-```text
+```
 
 | Entity | Description |
 | ------ | ----------- |
@@ -830,7 +830,7 @@ flowchart LR
     BR8 --> SR8
     BR9 --> SR9
     BR10 --> SR10
-```text
+```
 
 | Business Req | System Req | Priority |
 | ------------ | ---------- | -------- |
