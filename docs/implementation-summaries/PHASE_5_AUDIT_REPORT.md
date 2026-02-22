@@ -1,8 +1,8 @@
 # Phase 5: Comprehensive Audit Report
 
-**Date**: January 29, 2026  
-**Type**: Exhaustive Recursive Scan  
-**Status**: 🔍 **AUDIT COMPLETE - REFACTORING REQUIRED**
+**Date**: January 29, 2026
+**Type**: Exhaustive Recursive Scan
+### Status**: 🔍 **AUDIT COMPLETE - REFACTORING REQUIRED
 
 ---
 
@@ -11,7 +11,7 @@
 A comprehensive recursive scan of `resources/views/**/*.blade.php` has revealed **40+ files** with inline JavaScript that were missed in Phases 1-4. These files fall into three main categories:
 
 1. **Reusable Components** (18 files) - Need component-based extraction
-2. **Page Views** (15 files) - Need page-specific extraction  
+2. **Page Views** (15 files) - Need page-specific extraction
 3. **Data Injection Only** (7 files) - Already using proper pattern, no action needed
 
 ---
@@ -22,41 +22,35 @@ These components contain inline Alpine.js logic and need special handling for re
 
 ### Analytics Components (3 files)
 
-| File | Lines Est. | Complexity | Features |
-|------|-----------|------------|----------|
-| `components/analytics/stat-progression-chart.blade.php` | ~100 | High | Chart.js integration, data transformation |
-| `components/analytics/trend-analysis-chart.blade.php` | ~150 | High | Chart.js, trend calculations, animations |
-| `components/analytics/comparison-table.blade.php` | ~120 | Medium | Sorting, filtering, comparison logic |
+- **File**: `components/analytics/stat-progression-chart.blade.php`; **Lines Est.**: ~100; **Complexity**: High; **Features**: Chart.js integration, data transformation
+- **File**: `components/analytics/trend-analysis-chart.blade.php`; **Lines Est.**: ~150; **Complexity**: High; **Features**: Chart.js, trend calculations, animations
+- **File**: `components/analytics/comparison-table.blade.php`; **Lines Est.**: ~120; **Complexity**: Medium; **Features**: Sorting, filtering, comparison logic
 
 **Action**: Extract to `resources/js/components/analytics/`
 
 ### AI Components (8 files)
 
-| File | Lines Est. | Complexity | Features |
-|------|-----------|------------|----------|
-| `components/ai/tool-execution-monitor.blade.php` | ~80 | Medium | Real-time monitoring, status updates |
-| `components/ai/tool-usage-indicator.blade.php` | ~40 | Low | Usage tracking, visual indicators |
-| `components/ai/workflow-visualization.blade.php` | ~100 | High | Workflow rendering, state management |
-| `components/ai/server-status-indicator.blade.php` | ~60 | Medium | Server health checks, status display |
-| `components/ai/provider-selector.blade.php` | ~50 | Medium | Provider selection, configuration |
-| `components/ai/performance-metrics.blade.php` | ~70 | Medium | Metrics calculation, display |
-| `components/ai/agent-selector.blade.php` | ~90 | Medium | Agent selection, filtering |
-| `components/ai/agent-progress-tracker.blade.php` | ~80 | Medium | Progress tracking, updates |
+- **File**: `components/ai/tool-execution-monitor.blade.php`; **Lines Est.**: ~80; **Complexity**: Medium; **Features**: Real-time monitoring, status updates
+- **File**: `components/ai/tool-usage-indicator.blade.php`; **Lines Est.**: ~40; **Complexity**: Low; **Features**: Usage tracking, visual indicators
+- **File**: `components/ai/workflow-visualization.blade.php`; **Lines Est.**: ~100; **Complexity**: High; **Features**: Workflow rendering, state management
+- **File**: `components/ai/server-status-indicator.blade.php`; **Lines Est.**: ~60; **Complexity**: Medium; **Features**: Server health checks, status display
+- **File**: `components/ai/provider-selector.blade.php`; **Lines Est.**: ~50; **Complexity**: Medium; **Features**: Provider selection, configuration
+- **File**: `components/ai/performance-metrics.blade.php`; **Lines Est.**: ~70; **Complexity**: Medium; **Features**: Metrics calculation, display
+- **File**: `components/ai/agent-selector.blade.php`; **Lines Est.**: ~90; **Complexity**: Medium; **Features**: Agent selection, filtering
+- **File**: `components/ai/agent-progress-tracker.blade.php`; **Lines Est.**: ~80; **Complexity**: Medium; **Features**: Progress tracking, updates
 
 **Action**: Extract to `resources/js/components/ai/`
 
 ### Interactive Components (7 files)
 
-| File | Lines Est. | Complexity | Features |
-|------|-----------|------------|----------|
-| `components/line-chart.blade.php` | ~60 | High | Chart.js, dynamic data |
-| `components/class-pyramid.blade.php` | ~50 | Medium | Grade visualization |
-| `components/spirit-burst-gauge.blade.php` | ~80 | Medium | Gauge animation, state |
-| `components/team-member-selector.blade.php` | ~60 | Medium | Selection logic, validation |
-| `components/slide-panel.blade.php` | ~40 | Low | Panel animation, state |
-| `components/quick-actions.blade.php` | ~50 | Low | Action menu, keyboard shortcuts |
-| `components/password-input.blade.php` | ~30 | Low | Toggle visibility |
-| `components/facility-management.blade.php` | ~70 | Medium | Facility upgrades, state |
+- **File**: `components/line-chart.blade.php`; **Lines Est.**: ~60; **Complexity**: High; **Features**: Chart.js, dynamic data
+- **File**: `components/class-pyramid.blade.php`; **Lines Est.**: ~50; **Complexity**: Medium; **Features**: Grade visualization
+- **File**: `components/spirit-burst-gauge.blade.php`; **Lines Est.**: ~80; **Complexity**: Medium; **Features**: Gauge animation, state
+- **File**: `components/team-member-selector.blade.php`; **Lines Est.**: ~60; **Complexity**: Medium; **Features**: Selection logic, validation
+- **File**: `components/slide-panel.blade.php`; **Lines Est.**: ~40; **Complexity**: Low; **Features**: Panel animation, state
+- **File**: `components/quick-actions.blade.php`; **Lines Est.**: ~50; **Complexity**: Low; **Features**: Action menu, keyboard shortcuts
+- **File**: `components/password-input.blade.php`; **Lines Est.**: ~30; **Complexity**: Low; **Features**: Toggle visibility
+- **File**: `components/facility-management.blade.php`; **Lines Est.**: ~70; **Complexity**: Medium; **Features**: Facility upgrades, state
 
 **Action**: Extract to `resources/js/components/`
 
@@ -68,55 +62,43 @@ These are page-level views that need page-specific extraction.
 
 ### Import/Export/Migration (4 files)
 
-| File | Lines Est. | Complexity | Features |
-|------|-----------|------------|----------|
-| `import/index.blade.php` | ~150 | High | File upload, validation, preview |
-| `export/index.blade.php` | ~120 | High | Export options, format selection |
-| `migration/index.blade.php` | ~100 | Medium | Migration wizard, data transfer |
-| `historical/index.blade.php` | ~60 | Low | Cache management |
+- **File**: `import/index.blade.php`; **Lines Est.**: ~150; **Complexity**: High; **Features**: File upload, validation, preview
+- **File**: `export/index.blade.php`; **Lines Est.**: ~120; **Complexity**: High; **Features**: Export options, format selection
+- **File**: `migration/index.blade.php`; **Lines Est.**: ~100; **Complexity**: Medium; **Features**: Migration wizard, data transfer
+- **File**: `historical/index.blade.php`; **Lines Est.**: ~60; **Complexity**: Low; **Features**: Cache management
 
 **Action**: Extract to `resources/js/pages/{import,export,migration,historical}/`
 
 ### External Data & Browsing (1 file)
 
-| File | Lines Est. | Complexity | Features |
-|------|-----------|------------|----------|
-| `external-data/browse.blade.php` | ~200 | High | Data browsing, filtering, API calls |
+- **File**: `external-data/browse.blade.php`; **Lines Est.**: ~200; **Complexity**: High; **Features**: Data browsing, filtering, API calls
 
 **Action**: Extract to `resources/js/pages/external-data/`
 
 ### Skills & Support Cards (3 files)
 
-| File | Lines Est. | Complexity | Features |
-|------|-----------|------------|----------|
-| `skills/partials/planner.blade.php` | ~150 | High | Skill planning, SP calculations |
-| `support-cards/deck-management.blade.php` | ~80 | Medium | Deck CRUD operations |
-| `races/targets.blade.php` | ~100 | Medium | Race target selection |
+- **File**: `skills/partials/planner.blade.php`; **Lines Est.**: ~150; **Complexity**: High; **Features**: Skill planning, SP calculations
+- **File**: `support-cards/deck-management.blade.php`; **Lines Est.**: ~80; **Complexity**: Medium; **Features**: Deck CRUD operations
+- **File**: `races/targets.blade.php`; **Lines Est.**: ~100; **Complexity**: Medium; **Features**: Race target selection
 
 **Action**: Extract to `resources/js/pages/{skills,support-cards,races}/`
 
 ### Profile & Security (1 file)
 
-| File | Lines Est. | Complexity | Features |
-|------|-----------|------------|----------|
-| `profile/partials/security-tab.blade.php` | ~60 | Medium | Account deletion modal |
+- **File**: `profile/partials/security-tab.blade.php`; **Lines Est.**: ~60; **Complexity**: Medium; **Features**: Account deletion modal
 
 **Action**: Extract to `resources/js/pages/profile/partials/`
 
 ### Test & Demo (2 files)
 
-| File | Lines Est. | Complexity | Features |
-|------|-----------|------------|----------|
-| `test/remember-me-demo.blade.php` | ~40 | Low | Remember me checkbox demo |
-| `components/activity-timeline.blade.php` | ~80 | Medium | Timeline rendering, filtering |
+- **File**: `test/remember-me-demo.blade.php`; **Lines Est.**: ~40; **Complexity**: Low; **Features**: Remember me checkbox demo
+- **File**: `components/activity-timeline.blade.php`; **Lines Est.**: ~80; **Complexity**: Medium; **Features**: Timeline rendering, filtering
 
 **Action**: Extract to `resources/js/{test,components}/`
 
 ### Training (1 file)
 
-| File | Lines Est. | Complexity | Features |
-|------|-----------|------------|----------|
-| `training/show.blade.php` | ~50 | Low | Uses old asset() pattern |
+- **File**: `training/show.blade.php`; **Lines Est.**: ~50; **Complexity**: Low; **Features**: Uses old asset() pattern
 
 **Action**: Update to use @vite directive
 
@@ -126,12 +108,12 @@ These are page-level views that need page-specific extraction.
 
 These files already use the proper `window.pageData` pattern and have extracted JS:
 
-✅ `training/predictions.blade.php` - Data injection + @vite (Phase 1)  
-✅ `skills/index.blade.php` - Data injection + @vite (Phase 2)  
-✅ `support-cards/deck-builder.blade.php` - Data injection + @vite (Phase 1)  
-✅ `races/calendar.blade.php` - Data injection + @vite (Phase 2)  
-✅ `performance/dashboard.blade.php` - Data injection + @vite (Phase 2)  
-✅ `ocr/upload.blade.php` - Data injection + @vite (Phase 4)  
+✅ `training/predictions.blade.php` - Data injection + @vite (Phase 1)
+✅ `skills/index.blade.php` - Data injection + @vite (Phase 2)
+✅ `support-cards/deck-builder.blade.php` - Data injection + @vite (Phase 1)
+✅ `races/calendar.blade.php` - Data injection + @vite (Phase 2)
+✅ `performance/dashboard.blade.php` - Data injection + @vite (Phase 2)
+✅ `ocr/upload.blade.php` - Data injection + @vite (Phase 4)
 ✅ `ocr/partials/skill-list-form.blade.php` - Data injection + @vite (Phase 4)
 
 ---
@@ -140,28 +122,22 @@ These files already use the proper `window.pageData` pattern and have extracted 
 
 ### Layout Files (2 files)
 
-| File | Purpose | Action |
-|------|---------|--------|
-| `layouts/app.blade.php` | Theme initialization | Keep inline (performance critical) |
-| `layouts/guest.blade.php` | Theme initialization | Keep inline (performance critical) |
+- **File**: `layouts/app.blade.php`; **Purpose**: Theme initialization; **Action**: Keep inline (performance critical)
+- **File**: `layouts/guest.blade.php`; **Purpose**: Theme initialization; **Action**: Keep inline (performance critical)
 
 **Reason**: These contain synchronous theme initialization to prevent FOUC (Flash of Unstyled Content). Moving to external files would cause visual flicker.
 
 ### Structural Data (2 files)
 
-| File | Purpose | Action |
-|------|---------|--------|
-| `components/breadcrumb.blade.php` | JSON-LD structured data | Keep inline (SEO requirement) |
-| `test-api.blade.php` | CDN script tag | Keep inline (external dependency) |
+- **File**: `components/breadcrumb.blade.php`; **Purpose**: JSON-LD structured data; **Action**: Keep inline (SEO requirement)
+- **File**: `test-api.blade.php`; **Purpose**: CDN script tag; **Action**: Keep inline (external dependency)
 
 **Reason**: JSON-LD must be inline for search engines. CDN scripts are external dependencies.
 
 ### Character Forms (2 files)
 
-| File | Status | Action |
-|------|--------|--------|
-| `characters/create.blade.php` | Has inline + @vite | Already refactored in Phase 3 |
-| `characters/edit.blade.php` | Has inline helper | Extract helper function |
+- **File**: `characters/create.blade.php`; **Status**: Has inline + @vite; **Action**: Already refactored in Phase 3
+- **File**: `characters/edit.blade.php`; **Status**: Has inline helper; **Action**: Extract helper function
 
 ---
 
@@ -169,28 +145,24 @@ These files already use the proper `window.pageData` pattern and have extracted 
 
 ### Files Requiring Action
 
-| Category | Files | Est. Lines | Priority |
-|----------|-------|-----------|----------|
-| **Analytics Components** | 3 | ~370 | HIGH |
-| **AI Components** | 8 | ~570 | HIGH |
-| **Interactive Components** | 7 | ~380 | HIGH |
-| **Import/Export/Migration** | 4 | ~430 | MEDIUM |
-| **External Data** | 1 | ~200 | MEDIUM |
-| **Skills/Support/Races** | 3 | ~330 | MEDIUM |
-| **Profile/Security** | 1 | ~60 | MEDIUM |
-| **Test/Demo** | 2 | ~120 | LOW |
-| **Training** | 1 | ~50 | LOW |
-| **Character Edit Helper** | 1 | ~20 | LOW |
-| **Total** | **31** | **~2,530** | - |
+- **Category**: **Analytics Components**; **Files**: 3; **Est. Lines**: ~370; **Priority**: HIGH
+- **Category**: **AI Components**; **Files**: 8; **Est. Lines**: ~570; **Priority**: HIGH
+- **Category**: **Interactive Components**; **Files**: 7; **Est. Lines**: ~380; **Priority**: HIGH
+- **Category**: **Import/Export/Migration**; **Files**: 4; **Est. Lines**: ~430; **Priority**: MEDIUM
+- **Category**: **External Data**; **Files**: 1; **Est. Lines**: ~200; **Priority**: MEDIUM
+- **Category**: **Skills/Support/Races**; **Files**: 3; **Est. Lines**: ~330; **Priority**: MEDIUM
+- **Category**: **Profile/Security**; **Files**: 1; **Est. Lines**: ~60; **Priority**: MEDIUM
+- **Category**: **Test/Demo**; **Files**: 2; **Est. Lines**: ~120; **Priority**: LOW
+- **Category**: **Training**; **Files**: 1; **Est. Lines**: ~50; **Priority**: LOW
+- **Category**: **Character Edit Helper**; **Files**: 1; **Est. Lines**: ~20; **Priority**: LOW
+- **Category**: **Total**; **Files**: **31**; **Est. Lines**: **~2,530**; **Priority**: -
 
 ### Files Not Requiring Action
 
-| Category | Files | Reason |
-|----------|-------|--------|
-| **Already Refactored** | 7 | Completed in Phases 1-4 |
-| **Layout Theme Init** | 2 | Performance critical |
-| **Structural Data** | 2 | SEO/External requirements |
-| **Total** | **11** | - |
+- **Category**: **Already Refactored**; **Files**: 7; **Reason**: Completed in Phases 1-4
+- **Category**: **Layout Theme Init**; **Files**: 2; **Reason**: Performance critical
+- **Category**: **Structural Data**; **Files**: 2; **Reason**: SEO/External requirements
+- **Category**: **Total**; **Files**: **11**; **Reason**: -
 
 ---
 
