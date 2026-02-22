@@ -649,10 +649,7 @@ A change is considered complete when:
 
 ===
 
-<laravel-boost-guidelines>
-=== foundation rules ===
-
-# Laravel Boost Guidelines
+## Laravel Boost Guidelines
 
 The Laravel Boost guidelines are specifically curated by Laravel maintainers for this application. These guidelines should be followed closely to enhance the user's satisfaction building Laravel applications.
 
