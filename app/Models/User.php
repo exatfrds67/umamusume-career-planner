@@ -56,6 +56,7 @@ class User extends Authenticatable
         'is_admin',
         'preferences',
         'accessibility_settings',
+        'notification_preferences',
         'ai_settings',
         'mcp_settings',
     ];
@@ -99,6 +100,7 @@ class User extends Authenticatable
             'is_admin' => 'boolean',
             'preferences' => AsArrayObject::class,
             'accessibility_settings' => AsArrayObject::class,
+            'notification_preferences' => AsArrayObject::class,
             'ai_settings' => AsArrayObject::class,
             'mcp_settings' => AsArrayObject::class,
         ];
@@ -195,6 +197,22 @@ class User extends Authenticatable
     public function preferences(): HasMany
     {
         return $this->userPreferences();
+    }
+
+    /**
+     * @return HasMany<DeletionRequest, $this>
+     */
+    public function deletionRequests(): HasMany
+    {
+        return $this->hasMany(DeletionRequest::class);
+    }
+
+    /**
+     * @return HasMany<ConsentRecord, $this>
+     */
+    public function consentRecords(): HasMany
+    {
+        return $this->hasMany(ConsentRecord::class);
     }
 
     /**
@@ -301,6 +319,16 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return (bool) ($this->is_admin ?? false);
+    }
+
+    /**
+     * Route notifications for the Slack channel.
+     */
+    public function routeNotificationForSlack(): ?string
+    {
+        $webhookUrl = config('apm.alerting.channels.slack.webhook_url');
+
+        return is_string($webhookUrl) && $webhookUrl !== '' ? $webhookUrl : null;
     }
 
     /**
