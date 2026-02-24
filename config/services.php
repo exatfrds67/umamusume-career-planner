@@ -97,12 +97,17 @@ return [
     */
 
     'opencv' => [
+        'python_binary' => env('OPENCV_PYTHON_BINARY', 'python'),
         'preprocessing' => [
             'resize_max_width' => env('OPENCV_RESIZE_MAX_WIDTH', 1920),
             'resize_max_height' => env('OPENCV_RESIZE_MAX_HEIGHT', 1080),
             'contrast_enhancement' => env('OPENCV_CONTRAST_ENHANCEMENT', true),
             'sharpen_enabled' => env('OPENCV_SHARPEN_ENABLED', true),
             'denoise_strength' => env('OPENCV_DENOISE_STRENGTH', 10),
+            'deskew_enabled' => env('OPENCV_DESKEW_ENABLED', true),
+            'adaptive_threshold' => env('OPENCV_ADAPTIVE_THRESHOLD', true),
+            'threshold_block_size' => env('OPENCV_THRESHOLD_BLOCK_SIZE', 11),
+            'threshold_c_value' => env('OPENCV_THRESHOLD_C_VALUE', 2),
         ],
     ],
 

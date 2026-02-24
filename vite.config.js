@@ -41,6 +41,7 @@ export default defineConfig({
                 "resources/js/pages/ocr/partials/skill-list-form.js",
                 "resources/js/pages/data-management/index.js",
                 // Phase 5: Batch 1 - Analytics & AI Components
+                "resources/js/components/analytics/stat-progression-chart.js",
                 "resources/js/components/analytics/trend-analysis-chart.js",
                 "resources/js/components/analytics/comparison-table.js",
                 "resources/js/components/ai/tool-execution-monitor.js",
@@ -89,8 +90,6 @@ export default defineConfig({
             output: {
                 // Manual chunk splitting for optimal bundle sizes
                 manualChunks: {
-                    // Vendor chunk for Alpine.js and plugins
-                    "vendor-alpine": ["alpinejs", "@alpinejs/persist"],
                     // Core utilities chunk
                     "core-utils": [
                         "./resources/js/core/EventBus.js",

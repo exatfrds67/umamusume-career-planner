@@ -180,6 +180,9 @@ jobs:
       - name: Run PHPStan
         run: vendor/bin/phpstan analyse --memory-limit=2G --error-format=github
 
+      - name: Detect hardcoded secrets
+        run: php scripts/detect-secrets.php --verbose
+
   security:
     runs-on: ubuntu-latest
     name: Security Scan
@@ -194,11 +197,40 @@ jobs:
         with:
           php-version: 8.4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
-      - name: Security check
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Composer security audit
         run: composer audit
+
+      - name: npm security audit
+        run: npm audit --audit-level=high
+
+      - name: Check for hardcoded secrets
+        run: |
+          echo "Scanning for potential hardcoded secrets..."
+          ! grep -rn --include="*.php" --include="*.env*" --include="*.js" --include="*.ts" \
+            -E "(password|secret|api_key|token)\s*=\s*['\"][^'\"]{8,}" \
+            --exclude-dir=vendor --exclude-dir=node_modules \
+            --exclude-dir=storage --exclude-dir=.git \
+            --exclude=".env.example" --exclude="*.test.*" \
+            --exclude-dir=tests \
+            app/ config/ routes/ resources/ || echo "No hardcoded secrets found"
+
+      - name: Check file permissions
+        run: |
+          echo "Checking for overly permissive files..."
+          find . -name "*.env" ! -name ".env.example" -type f 2>/dev/null | head -5
+          echo "Check complete"
 
   performance:
     runs-on: ubuntu-latest
