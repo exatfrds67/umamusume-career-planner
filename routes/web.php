@@ -214,6 +214,11 @@ Route::middleware('auth')->group(function () {
 // Settings routes (requires authentication)
 Route::middleware('auth')->group(function () {
     Route::get('/settings', fn () => view('settings.index'))->name('settings.index');
+    Route::get('/settings/accessibility', fn () => view('settings.accessibility'))->name('settings.accessibility');
+    Route::get('/settings/notifications', fn () => view('settings.notifications'))->name('settings.notifications');
+    Route::get('/simulation', fn () => view('simulation.index'))->name('simulation.index');
+    Route::get('/analytics/patterns', fn () => view('analytics.patterns'))->name('analytics.patterns');
+    Route::get('/privacy/dashboard', App\Livewire\Privacy\PrivacyDashboard::class)->name('privacy.dashboard');
 });
 
 // Admin routes (requires authentication and admin privileges)
@@ -256,6 +261,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::delete('/queue/{id}', [App\Http\Controllers\Admin\QueueController::class, 'delete'])->name('queue.delete');
     Route::post('/queue/flush', [App\Http\Controllers\Admin\QueueController::class, 'flush'])->name('queue.flush');
     Route::post('/queue/restart', [App\Http\Controllers\Admin\QueueController::class, 'restart'])->name('queue.restart');
+
+    // APM Dashboard
+    Route::get('/apm', App\Livewire\Admin\ApmDashboard::class)->name('apm');
 });
 
 // Help routes (public)
