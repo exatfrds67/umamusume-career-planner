@@ -98,6 +98,36 @@ pest()->extend(Tests\TestCase::class)
 
 /*
 |--------------------------------------------------------------------------
+| Performance Tests Configuration
+|--------------------------------------------------------------------------
+|
+| Performance tests benchmark critical operations and detect regressions.
+| These tests measure response times, throughput, and resource usage
+| against configurable thresholds.
+|
+*/
+pest()->extend(Tests\TestCase::class)
+    ->use(RefreshDatabase::class)
+    ->use(WithFaker::class)
+    ->in('Performance');
+
+/*
+|--------------------------------------------------------------------------
+| Security Tests Configuration
+|--------------------------------------------------------------------------
+|
+| Security tests verify protection against common vulnerabilities
+| including SQL injection, XSS, CSRF, and authorization bypass.
+| These tests ensure the application meets NFR-S requirements.
+|
+*/
+pest()->extend(Tests\TestCase::class)
+    ->use(RefreshDatabase::class)
+    ->use(WithFaker::class)
+    ->in('Security');
+
+/*
+|--------------------------------------------------------------------------
 | Browser Tests Configuration
 |--------------------------------------------------------------------------
 |

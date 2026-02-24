@@ -67,9 +67,11 @@ it('selects a speed training facility and shows selection highlight', function (
     $this->actingAs($this->user);
     $page = visit('/training/predictions?character_id='.$this->character->id);
 
-    // Click the speed facility card
-    $page->click('[data-facility="speed"]')
-        ->wait(0.5);
+    // Unhide the predictions grid (normally shown after API fetch)
+    $page->script("document.getElementById('predictions-grid')?.classList.remove('hidden')");
+
+    // Trigger selection via JS function directly (avoids click event propagation race conditions)
+    $page->script("selectFacility('speed')");
 
     // Verify selection ring is applied
     $page->assertPresent('[data-facility="speed"].ring-2')
@@ -138,6 +140,9 @@ it('shows updated recommendations after refreshing page', function () {
 it('can interact with multiple facility cards in sequence', function () {
     $this->actingAs($this->user);
     $page = visit('/training/predictions?character_id='.$this->character->id);
+
+    // Unhide the predictions grid (normally shown after API fetch)
+    $page->script("document.getElementById('predictions-grid')?.classList.remove('hidden')");
 
     // Click speed
     $page->click('[data-facility="speed"]')

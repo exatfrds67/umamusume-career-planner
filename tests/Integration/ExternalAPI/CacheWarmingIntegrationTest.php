@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Models\Character;
+use App\Models\Race;
+use App\Models\Skill;
+use App\Models\SupportCard;
 use App\Services\ExternalAPI\CacheManagerService;
 use Illuminate\Support\Facades\Cache;
 
@@ -74,6 +78,8 @@ describe('Cache Warming Integration', function () {
 
     describe('Cache Warming Data Types', function () {
         it('warms top characters data', function () {
+            Character::factory()->create(['name' => 'Silence Suzuka']);
+
             $result = $this->cacheManager->warmCache('high');
 
             // Check that character data keys were created
@@ -85,32 +91,38 @@ describe('Cache Warming Integration', function () {
         });
 
         it('warms top support cards data', function () {
+            $card = SupportCard::factory()->create(['is_active' => true]);
+
             $result = $this->cacheManager->warmCache('high');
 
             expect($result['items']['top_support_cards'])->toBe('success');
 
             // Verify support card data exists
-            $cardData = $this->cacheManager->get('support_cards:1');
+            $cardData = $this->cacheManager->get("support_cards:{$card->id}");
             expect($cardData)->toBeArray();
         });
 
         it('warms race definitions data', function () {
+            $race = Race::factory()->create();
+
             $result = $this->cacheManager->warmCache('medium');
 
             expect($result['items']['race_definitions'])->toBe('success');
 
-            // Verify race data exists
-            $raceData = $this->cacheManager->get('race_data:sprint_turf');
+            // Verify race data exists (cache key uses race ID)
+            $raceData = $this->cacheManager->get("race_data:{$race->id}");
             expect($raceData)->toBeArray();
         });
 
         it('warms popular skills data', function () {
+            $skill = Skill::factory()->create(['is_active' => true]);
+
             $result = $this->cacheManager->warmCache('medium');
 
             expect($result['items']['popular_skills'])->toBe('success');
 
             // Verify skill data exists
-            $skillData = $this->cacheManager->get('skills:1');
+            $skillData = $this->cacheManager->get("skills:{$skill->id}");
             expect($skillData)->toBeArray();
         });
 

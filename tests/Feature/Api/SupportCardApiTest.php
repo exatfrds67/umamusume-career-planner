@@ -144,17 +144,74 @@ describe('Support Card API Endpoints', function (): void {
 
     describe('GET /api/v1/support-cards/{id}/synergies', function (): void {
         it('returns synergy data for card', function (): void {
-            $card = SupportCardDefinition::factory()->create();
+            $card = SupportCardDefinition::factory()->create([
+                'is_active' => true,
+                'card_type' => 'speed',
+                'meta_tier' => 'S',
+            ]);
+
+            SupportCardDefinition::factory()->count(3)->create([
+                'is_active' => true,
+                'card_type' => 'stamina',
+                'meta_tier' => 'A',
+            ]);
 
             $response = $this->getJson("/api/v1/support-cards/{$card->id}/synergies");
 
             $response->assertSuccessful()
                 ->assertJsonStructure([
                     'data' => [
+                        'card_id',
+                        'card_name',
                         'synergy_cards',
                         'synergy_score',
+                        'deck_synergies',
+                        'recommended_scenarios',
                     ],
                 ]);
+
+            $data = $response->json('data');
+            expect($data['card_id'])->toBe($card->id);
+            expect($data['synergy_score'])->toBeGreaterThanOrEqual(0);
+        });
+
+        it('returns 404 for non-existent card synergies', function (): void {
+            $response = $this->getJson('/api/v1/support-cards/99999/synergies');
+
+            $response->assertNotFound();
+        });
+
+        it('returns synergy cards sorted by score', function (): void {
+            $card = SupportCardDefinition::factory()->create([
+                'is_active' => true,
+                'card_type' => 'speed',
+                'meta_tier' => 'S',
+                'speed_bonus' => 10,
+            ]);
+
+            SupportCardDefinition::factory()->create([
+                'is_active' => true,
+                'card_type' => 'speed',
+                'meta_tier' => 'S+',
+                'speed_bonus' => 15,
+            ]);
+
+            SupportCardDefinition::factory()->create([
+                'is_active' => true,
+                'card_type' => 'stamina',
+                'meta_tier' => 'C',
+                'stamina_bonus' => 5,
+            ]);
+
+            $response = $this->getJson("/api/v1/support-cards/{$card->id}/synergies");
+
+            $response->assertSuccessful();
+            $synergyCards = $response->json('data.synergy_cards');
+            expect($synergyCards)->toBeArray();
+
+            if (count($synergyCards) >= 2) {
+                expect($synergyCards[0]['synergy_score'])->toBeGreaterThanOrEqual($synergyCards[1]['synergy_score']);
+            }
         });
     });
 

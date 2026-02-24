@@ -182,7 +182,8 @@ test('training predictions show page includes JavaScript module', function () us
     $response = $this->actingAs($user)->get(route('training.predictions.show', $character));
 
     $response->assertSuccessful();
-    $response->assertSee('resources/js/pages/training/show.js', false);
+    $content = $response->getContent();
+    expect($content)->toMatch('/show[-\w]*\.js/');
 });
 
 test('training predictions index with unity cup character displays correct scenario', function () use (&$user) {

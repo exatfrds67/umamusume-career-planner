@@ -2,18 +2,26 @@
 
 declare(strict_types=1);
 
+use App\Models\Character;
+use App\Models\Race;
+use App\Models\Skill;
+use App\Models\SupportCard;
 use App\Services\ExternalAPI\CacheManagerService;
 use Illuminate\Support\Facades\Cache;
 
 beforeEach(function () {
-    // Clear cache before each test
     Cache::flush();
 
     $this->cacheManager = app(CacheManagerService::class);
+
+    // Seed test data for warming methods
+    Character::factory()->count(3)->create();
+    SupportCard::factory()->count(5)->create();
+    Skill::factory()->count(5)->create();
+    Race::factory()->count(3)->create();
 });
 
 afterEach(function () {
-    // Clean up after tests
     Cache::flush();
 });
 
@@ -83,21 +91,23 @@ describe('Cache Warming', function () {
             ->and($stats['success'])->toBeTrue();
     });
 
-    it('creates placeholder data for cache keys', function () {
+    it('creates real data for cache keys', function () {
         $this->cacheManager->warmCache('high');
 
-        // Check that character data was cached
-        $characterData = $this->cacheManager->get('character_data:Silence Suzuka');
+        // Check that character data was cached using a real character from the DB
+        $character = Character::first();
+        $characterData = $this->cacheManager->get("character_data:{$character->name}");
 
         expect($characterData)->toBeArray()
             ->and($characterData)->toHaveKey('name')
-            ->and($characterData['name'])->toBe('Silence Suzuka');
+            ->and($characterData['name'])->toBe($character->name);
     });
 
     it('skips already cached items', function () {
-        // Pre-cache some data
-        $this->cacheManager->put('character_data:Silence Suzuka', [
-            'name' => 'Silence Suzuka',
+        // Pre-cache some data using a real character name
+        $character = Character::first();
+        $this->cacheManager->put("character_data:{$character->name}", [
+            'name' => $character->name,
             'status' => 'cached',
         ]);
 
@@ -107,7 +117,7 @@ describe('Cache Warming', function () {
             ->and($result['warmed_items'])->toBeGreaterThan(0);
 
         // Verify the pre-cached data wasn't overwritten
-        $data = $this->cacheManager->get('character_data:Silence Suzuka');
+        $data = $this->cacheManager->get("character_data:{$character->name}");
         expect($data['status'])->toBe('cached');
     });
 
@@ -200,7 +210,8 @@ describe('Cache Integration', function () {
         $this->cacheManager->warmCache('high');
 
         // Verify we can retrieve cached data
-        $data = $this->cacheManager->get('character_data:Silence Suzuka');
+        $character = Character::first();
+        $data = $this->cacheManager->get("character_data:{$character->name}");
 
         expect($data)->toBeArray()
             ->and($data)->toHaveKey('_cache')
@@ -217,9 +228,10 @@ describe('Cache Integration', function () {
     it('respects TTL configuration for warmed data', function () {
         $this->cacheManager->warmCache('high');
 
-        $metadata = $this->cacheManager->getCacheMetadata('character_data:Silence Suzuka');
+        $character = Character::first();
+        $metadata = $this->cacheManager->getCacheMetadata("character_data:{$character->name}");
 
         expect($metadata)->toBeArray()
-            ->and($metadata['ttl'])->toBe(300); // 5 minutes for placeholder
+            ->and($metadata['ttl'])->toBe(86400); // 24 hours for character_data
     });
 });

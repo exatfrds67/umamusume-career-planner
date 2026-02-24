@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Models\Character;
 use App\Models\Skill;
 use App\Models\SkillBuild;
 use App\Models\User;
@@ -156,6 +157,95 @@ describe('Skill Build API', function (): void {
             $response = $this->deleteJson("/api/skills/builds/{$build->id}");
 
             $response->assertNotFound();
+        });
+    });
+
+    describe('POST /api/skills/apply-build', function (): void {
+        it('returns build preview without character_id', function (): void {
+            $skills = Skill::where('is_active', true)->limit(3)->get();
+            $build = SkillBuild::factory()->create([
+                'user_id' => $this->user->id,
+                'skill_ids' => $skills->pluck('id')->toArray(),
+                'is_template' => false,
+            ]);
+
+            $response = $this->postJson('/api/skills/apply-build', [
+                'template_id' => $build->id,
+            ]);
+
+            $response->assertSuccessful()
+                ->assertJsonPath('success', true)
+                ->assertJsonPath('data.skills_added', 3)
+                ->assertJsonStructure([
+                    'success',
+                    'message',
+                    'data' => [
+                        'skills_added',
+                        'sp_spent',
+                        'skills',
+                        'build_name',
+                    ],
+                ]);
+        });
+
+        it('applies build to character', function (): void {
+            $skills = Skill::where('is_active', true)->limit(2)->get();
+            $character = Character::factory()->create(['user_id' => $this->user->id]);
+            $build = SkillBuild::factory()->create([
+                'user_id' => $this->user->id,
+                'skill_ids' => $skills->pluck('id')->toArray(),
+                'is_template' => false,
+            ]);
+
+            $response = $this->postJson('/api/skills/apply-build', [
+                'template_id' => $build->id,
+                'character_id' => $character->id,
+            ]);
+
+            $response->assertSuccessful()
+                ->assertJsonPath('data.skills_added', 2);
+
+            $this->assertDatabaseHas('ucp_skill_acquisitions', [
+                'character_id' => $character->id,
+                'skill_id' => $skills->first()->id,
+                'acquisition_method' => 'purchase',
+            ]);
+        });
+
+        it('returns 404 for non-existent build', function (): void {
+            $response = $this->postJson('/api/skills/apply-build', [
+                'template_id' => 99999,
+            ]);
+
+            $response->assertNotFound();
+        });
+
+        it('skips already acquired skills', function (): void {
+            $skills = Skill::where('is_active', true)->limit(2)->get();
+            $character = Character::factory()->create(['user_id' => $this->user->id]);
+            $build = SkillBuild::factory()->create([
+                'user_id' => $this->user->id,
+                'skill_ids' => $skills->pluck('id')->toArray(),
+                'is_template' => false,
+            ]);
+
+            $character->skills()->attach($skills->first()->id, [
+                'acquisition_method' => 'purchase',
+                'base_sp_cost' => $skills->first()->base_sp_cost,
+                'final_sp_cost' => $skills->first()->base_sp_cost,
+                'turn_acquired' => 1,
+                'career_phase' => 'junior',
+                'is_active' => true,
+            ]);
+
+            $response = $this->postJson('/api/skills/apply-build', [
+                'template_id' => $build->id,
+                'character_id' => $character->id,
+            ]);
+
+            $response->assertSuccessful()
+                ->assertJsonPath('data.skills_added', 1)
+                ->assertJsonCount(1, 'data.skipped');
         });
     });
 });
