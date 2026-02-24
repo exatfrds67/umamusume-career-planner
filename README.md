@@ -567,9 +567,36 @@ npm run test
 # E2E tests with Playwright
 npm run playwright:test
 
+# Comprehensive Browser Traversal (tests ALL routes)
+php artisan test:traversal
+php artisan test:traversal --open-report  # Opens HTML report after completion
+
 # Accessibility audit
 npm run a11y:test
 ```
+
+### Comprehensive Application Traversal
+
+The application includes an automated browser testing system that visits **every route** in the application:
+
+```bash
+# Test all routes (public + authenticated + admin)
+php artisan test:traversal --open-report
+
+# Test specific scope
+php artisan test:traversal --scope=public
+php artisan test:traversal --scope=auth
+php artisan test:traversal --scope=admin
+```
+
+**Reports**: Generated in `storage/app/test-reports/` with:
+
+- ✅ Coverage statistics (100+ routes)
+- ⚡ Performance metrics (load times)
+- 🐛 JavaScript error detection
+- 📊 Visual HTML report with tables and charts
+
+See [tests/Browser/README.md](tests/Browser/README.md) for details.
 
 ### Critical User Flows
 

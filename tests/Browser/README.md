@@ -80,6 +80,67 @@ Tests Alpine.js interactivity for the advisory panel:
 
 **Requirements**: 3.7, WCAG 2.2 AA
 
+### ComprehensiveTraversalTest.php (NEW)
+
+**Automated comprehensive application traversal** testing that systematically visits ALL routes in the application like a thorough manual tester.
+
+**What it does:**
+
+- 🔍 **Auto-discovers** all routes from `routes/web.php` (100+ routes)
+- 🚦 **Categorizes** routes: Public, Authenticated, Admin
+- ✅ **Visits** every page and checks for errors
+- 📊 **Generates** detailed HTML and JSON reports with:
+  - Coverage statistics (how many routes visited)
+  - Error details (JavaScript errors, HTTP errors)
+  - Performance metrics (load times, slowest pages)
+  - Pass/fail status for each route
+
+**Running the test:**
+
+```bash
+# Using Artisan command (recommended)
+php artisan test:traversal
+
+# Open report automatically after completion
+php artisan test:traversal --open-report
+
+# Test specific scope
+php artisan test:traversal --scope=public
+php artisan test:traversal --scope=auth
+php artisan test:traversal --scope=admin
+
+# Run with visible browser (for debugging)
+php artisan test:traversal --headless=false
+
+# Using PHPArtisan test directly
+php artisan test tests/Browser/ComprehensiveTraversalTest.php --group=traversal
+```
+
+**Generated Reports:**
+
+Reports are saved to `storage/app/test-reports/`:
+
+- `traversal-{timestamp}.html` - Visual HTML report with statistics and tables
+- `traversal-{timestamp}.json` - Machine-readable JSON for CI/CD
+- `traversal-latest.html` - Always points to the most recent report
+
+**Performance:**
+
+- Typical runtime: 5-10 minutes (depending on number of routes)
+- Tests ~100+ routes across all authentication levels
+- Tracks load time for each page
+- Fails if average load time exceeds 5 seconds
+
+**Use cases:**
+
+- ✅ Smoke testing before deployment
+- ✅ Regression detection after major changes
+- ✅ Performance benchmarking across all pages
+- ✅ Verifying all routes are accessible
+- ✅ Finding broken routes or JavaScript errors
+
+**Groups:** `@browser`, `@traversal`, `@slow`
+
 ## Test Structure
 
 Browser tests follow this structure:

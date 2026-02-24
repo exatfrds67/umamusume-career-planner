@@ -103,7 +103,9 @@ test('user can create character', function () {
 
 ### Browser Tests (`tests/Browser/`)
 
-End-to-end tests using real browsers.
+End-to-end tests using real browsers (Playwright).
+
+#### Standard Browser Tests
 
 ```php
 test('user can complete training workflow', function () {
@@ -113,6 +115,35 @@ test('user can complete training workflow', function () {
         ->assertNoJavascriptErrors();
 });
 ```
+
+#### Comprehensive Traversal Test (NEW)
+
+Automated testing of ALL application routes with detailed reporting:
+
+```bash
+# Run comprehensive traversal test
+php artisan test:traversal
+
+# View HTML report
+php artisan test:traversal --open-report
+
+# Test specific scope
+php artisan test:traversal --scope=public  # Only public pages
+php artisan test:traversal --scope=auth    # Only authenticated pages
+php artisan test:traversal --scope=admin   # Only admin pages
+```
+
+**What it does:**
+
+- Automatically discovers all routes from `routes/web.php`
+- Visits every page (100+ routes)
+- Checks for JavaScript errors on each page
+- Tracks performance (load times)
+- Generates HTML and JSON reports
+
+**Reports saved to:** `storage/app/test-reports/traversal-{timestamp}.html`
+
+See [tests/Browser/README.md](tests/Browser/README.md) for full documentation.
 
 ### Integration Tests (`tests/Integration/`)
 
