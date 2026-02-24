@@ -42,6 +42,10 @@
                                 class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium text-white hover:text-red-100 {{ request()->routeIs('admin.queue.*') ? 'border-white' : 'border-transparent' }}">
                                 Queue
                             </a>
+                            <a href="{{ route('admin.apm') }}"
+                                class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium text-white hover:text-red-100 {{ request()->routeIs('admin.apm') ? 'border-white' : 'border-transparent' }}">
+                                APM
+                            </a>
                         </div>
                     </div>
 

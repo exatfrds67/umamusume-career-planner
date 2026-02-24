@@ -56,6 +56,7 @@
 
     <!-- Scripts & Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @livewireStyles
 </head>
 
 <body class="h-full font-sans antialiased text-gray-900 dark:text-gray-100" x-data="{ sidebarOpen: false }"
@@ -159,6 +160,7 @@
     <div id="sidebar-announcer" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
 
     @stack('scripts')
+    @livewireScriptConfig
 </body>
 
 </html>

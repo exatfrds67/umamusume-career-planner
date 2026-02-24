@@ -31,7 +31,14 @@ Accessibility: WCAG 2.2 AA compliant
     'responsive' => true,
 ])
 
-<div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 space-y-4">
+<div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 space-y-4"
+    x-data="lineChart(
+        {{ json_encode($data) }},
+        {{ json_encode($labels) }},
+        {{ json_encode($colors) }},
+        {{ $animated ? 'true' : 'false' }},
+        {{ $responsive ? 'true' : 'false' }}
+    )">
     {{-- Header --}}
     <div>
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ $title }}</h3>
@@ -40,13 +47,7 @@ Accessibility: WCAG 2.2 AA compliant
 
     {{-- Chart Container --}}
     <div class="{{ $height }} relative">
-        <canvas id="lineChart_{{ uniqid() }}" x-data="lineChart(
-            {{ json_encode($data) }},
-            {{ json_encode($labels) }},
-            {{ json_encode($colors) }},
-            {{ $animated ? 'true' : 'false' }},
-            {{ $responsive ? 'true' : 'false' }}
-        )" x-init="init()" class="w-full"
+        <canvas x-init="init()" class="w-full"
             role="img" :aria-label="`{{ $title }} chart showing progression over time`"></canvas>
     </div>
 

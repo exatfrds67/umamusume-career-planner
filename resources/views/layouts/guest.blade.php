@@ -48,6 +48,7 @@
 
     <!-- Scripts & Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @livewireStyles
 </head>
 
 <body class="h-full font-sans antialiased text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-gray-900">
@@ -65,6 +66,7 @@
     </div>
 
     @stack('scripts')
+    @livewireScriptConfig
 </body>
 
 </html>

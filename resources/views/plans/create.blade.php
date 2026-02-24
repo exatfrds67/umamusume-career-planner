@@ -207,7 +207,7 @@
                 </div>
 
                 {{-- Step 4: Race Planning --}}
-                <div x-show="currentStep === 3" x-transition class="space-y-6">
+                <div x-show="currentStep === 3" x-transition class="space-y-6" x-data="racePlanner()">
                     <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
                         Plan Races (Optional)
                     </h2>
@@ -216,9 +216,110 @@
                         Select which races you plan to participate in during training. This step is optional.
                     </p>
 
-                    <div class="text-center py-12 text-gray-500 dark:text-gray-400">
-                        <p>Race planning interface coming soon</p>
-                        <p class="text-sm mt-2">For now, you can skip this step</p>
+                    {{-- Filters --}}
+                    <div class="flex flex-wrap gap-3 mb-4">
+                        <select x-model="gradeFilter" aria-label="Filter by grade"
+                            class="px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">
+                            <option value="">All Grades</option>
+                            <option value="G1">G1</option>
+                            <option value="G2">G2</option>
+                            <option value="G3">G3</option>
+                        </select>
+                        <select x-model="distanceFilter" aria-label="Filter by distance"
+                            class="px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">
+                            <option value="">All Distances</option>
+                            <option value="short">Short (&lt;1400m)</option>
+                            <option value="mile">Mile (1400-1800m)</option>
+                            <option value="intermediate">Intermediate (1800-2400m)</option>
+                            <option value="long">Long (2400m+)</option>
+                        </select>
+                        <select x-model="surfaceFilter" aria-label="Filter by surface"
+                            class="px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">
+                            <option value="">All Surfaces</option>
+                            <option value="turf">Turf</option>
+                            <option value="dirt">Dirt</option>
+                        </select>
+                        <select x-model="phaseFilter" aria-label="Filter by career phase"
+                            class="px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">
+                            <option value="">All Phases</option>
+                            <option value="junior">Junior</option>
+                            <option value="classic">Classic</option>
+                            <option value="senior">Senior</option>
+                        </select>
+                    </div>
+
+                    {{-- Race List --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-96 overflow-y-auto pr-1">
+                        <template x-for="race in filteredRaces" :key="race.id">
+                            <button type="button" @click="toggleRace(race)"
+                                :class="isSelected(race.id) ?
+                                    'ring-2 ring-blue-500 bg-blue-50 dark:bg-blue-900/20 border-blue-300 dark:border-blue-700' :
+                                    'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'"
+                                class="flex items-start gap-3 p-3 border rounded-lg text-left transition-colors duration-150"
+                                :aria-pressed="isSelected(race.id).toString()">
+                                <div class="shrink-0 mt-0.5">
+                                    <span x-show="isSelected(race.id)" class="text-blue-600 dark:text-blue-400">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd"
+                                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                                clip-rule="evenodd" />
+                                        </svg>
+                                    </span>
+                                    <span x-show="!isSelected(race.id)" class="text-gray-400 dark:text-gray-500">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <circle cx="12" cy="12" r="10" stroke-width="2" />
+                                        </svg>
+                                    </span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-medium text-gray-900 dark:text-white" x-text="race.name"></p>
+                                    <div class="flex flex-wrap gap-1.5 mt-1">
+                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium"
+                                            :class="race.grade === 'G1' ?
+                                                'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' :
+                                                race.grade === 'G2' ?
+                                                'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300' :
+                                                'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'"
+                                            x-text="race.grade"></span>
+                                        <span
+                                            class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
+                                            x-text="race.distance + 'm'"></span>
+                                        <span
+                                            class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
+                                            x-text="race.surface"></span>
+                                        <span
+                                            class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300"
+                                            x-text="race.phase"></span>
+                                    </div>
+                                </div>
+                            </button>
+                        </template>
+                    </div>
+
+                    <template x-if="filteredRaces.length === 0">
+                        <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                            <p class="text-sm">No races match the current filters.</p>
+                        </div>
+                    </template>
+
+                    {{-- Selected Races Summary --}}
+                    <div x-show="$parent.plan.races.length > 0" x-transition
+                        class="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                <span x-text="$parent.plan.races.length"></span> race<span
+                                    x-show="$parent.plan.races.length !== 1">s</span> planned
+                            </p>
+                            <button type="button" @click="clearAll()"
+                                class="ml-auto text-xs text-blue-600 dark:text-blue-400 hover:underline">
+                                Clear all
+                            </button>
+                        </div>
                     </div>
                 </div>
 

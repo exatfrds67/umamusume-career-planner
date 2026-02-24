@@ -34,7 +34,8 @@ Accessibility: WCAG 2.2 AA compliant
     'height' => 'h-96',
 ])
 
-<div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 space-y-4">
+<div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 space-y-4"
+    x-data="classPyramid({{ json_encode($grades) }})">
     {{-- Header --}}
     <div>
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ $title }}</h3>
@@ -43,7 +44,7 @@ Accessibility: WCAG 2.2 AA compliant
 
     {{-- Total Fans Summary --}}
     <div
-        class="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-700/50">
+        class="bg-linear-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-700/50">
         <div class="flex items-center justify-between">
             <div>
                 <span class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Total Fanbase</span>
@@ -56,7 +57,7 @@ Accessibility: WCAG 2.2 AA compliant
 
     {{-- Pyramid Variant --}}
     @if ($variant === 'pyramid')
-        <div class="{{ $height }} flex flex-col justify-center items-center space-y-2" x-data="classPyramid({{ json_encode($grades) }})">
+        <div class="{{ $height }} flex flex-col justify-center items-center space-y-2">
 
             {{-- Pyramid Layers --}}
             <template x-for="(layer, index) in sortedGrades" :key="index">
@@ -101,7 +102,7 @@ Accessibility: WCAG 2.2 AA compliant
 
         {{-- Bars Variant --}}
     @elseif ($variant === 'bars')
-        <div class="space-y-3" x-data="classPyramid({{ json_encode($grades) }})">
+        <div class="space-y-3">
             <template x-for="(grade, index) in sortedGrades" :key="index">
                 <div class="space-y-1">
                     {{-- Grade Label --}}
@@ -125,7 +126,7 @@ Accessibility: WCAG 2.2 AA compliant
 
         {{-- Cards Variant --}}
     @elseif ($variant === 'cards')
-        <div class="grid grid-cols-2 gap-3 @lg:grid-cols-3" x-data="classPyramid({{ json_encode($grades) }})">
+        <div class="grid grid-cols-2 gap-3 @lg:grid-cols-3">
             <template x-for="(grade, index) in sortedGrades" :key="index">
                 <div :class="`${grade.color} rounded-lg p-4 text-white space-y-2 hover:shadow-lg transition-shadow`"
                     role="article" :aria-label="`${grade.grade} tier`">
