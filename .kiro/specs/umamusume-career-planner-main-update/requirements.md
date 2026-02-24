@@ -2,11 +2,11 @@
 
 ## Umamusume Pretty Derby Career Planner
 
-**Document Version**: 2.1.0  
-**Date**: January 25, 2026  
+**Document Version**: 2.4.0  
+**Date**: February 23, 2026  
 **Project**: UmamusumeCareerPlanner  
 **Author**: Development Team  
-**Status**: Current - Aligned with v2.0.0/v2.1.0 Implementation
+**Status**: Current - Aligned with v2.3.0 Implementation, IVM v4.3.0, game-accurate mechanics, 97% requirements compliance
 
 ---
 
@@ -16,6 +16,8 @@
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.4.0 | 2026-02-23 | Development Team | Updated to v2.3.0 alignment; IVM v4.3.0 verified 97% compliance (228/236 requirements); all 7 core modules at 100%; 3,316+ tests with 11,563+ assertions; 195 test files; 30 Eloquent models, 60+ services, 42 Livewire components, 8 Neuron agents, 12 MCP tools; SPEC-008 APM fully implemented; known gaps: APM dashboards, PWA offline routes, accessibility pages (GAP-001 to GAP-007); Livewire 4, Neuron AI v2.11, Laravel Reverb WebSocket; stub/placeholder overhaul planned per GAP_PLANNING_090226 |
+| 2.3.0 | 2026-02-23 | Development Team | Updated to v2.2.0/v2.3.0 alignment; game-accurate mechanics (aptitude max S, stats >1200 diminishing returns, track conditions); added SPEC-008 APM; Livewire 4, Neuron AI v2.11; updated implementation status from IVM v4.3.0; 97% requirements compliance |
 | 2.1.0 | 2026-01-25 | Development Team | Comprehensive update aligned with v2.0.0 implementation and v2.1.0 enhancements; integrated all documentation sources (BRS, SRS, IVM, RTM, PRDs, SPECs, FLOWs); added complete traceability matrix; updated requirements with implementation evidence |
 | 2.0.0 | 2026-01-23 | Development Team | Initial v2.0 requirements |
 | 1.0.0 | 2026-01-14 | Development Team | Initial draft |
@@ -77,15 +79,65 @@ The Umamusume Career Planner is a comprehensive web application that enables pla
 
 **Technology Stack:**
 
-- **Backend**: Laravel 12+ (PHP 8.2+)
-- **Frontend**: Livewire 3, Alpine.js, Tailwind CSS v4
-- **Build Tool**: Vite 7
+- **Backend**: Laravel 12+ (PHP 8.4.11)
+- **Frontend**: Livewire 4, Alpine.js 3, Tailwind CSS v4
+- **Build Tool**: Vite 7+
 - **Database**: MySQL 8.0+, MariaDB 10.5+, SQLite (dev/test)
-- **Cache/Queue**: Redis (optional)
-- **AI**: Ollama (local) + AWS Bedrock (cloud fallback)
-- **Testing**: Pest 4.0+, Playwright
+- **Cache/Queue**: Redis 7+ (optional)
+- **AI**: Neuron AI v2.11 (neuron-laravel v0.3.4), Ollama (local) + AWS Bedrock Claude 4.5 (cloud fallback)
+- **MCP**: Model Context Protocol with 12 tools
+- **WebSocket**: Laravel Reverb for real-time updates
+- **Testing**: Pest v4 (with browser testing), PHPUnit v12, Playwright 1.58
+- **Code Quality**: Larastan v3, Laravel Pint v1
+- **Dev Tools**: Laravel Boost v1.8, Laravel Telescope v5, Laravel Horizon v5
 
-### 1.3 Conventions
+### 1.3 Codebase Snapshot (IVM v4.3.0 - February 21, 2026)
+
+The codebase contains:
+
+- **Eloquent Models**: 30 (includes SupportDeck, SkillBuild, CriticalAlert, etc.)
+- **Controllers (Web)**: 30 (includes HistoricalTracking, CareerReport)
+- **Controllers (API)**: 22+ (includes Admin/, Api/, Auth/)
+- **Services**: 60+ (in Admin/, AI/, Agents/, ExternalAPI/, MCP/, Neuron/, OCR/, Training/, BladeAssetExtraction/)
+- **Form Requests**: 29
+- **Livewire Components**: 42
+- **Neuron AI Agents**: 8 (neuron-ai v2.11, neuron-laravel v0.3.4)
+- **MCP Tools**: 12
+- **Database Migrations**: 50+ (with ucp_ prefix)
+- **Enums**: 8 (AlertType, CareerPhase, Mood, Priority, RaceDistance, RecommendationType, RunningStyle, StorageMode)
+- **Test Files**: 195 (Unit, Feature, E2E via Pest v4, PHPUnit v12)
+- **Database Tables**: 35 (31 specified + 4 January 2026 enhancements)
+- **Web Routes**: 34
+- **API Routes**: 42
+- **Internal Routes**: 18
+
+**Compliance Summary (IVM v4.3.0)**:
+
+| Category | Requirement Count | Implemented | Compliance % |
+|----------|-------------------|-------------|--------------|
+| Functional Requirements | 67 | 65 | 97% |
+| Non-Functional Requirements | 28 | 26 | 93% |
+| Business Requirements | 52 | 50 | 96% |
+| Technical Specifications | 89 | 87 | 98% |
+| **Overall** | **236** | **228** | **97%** |
+
+**Known Gaps (7 items)**:
+
+- GAP-001: APM Dashboard incomplete (🔄 In Progress, P1)
+- GAP-002: PWA offline route coverage (🔄 In Progress, P1)
+- GAP-003: Accessibility pages missing (🔄 In Progress, P1)
+- GAP-004: OpenCV preprocessing not integrated (⏳ Planned, P2)
+- GAP-005: Neuron MCP connector disabled by default (⏳ Optional, P3)
+- GAP-006: Background sync for Local mode (🔄 In Progress, P1)
+- GAP-007: Dark mode optimization (⏳ Planned, P2)
+
+**Stub/Placeholder Overhaul (GAP_PLANNING_090226)**:
+
+- ~30 stub/placeholder instances across 11 files identified
+- 8 phases planned: stub endpoints, placeholder services, UI gaps, local storage mode, notifications, snapshots, tests, documentation
+- Affects CareerController (7 stubs), SkillBuildController (6 stubs), CacheManagerService (6 warming methods)
+
+### 1.4 Conventions
 
 #### 1.3.1 Requirement Format
 
@@ -251,12 +303,12 @@ For complete terminology definitions, refer to [000_MASTER_GLOSSARY.md](../../do
 |------|------------|
 | **Uma Musume** | Horse girl characters that players train in the game |
 | **Career Run / Plan** | A single career mode progression tracking a character's training |
-| **Stats** | Five core attributes: Speed (0-1200), Stamina (0-1200), Power (0-1200), Guts (0-1200), Wit (0-1200) |
-| **Aptitudes** | Fixed talent ratings (G through S, S is maximum) for distance, surface, and running style |
+| **Stats** | Five core attributes: Speed, Stamina, Power, Guts, Wit. Range 0-1200 base, can exceed 1200 with diminishing returns (half value above 1200). Key breakpoints: 901, 1200, 1600. Stamina 1200+ activates "Stamina Contest" buff |
+| **Aptitudes** | Fixed talent ratings (G→F→E→D→C→B→A→S, S is maximum) for distance, surface, and running style. A-rank is baseline (0%); only S-rank provides positive bonuses (+5%) |
 | **Factors** | Inherited traits from parent characters providing stat/aptitude bonuses |
 | **Growth Rates** | Inherited bonuses (+10%, +20%, +30%) multiplying training effectiveness |
 | **Skill Points (SP)** | Currency earned from races/events, spent to acquire skills |
-| **Skill Hints** | Unlocked opportunities reducing SP cost progressively (5 levels: 10%/20%/30%/35%/40% max) |
+| **Skill Hints** | Unlocked opportunities reducing SP cost progressively (5 levels: 10%/20%/30%/35%/40% max). Additional discount sources: Fast Learner (+10%), Skill Sparks, Hint Books |
 | **Support Cards** | Cards providing bonuses and events during training (6-card deck) |
 | **Bond Level** | Friendship level with support cards (0-100%) |
 
@@ -383,11 +435,11 @@ For complete terminology definitions, refer to [000_MASTER_GLOSSARY.md](../../do
 | ID | Requirement | Priority | Status | Test Coverage | Evidence |
 |----|-------------|----------|--------|---------------|----------|
 | FR-02.1 | System SHALL support CRUD operations for characters | P0 | ✅ | 95% | `CharacterService`, SPEC-001 §3.1 |
-| FR-02.2 | System SHALL track five core stats (Speed, Stamina, Power, Guts, Wit) with range 0-1200 | P0 | ✅ | 92% | `Character` model, DBD §4.2 |
-| FR-02.3 | System SHALL track energy (0-100), mood (5 levels), and current turn (1-78) | P0 | ✅ | 90% | `Character` model fields |
+| FR-02.2 | System SHALL track five core stats (Speed, Stamina, Power, Guts, Wit) with range 0-1200 base, exceeding 1200 with diminishing returns | P0 | ✅ | 92% | `Character` model, DBD §4.2 |
+| FR-02.3 | System SHALL track energy (0-100), mood (5 levels), and current turn (1-78, ~70-78 turns across Junior/Classic/Senior years) | P0 | ✅ | 90% | `Character` model fields |
 | FR-02.4 | System SHALL manage character goals with progress tracking | P1 | ✅ | 87% | JSON field + validation |
 | FR-02.5 | System SHALL support scenario selection (URA, Grand Masters, etc.) | P0 | ✅ | 88% | Enum field |
-| FR-02.6 | System SHALL track aptitude grades (G through S, S is maximum) for distance/surface/style | P0 | ✅ | 90% | `AptitudeGrade` enum, SPEC-001 §4.1 |
+| FR-02.6 | System SHALL track aptitude grades (G→F→E→D→C→B→A→S, S is maximum) for distance/surface/style with A as baseline | P0 | ✅ | 90% | `AptitudeGrade` enum, SPEC-001 §4.1 |
 | FR-02.7 | System SHALL manage factor inheritance from parent characters | P0 | ✅ | 89% | `FactorInheritanceService`, SPEC-001 §4.3 |
 | FR-02.8 | System SHALL support character image upload with validation | P1 | ✅ | 92% | `ImageUploadService`, SPEC-001 §3.2 |
 | FR-02.9 | System SHALL track conditions (positive/negative status effects) | P1 | ✅ | 85% | JSON field |
@@ -405,7 +457,7 @@ For complete terminology definitions, refer to [000_MASTER_GLOSSARY.md](../../do
 **AC-02.2: Stat Tracking**
 
 - WHEN character stats are updated
-- THEN the system SHALL enforce range validation (0-1200 hard cap)
+- THEN the system SHALL enforce range validation (0-1200 base, diminishing returns above 1200)
 - AND calculate stat grades (G through S)
 - AND update stat progress history
 - AND trigger any dependent calculations (race readiness, etc.)
@@ -413,7 +465,7 @@ For complete terminology definitions, refer to [000_MASTER_GLOSSARY.md](../../do
 **AC-02.3: Aptitude Management**
 
 - WHEN character aptitudes are set or updated
-- THEN the system SHALL validate grade values (G through S, S is maximum)
+- THEN the system SHALL validate grade values (G→F→E→D→C→B→A→S, S is maximum, A is baseline)
 - AND store aptitudes for all categories (distance, surface, style)
 - AND use aptitudes in race suitability calculations
 - AND display aptitudes with appropriate visual indicators
@@ -541,6 +593,8 @@ For complete terminology definitions, refer to [000_MASTER_GLOSSARY.md](../../do
 | FR-04.5 | System SHALL calculate readiness score based on stats/skills/aptitudes | P1 | ✅ | 89% | Readiness calculator |
 | FR-04.6 | System SHALL generate win probability predictions | P1 | ✅ | 87% | `WinProbabilityCalculator`, SPEC-003 §4.2 |
 | FR-04.7 | System SHALL recommend optimal running style per race | P1 | ✅ | 89% | Style optimizer, SPEC-003 §4.1 |
+| FR-04.8 | System SHALL model track conditions (Firm/Good/Soft/Heavy) with surface-specific penalties | P1 | ✅ | 86% | `RaceConditionService`, SPEC-003 §4.3 |
+| FR-04.9 | System SHALL calculate stamina drain modifiers for track conditions (+2%/sec for Soft/Heavy) | P1 | ✅ | 85% | Stamina drain calculator |
 
 #### Acceptance Criteria
 
@@ -614,7 +668,7 @@ For complete terminology definitions, refer to [000_MASTER_GLOSSARY.md](../../do
 |----|-------------|----------|--------|---------------|----------|
 | FR-05.1 | System SHALL maintain skill catalog with 150+ skills (Normal, Rare, Unique) | P0 | ✅ | 93% | `Skill` model, SPEC-004 §3.1 |
 | FR-05.2 | System SHALL track skill acquisitions per character | P0 | ✅ | 92% | `SkillCareerRun` model |
-| FR-05.3 | System SHALL track hints and apply SP cost reduction (5 levels: 10%/20%/30%/35%/40% max) | P0 | ✅ | 91% | `calculateSpCost()`, SPEC-004 §4.1 |
+| FR-05.3 | System SHALL track hints and apply SP cost reduction (5 levels: 10%/20%/30%/35%/40% max, plus additional sources: Fast Learner, Skill Sparks, Hint Books) | P0 | ✅ | 91% | `calculateSpCost()`, SPEC-004 §4.1 |
 | FR-05.4 | System SHALL support skill evolution paths (Normal → Rare) | P1 | ✅ | 88% | `SkillEvolutionService`, SPEC-004 §4.2 |
 | FR-05.5 | System SHALL provide AI skill build recommendations | P1 | ✅ | 85% | `SkillAdvisorAgent` |
 | FR-05.6 | System SHALL calculate SP budget optimization | P1 | ✅ | 87% | SP optimizer |
@@ -635,7 +689,7 @@ For complete terminology definitions, refer to [000_MASTER_GLOSSARY.md](../../do
 
 - WHEN a user acquires a skill
 - THEN the system SHALL validate SP availability
-- AND apply hint discounts (5 levels: 10%/20%/30%/35%/40% max)
+- AND apply hint discounts (5 levels: 10%/20%/30%/35%/40% max, plus additional sources)
 - AND deduct final SP cost from character balance
 - AND record acquisition with turn number
 - AND update skill status to "Acquired"
@@ -645,7 +699,7 @@ For complete terminology definitions, refer to [000_MASTER_GLOSSARY.md](../../do
 
 - WHEN a skill hint is obtained
 - THEN the system SHALL record hint source (training facility, event, etc.)
-- AND increment hint level (max 5 levels: 10%/20%/30%/35%/40% discount)
+- AND increment hint level (max 5 levels: 10%/20%/30%/35%/40% discount, plus additional sources like Fast Learner)
 - AND update SP cost calculation
 - AND display hint indicator in skill shop
 
@@ -742,7 +796,7 @@ For complete terminology definitions, refer to [000_MASTER_GLOSSARY.md](../../do
 
 ### 4.7 AI Advisory System [FR-07]
 
-**Description:** AI-powered recommendations using hybrid local/cloud providers with Neuron agents.
+**Description:** AI-powered recommendations using hybrid local/cloud providers with Neuron AI v2.11 agents and MCP tool integration.
 
 **Source:** BR-6 (BRS §4.6), SRS §2.7  
 **Priority:** P1  
@@ -766,8 +820,10 @@ For complete terminology definitions, refer to [000_MASTER_GLOSSARY.md](../../do
 | FR-07.3 | System SHALL provide skill build recommendations | P0 | ✅ | 85% | `SkillAdvisorAgent` |
 | FR-07.4 | System SHALL track AI conversations and context | P1 | ✅ | 86% | `AIConversation` model |
 | FR-07.5 | System SHALL track AI costs and performance metrics | P1 | ✅ | 85% | `AICostTracker`, SPEC-006 §5.1 |
-| FR-07.6 | System SHALL support hybrid AI (Ollama local + AWS Bedrock fallback) | P1 | ✅ | 89% | `HybridAIService`, SPEC-006 §3.1 |
+| FR-07.6 | System SHALL support hybrid AI (Ollama local + AWS Bedrock Claude 4.5 fallback) | P1 | ✅ | 89% | `HybridAIService`, SPEC-006 §3.1 |
 | FR-07.7 | System SHALL provide confidence scoring for recommendations | P2 | ✅ | 82% | Confidence scorer |
+| FR-07.8 | System SHALL integrate MCP tools (12 tools across Memory, Filesystem, Fetch servers) | P1 | ✅ | 84% | `MCPOrchestrator`, SPEC-006 §5 |
+| FR-07.9 | System SHALL support 8 specialized Neuron AI agents | P1 | ✅ | 86% | `app/Neuron/Agents/` |
 
 #### Acceptance Criteria
 

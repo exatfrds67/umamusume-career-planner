@@ -1,10 +1,10 @@
-# Design Document: Umamusume Career Planner v2.1.0
+# Design Document: Umamusume Career Planner v2.4.0
 
-**Document Version**: 2.1.0  
-**Date**: January 25, 2026  
+**Document Version**: 2.4.0  
+**Date**: February 23, 2026  
 **Project**: UmamusumeCareerPlanner  
-**Status**: Production-Ready Design  
-**Related Documents**: requirements.md, SDP v2.1, SDS v2.1, SPEC-001 to SPEC-007
+**Status**: Production-Ready Design - Aligned with IVM v4.3.0, 97% compliance  
+**Related Documents**: requirements.md, SDP v2.2, SDS v2.2, SPEC-001 to SPEC-008
 
 ---
 
@@ -14,6 +14,8 @@
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 2.4.0 | 2026-02-23 | Development Team | Updated to v2.3.0 alignment; IVM v4.3.0 verified; 30 models, 60+ services, 42 Livewire components, 8 Neuron agents, 12 MCP tools, 35 DB tables; added Performance & Monitoring services (8 new: ApmService, ApiPerformanceMonitoringService, QueryOptimizationService, PerformanceAlertingService, RedisCacheOptimizationService, ApiResponseCachingService, PerformanceRegressionService, HistoricalTrackingService); added WebSocket via Laravel Reverb; added stub/placeholder overhaul plan; updated component counts from IVM |
+| 2.3.0 | 2026-02-23 | Development Team | Updated to v2.2.0/v2.3.0 alignment; Livewire 4, Neuron AI v2.11; SPEC-008 APM; game-accurate mechanics; track conditions; 8 Neuron agents; 12 MCP tools |
 | 2.1.0 | 2026-01-25 | Development Team | Comprehensive design aligned with v2.0.0 implementation and v2.1.0 requirements |
 | 2.0.0 | 2026-01-23 | Development Team | Initial v2.0 design |
 
@@ -29,6 +31,17 @@
 | **SPEC-002** | [SPEC-002](../../docs/02-specs/SPEC-002_Training_Optimization_Technical.md) | Training optimization |
 | **SPEC-006** | [SPEC-006](../../docs/02-specs/SPEC-006_AI_Advisory_Technical.md) | AI advisory system |
 | **SPEC-007** | [SPEC-007](../../docs/02-specs/SPEC-007_External_Integration_Technical.md) | External integration |
+| **SPEC-008** | [SPEC-008](../../docs/02-specs/SPEC-008_Performance_Monitoring_Technical.md) | Performance monitoring & APM |
+
+### Additional Documentation References
+
+| Document | Reference | Purpose |
+|----------|-----------|---------|
+| **Implementation Verification** | [000_IVM](../../docs/00-core-docs/000_IMPLEMENTATION_VERIFICATION_MATRIX.md) | Implementation status (v4.3.0) |
+| **Requirements Traceability** | [000_RTM](../../docs/00-core-docs/000_REQUIREMENTS_TRACEABILITY_MATRIX.md) | Requirements mapping |
+| **Master Glossary** | [000_MASTER_GLOSSARY](../../docs/00-core-docs/000_MASTER_GLOSSARY.md) | Terminology reference |
+| **Gap Planning** | [GAP_PLANNING_090226](../../docs/implementation/GAP_PLANNING_090226.md) | Stub/placeholder overhaul plan |
+| **Support Cards Status** | [FINAL_STATUS_REPORT](../../docs/verification-reports/FINAL_STATUS_REPORT.md) | Support cards system verification |
 
 ---
 
@@ -74,19 +87,29 @@ This Design Document provides the comprehensive technical design for the Umamusu
 | Layer | Technology | Version | Purpose |
 |-------|-----------|---------|---------|
 | **Backend Framework** | Laravel | 12+ | Application framework |
-| **Language** | PHP | 8.2+ | Server-side logic |
-| **Frontend Reactivity** | Livewire | 3 | Server-driven UI updates |
+| **Language** | PHP | 8.4.11 | Server-side logic |
+| **Frontend Reactivity** | Livewire | 4 | Server-driven UI updates |
 | **Client Interactivity** | Alpine.js | 3.x | Client-side interactions |
 | **Styling** | Tailwind CSS | v4 | Utility-first styling |
 | **Build Tool** | Vite | 7+ | Asset bundling and optimization |
 | **Database** | MySQL | 8.0+ | Primary data store |
 | **Cache** | Redis | 7+ | Caching and sessions |
 | **AI (Local)** | Ollama | Latest | Local AI inference |
-| **AI (Cloud)** | AWS Bedrock | Claude 3.5/4.5 | Cloud AI fallback |
-| **MCP** | Model Context Protocol | Latest | Tool execution framework |
+| **AI (Cloud)** | AWS Bedrock | Claude 4.5 | Cloud AI fallback |
+| **AI Framework** | Neuron AI | v2.11 | Agent framework |
+| **MCP** | Model Context Protocol | Latest | Tool execution framework (12 tools) |
 | **OCR** | Tesseract | 5+ | Optical character recognition |
-| **Testing** | Pest | 4.0+ | PHP testing framework |
-| **Browser Testing** | Playwright | Latest | E2E testing |
+| **Testing** | Pest | 4.0+ | PHP testing framework (with browser testing) |
+| **Testing** | PHPUnit | 12 | Unit testing framework |
+| **Browser Testing** | Playwright | 1.58 | E2E testing |
+| **Browser Testing** | pest-plugin-browser | 4.0 | Pest browser testing |
+| **Static Analysis** | Larastan | v3 | PHP static analysis |
+| **Code Formatting** | Laravel Pint | v1 | Code style enforcement |
+| **Dev Tools** | Laravel Boost | v1.8 | MCP development tools |
+| **WebSocket** | Laravel Reverb | 1.x | Real-time updates |
+| **Queue Management** | Laravel Horizon | v5 | Redis queue dashboard |
+| **Debugging** | Laravel Telescope | v5 | Development debugging |
+| **Charts** | Chart.js | 4.x | Data visualization |
 
 ### 1.4 Requirements Traceability
 
@@ -100,12 +123,17 @@ This design document maps directly to requirements defined in requirements.md:
 | FR-04: Race Strategy | §5.4 | RaceService, WinProbabilityCalculator |
 | FR-05: Skill Management | §5.5 | SkillService, SkillEvolutionService |
 | FR-06: Support Card Management | §5.6 | SupportDeckService, BonusCalculator |
-| FR-07: AI Advisory | §6 | Neuron agents, HybridAIService |
+| FR-07: AI Advisory | §6 | Neuron AI v2.11 agents, HybridAIService, 12 MCP tools |
 | FR-08: External Integration | §7 | ExternalAPIService, CircuitBreaker |
 | FR-09: Data Management | §5.7 | ImportService, ExportService |
 | NFR-P: Performance | §9.1 | CacheOptimizationService, QueryOptimization |
 | NFR-A: Accessibility | §8.2, §9.2 | Accessible component library |
 | NFR-S: Security | §11 | Authentication, Authorization, Validation |
+| NFR-APM: Performance Monitoring | §9.1, SPEC-008 | APMService, MetricsCollection, AlertingSystem |
+| FR-10: Dual Storage Mode | §4.1, §5.7 | LocalStorageService, StorageConversionService |
+| FR-11: Dashboard & Navigation | §3.2, §8 | DashboardOverview, PlanList |
+| FR-12: Analytics & Reporting | §9.1 | AnalyticsService, PerformanceController |
+| INT-WS: WebSocket | §7.5 | Laravel Reverb, Broadcasting channels |
 
 ---
 
@@ -559,14 +587,14 @@ enum MoodStatus: string {
 
 ```php
 enum AptitudeGrade: string {
-    case S = 'S';    // +5% (maximum)
+    case S = 'S';    // +5% (maximum grade)
     case A = 'A';    // 0% (baseline)
-    case B = 'B';    // 90%
-    case C = 'C';    // 80%
-    case D = 'D';    // 70%
-    case E = 'E';    // 60%
-    case F = 'F';    // 50%
-    case G = 'G';    // 40%
+    case B = 'B';    // -10%
+    case C = 'C';    // -20%
+    case D = 'D';    // -30%
+    case E = 'E';    // -40%
+    case F = 'F';    // -50%
+    case G = 'G';    // -60%
     
     public function getBonusValue(): int;
     public function upgrade(): self;
@@ -593,13 +621,16 @@ enum RunStatus: string {
 ```php
 class StatCollection {
     private const STAT_MIN = 0;
-    private const STAT_MAX = 1200;
+    private const STAT_SOFT_CAP = 1200;
+    // Stats can exceed 1200 with diminishing returns (half value above 1200)
+    // Key breakpoints: 901, 1200, 1600
+    // Stamina 1200+ activates "Stamina Contest" buff
     
     public function __construct(private array $stats);
     public function add(string $stat, int $value): void;
     public function get(string $stat): int;
     public function toArray(): array;
-    private function clamp(int $value): int;
+    private function applyDiminishingReturns(string $stat, int $value): int;
 }
 ```
 
@@ -817,6 +848,52 @@ public function restoreBackup(string $backupId): bool;
 - `BackupService`
 
 **Evidence**: Requirements FR-09, SPEC-001 §9
+
+### 5.8 Performance & Monitoring Services (SPEC-008)
+
+**Implemented Services** (8 total, all verified in IVM v4.3.0):
+
+**ApmService** (`App\Services\ApmService`):
+
+- Core APM coordination
+- Methods: `captureMetric()`, `captureException()`, `startTransaction()`
+
+**ApiPerformanceMonitoringService** (`App\Services\ApiPerformanceMonitoringService`):
+
+- API endpoint tracking
+- Methods: `recordApiCall()`, `getEndpointMetrics()`, `detectAnomalies()`
+
+**QueryOptimizationService** (`App\Services\QueryOptimizationService`):
+
+- Database query analysis and optimization suggestions
+- Methods: `analyzeQuery()`, `optimizeIndexes()`, `detectNPlusOne()`
+
+**PerformanceAlertingService** (`App\Services\PerformanceAlertingService`):
+
+- Alert management with configurable thresholds
+- Methods: `checkThresholds()`, `sendAlert()`, `configureAlerts()`
+
+**RedisCacheOptimizationService** (`App\Services\RedisCacheOptimizationService`):
+
+- Cache hit/miss analysis and optimization
+- Methods: `analyzeHitRate()`, `optimizeKeys()`, `reportMetrics()`
+
+**ApiResponseCachingService** (`App\Services\ApiResponseCachingService`):
+
+- Response caching with stale-while-revalidate
+- Methods: `cacheResponse()`, `invalidateCache()`, `getStaleData()`
+
+**PerformanceRegressionService** (`App\Services\PerformanceRegressionService`):
+
+- Regression detection across deployments
+- Methods: `detectRegression()`, `compareBaselines()`, `generateReport()`
+
+**HistoricalTrackingService** (`App\Services\HistoricalTrackingService`):
+
+- Long-term metrics storage and trend analysis
+- Methods: `storeMetrics()`, `getTrends()`, `aggregateData()`
+
+**Evidence**: SPEC-008, IVM §6.1
 
 ---
 
@@ -1559,10 +1636,11 @@ broadcast(new TrainingCompleted($career, $result))
 - **MINOR**: New features, backward compatible
 - **PATCH**: Bug fixes, backward compatible
 
-**Current Version**: 2.1.0
+**Current Version**: 2.3.0
 
 **Version History**:
 
+- 2.3.0 (2026-02-23): Game-accurate mechanics, SPEC-008 APM, Neuron AI v2.11, Livewire 4
 - 2.1.0 (2026-01-25): Performance optimization, accessibility enhancements
 - 2.0.0 (2026-01-23): Major rewrite with AI integration
 - 1.0.0 (2026-01-14): Initial release
@@ -1748,21 +1826,36 @@ YYYY_MM_DD_HHMMSS_descriptive_action_name.php
 
 ## Summary of Notable Design Updates
 
-This design document for v2.1.0 represents a comprehensive, production-ready design aligned with the implemented v2.0.0 system and planned v2.1.0 enhancements:
+This design document for v2.4.0 represents a comprehensive, production-ready design aligned with the implemented v2.3.0 system, IVM v4.3.0 verification, and game-accurate mechanics:
 
-1. **Hybrid AI Architecture**: Local-first with Ollama, cloud fallback with AWS Bedrock Claude, intelligent routing based on complexity
+1. **Hybrid AI Architecture**: Local-first with Ollama, cloud fallback with AWS Bedrock Claude 4.5, intelligent routing via Neuron AI v2.11 with 8 specialized agents
 2. **Circuit Breaker Pattern**: Resilient external API integration with automatic fallback to stale cache
-3. **Service Layer Separation**: Clear separation of concerns with dedicated services for each domain
+3. **Service Layer Separation**: Clear separation of concerns with 60+ dedicated services for each domain
 4. **Multi-Tier Caching**: Redis L2 cache with configurable TTLs, memory L1 cache for hot data
-5. **Accessibility by Default**: WCAG 2.2 AA compliance built into component library
-6. **Progressive Web App**: Service worker for offline functionality, installable app experience
-7. **Comprehensive Testing**: Unit, feature, and E2E tests with >80% coverage target
-8. **MCP Integration**: Model Context Protocol for enhanced AI tool execution
+5. **Accessibility by Default**: WCAG 2.2 AA compliance built into component library (92% compliance verified)
+6. **Progressive Web App**: Service worker for offline functionality, installable app experience (🔄 routes in progress)
+7. **Comprehensive Testing**: 3,316+ tests with 11,563+ assertions across 195 test files, Pest v4 browser testing, >90% coverage
+8. **MCP Integration**: Model Context Protocol with 12 tools across Memory, Filesystem, and Fetch servers
 9. **OCR Pipeline**: Tesseract-based screenshot processing with confidence scoring
-10. **Operational Excellence**: Monitoring, alerting, backup/recovery, and scaling considerations
+10. **Performance Monitoring**: SPEC-008 APM system with 8 dedicated services (ApmService, ApiPerformanceMonitoringService, QueryOptimizationService, PerformanceAlertingService, RedisCacheOptimizationService, ApiResponseCachingService, PerformanceRegressionService, HistoricalTrackingService)
+11. **Game-Accurate Mechanics**: Aptitude grades G→S (S max), stats >1200 with diminishing returns, track conditions (Firm/Good/Soft/Heavy), stamina drain modifiers
+12. **Operational Excellence**: Monitoring, alerting, backup/recovery, and scaling considerations
+13. **WebSocket Real-Time**: Laravel Reverb for live updates (training completion, race results, AI recommendations, meta changes)
+14. **Support Cards System**: 15 verified cards from Global English server, deck builder with synergy scoring, meta tier integration
+15. **Database Schema**: 35 tables (31 original + 4 January 2026 enhancements), 50+ migrations with ucp_ prefix
+16. **Stub/Placeholder Overhaul**: GAP_PLANNING_090226 identifies ~30 stubs across 11 files for replacement with real service calls
+
+**Known Design Gaps (from IVM v4.3.0)**:
+
+- APM Dashboard completion (GAP-001)
+- PWA offline route coverage (GAP-002)
+- Accessibility settings pages (GAP-003)
+- OpenCV OCR preprocessing (GAP-004, future)
+- Background sync for Local mode (GAP-006)
+- Dark mode optimization (GAP-007, future)
 
 ---
 
 **Document Status**: Production-Ready  
-**Next Review**: 2026-02-25  
+**Next Review**: 2026-03-23  
 **Maintained By**: Development Team
