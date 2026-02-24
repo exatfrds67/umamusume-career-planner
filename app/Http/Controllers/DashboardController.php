@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Character;
+use App\Models\Race;
+use App\Models\TrainingSession;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -493,11 +495,8 @@ class DashboardController extends Controller
      */
     private function getRecentResults(Character $character): array
     {
-        // For now, return placeholder data
-        // In a full implementation, this would query training_sessions, race_results, skill_acquisitions
         $results = [];
 
-        // Get recent skill acquisitions
         $recentAcquisitions = $character->skillAcquisitions()
             ->with('skill')
             ->orderBy('created_at', 'desc')
@@ -516,13 +515,61 @@ class DashboardController extends Controller
             ];
         }
 
-        // If no real data, show placeholder
-        // Placeholder handling moved to view
-        if (empty($results)) {
-            $results = [];
+        $recentTraining = TrainingSession::query()
+            ->where('character_id', $character->id)
+            ->orderBy('created_at', 'desc')
+            ->limit(3)
+            ->get();
+
+        foreach ($recentTraining as $session) {
+            $totalGain = ($session->speed_gain ?? 0) + ($session->stamina_gain ?? 0)
+                + ($session->power_gain ?? 0) + ($session->guts_gain ?? 0) + ($session->wit_gain ?? 0);
+            $results[] = [
+                'type' => 'training',
+                'description' => "Training: {$session->training_type} (+{$totalGain} stats)",
+                'highlight' => $session->training_type ?? 'Training',
+                'timestamp' => $session->created_at,
+                'icon' => 'chart-bar',
+                'color' => 'primary',
+            ];
         }
 
-        return array_slice($results, 0, 3);
+        $recentRaces = Race::query()
+            ->where('character_id', $character->id)
+            ->orderBy('created_at', 'desc')
+            ->limit(3)
+            ->get();
+
+        foreach ($recentRaces as $race) {
+            $position = $race->finish_position;
+            $positionText = $position ? "#{$position}" : 'N/A';
+            $results[] = [
+                'type' => 'race',
+                'description' => "Race: {$race->race_name} ({$positionText})",
+                'highlight' => $race->race_name ?? 'Race',
+                'timestamp' => $race->created_at,
+                'icon' => $race->won_race ? 'trophy' : 'flag',
+                'color' => $race->won_race ? 'warning' : 'info',
+            ];
+        }
+
+        usort($results, function (array $a, array $b) {
+            $timeA = $a['timestamp'] ?? null;
+            $timeB = $b['timestamp'] ?? null;
+            if ($timeA === null && $timeB === null) {
+                return 0;
+            }
+            if ($timeA === null) {
+                return 1;
+            }
+            if ($timeB === null) {
+                return -1;
+            }
+
+            return $timeB <=> $timeA;
+        });
+
+        return array_slice($results, 0, 5);
     }
 
     /**

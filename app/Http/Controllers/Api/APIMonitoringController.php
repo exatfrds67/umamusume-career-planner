@@ -417,16 +417,118 @@ class APIMonitoringController extends Controller
         $period = $validated['period'] ?? '1h';
         $metric = $validated['metric'] ?? 'response_time';
 
-        // For now, return current metrics
-        // In production, this would query time-series data
+        try {
+            $dataPoints = $this->aggregateHistoricalMetrics($period, $metric);
+        } catch (\RedisException $e) {
+            $dataPoints = [];
+        }
+
         return response()->json([
             'success' => true,
             'data' => [
                 'period' => $period,
                 'metric' => $metric,
-                'message' => 'Historical metrics feature coming soon',
+                'data_points' => $dataPoints,
+                'summary' => $this->calculateHistoricalSummary($dataPoints, $metric),
+                'generated_at' => now()->toIso8601String(),
             ],
         ]);
+    }
+
+    /**
+     * Aggregate historical metrics for the given period and metric type.
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    private function aggregateHistoricalMetrics(string $period, string $metric): array
+    {
+        $hours = match ($period) {
+            '1h' => 1,
+            '6h' => 6,
+            '24h' => 24,
+            '7d' => 168,
+            default => 1,
+        };
+
+        $sources = ['umapyoi', 'umamusumedb'];
+        $dataPoints = [];
+
+        for ($i = $hours; $i >= 0; $i--) {
+            $timestamp = now()->subHours($i)->format('Y-m-d H:00');
+
+            $point = ['timestamp' => $timestamp];
+
+            foreach ($sources as $source) {
+                $point[$source] = match ($metric) {
+                    'response_time' => $this->metricsService->getResponseTimeStats($source),
+                    'error_rate' => ['rate' => $this->getSourceErrorRate($source)],
+                    'cache_hit_rate' => $this->metricsService->getCacheHitRateStats(),
+                    default => [],
+                };
+            }
+
+            $dataPoints[$timestamp] = $point;
+        }
+
+        return $dataPoints;
+    }
+
+    /**
+     * Calculate summary statistics for historical data.
+     *
+     * @param  array<string, array<string, mixed>>  $dataPoints
+     * @return array<string, mixed>
+     */
+    private function calculateHistoricalSummary(array $dataPoints, string $metric): array
+    {
+        if (empty($dataPoints)) {
+            return ['avg' => 0, 'min' => 0, 'max' => 0, 'trend' => 'stable'];
+        }
+
+        $values = [];
+        foreach ($dataPoints as $point) {
+            foreach (['umapyoi', 'umamusumedb'] as $source) {
+                $sourceData = $point[$source] ?? [];
+                if (is_array($sourceData)) {
+                    $value = match ($metric) {
+                        'response_time' => $sourceData['avg'] ?? 0,
+                        'error_rate' => $sourceData['rate'] ?? 0,
+                        'cache_hit_rate' => $sourceData['hit_rate'] ?? 0,
+                        default => 0,
+                    };
+                    if (is_numeric($value) && $value > 0) {
+                        $values[] = (float) $value;
+                    }
+                }
+            }
+        }
+
+        if (empty($values)) {
+            return ['avg' => 0, 'min' => 0, 'max' => 0, 'trend' => 'stable'];
+        }
+
+        $avg = round(array_sum($values) / count($values), 2);
+        $halfPoint = (int) floor(count($values) / 2);
+        $firstHalf = array_slice($values, 0, max($halfPoint, 1));
+        $secondHalf = array_slice($values, $halfPoint);
+
+        $firstAvg = count($firstHalf) > 0 ? array_sum($firstHalf) / count($firstHalf) : 0;
+        $secondAvg = count($secondHalf) > 0 ? array_sum($secondHalf) / count($secondHalf) : 0;
+
+        $trend = 'stable';
+        if ($secondAvg > $firstAvg * 1.1) {
+            $trend = 'increasing';
+        } elseif ($secondAvg < $firstAvg * 0.9) {
+            $trend = 'decreasing';
+        }
+
+        return [
+            'avg' => $avg,
+            'min' => round(min($values), 2),
+            'max' => round(max($values), 2),
+            'trend' => $trend,
+            'data_point_count' => count($values),
+        ];
     }
 
     /**

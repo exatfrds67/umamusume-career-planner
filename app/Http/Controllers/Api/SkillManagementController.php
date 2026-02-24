@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Character;
+use App\Models\MCPToolUsage;
 use App\Models\Skill;
 use App\Models\SkillAcquisition;
+use App\Models\SkillBuild;
 use App\Services\MCP\SkillOptimizationOrchestrationService;
 use App\Services\SkillEvolutionService;
 use App\Services\SkillHintService;
@@ -326,44 +328,94 @@ class SkillManagementController extends Controller
         /** @var Character $character */
         $character = Character::query()->findOrFail($characterId);
 
-        // Get performance metrics from acquisitions
-        $acquisitions = SkillAcquisition::where('character_id', $characterId)->get();
+        $acquisitions = SkillAcquisition::query()->where('character_id', $characterId)->get();
+
+        $mcpUsages = MCPToolUsage::query()
+            ->where('tool_category', 'skill')
+            ->orderBy('executed_at', 'desc')
+            ->limit(500)
+            ->get();
+
+        $avgResponseTime = $mcpUsages->isNotEmpty()
+            ? round((float) ($mcpUsages->avg('execution_time') ?? 0.0), 3)
+            : 0.0;
+
+        $successfulMcp = $mcpUsages->where('execution_status', 'success')->count();
+        $mcpAccuracy = $mcpUsages->isNotEmpty()
+            ? round(($successfulMcp / $mcpUsages->count()) * 100, 1)
+            : 0.0;
+
+        $evolutionAcquisitions = $acquisitions->where('is_evolution', true);
+        $evolutionSuccessRate = $evolutionAcquisitions->isNotEmpty()
+            ? round(($evolutionAcquisitions->where('is_active', true)->count() / $evolutionAcquisitions->count()) * 100, 1)
+            : 0.0;
+
+        $builds = SkillBuild::query()->where('character_id', $characterId)->get();
+        $avgSynergy = $builds->isNotEmpty() && $builds->avg('optimized_cost') > 0
+            ? round(($builds->avg('total_sp_cost') - $builds->avg('optimized_cost')) / max($builds->avg('total_sp_cost'), 1) * 100, 1)
+            : 0.0;
+
+        $aiRecommended = $acquisitions->where('acquisition_method', 'ai_recommended');
+        $manualAcquisitions = $acquisitions->where('acquisition_method', '!=', 'ai_recommended');
+        $pendingRecommendations = $mcpUsages->where('execution_status', 'success')
+            ->where('tool_name', 'recommend_skills')
+            ->count() - $aiRecommended->count();
+
+        /** @var int|float $baseSpCostRaw */
+        $baseSpCostRaw = $manualAcquisitions->sum('base_sp_cost');
+        /** @var int|float $finalSpCostRaw */
+        $finalSpCostRaw = $manualAcquisitions->sum('final_sp_cost');
+        $potentialSavings = $baseSpCostRaw - $finalSpCostRaw;
+        /** @var int|float $filteredSpCostRaw */
+        $filteredSpCostRaw = $manualAcquisitions->filter(fn ($a) => ($a->hints_used ?? 0) === 0)->sum('base_sp_cost');
+        $missedSavings = $filteredSpCostRaw * 0.2;
 
         $performance = [
             'total_sp_saved' => $acquisitions->sum('sp_saved'),
-            'total_recommendations' => $acquisitions->where('acquisition_method', 'ai_recommended')->count(),
+            'total_recommendations' => $aiRecommended->count(),
             'success_rate' => $this->calculateSuccessRate($acquisitions),
-            'avg_response_time' => 1.2, // Mock data - would come from MCP logs
+            'avg_response_time' => $avgResponseTime,
             'activities' => $this->getRecentActivities($character),
             'agents' => [
                 'skill_analysis' => [
                     'total' => $acquisitions->count(),
-                    'accuracy' => 94,
+                    'accuracy' => $mcpAccuracy,
                     'sp_optimized' => $acquisitions->sum('sp_saved'),
                 ],
                 'hint_optimization' => [
                     'total' => $acquisitions->where('hints_used', '>', 0)->count(),
-                    'avg_discount' => $acquisitions->where('hints_used', '>', 0)->avg('total_discount_percentage') ?? 0,
+                    'avg_discount' => round((float) ($acquisitions->where('hints_used', '>', 0)->avg('total_discount_percentage') ?? 0), 1),
                     'sp_saved' => $acquisitions->sum('sp_saved'),
                 ],
                 'evolution_planning' => [
-                    'total' => $acquisitions->where('is_evolution', true)->count(),
-                    'success_rate' => 100,
-                    'efficiency_gain' => 35,
+                    'total' => $evolutionAcquisitions->count(),
+                    'success_rate' => $evolutionSuccessRate,
+                    'efficiency_gain' => $evolutionAcquisitions->isNotEmpty()
+                        ? (function () use ($evolutionAcquisitions): float {
+                            /** @var int|float $spSaved */
+                            $spSaved = $evolutionAcquisitions->sum('sp_saved');
+                            /** @var int|float $baseSpCost */
+                            $baseSpCost = $evolutionAcquisitions->sum('base_sp_cost');
+
+                            return round(($spSaved / max($baseSpCost, 1)) * 100, 1);
+                        })()
+                        : 0.0,
                 ],
                 'build_planning' => [
-                    'total' => 0, // Would track saved builds
-                    'avg_synergy' => 8.5,
-                    'meta_alignment' => 92,
+                    'total' => $builds->count(),
+                    'avg_synergy' => $avgSynergy,
+                    'meta_alignment' => $builds->isNotEmpty()
+                        ? round($builds->whereNotNull('meta_tier')->count() / max($builds->count(), 1) * 100, 1)
+                        : 0.0,
                 ],
             ],
             'recommendations' => [
-                'followed' => $acquisitions->where('acquisition_method', 'ai_recommended')->count(),
-                'pending' => 3, // Mock data
-                'ignored' => 1, // Mock data
-                'sp_saved' => $acquisitions->where('acquisition_method', 'ai_recommended')->sum('sp_saved'),
-                'potential_savings' => 120, // Mock data
-                'missed_savings' => 40, // Mock data
+                'followed' => $aiRecommended->count(),
+                'pending' => max(0, (int) $pendingRecommendations),
+                'ignored' => $manualAcquisitions->count(),
+                'sp_saved' => $aiRecommended->sum('sp_saved'),
+                'potential_savings' => (int) $potentialSavings,
+                'missed_savings' => (int) round($missedSavings),
             ],
         ];
 
@@ -424,12 +476,27 @@ class SkillManagementController extends Controller
                 'agent_name' => $acquisition->is_evolution ? 'Evolution Agent' : 'Acquisition Agent',
                 'metrics' => [
                     'sp_saved' => $acquisition->sp_saved,
-                    'efficiency' => round(($acquisition->sp_saved / $acquisition->base_sp_cost) * 100, 1),
-                    'processing_time' => 0.8, // Mock data
+                    'efficiency' => round(($acquisition->sp_saved / max($acquisition->base_sp_cost, 1)) * 100, 1),
+                    'processing_time' => $this->getAcquisitionProcessingTime($acquisition),
                 ],
             ];
         })->toArray();
 
         return $activities;
+    }
+
+    /**
+     * Get the processing time for a skill acquisition from MCP tool usage logs.
+     */
+    private function getAcquisitionProcessingTime(SkillAcquisition $acquisition): float
+    {
+        $usage = MCPToolUsage::query()
+            ->where('tool_category', 'skill')
+            ->where('executed_at', '>=', $acquisition->created_at?->subMinutes(5))
+            ->where('executed_at', '<=', $acquisition->created_at?->addMinutes(5))
+            ->orderBy('executed_at', 'desc')
+            ->first();
+
+        return $usage ? round($usage->execution_time, 3) : 0.0;
     }
 }
