@@ -1,0 +1,28 @@
+# Uma Musume Career Planner Security Policy
+# https://securitytxt.org/
+# Last updated: 2026-01-29
+
+Contact: mailto:security@umamusume-planner.dev
+Expires: 2027-01-29T00:00:00.000Z
+Preferred-Languages: en, ja
+Canonical: https://umamusume-planner.dev/.well-known/security.txt
+
+# Vulnerability Disclosure Policy
+Policy: https://umamusume-planner.dev/security-policy
+
+# We appreciate responsible disclosure of security vulnerabilities.
+# Please report any security issues to the contact above.
+# We aim to acknowledge receipt within 48 hours and provide
+# a fix timeline within 5 business days.
+
+# Scope
+# - Web application at umamusume-planner.dev
+# - API endpoints at umamusume-planner.dev/api/*
+# - Authentication and authorization systems
+# - Data storage and privacy controls
+
+# Out of Scope
+# - Third-party services and integrations
+# - Social engineering attacks
+# - Denial of service attacks
+# - Issues in dependencies (report to upstream maintainers)

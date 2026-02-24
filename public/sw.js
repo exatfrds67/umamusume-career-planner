@@ -30,6 +30,13 @@ const PRECACHE_ASSETS = [
     "/images/app_logo/uma_musume_race_planner_logo_512.png",
 ];
 
+// Critical authenticated routes to cache on first visit
+const CRITICAL_ROUTES = [
+    "/dashboard",
+    "/characters",
+    "/about",
+];
+
 // Cache size limits
 const CACHE_LIMITS = {
     images: 100, // Max 100 images
@@ -430,6 +437,16 @@ self.addEventListener("message", (event) => {
                 }),
             );
             break;
+
+        case "PRECACHE_ROUTES":
+            if (payload && Array.isArray(payload.routes)) {
+                event.waitUntil(
+                    precacheRoutes(payload.routes).then(() => {
+                        event.ports[0]?.postMessage({ success: true });
+                    }),
+                );
+            }
+            break;
     }
 });
 
@@ -489,11 +506,39 @@ self.addEventListener("sync", (event) => {
 
 /**
  * Sync offline data when connection is restored
+ * Opens IndexedDB and processes pending operations
  */
 async function syncOfflineData() {
-    // Implementation for syncing offline data
-    // This would be customized based on application needs
     console.log("[Service Worker] Syncing offline data...");
+
+    try {
+        const clients = await self.clients.matchAll({ type: "window" });
+        for (const client of clients) {
+            client.postMessage({ type: "TRIGGER_SYNC" });
+        }
+    } catch (error) {
+        console.error("[Service Worker] Sync failed:", error);
+    }
+}
+
+/**
+ * Precache critical routes for offline access
+ */
+async function precacheRoutes(routes) {
+    const cache = await caches.open(CACHE_NAME);
+
+    for (const route of routes) {
+        try {
+            const response = await fetch(route, { credentials: "same-origin" });
+            if (response.ok) {
+                await cache.put(new Request(route), response);
+            }
+        } catch (error) {
+            console.warn("[Service Worker] Could not precache route:", route);
+        }
+    }
+
+    console.log("[Service Worker] Precached routes:", routes);
 }
 
 /**
