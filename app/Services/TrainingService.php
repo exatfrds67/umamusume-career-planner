@@ -164,6 +164,10 @@ class TrainingService
         array $skillHints
     ): TrainingSession {
         $career = $character->currentCareer;
+        $energyCost = $this->calculateEnergyCost($trainingType);
+        $energyBefore = $character->energy_level ?? 100;
+        $energyAfter = max(0, $energyBefore - $energyCost);
+        $totalStatPoints = array_sum($gains);
 
         return TrainingSession::create([
             'career_id' => $career?->id,
@@ -177,6 +181,10 @@ class TrainingService
             'guts_gain' => $gains['guts'] ?? 0,
             'wit_gain' => $gains['wit'] ?? 0,
             'sp_gain' => $gains['sp'] ?? 0,
+            'energy_cost' => $energyCost,
+            'energy_before' => $energyBefore,
+            'energy_after' => $energyAfter,
+            'total_stat_points_gained' => $totalStatPoints,
             'participating_support_cards' => $bonuses['active_cards'],
             'skill_hints_obtained' => $skillHints,
             'training_bonuses' => [
@@ -187,6 +195,19 @@ class TrainingService
             'friendship_training' => $bonuses['is_friendship'],
             'friendship_level_bonus' => $bonuses['is_friendship'] ? 20 : 0,
         ]);
+    }
+
+    /**
+     * Calculate energy cost for a training type.
+     */
+    protected function calculateEnergyCost(string $trainingType): int
+    {
+        return match ($trainingType) {
+            'rest' => -30,
+            'recreation' => -20,
+            'infirmary' => -10,
+            default => 20,
+        };
     }
 
     /**

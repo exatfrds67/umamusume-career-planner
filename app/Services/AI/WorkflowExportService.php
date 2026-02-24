@@ -81,16 +81,14 @@ class WorkflowExportService
     public function exportAsPdf(AIConversation $conversation): string
     {
         try {
-            // This would use a PDF library like dompdf or snappy
-            // For now, return a placeholder
-            $markdown = $this->exportAsMarkdown($conversation);
+            $workflow = $this->conversationService->exportWorkflow($conversation, 'markdown');
+            $html = $this->generatePdfHtml($workflow);
 
-            Log::info('[WorkflowExport] PDF export requested', [
+            Log::info('[WorkflowExport] PDF-ready HTML export created', [
                 'conversation_id' => $conversation->conversation_id,
-                'note' => 'PDF generation requires additional library',
             ]);
 
-            return $markdown; // Would convert to PDF
+            return $html;
         } catch (\Exception $e) {
             Log::error('[WorkflowExport] PDF export failed', [
                 'conversation_id' => $conversation->conversation_id,
@@ -99,6 +97,98 @@ class WorkflowExportService
 
             throw $e;
         }
+    }
+
+    /**
+     * Generate print-ready HTML for PDF export
+     *
+     * @param  array<string, mixed>  $workflow
+     */
+    protected function generatePdfHtml(array $workflow): string
+    {
+        $title = isset($workflow['title']) && is_string($workflow['title']) ? e($workflow['title']) : 'Untitled';
+        $type = isset($workflow['type']) && is_string($workflow['type']) ? e($workflow['type']) : 'Unknown';
+        $createdAt = isset($workflow['created_at']) && is_string($workflow['created_at']) ? e($workflow['created_at']) : 'Unknown';
+        $conversationId = isset($workflow['conversation_id']) && is_string($workflow['conversation_id']) ? e($workflow['conversation_id']) : 'Unknown';
+
+        $html = <<<HTML
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+        <meta charset="UTF-8">
+        <title>{$title}</title>
+        <style>
+        body{font-family:system-ui,-apple-system,sans-serif;max-width:800px;margin:0 auto;padding:2rem;color:#1a1a1a;line-height:1.6}
+        h1{border-bottom:2px solid #333;padding-bottom:.5rem}
+        h2{color:#333;margin-top:2rem}
+        h3{color:#555}
+        .meta{color:#666;font-size:.9rem;margin-bottom:1.5rem}
+        .message{border:1px solid #ddd;border-radius:8px;padding:1rem;margin:1rem 0;page-break-inside:avoid}
+        .message-header{font-weight:bold;margin-bottom:.5rem}
+        .message-time{color:#888;font-size:.85rem}
+        .tools{background:#f5f5f5;padding:.5rem;border-radius:4px;font-size:.85rem;margin-top:.5rem}
+        .analytics{background:#f0f7ff;padding:1rem;border-radius:8px;margin-top:2rem}
+        @media print{body{padding:0}@page{margin:2cm}}
+        </style>
+        </head>
+        <body>
+        <h1>{$title}</h1>
+        <div class="meta">
+        <p><strong>Type:</strong> {$type} | <strong>Created:</strong> {$createdAt} | <strong>ID:</strong> {$conversationId}</p>
+        </div>
+        <h2>Messages</h2>
+        HTML;
+
+        $messages = isset($workflow['messages']) && is_array($workflow['messages']) ? $workflow['messages'] : [];
+        foreach ($messages as $message) {
+            if (! is_array($message)) {
+                continue;
+            }
+
+            $msgType = isset($message['type']) && is_string($message['type']) ? e(ucfirst($message['type'])) : 'Unknown';
+            $agentData = isset($message['agent']) && is_array($message['agent']) ? $message['agent'] : [];
+            $agent = isset($agentData['name']) && is_string($agentData['name']) ? e($agentData['name']) : '';
+            $time = isset($message['sent_at']) && is_string($message['sent_at']) ? e($message['sent_at']) : '';
+            $content = isset($message['content']) && is_string($message['content']) ? e($message['content']) : '';
+
+            $agentLabel = $agent !== '' ? " (Agent: {$agent})" : '';
+
+            $html .= '<div class="message">';
+            $html .= "<div class=\"message-header\">{$msgType}{$agentLabel}</div>";
+            if ($time !== '') {
+                $html .= "<div class=\"message-time\">{$time}</div>";
+            }
+            $html .= "<p>{$content}</p>";
+
+            $toolsData = isset($message['tools']) && is_array($message['tools']) ? $message['tools'] : [];
+            $toolsUsed = isset($toolsData['used']) && is_array($toolsData['used']) ? $toolsData['used'] : [];
+            if (! empty($toolsUsed)) {
+                $toolNames = [];
+                foreach ($toolsUsed as $tool) {
+                    if (is_string($tool)) {
+                        $toolNames[] = e($tool);
+                    }
+                }
+                $html .= '<div class="tools"><strong>Tools:</strong> '.implode(', ', $toolNames).'</div>';
+            }
+
+            $html .= '</div>';
+        }
+
+        if (isset($workflow['analytics']) && is_array($workflow['analytics'])) {
+            $analytics = $workflow['analytics'];
+            $totalMessages = isset($analytics['total_messages']) && is_int($analytics['total_messages']) ? $analytics['total_messages'] : 0;
+            $userMessages = isset($analytics['user_messages']) && is_int($analytics['user_messages']) ? $analytics['user_messages'] : 0;
+            $aiMessages = isset($analytics['ai_messages']) && is_int($analytics['ai_messages']) ? $analytics['ai_messages'] : 0;
+
+            $html .= '<div class="analytics"><h2>Analytics</h2>';
+            $html .= "<p>Total Messages: {$totalMessages} | User: {$userMessages} | AI: {$aiMessages}</p>";
+            $html .= '</div>';
+        }
+
+        $html .= '</body></html>';
+
+        return $html;
     }
 
     /**

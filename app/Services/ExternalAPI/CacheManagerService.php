@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace App\Services\ExternalAPI;
 
 use App\Events\GameVersionUpdated;
+use App\Models\Character;
+use App\Models\Race;
+use App\Models\Skill;
+use App\Models\SupportCard;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -546,89 +550,53 @@ class CacheManagerService
      */
     protected function warmTopCharacters(): array
     {
-        // Top 50 most popular characters based on usage data
-        $topCharacters = [
-            'Silence Suzuka',
-            'Tokai Teio',
-            'Gold Ship',
-            'Special Week',
-            'Vodka',
-            'Daiwa Scarlet',
-            'Oguri Cap',
-            'Taiki Shuttle',
-            'Mejiro McQueen',
-            'Rice Shower',
-            'Air Groove',
-            'Super Creek',
-            'Grass Wonder',
-            'Haru Urara',
-            'King Halo',
-            'Symboli Rudolf',
-            'Narita Brian',
-            'Twin Turbo',
-            'Mejiro Palmer',
-            'Admire Vega',
-            'Inari One',
-            'Winning Ticket',
-            'T.M. Opera O',
-            'Narita Taishin',
-            'Mejiro Dober',
-            'Agnes Tachyon',
-            'Seiun Sky',
-            'Machikane Fukukitaru',
-            'Eishin Flash',
-            'Mayano Top Gun',
-            'Manhattan Cafe',
-            'Mihono Bourbon',
-            'Mejiro Ryan',
-            'Hishi Amazon',
-            'Sakura Chiyono O',
-            'Sirius Symboli',
-            'Matikanetannhauser',
-            'Ikuno Dictus',
-            'Yaeno Muteki',
-            'Nice Nature',
-            'Kitasan Black',
-            'Satono Diamond',
-            'Scarlet',
-            'Mejiro Ardan',
-            'Fine Motion',
-            'Biwa Hayahide',
-            'Marvelous Sunday',
-            'Tokai Teio',
-            'Fuji Kiseki',
-            'Zenno Rob Roy',
-        ];
+        try {
+            $characters = Character::query()
+                ->select(['id', 'name', 'scenario_type', 'current_stats', 'status', 'career_stage'])
+                ->orderByDesc('updated_at')
+                ->limit(50)
+                ->get();
 
-        $warmedCount = 0;
+            $warmedCount = 0;
 
-        foreach ($topCharacters as $character) {
-            $cacheKey = "character_data:{$character}";
+            foreach ($characters as $character) {
+                $cacheKey = "character_data:{$character->name}";
 
-            // Check if already cached
-            if ($this->has($cacheKey)) {
-                $warmedCount = $warmedCount + 1;
+                if ($this->has($cacheKey)) {
+                    $warmedCount++;
 
-                continue;
+                    continue;
+                }
+
+                $characterData = [
+                    'id' => $character->id,
+                    'name' => $character->name,
+                    'scenario_type' => $character->scenario_type,
+                    'current_stats' => $character->current_stats,
+                    'status' => $character->status,
+                    'career_stage' => $character->career_stage,
+                    'warmed_at' => now()->toISOString(),
+                ];
+
+                $this->put($cacheKey, $characterData);
+                $warmedCount++;
             }
 
-            // For now, we'll just mark the key as needing warming
-            // The actual API fetching will be done by the background job
-            // This method just ensures the cache structure is ready
-            $placeholderData = [
-                'name' => $character,
-                'status' => 'warming',
-                'queued_at' => now()->toISOString(),
+            return [
+                'success' => true,
+                'count' => $warmedCount,
             ];
+        } catch (\Exception $e) {
+            Log::error('[CacheManagerService] Failed to warm top characters', [
+                'error' => $e->getMessage(),
+            ]);
 
-            $this->put($cacheKey, $placeholderData, 300); // 5 minutes TTL for placeholder
-            $warmedCount = $warmedCount + 1;
+            return [
+                'success' => false,
+                'count' => 0,
+                'error' => $e->getMessage(),
+            ];
         }
-
-        return [
-            'success' => true,
-            'count' => $warmedCount,
-        ];
     }
 
     /**
@@ -638,34 +606,54 @@ class CacheManagerService
      */
     protected function warmTopSupportCards(): array
     {
-        // Top 100 support card IDs (placeholder - would come from configuration or database)
-        $topCardIds = range(1, 100);
+        try {
+            $cards = SupportCard::query()
+                ->select(['id', 'name', 'card_type', 'rarity', 'meta_tier', 'is_active'])
+                ->where('is_active', true)
+                ->orderByDesc('updated_at')
+                ->limit(100)
+                ->get();
 
-        $warmedCount = 0;
+            $warmedCount = 0;
 
-        foreach ($topCardIds as $cardId) {
-            $cacheKey = "support_cards:{$cardId}";
+            foreach ($cards as $card) {
+                $cacheKey = "support_cards:{$card->id}";
 
-            if ($this->has($cacheKey)) {
-                $warmedCount = $warmedCount + 1;
+                if ($this->has($cacheKey)) {
+                    $warmedCount++;
 
-                continue;
+                    continue;
+                }
+
+                $cardData = [
+                    'id' => $card->id,
+                    'name' => $card->name,
+                    'card_type' => $card->card_type,
+                    'rarity' => $card->rarity,
+                    'meta_tier' => $card->meta_tier,
+                    'is_active' => $card->is_active,
+                    'warmed_at' => now()->toISOString(),
+                ];
+
+                $this->put($cacheKey, $cardData);
+                $warmedCount++;
             }
 
-            $placeholderData = [
-                'id' => $cardId,
-                'status' => 'warming',
-                'queued_at' => now()->toISOString(),
+            return [
+                'success' => true,
+                'count' => $warmedCount,
             ];
+        } catch (\Exception $e) {
+            Log::error('[CacheManagerService] Failed to warm top support cards', [
+                'error' => $e->getMessage(),
+            ]);
 
-            $this->put($cacheKey, $placeholderData, 300);
-            $warmedCount = $warmedCount + 1;
+            return [
+                'success' => false,
+                'count' => 0,
+                'error' => $e->getMessage(),
+            ];
         }
-
-        return [
-            'success' => true,
-            'count' => $warmedCount,
-        ];
     }
 
     /**
@@ -675,44 +663,55 @@ class CacheManagerService
      */
     protected function warmRaceDefinitions(): array
     {
-        // Common race types and distances
-        $raceDefinitions = [
-            'sprint_dirt',
-            'sprint_turf',
-            'mile_dirt',
-            'mile_turf',
-            'intermediate_dirt',
-            'intermediate_turf',
-            'long_dirt',
-            'long_turf',
-            'extended_turf',
-        ];
+        try {
+            $races = Race::query()
+                ->select(['id', 'race_name', 'race_grade', 'distance_category', 'distance_meters', 'surface', 'track_type'])
+                ->distinct('race_name')
+                ->orderBy('race_name')
+                ->limit(100)
+                ->get();
 
-        $warmedCount = 0;
+            $warmedCount = 0;
 
-        foreach ($raceDefinitions as $raceType) {
-            $cacheKey = "race_data:{$raceType}";
+            foreach ($races as $race) {
+                $cacheKey = "race_data:{$race->id}";
 
-            if ($this->has($cacheKey)) {
-                $warmedCount = $warmedCount + 1;
+                if ($this->has($cacheKey)) {
+                    $warmedCount++;
 
-                continue;
+                    continue;
+                }
+
+                $raceData = [
+                    'id' => $race->id,
+                    'race_name' => $race->race_name,
+                    'race_grade' => $race->race_grade,
+                    'distance_category' => $race->distance_category,
+                    'distance_meters' => $race->distance_meters,
+                    'surface' => $race->surface,
+                    'track_type' => $race->track_type,
+                    'warmed_at' => now()->toISOString(),
+                ];
+
+                $this->put($cacheKey, $raceData);
+                $warmedCount++;
             }
 
-            $placeholderData = [
-                'type' => $raceType,
-                'status' => 'warming',
-                'queued_at' => now()->toISOString(),
+            return [
+                'success' => true,
+                'count' => $warmedCount,
             ];
+        } catch (\Exception $e) {
+            Log::error('[CacheManagerService] Failed to warm race definitions', [
+                'error' => $e->getMessage(),
+            ]);
 
-            $this->put($cacheKey, $placeholderData, 300);
-            $warmedCount = $warmedCount + 1;
+            return [
+                'success' => false,
+                'count' => 0,
+                'error' => $e->getMessage(),
+            ];
         }
-
-        return [
-            'success' => true,
-            'count' => $warmedCount,
-        ];
     }
 
     /**
@@ -722,34 +721,55 @@ class CacheManagerService
      */
     protected function warmPopularSkills(): array
     {
-        // Popular skill IDs (placeholder)
-        $popularSkills = range(1, 50);
+        try {
+            $skills = Skill::query()
+                ->select(['id', 'name', 'skill_type', 'rarity', 'base_sp_cost', 'meta_tier', 'is_active'])
+                ->where('is_active', true)
+                ->orderByDesc('updated_at')
+                ->limit(50)
+                ->get();
 
-        $warmedCount = 0;
+            $warmedCount = 0;
 
-        foreach ($popularSkills as $skillId) {
-            $cacheKey = "skills:{$skillId}";
+            foreach ($skills as $skill) {
+                $cacheKey = "skills:{$skill->id}";
 
-            if ($this->has($cacheKey)) {
-                $warmedCount = $warmedCount + 1;
+                if ($this->has($cacheKey)) {
+                    $warmedCount++;
 
-                continue;
+                    continue;
+                }
+
+                $skillData = [
+                    'id' => $skill->id,
+                    'name' => $skill->name,
+                    'skill_type' => $skill->skill_type,
+                    'rarity' => $skill->rarity,
+                    'base_sp_cost' => $skill->base_sp_cost,
+                    'meta_tier' => $skill->meta_tier,
+                    'is_active' => $skill->is_active,
+                    'warmed_at' => now()->toISOString(),
+                ];
+
+                $this->put($cacheKey, $skillData);
+                $warmedCount++;
             }
 
-            $placeholderData = [
-                'id' => $skillId,
-                'status' => 'warming',
-                'queued_at' => now()->toISOString(),
+            return [
+                'success' => true,
+                'count' => $warmedCount,
             ];
+        } catch (\Exception $e) {
+            Log::error('[CacheManagerService] Failed to warm popular skills', [
+                'error' => $e->getMessage(),
+            ]);
 
-            $this->put($cacheKey, $placeholderData, 300);
-            $warmedCount = $warmedCount + 1;
+            return [
+                'success' => false,
+                'count' => 0,
+                'error' => $e->getMessage(),
+            ];
         }
-
-        return [
-            'success' => true,
-            'count' => $warmedCount,
-        ];
     }
 
     /**
@@ -759,40 +779,78 @@ class CacheManagerService
      */
     protected function warmMetaRankings(): array
     {
-        $rankingTypes = [
-            'speed',
-            'stamina',
-            'power',
-            'guts',
-            'wisdom',
-            'overall',
-        ];
+        try {
+            $rankingTypes = ['speed', 'stamina', 'power', 'guts', 'wisdom', 'overall'];
+            $warmedCount = 0;
 
-        $warmedCount = 0;
+            foreach ($rankingTypes as $type) {
+                $cacheKey = "meta_rankings:{$type}";
 
-        foreach ($rankingTypes as $type) {
-            $cacheKey = "meta_rankings:{$type}";
+                if ($this->has($cacheKey)) {
+                    $warmedCount++;
 
-            if ($this->has($cacheKey)) {
-                $warmedCount = $warmedCount + 1;
+                    continue;
+                }
 
-                continue;
+                $statColumn = match ($type) {
+                    'speed' => 'speed_bonus',
+                    'stamina' => 'stamina_bonus',
+                    'power' => 'power_bonus',
+                    'guts' => 'guts_bonus',
+                    'wisdom' => 'wit_bonus',
+                    default => null,
+                };
+
+                if ($type === 'overall') {
+                    $topCards = SupportCard::query()
+                        ->select(['id', 'name', 'card_type', 'meta_tier', 'rarity'])
+                        ->where('is_active', true)
+                        ->whereNotNull('meta_tier')
+                        ->orderBy('meta_tier')
+                        ->limit(20)
+                        ->get()
+                        ->toArray();
+                } else {
+                    if ($statColumn === null) {
+                        continue;
+                    }
+
+                    $topCards = SupportCard::query()
+                        ->select(['id', 'name', 'card_type', 'meta_tier', $statColumn])
+                        ->where('is_active', true)
+                        ->whereNotNull($statColumn)
+                        ->orderByDesc($statColumn)
+                        ->limit(20)
+                        ->get()
+                        ->toArray();
+                }
+
+                $rankingData = [
+                    'type' => $type,
+                    'rankings' => $topCards,
+                    'total_cards' => count($topCards),
+                    'warmed_at' => now()->toISOString(),
+                ];
+
+                $this->put($cacheKey, $rankingData);
+                $warmedCount++;
             }
 
-            $placeholderData = [
-                'type' => $type,
-                'status' => 'warming',
-                'queued_at' => now()->toISOString(),
+            return [
+                'success' => true,
+                'count' => $warmedCount,
             ];
+        } catch (\Exception $e) {
+            Log::error('[CacheManagerService] Failed to warm meta rankings', [
+                'error' => $e->getMessage(),
+            ]);
 
-            $this->put($cacheKey, $placeholderData, 300);
-            $warmedCount = $warmedCount + 1;
+            return [
+                'success' => false,
+                'count' => 0,
+                'error' => $e->getMessage(),
+            ];
         }
-
-        return [
-            'success' => true,
-            'count' => $warmedCount,
-        ];
     }
 
     /**
@@ -802,38 +860,73 @@ class CacheManagerService
      */
     protected function warmGameMechanics(): array
     {
-        $mechanicsTypes = [
-            'stat_breakpoints',
-            'growth_rates',
-            'training_multipliers',
-            'hidden_mechanics',
-        ];
+        try {
+            $warmedCount = 0;
 
-        $warmedCount = 0;
-
-        foreach ($mechanicsTypes as $type) {
-            $cacheKey = "game_mechanics:{$type}";
-
-            if ($this->has($cacheKey)) {
-                $warmedCount = $warmedCount + 1;
-
-                continue;
-            }
-
-            $placeholderData = [
-                'type' => $type,
-                'status' => 'warming',
-                'queued_at' => now()->toISOString(),
+            $mechanicsData = [
+                'stat_breakpoints' => [
+                    'type' => 'stat_breakpoints',
+                    'breakpoints' => [
+                        ['value' => 901, 'label' => 'A-rank threshold'],
+                        ['value' => 1200, 'label' => 'S-rank threshold / soft cap'],
+                        ['value' => 1600, 'label' => 'SS-rank threshold'],
+                    ],
+                    'diminishing_returns' => 'Half value above 1200',
+                    'stamina_contest_threshold' => 1200,
+                ],
+                'growth_rates' => [
+                    'type' => 'growth_rates',
+                    'multipliers' => ['+10%', '+20%', '+30%'],
+                    'description' => 'Inherited bonuses multiplying training effectiveness',
+                ],
+                'training_multipliers' => [
+                    'type' => 'training_multipliers',
+                    'mood_modifiers' => [
+                        'great' => 0.04,
+                        'good' => 0.02,
+                        'normal' => 0.0,
+                        'bad' => -0.02,
+                        'awful' => -0.04,
+                    ],
+                ],
+                'hidden_mechanics' => [
+                    'type' => 'hidden_mechanics',
+                    'aptitude_grades' => ['G', 'F', 'E', 'D', 'C', 'B', 'A', 'S'],
+                    'aptitude_baseline' => 'A (0%)',
+                    'aptitude_max' => 'S (+5%)',
+                    'hint_discount_levels' => [10, 20, 30, 35, 40],
+                ],
             ];
 
-            $this->put($cacheKey, $placeholderData, 300);
-            $warmedCount = $warmedCount + 1;
-        }
+            foreach ($mechanicsData as $type => $data) {
+                $cacheKey = "game_mechanics:{$type}";
 
-        return [
-            'success' => true,
-            'count' => $warmedCount,
-        ];
+                if ($this->has($cacheKey)) {
+                    $warmedCount++;
+
+                    continue;
+                }
+
+                $data['warmed_at'] = now()->toISOString();
+                $this->put($cacheKey, $data);
+                $warmedCount++;
+            }
+
+            return [
+                'success' => true,
+                'count' => $warmedCount,
+            ];
+        } catch (\Exception $e) {
+            Log::error('[CacheManagerService] Failed to warm game mechanics', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return [
+                'success' => false,
+                'count' => 0,
+                'error' => $e->getMessage(),
+            ];
+        }
     }
 
     /**

@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Models\User;
+use App\Notifications\PerformanceAlertNotification;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 
 /**
  * Performance Alerting Service
@@ -588,6 +591,11 @@ class PerformanceAlertingService
      *
      * @param  array<string, mixed>  $alert
      */
+    /**
+     * Dispatch alert to notification channels.
+     *
+     * @param  array<string, mixed>  $alert
+     */
     protected function dispatchAlert(array $alert): void
     {
         $channels = config('apm.alerting.channels', []);
@@ -609,7 +617,7 @@ class PerformanceAlertingService
             ]);
         }
 
-        // Database channel
+        // Database channel (system logs table)
         $dbChannel = is_array($channels['database'] ?? null) ? $channels['database'] : [];
         if ($dbChannel['enabled'] ?? true) {
             try {
@@ -628,6 +636,37 @@ class PerformanceAlertingService
                     'error' => $e->getMessage(),
                 ]);
             }
+        }
+
+        // Laravel Notifications (email, Slack) for warning/critical alerts
+        $this->dispatchLaravelNotification($alert);
+    }
+
+    /**
+     * Dispatch alert via Laravel Notification system (email, Slack).
+     *
+     * @param  array<string, mixed>  $alert
+     */
+    protected function dispatchLaravelNotification(array $alert): void
+    {
+        $severity = is_string($alert['severity'] ?? null) ? $alert['severity'] : 'info';
+
+        if ($severity === 'info') {
+            return;
+        }
+
+        try {
+            $adminUsers = User::query()->where('is_admin', true)->get();
+
+            if ($adminUsers->isEmpty()) {
+                return;
+            }
+
+            Notification::send($adminUsers, new PerformanceAlertNotification($alert));
+        } catch (\Exception $e) {
+            Log::error('[PerformanceAlerting] Failed to send Laravel notification', [
+                'error' => $e->getMessage(),
+            ]);
         }
     }
 

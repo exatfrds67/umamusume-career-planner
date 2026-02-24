@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Log;
  */
 class BedrockService
 {
-    protected BedrockRuntimeClient $client;
+    protected ?BedrockRuntimeClient $client = null;
 
     protected string $defaultModel;
 
@@ -52,7 +52,8 @@ class BedrockService
     }
 
     /**
-     * Initialize Bedrock client with AWS configuration
+     * Initialize Bedrock client with AWS configuration.
+     * Gracefully handles missing credentials by leaving the client null.
      */
     protected function initializeClient(): void
     {
@@ -62,7 +63,9 @@ class BedrockService
             $secretKey = (is_array($credentials) && isset($credentials['secret']) ? $credentials['secret'] : null);
 
             if (! $accessKey || ! $secretKey) {
-                throw new \RuntimeException('AWS credentials not configured. Set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY environment variables.');
+                Log::warning('[Bedrock] AWS credentials not configured. BedrockService will be unavailable.');
+
+                return;
             }
 
             $this->client = new BedrockRuntimeClient([
@@ -82,8 +85,22 @@ class BedrockService
                 'error' => $e->getMessage(),
             ]);
 
-            throw new \RuntimeException("Bedrock client initialization failed: {$e->getMessage()}", 0, $e);
+            $this->client = null;
         }
+    }
+
+    /**
+     * Ensure the Bedrock client is initialized and available.
+     *
+     * @throws \RuntimeException When AWS credentials are not configured
+     */
+    protected function ensureClientAvailable(): BedrockRuntimeClient
+    {
+        if ($this->client === null) {
+            throw new \RuntimeException('AWS credentials not configured. Set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY environment variables.');
+        }
+
+        return $this->client;
     }
 
     /**
@@ -101,6 +118,7 @@ class BedrockService
      */
     public function generate(string $prompt = '', array $context = [], ?string $model = null): array
     {
+        $client = $this->ensureClientAvailable();
         $model = $model ?? $this->defaultModel;
         $modelId = $this->getModelId($model);
 
@@ -109,7 +127,7 @@ class BedrockService
             $payload = $this->buildPayload($prompt, $context, $model);
 
             // Invoke Bedrock model
-            $response = $this->client->invokeModel([
+            $response = $client->invokeModel([
                 'modelId' => $modelId,
                 'contentType' => 'application/json',
                 'accept' => 'application/json',

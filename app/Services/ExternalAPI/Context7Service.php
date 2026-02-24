@@ -66,8 +66,8 @@ class Context7Service
             $history = array_slice($history, -self::MAX_CONTEXT_HISTORY);
         }
 
-        // Store updated history
         Cache::put($cacheKey, $history, self::CONTEXT_CACHE_TTL);
+        $this->trackKey($cacheKey);
 
         Log::debug('[Context7Service] API call context stored', [
             'api_name' => $apiName,
@@ -109,6 +109,7 @@ class Context7Service
         $mergedContext = array_merge($existingArray, $context);
 
         Cache::put($cacheKey, $mergedContext, self::CONTEXT_CACHE_TTL);
+        $this->trackKey($cacheKey);
 
         Log::debug('[Context7Service] Character context stored', [
             'character_id' => $characterId,
@@ -148,6 +149,7 @@ class Context7Service
         $mergedContext = array_merge($existingArray, $context);
 
         Cache::put($cacheKey, $mergedContext, self::CONTEXT_CACHE_TTL);
+        $this->trackKey($cacheKey);
 
         Log::debug('[Context7Service] Career context stored', [
             'career_id' => $careerId,
@@ -199,6 +201,7 @@ class Context7Service
         }
 
         Cache::put($cacheKey, $history, self::CONTEXT_CACHE_TTL);
+        $this->trackKey($cacheKey);
 
         Log::debug('[Context7Service] Conversation context stored', [
             'conversation_id' => $conversationId,
@@ -230,22 +233,68 @@ class Context7Service
      */
     public function analyzeContextPatterns(string $apiName = ''): array
     {
-        $pattern = self::CACHE_PREFIX."api_call:{$apiName}:*";
+        $frequentEndpoints = [];
+        $totalHits = 0;
+        $totalMisses = 0;
 
-        // In production, this would analyze actual cache patterns
-        // For now, return mock analysis
+        $prefix = self::CACHE_PREFIX.'api_call:';
+        $allKeys = Cache::get(self::CACHE_PREFIX.'tracked_keys', []);
+
+        if (is_array($allKeys)) {
+            foreach ($allKeys as $key) {
+                if (! is_string($key)) {
+                    continue;
+                }
+
+                $history = Cache::get($key, []);
+                if (! is_array($history)) {
+                    continue;
+                }
+
+                foreach ($history as $entry) {
+                    if (! is_array($entry)) {
+                        continue;
+                    }
+
+                    $endpoint = $entry['endpoint'] ?? 'unknown';
+                    if (! is_string($endpoint)) {
+                        continue;
+                    }
+
+                    if ($apiName !== '' && isset($entry['api_name']) && $entry['api_name'] !== $apiName) {
+                        continue;
+                    }
+
+                    if (! isset($frequentEndpoints[$endpoint])) {
+                        $frequentEndpoints[$endpoint] = 0;
+                    }
+                    $frequentEndpoints[$endpoint]++;
+                    $totalHits++;
+                }
+            }
+        }
+
+        arsort($frequentEndpoints);
+        $frequentEndpoints = array_slice($frequentEndpoints, 0, 10, true);
+
+        $totalRequests = $totalHits + $totalMisses;
+        $cacheHitRate = $totalRequests > 0 ? round($totalHits / $totalRequests, 2) : 0.0;
+
+        $recommendations = [];
+        foreach ($frequentEndpoints as $endpoint => $count) {
+            if ($count > 20) {
+                $recommendations[] = "Increase cache TTL for {$endpoint} endpoint (accessed {$count} times)";
+            }
+        }
+
+        if (empty($recommendations)) {
+            $recommendations[] = 'No optimization recommendations at this time';
+        }
+
         return [
-            'frequent_endpoints' => [
-                '/v1/characters' => 45,
-                '/v1/support-cards' => 32,
-                '/v1/skills' => 28,
-            ],
-            'cache_hit_rate' => 0.78,
-            'recommendations' => [
-                'Increase cache TTL for /v1/characters endpoint',
-                'Implement predictive caching for support cards',
-                'Consider background refresh for frequently accessed data',
-            ],
+            'frequent_endpoints' => $frequentEndpoints,
+            'cache_hit_rate' => $cacheHitRate,
+            'recommendations' => $recommendations,
         ];
     }
 
@@ -256,13 +305,34 @@ class Context7Service
      */
     public function getContextSummary(): array
     {
-        // In production, this would count actual cached contexts
-        // For now, return mock summary
+        $characterContexts = 0;
+        $careerContexts = 0;
+        $apiContexts = 0;
+
+        $trackedKeys = Cache::get(self::CACHE_PREFIX.'tracked_keys', []);
+        if (! is_array($trackedKeys)) {
+            $trackedKeys = [];
+        }
+
+        foreach ($trackedKeys as $key) {
+            if (! is_string($key)) {
+                continue;
+            }
+
+            if (str_contains($key, 'character:')) {
+                $characterContexts++;
+            } elseif (str_contains($key, 'career:')) {
+                $careerContexts++;
+            } elseif (str_contains($key, 'api_call:')) {
+                $apiContexts++;
+            }
+        }
+
         return [
-            'total_contexts' => 127,
-            'character_contexts' => 45,
-            'career_contexts' => 38,
-            'api_contexts' => 44,
+            'total_contexts' => $characterContexts + $careerContexts + $apiContexts,
+            'character_contexts' => $characterContexts,
+            'career_contexts' => $careerContexts,
+            'api_contexts' => $apiContexts,
         ];
     }
 
@@ -285,8 +355,34 @@ class Context7Service
      */
     public function clearAllContexts(): void
     {
-        // In production, this would use Cache::tags() or pattern matching
+        $trackedKeys = Cache::get(self::CACHE_PREFIX.'tracked_keys', []);
+        if (is_array($trackedKeys)) {
+            foreach ($trackedKeys as $key) {
+                if (is_string($key)) {
+                    Cache::forget($key);
+                }
+            }
+        }
+
+        Cache::forget(self::CACHE_PREFIX.'tracked_keys');
+
         Log::info('[Context7Service] All contexts cleared');
+    }
+
+    /**
+     * Track a cache key for summary and pattern analysis
+     */
+    protected function trackKey(string $cacheKey): void
+    {
+        $trackedKeys = Cache::get(self::CACHE_PREFIX.'tracked_keys', []);
+        if (! is_array($trackedKeys)) {
+            $trackedKeys = [];
+        }
+
+        if (! in_array($cacheKey, $trackedKeys, true)) {
+            $trackedKeys[] = $cacheKey;
+            Cache::put(self::CACHE_PREFIX.'tracked_keys', $trackedKeys, self::CONTEXT_CACHE_TTL);
+        }
     }
 
     /**

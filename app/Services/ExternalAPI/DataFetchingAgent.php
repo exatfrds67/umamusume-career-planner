@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\ExternalAPI;
 
 use App\Services\MCP\MCPClientService;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -45,6 +46,11 @@ class DataFetchingAgent
      * Retry delay in milliseconds (exponential backoff base)
      */
     private const RETRY_DELAY_MS = 1000;
+
+    /**
+     * Cache key prefix for performance metrics
+     */
+    private const METRICS_PREFIX = 'data_fetching_agent:metrics';
 
     /**
      * Priority levels for resource fetching
@@ -176,12 +182,15 @@ class DataFetchingAgent
     {
         $results = [];
 
-        // Process each resource in the batch
-        // In a real implementation with actual MCP strands-agents,
-        // these would be executed in parallel using the agent coordination
         foreach ($batch as $resource) {
             $resourceName = $resource['name'];
-            $results[$resourceName] = $this->fetchResource($resource);
+            $result = $this->fetchResource($resource);
+            $results[$resourceName] = $result;
+
+            $cacheHit = isset($result['metadata']['cache_hit']) && $result['metadata']['cache_hit'];
+            /** @var float $durationMs */
+            $durationMs = $result['metadata']['duration_ms'] ?? 0.0;
+            $this->recordFetch($result['success'], $cacheHit, $durationMs);
         }
 
         return $results;
@@ -843,14 +852,21 @@ class DataFetchingAgent
      */
     public function getPerformanceMetrics(): array
     {
-        // In a real implementation, these would be tracked in Redis or a database
-        // For now, we return placeholder metrics
+        /** @var int $totalFetches */
+        $totalFetches = Cache::get(self::METRICS_PREFIX.':total_fetches', 0);
+        /** @var int $successfulFetches */
+        $successfulFetches = Cache::get(self::METRICS_PREFIX.':successful_fetches', 0);
+        /** @var int $failedFetches */
+        $failedFetches = Cache::get(self::METRICS_PREFIX.':failed_fetches', 0);
+        /** @var int $cacheHits */
+        $cacheHits = Cache::get(self::METRICS_PREFIX.':cache_hits', 0);
+
         return [
-            'total_fetches' => 0,
-            'successful_fetches' => 0,
-            'failed_fetches' => 0,
-            'cache_hits' => 0,
-            'average_duration_ms' => 0.0,
+            'total_fetches' => $totalFetches,
+            'successful_fetches' => $successfulFetches,
+            'failed_fetches' => $failedFetches,
+            'cache_hits' => $cacheHits,
+            'average_duration_ms' => $this->calculateAverageDuration(),
         ];
     }
 
@@ -859,8 +875,58 @@ class DataFetchingAgent
      */
     public function resetPerformanceMetrics(): void
     {
-        // In a real implementation, this would clear tracked metrics
+        $keys = [
+            self::METRICS_PREFIX.':total_fetches',
+            self::METRICS_PREFIX.':successful_fetches',
+            self::METRICS_PREFIX.':failed_fetches',
+            self::METRICS_PREFIX.':cache_hits',
+            self::METRICS_PREFIX.':total_duration_ms',
+        ];
+
+        foreach ($keys as $key) {
+            Cache::forget($key);
+        }
+
         Log::info('[DataFetchingAgent] Performance metrics reset');
+    }
+
+    /**
+     * Record a fetch operation in performance metrics
+     */
+    public function recordFetch(bool $success, bool $cacheHit, float $durationMs): void
+    {
+        Cache::increment(self::METRICS_PREFIX.':total_fetches');
+
+        if ($success) {
+            Cache::increment(self::METRICS_PREFIX.':successful_fetches');
+        } else {
+            Cache::increment(self::METRICS_PREFIX.':failed_fetches');
+        }
+
+        if ($cacheHit) {
+            Cache::increment(self::METRICS_PREFIX.':cache_hits');
+        }
+
+        /** @var float $currentTotal */
+        $currentTotal = Cache::get(self::METRICS_PREFIX.':total_duration_ms', 0);
+        Cache::put(self::METRICS_PREFIX.':total_duration_ms', $currentTotal + $durationMs, 86400);
+    }
+
+    /**
+     * Calculate average fetch duration from stored metrics
+     */
+    protected function calculateAverageDuration(): float
+    {
+        /** @var int $totalFetches */
+        $totalFetches = Cache::get(self::METRICS_PREFIX.':total_fetches', 0);
+        /** @var float $totalDuration */
+        $totalDuration = Cache::get(self::METRICS_PREFIX.':total_duration_ms', 0);
+
+        if ($totalFetches === 0) {
+            return 0.0;
+        }
+
+        return round($totalDuration / $totalFetches, 2);
     }
 
     /**
