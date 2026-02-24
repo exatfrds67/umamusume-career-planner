@@ -1,10 +1,9 @@
 import "./bootstrap";
-import Alpine from "alpinejs";
-import persist from "@alpinejs/persist";
-import collapse from "@alpinejs/collapse";
+import { Livewire, Alpine } from "../../vendor/livewire/livewire/dist/livewire.esm";
 import axios from "axios";
 import connectivityMonitor from "./core/connectivity-monitor.js";
 import planWizard from "./components/plan-wizard.js";
+import racePlanner from "./components/race-planner.js";
 
 // Phase 4: Training & SP Management Components
 import { trainingTimeline } from "./components/training-timeline.js";
@@ -52,9 +51,7 @@ import "./pages/characters/index.js";
 import "./pages/skills/index.js";
 import "./pages/skills/partials/planner.js";
 
-// Register Alpine plugins early
-Alpine.plugin(persist);
-Alpine.plugin(collapse);
+// Alpine plugins (persist & collapse) are already bundled in Livewire's ESM
 
 // --- Sidebar Store (Sidebar Minimize Feature) ---
 document.addEventListener("alpine:init", () => {
@@ -610,6 +607,7 @@ const deckBuilder = () => ({
 // Register Components
 Alpine.data("connectivityMonitor", connectivityMonitor);
 Alpine.data("planWizard", planWizard);
+Alpine.data("racePlanner", racePlanner);
 Alpine.data("deckBuilder", deckBuilder);
 
 // Phase 4: Training & SP Management
@@ -654,6 +652,18 @@ Alpine.data("trendAnalysisChart", trendAnalysisChart);
 Alpine.data("supportCardManager", supportCardManager);
 Alpine.data("externalDataBrowser", externalDataBrowser);
 
+// Offline-aware Livewire helper
+import { offlineLivewire } from "./offline-livewire.js";
+Alpine.data("offlineLivewire", offlineLivewire);
+
+// PWA install prompt
+import { installPromptManager, initInstallPrompt } from "./install-prompt.js";
+Alpine.data("installPromptManager", installPromptManager);
+
+// App update manager
+import { appUpdateManager, scheduleAutoUpdateCheck } from "./app-update.js";
+Alpine.data("appUpdateManager", appUpdateManager);
+
 // Initialize Alpine.js immediately for faster interactivity
 window.Alpine = Alpine;
 
@@ -683,8 +693,8 @@ const loadNonCriticalModules = () => {
     import("./core/PerformanceMonitor.js");
 };
 
-// Start Alpine immediately for better INP
-Alpine.start();
+// Start Livewire (which starts Alpine after registering its directives)
+Livewire.start();
 
 // Load non-critical modules after Alpine starts
 if (document.readyState === "loading") {
@@ -739,26 +749,14 @@ if ("serviceWorker" in navigator) {
             // Check for updates immediately
             registration.update();
 
-            // Handle updates
-            registration.addEventListener("updatefound", () => {
-                const newWorker = registration.installing;
-
-                newWorker.addEventListener("statechange", () => {
-                    if (
-                        newWorker.state === "installed" &&
-                        navigator.serviceWorker.controller
-                    ) {
-                        // New service worker available, reload to activate
-                        console.log("[SW] New version available, reloading...");
-                        window.location.reload();
-                    }
-                });
+            // Use app-update module for update detection and auto-update
+            import("./app-update.js").then(({ setupUpdateDetection, scheduleAutoUpdateCheck }) => {
+                setupUpdateDetection(registration);
+                scheduleAutoUpdateCheck();
             });
 
-            // Listen for controller change (new service worker activated)
-            navigator.serviceWorker.addEventListener("controllerchange", () => {
-                console.log("[SW] New service worker activated");
-            });
+            // Initialize install prompt tracking
+            initInstallPrompt();
 
             // Listen for messages from service worker
             navigator.serviceWorker.addEventListener("message", (event) => {
@@ -773,6 +771,11 @@ if ("serviceWorker" in navigator) {
                         break;
                     case "CACHE_STATUS":
                         console.log("[SW] Cache status:", payload);
+                        break;
+                    case "TRIGGER_SYNC":
+                        import("./background-sync.js").then(({ startSync }) => {
+                            startSync();
+                        });
                         break;
                 }
             });

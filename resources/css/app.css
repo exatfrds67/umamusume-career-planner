@@ -2324,6 +2324,139 @@ input[type="range"]::-moz-range-thumb:hover {
 }
 
 /* ============================================
+   400% Zoom Reflow Support (WCAG 2.2 AA - NFR-A-10)
+   Ensures content reflows to single column at extreme zoom
+   and avoids horizontal scrollbar.
+   ============================================ */
+
+@media (max-width: 320px) {
+    /* Force single-column layout at extreme zoom */
+    .grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Prevent overflow on fixed-width elements */
+    .max-w-7xl,
+    .max-w-6xl,
+    .max-w-5xl,
+    .max-w-4xl,
+    .max-w-3xl,
+    .max-w-2xl,
+    .max-w-xl,
+    .max-w-lg {
+        max-width: 100% !important;
+    }
+
+    /* Prevent horizontal scrollbar */
+    body {
+        overflow-x: hidden;
+    }
+
+    /* Ensure text wraps properly */
+    table {
+        display: block;
+        overflow-x: auto;
+    }
+
+    /* Stack flex containers vertically */
+    .flex-row,
+    .sm\:flex-row,
+    .md\:flex-row,
+    .lg\:flex-row {
+        flex-direction: column !important;
+    }
+
+    /* Hide sidebar at extreme zoom */
+    .lg\:fixed.lg\:inset-y-0 {
+        display: none !important;
+    }
+
+    .lg\:pl-72,
+    .lg\:pl-20 {
+        padding-left: 0 !important;
+    }
+}
+
+/* ============================================
+   Dark Mode Stat Color Optimization (GAP-007)
+   Ensures stat colors maintain WCAG 4.5:1 contrast
+   on dark backgrounds.
+   ============================================ */
+
+.dark .stat-color-speed {
+    color: var(--color-stat-speed-300);
+}
+
+.dark .stat-color-stamina {
+    color: var(--color-stat-stamina-300);
+}
+
+.dark .stat-color-power {
+    color: var(--color-stat-power-300);
+}
+
+.dark .stat-color-guts {
+    color: var(--color-stat-guts-300);
+}
+
+.dark .stat-color-wit {
+    color: var(--color-stat-wit-300);
+}
+
+/* Stat background colors for dark mode */
+.dark .stat-bg-speed {
+    background-color: var(--color-stat-speed-800);
+    color: var(--color-stat-speed-200);
+}
+
+.dark .stat-bg-stamina {
+    background-color: var(--color-stat-stamina-800);
+    color: var(--color-stat-stamina-200);
+}
+
+.dark .stat-bg-power {
+    background-color: var(--color-stat-power-800);
+    color: var(--color-stat-power-200);
+}
+
+.dark .stat-bg-guts {
+    background-color: var(--color-stat-guts-800);
+    color: var(--color-stat-guts-200);
+}
+
+.dark .stat-bg-wit {
+    background-color: var(--color-stat-wit-800);
+    color: var(--color-stat-wit-200);
+}
+
+/* Stat bar fills for dark mode - brighter for visibility */
+.dark .stat-bar-fill-speed {
+    background: linear-gradient(90deg, var(--color-stat-speed-400), var(--color-stat-speed-500));
+}
+
+.dark .stat-bar-fill-stamina {
+    background: linear-gradient(90deg, var(--color-stat-stamina-400), var(--color-stat-stamina-500));
+}
+
+.dark .stat-bar-fill-power {
+    background: linear-gradient(90deg, var(--color-stat-power-400), var(--color-stat-power-500));
+}
+
+.dark .stat-bar-fill-guts {
+    background: linear-gradient(90deg, var(--color-stat-guts-400), var(--color-stat-guts-500));
+}
+
+.dark .stat-bar-fill-wit {
+    background: linear-gradient(90deg, var(--color-stat-wit-400), var(--color-stat-wit-500));
+}
+
+/* Chart.js canvas dark mode background */
+.dark canvas[id*="chart"],
+.dark canvas[data-chart] {
+    filter: brightness(1.1);
+}
+
+/* ============================================
    Reduced Motion Support (WCAG 2.2 AA)
    Sidebar Minimize Feature
    ============================================ */
