@@ -7,6 +7,7 @@
         class="relative h-48 bg-linear-to-br from-{{ $card->card_type ? ($card->card_type === 'speed' ? 'blue' : ($card->card_type === 'stamina' ? 'green' : ($card->card_type === 'power' ? 'red' : ($card->card_type === 'guts' ? 'orange' : ($card->card_type === 'wit' ? 'purple' : 'pink'))))) : 'gray' }}-400 to-{{ $card->card_type ? ($card->card_type === 'speed' ? 'blue' : ($card->card_type === 'stamina' ? 'green' : ($card->card_type === 'power' ? 'red' : ($card->card_type === 'guts' ? 'orange' : ($card->card_type === 'wit' ? 'purple' : 'pink'))))) : 'gray' }}-600">
         @if ($card->artwork_url)
             <img src="{{ $card->artwork_url }}" alt="{{ $card->name }}" loading="lazy" decoding="async"
+                width="400" height="192"
                 class="w-full h-full object-cover">
         @else
             <div class="absolute inset-0 flex items-center justify-center">
@@ -53,7 +54,7 @@
         </div>
 
         <!-- Stats Preview -->
-        <div class="grid grid-cols-3 gap-2 text-xs mb-3">
+        <div class="grid grid-cols-3 gap-2 text-xs mb-3 min-h-10">
             @if ($card->speed_bonus > 0)
                 <div class="text-center">
                     <div class="text-gray-500 dark:text-gray-400">Speed</div>

@@ -209,40 +209,8 @@
         </form>
     </div>
 
-    <script>
-        function enforceStatMax(input) {
-            const max = 1200;
-            const errorId = input.id.includes('goal_') ? null : input.id + '_error';
-            const errorEl = errorId ? document.getElementById(errorId) : null;
-
-            if (parseInt(input.value) > max) {
-                input.value = max;
-                if (errorEl) {
-                    errorEl.classList.remove('hidden');
-                    setTimeout(() => errorEl.classList.add('hidden'), 2000);
-                }
-            }
-
-            if (parseInt(input.value) < 0) {
-                input.value = 0;
-            }
-        }
-
-        document.getElementById('character-form').addEventListener('submit', function(e) {
-            const statInputs = document.querySelectorAll('.stat-input');
-            let hasError = false;
-
-            statInputs.forEach(input => {
-                if (parseInt(input.value) > 1200) {
-                    input.value = 1200;
-                    hasError = true;
-                }
-            });
-
-            if (hasError) {
-                // Just notify, form still submits with corrected values
-                // alert('Stats capped to 1200');
-            }
-        });
-    </script>
+    {{-- JS extracted to resources/js/pages/characters/edit.js --}}
+    @push('scripts')
+        @vite('resources/js/pages/characters/edit.js')
+    @endpush
 @endsection

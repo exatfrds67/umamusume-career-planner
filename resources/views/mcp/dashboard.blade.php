@@ -1,10 +1,15 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-                {{ __('MCP Management Dashboard') }}
-            </h2>
-            <div class="flex items-center space-x-3">
+        <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
+            {{ __('MCP Management Dashboard') }}
+        </h2>
+    </x-slot>
+
+    <div class="py-12" x-data="mcpDashboard()">
+        <div class="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
+
+            <!-- Dashboard Controls Bar -->
+            <div class="flex items-center justify-between">
                 <span class="text-sm text-gray-600 dark:text-gray-400">
                     Last updated: <span x-text="lastUpdated">--</span>
                 </span>
@@ -18,11 +23,6 @@
                     Refresh All
                 </button>
             </div>
-        </div>
-    </x-slot>
-
-    <div class="py-12" x-data="mcpDashboard()">
-        <div class="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
 
             <!-- Tab Navigation -->
             <div class="border-b border-gray-200 dark:border-gray-700">
@@ -425,186 +425,8 @@
         </div>
     </div>
 
+    {{-- Extracted: JS logic + routes moved to resources/js/pages/mcp/dashboard.js --}}
     @push('scripts')
-        <script>
-            function mcpDashboard() {
-                return {
-                    activeTab: 'overview',
-                    lastUpdated: '--',
-                    performanceTimeRange: '24h',
-                    loading: false,
-
-                    overview: {
-                        total_servers: 0,
-                        healthy_servers: 0,
-                        active_agents: 0,
-                        active_workflows: 0,
-                        cost_24h: 0,
-                        requests_24h: 0,
-                        avg_response_time: 0,
-                        p95_response_time: 0
-                    },
-
-                    servers: {},
-                    agents: {},
-                    costs: {
-                        daily_cost: 0,
-                        weekly_cost: 0,
-                        monthly_cost: 0,
-                        budget_status: null,
-                        by_provider: {},
-                        top_tools: [],
-                        recommendations: []
-                    },
-
-                    performance: {
-                        providers: {},
-                        fastest: null,
-                        most_reliable: null,
-                        most_cost_effective: null,
-                        recommendations: []
-                    },
-
-                    settings: {
-                        servers: {},
-                        agents: {
-                            training: 'auto',
-                            career: 'auto',
-                            race: 'auto',
-                            skill: 'auto'
-                        },
-                        budget: {
-                            daily: 1.00,
-                            monthly: 30.00,
-                            alert_threshold: 90
-                        },
-                        performance: {
-                            auto_fallback: true,
-                            parallel_processing: true,
-                            cache_responses: true
-                        }
-                    },
-
-                    init() {
-                        this.loadDashboard();
-                        // Refresh every 10 seconds
-                        setInterval(() => this.loadDashboard(), 10000);
-
-                        // Listen for custom events
-                        this.$watch('activeTab', () => this.loadTabData());
-                    },
-
-                    async loadDashboard() {
-                        if (this.loading) return;
-                        this.loading = true;
-
-                        try {
-                            const response = await fetch('/api/mcp/dashboard/overview');
-                            const data = await response.json();
-
-                            if (data.success) {
-                                this.overview = data.data.overview;
-                                this.servers = data.data.servers;
-                                this.agents = data.data.agents;
-                                this.costs = data.data.costs;
-                                this.performance = data.data.performance;
-                                this.settings = data.data.settings;
-                                this.lastUpdated = new Date().toLocaleTimeString();
-                            }
-                        } catch (error) {
-                            console.error('Failed to load dashboard:', error);
-                        } finally {
-                            this.loading = false;
-                        }
-                    },
-
-                    async loadTabData() {
-                        // Load specific tab data when switching tabs
-                        switch (this.activeTab) {
-                            case 'servers':
-                                await this.loadServers();
-                                break;
-                            case 'agents':
-                                await this.loadAgents();
-                                break;
-                            case 'costs':
-                                await this.loadCosts();
-                                break;
-                            case 'performance':
-                                await this.loadPerformance();
-                                break;
-                            case 'settings':
-                                await this.loadSettings();
-                                break;
-                        }
-                    },
-
-                    async loadServers() {
-                        try {
-                            const response = await fetch('/api/mcp/servers');
-                            const data = await response.json();
-                            if (data.success) {
-                                this.servers = data.data;
-                            }
-                        } catch (error) {
-                            console.error('Failed to load servers:', error);
-                        }
-                    },
-
-                    async loadAgents() {
-                        try {
-                            const response = await fetch('/api/mcp/agents');
-                            const data = await response.json();
-                            if (data.success) {
-                                this.agents = data.data;
-                            }
-                        } catch (error) {
-                            console.error('Failed to load agents:', error);
-                        }
-                    },
-
-                    async loadCosts() {
-                        try {
-                            const response = await fetch('/api/mcp/costs');
-                            const data = await response.json();
-                            if (data.success) {
-                                this.costs = data.data;
-                            }
-                        } catch (error) {
-                            console.error('Failed to load costs:', error);
-                        }
-                    },
-
-                    async loadPerformance() {
-                        try {
-                            const response = await fetch(`/api/mcp/performance?range=${this.performanceTimeRange}`);
-                            const data = await response.json();
-                            if (data.success) {
-                                this.performance = data.data;
-                            }
-                        } catch (error) {
-                            console.error('Failed to load performance:', error);
-                        }
-                    },
-
-                    async loadSettings() {
-                        try {
-                            const response = await fetch('/api/mcp/settings');
-                            const data = await response.json();
-                            if (data.success) {
-                                this.settings = data.data;
-                            }
-                        } catch (error) {
-                            console.error('Failed to load settings:', error);
-                        }
-                    },
-
-                    async refreshAll() {
-                        await this.loadDashboard();
-                        await this.loadTabData();
-                    }
-                }
-            }
-        </script>
+        @vite('resources/js/pages/mcp/dashboard.js')
     @endpush
 </x-app-layout>

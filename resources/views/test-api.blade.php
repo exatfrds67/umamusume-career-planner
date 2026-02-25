@@ -45,7 +45,7 @@
                 </button>
             </div>
 
-            <div id="umapyoi-results" class="bg-gray-50 p-4 rounded border border-gray-200 min-h-[200px]">
+            <div id="umapyoi-results" class="bg-gray-50 p-4 rounded border border-gray-200 min-h-50">
                 <p class="text-gray-500">Click a button to test an endpoint. Check the browser console (F12) for
                     detailed logs.</p>
             </div>
@@ -77,7 +77,7 @@
                 </button>
             </div>
 
-            <div id="umamusumedb-results" class="bg-gray-50 p-4 rounded border border-gray-200 min-h-[200px]">
+            <div id="umamusumedb-results" class="bg-gray-50 p-4 rounded border border-gray-200 min-h-50">
                 <p class="text-gray-500">Click a button to test. Check the browser console (F12) for detailed logs.</p>
             </div>
         </div>

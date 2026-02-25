@@ -45,7 +45,7 @@
 
         <!-- Profile dropdown -->
         <div x-data="{ open: false }" class="relative z-20" @keydown.escape.window="open = false">
-            <button type="button" class="-m-1.5 flex items-center p-1.5" @click="open = !open"
+            <button type="button" class="-m-1.5 flex items-center p-1.5" id="user-menu-btn" @click="open = !open"
                 @click.away="open = false">
                 <span class="sr-only">Open user menu</span>
                 <img class="h-8 w-8 rounded-full bg-gray-50"
@@ -80,9 +80,9 @@
                 <a href="{{ route('profile.show') ?? '#' }}"
                     class="block px-3 py-1 text-sm leading-6 text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700"
                     role="menuitem">Your profile</a>
-                <form method="POST" action="{{ route('logout') ?? '#' }}">
+                <form method="POST" action="{{ route('logout') ?? '#' }}" id="logout-form">
                     @csrf
-                    <button type="submit"
+                    <button type="submit" id="logout-btn"
                         class="block w-full text-left px-3 py-1 text-sm leading-6 text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700"
                         role="menuitem">Sign out</button>
                 </form>

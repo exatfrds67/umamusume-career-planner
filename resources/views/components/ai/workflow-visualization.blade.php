@@ -7,7 +7,7 @@
         <div class="space-y-4">
             {{-- Workflow Header --}}
             <div
-                class="flex items-center justify-between p-3 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                class="flex items-center justify-between p-3 bg-linear-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
                 <div class="flex items-center gap-2">
                     <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor"
                         viewBox="0 0 24 24">
@@ -176,47 +176,7 @@
     </template>
 </div>
 
-<script>
-    function workflowVisualization() {
-        return {
-            currentWorkflow: null,
-            completedSteps: 0,
-            totalDuration: 0,
-
-            initialize() {
-                this.fetchWorkflow();
-                // Poll for updates every 2 seconds
-                setInterval(() => this.fetchWorkflow(), 2000);
-            },
-
-            async fetchWorkflow() {
-                try {
-                    const response = await fetch('/api/ai/chat/workflow-status');
-                    const data = await response.json();
-
-                    if (data.workflow) {
-                        this.currentWorkflow = data.workflow;
-                        this.calculateMetrics();
-                    } else {
-                        this.currentWorkflow = null;
-                    }
-                } catch (error) {
-                    console.error('Failed to fetch workflow status:', error);
-                }
-            },
-
-            calculateMetrics() {
-                if (!this.currentWorkflow || !this.currentWorkflow.steps) {
-                    this.completedSteps = 0;
-                    this.totalDuration = 0;
-                    return;
-                }
-
-                this.completedSteps = this.currentWorkflow.steps.filter(s => s.status === 'completed').length;
-                this.totalDuration = this.currentWorkflow.steps
-                    .filter(s => s.duration)
-                    .reduce((sum, s) => sum + s.duration, 0);
-            }
-        };
-    }
-</script>
+{{-- JS extracted to resources/js/components/ai/workflow-visualization.js --}}
+@pushOnce('scripts')
+    @vite('resources/js/components/ai/workflow-visualization.js')
+@endPushOnce

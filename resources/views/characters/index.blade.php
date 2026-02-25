@@ -184,9 +184,11 @@
     </div>
 @endsection
 
+{{-- JS extracted to resources/js/pages/characters/index.js --}}
 @push('scripts')
     <script>
         // Inject characters data from server
         window.charactersData = @json($characters);
     </script>
+    @vite('resources/js/pages/characters/index.js')
 @endpush

@@ -258,22 +258,7 @@
     </div>
 </div>
 
-<script>
-    window.selectFacility = function(facility) {
-        // Highlight selected facility
-        document.querySelectorAll('.training-facility').forEach(el => {
-            el.classList.remove('ring-2', 'ring-primary-500');
-        });
-        document.querySelector(`[data-facility="${facility}"]`)?.classList.add('ring-2', 'ring-primary-500');
-    };
-
-    window.selectTraining = function(facility) {
-        // Show confirmation or execute training
-        window.dispatchEvent(new CustomEvent('toast', {
-            detail: {
-                type: 'info',
-                message: `Training selection: ${facility.charAt(0).toUpperCase() + facility.slice(1)}`
-            }
-        }));
-    };
-</script>
+{{-- Extracted: JS logic moved to resources/js/pages/training/partials/predictions-grid.js --}}
+@pushOnce('scripts')
+    @vite('resources/js/pages/training/partials/predictions-grid.js')
+@endPushOnce

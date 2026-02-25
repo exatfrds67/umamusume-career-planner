@@ -382,6 +382,7 @@
 
 @endsection
 
+{{-- JS extracted to resources/js/pages/skills/index.js --}}
 @push('scripts')
     {{-- Inject data for JavaScript --}}
     <script>
@@ -390,4 +391,5 @@
             preSelectedCharacterId: '{{ $preSelectedCharacterId ?? '' }}'
         };
     </script>
+    @vite('resources/js/pages/skills/index.js')
 @endpush

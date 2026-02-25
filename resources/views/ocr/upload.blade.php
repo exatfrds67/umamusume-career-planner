@@ -148,14 +148,6 @@
         </div>
     </div>
 
-    {{-- Data injection for OCR upload --}}
-    <script>
-        window.pageData = {
-            routes: {
-                status: '/api/ocr/status',
-                upload: '/api/ocr/upload'
-            }
-        };
-    </script>
+    {{-- Extracted: JS logic + routes moved to resources/js/pages/ocr/upload.js --}}
     @vite(['resources/js/pages/ocr/upload.js'])
 @endsection

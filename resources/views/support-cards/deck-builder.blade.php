@@ -267,7 +267,7 @@
                     </div>
                 </section>
 
-                <aside class="card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm flex flex-col h-[600px]"
+                <aside class="card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm flex flex-col h-150"
                     aria-labelledby="library-heading">
                     <h2 id="library-heading" class="text-lg font-semibold mb-4">Available Cards</h2>
 

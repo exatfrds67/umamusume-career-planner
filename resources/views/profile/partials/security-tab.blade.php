@@ -11,7 +11,7 @@
                 <label for="current_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Current Password
                 </label>
-                <input type="password" name="current_password" id="current_password" required
+                <input type="password" name="current_password" id="current_password" required autocomplete="current-password"
                     class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                 @error('current_password')
                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
@@ -23,7 +23,7 @@
                 <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     New Password
                 </label>
-                <input type="password" name="password" id="password" required
+                <input type="password" name="password" id="password" required autocomplete="new-password"
                     class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                 @error('password')
                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
@@ -35,7 +35,7 @@
                 <label for="password_confirmation" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Confirm New Password
                 </label>
-                <input type="password" name="password_confirmation" id="password_confirmation" required
+                <input type="password" name="password_confirmation" id="password_confirmation" required autocomplete="new-password"
                     class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
             </div>
 
@@ -81,7 +81,7 @@
 
 <!-- Danger Zone -->
 <div class="mt-6 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-lg"
-    x-data="deleteAccountModal()">
+    x-data="deleteAccountModal()" data-expected-name="{{ $user?->name ?? 'your username' }}">
     <div class="px-4 py-5 sm:p-6">
         <h2 class="text-lg font-medium text-red-900 dark:text-red-200 mb-2">Danger Zone</h2>
         <p class="text-sm text-red-700 dark:text-red-300 mb-4">
@@ -137,7 +137,7 @@
                         class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Confirm your password
                     </label>
-                    <input type="password" name="password" id="delete_password" required x-model="password"
+                    <input type="password" name="password" id="delete_password" required x-model="password" autocomplete="current-password"
                         class="block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                 </div>
 

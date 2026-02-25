@@ -18,7 +18,7 @@
     };
 @endphp
 
-<button type="button"
+<button type="button" id="critical-alert-btn"
     {{ $attributes->merge([
         'class' =>
             '-m-2.5 p-2.5 relative transition-colors duration-200 ' .

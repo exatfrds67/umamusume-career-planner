@@ -113,7 +113,7 @@
                 <x-top-status-bar :current-turn="$topStatus['currentTurn'] ?? null" :max-turns="$topStatus['maxTurns'] ?? null" :sp-available="$topStatus['spAvailable'] ?? null" :storage-mode="$topStatus['storageMode'] ?? null" />
 
                 <div class="flex h-16 shrink-0 items-center gap-x-4 px-4 sm:gap-x-6 sm:px-6 lg:px-8">
-                    <button type="button" class="-m-2.5 p-2.5 text-gray-700 dark:text-gray-200 lg:hidden"
+                    <button type="button" id="sidebar-toggle-btn" class="-m-2.5 p-2.5 text-gray-700 dark:text-gray-200 lg:hidden"
                         @click="sidebarOpen = true">
                         <span class="sr-only">Open sidebar</span>
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
@@ -158,6 +158,58 @@
 
     <!-- Screen Reader Announcer for Sidebar State -->
     <div id="sidebar-announcer" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- Global Flash Notifications (server-side) -->
+    @if (session('success') || session('error') || session('warning') || session('info'))
+        <div class="fixed top-4 right-4 z-50 flex flex-col gap-3 max-w-sm w-full" aria-live="polite">
+            @if (session('success'))
+                <x-toast variant="success">{{ session('success') }}</x-toast>
+            @endif
+            @if (session('error'))
+                <x-toast variant="error">{{ session('error') }}</x-toast>
+            @endif
+            @if (session('warning'))
+                <x-toast variant="warning">{{ session('warning') }}</x-toast>
+            @endif
+            @if (session('info'))
+                <x-toast variant="info">{{ session('info') }}</x-toast>
+            @endif
+        </div>
+    @endif
+
+    <!-- Dynamic Toast Container (client-side, for JS-dispatched toasts) -->
+    <div id="dynamic-toast-container"
+         class="fixed top-4 right-4 z-50 flex flex-col gap-3 max-w-sm w-full pointer-events-none"
+         aria-live="polite"
+         x-data="toastContainer"
+         @toast.window="addFromEvent($event)">
+        <template x-for="toast in items" :key="toast.id">
+            <div class="pointer-events-auto alert shadow-lg"
+                 :class="{
+                     'alert-success': toast.type === 'success',
+                     'alert-error': toast.type === 'error',
+                     'alert-warning': toast.type === 'warning',
+                     'alert-info': toast.type === 'info' || !['success','error','warning'].includes(toast.type)
+                 }"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-2"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100 translate-y-0"
+                 x-transition:leave-end="opacity-0 translate-y-2">
+                <div class="flex items-start gap-3">
+                    <div class="flex-1" x-text="toast.message"></div>
+                    <button type="button" @click="remove(toast.id)"
+                            class="shrink-0 opacity-70 hover:opacity-100 transition-opacity"
+                            aria-label="Dismiss notification">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </template>
+    </div>
 
     @stack('scripts')
     @livewireScriptConfig

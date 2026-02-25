@@ -4,7 +4,16 @@
     {{-- Breadcrumb Navigation --}}
     <x-breadcrumb :items="[['label' => 'Settings']]" />
 
-    <div class="space-y-6 animate-fade-in">
+    @php
+        $prefs        = $user->preferences         ? $user->preferences->getArrayCopy()         : [];
+        $aiSettings   = $user->ai_settings          ? $user->ai_settings->getArrayCopy()          : [];
+        $accessSettings = $user->accessibility_settings ? $user->accessibility_settings->getArrayCopy() : [];
+        $notifPrefs   = $user->notification_preferences ? $user->notification_preferences->getArrayCopy() : [];
+    @endphp
+
+    <div class="space-y-6 animate-fade-in"
+        x-data="settingsData()"
+        x-init="initToggles()">
         <!-- Page Header -->
         <div class="md:flex md:items-center md:justify-between">
             <div class="min-w-0 flex-1">
@@ -15,9 +24,10 @@
                 <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
                     Manage your application preferences, privacy settings, and account configuration.
                 </p>
+
             </div>
             <div class="mt-4 flex md:ml-4 md:mt-0">
-                <button type="button"
+                <button type="button" @click="resetDefaults()"
                     class="inline-flex items-center rounded-md bg-white dark:bg-gray-700 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600">
                     Reset to Defaults
                 </button>
@@ -43,7 +53,7 @@
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-4">
             <!-- Settings Navigation -->
             <div class="lg:col-span-1">
-                <nav class="space-y-1 sticky top-20" aria-label="Settings navigation" x-data="{ active: 'account' }">
+                <nav class="space-y-1 sticky top-20" aria-label="Settings navigation">
                     <a href="#account" @click.prevent="active = 'account'"
                         :class="active === 'account' ?
                             'bg-primary-50 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400' :
@@ -148,12 +158,12 @@
             <!-- Settings Content -->
             <div class="lg:col-span-3 space-y-6">
                 <!-- Account Settings -->
-                <div id="account" class="bg-white dark:bg-gray-800 shadow rounded-lg animate-fade-in-delay-1">
+                <div id="account" x-show="active === 'account'" x-transition class="bg-white dark:bg-gray-800 shadow rounded-lg animate-fade-in-delay-1">
                     <div class="px-4 py-5 sm:p-6">
                         <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white mb-4">
                             Account Settings
                         </h3>
-                        <form class="space-y-6">
+                        <form class="space-y-6" @submit.prevent="saveAccount()">
                             <!-- Profile Information -->
                             <div>
                                 <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Profile Information
@@ -164,7 +174,8 @@
                                             class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                             Display Name
                                         </label>
-                                        <input type="text" id="display-name" value="User"
+                                        <input type="text" id="display-name" name="name"
+                                            x-model="name"
                                             class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                                     </div>
                                     <div>
@@ -172,7 +183,8 @@
                                             class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                             Email Address
                                         </label>
-                                        <input type="email" id="email" value="user@example.com"
+                                        <input type="email" id="email" name="email"
+                                            x-model="email"
                                             class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
                                     </div>
                                     <div>
@@ -180,10 +192,10 @@
                                             class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                             Language
                                         </label>
-                                        <select id="language"
+                                        <select id="language" x-model="language"
                                             class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
-                                            <option selected>English</option>
-                                            <option>日本語 (Japanese)</option>
+                                            <option value="en">English</option>
+                                            <option value="ja">日本語 (Japanese)</option>
                                         </select>
                                     </div>
                                     <div>
@@ -191,14 +203,20 @@
                                             class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                             Timezone
                                         </label>
-                                        <select id="timezone"
+                                        <select id="timezone" x-model="timezone"
                                             class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
-                                            <option>UTC</option>
-                                            <option selected>Asia/Tokyo</option>
-                                            <option>America/New_York</option>
-                                            <option>Europe/London</option>
+                                            <option value="UTC">UTC</option>
+                                            <option value="Asia/Tokyo">Asia/Tokyo</option>
+                                            <option value="America/New_York">America/New_York</option>
+                                            <option value="Europe/London">Europe/London</option>
                                         </select>
                                     </div>
+                                </div>
+                                <div class="mt-4 flex justify-end">
+                                    <button type="submit"
+                                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                                        Save Profile
+                                    </button>
                                 </div>
                             </div>
 
@@ -206,7 +224,7 @@
                             <div class="pt-6 border-t border-gray-200 dark:border-gray-700">
                                 <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Security</h4>
                                 <div class="space-y-3">
-                                    <button type="button"
+                                    <button type="button" @click="showPasswordModal = true"
                                         class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                                         Change Password
                                     </button>
@@ -237,10 +255,11 @@
                                 </h4>
                                 <div class="space-y-3">
                                     <button type="button"
+                                        @click="window.location.href = '{{ route('settings.export') }}'"
                                         class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                                         Export Account Data
                                     </button>
-                                    <button type="button"
+                                    <button type="button" @click="showDeleteModal = true"
                                         class="inline-flex items-center px-3 py-2 border border-error-300 dark:border-error-600 shadow-sm text-sm leading-4 font-medium rounded-md text-error-700 dark:text-error-300 bg-white dark:bg-gray-700 hover:bg-error-50 dark:hover:bg-error-900/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-error-500">
                                         Delete Account
                                     </button>
@@ -251,7 +270,7 @@
                 </div>
 
                 <!-- Privacy & Data Control -->
-                <div id="privacy" class="bg-white dark:bg-gray-800 shadow rounded-lg animate-fade-in-delay-2">
+                <div id="privacy" x-show="active === 'privacy'" x-transition class="bg-white dark:bg-gray-800 shadow rounded-lg animate-fade-in-delay-2">
                     <div class="px-4 py-5 sm:p-6">
                         <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white mb-4">
                             Privacy & Data Control
@@ -371,10 +390,12 @@
                                 <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Data Management</h4>
                                 <div class="space-y-3">
                                     <button type="button"
+                                        @click="window.location.href = '{{ route('settings.export') }}'"
                                         class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                                         Export All Data (JSON)
                                     </button>
                                     <button type="button"
+                                        @click="clearLocalCache()"
                                         class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                                         Clear Local Cache
                                     </button>
@@ -390,7 +411,7 @@
                     </div>
                 </div>
                 <!-- AI Configuration -->
-                <div id="ai" class="bg-white dark:bg-gray-800 shadow rounded-lg animate-fade-in-delay-3">
+                <div id="ai" x-show="active === 'ai'" x-transition class="bg-white dark:bg-gray-800 shadow rounded-lg animate-fade-in-delay-3">
                     <div class="px-4 py-5 sm:p-6">
                         <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white mb-4">
                             AI Configuration
@@ -408,9 +429,9 @@
                                         </label>
                                         <select id="ai-provider"
                                             class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
-                                            <option selected>Ollama (Local - Privacy First)</option>
-                                            <option>AWS Bedrock (Cloud - Advanced)</option>
-                                            <option>Hybrid (Auto-select based on task)</option>
+                                            <option value="ollama" {{ ($aiSettings['provider'] ?? 'ollama') === 'ollama' ? 'selected' : '' }}>Ollama (Local - Privacy First)</option>
+                                            <option value="bedrock" {{ ($aiSettings['provider'] ?? 'ollama') === 'bedrock' ? 'selected' : '' }}>AWS Bedrock (Cloud - Advanced)</option>
+                                            <option value="hybrid" {{ ($aiSettings['provider'] ?? 'ollama') === 'hybrid' ? 'selected' : '' }}>Hybrid (Auto-select based on task)</option>
                                         </select>
                                         <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
                                             Local models run on your device. Cloud models require internet and may incur
@@ -505,9 +526,9 @@
                                         </label>
                                         <select id="recommendation-frequency"
                                             class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
-                                            <option selected>Per Turn (Automatic)</option>
-                                            <option>Per Session</option>
-                                            <option>Manual Only</option>
+                                            <option value="per_turn" {{ ($aiSettings['recommendation_frequency'] ?? 'per_turn') === 'per_turn' ? 'selected' : '' }}>Per Turn (Automatic)</option>
+                                            <option value="per_session" {{ ($aiSettings['recommendation_frequency'] ?? 'per_turn') === 'per_session' ? 'selected' : '' }}>Per Session</option>
+                                            <option value="manual" {{ ($aiSettings['recommendation_frequency'] ?? 'per_turn') === 'manual' ? 'selected' : '' }}>Manual Only</option>
                                         </select>
                                     </div>
                                     <div>
@@ -517,9 +538,9 @@
                                         </label>
                                         <select id="explanation-detail"
                                             class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm">
-                                            <option>Brief</option>
-                                            <option selected>Detailed</option>
-                                            <option>Expert</option>
+                                            <option value="brief" {{ ($aiSettings['explanation_detail'] ?? 'detailed') === 'brief' ? 'selected' : '' }}>Brief</option>
+                                            <option value="detailed" {{ ($aiSettings['explanation_detail'] ?? 'detailed') === 'detailed' ? 'selected' : '' }}>Detailed</option>
+                                            <option value="expert" {{ ($aiSettings['explanation_detail'] ?? 'detailed') === 'expert' ? 'selected' : '' }}>Expert</option>
                                         </select>
                                     </div>
                                     <div class="flex items-center justify-between">
@@ -546,7 +567,7 @@
                     </div>
                 </div>
                 <!-- Appearance Settings -->
-                <div id="appearance" class="bg-white dark:bg-gray-800 shadow rounded-lg animate-fade-in-delay-4">
+                <div id="appearance" x-show="active === 'appearance'" x-transition class="bg-white dark:bg-gray-800 shadow rounded-lg animate-fade-in-delay-4">
                     <div class="px-4 py-5 sm:p-6">
                         <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white mb-4">
                             Appearance
@@ -558,35 +579,44 @@
                                     Theme
                                 </label>
                                 <div class="grid grid-cols-3 gap-3">
-                                    <button type="button"
-                                        class="relative flex flex-col items-center justify-center rounded-lg border-2 border-primary-500 bg-white p-4 focus:outline-none">
+                                    <button type="button" @click="applyTheme('light')"
+                                        :class="theme === 'light' ? 'border-primary-500' : 'border-gray-300 dark:border-gray-600 hover:border-gray-400'"
+                                        class="relative flex flex-col items-center justify-center rounded-lg border-2 bg-white p-4 focus:outline-none">
                                         <svg class="h-8 w-8 text-gray-900 mb-2" fill="none" viewBox="0 0 24 24"
                                             stroke-width="1.5" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                 d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
                                         </svg>
                                         <span class="text-sm font-medium text-gray-900">Light</span>
-                                        <span
+                                        <span x-show="theme === 'light'"
                                             class="pointer-events-none absolute -inset-px rounded-lg border-2 border-primary-500"
                                             aria-hidden="true"></span>
                                     </button>
-                                    <button type="button"
-                                        class="relative flex flex-col items-center justify-center rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 p-4 hover:border-gray-400 focus:outline-none">
+                                    <button type="button" @click="applyTheme('dark')"
+                                        :class="theme === 'dark' ? 'border-primary-500' : 'border-gray-300 dark:border-gray-600 hover:border-gray-400'"
+                                        class="relative flex flex-col items-center justify-center rounded-lg border-2 bg-white dark:bg-gray-700 p-4 focus:outline-none">
                                         <svg class="h-8 w-8 text-gray-900 dark:text-white mb-2" fill="none"
                                             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                 d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
                                         </svg>
                                         <span class="text-sm font-medium text-gray-900 dark:text-white">Dark</span>
+                                        <span x-show="theme === 'dark'"
+                                            class="pointer-events-none absolute -inset-px rounded-lg border-2 border-primary-500"
+                                            aria-hidden="true"></span>
                                     </button>
-                                    <button type="button"
-                                        class="relative flex flex-col items-center justify-center rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 p-4 hover:border-gray-400 focus:outline-none">
+                                    <button type="button" @click="applyTheme('system')"
+                                        :class="theme === 'system' ? 'border-primary-500' : 'border-gray-300 dark:border-gray-600 hover:border-gray-400'"
+                                        class="relative flex flex-col items-center justify-center rounded-lg border-2 bg-white dark:bg-gray-700 p-4 focus:outline-none">
                                         <svg class="h-8 w-8 text-gray-900 dark:text-white mb-2" fill="none"
                                             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                 d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25" />
                                         </svg>
                                         <span class="text-sm font-medium text-gray-900 dark:text-white">System</span>
+                                        <span x-show="theme === 'system'"
+                                            class="pointer-events-none absolute -inset-px rounded-lg border-2 border-primary-500"
+                                            aria-hidden="true"></span>
                                     </button>
                                 </div>
                             </div>
@@ -634,10 +664,12 @@
                                     <div>
                                         <label for="font-size"
                                             class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                            Font Size: <span id="font-size-value">100%</span>
+                                            Font Size: <span x-text="fontSize + '%'">100%</span>
                                         </label>
                                         <input type="range" id="font-size" min="100" max="200"
-                                            value="100" step="10"
+                                            x-model="fontSize"
+                                            @input="applyFontSize($event.target.value)"
+                                            step="10"
                                             class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
                                     </div>
                                 </div>
@@ -647,7 +679,7 @@
                 </div>
 
                 <!-- Accessibility Settings -->
-                <div id="accessibility" class="bg-white dark:bg-gray-800 shadow rounded-lg">
+                <div id="accessibility" x-show="active === 'accessibility'" x-transition class="bg-white dark:bg-gray-800 shadow rounded-lg">
                     <div class="px-4 py-5 sm:p-6">
                         <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white mb-4">
                             Accessibility (WCAG 2.2 AA Compliant)
@@ -743,7 +775,7 @@
                     </div>
                 </div>
                 <!-- Notification Settings -->
-                <div id="notifications" class="bg-white dark:bg-gray-800 shadow rounded-lg">
+                <div id="notifications" x-show="active === 'notifications'" x-transition class="bg-white dark:bg-gray-800 shadow rounded-lg">
                     <div class="px-4 py-5 sm:p-6">
                         <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white mb-4">
                             Notifications
@@ -893,7 +925,7 @@
                 </div>
 
                 <!-- Gameplay Preferences -->
-                <div id="gameplay" class="bg-white dark:bg-gray-800 shadow rounded-lg">
+                <div id="gameplay" x-show="active === 'gameplay'" x-transition class="bg-white dark:bg-gray-800 shadow rounded-lg">
                     <div class="px-4 py-5 sm:p-6">
                         <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white mb-4">
                             Gameplay Preferences
@@ -1003,7 +1035,7 @@
                 </div>
 
                 <!-- Advanced Settings -->
-                <div id="advanced" class="bg-white dark:bg-gray-800 shadow rounded-lg">
+                <div id="advanced" x-show="active === 'advanced'" x-transition class="bg-white dark:bg-gray-800 shadow rounded-lg">
                     <div class="px-4 py-5 sm:p-6">
                         <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white mb-4">
                             Advanced Settings
@@ -1107,13 +1139,107 @@
                     </div>
                 </div>
 
+                <!-- Change Password Modal -->
+                <div x-show="showPasswordModal" x-transition class="fixed inset-0 z-50 flex items-center justify-center p-4" style="display: none;">
+                    <div class="absolute inset-0 bg-black/50" @click="showPasswordModal = false"></div>
+                    <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-white">Change Password</h3>
+                            <button type="button" @click="showPasswordModal = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                                <span class="sr-only">Close</span>
+                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        <form class="space-y-4" @submit.prevent="changePassword()">
+                            <div>
+                                <label for="current-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Current Password</label>
+                                <input type="password" id="current-password" name="current_password" autocomplete="current-password"
+                                    x-model="currentPassword"
+                                    class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-white dark:bg-gray-700 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm">
+                            </div>
+                            <div>
+                                <label for="new-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">New Password</label>
+                                <input type="password" id="new-password" name="new_password" autocomplete="new-password"
+                                    x-model="newPassword"
+                                    class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-white dark:bg-gray-700 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm">
+                            </div>
+                            <div>
+                                <label for="confirm-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Confirm New Password</label>
+                                <input type="password" id="confirm-password" name="confirm_password" autocomplete="new-password"
+                                    x-model="confirmPassword"
+                                    class="mt-1 block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-white dark:bg-gray-700 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm">
+                            </div>
+                            <div x-show="passwordError" class="text-sm text-red-600 dark:text-red-400" x-text="passwordError"></div>
+                            <div class="flex justify-end gap-3 pt-2">
+                                <button type="button" @click="showPasswordModal = false; currentPassword = ''; newPassword = ''; confirmPassword = ''; passwordError = ''"
+                                    class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50">
+                                    Cancel
+                                </button>
+                                <button type="submit"
+                                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                                    Update Password
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Delete Account Modal -->
+                <div x-show="showDeleteModal" x-transition class="fixed inset-0 z-50 flex items-center justify-center p-4" style="display: none;">
+                    <div class="absolute inset-0 bg-black/50" @click="showDeleteModal = false"></div>
+                    <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-medium text-red-600 dark:text-red-400">Delete Account</h3>
+                            <button type="button" @click="showDeleteModal = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                                <span class="sr-only">Close</span>
+                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                            This action is permanent and cannot be undone. All your data will be deleted.
+                            Type <strong>DELETE</strong> to confirm.
+                        </p>
+                        <div class="mb-4">
+                            <input type="text" x-model="deleteConfirmation" placeholder="Type DELETE to confirm"
+                                class="block w-full rounded-md border-0 py-1.5 text-gray-900 dark:text-white dark:bg-gray-700 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm">
+                        </div>
+                        <div class="flex justify-end gap-3">
+                            <button type="button" @click="showDeleteModal = false; deleteConfirmation = ''"
+                                class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50">
+                                Cancel
+                            </button>
+                            <button type="button"
+                                @click="deleteAccount()"
+                                :disabled="deleteConfirmation !== 'DELETE'"
+                                :class="deleteConfirmation === 'DELETE' ? 'bg-red-600 hover:bg-red-700 cursor-pointer' : 'bg-red-200 cursor-not-allowed'"
+                                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                Delete My Account
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Success Toast -->
+                <div x-show="saved" x-transition
+                    class="fixed bottom-4 right-4 z-50 bg-green-600 text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-2"
+                    style="display: none;">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>
+                    <span x-text="savedMessage">Settings saved successfully</span>
+                </div>
+
                 <!-- Save Button -->
                 <div class="flex justify-end gap-3">
-                    <button type="button"
+                    <button type="button" @click="active = 'account'"
                         class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                         Cancel
                     </button>
-                    <button type="button"
+                    <button type="button" @click="saveSettings()"
                         class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                         Save All Changes
                     </button>
@@ -1122,3 +1248,18 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+{{-- Extracted: JS logic moved to resources/js/pages/settings/index.js --}}
+<script>
+    window.pageData = window.pageData || {};
+    window.pageData.settings = {
+        user: @json($user->only(['name', 'email'])),
+        prefs: @json($prefs),
+        accessSettings: @json($accessSettings),
+        notifPrefs: @json($notifPrefs),
+        aiSettings: @json($aiSettings),
+    };
+</script>
+@vite('resources/js/pages/settings/index.js')
+@endpush

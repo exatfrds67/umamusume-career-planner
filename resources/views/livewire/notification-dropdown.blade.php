@@ -1,7 +1,7 @@
 <div class="relative" x-data="{ open: @entangle('isOpen') }" @click.away="open = false; $wire.closeDropdown()"
     @keydown.escape.window="open = false; $wire.closeDropdown()">
     {{-- Notification Bell Button --}}
-    <button type="button" wire:click="toggleDropdown"
+    <button type="button" id="notification-btn" wire:click="toggleDropdown"
         class="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500 dark:text-gray-300 dark:hover:text-gray-100 transition-colors duration-200 relative"
         aria-label="View notifications" :aria-expanded="open.toString()">
         <span class="sr-only">View notifications</span>
