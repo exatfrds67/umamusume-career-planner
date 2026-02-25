@@ -2,7 +2,7 @@
  * AI Chat Interface Alpine.js Component
  */
 
-window.aiChatInterface = function (config) {
+const aiChatInterface = function (config) {
     return {
         // State
         messages: [],
@@ -506,3 +506,8 @@ window.aiChatInterface = function (config) {
         },
     };
 };
+
+// Keep window reference for any inline onclick handlers
+window.aiChatInterface = aiChatInterface;
+
+export default aiChatInterface;

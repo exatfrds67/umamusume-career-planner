@@ -3,13 +3,28 @@ export default () => ({
     model: "",
     status: "connecting",
     autoFallback: true,
-    models: { ollama: [], bedrock: [] },
+    models: { ollama: {}, bedrock: {} },
     open: false,
 
-    initialize() {
+    async initialize() {
+        // Load saved preferences first so the selector reflects the current choice
+        await this.loadSavedPreferences();
         this.checkStatus();
         this.fetchModels();
         setInterval(() => this.checkStatus(), 5000);
+    },
+
+    async loadSavedPreferences() {
+        try {
+            const response = await fetch("/api/ai/chat/preferences");
+            const data = await response.json();
+            if (data.success && data.preferences) {
+                this.provider = data.preferences.provider || "ollama";
+                this.model = data.preferences.model || "llama3";
+            }
+        } catch (e) {
+            // Silently fall back to defaults
+        }
     },
 
     async fetchModels() {
@@ -18,9 +33,10 @@ export default () => ({
             const data = await response.json();
             if (data.success) {
                 this.models = data.models;
+                const ollamaKeys = Object.keys(this.models.ollama ?? {});
                 if (
-                    this.models.ollama.length > 0 &&
-                    !this.models.ollama.includes(this.model) &&
+                    ollamaKeys.length > 0 &&
+                    !ollamaKeys.includes(this.model) &&
                     this.provider === "ollama"
                 ) {
                     this.model = data.defaults.ollama;
@@ -36,8 +52,9 @@ export default () => ({
             const response = await fetch("/api/ai/chat/server-status");
             const data = await response.json();
 
-            if (data.servers && data.servers[this.provider]) {
-                this.status = data.servers[this.provider].status;
+            const servers = data.data?.servers ?? data.servers;
+            if (servers && servers[this.provider]) {
+                this.status = servers[this.provider].status;
             }
         } catch (error) {
             console.error("Failed to check provider status:", error);

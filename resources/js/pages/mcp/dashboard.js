@@ -15,8 +15,8 @@ const ROUTES = {
     settings: "/api/mcp/settings",
 };
 
-// Register Alpine component on initialization
-document.addEventListener("alpine:init", () => {
+// Register Alpine component — handles both pre-initialized and late-loaded Alpine
+function registerMcpDashboard() {
     Alpine.data("mcpDashboard", () => ({
         activeTab: "overview",
         lastUpdated: "--",
@@ -254,4 +254,10 @@ document.addEventListener("alpine:init", () => {
             await this.loadTabData();
         },
     }));
-});
+}
+
+if (window.Alpine) {
+    registerMcpDashboard();
+} else {
+    document.addEventListener("alpine:init", registerMcpDashboard);
+}

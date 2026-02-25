@@ -32,6 +32,7 @@ import spiritBurstGauge from "./components/spirit-burst-gauge.js";
 import teamMemberSelector from "./components/team-member-selector.js";
 
 // AI Components
+import aiChatInterface from "./ai-chat.js";
 import agentProgressTracker from "./components/ai/agent-progress-tracker.js";
 import agentSelector from "./components/ai/agent-selector.js";
 import performanceMetrics from "./components/ai/performance-metrics.js";
@@ -680,6 +681,7 @@ Alpine.data("spiritBurstGauge", spiritBurstGauge);
 Alpine.data("teamMemberSelector", teamMemberSelector);
 
 // AI Components
+Alpine.data("aiChatInterface", aiChatInterface);
 Alpine.data("agentProgressTracker", agentProgressTracker);
 Alpine.data("agentSelector", agentSelector);
 Alpine.data("performanceMetrics", performanceMetrics);
@@ -720,9 +722,6 @@ const loadNonCriticalModules = () => {
 
     // Import settings module
     import("./settings.js");
-
-    // Import AI Chat module
-    import("./ai-chat.js");
 
     // Import core modules
     import("./core/EventBus.js");
