@@ -151,7 +151,7 @@ Accessibility: WCAG 2.2 AA compliant
         </div>
     @endif
 
-    {{-- Legend {{--
+    {{-- Legend --}}
     <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
         <h4 class="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-3">Grade Information</h4>
         <div class="grid grid-cols-2 gap-2 text-xs">

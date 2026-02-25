@@ -234,7 +234,7 @@
                                         75 && costs.budget_status?.budget_utilization < 90,
                                     'text-red-600 dark:text-red-400': costs.budget_status?.budget_utilization >= 90
                                 }"
-                                x-text="costs.budget_status?.budget_utilization + '%'">0%</span>
+                                x-text="(costs.budget_status?.budget_utilization ?? 0) + '%'">0%</span>
                         </div>
                         <div class="mt-2 h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700" role="progressbar" :aria-valuenow="costs.budget_status?.budget_utilization || 0" aria-valuemin="0" aria-valuemax="100" aria-label="Budget status">
                             <div class="h-full transition-all duration-300"
