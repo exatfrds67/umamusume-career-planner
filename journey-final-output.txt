@@ -1,0 +1,629 @@
+   Γ£à Import page loaded
+   ΓÜá∩╕Å Expected redirect to login, got: http://127.0.0.1:44568/
+   Γ£à Step 1: Registration complete
+   Γ£à Step 2: Character creation page loaded
+   Γ£à Step 3: Characters list page loaded
+   ΓÜá∩╕Å Character form fill failed: Timeout 5000ms exceeded. A screenshot of the page has been saved to [Tests/Browser/Screenshots/_Character_Creation_and_Management_Journey__ΓåÆ_it_completes_full_character_creation_workflow].
+
+The following console logs were found:
+- [ConnectivityMonitor] Initializing...
+- [ConnectivityMonitor] Periodic checks started
+- [ConnectivityMonitor] Initialized
+- [SW] Found old service workers, unregistering...
+- [ConnectivityMonitor] Status updated: [object Object]
+- [SW] Old service workers unregistered
+- [SW] All caches cleared
+- [SW] Service Worker registered: http://127.0.0.1:44568/
+- [PerformanceMonitor] Initialized
+- [ImageOptimization] Initialized [object Object]
+- %c[LCP] 212.00 (good) color: green
+- %c[CLS] 0.02 (good) color: green
+- %c[CLS] 0.04 (good) color: green
+- %c[CLS] 0.06 (good) color: green
+- %c[CLS] 0.06 (good) color: green
+- %c[CLS] 0.07 (good) color: green
+- %c[CLS] 0.07 (good) color: green
+- %c[CLS] 0.07 (good) color: green
+- %c[FCP] 212.00 (good) color: green
+- %c[TTFB] 62.00 (good) color: green
+
+The following JavaScript errors were found:
+- Uncaught ReferenceError: characterWizard is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: showExternalPrefillNotice is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: validationErrors is not defined
+- Uncaught ReferenceError: showDatabase is not defined
+- Uncaught ReferenceError: showDatabase is not defined
+- Uncaught ReferenceError: showDatabase is not defined
+- Uncaught ReferenceError: showDatabase is not defined
+- Uncaught ReferenceError: showDatabase is not defined
+- Uncaught ReferenceError: filters is not defined
+- Uncaught ReferenceError: filters is not defined
+- Uncaught ReferenceError: filters is not defined
+- Uncaught ReferenceError: filters is not defined
+- Uncaught ReferenceError: filteredTrainees is not defined
+- Uncaught ReferenceError: filteredTrainees is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: showGallery is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: showGallery is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: getGradeColor is not defined
+- Uncaught ReferenceError: getGrade is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: getGradeColor is not defined
+- Uncaught ReferenceError: getGrade is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: getGradeColor is not defined
+- Uncaught ReferenceError: getGrade is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: getGradeColor is not defined
+- Uncaught ReferenceError: getGrade is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: getGradeColor is not defined
+- Uncaught ReferenceError: getGrade is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: isStep3Valid is not defined
+- Uncaught ReferenceError: isStep3Valid is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+   ΓÜá∩╕Å Skill selector element not found
+   Γ£à Race page loaded
+   ΓÜá∩╕Å Race 'Test Race' not found on page
+   ΓÜá∩╕Å Empty form submit behavior: Error: strict mode violation: locator('[type="submit"]') resolved to 2 elements:
+    1) <button type="submit" role="menuitem" class="block w-full text-left px-3 py-1 text-sm leading-6 text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700">Sign out</button> aka getByText('Sign out')
+    2) <button type="submit" @click="clearStorage()" class="btn btn-primary px-4 py-2">ΓÇª</button> aka getByLabel('Review & Confirm').getByText('Create Character')
+ A screenshot of the page has been saved to [Tests/Browser/Screenshots/_Error_Recovery_Journey__ΓåÆ_it_recovers_from_validation_errors_gracefully].
+
+The following console logs were found:
+- [ConnectivityMonitor] Initializing...
+- [ConnectivityMonitor] Periodic checks started
+- [ConnectivityMonitor] Initialized
+- [ConnectivityMonitor] Status updated: [object Object]
+- [PerformanceMonitor] Initialized
+- %c[LCP] 148.00 (good) color: green
+- %c[CLS] 0.00 (good) color: green
+- %c[CLS] 0.02 (good) color: green
+- %c[CLS] 0.06 (good) color: green
+- %c[CLS] 0.07 (good) color: green
+- %c[CLS] 0.07 (good) color: green
+- %c[FCP] 148.00 (good) color: green
+- %c[TTFB] 37.80 (good) color: green
+- [ImageOptimization] Initialized [object Object]
+- %c[TTFB] 37.80 (good) color: green
+- [SW] Found old service workers, unregistering...
+- [SW] Old service workers unregistered
+- [SW] All caches cleared
+- [SW] Service Worker registered: http://127.0.0.1:44568/
+
+The following JavaScript errors were found:
+- Uncaught ReferenceError: characterWizard is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: showExternalPrefillNotice is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: validationErrors is not defined
+- Uncaught ReferenceError: showDatabase is not defined
+- Uncaught ReferenceError: showDatabase is not defined
+- Uncaught ReferenceError: showDatabase is not defined
+- Uncaught ReferenceError: showDatabase is not defined
+- Uncaught ReferenceError: showDatabase is not defined
+- Uncaught ReferenceError: filters is not defined
+- Uncaught ReferenceError: filters is not defined
+- Uncaught ReferenceError: filters is not defined
+- Uncaught ReferenceError: filters is not defined
+- Uncaught ReferenceError: filteredTrainees is not defined
+- Uncaught ReferenceError: filteredTrainees is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: showGallery is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: showGallery is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: getGradeColor is not defined
+- Uncaught ReferenceError: getGrade is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: getGradeColor is not defined
+- Uncaught ReferenceError: getGrade is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: getGradeColor is not defined
+- Uncaught ReferenceError: getGrade is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: getGradeColor is not defined
+- Uncaught ReferenceError: getGrade is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: getGradeColor is not defined
+- Uncaught ReferenceError: getGrade is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: isStep3Valid is not defined
+- Uncaught ReferenceError: isStep3Valid is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+   ΓÜá∩╕Å Error recovery form fill failed: Timeout 5000ms exceeded. A screenshot of the page has been saved to [Tests/Browser/Screenshots/_Error_Recovery_Journey__ΓåÆ_it_recovers_from_validation_errors_gracefully].
+
+The following console logs were found:
+- [ConnectivityMonitor] Initializing...
+- [ConnectivityMonitor] Periodic checks started
+- [ConnectivityMonitor] Initialized
+- [ConnectivityMonitor] Status updated: [object Object]
+- [PerformanceMonitor] Initialized
+- %c[LCP] 148.00 (good) color: green
+- %c[CLS] 0.00 (good) color: green
+- %c[CLS] 0.02 (good) color: green
+- %c[CLS] 0.06 (good) color: green
+- %c[CLS] 0.07 (good) color: green
+- %c[CLS] 0.07 (good) color: green
+- %c[FCP] 148.00 (good) color: green
+- %c[TTFB] 37.80 (good) color: green
+- [ImageOptimization] Initialized [object Object]
+- %c[TTFB] 37.80 (good) color: green
+- [SW] Found old service workers, unregistering...
+- [SW] Old service workers unregistered
+- [SW] All caches cleared
+- [SW] Service Worker registered: http://127.0.0.1:44568/
+
+The following JavaScript errors were found:
+- Uncaught ReferenceError: characterWizard is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: showExternalPrefillNotice is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: validationErrors is not defined
+- Uncaught ReferenceError: showDatabase is not defined
+- Uncaught ReferenceError: showDatabase is not defined
+- Uncaught ReferenceError: showDatabase is not defined
+- Uncaught ReferenceError: showDatabase is not defined
+- Uncaught ReferenceError: showDatabase is not defined
+- Uncaught ReferenceError: filters is not defined
+- Uncaught ReferenceError: filters is not defined
+- Uncaught ReferenceError: filters is not defined
+- Uncaught ReferenceError: filters is not defined
+- Uncaught ReferenceError: filteredTrainees is not defined
+- Uncaught ReferenceError: filteredTrainees is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: showGallery is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: showGallery is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: getGradeColor is not defined
+- Uncaught ReferenceError: getGrade is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: getGradeColor is not defined
+- Uncaught ReferenceError: getGrade is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: getGradeColor is not defined
+- Uncaught ReferenceError: getGrade is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: getGradeColor is not defined
+- Uncaught ReferenceError: getGrade is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: getGradeColor is not defined
+- Uncaught ReferenceError: getGrade is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: isStep3Valid is not defined
+- Uncaught ReferenceError: isStep3Valid is not defined
+- Uncaught ReferenceError: currentStep is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+- Uncaught ReferenceError: formData is not defined
+   ΓÜá∩╕Å Profile save failed: Timeout 5000ms exceeded. A screenshot of the page has been saved to [Tests/Browser/Screenshots/_Settings_Configuration_Journey__ΓåÆ_it_configures_user_preferences].
+
+The following console logs were found:
+- [ConnectivityMonitor] Initializing...
+- [ConnectivityMonitor] Periodic checks started
+- [ConnectivityMonitor] Initialized
+- [SW] Found old service workers, unregistering...
+- [ConnectivityMonitor] Status updated: [object Object]
+- [SW] Old service workers unregistered
+- [SW] All caches cleared
+- [SW] Service Worker registered: http://127.0.0.1:44568/
+- [PerformanceMonitor] Initialized
+- [ImageOptimization] Initialized [object Object]
+- %c[LCP] 240.00 (good) color: green
+- %c[CLS] 0.02 (good) color: green
+- %c[CLS] 0.03 (good) color: green
+- %c[FCP] 240.00 (good) color: green
+- %c[TTFB] 26.90 (good) color: green
+- %c[CLS] 0.05 (good) color: green
+- %c[LCP] 272.00 (good) color: green
+- %c[CLS] 0.09 (good) color: green
+- %c[LCP] 312.00 (good) color: green
+- %c[CLS] 0.13 (needs-improvement) color: orange
+- %c[CLS] 0.15 (needs-improvement) color: orange
+- %c[CLS] 0.16 (needs-improvement) color: orange
+- %c[CLS] 0.17 (needs-improvement) color: orange
+   Γä╣∩╕Å Accessibility settings not available
+   Γ£à Training page loaded
+   ΓÜá∩╕Å Speed facility tab not found
+   ΓÜá∩╕Å No export button found
+
+   WARN  Tests\Browser\UserJourneyTest
+  ! Data Export and Import Journey ΓåÆ it imports character data ΓåÆ Test code or tested code printed unexpected output:ΓÇª  0.96s  
+  ! Guest to Registered User Journey ΓåÆ it explores app as guest before registering ΓåÆ Test code or tested code printedΓÇª 1.14s  
+  Γ£ô Guest to Registered User Journey ΓåÆ it completes full registration flow                                             0.74s  
+  ! Complete End-to-End Journey ΓåÆ it performs complete user lifecycle ΓåÆ Test code or tested code printed unexpected oΓÇª 1.08s  
+  Γ£ô Character Creation and Management Journey ΓåÆ it manages multiple characters                                         3.24s  
+  ! Character Creation and Management Journey ΓåÆ it completes full character creation workflow ΓåÆ Test code or testedΓÇª  16.36s  
+  ! Training and Progression Journey ΓåÆ it acquires and manages skills during training ΓåÆ Test code or tested code priΓÇª 11.30s  
+  ! Race Participation Journey ΓåÆ it enters and completes race ΓåÆ Test code or tested code printed unexpected output:ΓÇª  10.82s  
+  SM
+
+  at vendor\nunomaduro\termwind\src\ValueObjects\Styles.php:979
+    975Γûò 
+    976Γûò         $colorConstant = mb_strtoupper(str_replace('-', '_', $color), 'UTF-8');
+    977Γûò 
+    978Γûò         if (! defined(Color::class."::$colorConstant")) {
+  Γ₧£ 979Γûò             throw new ColorNotFound($colorConstant);
+    980Γûò         }
+    981Γûò 
+    982Γûò         return constant(Color::class."::$colorConstant");
+    983Γûò     }
+
+  1   vendor\nunomaduro\termwind\src\ValueObjects\Styles.php:979
+  2   vendor\nunomaduro\termwind\src\ValueObjects\Styles.php:407
+

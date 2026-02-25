@@ -213,7 +213,11 @@ Route::middleware('auth')->group(function () {
 
 // Settings routes (requires authentication)
 Route::middleware('auth')->group(function () {
-    Route::get('/settings', fn () => view('settings.index'))->name('settings.index');
+    Route::get('/settings', [App\Http\Controllers\SettingsController::class, 'index'])->name('settings.index');
+    Route::put('/settings', [App\Http\Controllers\SettingsController::class, 'update'])->name('settings.update');
+    Route::put('/settings/password', [App\Http\Controllers\SettingsController::class, 'updatePassword'])->name('settings.password');
+    Route::get('/settings/export', [App\Http\Controllers\SettingsController::class, 'exportData'])->name('settings.export');
+    Route::delete('/settings/account', [App\Http\Controllers\SettingsController::class, 'deleteAccount'])->name('settings.account.delete');
     Route::get('/settings/accessibility', fn () => view('settings.accessibility'))->name('settings.accessibility');
     Route::get('/settings/notifications', fn () => view('settings.notifications'))->name('settings.notifications');
     Route::get('/simulation', fn () => view('simulation.index'))->name('simulation.index');
@@ -267,7 +271,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 });
 
 // Help routes (public)
-Route::get('/help', fn () => view('help.index'))->name('help.index');
+Route::get('/help', fn () => response(view('help.index'))
+    ->header('Cache-Control', 'public, max-age=3600, s-maxage=86400')
+)->name('help.index');
 
 // Feedback routes (placeholders)
 Route::get('/feedback', function () {

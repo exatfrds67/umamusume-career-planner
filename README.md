@@ -1,35 +1,42 @@
 # Umamusume Pretty Derby Career Planner
 
-<p align="center">
-  <a href="https://laravel.com" target="_blank">
-    <img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo">
-  </a>
-</p>
+[![Laravel Logo](https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg)](https://laravel.com)
 
-<p align="center">
-  <a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-  <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-  <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-  <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+[![Build Status](https://github.com/laravel/framework/workflows/tests/badge.svg)](https://github.com/laravel/framework/actions)
+[![Total Downloads](https://img.shields.io/packagist/dt/laravel/framework)](https://packagist.org/packages/laravel/framework)
+[![Latest Stable Version](https://img.shields.io/packagist/v/laravel/framework)](https://packagist.org/packages/laravel/framework)
+[![License](https://img.shields.io/packagist/l/laravel/framework)](https://packagist.org/packages/laravel/framework)
 
 ---
 
 ## About This Project
 
-The **Umamusume Pretty Derby Career Planner** is a comprehensive local-first web application for optimizing gameplay in the Umamusume Pretty Derby mobile game. The system helps players achieve A+ grade character ratings consistently through data-driven decision making powered by AI.
+The **Umamusume Pretty Derby Career Planner** is a comprehensive
+local-first web application for optimizing gameplay in the Umamusume
+Pretty Derby mobile game. The system helps players achieve A+ grade
+character ratings consistently through data-driven decision making
+powered by AI.
 
 ### Key Features
 
-- **AI-Powered Recommendations**: Training, race strategy, and skill recommendations via Neuron AI agents with hybrid local (Ollama) and cloud (AWS Bedrock) providers
-- **Character Career Tracking**: Turn-by-turn stat progression (Speed, Stamina, Power, Guts, Wit) with visualization
-- **Skill Management**: Search, track, and manage skills with SP cost calculations and evolution paths
-- **Support Card Deck Building**: Build and validate six-card decks with synergy scoring
-- **Race Strategy Planning**: Race preparation analysis with readiness scoring and competitor evaluation
-- **Dual Storage Modes**: Local (browser localStorage) and Account (database) storage with seamless conversion
-- **Import/Export**: JSON, CSV, and Excel export with schema versioning and legacy format migration
+- **AI-Powered Recommendations**: Training, race strategy, and skill
+  recommendations via Neuron AI agents with hybrid local (Ollama) and
+  cloud (AWS Bedrock) providers
+- **Character Career Tracking**: Turn-by-turn stat progression (Speed,
+  Stamina, Power, Guts, Wit) with visualization
+- **Skill Management**: Search, track, and manage skills with SP cost
+  calculations and evolution paths
+- **Support Card Deck Building**: Build and validate six-card decks with
+  synergy scoring
+- **Race Strategy Planning**: Race preparation analysis with readiness
+  scoring and competitor evaluation
+- **Dual Storage Modes**: Local (browser localStorage) and Account
+  (database) storage with seamless conversion
+- **Import/Export**: JSON, CSV, and Excel export with schema versioning
+  and legacy format migration
 - **OCR Data Intake**: Screenshot processing for automated data extraction
-- **Performance Monitoring**: APM dashboards, cache monitoring, and cost tracking for AI services
+- **Performance Monitoring**: APM dashboards, cache monitoring, and cost
+  tracking for AI services
 
 ---
 
@@ -53,7 +60,7 @@ The **Umamusume Pretty Derby Career Planner** is a comprehensive local-first web
 ## System Requirements
 
 | Requirement | Version |
-|-------------|---------|
+| ----------- | ------- |
 | PHP | 8.4.11 |
 | Node.js | 18+ |
 | MySQL/MariaDB | 8.0+ / 10.5+ |
@@ -76,7 +83,7 @@ The **Umamusume Pretty Derby Career Planner** is a comprehensive local-first web
 ### Backend
 
 | Component | Technology | Version |
-|-----------|------------|---------|
+| --------- | ---------- | ------- |
 | Framework | Laravel | v12 |
 | Frontend Reactivity | Livewire | v3 |
 | PHP Runtime | PHP | 8.4.11 |
@@ -89,7 +96,7 @@ The **Umamusume Pretty Derby Career Planner** is a comprehensive local-first web
 ### Frontend
 
 | Component | Technology | Version |
-|-----------|------------|---------|
+| --------- | ---------- | ------- |
 | Client Interactivity | Alpine.js | v3 |
 | State Persistence | @alpinejs/persist | Latest |
 | Styling | TailwindCSS | v4 |
@@ -99,18 +106,19 @@ The **Umamusume Pretty Derby Career Planner** is a comprehensive local-first web
 ### AI & Integration
 
 | Component | Technology | Version |
-|-----------|------------|----------|
+| --------- | ---------- | ------- |
 | Local AI | Ollama | Latest |
 | Cloud AI | AWS Bedrock | Claude 3.5 Sonnet, Nova |
 | Agent Framework | Custom Neuron Implementation | - |
-| MCP Integration | Memory, Filesystem, Fetch, GitKraken, Chrome DevTools | Latest |
+| MCP Integration | Memory, Filesystem, Fetch, GitKraken,  | Latest |
+|  | Chrome DevTools |  |
 | OCR | Tesseract + OpenCV + GD | 5+ |
 | External APIs | umapyoi.net, UmamusumeDB.com | - |
 
 ### Testing & Quality
 
 | Type | Tool | Version |
-|------|------|---------|
+| ---- | ---- | ------- |
 | Backend Unit/Feature | Pest | v4 |
 | Static Analysis | Larastan | v3 |
 | Code Formatting | Laravel Pint | v1 |
@@ -248,7 +256,7 @@ HORIZON_ENABLED=true
 ### Configuration Files
 
 | File | Purpose |
-|------|---------|
+| ---- | ------- |
 | `config/ai.php` | AI provider settings and routing |
 | `config/ai_agents.php` | AI agent configurations |
 | `config/neuron.php` | Neuron framework settings |
@@ -265,7 +273,7 @@ HORIZON_ENABLED=true
 
 ## Architecture Overview
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                        Browser Layer                             │
 ├─────────────────────────────────────────────────────────────────┤
@@ -296,7 +304,7 @@ HORIZON_ENABLED=true
 
 ### Directory Structure
 
-```
+```text
 umamusume-career-planner/
 ├── app/
 │   ├── Console/
@@ -405,8 +413,9 @@ umamusume-career-planner/
 Track character progression with comprehensive stat management:
 
 - **Stats**: Speed, Stamina, Power, Guts, Wit (0-1200 range)
-- **Aptitudes**: Distance, Surface, Running Style grades (G through S, S is maximum)
-- **Factors**: Blue (stat), Red (aptitude), Green (unique skill), White (normal skill)
+- **Aptitudes**: Distance, Surface, Running Style grades (G through S)
+- **Factors**: Blue (stat), Red (aptitude), Green (unique skill),
+  White (normal skill)
 - **Goals**: Training objectives with progress tracking
 - **Conditions**: Positive/negative status effects
 - **Avatar Management**: Character images with optimization
@@ -460,7 +469,7 @@ Deck building and optimization:
 
 The system uses a hybrid approach with local-first AI:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                      AI Request Flow                             │
 ├─────────────────────────────────────────────────────────────────┤
@@ -485,7 +494,7 @@ The system uses a hybrid approach with local-first AI:
 ### Neuron AI Agents
 
 | Agent | Purpose | Status |
-|-------|---------|--------|
+| ----- | ------- | ------ |
 | TrainingAdvisorAgent | Training recommendations | Implemented |
 | RaceStrategyAgent | Race preparation | Implemented |
 | SkillRecommendationAgent | Skill build planning | Implemented |
@@ -519,7 +528,7 @@ Model Context Protocol servers provide additional capabilities:
 Supported formats:
 
 | Format | Import | Export | Notes |
-|--------|--------|--------|-------|
+| ------ | ------ | ------ | ----- |
 | JSON | ✓ | ✓ | Full data with relationships, schema versioned |
 | CSV | ✓ | ✓ | Summary data only |
 | Excel (.xlsx) | - | ✓ | Formatted spreadsheet |
@@ -527,8 +536,9 @@ Supported formats:
 
 ### Migration Workflow
 
-```
-Source Data ──► Detect Format ──► Validate Schema ──► Transform ──► Resolve Conflicts ──► Import
+```text
+Source Data ──► Detect Format ──► Validate Schema ──► Transform
+──► Resolve Conflicts ──► Import
 ```
 
 ### Backup & Restore
@@ -546,7 +556,7 @@ Source Data ──► Detect Format ──► Validate Schema ──► Transfor
 ### Test Coverage Targets
 
 | Type | Coverage Target |
-|------|-----------------|
+| ---- | --------------- |
 | Unit Tests | 90%+ |
 | Feature Tests | 80%+ |
 | E2E Tests | Critical paths 100% |
@@ -569,7 +579,9 @@ npm run playwright:test
 
 # Comprehensive Browser Traversal (tests ALL routes)
 php artisan test:traversal
-php artisan test:traversal --open-report  # Opens HTML report after completion
+
+# Opens HTML report after completion
+php artisan test:traversal --open-report
 
 # Accessibility audit
 npm run a11y:test
@@ -577,7 +589,8 @@ npm run a11y:test
 
 ### Comprehensive Application Traversal
 
-The application includes an automated browser testing system that visits **every route** in the application:
+The application includes an automated browser testing system that
+visits **every route** in the application:
 
 ```bash
 # Test all routes (public + authenticated + admin)
@@ -619,7 +632,7 @@ See [tests/Browser/README.md](tests/Browser/README.md) for details.
 ### Core Documentation
 
 | Document | Description |
-|----------|-------------|
+| -------- | ----------- |
 | [001_SDP](docs/00-core-docs/001_SDP_Software_Development_Plan.md) | Development phases and timeline |
 | [002_BRS](docs/00-core-docs/002_BRS_Business_Requirements_Specifications.md) | Business objectives and scope |
 | [003_SRS](docs/00-core-docs/003_SRS_Software_Requirement_Specifications.md) | Functional and non-functional requirements |
@@ -631,7 +644,7 @@ See [tests/Browser/README.md](tests/Browser/README.md) for details.
 ### Technical Documentation
 
 | Document | Description |
-|----------|-------------|
+| -------- | ----------- |
 | [PRDs](docs/02-prds/) | Product requirement documents (7 modules) |
 | [SPECs](docs/02-specs/) | Technical specifications (7 modules) |
 | [Flows](docs/01-flows/) | System flow diagrams |
@@ -644,7 +657,7 @@ See [tests/Browser/README.md](tests/Browser/README.md) for details.
 ### API Documentation
 
 | Endpoint | Method | Description |
-|----------|--------|-------------|
+| -------- | ------ | ----------- |
 | `/api/characters` | GET, POST | Character management |
 | `/api/characters/{id}` | GET, PUT, DELETE | Character operations |
 | `/api/careers` | GET, POST | Career run management |

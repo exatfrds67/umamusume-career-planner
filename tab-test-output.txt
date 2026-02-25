@@ -1,0 +1,16 @@
+   ΓÜá∩╕Å No [role=tabpanel] elements found on character page ΓÇö ARIA tabs may not be implemented yet
+   ΓÜá∩╕Å No [role=tab] elements found on dashboard
+   ΓÜá∩╕Å Facility speed tab or prediction panel not found
+   ΓÜá∩╕Å No [role=tab] elements found ΓÇö tab state test skipped
+   ΓÜá∩╕Å No [role=tab] elements found ΓÇö keyboard nav skipped
+   ΓÜá∩╕Å Overview tab not found or not active
+   ΓÜá∩╕Å Stats tab not found or not active
+   ΓÜá∩╕Å Skills tab not found or not active
+   ΓÜá∩╕Å History tab not found or not active
+   ΓÜá∩╕Å Support Cards category not found
+   ΓÜá∩╕Å Skills category not found
+   ΓÜá∩╕Å Characters category not found
+   ΓÜá∩╕Å Statistics report tab not found
+   ΓÜá∩╕Å Progress report tab not found
+   ΓÜá∩╕Å Skills report tab not found
+   ΓÜá∩╕Å Races report tab not found

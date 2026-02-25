@@ -74,6 +74,12 @@ export default defineConfig({
                 "resources/js/components/activity-timeline.js",
                 "resources/js/pages/training/show.js",
                 "resources/js/components/facility-management.js",
+                // Phase 6: Inline JS extraction
+                "resources/js/pages/characters/index.js",
+                "resources/js/pages/settings/index.js",
+                "resources/js/pages/local/convert.js",
+                "resources/js/pages/ai/dashboard.js",
+                "resources/js/pages/training/partials/predictions-grid.js",
             ],
             refresh: true,
         }),

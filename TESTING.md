@@ -145,6 +145,143 @@ php artisan test:traversal --scope=admin   # Only admin pages
 
 See [tests/Browser/README.md](tests/Browser/README.md) for full documentation.
 
+#### Tab Navigation Test (NEW)
+
+Tests all tab interfaces with keyboard navigation and accessibility:
+
+```bash
+# Run all tab navigation tests
+php artisan test tests/Browser/TabNavigationTest.php
+
+# Keyboard navigation only
+php artisan test --group=keyboard
+
+# Accessibility checks only
+php artisan test --group=tabs --group=accessibility
+```
+
+**What it tests:**
+
+- Tab switching functionality across all pages
+- Keyboard navigation (Arrow keys, Tab, Enter)
+- ARIA attributes (`aria-selected`, `role="tab"`)
+- Tab content visibility
+
+#### User Journey Test (NEW)
+
+Complete end-to-end user workflows:
+
+```bash
+# All user journey tests
+php artisan test tests/Browser/UserJourneyTest.php
+
+# Specific workflows
+php artisan test --filter="registration flow"
+php artisan test --filter="training session"
+
+# Complete E2E journey
+php artisan test --group=e2e
+```
+
+**What it tests:**
+
+- Guest → Registration → Dashboard
+- Character creation and management
+- Training sessions and skill acquisition
+- Data export/import workflows
+- Settings configuration
+- Error recovery and validation
+
+**Runtime:** 3-5 minutes
+
+#### Smoke Test Suite (NEW)
+
+Quick critical path verification (runs in 2-3 minutes):
+
+```bash
+# All smoke tests
+php artisan test tests/Browser/SmokeTestSuite.php --group=smoke
+
+# Critical tests only
+php artisan test --group=smoke --group=critical
+
+# Before deployment quick check
+php artisan test tests/Browser/SmokeTestSuite.php
+```
+
+**What it tests:**
+
+- Critical page loads (homepage, login, dashboard)
+- Authentication (login/logout)
+- Character CRUD operations
+- Database connectivity
+- Form validation
+- Navigation and session management
+- Performance (< 3 second load times)
+
+**Use Case:** Pre-deployment smoke testing, quick health check
+
+#### Visual Regression Test (ENHANCED)
+
+Screenshot capture and cross-browser visual consistency:
+
+```bash
+# All visual regression tests
+php artisan test tests/Browser/VisualRegressionTest.php
+
+# Specific viewport
+php artisan test --group=mobile
+php artisan test --group=tablet
+php artisan test --group=desktop
+
+# Dark/light mode
+php artisan test --group=dark-mode
+
+# Screenshot capture
+php artisan test --group=screenshots
+
+# Cross-browser
+php artisan test --group=cross-browser
+```
+
+**What it tests:**
+
+- Responsive viewports (320px - 1920px)
+- Dark/light mode rendering
+- Cross-browser consistency (Chromium, Firefox, WebKit)
+- Component-level screenshots
+- State-based visuals (empty, loading, error)
+
+**Screenshots Location:** `storage/app/screenshots/`
+
+#### Accessibility Audit Test (NEW)
+
+WCAG 2.1 AA compliance verification:
+
+```bash
+# All accessibility tests
+php artisan test tests/Browser/AccessibilityAuditTest.php
+
+# Specific WCAG areas
+php artisan test --group=aria
+php artisan test --group=keyboard
+php artisan test --group=forms
+php artisan test --group=wcag
+```
+
+**What it tests:**
+
+- ARIA attributes and roles
+- Keyboard navigation and focus management
+- Form accessibility (labels, error messages)
+- Image alt text
+- Color contrast ratios
+- Semantic HTML structure
+- Screen reader compatibility
+- Touch target sizes
+
+**Compliance Target:** WCAG 2.1 Level AA
+
 ### Integration Tests (`tests/Integration/`)
 
 Test interactions between multiple components.

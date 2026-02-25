@@ -79,11 +79,11 @@ class RunTraversalTestCommand extends Command
                 }
             }
 
-            return Command::SUCCESS;
+            return self::SUCCESS;
         } else {
             $this->error('❌ Traversal test failed!');
 
-            return Command::FAILURE;
+            return self::FAILURE;
         }
     }
 
