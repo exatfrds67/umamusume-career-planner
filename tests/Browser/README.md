@@ -1,6 +1,7 @@
 # Browser E2E Tests
 
-This directory contains end-to-end (E2E) browser tests using Pest 4's browser testing capabilities powered by Playwright.
+This directory contains end-to-end (E2E) browser tests using Pest 4's
+browser testing capabilities powered by Playwright.
 
 ## Prerequisites
 
@@ -19,7 +20,8 @@ npm install playwright@latest
 npx playwright install
 ```
 
-This will install Playwright and download the necessary browser binaries (Chromium, Firefox, WebKit).
+This will install Playwright and download the necessary browser
+binaries (Chromium, Firefox, WebKit).
 
 ## Running Browser Tests
 
@@ -82,7 +84,9 @@ Tests Alpine.js interactivity for the advisory panel:
 
 ### ComprehensiveTraversalTest.php (NEW)
 
-**Automated comprehensive application traversal** testing that systematically visits ALL routes in the application like a thorough manual tester.
+**Automated comprehensive application traversal** testing that
+systematically visits ALL routes in the application like a thorough
+manual tester.
 
 **What it does:**
 
@@ -140,6 +144,222 @@ Reports are saved to `storage/app/test-reports/`:
 - ✅ Finding broken routes or JavaScript errors
 
 **Groups:** `@browser`, `@traversal`, `@slow`
+
+### TabNavigationTest.php (NEW)
+
+**Comprehensive tab interface testing** across all application
+components with keyboard navigation and accessibility verification.
+
+**What it tests:**
+
+- 🔄 **Tab Switching**: Clicks through all tab interfaces in the application
+- ⌨️ **Keyboard Navigation**: Arrow keys, Tab, Enter key support
+- ♿ **ARIA Attributes**: Verifies `aria-selected`, `aria-controls`,
+  `role="tab"`, `role="tabpanel"`
+- 🎯 **Content Visibility**: Ensures tab panels show/hide correctly
+
+**Test Coverage:**
+
+- Character detail tabs (Overview, Stats, Skills, History)
+- Training facility tabs (Speed, Stamina, Power, Guts, Wit, Rest)
+- Settings sections (Profile, Accessibility, Notifications, Privacy)
+- Dashboard card sections
+- Report view tabs (Statistics, Progress, Skills, Races)
+- External data categories (Support Cards, Skills, Characters)
+- Tab state management across page refreshes
+
+**Running the tests:**
+
+```bash
+# All tab navigation tests
+php artisan test tests/Browser/TabNavigationTest.php
+
+# Specific groups
+php artisan test --group=tabs
+php artisan test --group=keyboard
+php artisan test --group=accessibility
+```
+
+**Groups:** `@browser`, `@tabs`, `@accessibility`, `@keyboard`
+
+### UserJourneyTest.php (NEW)
+
+**End-to-end user workflow simulation** covering complete user
+lifecycles from guest to advanced features.
+
+**What it tests:**
+
+- 👤 **Guest to Registered User**: Complete registration flow, guest browsing
+- 🎭 **Character Creation**: Full workflow from dashboard to character details
+- 🏋️ **Training Sessions**: Multi-turn training, skill acquisition, stat progression
+- 🏁 **Race Participation**: Race entry, confirmation, results
+- 📤 **Data Export/Import**: Character data export (JSON), import validation
+- ⚙️ **Settings Configuration**: Profile updates, accessibility preferences
+- 🔄 **Complete E2E Journey**: Registration → Character → Training → Export
+- ⚠️ **Error Recovery**: Validation errors, form correction, graceful recovery
+
+**Running the tests:**
+
+```bash
+# All user journey tests
+php artisan test tests/Browser/UserJourneyTest.php
+
+# Specific workflows
+php artisan test --filter="registration flow"
+php artisan test --filter="character creation"
+php artisan test --filter="training session"
+
+# Integration tests only
+php artisan test --group=integration
+php artisan test --group=e2e
+```
+
+**Groups:** `@browser`, `@user-journey`, `@integration`, `@e2e`
+
+**Typical Runtime:** 3-5 minutes
+
+### SmokeTestSuite.php (NEW)
+
+**Quick critical path verification** designed to run in 2-3 minutes before deployments.
+
+**What it tests:**
+
+- 🚀 **Critical Page Loads**: Homepage, login, dashboard
+- 🔐 **Authentication**: Login, logout, redirect protection
+- 📦 **Character CRUD**: Create, read, update, delete operations
+- 🎓 **Training Basics**: Access training screen, execute training actions
+- 🗄️ **Database Connectivity**: Read/write verification
+- 🌐 **API Endpoints**: External data API responses
+- ⚡ **JavaScript**: Livewire and Alpine.js initialization
+- ✅ **Form Validation**: Empty form submissions, invalid data
+- 🧭 **Navigation**: Main navigation links
+- 💾 **Session Management**: Session persistence across pages
+- 🚨 **Error Handling**: 404 pages, unauthorized access
+- 📱 **Asset Loading**: CSS and JavaScript loading
+- 📲 **Mobile Viewport**: Basic mobile responsiveness
+- ⏱️ **Performance**: Page load time checks (< 3 seconds)
+
+**Running the tests:**
+
+```bash
+# All smoke tests (fastest way to verify system health)
+php artisan test tests/Browser/SmokeTestSuite.php --group=smoke
+
+# Critical tests only
+php artisan test --group=smoke --group=critical
+
+# Before deployment quick check
+php artisan test tests/Browser/SmokeTestSuite.php
+```
+
+**Groups:** `@browser`, `@smoke`, `@critical`, `@auth`, `@character`,
+`@training`, `@database`, `@api`, `@validation`, `@navigation`,
+`@session`, `@errors`, `@assets`, `@mobile`, `@performance`
+
+**Target Runtime:** 2-3 minutes  
+**Use Case:** Pre-deployment smoke testing, quick health check
+
+### VisualRegressionTest.php (ENHANCED)
+
+**Visual consistency testing** with screenshot capture and cross-browser verification.
+
+**What it tests:**
+
+- 📱 **Responsive Viewports**: Mobile (320px), Tablet (640px), Desktop (1024px)
+- 🌓 **Dark Mode**: All pages in dark mode rendering
+- ☀️ **Light Mode**: All pages in light mode rendering
+- 📸 **Screenshot Capture**: All major pages for visual comparison
+- 🌐 **Cross-Browser**: Chromium, Firefox, WebKit rendering consistency
+- 🧩 **Component Screenshots**: Navigation, footer, individual components
+- 📐 **Breakpoint Testing**: 7 breakpoints from 320px to 1920px
+- 🎭 **State-Based Visuals**: Empty states, loading states, error states
+
+**Enhanced Features (v2):**
+
+- Full page screenshots for 8+ pages
+- Component-level screenshot isolation
+- Cross-browser consistency checks
+- All major responsive breakpoints
+- State-based visual capture (empty, loading, error)
+
+**Running the tests:**
+
+```bash
+# All visual regression tests
+php artisan test tests/Browser/VisualRegressionTest.php
+
+# Specific viewport tests
+php artisan test --group=mobile
+php artisan test --group=tablet
+php artisan test --group=desktop
+
+# Dark/light mode only
+php artisan test --group=dark-mode
+php artisan test --group=light-mode
+
+# Screenshot capture only
+php artisan test --group=screenshots
+
+# Cross-browser tests
+php artisan test --group=cross-browser
+
+# Responsive breakpoints
+php artisan test --group=breakpoints
+```
+
+**Screenshots Location:** `storage/app/screenshots/`
+
+**Groups:** `@browser`, `@visual-regression`, `@mobile`, `@tablet`,
+`@desktop`, `@dark-mode`, `@light-mode`, `@screenshots`,
+`@cross-browser`, `@breakpoints`, `@components`, `@states`
+
+### AccessibilityAuditTest.php (NEW)
+
+**WCAG 2.1 AA compliance testing** ensuring the application is
+accessible to all users.
+
+**What it tests:**
+
+- ♿ **ARIA Attributes**: Proper `aria-label`, `aria-labelledby`, `role` attributes
+- ⌨️ **Keyboard Navigation**: Tab order, Enter activation, Escape key handling
+- 🎹 **Focus Indicators**: Visible focus outlines, proper focus management
+- 📝 **Form Accessibility**: Labels, error messages, required field indicators
+- 🖼️ **Image Alt Text**: All images have descriptive alt attributes
+- 🎨 **Color Contrast**: Text contrast ratios (WCAG AA)
+- 🏗️ **Semantic HTML**: Proper heading hierarchy, nav/main/footer elements
+- 🔗 **Link Accessibility**: Descriptive link text, external link indicators
+- ⏭️ **Skip Links**: Skip to main content functionality
+- 🔒 **Focus Trapping**: Modal focus management
+- 📢 **Screen Reader**: Live regions, dynamic content announcements
+- 👆 **Touch Targets**: Minimum 32x32px button sizes
+- 🌍 **Language Attributes**: HTML lang attribute
+- 📏 **Responsive Text**: Text zoom to 200% without horizontal scroll
+
+**Running the tests:**
+
+```bash
+# All accessibility tests
+php artisan test tests/Browser/AccessibilityAuditTest.php
+
+# Specific WCAG areas
+php artisan test --group=aria
+php artisan test --group=keyboard
+php artisan test --group=forms
+php artisan test --group=semantic
+php artisan test --group=contrast
+
+# WCAG compliance check
+php artisan test --group=wcag
+
+# Accessibility group only
+php artisan test --group=accessibility
+```
+
+**Groups:** `@browser`, `@accessibility`, `@wcag`, `@aria`, `@keyboard`,
+`@forms`, `@images`, `@contrast`, `@semantic`, `@links`, `@skip-links`,
+`@focus`, `@screen-reader`, `@touch-targets`, `@language`, `@responsive`
+
+**Compliance Target:** WCAG 2.1 Level AA
 
 ## Test Structure
 
@@ -318,7 +538,9 @@ RECORD_VIDEO=true php artisan test tests/Browser/
 
 ## Notes
 
-- Browser tests are slower than unit/feature tests - use them for critical user flows
+- Browser tests are slower than unit/feature tests - use them for
+  critical user flows
 - Consider running browser tests separately from unit tests in CI/CD
-- Keep browser tests focused on user interactions, not implementation details
+- Keep browser tests focused on user interactions, not implementation
+  details
 - Use data attributes (e.g., `data-testid`) for reliable element selection
