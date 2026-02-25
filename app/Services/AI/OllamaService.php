@@ -61,6 +61,9 @@ class OllamaService
         $timeout = $timeout ?? $this->timeout;
 
         try {
+            // Enforce execution timeout for this request (applies to the blocking HTTP call to Ollama)
+            set_time_limit($timeout);
+
             // Build full prompt with context
             $fullPrompt = $this->buildPromptWithContext($prompt, $context);
 
@@ -197,25 +200,39 @@ class OllamaService
     }
 
     /**
-     * Extract content from Ollama response
+     * Extract content from Ollama response.
+     *
+     * Detects error payloads returned by Ollama (e.g. model not found) and
+     * throws so callers handle them as failures rather than showing raw JSON.
+     *
+     * @throws \RuntimeException when Ollama signals an error in the response
      */
     protected function extractContent(mixed $response): string
     {
+        // Normalise to a content string first
+        $content = '';
+
         if (\is_string($response)) {
-            return $response;
+            $content = $response;
+        } elseif (\is_array($response) && isset($response['response']) && is_string($response['response'])) {
+            $content = $response['response'];
+        } elseif (\is_array($response) && isset($response['error']) && is_string($response['error'])) {
+            // Ollama returned a top-level error object, e.g. {'error': 'model not found'}
+            throw new \RuntimeException('Ollama error: '.$response['error']);
+        } elseif (\is_object($response) && method_exists($response, 'getContent')) {
+            $raw = $response->getContent();
+            $content = is_string($raw) ? $raw : '';
         }
 
-        if (\is_array($response) && isset($response['response']) && is_string($response['response'])) {
-            return $response['response'];
+        // Also handle string payloads that are JSON error objects
+        if ($content !== '' && str_starts_with(ltrim($content), '{')) {
+            $decoded = json_decode($content, true);
+            if (is_array($decoded) && isset($decoded['error']) && is_string($decoded['error'])) {
+                throw new \RuntimeException('Ollama error: '.$decoded['error']);
+            }
         }
 
-        if (\is_object($response) && method_exists($response, 'getContent')) {
-            $content = $response->getContent();
-
-            return is_string($content) ? $content : '';
-        }
-
-        return '';
+        return $content;
     }
 
     /**

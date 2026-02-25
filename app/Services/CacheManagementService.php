@@ -193,10 +193,7 @@ class CacheManagementService
         try {
             // Check if Redis is available
             if (! $this->isRedisAvailable()) {
-                Log::debug('[CacheManagementService] Redis not available for pattern invalidation', [
-                    'pattern' => $pattern,
-                ]);
-
+                // Redis not configured - silently skip (expected in dev/local environments)
                 return 0;
             }
 
@@ -313,11 +310,7 @@ class CacheManagementService
         try {
             // Check if Redis is available
             if (! $this->isRedisAvailable()) {
-                Log::debug('[CacheManagementService] Redis not available for response time recording', [
-                    'api' => $apiName,
-                    'response_time_ms' => round($responseTime, 2),
-                ]);
-
+                // Redis not configured - silently skip
                 return;
             }
 
@@ -358,10 +351,7 @@ class CacheManagementService
         try {
             // Check if Redis is available
             if (! $this->isRedisAvailable()) {
-                Log::debug('[CacheManagementService] Redis not available for API stats', [
-                    'api' => $apiName,
-                ]);
-
+                // Redis not configured - return empty stats
                 return $this->getEmptyStats();
             }
 

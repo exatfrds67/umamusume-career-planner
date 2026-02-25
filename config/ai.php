@@ -30,12 +30,18 @@ return [
     'ollama' => [
         'enabled' => env('OLLAMA_ENABLED', true),
         'host' => env('OLLAMA_HOST', 'http://localhost:11434'),
-        'default_model' => env('OLLAMA_DEFAULT_MODEL', 'llama3'),
-        'timeout' => env('OLLAMA_TIMEOUT', 15), // seconds
+        'default_model' => env('OLLAMA_DEFAULT_MODEL', 'llama3.3'), // Synced with frontend default
+        'timeout' => env('OLLAMA_TIMEOUT', 120), // seconds
         'temperature' => env('OLLAMA_TEMPERATURE', 0.3),
         'max_tokens' => env('OLLAMA_MAX_TOKENS', 2048),
 
         'available_models' => [
+            'llama3.3' => [
+                'name' => 'Llama 3.3',
+                'version' => 'latest',
+                'context_window' => 131072,
+                'description' => 'Meta\'s Llama 3.3 model - installed locally (default)',
+            ],
             'llama3' => [
                 'name' => 'Llama 3',
                 'version' => 'latest',

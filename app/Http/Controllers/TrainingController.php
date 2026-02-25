@@ -8,7 +8,9 @@ use App\Models\Character;
 use App\Services\TrainingPredictionService;
 use App\Services\TrainingService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 /**
  * Training Controller
@@ -21,6 +23,65 @@ class TrainingController extends Controller
         protected TrainingPredictionService $predictionService,
         protected TrainingService $trainingService
     ) {}
+
+    /**
+     * Display the training page for a character.
+     */
+    public function index(Character $character): View
+    {
+        $this->authorize('view', $character);
+
+        $predictions = $this->predictionService->getPredictions($character);
+        $facilitiesData = $predictions['predictions'] ?? [];
+
+        $trainingData = [];
+        foreach ($facilitiesData as $type => $prediction) {
+            $trainingData[$type] = [
+                'gains' => $prediction['final_gains'] ?? $prediction['base_gains'] ?? [],
+                'failure_rate' => $this->calculateFailureRate($character, $type),
+                'energy_cost' => $this->getEnergyCost($type),
+            ];
+        }
+
+        return view('training.index', [
+            'character' => $character,
+            'trainingData' => $trainingData,
+        ]);
+    }
+
+    /**
+     * Store a training execution from the web form.
+     */
+    public function store(Request $request, Character $character): RedirectResponse
+    {
+        $this->authorize('update', $character);
+
+        $validated = $request->validate([
+            'training_type' => 'required|string|in:speed,stamina,power,guts,wit',
+        ]);
+
+        $predictions = $this->predictionService->getPredictions($character);
+        $facilitiesData = $predictions['predictions'] ?? [];
+        $prediction = $facilitiesData[$validated['training_type']] ?? null;
+
+        $gains = $prediction['final_gains'] ?? $prediction['base_gains'] ?? [];
+
+        $result = $this->trainingService->executeTraining(
+            $character,
+            $validated['training_type'],
+            $gains
+        );
+
+        if ($result['success'] ?? false) {
+            return redirect()
+                ->route('training.index', $character)
+                ->with('success', ucfirst($validated['training_type']).' training completed successfully!');
+        }
+
+        return redirect()
+            ->route('training.index', $character)
+            ->with('error', 'Training failed. Please try again.');
+    }
 
     /**
      * Get training predictions for a character.
@@ -134,5 +195,39 @@ class TrainingController extends Controller
                 }),
             ],
         ]);
+    }
+
+    /**
+     * Calculate failure rate based on character energy level.
+     */
+    private function calculateFailureRate(Character $character, string $trainingType): int
+    {
+        $energyLevel = $character->energy_level ?? 100;
+
+        if ($energyLevel >= 50) {
+            return 0;
+        }
+
+        if ($energyLevel >= 30) {
+            return 20;
+        }
+
+        return 40;
+    }
+
+    /**
+     * Get the energy cost for a training type.
+     */
+    private function getEnergyCost(string $trainingType): int
+    {
+        $costs = [
+            'speed' => -20,
+            'stamina' => -20,
+            'power' => -20,
+            'guts' => -20,
+            'wit' => -10,
+        ];
+
+        return $costs[$trainingType] ?? -20;
     }
 }

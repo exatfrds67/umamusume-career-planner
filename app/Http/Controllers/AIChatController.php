@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -47,6 +48,8 @@ class AIChatController extends Controller
      */
     public function sendMessage(Request $request): JsonResponse
     {
+        set_time_limit(0);
+
         $validated = $this->validateChatRequest($request);
 
         $userId = Auth::id();
@@ -106,9 +109,19 @@ class AIChatController extends Controller
 
     /**
      * Stream a message response using Server-Sent Events (SSE).
+     *
+     * NOTE: Current implementation is "fake streaming" - it processes the full
+     * AI response first, then chunks it for display. True incremental streaming
+     * would require streaming support from the underlying AI provider (Ollama
+     * supports this, Bedrock's InvokeModel does not by default).
+     *
+     * Future enhancement: Use Bedrock's InvokeModelWithResponseStream API or
+     * Ollama's streaming endpoint for true token-by-token streaming.
      */
     public function sendMessageStreaming(Request $request): StreamedResponse
     {
+        set_time_limit(0);
+
         $validated = $this->validateChatRequest($request);
 
         $userId = Auth::id();
@@ -209,6 +222,10 @@ class AIChatController extends Controller
     {
         try {
             $status = $this->realTimeMonitoringService->getRealTimeServerStatus();
+            $status['servers'] = array_merge(
+                $status['servers'] ?? [],
+                $this->buildProviderStatusEntries()
+            );
 
             return response()->json([
                 'success' => true,
@@ -224,11 +241,48 @@ class AIChatController extends Controller
                 'data' => [
                     'timestamp' => now()->toIso8601String(),
                     'overall_status' => 'unknown',
-                    'servers' => [],
+                    'servers' => $this->buildProviderStatusEntries(),
                     'alerts' => [],
                 ],
             ]);
         }
+    }
+
+    /**
+     * Build provider health entries for ollama and bedrock.
+     *
+     * @return array<string, array{name: string, status: string, is_connected: bool}>
+     */
+    private function buildProviderStatusEntries(): array
+    {
+        $cacheKey = 'ollama_availability';
+        if (Cache::has($cacheKey)) {
+            $ollamaOk = (bool) Cache::get($cacheKey);
+        } else {
+            try {
+                $host = config('ai.ollama.host', 'http://localhost:11434');
+                $host = is_string($host) ? $host : 'http://localhost:11434';
+                $ollamaOk = Http::timeout(2)->get("{$host}/api/tags")->successful();
+            } catch (\Exception) {
+                $ollamaOk = false;
+            }
+            Cache::put($cacheKey, $ollamaOk, 60);
+        }
+
+        $bedrockEnabled = (bool) config('ai.bedrock.enabled', false);
+
+        return [
+            'ollama' => [
+                'name' => 'ollama',
+                'status' => $ollamaOk ? 'healthy' : 'offline',
+                'is_connected' => $ollamaOk,
+            ],
+            'bedrock' => [
+                'name' => 'bedrock',
+                'status' => $bedrockEnabled ? 'healthy' : 'disabled',
+                'is_connected' => $bedrockEnabled,
+            ],
+        ];
     }
 
     /**
@@ -407,7 +461,7 @@ class AIChatController extends Controller
         $cacheKey = 'ai_chat_preferences_'.Auth::id();
         $preferences = Cache::get($cacheKey, [
             'provider' => 'ollama',
-            'model' => 'llama3.3',
+            'model' => config('ai.ollama.default_model', 'llama3'),
             'selected_agent' => null,
             'auto_fallback' => true,
         ]);
@@ -615,6 +669,30 @@ class AIChatController extends Controller
      *   confidence: float|null
      * } $response
      */
+    /**
+     * Rate an AI message (thumbs up/down feedback)
+     */
+    public function rateMessage(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'message_id' => ['required', 'string', 'max:255'],
+            'rating' => ['required', 'in:up,down,1,-1,positive,negative'],
+        ]);
+
+        $userId = Auth::id();
+        if (! is_int($userId)) {
+            return response()->json(['success' => false, 'error' => 'Authentication required.'], 401);
+        }
+
+        Log::info('[AI] Message rated', [
+            'user_id' => $userId,
+            'message_id' => $validated['message_id'],
+            'rating' => $validated['rating'],
+        ]);
+
+        return response()->json(['success' => true]);
+    }
+
     private function logConversation(
         int $userId,
         ?int $characterId,
@@ -626,7 +704,7 @@ class AIChatController extends Controller
             \App\Models\AIConversation::create([
                 'user_id' => $userId,
                 'character_id' => $characterId,
-                'conversation_id' => $conversationId ?? \Illuminate\Support\Str::uuid()->toString(),
+                'conversation_id' => $conversationId ?? Str::uuid()->toString(),
                 'message_type' => 'user',
                 'message_content' => $message,
                 'ai_model_used' => null,
@@ -638,7 +716,7 @@ class AIChatController extends Controller
             \App\Models\AIConversation::create([
                 'user_id' => $userId,
                 'character_id' => $characterId,
-                'conversation_id' => $conversationId ?? \Illuminate\Support\Str::uuid()->toString(),
+                'conversation_id' => $conversationId ?? Str::uuid()->toString(),
                 'message_type' => 'ai',
                 'message_content' => $response['content'],
                 'ai_model_used' => $response['model'],

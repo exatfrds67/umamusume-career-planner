@@ -59,8 +59,12 @@ return [
         ],
 
         'ollama' => [
-            'url' => env('OLLAMA_URL', 'http://localhost:11434/api'),
-            'model' => env('OLLAMA_MODEL', 'llama2'),
+            // Uses the same OLLAMA_HOST env var as config/ai.php (with /api appended for Neuron).
+            // Falls back to OLLAMA_URL for backward compatibility.
+            'url' => rtrim((string) env('OLLAMA_HOST', env('OLLAMA_URL', 'http://localhost:11434')), '/').'/api',
+            // Uses the same OLLAMA_DEFAULT_MODEL env var as config/ai.php.
+            // Falls back to OLLAMA_MODEL for backward compatibility.
+            'model' => env('OLLAMA_DEFAULT_MODEL', env('OLLAMA_MODEL', 'llama3.3')),
             'parameters' => [],
         ],
 

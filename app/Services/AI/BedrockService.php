@@ -415,12 +415,26 @@ class BedrockService
                 return false;
             }
 
-            // Check cached availability
+            // Check cached availability (includes real connectivity test)
             $cacheKey = 'bedrock_availability';
 
             $cached = Cache::remember($cacheKey, 300, function () {
-                // BedrockRuntimeClient does not expose listFoundationModels; treat configured credentials as available.
-                return true;
+                // Perform lightweight connectivity test by listing available models
+                try {
+                    if ($this->client === null) {
+                        return false;
+                    }
+
+                    // Test connectivity with a lightweight API call
+                    // ListFoundationModels with maxResults=1 to minimize network overhead
+                    $this->client->listFoundationModels(['maxResults' => 1]);
+
+                    return true;
+                } catch (\Exception $e) {
+                    Log::warning('[Bedrock] Availability check failed', ['error' => $e->getMessage()]);
+
+                    return false;
+                }
             });
 
             return is_bool($cached) ? $cached : false;

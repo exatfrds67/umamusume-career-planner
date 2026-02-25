@@ -506,6 +506,10 @@ Route::middleware('auth:sanctum')->prefix('ai/chat')->name('api.ai.chat.')->grou
 
     Route::post('/preferences', [\App\Http\Controllers\AIChatController::class, 'preferences'])
         ->name('preferences.update');
+
+    // Rate a message (thumbs up/down feedback)
+    Route::post('/rate', [\App\Http\Controllers\AIChatController::class, 'rateMessage'])
+        ->name('rate');
 });
 
 // MCP Monitoring and Control API Routes

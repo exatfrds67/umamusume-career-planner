@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\MCP;
 
+use App\Services\AI\BedrockService;
 use Cloudstudio\Ollama\Facades\Ollama;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -69,7 +70,8 @@ class AgentRoutingService
 
     public function __construct(
         private readonly MCPClientService $mcpClient,
-        private readonly CostManagementService $costManager
+        private readonly CostManagementService $costManager,
+        private readonly BedrockService $bedrockService
     ) {}
 
     /**
@@ -318,19 +320,19 @@ class AgentRoutingService
      */
     protected function selectFallbackProvider(string $complexity, string $reason): array
     {
-        // If budget exceeded, use Ollama if available
-        if ($reason === 'budget_exceeded' && $this->isOllamaAvailable()) {
+        // Always try Ollama first if available — covers both budget and provider failures
+        if ($this->isOllamaAvailable()) {
             $defaultModel = config('ai.ollama.default_model', 'llama3');
 
             return [
                 'provider' => self::PROVIDER_OLLAMA,
                 'model' => is_string($defaultModel) ? $defaultModel : 'llama3',
-                'reason' => 'Budget exceeded - falling back to free local Ollama',
+                'reason' => 'Budget exceeded or provider failed - falling back to free local Ollama',
                 'estimated_cost' => self::OLLAMA_COST,
             ];
         }
 
-        // Otherwise use cheapest Bedrock option
+        // Ollama unavailable — fall back to cheapest Bedrock option only when primary was not Bedrock
         return [
             'provider' => self::PROVIDER_BEDROCK,
             'model' => 'amazon.nova-lite-v1:0',
@@ -533,130 +535,23 @@ class AgentRoutingService
      *
      * @param  array<string, mixed>  $request
      */
-    /**
-     * Execute request with Bedrock
-     *
-     * @param  array<string, mixed>  $request
-     */
     protected function executeBedrock(string $modelKey, array $request): string
     {
-        $client = new \Aws\BedrockRuntime\BedrockRuntimeClient([
-            'region' => config('services.aws.region', 'us-east-1'),
-            'version' => 'latest',
-            'credentials' => array_filter([
-                'key' => config('services.aws.key'),
-                'secret' => config('services.aws.secret'),
-                'token' => config('services.aws.token'),
-            ]),
-        ]);
-
-        $modelId = $this->mapBedrockModelId($modelKey);
         $prompt = is_string($request['prompt'] ?? null) ? $request['prompt'] : '';
         $context = is_array($request['context'] ?? null) ? $request['context'] : [];
 
-        // Build system prompt if context exists
-        $systemPrompt = 'You are an expert Umamusume Career Advisor.';
-        if (! empty($context)) {
-            $systemPrompt = $this->buildSystemContext($context);
-        }
-
-        // Prepare body based on model family
-        if (str_contains($modelId, 'anthropic.claude')) {
-            $maxTokens = is_numeric($request['max_tokens'] ?? null) ? (int) $request['max_tokens'] : 4096;
-            $body = [
-                'anthropic_version' => 'bedrock-2023-05-31',
-                'max_tokens' => $maxTokens,
-                'messages' => [
-                    [
-                        'role' => 'user',
-                        'content' => [
-                            ['type' => 'text', 'text' => $prompt],
-                        ],
-                    ],
-                ],
-                'system' => [
-                    ['type' => 'text', 'text' => $systemPrompt],
-                ],
-            ];
-        } else {
-            // Nova / Titan / Generic (using Converse style or text)
-            // For simplicity, fallback to generic "inputText" or "messages" if supported
-            $maxTokens = is_numeric($request['max_tokens'] ?? null) ? (int) $request['max_tokens'] : 4096;
-            $body = [
-                'inferenceConfig' => [
-                    'max_new_tokens' => $maxTokens,
-                ],
-                'messages' => [
-                    [
-                        'role' => 'user',
-                        'content' => [
-                            ['text' => $systemPrompt."\n\n".$prompt],
-                        ],
-                    ],
-                ],
-            ];
-        }
-
         try {
-            $result = $client->invokeModel([
-                'modelId' => $modelId,
-                'contentType' => 'application/json',
-                'accept' => 'application/json',
-                'body' => json_encode($body),
-            ]);
+            // Use BedrockService instead of duplicating AWS SDK logic
+            $response = $this->bedrockService->generate($prompt, $context, $modelKey);
 
-            /** @var \GuzzleHttp\Psr7\Stream|null $bodyStream */
-            $bodyStream = $result['body'] ?? null;
-            if ($bodyStream === null) {
-                return '';
-            }
-            $responseBody = json_decode($bodyStream->getContents(), true);
-
-            // Parse response based on model
-            if (str_contains($modelId, 'anthropic.claude') && is_array($responseBody)) {
-                $content = $responseBody['content'] ?? null;
-                if (is_array($content) && isset($content[0]) && is_array($content[0])) {
-                    return is_string($content[0]['text'] ?? null) ? $content[0]['text'] : '';
-                }
-
-                return '';
-            } elseif (is_array($responseBody)) {
-                // Nova structure
-                $output = $responseBody['output'] ?? null;
-                if (is_array($output)) {
-                    $message = $output['message'] ?? null;
-                    if (is_array($message)) {
-                        $content = $message['content'] ?? null;
-                        if (is_array($content) && isset($content[0]) && is_array($content[0])) {
-                            return is_string($content[0]['text'] ?? null) ? $content[0]['text'] : '';
-                        }
-                    }
-                }
-            }
-
-            $jsonEncoded = json_encode($responseBody);
-
-            return $jsonEncoded !== false ? $jsonEncoded : ''; // Fallback debug
-
-        } catch (\Aws\Exception\AwsException $e) {
-            Log::error('[Bedrock] AWS Error: '.$e->getMessage());
-            throw new \RuntimeException('Bedrock invocation failed: '.$e->getAwsErrorMessage());
+            return is_string($response['content'] ?? null) ? $response['content'] : '';
         } catch (\Exception $e) {
-            Log::error('[Bedrock] General Error: '.$e->getMessage());
+            Log::error('[AgentRouting] Bedrock execution failed', [
+                'model' => $modelKey,
+                'error' => $e->getMessage(),
+            ]);
             throw $e;
         }
-    }
-
-    protected function mapBedrockModelId(string $key): string
-    {
-        return match ($key) {
-            'claude-3-5-sonnet' => 'anthropic.claude-3-5-sonnet-20240620-v1:0',
-            'claude-3-5-haiku' => 'anthropic.claude-3-5-haiku-20241022-v1:0',
-            'claude-opus-4-5' => 'anthropic.claude-3-opus-20240229-v1:0', // Fallback to 3 Opus if 4.5 not out
-            'nova-2-lite' => 'amazon.nova-lite-v1:0',
-            'nova-2-pro' => 'amazon.nova-pro-v1:0',
-            default => 'anthropic.claude-3-5-sonnet-20240620-v1:0',
-        };
     }
 
     /**
