@@ -23,6 +23,7 @@ class TrainingPredictionController extends Controller
     public function index(Request $request): View
     {
         $characters = Character::with(['aptitudes', 'supportCards'])
+            ->where('user_id', auth()->id())
             ->orderBy('name')
             ->get();
 
@@ -35,7 +36,8 @@ class TrainingPredictionController extends Controller
                     'aptitudes',
                     'supportCards.supportCard',
                     'factors',
-                ])->find($characterId);
+                ])->where('user_id', auth()->id())
+                    ->find($characterId);
             }
         }
 

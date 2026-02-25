@@ -18,7 +18,10 @@ class ForceJsonResponse
     public function handle(Request $request, Closure $next): Response
     {
         // For POST, PUT, PATCH requests, enforce JSON content type
-        if (in_array($request->method(), ['POST', 'PUT', 'PATCH']) && ! $request->isJson()) {
+        // Allow multipart/form-data requests (file uploads) to pass through
+        $isMultipart = str_contains($request->header('Content-Type', ''), 'multipart/form-data');
+
+        if (in_array($request->method(), ['POST', 'PUT', 'PATCH']) && ! $request->isJson() && ! $isMultipart) {
             return response()->json([
                 'message' => 'Content-Type must be application/json',
             ], 415);

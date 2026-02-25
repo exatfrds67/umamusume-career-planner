@@ -53,6 +53,8 @@ class MCPMonitoringService
             $health = $this->mcpClient->getServerHealth($serverName);
             $needsReconnection = $this->mcpClient->needsReconnection($serverName);
 
+            $uptimeStats = $this->getServerUptimeStats($serverName, 24);
+
             $results[$serverName] = [
                 'server_name' => $serverName,
                 'status' => $checkResult['status'],
@@ -64,6 +66,7 @@ class MCPMonitoringService
                 'last_error' => $this->getLastError($serverName),
                 'capabilities' => $checkResult['capabilities'] ?? [],
                 'needs_reconnection' => $needsReconnection,
+                'uptime_percentage' => $uptimeStats['uptime_percentage'],
             ];
 
             // Log health check result to database

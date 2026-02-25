@@ -3,6 +3,7 @@
 namespace App\Services\AI;
 
 use App\Models\AIConversation;
+use App\Models\ConversationMessage;
 use App\Services\MCP\AgentOrchestrationService;
 use App\Services\MCP\MCPClientService;
 use App\Services\MCP\Tools\AWSPricingService;
@@ -345,7 +346,7 @@ class AIDashboardService
     public function getConversationsSummary(): array
     {
         $totalConversations = AIConversation::distinct()->count('conversation_id');
-        $totalMessages = AIConversation::count();
+        $totalMessages = ConversationMessage::count();
 
         $avgLength = $totalConversations > 0 ? $totalMessages / $totalConversations : 0;
 
@@ -356,17 +357,14 @@ class AIDashboardService
             ->limit(10)
             ->get()
             ->map(function ($conv) {
-                $processingTime = $conv->getAttribute('processing_time');
-                $cost = $conv->getAttribute('cost');
-
                 return [
                     'id' => $conv->id,
                     'conversation_id' => $conv->conversation_id,
                     'character_name' => is_string($conv->character?->name) ? $conv->character->name : 'Unknown',
-                    'message_type' => $conv->message_type,
-                    'ai_model_used' => $conv->getAttribute('ai_model_used'),
-                    'processing_time' => is_numeric($processingTime) ? (float) $processingTime : null,
-                    'cost' => is_numeric($cost) ? (float) $cost : null,
+                    'message_type' => $conv->conversation_type,
+                    'ai_model_used' => $conv->ai_model,
+                    'processing_time' => null,
+                    'cost' => null,
                     'created_at' => $conv->created_at?->toIso8601String(),
                 ];
             })
@@ -413,15 +411,15 @@ class AIDashboardService
 
         $since = now()->subHours($hours);
 
-        $conversations = AIConversation::where('created_at', '>=', $since)
+        $messages = ConversationMessage::where('created_at', '>=', $since)
             ->where('message_type', '=', 'assistant')
             ->get();
 
-        $totalRequests = $conversations->count();
-        $successfulRequests = $conversations->filter(fn ($c) => is_string($c->getAttribute('ai_model_used')))->count();
-        $avgResponseTimeValue = $conversations->avg('processing_time');
+        $totalRequests = $messages->count();
+        $successfulRequests = $messages->filter(fn ($m) => is_string($m->getAttribute('ai_model_used')))->count();
+        $avgResponseTimeValue = $messages->avg('processing_time');
         $avgResponseTime = is_numeric($avgResponseTimeValue) ? (float) $avgResponseTimeValue : 0.0;
-        $totalCostValue = $conversations->sum('cost');
+        $totalCostValue = $messages->sum('cost_estimate');
         $totalCost = is_numeric($totalCostValue) ? (float) $totalCostValue : 0.0;
 
         return [
@@ -462,20 +460,20 @@ class AIDashboardService
             return [];
         }
 
-        $query = AIConversation::where('created_at', '>=', $since)
+        $query = ConversationMessage::where('created_at', '>=', $since)
             ->where('message_type', '=', 'assistant');
 
         foreach ($modelPattern as $pattern) {
             $query->orWhere('ai_model_used', 'like', $pattern);
         }
 
-        $conversations = $query->get();
+        $messages = $query->get();
 
-        $requestCount = $conversations->count();
-        $successCount = $conversations->filter(fn ($c) => is_string($c->getAttribute('ai_model_used')))->count();
+        $requestCount = $messages->count();
+        $successCount = $messages->filter(fn ($m) => is_string($m->getAttribute('ai_model_used')))->count();
         $successRate = $requestCount > 0 ? ($successCount / $requestCount) * 100 : 0;
 
-        $responseTimes = $conversations->pluck('processing_time')->filter()->sort()->values();
+        $responseTimes = $messages->pluck('processing_time')->filter()->sort()->values();
         $avgResponseTimeRaw = $responseTimes->avg();
         $avgResponseTime = is_numeric($avgResponseTimeRaw) ? (float) $avgResponseTimeRaw : 0.0;
         $minResponseTimeRaw = $responseTimes->min();
@@ -491,9 +489,9 @@ class AIDashboardService
         $p99ResponseTimeRaw = $responseTimes->get($p99Index);
         $p99ResponseTime = is_numeric($p99ResponseTimeRaw) ? (float) $p99ResponseTimeRaw : 0.0;
 
-        $totalTokensRaw = $conversations->sum('token_count');
+        $totalTokensRaw = $messages->sum('tokens_used');
         $totalTokens = is_numeric($totalTokensRaw) ? (int) $totalTokensRaw : 0;
-        $totalCostRaw = $conversations->sum('cost');
+        $totalCostRaw = $messages->sum('cost_estimate');
         $totalCost = is_numeric($totalCostRaw) ? (float) $totalCostRaw : 0.0;
 
         return [
@@ -506,7 +504,7 @@ class AIDashboardService
             'p99_response_time' => round($p99ResponseTime, 3),
             'total_tokens' => $totalTokens,
             'total_cost' => round($totalCost, 6),
-            'avg_confidence' => $this->calculateAverageConfidenceFromConversations($conversations),
+            'avg_confidence' => $this->calculateAverageConfidenceFromConversations($messages),
         ];
     }
 
@@ -582,9 +580,9 @@ class AIDashboardService
 
         $since = now()->subHours($hours);
 
-        $costValue = AIConversation::where('created_at', '>=', $since)
+        $costValue = ConversationMessage::where('created_at', '>=', $since)
             ->where('message_type', '=', 'assistant')
-            ->sum('cost');
+            ->sum('cost_estimate');
 
         return is_numeric($costValue) ? (float) $costValue : 0.0;
     }
@@ -606,12 +604,12 @@ class AIDashboardService
 
         $since = now()->subHours($hours);
 
-        $costs = AIConversation::where('created_at', '>=', $since)
+        $costs = ConversationMessage::where('created_at', '>=', $since)
             ->where('message_type', '=', 'assistant')
             ->whereNotNull('ai_model_used')
             ->get()
-            ->groupBy(function ($conv) {
-                $modelRaw = $conv->getAttribute('ai_model_used');
+            ->groupBy(function ($message) {
+                $modelRaw = $message->getAttribute('ai_model_used');
                 $model = is_string($modelRaw) ? $modelRaw : '';
                 if (str_contains($model, 'llama') || str_contains($model, 'mistral') || str_contains($model, 'qwen')) {
                     return 'ollama';
@@ -629,7 +627,7 @@ class AIDashboardService
                 return 'unknown';
             })
             ->map(function ($group) {
-                $sum = $group->sum('cost');
+                $sum = $group->sum('cost_estimate');
 
                 return is_numeric($sum) ? round((float) $sum, 6) : 0.0;
             })
@@ -656,10 +654,10 @@ class AIDashboardService
 
         $since = now()->subHours($hours);
 
-        $costs = AIConversation::where('created_at', '>=', $since)
+        $costs = ConversationMessage::where('created_at', '>=', $since)
             ->where('message_type', '=', 'assistant')
             ->whereNotNull('ai_model_used')
-            ->select('ai_model_used', DB::raw('SUM(cost) as total_cost'))
+            ->select('ai_model_used', DB::raw('SUM(cost_estimate) as total_cost'))
             ->groupBy('ai_model_used')
             ->get()
             ->pluck('total_cost', 'ai_model_used')

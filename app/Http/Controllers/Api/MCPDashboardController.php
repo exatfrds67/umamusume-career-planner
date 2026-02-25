@@ -342,7 +342,7 @@ class MCPDashboardController extends Controller
     protected function getUserSettings(): array
     {
         $user = auth()->user();
-        $preferences = $user?->preferences()->where('category', 'mcp')->first();
+        $preferences = $user?->preferences()->where('preference_category', 'mcp')->first();
 
         $defaultSettings = [
             'servers' => $this->getDefaultServerSettings(),
@@ -364,8 +364,8 @@ class MCPDashboardController extends Controller
             ],
         ];
 
-        if ($preferences && isset($preferences->settings) && is_string($preferences->settings)) {
-            $decoded = json_decode($preferences->settings, true);
+        if ($preferences && isset($preferences->preference_value) && is_string($preferences->preference_value)) {
+            $decoded = json_decode($preferences->preference_value, true);
             if (is_array($decoded)) {
                 return array_merge($defaultSettings, $decoded);
             }

@@ -52,7 +52,7 @@ class AgentLifecycleManager
                 'type' => $type,
                 'name' => $name,
                 'config' => json_encode($config),
-                'stage' => self::STAGE_CREATED,
+                'status' => self::STAGE_CREATED,
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
@@ -140,7 +140,7 @@ class AgentLifecycleManager
 
         return [
             'agent_id' => $agentId,
-            'stage' => $agent['stage'],
+            'stage' => $agent['status'],
             'metrics' => $metrics,
             'health' => $health,
             'recommendations' => $this->generateMaintenanceRecommendations($metrics, $health),
@@ -182,7 +182,7 @@ class AgentLifecycleManager
                 throw new \RuntimeException("Agent not found: {$agentId}");
             }
 
-            $stage = $agent['stage'] ?? null;
+            $stage = $agent['status'] ?? null;
             if ($stage !== self::STAGE_PAUSED) {
                 throw new \RuntimeException("Agent is not paused: {$agentId}");
             }
@@ -243,7 +243,7 @@ class AgentLifecycleManager
     {
         /** @var array<int, array<string, mixed>> $agents */
         $agents = DB::table('ucp_mcp_agents')
-            ->where('stage', self::STAGE_ACTIVE)
+            ->where('status', self::STAGE_ACTIVE)
             ->get()
             ->map(fn ($agent): array => (array) $agent)
             ->all();
@@ -300,7 +300,7 @@ class AgentLifecycleManager
         DB::table('ucp_mcp_agents')
             ->where('id', $agentId)
             ->update([
-                'stage' => $stage,
+                'status' => $stage,
                 'updated_at' => now(),
             ]);
 
