@@ -1,9 +1,19 @@
 /**
  * MCP Management Dashboard
  * Handles real-time monitoring of MCP servers, agents, costs, and performance
+ *
+ * Routes previously injected via inline <script> in mcp/dashboard.blade.php
  */
 
-import Alpine from "alpinejs";
+// Uses window.Alpine set by app.js (Livewire-bundled Alpine instance)
+const ROUTES = {
+    overview: "/api/mcp/dashboard/overview",
+    servers: "/api/mcp/servers",
+    agents: "/api/mcp/agents",
+    costs: "/api/mcp/costs",
+    performance: "/api/mcp/performance",
+    settings: "/api/mcp/settings",
+};
 
 // Register Alpine component on initialization
 document.addEventListener("alpine:init", () => {
@@ -78,7 +88,7 @@ document.addEventListener("alpine:init", () => {
             this.loading = true;
 
             try {
-                const response = await fetch(window.pageData.routes.overview, {
+                const response = await fetch(ROUTES.overview, {
                     headers: {
                         Accept: "application/json",
                         "X-CSRF-TOKEN":
@@ -137,7 +147,7 @@ document.addEventListener("alpine:init", () => {
 
         async loadServers() {
             try {
-                const response = await fetch(window.pageData.routes.servers, {
+                const response = await fetch(ROUTES.servers, {
                     headers: {
                         Accept: "application/json",
                         "X-CSRF-TOKEN":
@@ -157,7 +167,7 @@ document.addEventListener("alpine:init", () => {
 
         async loadAgents() {
             try {
-                const response = await fetch(window.pageData.routes.agents, {
+                const response = await fetch(ROUTES.agents, {
                     headers: {
                         Accept: "application/json",
                         "X-CSRF-TOKEN":
@@ -177,7 +187,7 @@ document.addEventListener("alpine:init", () => {
 
         async loadCosts() {
             try {
-                const response = await fetch(window.pageData.routes.costs, {
+                const response = await fetch(ROUTES.costs, {
                     headers: {
                         Accept: "application/json",
                         "X-CSRF-TOKEN":
@@ -198,7 +208,7 @@ document.addEventListener("alpine:init", () => {
         async loadPerformance() {
             try {
                 const response = await fetch(
-                    `${window.pageData.routes.performance}?range=${this.performanceTimeRange}`,
+                    `${ROUTES.performance}?range=${this.performanceTimeRange}`,
                     {
                         headers: {
                             Accept: "application/json",
@@ -221,7 +231,7 @@ document.addEventListener("alpine:init", () => {
 
         async loadSettings() {
             try {
-                const response = await fetch(window.pageData.routes.settings, {
+                const response = await fetch(ROUTES.settings, {
                     headers: {
                         Accept: "application/json",
                         "X-CSRF-TOKEN":

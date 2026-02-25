@@ -70,6 +70,20 @@ export default function externalDataBrowser() {
         filteredSupportCards: [],
         filteredSkills: [],
 
+        // Modal states
+        showCharacterModal: false,
+        showSupportCardModal: false,
+        selectedCharacter: null,
+        selectedSupportCard: null,
+        importingCard: false,
+
+        // Toast notification
+        toast: {
+            show: false,
+            message: "",
+            type: "success",
+        },
+
         /**
          * Initialize the component and load data
          */
@@ -575,13 +589,30 @@ export default function externalDataBrowser() {
         },
 
         /**
+         * Show a toast notification message
+         *
+         * @param {string} message - Toast message text
+         * @param {string} type - Toast type ('success' or 'error')
+         * @returns {void}
+         */
+        showToast(message, type = "success") {
+            this.toast.message = message;
+            this.toast.type = type;
+            this.toast.show = true;
+            setTimeout(() => {
+                this.toast.show = false;
+            }, 4000);
+        },
+
+        /**
          * Show detailed view of a character
          *
          * @param {Object} character - Character data object
          * @returns {void}
          */
         showCharacterDetail(character) {
-            console.log("Show character detail:", character);
+            this.selectedCharacter = character;
+            this.showCharacterModal = true;
         },
 
         /**
@@ -591,7 +622,8 @@ export default function externalDataBrowser() {
          * @returns {void}
          */
         showSupportCardDetail(card) {
-            console.log("Show support card detail:", card);
+            this.selectedSupportCard = card;
+            this.showSupportCardModal = true;
         },
 
         /**
@@ -601,7 +633,22 @@ export default function externalDataBrowser() {
          * @returns {void}
          */
         useForCharacterCreation(character) {
-            console.log("Use for character creation:", character);
+            const prefillData = {
+                external_id: character.id,
+                name: character.name_en,
+                name_jp: character.name_jp,
+                image: character.thumb_img,
+                category: character.category_label_en,
+                color: character.color_main,
+                source: "umapyoi.net",
+            };
+
+            sessionStorage.setItem(
+                "external_character_prefill",
+                JSON.stringify(prefillData),
+            );
+
+            window.location.href = "/characters/create?from_external=1";
         },
 
         /**
@@ -610,8 +657,52 @@ export default function externalDataBrowser() {
          * @param {Object} card - Support card data object
          * @returns {void}
          */
-        importSupportCard(card) {
-            console.log("Import support card:", card);
+        async importSupportCard(card) {
+            this.importingCard = true;
+
+            try {
+                const response = await fetch("/external-data/import-support-card", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                        "X-CSRF-TOKEN":
+                            document.querySelector('meta[name="csrf-token"]')
+                                ?.content || "",
+                    },
+                    body: JSON.stringify({
+                        external_id: card.id,
+                        title_en: card.title_en,
+                        chara_id: card.chara_id,
+                        gametora: card.gametora,
+                        rarity: card.rarity || "R",
+                        image_url: this.getSupportCardImage(card.id),
+                        source: "umapyoi.net",
+                    }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    this.showToast(
+                        data.message || "Support card imported successfully!",
+                        "success",
+                    );
+                } else {
+                    this.showToast(
+                        data.message || "Failed to import support card",
+                        "error",
+                    );
+                }
+            } catch (error) {
+                console.error("Import error:", error);
+                this.showToast(
+                    "Failed to import support card. Please try again.",
+                    "error",
+                );
+            } finally {
+                this.importingCard = false;
+            }
         },
 
         /**

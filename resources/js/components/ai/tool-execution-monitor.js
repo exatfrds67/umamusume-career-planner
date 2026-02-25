@@ -3,10 +3,9 @@
  * Monitors MCP tool execution status and statistics
  */
 
-import Alpine from "alpinejs";
-
 // Register Alpine component
 document.addEventListener("alpine:init", () => {
+    // eslint-disable-next-line no-undef
     Alpine.data("toolExecutionMonitor", (config) => ({
         toolData: null,
         loading: false,

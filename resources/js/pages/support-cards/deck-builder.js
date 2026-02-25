@@ -405,7 +405,7 @@ document.addEventListener("alpine:init", () => {
 
             try {
                 const response = await fetch(
-                    `/api/characters/${this.characterId}/deck`,
+                    `/api/v1/characters/${this.characterId}/deck/save`,
                     {
                         method: "POST",
                         headers: {
@@ -416,7 +416,14 @@ document.addEventListener("alpine:init", () => {
                                 )?.content || "",
                         },
                         body: JSON.stringify({
-                            deck: this.deck.filter((c) => c !== null),
+                            cards: this.deck
+                                .filter((c) => c !== null)
+                                .map((c) => ({
+                                    support_card_id: c.support_card_id,
+                                    position_slot: c.position_slot,
+                                    is_friend_card: c.is_friend_card,
+                                    limit_break_level: c.limit_break_level,
+                                })),
                         }),
                     },
                 );

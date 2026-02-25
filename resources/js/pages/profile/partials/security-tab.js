@@ -43,3 +43,48 @@ window.pageData.securityTab = {
         }
     },
 };
+
+/**
+ * Alpine.js component for the delete account modal.
+ * Handles modal visibility, confirmation input validation, and form submission.
+ */
+window.deleteAccountModal = function () {
+    return {
+        show: false,
+        password: "",
+        confirmation: "",
+        confirmationError: false,
+
+        get canSubmit() {
+            const expectedName = this.$el.dataset.expectedName || "";
+            return (
+                this.password.length > 0 &&
+                this.confirmation === expectedName
+            );
+        },
+
+        openModal() {
+            this.show = true;
+            this.password = "";
+            this.confirmation = "";
+            this.confirmationError = false;
+        },
+
+        closeModal() {
+            this.show = false;
+            this.password = "";
+            this.confirmation = "";
+            this.confirmationError = false;
+        },
+
+        handleSubmit(event) {
+            const expectedName = this.$el.dataset.expectedName || "";
+            if (this.confirmation !== expectedName) {
+                event.preventDefault();
+                this.confirmationError = true;
+                return;
+            }
+            this.confirmationError = false;
+        },
+    };
+};

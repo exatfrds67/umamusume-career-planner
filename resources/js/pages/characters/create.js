@@ -3,11 +3,10 @@
  * Handles multi-step character creation with database/API integration
  */
 
-import Alpine from "alpinejs";
-
 // Register Alpine component on initialization
+// Uses window.Alpine set by app.js (Livewire-bundled Alpine instance)
 document.addEventListener("alpine:init", () => {
-    Alpine.data("characterWizard", () => ({
+    window.Alpine.data("characterWizard", () => ({
         currentStep: 1,
         showGallery: false,
         showDatabase: false,

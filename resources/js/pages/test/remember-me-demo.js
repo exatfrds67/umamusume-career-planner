@@ -28,3 +28,31 @@ window.pageData.rememberMeDemo = {
         console.log("Remember me cleared");
     },
 };
+
+/**
+ * Update the remember-me checkbox status display.
+ * Previously inline in test/remember-me-demo.blade.php
+ */
+window.updateRememberStatus = function () {
+    const checkbox = document.getElementById("demo-remember");
+    const statusText = document.getElementById("remember-status");
+    const formValue = document.getElementById("form-value");
+
+    const isChecked = checkbox.checked;
+
+    statusText.innerHTML = `Checkbox is currently: <span class="font-semibold">${isChecked ? "checked" : "unchecked"}</span>`;
+    formValue.textContent = isChecked ? "true" : "false";
+};
+
+/**
+ * Simulate a login attempt with the remember-me option.
+ * Previously inline in test/remember-me-demo.blade.php
+ */
+window.simulateLogin = function () {
+    const checkbox = document.getElementById("demo-remember");
+    const isChecked = checkbox.checked;
+
+    alert(
+        `Demo Login Simulation:\n\nEmail: demo@example.com\nPassword: [hidden]\nRemember Me: ${isChecked ? "YES" : "NO"}\n\nIn a real login, this would ${isChecked ? "create a persistent session that lasts for years" : "create a session that expires when the browser closes"}.`,
+    );
+};

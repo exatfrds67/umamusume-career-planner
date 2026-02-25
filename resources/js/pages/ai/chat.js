@@ -3,6 +3,12 @@
  * Handles quick message sending functionality
  */
 
+// Import the aiChatInterface Alpine component definition
+import "../../ai-chat.js";
+
+// Import AI sub-components needed on the chat page
+import "../../components/ai/tool-usage-indicator.js";
+
 /**
  * Send a quick message to the chat interface
  * @param {string} message - The message to send

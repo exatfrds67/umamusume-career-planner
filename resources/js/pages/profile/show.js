@@ -3,8 +3,7 @@
  * Handles tab navigation, avatar upload, and profile settings
  */
 
-import Alpine from "alpinejs";
-
+// Uses window.Alpine set by app.js (Livewire-bundled Alpine instance)
 // Register Alpine components on initialization
 document.addEventListener("alpine:init", () => {
     // Main profile manager component

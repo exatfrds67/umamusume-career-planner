@@ -3,8 +3,7 @@
  * Handles race targeting and planning interface
  */
 
-import Alpine from "alpinejs";
-
+// Uses window.Alpine set by app.js (Livewire-bundled Alpine instance)
 // Register Alpine component
 document.addEventListener("alpine:init", () => {
     Alpine.data("raceTargets", () => ({

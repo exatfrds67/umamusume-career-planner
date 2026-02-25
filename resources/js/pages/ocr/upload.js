@@ -2,7 +2,14 @@
  * OCR Upload Manager
  * Handles drag-and-drop file upload, progress tracking, and batch processing
  * for OCR screenshot processing.
+ *
+ * Routes previously injected via inline <script> in ocr/upload.blade.php
  */
+
+const ROUTES = {
+    status: "/api/ocr/status",
+    upload: "/api/ocr/upload",
+};
 
 class OCRUploadManager {
     constructor() {
@@ -30,7 +37,7 @@ class OCRUploadManager {
      */
     async checkOCRStatus() {
         try {
-            const response = await fetch(window.pageData.routes.status, {
+            const response = await fetch(ROUTES.status, {
                 headers: {
                     Accept: "application/json",
                     "X-CSRF-TOKEN":
@@ -342,7 +349,7 @@ class OCRUploadManager {
             formData.append("screenshot", file);
             formData.append("character_id", characterId);
 
-            const response = await fetch(window.pageData.routes.upload, {
+            const response = await fetch(ROUTES.upload, {
                 method: "POST",
                 headers: {
                     "X-CSRF-TOKEN":

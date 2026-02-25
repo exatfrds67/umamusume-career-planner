@@ -53,6 +53,49 @@ import "./pages/skills/partials/planner.js";
 
 // Alpine plugins (persist & collapse) are already bundled in Livewire's ESM
 
+// --- Global Toast Store & Container Component ---
+document.addEventListener("alpine:init", () => {
+    Alpine.store("toasts", {
+        items: [],
+
+        add(type, message) {
+            const id = Date.now() + Math.random();
+            this.items = [...this.items, { id, type, message }];
+            setTimeout(() => { this.remove(id); }, 5000);
+        },
+
+        remove(id) {
+            this.items = this.items.filter((t) => t.id !== id);
+        },
+    });
+
+    Alpine.data("toastContainer", () => ({
+        items: [],
+
+        addFromEvent(event) {
+            const type = event.detail?.type || "info";
+            const message = event.detail?.message || "";
+            const id = Date.now() + Math.random();
+            this.items = [...this.items, { id, type, message }];
+            setTimeout(() => { this.remove(id); }, 5000);
+        },
+
+        remove(id) {
+            this.items = this.items.filter((t) => t.id !== id);
+        },
+    }));
+});
+
+// Listen for window toast events and route them to the Alpine store
+window.addEventListener("toast", (event) => {
+    if (window.Alpine && Alpine.store("toasts")) {
+        Alpine.store("toasts").add(
+            event.detail.type || "info",
+            event.detail.message || "",
+        );
+    }
+});
+
 // --- Sidebar Store (Sidebar Minimize Feature) ---
 document.addEventListener("alpine:init", () => {
     Alpine.store("sidebar", {
@@ -693,20 +736,28 @@ const loadNonCriticalModules = () => {
     import("./core/PerformanceMonitor.js");
 };
 
-// Start Livewire (which starts Alpine after registering its directives)
-Livewire.start();
+// Start Livewire (which starts Alpine after registering its directives).
+// Deferred via setTimeout(0) so that page-specific module scripts (loaded via
+// @push('scripts') / @vite) can register their alpine:init listeners before
+// Alpine.start() fires the event. All deferred modules (including page scripts)
+// run in the same "end of document" task synchronously in document order;
+// this setTimeout pushes Livewire.start() to the next task, guaranteeing that
+// all page-specific alpine:init registrations happen first.
+setTimeout(() => {
+    Livewire.start();
 
-// Load non-critical modules after Alpine starts
-if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", loadNonCriticalModules);
-} else {
-    // Use requestIdleCallback for better performance
-    if ("requestIdleCallback" in window) {
-        requestIdleCallback(loadNonCriticalModules, { timeout: 2000 });
+    // Load non-critical modules after Alpine starts
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", loadNonCriticalModules);
     } else {
-        setTimeout(loadNonCriticalModules, 1);
+        // Use requestIdleCallback for better performance
+        if ("requestIdleCallback" in window) {
+            requestIdleCallback(loadNonCriticalModules, { timeout: 2000 });
+        } else {
+            setTimeout(loadNonCriticalModules, 1);
+        }
     }
-}
+}, 0);
 
 // Service Worker Management with advanced caching
 if ("serviceWorker" in navigator) {

@@ -3,10 +3,9 @@
  * Shows active tool executions in a compact indicator
  */
 
-import Alpine from "alpinejs";
-
 // Register Alpine component
 document.addEventListener("alpine:init", () => {
+    // eslint-disable-next-line no-undef
     Alpine.data("toolUsageIndicator", () => ({
         activeTools: [],
 
