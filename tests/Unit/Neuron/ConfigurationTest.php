@@ -300,10 +300,10 @@ describe('Neuron Configuration', function () {
             expect($url)->toBe('http://localhost:11434/api');
         });
 
-        it('has llama2 as default ollama model', function () {
+        it('has llama3.3 as default ollama model', function () {
             $model = config('neuron.provider.ollama.model');
 
-            expect($model)->toBe('llama2');
+            expect($model)->toBe('llama3.3');
         });
 
         it('has openai as default embedding provider', function () {

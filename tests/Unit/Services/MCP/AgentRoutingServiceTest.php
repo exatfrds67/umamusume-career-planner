@@ -5,15 +5,31 @@ declare(strict_types=1);
 /**
  * @property App\Services\MCP\MCPClientService&Mockery\MockInterface $mcpClient
  * @property App\Services\MCP\CostManagementService&Mockery\MockInterface $costManager
+ * @property App\Services\AI\BedrockService&Mockery\MockInterface $bedrockService
  * @property App\Services\MCP\AgentRoutingService $service
  */
 
+use App\Services\AI\BedrockService;
 use App\Services\MCP\AgentRoutingService;
 use App\Services\MCP\CostManagementService;
 use App\Services\MCP\MCPClientService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
+use Mockery;
+
+function callProtectedMethod(object $service, string $method, array $args = []): mixed
+{
+    $caller = Closure::bind(
+        function (object $service, string $method, array $args): mixed {
+            return $service->{$method}(...$args);
+        },
+        null,
+        get_class($service)
+    );
+
+    return $caller($service, $method, $args);
+}
 
 // uses() removed - Pest handles this automatically
 
@@ -22,6 +38,8 @@ beforeEach(function () {
     $mcpClient = Mockery::mock(MCPClientService::class);
     /** @var CostManagementService&Mockery\MockInterface $costManager */
     $costManager = Mockery::mock(CostManagementService::class);
+    /** @var BedrockService&Mockery\MockInterface $bedrockService */
+    $bedrockService = Mockery::mock(BedrockService::class);
 
     // Set up default mock expectations for methods called during route validation
     $mcpClient->shouldReceive('isServerHealthy')
@@ -32,9 +50,15 @@ beforeEach(function () {
         ->andReturn(true)
         ->byDefault();
 
+    // Set up default mock expectations for BedrockService
+    $bedrockService->shouldReceive('isAvailable')
+        ->andReturn(true)
+        ->byDefault();
+
     $this->mcpClient = $mcpClient;
     $this->costManager = $costManager;
-    $this->service = new AgentRoutingService($this->mcpClient, $this->costManager);
+    $this->bedrockService = $bedrockService;
+    $this->service = new AgentRoutingService($this->mcpClient, $this->costManager, $this->bedrockService);
 
     // Clear cache before each test
     Cache::flush();
@@ -51,11 +75,7 @@ describe('Complexity Detection', function () {
             'context' => [],
         ];
 
-        $reflection = new ReflectionClass($this->service);
-        $method = $reflection->getMethod('detectComplexity');
-        $method->setAccessible(true);
-
-        $complexity = $method->invoke($this->service, $request);
+        $complexity = callProtectedMethod($this->service, 'detectComplexity', [$request]);
 
         expect($complexity)->toBe(AgentRoutingService::COMPLEXITY_SIMPLE);
     });
@@ -66,11 +86,7 @@ describe('Complexity Detection', function () {
             'context' => ['character' => 'test'],
         ];
 
-        $reflection = new ReflectionClass($this->service);
-        $method = $reflection->getMethod('detectComplexity');
-        $method->setAccessible(true);
-
-        $complexity = $method->invoke($this->service, $request);
+        $complexity = callProtectedMethod($this->service, 'detectComplexity', [$request]);
 
         expect($complexity)->toBe(AgentRoutingService::COMPLEXITY_MODERATE);
     });
@@ -82,11 +98,7 @@ describe('Complexity Detection', function () {
             'requires_rag' => true,
         ];
 
-        $reflection = new ReflectionClass($this->service);
-        $method = $reflection->getMethod('detectComplexity');
-        $method->setAccessible(true);
-
-        $complexity = $method->invoke($this->service, $request);
+        $complexity = callProtectedMethod($this->service, 'detectComplexity', [$request]);
 
         expect($complexity)->toBe(AgentRoutingService::COMPLEXITY_COMPLEX);
     });
@@ -98,11 +110,7 @@ describe('Complexity Detection', function () {
             'multi_step' => true,
         ];
 
-        $reflection = new ReflectionClass($this->service);
-        $method = $reflection->getMethod('detectComplexity');
-        $method->setAccessible(true);
-
-        $complexity = $method->invoke($this->service, $request);
+        $complexity = callProtectedMethod($this->service, 'detectComplexity', [$request]);
 
         expect($complexity)->toBe(AgentRoutingService::COMPLEXITY_SPECIALIZED);
     });
@@ -261,6 +269,34 @@ describe('Execution with Fallback', function () {
             ->and($result['fallback_used'])->toBeFalse()
             ->and($result['provider'])->toBe(AgentRoutingService::PROVIDER_OLLAMA);
     });
+
+    it('falls back to Ollama on provider failure when Ollama is available', function () {
+        Config::set('ai.ollama.default_model', 'llama3');
+        Config::set('ai.ollama.host', 'http://localhost:11434');
+
+        Http::fake([
+            'localhost:11434/api/tags' => Http::response(['models' => []], 200),
+        ]);
+
+        $fallback = callProtectedMethod($this->service, 'selectFallbackProvider', ['simple', 'provider_failure']);
+
+        expect($fallback['provider'])->toBe(AgentRoutingService::PROVIDER_OLLAMA)
+            ->and($fallback['reason'])->toContain('Budget');
+    });
+
+    it('falls back to Bedrock nova-lite when Ollama is unavailable on provider failure', function () {
+        Config::set('ai.ollama.host', 'http://localhost:11434');
+
+        // Ollama returns failure
+        Http::fake([
+            'localhost:11434/api/tags' => Http::response([], 500),
+        ]);
+
+        $fallback = callProtectedMethod($this->service, 'selectFallbackProvider', ['simple', 'provider_failure']);
+
+        expect($fallback['provider'])->toBe(AgentRoutingService::PROVIDER_BEDROCK)
+            ->and($fallback['model'])->toBe('amazon.nova-lite-v1:0');
+    });
 });
 
 describe('Token Estimation', function () {
@@ -268,11 +304,7 @@ describe('Token Estimation', function () {
         $text = str_repeat('word ', 100); // ~400 characters
         $context = ['key' => 'value'];
 
-        $reflection = new ReflectionClass($this->service);
-        $method = $reflection->getMethod('estimateTokenCount');
-        $method->setAccessible(true);
-
-        $tokens = $method->invoke($this->service, $text, $context);
+        $tokens = callProtectedMethod($this->service, 'estimateTokenCount', [$text, $context]);
 
         expect($tokens)->toBeGreaterThan(0)
             ->and($tokens)->toBeLessThan(200); // Rough estimate
@@ -292,20 +324,28 @@ describe('Routing Analytics', function () {
 
 describe('Performance Thresholds', function () {
     it('checks performance acceptability correctly', function () {
-        $reflection = new ReflectionClass($this->service);
-        $method = $reflection->getMethod('isPerformanceAcceptable');
-        $method->setAccessible(true);
-
         // Ollama should be fast
-        $acceptable = $method->invoke($this->service, AgentRoutingService::PROVIDER_OLLAMA, 5.0);
+        $acceptable = callProtectedMethod(
+            $this->service,
+            'isPerformanceAcceptable',
+            [AgentRoutingService::PROVIDER_OLLAMA, 5.0]
+        );
         expect($acceptable)->toBeTrue();
 
         // Ollama too slow
-        $notAcceptable = $method->invoke($this->service, AgentRoutingService::PROVIDER_OLLAMA, 20.0);
+        $notAcceptable = callProtectedMethod(
+            $this->service,
+            'isPerformanceAcceptable',
+            [AgentRoutingService::PROVIDER_OLLAMA, 20.0]
+        );
         expect($notAcceptable)->toBeFalse();
 
         // Bedrock acceptable
-        $acceptable = $method->invoke($this->service, AgentRoutingService::PROVIDER_BEDROCK, 25.0);
+        $acceptable = callProtectedMethod(
+            $this->service,
+            'isPerformanceAcceptable',
+            [AgentRoutingService::PROVIDER_BEDROCK, 25.0]
+        );
         expect($acceptable)->toBeTrue();
     });
 });
