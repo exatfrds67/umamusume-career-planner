@@ -32,14 +32,15 @@ class TrainingController extends Controller
         $this->authorize('view', $character);
 
         $predictions = $this->predictionService->getPredictions($character);
+        /** @var array<string, array{base_gains?: array<string, int>, final_gains?: array<string, int>}> $facilitiesData */
         $facilitiesData = $predictions['predictions'] ?? [];
 
         $trainingData = [];
         foreach ($facilitiesData as $type => $prediction) {
             $trainingData[$type] = [
                 'gains' => $prediction['final_gains'] ?? $prediction['base_gains'] ?? [],
-                'failure_rate' => $this->calculateFailureRate($character, $type),
-                'energy_cost' => $this->getEnergyCost($type),
+                'failure_rate' => $this->calculateFailureRate($character, (string) $type),
+                'energy_cost' => $this->getEnergyCost((string) $type),
             ];
         }
 
@@ -61,9 +62,12 @@ class TrainingController extends Controller
         ]);
 
         $predictions = $this->predictionService->getPredictions($character);
+        /** @var array<string, array{base_gains?: array<string, int>, final_gains?: array<string, int>}> $facilitiesData */
         $facilitiesData = $predictions['predictions'] ?? [];
+        /** @var array{base_gains?: array<string, int>, final_gains?: array<string, int>}|null $prediction */
         $prediction = $facilitiesData[$validated['training_type']] ?? null;
 
+        /** @var array<string, int> $gains */
         $gains = $prediction['final_gains'] ?? $prediction['base_gains'] ?? [];
 
         $result = $this->trainingService->executeTraining(

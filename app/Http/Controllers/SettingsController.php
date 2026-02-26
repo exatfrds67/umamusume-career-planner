@@ -54,22 +54,22 @@ class SettingsController extends Controller
 
         if (isset($validated['preferences'])) {
             $existing = $user->preferences ? $user->preferences->getArrayCopy() : [];
-            $updateData['preferences'] = array_merge($existing, $validated['preferences']);
+            $updateData['preferences'] = array_merge($existing, (array) $validated['preferences']);
         }
 
         if (isset($validated['ai_settings'])) {
             $existing = $user->ai_settings ? $user->ai_settings->getArrayCopy() : [];
-            $updateData['ai_settings'] = array_merge($existing, $validated['ai_settings']);
+            $updateData['ai_settings'] = array_merge($existing, (array) $validated['ai_settings']);
         }
 
         if (isset($validated['accessibility_settings'])) {
             $existing = $user->accessibility_settings ? $user->accessibility_settings->getArrayCopy() : [];
-            $updateData['accessibility_settings'] = array_merge($existing, $validated['accessibility_settings']);
+            $updateData['accessibility_settings'] = array_merge($existing, (array) $validated['accessibility_settings']);
         }
 
         if (isset($validated['notification_preferences'])) {
             $existing = $user->notification_preferences ? $user->notification_preferences->getArrayCopy() : [];
-            $updateData['notification_preferences'] = array_merge($existing, $validated['notification_preferences']);
+            $updateData['notification_preferences'] = array_merge($existing, (array) $validated['notification_preferences']);
         }
 
         $user->update($updateData);
@@ -106,7 +106,13 @@ class SettingsController extends Controller
     public function exportData(Request $request): JsonResponse
     {
         /** @var User $user */
-        $user = $request->user()->load(['userPreferences']);
+        $user = $request->user();
+
+        if ($user === null) {
+            abort(401);
+        }
+
+        $user->load(['userPreferences']);
 
         $data = [
             'schema_version' => '1.0',

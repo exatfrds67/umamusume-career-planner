@@ -693,12 +693,15 @@ class AIChatController extends Controller
         return response()->json(['success' => true]);
     }
 
+    /**
+     * @param  array<string, mixed>  $response
+     */
     private function logConversation(
         int $userId,
         ?int $characterId,
         ?string $conversationId,
         string $message,
-        array $response
+        array $response = []
     ): void {
         try {
             \App\Models\AIConversation::create([
