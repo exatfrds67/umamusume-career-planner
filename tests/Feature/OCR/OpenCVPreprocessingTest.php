@@ -237,6 +237,7 @@ describe('OpenCVPreprocessingService', function (): void {
         if ($result['processed_path'] !== null && file_exists($result['processed_path'])) {
             $imageInfo = getimagesize($result['processed_path']);
             expect($imageInfo)->not->toBeFalse();
+            assert(is_array($imageInfo));
             expect($imageInfo[0])->toBeGreaterThan(0);
             expect($imageInfo[1])->toBeGreaterThan(0);
         }

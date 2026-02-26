@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Mockery;
 
+/** @param array<mixed> $args */
 function callProtectedMethod(object $service, string $method, array $args = []): mixed
 {
     $caller = Closure::bind(

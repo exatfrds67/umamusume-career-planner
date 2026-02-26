@@ -161,6 +161,7 @@ describe('Property 27: Authorization Enforcement', function (): void {
                     'name' => fake()->name(),
                 ]),
                 'delete' => $this->deleteJson("/api/characters/{$otherCharacter->id}"),
+                default => $this->getJson("/api/characters/{$otherCharacter->id}"),
             };
 
             $response->assertForbidden();
