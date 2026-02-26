@@ -16,8 +16,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $user_id
  * @property int $turn_number
  * @property string $prediction_type
- * @property array $predicted_value
- * @property array|null $actual_value
+ * @property array<string, mixed> $predicted_value
+ * @property array<string, mixed>|null $actual_value
  * @property float $confidence_score
  * @property float|null $accuracy_score
  * @property string $model_version
@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class TrainingPrediction extends Model
 {
+    /** @use HasFactory<\Database\Factories\TrainingPredictionFactory> */
     use HasFactory;
 
     protected $table = 'ucp_training_predictions';
@@ -59,11 +60,17 @@ class TrainingPrediction extends Model
         ];
     }
 
+    /**
+     * @return BelongsTo<Career, TrainingPrediction>
+     */
     public function career(): BelongsTo
     {
         return $this->belongsTo(Career::class);
     }
 
+    /**
+     * @return BelongsTo<User, TrainingPrediction>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

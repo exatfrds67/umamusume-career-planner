@@ -26,6 +26,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @property \ArrayObject<string, mixed> $accessibility_settings
  * @property \ArrayObject<string, mixed> $ai_settings
  * @property \ArrayObject<string, mixed> $mcp_settings
+ * @property \ArrayObject<string, mixed> $notification_preferences
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $email_verified_at
