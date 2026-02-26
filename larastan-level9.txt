@@ -1,6 +1,1173 @@
 Note: Using configuration file C:\XAMPP\htdocs\umamusume-career-planner\phpstan.neon.
-   0/709 [>---------------------------]   0%[1G[2K 709/709 [============================] 100%
+ ------ ------------------------------------------------------------------ 
+  Line   app\Console\Commands\RunTraversalTestCommand.php                  
+ ------ ------------------------------------------------------------------ 
+  :47    Parameter #1 $scope of method                                     
+         App\Console\Commands\RunTraversalTestCommand::buildTestCommand()  
+         expects string, string|null given.                                
+         ≡ƒ¬¬  argument.type                                                 
+  :47    Parameter #2 $headless of method                                  
+         App\Console\Commands\RunTraversalTestCommand::buildTestCommand()  
+         expects string, string|null given.                                
+         ≡ƒ¬¬  argument.type                                                 
+ ------ ------------------------------------------------------------------ 
 
+ ------ ----------------------------------------------------------------------- 
+  Line   app\Http\Controllers\AIChatController.php                              
+ ------ ----------------------------------------------------------------------- 
+  :696   Method App\Http\Controllers\AIChatController::logConversation() has    
+         parameter $response with no value type specified in iterable type      
+         array.                                                                 
+         ≡ƒ¬¬  missingType.iterableValue                                          
+         ≡ƒÆí  See:                                                               
+         https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-i  
+         terable-type                                                           
+ ------ ----------------------------------------------------------------------- 
 
- [OK] No errors                                                                
+ ------ ---------------------------------------------------------------------- 
+  Line   app\Http\Controllers\SettingsController.php                           
+ ------ ---------------------------------------------------------------------- 
+  :57    Parameter #2 ...$arrays of function array_merge expects array, mixed  
+         given.                                                                
+         ≡ƒ¬¬  argument.type                                                     
+  :62    Parameter #2 ...$arrays of function array_merge expects array, mixed  
+         given.                                                                
+         ≡ƒ¬¬  argument.type                                                     
+  :67    Parameter #2 ...$arrays of function array_merge expects array, mixed  
+         given.                                                                
+         ≡ƒ¬¬  argument.type                                                     
+  :71    Cannot call method getArrayCopy() on string.                          
+         ≡ƒ¬¬  method.nonObject                                                  
+  :72    Parameter #2 ...$arrays of function array_merge expects array, mixed  
+         given.                                                                
+         ≡ƒ¬¬  argument.type                                                     
+  :109   Cannot call method load() on App\Models\User|null.                    
+         ≡ƒ¬¬  method.nonObject                                                  
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app\Http\Controllers\TrainingController.php                            
+ ------ ----------------------------------------------------------------------- 
+  :38    Argument of an invalid type mixed supplied for foreach, only           
+         iterables are supported.                                               
+         ≡ƒ¬¬  foreach.nonIterable                                                
+  :39    Possibly invalid array key type mixed.                                 
+         ≡ƒ¬¬  offsetAccess.invalidOffset                                         
+  :40    Cannot access offset 'base_gains' on mixed.                            
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                   
+  :40    Cannot access offset 'final_gains' on mixed.                           
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                   
+  :41    Parameter #2 $trainingType of method                                   
+         App\Http\Controllers\TrainingController::calculateFailureRate()        
+         expects string, mixed given.                                           
+         ≡ƒ¬¬  argument.type                                                      
+  :42    Parameter #1 $trainingType of method                                   
+         App\Http\Controllers\TrainingController::getEnergyCost() expects       
+         string, mixed given.                                                   
+         ≡ƒ¬¬  argument.type                                                      
+  :65    Cannot access offset mixed on mixed.                                   
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                   
+  :67    Cannot access offset 'base_gains' on mixed.                            
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                   
+  :67    Cannot access offset 'final_gains' on mixed.                           
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                   
+  :72    Parameter #3 $actualGains of method                                    
+         App\Services\TrainingService::executeTraining() expects array<string,  
+          int>, mixed given.                                                    
+         ≡ƒ¬¬  argument.type                                                      
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  Line   app\Livewire\Analytics\PatternDashboard.php                           
+ ------ ---------------------------------------------------------------------- 
+  :63    Property App\Livewire\Analytics\PatternDashboard::$selectedCareerIds  
+         (array<int, int>) does not accept array<mixed>.                       
+         ≡ƒ¬¬  assign.propertyType                                               
+  :121   Using nullsafe property access "?->name" on left side of ?? is        
+         unnecessary. Use -> instead.                                          
+         ≡ƒ¬¬  nullsafe.neverNull                                                
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app\Livewire\Privacy\PrivacyDashboard.php                              
+ ------ ----------------------------------------------------------------------- 
+  :37    Parameter #1 $user of method                                           
+         App\Services\Privacy\ConsentManagementService::getConsentStatus()      
+         expects App\Models\User, App\Models\User|null given.                   
+         ≡ƒ¬¬  argument.type                                                      
+  :56    Parameter #1 $user of method                                           
+         App\Services\Privacy\ConsentManagementService::revokeConsent()         
+         expects App\Models\User, App\Models\User|null given.                   
+         ≡ƒ¬¬  argument.type                                                      
+  :59    Parameter #1 $user of method                                           
+         App\Services\Privacy\ConsentManagementService::grantConsent() expects  
+         App\Models\User, App\Models\User|null given.                           
+         ≡ƒ¬¬  argument.type                                                      
+  :72    Parameter #1 $user of method                                           
+         App\Services\Privacy\DataExportService::generateExportFile() expects   
+         App\Models\User, App\Models\User|null given.                           
+         ≡ƒ¬¬  argument.type                                                      
+  :116   Parameter #1 $user of method                                           
+         App\Services\Privacy\DataDeletionService::hasPendingDeletion()         
+         expects App\Models\User, App\Models\User|null given.                   
+         ≡ƒ¬¬  argument.type                                                      
+  :123   Parameter #1 $user of method                                           
+         App\Services\Privacy\DataDeletionService::requestDeletion() expects    
+         App\Models\User, App\Models\User|null given.                           
+         ≡ƒ¬¬  argument.type                                                      
+  :138   Parameter #1 $user of method                                           
+         App\Services\Privacy\DataDeletionService::getActiveDeletionRequest()   
+         expects App\Models\User, App\Models\User|null given.                   
+         ≡ƒ¬¬  argument.type                                                      
+  :155   Parameter #1 $user of method                                           
+         App\Services\Privacy\DataDeletionService::getActiveDeletionRequest()   
+         expects App\Models\User, App\Models\User|null given.                   
+         ≡ƒ¬¬  argument.type                                                      
+  :157   Cannot access property $id on App\Models\User|null.                    
+         ≡ƒ¬¬  property.nonObject                                                 
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app\Livewire\Settings\AccessibilitySettings.php                        
+ ------ ----------------------------------------------------------------------- 
+  :47    Cannot cast mixed to string.                                           
+         ≡ƒ¬¬  cast.string                                                        
+  :50    Cannot cast mixed to string.                                           
+         ≡ƒ¬¬  cast.string                                                        
+  :95    Property App\Models\User::$accessibility_settings (ArrayObject<string  
+         , mixed>) does not accept array{reduced_motion: bool, high_contrast:   
+         bool, font_size: string, focus_indicators: bool,                       
+         screen_reader_optimization: bool, color_blind_mode: string}.           
+         ≡ƒ¬¬  assign.propertyType                                                
+ ------ ----------------------------------------------------------------------- 
+
+ ------ --------------------------------------------------------------------- 
+  Line   app\Models\PushSubscription.php                                      
+ ------ --------------------------------------------------------------------- 
+  :31    Method App\Models\PushSubscription::user() return type with generic  
+         class Illuminate\Database\Eloquent\Relations\BelongsTo does not      
+         specify its types: TRelatedModel, TDeclaringModel                    
+         ≡ƒ¬¬  missingType.generics                                             
+ ------ --------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app\Models\TrainingPrediction.php                                      
+ ------ ----------------------------------------------------------------------- 
+  :27    Class App\Models\TrainingPrediction has PHPDoc tag @property for       
+         property $actual_value with no value type specified in iterable type   
+         array.                                                                 
+         ≡ƒ¬¬  missingType.iterableValue                                          
+         ≡ƒÆí  See:                                                               
+         https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-i  
+         terable-type                                                           
+  :27    Class App\Models\TrainingPrediction has PHPDoc tag @property for       
+         property $predicted_value with no value type specified in iterable     
+         type array.                                                            
+         ≡ƒ¬¬  missingType.iterableValue                                          
+         ≡ƒÆí  See:                                                               
+         https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-i  
+         terable-type                                                           
+  :29    Class App\Models\TrainingPrediction uses generic trait                 
+         Illuminate\Database\Eloquent\Factories\HasFactory but does not         
+         specify its types: TFactory                                            
+         ≡ƒ¬¬  missingType.generics                                               
+  :62    Method App\Models\TrainingPrediction::career() return type with        
+         generic class Illuminate\Database\Eloquent\Relations\BelongsTo does    
+         not specify its types: TRelatedModel, TDeclaringModel                  
+         ≡ƒ¬¬  missingType.generics                                               
+  :67    Method App\Models\TrainingPrediction::user() return type with generic  
+         class Illuminate\Database\Eloquent\Relations\BelongsTo does not        
+         specify its types: TRelatedModel, TDeclaringModel                      
+         ≡ƒ¬¬  missingType.generics                                               
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app\Notifications\DeletionConfirmationNotification.php                 
+ ------ ----------------------------------------------------------------------- 
+  :39    Access to an undefined property object::$name.                         
+         ≡ƒ¬¬  property.notFound                                                  
+         ≡ƒÆí  Learn more: https://phpstan.org/blog/solving-phpstan-access-to-und  
+         efined-property                                                        
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app\Services\AI\ABTestingService.php                                   
+ ------ ----------------------------------------------------------------------- 
+  :58    Method App\Services\AI\ABTestingService::routeTraffic() should return  
+         string but returns mixed.                                              
+         ≡ƒ¬¬  return.type                                                        
+  :61    Binary operation "*" between mixed and 100 results in an error.        
+         ≡ƒ¬¬  binaryOp.invalid                                                   
+  :61    Method App\Services\AI\ABTestingService::routeTraffic() should return  
+         string but returns mixed.                                              
+         ≡ƒ¬¬  return.type                                                        
+  :85    Parameter #1 $modelVersion of method                                   
+         App\Services\AI\ABTestingService::getVariantAccuracy() expects         
+         string, mixed given.                                                   
+         ≡ƒ¬¬  argument.type                                                      
+  :86    Parameter #1 $modelVersion of method                                   
+         App\Services\AI\ABTestingService::getVariantAccuracy() expects         
+         string, mixed given.                                                   
+         ≡ƒ¬¬  argument.type                                                      
+  :88    Parameter #1 $modelVersion of method                                   
+         App\Services\AI\ABTestingService::getVariantSampleCount() expects      
+         string, mixed given.                                                   
+         ≡ƒ¬¬  argument.type                                                      
+  :89    Parameter #1 $modelVersion of method                                   
+         App\Services\AI\ABTestingService::getVariantSampleCount() expects      
+         string, mixed given.                                                   
+         ≡ƒ¬¬  argument.type                                                      
+  :108   Part $winner (mixed) of encapsed string cannot be cast to string.      
+         ≡ƒ¬¬  encapsedStringPart.nonString                                       
+  :110   Method App\Services\AI\ABTestingService::evaluateTest() should return  
+         array{winner: string|null, variant_a_accuracy: float,                  
+         variant_b_accuracy: float, should_rollback: bool, evaluation: string}  
+         but returns array{winner: mixed, variant_a_accuracy: float,            
+         variant_b_accuracy: float, should_rollback: bool, evaluation:          
+         non-falsy-string}.                                                     
+         ≡ƒ¬¬  return.type                                                        
+         ≡ƒÆí  Offset 'winner' (string|null) does not accept type mixed.          
+  :151   Method App\Services\AI\ABTestingService::getTest() should return       
+         array<string, mixed>|null but returns mixed.                           
+         ≡ƒ¬¬  return.type                                                        
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app\Services\AI\AIDashboardService.php                                 
+ ------ ----------------------------------------------------------------------- 
+  :507   Parameter #1 $conversations of method                                  
+         App\Services\AI\AIDashboardService::calculateAverageConfidenceFromCon  
+         versations() expects Illuminate\Support\Collection<int, App\Models\AI  
+         Conversation>, Illuminate\Database\Eloquent\Collection<int, App\Model  
+         s\ConversationMessage> given.                                          
+         ≡ƒ¬¬  argument.type                                                      
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------ 
+  Line   app\Services\AI\BedrockService.php                                
+ ------ ------------------------------------------------------------------ 
+  :430   Call to an undefined method                                       
+         Aws\BedrockRuntime\BedrockRuntimeClient::listFoundationModels().  
+         ≡ƒ¬¬  method.notFound                                               
+ ------ ------------------------------------------------------------------ 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app\Services\AI\ModelRetrainingService.php                             
+ ------ ----------------------------------------------------------------------- 
+  :65    Method App\Services\AI\ModelRetrainingService::recordActualResult()    
+         should return App\Models\TrainingPrediction but returns                
+         App\Models\TrainingPrediction|null.                                    
+         ≡ƒ¬¬  return.type                                                        
+  :85    Parameter #1 $num of function abs expects float|int, float|int|string  
+         given.                                                                 
+         ≡ƒ¬¬  argument.type                                                      
+  :85    Parameter #1 $num of function abs expects float|int, float|int|string  
+         given.                                                                 
+         ≡ƒ¬¬  argument.type                                                      
+  :236   Possibly invalid array key type mixed.                                 
+         ≡ƒ¬¬  offsetAccess.invalidOffset                                         
+  :239   Parameter #2 $predictionType of method                                 
+         App\Services\AI\ModelRetrainingService::calculateRMSE() expects        
+         string|null, mixed given.                                              
+         ≡ƒ¬¬  argument.type                                                      
+  :240   Parameter #2 $predictionType of method                                 
+         App\Services\AI\ModelRetrainingService::calculateMAE() expects         
+         string|null, mixed given.                                              
+         ≡ƒ¬¬  argument.type                                                      
+  :275   Method                                                                 
+         App\Services\AI\ModelRetrainingService::getActiveModelVersion()        
+         should return string but returns mixed.                                
+         ≡ƒ¬¬  return.type                                                        
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app\Services\Analytics\CareerComparisonAnalyticsService.php            
+ ------ ----------------------------------------------------------------------- 
+  :25    Method                                                                 
+         App\Services\Analytics\CareerComparisonAnalyticsService::generatePara  
+         llelCoordinatesData() should return array{axes: array<int, string>, s  
+         eries: array<int, array{career_id: int, career_name: string, values:   
+         array<string, float>, color: string}>} but returns array{axes: array{  
+         'speed', 'stamina', 'power', 'guts', 'wit', 'sp', 'turns'}, series:    
+         array<mixed>}.                                                         
+         ≡ƒ¬¬  return.type                                                        
+         ≡ƒÆí  Offset 'series' (array<int, array{career_id: int, career_name:     
+         string, values: array<string, float>, color: string}>) does not accep  
+         t type array<mixed>.                                                   
+  :78    Method                                                                 
+         App\Services\Analytics\CareerComparisonAnalyticsService::identifyDive  
+         rgencePoints() should return array{divergence_points: array<int,       
+         array{turn: int, stat: string, careers: array<int, array{career_id: i  
+         nt, value: float}>, magnitude: float}>, summary: array{earliest_diver  
+         gence: int|null, most_divergent_stat: string|null, max_magnitude:      
+         float}} but returns array{divergence_points: list<array{turn: int,     
+         stat: 'guts'|'power'|'speed'|'stamina'|'wit', careers: array<mixed>,   
+         magnitude: float}>, summary: array{earliest_divergence: int|null,      
+         most_divergent_stat: 'guts'|'power'|'speed'|'stamina'|'wit'|null,      
+         max_magnitude: 0|float}}.                                              
+         ≡ƒ¬¬  return.type                                                        
+         ≡ƒÆí  Offset 'divergence_points' (array<int, array{turn: int, stat:      
+         string, careers: array<int, array{career_id: int, value: float}>, mag  
+         nitude: float}>) does not accept type list<array{turn: int, stat:      
+         'guts'|'power'|'speed'|'stamina'|'wit', careers: array<mixed>, magnit  
+         ude: float}>: Offset 'careers' (array<int, array{career_id: int, valu  
+         e: float}>) does not accept type array<mixed>.                         
+  :90    Binary operation "-" between mixed and mixed results in an error.      
+         ≡ƒ¬¬  binaryOp.invalid                                                   
+  :187   Using nullsafe property access "?->career_name" on left side of ?? is  
+         unnecessary. Use -> instead.                                           
+         ≡ƒ¬¬  nullsafe.neverNull                                                 
+  :251   Parameter #1 $num of function round expects float|int, float|int|null  
+         given.                                                                 
+         ≡ƒ¬¬  argument.type                                                      
+  :252   Parameter #1 $values of method                                         
+         App\Services\Analytics\CareerComparisonAnalyticsService::standardDevi  
+         ation() expects array<int, float|int>, array<mixed> given.             
+         ≡ƒ¬¬  argument.type                                                      
+  :255   Method                                                                 
+         App\Services\Analytics\CareerComparisonAnalyticsService::calculateCom  
+         parisonSummary() should return array{careers: array<int, array{id:     
+         int, name: string, total_stats: int, stats: array<string, int>, rank:  
+          int}>, averages: array<string, float>, std_deviations: array<string,  
+          float>} but returns array{careers: array<mixed>, averages: non-empty  
+         -array<'guts'|'power'|'speed'|'stamina'|'wit', float>,                 
+         std_deviations:                                                        
+         non-empty-array<'guts'|'power'|'speed'|'stamina'|'wit', float>}.       
+         ≡ƒ¬¬  return.type                                                        
+         ≡ƒÆí  Offset 'careers' (array<int, array{id: int, name: string,          
+         total_stats: int, stats: array<string, int>, rank: int}>) does not ac  
+         cept type array<mixed>.                                                
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app\Services\Analytics\PatternRecognitionService.php                   
+ ------ ----------------------------------------------------------------------- 
+  :56    Method                                                                 
+         App\Services\Analytics\PatternRecognitionService::extractStatVectors(  
+         ) should return Illuminate\Support\Collection<int, array{id: int,      
+         vector: array<string, float>}> but returns Illuminate\Support\Collect  
+         ion<int, array{id: int, vector: array{speed: float, stamina: float, p  
+         ower: float, guts: float, wit: float}}>.                               
+         ≡ƒ¬¬  return.type                                                        
+         ≡ƒÆí  Template type TValue on class Illuminate\Support\Collection is not  
+         covariant. Learn more: https://phpstan.org/blog/whats-up-with-templat  
+         e-covariant                                                            
+  :98    Offset 'id' might not exist on array{id: int, vector: array<string, f  
+         loat>}|null.                                                           
+         ≡ƒ¬¬  offsetAccess.notFound                                              
+  :126   Offset 'vector' might not exist on array{id: int, vector: array<strin  
+         g, float>}|null.                                                       
+         ≡ƒ¬¬  offsetAccess.notFound                                              
+  :141   Offset 'vector' might not exist on array{id: int, vector: array<strin  
+         g, float>}|null.                                                       
+         ≡ƒ¬¬  offsetAccess.notFound                                              
+  :146   Binary operation "*" between (float|int) and mixed results in an       
+         error.                                                                 
+         ≡ƒ¬¬  binaryOp.invalid                                                   
+  :151   Offset 'vector' might not exist on array{id: int, vector: array<strin  
+         g, float>}|null.                                                       
+         ≡ƒ¬¬  offsetAccess.notFound                                              
+  :205   Offset 'vector' might not exist on array{id: int, vector: array<strin  
+         g, float>}|null.                                                       
+         ≡ƒ¬¬  offsetAccess.notFound                                              
+  :220   Method                                                                 
+         App\Services\Analytics\PatternRecognitionService::recalculateCentroid  
+         s() should return array<int, array<string, float>> but returns array<  
+         int<0, max>, array<string, float|int|null>>.                           
+         ≡ƒ¬¬  return.type                                                        
+  :293   Method                                                                 
+         App\Services\Analytics\PatternRecognitionService::buildTransactions()  
+         should return array<int, array<int, string>> but returns array<mixed>  
+         .                                                                      
+         ≡ƒ¬¬  return.type                                                        
+  :513   Method                                                                 
+         App\Services\Analytics\PatternRecognitionService::identifyTrainingPat  
+         terns() should return array{dominant_training_types: array<string, in  
+         t>, phase_patterns: array<string, array<string, int>>, efficiency_by_  
+         type: array<string, float>} but returns array{dominant_training_types  
+         : array<mixed>, phase_patterns: array<mixed>, efficiency_by_type: arr  
+         ay<mixed>}.                                                            
+         ≡ƒ¬¬  return.type                                                        
+         ≡ƒÆí  Offset 'dominant_training_types' (array<string, int>) does not acc  
+         ept type array<mixed>.                                                 
+         ≡ƒÆí  Offset 'phase_patterns' (array<string, array<string, int>>) does n  
+         ot accept type array<mixed>.                                           
+         ≡ƒÆí  Offset 'efficiency_by_type' (array<string, float>) does not accept  
+          type array<mixed>.                                                    
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app\Services\Export\ExcelExportService.php                             
+ ------ ----------------------------------------------------------------------- 
+  :79    Using nullsafe property access "?->name" on left side of ?? is         
+         unnecessary. Use -> instead.                                           
+         ≡ƒ¬¬  nullsafe.neverNull                                                 
+  :137   Method App\Services\Export\ExcelExportService::buildTrainingSheet()    
+         should return array{headers: array<int, string>, rows: array<int, arr  
+         ay<int, mixed>>} but returns array{headers: array{'Turn', 'Phase', 'T  
+         ype', 'SPD', 'STA', 'POW', 'GUT', 'WIT', ...}, rows: array<mixed>}.    
+         ≡ƒ¬¬  return.type                                                        
+         ≡ƒÆí  Offset 'rows' (array<int, array<int, mixed>>) does not accept type  
+          array<mixed>.                                                         
+  :160   Method App\Services\Export\ExcelExportService::buildRacesSheet()       
+         should return array{headers: array<int, string>, rows: array<int, arr  
+         ay<int, mixed>>} but returns array{headers: array{'Turn', 'Race Name'  
+         , 'Position', 'Grade'}, rows: array<mixed>}.                           
+         ≡ƒ¬¬  return.type                                                        
+         ≡ƒÆí  Offset 'rows' (array<int, array<int, mixed>>) does not accept type  
+          array<mixed>.                                                         
+  :183   Method App\Services\Export\ExcelExportService::buildSkillsSheet()      
+         should return array{headers: array<int, string>, rows: array<int, arr  
+         ay<int, mixed>>} but returns array{headers: array{'Skill Name', 'SP C  
+         ost', 'Acquired Turn', 'Status'}, rows: array<mixed>}.                 
+         ≡ƒ¬¬  return.type                                                        
+         ≡ƒÆí  Offset 'rows' (array<int, array<int, mixed>>) does not accept type  
+          array<mixed>.                                                         
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app\Services\Export\PDFExportService.php                               
+ ------ ----------------------------------------------------------------------- 
+  :29    Using nullsafe property access "?->name" on left side of ?? is         
+         unnecessary. Use -> instead.                                           
+         ≡ƒ¬¬  nullsafe.neverNull                                                 
+  :70    Using nullsafe property access "?->name" on left side of ?? is         
+         unnecessary. Use -> instead.                                           
+         ≡ƒ¬¬  nullsafe.neverNull                                                 
+  :132   Method App\Services\Export\PDFExportService::formatTrainingHistory()   
+         should return array<int, array{turn: int, type: string|null, speed: i  
+         nt, stamina: int, power: int, guts: int, wit: int}> but returns array  
+         <mixed>.                                                               
+         ≡ƒ¬¬  return.type                                                        
+  :154   Method App\Services\Export\PDFExportService::formatRaceHistory()       
+         should return array<int, array{name: string|null, position: int|null,  
+          turn: int|null}> but returns array<mixed>.                            
+         ≡ƒ¬¬  return.type                                                        
+  :172   Parameter #1 $value of function e expects                              
+         BackedEnum|float|Illuminate\Contracts\Support\DeferringDisplayableVal  
+         ue|Illuminate\Contracts\Support\Htmlable|int|string|null, mixed        
+         given.                                                                 
+         ≡ƒ¬¬  argument.type                                                      
+  :184   Parameter #1 $value of function e expects                              
+         BackedEnum|float|Illuminate\Contracts\Support\DeferringDisplayableVal  
+         ue|Illuminate\Contracts\Support\Htmlable|int|string|null, mixed        
+         given.                                                                 
+         ≡ƒ¬¬  argument.type                                                      
+  :188   Argument of an invalid type mixed supplied for foreach, only           
+         iterables are supported.                                               
+         ≡ƒ¬¬  foreach.nonIterable                                                
+  :189   Parameter #1 $value of function e expects                              
+         BackedEnum|float|Illuminate\Contracts\Support\DeferringDisplayableVal  
+         ue|Illuminate\Contracts\Support\Htmlable|int|string|null, mixed        
+         given.                                                                 
+         ≡ƒ¬¬  argument.type                                                      
+  :189   Parameter #3 $subject of function str_replace expects array<string>|s  
+         tring, mixed given.                                                    
+         ≡ƒ¬¬  argument.type                                                      
+  :196   Argument of an invalid type mixed supplied for foreach, only           
+         iterables are supported.                                               
+         ≡ƒ¬¬  foreach.nonIterable                                                
+  :197   Parameter #1 $value of function e expects                              
+         BackedEnum|float|Illuminate\Contracts\Support\DeferringDisplayableVal  
+         ue|Illuminate\Contracts\Support\Htmlable|int|string|null, mixed        
+         given.                                                                 
+         ≡ƒ¬¬  argument.type                                                      
+  :198   Parameter #1 $value of function e expects                              
+         BackedEnum|float|Illuminate\Contracts\Support\DeferringDisplayableVal  
+         ue|Illuminate\Contracts\Support\Htmlable|int|string|null, mixed        
+         given.                                                                 
+         ≡ƒ¬¬  argument.type                                                      
+  :206   Argument of an invalid type mixed supplied for foreach, only           
+         iterables are supported.                                               
+         ≡ƒ¬¬  foreach.nonIterable                                                
+  :208   Cannot access offset 'turn' on mixed.                                  
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                   
+  :208   Parameter #1 $value of function e expects                              
+         BackedEnum|float|Illuminate\Contracts\Support\DeferringDisplayableVal  
+         ue|Illuminate\Contracts\Support\Htmlable|int|string|null, mixed        
+         given.                                                                 
+         ≡ƒ¬¬  argument.type                                                      
+  :209   Cannot access offset 'type' on mixed.                                  
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                   
+  :209   Parameter #1 $value of function e expects                              
+         BackedEnum|float|Illuminate\Contracts\Support\DeferringDisplayableVal  
+         ue|Illuminate\Contracts\Support\Htmlable|int|string|null, mixed        
+         given.                                                                 
+         ≡ƒ¬¬  argument.type                                                      
+  :210   Cannot access offset 'speed' on mixed.                                 
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                   
+  :210   Parameter #1 $value of function e expects                              
+         BackedEnum|float|Illuminate\Contracts\Support\DeferringDisplayableVal  
+         ue|Illuminate\Contracts\Support\Htmlable|int|string|null, mixed        
+         given.                                                                 
+         ≡ƒ¬¬  argument.type                                                      
+  :211   Cannot access offset 'stamina' on mixed.                               
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                   
+  :211   Parameter #1 $value of function e expects                              
+         BackedEnum|float|Illuminate\Contracts\Support\DeferringDisplayableVal  
+         ue|Illuminate\Contracts\Support\Htmlable|int|string|null, mixed        
+         given.                                                                 
+         ≡ƒ¬¬  argument.type                                                      
+  :212   Cannot access offset 'power' on mixed.                                 
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                   
+  :212   Parameter #1 $value of function e expects                              
+         BackedEnum|float|Illuminate\Contracts\Support\DeferringDisplayableVal  
+         ue|Illuminate\Contracts\Support\Htmlable|int|string|null, mixed        
+         given.                                                                 
+         ≡ƒ¬¬  argument.type                                                      
+  :213   Cannot access offset 'guts' on mixed.                                  
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                   
+  :213   Parameter #1 $value of function e expects                              
+         BackedEnum|float|Illuminate\Contracts\Support\DeferringDisplayableVal  
+         ue|Illuminate\Contracts\Support\Htmlable|int|string|null, mixed        
+         given.                                                                 
+         ≡ƒ¬¬  argument.type                                                      
+  :214   Cannot access offset 'wit' on mixed.                                   
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                   
+  :214   Parameter #1 $value of function e expects                              
+         BackedEnum|float|Illuminate\Contracts\Support\DeferringDisplayableVal  
+         ue|Illuminate\Contracts\Support\Htmlable|int|string|null, mixed        
+         given.                                                                 
+         ≡ƒ¬¬  argument.type                                                      
+  :223   Argument of an invalid type mixed supplied for foreach, only           
+         iterables are supported.                                               
+         ≡ƒ¬¬  foreach.nonIterable                                                
+  :225   Cannot access offset 'name' on mixed.                                  
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                   
+  :225   Parameter #1 $value of function e expects                              
+         BackedEnum|float|Illuminate\Contracts\Support\DeferringDisplayableVal  
+         ue|Illuminate\Contracts\Support\Htmlable|int|string|null, mixed        
+         given.                                                                 
+         ≡ƒ¬¬  argument.type                                                      
+  :226   Cannot access offset 'position' on mixed.                              
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                   
+  :226   Parameter #1 $value of function e expects                              
+         BackedEnum|float|Illuminate\Contracts\Support\DeferringDisplayableVal  
+         ue|Illuminate\Contracts\Support\Htmlable|int|string|null, mixed        
+         given.                                                                 
+         ≡ƒ¬¬  argument.type                                                      
+  :227   Cannot access offset 'turn' on mixed.                                  
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                   
+  :227   Parameter #1 $value of function e expects                              
+         BackedEnum|float|Illuminate\Contracts\Support\DeferringDisplayableVal  
+         ue|Illuminate\Contracts\Support\Htmlable|int|string|null, mixed        
+         given.                                                                 
+         ≡ƒ¬¬  argument.type                                                      
+  :236   Argument of an invalid type mixed supplied for foreach, only           
+         iterables are supported.                                               
+         ≡ƒ¬¬  foreach.nonIterable                                                
+  :238   Cannot access offset 'name' on mixed.                                  
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                   
+  :238   Parameter #1 $value of function e expects                              
+         BackedEnum|float|Illuminate\Contracts\Support\DeferringDisplayableVal  
+         ue|Illuminate\Contracts\Support\Htmlable|int|string|null, mixed        
+         given.                                                                 
+         ≡ƒ¬¬  argument.type                                                      
+  :239   Cannot access offset 'scenario' on mixed.                              
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                   
+  :239   Parameter #1 $value of function e expects                              
+         BackedEnum|float|Illuminate\Contracts\Support\DeferringDisplayableVal  
+         ue|Illuminate\Contracts\Support\Htmlable|int|string|null, mixed        
+         given.                                                                 
+         ≡ƒ¬¬  argument.type                                                      
+  :240   Cannot access offset 'status' on mixed.                                
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                   
+  :240   Parameter #1 $value of function e expects                              
+         BackedEnum|float|Illuminate\Contracts\Support\DeferringDisplayableVal  
+         ue|Illuminate\Contracts\Support\Htmlable|int|string|null, mixed        
+         given.                                                                 
+         ≡ƒ¬¬  argument.type                                                      
+  :241   Cannot access offset 'total_stats' on mixed.                           
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                   
+  :241   Parameter #1 $num of function number_format expects float, mixed       
+         given.                                                                 
+         ≡ƒ¬¬  argument.type                                                      
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app\Services\Notifications\PushNotificationService.php                 
+ ------ ----------------------------------------------------------------------- 
+  :116   Method                                                                 
+         App\Services\Notifications\PushNotificationService::buildPayload()     
+         has parameter $data with no value type specified in iterable type      
+         array.                                                                 
+         ≡ƒ¬¬  missingType.iterableValue                                          
+         ≡ƒÆí  See:                                                               
+         https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-i  
+         terable-type                                                           
+  :162   Method                                                                 
+         App\Services\Notifications\PushNotificationService::getVapidPublicKey  
+         () should return string but returns mixed.                             
+         ≡ƒ¬¬  return.type                                                        
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------- 
+  Line   app\Services\OCR\OpenCVPreprocessingService.php  
+ ------ ------------------------------------------------- 
+  :256   Cannot cast mixed to int.                        
+         ≡ƒ¬¬  cast.int                                     
+  :257   Cannot cast mixed to int.                        
+         ≡ƒ¬¬  cast.int                                     
+  :260   Cannot cast mixed to int.                        
+         ≡ƒ¬¬  cast.int                                     
+  :263   Cannot cast mixed to int.                        
+         ≡ƒ¬¬  cast.int                                     
+  :264   Cannot cast mixed to int.                        
+         ≡ƒ¬¬  cast.int                                     
+ ------ ------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app\Services\Offline\OfflineSyncService.php                            
+ ------ ----------------------------------------------------------------------- 
+  :29    Method App\Services\Offline\OfflineSyncService::syncBatch() has        
+         parameter $operations with no value type specified in iterable type    
+         array.                                                                 
+         ≡ƒ¬¬  missingType.iterableValue                                          
+         ≡ƒÆí  See:                                                               
+         https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-i  
+         terable-type                                                           
+  :29    Method App\Services\Offline\OfflineSyncService::syncBatch() return     
+         type has no value type specified in iterable type array.               
+         ≡ƒ¬¬  missingType.iterableValue                                          
+         ≡ƒÆí  See:                                                               
+         https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-i  
+         terable-type                                                           
+  :29    Method App\Services\Offline\OfflineSyncService::syncBatch() return     
+         type has no value type specified in iterable type array.               
+         ≡ƒ¬¬  missingType.iterableValue                                          
+         ≡ƒÆí  See:                                                               
+         https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-i  
+         terable-type                                                           
+  :81    Method App\Services\Offline\OfflineSyncService::detectConflict() has   
+         parameter $operation with no value type specified in iterable type     
+         array.                                                                 
+         ≡ƒ¬¬  missingType.iterableValue                                          
+         ≡ƒÆí  See:                                                               
+         https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-i  
+         terable-type                                                           
+  :81    Method App\Services\Offline\OfflineSyncService::detectConflict()       
+         return type has no value type specified in iterable type array.        
+         ≡ƒ¬¬  missingType.iterableValue                                          
+         ≡ƒÆí  See:                                                               
+         https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-i  
+         terable-type                                                           
+  :81    Method App\Services\Offline\OfflineSyncService::detectConflict()       
+         return type has no value type specified in iterable type array.        
+         ≡ƒ¬¬  missingType.iterableValue                                          
+         ≡ƒÆí  See:                                                               
+         https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-i  
+         terable-type                                                           
+  :120   Method App\Services\Offline\OfflineSyncService::processOperation()     
+         has parameter $operation with no value type specified in iterable      
+         type array.                                                            
+         ≡ƒ¬¬  missingType.iterableValue                                          
+         ≡ƒÆí  See:                                                               
+         https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-i  
+         terable-type                                                           
+  :139   Method App\Services\Offline\OfflineSyncService::resolveConflict() has  
+         parameter $conflict with no value type specified in iterable type      
+         array.                                                                 
+         ≡ƒ¬¬  missingType.iterableValue                                          
+         ≡ƒÆí  See:                                                               
+         https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-i  
+         terable-type                                                           
+  :160   Method App\Services\Offline\OfflineSyncService::handleCreate() has     
+         parameter $data with no value type specified in iterable type array.   
+         ≡ƒ¬¬  missingType.iterableValue                                          
+         ≡ƒÆí  See:                                                               
+         https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-i  
+         terable-type                                                           
+  :178   Method App\Services\Offline\OfflineSyncService::handleUpdate() has     
+         parameter $data with no value type specified in iterable type array.   
+         ≡ƒ¬¬  missingType.iterableValue                                          
+         ≡ƒÆí  See:                                                               
+         https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-i  
+         terable-type                                                           
+  :207   Method App\Services\Offline\OfflineSyncService::handleMerge() has      
+         parameter $offlineData with no value type specified in iterable type   
+         array.                                                                 
+         ≡ƒ¬¬  missingType.iterableValue                                          
+         ≡ƒÆí  See:                                                               
+         https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-i  
+         terable-type                                                           
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------- 
+  Line   app\Services\Privacy\DataDeletionService.php                       
+ ------ ------------------------------------------------------------------- 
+  :67    Method App\Services\Privacy\DataDeletionService::cancelDeletion()  
+         should return App\Models\DeletionRequest but returns               
+         App\Models\DeletionRequest|null.                                   
+         ≡ƒ¬¬  return.type                                                    
+ ------ ------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app\Services\Privacy\DataExportService.php                             
+ ------ ----------------------------------------------------------------------- 
+  :73    Parameter #2 $contents of static method                                
+         Illuminate\Contracts\Filesystem\Filesystem::put() expects              
+         Illuminate\Http\File|Illuminate\Http\UploadedFile|Psr\Http\Message\St  
+         reamInterface|resource|string, string|false given.                     
+         ≡ƒ¬¬  argument.type                                                      
+  :148   Using nullsafe method call on non-nullable type                        
+         Illuminate\Support\Carbon. Use -> instead.                             
+         ≡ƒ¬¬  nullsafe.neverNull                                                 
+  :160   Using nullsafe method call on non-nullable type                        
+         Illuminate\Support\Carbon. Use -> instead.                             
+         ≡ƒ¬¬  nullsafe.neverNull                                                 
+  :161   Using nullsafe method call on non-nullable type                        
+         Illuminate\Support\Carbon. Use -> instead.                             
+         ≡ƒ¬¬  nullsafe.neverNull                                                 
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app\Services\Share\ShareLinkService.php                                
+ ------ ----------------------------------------------------------------------- 
+  :69    Cannot access offset 'expires_at' on mixed.                            
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                   
+  :69    Parameter #1 $date of method Carbon\Carbon::isAfter() expects          
+         DateTimeInterface|string, mixed given.                                 
+         ≡ƒ¬¬  argument.type                                                      
+  :75    Cannot access offset 'password_hash' on mixed.                         
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                   
+  :76    Parameter #2 $hash of function password_verify expects string, mixed   
+         given.                                                                 
+         ≡ƒ¬¬  argument.type                                                      
+  :83    Method App\Services\Share\ShareLinkService::accessShareLink() should   
+         return array{success: bool, data?: array<string, mixed>, error?: stri  
+         ng} but returns array{success: true, data: mixed}.                     
+         ≡ƒ¬¬  return.type                                                        
+         ≡ƒÆí  Offset 'data' (array<string, mixed>) does not accept type mixed.   
+  :85    Cannot access offset 'career_snapshot' on mixed.                       
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                   
+  :111   Cannot cast mixed to int.                                              
+         ≡ƒ¬¬  cast.int                                                           
+  :122   Cannot access offset 'expires_at' on mixed.                            
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                   
+  :123   Parameter #1 $date of method Carbon\Carbon::diffInSeconds() expects    
+         DateTimeInterface|string|null, mixed given.                            
+         ≡ƒ¬¬  argument.type                                                      
+  :139   Cannot access offset 'expires_at' on mixed.                            
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                   
+  :139   Parameter #1 $date of method Carbon\Carbon::isAfter() expects          
+         DateTimeInterface|string, mixed given.                                 
+         ≡ƒ¬¬  argument.type                                                      
+  :159   Method App\Services\Share\ShareLinkService::getShareLinkInfo() should  
+         return array{exists: bool, privacy?: string, expires_at?: string,      
+         view_count?: int, requires_password?: bool} but returns array{exists:  
+         true, privacy: mixed, expires_at: mixed, view_count: int,              
+         requires_password: bool}.                                              
+         ≡ƒ¬¬  return.type                                                        
+         ≡ƒÆí  Offset 'privacy' (string) does not accept type mixed.              
+         ≡ƒÆí  Offset 'expires_at' (string) does not accept type mixed.           
+  :161   Cannot access offset 'privacy' on mixed.                               
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                   
+  :162   Cannot access offset 'expires_at' on mixed.                            
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                   
+  :164   Cannot access offset 'password_hash' on mixed.                         
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                   
+  :179   Using nullsafe property access "?->name" on left side of ?? is         
+         unnecessary. Use -> instead.                                           
+         ≡ƒ¬¬  nullsafe.neverNull                                                 
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app\Services\Simulation\BatchSimulationService.php                     
+ ------ ----------------------------------------------------------------------- 
+  :80    Argument of an invalid type mixed supplied for foreach, only           
+         iterables are supported.                                               
+         ≡ƒ¬¬  foreach.nonIterable                                                
+  :83    Parameter #2 $scenarioIndex of class                                   
+         App\Jobs\RunSimulationScenarioJob constructor expects int, mixed       
+         given.                                                                 
+         ≡ƒ¬¬  argument.type                                                      
+  :84    Cannot access offset 'target_stats' on mixed.                          
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                   
+  :84    Parameter #3 $targetStats of class App\Jobs\RunSimulationScenarioJob   
+         constructor expects array{speed: int, stamina: int, power: int, guts:  
+         int, wit: int}, mixed given.                                           
+         ≡ƒ¬¬  argument.type                                                      
+  :85    Cannot access offset 'parameters' on mixed.                            
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                   
+  :85    Parameter #4 $parameters of class App\Jobs\RunSimulationScenarioJob    
+         constructor expects array{training_focus: string, support_deck_bonus:  
+         float, scenario_type: string}, mixed given.                            
+         ≡ƒ¬¬  argument.type                                                      
+  :105   Cannot access offset int on mixed.                                     
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                   
+  :106   Cannot use ++ on mixed.                                                
+         ≡ƒ¬¬  postInc.type                                                       
+  :108   Binary operation "+" between (float|int) and mixed results in an       
+         error.                                                                 
+         ≡ƒ¬¬  binaryOp.invalid                                                   
+  :126   Cannot access offset int on mixed.                                     
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                   
+  :127   Cannot use ++ on mixed.                                                
+         ≡ƒ¬¬  postInc.type                                                       
+  :129   Binary operation "+" between mixed and (float|int) results in an       
+         error.                                                                 
+         ≡ƒ¬¬  binaryOp.invalid                                                   
+  :143   Method App\Services\Simulation\BatchSimulationService::getBatch()      
+         should return array<string, mixed>|null but returns mixed.             
+         ≡ƒ¬¬  return.type                                                        
+  :166   Binary operation "+" between mixed and mixed results in an error.      
+         ≡ƒ¬¬  binaryOp.invalid                                                   
+  :168   Method App\Services\Simulation\BatchSimulationService::getProgress()   
+         should return array{completed: int, failed: int, total: int,           
+         percentage: float, status: string} but returns array{completed:        
+         mixed, failed: mixed, total: mixed, percentage: float, status:         
+         mixed}.                                                                
+         ≡ƒ¬¬  return.type                                                        
+         ≡ƒÆí  Offset 'completed' (int) does not accept type mixed.               
+         ≡ƒÆí  Offset 'failed' (int) does not accept type mixed.                  
+         ≡ƒÆí  Offset 'total' (int) does not accept type mixed.                   
+         ≡ƒÆí  Offset 'status' (string) does not accept type mixed.               
+  :172   Binary operation "/" between (array|float|int) and mixed results in    
+         an error.                                                              
+         ≡ƒ¬¬  binaryOp.invalid                                                   
+  :186   Method App\Services\Simulation\BatchSimulationService::getResults()    
+         should return array<int, array<string, mixed>> but returns mixed.      
+         ≡ƒ¬¬  return.type                                                        
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app\Services\Simulation\ComparisonReportService.php                    
+ ------ ----------------------------------------------------------------------- 
+  :29    Method                                                                 
+         App\Services\Simulation\ComparisonReportService::generateReport()      
+         should return array{stat_comparison: array<string, array<int, int>>,   
+         rankings: array<string, array<int, mixed>>, best_scenario: int, recom  
+         mendations: array<int, string>, summary: array<string, mixed>} but re  
+         turns array<string, mixed>.                                            
+         ≡ƒ¬¬  return.type                                                        
+  :55    Cannot access offset 'guts'|'power'|'speed'|'stamina'|'wit' on mixed.  
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                   
+  :59    Method                                                                 
+         App\Services\Simulation\ComparisonReportService::compareStats()        
+         should return array<string, array<int, int>> but returns array<string  
+         , array<int, mixed>>.                                                  
+         ≡ƒ¬¬  return.type                                                        
+  :106   Parameter #1 $array of function array_sum expects array, mixed given.  
+         ≡ƒ¬¬  argument.type                                                      
+  :125   Parameter #1 ...$arg1 of function max expects non-empty-array, list<m  
+         ixed> given.                                                           
+         ≡ƒ¬¬  argument.type                                                      
+         ≡ƒÆí  list<mixed> might be empty.                                        
+  :126   Parameter #1 ...$arg1 of function max expects non-empty-array, list<m  
+         ixed> given.                                                           
+         ≡ƒ¬¬  argument.type                                                      
+         ≡ƒÆí  list<mixed> might be empty.                                        
+  :127   Parameter #1 ...$arg1 of function max expects non-empty-array, list<m  
+         ixed> given.                                                           
+         ≡ƒ¬¬  argument.type                                                      
+         ≡ƒÆí  list<mixed> might be empty.                                        
+  :130   Binary operation "/" between mixed and mixed results in an error.      
+         ≡ƒ¬¬  binaryOp.invalid                                                   
+  :131   Binary operation "/" between mixed and mixed results in an error.      
+         ≡ƒ¬¬  binaryOp.invalid                                                   
+  :132   Binary operation "/" between mixed and mixed results in an error.      
+         ≡ƒ¬¬  binaryOp.invalid                                                   
+  :155   Cannot access offset 'training_focus' on mixed.                        
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                   
+  :158   Part $focus (mixed) of encapsed string cannot be cast to string.       
+         ≡ƒ¬¬  encapsedStringPart.nonString                                       
+  :158   Part $result['efficiency_score'] (mixed) of encapsed string cannot be  
+         cast to string.                                                        
+         ≡ƒ¬¬  encapsedStringPart.nonString                                       
+  :158   Part $result['win_rate'] (mixed) of encapsed string cannot be cast to  
+         string.                                                                
+         ≡ƒ¬¬  encapsedStringPart.nonString                                       
+  :163   Binary operation "-" between mixed and mixed results in an error.      
+         ≡ƒ¬¬  binaryOp.invalid                                                   
+  :164   Binary operation "-" between mixed and mixed results in an error.      
+         ≡ƒ¬¬  binaryOp.invalid                                                   
+  :175   Part $focus (mixed) of encapsed string cannot be cast to string.       
+         ≡ƒ¬¬  encapsedStringPart.nonString                                       
+  :177   Part $focus (mixed) of encapsed string cannot be cast to string.       
+         ≡ƒ¬¬  encapsedStringPart.nonString                                       
+  :199   Parameter #1 ...$arg1 of function max expects non-empty-array, list<m  
+         ixed> given.                                                           
+         ≡ƒ¬¬  argument.type                                                      
+         ≡ƒÆí  list<mixed> might be empty.                                        
+  :200   Parameter #1 ...$arg1 of function min expects non-empty-array, list<m  
+         ixed> given.                                                           
+         ≡ƒ¬¬  argument.type                                                      
+         ≡ƒÆí  list<mixed> might be empty.                                        
+  :203   Binary operation "-" between mixed and mixed results in an error.      
+         ≡ƒ¬¬  binaryOp.invalid                                                   
+  :203   Parameter #1 ...$arg1 of function max expects non-empty-array, list<m  
+         ixed> given.                                                           
+         ≡ƒ¬¬  argument.type                                                      
+         ≡ƒÆí  list<mixed> might be empty.                                        
+  :203   Parameter #1 ...$arg1 of function min expects non-empty-array, list<m  
+         ixed> given.                                                           
+         ≡ƒ¬¬  argument.type                                                      
+         ≡ƒÆí  list<mixed> might be empty.                                        
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app\Services\Simulation\SimulationEngine.php                           
+ ------ ----------------------------------------------------------------------- 
+  :92    Method App\Services\Simulation\SimulationEngine::calculateSpEarned()   
+         has parameter $stats with no value type specified in iterable type     
+         array.                                                                 
+         ≡ƒ¬¬  missingType.iterableValue                                          
+         ≡ƒÆí  See:                                                               
+         https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-i  
+         terable-type                                                           
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app\Services\Testing\CoverageReporter.php                              
+ ------ ----------------------------------------------------------------------- 
+  :17    Property App\Services\Testing\CoverageReporter::$results type has no   
+         value type specified in iterable type array.                           
+         ≡ƒ¬¬  missingType.iterableValue                                          
+         ≡ƒÆí  See:                                                               
+         https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-i  
+         terable-type                                                           
+  :19    Property App\Services\Testing\CoverageReporter::$errors type has no    
+         value type specified in iterable type array.                           
+         ≡ƒ¬¬  missingType.iterableValue                                          
+         ≡ƒÆí  See:                                                               
+         https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-i  
+         terable-type                                                           
+  :21    Property App\Services\Testing\CoverageReporter::$performance type has  
+         no value type specified in iterable type array.                        
+         ≡ƒ¬¬  missingType.iterableValue                                          
+         ≡ƒÆí  See:                                                               
+         https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-i  
+         terable-type                                                           
+  :40    Method App\Services\Testing\CoverageReporter::recordVisit() has        
+         parameter $data with no value type specified in iterable type array.   
+         ≡ƒ¬¬  missingType.iterableValue                                          
+         ≡ƒÆí  See:                                                               
+         https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-i  
+         terable-type                                                           
+  :74    Method App\Services\Testing\CoverageReporter::getSummary() return      
+         type has no value type specified in iterable type array.               
+         ≡ƒ¬¬  missingType.iterableValue                                          
+         ≡ƒÆí  See:                                                               
+         https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-i  
+         terable-type                                                           
+  :137   Parameter #2 $contents of method                                       
+         Illuminate\Filesystem\FilesystemAdapter::put() expects                 
+         Illuminate\Http\File|Illuminate\Http\UploadedFile|Psr\Http\Message\St  
+         reamInterface|resource|string, string|false given.                     
+         ≡ƒ¬¬  argument.type                                                      
+  :145   Method App\Services\Testing\CoverageReporter::buildHtml() has          
+         parameter $summary with no value type specified in iterable type       
+         array.                                                                 
+         ≡ƒ¬¬  missingType.iterableValue                                          
+         ≡ƒÆí  See:                                                               
+         https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-i  
+         terable-type                                                           
+  :349   Method App\Services\Testing\CoverageReporter::getResults() return      
+         type has no value type specified in iterable type array.               
+         ≡ƒ¬¬  missingType.iterableValue                                          
+         ≡ƒÆí  See:                                                               
+         https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-i  
+         terable-type                                                           
+  :357   Method App\Services\Testing\CoverageReporter::getErrors() return type  
+         has no value type specified in iterable type array.                    
+         ≡ƒ¬¬  missingType.iterableValue                                          
+         ≡ƒÆí  See:                                                               
+         https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-i  
+         terable-type                                                           
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   app\Services\Testing\RouteDiscoveryService.php                         
+ ------ ----------------------------------------------------------------------- 
+  :23    Method App\Services\Testing\RouteDiscoveryService::discoverRoutes()    
+         return type has no value type specified in iterable type array.        
+         ≡ƒ¬¬  missingType.iterableValue                                          
+         ≡ƒÆí  See:                                                               
+         https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-i  
+         terable-type                                                           
+  :23    Method App\Services\Testing\RouteDiscoveryService::discoverRoutes()    
+         return type has no value type specified in iterable type array.        
+         ≡ƒ¬¬  missingType.iterableValue                                          
+         ≡ƒÆí  See:                                                               
+         https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-i  
+         terable-type                                                           
+  :23    Method App\Services\Testing\RouteDiscoveryService::discoverRoutes()    
+         return type has no value type specified in iterable type array.        
+         ≡ƒ¬¬  missingType.iterableValue                                          
+         ≡ƒÆí  See:                                                               
+         https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-i  
+         terable-type                                                           
+  :33    Argument of an invalid type                                            
+         Illuminate\Routing\RouteCollectionInterface supplied for foreach,      
+         only iterables are supported.                                          
+         ≡ƒ¬¬  foreach.nonIterable                                                
+  :75    Method App\Services\Testing\RouteDiscoveryService::extractRouteData()  
+         return type has no value type specified in iterable type array.        
+         ≡ƒ¬¬  missingType.iterableValue                                          
+         ≡ƒÆí  See:                                                               
+         https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-i  
+         terable-type                                                           
+  :75    Method App\Services\Testing\RouteDiscoveryService::extractRouteData()  
+         return type has no value type specified in iterable type array.        
+         ≡ƒ¬¬  missingType.iterableValue                                          
+         ≡ƒÆí  See:                                                               
+         https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-i  
+         terable-type                                                           
+  :99    Offset 1 on array{list<string>, list<non-empty-string>} on left side   
+         of ?? always exists and is not nullable.                               
+         ≡ƒ¬¬  nullCoalesce.offset                                                
+  :114   Call to function is_string() with string will always evaluate to       
+         true.                                                                  
+         ≡ƒ¬¬  function.alreadyNarrowedType                                       
+  :186   Method App\Services\Testing\RouteDiscoveryService::buildUrl() has      
+         parameter $parameterValues with no value type specified in iterable    
+         type array.                                                            
+         ≡ƒ¬¬  missingType.iterableValue                                          
+         ≡ƒÆí  See:                                                               
+         https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-i  
+         terable-type                                                           
+  :186   Method App\Services\Testing\RouteDiscoveryService::buildUrl() has      
+         parameter $routeData with no value type specified in iterable type     
+         array.                                                                 
+         ≡ƒ¬¬  missingType.iterableValue                                          
+         ≡ƒÆí  See:                                                               
+         https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-i  
+         terable-type                                                           
+  :206   Method App\Services\Testing\RouteDiscoveryService::getStatistics()     
+         has parameter $categorized with no value type specified in iterable    
+         type array.                                                            
+         ≡ƒ¬¬  missingType.iterableValue                                          
+         ≡ƒÆí  See:                                                               
+         https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-i  
+         terable-type                                                           
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   tests\Browser\AccessibilityAuditTest.php                               
+ ------ ----------------------------------------------------------------------- 
+  :184   Method Pest\Browser\Api\Webpage::submit() invoked with 1 parameter, 0  
+         required.                                                              
+         ≡ƒ¬¬  arguments.count                                                    
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   tests\Browser\SmokeTestSuite.php                                       
+ ------ ----------------------------------------------------------------------- 
+  :72    Method Pest\Browser\Api\Webpage::submit() invoked with 1 parameter, 0  
+         required.                                                              
+         ≡ƒ¬¬  arguments.count                                                    
+  :125   Method Pest\Browser\Api\Webpage::submit() invoked with 1 parameter, 0  
+         required.                                                              
+         ≡ƒ¬¬  arguments.count                                                    
+  :166   Method Pest\Browser\Api\Webpage::submit() invoked with 1 parameter, 0  
+         required.                                                              
+         ≡ƒ¬¬  arguments.count                                                    
+  :261   Method Pest\Browser\Api\Webpage::submit() invoked with 1 parameter, 0  
+         required.                                                              
+         ≡ƒ¬¬  arguments.count                                                    
+  :323   Method Pest\Browser\Api\Webpage::submit() invoked with 1 parameter, 0  
+         required.                                                              
+         ≡ƒ¬¬  arguments.count                                                    
+  :340   Method Pest\Browser\Api\Webpage::submit() invoked with 1 parameter, 0  
+         required.                                                              
+         ≡ƒ¬¬  arguments.count                                                    
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   tests\Browser\UserJourneyTest.php                                      
+ ------ ----------------------------------------------------------------------- 
+  :43    Method Pest\Browser\Api\Webpage::submit() invoked with 1 parameter, 0  
+         required.                                                              
+         ≡ƒ¬¬  arguments.count                                                    
+  :85    Dead catch - Throwable is never thrown in the try block.               
+         ≡ƒ¬¬  catch.neverThrown                                                  
+  :92    Dead catch - Throwable is never thrown in the try block.               
+         ≡ƒ¬¬  catch.neverThrown                                                  
+  :109   Method Pest\Browser\Api\Webpage::submit() invoked with 1 parameter, 0  
+         required.                                                              
+         ≡ƒ¬¬  arguments.count                                                    
+  :318   Method Pest\Browser\Api\Webpage::submit() invoked with 1 parameter, 0  
+         required.                                                              
+         ≡ƒ¬¬  arguments.count                                                    
+  :361   Method Pest\Browser\Api\Webpage::submit() invoked with 1 parameter, 0  
+         required.                                                              
+         ≡ƒ¬¬  arguments.count                                                    
+  :396   Method Pest\Browser\Api\Webpage::submit() invoked with 1 parameter, 0  
+         required.                                                              
+         ≡ƒ¬¬  arguments.count                                                    
+  :405   Method Pest\Browser\Api\Webpage::submit() invoked with 1 parameter, 0  
+         required.                                                              
+         ≡ƒ¬¬  arguments.count                                                    
+ ------ ----------------------------------------------------------------------- 
+
+ ------ -------------------------------------------------------------------- 
+  Line   tests\Feature\OCR\OpenCVPreprocessingTest.php                       
+ ------ -------------------------------------------------------------------- 
+  :240   Cannot access offset 0 on array{0: int<0, max>, 1: int<0, max>, 2:  
+         int, 3: string, mime: string, channels?: int, bits?: int}|false.    
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                
+  :241   Cannot access offset 1 on array{0: int<0, max>, 1: int<0, max>, 2:  
+         int, 3: string, mime: string, channels?: int, bits?: int}|false.    
+         ≡ƒ¬¬  offsetAccess.nonOffsetAccessible                                
+ ------ -------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------ 
+  Line   tests\Performance\BenchmarkSuite.php                              
+ ------ ------------------------------------------------------------------ 
+  :223   Call to method App\ValueObjects\CharacterStats::getTotal() on a   
+         separate line has no effect.                                      
+         ≡ƒ¬¬  method.resultUnused                                           
+  :225   Call to method App\ValueObjects\CharacterStats::toArray() on a    
+         separate line has no effect.                                      
+         ≡ƒ¬¬  method.resultUnused                                           
+  :237   Call to method App\ValueObjects\CharacterStats::compareTo() on a  
+         separate line has no effect.                                      
+         ≡ƒ¬¬  method.resultUnused                                           
+ ------ ------------------------------------------------------------------ 
+
+ ------ ----------------------------------------------------------------- 
+  Line   tests\Performance\PerformanceRegressionTest.php                  
+ ------ ----------------------------------------------------------------- 
+  :132   Call to method App\ValueObjects\CharacterStats::getTotal() on a  
+         separate line has no effect.                                     
+         ≡ƒ¬¬  method.resultUnused                                          
+  :134   Call to method App\ValueObjects\CharacterStats::toArray() on a   
+         separate line has no effect.                                     
+         ≡ƒ¬¬  method.resultUnused                                          
+ ------ ----------------------------------------------------------------- 
+
+ ------ ---------------------------------------------- 
+  Line   tests\Property\AccessibilityPropertyTest.php  
+ ------ ---------------------------------------------- 
+  :204   Ternary operator condition is always true.    
+         ≡ƒ¬¬  ternary.alwaysTrue                        
+ ------ ---------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   tests\Property\EdgeCaseGeneratorPropertyTest.php                       
+ ------ ----------------------------------------------------------------------- 
+  :362   Offset 'guts' on array{}|array{speed: 500}|array{stamina: 300, power:  
+         200}|array{wisdom: 1200} on left side of ?? does not exist.            
+         ≡ƒ¬¬  nullCoalesce.offset                                                
+ ------ ----------------------------------------------------------------------- 
+
+ ------ --------------------------------------------------------- 
+  Line   tests\Security\SecurityPropertyTest.php                  
+ ------ --------------------------------------------------------- 
+  :158   Match expression does not handle remaining value: mixed  
+         ≡ƒ¬¬  match.unhandled                                      
+ ------ --------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   tests\Unit\Services\MCP\AgentRoutingServiceTest.php                    
+ ------ ----------------------------------------------------------------------- 
+  :21    Function callProtectedMethod() has parameter $args with no value type  
+         specified in iterable type array.                                      
+         ≡ƒ¬¬  missingType.iterableValue                                          
+         ≡ƒÆí  See:                                                               
+         https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-i  
+         terable-type                                                           
+ ------ ----------------------------------------------------------------------- 
+
+ [ERROR] Found 249 errors                                                      
 

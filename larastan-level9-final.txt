@@ -1,0 +1,1 @@
+Note: Using configuration file C:\XAMPP\htdocs\umamusume-career-planner\phpstan.neon.

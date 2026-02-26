@@ -95,5 +95,10 @@
         "zip",
         "zlib"
     ],
-    "chatgpt.openOnStartup": false
+    "chatgpt.openOnStartup": false,
+
+    // Blade files contain @json() Blade directives inside <script> tags which VS Code's
+    // JS linter misinterprets as JS decorator syntax. Disable the built-in JS validator
+    // (Blade files are not real JS — Vite/ESLint handles actual JS in resources/js/).
+    "javascript.validate.enable": false
 }
