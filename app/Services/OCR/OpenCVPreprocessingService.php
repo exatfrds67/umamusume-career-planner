@@ -253,15 +253,15 @@ class OpenCVPreprocessingService
     protected function getPreprocessingConfig(): array
     {
         return [
-            'resize_max_width' => (int) config('services.opencv.preprocessing.resize_max_width', 1920),
-            'resize_max_height' => (int) config('services.opencv.preprocessing.resize_max_height', 1080),
+            'resize_max_width' => intval(config('services.opencv.preprocessing.resize_max_width', 1920)),
+            'resize_max_height' => intval(config('services.opencv.preprocessing.resize_max_height', 1080)),
             'contrast_enhancement' => (bool) config('services.opencv.preprocessing.contrast_enhancement', true),
             'sharpen_enabled' => (bool) config('services.opencv.preprocessing.sharpen_enabled', true),
-            'denoise_strength' => (int) config('services.opencv.preprocessing.denoise_strength', 10),
+            'denoise_strength' => intval(config('services.opencv.preprocessing.denoise_strength', 10)),
             'deskew_enabled' => (bool) config('services.opencv.preprocessing.deskew_enabled', true),
             'adaptive_threshold' => (bool) config('services.opencv.preprocessing.adaptive_threshold', true),
-            'threshold_block_size' => (int) config('services.opencv.preprocessing.threshold_block_size', 11),
-            'threshold_c_value' => (int) config('services.opencv.preprocessing.threshold_c_value', 2),
+            'threshold_block_size' => intval(config('services.opencv.preprocessing.threshold_block_size', 11)),
+            'threshold_c_value' => intval(config('services.opencv.preprocessing.threshold_c_value', 2)),
         ];
     }
 

@@ -76,7 +76,7 @@ class ExcelExportService
             'headers' => ['Field', 'Value'],
             'rows' => [
                 ['Career Name', $career->career_name ?? "Career #{$career->id}"],
-                ['Character', $character?->name ?? 'Unknown'],
+                ['Character', $character->name ?? 'Unknown'],
                 ['Scenario', $career->scenario_type ?? 'Unknown'],
                 ['Status', $career->status ?? 'Unknown'],
                 ['Total Turns', $career->current_turn ?? 0],
@@ -117,6 +117,7 @@ class ExcelExportService
      */
     private function buildTrainingSheet(Career $career): array
     {
+        /** @var array<int, array<int, mixed>> $rows */
         $rows = $career->trainingSessions
             ->sortBy('turn_number')
             ->map(fn ($session) => [
@@ -147,6 +148,7 @@ class ExcelExportService
      */
     private function buildRacesSheet(Career $career): array
     {
+        /** @var array<int, array<int, mixed>> $rows */
         $rows = $career->races
             ->map(fn ($race) => [
                 $race->turn_number ?? 'N/A',
@@ -170,6 +172,7 @@ class ExcelExportService
      */
     private function buildSkillsSheet(Career $career): array
     {
+        /** @var array<int, array<int, mixed>> $rows */
         $rows = $career->skillAcquisitions
             ->map(fn ($skill) => [
                 $skill->skill_name ?? $skill->name ?? 'N/A',

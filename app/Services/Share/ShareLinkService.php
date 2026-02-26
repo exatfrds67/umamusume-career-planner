@@ -60,29 +60,33 @@ class ShareLinkService
      */
     public function accessShareLink(string $token, ?string $password = null): array
     {
+        /** @var array<string, mixed>|null $shareData */
         $shareData = Cache::get(self::CACHE_PREFIX.$token);
 
         if (! $shareData) {
             return ['success' => false, 'error' => 'Share link not found or expired.'];
         }
 
-        if (isset($shareData['expires_at']) && now()->isAfter($shareData['expires_at'])) {
+        if (isset($shareData['expires_at']) && now()->isAfter((string) $shareData['expires_at'])) {
             Cache::forget(self::CACHE_PREFIX.$token);
 
             return ['success' => false, 'error' => 'Share link has expired.'];
         }
 
         if (! empty($shareData['password_hash'])) {
-            if (! $password || ! password_verify($password, $shareData['password_hash'])) {
+            if (! $password || ! password_verify($password, (string) $shareData['password_hash'])) {
                 return ['success' => false, 'error' => 'Invalid password.'];
             }
         }
 
         $this->incrementViewCount($token);
 
+        /** @var array<string, mixed> $snapshot */
+        $snapshot = $shareData['career_snapshot'];
+
         return [
             'success' => true,
-            'data' => $shareData['career_snapshot'],
+            'data' => $snapshot,
         ];
     }
 
@@ -117,10 +121,11 @@ class ShareLinkService
     private function incrementViewCount(string $token): void
     {
         $count = $this->getViewCount($token);
+        /** @var array<string, mixed>|null $shareData */
         $shareData = Cache::get(self::CACHE_PREFIX.$token);
 
         if ($shareData && isset($shareData['expires_at'])) {
-            $remainingSeconds = max(1, now()->diffInSeconds($shareData['expires_at']));
+            $remainingSeconds = max(1, now()->diffInSeconds((string) $shareData['expires_at']));
             Cache::put(self::VIEW_COUNT_PREFIX.$token, $count + 1, (int) $remainingSeconds);
         }
     }
@@ -130,13 +135,14 @@ class ShareLinkService
      */
     public function isValidShareLink(string $token): bool
     {
+        /** @var array<string, mixed>|null $shareData */
         $shareData = Cache::get(self::CACHE_PREFIX.$token);
 
         if (! $shareData) {
             return false;
         }
 
-        if (isset($shareData['expires_at']) && now()->isAfter($shareData['expires_at'])) {
+        if (isset($shareData['expires_at']) && now()->isAfter((string) $shareData['expires_at'])) {
             return false;
         }
 
@@ -150,6 +156,7 @@ class ShareLinkService
      */
     public function getShareLinkInfo(string $token): array
     {
+        /** @var array<string, mixed>|null $shareData */
         $shareData = Cache::get(self::CACHE_PREFIX.$token);
 
         if (! $shareData) {
@@ -158,8 +165,8 @@ class ShareLinkService
 
         return [
             'exists' => true,
-            'privacy' => $shareData['privacy'] ?? 'unlisted',
-            'expires_at' => $shareData['expires_at'] ?? null,
+            'privacy' => (string) ($shareData['privacy'] ?? 'unlisted'),
+            'expires_at' => isset($shareData['expires_at']) ? (string) $shareData['expires_at'] : null,
             'view_count' => $this->getViewCount($token),
             'requires_password' => ! empty($shareData['password_hash']),
         ];
@@ -176,7 +183,7 @@ class ShareLinkService
 
         return [
             'career_name' => $career->career_name ?? "Career #{$career->id}",
-            'character_name' => $career->character?->name ?? 'Unknown',
+            'character_name' => $career->character->name ?? 'Unknown',
             'scenario_type' => $career->scenario_type ?? 'Unknown',
             'status' => $career->status ?? 'Unknown',
             'total_turns' => $career->current_turn ?? 0,

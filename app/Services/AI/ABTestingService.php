@@ -55,12 +55,12 @@ class ABTestingService
         $testData = $this->getTest($testId);
 
         if (! $testData || $testData['status'] !== 'running') {
-            return $testData['variant_a'] ?? 'v1.0';
+            return (string) ($testData['variant_a'] ?? 'v1.0');
         }
 
-        return mt_rand(0, 99) < ($testData['traffic_split'] * 100)
-            ? $testData['variant_a']
-            : $testData['variant_b'];
+        return mt_rand(0, 99) < ((float) $testData['traffic_split'] * 100)
+            ? (string) $testData['variant_a']
+            : (string) $testData['variant_b'];
     }
 
     /**
@@ -82,11 +82,11 @@ class ABTestingService
             ];
         }
 
-        $variantAAccuracy = $this->getVariantAccuracy($testData['variant_a'], 'A');
-        $variantBAccuracy = $this->getVariantAccuracy($testData['variant_b'], 'B');
+        $variantAAccuracy = $this->getVariantAccuracy((string) $testData['variant_a'], 'A');
+        $variantBAccuracy = $this->getVariantAccuracy((string) $testData['variant_b'], 'B');
 
-        $sampleCountA = $this->getVariantSampleCount($testData['variant_a'], 'A');
-        $sampleCountB = $this->getVariantSampleCount($testData['variant_b'], 'B');
+        $sampleCountA = $this->getVariantSampleCount((string) $testData['variant_a'], 'A');
+        $sampleCountB = $this->getVariantSampleCount((string) $testData['variant_b'], 'B');
 
         if ($sampleCountA < self::MIN_SAMPLES_FOR_EVALUATION || $sampleCountB < self::MIN_SAMPLES_FOR_EVALUATION) {
             return [
@@ -101,7 +101,7 @@ class ABTestingService
         $accuracyDrop = $variantAAccuracy - $variantBAccuracy;
         $shouldRollback = $accuracyDrop > self::ACCURACY_DROP_THRESHOLD;
 
-        $winner = $variantBAccuracy >= $variantAAccuracy ? $testData['variant_b'] : $testData['variant_a'];
+        $winner = $variantBAccuracy >= $variantAAccuracy ? (string) $testData['variant_b'] : (string) $testData['variant_a'];
 
         $evaluation = $shouldRollback
             ? 'Variant B accuracy dropped by '.round($accuracyDrop * 100, 2).'%. Rolling back to variant A.'
@@ -144,11 +144,14 @@ class ABTestingService
     /**
      * Get A/B test data.
      *
-     * @return array<string, mixed>|null
+     * @return array{test_id: string, variant_a: string, variant_b: string, status: string, started_at: string, traffic_split: float, completed_at?: string, applied_version?: string|null}|null
      */
     public function getTest(string $testId): ?array
     {
-        return Cache::get(self::CACHE_PREFIX.$testId);
+        /** @var array{test_id: string, variant_a: string, variant_b: string, status: string, started_at: string, traffic_split: float, completed_at?: string, applied_version?: string|null}|null $data */
+        $data = Cache::get(self::CACHE_PREFIX.$testId);
+
+        return $data;
     }
 
     /**

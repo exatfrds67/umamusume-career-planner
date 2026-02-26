@@ -18,7 +18,7 @@ class RouteDiscoveryService
     /**
      * Get all routes categorized by authentication level.
      *
-     * @return array{public: array, auth: array, admin: array}
+     * @return array{public: array<int, array<string, mixed>>, auth: array<int, array<string, mixed>>, admin: array<int, array<string, mixed>>}
      */
     public function discoverRoutes(): array
     {
@@ -30,6 +30,7 @@ class RouteDiscoveryService
         ];
 
         /** @var Route $route */
+        /** @var iterable<int, Route> $routes */
         foreach ($routes as $route) {
             // Only process GET routes for browser testing
             if (! in_array('GET', $route->methods(), true)) {
@@ -67,8 +68,8 @@ class RouteDiscoveryService
      * @return array{
      *     uri: string,
      *     name: string|null,
-     *     parameters: array,
-     *     middleware: array,
+     *     parameters: array<string>,
+     *     middleware: array<string>,
      *     hasParameters: bool
      * }
      */
@@ -89,14 +90,13 @@ class RouteDiscoveryService
     /**
      * Extract parameter names from route URI.
      *
-     * @param  string  $uri
      * @return array<string>
      */
     private function extractParameters(string $uri): array
     {
         preg_match_all('/\{([^}]+)\}/', $uri, $matches);
 
-        return $matches[1] ?? [];
+        return $matches[1];
     }
 
     /**
@@ -110,9 +110,7 @@ class RouteDiscoveryService
 
         // Flatten if middleware is nested
         if (is_array($middleware)) {
-            return array_values(array_filter(array_map(function ($m) {
-                return is_string($m) ? $m : null;
-            }, $middleware)));
+            return array_values(array_filter(array_map(fn ($m) => is_string($m) ? $m : null, $middleware)));
         }
 
         return [];
@@ -179,9 +177,8 @@ class RouteDiscoveryService
     /**
      * Build URL for route with test parameters.
      *
-     * @param  array  $routeData
-     * @param  array  $parameterValues  Map of parameter names to values
-     * @return string
+     * @param  array<string, mixed>  $routeData
+     * @param  array<string, string|int>  $parameterValues  Map of parameter names to values
      */
     public function buildUrl(array $routeData, array $parameterValues = []): string
     {
@@ -200,7 +197,7 @@ class RouteDiscoveryService
     /**
      * Get statistics about discovered routes.
      *
-     * @param  array  $categorized
+     * @param  array<string, array<int, array<string, mixed>>>  $categorized
      * @return array{total: int, public: int, auth: int, admin: int, withParameters: int}
      */
     public function getStatistics(array $categorized): array

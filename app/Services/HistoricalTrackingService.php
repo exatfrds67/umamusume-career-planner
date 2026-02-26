@@ -1606,9 +1606,10 @@ class HistoricalTrackingService
      */
     protected function getInsufficientDataResult(string $analysisType, int $currentSize): array
     {
+        $formattedAnalysisType = str_replace('_', ' ', $analysisType);
         return [
             'error' => 'insufficient_data',
-            'message' => 'At least '.self::MIN_SAMPLE_SIZE." completed careers are required for {$analysisType} analysis.",
+            'message' => 'At least '.self::MIN_SAMPLE_SIZE." completed careers are required for {$formattedAnalysisType} analysis.",
             'current_sample_size' => $currentSize,
             'required_sample_size' => self::MIN_SAMPLE_SIZE,
         ];

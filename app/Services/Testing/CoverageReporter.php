@@ -14,10 +14,13 @@ use Illuminate\Support\Facades\Storage;
  */
 class CoverageReporter
 {
+    /** @var array<int, array<string, mixed>> */
     private array $results = [];
 
+    /** @var array<int, array<string, mixed>> */
     private array $errors = [];
 
+    /** @var array<int, float> */
     private array $performance = [];
 
     private string $reportId;
@@ -33,9 +36,8 @@ class CoverageReporter
     /**
      * Record a visited page result.
      *
-     * @param  string  $url
      * @param  string  $category  'public', 'auth', or 'admin'
-     * @param  array  $data  {success: bool, statusCode: int|null, loadTime: float, error: string|null}
+     * @param  array<string, mixed>  $data  {success: bool, statusCode: int|null, loadTime: float, error: string|null}
      */
     public function recordVisit(string $url, string $category, array $data): void
     {
@@ -69,7 +71,7 @@ class CoverageReporter
     /**
      * Get summary statistics.
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public function getSummary(): array
     {
@@ -100,7 +102,7 @@ class CoverageReporter
     /**
      * Generate HTML report.
      *
-     * @return string  Path to generated report
+     * @return string Path to generated report
      */
     public function generateHtmlReport(): string
     {
@@ -120,7 +122,7 @@ class CoverageReporter
     /**
      * Generate JSON report.
      *
-     * @return string  Path to generated report
+     * @return string Path to generated report
      */
     public function generateJsonReport(): string
     {
@@ -134,13 +136,15 @@ class CoverageReporter
             'errors' => $this->errors,
         ];
 
-        Storage::disk('local')->put($reportPath, json_encode($data, JSON_PRETTY_PRINT));
+        Storage::disk('local')->put($reportPath, json_encode($data, JSON_PRETTY_PRINT) ?: '');
 
         return storage_path("app/{$reportPath}");
     }
 
     /**
      * Build HTML report content.
+     *
+     * @param  array<string, mixed>  $summary
      */
     private function buildHtml(array $summary): string
     {
@@ -345,6 +349,8 @@ HTML;
 
     /**
      * Get all recorded results.
+     *
+     * @return array<int, array<string, mixed>>
      */
     public function getResults(): array
     {
@@ -353,6 +359,8 @@ HTML;
 
     /**
      * Get all recorded errors.
+     *
+     * @return array<int, array<string, mixed>>
      */
     public function getErrors(): array
     {

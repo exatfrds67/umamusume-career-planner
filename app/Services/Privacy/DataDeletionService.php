@@ -64,7 +64,7 @@ class DataDeletionService
             'cancelled_at' => now(),
         ]);
 
-        return $deletionRequest->fresh();
+        return $deletionRequest->fresh() ?? $deletionRequest;
     }
 
     /**

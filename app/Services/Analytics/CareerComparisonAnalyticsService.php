@@ -22,7 +22,8 @@ class CareerComparisonAnalyticsService
     {
         $cacheKey = 'parallel_coords_'.md5(implode('_', $careerIds));
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($careerIds) {
+        /** @var array{axes: array<int, string>, series: array<int, array{career_id: int, career_name: string, values: array<string, float>, color: string}>} $result */
+        $result = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($careerIds) {
             $careers = Career::query()
                 ->whereIn('id', $careerIds)
                 ->get();
@@ -52,6 +53,8 @@ class CareerComparisonAnalyticsService
                 'series' => $series,
             ];
         });
+
+        return $result;
     }
 
     /**
@@ -75,7 +78,8 @@ class CareerComparisonAnalyticsService
 
         $cacheKey = 'divergence_'.md5(implode('_', $careerIds));
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($careerIds) {
+        /** @var array{divergence_points: array<int, array{turn: int, stat: string, careers: array<int, array{career_id: int, value: float}>, magnitude: float}>, summary: array{earliest_divergence: int|null, most_divergent_stat: string|null, max_magnitude: float}} $result */
+        $result = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($careerIds) {
             $turnData = $this->buildTurnProgressionData($careerIds);
             $divergencePoints = [];
             $divergenceThreshold = 50;
@@ -86,8 +90,9 @@ class CareerComparisonAnalyticsService
                 }
 
                 foreach (self::STAT_KEYS as $stat) {
-                    $values = collect($careerStats)->map(fn ($cs) => $cs[$stat] ?? 0);
-                    $maxDiff = $values->max() - $values->min();
+                    /** @var \Illuminate\Support\Collection<int, float> $values */
+                    $values = collect($careerStats)->map(fn ($cs): float => (float) $cs[$stat]);
+                    $maxDiff = ($values->max() ?? 0.0) - ($values->min() ?? 0.0);
 
                     if ($maxDiff >= $divergenceThreshold) {
                         $divergencePoints[] = [
@@ -129,6 +134,8 @@ class CareerComparisonAnalyticsService
                 ],
             ];
         });
+
+        return $result;
     }
 
     /**
@@ -184,7 +191,7 @@ class CareerComparisonAnalyticsService
 
             foreach ($careerIds as $careerId) {
                 $career = $careers->get($careerId);
-                $careerName = $career?->career_name ?? "Career #{$careerId}";
+                $careerName = $career->career_name ?? "Career #{$careerId}";
 
                 foreach (self::STAT_KEYS as $stat) {
                     $data = [];
@@ -248,12 +255,19 @@ class CareerComparisonAnalyticsService
         $stdDeviations = [];
         foreach (self::STAT_KEYS as $stat) {
             $values = $careerData->pluck("stats.{$stat}");
-            $averages[$stat] = round($values->avg(), 2);
-            $stdDeviations[$stat] = round($this->standardDeviation($values->toArray()), 2);
+            /** @var float|int|null $avgVal */
+            $avgVal = $values->avg();
+            $averages[$stat] = round((float) $avgVal, 2);
+            /** @var array<int, float|int> $valuesArray */
+            $valuesArray = $values->toArray();
+            $stdDeviations[$stat] = round($this->standardDeviation($valuesArray), 2);
         }
 
+        /** @var array<int, array{id: int, name: string, total_stats: int, stats: array<string, int>, rank: int}> $careersArray */
+        $careersArray = $careerData->toArray();
+
         return [
-            'careers' => $careerData->toArray(),
+            'careers' => $careersArray,
             'averages' => $averages,
             'std_deviations' => $stdDeviations,
         ];

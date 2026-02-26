@@ -26,7 +26,7 @@ class PDFExportService
                 'generated_at' => now()->toIso8601String(),
                 'version' => '1.0',
                 'career_id' => $career->id,
-                'character_name' => $career->character?->name ?? 'Unknown',
+                'character_name' => $career->character->name ?? 'Unknown',
             ],
         ];
     }
@@ -67,7 +67,7 @@ class PDFExportService
         return $this->renderTemplate([
             'title' => 'Career Report: '.($career->career_name ?? "Career #{$career->id}"),
             'cover' => [
-                'character_name' => $character?->name ?? 'Unknown',
+                'character_name' => $character->name ?? 'Unknown',
                 'scenario_type' => $career->scenario_type ?? 'Unknown',
                 'status' => $career->status ?? 'Unknown',
                 'started_at' => $career->started_at,
@@ -129,7 +129,8 @@ class PDFExportService
      */
     private function formatTrainingHistory(Career $career): array
     {
-        return $career->trainingSessions
+        /** @var array<int, array{turn: int, type: string|null, speed: int, stamina: int, power: int, guts: int, wit: int}> $history */
+        $history = $career->trainingSessions
             ->sortBy('turn_number')
             ->map(fn ($session) => [
                 'turn' => $session->turn_number,
@@ -142,6 +143,8 @@ class PDFExportService
             ])
             ->values()
             ->toArray();
+
+        return $history;
     }
 
     /**
@@ -151,7 +154,8 @@ class PDFExportService
      */
     private function formatRaceHistory(Career $career): array
     {
-        return $career->races
+        /** @var array<int, array{name: string|null, position: int|null, turn: int|null}> $history */
+        $history = $career->races
             ->map(fn ($race) => [
                 'name' => $race->race_name ?? $race->name ?? null,
                 'position' => $race->finishing_position ?? $race->position ?? null,
@@ -159,6 +163,8 @@ class PDFExportService
             ])
             ->values()
             ->toArray();
+
+        return $history;
     }
 
     /**
@@ -184,16 +190,20 @@ class PDFExportService
         $html .= '<h1>'.e($data['title'] ?? 'Report').'</h1>';
 
         if (isset($data['cover'])) {
+            /** @var array<string, mixed> $cover */
+            $cover = $data['cover'];
             $html .= '<div class="cover">';
-            foreach ($data['cover'] as $label => $value) {
-                $html .= '<p><strong>'.e(ucfirst(str_replace('_', ' ', $label))).':</strong> '.e($value ?? 'N/A').'</p>';
+            foreach ($cover as $label => $value) {
+                $html .= '<p><strong>'.e(ucfirst(str_replace('_', ' ', (string) $label))).':</strong> '.e($value ?? 'N/A').'</p>';
             }
             $html .= '</div>';
         }
 
         if (isset($data['stats'])) {
+            /** @var array<string, mixed> $stats */
+            $stats = $data['stats'];
             $html .= '<h2>Final Stats</h2><div class="stat-grid">';
-            foreach ($data['stats'] as $label => $value) {
+            foreach ($stats as $label => $value) {
                 $html .= '<div class="stat-card"><div class="stat-value">'.e($value).'</div>';
                 $html .= '<div class="stat-label">'.e($label).'</div></div>';
             }
@@ -201,9 +211,11 @@ class PDFExportService
         }
 
         if (! empty($data['training_history'])) {
+            /** @var array<int, array<string, mixed>> $trainingHistory */
+            $trainingHistory = $data['training_history'];
             $html .= '<h2>Training History</h2><table>';
             $html .= '<tr><th>Turn</th><th>Type</th><th>SPD</th><th>STA</th><th>POW</th><th>GUT</th><th>WIT</th></tr>';
-            foreach ($data['training_history'] as $session) {
+            foreach ($trainingHistory as $session) {
                 $html .= '<tr>';
                 $html .= '<td>'.e($session['turn']).'</td>';
                 $html .= '<td>'.e($session['type'] ?? 'N/A').'</td>';
@@ -218,9 +230,11 @@ class PDFExportService
         }
 
         if (! empty($data['race_history'])) {
+            /** @var array<int, array<string, mixed>> $raceHistory */
+            $raceHistory = $data['race_history'];
             $html .= '<h2>Race Results</h2><table>';
             $html .= '<tr><th>Race</th><th>Position</th><th>Turn</th></tr>';
-            foreach ($data['race_history'] as $race) {
+            foreach ($raceHistory as $race) {
                 $html .= '<tr>';
                 $html .= '<td>'.e($race['name'] ?? 'N/A').'</td>';
                 $html .= '<td>'.e($race['position'] ?? 'N/A').'</td>';
@@ -231,14 +245,16 @@ class PDFExportService
         }
 
         if (! empty($data['careers'])) {
+            /** @var array<int, array<string, mixed>> $careersList */
+            $careersList = $data['careers'];
             $html .= '<h2>Career History</h2><table>';
             $html .= '<tr><th>Name</th><th>Scenario</th><th>Status</th><th>Total Stats</th></tr>';
-            foreach ($data['careers'] as $career) {
+            foreach ($careersList as $career) {
                 $html .= '<tr>';
                 $html .= '<td>'.e($career['name']).'</td>';
                 $html .= '<td>'.e($career['scenario']).'</td>';
                 $html .= '<td>'.e($career['status']).'</td>';
-                $html .= '<td>'.e(number_format($career['total_stats'])).'</td>';
+                $html .= '<td>'.e(number_format((int) $career['total_stats'])).'</td>';
                 $html .= '</tr>';
             }
             $html .= '</table>';

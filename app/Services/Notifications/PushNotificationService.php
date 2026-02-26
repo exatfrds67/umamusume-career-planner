@@ -111,6 +111,7 @@ class PushNotificationService
     /**
      * Build the push notification payload.
      *
+     * @param  array<string, mixed>  $data
      * @return array{title: string, body: string, icon: string, badge: string, data: array<string, mixed>}
      */
     public function buildPayload(string $title, string $body, string $url = '/', array $data = []): array
@@ -159,6 +160,6 @@ class PushNotificationService
      */
     public function getVapidPublicKey(): string
     {
-        return config('services.vapid.public_key', '');
+        return (string) config('services.vapid.public_key', '');
     }
 }

@@ -62,7 +62,7 @@ class ModelRetrainingService
 
         $this->checkRetrainingTrigger($prediction->model_version);
 
-        return $prediction->fresh();
+        return $prediction->fresh() ?? $prediction;
     }
 
     /**
@@ -82,7 +82,7 @@ class ModelRetrainingService
 
         foreach ($predicted as $key => $value) {
             if (isset($actual[$key]) && is_numeric($value) && is_numeric($actual[$key])) {
-                $maxVal = max(abs($value), abs($actual[$key]), 1);
+                $maxVal = max(abs((float) $value), abs((float) $actual[$key]), 1);
                 $relativeError = abs($value - $actual[$key]) / $maxVal;
                 $totalError += $relativeError;
                 $count++;
@@ -120,8 +120,9 @@ class ModelRetrainingService
 
         foreach ($predictions as $prediction) {
             foreach ($prediction->predicted_value as $key => $value) {
-                if (isset($prediction->actual_value[$key]) && is_numeric($value)) {
-                    $error = $value - $prediction->actual_value[$key];
+                if (isset($prediction->actual_value[$key]) && is_numeric($value) && is_numeric($prediction->actual_value[$key])) {
+                    $actualVal = (float) $prediction->actual_value[$key];
+                    $error = (float) $value - $actualVal;
                     $sumSquaredErrors += $error * $error;
                     $count++;
                 }
@@ -159,8 +160,8 @@ class ModelRetrainingService
 
         foreach ($predictions as $prediction) {
             foreach ($prediction->predicted_value as $key => $value) {
-                if (isset($prediction->actual_value[$key]) && is_numeric($value)) {
-                    $sumAbsErrors += abs($value - $prediction->actual_value[$key]);
+                if (isset($prediction->actual_value[$key]) && is_numeric($value) && is_numeric($prediction->actual_value[$key])) {
+                    $sumAbsErrors += abs((float) $value - (float) $prediction->actual_value[$key]);
                     $count++;
                 }
             }
@@ -197,8 +198,8 @@ class ModelRetrainingService
 
         foreach ($predictions as $prediction) {
             foreach ($prediction->predicted_value as $key => $value) {
-                if (isset($prediction->actual_value[$key]) && is_numeric($value) && $prediction->actual_value[$key] != 0) {
-                    $percentError = abs(($value - $prediction->actual_value[$key]) / $prediction->actual_value[$key]) * 100;
+                if (isset($prediction->actual_value[$key]) && is_numeric($value) && is_numeric($prediction->actual_value[$key]) && $prediction->actual_value[$key] != 0) {
+                    $percentError = abs(((float) $value - (float) $prediction->actual_value[$key]) / (float) $prediction->actual_value[$key]) * 100;
                     $sumPercentErrors += $percentError;
                     $count++;
                 }
@@ -228,6 +229,7 @@ class ModelRetrainingService
         $metrics = [];
 
         foreach ($types as $type) {
+            /** @var string $type */
             $predictions = TrainingPrediction::query()
                 ->where('model_version', $modelVersion)
                 ->where('prediction_type', $type)
@@ -272,7 +274,10 @@ class ModelRetrainingService
      */
     public function getActiveModelVersion(): string
     {
-        return Cache::get(self::CACHE_PREFIX.'active_version', 'v1.0');
+        /** @var string $version */
+        $version = Cache::get(self::CACHE_PREFIX.'active_version', 'v1.0');
+
+        return $version;
     }
 
     /**

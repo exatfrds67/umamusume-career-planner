@@ -52,7 +52,9 @@ class ComparisonReportService
         foreach ($statNames as $stat) {
             $comparison[$stat] = [];
             foreach ($results as $index => $result) {
-                $comparison[$stat][$index] = $result['final_stats'][$stat] ?? 0;
+                /** @var array<string, int> $finalStats */
+                $finalStats = $result['final_stats'] ?? [];
+                $comparison[$stat][$index] = $finalStats[$stat] ?? 0;
             }
         }
 
@@ -103,7 +105,9 @@ class ComparisonReportService
     {
         $ranked = [];
         foreach ($results as $index => $result) {
-            $ranked[$index] = array_sum($result['final_stats'] ?? []);
+            /** @var array<string, int> $finalStats */
+            $finalStats = $result['final_stats'] ?? [];
+            $ranked[$index] = array_sum($finalStats);
         }
 
         arsort($ranked);
@@ -122,14 +126,21 @@ class ComparisonReportService
     {
         $scores = [];
 
-        $maxWinRate = max(array_column($results, 'win_rate')) ?: 1;
-        $maxEfficiency = max(array_column($results, 'efficiency_score')) ?: 1;
-        $maxSp = max(array_column($results, 'sp_earned')) ?: 1;
+        /** @var array<int, float|int> $winRateCol */
+        $winRateCol = array_column($results, 'win_rate');
+        /** @var array<int, float|int> $efficiencyCol */
+        $efficiencyCol = array_column($results, 'efficiency_score');
+        /** @var array<int, float|int> $spCol */
+        $spCol = array_column($results, 'sp_earned');
+
+        $maxWinRate = (float) (max($winRateCol) ?: 1);
+        $maxEfficiency = (float) (max($efficiencyCol) ?: 1);
+        $maxSp = (float) (max($spCol) ?: 1);
 
         foreach ($results as $index => $result) {
-            $normalizedWin = ($result['win_rate'] ?? 0) / $maxWinRate;
-            $normalizedEfficiency = ($result['efficiency_score'] ?? 0) / $maxEfficiency;
-            $normalizedSp = ($result['sp_earned'] ?? 0) / $maxSp;
+            $normalizedWin = (float) ($result['win_rate'] ?? 0) / $maxWinRate;
+            $normalizedEfficiency = (float) ($result['efficiency_score'] ?? 0) / $maxEfficiency;
+            $normalizedSp = (float) ($result['sp_earned'] ?? 0) / $maxSp;
 
             $scores[$index] = ($normalizedWin * 0.4) + ($normalizedEfficiency * 0.3) + ($normalizedSp * 0.3);
         }
@@ -152,16 +163,18 @@ class ComparisonReportService
         $bestIndex = $this->determineBestScenario($results);
 
         foreach ($results as $index => $result) {
-            $focus = $scenarios[$index]['parameters']['training_focus'] ?? 'balanced';
+            $focus = (string) ($scenarios[$index]['parameters']['training_focus'] ?? 'balanced');
 
             if ($index === $bestIndex) {
-                $recommendations[$index] = "Best overall scenario. Focus: {$focus}. Win rate: {$result['win_rate']}%, Efficiency: {$result['efficiency_score']}.";
+                $winRate = (string) ($result['win_rate'] ?? 0);
+                $efficiencyScore = (string) ($result['efficiency_score'] ?? 0);
+                $recommendations[$index] = "Best overall scenario. Focus: {$focus}. Win rate: {$winRate}%, Efficiency: {$efficiencyScore}.";
 
                 continue;
             }
 
-            $winDiff = $results[$bestIndex]['win_rate'] - $result['win_rate'];
-            $effDiff = $results[$bestIndex]['efficiency_score'] - $result['efficiency_score'];
+            $winDiff = (float) ($results[$bestIndex]['win_rate'] ?? 0) - (float) ($result['win_rate'] ?? 0);
+            $effDiff = (float) ($results[$bestIndex]['efficiency_score'] ?? 0) - (float) ($result['efficiency_score'] ?? 0);
 
             $issues = [];
             if ($winDiff > 5) {
@@ -189,8 +202,11 @@ class ComparisonReportService
      */
     protected function buildSummary(array $results): array
     {
+        /** @var array<int, float> $winRates */
         $winRates = array_column($results, 'win_rate');
+        /** @var array<int, float> $efficiencies */
         $efficiencies = array_column($results, 'efficiency_score');
+        /** @var array<int, int> $spValues */
         $spValues = array_column($results, 'sp_earned');
 
         return [

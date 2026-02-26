@@ -53,7 +53,8 @@ class PatternRecognitionService
      */
     public function extractStatVectors(Collection $careers): Collection
     {
-        return $careers->map(function (Career $career) {
+        /** @var Collection<int, array{id: int, vector: array<string, float>}> $result */
+        $result = $careers->map(function (Career $career) {
             return [
                 'id' => $career->id,
                 'vector' => [
@@ -65,6 +66,8 @@ class PatternRecognitionService
                 ],
             ];
         })->values();
+
+        return $result;
     }
 
     /**
@@ -95,7 +98,9 @@ class PatternRecognitionService
             $members = [];
             foreach ($assignments as $pointIndex => $clusterIndex) {
                 if ($clusterIndex === $i) {
-                    $members[] = $dataPoints[$pointIndex]['id'];
+                    /** @var array{id: int, vector: array<string, float>} $point */
+                    $point = $dataPoints[$pointIndex];
+                    $members[] = $point['id'];
                 }
             }
 
@@ -123,7 +128,9 @@ class PatternRecognitionService
     {
         $centroids = [];
         $firstIndex = array_rand($dataPoints->toArray());
-        $centroids[] = $dataPoints[$firstIndex]['vector'];
+        /** @var array{id: int, vector: array<string, float>} $firstPoint */
+        $firstPoint = $dataPoints[$firstIndex];
+        $centroids[] = $firstPoint['vector'];
 
         for ($i = 1; $i < $k; $i++) {
             $distances = $dataPoints->map(function ($point) use ($centroids) {
@@ -138,17 +145,21 @@ class PatternRecognitionService
 
             $totalDistance = $distances->sum();
             if ($totalDistance == 0) {
-                $centroids[] = $dataPoints[array_rand($dataPoints->toArray())]['vector'];
+                /** @var array{id: int, vector: array<string, float>} $randPoint */
+                $randPoint = $dataPoints[array_rand($dataPoints->toArray())];
+                $centroids[] = $randPoint['vector'];
 
                 continue;
             }
 
-            $threshold = mt_rand() / mt_getrandmax() * $totalDistance;
-            $cumulative = 0;
+            $threshold = mt_rand() / mt_getrandmax() * (float) $totalDistance;
+            $cumulative = 0.0;
             foreach ($distances as $index => $distance) {
-                $cumulative += $distance;
+                $cumulative += (float) $distance;
                 if ($cumulative >= $threshold) {
-                    $centroids[] = $dataPoints[$index]['vector'];
+                    /** @var array{id: int, vector: array<string, float>} $selectedPoint */
+                    $selectedPoint = $dataPoints[$index];
+                    $centroids[] = $selectedPoint['vector'];
                     break;
                 }
             }
@@ -202,7 +213,12 @@ class PatternRecognitionService
             $clusterPoints = collect($assignments)
                 ->filter(fn ($cluster) => $cluster === $i)
                 ->keys()
-                ->map(fn ($index) => $dataPoints[$index]['vector']);
+                ->map(function ($index) use ($dataPoints) {
+                    /** @var array{id: int, vector: array<string, float>} $dp */
+                    $dp = $dataPoints[$index];
+
+                    return $dp['vector'];
+                });
 
             if ($clusterPoints->isEmpty()) {
                 $centroids[$i] = array_fill_keys($statKeys, 0.0);
@@ -212,7 +228,7 @@ class PatternRecognitionService
 
             $centroid = [];
             foreach ($statKeys as $key) {
-                $centroid[$key] = $clusterPoints->avg($key);
+                $centroid[$key] = (float) $clusterPoints->avg($key);
             }
             $centroids[$i] = $centroid;
         }
@@ -290,7 +306,8 @@ class PatternRecognitionService
      */
     private function buildTransactions(Collection $careers): array
     {
-        return $careers->map(function (Career $career) {
+        /** @var array<int, array<int, string>> $result */
+        $result = $careers->map(function (Career $career) {
             $items = [];
 
             $items[] = 'scenario:'.($career->scenario_type ?? 'unknown');
@@ -329,6 +346,8 @@ class PatternRecognitionService
 
             return $items;
         })->toArray();
+
+        return $result;
     }
 
     /**
@@ -497,15 +516,18 @@ class PatternRecognitionService
             ->orderBy('turn_number')
             ->get();
 
+        /** @var array<string, int> $trainingTypeCounts */
         $trainingTypeCounts = $sessions->groupBy('training_type')
             ->map->count()
             ->sortDesc()
             ->toArray();
 
+        /** @var array<string, array<string, int>> $phasePatterns */
         $phasePatterns = $sessions->groupBy('career_phase')
             ->map(fn (Collection $group) => $group->groupBy('training_type')->map->count()->toArray())
             ->toArray();
 
+        /** @var array<string, float> $efficiencyByType */
         $efficiencyByType = $sessions->groupBy('training_type')
             ->map(fn (Collection $group) => round($group->avg('training_efficiency') ?? 0, 2))
             ->toArray();

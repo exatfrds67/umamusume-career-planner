@@ -427,6 +427,7 @@ class BedrockService
 
                     // Test connectivity with a lightweight API call
                     // ListFoundationModels with maxResults=1 to minimize network overhead
+                    // @phpstan-ignore method.notFound
                     $this->client->listFoundationModels(['maxResults' => 1]);
 
                     return true;

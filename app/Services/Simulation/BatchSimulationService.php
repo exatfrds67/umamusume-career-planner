@@ -136,11 +136,14 @@ class BatchSimulationService
     /**
      * Get batch data.
      *
-     * @return array<string, mixed>|null
+     * @return array{batch_id: string, user_id: int, scenario_count: int, scenarios: array<int, array{target_stats: array{speed: int, stamina: int, power: int, guts: int, wit: int}, parameters: array{training_focus: string, support_deck_bonus: float, scenario_type: string}}>, results: array<int, array<string, mixed>>, completed: int, failed: int, status: string, created_at: string}|null
      */
     public function getBatch(string $batchId): ?array
     {
-        return Cache::get("simulation_batch:{$batchId}");
+        /** @var array{batch_id: string, user_id: int, scenario_count: int, scenarios: array<int, array{target_stats: array{speed: int, stamina: int, power: int, guts: int, wit: int}, parameters: array{training_focus: string, support_deck_bonus: float, scenario_type: string}}>, results: array<int, array<string, mixed>>, completed: int, failed: int, status: string, created_at: string}|null $data */
+        $data = Cache::get("simulation_batch:{$batchId}");
+
+        return $data;
     }
 
     /**

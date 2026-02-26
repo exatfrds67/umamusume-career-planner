@@ -23,8 +23,8 @@ class OfflineSyncService
     /**
      * Sync a batch of offline operations for a user.
      *
-     * @param  array<int, array{type: string, endpoint: string, method: string, data: array, entity_id: string|null, timestamp: int}>  $operations
-     * @return array{processed: int, succeeded: int, failed: int, conflicts: array, errors: array}
+     * @param  array<int, array{type: string, endpoint: string, method: string, data: array<string, mixed>, entity_id: string|null, timestamp: int}>  $operations
+     * @return array{processed: int, succeeded: int, failed: int, conflicts: array<int, array<string, mixed>>, errors: array<int, array<string, mixed>>}
      */
     public function syncBatch(User $user, array $operations): array
     {
@@ -75,8 +75,8 @@ class OfflineSyncService
      * A conflict exists when the same record was modified on the server
      * after the offline operation was created.
      *
-     * @param  array{type: string, entity_id: string|null, timestamp: int, data: array}  $operation
-     * @return array{entity_id: string, type: string, server_updated_at: string, offline_timestamp: int, server_data: array, offline_data: array}|null
+     * @param  array{type: string, entity_id: string|null, timestamp: int, data: array<string, mixed>}  $operation
+     * @return array{entity_id: string, type: string, server_updated_at: string, offline_timestamp: int, server_data: array<string, mixed>, offline_data: array<string, mixed>}|null
      */
     public function detectConflict(User $user, array $operation): ?array
     {
@@ -115,7 +115,7 @@ class OfflineSyncService
     /**
      * Process a single sync operation.
      *
-     * @param  array{type: string, endpoint: string, method: string, data: array, entity_id: string|null}  $operation
+     * @param  array{type: string, endpoint: string, method: string, data: array<string, mixed>, entity_id: string|null}  $operation
      */
     public function processOperation(User $user, array $operation): void
     {
@@ -132,7 +132,7 @@ class OfflineSyncService
     /**
      * Resolve a conflict by applying the chosen strategy.
      *
-     * @param  array{entity_id: string, offline_data: array}  $conflict
+     * @param  array{entity_id: string, offline_data: array<string, mixed>}  $conflict
      * @param  string  $strategy  One of: server_wins, client_wins, merge
      * @return array{resolved: bool, strategy: string, entity_id: string}
      */
@@ -156,6 +156,8 @@ class OfflineSyncService
 
     /**
      * Handle a create operation.
+     *
+     * @param  array<string, mixed>  $data
      */
     private function handleCreate(User $user, array $data): void
     {
@@ -174,6 +176,8 @@ class OfflineSyncService
 
     /**
      * Handle an update operation.
+     *
+     * @param  array<string, mixed>  $data
      */
     private function handleUpdate(User $user, string $entityId, array $data): void
     {
@@ -203,6 +207,8 @@ class OfflineSyncService
     /**
      * Handle a merge operation (combine offline and server data).
      * Offline data overwrites only non-null fields.
+     *
+     * @param  array<string, mixed>  $offlineData
      */
     private function handleMerge(User $user, string $entityId, array $offlineData): void
     {

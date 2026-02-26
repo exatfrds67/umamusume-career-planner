@@ -729,7 +729,7 @@ class AIDashboardService
     /**
      * Calculate average confidence from conversations
      *
-     * @param  \Illuminate\Support\Collection<int, \App\Models\AIConversation>  $conversations
+     * @param  \Illuminate\Support\Collection<int, mixed>  $conversations
      */
     protected function calculateAverageConfidenceFromConversations($conversations): float
     {

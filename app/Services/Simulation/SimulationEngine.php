@@ -88,6 +88,8 @@ class SimulationEngine
 
     /**
      * Calculate SP earned based on final stats and turns.
+     *
+     * @param  array<string, mixed>  $stats
      */
     protected function calculateSpEarned(array $stats, int $turns): int
     {

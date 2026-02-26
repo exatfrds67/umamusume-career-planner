@@ -70,7 +70,7 @@ class DataExportService
         $data = $this->generateExport($user);
         $filename = "privacy-exports/user-{$user->id}-".now()->format('Y-m-d-His').'.json';
 
-        Storage::put($filename, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        Storage::put($filename, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) ?: '');
 
         return $filename;
     }
@@ -145,7 +145,7 @@ class DataExportService
             'granted' => $record->granted,
             'granted_at' => $record->granted_at?->toIso8601String(),
             'revoked_at' => $record->revoked_at?->toIso8601String(),
-            'created_at' => $record->created_at?->toIso8601String(),
+            'created_at' => $record->created_at->toIso8601String(),
         ])->values()->all();
     }
 
@@ -157,8 +157,8 @@ class DataExportService
         return $user->deletionRequests->map(fn ($request) => [
             'status' => $request->status->value,
             'reason' => $request->reason,
-            'grace_period_ends_at' => $request->grace_period_ends_at?->toIso8601String(),
-            'created_at' => $request->created_at?->toIso8601String(),
+            'grace_period_ends_at' => $request->grace_period_ends_at->toIso8601String(),
+            'created_at' => $request->created_at->toIso8601String(),
         ])->values()->all();
     }
 
