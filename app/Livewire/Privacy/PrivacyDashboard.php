@@ -34,7 +34,11 @@ class PrivacyDashboard extends Component
     public function mount(): void
     {
         $consentService = app(ConsentManagementService::class);
-        $this->consents = $consentService->getConsentStatus(auth()->user());
+        $user = auth()->user();
+        if ($user === null) {
+            return;
+        }
+        $this->consents = $consentService->getConsentStatus($user);
     }
 
     /**
@@ -49,6 +53,10 @@ class PrivacyDashboard extends Component
 
         $consentService = app(ConsentManagementService::class);
         $user = auth()->user();
+
+        if ($user === null) {
+            return;
+        }
 
         $currentValue = $this->consents[$consentType] ?? false;
 
@@ -69,7 +77,11 @@ class PrivacyDashboard extends Component
     public function exportData(): void
     {
         $exportService = app(DataExportService::class);
-        $this->exportPath = $exportService->generateExportFile(auth()->user());
+        $user = auth()->user();
+        if ($user === null) {
+            return;
+        }
+        $this->exportPath = $exportService->generateExportFile($user);
         $this->exportReady = true;
         $this->setStatus('Your data export is ready for download.', 'success');
     }
@@ -113,6 +125,10 @@ class PrivacyDashboard extends Component
         $deletionService = app(DataDeletionService::class);
         $user = auth()->user();
 
+        if ($user === null) {
+            return;
+        }
+
         if ($deletionService->hasPendingDeletion($user)) {
             $this->setStatus('You already have a pending deletion request.', 'warning');
             $this->showDeletionConfirm = false;
@@ -135,6 +151,10 @@ class PrivacyDashboard extends Component
         $deletionService = app(DataDeletionService::class);
         $user = auth()->user();
 
+        if ($user === null) {
+            return;
+        }
+
         $request = $deletionService->getActiveDeletionRequest($user);
 
         if (! $request) {
@@ -150,6 +170,9 @@ class PrivacyDashboard extends Component
     public function render(): View
     {
         $user = auth()->user();
+        if ($user === null) {
+            abort(401);
+        }
         $deletionService = app(DataDeletionService::class);
 
         $activeDeletion = $deletionService->getActiveDeletionRequest($user);

@@ -60,13 +60,16 @@ class PatternDashboard extends Component
             return;
         }
 
-        $this->selectedCareerIds = $user->characters()
-            ->with(['careers' => fn ($q) => $q->where('status', 'completed')->latest()->limit(10)])
-            ->get()
-            ->pluck('careers')
-            ->flatten()
-            ->pluck('id')
-            ->toArray();
+        $this->selectedCareerIds = array_map(
+            'intval',
+            $user->characters()
+                ->with(['careers' => fn ($q) => $q->where('status', 'completed')->latest()->limit(10)])
+                ->get()
+                ->pluck('careers')
+                ->flatten()
+                ->pluck('id')
+                ->toArray()
+        );
     }
 
     public function analyzePatterns(): void
@@ -118,7 +121,7 @@ class PatternDashboard extends Component
                 ->map(fn ($career) => [
                     'id' => $career->id,
                     'name' => $career->career_name ?? "Career #{$career->id}",
-                    'character' => $career->character?->name ?? 'Unknown',
+                    'character' => $career->character->name ?? 'Unknown',
                     'scenario' => $career->scenario_type ?? 'Unknown',
                 ])
                 ->toArray();

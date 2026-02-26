@@ -44,10 +44,12 @@ class AccessibilitySettings extends Component
 
             $this->reducedMotion = (bool) ($settings['reduced_motion'] ?? false);
             $this->highContrast = (bool) ($settings['high_contrast'] ?? false);
-            $this->fontSize = (string) ($settings['font_size'] ?? 'medium');
+            $fontSizeRaw = $settings['font_size'] ?? 'medium';
+            $this->fontSize = is_string($fontSizeRaw) ? $fontSizeRaw : 'medium';
             $this->focusIndicators = (bool) ($settings['focus_indicators'] ?? true);
             $this->screenReaderOptimization = (bool) ($settings['screen_reader_optimization'] ?? false);
-            $this->colorBlindMode = (string) ($settings['color_blind_mode'] ?? 'none');
+            $colorBlindRaw = $settings['color_blind_mode'] ?? 'none';
+            $this->colorBlindMode = is_string($colorBlindRaw) ? $colorBlindRaw : 'none';
         }
     }
 
@@ -92,14 +94,14 @@ class AccessibilitySettings extends Component
             return;
         }
 
-        $user->accessibility_settings = [
+        $user->accessibility_settings = new \ArrayObject([
             'reduced_motion' => $this->reducedMotion,
             'high_contrast' => $this->highContrast,
             'font_size' => $this->fontSize,
             'focus_indicators' => $this->focusIndicators,
             'screen_reader_optimization' => $this->screenReaderOptimization,
             'color_blind_mode' => $this->colorBlindMode,
-        ];
+        ]);
 
         $user->save();
 
