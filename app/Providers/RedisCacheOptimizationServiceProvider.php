@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\ServiceProvider;
@@ -27,8 +26,7 @@ class RedisCacheOptimizationServiceProvider extends ServiceProvider
     {
         // Only proceed if Redis is configured and available
         if (! $this->isRedisConfigured()) {
-            Log::debug('Redis cache optimization provider skipped - Redis not configured or available');
-
+            // Redis not configured - skip optimization silently (expected in dev/local environments)
             return;
         }
 

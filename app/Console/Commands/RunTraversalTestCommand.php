@@ -90,12 +90,12 @@ class RunTraversalTestCommand extends Command
     /**
      * Build the test command based on options.
      */
-    private function buildTestCommand(string $scope, string $headless): string
+    private function buildTestCommand(?string $scope, ?string $headless): string
     {
         $baseCommand = 'php artisan test tests/Browser/ComprehensiveTraversalTest.php --compact';
 
         // Add scope filter if not 'all'
-        if ($scope !== 'all') {
+        if ($scope !== null && $scope !== 'all') {
             $baseCommand .= " --group={$scope}";
         }
 

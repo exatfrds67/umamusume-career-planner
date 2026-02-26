@@ -31,8 +31,7 @@ class DeletionConfirmationNotification extends Notification implements ShouldQue
     }
 
     public function toMail(object $notifiable): MailMessage
-    {
-        $gracePeriodEnd = $this->deletionRequest->grace_period_ends_at->format('F j, Y');
+    {        /** @var \App\Models\User $notifiable */ $gracePeriodEnd = $this->deletionRequest->grace_period_ends_at->format('F j, Y');
 
         return (new MailMessage)
             ->subject('Account Deletion Request Confirmation')
