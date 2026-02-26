@@ -44,8 +44,11 @@
         <div class="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-200 dark:lg:bg-gray-700" aria-hidden="true"></div>
 
         <!-- Profile dropdown -->
-        <div x-data="{ open: false }" class="relative z-20" @keydown.escape.window="open = false">
-            <button type="button" class="-m-1.5 flex items-center p-1.5" id="user-menu-btn" @click="open = !open"
+        <div x-data="{ open: false }" class="relative z-20" 
+            @keydown.escape.window="open = false"
+            @popover-opened.window="if ($event.detail !== 'user-menu') open = false">
+            <button type="button" class="-m-1.5 flex items-center p-1.5" id="user-menu-btn" 
+                @click="open = !open; if(open) $dispatch('popover-opened', 'user-menu')"
                 @click.away="open = false">
                 <span class="sr-only">Open user menu</span>
                 <img class="h-8 w-8 rounded-full bg-gray-50"

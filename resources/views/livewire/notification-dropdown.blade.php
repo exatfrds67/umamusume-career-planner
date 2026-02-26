@@ -1,7 +1,9 @@
 <div class="relative" x-data="{ open: @entangle('isOpen') }" @click.away="open = false; $wire.closeDropdown()"
-    @keydown.escape.window="open = false; $wire.closeDropdown()">
+    @keydown.escape.window="open = false; $wire.closeDropdown()"
+    @popover-opened.window="if ($event.detail !== 'notifications' && open) { open = false; $wire.closeDropdown(); }">
     {{-- Notification Bell Button --}}
     <button type="button" id="notification-btn" wire:click="toggleDropdown"
+        x-on:click="$dispatch('popover-opened', 'notifications')"
         class="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500 dark:text-gray-300 dark:hover:text-gray-100 transition-colors duration-200 relative"
         aria-label="View notifications" :aria-expanded="open.toString()">
         <span class="sr-only">View notifications</span>
@@ -32,8 +34,7 @@
         <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-700">
             <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Notifications</h3>
             @if ($this->unreadCount > 0)
-                <button wire:click="markAllAsRead"
-                    class="text-xs text-primary-600 dark:text-primary-400 hover:underline">
+                <button wire:click="markAllAsRead" class="text-xs text-primary-600 dark:text-primary-400 hover:underline">
                     Mark all read
                 </button>
             @endif

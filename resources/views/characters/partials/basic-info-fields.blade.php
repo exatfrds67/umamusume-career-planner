@@ -48,11 +48,11 @@
                                         @keydown.arrow-left.prevent="moveImage(-5, 0)"
                                         @keydown.arrow-right.prevent="moveImage(5, 0)">
                                         <!-- Base image layer - fills entire container, positioned behind mask -->
-                                        <div x-show="formData.avatar_preview" class="absolute inset-0"
+                                        <div x-show="formData.avatar_preview" x-cloak class="absolute inset-0"
                                             :style="`transform: translate(${formData.imageX}px, ${formData.imageY}px);`">
                                             <img :src="formData.avatar_preview" alt="Avatar preview"
-                                                loading="lazy" decoding="async"
-                                                class="w-full h-full object-cover pointer-events-none"
+                                                loading="lazy" decoding="async" width="256" height="256"
+                                                class="w-full h-full object-cover pointer-events-none origin-center"
                                                 x-on:error="$el.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(formData.name || 'User') + '&background=random'"
                                                 :style="`transform: scale(${formData.imageZoom}) rotate(${formData.imageRotation}deg) scaleX(${formData.imageFlipH ? -1 : 1}); transform-origin: center center;`">
                                         </div>
@@ -130,7 +130,7 @@
                                 </div>
 
                                 <!-- Image Editor Panel -->
-                                <div x-show="formData.avatar_preview"
+                                <div x-show="formData.avatar_preview" x-cloak
                                     class="glass-card-inner border border-gray-200 dark:border-gray-700 rounded-lg">
                                     <div class="card-header">
                                         <h4
@@ -271,7 +271,7 @@
                                             'border-primary-500 ring-2 ring-primary-500' :
                                             'border-gray-300 dark:border-gray-600'">
                                         <img src="{{ $imagePath }}" alt="{{ $imageName }}" loading="lazy"
-                                            decoding="async" class="w-full h-full object-cover">
+                                            decoding="async" width="80" height="80" class="w-full h-full object-cover">
                                         <div
                                             class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                             <span

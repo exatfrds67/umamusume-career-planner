@@ -43,7 +43,7 @@
                                             'border-gray-200 dark:border-gray-700'">
                                         <div class="flex items-start gap-3">
                                             <img :src="trainee.image" :alt="trainee.name"
-                                                loading="lazy" decoding="async"
+                                                loading="lazy" decoding="async" width="64" height="64"
                                                 x-on:error="$el.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(trainee.name) + '&background=random&color=fff'"
                                                 class="w-16 h-16 rounded-lg object-cover border border-gray-200 dark:border-gray-700">
                                             <div class="flex-1">

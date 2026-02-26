@@ -602,7 +602,7 @@
                                             <div class="absolute inset-0"
                                                 :style="`transform: translate(${formData.imageX}px, ${formData.imageY}px);`">
                                                 <img :src="formData.avatar_preview" alt="Character avatar" loading="lazy"
-                                                    decoding="async" class="w-full h-full object-cover"
+                                                    decoding="async" width="256" height="256" class="w-full h-full object-cover"
                                                     x-on:error="$el.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(formData.name || 'User') + '&background=random'"
                                                     :style="`transform: scale(${formData.imageZoom}) rotate(${formData.imageRotation}deg) scaleX(${formData.imageFlipH ? -1 : 1}); transform-origin: center center;`">
                                             </div>
@@ -712,15 +712,18 @@
         </form>
     </div>
 
+    <script id="page-data" type="application/json">
+        {!! json_encode([
+            'trainees' => $trainees ?? [],
+            'routes' => [
+                'store' => route('characters.store')
+            ],
+            'externalPrefill' => $externalPrefill ?? null
+        ]) !!}
+    </script>
     <script>
-        // Page data for Alpine.js component
-        window.pageData = {
-            trainees: @json($trainees ?? []),
-            routes: {
-                store: "{{ route('characters.store') }}"
-            },
-            externalPrefill: @json($externalPrefill ?? null)
-        };
+        // Parse page data for Alpine.js component without triggering VS Code JS linter errors
+        window.pageData = JSON.parse(document.getElementById('page-data').textContent);
     </script>
     @vite(['resources/js/pages/characters/create.js'])
 @endsection
