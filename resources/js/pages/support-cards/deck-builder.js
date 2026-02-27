@@ -3,8 +3,11 @@
  * Handles deck building functionality for support cards
  */
 
-// Access data from window.deckBuilderData (injected by Blade)
-const { deck, availableCards, characterId } = window.deckBuilderData || {};
+// Parse data from JSON data island injected by Blade
+const dataElement = document.getElementById("deck-builder-data");
+const { deck, availableCards, characterId } = dataElement
+    ? JSON.parse(dataElement.textContent)
+    : {};
 
 // Initialize Alpine component
 document.addEventListener("alpine:init", () => {

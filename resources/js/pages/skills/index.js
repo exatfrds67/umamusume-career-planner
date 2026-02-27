@@ -3,8 +3,11 @@
  * Handles skill inventory, acquisition, hints, evolution, and AI recommendations
  */
 
-// Access data from window.skillsData (injected by Blade)
-const { isAdmin, preSelectedCharacterId } = window.skillsData || {};
+// Parse data from JSON data island injected by Blade
+const dataElement = document.getElementById("skills-data");
+const { isAdmin, preSelectedCharacterId } = dataElement
+    ? JSON.parse(dataElement.textContent)
+    : {};
 
 // Initialize Alpine component
 document.addEventListener("alpine:init", () => {

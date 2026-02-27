@@ -11,7 +11,10 @@
 // Uses window.Alpine set by app.js (Livewire-bundled Alpine instance)
 document.addEventListener("alpine:init", () => {
     Alpine.data("settingsData", () => {
-        const serverData = window.pageData?.settings || {};
+        const dataElement = document.getElementById("settings-data");
+        const serverData = dataElement
+            ? JSON.parse(dataElement.textContent)
+            : {};
         const user = serverData.user || {};
         const prefs = serverData.prefs || {};
         const accessSettings = serverData.accessSettings || {};
@@ -34,8 +37,7 @@ document.addEventListener("alpine:init", () => {
             timezone: prefs.timezone || "Asia/Tokyo",
 
             // Appearance
-            theme:
-                localStorage.getItem("theme") || prefs.theme || "system",
+            theme: localStorage.getItem("theme") || prefs.theme || "system",
             fontSize: prefs.font_size || 100,
 
             // Password modal
@@ -59,15 +61,11 @@ document.addEventListener("alpine:init", () => {
                     "compact-mode": prefs.compact_mode ?? false,
                     animations: prefs.animations ?? true,
                     "show-model": aiSettings.show_model ?? true,
-                    "high-contrast":
-                        accessSettings.high_contrast ?? false,
-                    "reduced-motion":
-                        accessSettings.reduced_motion ?? false,
+                    "high-contrast": accessSettings.high_contrast ?? false,
+                    "reduced-motion": accessSettings.reduced_motion ?? false,
                     "screen-reader-opt":
-                        accessSettings.screen_reader_optimization ??
-                        false,
-                    "training-notif":
-                        notifPrefs.training_alerts ?? true,
+                        accessSettings.screen_reader_optimization ?? false,
+                    "training-notif": notifPrefs.training_alerts ?? true,
                     "race-notif": notifPrefs.race_reminders ?? true,
                     "goal-notif": notifPrefs.goal_progress ?? true,
                     "budget-notif": notifPrefs.budget_alerts ?? true,
@@ -87,16 +85,11 @@ document.addEventListener("alpine:init", () => {
                     if (!btn) {
                         return;
                     }
-                    const thumb = btn.querySelector(
-                        '[aria-hidden="true"]',
-                    );
+                    const thumb = btn.querySelector('[aria-hidden="true"]');
                     btn.setAttribute("aria-checked", String(isOn));
                     if (isOn) {
                         btn.classList.add("bg-primary-600");
-                        btn.classList.remove(
-                            "bg-gray-200",
-                            "dark:bg-gray-600",
-                        );
+                        btn.classList.remove("bg-gray-200", "dark:bg-gray-600");
                         if (thumb) {
                             thumb.classList.add("translate-x-5");
                             thumb.classList.remove("translate-x-0");
@@ -117,12 +110,9 @@ document.addEventListener("alpine:init", () => {
                     if (!btn) {
                         return;
                     }
-                    const isOn =
-                        btn.getAttribute("aria-checked") === "true";
+                    const isOn = btn.getAttribute("aria-checked") === "true";
                     btn.setAttribute("aria-checked", String(!isOn));
-                    const thumb = btn.querySelector(
-                        '[aria-hidden="true"]',
-                    );
+                    const thumb = btn.querySelector('[aria-hidden="true"]');
                     if (isOn) {
                         btn.classList.remove("bg-primary-600");
                         btn.classList.add("bg-gray-200");
@@ -165,18 +155,14 @@ document.addEventListener("alpine:init", () => {
                     if (prefersDark) {
                         document.documentElement.classList.add("dark");
                     } else {
-                        document.documentElement.classList.remove(
-                            "dark",
-                        );
+                        document.documentElement.classList.remove("dark");
                     }
                 } else {
                     localStorage.setItem("theme", t);
                     if (t === "dark") {
                         document.documentElement.classList.add("dark");
                     } else {
-                        document.documentElement.classList.remove(
-                            "dark",
-                        );
+                        document.documentElement.classList.remove("dark");
                     }
                 }
             },
@@ -248,8 +234,7 @@ document.addEventListener("alpine:init", () => {
                     this.saved = true;
                     setTimeout(() => {
                         this.saved = false;
-                        this.savedMessage =
-                            "Settings saved successfully";
+                        this.savedMessage = "Settings saved successfully";
                     }, 3000);
                 } else {
                     const data = await resp.json();
@@ -283,28 +268,22 @@ document.addEventListener("alpine:init", () => {
                     sp_budget_alerts: toggles["sp-budget"] ?? true,
                     lazy_loading: toggles["lazy-loading"] ?? true,
                     debug_mode: toggles["debug-mode"] ?? false,
-                    error_reporting:
-                        toggles["error-reporting"] ?? false,
+                    error_reporting: toggles["error-reporting"] ?? false,
                 };
 
                 const defaultFacilityEl =
                     document.getElementById("default-facility");
-                const cardSortingEl =
-                    document.getElementById("card-sorting");
-                const autoSaveEl =
-                    document.getElementById("auto-save");
+                const cardSortingEl = document.getElementById("card-sorting");
+                const autoSaveEl = document.getElementById("auto-save");
                 const backupFrequencyEl =
                     document.getElementById("backup-frequency");
                 const colorblindModeEl =
                     document.getElementById("colorblind-mode");
-                const quietStartEl =
-                    document.getElementById("quiet-start");
-                const quietEndEl =
-                    document.getElementById("quiet-end");
+                const quietStartEl = document.getElementById("quiet-start");
+                const quietEndEl = document.getElementById("quiet-end");
 
                 if (defaultFacilityEl) {
-                    prefsPayload.default_facility =
-                        defaultFacilityEl.value;
+                    prefsPayload.default_facility = defaultFacilityEl.value;
                 }
                 if (cardSortingEl) {
                     prefsPayload.card_sorting = cardSortingEl.value;
@@ -313,31 +292,22 @@ document.addEventListener("alpine:init", () => {
                     prefsPayload.auto_save = autoSaveEl.value;
                 }
                 if (backupFrequencyEl) {
-                    prefsPayload.backup_frequency =
-                        backupFrequencyEl.value;
+                    prefsPayload.backup_frequency = backupFrequencyEl.value;
                 }
 
-                const aiProviderEl =
-                    document.getElementById("ai-provider");
-                const aiModelEl =
-                    document.getElementById("ai-model");
+                const aiProviderEl = document.getElementById("ai-provider");
+                const aiModelEl = document.getElementById("ai-model");
                 const recFrequencyEl = document.getElementById(
                     "recommendation-frequency",
                 );
-                const explanationDetailEl = document.getElementById(
-                    "explanation-detail",
-                );
-                const dailyLimitEl =
-                    document.getElementById("daily-limit");
-                const weeklyLimitEl =
-                    document.getElementById("weekly-limit");
-                const monthlyLimitEl =
-                    document.getElementById("monthly-limit");
+                const explanationDetailEl =
+                    document.getElementById("explanation-detail");
+                const dailyLimitEl = document.getElementById("daily-limit");
+                const weeklyLimitEl = document.getElementById("weekly-limit");
+                const monthlyLimitEl = document.getElementById("monthly-limit");
 
                 const aiSettingsPayload = {
-                    provider: aiProviderEl
-                        ? aiProviderEl.value
-                        : "ollama",
+                    provider: aiProviderEl ? aiProviderEl.value : "ollama",
                     model: aiModelEl ? aiModelEl.value : "llama3.3",
                     recommendation_frequency: recFrequencyEl
                         ? recFrequencyEl.value
@@ -366,10 +336,8 @@ document.addEventListener("alpine:init", () => {
                     : "none";
 
                 const accessibilitySettingsPayload = {
-                    high_contrast:
-                        toggles["high-contrast"] ?? false,
-                    reduced_motion:
-                        toggles["reduced-motion"] ?? false,
+                    high_contrast: toggles["high-contrast"] ?? false,
+                    reduced_motion: toggles["reduced-motion"] ?? false,
                     screen_reader_optimization:
                         toggles["screen-reader-opt"] ?? false,
                     color_blind_mode: [
@@ -383,8 +351,7 @@ document.addEventListener("alpine:init", () => {
                 };
 
                 const notificationPreferencesPayload = {
-                    training_alerts:
-                        toggles["training-notif"] ?? true,
+                    training_alerts: toggles["training-notif"] ?? true,
                     race_reminders: toggles["race-notif"] ?? true,
                     goal_progress: toggles["goal-notif"] ?? true,
                     budget_alerts: toggles["budget-notif"] ?? true,
@@ -393,9 +360,7 @@ document.addEventListener("alpine:init", () => {
                     quiet_hours_start: quietStartEl
                         ? quietStartEl.value
                         : "22:00",
-                    quiet_hours_end: quietEndEl
-                        ? quietEndEl.value
-                        : "08:00",
+                    quiet_hours_end: quietEndEl ? quietEndEl.value : "08:00",
                 };
 
                 const resp = await fetch("/settings", {
@@ -412,8 +377,7 @@ document.addEventListener("alpine:init", () => {
                         email: this.email,
                         preferences: prefsPayload,
                         ai_settings: aiSettingsPayload,
-                        accessibility_settings:
-                            accessibilitySettingsPayload,
+                        accessibility_settings: accessibilitySettingsPayload,
                         notification_preferences:
                             notificationPreferencesPayload,
                     }),
@@ -463,8 +427,7 @@ document.addEventListener("alpine:init", () => {
                     this.saved = true;
                     setTimeout(() => {
                         this.saved = false;
-                        this.savedMessage =
-                            "Settings saved successfully";
+                        this.savedMessage = "Settings saved successfully";
                     }, 3000);
                 } else {
                     const data = await resp.json();
@@ -529,16 +492,11 @@ document.addEventListener("alpine:init", () => {
                     if (!btn) {
                         return;
                     }
-                    const thumb = btn.querySelector(
-                        '[aria-hidden="true"]',
-                    );
+                    const thumb = btn.querySelector('[aria-hidden="true"]');
                     btn.setAttribute("aria-checked", String(isOn));
                     if (isOn) {
                         btn.classList.add("bg-primary-600");
-                        btn.classList.remove(
-                            "bg-gray-200",
-                            "dark:bg-gray-600",
-                        );
+                        btn.classList.remove("bg-gray-200", "dark:bg-gray-600");
                         if (thumb) {
                             thumb.classList.add("translate-x-5");
                             thumb.classList.remove("translate-x-0");

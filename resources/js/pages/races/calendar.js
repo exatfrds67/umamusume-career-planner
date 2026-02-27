@@ -3,8 +3,9 @@
  * Handles race carousel navigation, filtering, and selection
  */
 
-// Access data from window.raceCalendarData (injected by Blade)
-const { races } = window.raceCalendarData || {};
+// Access data from data island (injected by Blade)
+const dataElement = document.getElementById("race-calendar-data");
+const { races } = dataElement ? JSON.parse(dataElement.textContent) : {};
 
 // Initialize Alpine component
 document.addEventListener("alpine:init", () => {

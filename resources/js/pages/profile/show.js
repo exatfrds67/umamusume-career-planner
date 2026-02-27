@@ -3,6 +3,12 @@
  * Handles tab navigation, avatar upload, and profile settings
  */
 
+// Access data from data island (injected by Blade)
+const profileDataElement = document.getElementById("profile-data");
+const profileData = profileDataElement
+    ? JSON.parse(profileDataElement.textContent)
+    : { routes: {} };
+
 // Uses window.Alpine set by app.js (Livewire-bundled Alpine instance)
 // Register Alpine components on initialization
 document.addEventListener("alpine:init", () => {
@@ -87,19 +93,16 @@ document.addEventListener("alpine:init", () => {
             formData.append("avatar", file);
 
             try {
-                const response = await fetch(
-                    window.pageData.routes.avatarUpload,
-                    {
-                        method: "POST",
-                        headers: {
-                            "X-CSRF-TOKEN": document.querySelector(
-                                'meta[name="csrf-token"]',
-                            ).content,
-                            Accept: "application/json",
-                        },
-                        body: formData,
+                const response = await fetch(profileData.routes.avatarUpload, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRF-TOKEN": document.querySelector(
+                            'meta[name="csrf-token"]',
+                        ).content,
+                        Accept: "application/json",
                     },
-                );
+                    body: formData,
+                });
 
                 const data = await response.json();
 
@@ -139,18 +142,15 @@ document.addEventListener("alpine:init", () => {
             this.error = null;
 
             try {
-                const response = await fetch(
-                    window.pageData.routes.avatarDelete,
-                    {
-                        method: "DELETE",
-                        headers: {
-                            "X-CSRF-TOKEN": document.querySelector(
-                                'meta[name="csrf-token"]',
-                            ).content,
-                            Accept: "application/json",
-                        },
+                const response = await fetch(profileData.routes.avatarDelete, {
+                    method: "DELETE",
+                    headers: {
+                        "X-CSRF-TOKEN": document.querySelector(
+                            'meta[name="csrf-token"]',
+                        ).content,
+                        Accept: "application/json",
                     },
-                );
+                });
 
                 const data = await response.json();
 

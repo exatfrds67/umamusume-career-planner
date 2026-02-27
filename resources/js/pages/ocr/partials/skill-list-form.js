@@ -4,8 +4,10 @@
  */
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Get initial skill count from window.pageData
-    let skillIndex = window.pageData?.initialSkillCount ?? 0;
+    // Get initial skill count from JSON data island
+    const dataEl = document.getElementById("skill-list-form-data");
+    const pageData = dataEl ? JSON.parse(dataEl.textContent) : {};
+    let skillIndex = pageData.initialSkillCount ?? 0;
 
     // Add skill button
     const addButton = document.getElementById("add-skill-button");

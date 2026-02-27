@@ -166,9 +166,14 @@ document.addEventListener("alpine:init", () => {
         },
 
         init() {
-            // Load trainee data from window.pageData
-            if (window.pageData && window.pageData.trainees) {
-                this.trainees = window.pageData.trainees;
+            const dataElement = document.getElementById("page-data");
+            const pageData = dataElement
+                ? JSON.parse(dataElement.textContent)
+                : {};
+
+            // Load trainee data from pageData
+            if (pageData && pageData.trainees) {
+                this.trainees = pageData.trainees;
             }
 
             // Load draft from localStorage
@@ -178,13 +183,12 @@ document.addEventListener("alpine:init", () => {
             setInterval(() => this.saveDraft(), 30000);
 
             // Check for external prefill
-            if (window.pageData && window.pageData.externalPrefill) {
+            if (pageData && pageData.externalPrefill) {
                 this.showExternalPrefillNotice = true;
-                this.formData.name = window.pageData.externalPrefill.name || "";
-                this.formData.avatar_url =
-                    window.pageData.externalPrefill.image || "";
+                this.formData.name = pageData.externalPrefill.name || "";
+                this.formData.avatar_url = pageData.externalPrefill.image || "";
                 this.formData.avatar_preview =
-                    window.pageData.externalPrefill.image || "";
+                    pageData.externalPrefill.image || "";
             }
         },
 

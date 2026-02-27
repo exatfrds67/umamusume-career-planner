@@ -3,8 +3,9 @@
  * Handles real-time monitoring, polling, and health score updates
  */
 
-// Access data from window.apmDashboardData (injected by Blade)
-const { lastUpdated } = window.apmDashboardData || {};
+// Access data from data island (injected by Blade)
+const dataElement = document.getElementById("apm-dashboard-data");
+const { lastUpdated } = dataElement ? JSON.parse(dataElement.textContent) : {};
 
 // Initialize Alpine component
 document.addEventListener("alpine:init", () => {

@@ -21,8 +21,11 @@ document.addEventListener("alpine:init", () => {
 
         // Initialize
         init() {
-            // Load characters from window.charactersData (injected by Blade)
-            this.allCharacters = window.charactersData || [];
+            // Load characters from data island (injected by Blade)
+            const dataElement = document.getElementById("characters-data");
+            this.allCharacters = dataElement
+                ? JSON.parse(dataElement.textContent)
+                : [];
             this.filteredCharacters = [...this.allCharacters];
 
             // Debug: Log character count
