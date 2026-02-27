@@ -65,9 +65,9 @@ describe('Deck Management UI', function () {
             ->get(route('characters.deck-builder', $this->character));
 
         $response->assertOk();
-        // Card names are passed via window.deckBuilderData JSON
+        // Card names are passed via id="deck-builder-data" JSON
         // Check that the deck data is present in the page
-        $response->assertSee('window.deckBuilderData');
+        $response->assertSee('id="deck-builder-data"', false);
         $response->assertSee($card1->name);
         $response->assertSee($card2->name);
         // The deck count is rendered client-side via Alpine.js
